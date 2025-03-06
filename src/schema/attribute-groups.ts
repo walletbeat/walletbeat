@@ -426,9 +426,9 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 				return score === null
 					? null
 					: {
-							score,
-							weight,
-						}
+						score,
+						weight,
+					}
 			}),
 		).filter(score => score !== null)
 		if (isNonEmptyArray(subScores)) {

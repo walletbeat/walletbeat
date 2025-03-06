@@ -15,9 +15,9 @@ import {
 } from '@/types/utils/non-empty'
 import { Box, Typography, Paper, styled, Divider, Tooltip } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { WalletIcon } from '@/components/ui/atoms/WalletIcon'
-import { AnchorHeader } from '@/components/ui/atoms/AnchorHeader'
-import { WalletAttribute } from '@/components/ui/organisms/WalletAttribute'
+import { WalletIcon } from '@/ui/atoms/WalletIcon'
+import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
+import { WalletAttribute } from '@/ui/organisms/WalletAttribute'
 import { blend, ThemeProvider } from '@mui/system'
 import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
 import {
@@ -35,7 +35,7 @@ import {
 	subsectionBorderRadius,
 	subsectionIconWidth,
 } from '@/components/constants'
-import type { NavigationItem } from '@/components/ui/organisms/Navigation'
+import type { NavigationItem } from '@/ui/organisms/Navigation'
 import {
 	navigationAbout,
 	navigationFaq,
@@ -45,7 +45,7 @@ import {
 	scrollPastHeaderPixels,
 } from '@/components/navigation'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { type PickableVariant, VariantPicker } from '@/components/ui/atoms/VariantPicker'
+import { type PickableVariant, VariantPicker } from '@/ui/atoms/VariantPicker'
 import { getSingleVariant, type Variant } from '@/schema/variants'
 import {
 	variantFromUrlQuery,
@@ -56,7 +56,7 @@ import {
 	variantUrlQuery,
 } from '@/components/variants'
 import { VariantSpecificity, type ResolvedWallet } from '@/schema/wallet'
-import { RenderTypographicContent } from '@/components/ui/atoms/RenderTypographicContent'
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { commaListPrefix, slugifyCamelCase } from '@/types/utils/text'
 
 const headerHeight = 80
@@ -197,8 +197,8 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				: `Runs on ${variantToName(variant, false)}`,
 			click: needsVariantFiltering
 				? () => {
-						updatePickedVariant(pickedVariant === variant ? null : variant)
-					}
+					updatePickedVariant(pickedVariant === variant ? null : variant)
+				}
 				: undefined,
 		}),
 	)
@@ -484,11 +484,11 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 								children:
 									section.subsections !== undefined && isNonEmptyArray(section.subsections)
 										? nonEmptyMap(section.subsections, subsection => ({
-												id: sectionHeaderId(subsection),
-												icon: subsection.icon,
-												title: subsection.title,
-												contentId: sectionHeaderId(subsection),
-											}))
+											id: sectionHeaderId(subsection),
+											icon: subsection.icon,
+											title: subsection.title,
+											contentId: sectionHeaderId(subsection),
+										}))
 										: undefined,
 							}),
 						),

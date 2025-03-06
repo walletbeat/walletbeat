@@ -6,8 +6,8 @@ import { betaSiteRoot } from '@/constants'
 import Layout from '../layouts/Layout.astro'
 
 // Components
-import { IconLink } from '@/components/ui/atoms/IconLink.tsx'
-import WalletTable from '@/components/ui/organisms/WalletTable.tsx'
+import { IconLink } from '@/ui/atoms/IconLink'
+import WalletTable from '@/ui/organisms/WalletTable'
 
 import { Box, Typography } from '@mui/material'
 import HelpCenterIcon from '@mui/icons-material/HelpCenter'
@@ -31,17 +31,24 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 			justifyContent="center"
 			px={2}
 		>
-			<Typography variant="h1" fontWeight={600} mt={1} maxWidth="90vw"> Walletbeat </Typography>
+			<Typography
+				variant="h1"
+				fontWeight={600}
+				mt={1}
+				maxWidth="90vw"
+				style={{
+					wordBreak: 'break-word',
+				}}>Walletbeat</Typography
+			>
 			<Typography
 				variant="caption"
 				sx={{
 					fontStyle: 'italic',
 					opacity: 0.75,
+					wordBreak: 'break-word',
 				}}
-				maxWidth="90vw"
+				maxWidth="90vw">Who watches the wallets?</Typography
 			>
-				Who watches the wallets?
-			</Typography>
 			<Typography variant="caption" mt={1} maxWidth="90vw">
 				Beta version; work in progress. Get in touch on Farcaster or GitHub if you wish to
 				contribute.

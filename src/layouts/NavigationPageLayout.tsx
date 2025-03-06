@@ -7,7 +7,7 @@ import {
 	type NavigationGroup,
 	isNavigationContentItem,
 	type NavigationItem,
-} from '@/components/ui/organisms/Navigation'
+} from '@/ui/organisms/Navigation'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 const scrollNavigationMargin = 8

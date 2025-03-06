@@ -1,6 +1,6 @@
 import { Typography, Divider } from '@mui/material'
 import { Box } from '@mui/system'
-import FrequentlyAskedQuestion from '@/components/ui/molecules/FrequentlyAskedQuestion'
+import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion'
 import React from 'react'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
@@ -11,7 +11,7 @@ import {
 	navigationRepository,
 } from '../../components/navigation'
 import { type NonEmptyArray, nonEmptyConcat, nonEmptyMap } from '@/types/utils/non-empty'
-import type { NavigationContentItem } from '../../components/ui/organisms/Navigation'
+import type { NavigationContentItem } from '../../ui/organisms/Navigation'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 
 interface FAQEntry {

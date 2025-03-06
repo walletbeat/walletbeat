@@ -1,4 +1,4 @@
-import type { NavigationLinkItem } from '@/components/ui/organisms/Navigation'
+import type { NavigationLinkItem } from '@/ui/organisms/Navigation'
 import HomeIcon from '@mui/icons-material/Home'
 import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import ForumIcon from '@mui/icons-material/Forum'

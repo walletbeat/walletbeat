@@ -9,8 +9,8 @@ import {
 	navigationHome,
 	navigationRepository,
 } from '@/components/navigation'
-import { ExternalLink } from '@/components/ui/atoms/ExternalLink'
-import { IconLink } from '@/components/ui/atoms/IconLink'
+import { ExternalLink } from '@/ui/atoms/ExternalLink'
+import { IconLink } from '@/ui/atoms/IconLink'
 import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import ForumIcon from '@mui/icons-material/Forum'
 import GitHubIcon from '@mui/icons-material/GitHub'

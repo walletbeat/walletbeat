@@ -59,14 +59,13 @@ function evaluateEoa(eoa: AccountTypeEoa): Evaluation<AccountPortabilityValue> {
 						for deterministic hierarchical key derivation from the binary seed.
 					* [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
 						as a standard when deriving hierarchical private keys.
-					${
-						canExportSeedPhrase
-							? `
+					${canExportSeedPhrase
+						? `
 					In addition, seed phrases are exportable so that they can be
 					imported into other wallets. This ensures your account is portable
 					and avoids lock-in.
 						`
-							: ''
+						: ''
 					}
 				`,
 			),
@@ -507,7 +506,7 @@ function evaluateMultifactor(
 	if (
 		multifactor.controllingSharesInSelfCustodyByDefault === 'NO' &&
 		multifactor.keyRotationTransactionGeneration ===
-			TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP
+		TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP
 	) {
 		return {
 			value: {

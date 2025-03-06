@@ -258,8 +258,8 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 		)
 			? 'SELF_GOSSIP'
 			: isSupported(
-						features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaSelfHostedNode,
-				  )
+				features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaSelfHostedNode,
+			)
 				? 'OWN_NODE'
 				: 'NO'
 		const supportAnyL2Transactions: TransactionSubmissionL2Type[] = []
