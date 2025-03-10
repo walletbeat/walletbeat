@@ -1,4 +1,4 @@
-name: Deploy site via GH Pages
+name: Deploy site via Edgeserver
 on: push
 jobs:
   build:
@@ -22,26 +22,11 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm build
-        env:
-          BASE_URL: /walletbeat-eth
-      - name: Upload static files as artifact
-        id: deployment
-        uses: actions/upload-pages-artifact@v3
+      - name: Edgeserver Upload
+        uses: v3xlabs/edgeserver-upload@v0.1.2-pre.4
         with:
-          path: dist
-      - name: Deploy to GH Pages
-        uses: actions/deploy-pages@v4
-
-  deploy:
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          app_id: "422130713911889920"
+          server: https://api.edgeserver.io
+          token: ${{ secrets.EDGE_TOKEN }}
+          directory: dist
+          context: true
