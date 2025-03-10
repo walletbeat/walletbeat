@@ -76,7 +76,6 @@ export const HomePage: FC = () =>
 			className="flex flex-col mt-10 gap-4"
 		>
 			<div>
-
 				<div className="w-full px-8 text-inverse bg-accent py-2 text-center">
 					Wallets listed on this page are not official endoresements, and are provided for informational purposes only.
 				</div>

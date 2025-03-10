@@ -25,6 +25,7 @@ export default {
 			},
 			textColor: {
 				inverse: 'var(--text-inverse)',
+				primary: 'var(--text-primary)',
 				secondary: 'var(--text-secondary)',
 			},
 		},

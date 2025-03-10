@@ -178,7 +178,10 @@ export default function WalletTable(): React.JSX.Element {
 		walletTableColumn(ecosystemAttributeGroup, tree => tree.ecosystem),
 	]
 	return (
-		<Box maxWidth="100%" height="80vh" width="fit-content" overflow="auto">
+		<div
+			className="w-full h-full overflow-auto"
+		//  maxWidth="100%" height="80vh" width="fit-content" overflow="auto"
+		>
 			<ThemeProvider theme={walletTableTheme}>
 				<DataGrid<WalletRow>
 					rows={rows}
@@ -203,6 +206,6 @@ export default function WalletTable(): React.JSX.Element {
 					}}
 				/>
 			</ThemeProvider>
-		</Box>
+		</div>
 	)
 }

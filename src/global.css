@@ -41,6 +41,7 @@ body {
 	color: var(--text-primary) !important;
 	background-color: var(--background-primary) !important;
 	background: var(--background-primary) !important;
+	font-size: 18px !important;
 }
 
 .card {
