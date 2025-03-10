@@ -162,9 +162,11 @@ export function NavigationPageLayout({
 
 				<div
 					key="contentContainer"
-					className="flex-col flex overflow-hidden px-4 min-h-screen mb-48 mx-auto max-w-7xl"
+					className="flex-col flex overflow-hidden min-h-screen mb-48 mx-auto max-w-7xl"
 				>
+					<div className="px-2">
 					{children}
+					</div>
 				</div>
 			</div>
 		</ThemeProvider>
