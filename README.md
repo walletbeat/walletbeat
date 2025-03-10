@@ -1,8 +1,9 @@
 # walletbeat 💗
 
-An open repository of EVM-compatible wallets.
+> This is a work in progress visual rework of the walletbeat website. You can view [the new alpha version here](https://wallet.page).
+> You can visit the original site at [beta.walletbeat.eth](https://beta.walletbeat.eth.limo).
 
-You can visit the site at [beta.walletbeat.eth](https://beta.walletbeat.eth.limo).
+An open repository of EVM-compatible wallets.
 
 ## Special Thanks
 
