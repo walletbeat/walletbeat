@@ -1,4 +1,4 @@
-name: Deploy site via Edgeserver
+name: Deploy site via GH Pages
 on: push
 jobs:
   build:
@@ -19,14 +19,14 @@ jobs:
       - name: Install packageManager
         uses: pnpm/action-setup@v4
       - name: Install Project Dependencies
-        run: cd app && pnpm install
+        run: pnpm install
       - name: Build
-        run: cd app && pnpm build
+        run: pnpm build
       - name: Upload static files as artifact
         id: deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          path: app/dist
+          path: dist
       - name: Deploy to GH Pages
         uses: actions/deploy-pages@v4
 
