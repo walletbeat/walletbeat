@@ -1,9 +1,0 @@
-{
-  "sites": [
-    {
-      "slug": "walletbeat-beta",
-      "distDir": "dist",
-      "buildCommand": "pnpm install && pnpm run check:all && pnpm build"
-    }
-  ]
-}
