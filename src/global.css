@@ -65,6 +65,10 @@ body {
 	@apply text-accent hover:underline;
 }
 
+html.dark {
+	color-scheme: dark;
+}
+
 /*
 	This is a hacky way to get Noto Color Emoji emojis throughout the page,
 	without bundling all of that font inside the web bundle (which is huge
