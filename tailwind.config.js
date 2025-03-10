@@ -7,14 +7,15 @@ export default {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background-primary))',
-				backgroundSecondary: 'hsl(var(--background-secondary))',
+				background: 'var(--background-primary)',
+				backgroundSecondary: 'var(--background-secondary)',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
+					DEFAULT: 'var(--primary)',
 				},
 				card: {
 					DEFAULT: 'hsl(var(--background-secondary))',
 				},
+				accent: 'var(--accent)',
 			},
 			animation: {
 				hop: 'hop 0.6s ease-in-out infinite',

@@ -6,23 +6,14 @@
 
 @layer base {
 	:root {
-		// Page background
 		--background-primary: #fff;
-		// Card background
 		--background-secondary: #efefef;
-		// Secondary Card Background
 		--background-tertiary: #eeeff4;
-		// Primary color
-		--primary: #6c24e0;
-		// Logo color
-		--logo-color: var(--primary);
-		// any text
+		--accent: #6c24e0;
+		--logo-color: var(--accent);
 		--text-primary: #222222;
-		// sub texts
 		--text-secondary: #22242b;
-		// Inverse text
 		--text-inverse: #ffffff;
-		// Border color
 		--border: #000;
 	}
 }
@@ -31,7 +22,7 @@
 	--background-primary: #000000;
 	--background-secondary: #17191f;
 	--background-tertiary: #17191f;
-	--primary: #6c24e0;
+	--accent: #6c24e0;
 	--logo-color: var(--text-primary);
 	--text-primary: #efefef;
 	--text-secondary: #e4e5eb;
@@ -53,6 +44,10 @@ body {
 
 .card:not(.no-padding) {
 	padding: 16px;
+}
+
+.text-accent {
+	color: var(--accent);
 }
 
 /*

@@ -1,21 +1,7 @@
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import {
-	Box,
-	Typography,
-	List,
-	ListItemText,
-	ListItemButton,
-	ListItemIcon,
-	Divider,
-	ListItem,
-} from '@mui/material'
+import type { ListItemButton } from '@mui/material'
+import type { Box } from '@mui/system'
 import React, { memo } from 'react'
-import {
-	navigationListFontSizePrimary,
-	navigationListFontSizeSecondary,
-	navigationListIconSize,
-	navigationListItemRadius,
-} from '../../components/constants'
 
 /**
  * Size of the navigation menu, in pixels.
@@ -112,19 +98,19 @@ export interface NavigationGroup {
  */
 function SingleListItemIcon({ children }: { children: React.ReactNode }): React.JSX.Element {
 	return (
-		<ListItemIcon
+		<span
 			key="listItemIcon"
-			sx={{
-				minWidth: `${navigationListIconSize}px`,
-				width: `${navigationListIconSize}px`,
-				height: `${navigationListIconSize}px`,
-				display: 'inline-block',
-				textAlign: 'center',
-				marginRight: '4px',
-			}}
+			// sx={{
+			// 	minWidth: `${navigationListIconSize}px`,
+			// 	width: `${navigationListIconSize}px`,
+			// 	height: `${navigationListIconSize}px`,
+			// 	display: 'inline-block',
+				// textAlign: 'center',
+				// marginRight: '4px',
+			// }}
 		>
 			{children}
-		</ListItemIcon>
+		</span>
 	)
 }
 
@@ -132,7 +118,7 @@ interface NavigationItemProps {
 	item: NavigationItem
 	active: boolean
 	depth: 'primary' | 'secondary'
-	sx?: React.ComponentProps<typeof ListItem>['sx']
+	// sx?: React.ComponentProps<typeof ListItem>['sx']
 	onContentItemClick?: (item: NavigationContentItem) => void
 }
 
@@ -140,7 +126,7 @@ interface NavigationItemProps {
  * A single navigation list item.
  */
 const NavigationItem = memo(
-	function NavigationItem({ item, active, depth, sx }: NavigationItemProps): React.JSX.Element {
+	function NavigationItem({ item, active, depth }: NavigationItemProps): React.JSX.Element {
 		const ButtonComponent = ({
 			children,
 		}: {
@@ -148,64 +134,59 @@ const NavigationItem = memo(
 		}): React.JSX.Element => {
 			if (isNavigationContentItem(item)) {
 				return (
-					<ListItemButton
-						component="a"
+					<a
+						// component="a"
 						href={`#${item.contentId}`}
-						disableRipple={true}
-						selected={active}
-						sx={{ borderRadius: `${navigationListItemRadius}px` }}
+						className="whitespace-nowrap flex flex-row items-center gap-2"
+						// disableRipple={true}
+						// selected={active}
+						// sx={{ borderRadius: `${navigationListItemRadius}px` }}
 					>
 						{children}
-					</ListItemButton>
+					</a>
 				)
 			}
 			if (isNavigationLinkItem(item)) {
 				return (
-					<ListItemButton
-						component="a"
+					<a
+						// component="a"
 						href={item.href}
-						target={item.href.startsWith('https://') ? '_blank' : undefined}
-						disableRipple={true}
-						selected={active}
-						sx={{ borderRadius: `${navigationListItemRadius}px` }}
+						target={item.href.startsWith('https://') ? '_blank' : undefined} rel="noreferrer"
+						// disableRipple={true}
+						// selected={active}
+						// sx={{ borderRadius: `${navigationListItemRadius}px` }}
 					>
 						{children}
-					</ListItemButton>
+					</a>
 				)
 			}
 			throw new Error('Invalid navigation item')
 		}
 		return (
-			<ListItem
+			<li
 				key={`listItem-${item.id}`}
 				id={`listItem-${item.id}`}
-				disablePadding={true}
-				sx={{
-					...sx,
-					width: 'auto',
-					marginLeft: depth === 'secondary' ? `${navigationListIconSize * 0.75}px` : undefined,
-				}}
+				// disablePadding={true}
+				// sx={{
+				// 	...sx,
+				// 	width: 'auto',
+				// 	marginLeft: depth === 'secondary' ? `${navigationListIconSize * 0.75}px` : undefined,
+				// }}
 			>
 				<ButtonComponent key="buttonComponent">
 					<SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>
-					<ListItemText
-						key="listItemText"
-						primary={
-							<Typography
-								sx={{
-									fontSize:
-										depth === 'primary'
-											? navigationListFontSizePrimary
-											: navigationListFontSizeSecondary,
-								}}
+							<span
+									// sx={{
+									// 	fontSize:
+									// 		depth === 'primary'
+									// 			? navigationListFontSizePrimary
+									// 			: navigationListFontSizeSecondary,
+									// }}
 							>
 								{item.title}
-							</Typography>
-						}
-						sx={{ whiteSpace: 'nowrap' }}
-					/>
+							</span>
 				</ButtonComponent>
-			</ListItem>
+			</li>
 		)
 	},
 	(prevProps: Readonly<NavigationItemProps>, nextProps: Readonly<NavigationItemProps>): boolean =>
@@ -238,19 +219,11 @@ export const NavigationGroup = memo(
 		onContentItemClick,
 	}: NavigationGroupProps): React.JSX.Element {
 		return (
-			<React.Fragment key={`navigationFragment-${group.id}`}>
-				{groupIndex === 0 ? null : (
-					<Divider
-						key={`navigationGroupDivider-${group.id}`}
-						orientation="horizontal"
-						variant="middle"
-						flexItem={true}
-					/>
-				)}
-				<List
-					key={`navigationGroupBox-${group.id}`}
-					id={`navigationGroup-${group.id}`}
-					sx={group.overflow ? { overflowY: 'auto', flex: '1' } : { flex: '0' }}
+			<>
+				<ul
+					// key={`navigationGroupBox-${group.id}`}
+					// id={`navigationGroup-${group.id}`}
+					// sx={group.overflow ? { overflowY: 'auto', flex: '1' } : { flex: '0' }}
 				>
 					{nonEmptyMap(group.items, item => (
 						<React.Fragment key={`fragment-${item.id}`}>
@@ -262,7 +235,7 @@ export const NavigationGroup = memo(
 								onContentItemClick={onContentItemClick}
 							/>
 							{(item.children?.length ?? 0) > 0 ? (
-								<List key={`subitems-${item.id}`} component="div" disablePadding>
+								<ul key={`subitems-${item.id}`} className="pl-4">
 									{item.children?.map(subitem => (
 										<NavigationItem
 											key={`subitem-${subitem.id}`}
@@ -272,12 +245,12 @@ export const NavigationGroup = memo(
 											onContentItemClick={onContentItemClick}
 										/>
 									))}
-								</List>
+								</ul>
 							) : null}
 						</React.Fragment>
 					))}
-				</List>
-			</React.Fragment>
+				</ul>
+			</>
 		)
 	},
 	(
@@ -330,8 +303,11 @@ export function Navigation({
 	return (
 		<div
 			key="navigationBox"
-			className="flex flex-col gap-0 max-w-2xl w-full w-full flex-0 border"
+			className="flex flex-col gap-0 max-w-3xl w-screen flex-0 px-8 py-8"
 		>
+			<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
+				~ WalletBeat
+			</a>
 			{nonEmptyMap(groups, (group, groupIndex) => (
 				<NavigationGroup
 					key={`navigationGroup-${group.id}`}
