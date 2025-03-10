@@ -157,16 +157,14 @@ export function NavigationPageLayout({
 
 	return (
 		<ThemeProvider theme={theme}>
-			<div className="flex w-full min-h-screen flex-row flex-wrap">
+			<div className="flex w-full min-h-screen flex-wrap lg:flex-nowrap flex-row max-w-screen">
 				<Navigation key="navigation" groups={groups} activeItemId={activeItemId} />
-				<div className="flex-1">
 
-					<div
-						key="contentContainer"
-						className="flex-0 flex-col w-screen px-4 md:max-w-5xl mx-auto min-h-screen mb-48"
-					>
-						{children}
-					</div>
+				<div
+					key="contentContainer"
+					className="flex-col flex overflow-hidden px-4 min-h-screen mb-48 mx-auto max-w-7xl"
+				>
+					{children}
 				</div>
 			</div>
 		</ThemeProvider>

@@ -79,7 +79,7 @@ export const HomePage: FC = () =>
 				<div className="w-full px-8 text-inverse bg-accent py-2 text-center">
 					Wallets listed on this page are not official endoresements, and are provided for informational purposes only.
 				</div>
-				<div className="bg-gradient-to-r from-[var(--banner-gradient-from)] to-[var(--banner-gradient-to)] px-8 py-4 flex justify-between items-center">
+				<div className="bg-gradient-to-r from-[var(--banner-gradient-from)] to-[var(--banner-gradient-to)] px-8 py-4 flex justify-between items-center flex-wrap">
 					<div className="flex flex-col gap-2 py-8">
 						<div className="text-sm text-secondary">HOME / WALLETS / <span>FIND WALLET</span></div>
 						<h1 className="text-3xl font-bold">Who watches the wallets?</h1>
@@ -93,7 +93,7 @@ export const HomePage: FC = () =>
 
 			<div className="w-full flex flex-col gap-2">
 				<h2 className="font-bold">Find a wallet that suits you</h2>
-				<div className="flex gap-4 w-full">
+				<div className="flex gap-4 w-full flex-wrap xl:flex-nowrap flex-col xl:flex-row">
 					{
 						[
 							{
@@ -110,7 +110,7 @@ export const HomePage: FC = () =>
 								description: 'Looking for a wallet for your crypto portfolio.',
 							},
 						].map((item) => (
-							<div key={item.id} className="flex flex-col gap-2 card">
+							<div key={item.id} className="flex flex-col gap-2 card flex-1">
 								<h3 className="font-bold text-accent">{item.title}</h3>
 								<div className="text-secondary">{item.description}</div>
 							</div>
