@@ -1,20 +1,20 @@
 ---
 // Global CSS
-import './global.css'
-import '@fontsource/work-sans'
+import '../global.scss';
+import '@fontsource/work-sans';
 
 // Props
-import type { ComponentProps } from 'astro/types'
+import type { ComponentProps } from 'astro/types';
 
 type Props = {
-	metadata: ComponentProps<typeof Metadata>['metadata']
-}
+	metadata: ComponentProps<typeof Metadata>['metadata'];
+};
 
-const { metadata } = Astro.props
+const { metadata } = Astro.props;
 
 // Components
-import Metadata from '@/components/Metadata.astro'
-import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
+import Metadata from '@/components/Metadata.astro';
+import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry';
 ---
 
 <!doctype html>
@@ -40,8 +40,8 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 			window.plausible =
 				window.plausible ||
 				function () {
-					;(window.plausible.q = window.plausible.q || []).push(arguments)
-				}
+					(window.plausible.q = window.plausible.q || []).push(arguments);
+				};
 		</script>
 	</body>
 </html>

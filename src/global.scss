@@ -1,5 +1,57 @@
 /* cSpell:disable */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme */
+
+@layer base {
+	:root {
+		// Page background
+		--background-primary: #fff;
+		// Card background
+		--background-secondary: #efefef;
+		// Secondary Card Background
+		--background-tertiary: #eeeff4;
+		// Primary color
+		--primary: #6c24e0;
+		// Logo color
+		--logo-color: var(--primary);
+		// any text
+		--text-primary: #222222;
+		// sub texts
+		--text-secondary: #22242B;
+		// Inverse text
+		--text-inverse: #FFFFFF;
+	}
+}
+
+:root.dark {
+	--background-primary: #000000;
+	--background-secondary: #17191F;
+	--background-tertiary: #17191F;
+	--primary: #6c24e0;
+	--logo-color: var(--text-primary);
+	--text-primary: #efefef;
+	--text-secondary: #E4E5EB;
+	--text-inverse: #FFFFFF;
+}
+
+html {
+	color: var(--text-primary);
+	background-color: var(--background-primary);
+}
+
+.card {
+	background-color: var(--background-secondary);
+	border-radius: 8px;
+}
+
+.card:not(.no-padding) {
+	padding: 16px;
+}
+
 /*
 	This is a hacky way to get Noto Color Emoji emojis throughout the page,
 	without bundling all of that font inside the web bundle (which is huge

@@ -1,19 +1,20 @@
 ---
 // Constants
-import { betaSiteRoot } from '@/constants'
+import { betaSiteRoot } from '@/constants';
 
 // Layouts
-import Layout from '../layouts/Layout.astro'
+import Layout from '../layouts/Layout.astro';
 
 // Components
-import { IconLink } from '@/ui/atoms/IconLink'
-import WalletTable from '@/ui/organisms/WalletTable'
+import { IconLink } from '@/ui/atoms/IconLink';
+import WalletTable from '@/ui/organisms/WalletTable';
 
-import { Box, Typography } from '@mui/material'
-import HelpCenterIcon from '@mui/icons-material/HelpCenter'
-import ForumIcon from '@mui/icons-material/Forum'
-import FoundationIcon from '@mui/icons-material/Foundation'
-import GitHubIcon from '@mui/icons-material/GitHub'
+import { Box, Typography } from '@mui/material';
+import HelpCenterIcon from '@mui/icons-material/HelpCenter';
+import ForumIcon from '@mui/icons-material/Forum';
+import FoundationIcon from '@mui/icons-material/Foundation';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
 ---
 
 <Layout
@@ -21,7 +22,39 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 		title: 'Walletbeat',
 	}}
 >
-	<Box maxWidth="100vw" display="flex" flexDirection="column" alignItems="center">
+	<NavigationPageLayout
+		groups={[
+			{
+				id: 'home',
+				items: [
+					{
+						id: 'home',
+						title: 'Home',
+						href: '/',
+						icon: '',
+						contentId: '',
+						children: [],
+					},
+				],
+				overflow: false,
+			},
+			{
+				id: 'about',
+				items: [
+					{
+						id: 'about',
+						title: 'About',
+						href: '/about',
+						icon: '',
+						contentId: '',
+						children: [],
+					},
+				],
+				overflow: false,
+			},
+		]}
+	>
+		<div class="card">hello</div>
 		<Box
 			minHeight="100vh"
 			maxWidth="100vw"
@@ -94,5 +127,5 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 			</Box>
 			<WalletTable client:load />
 		</Box>
-	</Box>
+	</NavigationPageLayout>
 </Layout>
