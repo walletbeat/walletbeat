@@ -21,7 +21,8 @@ jobs:
       - name: Install Project Dependencies
         run: pnpm install
       - name: Build
-        run: pnpm build
+	      # Overwrite build path due to GH Pages
+        run: BASE_URL='/walletbeat-eth/' pnpm build
       - name: Upload static files as artifact
         id: deployment
         uses: actions/upload-pages-artifact@v3
