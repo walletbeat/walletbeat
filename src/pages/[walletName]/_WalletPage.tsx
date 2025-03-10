@@ -64,7 +64,7 @@ const headerBottomMargin = 24
 
 const StyledHeader = styled(Paper)(({ theme }) => ({
 	position: 'sticky',
-	top: 0,
+	top: 40,
 	zIndex: 1100,
 	backgroundColor: theme.palette.background.paper,
 	padding: theme.spacing(2),
@@ -505,32 +505,31 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			stickyHeaderMargin={headerBottomMargin}
 			contentDependencies={[wallet, pickedVariant]}
 		>
+		<StyledHeader key="walletHeader" id="walletHeader">
+			<Typography
+				variant="h4"
+				component="h1"
+				display="flex"
+				flexDirection="row"
+				alignItems="center"
+				gap="12px"
+			>
+				<WalletIcon
+					key="walletIcon"
+					walletMetadata={wallet.metadata}
+					iconSize={navigationListIconSize * 2}
+				/>
+				{wallet.metadata.displayName}
+			</Typography>
+			<VariantPicker
+				pickerId="variantPicker"
+				variants={headerVariants}
+				pickedVariant={pickedVariant}
+			/>
+		</StyledHeader>
 			<div
 				className="flex flex-col mt-10 gap-4"
 			>
-
-				<StyledHeader key="walletHeader" id="walletHeader">
-					<Typography
-						variant="h4"
-						component="h1"
-						display="flex"
-						flexDirection="row"
-						alignItems="center"
-						gap="12px"
-					>
-						<WalletIcon
-							key="walletIcon"
-							walletMetadata={wallet.metadata}
-							iconSize={navigationListIconSize * 2}
-						/>
-						{wallet.metadata.displayName}
-					</Typography>
-					<VariantPicker
-						pickerId="variantPicker"
-						variants={headerVariants}
-						pickedVariant={pickedVariant}
-					/>
-				</StyledHeader>
 				<Box key="walletPageBody" display="flex" flexDirection="row">
 					<Box key="walletPageContent" component="main" flex="1">
 						<Box key="topSpacer" height={headerBottomMargin}></Box>
