@@ -328,13 +328,9 @@ export function Navigation({
 	onContentItemClick?: (item: NavigationContentItem) => void
 }): React.JSX.Element {
 	return (
-		<Box
+		<div
 			key="navigationBox"
-			flex={flex}
-			display="flex"
-			flexDirection="column"
-			gap="0px"
-			sx={navigationBoxStyle}
+			className="flex flex-col gap-0 max-w-2xl w-full w-full flex-0 border"
 		>
 			{nonEmptyMap(groups, (group, groupIndex) => (
 				<NavigationGroup
@@ -345,6 +341,6 @@ export function Navigation({
 					activeItemId={activeItemId}
 				/>
 			))}
-		</Box>
+		</div>
 	)
 }
