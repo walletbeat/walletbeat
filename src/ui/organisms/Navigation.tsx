@@ -2,6 +2,7 @@ import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
 import React, { memo } from 'react'
+import { ThemeSwitcher } from './ThemeSwitcher'
 
 /**
  * Size of the navigation menu, in pixels.
@@ -100,14 +101,14 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 	return (
 		<span
 			key="listItemIcon"
-			// sx={{
-			// 	minWidth: `${navigationListIconSize}px`,
-			// 	width: `${navigationListIconSize}px`,
-			// 	height: `${navigationListIconSize}px`,
-			// 	display: 'inline-block',
-				// textAlign: 'center',
-				// marginRight: '4px',
-			// }}
+		// sx={{
+		// 	minWidth: `${navigationListIconSize}px`,
+		// 	width: `${navigationListIconSize}px`,
+		// 	height: `${navigationListIconSize}px`,
+		// 	display: 'inline-block',
+		// textAlign: 'center',
+		// marginRight: '4px',
+		// }}
 		>
 			{children}
 		</span>
@@ -138,9 +139,9 @@ const NavigationItem = memo(
 						// component="a"
 						href={`#${item.contentId}`}
 						className="whitespace-nowrap flex flex-row items-center gap-2"
-						// disableRipple={true}
-						// selected={active}
-						// sx={{ borderRadius: `${navigationListItemRadius}px` }}
+					// disableRipple={true}
+					// selected={active}
+					// sx={{ borderRadius: `${navigationListItemRadius}px` }}
 					>
 						{children}
 					</a>
@@ -154,8 +155,8 @@ const NavigationItem = memo(
 						target={item.href.startsWith('https://') ? '_blank' : undefined} rel="noreferrer"
 						// disableRipple={true}
 						className="whitespace-nowrap flex flex-row items-center gap-2"
-						// selected={active}
-						// sx={{ borderRadius: `${navigationListItemRadius}px` }}
+					// selected={active}
+					// sx={{ borderRadius: `${navigationListItemRadius}px` }}
 					>
 						{children}
 					</a>
@@ -167,25 +168,25 @@ const NavigationItem = memo(
 			<li
 				key={`listItem-${item.id}`}
 				id={`listItem-${item.id}`}
-				// disablePadding={true}
-				// sx={{
-				// 	...sx,
-				// 	width: 'auto',
-				// 	marginLeft: depth === 'secondary' ? `${navigationListIconSize * 0.75}px` : undefined,
-				// }}
+			// disablePadding={true}
+			// sx={{
+			// 	...sx,
+			// 	width: 'auto',
+			// 	marginLeft: depth === 'secondary' ? `${navigationListIconSize * 0.75}px` : undefined,
+			// }}
 			>
 				<ButtonComponent key="buttonComponent">
 					<SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>
-							<span
-									// sx={{
-									// 	fontSize:
-									// 		depth === 'primary'
-									// 			? navigationListFontSizePrimary
-									// 			: navigationListFontSizeSecondary,
-									// }}
-							>
-								{item.title}
-							</span>
+					<span
+					// sx={{
+					// 	fontSize:
+					// 		depth === 'primary'
+					// 			? navigationListFontSizePrimary
+					// 			: navigationListFontSizeSecondary,
+					// }}
+					>
+						{item.title}
+					</span>
 				</ButtonComponent>
 			</li>
 		)
@@ -222,9 +223,9 @@ export const NavigationGroup = memo(
 		return (
 			<>
 				<ul
-					// key={`navigationGroupBox-${group.id}`}
-					// id={`navigationGroup-${group.id}`}
-					// sx={group.overflow ? { overflowY: 'auto', flex: '1' } : { flex: '0' }}
+				// key={`navigationGroupBox-${group.id}`}
+				// id={`navigationGroup-${group.id}`}
+				// sx={group.overflow ? { overflowY: 'auto', flex: '1' } : { flex: '0' }}
 				>
 					{nonEmptyMap(group.items, item => (
 						<React.Fragment key={`fragment-${item.id}`}>
@@ -306,9 +307,12 @@ export function Navigation({
 			key="navigationBox"
 			className="flex flex-col gap-0 max-w-3xl w-screen flex-0 px-8 py-8"
 		>
-			<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
-				~ WalletBeat
-			</a>
+			<div className="flex justify-between items-center gap-4">
+				<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
+					~ WalletBeat
+				</a>
+				<ThemeSwitcher />
+			</div>
 			{nonEmptyMap(groups, (group, groupIndex) => (
 				<NavigationGroup
 					key={`navigationGroup-${group.id}`}

@@ -18,7 +18,7 @@
 	}
 }
 
-:root.dark {
+html.dark {
 	--background-primary: #000000;
 	--background-secondary: #17191f;
 	--background-tertiary: #17191f;
@@ -27,7 +27,7 @@
 	--text-primary: #efefef;
 	--text-secondary: #e4e5eb;
 	--text-inverse: #ffffff;
-	--border: #efefef;
+	--border: #313131;
 }
 
 html,
@@ -48,6 +48,10 @@ body {
 
 .text-accent {
 	color: var(--accent);
+}
+
+.btn {
+	@apply border p-2 rounded-md cursor-pointer;
 }
 
 /*

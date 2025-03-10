@@ -31,7 +31,10 @@ export default {
 				},
 			},
 			borderColor: {
-				DEFAULT: 'hsl(var(--border))',
+				DEFAULT: 'var(--border)',
+			},
+			backgroundColor: {
+				secondary: 'var(--background-secondary)',
 			},
 		},
 	},
