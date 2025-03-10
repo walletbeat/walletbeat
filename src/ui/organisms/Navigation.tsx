@@ -153,6 +153,7 @@ const NavigationItem = memo(
 						href={item.href}
 						target={item.href.startsWith('https://') ? '_blank' : undefined} rel="noreferrer"
 						// disableRipple={true}
+						className="whitespace-nowrap flex flex-row items-center gap-2"
 						// selected={active}
 						// sx={{ borderRadius: `${navigationListItemRadius}px` }}
 					>

@@ -17,121 +17,126 @@ import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
 import { navigationAbout } from '@/components/navigation';
 import { LuWallet } from 'react-icons/lu';
 import type { FC } from 'react';
+import { wallets } from '@/data/wallets';
+import type { Wallet } from '@/schema/wallet';
 
-export const HomePage: FC = () => {
-	// hi
+export const HomePage: FC = () =>
+// hi
 
-	return (
-		<NavigationPageLayout
-			groups={[
-				{
-					id: 'home',
-					items: [
-						{
-							title: 'Summary',
-							href: '/',
-							id: 'summary',
-							icon: '',
-						},
-					],
-					overflow: false,
-				},
-				{
-					id: 'wallets',
-					items: [
-						{
-							title: 'Wallets',
-							href: '/',
-							icon: LuWallet,
-							children: [
-								{
-									title: 'Coinbase Wallet',
-									href: '/coinbase',
-								},
-							],
-						},
-					],
-					overflow: false,
-				},
-				{
-					id: 'about',
-					items: [navigationAbout],
-					overflow: false,
-				},
-			]}
+(
+	<NavigationPageLayout
+		groups={[
+			{
+				id: 'home',
+				items: [
+					{
+						title: 'Summary',
+						href: '/',
+						id: 'summary',
+						icon: '',
+					},
+				],
+				overflow: false,
+			},
+			{
+				id: 'wallets',
+				items: [
+					{
+						title: 'Wallets',
+						icon: <LuWallet />,
+						href: '/',
+						children: Object.keys(wallets).map((key) => {
+							const wallet = wallets[key as keyof typeof wallets] as Wallet;
+
+							return {
+								title: wallet.metadata.displayName,
+								href: `/${key}`,
+								id: key,
+							}
+						}),
+
+					}
+				],
+				overflow: false,
+			},
+			{
+				id: 'about',
+				items: [navigationAbout],
+				overflow: false,
+			},
+		]}
+	>
+		<div
+		// minHeight="100vh"
+		// maxWidth="100vw"
+		// display="flex"
+		// flexDirection="column"
+		// alignItems="center"
+		// justifyContent="center"
+		// px={2}
 		>
-			<Box
-				minHeight="100vh"
-				maxWidth="100vw"
-				display="flex"
-				flexDirection="column"
-				alignItems="center"
-				justifyContent="center"
-				px={2}
+			<Typography
+				variant="h1"
+				fontWeight={600}
+				mt={1}
+				maxWidth="90vw"
+				style={{
+					wordBreak: 'break-word',
+				}}>Walletbeat</Typography>
+			<Typography
+				variant="caption"
+				sx={{
+					fontStyle: 'italic',
+					opacity: 0.75,
+					wordBreak: 'break-word',
+				}}
+				maxWidth="90vw">Who watches the wallets?</Typography
 			>
-				<Typography
-					variant="h1"
-					fontWeight={600}
-					mt={1}
-					maxWidth="90vw"
-					style={{
-						wordBreak: 'break-word',
-					}}>Walletbeat</Typography
-				>
-				<Typography
-					variant="caption"
-					sx={{
-						fontStyle: 'italic',
-						opacity: 0.75,
-						wordBreak: 'break-word',
-					}}
-					maxWidth="90vw">Who watches the wallets?</Typography
-				>
-				<Typography variant="caption" mt={1} maxWidth="90vw">
-					Beta version; work in progress. Get in touch on Farcaster or GitHub if you wish to
-					contribute.
+			<Typography variant="caption" mt={1} maxWidth="90vw">
+				Beta version; work in progress. Get in touch on Farcaster or GitHub if you wish to
+				contribute.
+			</Typography>
+			<div className="flex flex-row items-center mt-1 mb-1">
+				<Typography component="div" variant="caption">
+					<IconLink href={`${betaSiteRoot}/faq`} IconComponent={HelpCenterIcon}>
+						Frequently asked questions
+					</IconLink>
 				</Typography>
-				<Box display="flex" flexDirection="row" alignItems="center" mt={1} mb={1}>
-					<Typography component="div" variant="caption">
-						<IconLink href={`${betaSiteRoot}/faq`} IconComponent={HelpCenterIcon}>
-							Frequently asked questions
-						</IconLink>
-					</Typography>
-					<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-						|
-					</Typography>
-					<Typography component="div" variant="caption">
-						<IconLink href={`${betaSiteRoot}/about`} IconComponent={FoundationIcon}>
-							About Walletbeat
-						</IconLink>
-					</Typography>
-					<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-						|
-					</Typography>
-					<Typography component="div" variant="caption">
-						<IconLink
-							href="https://github.com/fluidkey/walletbeat"
-							target="_blank"
-							IconComponent={GitHubIcon}
-						>
-							Contribute on GitHub
-						</IconLink>
-					</Typography>
-					<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-						|
-					</Typography>
-					<Typography component="div" variant="caption">
-						<IconLink
-							href="https://warpcast.com/~/channel/walletbeat"
-							target="_blank"
-							IconComponent={ForumIcon}
-						>
-							Discuss on Farcaster
-						</IconLink>
-					</Typography>
-				</Box>
-				<WalletTable />
-			</Box>
-		</NavigationPageLayout>
-	);
-};
+				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
+					|
+				</Typography>
+				<Typography component="div" variant="caption">
+					<IconLink href={`${betaSiteRoot}/about`} IconComponent={FoundationIcon}>
+						About Walletbeat
+					</IconLink>
+				</Typography>
+				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
+					|
+				</Typography>
+				<Typography component="div" variant="caption">
+					<IconLink
+						href="https://github.com/fluidkey/walletbeat"
+						target="_blank"
+						IconComponent={GitHubIcon}
+					>
+						Contribute on GitHub
+					</IconLink>
+				</Typography>
+				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
+					|
+				</Typography>
+				<Typography component="div" variant="caption">
+					<IconLink
+						href="https://warpcast.com/~/channel/walletbeat"
+						target="_blank"
+						IconComponent={ForumIcon}
+					>
+						Discuss on Farcaster
+					</IconLink>
+				</Typography>
+			</div>
+			<WalletTable />
+		</div>
+	</NavigationPageLayout>
+)
+	;
