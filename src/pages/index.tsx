@@ -91,8 +91,39 @@ export const HomePage: FC = () =>
 				</div>
 			</div>
 
-			<WalletTable />
+			<div className="w-full flex flex-col gap-2">
+				<h2 className="font-bold">Find a wallet that suits you</h2>
+				<div className="flex gap-4 w-full">
+					{
+						[
+							{
+								title: '🤷‍♀️ New to Crypto',
+								description: 'First time user looking for beginner wallet.',
+								id: 'beginner',
+							},
+							{
+								title: '📊 Finance',
+								description: 'Looking for a wallet for your crypto portfolio.',
+							},
+							{
+								title: '🛠️ Developer',
+								description: 'Looking for a wallet for your crypto portfolio.',
+							},
+						].map((item) => (
+							<div key={item.id} className="flex flex-col gap-2 card">
+								<h3 className="font-bold text-accent">{item.title}</h3>
+								<div className="text-secondary">{item.description}</div>
+							</div>
+						))
+					}
+				</div>
+			</div>
+
+			<div className="w-full flex flex-col gap-2">
+				<h2 className="font-bold">Explore all the wallets</h2>
+				<WalletTable />
+			</div>
+
 		</div>
 	</NavigationPageLayout>
-)
-	;
+);

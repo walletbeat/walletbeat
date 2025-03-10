@@ -163,7 +163,7 @@ export function NavigationPageLayout({
 
 					<div
 						key="contentContainer"
-						className="flex-0 flex-col w-screen px-4 md:max-w-5xl mx-auto"
+						className="flex-0 flex-col w-screen px-4 md:max-w-5xl mx-auto min-h-screen mb-48"
 					>
 						{children}
 					</div>

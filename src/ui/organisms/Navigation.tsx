@@ -138,7 +138,7 @@ const NavigationItem = memo(
 					<a
 						// component="a"
 						href={`#${item.contentId}`}
-						className="whitespace-nowrap flex flex-row items-center gap-2"
+						className="whitespace-nowrap flex flex-row items-center gap-2 text-lg"
 					// disableRipple={true}
 					// selected={active}
 					// sx={{ borderRadius: `${navigationListItemRadius}px` }}
@@ -154,7 +154,7 @@ const NavigationItem = memo(
 						href={item.href}
 						target={item.href.startsWith('https://') ? '_blank' : undefined} rel="noreferrer"
 						// disableRipple={true}
-						className="whitespace-nowrap flex flex-row items-center gap-2"
+						className="whitespace-nowrap flex flex-row items-center gap-2 text-lg"
 					// selected={active}
 					// sx={{ borderRadius: `${navigationListItemRadius}px` }}
 					>
