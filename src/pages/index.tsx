@@ -14,7 +14,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import FoundationIcon from '@mui/icons-material/Foundation';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
-import { navigationAbout } from '@/components/navigation';
+import { navigationAbout, navigationCriteria } from '@/components/navigation';
 import { LuWallet } from 'react-icons/lu';
 import type { FC } from 'react';
 import { wallets } from '@/data/wallets';
@@ -61,6 +61,11 @@ export const HomePage: FC = () =>
 				overflow: false,
 			},
 			{
+				id: 'criteria',
+				items: [navigationCriteria],
+				overflow: false,
+			},
+			{
 				id: 'about',
 				items: [navigationAbout],
 				overflow: false,
@@ -68,74 +73,25 @@ export const HomePage: FC = () =>
 		]}
 	>
 		<div
-		// minHeight="100vh"
-		// maxWidth="100vw"
-		// display="flex"
-		// flexDirection="column"
-		// alignItems="center"
-		// justifyContent="center"
-		// px={2}
+			className="flex flex-col mt-10 gap-4"
 		>
-			<Typography
-				variant="h1"
-				fontWeight={600}
-				mt={1}
-				maxWidth="90vw"
-				style={{
-					wordBreak: 'break-word',
-				}}>Walletbeat</Typography>
-			<Typography
-				variant="caption"
-				sx={{
-					fontStyle: 'italic',
-					opacity: 0.75,
-					wordBreak: 'break-word',
-				}}
-				maxWidth="90vw">Who watches the wallets?</Typography
-			>
-			<Typography variant="caption" mt={1} maxWidth="90vw">
-				Beta version; work in progress. Get in touch on Farcaster or GitHub if you wish to
-				contribute.
-			</Typography>
-			<div className="flex flex-row items-center mt-1 mb-1">
-				<Typography component="div" variant="caption">
-					<IconLink href={`${betaSiteRoot}/faq`} IconComponent={HelpCenterIcon}>
-						Frequently asked questions
-					</IconLink>
-				</Typography>
-				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-					|
-				</Typography>
-				<Typography component="div" variant="caption">
-					<IconLink href={`${betaSiteRoot}/about`} IconComponent={FoundationIcon}>
-						About Walletbeat
-					</IconLink>
-				</Typography>
-				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-					|
-				</Typography>
-				<Typography component="div" variant="caption">
-					<IconLink
-						href="https://github.com/fluidkey/walletbeat"
-						target="_blank"
-						IconComponent={GitHubIcon}
-					>
-						Contribute on GitHub
-					</IconLink>
-				</Typography>
-				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-					|
-				</Typography>
-				<Typography component="div" variant="caption">
-					<IconLink
-						href="https://warpcast.com/~/channel/walletbeat"
-						target="_blank"
-						IconComponent={ForumIcon}
-					>
-						Discuss on Farcaster
-					</IconLink>
-				</Typography>
+			<div>
+
+				<div className="w-full px-8 text-inverse bg-accent py-2 text-center">
+					Wallets listed on this page are not official endoresements, and are provided for informational purposes only.
+				</div>
+				<div className="bg-gradient-to-r from-[var(--banner-gradient-from)] to-[var(--banner-gradient-to)] px-8 py-4 flex justify-between items-center">
+					<div className="flex flex-col gap-2 py-8">
+						<div className="text-sm text-secondary">HOME / WALLETS / <span>FIND WALLET</span></div>
+						<h1 className="text-3xl font-bold">Who watches the wallets?</h1>
+						<p>Alpha version; work in progress. For content contributions, please see <a href="https://github.com/fluidkey/walletbeat" className="link" target="_blank" rel="noreferrer">GitHub</a>.</p>
+					</div>
+					<div>
+						<img src="/banner.png" className="h-full" />
+					</div>
+				</div>
 			</div>
+
 			<WalletTable />
 		</div>
 	</NavigationPageLayout>

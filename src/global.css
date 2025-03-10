@@ -1,6 +1,8 @@
 /* cSpell:disable */
 
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Theme */
 
@@ -15,6 +17,8 @@
 		--text-secondary: #22242b;
 		--text-inverse: #ffffff;
 		--border: #000;
+		--banner-gradient-from: #ECEDFD;
+		--banner-gradient-to: #E8F6F2;
 	}
 }
 
@@ -28,6 +32,8 @@ html.dark {
 	--text-secondary: #e4e5eb;
 	--text-inverse: #ffffff;
 	--border: #313131;
+	--banner-gradient-from: #15151a;
+	--banner-gradient-to: #212126;
 }
 
 html,
@@ -52,6 +58,10 @@ body {
 
 .btn {
 	@apply border p-2 rounded-md cursor-pointer;
+}
+
+.link {
+	@apply text-accent hover:underline;
 }
 
 /*

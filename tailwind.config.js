@@ -17,24 +17,15 @@ export default {
 				},
 				accent: 'var(--accent)',
 			},
-			animation: {
-				hop: 'hop 0.6s ease-in-out infinite',
-			},
-			keyframes: {
-				hop: {
-					'0%, 100%': {
-						transform: 'translateY(0) rotate3d(0, 1, 0, 0deg)',
-					},
-					'50%': {
-						transform: 'translateY(-2px) rotate3d(0, 1, 0, 180deg)',
-					},
-				},
-			},
 			borderColor: {
 				DEFAULT: 'var(--border)',
 			},
 			backgroundColor: {
 				secondary: 'var(--background-secondary)',
+			},
+			textColor: {
+				inverse: 'var(--text-inverse)',
+				secondary: 'var(--text-secondary)',
 			},
 		},
 	},
