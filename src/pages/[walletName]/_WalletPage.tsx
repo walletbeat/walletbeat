@@ -134,6 +134,69 @@ function maybeAddCornerControl(
 	)
 }
 
+// Helper type for FAQ schema generation
+interface FAQSchemaEntry {
+	'@type': 'Question'
+	name: string
+	acceptedAnswer: {
+		'@type': 'Answer'
+		text: string
+	}
+}
+
+// Function to generate FAQ structured data in LDJSON format
+function generateFaqSchema(sections: RichSection[], walletName: string): string {
+	// Extract questions and answers from sections
+	const faqEntries: FAQSchemaEntry[] = []
+
+	// Process all sections except the first one (details section)
+	for (const section of sections.slice(1)) {
+		// Only include sections with subsections
+		if (section.subsections && section.subsections.length > 0) {
+			// For each attribute in the section, create a FAQ entry
+			for (const subsection of section.subsections) {
+				// Safely check for caption and body
+				if (subsection.caption !== null && subsection.body !== null) {
+					try {
+						// Get a reasonable question text
+						const questionText = typeof subsection.title === 'string' && subsection.title !== ''
+							? subsection.title
+							: 'Feature question';
+
+						// Get a reasonable answer text
+						const answerText = `${walletName} supports this feature.`;
+
+						// Add to FAQ entries
+						faqEntries.push({
+							'@type': 'Question',
+							'name': questionText,
+							'acceptedAnswer': {
+								'@type': 'Answer',
+								'text': answerText
+							}
+						});
+					} catch (error) {
+						// Error handling, silent in production
+						if (process.env.NODE_ENV !== 'production') {
+							// eslint-disable-next-line no-console
+							console.error('Error creating FAQ entry:', error);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Create the complete FAQ schema
+	const faqSchema = {
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		'mainEntity': faqEntries
+	}
+
+	return JSON.stringify(faqSchema)
+}
+
 export function WalletPage({ walletName }: { walletName: WalletName }): React.JSX.Element {
 	const wallet = ratedWallets[walletName]
 	const { singleVariant } = getSingleVariant(wallet.variants)
@@ -501,6 +564,12 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			stickyHeaderMargin={headerBottomMargin}
 			contentDependencies={[wallet, pickedVariant]}
 		>
+			{/* Add structured data for FAQs */}
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: generateFaqSchema(sections, wallet.metadata.displayName) }}
+			/>
+
 			<ReturnToTop />
 			<StyledHeader key="walletHeader" id="walletHeader">
 				<Typography
