@@ -22,7 +22,9 @@ jobs:
         run: pnpm install
       - name: Build
 	      # Overwrite build path due to GH Pages
-        run: BASE_URL=/walletbeat-eth pnpm build
+        run: pnpm build
+        env:
+          BASE_URL: /walletbeat-beta
       - name: Upload static files as artifact
         id: deployment
         uses: actions/upload-pages-artifact@v3
