@@ -236,7 +236,7 @@ export const NavigationGroup = memo(
 								onContentItemClick={onContentItemClick}
 							/>
 							{(item.children?.length ?? 0) > 0 ? (
-								<ul key={`subitems-${item.id}`} className="pl-4">
+								<ul key={`subitems-${item.id}`} className="pl-4 border-l ml-2">
 									{item.children?.map(subitem => (
 										<NavigationItem
 											key={`subitem-${subitem.id}`}

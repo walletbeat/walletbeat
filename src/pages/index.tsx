@@ -52,6 +52,7 @@ export const HomePage: FC = () =>
 								title: wallet.metadata.displayName,
 								href: `/${key}`,
 								id: key,
+								icon: <img src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`} className="size-4" />,
 							}
 						}),
 
