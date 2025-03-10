@@ -505,120 +505,125 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			stickyHeaderMargin={headerBottomMargin}
 			contentDependencies={[wallet, pickedVariant]}
 		>
-			<StyledHeader key="walletHeader" id="walletHeader">
-				<Typography
-					variant="h4"
-					component="h1"
-					display="flex"
-					flexDirection="row"
-					alignItems="center"
-					gap="12px"
-				>
-					<WalletIcon
-						key="walletIcon"
-						walletMetadata={wallet.metadata}
-						iconSize={navigationListIconSize * 2}
+			<div
+				className="flex flex-col mt-10 gap-4"
+			>
+
+				<StyledHeader key="walletHeader" id="walletHeader">
+					<Typography
+						variant="h4"
+						component="h1"
+						display="flex"
+						flexDirection="row"
+						alignItems="center"
+						gap="12px"
+					>
+						<WalletIcon
+							key="walletIcon"
+							walletMetadata={wallet.metadata}
+							iconSize={navigationListIconSize * 2}
+						/>
+						{wallet.metadata.displayName}
+					</Typography>
+					<VariantPicker
+						pickerId="variantPicker"
+						variants={headerVariants}
+						pickedVariant={pickedVariant}
 					/>
-					{wallet.metadata.displayName}
-				</Typography>
-				<VariantPicker
-					pickerId="variantPicker"
-					variants={headerVariants}
-					pickedVariant={pickedVariant}
-				/>
-			</StyledHeader>
-			<Box key="walletPageBody" display="flex" flexDirection="row">
-				<Box key="walletPageContent" component="main" flex="1">
-					<Box key="topSpacer" height={headerBottomMargin}></Box>
-					{nonEmptyMap(sections, (section, index) => (
-						<React.Fragment key={sectionHeaderId(section)}>
-							{index > 0 ? (
-								<Divider
-									key="sectionDivider"
-									orientation="horizontal"
-									variant="middle"
-									flexItem={true}
-									sx={{
-										width: '80%',
-										marginLeft: 'auto',
-										marginRight: 'auto',
-										marginTop: '1.5rem',
-										marginBottom: '1.5rem',
-									}}
-								/>
-							) : null}
-							<StyledSection key="sectionContainer" sx={section.sx}>
-								{maybeAddCornerControl(
-									section,
-									<AnchorHeader
-										key="sectionHeader"
-										id={sectionHeaderId(section)}
-										sx={{ scrollMarginTop }}
-										variant="h4"
-										component="h2"
-										marginBottom="0"
-										paddingLeft={theme.spacing(2)}
-										paddingRight={theme.spacing(2)}
-									>
-										{section.icon} {section.title}
-									</AnchorHeader>,
-								)}
-								{section.caption === null ? null : (
-									<Box
-										key="sectionCaption"
-										marginLeft={sectionIconWidth}
-										marginBottom="1rem"
-										sx={{ opacity: 0.8 }}
-									>
-										{section.caption}
-									</Box>
-								)}
-								{section.body === null ? null : (
-									<Box
-										key="sectionBody"
-										paddingTop={theme.spacing(2)}
-										paddingLeft={theme.spacing(2)}
-										paddingRight={theme.spacing(2)}
-									>
-										{section.body}
-									</Box>
-								)}
-								{section.subsections?.map(subsection => (
-									<StyledSubsection key={sectionHeaderId(subsection)} sx={subsection.sx}>
-										<ThemeProvider theme={subsectionTheme}>
-											{maybeAddCornerControl(
-												subsection,
-												<AnchorHeader
-													key="subsectionHeader"
-													id={sectionHeaderId(subsection)}
-													sx={{ scrollMarginTop }}
-													variant="h3"
-													marginBottom="0rem"
-												>
-													{subsection.icon} {subsection.title}
-												</AnchorHeader>,
-											)}
-											{subsection.caption === null ? null : (
-												<Box
-													key="subsectionCaption"
-													marginLeft={subsectionIconWidth}
-													marginBottom="1rem"
-													sx={{ opacity: 0.8 }}
-												>
-													{subsection.caption}
-												</Box>
-											)}
-											{subsection.body === null ? null : (
-												<Box key="subsectionBody">{subsection.body}</Box>
-											)}
-										</ThemeProvider>
-									</StyledSubsection>
-								))}
-							</StyledSection>
-						</React.Fragment>
-					))}
+				</StyledHeader>
+				<Box key="walletPageBody" display="flex" flexDirection="row">
+					<Box key="walletPageContent" component="main" flex="1">
+						<Box key="topSpacer" height={headerBottomMargin}></Box>
+						{nonEmptyMap(sections, (section, index) => (
+							<React.Fragment key={sectionHeaderId(section)}>
+								{index > 0 ? (
+									<Divider
+										key="sectionDivider"
+										orientation="horizontal"
+										variant="middle"
+										flexItem={true}
+										sx={{
+											width: '80%',
+											marginLeft: 'auto',
+											marginRight: 'auto',
+											marginTop: '1.5rem',
+											marginBottom: '1.5rem',
+										}}
+									/>
+								) : null}
+								<StyledSection key="sectionContainer" sx={section.sx}>
+									{maybeAddCornerControl(
+										section,
+										<AnchorHeader
+											key="sectionHeader"
+											id={sectionHeaderId(section)}
+											sx={{ scrollMarginTop }}
+											variant="h4"
+											component="h2"
+											marginBottom="0"
+											paddingLeft={theme.spacing(2)}
+											paddingRight={theme.spacing(2)}
+										>
+											{section.icon} {section.title}
+										</AnchorHeader>,
+									)}
+									{section.caption === null ? null : (
+										<Box
+											key="sectionCaption"
+											marginLeft={sectionIconWidth}
+											marginBottom="1rem"
+											sx={{ opacity: 0.8 }}
+										>
+											{section.caption}
+										</Box>
+									)}
+									{section.body === null ? null : (
+										<Box
+											key="sectionBody"
+											paddingTop={theme.spacing(2)}
+											paddingLeft={theme.spacing(2)}
+											paddingRight={theme.spacing(2)}
+										>
+											{section.body}
+										</Box>
+									)}
+									{section.subsections?.map(subsection => (
+										<StyledSubsection key={sectionHeaderId(subsection)} sx={subsection.sx}>
+											<ThemeProvider theme={subsectionTheme}>
+												{maybeAddCornerControl(
+													subsection,
+													<AnchorHeader
+														key="subsectionHeader"
+														id={sectionHeaderId(subsection)}
+														sx={{ scrollMarginTop }}
+														variant="h3"
+														marginBottom="0rem"
+													>
+														{subsection.icon} {subsection.title}
+													</AnchorHeader>,
+												)}
+												{subsection.caption === null ? null : (
+													<Box
+														key="subsectionCaption"
+														marginLeft={subsectionIconWidth}
+														marginBottom="1rem"
+														sx={{ opacity: 0.8 }}
+													>
+														{subsection.caption}
+													</Box>
+												)}
+												{subsection.body === null ? null : (
+													<Box key="subsectionBody">{subsection.body}</Box>
+												)}
+											</ThemeProvider>
+										</StyledSubsection>
+									))}
+								</StyledSection>
+							</React.Fragment>
+						))}
+					</Box>
 				</Box>
-			</Box>
+			</div>
 		</NavigationPageLayout>
 	)
 }
