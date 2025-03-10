@@ -58,6 +58,7 @@ import {
 import { VariantSpecificity, type ResolvedWallet } from '@/schema/wallet'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { commaListPrefix, slugifyCamelCase } from '@/types/utils/text'
+import { ReturnToTop } from '@/ui/organisms/ReturnToTop'
 
 const headerHeight = 80
 const headerBottomMargin = 24
@@ -457,11 +458,6 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 		<NavigationPageLayout
 			groups={[
 				{
-					id: 'home',
-					items: [navigationHome],
-					overflow: false,
-				},
-				{
 					id: 'wallet-sections',
 					items: [
 						{
@@ -505,49 +501,41 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			stickyHeaderMargin={headerBottomMargin}
 			contentDependencies={[wallet, pickedVariant]}
 		>
-		<StyledHeader key="walletHeader" id="walletHeader">
-			<Typography
-				variant="h4"
-				component="h1"
-				display="flex"
-				flexDirection="row"
-				alignItems="center"
-				gap="12px"
-			>
-				<WalletIcon
-					key="walletIcon"
-					walletMetadata={wallet.metadata}
-					iconSize={navigationListIconSize * 2}
+			<ReturnToTop />
+			<StyledHeader key="walletHeader" id="walletHeader">
+				<Typography
+					variant="h4"
+					component="h1"
+					display="flex"
+					flexDirection="row"
+					alignItems="center"
+					gap="12px"
+				>
+					<WalletIcon
+						key="walletIcon"
+						walletMetadata={wallet.metadata}
+						iconSize={navigationListIconSize * 2}
+					/>
+					{wallet.metadata.displayName}
+				</Typography>
+				<VariantPicker
+					pickerId="variantPicker"
+					variants={headerVariants}
+					pickedVariant={pickedVariant}
 				/>
-				{wallet.metadata.displayName}
-			</Typography>
-			<VariantPicker
-				pickerId="variantPicker"
-				variants={headerVariants}
-				pickedVariant={pickedVariant}
-			/>
-		</StyledHeader>
+			</StyledHeader>
 			<div
 				className="flex flex-col mt-10 gap-4"
 			>
-				<Box key="walletPageBody" display="flex" flexDirection="row">
-					<Box key="walletPageContent" component="main" flex="1">
-						<Box key="topSpacer" height={headerBottomMargin}></Box>
+				<div key="walletPageBody" className="flex flex-row">
+					<div key="walletPageContent" className="flex-1">
+						<div key="topSpacer" style={{ height: headerBottomMargin }}></div>
 						{nonEmptyMap(sections, (section, index) => (
 							<React.Fragment key={sectionHeaderId(section)}>
 								{index > 0 ? (
-									<Divider
+									<div
 										key="sectionDivider"
-										orientation="horizontal"
-										variant="middle"
-										flexItem={true}
-										sx={{
-											width: '80%',
-											marginLeft: 'auto',
-											marginRight: 'auto',
-											marginTop: '1.5rem',
-											marginBottom: '1.5rem',
-										}}
+										className="w-4/5 mx-auto mt-6 mb-6 border-b"
 									/>
 								) : null}
 								<StyledSection key="sectionContainer" sx={section.sx}>
@@ -567,14 +555,15 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 										</AnchorHeader>,
 									)}
 									{section.caption === null ? null : (
-										<Box
+										<div
 											key="sectionCaption"
-											marginLeft={sectionIconWidth}
-											marginBottom="1rem"
-											sx={{ opacity: 0.8 }}
+											className="mb-4 opacity-80"
+											style={{
+												marginLeft: sectionIconWidth,
+											}}
 										>
 											{section.caption}
-										</Box>
+										</div>
 									)}
 									{section.body === null ? null : (
 										<Box
@@ -620,8 +609,8 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 								</StyledSection>
 							</React.Fragment>
 						))}
-					</Box>
-				</Box>
+					</div>
+				</div>
 			</div>
 		</NavigationPageLayout>
 	)

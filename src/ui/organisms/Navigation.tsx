@@ -21,7 +21,7 @@ interface NavigationItemBase {
 	/**
 	 * Item icon shown next to the item name in the navigation menu.
 	 */
-	icon: React.ReactNode
+	icon?: React.ReactNode
 
 	/**
 	 * Item name in the navigation menu.
@@ -128,6 +128,8 @@ interface NavigationItemProps {
  */
 const NavigationItem = memo(
 	function NavigationItem({ item, active, depth }: NavigationItemProps): React.JSX.Element {
+		const linkStyles = "whitespace-nowrap flex flex-row items-center gap-2 py-1 hover:bg-backgroundSecondary rounded-md px-4";
+
 		const ButtonComponent = ({
 			children,
 		}: {
@@ -138,7 +140,7 @@ const NavigationItem = memo(
 					<a
 						// component="a"
 						href={`#${item.contentId}`}
-						className="whitespace-nowrap flex flex-row items-center gap-2 text-lg"
+						className={linkStyles}
 					// disableRipple={true}
 					// selected={active}
 					// sx={{ borderRadius: `${navigationListItemRadius}px` }}
@@ -154,7 +156,7 @@ const NavigationItem = memo(
 						href={item.href}
 						target={item.href.startsWith('https://') ? '_blank' : undefined} rel="noreferrer"
 						// disableRipple={true}
-						className="whitespace-nowrap flex flex-row items-center gap-2 text-lg"
+						className={linkStyles}
 					// selected={active}
 					// sx={{ borderRadius: `${navigationListItemRadius}px` }}
 					>
@@ -176,7 +178,7 @@ const NavigationItem = memo(
 			// }}
 			>
 				<ButtonComponent key="buttonComponent">
-					<SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>
+					{item.icon && <SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>}
 					<span
 					// sx={{
 					// 	fontSize:
@@ -223,6 +225,7 @@ export const NavigationGroup = memo(
 		return (
 			<>
 				<ul
+				 className="flex flex-col gap-0.5"
 				// key={`navigationGroupBox-${group.id}`}
 				// id={`navigationGroup-${group.id}`}
 				// sx={group.overflow ? { overflowY: 'auto', flex: '1' } : { flex: '0' }}
@@ -237,7 +240,7 @@ export const NavigationGroup = memo(
 								onContentItemClick={onContentItemClick}
 							/>
 							{(item.children?.length ?? 0) > 0 ? (
-								<ul key={`subitems-${item.id}`} className="pl-4 border-l ml-2">
+								<ul key={`subitems-${item.id}`} className="pl-1 border-l ml-6 flex flex-col gap-0.5">
 									{item.children?.map(subitem => (
 										<NavigationItem
 											key={`subitem-${subitem.id}`}
@@ -305,23 +308,25 @@ export function Navigation({
 	return (
 		<div
 			key="navigationBox"
-			className="flex flex-col gap-0 max-w-lg flex-0 px-8 py-8"
+			className="flex flex-col gap-0 max-w-lg flex-0 py-8"
 		>
-			<div className="flex justify-between items-center w-full gap-4">
+			<div className="flex justify-between items-center w-full gap-4 px-8 mb-4">
 				<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
 					~ WalletBeat
 				</a>
 				<ThemeSwitcher />
 			</div>
-			{nonEmptyMap(groups, (group, groupIndex) => (
-				<NavigationGroup
-					key={`navigationGroup-${group.id}`}
-					group={group}
-					groupIndex={groupIndex}
-					onContentItemClick={onContentItemClick}
-					activeItemId={activeItemId}
-				/>
-			))}
+			<div className="flex flex-col gap-0.5 px-4">
+				{nonEmptyMap(groups, (group, groupIndex) => (
+					<NavigationGroup
+						key={`navigationGroup-${group.id}`}
+						group={group}
+						groupIndex={groupIndex}
+						onContentItemClick={onContentItemClick}
+						activeItemId={activeItemId}
+					/>
+				))}
+			</div>
 		</div>
 	)
 }
