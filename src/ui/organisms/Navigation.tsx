@@ -307,7 +307,7 @@ export function Navigation({
 			key="navigationBox"
 			className="flex flex-col gap-0 max-w-lg flex-0 px-8 py-8"
 		>
-			<div className="flex justify-between items-center gap-4">
+			<div className="flex justify-between items-center w-full gap-4">
 				<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
 					~ WalletBeat
 				</a>
