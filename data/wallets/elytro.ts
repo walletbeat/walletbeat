@@ -1,26 +1,30 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { exampleContributor } from '../contributors/example'
-import { polymutex } from '../contributors/polymutex'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { notSupported } from '@/schema/features/support'
+import { nconsigny } from '../contributors/nconsigny'
 
-export const unratedTemplate: Wallet = {
+export const elytro: Wallet = {
 	metadata: {
-		id: 'unrated',
-		displayName: 'Unrated wallet template',
-		tableName: 'Unrated',
+		id: 'Elytro',
+		displayName: 'Elytro',
+		tableName: 'Elytro',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			This is a fictitious wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
+			We build Smart Contract Wallet for Ethereum.
+
+If you want to report a security issue, please mail it to contact@elytro.com
+
+You can find all the code for our open-source products.
+
+For general information, visit elytro.com
 		`),
-		url: 'https://example.com',
-		repoUrl: 'https://example.com/repo',
-		contributors: [exampleContributor],
-		lastUpdated: '2020-01-01',
+		url: 'https://elytro.io',
+		repoUrl: 'https://github.com/Elytro-eth',
+		contributors: [nconsigny],
+		lastUpdated: '2025-03-12',
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -44,6 +48,17 @@ export const unratedTemplate: Wallet = {
 			},
 		},
 		security: {
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
+				libraryUrl: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/a0146910dfbc46afeba809b26f256129d37e3301/contracts/libraries/WebAuthn.sol#L69',
+				details: 'Elytro uses FreshCryptoLib for passkey verification in their WebAuthn library.',
+				ref: [
+					{
+						url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/a0146910dfbc46afeba809b26f256129d37e3301/contracts/libraries/WebAuthn.sol#L69',
+						explanation: 'Elytro implements P256 verification using FreshCryptoLib in their WebAuthn library.'
+					}
+				]
+			},
 			scamAlerts: null,
 			publicSecurityAudits: null,
 			lightClient: {
@@ -60,14 +75,10 @@ export const unratedTemplate: Wallet = {
 				},
 				ref: null,
 			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
 		},
 		privacy: {
 			dataCollection: null,
-			privacyPolicy: 'https://example.com/privacy-policy',
+			privacyPolicy: 'https://github.com/Elytro-eth',
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -102,9 +113,9 @@ export const unratedTemplate: Wallet = {
 		},
 	},
 	variants: {
-		mobile: false,
+		mobile: true,
 		browser: true,
 		desktop: false,
 		embedded: false,
 	},
-}
+} 

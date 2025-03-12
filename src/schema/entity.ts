@@ -71,6 +71,12 @@ export interface Entity<Ts extends EntityType[] = []> {
 
 	/** The Crunchbase URL of the entity, if any. */
 	crunchbase: Url | { type: 'NO_CRUNCHBASE_URL' }
+	
+	/** The LinkedIn URL of the entity, if any. */
+	linkedin?: Url | { type: 'NO_LINKEDIN_URL' }
+	
+	/** The Twitter/X URL of the entity, if any. */
+	twitter?: Url | { type: 'NO_TWITTER_URL' }
 }
 
 type EntityWithType<T extends EntityType> = Entity & Entity<[T]>

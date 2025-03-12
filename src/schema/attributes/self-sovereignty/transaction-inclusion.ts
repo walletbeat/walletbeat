@@ -90,7 +90,7 @@ function transactionSubmissionEvaluation(
 			),
 		}
 	}
-	const valueId = `l1${supportsL1Broadcast.toLowerCase()}_any${supportAnyL2Transactions.toSorted().join('-').toLocaleLowerCase()}_withdrawal${supportForceWithdrawal.toSorted().join('-').toLowerCase()}_no${unsupportedL2s.toSorted().join('-').toLowerCase()}`
+	const valueId = `l1${supportsL1Broadcast.toLowerCase()}_any${[...supportAnyL2Transactions].sort().join('-').toLocaleLowerCase()}_withdrawal${[...supportForceWithdrawal].sort().join('-').toLowerCase()}_no${[...unsupportedL2s].sort().join('-').toLowerCase()}`
 	if (unsupportedL2s.length > 0) {
 		return {
 			value: {

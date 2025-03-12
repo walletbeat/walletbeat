@@ -13,6 +13,10 @@ import type { TransactionSubmission } from './features/self-sovereignty/transact
 import type { AccountSupport } from './features/account-support'
 import type { Support } from './features/support'
 import type { ScamAlerts } from './features/security/scam-alerts'
+import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
+import type { HardwareWalletClearSigningSupport } from './features/security/hardware-wallet-clear-signing'
+import type { FeeTransparencySupport } from './features/transparency/fee-transparency'
+import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
 
 /**
  * A set of features about a wallet, each of which may or may not depend on
@@ -46,6 +50,15 @@ export interface WalletFeatures {
 			/** Light client used for Ethereum L1. */
 			ethereumL1: VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
+
+		/** Hardware wallet support */
+		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
+
+		/** Hardware wallet clear signing support */
+		hardwareWalletClearSigning: VariantFeature<HardwareWalletClearSigningSupport>
+		
+		/** Passkey verification implementation */
+		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
 	}
 
 	/** Privacy features. */
@@ -83,6 +96,12 @@ export interface WalletFeatures {
 
 	/** The monetization model of the wallet. */
 	monetization: VariantFeature<Monetization>
+
+	/** Transparency features. */
+	transparency: {
+		/** Fee transparency information. */
+		feeTransparency: VariantFeature<FeeTransparencySupport>
+	}
 }
 
 /**
@@ -102,6 +121,9 @@ export interface ResolvedFeatures {
 		lightClient: {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
+		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
+		hardwareWalletClearSigning: ResolvedFeature<HardwareWalletClearSigningSupport>
+		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 	}
 	privacy: {
 		dataCollection: ResolvedFeature<DataCollection>
@@ -117,12 +139,16 @@ export interface ResolvedFeatures {
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
 	license: ResolvedFeature<WithRef<License>>
 	monetization: ResolvedFeature<Monetization>
+	transparency: {
+		feeTransparency: ResolvedFeature<FeeTransparencySupport> | null
+	}
 }
 
 /** Resolve a set of features according to the given variant. */
 export function resolveFeatures(features: WalletFeatures, variant: Variant): ResolvedFeatures {
 	const feat = <F>(feature: VariantFeature<F>): ResolvedFeature<F> =>
 		resolveFeature<F>(feature, variant)
+	
 	return {
 		variant,
 		profile: features.profile,
@@ -138,6 +164,9 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 			lightClient: {
 				ethereumL1: feat(features.security.lightClient.ethereumL1),
 			},
+			hardwareWalletSupport: feat(features.security.hardwareWalletSupport),
+			hardwareWalletClearSigning: feat(features.security.hardwareWalletClearSigning),
+			passkeyVerification: feat(features.security.passkeyVerification),
 		},
 		privacy: {
 			dataCollection: feat(features.privacy.dataCollection),
@@ -153,5 +182,10 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 		addressResolution: feat(features.addressResolution),
 		license: feat(features.license),
 		monetization: feat(features.monetization),
+		transparency: {
+			feeTransparency: features.transparency?.feeTransparency 
+				? feat(features.transparency.feeTransparency) 
+				: null,
+		},
 	}
 }

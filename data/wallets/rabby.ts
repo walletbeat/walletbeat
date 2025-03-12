@@ -13,6 +13,8 @@ import { cure53 } from '../entities/cure53'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 
 export const rabby: Wallet = {
 	metadata: {
@@ -81,6 +83,10 @@ export const rabby: Wallet = {
 			},
 		},
 		security: {
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
 			scamAlerts: {
 				scamUrlWarning: supported({
 					leaksVisitedUrl: 'FULL_URL',
@@ -266,6 +272,17 @@ export const rabby: Wallet = {
 			lightClient: {
 				ethereumL1: notSupported,
 			},
+			hardwareWalletSupport: {
+				supportedWallets: {},
+				ref: null,
+			},
+			hardwareWalletClearSigning: {
+				clearSigningSupport: {
+					level: ClearSigningLevel.NONE,
+					details: 'Rabby does not support hardware wallet clear signing.'
+				},
+				ref: null,
+			},
 		},
 		privacy: {
 			dataCollection: {
@@ -350,6 +367,9 @@ export const rabby: Wallet = {
 					],
 				},
 			],
+		},
+		transparency: {
+			feeTransparency: null,
 		},
 	},
 	variants: {

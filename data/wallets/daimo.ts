@@ -15,6 +15,9 @@ import { veridise } from '../entities/veridise'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { nconsigny } from '../contributors/nconsigny'
 
 export const daimo: Wallet = {
 	metadata: {
@@ -33,8 +36,8 @@ export const daimo: Wallet = {
 		},
 		url: 'https://daimo.com',
 		repoUrl: 'https://github.com/daimo-eth/daimo',
-		contributors: [polymutex],
-		lastUpdated: '2024-12-15',
+		contributors: [polymutex, nconsigny],
+		lastUpdated: '2025-03-12',
 	},
 	features: {
 		profile: WalletProfile.PAYMENTS,
@@ -82,6 +85,17 @@ export const daimo: Wallet = {
 			browser: 'NOT_A_BROWSER_WALLET',
 		},
 		security: {
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
+				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
+				details: 'Daimo uses FreshCryptoLib for passkey verification in their P256Verifier contract.',
+				ref: [
+					{
+						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
+						explanation: 'Daimo implements P256 verification using FreshCryptoLib in their P256Verifier contract.'
+					}
+				]
+			},
 			scamAlerts: {
 				scamUrlWarning: notSupported,
 				contractTransactionWarning: notSupported,
@@ -119,6 +133,17 @@ export const daimo: Wallet = {
 			],
 			lightClient: {
 				ethereumL1: notSupported,
+			},
+			hardwareWalletSupport: {
+				supportedWallets: {},
+				ref: null,
+			},
+			hardwareWalletClearSigning: {
+				clearSigningSupport: {
+					level: ClearSigningLevel.NONE,
+					details: 'Daimo does not support hardware wallets.'
+				},
+				ref: null,
 			},
 		},
 		privacy: {
@@ -290,6 +315,9 @@ export const daimo: Wallet = {
 					url: 'https://vote.optimism.io/retropgf/3/application/0x118a000851cf4c736497bab89993418517ac7cd9c8ede074aff408a8e0f84060',
 				},
 			],
+		},
+		transparency: {
+			feeTransparency: null,
 		},
 	},
 	overrides: {

@@ -1,26 +1,26 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { exampleContributor } from '../contributors/example'
-import { polymutex } from '../contributors/polymutex'
+import { nconsigny } from '../contributors/nconsigny'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { featureSupported } from '@/schema/features/support'
+import { keystone } from '../entities/keystone'
 
-export const unratedTemplate: Wallet = {
+export const keystoneWallet: Wallet = {
 	metadata: {
-		id: 'unrated',
-		displayName: 'Unrated wallet template',
-		tableName: 'Unrated',
+		id: 'keystone',
+		displayName: 'Keystone',
+		tableName: 'Keystone',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			This is a fictitious wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
+			Keystone is an air-gapped hardware wallet that uses QR codes for communication.
+			It offers enhanced security by keeping private keys completely offline.
 		`),
-		url: 'https://example.com',
-		repoUrl: 'https://example.com/repo',
-		contributors: [exampleContributor],
-		lastUpdated: '2020-01-01',
+		url: 'https://keyst.one/',
+		repoUrl: 'https://github.com/KeystoneHQ',
+		contributors: [nconsigny],
+		lastUpdated: '2025-03-12',
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -44,30 +44,29 @@ export const unratedTemplate: Wallet = {
 			},
 		},
 		security: {
+			passkeyVerification: null,	
 			scamAlerts: null,
 			publicSecurityAudits: null,
 			lightClient: {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
+				supportedWallets: {
+					[HardwareWalletType.KEYSTONE]: featureSupported,
+				},
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					level: ClearSigningLevel.FULL,
+					details: 'TBD.'
 				},
-				ref: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
 				ref: null,
 			},
 		},
 		privacy: {
 			dataCollection: null,
-			privacyPolicy: 'https://example.com/privacy-policy',
+			privacyPolicy: 'https://keyst.one/privacy-policy',
 		},
 		selfSovereignty: {
 			transactionSubmission: {

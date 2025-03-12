@@ -1,26 +1,27 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { exampleContributor } from '../contributors/example'
-import { polymutex } from '../contributors/polymutex'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { notSupported } from '@/schema/features/support'
+import { nconsigny } from '../contributors/nconsigny'
 
-export const unratedTemplate: Wallet = {
+
+
+export const safe: Wallet = {
 	metadata: {
-		id: 'unrated',
-		displayName: 'Unrated wallet template',
-		tableName: 'Unrated',
+		id: 'safe',
+		displayName: 'Safe',
+		tableName: 'Safe',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			This is a fictitious wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
+			Safe (formerly Gnosis Safe) is a smart contract wallet focused on secure asset management
+			with multi-signature functionality for individuals and organizations.
 		`),
-		url: 'https://example.com',
-		repoUrl: 'https://example.com/repo',
-		contributors: [exampleContributor],
-		lastUpdated: '2020-01-01',
+		url: 'https://safe.global',
+		repoUrl: 'https://github.com/safe-global',
+		contributors: [nconsigny],
+		lastUpdated: '2025-03-12',
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -44,6 +45,17 @@ export const unratedTemplate: Wallet = {
 			},
 		},
 		security: {
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
+				libraryUrl: 'https://github.com/safe-global/safe-modules/tree/master/4337/contracts/test/FCL',
+				details: 'Safe uses FreshCryptoLib for passkey verification in their 4337 modules.',
+				ref: [
+					{
+						url: 'https://github.com/safe-global/safe-modules/tree/master/4337/contracts/test/FCL',
+						explanation: 'Safe implements P256 verification using FreshCryptoLib in their 4337 modules.'
+					}
+				]
+			},
 			scamAlerts: null,
 			publicSecurityAudits: null,
 			lightClient: {
@@ -60,14 +72,10 @@ export const unratedTemplate: Wallet = {
 				},
 				ref: null,
 			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
 		},
 		privacy: {
 			dataCollection: null,
-			privacyPolicy: 'https://example.com/privacy-policy',
+			privacyPolicy: 'https://safe.global/privacy',
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -102,9 +110,9 @@ export const unratedTemplate: Wallet = {
 		},
 	},
 	variants: {
-		mobile: false,
+		mobile: true,
 		browser: true,
 		desktop: false,
 		embedded: false,
 	},
-}
+} 

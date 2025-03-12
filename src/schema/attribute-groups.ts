@@ -25,6 +25,7 @@ import {
 	sourceVisibility,
 	type SourceVisibilityValue,
 } from './attributes/transparency/source-visibility'
+import { feeTransparency, type FeeTransparencyValue } from './attributes/transparency/fee-transparency'
 import type { ResolvedFeatures } from './features'
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { Dict } from '@/types/utils/dict'
@@ -54,6 +55,10 @@ import {
 } from './attributes/ecosystem/address-resolution'
 import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
 import {
+	hardwareWalletClearSigning,
+	type HardwareWalletClearSigningValue,
+} from './attributes/security/hardware-wallet-clear-signing'
+import {
 	transactionInclusion,
 	type TransactionInclusionValue,
 } from './attributes/self-sovereignty/transaction-inclusion'
@@ -65,11 +70,17 @@ import {
 	accountPortability,
 	type AccountPortabilityValue,
 } from './attributes/self-sovereignty/account-portability'
+import {
+	passkeyImplementation,
+	type PasskeyImplementationValue,
+} from './attributes/security/passkey-implementation'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
 	chainVerification: ChainVerificationValue
+	hardwareWalletClearSigning: HardwareWalletClearSigningValue
+	passkeyImplementation: PasskeyImplementationValue
 }>
 
 /** Security attributes. */
@@ -83,10 +94,14 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	attributes: {
 		securityAudits,
 		chainVerification,
+		hardwareWalletClearSigning,
+		passkeyImplementation,
 	},
 	score: scoreGroup<SecurityValues>({
 		securityAudits: 1.0,
 		chainVerification: 1.0,
+		hardwareWalletClearSigning: 1.0,
+		passkeyImplementation: 1.0,
 	}),
 }
 
@@ -148,6 +163,7 @@ type TransparencyValues = Dict<{
 	openSource: OpenSourceValue
 	sourceVisibility: SourceVisibilityValue
 	funding: FundingValue
+	feeTransparency: FeeTransparencyValue
 }>
 
 /** Transparency attributes. */
@@ -163,11 +179,13 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		openSource,
 		sourceVisibility,
 		funding,
+		feeTransparency,
 	},
 	score: scoreGroup<TransparencyValues>({
 		openSource: 1.0,
 		sourceVisibility: 1.0,
 		funding: 1.0,
+		feeTransparency: 1.0,
 	}),
 }
 
@@ -213,6 +231,8 @@ export const attributeTree: NonEmptyRecord<string, AttributeGroup<any>> = {
 export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
+	hardwareWalletClearSigning: EvaluatedAttribute<HardwareWalletClearSigningValue>
+	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
 }
 
 /** Evaluated privacy attributes for a single wallet. */
@@ -232,6 +252,8 @@ export interface SelfSovereigntyEvaluations extends EvaluatedGroup<SelfSovereign
 export interface TransparencyEvaluations extends EvaluatedGroup<TransparencyValues> {
 	openSource: EvaluatedAttribute<OpenSourceValue>
 	sourceVisibility: EvaluatedAttribute<SourceVisibilityValue>
+	funding: EvaluatedAttribute<FundingValue>
+	feeTransparency: EvaluatedAttribute<FeeTransparencyValue>
 }
 
 /** Evaluated ecosystem attributes for a single wallet. */
@@ -266,6 +288,8 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 		security: {
 			securityAudits: evalAttr(securityAudits),
 			chainVerification: evalAttr(chainVerification),
+			hardwareWalletClearSigning: evalAttr(hardwareWalletClearSigning),
+			passkeyImplementation: evalAttr(passkeyImplementation),
 		},
 		privacy: {
 			addressCorrelation: evalAttr(addressCorrelation),
@@ -280,6 +304,7 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 			openSource: evalAttr(openSource),
 			sourceVisibility: evalAttr(sourceVisibility),
 			funding: evalAttr(funding),
+			feeTransparency: evalAttr(feeTransparency),
 		},
 		ecosystem: {
 			accountAbstraction: evalAttr(accountAbstraction),
@@ -313,6 +338,8 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 		security: {
 			securityAudits: attr(tree => tree.security.securityAudits),
 			chainVerification: attr(tree => tree.security.chainVerification),
+			hardwareWalletClearSigning: attr(tree => tree.security.hardwareWalletClearSigning),
+			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 		},
 		privacy: {
 			addressCorrelation: attr(tree => tree.privacy.addressCorrelation),
@@ -327,6 +354,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			openSource: attr(tree => tree.transparency.openSource),
 			sourceVisibility: attr(tree => tree.transparency.sourceVisibility),
 			funding: attr(tree => tree.transparency.funding),
+			feeTransparency: attr(tree => tree.transparency.feeTransparency),
 		},
 		ecosystem: {
 			accountAbstraction: attr(tree => tree.ecosystem.accountAbstraction),

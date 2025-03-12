@@ -1,26 +1,27 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { exampleContributor } from '../contributors/example'
-import { polymutex } from '../contributors/polymutex'
+import { nconsigny } from '../contributors/nconsigny'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
+import { featureSupported } from '@/schema/features/support'
+import { ledger } from '../entities/ledger'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 
-export const unratedTemplate: Wallet = {
+export const ledgerWallet: Wallet = {
 	metadata: {
-		id: 'unrated',
-		displayName: 'Unrated wallet template',
-		tableName: 'Unrated',
+		id: 'ledger',
+		displayName: 'Ledger Wallet',
+		tableName: 'Ledger',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			This is a fictitious wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
+			Ledger Wallet is a self-custodial wallet built by Ledger. It
+			integrates with Ledger hardware wallets to provide secure cryptocurrency management.
 		`),
-		url: 'https://example.com',
-		repoUrl: 'https://example.com/repo',
-		contributors: [exampleContributor],
-		lastUpdated: '2020-01-01',
+		url: 'https://www.ledger.com/',
+		repoUrl: null,
+		contributors: [nconsigny],
+		lastUpdated: '2025-03-12',
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -44,30 +45,32 @@ export const unratedTemplate: Wallet = {
 			},
 		},
 		security: {
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
 			scamAlerts: null,
 			publicSecurityAudits: null,
 			lightClient: {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
+				supportedWallets: {
+					[HardwareWalletType.LEDGER]: featureSupported,
+				},
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					level: ClearSigningLevel.FULL,
+					details: 'TBD.'
 				},
-				ref: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
 				ref: null,
 			},
 		},
 		privacy: {
 			dataCollection: null,
-			privacyPolicy: 'https://example.com/privacy-policy',
+			privacyPolicy: 'https://ledger.com/privacy-policy',
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -102,7 +105,7 @@ export const unratedTemplate: Wallet = {
 		},
 	},
 	variants: {
-		mobile: false,
+		mobile: true,
 		browser: true,
 		desktop: false,
 		embedded: false,

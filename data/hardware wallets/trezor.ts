@@ -1,26 +1,28 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { exampleContributor } from '../contributors/example'
-import { polymutex } from '../contributors/polymutex'
+import { nconsigny } from '../contributors/nconsigny'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
+import { featureSupported } from '@/schema/features/support'
+import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
+import { trezor } from '../entities/trezor'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 
-export const unratedTemplate: Wallet = {
+export const trezorWallet: Wallet = {
 	metadata: {
-		id: 'unrated',
-		displayName: 'Unrated wallet template',
-		tableName: 'Unrated',
+		id: 'trezor',
+		displayName: 'Trezor Wallet',
+		tableName: 'Trezor',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			This is a fictitious wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
+			Trezor Wallet is a self-custodial hardware wallet built by SatoshiLabs. It
+			provides secure storage for cryptocurrencies with an easy-to-use interface.
 		`),
-		url: 'https://example.com',
-		repoUrl: 'https://example.com/repo',
-		contributors: [exampleContributor],
-		lastUpdated: '2020-01-01',
+		url: 'https://trezor.io/',
+		repoUrl: 'https://github.com/trezor/trezor-suite',
+		contributors: [nconsigny],
+		lastUpdated: '2025-03-12',
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -44,30 +46,32 @@ export const unratedTemplate: Wallet = {
 			},
 		},
 		security: {
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
 			scamAlerts: null,
 			publicSecurityAudits: null,
 			lightClient: {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
+				supportedWallets: {
+					[HardwareWalletType.TREZOR]: featureSupported,
+				},
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					level: ClearSigningLevel.FULL,
+					details: 'Trezor provides full clear signing support with detailed transaction information displayed on the device screen.'
 				},
-				ref: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
 				ref: null,
 			},
 		},
 		privacy: {
 			dataCollection: null,
-			privacyPolicy: 'https://example.com/privacy-policy',
+			privacyPolicy: 'https://trezor.io/privacy-policy',
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -104,7 +108,7 @@ export const unratedTemplate: Wallet = {
 	variants: {
 		mobile: false,
 		browser: true,
-		desktop: false,
+		desktop: true,
 		embedded: false,
 	},
 }
