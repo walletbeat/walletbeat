@@ -3,12 +3,21 @@ import { WalletIcon } from "../atoms/WalletIcon"
 import { wallets } from "@/data/wallets"
 import * as Popover from "@radix-ui/react-popover"
 import { Command } from "cmdk"
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { LuChevronDown, LuSearch } from "react-icons/lu"
 
 export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Element {
 	const [open, setOpen] = useState(false)
 	const inputRef = useRef<HTMLInputElement>(null)
+	const triggerRef = useRef<HTMLButtonElement>(null)
+	const [width, setWidth] = useState(0)
+
+	// Update width when popover opens
+	useEffect(() => {
+		if (open && triggerRef.current) {
+			setWidth(triggerRef.current.offsetWidth)
+		}
+	}, [open])
 
 	// Convert wallets object to array with ids
 	const allWallets = Object.entries(wallets).map(([id, walletData]) => ({
@@ -26,6 +35,7 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 		<Popover.Root open={open} onOpenChange={setOpen}>
 			<Popover.Trigger asChild>
 				<button
+					ref={triggerRef}
 					className="border px-2 py-1 rounded-md flex items-center justify-between gap-2 bg-backgroundSecondary w-full"
 					aria-label="Select wallet"
 				>
@@ -48,7 +58,8 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 
 			<Popover.Portal>
 				<Popover.Content
-					className="bg-background border rounded-md shadow-lg w-[300px] p-1"
+					className="bg-background border rounded-md shadow-lg p-1"
+					style={{ width: width > 0 ? width : 'auto' }}
 					sideOffset={8}
 					align="start"
 					onOpenAutoFocus={(e) => {
