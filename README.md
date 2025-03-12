@@ -9,6 +9,12 @@ An open repository of EVM-compatible wallets.
 
 A special thank you goes out to [@polymutex](https://github.com/polymutex) & [@fluidkey](https://github.com/fluidkey) for their kickstart & continued support of this project.
 
+## SEO
+
+The site automatically generates a sitemap.xml file using the @astrojs/sitemap integration. The sitemap will be available at `https://wallet.page/sitemap-index.xml` after building the site.
+
+To configure the site URL for sitemap generation, update the `SITE_URL` in the `.env` file or set it as an environment variable.
+
 ## Contributing
 
 We welcome and encourage contributions.
