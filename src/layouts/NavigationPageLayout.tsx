@@ -18,6 +18,7 @@ export function NavigationPageLayout({
 	contentDependencies = [],
 	stickyHeaderId = undefined,
 	stickyHeaderMargin = undefined,
+	prefix,
 }: {
 	/**
 	 * Set of navigation item groups.
@@ -47,6 +48,11 @@ export function NavigationPageLayout({
 	 * `groups` is already implicitly included in this.
 	 */
 	contentDependencies?: React.DependencyList
+
+	/**
+	 * Prefix to display in the navigation bar.
+	 */
+	prefix?: React.ReactNode
 }): React.JSX.Element {
 	const [activeItemId, setActiveItemId] = useState<string>('')
 
@@ -158,7 +164,7 @@ export function NavigationPageLayout({
 	return (
 		<ThemeProvider theme={theme}>
 			<div className="flex w-full min-h-screen flex-wrap lg:flex-nowrap flex-row max-w-screen">
-				<Navigation key="navigation" groups={groups} activeItemId={activeItemId} />
+				<Navigation key="navigation" groups={groups} activeItemId={activeItemId} prefix={prefix} />
 
 				<div
 					key="contentContainer"

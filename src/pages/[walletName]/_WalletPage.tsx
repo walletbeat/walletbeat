@@ -59,6 +59,7 @@ import { VariantSpecificity, type ResolvedWallet } from '@/schema/wallet'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { commaListPrefix, slugifyCamelCase } from '@/types/utils/text'
 import { ReturnToTop } from '@/ui/organisms/ReturnToTop'
+import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
 
 const headerHeight = 80
 const headerBottomMargin = 24
@@ -519,21 +520,24 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 
 	return (
 		<NavigationPageLayout
+			prefix={
+				<WalletDropdown wallet={wallet} />
+			}
 			groups={[
 				{
 					id: 'wallet-sections',
 					items: [
-						{
-							id: sections[0].header,
-							icon: (
-								<WalletIcon
-									walletMetadata={wallet.metadata}
-									iconSize={navigationListIconSize * 0.75}
-								/>
-							),
-							title: wallet.metadata.displayName,
-							contentId: sectionHeaderId(sections[0]),
-						},
+						// {
+						// 	id: sections[0].header,
+						// 	icon: (
+						// 		<WalletIcon
+						// 			walletMetadata={wallet.metadata}
+						// 			iconSize={navigationListIconSize * 0.75}
+						// 		/>
+						// 	),
+						// 	title: wallet.metadata.displayName,
+						// 	contentId: sectionHeaderId(sections[0]),
+						// },
 						...sections.slice(1).map(
 							(section): NavigationItem => ({
 								id: sectionHeaderId(section),

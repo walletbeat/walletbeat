@@ -299,11 +299,13 @@ export function Navigation({
 	activeItemId,
 	flex,
 	onContentItemClick = undefined,
+	prefix,
 }: {
 	groups: NonEmptyArray<NavigationGroup>
 	activeItemId?: string
 	flex?: React.ComponentProps<typeof Box>['flex']
 	onContentItemClick?: (item: NavigationContentItem) => void
+	prefix?: React.ReactNode
 }): React.JSX.Element {
 	return (
 		<div
@@ -316,7 +318,8 @@ export function Navigation({
 				</a>
 				<ThemeSwitcher />
 			</div>
-			<div className="flex flex-col gap-0.5 px-4">
+			<div className="flex flex-col gap-4 px-4">
+				{prefix}
 				{nonEmptyMap(groups, (group, groupIndex) => (
 					<NavigationGroup
 						key={`navigationGroup-${group.id}`}

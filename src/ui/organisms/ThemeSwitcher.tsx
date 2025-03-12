@@ -34,7 +34,7 @@ export const ThemeSwitcher: FC = () => {
 	};
 
 	// Don't render until we've determined the theme
-	if (isDarkMode === null) return null;
+	if (isDarkMode === null) return <div className="size-[38px]"></div>;
 
 	return (
 		<div className="flex flex-row items-center gap-2">
