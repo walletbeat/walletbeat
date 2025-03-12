@@ -5,6 +5,8 @@ import { polymutex } from '../contributors/polymutex'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { nconsigny } from '../contributors/nconsigny'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { featureSupported } from '@/schema/features/support'
 
 export const metamask: Wallet = {
 	metadata: {
@@ -61,15 +63,31 @@ export const metamask: Wallet = {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
-				ref: null,
+				supportedWallets: {
+					[HardwareWalletType.LEDGER]: featureSupported,
+					[HardwareWalletType.TREZOR]: featureSupported,
+					[HardwareWalletType.GRIDPLUS]: featureSupported,
+					[HardwareWalletType.KEYSTONE]: featureSupported,
+					[HardwareWalletType.KEEPKEY]: featureSupported,
+				},
+				ref: [
+					{
+						url: 'https://support.metamask.io/hc/en-us/articles/4408552261275-Hardware-Wallet-Hub',
+						explanation: 'MetaMask supports Ledger, Trezor, Lattice (GridPlus), Keystone, OneKey, and KeepKey hardware wallets through their Hardware Wallet Hub.'
+					}
+				],
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					level: ClearSigningLevel.PARTIAL,
+					details: 'MetaMask provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.'
 				},
-				ref: null,
+				ref: [
+					{
+						url: 'https://support.metamask.io/hc/en-us/articles/4408552261275-Hardware-Wallet-Hub',
+						explanation: 'MetaMask Hardware Wallet Hub supports transaction signing with hardware wallets, displaying basic transaction information on the device.'
+					}
+				],
 			},
 		},
 		privacy: {

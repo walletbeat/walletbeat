@@ -15,9 +15,10 @@ import FoundationIcon from '@mui/icons-material/Foundation';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
 import { navigationAbout, navigationCriteria } from '@/components/navigation';
-import { LuWallet } from 'react-icons/lu';
+import { LuWallet, LuKey } from 'react-icons/lu';
 import type { FC } from 'react';
 import { wallets } from '@/data/wallets';
+import { hardwareWallets } from '@/data/hardwareWallets';
 import type { Wallet } from '@/schema/wallet';
 
 export const HomePage: FC = () =>
@@ -56,6 +57,35 @@ export const HomePage: FC = () =>
 							}
 						}),
 
+					}
+				],
+				overflow: false,
+			},
+			{
+				id: 'hardware-wallets',
+				items: [
+					{
+						title: 'Hardware Wallets',
+						icon: <LuKey />,
+						href: '/',
+						id: 'hardware-wallets',
+						children: Object.keys(hardwareWallets).map((key) => {
+							const wallet = hardwareWallets[key as keyof typeof hardwareWallets] as Wallet;
+							
+							// Simplified display names for hardware wallets
+							let displayName = wallet.metadata.displayName;
+							if (key === 'ledger') displayName = 'Ledger';
+							if (key === 'trezor') displayName = 'Trezor';
+							if (key === 'gridplus') displayName = 'Grid Plus';
+							if (key === 'keystone') displayName = 'Keystone';
+
+							return {
+								title: displayName,
+								href: `/${key}`,
+								id: key,
+								icon: <img src={`/images/hardware-wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`} className="size-4" />,
+							}
+						}),
 					}
 				],
 				overflow: false,

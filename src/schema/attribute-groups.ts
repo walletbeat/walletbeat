@@ -59,6 +59,10 @@ import {
 	type HardwareWalletClearSigningValue,
 } from './attributes/security/hardware-wallet-clear-signing'
 import {
+	hardwareWalletSupport,
+	type HardwareWalletSupportValue,
+} from './attributes/security/hardware-wallet-support'
+import {
 	transactionInclusion,
 	type TransactionInclusionValue,
 } from './attributes/self-sovereignty/transaction-inclusion'
@@ -80,6 +84,7 @@ type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
 	chainVerification: ChainVerificationValue
 	hardwareWalletClearSigning: HardwareWalletClearSigningValue
+	hardwareWalletSupport: HardwareWalletSupportValue
 	passkeyImplementation: PasskeyImplementationValue
 }>
 
@@ -95,12 +100,14 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		securityAudits,
 		chainVerification,
 		hardwareWalletClearSigning,
+		hardwareWalletSupport,
 		passkeyImplementation,
 	},
 	score: scoreGroup<SecurityValues>({
 		securityAudits: 1.0,
 		chainVerification: 1.0,
 		hardwareWalletClearSigning: 1.0,
+		hardwareWalletSupport: 1.0,
 		passkeyImplementation: 1.0,
 	}),
 }
@@ -232,6 +239,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
 	hardwareWalletClearSigning: EvaluatedAttribute<HardwareWalletClearSigningValue>
+	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
 	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
 }
 
@@ -289,6 +297,7 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 			securityAudits: evalAttr(securityAudits),
 			chainVerification: evalAttr(chainVerification),
 			hardwareWalletClearSigning: evalAttr(hardwareWalletClearSigning),
+			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 		},
 		privacy: {
@@ -339,6 +348,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			securityAudits: attr(tree => tree.security.securityAudits),
 			chainVerification: attr(tree => tree.security.chainVerification),
 			hardwareWalletClearSigning: attr(tree => tree.security.hardwareWalletClearSigning),
+			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 		},
 		privacy: {

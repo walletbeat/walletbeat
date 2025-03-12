@@ -154,7 +154,7 @@ function ExampleRatings<V extends Value>({
 	})()
 	return (
 		<>
-			<Typography variant="h5">{exhaustive ? 'In other words' : 'A few examples'}</Typography>
+			<Typography variant="h5">{exhaustive ? '' : 'A few examples'}</Typography>
 			<Box>
 				{renderedExamples.map(renderedExample =>
 					renderedExample.element === null ? null : (

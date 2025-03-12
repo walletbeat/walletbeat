@@ -15,6 +15,7 @@ import { AccountType } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 
 export const rabby: Wallet = {
 	metadata: {
@@ -273,15 +274,30 @@ export const rabby: Wallet = {
 				ethereumL1: notSupported,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
-				ref: null,
+				supportedWallets: {
+					[HardwareWalletType.LEDGER]: featureSupported,
+					[HardwareWalletType.TREZOR]: featureSupported,
+					[HardwareWalletType.KEYSTONE]: featureSupported,
+					[HardwareWalletType.GRIDPLUS]: featureSupported,
+				},
+				ref: [
+					{
+						url: 'https://rabby.io/download',
+						explanation: 'Rabby Desktop supports Ledger, Trezor, OneKey, Keystone, AirGap Vault, CoolWallet, GridPlus, and NGRAVE ZERO hardware wallets. Note that this support is only available in the desktop version, not in the mobile or browser extension versions.'
+					}
+				],
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'Rabby does not support hardware wallet clear signing.'
+					level: ClearSigningLevel.PARTIAL,
+					details: 'Rabby Desktop provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.'
 				},
-				ref: null,
+				ref: [
+					{
+						url: 'https://rabby.io/download',
+						explanation: 'Rabby Desktop supports transaction signing with hardware wallets, displaying basic transaction information on the device. This feature is only available in the desktop version.'
+					}
+				],
 			},
 		},
 		privacy: {

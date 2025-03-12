@@ -16,7 +16,8 @@ export function TransactionInclusionDetails({
 }: TransactionInclusionDetailsProps): React.JSX.Element {
 	const allSupportedForceWithdrawals = supportAnyL2Transactions
 		.concat(supportForceWithdrawal)
-		.toSorted()
+		.slice()
+		.sort()
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			{allSupportedForceWithdrawals.length > 0 && (
