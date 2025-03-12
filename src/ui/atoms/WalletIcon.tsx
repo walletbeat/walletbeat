@@ -10,12 +10,14 @@ export function WalletIcon({
 	iconSize: number
 }): React.JSX.Element {
 	return (
-		<img
-			alt={walletMetadata.displayName}
+		<div style={{ width: iconSize, height: iconSize, overflow: 'hidden' }} className='flex'>
+			<img
+				alt={walletMetadata.displayName}
 			width={iconSize}
 			height={iconSize}
 			src={`${betaImagesRoot}/wallets/${walletMetadata.id}.${walletMetadata.iconExtension}`}
-			style={{ filter: `drop-shadow(0 0 ${iconSize / 6}px rgba(255, 255, 255, 0.1))` }}
-		/>
+				style={{ filter: `drop-shadow(0 0 ${iconSize / 6}px rgba(255, 255, 255, 0.1))` }}
+			/>
+		</div>
 	)
 }

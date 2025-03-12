@@ -5,6 +5,7 @@ import { metamask } from './wallets/metamask'
 import { phantom } from './wallets/phantom'
 import { rainbow } from './wallets/rainbow'
 import { coinbase } from './wallets/coinbase'
+import { frame } from './wallets/frame'
 
 /** Set of all known wallets. */
 export const wallets = {
@@ -14,6 +15,7 @@ export const wallets = {
 	phantom,
 	rabby,
 	rainbow,
+	frame,
 }
 
 /** A valid wallet name. */
