@@ -41,7 +41,8 @@ export const coinbase: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
+		security:
+			{
 			scamAlerts: null,
 			publicSecurityAudits: null,
 			lightClient: {
@@ -59,7 +60,8 @@ export const coinbase: Wallet = {
 				ref: null,
 			},
 			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
+				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
+				libraryUrl: 'https://github.com/rdubois-crypto/FreshCryptoLib',
 				ref: null,
 			},
 		},

@@ -25,7 +25,7 @@ export const trezorWallet: Wallet = {
 		lastUpdated: '2025-03-12',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
+		profile: WalletProfile.HARDWARE,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -63,8 +63,8 @@ export const trezorWallet: Wallet = {
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					level: ClearSigningLevel.FULL,
-					details: 'Trezor provides full clear signing support with detailed transaction information displayed on the device screen.'
+					level: ClearSigningLevel.PARTIAL,
+					details: 'Trezor provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.'
 				},
 				ref: null,
 			},
@@ -107,8 +107,9 @@ export const trezorWallet: Wallet = {
 	},
 	variants: {
 		mobile: false,
-		browser: true,
-		desktop: true,
+		browser: false,
+		desktop: false,
 		embedded: false,
+		hardware: true,
 	},
 }

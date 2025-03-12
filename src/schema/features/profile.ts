@@ -18,4 +18,11 @@ export enum WalletProfile {
 	 * with.
 	 */
 	PAYMENTS = 'PAYMENTS',
+	
+	/**
+	 * A hardware wallet that stores private keys in a secure hardware element.
+	 * Such wallets are exempt from features such as hardware wallet support
+	 * since they are themselves hardware wallets.
+	 */
+	HARDWARE = 'HARDWARE',
 }

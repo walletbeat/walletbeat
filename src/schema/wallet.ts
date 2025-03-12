@@ -210,6 +210,7 @@ export function rateWallet(wallet: Wallet): RatedWallet {
 			desktop: resolveVariant(wallet, Variant.DESKTOP),
 			browser: resolveVariant(wallet, Variant.BROWSER),
 			mobile: resolveVariant(wallet, Variant.MOBILE),
+			hardware: resolveVariant(wallet, Variant.HARDWARE),
 		}).filter(([_, val]) => val !== null),
 	) as AtLeastOneVariant<ResolvedWallet>
 	const perVariantTree: AtLeastOneVariant<EvaluationTree> = nonEmptyRemap(

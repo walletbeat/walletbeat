@@ -1,4 +1,5 @@
 import { ratedWallets } from '@/data/wallets'
+import { ratedHardwareWallets } from '@/data/hardwareWallets'
 import type { AttributeGroup, ValueSet, EvaluatedGroup } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
 import { Box, type SxProps } from '@mui/material'
@@ -158,7 +159,14 @@ export default function WalletTable(): React.JSX.Element {
 	})
 	const tableStateHandle = new TableStateHandle(tableState, setTableState)
 	const [rowsState, setRowsState] = useState<Record<string, WalletRowState>>({})
-	const rows = Object.values(ratedWallets).map(
+	
+	// Combine regular wallets and hardware wallets
+	const allWallets = {
+		...ratedWallets,
+		...ratedHardwareWallets
+	}
+	
+	const rows = Object.values(allWallets).map(
 		wallet => new WalletRow(wallet, tableStateHandle, rowsState, setRowsState),
 	)
 	const walletNameColumn: GridColDef<WalletRow, string> = {

@@ -23,7 +23,7 @@ export const keystoneWallet: Wallet = {
 		lastUpdated: '2025-03-12',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
+		profile: WalletProfile.HARDWARE,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -59,9 +59,18 @@ export const keystoneWallet: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.FULL,
-					details: 'TBD.'
+					details: 'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.'
 				},
-				ref: null,
+				ref: [
+					{
+						url: 'https://x.com/ml_sudo/status/1899560303370944598',
+						explanation: 'Independent verification of Keystone\'s strong security features and clear signing capabilities.',
+					},
+					{
+						url: 'https://www.youtube.com/watch?v=7lP_0h-PPvY',
+						explanation: 'Video demonstration of Keystone\'s clear signing implementation.',
+					}
+				],
 			},
 		},
 		privacy: {
@@ -102,8 +111,9 @@ export const keystoneWallet: Wallet = {
 	},
 	variants: {
 		mobile: false,
-		browser: true,
+		browser: false,
 		desktop: false,
 		embedded: false,
+		hardware: true,
 	},
 }

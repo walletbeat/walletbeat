@@ -1,4 +1,5 @@
 import { ratedWallets, type WalletName } from '@/data/wallets'
+import { ratedHardwareWallets, type HardwareWalletName } from '@/data/hardwareWallets'
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
@@ -198,8 +199,10 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 	return JSON.stringify(faqSchema)
 }
 
-export function WalletPage({ walletName }: { walletName: WalletName }): React.JSX.Element {
-	const wallet = ratedWallets[walletName]
+export function WalletPage({ walletName }: { walletName: WalletName | HardwareWalletName }): React.JSX.Element {
+	// Determine if this is a hardware wallet or regular wallet
+	const isHardwareWallet = Object.keys(ratedHardwareWallets).includes(walletName);
+	const wallet = isHardwareWallet ? ratedHardwareWallets[walletName as HardwareWalletName] : ratedWallets[walletName as WalletName]
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
 	useEffect(() => {
@@ -588,6 +591,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 						key="walletIcon"
 						walletMetadata={wallet.metadata}
 						iconSize={navigationListIconSize * 2}
+						variants={wallet.variants}
 					/>
 					{wallet.metadata.displayName}
 				</Typography>

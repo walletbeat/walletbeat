@@ -1,0 +1,65 @@
+---
+// Astro settings
+export const prerender = true
+
+// Data
+import { IsValidHardwareWalletName, ratedHardwareWallets } from '@/data/hardwareWallets'
+
+// Utils
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
+
+// Params
+export const getStaticPaths = () =>
+	nonEmptyMap(nonEmptyKeys(ratedHardwareWallets), hardwareWalletName => ({
+		params: {
+			hardwareWalletName,
+		},
+	}))
+
+const { hardwareWalletName } = Astro.params
+
+// Derived
+const hardwareWalletMetadata = hardwareWalletName && IsValidHardwareWalletName(hardwareWalletName)
+	? ratedHardwareWallets[hardwareWalletName].metadata
+	: null
+
+// Layouts
+import Layout from '@/layouts/Layout.astro'
+
+// Components
+import { WalletPage } from '../[walletName]/_WalletPage'
+---
+
+{
+	hardwareWalletName && IsValidHardwareWalletName(hardwareWalletName) ? (
+		<Layout
+			metadata={{
+				title: `${hardwareWalletMetadata.displayName} - Walletbeat`,
+				description: `How does ${hardwareWalletMetadata.displayName} stack up as a hardware wallet?`,
+				icons: [
+					{
+						url: `/images/hardware-wallets/${hardwareWalletMetadata.id}.${hardwareWalletMetadata.iconExtension}`,
+					},
+				],
+				keywordsBefore: [
+					hardwareWalletName,
+					hardwareWalletMetadata.displayName,
+					`${hardwareWalletMetadata.id} hardware wallet`,
+					`${hardwareWalletMetadata.displayName} hardware wallet`,
+					'hardware wallet',
+				],
+				keywordsAfter: ['ranking', 'reviews', 'security', 'durability'],
+			}}
+		>
+			<WalletPage walletName={hardwareWalletName} client:load />
+		</Layout>
+	) : (
+		<Layout
+			metadata={{
+				title: '404',
+			}}
+		>
+			<div>Invalid hardware wallet name!</div>
+		</Layout>
+	)
+} 

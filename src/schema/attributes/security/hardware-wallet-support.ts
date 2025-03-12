@@ -12,6 +12,7 @@ import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import type { AtLeastOneVariant } from '@/schema/variants'
+import { WalletProfile } from '@/schema/features/profile'
 
 const brand = 'attributes.security.hardware_wallet_support'
 export type HardwareWalletSupportValue = Value & {
@@ -180,6 +181,30 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletSupportValue> => {
+		// If this is a hardware wallet, mark as exempt since hardware wallets inherently support themselves
+		if (features.profile === WalletProfile.HARDWARE) {
+			return {
+				value: {
+					id: 'exempt_hardware_wallet',
+					rating: Rating.EXEMPT,
+					displayName: 'Exempt for hardware wallets',
+					shortExplanation: sentence(
+						(walletMetadata: WalletMetadata) => `
+							This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet itself.
+						`,
+					),
+					supportedHardwareWallets: [],
+					__brand: brand,
+				},
+				details: paragraph(
+					({ wallet }) => `
+						As ${wallet.metadata.displayName} is a hardware wallet itself, evaluating hardware wallet support
+						is not applicable. Hardware wallets are designed to secure private keys, not to connect with other hardware wallets.
+					`,
+				),
+			}
+		}
+
 		if (!features.security.hardwareWalletSupport) {
 			return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] })
 		}

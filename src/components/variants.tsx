@@ -2,6 +2,7 @@ import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid'
 import LanguageIcon from '@mui/icons-material/Language'
 import MonitorIcon from '@mui/icons-material/Monitor'
 import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet'
+import MemoryIcon from '@mui/icons-material/Memory'
 import type { SvgIconComponent } from '@mui/icons-material'
 import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/variants'
 import React from 'react'
@@ -27,6 +28,10 @@ export function variantToIcon(variant: Variant): SvgIconComponent {
 		<SettingsEthernetIcon ref={ref} {...props} sx={{ color: 'currentcolor', ...props.sx }} />
 	));
 	
+	const StyledMemoryIcon = React.forwardRef((props: any, ref) => (
+		<MemoryIcon ref={ref} {...props} sx={{ color: 'currentcolor', ...props.sx }} />
+	));
+	
 	switch (variant) {
 		case Variant.BROWSER:
 			return StyledLanguageIcon as unknown as SvgIconComponent;
@@ -36,6 +41,8 @@ export function variantToIcon(variant: Variant): SvgIconComponent {
 			return StyledPhoneAndroidIcon as unknown as SvgIconComponent;
 		case Variant.EMBEDDED:
 			return StyledSettingsEthernetIcon as unknown as SvgIconComponent;
+		case Variant.HARDWARE:
+			return StyledMemoryIcon as unknown as SvgIconComponent;
 	}
 }
 
@@ -52,6 +59,8 @@ export function variantToName(variant: Variant, titleCase: boolean): string {
 			return titleCase ? 'Mobile' : 'mobile'
 		case Variant.EMBEDDED:
 			return titleCase ? 'Embedded' : 'embedded'
+		case Variant.HARDWARE:
+			return titleCase ? 'Hardware' : 'hardware'
 	}
 }
 
@@ -69,6 +78,8 @@ export function variantToRunsOn(variant: Variant): string {
 			return 'on mobile'
 		case Variant.EMBEDDED:
 			return 'within other applications'
+		case Variant.HARDWARE:
+			return 'as a hardware wallet'
 	}
 }
 

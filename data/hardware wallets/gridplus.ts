@@ -23,7 +23,7 @@ export const gridplusWallet: Wallet = {
 		lastUpdated: '2025-03-12',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
+		profile: WalletProfile.HARDWARE,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -58,8 +58,8 @@ export const gridplusWallet: Wallet = {
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					level: ClearSigningLevel.FULL,
-					details: 'TBD'
+					level: ClearSigningLevel.PARTIAL,
+					details: 'GridPlus Lattice1 provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.'
 				},
 				ref: null,
 			},
@@ -102,8 +102,9 @@ export const gridplusWallet: Wallet = {
 	},
 	variants: {
 		mobile: false,
-		browser: true,
+		browser: false,
 		desktop: false,
 		embedded: false,
+		hardware: true,
 	},
 }

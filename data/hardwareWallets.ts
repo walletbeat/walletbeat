@@ -17,11 +17,10 @@ export type HardwareWalletName = keyof typeof hardwareWallets
 
 /** Type predicate for HardwareWalletName. */
 export function IsValidHardwareWalletName(name: string): name is HardwareWalletName {
-  return Object.hasOwn(hardwareWallets, name)
+  return Object.prototype.hasOwnProperty.call(hardwareWallets, name)
 }
 
-/** All rated hardware wallets. */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `hardwareWallets`.
+/** Rated hardware wallets. */
 export const ratedHardwareWallets: Record<HardwareWalletName, RatedWallet> = Object.fromEntries(
-  Object.entries(hardwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
+  Object.entries(hardwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)])
 ) as Record<HardwareWalletName, RatedWallet> 

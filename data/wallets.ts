@@ -6,16 +6,20 @@ import { phantom } from './wallets/phantom'
 import { rainbow } from './wallets/rainbow'
 import { coinbase } from './wallets/coinbase'
 import { frame } from './wallets/frame'
+import { safe } from './wallets/safe'
+import { elytro } from './wallets/elytro'
 
 /** Set of all known wallets. */
 export const wallets = {
 	coinbase,
 	daimo,
+	elytro,
+	frame,
 	metamask,
 	phantom,
 	rabby,
 	rainbow,
-	frame,
+	safe,
 }
 
 /** A valid wallet name. */
@@ -23,7 +27,7 @@ export type WalletName = keyof typeof wallets
 
 /** Type predicate for WalletName. */
 export function IsValidWalletName(name: string): name is WalletName {
-	return Object.hasOwn(wallets, name)
+	return Object.prototype.hasOwnProperty.call(wallets, name)
 }
 
 /** All rated wallets. */

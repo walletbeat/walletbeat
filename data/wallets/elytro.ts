@@ -8,7 +8,7 @@ import { nconsigny } from '../contributors/nconsigny'
 
 export const elytro: Wallet = {
 	metadata: {
-		id: 'Elytro',
+		id: 'elytro',
 		displayName: 'Elytro',
 		tableName: 'Elytro',
 		iconExtension: 'svg',

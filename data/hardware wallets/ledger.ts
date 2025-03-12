@@ -24,7 +24,7 @@ export const ledgerWallet: Wallet = {
 		lastUpdated: '2025-03-12',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
+		profile: WalletProfile.HARDWARE,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -62,8 +62,8 @@ export const ledgerWallet: Wallet = {
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					level: ClearSigningLevel.FULL,
-					details: 'TBD.'
+					level: ClearSigningLevel.PARTIAL,
+					details: 'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.'
 				},
 				ref: null,
 			},
@@ -105,9 +105,10 @@ export const ledgerWallet: Wallet = {
 		},
 	},
 	variants: {
-		mobile: true,
-		browser: true,
+		mobile: false,
+		browser: false,
 		desktop: false,
 		embedded: false,
+		hardware: true,
 	},
 }

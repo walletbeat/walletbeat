@@ -7,7 +7,7 @@ import {
 	exampleRating,
 } from '@/schema/attributes'
 import { pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
+import { markdown, paragraph, sentence, mdParagraph } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { PasskeyVerificationLibrary, type PasskeyVerificationSupport } from '@/schema/features/security/passkey-verification'
@@ -41,10 +41,10 @@ function noPasskeyImplementation(): Evaluation<PasskeyImplementationValue> {
 				method than traditional passwords, but proper implementation is crucial for security.
 			`,
 		),
-		howToImprove: paragraph(
+		howToImprove: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should implement passkeys using a well-audited verification library
-				such as Smooth Crypto Lib or Fresh Crypto Lib for P256/R1 curve operations.
+				such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) or [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib) for P256/R1 curve operations.
 			`,
 		),
 	}
@@ -74,10 +74,10 @@ function otherPasskeyImplementation(
 				widely recognized library would provide stronger security guarantees.
 			`,
 		),
-		howToImprove: paragraph(
+		howToImprove: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should consider upgrading to a more widely recognized
-				and audited verification library such as Smooth Crypto Lib or Fresh Crypto Lib.
+				and audited verification library such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) or [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib).
 			`,
 		),
 	}
@@ -93,24 +93,24 @@ function freshCryptoLibImplementation(
 			displayName: 'Good passkey implementation',
 			shortExplanation: sentence(
 				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} implements passkeys using Fresh Crypto Lib.
+					${walletMetadata.displayName} implements passkeys using [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib).
 				`,
 			),
 			library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
 			libraryUrl: support.libraryUrl || 'https://github.com/rdubois-crypto/FreshCryptoLib',
 			__brand: brand,
 		},
-		details: paragraph(
+		details: mdParagraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} implements passkeys using Fresh Crypto Lib,
-				a well-regarded verification library for P256/R1 curve operations. This provides good security and efficient gas for passkey
-				authentication.
+				${wallet.metadata.displayName} implements passkeys using [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib).
+				While this is a well-regarded library, it has not undergone as extensive auditing and testing. 
+				as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
 			`,
 		),
-		howToImprove: paragraph(
+		howToImprove: mdParagraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} has a good passkey implementation. For even better security,
-				consider using Smooth Crypto Lib which is considered the gold standard for passkey verification.
+				${wallet.metadata.displayName} should consider upgrading to [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib),
+				which has undergone more extensive auditing and testing.
 			`,
 		),
 	}
@@ -126,20 +126,20 @@ function smoothCryptoLibImplementation(
 			displayName: 'Excellent passkey implementation',
 			shortExplanation: sentence(
 				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} implements passkeys using Smooth Crypto Lib.
+					${walletMetadata.displayName} implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
 				`,
 			),
 			library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
 			libraryUrl: support.libraryUrl || 'https://github.com/get-smooth/crypto-lib',
 			__brand: brand,
 		},
-		details: paragraph(
+		details: mdParagraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} implements passkeys using Smooth Crypto Lib, which is considered
-				the gold standard for P256/R1 curve operations in passkey verification. This provides the highest
-				level of security for passkey authentication.
+				${wallet.metadata.displayName} implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib),
+				the most secure and well-audited verification library for P256/R1 curve operations.
 			`,
 		),
+		howToImprove: undefined,
 	}
 }
 
@@ -172,12 +172,12 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		Wallets are evaluated based on the verification library they use for passkey implementation,
 		specifically for P256/R1 curve operations.
 		
-		A wallet receives a passing rating if it uses Smooth Crypto Lib, which is considered the
-		most efficient verification library for passkey verification. Smooth Crypto Lib is also audited. The results of the completed audits are in the [doc/audit](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits) folder.
+		A wallet receives a passing rating if it uses [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), which is considered the
+		most efficient verification library for passkey verification. [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) is also audited. The results of the completed audits are in the [doc/audit](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits) folder.
 
-		
+		A wallet receives a partial rating if it uses [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib), which is also well-regarded
 		A wallet receives a partial rating if it uses Fresh Crypto Lib, which is also well-regarded
-		but considered slightly less optimal than Smooth Crypto Lib.
+		but considered slightly less optimal than [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
 		
 		A wallet receives a lower partial rating if it uses an unaudited less efficient library for passkey
 		verification.
@@ -189,9 +189,9 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			paragraph(`
-				The wallet implements passkeys using Smooth Crypto Lib, the most efficient
-				verification library for P256/R1 curve operations in passkey verification.
+			mdParagraph(`
+				The wallet implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), at 159K gas cost it's the most efficient
+				verification library for P256/R1 curve operations.
 			`),
 			smoothCryptoLibImplementation({
 				library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
@@ -200,8 +200,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		),
 		partial: [
 			exampleRating(
-				paragraph(`
-					The wallet implements passkeys using Fresh Crypto Lib, a well-regarded but suboptimal
+				mdParagraph(`
+					The wallet implements passkeys using [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib), a well-regarded but suboptimal
 					verification library for P256/R1 curve operations.
 				`),
 				freshCryptoLibImplementation({
@@ -210,8 +210,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 				}).value,
 			),
 			exampleRating(
-				paragraph(`
-					The wallet implements passkeys using a less common verification library.
+				mdParagraph(`
+					The wallet implements passkeys using a non audited / less common verification library.
 				`),
 				otherPasskeyImplementation({
 					library: PasskeyVerificationLibrary.OTHER,
@@ -220,7 +220,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		],
 		fail: [
 			exampleRating(
-				paragraph(`
+				mdParagraph(`
 					The wallet does not implement passkeys or does not use a recognized
 					verification library for P256/R1 curve operations.
 				`),

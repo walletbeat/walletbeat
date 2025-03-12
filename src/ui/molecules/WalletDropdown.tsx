@@ -45,6 +45,7 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 								<WalletIcon
 									walletMetadata={wallet.metadata}
 									iconSize={24}
+									variants={wallet.variants}
 								/>
 								<span>{wallet.metadata.displayName}</span>
 							</>
@@ -85,7 +86,7 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 									onSelect={handleSelect}
 									className="flex items-center gap-2 px-2 py-1.5 rounded m-1 cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
 								>
-									<WalletIcon walletMetadata={w.metadata} iconSize={20} />
+									<WalletIcon walletMetadata={w.metadata} iconSize={20} variants={w.variants} />
 									<span>{w.metadata.displayName}</span>
 								</Command.Item>
 							))}
