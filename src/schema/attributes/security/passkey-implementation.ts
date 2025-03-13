@@ -44,7 +44,7 @@ function noPasskeyImplementation(): Evaluation<PasskeyImplementationValue> {
 		howToImprove: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should implement passkeys using a well-audited verification library
-				such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) or [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib) for P256/R1 curve operations.
+				such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
 			`,
 		),
 	}
@@ -77,7 +77,7 @@ function otherPasskeyImplementation(
 		howToImprove: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should consider upgrading to a more widely recognized
-				and audited verification library such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) or [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib).
+				and audited verification library such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
 			`,
 		),
 	}
@@ -90,7 +90,7 @@ function freshCryptoLibImplementation(
 		value: {
 			id: 'fresh_crypto_lib_implementation',
 			rating: Rating.PARTIAL,
-			displayName: 'Good passkey implementation',
+			displayName: 'outdated passkey verification implementation',
 			shortExplanation: sentence(
 				(walletMetadata: WalletMetadata) => `
 					${walletMetadata.displayName} implements passkeys using [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib).

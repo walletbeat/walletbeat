@@ -7,11 +7,13 @@ import {
 	exampleRating,
 } from '@/schema/attributes'
 import { pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import type { AtLeastOneVariant } from '@/schema/variants'
+import { WalletProfile } from '@/schema/features/profile'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 
 const brand = 'attributes.security.hardware_wallet_clear_signing'
 export type HardwareWalletClearSigningValue = Value & {
@@ -24,10 +26,10 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletClearSigningValue> 
 		value: {
 			id: 'no_hardware_wallet_support',
 			rating: Rating.FAIL,
-			displayName: 'No hardware wallet support',
+			displayName: 'No clear signing due to no hardware wallet support',
 			shortExplanation: sentence(
 				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} does not support hardware wallets.
+					${walletMetadata.displayName} does not support hardware wallets, so clear signing is not possible.
 				`,
 			),
 			clearSigningLevel: ClearSigningLevel.NONE,
@@ -35,13 +37,15 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletClearSigningValue> 
 		},
 		details: paragraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} does not support connecting to hardware wallets.
-				Hardware wallets provide an additional layer of security by keeping private keys offline.
+				${wallet.metadata.displayName} does not support connecting to any hardware wallets.
+				Without hardware wallet support, clear signing is not possible. Clear signing allows users to
+				verify transaction details directly on the hardware wallet's screen before signing.
 			`,
 		),
 		howToImprove: paragraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} should add support for hardware wallets to improve security options for users.
+				${wallet.metadata.displayName} should add support for hardware wallets to enable clear signing,
+				which enhances security by allowing users to verify transaction details on a separate device.
 			`,
 		),
 	}
@@ -77,7 +81,11 @@ function noHardwareWalletClearSigning(): Evaluation<HardwareWalletClearSigningVa
 	}
 }
 
-function basicClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
+function basicClearSigning(supportedWallets: string[] = []): Evaluation<HardwareWalletClearSigningValue> {
+	const supportedWalletsText = supportedWallets.length > 0 
+		? ` through ${supportedWallets.join(', ')}`
+		: '';
+	
 	return {
 		value: {
 			id: 'basic_clear_signing',
@@ -85,7 +93,7 @@ function basicClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
 			displayName: 'Basic clear signing support',
 			shortExplanation: sentence(
 				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} supports hardware wallets with basic clear signing.
+					${walletMetadata.displayName} supports hardware wallets with basic clear signing${supportedWalletsText}.
 				`,
 			),
 			clearSigningLevel: ClearSigningLevel.BASIC,
@@ -93,7 +101,7 @@ function basicClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
 		},
 		details: paragraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} supports hardware wallets with basic clear signing,
+				${wallet.metadata.displayName} supports hardware wallets with basic clear signing${supportedWalletsText},
 				but the implementation does not provide full transparency for all transaction details.
 				Clear signing allows users to verify transaction details on their hardware wallet screen
 				before signing, which is crucial for security.
@@ -108,7 +116,11 @@ function basicClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
 	}
 }
 
-function partialClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
+function partialClearSigning(supportedWallets: string[] = []): Evaluation<HardwareWalletClearSigningValue> {
+	const supportedWalletsText = supportedWallets.length > 0 
+		? ` through ${supportedWallets.join(', ')}`
+		: '';
+	
 	return {
 		value: {
 			id: 'partial_clear_signing',
@@ -116,7 +128,7 @@ function partialClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
 			displayName: 'Partial clear signing support',
 			shortExplanation: sentence(
 				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} supports hardware wallets with partial clear signing.
+					${walletMetadata.displayName} supports hardware wallets with partial clear signing${supportedWalletsText}.
 				`,
 			),
 			clearSigningLevel: ClearSigningLevel.PARTIAL,
@@ -124,7 +136,7 @@ function partialClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
 		},
 		details: paragraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} supports hardware wallets with partial clear signing.
+				${wallet.metadata.displayName} supports hardware wallets with partial clear signing${supportedWalletsText}.
 				Most transaction details are displayed on the hardware wallet screen for verification,
 				but some complex transactions may not show all details. Clear signing is crucial for
 				security as it allows users to verify transaction details before signing.
@@ -139,7 +151,14 @@ function partialClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
 	}
 }
 
-function fullClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
+function fullClearSigning(
+	supportedWallets: string[] = [], 
+	refs: Array<{ url: string, explanation: string }> = []
+): Evaluation<HardwareWalletClearSigningValue> {
+	const supportedWalletsText = supportedWallets.length > 0 
+		? ` through ${supportedWallets.join(', ')}`
+		: '';
+	
 	return {
 		value: {
 			id: 'full_clear_signing',
@@ -147,19 +166,21 @@ function fullClearSigning(): Evaluation<HardwareWalletClearSigningValue> {
 			displayName: 'Full clear signing support',
 			shortExplanation: sentence(
 				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} supports hardware wallets with full clear signing.
+					${walletMetadata.displayName} supports hardware wallets with full clear signing${supportedWalletsText}.
 				`,
 			),
 			clearSigningLevel: ClearSigningLevel.FULL,
 			__brand: brand,
 		},
-		details: paragraph(
+		details: mdParagraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} supports hardware wallets with full clear signing implementation.
+				${wallet.metadata.displayName} supports hardware wallets with full clear signing implementation${supportedWalletsText}.
 				All transaction details are clearly displayed on the hardware wallet screen for verification
 				before signing, providing maximum security and transparency for users.
 			`,
 		),
+		// Include references if provided
+		...(refs.length > 0 && { references: refs }),
 	}
 }
 
@@ -192,16 +213,18 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 		users to make informed decisions before authorizing transactions.
 	`),
 	methodology: markdown(`
-		Wallets are evaluated based on their implementation of clear signing with hardware wallets.
+		Hardware wallets are evaluated based on their implementation of clear signing capabilities.
 		
-		A wallet receives a passing rating if it implements full clear signing, where all transaction
-		details are clearly displayed on the hardware wallet screen for verification before signing.
+		A hardware wallet receives a passing rating if it implements full clear signing, where all transaction
+		details are clearly displayed on the hardware wallet screen for verification before signing. This includes
+		support for standard transactions, ERC-20 token transfers, 712 messages and complex contract interactions. 
+		The hardware should be able to connect directly to the dapp or allow the user to use at least two different software wallets independent from the hardware manufacturer.
 		
-		A wallet receives a partial rating if it implements clear signing but with limitations, such
+		A hardware wallet receives a partial rating if it implements clear signing but with limitations, such
 		as not displaying all transaction details or not supporting clear signing for all transaction types.
 		
-		A wallet fails this attribute if it either doesn't support hardware wallets at all or supports
-		hardware wallets but without implementing clear signing.
+		A hardware wallet fails this attribute if it doesn't properly implement clear signing functionality,
+		requiring users to trust the connected software wallet without independent verification.
 		
 	`),
 	ratingScale: {
@@ -246,37 +269,61 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletClearSigningValue> => {
-		// Check if hardware wallet support feature exists
-		if (!features.security.hardwareWalletSupport) {
-			return noHardwareWalletSupport()
-		}
-
-		// Check if any hardware wallets are supported
-		const hwSupport = features.security.hardwareWalletSupport.supportedWallets
-		const hasHardwareWalletSupport = Object.values(hwSupport).some(support => support && isSupported(support))
-		
-		if (!hasHardwareWalletSupport) {
-			return noHardwareWalletSupport()
-		}
-
-		// Check clear signing support
-		if (!features.security.hardwareWalletClearSigning) {
-			return unrated(hardwareWalletClearSigning, brand, { clearSigningLevel: ClearSigningLevel.NONE })
-		}
-
-		const clearSigningLevel = features.security.hardwareWalletClearSigning.clearSigningSupport.level
-
-		switch (clearSigningLevel) {
-			case ClearSigningLevel.NONE:
-				return noHardwareWalletClearSigning()
-			case ClearSigningLevel.BASIC:
-				return basicClearSigning()
-			case ClearSigningLevel.PARTIAL:
-				return partialClearSigning()
-			case ClearSigningLevel.FULL:
-				return fullClearSigning()
-			default:
+		// For hardware wallets themselves:
+		// This evaluates the hardware wallet's own clear signing capabilities
+		if (features.profile === WalletProfile.HARDWARE) {
+			// Check if clear signing feature exists
+			if (!features.security.hardwareWalletClearSigning) {
 				return unrated(hardwareWalletClearSigning, brand, { clearSigningLevel: ClearSigningLevel.NONE })
+			}
+
+			const clearSigningFeature = features.security.hardwareWalletClearSigning;
+			const clearSigningLevel = clearSigningFeature.clearSigningSupport.level;
+			
+			// Use a simpler approach for now - we'll just include a standard reference for devices with full clear signing
+			const references = (clearSigningLevel === ClearSigningLevel.FULL) ? [
+				{
+					url: "https://ethereum.org/en/security/#hardware-wallets",
+					explanation: "More information about hardware wallet security"
+				}
+			] : [];
+
+			switch (clearSigningLevel) {
+				case ClearSigningLevel.NONE:
+					return noHardwareWalletClearSigning()
+				case ClearSigningLevel.BASIC:
+					return basicClearSigning(['this hardware wallet'])
+				case ClearSigningLevel.PARTIAL:
+					return partialClearSigning(['this hardware wallet'])
+				case ClearSigningLevel.FULL:
+					return fullClearSigning(['this hardware wallet'], references)
+				default:
+					return unrated(hardwareWalletClearSigning, brand, { clearSigningLevel: ClearSigningLevel.NONE })
+			}
+		}
+		
+		// For software wallets: 
+		// Make this attribute exempt as it should only apply to hardware wallets
+		return {
+			value: {
+				id: 'exempt_software_wallet',
+				rating: Rating.EXEMPT,
+				displayName: 'Only applicable for hardware wallets',
+				shortExplanation: sentence(
+					(walletMetadata: WalletMetadata) => `
+						This attribute evaluates hardware wallet clear signing capabilities and is not applicable for software wallets.
+					`,
+				),
+				clearSigningLevel: ClearSigningLevel.NONE,
+				__brand: brand,
+			},
+			details: paragraph(
+				({ wallet }) => `
+					As ${wallet.metadata.displayName} is a software wallet, this attribute which evaluates
+					hardware wallet clear signing capabilities is not applicable. Please see the hardware wallet 
+					integration attribute for how well this software wallet connects to hardware wallets.
+				`,
+			),
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletClearSigningValue>>) => {

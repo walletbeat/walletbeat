@@ -78,6 +78,10 @@ import {
 	passkeyImplementation,
 	type PasskeyImplementationValue,
 } from './attributes/security/passkey-implementation'
+import {
+	softwareHWIntegration,
+	type SoftwareHWIntegrationValue,
+} from './attributes/security/software-hw-integration'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
@@ -85,6 +89,7 @@ type SecurityValues = Dict<{
 	chainVerification: ChainVerificationValue
 	hardwareWalletClearSigning: HardwareWalletClearSigningValue
 	hardwareWalletSupport: HardwareWalletSupportValue
+	softwareHWIntegration: SoftwareHWIntegrationValue
 	passkeyImplementation: PasskeyImplementationValue
 }>
 
@@ -101,6 +106,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		chainVerification,
 		hardwareWalletClearSigning,
 		hardwareWalletSupport,
+		softwareHWIntegration,
 		passkeyImplementation,
 	},
 	score: scoreGroup<SecurityValues>({
@@ -108,6 +114,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		chainVerification: 1.0,
 		hardwareWalletClearSigning: 1.0,
 		hardwareWalletSupport: 1.0,
+		softwareHWIntegration: 1.0,
 		passkeyImplementation: 1.0,
 	}),
 }
@@ -240,6 +247,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
 	hardwareWalletClearSigning: EvaluatedAttribute<HardwareWalletClearSigningValue>
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
+	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>
 	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
 }
 
@@ -298,6 +306,7 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 			chainVerification: evalAttr(chainVerification),
 			hardwareWalletClearSigning: evalAttr(hardwareWalletClearSigning),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
+			softwareHWIntegration: evalAttr(softwareHWIntegration),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 		},
 		privacy: {
@@ -349,6 +358,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			chainVerification: attr(tree => tree.security.chainVerification),
 			hardwareWalletClearSigning: attr(tree => tree.security.hardwareWalletClearSigning),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
+			softwareHWIntegration: attr(tree => tree.security.softwareHWIntegration),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 		},
 		privacy: {

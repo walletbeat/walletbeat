@@ -16,6 +16,7 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { WalletTypeCategory } from '@/schema/features/wallet-type'
 
 export const rabby: Wallet = {
 	metadata: {
@@ -31,6 +32,9 @@ export const rabby: Wallet = {
 		repoUrl: 'https://github.com/RabbyHub/Rabby',
 		contributors: [polymutex],
 		lastUpdated: '2024-12-15',
+		multiWalletType: {
+			categories: [WalletTypeCategory.EOA]
+		}
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -279,6 +283,7 @@ export const rabby: Wallet = {
 					[HardwareWalletType.TREZOR]: featureSupported,
 					[HardwareWalletType.KEYSTONE]: featureSupported,
 					[HardwareWalletType.GRIDPLUS]: featureSupported,
+					[HardwareWalletType.OTHER]: featureSupported,
 				},
 				ref: [
 					{

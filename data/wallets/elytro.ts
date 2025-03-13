@@ -3,8 +3,10 @@ import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { notSupported } from '@/schema/features/support'
+import { notSupported, supported } from '@/schema/features/support'
 import { nconsigny } from '../contributors/nconsigny'
+import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 
 export const elytro: Wallet = {
 	metadata: {
@@ -25,11 +27,32 @@ For general information, visit elytro.com
 		repoUrl: 'https://github.com/Elytro-eth',
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
+		multiWalletType: {
+			categories: [WalletTypeCategory.SMART_WALLET],
+			smartWalletStandards: [SmartWalletStandard.ERC_4337]
+		}
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.rawErc4337,
+			eoa: notSupported,
+			mpc: notSupported,
+			eip7702: notSupported,
+			rawErc4337: supported({
+				controllingSharesInSelfCustodyByDefault: 'YES',
+				keyRotationTransactionGeneration:
+					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				tokenTransferTransactionGeneration:
+					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				ref: {
+					url: 'https://github.com/Elytro-eth/soul-wallet-contract',
+					explanation:
+						'Elytro supports ERC-4337 smart contract wallets',
+				},
+			}),
+		},
 		multiAddress: null,
 		addressResolution: {
 			nonChainSpecificEnsResolution: null,
@@ -65,7 +88,8 @@ For general information, visit elytro.com
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
+				supportedWallets: {
+				},
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
@@ -117,5 +141,6 @@ For general information, visit elytro.com
 		browser: true,
 		desktop: false,
 		embedded: false,
+		hardware: false,
 	},
 } 

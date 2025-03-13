@@ -7,6 +7,7 @@ import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-v
 import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported } from '@/schema/features/support'
+import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 
 export const metamask: Wallet = {
 	metadata: {
@@ -23,6 +24,11 @@ export const metamask: Wallet = {
 		repoUrl: 'https://github.com/MetaMask/metamask-extension',
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-02-08',
+		multiWalletType: {
+			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
+			smartWalletStandards: [SmartWalletStandard.ERC_7702],
+			details: "Supports EOA with 7702 delegation"
+		}
 	},
 	features: {
 		profile: WalletProfile.GENERIC,

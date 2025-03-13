@@ -19,7 +19,7 @@ import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../componen
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { betaSiteRoot } from '@/constants'
 
-const walletIconSize = shortRowHeight / 2
+const walletIconSize = (shortRowHeight ) * 0.6
 
 function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element {
 	const Icon = variantToIcon(variant)
@@ -68,15 +68,15 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 				flexDirection="row"
 				alignItems="center"
 				justifyContent="flex-start"
-				gap="8px"
+				gap="16px"
 				width="100%"
-				height={shortRowHeight}
+				height={shortRowHeight + 40}
 			>
 				<Box
 					display="flex"
 					flexDirection="column"
 					justifyContent="center"
-					height={shortRowHeight}
+					height={shortRowHeight + 40}
 					sx={row.rowWideStyle}
 				>
 					<IconButton size="small" onClick={row.toggleExpanded.bind(row)}>
@@ -95,8 +95,8 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 					<Box display="flex" flexDirection="column" justifyContent="center">
 						<WalletIcon walletMetadata={row.wallet.metadata} iconSize={walletIconSize} variants={row.wallet.variants} />
 					</Box>
-					<Box flex="1" sx={row.rowWideStyle}>
-						<h2 className="text-primary">
+					<Box flex="1" sx={row.rowWideStyle} display="flex" alignItems="center">
+						<h2 className="text-primary" style={{ fontSize: '1.25rem' }}>
 						{row.wallet.metadata.tableName}
 						</h2>
 						{/* <Typography variant="h2"></Typography> */}
@@ -119,7 +119,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 				<Box
 					display="flex"
 					flexDirection="column"
-					height={expandedRowHeight - shortRowHeight}
+					height={expandedRowHeight - (shortRowHeight + 40)}
 					sx={{ ...row.rowWideStyle, lineHeight: 1, whiteSpace: 'normal' }}
 				>
 					<Box flex="1">

@@ -2,7 +2,7 @@ import { ratedWallets } from '@/data/wallets'
 import { ratedHardwareWallets } from '@/data/hardwareWallets'
 import type { AttributeGroup, ValueSet, EvaluatedGroup } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
-import { Box, type SxProps } from '@mui/material'
+import { Box, type SxProps, Tooltip } from '@mui/material'
 import { DataGrid, type GridColDef, GridToolbar } from '@mui/x-data-grid'
 import type React from 'react'
 import {
@@ -29,11 +29,34 @@ import type {
 import type { Variant } from '@/schema/variants'
 import { ThemeProvider } from '@mui/system'
 import { walletTableTheme } from '@/components/ThemeRegistry/theme'
+import { WalletTypeCategory, SmartWalletStandard, createHardwareWalletType } from '@/schema/features/wallet-type'
+import { useTheme } from '@mui/material/styles'
 
-// Define wallet type enum
-enum WalletType {
-	SOFTWARE = 'Software Wallet',
-	HARDWARE = 'Hardware Wallet'
+// Define display strings for wallet types
+const WALLET_TYPE_DISPLAY = {
+	[WalletTypeCategory.EOA]: 'EOA',
+	[WalletTypeCategory.SMART_WALLET]: 'SW',
+	[WalletTypeCategory.HARDWARE_WALLET]: 'HW'
+};
+
+// Define display strings for smart wallet standards
+const SMART_WALLET_STANDARD_DISPLAY = {
+	[SmartWalletStandard.ERC_4337]: 'ERC-4337',
+	[SmartWalletStandard.ERC_7702]: 'ERC-7702',
+	[SmartWalletStandard.OTHER]: 'Other'
+};
+
+// Define EIP file paths for standards
+const SMART_WALLET_STANDARD_LINKS: Record<string, string> = {
+	[SmartWalletStandard.ERC_4337]: 'https://eips.ethereum.org/EIPS/eip-4337',
+	[SmartWalletStandard.ERC_7702]: 'https://eips.ethereum.org/EIPS/eip-7702',
+};
+
+// Helper to create a multi-type wallet definition for the UI
+interface MultiWalletTypeInfo {
+	categories: WalletTypeCategory[];
+	smartWalletStandards?: SmartWalletStandard[];
+	details?: string;
 }
 
 class TableStateHandle implements WalletTableStateHandle {
@@ -63,7 +86,6 @@ class WalletRow implements WalletRowStateHandle {
 	readonly table: WalletTableStateHandle
 	readonly expanded: boolean
 	readonly rowWideStyle: SxProps
-	readonly isHardwareWallet: boolean
 
 	/** Data table ID; required by DataGrid. */
 	readonly id: string
@@ -75,12 +97,10 @@ class WalletRow implements WalletRowStateHandle {
 		tableStateHandle: WalletTableStateHandle,
 		rowsState: Record<string, WalletRowState>,
 		setRowsState: Dispatch<SetStateAction<Record<string, WalletRowState>>>,
-		isHardwareWallet: boolean = false
 	) {
 		this.wallet = wallet
 		this.id = wallet.metadata.id
 		this.table = tableStateHandle
-		this.isHardwareWallet = isHardwareWallet
 		const rowState = rowsState[this.id] ?? { expanded: false }
 		this.expanded = rowState.expanded
 		this.setRowsState = setRowsState
@@ -119,7 +139,7 @@ class WalletRow implements WalletRowStateHandle {
 
 	/** Get the height of the row in pixels. */
 	getRowHeight(): number {
-		return this.expanded ? expandedRowHeight : shortRowHeight
+		return this.expanded ? expandedRowHeight : Math.max(shortRowHeight + 40, 120);
 	}
 
 	/** Render the "Name" cell. */
@@ -143,6 +163,172 @@ class WalletRow implements WalletRowStateHandle {
 	): React.JSX.Element {
 		return <WalletRatingCell<Vs> row={this} attrGroup={attrGroup} evalGroupFn={evalGroupFn} />
 	}
+	
+	/** Get all wallet type categories */
+	getWalletTypeCategories(): WalletTypeCategory[] {
+		if (this.wallet.metadata.multiWalletType) {
+			return this.wallet.metadata.multiWalletType.categories;
+		}
+		return [this.wallet.metadata.walletType?.category || WalletTypeCategory.EOA];
+	}
+	
+	/** Get the smart wallet standards if applicable */
+	getSmartWalletStandards(): SmartWalletStandard[] | undefined {
+		if (this.wallet.metadata.multiWalletType?.smartWalletStandards) {
+			return this.wallet.metadata.multiWalletType.smartWalletStandards;
+		}
+		
+		if (this.getWalletTypeCategories().includes(WalletTypeCategory.SMART_WALLET)) {
+			const standard = this.wallet.metadata.walletType?.smartWalletStandard;
+			return standard ? [standard] : undefined;
+		}
+		
+		return undefined;
+	}
+	
+	/** Get human-readable wallet type for display */
+	getDisplayWalletType(): string {
+		const categories = this.getWalletTypeCategories();
+		
+		// Compact display
+		const typeDisplay = categories.map(cat => WALLET_TYPE_DISPLAY[cat]).join(' & ');
+		return typeDisplay;
+	}
+	
+	/** Get detailed wallet type for tooltip */
+	getDetailedWalletType(): string {
+		const categories = this.getWalletTypeCategories();
+		const standards = this.getSmartWalletStandards();
+		
+		// If we have both EOA and Smart Wallet
+		if (categories.includes(WalletTypeCategory.EOA) && categories.includes(WalletTypeCategory.SMART_WALLET)) {
+			const smartWalletStandardsStr = standards?.map(std => SMART_WALLET_STANDARD_DISPLAY[std]).join(' + ');
+			return `Externally Owned Account + Smart Wallet (${smartWalletStandardsStr})`;
+		}
+		
+		// If just EOA
+		if (categories.length === 1 && categories[0] === WalletTypeCategory.EOA) {
+			return 'Externally Owned Account';
+		}
+		
+		// If just Smart Wallet with standards
+		if (categories.length === 1 && categories[0] === WalletTypeCategory.SMART_WALLET && standards?.length) {
+			return `Smart Wallet (${standards.map(std => SMART_WALLET_STANDARD_DISPLAY[std]).join(' + ')})`;
+		}
+		
+		// If hardware wallet
+		if (categories.length === 1 && categories[0] === WalletTypeCategory.HARDWARE_WALLET) {
+			return 'Hardware Wallet';
+		}
+		
+		// Fallback for other multi-type combinations
+		const fullTypeNames = categories.map(cat => {
+			if (cat === WalletTypeCategory.EOA) return 'Externally Owned Account';
+			if (cat === WalletTypeCategory.SMART_WALLET) return 'Smart Wallet';
+			if (cat === WalletTypeCategory.HARDWARE_WALLET) return 'Hardware Wallet';
+			return cat;
+		}).join(' + ');
+		
+		return fullTypeNames;
+	}
+	
+	/** Check if wallet has a specific standard */
+	hasStandard(standard: SmartWalletStandard): boolean {
+		const standards = this.getSmartWalletStandards();
+		return standards ? standards.includes(standard) : false;
+	}
+	
+	/** Render the wallet type cell with tooltip and standard links */
+	renderWalletType(): React.JSX.Element {
+		const displayText = this.getDisplayWalletType();
+		const detailedText = this.getDetailedWalletType();
+		const standards = this.getSmartWalletStandards();
+		
+		// Ensure the row has enough height to display both the type and standards
+		const rowHeight = this.expanded ? expandedRowHeight : Math.max(shortRowHeight + 40, 120);
+		
+		return (
+			<Box 
+				sx={{ 
+					display: 'flex', 
+					flexDirection: 'column', 
+					width: '100%',
+					minHeight: `${rowHeight}px`,
+					py: 1.5,
+					justifyContent: 'center',
+					gap: '4px'
+				}}
+			>
+				<Tooltip title={detailedText} arrow placement="top">
+					<Box sx={{ 
+						fontWeight: 'medium',
+						fontSize: '1.05rem',
+						mb: 0.25,
+						lineHeight: 1.2
+					}}>
+						{displayText}
+					</Box>
+				</Tooltip>
+				
+				<Box sx={{ 
+					display: 'flex', 
+					gap: 0.5, 
+					flexWrap: 'wrap',
+					alignItems: 'center'
+				}}>
+					{standards && standards.length > 0 ? (
+						standards.map(std => {
+							const standardKey = std as string;
+							const displayNumber = std === SmartWalletStandard.ERC_4337 ? '4337' : '7702';
+							const linkPath = SMART_WALLET_STANDARD_LINKS[standardKey] || '#';
+							
+							return (
+								<Box 
+									key={std}
+									component="a"
+									href={linkPath}
+									target="_blank"
+									rel="noopener"
+									sx={{ 
+										fontSize: '0.75rem', 
+										fontWeight: 'medium',
+										color: 'primary.main',
+										backgroundColor: 'rgba(25, 118, 210, 0.08)',
+										borderRadius: '4px',
+										padding: '1px 4px',
+										display: 'inline-flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										lineHeight: 1.2,
+										textDecoration: 'none',
+										'&:hover': { 
+											textDecoration: 'underline',
+											backgroundColor: 'rgba(25, 118, 210, 0.12)' 
+										} 
+									}}
+								>
+									#{displayNumber}
+								</Box>
+							);
+						})
+					) : (
+						// If no standards, still show a placeholder to maintain consistent row height
+						<Box sx={{ height: '18px' }}></Box>
+					)}
+				</Box>
+			</Box>
+		);
+	}
+	
+	/** Check if this is a hardware wallet */
+	isHardwareWallet(): boolean {
+		return this.getWalletTypeCategories().includes(WalletTypeCategory.HARDWARE_WALLET);
+	}
+	
+	/** Check if this is a smart wallet */
+	isSmartWallet(): boolean {
+		return this.getWalletTypeCategories().includes(WalletTypeCategory.SMART_WALLET);
+	}
 }
 
 /** Column definition for wallet rating columns. */
@@ -155,7 +341,6 @@ function walletTableColumn<Vs extends ValueSet>(
 		field: group.id,
 		headerName: `${group.icon} ${group.displayName}`,
 		type: 'number',
-		width: 128,
 		valueGetter: (_: never, row: WalletRow): number => row.score(group, evalGroupFn),
 		renderCell: params => params.row.render(group, evalGroupFn),
 	}
@@ -169,26 +354,53 @@ export default function WalletTable(): React.JSX.Element {
 	const tableStateHandle = new TableStateHandle(tableState, setTableState)
 	const [rowsState, setRowsState] = useState<Record<string, WalletRowState>>({})
 	
+	// Set wallet types for hardware wallets if not already set
+	const hardwareWalletRows = Object.values(ratedHardwareWallets).map(wallet => {
+		// Add hardware wallet type if not set
+		if (!wallet.metadata.walletType) {
+			wallet.metadata.walletType = createHardwareWalletType();
+		}
+		return new WalletRow(wallet, tableStateHandle, rowsState, setRowsState);
+	});
+	
 	// Create software wallet rows
-	const softwareWalletRows = Object.values(ratedWallets).map(
-		wallet => new WalletRow(wallet, tableStateHandle, rowsState, setRowsState, false)
-	)
+	const softwareWalletRows = Object.values(ratedWallets).map(wallet => 
+		new WalletRow(wallet, tableStateHandle, rowsState, setRowsState)
+	);
 	
-	// Create hardware wallet rows
-	const hardwareWalletRows = Object.values(ratedHardwareWallets).map(
-		wallet => new WalletRow(wallet, tableStateHandle, rowsState, setRowsState, true)
-	)
+	// Add wallet type column
+	const walletTypeColumn: GridColDef<WalletRow, string> = {
+		field: 'walletType',
+		headerName: 'Type',
+		width: 100,
+		renderCell: params => (params.row as WalletRow).renderWalletType(),
+		sortable: true
+	};
 	
-	// Create separate sections for each wallet type
 	const walletNameColumn: GridColDef<WalletRow, string> = {
 		field: 'displayName',
 		headerName: 'Wallet',
 		type: 'string',
-		width: 320,
+		width: 340,
+		minWidth: 320,
+		flex: 1,
 		valueGetter: (_: never, row: WalletRow): string => row.wallet.metadata.displayName,
 		renderCell: params => params.row.renderName(),
 	}
-	const columns: GridColDef[] = [
+	
+	// Define columns for main wallet table
+	const mainColumns: GridColDef[] = [
+		walletNameColumn,
+		walletTypeColumn,
+		walletTableColumn(securityAttributeGroup, tree => tree.security),
+		walletTableColumn(privacyAttributeGroup, tree => tree.privacy),
+		walletTableColumn(selfSovereigntyAttributeGroup, tree => tree.selfSovereignty),
+		walletTableColumn(transparencyAttributeGroup, tree => tree.transparency),
+		walletTableColumn(ecosystemAttributeGroup, tree => tree.ecosystem),
+	]
+	
+	// Define columns for hardware wallet table (without wallet type column)
+	const hardwareColumns: GridColDef[] = [
 		walletNameColumn,
 		walletTableColumn(securityAttributeGroup, tree => tree.security),
 		walletTableColumn(privacyAttributeGroup, tree => tree.privacy),
@@ -197,58 +409,108 @@ export default function WalletTable(): React.JSX.Element {
 		walletTableColumn(ecosystemAttributeGroup, tree => tree.ecosystem),
 	]
 	
+	// Common DataGrid style
+	const dataGridSx = {
+		'& .MuiDataGrid-cell:first-child': {
+			position: 'sticky',
+			left: 0,
+			zIndex: 1,
+			backgroundColor: 'background.default',
+			borderRight: '1px solid #141519',
+		},
+		'& .MuiDataGrid-columnHeaders': {
+			borderBottom: '2px solid #141519',
+			backgroundColor: 'background.paper',
+			height: '64px !important',
+			lineHeight: '64px !important',
+			'& .MuiDataGrid-columnHeaderTitle': {
+				fontWeight: 'bold',
+				fontSize: '1.05rem',
+				lineHeight: 1.3,
+			},
+		},
+		'& .MuiDataGrid-main': {
+			overflow: 'visible',
+		},
+		'& .MuiDataGrid-virtualScroller': {
+			overflowX: 'visible !important',
+		},
+		'& .MuiDataGrid-toolbarContainer': {
+			paddingLeft: 2,
+			paddingRight: 2,
+			borderBottom: '1px solid rgba(81, 81, 81, 0.3)',
+		},
+		'& .MuiDataGrid-row': {
+			'&:hover': {
+				backgroundColor: 'rgba(25, 118, 210, 0.04)',
+			},
+			minHeight: `${shortRowHeight + 30}px !important`,
+			'& > *': {
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'flex-start'
+			}
+		},
+		'& .MuiDataGrid-cell': {
+			padding: '10px 8px',
+			fontSize: '1rem',
+		},
+	};
+	
 	return (
-		<div className="w-full h-full overflow-auto">
+		<div className="w-full h-full overflow-auto pl-2 pr-2">
 			<ThemeProvider theme={walletTableTheme}>
-				{/* Software Wallets Section */}
-				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Software Wallets</h2>
-				<DataGrid<WalletRow>
-					rows={softwareWalletRows}
-					columns={columns}
-					getRowHeight={row => (row.model as WalletRow).getRowHeight()}
-					density="standard"
-					disableRowSelectionOnClick
-					initialState={{
-						sorting: {
-							sortModel: [{ field: walletNameColumn.field, sort: 'asc' }],
-						},
-					}}
-					disableVirtualization={true}
-					sx={{
-						'& .MuiDataGrid-cell:first-child': {
-							position: 'sticky',
-							left: 0,
-							zIndex: 1,
-							backgroundColor: 'background.default',
-							borderRight: '1px solid #141519',
-						},
-					}}
-				/>
+				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Wallets</h2>
+				<Box sx={{ mb: 6, width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
+					<DataGrid<WalletRow>
+						rows={softwareWalletRows}
+						columns={mainColumns}
+						getRowHeight={row => (row.model as WalletRow).getRowHeight()}
+						density="standard"
+						disableRowSelectionOnClick
+						initialState={{
+							sorting: {
+								sortModel: [{ field: walletNameColumn.field, sort: 'asc' }],
+							},
+							filter: {
+								filterModel: {
+									items: [],
+								},
+							},
+						}}
+						slots={{ toolbar: GridToolbar }}
+						slotProps={{
+							toolbar: {
+								showQuickFilter: true,
+							},
+						}}
+						filterModel={{
+							items: [],
+						}}
+						autoHeight
+						disableVirtualization={true}
+						sx={dataGridSx}
+					/>
+				</Box>
 				
-				{/* Hardware Wallets Section */}
-				<h2 className="text-2xl font-bold mt-10 mb-4 text-accent border-b pb-2">Hardware Wallets</h2>
-				<DataGrid<WalletRow>
-					rows={hardwareWalletRows}
-					columns={columns}
-					getRowHeight={row => (row.model as WalletRow).getRowHeight()}
-					density="standard"
-					disableRowSelectionOnClick
-					initialState={{
-						sorting: {
-							sortModel: [{ field: walletNameColumn.field, sort: 'asc' }],
-						},
-					}}
-					disableVirtualization={true}
-					sx={{
-						'& .MuiDataGrid-cell:first-child': {
-							position: 'sticky',
-							left: 0,
-							zIndex: 1,
-							backgroundColor: 'background.default',
-							borderRight: '1px solid #141519',
-						},
-					}}
-				/>
+				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Hardware Wallets</h2>
+				<Box sx={{ width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
+					<DataGrid<WalletRow>
+						rows={hardwareWalletRows}
+						columns={hardwareColumns}
+						getRowHeight={row => (row.model as WalletRow).getRowHeight()}
+						density="standard"
+						disableRowSelectionOnClick
+						initialState={{
+							sorting: {
+								sortModel: [{ field: walletNameColumn.field, sort: 'asc' }],
+							},
+						}}
+						autoHeight
+						disableVirtualization={true}
+						sx={dataGridSx}
+					/>
+				</Box>
 			</ThemeProvider>
 		</div>
 	)

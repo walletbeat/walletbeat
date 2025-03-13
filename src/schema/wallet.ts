@@ -12,6 +12,8 @@ import type { Url } from './url'
 import { Rating, type Attribute, type EvaluatedAttribute, type Value } from './attributes'
 import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
+import type { WalletTypeInfo } from './features/wallet-type'
+import { WalletTypeCategory, SmartWalletStandard } from './features/wallet-type'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -76,6 +78,20 @@ export interface WalletMetadata {
 
 	/** List of people who contributed to the information for this wallet. */
 	contributors: NonEmptyArray<Contributor>
+
+	/**
+	 * Information about the wallet type (EOA, Smart Wallet, or Hardware Wallet)
+	 */
+	walletType?: WalletTypeInfo
+	
+	/**
+	 * Information for wallets with multiple types (e.g., both EOA and Smart Wallet)
+	 */
+	multiWalletType?: {
+		categories: WalletTypeCategory[];
+		smartWalletStandards?: SmartWalletStandard[];
+		details?: string;
+	}
 }
 
 /** Per-wallet, per-attribute override. */

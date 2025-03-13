@@ -6,13 +6,14 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletProfile } from '@/schema/features/profile'
+import { isAccountTypeSupported } from '@/schema/features/account-support'
 
 const brand = 'attributes.security.hardware_wallet_support'
 export type HardwareWalletSupportValue = Value & {
@@ -136,12 +137,12 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	methodology: markdown(`
 		Wallets are evaluated based on their support for popular hardware wallet devices.
 		
-		A wallet receives a passing rating if it supports at least two major hardware
-		wallet brands (such as Ledger and Trezor) and allows users to perform all
+		A wallet receives a passing rating if it supports all four major hardware
+		wallet brands: Ledger, Trezor, Keystone, and GridPlus, allowing users to perform all
 		essential operations using these hardware wallets.
 		
 		A wallet receives a partial rating if it supports at least one hardware wallet
-		brand but has limitations in functionality or doesn't support multiple major brands.
+		brand but doesn't support all four major brands mentioned above.
 		
 		A wallet fails this attribute if it doesn't support any hardware wallets.
 	`),
@@ -150,16 +151,14 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		exhaustive: true,
 		pass: exampleRating(
 			paragraph(`
-				The wallet supports multiple major hardware wallet brands, including at least
-				Ledger and Trezor, with full functionality.
+				The wallet supports all four major hardware wallet brands: Ledger, Trezor, 
+				Keystone, and GridPlus, with full functionality.
 			`),
 			comprehensiveHardwareWalletSupport([
 				HardwareWalletType.LEDGER,
 				HardwareWalletType.TREZOR,
-				HardwareWalletType.KEEPKEY,
-				HardwareWalletType.OTHER,
-				HardwareWalletType.GRIDPLUS,
 				HardwareWalletType.KEYSTONE,
+				HardwareWalletType.GRIDPLUS,
 			]).value,
 		),
 		partial: [
@@ -183,29 +182,31 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletSupportValue> => {
 		// If this is a hardware wallet, mark as exempt since hardware wallets inherently support themselves
 		if (features.profile === WalletProfile.HARDWARE) {
-			return {
-				value: {
-					id: 'exempt_hardware_wallet',
-					rating: Rating.EXEMPT,
-					displayName: 'Exempt for hardware wallets',
-					shortExplanation: sentence(
-						(walletMetadata: WalletMetadata) => `
-							This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet itself.
-						`,
-					),
-					supportedHardwareWallets: [],
-					__brand: brand,
-				},
-				details: paragraph(
-					({ wallet }) => `
-						As ${wallet.metadata.displayName} is a hardware wallet itself, evaluating hardware wallet support
-						is not applicable. Hardware wallets are designed to secure private keys, not to connect with other hardware wallets.
-					`,
+			return exempt(
+				hardwareWalletSupport, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet itself.`
 				),
-			}
+				brand,
+				{ supportedHardwareWallets: [] }
+			)
 		}
 
-		if (!features.security.hardwareWalletSupport) {
+        // Check for ERC-4337 smart wallet support in accountSupport
+        if (features.accountSupport !== null && 
+            features.accountSupport.rawErc4337 !== undefined && 
+            isAccountTypeSupported(features.accountSupport.rawErc4337)) {
+            return exempt(
+				hardwareWalletSupport, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`
+				),
+				brand,
+				{ supportedHardwareWallets: [] }
+			)
+        }
+
+		if (features.security.hardwareWalletSupport === undefined || features.security.hardwareWalletSupport === null) {
 			return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] })
 		}
 
@@ -215,6 +216,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		// Check which hardware wallets are supported
 		Object.entries(hwSupport).forEach(([walletType, support]) => {
 			if (support && isSupported(support)) {
+				// Type assertion is safe because we're iterating over keys of hwSupport
+				// which are HardwareWalletType values
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're iterating over hwSupport keys
 				supportedWallets.push(walletType as HardwareWalletType)
 			}
 		})
@@ -226,10 +230,12 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		const hasLedger = supportedWallets.includes(HardwareWalletType.LEDGER)
 		const hasTrezor = supportedWallets.includes(HardwareWalletType.TREZOR)
 		const hasKeystone = supportedWallets.includes(HardwareWalletType.KEYSTONE)
+		// Used for future expansion
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Kept for future use
 		const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
 		const hasGridplus = supportedWallets.includes(HardwareWalletType.GRIDPLUS)
 
-		if (hasLedger && hasTrezor && hasKeystone && hasKeepkey && hasGridplus) {
+		if (hasLedger && hasTrezor && hasKeystone && hasGridplus) {
 			return comprehensiveHardwareWalletSupport(supportedWallets)
 		}
 

@@ -4,6 +4,7 @@ import { WalletProfile } from '@/schema/features/profile'
 import { polymutex } from '../contributors/polymutex'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { WalletTypeCategory } from '@/schema/features/wallet-type'
 
 export const phantom: Wallet = {
 	metadata: {
@@ -20,6 +21,9 @@ export const phantom: Wallet = {
 		repoUrl: null,
 		contributors: [polymutex],
 		lastUpdated: '2025-02-08',
+		multiWalletType: {
+			categories: [WalletTypeCategory.EOA]
+		}
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
