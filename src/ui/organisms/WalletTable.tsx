@@ -3,7 +3,7 @@ import { ratedHardwareWallets } from '@/data/hardwareWallets'
 import type { AttributeGroup, ValueSet, EvaluatedGroup } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
 import { Box, type SxProps } from '@mui/material'
-import { DataGrid, type GridColDef } from '@mui/x-data-grid'
+import { DataGrid, type GridColDef, GridToolbar } from '@mui/x-data-grid'
 import type React from 'react'
 import {
 	WalletRatingCell,
@@ -29,6 +29,12 @@ import type {
 import type { Variant } from '@/schema/variants'
 import { ThemeProvider } from '@mui/system'
 import { walletTableTheme } from '@/components/ThemeRegistry/theme'
+
+// Define wallet type enum
+enum WalletType {
+	SOFTWARE = 'Software Wallet',
+	HARDWARE = 'Hardware Wallet'
+}
 
 class TableStateHandle implements WalletTableStateHandle {
 	readonly variantSelected: Variant | null
@@ -57,6 +63,7 @@ class WalletRow implements WalletRowStateHandle {
 	readonly table: WalletTableStateHandle
 	readonly expanded: boolean
 	readonly rowWideStyle: SxProps
+	readonly isHardwareWallet: boolean
 
 	/** Data table ID; required by DataGrid. */
 	readonly id: string
@@ -68,10 +75,12 @@ class WalletRow implements WalletRowStateHandle {
 		tableStateHandle: WalletTableStateHandle,
 		rowsState: Record<string, WalletRowState>,
 		setRowsState: Dispatch<SetStateAction<Record<string, WalletRowState>>>,
+		isHardwareWallet: boolean = false
 	) {
 		this.wallet = wallet
 		this.id = wallet.metadata.id
 		this.table = tableStateHandle
+		this.isHardwareWallet = isHardwareWallet
 		const rowState = rowsState[this.id] ?? { expanded: false }
 		this.expanded = rowState.expanded
 		this.setRowsState = setRowsState
@@ -160,15 +169,17 @@ export default function WalletTable(): React.JSX.Element {
 	const tableStateHandle = new TableStateHandle(tableState, setTableState)
 	const [rowsState, setRowsState] = useState<Record<string, WalletRowState>>({})
 	
-	// Combine regular wallets and hardware wallets
-	const allWallets = {
-		...ratedWallets,
-		...ratedHardwareWallets
-	}
-	
-	const rows = Object.values(allWallets).map(
-		wallet => new WalletRow(wallet, tableStateHandle, rowsState, setRowsState),
+	// Create software wallet rows
+	const softwareWalletRows = Object.values(ratedWallets).map(
+		wallet => new WalletRow(wallet, tableStateHandle, rowsState, setRowsState, false)
 	)
+	
+	// Create hardware wallet rows
+	const hardwareWalletRows = Object.values(ratedHardwareWallets).map(
+		wallet => new WalletRow(wallet, tableStateHandle, rowsState, setRowsState, true)
+	)
+	
+	// Create separate sections for each wallet type
 	const walletNameColumn: GridColDef<WalletRow, string> = {
 		field: 'displayName',
 		headerName: 'Wallet',
@@ -185,16 +196,41 @@ export default function WalletTable(): React.JSX.Element {
 		walletTableColumn(transparencyAttributeGroup, tree => tree.transparency),
 		walletTableColumn(ecosystemAttributeGroup, tree => tree.ecosystem),
 	]
+	
 	return (
-		<div
-			className="w-full h-full overflow-auto"
-		//  maxWidth="100%" height="80vh" width="fit-content" overflow="auto"
-		>
+		<div className="w-full h-full overflow-auto">
 			<ThemeProvider theme={walletTableTheme}>
+				{/* Software Wallets Section */}
+				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Software Wallets</h2>
 				<DataGrid<WalletRow>
-					rows={rows}
+					rows={softwareWalletRows}
 					columns={columns}
-					getRowHeight={row => (row.model as WalletRow).getRowHeight()} // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- The row model is WalletRow.
+					getRowHeight={row => (row.model as WalletRow).getRowHeight()}
+					density="standard"
+					disableRowSelectionOnClick
+					initialState={{
+						sorting: {
+							sortModel: [{ field: walletNameColumn.field, sort: 'asc' }],
+						},
+					}}
+					disableVirtualization={true}
+					sx={{
+						'& .MuiDataGrid-cell:first-child': {
+							position: 'sticky',
+							left: 0,
+							zIndex: 1,
+							backgroundColor: 'background.default',
+							borderRight: '1px solid #141519',
+						},
+					}}
+				/>
+				
+				{/* Hardware Wallets Section */}
+				<h2 className="text-2xl font-bold mt-10 mb-4 text-accent border-b pb-2">Hardware Wallets</h2>
+				<DataGrid<WalletRow>
+					rows={hardwareWalletRows}
+					columns={columns}
+					getRowHeight={row => (row.model as WalletRow).getRowHeight()}
 					density="standard"
 					disableRowSelectionOnClick
 					initialState={{
