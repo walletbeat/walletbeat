@@ -5,6 +5,8 @@ import { nconsigny } from '../contributors/nconsigny'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { WalletTypeCategory } from '@/schema/features/wallet-type'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { featureSupported } from '@/schema/features/support'
 
 export const phantom: Wallet = {
 	metadata: {
@@ -53,7 +55,9 @@ export const phantom: Wallet = {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
+				supportedWallets: {
+					[HardwareWalletType.LEDGER]: featureSupported,
+				},
 				ref: null,
 			},
 			hardwareWalletClearSigning: {

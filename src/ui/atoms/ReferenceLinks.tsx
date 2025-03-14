@@ -70,7 +70,7 @@ export function ReferenceLinks({
 											alignItems: 'center',
 											fontSize: '0.75rem',
 											gap: 0.5,
-											color: 'var(--text-primary)',
+											color: 'primary.main',
 											textDecoration: 'none',
 											'&:hover': { textDecoration: 'underline' }
 										}}
@@ -90,7 +90,7 @@ export function ReferenceLinks({
 										alignItems: 'center',
 										fontSize: '0.75rem',
 										gap: 0.5,
-										color: 'var(--text-primary)',
+										color: 'primary.main',
 										textDecoration: 'none',
 										'&:hover': { textDecoration: 'underline' }
 									}}

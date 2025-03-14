@@ -61,6 +61,9 @@ import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { commaListPrefix, slugifyCamelCase } from '@/types/utils/text'
 import { ReturnToTop } from '@/ui/organisms/ReturnToTop'
 import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
+import { ExternalLink } from '@/ui/atoms/ExternalLink'
+import LanguageIcon from '@mui/icons-material/Language'
+import GitHubIcon from '@mui/icons-material/GitHub'
 
 const headerHeight = 80
 const headerBottomMargin = 24
@@ -284,6 +287,46 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 						content={wallet.metadata.blurb.render({})}
 						typography={{ variant: 'body1' }}
 					/>
+					<Box 
+						sx={{
+							display: 'flex',
+							flexDirection: 'row',
+							gap: '16px',
+							marginTop: '24px',
+							marginBottom: '24px',
+							alignItems: 'center',
+							flexWrap: 'wrap',
+							padding: '12px',
+							backgroundColor: 'rgba(50, 50, 50, 0.25)',
+							border: '1px solid var(--border)',
+							borderRadius: '8px',
+							'.dark &': {
+								backgroundColor: 'rgba(189, 159, 224, 0.15)'
+							}
+						}}
+					>
+						<Typography variant="body1" fontWeight="medium">Links:</Typography>
+						
+						<Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+							<LanguageIcon fontSize="small" sx={{ color: 'var(--accent)' }} />
+							<ExternalLink
+								url={wallet.metadata.url}
+								defaultLabel={`${wallet.metadata.displayName} website`}
+								style={{ fontWeight: 500 }}
+							/>
+						</Box>
+						
+						{wallet.metadata.repoUrl !== null && (
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+								<GitHubIcon fontSize="small" sx={{ color: 'var(--accent)' }} />
+								<ExternalLink 
+									url={wallet.metadata.repoUrl} 
+									defaultLabel="GitHub Repository"
+									style={{ fontWeight: 500 }}
+								/>
+							</Box>
+						)}
+					</Box>
 					<Typography variant="body1">
 						<React.Fragment key="begin">{wallet.metadata.displayName} runs </React.Fragment>
 						{nonEmptyMap(nonEmptyKeys(wallet.variants), (variant, variantIndex) => (

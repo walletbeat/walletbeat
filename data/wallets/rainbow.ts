@@ -5,6 +5,8 @@ import { polymutex } from '../contributors/polymutex'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { WalletTypeCategory } from '@/schema/features/wallet-type'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { featureSupported } from '@/schema/features/support'
 
 export const rainbow: Wallet = {
 	metadata: {
@@ -13,9 +15,7 @@ export const rainbow: Wallet = {
 		tableName: 'Rainbow',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			Rainbow is an Ethereum wallet that prides itself in rewarding its
-			users by integrating airdrop claims in the wallet. It also integrates
-			memecoin and NFT trading.
+			Rainbow Extension. Built for speed. Built for power. Built for You.
 		`),
 		url: 'https://rainbow.me',
 		repoUrl: 'https://github.com/rainbow-me/rainbow',
@@ -53,7 +53,10 @@ export const rainbow: Wallet = {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
+				supportedWallets: {
+					[HardwareWalletType.LEDGER]: featureSupported,
+					[HardwareWalletType.TREZOR]: featureSupported,
+				},
 				ref: null,
 			},
 			hardwareWalletClearSigning: {

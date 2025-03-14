@@ -95,6 +95,7 @@ export function EipLink({
 				<Link
 					href={eipEthereumDotOrgUrl(eip)}
 					target="_blank"
+					color="primary"
 					display="flex"
 					flexDirection="row"
 					gap="2px"
@@ -106,6 +107,9 @@ export function EipLink({
 					onMouseLeave={() => {
 						setHovered(false)
 					}}
+					sx={{
+						color: 'primary.main'
+					}}
 				>
 					<Box component="span" display="inline-block" sx={{ filter: 'invert(100%)' }}>
 						<img src={`${betaImagesRoot}/ethereum-logo.svg`} alt="" width={14} height={14} />
@@ -113,7 +117,8 @@ export function EipLink({
 					<Box
 						component="span"
 						display="inline-block"
-						sx={{ textDecoration: hovered ? 'underline' : 'underline dotted' }}
+						className="eip-tag"
+						sx={{ textDecoration: hovered ? 'underline' : 'none' }}
 					>
 						{format === 'SHORT' ? eipShortLabel(eip) : eipLabel(eip)}
 					</Box>

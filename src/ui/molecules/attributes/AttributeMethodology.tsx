@@ -30,10 +30,12 @@ interface ListItemProps {
 }
 
 const StyledListItem = styled('li') <ListItemProps>`
-	margin-top: ${props => (props.isFirstItem ? '0px' : (props.spaceBetweenItems ?? '0px'))};
+	margin-top: ${props => (props.isFirstItem ? '0px' : (props.spaceBetweenItems ?? '0.75rem'))};
+	padding-bottom: 0.5rem;
 	&::marker {
 		content: '${props => props.bulletText}  ';
 		font-size: ${props => props.bulletFontSize ?? 'inherit'};
+		padding-right: 0.5rem;
 	}
 `
 
@@ -84,7 +86,7 @@ function ExampleRatings<V extends Value>({
 			bulletText={ratingToIcon(rating)}
 			bulletFontSize="75%"
 			isFirstItem={index === 0}
-			spaceBetweenItems="0.125rem"
+			spaceBetweenItems="0.75rem"
 		>
 			<RenderTypographicContent
 				content={exampleRating.description.render({})}
@@ -117,7 +119,7 @@ function ExampleRatings<V extends Value>({
 						content={preamble.render({})}
 						typography={typographyPropsHeader}
 					/>
-					<ul>
+					<ul style={{ paddingLeft: "2rem" }}>
 						{ratingsList.map((exampleRating, index) =>
 							renderListItem(exampleRating, index, rating),
 						)}

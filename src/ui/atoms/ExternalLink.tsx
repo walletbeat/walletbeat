@@ -27,10 +27,9 @@ export function ExternalLink({
 				href={labeled.url}
 				target="_blank"
 				rel={rel}
-				color={color}
+				color="primary"
 				style={{
 					...style,
-					color: 'var(--text-primary)'
 				}}
 				display="flex"
 				flexDirection="row"
@@ -44,7 +43,7 @@ export function ExternalLink({
 					setHovered(false)
 				}}
 				sx={{
-					color: 'var(--text-primary)',
+					color: 'primary.main',
 				}}
 			>
 				<Box

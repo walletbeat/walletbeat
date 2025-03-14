@@ -63,12 +63,8 @@ export const keystoneWallet: Wallet = {
 				},
 				ref: [
 					{
-						url: 'https://x.com/ml_sudo/status/1899560303370944598',
-						explanation: 'Independent verification of Keystone\'s strong security features and clear signing capabilities.',
-					},
-					{
 						url: 'https://youtu.be/7lP_0h-PPvY?si=S4wNFukrmg4rwyFA&t=1141',
-						explanation: 'Video demonstration of Keystone\'s clear signing implementation on Safe.',
+						explanation: 'Independent video demonstration of Keystone\'s clear signing implementation on Safe.',
 					}
 				],
 			},

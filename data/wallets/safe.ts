@@ -85,7 +85,9 @@ export const safe: Wallet = {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {},
+				supportedWallets: {
+					
+				},
 				ref: null,
 			},
 			hardwareWalletClearSigning: {

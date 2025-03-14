@@ -57,6 +57,11 @@ export interface Entity<Ts extends EntityType[] = []> {
 	url: Url | { type: 'NO_WEBSITE' }
 
 	/**
+	 * Repository URL of the entity (like GitHub).
+	 */
+	repoUrl: Url | null
+
+	/**
 	 * The jurisdiction in which the entity is located.
 	 *
 	 * 'GLOBAL' should be used when an entity exists in such a manner that

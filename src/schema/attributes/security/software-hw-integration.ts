@@ -85,7 +85,7 @@ function basicHardwareWalletIntegration(supportedWallets: string[] = []): Evalua
 			({ wallet }) => `
 				${wallet.metadata.displayName} should implement full EIP-712 clear signing support for transactions with
 				Safe, Aave, and other major DeFi platforms. This would ensure users can verify all transaction details on
-				their hardware devices before signing. One way to do this is to implement support for[Ledger's device management kit](https://developers.ledger.com/docs/device-interaction/getting-started)
+				their hardware devices before signing. ${wallet.metadata.displayName} should make sure to support the lastest hardware sdk such as  [Gridplus's](https://github.com/GridPlus/gridplus-sdk) or [Ledger's device management kit](https://developers.ledger.com/docs/device-interaction/getting-started).
 			`,
 		),
 	}

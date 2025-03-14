@@ -197,6 +197,38 @@ function openZeppelinP256VerifierImplementation(
 	}
 }
 
+function webAuthnSolImplementation(
+	support: PasskeyVerificationSupport,
+): Evaluation<PasskeyImplementationValue> {
+	return {
+		value: {
+			id: 'web_authn_sol_implementation',
+			rating: Rating.PASS,
+			displayName: 'Audited passkey implementation (WebAuthn.sol)',
+			shortExplanation: mdSentence(
+				(walletMetadata: WalletMetadata) => `
+					${walletMetadata.displayName} implements passkeys using WebAuthn.sol.
+				`,
+			),
+			library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
+			libraryUrl: support.libraryUrl || 'https://github.com/base/webauthn-sol',
+			__brand: brand,
+		},
+		details: mdParagraph(
+			({ wallet }) => `
+				${wallet.metadata.displayName} implements passkeys using WebAuthn.sol from Base, a Solidity library for verifying WebAuthn authentication assertions. It builds on Daimo's WebAuthn.sol.
+				This library is optimized for Ethereum layer 2 rollup chains but will work on all EVM chains. Signature verification always attempts to use the RIP-7212 precompile and, if this fails, falls back to using FreshCryptoLib.
+				The library has been [audited](https://github.com/coinbase/smart-wallet/tree/main/audits)
+			`,
+		),
+		howToImprove: mdParagraph(
+			({ wallet }) => `
+				${wallet.metadata.displayName} could improve by updating the fallback mechanism to use Smooth Crypto Library instead of FreshCryptoLib for better performance and security.
+			`,
+		),
+	}
+}
+
 export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 	id: 'passkeyImplementation',
 	icon: '\u{1F5F9}', // Check mark
@@ -207,41 +239,33 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
 			`What can ${walletMetadata.displayName} do to improve its passkey implementation?`,
 	},
-	question: sentence(`
-		Does the wallet implement passkeys with a secure verification library?
-	`),
+	question: sentence(
+		(walletMetadata: WalletMetadata) => `Does ${walletMetadata.displayName} use a secure and efficient passkey verification library?`,
+	),
 	why: markdown(`
-		Passkeys are a more secure alternative to passwords, using public key cryptography
-		for authentication. However, the security and gas cost of passkeys depends heavily on the
-		implementation, particularly the library used for verification of P256/R1 curve operations.
+		Passkeys provide a secure and phishing-resistant way to authenticate users without relying on seed phrases. 
+		Using gas-efficient and well-audited libraries for verification is crucial for both security and cost-effectiveness.
 		
-		Using a well-audited and secure verification library is crucial to prevent vulnerabilities
-		that could compromise the authentication process. Different libraries offer varying levels
-		of security, with some providing more robust protection against potential attacks.
+		P256 signature verification is computationally expensive on-chain, so using optimized libraries reduces transaction costs.
 		
-		A wallet with a strong passkey implementation using a high-quality verification library
-		offers users better protection for their accounts and assets.
+		Some verification libraries have undergone multiple security audits while others may have fewer or no publicly available audits.
 	`),
 	methodology: markdown(`
-		Wallets are evaluated based on the verification library they use for passkey implementation,
-		specifically for P256/R1 curve operations.
-		
-		A wallet receives a passing rating if it uses either [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), which is a well audited library at 159K gas. 
-		[Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier), which is also well-audited but has a higher gas cost at 330K gas. 
-		Or [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol),
-		which is developed by OpenZeppelin team. 
-		
-		[Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) is audited and the results of the completed audits are in the 
-		[doc/audit](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits) folder.
+		Wallets are assessed based on the passkey verification library they use:
 
-		A wallet receives a partial rating if it uses [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib), which is also well-regarded
-		but considered slightly less optimal than the passing verification libraries.
-		
-		A wallet receives a lower partial rating if it uses an unaudited less efficient library for passkey
-		verification.
-		
-		A wallet fails this attribute if it either does not implement passkeys or does not use a
-		recognized verification library for P256/R1 curve operations.
+		1. **Pass (Best)**: Using the most gas-efficient and well-audited library like:
+			- [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib)
+			- [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier)
+			- [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol)
+
+		2. **Partial**: Using libraries that work but are less optimal:
+			- [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib)
+			- [WebAuthn.sol](https://github.com/base/webauthn-sol) which falls back to Fresh Crypto Lib
+			- Other less common verification libraries
+
+		3. **Fail**: Not implementing passkeys or using a non-recognized library.
+
+		Wallets that don't support smart contract accounts or are hardware wallets are exempt from this rating.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
@@ -249,7 +273,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		pass: [
 			exampleRating(
 				mdParagraph(`
-					The wallet implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), a well audited library at 159K gas.
+					The wallet implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), the most gas-efficient and triple-audited verification library for P256/R1 curve operations.
 				`),
 				smoothCryptoLibImplementation({
 					library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
@@ -258,8 +282,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet implements passkeys using [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier), a well-audited
-					verification library for P256/R1 curve operations with a 330K gas cost.
+					The wallet implements passkeys using [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier), which is well-audited and reasonably gas-efficient.
 				`),
 				daimoP256VerifierImplementation({
 					library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
@@ -268,8 +291,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet implements passkeys using [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol), a well-audited
-					verification library for P256/R1 curve operations from the OpenZeppelin team.
+					The wallet implements passkeys using [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol), a well-audited verification library from a respected team.
 				`),
 				openZeppelinP256VerifierImplementation({
 					library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
@@ -286,6 +308,15 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 				freshCryptoLibImplementation({
 					library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
 					libraryUrl: 'https://github.com/rdubois-crypto/FreshCryptoLib',
+				}).value,
+			),
+			exampleRating(
+				mdParagraph(`
+					The wallet implements passkeys using [WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the less efficient FreshCryptoLib.
+				`),
+				webAuthnSolImplementation({
+					library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
+					libraryUrl: 'https://github.com/base/webauthn-sol',
 				}).value,
 			),
 			exampleRating(
@@ -357,6 +388,9 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 				break;
 			case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
 				result = freshCryptoLibImplementation(withoutRefs);
+				break;
+			case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
+				result = webAuthnSolImplementation(withoutRefs);
 				break;
 			case PasskeyVerificationLibrary.OTHER:
 				result = otherPasskeyImplementation(withoutRefs);

@@ -129,7 +129,7 @@ interface NavigationItemProps {
 const NavigationItem = memo(
 	function NavigationItem({ item, active, depth }: NavigationItemProps): React.JSX.Element {
 		const [isOpen, setIsOpen] = useState(false);
-		const linkStyles = "whitespace-nowrap flex flex-row items-center gap-2 py-1 hover:bg-backgroundSecondary rounded-md px-4";
+		const linkStyles = "whitespace-nowrap flex flex-row items-center gap-2 py-0.5 hover:bg-backgroundSecondary rounded-md px-4";
 		const hasChildren = (item.children?.length ?? 0) > 0;
 
 		const toggleDropdown = (e: React.MouseEvent) => {
@@ -220,7 +220,7 @@ const NavigationItem = memo(
 				
 				{hasChildren && (
 					<ul key={`subitems-${item.id}`} 
-						className={`pl-1 border-l ml-6 flex flex-col gap-0.5 overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+						className={`pl-1 border-l ml-2 flex flex-col gap-0 overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
 					>
 						{item.children?.map(subitem => (
 							<NavigationItem
@@ -268,7 +268,7 @@ export const NavigationGroup = memo(
 		return (
 			<>
 				<ul
-				 className="flex flex-col gap-0.5"
+				 className="flex flex-col gap-0"
 				>
 					{nonEmptyMap(group.items, item => (
 						<React.Fragment key={`fragment-${item.id}`}>
@@ -345,7 +345,7 @@ export function Navigation({
 				</a>
 				<ThemeSwitcher />
 			</div>
-			<div className="flex flex-col gap-4 px-4">
+			<div className="flex flex-col gap-2 px-4">
 				{prefix}
 				{nonEmptyMap(groups, (group, groupIndex) => (
 					<NavigationGroup

@@ -19,7 +19,7 @@ export const ledgerWallet: Wallet = {
 			integrates with Ledger hardware wallets to provide secure cryptocurrency management.
 		`),
 		url: 'https://www.ledger.com/',
-		repoUrl: null,
+		repoUrl: 'https://github.com/LedgerHQ/',
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
 	},

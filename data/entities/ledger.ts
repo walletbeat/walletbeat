@@ -19,6 +19,7 @@ export const ledger: CorporateEntity & WalletDeveloper = {
 	},
 	jurisdiction: 'France',
 	url: 'https://www.ledger.com/',
+	repoUrl: 'https://github.com/LedgerHQ/',
 	privacyPolicy: 'https://shop.ledger.com/pages/privacy-policy',
 	crunchbase: 'https://www.crunchbase.com/organization/ledger-2',
 	linkedin: 'https://www.linkedin.com/company/ledgerhq/',

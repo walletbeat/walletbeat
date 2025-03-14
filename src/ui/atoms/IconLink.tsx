@@ -29,10 +29,9 @@ export function IconLink({
 				href={href}
 				target={target}
 				rel={rel}
-				color={color}
+				color="primary"
 				style={{
 					...style,
-					color: 'var(--text-primary)'
 				}}
 				display="flex"
 				flexDirection="row"
@@ -46,7 +45,7 @@ export function IconLink({
 					setHovered(false)
 				}}
 				sx={{
-					color: 'var(--text-primary)',
+					color: 'primary.main',
 				}}
 			>
 				<IconComponent color="inherit" fontSize="inherit" display="inline-block" />
