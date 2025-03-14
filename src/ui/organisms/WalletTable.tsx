@@ -28,7 +28,7 @@ import type {
 } from '../WalletTableState'
 import type { Variant } from '@/schema/variants'
 import { ThemeProvider } from '@mui/system'
-import { walletTableTheme } from '@/components/ThemeRegistry/theme'
+import { walletTableTheme, lightWalletTableTheme } from '@/components/ThemeRegistry/theme'
 import { WalletTypeCategory, SmartWalletStandard, createHardwareWalletType } from '@/schema/features/wallet-type'
 import { useTheme } from '@mui/material/styles'
 
@@ -422,6 +422,10 @@ export default function WalletTable(): React.JSX.Element {
 	]
 	
 	// Common DataGrid style
+	const theme = useTheme();
+	// Determine which theme to use based on the current mode
+	const currentWalletTableTheme = theme.palette.mode === 'light' ? lightWalletTableTheme : walletTableTheme;
+
 	const dataGridSx = {
 		'& .MuiDataGrid-cell:first-child': {
 			position: 'sticky',
@@ -431,9 +435,9 @@ export default function WalletTable(): React.JSX.Element {
 			borderRight: '1px solid var(--border)',
 			color: 'var(--text-primary)',
 		},
-		'& .MuiDataGrid-columnHeaders': {
+		'& .MuiDataGrid-row--borderBottom css-gvoll6': {
 			borderBottom: '2px solid var(--border)',
-			backgroundColor: 'var(--background-secondary)',
+			backgroundColor: 'var(--background-row-border) !important',
 			height: '64px !important',
 			lineHeight: '64px !important',
 			color: 'var(--text-primary)',
@@ -474,11 +478,14 @@ export default function WalletTable(): React.JSX.Element {
 			fontSize: '1rem',
 			color: 'var(--text-primary)',
 		},
+		'& .MuiDataGrid-row--borderBottom': {
+			backgroundColor: 'var(--background-row-border) !important',
+		},
 	};
 	
 	return (
 		<div className="w-full h-full overflow-auto pl-2 pr-2">
-			<ThemeProvider theme={walletTableTheme}>
+			<ThemeProvider theme={currentWalletTableTheme}>
 				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Wallets</h2>
 				<Box sx={{ mb: 6, width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
 					<DataGrid<WalletRow>
