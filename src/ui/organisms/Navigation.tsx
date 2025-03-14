@@ -1,7 +1,7 @@
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
 import { ThemeSwitcher } from './ThemeSwitcher'
 
 /**
@@ -128,7 +128,16 @@ interface NavigationItemProps {
  */
 const NavigationItem = memo(
 	function NavigationItem({ item, active, depth }: NavigationItemProps): React.JSX.Element {
+		const [isOpen, setIsOpen] = useState(false);
 		const linkStyles = "whitespace-nowrap flex flex-row items-center gap-2 py-1 hover:bg-backgroundSecondary rounded-md px-4";
+		const hasChildren = (item.children?.length ?? 0) > 0;
+
+		const toggleDropdown = (e: React.MouseEvent) => {
+			if (hasChildren) {
+				e.preventDefault();
+				setIsOpen(!isOpen);
+			}
+		};
 
 		const ButtonComponent = ({
 			children,
@@ -138,29 +147,60 @@ const NavigationItem = memo(
 			if (isNavigationContentItem(item)) {
 				return (
 					<a
-						// component="a"
-						href={`#${item.contentId}`}
+						href={hasChildren ? "#" : `#${item.contentId}`}
 						className={linkStyles}
-					// disableRipple={true}
-					// selected={active}
-					// sx={{ borderRadius: `${navigationListItemRadius}px` }}
+						onClick={toggleDropdown}
 					>
 						{children}
+						{hasChildren && (
+							<span className="ml-auto">
+								<svg 
+									stroke="currentColor" 
+									fill="none" 
+									strokeWidth="2" 
+									viewBox="0 0 24 24" 
+									strokeLinecap="round" 
+									strokeLinejoin="round" 
+									height="1em" 
+									width="1em" 
+									xmlns="http://www.w3.org/2000/svg"
+									className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+								>
+									<polyline points="6 9 12 15 18 9"></polyline>
+								</svg>
+							</span>
+						)}
 					</a>
 				)
 			}
 			if (isNavigationLinkItem(item)) {
 				return (
 					<a
-						// component="a"
-						href={item.href}
-						target={item.href.startsWith('https://') ? '_blank' : undefined} rel="noreferrer"
-						// disableRipple={true}
+						href={hasChildren ? "#" : item.href}
+						target={!hasChildren && item.href.startsWith('https://') ? '_blank' : undefined} 
+						rel="noreferrer"
 						className={linkStyles}
-					// selected={active}
-					// sx={{ borderRadius: `${navigationListItemRadius}px` }}
+						onClick={toggleDropdown}
 					>
 						{children}
+						{hasChildren && (
+							<span className="ml-auto">
+								<svg 
+									stroke="currentColor" 
+									fill="none" 
+									strokeWidth="2" 
+									viewBox="0 0 24 24" 
+									strokeLinecap="round" 
+									strokeLinejoin="round" 
+									height="1em" 
+									width="1em" 
+									xmlns="http://www.w3.org/2000/svg"
+									className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+								>
+									<polyline points="6 9 12 15 18 9"></polyline>
+								</svg>
+							</span>
+						)}
 					</a>
 				)
 			}
@@ -170,26 +210,29 @@ const NavigationItem = memo(
 			<li
 				key={`listItem-${item.id}`}
 				id={`listItem-${item.id}`}
-			// disablePadding={true}
-			// sx={{
-			// 	...sx,
-			// 	width: 'auto',
-			// 	marginLeft: depth === 'secondary' ? `${navigationListIconSize * 0.75}px` : undefined,
-			// }}
 			>
 				<ButtonComponent key="buttonComponent">
 					{item.icon && <SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>}
-					<span
-					// sx={{
-					// 	fontSize:
-					// 		depth === 'primary'
-					// 			? navigationListFontSizePrimary
-					// 			: navigationListFontSizeSecondary,
-					// }}
-					>
+					<span>
 						{item.title}
 					</span>
 				</ButtonComponent>
+				
+				{hasChildren && (
+					<ul key={`subitems-${item.id}`} 
+						className={`pl-1 border-l ml-6 flex flex-col gap-0.5 overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+					>
+						{item.children?.map(subitem => (
+							<NavigationItem
+								key={`subitem-${subitem.id}`}
+								item={subitem}
+								depth="secondary"
+								active={active}
+								onContentItemClick={undefined}
+							/>
+						))}
+					</ul>
+				)}
 			</li>
 		)
 	},
@@ -226,9 +269,6 @@ export const NavigationGroup = memo(
 			<>
 				<ul
 				 className="flex flex-col gap-0.5"
-				// key={`navigationGroupBox-${group.id}`}
-				// id={`navigationGroup-${group.id}`}
-				// sx={group.overflow ? { overflowY: 'auto', flex: '1' } : { flex: '0' }}
 				>
 					{nonEmptyMap(group.items, item => (
 						<React.Fragment key={`fragment-${item.id}`}>
@@ -239,19 +279,6 @@ export const NavigationGroup = memo(
 								depth="primary"
 								onContentItemClick={onContentItemClick}
 							/>
-							{(item.children?.length ?? 0) > 0 ? (
-								<ul key={`subitems-${item.id}`} className="pl-1 border-l ml-6 flex flex-col gap-0.5">
-									{item.children?.map(subitem => (
-										<NavigationItem
-											key={`subitem-${subitem.id}`}
-											item={subitem}
-											depth="secondary"
-											active={activeItemId === subitem.id}
-											onContentItemClick={onContentItemClick}
-										/>
-									))}
-								</ul>
-							) : null}
 						</React.Fragment>
 					))}
 				</ul>
