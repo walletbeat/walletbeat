@@ -377,10 +377,12 @@ export default function WalletTable(): React.JSX.Element {
 	const walletTypeColumn: GridColDef<WalletRow, string> = {
 		field: 'walletType',
 		headerName: 'Type',
-		width: 120,
-		minWidth: 110,
-		flex: 0.3,
-		renderCell: params => (params.row as WalletRow).renderWalletType(),
+		width: 104,
+		minWidth: 103,
+		flex: 0.15,
+		renderCell: params => (
+			<Box sx={{ fontSize: '0.85rem' }}>{(params.row as WalletRow).renderWalletType()}</Box>
+		),
 		sortable: true,
 		resizable: true
 	};
@@ -389,12 +391,14 @@ export default function WalletTable(): React.JSX.Element {
 		field: 'displayName',
 		headerName: 'Wallet',
 		type: 'string',
-		width: 340,
-		minWidth: 320,
-		flex: 1,
+		width: 280,
+		minWidth: 277,
+		flex: 0.7,
 		valueGetter: (_: never, row: WalletRow): string => row.wallet.metadata.displayName,
-		renderCell: params => params.row.renderName(),
-	}
+		renderCell: params => (
+			<Box sx={{ fontSize: '0.9rem' }}>{params.row.renderName()}</Box>
+		)
+	};
 	
 	// Define columns for main wallet table
 	const mainColumns: GridColDef[] = [
@@ -476,7 +480,7 @@ export default function WalletTable(): React.JSX.Element {
 		<div className="w-full h-full overflow-auto pl-2 pr-2">
 			<ThemeProvider theme={walletTableTheme}>
 				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Wallets</h2>
-				<Box sx={{ mb: 6, width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
+				<Box sx={{ mb: 6, width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
 					<DataGrid<WalletRow>
 						rows={softwareWalletRows}
 						columns={mainColumns}
@@ -504,12 +508,12 @@ export default function WalletTable(): React.JSX.Element {
 						}}
 						autoHeight
 						disableVirtualization={true}
-						sx={dataGridSx}
+						sx={{ width: '100%', minWidth: '1200px', ...dataGridSx }}
 					/>
 				</Box>
 				
 				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Hardware Wallets</h2>
-				<Box sx={{ width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
+				<Box sx={{ width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
 					<DataGrid<WalletRow>
 						rows={hardwareWalletRows}
 						columns={hardwareColumns}
@@ -523,7 +527,7 @@ export default function WalletTable(): React.JSX.Element {
 						}}
 						autoHeight
 						disableVirtualization={true}
-						sx={dataGridSx}
+						sx={{ width: '100%', minWidth: '1200px', ...dataGridSx }}
 					/>
 				</Box>
 			</ThemeProvider>

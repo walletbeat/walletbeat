@@ -19,7 +19,7 @@ import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../componen
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { betaSiteRoot } from '@/constants'
 
-const walletIconSize = (shortRowHeight ) * 0.6
+const walletIconSize = (shortRowHeight) * 0.5;
 
 function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element {
 	const Icon = variantToIcon(variant)
@@ -96,7 +96,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 						<WalletIcon walletMetadata={row.wallet.metadata} iconSize={walletIconSize} variants={row.wallet.variants} />
 					</Box>
 					<Box flex="1" sx={row.rowWideStyle} display="flex" alignItems="center">
-						<h2 className="text-primary" style={{ fontSize: '1.25rem' }}>
+						<h2 className="text-primary" style={{ fontSize: '1.04rem' }}>
 						{row.wallet.metadata.tableName}
 						</h2>
 						{/* <Typography variant="h2"></Typography> */}
