@@ -142,7 +142,8 @@ class WalletRow implements WalletRowStateHandle {
 
 	/** Get the height of the row in pixels. */
 	getRowHeight(): number {
-		return this.expanded ? expandedRowHeight : Math.max(shortRowHeight + 40, 120);
+		// Increase row height for all rows to accommodate pie charts better
+		return this.expanded ? expandedRowHeight + 100 : Math.max(shortRowHeight + 60, 140);
 	}
 
 	/** Render the "Name" cell. */
@@ -477,6 +478,10 @@ export default function WalletTable(): React.JSX.Element {
 			padding: '10px 8px',
 			fontSize: '1rem',
 			color: 'var(--text-primary)',
+			wordBreak: 'break-word',
+			overflowWrap: 'break-word',
+			whiteSpace: 'normal',
+			lineHeight: 1.4,
 		},
 		'& .MuiDataGrid-row--borderBottom': {
 			backgroundColor: 'var(--background-row-border) !important',

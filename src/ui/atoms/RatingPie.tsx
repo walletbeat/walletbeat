@@ -1,7 +1,7 @@
 import { type NonEmptyArray, nonEmptyGet, nonEmptyMap } from '@/types/utils/non-empty'
 import { PieChart } from '@mui/x-charts/PieChart'
 import type React from 'react'
-import { styled, type Theme } from '@mui/material/styles'
+import { styled, type Theme, useTheme } from '@mui/material/styles'
 import type { FadeOptions, HighlightItemData, PieItemIdentifier, PieValueType } from '@mui/x-charts'
 import { useState } from 'react'
 
@@ -114,16 +114,19 @@ export function RatingPie({
 	width,
 	height,
 	arc = Arc.FULL,
-	paddingAngle = 6,
-	innerRadiusFraction = 0.5,
+	paddingAngle = 8,
+	innerRadiusFraction = arc === Arc.FULL ? 0.02 : 0.35,
 	outerRadiusFraction = 0.95,
 	cornerRadiusFraction = 0.1,
 	hoverEffect = true,
-	hoverRadiusFraction = 1.0,
+	hoverRadiusFraction = 1.02,
 	highlightedSliceId = undefined,
 	centerLabel = '',
-	centerLabelHeightFraction = 0.275,
+	centerLabelHeightFraction = 0.3,
 }: PieRatings): React.JSX.Element {
+	const theme = useTheme();
+	const isDarkMode = theme.palette.mode === 'dark';
+	
 	const { maxRadius, startAngle, endAngle, cx, cy } = (() => {
 		switch (arc) {
 			case Arc.TOP_HALF:
@@ -136,21 +139,27 @@ export function RatingPie({
 				}
 			case Arc.FULL:
 				return {
-					maxRadius: height,
-					startAngle: -90,
-					endAngle: 270,
+					maxRadius: Math.min(width, height) / 2,
+					startAngle: 0,
+					endAngle: 380,
 					cx: width / 2 + pieChartCenterError,
 					cy: height / 2 + pieChartCenterError,
 				}
 		}
 	})()
-	const innerRadius = maxRadius * innerRadiusFraction
-	const outerRadius = maxRadius * outerRadiusFraction
-	const cornerRadius = maxRadius * cornerRadiusFraction
-	const hoverRadius = maxRadius * hoverRadiusFraction
+	
+	// Fixed values to match requested configuration but scaled down to be less zoomed
+	const innerRadius = 3; // Smaller inner radius
+	const outerRadius = 60; // Smaller outer radius to make it less zoomed
+	const cornerRadius = 8; // Proportionally smaller corner radius
+	
+	// Use calculated values for hover radius
+	const hoverRadius = outerRadius * hoverRadiusFraction;
+	
 	const hasFocusHandling = nonEmptyGet(slices).focusChange !== undefined
 	let handleHighlightChange: ((data: HighlightItemData | null) => void) | undefined = undefined
 	const [lastFocusedSliceIndex, setLastFocusedSliceIndex] = useState<number | null>(null)
+	
 	if (hasFocusHandling) {
 		handleHighlightChange = (data: HighlightItemData | null) => {
 			const currentFocusedSliceIndex = data === null ? null : (data.dataIndex ?? null)
@@ -172,8 +181,10 @@ export function RatingPie({
 			setLastFocusedSliceIndex(currentFocusedSliceIndex)
 		}
 	}
+	
 	let highlightedItem: HighlightItemData | null | undefined = undefined
 	let fadeScope: FadeOptions = 'none'
+	
 	if (highlightedSliceId !== undefined) {
 		if (highlightedSliceId === null) {
 			highlightedItem = { seriesId: pieId }
@@ -186,6 +197,7 @@ export function RatingPie({
 			fadeScope = 'global'
 		}
 	}
+	
 	const hasClickHandling = nonEmptyGet(slices).click !== undefined
 	const handleClick = hasClickHandling
 		? (event: React.MouseEvent<SVGPathElement>, itemIdentifier: PieItemIdentifier) => {
@@ -195,6 +207,26 @@ export function RatingPie({
 			}
 		}
 		: undefined
+	
+	// Update the faded and highlighted properties based on the filled pie or donut style
+	const isFilled = innerRadius <= 5;
+	const fadedSettings = isFilled 
+		? {
+			innerRadius: 0,
+			outerRadius: outerRadius * 0.95,
+			color: isDarkMode ? 'gray' : '#e0e0e0',
+		}
+		: {
+			innerRadius: innerRadius + (isDarkMode ? 0 : 10),
+			outerRadius: outerRadius - (isDarkMode ? 0 : 10),
+			color: isDarkMode ? 'gray' : '#e0e0e0',
+		};
+	
+	const highlightedSettings = {
+		innerRadius: isFilled ? 0 : innerRadius,
+		outerRadius: hoverRadius,
+	};
+	
 	return (
 		<PieChart
 			series={[
@@ -204,8 +236,8 @@ export function RatingPie({
 					type: 'pie',
 					arcLabel: 'label',
 					arcLabelRadius: computeArcLabel(innerRadius, outerRadius),
-					cx,
-					cy,
+					cx, 
+					cy, 
 					cornerRadius,
 					outerRadius,
 					innerRadius,
@@ -215,18 +247,8 @@ export function RatingPie({
 							highlight: 'item',
 						}
 						: undefined,
-					faded: hoverEffect
-						? {
-							innerRadius,
-							outerRadius,
-						}
-						: undefined,
-					highlighted: hoverEffect
-						? {
-							innerRadius,
-							outerRadius: hoverRadius,
-						}
-						: undefined,
+					faded: hoverEffect ? fadedSettings : undefined,
+					highlighted: hoverEffect ? highlightedSettings : undefined,
 					startAngle,
 					endAngle,
 					paddingAngle,
@@ -249,10 +271,10 @@ export function RatingPie({
 			{centerLabel === '' ? null : (
 				<PieCenterLabel
 					arc={arc}
-					color={theme => theme.palette.text.primary}
-					fontSize={height * centerLabelHeightFraction}
 					cx={cx}
 					cy={cy}
+					fontSize={centerLabelHeightFraction * height}
+					color={(theme: Theme) => theme.palette.text.primary}
 				>
 					{centerLabel}
 				</PieCenterLabel>
