@@ -28,7 +28,10 @@ export function ExternalLink({
 				target="_blank"
 				rel={rel}
 				color={color}
-				style={style}
+				style={{
+					...style,
+					color: 'var(--text-primary)'
+				}}
 				display="flex"
 				flexDirection="row"
 				gap="2px"
@@ -39,6 +42,9 @@ export function ExternalLink({
 				}}
 				onMouseLeave={() => {
 					setHovered(false)
+				}}
+				sx={{
+					color: 'var(--text-primary)',
 				}}
 			>
 				<Box

@@ -18,97 +18,73 @@ export function ReferenceLinks({
 	}
 
 	return (
-		<Box 
-			sx={{ 
-				mt: 2, 
-				pt: 2, 
-				borderTop: '1px dashed rgba(255, 255, 255, 0.12)',
+		<Box
+			sx={{
+				pt: 1,
+				mt: 0.5,
+				borderTop: '1px solid rgba(0,0,0,0.1)',
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 0.5,
+				color: 'var(--text-primary)'
 			}}
 		>
-			<Typography variant="subtitle2" sx={{ 
-				display: 'flex', 
-				alignItems: 'center',
-				gap: 0.5,
-				mb: 1,
-				color: 'text.secondary'
-			}}>
-				<InfoOutlinedIcon fontSize="small" />
-				Sources
+			{/* References header */}
+			<Typography
+				variant="caption"
+				sx={{
+					display: 'flex',
+					alignItems: 'center',
+					gap: 0.5,
+					color: 'var(--text-primary)',
+					fontWeight: 'medium'
+				}}
+			>
+				<InfoOutlinedIcon sx={{ fontSize: '0.875rem' }} />
+				Source
 			</Typography>
 			
-			{references.map((ref, index) => (
-				<Box key={index} sx={{ mb: 1.5 }}>
-					{/* Handle both old reference format (url, explanation) and new format (urls array) */}
-					{ref.urls ? (
-						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 0.5 }}>
-							{ref.urls.map((urlObj, urlIndex) => (
-								<Link 
-									key={urlIndex} 
-									href={urlObj.url} 
-									target="_blank" 
-									rel="noopener noreferrer"
-									sx={{ 
-										display: 'inline-flex',
-										alignItems: 'center',
-										fontSize: '0.85rem',
-										backgroundColor: 'rgba(25, 118, 210, 0.08)',
-										borderRadius: '4px',
-										padding: '2px 8px',
-										gap: 0.5,
-										textDecoration: 'none',
-										'&:hover': { 
-											textDecoration: 'underline',
-											backgroundColor: 'rgba(25, 118, 210, 0.12)' 
-										}
-									}}
-								>
-									<LinkIcon fontSize="inherit" />
-									{urlObj.label}
-								</Link>
-							))}
-						</Box>
-					) : ref.url ? (
-						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 0.5 }}>
-							<Link 
-								href={ref.url} 
-								target="_blank" 
-								rel="noopener noreferrer"
-								sx={{ 
-									display: 'inline-flex',
-									alignItems: 'center',
-									fontSize: '0.85rem',
-									backgroundColor: 'rgba(25, 118, 210, 0.08)',
-									borderRadius: '4px',
-									padding: '2px 8px',
-									gap: 0.5,
-									textDecoration: 'none',
-									'&:hover': { 
-										textDecoration: 'underline',
-										backgroundColor: 'rgba(25, 118, 210, 0.12)' 
-									}
-								}}
-							>
-								<LinkIcon fontSize="inherit" />
-								{typeof ref.url === 'string' ? new URL(ref.url).hostname : ref.url.label || new URL(ref.url.url).hostname}
-							</Link>
-						</Box>
-					) : null}
-					
-					{ref.explanation && (
-						<Typography 
-							variant="body2" 
-							sx={{ 
-								color: 'text.secondary', 
-								ml: 0.5,
-								fontSize: '0.85rem',
-								fontStyle: 'italic'
-							}}
-						>
-							{ref.explanation}
-						</Typography>
-					)}
-				</Box>
-			))}
+			{/* References content */}
+			<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+				{references.map((ref, index) => (
+					<Link
+						key={index}
+						href={ref.url}
+						target="_blank"
+						rel="noopener noreferrer"
+						sx={{
+							display: 'inline-flex',
+							alignItems: 'center',
+							fontSize: '0.75rem',
+							gap: 0.5,
+							color: 'var(--text-primary)',
+							textDecoration: 'none',
+							'&:hover': {
+								textDecoration: 'underline'
+							}
+						}}
+					>
+						<LinkIcon fontSize="inherit" />
+						{ref.label}
+					</Link>
+				))}
+			</Box>
+			
+			{/* Reference explanation if provided */}
+			{explanation && (
+				<Typography
+					variant="caption"
+					sx={{
+						color: 'var(--text-primary)',
+						display: 'block',
+						fontSize: '0.7rem',
+						lineHeight: 1.2,
+						fontStyle: 'italic'
+					}}
+				>
+					{explanation}
+				</Typography>
+			)}
 		</Box>
 	)
 }

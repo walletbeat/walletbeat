@@ -67,7 +67,8 @@ function AboutContents(): React.JSX.Element {
 				}}
 			/>
 			<Typography variant="body1">
-				Walletbeat is committed to transparency. It is an{' '}
+				Walletbeat is committed to transparency. Contributors reveal their affiliation and / or
+				shares in wallet companies. It is an{' '}
 				<IconLink
 					IconComponent={GitHubIcon}
 					href="https://github.com/fluidkey/walletbeat"

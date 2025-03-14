@@ -19,6 +19,8 @@ import { WalletTypeCategory, SmartWalletStandard } from './features/wallet-type'
 export interface Contributor {
 	name: string
 	url?: Url
+	affiliation?: string
+	shares_in_wallet_company?: string
 }
 
 /** Basic wallet metadata. */

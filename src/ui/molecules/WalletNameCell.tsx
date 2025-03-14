@@ -120,12 +120,17 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 					display="flex"
 					flexDirection="column"
 					height={expandedRowHeight - (shortRowHeight + 40)}
-					sx={{ ...row.rowWideStyle, lineHeight: 1, whiteSpace: 'normal' }}
+					sx={{ 
+						...row.rowWideStyle, 
+						lineHeight: 1, 
+						whiteSpace: 'normal',
+						color: 'var(--text-primary)',
+					}}
 				>
 					<Box flex="1">
 						{row.table.variantSelected !== null &&
 							row.wallet.variants[row.table.variantSelected] === undefined ? (
-							<Typography variant="body1" marginBottom="0.5rem">
+							<Typography variant="body1" marginBottom="0.5rem" sx={{ color: 'var(--text-primary)' }}>
 								{row.wallet.metadata.displayName} does not have a {row.table.variantSelected}{' '}
 								version.
 							</Typography>
@@ -135,6 +140,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 								typography={{
 									variant: 'body1',
 									marginBottom: '0.5rem',
+									color: 'var(--text-primary)',
 								}}
 							/>
 						)}
@@ -146,10 +152,17 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 						alignItems="baseline"
 						gap="6px"
 						paddingBottom="10px"
+						sx={{
+							color: 'var(--text-primary)',
+							'& a': {
+								color: 'var(--text-primary)',
+							}
+						}}
 					>
 						<IconLink
 							href={`${betaSiteRoot}/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}`}
 							IconComponent={InfoOutlinedIcon}
+							color="text.primary"
 						>
 							Learn more
 						</IconLink>
@@ -157,10 +170,15 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 						<ExternalLink
 							url={row.wallet.metadata.url}
 							defaultLabel={`${row.wallet.metadata.displayName} website`}
+							color="text.primary"
 						/>
 						|
 						{row.wallet.metadata.repoUrl === null ? null : (
-							<ExternalLink url={row.wallet.metadata.repoUrl} defaultLabel="Code" />
+							<ExternalLink 
+								url={row.wallet.metadata.repoUrl} 
+								defaultLabel="Code"
+								color="text.primary"
+							/>
 						)}
 					</Typography>
 				</Box>

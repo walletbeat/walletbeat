@@ -189,23 +189,28 @@ export function WalletRatingCell<Vs extends ValueSet>({
 					flexDirection="column"
 					lineHeight="1"
 					gap="4px"
-					sx={{ lineHeight: 1, whiteSpace: 'normal' }}
+					sx={{ 
+						lineHeight: 1, 
+						whiteSpace: 'normal',
+						color: 'var(--text-primary)',
+					}}
 				>
 					{highlightedEvalAttr === null ? (
 						<>
-							<Typography variant="h3" whiteSpace="nowrap">
+							<Typography variant="h3" whiteSpace="nowrap" sx={{ color: 'var(--text-primary)' }}>
 								{attrGroup.icon} {attrGroup.displayName}
 							</Typography>
 							<RenderTypographicContent
 								content={attrGroup.perWalletQuestion.render(row.wallet.metadata)}
 								typography={{
 									variant: 'body2',
+									color: 'var(--text-primary)',
 								}}
 							/>
 						</>
 					) : (
 						<>
-							<Typography variant="h4" whiteSpace="nowrap">
+							<Typography variant="h4" whiteSpace="nowrap" sx={{ color: 'var(--text-primary)' }}>
 								{highlightedEvalAttr.evaluation.value.icon ?? highlightedEvalAttr.attribute.icon}{' '}
 								{highlightedEvalAttr.attribute.displayName}{' '}
 							</Typography>
@@ -215,6 +220,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 								)}
 								typography={{
 									variant: 'body2',
+									color: 'var(--text-primary)',
 								}}
 								textTransform={(input: string) => {
 									const suffix: string = (() => {
@@ -262,7 +268,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 										alignItems: 'center',
 										gap: 0.5,
 										mb: 0.5,
-										color: 'text.secondary',
+										color: 'var(--text-primary)',
 										fontWeight: 'medium'
 									}}>
 										<InfoOutlinedIcon sx={{ fontSize: '0.875rem' }} />
@@ -284,7 +290,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 															alignItems: 'center',
 															fontSize: '0.75rem',
 															gap: 0.5,
-															color: 'primary.main',
+															color: 'var(--text-primary)',
 															textDecoration: 'none',
 															'&:hover': { textDecoration: 'underline' }
 														}}
@@ -300,7 +306,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 												<Typography 
 													variant="caption" 
 													sx={{ 
-														color: 'text.secondary',
+														color: 'var(--text-primary)',
 														display: 'block',
 														fontSize: '0.7rem',
 														lineHeight: 1.2,
@@ -320,6 +326,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 								<IconLink
 									href={`${betaSiteRoot}/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}#${slugifyCamelCase(highlightedEvalAttr.attribute.id)}`}
 									IconComponent={InfoOutlinedIcon}
+									color="text.primary"
 								>
 									Learn more
 								</IconLink>

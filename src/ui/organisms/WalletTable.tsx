@@ -104,7 +104,9 @@ class WalletRow implements WalletRowStateHandle {
 		const rowState = rowsState[this.id] ?? { expanded: false }
 		this.expanded = rowState.expanded
 		this.setRowsState = setRowsState
-		this.rowWideStyle = {}
+		this.rowWideStyle = {
+			color: 'var(--text-primary)',
+		}
 		this.evalTree = wallet.overall
 		if (tableStateHandle.variantSelected !== null) {
 			const walletForVariant = wallet.variants[tableStateHandle.variantSelected]
@@ -112,6 +114,7 @@ class WalletRow implements WalletRowStateHandle {
 				this.rowWideStyle = {
 					filter: 'contrast(65%)',
 					opacity: 0.5,
+					color: 'var(--text-primary)',
 				}
 			} else {
 				this.evalTree = walletForVariant.attributes
@@ -256,7 +259,8 @@ class WalletRow implements WalletRowStateHandle {
 					minHeight: `${rowHeight}px`,
 					py: 1.5,
 					justifyContent: 'center',
-					gap: '4px'
+					gap: '4px',
+					color: 'var(--text-primary)',
 				}}
 			>
 				<Tooltip title={detailedText} arrow placement="top">
@@ -264,7 +268,8 @@ class WalletRow implements WalletRowStateHandle {
 						fontWeight: 'medium',
 						fontSize: '1.05rem',
 						mb: 0.25,
-						lineHeight: 1.2
+						lineHeight: 1.2,
+						color: 'var(--text-primary)',
 					}}>
 						{displayText}
 					</Box>
@@ -415,22 +420,26 @@ export default function WalletTable(): React.JSX.Element {
 			position: 'sticky',
 			left: 0,
 			zIndex: 1,
-			backgroundColor: 'background.default',
-			borderRight: '1px solid #141519',
+			backgroundColor: 'var(--background-primary)',
+			borderRight: '1px solid var(--border)',
+			color: 'var(--text-primary)',
 		},
 		'& .MuiDataGrid-columnHeaders': {
-			borderBottom: '2px solid #141519',
-			backgroundColor: 'background.paper',
+			borderBottom: '2px solid var(--border)',
+			backgroundColor: 'var(--background-secondary)',
 			height: '64px !important',
 			lineHeight: '64px !important',
+			color: 'var(--text-primary)',
 			'& .MuiDataGrid-columnHeaderTitle': {
 				fontWeight: 'bold',
 				fontSize: '1.05rem',
 				lineHeight: 1.3,
+				color: 'var(--text-primary)',
 			},
 		},
 		'& .MuiDataGrid-main': {
 			overflow: 'visible',
+			color: 'var(--text-primary)',
 		},
 		'& .MuiDataGrid-virtualScroller': {
 			overflowX: 'visible !important',
@@ -438,22 +447,25 @@ export default function WalletTable(): React.JSX.Element {
 		'& .MuiDataGrid-toolbarContainer': {
 			paddingLeft: 2,
 			paddingRight: 2,
-			borderBottom: '1px solid rgba(81, 81, 81, 0.3)',
+			borderBottom: '1px solid var(--border)',
 		},
 		'& .MuiDataGrid-row': {
 			'&:hover': {
 				backgroundColor: 'rgba(25, 118, 210, 0.04)',
 			},
 			minHeight: `${shortRowHeight + 30}px !important`,
+			color: 'var(--text-primary)',
 			'& > *': {
 				display: 'flex',
 				alignItems: 'center',
-				justifyContent: 'flex-start'
+				justifyContent: 'flex-start',
+				color: 'var(--text-primary)',
 			}
 		},
 		'& .MuiDataGrid-cell': {
 			padding: '10px 8px',
 			fontSize: '1rem',
+			color: 'var(--text-primary)',
 		},
 	};
 	

@@ -30,7 +30,10 @@ export function IconLink({
 				target={target}
 				rel={rel}
 				color={color}
-				style={style}
+				style={{
+					...style,
+					color: 'var(--text-primary)'
+				}}
 				display="flex"
 				flexDirection="row"
 				gap={gap}
@@ -41,6 +44,9 @@ export function IconLink({
 				}}
 				onMouseLeave={() => {
 					setHovered(false)
+				}}
+				sx={{
+					color: 'var(--text-primary)',
 				}}
 			>
 				<IconComponent color="inherit" fontSize="inherit" display="inline-block" />
