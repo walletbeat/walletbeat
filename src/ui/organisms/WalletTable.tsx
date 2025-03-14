@@ -393,7 +393,7 @@ export default function WalletTable(): React.JSX.Element {
 		headerName: 'Wallet',
 		type: 'string',
 		width: 280,
-		minWidth: 277,
+		minWidth: 295,
 		flex: 0.7,
 		valueGetter: (_: never, row: WalletRow): string => row.wallet.metadata.displayName,
 		renderCell: params => (
