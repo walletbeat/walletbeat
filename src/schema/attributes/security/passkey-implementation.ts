@@ -181,7 +181,7 @@ function openZeppelinP256VerifierImplementation(
 			displayName: 'Audited passkey implementation (OpenZeppelin P256 verifier)',
 			shortExplanation: mdSentence(
 				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} implements passkeys using [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol).
+					${walletMetadata.displayName} implements passkeys using [OpenZeppelin P256 verifier.](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol)
 				`,
 			),
 			library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,

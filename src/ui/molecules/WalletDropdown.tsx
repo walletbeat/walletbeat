@@ -1,13 +1,23 @@
 import type { Wallet } from "@/schema/wallet"
 import { WalletIcon } from "../atoms/WalletIcon"
 import { wallets } from "@/data/wallets"
+import { hardwareWallets } from "@/data/hardwareWallets"
 import * as Popover from "@radix-ui/react-popover"
 import { Command } from "cmdk"
 import { useState, useCallback, useRef, useEffect } from "react"
-import { LuChevronDown, LuSearch } from "react-icons/lu"
+import { LuChevronDown, LuSearch, LuKey, LuWallet } from "react-icons/lu"
+
+// Interface for wallet items with additional metadata
+interface WalletItem {
+	id: string;
+	type: 'software' | 'hardware';
+	metadata: Wallet['metadata'];
+	variants: Wallet['variants'];
+}
 
 export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Element {
 	const [open, setOpen] = useState(false)
+	const [search, setSearch] = useState("")
 	const inputRef = useRef<HTMLInputElement>(null)
 	const triggerRef = useRef<HTMLButtonElement>(null)
 	const [width, setWidth] = useState(0)
@@ -19,11 +29,27 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 		}
 	}, [open])
 
-	// Convert wallets object to array with ids
-	const allWallets = Object.entries(wallets).map(([id, walletData]) => ({
-		id,
-		...walletData,
-	}))
+	// Convert all wallets to a unified array with type information
+	const allWalletItems: WalletItem[] = [
+		// Regular wallets
+		...Object.entries(wallets).map(([id, walletData]) => ({
+			id,
+			type: 'software' as const,
+			metadata: walletData.metadata,
+			variants: walletData.variants,
+		})),
+		// Hardware wallets
+		...Object.entries(hardwareWallets).map(([id, walletData]) => ({
+			id,
+			type: 'hardware' as const,
+			metadata: walletData.metadata,
+			variants: walletData.variants,
+		})),
+	]
+
+	// Filter wallets for each category
+	const softwareWalletItems = allWalletItems.filter(w => w.type === 'software')
+	const hardwareWalletItems = allWalletItems.filter(w => w.type === 'hardware')
 
 	const handleSelect = useCallback((walletId: string) => {
 		setOpen(false)
@@ -60,7 +86,7 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 			<Popover.Portal>
 				<Popover.Content
 					className="bg-background border rounded-md shadow-lg p-1"
-					style={{ width: width > 0 ? width : 'auto' }}
+					style={{ width: width > 0 ? Math.max(width, 320) : 320 }}
 					sideOffset={8}
 					align="start"
 					onOpenAutoFocus={(e) => {
@@ -68,28 +94,77 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 						inputRef.current?.focus()
 					}}
 				>
-					<Command className="w-full">
+					<Command className="w-full" filter={(value, search) => {
+						// Custom filter function to search in wallet name
+						if (value.includes(search.toLowerCase())) return 1
+						return 0
+					}}>
 						<div className="flex items-center border-b px-2 mb-1">
 							<LuSearch className="text-gray-400 mr-2" />
 							<Command.Input
 								ref={inputRef}
-								placeholder="Search wallets..."
+								value={search}
+								onValueChange={setSearch}
+								placeholder="Search all wallets..."
 								className="flex-1 h-9 bg-transparent outline-none placeholder:text-gray-400"
 							/>
 						</div>
 
-						<Command.List className="max-h-[300px] overflow-auto py-1">
-							{allWallets.map(w => (
-								<Command.Item
-									key={w.id}
-									value={w.id}
-									onSelect={handleSelect}
-									className="flex items-center gap-2 px-2 py-1.5 rounded m-1 cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
-								>
-									<WalletIcon walletMetadata={w.metadata} iconSize={20} variants={w.variants} />
-									<span>{w.metadata.displayName}</span>
-								</Command.Item>
-							))}
+						<Command.List className="max-h-[350px] overflow-auto py-1">
+							{/* Only show section headers when there are matching items */}
+							{softwareWalletItems.some(w => 
+								w.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
+								w.id.toLowerCase().includes(search.toLowerCase())
+							) && (
+								<Command.Group heading="Software Wallets" className="px-2 py-1 text-xs font-medium text-gray-500 uppercase">
+									{softwareWalletItems
+										.filter(w => 
+											w.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
+											w.id.toLowerCase().includes(search.toLowerCase())
+										)
+										.map(w => (
+											<Command.Item
+												key={w.id}
+												value={w.id}
+												onSelect={handleSelect}
+												className="flex items-center justify-between px-2 py-1.5 rounded m-1 cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
+											>
+												<span className="flex items-center gap-2 flex-1 min-w-0">
+													<WalletIcon walletMetadata={w.metadata} iconSize={20} variants={w.variants} />
+													<span className="truncate">{w.metadata.displayName}</span>
+												</span>
+												<LuWallet className="ml-2 flex-shrink-0 opacity-40" size={14} />
+											</Command.Item>
+										))}
+								</Command.Group>
+							)}
+							
+							{hardwareWalletItems.some(w => 
+								w.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
+								w.id.toLowerCase().includes(search.toLowerCase())
+							) && (
+								<Command.Group heading="Hardware Wallets" className="px-2 py-1 text-xs font-medium text-gray-500 uppercase mt-2">
+									{hardwareWalletItems
+										.filter(w => 
+											w.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
+											w.id.toLowerCase().includes(search.toLowerCase())
+										)
+										.map(w => (
+											<Command.Item
+												key={w.id}
+												value={w.id}
+												onSelect={handleSelect}
+												className="flex items-center justify-between px-2 py-1.5 rounded m-1 cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
+											>
+												<span className="flex items-center gap-2 flex-1 min-w-0">
+													<WalletIcon walletMetadata={w.metadata} iconSize={20} variants={w.variants} />
+													<span className="truncate">{w.metadata.displayName}</span>
+												</span>
+												<LuKey className="ml-2 flex-shrink-0 opacity-40" size={14} />
+											</Command.Item>
+										))}
+								</Command.Group>
+							)}
 						</Command.List>
 						<Command.Empty>
 							<div className="px-2 py-4 text-center text-gray-400">
