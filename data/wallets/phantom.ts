@@ -1,7 +1,7 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { polymutex } from '../contributors/polymutex'
+import { nconsigny } from '../contributors/nconsigny'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { WalletTypeCategory } from '@/schema/features/wallet-type'
@@ -19,7 +19,7 @@ export const phantom: Wallet = {
 		`),
 		url: 'https://www.phantom.com',
 		repoUrl: null,
-		contributors: [polymutex],
+		contributors: [nconsigny],
 		lastUpdated: '2025-02-08',
 		multiWalletType: {
 			categories: [WalletTypeCategory.EOA]

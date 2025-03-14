@@ -6,14 +6,16 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
+import { pickWorstRating, unrated, exempt, isErc4337SmartWallet } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import { isSupported } from '@/schema/features/support'
+import { isSupported, type Support } from '@/schema/features/support'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletProfile } from '@/schema/features/profile'
 import { isAccountTypeSupported } from '@/schema/features/account-support'
+import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { popRefs } from '@/schema/reference'
 
 const brand = 'attributes.security.hardware_wallet_support'
 export type HardwareWalletSupportValue = Value & {
@@ -192,11 +194,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 			)
 		}
 
-        // Check for ERC-4337 smart wallet support in accountSupport
-        if (features.accountSupport !== null && 
-            features.accountSupport.rawErc4337 !== undefined && 
-            isAccountTypeSupported(features.accountSupport.rawErc4337)) {
-            return exempt(
+		// Check for ERC-4337 smart wallet support
+		if (isErc4337SmartWallet(features)) {
+			return exempt(
 				hardwareWalletSupport, 
 				sentence((walletMetadata: WalletMetadata) => 
 					`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`
@@ -204,14 +204,17 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				brand,
 				{ supportedHardwareWallets: [] }
 			)
-        }
+		}
 
 		if (features.security.hardwareWalletSupport === undefined || features.security.hardwareWalletSupport === null) {
 			return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] })
 		}
 
+		// Extract references from the hardware wallet support feature
+		const { withoutRefs, refs: extractedRefs } = popRefs(features.security.hardwareWalletSupport);
+		
 		const supportedWallets: HardwareWalletType[] = []
-		const hwSupport = features.security.hardwareWalletSupport.supportedWallets
+		const hwSupport = withoutRefs.supportedWallets
 
 		// Check which hardware wallets are supported
 		Object.entries(hwSupport).forEach(([walletType, support]) => {
@@ -235,11 +238,20 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
 		const hasGridplus = supportedWallets.includes(HardwareWalletType.GRIDPLUS)
 
+		// Generate the base evaluation result
+		let result: Evaluation<HardwareWalletSupportValue>;
+		
 		if (hasLedger && hasTrezor && hasKeystone && hasGridplus) {
-			return comprehensiveHardwareWalletSupport(supportedWallets)
+			result = comprehensiveHardwareWalletSupport(supportedWallets);
+		} else {
+			result = limitedHardwareWalletSupport(supportedWallets);
 		}
-
-		return limitedHardwareWalletSupport(supportedWallets)
+		
+		// Return result with references if any
+		return {
+			...result,
+			...(extractedRefs.length > 0 && { references: extractedRefs }),
+		};
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletSupportValue>>) => {
 		const worstEvaluation = pickWorstRating<HardwareWalletSupportValue>(perVariant)

@@ -53,13 +53,13 @@ export const metamask: Wallet = {
 		},
 		security: {
 			passkeyVerification: {
-				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
-				libraryUrl: 'https://github.com/MetaMask/delegation-framework/blob/635f717372f58a2b338964ba8e3de4ad285c9a47/src/libraries/P256FCLVerifierLib.sol',
-				details: 'MetaMask uses FreshCryptoLib for passkey verification in their delegation framework.',
+				library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
+				libraryUrl: 'https://github.com/MetaMask/delegation-framework/tree/main/lib',
+				details: 'MetaMask uses Smooth Crypto lib for passkey verification in their delegation framework.',
 				ref: [
 					{
-						url: 'https://github.com/MetaMask/delegation-framework/blob/635f717372f58a2b338964ba8e3de4ad285c9a47/src/libraries/P256FCLVerifierLib.sol',
-						explanation: 'MetaMask implements P256 verification using FreshCryptoLib in their delegation framework.'
+						url: 'https://github.com/MetaMask/delegation-framework/commit/8641eccdedf486832e66e589b8a9bcfd44d00104',
+						explanation: 'MetaMask implements P256 verification using Smooth Crypto lib in their delegation framework.'
 					}
 				]
 			},

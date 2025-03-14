@@ -12,7 +12,7 @@ import {
 } from '@/schema/attributes'
 import { attributeVariantSpecificity, VariantSpecificity } from '@/schema/wallet'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, Link } from '@mui/material'
 import type React from 'react'
 import { Arc, type PieSlice, RatingPie } from '../atoms/RatingPie'
 import type { GridColTypeDef } from '@mui/x-data-grid'
@@ -21,10 +21,12 @@ import { useState } from 'react'
 import type { WalletRowStateHandle } from '../WalletTableState'
 import { IconLink } from '../atoms/IconLink'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import LinkIcon from '@mui/icons-material/Link'
 import { variantToName, variantUrlQuery } from '../../components/variants'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { slugifyCamelCase } from '@/types/utils/text'
 import { betaSiteRoot } from '@/constants'
+import { refs } from '@/schema/reference'
 
 /**
  * Common properties of rating-type columns.
@@ -149,6 +151,13 @@ export function WalletRatingCell<Vs extends ValueSet>({
 			}
 		},
 	)
+	
+	// Get references if there's a highlighted attribute
+	const attributeReferences = highlightedEvalAttr && highlightedEvalAttr.evaluation
+		? (highlightedEvalAttr.evaluation.references) || 
+		  (highlightedEvalAttr.evaluation.value ? refs(highlightedEvalAttr.evaluation.value) : [])
+		: [];
+	
 	return (
 		<Box
 			display="flex"
@@ -237,6 +246,76 @@ export function WalletRatingCell<Vs extends ValueSet>({
 									return `${ratingToIcon(highlightedEvalAttr.evaluation.value.rating)} ${input.trim()}${suffix}`
 								}}
 							/>
+							
+							{/* Display references if available */}
+							{attributeReferences.length > 0 && (
+								<Box 
+									sx={{ 
+										mt: 1,
+										px: 1,
+										width: '100%'
+									}}
+								>
+									{/* Header for references */}
+									<Typography variant="caption" sx={{ 
+										display: 'flex', 
+										alignItems: 'center',
+										gap: 0.5,
+										mb: 0.5,
+										color: 'text.secondary',
+										fontWeight: 'medium'
+									}}>
+										<InfoOutlinedIcon sx={{ fontSize: '0.875rem' }} />
+										Source
+									</Typography>
+									
+									{attributeReferences.map((ref, refIndex) => (
+										<Box key={refIndex} sx={{ mb: refIndex < attributeReferences.length - 1 ? 1 : 0 }}>
+											{/* Reference links */}
+											<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 0.5 }}>
+												{ref.urls.map((url, urlIndex) => (
+													<Link
+														key={`${refIndex}-${urlIndex}`}
+														href={url.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														sx={{
+															display: 'inline-flex',
+															alignItems: 'center',
+															fontSize: '0.75rem',
+															gap: 0.5,
+															color: 'primary.main',
+															textDecoration: 'none',
+															'&:hover': { textDecoration: 'underline' }
+														}}
+													>
+														<LinkIcon fontSize="inherit" />
+														{url.label}
+													</Link>
+												))}
+											</Box>
+											
+											{/* Reference explanation */}
+											{ref.explanation && (
+												<Typography 
+													variant="caption" 
+													sx={{ 
+														color: 'text.secondary',
+														display: 'block',
+														fontSize: '0.7rem',
+														lineHeight: 1.2,
+														mb: 0.5,
+														fontStyle: 'italic'
+													}}
+												>
+													{ref.explanation}
+												</Typography>
+											)}
+										</Box>
+									))}
+								</Box>
+							)}
+							
 							<Box display="flex" flexDirection="row" justifyContent="center">
 								<IconLink
 									href={`${betaSiteRoot}/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}#${slugifyCamelCase(highlightedEvalAttr.attribute.id)}`}

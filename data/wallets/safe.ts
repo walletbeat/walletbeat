@@ -70,11 +70,11 @@ export const safe: Wallet = {
 		security: {
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
-				libraryUrl: 'https://github.com/safe-global/safe-modules/tree/master/4337/contracts/test/FCL',
+				libraryUrl: 'https://github.com/safe-global/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
 				details: 'Safe uses FreshCryptoLib for passkey verification in their 4337 modules.',
 				ref: [
 					{
-						url: 'https://github.com/safe-global/safe-modules/tree/master/4337/contracts/test/FCL',
+						url: 'https://github.com/safe-global/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
 						explanation: 'Safe implements P256 verification using FreshCryptoLib in their 4337 modules.'
 					}
 				]

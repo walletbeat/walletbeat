@@ -67,8 +67,8 @@ export const keystoneWallet: Wallet = {
 						explanation: 'Independent verification of Keystone\'s strong security features and clear signing capabilities.',
 					},
 					{
-						url: 'https://www.youtube.com/watch?v=7lP_0h-PPvY',
-						explanation: 'Video demonstration of Keystone\'s clear signing implementation.',
+						url: 'https://youtu.be/7lP_0h-PPvY?si=S4wNFukrmg4rwyFA&t=1141',
+						explanation: 'Video demonstration of Keystone\'s clear signing implementation on Safe.',
 					}
 				],
 			},

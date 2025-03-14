@@ -6,12 +6,13 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence, mdParagraph } from '@/types/content'
+import { pickWorstRating, unrated, exempt } from '../common'
+import { markdown, paragraph, sentence, mdParagraph, mdSentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { PasskeyVerificationLibrary, type PasskeyVerificationSupport } from '@/schema/features/security/passkey-verification'
 import { popRefs } from '@/schema/reference'
+import { WalletProfile } from '@/schema/features/profile'
 
 const brand = 'attributes.security.passkey_implementation'
 export type PasskeyImplementationValue = Value & {
@@ -26,7 +27,7 @@ function noPasskeyImplementation(): Evaluation<PasskeyImplementationValue> {
 			id: 'no_passkey_implementation',
 			rating: Rating.FAIL,
 			displayName: 'No passkey implementation',
-			shortExplanation: sentence(
+			shortExplanation: mdSentence(
 				(walletMetadata: WalletMetadata) => `
 					${walletMetadata.displayName} does not implement passkeys or does not use a recognized verification library.
 				`,
@@ -44,7 +45,7 @@ function noPasskeyImplementation(): Evaluation<PasskeyImplementationValue> {
 		howToImprove: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should implement passkeys using a well-audited verification library
-				such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
+				such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) 159K gas.
 			`,
 		),
 	}
@@ -58,7 +59,7 @@ function otherPasskeyImplementation(
 			id: 'other_passkey_implementation',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic passkey implementation',
-			shortExplanation: sentence(
+			shortExplanation: mdSentence(
 				(walletMetadata: WalletMetadata) => `
 					${walletMetadata.displayName} implements passkeys with a less common verification library.
 				`,
@@ -77,7 +78,7 @@ function otherPasskeyImplementation(
 		howToImprove: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should consider upgrading to a more widely recognized
-				and audited verification library such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
+				and audited verification library such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) (159K gas).
 			`,
 		),
 	}
@@ -91,7 +92,7 @@ function freshCryptoLibImplementation(
 			id: 'fresh_crypto_lib_implementation',
 			rating: Rating.PARTIAL,
 			displayName: 'outdated passkey verification implementation',
-			shortExplanation: sentence(
+			shortExplanation: mdSentence(
 				(walletMetadata: WalletMetadata) => `
 					${walletMetadata.displayName} implements passkeys using [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib).
 				`,
@@ -109,7 +110,7 @@ function freshCryptoLibImplementation(
 		),
 		howToImprove: mdParagraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} should consider upgrading to [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib),
+				${wallet.metadata.displayName} should consider upgrading to [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) (159K gas),
 				which has undergone more extensive auditing and testing.
 			`,
 		),
@@ -123,8 +124,8 @@ function smoothCryptoLibImplementation(
 		value: {
 			id: 'smooth_crypto_lib_implementation',
 			rating: Rating.PASS,
-			displayName: 'Excellent passkey implementation',
-			shortExplanation: sentence(
+			displayName: 'Audited passkey implementation (SCL 159K gas)',
+			shortExplanation: mdSentence(
 				(walletMetadata: WalletMetadata) => `
 					${walletMetadata.displayName} implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
 				`,
@@ -136,7 +137,61 @@ function smoothCryptoLibImplementation(
 		details: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib),
-				the most secure and well-audited verification library for P256/R1 curve operations.
+				the most gas-efficient (159K gas) and well-audited verification library for P256/R1 curve operations.
+			`,
+		),
+		howToImprove: undefined,
+	}
+}
+
+function daimoP256VerifierImplementation(
+	support: PasskeyVerificationSupport,
+): Evaluation<PasskeyImplementationValue> {
+	return {
+		value: {
+			id: 'daimo_p256_verifier_implementation',
+			rating: Rating.PASS,
+			displayName: 'Audited passkey implementation (Daimo P256 verifier)',
+			shortExplanation: mdSentence(
+				(walletMetadata: WalletMetadata) => `
+					${walletMetadata.displayName} implements passkeys using [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier).
+				`,
+			),
+			library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
+			libraryUrl: support.libraryUrl || 'https://github.com/daimo-eth/p256-verifier',
+			__brand: brand,
+		},
+		details: mdParagraph(
+			({ wallet }) => `
+				${wallet.metadata.displayName} implements passkeys using [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier),
+				a well-audited verification library for P256/R1 curve operations. Costs 330K gas.
+			`,
+		),
+		howToImprove: undefined,
+	}
+}
+
+function openZeppelinP256VerifierImplementation(
+	support: PasskeyVerificationSupport,
+): Evaluation<PasskeyImplementationValue> {
+	return {
+		value: {
+			id: 'open_zeppelin_p256_verifier_implementation',
+			rating: Rating.PASS,
+			displayName: 'Audited passkey implementation (OpenZeppelin P256 verifier)',
+			shortExplanation: mdSentence(
+				(walletMetadata: WalletMetadata) => `
+					${walletMetadata.displayName} implements passkeys using [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol).
+				`,
+			),
+			library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
+			libraryUrl: support.libraryUrl || 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+			__brand: brand,
+		},
+		details: mdParagraph(
+			({ wallet }) => `
+				${wallet.metadata.displayName} implements passkeys using [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol),
+				a well-audited verification library for P256/R1 curve operations from the respected OpenZeppelin team. This implementation provides strong security guarantees and has been thoroughly reviewed.
 			`,
 		),
 		howToImprove: undefined,
@@ -172,12 +227,16 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		Wallets are evaluated based on the verification library they use for passkey implementation,
 		specifically for P256/R1 curve operations.
 		
-		A wallet receives a passing rating if it uses [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), which is considered the
-		most efficient verification library for passkey verification. [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) is also audited. The results of the completed audits are in the [doc/audit](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits) folder.
+		A wallet receives a passing rating if it uses either [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), which is a well audited library at 159K gas. 
+		[Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier), which is also well-audited but has a higher gas cost at 330K gas. 
+		Or [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol),
+		which is developed by OpenZeppelin team. 
+		
+		[Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) is audited and the results of the completed audits are in the 
+		[doc/audit](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits) folder.
 
 		A wallet receives a partial rating if it uses [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib), which is also well-regarded
-		A wallet receives a partial rating if it uses Fresh Crypto Lib, which is also well-regarded
-		but considered slightly less optimal than [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib).
+		but considered slightly less optimal than the passing verification libraries.
 		
 		A wallet receives a lower partial rating if it uses an unaudited less efficient library for passkey
 		verification.
@@ -188,16 +247,37 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
-		pass: exampleRating(
-			mdParagraph(`
-				The wallet implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), at 159K gas cost it's the most efficient
-				verification library for P256/R1 curve operations.
-			`),
-			smoothCryptoLibImplementation({
-				library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
-				libraryUrl: 'https://github.com/get-smooth/crypto-lib',
-			}).value,
-		),
+		pass: [
+			exampleRating(
+				mdParagraph(`
+					The wallet implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), a well audited library at 159K gas.
+				`),
+				smoothCryptoLibImplementation({
+					library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
+					libraryUrl: 'https://github.com/get-smooth/crypto-lib',
+				}).value,
+			),
+			exampleRating(
+				mdParagraph(`
+					The wallet implements passkeys using [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier), a well-audited
+					verification library for P256/R1 curve operations with a 330K gas cost.
+				`),
+				daimoP256VerifierImplementation({
+					library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
+					libraryUrl: 'https://github.com/daimo-eth/p256-verifier',
+				}).value,
+			),
+			exampleRating(
+				mdParagraph(`
+					The wallet implements passkeys using [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol), a well-audited
+					verification library for P256/R1 curve operations from the OpenZeppelin team.
+				`),
+				openZeppelinP256VerifierImplementation({
+					library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
+					libraryUrl: 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+				}).value,
+			),
+		],
 		partial: [
 			exampleRating(
 				mdParagraph(`
@@ -228,27 +308,69 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 		],
 	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) => {
+		return pickWorstRating<PasskeyImplementationValue>(perVariant)
+	},
 	evaluate: (features: ResolvedFeatures): Evaluation<PasskeyImplementationValue> => {
+		// Hardware wallets don't use passkeys
+		if (features.profile === WalletProfile.HARDWARE) {
+			return exempt(
+				passkeyImplementation, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet and doesn't use passkeys.`
+				),
+				brand,
+				{ library: PasskeyVerificationLibrary.NONE }
+			)
+		}
+		
 		const passkeyVerification = features.security.passkeyVerification
 		if (passkeyVerification === null) {
 			return unrated(passkeyImplementation, brand, { library: PasskeyVerificationLibrary.NONE })
 		}
 		
-		const { withoutRefs } = popRefs<PasskeyVerificationSupport>(passkeyVerification)
+		// If the library is explicitly set to NONE, this means the wallet doesn't support passkeys
+		// This handles EOA-only wallets like Frame, Rabby, Rainbow, etc.
+		if (passkeyVerification.library === PasskeyVerificationLibrary.NONE) {
+			return exempt(
+				passkeyImplementation, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is not applicable for ${walletMetadata.displayName} as it doesn't implement passkeys.`
+				),
+				brand,
+				{ library: PasskeyVerificationLibrary.NONE }
+			)
+		}
+		
+		const { withoutRefs, refs: extractedRefs } = popRefs<PasskeyVerificationSupport>(passkeyVerification)
+		
+		let result: Evaluation<PasskeyImplementationValue>;
 		
 		switch (withoutRefs.library) {
 			case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
-				return smoothCryptoLibImplementation(withoutRefs)
+				result = smoothCryptoLibImplementation(withoutRefs);
+				break;
+			case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
+				result = daimoP256VerifierImplementation(withoutRefs);
+				break;
+			case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
+				result = openZeppelinP256VerifierImplementation(withoutRefs);
+				break;
 			case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
-				return freshCryptoLibImplementation(withoutRefs)
+				result = freshCryptoLibImplementation(withoutRefs);
+				break;
 			case PasskeyVerificationLibrary.OTHER:
-				return otherPasskeyImplementation(withoutRefs)
-			case PasskeyVerificationLibrary.NONE:
+				result = otherPasskeyImplementation(withoutRefs);
+				break;
 			default:
-				return noPasskeyImplementation()
+				result = noPasskeyImplementation();
+				break;
 		}
-	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) => {
-		return pickWorstRating<PasskeyImplementationValue>(perVariant)
+		
+		// Return result with references if any
+		return {
+			...result,
+			...(extractedRefs.length > 0 && { references: extractedRefs }),
+		};
 	},
 } 

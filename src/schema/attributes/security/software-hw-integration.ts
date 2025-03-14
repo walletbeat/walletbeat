@@ -6,7 +6,7 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, exempt, unrated, isErc4337SmartWallet } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
@@ -14,7 +14,9 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletProfile } from '@/schema/features/profile'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { WalletTypeCategory } from '@/schema/features/wallet-type'
+import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { isAccountTypeSupported } from '@/schema/features/account-support'
+import { popRefs } from '@/schema/reference'
 
 const brand = 'attributes.security.software_hw_integration'
 export type SoftwareHWIntegrationValue = Value & {
@@ -261,17 +263,46 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 			}
 		}
 	
+		// Check for ERC-4337 smart wallet
+		if (isErc4337SmartWallet(features)) {
+			return exempt(
+				softwareHWIntegration, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`
+				),
+				brand,
+				{ integrationLevel: 0 }
+			)
+		}
+
 		// Check if hardware wallet support feature exists
 		if (!features.security.hardwareWalletSupport) {
 			return noHardwareWalletSupport()
 		}
+		
+		// Extract references from hardware wallet support feature
+		const { withoutRefs: hwSupportWithoutRefs, refs: hwSupportRefs } = 
+			popRefs(features.security.hardwareWalletSupport);
+
+		// Extract references from hardware wallet clear signing feature if it exists
+		let hwClearSigningRefs = [];
+		if (features.security.hardwareWalletClearSigning) {
+			const { refs: extractedRefs } = popRefs(features.security.hardwareWalletClearSigning);
+			hwClearSigningRefs = extractedRefs;
+		}
+		
+		// Combine all references
+		const allReferences = [...hwSupportRefs, ...hwClearSigningRefs];
 
 		// Check if any hardware wallets are supported
-		const hwSupport = features.security.hardwareWalletSupport.supportedWallets
+		const hwSupport = hwSupportWithoutRefs.supportedWallets
 		const hasHardwareWalletSupport = Object.values(hwSupport).some(support => support && isSupported(support))
 		
 		if (!hasHardwareWalletSupport) {
-			return noHardwareWalletSupport()
+			return {
+				...noHardwareWalletSupport(),
+				...(allReferences.length > 0 && { references: allReferences }),
+			}
 		}
 		
 		// Get list of supported hardware wallets for display
@@ -301,17 +332,26 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		// Check how many hardware wallet brands are supported for these integrations
 		const supportedHWBrands = supportedHardwareWallets.length;
 		
+		// Generate base evaluation result
+		let result: Evaluation<SoftwareHWIntegrationValue>;
+		
 		// Determine integration level based on support
 		if (hasSafeIntegration && hasAaveIntegration && supportedHWBrands >= 2) {
-			return excellentHardwareWalletIntegration(supportedHardwareWallets);
+			result = excellentHardwareWalletIntegration(supportedHardwareWallets);
 		} else if ((hasSafeIntegration || hasAaveIntegration) && supportedHWBrands >= 1) {
 			const supportedDApps = [];
 			if (hasSafeIntegration) supportedDApps.push('Safe');
 			if (hasAaveIntegration) supportedDApps.push('Aave');
-			return goodHardwareWalletIntegration(supportedHardwareWallets, supportedDApps);
+			result = goodHardwareWalletIntegration(supportedHardwareWallets, supportedDApps);
 		} else {
-			return basicHardwareWalletIntegration(supportedHardwareWallets);
+			result = basicHardwareWalletIntegration(supportedHardwareWallets);
 		}
+		
+		// Return result with references if any
+		return {
+			...result,
+			...(allReferences.length > 0 && { references: allReferences }),
+		};
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SoftwareHWIntegrationValue>>) => {
 		return pickWorstRating<SoftwareHWIntegrationValue>(perVariant)

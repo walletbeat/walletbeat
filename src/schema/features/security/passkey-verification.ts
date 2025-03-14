@@ -7,6 +7,8 @@ import { type WithRef } from '@/schema/reference'
 export enum PasskeyVerificationLibrary {
   SMOOTH_CRYPTO_LIB = 'SMOOTH_CRYPTO_LIB',
   FRESH_CRYPTO_LIB = 'FRESH_CRYPTO_LIB',
+	DAIMO_P256_VERIFIER = 'DAIMO_P256_VERIFIER',
+  OPEN_ZEPPELIN_P256_VERIFIER = 'OPEN_ZEPPELIN_P256_VERIFIER',
   OTHER = 'OTHER',
   NONE = 'NONE'
 }

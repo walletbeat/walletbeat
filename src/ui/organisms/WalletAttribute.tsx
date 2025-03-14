@@ -21,6 +21,8 @@ import { variantToName } from '../../components/variants'
 import { RenderContent } from '../atoms/RenderContent'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { isTypographicContent } from '@/types/content'
+import { refs } from '@/schema/reference'
+import { ReferenceLinks } from '../atoms/ReferenceLinks'
 
 export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	wallet,
@@ -71,6 +73,13 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 				)
 		}
 	})()
+	
+	// Extract references from the evaluation
+	// First check for references at the evaluation level, then fall back to extracting from value
+	const attributeReferences = 
+		(evalAttr.evaluation.references) ||
+		(evalAttr.evaluation.value ? refs(evalAttr.evaluation.value) : []);
+	
 	let rendered = (
 		<>
 			<React.Fragment key="details">
@@ -98,6 +107,11 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					</>
 				)}
 			</React.Fragment>
+			
+			{/* Display references if available */}
+			{attributeReferences.length > 0 && (
+				<ReferenceLinks references={attributeReferences} />
+			)}
 		</>
 	)
 	if (isTypographicContent(details)) {

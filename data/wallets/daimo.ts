@@ -91,13 +91,13 @@ export const daimo: Wallet = {
 		},
 		security: {
 			passkeyVerification: {
-				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
+				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
 				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-				details: 'Daimo uses FreshCryptoLib for passkey verification in their P256Verifier contract.',
+				details: 'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
 				ref: [
 					{
 						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-						explanation: 'Daimo implements P256 verification using FreshCryptoLib in their P256Verifier contract.'
+						explanation: 'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.'
 					}
 				]
 			},

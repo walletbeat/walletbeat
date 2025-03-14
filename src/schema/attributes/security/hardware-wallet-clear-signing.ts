@@ -6,7 +6,7 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated, isErc4337SmartWallet, exempt } from '../common'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
@@ -14,6 +14,9 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletProfile } from '@/schema/features/profile'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { isAccountTypeSupported } from '@/schema/features/account-support'
+import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { popRefs } from '@/schema/reference'
 
 const brand = 'attributes.security.hardware_wallet_clear_signing'
 export type HardwareWalletClearSigningValue = Value & {
@@ -180,7 +183,7 @@ function fullClearSigning(
 			`,
 		),
 		// Include references if provided
-		...(refs.length > 0 && { references: refs }),
+		references: refs.length > 0 ? refs : undefined,
 	}
 }
 
@@ -276,30 +279,62 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 			if (!features.security.hardwareWalletClearSigning) {
 				return unrated(hardwareWalletClearSigning, brand, { clearSigningLevel: ClearSigningLevel.NONE })
 			}
+			
+			// Extract references from the hardware wallet clear signing feature
+			const { withoutRefs, refs: extractedRefs } = popRefs(features.security.hardwareWalletClearSigning);
 
-			const clearSigningFeature = features.security.hardwareWalletClearSigning;
-			const clearSigningLevel = clearSigningFeature.clearSigningSupport.level;
+			const clearSigningLevel = withoutRefs.clearSigningSupport.level;
 			
 			// Use a simpler approach for now - we'll just include a standard reference for devices with full clear signing
-			const references = (clearSigningLevel === ClearSigningLevel.FULL) ? [
-				{
-					url: "https://ethereum.org/en/security/#hardware-wallets",
-					explanation: "More information about hardware wallet security"
-				}
-			] : [];
+			let standardRefs = [];
+			if (clearSigningLevel === ClearSigningLevel.FULL) {
+				standardRefs = [
+					{
+						url: "https://ethereum.org/en/security/#hardware-wallets",
+						explanation: "More information about hardware wallet security"
+					}
+				];
+			}
+			
+			// Combine extracted references with standard references if any
+			const allReferences = [...extractedRefs, ...standardRefs];
 
+			let result: Evaluation<HardwareWalletClearSigningValue>;
+			
 			switch (clearSigningLevel) {
 				case ClearSigningLevel.NONE:
-					return noHardwareWalletClearSigning()
+					result = noHardwareWalletClearSigning();
+					break;
 				case ClearSigningLevel.BASIC:
-					return basicClearSigning(['this hardware wallet'])
+					result = basicClearSigning(['this hardware wallet']);
+					break;
 				case ClearSigningLevel.PARTIAL:
-					return partialClearSigning(['this hardware wallet'])
+					result = partialClearSigning(['this hardware wallet']);
+					break;
 				case ClearSigningLevel.FULL:
-					return fullClearSigning(['this hardware wallet'], references)
+					result = fullClearSigning(['this hardware wallet']);
+					break;
 				default:
-					return unrated(hardwareWalletClearSigning, brand, { clearSigningLevel: ClearSigningLevel.NONE })
+					return unrated(hardwareWalletClearSigning, brand, { clearSigningLevel: ClearSigningLevel.NONE });
 			}
+			
+			// Return result with references
+			return {
+				...result,
+				...(allReferences.length > 0 && { references: allReferences }),
+			};
+		}
+		
+		// Check for ERC-4337 smart wallet
+		if (isErc4337SmartWallet(features)) {
+			return exempt(
+				hardwareWalletClearSigning, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`
+				),
+				brand,
+				{ clearSigningLevel: ClearSigningLevel.NONE }
+			)
 		}
 		
 		// For software wallets: 

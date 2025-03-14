@@ -4,6 +4,7 @@ import type { AtLeastOneVariant } from './variants'
 import type { MaybeUnratedScore, Score } from './score'
 import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content'
 import type { RatedWallet, WalletMetadata } from './wallet'
+import type { FullyQualifiedReference } from './reference'
 
 /**
  * Rating is an enum that should be visually meaningful.
@@ -209,6 +210,12 @@ export interface Evaluation<V extends Value> {
 	 * not perfect.
 	 */
 	howToImprove?: RenderableTypography<EvaluationData<V>>
+
+	/**
+	 * Optional array of references with URLs and explanations.
+	 * These references provide sources for the evaluation claims.
+	 */
+	references?: FullyQualifiedReference[]
 }
 
 /**

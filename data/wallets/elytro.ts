@@ -15,15 +15,9 @@ export const elytro: Wallet = {
 		tableName: 'Elytro',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			We build Smart Contract Wallet for Ethereum.
-
-If you want to report a security issue, please mail it to contact@elytro.com
-
-You can find all the code for our open-source products.
-
-For general information, visit elytro.com
+			Coming soon. We build secured and decentralized public infra for humanity on Ethereum. We believe in a free, open and self-own internet. We start by building a smart contract account.
 		`),
-		url: 'https://elytro.io',
+		url: 'https://elytro.com',
 		repoUrl: 'https://github.com/Elytro-eth',
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
@@ -72,13 +66,13 @@ For general information, visit elytro.com
 		},
 		security: {
 			passkeyVerification: {
-				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
-				libraryUrl: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/a0146910dfbc46afeba809b26f256129d37e3301/contracts/libraries/WebAuthn.sol#L69',
+				library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
+				libraryUrl: 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
 				details: 'Elytro uses FreshCryptoLib for passkey verification in their WebAuthn library.',
 				ref: [
 					{
-						url: 'https://github.com/Elytro-eth/soul-wallet-contract/blob/a0146910dfbc46afeba809b26f256129d37e3301/contracts/libraries/WebAuthn.sol#L69',
-						explanation: 'Elytro implements P256 verification using FreshCryptoLib in their WebAuthn library.'
+						url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/contracts/libraries/WebAuthn.sol',
+						explanation: 'Elytro implements P256 verification using openzeppelin p256 verifier in their WebAuthn library.'
 					}
 				]
 			},

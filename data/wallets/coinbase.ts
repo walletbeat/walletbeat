@@ -67,7 +67,10 @@ export const coinbase: Wallet = {
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
 				libraryUrl: 'https://github.com/rdubois-crypto/FreshCryptoLib',
-				ref: null,
+				ref: {
+					url: 'https://github.com/base/webauthn-sol/tree/619f20ab0f074fef41066ee4ab24849a913263b2',
+					explanation: 'Coinbase uses the FreshCryptoLib for passkey verification.',
+				},
 			},
 		},
 		privacy: {
