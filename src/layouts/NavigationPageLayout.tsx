@@ -168,9 +168,9 @@ export function NavigationPageLayout({
 
 				<div
 					key="contentContainer"
-					className="flex-col flex overflow-y-auto min-h-screen mb-48 mx-auto max-w-5xl 2xl:max-w-7xl"
+					className="flex-col flex overflow-y-auto min-h-screen mb-48 w-full md:pl-4 pt-16 md:pt-0"
 				>
-					<div className="px-2">
+					<div className="px-1 md:px-2 mx-auto max-w-6xl 2xl:max-w-screen-2xl w-full">
 					{children}
 					</div>
 				</div>

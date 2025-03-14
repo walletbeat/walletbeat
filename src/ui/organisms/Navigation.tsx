@@ -1,7 +1,7 @@
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
-import React, { memo, useState } from 'react'
+import React, { memo, useState, useEffect } from 'react'
 import { ThemeSwitcher } from './ThemeSwitcher'
 
 /**
@@ -334,29 +334,105 @@ export function Navigation({
 	onContentItemClick?: (item: NavigationContentItem) => void
 	prefix?: React.ReactNode
 }): React.JSX.Element {
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	
+	// Close mobile menu when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			const nav = document.getElementById('navigation-container');
+			const button = document.getElementById('mobile-menu-button');
+			
+			if (isMobileMenuOpen && nav && !nav.contains(event.target as Node) && 
+				button && !button.contains(event.target as Node)) {
+				setIsMobileMenuOpen(false);
+			}
+		};
+		
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [isMobileMenuOpen]);
+	
+	// Close menu when user clicks a link on mobile
+	const handleMobileLinkClick = () => {
+		if (window.innerWidth < 768) {
+			setIsMobileMenuOpen(false);
+		}
+	};
+	
 	return (
-		<div
-			key="navigationBox"
-			className="flex flex-col gap-0 w-full md:max-w-xs flex-0 py-8 sticky top-0 h-screen overflow-y-auto"
-		>
-			<div className="flex justify-between items-center w-full gap-4 px-8 mb-4">
-				<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
-					~ WalletBeat
-				</a>
-				<ThemeSwitcher />
+		<>
+			{/* Mobile menu button - only visible on small screens */}
+			<button 
+				id="mobile-menu-button"
+				className="fixed top-4 left-4 z-50 rounded-md p-2 md:hidden shadow-md bg-background border"
+				onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+				aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+			>
+				<svg 
+					xmlns="http://www.w3.org/2000/svg" 
+					width="24" 
+					height="24" 
+					viewBox="0 0 24 24" 
+					fill="none" 
+					stroke="currentColor" 
+					strokeWidth="2" 
+					strokeLinecap="round" 
+					strokeLinejoin="round"
+					className="text-accent"
+				>
+					{isMobileMenuOpen ? (
+						<>
+							<line x1="18" y1="6" x2="6" y2="18"></line>
+							<line x1="6" y1="6" x2="18" y2="18"></line>
+						</>
+					) : (
+						<>
+							<line x1="3" y1="12" x2="21" y2="12"></line>
+							<line x1="3" y1="6" x2="21" y2="6"></line>
+							<line x1="3" y1="18" x2="21" y2="18"></line>
+						</>
+					)}
+				</svg>
+			</button>
+			
+			{/* Backdrop - only on mobile when menu is open */}
+			{isMobileMenuOpen && (
+				<div 
+					className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+					onClick={() => setIsMobileMenuOpen(false)}
+				></div>
+			)}
+			
+			{/* Main navigation container */}
+			<div
+				id="navigation-container"
+				key="navigationBox"
+				className={`flex flex-col gap-0 w-full md:max-w-xs flex-0 py-8 h-screen overflow-y-auto fixed md:sticky top-0 left-0 z-40 bg-background transition-transform duration-300 transform shadow-lg md:shadow-none ${
+					isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+				}`}
+				onClick={handleMobileLinkClick}
+			>
+				<div className="flex justify-between items-center w-full gap-4 px-8 mb-4">
+					<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
+						~ WalletBeat
+					</a>
+					<ThemeSwitcher />
+				</div>
+				<div className="flex flex-col gap-4 px-4">
+					{prefix}
+					{nonEmptyMap(groups, (group, groupIndex) => (
+						<NavigationGroup
+							key={`navigationGroup-${group.id}`}
+							group={group}
+							groupIndex={groupIndex}
+							onContentItemClick={onContentItemClick}
+							activeItemId={activeItemId}
+						/>
+					))}
+				</div>
 			</div>
-			<div className="flex flex-col gap-4 px-4">
-				{prefix}
-				{nonEmptyMap(groups, (group, groupIndex) => (
-					<NavigationGroup
-						key={`navigationGroup-${group.id}`}
-						group={group}
-						groupIndex={groupIndex}
-						onContentItemClick={onContentItemClick}
-						activeItemId={activeItemId}
-					/>
-				))}
-			</div>
-		</div>
+		</>
 	)
 }
