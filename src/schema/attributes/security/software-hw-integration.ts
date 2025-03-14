@@ -7,7 +7,7 @@ import {
 	exampleRating,
 } from '@/schema/attributes'
 import { pickWorstRating, exempt, unrated, isErc4337SmartWallet } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
@@ -81,11 +81,11 @@ function basicHardwareWalletIntegration(supportedWallets: string[] = []): Evalua
 				which could potentially compromise security for advanced DeFi operations.
 			`,
 		),
-		howToImprove: paragraph(
+		howToImprove: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should implement full EIP-712 clear signing support for transactions with
 				Safe, Aave, and other major DeFi platforms. This would ensure users can verify all transaction details on
-				their hardware devices before signing.
+				their hardware devices before signing. One way to do this is to implement support for[Ledger's device management kit](https://developers.ledger.com/docs/device-interaction/getting-started)
 			`,
 		),
 	}

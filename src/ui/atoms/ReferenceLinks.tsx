@@ -1,4 +1,5 @@
 import { type FullyQualifiedReference } from '@/schema/reference'
+import { type LabeledUrl } from '@/schema/url'
 import { Box, Link, Typography } from '@mui/material'
 import React from 'react'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
@@ -18,6 +19,9 @@ export function ReferenceLinks({
 	if (!references || references.length === 0) {
 		return <></>
 	}
+
+	// Debug check
+	console.log("References:", JSON.stringify(references, null, 2));
 
 	return (
 		<Box
@@ -47,32 +51,77 @@ export function ReferenceLinks({
 			</Typography>
 			
 			{/* References content */}
-			<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-				{references.map((ref, index) => (
-					<Link
-						key={index}
-						href={ref.url}
-						target="_blank"
-						rel="noopener noreferrer"
-						sx={{
-							display: 'inline-flex',
-							alignItems: 'center',
-							fontSize: '0.75rem',
-							gap: 0.5,
-							color: 'var(--text-primary)',
-							textDecoration: 'none',
-							'&:hover': {
-								textDecoration: 'underline'
-							}
-						}}
-					>
-						<LinkIcon fontSize="inherit" />
-						{ref.label}
-					</Link>
+			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+				{references.map((ref, refIndex) => (
+					<Box key={refIndex}>
+						{/* Reference links */}
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 0.5 }}>
+							{/* Check if the reference has urls array (FullyQualifiedReference structure) */}
+							{ref.urls ? (
+								// Map over the urls array within the reference
+								ref.urls.map((url: LabeledUrl, urlIndex: number) => (
+									<Link
+										key={`${refIndex}-${urlIndex}`}
+										href={url.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										sx={{
+											display: 'inline-flex',
+											alignItems: 'center',
+											fontSize: '0.75rem',
+											gap: 0.5,
+											color: 'var(--text-primary)',
+											textDecoration: 'none',
+											'&:hover': { textDecoration: 'underline' }
+										}}
+									>
+										<LinkIcon fontSize="inherit" />
+										{url.label}
+									</Link>
+								))
+							) : (
+								// Fallback for legacy format references with direct url property
+								<Link
+									href={ref.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									sx={{
+										display: 'inline-flex',
+										alignItems: 'center',
+										fontSize: '0.75rem',
+										gap: 0.5,
+										color: 'var(--text-primary)',
+										textDecoration: 'none',
+										'&:hover': { textDecoration: 'underline' }
+									}}
+								>
+									<LinkIcon fontSize="inherit" />
+									{ref.label || ref.url}
+								</Link>
+							)}
+						</Box>
+						
+						{/* Reference explanation if available in the reference object */}
+						{ref.explanation && (
+							<Typography
+								variant="caption"
+								sx={{
+									color: 'var(--text-primary)',
+									display: 'block',
+									fontSize: '0.75rem',
+									lineHeight: 1.2,
+									fontStyle: 'italic',
+									mb: 0.5
+								}}
+							>
+								{ref.explanation}
+							</Typography>
+						)}
+					</Box>
 				))}
 			</Box>
 			
-			{/* Reference explanation if provided */}
+			{/* Global explanation if provided to the component */}
 			{explanation && (
 				<Typography
 					variant="caption"

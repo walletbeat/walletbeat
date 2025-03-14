@@ -111,7 +111,7 @@ function freshCryptoLibImplementation(
 		howToImprove: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should consider upgrading to [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) (159K gas),
-				which has undergone more extensive auditing and testing.
+				which has undergone more extensive [auditing and testing.](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits)
 			`,
 		),
 	}
@@ -136,8 +136,7 @@ function smoothCryptoLibImplementation(
 		},
 		details: mdParagraph(
 			({ wallet }) => `
-				${wallet.metadata.displayName} implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib),
-				the most gas-efficient (159K gas) and well-audited verification library for P256/R1 curve operations.
+				${wallet.metadata.displayName} implements passkeys using [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib), at 159K this the most gas-efficient ( and [triple audited](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits) verification library for P256/R1 curve operations.
 			`,
 		),
 		howToImprove: undefined,
@@ -191,7 +190,7 @@ function openZeppelinP256VerifierImplementation(
 		details: mdParagraph(
 			({ wallet }) => `
 				${wallet.metadata.displayName} implements passkeys using [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol),
-				a well-audited verification library for P256/R1 curve operations from the respected OpenZeppelin team. This implementation provides strong security guarantees and has been thoroughly reviewed.
+				a well-audited verification library for P256/R1 curve operations from the respected OpenZeppelin team. This implementation provides strong security guarantees and has been (thoroughly reviewed.)[https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/audits/2024-10-v5.1.pdf]
 			`,
 		),
 		howToImprove: undefined,
