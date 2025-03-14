@@ -27,17 +27,21 @@ import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { slugifyCamelCase } from '@/types/utils/text'
 import { betaSiteRoot } from '@/constants'
 import { refs } from '@/schema/reference'
+import { ReferenceLinks } from '../atoms/ReferenceLinks'
+import { toFullyQualified } from '@/schema/reference'
 
 /**
  * Common properties of rating-type columns.
  */
 export const walletRatingColumnProps: GridColTypeDef = {
-	resizable: false,
+	resizable: true,
 	filterable: false,
 	editable: false,
 	width: ratingCellWidth,
 	minWidth: ratingCellWidth,
-	maxWidth: ratingCellWidth,
+	// Remove maxWidth constraint to allow columns to grow
+	// maxWidth: ratingCellWidth,
+	flex: 0.5, // Add flex property to allow columns to grow with available space
 	align: 'center',
 	headerAlign: 'left',
 }
@@ -158,6 +162,9 @@ export function WalletRatingCell<Vs extends ValueSet>({
 		  (highlightedEvalAttr.evaluation.value ? refs(highlightedEvalAttr.evaluation.value) : [])
 		: [];
 	
+	// Make sure references are fully qualified
+	const qualifiedReferences = attributeReferences.length > 0 ? toFullyQualified(attributeReferences) : [];
+	
 	return (
 		<Box
 			display="flex"
@@ -254,7 +261,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 							/>
 							
 							{/* Display references if available */}
-							{attributeReferences.length > 0 && (
+							{qualifiedReferences.length > 0 && (
 								<Box 
 									sx={{ 
 										mt: 1,
@@ -275,11 +282,11 @@ export function WalletRatingCell<Vs extends ValueSet>({
 										Source
 									</Typography>
 									
-									{attributeReferences.map((ref, refIndex) => (
-										<Box key={refIndex} sx={{ mb: refIndex < attributeReferences.length - 1 ? 1 : 0 }}>
+									{qualifiedReferences.map((ref, refIndex) => (
+										<Box key={refIndex} sx={{ mb: refIndex < qualifiedReferences.length - 1 ? 1 : 0 }}>
 											{/* Reference links */}
 											<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 0.5 }}>
-												{ref.urls.map((url, urlIndex) => (
+												{ref.urls && ref.urls.map((url, urlIndex) => (
 													<Link
 														key={`${refIndex}-${urlIndex}`}
 														href={url.url}

@@ -297,8 +297,8 @@ class WalletRow implements WalletRowStateHandle {
 									sx={{ 
 										fontSize: '0.75rem', 
 										fontWeight: 'medium',
-										color: 'primary.main',
-										backgroundColor: 'rgba(25, 118, 210, 0.08)',
+										color: 'var(--hashtag-text)',
+										backgroundColor: 'var(--hashtag-bg)',
 										borderRadius: '4px',
 										padding: '1px 4px',
 										display: 'inline-flex',
@@ -308,7 +308,7 @@ class WalletRow implements WalletRowStateHandle {
 										textDecoration: 'none',
 										'&:hover': { 
 											textDecoration: 'underline',
-											backgroundColor: 'rgba(25, 118, 210, 0.12)' 
+											backgroundColor: 'var(--hashtag-bg-hover)'
 										} 
 									}}
 								>
@@ -377,9 +377,12 @@ export default function WalletTable(): React.JSX.Element {
 	const walletTypeColumn: GridColDef<WalletRow, string> = {
 		field: 'walletType',
 		headerName: 'Type',
-		width: 100,
+		width: 120,
+		minWidth: 110,
+		flex: 0.3,
 		renderCell: params => (params.row as WalletRow).renderWalletType(),
-		sortable: true
+		sortable: true,
+		resizable: true
 	};
 	
 	const walletNameColumn: GridColDef<WalletRow, string> = {

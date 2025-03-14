@@ -2,10 +2,10 @@
 export const shortRowHeight = 80
 
 /** Expanded row height. */
-export const expandedRowHeight = shortRowHeight * 3.5
+export const expandedRowHeight = shortRowHeight * 4.5
 
 /** Width of rating cells. */
-export const ratingCellWidth = shortRowHeight * 2 + 30
+export const ratingCellWidth = shortRowHeight * 2.3 + 30
 
 /** Width occupied by icons in section headers. */
 export const sectionIconWidth = '3.5rem'

@@ -57,7 +57,7 @@ export function AddressCorrelationDetails({
 				<li key={sourceName}>
 					<Typography>
 						An onchain record permanently associates your {linkableInfos} with your wallet address.{' '}
-						<ReferenceLinks ref={refs} />
+						<ReferenceLinks references={refs} />
 					</Typography>
 				</li>,
 			)
@@ -74,7 +74,7 @@ export function AddressCorrelationDetails({
 							{')'}
 						</>
 					) : null}{' '}
-					may link your wallet address to your {linkableInfos}. <ReferenceLinks ref={refs} />
+					may link your wallet address to your {linkableInfos}. <ReferenceLinks references={refs} />
 				</Typography>
 			</li>,
 		)
@@ -93,3 +93,4 @@ export function AddressCorrelationDetails({
 		</>
 	)
 }
+

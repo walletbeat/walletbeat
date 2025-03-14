@@ -78,7 +78,7 @@ export const metamask: Wallet = {
 				},
 				ref: [
 					{
-						url: 'https://support.metamask.io/hc/en-us/articles/4408552261275-Hardware-Wallet-Hub',
+						url: 'https://support.metamask.io/more-web3/wallets/hardware-wallet-hub/',
 						explanation: 'MetaMask supports Ledger, Trezor, Lattice (GridPlus), Keystone, OneKey, and KeepKey hardware wallets through their Hardware Wallet Hub.'
 					}
 				],
@@ -90,7 +90,7 @@ export const metamask: Wallet = {
 				},
 				ref: [
 					{
-						url: 'https://support.metamask.io/hc/en-us/articles/4408552261275-Hardware-Wallet-Hub',
+						url: 'https://support.metamask.io/more-web3/wallets/hardware-wallet-hub/',
 						explanation: 'MetaMask Hardware Wallet Hub supports transaction signing with hardware wallets, displaying basic transaction information on the device.'
 					}
 				],

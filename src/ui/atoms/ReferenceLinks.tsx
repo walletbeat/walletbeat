@@ -9,8 +9,10 @@ import LinkIcon from '@mui/icons-material/Link'
  */
 export function ReferenceLinks({
 	references,
+	explanation,
 }: {
 	references: FullyQualifiedReference[] | any[] | undefined | null
+	explanation?: string
 }): React.JSX.Element {
 	// Check if references is undefined, null, or empty
 	if (!references || references.length === 0) {

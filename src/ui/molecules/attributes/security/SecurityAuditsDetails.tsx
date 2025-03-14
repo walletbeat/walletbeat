@@ -35,7 +35,7 @@ export function SecurityAuditsDetails({
 				<Typography fontWeight={subsectionWeight}>
 					{wallet.metadata.displayName} was last audited on {mostRecentAudit.auditDate}
 					{auditedInLastYear ? '.' : ', which was over a year ago.'}{' '}
-					<ReferenceLinks ref={toFullyQualified(mostRecentAudit.ref)} />
+					<ReferenceLinks references={toFullyQualified(mostRecentAudit.ref)} />
 					{hasUnaddressedFlaws && ' There remains unaddressed security flaws in the codebase.'}
 				</Typography>
 			</WrapRatingIcon>
@@ -44,7 +44,7 @@ export function SecurityAuditsDetails({
 					{nonEmptyMap(sortedAudits, audit => (
 						<li key={securityAuditId(audit)}>
 							<strong>{audit.auditDate}</strong>{' '}
-							<ReferenceLinks ref={toFullyQualified(audit.ref)} /> by{' '}
+							<ReferenceLinks references={toFullyQualified(audit.ref)} /> by{' '}
 							<EntityLink entity={audit.auditor} />.{' '}
 							<React.Fragment key="unpatchedFlaws">
 								{audit.unpatchedFlaws === 'NONE_FOUND' &&

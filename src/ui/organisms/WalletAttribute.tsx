@@ -21,7 +21,7 @@ import { variantToName } from '../../components/variants'
 import { RenderContent } from '../atoms/RenderContent'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { isTypographicContent } from '@/types/content'
-import { refs } from '@/schema/reference'
+import { refs, toFullyQualified } from '@/schema/reference'
 import { ReferenceLinks } from '../atoms/ReferenceLinks'
 
 export function WalletAttribute<Vs extends ValueSet, V extends Value>({
@@ -80,6 +80,9 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		(evalAttr.evaluation.references) ||
 		(evalAttr.evaluation.value ? refs(evalAttr.evaluation.value) : []);
 	
+	// Ensure references are properly qualified
+	const qualifiedReferences = attributeReferences.length > 0 ? toFullyQualified(attributeReferences) : [];
+	
 	let rendered = (
 		<>
 			<React.Fragment key="details">
@@ -109,8 +112,10 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			</React.Fragment>
 			
 			{/* Display references if available */}
-			{attributeReferences.length > 0 && (
-				<ReferenceLinks references={attributeReferences} />
+			{qualifiedReferences.length > 0 && (
+				<Box sx={{ mt: 2 }}>
+					<ReferenceLinks references={qualifiedReferences} />
+				</Box>
 			)}
 		</>
 	)
