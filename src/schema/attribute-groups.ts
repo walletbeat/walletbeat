@@ -90,6 +90,7 @@ import {
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
+	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
 	hardwareWalletClearSigning: HardwareWalletClearSigningValue
 	hardwareWalletSupport: HardwareWalletSupportValue
@@ -108,6 +109,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	),
 	attributes: {
 		securityAudits,
+		scamPrevention,
 		chainVerification,
 		hardwareWalletClearSigning,
 		hardwareWalletSupport,
@@ -117,6 +119,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	},
 	score: scoreGroup<SecurityValues>({
 		securityAudits: 1.0,
+		scamPrevention: 1.0,
 		chainVerification: 1.0,
 		hardwareWalletClearSigning: 1.0,
 		hardwareWalletSupport: 1.0,
@@ -251,6 +254,7 @@ export const attributeTree: NonEmptyRecord<string, AttributeGroup<any>> = {
 /** Evaluated security attributes for a single wallet. */
 export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
+	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
 	hardwareWalletClearSigning: EvaluatedAttribute<HardwareWalletClearSigningValue>
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
@@ -311,6 +315,7 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 	return {
 		security: {
 			securityAudits: evalAttr(securityAudits),
+			scamPrevention: evalAttr(scamPrevention),
 			chainVerification: evalAttr(chainVerification),
 			hardwareWalletClearSigning: evalAttr(hardwareWalletClearSigning),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
@@ -364,6 +369,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 	return {
 		security: {
 			securityAudits: attr(tree => tree.security.securityAudits),
+			scamPrevention: attr(tree => tree.security.scamPrevention),
 			chainVerification: attr(tree => tree.security.chainVerification),
 			hardwareWalletClearSigning: attr(tree => tree.security.hardwareWalletClearSigning),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),

@@ -94,9 +94,14 @@ export const rabby: Wallet = {
 			},
 			scamAlerts: {
 				scamUrlWarning: supported({
-					leaksVisitedUrl: 'FULL_URL',
+					leaksVisitedUrl: 'DOMAIN_ONLY',
+					leaksUserAddress: true,
 					leaksIp: true,
 					ref: [
+						{
+							url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/connect.ts#L5-L73',
+							label: 'Rabby Security engine rule for scam dapp URL flagging',
+						},
 						{
 							url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
 							label: 'Rabby API code on npmjs.com',
@@ -106,13 +111,21 @@ export const rabby: Wallet = {
 					],
 				}),
 				contractTransactionWarning: supported({
-					previousContractInteractionWarning: true,
+					previousContractInteractionWarning: false,
 					recentContractWarning: true,
 					contractRegistry: true,
 					leaksContractAddress: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
 					ref: [
+						{
+							url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/permit.ts#L42-L70',
+							label: 'Rabby Security engine rule for contract recency',
+						},
+						{
+							url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/tokenApprove.ts#L73-L92',
+							label: 'Rabby Security engine rule for contracts flagged as suspicious',
+						},
 						{
 							url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
 							label: 'Rabby API code on npmjs.com',
@@ -127,6 +140,16 @@ export const rabby: Wallet = {
 					leaksRecipient: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
+					ref: [
+						{
+							url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/send.ts#L25-L44',
+							label: 'Rabby Security engine rule for sending to unknown addresses',
+						},
+						{
+							url: 'https://github.com/RabbyHub/rabby-security-engine/blob/5f6acd1a90eb0230176fadc7d0ae373cf8c21a73/src/rules/send.ts#L113-L132',
+							label: 'Rabby Security engine rule for sending to whitelisted addresses',
+						},
+					],
 				}),
 			},
 			publicSecurityAudits: [

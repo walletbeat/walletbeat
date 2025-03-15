@@ -27,10 +27,7 @@ export function FundingDetails({
 						value: monetizationStrategyName(strategy),
 					}))}
 				/>
-				.{' '}
-				{ref.length > 0 && (
-					<ReferenceList ref={ref} ulStyle={{ paddingLeft: '1.5rem', marginBottom: '0px' }} />
-				)}
+				. <ReferenceList ref={ref} ulStyle={{ paddingLeft: '1.5rem', marginBottom: '0px' }} />
 			</Box>
 		</WrapRatingIcon>
 	)

@@ -29,6 +29,8 @@ export function RenderContent({
 			return <FundingDetails {...componentProps} {...otherProps} />
 		case 'LicenseDetails':
 			return <LicenseDetails {...componentProps} {...otherProps} />
+		case 'ScamAlertDetails':
+			return <ScamAlertDetails {...componentProps} {...otherProps} />
 		case 'SecurityAuditsDetails':
 			return <SecurityAuditsDetails {...componentProps} {...otherProps} />
 		case 'SourceVisibilityDetails':
