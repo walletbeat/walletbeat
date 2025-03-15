@@ -6,23 +6,54 @@
  */
 export enum WalletProfile {
 	/**
-	 * A generic, one-size fits all wallet that aims to fulfill the needs of
-	 * all regular Ethereum users.
+	 * A browser extension wallet is installed as a browser plugin.
+	 * Examples include MetaMask.
 	 */
-	GENERIC = 'GENERIC',
+	BROWSER_EXTENSION = 'BROWSER_EXTENSION',
 
 	/**
-	 * A wallet that focuses on peer-to-peer payments only.
-	 * Such wallets are exempt from features such as browser integration
-	 * standards, because they do not aim to integrate in browsers to begin
-	 * with.
+	 * A web wallet runs in the browser, not as a plugin.
+	 * Examples include Rabby and Frame.
 	 */
-	PAYMENTS = 'PAYMENTS',
-	
+	WEB = 'WEB',
+
 	/**
-	 * A hardware wallet that stores private keys in a secure hardware element.
-	 * Such wallets are exempt from features such as hardware wallet support
-	 * since they are themselves hardware wallets.
+	 * A mobile wallet is installed as a mobile app.
+	 * Examples include Rainbow.
+	 */
+	MOBILE = 'MOBILE',
+
+	/**
+	 * A desktop wallet is installed as a desktop app.
+	 * Examples include MyCrypto.
+	 */
+	DESKTOP = 'DESKTOP',
+
+	/**
+	 * A hardware wallet is a physical device that holds private keys.
+	 * Examples include Ledger and Trezor.
 	 */
 	HARDWARE = 'HARDWARE',
+
+	/**
+	 * A generic wallet is not of any specific type.
+	 */
+	GENERIC = 'GENERIC',
+}
+
+/**
+ * The type of hardware wallet manufacturing.
+ */
+export enum HardwareWalletManufactureType {
+	/**
+	 * A factory-made hardware wallet is manufactured by a company
+	 * Examples include Ledger, Trezor, GridPlus, and Keystone.
+	 */
+	FACTORY_MADE = 'FACTORY_MADE',
+	
+	/**
+	 * A DIY hardware wallet is assembled by the user themselves
+	 * Examples include self-assembled devices using open source hardware designs.
+	 */
+	DIY = 'DIY',
 }

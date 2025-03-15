@@ -31,6 +31,7 @@ import { ThemeProvider } from '@mui/system'
 import { walletTableTheme, lightWalletTableTheme } from '@/components/ThemeRegistry/theme'
 import { WalletTypeCategory, SmartWalletStandard, createHardwareWalletType } from '@/schema/features/wallet-type'
 import { useTheme } from '@mui/material/styles'
+import { HardwareWalletManufactureType } from '@/schema/features/profile'
 
 // Define display strings for wallet types
 const WALLET_TYPE_DISPLAY = {
@@ -50,6 +51,12 @@ const SMART_WALLET_STANDARD_DISPLAY = {
 const SMART_WALLET_STANDARD_LINKS: Record<string, string> = {
 	[SmartWalletStandard.ERC_4337]: 'https://eips.ethereum.org/EIPS/eip-4337',
 	[SmartWalletStandard.ERC_7702]: 'https://eips.ethereum.org/EIPS/eip-7702',
+};
+
+// Define display strings for hardware wallet manufacture types
+const HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY = {
+	[HardwareWalletManufactureType.FACTORY_MADE]: 'Factory-Made',
+	[HardwareWalletManufactureType.DIY]: 'DIY',
 };
 
 // Helper to create a multi-type wallet definition for the UI
@@ -335,6 +342,21 @@ class WalletRow implements WalletRowStateHandle {
 	isSmartWallet(): boolean {
 		return this.getWalletTypeCategories().includes(WalletTypeCategory.SMART_WALLET);
 	}
+	
+	/** Get the hardware wallet manufacture type */
+	getHardwareWalletManufactureType(): HardwareWalletManufactureType | undefined {
+		return this.wallet.metadata.hardwareWalletManufactureType;
+	}
+	
+	/** Render the hardware wallet manufacture type */
+	renderHardwareWalletManufactureType(): React.ReactNode {
+		const manufactureType = this.getHardwareWalletManufactureType();
+		if (!manufactureType) {
+			return 'Unknown';
+		}
+		
+		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType] || 'Unknown';
+	}
 }
 
 /** Column definition for wallet rating columns. */
@@ -401,6 +423,20 @@ export default function WalletTable(): React.JSX.Element {
 		)
 	};
 	
+	// Add hardware wallet manufacture type column
+	const hardwareWalletManufactureTypeColumn: GridColDef<WalletRow, string> = {
+		field: 'hardwareWalletManufactureType',
+		headerName: 'Manufacture Type',
+		width: 150,
+		minWidth: 130,
+		flex: 0.2,
+		renderCell: params => (
+			<Box sx={{ fontSize: '0.85rem' }}>{(params.row as WalletRow).renderHardwareWalletManufactureType()}</Box>
+		),
+		sortable: true,
+		resizable: true
+	};
+	
 	// Define columns for main wallet table
 	const mainColumns: GridColDef[] = [
 		walletNameColumn,
@@ -412,9 +448,10 @@ export default function WalletTable(): React.JSX.Element {
 		walletTableColumn(ecosystemAttributeGroup, tree => tree.ecosystem),
 	]
 	
-	// Define columns for hardware wallet table (without wallet type column)
+	// Define columns for hardware wallet table (add manufacture type column)
 	const hardwareColumns: GridColDef[] = [
 		walletNameColumn,
+		hardwareWalletManufactureTypeColumn,
 		walletTableColumn(securityAttributeGroup, tree => tree.security),
 		walletTableColumn(privacyAttributeGroup, tree => tree.privacy),
 		walletTableColumn(selfSovereigntyAttributeGroup, tree => tree.selfSovereignty),

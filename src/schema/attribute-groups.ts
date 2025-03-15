@@ -82,6 +82,10 @@ import {
 	softwareHWIntegration,
 	type SoftwareHWIntegrationValue,
 } from './attributes/security/software-hw-integration'
+import {
+	bugBountyProgram,
+	type BugBountyProgramValue,
+} from './attributes/security/bug-bounty-program'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
@@ -91,6 +95,7 @@ type SecurityValues = Dict<{
 	hardwareWalletSupport: HardwareWalletSupportValue
 	softwareHWIntegration: SoftwareHWIntegrationValue
 	passkeyImplementation: PasskeyImplementationValue
+	bugBountyProgram: BugBountyProgramValue
 }>
 
 /** Security attributes. */
@@ -108,6 +113,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		hardwareWalletSupport,
 		softwareHWIntegration,
 		passkeyImplementation,
+		bugBountyProgram,
 	},
 	score: scoreGroup<SecurityValues>({
 		securityAudits: 1.0,
@@ -116,6 +122,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		hardwareWalletSupport: 1.0,
 		softwareHWIntegration: 1.0,
 		passkeyImplementation: 1.0,
+		bugBountyProgram: 1.0,
 	}),
 }
 
@@ -249,6 +256,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
 	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>
 	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
+	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
 }
 
 /** Evaluated privacy attributes for a single wallet. */
@@ -308,6 +316,7 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			softwareHWIntegration: evalAttr(softwareHWIntegration),
 			passkeyImplementation: evalAttr(passkeyImplementation),
+			bugBountyProgram: evalAttr(bugBountyProgram),
 		},
 		privacy: {
 			addressCorrelation: evalAttr(addressCorrelation),
@@ -360,6 +369,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			softwareHWIntegration: attr(tree => tree.security.softwareHWIntegration),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
+			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
 		},
 		privacy: {
 			addressCorrelation: attr(tree => tree.privacy.addressCorrelation),

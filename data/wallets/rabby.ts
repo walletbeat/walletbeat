@@ -134,7 +134,7 @@ export const rabby: Wallet = {
 					auditor: slowMist,
 					auditDate: '2021-06-18',
 					ref: 'https://github.com/RabbyHub/Rabby/blob/master/docs/Rabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
-					variantsScope: { browser: true },
+					variantsScope: 'ALL_VARIANTS',
 					codeSnapshot: {
 						date: '2021-06-23',
 					},
@@ -144,7 +144,7 @@ export const rabby: Wallet = {
 					auditor: slowMist,
 					auditDate: '2022-03-18',
 					ref: 'https://github.com/RabbyHub/Rabby/blob/master/docs/SlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet-2022.03.18.pdf',
-					variantsScope: { browser: true },
+					variantsScope: 'ALL_VARIANTS',
 					codeSnapshot: {
 						date: '2022-01-26',
 						commit: 'f6d19bd70664a7214677918e298619d583f9c3f1',
@@ -156,7 +156,7 @@ export const rabby: Wallet = {
 					auditor: slowMist,
 					auditDate: '2023-07-20',
 					ref: 'https://github.com/RabbyHub/Rabby/blob/master/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet-2023.07.20.pdf',
-					variantsScope: { browser: true },
+					variantsScope: 'ALL_VARIANTS',
 					codeSnapshot: {
 						date: '2023-06-19',
 						commit: 'f6221693b877b3c4eb1c7ac61146137eb1908997',
@@ -180,7 +180,7 @@ export const rabby: Wallet = {
 					auditor: leastAuthority,
 					auditDate: '2024-10-18',
 					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/docs/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
-					variantsScope: { mobile: true },
+					variantsScope: 'ALL_VARIANTS',
 					codeSnapshot: {
 						date: '2024-09-08',
 						commit: 'a8dea5d8c530cb1acf9104a7854089256c36d85a',
@@ -207,7 +207,7 @@ export const rabby: Wallet = {
 					auditor: cure53,
 					auditDate: '2024-10-22',
 					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/docs/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
-					variantsScope: { mobile: true },
+					variantsScope: 'ALL_VARIANTS',
 					codeSnapshot: {
 						date: '2024-09-08',
 						commit: 'a8dea5d8c530cb1acf9104a7854089256c36d85a',
@@ -243,7 +243,7 @@ export const rabby: Wallet = {
 				{
 					auditor: slowMist,
 					auditDate: '2024-10-23',
-					variantsScope: { mobile: true },
+					variantsScope: 'ALL_VARIANTS',
 					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/docs/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
 					codeSnapshot: {
 						date: '2024-06-17',
@@ -255,7 +255,7 @@ export const rabby: Wallet = {
 					auditor: leastAuthority,
 					auditDate: '2024-12-12',
 					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/docs/Least%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report-20241212.pdf',
-					variantsScope: { browser: true },
+					variantsScope: 'ALL_VARIANTS',
 					codeSnapshot: {
 						date: '2024-10-14',
 						commit: 'eb5da18727b38a3fd693af8b74f6f151f2fd361c',
@@ -265,7 +265,7 @@ export const rabby: Wallet = {
 				{
 					auditor: slowMist,
 					auditDate: '2024-12-17',
-					variantsScope: { browser: true },
+					variantsScope: 'ALL_VARIANTS',
 					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/docs/Rabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report-20241217.pdf',
 					codeSnapshot: {
 						date: '2024-11-28',

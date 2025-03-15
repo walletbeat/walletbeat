@@ -3,6 +3,7 @@ import { ledgerWallet } from './hardware wallets/ledger'
 import { trezorWallet } from './hardware wallets/trezor'
 import { gridplusWallet } from './hardware wallets/gridplus'
 import { keystoneWallet } from './hardware wallets/keystone'
+import { fireflyWallet } from './hardware wallets/firefly'
 
 /** Set of all known hardware wallets. */
 export const hardwareWallets = {
@@ -10,6 +11,7 @@ export const hardwareWallets = {
   trezor: trezorWallet,
   gridplus: gridplusWallet,
   keystone: keystoneWallet,
+  firefly: fireflyWallet,
 }
 
 /** A valid hardware wallet name. */

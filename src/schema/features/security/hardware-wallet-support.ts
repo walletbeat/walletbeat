@@ -11,6 +11,7 @@ export enum HardwareWalletType {
   GRIDPLUS = 'GRIDPLUS',
   KEYSTONE = 'KEYSTONE',
 	KEEPKEY = 'KEEPKEY',
+  FIREFLY = 'FIREFLY',
   OTHER = 'OTHER'
 }
 

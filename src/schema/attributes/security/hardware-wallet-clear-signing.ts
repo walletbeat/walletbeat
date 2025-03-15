@@ -221,7 +221,10 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 		A hardware wallet receives a passing rating if it implements full clear signing, where all transaction
 		details are clearly displayed on the hardware wallet screen for verification before signing. This includes
 		support for standard transactions, ERC-20 token transfers, 712 messages and complex contract interactions. 
-		The hardware should be able to connect directly to the dapp or allow the user to use at least two different software wallets independent from the hardware manufacturer.
+
+		The hardware should be able to clear sign all transaction types on Safe and Aave.
+		To do so the hardware should be able to connect directly to the dapp or allow the user to use at least two different software wallets independent from the hardware manufacturer.
+    
 		
 		A hardware wallet receives a partial rating if it implements clear signing but with limitations, such
 		as not displaying all transaction details or not supporting clear signing for all transaction types.

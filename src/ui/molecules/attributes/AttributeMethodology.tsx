@@ -49,14 +49,53 @@ function replaceExampleRatingPrefix(
 			whitespacePrefixLength === 0 ? '' : text.substring(0, whitespacePrefixLength)
 		const unprefixedText =
 			whitespacePrefixLength === 0 ? text : text.substring(whitespacePrefix.length)
+		
+		// Accept "The wallet" as before
 		if (unprefixedText.startsWith('The wallet ')) {
 			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The wallet '.length)}`
 		}
+		
+		// Accept "The wallet's" as before
 		if (unprefixedText.startsWith("The wallet's ")) {
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The wallet's ".length)}`
 		}
+		
+		// Accept "The hardware wallet"
+		if (unprefixedText.startsWith('The hardware wallet ')) {
+			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The hardware wallet '.length)}`
+		}
+		
+		// Accept "The hardware wallet's"
+		if (unprefixedText.startsWith("The hardware wallet's ")) {
+			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The hardware wallet's ".length)}`
+		}
+		
+		// Accept "The smart wallet"
+		if (unprefixedText.startsWith('The smart wallet ')) {
+			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The smart wallet '.length)}`
+		}
+		
+		// Accept "The smart wallet's"
+		if (unprefixedText.startsWith("The smart wallet's ")) {
+			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The smart wallet's ".length)}`
+		}
+		
+		// More general approach to handle any wallet type
+		const walletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet\s+/;
+		const possessiveWalletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet's\s+/;
+		
+		const walletTypeMatch = unprefixedText.match(walletTypeRegex);
+		if (walletTypeMatch) {
+			return `${whitespacePrefix}${theWallet}${unprefixedText.substring(walletTypeMatch[0].length)}`
+		}
+		
+		const possessiveWalletTypeMatch = unprefixedText.match(possessiveWalletTypeRegex);
+		if (possessiveWalletTypeMatch) {
+			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring(possessiveWalletTypeMatch[0].length)}`
+		}
+		
 		throw new Error(
-			`Example ratings should always begin with the phrase "The wallet"; got: "${unprefixedText}"`,
+			`Example ratings should always begin with the phrase "The wallet" or "The [type] wallet"; got: "${unprefixedText}"`,
 		)
 	}
 }

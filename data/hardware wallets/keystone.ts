@@ -1,11 +1,12 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
-import { WalletProfile } from '@/schema/features/profile'
+import { WalletProfile, HardwareWalletManufactureType } from '@/schema/features/profile'
 import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
 import { keystone } from '../entities/keystone'
+import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 
 export const keystoneWallet: Wallet = {
 	metadata: {
@@ -21,6 +22,7 @@ export const keystoneWallet: Wallet = {
 		repoUrl: 'https://github.com/KeystoneHQ',
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
+		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 	},
 	features: {
 		profile: WalletProfile.HARDWARE,
@@ -67,6 +69,18 @@ export const keystoneWallet: Wallet = {
 						explanation: 'Independent video demonstration of Keystone\'s clear signing implementation on Safe.',
 					}
 				],
+			},
+			bugBountyProgram: {
+				type: BugBountyProgramType.COMPREHENSIVE,
+				url: 'https://keyst.one/bug-bounty-program',
+				details: 'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users.',
+				upgradePathAvailable: false,
+				ref: [
+					{
+						url: 'https://keyst.one/bug-bounty-program',
+						explanation: 'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users'
+					}
+				]
 			},
 		},
 		privacy: {

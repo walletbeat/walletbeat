@@ -14,6 +14,8 @@ import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
 import type { WalletTypeInfo } from './features/wallet-type'
 import { WalletTypeCategory, SmartWalletStandard } from './features/wallet-type'
+import type { EvmForkLike, EvmFork } from './evm-forks'
+import { WalletProfile, HardwareWalletManufactureType } from './features/profile'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -94,6 +96,11 @@ export interface WalletMetadata {
 		smartWalletStandards?: SmartWalletStandard[];
 		details?: string;
 	}
+
+	/**
+	 * For hardware wallets, indicates whether it's factory-made or DIY
+	 */
+	hardwareWalletManufactureType?: HardwareWalletManufactureType
 }
 
 /** Per-wallet, per-attribute override. */

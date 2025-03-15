@@ -6,8 +6,12 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { featureSupported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { diligence } from '../entities/diligence'
+import { cure53 } from '../entities/cure53'
+import { Variant } from '@/schema/variants'
+
 
 export const metamask: Wallet = {
 	metadata: {
@@ -64,7 +68,28 @@ export const metamask: Wallet = {
 				]
 			},
 			scamAlerts: null,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [
+			{
+				auditor: diligence,
+				auditDate: '2024-10-25',
+				ref: 'https://assets.ctfassets.net/clixtyxoaeas/21m4LE3WLYbgWjc33aDcp2/8252073e115688b1dc1500a9c2d33fe4/metamask-delegator-framework-audit-2024-10.pdf',
+				variantsScope: 'ALL_VARIANTS',
+				codeSnapshot: {
+					date: '2024-10-25',
+				},
+				unpatchedFlaws: 'ALL_FIXED',
+			},
+			{
+				auditor: cure53,
+				auditDate: '2024-10-25',
+				ref: 'https://assets.ctfassets.net/clixtyxoaeas/4sNMB55kkGw6BtAiIn08mm/f1f4a78d3901dd03848d070e15a1ff12/pentest-report_metamask-signing-snap.pdf',
+				variantsScope: 'ALL_VARIANTS',
+				codeSnapshot: {
+					date: '2024-03-25',
+				}, 
+				unpatchedFlaws: 'ALL_FIXED',
+			},
+			],
 			lightClient: {
 				ethereumL1: null,
 			},
@@ -133,9 +158,10 @@ export const metamask: Wallet = {
 		},
 	},
 	variants: {
-		mobile: true,
-		browser: true,
-		desktop: false,
-		embedded: false,
+		[Variant.MOBILE]: true,
+		[Variant.BROWSER]: true,
+		[Variant.DESKTOP]: false,
+		[Variant.EMBEDDED]: false,
+		[Variant.HARDWARE]: false,
 	},
 }

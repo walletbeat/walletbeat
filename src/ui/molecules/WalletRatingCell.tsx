@@ -29,6 +29,8 @@ import { betaSiteRoot } from '@/constants'
 import { refs } from '@/schema/reference'
 import { ReferenceLinks } from '../atoms/ReferenceLinks'
 import { toFullyQualified } from '@/schema/reference'
+import { WalletProfile } from '@/schema/features/profile'
+import { bugBountyProgram } from '@/schema/attributes/security/bug-bounty-program'
 
 /**
  * Common properties of rating-type columns.
@@ -65,8 +67,44 @@ export function WalletRatingCell<Vs extends ValueSet>({
 	evalGroupFn: (tree: EvaluationTree) => EvaluatedGroup<Vs>
 }): React.JSX.Element {
 	const evalGroup = evalGroupFn(row.evalTree)
+	
+	// Check if this is a hardware wallet by checking the hardware variant
+	const isHardwareWallet = row.wallet.variants.hardware !== undefined
+	
+	// Filter out EXEMPT attributes and include bug bounty program for hardware wallets only
 	const evalEntries = evaluatedAttributesEntries(evalGroup).filter(
-		([_, evalAttr]) => evalAttr.evaluation.value.rating !== Rating.EXEMPT,
+		([attrId, evalAttr]) => {
+			// Always exclude EXEMPT attributes
+			if (evalAttr.evaluation.value.rating === Rating.EXEMPT) {
+				return false
+			}
+			
+			// For hardware wallets: 
+			if (isHardwareWallet) {
+				// Include bug bounty program only for hardware wallets
+				if (attrId === 'bugBountyProgram') {
+					return true
+				}
+				
+				// Exclude chain verification for hardware wallets
+				if (attrId === 'chainVerification') {
+					return false
+				}
+				
+				// Exclude security audits for hardware wallets
+				if (attrId === 'securityAudits') {
+					return false
+				}
+			} else {
+				// For non-hardware wallets, exclude the bug bounty program
+				if (attrId === 'bugBountyProgram') {
+					return false
+				}
+			}
+			
+			// Include all other attributes
+			return true
+		},
 	)
 	const groupScore = attrGroup.score(evalGroup)
 	if (groupScore === null || !isNonEmptyArray(evalEntries)) {
