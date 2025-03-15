@@ -345,7 +345,7 @@ function walletTableColumn<Vs extends ValueSet>(
 	return {
 		...walletRatingColumnProps,
 		field: group.id,
-		headerName: `${group.icon} ${group.displayName}`,
+		headerName: `${group.displayName}`,
 		type: 'number',
 		valueGetter: (_: never, row: WalletRow): number => row.score(group, evalGroupFn),
 		renderCell: params => params.row.render(group, evalGroupFn),
@@ -392,8 +392,8 @@ export default function WalletTable(): React.JSX.Element {
 		field: 'displayName',
 		headerName: 'Wallet',
 		type: 'string',
-		width: 300,
-		minWidth: 300,
+		width: 310,
+		minWidth: 310,
 		flex: 0.7,
 		valueGetter: (_: never, row: WalletRow): string => row.wallet.metadata.displayName,
 		renderCell: params => (

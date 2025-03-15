@@ -297,7 +297,7 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 							alignItems: 'center',
 							flexWrap: 'wrap',
 							padding: '12px',
-							backgroundColor: 'rgba(50, 50, 50, 0.25)',
+							backgroundColor: 'rgba(50, 50, 50, 0.35)',
 							border: '1px solid var(--border)',
 							borderRadius: '8px',
 							'.dark &': {

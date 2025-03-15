@@ -50,7 +50,7 @@ function sliceToData(slice: PieSlice): PieValueType {
 				case 'tooltip':
 					return slice.tooltip
 				case 'arc':
-					return slice.arcLabel
+					return `${slice.arcLabel}`
 			}
 		},
 	}
@@ -267,6 +267,10 @@ export function RatingPie({
 			onHighlightChange={handleHighlightChange}
 			onItemClick={handleClick}
 			slotProps={{ legend: { hidden: true, padding: 0 } }}
+			sx={{
+				'.MuiChartsLegend-series': { display: 'none' },
+				'.MuiChartsArcLabel-root': { fontSize: '0.85rem' }
+			}}
 		>
 			{centerLabel === '' ? null : (
 				<PieCenterLabel

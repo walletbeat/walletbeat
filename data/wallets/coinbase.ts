@@ -2,12 +2,16 @@ import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
 import { polymutex } from '../contributors/polymutex'
+import { nconsigny } from '../contributors/nconsigny'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
+import { cantina } from '../entities/cantina'
+import { code4rena } from '../entities/code4rena'
+import { certora } from '../entities/certora'
 
 export const coinbase: Wallet = {
 	metadata: {
@@ -20,9 +24,9 @@ export const coinbase: Wallet = {
 			integrates with Coinbase exchange accounts to bring them onchain.
 		`),
 		url: 'https://www.coinbase.com/wallet',
-		repoUrl: null,
-		contributors: [polymutex],
-		lastUpdated: '2025-02-08',
+		repoUrl: 'https://github.com/coinbase/smart-wallet',
+		contributors: [polymutex, nconsigny],
+		lastUpdated: '2025-03-14',
 		multiWalletType: {
 			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
 			smartWalletStandards: [SmartWalletStandard.ERC_4337, SmartWalletStandard.ERC_7702]
@@ -52,7 +56,36 @@ export const coinbase: Wallet = {
 		security:
 			{
 			scamAlerts: null,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [
+				{
+					auditor: cantina,
+					auditDate: '2024-04-01',
+					variantsScope: 'ALL_VARIANTS',
+					unpatchedFlaws: 'NONE_FOUND',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Cantina-April-2024.pdf',
+				},
+				{
+					auditor: code4rena,
+					auditDate: '2024-03-01',
+					variantsScope: 'ALL_VARIANTS',
+					unpatchedFlaws: 'NONE_FOUND',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Code4rena-March-2024.md',
+				},
+				{
+					auditor: certora,
+					auditDate: '2024-02-01',
+					variantsScope: 'ALL_VARIANTS',
+					unpatchedFlaws: 'NONE_FOUND',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Certora-February-2024.pdf',
+				},
+				{
+					auditor: cantina,
+					auditDate: '2023-12-01',
+					variantsScope: 'ALL_VARIANTS',
+					unpatchedFlaws: 'NONE_FOUND',
+					ref: 'https://github.com/coinbase/smart-wallet/blob/main/audits/Cantina-December-2023.pdf',
+				},
+			],
 			lightClient: {
 				ethereumL1: null,
 			},

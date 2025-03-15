@@ -48,8 +48,8 @@ export const walletRatingColumnProps: GridColTypeDef = {
 
 const ratingPieMargin = 2
 // Reduce the size of the chart to make it less dominant
-const ratingPieHeight = 140
-const ratingPieWidth = 140
+const ratingPieHeight = 130
+const ratingPieWidth = 130
 
 // Function to get slightly increased row height
 const getRowExtraHeight = () => 20; // Extra height added to base shortRowHeight

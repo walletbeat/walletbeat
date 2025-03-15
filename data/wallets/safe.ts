@@ -76,6 +76,10 @@ export const safe: Wallet = {
 					{
 						url: 'https://github.com/safe-global/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
 						explanation: 'Safe implements P256 verification using FreshCryptoLib in their 4337 modules.'
+					},
+					{
+						url: 'https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
+						explanation: 'Safe implements P256 verification using FreshCryptoLib in their 4337 modules.'
 					}
 				]
 			},

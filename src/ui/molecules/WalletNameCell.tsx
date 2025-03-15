@@ -176,7 +176,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 						{row.wallet.metadata.repoUrl === null ? null : (
 							<ExternalLink 
 								url={row.wallet.metadata.repoUrl} 
-								defaultLabel="Code"
+								defaultLabel="GitHub"
 								color="text.primary"
 							/>
 						)}
