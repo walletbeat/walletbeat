@@ -86,6 +86,10 @@ import {
 	bugBountyProgram,
 	type BugBountyProgramValue,
 } from './attributes/security/bug-bounty-program'
+import {
+	scamPrevention,
+	type ScamPreventionValue,
+} from './attributes/security/scam-prevention'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{

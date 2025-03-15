@@ -9,6 +9,7 @@ import { SourceVisibilityDetails } from '@/ui/molecules/attributes/transparency/
 import { UnratedAttribute } from '@/ui/molecules/attributes/UnratedAttribute'
 import { SecurityAuditsDetails } from '@/ui/molecules/attributes/security/SecurityAuditsDetails'
 import { TransactionInclusionDetails } from '@/ui/molecules/attributes/self-sovereignty/TransactionInclusionDetails'
+import { ScamAlertDetails } from '@/ui/molecules/attributes/security/ScamAlertDetails'
 
 export function RenderContent({
 	content,

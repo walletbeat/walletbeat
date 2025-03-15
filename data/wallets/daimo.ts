@@ -118,11 +118,7 @@ export const daimo: Wallet = {
 						},
 					],
 				}),
-			},
-			// Note: Daimo has had their p256 verifier contract audited:
-			// https://github.com/daimo-eth/p256-verifier/blob/master/audits/2023-10-veridise.pdf
-			// However while the wallet relies on it, it is not the wallet software itself,
-			// so it is not a full-stack audit of the wallet software.
+			}, 
 			publicSecurityAudits: [
 				{
 					auditor: veridise,

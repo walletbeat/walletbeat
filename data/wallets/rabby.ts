@@ -315,18 +315,6 @@ export const rabby: Wallet = {
 					}
 				],
 			},
-			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details: 'Rabby Desktop provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.'
-				},
-				ref: [
-					{
-						url: 'https://rabby.io/download',
-						explanation: 'Rabby Desktop supports transaction signing with hardware wallets, displaying basic transaction information on the device. This feature is only available in the desktop version.'
-					}
-				],
-			},
 		},
 		privacy: {
 			dataCollection: {
