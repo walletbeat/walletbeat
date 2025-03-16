@@ -14,7 +14,13 @@ export interface ScamAlerts {
 			 * like the Google Safe Browsing API for checking spam domains without
 			 * leaking the domains being visited to Google.
 			 */
-			leaksVisitedUrl: 'FULL_URL' | 'DOMAIN_ONLY' | 'HASH_OF_DOMAIN' | 'NO'
+			leaksVisitedUrl: 'FULL_URL' | 'DOMAIN_ONLY' | 'PARTIAL_HASH_OF_DOMAIN' | 'NO'
+
+			/**
+			 * Whether the contract lookup process leaks the user's Ethereum address
+			 * to an external service.
+			 */
+			leaksUserAddress: boolean
 
 			/**
 			 * Whether the scam site lookup process leaks the user's IP to an external

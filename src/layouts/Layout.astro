@@ -1,20 +1,20 @@
 ---
 // Global CSS
-import './global.css'
-import '@fontsource/work-sans'
+import '../global.css';
+import '@fontsource/work-sans';
 
 // Props
-import type { ComponentProps } from 'astro/types'
+import type { ComponentProps } from 'astro/types';
 
 type Props = {
-	metadata: ComponentProps<typeof Metadata>['metadata']
-}
+	metadata: ComponentProps<typeof Metadata>['metadata'];
+};
 
-const { metadata } = Astro.props
+const { metadata } = Astro.props;
 
 // Components
-import Metadata from '@/components/Metadata.astro'
-import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry.tsx'
+import Metadata from '@/components/Metadata.astro';
+import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry';
 ---
 
 <!doctype html>
@@ -22,9 +22,29 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry.tsx'
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
 		<Metadata {metadata} />
+		<!-- Theme initialization script -->
+		<script is:inline>
+			// Initialize theme from localStorage or system preference
+			function initializeTheme() {
+				// Check localStorage first
+				const storedTheme = localStorage.getItem('theme');
+
+				if (storedTheme) {
+					// Use stored preference
+					document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+				} else {
+					// Check system preference
+					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					document.documentElement.classList.toggle('dark', prefersDark);
+					// Store the initial preference
+					localStorage.setItem('theme', prefersDark ? 'dark' : 'light');
+				}
+			}
+
+			// Run immediately
+			initializeTheme();
+		</script>
 	</head>
 	<body>
 		<ThemeRegistry>
@@ -42,8 +62,8 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry.tsx'
 			window.plausible =
 				window.plausible ||
 				function () {
-					;(window.plausible.q = window.plausible.q || []).push(arguments)
-				}
+					(window.plausible.q = window.plausible.q || []).push(arguments);
+				};
 		</script>
 	</body>
 </html>

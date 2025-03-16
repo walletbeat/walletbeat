@@ -7,7 +7,7 @@ import {
 	type NavigationGroup,
 	isNavigationContentItem,
 	type NavigationItem,
-} from '@/components/ui/organisms/Navigation'
+} from '@/ui/organisms/Navigation'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 const scrollNavigationMargin = 8
@@ -18,6 +18,7 @@ export function NavigationPageLayout({
 	contentDependencies = [],
 	stickyHeaderId = undefined,
 	stickyHeaderMargin = undefined,
+	prefix,
 }: {
 	/**
 	 * Set of navigation item groups.
@@ -47,6 +48,11 @@ export function NavigationPageLayout({
 	 * `groups` is already implicitly included in this.
 	 */
 	contentDependencies?: React.DependencyList
+
+	/**
+	 * Prefix to display in the navigation bar.
+	 */
+	prefix?: React.ReactNode
 }): React.JSX.Element {
 	const [activeItemId, setActiveItemId] = useState<string>('')
 
@@ -157,21 +163,18 @@ export function NavigationPageLayout({
 
 	return (
 		<ThemeProvider theme={theme}>
-			<Box key="pageViewport" display="flex" flexDirection="row" width="100%">
-				<Navigation key="navigation" flex="0" groups={groups} activeItemId={activeItemId} />
-				<Box key="contentSpacerLeft" flex="1" />
-				<Box
+			<div className="flex w-full min-h-screen flex-wrap lg:flex-nowrap flex-row max-w-screen">
+				<Navigation key="navigation" groups={groups} activeItemId={activeItemId} prefix={prefix} />
+
+				<div
 					key="contentContainer"
-					display="flex"
-					flex="0"
-					flexDirection="column"
-					minWidth="60vw"
-					maxWidth="80vw"
+					className="flex-col flex overflow-y-auto min-h-screen mb-48 w-full md:pl-4 pt-16 md:pt-0"
 				>
+					<div className="px-1 md:px-2 mx-auto max-w-6xl 2xl:max-w-screen-2xl w-full">
 					{children}
-				</Box>
-				<Box key="contentSpacerRight" flex="1" />
-			</Box>
+					</div>
+				</div>
+			</div>
 		</ThemeProvider>
 	)
 }

@@ -4,6 +4,7 @@ import type { AtLeastOneVariant } from './variants'
 import type { MaybeUnratedScore, Score } from './score'
 import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content'
 import type { RatedWallet, WalletMetadata } from './wallet'
+import type { FullyQualifiedReference } from './reference'
 
 /**
  * Rating is an enum that should be visually meaningful.
@@ -209,6 +210,12 @@ export interface Evaluation<V extends Value> {
 	 * not perfect.
 	 */
 	howToImprove?: RenderableTypography<EvaluationData<V>>
+
+	/**
+	 * Optional array of references with URLs and explanations.
+	 * These references provide sources for the evaluation claims.
+	 */
+	references?: FullyQualifiedReference[]
 }
 
 /**
@@ -262,32 +269,32 @@ export interface Attribute<V extends Value> {
 	displayName: string
 
 	wording:
-		| {
-				/**
-				 * A very short, human-readable name for the attribute in a sentence.
-				 * Should be no more than 3 or 4 words.
-				 * Used in the context of mid-sentence descriptions. For example, the
-				 * following string should make sense:
-				 * "Is this wallet's ${midSentenceName} good or bad?"
-				 * In most cases, a lowercase version of `displayName` will be appropriate.
-				 * In more complex cases, this should be omitted and the more complex
-				 * variation of `wording` should be used.
-				 */
-				midSentenceName: string
-		  }
-		| {
-				/**
-				 * midSentenceName can be set to `null` for more complex attribute
-				 * names.
-				 */
-				midSentenceName: null
+	| {
+		/**
+		 * A very short, human-readable name for the attribute in a sentence.
+		 * Should be no more than 3 or 4 words.
+		 * Used in the context of mid-sentence descriptions. For example, the
+		 * following string should make sense:
+		 * "Is this wallet's ${midSentenceName} good or bad?"
+		 * In most cases, a lowercase version of `displayName` will be appropriate.
+		 * In more complex cases, this should be omitted and the more complex
+		 * variation of `wording` should be used.
+		 */
+		midSentenceName: string
+	}
+	| {
+		/**
+		 * midSentenceName can be set to `null` for more complex attribute
+		 * names.
+		 */
+		midSentenceName: null
 
-				/** The sentence "How is <attribute> evaluated?"  */
-				howIsEvaluated: string
+		/** The sentence "How is <attribute> evaluated?"  */
+		howIsEvaluated: string
 
-				/** The sentence "What can <wallet> do about its <attribute>?" */
-				whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) => string
-		  }
+		/** The sentence "What can <wallet> do about its <attribute>?" */
+		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) => string
+	}
 
 	/** A question explaining what question the attribute is answering. */
 	question: Sentence<WalletMetadata>
@@ -300,45 +307,45 @@ export interface Attribute<V extends Value> {
 
 	/** Explanations of what a wallet can do to achieve each rating. */
 	ratingScale:
-		| {
-				/**
-				 * The type of display used to render the rating scale.
-				 * "simple" means to render a simple renderable block of text, useful for
-				 * simple yes/no-type attributes.
-				 */
-				display: 'simple'
+	| {
+		/**
+		 * The type of display used to render the rating scale.
+		 * "simple" means to render a simple renderable block of text, useful for
+		 * simple yes/no-type attributes.
+		 */
+		display: 'simple'
 
-				/** The content to display to explain the rating scale. */
-				content: RenderableTypography
-		  }
-		| {
-				/**
-				 * The order in which each explanation below is displayed:
-				 * - "pass-fail": Passing examples first, failing examples last
-				 *   (partial examples in the middle, if any).
-				 * - "fail-pass": Failing examples first, passing examples last
-				 *   (partial examples in the middle, if any).
-				 */
-				display: 'pass-fail' | 'fail-pass'
+		/** The content to display to explain the rating scale. */
+		content: RenderableTypography
+	}
+	| {
+		/**
+		 * The order in which each explanation below is displayed:
+		 * - "pass-fail": Passing examples first, failing examples last
+		 *   (partial examples in the middle, if any).
+		 * - "fail-pass": Failing examples first, passing examples last
+		 *   (partial examples in the middle, if any).
+		 */
+		display: 'pass-fail' | 'fail-pass'
 
-				/**
-				 * Whether the examples below exhaustively cover all cases that
-				 * are possible. This affects the wording around the examples.
-				 */
-				exhaustive: boolean
+		/**
+		 * Whether the examples below exhaustively cover all cases that
+		 * are possible. This affects the wording around the examples.
+		 */
+		exhaustive: boolean
 
-				/** One or more ways in which a wallet can achieve a passing rating. */
-				pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+		/** One or more ways in which a wallet can achieve a passing rating. */
+		pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
 
-				/**
-				 * Ways in which a wallet can achieve a partial rating.
-				 * Unlike passing/failing, there may be zero ways to get a partial rating.
-				 */
-				partial?: ExampleRating<V> | Array<ExampleRating<V>>
+		/**
+		 * Ways in which a wallet can achieve a partial rating.
+		 * Unlike passing/failing, there may be zero ways to get a partial rating.
+		 */
+		partial?: ExampleRating<V> | Array<ExampleRating<V>>
 
-				/** One or more ways in which a wallet can achieve a failing rating. */
-				fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
-		  }
+		/** One or more ways in which a wallet can achieve a failing rating. */
+		fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+	}
 
 	/**
 	 * Evaluate the attribute for a given set of wallet features.

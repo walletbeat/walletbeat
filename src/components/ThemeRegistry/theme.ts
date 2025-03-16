@@ -218,6 +218,63 @@ const walletTableThemeOptions: ThemeOptions = {
 			fontSize: '0.75rem',
 		},
 	},
+	components: {
+		MuiDataGrid: {
+			styleOverrides: {
+				root: {
+					'& .MuiDataGrid-row--borderBottom': {
+						backgroundColor: 'var(--background-row-border)',
+					},
+				},
+			},
+		},
+	},
 }
 
+// Create light mode version of the wallet table theme
+const lightWalletTableThemeOptions: ThemeOptions = {
+	palette: {
+		mode: 'light',
+		primary: {
+			main: '#105C7E',
+			contrastText: '#F1FAFD',
+			light: '#198DC2',
+			dark: '#082E3F',
+		},
+		background: {
+			default: '#ffffff',
+			paper: '#f5f5f5',
+		},
+		text: {
+			primary: '#292C34',
+			secondary: '#545864',
+			disabled: '#888B94',
+		},
+		divider: '#e0e0e0',
+	},
+}
+
+// Create walletTableTheme with theme-specific CSS variables
 export const walletTableTheme = createTheme(deepmerge(themeOptions, walletTableThemeOptions))
+export const lightWalletTableTheme = createTheme(deepmerge(deepmerge(themeOptions, lightWalletTableThemeOptions), walletTableThemeOptions))
+
+// Add theme-specific CSS variables
+walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
+	MuiCssBaseline: {
+		styleOverrides: {
+			':root': {
+				'--background-row-border': '#6a1b9a'
+			},
+		},
+	},
+})
+
+lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components || {}, {
+	MuiCssBaseline: {
+		styleOverrides: {
+			':root': {
+				'--background-row-border': '#e0f2ff'
+			},
+		},
+	},
+})

@@ -190,14 +190,23 @@ export const openSource: Attribute<OpenSourceValue> = {
 		if (features.license === null) {
 			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE })
 		}
-		if (features.license === License.UNLICENSED_VISIBLE) {
+		
+		// Handle the new LicenseWithValue type
+		let licenseValue: License
+		if (typeof features.license === 'object' && features.license.value !== undefined) {
+			licenseValue = features.license.value
+		} else {
+			licenseValue = features.license as License
+		}
+		
+		if (licenseValue === License.UNLICENSED_VISIBLE) {
 			return unlicensed
 		}
-		switch (licenseIsFOSS(features.license)) {
+		switch (licenseIsFOSS(licenseValue)) {
 			case FOSS.FOSS:
-				return open(features.license)
+				return open(licenseValue)
 			case FOSS.FUTURE_FOSS:
-				return openInTheFuture(features.license)
+				return openInTheFuture(licenseValue)
 			case FOSS.NOT_FOSS:
 				return proprietary
 		}

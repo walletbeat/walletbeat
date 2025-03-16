@@ -1,4 +1,5 @@
 import type { LabeledUrl } from '../url'
+import type { WithRef } from '../reference'
 
 /**
  * An enum of licenses mapping to their SPDX ID.
@@ -12,6 +13,13 @@ export enum License {
 	PROPRIETARY = '_PROPRIETARY',
 	UNLICENSED_VISIBLE = '_UNLICENSED_VISIBLE',
 }
+
+/**
+ * A structure that contains both the license value and optional references
+ */
+export type LicenseWithValue = WithRef<{
+	value: License
+}>
 
 /**
  * An enum representing whether a given license is FOSS

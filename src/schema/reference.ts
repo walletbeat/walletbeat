@@ -68,7 +68,8 @@ export function isFullyQualifiedReference(
 	return typeof reference === 'object' && Object.hasOwn(reference, 'urls')
 }
 
-type References = Reference | NonEmptyArray<Reference>
+/** One or more references. */
+export type References = Reference | NonEmptyArray<Reference>
 
 /** An object that *must* be annotated with References. */
 export type MustRef<T> = T & { ref: References }
@@ -77,7 +78,9 @@ export type MustRef<T> = T & { ref: References }
 export type WithRef<T> = MustRef<T> | (T & { ref?: null })
 
 /** Fully qualify a `Reference`. */
-export function toFullyQualified(reference: References): FullyQualifiedReference[] {
+export function toFullyQualified(
+	reference: References | FullyQualifiedReference[],
+): FullyQualifiedReference[] {
 	if (Array.isArray(reference)) {
 		const qualified: FullyQualifiedReference[] = []
 		for (const ref of reference) {
@@ -85,21 +88,43 @@ export function toFullyQualified(reference: References): FullyQualifiedReference
 		}
 		return mergeRefs(...qualified)
 	}
-	if (isUrl(reference)) {
-		reference = labeledUrl(reference)
-	}
-	if (isLabeledUrl(reference)) {
-		return [{ urls: [reference] }]
-	}
 	if (isFullyQualifiedReference(reference)) {
 		return [reference]
+	}
+	if (typeof reference === 'string') {
+		return toFullyQualified({ url: reference })
+	}
+	let explanation: string | undefined = undefined
+	if (
+		Object.hasOwn(reference, 'explanation') &&
+		typeof (reference as { explanation: unknown }).explanation === 'string' // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "explanation" field exists.
+	) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just verified the "explanation" field exists and is a string.
+		explanation = (reference as { explanation: string }).explanation
+	}
+	let lastRetrieved: CalendarDate | undefined = undefined
+	if (
+		Object.hasOwn(reference, 'lastRetrieved') &&
+		typeof (reference as { lastRetrieved: unknown }).lastRetrieved === 'string' // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "lastRetrieved" field exists.
+	) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "lastRetrieved" field exists, and the only possible string type for it is CalendarDate.
+		lastRetrieved = (reference as { lastRetrieved: CalendarDate }).lastRetrieved
+	}
+	if (isLabeledUrl(reference)) {
+		return [
+			{
+				urls: [reference],
+				explanation,
+				lastRetrieved,
+			},
+		]
 	}
 	if (isUrl(reference.url)) {
 		return [
 			{
 				urls: [labeledUrl(reference.url, reference.label)],
-				explanation: reference.explanation,
-				lastRetrieved: reference.lastRetrieved,
+				explanation,
+				lastRetrieved,
 			},
 		]
 	}
@@ -108,8 +133,8 @@ export function toFullyQualified(reference: References): FullyQualifiedReference
 		return [
 			{
 				urls: [labeledUrl(url, reference.label)],
-				explanation: reference.explanation,
-				lastRetrieved: reference.lastRetrieved,
+				explanation,
+				lastRetrieved,
 			},
 		]
 	}
@@ -118,8 +143,8 @@ export function toFullyQualified(reference: References): FullyQualifiedReference
 		if (isLabeledUrl(url)) {
 			return {
 				urls: [url],
-				explanation: reference.explanation,
-				lastRetrieved: reference.lastRetrieved,
+				explanation,
+				lastRetrieved,
 			}
 		}
 		const label = getUrlLabel(url)
@@ -132,8 +157,8 @@ export function toFullyQualified(reference: References): FullyQualifiedReference
 					label: `${label} ${count + 1}`,
 				},
 			],
-			explanation: reference.explanation,
-			lastRetrieved: reference.lastRetrieved,
+			explanation,
+			lastRetrieved,
 		}
 	})
 }
@@ -156,6 +181,59 @@ export function refs<T>(withRef: WithRef<T>): FullyQualifiedReference[] {
 	return mergeRefs(...qualifiedRefs)
 }
 
+/** Extract references out of an object that may have a value property and references. */
+export function refsWithValue<T>(obj: any): FullyQualifiedReference[] {
+	// Handle null or undefined
+	if (!obj) {
+		return [];
+	}
+	
+	// Handle primitive values
+	if (typeof obj !== 'object') {
+		return [];
+	}
+	
+	try {
+		// Handle case where obj has 'value' and 'ref' properties (LicenseWithValue)
+		if ('value' in obj && 'ref' in obj) {
+			return refs(obj);
+		}
+		
+		// Handle case where obj has nested reference properties
+		if ('sendTransactionWarning' in obj || 'contractTransactionWarning' in obj || 'scamUrlWarning' in obj) {
+			const allRefs: FullyQualifiedReference[] = [];
+			
+			// Check for each potential ref source
+			const checkAndAddRefs = (source: any) => {
+				if (source && 'ref' in source) {
+					allRefs.push(...refs({ref: source.ref}));
+				}
+			};
+			
+			// Check all possible warning types
+			if ('sendTransactionWarning' in obj) checkAndAddRefs(obj.sendTransactionWarning);
+			if ('contractTransactionWarning' in obj) checkAndAddRefs(obj.contractTransactionWarning);
+			if ('scamUrlWarning' in obj) checkAndAddRefs(obj.scamUrlWarning);
+			
+			return allRefs;
+		}
+		
+		// Handle normal WithRef objects
+		if ('ref' in obj) {
+			return refs(obj as WithRef<any>);
+		}
+		
+		// Handle Arrays of refs
+		if (Array.isArray(obj)) {
+			return obj.flatMap(item => refsWithValue(item));
+		}
+	} catch (error) {
+		console.error('Error extracting references:', error);
+	}
+	
+	return [];
+}
+
 /** Extract references out of `withRef` and return an object without them. */
 export function popRefs<T>(withRef: WithRef<T>): {
 	withoutRefs: T
@@ -171,24 +249,27 @@ export function popRefs<T>(withRef: WithRef<T>): {
 /** Deduplicate and merge references in `refs`. */
 export function mergeRefs(...refs: FullyQualifiedReference[]): FullyQualifiedReference[] {
 	const byExplanation = new Map<string, FullyQualifiedReference>()
+	const mergedRefs: FullyQualifiedReference[] = []
 	for (const ref of refs) {
-		const explanation = ref.explanation ?? ''
-		const existing = byExplanation.get(explanation)
+		if (ref.explanation === undefined) {
+			mergedRefs.push(ref)
+			continue
+		}
+		const existing = byExplanation.get(ref.explanation)
 		if (existing === undefined) {
-			byExplanation.set(explanation, ref)
+			byExplanation.set(ref.explanation, ref)
 			continue
 		}
 		let newUrls = existing.urls
 		for (const url of ref.urls) {
 			newUrls = mergeLabeledUrls(newUrls, url)
 		}
-		byExplanation.set(explanation, {
+		byExplanation.set(ref.explanation, {
 			urls: newUrls,
-			explanation: existing.explanation ?? ref.explanation,
+			explanation: ref.explanation,
 			lastRetrieved: existing.lastRetrieved ?? ref.lastRetrieved,
 		})
 	}
-	const mergedRefs: FullyQualifiedReference[] = []
 	byExplanation.forEach(ref => {
 		mergedRefs.push(ref)
 	})

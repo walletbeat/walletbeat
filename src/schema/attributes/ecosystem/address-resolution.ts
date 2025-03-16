@@ -136,11 +136,11 @@ function evaluateAddressResolution(
 				walletShould === undefined
 					? undefined
 					: mdParagraph(
-							({ wallet }) => `
+						({ wallet }) => `
 					${wallet.metadata.displayName} should use fully-onchain resolution
 					to resolve the address, or should ${walletShould}.
 				`,
-						),
+					),
 		}
 	}
 	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
@@ -247,7 +247,7 @@ function evaluateAddressResolution(
 			walletShould === undefined
 				? undefined
 				: markdown(
-						({ wallet }) => `
+					({ wallet }) => `
 							${wallet.metadata.displayName} should use fully-onchain
 							resolution to resolve the address, or should ${walletShould}.
 
@@ -257,7 +257,7 @@ function evaluateAddressResolution(
 							* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
 							* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
 						`,
-					),
+				),
 	}
 }
 

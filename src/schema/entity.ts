@@ -57,6 +57,11 @@ export interface Entity<Ts extends EntityType[] = []> {
 	url: Url | { type: 'NO_WEBSITE' }
 
 	/**
+	 * Repository URL of the entity (like GitHub).
+	 */
+	repoUrl: Url | null
+
+	/**
 	 * The jurisdiction in which the entity is located.
 	 *
 	 * 'GLOBAL' should be used when an entity exists in such a manner that
@@ -71,6 +76,12 @@ export interface Entity<Ts extends EntityType[] = []> {
 
 	/** The Crunchbase URL of the entity, if any. */
 	crunchbase: Url | { type: 'NO_CRUNCHBASE_URL' }
+	
+	/** The LinkedIn URL of the entity, if any. */
+	linkedin?: Url | { type: 'NO_LINKEDIN_URL' }
+	
+	/** The Twitter/X URL of the entity, if any. */
+	twitter?: Url | { type: 'NO_TWITTER_URL' }
 }
 
 type EntityWithType<T extends EntityType> = Entity & Entity<[T]>

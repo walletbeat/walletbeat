@@ -110,11 +110,11 @@ function browserIntegrationSupport(
 			unsupported.length === 0
 				? undefined
 				: markdown(
-						({ wallet }) => `
+					({ wallet }) => `
 							${wallet.metadata.displayName} should implement
 							${commaListFormat(unsupported.map(eipNum => eipMarkdownLink(getEip(eipNum))))}.
 						`,
-					),
+				),
 	}
 }
 
