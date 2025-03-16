@@ -1,4 +1,4 @@
-import type { CorporateEntity, Exchange } from '@/schema/entity'
+import type { CorporateEntity, Exchange } from '@/schema/entity';
 
 export const binance: CorporateEntity & Exchange = {
 	id: 'binance',
@@ -19,6 +19,7 @@ export const binance: CorporateEntity & Exchange = {
 	},
 	jurisdiction: 'Malta',
 	url: 'https://binance.com/',
+	repoUrl: 'https://github.com/binance',
 	privacyPolicy: 'https://www.binance.com/en/about-legal/privacy-portal',
 	crunchbase: 'https://www.crunchbase.com/organization/binance',
-}
+};

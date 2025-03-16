@@ -8,11 +8,11 @@
 		"check": "pnpm run astro check",
 		"check:all": "pnpm run check:hint && pnpm run check:lint && pnpm run check:syntax && pnpm run check:spelling",
 		"check:hint": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
-		"check:lint": "eslint src",
+		"check:lint": "eslint src data",
 		"check:spelling": "cspell lint .",
-		"check:syntax": "prettier --check src",
+		"check:syntax": "prettier --check src data",
 		"dev": "pnpm run astro dev",
-		"lint": "prettier --check --write src && eslint src --fix && cspell lint .",
+		"lint": "prettier --check --write src data && eslint src data --fix && cspell lint .",
 		"preview": "pnpm run astro preview"
 	},
 	"dependencies": {

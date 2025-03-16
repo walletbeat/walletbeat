@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
 
 export const cantina: CorporateEntity & SecurityAuditor = {
 	id: 'cantina',
@@ -21,6 +21,7 @@ export const cantina: CorporateEntity & SecurityAuditor = {
 	},
 	jurisdiction: 'United States',
 	url: 'https://cantina.xyz/',
-	privacyPolicy: null,
-	crunchbase: null,
-} 
+	repoUrl: { type: 'NO_REPO' },
+	privacyPolicy: 'https://cantina.xyz/privacy-policy',
+	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
+}

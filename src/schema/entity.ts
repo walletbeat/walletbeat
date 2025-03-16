@@ -59,7 +59,7 @@ export interface Entity<Ts extends EntityType[] = []> {
 	/**
 	 * Repository URL of the entity (like GitHub).
 	 */
-	repoUrl: Url | null
+	repoUrl: Url | { type: 'NO_REPO' }
 
 	/**
 	 * The jurisdiction in which the entity is located.
