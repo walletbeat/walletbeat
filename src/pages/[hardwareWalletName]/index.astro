@@ -3,7 +3,7 @@
 export const prerender = true
 
 // Data
-import { IsValidHardwareWalletName, ratedHardwareWallets } from '@/data/hardwareWallets'
+import { isValidHardwareWalletName, ratedHardwareWallets } from '@/data/hardware-wallets'
 
 // Utils
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
@@ -19,9 +19,10 @@ export const getStaticPaths = () =>
 const { hardwareWalletName } = Astro.params
 
 // Derived
-const hardwareWalletMetadata = hardwareWalletName && IsValidHardwareWalletName(hardwareWalletName)
-	? ratedHardwareWallets[hardwareWalletName].metadata
-	: null
+const hardwareWalletMetadata =
+	hardwareWalletName && isValidHardwareWalletName(hardwareWalletName)
+		? ratedHardwareWallets[hardwareWalletName].metadata
+		: null
 
 // Layouts
 import Layout from '@/layouts/Layout.astro'
@@ -31,7 +32,7 @@ import { WalletPage } from '../[walletName]/_WalletPage'
 ---
 
 {
-	hardwareWalletName && IsValidHardwareWalletName(hardwareWalletName) ? (
+	hardwareWalletName && isValidHardwareWalletName(hardwareWalletName) ? (
 		<Layout
 			metadata={{
 				title: `${hardwareWalletMetadata.displayName} - Walletbeat`,
@@ -62,4 +63,4 @@ import { WalletPage } from '../[walletName]/_WalletPage'
 			<div>Invalid hardware wallet name!</div>
 		</Layout>
 	)
-} 
+}

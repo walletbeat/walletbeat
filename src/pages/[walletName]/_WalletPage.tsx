@@ -1,5 +1,5 @@
 import { ratedWallets, type WalletName } from '@/data/wallets'
-import { ratedHardwareWallets, type HardwareWalletName } from '@/data/hardwareWallets'
+import { ratedHardwareWallets, type HardwareWalletName } from '@/data/hardware-wallets'
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
@@ -164,27 +164,28 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 				if (subsection.caption !== null && subsection.body !== null) {
 					try {
 						// Get a reasonable question text
-						const questionText = typeof subsection.title === 'string' && subsection.title !== ''
-							? subsection.title
-							: 'Feature question';
+						const questionText =
+							typeof subsection.title === 'string' && subsection.title !== ''
+								? subsection.title
+								: 'Feature question'
 
 						// Get a reasonable answer text
-						const answerText = `${walletName} supports this feature.`;
+						const answerText = `${walletName} supports this feature.`
 
 						// Add to FAQ entries
 						faqEntries.push({
 							'@type': 'Question',
-							'name': questionText,
-							'acceptedAnswer': {
+							name: questionText,
+							acceptedAnswer: {
 								'@type': 'Answer',
-								'text': answerText
-							}
-						});
+								text: answerText,
+							},
+						})
 					} catch (error) {
 						// Error handling, silent in production
 						if (process.env.NODE_ENV !== 'production') {
 							// eslint-disable-next-line no-console
-							console.error('Error creating FAQ entry:', error);
+							console.error('Error creating FAQ entry:', error)
 						}
 					}
 				}
@@ -196,16 +197,22 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 	const faqSchema = {
 		'@context': 'https://schema.org',
 		'@type': 'FAQPage',
-		'mainEntity': faqEntries
+		mainEntity: faqEntries,
 	}
 
 	return JSON.stringify(faqSchema)
 }
 
-export function WalletPage({ walletName }: { walletName: WalletName | HardwareWalletName }): React.JSX.Element {
+export function WalletPage({
+	walletName,
+}: {
+	walletName: WalletName | HardwareWalletName
+}): React.JSX.Element {
 	// Determine if this is a hardware wallet or regular wallet
-	const isHardwareWallet = Object.keys(ratedHardwareWallets).includes(walletName);
-	const wallet = isHardwareWallet ? ratedHardwareWallets[walletName as HardwareWalletName] : ratedWallets[walletName as WalletName]
+	const isHardwareWallet = Object.keys(ratedHardwareWallets).includes(walletName)
+	const wallet = isHardwareWallet
+		? ratedHardwareWallets[walletName as HardwareWalletName]
+		: ratedWallets[walletName as WalletName]
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
 	useEffect(() => {
@@ -268,8 +275,8 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 				: `Runs on ${variantToName(variant, false)}`,
 			click: needsVariantFiltering
 				? () => {
-					updatePickedVariant(pickedVariant === variant ? null : variant)
-				}
+						updatePickedVariant(pickedVariant === variant ? null : variant)
+					}
 				: undefined,
 		}),
 	)
@@ -287,7 +294,7 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 						content={wallet.metadata.blurb.render({})}
 						typography={{ variant: 'body1' }}
 					/>
-					<Box 
+					<Box
 						sx={{
 							display: 'flex',
 							flexDirection: 'row',
@@ -301,12 +308,14 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 							border: '1px solid var(--border)',
 							borderRadius: '8px',
 							'.dark &': {
-								backgroundColor: 'rgba(189, 159, 224, 0.15)'
-							}
+								backgroundColor: 'rgba(189, 159, 224, 0.15)',
+							},
 						}}
 					>
-						<Typography variant="body1" fontWeight="medium">Links:</Typography>
-						
+						<Typography variant="body1" fontWeight="medium">
+							Links:
+						</Typography>
+
 						<Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 							<LanguageIcon fontSize="small" sx={{ color: 'var(--accent)' }} />
 							<ExternalLink
@@ -315,12 +324,12 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 								style={{ fontWeight: 500 }}
 							/>
 						</Box>
-						
+
 						{wallet.metadata.repoUrl !== null && (
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 								<GitHubIcon fontSize="small" sx={{ color: 'var(--accent)' }} />
-								<ExternalLink 
-									url={wallet.metadata.repoUrl} 
+								<ExternalLink
+									url={wallet.metadata.repoUrl}
 									defaultLabel="GitHub Repository"
 									style={{ fontWeight: 500 }}
 								/>
@@ -566,9 +575,7 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 
 	return (
 		<NavigationPageLayout
-			prefix={
-				<WalletDropdown wallet={wallet} />
-			}
+			prefix={<WalletDropdown wallet={wallet} />}
 			groups={[
 				{
 					id: 'wallet-sections',
@@ -593,11 +600,11 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 								children:
 									section.subsections !== undefined && isNonEmptyArray(section.subsections)
 										? nonEmptyMap(section.subsections, subsection => ({
-											id: sectionHeaderId(subsection),
-											icon: subsection.icon,
-											title: subsection.title,
-											contentId: sectionHeaderId(subsection),
-										}))
+												id: sectionHeaderId(subsection),
+												icon: subsection.icon,
+												title: subsection.title,
+												contentId: sectionHeaderId(subsection),
+											}))
 										: undefined,
 							}),
 						),
@@ -617,7 +624,9 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 			{/* Add structured data for FAQs */}
 			<script
 				type="application/ld+json"
-				dangerouslySetInnerHTML={{ __html: generateFaqSchema(sections, wallet.metadata.displayName) }}
+				dangerouslySetInnerHTML={{
+					__html: generateFaqSchema(sections, wallet.metadata.displayName),
+				}}
 			/>
 
 			<ReturnToTop />
@@ -644,19 +653,14 @@ export function WalletPage({ walletName }: { walletName: WalletName | HardwareWa
 					pickedVariant={pickedVariant}
 				/>
 			</StyledHeader>
-			<div
-				className="flex flex-col mt-10 gap-4"
-			>
+			<div className="flex flex-col mt-10 gap-4">
 				<div key="walletPageBody" className="flex flex-row">
 					<div key="walletPageContent" className="flex-1">
 						<div key="topSpacer" style={{ height: headerBottomMargin }}></div>
 						{nonEmptyMap(sections, (section, index) => (
 							<React.Fragment key={sectionHeaderId(section)}>
 								{index > 0 ? (
-									<div
-										key="sectionDivider"
-										className="w-4/5 mx-auto mt-6 mb-6 border-b"
-									/>
+									<div key="sectionDivider" className="w-4/5 mx-auto mt-6 mb-6 border-b" />
 								) : null}
 								<StyledSection key="sectionContainer" sx={section.sx}>
 									{maybeAddCornerControl(
