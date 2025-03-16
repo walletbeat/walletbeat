@@ -3,7 +3,7 @@ import type {
 	CorporateEntity,
 	TransactionBroadcastProvider,
 	WalletDeveloper,
-} from '@/schema/entity'
+} from '@/schema/entity';
 
 export const deBank: ChainDataProvider &
 	CorporateEntity &
@@ -27,6 +27,7 @@ export const deBank: ChainDataProvider &
 	},
 	jurisdiction: 'Singapore',
 	url: 'https://debank.com/',
+	repoUrl: 'https://github.com/DeBankDeFi',
 	privacyPolicy: 'https://rabby.io/docs/privacy/',
 	crunchbase: 'https://www.crunchbase.com/organization/debank',
-}
+};

@@ -24,4 +24,6 @@ export const cantina: CorporateEntity & SecurityAuditor = {
 	repoUrl: { type: 'NO_REPO' },
 	privacyPolicy: 'https://cantina.xyz/privacy-policy',
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
-}
+	linkedin: { type: 'NO_LINKEDIN_URL' },
+	twitter: 'https://x.com/cantinaxyz',
+};
