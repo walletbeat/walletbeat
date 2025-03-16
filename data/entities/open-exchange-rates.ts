@@ -1,4 +1,4 @@
-import type { CorporateEntity, OffchainDataProvider } from '@/schema/entity';
+import type { CorporateEntity, OffchainDataProvider } from '@/schema/entity'
 
 export const openExchangeRates: CorporateEntity & OffchainDataProvider = {
 	id: 'open-exchange-rates',
@@ -23,4 +23,4 @@ export const openExchangeRates: CorporateEntity & OffchainDataProvider = {
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: { type: 'NO_TWITTER_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-};
+}

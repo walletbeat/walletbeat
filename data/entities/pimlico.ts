@@ -1,4 +1,4 @@
-import type { CorporateEntity, TransactionBroadcastProvider } from '@/schema/entity';
+import type { CorporateEntity, TransactionBroadcastProvider } from '@/schema/entity'
 
 export const pimlico: CorporateEntity & TransactionBroadcastProvider = {
 	id: 'pimlico',
@@ -27,4 +27,4 @@ export const pimlico: CorporateEntity & TransactionBroadcastProvider = {
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/pimlicoHQ',
 	farcaster: 'https://warpcast.com/pimlico',
-};
+}

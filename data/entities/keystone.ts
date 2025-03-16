@@ -1,4 +1,4 @@
-import type { CorporateEntity, WalletDeveloper } from '@/schema/entity';
+import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
 
 export const keystone: CorporateEntity & WalletDeveloper = {
 	id: 'keystone',
@@ -25,4 +25,4 @@ export const keystone: CorporateEntity & WalletDeveloper = {
 	twitter: 'https://x.com/KeystoneWallet',
 	crunchbase: 'https://www.crunchbase.com/organization/kesytone',
 	farcaster: 'https://warpcast.com/keystonewallet',
-};
+}

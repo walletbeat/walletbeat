@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
 
 export const slowMist: CorporateEntity & SecurityAuditor = {
 	id: 'slowmist',
@@ -27,4 +27,4 @@ export const slowMist: CorporateEntity & SecurityAuditor = {
 	linkedin: 'https://www.linkedin.com/company/slowmist',
 	twitter: 'https://x.com/SlowMist_Team',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-};
+}

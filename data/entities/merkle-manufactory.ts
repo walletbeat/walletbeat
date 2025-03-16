@@ -1,4 +1,4 @@
-import type { CorporateEntity } from '@/schema/entity';
+import type { CorporateEntity } from '@/schema/entity'
 
 export const merkleManufactory: CorporateEntity = {
 	id: 'merkle-manufactory',
@@ -23,4 +23,4 @@ export const merkleManufactory: CorporateEntity = {
 	twitter: 'https://x.com/farcaster_xyz',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	farcaster: 'https://warpcast.com/farcaster',
-};
+}

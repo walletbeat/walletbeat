@@ -1,4 +1,4 @@
-import type { CorporateEntity, WalletDeveloper } from '@/schema/entity';
+import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
 
 export const trezor: CorporateEntity & WalletDeveloper = {
 	id: 'trezor',
@@ -25,4 +25,4 @@ export const trezor: CorporateEntity & WalletDeveloper = {
 	linkedin: 'https://www.linkedin.com/company/trezor-by-satoshilabs/',
 	twitter: 'https://x.com/trezor',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-};
+}

@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
 
 export const veridise: CorporateEntity & SecurityAuditor = {
 	id: 'veridise',
@@ -25,4 +25,4 @@ export const veridise: CorporateEntity & SecurityAuditor = {
 	linkedin: 'https://www.linkedin.com/company/veridise',
 	twitter: 'https://x.com/VeridiseInc',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-};
+}

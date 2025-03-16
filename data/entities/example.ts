@@ -4,7 +4,7 @@ import type {
 	Exchange,
 	SecurityAuditor,
 	TransactionBroadcastProvider,
-} from '@/schema/entity';
+} from '@/schema/entity'
 
 export const exampleNodeCompany: CorporateEntity &
 	ChainDataProvider &
@@ -31,7 +31,7 @@ export const exampleNodeCompany: CorporateEntity &
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: { type: 'NO_TWITTER_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-};
+}
 
 export const exampleSecurityAuditor: CorporateEntity & SecurityAuditor = {
 	id: 'exampleSecurityAuditor',
@@ -56,7 +56,7 @@ export const exampleSecurityAuditor: CorporateEntity & SecurityAuditor = {
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: { type: 'NO_TWITTER_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-};
+}
 
 export const exampleCex: CorporateEntity & Exchange = {
 	id: 'exampleCex',
@@ -81,4 +81,4 @@ export const exampleCex: CorporateEntity & Exchange = {
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: { type: 'NO_TWITTER_URL' },
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-};
+}

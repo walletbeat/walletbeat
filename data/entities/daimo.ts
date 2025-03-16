@@ -1,4 +1,4 @@
-import type { CorporateEntity, WalletDeveloper } from '@/schema/entity';
+import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
 
 export const daimoInc: CorporateEntity & WalletDeveloper = {
 	id: 'daimo',
@@ -25,4 +25,4 @@ export const daimoInc: CorporateEntity & WalletDeveloper = {
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/daimo_eth',
 	farcaster: 'https://warpcast.com/daimo',
-};
+}

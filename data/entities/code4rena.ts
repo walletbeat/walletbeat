@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
 
 export const code4rena: CorporateEntity & SecurityAuditor = {
 	id: 'code4rena',
@@ -27,4 +27,4 @@ export const code4rena: CorporateEntity & SecurityAuditor = {
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/code4rena',
 	farcaster: 'https://warpcast.com/code4rena',
-};
+}

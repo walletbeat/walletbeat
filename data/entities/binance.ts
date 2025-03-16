@@ -1,4 +1,4 @@
-import type { CorporateEntity, Exchange } from '@/schema/entity';
+import type { CorporateEntity, Exchange } from '@/schema/entity'
 
 export const binance: CorporateEntity & Exchange = {
 	id: 'binance',
@@ -25,4 +25,4 @@ export const binance: CorporateEntity & Exchange = {
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/binance',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
-};
+}

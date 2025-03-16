@@ -3,7 +3,7 @@ import type {
 	CorporateEntity,
 	TransactionBroadcastProvider,
 	WalletDeveloper,
-} from '@/schema/entity';
+} from '@/schema/entity'
 
 export const deBank: ChainDataProvider &
 	CorporateEntity &
@@ -33,4 +33,4 @@ export const deBank: ChainDataProvider &
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/DebankDeFi',
 	farcaster: 'https://warpcast.com/debankdefi',
-};
+}
