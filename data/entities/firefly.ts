@@ -24,4 +24,5 @@ export const firefly: CorporateEntity & WalletDeveloper = {
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/FireflyPocket',
+	farcaster: 'https://warpcast.com/firefly',
 };

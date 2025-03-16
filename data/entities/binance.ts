@@ -24,4 +24,5 @@ export const binance: CorporateEntity & Exchange = {
 	crunchbase: 'https://www.crunchbase.com/organization/binance',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/binance',
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 };

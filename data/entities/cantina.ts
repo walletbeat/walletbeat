@@ -26,4 +26,5 @@ export const cantina: CorporateEntity & SecurityAuditor = {
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/cantinaxyz',
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 };

@@ -1,4 +1,4 @@
-import type { Url } from './url';
+import type { DomainUrl, Url } from './url';
 
 export enum EntityType {
 	chainDataProvider = 'chainDataProvider',
@@ -59,7 +59,7 @@ export interface Entity<Ts extends EntityType[] = []> {
 	/**
 	 * Repository URL of the entity (like GitHub).
 	 */
-	repoUrl: Url | { type: 'NO_REPO' };
+	repoUrl: DomainUrl<'github.com' | 'bitbucket.org' | 'radicle.xyz'> | { type: 'NO_REPO' };
 
 	/**
 	 * The jurisdiction in which the entity is located.
@@ -75,13 +75,16 @@ export interface Entity<Ts extends EntityType[] = []> {
 	privacyPolicy: Url | { type: 'NO_PRIVACY_POLICY' };
 
 	/** The Crunchbase URL of the entity, if any. */
-	crunchbase: Url | { type: 'NO_CRUNCHBASE_URL' };
+	crunchbase: DomainUrl<'crunchbase.com'> | { type: 'NO_CRUNCHBASE_URL' };
 
 	/** The LinkedIn URL of the entity, if any. */
-	linkedin: Url | { type: 'NO_LINKEDIN_URL' };
+	linkedin: DomainUrl<'linkedin.com'> | { type: 'NO_LINKEDIN_URL' };
 
 	/** The Twitter/X URL of the entity, if any. */
-	twitter: Url | { type: 'NO_TWITTER_URL' };
+	twitter: DomainUrl<'x.com'> | { type: 'NO_TWITTER_URL' };
+
+	/** The Farcaster profile name of the entity, as a Warpcast URL, if any. */
+	farcaster: DomainUrl<'warpcast.com'> | { type: 'NO_FARCASTER_PROFILE' };
 }
 
 type EntityWithType<T extends EntityType> = Entity & Entity<[T]>;

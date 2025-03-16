@@ -26,4 +26,5 @@ export const diligence: CorporateEntity & SecurityAuditor = {
 	crunchbase: 'https://www.crunchbase.com/organization/consensus-systems',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/ConsensysAudits',
+	farcaster: 'https://warpcast.com/consensys',
 };

@@ -24,4 +24,7 @@ export const cure53: CorporateEntity & SecurityAuditor = {
 	repoUrl: 'https://github.com/cure53',
 	privacyPolicy: 'https://cure53.de/datenschutz.php',
 	crunchbase: 'https://www.crunchbase.com/organization/cure53',
+	linkedin: 'https://www.linkedin.com/company/cure53',
+	twitter: 'https://x.com/cure53berlin',
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 };
