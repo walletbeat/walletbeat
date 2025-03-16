@@ -10,7 +10,7 @@ export const eip6963: Eip = {
 		An alternative discovery mechanism to EIP-1193 which supports discovering multiple injected Wallet Providers in a web page.
 	`,
 	whyItMattersMarkdown: `
-		EIP-9693 defines a consistent standard for browser-extension-based
+		EIP-6963 defines a consistent standard for browser-extension-based
 		Ethereum wallets to integrate with web applications. This allows
 		web applications to interact with the wallet and the Ethereum blockchain
 		without needing to implement wallet-specific code.

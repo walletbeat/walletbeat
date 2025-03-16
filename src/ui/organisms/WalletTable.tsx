@@ -3,7 +3,7 @@ import { ratedHardwareWallets } from '@/data/hardwareWallets'
 import type { AttributeGroup, ValueSet, EvaluatedGroup } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
 import { Box, type SxProps, Tooltip } from '@mui/material'
-import { DataGrid, type GridColDef, GridToolbar } from '@mui/x-data-grid'
+import { DataGrid, type GridColDef, GridToolbar, type GridSortModel } from '@mui/x-data-grid'
 import type React from 'react'
 import {
 	WalletRatingCell,
@@ -32,6 +32,11 @@ import { walletTableTheme, lightWalletTableTheme } from '@/components/ThemeRegis
 import { WalletTypeCategory, SmartWalletStandard, createHardwareWalletType } from '@/schema/features/wallet-type'
 import { useTheme } from '@mui/material/styles'
 import { HardwareWalletManufactureType } from '@/schema/features/profile'
+import { eipMarkdownLink } from '@/schema/eips'
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
+import { eip7702 } from '@/data/eips/eip-7702'
+import { erc4337 } from '@/data/eips/erc-4337'
+import { ContentType } from '@/types/content'
 
 // Define display strings for wallet types
 const WALLET_TYPE_DISPLAY = {
@@ -258,6 +263,22 @@ class WalletRow implements WalletRowStateHandle {
 		// Ensure the row has enough height to display both the type and standards
 		const rowHeight = this.expanded ? expandedRowHeight : Math.max(shortRowHeight + 40, 120);
 		
+		// Create markdown links for EIP standards
+		const getEipMarkdownContent = (std: SmartWalletStandard) => {
+			if (std === SmartWalletStandard.ERC_4337) {
+				return {
+					contentType: ContentType.MARKDOWN as ContentType.MARKDOWN,
+					markdown: eipMarkdownLink(erc4337)
+				};
+			} else if (std === SmartWalletStandard.ERC_7702) {
+				return {
+					contentType: ContentType.MARKDOWN as ContentType.MARKDOWN,
+					markdown: eipMarkdownLink(eip7702)
+				};
+			}
+			return null;
+		};
+		
 		return (
 			<Box 
 				sx={{ 
@@ -291,6 +312,34 @@ class WalletRow implements WalletRowStateHandle {
 				}}>
 					{standards && standards.length > 0 ? (
 						standards.map(std => {
+							const markdownContent = getEipMarkdownContent(std);
+							
+							if (markdownContent) {
+								return (
+									<Box 
+										key={std}
+										sx={{ 
+											fontSize: '0.8rem',
+											'& a': {
+												color: 'var(--hashtag-text)',
+												backgroundColor: 'var(--hashtag-bg)',
+												borderRadius: '4px',
+												padding: '1px 6px',
+												textDecoration: 'none',
+												fontWeight: 'medium',
+												'&:hover': { 
+													textDecoration: 'underline',
+													backgroundColor: 'var(--hashtag-bg-hover)'
+												}
+											}
+										}}
+									>
+										<RenderTypographicContent content={markdownContent} />
+									</Box>
+								);
+							}
+
+							// Fallback for OTHER standard
 							const standardKey = std as string;
 							const displayNumber = std === SmartWalletStandard.ERC_4337 ? '4337' : '7702';
 							const linkPath = SMART_WALLET_STANDARD_LINKS[standardKey] || '#';
@@ -374,6 +423,39 @@ function walletTableColumn<Vs extends ValueSet>(
 	}
 }
 
+/** Get sorting weight for wallet type */
+function getWalletTypeSortWeight(row: WalletRow): number {
+	const standards = row.getSmartWalletStandards();
+	const categories = row.getWalletTypeCategories();
+	
+	// Smart Wallets first
+	if (categories.includes(WalletTypeCategory.SMART_WALLET)) {
+		// ERC-4337 wallets first
+		if (standards?.includes(SmartWalletStandard.ERC_4337)) {
+			return 1;
+		}
+		// ERC-7702 wallets second
+		if (standards?.includes(SmartWalletStandard.ERC_7702)) {
+			return 2;
+		}
+		// Other smart wallets third
+		return 3;
+	}
+	
+	// EOA wallets fourth
+	if (categories.includes(WalletTypeCategory.EOA)) {
+		return 4;
+	}
+	
+	// Hardware wallets last
+	if (categories.includes(WalletTypeCategory.HARDWARE_WALLET)) {
+		return 5;
+	}
+	
+	// Unknown types at the very end
+	return 6;
+}
+
 /** Main wallet comparison table. */
 export default function WalletTable(): React.JSX.Element {
 	const [tableState, setTableState] = useState<WalletTableState>({
@@ -396,18 +478,27 @@ export default function WalletTable(): React.JSX.Element {
 		new WalletRow(wallet, tableStateHandle, rowsState, setRowsState)
 	);
 	
-	// Add wallet type column
+	// Add wallet type column with custom sorting
 	const walletTypeColumn: GridColDef<WalletRow, string> = {
 		field: 'walletType',
 		headerName: 'Type',
-		width: 104,
-		minWidth: 103,
+		width: 142,
+		minWidth: 142,
 		flex: 0.15,
 		renderCell: params => (
 			<Box sx={{ fontSize: '0.85rem' }}>{(params.row as WalletRow).renderWalletType()}</Box>
 		),
 		sortable: true,
-		resizable: true
+		resizable: true,
+		sortComparator: (v1, v2, param1, param2) => {
+			const row1 = param1.api.getRow(param1.id) as WalletRow;
+			const row2 = param2.api.getRow(param2.id) as WalletRow;
+			
+			const weight1 = getWalletTypeSortWeight(row1);
+			const weight2 = getWalletTypeSortWeight(row2);
+			
+			return weight1 - weight2;
+		}
 	};
 	
 	const walletNameColumn: GridColDef<WalletRow, string> = {
@@ -538,7 +629,7 @@ export default function WalletTable(): React.JSX.Element {
 						disableRowSelectionOnClick
 						initialState={{
 							sorting: {
-								sortModel: [{ field: walletNameColumn.field, sort: 'asc' }],
+								sortModel: [{ field: 'walletType', sort: 'asc' }],
 							},
 							filter: {
 								filterModel: {
