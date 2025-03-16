@@ -1,0 +1,19 @@
+name: Run code checks
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      - name: Install packageManager
+        uses: pnpm/action-setup@v4
+      - name: Run checks
+        run: pnpm check:all
