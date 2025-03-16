@@ -166,9 +166,18 @@ function evaluateScamAlerts(
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
 	const requiredFeatures = ((): NonEmptyArray<ScamAlertSupport> => {
 		switch (walletProfile) {
-			case WalletProfile.PAYMENTS:
-				return [sendTransactionWarning]
 			case WalletProfile.GENERIC:
+				return [sendTransactionWarning, contractTransactionWarning, scamUrlWarning]
+			case WalletProfile.BROWSER_EXTENSION:
+			case WalletProfile.WEB:
+			case WalletProfile.MOBILE:
+			case WalletProfile.DESKTOP:
+			case WalletProfile.HARDWARE:
+				// Use the same requirements as GENERIC for other wallet types
+				return [sendTransactionWarning, contractTransactionWarning, scamUrlWarning]
+			default:
+				// In case new wallet profiles are added in the future, provide a reasonable default
+				console.warn(`Unhandled wallet profile: ${walletProfile}, using default scam prevention requirements`);
 				return [sendTransactionWarning, contractTransactionWarning, scamUrlWarning]
 		}
 	})()

@@ -367,9 +367,13 @@ export const rabby: Wallet = {
 			},
 		},
 		license: {
-			browser: License.MIT,
-			desktop: License.MIT,
-			mobile: License.UNLICENSED_VISIBLE,
+			value: License.MIT,
+			ref: [
+				{
+					explanation: 'Rabby is licensed under the MIT license.',
+					url: 'https://github.com/RabbyHub/Rabby/blob/develop/LICENSE',
+				},
+			],
 		},
 		monetization: {
 			revenueBreakdownIsPublic: false,

@@ -5,37 +5,43 @@ import { ExternalLink } from '../../../atoms/ExternalLink'
 import { subsectionWeight } from '@/components/constants'
 import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 import type { LicenseDetailsProps } from '@/types/content/license-details'
+import { ReferenceLinks } from '../../../atoms/ReferenceLinks'
+import { refs, refsWithValue } from '@/schema/reference'
+import type { Wallet } from '@/schema/wallet'
+import { License } from '@/schema/features/license'
 
-export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JSX.Element {
-	let name = <strong>{licenseName(value.license)}</strong>
-	const url = licenseUrl(value.license)
-	if (url !== null) {
-		name = <ExternalLink url={url}>{name}</ExternalLink>
+export function LicenseDetails({ wallet, value }: LicenseDetailsProps) {
+	// First check if wallet is proper RatedWallet with features
+	if (!wallet || !value) {
+		return <Typography variant="body2">License information unavailable.</Typography>
 	}
-	const content = ((): React.ReactNode => {
-		switch (licenseIsFOSS(value.license)) {
-			case FOSS.FOSS:
-				return (
-					<>
-						<strong>{wallet.metadata.displayName}</strong> is licensed under the {name} license,
-						which is a Free and Open-Source Software license.
-					</>
-				)
-			case FOSS.FUTURE_FOSS:
-				return (
-					<>
-						While <strong>{wallet.metadata.displayName}</strong> is not currently Free and
-						Open-Source Software, it is licensed under the {name} license, which binds it to
-						transition to a Free and Open-Source Software license at a later date.
-					</>
-				)
-			case FOSS.NOT_FOSS:
-				throw new Error('This component can only render FOSS or FUTURE_FOSS licenses.')
-		}
-	})()
+
+	// Use the value passed as props since it's already processed
+	const licenseValue = value.license;
+	let licenseRefs = [];
+
+	// Try to get references if features are available 
+	if (wallet.features && wallet.features.license) {
+		// Extract references using the enhanced refsWithValue function
+		licenseRefs = refsWithValue(wallet.features.license);
+	} else if (wallet.metadata && wallet.metadata.repoUrl) {
+		// Fallback to repo URL if no specific license references
+		licenseRefs = [{
+			urls: [{ 
+				url: `${wallet.metadata.repoUrl}/blob/master/LICENSE`,
+				label: `${wallet.metadata.displayName} License File`
+			}],
+			explanation: `${wallet.metadata.displayName}'s license file in the source code repository`
+		}];
+	}
+	
+	// Use displayName from value instead of hardcoding specific licenses
+	const licenseText = value.displayName;
+
 	return (
-		<WrapRatingIcon rating={value.rating}>
-			<Typography fontWeight={subsectionWeight}>{content}</Typography>
-		</WrapRatingIcon>
+		<>
+			<Typography variant="body2">{licenseText}</Typography>
+			{licenseRefs?.length > 0 && <ReferenceLinks refs={licenseRefs} />}
+		</>
 	)
 }

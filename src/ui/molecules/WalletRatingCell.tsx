@@ -32,6 +32,8 @@ import { toFullyQualified } from '@/schema/reference'
 import { WalletProfile } from '@/schema/features/profile'
 import { bugBountyProgram } from '@/schema/attributes/security/bug-bounty-program'
 import { scamPrevention } from '@/schema/attributes/security/scam-prevention'
+import { type ResolvedFeatures } from '@/schema/features'
+import { getAttributeReferences } from '@/schema/attributeReferences'
 
 /**
  * Common properties of rating-type columns.
@@ -123,6 +125,11 @@ export function WalletRatingCell<Vs extends ValueSet>({
 		evalAttrId: keyof EvaluatedGroup<Vs>
 		sticky: boolean
 	} | null>(null)
+	
+	// Keep track of the frozen slice state - when a slice is frozen, it remains highlighted
+	// regardless of mouse movements until explicitly unfrozen
+	const [frozenSliceId, setFrozenSliceId] = useState<keyof EvaluatedGroup<Vs> | null>(null)
+	
 	const highlightedEvalAttr =
 		highlightedSlice === null ? null : evalGroup[highlightedSlice.evalAttrId]
 	const slices: NonEmptyArray<PieSlice> = nonEmptyMap(
@@ -159,96 +166,108 @@ export function WalletRatingCell<Vs extends ValueSet>({
 				tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
 				tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
 				focusChange: (focused: boolean) => {
+					// If there's a frozen slice, ignore all focus change events completely
+					if (frozenSliceId !== null) {
+						return;
+					}
+					
 					if (!focused) {
-						return // Do nothing on de-focus.
+						// Only handle de-focus if not sticky
+						if (highlightedSlice?.evalAttrId === evalAttrId && !highlightedSlice.sticky) {
+							setHighlightedSlice(null);
+						}
+						return; 
 					}
-					if (highlightedSlice === null) {
-						// First to be focused.
-						setHighlightedSlice({
-							evalAttrId,
-							sticky: false,
-						})
-					} else {
-						// Not the first to be focused. Maintain sticky bit.
-						setHighlightedSlice({
-							evalAttrId,
-							sticky: highlightedSlice.sticky,
-						})
+					
+					// If there's already a sticky highlight, don't change it on hover
+					if (highlightedSlice !== null && highlightedSlice.sticky) {
+						return;
 					}
+					
+					// Otherwise, highlight this slice (non-sticky)
+					setHighlightedSlice({
+						evalAttrId,
+						sticky: false,
+					});
 				},
 				click: () => {
-					if (highlightedSlice === null || highlightedSlice.evalAttrId !== evalAttrId) {
-						// Clicking on a slice for the first time, or clicking a different
-						// slice than the current highlighted slice. Highlight and set
-						// sticky bit.
+					// If this slice is already frozen, unfreeze it and clear highlights
+					if (frozenSliceId === evalAttrId) {
+						setFrozenSliceId(null);
+						setHighlightedSlice(null);
+					} else {
+						// Otherwise freeze this slice
+						setFrozenSliceId(evalAttrId);
 						setHighlightedSlice({
 							evalAttrId,
 							sticky: true,
-						})
-					} else {
-						// Clicking on currently-highlighted slice. Flip sticky bit.
-						setHighlightedSlice({
-							evalAttrId,
-							sticky: !highlightedSlice.sticky,
-						})
+						});
 					}
-					// In either case, expand the row.
-					row.setExpanded(true)
+					
+					// In either case, expand the row
+					row.setExpanded(true);
 				},
 			}
 		},
 	)
 	
 	// Get references if there's a highlighted attribute
-	const getAttributeReferences = () => {
-		if (!highlightedEvalAttr || !highlightedEvalAttr.evaluation) {
+	const getHighlightedAttributeReferences = () => {
+		// Use frozen slice ID for references if available
+		const activeEvalAttrId = frozenSliceId || (highlightedSlice?.evalAttrId);
+		
+		if (!activeEvalAttrId) {
+			return [];
+		}
+		
+		const activeEvalAttr = evalGroup[activeEvalAttrId];
+		
+		if (!activeEvalAttr || !activeEvalAttr.evaluation) {
 			return [];
 		}
 
-		// Use existing reference extraction for all attributes
-		const defaultReferences = (highlightedEvalAttr.evaluation.references) || 
-		       (highlightedEvalAttr.evaluation.value ? refs(highlightedEvalAttr.evaluation.value) : []);
+		// First try to get references from the attribute evaluations
+		const defaultReferences = (activeEvalAttr.evaluation.references) || 
+		       (activeEvalAttr.evaluation.value ? refs(activeEvalAttr.evaluation.value) : []);
 		       
-		// If we don't have any references and this is the scam prevention attribute,
-		// we need to add a special extraction case for scam alerts
-		if (defaultReferences.length === 0 && 
-		    highlightedEvalAttr.attribute.id === 'scamPrevention' &&
-		    highlightedEvalAttr.evaluation.value) {
-			
-			try {
-				// Try to extract references from specific wallet examples that we know have references
-				// This isn't ideal but helps us display something
-				if (row.wallet.metadata.id === 'daimo' || row.wallet.metadata.id === 'rabby') {
-					return [
-						{ 
-							urls: [{ 
-								url: row.wallet.metadata.id === 'daimo' 
-								  ? 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/apps/daimo-mobile/src/view/screen/send/SendTransferScreen.tsx#L234-L238'
-								  : 'https://github.com/RabbyHub/rabby-security-engine',
-								label: row.wallet.metadata.id === 'daimo'
-								  ? 'Daimo code on GitHub'
-								  : 'Rabby Security engine' 
-							}],
-							explanation: row.wallet.metadata.id === 'daimo'
-								? 'Daimo shows a warning when sending funds to a user that you have not sent funds to in the past.'
-								: 'Rabby security engine provides scam protection features.'
-						}
-					];
-				}
-			} catch (e) {
-				console.error('Error extracting scam prevention references:', e);
-			}
+		// If we have references from evaluation, return them
+		if (defaultReferences.length > 0) {
+			return defaultReferences;
 		}
 		
-		return defaultReferences;
+		// Otherwise use our attribute references helper
+		const attributeId = activeEvalAttr.attribute.id;
+		const category = attrGroup.id;
+		
+		// Use the imported getAttributeReferences helper
+		return getAttributeReferences(
+			row.wallet, 
+			category, 
+			attributeId
+		);
 	};
 	
-	const attributeReferences = getAttributeReferences();
+	const attributeReferences = getHighlightedAttributeReferences();
 	
 	// Make sure references are fully qualified
 	const qualifiedReferences = attributeReferences.length > 0 
 		? toFullyQualified(attributeReferences as any) // Cast to any to bypass TypeScript error
 		: [];
+		
+	// Add debug logging to help troubleshoot
+	if (highlightedEvalAttr) {
+		console.log(
+			`References for ${attrGroup.id}/${highlightedEvalAttr.attribute.id}:`, 
+			JSON.stringify({
+				attributeId: highlightedEvalAttr.attribute.id,
+				category: attrGroup.id,
+				wallet: row.wallet.metadata.id,
+				hasDefaultRefs: attributeReferences.length > 0,
+				qualifiedRefsCount: qualifiedReferences.length,
+				qualifiedRefs: qualifiedReferences
+			}, null, 2)
+		);
+	}
 	
 	return (
 		<Box
@@ -258,7 +277,8 @@ export function WalletRatingCell<Vs extends ValueSet>({
 			gap="4px"
 			sx={row.rowWideStyle}
 			onMouseLeave={() => {
-				if (highlightedSlice !== null && !highlightedSlice.sticky) {
+				// Only clear non-sticky highlights and only if not frozen
+				if (frozenSliceId === null && highlightedSlice !== null && !highlightedSlice.sticky) {
 					setHighlightedSlice(null)
 				}
 			}}
@@ -268,6 +288,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 					pieId={attrGroup.id}
 					slices={slices}
 					highlightedSliceId={
+						frozenSliceId !== null ? frozenSliceId.toString() : 
 						highlightedSlice === null ? null : highlightedSlice.evalAttrId.toString()
 					}
 					arc={Arc.FULL}

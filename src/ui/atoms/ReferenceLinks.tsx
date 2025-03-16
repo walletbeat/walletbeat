@@ -20,8 +20,38 @@ export function ReferenceLinks({
 		return <></>
 	}
 
-	// Debug check
-	console.log("References:", JSON.stringify(references, null, 2));
+	// Debug check - more comprehensive logging
+	console.log("ReferenceLinks component receiving:", 
+		JSON.stringify({
+			referencesLength: references.length,
+			referencesType: Array.isArray(references) ? 'array' : typeof references,
+			firstReference: references[0] ? {
+				hasUrls: !!references[0].urls,
+				urlsLength: references[0].urls?.length,
+				hasExplanation: !!references[0].explanation,
+				urls: references[0].urls || references[0].url
+			} : null
+		}, null, 2)
+	);
+	
+	// Make sure we have valid references with urls
+	const validReferences = references.filter(ref => {
+		// Check if the reference has a valid url property
+		const hasValidUrl = 
+			(ref.urls && Array.isArray(ref.urls) && ref.urls.length > 0) ||
+			(ref.url && typeof ref.url === 'string');
+		
+		if (!hasValidUrl) {
+			console.warn("Invalid reference without URL:", ref);
+		}
+		
+		return hasValidUrl;
+	});
+	
+	if (validReferences.length === 0) {
+		console.warn("No valid references with URLs found");
+		return <></>;
+	}
 
 	return (
 		<Box
@@ -52,7 +82,7 @@ export function ReferenceLinks({
 			
 			{/* References content */}
 			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-				{references.map((ref, refIndex) => (
+				{validReferences.map((ref, refIndex) => (
 					<Box key={refIndex}>
 						{/* Reference links */}
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 0.5 }}>

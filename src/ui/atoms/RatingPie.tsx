@@ -214,12 +214,12 @@ export function RatingPie({
 		? {
 			innerRadius: 0,
 			outerRadius: outerRadius * 0.95,
-			color: isDarkMode ? 'gray' : '#e0e0e0',
+			opacity: 0.5,
 		}
 		: {
 			innerRadius: innerRadius + (isDarkMode ? 0 : 10),
 			outerRadius: outerRadius - (isDarkMode ? 0 : 10),
-			color: isDarkMode ? 'gray' : '#e0e0e0',
+			opacity: 0.5,
 		};
 	
 	const highlightedSettings = {

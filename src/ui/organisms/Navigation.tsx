@@ -345,8 +345,15 @@ export function Navigation({
 				</a>
 				<ThemeSwitcher />
 			</div>
+			
+			{/* Desktop Search Component - ensures the search is always visible on desktop */}
+			{prefix && (
+				<div className="px-8 mb-6 w-full">
+					{prefix}
+				</div>
+			)}
+			
 			<div className="flex flex-col gap-2 px-4">
-				{prefix}
 				{nonEmptyMap(groups, (group, groupIndex) => (
 					<NavigationGroup
 						key={`navigationGroup-${group.id}`}

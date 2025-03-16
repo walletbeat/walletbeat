@@ -257,10 +257,10 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			- [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib)
 			- [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier)
 			- [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol)
+			- [WebAuthn.sol](https://github.com/base/webauthn-sol) which falls back to Fresh Crypto Lib
 
 		2. **Partial**: Using libraries that work but are less optimal:
 			- [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib)
-			- [WebAuthn.sol](https://github.com/base/webauthn-sol) which falls back to Fresh Crypto Lib
 			- Other less common verification libraries
 
 		3. **Fail**: Not implementing passkeys or using a non-recognized library.

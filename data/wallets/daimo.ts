@@ -19,6 +19,7 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { nconsigny } from '../contributors/nconsigny'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { Variant } from '@/schema/variants'
 
 export const daimo: Wallet = {
 	metadata: {
@@ -45,7 +46,7 @@ export const daimo: Wallet = {
 		}
 	},
 	features: {
-		profile: WalletProfile.PAYMENTS,
+		profile: WalletProfile.MOBILE,
 		chainConfigurability: {
 			l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,
 			otherRpcEndpoints: RpcEndpointConfiguration.NO,
@@ -287,7 +288,15 @@ export const daimo: Wallet = {
 				},
 			},
 		},
-		license: License.GPL_3_0,
+		license: {
+			value: License.GPL_3_0,
+			ref: [
+				{
+					explanation: 'Daimo is licensed under the GPL-3.0 license.',
+					url: 'https://github.com/daimo-eth/daimo/blob/master/LICENSE',
+				},
+			],
+		},
 		monetization: {
 			revenueBreakdownIsPublic: false,
 			strategies: {
@@ -338,9 +347,10 @@ export const daimo: Wallet = {
 		},
 	},
 	variants: {
-		mobile: true,
-		browser: false,
-		desktop: false,
-		embedded: false,
+		[Variant.MOBILE]: true,
+		[Variant.BROWSER]: false,
+		[Variant.DESKTOP]: false,
+		[Variant.EMBEDDED]: false,
+		[Variant.HARDWARE]: false,
 	},
 }

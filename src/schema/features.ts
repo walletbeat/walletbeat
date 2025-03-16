@@ -1,5 +1,5 @@
 import type { DataCollection } from './features/privacy/data-collection'
-import type { License } from './features/license'
+import type { License, LicenseWithValue } from './features/license'
 import { type ResolvedFeature, resolveFeature, type Variant, type VariantFeature } from './variants'
 import type { Monetization } from './features/monetization'
 import type { WithRef } from './reference'
@@ -96,7 +96,7 @@ export interface WalletFeatures {
 	addressResolution: VariantFeature<WithRef<AddressResolution>>
 
 	/** License of the wallet. */
-	license: VariantFeature<WithRef<License>>
+	license: VariantFeature<LicenseWithValue | License>
 
 	/** The monetization model of the wallet. */
 	monetization: VariantFeature<Monetization>
@@ -142,7 +142,7 @@ export interface ResolvedFeatures {
 	multiAddress: ResolvedFeature<Support>
 	integration: WalletIntegration
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
-	license: ResolvedFeature<WithRef<License>>
+	license: ResolvedFeature<LicenseWithValue | License>
 	monetization: ResolvedFeature<Monetization>
 	transparency: {
 		feeTransparency: ResolvedFeature<FeeTransparencySupport> | null

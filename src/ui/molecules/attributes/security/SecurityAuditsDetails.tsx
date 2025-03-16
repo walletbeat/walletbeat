@@ -19,10 +19,28 @@ export function SecurityAuditsDetails({
 	auditedInLastYear,
 	hasUnaddressedFlaws,
 }: SecurityAuditsDetailsProps): React.JSX.Element {
+	// Safety check for value and audits
+	if (!value || !value.securityAudits) {
+		return (
+			<WrapRatingIcon rating="UNRATED">
+				<Typography fontWeight={subsectionWeight}>
+					No security audit information is available.
+				</Typography>
+			</WrapRatingIcon>
+		);
+	}
+	
 	const audits = value.securityAudits
 	if (!isNonEmptyArray(audits)) {
-		throw new Error('This component cannot be used to render an empty set of security audits.')
+		return (
+			<WrapRatingIcon rating={value.rating}>
+				<Typography fontWeight={subsectionWeight}>
+					{wallet.metadata.displayName} has not undergone any security audits.
+				</Typography>
+			</WrapRatingIcon>
+		);
 	}
+	
 	const sortedAudits = nonEmptySorted(
 		audits,
 		(audit1, audit2) => dateCompare(audit1.auditDate, audit2.auditDate),
