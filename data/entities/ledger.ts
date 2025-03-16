@@ -1,4 +1,4 @@
-import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
+import type { CorporateEntity, WalletDeveloper } from '@/schema/entity';
 
 export const ledger: CorporateEntity & WalletDeveloper = {
 	id: 'ledger',
@@ -24,4 +24,5 @@ export const ledger: CorporateEntity & WalletDeveloper = {
 	crunchbase: 'https://www.crunchbase.com/organization/ledger-2',
 	linkedin: 'https://www.linkedin.com/company/ledgerhq/',
 	twitter: 'https://x.com/Ledger',
-} 
+	farcaster: 'https://warpcast.com/ledgerofficial',
+};

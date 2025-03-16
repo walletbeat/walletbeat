@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
 
 export const leastAuthority: CorporateEntity & SecurityAuditor = {
 	id: 'least-authority',
@@ -21,6 +21,10 @@ export const leastAuthority: CorporateEntity & SecurityAuditor = {
 	},
 	jurisdiction: 'Berlin, Germany',
 	url: 'https://leastauthority.com/',
+	repoUrl: 'https://github.com/LeastAuthority',
 	privacyPolicy: 'https://leastauthority.com/privacy-policy/',
 	crunchbase: 'https://www.crunchbase.com/organization/least-authority-enterprises',
-}
+	linkedin: 'https://www.linkedin.com/company/leastauthority/',
+	twitter: 'https://x.com/LeastAuthority',
+	farcaster: 'https://warpcast.com/leastauthority',
+};

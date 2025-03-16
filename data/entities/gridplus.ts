@@ -1,4 +1,4 @@
-import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
+import type { CorporateEntity, WalletDeveloper } from '@/schema/entity';
 
 export const gridplus: CorporateEntity & WalletDeveloper = {
 	id: 'gridplus',
@@ -19,8 +19,10 @@ export const gridplus: CorporateEntity & WalletDeveloper = {
 	},
 	jurisdiction: 'United States',
 	url: 'https://gridplus.io/',
+	repoUrl: 'https://github.com/GridPlus',
 	privacyPolicy: 'https://gridplus.io/policies/privacy-policy',
 	linkedin: 'https://www.linkedin.com/company/gridplus/',
 	twitter: 'https://x.com/gridplus',
 	crunchbase: 'https://www.crunchbase.com/organization/gridplus',
-} 
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
+};

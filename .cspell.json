@@ -37,6 +37,7 @@
     "fontspec",
     "FOSS",
     "Frontends",
+    "gridplus",
     "hmargin",
     "Interrobang",
     "IPFS",
@@ -88,7 +89,8 @@
     "Vitalik",
     "vmargin",
     "walletbeat",
-    "Warpcast"
+    "Warpcast",
+    "Yanssie"
   ],
   "flagWords": [],
   "ignorePaths": [
