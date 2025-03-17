@@ -336,7 +336,11 @@ export function Navigation({
 			style={{ backgroundColor: 'var(--navigation-bg)' }}
 		>
 			<div className="flex justify-between items-center w-full gap-4 px-8 mb-4">
-				<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
+				<a
+					href="/"
+					className="text-2xl font-bold italic whitespace-nowrap"
+					style={{ color: 'var(--logo-color)' }}
+				>
 					~ WalletBeat
 				</a>
 				<ThemeSwitcher />
