@@ -118,7 +118,7 @@ export const HomePage: FC = () => (
 			},
 		]}
 	>
-		<div className="flex flex-col mt-10 gap-4">
+		<div className="flex flex-col">
 			<div>
 				<div className="bg-gradient-to-r from-[var(--banner-gradient-from)] to-[var(--banner-gradient-to)] px-8 py-6 flex justify-between items-center flex-wrap">
 					<div className="flex flex-col gap-2 py-8">
