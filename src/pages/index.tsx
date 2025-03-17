@@ -149,7 +149,7 @@ export const HomePage: FC = () => (
 				</div>
 			</div>
 
-			<div className="w-full flex flex-col gap-2">
+			{/* <div className="w-full flex flex-col gap-2">
 				<h2 className="font-bold">Find a wallet that suits you</h2>
 				<div className="flex gap-4 w-full flex-wrap xl:flex-nowrap flex-col xl:flex-row">
 					{[
@@ -173,7 +173,7 @@ export const HomePage: FC = () => (
 						</div>
 					))}
 				</div>
-			</div>
+			</div> */}
 
 			<div className="w-full flex flex-col gap-2">
 				<h2 className="font-bold">Explore all the wallets</h2>
