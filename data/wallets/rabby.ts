@@ -33,8 +33,8 @@ export const rabby: Wallet = {
 		contributors: [polymutex],
 		lastUpdated: '2024-12-15',
 		multiWalletType: {
-			categories: [WalletTypeCategory.EOA]
-		}
+			categories: [WalletTypeCategory.EOA],
+		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -106,7 +106,7 @@ export const rabby: Wallet = {
 							url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
 							label: 'Rabby API code on npmjs.com',
 							explanation:
-								'Rabby checks whether the URL you are visiting is on a scam list. It sends the URL along with Ethereum address in non-proxied HTTP requests for API methods `getOriginIsScam`, `getOriginPopularityLevel`, `getRecommendChains`, and others.',
+								'Rabby checks whether the domain you are visiting is on a scam list. It sends the domain along with Ethereum address in non-proxied HTTP requests for API methods `getOriginIsScam`, `getOriginPopularityLevel`, `getRecommendChains`, and others.',
 						},
 					],
 				}),
@@ -301,20 +301,24 @@ export const rabby: Wallet = {
 				ethereumL1: notSupported,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {
-					[HardwareWalletType.LEDGER]: featureSupported,
-					[HardwareWalletType.TREZOR]: featureSupported,
-					[HardwareWalletType.KEYSTONE]: featureSupported,
-					[HardwareWalletType.GRIDPLUS]: featureSupported,
-					[HardwareWalletType.OTHER]: featureSupported,
+				desktop: {
+					supportedWallets: {
+						[HardwareWalletType.LEDGER]: featureSupported,
+						[HardwareWalletType.TREZOR]: featureSupported,
+						[HardwareWalletType.KEYSTONE]: featureSupported,
+						[HardwareWalletType.GRIDPLUS]: featureSupported,
+						[HardwareWalletType.OTHER]: featureSupported,
+					},
+					ref: [
+						{
+							url: 'https://rabby.io/download',
+							explanation:
+								'Rabby Desktop supports Ledger, Trezor, OneKey, Keystone, AirGap Vault, CoolWallet, GridPlus, and NGRAVE ZERO hardware wallets. Note that this support is only available in the desktop version, not in the mobile or browser extension versions.',
+						},
+					],
 				},
-				ref: [
-					{
-						url: 'https://rabby.io/download',
-						explanation: 'Rabby Desktop supports Ledger, Trezor, OneKey, Keystone, AirGap Vault, CoolWallet, GridPlus, and NGRAVE ZERO hardware wallets. Note that this support is only available in the desktop version, not in the mobile or browser extension versions.'
-					}
-				],
 			},
+			hardwareWalletClearSigning: null,
 		},
 		privacy: {
 			dataCollection: {
@@ -413,5 +417,6 @@ export const rabby: Wallet = {
 		browser: true,
 		desktop: true,
 		embedded: false,
+		hardware: false,
 	},
 }
