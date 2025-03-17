@@ -120,10 +120,6 @@ export const HomePage: FC = () => (
 	>
 		<div className="flex flex-col mt-10 gap-4">
 			<div>
-				<div className="w-full px-8 text-inverse bg-accent py-2 text-center">
-					Wallets listed on this page are not official endoresements, and are provided for
-					informational purposes only.
-				</div>
 				<div className="bg-gradient-to-r from-[var(--banner-gradient-from)] to-[var(--banner-gradient-to)] px-8 py-6 flex justify-between items-center flex-wrap">
 					<div className="flex flex-col gap-2 py-8">
 						<div className="text-sm text-secondary">

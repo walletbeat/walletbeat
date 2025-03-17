@@ -332,10 +332,10 @@ export function Navigation({
 	return (
 		<div
 			key="navigationBox"
-			className="flex flex-col gap-0 w-full md:max-w-xs flex-0 py-8 sticky top-0 h-screen overflow-y-auto"
+			className="flex flex-col gap-0 w-full md:max-w-xs flex-0 sticky top-0 h-screen overflow-y-auto"
 			style={{ backgroundColor: 'var(--navigation-bg)' }}
 		>
-			<div className="flex justify-between items-center w-full gap-4 px-8 mb-4">
+			<div className="flex justify-between items-center w-full gap-4 px-8 mb-4 mt-8">
 				<a
 					href="/"
 					className="text-2xl font-bold italic whitespace-nowrap"
@@ -359,6 +359,10 @@ export function Navigation({
 						activeItemId={activeItemId}
 					/>
 				))}
+			</div>
+			<div className="mt-auto px-8 py-4 text-inverse bg-accent text-sm text-center">
+				Wallets listed on this page are not official endoresements, and are provided for
+				informational purposes only.
 			</div>
 		</div>
 	)
