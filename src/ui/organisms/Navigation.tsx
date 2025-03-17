@@ -333,6 +333,7 @@ export function Navigation({
 		<div
 			key="navigationBox"
 			className="flex flex-col gap-0 w-full md:max-w-xs flex-0 py-8 sticky top-0 h-screen overflow-y-auto"
+			style={{ backgroundColor: 'var(--navigation-bg)' }}
 		>
 			<div className="flex justify-between items-center w-full gap-4 px-8 mb-4">
 				<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">

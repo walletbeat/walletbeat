@@ -12,6 +12,7 @@
 		--background-secondary: #efefef;
 		--background-tertiary: #eeeff4;
 		--accent: #6c24e0;
+		--accent-light: #eee3ff;
 		--logo-color: var(--accent);
 		--text-primary: #222222;
 		--text-secondary: #22242b;
@@ -20,6 +21,7 @@
 		--banner-gradient-from: #ecedfd;
 		--banner-gradient-to: #e8f6f2;
 		--icon-color: #222222; /* Add icon color for light mode */
+		--navigation-bg: #f7f7f7; /* Navigation background color for light mode */
 
 		/* Hashtag styling for light mode */
 		--hashtag-text: #1976d2; /* Blue that's readable on light background */
@@ -34,10 +36,11 @@
 }
 
 html.dark {
-	--background-primary: #22242b;
+	--background-primary: #141414;
 	--background-secondary: #17191f;
 	--background-tertiary: #17191f;
 	--accent: #6c24e0;
+	--accent-light: #18023a;
 	--logo-color: var(--text-primary);
 	--text-primary: #efefef;
 	--text-secondary: #e4e5eb;
@@ -46,6 +49,7 @@ html.dark {
 	--banner-gradient-from: #15151a;
 	--banner-gradient-to: #212126;
 	--icon-color: #efefef; /* Add icon color for dark mode */
+	--navigation-bg: #000000; /* Navigation background color for dark mode */
 
 	/* Hashtag styling for dark mode */
 	--hashtag-text: #90caf9; /* Lighter blue that's readable on dark background */
