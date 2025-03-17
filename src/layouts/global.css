@@ -16,11 +16,29 @@
 }
 
 :root {
+	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
+
+	--active-transitionInDuration: 0.125s;
+	--active-transitionOutDuration: 0.2s;
+	--active-scale: 0.99;
+	--active-opacity: 0.8;
+
 	scroll-behavior: smooth;
 }
 
 * {
 	font-family: 'Work Sans', 'Work Sans Fallback', 'Noto Color Emoji';
+}
+
+.row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.75em;
+
+	&.inline {
+		gap: 0.5ch;
+	}
 }
 
 code {
