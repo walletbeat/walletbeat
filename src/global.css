@@ -41,7 +41,7 @@ html.dark {
 	--background-tertiary: #17191f;
 	--accent: #6c24e0;
 	--accent-light: #18023a;
-	--logo-color: #c8a5ff;
+	--logo-color: var(--text-primary);
 	--text-primary: #efefef;
 	--text-secondary: #e4e5eb;
 	--text-inverse: #ffffff;

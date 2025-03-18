@@ -120,28 +120,20 @@ export const HomePage: FC = () => (
 	>
 		<div className="flex flex-col">
 			<div>
-				<div className="bg-gradient-to-r from-[var(--banner-gradient-from)] to-[var(--banner-gradient-to)] px-8 py-6 flex justify-between items-center flex-wrap">
+				<div className="bg-accent px-8 py-6 flex justify-between items-center flex-wrap min-h-96">
 					<div className="flex flex-col gap-2 py-8">
-						<div className="text-sm text-secondary">
-							HOME / WALLETS / <span>FIND WALLET</span>
-						</div>
-						<h1 className="text-3xl font-bold">Who watches the wallets?</h1>
+						<h1 className="text-4xl font-bold">Who watches the wallets?</h1>
 						<p>
 							Alpha version; work in progress. For content contributions, please see{' '}
-							<a
-								href="https://github.com/fluidkey/walletbeat"
-								className="link"
-								target="_blank"
-								rel="noreferrer"
-							>
+							<a href="https://github.com/fluidkey/walletbeat" target="_blank" rel="noreferrer">
 								GitHub
 							</a>
 							.
 						</p>
 					</div>
-					<div className="flex items-center">
+					{/* <div className="flex items-center">
 						<img src="/banner.png" className="h-[210px] w-auto" />
-					</div>
+					</div> */}
 				</div>
 			</div>
 
@@ -171,8 +163,8 @@ export const HomePage: FC = () => (
 				</div>
 			</div> */}
 
-			<div className="w-full flex flex-col gap-2">
-				<h2 className="font-bold">Explore all the wallets</h2>
+			<div className="w-full flex flex-col gap-2 p-4 md:p-8">
+				{/* <h2 className="font-bold">Explore all the wallets</h2> */}
 				<WalletTable />
 			</div>
 		</div>
