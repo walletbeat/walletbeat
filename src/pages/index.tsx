@@ -120,12 +120,23 @@ export const HomePage: FC = () => (
 	>
 		<div className="flex flex-col">
 			<div>
-				<div className="bg-accent px-8 py-6 flex justify-between items-center flex-wrap min-h-96">
-					<div className="flex flex-col gap-2 py-8">
-						<h1 className="text-4xl font-bold">Who watches the wallets?</h1>
-						<p>
+				<div className="bg-accent px-8 py-6 flex justify-between items-center flex-wrap min-h-96 relative overflow-hidden">
+					<div className="absolute inset-0 bg-black/50 z-0"></div>
+					<img
+						src="/hero.jpg"
+						alt="Hero background"
+						className="absolute inset-0 w-full h-full object-cover"
+					/>
+					<div className="flex flex-col gap-2 py-8 relative z-10">
+						<h1 className="text-4xl font-bold text-white">Who watches the wallets?</h1>
+						<p className="text-white">
 							Alpha version; work in progress. For content contributions, please see{' '}
-							<a href="https://github.com/fluidkey/walletbeat" target="_blank" rel="noreferrer">
+							<a
+								href="https://github.com/fluidkey/walletbeat"
+								target="_blank"
+								rel="noreferrer"
+								className="text-white underline"
+							>
 								GitHub
 							</a>
 							.

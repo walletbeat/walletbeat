@@ -11,7 +11,7 @@
 		--background-primary: #fff;
 		--background-secondary: #efefef;
 		--background-tertiary: #eeeff4;
-		--accent: #6c24e0;
+		--accent: #140257;
 		--accent-light: #eee3ff;
 		--logo-color: var(--accent);
 		--text-primary: #222222;
@@ -39,7 +39,7 @@ html.dark {
 	--background-primary: #141414;
 	--background-secondary: #17191f;
 	--background-tertiary: #17191f;
-	--accent: #6c24e0;
+	--accent: #7394c9;
 	--accent-light: #18023a;
 	--logo-color: var(--text-primary);
 	--text-primary: #efefef;
