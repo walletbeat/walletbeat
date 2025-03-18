@@ -9,11 +9,12 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import type { Metadata } from 'next';
 import { generateBasicMetadata } from '@/beta/components/metadata';
 import { IconLink } from '@/beta/components/ui/atoms/IconLink';
+import { betaSiteRoot } from '@/beta/constants';
 
 export function generateMetadata(): Metadata {
   return generateBasicMetadata({
     title: 'Walletbeat',
-    route: '/beta',
+    route: betaSiteRoot,
   });
 }
 
@@ -48,7 +49,7 @@ export default function Page(): React.JSX.Element {
         </Typography>
         <Box display="flex" flexDirection="row" alignItems="center" mt={1} mb={1}>
           <Typography component="div" variant="caption">
-            <IconLink href="/beta/faq" IconComponent={HelpCenterIcon}>
+            <IconLink href={`${betaSiteRoot}/faq`} IconComponent={HelpCenterIcon}>
               Frequently asked questions
             </IconLink>
           </Typography>
@@ -56,7 +57,7 @@ export default function Page(): React.JSX.Element {
             |
           </Typography>
           <Typography component="div" variant="caption">
-            <IconLink href="/beta/about" IconComponent={FoundationIcon}>
+            <IconLink href={`${betaSiteRoot}/about`} IconComponent={FoundationIcon}>
               About Walletbeat
             </IconLink>
           </Typography>

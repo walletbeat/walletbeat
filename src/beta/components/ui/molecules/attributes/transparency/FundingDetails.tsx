@@ -1,27 +1,21 @@
-import type { RatedWallet } from '@/beta/schema/wallet';
 import { Box } from '@mui/material';
 import type React from 'react';
 import { subsectionWeight } from '@/beta/components/constants';
 import { ReferenceList } from '../../../atoms/ReferenceList';
 import {
-  type Monetization,
   monetizationStrategies,
   monetizationStrategyName,
 } from '@/beta/schema/features/monetization';
 import { JoinedList } from '../../../atoms/JoinedList';
 import { refs } from '@/beta/schema/reference';
-import type { FundingValue } from '@/beta/schema/attributes/transparency/funding';
 import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
+import type { FundingDetailsProps } from '@/beta/types/content/funding-details';
 
 export function FundingDetails({
   wallet,
   value,
   monetization,
-}: {
-  wallet: RatedWallet;
-  value: FundingValue;
-  monetization: Monetization;
-}): React.JSX.Element {
+}: FundingDetailsProps): React.JSX.Element {
   const strategies = monetizationStrategies(monetization)
     .filter(({ strategy, value }) => value === true)
     .map(({ strategy, value }) => strategy);

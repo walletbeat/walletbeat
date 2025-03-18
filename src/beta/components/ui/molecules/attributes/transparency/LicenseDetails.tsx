@@ -1,19 +1,12 @@
-import type { RatedWallet } from '@/beta/schema/wallet';
 import { Typography } from '@mui/material';
 import { FOSS, licenseIsFOSS, licenseName, licenseUrl } from '@/beta/schema/features/license';
 import type React from 'react';
 import { ExternalLink } from '../../../atoms/ExternalLink';
 import { subsectionWeight } from '@/beta/components/constants';
-import type { OpenSourceValue } from '@/beta/schema/attributes/transparency/open-source';
 import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
+import type { LicenseDetailsProps } from '@/beta/types/content/license-details';
 
-export function LicenseDetails({
-  wallet,
-  value,
-}: {
-  wallet: RatedWallet;
-  value: OpenSourceValue;
-}): React.JSX.Element {
+export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JSX.Element {
   let name = <strong>{licenseName(value.license)}</strong>;
   const url = licenseUrl(value.license);
   if (url !== null) {

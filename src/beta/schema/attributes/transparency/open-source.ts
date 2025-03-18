@@ -8,9 +8,9 @@ import {
   exampleRating,
 } from '@/beta/schema/attributes';
 import { pickWorstRating, unrated } from '../common';
-import { component, markdown, mdParagraph, paragraph, sentence } from '@/beta/types/text';
+import { markdown, mdParagraph, paragraph, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
-import { LicenseDetails } from '@/beta/components/ui/molecules/attributes/transparency/LicenseDetails';
+import { licenseDetailsContent } from '@/beta/types/content/license-details';
 
 const brand = 'attributes.transparency.open_source';
 export type OpenSourceValue = Value & {
@@ -34,7 +34,7 @@ function open(license: License): Evaluation<OpenSourceValue> {
       license,
       __brand: brand,
     },
-    details: component(LicenseDetails),
+    details: licenseDetailsContent(),
   };
 }
 
@@ -54,7 +54,7 @@ function openInTheFuture(license: License): Evaluation<OpenSourceValue> {
       license,
       __brand: brand,
     },
-    details: component(LicenseDetails),
+    details: licenseDetailsContent(),
   };
 }
 

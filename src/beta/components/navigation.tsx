@@ -4,26 +4,27 @@ import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 import ForumIcon from '@mui/icons-material/Forum';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import FoundationIcon from '@mui/icons-material/Foundation';
+import { betaSiteRoot } from '../constants';
 
 export const navigationHome: NavigationLinkItem = {
   id: 'wallet-table',
   icon: <HomeIcon />,
   title: 'Walletbeat',
-  href: '/beta',
+  href: betaSiteRoot,
 };
 
 export const navigationFaq: NavigationLinkItem = {
   id: 'faq',
   icon: <HelpCenterIcon />,
   title: 'FAQ',
-  href: '/beta/faq',
+  href: `${betaSiteRoot}/faq`,
 };
 
 export const navigationAbout: NavigationLinkItem = {
   id: 'about',
   icon: <FoundationIcon />,
   title: 'About Walletbeat',
-  href: '/beta/about',
+  href: `${betaSiteRoot}/about`,
 };
 
 export const navigationRepository: NavigationLinkItem = {

@@ -7,6 +7,7 @@ import Markdown, { type Components } from 'react-markdown';
 import { ExternalLink } from './ExternalLink';
 import { lookupEip } from '@/beta/data/eips';
 import { EipLink } from './EipLink';
+import { trimWhitespacePrefix } from '@/beta/types/utils/text';
 
 export interface MarkdownOwnProps {
   markdownTransform?: (markdown: string) => string;
@@ -111,6 +112,7 @@ export function MarkdownBase({
       </li>
     ),
   };
+  markdown = trimWhitespacePrefix(markdown);
   if (markdownTransform !== undefined) {
     markdown = markdownTransform(markdown);
   }

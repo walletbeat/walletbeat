@@ -2,7 +2,7 @@ import { nonEmptyMap, type NonEmptyArray, type NonEmptyRecord } from '@/beta/typ
 import type { ResolvedFeatures } from './features';
 import type { AtLeastOneVariant } from './variants';
 import type { MaybeUnratedScore, Score } from './score';
-import type { Paragraph, Renderable, Sentence, WithTypography } from '@/beta/types/text';
+import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/beta/types/content';
 import type { RatedWallet, WalletMetadata } from './wallet';
 
 /**
@@ -208,7 +208,7 @@ export interface Evaluation<V extends Value> {
    * to improve this rating. Should only be populated for ratings that are
    * not perfect.
    */
-  howToImprove?: Renderable<WithTypography<EvaluationData<V>>>;
+  howToImprove?: RenderableTypography<EvaluationData<V>>;
 }
 
 /**
@@ -275,10 +275,10 @@ export interface Attribute<V extends Value> {
   question: Sentence<WalletMetadata>;
 
   /** A paragraph explaining why this attribute is important to users. */
-  why: Renderable<WithTypography>;
+  why: RenderableTypography;
 
   /** General explanation of how wallets are rated on this attribute. */
-  methodology: Renderable<WithTypography>;
+  methodology: RenderableTypography;
 
   /** Explanations of what a wallet can do to achieve each rating. */
   ratingScale:
@@ -291,7 +291,7 @@ export interface Attribute<V extends Value> {
         display: 'simple';
 
         /** The content to display to explain the rating scale. */
-        content: Renderable<WithTypography>;
+        content: RenderableTypography;
       }
     | {
         /**
@@ -322,7 +322,8 @@ export interface Attribute<V extends Value> {
         fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>;
       };
 
-  /** Evaluate the attribute for a given set of wallet features.
+  /**
+   * Evaluate the attribute for a given set of wallet features.
    * This function is the default way in which attributes are evaluated.
    * However, a wallet may override the evaluation of an attribute using
    * overrides.

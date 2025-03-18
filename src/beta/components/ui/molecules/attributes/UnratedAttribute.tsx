@@ -1,10 +1,12 @@
-import type { RatedWallet } from '@/beta/schema/wallet';
 import { WrapRatingIcon } from '../../atoms/WrapRatingIcon';
-import { Rating } from '@/beta/schema/attributes';
+import { Rating, type Value } from '@/beta/schema/attributes';
 import { Typography } from '@mui/material';
 import { ExternalLink } from '../../atoms/ExternalLink';
+import type { UnratedAttributeProps } from '@/beta/types/content/unrated-attribute';
 
-export function UnratedAttribute({ wallet }: { wallet: RatedWallet }): React.JSX.Element {
+export function UnratedAttribute<V extends Value>({
+  wallet,
+}: UnratedAttributeProps<V>): React.JSX.Element {
   return (
     <WrapRatingIcon rating={Rating.UNRATED}>
       <Typography>

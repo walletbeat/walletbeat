@@ -7,7 +7,7 @@ import {
   exampleRating,
 } from '@/beta/schema/attributes';
 import { exempt, pickWorstRating, unrated } from '../common';
-import { commaListFormat, markdown, paragraph, sentence } from '@/beta/types/text';
+import { markdown, paragraph, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
 import { Variant } from '../../variants';
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips';
@@ -16,6 +16,7 @@ import { eip6963 } from '@/beta/data/eips/eip-6963';
 import { eip2700 } from '@/beta/data/eips/eip-2700';
 import type { BrowserIntegrationEip } from '../../features/integration';
 import { getEip } from '@/beta/data/eips';
+import { commaListFormat } from '@/beta/types/utils/text';
 
 type ResolvedSupport = Record<BrowserIntegrationEip, boolean>;
 

@@ -15,7 +15,7 @@ import {
   type MultiAddressHandling,
   MultiAddressPolicy,
 } from '@/beta/schema/features/privacy/data-collection';
-import { markdown, paragraph, sentence } from '@/beta/types/text';
+import { markdown, paragraph, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
 
 const brand = 'attributes.privacy.multi_address_correlation';

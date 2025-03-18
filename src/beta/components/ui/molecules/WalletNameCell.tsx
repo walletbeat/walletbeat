@@ -15,6 +15,8 @@ import { WalletIcon } from '../atoms/WalletIcon';
 import { IconLink } from '../atoms/IconLink';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../variants';
+import { RenderTypographicContent } from '../atoms/RenderTypographicContent';
+import { betaSiteRoot } from '@/beta/constants';
 
 const walletIconSize = shortRowHeight / 2;
 
@@ -81,7 +83,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
           </IconButton>
         </Box>
         <Link
-          href={`/beta/wallet/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}`}
+          href={`${betaSiteRoot}/wallet/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}`}
           color="text.primary"
           underline="hover"
           display="flex"
@@ -124,12 +126,13 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
                 version.
               </Typography>
             ) : (
-              row.wallet.metadata.blurb.render({
-                typography: {
+              <RenderTypographicContent
+                content={row.wallet.metadata.blurb.render({})}
+                typography={{
                   variant: 'body1',
                   marginBottom: '0.5rem',
-                },
-              })
+                }}
+              />
             )}
           </Box>
           <Typography
@@ -141,7 +144,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
             paddingBottom="10px"
           >
             <IconLink
-              href={`/beta/wallet/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}`}
+              href={`${betaSiteRoot}/wallet/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}`}
               IconComponent={InfoOutlinedIcon}
             >
               Learn more

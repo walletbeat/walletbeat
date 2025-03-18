@@ -7,7 +7,7 @@ import {
   exampleRating,
 } from '@/beta/schema/attributes';
 import { pickWorstRating, unrated } from '../common';
-import { component, markdown, mdParagraph, paragraph, sentence } from '@/beta/types/text';
+import { markdown, mdParagraph, paragraph, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/beta/types/utils/non-empty';
 import { EthereumL1LightClient } from '../../features/security/light-client';
@@ -15,8 +15,8 @@ import {
   RpcEndpointConfiguration,
   type ChainConfigurability,
 } from '../../features/chain-configurability';
-import { ChainVerificationDetails } from '@/beta/components/ui/molecules/attributes/security/ChainVerificationDetails';
 import { type FullyQualifiedReference, popRefs } from '../../reference';
+import { chainVerificationDetailsContent } from '@/beta/types/content/chain-verification-details';
 
 const brand = 'attributes.security.chain_verification';
 export type ChainVerificationValue = Value & {
@@ -40,7 +40,7 @@ function supportsChainVerification(
       ),
       __brand: brand,
     },
-    details: component(ChainVerificationDetails, { lightClients, refs }),
+    details: chainVerificationDetailsContent({ lightClients, refs }),
   };
 }
 

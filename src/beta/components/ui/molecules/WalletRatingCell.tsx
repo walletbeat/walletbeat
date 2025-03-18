@@ -13,7 +13,7 @@ import {
   ratingToColor,
 } from '@/beta/schema/attributes';
 import { attributeVariantSpecificity, VariantSpecificity } from '@/beta/schema/wallet';
-import { type NonEmptyArray, nonEmptyMap } from '@/beta/types/utils/non-empty';
+import { isNonEmptyArray, type NonEmptyArray, nonEmptyMap } from '@/beta/types/utils/non-empty';
 import { Box, Typography } from '@mui/material';
 import type React from 'react';
 import { Arc, type PieSlice, RatingPie } from '../atoms/RatingPie';
@@ -23,8 +23,10 @@ import { useState } from 'react';
 import type { WalletRowStateHandle } from '../WalletTableState';
 import { IconLink } from '../atoms/IconLink';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { slugifyCamelCase } from '@/beta/types/text';
 import { variantToName, variantUrlQuery } from '../../variants';
+import { RenderTypographicContent } from '../atoms/RenderTypographicContent';
+import { slugifyCamelCase } from '@/beta/types/utils/text';
+import { betaSiteRoot } from '@/beta/constants';
 
 /**
  * Common properties of rating-type columns.
@@ -55,8 +57,11 @@ export function WalletRatingCell<Vs extends ValueSet>({
   evalGroupFn: (tree: EvaluationTree) => EvaluatedGroup<Vs>;
 }): React.JSX.Element {
   const evalGroup = evalGroupFn(row.evalTree);
+  const evalEntries = evaluatedAttributesEntries(evalGroup).filter(
+    ([_, evalAttr]) => evalAttr.evaluation.value.rating !== Rating.EXEMPT
+  );
   const groupScore = attrGroup.score(evalGroup);
-  if (groupScore === null) {
+  if (groupScore === null || !isNonEmptyArray(evalEntries)) {
     return <>N/A</>;
   }
   const { score, hasUnratedComponent } = groupScore;
@@ -74,7 +79,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
   const highlightedEvalAttr =
     highlightedSlice === null ? null : evalGroup[highlightedSlice.evalAttrId];
   const slices: NonEmptyArray<PieSlice> = nonEmptyMap(
-    evaluatedAttributesEntries(evalGroup),
+    evalEntries,
     ([evalAttrId, evalAttr]: [keyof EvaluatedGroup<Vs>, EvaluatedAttribute<Value>]): PieSlice => {
       const icon = evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon;
       const tooltipSuffix: string = (() => {
@@ -184,12 +189,12 @@ export function WalletRatingCell<Vs extends ValueSet>({
               <Typography variant="h3" whiteSpace="nowrap">
                 {attrGroup.icon} {attrGroup.displayName}
               </Typography>
-              {attrGroup.perWalletQuestion.render({
-                ...row.wallet.metadata,
-                typography: {
+              <RenderTypographicContent
+                content={attrGroup.perWalletQuestion.render(row.wallet.metadata)}
+                typography={{
                   variant: 'body2',
-                },
-              })}
+                }}
+              />
             </>
           ) : (
             <>
@@ -197,9 +202,14 @@ export function WalletRatingCell<Vs extends ValueSet>({
                 {highlightedEvalAttr.evaluation.value.icon ?? highlightedEvalAttr.attribute.icon}{' '}
                 {highlightedEvalAttr.attribute.displayName}{' '}
               </Typography>
-              {highlightedEvalAttr.evaluation.value.shortExplanation.render({
-                ...row.wallet.metadata,
-                textTransform: (input: string) => {
+              <RenderTypographicContent
+                content={highlightedEvalAttr.evaluation.value.shortExplanation.render(
+                  row.wallet.metadata
+                )}
+                typography={{
+                  variant: 'body2',
+                }}
+                textTransform={(input: string) => {
                   const suffix: string = (() => {
                     if (
                       row.table.variantSelected === null ||
@@ -227,14 +237,11 @@ export function WalletRatingCell<Vs extends ValueSet>({
                     }
                   })();
                   return `${ratingToIcon(highlightedEvalAttr.evaluation.value.rating)} ${input.trim()}${suffix}`;
-                },
-                typography: {
-                  variant: 'body2',
-                },
-              })}
+                }}
+              />
               <Box display="flex" flexDirection="row" justifyContent="center">
                 <IconLink
-                  href={`/beta/wallet/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}#${slugifyCamelCase(highlightedEvalAttr.attribute.id)}`}
+                  href={`${betaSiteRoot}/wallet/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}#${slugifyCamelCase(highlightedEvalAttr.attribute.id)}`}
                   IconComponent={InfoOutlinedIcon}
                 >
                   Learn more

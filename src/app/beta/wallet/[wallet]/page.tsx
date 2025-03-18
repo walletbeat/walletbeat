@@ -5,6 +5,7 @@ import '../../global.css';
 import type React from 'react';
 import type { Metadata } from 'next';
 import { generateBasicMetadata } from '@/beta/components/metadata';
+import { betaSiteRoot } from '@/beta/constants';
 
 interface WalletUrlParams {
   wallet: string;
@@ -28,14 +29,14 @@ export async function generateMetadata({
   if (!IsValidWalletName(walletName)) {
     return generateBasicMetadata({
       title: '404',
-      route: '/beta/404',
+      route: `${betaSiteRoot}/404`,
     });
   }
   const walletMetadata = ratedWallets[walletName].metadata;
   return generateBasicMetadata({
     title: `${walletMetadata.displayName} - Walletbeat`,
     description: `How does ${walletMetadata.displayName} stack up as an Ethereum wallet?`,
-    route: `/beta/wallet/${walletMetadata.id}`,
+    route: `${betaSiteRoot}/wallet/${walletMetadata.id}`,
     icons: `/images/wallets/${walletMetadata.id}.${walletMetadata.iconExtension}`,
     keywordsBefore: [
       walletName,

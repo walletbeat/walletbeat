@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { Icons } from 'next/dist/lib/metadata/types/metadata-types';
+import { betaImagesRoot } from '../constants';
 
 const siteName = 'Walletbeat';
 const siteDescription =
@@ -8,11 +9,11 @@ const defaultKeywords = ['walletbeat', 'ethereum', 'wallet', 'wallets', 'wallet 
 const defaultIcons: Icons = {
   icon: [
     {
-      url: '/images/beta/favicon.ico',
+      url: `${betaImagesRoot}/favicon.ico`,
       sizes: '16x16',
     },
     {
-      url: '/images/beta/icon.jpg',
+      url: `${betaImagesRoot}/icon.jpg`,
     },
   ],
 };

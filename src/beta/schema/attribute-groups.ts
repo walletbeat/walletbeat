@@ -34,7 +34,7 @@ import {
   type MultiAddressCorrelationValue,
 } from './attributes/privacy/multi-address-correlation';
 import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score';
-import { sentence } from '@/beta/types/text';
+import { sentence } from '@/beta/types/content';
 import type { WalletMetadata } from './wallet';
 import {
   chainVerification,

@@ -1,10 +1,6 @@
-import type {
-  AddressCorrelationValue,
-  WalletAddressLinkableBy,
-} from '@/beta/schema/attributes/privacy/address-correlation';
+import type { WalletAddressLinkableBy } from '@/beta/schema/attributes/privacy/address-correlation';
 import { compareLeakedInfo, leakedInfoName } from '@/beta/schema/features/privacy/data-collection';
 import { mergeRefs } from '@/beta/schema/reference';
-import type { RatedWallet } from '@/beta/schema/wallet';
 import { type NonEmptyArray, nonEmptyGet, nonEmptySorted } from '@/beta/types/utils/non-empty';
 import { Tooltip, Typography } from '@mui/material';
 import type React from 'react';
@@ -14,16 +10,13 @@ import { ReferenceLinks } from '../../../atoms/ReferenceLinks';
 import { subsectionWeight } from '@/beta/components/constants';
 import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
 import { isUrl } from '@/beta/schema/url';
+import type { AddressCorrelationDetailsProps } from '@/beta/types/content/address-correlation-details';
 
 export function AddressCorrelationDetails({
   wallet,
   value,
   linkables,
-}: {
-  wallet: RatedWallet;
-  value: AddressCorrelationValue;
-  linkables: NonEmptyArray<WalletAddressLinkableBy>;
-}): React.JSX.Element {
+}: AddressCorrelationDetailsProps): React.JSX.Element {
   const bySource = new Map<string, NonEmptyArray<WalletAddressLinkableBy>>();
   for (const linkable of nonEmptySorted(
     linkables,

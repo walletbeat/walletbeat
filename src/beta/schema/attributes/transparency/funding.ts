@@ -15,9 +15,9 @@ import {
   monetizationStrategyIsUserAligned,
   monetizationStrategyName,
 } from '@/beta/schema/features/monetization';
-import { component, markdown, paragraph, sentence } from '@/beta/types/text';
+import { markdown, paragraph, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
-import { FundingDetails } from '@/beta/components/ui/molecules/attributes/transparency/FundingDetails';
+import { fundingDetailsContent } from '@/beta/types/content/funding-details';
 
 const brand = 'attributes.transparency.funding';
 export type FundingValue = Value & {
@@ -42,7 +42,7 @@ function transparent(
       ),
       __brand: brand,
     },
-    details: component(FundingDetails, { monetization }),
+    details: fundingDetailsContent({ monetization }),
   };
 }
 
@@ -66,7 +66,7 @@ function extractive(
       ),
       __brand: brand,
     },
-    details: component(FundingDetails, { monetization }),
+    details: fundingDetailsContent({ monetization }),
     howToImprove: paragraph(
       ({ wallet }) => `
         ${wallet.metadata.displayName} should change its funding sources

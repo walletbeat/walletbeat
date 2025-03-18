@@ -6,6 +6,7 @@ import Tooltip, { tooltipClasses, type TooltipProps } from '@mui/material/Toolti
 import { type Eip, eipEthereumDotOrgUrl, eipLabel, eipShortLabel } from '@/beta/schema/eips';
 import Image from 'next/image';
 import { MarkdownBox } from './MarkdownBox';
+import { betaImagesRoot } from '@/beta/constants';
 
 const EipTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -110,7 +111,7 @@ export function EipLink({
           }}
         >
           <Box component="span" display="inline-block" sx={{ filter: 'invert(100%)' }}>
-            <Image src={'/images/beta/ethereum-logo.svg'} alt="" width={14} height={14} />
+            <Image src={`${betaImagesRoot}/ethereum-logo.svg`} alt="" width={14} height={14} />
           </Box>
           <Box
             component="span"

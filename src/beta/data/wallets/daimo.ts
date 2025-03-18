@@ -5,7 +5,7 @@ import { daimoInc } from '../entities/daimo';
 import { binance } from '../entities/binance';
 import { openExchangeRates } from '../entities/open-exchange-rates';
 import { polymutex } from '../contributors/polymutex';
-import { paragraph } from '@/beta/types/text';
+import { paragraph } from '@/beta/types/content';
 import { merkleManufactory } from '../entities/merkle-manufactory';
 import { pimlico } from '../entities/pimlico';
 import { honeycomb } from '../entities/honeycomb';

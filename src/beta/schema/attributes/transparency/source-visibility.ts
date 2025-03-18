@@ -2,9 +2,9 @@ import type { ResolvedFeatures } from '@/beta/schema/features';
 import { licenseSourceIsVisible } from '@/beta/schema/features/license';
 import { Rating, type Value, type Attribute, type Evaluation } from '@/beta/schema/attributes';
 import { pickWorstRating, unrated } from '../common';
-import { component, paragraph, sentence } from '@/beta/types/text';
+import { paragraph, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
-import { SourceVisibilityDetails } from '@/beta/components/ui/molecules/attributes/transparency/SourceVisibilityDetails';
+import { sourceVisibilityDetailsContent } from '@/beta/types/content/source-visibility-details';
 
 const brand = 'attributes.transparency.source_visibility';
 export type SourceVisibilityValue = Value & {
@@ -23,7 +23,7 @@ const sourcePublic: Evaluation<SourceVisibilityValue> = {
     ),
     __brand: brand,
   },
-  details: component(SourceVisibilityDetails),
+  details: sourceVisibilityDetailsContent(),
 };
 
 const sourcePrivate: Evaluation<SourceVisibilityValue> = {

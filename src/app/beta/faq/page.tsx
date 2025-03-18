@@ -1,11 +1,12 @@
 import { generateBasicMetadata } from '@/beta/components/metadata';
 import { FrequentlyAskedQuestionsPage } from '@/beta/components/ui/pages/FrequentlyAskedQuestionsPage';
+import { betaSiteRoot } from '@/beta/constants';
 import type { Metadata } from 'next';
 
 export function generateMetadata(): Metadata {
   return generateBasicMetadata({
     title: 'Walletbeat FAQ',
-    route: '/beta/faq',
+    route: `${betaSiteRoot}/faq`,
     keywordsAfter: ['faq'],
   });
 }

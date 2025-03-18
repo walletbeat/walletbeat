@@ -10,14 +10,15 @@ import { Divider, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import type { NonEmptyArray } from '@/beta/types/utils/non-empty';
 import React from 'react';
-import { mdSentence, type Sentence, type WithTypography } from '@/beta/types/text';
+import { mdSentence, type Sentence } from '@/beta/types/content';
 import { styled } from '@mui/material/styles';
+import { RenderTypographicContent } from '../../atoms/RenderTypographicContent';
 
-const typographyPropsHeader: WithTypography['typography'] = {
+const typographyPropsHeader: React.ComponentProps<typeof RenderTypographicContent>['typography'] = {
   variant: 'h6',
 };
 
-const typographyPropsBody: WithTypography['typography'] = {
+const typographyPropsBody: React.ComponentProps<typeof RenderTypographicContent>['typography'] = {
   variant: 'body2',
 };
 
@@ -85,10 +86,11 @@ function ExampleRatings<V extends Value>({
       isFirstItem={index === 0}
       spaceBetweenItems="0.125rem"
     >
-      {exampleRating.description.render({
-        textTransform: replaceExampleRatingPrefix('It ', 'Its '),
-        typography: typographyPropsBody,
-      })}
+      <RenderTypographicContent
+        content={exampleRating.description.render({})}
+        typography={typographyPropsBody}
+        textTransform={replaceExampleRatingPrefix('It ', 'Its ')}
+      />
     </StyledListItem>
   );
   const renderExamples = (
@@ -111,9 +113,10 @@ function ExampleRatings<V extends Value>({
       key: rating,
       element: (
         <React.Fragment>
-          {preamble.render({
-            typography: typographyPropsHeader,
-          })}
+          <RenderTypographicContent
+            content={preamble.render({})}
+            typography={typographyPropsHeader}
+          />
           <ul>
             {ratingsList.map((exampleRating, index) =>
               renderListItem(exampleRating, index, rating)
@@ -180,9 +183,10 @@ export function AttributeMethodology<V extends Value>({
   return (
     <>
       <Box key="methodology">
-        {attribute.methodology.render({
-          typography: typographyPropsBody,
-        })}
+        <RenderTypographicContent
+          content={attribute.methodology.render({})}
+          typography={typographyPropsBody}
+        />
       </Box>
       <Divider
         key="after-methodology"
@@ -193,9 +197,10 @@ export function AttributeMethodology<V extends Value>({
       />
       <Box key="example-ratings">
         {attribute.ratingScale.display === 'simple' ? (
-          attribute.ratingScale.content.render({
-            typography: typographyPropsBody,
-          })
+          <RenderTypographicContent
+            content={attribute.ratingScale.content.render({})}
+            typography={typographyPropsBody}
+          />
         ) : (
           <ExampleRatings
             displayOrder={attribute.ratingScale.display}

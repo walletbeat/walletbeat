@@ -7,7 +7,7 @@ import {
   exampleRating,
 } from '@/beta/schema/attributes';
 import { pickWorstRating, unrated } from '../common';
-import { markdown, paragraph, sentence } from '@/beta/types/text';
+import { markdown, paragraph, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
 import { RpcEndpointConfiguration } from '../../features/chain-configurability';
 

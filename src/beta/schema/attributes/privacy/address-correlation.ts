@@ -22,19 +22,12 @@ import {
   type Leaks,
   leaksByDefault,
 } from '@/beta/schema/features/privacy/data-collection';
-import {
-  component,
-  markdown,
-  paragraph,
-  type Renderable,
-  sentence,
-  type WithTypography,
-} from '@/beta/types/text';
+import { markdown, paragraph, type RenderableTypography, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
-import { AddressCorrelationDetails } from '@/beta/components/ui/molecules/attributes/privacy/AddressCorrelationDetails';
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/beta/types/utils/non-empty';
 import { type FullyQualifiedReference, refs } from '../../reference';
 import type { Entity } from '../../entity';
+import { addressCorrelationDetailsContent } from '@/beta/types/content/address-correlation-details';
 
 const brand = 'attributes.privacy.address_correlation';
 export type AddressCorrelationValue = Value & {
@@ -77,7 +70,7 @@ function linkable(
   );
   const { rating, howToImprove } = ((): {
     rating: Rating;
-    howToImprove: Renderable<WithTypography<EvaluationData<AddressCorrelationValue>>>;
+    howToImprove: RenderableTypography<EvaluationData<AddressCorrelationValue>>;
   } => {
     const leakName = leakedInfoName(worstLeak.info).long;
     const by = worstLeak.by;
@@ -157,7 +150,7 @@ function linkable(
       worstLeak,
       __brand: brand,
     },
-    details: component(AddressCorrelationDetails, { linkables }),
+    details: addressCorrelationDetailsContent({ linkables }),
     howToImprove,
   };
 }

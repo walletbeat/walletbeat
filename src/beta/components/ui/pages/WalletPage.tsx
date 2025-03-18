@@ -47,7 +47,6 @@ import {
   scrollPastHeaderPixels,
 } from '../../navigation';
 import { NavigationPageLayout } from './NavigationPageLayout';
-import { commaListPrefix, slugifyCamelCase } from '@/beta/types/text';
 import { type PickableVariant, VariantPicker } from '../atoms/VariantPicker';
 import { getSingleVariant, type Variant } from '@/beta/schema/variants';
 import {
@@ -59,6 +58,8 @@ import {
   variantUrlQuery,
 } from '../../variants';
 import { VariantSpecificity, type ResolvedWallet } from '@/beta/schema/wallet';
+import { RenderTypographicContent } from '../atoms/RenderTypographicContent';
+import { commaListPrefix, slugifyCamelCase } from '@/beta/types/utils/text';
 
 const headerHeight = 80;
 const headerBottomMargin = 24;
@@ -213,7 +214,10 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
       icon: '\u{2139}', // Info
       body: (
         <>
-          {wallet.metadata.blurb.render({ typography: { variant: 'body1' } })}
+          <RenderTypographicContent
+            content={wallet.metadata.blurb.render({})}
+            typography={{ variant: 'body1' }}
+          />
           <Typography variant="body1">
             <React.Fragment key="begin">{wallet.metadata.displayName} runs </React.Fragment>
             {nonEmptyMap(nonEmptyKeys(wallet.variants), (variant, variantIndex) => (
@@ -255,13 +259,15 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
         title: attrGroup.displayName,
         icon: attrGroup.icon,
         cornerControl: null,
-        caption: attrGroup.perWalletQuestion.render({
-          typography: {
-            variant: 'caption',
-            fontStyle: 'italic',
-          },
-          ...wallet.metadata,
-        }),
+        caption: (
+          <RenderTypographicContent
+            content={attrGroup.perWalletQuestion.render(wallet.metadata)}
+            typography={{
+              variant: 'caption',
+              fontStyle: 'italic',
+            }}
+          />
+        ),
         body: null,
         subsections: mapGroupAttributes<RichSection | null, Vs>(
           evalGroup,
@@ -428,13 +434,15 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
                   1
                 ),
               },
-              caption: evalAttr.attribute.question.render({
-                typography: {
-                  variant: 'caption',
-                  fontStyle: 'italic',
-                },
-                ...wallet.metadata,
-              }),
+              caption: (
+                <RenderTypographicContent
+                  content={evalAttr.attribute.question.render(wallet.metadata)}
+                  typography={{
+                    variant: 'caption',
+                    fontStyle: 'italic',
+                  }}
+                />
+              ),
               body,
             };
           }

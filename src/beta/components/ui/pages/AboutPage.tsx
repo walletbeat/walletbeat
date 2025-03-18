@@ -14,6 +14,7 @@ import { IconLink } from '../atoms/IconLink';
 import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 import ForumIcon from '@mui/icons-material/Forum';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import { betaSiteRoot } from '@/beta/constants';
 
 function AboutContents(): React.JSX.Element {
   return (
@@ -49,7 +50,7 @@ function AboutContents(): React.JSX.Element {
           Vitalik&apos;s blog post on wallets
         </ExternalLink>{' '}
         and the{' '}
-        <IconLink IconComponent={HelpCenterIcon} href="/beta/faq">
+        <IconLink IconComponent={HelpCenterIcon} href={`${betaSiteRoot}/faq`}>
           Walletbeat FAQ page
         </IconLink>{' '}
         for more details.

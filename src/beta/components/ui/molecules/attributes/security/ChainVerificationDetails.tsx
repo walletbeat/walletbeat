@@ -1,30 +1,20 @@
-import type { RatedWallet } from '@/beta/schema/wallet';
 import { Typography } from '@mui/material';
 import React from 'react';
 import { ExternalLink } from '../../../atoms/ExternalLink';
 import { subsectionWeight } from '@/beta/components/constants';
 import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
-import type { ChainVerificationValue } from '@/beta/schema/attributes/security/chain-verification';
-import { type NonEmptyArray, nonEmptyMap } from '@/beta/types/utils/non-empty';
-import {
-  type EthereumL1LightClient,
-  ethereumL1LightClientUrl,
-} from '@/beta/schema/features/security/light-client';
+import { nonEmptyMap } from '@/beta/types/utils/non-empty';
+import { ethereumL1LightClientUrl } from '@/beta/schema/features/security/light-client';
 import { ReferenceList } from '../../../atoms/ReferenceList';
-import type { FullyQualifiedReference } from '@/beta/schema/reference';
-import { commaListPrefix } from '@/beta/types/text';
+import type { ChainVerificationDetailsProps } from '@/beta/types/content/chain-verification-details';
+import { commaListPrefix } from '@/beta/types/utils/text';
 
 export function ChainVerificationDetails({
   wallet,
   value,
   lightClients,
   refs,
-}: {
-  wallet: RatedWallet;
-  value: ChainVerificationValue;
-  lightClients: NonEmptyArray<EthereumL1LightClient>;
-  refs: FullyQualifiedReference[];
-}): React.JSX.Element {
+}: ChainVerificationDetailsProps): React.JSX.Element {
   return (
     <WrapRatingIcon rating={value.rating}>
       <Typography fontWeight={subsectionWeight}>

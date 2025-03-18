@@ -1,9 +1,9 @@
 import { nonEmptyValues } from '@/beta/types/utils/non-empty';
 import { type Attribute, type Evaluation, Rating, type Value } from '../attributes';
 import type { AtLeastOneVariant, Variant } from '../variants';
-import { component, type Sentence, sentence } from '@/beta/types/text';
-import { UnratedAttribute } from '@/beta/components/ui/molecules/attributes/UnratedAttribute';
+import { type Sentence, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '../wallet';
+import { unratedAttributeContent } from '@/beta/types/content/unrated-attribute';
 
 /**
  * Helper for constructing "Unrated" values.
@@ -30,7 +30,7 @@ export function unrated<V extends Value>(
   } as unknown as V;
   return {
     value: v,
-    details: component(UnratedAttribute),
+    details: unratedAttributeContent<V>(),
   };
 }
 

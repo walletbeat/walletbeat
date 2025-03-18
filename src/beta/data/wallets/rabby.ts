@@ -1,7 +1,7 @@
 import { Leak, MultiAddressPolicy } from '@/beta/schema/features/privacy/data-collection';
 import { deBank } from '../entities/debank';
 import { polymutex } from '../contributors/polymutex';
-import { paragraph } from '@/beta/types/text';
+import { paragraph } from '@/beta/types/content';
 import type { Wallet } from '@/beta/schema/wallet';
 import { License } from '@/beta/schema/features/license';
 import { WalletProfile } from '@/beta/schema/features/profile';

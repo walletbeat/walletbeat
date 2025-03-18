@@ -7,7 +7,7 @@ import {
   exampleRating,
 } from '@/beta/schema/attributes';
 import { pickWorstRating, unrated } from '../common';
-import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/beta/types/text';
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/beta/types/content';
 import type { WalletMetadata } from '@/beta/schema/wallet';
 import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } from '../../eips';
 import type {
