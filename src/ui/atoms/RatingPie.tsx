@@ -117,13 +117,13 @@ export function RatingPie({
 	arc = Arc.FULL,
 	paddingAngle = 0,
 	innerRadiusFraction = arc === Arc.FULL ? 0.02 : 0.35,
-	outerRadiusFraction = 0.95,
-	cornerRadiusFraction = 0.1,
+	outerRadiusFraction = 0,
+	cornerRadiusFraction = 0,
 	hoverEffect = true,
-	hoverRadiusFraction = 1.02,
+	hoverRadiusFraction = 1,
 	highlightedSliceId = undefined,
 	centerLabel = '',
-	centerLabelHeightFraction = 0.3,
+	centerLabelHeightFraction = 0,
 	arcLabel = 'label',
 }: PieRatings): React.JSX.Element {
 	const theme = useTheme()
@@ -153,7 +153,7 @@ export function RatingPie({
 	// Fixed values to match requested configuration but scaled down to be less zoomed
 	const innerRadius = 0 // Smaller inner radius
 	const outerRadius = 40 // Smaller outer radius to make it less zoomed
-	const cornerRadius = 0 // Proportionally smaller corner radius
+	const cornerRadius = 2 // Proportionally smaller corner radius
 
 	// Use calculated values for hover radius
 	const hoverRadius = outerRadius * hoverRadiusFraction
