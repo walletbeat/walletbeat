@@ -6,7 +6,7 @@ export const enkrypt: Info = {
   submittedByUrl: 'https://warpcast.com/timmykwesi',
   updatedAt: '18/03/2025',
   updatedByName: '@Abyscuit',
-  updatedByUrl: 'https://warpcast.com/abyscuit.eth',
+  updatedByUrl: 'https://github.com/Abyscuit',
   browser: {
     accountType: 'EOA',
     chainCompatibility: {
