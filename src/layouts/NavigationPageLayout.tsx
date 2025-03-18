@@ -170,7 +170,7 @@ export function NavigationPageLayout({
 					key="contentContainer"
 					className="flex-col flex overflow-y-auto min-h-screen mb-48 w-full"
 				>
-					<div className="mx-auto max-w-6xl 2xl:max-w-screen-2xl w-full">{children}</div>
+					<div className="mx-auto w-full">{children}</div>
 				</div>
 			</div>
 		</ThemeProvider>
