@@ -7,6 +7,7 @@ export const enkrypt: Info = {
   updatedAt: '18/03/2025',
   updatedByName: '@Abyscuit',
   updatedByUrl: 'https://github.com/Abyscuit',
+  repoUrl: 'https://github.com/enkryptcom/enKrypt',
   browser: {
     accountType: 'EOA',
     chainCompatibility: {
