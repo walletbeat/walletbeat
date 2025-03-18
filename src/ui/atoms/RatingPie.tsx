@@ -124,9 +124,9 @@ export function RatingPie({
 	centerLabel = '',
 	centerLabelHeightFraction = 0.3,
 }: PieRatings): React.JSX.Element {
-	const theme = useTheme();
-	const isDarkMode = theme.palette.mode === 'dark';
-	
+	const theme = useTheme()
+	const isDarkMode = theme.palette.mode === 'dark'
+
 	const { maxRadius, startAngle, endAngle, cx, cy } = (() => {
 		switch (arc) {
 			case Arc.TOP_HALF:
@@ -147,19 +147,19 @@ export function RatingPie({
 				}
 		}
 	})()
-	
+
 	// Fixed values to match requested configuration but scaled down to be less zoomed
-	const innerRadius = 3; // Smaller inner radius
-	const outerRadius = 60; // Smaller outer radius to make it less zoomed
-	const cornerRadius = 8; // Proportionally smaller corner radius
-	
+	const innerRadius = 25 // Smaller inner radius
+	const outerRadius = 50 // Smaller outer radius to make it less zoomed
+	const cornerRadius = 0 // Proportionally smaller corner radius
+
 	// Use calculated values for hover radius
-	const hoverRadius = outerRadius * hoverRadiusFraction;
-	
+	const hoverRadius = outerRadius * hoverRadiusFraction
+
 	const hasFocusHandling = nonEmptyGet(slices).focusChange !== undefined
 	let handleHighlightChange: ((data: HighlightItemData | null) => void) | undefined = undefined
 	const [lastFocusedSliceIndex, setLastFocusedSliceIndex] = useState<number | null>(null)
-	
+
 	if (hasFocusHandling) {
 		handleHighlightChange = (data: HighlightItemData | null) => {
 			const currentFocusedSliceIndex = data === null ? null : (data.dataIndex ?? null)
@@ -181,10 +181,10 @@ export function RatingPie({
 			setLastFocusedSliceIndex(currentFocusedSliceIndex)
 		}
 	}
-	
+
 	let highlightedItem: HighlightItemData | null | undefined = undefined
 	let fadeScope: FadeOptions = 'none'
-	
+
 	if (highlightedSliceId !== undefined) {
 		if (highlightedSliceId === null) {
 			highlightedItem = { seriesId: pieId }
@@ -197,36 +197,36 @@ export function RatingPie({
 			fadeScope = 'global'
 		}
 	}
-	
+
 	const hasClickHandling = nonEmptyGet(slices).click !== undefined
 	const handleClick = hasClickHandling
 		? (event: React.MouseEvent<SVGPathElement>, itemIdentifier: PieItemIdentifier) => {
-			const handler = slices[itemIdentifier.dataIndex].click
-			if (handler !== undefined) {
-				handler(event)
+				const handler = slices[itemIdentifier.dataIndex].click
+				if (handler !== undefined) {
+					handler(event)
+				}
 			}
-		}
 		: undefined
-	
+
 	// Update the faded and highlighted properties based on the filled pie or donut style
-	const isFilled = innerRadius <= 5;
-	const fadedSettings = isFilled 
+	const isFilled = innerRadius <= 5
+	const fadedSettings = isFilled
 		? {
-			innerRadius: 0,
-			outerRadius: outerRadius * 0.95,
-			opacity: 0.5,
-		}
+				innerRadius: 0,
+				outerRadius: outerRadius * 0.95,
+				opacity: 0.5,
+			}
 		: {
-			innerRadius: innerRadius + (isDarkMode ? 0 : 10),
-			outerRadius: outerRadius - (isDarkMode ? 0 : 10),
-			opacity: 0.5,
-		};
-	
+				innerRadius: innerRadius + (isDarkMode ? 0 : 10),
+				outerRadius: outerRadius - (isDarkMode ? 0 : 10),
+				opacity: 0.5,
+			}
+
 	const highlightedSettings = {
 		innerRadius: isFilled ? 0 : innerRadius,
 		outerRadius: hoverRadius,
-	};
-	
+	}
+
 	return (
 		<PieChart
 			series={[
@@ -236,16 +236,16 @@ export function RatingPie({
 					type: 'pie',
 					arcLabel: 'label',
 					arcLabelRadius: computeArcLabel(innerRadius, outerRadius),
-					cx, 
-					cy, 
+					cx,
+					cy,
 					cornerRadius,
 					outerRadius,
 					innerRadius,
 					highlightScope: hoverEffect
 						? {
-							fade: fadeScope,
-							highlight: 'item',
-						}
+								fade: fadeScope,
+								highlight: 'item',
+							}
 						: undefined,
 					faded: hoverEffect ? fadedSettings : undefined,
 					highlighted: hoverEffect ? highlightedSettings : undefined,
@@ -269,7 +269,7 @@ export function RatingPie({
 			slotProps={{ legend: { hidden: true, padding: 0 } }}
 			sx={{
 				'.MuiChartsLegend-series': { display: 'none' },
-				'.MuiChartsArcLabel-root': { fontSize: '0.85rem' }
+				'.MuiChartsArcLabel-root': { fontSize: '0.85rem' },
 			}}
 		>
 			{centerLabel === '' ? null : (
