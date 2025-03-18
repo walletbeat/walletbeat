@@ -36,6 +36,7 @@ export interface PieRatings {
 	highlightedSliceId?: string | null
 	centerLabel?: string
 	centerLabelHeightFraction?: number
+	arcLabel?: 'label' | 'value' | 'formattedValue' | ((item: any) => string)
 }
 
 function sliceToData(slice: PieSlice): PieValueType {
@@ -114,7 +115,7 @@ export function RatingPie({
 	width,
 	height,
 	arc = Arc.FULL,
-	paddingAngle = 8,
+	paddingAngle = 0,
 	innerRadiusFraction = arc === Arc.FULL ? 0.02 : 0.35,
 	outerRadiusFraction = 0.95,
 	cornerRadiusFraction = 0.1,
@@ -123,6 +124,7 @@ export function RatingPie({
 	highlightedSliceId = undefined,
 	centerLabel = '',
 	centerLabelHeightFraction = 0.3,
+	arcLabel = 'label',
 }: PieRatings): React.JSX.Element {
 	const theme = useTheme()
 	const isDarkMode = theme.palette.mode === 'dark'
@@ -149,8 +151,8 @@ export function RatingPie({
 	})()
 
 	// Fixed values to match requested configuration but scaled down to be less zoomed
-	const innerRadius = 25 // Smaller inner radius
-	const outerRadius = 50 // Smaller outer radius to make it less zoomed
+	const innerRadius = 0 // Smaller inner radius
+	const outerRadius = 40 // Smaller outer radius to make it less zoomed
 	const cornerRadius = 0 // Proportionally smaller corner radius
 
 	// Use calculated values for hover radius
@@ -234,7 +236,7 @@ export function RatingPie({
 					id: pieId,
 					data: nonEmptyMap(slices, slice => sliceToData(slice)),
 					type: 'pie',
-					arcLabel: 'label',
+					arcLabel: arcLabel,
 					arcLabelRadius: computeArcLabel(innerRadius, outerRadius),
 					cx,
 					cy,
