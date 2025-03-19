@@ -273,7 +273,10 @@
 		tabindex="0"
 		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
-		onclick={() => { onSliceClick?.(slice.id) }}
+		onclick={e => {
+			e.stopPropagation()
+			onSliceClick?.(slice.id)
+		}}
 		onkeydown={e => {
 			if (e.code === 'Enter' || e.code === 'Space')
 				onSliceClick?.(slice.id)
