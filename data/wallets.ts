@@ -26,7 +26,7 @@ export const wallets = {
 export type WalletName = keyof typeof wallets
 
 /** Type predicate for WalletName. */
-export function IsValidWalletName(name: string): name is WalletName {
+export function isValidWalletName(name: string): name is WalletName {
 	return Object.prototype.hasOwnProperty.call(wallets, name)
 }
 

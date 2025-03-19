@@ -3,7 +3,7 @@
 export const prerender = true
 
 // Data
-import { IsValidWalletName, ratedWallets, wallets } from '@/data/wallets.ts'
+import { isValidWalletName, ratedWallets, wallets } from '@/data/wallets.ts'
 
 // Utils
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
@@ -29,7 +29,7 @@ import { WalletPage } from './_WalletPage.tsx'
 ---
 
 {
-	walletName && IsValidWalletName(walletName) ? (
+	walletName && isValidWalletName(walletName) ? (
 		<Layout
 			metadata={{
 				title: `${walletMetadata.displayName} - Walletbeat`,

@@ -3,7 +3,7 @@
 export const prerender = true
 
 // Data
-import { IsValidWalletName, ratedWallets, wallets } from '@/data/wallets'
+import { isValidWalletName, ratedWallets, wallets } from '@/data/wallets'
 
 // Utils
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
@@ -26,7 +26,7 @@ import Layout from '@/layouts/Layout.astro'
 ---
 
 {
-	walletName && IsValidWalletName(walletName) ? (
+	walletName && isValidWalletName(walletName) ? (
 		<Layout
 			metadata={{
 				title: `${walletMetadata.displayName} - Walletbeat`,
