@@ -1,7 +1,0 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
-import { WalletProfile } from '@/schema/features/profile'
-import { nconsigny } from '../contributors/nconsigny'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { featureSupported } from '@/schema/features/support'

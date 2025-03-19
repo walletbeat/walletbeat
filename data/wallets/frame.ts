@@ -1,23 +1,14 @@
-import { Leak, MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
-import { deBank } from '../entities/debank'
 import { polymutex } from '../contributors/polymutex'
 import { nconsigny } from '../contributors/nconsigny'
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
-import { License } from '@/schema/features/license'
 import { WalletProfile } from '@/schema/features/profile'
-import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
-import { leastAuthority } from '../entities/least-authority'
-import { slowMist } from '../entities/slowmist'
-import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
-import { cure53 } from '../entities/cure53'
-import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
-import { AccountType } from '@/schema/features/account-support'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { featureSupported } from '@/schema/features/support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { WalletTypeCategory } from '@/schema/features/wallet-type'
+import { Variant } from '@/schema/variants'
 
 export const frame: Wallet = {
 	metadata: {
@@ -33,8 +24,8 @@ export const frame: Wallet = {
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-03-13',
 		multiWalletType: {
-			categories: [WalletTypeCategory.EOA]
-		}
+			categories: [WalletTypeCategory.EOA],
+		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -76,7 +67,7 @@ export const frame: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					details: 'No hardware wallet clear signing information available.',
 				},
 				ref: null,
 			},
@@ -122,9 +113,10 @@ export const frame: Wallet = {
 		},
 	},
 	variants: {
-		mobile: false,
-		browser: true,
-		desktop: true,
-		embedded: false,
+		[Variant.MOBILE]: false,
+		[Variant.BROWSER]: true,
+		[Variant.DESKTOP]: true,
+		[Variant.EMBEDDED]: false,
+		[Variant.HARDWARE]: false,
 	},
 }

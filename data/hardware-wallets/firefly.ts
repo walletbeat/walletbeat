@@ -6,7 +6,7 @@ import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-s
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { firefly } from '../entities/firefly'
+import { Variant } from '@/schema/variants'
 
 export const fireflyWallet: Wallet = {
 	metadata: {
@@ -61,7 +61,8 @@ export const fireflyWallet: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'Firefly currently does not provide clear signing support as it is still in development.'
+					details:
+						'Firefly currently does not provide clear signing support as it is still in development.',
 				},
 				ref: null,
 			},
@@ -110,10 +111,10 @@ export const fireflyWallet: Wallet = {
 		},
 	},
 	variants: {
-		mobile: false,
-		browser: false,
-		desktop: false,
-		embedded: false,
-		hardware: true,
+		[Variant.MOBILE]: false,
+		[Variant.BROWSER]: false,
+		[Variant.DESKTOP]: false,
+		[Variant.EMBEDDED]: false,
+		[Variant.HARDWARE]: true,
 	},
 }

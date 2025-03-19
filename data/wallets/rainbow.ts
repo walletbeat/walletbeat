@@ -7,6 +7,7 @@ import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-v
 import { WalletTypeCategory } from '@/schema/features/wallet-type'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported } from '@/schema/features/support'
+import { Variant } from '@/schema/variants'
 
 export const rainbow: Wallet = {
 	metadata: {
@@ -22,8 +23,8 @@ export const rainbow: Wallet = {
 		contributors: [polymutex],
 		lastUpdated: '2025-02-08',
 		multiWalletType: {
-			categories: [WalletTypeCategory.EOA]
-		}
+			categories: [WalletTypeCategory.EOA],
+		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -62,7 +63,7 @@ export const rainbow: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					details: 'No hardware wallet clear signing information available.',
 				},
 				ref: null,
 			},
@@ -108,9 +109,10 @@ export const rainbow: Wallet = {
 		},
 	},
 	variants: {
-		mobile: true,
-		browser: true,
-		desktop: false,
-		embedded: false,
+		[Variant.MOBILE]: true,
+		[Variant.BROWSER]: true,
+		[Variant.DESKTOP]: false,
+		[Variant.EMBEDDED]: false,
+		[Variant.HARDWARE]: false,
 	},
 }

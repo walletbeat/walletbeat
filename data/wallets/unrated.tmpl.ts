@@ -2,9 +2,9 @@ import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
 import { exampleContributor } from '../contributors/example'
-import { polymutex } from '../contributors/polymutex'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { Variant } from '@/schema/variants'
 
 export const unratedTemplate: Wallet = {
 	metadata: {
@@ -56,7 +56,7 @@ export const unratedTemplate: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					details: 'No hardware wallet clear signing information available.',
 				},
 				ref: null,
 			},
@@ -102,9 +102,10 @@ export const unratedTemplate: Wallet = {
 		},
 	},
 	variants: {
-		mobile: false,
-		browser: true,
-		desktop: false,
-		embedded: false,
+		[Variant.MOBILE]: false,
+		[Variant.BROWSER]: true,
+		[Variant.DESKTOP]: false,
+		[Variant.EMBEDDED]: false,
+		[Variant.HARDWARE]: false,
 	},
 }
