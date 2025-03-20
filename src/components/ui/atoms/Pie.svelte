@@ -11,7 +11,7 @@
 
 	export const Layout = {
 		TopHalf: 'TopHalf',
-		Full: 'Full'
+		Full: 'Full',
 	}
 </script>
 
@@ -48,7 +48,7 @@
 		centerLabel?: string
 
 		// View options
-		layout?: typeof Layout[keyof typeof Layout],
+		layout?: typeof Layout[keyof typeof Layout]
 		radius?: number
 		padding?: number
 		gap?: number
@@ -91,12 +91,12 @@
 		startAngle,
 		endAngle,
 	}: {
-		cx: number,
-		cy: number,
-		outerRadius: number,
-		innerRadius: number,
-		startAngle: number,
-		endAngle: number,
+		cx: number
+		cy: number
+		outerRadius: number
+		innerRadius: number
+		startAngle: number
+		endAngle: number
 	}) => {
 		const start = polarToCartesian(cx, cy, outerRadius, endAngle)
 		const end = polarToCartesian(cx, cy, outerRadius, startAngle)
@@ -176,8 +176,8 @@
 		]
 			.join(' ')
 	)
-
 </script>
+
 
 <div class="container"
 	data-arc-type={layout}
