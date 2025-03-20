@@ -102,6 +102,22 @@
 							onRowClick?.(row)
 						}
 					}}
+					onkeyup={e => {
+						if(e.code === 'ArrowUp'){
+							e.preventDefault()
+
+							const row = e.currentTarget.previousElementSibling ?? e.currentTarget.parentElement?.lastElementChild
+							if(row instanceof HTMLElement)
+								row.focus({ focusVisible: true })
+						}
+						else if(e.code === 'ArrowDown'){
+							e.preventDefault()
+
+							const row = e.currentTarget.nextElementSibling ?? e.currentTarget.parentElement?.firstElementChild
+							if(row instanceof HTMLElement)
+								row.focus({ focusVisible: true })
+						}
+					}}
 					animate:flip={{ duration: 300, easing: expoOut }}
 				>
 					{#each table.columns as column (column.id)}
