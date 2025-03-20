@@ -71,16 +71,22 @@ export function isFullyQualifiedReference(
 /** One or more references. */
 export type References = Reference | NonEmptyArray<Reference>
 
+/** An array of zero or more references. */
+export type ReferenceArray = Reference[]
+
 /** An object that *must* be annotated with References. */
 export type MustRef<T> = T & { ref: References }
 
 /** An object that *may or may not* be annotated with References. */
 export type WithRef<T> = MustRef<T> | (T & { ref?: null })
 
-/** Fully qualify a `Reference`. */
+/** Fully qualify any number of `Reference`s in any supported type. */
 export function toFullyQualified(
-	reference: References | FullyQualifiedReference[],
+	reference: References | ReferenceArray | FullyQualifiedReference[] | null | undefined,
 ): FullyQualifiedReference[] {
+	if (reference === null || reference === undefined) {
+		return []
+	}
 	if (Array.isArray(reference)) {
 		const qualified: FullyQualifiedReference[] = []
 		for (const ref of reference) {
@@ -181,59 +187,6 @@ export function refs<T>(withRef: WithRef<T>): FullyQualifiedReference[] {
 	return mergeRefs(...qualifiedRefs)
 }
 
-/** Extract references out of an object that may have a value property and references. */
-export function refsWithValue<T>(obj: any): FullyQualifiedReference[] {
-	// Handle null or undefined
-	if (!obj) {
-		return [];
-	}
-	
-	// Handle primitive values
-	if (typeof obj !== 'object') {
-		return [];
-	}
-	
-	try {
-		// Handle case where obj has 'value' and 'ref' properties (LicenseWithValue)
-		if ('value' in obj && 'ref' in obj) {
-			return refs(obj);
-		}
-		
-		// Handle case where obj has nested reference properties
-		if ('sendTransactionWarning' in obj || 'contractTransactionWarning' in obj || 'scamUrlWarning' in obj) {
-			const allRefs: FullyQualifiedReference[] = [];
-			
-			// Check for each potential ref source
-			const checkAndAddRefs = (source: any) => {
-				if (source && 'ref' in source) {
-					allRefs.push(...refs({ref: source.ref}));
-				}
-			};
-			
-			// Check all possible warning types
-			if ('sendTransactionWarning' in obj) checkAndAddRefs(obj.sendTransactionWarning);
-			if ('contractTransactionWarning' in obj) checkAndAddRefs(obj.contractTransactionWarning);
-			if ('scamUrlWarning' in obj) checkAndAddRefs(obj.scamUrlWarning);
-			
-			return allRefs;
-		}
-		
-		// Handle normal WithRef objects
-		if ('ref' in obj) {
-			return refs(obj as WithRef<any>);
-		}
-		
-		// Handle Arrays of refs
-		if (Array.isArray(obj)) {
-			return obj.flatMap(item => refsWithValue(item));
-		}
-	} catch (error) {
-		console.error('Error extracting references:', error);
-	}
-	
-	return [];
-}
-
 /** Extract references out of `withRef` and return an object without them. */
 export function popRefs<T>(withRef: WithRef<T>): {
 	withoutRefs: T
@@ -247,10 +200,23 @@ export function popRefs<T>(withRef: WithRef<T>): {
 }
 
 /** Deduplicate and merge references in `refs`. */
-export function mergeRefs(...refs: FullyQualifiedReference[]): FullyQualifiedReference[] {
+export function mergeRefs(
+	...refs: (References | ReferenceArray | FullyQualifiedReference | null | undefined)[]
+): FullyQualifiedReference[] {
+	const qualifiedRefs = []
+	for (const ref of refs) {
+		if (ref === null || ref === undefined) {
+			continue
+		}
+		if (!Array.isArray(ref) && isFullyQualifiedReference(ref)) {
+			qualifiedRefs.push(ref)
+		} else {
+			qualifiedRefs.push(...toFullyQualified(ref))
+		}
+	}
 	const byExplanation = new Map<string, FullyQualifiedReference>()
 	const mergedRefs: FullyQualifiedReference[] = []
-	for (const ref of refs) {
+	for (const ref of qualifiedRefs) {
 		if (ref.explanation === undefined) {
 			mergedRefs.push(ref)
 			continue

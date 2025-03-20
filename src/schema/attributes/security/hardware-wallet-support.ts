@@ -13,7 +13,6 @@ import { isSupported, type Support } from '@/schema/features/support'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletProfile } from '@/schema/features/profile'
-import { isAccountTypeSupported } from '@/schema/features/account-support'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { popRefs } from '@/schema/reference'
 

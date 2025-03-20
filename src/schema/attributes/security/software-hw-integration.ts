@@ -15,7 +15,6 @@ import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletProfile } from '@/schema/features/profile'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
-import { isAccountTypeSupported } from '@/schema/features/account-support'
 import { popRefs } from '@/schema/reference'
 
 const brand = 'attributes.security.software_hw_integration'

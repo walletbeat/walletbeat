@@ -14,8 +14,7 @@ import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
 import type { WalletTypeInfo } from './features/wallet-type'
 import { WalletTypeCategory, SmartWalletStandard } from './features/wallet-type'
-import type { EvmForkLike, EvmFork } from './evm-forks'
-import { WalletProfile, HardwareWalletManufactureType } from './features/profile'
+import { HardwareWalletManufactureType } from './features/profile'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -87,14 +86,14 @@ export interface WalletMetadata {
 	 * Information about the wallet type (EOA, Smart Wallet, or Hardware Wallet)
 	 */
 	walletType?: WalletTypeInfo
-	
+
 	/**
 	 * Information for wallets with multiple types (e.g., both EOA and Smart Wallet)
 	 */
 	multiWalletType?: {
-		categories: WalletTypeCategory[];
-		smartWalletStandards?: SmartWalletStandard[];
-		details?: string;
+		categories: WalletTypeCategory[]
+		smartWalletStandards?: SmartWalletStandard[]
+		details?: string
 	}
 
 	/**

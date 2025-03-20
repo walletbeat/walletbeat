@@ -371,7 +371,7 @@ export const rabby: Wallet = {
 			},
 		},
 		license: {
-			value: License.MIT,
+			license: License.MIT,
 			ref: [
 				{
 					explanation: 'Rabby is licensed under the MIT license.',

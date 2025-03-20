@@ -1,17 +1,7 @@
 import type { WithRef } from '../reference'
-import { isSupported, type NotSupported, type Supported } from './support'
+import { type Support, type NotSupported } from './support'
 
-export type AccountTypeSupported<T> = WithRef<Supported<T>>
-export type AccountTypeNotSupported = WithRef<NotSupported>
-
-export type AccountTypeSupport<T> = AccountTypeSupported<T> | AccountTypeNotSupported
-
-/** Type predicate for AccountTypeSupported<T>. */
-export function isAccountTypeSupported<T>(
-	accountTypeSupport: AccountTypeSupport<T>,
-): accountTypeSupport is AccountTypeSupported<T> {
-	return isSupported<T>(accountTypeSupport)
-}
+export type AccountTypeSupport<T> = WithRef<Support<T>>
 
 /** Set of possible account types. */
 export enum AccountType {
@@ -59,43 +49,26 @@ export type AccountSupport = Exclude<
 		 * Support for raw EOA accounts.
 		 * Leave as NOT_SUPPORTED if the wallet only supports EIP-7702-type EOAs.
 		 */
-		eoa: AccountTypeSupport<AccountTypeEoa>
+		[AccountType.eoa]: AccountTypeSupport<AccountTypeEoa>
 
 		/** Support for MPC-based (sharded key) accounts. */
-		mpc: AccountTypeSupport<AccountTypeMpc>
+		[AccountType.mpc]: AccountTypeSupport<AccountTypeMpc>
 
 		/**
 		 * Support for EIP-7702 EOA accounts.
 		 * This usually also implies `rawEoa` support.
 		 */
-		eip7702: AccountTypeSupport<AccountType7702>
+		[AccountType.eip7702]: AccountTypeSupport<AccountType7702>
 
 		/**
 		 * Support for smart accounts (pure ERC-4337 accounts for which the
 		 * address matches the contract code).
 		 */
-		rawErc4337: AccountTypeSupport<AccountTypeMutableMultifactor>
+		[AccountType.rawErc4337]: AccountTypeSupport<AccountTypeMutableMultifactor>
 	},
 	// At least one account type must be supported.
-	Record<AccountType, AccountTypeNotSupported>
-> & { defaultAccountType: AccountType } & (
-		| {
-				// Either EIP-7702 is not supported...
-				eip7702: AccountTypeNotSupported
-		  }
-		| ({
-				// Or EIP-7702 is supported, in which case either EOA or MPC accounts
-				// (or both) must be supported.
-				eip7702: AccountTypeSupported<AccountType7702>
-		  } & (
-				| {
-						eoa: AccountTypeSupported<AccountTypeEoa>
-				  }
-				| {
-						mpc: AccountTypeSupported<AccountTypeMpc>
-				  }
-		  ))
-	)
+	Record<AccountType, NotSupported>
+> & { defaultAccountType: AccountType }
 
 /** Support information for EOA accounts. */
 export interface AccountTypeEoa {

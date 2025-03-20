@@ -10,13 +10,14 @@ import { pickWorstRating, unrated } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { RpcEndpointConfiguration } from '../../features/chain-configurability'
+import { refs, type ReferenceArray } from '@/schema/reference'
 
 const brand = 'attributes.self_sovereignty.self_hosted_node'
 export type SelfHostedNodeValue = Value & {
 	__brand: 'attributes.self_sovereignty.self_hosted_node'
 }
 
-function supportsSelfHostedNode(): Evaluation<SelfHostedNodeValue> {
+function supportsSelfHostedNode(references: ReferenceArray): Evaluation<SelfHostedNodeValue> {
 	return {
 		value: {
 			id: 'support_self_hosted_node',
@@ -37,10 +38,13 @@ function supportsSelfHostedNode(): Evaluation<SelfHostedNodeValue> {
 				Ethereum node to interact with the Ethereum chain.
 			`,
 		),
+		references,
 	}
 }
 
-function supportsSelfHostedNodeAfterRequests(): Evaluation<SelfHostedNodeValue> {
+function supportsSelfHostedNodeAfterRequests(
+	references: ReferenceArray,
+): Evaluation<SelfHostedNodeValue> {
 	return {
 		value: {
 			id: 'self_hosted_node_after_requests',
@@ -69,10 +73,11 @@ function supportsSelfHostedNodeAfterRequests(): Evaluation<SelfHostedNodeValue> 
 				user can access the RPC endpoint configuration options.
 			`,
 		),
+		references,
 	}
 }
 
-function customChainOnly(): Evaluation<SelfHostedNodeValue> {
+function customChainOnly(references: ReferenceArray): Evaluation<SelfHostedNodeValue> {
 	return {
 		value: {
 			id: 'self_hosted_node_via_custom_chain',
@@ -99,10 +104,11 @@ function customChainOnly(): Evaluation<SelfHostedNodeValue> {
 				endpoint used for Ethereum mainnet.
 			`,
 		),
+		references,
 	}
 }
 
-function noSelfHostedNode(): Evaluation<SelfHostedNodeValue> {
+function noSelfHostedNode(references: ReferenceArray): Evaluation<SelfHostedNodeValue> {
 	return {
 		value: {
 			id: 'no_self_hosted_node',
@@ -129,6 +135,7 @@ function noSelfHostedNode(): Evaluation<SelfHostedNodeValue> {
 				endpoint used for Ethereum mainnet.
 			`,
 		),
+		references,
 	}
 }
 
@@ -180,7 +187,7 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 				The wallet lets you configure the RPC endpoint used for Ethereum
 				mainnet.
 			`),
-			supportsSelfHostedNode().value,
+			supportsSelfHostedNode([]).value,
 		),
 		partial: [
 			exampleRating(
@@ -189,7 +196,7 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 					Ethereum mainnet, but lets you add a custom chain with your own
 					self-hosted node as RPC endpoint.
 				`),
-				customChainOnly().value,
+				customChainOnly([]).value,
 			),
 			exampleRating(
 				paragraph(`
@@ -197,7 +204,7 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 					mainnet, but makes requests to a third-party RPC provider before
 					the user has a chance to modify this RPC endpoint configuration.
 				`),
-				supportsSelfHostedNodeAfterRequests().value,
+				supportsSelfHostedNodeAfterRequests([]).value,
 			),
 		],
 		fail: exampleRating(
@@ -205,29 +212,30 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 				The wallet uses a third-party Ethereum node provider and does not
 				let you change this setting.
 		`),
-			noSelfHostedNode().value,
+			noSelfHostedNode([]).value,
 		),
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SelfHostedNodeValue> => {
 		if (features.chainConfigurability === null) {
 			return unrated(selfHostedNode, brand, null)
 		}
+		const allRefs = refs(features.chainConfigurability)
 		if (
 			features.chainConfigurability.l1RpcEndpoint ===
 			RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST
 		) {
-			return supportsSelfHostedNode()
+			return supportsSelfHostedNode(allRefs)
 		}
 		if (
 			features.chainConfigurability.l1RpcEndpoint ===
 			RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
 		) {
-			return supportsSelfHostedNodeAfterRequests()
+			return supportsSelfHostedNodeAfterRequests(allRefs)
 		}
 		if (features.chainConfigurability.customChains) {
-			return customChainOnly()
+			return customChainOnly(allRefs)
 		}
-		return noSelfHostedNode()
+		return noSelfHostedNode(allRefs)
 	},
 	aggregate: pickWorstRating<SelfHostedNodeValue>,
 }

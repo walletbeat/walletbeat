@@ -17,8 +17,8 @@ export enum License {
 /**
  * A structure that contains both the license value and optional references
  */
-export type LicenseWithValue = WithRef<{
-	value: License
+export type LicenseWithRef = WithRef<{
+	license: License
 }>
 
 /**

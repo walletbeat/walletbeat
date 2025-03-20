@@ -4,9 +4,10 @@ import type { AtLeastOneVariant, Variant } from '../variants'
 import { type Sentence, sentence } from '@/types/content'
 import type { WalletMetadata } from '../wallet'
 import { unratedAttributeContent } from '@/types/content/unrated-attribute'
-import { isAccountTypeSupported } from '@/schema/features/account-support'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import type { ResolvedFeatures } from '@/schema/features'
+import { isSupported } from '@/schema/features/support'
+import type { AccountTypeMutableMultifactor } from '../features/account-support'
 
 /**
  * Helper for constructing "Unrated" values.
@@ -34,6 +35,7 @@ export function unrated<V extends Value>(
 	return {
 		value: v,
 		details: unratedAttributeContent<V>(),
+		references: [],
 	}
 }
 
@@ -66,6 +68,7 @@ export function exempt<V extends Value>(
 		details: {
 			render: ({ wallet }) => whyExempt.render(wallet.metadata),
 		},
+		references: [],
 	}
 }
 
@@ -122,14 +125,16 @@ export function pickWorstRating<V extends Value>(
  */
 export function isErc4337SmartWallet(features: ResolvedFeatures): boolean {
 	// Check in accountSupport
-	if (features.accountSupport !== null && 
-		features.accountSupport.rawErc4337 !== undefined && 
-		isAccountTypeSupported(features.accountSupport.rawErc4337)) {
-		return true;
+	if (
+		features.accountSupport !== null &&
+		features.accountSupport.rawErc4337 !== undefined &&
+		isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)
+	) {
+		return true
 	}
-	
+
 	// We can't access wallet.metadata from features, so we can only check accountSupport
-	return false;
+	return false
 }
 
 /**
@@ -145,22 +150,24 @@ export function isEoaOnlyWallet(features: ResolvedFeatures): boolean {
 		// Some wallets might not have walletType set but might have profile
 		if (features.profile !== null && features.profile !== 'GENERIC') {
 			// If profile is set and not GENERIC, it's not an EOA-only wallet
-			return false;
+			return false
 		}
 	}
-	
+
 	// Second check: Make sure it doesn't support ERC-4337 or other smart account standards
 	if (features.accountSupport !== null) {
-		if (features.accountSupport.rawErc4337 !== undefined && 
-			isAccountTypeSupported(features.accountSupport.rawErc4337)) {
+		if (
+			features.accountSupport.rawErc4337 !== undefined &&
+			isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)
+		) {
 			// Supports ERC-4337, so not an EOA-only wallet
-			return false;
+			return false
 		}
-		
+
 		// Check for other smart account types if relevant
 		// Add more checks here if needed
 	}
-	
+
 	// Third check: ensure it doesn't have smart contract wallet features
 	// Passkeys are typically used with smart contract wallets
 	if (features.security.passkeyVerification !== null) {
@@ -170,10 +177,10 @@ export function isEoaOnlyWallet(features: ResolvedFeatures): boolean {
 			// This means it doesn't have passkey verification (common for EOA wallets)
 		} else {
 			// Has real passkey verification, so likely not an EOA-only wallet
-			return false;
+			return false
 		}
 	}
-	
+
 	// If passed all checks, consider it an EOA-only wallet
-	return true;
+	return true
 }

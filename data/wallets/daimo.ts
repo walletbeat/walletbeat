@@ -291,7 +291,7 @@ export const daimo: Wallet = {
 			},
 		},
 		license: {
-			value: License.GPL_3_0,
+			license: License.GPL_3_0,
 			ref: [
 				{
 					explanation: 'Daimo is licensed under the GPL-3.0 license.',

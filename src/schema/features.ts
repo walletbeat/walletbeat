@@ -1,5 +1,5 @@
 import type { DataCollection } from './features/privacy/data-collection'
-import type { License, LicenseWithValue } from './features/license'
+import type { LicenseWithRef } from './features/license'
 import { type ResolvedFeature, resolveFeature, type Variant, type VariantFeature } from './variants'
 import type { Monetization } from './features/monetization'
 import type { WithRef } from './reference'
@@ -57,7 +57,7 @@ export interface WalletFeatures {
 
 		/** Hardware wallet clear signing support */
 		hardwareWalletClearSigning: VariantFeature<HardwareWalletClearSigningSupport>
-		
+
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
 
@@ -84,7 +84,7 @@ export interface WalletFeatures {
 	chainConfigurability: VariantFeature<ChainConfigurability>
 
 	/** Which types of accounts the wallet supports. */
-	accountSupport: VariantFeature<WithRef<AccountSupport>>
+	accountSupport: VariantFeature<AccountSupport>
 
 	/** Does the wallet support more than one Ethereum address? */
 	multiAddress: VariantFeature<Support>
@@ -96,7 +96,7 @@ export interface WalletFeatures {
 	addressResolution: VariantFeature<WithRef<AddressResolution>>
 
 	/** License of the wallet. */
-	license: VariantFeature<LicenseWithValue | License>
+	license: VariantFeature<LicenseWithRef>
 
 	/** The monetization model of the wallet. */
 	monetization: VariantFeature<Monetization>
@@ -142,7 +142,7 @@ export interface ResolvedFeatures {
 	multiAddress: ResolvedFeature<Support>
 	integration: WalletIntegration
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
-	license: ResolvedFeature<LicenseWithValue | License>
+	license: ResolvedFeature<LicenseWithRef>
 	monetization: ResolvedFeature<Monetization>
 	transparency: {
 		feeTransparency: ResolvedFeature<FeeTransparencySupport> | null
@@ -153,7 +153,7 @@ export interface ResolvedFeatures {
 export function resolveFeatures(features: WalletFeatures, variant: Variant): ResolvedFeatures {
 	const feat = <F>(feature: VariantFeature<F>): ResolvedFeature<F> =>
 		resolveFeature<F>(feature, variant)
-	
+
 	return {
 		variant,
 		profile: features.profile,
@@ -172,7 +172,9 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 			hardwareWalletSupport: feat(features.security.hardwareWalletSupport),
 			hardwareWalletClearSigning: feat(features.security.hardwareWalletClearSigning),
 			passkeyVerification: feat(features.security.passkeyVerification),
-			bugBountyProgram: features.security.bugBountyProgram ? feat(features.security.bugBountyProgram) : undefined,
+			bugBountyProgram: features.security.bugBountyProgram
+				? feat(features.security.bugBountyProgram)
+				: undefined,
 		},
 		privacy: {
 			dataCollection: feat(features.privacy.dataCollection),
@@ -189,8 +191,8 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 		license: feat(features.license),
 		monetization: feat(features.monetization),
 		transparency: {
-			feeTransparency: features.transparency?.feeTransparency 
-				? feat(features.transparency.feeTransparency) 
+			feeTransparency: features.transparency?.feeTransparency
+				? feat(features.transparency.feeTransparency)
 				: null,
 		},
 	}
