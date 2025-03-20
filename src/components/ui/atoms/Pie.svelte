@@ -179,6 +179,36 @@
 </script>
 
 
+
+{#snippet sliceSnippet(
+	slice: Slice,
+	i: number,
+)}
+
+	<g
+		class="slice"
+		style:--rotationAngle={sliceParams.rotationAngle(i)}
+		class:highlighted={highlightedSliceId === slice.id}
+		data-slice-id={slice.id}
+		role="button"
+		tabindex="0"
+		onmouseenter={() => onSliceMouseEnter?.(slice.id)}
+		onmouseleave={() => onSliceMouseLeave?.(slice.id)}
+		onclick={() => onSliceClick?.(slice.id)}
+		onkeydown={e => e.key === 'Enter' && onSliceClick?.(slice.id)}
+	>
+		<path d={sliceParams.path} fill={slice.color}>
+			<title>{slice.tooltip}: {slice.tooltipValue}</title>
+		</path>
+
+		<line x1="0" y1="0" x2="0" y2={-sliceParams.innerRadius} class="label-line" />
+		<text class="slice-label" aria-hidden="true">
+			{slice.arcLabel}
+		</text>
+	</g>
+{/snippet}
+
+
 <div class="container"
 	data-arc-type={layout}
 	style:--radius={radius}
@@ -189,27 +219,7 @@
 	<svg {width} {height} viewBox={viewBoxParams}>
 		<g class="slices">
 			{#each slices as slice, i}
-				<g
-					class="slice"
-					style:--rotationAngle={sliceParams.rotationAngle(i)}
-					class:highlighted={highlightedSliceId === slice.id}
-					data-slice-id={slice.id}
-					role="button"
-					tabindex="0"
-					onmouseenter={() => onSliceMouseEnter?.(slice.id)}
-					onmouseleave={() => onSliceMouseLeave?.(slice.id)}
-					onclick={() => onSliceClick?.(slice.id)}
-					onkeydown={e => e.key === 'Enter' && onSliceClick?.(slice.id)}
-				>
-					<path d={sliceParams.path} fill={slice.color}>
-						<title>{slice.tooltip}: {slice.tooltipValue}</title>
-					</path>
-
-					<line x1="0" y1="0" x2="0" y2={-sliceParams.innerRadius} class="label-line" />
-					<text class="slice-label" aria-hidden="true">
-						{slice.arcLabel}
-					</text>
-				</g>
+				{@render sliceSnippet(slice, i)}
 			{/each}
 		</g>
 
