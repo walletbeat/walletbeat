@@ -1,5 +1,8 @@
 name: Deploy site via Edgeserver
-on: push
+on:
+  push:
+    branches:
+      - beta
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,7 +28,7 @@ jobs:
       - name: Edgeserver Upload
         uses: v3xlabs/edgeserver-upload@v0.1.2-pre.4
         with:
-          app_id: "422130713911889920"
+          app_id: '422130713911889920'
           server: https://api.edgeserver.io
           token: ${{ secrets.EDGE_TOKEN }}
           directory: dist
