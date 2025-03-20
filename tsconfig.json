@@ -9,6 +9,7 @@
 			"@/*": ["src/*"]
 		},
 		"jsx": "react-jsx",
-		"jsxImportSource": "react"
+		"jsxImportSource": "react",
+		"forceConsistentCasingInFileNames": false
 	}
 }
