@@ -29,7 +29,7 @@ export const frame: Wallet = {
 			Frame...
 		`),
 		url: 'https://frame.sh',
-		repoUrl: null,
+		repoUrl: 'https://github.com/floating/frame',
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-03-13',
 		multiWalletType: {

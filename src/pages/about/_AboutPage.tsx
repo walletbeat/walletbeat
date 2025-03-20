@@ -71,7 +71,7 @@ function AboutContents(): React.JSX.Element {
 				shares in wallet companies. It is an{' '}
 				<IconLink
 					IconComponent={GitHubIcon}
-					href="https://github.com/fluidkey/walletbeat"
+					href="https://github.com/walletbeat/walletbeat"
 					target="_blank"
 				>
 					open-source project
@@ -143,7 +143,7 @@ function AboutContents(): React.JSX.Element {
 				purposes only. If you find that something is wrong, please help Walletbeat by{' '}
 				<IconLink
 					IconComponent={GitHubIcon}
-					href="https://github.com/fluidkey/walletbeat"
+					href="https://github.com/walletbeat/walletbeat"
 					target="_blank"
 				>
 					contributing

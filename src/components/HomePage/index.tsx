@@ -118,9 +118,9 @@ export const HomePage: FC = () => (
 					<div className="flex flex-col gap-2 py-8 flex-1">
 						<h1 className="text-5xl font-extrabold text-accent">Who watches the wallets?</h1>
 						<p className="text-secondary">
-							Alpha version; work in progress. For content contributions, please see{' '}
+							Beta version; For content contributions, please see{' '}
 							<a
-								href="https://github.com/fluidkey/walletbeat"
+								href="https://github.com/walletbeat/walletbeat"
 								target="_blank"
 								rel="noreferrer"
 								className="text-accent underline"

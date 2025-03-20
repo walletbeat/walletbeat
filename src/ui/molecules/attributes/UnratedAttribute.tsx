@@ -15,7 +15,7 @@ export function UnratedAttribute<V extends Value>({
 			</Typography>
 			<Typography>
 				Please help us by contributing your knowledge on{' '}
-				<ExternalLink url="https://github.com/fluidkey/walletbeat" rel="">
+				<ExternalLink url="https://github.com/walletbeat/walletbeat" rel="">
 					our repository
 				</ExternalLink>
 				!

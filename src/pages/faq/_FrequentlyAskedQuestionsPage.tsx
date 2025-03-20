@@ -238,7 +238,7 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			Walletbeat was originally created by
 			[moritz](https://warpcast.com/moritz/) as an open-source effort to
 			document the state of the wallet ecosystem.
-			[Multiple contributors](https://github.com/fluidkey/walletbeat/graphs/contributors)
+			[Multiple contributors](https://github.com/walletbeat/walletbeat/graphs/contributors)
 			have helped along the way by adding data on a variety of wallets.
 
 			Walletbeat was later revamped in 2025 by
@@ -246,7 +246,7 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			focus on Ethereum alignment and richer data about individual wallets.
 			This is still a work in progress.
 
-			Walletbeat is currently hosted by [Fluidkey](https://fluidkey.com/),
+			Walletbeat is currently community run, but was previously hosted by [Fluidkey](https://fluidkey.com/),
 			an incorporated company in Switzerland. In order to maximize credible
 			neutrality, Walletbeat's long-term ownership goal is to become an
 			independent DAO or foundation (similar to L2Beat) once Walletbeat
@@ -271,7 +271,7 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			process a lot.
 
 			If you would like to help with this, please
-			[contribute to our repository!](https://github.com/fluidkey/walletbeat).
+			[contribute to our repository!](https://github.com/walletbeat/walletbeat).
 		`,
 	},
 ]
