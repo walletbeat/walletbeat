@@ -92,7 +92,16 @@
 			{#each table.rows as row, index (getId?.(row, index))}
 				<tr
 					tabIndex={0}
-					onclick={() => onRowClick?.(row)}
+					onclick={e => {
+						e.stopPropagation()
+						onRowClick?.(row)
+					}}
+					onkeypress={e => {
+						if(e.code === 'Enter' || e.code === 'Space'){
+							e.stopPropagation()
+							onRowClick?.(row)
+						}
+					}}
 					animate:flip={{ duration: 300, easing: expoOut }}
 				>
 					{#each table.columns as column (column.id)}
