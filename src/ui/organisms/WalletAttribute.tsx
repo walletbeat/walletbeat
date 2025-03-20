@@ -25,7 +25,7 @@ import { variantToName } from '../../components/variants'
 import { RenderContent } from '../atoms/RenderContent'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { isTypographicContent } from '@/types/content'
-import { refs, toFullyQualified } from '@/schema/reference'
+import { toFullyQualified } from '@/schema/reference'
 import { ReferenceLinks } from '../atoms/ReferenceLinks'
 
 export function WalletAttribute<Vs extends ValueSet, V extends Value>({
@@ -78,143 +78,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		}
 	})()
 
-	// Extract references from the evaluation
-	// First check for references at the evaluation level, then fall back to extracting from value
-	const attributeReferences =
-		evalAttr.evaluation.references ||
-		(evalAttr.evaluation.value ? refs(evalAttr.evaluation.value) : [])
-
-	// Add additional references for certain categories and attributes that may not have built-in references
-	const addAdditionalReferences = () => {
-		// If we already have references, use them
-		if (attributeReferences.length > 0) {
-			return attributeReferences
-		}
-
-		const category = attrGroup.id
-		const attributeId = evalAttr.attribute.id
-
-		// Only add references for specific categories
-		if (
-			category === 'privacy' ||
-			category === 'selfSovereignty' ||
-			category === 'transparency' ||
-			category === 'ecosystem'
-		) {
-			console.log(`Adding references for ${category}/${attributeId}`)
-
-			// For open source in transparency category
-			if (attributeId === 'openSource' && wallet.metadata.repoUrl) {
-				return [
-					{
-						urls: [
-							{
-								url: wallet.metadata.repoUrl,
-								label: `${wallet.metadata.displayName} Repository`,
-							},
-						],
-						explanation: `${wallet.metadata.displayName}'s source code repository`,
-					},
-				]
-			}
-
-			// For specific wallet examples
-			if (wallet.metadata.id) {
-				switch (wallet.metadata.id) {
-					case 'rainbow':
-						if (attributeId === 'openSource') {
-							return [
-								{
-									urls: [
-										{
-											url: 'https://github.com/rainbow-me/rainbow/blob/develop/LICENSE',
-											label: 'Rainbow License File',
-										},
-									],
-									explanation: 'Rainbow uses the GPL-3.0 license for its source code',
-								},
-							]
-						}
-						break
-
-					case 'frame':
-						if (attributeId === 'selfHostedNode') {
-							return [
-								{
-									urls: [
-										{
-											url: 'https://frame.sh/docs/getting-started/connecting-to-ethereum/',
-											label: 'Frame node connection documentation',
-										},
-									],
-									explanation: 'Frame allows connecting to your own Ethereum node',
-								},
-							]
-						}
-						break
-
-					case 'metamask':
-						if (attributeId === 'passkeyImplementation') {
-							return [
-								{
-									urls: [
-										{
-											url: 'https://github.com/MetaMask/delegation-framework/tree/main/lib',
-											label: 'MetaMask Delegation Framework',
-										},
-									],
-									explanation: 'MetaMask uses Smooth Crypto lib for passkey verification',
-								},
-							]
-						}
-						break
-
-					case 'rabby':
-						if (attributeId === 'scamPrevention') {
-							return [
-								{
-									urls: [
-										{
-											url: 'https://github.com/RabbyHub/rabby-security-engine',
-											label: 'Rabby Security Engine',
-										},
-									],
-									explanation: 'Rabby provides warnings about potential scam activities',
-								},
-							]
-						}
-						break
-				}
-			}
-		}
-
-		// Return original references if no additions were made
-		return attributeReferences
-	}
-
-	// Get enhanced references
-	const enhancedReferences = addAdditionalReferences()
-
-	// Ensure references are properly qualified
-	const qualifiedReferences =
-		enhancedReferences.length > 0 ? toFullyQualified(enhancedReferences) : []
-
-	// Add debug logging
-	console.log(
-		`WalletAttribute references for ${attrGroup.id}/${evalAttr.attribute.id}:`,
-		JSON.stringify(
-			{
-				category: attrGroup.id,
-				attributeId: evalAttr.attribute.id,
-				wallet: wallet.metadata.id,
-				originalReferencesCount: attributeReferences.length,
-				enhancedReferencesCount: enhancedReferences.length,
-				qualifiedReferencesCount: qualifiedReferences.length,
-			},
-			null,
-			2,
-		),
-	)
+	const qualifiedReferences = toFullyQualified(evalAttr.evaluation.references)
 
 	let rendered = (
 		<>

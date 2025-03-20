@@ -8,6 +8,7 @@ import { WalletTypeCategory } from '@/schema/features/wallet-type'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
+import { License } from '@/schema/features/license'
 
 export const rainbow: Wallet = {
 	metadata: {
@@ -88,7 +89,16 @@ export const rainbow: Wallet = {
 				},
 			},
 		},
-		license: null,
+		license: {
+			license: License.GPL_3_0,
+			ref: [
+				{
+					url: 'https://github.com/rainbow-me/rainbow/blob/develop/LICENSE',
+					label: 'Rainbow License File',
+					explanation: 'Rainbow uses the GPL-3.0 license for its source code',
+				},
+			],
+		},
 		monetization: {
 			revenueBreakdownIsPublic: false,
 			strategies: {
