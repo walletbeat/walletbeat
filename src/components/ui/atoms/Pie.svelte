@@ -260,6 +260,7 @@
 			--center-label-baseline: central;
 		}
 
+		display: inline-grid;
 		transform: translateZ(0);
 		will-change: transform;
 		backface-visibility: hidden;
