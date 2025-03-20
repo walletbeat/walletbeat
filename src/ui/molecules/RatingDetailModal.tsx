@@ -499,7 +499,10 @@ function getShortExplanation(
 		if (categoryData && typeof categoryData === 'object') {
 			const attrData = (categoryData as any)[attributeId]
 			if (attrData?.evaluation?.value?.shortExplanation?.render) {
-				const rendered = attrData.evaluation.value.shortExplanation.render(evalTree.metadata || {})
+				const walletData = getWalletById(walletId)
+				const walletMetadata = walletData?.metadata || {}
+
+				const rendered = attrData.evaluation.value.shortExplanation.render(walletMetadata)
 				if (rendered) {
 					if (typeof rendered === 'object' && 'text' in rendered) {
 						return rendered.text
