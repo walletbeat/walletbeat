@@ -1,6 +1,6 @@
 <script module lang="ts">
 	// Types/constants
-	export type PieSlice = {
+	export type Slice = {
 		id: string
 		color: string
 		weight: number
@@ -44,7 +44,7 @@
 		centerContentSnippet,
 	}: {
 		// Content
-		slices: PieSlice[]
+		slices: Slice[]
 		centerLabel?: string
 
 		// View options
