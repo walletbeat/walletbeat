@@ -65,6 +65,7 @@ import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import LanguageIcon from '@mui/icons-material/Language'
 import GitHubIcon from '@mui/icons-material/GitHub'
+import type { Url } from '@/schema/url'
 
 const headerBottomMargin = 0
 
@@ -273,50 +274,53 @@ export function WalletPage({
 			caption: null,
 			icon: null,
 			body: (
-				<Box
-					sx={{
-						marginTop: '0',
-						marginBottom: '0',
-						padding: '0',
-					}}
-				>
+				<div data-testid="wallet-blurb">
+					<div
+						// sx={{
+						// 	display: 'flex',
+						// 	flexDirection: 'row',
+						// 	gap: '1rem',
+						// 	marginTop: '1rem',
+						// 	marginBottom: '24px',
+						// 	alignItems: 'center',
+						// 	flexWrap: 'wrap',
+						// 	padding: '2px',
+						// 	backgroundColor: 'var(--background)',
+						// }}
+						className="flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]"
+					>
+						{
+							[
+								(<div className="flex flex-row gap-2 items-center" key="website">
+									<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+									<ExternalLink
+										url={refLink(wallet.metadata.url)}
+										defaultLabel={`${wallet.metadata.displayName} website`}
+										style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+									/>
+								</div>),
+								(
+									wallet.metadata.repoUrl !== null ? (
+										<div className="flex flex-row gap-2 items-center" key="repo">
+											<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+											<ExternalLink
+												url={refLink(wallet.metadata.repoUrl)}
+												defaultLabel="GitHub Repository"
+												style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+											/>
+										</div>
+									) : undefined
+								)].filter(Boolean).map((value) => (value !== undefined &&
+									<div key={value.key ?? 'hi'} className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary">
+										{value}
+									</div>
+								))
+						}
+					</div>
 					<RenderTypographicContent
 						content={wallet.metadata.blurb.render({})}
 						typography={{ variant: 'body1' }}
 					/>
-					<Box
-						sx={{
-							display: 'flex',
-							flexDirection: 'row',
-							gap: '1rem',
-							marginTop: '1rem',
-							marginBottom: '24px',
-							alignItems: 'center',
-							flexWrap: 'wrap',
-							padding: '2px',
-							backgroundColor: 'var(--background)',
-						}}
-					>
-						<Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-							<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
-							<ExternalLink
-								url={wallet.metadata.url}
-								defaultLabel={`${wallet.metadata.displayName} website`}
-								style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
-							/>
-						</Box>
-
-						{wallet.metadata.repoUrl !== null && (
-							<Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-								<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
-								<ExternalLink
-									url={wallet.metadata.repoUrl}
-									defaultLabel="GitHub Repository"
-									style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
-								/>
-							</Box>
-						)}
-					</Box>
 					<Typography fontSize="0.9rem" marginTop="3rem">
 						<React.Fragment key="begin">
 							<span style={{ color: 'var(--accent)' }}>Platforms: </span>
@@ -347,7 +351,7 @@ export function WalletPage({
 							</React.Fragment>
 						)}
 					</Typography>
-				</Box>
+				</div>
 			),
 		},
 	]
@@ -622,12 +626,12 @@ export function WalletPage({
 			/>
 
 			<ReturnToTop />
-			<div className="max-w-screen-xl mx-auto w-full">
-				<div className="flex flex-col mt-10 gap-4">
+			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
+				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
 					<div className="flex flex-row">
 						<div className="flex-1">
 							<div style={{ height: headerBottomMargin }}></div>
-							<div className="mb-4 px-6">
+							<div className="px-8">
 								<Typography
 									variant="h4"
 									component="h1"
@@ -687,7 +691,7 @@ export function WalletPage({
 											<Box
 												key="sectionBody"
 												color="var(--text-primary)"
-												paddingTop={theme.spacing(2)}
+												// paddingTop={theme.spacing(2)}
 												paddingLeft={theme.spacing(2)}
 												paddingRight={theme.spacing(2)}
 											>
@@ -734,4 +738,22 @@ export function WalletPage({
 			</div>
 		</NavigationPageLayout>
 	)
+}
+
+// ensures ref = wallet-page is in the url as query param
+export const refLink = (url: Url | undefined): Url | undefined => {
+	if (url === undefined) {
+		return undefined
+	}
+
+	// If url is a LabeledUrl, preserve the label while updating the URL
+	if (typeof url === 'object' && 'url' in url) {
+		return {
+			url: new URL(url.url).toString() + '?ref=wallet.page',
+			label: url.label
+		}
+	}
+
+	// Handle string URL
+	return new URL(url).toString() + '?ref=wallet.page'
 }
