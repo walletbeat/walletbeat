@@ -254,10 +254,12 @@ function PizzaSliceChart({
 	attrGroup,
 	evalTree,
 	isSupported = true,
+	walletId,
 }: {
 	attrGroup: AttributeGroup<any>
 	evalTree: EvaluationTree
 	isSupported?: boolean
+	walletId: string
 }): React.ReactElement {
 	// Add state for the modal
 	const [modalOpen, setModalOpen] = useState(false)
@@ -389,6 +391,7 @@ function PizzaSliceChart({
 					attrGroup={attrGroup}
 					evalTree={evalTree}
 					attributeRatings={attributeRatings}
+					walletId={walletId}
 				/>
 			)}
 		</>
@@ -415,11 +418,11 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets).map(wallet =>
 	const standardsDisplay =
 		standards.length > 0
 			? standards
-				.map(std => {
-					const display = SMART_WALLET_STANDARD_DISPLAY[std]
-					return display !== undefined ? display : std
-				})
-				.join(', ')
+					.map(std => {
+						const display = SMART_WALLET_STANDARD_DISPLAY[std]
+						return display !== undefined ? display : std
+					})
+					.join(', ')
 			: 'None'
 
 	const websiteUrl =
@@ -559,12 +562,13 @@ export default function WalletTable(): React.ReactElement {
 					<div className="flex space-x-0 items-center">
 						<div className="flex flex-col items-center">
 							<button
-								className={`p-2 rounded-md ${!supportsWeb
+								className={`p-2 rounded-md ${
+									!supportsWeb
 										? 'opacity-40 cursor-not-allowed text-gray-400'
 										: selectedVariant === DeviceVariant.WEB
 											? 'text-purple-700'
 											: 'text-gray-600 hover:text-gray-900'
-									}`}
+								}`}
 								onClick={() => {
 									if (supportsWeb) {
 										handleVariantChange(DeviceVariant.WEB)
@@ -576,18 +580,20 @@ export default function WalletTable(): React.ReactElement {
 								<WebIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${selectedVariant === DeviceVariant.WEB ? 'bg-purple-700' : 'bg-gray-300'
-									}`}
+								className={`w-2 h-2 rounded-full mt-1 ${
+									selectedVariant === DeviceVariant.WEB ? 'bg-purple-700' : 'bg-gray-300'
+								}`}
 							/>
 						</div>
 						<div className="flex flex-col items-center">
 							<button
-								className={`p-2 rounded-md ${!supportsMobile
+								className={`p-2 rounded-md ${
+									!supportsMobile
 										? 'opacity-40 cursor-not-allowed text-gray-400'
 										: selectedVariant === DeviceVariant.MOBILE
 											? 'text-purple-700'
 											: 'text-gray-600 hover:text-gray-900'
-									}`}
+								}`}
 								onClick={() => {
 									if (supportsMobile) {
 										handleVariantChange(DeviceVariant.MOBILE)
@@ -599,18 +605,20 @@ export default function WalletTable(): React.ReactElement {
 								<MobileIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${selectedVariant === DeviceVariant.MOBILE ? 'bg-purple-700' : 'bg-gray-300'
-									}`}
+								className={`w-2 h-2 rounded-full mt-1 ${
+									selectedVariant === DeviceVariant.MOBILE ? 'bg-purple-700' : 'bg-gray-300'
+								}`}
 							/>
 						</div>
 						<div className="flex flex-col items-center">
 							<button
-								className={`p-2 rounded-md ${!supportsDesktop
+								className={`p-2 rounded-md ${
+									!supportsDesktop
 										? 'opacity-40 cursor-not-allowed text-gray-400'
 										: selectedVariant === DeviceVariant.DESKTOP
 											? 'text-purple-700'
 											: 'text-gray-600 hover:text-gray-900'
-									}`}
+								}`}
 								onClick={() => {
 									if (supportsDesktop) {
 										handleVariantChange(DeviceVariant.DESKTOP)
@@ -622,8 +630,9 @@ export default function WalletTable(): React.ReactElement {
 								<DesktopIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${selectedVariant === DeviceVariant.DESKTOP ? 'bg-purple-700' : 'bg-gray-300'
-									}`}
+								className={`w-2 h-2 rounded-full mt-1 ${
+									selectedVariant === DeviceVariant.DESKTOP ? 'bg-purple-700' : 'bg-gray-300'
+								}`}
 							/>
 						</div>
 					</div>
@@ -638,8 +647,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -647,13 +657,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={securityAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -665,8 +676,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -674,13 +686,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={privacyAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -692,8 +705,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -701,13 +715,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={selfSovereigntyAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -719,8 +734,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -728,13 +744,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={transparencyAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -746,8 +763,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -755,13 +773,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={ecosystemAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -801,10 +820,11 @@ export default function WalletTable(): React.ReactElement {
 					<div className="flex space-x-0 items-center justify-center">
 						<div className="flex flex-col items-center">
 							<button
-								className={`p-2 rounded-md ${selectedVariant === DeviceVariant.NONE
+								className={`p-2 rounded-md ${
+									selectedVariant === DeviceVariant.NONE
 										? 'text-gray-600 hover:text-gray-900'
 										: 'text-purple-700'
-									}`}
+								}`}
 								onClick={() => {
 									// Toggle between none and hardware selection
 									handleVariantChange(
@@ -824,8 +844,9 @@ export default function WalletTable(): React.ReactElement {
 								/>
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${selectedVariant !== DeviceVariant.NONE ? 'bg-purple-700' : 'bg-gray-300'
-									}`}
+								className={`w-2 h-2 rounded-full mt-1 ${
+									selectedVariant !== DeviceVariant.NONE ? 'bg-purple-700' : 'bg-gray-300'
+								}`}
 							/>
 						</div>
 					</div>
@@ -840,8 +861,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -849,13 +871,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={securityAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -867,8 +890,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -876,13 +900,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={privacyAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -894,8 +919,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -903,13 +929,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={selfSovereigntyAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -921,8 +948,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -930,13 +958,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={transparencyAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -948,8 +977,9 @@ export default function WalletTable(): React.ReactElement {
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const walletId = wallet.metadata?.id || row.id
 
-				return { wallet, isSupported, evalTree }
+				return { wallet, isSupported, evalTree, walletId }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -957,13 +987,14 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { wallet, isSupported, evalTree } = value
+				const { wallet, isSupported, evalTree, walletId } = value
 
 				return (
 					<PizzaSliceChart
 						attrGroup={ecosystemAttributeGroup}
 						evalTree={evalTree}
 						isSupported={isSupported}
+						walletId={walletId}
 					/>
 				)
 			},
@@ -985,10 +1016,11 @@ export default function WalletTable(): React.ReactElement {
 			{/* Tabs */}
 			<div className="flex border-b mb-4">
 				<button
-					className={`px-4 py-2 font-medium text-sm focus:outline-none ${activeTab === WalletTableTab.SOFTWARE
+					className={`px-4 py-2 font-medium text-sm focus:outline-none ${
+						activeTab === WalletTableTab.SOFTWARE
 							? 'border-b-2 border-blue-500 text-blue-600'
 							: 'text-gray-500 hover:text-gray-700'
-						}`}
+					}`}
 					onClick={() => {
 						handleTabChange(WalletTableTab.SOFTWARE)
 					}}
@@ -996,10 +1028,11 @@ export default function WalletTable(): React.ReactElement {
 					Software Wallets
 				</button>
 				<button
-					className={`px-4 py-2 font-medium text-sm focus:outline-none ${activeTab === WalletTableTab.HARDWARE
+					className={`px-4 py-2 font-medium text-sm focus:outline-none ${
+						activeTab === WalletTableTab.HARDWARE
 							? 'border-b-2 border-blue-500 text-blue-600'
 							: 'text-gray-500 hover:text-gray-700'
-						}`}
+					}`}
 					onClick={() => {
 						handleTabChange(WalletTableTab.HARDWARE)
 					}}
@@ -1016,13 +1049,14 @@ export default function WalletTable(): React.ReactElement {
 							{headerGroup.headers.map(header => (
 								<th
 									key={header.id}
-									className={`px-4 py-2 text-left text-[14px] text-[#616161] bg-gray-100 ${header.column.columnDef.header === 'Wallet' ||
-											header.column.columnDef.header === 'Type'
+									className={`px-4 py-2 text-left text-[14px] text-[#616161] bg-gray-100 ${
+										header.column.columnDef.header === 'Wallet' ||
+										header.column.columnDef.header === 'Type'
 											? 'font-bold'
 											: header.column.columnDef.header === 'Risk by device'
 												? 'font-semibold'
 												: 'font-normal'
-										}`}
+									}`}
 								>
 									{flexRender(header.column.columnDef.header, header.getContext())}
 								</th>
