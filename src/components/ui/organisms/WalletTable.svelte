@@ -63,7 +63,9 @@
 			id: 'displayName',
 			key: 'displayName',
 			name: 'Wallet',
-			getValue: ({ wallet }) => wallet.metadata.displayName,
+			getValue: ({ wallet }) => (
+				wallet.metadata.displayName
+			),
 		},
 		...(
 			Object.values(attributeGroups)
@@ -71,7 +73,9 @@
 					id: attrGroup.id,
 					key: attrGroup.id,
 					name: `${attrGroup.icon} ${attrGroup.displayName}`,
-					getValue: ({ wallet }) => attrGroup.score(wallet.overall[attrGroup.id]),
+					getValue: ({ wallet }) => (
+						wallet.overall[attrGroup.id] && attrGroup.score(wallet.overall[attrGroup.id])?.score || undefined
+					),
 				}))
 		),
 	]}
