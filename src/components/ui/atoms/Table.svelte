@@ -151,6 +151,7 @@
 		--table-innerBorderColor: rgba(20, 21, 25, 1);
 		--table-borderWidth: 1px;
 		--table-cornerRadius: 1rem;
+		--table-cell-verticalAlign: top;
 		--table-cell-padding: 0.5em 1em;
 
 		scroll-padding: var(--table-borderWidth);
@@ -240,6 +241,7 @@
 
 					> td {
 						box-shadow: var(--table-borderWidth) 0 var(--table-row-backgroundColor);
+						vertical-align: var(--table-cell-verticalAlign);
 					}
 				}
 
