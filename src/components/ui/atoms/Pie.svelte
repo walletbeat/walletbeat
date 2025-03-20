@@ -246,6 +246,11 @@
 
 <style>
 	.container {
+		--highlight-color: rgba(255, 255, 255, 1);
+		--highlight-stroke-width: 2;
+		--hover-brightness: 1.1;
+		--hover-scale: 1.05;
+
 		--sliceLabel-radius: calc(var(--radius) * (var(--outerRadiusFraction) + var(--innerRadiusFraction)) / 2);
 
 		&[data-arc-type="TopHalf"] {
@@ -277,20 +282,20 @@
 
 				&:hover,
 				&:focus {
-					filter: brightness(1.1);
-					--slice-scale: 1.05;
+					filter: brightness(var(--hover-brightness));
+					--slice-scale: var(--hover-scale);
 				}
 
 				&:focus {
-					stroke: rgba(255, 255, 255, 0.8);
-					stroke-width: 2px;
+					stroke: var(--highlight-color);
+					stroke-width: calc(var(--highlight-stroke-width) * 1px);
 					z-index: 2;
 					outline: none;
 				}
 
 				&.highlighted {
-					stroke: rgba(255, 255, 255, 1);
-					stroke-width: 2px;
+					stroke: var(--highlight-color);
+					stroke-width: calc(var(--highlight-stroke-width) * 1px);
 					z-index: 2;
 				}
 
