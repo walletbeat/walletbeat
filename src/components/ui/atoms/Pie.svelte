@@ -39,6 +39,9 @@
 		onSliceClick,
 		onSliceMouseEnter,
 		onSliceMouseLeave,
+
+		// Snippets
+		centerContentSnippet,
 	}: {
 		// Content
 		slices: PieSlice[]
@@ -60,6 +63,9 @@
 		onSliceClick?: (id: string) => void
 		onSliceMouseEnter?: (id: string) => void
 		onSliceMouseLeave?: (id: string) => void
+
+		// Snippets
+		centerContentSnippet?: Snippet
 	} = $props()
 
 
@@ -207,13 +213,15 @@
 			{/each}
 		</g>
 
-		{#if centerLabel}
-			<text
-				class="center-label"
-			>
-				{centerLabel}
-			</text>
-		{/if}
+		<g class="center">
+			{#if centerContentSnippet}
+				{@render centerContentSnippet()}
+			{:else}
+				<text>
+					{centerLabel}
+				</text>
+			{/if}
+		</g>
 	</svg>
 </div>
 
@@ -223,11 +231,10 @@
 		--sliceLabel-radius: calc(var(--radius) * (var(--outerRadiusFraction) + var(--innerRadiusFraction)) / 2);
 
 		&[data-arc-type="TopHalf"] {
-			--centerLabel-dominantBaseline: text-after-edge;
+			--center-label-baseline: text-after-edge;
 		}
-
 		&[data-arc-type="Full"] {
-			--centerLabel-dominantBaseline: central;
+			--center-label-baseline: central;
 		}
 
 		transform: translateZ(0);
@@ -287,12 +294,16 @@
 			}
 		}
 
-		.center-label {
-			text-anchor: middle;
-			dominant-baseline: var(--centerLabel-dominantBaseline);
-			font-size: 14px;
-			fill: currentColor;
-			pointer-events: none;
+		.center {
+			:global(text) {
+				font-size: 0.8em;
+				fill: currentColor;
+
+				text-anchor: middle;
+				dominant-baseline: var(--center-label-baseline);
+
+				pointer-events: none;
+			}
 		}
 	}
 </style>
