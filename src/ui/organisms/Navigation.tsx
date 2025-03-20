@@ -1,13 +1,9 @@
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
-import React, { memo, useState } from 'react'
+import React, { memo, useState, useEffect } from 'react'
 import { ThemeSwitcher } from './ThemeSwitcher'
-
-/**
- * Size of the navigation menu, in pixels.
- */
-const drawerWidth = 280
+import { LuMenu, LuX } from 'react-icons/lu'
 
 /**
  * A navigation item in the navigation menu.
@@ -133,7 +129,7 @@ const NavigationItem = memo(
 			'whitespace-nowrap flex flex-row items-center gap-2 py-1 px-2 hover:bg-backgroundSecondary rounded-md'
 		const hasChildren = (item.children?.length ?? 0) > 0
 
-		const toggleDropdown = (e: React.MouseEvent) => {
+		const toggleDropdown = (e: React.MouseEvent): void => {
 			if (hasChildren) {
 				e.preventDefault()
 				setIsOpen(!isOpen)
@@ -210,7 +206,7 @@ const NavigationItem = memo(
 		return (
 			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				<ButtonComponent key="buttonComponent">
-					{item.icon && <SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>}
+					{item.icon ? <SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon> : null}
 					<span>{item.title}</span>
 				</ButtonComponent>
 
@@ -238,15 +234,6 @@ const NavigationItem = memo(
 		prevProps.depth === nextProps.depth &&
 		prevProps.active === nextProps.active,
 )
-
-const navigationBoxStyle = {
-	width: drawerWidth,
-	minWidth: drawerWidth,
-	position: 'sticky',
-	top: '0px',
-	height: '100vh',
-	bottom: '0px',
-}
 
 interface NavigationGroupProps {
 	group: NavigationGroup
@@ -329,13 +316,66 @@ export function Navigation({
 	onContentItemClick?: (item: NavigationContentItem) => void
 	prefix?: React.ReactNode
 }): React.JSX.Element {
+	const [isOpen, setIsOpen] = useState(false)
+	const [isMobile, setIsMobile] = useState(false)
+
+	// Handle responsive behavior
+	useEffect(() => {
+		const handleResize = (): void => {
+			const mobile = window.innerWidth < 1024
+			setIsMobile(mobile)
+
+			// Only change isOpen state when transitioning between mobile/desktop
+			if (mobile !== isMobile) {
+				setIsOpen(!mobile) // Open on desktop, closed on mobile
+			}
+		}
+
+		// Set initial state
+		handleResize()
+
+		window.addEventListener('resize', handleResize)
+		return (): void => {
+			window.removeEventListener('resize', handleResize)
+		}
+	}, [isMobile])
+
+	// Freeze body scroll when mobile sidebar is open
+	useEffect(() => {
+		if (isMobile && isOpen) {
+			// Freeze the body scroll
+			document.body.style.overflow = 'hidden'
+		} else {
+			// Allow scrolling again
+			document.body.style.overflow = ''
+		}
+
+		// Cleanup when component unmounts
+		return (): void => {
+			document.body.style.overflow = ''
+		}
+	}, [isMobile, isOpen])
+
+	// Toggle menu
+	const toggleMenu = (): void => {
+		setIsOpen(!isOpen)
+	}
+
+	// Helper function for mapping navigation groups to avoid linter errors
+	const renderNavigationGroup = (group: NavigationGroup, groupIndex: number): React.ReactElement => (
+		<NavigationGroup
+			key={`navigationGroup-${group.id}`}
+			group={group}
+			groupIndex={groupIndex}
+			onContentItemClick={onContentItemClick}
+			activeItemId={activeItemId}
+		/>
+	)
+
 	return (
-		<div
-			key="navigationBox"
-			className="flex flex-col gap-0 w-full md:max-w-xs flex-0 sticky top-0 h-screen overflow-y-auto"
-			style={{ backgroundColor: 'var(--navigation-bg)' }}
-		>
-			<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-4 mt-8">
+		<>
+			{/* Fixed top bar for mobile */}
+			<div className="lg:hidden fixed top-0 left-0 right-0 flex justify-between items-center px-4 bg-background z-50 border-b border-borderColor h-16">
 				<a href="/" className="flex items-center">
 					<img
 						src="/logo-light.svg"
@@ -348,27 +388,83 @@ export function Navigation({
 						className="h-8 w-auto hidden dark:block transition-all"
 					/>
 				</a>
-				<ThemeSwitcher />
+				<div className="flex items-center gap-2 h-[34px]">
+					<ThemeSwitcher />
+					<button
+						onClick={toggleMenu}
+						className="btn"
+						aria-label={isOpen ? "Close menu" : "Open menu"}
+					>
+						{isOpen ? <LuX size={16} /> : <LuMenu size={16} />}
+					</button>
+				</div>
 			</div>
 
-			{/* Desktop Search Component - ensures the search is always visible on desktop */}
-			{prefix && <div className="px-4 mb-6 w-full">{prefix}</div>}
+			{/* Placeholder div to push content down on mobile */}
+			<div className="lg:hidden h-16"></div>
 
-			<div className="flex flex-col gap-2 px-4">
-				{nonEmptyMap(groups, (group, groupIndex) => (
-					<NavigationGroup
-						key={`navigationGroup-${group.id}`}
-						group={group}
-						groupIndex={groupIndex}
-						onContentItemClick={onContentItemClick}
-						activeItemId={activeItemId}
-					/>
-				))}
+			{/* Navigation sidebar - desktop behavior differs from mobile */}
+			<div
+				key="navigationBox"
+				className={`
+				    /* Desktop styles */
+				    lg:flex lg:flex-col lg:gap-0 lg:w-full lg:max-w-xs lg:flex-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:z-40
+
+				    /* Mobile styles */
+				    fixed top-0 left-0 h-full w-full lg:w-auto overflow-y-auto z-40
+
+				    /* Transition for mobile only */
+				    transition-all duration-300
+
+				    /* Different transform behavior for mobile vs desktop */
+				    ${isMobile
+						? isOpen ? 'translate-x-0' : '-translate-x-full'
+						: 'translate-x-0'
+					}
+				`}
+				style={{ backgroundColor: 'var(--navigation-bg)' }}
+			>
+				{/* Logo - visible only on desktop */}
+				<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-14 lg:pt-0 h-[34px]">
+					<a href="/" className="hidden lg:flex items-center">
+						<img
+							src="/logo-light.svg"
+							alt="WalletBeat Logo"
+							className="h-8 w-auto block dark:hidden transition-all"
+						/>
+						<img
+							src="/logo-dark.svg"
+							alt="WalletBeat Logo"
+							className="h-8 w-auto hidden dark:block transition-all"
+						/>
+					</a>
+					<div className="hidden lg:block">
+						<ThemeSwitcher />
+					</div>
+				</div>
+
+				{/* Desktop Search Component - ensures the search is always visible on desktop */}
+				{typeof prefix !== 'undefined' && prefix !== null ? (
+					<div className="px-4 mb-2 w-full">{prefix}</div>
+				) : null}
+
+				<div className="flex flex-col gap-2 px-4">
+					{nonEmptyMap(groups, renderNavigationGroup)}
+				</div>
+				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-center rounded-lg">
+					Wallets listed on this page are not official endoresements, and are provided for
+					informational purposes only.
+				</div>
 			</div>
-			<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-center rounded-lg">
-				Wallets listed on this page are not official endoresements, and are provided for
-				informational purposes only.
-			</div>
-		</div>
+
+			{/* Overlay when mobile menu is open */}
+			{isOpen && isMobile && (
+				<div
+					className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+					onClick={toggleMenu}
+					aria-hidden="true"
+				/>
+			)}
+		</>
 	)
 }

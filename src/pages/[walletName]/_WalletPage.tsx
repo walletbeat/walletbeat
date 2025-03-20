@@ -79,7 +79,7 @@ const StyledSubsection = styled(Paper)(({ theme }) => ({
 	display: 'flex',
 	flexDirection: 'column',
 	borderRadius: `${subsectionBorderRadius}px`,
-	margin: '1rem 2rem',
+	margin: '0rem 1rem 1rem 1rem',
 }))
 
 interface Section {

@@ -104,18 +104,18 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 							return 0
 						}}
 					>
-						<div className="flex items-center border-b px-2 mb-1">
+						<div className="flex items-center border-b px-2">
 							<LuSearch className="text-gray-400 mr-2" />
 							<Command.Input
 								ref={inputRef}
 								value={search}
 								onValueChange={setSearch}
 								placeholder="Search all wallets..."
-								className="flex-1 h-9 bg-transparent outline-none placeholder:text-gray-400 mb-2"
+								className="flex-1 h-9 bg-transparent outline-none placeholder:text-gray-400"
 							/>
 						</div>
 
-						<Command.List className="max-h-[350px] overflow-auto py-1">
+						<Command.List className="max-h-[350px] overflow-auto">
 							{/* Only show section headers when there are matching items */}
 							{softwareWalletItems.some(
 								w =>

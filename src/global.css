@@ -155,10 +155,18 @@ code {
 	font-family: monospace, monospace;
 }
 
+[cmdk-list] {
+	@apply pb-2 pt-3;
+}
+
 [cmdk-group-heading] {
 	@apply px-2;
 }
 
 [cmdk-list-sizer] {
 	@apply space-y-2;
+}
+
+[data-radix-popper-content-wrapper] {
+	z-index: 100 !important;
 }
