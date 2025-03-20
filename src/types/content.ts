@@ -85,12 +85,12 @@ type Input = object
 /** Arbitrary renderable content. */
 export interface Renderable<I extends Input = Input> {
 	/** Renders the element given an input template. */
-	render: (input: I) => Content
+	render: (input?: I) => Content
 }
 
 /** A Renderable that renders typographic content. */
 export interface RenderableTypography<I extends Input = Input> extends Renderable<I> {
-	render: (input: I) => TypographicContent
+	render: (input?: I) => TypographicContent
 }
 
 function textContent<I extends Input = Input>(
