@@ -1,9 +1,7 @@
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import type * as React from 'react'
 import { Box, Tooltip } from '@mui/material'
 import type { SvgIconComponent } from '@mui/icons-material'
 import { IconButton } from './IconButton'
-import theme from '../../components/ThemeRegistry/theme'
 import { useEffect, useState } from 'react'
 
 export interface PickableVariant<V extends string> {
@@ -33,7 +31,6 @@ export function VariantPicker<V extends string>({
 	opacityFaded = 0.35,
 	opacityDefault = 0.85,
 	opacityPicked = 1.0,
-	colorPicked = 'primary.light',
 	flexDirection = 'row',
 	gap = '0px',
 }: VariantPickerProps<V>): React.JSX.Element {

@@ -27,7 +27,7 @@ export function ReferenceList({
 				{refs.map(ref => (
 					<li key={ref.urls[0].url}>
 						{ref.explanation ?? 'Reference:'}
-						<ReferenceLinks ref={ref} showExplanation={false} nonEmptyPrefix=" " />
+						<ReferenceLinks references={ref} />
 					</li>
 				))}
 			</ul>

@@ -1,29 +1,14 @@
-// Constants
-import { betaSiteRoot } from '@/constants'
-
-// Layouts
-import Layout from '../layouts/Layout.astro'
-
 // Components
-import { IconLink } from '@/ui/atoms/IconLink'
 import WalletTable from '@/ui/organisms/WalletTable'
 
-import { Box, Typography } from '@mui/material'
-import HelpCenterIcon from '@mui/icons-material/HelpCenter'
-import ForumIcon from '@mui/icons-material/Forum'
-import FoundationIcon from '@mui/icons-material/Foundation'
-import GitHubIcon from '@mui/icons-material/GitHub'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { navigationAbout, navigationCriteria } from '@/components/navigation'
 import { LuWallet, LuKey } from 'react-icons/lu'
 import type { FC } from 'react'
 import { wallets } from '@/data/wallets'
 import { hardwareWallets } from '@/data/hardware-wallets'
-import type { Wallet } from '@/schema/wallet'
 
 export const HomePage: FC = () => (
-	// hi
-
 	<NavigationPageLayout
 		groups={[
 			{

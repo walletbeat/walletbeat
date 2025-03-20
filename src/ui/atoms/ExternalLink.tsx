@@ -27,7 +27,7 @@ export function ExternalLink({
 				href={labeled.url}
 				target="_blank"
 				rel={rel}
-				color="primary"
+				color={color}
 				style={{
 					...style,
 				}}

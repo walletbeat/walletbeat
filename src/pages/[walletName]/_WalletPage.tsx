@@ -14,7 +14,7 @@ import {
 	nonEmptyMap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-import { Box, Typography, Paper, styled, Divider, Tooltip } from '@mui/material'
+import { Box, Typography, Paper, styled, Tooltip } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { WalletIcon } from '@/ui/atoms/WalletIcon'
 import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
@@ -41,7 +41,6 @@ import {
 	navigationAbout,
 	navigationFaq,
 	navigationFarcasterChannel,
-	navigationHome,
 	navigationRepository,
 	scrollPastHeaderPixels,
 } from '@/components/navigation'

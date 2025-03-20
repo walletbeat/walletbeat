@@ -29,7 +29,7 @@ export function IconLink({
 				href={href}
 				target={target}
 				rel={rel}
-				color="primary"
+				color={color}
 				style={{
 					...style,
 				}}

@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useState } from 'react'
+import { type FC, useEffect, useState } from 'react'
 import { LuSun, LuMoon } from 'react-icons/lu'
 
 export const ThemeSwitcher: FC = () => {

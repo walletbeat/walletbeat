@@ -3,7 +3,7 @@ import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import type { AttributeGroup, ValueSet, EvaluatedGroup } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
 import { Box, type SxProps, Tooltip } from '@mui/material'
-import { DataGrid, type GridColDef, GridToolbar, type GridSortModel } from '@mui/x-data-grid'
+import { DataGrid, type GridColDef, GridToolbar } from '@mui/x-data-grid'
 import type React from 'react'
 import { WalletRatingCell, walletRatingColumnProps } from '@/ui/molecules/WalletRatingCell'
 import {
@@ -63,13 +63,6 @@ const SMART_WALLET_STANDARD_LINKS: Record<string, string> = {
 const HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY = {
 	[HardwareWalletManufactureType.FACTORY_MADE]: 'Factory-Made',
 	[HardwareWalletManufactureType.DIY]: 'DIY',
-}
-
-// Helper to create a multi-type wallet definition for the UI
-interface MultiWalletTypeInfo {
-	categories: WalletTypeCategory[]
-	smartWalletStandards?: SmartWalletStandard[]
-	details?: string
 }
 
 class TableStateHandle implements WalletTableStateHandle {
@@ -507,9 +500,7 @@ export default function WalletTable(): React.JSX.Element {
 		width: 142,
 		minWidth: 142,
 		flex: 0.15,
-		renderCell: params => (
-			<Box sx={{ fontSize: '0.85rem' }}>{(params.row).renderWalletType()}</Box>
-		),
+		renderCell: params => <Box sx={{ fontSize: '0.85rem' }}>{params.row.renderWalletType()}</Box>,
 		sortable: true,
 		resizable: true,
 		sortComparator: (v1, v2, param1, param2) => {
@@ -542,9 +533,7 @@ export default function WalletTable(): React.JSX.Element {
 		minWidth: 130,
 		flex: 0.2,
 		renderCell: params => (
-			<Box sx={{ fontSize: '0.85rem' }}>
-				{(params.row).renderHardwareWalletManufactureType()}
-			</Box>
+			<Box sx={{ fontSize: '0.85rem' }}>{params.row.renderHardwareWalletManufactureType()}</Box>
 		),
 		sortable: true,
 		resizable: true,
@@ -643,7 +632,11 @@ export default function WalletTable(): React.JSX.Element {
 		<div className="w-full h-full overflow-auto pl-2 pr-2">
 			<ThemeProvider theme={currentWalletTableTheme}>
 				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Wallets</h2>
-				<Box sx={{ mb: 6, width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
+				<Box
+					sx={{ mb: 6, width: '100%', maxWidth: '1600px', margin: '0 auto' }}
+					display="flex"
+					flexDirection="column"
+				>
 					<DataGrid<WalletRow>
 						rows={softwareWalletRows}
 						columns={mainColumns}
@@ -669,14 +662,17 @@ export default function WalletTable(): React.JSX.Element {
 						filterModel={{
 							items: [],
 						}}
-						autoHeight
 						disableVirtualization={true}
 						sx={{ width: '100%', minWidth: '1200px', ...dataGridSx }}
 					/>
 				</Box>
 
 				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Hardware Wallets</h2>
-				<Box sx={{ width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
+				<Box
+					sx={{ width: '100%', maxWidth: '1600px', margin: '0 auto' }}
+					display="flex"
+					flexDirection="column"
+				>
 					<DataGrid<WalletRow>
 						rows={hardwareWalletRows}
 						columns={hardwareColumns}
@@ -688,7 +684,6 @@ export default function WalletTable(): React.JSX.Element {
 								sortModel: [{ field: walletNameColumn.field, sort: 'asc' }],
 							},
 						}}
-						autoHeight
 						disableVirtualization={true}
 						sx={{ width: '100%', minWidth: '1200px', ...dataGridSx }}
 					/>

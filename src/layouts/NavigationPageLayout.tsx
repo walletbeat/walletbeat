@@ -1,5 +1,5 @@
 import theme from '@/components/ThemeRegistry/theme'
-import { Box, ThemeProvider } from '@mui/material'
+import { ThemeProvider } from '@mui/material'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {

@@ -127,7 +127,7 @@ interface NavigationItemProps {
  * A single navigation list item.
  */
 const NavigationItem = memo(
-	function NavigationItem({ item, active, depth }: NavigationItemProps): React.JSX.Element {
+	function NavigationItem({ item, active }: NavigationItemProps): React.JSX.Element {
 		const [isOpen, setIsOpen] = useState(false)
 		const linkStyles =
 			'whitespace-nowrap flex flex-row items-center gap-2 py-0.5 hover:bg-backgroundSecondary rounded-md px-4'
@@ -250,7 +250,6 @@ const navigationBoxStyle = {
 
 interface NavigationGroupProps {
 	group: NavigationGroup
-	groupIndex: number
 	activeItemId?: string
 	onContentItemClick?: (item: NavigationContentItem) => void
 }
@@ -258,7 +257,6 @@ interface NavigationGroupProps {
 export const NavigationGroup = memo(
 	function NavigationGroup({
 		group,
-		groupIndex,
 		activeItemId,
 		onContentItemClick,
 	}: NavigationGroupProps): React.JSX.Element {
@@ -285,9 +283,6 @@ export const NavigationGroup = memo(
 		nextProps: Readonly<NavigationGroupProps>,
 	): boolean => {
 		if (prevProps.group !== nextProps.group) {
-			return false
-		}
-		if (prevProps.groupIndex !== nextProps.groupIndex) {
 			return false
 		}
 		if (prevProps.onContentItemClick !== nextProps.onContentItemClick) {
@@ -319,13 +314,11 @@ export const NavigationGroup = memo(
 export function Navigation({
 	groups,
 	activeItemId,
-	flex,
 	onContentItemClick = undefined,
 	prefix,
 }: {
 	groups: NonEmptyArray<NavigationGroup>
 	activeItemId?: string
-	flex?: React.ComponentProps<typeof Box>['flex']
 	onContentItemClick?: (item: NavigationContentItem) => void
 	prefix?: React.ReactNode
 }): React.JSX.Element {
@@ -345,11 +338,10 @@ export function Navigation({
 			{prefix && <div className="px-8 mb-6 w-full">{prefix}</div>}
 
 			<div className="flex flex-col gap-2 px-4">
-				{nonEmptyMap(groups, (group, groupIndex) => (
+				{nonEmptyMap(groups, group => (
 					<NavigationGroup
 						key={`navigationGroup-${group.id}`}
 						group={group}
-						groupIndex={groupIndex}
 						onContentItemClick={onContentItemClick}
 						activeItemId={activeItemId}
 					/>
