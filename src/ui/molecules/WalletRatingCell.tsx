@@ -275,6 +275,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 			flexDirection="column"
 			alignItems="center"
 			gap="4px"
+			width="100%"
 			sx={row.rowWideStyle}
 			onMouseLeave={() => {
 				// Only clear non-sticky highlights and only if not frozen
