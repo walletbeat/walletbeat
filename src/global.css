@@ -16,7 +16,7 @@
 		--accent-very-light: #ffdbf4;
 		--logo-color: var(--accent);
 		--text-primary: #222222;
-		--text-secondary: #22242b;
+		--text-secondary: #3f4046;
 		--text-inverse: #ffffff;
 		--border: #cecece;
 		--banner-gradient-from: #ecedfd;
@@ -45,7 +45,7 @@ html.dark {
 	--accent-very-light: #440530;
 	--logo-color: var(--text-primary);
 	--text-primary: #efefef;
-	--text-secondary: #e4e5eb;
+	--text-secondary: #b1b2b9;
 	--text-inverse: #ffffff;
 	--border: #313131;
 	--banner-gradient-from: #15151a;

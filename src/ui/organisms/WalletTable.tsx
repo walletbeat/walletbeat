@@ -1042,14 +1042,14 @@ export default function WalletTable(): React.ReactElement {
 			</div>
 
 			{/* Table */}
-			<table className="min-w-full divide-y divide-gray-200">
+			<table className="min-w-full divide-y border-[var(--border)]">
 				<thead>
 					{table.getHeaderGroups().map(headerGroup => (
 						<tr key={headerGroup.id}>
 							{headerGroup.headers.map(header => (
 								<th
 									key={header.id}
-									className={`px-4 py-2 text-left text-[14px] text-[#616161] bg-gray-100 ${
+									className={`px-4 py-2 text-left text-[14px] text-[var(--text-secondary)] bg-[var(--background-tertiary)] ${
 										header.column.columnDef.header === 'Wallet' ||
 										header.column.columnDef.header === 'Type'
 											? 'font-bold'
@@ -1064,7 +1064,7 @@ export default function WalletTable(): React.ReactElement {
 						</tr>
 					))}
 				</thead>
-				<tbody className="divide-y divide-gray-200">
+				<tbody className="divide-y border-[var(--border)]">
 					{table
 						.getRowModel()
 						.rows.map(row => {
