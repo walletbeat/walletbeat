@@ -30,6 +30,13 @@
 	font-family: 'Work Sans', 'Work Sans Fallback', 'Noto Color Emoji';
 }
 
+.column {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 1rem;
+	align-content: start;
+}
+
 .row {
 	display: flex;
 	justify-content: space-between;
