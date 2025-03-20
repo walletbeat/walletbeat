@@ -194,8 +194,16 @@
 		tabindex="0"
 		onmouseenter={() => onSliceMouseEnter?.(slice.id)}
 		onmouseleave={() => onSliceMouseLeave?.(slice.id)}
-		onclick={() => onSliceClick?.(slice.id)}
-		onkeydown={e => e.key === 'Enter' && onSliceClick?.(slice.id)}
+		onclick={e => {
+			e.stopPropagation()
+			onSliceClick?.(slice.id)
+		}}
+		onkeydown={e => {
+			if (e.code === 'Enter' || e.code === 'Space'){
+				e.stopPropagation()
+				onSliceClick?.(slice.id)
+			}
+		}}
 	>
 		<path d={sliceParams.path} fill={slice.color}>
 			<title>{slice.tooltip}: {slice.tooltipValue}</title>
