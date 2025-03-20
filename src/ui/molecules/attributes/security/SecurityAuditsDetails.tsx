@@ -27,9 +27,9 @@ export function SecurityAuditsDetails({
 					No security audit information is available.
 				</Typography>
 			</WrapRatingIcon>
-		);
+		)
 	}
-	
+
 	const audits = value.securityAudits
 	if (!isNonEmptyArray(audits)) {
 		return (
@@ -38,9 +38,9 @@ export function SecurityAuditsDetails({
 					{wallet.metadata.displayName} has not undergone any security audits.
 				</Typography>
 			</WrapRatingIcon>
-		);
+		)
 	}
-	
+
 	const sortedAudits = nonEmptySorted(
 		audits,
 		(audit1, audit2) => dateCompare(audit1.auditDate, audit2.auditDate),

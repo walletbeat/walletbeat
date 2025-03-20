@@ -46,7 +46,7 @@ export const HomePage: FC = () => (
 						icon: <LuWallet />,
 						href: '/',
 						children: Object.keys(wallets).map(key => {
-							const wallet = wallets[key as keyof typeof wallets] as Wallet
+							const wallet = wallets[key as keyof typeof wallets]
 
 							return {
 								title: wallet.metadata.displayName,
@@ -73,7 +73,7 @@ export const HomePage: FC = () => (
 						href: '/',
 						id: 'hardware-wallets',
 						children: Object.keys(hardwareWallets).map(key => {
-							const wallet = hardwareWallets[key as keyof typeof hardwareWallets] as Wallet
+							const wallet = hardwareWallets[key as keyof typeof hardwareWallets]
 
 							// Simplified display names for hardware wallets
 							let displayName = wallet.metadata.displayName

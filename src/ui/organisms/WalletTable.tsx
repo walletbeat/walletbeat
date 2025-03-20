@@ -438,7 +438,7 @@ function walletTableColumn<Vs extends ValueSet>(
 	return {
 		...walletRatingColumnProps,
 		field: group.id,
-		headerName: `${group.displayName}`,
+		headerName: group.displayName,
 		type: 'number',
 		valueGetter: (_: never, row: WalletRow): number => row.score(group, evalGroupFn),
 		renderCell: params => params.row.render(group, evalGroupFn),
@@ -508,7 +508,7 @@ export default function WalletTable(): React.JSX.Element {
 		minWidth: 142,
 		flex: 0.15,
 		renderCell: params => (
-			<Box sx={{ fontSize: '0.85rem' }}>{(params.row as WalletRow).renderWalletType()}</Box>
+			<Box sx={{ fontSize: '0.85rem' }}>{(params.row).renderWalletType()}</Box>
 		),
 		sortable: true,
 		resizable: true,
@@ -543,7 +543,7 @@ export default function WalletTable(): React.JSX.Element {
 		flex: 0.2,
 		renderCell: params => (
 			<Box sx={{ fontSize: '0.85rem' }}>
-				{(params.row as WalletRow).renderHardwareWalletManufactureType()}
+				{(params.row).renderHardwareWalletManufactureType()}
 			</Box>
 		),
 		sortable: true,

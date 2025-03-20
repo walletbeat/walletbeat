@@ -201,7 +201,7 @@ export function popRefs<T>(withRef: WithRef<T>): {
 
 /** Deduplicate and merge references in `refs`. */
 export function mergeRefs(
-	...refs: (References | ReferenceArray | FullyQualifiedReference | null | undefined)[]
+	...refs: Array<References | ReferenceArray | FullyQualifiedReference | null | undefined>
 ): FullyQualifiedReference[] {
 	const qualifiedRefs = []
 	for (const ref of refs) {

@@ -295,8 +295,8 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			if (!Object.hasOwn(features.selfSovereignty.transactionSubmission.l2, l2Type)) {
 				continue
 			}
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We are iterating over variables of this type.
-			const l2 = l2Type as TransactionSubmissionL2Type
+			 
+			const l2 = l2Type
 			const support = features.selfSovereignty.transactionSubmission.l2[l2]
 			if (support === null) {
 				return unrated(transactionInclusion, brand, null)

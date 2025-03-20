@@ -21,18 +21,22 @@ export function SourceVisibilityDetails({
 					Source code visibility information is not available.
 				</Typography>
 			</WrapRatingIcon>
-		);
+		)
 	}
-	
+
 	// Create a reference for the repository URL
-	const repoReference = [{
-		urls: [{
-			url: wallet.metadata.repoUrl,
-			label: `${wallet.metadata.displayName} Repository`
-		}],
-		explanation: `${wallet.metadata.displayName}'s source code is publicly viewable on GitHub`
-	}];
-	
+	const repoReference = [
+		{
+			urls: [
+				{
+					url: wallet.metadata.repoUrl,
+					label: `${wallet.metadata.displayName} Repository`,
+				},
+			],
+			explanation: `${wallet.metadata.displayName}'s source code is publicly viewable on GitHub`,
+		},
+	]
+
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			<Typography fontWeight={subsectionWeight}>

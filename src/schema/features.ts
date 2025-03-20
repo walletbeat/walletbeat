@@ -17,7 +17,7 @@ import type { HardwareWalletSupport } from './features/security/hardware-wallet-
 import type { HardwareWalletClearSigningSupport } from './features/security/hardware-wallet-clear-signing'
 import type { FeeTransparencySupport } from './features/transparency/fee-transparency'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
-import { type BugBountyProgramImplementation } from './features/security/bug-bounty-program'
+import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
 
 /**
  * A set of features about a wallet, each of which may or may not depend on
@@ -191,7 +191,7 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 		license: feat(features.license),
 		monetization: feat(features.monetization),
 		transparency: {
-			feeTransparency: features.transparency?.feeTransparency
+			feeTransparency: features.transparency.feeTransparency
 				? feat(features.transparency.feeTransparency)
 				: null,
 		},

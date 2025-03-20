@@ -26,7 +26,7 @@ import { variantToName, variantUrlQuery } from '../../components/variants'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { slugifyCamelCase } from '@/types/utils/text'
 import { betaSiteRoot } from '@/constants'
-import { type FullyQualifiedReference } from '@/schema/reference'
+import type { FullyQualifiedReference } from '@/schema/reference'
 import { toFullyQualified } from '@/schema/reference'
 
 /**

@@ -256,14 +256,16 @@ const lightWalletTableThemeOptions: ThemeOptions = {
 
 // Create walletTableTheme with theme-specific CSS variables
 export const walletTableTheme = createTheme(deepmerge(themeOptions, walletTableThemeOptions))
-export const lightWalletTableTheme = createTheme(deepmerge(deepmerge(themeOptions, lightWalletTableThemeOptions), walletTableThemeOptions))
+export const lightWalletTableTheme = createTheme(
+	deepmerge(deepmerge(themeOptions, lightWalletTableThemeOptions), walletTableThemeOptions),
+)
 
 // Add theme-specific CSS variables
 walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
 	MuiCssBaseline: {
 		styleOverrides: {
 			':root': {
-				'--background-row-border': '#6a1b9a'
+				'--background-row-border': '#6a1b9a',
 			},
 		},
 	},
@@ -273,7 +275,7 @@ lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components ||
 	MuiCssBaseline: {
 		styleOverrides: {
 			':root': {
-				'--background-row-border': '#e0f2ff'
+				'--background-row-border': '#e0f2ff',
 			},
 		},
 	},

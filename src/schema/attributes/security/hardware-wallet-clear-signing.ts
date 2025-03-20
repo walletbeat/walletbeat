@@ -83,11 +83,12 @@ function noHardwareWalletClearSigning(): Evaluation<HardwareWalletClearSigningVa
 	}
 }
 
-function basicClearSigning(supportedWallets: string[] = []): Evaluation<HardwareWalletClearSigningValue> {
-	const supportedWalletsText = supportedWallets.length > 0 
-		? ` through ${supportedWallets.join(', ')}`
-		: '';
-	
+function basicClearSigning(
+	supportedWallets: string[] = [],
+): Evaluation<HardwareWalletClearSigningValue> {
+	const supportedWalletsText =
+		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : ''
+
 	return {
 		value: {
 			id: 'basic_clear_signing',
@@ -118,11 +119,12 @@ function basicClearSigning(supportedWallets: string[] = []): Evaluation<Hardware
 	}
 }
 
-function partialClearSigning(supportedWallets: string[] = []): Evaluation<HardwareWalletClearSigningValue> {
-	const supportedWalletsText = supportedWallets.length > 0 
-		? ` through ${supportedWallets.join(', ')}`
-		: '';
-	
+function partialClearSigning(
+	supportedWallets: string[] = [],
+): Evaluation<HardwareWalletClearSigningValue> {
+	const supportedWalletsText =
+		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : ''
+
 	return {
 		value: {
 			id: 'partial_clear_signing',
@@ -154,13 +156,12 @@ function partialClearSigning(supportedWallets: string[] = []): Evaluation<Hardwa
 }
 
 function fullClearSigning(
-	supportedWallets: string[] = [], 
-	refs: Array<{ url: string, explanation: string }> = []
+	supportedWallets: string[] = [],
+	refs: Array<{ url: string; explanation: string }> = [],
 ): Evaluation<HardwareWalletClearSigningValue> {
-	const supportedWalletsText = supportedWallets.length > 0 
-		? ` through ${supportedWallets.join(', ')}`
-		: '';
-	
+	const supportedWalletsText =
+		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : ''
+
 	return {
 		value: {
 			id: 'full_clear_signing',
@@ -279,67 +280,74 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 		if (features.profile === WalletProfile.HARDWARE) {
 			// Check if clear signing feature exists
 			if (!features.security.hardwareWalletClearSigning) {
-				return unrated(hardwareWalletClearSigning, brand, { clearSigningLevel: ClearSigningLevel.NONE })
+				return unrated(hardwareWalletClearSigning, brand, {
+					clearSigningLevel: ClearSigningLevel.NONE,
+				})
 			}
-			
-			// Extract references from the hardware wallet clear signing feature
-			const { withoutRefs, refs: extractedRefs } = popRefs(features.security.hardwareWalletClearSigning);
 
-			const clearSigningLevel = withoutRefs.clearSigningSupport.level;
-			
+			// Extract references from the hardware wallet clear signing feature
+			const { withoutRefs, refs: extractedRefs } = popRefs(
+				features.security.hardwareWalletClearSigning,
+			)
+
+			const clearSigningLevel = withoutRefs.clearSigningSupport.level
+
 			// Use a simpler approach for now - we'll just include a standard reference for devices with full clear signing
-			let standardRefs = [];
+			let standardRefs = []
 			if (clearSigningLevel === ClearSigningLevel.FULL) {
 				standardRefs = [
 					{
-						url: "https://ethereum.org/en/security/#hardware-wallets",
-						explanation: "More information about hardware wallet security"
-					}
-				];
+						url: 'https://ethereum.org/en/security/#hardware-wallets',
+						explanation: 'More information about hardware wallet security',
+					},
+				]
 			}
-			
-			// Combine extracted references with standard references if any
-			const allReferences = [...extractedRefs, ...standardRefs];
 
-			let result: Evaluation<HardwareWalletClearSigningValue>;
-			
+			// Combine extracted references with standard references if any
+			const allReferences = [...extractedRefs, ...standardRefs]
+
+			let result: Evaluation<HardwareWalletClearSigningValue>
+
 			switch (clearSigningLevel) {
 				case ClearSigningLevel.NONE:
-					result = noHardwareWalletClearSigning();
-					break;
+					result = noHardwareWalletClearSigning()
+					break
 				case ClearSigningLevel.BASIC:
-					result = basicClearSigning(['this hardware wallet']);
-					break;
+					result = basicClearSigning(['this hardware wallet'])
+					break
 				case ClearSigningLevel.PARTIAL:
-					result = partialClearSigning(['this hardware wallet']);
-					break;
+					result = partialClearSigning(['this hardware wallet'])
+					break
 				case ClearSigningLevel.FULL:
-					result = fullClearSigning(['this hardware wallet']);
-					break;
+					result = fullClearSigning(['this hardware wallet'])
+					break
 				default:
-					return unrated(hardwareWalletClearSigning, brand, { clearSigningLevel: ClearSigningLevel.NONE });
+					return unrated(hardwareWalletClearSigning, brand, {
+						clearSigningLevel: ClearSigningLevel.NONE,
+					})
 			}
-			
+
 			// Return result with references
 			return {
 				...result,
 				...(allReferences.length > 0 && { references: allReferences }),
-			};
+			}
 		}
-		
+
 		// Check for ERC-4337 smart wallet
 		if (isErc4337SmartWallet(features)) {
 			return exempt(
-				hardwareWalletClearSigning, 
-				sentence((walletMetadata: WalletMetadata) => 
-					`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`
+				hardwareWalletClearSigning,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`,
 				),
 				brand,
-				{ clearSigningLevel: ClearSigningLevel.NONE }
+				{ clearSigningLevel: ClearSigningLevel.NONE },
 			)
 		}
-		
-		// For software wallets: 
+
+		// For software wallets:
 		// Make this attribute exempt as it should only apply to hardware wallets
 		return {
 			value: {
@@ -363,7 +371,5 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 			),
 		}
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletClearSigningValue>>) => {
-		return pickWorstRating<HardwareWalletClearSigningValue>(perVariant)
-	},
-} 
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletClearSigningValue>>) => pickWorstRating<HardwareWalletClearSigningValue>(perVariant),
+}

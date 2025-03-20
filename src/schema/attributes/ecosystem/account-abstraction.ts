@@ -10,12 +10,12 @@ import { pickWorstRating, unrated } from '../common'
 import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
-import {
-	type AccountType,
-	type AccountType7702,
-	type AccountTypeEoa,
-	type AccountTypeMpc,
-	type AccountTypeMutableMultifactor,
+import type {
+	AccountType,
+	AccountType7702,
+	AccountTypeEoa,
+	AccountTypeMpc,
+	AccountTypeMutableMultifactor,
 } from '@/schema/features/account-support'
 import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'

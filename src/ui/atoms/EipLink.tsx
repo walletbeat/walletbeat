@@ -108,7 +108,7 @@ export function EipLink({
 						setHovered(false)
 					}}
 					sx={{
-						color: 'primary.main'
+						color: 'primary.main',
 					}}
 				>
 					<Box component="span" display="inline-block" sx={{ filter: 'invert(100%)' }}>

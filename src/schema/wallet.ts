@@ -12,9 +12,8 @@ import type { Url } from './url'
 import { Rating, type Attribute, type EvaluatedAttribute, type Value } from './attributes'
 import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
-import type { WalletTypeInfo } from './features/wallet-type'
-import { WalletTypeCategory, SmartWalletStandard } from './features/wallet-type'
-import { HardwareWalletManufactureType } from './features/profile'
+import type { WalletTypeInfo , type WalletTypeCategory, type SmartWalletStandard } from './features/wallet-type'
+import type { HardwareWalletManufactureType } from './features/profile'
 
 /** A contributor to walletbeat. */
 export interface Contributor {

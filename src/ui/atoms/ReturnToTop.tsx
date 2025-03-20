@@ -15,7 +15,7 @@ export const ReturnToTop = () => {
 
 		window.addEventListener('scroll', toggleVisibility)
 
-		return () => window.removeEventListener('scroll', toggleVisibility)
+		return () => { window.removeEventListener('scroll', toggleVisibility); }
 	}, [])
 
 	const scrollToTop = () => {
@@ -41,4 +41,4 @@ export const ReturnToTop = () => {
 			)}
 		</>
 	)
-} 
+}

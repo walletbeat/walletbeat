@@ -104,45 +104,45 @@ export enum MultiAddressPolicy {
  */
 export type MultiAddressHandling =
 	| {
-		/** How the wallet handles refreshing data for multiple addresses. */
-		type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY
-	}
+			/** How the wallet handles refreshing data for multiple addresses. */
+			type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY
+	  }
 	| {
-		/** How the wallet handles refreshing data for multiple addresses. */
-		type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES
-	}
+			/** How the wallet handles refreshing data for multiple addresses. */
+			type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES
+	  }
 	| {
-		/** How the wallet handles refreshing data for multiple addresses. */
-		type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS
+			/** How the wallet handles refreshing data for multiple addresses. */
+			type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS
 
-		/**
-		 * Diversity of endpoints on the receiving end of the requests.
-		 * Is it always the same set of endpoints for all addresses, or is there
-		 * a pool of multiple endpoints such that each address is only mapped to
-		 * one of them?
-		 */
-		destination: 'SAME_FOR_ALL' | 'ISOLATED'
+			/**
+			 * Diversity of endpoints on the receiving end of the requests.
+			 * Is it always the same set of endpoints for all addresses, or is there
+			 * a pool of multiple endpoints such that each address is only mapped to
+			 * one of them?
+			 */
+			destination: 'SAME_FOR_ALL' | 'ISOLATED'
 
-		/**
-		 * How individual requests are proxied: separate circuits (such that they
-		 * are perceived as coming from different IPs on the destination endpoint),
-		 * same circuit (same IP perceived on the destination endpoint), or not
-		 * proxied at all?
-		 */
-		proxy: 'NONE' | 'SAME_CIRCUIT' | 'SEPARATE_CIRCUITS'
+			/**
+			 * How individual requests are proxied: separate circuits (such that they
+			 * are perceived as coming from different IPs on the destination endpoint),
+			 * same circuit (same IP perceived on the destination endpoint), or not
+			 * proxied at all?
+			 */
+			proxy: 'NONE' | 'SAME_CIRCUIT' | 'SEPARATE_CIRCUITS'
 
-		/**
-		 * Whether individual requests are staggered across time to reduce the
-		 * ease of correlating them by the destination endpoint.
-		 *
-		 * - SIMULTANEOUS: If the wallet makes N simultaneous requests for N
-		 *   addresses at the same time.
-		 * - STAGGERED: If the wallet staggers N requests for N addresses
-		 *   over a period of time (e.g. by waiting a minute between each
-		 *   request).
-		 */
-		timing: 'SIMULTANEOUS' | 'STAGGERED'
-	}
+			/**
+			 * Whether individual requests are staggered across time to reduce the
+			 * ease of correlating them by the destination endpoint.
+			 *
+			 * - SIMULTANEOUS: If the wallet makes N simultaneous requests for N
+			 *   addresses at the same time.
+			 * - STAGGERED: If the wallet staggers N requests for N addresses
+			 *   over a period of time (e.g. by waiting a minute between each
+			 *   request).
+			 */
+			timing: 'SIMULTANEOUS' | 'STAGGERED'
+	  }
 
 /**
  * @param leak Some leak level.

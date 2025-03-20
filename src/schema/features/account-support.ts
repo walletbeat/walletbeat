@@ -1,5 +1,5 @@
 import type { WithRef } from '../reference'
-import { type Support, type NotSupported } from './support'
+import type { Support, NotSupported } from './support'
 
 export type AccountTypeSupport<T> = WithRef<Support<T>>
 

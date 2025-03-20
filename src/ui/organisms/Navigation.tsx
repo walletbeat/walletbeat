@@ -101,14 +101,14 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 	return (
 		<span
 			key="listItemIcon"
-		// sx={{
-		// 	minWidth: `${navigationListIconSize}px`,
-		// 	width: `${navigationListIconSize}px`,
-		// 	height: `${navigationListIconSize}px`,
-		// 	display: 'inline-block',
-		// textAlign: 'center',
-		// marginRight: '4px',
-		// }}
+			// sx={{
+			// 	minWidth: `${navigationListIconSize}px`,
+			// 	width: `${navigationListIconSize}px`,
+			// 	height: `${navigationListIconSize}px`,
+			// 	display: 'inline-block',
+			// textAlign: 'center',
+			// marginRight: '4px',
+			// }}
 		>
 			{children}
 		</span>
@@ -128,16 +128,17 @@ interface NavigationItemProps {
  */
 const NavigationItem = memo(
 	function NavigationItem({ item, active, depth }: NavigationItemProps): React.JSX.Element {
-		const [isOpen, setIsOpen] = useState(false);
-		const linkStyles = "whitespace-nowrap flex flex-row items-center gap-2 py-0.5 hover:bg-backgroundSecondary rounded-md px-4";
-		const hasChildren = (item.children?.length ?? 0) > 0;
+		const [isOpen, setIsOpen] = useState(false)
+		const linkStyles =
+			'whitespace-nowrap flex flex-row items-center gap-2 py-0.5 hover:bg-backgroundSecondary rounded-md px-4'
+		const hasChildren = (item.children?.length ?? 0) > 0
 
 		const toggleDropdown = (e: React.MouseEvent) => {
 			if (hasChildren) {
-				e.preventDefault();
-				setIsOpen(!isOpen);
+				e.preventDefault()
+				setIsOpen(!isOpen)
 			}
-		};
+		}
 
 		const ButtonComponent = ({
 			children,
@@ -147,22 +148,22 @@ const NavigationItem = memo(
 			if (isNavigationContentItem(item)) {
 				return (
 					<a
-						href={hasChildren ? "#" : `#${item.contentId}`}
+						href={hasChildren ? '#' : `#${item.contentId}`}
 						className={linkStyles}
 						onClick={toggleDropdown}
 					>
 						{children}
 						{hasChildren && (
 							<span className="ml-auto">
-								<svg 
-									stroke="currentColor" 
-									fill="none" 
-									strokeWidth="2" 
-									viewBox="0 0 24 24" 
-									strokeLinecap="round" 
-									strokeLinejoin="round" 
-									height="1em" 
-									width="1em" 
+								<svg
+									stroke="currentColor"
+									fill="none"
+									strokeWidth="2"
+									viewBox="0 0 24 24"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									height="1em"
+									width="1em"
 									xmlns="http://www.w3.org/2000/svg"
 									className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
 								>
@@ -176,8 +177,8 @@ const NavigationItem = memo(
 			if (isNavigationLinkItem(item)) {
 				return (
 					<a
-						href={hasChildren ? "#" : item.href}
-						target={!hasChildren && item.href.startsWith('https://') ? '_blank' : undefined} 
+						href={hasChildren ? '#' : item.href}
+						target={!hasChildren && item.href.startsWith('https://') ? '_blank' : undefined}
 						rel="noreferrer"
 						className={linkStyles}
 						onClick={toggleDropdown}
@@ -185,15 +186,15 @@ const NavigationItem = memo(
 						{children}
 						{hasChildren && (
 							<span className="ml-auto">
-								<svg 
-									stroke="currentColor" 
-									fill="none" 
-									strokeWidth="2" 
-									viewBox="0 0 24 24" 
-									strokeLinecap="round" 
-									strokeLinejoin="round" 
-									height="1em" 
-									width="1em" 
+								<svg
+									stroke="currentColor"
+									fill="none"
+									strokeWidth="2"
+									viewBox="0 0 24 24"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									height="1em"
+									width="1em"
 									xmlns="http://www.w3.org/2000/svg"
 									className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
 								>
@@ -207,19 +208,15 @@ const NavigationItem = memo(
 			throw new Error('Invalid navigation item')
 		}
 		return (
-			<li
-				key={`listItem-${item.id}`}
-				id={`listItem-${item.id}`}
-			>
+			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				<ButtonComponent key="buttonComponent">
 					{item.icon && <SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>}
-					<span>
-						{item.title}
-					</span>
+					<span>{item.title}</span>
 				</ButtonComponent>
-				
+
 				{hasChildren && (
-					<ul key={`subitems-${item.id}`} 
+					<ul
+						key={`subitems-${item.id}`}
 						className={`pl-1 border-l ml-2 flex flex-col gap-0 overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
 					>
 						{item.children?.map(subitem => (
@@ -267,9 +264,7 @@ export const NavigationGroup = memo(
 	}: NavigationGroupProps): React.JSX.Element {
 		return (
 			<>
-				<ul
-				 className="flex flex-col gap-0"
-				>
+				<ul className="flex flex-col gap-0">
 					{nonEmptyMap(group.items, item => (
 						<React.Fragment key={`fragment-${item.id}`}>
 							<NavigationItem
@@ -345,14 +340,10 @@ export function Navigation({
 				</a>
 				<ThemeSwitcher />
 			</div>
-			
+
 			{/* Desktop Search Component - ensures the search is always visible on desktop */}
-			{prefix && (
-				<div className="px-8 mb-6 w-full">
-					{prefix}
-				</div>
-			)}
-			
+			{prefix && <div className="px-8 mb-6 w-full">{prefix}</div>}
+
 			<div className="flex flex-col gap-2 px-4">
 				{nonEmptyMap(groups, (group, groupIndex) => (
 					<NavigationGroup

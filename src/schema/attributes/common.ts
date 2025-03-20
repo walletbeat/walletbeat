@@ -126,8 +126,7 @@ export function pickWorstRating<V extends Value>(
 export function isErc4337SmartWallet(features: ResolvedFeatures): boolean {
 	// Check in accountSupport
 	if (
-		features.accountSupport !== null &&
-		features.accountSupport.rawErc4337 !== undefined &&
+		features.accountSupport?.rawErc4337 !== undefined &&
 		isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)
 	) {
 		return true
