@@ -415,11 +415,11 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets).map(wallet =>
 	const standardsDisplay =
 		standards.length > 0
 			? standards
-				.map(std => {
-					const display = SMART_WALLET_STANDARD_DISPLAY[std]
-					return display !== undefined ? display : std
-				})
-				.join(', ')
+					.map(std => {
+						const display = SMART_WALLET_STANDARD_DISPLAY[std]
+						return display !== undefined ? display : std
+					})
+					.join(', ')
 			: 'None'
 
 	const websiteUrl =
@@ -559,12 +559,13 @@ export default function WalletTable(): React.ReactElement {
 					<div className="flex space-x-0 items-center">
 						<div className="flex flex-col items-center">
 							<button
-								className={`p-2 rounded-md ${!supportsWeb
+								className={`p-2 rounded-md ${
+									!supportsWeb
 										? 'opacity-40 cursor-not-allowed text-gray-400'
 										: selectedVariant === DeviceVariant.WEB
 											? 'text-purple-700'
 											: 'text-gray-600 hover:text-gray-900'
-									}`}
+								}`}
 								onClick={() => {
 									if (supportsWeb) {
 										handleVariantChange(DeviceVariant.WEB)
@@ -576,18 +577,20 @@ export default function WalletTable(): React.ReactElement {
 								<WebIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${selectedVariant === DeviceVariant.WEB ? 'bg-purple-700' : 'bg-gray-300'
-									}`}
+								className={`w-2 h-2 rounded-full mt-1 ${
+									selectedVariant === DeviceVariant.WEB ? 'bg-purple-700' : 'bg-gray-300'
+								}`}
 							/>
 						</div>
 						<div className="flex flex-col items-center">
 							<button
-								className={`p-2 rounded-md ${!supportsMobile
+								className={`p-2 rounded-md ${
+									!supportsMobile
 										? 'opacity-40 cursor-not-allowed text-gray-400'
 										: selectedVariant === DeviceVariant.MOBILE
 											? 'text-purple-700'
 											: 'text-gray-600 hover:text-gray-900'
-									}`}
+								}`}
 								onClick={() => {
 									if (supportsMobile) {
 										handleVariantChange(DeviceVariant.MOBILE)
@@ -599,18 +602,20 @@ export default function WalletTable(): React.ReactElement {
 								<MobileIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${selectedVariant === DeviceVariant.MOBILE ? 'bg-purple-700' : 'bg-gray-300'
-									}`}
+								className={`w-2 h-2 rounded-full mt-1 ${
+									selectedVariant === DeviceVariant.MOBILE ? 'bg-purple-700' : 'bg-gray-300'
+								}`}
 							/>
 						</div>
 						<div className="flex flex-col items-center">
 							<button
-								className={`p-2 rounded-md ${!supportsDesktop
+								className={`p-2 rounded-md ${
+									!supportsDesktop
 										? 'opacity-40 cursor-not-allowed text-gray-400'
 										: selectedVariant === DeviceVariant.DESKTOP
 											? 'text-purple-700'
 											: 'text-gray-600 hover:text-gray-900'
-									}`}
+								}`}
 								onClick={() => {
 									if (supportsDesktop) {
 										handleVariantChange(DeviceVariant.DESKTOP)
@@ -622,8 +627,9 @@ export default function WalletTable(): React.ReactElement {
 								<DesktopIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${selectedVariant === DeviceVariant.DESKTOP ? 'bg-purple-700' : 'bg-gray-300'
-									}`}
+								className={`w-2 h-2 rounded-full mt-1 ${
+									selectedVariant === DeviceVariant.DESKTOP ? 'bg-purple-700' : 'bg-gray-300'
+								}`}
 							/>
 						</div>
 					</div>
@@ -801,10 +807,11 @@ export default function WalletTable(): React.ReactElement {
 					<div className="flex space-x-0 items-center justify-center">
 						<div className="flex flex-col items-center">
 							<button
-								className={`p-2 rounded-md ${selectedVariant === DeviceVariant.NONE
+								className={`p-2 rounded-md ${
+									selectedVariant === DeviceVariant.NONE
 										? 'text-gray-600 hover:text-gray-900'
 										: 'text-purple-700'
-									}`}
+								}`}
 								onClick={() => {
 									// Toggle between none and hardware selection
 									handleVariantChange(
@@ -824,8 +831,9 @@ export default function WalletTable(): React.ReactElement {
 								/>
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${selectedVariant !== DeviceVariant.NONE ? 'bg-purple-700' : 'bg-gray-300'
-									}`}
+								className={`w-2 h-2 rounded-full mt-1 ${
+									selectedVariant !== DeviceVariant.NONE ? 'bg-purple-700' : 'bg-gray-300'
+								}`}
 							/>
 						</div>
 					</div>
@@ -982,81 +990,88 @@ export default function WalletTable(): React.ReactElement {
 
 	return (
 		<div className="overflow-x-auto">
-			{/* Tabs */}
-			<div className="flex border-b mb-4">
-				<button
-					className={`px-4 py-2 font-medium text-sm focus:outline-none ${activeTab === WalletTableTab.SOFTWARE
-							? 'border-b-2 border-blue-500 text-blue-600'
-							: 'text-gray-500 hover:text-gray-700'
+			{/* Tabs - now fixed */}
+			<div className="sticky top-0 bg-white z-10">
+				<div className="flex">
+					<button
+						className={`px-4 py-2 font-medium text-sm focus:outline-none ${
+							activeTab === WalletTableTab.SOFTWARE
+								? 'border-b-2 border-blue-500 text-blue-600'
+								: 'text-gray-500 hover:text-gray-700'
 						}`}
-					onClick={() => {
-						handleTabChange(WalletTableTab.SOFTWARE)
-					}}
-				>
-					Software Wallets
-				</button>
-				<button
-					className={`px-4 py-2 font-medium text-sm focus:outline-none ${activeTab === WalletTableTab.HARDWARE
-							? 'border-b-2 border-blue-500 text-blue-600'
-							: 'text-gray-500 hover:text-gray-700'
+						onClick={() => {
+							handleTabChange(WalletTableTab.SOFTWARE)
+						}}
+					>
+						Software Wallets
+					</button>
+					<button
+						className={`px-4 py-2 font-medium text-sm focus:outline-none ${
+							activeTab === WalletTableTab.HARDWARE
+								? 'border-b-2 border-blue-500 text-blue-600'
+								: 'text-gray-500 hover:text-gray-700'
 						}`}
-					onClick={() => {
-						handleTabChange(WalletTableTab.HARDWARE)
-					}}
-				>
-					Hardware Wallets
-				</button>
+						onClick={() => {
+							handleTabChange(WalletTableTab.HARDWARE)
+						}}
+					>
+						Hardware Wallets
+					</button>
+				</div>
 			</div>
 
 			{/* Table */}
-			<table className="min-w-full divide-y divide-gray-200">
-				<thead>
-					{table.getHeaderGroups().map(headerGroup => (
-						<tr key={headerGroup.id}>
-							{headerGroup.headers.map(header => (
-								<th
-									key={header.id}
-									className={`px-4 py-2 text-left text-[14px] text-[#616161] bg-gray-100 ${header.column.columnDef.header === 'Wallet' ||
+			<div className="overflow-x-auto">
+				<table className="min-w-full divide-y divide-gray-200">
+					<thead>
+						{table.getHeaderGroups().map(headerGroup => (
+							<tr key={headerGroup.id}>
+								{headerGroup.headers.map(header => (
+									<th
+										key={header.id}
+										className={`px-4 py-2 text-left text-[14px] text-[#616161] bg-gray-100 ${
+											header.column.columnDef.header === 'Wallet' ||
 											header.column.columnDef.header === 'Type'
-											? 'font-bold'
-											: header.column.columnDef.header === 'Risk by device'
-												? 'font-semibold'
-												: 'font-normal'
+												? 'font-bold'
+												: header.column.columnDef.header === 'Risk by device'
+													? 'font-semibold'
+													: 'font-normal'
 										}`}
-								>
-									{flexRender(header.column.columnDef.header, header.getContext())}
-								</th>
-							))}
-						</tr>
-					))}
-				</thead>
-				<tbody className="divide-y divide-gray-200">
-					{table
-						.getRowModel()
-						.rows.map(row => {
-							const parentWallet = row.original.wallet
-							const isSupported =
-								!parentWallet ||
-								(activeTab === WalletTableTab.HARDWARE &&
-									(selectedVariant === DeviceVariant.NONE ||
-										selectedVariant === DeviceVariant.HARDWARE)) ||
-								(activeTab === WalletTableTab.SOFTWARE &&
-									(selectedVariant === DeviceVariant.NONE ||
-										walletSupportsVariant(parentWallet, selectedVariant)))
+									>
+										{flexRender(header.column.columnDef.header, header.getContext())}
+									</th>
+								))}
+							</tr>
+						))}
+					</thead>
+					<tbody className="divide-y divide-gray-200">
+						{table
+							.getRowModel()
+							.rows.map(row => {
+								const parentWallet = row.original.wallet
+								const isSupported =
+									!parentWallet ||
+									(activeTab === WalletTableTab.HARDWARE &&
+										(selectedVariant === DeviceVariant.NONE ||
+											selectedVariant === DeviceVariant.HARDWARE)) ||
+									(activeTab === WalletTableTab.SOFTWARE &&
+										(selectedVariant === DeviceVariant.NONE ||
+											walletSupportsVariant(parentWallet, selectedVariant)))
 
-							return (
-								<tr key={row.id} className={`${!isSupported ? 'opacity-50' : ''}`}>
-									{row.getVisibleCells().map(cell => (
-										<td key={cell.id} className="px-4 py-2">
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
-										</td>
-									))}
-								</tr>
-							)
-						})
-						.filter(Boolean)}
-				</tbody>
-			</table>
+								return (
+									<tr key={row.id} className={`${!isSupported ? 'opacity-50' : ''}`}>
+										{row.getVisibleCells().map(cell => (
+											<td key={cell.id} className="px-4 py-2">
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</td>
+										))}
+									</tr>
+								)
+							})
+							.filter(Boolean)}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	)
 }
