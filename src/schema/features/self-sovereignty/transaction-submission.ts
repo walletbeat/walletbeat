@@ -1,23 +1,16 @@
-import type { WithRef } from '@/schema/reference'
 import type { Support } from '../support'
 
 /** L2 types considered for transaction submission. */
-export enum TransactionSubmissionL2Type {
-	arbitrum = 'arbitrum', // https://github.com/wakeuplabs-io/arbitrum-connect/blob/main/README.md | https://rollup-fortress.github.io/uncensored-book/research/arbitrum-force-inclusion.html
-	opStack = 'opStack', // https://docs.optimism.io/stack/transactions/forced-transaction
-}
-
-export const transactionSubmissionL2Types: TransactionSubmissionL2Type[] = [
-	TransactionSubmissionL2Type.arbitrum,
-	TransactionSubmissionL2Type.opStack,
-]
+export type TransactionSubmissionL2Type =
+	| 'opStack' // https://docs.optimism.io/stack/transactions/forced-transaction
+	| 'arbitrum' // https://github.com/wakeuplabs-io/arbitrum-connect/blob/main/README.md | https://rollup-fortress.github.io/uncensored-book/research/arbitrum-force-inclusion.html
 
 /** Human-friendly name for an L2 type. */
 export function transactionSubmissionL2TypeName(l2Type: TransactionSubmissionL2Type): string {
 	switch (l2Type) {
-		case TransactionSubmissionL2Type.arbitrum:
+		case 'arbitrum':
 			return 'Arbitrum'
-		case TransactionSubmissionL2Type.opStack:
+		case 'opStack':
 			return 'OP Stack'
 	}
 }
@@ -50,7 +43,7 @@ export enum TransactionSubmissionL2Support {
 /** Support for transaction broadcast and inclusion. */
 export interface TransactionSubmission {
 	/* Options for broadcasting transactions to L1. */
-	l1: WithRef<{
+	l1: {
 		/**
 		 * Whether the wallet is able to self-broadcast by acting as its own
 		 * gossipping node in the Ethereum L1.
@@ -66,8 +59,8 @@ export interface TransactionSubmission {
 		 * verification.
 		 */
 		selfBroadcastViaSelfHostedNode: Support | null
-	}>
+	}
 
 	/** Options for broadcasting transactions to L2 chains. */
-	l2: WithRef<Record<TransactionSubmissionL2Type, TransactionSubmissionL2Support | null>>
+	l2: Record<TransactionSubmissionL2Type, TransactionSubmissionL2Support | null>
 }

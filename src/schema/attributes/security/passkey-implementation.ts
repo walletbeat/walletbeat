@@ -10,10 +10,7 @@ import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence, mdParagraph, mdSentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
-import {
-	PasskeyVerificationLibrary,
-	type PasskeyVerificationSupport,
-} from '@/schema/features/security/passkey-verification'
+import { PasskeyVerificationLibrary, type PasskeyVerificationSupport } from '@/schema/features/security/passkey-verification'
 import { popRefs } from '@/schema/reference'
 import { WalletProfile } from '@/schema/features/profile'
 
@@ -187,9 +184,7 @@ function openZeppelinP256VerifierImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
-			libraryUrl:
-				support.libraryUrl ||
-				'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+			libraryUrl: support.libraryUrl || 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -245,8 +240,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			`What can ${walletMetadata.displayName} do to improve its passkey implementation?`,
 	},
 	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} use a secure and efficient passkey verification library?`,
+		(walletMetadata: WalletMetadata) => `Does ${walletMetadata.displayName} use a secure and efficient passkey verification library?`,
 	),
 	why: markdown(`
 		Passkeys provide a secure and phishing-resistant way to authenticate users without relying on seed phrases. 
@@ -301,8 +295,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 				`),
 				openZeppelinP256VerifierImplementation({
 					library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
-					libraryUrl:
-						'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+					libraryUrl: 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
 				}).value,
 			),
 		],
@@ -345,73 +338,72 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) => pickWorstRating<PasskeyImplementationValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) => {
+		return pickWorstRating<PasskeyImplementationValue>(perVariant)
+	},
 	evaluate: (features: ResolvedFeatures): Evaluation<PasskeyImplementationValue> => {
 		// Hardware wallets don't use passkeys
 		if (features.profile === WalletProfile.HARDWARE) {
 			return exempt(
-				passkeyImplementation,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet and doesn't use passkeys.`,
+				passkeyImplementation, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet and doesn't use passkeys.`
 				),
 				brand,
-				{ library: PasskeyVerificationLibrary.NONE },
+				{ library: PasskeyVerificationLibrary.NONE }
 			)
 		}
-
+		
 		const passkeyVerification = features.security.passkeyVerification
 		if (passkeyVerification === null) {
 			return unrated(passkeyImplementation, brand, { library: PasskeyVerificationLibrary.NONE })
 		}
-
+		
 		// If the library is explicitly set to NONE, this means the wallet doesn't support passkeys
 		// This handles EOA-only wallets like Frame, Rabby, Rainbow, etc.
 		if (passkeyVerification.library === PasskeyVerificationLibrary.NONE) {
 			return exempt(
-				passkeyImplementation,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it doesn't implement passkeys.`,
+				passkeyImplementation, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is not applicable for ${walletMetadata.displayName} as it doesn't implement passkeys.`
 				),
 				brand,
-				{ library: PasskeyVerificationLibrary.NONE },
+				{ library: PasskeyVerificationLibrary.NONE }
 			)
 		}
-
-		const { withoutRefs, refs: extractedRefs } =
-			popRefs<PasskeyVerificationSupport>(passkeyVerification)
-
-		let result: Evaluation<PasskeyImplementationValue>
-
+		
+		const { withoutRefs, refs: extractedRefs } = popRefs<PasskeyVerificationSupport>(passkeyVerification)
+		
+		let result: Evaluation<PasskeyImplementationValue>;
+		
 		switch (withoutRefs.library) {
 			case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
-				result = smoothCryptoLibImplementation(withoutRefs)
-				break
+				result = smoothCryptoLibImplementation(withoutRefs);
+				break;
 			case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
-				result = daimoP256VerifierImplementation(withoutRefs)
-				break
+				result = daimoP256VerifierImplementation(withoutRefs);
+				break;
 			case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
-				result = openZeppelinP256VerifierImplementation(withoutRefs)
-				break
+				result = openZeppelinP256VerifierImplementation(withoutRefs);
+				break;
 			case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
-				result = freshCryptoLibImplementation(withoutRefs)
-				break
+				result = freshCryptoLibImplementation(withoutRefs);
+				break;
 			case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
-				result = webAuthnSolImplementation(withoutRefs)
-				break
+				result = webAuthnSolImplementation(withoutRefs);
+				break;
 			case PasskeyVerificationLibrary.OTHER:
-				result = otherPasskeyImplementation(withoutRefs)
-				break
+				result = otherPasskeyImplementation(withoutRefs);
+				break;
 			default:
-				result = noPasskeyImplementation()
-				break
+				result = noPasskeyImplementation();
+				break;
 		}
-
+		
 		// Return result with references if any
 		return {
 			...result,
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+} 

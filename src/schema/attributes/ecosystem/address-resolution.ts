@@ -14,7 +14,6 @@ import type { AddressResolution, AddressResolutionSupport } from '../../features
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { erc7828 } from '@/data/eips/erc-7828'
 import { erc7831 } from '@/data/eips/erc-7831'
-import { refs, type ReferenceArray } from '@/schema/reference'
 
 const brand = 'attributes.ecosystem.address_resolution'
 export type AddressResolutionValue = Value & {
@@ -65,7 +64,6 @@ function getOffchainProviderInfo(
 
 function evaluateAddressResolution(
 	addressResolution: AddressResolution<AddressResolutionSupport>,
-	references: ReferenceArray,
 ): Evaluation<AddressResolutionValue> {
 	const chainSpecificErcs: NonEmptyArray<[Eip, AddressResolutionSupport, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
@@ -104,7 +102,6 @@ function evaluateAddressResolution(
 						${eipMarkdownLinkAndTitle(erc)}.
 					`,
 				),
-				references,
 			}
 		}
 		const { rating, offchainInfo, walletShould } = getOffchainProviderInfo(chainSpecificSupport)
@@ -139,12 +136,11 @@ function evaluateAddressResolution(
 				walletShould === undefined
 					? undefined
 					: mdParagraph(
-							({ wallet }) => `
+						({ wallet }) => `
 					${wallet.metadata.displayName} should use fully-onchain resolution
 					to resolve the address, or should ${walletShould}.
 				`,
-						),
-			references,
+					),
 		}
 	}
 	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
@@ -176,7 +172,6 @@ function evaluateAddressResolution(
 					ENS (.eth) names.
 				`,
 			),
-			references,
 		}
 	}
 	if (addressResolution.nonChainSpecificEnsResolution.medium === 'CHAIN_CLIENT') {
@@ -217,7 +212,6 @@ function evaluateAddressResolution(
 					* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
 				`,
 			),
-			references,
 		}
 	}
 	const { offchainInfo, walletShould } = getOffchainProviderInfo(
@@ -253,7 +247,7 @@ function evaluateAddressResolution(
 			walletShould === undefined
 				? undefined
 				: markdown(
-						({ wallet }) => `
+					({ wallet }) => `
 							${wallet.metadata.displayName} should use fully-onchain
 							resolution to resolve the address, or should ${walletShould}.
 
@@ -263,8 +257,7 @@ function evaluateAddressResolution(
 							* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
 							* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
 						`,
-					),
-		references,
+				),
 	}
 }
 
@@ -342,47 +335,41 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 				mdSentence(`
 					The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using onchain data.
 				`),
-				evaluateAddressResolution(
-					{
-						chainSpecificAddressing: {
-							erc7828: {
-								support: 'SUPPORTED',
-								medium: 'CHAIN_CLIENT',
-							},
-							erc7831: {
-								support: 'NOT_SUPPORTED',
-							},
+				evaluateAddressResolution({
+					chainSpecificAddressing: {
+						erc7828: {
+							support: 'SUPPORTED',
+							medium: 'CHAIN_CLIENT',
 						},
-						nonChainSpecificEnsResolution: {
+						erc7831: {
 							support: 'NOT_SUPPORTED',
 						},
 					},
-					[],
-				).value,
+					nonChainSpecificEnsResolution: {
+						support: 'NOT_SUPPORTED',
+					},
+				}).value,
 			),
 			exampleRating(
 				mdSentence(`
 					The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain provider in a verifiable and privacy-preserving manner.
 				`),
-				evaluateAddressResolution(
-					{
-						chainSpecificAddressing: {
-							erc7828: {
-								support: 'NOT_SUPPORTED',
-							},
-							erc7831: {
-								support: 'SUPPORTED',
-								medium: 'OFFCHAIN',
-								offchainDataVerifiability: 'VERIFIABLE',
-								offchainProviderConnection: 'UNIQUE_PROXY_CIRCUIT',
-							},
-						},
-						nonChainSpecificEnsResolution: {
+				evaluateAddressResolution({
+					chainSpecificAddressing: {
+						erc7828: {
 							support: 'NOT_SUPPORTED',
 						},
+						erc7831: {
+							support: 'SUPPORTED',
+							medium: 'OFFCHAIN',
+							offchainDataVerifiability: 'VERIFIABLE',
+							offchainProviderConnection: 'UNIQUE_PROXY_CIRCUIT',
+						},
 					},
-					[],
-				).value,
+					nonChainSpecificEnsResolution: {
+						support: 'NOT_SUPPORTED',
+					},
+				}).value,
 			),
 		],
 		partial: [
@@ -390,79 +377,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 				mdSentence(`
 					The wallet only resolves plain ENS addresses (\`username.eth\`) which do not include a destination chain.
 				`),
-				evaluateAddressResolution(
-					{
-						chainSpecificAddressing: {
-							erc7828: {
-								support: 'NOT_SUPPORTED',
-							},
-							erc7831: {
-								support: 'NOT_SUPPORTED',
-							},
-						},
-						nonChainSpecificEnsResolution: {
-							support: 'SUPPORTED',
-							medium: 'CHAIN_CLIENT',
-						},
-					},
-					[],
-				).value,
-			),
-			exampleRating(
-				mdSentence(`
-					The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain third-party provider, without verifying the address.
-				`),
-				evaluateAddressResolution(
-					{
-						chainSpecificAddressing: {
-							erc7828: {
-								support: 'SUPPORTED',
-								medium: 'OFFCHAIN',
-								offchainDataVerifiability: 'NOT_VERIFIABLE',
-								offchainProviderConnection: 'UNIQUE_PROXY_CIRCUIT',
-							},
-							erc7831: {
-								support: 'NOT_SUPPORTED',
-							},
-						},
-						nonChainSpecificEnsResolution: {
-							support: 'NOT_SUPPORTED',
-						},
-					},
-					[],
-				).value,
-			),
-			exampleRating(
-				mdSentence(`
-					The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain third-party provider which may learn the user's IP address.
-				`),
-				evaluateAddressResolution(
-					{
-						chainSpecificAddressing: {
-							erc7828: {
-								support: 'SUPPORTED',
-								medium: 'OFFCHAIN',
-								offchainDataVerifiability: 'VERIFIABLE',
-								offchainProviderConnection: 'DIRECT_CONNECTION',
-							},
-							erc7831: {
-								support: 'NOT_SUPPORTED',
-							},
-						},
-						nonChainSpecificEnsResolution: {
-							support: 'NOT_SUPPORTED',
-						},
-					},
-					[],
-				).value,
-			),
-		],
-		fail: exampleRating(
-			mdSentence(`
-				The wallet only supports sending funds to raw (\`0x...\`) addresses.
-			`),
-			evaluateAddressResolution(
-				{
+				evaluateAddressResolution({
 					chainSpecificAddressing: {
 						erc7828: {
 							support: 'NOT_SUPPORTED',
@@ -472,11 +387,71 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 						},
 					},
 					nonChainSpecificEnsResolution: {
+						support: 'SUPPORTED',
+						medium: 'CHAIN_CLIENT',
+					},
+				}).value,
+			),
+			exampleRating(
+				mdSentence(`
+					The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain third-party provider, without verifying the address.
+				`),
+				evaluateAddressResolution({
+					chainSpecificAddressing: {
+						erc7828: {
+							support: 'SUPPORTED',
+							medium: 'OFFCHAIN',
+							offchainDataVerifiability: 'NOT_VERIFIABLE',
+							offchainProviderConnection: 'UNIQUE_PROXY_CIRCUIT',
+						},
+						erc7831: {
+							support: 'NOT_SUPPORTED',
+						},
+					},
+					nonChainSpecificEnsResolution: {
+						support: 'NOT_SUPPORTED',
+					},
+				}).value,
+			),
+			exampleRating(
+				mdSentence(`
+					The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain third-party provider which may learn the user's IP address.
+				`),
+				evaluateAddressResolution({
+					chainSpecificAddressing: {
+						erc7828: {
+							support: 'SUPPORTED',
+							medium: 'OFFCHAIN',
+							offchainDataVerifiability: 'VERIFIABLE',
+							offchainProviderConnection: 'DIRECT_CONNECTION',
+						},
+						erc7831: {
+							support: 'NOT_SUPPORTED',
+						},
+					},
+					nonChainSpecificEnsResolution: {
+						support: 'NOT_SUPPORTED',
+					},
+				}).value,
+			),
+		],
+		fail: exampleRating(
+			mdSentence(`
+				The wallet only supports sending funds to raw (\`0x...\`) addresses.
+			`),
+			evaluateAddressResolution({
+				chainSpecificAddressing: {
+					erc7828: {
+						support: 'NOT_SUPPORTED',
+					},
+					erc7831: {
 						support: 'NOT_SUPPORTED',
 					},
 				},
-				[],
-			).value,
+				nonChainSpecificEnsResolution: {
+					support: 'NOT_SUPPORTED',
+				},
+			}).value,
 		),
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<AddressResolutionValue> => {
@@ -499,7 +474,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 			},
 			nonChainSpecificEnsResolution: features.addressResolution.nonChainSpecificEnsResolution,
 		}
-		return evaluateAddressResolution(resolvedResolution, refs(features.addressResolution))
+		return evaluateAddressResolution(resolvedResolution)
 	},
 	aggregate: pickWorstRating<AddressResolutionValue>,
 }

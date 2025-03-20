@@ -5,9 +5,9 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
+import { ledger } from '../entities/ledger'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { Variant } from '@/schema/variants'
 
 export const ledgerWallet: Wallet = {
 	metadata: {
@@ -65,30 +65,26 @@ export const ledgerWallet: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.PARTIAL,
-					details:
-						'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.',
+					details: 'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.'
 				},
 				ref: [
 					{
 						url: 'https://youtu.be/7lP_0h-PPvY?si=KirhDV7xEQx9Npcl&t=720',
-						explanation:
-							"Independent video demonstration of Ledger's clear signing implementation on Safe.",
-					},
+						explanation: 'Independent video demonstration of Ledger\'s clear signing implementation on Safe.',
+					}
 				],
 			},
 			bugBountyProgram: {
 				type: BugBountyProgramType.COMPREHENSIVE,
 				url: 'https://donjon.ledger.com/bounty/',
-				details:
-					'Ledger offers a comprehensive bug bounty program through their Donjon security team. The program offers competitive rewards based on the severity of findings and has a clear disclosure process.',
+				details: 'Ledger offers a comprehensive bug bounty program through their Donjon security team. The program offers competitive rewards based on the severity of findings and has a clear disclosure process.',
 				upgradePathAvailable: true,
 				ref: [
 					{
 						url: 'https://donjon.ledger.com/bounty/',
-						explanation:
-							'Ledger maintains a well-documented bug bounty program through their Donjon security team, offering rewards up to $10,000 for critical vulnerabilities.',
-					},
-				],
+						explanation: 'Ledger maintains a well-documented bug bounty program through their Donjon security team, offering rewards up to $10,000 for critical vulnerabilities.'
+					}
+				]
 			},
 		},
 		privacy: {
@@ -128,10 +124,10 @@ export const ledgerWallet: Wallet = {
 		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: true,
+		mobile: false,
+		browser: false,
+		desktop: false,
+		embedded: false,
+		hardware: true,
 	},
 }

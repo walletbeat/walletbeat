@@ -26,8 +26,14 @@ import { variantToName, variantUrlQuery } from '../../components/variants'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { slugifyCamelCase } from '@/types/utils/text'
 import { betaSiteRoot } from '@/constants'
-import type { FullyQualifiedReference } from '@/schema/reference'
+import { refs, type References } from '@/schema/reference'
+import { ReferenceLinks } from '../atoms/ReferenceLinks'
 import { toFullyQualified } from '@/schema/reference'
+import { WalletProfile } from '@/schema/features/profile'
+import { bugBountyProgram } from '@/schema/attributes/security/bug-bounty-program'
+import { scamPrevention } from '@/schema/attributes/security/scam-prevention'
+import { type ResolvedFeatures } from '@/schema/features'
+import { getAttributeReferences } from '@/schema/attributeReferences'
 
 /**
  * Common properties of rating-type columns.
@@ -47,8 +53,8 @@ export const walletRatingColumnProps: GridColTypeDef = {
 
 const ratingPieMargin = 2
 // Reduce the size of the chart to make it less dominant
-const ratingPieHeight = 130
-const ratingPieWidth = 130
+const ratingPieHeight = 100
+const ratingPieWidth = 100
 
 // Function to get slightly increased row height
 const getRowExtraHeight = () => 20 // Extra height added to base shortRowHeight
@@ -107,11 +113,11 @@ export function WalletRatingCell<Vs extends ValueSet>({
 	}
 	const { score, hasUnratedComponent } = groupScore
 	const centerLabel = hasUnratedComponent
-		? ratingToIcon(Rating.UNRATED)
+		? ''
 		: score <= 0.0
-			? '\u{1f480}' /* Skull */
+			? ''
 			: score >= 1.0
-				? '\u{1f4af}' /* 100 */
+				? '100'
 				: Math.round(score * 100).toString()
 	const [highlightedSlice, setHighlightedSlice] = useState<{
 		evalAttrId: keyof EvaluatedGroup<Vs>
@@ -154,7 +160,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 				id: evalAttrId.toString(),
 				color: ratingToColor(evalAttr.evaluation.value.rating),
 				weight: 1,
-				arcLabel: icon,
+				arcLabel: '',
 				tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
 				tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
 				focusChange: (focused: boolean) => {
@@ -204,16 +210,64 @@ export function WalletRatingCell<Vs extends ValueSet>({
 	)
 
 	// Get references if there's a highlighted attribute
-	const getHighlightedAttributeReferences = (): FullyQualifiedReference[] => {
+	const getHighlightedAttributeReferences = () => {
 		// Use frozen slice ID for references if available
 		const activeEvalAttrId = frozenSliceId || highlightedSlice?.evalAttrId
-		if (activeEvalAttrId === undefined) {
+
+		if (!activeEvalAttrId) {
 			return []
 		}
-		return toFullyQualified(evalGroup[activeEvalAttrId].evaluation.references)
+
+		const activeEvalAttr = evalGroup[activeEvalAttrId]
+
+		if (!activeEvalAttr || !activeEvalAttr.evaluation) {
+			return []
+		}
+
+		// First try to get references from the attribute evaluations
+		const defaultReferences =
+			activeEvalAttr.evaluation.references ||
+			(activeEvalAttr.evaluation.value ? refs(activeEvalAttr.evaluation.value) : [])
+
+		// If we have references from evaluation, return them
+		if (defaultReferences.length > 0) {
+			return defaultReferences
+		}
+
+		// Otherwise use our attribute references helper
+		const attributeId = activeEvalAttr.attribute.id
+		const category = attrGroup.id
+
+		// Use the imported getAttributeReferences helper
+		return getAttributeReferences(row.wallet, category, attributeId)
 	}
 
 	const attributeReferences = getHighlightedAttributeReferences()
+
+	// Make sure references are fully qualified
+	const qualifiedReferences =
+		attributeReferences.length > 0
+			? toFullyQualified(attributeReferences as any) // Cast to any to bypass TypeScript error
+			: []
+
+	// Add debug logging to help troubleshoot
+	if (highlightedEvalAttr) {
+		console.log(
+			`References for ${attrGroup.id}/${highlightedEvalAttr.attribute.id}:`,
+			JSON.stringify(
+				{
+					attributeId: highlightedEvalAttr.attribute.id,
+					category: attrGroup.id,
+					wallet: row.wallet.metadata.id,
+					hasDefaultRefs: attributeReferences.length > 0,
+					qualifiedRefsCount: qualifiedReferences.length,
+					qualifiedRefs: qualifiedReferences,
+				},
+				null,
+				2,
+			),
+		)
+	}
 
 	return (
 		<Box
@@ -347,7 +401,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 							/>
 
 							{/* Display references if available */}
-							{attributeReferences.length > 0 && (
+							{qualifiedReferences.length > 0 && (
 								<Box
 									sx={{
 										mt: 0.5,
@@ -377,10 +431,10 @@ export function WalletRatingCell<Vs extends ValueSet>({
 										Source
 									</Typography>
 
-									{attributeReferences.map((ref, refIndex) => (
+									{qualifiedReferences.map((ref, refIndex) => (
 										<Box
 											key={refIndex}
-											sx={{ mb: refIndex < attributeReferences.length - 1 ? 1 : 0 }}
+											sx={{ mb: refIndex < qualifiedReferences.length - 1 ? 1 : 0 }}
 										>
 											{/* Reference links */}
 											<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 0.5 }}>

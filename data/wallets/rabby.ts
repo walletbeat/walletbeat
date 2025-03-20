@@ -13,10 +13,10 @@ import { cure53 } from '../entities/cure53'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { WalletTypeCategory } from '@/schema/features/wallet-type'
-import { Variant } from '@/schema/variants'
 
 export const rabby: Wallet = {
 	metadata: {
@@ -191,7 +191,7 @@ export const rabby: Wallet = {
 					auditor: slowMist,
 					auditDate: '2023-09-26',
 					ref: 'https://github.com/RabbyHub/RabbyDesktop/blob/publish/prod/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
-					variantsScope: { [Variant.DESKTOP]: true },
+					variantsScope: { desktop: true },
 					codeSnapshot: {
 						date: '2023-09-01',
 						commit: '586447a46bcd0abab6356076e369357050c97796',
@@ -301,7 +301,7 @@ export const rabby: Wallet = {
 				ethereumL1: notSupported,
 			},
 			hardwareWalletSupport: {
-				[Variant.DESKTOP]: {
+				desktop: {
 					supportedWallets: {
 						[HardwareWalletType.LEDGER]: featureSupported,
 						[HardwareWalletType.TREZOR]: featureSupported,
@@ -322,7 +322,7 @@ export const rabby: Wallet = {
 		},
 		privacy: {
 			dataCollection: {
-				[Variant.BROWSER]: {
+				browser: {
 					onchain: {},
 					collectedByEntities: [
 						{
@@ -371,7 +371,7 @@ export const rabby: Wallet = {
 			},
 		},
 		license: {
-			license: License.MIT,
+			value: License.MIT,
 			ref: [
 				{
 					explanation: 'Rabby is licensed under the MIT license.',
@@ -413,10 +413,10 @@ export const rabby: Wallet = {
 		},
 	},
 	variants: {
-		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: true,
-		[Variant.DESKTOP]: true,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: false,
+		mobile: true,
+		browser: true,
+		desktop: true,
+		embedded: false,
+		hardware: false,
 	},
 }

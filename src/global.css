@@ -11,7 +11,9 @@
 		--background-primary: #fff;
 		--background-secondary: #efefef;
 		--background-tertiary: #eeeff4;
-		--accent: #6c24e0;
+		--accent: #4d1957;
+		--accent-light: #e683c7;
+		--accent-very-light: #ffdbf4;
 		--logo-color: var(--accent);
 		--text-primary: #222222;
 		--text-secondary: #22242b;
@@ -20,6 +22,7 @@
 		--banner-gradient-from: #ecedfd;
 		--banner-gradient-to: #e8f6f2;
 		--icon-color: #222222; /* Add icon color for light mode */
+		--navigation-bg: #f7f7f7; /* Navigation background color for light mode */
 
 		/* Hashtag styling for light mode */
 		--hashtag-text: #1976d2; /* Blue that's readable on light background */
@@ -34,10 +37,12 @@
 }
 
 html.dark {
-	--background-primary: #22242b;
+	--background-primary: #141414;
 	--background-secondary: #17191f;
 	--background-tertiary: #17191f;
-	--accent: #6c24e0;
+	--accent: #e683c7;
+	--accent-light: #4d1957;
+	--accent-very-light: #440530;
 	--logo-color: var(--text-primary);
 	--text-primary: #efefef;
 	--text-secondary: #e4e5eb;
@@ -46,6 +51,7 @@ html.dark {
 	--banner-gradient-from: #15151a;
 	--banner-gradient-to: #212126;
 	--icon-color: #efefef; /* Add icon color for dark mode */
+	--navigation-bg: #000000; /* Navigation background color for dark mode */
 
 	/* Hashtag styling for dark mode */
 	--hashtag-text: #90caf9; /* Lighter blue that's readable on dark background */
@@ -77,24 +83,12 @@ body {
 	color: var(--accent) !important;
 }
 
-/* Improved styling for list items */
-li {
-	margin-bottom: 0.5rem;
-	padding-left: 0.5rem;
-}
-
-ul {
-	padding-left: 2rem;
-	margin-top: 0.75rem;
-	margin-bottom: 0.75rem;
-}
-
 /* Styling for EIP/ERC tags */
 .eip-tag {
 	background-color: var(--eip-bg);
 	color: var(--eip-text) !important;
-	padding: 0.15rem 0.4rem;
-	border-radius: 4px;
+	padding: 0.3rem 0.6rem;
+	border-radius: 9999px;
 	font-weight: 500;
 	border: 1px solid var(--eip-border);
 	display: inline-block;
@@ -153,10 +147,18 @@ html.dark {
 }
 
 * {
-	font-family: 'Work Sans', 'Work Sans Fallback', 'Noto Color Emoji';
+	font-family: 'Montserrat', 'Noto Color Emoji';
 }
 
 code {
 	/* Why monospace twice? See https://github.com/necolas/normalize.css/issues/519#issuecomment-197131966 */
 	font-family: monospace, monospace;
+}
+
+[cmdk-group-heading] {
+	@apply px-2;
+}
+
+[cmdk-list-sizer] {
+	@apply space-y-2;
 }

@@ -2,8 +2,8 @@ import { ratedWallets } from '@/data/wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import type { AttributeGroup, ValueSet, EvaluatedGroup } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
-import { Box, type SxProps, Tooltip } from '@mui/material'
-import { DataGrid, type GridColDef, GridToolbar } from '@mui/x-data-grid'
+import { Box, type SxProps, Tooltip, IconButton } from '@mui/material'
+import { DataGrid, type GridColDef, GridToolbar, type GridSortModel } from '@mui/x-data-grid'
 import type React from 'react'
 import { WalletRatingCell, walletRatingColumnProps } from '@/ui/molecules/WalletRatingCell'
 import {
@@ -38,6 +38,8 @@ import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { ContentType } from '@/types/content'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 // Define display strings for wallet types
 const WALLET_TYPE_DISPLAY = {
@@ -63,6 +65,13 @@ const SMART_WALLET_STANDARD_LINKS: Record<string, string> = {
 const HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY = {
 	[HardwareWalletManufactureType.FACTORY_MADE]: 'Factory-Made',
 	[HardwareWalletManufactureType.DIY]: 'DIY',
+}
+
+// Helper to create a multi-type wallet definition for the UI
+interface MultiWalletTypeInfo {
+	categories: WalletTypeCategory[]
+	smartWalletStandards?: SmartWalletStandard[]
+	details?: string
 }
 
 class TableStateHandle implements WalletTableStateHandle {
@@ -421,6 +430,28 @@ class WalletRow implements WalletRowStateHandle {
 
 		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType] || 'Unknown'
 	}
+
+	/** Render the expand button cell. */
+	renderExpandButton(): React.JSX.Element {
+		return (
+			<Box sx={{ width: '50px', display: 'flex', justifyContent: 'center' }}>
+				<IconButton
+					onClick={() => {
+						this.toggleExpanded()
+					}}
+					size="small"
+					sx={{
+						color: 'var(--text-primary)',
+						'&:hover': {
+							backgroundColor: 'var(--background-secondary)',
+						},
+					}}
+				>
+					{this.expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+				</IconButton>
+			</Box>
+		)
+	}
 }
 
 /** Column definition for wallet rating columns. */
@@ -431,7 +462,7 @@ function walletTableColumn<Vs extends ValueSet>(
 	return {
 		...walletRatingColumnProps,
 		field: group.id,
-		headerName: group.displayName,
+		headerName: `${group.displayName}`,
 		type: 'number',
 		valueGetter: (_: never, row: WalletRow): number => row.score(group, evalGroupFn),
 		renderCell: params => params.row.render(group, evalGroupFn),
@@ -500,7 +531,9 @@ export default function WalletTable(): React.JSX.Element {
 		width: 142,
 		minWidth: 142,
 		flex: 0.15,
-		renderCell: params => <Box sx={{ fontSize: '0.85rem' }}>{params.row.renderWalletType()}</Box>,
+		renderCell: params => (
+			<Box sx={{ fontSize: '0.85rem' }}>{(params.row as WalletRow).renderWalletType()}</Box>
+		),
 		sortable: true,
 		resizable: true,
 		sortComparator: (v1, v2, param1, param2) => {
@@ -533,7 +566,9 @@ export default function WalletTable(): React.JSX.Element {
 		minWidth: 130,
 		flex: 0.2,
 		renderCell: params => (
-			<Box sx={{ fontSize: '0.85rem' }}>{params.row.renderHardwareWalletManufactureType()}</Box>
+			<Box sx={{ fontSize: '0.85rem' }}>
+				{(params.row as WalletRow).renderHardwareWalletManufactureType()}
+			</Box>
 		),
 		sortable: true,
 		resizable: true,
@@ -548,6 +583,13 @@ export default function WalletTable(): React.JSX.Element {
 		walletTableColumn(selfSovereigntyAttributeGroup, tree => tree.selfSovereignty),
 		walletTableColumn(transparencyAttributeGroup, tree => tree.transparency),
 		walletTableColumn(ecosystemAttributeGroup, tree => tree.ecosystem),
+		{
+			field: 'actions',
+			type: 'actions',
+			headerName: '',
+			width: 50,
+			renderCell: params => params.row.renderExpandButton(),
+		},
 	]
 
 	// Define columns for hardware wallet table (add manufacture type column)
@@ -559,6 +601,13 @@ export default function WalletTable(): React.JSX.Element {
 		walletTableColumn(selfSovereigntyAttributeGroup, tree => tree.selfSovereignty),
 		walletTableColumn(transparencyAttributeGroup, tree => tree.transparency),
 		walletTableColumn(ecosystemAttributeGroup, tree => tree.ecosystem),
+		{
+			field: 'actions',
+			type: 'actions',
+			headerName: '',
+			width: 50,
+			renderCell: params => params.row.renderExpandButton(),
+		},
 	]
 
 	// Common DataGrid style
@@ -632,17 +681,15 @@ export default function WalletTable(): React.JSX.Element {
 		<div className="w-full h-full overflow-auto pl-2 pr-2">
 			<ThemeProvider theme={currentWalletTableTheme}>
 				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Wallets</h2>
-				<Box
-					sx={{ mb: 6, width: '100%', maxWidth: '1600px', margin: '0 auto' }}
-					display="flex"
-					flexDirection="column"
-				>
+				<Box sx={{ mb: 6, width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
 					<DataGrid<WalletRow>
 						rows={softwareWalletRows}
 						columns={mainColumns}
 						getRowHeight={row => (row.model as WalletRow).getRowHeight()}
 						density="standard"
 						disableRowSelectionOnClick
+						disableColumnMenu
+						disableColumnSelector
 						initialState={{
 							sorting: {
 								sortModel: [{ field: 'walletType', sort: 'asc' }],
@@ -662,28 +709,28 @@ export default function WalletTable(): React.JSX.Element {
 						filterModel={{
 							items: [],
 						}}
+						autoHeight
 						disableVirtualization={true}
 						sx={{ width: '100%', minWidth: '1200px', ...dataGridSx }}
 					/>
 				</Box>
 
 				<h2 className="text-2xl font-bold mb-4 text-accent border-b pb-2">Hardware Wallets</h2>
-				<Box
-					sx={{ width: '100%', maxWidth: '1600px', margin: '0 auto' }}
-					display="flex"
-					flexDirection="column"
-				>
+				<Box sx={{ width: '100%', maxWidth: '1600px', margin: '0 auto' }}>
 					<DataGrid<WalletRow>
 						rows={hardwareWalletRows}
 						columns={hardwareColumns}
 						getRowHeight={row => (row.model as WalletRow).getRowHeight()}
 						density="standard"
 						disableRowSelectionOnClick
+						disableColumnMenu
+						disableColumnSelector
 						initialState={{
 							sorting: {
 								sortModel: [{ field: walletNameColumn.field, sort: 'asc' }],
 							},
 						}}
+						autoHeight
 						disableVirtualization={true}
 						sx={{ width: '100%', minWidth: '1200px', ...dataGridSx }}
 					/>

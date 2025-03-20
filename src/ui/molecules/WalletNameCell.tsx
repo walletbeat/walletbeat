@@ -19,7 +19,7 @@ import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../componen
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { betaSiteRoot } from '@/constants'
 
-const walletIconSize = shortRowHeight * 0.5
+const walletIconSize = (shortRowHeight) * 0.5;
 
 function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element {
 	const Icon = variantToIcon(variant)
@@ -93,15 +93,11 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 					sx={row.rowWideStyle}
 				>
 					<Box display="flex" flexDirection="column" justifyContent="center">
-						<WalletIcon
-							walletMetadata={row.wallet.metadata}
-							iconSize={walletIconSize}
-							variants={row.wallet.variants}
-						/>
+						<WalletIcon walletMetadata={row.wallet.metadata} iconSize={walletIconSize} variants={row.wallet.variants} />
 					</Box>
 					<Box flex="1" sx={row.rowWideStyle} display="flex" alignItems="center">
 						<h2 className="text-primary" style={{ fontSize: '1.04rem' }}>
-							{row.wallet.metadata.tableName}
+						{row.wallet.metadata.tableName}
 						</h2>
 						{/* <Typography variant="h2"></Typography> */}
 					</Box>
@@ -109,7 +105,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 
 				<Box display="flex" flexDirection="row" gap="0px">
 					{row.table.variantSelected !== null &&
-					row.wallet.variants[row.table.variantSelected] === undefined ? (
+						row.wallet.variants[row.table.variantSelected] === undefined ? (
 						<CrossedOutVariant variant={row.table.variantSelected} />
 					) : null}
 					<VariantPicker
@@ -124,21 +120,17 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 					display="flex"
 					flexDirection="column"
 					height={expandedRowHeight - (shortRowHeight + 40)}
-					sx={{
-						...row.rowWideStyle,
-						lineHeight: 1,
+					sx={{ 
+						...row.rowWideStyle, 
+						lineHeight: 1, 
 						whiteSpace: 'normal',
 						color: 'var(--text-primary)',
 					}}
 				>
 					<Box flex="1">
 						{row.table.variantSelected !== null &&
-						row.wallet.variants[row.table.variantSelected] === undefined ? (
-							<Typography
-								variant="body1"
-								marginBottom="0.5rem"
-								sx={{ color: 'var(--text-primary)' }}
-							>
+							row.wallet.variants[row.table.variantSelected] === undefined ? (
+							<Typography variant="body1" marginBottom="0.5rem" sx={{ color: 'var(--text-primary)' }}>
 								{row.wallet.metadata.displayName} does not have a {row.table.variantSelected}{' '}
 								version.
 							</Typography>
@@ -164,7 +156,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 							color: 'var(--text-primary)',
 							'& a': {
 								color: 'var(--text-primary)',
-							},
+							}
 						}}
 					>
 						<IconLink
@@ -182,8 +174,8 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 						/>
 						|
 						{row.wallet.metadata.repoUrl === null ? null : (
-							<ExternalLink
-								url={row.wallet.metadata.repoUrl}
+							<ExternalLink 
+								url={row.wallet.metadata.repoUrl} 
 								defaultLabel="GitHub"
 								color="text.primary"
 							/>

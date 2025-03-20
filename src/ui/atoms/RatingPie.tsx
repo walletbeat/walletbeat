@@ -36,6 +36,7 @@ export interface PieRatings {
 	highlightedSliceId?: string | null
 	centerLabel?: string
 	centerLabelHeightFraction?: number
+	arcLabel?: 'label' | 'value' | 'formattedValue' | ((item: any) => string)
 }
 
 function sliceToData(slice: PieSlice): PieValueType {
@@ -50,7 +51,7 @@ function sliceToData(slice: PieSlice): PieValueType {
 				case 'tooltip':
 					return slice.tooltip
 				case 'arc':
-					return slice.arcLabel
+					return `${slice.arcLabel}`
 			}
 		},
 	}
@@ -114,20 +115,25 @@ export function RatingPie({
 	width,
 	height,
 	arc = Arc.FULL,
-	paddingAngle = 8,
+	paddingAngle = 0,
+	innerRadiusFraction = arc === Arc.FULL ? 0.02 : 0.35,
+	outerRadiusFraction = 0,
+	cornerRadiusFraction = 0,
 	hoverEffect = true,
-	hoverRadiusFraction = 1.02,
+	hoverRadiusFraction = 1,
 	highlightedSliceId = undefined,
 	centerLabel = '',
-	centerLabelHeightFraction = 0.3,
+	centerLabelHeightFraction = 0,
+	arcLabel = 'label',
 }: PieRatings): React.JSX.Element {
 	const theme = useTheme()
 	const isDarkMode = theme.palette.mode === 'dark'
 
-	const { startAngle, endAngle, cx, cy } = (() => {
+	const { maxRadius, startAngle, endAngle, cx, cy } = (() => {
 		switch (arc) {
 			case Arc.TOP_HALF:
 				return {
+					maxRadius: height,
 					startAngle: -90,
 					endAngle: 90,
 					cx: width / 2 + pieChartCenterError,
@@ -135,6 +141,7 @@ export function RatingPie({
 				}
 			case Arc.FULL:
 				return {
+					maxRadius: Math.min(width, height) / 2,
 					startAngle: 0,
 					endAngle: 380,
 					cx: width / 2 + pieChartCenterError,
@@ -144,9 +151,9 @@ export function RatingPie({
 	})()
 
 	// Fixed values to match requested configuration but scaled down to be less zoomed
-	const innerRadius = 3 // Smaller inner radius
-	const outerRadius = 60 // Smaller outer radius to make it less zoomed
-	const cornerRadius = 8 // Proportionally smaller corner radius
+	const innerRadius = 0 // Smaller inner radius
+	const outerRadius = 40 // Smaller outer radius to make it less zoomed
+	const cornerRadius = 2 // Proportionally smaller corner radius
 
 	// Use calculated values for hover radius
 	const hoverRadius = outerRadius * hoverRadiusFraction
@@ -229,7 +236,7 @@ export function RatingPie({
 					id: pieId,
 					data: nonEmptyMap(slices, slice => sliceToData(slice)),
 					type: 'pie',
-					arcLabel: 'label',
+					arcLabel: arcLabel,
 					arcLabelRadius: computeArcLabel(innerRadius, outerRadius),
 					cx,
 					cy,

@@ -11,10 +11,7 @@ import { markdown, mdParagraph, paragraph, sentence, mdSentence } from '@/types/
 import type { WalletMetadata } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletProfile } from '@/schema/features/profile'
-import {
-	BugBountyProgramType,
-	type BugBountyProgramSupport,
-} from '@/schema/features/security/bug-bounty-program'
+import { BugBountyProgramType, type BugBountyProgramSupport } from '@/schema/features/security/bug-bounty-program'
 import { popRefs } from '@/schema/reference'
 
 const brand = 'attributes.security.bug_bounty_program'
@@ -78,11 +75,9 @@ function disclosureOnlyProgram(
 				${wallet.metadata.displayName} implements a basic vulnerability disclosure policy, allowing security
 				researchers to report issues. However, it does not offer financial incentives or a formal bug bounty program,
 				which may limit the motivation for researchers to find and report vulnerabilities.
-				${
-					support.upgradePathAvailable
-						? `\n\nPositively, the wallet does provide an upgrade path for users when security issues are identified.`
-						: `\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.`
-				}
+				${support.upgradePathAvailable ? 
+					`\n\nPositively, the wallet does provide an upgrade path for users when security issues are identified.` : 
+					`\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.`}
 			`,
 		),
 		howToImprove: mdParagraph(
@@ -118,11 +113,9 @@ function basicBugBountyProgram(
 				${wallet.metadata.displayName} implements a basic bug bounty program that offers some incentives for
 				security researchers to find and report vulnerabilities. However, the program has limitations in terms
 				of scope, reward size, or responsiveness.
-				${
-					support.upgradePathAvailable
-						? `\n\nPositively, the wallet provides an upgrade path for users when security issues are identified.`
-						: `\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.`
-				}
+				${support.upgradePathAvailable ? 
+					`\n\nPositively, the wallet provides an upgrade path for users when security issues are identified.` : 
+					`\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.`}
 			`,
 		),
 		howToImprove: mdParagraph(
@@ -158,21 +151,17 @@ function comprehensiveBugBountyProgram(
 				${wallet.metadata.displayName} implements a comprehensive bug bounty program that offers strong incentives for
 				security researchers to find and report vulnerabilities. The program has a wide scope, competitive rewards,
 				and a responsive disclosure process.
-				${
-					support.upgradePathAvailable
-						? `\n\nAdditionally, the wallet provides a clear upgrade path for users when security issues are identified.`
-						: `\n\nHowever, the wallet should still improve by providing a clearer upgrade path for users when security issues are identified.`
-				}
+				${support.upgradePathAvailable ? 
+					`\n\nAdditionally, the wallet provides a clear upgrade path for users when security issues are identified.` : 
+					`\n\nHowever, the wallet should still improve by providing a clearer upgrade path for users when security issues are identified.`}
 			`,
 		),
-		howToImprove: support.upgradePathAvailable
-			? undefined
-			: mdParagraph(
-					({ wallet }) => `
+		howToImprove: support.upgradePathAvailable ? undefined : mdParagraph(
+			({ wallet }) => `
 				${wallet.metadata.displayName} should establish a clearer upgrade path for users when security vulnerabilities are discovered,
 				such as offering discounted replacements or firmware updates when possible.
 			`,
-				),
+		),
 	}
 }
 
@@ -187,8 +176,7 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 			`What can ${walletMetadata.displayName} do to improve its bug bounty program?`,
 	},
 	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} implement a bug bounty program and provide security updates?`,
+		(walletMetadata: WalletMetadata) => `Does ${walletMetadata.displayName} implement a bug bounty program and provide security updates?`,
 	),
 	why: markdown(`
 		Hardware wallets manage sensitive cryptographic keys and access to users' funds, making them high-value targets for attackers.
@@ -272,60 +260,60 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<BugBountyProgramValue>>) => pickWorstRating<BugBountyProgramValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<BugBountyProgramValue>>) => {
+		return pickWorstRating<BugBountyProgramValue>(perVariant)
+	},
 	evaluate: (features: ResolvedFeatures): Evaluation<BugBountyProgramValue> => {
 		// This attribute only applies to hardware wallets
 		if (features.profile !== WalletProfile.HARDWARE) {
 			return exempt(
-				bugBountyProgram,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is only applicable for hardware wallets, not for ${walletMetadata.displayName}.`,
+				bugBountyProgram, 
+				sentence((walletMetadata: WalletMetadata) => 
+					`This attribute is only applicable for hardware wallets, not for ${walletMetadata.displayName}.`
 				),
 				brand,
-				{
+				{ 
 					programType: BugBountyProgramType.NONE,
-					upgradePathAvailable: false,
-				},
+					upgradePathAvailable: false
+				}
 			)
 		}
-
+		
 		// If the bugBountyProgram feature is not defined, return unrated
-		if (
-			features.security.bugBountyProgram === null ||
-			features.security.bugBountyProgram === undefined
-		) {
-			return unrated(bugBountyProgram, brand, {
-				programType: BugBountyProgramType.NONE,
-				upgradePathAvailable: false,
-			})
+		if (features.security.bugBountyProgram === null || features.security.bugBountyProgram === undefined) {
+			return unrated(
+				bugBountyProgram, 
+				brand, 
+				{ 
+					programType: BugBountyProgramType.NONE, 
+					upgradePathAvailable: false 
+				}
+			)
 		}
-
-		const { withoutRefs, refs: extractedRefs } = popRefs<BugBountyProgramSupport>(
-			features.security.bugBountyProgram,
-		)
-
-		let result: Evaluation<BugBountyProgramValue>
-
+		
+		const { withoutRefs, refs: extractedRefs } = popRefs<BugBountyProgramSupport>(features.security.bugBountyProgram)
+		
+		let result: Evaluation<BugBountyProgramValue>;
+		
 		switch (withoutRefs.type) {
 			case BugBountyProgramType.COMPREHENSIVE:
-				result = comprehensiveBugBountyProgram(withoutRefs)
-				break
+				result = comprehensiveBugBountyProgram(withoutRefs);
+				break;
 			case BugBountyProgramType.BASIC:
-				result = basicBugBountyProgram(withoutRefs)
-				break
+				result = basicBugBountyProgram(withoutRefs);
+				break;
 			case BugBountyProgramType.DISCLOSURE_ONLY:
-				result = disclosureOnlyProgram(withoutRefs)
-				break
+				result = disclosureOnlyProgram(withoutRefs);
+				break;
 			default:
-				result = noBugBountyProgram()
-				break
+				result = noBugBountyProgram();
+				break;
 		}
-
+		
 		// Return result with references if any
 		return {
 			...result,
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+} 

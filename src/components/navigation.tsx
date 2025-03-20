@@ -3,6 +3,7 @@ import HomeIcon from '@mui/icons-material/Home'
 import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import ForumIcon from '@mui/icons-material/Forum'
 import GitHubIcon from '@mui/icons-material/GitHub'
+import FoundationIcon from '@mui/icons-material/Foundation'
 import { betaSiteRoot } from '@/constants'
 import { LuBadgeCheck, LuBuilding2 } from 'react-icons/lu'
 

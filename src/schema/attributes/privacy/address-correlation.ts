@@ -25,7 +25,7 @@ import {
 import { markdown, paragraph, type RenderableTypography, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty'
-import { type FullyQualifiedReference, type ReferenceArray, refs } from '../../reference'
+import { type FullyQualifiedReference, refs } from '../../reference'
 import type { Entity } from '../../entity'
 import { addressCorrelationDetailsContent } from '@/types/content/address-correlation-details'
 
@@ -61,7 +61,6 @@ export type WalletAddressLinkableBy = WalletAddressLinkableTo & {
 
 function linkable(
 	linkables: NonEmptyArray<WalletAddressLinkableBy>,
-	references: ReferenceArray,
 ): Evaluation<AddressCorrelationValue> {
 	const worstLeak = nonEmptyFirst(
 		linkables,
@@ -153,7 +152,6 @@ function linkable(
 		},
 		details: addressCorrelationDetailsContent({ linkables }),
 		howToImprove,
-		references,
 	}
 }
 
@@ -275,9 +273,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 			return unrated(addressCorrelation, brand, { worstLeak: null })
 		}
 		const linkables: WalletAddressLinkableBy[] = []
-		const allRefs: ReferenceArray = refs(features.privacy.dataCollection.onchain)
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
-			allRefs.push(...refs(collected.leaks))
 			for (const linkable of linkableToWalletAddress(collected.leaks)) {
 				linkables.push({ by: collected.entity, ...linkable })
 			}
@@ -289,7 +285,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 			linkables.push({ by: 'onchain', ...linkable })
 		}
 		if (isNonEmptyArray(linkables)) {
-			return linkable(linkables, allRefs)
+			return linkable(linkables)
 		}
 		return {
 			value: uncorrelated,
@@ -299,7 +295,6 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 					your wallet address to any personal information.
 				`,
 			),
-			references: allRefs,
 		}
 	},
 	aggregate: pickWorstRating<AddressCorrelationValue>,

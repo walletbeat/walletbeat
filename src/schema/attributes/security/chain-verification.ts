@@ -45,7 +45,6 @@ function supportsChainVerification(
 			__brand: brand,
 		},
 		details: chainVerificationDetailsContent({ lightClients, refs }),
-		references: refs,
 	}
 }
 
@@ -75,14 +74,13 @@ function noChainVerification(
 					Ethereum L1 blockchain when retrieving chain state or simulating
 					transactions.
 
-					${
-						canConfigureL1
-							? `
+					${canConfigureL1
+					? `
 					Users may work around this by setting a custom RPC endpoint for the
 					L1 chain and running their own node or external light client.
 					`
-							: ''
-					}
+					: ''
+				}
 				`
 		}),
 		howToImprove: mdParagraph(
@@ -92,7 +90,6 @@ function noChainVerification(
 				to verify the integrity of Ethereum chain data.
 			`,
 		),
-		references: [],
 	}
 }
 

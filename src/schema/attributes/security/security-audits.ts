@@ -15,7 +15,6 @@ import { type SecurityAudit, securityAuditId } from '@/schema/features/security/
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
 import { exampleSecurityAuditor } from '@/data/entities/example'
 import type { AtLeastOneVariant } from '@/schema/variants'
-import { mergeRefs } from '@/schema/reference'
 
 const brand = 'attributes.security.security_audits'
 export type SecurityAuditsValue = Value & {
@@ -42,7 +41,6 @@ function noAudits(): Evaluation<SecurityAuditsValue> {
 				${wallet.metadata.displayName} has not undergone any security auditing.
 			`,
 		),
-		references: [],
 	}
 }
 
@@ -134,7 +132,6 @@ function audited(
 			hasUnaddressedFlaws,
 		}),
 		howToImprove,
-		references: mergeRefs(...audits.map(audit => audit.ref)),
 	}
 }
 

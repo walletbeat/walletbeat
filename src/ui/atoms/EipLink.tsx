@@ -86,44 +86,31 @@ export function EipLink({
 					)}
 				</React.Fragment>
 			}
-			sx={{
-				maxWidth: '80%',
-			}}
 			arrow={true}
 		>
-			<Box component="span" display="inline-block">
-				<Link
-					href={eipEthereumDotOrgUrl(eip)}
-					target="_blank"
-					color="primary"
-					display="flex"
-					flexDirection="row"
-					gap="2px"
-					alignItems="baseline"
-					underline="none"
-					onMouseEnter={() => {
-						setHovered(true)
-					}}
-					onMouseLeave={() => {
-						setHovered(false)
-					}}
-					sx={{
-						color: 'primary.main',
-					}}
-				>
-					<Box component="span" display="inline-block" sx={{ filter: 'invert(100%)' }}>
-						<img src={`${betaImagesRoot}/ethereum-logo.svg`} alt="" width={14} height={14} />
-					</Box>
-					<Box
-						component="span"
-						display="inline-block"
-						className="eip-tag"
-						sx={{ textDecoration: hovered ? 'underline' : 'none' }}
-					>
-						{format === 'SHORT' ? eipShortLabel(eip) : eipLabel(eip)}
-					</Box>
-				</Link>
-			</Box>
+			<Link
+				href={eipEthereumDotOrgUrl(eip)}
+				target="_blank"
+				color="primary"
+				display="flex"
+				flexDirection="row"
+				gap="2px"
+				alignItems="baseline"
+				underline="none"
+				onMouseEnter={() => {
+					setHovered(true)
+				}}
+				onMouseLeave={() => {
+					setHovered(false)
+				}}
+				sx={{
+					color: 'var(--accent)',
+					textDecoration: hovered ? 'underline' : 'none',
+					className: 'eip-tag',
+				}}
+			>
+				{format === 'SHORT' ? eipShortLabel(eip) : eipLabel(eip)}
+			</Link>
 		</EipTooltip>
 	)
 }

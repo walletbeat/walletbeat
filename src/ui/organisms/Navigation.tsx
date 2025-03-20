@@ -101,14 +101,14 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 	return (
 		<span
 			key="listItemIcon"
-			// sx={{
-			// 	minWidth: `${navigationListIconSize}px`,
-			// 	width: `${navigationListIconSize}px`,
-			// 	height: `${navigationListIconSize}px`,
-			// 	display: 'inline-block',
-			// textAlign: 'center',
-			// marginRight: '4px',
-			// }}
+		// sx={{
+		// 	minWidth: `${navigationListIconSize}px`,
+		// 	width: `${navigationListIconSize}px`,
+		// 	height: `${navigationListIconSize}px`,
+		// 	display: 'inline-block',
+		// textAlign: 'center',
+		// marginRight: '4px',
+		// }}
 		>
 			{children}
 		</span>
@@ -127,10 +127,10 @@ interface NavigationItemProps {
  * A single navigation list item.
  */
 const NavigationItem = memo(
-	function NavigationItem({ item, active }: NavigationItemProps): React.JSX.Element {
+	function NavigationItem({ item, active, depth }: NavigationItemProps): React.JSX.Element {
 		const [isOpen, setIsOpen] = useState(false)
 		const linkStyles =
-			'whitespace-nowrap flex flex-row items-center gap-2 py-0.5 hover:bg-backgroundSecondary rounded-md px-4'
+			'whitespace-nowrap flex flex-row items-center gap-2 py-1 px-2 hover:bg-backgroundSecondary rounded-md'
 		const hasChildren = (item.children?.length ?? 0) > 0
 
 		const toggleDropdown = (e: React.MouseEvent) => {
@@ -250,6 +250,7 @@ const navigationBoxStyle = {
 
 interface NavigationGroupProps {
 	group: NavigationGroup
+	groupIndex: number
 	activeItemId?: string
 	onContentItemClick?: (item: NavigationContentItem) => void
 }
@@ -257,12 +258,13 @@ interface NavigationGroupProps {
 export const NavigationGroup = memo(
 	function NavigationGroup({
 		group,
+		groupIndex,
 		activeItemId,
 		onContentItemClick,
 	}: NavigationGroupProps): React.JSX.Element {
 		return (
 			<>
-				<ul className="flex flex-col gap-0">
+				<ul className="flex flex-col gap-0 p-0 m-0">
 					{nonEmptyMap(group.items, item => (
 						<React.Fragment key={`fragment-${item.id}`}>
 							<NavigationItem
@@ -283,6 +285,9 @@ export const NavigationGroup = memo(
 		nextProps: Readonly<NavigationGroupProps>,
 	): boolean => {
 		if (prevProps.group !== nextProps.group) {
+			return false
+		}
+		if (prevProps.groupIndex !== nextProps.groupIndex) {
 			return false
 		}
 		if (prevProps.onContentItemClick !== nextProps.onContentItemClick) {
@@ -314,38 +319,55 @@ export const NavigationGroup = memo(
 export function Navigation({
 	groups,
 	activeItemId,
+	flex,
 	onContentItemClick = undefined,
 	prefix,
 }: {
 	groups: NonEmptyArray<NavigationGroup>
 	activeItemId?: string
+	flex?: React.ComponentProps<typeof Box>['flex']
 	onContentItemClick?: (item: NavigationContentItem) => void
 	prefix?: React.ReactNode
 }): React.JSX.Element {
 	return (
 		<div
 			key="navigationBox"
-			className="flex flex-col gap-0 w-full md:max-w-xs flex-0 py-8 sticky top-0 h-screen overflow-y-auto"
+			className="flex flex-col gap-0 w-full md:max-w-xs flex-0 sticky top-0 h-screen overflow-y-auto"
+			style={{ backgroundColor: 'var(--navigation-bg)' }}
 		>
-			<div className="flex justify-between items-center w-full gap-4 px-8 mb-4">
-				<a href="/" className="text-2xl text-accent font-bold italic whitespace-nowrap">
-					~ WalletBeat
+			<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-4 mt-8">
+				<a href="/" className="flex items-center">
+					<img
+						src="/logo-light.svg"
+						alt="WalletBeat Logo"
+						className="h-8 w-auto block dark:hidden transition-all"
+					/>
+					<img
+						src="/logo-dark.svg"
+						alt="WalletBeat Logo"
+						className="h-8 w-auto hidden dark:block transition-all"
+					/>
 				</a>
 				<ThemeSwitcher />
 			</div>
 
 			{/* Desktop Search Component - ensures the search is always visible on desktop */}
-			{prefix && <div className="px-8 mb-6 w-full">{prefix}</div>}
+			{prefix && <div className="px-4 mb-6 w-full">{prefix}</div>}
 
 			<div className="flex flex-col gap-2 px-4">
-				{nonEmptyMap(groups, group => (
+				{nonEmptyMap(groups, (group, groupIndex) => (
 					<NavigationGroup
 						key={`navigationGroup-${group.id}`}
 						group={group}
+						groupIndex={groupIndex}
 						onContentItemClick={onContentItemClick}
 						activeItemId={activeItemId}
 					/>
 				))}
+			</div>
+			<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-center rounded-lg">
+				Wallets listed on this page are not official endoresements, and are provided for
+				informational purposes only.
 			</div>
 		</div>
 	)

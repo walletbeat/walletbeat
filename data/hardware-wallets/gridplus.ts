@@ -5,8 +5,8 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
+import { gridplus } from '../entities/gridplus'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { Variant } from '@/schema/variants'
 
 export const gridplusWallet: Wallet = {
 	metadata: {
@@ -61,30 +61,26 @@ export const gridplusWallet: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.PARTIAL,
-					details:
-						'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.',
+					details: 'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.'
 				},
 				ref: [
 					{
 						url: 'https://youtu.be/7lP_0h-PPvY?si=S4wNFukrmg4rwyFA&t=1141',
-						explanation:
-							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
-					},
+						explanation: 'Independent video demonstration of Keystone\'s clear signing implementation on Safe.',
+					}
 				],
 			},
 			bugBountyProgram: {
 				type: BugBountyProgramType.COMPREHENSIVE,
 				url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
-				details:
-					'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
+				details: 'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
 				upgradePathAvailable: true,
 				ref: [
 					{
 						url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
-						explanation:
-							'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
-					},
-				],
+						explanation: 'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations'
+					}
+				]
 			},
 		},
 		privacy: {
@@ -124,10 +120,10 @@ export const gridplusWallet: Wallet = {
 		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: true,
+		mobile: false,
+		browser: false,
+		desktop: false,
+		embedded: false,
+		hardware: true,
 	},
 }

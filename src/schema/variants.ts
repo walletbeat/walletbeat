@@ -35,13 +35,7 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 	let foundVariant = false
 	let foundNonVariant = false
 	Object.keys(value).forEach(key => {
-		if (
-			key === 'mobile' ||
-			key === 'desktop' ||
-			key === 'browser' ||
-			key === 'embedded' ||
-			key === 'hardware'
-		) {
+		if (key === 'mobile' || key === 'desktop' || key === 'browser' || key === 'embedded' || key === 'hardware') {
 			foundVariant = true
 		} else {
 			foundNonVariant = true

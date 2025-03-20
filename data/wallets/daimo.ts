@@ -42,8 +42,8 @@ export const daimo: Wallet = {
 		lastUpdated: '2025-03-12',
 		multiWalletType: {
 			categories: [WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337],
-		},
+			smartWalletStandards: [SmartWalletStandard.ERC_4337]
+		}
 	},
 	features: {
 		profile: WalletProfile.MOBILE,
@@ -94,15 +94,13 @@ export const daimo: Wallet = {
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
 				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-				details:
-					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
+				details: 'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
 				ref: [
 					{
 						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-						explanation:
-							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
-					},
-				],
+						explanation: 'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.'
+					}
+				]
 			},
 			scamAlerts: {
 				scamUrlWarning: notSupported,
@@ -121,13 +119,13 @@ export const daimo: Wallet = {
 						},
 					],
 				}),
-			},
+			}, 
 			publicSecurityAudits: [
 				{
 					auditor: veridise,
 					auditDate: '2023-10-06',
 					ref: 'https://github.com/daimo-eth/daimo/blob/master/audits/2023-10-veridise-daimo.pdf',
-					variantsScope: { [Variant.MOBILE]: true },
+					variantsScope: { mobile: true },
 					codeSnapshot: {
 						date: '2023-09-12',
 						commit: 'f0dc56d68852c1488461e88a506ff7b0f027f245',
@@ -145,7 +143,7 @@ export const daimo: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'Daimo does not support hardware wallets.',
+					details: 'Daimo does not support hardware wallets.'
 				},
 				ref: null,
 			},
@@ -291,7 +289,7 @@ export const daimo: Wallet = {
 			},
 		},
 		license: {
-			license: License.GPL_3_0,
+			value: License.GPL_3_0,
 			ref: [
 				{
 					explanation: 'Daimo is licensed under the GPL-3.0 license.',

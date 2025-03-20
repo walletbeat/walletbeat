@@ -50,7 +50,7 @@ export enum HardwareWalletManufactureType {
 	 * Examples include Ledger, Trezor, GridPlus, and Keystone.
 	 */
 	FACTORY_MADE = 'FACTORY_MADE',
-
+	
 	/**
 	 * A DIY hardware wallet is assembled by the user themselves
 	 * Examples include self-assembled devices using open source hardware designs.
