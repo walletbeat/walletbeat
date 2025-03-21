@@ -10,7 +10,10 @@ import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import { cure53 } from '../entities/cure53'
-import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
@@ -365,8 +368,10 @@ export const rabby: Wallet = {
 					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
-					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},

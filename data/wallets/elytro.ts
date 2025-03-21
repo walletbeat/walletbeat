@@ -8,6 +8,7 @@ import { nconsigny } from '../contributors/nconsigny'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const elytro: Wallet = {
 	metadata: {
@@ -106,8 +107,8 @@ export const elytro: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},

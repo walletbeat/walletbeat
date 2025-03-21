@@ -12,7 +12,10 @@ import { honeycomb } from '../entities/honeycomb'
 import { WalletProfile } from '@/schema/features/profile'
 import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
 import { veridise } from '../entities/veridise'
-import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
@@ -285,8 +288,10 @@ export const daimo: Wallet = {
 					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					arbitrum: TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
-					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},

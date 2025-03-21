@@ -7,6 +7,7 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import { featureSupported } from '@/schema/features/support'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { firefly } from '../entities/firefly'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const fireflyWallet: Wallet = {
 	metadata: {
@@ -61,7 +62,8 @@ export const fireflyWallet: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'Firefly currently does not provide clear signing support as it is still in development.'
+					details:
+						'Firefly currently does not provide clear signing support as it is still in development.',
 				},
 				ref: null,
 			},
@@ -84,8 +86,8 @@ export const fireflyWallet: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},

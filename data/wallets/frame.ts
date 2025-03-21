@@ -9,6 +9,7 @@ import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-v
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { WalletTypeCategory } from '@/schema/features/wallet-type'
 import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const frame: Wallet = {
 	metadata: {
@@ -87,8 +88,8 @@ export const frame: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},

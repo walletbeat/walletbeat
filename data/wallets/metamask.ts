@@ -11,6 +11,7 @@ import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/walle
 import { diligence } from '../entities/diligence'
 import { cure53 } from '../entities/cure53'
 import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const metamask: Wallet = {
 	metadata: {
@@ -136,8 +137,8 @@ export const metamask: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},

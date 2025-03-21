@@ -12,6 +12,10 @@ import { Variant } from '@/schema/variants'
 import { cantina } from '../entities/cantina'
 import { code4rena } from '../entities/code4rena'
 import { certora } from '../entities/certora'
+import {
+	TransactionSubmissionL2Type,
+	transactionSubmissionL2TypeName,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const coinbase: Wallet = {
 	metadata: {
@@ -122,8 +126,8 @@ export const coinbase: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},

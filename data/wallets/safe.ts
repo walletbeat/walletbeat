@@ -8,6 +8,7 @@ import { nconsigny } from '../contributors/nconsigny'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const safe: Wallet = {
 	metadata: {
@@ -112,8 +113,8 @@ export const safe: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},

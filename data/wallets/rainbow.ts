@@ -9,6 +9,7 @@ import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-s
 import { featureSupported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import { License } from '@/schema/features/license'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const rainbow: Wallet = {
 	metadata: {
@@ -84,8 +85,8 @@ export const rainbow: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},

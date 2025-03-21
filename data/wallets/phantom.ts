@@ -8,6 +8,7 @@ import { WalletTypeCategory } from '@/schema/features/wallet-type'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const phantom: Wallet = {
 	metadata: {
@@ -84,8 +85,8 @@ export const phantom: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},
