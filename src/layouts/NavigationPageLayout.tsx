@@ -1,5 +1,5 @@
 import theme from '@/components/ThemeRegistry/theme'
-import { Box, ThemeProvider } from '@mui/material'
+import { ThemeProvider } from '@mui/material'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -163,13 +163,10 @@ export function NavigationPageLayout({
 
 	return (
 		<ThemeProvider theme={theme}>
-			<div className="flex w-full min-h-screen flex-nowrap flex-row max-w-screen">
+			<div className="flex flex-col lg:flex-row w-full min-h-screen max-w-screen">
 				<Navigation key="navigation" groups={groups} activeItemId={activeItemId} prefix={prefix} />
 
-				<div
-					key="contentContainer"
-					className="flex-col flex overflow-y-auto min-h-screen mb-48 w-full"
-				>
+				<div key="contentContainer" className="flex-grow overflow-y-auto min-h-screen w-full pb-24">
 					<div className="mx-auto w-full">{children}</div>
 				</div>
 			</div>

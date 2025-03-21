@@ -1,7 +1,7 @@
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
-import React, { memo, useState, useEffect } from 'react'
+import React, { memo, useState } from 'react'
 import { ThemeSwitcher } from './ThemeSwitcher'
 import { LuMenu, LuX } from 'react-icons/lu'
 
@@ -97,14 +97,15 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 	return (
 		<span
 			key="listItemIcon"
-		// sx={{
-		// 	minWidth: `${navigationListIconSize}px`,
-		// 	width: `${navigationListIconSize}px`,
-		// 	height: `${navigationListIconSize}px`,
-		// 	display: 'inline-block',
-		// textAlign: 'center',
-		// marginRight: '4px',
-		// }}
+			className="inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1"
+			// sx={{
+			// 	minWidth: `${navigationListIconSize}px`,
+			// 	width: `${navigationListIconSize}px`,
+			// 	height: `${navigationListIconSize}px`,
+			// 	display: 'inline-block',
+			// textAlign: 'center',
+			// marginRight: '4px',
+			// }}
 		>
 			{children}
 		</span>
@@ -317,52 +318,23 @@ export function Navigation({
 	prefix?: React.ReactNode
 }): React.JSX.Element {
 	const [isOpen, setIsOpen] = useState(false)
-	const [isMobile, setIsMobile] = useState(false)
-
-	// Handle responsive behavior
-	useEffect(() => {
-		const handleResize = (): void => {
-			const mobile = window.innerWidth < 1024
-			setIsMobile(mobile)
-
-			// Only change isOpen state when transitioning between mobile/desktop
-			if (mobile !== isMobile) {
-				setIsOpen(!mobile) // Open on desktop, closed on mobile
-			}
-		}
-
-		// Set initial state
-		handleResize()
-
-		window.addEventListener('resize', handleResize)
-		return (): void => {
-			window.removeEventListener('resize', handleResize)
-		}
-	}, [isMobile])
-
-	// Freeze body scroll when mobile sidebar is open
-	useEffect(() => {
-		if (isMobile && isOpen) {
-			// Freeze the body scroll
-			document.body.style.overflow = 'hidden'
-		} else {
-			// Allow scrolling again
-			document.body.style.overflow = ''
-		}
-
-		// Cleanup when component unmounts
-		return (): void => {
-			document.body.style.overflow = ''
-		}
-	}, [isMobile, isOpen])
 
 	// Toggle menu
 	const toggleMenu = (): void => {
 		setIsOpen(!isOpen)
+		// Toggle body scroll lock when the mobile menu is toggled
+		if (!isOpen) {
+			document.body.style.overflow = 'hidden'
+		} else {
+			document.body.style.overflow = ''
+		}
 	}
 
 	// Helper function for mapping navigation groups to avoid linter errors
-	const renderNavigationGroup = (group: NavigationGroup, groupIndex: number): React.ReactElement => (
+	const renderNavigationGroup = (
+		group: NavigationGroup,
+		groupIndex: number,
+	): React.ReactElement => (
 		<NavigationGroup
 			key={`navigationGroup-${group.id}`}
 			group={group}
@@ -393,7 +365,7 @@ export function Navigation({
 					<button
 						onClick={toggleMenu}
 						className="btn"
-						aria-label={isOpen ? "Close menu" : "Open menu"}
+						aria-label={isOpen ? 'Close menu' : 'Open menu'}
 					>
 						{isOpen ? <LuX size={16} /> : <LuMenu size={16} />}
 					</button>
@@ -407,25 +379,30 @@ export function Navigation({
 			<div
 				key="navigationBox"
 				className={`
-				    /* Desktop styles */
-				    lg:flex lg:flex-col lg:gap-0 lg:w-full lg:max-w-xs lg:flex-0 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:z-40
-
-				    /* Mobile styles */
-				    fixed top-0 left-0 h-full w-full lg:w-auto overflow-y-auto z-40
-
-				    /* Transition for mobile only */
-				    transition-all duration-300
-
-				    /* Different transform behavior for mobile vs desktop */
-				    ${isMobile
-						? isOpen ? 'translate-x-0' : '-translate-x-full'
-						: 'translate-x-0'
-					}
+				    /* Base styles */
+				    fixed lg:relative h-full z-40
+				    flex flex-col gap-0 overflow-y-auto
+				    
+				    /* Full width on mobile, constrained on desktop */
+				    w-full lg:w-auto lg:max-w-xs
+				    
+				    /* Positioning */
+				    inset-0 lg:inset-auto
+				    
+				    /* Desktop styles - always visible and positioned */
+				    lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-0
+				    
+				    /* Mobile styles - controlled by state */
+				    lg:translate-x-0
+				    transition-transform duration-300
+				    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+				    
+				    /* Background color */
+				    bg-[var(--navigation-bg)]
 				`}
-				style={{ backgroundColor: 'var(--navigation-bg)' }}
 			>
-				{/* Logo - visible only on desktop */}
-				<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-14 lg:pt-0 h-[34px]">
+				{/* Logo area */}
+				<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-16 lg:pt-0 h-[34px]">
 					<a href="/" className="hidden lg:flex items-center">
 						<img
 							src="/logo-light.svg"
@@ -443,22 +420,20 @@ export function Navigation({
 					</div>
 				</div>
 
-				{/* Desktop Search Component - ensures the search is always visible on desktop */}
+				{/* Search/prefix component */}
 				{typeof prefix !== 'undefined' && prefix !== null ? (
 					<div className="px-4 mb-2 w-full">{prefix}</div>
 				) : null}
 
-				<div className="flex flex-col gap-2 px-4">
-					{nonEmptyMap(groups, renderNavigationGroup)}
-				</div>
+				<div className="flex flex-col gap-2 px-4">{nonEmptyMap(groups, renderNavigationGroup)}</div>
 				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-center rounded-lg">
 					Wallets listed on this page are not official endoresements, and are provided for
 					informational purposes only.
 				</div>
 			</div>
 
-			{/* Overlay when mobile menu is open */}
-			{isOpen && isMobile && (
+			{/* Overlay for mobile menu - only visible when menu is open on mobile */}
+			{isOpen && (
 				<div
 					className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
 					onClick={toggleMenu}
