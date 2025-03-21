@@ -1075,11 +1075,11 @@ export default function WalletTable(): React.ReactElement {
 				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 					<thead>
 						{table.getHeaderGroups().map(headerGroup => (
-							<tr key={headerGroup.id}>
+							<tr className="bg-tertiary" key={headerGroup.id}>
 								{headerGroup.headers.map(header => (
 									<th
 										key={header.id}
-										className={`px-4 py-2 text-center text-[14px] text-[#616161] bg-gray-100 ${
+										className={`px-4 py-2 text-center text-[14px] text-secondary ${
 											header.column.columnDef.header === 'Wallet' ||
 											header.column.columnDef.header === 'Type' ||
 											header.column.columnDef.header === 'Manufacture Type'
