@@ -300,20 +300,20 @@ function PizzaSliceChart({
 	const sliceColors = attributeRatings.map(attr => {
 		switch (attr.rating) {
 			case Rating.PASS:
-				return '#2ecc71' // Green
+				return 'var(--rating-pass)'
 			case Rating.PARTIAL:
-				return '#f1c40f' // Yellow
+				return 'var(--rating-partial)'
 			case Rating.FAIL:
-				return '#e74c3c' // Red
+				return 'var(--rating-fail)'
 			default:
-				return '#bdc3c7' // Gray
+				return 'var(--rating-neutral)'
 		}
 	})
 
 	// If we don't have any ratings, use default colors
 	if (sliceColors.length === 0) {
 		for (let i = 0; i < 4; i++) {
-			sliceColors.push('#bdc3c7') // Gray
+			sliceColors.push('var(--rating-neutral)')
 		}
 	}
 

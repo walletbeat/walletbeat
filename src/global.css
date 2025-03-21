@@ -33,6 +33,12 @@
 		--eip-bg: rgba(108, 36, 224, 0.08);
 		--eip-text: var(--accent);
 		--eip-border: rgba(108, 36, 224, 0.2);
+
+		/* Rating colors */
+		--rating-pass: #2ecc71; /* Green */
+		--rating-partial: #f1c40f; /* Yellow */
+		--rating-fail: #e74c3c; /* Red */
+		--rating-neutral: #bdc3c7; /* Gray */
 	}
 }
 
@@ -62,6 +68,12 @@ html.dark {
 	--eip-bg: rgba(108, 36, 224, 0.12);
 	--eip-text: rgb(187, 147, 255);
 	--eip-border: rgba(108, 36, 224, 0.3);
+
+	/* Rating colors - keep same as light mode since they represent statuses */
+	--rating-pass: #2ecc71; /* Green */
+	--rating-partial: #f1c40f; /* Yellow */
+	--rating-fail: #e74c3c; /* Red */
+	--rating-neutral: #bdc3c7; /* Gray */
 }
 
 html,
