@@ -57,7 +57,7 @@ export interface WalletFeatures {
 
 		/** Hardware wallet clear signing support */
 		hardwareWalletClearSigning: VariantFeature<HardwareWalletClearSigningSupport>
-		
+
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
 
@@ -84,7 +84,7 @@ export interface WalletFeatures {
 	chainConfigurability: VariantFeature<ChainConfigurability>
 
 	/** Which types of accounts the wallet supports. */
-	accountSupport: VariantFeature<WithRef<AccountSupport>>
+	accountSupport: VariantFeature<AccountSupport>
 
 	/** Does the wallet support more than one Ethereum address? */
 	multiAddress: VariantFeature<Support>
@@ -153,7 +153,7 @@ export interface ResolvedFeatures {
 export function resolveFeatures(features: WalletFeatures, variant: Variant): ResolvedFeatures {
 	const feat = <F>(feature: VariantFeature<F>): ResolvedFeature<F> =>
 		resolveFeature<F>(feature, variant)
-	
+
 	return {
 		variant,
 		profile: features.profile,
@@ -172,7 +172,9 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 			hardwareWalletSupport: feat(features.security.hardwareWalletSupport),
 			hardwareWalletClearSigning: feat(features.security.hardwareWalletClearSigning),
 			passkeyVerification: feat(features.security.passkeyVerification),
-			bugBountyProgram: features.security.bugBountyProgram ? feat(features.security.bugBountyProgram) : undefined,
+			bugBountyProgram: features.security.bugBountyProgram
+				? feat(features.security.bugBountyProgram)
+				: undefined,
 		},
 		privacy: {
 			dataCollection: feat(features.privacy.dataCollection),
@@ -189,8 +191,8 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 		license: feat(features.license),
 		monetization: feat(features.monetization),
 		transparency: {
-			feeTransparency: features.transparency?.feeTransparency 
-				? feat(features.transparency.feeTransparency) 
+			feeTransparency: features.transparency?.feeTransparency
+				? feat(features.transparency.feeTransparency)
 				: null,
 		},
 	}
