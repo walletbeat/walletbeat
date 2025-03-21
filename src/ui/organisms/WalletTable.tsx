@@ -1014,13 +1014,13 @@ export default function WalletTable(): React.ReactElement {
 	return (
 		<div className="overflow-x-auto">
 			{/* Tabs - now fixed */}
-			<div className="sticky top-0 bg-white z-10">
+			<div className="sticky top-0 bg-white dark:bg-[#141414] z-10">
 				<div className="flex">
 					<button
 						className={`px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform ${
 							activeTab === WalletTableTab.SOFTWARE
-								? 'bg-white shadow-sm text-gray-800 border border-b-0 border-[#DE69BB]'
-								: 'text-gray-500 hover:text-gray-700 bg-[#EAEAEA]'
+								? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
+								: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]'
 						}`}
 						onClick={() => {
 							handleTabChange(WalletTableTab.SOFTWARE)
@@ -1038,8 +1038,8 @@ export default function WalletTable(): React.ReactElement {
 					<button
 						className={`px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform ${
 							activeTab === WalletTableTab.HARDWARE
-								? 'bg-white shadow-sm text-gray-800 border border-b-0 border-[#DE69BB]'
-								: 'text-gray-500 hover:text-gray-700 bg-[#EAEAEA]'
+								? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
+								: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]'
 						}`}
 						onClick={() => {
 							handleTabChange(WalletTableTab.HARDWARE)
@@ -1059,14 +1059,14 @@ export default function WalletTable(): React.ReactElement {
 
 			{/* Table */}
 			<div className="overflow-x-auto">
-				<table className="min-w-full divide-y divide-gray-200">
+				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 					<thead>
 						{table.getHeaderGroups().map(headerGroup => (
 							<tr key={headerGroup.id}>
 								{headerGroup.headers.map(header => (
 									<th
 										key={header.id}
-										className={`px-4 py-2 text-left text-[14px] text-[#616161] bg-gray-100 ${
+										className={`px-4 py-2 text-left text-[14px] text-[#616161] dark:text-gray-300 bg-gray-100 dark:bg-gray-800 ${
 											header.column.columnDef.header === 'Wallet' ||
 											header.column.columnDef.header === 'Type'
 												? 'font-bold'
@@ -1081,7 +1081,7 @@ export default function WalletTable(): React.ReactElement {
 							</tr>
 						))}
 					</thead>
-					<tbody className="divide-y divide-gray-200">
+					<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
 						{table
 							.getRowModel()
 							.rows.map(row => {
