@@ -15,7 +15,6 @@ import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletProfile } from '@/schema/features/profile'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
-import { isAccountTypeSupported } from '@/schema/features/account-support'
 import { popRefs } from '@/schema/reference'
 
 const brand = 'attributes.security.software_hw_integration'
@@ -55,11 +54,12 @@ function noHardwareWalletSupport(): Evaluation<SoftwareHWIntegrationValue> {
 	}
 }
 
-function basicHardwareWalletIntegration(supportedWallets: string[] = []): Evaluation<SoftwareHWIntegrationValue> {
-	const supportedWalletsText = supportedWallets.length > 0 
-		? ` with ${supportedWallets.join(', ')}`
-		: '';
-	
+function basicHardwareWalletIntegration(
+	supportedWallets: string[] = [],
+): Evaluation<SoftwareHWIntegrationValue> {
+	const supportedWalletsText =
+		supportedWallets.length > 0 ? ` with ${supportedWallets.join(', ')}` : ''
+
 	return {
 		value: {
 			id: 'basic_hw_integration',
@@ -91,15 +91,16 @@ function basicHardwareWalletIntegration(supportedWallets: string[] = []): Evalua
 	}
 }
 
-function goodHardwareWalletIntegration(supportedWallets: string[] = [], supportedDApps: string[] = []): Evaluation<SoftwareHWIntegrationValue> {
-	const supportedWalletsText = supportedWallets.length > 0 
-		? ` with ${supportedWallets.join(', ')}`
-		: '';
-	
-	const supportedDAppsText = supportedDApps.length > 0
-		? supportedDApps.join(' or ')
-		: 'one major DeFi platform';
-	
+function goodHardwareWalletIntegration(
+	supportedWallets: string[] = [],
+	supportedDApps: string[] = [],
+): Evaluation<SoftwareHWIntegrationValue> {
+	const supportedWalletsText =
+		supportedWallets.length > 0 ? ` with ${supportedWallets.join(', ')}` : ''
+
+	const supportedDAppsText =
+		supportedDApps.length > 0 ? supportedDApps.join(' or ') : 'one major DeFi platform'
+
 	return {
 		value: {
 			id: 'good_hw_integration',
@@ -131,11 +132,12 @@ function goodHardwareWalletIntegration(supportedWallets: string[] = [], supporte
 	}
 }
 
-function excellentHardwareWalletIntegration(supportedWallets: string[] = []): Evaluation<SoftwareHWIntegrationValue> {
-	const supportedWalletsText = supportedWallets.length > 0 
-		? ` with ${supportedWallets.join(', ')}`
-		: '';
-	
+function excellentHardwareWalletIntegration(
+	supportedWallets: string[] = [],
+): Evaluation<SoftwareHWIntegrationValue> {
+	const supportedWalletsText =
+		supportedWallets.length > 0 ? ` with ${supportedWallets.join(', ')}` : ''
+
 	return {
 		value: {
 			id: 'excellent_hw_integration',
@@ -262,16 +264,17 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 				),
 			}
 		}
-	
+
 		// Check for ERC-4337 smart wallet
 		if (isErc4337SmartWallet(features)) {
 			return exempt(
-				softwareHWIntegration, 
-				sentence((walletMetadata: WalletMetadata) => 
-					`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`
+				softwareHWIntegration,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`,
 				),
 				brand,
-				{ integrationLevel: 0 }
+				{ integrationLevel: 0 },
 			)
 		}
 
@@ -279,81 +282,98 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		if (!features.security.hardwareWalletSupport) {
 			return noHardwareWalletSupport()
 		}
-		
+
 		// Extract references from hardware wallet support feature
-		const { withoutRefs: hwSupportWithoutRefs, refs: hwSupportRefs } = 
-			popRefs(features.security.hardwareWalletSupport);
+		const { withoutRefs: hwSupportWithoutRefs, refs: hwSupportRefs } = popRefs(
+			features.security.hardwareWalletSupport,
+		)
 
 		// Extract references from hardware wallet clear signing feature if it exists
-		let hwClearSigningRefs = [];
+		let hwClearSigningRefs = []
 		if (features.security.hardwareWalletClearSigning) {
-			const { refs: extractedRefs } = popRefs(features.security.hardwareWalletClearSigning);
-			hwClearSigningRefs = extractedRefs;
+			const { refs: extractedRefs } = popRefs(features.security.hardwareWalletClearSigning)
+			hwClearSigningRefs = extractedRefs
 		}
-		
+
 		// Combine all references
-		const allReferences = [...hwSupportRefs, ...hwClearSigningRefs];
+		const allReferences = [...hwSupportRefs, ...hwClearSigningRefs]
 
 		// Check if any hardware wallets are supported
 		const hwSupport = hwSupportWithoutRefs.supportedWallets
-		const hasHardwareWalletSupport = Object.values(hwSupport).some(support => support && isSupported(support))
-		
+		const hasHardwareWalletSupport = Object.values(hwSupport).some(
+			support => support && isSupported(support),
+		)
+
 		if (!hasHardwareWalletSupport) {
 			return {
 				...noHardwareWalletSupport(),
 				...(allReferences.length > 0 && { references: allReferences }),
 			}
 		}
-		
+
 		// Get list of supported hardware wallets for display
 		const supportedHardwareWallets = Object.entries(hwSupport)
 			.filter(([_, support]) => support && isSupported(support))
 			.map(([walletType]) => {
-				switch(walletType) {
-					case HardwareWalletType.LEDGER: return 'Ledger';
-					case HardwareWalletType.TREZOR: return 'Trezor';
-					case HardwareWalletType.GRIDPLUS: return 'GridPlus';
-					case HardwareWalletType.KEYSTONE: return 'Keystone';
-					case HardwareWalletType.KEEPKEY: return 'KeepKey';
-					default: return 'Other hardware wallets';
+				switch (walletType) {
+					case HardwareWalletType.LEDGER:
+						return 'Ledger'
+					case HardwareWalletType.TREZOR:
+						return 'Trezor'
+					case HardwareWalletType.GRIDPLUS:
+						return 'GridPlus'
+					case HardwareWalletType.KEYSTONE:
+						return 'Keystone'
+					case HardwareWalletType.KEEPKEY:
+						return 'KeepKey'
+					default:
+						return 'Other hardware wallets'
 				}
-			});
+			})
 
 		// Check for EIP-712 clear signing support on Safe and Aave
 		// This would need to be added to the features schema to track this data
 		// For now we'll use a placeholder implementation
-		
+
 		// Placeholder for checking if Safe integration exists with clear signing
-		const hasSafeIntegration = features.security.hardwareWalletClearSigning?.clearSigningSupport?.details?.includes('Safe') || false;
-		
+		const hasSafeIntegration =
+			features.security.hardwareWalletClearSigning?.clearSigningSupport.details?.includes(
+				'Safe',
+			) || false
+
 		// Placeholder for checking if Aave integration exists with clear signing
-		const hasAaveIntegration = features.security.hardwareWalletClearSigning?.clearSigningSupport?.details?.includes('Aave') || false;
-		
+		const hasAaveIntegration =
+			features.security.hardwareWalletClearSigning?.clearSigningSupport.details?.includes(
+				'Aave',
+			) || false
+
 		// Check how many hardware wallet brands are supported for these integrations
-		const supportedHWBrands = supportedHardwareWallets.length;
-		
+		const supportedHWBrands = supportedHardwareWallets.length
+
 		// Generate base evaluation result
-		let result: Evaluation<SoftwareHWIntegrationValue>;
-		
+		let result: Evaluation<SoftwareHWIntegrationValue>
+
 		// Determine integration level based on support
 		if (hasSafeIntegration && hasAaveIntegration && supportedHWBrands >= 2) {
-			result = excellentHardwareWalletIntegration(supportedHardwareWallets);
+			result = excellentHardwareWalletIntegration(supportedHardwareWallets)
 		} else if ((hasSafeIntegration || hasAaveIntegration) && supportedHWBrands >= 1) {
-			const supportedDApps = [];
-			if (hasSafeIntegration) supportedDApps.push('Safe');
-			if (hasAaveIntegration) supportedDApps.push('Aave');
-			result = goodHardwareWalletIntegration(supportedHardwareWallets, supportedDApps);
+			const supportedDApps = []
+			if (hasSafeIntegration) {
+				supportedDApps.push('Safe')
+			}
+			if (hasAaveIntegration) {
+				supportedDApps.push('Aave')
+			}
+			result = goodHardwareWalletIntegration(supportedHardwareWallets, supportedDApps)
 		} else {
-			result = basicHardwareWalletIntegration(supportedHardwareWallets);
+			result = basicHardwareWalletIntegration(supportedHardwareWallets)
 		}
-		
+
 		// Return result with references if any
 		return {
 			...result,
 			...(allReferences.length > 0 && { references: allReferences }),
-		};
+		}
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SoftwareHWIntegrationValue>>) => {
-		return pickWorstRating<SoftwareHWIntegrationValue>(perVariant)
-	},
-} 
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SoftwareHWIntegrationValue>>) => pickWorstRating<SoftwareHWIntegrationValue>(perVariant),
+}

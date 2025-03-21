@@ -10,7 +10,7 @@ import { pickWorstRating, unrated } from '../common'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
-import type { WithRef } from '../../reference'
+import { mergeRefs, type WithRef } from '../../reference'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { WalletProfile } from '@/schema/features/profile'
 import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
@@ -164,6 +164,11 @@ function evaluateScamAlerts(
 	const sendTransactionWarning = rateSendTransactionWarning(scamAlerts)
 	const contractTransactionWarning = rateContractTransactionWarning(scamAlerts)
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
+	const allRefs = mergeRefs(
+		sendTransactionWarning.ref,
+		contractTransactionWarning.ref,
+		scamUrlWarning.ref,
+	)
 	const requiredFeatures = ((): NonEmptyArray<ScamAlertSupport> => {
 		switch (walletProfile) {
 			case WalletProfile.GENERIC:
@@ -177,7 +182,9 @@ function evaluateScamAlerts(
 				return [sendTransactionWarning, contractTransactionWarning, scamUrlWarning]
 			default:
 				// In case new wallet profiles are added in the future, provide a reasonable default
-				console.warn(`Unhandled wallet profile: ${walletProfile}, using default scam prevention requirements`);
+				console.warn(
+					`Unhandled wallet profile: ${walletProfile}, using default scam prevention requirements`,
+				)
 				return [sendTransactionWarning, contractTransactionWarning, scamUrlWarning]
 		}
 	})()
@@ -211,6 +218,7 @@ function evaluateScamAlerts(
 					${wallet.metadata.displayName} should implement scam alerting features.
 				`,
 			),
+			references: allRefs,
 		}
 	}
 	const privacyPreservingFeatures = supportedFeatures.filter(sas => sas.privacyPreserving)
@@ -250,6 +258,7 @@ function evaluateScamAlerts(
 						[same domain name hash prefix](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
 					`,
 				),
+				references: allRefs,
 			}
 		}
 		if (
@@ -285,6 +294,7 @@ function evaluateScamAlerts(
 						[same domain name hash prefix](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
 					`,
 				),
+				references: allRefs,
 			}
 		}
 	}
@@ -322,6 +332,7 @@ function evaluateScamAlerts(
 						.join('\n')}
 				`,
 			),
+			references: allRefs,
 		}
 	}
 	if (privacyPreservingFeatures.length < supportedFeatures.length) {
@@ -382,6 +393,7 @@ function evaluateScamAlerts(
 					}
 				`,
 			),
+			references: allRefs,
 		}
 	}
 	// All features implements with privacy.
@@ -403,6 +415,7 @@ function evaluateScamAlerts(
 			__brand: brand,
 		},
 		details: scamAlertsDetailsContent({}),
+		references: allRefs,
 	}
 }
 
