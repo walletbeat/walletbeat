@@ -16,6 +16,7 @@ import {
 	TransactionSubmissionL2Type,
 	transactionSubmissionL2TypeName,
 } from '@/schema/features/self-sovereignty/transaction-submission'
+import { License } from '@/schema/features/license'
 
 export const coinbase: Wallet = {
 	metadata: {
@@ -131,7 +132,18 @@ export const coinbase: Wallet = {
 				},
 			},
 		},
-		license: null,
+		license: {
+			license: License.BSD_3_CLAUSE,
+			ref: {
+				urls: [
+					{
+						url: 'https://github.com/coinbase/wallet-mobile/blob/master/LICENSE.md',
+						label: 'Coinbase Wallet License File',
+					},
+				],
+				explanation: 'Coinbase Wallet uses the BSD-3-Clause license for its source code',
+			},
+		},
 		monetization: {
 			revenueBreakdownIsPublic: false,
 			strategies: {
