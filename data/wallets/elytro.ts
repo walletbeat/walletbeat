@@ -7,6 +7,7 @@ import { notSupported, supported } from '@/schema/features/support'
 import { nconsigny } from '../contributors/nconsigny'
 import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { Variant } from '@/schema/variants'
 
 export const elytro: Wallet = {
 	metadata: {
@@ -23,8 +24,8 @@ export const elytro: Wallet = {
 		lastUpdated: '2025-03-12',
 		multiWalletType: {
 			categories: [WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337]
-		}
+			smartWalletStandards: [SmartWalletStandard.ERC_4337],
+		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -42,8 +43,7 @@ export const elytro: Wallet = {
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 				ref: {
 					url: 'https://github.com/Elytro-eth/soul-wallet-contract',
-					explanation:
-						'Elytro supports ERC-4337 smart contract wallets',
+					explanation: 'Elytro supports ERC-4337 smart contract wallets',
 				},
 			}),
 		},
@@ -67,14 +67,16 @@ export const elytro: Wallet = {
 		security: {
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
-				libraryUrl: 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+				libraryUrl:
+					'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
 				details: 'Elytro uses FreshCryptoLib for passkey verification in their WebAuthn library.',
 				ref: [
 					{
 						url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/contracts/libraries/WebAuthn.sol',
-						explanation: 'Elytro implements P256 verification using openzeppelin p256 verifier in their WebAuthn library.'
-					}
-				]
+						explanation:
+							'Elytro implements P256 verification using openzeppelin p256 verifier in their WebAuthn library.',
+					},
+				],
 			},
 			scamAlerts: null,
 			publicSecurityAudits: null,
@@ -82,14 +84,13 @@ export const elytro: Wallet = {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {
-				},
+				supportedWallets: {},
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					details: 'No hardware wallet clear signing information available.',
 				},
 				ref: null,
 			},
@@ -131,10 +132,10 @@ export const elytro: Wallet = {
 		},
 	},
 	variants: {
-		mobile: true,
-		browser: true,
-		desktop: false,
-		embedded: false,
-		hardware: false,
+		[Variant.MOBILE]: true,
+		[Variant.BROWSER]: true,
+		[Variant.DESKTOP]: false,
+		[Variant.EMBEDDED]: false,
+		[Variant.HARDWARE]: false,
 	},
-} 
+}

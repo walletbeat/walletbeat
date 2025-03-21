@@ -1,5 +1,11 @@
 import type { ResolvedFeatures } from '@/schema/features'
-import { License, FOSS, licenseIsFOSS, licenseName } from '@/schema/features/license'
+import {
+	License,
+	FOSS,
+	licenseIsFOSS,
+	licenseName,
+	type LicenseWithRef,
+} from '@/schema/features/license'
 import {
 	Rating,
 	type Value,
@@ -11,6 +17,7 @@ import { pickWorstRating, unrated } from '../common'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { licenseDetailsContent } from '@/types/content/license-details'
+import { toFullyQualified } from '@/schema/reference'
 
 const brand = 'attributes.transparency.open_source'
 export type OpenSourceValue = Value & {
@@ -18,7 +25,7 @@ export type OpenSourceValue = Value & {
 	__brand: 'attributes.transparency.open_source'
 }
 
-function open(license: License): Evaluation<OpenSourceValue> {
+function open({ license, ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
 	return {
 		value: {
 			id: license,
@@ -35,10 +42,11 @@ function open(license: License): Evaluation<OpenSourceValue> {
 			__brand: brand,
 		},
 		details: licenseDetailsContent(),
+		references: toFullyQualified(ref),
 	}
 }
 
-function openInTheFuture(license: License): Evaluation<OpenSourceValue> {
+function openInTheFuture({ license, ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
 	return {
 		value: {
 			id: license,
@@ -55,35 +63,39 @@ function openInTheFuture(license: License): Evaluation<OpenSourceValue> {
 			__brand: brand,
 		},
 		details: licenseDetailsContent(),
+		references: toFullyQualified(ref),
 	}
 }
 
-const proprietary: Evaluation<OpenSourceValue> = {
-	value: {
-		id: 'proprietary',
-		rating: Rating.FAIL,
-		icon: '\u{1f494}', // Broken heart
-		displayName: 'Proprietary code license',
-		shortExplanation: sentence(
-			(walletMetadata: WalletMetadata) => `
-				${walletMetadata.displayName} uses a proprietary source code license.
+function proprietary({ ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
+	return {
+		value: {
+			id: 'proprietary',
+			rating: Rating.FAIL,
+			icon: '\u{1f494}', // Broken heart
+			displayName: 'Proprietary code license',
+			shortExplanation: sentence(
+				(walletMetadata: WalletMetadata) => `
+					${walletMetadata.displayName} uses a proprietary source code license.
+				`,
+			),
+			license: License.PROPRIETARY,
+			__brand: brand,
+		},
+		details: paragraph(
+			({ wallet }) => `
+				${wallet.metadata.displayName} uses a proprietary or non-FOSS source code
+				license. Therefore, it is not Free and Open Source Software.
 			`,
 		),
-		license: License.PROPRIETARY,
-		__brand: brand,
-	},
-	details: paragraph(
-		({ wallet }) => `
-			${wallet.metadata.displayName} uses a proprietary or non-FOSS source code
-			license. Therefore, it is not Free and Open Source Software.
-		`,
-	),
-	howToImprove: paragraph(
-		({ wallet }) => `
-			${wallet.metadata.displayName} should consider re-licensing under a
-			Free and Open Source Software license.
-		`,
-	),
+		howToImprove: paragraph(
+			({ wallet }) => `
+				${wallet.metadata.displayName} should consider re-licensing under a
+				Free and Open Source Software license.
+			`,
+		),
+		references: toFullyQualified(ref),
+	}
 }
 
 const unlicensed: Evaluation<OpenSourceValue> = {
@@ -119,6 +131,7 @@ const unlicensed: Evaluation<OpenSourceValue> = {
 			code.
 		`,
 	),
+	references: [],
 }
 
 export const openSource: Attribute<OpenSourceValue> = {
@@ -171,7 +184,7 @@ export const openSource: Attribute<OpenSourceValue> = {
 				paragraph(`
 					The wallet is licensed under any non-FOSS (proprietary) license.
 				`),
-				proprietary.value,
+				proprietary({ license: License.PROPRIETARY }).value,
 			),
 			exampleRating(
 				paragraph(`
@@ -190,25 +203,17 @@ export const openSource: Attribute<OpenSourceValue> = {
 		if (features.license === null) {
 			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE })
 		}
-		
-		// Handle the new LicenseWithValue type
-		let licenseValue: License
-		if (typeof features.license === 'object' && features.license.value !== undefined) {
-			licenseValue = features.license.value
-		} else {
-			licenseValue = features.license as License
-		}
-		
-		if (licenseValue === License.UNLICENSED_VISIBLE) {
+		const license = features.license.license
+		if (license === License.UNLICENSED_VISIBLE) {
 			return unlicensed
 		}
-		switch (licenseIsFOSS(licenseValue)) {
+		switch (licenseIsFOSS(license)) {
 			case FOSS.FOSS:
-				return open(licenseValue)
+				return open(features.license)
 			case FOSS.FUTURE_FOSS:
-				return openInTheFuture(licenseValue)
+				return openInTheFuture(features.license)
 			case FOSS.NOT_FOSS:
-				return proprietary
+				return proprietary(features.license)
 		}
 	},
 	aggregate: pickWorstRating<OpenSourceValue>,
