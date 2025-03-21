@@ -345,7 +345,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) => pickWorstRating<PasskeyImplementationValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) =>
+		pickWorstRating<PasskeyImplementationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<PasskeyImplementationValue> => {
 		// Hardware wallets don't use passkeys
 		if (features.profile === WalletProfile.HARDWARE) {

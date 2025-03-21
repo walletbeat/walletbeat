@@ -6,7 +6,7 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
@@ -21,6 +21,7 @@ import {
 import { type FullyQualifiedReference, popRefs } from '../../reference'
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { isSupported, type Support } from '@/schema/features/support'
+import { WalletProfile } from '@/schema/features/profile'
 
 const brand = 'attributes.security.chain_verification'
 export type ChainVerificationValue = Value & {
@@ -150,6 +151,18 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		),
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<ChainVerificationValue> => {
+		if (features.profile === WalletProfile.HARDWARE) {
+			return exempt(
+				chainVerification,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet.`,
+				),
+				brand,
+				null,
+			)
+		}
+
 		const l1Client = features.security.lightClient.ethereumL1
 		if (l1Client === null) {
 			return unrated(chainVerification, brand, null)
