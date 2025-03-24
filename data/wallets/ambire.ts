@@ -151,15 +151,7 @@ export const ambire: Wallet = {
 					leaksUserAddress: false,
 					leaksIp: false,
 				}),
-
-				contractTransactionWarning: supported({
-					previousContractInteractionWarning: false,
-					recentContractWarning: false,
-					contractRegistry: false,
-					leaksContractAddress: false,
-					leaksUserAddress: false,
-					leaksUserIp: false,
-				}),
+				contractTransactionWarning: notSupported,
 				sendTransactionWarning: supported({
 					userWhitelist: true,
 					newRecipientWarning: false,
