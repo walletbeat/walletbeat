@@ -99,6 +99,7 @@ export const ambire: Wallet = {
 			defaultAccountType: AccountType.eip7702,
 			eoa: supported({
 				canExportPrivateKey: true,
+				canExportSeedPhrase: true,
 				keyDerivation: {
 					derivationPath: 'BIP44',
 					seedPhrase: 'BIP39',
