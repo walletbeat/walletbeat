@@ -8,6 +8,7 @@ import { coinbase } from './wallets/coinbase'
 import { frame } from './wallets/frame'
 import { safe } from './wallets/safe'
 import { elytro } from './wallets/elytro'
+import { ambire } from './wallets/ambire'
 
 /** Set of all known wallets. */
 export const wallets = {
@@ -20,6 +21,7 @@ export const wallets = {
 	rabby,
 	rainbow,
 	safe,
+	ambire,
 }
 
 /** A valid wallet name. */
