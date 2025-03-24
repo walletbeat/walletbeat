@@ -1,7 +1,6 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { exampleContributor } from '../contributors/example'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { Variant } from '@/schema/variants'
@@ -17,6 +16,7 @@ import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import { certik } from '../entities/certik'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
+import { jiojosbg } from '../contributors/jiojosbg'
 
 const v1Audits: SecurityAudit[] = [
 	{
@@ -78,8 +78,7 @@ export const ambire: Wallet = {
 			`),
 		url: 'https://ambire.com',
 		repoUrl: 'https://github.com/AmbireTech/extension',
-		// @TODO
-		contributors: [exampleContributor],
+		contributors: [jiojosbg],
 		lastUpdated: '2025-03-20',
 		multiWalletType: {
 			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
