@@ -13,7 +13,58 @@ import { License } from '@/schema/features/license'
 import { pashov } from '../entities/pashov-audit-group'
 import { hunterSecurity } from '../entities/hunter-security'
 import { SmartWalletStandard, WalletTypeCategory } from '@/schema/features/wallet-type'
+import type { SecurityAudit } from '@/schema/features/security/security-audits'
+import { certik } from '../entities/certik'
+import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 
+const v1Audits: SecurityAudit[] = [
+	{
+		variantsScope: { [Variant.MOBILE]: true },
+		// @TODO verify
+		unpatchedFlaws: 'ALL_FIXED',
+		auditor: certik,
+		// @TODO verify
+		auditDate: '2022-02-03',
+		codeSnapshot: {
+			// 	// @TODO verify
+			date: '2023-11-08',
+			commit:
+				'https://github.com/AmbireTech/ambire-common/tree/da3ba641a004d1f0143a20ddde48049b619431ad',
+		},
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Pashov-Ambire-third-security-review.md',
+	},
+]
+const v2Audits: SecurityAudit[] = [
+	{
+		variantsScope: { [Variant.BROWSER]: true },
+		// @TODO verify
+		unpatchedFlaws: 'ALL_FIXED',
+		auditor: pashov,
+		// @TODO verify
+		auditDate: '2024-04-01',
+		codeSnapshot: {
+			// 	// @TODO verify
+			date: '2023-11-08',
+			commit:
+				'https://github.com/AmbireTech/ambire-common/tree/da3ba641a004d1f0143a20ddde48049b619431ad',
+		},
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Pashov-Ambire-third-security-review.md',
+	},
+	{
+		variantsScope: { [Variant.BROWSER]: true },
+		// @TODO verify
+		unpatchedFlaws: 'ALL_FIXED',
+		auditor: hunterSecurity,
+		// @TODO verify
+		auditDate: '2025-02-20',
+		codeSnapshot: {
+			date: '2025-02-17',
+			commit:
+				'https://github.com/AmbireTech/ambire-common/commit/de88e26041db8777468f384e56d5ad0cb96e29a5',
+		},
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+	},
+]
 // @TODO formatting
 export const ambire: Wallet = {
 	metadata: {
@@ -38,8 +89,8 @@ export const ambire: Wallet = {
 	features: {
 		profile: WalletProfile.BROWSER_EXTENSION,
 		chainConfigurability: {
-			l1RpcEndpoint: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
-			otherRpcEndpoints: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			customChains: true,
 		},
 
@@ -138,37 +189,7 @@ export const ambire: Wallet = {
 				}),
 			},
 			// @TODO add mobile and web audits
-			publicSecurityAudits: [
-				{
-					variantsScope: { [Variant.BROWSER]: true },
-					// @TODO verify
-					unpatchedFlaws: 'ALL_FIXED',
-					auditor: pashov,
-					// @TODO verify
-					auditDate: '2024-04-01',
-					codeSnapshot: {
-						// 	// @TODO verify
-						date: '2023-11-08',
-						commit:
-							'https://github.com/AmbireTech/ambire-common/tree/da3ba641a004d1f0143a20ddde48049b619431ad',
-					},
-					ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Pashov-Ambire-third-security-review.md',
-				},
-				{
-					variantsScope: { [Variant.BROWSER]: true },
-					// @TODO verify
-					unpatchedFlaws: 'ALL_FIXED',
-					auditor: hunterSecurity,
-					// @TODO verify
-					auditDate: '2025-02-20',
-					codeSnapshot: {
-						date: '2025-02-17',
-						commit:
-							'https://github.com/AmbireTech/ambire-common/commit/de88e26041db8777468f384e56d5ad0cb96e29a5',
-					},
-					ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
-				},
-			],
+			publicSecurityAudits: [...v2Audits, ...v1Audits],
 			lightClient: {
 				ethereumL1: notSupported,
 			},
@@ -234,12 +255,16 @@ export const ambire: Wallet = {
 				transparentConvenienceFees: false,
 				hiddenConvenienceFees: true,
 				governanceTokenLowFloat: false,
-				governanceTokenMostlyDistributed: true,
+				governanceTokenMostlyDistributed: false,
 			},
 			ref: null,
 		},
 		transparency: {
-			feeTransparency: null,
+			feeTransparency: {
+				level: FeeTransparencyLevel.DETAILED,
+				disclosesWalletFees: true,
+				showsTransactionPurpose: true,
+			},
 		},
 	},
 	variants: {
