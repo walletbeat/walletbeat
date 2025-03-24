@@ -148,8 +148,8 @@ export const ambire: Wallet = {
 		integration: {
 			browser: {
 				// @TODO verify
-				'1193': notSupported,
-				'2700': notSupported,
+				'1193': featureSupported,
+				'2700': featureSupported,
 				'6963': featureSupported,
 				ref: {
 					url: 'https://github.com/AmbireTech/ambire-app/blob/v2/src/web/extension-services/background/background.ts',
