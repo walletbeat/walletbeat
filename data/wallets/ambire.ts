@@ -16,6 +16,7 @@ import { SmartWalletStandard, WalletTypeCategory } from '@/schema/features/walle
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import { certik } from '../entities/certik'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
+import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 
 const v1Audits: SecurityAudit[] = [
 	{
@@ -65,7 +66,6 @@ const v2Audits: SecurityAudit[] = [
 		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
 	},
 ]
-// @TODO formatting
 export const ambire: Wallet = {
 	metadata: {
 		id: 'ambire',
@@ -94,7 +94,6 @@ export const ambire: Wallet = {
 			customChains: true,
 		},
 
-		// @TODO go over everything again
 		accountSupport: {
 			defaultAccountType: AccountType.eip7702,
 			eoa: supported({
@@ -107,7 +106,6 @@ export const ambire: Wallet = {
 					canExportSeedPhrase: true,
 				},
 			}),
-			// @TODO finish and ref
 			eip7702: supported({
 				contractCode: {
 					keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
@@ -147,7 +145,6 @@ export const ambire: Wallet = {
 		},
 		integration: {
 			browser: {
-				// @TODO verify
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
@@ -157,9 +154,7 @@ export const ambire: Wallet = {
 			},
 		},
 		security: {
-			// @TODO
 			scamAlerts: {
-				/** Does the wallet warn the user when visiting a known-scam site? */
 				scamUrlWarning: supported({
 					leaksVisitedUrl: 'NO',
 					leaksUserAddress: false,
@@ -167,17 +162,14 @@ export const ambire: Wallet = {
 				}),
 
 				contractTransactionWarning: supported({
-					// @TODO do we ?
-					previousContractInteractionWarning: true,
+					previousContractInteractionWarning: false,
 					recentContractWarning: false,
 					contractRegistry: false,
 					leaksContractAddress: false,
 					leaksUserAddress: false,
 					leaksUserIp: false,
 				}),
-				// @TODo are those really false?
 				sendTransactionWarning: supported({
-					// @TODO do we
 					userWhitelist: true,
 					newRecipientWarning: false,
 					leaksRecipient: false,
@@ -185,7 +177,6 @@ export const ambire: Wallet = {
 					leaksUserIp: true,
 				}),
 			},
-			// @TODO add mobile and web audits
 			publicSecurityAudits: [...v2Audits, ...v1Audits],
 			lightClient: {
 				ethereumL1: notSupported,
@@ -209,10 +200,7 @@ export const ambire: Wallet = {
 			},
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
-					// @TODO do we?
 					level: ClearSigningLevel.FULL,
-					// @TODO
-					// details: 'No hardware wallet clear signing information available.',
 				},
 				ref: null,
 			},
@@ -221,7 +209,6 @@ export const ambire: Wallet = {
 				ref: null,
 			},
 		},
-		// @TODO
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
@@ -232,10 +219,9 @@ export const ambire: Wallet = {
 					selfBroadcastViaDirectGossip: notSupported,
 					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
-				// @TODO
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},
