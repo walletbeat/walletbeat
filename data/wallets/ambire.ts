@@ -12,6 +12,7 @@ import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-s
 import { License } from '@/schema/features/license'
 import { pashov } from '../entities/pashov-audit-group'
 import { hunterSecurity } from '../entities/hunter-security'
+import { SmartWalletStandard, WalletTypeCategory } from '@/schema/features/wallet-type'
 
 // @TODO formatting
 export const ambire: Wallet = {
@@ -29,6 +30,10 @@ export const ambire: Wallet = {
 		// @TODO
 		contributors: [exampleContributor],
 		lastUpdated: '2025-03-20',
+		multiWalletType: {
+			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
+			smartWalletStandards: [SmartWalletStandard.ERC_4337, SmartWalletStandard.ERC_7702],
+		},
 	},
 	features: {
 		profile: WalletProfile.BROWSER_EXTENSION,
