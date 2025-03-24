@@ -193,7 +193,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				{ supportedHardwareWallets: [] },
 			)
 		}
-
+		// @NOTE this is not entirely correct
 		// Check for ERC-4337 smart wallet support
 		if (isErc4337SmartWallet(features)) {
 			return exempt(
