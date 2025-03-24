@@ -17,6 +17,8 @@ import { RatingDetailModal } from '../molecules/RatingDetailModal'
 import { HardwareWalletManufactureType } from '@/schema/features/profile'
 import { WebIcon, MobileIcon, DesktopIcon } from '@/icons'
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
+import { EipPreviewModal } from '../molecules/EipPreviewModal'
+import { EipPrefix } from '@/schema/eips'
 
 // Define wallet type constants from the previous implementation
 const WalletTypeCategory = {
@@ -491,6 +493,60 @@ function createWalletNameCell(isHardware: boolean) {
 	}
 }
 
+// Helper function for EIP links with hover preview
+function EipStandardLink({
+	standard,
+	standardNumber,
+	prefix,
+}: {
+	standard: string
+	standardNumber: string
+	prefix: string
+}): React.ReactElement {
+	const [isHovered, setIsHovered] = useState<boolean>(false)
+	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+	return (
+		<React.Fragment>
+			<a
+				href={`https://eips.ethereum.org/EIPS/eip-${standardNumber}`}
+				target="_blank"
+				rel="noopener noreferrer"
+				className="eip-tag text-xs dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f] relative z-10"
+				onMouseEnter={e => {
+					setIsHovered(true)
+					setAnchorEl(e.currentTarget)
+				}}
+				onMouseLeave={() => {
+					// Use a timeout to allow moving the mouse to the modal
+					setTimeout(() => {
+						// Only close if not hovering the modal
+						const modalElement = document.querySelector('.eip-preview-modal')
+						if (modalElement && modalElement.matches(':hover')) {
+							return
+						}
+						setIsHovered(false)
+						setAnchorEl(null)
+					}, 100)
+				}}
+			>
+				#{standardNumber}
+			</a>
+			{isHovered && anchorEl && (
+				<EipPreviewModal
+					eipNumber={standardNumber}
+					eipPrefix={prefix}
+					anchorEl={anchorEl}
+					onClose={() => {
+						setIsHovered(false)
+						setAnchorEl(null)
+					}}
+				/>
+			)}
+		</React.Fragment>
+	)
+}
+
 export default function WalletTable(): React.ReactElement {
 	// Add state for selected device variant and active tab
 	const [selectedVariant, setSelectedVariant] = useState<DeviceVariant>(DeviceVariant.NONE)
@@ -541,34 +597,29 @@ export default function WalletTable(): React.ReactElement {
 					<div>
 						<span>{typeString}</span>
 						<div className="mt-1 flex flex-wrap gap-1">
-							{standards.map((std: string, index: number) => {
+							{standards.map((std: string) => {
 								const stdKey = std as SmartWalletStandard
 								const display = SMART_WALLET_STANDARD_DISPLAY[stdKey] || std
+								const standardNumber = display.replace('ERC-', '')
 
 								// Add Markdown-style links for ERC standards
 								if (stdKey === SmartWalletStandard.ERC_4337) {
 									return (
-										<a
+										<EipStandardLink
 											key={std}
-											href="https://eips.ethereum.org/EIPS/eip-4337"
-											target="_blank"
-											rel="noopener noreferrer"
-											className="eip-tag text-xs dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f]"
-										>
-											#{display.replace('ERC-', '')}
-										</a>
+											standard={std}
+											standardNumber="4337"
+											prefix={EipPrefix.ERC}
+										/>
 									)
 								} else if (stdKey === SmartWalletStandard.ERC_7702) {
 									return (
-										<a
+										<EipStandardLink
 											key={std}
-											href="https://eips.ethereum.org/EIPS/eip-7702"
-											target="_blank"
-											rel="noopener noreferrer"
-											className="eip-tag text-xs dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f]"
-										>
-											#{display.replace('ERC-', '')}
-										</a>
+											standard={std}
+											standardNumber="7702"
+											prefix={EipPrefix.EIP}
+										/>
 									)
 								} else {
 									return (

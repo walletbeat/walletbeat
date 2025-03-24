@@ -5,7 +5,7 @@ export const eip7702: Eip = {
 	number: '7702',
 	friendlyName: 'Account Abstraction via smart contract authority delegation',
 	formalTitle: 'Set EOA account code',
-	status: EipStatus.DRAFT,
+	status: EipStatus.LAST_CALL,
 	summaryMarkdown: `
 		Smart contract accounts require their own Ethereum address by definition.
 		EIP-7702 builds on top of ERC-4337 by allowing non-smart-contract accounts

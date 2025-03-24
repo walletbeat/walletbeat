@@ -10,6 +10,7 @@ export enum EipStatus {
 	DRAFT = 'DRAFT',
 	FINAL = 'FINAL',
 	LIVING = 'LIVING',
+	LAST_CALL = 'LAST_CALL',
 }
 
 /**
