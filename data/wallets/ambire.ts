@@ -240,7 +240,6 @@ export const ambire: Wallet = {
 			},
 		},
 		license: { license: License.GPL_3_0 },
-		// @TODO verify
 		monetization: {
 			revenueBreakdownIsPublic: false,
 			strategies: {
@@ -265,8 +264,7 @@ export const ambire: Wallet = {
 		},
 	},
 	variants: {
-		// @TODO look into the alg and set mobile to true
-		[Variant.MOBILE]: false,
+		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
 		[Variant.DESKTOP]: false,
 		[Variant.EMBEDDED]: false,
