@@ -21,30 +21,24 @@ import { jiojosbg } from '../contributors/jiojosbg'
 const v1Audits: SecurityAudit[] = [
 	{
 		variantsScope: { [Variant.MOBILE]: true },
-		// @TODO verify
 		unpatchedFlaws: 'ALL_FIXED',
 		auditor: certik,
-		// @TODO verify
 		auditDate: '2022-02-03',
 		codeSnapshot: {
-			// 	// @TODO verify
-			date: '2023-11-08',
+			date: '2022-01-10',
 			commit:
-				'https://github.com/AmbireTech/ambire-common/tree/da3ba641a004d1f0143a20ddde48049b619431ad',
+				'https://github.com/AmbireTech/wallet/commit/09c5da5f5b5572092289b3c1cf8371b62ad87cee',
 		},
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Pashov-Ambire-third-security-review.md',
+		ref: 'https://github.com/AmbireTech/wallet/blob/main/contracts/audits/Certik.pdf',
 	},
 ]
 const v2Audits: SecurityAudit[] = [
 	{
 		variantsScope: { [Variant.BROWSER]: true },
-		// @TODO verify
 		unpatchedFlaws: 'ALL_FIXED',
 		auditor: pashov,
-		// @TODO verify
-		auditDate: '2024-04-01',
+		auditDate: '2024-01-26',
 		codeSnapshot: {
-			// 	// @TODO verify
 			date: '2023-11-08',
 			commit:
 				'https://github.com/AmbireTech/ambire-common/tree/da3ba641a004d1f0143a20ddde48049b619431ad',
@@ -53,10 +47,8 @@ const v2Audits: SecurityAudit[] = [
 	},
 	{
 		variantsScope: { [Variant.BROWSER]: true },
-		// @TODO verify
-		unpatchedFlaws: 'ALL_FIXED',
+		unpatchedFlaws: 'NONE_FOUND',
 		auditor: hunterSecurity,
-		// @TODO verify
 		auditDate: '2025-02-20',
 		codeSnapshot: {
 			date: '2025-02-17',
