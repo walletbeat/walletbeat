@@ -109,19 +109,15 @@ export const ambire: Wallet = {
 			}),
 			// @TODO finish and ref
 			eip7702: supported({
-				// ref:{
-				// 	/** The URL(s) the reference is about. */
-				// 	url: 'NonEmptyArray<Url> | Url',
-				// 	/** The text of the link that goes to `url`; defaults to the domain name of `url`. */
-				// 	label: 'string',
-				// 	/** A human-readable string that explains what the reference is about. */
-				// 	explanation: "string"
-				// },
 				contractCode: {
 					keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
 					controllingSharesInSelfCustodyByDefault: 'YES',
 					tokenTransferTransactionGeneration:
 						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					ref: {
+						url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount7702.sol',
+						explanation: 'Ambire supports EIP-7702 smart contract wallets',
+					},
 				},
 			}),
 			mpc: notSupported,
