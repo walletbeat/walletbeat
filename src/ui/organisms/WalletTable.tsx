@@ -404,7 +404,7 @@ interface TableRow {
 	name: string
 	wallet: WalletLike
 	typeDescription?: string
-	standards?: string
+	standards?: SmartWalletStandard[]
 	websiteUrl?: string
 	manufactureType?: string
 }
@@ -414,16 +414,8 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets).map(wallet =>
 	const detailedType = getDetailedWalletDescription(wallet as WalletLike)
 	const { standards } = getWalletTypeInfo(wallet as WalletLike)
 
-	// Format wallet standards for display
-	const standardsDisplay =
-		standards.length > 0
-			? standards
-					.map(std => {
-						const display = SMART_WALLET_STANDARD_DISPLAY[std]
-						return display !== undefined ? display : std
-					})
-					.join(', ')
-			: 'None'
+	// Format wallet standards for display (return raw standards, will render links in cell renderer)
+	const standardsRaw = standards.length > 0 ? standards : []
 
 	const websiteUrl =
 		typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
@@ -435,7 +427,7 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets).map(wallet =>
 		name: wallet.metadata.displayName,
 		wallet: wallet as WalletLike,
 		typeDescription: detailedType,
-		standards: standardsDisplay,
+		standards: standardsRaw,
 		websiteUrl,
 	}
 })
@@ -528,9 +520,71 @@ export default function WalletTable(): React.ReactElement {
 			header: 'Type',
 			accessorFn: (row: any) => {
 				const { categories } = getWalletTypeInfo(row.wallet)
-				return categories.map(cat => WALLET_TYPE_DISPLAY[cat] || cat).join(' & ')
+				const typeString = categories.map(cat => WALLET_TYPE_DISPLAY[cat] || cat).join(' & ')
+				const standards = row.standards || []
+				return { typeString, standards }
 			},
-			cell: (info: any) => info.getValue(),
+			cell: (info: any) => {
+				const value = info.getValue()
+				if (!value) {
+					return null
+				}
+
+				const { typeString, standards } = value
+
+				// If no standards, just return the type string
+				if (!standards.length) {
+					return typeString
+				}
+
+				return (
+					<div>
+						<span>{typeString}</span>
+						<div className="mt-1 flex flex-wrap gap-1">
+							{standards.map((std: string, index: number) => {
+								const stdKey = std as SmartWalletStandard
+								const display = SMART_WALLET_STANDARD_DISPLAY[stdKey] || std
+
+								// Add Markdown-style links for ERC standards
+								if (stdKey === SmartWalletStandard.ERC_4337) {
+									return (
+										<a
+											key={std}
+											href="https://eips.ethereum.org/EIPS/eip-4337"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="eip-tag text-xs dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f]"
+										>
+											#{display.replace('ERC-', '')}
+										</a>
+									)
+								} else if (stdKey === SmartWalletStandard.ERC_7702) {
+									return (
+										<a
+											key={std}
+											href="https://eips.ethereum.org/EIPS/eip-7702"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="eip-tag text-xs dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f]"
+										>
+											#{display.replace('ERC-', '')}
+										</a>
+									)
+								} else {
+									return (
+										<span
+											key={std}
+											className="text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-300"
+										>
+											{display}
+										</span>
+									)
+								}
+							})}
+						</div>
+					</div>
+				)
+			},
 		},
 		// Remove Website column
 		// Add Device Support column
@@ -1096,9 +1150,12 @@ export default function WalletTable(): React.ReactElement {
 											walletSupportsVariant(parentWallet, selectedVariant)))
 
 								return (
-									<tr key={row.id} className={`${!isSupported ? 'opacity-50' : ''}`}>
+									<tr
+										key={row.id}
+										className={`${!isSupported ? 'opacity-50' : ''} dark:bg-[#141414] dark:hover:bg-[#1a1a1a]`}
+									>
 										{row.getVisibleCells().map(cell => (
-											<td key={cell.id} className="px-4 py-2">
+											<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
 											</td>
 										))}
