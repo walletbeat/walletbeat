@@ -265,6 +265,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 			}
 		}
 
+		// @NOTE this is not entirely correct
 		// Check for ERC-4337 smart wallet
 		if (isErc4337SmartWallet(features)) {
 			return exempt(
@@ -375,5 +376,6 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 			...(allReferences.length > 0 && { references: allReferences }),
 		}
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SoftwareHWIntegrationValue>>) => pickWorstRating<SoftwareHWIntegrationValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SoftwareHWIntegrationValue>>) =>
+		pickWorstRating<SoftwareHWIntegrationValue>(perVariant),
 }
