@@ -42,13 +42,14 @@ export function Accordions({
 						square={true}
 						sx={{
 							marginTop: blankTop ? interAccordionMargin : '0px',
-							':before': blankTop ? { display: 'none' } : undefined,
+							':before': blankTop ? { display: 'none' } : { opacity: 0.25 },
 							backgroundColor: theme.palette.background.paper,
 							borderTopLeftRadius: blankTop ? borderRadius : '0px',
 							borderTopRightRadius: blankTop ? borderRadius : '0px',
 							borderBottomLeftRadius: blankBottom ? borderRadius : '0px',
 							borderBottomRightRadius: blankBottom ? borderRadius : '0px',
 						}}
+						className="bg-secondary text-primary shadow-none"
 					>
 						<AccordionSummary
 							key={accordion.id}
@@ -69,6 +70,7 @@ export function Accordions({
 								borderBottomLeftRadius: blankBottom ? borderRadius : '0px',
 								borderBottomRightRadius: blankBottom ? borderRadius : '0px',
 							}}
+							className="bg-secondary text-primary"
 						>
 							{accordion.contents}
 						</AccordionDetails>

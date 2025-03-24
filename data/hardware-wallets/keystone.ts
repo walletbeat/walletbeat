@@ -7,6 +7,7 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import { featureSupported } from '@/schema/features/support'
 import { keystone } from '../entities/keystone'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const keystoneWallet: Wallet = {
 	metadata: {
@@ -46,7 +47,7 @@ export const keystoneWallet: Wallet = {
 			},
 		},
 		security: {
-			passkeyVerification: null,	
+			passkeyVerification: null,
 			scamAlerts: null,
 			publicSecurityAudits: null,
 			lightClient: {
@@ -61,26 +62,30 @@ export const keystoneWallet: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.FULL,
-					details: 'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.'
+					details:
+						'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
 				},
 				ref: [
 					{
 						url: 'https://youtu.be/7lP_0h-PPvY?si=S4wNFukrmg4rwyFA&t=1141',
-						explanation: 'Independent video demonstration of Keystone\'s clear signing implementation on Safe.',
-					}
+						explanation:
+							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
+					},
 				],
 			},
 			bugBountyProgram: {
 				type: BugBountyProgramType.COMPREHENSIVE,
 				url: 'https://keyst.one/bug-bounty-program',
-				details: 'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users.',
+				details:
+					'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users.',
 				upgradePathAvailable: false,
 				ref: [
 					{
 						url: 'https://keyst.one/bug-bounty-program',
-						explanation: 'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users'
-					}
-				]
+						explanation:
+							'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users',
+					},
+				],
 			},
 		},
 		privacy: {
@@ -94,8 +99,8 @@ export const keystoneWallet: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},

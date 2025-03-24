@@ -12,7 +12,10 @@ import { honeycomb } from '../entities/honeycomb'
 import { WalletProfile } from '@/schema/features/profile'
 import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
 import { veridise } from '../entities/veridise'
-import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
@@ -42,8 +45,8 @@ export const daimo: Wallet = {
 		lastUpdated: '2025-03-12',
 		multiWalletType: {
 			categories: [WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337]
-		}
+			smartWalletStandards: [SmartWalletStandard.ERC_4337],
+		},
 	},
 	features: {
 		profile: WalletProfile.MOBILE,
@@ -94,13 +97,15 @@ export const daimo: Wallet = {
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
 				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-				details: 'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
+				details:
+					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
 				ref: [
 					{
 						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-						explanation: 'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.'
-					}
-				]
+						explanation:
+							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
+					},
+				],
 			},
 			scamAlerts: {
 				scamUrlWarning: notSupported,
@@ -119,13 +124,13 @@ export const daimo: Wallet = {
 						},
 					],
 				}),
-			}, 
+			},
 			publicSecurityAudits: [
 				{
 					auditor: veridise,
 					auditDate: '2023-10-06',
 					ref: 'https://github.com/daimo-eth/daimo/blob/master/audits/2023-10-veridise-daimo.pdf',
-					variantsScope: { mobile: true },
+					variantsScope: { [Variant.MOBILE]: true },
 					codeSnapshot: {
 						date: '2023-09-12',
 						commit: 'f0dc56d68852c1488461e88a506ff7b0f027f245',
@@ -143,7 +148,7 @@ export const daimo: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'Daimo does not support hardware wallets.'
+					details: 'Daimo does not support hardware wallets.',
 				},
 				ref: null,
 			},
@@ -283,13 +288,15 @@ export const daimo: Wallet = {
 					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
-					arbitrum: TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
-					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},
 		license: {
-			value: License.GPL_3_0,
+			license: License.GPL_3_0,
 			ref: [
 				{
 					explanation: 'Daimo is licensed under the GPL-3.0 license.',

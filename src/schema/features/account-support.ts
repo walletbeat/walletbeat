@@ -1,15 +1,12 @@
 import type { WithRef } from '../reference'
-import { isSupported, type NotSupported, type Supported } from './support'
+import { isSupported, type NotSupported, type Support, type Supported } from './support'
 
-export type AccountTypeSupported<T> = WithRef<Supported<T>>
-export type AccountTypeNotSupported = WithRef<NotSupported>
-
-export type AccountTypeSupport<T> = AccountTypeSupported<T> | AccountTypeNotSupported
+export type AccountTypeSupport<T> = WithRef<Support<T>>
 
 /** Type predicate for AccountTypeSupported<T>. */
 export function isAccountTypeSupported<T>(
 	accountTypeSupport: AccountTypeSupport<T>,
-): accountTypeSupport is AccountTypeSupported<T> {
+): accountTypeSupport is WithRef<Supported<T>> {
 	return isSupported<T>(accountTypeSupport)
 }
 
@@ -77,25 +74,8 @@ export type AccountSupport = Exclude<
 		rawErc4337: AccountTypeSupport<AccountTypeMutableMultifactor>
 	},
 	// At least one account type must be supported.
-	Record<AccountType, AccountTypeNotSupported>
-> & { defaultAccountType: AccountType } & (
-		| {
-				// Either EIP-7702 is not supported...
-				eip7702: AccountTypeNotSupported
-		  }
-		| ({
-				// Or EIP-7702 is supported, in which case either EOA or MPC accounts
-				// (or both) must be supported.
-				eip7702: AccountTypeSupported<AccountType7702>
-		  } & (
-				| {
-						eoa: AccountTypeSupported<AccountTypeEoa>
-				  }
-				| {
-						mpc: AccountTypeSupported<AccountTypeMpc>
-				  }
-		  ))
-	)
+	Record<AccountType, NotSupported>
+> & { defaultAccountType: AccountType }
 
 /** Support information for EOA accounts. */
 export interface AccountTypeEoa {

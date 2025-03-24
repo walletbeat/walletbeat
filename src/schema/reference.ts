@@ -71,16 +71,22 @@ export function isFullyQualifiedReference(
 /** One or more references. */
 export type References = Reference | NonEmptyArray<Reference>
 
+/** An array of zero or more references. */
+export type ReferenceArray = Reference[]
+
 /** An object that *must* be annotated with References. */
 export type MustRef<T> = T & { ref: References }
 
 /** An object that *may or may not* be annotated with References. */
 export type WithRef<T> = MustRef<T> | (T & { ref?: null })
 
-/** Fully qualify a `Reference`. */
+/** Fully qualify any number of `Reference`s in any supported type. */
 export function toFullyQualified(
-	reference: References | FullyQualifiedReference[],
+	reference: References | ReferenceArray | FullyQualifiedReference[] | null | undefined,
 ): FullyQualifiedReference[] {
+	if (reference === null || reference === undefined) {
+		return []
+	}
 	if (Array.isArray(reference)) {
 		const qualified: FullyQualifiedReference[] = []
 		for (const ref of reference) {
@@ -247,10 +253,23 @@ export function popRefs<T>(withRef: WithRef<T>): {
 }
 
 /** Deduplicate and merge references in `refs`. */
-export function mergeRefs(...refs: FullyQualifiedReference[]): FullyQualifiedReference[] {
+export function mergeRefs(
+	...refs: Array<References | ReferenceArray | FullyQualifiedReference | null | undefined>
+): FullyQualifiedReference[] {
+	const qualifiedRefs = []
+	for (const ref of refs) {
+		if (ref === null || ref === undefined) {
+			continue
+		}
+		if (!Array.isArray(ref) && isFullyQualifiedReference(ref)) {
+			qualifiedRefs.push(ref)
+		} else {
+			qualifiedRefs.push(...toFullyQualified(ref))
+		}
+	}
 	const byExplanation = new Map<string, FullyQualifiedReference>()
 	const mergedRefs: FullyQualifiedReference[] = []
-	for (const ref of refs) {
+	for (const ref of qualifiedRefs) {
 		if (ref.explanation === undefined) {
 			mergedRefs.push(ref)
 			continue

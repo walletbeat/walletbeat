@@ -614,14 +614,14 @@ export default function WalletTable(): React.ReactElement {
 
 				return (
 					<div className="flex space-x-0 items-center">
-						<div className="flex flex-col items-center">
+						<div className="flex flex-col items-center group">
 							<button
-								className={`p-2 rounded-md ${
+								className={`p-2 rounded-md transition-colors ${
 									!supportsWeb
-										? 'opacity-40 cursor-not-allowed text-gray-400'
+										? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
 										: selectedVariant === DeviceVariant.WEB
-											? 'text-purple-700'
-											: 'text-gray-600 hover:text-gray-900'
+											? 'text-[var(--active)]'
+											: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
 								}`}
 								onClick={() => {
 									if (supportsWeb) {
@@ -634,19 +634,23 @@ export default function WalletTable(): React.ReactElement {
 								<WebIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${
-									selectedVariant === DeviceVariant.WEB ? 'bg-purple-700' : 'bg-gray-300'
+								className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+									!supportsWeb
+										? 'bg-[var(--background-tertiary)]'
+										: selectedVariant === DeviceVariant.WEB
+											? 'bg-[var(--active)]'
+											: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
 								}`}
 							/>
 						</div>
-						<div className="flex flex-col items-center">
+						<div className="flex flex-col items-center group">
 							<button
-								className={`p-2 rounded-md ${
+								className={`p-2 rounded-md transition-colors ${
 									!supportsMobile
-										? 'opacity-40 cursor-not-allowed text-gray-400'
+										? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
 										: selectedVariant === DeviceVariant.MOBILE
-											? 'text-purple-700'
-											: 'text-gray-600 hover:text-gray-900'
+											? 'text-[var(--active)]'
+											: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
 								}`}
 								onClick={() => {
 									if (supportsMobile) {
@@ -659,19 +663,23 @@ export default function WalletTable(): React.ReactElement {
 								<MobileIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${
-									selectedVariant === DeviceVariant.MOBILE ? 'bg-purple-700' : 'bg-gray-300'
+								className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+									!supportsMobile
+										? 'bg-[var(--background-tertiary)]'
+										: selectedVariant === DeviceVariant.MOBILE
+											? 'bg-[var(--active)]'
+											: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
 								}`}
 							/>
 						</div>
-						<div className="flex flex-col items-center">
+						<div className="flex flex-col items-center group">
 							<button
-								className={`p-2 rounded-md ${
+								className={`p-2 rounded-md transition-colors ${
 									!supportsDesktop
-										? 'opacity-40 cursor-not-allowed text-gray-400'
+										? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
 										: selectedVariant === DeviceVariant.DESKTOP
-											? 'text-purple-700'
-											: 'text-gray-600 hover:text-gray-900'
+											? 'text-[var(--active)]'
+											: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
 								}`}
 								onClick={() => {
 									if (supportsDesktop) {
@@ -684,8 +692,12 @@ export default function WalletTable(): React.ReactElement {
 								<DesktopIcon />
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${
-									selectedVariant === DeviceVariant.DESKTOP ? 'bg-purple-700' : 'bg-gray-300'
+								className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+									!supportsDesktop
+										? 'bg-[var(--background-tertiary)]'
+										: selectedVariant === DeviceVariant.DESKTOP
+											? 'bg-[var(--active)]'
+											: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
 								}`}
 							/>
 						</div>
@@ -872,15 +884,14 @@ export default function WalletTable(): React.ReactElement {
 
 				return (
 					<div className="flex space-x-0 items-center justify-center">
-						<div className="flex flex-col items-center">
+						<div className="flex flex-col items-center group">
 							<button
-								className={`p-2 rounded-md ${
+								className={`p-2 rounded-md transition-colors ${
 									selectedVariant === DeviceVariant.NONE
-										? 'text-gray-600 hover:text-gray-900'
-										: 'text-purple-700'
+										? 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
+										: 'text-[var(--active)]'
 								}`}
 								onClick={() => {
-									// Toggle between none and hardware selection
 									handleVariantChange(
 										selectedVariant === DeviceVariant.NONE
 											? DeviceVariant.HARDWARE
@@ -893,13 +904,15 @@ export default function WalletTable(): React.ReactElement {
 									style={{
 										width: '24px',
 										height: '24px',
-										fill: selectedVariant === DeviceVariant.NONE ? 'currentColor' : '#9333EA',
+										fill: selectedVariant === DeviceVariant.NONE ? 'currentColor' : 'var(--active)',
 									}}
 								/>
 							</button>
 							<div
-								className={`w-2 h-2 rounded-full mt-1 ${
-									selectedVariant !== DeviceVariant.NONE ? 'bg-purple-700' : 'bg-gray-300'
+								className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+									selectedVariant !== DeviceVariant.NONE
+										? 'bg-[var(--active)]'
+										: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
 								}`}
 							/>
 						</div>
@@ -1116,14 +1129,15 @@ export default function WalletTable(): React.ReactElement {
 				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 					<thead>
 						{table.getHeaderGroups().map(headerGroup => (
-							<tr key={headerGroup.id}>
+							<tr className="bg-tertiary" key={headerGroup.id}>
 								{headerGroup.headers.map(header => (
 									<th
 										key={header.id}
-										className={`px-4 py-2 text-left text-[14px] text-[#616161] dark:text-gray-300 bg-gray-100 dark:bg-gray-800 ${
+										className={`px-4 py-2 text-center text-[14px] text-secondary ${
 											header.column.columnDef.header === 'Wallet' ||
-											header.column.columnDef.header === 'Type'
-												? 'font-bold'
+											header.column.columnDef.header === 'Type' ||
+											header.column.columnDef.header === 'Manufacture Type'
+												? 'font-bold !text-left'
 												: header.column.columnDef.header === 'Risk by device'
 													? 'font-semibold'
 													: 'font-normal'

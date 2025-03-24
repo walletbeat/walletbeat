@@ -12,6 +12,11 @@ import { Variant } from '@/schema/variants'
 import { cantina } from '../entities/cantina'
 import { code4rena } from '../entities/code4rena'
 import { certora } from '../entities/certora'
+import {
+	TransactionSubmissionL2Type,
+	transactionSubmissionL2TypeName,
+} from '@/schema/features/self-sovereignty/transaction-submission'
+import { License } from '@/schema/features/license'
 
 export const coinbase: Wallet = {
 	metadata: {
@@ -29,8 +34,8 @@ export const coinbase: Wallet = {
 		lastUpdated: '2025-03-14',
 		multiWalletType: {
 			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337, SmartWalletStandard.ERC_7702]
-		}
+			smartWalletStandards: [SmartWalletStandard.ERC_4337, SmartWalletStandard.ERC_7702],
+		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -53,8 +58,7 @@ export const coinbase: Wallet = {
 				ref: null,
 			},
 		},
-		security:
-			{
+		security: {
 			scamAlerts: null,
 			publicSecurityAudits: [
 				{
@@ -98,13 +102,14 @@ export const coinbase: Wallet = {
 			hardwareWalletClearSigning: {
 				clearSigningSupport: {
 					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.'
+					details: 'No hardware wallet clear signing information available.',
 				},
 				ref: null,
 			},
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
-				libraryUrl: 'https://github.com/base/webauthn-sol/tree/619f20ab0f074fef41066ee4ab24849a913263b2',
+				libraryUrl:
+					'https://github.com/base/webauthn-sol/tree/619f20ab0f074fef41066ee4ab24849a913263b2',
 				ref: {
 					url: 'https://github.com/base/webauthn-sol/tree/619f20ab0f074fef41066ee4ab24849a913263b2',
 					explanation: 'Coinbase uses the webauthn-sol library for passkey verification.',
@@ -122,12 +127,23 @@ export const coinbase: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},
-		license: null,
+		license: {
+			license: License.BSD_3_CLAUSE,
+			ref: {
+				urls: [
+					{
+						url: 'https://github.com/coinbase/wallet-mobile/blob/master/LICENSE.md',
+						label: 'Coinbase Wallet License File',
+					},
+				],
+				explanation: 'Coinbase Wallet uses the BSD-3-Clause license for its source code',
+			},
+		},
 		monetization: {
 			revenueBreakdownIsPublic: false,
 			strategies: {

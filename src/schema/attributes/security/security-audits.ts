@@ -6,7 +6,7 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
@@ -15,6 +15,8 @@ import { type SecurityAudit, securityAuditId } from '@/schema/features/security/
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
 import { exampleSecurityAuditor } from '@/data/entities/example'
 import type { AtLeastOneVariant } from '@/schema/variants'
+import { mergeRefs } from '@/schema/reference'
+import { WalletProfile } from '@/schema/features/profile'
 
 const brand = 'attributes.security.security_audits'
 export type SecurityAuditsValue = Value & {
@@ -41,6 +43,7 @@ function noAudits(): Evaluation<SecurityAuditsValue> {
 				${wallet.metadata.displayName} has not undergone any security auditing.
 			`,
 		),
+		references: [],
 	}
 }
 
@@ -132,6 +135,7 @@ function audited(
 			hasUnaddressedFlaws,
 		}),
 		howToImprove,
+		references: mergeRefs(...audits.map(audit => audit.ref)),
 	}
 }
 
@@ -230,6 +234,18 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SecurityAuditsValue> => {
+		if (features.profile === WalletProfile.HARDWARE) {
+			return exempt(
+				securityAudits,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet that follows different security evaluation processes.`,
+				),
+				brand,
+				{ securityAudits: [] },
+			)
+		}
+
 		if (features.security.publicSecurityAudits === null) {
 			return unrated(securityAudits, brand, { securityAudits: [] })
 		}

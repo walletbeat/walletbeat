@@ -27,7 +27,7 @@ export function ExternalLink({
 				href={labeled.url}
 				target="_blank"
 				rel={rel}
-				color="primary"
+				className={`text-accent`} // overwrite mui primary color
 				style={{
 					...style,
 				}}

@@ -5,51 +5,58 @@ import { pickWorstRating, unrated } from '../common'
 import { paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { sourceVisibilityDetailsContent } from '@/types/content/source-visibility-details'
+import { toFullyQualified, type ReferenceArray } from '@/schema/reference'
 
 const brand = 'attributes.transparency.source_visibility'
 export type SourceVisibilityValue = Value & {
 	__brand: 'attributes.transparency.source_visibility'
 }
 
-const sourcePublic: Evaluation<SourceVisibilityValue> = {
-	value: {
-		id: 'public',
-		rating: Rating.PASS,
-		displayName: 'Source code publicly available',
-		shortExplanation: sentence(
-			(walletMetadata: WalletMetadata) => `
-				The source code for ${walletMetadata.displayName} is public.
-			`,
-		),
-		__brand: brand,
-	},
-	details: sourceVisibilityDetailsContent(),
+function sourcePublic(references: ReferenceArray): Evaluation<SourceVisibilityValue> {
+	return {
+		value: {
+			id: 'public',
+			rating: Rating.PASS,
+			displayName: 'Source code publicly available',
+			shortExplanation: sentence(
+				(walletMetadata: WalletMetadata) => `
+					The source code for ${walletMetadata.displayName} is public.
+				`,
+			),
+			__brand: brand,
+		},
+		details: sourceVisibilityDetailsContent(),
+		references,
+	}
 }
 
-const sourcePrivate: Evaluation<SourceVisibilityValue> = {
-	value: {
-		id: 'private',
-		rating: Rating.FAIL,
-		displayName: 'Source code not publicly available',
-		shortExplanation: sentence(
-			(walletMetadata: WalletMetadata) => `
-				The source code for ${walletMetadata.displayName} is not public.
+function sourcePrivate(references: ReferenceArray): Evaluation<SourceVisibilityValue> {
+	return {
+		value: {
+			id: 'private',
+			rating: Rating.FAIL,
+			displayName: 'Source code not publicly available',
+			shortExplanation: sentence(
+				(walletMetadata: WalletMetadata) => `
+					The source code for ${walletMetadata.displayName} is not public.
+				`,
+			),
+			__brand: brand,
+		},
+		details: paragraph(
+			({ wallet }) => `
+				The source code for ${wallet.metadata.displayName} is not available
+				to the public.
 			`,
 		),
-		__brand: brand,
-	},
-	details: paragraph(
-		({ wallet }) => `
-			The source code for ${wallet.metadata.displayName} is not available
-			to the public.
-		`,
-	),
-	howToImprove: paragraph(
-		({ wallet }) => `
-			${wallet.metadata.displayName} should make its source code publicly
-			viewable.
-		`,
-	),
+		howToImprove: paragraph(
+			({ wallet }) => `
+				${wallet.metadata.displayName} should make its source code publicly
+				viewable.
+			`,
+		),
+		references,
+	}
 }
 
 export const sourceVisibility: Attribute<SourceVisibilityValue> = {
@@ -82,19 +89,11 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 		if (features.license === null) {
 			return unrated(sourceVisibility, brand, null)
 		}
-		
-		// Handle the new LicenseWithValue type
-		let licenseValue;
-		if (typeof features.license === 'object' && 'value' in features.license) {
-			licenseValue = features.license.value;
-		} else {
-			licenseValue = features.license;
+
+		if (licenseSourceIsVisible(features.license.license)) {
+			return sourcePublic(toFullyQualified(features.license.ref))
 		}
-		
-		if (licenseSourceIsVisible(licenseValue)) {
-			return sourcePublic
-		}
-		return sourcePrivate
+		return sourcePrivate(toFullyQualified(features.license.ref))
 	},
 	aggregate: pickWorstRating<SourceVisibilityValue>,
 }
