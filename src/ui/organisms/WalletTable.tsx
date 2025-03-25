@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/strict-boolean-expressions - Disabled for integration with tanstack table */
 import * as React from 'react'
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table'
 import { ratedWallets } from '@/data/wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
@@ -19,6 +19,7 @@ import { WebIcon, MobileIcon, DesktopIcon } from '@/icons'
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
 import { EipPreviewModal } from '../molecules/EipPreviewModal'
 import { EipPrefix } from '@/schema/eips'
+import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
 
 // Define wallet type constants from the previous implementation
 const WalletTypeCategory = {
@@ -26,6 +27,16 @@ const WalletTypeCategory = {
 	SMART_WALLET: 'SMART_WALLET',
 	HARDWARE_WALLET: 'HARDWARE_WALLET',
 } as const
+
+// Define wallet type filter options
+const WalletTypeFilter = {
+	ALL: 'ALL',
+	EOA_ONLY: 'EOA_ONLY',
+	SMART_WALLET_ONLY: 'SMART_WALLET_ONLY',
+	SMART_WALLET_AND_EOA: 'SMART_WALLET_AND_EOA',
+} as const
+
+type WalletTypeFilter = (typeof WalletTypeFilter)[keyof typeof WalletTypeFilter]
 
 // Define device variants for device selector
 const DeviceVariant = {
@@ -56,7 +67,7 @@ type SmartWalletStandard = (typeof SmartWalletStandard)[keyof typeof SmartWallet
 
 const WALLET_TYPE_DISPLAY: Record<WalletTypeCategory, string> = {
 	[WalletTypeCategory.EOA]: 'EOA',
-	[WalletTypeCategory.SMART_WALLET]: 'SW',
+	[WalletTypeCategory.SMART_WALLET]: 'Smart Wallet',
 	[WalletTypeCategory.HARDWARE_WALLET]: 'HW',
 }
 
@@ -93,6 +104,12 @@ interface WalletMetadataLike {
 		smartWalletStandards?: SmartWalletStandard[]
 	}
 	hardwareWalletManufactureType?: HardwareWalletManufactureType
+	hardwareWalletModels?: {
+		id: string
+		name: string
+		url: string
+		isFlagship: boolean
+	}[]
 	// Add properties for variants
 	variants?: Record<string, any>
 }
@@ -400,6 +417,126 @@ function PizzaSliceChart({
 	)
 }
 
+// Define hardware wallet models
+interface HardwareWalletModel {
+	id: string
+	name: string
+	url: string
+	isFlagship?: boolean
+}
+
+// Hardware wallet models by brand
+const hardwareWalletModels: Record<string, HardwareWalletModel[]> = {
+	ledger: [
+		{
+			id: 'ledger-stax',
+			name: 'Ledger Stax',
+			url: 'https://shop.ledger.com/products/ledger-stax',
+			isFlagship: true,
+		},
+		{
+			id: 'ledger-nano-s',
+			name: 'Ledger Nano S',
+			url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
+			isFlagship: false,
+		},
+		{
+			id: 'ledger-nano-s-plus',
+			name: 'Ledger Nano S+',
+			url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
+			isFlagship: false,
+		},
+		{
+			id: 'ledger-nano-x',
+			name: 'Ledger Nano X',
+			url: 'https://shop.ledger.com/products/ledger-nano-x',
+			isFlagship: false,
+		},
+		{
+			id: 'ledger-flex',
+			name: 'Ledger Flex',
+			url: 'https://shop.ledger.com/products/ledger-flex',
+			isFlagship: false,
+		},
+	],
+	trezor: [
+		{
+			id: 'trezor-safe-5',
+			name: 'Trezor Safe 5',
+			url: 'https://trezor.io/trezor-safe-5',
+			isFlagship: true,
+		},
+		{
+			id: 'trezor-safe-3',
+			name: 'Trezor Safe 3',
+			url: 'https://trezor.io/trezor-safe-3',
+			isFlagship: false,
+		},
+		{
+			id: 'trezor-model-one',
+			name: 'Trezor Model One',
+			url: 'https://trezor.io/trezor-model-one',
+			isFlagship: false,
+		},
+		{
+			id: 'trezor-model-t',
+			name: 'Trezor Model T',
+			url: 'https://trezor.io/trezor-model-t',
+			isFlagship: false,
+		},
+	],
+	keystone: [
+		{
+			id: 'keystone-pro',
+			name: 'Keystone Pro',
+			url: 'https://keyst.one/pro',
+			isFlagship: true,
+		},
+		{
+			id: 'keystone-essential',
+			name: 'Keystone Essential',
+			url: 'https://keyst.one/essential',
+			isFlagship: false,
+		},
+	],
+	gridplus: [
+		{
+			id: 'gridplus-lattice1',
+			name: 'GridPlus Lattice1',
+			url: 'https://gridplus.io/products/lattice1',
+			isFlagship: true,
+		},
+	],
+	firefly: [
+		{ id: 'firefly-v1', name: 'Firefly V1', url: 'https://firefly.technology/', isFlagship: true },
+	],
+}
+
+// Helper function to get models for a wallet brand
+function getHardwareWalletModels(walletId: string): HardwareWalletModel[] {
+	// First check if the wallet has models in its metadata
+	const wallet = ratedHardwareWallets[walletId as keyof typeof ratedHardwareWallets]
+	if (
+		wallet &&
+		wallet.metadata.hardwareWalletModels &&
+		wallet.metadata.hardwareWalletModels.length > 0
+	) {
+		return wallet.metadata.hardwareWalletModels
+	}
+
+	// Fallback to the hardcoded models if no models in metadata
+	return hardwareWalletModels[walletId] || []
+}
+
+// Helper function to get flagship model for a wallet brand
+function getFlagshipModel(walletId: string): HardwareWalletModel | undefined {
+	const models = getHardwareWalletModels(walletId)
+	// First, try to find a model explicitly marked as flagship
+	const flagshipModel = models.find(model => model.isFlagship)
+	// If no flagship is explicitly marked, return the first model as default
+	return flagshipModel || models[0]
+}
+
 // TableRow interface for better type safety
 interface TableRow {
 	id: string
@@ -409,30 +546,52 @@ interface TableRow {
 	standards?: SmartWalletStandard[]
 	websiteUrl?: string
 	manufactureType?: string
+	sortPriority: number
 }
 
 // Create software wallet table data
-const softwareWalletData: TableRow[] = Object.values(ratedWallets).map(wallet => {
-	const detailedType = getDetailedWalletDescription(wallet as WalletLike)
-	const { standards } = getWalletTypeInfo(wallet as WalletLike)
+const softwareWalletData: TableRow[] = Object.values(ratedWallets)
+	.map(wallet => {
+		const detailedType = getDetailedWalletDescription(wallet as WalletLike)
+		const { standards, categories } = getWalletTypeInfo(wallet as WalletLike)
 
-	// Format wallet standards for display (return raw standards, will render links in cell renderer)
-	const standardsRaw = standards.length > 0 ? standards : []
+		// Format wallet standards for display (return raw standards, will render links in cell renderer)
+		const standardsRaw = standards.length > 0 ? standards : []
 
-	const websiteUrl =
-		typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
-			? wallet.metadata.url
-			: 'Not available'
+		const websiteUrl =
+			typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
+				? wallet.metadata.url
+				: 'Not available'
 
-	return {
-		id: wallet.metadata.id,
-		name: wallet.metadata.displayName,
-		wallet: wallet as WalletLike,
-		typeDescription: detailedType,
-		standards: standardsRaw,
-		websiteUrl,
-	}
-})
+		// Assign a sort priority based on type:
+		// 1. Smart Wallet only
+		// 2. Smart Wallet & EOA
+		// 3. EOA only
+		let sortPriority = 3 // Default to EOA only
+		const hasEOA = categories.includes(WalletTypeCategory.EOA)
+		const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
+
+		if (hasSmartWallet) {
+			if (hasEOA) {
+				sortPriority = 2 // Both Smart Wallet & EOA
+			} else {
+				sortPriority = 1 // Smart Wallet only
+			}
+		} else if (hasEOA) {
+			sortPriority = 3 // EOA only
+		}
+
+		return {
+			id: wallet.metadata.id,
+			name: wallet.metadata.displayName,
+			wallet: wallet as WalletLike,
+			typeDescription: detailedType,
+			standards: standardsRaw,
+			websiteUrl,
+			sortPriority,
+		}
+	})
+	.sort((a, b) => a.sortPriority - b.sortPriority)
 
 // Create hardware wallet table data
 const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets).map(wallet => {
@@ -449,6 +608,7 @@ const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets).map(w
 		wallet: walletLike,
 		manufactureType,
 		websiteUrl,
+		sortPriority: 0,
 	}
 })
 
@@ -493,8 +653,8 @@ function createWalletNameCell(isHardware: boolean) {
 	}
 }
 
-// Helper function for EIP links with hover preview
-function EipStandardLink({
+// Helper function for EIP standards with hover preview (non-link version)
+function EipStandardTag({
 	standard,
 	standardNumber,
 	prefix,
@@ -508,11 +668,9 @@ function EipStandardLink({
 
 	return (
 		<React.Fragment>
-			<a
-				href={`https://eips.ethereum.org/EIPS/eip-${standardNumber}`}
-				target="_blank"
-				rel="noopener noreferrer"
-				className="eip-tag text-xs dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f] relative z-10"
+			<span
+				className="eip-tag text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f] relative z-10 cursor-help"
+				title={`${prefix}-${standardNumber} - Hover for details`}
 				onMouseEnter={e => {
 					setIsHovered(true)
 					setAnchorEl(e.currentTarget)
@@ -531,7 +689,7 @@ function EipStandardLink({
 				}}
 			>
 				#{standardNumber}
-			</a>
+			</span>
 			{isHovered && anchorEl && (
 				<EipPreviewModal
 					eipNumber={standardNumber}
@@ -547,13 +705,345 @@ function EipStandardLink({
 	)
 }
 
+// Define a component for expandable hardware wallet row
+function ExpandableHardwareWalletRow({
+	row,
+	columns,
+}: {
+	row: any
+	columns: any[]
+}): React.ReactElement {
+	const [isExpanded, setIsExpanded] = useState(false)
+	const [selectedModel, setSelectedModel] = useState<string | null>(null)
+	const [selectedModelVariant, setSelectedModelVariant] = useState<DeviceVariant>(
+		DeviceVariant.HARDWARE,
+	)
+
+	const walletId = row.original.id
+	const wallet = row.original.wallet
+	const models = getHardwareWalletModels(walletId)
+	const flagshipModel = getFlagshipModel(walletId)
+
+	// Set the flagship model as the default selected model
+	useEffect(() => {
+		// Always have a selected model, even if there's only one
+		if (models.length > 0 && !selectedModel) {
+			// If there's a flagship model, use it, otherwise use the first model
+			const modelToSelect = flagshipModel ? flagshipModel.id : models[0].id
+			setSelectedModel(modelToSelect)
+		}
+	}, [flagshipModel, models, selectedModel])
+
+	// Get the currently selected model name
+	const selectedModelName = selectedModel
+		? models.find(m => m.id === selectedModel)?.name
+		: models.length > 0
+			? models[0].name
+			: ''
+
+	// Check if the selected model is the flagship
+	const isSelectedFlagship = selectedModel
+		? models.find(m => m.id === selectedModel)?.isFlagship
+		: false
+
+	// Toggle expansion of the models list
+	const toggleExpanded = () => {
+		setIsExpanded(!isExpanded)
+	}
+
+	// Handle click on a model
+	const handleModelClick = (modelId: string) => {
+		setSelectedModel(modelId)
+	}
+
+	// Create updated cells for rating data
+	const createUpdatedCell = (cell: any, columnIndex: number) => {
+		// Skip first two columns (Wallet name and Manufacture Type)
+		if (columnIndex < 2) {
+			return cell && cell.column && cell.column.columnDef && cell.column.columnDef.cell
+				? flexRender(cell.column.columnDef.cell, cell.getContext())
+				: null
+		}
+
+		// Handle Rating data columns (Security, Privacy, etc.)
+		if (columnIndex >= 3) {
+			if (!cell || !cell.getValue) {
+				return null
+			}
+
+			const cellValue = cell.getValue()
+
+			if (!cellValue) {
+				return null
+			}
+
+			const { evalTree, walletId } = cellValue
+
+			// Get the column name from the header to determine which attribute group to use
+			if (!cell.column || !cell.column.columnDef || !cell.column.columnDef.header) {
+				return null
+			}
+
+			const headerText = cell.column.columnDef.header as string
+			let attrGroup
+
+			switch (headerText) {
+				case 'Security':
+					attrGroup = securityAttributeGroup
+					break
+				case 'Privacy':
+					attrGroup = privacyAttributeGroup
+					break
+				case 'Sovereignty':
+					attrGroup = selfSovereigntyAttributeGroup
+					break
+				case 'Transparency':
+					attrGroup = transparencyAttributeGroup
+					break
+				case 'Ecosystem':
+					attrGroup = ecosystemAttributeGroup
+					break
+				default:
+					// For other columns, just render the default cell
+					return cell && cell.column && cell.column.columnDef && cell.column.columnDef.cell
+						? flexRender(cell.column.columnDef.cell, cell.getContext())
+						: null
+			}
+
+			// For now, with mock model data, we simply return the same pizza slice chart
+			// When model-specific data is available, we would modify evalTree based on the model
+			const modelName = selectedModel ? models.find(m => m.id === selectedModel)?.name : ''
+
+			return (
+				<div className="flex flex-col items-center">
+					{modelName && (
+						<div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{modelName}</div>
+					)}
+					<PizzaSliceChart
+						attrGroup={attrGroup}
+						evalTree={evalTree}
+						isSupported={true}
+						walletId={walletId}
+					/>
+				</div>
+			)
+		}
+
+		// For other columns (like the device icon column)
+		return flexRender(cell.column.columnDef.cell, cell.getContext())
+	}
+
+	// Sort models to place flagship first
+	const sortedModels = [...models].sort((a, b) => {
+		if (a.isFlagship) {
+			return -1
+		}
+		if (b.isFlagship) {
+			return 1
+		}
+		return 0
+	})
+
+	// Render the table row with expansion capabilities
+	return (
+		<>
+			<tr
+				className={`dark:bg-[#141414] dark:hover:bg-[#1a1a1a] cursor-pointer`}
+				onClick={toggleExpanded}
+			>
+				<td className="px-4 py-2 dark:text-gray-200">
+					<div className="flex items-center">
+						{models.length > 1 ? (
+							<span className="mr-2">
+								{isExpanded ? (
+									<LuChevronDown className="w-4 h-4" />
+								) : (
+									<LuChevronRight className="w-4 h-4" />
+								)}
+							</span>
+						) : null}
+						{/* Wallet Logo */}
+						<div className="flex-shrink-0 mr-3">
+							<img
+								src={`/images/hardware-wallets/${walletId}.svg`}
+								alt=""
+								className="w-6 h-6 object-contain"
+								onError={e => {
+									// Fallback for missing logos
+									e.currentTarget.src = '/images/hardware-wallets/default.svg'
+								}}
+							/>
+						</div>
+						{/* Wallet Name */}
+						<a
+							href={`/${walletId}`}
+							className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
+						>
+							{row.original.name}
+						</a>
+						{/* Always show model name, but only show flagship indicator in expanded view */}
+						<span className="ml-2 text-xs flex items-center">
+							<span className="text-purple-500 dark:text-purple-400 font-medium">
+								{selectedModelName}
+							</span>
+						</span>
+					</div>
+				</td>
+				{row &&
+					row.getVisibleCells &&
+					row
+						.getVisibleCells()
+						.slice(1)
+						.map((cell: any, index: number) => (
+							<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
+								{index === 0 &&
+								cell &&
+								cell.column &&
+								cell.column.columnDef &&
+								cell.column.columnDef.cell
+									? // This is the "Manufacture Type" column
+										flexRender(cell.column.columnDef.cell, cell.getContext())
+									: createUpdatedCell(cell, index + 1)}
+							</td>
+						))}
+			</tr>
+
+			{isExpanded && models.length > 1 && (
+				<tr className="bg-gray-50 dark:bg-[#1a1a1a]">
+					<td colSpan={columns && columns.length ? columns.length : 8} className="p-0">
+						<div className="pl-10 pr-4 py-3">
+							<div className="text-sm font-medium mb-2 dark:text-gray-200">Models:</div>
+							<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+								{sortedModels.map((model, index) => (
+									<div
+										key={model.id}
+										className={`p-2 border rounded flex items-center ${
+											selectedModel === model.id
+												? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-700'
+												: 'border-gray-200 dark:border-gray-700'
+										} ${
+											model.isFlagship ? 'ring-1 ring-purple-300 dark:ring-purple-800' : ''
+										} cursor-pointer hover:border-purple-300 dark:hover:border-purple-500 transition-colors`}
+										onClick={e => {
+											e.stopPropagation()
+											handleModelClick(model.id)
+										}}
+									>
+										<div
+											className={`w-3 h-3 rounded-full mr-2 ${
+												selectedModel === model.id ? 'bg-purple-500' : 'bg-gray-400'
+											}`}
+										></div>
+										<div className="flex-grow dark:text-gray-200 font-medium">
+											{model.name}
+											{model.isFlagship && (
+												<span className="ml-1 text-xs text-purple-600 dark:text-purple-400 font-medium">
+													(Flagship)
+												</span>
+											)}
+										</div>
+										<a
+											href={model.url}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+											onClick={e => e.stopPropagation()}
+										>
+											Website
+										</a>
+									</div>
+								))}
+							</div>
+						</div>
+					</td>
+				</tr>
+			)}
+		</>
+	)
+}
+
 export default function WalletTable(): React.ReactElement {
 	// Add state for selected device variant and active tab
 	const [selectedVariant, setSelectedVariant] = useState<DeviceVariant>(DeviceVariant.NONE)
 	const [activeTab, setActiveTab] = useState<WalletTableTab>(WalletTableTab.SOFTWARE)
+	const [walletTypeFilter, setWalletTypeFilter] = useState<WalletTypeFilter>(WalletTypeFilter.ALL)
 
-	// Use the appropriate data based on active tab
-	const tableData = activeTab === WalletTableTab.SOFTWARE ? softwareWalletData : hardwareWalletData
+	// Calculate counts for each filter type
+	// IMPORTANT: We calculate these from the original data, not the filtered data
+	// to prevent circular dependencies and infinite loops
+	const eoaOnlyWalletCount = useMemo(() => {
+		return softwareWalletData.filter(row => {
+			if (!row || !row.wallet) {
+				return false
+			}
+			const { categories } = getWalletTypeInfo(row.wallet)
+			const hasEOA = categories.includes(WalletTypeCategory.EOA)
+			const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
+			return hasEOA && !hasSmartWallet
+		}).length
+	}, [])
+
+	const smartWalletOnlyCount = useMemo(() => {
+		return softwareWalletData.filter(row => {
+			if (!row || !row.wallet) {
+				return false
+			}
+			const { categories } = getWalletTypeInfo(row.wallet)
+			const hasEOA = categories.includes(WalletTypeCategory.EOA)
+			const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
+			return hasSmartWallet && !hasEOA
+		}).length
+	}, [])
+
+	const smartWalletAndEoaCount = useMemo(() => {
+		return softwareWalletData.filter(row => {
+			if (!row || !row.wallet) {
+				return false
+			}
+			const { categories } = getWalletTypeInfo(row.wallet)
+			const hasEOA = categories.includes(WalletTypeCategory.EOA)
+			const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
+			return hasSmartWallet && hasEOA
+		}).length
+	}, [])
+
+	// Filter the software wallet data based on the selected wallet type filter
+	const filteredSoftwareWalletData = useMemo(() => {
+		if (walletTypeFilter === WalletTypeFilter.ALL) {
+			return softwareWalletData
+		}
+
+		return softwareWalletData.filter(row => {
+			if (!row || !row.wallet) {
+				return false
+			}
+			const { categories } = getWalletTypeInfo(row.wallet)
+			const hasEOA = categories.includes(WalletTypeCategory.EOA)
+			const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
+
+			// For EOA_ONLY filter, check if the wallet has only EOA type
+			if (walletTypeFilter === WalletTypeFilter.EOA_ONLY) {
+				return hasEOA && !hasSmartWallet
+			}
+
+			// For SMART_WALLET_ONLY filter
+			if (walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY) {
+				return hasSmartWallet && !hasEOA
+			}
+
+			// For SMART_WALLET_AND_EOA filter
+			if (walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA) {
+				return hasSmartWallet && hasEOA
+			}
+
+			return true
+		})
+	}, [walletTypeFilter])
+
+	// Use the appropriate data based on active tab and filters
+	const tableData = useMemo(() => {
+		return activeTab === WalletTableTab.SOFTWARE ? filteredSoftwareWalletData : hardwareWalletData
+	}, [activeTab, filteredSoftwareWalletData])
 
 	// Handler for device variant change
 	const handleVariantChange = (variant: DeviceVariant) => {
@@ -563,6 +1053,13 @@ export default function WalletTable(): React.ReactElement {
 	// Handler for tab change
 	const handleTabChange = (tab: WalletTableTab) => {
 		setActiveTab(tab)
+		// Reset wallet type filter when switching tabs
+		setWalletTypeFilter(WalletTypeFilter.ALL)
+	}
+
+	// Handler for wallet type filter change
+	const handleWalletTypeFilterChange = (filter: WalletTypeFilter) => {
+		setWalletTypeFilter(filter)
 	}
 
 	// Define columns for software wallets
@@ -605,7 +1102,7 @@ export default function WalletTable(): React.ReactElement {
 								// Add Markdown-style links for ERC standards
 								if (stdKey === SmartWalletStandard.ERC_4337) {
 									return (
-										<EipStandardLink
+										<EipStandardTag
 											key={std}
 											standard={std}
 											standardNumber="4337"
@@ -614,7 +1111,7 @@ export default function WalletTable(): React.ReactElement {
 									)
 								} else if (stdKey === SmartWalletStandard.ERC_7702) {
 									return (
-										<EipStandardLink
+										<EipStandardTag
 											key={std}
 											standard={std}
 											standardNumber="7702"
@@ -909,7 +1406,8 @@ export default function WalletTable(): React.ReactElement {
 		{
 			header: 'Wallet',
 			accessorKey: 'name',
-			cell: createWalletNameCell(true), // Use the shared function for hardware wallets
+			// For hardware wallets, we just use a simple accessor since ExpandableHardwareWalletRow handles display
+			cell: (info: any) => info.getValue(),
 		},
 		{
 			header: 'Manufacture Type',
@@ -1120,7 +1618,9 @@ export default function WalletTable(): React.ReactElement {
 	]
 
 	// Use the appropriate columns based on active tab
-	const columns = activeTab === WalletTableTab.SOFTWARE ? softwareColumns : hardwareColumns
+	const columns = useMemo(() => {
+		return activeTab === WalletTableTab.SOFTWARE ? softwareColumns : hardwareColumns
+	}, [activeTab])
 
 	// Create table
 	const table = useReactTable({
@@ -1150,7 +1650,7 @@ export default function WalletTable(): React.ReactElement {
 								activeTab === WalletTableTab.SOFTWARE ? 'bg-purple-500' : 'bg-[#3B0E45]'
 							}`}
 						>
-							{softwareWalletData.length}
+							{filteredSoftwareWalletData.length}
 						</span>
 					</button>
 					<button
@@ -1173,6 +1673,91 @@ export default function WalletTable(): React.ReactElement {
 						</span>
 					</button>
 				</div>
+
+				{/* Wallet Type Filter Buttons - only show for Software wallets tab */}
+				{activeTab === WalletTableTab.SOFTWARE && (
+					<div className="flex flex-wrap gap-2 mt-4 mb-2 px-1">
+						<span className="text-sm font-medium text-gray-600 dark:text-gray-300 self-center mr-2">
+							Filter by:
+						</span>
+						<button
+							className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+								walletTypeFilter === WalletTypeFilter.ALL
+									? 'bg-purple-500 text-white'
+									: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+							}`}
+							onClick={() => handleWalletTypeFilterChange(WalletTypeFilter.ALL)}
+						>
+							All
+							<span
+								className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+									walletTypeFilter === WalletTypeFilter.ALL
+										? 'bg-white bg-opacity-30 text-white'
+										: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+								}`}
+							>
+								{softwareWalletData.length}
+							</span>
+						</button>
+						<button
+							className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+								walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY
+									? 'bg-purple-500 text-white'
+									: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+							}`}
+							onClick={() => handleWalletTypeFilterChange(WalletTypeFilter.SMART_WALLET_ONLY)}
+						>
+							Smart Wallet
+							<span
+								className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+									walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY
+										? 'bg-white bg-opacity-30 text-white'
+										: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+								}`}
+							>
+								{smartWalletOnlyCount}
+							</span>
+						</button>
+						<button
+							className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+								walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA
+									? 'bg-purple-500 text-white'
+									: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+							}`}
+							onClick={() => handleWalletTypeFilterChange(WalletTypeFilter.SMART_WALLET_AND_EOA)}
+						>
+							Smart Wallet & EOA
+							<span
+								className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+									walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA
+										? 'bg-white bg-opacity-30 text-white'
+										: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+								}`}
+							>
+								{smartWalletAndEoaCount}
+							</span>
+						</button>
+						<button
+							className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+								walletTypeFilter === WalletTypeFilter.EOA_ONLY
+									? 'bg-purple-500 text-white'
+									: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+							}`}
+							onClick={() => handleWalletTypeFilterChange(WalletTypeFilter.EOA_ONLY)}
+						>
+							EOA
+							<span
+								className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+									walletTypeFilter === WalletTypeFilter.EOA_ONLY
+										? 'bg-white bg-opacity-30 text-white'
+										: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+								}`}
+							>
+								{eoaOnlyWalletCount}
+							</span>
+						</button>
+					</div>
+				)}
 			</div>
 
 			{/* Table */}
@@ -1185,49 +1770,72 @@ export default function WalletTable(): React.ReactElement {
 									<th
 										key={header.id}
 										className={`px-4 py-2 text-center text-[14px] text-secondary ${
-											header.column.columnDef.header === 'Wallet' ||
-											header.column.columnDef.header === 'Type' ||
-											header.column.columnDef.header === 'Manufacture Type'
+											(header.column &&
+												header.column.columnDef &&
+												header.column.columnDef.header === 'Wallet') ||
+											(header.column &&
+												header.column.columnDef &&
+												header.column.columnDef.header === 'Type') ||
+											(header.column &&
+												header.column.columnDef &&
+												header.column.columnDef.header === 'Manufacture Type')
 												? 'font-bold !text-left'
-												: header.column.columnDef.header === 'Risk by device'
+												: header.column &&
+													  header.column.columnDef &&
+													  header.column.columnDef.header === 'Risk by device'
 													? 'font-semibold'
 													: 'font-normal'
 										}`}
 									>
-										{flexRender(header.column.columnDef.header, header.getContext())}
+										{header &&
+										header.column &&
+										header.column.columnDef &&
+										header.column.columnDef.header
+											? flexRender(header.column.columnDef.header, header.getContext())
+											: null}
 									</th>
 								))}
 							</tr>
 						))}
 					</thead>
 					<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-						{table
-							.getRowModel()
-							.rows.map(row => {
-								const parentWallet = row.original.wallet
-								const isSupported =
-									!parentWallet ||
-									(activeTab === WalletTableTab.HARDWARE &&
-										(selectedVariant === DeviceVariant.NONE ||
-											selectedVariant === DeviceVariant.HARDWARE)) ||
-									(activeTab === WalletTableTab.SOFTWARE &&
-										(selectedVariant === DeviceVariant.NONE ||
-											walletSupportsVariant(parentWallet, selectedVariant)))
+						{(activeTab as string) === WalletTableTab.HARDWARE
+							? table
+									.getRowModel()
+									.rows.map(row => (
+										<ExpandableHardwareWalletRow key={row.id} row={row} columns={columns} />
+									))
+							: table.getRowModel().rows.map(row => {
+									const parentWallet = row.original.wallet
+									const isSupported =
+										!parentWallet ||
+										(activeTab === WalletTableTab.HARDWARE &&
+											(selectedVariant === DeviceVariant.NONE ||
+												selectedVariant === DeviceVariant.HARDWARE)) ||
+										(activeTab === WalletTableTab.SOFTWARE &&
+											(selectedVariant === DeviceVariant.NONE ||
+												walletSupportsVariant(parentWallet, selectedVariant)))
 
-								return (
-									<tr
-										key={row.id}
-										className={`${!isSupported ? 'opacity-50' : ''} dark:bg-[#141414] dark:hover:bg-[#1a1a1a]`}
-									>
-										{row.getVisibleCells().map(cell => (
-											<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</td>
-										))}
-									</tr>
-								)
-							})
-							.filter(Boolean)}
+									return (
+										<tr
+											key={row.id}
+											className={`${!isSupported ? 'opacity-50' : ''} dark:bg-[#141414] dark:hover:bg-[#1a1a1a]`}
+										>
+											{row &&
+												row.getVisibleCells &&
+												row.getVisibleCells().map(cell => (
+													<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
+														{cell &&
+														cell.column &&
+														cell.column.columnDef &&
+														cell.column.columnDef.cell
+															? flexRender(cell.column.columnDef.cell, cell.getContext())
+															: null}
+													</td>
+												))}
+										</tr>
+									)
+								})}
 					</tbody>
 				</table>
 			</div>

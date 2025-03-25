@@ -5,6 +5,7 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { gridplus } from '../entities/gridplus'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -12,18 +13,26 @@ import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/
 export const gridplusWallet: Wallet = {
 	metadata: {
 		id: 'gridplus',
-		displayName: 'GridPlus Lattice1',
+		displayName: 'GridPlus Wallet',
 		tableName: 'GridPlus',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			GridPlus Lattice1 is a secure hardware wallet designed for advanced users.
-			It features a touchscreen interface and supports multiple cryptocurrencies.
+			GridPlus Wallet is a secure hardware wallet that combines secure key storage
+			with convenient authentication methods.
 		`),
 		url: 'https://gridplus.io/',
-		repoUrl: 'https://github.com/GridPlus/lattice-firmware',
+		repoUrl: 'https://github.com/GridPlus',
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'gridplus-lattice1',
+				name: 'GridPlus Lattice1',
+				url: 'https://gridplus.io/products/lattice1',
+				isFlagship: true,
+			},
+		],
 	},
 	features: {
 		profile: WalletProfile.HARDWARE,

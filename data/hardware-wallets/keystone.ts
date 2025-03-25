@@ -5,6 +5,7 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { keystone } from '../entities/keystone'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -12,18 +13,26 @@ import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/
 export const keystoneWallet: Wallet = {
 	metadata: {
 		id: 'keystone',
-		displayName: 'Keystone',
+		displayName: 'Keystone Wallet',
 		tableName: 'Keystone',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			Keystone is an air-gapped hardware wallet that uses QR codes for communication.
-			It offers enhanced security by keeping private keys completely offline.
+			Keystone Wallet is a self-custodial hardware wallet that provides secure private
+			key storage. It uses QR codes for air-gapped transaction signing.
 		`),
 		url: 'https://keyst.one/',
 		repoUrl: 'https://github.com/KeystoneHQ',
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'keystone-pro',
+				name: 'Keystone Pro',
+				url: 'https://keyst.one/pro',
+				isFlagship: true,
+			},
+		],
 	},
 	features: {
 		profile: WalletProfile.HARDWARE,

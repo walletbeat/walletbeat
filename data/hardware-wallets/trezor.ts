@@ -26,6 +26,32 @@ export const trezorWallet: Wallet = {
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'trezor-safe-5',
+				name: 'Trezor Safe 5',
+				url: 'https://trezor.io/trezor-safe-5',
+				isFlagship: true,
+			},
+			{
+				id: 'trezor-safe-3',
+				name: 'Trezor Safe 3',
+				url: 'https://trezor.io/trezor-safe-3',
+				isFlagship: false,
+			},
+			{
+				id: 'trezor-model-one',
+				name: 'Trezor Model One',
+				url: 'https://trezor.io/trezor-model-one',
+				isFlagship: false,
+			},
+			{
+				id: 'trezor-model-t',
+				name: 'Trezor Model T',
+				url: 'https://trezor.io/trezor-model-t',
+				isFlagship: false,
+			},
+		],
 	},
 	features: {
 		profile: WalletProfile.HARDWARE,
@@ -137,3 +163,8 @@ export const trezorWallet: Wallet = {
 		hardware: true,
 	},
 }
+
+// Flagship : Trezor safe 5 : @https://trezor.io/trezor-safe-5
+// Trezor safe 3 : @https://trezor.io/trezor-safe-3
+// Trezor model one : @https://trezor.io/trezor-model-one
+// Trezor model T / @https://trezor.io/trezor-model-t

@@ -25,6 +25,38 @@ export const ledgerWallet: Wallet = {
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'ledger-stax',
+				name: 'Ledger Stax',
+				url: 'https://shop.ledger.com/products/ledger-stax',
+				isFlagship: true,
+			},
+			{
+				id: 'ledger-nano-s',
+				name: 'Ledger Nano S',
+				url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
+				isFlagship: false,
+			},
+			{
+				id: 'ledger-nano-s-plus',
+				name: 'Ledger Nano S+',
+				url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
+				isFlagship: false,
+			},
+			{
+				id: 'ledger-nano-x',
+				name: 'Ledger Nano X',
+				url: 'https://shop.ledger.com/products/ledger-nano-x',
+				isFlagship: false,
+			},
+			{
+				id: 'ledger-flex',
+				name: 'Ledger Flex',
+				url: 'https://shop.ledger.com/products/ledger-flex',
+				isFlagship: false,
+			},
+		],
 	},
 	features: {
 		profile: WalletProfile.HARDWARE,
@@ -136,3 +168,13 @@ export const ledgerWallet: Wallet = {
 		hardware: true,
 	},
 }
+
+// add entries for
+
+// For Ledger I need :
+
+// Ledger nano S : @https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device
+// Ledger nano S + :  @https://shop.ledger.com/products/ledger-nano-s-plus
+// Ledger nano X : @https://shop.ledger.com/products/ledger-nano-x
+// Ledger flex : @https://shop.ledger.com/products/ledger-flex
+// flagship : Ledger stax : @https://shop.ledger.com/products/ledger-stax

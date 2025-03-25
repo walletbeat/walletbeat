@@ -5,6 +5,7 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { firefly } from '../entities/firefly'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -12,18 +13,26 @@ import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/
 export const fireflyWallet: Wallet = {
 	metadata: {
 		id: 'firefly',
-		displayName: 'Firefly',
+		displayName: 'Firefly Wallet',
 		tableName: 'Firefly',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			Firefly is a DIY open-source hardware wallet for secure cryptocurrency management.
-			It's designed for users who want to build their own hardware wallet with full transparency and control.
+			Firefly Wallet is a hardware wallet that uses biometrics
+			for user authentication and secure private key management.
 		`),
-		url: 'https://firefly.city/',
-		repoUrl: 'https://github.com/firefly',
+		url: 'https://firefly.technology/',
+		repoUrl: null,
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
-		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
+		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'firefly-v1',
+				name: 'Firefly V1',
+				url: 'https://firefly.technology/',
+				isFlagship: true,
+			},
+		],
 	},
 	features: {
 		profile: WalletProfile.HARDWARE,

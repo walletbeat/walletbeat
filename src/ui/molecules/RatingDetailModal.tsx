@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Disabled for complex typing with attribute groups */
-import React from 'react'
-import { Modal, Button, useMediaQuery, useTheme } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import { Modal, Button, useMediaQuery, useTheme, Typography } from '@mui/material'
 import type { Theme } from '@mui/material'
 import { Rating, type AttributeGroup } from '@/schema/attributes'
 import type { EvaluationTree } from '@/schema/attribute-groups'
@@ -18,6 +18,7 @@ import { rainbow } from '@/data/wallets/rainbow'
 import { frame } from '@/data/wallets/frame'
 import { elytro } from '@/data/wallets/elytro'
 import { phantom } from '@/data/wallets/phantom'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import type { Wallet } from '@/schema/wallet'
 
 interface RatingDetailModalProps {
@@ -27,6 +28,7 @@ interface RatingDetailModalProps {
 	evalTree: EvaluationTree
 	attributeRatings: Array<{ rating: Rating; id: string }>
 	walletId?: string // Add walletId to generate links
+	modelId?: string // Add modelId for hardware wallets
 }
 
 // Helper function to get readable name for attribute IDs
@@ -99,7 +101,18 @@ function getWalletById(id?: string): Wallet | undefined {
 		phantom,
 	}
 
-	return walletMap[id]
+	// Check in regular wallets
+	if (id in walletMap) {
+		return walletMap[id]
+	}
+
+	// Check in hardware wallets
+	if (id in ratedHardwareWallets) {
+		// Type assertion to access hardware wallets
+		return (ratedHardwareWallets as any)[id]
+	}
+
+	return undefined
 }
 
 // Helper function to get references for an attribute
@@ -768,11 +781,44 @@ export function RatingDetailModal({
 	evalTree,
 	attributeRatings,
 	walletId,
+	modelId,
 }: RatingDetailModalProps): React.ReactElement {
 	const theme = useTheme()
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-	const [highlightedSlice, setHighlightedSlice] = React.useState<number | null>(null)
-	const [expandedAttribute, setExpandedAttribute] = React.useState<string | null>(null)
+	const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+	const [expandedAttribute, setExpandedAttribute] = useState<string | null>(null)
+	const [selectedModelId, setSelectedModelId] = useState<string | null>(modelId || null)
+	const [hoveredSliceIndex, setHoveredSliceIndex] = useState<number | null>(null)
+
+	// Get wallet data
+	const wallet = walletId ? getWalletById(walletId) : undefined
+
+	// Check if this is a hardware wallet
+	const isHardwareWallet =
+		wallet &&
+		walletId &&
+		ratedHardwareWallets &&
+		Object.keys(ratedHardwareWallets).includes(walletId)
+
+	// Get hardware wallet models if applicable
+	const hardwareModels = (isHardwareWallet && wallet?.metadata?.hardwareWalletModels) || []
+	const hasModels = hardwareModels.length > 0
+
+	// Get the flagship model if available
+	const flagshipModel = hasModels
+		? hardwareModels.find(model => model && model.isFlagship) || hardwareModels[0]
+		: null
+
+	// If no model is selected but we have models, default to the flagship
+	useEffect(() => {
+		if (!selectedModelId && flagshipModel && flagshipModel.id) {
+			setSelectedModelId(flagshipModel.id)
+		}
+	}, [flagshipModel, selectedModelId])
+
+	// Handle model selection change
+	const handleModelChange = (modelId: string) => {
+		setSelectedModelId(modelId)
+	}
 
 	// Calculate overall score
 	let overallScore = 0
@@ -843,14 +889,16 @@ export function RatingDetailModal({
 					stroke="#ffffff"
 					strokeWidth="2"
 					style={{
-						opacity: highlightedSlice === null || highlightedSlice === i ? 1 : 0.4,
+						opacity: hoveredSliceIndex === null || hoveredSliceIndex === i ? 1 : 0.4,
 						transition: 'opacity 0.2s ease-in-out',
 						cursor: 'pointer',
 					}}
 					onMouseEnter={() => {
-						handleMouseEnter(i)
+						setHoveredSliceIndex(i)
 					}}
-					onMouseLeave={handleMouseLeave}
+					onMouseLeave={() => {
+						setHoveredSliceIndex(null)
+					}}
 				/>,
 			)
 		}
@@ -858,34 +906,85 @@ export function RatingDetailModal({
 		return slices
 	}
 
-	// Handlers for hover events
-	const handleMouseEnter = (index: number): void => {
-		setHighlightedSlice(index)
-	}
-
-	const handleMouseLeave = (): void => {
-		setHighlightedSlice(null)
-	}
-
 	// Toggle expanded state for an attribute
 	const toggleExpandedAttribute = (attributeId: string): void => {
 		setExpandedAttribute(expandedAttribute === attributeId ? null : attributeId)
 	}
 
+	// Add the model selector component
+	const modelSelector = hasModels ? (
+		<div className="mb-4">
+			<Typography variant="subtitle2" className="mb-2">
+				Select Device Model:
+			</Typography>
+			<div className="flex flex-wrap gap-2">
+				{hardwareModels.map(model => (
+					<Button
+						key={model.id}
+						variant={selectedModelId === model.id ? 'contained' : 'outlined'}
+						size="small"
+						onClick={() => handleModelChange(model.id)}
+						sx={{
+							borderRadius: '16px',
+							textTransform: 'none',
+							fontSize: '0.75rem',
+							backgroundColor: selectedModelId === model.id ? 'primary.main' : 'transparent',
+							'&:hover': {
+								backgroundColor:
+									selectedModelId === model.id ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+							},
+						}}
+					>
+						{model.name}
+						{model.isFlagship && (
+							<span style={{ marginLeft: '4px', fontSize: '0.65rem' }}>(Flagship)</span>
+						)}
+					</Button>
+				))}
+			</div>
+		</div>
+	) : null
+
 	return (
-		<Modal open={open} onClose={onClose} aria-labelledby="rating-detail-modal-title">
-			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] max-w-[95vw] max-h-[90vh] overflow-auto bg-white dark:bg-[#292C34] text-[#292C34] dark:text-[#FAFDFF] shadow-2xl rounded-lg p-6 sm:p-4">
-				<div className="flex justify-between items-center mb-6">
-					<h2 className="text-xl font-medium" id="rating-detail-modal-title">
-						{attrGroup.displayName} - {Math.round(overallScore * 100)}% Overall
-					</h2>
-					<Button onClick={onClose} variant="outlined" size="small">
+		<Modal
+			open={open}
+			onClose={onClose}
+			className="flex items-center justify-center overflow-y-auto"
+		>
+			<div className="bg-white dark:bg-gray-800 rounded-lg p-4 max-w-[90vw] md:max-w-2xl max-h-[90vh] overflow-y-auto">
+				<div className="flex justify-between items-center mb-4">
+					<Typography variant="h6" className="dark:text-gray-100 font-bold">
+						{attrGroup.displayName} Details
+					</Typography>
+					<Button
+						variant="outlined"
+						size="small"
+						onClick={onClose}
+						className="dark:text-gray-200 dark:border-gray-500"
+					>
 						Close
 					</Button>
 				</div>
 
+				{/* Add the model selector if we have hardware wallet models */}
+				{modelSelector}
+
+				<div className="flex justify-between items-center mb-6">
+					<h2 className="text-xl font-medium" id="rating-detail-modal-title">
+						{attrGroup.displayName} - {Math.round(overallScore * 100)}% Overall
+						{selectedModelId && hasModels && (
+							<span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+								{hardwareModels.find(m => m && m.id === selectedModelId)?.name || ''}
+								{hardwareModels.find(m => m && m.id === selectedModelId)?.isFlagship && (
+									<span className="ml-1 text-purple-500 dark:text-purple-400">(Flagship)</span>
+								)}
+							</span>
+						)}
+					</h2>
+				</div>
+
 				<div
-					className={`flex ${isMobile ? 'flex-col items-center' : 'flex-row items-start'} gap-4`}
+					className={`flex ${isSmallScreen ? 'flex-col items-center' : 'flex-row items-start'} gap-4`}
 				>
 					{/* Chart */}
 					<div className="w-[280px] h-[280px] flex-shrink-0 rounded p-1">
@@ -913,14 +1012,16 @@ export function RatingDetailModal({
 										<div key={attr.id} className="mb-2">
 											<div
 												className={`flex items-center p-2 rounded cursor-pointer text-sm ${
-													highlightedSlice === index
+													hoveredSliceIndex === index
 														? 'bg-gray-200 dark:bg-gray-700'
 														: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
 												}`}
 												onMouseEnter={() => {
-													handleMouseEnter(index)
+													setHoveredSliceIndex(index)
 												}}
-												onMouseLeave={handleMouseLeave}
+												onMouseLeave={() => {
+													setHoveredSliceIndex(null)
+												}}
 												onClick={() => toggleExpandedAttribute(attr.id)}
 											>
 												<div
