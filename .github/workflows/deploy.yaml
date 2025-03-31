@@ -33,3 +33,12 @@ jobs:
           token: ${{ secrets.EDGE_TOKEN }}
           directory: dist
           context: true
+      # Edgeserver v0.2 Upload
+      - name: Edgeserver v0.2 Upload
+        uses: v3xlabs/edgeserver-upload@v0.2.1-pre.4
+        with:
+          site_id: s_305c36a033
+          server: https://edgeserver.dev/api
+          token: ${{ secrets.EDGE_TOKEN2 }}
+          directory: dist
+          context: true
