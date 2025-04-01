@@ -26,7 +26,7 @@
 
 
 	// Components
-	import WalletRating from '@/components/ui/molecules/WalletRating.svelte'
+	import WalletAttributeGroupRating from '@/components/ui/molecules/WalletAttributeGroupRating.svelte'
 	import Table from '@/components/ui/atoms/Table.svelte'
 
 	import PhoneAndroidIcon from '@material-icons/svg/svg/phone_android/baseline.svg?raw'
@@ -129,7 +129,7 @@
 			{@const evalGroup = wallet.overall[attrGroup.id]}
 			{@const groupScore = value}
 
-			<WalletRating
+			<WalletAttributeGroupRating
 				{wallet}
 				{attrGroup}
 				{evalGroup}
