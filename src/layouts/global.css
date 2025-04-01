@@ -38,6 +38,10 @@
 	transition-behavior: allow-discrete;
 }
 
+[hidden] {
+	display: none !important;
+}
+
 .stack {
 	display: grid;
 	grid: "stack";

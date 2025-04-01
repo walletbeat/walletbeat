@@ -25,9 +25,18 @@
 	let walletTableState = new WalletTableState()
 
 
+	// Functions
+	import { variantUrlQuery } from '@/components/variants'
+	import { isLabeledUrl } from '@/schema/url'
+
+
 	// Components
 	import WalletAttributeGroupRating from '@/components/ui/molecules/WalletAttributeGroupRating.svelte'
 	import Table from '@/components/ui/atoms/Table.svelte'
+	import Typography from '@/components/ui/atoms/Typography.svelte'
+
+	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
+	import OpenInNewRoundedIcon from '@material-icons/svg/svg/open_in_new//baseline.svg?raw'
 
 	import PhoneAndroidIcon from '@material-icons/svg/svg/phone_android/baseline.svg?raw'
 	import LanguageIcon from '@material-icons/svg/svg/language/baseline.svg?raw'
@@ -107,7 +116,7 @@
 								.map(([variant]) => variant)
 						) as variant}
 							<button
-								class:selected={!walletTableState.selectedVariant || variant === walletTableState.selectedVariant}
+								data-selected={variant === walletTableState.selectedVariant ? '' : undefined}
 								onclick={e => {
 									e.stopPropagation()
 									walletTableState.selectVariant(variant as Variant)
@@ -121,6 +130,52 @@
 								</span>
 							</button>
 						{/each}
+					</div>
+				</div>
+
+				<div
+					class="expanded-content column"
+					hidden={!isExpanded}
+				>
+					{#if !walletTableState.selectedVariant || wallet.variants[walletTableState.selectedVariant]}
+						<p class="blurb">
+							<Typography
+								renderable={wallet.metadata.blurb}
+							/>
+						</p>
+					{:else}
+						<p class="blurb">
+							{wallet.metadata.displayName} does not have a {walletTableState.selectedVariant} version.
+						</p>
+					{/if}
+					
+					<div class="links">
+						<a
+							href={`/wallets/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, walletTableState.selectedVariant)}`}
+							class="info-link"
+						>
+							<span class="icon">{@html InfoIcon}</span>
+							Learn more
+						</a>
+						|
+						<a
+							href={isLabeledUrl(wallet.metadata.url) ? wallet.metadata.url.url : wallet.metadata.url}
+							target="_blank"
+							class="external-link"
+						>
+							{wallet.metadata.displayName} website
+						</a>
+						{#if wallet.metadata.repoUrl}
+							|
+							<a
+								href={isLabeledUrl(wallet.metadata.repoUrl) ? wallet.metadata.repoUrl.url : wallet.metadata.repoUrl}
+								target="_blank"
+								class="external-link"
+							>
+								Code
+								<span class="icon">{@html OpenInNewRoundedIcon}</span>
+							</a>
+						{/if}
 					</div>
 				</div>
 			</div>
@@ -151,16 +206,79 @@
 		font-size: 1.1em;
 	}
 
-	img {
-		filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
-		width: auto;
-		height: 1.66rem;
-		vertical-align: middle;
-	}
+	.wallet-name-cell {
+		transition-property: gap;
 
-	.variants {
-		:global(svg) {
-			fill: currentColor;
+		&:not([data-is-expanded]) {
+			gap: 0;
+		}
+
+		.wallet-name-title {
+			min-height: 4rem;
+
+			img {
+				filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
+				width: auto;
+				height: 1.66rem;
+				vertical-align: middle;
+			}
+
+			.variants {
+				gap: 0.1em;
+
+				button {
+					all: unset;
+					cursor: pointer;
+
+					display: inline-flex;
+					place-items: center;
+					aspect-ratio: 1;
+					padding: 0.33em;
+					border-radius: 50%;
+
+					transition-property: background-color, opacity;
+					transition-duration: inherit;
+					transition-timing-function: inherit;
+
+					&[data-selected] {
+						background-color: rgba(255, 255, 255, 0.1);
+						box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.33);
+					}
+
+					&:focus {
+						background-color: rgba(255, 255, 255, 0.15);
+					}
+
+					&:hover {
+						background-color: rgba(255, 255, 255, 0.2);
+					}
+
+					.variants:has([data-selected]) &:not([data-selected]) {
+						opacity: 0.5;
+					}
+				}
+
+				:global(svg) {
+					fill: currentColor;
+				}
+			}
+		}
+
+		.expanded-content {
+			font-size: 0.64em;
+			max-width: 40ch;
+
+			overflow: hidden;
+			transition-property: height, display;
+
+			&[hidden] {
+				height: 0;
+			}
+
+			p {
+				width: 0;
+				min-width: 100%;
+			}
 		}
 	}
 </style>
