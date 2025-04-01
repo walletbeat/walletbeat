@@ -12,17 +12,27 @@
 
 	// Inputs
 	let {
+		columns,
+		defaultSort,
 		rows,
 		getId,
-		columns,
 		cellSnippet,
 		columnCellSnippet,
 		onRowClick,
 		...restProps
 	}: {
+		columns: (
+			& ColumnDef<Datum, CellValue>
+			// & {
+			// 	sorter?: (a: CellValue, b: CellValue, rowA: Datum, rowB: Datum, direction: SortDirection) => number
+			// }
+		)[]
+		defaultSort?: {
+			columnId: NonNullable<ConstructorParameters<typeof DataTable<Datum>>[0]['initialSort']>
+			direction: NonNullable<ConstructorParameters<typeof DataTable<Datum>>[0]['initialSortDirection']>
+		}
 		rows: Datum[]
 		getId?: (row: Datum, index: number) => any
-		columns: ColumnDef<Datum, CellValue>[]
 		cellSnippet?: Snippet<[{
 			row: Datum
 			column: ColumnDef<Datum, CellValue>
@@ -36,18 +46,64 @@
 
 
 	// State
+	const defaultSorter = (a, b) => (
+		typeof a === 'number' ?
+			a - b
+		:
+			String(a).localeCompare(String(b))
+	)
+
 	let table = $state(
 		new DataTable<Datum>({
 			data: rows,
 			columns,
+			initialSort: defaultSort?.columnId,
+			initialSortDirection: defaultSort?.direction,
 		})
 	)
 
 	$effect(() => {
 		table = new DataTable<Datum>({
 			data: rows,
-			columns,
+
+			columns: columns.map(column => ({
+				...column,
+				sorter: (a: CellValue, b: CellValue, rowA: Datum, rowB: Datum) => {
+					const direction = $state.snapshot(table.sortState).direction
+
+					const isRowADisplaced = displaceDisabledRows && getDisabled?.($state.snapshot(rowA), $state.snapshot(table))
+					const isRowBDisplaced = displaceDisabledRows && getDisabled?.($state.snapshot(rowB), $state.snapshot(table))
+
+					return (
+						isRowADisplaced && isRowBDisplaced ?
+							0
+						: isRowADisplaced ?
+							direction === 'asc' ? 1 : -1
+						: isRowBDisplaced ?
+							direction === 'asc' ? -1 : 1
+						:
+							(
+								column.sorter
+								?? defaultSorter
+							)(a, b, rowA, rowB)
+					)
+				},
+			})),
+
+			initialSort: defaultSort?.columnId,
+			initialSortDirection: defaultSort?.direction,
 		})
+	})
+
+	$effect(() => {
+		if(defaultSort && !table.sortState.direction){
+			// table.sortState = defaultSort
+
+			table.toggleSort(defaultSort.columnId)
+
+			if(table.sortState.direction !== defaultSort.direction)
+				table.toggleSort(defaultSort.columnId)
+		}
 	})
 
 
