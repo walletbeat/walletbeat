@@ -17,6 +17,10 @@
 
 
 <script lang="ts">
+	// Types
+	import type { Snippet } from 'svelte'
+
+
 	// Props
 	let {
 		// Content
@@ -39,6 +43,8 @@
 		onSliceClick,
 		onSliceMouseEnter,
 		onSliceMouseLeave,
+		onSliceFocus,
+		onSliceBlur,
 
 		// Snippets
 		centerContentSnippet,
@@ -63,6 +69,8 @@
 		onSliceClick?: (id: string) => void
 		onSliceMouseEnter?: (id: string) => void
 		onSliceMouseLeave?: (id: string) => void
+		onSliceFocus?: (id: string) => void
+		onSliceBlur?: (id: string) => void
 
 		// Snippets
 		centerContentSnippet?: Snippet
@@ -192,14 +200,17 @@
 		data-slice-id={slice.id}
 		role="button"
 		tabindex="0"
-		onmouseenter={() => onSliceMouseEnter?.(slice.id)}
-		onmouseleave={() => onSliceMouseLeave?.(slice.id)}
+		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
+		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
+		onfocus={() => { onSliceFocus?.(slice.id) }}
+		onblur={() => { onSliceBlur?.(slice.id) }}
 		onclick={e => {
 			e.stopPropagation()
 			onSliceClick?.(slice.id)
 		}}
 		onkeydown={e => {
 			if (e.code === 'Enter' || e.code === 'Space'){
+				e.preventDefault()
 				e.stopPropagation()
 				onSliceClick?.(slice.id)
 			}

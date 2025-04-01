@@ -2,14 +2,11 @@
 	_ValueSet extends ValueSet = ValueSet
 ">
 	// Types/constants
-	import type { EvaluationTree } from '@/schema/attribute-groups'
 	import {
 		type AttributeGroup,
 		type EvaluatedGroup,
 		type ValueSet,
-		type EvaluatedAttribute,
 		Rating,
-		type Value,
 		evaluatedAttributesEntries,
 		ratingToIcon,
 		ratingToColor,
@@ -18,9 +15,8 @@
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { slugifyCamelCase } from '@/types/utils/text'
 	import { betaSiteRoot } from '@/constants'
+	import type { Variant } from '@/schema/variants'
 	import { variantToName, variantUrlQuery } from '../../variants'
-	import Pie from '../atoms/Pie.svelte'
-	import type { WalletTableState } from '../organisms/WalletTable.svelte'
 	import type { MaybeUnratedScore } from '@/schema/score'
 
 
@@ -30,25 +26,24 @@
 		attrGroup,
 		evalGroup,
 		groupScore,
-		tableState = $bindable(null as WalletTableState | null),
-		rowId = null
+		selectedEvaluationAttribute = $bindable(),
+		selectedVariant = $bindable(),
+		isExpanded = false,
+		toggleExpanded,
 	}: {
 		wallet: RatedWallet
 		attrGroup: AttributeGroup<_ValueSet>
 		evalGroup: EvaluatedGroup<_ValueSet>
 		groupScore: MaybeUnratedScore
-		tableState?: WalletTableState | null
-		rowId?: string | null
+		selectedEvaluationAttribute?: string,
+		selectedVariant?: Variant,
+		isExpanded?: boolean
+		toggleExpanded?: (id: string) => void
 	} = $props()
 
 
 	// State
-	let highlightedSlice = $state<
-		{
-			evalAttrId: string,
-			sticky: boolean
-		} | null
-	>(null)
+	let activeEvaluationAttribute: string | undefined = $state(undefined)
 
 	let evalEntries = $derived(
 		evaluatedAttributesEntries(evalGroup)
@@ -57,66 +52,30 @@
 			))
 	)
 
-	let highlightedEvalAttr = $derived(
-		highlightedSlice !== null ?
-			evalGroup[highlightedSlice.evalAttrId]
+	let currentEvaluationAttribute = $derived(
+		activeEvaluationAttribute ?
+			evalGroup[activeEvaluationAttribute]
+		: selectedEvaluationAttribute ?
+			evalGroup[selectedEvaluationAttribute]
 		:
-			null 
+			undefined
 	)
 
-	// Actions
-	const onSliceClick = (evalAttrId: string) => {
-		if (highlightedSlice === null) {
-			// First click on any slice, create a new highlight
-			highlightedSlice = {
-				evalAttrId,
-				sticky: true
-			}
-		} else if (highlightedSlice.evalAttrId !== evalAttrId) {
-			// Clicking on a different slice, update the highlight
-			highlightedSlice = {
-				evalAttrId,
-				sticky: true
-			}
-		} else {
-			// Clicking on the same slice, toggle sticky state
-			highlightedSlice = {
-				evalAttrId,
-				sticky: !highlightedSlice.sticky
-			}
-		}
-		// In either case, expand the row
-		if (tableState?.expandedRowIds && rowId) {
-			tableState.expandedRowIds.add(rowId)
-		}
-	}
 
-	const onSliceMouseEnter = (evalAttrId: string) => {
-		if (highlightedSlice === null) {
-			// First to be focused
-			highlightedSlice = {
-				evalAttrId,
-				sticky: false
-			}
-		}
-	}
-
-	const onSliceMouseLeave = (evalAttrId: string) => {
-		if (highlightedSlice !== null && 
-			!highlightedSlice.sticky && 
-			highlightedSlice.evalAttrId === evalAttrId) {
-			highlightedSlice = null
-		}
-	}
+	// Componnets
+	import Pie from '../atoms/Pie.svelte'
+	import Typography from '../atoms/Typography.svelte'
+	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 </script>
 
+
 <div 
-	class="wallet-rating-cell" 
+	class="container column"
 	role="button"
 	tabindex="0"
 >
 	<!-- Rating Pie Chart -->
-	{#if groupScore === null || !isNonEmptyArray(evalEntries)}
+	{#if groupScore === undefined || !isNonEmptyArray(evalEntries)}
 		<div>N/A</div>
 	{:else}
 		<Pie
@@ -128,27 +87,23 @@
 					evalEntries,
 					([evalAttrId, evalAttr]) => {
 						const icon = evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon
-						const tooltipSuffix: string = (() => {
-							if (
-								!tableState?.variantSelected ||
-								wallet.variants[tableState.variantSelected] === undefined
-							) {
-								return ''
-							}
-							switch (
-								attributeVariantSpecificity(wallet, tableState.variantSelected, evalAttr.attribute)
-							) {
-								case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
-									return ''
-								case VariantSpecificity.ALL_SAME:
-									return ''
-								case VariantSpecificity.EXEMPT_FOR_THIS_VARIANT:
-									return ''
-								case VariantSpecificity.UNIQUE_TO_VARIANT:
-									return ` (${variantToName(tableState.variantSelected, false)} only)`
-								case VariantSpecificity.NOT_UNIVERSAL:
-									return ` (${variantToName(tableState.variantSelected, false)} specific)`
-							}
+
+						const tooltipSuffix = (() => {
+							const variant = selectedVariant
+
+							if(!variant || !wallet.variants[variant])
+								return
+
+							const specificity = attributeVariantSpecificity(wallet, variant, evalAttr.attribute)
+
+							return (
+								specificity === VariantSpecificity.UNIQUE_TO_VARIANT ?
+									` (${variantToName(variant, false)} only)`
+								: specificity === VariantSpecificity.NOT_UNIVERSAL ?
+									` (${variantToName(variant, false)} specific)`
+								:
+									undefined
+							)
 						})()
 						
 						return {
@@ -162,126 +117,131 @@
 					}
 				)
 			}
-			highlightedSliceId={highlightedSlice?.evalAttrId}
+			highlightedSliceId={currentEvaluationAttribute?.attribute.id}
 			centerLabel={groupScore ? (groupScore.hasUnratedComponent ? ratingToIcon(Rating.UNRATED) : groupScore.score <= 0.0 ? '\u{1f480}' : groupScore.score >= 1.0 ? '\u{1f4af}' : (groupScore.score * 100).toFixed(0)) : '❓'}
-			onSliceClick={onSliceClick}
-			onSliceMouseEnter={onSliceMouseEnter}
-			onSliceMouseLeave={onSliceMouseLeave}
+
+			onSliceClick={id => {
+				selectedEvaluationAttribute = activeEvaluationAttribute = (
+					selectedEvaluationAttribute === id ? undefined : id
+				)
+
+				if (!isExpanded)
+					toggleExpanded?.(wallet.metadata.id)
+			}}
+			onSliceMouseEnter={id => {
+				activeEvaluationAttribute = id
+			}}
+			onSliceMouseLeave={id => {
+				if (activeEvaluationAttribute === id)
+					activeEvaluationAttribute = undefined
+			}}
+			onSliceFocus={id => {
+				activeEvaluationAttribute = id
+			}}
+			onSliceBlur={id => {
+				if (activeEvaluationAttribute === id)
+					activeEvaluationAttribute = undefined
+			}}
 		/>
 	{/if}
-	
-	<!-- Expanded Details -->
-	{#if tableState?.expandedRowIds?.has(rowId ?? '')}
-		<div class="expanded-details">
-			{#if highlightedEvalAttr === null}
-				<!-- Group Information -->
-				<h3 class="group-title">{attrGroup.icon} {attrGroup.displayName}</h3>
-				<p class="group-description">
-					{#if typeof attrGroup.perWalletQuestion.render === 'function'}
-						{attrGroup.perWalletQuestion.render(wallet.metadata)}
-					{:else}
-						{attrGroup.perWalletQuestion}
+
+	<div
+		class="details column"
+		hidden={!isExpanded}
+	>
+		{#if !currentEvaluationAttribute}
+			<h3>
+				{attrGroup.icon} {attrGroup.displayName}
+			</h3>
+
+			<p>
+				<Typography
+					renderable={attrGroup.perWalletQuestion}
+					context={wallet.metadata}	
+				/>
+			</p>
+		{:else if currentEvaluationAttribute?.evaluation?.value}
+			<h4>
+				{currentEvaluationAttribute.evaluation.value.icon ?? currentEvaluationAttribute.attribute.icon} {currentEvaluationAttribute.attribute.displayName}
+			</h4>
+
+			<p>
+				{#if typeof currentEvaluationAttribute.evaluation.value.shortExplanation?.render === 'function'}
+					{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
+
+					<Typography
+						renderable={currentEvaluationAttribute.evaluation.value.shortExplanation}
+						context={wallet.metadata}
+					/>
+
+					{#if selectedVariant && wallet.variants[selectedVariant]}
+						{@const specificity = attributeVariantSpecificity(wallet, selectedVariant, currentEvaluationAttribute.attribute)}
+
+						{#if specificity === VariantSpecificity.NOT_UNIVERSAL}
+							This is the case on the {variantToName(selectedVariant, false)} version.
+
+						{:else if specificity === VariantSpecificity.UNIQUE_TO_VARIANT}
+							This is only the case on the {variantToName(selectedVariant, false)} version.
+						{/if}
 					{/if}
-				</p>
-			{:else}
-				<!-- Attribute Information -->
-				<h4 class="attribute-title">
-					{highlightedEvalAttr.evaluation.value.icon ?? highlightedEvalAttr.attribute.icon} {highlightedEvalAttr.attribute.displayName}
-				</h4>
-				<p class="attribute-description">
-					{#if typeof highlightedEvalAttr.evaluation.value.shortExplanation.render === 'function'}
-						{@const explanation = highlightedEvalAttr.evaluation.value.shortExplanation.render(wallet.metadata)}
-						{@const suffix = (() => {
-							if (
-								!tableState?.variantSelected ||
-								wallet.variants[tableState.variantSelected] === undefined
-							) {
-								return ''
-							}
-							switch (
-								attributeVariantSpecificity(wallet, tableState.variantSelected, highlightedEvalAttr.attribute)
-							) {
-								case VariantSpecificity.ALL_SAME:
-								case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
-								case VariantSpecificity.EXEMPT_FOR_THIS_VARIANT:
-									return ''
-								case VariantSpecificity.NOT_UNIVERSAL:
-									return ` This is the case on the ${variantToName(tableState.variantSelected, false)} version.`
-								case VariantSpecificity.UNIQUE_TO_VARIANT:
-									return ` This is only the case on the ${variantToName(tableState.variantSelected, false)} version.`
-							}
-						})()}
-						{ratingToIcon(highlightedEvalAttr.evaluation.value.rating)} {explanation}{suffix}
-					{:else}
-						{ratingToIcon(highlightedEvalAttr.evaluation.value.rating)} {highlightedEvalAttr.evaluation.value.shortExplanation}
-					{/if}
-				</p>
-				
-				<!-- Learn More Link -->
-				<div class="learn-more-container">
-					<a 
-						href="{betaSiteRoot}/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, tableState?.variantSelected ?? null)}#{slugifyCamelCase(highlightedEvalAttr.attribute.id)}"
-						class="learn-more-link"
-					>
-						<svg viewBox="0 0 24 24" width="16" height="16">
-							<path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-						</svg>
-						Learn more
-					</a>
-				</div>
-			{/if}
-		</div>
-	{/if}
+				{:else if currentEvaluationAttribute.evaluation.value.shortExplanation}
+					{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
+
+					<Typography
+						renderable={currentEvaluationAttribute.evaluation.value.shortExplanation}
+						context={wallet.metadata}
+					/>
+				{/if}
+			</p>
+
+			<a 
+				href="{betaSiteRoot}/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, selectedVariant)}#{slugifyCamelCase(currentEvaluationAttribute.attribute.id)}"
+			>
+				<span class="icon">{@html InfoIcon}</span>
+				Learn more
+			</a>
+		{/if}
+	</div>
 </div>
 
+
 <style>
-	.wallet-rating-cell {
-		width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 4px;
+	.container {
+		justify-items: center;
+		align-content: start;
+		gap: 1em;
 	}
 	
-	.expanded-details {
-		height: calc(var(--expanded-row-height, 200px) - 40px);
-		display: flex;
-		flex-direction: column;
+	.details {
+		display: grid;
+		/* grid-template-columns: minmax(0, 32ch); */
+		max-width: 32ch;
+		justify-items: center;
+		align-content: start;
+
+
 		line-height: 1;
-		gap: 4px;
-		white-space: normal;
-	}
-	
-	.group-title, .attribute-title {
-		white-space: nowrap;
-		margin: 0;
-	}
-	
-	.group-title {
-		font-size: 1.2rem;
-	}
-	
-	.attribute-title {
-		font-size: 1.1rem;
-	}
-	
-	.group-description, .attribute-description {
-		margin: 0;
-		font-size: 0.9rem;
-	}
-	
-	.learn-more-container {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-	}
-	
-	.learn-more-link {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		text-decoration: none;
-		color: inherit;
+		text-align: center;
+
+		font-size: 0.8em;
+
+		h3 {
+			margin: 0;
+			font-size: 1em;
+		}
+		
+		h4 {
+			margin: 0;
+			font-size: 1.1em;
+		}
+		
+		p {
+			margin: 0;
+			font-size: 0.9em;
+
+			width: 0;
+			min-width: 100%;
+		}
 	}
 </style>
+

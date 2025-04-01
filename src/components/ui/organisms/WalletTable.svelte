@@ -1,11 +1,3 @@
-<script module lang="ts">
-	export type WalletTableState = {
-		variantSelected: Variant | undefined
-		expandedRowIds: Set<string>
-	}
-</script>
-
-
 <script lang="ts">
 	// Types/constants
 	import { Variant } from '@/schema/variants'
@@ -28,10 +20,9 @@
 
 
 	// State
-	let tableState = $state<WalletTableState>({
-		variantSelected: undefined,
-		expandedRowIds: new Set<string>()
-	})
+	import { WalletTableState } from '../WalletTableState.svelte'
+
+	let walletTableState = new WalletTableState()
 
 
 	// Components
@@ -80,10 +71,7 @@
 		),
 	]}
 	onRowClick={({ id }) => {
-		if(tableState.expandedRowIds.has(id))
-			tableState.expandedRowIds.delete(id)
-		else
-			tableState.expandedRowIds.add(id)
+		walletTableState.toggleRowExpanded(id)
 	}}
 	class="wallet-table"
 >
@@ -92,30 +80,48 @@
 		column,
 		value,
 	})}
-		{#if column.key === 'displayName'}
+		{@const isExpanded = walletTableState.isRowExpanded(wallet.metadata.id)}
+
+		{#if column.id === 'displayName'}
 			{@const displayName = value}
 
-			<div class="row">
-				<div class="row">
-					<img
-						alt={displayName}
-						src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-						width="16"
-						height="16"
-					/>
-					{displayName}
-				</div>
+			<div
+				class="wallet-name-cell column"
+				data-is-expanded={isExpanded ? '' : undefined}
+			>
+				<div class="wallet-name-title row">
+					<div class="row">
+						<img
+							alt={displayName}
+							src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+							width="16"
+							height="16"
+						/>
+						{displayName}
+					</div>
 
-				<div class="variants row inline">
-					{#each (
-						Object.entries(wallet.variants)
-							.filter(([, hasVariant]) => hasVariant)
-							.map(([variant]) => variant)
-					) as variant}
-						<span title={variant}>
-							{@html variantIcons[variant]}
-						</span>
-					{/each}
+					<div class="variants row inline">
+						{#each (
+							Object.entries(wallet.variants)
+								.filter(([, hasVariant]) => hasVariant)
+								.map(([variant]) => variant)
+						) as variant}
+							<button
+								class:selected={!walletTableState.selectedVariant || variant === walletTableState.selectedVariant}
+								onclick={e => {
+									e.stopPropagation()
+									walletTableState.selectVariant(variant as Variant)
+								}}
+							>
+								<span
+									class="icon"
+									title={variant}
+								>
+									{@html variantIcons[variant]}
+								</span>
+							</button>
+						{/each}
+					</div>
 				</div>
 			</div>
 		{:else}
@@ -128,8 +134,12 @@
 				{attrGroup}
 				{evalGroup}
 				{groupScore}
-				bind:tableState
-				rowId={wallet.metadata.id}
+				bind:selectedEvaluationAttribute={walletTableState.selectedEvaluationAttribute}
+				bind:selectedVariant={walletTableState.selectedVariant}
+				{isExpanded}
+				toggleExpanded={id => {
+					walletTableState.toggleRowExpanded(id)
+				}}
 			/>
 		{/if}
 	{/snippet}
