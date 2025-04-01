@@ -53,11 +53,6 @@
 
 
 <Table
-	rows={
-		Object.entries(ratedWallets)
-			.map(([id, wallet]) => ({ id, wallet }))
-	}
-	getId={({ id }) => id}
 	columns={[
 		{
 			id: 'displayName',
@@ -79,6 +74,15 @@
 				}))
 		),
 	]}
+	defaultSort={{
+		columnId: 'displayName',
+		direction: 'asc',
+	}}
+	rows={
+		Object.entries(ratedWallets)
+			.map(([id, wallet]) => ({ id, wallet }))
+	}
+	getId={({ id }) => id}
 	onRowClick={({ id }) => {
 		walletTableState.toggleRowExpanded(id)
 	}}
