@@ -24,12 +24,18 @@
 	--active-opacity: 0.8;
 
 	scroll-behavior: smooth;
+
+	transition-duration: 0.2s;
+	transition-timing-function: var(--transition-easeOutExpo);
 }
 
 * {
 	font-family: 'Work Sans', 'Work Sans Fallback', 'Noto Color Emoji';
 	margin: 0;
 	text-box-trim: trim-both;
+	transition-duration: inherit;
+	transition-timing-function: inherit;
+	transition-behavior: allow-discrete;
 }
 
 .stack {
