@@ -28,6 +28,8 @@
 
 * {
 	font-family: 'Work Sans', 'Work Sans Fallback', 'Noto Color Emoji';
+	margin: 0;
+	text-box-trim: trim-both;
 }
 
 .stack {
