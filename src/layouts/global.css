@@ -58,6 +58,10 @@
 	grid-template-columns: minmax(0, 1fr);
 	gap: 1rem;
 	align-content: start;
+
+	&.inline {
+		gap: 0.25rem;
+	}
 }
 
 .row {
