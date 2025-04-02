@@ -35,6 +35,9 @@
 	import Table from '@/components/ui/atoms/Table.svelte'
 	import Typography from '@/components/ui/atoms/Typography.svelte'
 
+	import UnfoldLessIcon from '@material-icons/svg/svg/unfold_less/baseline.svg?raw'
+	import UnfoldMoreIcon from '@material-icons/svg/svg/unfold_more/baseline.svg?raw'
+
 	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 	import OpenInNewRoundedIcon from '@material-icons/svg/svg/open_in_new//baseline.svg?raw'
 
@@ -116,6 +119,14 @@
 			>
 				<div class="wallet-name-title row">
 					<div class="row">
+						<span class="icon">
+							{#if isExpanded}
+								{@html UnfoldLessIcon}
+							{:else}
+								{@html UnfoldMoreIcon}
+							{/if}
+						</span>
+
 						<img
 							alt={displayName}
 							src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
