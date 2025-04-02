@@ -16,6 +16,7 @@
 		defaultSort,
 		rows,
 		getId,
+		getDisabled,
 		cellSnippet,
 		columnCellSnippet,
 		onRowClick,
@@ -33,6 +34,7 @@
 		}
 		rows: Datum[]
 		getId?: (row: Datum, index: number) => any
+		getDisabled: (row: Datum, table: DataTable<Datum>) => boolean
 		cellSnippet?: Snippet<[{
 			row: Datum
 			column: ColumnDef<Datum, CellValue>
@@ -175,6 +177,7 @@
 						}
 					}}
 					animate:flip={{ duration: 300, easing: expoOut }}
+					data-disabled={getDisabled?.(row, table) ? '' : undefined}
 				>
 					{#each table.columns as column (column.id)}
 						{@const value = column.getValue?.(row)}
@@ -335,6 +338,11 @@
 							scale: 0.9;
 						}
 					}
+				}
+
+				&[data-disabled] {
+					filter: grayscale();
+					opacity: 0.3;
 				}
 			}
 		}
