@@ -98,6 +98,10 @@
 			.map(([id, wallet]) => ({ id, wallet }))
 	}
 	getId={({ id }) => id}
+	getDisabled={(row, table) => (
+		(walletTableState.selectedVariant && !(walletTableState.selectedVariant in row.wallet.variants))
+		|| (table.sortState.direction && table.columns.find(column => column.id === table.sortState.columnId)?.getValue?.(row) === undefined)
+	)}
 	onRowClick={({ id }) => {
 		walletTableState.toggleRowExpanded(id)
 	}}
