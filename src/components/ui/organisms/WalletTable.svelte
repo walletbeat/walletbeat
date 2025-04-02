@@ -218,7 +218,7 @@
 		{:else}
 			{@const attrGroup = attributeGroups[column.id]}
 			{@const evalGroup = wallet.overall[attrGroup.id]}
-			{@const groupScore = value}
+			{@const groupScore = attrGroup.score(wallet.overall[attrGroup.id])}
 
 			<WalletAttributeGroupRating
 				{wallet}
