@@ -63,7 +63,7 @@ export const ambire: Wallet = {
 		id: 'ambire',
 		displayName: 'Ambire',
 		tableName: 'Ambire',
-		iconExtension: 'png',
+		iconExtension: 'svg',
 		blurb: paragraph(`
 			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
 			improving security and user experience.
