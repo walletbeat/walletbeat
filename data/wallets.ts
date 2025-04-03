@@ -12,6 +12,7 @@ import { ambire } from './wallets/ambire'
 
 /** Set of all known wallets. */
 export const wallets = {
+	ambire,
 	coinbase,
 	daimo,
 	elytro,
@@ -21,7 +22,6 @@ export const wallets = {
 	rabby,
 	rainbow,
 	safe,
-	ambire,
 }
 
 /** A valid wallet name. */
