@@ -2,18 +2,34 @@
 // Constants
 import { wallets } from '@/data/wallets'
 import { hardwareWallets } from '@/data/hardware-wallets'
-
+import { ratedWallets } from '@/data/wallets'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
 
 // Layouts
 import Layout from '../layouts/Layout.astro'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 
 // Components
-// import { LuKey, LuWallet } from 'react-icons/lu'
 import LuKey from 'lucide-static/icons/key.svg?raw'
 import LuWallet from 'lucide-static/icons/wallet.svg?raw'
 import { navigationAbout, navigationCriteria } from '@/components/navigation'
 import WalletTable from '@/ui/organisms/WalletTable.svelte'
+
+import {
+	ecosystemAttributeGroup,
+	privacyAttributeGroup,
+	securityAttributeGroup,
+	selfSovereigntyAttributeGroup,
+	transparencyAttributeGroup,
+} from '@/schema/attribute-groups'
+
+const attributeGroups = [
+	securityAttributeGroup,
+	privacyAttributeGroup,
+	selfSovereigntyAttributeGroup,
+	transparencyAttributeGroup,
+	ecosystemAttributeGroup,
+]
 ---
 
 
@@ -136,8 +152,53 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 			</div>
 
 			<div class="w-full flex flex-col gap-2 p-4 md:p-8">
-				<WalletTable client:load />
+				<div class="wallet-tables">
+					<div class="table-section">
+						<h2>Software Wallets</h2>
+
+						<WalletTable
+							client:load
+							wallets={
+								Object.entries(ratedWallets)
+									.map(([id, wallet]) => ({ id, wallet }))
+							}
+							{attributeGroups}
+						/>
+					</div>
+
+					<div class="table-section">
+						<h2>Hardware Wallets</h2>
+
+						<WalletTable
+							client:load
+							wallets={
+								Object.entries(ratedHardwareWallets)
+									.map(([id, wallet]) => ({ id, wallet }))
+							}
+							{attributeGroups}
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 	</NavigationPageLayout>
 </Layout>
+
+
+<style>
+	.wallet-tables {
+		display: grid;
+		gap: 2rem;
+	}
+
+	.table-section {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.table-section h2 {
+		font-size: 1.5rem;
+		font-weight: 500;
+		margin: 0;
+	}
+</style>

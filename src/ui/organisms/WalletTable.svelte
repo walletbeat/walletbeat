@@ -1,22 +1,18 @@
 <script lang="ts">
 	// Types/constants
 	import { Variant } from '@/schema/variants'
-	import {
-		ecosystemAttributeGroup,
-		privacyAttributeGroup,
-		securityAttributeGroup,
-		selfSovereigntyAttributeGroup,
-		transparencyAttributeGroup,
-	} from '@/schema/attribute-groups'
-	import { ratedWallets } from '@/data/wallets'
+	import type { RatedWallet } from '@/schema/wallet'
+	import type { AttributeGroup } from '@/schema/attribute-groups'
 
-	const attributeGroups = {
-		[securityAttributeGroup.id]: securityAttributeGroup,
-		[privacyAttributeGroup.id]: privacyAttributeGroup,
-		[selfSovereigntyAttributeGroup.id]: selfSovereigntyAttributeGroup,
-		[transparencyAttributeGroup.id]: transparencyAttributeGroup,
-		[ecosystemAttributeGroup.id]: ecosystemAttributeGroup,
-	}
+
+	// Props
+	let {
+		wallets,
+		attributeGroups,
+	}: {
+		wallets: RatedWallet[]
+		attributeGroups: AttributeGroup<any>[]
+	} = $props()
 
 
 	// State
@@ -45,6 +41,7 @@
 	import LanguageIcon from '@material-icons/svg/svg/language/baseline.svg?raw'
 	import MonitorIcon from '@material-icons/svg/svg/monitor/baseline.svg?raw'
 	import SettingsEthernetIcon from '@material-icons/svg/svg/settings_ethernet/baseline.svg?raw'
+	import HardwareIcon from '@material-icons/svg/svg/hardware/baseline.svg?raw'
 
 	const variants = {
 		[Variant.BROWSER]: {
@@ -63,7 +60,11 @@
 			label: 'Embedded wallet',
 			icon: SettingsEthernetIcon,
 		},
-	}
+		[Variant.HARDWARE]: {
+			label: 'Hardware wallet',
+			icon: HardwareIcon,
+		},
+	} as const satisfies Record<Variant, { label: string, icon: string }>
 </script>
 
 
@@ -78,7 +79,7 @@
 			),
 		},
 		...(
-			Object.values(attributeGroups)
+			attributeGroups
 				.map(attrGroup => ({
 					id: attrGroup.id,
 					key: attrGroup.id,
@@ -94,10 +95,7 @@
 		columnId: 'displayName',
 		direction: 'asc',
 	}}
-	rows={
-		Object.entries(ratedWallets)
-			.map(([id, wallet]) => ({ id, wallet }))
-	}
+	rows={wallets}
 	getId={({ id }) => id}
 	getDisabled={(row, table) => (
 		(walletTableState.selectedVariant && !(walletTableState.selectedVariant in row.wallet.variants))
@@ -221,7 +219,7 @@
 				</div>
 			</div>
 		{:else}
-			{@const attrGroup = attributeGroups[column.id]}
+			{@const attrGroup = attributeGroups.find(attributeGroup => attributeGroup.id === column.id)}
 			{@const evalGroup = wallet.overall[attrGroup.id]}
 			{@const groupScore = attrGroup.score(wallet.overall[attrGroup.id])}
 
@@ -240,7 +238,6 @@
 		{/if}
 	{/snippet}
 </Table>
-
 
 <style>
 	:global(.wallet-table) {
