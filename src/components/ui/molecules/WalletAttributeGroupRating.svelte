@@ -1,6 +1,9 @@
-<script lang="ts" generics="
-	_ValueSet extends ValueSet = ValueSet
-">
+<script
+	lang="ts"
+	generics="
+		_ValueSet extends ValueSet = ValueSet
+	"
+>
 	// Types/constants
 	import {
 		type AttributeGroup,
@@ -11,7 +14,11 @@
 		ratingToIcon,
 		ratingToColor,
 	} from '@/schema/attributes'
-	import { attributeVariantSpecificity, VariantSpecificity, type RatedWallet } from '@/schema/wallet'
+	import {
+		attributeVariantSpecificity,
+		VariantSpecificity,
+		type RatedWallet,
+	} from '@/schema/wallet'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { slugifyCamelCase } from '@/types/utils/text'
 	import { betaSiteRoot } from '@/constants'
@@ -35,8 +42,8 @@
 		attrGroup: AttributeGroup<_ValueSet>
 		evalGroup: EvaluatedGroup<_ValueSet>
 		groupScore: MaybeUnratedScore
-		selectedEvaluationAttribute?: string,
-		selectedVariant?: Variant,
+		selectedEvaluationAttribute?: string
+		selectedVariant?: Variant
 		isExpanded?: boolean
 		toggleExpanded?: (id: string) => void
 	} = $props()
@@ -112,14 +119,25 @@
 							weight: 1,
 							arcLabel: icon,
 							tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
-							tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating)
+							tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
 						}
 					}
 				)
 			}
 			highlightedSliceId={currentEvaluationAttribute?.attribute.id}
-			centerLabel={groupScore ? (groupScore.hasUnratedComponent ? ratingToIcon(Rating.UNRATED) : groupScore.score <= 0.0 ? '\u{1f480}' : groupScore.score >= 1.0 ? '\u{1f4af}' : (groupScore.score * 100).toFixed(0)) : '❓'}
-
+			centerLabel={
+				groupScore ?
+					groupScore.hasUnratedComponent ?
+						ratingToIcon(Rating.UNRATED)
+					: groupScore.score <= 0.0 ?
+						'\u{1f480}'
+					: groupScore.score >= 1.0 ?
+							'\u{1f4af}'
+					:
+						(groupScore.score * 100).toFixed(0)
+				:
+					'❓'
+			}
 			onSliceClick={id => {
 				selectedEvaluationAttribute = activeEvaluationAttribute = (
 					selectedEvaluationAttribute === id ? undefined : id
@@ -211,14 +229,13 @@
 		align-content: start;
 		gap: 1em;
 	}
-	
+
 	.details {
 		display: grid;
 		/* grid-template-columns: minmax(0, 32ch); */
 		max-width: 32ch;
 		justify-items: center;
 		align-content: start;
-
 
 		line-height: 1;
 		text-align: center;
@@ -229,12 +246,12 @@
 			margin: 0;
 			font-size: 1em;
 		}
-		
+
 		h4 {
 			margin: 0;
 			font-size: 1.1em;
 		}
-		
+
 		p {
 			margin: 0;
 			font-size: 0.9em;
@@ -244,4 +261,3 @@
 		}
 	}
 </style>
-
