@@ -6,7 +6,7 @@
 	"
 >
 	// Types
-	import { DataTable, type ColumnDef } from '@careswitch/svelte-data-table'
+	import { DataTable, type ColumnDef } from '@/lib/DataTable.svelte'
 	import type { Snippet } from 'svelte'
 
 
