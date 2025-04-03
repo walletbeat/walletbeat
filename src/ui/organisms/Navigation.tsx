@@ -210,7 +210,11 @@ const NavigationItem = memo(
 					{item.icon ? (
 						<SingleListItemIcon key="icon">
 							{typeof item.icon === 'string' ? (
-								<img src={item.icon} />
+								item.icon.length <= 2 ? (
+									item.icon
+								) : (
+									<img src={item.icon} />
+								)
 							) : 'raw' in item.icon ? (
 								<span dangerouslySetInnerHTML={{ __html: item.icon.raw }} />
 							) : (
