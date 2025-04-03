@@ -192,7 +192,7 @@
 					
 					<div class="links">
 						<a
-							href={`/wallets/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, walletTableState.selectedVariant)}`}
+							href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, walletTableState.selectedVariant)}`}
 							class="info-link"
 						>
 							<span class="icon">{@html InfoIcon}</span>
