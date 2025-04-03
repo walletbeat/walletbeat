@@ -83,6 +83,11 @@ export const ambire: Wallet = {
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			customChains: true,
+			ref: {
+				url: 'https://github.com/AmbireTech/ambire-common/blob/v2/src/consts/networks.ts',
+				label: 'List of RPCs we use for default chains',
+				explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
+			},
 		},
 
 		accountSupport: {
@@ -132,7 +137,6 @@ export const ambire: Wallet = {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
-			ref: null,
 		},
 		integration: {
 			browser: {
@@ -140,7 +144,7 @@ export const ambire: Wallet = {
 				'2700': featureSupported,
 				'6963': featureSupported,
 				ref: {
-					url: 'https://github.com/AmbireTech/ambire-app/blob/v2/src/web/extension-services/background/background.ts',
+					url: 'https://github.com/AmbireTech/extension/blob/v2/src/web/extension-services/background/background.ts',
 				},
 			},
 		},
@@ -150,6 +154,17 @@ export const ambire: Wallet = {
 					leaksVisitedUrl: 'NO',
 					leaksUserAddress: false,
 					leaksIp: false,
+					ref: {
+						urls: [
+							{
+								url: 'https://github.com/AmbireTech/ambire-common/blob/v2/src/controllers/phishing/phishing.ts',
+								label: 'Implementation',
+							},
+						],
+						explanation:
+							"Ambire first fetches a list of publicly available known scam URLs from an external API. Then, it checks if the website you're visiting is on that list. If it is, a warning is displayed.",
+						lastRetrieved: '2025-04-02',
+					},
 				}),
 				contractTransactionWarning: notSupported,
 				sendTransactionWarning: supported({
@@ -208,7 +223,10 @@ export const ambire: Wallet = {
 				},
 			},
 		},
-		license: { license: License.GPL_3_0 },
+		license: {
+			license: License.GPL_3_0,
+			ref: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
+		},
 		monetization: {
 			revenueBreakdownIsPublic: false,
 			strategies: {
