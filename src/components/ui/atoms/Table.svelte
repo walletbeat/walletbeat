@@ -20,13 +20,11 @@
 		cellSnippet,
 		columnCellSnippet,
 		onRowClick,
+		displaceDisabledRows = false,
 		...restProps
 	}: {
 		columns: (
 			& ColumnDef<Datum, CellValue>
-			// & {
-			// 	sorter?: (a: CellValue, b: CellValue, rowA: Datum, rowB: Datum, direction: SortDirection) => number
-			// }
 		)[]
 		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<Datum>>[0]['defaultSort']>
 		rows: Datum[]
@@ -41,54 +39,28 @@
 			column: ColumnDef<Datum, CellValue>
 		}]>
 		onRowClick?: (row: Datum) => void
+		displaceDisabledRows?: boolean
 	} = $props()
 
 
 	// State
-	const defaultSorter = (a, b) => (
-		typeof a === 'number' ?
-			a - b
-		:
-			String(a).localeCompare(String(b))
-	)
-
 	let table = $state(
 		new DataTable<Datum>({
 			data: rows,
 			columns,
 			defaultSort,
+			getDisabled,
+			displaceDisabledRows,
 		})
 	)
 
 	$effect(() => {
 		table = new DataTable<Datum>({
 			data: rows,
-
-			columns: columns.map(column => ({
-				...column,
-				sorter: (a: CellValue, b: CellValue, rowA: Datum, rowB: Datum) => {
-					const direction = $state.snapshot(table.sortState).direction
-
-					const isRowADisplaced = displaceDisabledRows && getDisabled?.($state.snapshot(rowA), $state.snapshot(table))
-					const isRowBDisplaced = displaceDisabledRows && getDisabled?.($state.snapshot(rowB), $state.snapshot(table))
-
-					return (
-						isRowADisplaced && isRowBDisplaced ?
-							0
-						: isRowADisplaced ?
-							direction === 'asc' ? 1 : -1
-						: isRowBDisplaced ?
-							direction === 'asc' ? -1 : 1
-						:
-							(
-								column.sorter
-								?? defaultSorter
-							)(a, b, rowA, rowB)
-					)
-				},
-			})),
-
+			columns,
 			defaultSort,
+			getDisabled,
+			displaceDisabledRows,
 		})
 	})
 

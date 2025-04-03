@@ -26,6 +26,8 @@ type TableConfig<T> = {
 	pageSize?: number
 	defaultSort?: SortState
 	initialFilters?: { [id: string]: any[] }
+	getDisabled?: (row: T, table: DataTable<T>) => boolean
+	displaceDisabledRows?: boolean
 }
 
 /**
@@ -36,6 +38,8 @@ export class DataTable<T> {
 	#columns: ColumnDef<T>[]
 	#pageSize: number
 	#defaultSort?: SortState
+	#getDisabled?: (row: T, table: DataTable<T>) => boolean
+	#displaceDisabledRows: boolean
 
 	#originalData = $state<T[]>([])
 	#currentPage = $state(1)
@@ -60,6 +64,8 @@ export class DataTable<T> {
 		this.#columns = config.columns
 		this.#pageSize = config.pageSize || 10
 		this.#defaultSort = config.defaultSort
+		this.#getDisabled = config.getDisabled
+		this.#displaceDisabledRows = config.displaceDisabledRows ?? false
 		this.#initializeFilterState(config.initialFilters)
 	}
 
@@ -133,6 +139,21 @@ export class DataTable<T> {
 
 			const colDef = this.#getColumnDef(columnId)
 			this.#sortedData = [...this.#filteredData].sort((a, b) => {
+				if (this.#displaceDisabledRows && this.#getDisabled) {
+					const isRowADisplaced = this.#getDisabled(a, this)
+					const isRowBDisplaced = this.#getDisabled(b, this)
+
+					if(isRowADisplaced || isRowBDisplaced)
+						return (
+							isRowADisplaced && isRowBDisplaced ?
+								0
+							: isRowADisplaced ?
+								1
+							:
+								-1
+						)
+				}
+
 				const aVal = this.#getValue(a, columnId)
 				const bVal = this.#getValue(b, columnId)
 
