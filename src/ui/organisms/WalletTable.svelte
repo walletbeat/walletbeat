@@ -327,4 +327,9 @@
 			}
 		}
 	}
+
+	.icon {
+		display: inline-flex;
+		vertical-align: middle;
+	}
 </style>
