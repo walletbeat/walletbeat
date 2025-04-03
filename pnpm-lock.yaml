@@ -14,9 +14,6 @@ importers:
       '@astrojs/svelte':
         specifier: ^7.0.5
         version: 7.0.5(@types/node@22.13.1)(astro@5.2.5(@types/node@22.13.1)(jiti@2.4.2)(rollup@4.34.3)(tsx@4.19.2)(typescript@5.8.2)(yaml@2.7.0))(jiti@2.4.2)(svelte@5.22.1)(tsx@4.19.2)(typescript@5.8.2)(yaml@2.7.0)
-      '@careswitch/svelte-data-table':
-        specifier: ^0.6.3
-        version: 0.6.3(svelte@5.22.1)
       '@emotion/cache':
         specifier: ^11.14.0
         version: 11.14.0
@@ -364,11 +361,6 @@ packages:
   '@babel/types@7.26.7':
     resolution: {integrity: sha512-t8kDRGrKXyp6+tjUh7hw2RLyclsW4TRoRvRHtSyAX9Bb5ldlFh+90YAYY6awRXrlB4G5G2izNeGySpATlFzmOg==}
     engines: {node: '>=6.9.0'}
-
-  '@careswitch/svelte-data-table@0.6.3':
-    resolution: {integrity: sha512-CJEMMfa/jhwt5DE/LpQ3FoBAPEqrOyi7Ky5LT/5tZz5hOIhaQicWVEVBtK2NYJkaKFYNnOCvtiCa4vlTyhP+pg==}
-    peerDependencies:
-      svelte: ^5.0.0-next.1
 
   '@cspell/cspell-bundled-dicts@8.17.3':
     resolution: {integrity: sha512-6uOF726o3JnExAUKM20OJJXZo+Qf9Jt64nkVwnVXx7Upqr5I9Pb1npYPEAIpUA03SnWYmKwUIqhAmkwrN+bLPA==}
@@ -5860,10 +5852,6 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
-
-  '@careswitch/svelte-data-table@0.6.3(svelte@5.22.1)':
-    dependencies:
-      svelte: 5.22.1
 
   '@cspell/cspell-bundled-dicts@8.17.3':
     dependencies:

@@ -18,7 +18,6 @@
   "dependencies": {
     "@astrojs/react": "^4.2.0",
     "@astrojs/svelte": "^7.0.5",
-    "@careswitch/svelte-data-table": "^0.6.3",
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
