@@ -7,6 +7,7 @@ export interface ColumnDef<T, V = any> {
 	key: keyof T
 	name: string
 	sortable?: boolean
+	defaultSortDirection?: SortDirection
 	getValue?: ValueGetter<T, V>
 	sorter?: Sorter<T, V>
 	filter?: Filter<T, V>
@@ -319,18 +320,28 @@ export class DataTable<T> {
 		if (!colDef || colDef.sortable === false) return
 
 		this.#isSortDirty = true
+
 		if (this.#sortState.columnId === columnId) {
+			const defaultSortDirection = colDef.defaultSortDirection ?? 'asc'
+
 			this.#sortState = {
 				columnId,
-				direction:
-					this.#sortState.direction === 'asc'
-						? 'desc'
-						: this.#sortState.direction === 'desc'
-							? null
-							: 'asc'
+				direction: (
+					this.#sortState.direction === null ?
+						defaultSortDirection
+					: this.#sortState.direction === defaultSortDirection ?
+						defaultSortDirection ? 'desc' : 'asc'
+					:
+						null
+				),
 			}
 		} else {
-			this.#sortState = { columnId, direction: 'asc' }
+			this.#sortState = { 
+				columnId, 
+				direction: (
+					this.#getColumnDef(columnId)?.defaultSortDirection ?? 'asc'
+				),
+			}
 		}
 	}
 

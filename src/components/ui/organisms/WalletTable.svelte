@@ -86,6 +86,7 @@
 					getValue: ({ wallet }) => (
 						wallet.overall[attrGroup.id] && attrGroup.score(wallet.overall[attrGroup.id])?.score || undefined
 					),
+					defaultSortDirection: 'desc',
 				}))
 		),
 	]}
