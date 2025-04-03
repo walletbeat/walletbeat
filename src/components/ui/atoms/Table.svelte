@@ -138,7 +138,7 @@
 						animate:flip={{ duration: 300, easing: expoOut }}
 					>
 						{#if columnCellSnippet}
-							{@render columnCellSnippet(column)}
+							{@render columnCellSnippet({ column })}
 						{:else}
 							{column.name}
 						{/if}
