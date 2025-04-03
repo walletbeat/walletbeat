@@ -1,5 +1,5 @@
 ---
-Status: Draft
+Status: Submitted
 Project name: Walletbeat beta EIP-7702 tracking
 Project category: Other
 Grant recipient: polymutex (Individual)

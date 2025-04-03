@@ -1,92 +1,140 @@
 ---
 // Constants
-import { betaSiteRoot } from '@/constants'
+import { wallets } from '@/data/wallets'
+import { hardwareWallets } from '@/data/hardware-wallets'
+
 
 // Layouts
 import Layout from '../layouts/Layout.astro'
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 
 // Components
-import { IconLink } from '@/components/ui/atoms/IconLink.tsx'
-// import WalletTable from '@/components/ui/organisms/WalletTable.tsx'
-import WalletTable from '@/components/ui/organisms/WalletTable.svelte'
-
-import { Box, Typography } from '@mui/material'
-import HelpCenterIcon from '@mui/icons-material/HelpCenter'
-import ForumIcon from '@mui/icons-material/Forum'
-import FoundationIcon from '@mui/icons-material/Foundation'
-import GitHubIcon from '@mui/icons-material/GitHub'
+import { LuKey, LuWallet } from 'react-icons/lu'
+import { navigationAbout, navigationCriteria } from '@/components/navigation'
+import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
+
 
 <Layout
 	metadata={{
 		title: 'Walletbeat',
 	}}
 >
-	<Box maxWidth="100vw" display="flex" flexDirection="column" alignItems="center">
-		<Box
-			minHeight="100vh"
-			maxWidth="100vw"
-			display="flex"
-			flexDirection="column"
-			alignItems="center"
-			justifyContent="center"
-			px={2}
-		>
-			<Typography variant="h1" fontWeight={600} mt={1} maxWidth="90vw"> Walletbeat </Typography>
-			<Typography
-				variant="caption"
-				sx={{
-					fontStyle: 'italic',
-					opacity: 0.75,
-				}}
-				maxWidth="90vw"
-			>
-				Who watches the wallets?
-			</Typography>
-			<Typography variant="caption" mt={1} maxWidth="90vw">
-				Beta version; work in progress. Get in touch on Farcaster or GitHub if you wish to
-				contribute.
-			</Typography>
-			<Box display="flex" flexDirection="row" alignItems="center" mt={1} mb={1}>
-				<Typography component="div" variant="caption">
-					<IconLink href={`${betaSiteRoot}/faq`} IconComponent={HelpCenterIcon}>
-						Frequently asked questions
-					</IconLink>
-				</Typography>
-				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-					|
-				</Typography>
-				<Typography component="div" variant="caption">
-					<IconLink href={`${betaSiteRoot}/about`} IconComponent={FoundationIcon}>
-						About Walletbeat
-					</IconLink>
-				</Typography>
-				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-					|
-				</Typography>
-				<Typography component="div" variant="caption">
-					<IconLink
-						href="https://github.com/fluidkey/walletbeat"
-						target="_blank"
-						IconComponent={GitHubIcon}
-					>
-						Contribute on GitHub
-					</IconLink>
-				</Typography>
-				<Typography component="div" minWidth="1.5rem" textAlign="center" variant="caption">
-					|
-				</Typography>
-				<Typography component="div" variant="caption">
-					<IconLink
-						href="https://warpcast.com/~/channel/walletbeat"
-						target="_blank"
-						IconComponent={ForumIcon}
-					>
-						Discuss on Farcaster
-					</IconLink>
-				</Typography>
-			</Box>
-			<WalletTable client:load />
-		</Box>
-	</Box>
+	<NavigationPageLayout
+		groups={[
+			{
+				id: 'home',
+				items: [
+					{
+						title: 'Summary',
+						href: '/',
+						id: 'summary',
+					},
+				],
+				overflow: false,
+			},
+			{
+				id: 'wallets',
+				items: [
+					{
+						title: 'Wallets',
+						icon: LuWallet,
+						href: '/',
+						id: 'wallets-nav',
+						children: Object.keys(wallets).map(key => {
+							// Using type-safe keys
+							const safeKey = key as keyof typeof wallets
+							const wallet = wallets[safeKey]
+
+							return {
+								title: wallet.metadata.displayName,
+								href: `/${key}`,
+								id: key,
+								icon: `/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
+							}
+						}),
+					},
+				],
+				overflow: false,
+			},
+			{
+				id: 'hardware-wallets',
+				items: [
+					{
+						title: 'Hardware Wallets',
+						icon: LuKey,
+						href: '/',
+						id: 'hardware-wallets',
+						children: Object.keys(hardwareWallets).map(key => {
+							// Using type-safe keys
+							const safeKey = key as keyof typeof hardwareWallets
+							const wallet = hardwareWallets[safeKey]
+
+							// Simplified display names for hardware wallets
+							let displayName = wallet.metadata.displayName
+							if (key === 'ledger') {
+								displayName = 'Ledger'
+							}
+							if (key === 'trezor') {
+								displayName = 'Trezor'
+							}
+							if (key === 'gridplus') {
+								displayName = 'Grid Plus'
+							}
+							if (key === 'keystone') {
+								displayName = 'Keystone'
+							}
+
+							return {
+								title: displayName,
+								href: `/${key}`,
+								id: key,
+								icon: `/images/hardware-wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
+							}
+						}),
+					},
+				],
+				overflow: false,
+			},
+			{
+				id: 'criteria',
+				items: [navigationCriteria],
+				overflow: false,
+			},
+			{
+				id: 'about',
+				items: [navigationAbout],
+				overflow: false,
+			},
+		]}
+	>
+		<div class="flex flex-col">
+			<div>
+				<div class="px-8 py-6 flex justify-between items-center flex-wrap min-h-96 relative">
+					<div class="flex flex-col gap-2 py-8 flex-1">
+						<h1 class="text-5xl font-extrabold text-accent">Who watches the wallets?</h1>
+						<p class="text-secondary">
+							Beta version; For content contributions, please see{' '}
+							<a
+								href="https://github.com/walletbeat/walletbeat"
+								target="_blank"
+								rel="noreferrer"
+								class="text-accent underline"
+							>
+								GitHub
+							</a>
+							.
+						</p>
+					</div>
+					<div class="flex-1 flex justify-center items-center">
+						<img src="robot.png" alt="Walletbeat Robot" class="h-80 w-auto object-contain" />
+					</div>
+				</div>
+			</div>
+
+			<div class="w-full flex flex-col gap-2 p-4 md:p-8">
+				<WalletTable client:load />
+			</div>
+		</div>
+	</NavigationPageLayout>
 </Layout>

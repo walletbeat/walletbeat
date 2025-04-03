@@ -3,10 +3,10 @@
 export const prerender = true
 
 // Data
-import { IsValidWalletName, ratedWallets, wallets } from '@/data/wallets'
+import { isValidWalletName, ratedWallets, wallets } from '@/data/wallets.ts'
 
 // Utils
-import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 // Params
 export const getStaticPaths = () =>
@@ -29,7 +29,7 @@ import { WalletPage } from './_WalletPage.tsx'
 ---
 
 {
-	walletName && IsValidWalletName(walletName) ? (
+	walletName && isValidWalletName(walletName) ? (
 		<Layout
 			metadata={{
 				title: `${walletMetadata.displayName} - Walletbeat`,

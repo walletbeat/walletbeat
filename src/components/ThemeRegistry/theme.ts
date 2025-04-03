@@ -37,6 +37,13 @@ const themeOptions: ThemeOptions = {
 			main: '#80ffa2',
 			contrastText: '#292C34',
 		},
+		rating: {
+			fail: '#e74c3c',
+			partial: '#f1c40f',
+			pass: '#2ecc71',
+			unrated: '#bdc3c7',
+			exempt: '#bdc3c7',
+		},
 	},
 	typography: {
 		fontFamily: 'inherit',
@@ -218,6 +225,97 @@ const walletTableThemeOptions: ThemeOptions = {
 			fontSize: '0.75rem',
 		},
 	},
+	components: {
+		MuiDataGrid: {
+			styleOverrides: {
+				root: {
+					'& .MuiDataGrid-row--borderBottom': {
+						backgroundColor: 'var(--background-row-border)',
+					},
+				},
+			},
+		},
+	},
 }
 
+// Create light mode version of the wallet table theme
+const lightWalletTableThemeOptions: ThemeOptions = {
+	palette: {
+		mode: 'light',
+		primary: {
+			main: '#105C7E',
+			contrastText: '#F1FAFD',
+			light: '#198DC2',
+			dark: '#082E3F',
+		},
+		background: {
+			default: '#ffffff',
+			paper: '#f5f5f5',
+		},
+		text: {
+			primary: '#292C34',
+			secondary: '#545864',
+			disabled: '#888B94',
+		},
+		divider: '#e0e0e0',
+		rating: {
+			fail: '#fde8e7', // Light red
+			partial: '#fff3dc', // Light yellow
+			pass: '#e6f5ed', // Light green
+			unrated: '#f0f0f0', // Light gray
+			exempt: '#f0f0f0', // Light gray
+		},
+	},
+}
+
+// Create walletTableTheme with theme-specific CSS variables
 export const walletTableTheme = createTheme(deepmerge(themeOptions, walletTableThemeOptions))
+export const lightWalletTableTheme = createTheme(
+	deepmerge(deepmerge(themeOptions, lightWalletTableThemeOptions), walletTableThemeOptions),
+)
+
+// Add theme-specific CSS variables
+walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
+	MuiCssBaseline: {
+		styleOverrides: {
+			':root': {
+				'--background-row-border': '#6a1b9a',
+			},
+		},
+	},
+})
+
+lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components || {}, {
+	MuiCssBaseline: {
+		styleOverrites: {
+			':root': {
+				'--background-row-border': '#e0f2ff',
+			},
+		},
+	},
+})
+
+// Add light theme options
+export const lightThemeOptions: ThemeOptions = {
+	...themeOptions,
+	palette: {
+		...themeOptions.palette,
+		mode: 'light',
+		background: {
+			default: '#ffffff',
+			paper: '#f5f5f5',
+		},
+		text: {
+			primary: '#1a1a1a',
+			secondary: '#666666',
+			disabled: '#999999',
+		},
+		rating: {
+			fail: '#fde8e7', // Light red
+			partial: '#fff3dc', // Light yellow
+			pass: '#e6f5ed', // Light green
+			unrated: '#f0f0f0', // Light gray
+			exempt: '#f0f0f0', // Light gray
+		},
+	},
+}

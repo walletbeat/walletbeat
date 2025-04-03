@@ -1,7 +1,13 @@
 ---
 // Global CSS
-import './global.css'
-import '@fontsource/work-sans'
+import '../global.css'
+import '@fontsource/montserrat/300.css'
+import '@fontsource/montserrat/400.css'
+import '@fontsource/montserrat/500.css'
+import '@fontsource/montserrat/600.css'
+import '@fontsource/montserrat/700.css'
+import '@fontsource/montserrat/800.css'
+import '@fontsource/montserrat/900.css'
 
 // Props
 import type { ComponentProps } from 'astro/types'
@@ -14,7 +20,7 @@ const { metadata } = Astro.props
 
 // Components
 import Metadata from '@/components/Metadata.astro'
-import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry.tsx'
+import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 ---
 
 <!doctype html>
@@ -22,9 +28,29 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry.tsx'
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
 		<Metadata {metadata} />
+		<!-- Theme initialization script -->
+		<script is:inline>
+			// Initialize theme from localStorage or system preference
+			function initializeTheme() {
+				// Check localStorage first
+				const storedTheme = localStorage.getItem('theme')
+
+				if (storedTheme) {
+					// Use stored preference
+					document.documentElement.classList.toggle('dark', storedTheme === 'dark')
+				} else {
+					// Check system preference
+					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+					document.documentElement.classList.toggle('dark', prefersDark)
+					// Store the initial preference
+					localStorage.setItem('theme', prefersDark ? 'dark' : 'light')
+				}
+			}
+
+			// Run immediately
+			initializeTheme()
+		</script>
 	</head>
 	<body>
 		<ThemeRegistry>

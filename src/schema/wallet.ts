@@ -12,11 +12,21 @@ import type { Url } from './url'
 import { Rating, type Attribute, type EvaluatedAttribute, type Value } from './attributes'
 import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
+import type { WalletTypeInfo } from './features/wallet-type'
+import { WalletTypeCategory, SmartWalletStandard } from './features/wallet-type'
+import type { EvmForkLike, EvmFork } from './evm-forks'
+import {
+	WalletProfile,
+	HardwareWalletManufactureType,
+	type HardwareWalletModel,
+} from './features/profile'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
 	name: string
 	url?: Url
+	affiliation?: string
+	shares_in_wallet_company?: string
 }
 
 /** Basic wallet metadata. */
@@ -76,6 +86,30 @@ export interface WalletMetadata {
 
 	/** List of people who contributed to the information for this wallet. */
 	contributors: NonEmptyArray<Contributor>
+
+	/**
+	 * Information about the wallet type (EOA, Smart Wallet, or Hardware Wallet)
+	 */
+	walletType?: WalletTypeInfo
+
+	/**
+	 * Information for wallets with multiple types (e.g., both EOA and Smart Wallet)
+	 */
+	multiWalletType?: {
+		categories: WalletTypeCategory[]
+		smartWalletStandards?: SmartWalletStandard[]
+		details?: string
+	}
+
+	/**
+	 * For hardware wallets, indicates whether it's factory-made or DIY
+	 */
+	hardwareWalletManufactureType?: HardwareWalletManufactureType
+
+	/**
+	 * For hardware wallets, list of available models/devices
+	 */
+	hardwareWalletModels?: HardwareWalletModel[]
 }
 
 /** Per-wallet, per-attribute override. */
@@ -210,6 +244,7 @@ export function rateWallet(wallet: Wallet): RatedWallet {
 			desktop: resolveVariant(wallet, Variant.DESKTOP),
 			browser: resolveVariant(wallet, Variant.BROWSER),
 			mobile: resolveVariant(wallet, Variant.MOBILE),
+			hardware: resolveVariant(wallet, Variant.HARDWARE),
 		}).filter(([_, val]) => val !== null),
 	) as AtLeastOneVariant<ResolvedWallet>
 	const perVariantTree: AtLeastOneVariant<EvaluationTree> = nonEmptyRemap(

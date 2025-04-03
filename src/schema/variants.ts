@@ -10,6 +10,7 @@ export enum Variant {
 	DESKTOP = 'desktop',
 	BROWSER = 'browser',
 	EMBEDDED = 'embedded',
+	HARDWARE = 'hardware',
 }
 
 /** Maps at least one variant to a T. */
@@ -34,7 +35,7 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 	let foundVariant = false
 	let foundNonVariant = false
 	Object.keys(value).forEach(key => {
-		if (key === 'mobile' || key === 'desktop' || key === 'browser') {
+		if (key === 'mobile' || key === 'desktop' || key === 'browser' || key === 'embedded' || key === 'hardware') {
 			foundVariant = true
 		} else {
 			foundNonVariant = true

@@ -9,8 +9,8 @@ import {
 	navigationHome,
 	navigationRepository,
 } from '@/components/navigation'
-import { ExternalLink } from '@/components/ui/atoms/ExternalLink'
-import { IconLink } from '@/components/ui/atoms/IconLink'
+import { ExternalLink } from '@/ui/atoms/ExternalLink'
+import { IconLink } from '@/ui/atoms/IconLink'
 import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import ForumIcon from '@mui/icons-material/Forum'
 import GitHubIcon from '@mui/icons-material/GitHub'
@@ -67,10 +67,11 @@ function AboutContents(): React.JSX.Element {
 				}}
 			/>
 			<Typography variant="body1">
-				Walletbeat is committed to transparency. It is an{' '}
+				Walletbeat is committed to transparency. Contributors reveal their affiliation and / or
+				shares in wallet companies. It is an{' '}
 				<IconLink
 					IconComponent={GitHubIcon}
-					href="https://github.com/fluidkey/walletbeat"
+					href="https://github.com/walletbeat/walletbeat"
 					target="_blank"
 				>
 					open-source project
@@ -142,7 +143,7 @@ function AboutContents(): React.JSX.Element {
 				purposes only. If you find that something is wrong, please help Walletbeat by{' '}
 				<IconLink
 					IconComponent={GitHubIcon}
-					href="https://github.com/fluidkey/walletbeat"
+					href="https://github.com/walletbeat/walletbeat"
 					target="_blank"
 				>
 					contributing

@@ -11,7 +11,6 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import {
 	AccountType,
-	isAccountTypeSupported,
 	TransactionGenerationCapability,
 	type AccountSupport,
 	type AccountType7702,
@@ -23,13 +22,18 @@ import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 import { eipMarkdownLink } from '@/schema/eips'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { eip7702 } from '@/data/eips/eip-7702'
+import { isSupported, type Support } from '@/schema/features/support'
+import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
 
 const brand = 'attributes.self_sovereignty.account_portability'
 export type AccountPortabilityValue = Value & {
 	__brand: 'attributes.self_sovereignty.account_portability'
 }
 
-function evaluateEoa(eoa: AccountTypeEoa): Evaluation<AccountPortabilityValue> {
+function evaluateEoa(
+	eoa: AccountTypeEoa,
+	references: ReferenceArray,
+): Evaluation<AccountPortabilityValue> {
 	if (
 		eoa.keyDerivation.type === 'BIP32' &&
 		eoa.keyDerivation.seedPhrase === 'BIP39' &&
@@ -70,6 +74,7 @@ function evaluateEoa(eoa: AccountTypeEoa): Evaluation<AccountPortabilityValue> {
 					}
 				`,
 			),
+			references,
 		}
 	}
 	if (eoa.canExportPrivateKey) {
@@ -106,6 +111,7 @@ function evaluateEoa(eoa: AccountTypeEoa): Evaluation<AccountPortabilityValue> {
 					standards to avoid requiring users to back up each private key.
 				`,
 			),
+			references,
 		}
 	}
 	return {
@@ -139,10 +145,14 @@ function evaluateEoa(eoa: AccountTypeEoa): Evaluation<AccountPortabilityValue> {
 				${wallet.metadata.displayName} should let users export private keys.
 			`,
 		),
+		references,
 	}
 }
 
-function evaluateMpc(mpc: AccountTypeMpc): Evaluation<AccountPortabilityValue> {
+function evaluateMpc(
+	mpc: AccountTypeMpc,
+	references: ReferenceArray,
+): Evaluation<AccountPortabilityValue> {
 	if (mpc.controllingSharesInSelfCustodyByDefault === 'NO') {
 		return {
 			value: {
@@ -182,6 +192,7 @@ function evaluateMpc(mpc: AccountTypeMpc): Evaluation<AccountPortabilityValue> {
 					*need* to rely on third parties for transactions.
 				`,
 			),
+			references,
 		}
 	}
 	if (
@@ -225,6 +236,7 @@ function evaluateMpc(mpc: AccountTypeMpc): Evaluation<AccountPortabilityValue> {
 					using their self-custodial key shares.
 				`,
 			),
+			references,
 		}
 	}
 	if (
@@ -269,6 +281,7 @@ function evaluateMpc(mpc: AccountTypeMpc): Evaluation<AccountPortabilityValue> {
 					using their self-custodial key shares.
 				`,
 			),
+			references,
 		}
 	}
 	return {
@@ -292,12 +305,14 @@ function evaluateMpc(mpc: AccountTypeMpc): Evaluation<AccountPortabilityValue> {
 				relying on a third-party.
 			`,
 		),
+		references,
 	}
 }
 
 function evaluateMultifactor(
 	multifactor: AccountTypeMutableMultifactor,
 	multifactorType: 'erc4337' | 'eip7702',
+	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	const eip = multifactorType === 'erc4337' ? erc4337 : eip7702
 	if (multifactor.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
@@ -337,6 +352,7 @@ function evaluateMultifactor(
 					control logic to allow users to take full control of the account.
 				`,
 			),
+			references,
 		}
 	}
 	if (multifactor.controllingSharesInSelfCustodyByDefault === 'NO') {
@@ -380,6 +396,7 @@ function evaluateMultifactor(
 						their account to be effectively self-custodied.
 					`,
 				),
+				references,
 			}
 		}
 		if (
@@ -422,6 +439,7 @@ function evaluateMultifactor(
 						their account to be effectively self-custodied.
 					`,
 				),
+				references,
 			}
 		}
 	}
@@ -462,6 +480,7 @@ function evaluateMultifactor(
 					arbitrary transactions without relying on any third party.
 				`,
 			),
+			references,
 		}
 	}
 	if (
@@ -502,6 +521,7 @@ function evaluateMultifactor(
 					arbitrary transactions without relying on any third party.
 				`,
 			),
+			references,
 		}
 	}
 	if (
@@ -538,6 +558,7 @@ function evaluateMultifactor(
 					self-custodied by the user from the start.
 				`,
 			),
+			references,
 		}
 	}
 	return {
@@ -563,19 +584,20 @@ function evaluateMultifactor(
 				(e.g. for key rotation).
 			`,
 		),
+		references,
 	}
 }
 
-function evaluateEip7702(accountSupport: AccountSupport): Evaluation<AccountPortabilityValue> {
-	if (!isAccountTypeSupported<AccountType7702>(accountSupport.eip7702)) {
+function evaluateEip7702(
+	accountSupport: AccountSupport,
+	_: ReferenceArray,
+): Evaluation<AccountPortabilityValue> {
+	if (!isSupported<AccountType7702>(accountSupport.eip7702)) {
 		throw new Error('EIP-7702 account type is not supported')
 	}
 	const eoaSupport = accountSupport.eoa
 	const mpcSupport = accountSupport.mpc
-	if (
-		!isAccountTypeSupported<AccountTypeEoa>(eoaSupport) &&
-		!isAccountTypeSupported<AccountTypeMpc>(mpcSupport)
-	) {
+	if (!isSupported<AccountTypeEoa>(eoaSupport) && !isSupported<AccountTypeMpc>(mpcSupport)) {
 		throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported')
 	}
 	// Not implemented yet.
@@ -678,12 +700,15 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					derivation standards for EOA key derivation, and does not allow the
 					user to export their private keys.
 				`),
-				evaluateEoa({
-					canExportPrivateKey: false,
-					keyDerivation: {
-						type: 'NONSTANDARD',
+				evaluateEoa(
+					{
+						canExportPrivateKey: false,
+						keyDerivation: {
+							type: 'NONSTANDARD',
+						},
 					},
-				}).value,
+					[],
+				).value,
 			),
 			exampleRating(
 				paragraph(`
@@ -691,12 +716,15 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					sufficient key shares under self-custody to unilaterally control
 					the account by default.
 				`),
-				evaluateMpc({
-					controllingSharesInSelfCustodyByDefault: 'NO',
-					initialKeyGeneration: 'ON_USER_DEVICE',
-					tokenTransferTransactionGeneration:
-						TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API,
-				}).value,
+				evaluateMpc(
+					{
+						controllingSharesInSelfCustodyByDefault: 'NO',
+						initialKeyGeneration: 'ON_USER_DEVICE',
+						tokenTransferTransactionGeneration:
+							TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API,
+					},
+					[],
+				).value,
 			),
 			exampleRating(
 				paragraph(`
@@ -705,12 +733,15 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					cannot generate a token transfer transaction without relying on
 					a third party API.
 				`),
-				evaluateMpc({
-					controllingSharesInSelfCustodyByDefault: 'YES',
-					initialKeyGeneration: 'ON_USER_DEVICE',
-					tokenTransferTransactionGeneration:
-						TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API,
-				}).value,
+				evaluateMpc(
+					{
+						controllingSharesInSelfCustodyByDefault: 'YES',
+						initialKeyGeneration: 'ON_USER_DEVICE',
+						tokenTransferTransactionGeneration:
+							TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API,
+					},
+					[],
+				).value,
 			),
 			exampleRating(
 				mdParagraph(`
@@ -727,6 +758,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API,
 					},
 					'erc4337',
+					[],
 				).value,
 			),
 			exampleRating(
@@ -745,6 +777,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API,
 					},
 					'erc4337',
+					[],
 				).value,
 			),
 			exampleRating(
@@ -763,6 +796,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API,
 					},
 					'erc4337',
+					[],
 				).value,
 			),
 		],
@@ -774,12 +808,15 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					user to export private keys so that they can be imported into
 					other wallets.
 				`),
-				evaluateEoa({
-					canExportPrivateKey: true,
-					keyDerivation: {
-						type: 'NONSTANDARD',
+				evaluateEoa(
+					{
+						canExportPrivateKey: true,
+						keyDerivation: {
+							type: 'NONSTANDARD',
+						},
 					},
-				}).value,
+					[],
+				).value,
 			),
 			exampleRating(
 				paragraph(`
@@ -788,12 +825,15 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					cannot generate a token transfer transaction without the use of
 					proprietary software.
 				`),
-				evaluateMpc({
-					controllingSharesInSelfCustodyByDefault: 'YES',
-					initialKeyGeneration: 'ON_USER_DEVICE',
-					tokenTransferTransactionGeneration:
-						TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
-				}).value,
+				evaluateMpc(
+					{
+						controllingSharesInSelfCustodyByDefault: 'YES',
+						initialKeyGeneration: 'ON_USER_DEVICE',
+						tokenTransferTransactionGeneration:
+							TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
+					},
+					[],
+				).value,
 			),
 			exampleRating(
 				mdParagraph(`
@@ -811,6 +851,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 					},
 					'erc4337',
+					[],
 				).value,
 			),
 		],
@@ -823,15 +864,18 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					and [BIP-44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki),
 					and allows the user to export the seed phrase and/or private keys.
 				`),
-				evaluateEoa({
-					canExportPrivateKey: true,
-					keyDerivation: {
-						canExportSeedPhrase: true,
-						type: 'BIP32',
-						derivationPath: 'BIP44',
-						seedPhrase: 'BIP39',
+				evaluateEoa(
+					{
+						canExportPrivateKey: true,
+						keyDerivation: {
+							canExportSeedPhrase: true,
+							type: 'BIP32',
+							derivationPath: 'BIP44',
+							seedPhrase: 'BIP39',
+						},
 					},
-				}).value,
+					[],
+				).value,
 			),
 			exampleRating(
 				paragraph(`
@@ -840,12 +884,15 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					generate a token transfer transaction using standalone open-source
 					software which does not rely on any third party API.
 				`),
-				evaluateMpc({
-					controllingSharesInSelfCustodyByDefault: 'YES',
-					initialKeyGeneration: 'ON_USER_DEVICE',
-					tokenTransferTransactionGeneration:
-						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				}).value,
+				evaluateMpc(
+					{
+						controllingSharesInSelfCustodyByDefault: 'YES',
+						initialKeyGeneration: 'ON_USER_DEVICE',
+						tokenTransferTransactionGeneration:
+							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					},
+					[],
+				).value,
 			),
 			exampleRating(
 				mdParagraph(`
@@ -863,6 +910,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 					},
 					'erc4337',
+					[],
 				).value,
 			),
 		],
@@ -871,31 +919,37 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 		if (features.accountSupport === null) {
 			return unrated(accountPortability, brand, null)
 		}
+		const allRefs = mergeRefs(
+			refs<Support<AccountTypeEoa>>(features.accountSupport.eoa),
+			refs<Support<AccountTypeMpc>>(features.accountSupport.mpc),
+			refs<Support<AccountTypeMutableMultifactor>>(features.accountSupport.rawErc4337),
+			refs<Support<AccountType7702>>(features.accountSupport.eip7702),
+		)
 		const evaluations: Array<Evaluation<AccountPortabilityValue>> = []
 		let defaultEvaluation: Evaluation<AccountPortabilityValue> | null = null
-		if (isAccountTypeSupported<AccountTypeEoa>(features.accountSupport.eoa)) {
-			const evaluation = evaluateEoa(features.accountSupport.eoa)
+		if (isSupported<AccountTypeEoa>(features.accountSupport.eoa)) {
+			const evaluation = evaluateEoa(features.accountSupport.eoa, allRefs)
 			evaluations.push(evaluation)
 			if (features.accountSupport.defaultAccountType === AccountType.eoa) {
 				defaultEvaluation = evaluation
 			}
 		}
-		if (isAccountTypeSupported<AccountTypeMpc>(features.accountSupport.mpc)) {
-			const evaluation = evaluateMpc(features.accountSupport.mpc)
+		if (isSupported<AccountTypeMpc>(features.accountSupport.mpc)) {
+			const evaluation = evaluateMpc(features.accountSupport.mpc, allRefs)
 			evaluations.push(evaluation)
 			if (features.accountSupport.defaultAccountType === AccountType.mpc) {
 				defaultEvaluation = evaluation
 			}
 		}
-		if (isAccountTypeSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)) {
-			const evaluation = evaluateMultifactor(features.accountSupport.rawErc4337, 'erc4337')
+		if (isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)) {
+			const evaluation = evaluateMultifactor(features.accountSupport.rawErc4337, 'erc4337', allRefs)
 			evaluations.push(evaluation)
 			if (features.accountSupport.defaultAccountType === AccountType.rawErc4337) {
 				defaultEvaluation = evaluation
 			}
 		}
-		if (isAccountTypeSupported<AccountType7702>(features.accountSupport.eip7702)) {
-			const evaluation = evaluateEip7702(features.accountSupport)
+		if (isSupported<AccountType7702>(features.accountSupport.eip7702)) {
+			const evaluation = evaluateEip7702(features.accountSupport, allRefs)
 			evaluations.push(evaluation)
 			if (features.accountSupport.defaultAccountType === AccountType.eip7702) {
 				defaultEvaluation = evaluation

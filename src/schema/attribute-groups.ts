@@ -25,6 +25,7 @@ import {
 	sourceVisibility,
 	type SourceVisibilityValue,
 } from './attributes/transparency/source-visibility'
+import { feeTransparency, type FeeTransparencyValue } from './attributes/transparency/fee-transparency'
 import type { ResolvedFeatures } from './features'
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { Dict } from '@/types/utils/dict'
@@ -54,6 +55,14 @@ import {
 } from './attributes/ecosystem/address-resolution'
 import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
 import {
+	hardwareWalletClearSigning,
+	type HardwareWalletClearSigningValue,
+} from './attributes/security/hardware-wallet-clear-signing'
+import {
+	hardwareWalletSupport,
+	type HardwareWalletSupportValue,
+} from './attributes/security/hardware-wallet-support'
+import {
 	transactionInclusion,
 	type TransactionInclusionValue,
 } from './attributes/self-sovereignty/transaction-inclusion'
@@ -65,11 +74,33 @@ import {
 	accountPortability,
 	type AccountPortabilityValue,
 } from './attributes/self-sovereignty/account-portability'
+import {
+	passkeyImplementation,
+	type PasskeyImplementationValue,
+} from './attributes/security/passkey-implementation'
+import {
+	softwareHWIntegration,
+	type SoftwareHWIntegrationValue,
+} from './attributes/security/software-hw-integration'
+import {
+	bugBountyProgram,
+	type BugBountyProgramValue,
+} from './attributes/security/bug-bounty-program'
+import {
+	scamPrevention,
+	type ScamPreventionValue,
+} from './attributes/security/scam-prevention'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
+	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
+	hardwareWalletClearSigning: HardwareWalletClearSigningValue
+	hardwareWalletSupport: HardwareWalletSupportValue
+	softwareHWIntegration: SoftwareHWIntegrationValue
+	passkeyImplementation: PasskeyImplementationValue
+	bugBountyProgram: BugBountyProgramValue
 }>
 
 /** Security attributes. */
@@ -82,11 +113,23 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	),
 	attributes: {
 		securityAudits,
+		scamPrevention,
 		chainVerification,
+		hardwareWalletClearSigning,
+		hardwareWalletSupport,
+		softwareHWIntegration,
+		passkeyImplementation,
+		bugBountyProgram,
 	},
 	score: scoreGroup<SecurityValues>({
 		securityAudits: 1.0,
+		scamPrevention: 1.0,
 		chainVerification: 1.0,
+		hardwareWalletClearSigning: 1.0,
+		hardwareWalletSupport: 1.0,
+		softwareHWIntegration: 1.0,
+		passkeyImplementation: 1.0,
+		bugBountyProgram: 1.0,
 	}),
 }
 
@@ -148,6 +191,7 @@ type TransparencyValues = Dict<{
 	openSource: OpenSourceValue
 	sourceVisibility: SourceVisibilityValue
 	funding: FundingValue
+	feeTransparency: FeeTransparencyValue
 }>
 
 /** Transparency attributes. */
@@ -163,11 +207,13 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		openSource,
 		sourceVisibility,
 		funding,
+		feeTransparency,
 	},
 	score: scoreGroup<TransparencyValues>({
 		openSource: 1.0,
 		sourceVisibility: 1.0,
 		funding: 1.0,
+		feeTransparency: 1.0,
 	}),
 }
 
@@ -212,7 +258,13 @@ export const attributeTree: NonEmptyRecord<string, AttributeGroup<any>> = {
 /** Evaluated security attributes for a single wallet. */
 export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
+	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
+	hardwareWalletClearSigning: EvaluatedAttribute<HardwareWalletClearSigningValue>
+	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
+	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>
+	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
+	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
 }
 
 /** Evaluated privacy attributes for a single wallet. */
@@ -232,6 +284,8 @@ export interface SelfSovereigntyEvaluations extends EvaluatedGroup<SelfSovereign
 export interface TransparencyEvaluations extends EvaluatedGroup<TransparencyValues> {
 	openSource: EvaluatedAttribute<OpenSourceValue>
 	sourceVisibility: EvaluatedAttribute<SourceVisibilityValue>
+	funding: EvaluatedAttribute<FundingValue>
+	feeTransparency: EvaluatedAttribute<FeeTransparencyValue>
 }
 
 /** Evaluated ecosystem attributes for a single wallet. */
@@ -265,7 +319,13 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 	return {
 		security: {
 			securityAudits: evalAttr(securityAudits),
+			scamPrevention: evalAttr(scamPrevention),
 			chainVerification: evalAttr(chainVerification),
+			hardwareWalletClearSigning: evalAttr(hardwareWalletClearSigning),
+			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
+			softwareHWIntegration: evalAttr(softwareHWIntegration),
+			passkeyImplementation: evalAttr(passkeyImplementation),
+			bugBountyProgram: evalAttr(bugBountyProgram),
 		},
 		privacy: {
 			addressCorrelation: evalAttr(addressCorrelation),
@@ -280,6 +340,7 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 			openSource: evalAttr(openSource),
 			sourceVisibility: evalAttr(sourceVisibility),
 			funding: evalAttr(funding),
+			feeTransparency: evalAttr(feeTransparency),
 		},
 		ecosystem: {
 			accountAbstraction: evalAttr(accountAbstraction),
@@ -312,7 +373,13 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 	return {
 		security: {
 			securityAudits: attr(tree => tree.security.securityAudits),
+			scamPrevention: attr(tree => tree.security.scamPrevention),
 			chainVerification: attr(tree => tree.security.chainVerification),
+			hardwareWalletClearSigning: attr(tree => tree.security.hardwareWalletClearSigning),
+			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
+			softwareHWIntegration: attr(tree => tree.security.softwareHWIntegration),
+			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
+			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
 		},
 		privacy: {
 			addressCorrelation: attr(tree => tree.privacy.addressCorrelation),
@@ -327,6 +394,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			openSource: attr(tree => tree.transparency.openSource),
 			sourceVisibility: attr(tree => tree.transparency.sourceVisibility),
 			funding: attr(tree => tree.transparency.funding),
+			feeTransparency: attr(tree => tree.transparency.feeTransparency),
 		},
 		ecosystem: {
 			accountAbstraction: attr(tree => tree.ecosystem.accountAbstraction),
@@ -426,9 +494,9 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 				return score === null
 					? null
 					: {
-							score,
-							weight,
-						}
+						score,
+						weight,
+					}
 			}),
 		).filter(score => score !== null)
 		if (isNonEmptyArray(subScores)) {

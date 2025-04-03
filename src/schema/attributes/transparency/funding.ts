@@ -18,6 +18,7 @@ import {
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { fundingDetailsContent } from '@/types/content/funding-details'
+import { toFullyQualified } from '@/schema/reference'
 
 const brand = 'attributes.transparency.funding'
 export type FundingValue = Value & {
@@ -43,6 +44,7 @@ function transparent(
 			__brand: brand,
 		},
 		details: fundingDetailsContent({ monetization }),
+		references: toFullyQualified(monetization.ref),
 	}
 }
 
@@ -74,6 +76,7 @@ function extractive(
 				donations, or ecosystem grants.
 			`,
 		),
+		references: toFullyQualified(monetization.ref),
 	}
 }
 
@@ -104,6 +107,7 @@ const noFunding: Evaluation<FundingValue> = {
 			once feasible.
 		`,
 	),
+	references: [],
 }
 
 /** Funding is not transparent. */
@@ -130,6 +134,7 @@ const unclear: Evaluation<FundingValue> = {
 			plans to fund itself.
 		`,
 	),
+	references: [],
 }
 
 /**

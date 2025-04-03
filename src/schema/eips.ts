@@ -9,6 +9,8 @@ export type EipNumber = '1193' | '2700' | '4337' | '6963' | '7702' | '7828' | '7
 export enum EipStatus {
 	DRAFT = 'DRAFT',
 	FINAL = 'FINAL',
+	LIVING = 'LIVING',
+	LAST_CALL = 'LAST_CALL',
 }
 
 /**

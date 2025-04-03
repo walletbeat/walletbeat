@@ -36,7 +36,8 @@ export type BrowserIntegrationValue = Value & {
 function browserIntegrationSupport(
 	support: WithRef<ResolvedSupport>,
 ): Evaluation<BrowserIntegrationValue> {
-	const { withoutRefs } = popRefs<ResolvedSupport>(support)
+	const { refs, withoutRefs } = popRefs<ResolvedSupport>(support)
+
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
 	const supported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
 		.filter(([_, v]) => isSupported(v))
@@ -74,6 +75,7 @@ function browserIntegrationSupport(
 					or the newer ${eipMarkdownLink(eip6963)}.
 				`,
 			),
+			references: refs,
 		}
 	}
 	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL
@@ -115,6 +117,7 @@ function browserIntegrationSupport(
 							${commaListFormat(unsupported.map(eipNum => eipMarkdownLink(getEip(eipNum))))}.
 						`,
 					),
+		references: refs,
 	}
 }
 

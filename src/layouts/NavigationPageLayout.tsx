@@ -1,5 +1,5 @@
 import theme from '@/components/ThemeRegistry/theme'
-import { Box, ThemeProvider } from '@mui/material'
+import { ThemeProvider } from '@mui/material'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -7,7 +7,7 @@ import {
 	type NavigationGroup,
 	isNavigationContentItem,
 	type NavigationItem,
-} from '@/components/ui/organisms/Navigation'
+} from '@/ui/organisms/Navigation'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 const scrollNavigationMargin = 8
@@ -18,6 +18,7 @@ export function NavigationPageLayout({
 	contentDependencies = [],
 	stickyHeaderId = undefined,
 	stickyHeaderMargin = undefined,
+	prefix,
 }: {
 	/**
 	 * Set of navigation item groups.
@@ -47,6 +48,11 @@ export function NavigationPageLayout({
 	 * `groups` is already implicitly included in this.
 	 */
 	contentDependencies?: React.DependencyList
+
+	/**
+	 * Prefix to display in the navigation bar.
+	 */
+	prefix?: React.ReactNode
 }): React.JSX.Element {
 	const [activeItemId, setActiveItemId] = useState<string>('')
 
@@ -157,21 +163,13 @@ export function NavigationPageLayout({
 
 	return (
 		<ThemeProvider theme={theme}>
-			<Box key="pageViewport" display="flex" flexDirection="row" width="100%">
-				<Navigation key="navigation" flex="0" groups={groups} activeItemId={activeItemId} />
-				<Box key="contentSpacerLeft" flex="1" />
-				<Box
-					key="contentContainer"
-					display="flex"
-					flex="0"
-					flexDirection="column"
-					minWidth="60vw"
-					maxWidth="80vw"
-				>
-					{children}
-				</Box>
-				<Box key="contentSpacerRight" flex="1" />
-			</Box>
+			<div className="flex flex-col lg:flex-row w-full min-h-screen max-w-screen">
+				<Navigation key="navigation" groups={groups} activeItemId={activeItemId} prefix={prefix} />
+
+				<div key="contentContainer" className="flex-grow overflow-y-auto min-h-screen w-full pb-24">
+					<div className="mx-auto w-full">{children}</div>
+				</div>
+			</div>
 		</ThemeProvider>
 	)
 }

@@ -35,11 +35,11 @@ export type UnpatchedSecurityFlaw = {
 	/** The severity level of the security flaw. */
 	severityAtAuditPublication: SecurityFlawSeverity
 } & (
-	| {
+		| {
 			/** The status of this flaw in the present day. */
 			presentStatus: 'NOT_FIXED'
-	  }
-	| MustRef<{
+		}
+		| MustRef<{
 			/**
 			 * The status of this flaw in the present day.
 			 * If a flaw was fixed after audit publication, it must come with a
@@ -50,8 +50,8 @@ export type UnpatchedSecurityFlaw = {
 
 			/** The date at which the flaw was fixed. */
 			fixedDate: CalendarDate
-	  }>
-)
+		}>
+	)
 
 /**
  * A single security audit.
