@@ -28,10 +28,7 @@
 			// 	sorter?: (a: CellValue, b: CellValue, rowA: Datum, rowB: Datum, direction: SortDirection) => number
 			// }
 		)[]
-		defaultSort?: {
-			columnId: NonNullable<ConstructorParameters<typeof DataTable<Datum>>[0]['initialSort']>
-			direction: NonNullable<ConstructorParameters<typeof DataTable<Datum>>[0]['initialSortDirection']>
-		}
+		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<Datum>>[0]['defaultSort']>
 		rows: Datum[]
 		getId?: (row: Datum, index: number) => any
 		getDisabled: (row: Datum, table: DataTable<Datum>) => boolean
@@ -59,8 +56,7 @@
 		new DataTable<Datum>({
 			data: rows,
 			columns,
-			initialSort: defaultSort?.columnId,
-			initialSortDirection: defaultSort?.direction,
+			defaultSort,
 		})
 	)
 
@@ -92,20 +88,8 @@
 				},
 			})),
 
-			initialSort: defaultSort?.columnId,
-			initialSortDirection: defaultSort?.direction,
+			defaultSort,
 		})
-	})
-
-	$effect(() => {
-		if(defaultSort && !table.sortState.direction){
-			// table.sortState = defaultSort
-
-			table.toggleSort(defaultSort.columnId)
-
-			if(table.sortState.direction !== defaultSort.direction)
-				table.toggleSort(defaultSort.columnId)
-		}
 	})
 
 

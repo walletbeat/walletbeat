@@ -13,14 +13,18 @@ export interface ColumnDef<T, V = any> {
 	filter?: Filter<T, V>
 }
 
-type SortDirection = 'asc' | 'desc' | null
+type SortDirection = 'asc' | 'desc'
+
+type SortState = {
+	columnId: string
+	direction: SortDirection
+}
 
 type TableConfig<T> = {
 	data: T[]
 	columns: ColumnDef<T>[]
 	pageSize?: number
-	initialSort?: string
-	initialSortDirection?: SortDirection
+	defaultSort?: SortState
 	initialFilters?: { [id: string]: any[] }
 }
 
@@ -31,16 +35,11 @@ type TableConfig<T> = {
 export class DataTable<T> {
 	#columns: ColumnDef<T>[]
 	#pageSize: number
+	#defaultSort?: SortState
 
 	#originalData = $state<T[]>([])
 	#currentPage = $state(1)
-	#sortState = $state<{
-		columnId: string | null
-		direction: SortDirection
-	}>({
-		columnId: null,
-		direction: null
-	})
+	#sortState?: SortState = $state()
 	#filterState = $state<{
 		[id: string]: Set<any>
 	}>({})
@@ -60,12 +59,7 @@ export class DataTable<T> {
 		this.#originalData = [...config.data]
 		this.#columns = config.columns
 		this.#pageSize = config.pageSize || 10
-		if (config.initialSort) {
-			this.#sortState = {
-				columnId: config.initialSort,
-				direction: config.initialSortDirection || 'asc'
-			}
-		}
+		this.#defaultSort = config.defaultSort
 		this.#initializeFilterState(config.initialFilters)
 	}
 
@@ -134,8 +128,9 @@ export class DataTable<T> {
 	#applySort() {
 		if (!this.#isSortDirty) return
 
-		const { columnId, direction } = this.#sortState
-		if (columnId && direction) {
+		if (this.#sortState) {
+			const { columnId, direction } = this.#sortState
+
 			const colDef = this.#getColumnDef(columnId)
 			this.#sortedData = [...this.#filteredData].sort((a, b) => {
 				const aVal = this.#getValue(a, columnId)
@@ -321,27 +316,35 @@ export class DataTable<T> {
 
 		this.#isSortDirty = true
 
-		if (this.#sortState.columnId === columnId) {
-			const defaultSortDirection = colDef.defaultSortDirection ?? 'asc'
-
+		if(this.#sortState?.columnId !== columnId){
 			this.#sortState = {
-				columnId,
-				direction: (
-					this.#sortState.direction === null ?
-						defaultSortDirection
-					: this.#sortState.direction === defaultSortDirection ?
-						defaultSortDirection ? 'desc' : 'asc'
-					:
-						null
-				),
-			}
-		} else {
-			this.#sortState = { 
 				columnId, 
 				direction: (
 					this.#getColumnDef(columnId)?.defaultSortDirection ?? 'asc'
 				),
 			}
+		}else{
+			const defaultSortDirection = colDef.defaultSortDirection ?? 'asc'
+
+			const newSortDirection = (
+				!this.#sortState?.direction ?
+					defaultSortDirection
+				: this.#sortState.direction === defaultSortDirection ?
+					defaultSortDirection === 'asc' ? 'desc' : 'asc'
+				:
+					null
+			)
+
+			if(newSortDirection){
+				this.#sortState = {
+					columnId,
+					direction: newSortDirection,
+				}
+
+				return
+			}
+
+			this.#sortState = this.#defaultSort
 		}
 	}
 
@@ -349,8 +352,8 @@ export class DataTable<T> {
 	 * Gets the current sort state for the specified column.
 	 * @param {string} columnId - The column id to get the sort state for.
 	 */
-	getSortState = (columnId: string): SortDirection => {
-		return this.#sortState.columnId === columnId ? this.#sortState.direction : null
+	getSortState = (columnId: string) => {
+		return this.#sortState?.columnId === columnId ? this.#sortState.direction : undefined
 	}
 
 	/**
