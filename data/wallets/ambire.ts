@@ -172,7 +172,15 @@ export const ambire: Wallet = {
 					newRecipientWarning: false,
 					leaksRecipient: false,
 					leaksUserAddress: false,
-					leaksUserIp: true,
+					leaksUserIp: false,
+					ref: {
+						url: {
+							url: 'https://github.com/AmbireTech/ambire-common/blob/v2/src/libs/portfolio/getOnchainBalances.ts',
+							label: 'Part of the implementation for balance change detection',
+						},
+						explanation:
+							'Ambire uses generic JSON RPC methods methods to detect significant balance changes without relying on third party services (other than standard JSON RPC-s and internal services). By Default all provider requests for default chains are handled via an Ambire proxy service that prevents the leaking of user IPs.',
+					},
 				}),
 			},
 			publicSecurityAudits: [...v2Audits, ...v1Audits],
