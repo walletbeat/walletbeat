@@ -50,10 +50,59 @@ export class DataTable<T> {
 	#globalFilter = $state<string>('')
 
 	#globalFilterRegex: RegExp | null = null
-	#isFilterDirty = true
-	#isSortDirty = true
-	#filteredData: T[] = []
-	#sortedData: T[] = []
+
+	#filteredData = $derived(
+		this.#originalData.filter((row) => (
+			this.#matchesGlobalFilter(row) && this.#matchesFilters(row)
+		))
+	)
+
+	#sortedData = $derived.by(() => {
+		if (this.#sortState) {
+			const { columnId, direction } = this.#sortState
+
+			const colDef = this.#getColumnDef(columnId)
+
+			return [...this.#filteredData].sort((a, b) => {
+				if (this.#displaceDisabledRows && this.#getDisabled) {
+					const isRowADisplaced = this.#getDisabled(a, this)
+					const isRowBDisplaced = this.#getDisabled(b, this)
+
+					if(isRowADisplaced || isRowBDisplaced)
+						return (
+							isRowADisplaced && isRowBDisplaced ?
+								0
+							: isRowADisplaced ?
+								1
+							:
+								-1
+						)
+				}
+
+				const aVal = this.#getValue(a, columnId)
+				const bVal = this.#getValue(b, columnId)
+
+				if (aVal === undefined || aVal === null) return direction === 'asc' ? 1 : -1
+				if (bVal === undefined || bVal === null) return direction === 'asc' ? -1 : 1
+
+				if (colDef && colDef.sorter) {
+					return direction === 'asc'
+						? colDef.sorter(aVal, bVal, a, b)
+						: colDef.sorter(bVal, aVal, b, a)
+				}
+
+				if (typeof aVal === 'string' && typeof bVal === 'string') {
+					return direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+				}
+
+				if (aVal < bVal) return direction === 'asc' ? -1 : 1
+				if (aVal > bVal) return direction === 'asc' ? 1 : -1
+				return 0
+			})
+		} else {
+			return this.#filteredData
+		}
+	})
 
 	/**
 	 * Creates a new DataTable instance.
@@ -121,65 +170,6 @@ export class DataTable<T> {
 		})
 	}
 
-	#applyFilters() {
-		if (!this.#isFilterDirty) return
-
-		this.#filteredData = this.#originalData.filter(
-			(row) => this.#matchesGlobalFilter(row) && this.#matchesFilters(row)
-		)
-		this.#isFilterDirty = false
-		this.#isSortDirty = true
-	}
-
-	#applySort() {
-		if (!this.#isSortDirty) return
-
-		if (this.#sortState) {
-			const { columnId, direction } = this.#sortState
-
-			const colDef = this.#getColumnDef(columnId)
-			this.#sortedData = [...this.#filteredData].sort((a, b) => {
-				if (this.#displaceDisabledRows && this.#getDisabled) {
-					const isRowADisplaced = this.#getDisabled(a, this)
-					const isRowBDisplaced = this.#getDisabled(b, this)
-
-					if(isRowADisplaced || isRowBDisplaced)
-						return (
-							isRowADisplaced && isRowBDisplaced ?
-								0
-							: isRowADisplaced ?
-								1
-							:
-								-1
-						)
-				}
-
-				const aVal = this.#getValue(a, columnId)
-				const bVal = this.#getValue(b, columnId)
-
-				if (aVal === undefined || aVal === null) return direction === 'asc' ? 1 : -1
-				if (bVal === undefined || bVal === null) return direction === 'asc' ? -1 : 1
-
-				if (colDef && colDef.sorter) {
-					return direction === 'asc'
-						? colDef.sorter(aVal, bVal, a, b)
-						: colDef.sorter(bVal, aVal, b, a)
-				}
-
-				if (typeof aVal === 'string' && typeof bVal === 'string') {
-					return direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
-				}
-
-				if (aVal < bVal) return direction === 'asc' ? -1 : 1
-				if (aVal > bVal) return direction === 'asc' ? 1 : -1
-				return 0
-			})
-		} else {
-			this.#sortedData = [...this.#filteredData]
-		}
-		this.#isSortDirty = false
-	}
-
 	/**
 	 * Gets or sets the base data rows without any filtering or sorting applied.
 	 * @returns {T[]} An array of all rows.
@@ -193,7 +183,6 @@ export class DataTable<T> {
 	 */
 	set baseRows(rows: T[]) {
 		this.#currentPage = 1
-		this.#isFilterDirty = true
 		this.#originalData = [...rows]
 	}
 
@@ -202,15 +191,6 @@ export class DataTable<T> {
 	 * @returns {T[]} An array of all filtered and sorted rows.
 	 */
 	get allRows() {
-		// React to changes in original data, filter state, and sort state
-		this.#originalData
-		this.#sortState
-		this.#filterState
-		this.#globalFilter
-
-		this.#applyFilters()
-		this.#applySort()
-
 		return this.#sortedData
 	}
 
@@ -253,13 +233,6 @@ export class DataTable<T> {
 	 * @returns {number} The total number of pages.
 	 */
 	get totalPages() {
-		// React to changes in original data and filter state
-		this.#originalData
-		this.#filterState
-		this.#globalFilter
-
-		this.#applyFilters()
-
 		return Math.max(1, Math.ceil(this.#filteredData.length / this.#pageSize))
 	}
 
@@ -283,10 +256,6 @@ export class DataTable<T> {
 	 * @returns {boolean} True if there's a previous page available, false otherwise.
 	 */
 	get canGoBack() {
-		// React to changes in filter state
-		this.#filterState
-		this.#globalFilterRegex
-
 		return this.currentPage > 1 && this.#filteredData.length > 0
 	}
 
@@ -295,10 +264,6 @@ export class DataTable<T> {
 	 * @returns {boolean} True if there's a next page available, false otherwise.
 	 */
 	get canGoForward() {
-		// React to changes in filter state
-		this.#filterState
-		this.#globalFilterRegex
-
 		return this.currentPage < this.totalPages && this.#filteredData.length > 0
 	}
 
@@ -324,7 +289,6 @@ export class DataTable<T> {
 		}
 
 		this.#currentPage = 1
-		this.#isFilterDirty = true
 	}
 
 	/**
@@ -335,36 +299,20 @@ export class DataTable<T> {
 		const colDef = this.#getColumnDef(columnId)
 		if (!colDef || colDef.sortable === false) return
 
-		this.#isSortDirty = true
+		const defaultSortDirection = colDef.defaultSortDirection ?? 'asc'
+		const currentDirection = this.#sortState?.direction
 
-		if(this.#sortState?.columnId !== columnId){
+		if (this.#sortState?.columnId !== columnId) {
 			this.#sortState = {
-				columnId, 
-				direction: (
-					this.#getColumnDef(columnId)?.defaultSortDirection ?? 'asc'
-				),
+				columnId,
+				direction: defaultSortDirection
 			}
-		}else{
-			const defaultSortDirection = colDef.defaultSortDirection ?? 'asc'
-
-			const newSortDirection = (
-				!this.#sortState?.direction ?
-					defaultSortDirection
-				: this.#sortState.direction === defaultSortDirection ?
-					defaultSortDirection === 'asc' ? 'desc' : 'asc'
-				:
-					null
-			)
-
-			if(newSortDirection){
-				this.#sortState = {
-					columnId,
-					direction: newSortDirection,
-				}
-
-				return
+		} else if (currentDirection === defaultSortDirection) {
+			this.#sortState = {
+				columnId,
+				direction: defaultSortDirection === 'asc' ? 'desc' : 'asc'
 			}
-
+		} else {
 			this.#sortState = this.#defaultSort
 		}
 	}
@@ -392,7 +340,6 @@ export class DataTable<T> {
 	 * @param {any[]} values - The filter values to set.
 	 */
 	setFilter = (columnId: string, values: any[]) => {
-		this.#isFilterDirty = true
 		this.#filterState = { ...this.#filterState, [columnId]: new Set(values) }
 		this.#currentPage = 1
 	}
@@ -402,7 +349,6 @@ export class DataTable<T> {
 	 * @param {string} columnId - The column id to clear the filter values for.
 	 */
 	clearFilter = (columnId: string) => {
-		this.#isFilterDirty = true
 		this.#filterState = { ...this.#filterState, [columnId]: new Set() }
 		this.#currentPage = 1
 	}
@@ -413,7 +359,6 @@ export class DataTable<T> {
 	 * @param {any} value - The filter value to toggle.
 	 */
 	toggleFilter = (columnId: string, value: any) => {
-		this.#isFilterDirty = true
 		this.#filterState = {
 			...this.#filterState,
 			[columnId]: this.isFilterActive(columnId, value)
