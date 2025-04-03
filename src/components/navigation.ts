@@ -5,7 +5,8 @@ import ForumIcon from '@mui/icons-material/Forum'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import FoundationIcon from '@mui/icons-material/Foundation'
 import { betaSiteRoot } from '@/constants'
-import { LuBadgeCheck, LuBuilding2 } from 'react-icons/lu'
+import LuBadgeCheck from 'lucide-static/icons/badge-check.svg?raw'
+import LuBuilding2 from 'lucide-static/icons/building-2.svg?raw'
 
 export const navigationHome: NavigationLinkItem = {
 	id: 'wallet-table',
@@ -23,14 +24,14 @@ export const navigationFaq: NavigationLinkItem = {
 
 export const navigationAbout: NavigationLinkItem = {
 	id: 'about',
-	icon: LuBuilding2,
+	icon: { raw: LuBuilding2 },
 	title: 'About Walletbeat',
 	href: `${betaSiteRoot}/about`,
 }
 
 export const navigationCriteria: NavigationLinkItem = {
 	id: 'criteria',
-	icon: LuBadgeCheck,
+	icon: { raw: LuBadgeCheck },
 	title: 'Evaluation Criteria',
 	href: `${betaSiteRoot}/criteria`,
 }

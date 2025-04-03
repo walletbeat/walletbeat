@@ -9,7 +9,9 @@ import Layout from '../layouts/Layout.astro'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 
 // Components
-import { LuKey, LuWallet } from 'react-icons/lu'
+// import { LuKey, LuWallet } from 'react-icons/lu'
+import LuKey from 'lucide-static/icons/key.svg?raw'
+import LuWallet from 'lucide-static/icons/wallet.svg?raw'
 import { navigationAbout, navigationCriteria } from '@/components/navigation'
 import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
@@ -21,6 +23,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 	}}
 >
 	<NavigationPageLayout
+		client:load
 		groups={[
 			{
 				id: 'home',
@@ -38,7 +41,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 				items: [
 					{
 						title: 'Wallets',
-						icon: LuWallet,
+						icon: { raw: LuWallet },
 						href: '/',
 						id: 'wallets-nav',
 						children: Object.keys(wallets).map(key => {
@@ -62,7 +65,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 				items: [
 					{
 						title: 'Hardware Wallets',
-						icon: LuKey,
+						icon: { raw: LuKey },
 						href: '/',
 						id: 'hardware-wallets',
 						children: Object.keys(hardwareWallets).map(key => {

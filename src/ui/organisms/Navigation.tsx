@@ -17,7 +17,7 @@ interface NavigationItemBase {
 	/**
 	 * Item icon shown next to the item name in the navigation menu.
 	 */
-	icon?: string | React.FC
+	icon?: string | { raw: string } | React.FC
 
 	/**
 	 * Item name in the navigation menu.
@@ -207,7 +207,17 @@ const NavigationItem = memo(
 		return (
 			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				<ButtonComponent key="buttonComponent">
-					{item.icon !== undefined ? typeof item.icon === 'string' ? <img src={item.icon} /> : <SingleListItemIcon key="icon"><item.icon /></SingleListItemIcon> : null}
+					{item.icon ? (
+						<SingleListItemIcon key="icon">
+							{typeof item.icon === 'string' ? (
+								<img src={item.icon} />
+							) : 'raw' in item.icon ? (
+								<span dangerouslySetInnerHTML={{ __html: item.icon.raw }} />
+							) : (
+								<item.icon />
+							)}
+						</SingleListItemIcon>
+					) : null}
 					<span>{item.title}</span>
 				</ButtonComponent>
 

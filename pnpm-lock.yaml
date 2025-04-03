@@ -29,9 +29,6 @@ importers:
       '@fontsource/montserrat':
         specifier: ^5.2.5
         version: 5.2.5
-      '@fontsource/work-sans':
-        specifier: ^5.1.1
-        version: 5.1.1
       '@material-icons/svg':
         specifier: ^1.0.33
         version: 1.0.33
@@ -80,6 +77,9 @@ importers:
       cmdk:
         specifier: ^1.0.4
         version: 1.0.4(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      lucide-static:
+        specifier: ^0.487.0
+        version: 0.487.0
       postcss:
         specifier: ^8.5.1
         version: 8.5.1
@@ -1359,9 +1359,6 @@ packages:
 
   '@fontsource/montserrat@5.2.5':
     resolution: {integrity: sha512-/OA+bdg1yqUArDUnEeCqDwgTDiIpvED56TxYskje8UKpsvjl/0A9eNod7IcdHz6/Osi70vo7briRO3la8/u+5Q==}
-
-  '@fontsource/work-sans@5.1.1':
-    resolution: {integrity: sha512-fKxyO68szc0pg1GMVP87lVwfDAU/Ku3gjJK5G8TonOjSQAyQjcHlnC7HENeyIgboC/+hocGklSnMYmldjyAJtw==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -4218,6 +4215,9 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  lucide-static@0.487.0:
+    resolution: {integrity: sha512-voCG76ciX9Ri74MN4THwJbKY6iLBEvtiaWUKJwd0nk+ff4X247GPlukxvgUzCgYHpejrHLNdiVjlT0xOIayMLQ==}
 
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
@@ -7396,8 +7396,6 @@ snapshots:
   '@floating-ui/utils@0.2.9': {}
 
   '@fontsource/montserrat@5.2.5': {}
-
-  '@fontsource/work-sans@5.1.1': {}
 
   '@humanfs/core@0.19.1': {}
 
@@ -10732,6 +10730,8 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-static@0.487.0: {}
 
   magic-string@0.30.17:
     dependencies:
