@@ -45,6 +45,13 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 }
 
 /**
+ * Returns whether `obj` contains an entry for the given `variant`.
+ */
+export function hasVariant(obj: AtLeastOneVariant<unknown>, variant: Variant): boolean {
+	return Object.hasOwn(obj, variant);
+}
+
+/**
  * If the given object only has one variant, return it.
  * Otherwise, return [null, null].
  */

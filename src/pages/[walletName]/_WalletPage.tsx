@@ -625,9 +625,8 @@ export function WalletPage({
 								>
 									<WalletIcon
 										key="walletIcon"
-										walletMetadata={wallet.metadata}
+										wallet={wallet}
 										iconSize={navigationListIconSize * 2}
-										variants={wallet.variants}
 									/>
 									{wallet.metadata.displayName}
 								</Typography>

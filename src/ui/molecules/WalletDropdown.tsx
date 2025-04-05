@@ -1,21 +1,20 @@
-import type { Wallet } from '@/schema/wallet'
+import type { RatedWallet } from '@/schema/wallet'
 import { WalletIcon } from '../atoms/WalletIcon'
-import { wallets } from '@/data/wallets'
-import { hardwareWallets } from '@/data/hardware-wallets'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import * as Popover from '@radix-ui/react-popover'
 import { Command } from 'cmdk'
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { LuChevronDown, LuSearch, LuKey, LuWallet } from 'react-icons/lu'
+import { ratedWallets } from '@/data/wallets'
 
 // Interface for wallet items with additional metadata
 interface WalletItem {
 	id: string
 	type: 'software' | 'hardware'
-	metadata: Wallet['metadata']
-	variants: Wallet['variants']
+	wallet: RatedWallet
 }
 
-export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Element {
+export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.Element {
 	const [open, setOpen] = useState(false)
 	const [search, setSearch] = useState('')
 	const inputRef = useRef<HTMLInputElement>(null)
@@ -32,18 +31,16 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 	// Convert all wallets to a unified array with type information
 	const allWalletItems: WalletItem[] = [
 		// Regular wallets
-		...Object.entries(wallets).map(([id, walletData]) => ({
+		...Object.entries(ratedWallets).map(([id, walletData]) => ({
 			id,
 			type: 'software' as const,
-			metadata: walletData.metadata,
-			variants: walletData.variants,
+			wallet: walletData,
 		})),
 		// Hardware wallets
-		...Object.entries(hardwareWallets).map(([id, walletData]) => ({
+		...Object.entries(ratedHardwareWallets).map(([id, walletData]) => ({
 			id,
 			type: 'hardware' as const,
-			metadata: walletData.metadata,
-			variants: walletData.variants,
+			wallet: walletData,
 		})),
 	]
 
@@ -69,9 +66,8 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 						{wallet !== undefined ? (
 							<>
 								<WalletIcon
-									walletMetadata={wallet.metadata}
+									wallet={wallet}
 									iconSize={24}
-									variants={wallet.variants}
 								/>
 								<span>{wallet.metadata.displayName}</span>
 							</>
@@ -119,7 +115,7 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 							{/* Only show section headers when there are matching items */}
 							{softwareWalletItems.some(
 								w =>
-									w.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
+									w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
 									w.id.toLowerCase().includes(search.toLowerCase()),
 							) && (
 									<Command.Group
@@ -129,7 +125,7 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 										{softwareWalletItems
 											.filter(
 												w =>
-													w.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
+													w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
 													w.id.toLowerCase().includes(search.toLowerCase()),
 											)
 											.map(w => (
@@ -141,11 +137,10 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 												>
 													<span className="flex items-center gap-2 flex-1 min-w-0">
 														<WalletIcon
-															walletMetadata={w.metadata}
+															wallet={w.wallet}
 															iconSize={20}
-															variants={w.variants}
 														/>
-														<span className="truncate">{w.metadata.displayName}</span>
+														<span className="truncate">{w.wallet.metadata.displayName}</span>
 													</span>
 													<LuWallet className="ml-2 flex-shrink-0 opacity-40" size={14} />
 												</Command.Item>
@@ -155,7 +150,7 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 
 							{hardwareWalletItems.some(
 								w =>
-									w.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
+									w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
 									w.id.toLowerCase().includes(search.toLowerCase()),
 							) && (
 									<Command.Group
@@ -165,7 +160,7 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 										{hardwareWalletItems
 											.filter(
 												w =>
-													w.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
+													w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
 													w.id.toLowerCase().includes(search.toLowerCase()),
 											)
 											.map(w => (
@@ -177,11 +172,10 @@ export function WalletDropdown({ wallet }: { wallet?: Wallet }): React.JSX.Eleme
 												>
 													<span className="flex items-center gap-2 flex-1 min-w-0">
 														<WalletIcon
-															walletMetadata={w.metadata}
+															wallet={w.wallet}
 															iconSize={20}
-															variants={w.variants}
 														/>
-														<span className="truncate">{w.metadata.displayName}</span>
+														<span className="truncate">{w.wallet.metadata.displayName}</span>
 													</span>
 													<LuKey className="ml-2 flex-shrink-0 opacity-40" size={14} />
 												</Command.Item>
