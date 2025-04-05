@@ -14,7 +14,7 @@ import {
 	nonEmptyMap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-import { Box, Typography, Paper, styled, Divider, Tooltip } from '@mui/material'
+import { Box, Typography, Paper, styled, Tooltip } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { WalletIcon } from '@/ui/atoms/WalletIcon'
 import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
@@ -33,16 +33,13 @@ import {
 } from '@/schema/attributes'
 import {
 	navigationListIconSize,
-	sectionIconWidth,
 	subsectionBorderRadius,
-	subsectionIconWidth,
 } from '@/components/constants'
 import type { NavigationItem } from '@/ui/organisms/Navigation'
 import {
 	navigationAbout,
 	navigationFaq,
 	navigationFarcasterChannel,
-	navigationHome,
 	navigationRepository,
 	scrollPastHeaderPixels,
 } from '@/components/navigation'
@@ -65,7 +62,6 @@ import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import LanguageIcon from '@mui/icons-material/Language'
 import GitHubIcon from '@mui/icons-material/GitHub'
-import type { Url } from '@/schema/url'
 
 const headerBottomMargin = 0
 
