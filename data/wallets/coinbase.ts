@@ -14,7 +14,6 @@ import { code4rena } from '../entities/code4rena'
 import { certora } from '../entities/certora'
 import {
 	TransactionSubmissionL2Type,
-	transactionSubmissionL2TypeName,
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { License } from '@/schema/features/license'
 
