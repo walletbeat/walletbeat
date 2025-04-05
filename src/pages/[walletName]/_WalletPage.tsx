@@ -294,7 +294,7 @@ export function WalletPage({
 								(<div className="flex flex-row gap-2 items-center" key="website">
 									<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
 									<ExternalLink
-										url={refLink(wallet.metadata.url)}
+										url={wallet.metadata.url}
 										defaultLabel={`${wallet.metadata.displayName} website`}
 										style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
 									/>
@@ -304,7 +304,7 @@ export function WalletPage({
 										<div className="flex flex-row gap-2 items-center" key="repo">
 											<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
 											<ExternalLink
-												url={refLink(wallet.metadata.repoUrl)}
+												url={wallet.metadata.repoUrl}
 												defaultLabel="GitHub Repository"
 												style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
 											/>
@@ -738,22 +738,4 @@ export function WalletPage({
 			</div>
 		</NavigationPageLayout>
 	)
-}
-
-// ensures ref = wallet-page is in the url as query param
-export const refLink = (url: Url | undefined): Url | undefined => {
-	if (url === undefined) {
-		return undefined
-	}
-
-	// If url is a LabeledUrl, preserve the label while updating the URL
-	if (typeof url === 'object' && 'url' in url) {
-		return {
-			url: new URL(url.url).toString() + '?ref=wallet.page',
-			label: url.label
-		}
-	}
-
-	// Handle string URL
-	return new URL(url).toString() + '?ref=wallet.page'
 }
