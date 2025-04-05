@@ -9,8 +9,7 @@ import {
 import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, mdParagraph, paragraph, sentence, mdSentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { WalletProfile } from '@/schema/features/profile'
+import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import {
 	BugBountyProgramType,
 	type BugBountyProgramSupport,
@@ -277,13 +276,10 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 	evaluate: (features: ResolvedFeatures): Evaluation<BugBountyProgramValue> => {
 		// This attribute is only applicable for hardware wallets
 		// For software wallets, we exempt them from this attribute
-		if (features.profile !== WalletProfile.HARDWARE) {
+		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				bugBountyProgram,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is only applicable for hardware wallets, not for ${walletMetadata.displayName}.`,
-				),
+				sentence('This attribute is only applicable for hardware wallets.'),
 				brand,
 				{
 					programType: BugBountyProgramType.NONE,

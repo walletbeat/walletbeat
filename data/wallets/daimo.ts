@@ -49,7 +49,7 @@ export const daimo: Wallet = {
 		},
 	},
 	features: {
-		profile: WalletProfile.MOBILE,
+		profile: WalletProfile.PAYMENTS,
 		chainConfigurability: {
 			l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,
 			otherRpcEndpoints: RpcEndpointConfiguration.NO,

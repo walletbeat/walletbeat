@@ -21,7 +21,7 @@ import {
 import { type FullyQualifiedReference, popRefs } from '../../reference'
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { isSupported, type Support } from '@/schema/features/support'
-import { WalletProfile } from '@/schema/features/profile'
+import { Variant } from '@/schema/variants'
 
 const brand = 'attributes.security.chain_verification'
 export type ChainVerificationValue = Value & {
@@ -151,13 +151,10 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		),
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<ChainVerificationValue> => {
-		if (features.profile === WalletProfile.HARDWARE) {
+		if (features.variant == Variant.HARDWARE) {
 			return exempt(
 				chainVerification,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet.`,
-				),
+				sentence('This attribute is not applicable for hardware wallets.'),
 				brand,
 				null,
 			)

@@ -33,7 +33,7 @@ export const fireflyWallet: Wallet = {
 		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,

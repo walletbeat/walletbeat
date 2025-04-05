@@ -6,16 +6,13 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, isErc4337SmartWallet, exempt } from '../common'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import { isSupported } from '@/schema/features/support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { WalletProfile } from '@/schema/features/profile'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import { popRefs } from '@/schema/reference'
+import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 
 const brand = 'attributes.security.hardware_wallet_clear_signing'
 export type HardwareWalletClearSigningValue = Value & {
@@ -277,98 +274,96 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletClearSigningValue> => {
 		// For hardware wallets themselves:
 		// This evaluates the hardware wallet's own clear signing capabilities
-		if (features.profile === WalletProfile.HARDWARE) {
-			// Check if clear signing feature exists
-			if (!features.security.hardwareWalletClearSigning) {
-				return unrated(hardwareWalletClearSigning, brand, {
-					clearSigningLevel: ClearSigningLevel.NONE,
-				})
-			}
-
-			// Extract references from the hardware wallet clear signing feature
-			const { withoutRefs, refs: extractedRefs } = popRefs(
-				features.security.hardwareWalletClearSigning,
-			)
-
-			const clearSigningLevel = withoutRefs.clearSigningSupport.level
-
-			// Use a simpler approach for now - we'll just include a standard reference for devices with full clear signing
-			let standardRefs = []
-			if (clearSigningLevel === ClearSigningLevel.FULL) {
-				standardRefs = [
-					{
-						url: 'https://ethereum.org/en/security/#hardware-wallets',
-						explanation: 'More information about hardware wallet security',
-					},
-				]
-			}
-
-			// Combine extracted references with standard references if any
-			const allReferences = [...extractedRefs, ...standardRefs]
-
-			let result: Evaluation<HardwareWalletClearSigningValue>
-
-			switch (clearSigningLevel) {
-				case ClearSigningLevel.NONE:
-					result = noHardwareWalletClearSigning()
-					break
-				case ClearSigningLevel.BASIC:
-					result = basicClearSigning(['this hardware wallet'])
-					break
-				case ClearSigningLevel.PARTIAL:
-					result = partialClearSigning(['this hardware wallet'])
-					break
-				case ClearSigningLevel.FULL:
-					result = fullClearSigning(['this hardware wallet'])
-					break
-				default:
+		switch (features.variant){
+			case Variant.HARDWARE:
+				// Check if clear signing feature exists
+				if (!features.security.hardwareWalletClearSigning) {
 					return unrated(hardwareWalletClearSigning, brand, {
 						clearSigningLevel: ClearSigningLevel.NONE,
 					})
-			}
+				}
 
-			// Return result with references
-			return {
-				...result,
-				...(allReferences.length > 0 && { references: allReferences }),
-			}
-		}
+				// Extract references from the hardware wallet clear signing feature
+				const { withoutRefs, refs: extractedRefs } = popRefs(
+					features.security.hardwareWalletClearSigning,
+				)
 
-		// Check for ERC-4337 smart wallet
-		if (isErc4337SmartWallet(features)) {
-			return exempt(
-				hardwareWalletClearSigning,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`,
-				),
-				brand,
-				{ clearSigningLevel: ClearSigningLevel.NONE },
-			)
-		}
+				const clearSigningLevel = withoutRefs.clearSigningSupport.level
 
-		// For software wallets:
-		// Make this attribute exempt as it should only apply to hardware wallets
-		return {
-			value: {
-				id: 'exempt_software_wallet',
-				rating: Rating.EXEMPT,
-				displayName: 'Only applicable for hardware wallets',
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) => `
-						This attribute evaluates hardware wallet clear signing capabilities and is not applicable for software wallets.
-					`,
-				),
-				clearSigningLevel: ClearSigningLevel.NONE,
-				__brand: brand,
-			},
-			details: paragraph(
-				({ wallet }) => `
-					As ${wallet.metadata.displayName} is a software wallet, this attribute which evaluates
-					hardware wallet clear signing capabilities is not applicable. Please see the hardware wallet 
-					integration attribute for how well this software wallet connects to hardware wallets.
-				`,
-			),
+				// Use a simpler approach for now - we'll just include a standard reference for devices with full clear signing
+				let standardRefs = []
+				if (clearSigningLevel === ClearSigningLevel.FULL) {
+					standardRefs = [
+						{
+							url: 'https://ethereum.org/en/security/#hardware-wallets',
+							explanation: 'More information about hardware wallet security',
+						},
+					]
+				}
+
+				// Combine extracted references with standard references if any
+				const allReferences = [...extractedRefs, ...standardRefs]
+
+				let result: Evaluation<HardwareWalletClearSigningValue>
+
+				switch (clearSigningLevel) {
+					case ClearSigningLevel.NONE:
+						result = noHardwareWalletClearSigning()
+						break
+					case ClearSigningLevel.BASIC:
+						result = basicClearSigning(['this hardware wallet'])
+						break
+					case ClearSigningLevel.PARTIAL:
+						result = partialClearSigning(['this hardware wallet'])
+						break
+					case ClearSigningLevel.FULL:
+						result = fullClearSigning(['this hardware wallet'])
+						break
+					default:
+						return unrated(hardwareWalletClearSigning, brand, {
+							clearSigningLevel: ClearSigningLevel.NONE,
+						})
+				}
+
+				// Return result with references
+				return {
+					...result,
+					...(allReferences.length > 0 && { references: allReferences }),
+				}
+
+			default:
+				// Check for ERC-4337 smart wallet
+				if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
+					return exempt(
+						hardwareWalletClearSigning,
+						sentence(
+							(walletMetadata: WalletMetadata) =>
+								`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`,
+						),
+						brand,
+						{ clearSigningLevel: ClearSigningLevel.NONE },
+					)
+				}
+
+				// For software wallets:
+				// Make this attribute exempt as it should only apply to hardware wallets
+				return {
+					value: {
+						id: 'exempt_software_wallet',
+						rating: Rating.EXEMPT,
+						displayName: 'Only applicable for hardware wallets',
+						shortExplanation: sentence('This attribute evaluates hardware wallet clear signing capabilities and is not applicable for software wallets.'),
+						clearSigningLevel: ClearSigningLevel.NONE,
+						__brand: brand,
+					},
+					details: paragraph(
+						({ wallet }) => `
+							As ${wallet.metadata.displayName} is a software wallet, this attribute which evaluates
+							hardware wallet clear signing capabilities is not applicable. Please see the hardware wallet
+							integration attribute for how well this software wallet connects to hardware wallets.
+						`,
+					),
+				}
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletClearSigningValue>>) => pickWorstRating<HardwareWalletClearSigningValue>(perVariant),

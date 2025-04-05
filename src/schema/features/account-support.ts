@@ -28,6 +28,13 @@ export enum AccountType {
 	rawErc4337 = 'rawErc4337',
 }
 
+const allAccountTypes: AccountType[] = [
+	AccountType.eoa,
+	AccountType.mpc,
+	AccountType.rawErc4337,
+	AccountType.eip7702,
+]
+
 /** The ability (or lack thereof) to generate a transaction of a specific type. */
 export enum TransactionGenerationCapability {
 	/** The process to generate such a transaction relies on a third-party API. */
@@ -76,6 +83,34 @@ export type AccountSupport = Exclude<
 	// At least one account type must be supported.
 	Record<AccountType, NotSupported>
 > & { defaultAccountType: AccountType }
+
+/**
+ * Returns whether the given AccountSupport data supports the given account type.
+ */
+export function supportsAccountType(accountSupport: AccountSupport | null | undefined, accountType: AccountType): boolean {
+	if (accountSupport === undefined || accountSupport === null) {
+		return false;
+	}
+	return Object.hasOwn(accountSupport, accountType) && isSupported(accountSupport[accountType]);
+}
+
+/**
+ * Returns whether the given AccountSupport data supports *only* the given account type and no other.
+ */
+export function supportsOnlyAccountType(accountSupport: AccountSupport | null | undefined, accountType: AccountType): boolean {
+	if (!supportsAccountType(accountSupport, accountType)) {
+		return false;
+	}
+	for (const otherType of allAccountTypes) {
+		if (otherType === accountType) {
+			continue;
+		}
+		if (supportsAccountType(accountSupport, otherType)) {
+			return false;
+		}
+	}
+	return true;
+}
 
 /** Support information for EOA accounts. */
 export interface AccountTypeEoa {

@@ -6,16 +6,14 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, exempt, unrated, isErc4337SmartWallet } from '../common'
+import { pickWorstRating, exempt } from '../common'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { WalletProfile } from '@/schema/features/profile'
+import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { popRefs } from '@/schema/reference'
+import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 
 const brand = 'attributes.security.software_hw_integration'
 export type SoftwareHWIntegrationValue = Value & {
@@ -242,7 +240,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SoftwareHWIntegrationValue> => {
 		// For hardware wallets, this evaluation doesn't apply
-		if (features.profile === WalletProfile.HARDWARE) {
+		if (features.variant === Variant.HARDWARE) {
 			return {
 				value: {
 					id: 'exempt_hardware_wallet',
@@ -266,7 +264,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		}
 
 		// Check for ERC-4337 smart wallet
-		if (isErc4337SmartWallet(features)) {
+		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(
 				softwareHWIntegration,
 				sentence(

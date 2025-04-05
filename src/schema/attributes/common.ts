@@ -117,22 +117,6 @@ export function pickWorstRating<V extends Value>(
 }
 
 /**
- * Helper function to check if a wallet is an ERC-4337 smart wallet
- * Checks both accountSupport and wallet type information
- */
-export function isErc4337SmartWallet(features: ResolvedFeatures): boolean {
-	// Check in accountSupport
-	if (features.accountSupport !== null && 
-		features.accountSupport.rawErc4337 !== undefined && 
-		isAccountTypeSupported(features.accountSupport.rawErc4337)) {
-		return true;
-	}
-	
-	// We can't access wallet.metadata from features, so we can only check accountSupport
-	return false;
-}
-
-/**
  * Helper function to check if a wallet is an EOA-only wallet
  * This checks multiple factors to determine if a wallet exclusively uses EOAs
  */

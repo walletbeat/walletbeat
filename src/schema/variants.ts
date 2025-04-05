@@ -52,6 +52,13 @@ export function hasVariant(obj: AtLeastOneVariant<unknown>, variant: Variant): b
 }
 
 /**
+ * Returns whether `obj` has a hardware variant.
+ */
+export function hasHardwareVariant(obj: AtLeastOneVariant<unknown>): boolean {
+	return hasVariant(obj, Variant.HARDWARE);
+}
+
+/**
  * If the given object only has one variant, return it.
  * Otherwise, return [null, null].
  */

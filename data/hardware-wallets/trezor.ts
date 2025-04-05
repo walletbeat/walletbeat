@@ -52,7 +52,7 @@ export const trezorWallet: Wallet = {
 		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
