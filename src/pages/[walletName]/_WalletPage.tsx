@@ -659,7 +659,7 @@ export function WalletPage({
 												component="h2"
 												marginBottom="0"
 												fontSize="2rem"
-												fontWeight={fontWeight.bold}
+												fontWeight="700"
 												paddingLeft={theme.spacing(2)}
 												paddingRight={theme.spacing(2)}
 											>
