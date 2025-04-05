@@ -559,42 +559,31 @@ export function WalletPage({
 	)
 	const scrollMarginTop = `${headerBottomMargin + scrollPastHeaderPixels}px`
 
+	const nonHeaderSections: RichSection[] =  sections.slice(1)
+  if (!isNonEmptyArray(nonHeaderSections)) {
+		throw new Error('No non-header sections defined for navigation');
+	}
 	return (
 		<NavigationPageLayout
 			prefix={<WalletDropdown wallet={wallet} />}
 			groups={[
 				{
 					id: 'wallet-sections',
-					items: [
-						// {
-						// 	id: sections[0].header,
-						// 	icon: (
-						// 		<WalletIcon
-						// 			walletMetadata={wallet.metadata}
-						// 			iconSize={navigationListIconSize * 0.75}
-						// 		/>
-						// 	),
-						// 	title: wallet.metadata.displayName,
-						// 	contentId: sectionHeaderId(sections[0]),
-						// },
-						...sections.slice(1).map(
-							(section): NavigationItem => ({
-								id: sectionHeaderId(section),
-								icon: section.icon,
-								title: section.title,
-								contentId: sectionHeaderId(section),
-								children:
-									section.subsections !== undefined && isNonEmptyArray(section.subsections)
-										? nonEmptyMap(section.subsections, subsection => ({
-											id: sectionHeaderId(subsection),
-											icon: subsection.icon,
-											title: subsection.title,
-											contentId: sectionHeaderId(subsection),
-										}))
-										: undefined,
-							}),
-						),
-					],
+					items: nonEmptyMap(nonHeaderSections, (section): NavigationItem => ({
+						id: sectionHeaderId(section),
+						icon: section.icon,
+						title: section.title,
+						contentId: sectionHeaderId(section),
+						children:
+							section.subsections !== undefined && isNonEmptyArray(section.subsections)
+								? nonEmptyMap(section.subsections, subsection => ({
+									id: sectionHeaderId(subsection),
+									icon: subsection.icon,
+									title: subsection.title,
+									contentId: sectionHeaderId(subsection),
+								}))
+								: undefined,
+					})),
 					overflow: true,
 				},
 				{

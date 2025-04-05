@@ -82,6 +82,7 @@ export interface NavigationGroup {
 	 * level of nesting).
 	 */
 	items: NonEmptyArray<NavigationItem>
+
 	/**
 	 * If true, allow this navigation group to scroll on the Y axis if it
 	 * overflows, and expand this group to take as much height as possible.
