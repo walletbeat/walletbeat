@@ -530,12 +530,6 @@ export function WalletPage({
 							sx: {
 								border: '2px solid',
 								color: 'var(--text-primary)',
-								backgroundColor: blend(
-									theme.palette.background.paper,
-									ratingToColor(evalAttr.evaluation.value.rating),
-									0.5,
-									1,
-								),
 								borderColor: blend(
 									theme.palette.background.paper,
 									borderRatingToColor(evalAttr.evaluation.value.rating),
