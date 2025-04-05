@@ -26,14 +26,8 @@ import { variantToName, variantUrlQuery } from '../../components/variants'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { slugifyCamelCase } from '@/types/utils/text'
 import { betaSiteRoot } from '@/constants'
-import { refs, type References } from '@/schema/reference'
-import { ReferenceLinks } from '../atoms/ReferenceLinks'
+import { refs } from '@/schema/reference'
 import { toFullyQualified } from '@/schema/reference'
-import { WalletProfile } from '@/schema/features/profile'
-import { bugBountyProgram } from '@/schema/attributes/security/bug-bounty-program'
-import { scamPrevention } from '@/schema/attributes/security/scam-prevention'
-import { type ResolvedFeatures } from '@/schema/features'
-import { getAttributeReferences } from '@/schema/attributeReferences'
 
 /**
  * Common properties of rating-type columns.
@@ -209,66 +203,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 		},
 	)
 
-	// Get references if there's a highlighted attribute
-	const getHighlightedAttributeReferences = () => {
-		// Use frozen slice ID for references if available
-		const activeEvalAttrId = frozenSliceId || highlightedSlice?.evalAttrId
-
-		if (!activeEvalAttrId) {
-			return []
-		}
-
-		const activeEvalAttr = evalGroup[activeEvalAttrId]
-
-		if (!activeEvalAttr || !activeEvalAttr.evaluation) {
-			return []
-		}
-
-		// First try to get references from the attribute evaluations
-		const defaultReferences =
-			activeEvalAttr.evaluation.references ||
-			(activeEvalAttr.evaluation.value ? refs(activeEvalAttr.evaluation.value) : [])
-
-		// If we have references from evaluation, return them
-		if (defaultReferences.length > 0) {
-			return defaultReferences
-		}
-
-		// Otherwise use our attribute references helper
-		const attributeId = activeEvalAttr.attribute.id
-		const category = attrGroup.id
-
-		// Use the imported getAttributeReferences helper
-		return getAttributeReferences(row.wallet, category, attributeId)
-	}
-
-	const attributeReferences = getHighlightedAttributeReferences()
-
-	// Make sure references are fully qualified
-	const qualifiedReferences =
-		attributeReferences.length > 0
-			? toFullyQualified(attributeReferences as any) // Cast to any to bypass TypeScript error
-			: []
-
-	// Add debug logging to help troubleshoot
-	if (highlightedEvalAttr) {
-		console.log(
-			`References for ${attrGroup.id}/${highlightedEvalAttr.attribute.id}:`,
-			JSON.stringify(
-				{
-					attributeId: highlightedEvalAttr.attribute.id,
-					category: attrGroup.id,
-					wallet: row.wallet.metadata.id,
-					hasDefaultRefs: attributeReferences.length > 0,
-					qualifiedRefsCount: qualifiedReferences.length,
-					qualifiedRefs: qualifiedReferences,
-				},
-				null,
-				2,
-			),
-		)
-	}
-
+	const attributeReferences = toFullyQualified(highlightedEvalAttr?.evaluation.references)
 	return (
 		<Box
 			display="flex"
@@ -402,7 +337,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 							/>
 
 							{/* Display references if available */}
-							{qualifiedReferences.length > 0 && (
+							{attributeReferences.length > 0 && (
 								<Box
 									sx={{
 										mt: 0.5,
@@ -432,10 +367,10 @@ export function WalletRatingCell<Vs extends ValueSet>({
 										Source
 									</Typography>
 
-									{qualifiedReferences.map((ref, refIndex) => (
+									{attributeReferences.map((ref, refIndex) => (
 										<Box
 											key={refIndex}
-											sx={{ mb: refIndex < qualifiedReferences.length - 1 ? 1 : 0 }}
+											sx={{ mb: refIndex < attributeReferences.length - 1 ? 1 : 0 }}
 										>
 											{/* Reference links */}
 											<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 0.5 }}>
