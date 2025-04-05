@@ -19,7 +19,7 @@ import React, { useEffect, useState } from 'react'
 import { WalletIcon } from '@/ui/atoms/WalletIcon'
 import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
 import { WalletAttribute } from '@/ui/organisms/WalletAttribute'
-import { blend, fontWeight, ThemeProvider } from '@mui/system'
+import { blend, ThemeProvider } from '@mui/system'
 import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
 import {
 	type AttributeGroup,

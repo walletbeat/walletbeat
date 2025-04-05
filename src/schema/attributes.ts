@@ -4,7 +4,7 @@ import type { AtLeastOneVariant } from './variants'
 import type { MaybeUnratedScore, Score } from './score'
 import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content'
 import type { RatedWallet, WalletMetadata } from './wallet'
-import type { FullyQualifiedReference, ReferenceArray } from './reference'
+import type { ReferenceArray } from './reference'
 
 /**
  * Rating is an enum that should be visually meaningful.

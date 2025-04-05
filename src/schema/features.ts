@@ -1,5 +1,5 @@
 import type { DataCollection } from './features/privacy/data-collection'
-import type { License, LicenseWithRef } from './features/license'
+import type { LicenseWithRef } from './features/license'
 import { type ResolvedFeature, resolveFeature, type Variant, type VariantFeature } from './variants'
 import type { Monetization } from './features/monetization'
 import type { WithRef } from './reference'
