@@ -32,7 +32,7 @@ import { WalletPage } from '../[walletName]/_WalletPage'
 ---
 
 {
-	hardwareWalletName && isValidHardwareWalletName(hardwareWalletName) ? (
+	hardwareWalletMetadata !== null ? (
 		<Layout
 			metadata={{
 				title: `${hardwareWalletMetadata.displayName} - Walletbeat`,
