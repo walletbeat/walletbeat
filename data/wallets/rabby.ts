@@ -375,6 +375,9 @@ export const rabby: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: {
 			license: License.MIT,
 			ref: [
@@ -412,9 +415,6 @@ export const rabby: Wallet = {
 					],
 				},
 			],
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

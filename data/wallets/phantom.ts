@@ -90,6 +90,9 @@ export const phantom: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -105,9 +108,6 @@ export const phantom: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

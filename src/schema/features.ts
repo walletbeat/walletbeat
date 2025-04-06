@@ -80,6 +80,12 @@ export interface WalletFeatures {
 		transactionSubmission: VariantFeature<TransactionSubmission>
 	}
 
+	/** Transparency features. */
+	transparency: {
+		/** Fee transparency information. */
+		feeTransparency: VariantFeature<FeeTransparencySupport>
+	}
+
 	/** Level of configurability for chains. */
 	chainConfigurability: VariantFeature<ChainConfigurability>
 
@@ -100,12 +106,6 @@ export interface WalletFeatures {
 
 	/** The monetization model of the wallet. */
 	monetization: VariantFeature<Monetization>
-
-	/** Transparency features. */
-	transparency: {
-		/** Fee transparency information. */
-		feeTransparency: VariantFeature<FeeTransparencySupport>
-	}
 }
 
 /**
@@ -137,6 +137,9 @@ export interface ResolvedFeatures {
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
 	}
+	transparency: {
+		feeTransparency: ResolvedFeature<FeeTransparencySupport>
+	}
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
 	accountSupport: ResolvedFeature<AccountSupport>
 	multiAddress: ResolvedFeature<Support>
@@ -144,9 +147,6 @@ export interface ResolvedFeatures {
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
 	license: ResolvedFeature<LicenseWithRef>
 	monetization: ResolvedFeature<Monetization>
-	transparency: {
-		feeTransparency: ResolvedFeature<FeeTransparencySupport> | null
-	}
 }
 
 /** Resolve a set of features according to the given variant. */
@@ -183,6 +183,9 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 		selfSovereignty: {
 			transactionSubmission: feat(features.selfSovereignty.transactionSubmission),
 		},
+		transparency: {
+			feeTransparency: feat(features.transparency.feeTransparency),
+		},
 		chainConfigurability: feat(features.chainConfigurability),
 		accountSupport: feat(features.accountSupport),
 		multiAddress: feat(features.multiAddress),
@@ -190,10 +193,5 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 		addressResolution: feat(features.addressResolution),
 		license: feat(features.license),
 		monetization: feat(features.monetization),
-		transparency: {
-			feeTransparency: features.transparency?.feeTransparency
-				? feat(features.transparency.feeTransparency)
-				: null,
-		},
 	}
 }

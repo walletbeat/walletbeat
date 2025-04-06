@@ -142,6 +142,9 @@ export const metamask: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -157,9 +160,6 @@ export const metamask: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

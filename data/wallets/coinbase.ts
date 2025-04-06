@@ -131,6 +131,9 @@ export const coinbase: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: {
 			license: License.BSD_3_CLAUSE,
 			ref: {
@@ -157,9 +160,6 @@ export const coinbase: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

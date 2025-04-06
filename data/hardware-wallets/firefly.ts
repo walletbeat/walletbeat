@@ -98,6 +98,9 @@ export const fireflyWallet: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -113,9 +116,6 @@ export const fireflyWallet: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

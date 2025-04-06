@@ -112,6 +112,9 @@ export const elytro: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -127,9 +130,6 @@ export const elytro: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

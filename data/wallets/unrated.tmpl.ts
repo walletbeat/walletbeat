@@ -82,6 +82,9 @@ export const unratedTemplate: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -97,9 +100,6 @@ export const unratedTemplate: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

@@ -295,6 +295,9 @@ export const daimo: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: {
 			license: License.GPL_3_0,
 			ref: [
@@ -332,9 +335,6 @@ export const daimo: Wallet = {
 					url: 'https://vote.optimism.io/retropgf/3/application/0x118a000851cf4c736497bab89993418517ac7cd9c8ede074aff408a8e0f84060',
 				},
 			],
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	overrides: {

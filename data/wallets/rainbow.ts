@@ -90,6 +90,9 @@ export const rainbow: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: {
 			license: License.GPL_3_0,
 			ref: [
@@ -114,9 +117,6 @@ export const rainbow: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {
