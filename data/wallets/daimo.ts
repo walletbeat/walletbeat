@@ -21,7 +21,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { nconsigny } from '../contributors/nconsigny'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { Variant } from '@/schema/variants'
 
 export const daimo: Wallet = {
@@ -43,10 +42,6 @@ export const daimo: Wallet = {
 		repoUrl: 'https://github.com/daimo-eth/daimo',
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-03-12',
-		multiWalletType: {
-			categories: [WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337],
-		},
 	},
 	features: {
 		profile: WalletProfile.PAYMENTS,

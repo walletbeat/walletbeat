@@ -3,14 +3,14 @@ import { nconsigny } from '../contributors/nconsigny'
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { featureSupported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { WalletTypeCategory } from '@/schema/features/wallet-type'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
+import { AccountType } from '@/schema/features/account-support'
 
 export const frame: Wallet = {
 	metadata: {
@@ -25,9 +25,6 @@ export const frame: Wallet = {
 		repoUrl: null,
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-03-13',
-		multiWalletType: {
-			categories: [WalletTypeCategory.EOA],
-		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -47,7 +44,21 @@ export const frame: Wallet = {
 				},
 			],
 		},
-		accountSupport: null,
+		accountSupport: {
+			eoa: supported({
+				canExportPrivateKey: true,
+				keyDerivation: {
+					type: 'BIP32',
+					seedPhrase: 'BIP39',
+					derivationPath: 'BIP44',
+					canExportSeedPhrase: true,
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			eip7702: notSupported,
+			defaultAccountType: AccountType.eoa,
+		},
 		multiAddress: null,
 		addressResolution: {
 			nonChainSpecificEnsResolution: null,

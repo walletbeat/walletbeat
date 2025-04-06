@@ -4,9 +4,6 @@ import type { AtLeastOneVariant, Variant } from '../variants'
 import { type Sentence, sentence } from '@/types/content'
 import type { WalletMetadata } from '../wallet'
 import { unratedAttributeContent } from '@/types/content/unrated-attribute'
-import { isAccountTypeSupported } from '@/schema/features/account-support'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
-import type { ResolvedFeatures } from '@/schema/features'
 
 /**
  * Helper for constructing "Unrated" values.

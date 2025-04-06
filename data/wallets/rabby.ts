@@ -18,7 +18,6 @@ import { AccountType } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { WalletTypeCategory } from '@/schema/features/wallet-type'
 import { Variant } from '@/schema/variants'
 
 export const rabby: Wallet = {
@@ -35,9 +34,6 @@ export const rabby: Wallet = {
 		repoUrl: 'https://github.com/RabbyHub/Rabby',
 		contributors: [polymutex],
 		lastUpdated: '2024-12-15',
-		multiWalletType: {
-			categories: [WalletTypeCategory.EOA],
-		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,

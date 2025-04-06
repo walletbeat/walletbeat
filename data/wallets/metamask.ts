@@ -6,12 +6,12 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { featureSupported } from '@/schema/features/support'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { diligence } from '../entities/diligence'
 import { cure53 } from '../entities/cure53'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { AccountType } from '@/schema/features/account-support'
 
 export const metamask: Wallet = {
 	metadata: {
@@ -28,16 +28,25 @@ export const metamask: Wallet = {
 		repoUrl: 'https://github.com/MetaMask/metamask-extension',
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-02-08',
-		multiWalletType: {
-			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_7702],
-			details: 'Supports EOA with 7702 delegation',
-		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
-		accountSupport: null,
+		accountSupport: {
+			eoa: supported({
+				canExportPrivateKey: true,
+				keyDerivation: {
+					type: 'BIP32',
+					seedPhrase: 'BIP39',
+					derivationPath: 'BIP44',
+					canExportSeedPhrase: true,
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			eip7702: notSupported,
+			defaultAccountType: AccountType.eoa,
+		},
 		multiAddress: null,
 		addressResolution: {
 			nonChainSpecificEnsResolution: null,

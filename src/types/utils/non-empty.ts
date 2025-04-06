@@ -31,6 +31,15 @@ export function nonEmptyKeys<
 }
 
 /**
+ * Returns the set of keys of the given record.
+ */
+export function nonEmptyKeySet<K extends string | number | symbol>(
+	rec: NonEmptyRecord<K, unknown>,
+): NonEmptySet<K> {
+	return nonEmptySetFromArray(nonEmptyKeys(rec))
+}
+
+/**
  * Like Object.values but guarantees at least one value.
  * @param rec The record to get the values from.
  * @returns A non-empty array of values.
@@ -125,4 +134,65 @@ export function nonEmptyConcat<T>([arr, rest]:
 	| [NonEmptyArray<T>, T[]]): NonEmptyArray<T> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know one of the two input arrays was non-empty.
 	return arr.concat(...rest) as NonEmptyArray<T>
+}
+
+/**
+ * A set that contains at least one true element.
+ */
+export type NonEmptySet<K extends string | number | symbol> = NonEmptyRecord<K, true> &
+	Record<K, boolean>
+
+/**
+ * Initialize a non-empty set from at least one key.
+ */
+export function nonEmptySet<K extends string | number | symbol>(
+	key: K,
+	...keys: K[]
+): NonEmptySet<K> {
+	return nonEmptySetFromArray([key, ...keys])
+}
+
+/**
+ * Initialize a non-empty set from a non-empty array of keys.
+ */
+export function nonEmptySetFromArray<K extends string | number | symbol>(
+	keys: NonEmptyArray<K>,
+): NonEmptySet<K> {
+	return Object.fromEntries(nonEmptyMap<K, [K, true]>(keys, key => [key, true])) as NonEmptySet<K>
+}
+
+/**
+ * Returns whether `set` contains `key` with a `true` value.
+ */
+export function setContains<K extends string | number | symbol>(
+	set: NonEmptySet<K>,
+	key: K,
+): boolean {
+	return Object.hasOwn(set, key) && set[key]
+}
+
+/**
+ * Iterates over the items in the set. Guaranteed to be non-empty.
+ */
+export function setItems<K extends string | number | symbol>(
+	set: NonEmptySet<K>,
+): NonEmptyArray<K> {
+	return Object.entries(set)
+		.filter(([_, v]) => v)
+		.map(([k, _]) => k) as NonEmptyArray<K>
+}
+
+/**
+ * Returns the union of one or more non-empty sets.
+ */
+export function setUnion<K extends string | number | symbol>(
+	sets: NonEmptyArray<NonEmptySet<K>>,
+): NonEmptySet<K> {
+	const union: Map<K, true> = new Map()
+	for (const set of sets) {
+		for (const item of setItems(set)) {
+			union.set(item, true)
+		}
+	}
+	return Object.fromEntries(union.entries()) as NonEmptySet<K>
 }

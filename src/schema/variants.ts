@@ -1,4 +1,9 @@
-import { nonEmptyEntries, type NonEmptyRecord } from '@/types/utils/non-empty'
+import {
+	nonEmptyEntries,
+	nonEmptyKeySet,
+	type NonEmptyRecord,
+	type NonEmptySet,
+} from '@/types/utils/non-empty'
 
 /**
  * An enum of wallet variants.
@@ -35,7 +40,13 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 	let foundVariant = false
 	let foundNonVariant = false
 	Object.keys(value).forEach(key => {
-		if (key === 'mobile' || key === 'desktop' || key === 'browser' || key === 'embedded' || key === 'hardware') {
+		if (
+			key === 'mobile' ||
+			key === 'desktop' ||
+			key === 'browser' ||
+			key === 'embedded' ||
+			key === 'hardware'
+		) {
 			foundVariant = true
 		} else {
 			foundNonVariant = true
@@ -45,17 +56,24 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 }
 
 /**
+ * Returns a set of variants populated in `value`.
+ */
+export function getVariants(value: AtLeastOneVariant<unknown>): NonEmptySet<Variant> {
+	return nonEmptyKeySet(value)
+}
+
+/**
  * Returns whether `obj` contains an entry for the given `variant`.
  */
 export function hasVariant(obj: AtLeastOneVariant<unknown>, variant: Variant): boolean {
-	return Object.hasOwn(obj, variant);
+	return Object.hasOwn(obj, variant)
 }
 
 /**
  * Returns whether `obj` has a hardware variant.
  */
 export function hasHardwareVariant(obj: AtLeastOneVariant<unknown>): boolean {
-	return hasVariant(obj, Variant.HARDWARE);
+	return hasVariant(obj, Variant.HARDWARE)
 }
 
 /**

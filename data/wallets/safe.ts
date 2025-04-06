@@ -5,7 +5,6 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { notSupported, supported } from '@/schema/features/support'
 import { nconsigny } from '../contributors/nconsigny'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -24,10 +23,6 @@ export const safe: Wallet = {
 		repoUrl: 'https://github.com/safe-global',
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
-		multiWalletType: {
-			categories: [WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337],
-		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -36,7 +31,6 @@ export const safe: Wallet = {
 			defaultAccountType: AccountType.rawErc4337,
 			eoa: notSupported,
 			mpc: notSupported,
-			eip7702: notSupported,
 			rawErc4337: supported({
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
@@ -48,6 +42,7 @@ export const safe: Wallet = {
 					explanation: 'Safe supports ERC-4337 via their 4337 module implementation',
 				},
 			}),
+			eip7702: notSupported,
 		},
 		multiAddress: null,
 		addressResolution: {

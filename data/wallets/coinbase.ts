@@ -5,16 +5,13 @@ import { polymutex } from '../contributors/polymutex'
 import { nconsigny } from '../contributors/nconsigny'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import { cantina } from '../entities/cantina'
 import { code4rena } from '../entities/code4rena'
 import { certora } from '../entities/certora'
-import {
-	TransactionSubmissionL2Type,
-} from '@/schema/features/self-sovereignty/transaction-submission'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { License } from '@/schema/features/license'
 
 export const coinbase: Wallet = {
@@ -31,10 +28,6 @@ export const coinbase: Wallet = {
 		repoUrl: 'https://github.com/coinbase/smart-wallet',
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-03-14',
-		multiWalletType: {
-			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337, SmartWalletStandard.ERC_7702],
-		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
