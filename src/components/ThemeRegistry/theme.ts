@@ -1,8 +1,24 @@
 import { deepmerge } from '@mui/utils'
-import { createTheme, type ThemeOptions } from '@mui/material/styles'
+import { createTheme, type ThemeOptions as MaterialThemeOptions } from '@mui/material/styles'
 import type {} from '@mui/x-data-grid/themeAugmentation'
 
 /* eslint @typescript-eslint/no-magic-numbers: 0 -- A theme file will have numbers and hex codes in it, this is normal. */
+
+/** Color options for rating pie slices. */
+export interface RatingThemeOptions {
+	fail: string,
+	partial: string,
+	pass: string,
+	unrated: string,
+	exempt: string,
+}
+
+/** Expanded ThemeOptions and palette. */
+export type ThemeOptions = MaterialThemeOptions & {
+	palette?: MaterialThemeOptions['palette'] & {
+		rating?: RatingThemeOptions,
+	}
+}
 
 const themeOptions: ThemeOptions = {
 	palette: {
