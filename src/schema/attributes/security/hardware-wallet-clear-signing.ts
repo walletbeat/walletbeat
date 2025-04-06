@@ -11,7 +11,7 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { Variant, type AtLeastOneVariant } from '@/schema/variants'
-import { popRefs, refs } from '@/schema/reference'
+import { refs } from '@/schema/reference'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 
 const brand = 'attributes.security.hardware_wallet_clear_signing'
@@ -274,7 +274,7 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletClearSigningValue> => {
 		// For hardware wallets themselves:
 		// This evaluates the hardware wallet's own clear signing capabilities
-		switch (features.variant){
+		switch (features.variant) {
 			case Variant.HARDWARE:
 				// Check if clear signing feature exists
 				if (!features.security.hardwareWalletClearSigning) {
@@ -338,7 +338,9 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 						id: 'exempt_software_wallet',
 						rating: Rating.EXEMPT,
 						displayName: 'Only applicable for hardware wallets',
-						shortExplanation: sentence('This attribute evaluates hardware wallet clear signing capabilities and is not applicable for software wallets.'),
+						shortExplanation: sentence(
+							'This attribute evaluates hardware wallet clear signing capabilities and is not applicable for software wallets.',
+						),
 						clearSigningLevel: ClearSigningLevel.NONE,
 						__brand: brand,
 					},
@@ -352,5 +354,6 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 				}
 		}
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletClearSigningValue>>) => pickWorstRating<HardwareWalletClearSigningValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletClearSigningValue>>) =>
+		pickWorstRating<HardwareWalletClearSigningValue>(perVariant),
 }

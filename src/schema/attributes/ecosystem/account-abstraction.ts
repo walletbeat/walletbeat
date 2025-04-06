@@ -21,7 +21,6 @@ import {
 import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
-import type { Support } from '@/schema/features/support'
 
 const brand = 'attributes.ecosystem.account_abstraction'
 export type AccountAbstractionValue = Value & {

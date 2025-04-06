@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { eips, lookupEip } from '@/data/eips'
 import type { Eip, EipNumber } from '@/schema/eips'
-import { EipPrefix } from '@/schema/eips'
 
 interface EipPreviewModalProps {
 	eipNumber: string
@@ -68,31 +67,33 @@ export function EipPreviewModal({
 		// Remove extra indentation
 		return text
 			.trim()
-			.replace(/^\t+/gm, '')  // Remove tab indentation
-			.replace(/\n\s*\n/g, '\n\n')  // Normalize paragraph breaks
-			.replace(/\n{3,}/g, '\n\n')  // Limit consecutive line breaks
+			.replace(/^\t+/gm, '') // Remove tab indentation
+			.replace(/\n\s*\n/g, '\n\n') // Normalize paragraph breaks
+			.replace(/\n{3,}/g, '\n\n') // Limit consecutive line breaks
 	}
 
 	// Process links to make them clickable
 	const processMarkdownLinks = (text: string): React.ReactNode[] => {
-		if (!text) return []
-		
+		if (!text) {
+			return []
+		}
+
 		// Regex to find markdown links: [text](url)
 		const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
 		const parts: React.ReactNode[] = []
-		
+
 		let lastIndex = 0
 		let match
-		
+
 		while ((match = linkRegex.exec(text)) !== null) {
 			// Add text before the link
 			if (match.index > lastIndex) {
 				parts.push(text.substring(lastIndex, match.index))
 			}
-			
+
 			// Add the link
 			parts.push(
-				<a 
+				<a
 					key={match.index}
 					href={match[2]}
 					target="_blank"
@@ -100,17 +101,17 @@ export function EipPreviewModal({
 					className="text-blue-600 dark:text-blue-400 hover:underline"
 				>
 					{match[1]}
-				</a>
+				</a>,
 			)
-			
+
 			lastIndex = match.index + match[0].length
 		}
-		
+
 		// Add any remaining text
 		if (lastIndex < text.length) {
 			parts.push(text.substring(lastIndex))
 		}
-		
+
 		return parts
 	}
 

@@ -22,7 +22,7 @@ import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 import { eipMarkdownLink } from '@/schema/eips'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { eip7702 } from '@/data/eips/eip-7702'
-import { isSupported, type Support } from '@/schema/features/support'
+import { isSupported } from '@/schema/features/support'
 import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
 
 const brand = 'attributes.self_sovereignty.account_portability'

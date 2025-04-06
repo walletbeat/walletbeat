@@ -1,9 +1,4 @@
-import {
-	nonEmptyMap,
-	nonEmptySetFromArray,
-	type NonEmptyArray,
-	type NonEmptySet,
-} from '@/types/utils/non-empty'
+import { nonEmptySetFromArray, type NonEmptyArray, type NonEmptySet } from '@/types/utils/non-empty'
 import type { WithRef } from '../reference'
 import { isSupported, type NotSupported, type Support, type Supported } from './support'
 
