@@ -10,6 +10,7 @@ import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-s
 import { WalletTypeCategory } from '@/schema/features/wallet-type'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
 
 export const frame: Wallet = {
 	metadata: {
@@ -30,7 +31,22 @@ export const frame: Wallet = {
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
+		chainConfigurability: {
+			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			customChains: true,
+			ref: [
+				{
+					urls: [
+						{
+							url: 'https://docs.frame.sh/docs/Getting%20Started/Basics/Configuring%20Chains',
+							label: 'Frame node connection documentation',
+						},
+					],
+					explanation: 'Frame allows connecting to your own Ethereum node',
+				},
+			],
+		},
 		accountSupport: null,
 		multiAddress: null,
 		addressResolution: {
