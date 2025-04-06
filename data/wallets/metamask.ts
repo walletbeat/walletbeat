@@ -112,11 +112,9 @@ export const metamask: Wallet = {
 				],
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'MetaMask provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'MetaMask provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
 				ref: [
 					{
 						url: 'https://support.metamask.io/more-web3/wallets/hardware-wallet-hub/',

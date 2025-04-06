@@ -146,10 +146,8 @@ export const daimo: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'Daimo does not support hardware wallets.',
-				},
+				level: ClearSigningLevel.NONE,
+				details: 'Daimo does not support hardware wallets.',
 				ref: null,
 			},
 		},

@@ -95,14 +95,12 @@ export const ledgerWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.',
 				ref: [
 					{
-						url: 'https://youtu.be/7lP_0h-PPvY?si=KirhDV7xEQx9Npcl&t=720',
+						url: 'https://youtu.be/7lP_0h-PPvY?t=720',
 						explanation:
 							"Independent video demonstration of Ledger's clear signing implementation on Safe.",
 					},

@@ -12,7 +12,7 @@ import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
 import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { popRefs } from '@/schema/reference'
+import { mergeRefs, popRefs, refs, type FullyQualifiedReference } from '@/schema/reference'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 
 const brand = 'attributes.security.software_hw_integration'
@@ -281,36 +281,22 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 			return noHardwareWalletSupport()
 		}
 
-		// Extract references from hardware wallet support feature
-		const { withoutRefs: hwSupportWithoutRefs, refs: hwSupportRefs } = popRefs(
-			features.security.hardwareWalletSupport,
-		)
-
-		// Extract references from hardware wallet clear signing feature if it exists
-		let hwClearSigningRefs = []
-		if (features.security.hardwareWalletClearSigning) {
-			const { refs: extractedRefs } = popRefs(features.security.hardwareWalletClearSigning)
-			hwClearSigningRefs = extractedRefs
-		}
-
-		// Combine all references
-		const allReferences = [...hwSupportRefs, ...hwClearSigningRefs]
-
 		// Check if any hardware wallets are supported
-		const hwSupport = hwSupportWithoutRefs.supportedWallets
-		const hasHardwareWalletSupport = Object.values(hwSupport).some(
+		const hasHardwareWalletSupport = Object.values(features.security.hardwareWalletSupport.supportedWallets).some(
 			support => support && isSupported(support),
 		)
 
+		const references = mergeRefs(refs(features.security.hardwareWalletSupport), refs(features.security.hardwareWalletClearSigning == null ? {} : features.security.hardwareWalletClearSigning))
+
 		if (!hasHardwareWalletSupport) {
 			return {
+				references,
 				...noHardwareWalletSupport(),
-				...(allReferences.length > 0 && { references: allReferences }),
 			}
 		}
 
 		// Get list of supported hardware wallets for display
-		const supportedHardwareWallets = Object.entries(hwSupport)
+		const supportedHardwareWallets = Object.entries(features.security.hardwareWalletSupport.supportedWallets)
 			.filter(([_, support]) => support && isSupported(support))
 			.map(([walletType]) => {
 				switch (walletType) {
@@ -335,13 +321,13 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 
 		// Placeholder for checking if Safe integration exists with clear signing
 		const hasSafeIntegration =
-			features.security.hardwareWalletClearSigning?.clearSigningSupport.details?.includes(
+			features.security.hardwareWalletClearSigning?.details?.includes(
 				'Safe',
 			) || false
 
 		// Placeholder for checking if Aave integration exists with clear signing
 		const hasAaveIntegration =
-			features.security.hardwareWalletClearSigning?.clearSigningSupport.details?.includes(
+			features.security.hardwareWalletClearSigning?.details?.includes(
 				'Aave',
 			) || false
 
@@ -369,8 +355,8 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 
 		// Return result with references if any
 		return {
+			references,
 			...result,
-			...(allReferences.length > 0 && { references: allReferences }),
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SoftwareHWIntegrationValue>>) => pickWorstRating<SoftwareHWIntegrationValue>(perVariant),

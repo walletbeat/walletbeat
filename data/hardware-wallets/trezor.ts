@@ -89,11 +89,9 @@ export const trezorWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'Trezor provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'Trezor provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.',
 				ref: [
 					{
 						url: 'https://youtu.be/7lP_0h-PPvY?si=07dMNswh_9RsuWQ9&t=879',

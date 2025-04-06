@@ -67,14 +67,12 @@ export const gridplusWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.',
 				ref: [
 					{
-						url: 'https://youtu.be/7lP_0h-PPvY?si=S4wNFukrmg4rwyFA&t=1141',
+						url: 'https://youtu.be/7lP_0h-PPvY?t=1141',
 						explanation:
 							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
 					},

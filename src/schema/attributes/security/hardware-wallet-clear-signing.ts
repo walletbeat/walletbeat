@@ -11,7 +11,7 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { Variant, type AtLeastOneVariant } from '@/schema/variants'
-import { popRefs } from '@/schema/reference'
+import { popRefs, refs } from '@/schema/reference'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 
 const brand = 'attributes.security.hardware_wallet_clear_signing'
@@ -284,25 +284,11 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 				}
 
 				// Extract references from the hardware wallet clear signing feature
-				const { withoutRefs, refs: extractedRefs } = popRefs(
-					features.security.hardwareWalletClearSigning,
-				)
+				const references = refs(features.security.hardwareWalletClearSigning)
 
-				const clearSigningLevel = withoutRefs.clearSigningSupport.level
-
-				// Use a simpler approach for now - we'll just include a standard reference for devices with full clear signing
-				let standardRefs = []
-				if (clearSigningLevel === ClearSigningLevel.FULL) {
-					standardRefs = [
-						{
-							url: 'https://ethereum.org/en/security/#hardware-wallets',
-							explanation: 'More information about hardware wallet security',
-						},
-					]
-				}
+				const clearSigningLevel = features.security.hardwareWalletClearSigning.level
 
 				// Combine extracted references with standard references if any
-				const allReferences = [...extractedRefs, ...standardRefs]
 
 				let result: Evaluation<HardwareWalletClearSigningValue>
 
@@ -327,8 +313,8 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 
 				// Return result with references
 				return {
+					references,
 					...result,
-					...(allReferences.length > 0 && { references: allReferences }),
 				}
 
 			default:

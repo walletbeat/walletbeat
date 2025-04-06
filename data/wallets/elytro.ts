@@ -89,10 +89,8 @@ export const elytro: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.',
-				},
+				level: ClearSigningLevel.NONE,
+				details: 'No hardware wallet clear signing information available.',
 				ref: null,
 			},
 		},
