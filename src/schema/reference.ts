@@ -187,59 +187,6 @@ export function refs(withRef: WithRef<unknown>): FullyQualifiedReference[] {
 	return mergeRefs(...qualifiedRefs)
 }
 
-/** Extract references out of an object that may have a value property and references. */
-export function refsWithValue<T>(obj: any): FullyQualifiedReference[] {
-	// Handle null or undefined
-	if (!obj) {
-		return [];
-	}
-	
-	// Handle primitive values
-	if (typeof obj !== 'object') {
-		return [];
-	}
-	
-	try {
-		// Handle case where obj has 'value' and 'ref' properties (LicenseWithValue)
-		if ('value' in obj && 'ref' in obj) {
-			return refs(obj);
-		}
-		
-		// Handle case where obj has nested reference properties
-		if ('sendTransactionWarning' in obj || 'contractTransactionWarning' in obj || 'scamUrlWarning' in obj) {
-			const allRefs: FullyQualifiedReference[] = [];
-			
-			// Check for each potential ref source
-			const checkAndAddRefs = (source: any) => {
-				if (source && 'ref' in source) {
-					allRefs.push(...refs({ref: source.ref}));
-				}
-			};
-			
-			// Check all possible warning types
-			if ('sendTransactionWarning' in obj) checkAndAddRefs(obj.sendTransactionWarning);
-			if ('contractTransactionWarning' in obj) checkAndAddRefs(obj.contractTransactionWarning);
-			if ('scamUrlWarning' in obj) checkAndAddRefs(obj.scamUrlWarning);
-			
-			return allRefs;
-		}
-		
-		// Handle normal WithRef objects
-		if ('ref' in obj) {
-			return refs(obj as WithRef<any>);
-		}
-		
-		// Handle Arrays of refs
-		if (Array.isArray(obj)) {
-			return obj.flatMap(item => refsWithValue(item));
-		}
-	} catch (error) {
-		console.error('Error extracting references:', error);
-	}
-	
-	return [];
-}
-
 /** Extract references out of `withRef` and return an object without them. */
 export function popRefs<T>(withRef: WithRef<T>): {
 	withoutRefs: T

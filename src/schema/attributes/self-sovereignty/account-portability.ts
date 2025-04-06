@@ -920,10 +920,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			return unrated(accountPortability, brand, null)
 		}
 		const allRefs = mergeRefs(
-			refs<Support<AccountTypeEoa>>(features.accountSupport.eoa),
-			refs<Support<AccountTypeMpc>>(features.accountSupport.mpc),
-			refs<Support<AccountTypeMutableMultifactor>>(features.accountSupport.rawErc4337),
-			refs<Support<AccountType7702>>(features.accountSupport.eip7702),
+			refs(features.accountSupport.eoa),
+			refs(features.accountSupport.mpc),
+			refs(features.accountSupport.rawErc4337),
+			refs(features.accountSupport.eip7702),
 		)
 		const evaluations: Array<Evaluation<AccountPortabilityValue>> = []
 		let defaultEvaluation: Evaluation<AccountPortabilityValue> | null = null
