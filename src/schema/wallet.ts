@@ -14,7 +14,6 @@ import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
 import type { WalletTypeInfo } from './features/wallet-type'
 import { WalletTypeCategory, SmartWalletStandard } from './features/wallet-type'
-import type { EvmForkLike, EvmFork } from './evm-forks'
 import {
 	WalletProfile,
 	HardwareWalletManufactureType,
