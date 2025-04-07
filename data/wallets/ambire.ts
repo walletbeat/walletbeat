@@ -11,7 +11,6 @@ import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-s
 import { License } from '@/schema/features/license'
 import { pashov } from '../entities/pashov-audit-group'
 import { hunterSecurity } from '../entities/hunter-security'
-import { SmartWalletStandard, WalletTypeCategory } from '@/schema/features/wallet-type'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import { certik } from '../entities/certik'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
@@ -72,13 +71,9 @@ export const ambire: Wallet = {
 		repoUrl: 'https://github.com/AmbireTech/extension',
 		contributors: [jiojosbg],
 		lastUpdated: '2025-03-20',
-		multiWalletType: {
-			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337, SmartWalletStandard.ERC_7702],
-		},
 	},
 	features: {
-		profile: WalletProfile.BROWSER_EXTENSION,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: {
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
@@ -112,6 +107,11 @@ export const ambire: Wallet = {
 						url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount7702.sol',
 						explanation: 'Ambire supports EIP-7702 smart contract wallets',
 					},
+				},
+				ref: {
+					url: 'https://blog.ambire.com/eip-7702-wallet',
+					explanation:
+						'Ambire is AA wallet by default. With the introduction of EIP-7702 it allows you to use your existing EOA just like you would use any smart account wallet!',
 				},
 			}),
 			mpc: notSupported,
@@ -149,6 +149,8 @@ export const ambire: Wallet = {
 			},
 		},
 		security: {
+			// @TODO
+			// bugBountyProgram
 			scamAlerts: {
 				scamUrlWarning: supported({
 					leaksVisitedUrl: 'NO',
@@ -203,12 +205,24 @@ export const ambire: Wallet = {
 						},
 					],
 				},
+				[Variant.MOBILE]: {
+					supportedWallets: {
+						[HardwareWalletType.LEDGER]: featureSupported,
+						[HardwareWalletType.GRIDPLUS]: notSupported,
+						[HardwareWalletType.TREZOR]: notSupported,
+						[HardwareWalletType.FIREFLY]: notSupported,
+						[HardwareWalletType.KEEPKEY]: notSupported,
+						[HardwareWalletType.KEYSTONE]: notSupported,
+					},
+					ref: [
+						{
+							url: 'https://www.ambire.com/',
+						},
+					],
+				},
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.FULL,
-				},
-				ref: null,
+				level: ClearSigningLevel.FULL,
 			},
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.NONE,
