@@ -192,7 +192,8 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				{ supportedHardwareWallets: [] },
 			)
 		}
-		// @NOTE this is not entirely correct
+		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
+		// 	all such wallet have the opportunity to support hardware wallet to provide better security for the user
 		// Check for ERC-4337 smart wallet support
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(
