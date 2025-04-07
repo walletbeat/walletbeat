@@ -5,13 +5,14 @@ import { polymutex } from '../contributors/polymutex'
 import { nconsigny } from '../contributors/nconsigny'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import { cantina } from '../entities/cantina'
 import { code4rena } from '../entities/code4rena'
 import { certora } from '../entities/certora'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { License } from '@/schema/features/license'
 
 export const coinbase: Wallet = {
 	metadata: {
@@ -27,10 +28,6 @@ export const coinbase: Wallet = {
 		repoUrl: 'https://github.com/coinbase/smart-wallet',
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-03-14',
-		multiWalletType: {
-			categories: [WalletTypeCategory.EOA, WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337, SmartWalletStandard.ERC_7702],
-		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
@@ -95,10 +92,8 @@ export const coinbase: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.',
-				},
+				level: ClearSigningLevel.NONE,
+				details: 'No hardware wallet clear signing information available.',
 				ref: null,
 			},
 			passkeyVerification: {
@@ -122,12 +117,26 @@ export const coinbase: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
 		},
-		license: null,
+		transparency: {
+			feeTransparency: null,
+		},
+		license: {
+			license: License.BSD_3_CLAUSE,
+			ref: {
+				urls: [
+					{
+						url: 'https://github.com/coinbase/wallet-mobile/blob/master/LICENSE.md',
+						label: 'Coinbase Wallet License File',
+					},
+				],
+				explanation: 'Coinbase Wallet uses the BSD-3-Clause license for its source code',
+			},
+		},
 		monetization: {
 			revenueBreakdownIsPublic: false,
 			strategies: {
@@ -142,9 +151,6 @@ export const coinbase: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

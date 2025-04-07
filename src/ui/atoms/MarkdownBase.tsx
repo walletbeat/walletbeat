@@ -45,16 +45,14 @@ const StyledMarkdown = styled(Box, {
 		margin-top: 0px;
 	}
 
-	${
-		pSpacing === undefined
+	${pSpacing === undefined
 			? ''
 			: `p + p {
 		margin-top: ${pSpacing};
 	}`
-	}
+		}
 
-	${
-		liSpacing === undefined
+	${liSpacing === undefined
 			? ''
 			: `li + li:not(li li), li li:not(li li + li) {
 		margin-top: ${pSpacing};
@@ -62,7 +60,7 @@ const StyledMarkdown = styled(Box, {
 	li li + li {
 		margin-top: calc(${pSpacing} / 2);
 	}`
-	}
+		}
 `,
 )
 

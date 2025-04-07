@@ -8,6 +8,10 @@ import type { FC } from 'react'
 import { wallets } from '@/data/wallets'
 import { hardwareWallets } from '@/data/hardware-wallets'
 
+// Type-safe object key access
+type WalletsKey = keyof typeof wallets
+type HardwareWalletsKey = keyof typeof hardwareWallets
+
 export const HomePage: FC = () => (
 	<NavigationPageLayout
 		groups={[
@@ -30,8 +34,11 @@ export const HomePage: FC = () => (
 						title: 'Wallets',
 						icon: <LuWallet />,
 						href: '/',
+						id: 'wallets-nav',
 						children: Object.keys(wallets).map(key => {
-							const wallet = wallets[key as keyof typeof wallets]
+							// Using type-safe keys
+							const safeKey = key as WalletsKey
+							const wallet = wallets[safeKey]
 
 							return {
 								title: wallet.metadata.displayName,
@@ -58,7 +65,9 @@ export const HomePage: FC = () => (
 						href: '/',
 						id: 'hardware-wallets',
 						children: Object.keys(hardwareWallets).map(key => {
-							const wallet = hardwareWallets[key as keyof typeof hardwareWallets]
+							// Using type-safe keys
+							const safeKey = key as HardwareWalletsKey
+							const wallet = hardwareWallets[safeKey]
 
 							// Simplified display names for hardware wallets
 							let displayName = wallet.metadata.displayName
@@ -103,65 +112,31 @@ export const HomePage: FC = () => (
 			},
 		]}
 	>
-		<div className="flex flex-col mt-10 gap-4">
+		<div className="flex flex-col">
 			<div>
-				<div className="w-full px-8 text-inverse bg-accent py-2 text-center">
-					Wallets listed on this page are not official endoresements, and are provided for
-					informational purposes only.
-				</div>
-				<div className="bg-gradient-to-r from-[var(--banner-gradient-from)] to-[var(--banner-gradient-to)] px-8 py-6 flex justify-between items-center flex-wrap">
-					<div className="flex flex-col gap-2 py-8">
-						<div className="text-sm text-secondary">
-							HOME / WALLETS / <span>FIND WALLET</span>
-						</div>
-						<h1 className="text-3xl font-bold">Who watches the wallets?</h1>
-						<p>
-							Alpha version; work in progress. For content contributions, please see{' '}
+				<div className="px-8 py-6 flex justify-between items-center flex-wrap min-h-96 relative">
+					<div className="flex flex-col gap-2 py-8 flex-1">
+						<h1 className="text-5xl font-extrabold text-accent">Who watches the wallets?</h1>
+						<p className="text-secondary">
+							Beta version; For content contributions, please see{' '}
 							<a
-								href="https://github.com/fluidkey/walletbeat"
-								className="link"
+								href="https://github.com/walletbeat/walletbeat"
 								target="_blank"
 								rel="noreferrer"
+								className="text-accent underline"
 							>
 								GitHub
 							</a>
 							.
 						</p>
 					</div>
-					<div className="flex items-center">
-						<img src="/banner.png" className="h-[210px] w-auto" />
+					<div className="flex-1 flex justify-center items-center">
+						<img src="robot.png" alt="Walletbeat Robot" className="h-80 w-auto object-contain" />
 					</div>
 				</div>
 			</div>
 
-			<div className="w-full flex flex-col gap-2">
-				<h2 className="font-bold">Find a wallet that suits you</h2>
-				<div className="flex gap-4 w-full flex-wrap xl:flex-nowrap flex-col xl:flex-row">
-					{[
-						{
-							title: '🤷‍♀️ New to Crypto',
-							description: 'First time user looking for beginner wallet.',
-							id: 'beginner',
-						},
-						{
-							title: '📊 Finance',
-							description: 'Looking for a wallet for your crypto portfolio.',
-						},
-						{
-							title: '🛠️ Developer',
-							description: 'Looking for a wallet for your crypto portfolio.',
-						},
-					].map(item => (
-						<div key={item.id} className="flex flex-col gap-2 card flex-1">
-							<h3 className="font-bold text-accent">{item.title}</h3>
-							<div className="text-secondary">{item.description}</div>
-						</div>
-					))}
-				</div>
-			</div>
-
-			<div className="w-full flex flex-col gap-2">
-				<h2 className="font-bold">Explore all the wallets</h2>
+			<div className="w-full flex flex-col gap-2 p-4 md:p-8">
 				<WalletTable />
 			</div>
 		</div>

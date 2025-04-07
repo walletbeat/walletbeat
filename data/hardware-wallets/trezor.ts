@@ -7,7 +7,7 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import { featureSupported } from '@/schema/features/support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const trezorWallet: Wallet = {
 	metadata: {
@@ -24,9 +24,35 @@ export const trezorWallet: Wallet = {
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'trezor-safe-5',
+				name: 'Trezor Safe 5',
+				url: 'https://trezor.io/trezor-safe-5',
+				isFlagship: true,
+			},
+			{
+				id: 'trezor-safe-3',
+				name: 'Trezor Safe 3',
+				url: 'https://trezor.io/trezor-safe-3',
+				isFlagship: false,
+			},
+			{
+				id: 'trezor-model-one',
+				name: 'Trezor Model One',
+				url: 'https://trezor.io/trezor-model-one',
+				isFlagship: false,
+			},
+			{
+				id: 'trezor-model-t',
+				name: 'Trezor Model T',
+				url: 'https://trezor.io/trezor-model-t',
+				isFlagship: false,
+			},
+		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -63,11 +89,9 @@ export const trezorWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'Trezor provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'Trezor provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.',
 				ref: [
 					{
 						url: 'https://youtu.be/7lP_0h-PPvY?si=07dMNswh_9RsuWQ9&t=879',
@@ -102,10 +126,13 @@ export const trezorWallet: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
+		},
+		transparency: {
+			feeTransparency: null,
 		},
 		license: null,
 		monetization: {
@@ -123,15 +150,17 @@ export const trezorWallet: Wallet = {
 			},
 			ref: null,
 		},
-		transparency: {
-			feeTransparency: null,
-		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: true,
+		mobile: false,
+		browser: false,
+		desktop: false,
+		embedded: false,
+		hardware: true,
 	},
 }
+
+// Flagship : Trezor safe 5 : @https://trezor.io/trezor-safe-5
+// Trezor safe 3 : @https://trezor.io/trezor-safe-3
+// Trezor model one : @https://trezor.io/trezor-model-one
+// Trezor model T / @https://trezor.io/trezor-model-t

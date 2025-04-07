@@ -1,6 +1,5 @@
-import type { Support } from '@/schema/features/support'
-import type { WithRef } from '@/schema/reference'
-import type { NonEmptyRecord } from '@/types/utils/non-empty'
+import { type Support } from '@/schema/features/support'
+import { type WithRef } from '@/schema/reference'
 
 /**
  * Types of hardware wallets that can be supported

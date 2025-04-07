@@ -9,13 +9,12 @@ import {
 import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence, mdParagraph, mdSentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import {
 	PasskeyVerificationLibrary,
 	type PasskeyVerificationSupport,
 } from '@/schema/features/security/passkey-verification'
 import { popRefs } from '@/schema/reference'
-import { WalletProfile } from '@/schema/features/profile'
 
 const brand = 'attributes.security.passkey_implementation'
 export type PasskeyImplementationValue = Value & {
@@ -345,10 +344,11 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) => pickWorstRating<PasskeyImplementationValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) =>
+		pickWorstRating<PasskeyImplementationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<PasskeyImplementationValue> => {
 		// Hardware wallets don't use passkeys
-		if (features.profile === WalletProfile.HARDWARE) {
+		if (features.variant === Variant.HARDWARE) {
 			return exempt(
 				passkeyImplementation,
 				sentence(

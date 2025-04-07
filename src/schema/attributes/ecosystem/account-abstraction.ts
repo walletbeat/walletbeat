@@ -10,17 +10,17 @@ import { pickWorstRating, unrated } from '../common'
 import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
-import type {
-	AccountType,
-	AccountType7702,
-	AccountTypeEoa,
-	AccountTypeMpc,
-	AccountTypeMutableMultifactor,
+import {
+	type AccountType,
+	isAccountTypeSupported,
+	type AccountType7702,
+	type AccountTypeEoa,
+	type AccountTypeMpc,
+	type AccountTypeMutableMultifactor,
 } from '@/schema/features/account-support'
 import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
-import { refs, mergeRefs, type ReferenceArray } from '@/schema/reference'
-import { isSupported, type Support } from '@/schema/features/support'
+import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
 
 const brand = 'attributes.ecosystem.account_abstraction'
 export type AccountAbstractionValue = Value & {
@@ -308,16 +308,18 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 			return unrated(accountAbstraction, brand, null)
 		}
 		const supported: Record<AccountType, boolean> = {
-			eoa: isSupported<AccountTypeEoa>(features.accountSupport.eoa),
-			mpc: isSupported<AccountTypeMpc>(features.accountSupport.mpc),
-			rawErc4337: isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337),
-			eip7702: isSupported<AccountType7702>(features.accountSupport.eip7702),
+			eoa: isAccountTypeSupported<AccountTypeEoa>(features.accountSupport.eoa),
+			mpc: isAccountTypeSupported<AccountTypeMpc>(features.accountSupport.mpc),
+			rawErc4337: isAccountTypeSupported<AccountTypeMutableMultifactor>(
+				features.accountSupport.rawErc4337,
+			),
+			eip7702: isAccountTypeSupported<AccountType7702>(features.accountSupport.eip7702),
 		}
 		const allRefs = mergeRefs(
-			refs<Support<AccountTypeEoa>>(features.accountSupport.eoa),
-			refs<Support<AccountTypeMpc>>(features.accountSupport.mpc),
-			refs<Support<AccountTypeMutableMultifactor>>(features.accountSupport.rawErc4337),
-			refs<Support<AccountType7702>>(features.accountSupport.eip7702),
+			refs(features.accountSupport.eoa),
+			refs(features.accountSupport.mpc),
+			refs(features.accountSupport.rawErc4337),
+			refs(features.accountSupport.eip7702),
 		)
 		if (supported.rawErc4337 && supported.eip7702) {
 			return supportsErc4337AndEip7702(allRefs)

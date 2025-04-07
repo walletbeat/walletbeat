@@ -3,42 +3,26 @@
  * and audience for a wallet. It is used to determine which features matter
  * for a wallet, and which attributes it may be exempt from because they do
  * not matter for users of this type of wallet.
+ *
+ * A profile is **not** something like "web browser wallet" or
+ * "mobile wallet"; those are "variants". A single wallet may have
+ * multiple variants, i.e. it can have a desktop version, a mobile
+ * version, a browser version, and so on.
+ *
+ * A profile is about the intended audience of the wallet, not about
+ * the platform it runs on.
  */
 export enum WalletProfile {
-	/**
-	 * A browser extension wallet is installed as a browser plugin.
-	 * Examples include MetaMask.
-	 */
-	BROWSER_EXTENSION = 'BROWSER_EXTENSION',
-
-	/**
-	 * A web wallet runs in the browser, not as a plugin.
-	 * Examples include Rabby and Frame.
-	 */
-	WEB = 'WEB',
-
-	/**
-	 * A mobile wallet is installed as a mobile app.
-	 * Examples include Rainbow.
-	 */
-	MOBILE = 'MOBILE',
-
-	/**
-	 * A desktop wallet is installed as a desktop app.
-	 * Examples include MyCrypto.
-	 */
-	DESKTOP = 'DESKTOP',
-
-	/**
-	 * A hardware wallet is a physical device that holds private keys.
-	 * Examples include Ledger and Trezor.
-	 */
-	HARDWARE = 'HARDWARE',
-
 	/**
 	 * A generic wallet is not of any specific type.
 	 */
 	GENERIC = 'GENERIC',
+
+	/**
+	 * A payments-focused wallet. Focused on sending and receiving money.
+	 * Not arbitrary transactions.
+	 */
+	PAYMENTS = 'PAYMENTS',
 }
 
 /**
@@ -56,4 +40,30 @@ export enum HardwareWalletManufactureType {
 	 * Examples include self-assembled devices using open source hardware designs.
 	 */
 	DIY = 'DIY',
+}
+
+/**
+ * Interface for a hardware wallet model/device
+ */
+export interface HardwareWalletModel {
+	/**
+	 * Unique identifier for this model
+	 */
+	id: string
+
+	/**
+	 * Display name of the hardware wallet model
+	 */
+	name: string
+
+	/**
+	 * URL to the product page
+	 */
+	url: string
+
+	/**
+	 * Whether this model is the flagship product
+	 * The flagship will be displayed by default when viewing wallet details
+	 */
+	isFlagship: boolean
 }

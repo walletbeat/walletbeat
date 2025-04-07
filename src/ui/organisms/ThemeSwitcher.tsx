@@ -39,7 +39,7 @@ export const ThemeSwitcher: FC = () => {
 	}
 
 	return (
-		<div className="flex flex-row items-center gap-2">
+		<div className="flex flex-row items-center gap-2 h-[34px]">
 			<button onClick={toggleTheme} className="btn">
 				{isDarkMode ? <LuMoon /> : <LuSun />}
 			</button>

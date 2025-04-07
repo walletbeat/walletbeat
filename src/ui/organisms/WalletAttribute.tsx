@@ -25,7 +25,7 @@ import { variantToName } from '../../components/variants'
 import { RenderContent } from '../atoms/RenderContent'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { isTypographicContent } from '@/types/content'
-import { toFullyQualified } from '@/schema/reference'
+import { refs, toFullyQualified } from '@/schema/reference'
 import { ReferenceLinks } from '../atoms/ReferenceLinks'
 
 export function WalletAttribute<Vs extends ValueSet, V extends Value>({
@@ -52,8 +52,10 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			displayedVariant: Variant
 	  }
 )): React.JSX.Element {
+	const qualRefs = toFullyQualified(evalAttr.evaluation.references)
 	const details = evalAttr.evaluation.details.render({
 		wallet,
+		references: qualRefs,
 		value: evalAttr.evaluation.value,
 	})
 	const override = getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id)
@@ -78,8 +80,6 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		}
 	})()
 
-	const qualifiedReferences = toFullyQualified(evalAttr.evaluation.references)
-
 	let rendered = (
 		<>
 			<React.Fragment key="details">
@@ -98,6 +98,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 						<RenderTypographicContent
 							content={evalAttr.evaluation.impact.render({
 								wallet,
+								references: qualRefs,
 								value: evalAttr.evaluation.value,
 							})}
 							typography={{
@@ -109,9 +110,9 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			</React.Fragment>
 
 			{/* Display references if available */}
-			{qualifiedReferences.length > 0 && (
+			{qualRefs.length > 0 && (
 				<Box sx={{ mt: 2 }}>
-					<ReferenceLinks references={qualifiedReferences} />
+					<ReferenceLinks references={qualRefs} />
 				</Box>
 			)}
 		</>
@@ -156,7 +157,11 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					: `What can ${wallet.metadata.displayName} do about its ${evalAttr.attribute.wording.midSentenceName}?`,
 			contents: (
 				<RenderTypographicContent
-					content={howToImprove.render({ wallet, value: evalAttr.evaluation.value })}
+					content={howToImprove.render({
+						wallet,
+						references: qualRefs,
+						value: evalAttr.evaluation.value,
+					})}
 					typography={{ variant: 'body2' }}
 				/>
 			),

@@ -170,7 +170,7 @@ export function toFullyQualified(
 }
 
 /** Extract references out of `withRef`. */
-export function refs<T>(withRef: WithRef<T>): FullyQualifiedReference[] {
+export function refs(withRef: WithRef<unknown>): FullyQualifiedReference[] {
 	if (withRef.ref === undefined || withRef.ref === null) {
 		return []
 	}

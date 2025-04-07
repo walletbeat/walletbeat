@@ -6,26 +6,34 @@ import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-s
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const fireflyWallet: Wallet = {
 	metadata: {
 		id: 'firefly',
-		displayName: 'Firefly',
+		displayName: 'Firefly Wallet',
 		tableName: 'Firefly',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			Firefly is a DIY open-source hardware wallet for secure cryptocurrency management.
-			It's designed for users who want to build their own hardware wallet with full transparency and control.
+			Firefly Wallet is a hardware wallet that uses biometrics
+			for user authentication and secure private key management.
 		`),
-		url: 'https://firefly.city/',
-		repoUrl: 'https://github.com/firefly',
+		url: 'https://firefly.technology/',
+		repoUrl: null,
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
-		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
+		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'firefly-v1',
+				name: 'Firefly V1',
+				url: 'https://firefly.technology/',
+				isFlagship: true,
+			},
+		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -59,11 +67,9 @@ export const fireflyWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details:
-						'Firefly currently does not provide clear signing support as it is still in development.',
-				},
+				level: ClearSigningLevel.NONE,
+				details:
+					'Firefly currently does not provide clear signing support as it is still in development.',
 				ref: null,
 			},
 			bugBountyProgram: {
@@ -85,10 +91,13 @@ export const fireflyWallet: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
+		},
+		transparency: {
+			feeTransparency: null,
 		},
 		license: null,
 		monetization: {
@@ -106,15 +115,12 @@ export const fireflyWallet: Wallet = {
 			},
 			ref: null,
 		},
-		transparency: {
-			feeTransparency: null,
-		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: true,
+		mobile: false,
+		browser: false,
+		desktop: false,
+		embedded: false,
+		hardware: true,
 	},
 }

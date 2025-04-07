@@ -26,7 +26,7 @@ import { variantToName, variantUrlQuery } from '../../components/variants'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { slugifyCamelCase } from '@/types/utils/text'
 import { betaSiteRoot } from '@/constants'
-import type { FullyQualifiedReference } from '@/schema/reference'
+import { refs } from '@/schema/reference'
 import { toFullyQualified } from '@/schema/reference'
 
 /**
@@ -47,8 +47,8 @@ export const walletRatingColumnProps: GridColTypeDef = {
 
 const ratingPieMargin = 2
 // Reduce the size of the chart to make it less dominant
-const ratingPieHeight = 130
-const ratingPieWidth = 130
+const ratingPieHeight = 100
+const ratingPieWidth = 100
 
 // Function to get slightly increased row height
 const getRowExtraHeight = () => 20 // Extra height added to base shortRowHeight
@@ -107,11 +107,11 @@ export function WalletRatingCell<Vs extends ValueSet>({
 	}
 	const { score, hasUnratedComponent } = groupScore
 	const centerLabel = hasUnratedComponent
-		? ratingToIcon(Rating.UNRATED)
+		? ''
 		: score <= 0.0
-			? '\u{1f480}' /* Skull */
+			? ''
 			: score >= 1.0
-				? '\u{1f4af}' /* 100 */
+				? '100'
 				: Math.round(score * 100).toString()
 	const [highlightedSlice, setHighlightedSlice] = useState<{
 		evalAttrId: keyof EvaluatedGroup<Vs>
@@ -154,7 +154,7 @@ export function WalletRatingCell<Vs extends ValueSet>({
 				id: evalAttrId.toString(),
 				color: ratingToColor(evalAttr.evaluation.value.rating),
 				weight: 1,
-				arcLabel: icon,
+				arcLabel: '',
 				tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
 				tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
 				focusChange: (focused: boolean) => {
@@ -203,24 +203,14 @@ export function WalletRatingCell<Vs extends ValueSet>({
 		},
 	)
 
-	// Get references if there's a highlighted attribute
-	const getHighlightedAttributeReferences = (): FullyQualifiedReference[] => {
-		// Use frozen slice ID for references if available
-		const activeEvalAttrId = frozenSliceId || highlightedSlice?.evalAttrId
-		if (activeEvalAttrId === undefined) {
-			return []
-		}
-		return toFullyQualified(evalGroup[activeEvalAttrId].evaluation.references)
-	}
-
-	const attributeReferences = getHighlightedAttributeReferences()
-
+	const attributeReferences = toFullyQualified(highlightedEvalAttr?.evaluation.references)
 	return (
 		<Box
 			display="flex"
 			flexDirection="column"
 			alignItems="center"
 			gap="4px"
+			width="100%"
 			sx={row.rowWideStyle}
 			onMouseLeave={() => {
 				// Only clear non-sticky highlights and only if not frozen

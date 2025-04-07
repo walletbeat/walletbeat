@@ -7,7 +7,7 @@ import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-cl
 import { featureSupported } from '@/schema/features/support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const ledgerWallet: Wallet = {
 	metadata: {
@@ -24,9 +24,41 @@ export const ledgerWallet: Wallet = {
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'ledger-stax',
+				name: 'Ledger Stax',
+				url: 'https://shop.ledger.com/products/ledger-stax',
+				isFlagship: true,
+			},
+			{
+				id: 'ledger-nano-s',
+				name: 'Ledger Nano S',
+				url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
+				isFlagship: false,
+			},
+			{
+				id: 'ledger-nano-s-plus',
+				name: 'Ledger Nano S+',
+				url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
+				isFlagship: false,
+			},
+			{
+				id: 'ledger-nano-x',
+				name: 'Ledger Nano X',
+				url: 'https://shop.ledger.com/products/ledger-nano-x',
+				isFlagship: false,
+			},
+			{
+				id: 'ledger-flex',
+				name: 'Ledger Flex',
+				url: 'https://shop.ledger.com/products/ledger-flex',
+				isFlagship: false,
+			},
+		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -63,14 +95,12 @@ export const ledgerWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.',
 				ref: [
 					{
-						url: 'https://youtu.be/7lP_0h-PPvY?si=KirhDV7xEQx9Npcl&t=720',
+						url: 'https://youtu.be/7lP_0h-PPvY?t=720',
 						explanation:
 							"Independent video demonstration of Ledger's clear signing implementation on Safe.",
 					},
@@ -102,10 +132,13 @@ export const ledgerWallet: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
+		},
+		transparency: {
+			feeTransparency: null,
 		},
 		license: null,
 		monetization: {
@@ -123,15 +156,22 @@ export const ledgerWallet: Wallet = {
 			},
 			ref: null,
 		},
-		transparency: {
-			feeTransparency: null,
-		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: true,
+		mobile: false,
+		browser: false,
+		desktop: false,
+		embedded: false,
+		hardware: true,
 	},
 }
+
+// add entries for
+
+// For Ledger I need :
+
+// Ledger nano S : @https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device
+// Ledger nano S + :  @https://shop.ledger.com/products/ledger-nano-s-plus
+// Ledger nano X : @https://shop.ledger.com/products/ledger-nano-x
+// Ledger flex : @https://shop.ledger.com/products/ledger-flex
+// flagship : Ledger stax : @https://shop.ledger.com/products/ledger-stax

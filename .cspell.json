@@ -42,6 +42,7 @@
     "hmargin",
     "Interrobang",
     "IPFS",
+    "KEEPKEY",
     "linkables",
     "linkcolor",
     "lualatex",
@@ -79,6 +80,7 @@
     "setmonofont",
     "slowmist",
     "Solana",
+    "Stax",
     "subfeature",
     "texlive",
     "Timelocks",
@@ -94,6 +96,7 @@
     "vmargin",
     "walletbeat",
     "Warpcast",
+    "webauthn",
     "Yanssie"
   ],
   "flagWords": [],

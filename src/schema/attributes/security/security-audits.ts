@@ -6,7 +6,7 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
@@ -14,7 +14,7 @@ import { daysSince } from '@/types/date'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
 import { exampleSecurityAuditor } from '@/data/entities/example'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import { mergeRefs } from '@/schema/reference'
 
 const brand = 'attributes.security.security_audits'
@@ -233,6 +233,15 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SecurityAuditsValue> => {
+		if (features.variant == Variant.HARDWARE) {
+			return exempt(
+				securityAudits,
+				sentence('This attribute is not applicable to hardware wallets.'),
+				brand,
+				{ securityAudits: [] },
+			)
+		}
+
 		if (features.security.publicSecurityAudits === null) {
 			return unrated(securityAudits, brand, { securityAudits: [] })
 		}

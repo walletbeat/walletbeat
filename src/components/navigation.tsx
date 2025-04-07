@@ -38,7 +38,7 @@ export const navigationRepository: NavigationLinkItem = {
 	id: 'code-repository',
 	icon: <GitHubIcon />,
 	title: 'Contribute on GitHub',
-	href: 'https://github.com/fluidkey/walletbeat',
+	href: 'https://github.com/walletbeat/walletbeat',
 }
 
 export const navigationFarcasterChannel: NavigationLinkItem = {

@@ -9,8 +9,7 @@ import {
 import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, mdParagraph, paragraph, sentence, mdSentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { WalletProfile } from '@/schema/features/profile'
+import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import {
 	BugBountyProgramType,
 	type BugBountyProgramSupport,
@@ -272,16 +271,15 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<BugBountyProgramValue>>) => pickWorstRating<BugBountyProgramValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<BugBountyProgramValue>>) =>
+		pickWorstRating<BugBountyProgramValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<BugBountyProgramValue> => {
-		// This attribute only applies to hardware wallets
-		if (features.profile !== WalletProfile.HARDWARE) {
+		// This attribute is only applicable for hardware wallets
+		// For software wallets, we exempt them from this attribute
+		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				bugBountyProgram,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is only applicable for hardware wallets, not for ${walletMetadata.displayName}.`,
-				),
+				sentence('This attribute is only applicable for hardware wallets.'),
 				brand,
 				{
 					programType: BugBountyProgramType.NONE,
@@ -290,22 +288,19 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 			)
 		}
 
-		// If the bugBountyProgram feature is not defined, return unrated
-		if (
-			features.security.bugBountyProgram === null ||
-			features.security.bugBountyProgram === undefined
-		) {
+		if (features.security.bugBountyProgram === null) {
 			return unrated(bugBountyProgram, brand, {
 				programType: BugBountyProgramType.NONE,
 				upgradePathAvailable: false,
 			})
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<BugBountyProgramSupport>(
+		const { withoutRefs, refs } = popRefs<BugBountyProgramSupport>(
 			features.security.bugBountyProgram,
 		)
 
-		let result: Evaluation<BugBountyProgramValue>
+		// Initialize result with a default value
+		let result: Evaluation<BugBountyProgramValue> = noBugBountyProgram()
 
 		switch (withoutRefs.type) {
 			case BugBountyProgramType.COMPREHENSIVE:
@@ -317,7 +312,7 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 			case BugBountyProgramType.DISCLOSURE_ONLY:
 				result = disclosureOnlyProgram(withoutRefs)
 				break
-			default:
+			case BugBountyProgramType.NONE:
 				result = noBugBountyProgram()
 				break
 		}
@@ -325,7 +320,7 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 		// Return result with references if any
 		return {
 			...result,
-			...(extractedRefs.length > 0 && { references: extractedRefs }),
+			...(refs.length > 0 && { references: refs }),
 		}
 	},
 }

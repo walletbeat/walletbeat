@@ -2,9 +2,8 @@ import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
 import { exampleContributor } from '../contributors/example'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const unratedTemplate: Wallet = {
 	metadata: {
@@ -49,21 +48,9 @@ export const unratedTemplate: Wallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			hardwareWalletSupport: {
-				supportedWallets: {},
-				ref: null,
-			},
-			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.',
-				},
-				ref: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
+			hardwareWalletSupport: null,
+			hardwareWalletClearSigning: null,
+			passkeyVerification: null,
 		},
 		privacy: {
 			dataCollection: null,
@@ -76,10 +63,13 @@ export const unratedTemplate: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
+		},
+		transparency: {
+			feeTransparency: null,
 		},
 		license: null,
 		monetization: {
@@ -96,9 +86,6 @@ export const unratedTemplate: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

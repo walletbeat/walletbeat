@@ -12,6 +12,7 @@ import {
 	securityFlawSeverityName,
 } from '@/schema/features/security/security-audits'
 import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
+import { Rating } from '@/schema/attributes'
 
 export function SecurityAuditsDetails({
 	wallet,
@@ -22,7 +23,7 @@ export function SecurityAuditsDetails({
 	// Safety check for value and audits
 	if (!value || !value.securityAudits) {
 		return (
-			<WrapRatingIcon rating="UNRATED">
+			<WrapRatingIcon rating={Rating.UNRATED}>
 				<Typography fontWeight={subsectionWeight}>
 					No security audit information is available.
 				</Typography>

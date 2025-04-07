@@ -1,23 +1,33 @@
 import { resolveFeatures, type ResolvedFeatures, type WalletFeatures } from './features'
-import { type AtLeastOneTrueVariant, type AtLeastOneVariant, Variant } from './variants'
+import {
+	type AtLeastOneTrueVariant,
+	type AtLeastOneVariant,
+	getVariants,
+	hasVariant,
+	Variant,
+} from './variants'
 import {
 	aggregateAttributes,
 	evaluateAttributes,
 	mapAttributesGetter,
 	type EvaluationTree,
 } from './attribute-groups'
-import { type NonEmptyArray, nonEmptyEntries, nonEmptyRemap } from '@/types/utils/non-empty'
+import {
+	isNonEmptyArray,
+	type NonEmptyArray,
+	nonEmptyEntries,
+	nonEmptyRemap,
+	type NonEmptySet,
+	setItems,
+	setUnion,
+} from '@/types/utils/non-empty'
 import type { Paragraph, Renderable, RenderableTypography } from '@/types/content'
 import type { Url } from './url'
 import { Rating, type Attribute, type EvaluatedAttribute, type Value } from './attributes'
 import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
-import type {
-	WalletTypeInfo,
-	WalletTypeCategory,
-	SmartWalletStandard,
-} from './features/wallet-type'
-import type { HardwareWalletManufactureType } from './features/profile'
+import { HardwareWalletManufactureType, type HardwareWalletModel } from './features/profile'
+import { supportedAccountTypes, type AccountType } from './features/account-support'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -86,23 +96,14 @@ export interface WalletMetadata {
 	contributors: NonEmptyArray<Contributor>
 
 	/**
-	 * Information about the wallet type (EOA, Smart Wallet, or Hardware Wallet)
-	 */
-	walletType?: WalletTypeInfo
-
-	/**
-	 * Information for wallets with multiple types (e.g., both EOA and Smart Wallet)
-	 */
-	multiWalletType?: {
-		categories: WalletTypeCategory[]
-		smartWalletStandards?: SmartWalletStandard[]
-		details?: string
-	}
-
-	/**
 	 * For hardware wallets, indicates whether it's factory-made or DIY
 	 */
 	hardwareWalletManufactureType?: HardwareWalletManufactureType
+
+	/**
+	 * For hardware wallets, list of available models/devices
+	 */
+	hardwareWalletModels?: HardwareWalletModel[]
 }
 
 /** Per-wallet, per-attribute override. */
@@ -131,6 +132,9 @@ export interface WalletOverrides {
 
 /**
  * The interface used to describe wallets.
+ * This should only be used for data entry and in attribute rating logic,
+ * never in UI code. UI code should only deal with fully-rated wallet data.
+ * See `RatedWallet` instead.
  */
 export interface Wallet {
 	/** Wallet metadata (name, URL, icon, etc.) */
@@ -383,4 +387,55 @@ export function getAttributeOverride(
 	}
 	const override = attributeGroup[attrId]
 	return override ?? null
+}
+
+/**
+ * Returns the set of variants the wallet supports.
+ */
+export function getWalletVariants(wallet: RatedWallet): NonEmptySet<Variant> {
+	return getVariants(wallet.variants)
+}
+
+export function getVariantResolvedWallet(
+	wallet: RatedWallet,
+	variant: Variant,
+): ResolvedWallet | null {
+	if (!hasVariant(wallet.variants, variant) || wallet.variants[variant] === undefined) {
+		return null
+	}
+	return wallet.variants[variant]
+}
+
+/**
+ * Returns the set of account types supported by the wallet, or null if any information is unknown.
+ *
+ * @param wallet The rated wallet.
+ * @param variant The variant to query for, or "ALL_VARIANTS" to get the union of all account types across all variants.
+ */
+export function walletSupportedAccountTypes(
+	wallet: RatedWallet,
+	variant: Variant | 'ALL_VARIANTS',
+): NonEmptySet<AccountType> | null {
+	if (variant === 'ALL_VARIANTS') {
+		const accountTypeSets: NonEmptySet<AccountType>[] = []
+		for (const variant of setItems(getWalletVariants(wallet))) {
+			const supportedByVariant = walletSupportedAccountTypes(wallet, variant)
+			if (supportedByVariant === null) {
+				return null
+			}
+			accountTypeSets.push(supportedByVariant)
+		}
+		if (!isNonEmptyArray(accountTypeSets)) {
+			return null
+		}
+		return setUnion(accountTypeSets)
+	}
+	const resolvedWallet = getVariantResolvedWallet(wallet, variant)
+	if (resolvedWallet === null) {
+		return null
+	}
+	if (resolvedWallet.features.accountSupport === null) {
+		return null
+	}
+	return supportedAccountTypes(resolvedWallet.features.accountSupport)
 }

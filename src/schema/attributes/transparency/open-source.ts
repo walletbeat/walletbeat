@@ -41,7 +41,7 @@ function open({ license, ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
 			license,
 			__brand: brand,
 		},
-		details: licenseDetailsContent({ licenseRefs: ref }),
+		details: licenseDetailsContent(),
 		references: toFullyQualified(ref),
 	}
 }
@@ -62,7 +62,7 @@ function openInTheFuture({ license, ref }: LicenseWithRef): Evaluation<OpenSourc
 			license,
 			__brand: brand,
 		},
-		details: licenseDetailsContent({ licenseRefs: ref }),
+		details: licenseDetailsContent(),
 		references: toFullyQualified(ref),
 	}
 }

@@ -11,16 +11,24 @@
 		--background-primary: #fff;
 		--background-secondary: #efefef;
 		--background-tertiary: #eeeff4;
-		--accent: #6c24e0;
+		--accent: #4d1957;
+		--accent-light: #e683c7;
+		--accent-very-light: #ffdbf4;
 		--logo-color: var(--accent);
 		--text-primary: #222222;
-		--text-secondary: #22242b;
+		--text-secondary: #3f4046;
 		--text-inverse: #ffffff;
 		--border: #cecece;
 		--banner-gradient-from: #ecedfd;
 		--banner-gradient-to: #e8f6f2;
 		--icon-color: #222222; /* Add icon color for light mode */
-
+		--navigation-bg: #f7f7f7; /* Navigation background color for light mode */
+		--disabled-text: #b1b2b9;
+		--pass: #2ecc71;
+		--fail: #e74c3c;
+		--partial: #f1c40f;
+		--active: #e683c7;
+		--hover: #e683c7;
 		/* Hashtag styling for light mode */
 		--hashtag-text: #1976d2; /* Blue that's readable on light background */
 		--hashtag-bg: rgba(25, 118, 210, 0.08);
@@ -30,23 +38,37 @@
 		--eip-bg: rgba(108, 36, 224, 0.08);
 		--eip-text: var(--accent);
 		--eip-border: rgba(108, 36, 224, 0.2);
+
+		/* Rating colors */
+		--rating-pass: #2ecc71; /* Green */
+		--rating-partial: #f1c40f; /* Yellow */
+		--rating-fail: #e74c3c; /* Red */
+		--rating-neutral: #bdc3c7; /* Gray */
 	}
 }
 
 html.dark {
-	--background-primary: #22242b;
+	--background-primary: #141414;
 	--background-secondary: #17191f;
 	--background-tertiary: #17191f;
-	--accent: #6c24e0;
+	--accent: #e683c7;
+	--accent-light: #4d1957;
+	--accent-very-light: #440530;
 	--logo-color: var(--text-primary);
 	--text-primary: #efefef;
-	--text-secondary: #e4e5eb;
+	--text-secondary: #b1b2b9;
 	--text-inverse: #ffffff;
 	--border: #313131;
 	--banner-gradient-from: #15151a;
 	--banner-gradient-to: #212126;
 	--icon-color: #efefef; /* Add icon color for dark mode */
-
+	--navigation-bg: #000000; /* Navigation background color for dark mode */
+	--disabled-text: #656566;
+	--pass: #2ecc71;
+	--fail: #e74c3c;
+	--partial: #f1c40f;
+	--active: #b14f92;
+	--hover: #b14f92;
 	/* Hashtag styling for dark mode */
 	--hashtag-text: #90caf9; /* Lighter blue that's readable on dark background */
 	--hashtag-bg: rgba(144, 202, 249, 0.08);
@@ -56,6 +78,12 @@ html.dark {
 	--eip-bg: rgba(108, 36, 224, 0.12);
 	--eip-text: rgb(187, 147, 255);
 	--eip-border: rgba(108, 36, 224, 0.3);
+
+	/* Rating colors - keep same as light mode since they represent statuses */
+	--rating-pass: #2ecc71; /* Green */
+	--rating-partial: #f1c40f; /* Yellow */
+	--rating-fail: #e74c3c; /* Red */
+	--rating-neutral: #bdc3c7; /* Gray */
 }
 
 html,
@@ -63,7 +91,7 @@ body {
 	color: var(--text-primary) !important;
 	background-color: var(--background-primary) !important;
 	background: var(--background-primary) !important;
-	font-size: 18px !important;
+	font-size: 16px !important;
 }
 
 /* Force SVG icons to use the appropriate color based on theme */
@@ -77,24 +105,12 @@ body {
 	color: var(--accent) !important;
 }
 
-/* Improved styling for list items */
-li {
-	margin-bottom: 0.5rem;
-	padding-left: 0.5rem;
-}
-
-ul {
-	padding-left: 2rem;
-	margin-top: 0.75rem;
-	margin-bottom: 0.75rem;
-}
-
 /* Styling for EIP/ERC tags */
 .eip-tag {
 	background-color: var(--eip-bg);
 	color: var(--eip-text) !important;
-	padding: 0.15rem 0.4rem;
-	border-radius: 4px;
+	padding: 0.3rem 0.6rem;
+	border-radius: 9999px;
 	font-weight: 500;
 	border: 1px solid var(--eip-border);
 	display: inline-block;
@@ -153,10 +169,26 @@ html.dark {
 }
 
 * {
-	font-family: 'Work Sans', 'Work Sans Fallback', 'Noto Color Emoji';
+	font-family: 'Montserrat', 'Noto Color Emoji';
 }
 
 code {
 	/* Why monospace twice? See https://github.com/necolas/normalize.css/issues/519#issuecomment-197131966 */
 	font-family: monospace, monospace;
+}
+
+[cmdk-list] {
+	@apply pb-2 pt-3;
+}
+
+[cmdk-group-heading] {
+	@apply px-2;
+}
+
+[cmdk-list-sizer] {
+	@apply space-y-2;
+}
+
+[data-radix-popper-content-wrapper] {
+	z-index: 100 !important;
 }

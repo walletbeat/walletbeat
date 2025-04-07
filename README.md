@@ -24,4 +24,4 @@ Simply create a new file with your wallet data in the [data/wallets](./data/wall
 
 You can find the definition of each criterion at [beta.walletbeat.eth](https://beta.walletbeat.eth.limo).
 
-Feel free to also check open issues in [this repo](https://github.com/fluidkey/walletbeat/issues) and contribute to them.
+Feel free to also check open issues in [this repo](https://github.com/walletbeat/walletbeat/issues) and contribute to them.

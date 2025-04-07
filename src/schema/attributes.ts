@@ -4,7 +4,7 @@ import type { AtLeastOneVariant } from './variants'
 import type { MaybeUnratedScore, Score } from './score'
 import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content'
 import type { RatedWallet, WalletMetadata } from './wallet'
-import type { ReferenceArray } from './reference'
+import type { FullyQualifiedReference, ReferenceArray } from './reference'
 
 /**
  * Rating is an enum that should be visually meaningful.
@@ -80,15 +80,29 @@ export function ratingToIcon(rating: Rating): string {
 export function ratingToColor(rating: Rating): string {
 	switch (rating) {
 		case Rating.FAIL:
-			return '#FF0000'
+			return '#e74c3c' // Red
 		case Rating.PARTIAL:
-			return '#FFA500'
+			return '#f1c40f' // Yellow
 		case Rating.PASS:
-			return '#008000'
+			return '#2ecc71' // Green
 		case Rating.UNRATED:
-			return '#808080'
+			return '#bdc3c7' // Gray
 		case Rating.EXEMPT:
-			return '#C0C0C0'
+			return '#bdc3c7' // Gray
+	}
+}
+export function borderRatingToColor(rating: Rating): string {
+	switch (rating) {
+		case Rating.FAIL:
+			return '#e74c3c' // Red
+		case Rating.PARTIAL:
+			return '#f1c40f' // Yellow
+		case Rating.PASS:
+			return '#2ecc71' // Green
+		case Rating.UNRATED:
+			return '#bdc3c7' // Gray
+		case Rating.EXEMPT:
+			return '#bdc3c7' // Gray
 	}
 }
 
@@ -149,7 +163,7 @@ export interface Value {
 	 * A score representing this value on this specific attribute.
 	 * For any given Attribute, there should be at least one way to get a
 	 * score of 1.0.
-	 * If unspecified, the score is derived using `defaultRatingScore`.
+	 * If unspecified, the score is derived  using `defaultRatingScore`.
 	 */
 	score?: Score
 }
@@ -172,6 +186,7 @@ export function defaultRatingScore(rating: Rating): Score | null {
 
 export interface EvaluationData<V extends Value> {
 	value: V
+	references: FullyQualifiedReference[]
 	wallet: RatedWallet
 }
 
@@ -215,7 +230,7 @@ export interface Evaluation<V extends Value> {
 	 * Optional array of references with URLs and explanations.
 	 * These references provide sources for the evaluation claims.
 	 */
-	references: ReferenceArray
+	references?: ReferenceArray
 }
 
 /**

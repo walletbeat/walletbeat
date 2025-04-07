@@ -23,6 +23,7 @@ import { blend, ThemeProvider } from '@mui/system'
 import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
 import {
 	type AttributeGroup,
+	borderRatingToColor,
 	type EvaluatedAttribute,
 	type EvaluatedGroup,
 	Rating,
@@ -32,9 +33,7 @@ import {
 } from '@/schema/attributes'
 import {
 	navigationListIconSize,
-	sectionIconWidth,
 	subsectionBorderRadius,
-	subsectionIconWidth,
 } from '@/components/constants'
 import type { NavigationItem } from '@/ui/organisms/Navigation'
 import {
@@ -64,23 +63,7 @@ import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import LanguageIcon from '@mui/icons-material/Language'
 import GitHubIcon from '@mui/icons-material/GitHub'
 
-const headerHeight = 80
-const headerBottomMargin = 24
-
-const StyledHeader = styled(Paper)(({ theme }) => ({
-	position: 'sticky',
-	top: 40,
-	zIndex: 1100,
-	backgroundColor: theme.palette.background.paper,
-	padding: theme.spacing(2),
-	display: 'flex',
-	flexDirection: 'row',
-	alignItems: 'center',
-	gap: theme.spacing(2),
-	height: headerHeight,
-	marginBottom: `${headerBottomMargin}px`,
-	borderRadius: '24px',
-}))
+const headerBottomMargin = 0
 
 const StyledSection = styled(Box)(({ theme }) => ({
 	padding: theme.spacing(2),
@@ -93,8 +76,7 @@ const StyledSubsection = styled(Paper)(({ theme }) => ({
 	display: 'flex',
 	flexDirection: 'column',
 	borderRadius: `${subsectionBorderRadius}px`,
-	marginTop: '1rem',
-	marginBottom: '1rem',
+	margin: '0rem 1rem 1rem 1rem',
 }))
 
 interface Section {
@@ -274,8 +256,8 @@ export function WalletPage({
 				: `Runs on ${variantToName(variant, false)}`,
 			click: needsVariantFiltering
 				? () => {
-						updatePickedVariant(pickedVariant === variant ? null : variant)
-					}
+					updatePickedVariant(pickedVariant === variant ? null : variant)
+				}
 				: undefined,
 		}),
 	)
@@ -283,60 +265,62 @@ export function WalletPage({
 		{
 			header: 'details',
 			subHeader: null,
-			title: 'Details',
+			title: '',
 			cornerControl: null,
 			caption: null,
-			icon: '\u{2139}', // Info
+			icon: null,
 			body: (
-				<>
+				<div data-testid="wallet-blurb">
+					<div
+						// sx={{
+						// 	display: 'flex',
+						// 	flexDirection: 'row',
+						// 	gap: '1rem',
+						// 	marginTop: '1rem',
+						// 	marginBottom: '24px',
+						// 	alignItems: 'center',
+						// 	flexWrap: 'wrap',
+						// 	padding: '2px',
+						// 	backgroundColor: 'var(--background)',
+						// }}
+						className="flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]"
+					>
+						{
+							[
+								(<div className="flex flex-row gap-2 items-center" key="website">
+									<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+									<ExternalLink
+										url={wallet.metadata.url}
+										defaultLabel={`${wallet.metadata.displayName} website`}
+										style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+									/>
+								</div>),
+								(
+									wallet.metadata.repoUrl !== null ? (
+										<div className="flex flex-row gap-2 items-center" key="repo">
+											<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+											<ExternalLink
+												url={wallet.metadata.repoUrl}
+												defaultLabel="GitHub Repository"
+												style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+											/>
+										</div>
+									) : undefined
+								)].filter(Boolean).map((value) => (value !== undefined &&
+									<div key={value.key ?? 'hi'} className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary">
+										{value}
+									</div>
+								))
+						}
+					</div>
 					<RenderTypographicContent
 						content={wallet.metadata.blurb.render({})}
 						typography={{ variant: 'body1' }}
 					/>
-					<Box
-						sx={{
-							display: 'flex',
-							flexDirection: 'row',
-							gap: '16px',
-							marginTop: '24px',
-							marginBottom: '24px',
-							alignItems: 'center',
-							flexWrap: 'wrap',
-							padding: '12px',
-							backgroundColor: 'rgba(50, 50, 50, 0.35)',
-							border: '1px solid var(--border)',
-							borderRadius: '8px',
-							'.dark &': {
-								backgroundColor: 'rgba(189, 159, 224, 0.15)',
-							},
-						}}
-					>
-						<Typography variant="body1" fontWeight="medium">
-							Links:
-						</Typography>
-
-						<Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-							<LanguageIcon fontSize="small" sx={{ color: 'var(--accent)' }} />
-							<ExternalLink
-								url={wallet.metadata.url}
-								defaultLabel={`${wallet.metadata.displayName} website`}
-								style={{ fontWeight: 500 }}
-							/>
-						</Box>
-
-						{wallet.metadata.repoUrl !== null && (
-							<Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-								<GitHubIcon fontSize="small" sx={{ color: 'var(--accent)' }} />
-								<ExternalLink
-									url={wallet.metadata.repoUrl}
-									defaultLabel="GitHub Repository"
-									style={{ fontWeight: 500 }}
-								/>
-							</Box>
-						)}
-					</Box>
-					<Typography variant="body1">
-						<React.Fragment key="begin">{wallet.metadata.displayName} runs </React.Fragment>
+					<Typography fontSize="0.9rem" marginTop="3rem">
+						<React.Fragment key="begin">
+							<span style={{ color: 'var(--accent)' }}>Platforms: </span>
+						</React.Fragment>
 						{nonEmptyMap(nonEmptyKeys(wallet.variants), (variant, variantIndex) => (
 							<React.Fragment key={variant}>
 								{commaListPrefix(variantIndex, Object.keys(wallet.variants).length)}
@@ -363,7 +347,7 @@ export function WalletPage({
 							</React.Fragment>
 						)}
 					</Typography>
-				</>
+				</div>
 			),
 		},
 	]
@@ -544,12 +528,15 @@ export function WalletPage({
 							icon: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
 							cornerControl,
 							sx: {
-								backgroundColor: blend(
+								border: '2px solid',
+								color: 'var(--text-primary)',
+								borderColor: blend(
 									theme.palette.background.paper,
-									ratingToColor(evalAttr.evaluation.value.rating),
-									0.2,
+									borderRatingToColor(evalAttr.evaluation.value.rating),
+									1,
 									1,
 								),
+								backgroundColor: 'transparent',
 							},
 							caption: (
 								<RenderTypographicContent
@@ -570,44 +557,33 @@ export function WalletPage({
 			}
 		},
 	)
-	const scrollMarginTop = `${headerHeight + headerBottomMargin + scrollPastHeaderPixels}px`
+	const scrollMarginTop = `${headerBottomMargin + scrollPastHeaderPixels}px`
 
+	const nonHeaderSections: RichSection[] =  sections.slice(1)
+  if (!isNonEmptyArray(nonHeaderSections)) {
+		throw new Error('No non-header sections defined for navigation');
+	}
 	return (
 		<NavigationPageLayout
 			prefix={<WalletDropdown wallet={wallet} />}
 			groups={[
 				{
 					id: 'wallet-sections',
-					items: [
-						// {
-						// 	id: sections[0].header,
-						// 	icon: (
-						// 		<WalletIcon
-						// 			walletMetadata={wallet.metadata}
-						// 			iconSize={navigationListIconSize * 0.75}
-						// 		/>
-						// 	),
-						// 	title: wallet.metadata.displayName,
-						// 	contentId: sectionHeaderId(sections[0]),
-						// },
-						...sections.slice(1).map(
-							(section): NavigationItem => ({
-								id: sectionHeaderId(section),
-								icon: section.icon,
-								title: section.title,
-								contentId: sectionHeaderId(section),
-								children:
-									section.subsections !== undefined && isNonEmptyArray(section.subsections)
-										? nonEmptyMap(section.subsections, subsection => ({
-												id: sectionHeaderId(subsection),
-												icon: subsection.icon,
-												title: subsection.title,
-												contentId: sectionHeaderId(subsection),
-											}))
-										: undefined,
-							}),
-						),
-					],
+					items: nonEmptyMap(nonHeaderSections, (section): NavigationItem => ({
+						id: sectionHeaderId(section),
+						icon: section.icon,
+						title: section.title,
+						contentId: sectionHeaderId(section),
+						children:
+							section.subsections !== undefined && isNonEmptyArray(section.subsections)
+								? nonEmptyMap(section.subsections, subsection => ({
+									id: sectionHeaderId(subsection),
+									icon: subsection.icon,
+									title: subsection.title,
+									contentId: sectionHeaderId(subsection),
+								}))
+								: undefined,
+					})),
 					overflow: true,
 				},
 				{
@@ -617,7 +593,7 @@ export function WalletPage({
 				},
 			]}
 			stickyHeaderId="walletHeader"
-			stickyHeaderMargin={headerBottomMargin}
+			stickyHeaderMargin={0}
 			contentDependencies={[wallet, pickedVariant]}
 		>
 			{/* Add structured data for FAQs */}
@@ -629,109 +605,112 @@ export function WalletPage({
 			/>
 
 			<ReturnToTop />
-			<StyledHeader key="walletHeader" id="walletHeader">
-				<Typography
-					variant="h4"
-					component="h1"
-					display="flex"
-					flexDirection="row"
-					alignItems="center"
-					gap="12px"
-				>
-					<WalletIcon
-						key="walletIcon"
-						walletMetadata={wallet.metadata}
-						iconSize={navigationListIconSize * 2}
-						variants={wallet.variants}
-					/>
-					{wallet.metadata.displayName}
-				</Typography>
-				<VariantPicker
-					pickerId="variantPicker"
-					variants={headerVariants}
-					pickedVariant={pickedVariant}
-				/>
-			</StyledHeader>
-			<div className="flex flex-col mt-10 gap-4">
-				<div key="walletPageBody" className="flex flex-row">
-					<div key="walletPageContent" className="flex-1">
-						<div key="topSpacer" style={{ height: headerBottomMargin }}></div>
-						{nonEmptyMap(sections, (section, index) => (
-							<React.Fragment key={sectionHeaderId(section)}>
-								{index > 0 ? (
-									<div key="sectionDivider" className="w-4/5 mx-auto mt-6 mb-6 border-b" />
-								) : null}
-								<StyledSection key="sectionContainer" sx={section.sx}>
-									{maybeAddCornerControl(
-										section,
-										<AnchorHeader
-											key="sectionHeader"
-											id={sectionHeaderId(section)}
-											sx={{ scrollMarginTop }}
-											variant="h4"
-											component="h2"
-											marginBottom="0"
-											paddingLeft={theme.spacing(2)}
-											paddingRight={theme.spacing(2)}
-										>
-											{section.icon} {section.title}
-										</AnchorHeader>,
-									)}
-									{section.caption === null ? null : (
-										<div
-											key="sectionCaption"
-											className="mb-4 opacity-80"
-											style={{
-												marginLeft: sectionIconWidth,
-											}}
-										>
-											{section.caption}
-										</div>
-									)}
-									{section.body === null ? null : (
-										<Box
-											key="sectionBody"
-											paddingTop={theme.spacing(2)}
-											paddingLeft={theme.spacing(2)}
-											paddingRight={theme.spacing(2)}
-										>
-											{section.body}
-										</Box>
-									)}
-									{section.subsections?.map(subsection => (
-										<StyledSubsection key={sectionHeaderId(subsection)} sx={subsection.sx}>
-											<ThemeProvider theme={subsectionTheme}>
-												{maybeAddCornerControl(
-													subsection,
-													<AnchorHeader
-														key="subsectionHeader"
-														id={sectionHeaderId(subsection)}
-														sx={{ scrollMarginTop }}
-														variant="h3"
-														marginBottom="0rem"
-													>
-														{subsection.icon} {subsection.title}
-													</AnchorHeader>,
-												)}
-												{subsection.caption === null ? null : (
-													<Box
-														key="subsectionCaption"
-														marginLeft={subsectionIconWidth}
-														marginBottom="1rem"
-														sx={{ opacity: 0.8 }}
-													>
-														{subsection.caption}
-													</Box>
-												)}
-												{subsection.body === null ? null : (
-													<Box key="subsectionBody">{subsection.body}</Box>
-												)}
-											</ThemeProvider>
-										</StyledSubsection>
-									))}
-								</StyledSection>
-							</React.Fragment>
-						))}
+			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
+				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
+					<div className="flex flex-row">
+						<div className="flex-1">
+							<div style={{ height: headerBottomMargin }}></div>
+							<div className="px-8">
+								<Typography
+									variant="h4"
+									component="h1"
+									display="flex"
+									flexDirection="row"
+									alignItems="center"
+									gap="12px"
+									sx={{
+										fontSize: '2.25rem', // equivalent to text-4xl
+										color: 'var(--text-primary)',
+									}}
+								>
+									<WalletIcon
+										key="walletIcon"
+										wallet={wallet}
+										iconSize={navigationListIconSize * 2}
+									/>
+									{wallet.metadata.displayName}
+								</Typography>
+							</div>
+							{nonEmptyMap(sections, (section, index) => (
+								<React.Fragment key={sectionHeaderId(section)}>
+									{index > 0 ? (
+										<div key="sectionDivider" className="w-4/5 mx-auto mt-6 mb-6 border-b" />
+									) : null}
+									<StyledSection key="sectionContainer" sx={section.sx}>
+										{maybeAddCornerControl(
+											section,
+											<AnchorHeader
+												key="sectionHeader"
+												id={sectionHeaderId(section)}
+												sx={{ scrollMarginTop }}
+												variant="h4"
+												component="h2"
+												marginBottom="0"
+												fontSize="2rem"
+												fontWeight="700"
+												paddingLeft={theme.spacing(2)}
+												paddingRight={theme.spacing(2)}
+											>
+												{section.title}
+											</AnchorHeader>,
+										)}
+										{section.caption === null ? null : (
+											<div
+												key="sectionCaption"
+												className="mb-4 opacity-80"
+												style={{
+													marginLeft: '16px',
+												}}
+											>
+												{section.caption}
+											</div>
+										)}
+										{section.body === null ? null : (
+											<Box
+												key="sectionBody"
+												color="var(--text-primary)"
+												// paddingTop={theme.spacing(2)}
+												paddingLeft={theme.spacing(2)}
+												paddingRight={theme.spacing(2)}
+											>
+												{section.body}
+											</Box>
+										)}
+										{section.subsections?.map(subsection => (
+											<StyledSubsection key={sectionHeaderId(subsection)} sx={subsection.sx}>
+												<ThemeProvider theme={subsectionTheme}>
+													{maybeAddCornerControl(
+														subsection,
+														<AnchorHeader
+															key="subsectionHeader"
+															id={sectionHeaderId(subsection)}
+															sx={{ scrollMarginTop }}
+															variant="h3"
+															marginBottom=".3rem"
+														>
+															{subsection.title}
+														</AnchorHeader>,
+													)}
+													{subsection.caption === null ? null : (
+														<Box
+															key="subsectionCaption"
+															marginLeft="0"
+															marginBottom="2rem"
+															sx={{ opacity: 0.8 }}
+														>
+															{subsection.caption}
+														</Box>
+													)}
+													{subsection.body === null ? null : (
+														<Box key="subsectionBody">{subsection.body}</Box>
+													)}
+												</ThemeProvider>
+											</StyledSubsection>
+										))}
+									</StyledSection>
+								</React.Fragment>
+							))}
+						</div>
 					</div>
 				</div>
 			</div>

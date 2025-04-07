@@ -295,7 +295,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			if (!Object.hasOwn(features.selfSovereignty.transactionSubmission.l2, l2Type)) {
 				continue
 			}
-			 
+
 			const l2 = l2Type
 			const support = features.selfSovereignty.transactionSubmission.l2[l2]
 			if (support === null) {

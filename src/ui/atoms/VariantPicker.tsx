@@ -31,6 +31,7 @@ export function VariantPicker<V extends string>({
 	opacityFaded = 0.35,
 	opacityDefault = 0.85,
 	opacityPicked = 1.0,
+	colorPicked = 'primary.light',
 	flexDirection = 'row',
 	gap = '0px',
 }: VariantPickerProps<V>): React.JSX.Element {

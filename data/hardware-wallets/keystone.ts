@@ -6,26 +6,34 @@ import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-s
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { Variant } from '@/schema/variants'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const keystoneWallet: Wallet = {
 	metadata: {
 		id: 'keystone',
-		displayName: 'Keystone',
+		displayName: 'Keystone Wallet',
 		tableName: 'Keystone',
 		iconExtension: 'svg',
 		blurb: paragraph(`
-			Keystone is an air-gapped hardware wallet that uses QR codes for communication.
-			It offers enhanced security by keeping private keys completely offline.
+			Keystone Wallet is a self-custodial hardware wallet that provides secure private
+			key storage. It uses QR codes for air-gapped transaction signing.
 		`),
 		url: 'https://keyst.one/',
 		repoUrl: 'https://github.com/KeystoneHQ',
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletModels: [
+			{
+				id: 'keystone-pro',
+				name: 'Keystone Pro',
+				url: 'https://keyst.one/pro',
+				isFlagship: true,
+			},
+		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -59,14 +67,12 @@ export const keystoneWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.FULL,
-					details:
-						'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
-				},
+				level: ClearSigningLevel.FULL,
+				details:
+					'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
 				ref: [
 					{
-						url: 'https://youtu.be/7lP_0h-PPvY?si=S4wNFukrmg4rwyFA&t=1141',
+						url: 'https://youtu.be/7lP_0h-PPvY?t=1141',
 						explanation:
 							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
 					},
@@ -98,10 +104,13 @@ export const keystoneWallet: Wallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
-					arbitrum: null,
-					opStack: null,
+					[TransactionSubmissionL2Type.arbitrum]: null,
+					[TransactionSubmissionL2Type.opStack]: null,
 				},
 			},
+		},
+		transparency: {
+			feeTransparency: null,
 		},
 		license: null,
 		monetization: {
@@ -119,15 +128,12 @@ export const keystoneWallet: Wallet = {
 			},
 			ref: null,
 		},
-		transparency: {
-			feeTransparency: null,
-		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: true,
+		mobile: false,
+		browser: false,
+		desktop: false,
+		embedded: false,
+		hardware: true,
 	},
 }

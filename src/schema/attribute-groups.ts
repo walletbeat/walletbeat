@@ -25,10 +25,7 @@ import {
 	sourceVisibility,
 	type SourceVisibilityValue,
 } from './attributes/transparency/source-visibility'
-import {
-	feeTransparency,
-	type FeeTransparencyValue,
-} from './attributes/transparency/fee-transparency'
+import { feeTransparency, type FeeTransparencyValue } from './attributes/transparency/fee-transparency'
 import type { ResolvedFeatures } from './features'
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { Dict } from '@/types/utils/dict'
@@ -89,7 +86,10 @@ import {
 	bugBountyProgram,
 	type BugBountyProgramValue,
 } from './attributes/security/bug-bounty-program'
-import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
+import {
+	scamPrevention,
+	type ScamPreventionValue,
+} from './attributes/security/scam-prevention'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
@@ -494,9 +494,9 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 				return score === null
 					? null
 					: {
-							score,
-							weight,
-						}
+						score,
+						weight,
+					}
 			}),
 		).filter(score => score !== null)
 		if (isNonEmptyArray(subScores)) {

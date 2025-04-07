@@ -140,9 +140,9 @@ function evaluateAddressResolution(
 					? undefined
 					: mdParagraph(
 							({ wallet }) => `
-					${wallet.metadata.displayName} should use fully-onchain resolution
-					to resolve the address, or should ${walletShould}.
-				`,
+								${wallet.metadata.displayName} should use fully-onchain resolution
+								to resolve the address, or should ${walletShould}.
+							`,
 						),
 			references,
 		}

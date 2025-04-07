@@ -1,6 +1,4 @@
 import type React from 'react'
-import { Box, Link, type TypographyOwnProps } from '@mui/material'
-import { useState } from 'react'
 import type SvgIcon from '@mui/material/SvgIcon'
 
 export function IconLink({
@@ -15,48 +13,31 @@ export function IconLink({
 }: {
 	href: string
 	IconComponent: typeof SvgIcon
-	target?: React.ComponentProps<typeof Link>['target']
-	gap?: React.ComponentProps<typeof Box>['gap']
-	color?: TypographyOwnProps['color']
+	target?: string
+	gap?: string
+	color?: string
 	style?: React.CSSProperties
 	rel?: string
 	children?: React.ReactNode
 }): React.JSX.Element {
-	const [hovered, setHovered] = useState(false)
+	// Convert gap to Tailwind spacing class
+	const gapClass = gap === '0.25rem' ? 'gap-1' : 'gap-2'
+
+	// Default color to text-primary
+	const colorClass = color ?? 'text-primary'
+
 	return (
-		<Box component="span" display="inline-block">
-			<Link
+		<span className="inline-block">
+			<a
 				href={href}
 				target={target}
 				rel={rel}
-				color={color}
-				style={{
-					...style,
-				}}
-				display="flex"
-				flexDirection="row"
-				gap={gap}
-				alignItems="baseline"
-				underline="none"
-				onMouseEnter={() => {
-					setHovered(true)
-				}}
-				onMouseLeave={() => {
-					setHovered(false)
-				}}
-				sx={{
-					color: 'primary.main',
-				}}
+				style={style}
+				className={`inline-flex flex-row ${gapClass} items-baseline no-underline ${colorClass} hover:underline`}
 			>
-				<IconComponent color="inherit" fontSize="inherit" display="inline-block" />
-				<Box
-					component="span"
-					display="inline-block"
-					sx={{ textDecoration: hovered ? 'underline' : 'inherit' }}
-				>
-					{children}
-				</Box>
-			</Link>
-		</Box>
+				<IconComponent className="inline-block" fontSize="inherit" />
+				<span className="inline-block">{children}</span>
+			</a>
+		</span>
 	)
 }

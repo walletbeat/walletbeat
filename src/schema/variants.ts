@@ -1,4 +1,9 @@
-import { nonEmptyEntries, type NonEmptyRecord } from '@/types/utils/non-empty'
+import {
+	nonEmptyEntries,
+	nonEmptyKeySet,
+	type NonEmptyRecord,
+	type NonEmptySet,
+} from '@/types/utils/non-empty'
 
 /**
  * An enum of wallet variants.
@@ -48,6 +53,27 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 		}
 	})
 	return foundVariant && !foundNonVariant // eslint-disable-line @typescript-eslint/no-unnecessary-condition -- Not sure why it thinks this is an unnecessary conditional.
+}
+
+/**
+ * Returns a set of variants populated in `value`.
+ */
+export function getVariants(value: AtLeastOneVariant<unknown>): NonEmptySet<Variant> {
+	return nonEmptyKeySet(value)
+}
+
+/**
+ * Returns whether `obj` contains an entry for the given `variant`.
+ */
+export function hasVariant(obj: AtLeastOneVariant<unknown>, variant: Variant): boolean {
+	return Object.hasOwn(obj, variant)
+}
+
+/**
+ * Returns whether `obj` has a hardware variant.
+ */
+export function hasHardwareVariant(obj: AtLeastOneVariant<unknown>): boolean {
+	return hasVariant(obj, Variant.HARDWARE)
 }
 
 /**

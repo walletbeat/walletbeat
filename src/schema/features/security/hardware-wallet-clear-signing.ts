@@ -1,15 +1,13 @@
-import type { Support } from '@/schema/features/support'
-import type { WithRef } from '@/schema/reference'
-import type { NonEmptyRecord } from '@/types/utils/non-empty'
+import { type WithRef } from '@/schema/reference'
 
 /**
  * Types of clear signing support levels
  */
 export enum ClearSigningLevel {
-	NONE = 'NONE',
-	BASIC = 'BASIC',
-	PARTIAL = 'PARTIAL',
-	FULL = 'FULL',
+  NONE = 'NONE',
+  BASIC = 'BASIC',
+  PARTIAL = 'PARTIAL',
+  FULL = 'FULL'
 }
 
 /**
@@ -17,16 +15,11 @@ export enum ClearSigningLevel {
  */
 export type HardwareWalletClearSigningSupport = WithRef<{
 	/**
-	 * Record of hardware wallet types and their clear signing support level
+	 * The level of clear signing support
 	 */
-	clearSigningSupport: {
-		/**
-		 * The level of clear signing support
-		 */
-		level: ClearSigningLevel
-		/**
-		 * Additional details about the clear signing implementation
-		 */
-		details?: string
-	}
-}>
+	level: ClearSigningLevel
+	/**
+	 * Additional details about the clear signing implementation
+	 */
+	details?: string
+}> 

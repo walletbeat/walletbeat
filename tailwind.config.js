@@ -17,6 +17,12 @@ export default {
 					DEFAULT: 'hsl(var(--background-secondary))',
 				},
 				accent: 'var(--accent)',
+				rating: {
+					pass: 'var(--rating-pass)',
+					partial: 'var(--rating-partial)',
+					fail: 'var(--rating-fail)',
+					neutral: 'var(--rating-neutral)',
+				},
 			},
 			borderColor: {
 				DEFAULT: 'var(--border)',
@@ -31,5 +37,5 @@ export default {
 			},
 		},
 	},
-	plugins: [require('tailwindcss-animate')],
-};
+	plugins: [import('tailwindcss-animate')],
+}

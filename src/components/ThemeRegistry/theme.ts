@@ -1,8 +1,24 @@
 import { deepmerge } from '@mui/utils'
-import { createTheme, type ThemeOptions } from '@mui/material/styles'
+import { createTheme, type ThemeOptions as MaterialThemeOptions } from '@mui/material/styles'
 import type {} from '@mui/x-data-grid/themeAugmentation'
 
 /* eslint @typescript-eslint/no-magic-numbers: 0 -- A theme file will have numbers and hex codes in it, this is normal. */
+
+/** Color options for rating pie slices. */
+export interface RatingThemeOptions {
+	fail: string,
+	partial: string,
+	pass: string,
+	unrated: string,
+	exempt: string,
+}
+
+/** Expanded ThemeOptions and palette. */
+export type ThemeOptions = MaterialThemeOptions & {
+	palette?: MaterialThemeOptions['palette'] & {
+		rating?: RatingThemeOptions,
+	}
+}
 
 const themeOptions: ThemeOptions = {
 	palette: {
@@ -36,6 +52,13 @@ const themeOptions: ThemeOptions = {
 		success: {
 			main: '#80ffa2',
 			contrastText: '#292C34',
+		},
+		rating: {
+			fail: '#e74c3c',
+			partial: '#f1c40f',
+			pass: '#2ecc71',
+			unrated: '#bdc3c7',
+			exempt: '#bdc3c7',
 		},
 	},
 	typography: {
@@ -251,6 +274,13 @@ const lightWalletTableThemeOptions: ThemeOptions = {
 			disabled: '#888B94',
 		},
 		divider: '#e0e0e0',
+		rating: {
+			fail: '#fde8e7', // Light red
+			partial: '#fff3dc', // Light yellow
+			pass: '#e6f5ed', // Light green
+			unrated: '#f0f0f0', // Light gray
+			exempt: '#f0f0f0', // Light gray
+		},
 	},
 }
 
@@ -273,10 +303,35 @@ walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
 
 lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components || {}, {
 	MuiCssBaseline: {
-		styleOverrides: {
+		styleOverrites: {
 			':root': {
 				'--background-row-border': '#e0f2ff',
 			},
 		},
 	},
 })
+
+// Add light theme options
+export const lightThemeOptions: ThemeOptions = {
+	...themeOptions,
+	palette: {
+		...themeOptions.palette,
+		mode: 'light',
+		background: {
+			default: '#ffffff',
+			paper: '#f5f5f5',
+		},
+		text: {
+			primary: '#1a1a1a',
+			secondary: '#666666',
+			disabled: '#999999',
+		},
+		rating: {
+			fail: '#fde8e7', // Light red
+			partial: '#fff3dc', // Light yellow
+			pass: '#e6f5ed', // Light green
+			unrated: '#f0f0f0', // Light gray
+			exempt: '#f0f0f0', // Light gray
+		},
+	},
+}
