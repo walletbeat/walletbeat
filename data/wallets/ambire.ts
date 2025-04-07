@@ -168,7 +168,7 @@ export const ambire: Wallet = {
 							},
 						],
 						explanation:
-							"Ambire first fetches a list of publicly available known scam URLs from an external API. Then, it checks if the website you're visiting is on that list. If it is, a warning is displayed.",
+							"Every 6 hours, Ambire downloads a list of publicly available known scam URLs from an external API. Then, it checks if the website you're connecting to is on that list. If it is, a warning is displayed.",
 						lastRetrieved: '2025-04-02',
 					},
 				}),
