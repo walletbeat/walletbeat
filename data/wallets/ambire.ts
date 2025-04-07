@@ -79,7 +79,11 @@ export const ambire: Wallet = {
 			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			customChains: true,
 			ref: {
-				url: 'https://github.com/AmbireTech/ambire-common/blob/v2/src/consts/networks.ts',
+				url: [
+					'https://github.com/AmbireTech/ambire-common/blob/v2/src/consts/networks.ts',
+					'https://github.com/AmbireTech/ambire-common/blob/v2/src/services/ensDomains/ensDomains.ts',
+					'https://github.com/AmbireTech/ambire-common/blob/v2/src/libs/portfolio/getOnchainBalances.ts',
+				],
 				label: 'List of RPCs we use for default chains',
 				explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
 			},
