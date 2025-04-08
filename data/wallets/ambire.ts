@@ -24,6 +24,7 @@ import { biconomy } from '../entities/biconomy'
 import { lifi } from '../entities/lifi'
 import { github } from '../entities/github'
 import { jiffylabs } from '../entities/jiffyscan'
+import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 
 const v1Audits: SecurityAudit[] = [
 	{
@@ -216,8 +217,21 @@ export const ambire: Wallet = {
 			},
 		},
 		security: {
-			// @TODO
-			// bugBountyProgram
+			bugBountyProgram: {
+				type: BugBountyProgramType.COMPREHENSIVE,
+				url: 'https://immunefi.com/bug-bounty/ambire/information/',
+
+				details: `Rewards are distributed according to the impact of the vulnerability based on the Immunefi Vulnerability Severity Classification System V2.2. This is a simplified 5-level scale, with separate scales for websites/apps and smart contracts/blockchains, encompassing everything from consequence of exploitation to privilege required to likelihood of a successful exploit.
+
+All High and Critical Smart Contract bug reports require a PoC and a suggestion for a fix to be eligible for a reward. All Low and Medium Smart contract bug reports require a suggestion for a fix to be eligible for a reward.
+
+The following vulnerabilities are not eligible for a reward:
+
+https://github.com/AmbireTech/code4rena#known-tradeoffs
+
+Payouts are handled by the Ambire team directly and are denominated in USD. However, payouts are done in ETH unless agreed otherwise.`,
+				upgradePathAvailable: false,
+			},
 			scamAlerts: {
 				scamUrlWarning: supported({
 					leaksVisitedUrl: 'NO',
