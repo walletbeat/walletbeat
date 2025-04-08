@@ -84,7 +84,7 @@ export const ambire: Wallet = {
 					'https://github.com/AmbireTech/ambire-common/blob/v2/src/services/ensDomains/ensDomains.ts',
 					'https://github.com/AmbireTech/ambire-common/blob/v2/src/libs/portfolio/getOnchainBalances.ts',
 				],
-				label: 'List of RPCs we use for default chains',
+				label: 'List of RPCs Ambire uses for default chains',
 				explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
 			},
 		},
