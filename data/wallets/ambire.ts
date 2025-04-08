@@ -16,6 +16,14 @@ import { certik } from '../entities/certik'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { jiojosbg } from '../contributors/jiojosbg'
+import { Leak, MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
+import type { References } from '@/schema/reference'
+import { pimlico } from '../entities/pimlico'
+import { ambireEntity } from '../entities/ambire'
+import { biconomy } from '../entities/biconomy'
+import { lifi } from '../entities/lifi'
+import { github } from '../entities/github'
+import { jiffylabs } from '../entities/jiffyscan'
 
 const v1Audits: SecurityAudit[] = [
 	{
@@ -57,6 +65,61 @@ const v2Audits: SecurityAudit[] = [
 		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
 	},
 ]
+
+const dataLeakReferences: Record<string, References> = {
+	ambire: [
+		{
+			explanation:
+				"All RPC traffic for default chains passes through Ambire's proxy - Invictus RPC",
+			url: 'https://invictus.ambire.com',
+		},
+		{
+			explanation:
+				"Token prices and additional token info are fetched from Ambire's 'cena' service.",
+			url: 'https://cena.ambire.com',
+		},
+		{
+			explanation:
+				"Ambire's backend is responsible for features such as the Gas Tank, Velcro (for finding your tokens), finding linked account and others.",
+			url: 'https://relayer.ambire.com',
+		},
+		{
+			explanation: "Ambire's NFT CDN is responsible for fetching NFT media.",
+			url: 'https://nftcdn.ambire.com',
+		},
+	],
+	pimlico: [
+		{
+			explanation: 'Pimlico is used as a Bundler and gas estimation helper.',
+			url: 'https://api.pimlico.io',
+		},
+	],
+	biconomy: [
+		{
+			explanation: 'Pimlico is used as a Bundler and gas estimation helper.',
+			url: 'https://bundler.biconomy.io',
+		},
+	],
+	lifi: [
+		{
+			explanation: 'Ambire uses LiFi as bridge and swap API.',
+			url: 'https://li.quest',
+		},
+	],
+	github: [
+		{
+			explanation: 'Used for static content and info lists.',
+			url: ['https://raw.githubusercontent.com', 'https://github.com', 'https://api.github.com'],
+		},
+	],
+	jiffylabs: [
+		{
+			explanation: 'User for fetching info about AA operations.',
+			url: 'https://api.jiffyscan.xyz',
+		},
+	],
+}
+
 export const ambire: Wallet = {
 	metadata: {
 		id: 'ambire',
@@ -220,7 +283,80 @@ export const ambire: Wallet = {
 			},
 		},
 		privacy: {
-			dataCollection: null,
+			dataCollection: {
+				onchain: {},
+				collectedByEntities: [
+					{
+						entity: ambireEntity,
+						leaks: {
+							ipAddress: Leak.ALWAYS,
+							walletAddress: Leak.ALWAYS,
+							multiAddress: {
+								type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+							},
+							mempoolTransactions: Leak.ALWAYS,
+							cexAccount: Leak.NEVER,
+							ref: dataLeakReferences.ambire,
+						},
+					},
+					{
+						entity: pimlico,
+						leaks: {
+							ipAddress: Leak.ALWAYS,
+							walletAddress: Leak.ALWAYS,
+							multiAddress: {
+								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+							},
+							mempoolTransactions: Leak.ALWAYS,
+							cexAccount: Leak.NEVER,
+							ref: dataLeakReferences.pimlico,
+						},
+					},
+					{
+						entity: biconomy,
+						leaks: {
+							ipAddress: Leak.ALWAYS,
+							walletAddress: Leak.ALWAYS,
+							multiAddress: {
+								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+							},
+							mempoolTransactions: Leak.ALWAYS,
+							cexAccount: Leak.NEVER,
+							ref: dataLeakReferences.biconomy,
+						},
+					},
+					{
+						entity: lifi,
+						leaks: {
+							ipAddress: Leak.ALWAYS,
+							walletAddress: Leak.NEVER,
+							mempoolTransactions: Leak.NEVER,
+							cexAccount: Leak.NEVER,
+							ref: dataLeakReferences.lifi,
+						},
+					},
+					{
+						entity: github,
+						leaks: {
+							ipAddress: Leak.ALWAYS,
+							walletAddress: Leak.NEVER,
+							mempoolTransactions: Leak.NEVER,
+							cexAccount: Leak.NEVER,
+							ref: dataLeakReferences.github,
+						},
+					},
+					{
+						entity: jiffylabs,
+						leaks: {
+							ipAddress: Leak.ALWAYS,
+							walletAddress: Leak.NEVER,
+							mempoolTransactions: Leak.NEVER,
+							cexAccount: Leak.NEVER,
+							ref: dataLeakReferences.jiffylabs,
+						},
+					},
+				],
+			},
 			privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
 		},
 		selfSovereignty: {
