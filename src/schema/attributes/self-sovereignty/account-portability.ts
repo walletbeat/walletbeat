@@ -590,7 +590,7 @@ function evaluateMultifactor(
 
 function evaluateEip7702(
 	accountSupport: AccountSupport,
-	_: ReferenceArray,
+	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	if (!isSupported<AccountType7702>(accountSupport.eip7702)) {
 		throw new Error('EIP-7702 account type is not supported')
@@ -600,8 +600,8 @@ function evaluateEip7702(
 	if (!isSupported<AccountTypeEoa>(eoaSupport) && !isSupported<AccountTypeMpc>(mpcSupport)) {
 		throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported')
 	}
-	// Not implemented yet.
-	return unrated(accountPortability, brand, null)
+
+	return evaluateEoa(eoaSupport, references)
 }
 
 export const accountPortability: Attribute<AccountPortabilityValue> = {
