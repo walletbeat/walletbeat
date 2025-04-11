@@ -12,7 +12,6 @@ import { License } from '@/schema/features/license'
 import { pashov } from '../entities/pashov-audit-group'
 import { hunterSecurity } from '../entities/hunter-security'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
-import { certik } from '../entities/certik'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { jiojosbg } from '../contributors/jiojosbg'
@@ -26,20 +25,6 @@ import { github } from '../entities/github'
 import { jiffylabs } from '../entities/jiffyscan'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 
-const v1Audits: SecurityAudit[] = [
-	{
-		variantsScope: { [Variant.MOBILE]: true },
-		unpatchedFlaws: 'ALL_FIXED',
-		auditor: certik,
-		auditDate: '2022-02-03',
-		codeSnapshot: {
-			date: '2022-01-10',
-			commit:
-				'https://github.com/AmbireTech/wallet/commit/09c5da5f5b5572092289b3c1cf8371b62ad87cee',
-		},
-		ref: 'https://github.com/AmbireTech/wallet/blob/main/contracts/audits/Certik.pdf',
-	},
-]
 const v2Audits: SecurityAudit[] = [
 	{
 		variantsScope: { [Variant.BROWSER]: true },
@@ -252,7 +237,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 				contractTransactionWarning: notSupported,
 				sendTransactionWarning: notSupported,
 			},
-			publicSecurityAudits: [...v2Audits, ...v1Audits],
+			publicSecurityAudits: v2Audits,
 			lightClient: {
 				ethereumL1: notSupported,
 			},
@@ -262,21 +247,6 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 						[HardwareWalletType.LEDGER]: featureSupported,
 						[HardwareWalletType.GRIDPLUS]: featureSupported,
 						[HardwareWalletType.TREZOR]: featureSupported,
-						[HardwareWalletType.FIREFLY]: notSupported,
-						[HardwareWalletType.KEEPKEY]: notSupported,
-						[HardwareWalletType.KEYSTONE]: notSupported,
-					},
-					ref: [
-						{
-							url: 'https://www.ambire.com/',
-						},
-					],
-				},
-				[Variant.MOBILE]: {
-					supportedWallets: {
-						[HardwareWalletType.LEDGER]: featureSupported,
-						[HardwareWalletType.GRIDPLUS]: notSupported,
-						[HardwareWalletType.TREZOR]: notSupported,
 						[HardwareWalletType.FIREFLY]: notSupported,
 						[HardwareWalletType.KEEPKEY]: notSupported,
 						[HardwareWalletType.KEYSTONE]: notSupported,
@@ -413,7 +383,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 		},
 	},
 	variants: {
-		[Variant.MOBILE]: true,
+		[Variant.MOBILE]: false,
 		[Variant.BROWSER]: true,
 		[Variant.DESKTOP]: false,
 		[Variant.EMBEDDED]: false,
