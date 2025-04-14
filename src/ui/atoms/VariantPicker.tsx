@@ -31,18 +31,10 @@ export function VariantPicker<V extends string>({
 	opacityFaded = 0.35,
 	opacityDefault = 0.85,
 	opacityPicked = 1.0,
-	colorPicked = 'primary.light',
+	// colorPicked = 'primary.light',
 	flexDirection = 'row',
 	gap = '0px',
 }: VariantPickerProps<V>): React.JSX.Element {
-	const [isDarkMode, setIsDarkMode] = useState(true)
-
-	// Check if we're in dark mode whenever the component renders
-	useEffect(() => {
-		// Fallback to checking the document class
-		setIsDarkMode(document.documentElement.classList.contains('dark'))
-	}, [])
-
 	return (
 		<Box key={pickerId} display="flex" flexDirection={flexDirection} gap={gap}>
 			{nonEmptyMap(variants, variant => {

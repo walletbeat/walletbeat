@@ -7,7 +7,7 @@ import { useState } from 'react'
 export function ExternalLink({
 	url,
 	defaultLabel = undefined,
-	color = undefined,
+	color = 'primary.main',
 	style = undefined,
 	rel = 'noopener noreferrer nofollow',
 	children = undefined,
@@ -43,7 +43,7 @@ export function ExternalLink({
 					setHovered(false)
 				}}
 				sx={{
-					color: 'primary.main',
+					color,
 				}}
 			>
 				<Box
