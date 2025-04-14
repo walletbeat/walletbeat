@@ -28,13 +28,32 @@ import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
 import { HardwareWalletManufactureType, type HardwareWalletModel } from './features/profile'
 import { supportedAccountTypes, type AccountType } from './features/account-support'
+import type { WalletDeveloper } from './entity'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
 	name: string
 	url?: Url
-	affiliation?: string
-	shares_in_wallet_company?: string
+
+	/** The contributor's affiliation with wallet development organizations. */
+	affiliation:
+		| {
+				/**
+				 * The wallet development organization that the contributor works for.
+				 */
+				developer: WalletDeveloper
+
+				/**
+				 * Role at the organization that the contributor works for.
+				 */
+				role: 'EMPLOYEE' | 'FOUNDER' | 'CONSULTANT'
+
+				/**
+				 * Whether the contributor has non-zero equity ownership of the company.
+				 */
+				hasEquity: boolean
+		  }[]
+		| 'NO_AFFILIATION'
 }
 
 /** Basic wallet metadata. */
