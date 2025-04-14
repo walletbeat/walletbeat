@@ -237,10 +237,10 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		const hasLedger = supportedWallets.includes(HardwareWalletType.LEDGER)
 		const hasTrezor = supportedWallets.includes(HardwareWalletType.TREZOR)
 		const hasKeystone = supportedWallets.includes(HardwareWalletType.KEYSTONE)
-		// Used for future expansion
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Kept for future use
-		const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
 		const hasGridplus = supportedWallets.includes(HardwareWalletType.GRIDPLUS)
+
+		// Used for future expansion
+		// const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
 
 		// Generate the base evaluation result
 		let result: Evaluation<HardwareWalletSupportValue>
