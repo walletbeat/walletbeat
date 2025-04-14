@@ -31,10 +31,7 @@ import {
 	type Value,
 	type ValueSet,
 } from '@/schema/attributes'
-import {
-	navigationListIconSize,
-	subsectionBorderRadius,
-} from '@/components/constants'
+import { navigationListIconSize, subsectionBorderRadius } from '@/components/constants'
 import type { NavigationItem } from '@/ui/organisms/Navigation'
 import {
 	navigationAbout,
@@ -51,7 +48,6 @@ import {
 	variantToIcon,
 	variantToName,
 	variantToRunsOn,
-	variantToTooltip,
 	variantUrlQuery,
 } from '@/components/variants'
 import { VariantSpecificity, type ResolvedWallet } from '@/schema/wallet'
@@ -244,23 +240,6 @@ export function WalletPage({
 			}
 		}
 	}
-	const headerVariants = nonEmptyMap(
-		nonEmptyKeys(wallet.variants),
-		(variant): PickableVariant<Variant> => ({
-			id: variant,
-			icon: variantToIcon(variant),
-			tooltip: needsVariantFiltering
-				? pickedVariant === variant
-					? 'Remove version filter'
-					: variantToTooltip(wallet.variants, variant)
-				: `Runs on ${variantToName(variant, false)}`,
-			click: needsVariantFiltering
-				? () => {
-					updatePickedVariant(pickedVariant === variant ? null : variant)
-				}
-				: undefined,
-		}),
-	)
 	const sections: NonEmptyArray<RichSection> = [
 		{
 			header: 'details',
@@ -285,33 +264,38 @@ export function WalletPage({
 						// }}
 						className="flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]"
 					>
-						{
-							[
-								(<div className="flex flex-row gap-2 items-center" key="website">
-									<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+						{[
+							<div className="flex flex-row gap-2 items-center" key="website">
+								<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+								<ExternalLink
+									url={wallet.metadata.url}
+									defaultLabel={`${wallet.metadata.displayName} website`}
+									style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+								/>
+							</div>,
+							wallet.metadata.repoUrl !== null ? (
+								<div className="flex flex-row gap-2 items-center" key="repo">
+									<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
 									<ExternalLink
-										url={wallet.metadata.url}
-										defaultLabel={`${wallet.metadata.displayName} website`}
+										url={wallet.metadata.repoUrl}
+										defaultLabel="GitHub Repository"
 										style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
 									/>
-								</div>),
-								(
-									wallet.metadata.repoUrl !== null ? (
-										<div className="flex flex-row gap-2 items-center" key="repo">
-											<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
-											<ExternalLink
-												url={wallet.metadata.repoUrl}
-												defaultLabel="GitHub Repository"
-												style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
-											/>
+								</div>
+							) : undefined,
+						]
+							.filter(Boolean)
+							.map(
+								value =>
+									value !== undefined && (
+										<div
+											key={value.key ?? 'hi'}
+											className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary"
+										>
+											{value}
 										</div>
-									) : undefined
-								)].filter(Boolean).map((value) => (value !== undefined &&
-									<div key={value.key ?? 'hi'} className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary">
-										{value}
-									</div>
-								))
-						}
+									),
+							)}
 					</div>
 					<RenderTypographicContent
 						content={wallet.metadata.blurb.render({})}
@@ -559,9 +543,9 @@ export function WalletPage({
 	)
 	const scrollMarginTop = `${headerBottomMargin + scrollPastHeaderPixels}px`
 
-	const nonHeaderSections: RichSection[] =  sections.slice(1)
-  if (!isNonEmptyArray(nonHeaderSections)) {
-		throw new Error('No non-header sections defined for navigation');
+	const nonHeaderSections: RichSection[] = sections.slice(1)
+	if (!isNonEmptyArray(nonHeaderSections)) {
+		throw new Error('No non-header sections defined for navigation')
 	}
 	return (
 		<NavigationPageLayout
@@ -569,21 +553,24 @@ export function WalletPage({
 			groups={[
 				{
 					id: 'wallet-sections',
-					items: nonEmptyMap(nonHeaderSections, (section): NavigationItem => ({
-						id: sectionHeaderId(section),
-						icon: section.icon,
-						title: section.title,
-						contentId: sectionHeaderId(section),
-						children:
-							section.subsections !== undefined && isNonEmptyArray(section.subsections)
-								? nonEmptyMap(section.subsections, subsection => ({
-									id: sectionHeaderId(subsection),
-									icon: subsection.icon,
-									title: subsection.title,
-									contentId: sectionHeaderId(subsection),
-								}))
-								: undefined,
-					})),
+					items: nonEmptyMap(
+						nonHeaderSections,
+						(section): NavigationItem => ({
+							id: sectionHeaderId(section),
+							icon: section.icon,
+							title: section.title,
+							contentId: sectionHeaderId(section),
+							children:
+								section.subsections !== undefined && isNonEmptyArray(section.subsections)
+									? nonEmptyMap(section.subsections, subsection => ({
+											id: sectionHeaderId(subsection),
+											icon: subsection.icon,
+											title: subsection.title,
+											contentId: sectionHeaderId(subsection),
+										}))
+									: undefined,
+						}),
+					),
 					overflow: true,
 				},
 				{
