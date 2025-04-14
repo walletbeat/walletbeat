@@ -85,7 +85,7 @@
 					key: attrGroup.id,
 					name: `${attrGroup.icon} ${attrGroup.displayName}`,
 					getValue: ({ wallet }) => (
-						wallet.overall[attrGroup.id] && attrGroup.score(wallet.overall[attrGroup.id])?.score || undefined
+						wallet.overall[attrGroup.id] && attrGroup.score?.(wallet.overall[attrGroup.id])?.score || undefined
 					),
 					defaultSortDirection: 'desc',
 				}))
@@ -221,7 +221,7 @@
 		{:else}
 			{@const attrGroup = attributeGroups.find(attributeGroup => attributeGroup.id === column.id)}
 			{@const evalGroup = wallet.overall[attrGroup.id]}
-			{@const groupScore = attrGroup.score(wallet.overall[attrGroup.id])}
+			{@const groupScore = attrGroup.score?.(wallet.overall[attrGroup.id])}
 
 			<WalletAttributeGroupRating
 				{wallet}
