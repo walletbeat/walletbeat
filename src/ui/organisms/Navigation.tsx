@@ -125,7 +125,7 @@ interface NavigationItemProps {
  * A single navigation list item.
  */
 const NavigationItem = memo(
-	function NavigationItem({ item, active, depth }: NavigationItemProps): React.JSX.Element {
+	function NavigationItem({ item, active }: NavigationItemProps): React.JSX.Element {
 		const [isOpen, setIsOpen] = useState(false)
 		const linkStyles =
 			'whitespace-nowrap flex flex-row items-center gap-2 py-1 px-2 hover:bg-backgroundSecondary rounded-md'
@@ -247,7 +247,6 @@ interface NavigationGroupProps {
 export const NavigationGroup = memo(
 	function NavigationGroup({
 		group,
-		groupIndex,
 		activeItemId,
 		onContentItemClick,
 	}: NavigationGroupProps): React.JSX.Element {
@@ -308,7 +307,6 @@ export const NavigationGroup = memo(
 export function Navigation({
 	groups,
 	activeItemId,
-	flex,
 	onContentItemClick = undefined,
 	prefix,
 }: {
