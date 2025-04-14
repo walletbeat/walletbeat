@@ -1,3 +1,5 @@
+import type { WithRef } from '../reference'
+
 /**
  * Customization options for each chain.
  */
@@ -31,7 +33,7 @@ export enum RpcEndpointConfiguration {
 /**
  * Customization options that exist for chains.
  */
-export interface ChainConfigurability {
+export type ChainConfigurability = WithRef<{
 	/** Can set a custom RPC endpoint address for L1. */
 	l1RpcEndpoint: RpcEndpointConfiguration
 
@@ -42,4 +44,4 @@ export interface ChainConfigurability {
 
 	/** Can add custom chains. */
 	customChains: boolean
-}
+}>

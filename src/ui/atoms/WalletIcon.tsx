@@ -1,19 +1,17 @@
 import { betaImagesRoot } from '@/constants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { Variant } from '@/schema/variants'
+import type { RatedWallet } from '@/schema/wallet'
+import {  hasVariant, Variant } from '@/schema/variants'
 import type React from 'react'
 
 export function WalletIcon({
-	walletMetadata,
+	wallet,
 	iconSize,
-	variants = null,
 }: {
-	walletMetadata: WalletMetadata
+	wallet: RatedWallet
 	iconSize: number
-	variants?: Record<Variant, boolean> | null
 }): React.JSX.Element {
 	// Determine if this is a hardware wallet
-	const isHardwareWallet = variants?.hardware || false;
+	const isHardwareWallet = hasVariant(wallet.variants, Variant.HARDWARE);
 	
 	// Determine the correct folder based on wallet type
 	const folderPath = isHardwareWallet ? 'hardware-wallets' : 'wallets';
@@ -21,10 +19,10 @@ export function WalletIcon({
 	return (
 		<div style={{ width: iconSize, height: iconSize, overflow: 'hidden' }} className='flex'>
 			<img
-				alt={walletMetadata.displayName}
+				alt={wallet.metadata.displayName}
 				width={iconSize}
 				height={iconSize}
-				src={`${betaImagesRoot}/${folderPath}/${walletMetadata.id}.${walletMetadata.iconExtension}`}
+				src={`${betaImagesRoot}/${folderPath}/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
 				style={{ filter: `drop-shadow(0 0 ${iconSize / 6}px rgba(255, 255, 255, 0.1))` }}
 			/>
 		</div>

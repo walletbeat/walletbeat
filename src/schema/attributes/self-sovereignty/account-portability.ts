@@ -22,7 +22,7 @@ import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 import { eipMarkdownLink } from '@/schema/eips'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { eip7702 } from '@/data/eips/eip-7702'
-import { isSupported, type Support } from '@/schema/features/support'
+import { isSupported } from '@/schema/features/support'
 import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
 
 const brand = 'attributes.self_sovereignty.account_portability'
@@ -590,18 +590,19 @@ function evaluateMultifactor(
 
 function evaluateEip7702(
 	accountSupport: AccountSupport,
-	_: ReferenceArray,
+	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	if (!isSupported<AccountType7702>(accountSupport.eip7702)) {
 		throw new Error('EIP-7702 account type is not supported')
 	}
-	const eoaSupport = accountSupport.eoa
-	const mpcSupport = accountSupport.mpc
-	if (!isSupported<AccountTypeEoa>(eoaSupport) && !isSupported<AccountTypeMpc>(mpcSupport)) {
-		throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported')
+	// TODO: Add specific evaluations for EIP-7702 features on top of this.
+	if (isSupported<AccountTypeEoa>(accountSupport.eoa)) {
+		return evaluateEoa(accountSupport.eoa, references)
 	}
-	// Not implemented yet.
-	return unrated(accountPortability, brand, null)
+	if (isSupported<AccountTypeMpc>(accountSupport.mpc)) {
+		return evaluateMpc(accountSupport.mpc, references)
+	}
+	throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported')
 }
 
 export const accountPortability: Attribute<AccountPortabilityValue> = {
@@ -920,10 +921,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			return unrated(accountPortability, brand, null)
 		}
 		const allRefs = mergeRefs(
-			refs<Support<AccountTypeEoa>>(features.accountSupport.eoa),
-			refs<Support<AccountTypeMpc>>(features.accountSupport.mpc),
-			refs<Support<AccountTypeMutableMultifactor>>(features.accountSupport.rawErc4337),
-			refs<Support<AccountType7702>>(features.accountSupport.eip7702),
+			refs(features.accountSupport.eoa),
+			refs(features.accountSupport.mpc),
+			refs(features.accountSupport.rawErc4337),
+			refs(features.accountSupport.eip7702),
 		)
 		const evaluations: Array<Evaluation<AccountPortabilityValue>> = []
 		let defaultEvaluation: Evaluation<AccountPortabilityValue> | null = null

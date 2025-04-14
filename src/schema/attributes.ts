@@ -186,6 +186,7 @@ export function defaultRatingScore(rating: Rating): Score | null {
 
 export interface EvaluationData<V extends Value> {
 	value: V
+	references: FullyQualifiedReference[]
 	wallet: RatedWallet
 }
 

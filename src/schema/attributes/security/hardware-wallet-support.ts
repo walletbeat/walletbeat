@@ -6,15 +6,14 @@ import {
 	type Evaluation,
 	exampleRating,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt, isErc4337SmartWallet } from '../common'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import { isSupported, type Support } from '@/schema/features/support'
+import { isSupported } from '@/schema/features/support'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { WalletProfile } from '@/schema/features/profile'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
+import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import { popRefs } from '@/schema/reference'
+import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 
 const brand = 'attributes.security.hardware_wallet_support'
 export type HardwareWalletSupportValue = Value & {
@@ -182,7 +181,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletSupportValue> => {
 		// If this is a hardware wallet, mark as exempt since hardware wallets inherently support themselves
-		if (features.profile === WalletProfile.HARDWARE) {
+		if (features.variant === Variant.HARDWARE) {
 			return exempt(
 				hardwareWalletSupport,
 				sentence(
@@ -193,9 +192,10 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				{ supportedHardwareWallets: [] },
 			)
 		}
-
+		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
+		// 	all such wallet have the opportunity to support hardware wallet to provide better security for the user
 		// Check for ERC-4337 smart wallet support
-		if (isErc4337SmartWallet(features)) {
+		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(
 				hardwareWalletSupport,
 				sentence(
@@ -237,10 +237,10 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		const hasLedger = supportedWallets.includes(HardwareWalletType.LEDGER)
 		const hasTrezor = supportedWallets.includes(HardwareWalletType.TREZOR)
 		const hasKeystone = supportedWallets.includes(HardwareWalletType.KEYSTONE)
-		// Used for future expansion
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Kept for future use
-		const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
 		const hasGridplus = supportedWallets.includes(HardwareWalletType.GRIDPLUS)
+
+		// Used for future expansion
+		// const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
 
 		// Generate the base evaluation result
 		let result: Evaluation<HardwareWalletSupportValue>

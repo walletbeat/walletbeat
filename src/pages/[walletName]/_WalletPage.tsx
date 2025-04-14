@@ -14,12 +14,12 @@ import {
 	nonEmptyMap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-import { Box, Typography, Paper, styled, Divider, Tooltip } from '@mui/material'
+import { Box, Typography, Paper, styled, Tooltip } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { WalletIcon } from '@/ui/atoms/WalletIcon'
 import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
 import { WalletAttribute } from '@/ui/organisms/WalletAttribute'
-import { blend, fontWeight, ThemeProvider } from '@mui/system'
+import { blend, ThemeProvider } from '@mui/system'
 import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
 import {
 	type AttributeGroup,
@@ -31,18 +31,12 @@ import {
 	type Value,
 	type ValueSet,
 } from '@/schema/attributes'
-import {
-	navigationListIconSize,
-	sectionIconWidth,
-	subsectionBorderRadius,
-	subsectionIconWidth,
-} from '@/components/constants'
+import { navigationListIconSize, subsectionBorderRadius } from '@/components/constants'
 import type { NavigationItem } from '@/ui/organisms/Navigation'
 import {
 	navigationAbout,
 	navigationFaq,
 	navigationFarcasterChannel,
-	navigationHome,
 	navigationRepository,
 	scrollPastHeaderPixels,
 } from '@/components/navigation'
@@ -53,7 +47,6 @@ import {
 	variantFromUrlQuery,
 	variantToName,
 	variantToRunsOn,
-	variantToTooltip,
 	variantUrlQuery,
 } from '@/components/variants'
 import {
@@ -67,7 +60,6 @@ import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import LanguageIcon from '@mui/icons-material/Language'
 import GitHubIcon from '@mui/icons-material/GitHub'
-import type { Url } from '@/schema/url'
 
 const headerBottomMargin = 0
 
@@ -250,23 +242,6 @@ export function WalletPage({
 			}
 		}
 	}
-	const headerVariants = nonEmptyMap(
-		nonEmptyKeys(wallet.variants),
-		(variant): PickableVariant<Variant> => ({
-			id: variant,
-			icon: variantToIcon(variant),
-			tooltip: needsVariantFiltering
-				? pickedVariant === variant
-					? 'Remove version filter'
-					: variantToTooltip(wallet.variants, variant)
-				: `Runs on ${variantToName(variant, false)}`,
-			click: needsVariantFiltering
-				? () => {
-					updatePickedVariant(pickedVariant === variant ? null : variant)
-				}
-				: undefined,
-		}),
-	)
 	const sections: NonEmptyArray<RichSection> = [
 		{
 			header: 'details',
@@ -291,33 +266,38 @@ export function WalletPage({
 						// }}
 						className="flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]"
 					>
-						{
-							[
-								(<div className="flex flex-row gap-2 items-center" key="website">
-									<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+						{[
+							<div className="flex flex-row gap-2 items-center" key="website">
+								<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+								<ExternalLink
+									url={wallet.metadata.url}
+									defaultLabel={`${wallet.metadata.displayName} website`}
+									style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+								/>
+							</div>,
+							wallet.metadata.repoUrl !== null ? (
+								<div className="flex flex-row gap-2 items-center" key="repo">
+									<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
 									<ExternalLink
-										url={refLink(wallet.metadata.url)}
-										defaultLabel={`${wallet.metadata.displayName} website`}
+										url={wallet.metadata.repoUrl}
+										defaultLabel="GitHub Repository"
 										style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
 									/>
-								</div>),
-								(
-									wallet.metadata.repoUrl !== null ? (
-										<div className="flex flex-row gap-2 items-center" key="repo">
-											<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
-											<ExternalLink
-												url={refLink(wallet.metadata.repoUrl)}
-												defaultLabel="GitHub Repository"
-												style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
-											/>
+								</div>
+							) : undefined,
+						]
+							.filter(Boolean)
+							.map(
+								value =>
+									value !== undefined && (
+										<div
+											key={value.key ?? 'hi'}
+											className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary"
+										>
+											{value}
 										</div>
-									) : undefined
-								)].filter(Boolean).map((value) => (value !== undefined &&
-									<div key={value.key ?? 'hi'} className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary">
-										{value}
-									</div>
-								))
-						}
+									),
+							)}
 					</div>
 					<RenderTypographicContent
 						content={wallet.metadata.blurb.render({})}
@@ -536,12 +516,6 @@ export function WalletPage({
 							sx: {
 								border: '2px solid',
 								color: 'var(--text-primary)',
-								backgroundColor: blend(
-									theme.palette.background.paper,
-									ratingToColor(evalAttr.evaluation.value.rating),
-									0.5,
-									1,
-								),
 								borderColor: blend(
 									theme.palette.background.paper,
 									borderRatingToColor(evalAttr.evaluation.value.rating),
@@ -571,42 +545,34 @@ export function WalletPage({
 	)
 	const scrollMarginTop = `${headerBottomMargin + scrollPastHeaderPixels}px`
 
+	const nonHeaderSections: RichSection[] = sections.slice(1)
+	if (!isNonEmptyArray(nonHeaderSections)) {
+		throw new Error('No non-header sections defined for navigation')
+	}
 	return (
 		<NavigationPageLayout
 			prefix={<WalletDropdown wallet={wallet} />}
 			groups={[
 				{
 					id: 'wallet-sections',
-					items: [
-						// {
-						// 	id: sections[0].header,
-						// 	icon: (
-						// 		<WalletIcon
-						// 			walletMetadata={wallet.metadata}
-						// 			iconSize={navigationListIconSize * 0.75}
-						// 		/>
-						// 	),
-						// 	title: wallet.metadata.displayName,
-						// 	contentId: sectionHeaderId(sections[0]),
-						// },
-						...sections.slice(1).map(
-							(section): NavigationItem => ({
-								id: sectionHeaderId(section),
-								icon: section.icon,
-								title: section.title,
-								contentId: sectionHeaderId(section),
-								children:
-									section.subsections !== undefined && isNonEmptyArray(section.subsections)
-										? nonEmptyMap(section.subsections, subsection => ({
+					items: nonEmptyMap(
+						nonHeaderSections,
+						(section): NavigationItem => ({
+							id: sectionHeaderId(section),
+							icon: section.icon,
+							title: section.title,
+							contentId: sectionHeaderId(section),
+							children:
+								section.subsections !== undefined && isNonEmptyArray(section.subsections)
+									? nonEmptyMap(section.subsections, subsection => ({
 											id: sectionHeaderId(subsection),
 											icon: subsection.icon,
 											title: subsection.title,
 											contentId: sectionHeaderId(subsection),
 										}))
-										: undefined,
-							}),
-						),
-					],
+									: undefined,
+						}),
+					),
 					overflow: true,
 				},
 				{
@@ -648,9 +614,8 @@ export function WalletPage({
 								>
 									<WalletIcon
 										key="walletIcon"
-										walletMetadata={wallet.metadata}
+										wallet={wallet}
 										iconSize={navigationListIconSize * 2}
-										variants={wallet.variants}
 									/>
 									{wallet.metadata.displayName}
 								</Typography>
@@ -671,7 +636,7 @@ export function WalletPage({
 												component="h2"
 												marginBottom="0"
 												fontSize="2rem"
-												fontWeight={fontWeight.bold}
+												fontWeight="700"
 												paddingLeft={theme.spacing(2)}
 												paddingRight={theme.spacing(2)}
 											>
@@ -740,22 +705,4 @@ export function WalletPage({
 			</div>
 		</NavigationPageLayout>
 	)
-}
-
-// ensures ref = wallet-page is in the url as query param
-export const refLink = (url: Url | undefined): Url | undefined => {
-	if (url === undefined) {
-		return undefined
-	}
-
-	// If url is a LabeledUrl, preserve the label while updating the URL
-	if (typeof url === 'object' && 'url' in url) {
-		return {
-			url: new URL(url.url).toString() + '?ref=wallet.page',
-			label: url.label
-		}
-	}
-
-	// Handle string URL
-	return new URL(url).toString() + '?ref=wallet.page'
 }

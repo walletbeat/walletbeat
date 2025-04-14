@@ -5,7 +5,6 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
-import { ledger } from '../entities/ledger'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -59,7 +58,7 @@ export const ledgerWallet: Wallet = {
 		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -96,14 +95,12 @@ export const ledgerWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.',
 				ref: [
 					{
-						url: 'https://youtu.be/7lP_0h-PPvY?si=KirhDV7xEQx9Npcl&t=720',
+						url: 'https://youtu.be/7lP_0h-PPvY?t=720',
 						explanation:
 							"Independent video demonstration of Ledger's clear signing implementation on Safe.",
 					},
@@ -140,6 +137,9 @@ export const ledgerWallet: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -155,9 +155,6 @@ export const ledgerWallet: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

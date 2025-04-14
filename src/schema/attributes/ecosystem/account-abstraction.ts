@@ -21,7 +21,6 @@ import {
 import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
-import type { Support } from '@/schema/features/support'
 
 const brand = 'attributes.ecosystem.account_abstraction'
 export type AccountAbstractionValue = Value & {
@@ -317,10 +316,10 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 			eip7702: isAccountTypeSupported<AccountType7702>(features.accountSupport.eip7702),
 		}
 		const allRefs = mergeRefs(
-			refs<Support<AccountTypeEoa>>(features.accountSupport.eoa),
-			refs<Support<AccountTypeMpc>>(features.accountSupport.mpc),
-			refs<Support<AccountTypeMutableMultifactor>>(features.accountSupport.rawErc4337),
-			refs<Support<AccountType7702>>(features.accountSupport.eip7702),
+			refs(features.accountSupport.eoa),
+			refs(features.accountSupport.mpc),
+			refs(features.accountSupport.rawErc4337),
+			refs(features.accountSupport.eip7702),
 		)
 		if (supported.rawErc4337 && supported.eip7702) {
 			return supportsErc4337AndEip7702(allRefs)

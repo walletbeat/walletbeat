@@ -116,9 +116,9 @@ export function RatingPie({
 	height,
 	arc = Arc.FULL,
 	paddingAngle = 0,
-	innerRadiusFraction = arc === Arc.FULL ? 0.02 : 0.35,
-	outerRadiusFraction = 0,
-	cornerRadiusFraction = 0,
+	// innerRadiusFraction = arc === Arc.FULL ? 0.02 : 0.35,
+	// outerRadiusFraction = 0,
+	// cornerRadiusFraction = 0,
 	hoverEffect = true,
 	hoverRadiusFraction = 1,
 	highlightedSliceId = undefined,
@@ -129,11 +129,10 @@ export function RatingPie({
 	const theme = useTheme()
 	const isDarkMode = theme.palette.mode === 'dark'
 
-	const { maxRadius, startAngle, endAngle, cx, cy } = (() => {
+	const { startAngle, endAngle, cx, cy } = (() => {
 		switch (arc) {
 			case Arc.TOP_HALF:
 				return {
-					maxRadius: height,
 					startAngle: -90,
 					endAngle: 90,
 					cx: width / 2 + pieChartCenterError,
@@ -141,7 +140,6 @@ export function RatingPie({
 				}
 			case Arc.FULL:
 				return {
-					maxRadius: Math.min(width, height) / 2,
 					startAngle: 0,
 					endAngle: 380,
 					cx: width / 2 + pieChartCenterError,

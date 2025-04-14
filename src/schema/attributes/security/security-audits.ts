@@ -14,9 +14,8 @@ import { daysSince } from '@/types/date'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
 import { exampleSecurityAuditor } from '@/data/entities/example'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import { mergeRefs } from '@/schema/reference'
-import { WalletProfile } from '@/schema/features/profile'
 
 const brand = 'attributes.security.security_audits'
 export type SecurityAuditsValue = Value & {
@@ -234,13 +233,10 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SecurityAuditsValue> => {
-		if (features.profile === WalletProfile.HARDWARE) {
+		if (features.variant == Variant.HARDWARE) {
 			return exempt(
 				securityAudits,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet that follows different security evaluation processes.`,
-				),
+				sentence('This attribute is not applicable to hardware wallets.'),
 				brand,
 				{ securityAudits: [] },
 			)

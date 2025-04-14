@@ -21,7 +21,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { nconsigny } from '../contributors/nconsigny'
-import { WalletTypeCategory, SmartWalletStandard } from '@/schema/features/wallet-type'
 import { Variant } from '@/schema/variants'
 
 export const daimo: Wallet = {
@@ -43,13 +42,9 @@ export const daimo: Wallet = {
 		repoUrl: 'https://github.com/daimo-eth/daimo',
 		contributors: [polymutex, nconsigny],
 		lastUpdated: '2025-03-12',
-		multiWalletType: {
-			categories: [WalletTypeCategory.SMART_WALLET],
-			smartWalletStandards: [SmartWalletStandard.ERC_4337],
-		},
 	},
 	features: {
-		profile: WalletProfile.MOBILE,
+		profile: WalletProfile.PAYMENTS,
 		chainConfigurability: {
 			l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,
 			otherRpcEndpoints: RpcEndpointConfiguration.NO,
@@ -146,10 +141,8 @@ export const daimo: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'Daimo does not support hardware wallets.',
-				},
+				level: ClearSigningLevel.NONE,
+				details: 'Daimo does not support hardware wallets.',
 				ref: null,
 			},
 		},
@@ -295,6 +288,9 @@ export const daimo: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: {
 			license: License.GPL_3_0,
 			ref: [
@@ -332,9 +328,6 @@ export const daimo: Wallet = {
 					url: 'https://vote.optimism.io/retropgf/3/application/0x118a000851cf4c736497bab89993418517ac7cd9c8ede074aff408a8e0f84060',
 				},
 			],
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	overrides: {

@@ -20,6 +20,10 @@ import { HardwareIcon } from '@/icons/devices/HardwareIcon'
 import { EipPreviewModal } from '../molecules/EipPreviewModal'
 import { EipPrefix } from '@/schema/eips'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
+import { walletSupportedAccountTypes, type RatedWallet } from '@/schema/wallet'
+import { AccountType } from '@/schema/features/account-support'
+import { setContains, type NonEmptySet } from '@/types/utils/non-empty'
+import { hasVariant, Variant } from '@/schema/variants'
 
 // Define wallet type constants from the previous implementation
 const WalletTypeCategory = {
@@ -84,92 +88,70 @@ const HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY: Record<HardwareWalletManufacture
 }
 
 // Helper functions for wallet data
-interface WalletInfo {
-	categories: WalletTypeCategory[]
-	standards: SmartWalletStandard[]
-	isMultiType: boolean
-}
-
-// Helper type for wallet metadata access
-interface WalletMetadataLike {
-	id: string
-	displayName: string
-	url?: string
-	walletType?: {
-		category?: WalletTypeCategory
-		smartWalletStandard?: SmartWalletStandard
-	}
-	multiWalletType?: {
-		categories?: WalletTypeCategory[]
-		smartWalletStandards?: SmartWalletStandard[]
-	}
-	hardwareWalletManufactureType?: HardwareWalletManufactureType
-	hardwareWalletModels?: {
-		id: string
-		name: string
-		url: string
-		isFlagship: boolean
-	}[]
-	// Add properties for variants
-	variants?: Record<string, any>
-}
-
-interface WalletLike {
-	metadata: WalletMetadataLike
-	overall: EvaluationTree
-	variants?: Record<string, { attributes: EvaluationTree }>
+interface WalletFilterInfo {
+	accountTypes: NonEmptySet<AccountType> | null
+	hasEoa: boolean
+	hasSmartWallet: boolean
+	hasHardware: boolean
+	standards: Record<SmartWalletStandard, boolean>
 }
 
 // Helper function to get wallet type information
-function getWalletTypeInfo(wallet: WalletLike): WalletInfo {
-	const walletType = wallet.metadata.walletType ?? {}
-	const category = walletType.category ?? WalletTypeCategory.EOA
-	const standards: SmartWalletStandard[] = []
-
-	if (category === WalletTypeCategory.SMART_WALLET && walletType.smartWalletStandard) {
-		standards.push(walletType.smartWalletStandard)
-	}
-
-	// Also check for multiWalletType
-	if (wallet.metadata.multiWalletType) {
-		const multiType = wallet.metadata.multiWalletType
-		const categories = multiType.categories ?? []
-		if (multiType.smartWalletStandards) {
-			standards.push(...multiType.smartWalletStandards)
-		}
-		return {
-			categories,
-			standards,
-			isMultiType: true,
-		}
-	}
-
+function getWalletTypeInfo(
+	wallet: RatedWallet,
+	variant: Variant | 'ALL_VARIANTS',
+): WalletFilterInfo {
+	const accountTypes = walletSupportedAccountTypes(wallet, variant)
+	const hasEoa =
+		accountTypes !== null &&
+		(setContains(accountTypes, AccountType.eip7702) ||
+			setContains(accountTypes, AccountType.eoa) ||
+			setContains(accountTypes, AccountType.mpc))
+	const hasSmartWallet =
+		accountTypes !== null &&
+		(setContains(accountTypes, AccountType.eip7702) ||
+			setContains(accountTypes, AccountType.rawErc4337))
+	const hasHardware = hasVariant(wallet.variants, Variant.HARDWARE)
 	return {
-		categories: [category],
-		standards,
-		isMultiType: false,
+		accountTypes,
+		hasEoa,
+		hasSmartWallet,
+		hasHardware,
+		standards: {
+			ERC_4337: accountTypes !== null && setContains(accountTypes, AccountType.rawErc4337),
+			ERC_7702: accountTypes !== null && setContains(accountTypes, AccountType.eip7702),
+			OTHER:
+				accountTypes !== null &&
+				(setContains(accountTypes, AccountType.eoa) || setContains(accountTypes, AccountType.mpc)),
+		},
 	}
 }
 
 // Helper function to get a detailed description of the wallet
-function getDetailedWalletDescription(wallet: WalletLike): string {
-	const { categories, standards } = getWalletTypeInfo(wallet)
+function getDetailedWalletDescription(wallet: RatedWallet): string {
+	const { hasEoa, hasSmartWallet, hasHardware, standards } = getWalletTypeInfo(
+		wallet,
+		'ALL_VARIANTS',
+	)
 
 	const typeDescriptions: string[] = []
 
-	if (categories.includes(WalletTypeCategory.EOA)) {
+	if (hasEoa) {
 		typeDescriptions.push('Externally Owned Account')
 	}
 
-	if (categories.includes(WalletTypeCategory.SMART_WALLET)) {
-		const standardsStr =
-			standards.length > 0
-				? `(${standards.map(std => SMART_WALLET_STANDARD_DISPLAY[std] ?? std).join(', ')})`
-				: ''
-		typeDescriptions.push(`Smart Wallet ${standardsStr}`)
+	if (hasSmartWallet) {
+		typeDescriptions.push(
+			`Smart Wallet (${[
+				standards.ERC_4337 ? SMART_WALLET_STANDARD_DISPLAY['ERC_4337'] : null,
+				standards.ERC_7702 ? SMART_WALLET_STANDARD_DISPLAY['ERC_7702'] : null,
+			]
+				.filter(val => val !== null)
+				.join(', ')})`,
+		)
 	}
 
-	if (categories.includes(WalletTypeCategory.HARDWARE_WALLET)) {
+	if (hasHardware) {
 		typeDescriptions.push('Hardware Wallet')
 	}
 
@@ -177,7 +159,7 @@ function getDetailedWalletDescription(wallet: WalletLike): string {
 }
 
 // Helper function to get hardware wallet manufacture type display name
-function getHardwareWalletManufactureTypeDisplay(wallet: WalletLike): string {
+function getHardwareWalletManufactureTypeDisplay(wallet: RatedWallet): string {
 	const manufactureType = wallet.metadata.hardwareWalletManufactureType
 	if (manufactureType !== undefined && manufactureType !== null) {
 		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType] || 'Unknown'
@@ -186,28 +168,21 @@ function getHardwareWalletManufactureTypeDisplay(wallet: WalletLike): string {
 }
 
 // Helper function to check if wallet supports a specific device variant
-function walletSupportsVariant(wallet: WalletLike, variant: DeviceVariant): boolean {
+function walletSupportsVariant(wallet: RatedWallet, variant: DeviceVariant): boolean {
 	if (variant === DeviceVariant.NONE) {
 		return true
 	}
 
 	// For hardware variant in hardware wallets tab
 	if (variant === DeviceVariant.HARDWARE) {
-		// Hardware wallets always support the hardware variant
-		const isHardware =
-			wallet.metadata.walletType?.category === WalletTypeCategory.HARDWARE_WALLET ||
-			Boolean(
-				wallet.metadata.multiWalletType?.categories?.includes(WalletTypeCategory.HARDWARE_WALLET),
-			)
-
-		return isHardware
+		return hasVariant(wallet.variants, Variant.HARDWARE)
 	}
 
 	return Boolean(wallet.variants && variant in wallet.variants)
 }
 
 // Helper function to get device-specific evaluation tree
-function getEvaluationTree(wallet: WalletLike, selectedVariant: DeviceVariant): EvaluationTree {
+function getEvaluationTree(wallet: RatedWallet, selectedVariant: DeviceVariant): EvaluationTree {
 	// For hardware wallet variant, use overall evaluation data as hardware wallets don't have separate device variants
 	if (selectedVariant === DeviceVariant.HARDWARE) {
 		return wallet.overall
@@ -541,9 +516,9 @@ function getFlagshipModel(walletId: string): HardwareWalletModel | undefined {
 interface TableRow {
 	id: string
 	name: string
-	wallet: WalletLike
+	wallet: RatedWallet
 	typeDescription?: string
-	standards?: SmartWalletStandard[]
+	standards?: Record<SmartWalletStandard, boolean>
 	websiteUrl?: string
 	manufactureType?: string
 	sortPriority: number
@@ -552,11 +527,8 @@ interface TableRow {
 // Create software wallet table data
 const softwareWalletData: TableRow[] = Object.values(ratedWallets)
 	.map(wallet => {
-		const detailedType = getDetailedWalletDescription(wallet as WalletLike)
-		const { standards, categories } = getWalletTypeInfo(wallet as WalletLike)
-
-		// Format wallet standards for display (return raw standards, will render links in cell renderer)
-		const standardsRaw = standards.length > 0 ? standards : []
+		const detailedType = getDetailedWalletDescription(wallet)
+		const { standards, hasEoa, hasSmartWallet } = getWalletTypeInfo(wallet, 'ALL_VARIANTS')
 
 		const websiteUrl =
 			typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
@@ -568,25 +540,23 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets)
 		// 2. Smart Wallet & EOA
 		// 3. EOA only
 		let sortPriority = 3 // Default to EOA only
-		const hasEOA = categories.includes(WalletTypeCategory.EOA)
-		const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
 
 		if (hasSmartWallet) {
-			if (hasEOA) {
+			if (hasEoa) {
 				sortPriority = 2 // Both Smart Wallet & EOA
 			} else {
 				sortPriority = 1 // Smart Wallet only
 			}
-		} else if (hasEOA) {
+		} else if (hasEoa) {
 			sortPriority = 3 // EOA only
 		}
 
 		return {
 			id: wallet.metadata.id,
 			name: wallet.metadata.displayName,
-			wallet: wallet as WalletLike,
+			wallet: wallet,
 			typeDescription: detailedType,
-			standards: standardsRaw,
+			standards,
 			websiteUrl,
 			sortPriority,
 		}
@@ -595,17 +565,16 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets)
 
 // Create hardware wallet table data
 const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets).map(wallet => {
-	const walletLike = wallet as WalletLike
-	const manufactureType = getHardwareWalletManufactureTypeDisplay(walletLike)
+	const manufactureType = getHardwareWalletManufactureTypeDisplay(wallet)
 	const websiteUrl =
-		typeof walletLike.metadata.url === 'string' && walletLike.metadata.url !== ''
-			? walletLike.metadata.url
+		typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
+			? wallet.metadata.url
 			: 'Not available'
 
 	return {
-		id: walletLike.metadata.id,
-		name: walletLike.metadata.displayName,
-		wallet: walletLike,
+		id: wallet.metadata.id,
+		name: wallet.metadata.displayName,
+		wallet: wallet,
 		manufactureType,
 		websiteUrl,
 		sortPriority: 0,
@@ -976,10 +945,8 @@ export default function WalletTable(): React.ReactElement {
 			if (!row || !row.wallet) {
 				return false
 			}
-			const { categories } = getWalletTypeInfo(row.wallet)
-			const hasEOA = categories.includes(WalletTypeCategory.EOA)
-			const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
-			return hasEOA && !hasSmartWallet
+			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+			return hasEoa && !hasSmartWallet
 		}).length
 	}, [])
 
@@ -988,10 +955,8 @@ export default function WalletTable(): React.ReactElement {
 			if (!row || !row.wallet) {
 				return false
 			}
-			const { categories } = getWalletTypeInfo(row.wallet)
-			const hasEOA = categories.includes(WalletTypeCategory.EOA)
-			const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
-			return hasSmartWallet && !hasEOA
+			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+			return hasSmartWallet && !hasEoa
 		}).length
 	}, [])
 
@@ -1000,10 +965,8 @@ export default function WalletTable(): React.ReactElement {
 			if (!row || !row.wallet) {
 				return false
 			}
-			const { categories } = getWalletTypeInfo(row.wallet)
-			const hasEOA = categories.includes(WalletTypeCategory.EOA)
-			const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
-			return hasSmartWallet && hasEOA
+			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+			return hasSmartWallet && hasEoa
 		}).length
 	}, [])
 
@@ -1017,23 +980,21 @@ export default function WalletTable(): React.ReactElement {
 			if (!row || !row.wallet) {
 				return false
 			}
-			const { categories } = getWalletTypeInfo(row.wallet)
-			const hasEOA = categories.includes(WalletTypeCategory.EOA)
-			const hasSmartWallet = categories.includes(WalletTypeCategory.SMART_WALLET)
+			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
 
 			// For EOA_ONLY filter, check if the wallet has only EOA type
 			if (walletTypeFilter === WalletTypeFilter.EOA_ONLY) {
-				return hasEOA && !hasSmartWallet
+				return hasEoa && !hasSmartWallet
 			}
 
 			// For SMART_WALLET_ONLY filter
 			if (walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY) {
-				return hasSmartWallet && !hasEOA
+				return hasSmartWallet && !hasEoa
 			}
 
 			// For SMART_WALLET_AND_EOA filter
 			if (walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA) {
-				return hasSmartWallet && hasEOA
+				return hasSmartWallet && hasEoa
 			}
 
 			return true
@@ -1072,10 +1033,19 @@ export default function WalletTable(): React.ReactElement {
 		{
 			header: 'Type',
 			accessorFn: (row: any) => {
-				const { categories } = getWalletTypeInfo(row.wallet)
-				const typeString = categories.map(cat => WALLET_TYPE_DISPLAY[cat] || cat).join(' & ')
-				const standards = row.standards || []
-				return { typeString, standards }
+				const { hasEoa, hasSmartWallet, hasHardware, standards } = getWalletTypeInfo(
+					row.wallet,
+					'ALL_VARIANTS',
+				)
+				const typeString = [
+					hasEoa ? ('EOA' as WalletTypeCategory) : null,
+					hasSmartWallet ? ('SMART_WALLET' as WalletTypeCategory) : null,
+					hasHardware ? ('HARDWARE_WALLET' as WalletTypeCategory) : null,
+				]
+					.filter(val => val !== null)
+					.map(cat => WALLET_TYPE_DISPLAY[cat] || cat)
+					.join(' & ')
+				return { typeString, hasSmartWallet, standards }
 			},
 			cell: (info: any) => {
 				const value = info.getValue()
@@ -1083,10 +1053,18 @@ export default function WalletTable(): React.ReactElement {
 					return null
 				}
 
-				const { typeString, standards } = value
+				const {
+					typeString,
+					hasSmartWallet,
+					standards,
+				}: {
+					typeString: string
+					hasSmartWallet: boolean
+					standards: Record<SmartWalletStandard, boolean>
+				} = value
 
 				// If no standards, just return the type string
-				if (!standards.length) {
+				if (!hasSmartWallet) {
 					return typeString
 				}
 
@@ -1094,13 +1072,14 @@ export default function WalletTable(): React.ReactElement {
 					<div>
 						<span>{typeString}</span>
 						<div className="mt-1 flex flex-wrap gap-1">
-							{standards.map((std: string) => {
-								const stdKey = std as SmartWalletStandard
-								const display = SMART_WALLET_STANDARD_DISPLAY[stdKey] || std
-								const standardNumber = display.replace('ERC-', '')
+							{Object.entries(standards).map(([std, supported]: [string, boolean]) => {
+								if (!supported) {
+									return null
+								}
+								const display = SMART_WALLET_STANDARD_DISPLAY[std as SmartWalletStandard] || std
 
 								// Add Markdown-style links for ERC standards
-								if (stdKey === SmartWalletStandard.ERC_4337) {
+								if (std === SmartWalletStandard.ERC_4337) {
 									return (
 										<EipStandardTag
 											key={std}
@@ -1109,7 +1088,7 @@ export default function WalletTable(): React.ReactElement {
 											prefix={EipPrefix.ERC}
 										/>
 									)
-								} else if (stdKey === SmartWalletStandard.ERC_7702) {
+								} else if (std === SmartWalletStandard.ERC_7702) {
 									return (
 										<EipStandardTag
 											key={std}

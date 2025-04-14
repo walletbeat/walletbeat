@@ -5,8 +5,6 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { gridplus } from '../entities/gridplus'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
@@ -35,7 +33,7 @@ export const gridplusWallet: Wallet = {
 		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -69,14 +67,12 @@ export const gridplusWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.',
 				ref: [
 					{
-						url: 'https://youtu.be/7lP_0h-PPvY?si=S4wNFukrmg4rwyFA&t=1141',
+						url: 'https://youtu.be/7lP_0h-PPvY?t=1141',
 						explanation:
 							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
 					},
@@ -113,6 +109,9 @@ export const gridplusWallet: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -128,9 +127,6 @@ export const gridplusWallet: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

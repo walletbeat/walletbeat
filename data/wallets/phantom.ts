@@ -4,11 +4,11 @@ import { WalletProfile } from '@/schema/features/profile'
 import { nconsigny } from '../contributors/nconsigny'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { WalletTypeCategory } from '@/schema/features/wallet-type'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { featureSupported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { AccountType } from '@/schema/features/account-support'
 
 export const phantom: Wallet = {
 	metadata: {
@@ -25,14 +25,25 @@ export const phantom: Wallet = {
 		repoUrl: null,
 		contributors: [nconsigny],
 		lastUpdated: '2025-02-08',
-		multiWalletType: {
-			categories: [WalletTypeCategory.EOA],
-		},
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
-		accountSupport: null,
+		accountSupport: {
+			eoa: supported({
+				canExportPrivateKey: true,
+				keyDerivation: {
+					type: 'BIP32',
+					seedPhrase: 'BIP39',
+					derivationPath: 'BIP44',
+					canExportSeedPhrase: true,
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			eip7702: notSupported,
+			defaultAccountType: AccountType.eoa,
+		},
 		multiAddress: null,
 		addressResolution: {
 			nonChainSpecificEnsResolution: null,
@@ -63,10 +74,8 @@ export const phantom: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details: 'No hardware wallet clear signing information available.',
-				},
+				level: ClearSigningLevel.NONE,
+				details: 'No hardware wallet clear signing information available.',
 				ref: null,
 			},
 			passkeyVerification: {
@@ -90,6 +99,9 @@ export const phantom: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -105,9 +117,6 @@ export const phantom: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

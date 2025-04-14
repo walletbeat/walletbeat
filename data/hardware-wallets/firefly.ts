@@ -5,9 +5,7 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { firefly } from '../entities/firefly'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
 export const fireflyWallet: Wallet = {
@@ -35,7 +33,7 @@ export const fireflyWallet: Wallet = {
 		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -69,11 +67,9 @@ export const fireflyWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.NONE,
-					details:
-						'Firefly currently does not provide clear signing support as it is still in development.',
-				},
+				level: ClearSigningLevel.NONE,
+				details:
+					'Firefly currently does not provide clear signing support as it is still in development.',
 				ref: null,
 			},
 			bugBountyProgram: {
@@ -100,6 +96,9 @@ export const fireflyWallet: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -115,9 +114,6 @@ export const fireflyWallet: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

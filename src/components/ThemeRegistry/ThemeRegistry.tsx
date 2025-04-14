@@ -3,8 +3,6 @@ import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import theme from './theme'
 import EmotionCacheProvider from './EmotionCacheProvider'
-// Import registry to initialize global helpers
-import '@/schema/registry'
 
 export default function ThemeRegistry({
 	children,

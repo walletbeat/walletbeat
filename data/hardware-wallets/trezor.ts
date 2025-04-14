@@ -5,8 +5,6 @@ import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
-import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
-import { trezor } from '../entities/trezor'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -54,7 +52,7 @@ export const trezorWallet: Wallet = {
 		],
 	},
 	features: {
-		profile: WalletProfile.HARDWARE,
+		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
 		accountSupport: null,
 		multiAddress: null,
@@ -91,11 +89,9 @@ export const trezorWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletClearSigning: {
-				clearSigningSupport: {
-					level: ClearSigningLevel.PARTIAL,
-					details:
-						'Trezor provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.',
-				},
+				level: ClearSigningLevel.PARTIAL,
+				details:
+					'Trezor provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.',
 				ref: [
 					{
 						url: 'https://youtu.be/7lP_0h-PPvY?si=07dMNswh_9RsuWQ9&t=879',
@@ -135,6 +131,9 @@ export const trezorWallet: Wallet = {
 				},
 			},
 		},
+		transparency: {
+			feeTransparency: null,
+		},
 		license: null,
 		monetization: {
 			revenueBreakdownIsPublic: false,
@@ -150,9 +149,6 @@ export const trezorWallet: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
-		},
-		transparency: {
-			feeTransparency: null,
 		},
 	},
 	variants: {

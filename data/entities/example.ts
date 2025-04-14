@@ -4,6 +4,7 @@ import type {
 	Exchange,
 	SecurityAuditor,
 	TransactionBroadcastProvider,
+	WalletDeveloper,
 } from '@/schema/entity'
 
 export const exampleNodeCompany: CorporateEntity &
@@ -76,6 +77,31 @@ export const exampleCex: CorporateEntity & Exchange = {
 	jurisdiction: 'Atlantis',
 	url: 'https://example.com/',
 	repoUrl: 'https://github.com/example-centralized-exchange',
+	privacyPolicy: 'https://example.com/privacy',
+	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
+	linkedin: { type: 'NO_LINKEDIN_URL' },
+	twitter: { type: 'NO_TWITTER_URL' },
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
+}
+
+export const exampleWalletDevelopmentCompany: CorporateEntity & WalletDeveloper = {
+	id: 'exampleWalletDevelopmentCompany',
+	name: 'Example Wallet Development Company',
+	legalName: { name: 'Example Wallet Corp', soundsDifferent: true },
+	type: {
+		chainDataProvider: false,
+		corporate: true,
+		dataBroker: false,
+		exchange: false,
+		offchainDataProvider: false,
+		securityAuditor: false,
+		transactionBroadcastProvider: false,
+		walletDeveloper: true,
+	},
+	icon: 'NO_ICON',
+	jurisdiction: 'Atlantis',
+	url: 'https://example.com/',
+	repoUrl: 'https://github.com/example-wallet-company',
 	privacyPolicy: 'https://example.com/privacy',
 	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	linkedin: { type: 'NO_LINKEDIN_URL' },
