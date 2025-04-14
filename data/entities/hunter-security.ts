@@ -1,10 +1,9 @@
 import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
 
-export const hunterSecurity: SecurityAuditor = {
+export const hunterSecurity: CorporateEntity & SecurityAuditor = {
 	id: 'hunter-security',
 	name: 'Hunter Security',
-	// @TODO
-	legalName: { name: 'Hunter Security Ltd', soundsDifferent: false },
+	legalName: { name: 'Hunter Security', soundsDifferent: false },
 	type: {
 		chainDataProvider: false,
 		corporate: true,
@@ -19,14 +18,12 @@ export const hunterSecurity: SecurityAuditor = {
 	icon: {
 		extension: 'svg',
 	},
-	// @TODO
 	jurisdiction: { type: 'UNKNOWN' },
 	url: 'https://www.huntersec.co/',
-	repoUrl: null,
-	// @TODO
+	repoUrl: 'https://github.com/GeorgeHNTR',
 	privacyPolicy: { type: 'NO_PRIVACY_POLICY' },
-	crunchbase: null,
-	linkedin: null,
+	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
+	linkedin: { type: 'NO_LINKEDIN_URL' },
 	twitter: 'https://x.com/HunterBlockSec',
 	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 }
