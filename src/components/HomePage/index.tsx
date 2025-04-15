@@ -7,6 +7,8 @@ import { LuWallet, LuKey } from 'react-icons/lu'
 import type { FC } from 'react'
 import { wallets } from '@/data/wallets'
 import { hardwareWallets } from '@/data/hardware-wallets'
+import { ExternalLink } from '@/ui/atoms/ExternalLink'
+import GitHubIcon from '@mui/icons-material/GitHub'
 
 // Type-safe object key access
 type WalletsKey = keyof typeof wallets
@@ -114,20 +116,27 @@ export const HomePage: FC = () => (
 	>
 		<div className="max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full">
 			<div className="flex flex-col lg:mt-10 mt-24 gap-4">
-				<div className="px-8 py-6 flex justify-between items-center flex-wrap min-h-96 relative">
-					<div className="flex flex-col gap-2 py-8 flex-1">
-						<h1 className="text-5xl font-extrabold text-accent">Who watches the wallets?</h1>
+				<div className="px-8 py-6 flex justify-between items-start flex-wrap min-h-96 relative">
+					<div className="flex flex-col gap-4 py-8 flex-1">
+						<div className="flex gap-2">
+							<div className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary">
+								<div className="flex flex-row gap-2 items-center" key="repo">
+									<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+									<ExternalLink
+										url="https://github.com/walletbeat/walletbeat"
+										defaultLabel="GitHub Repository"
+										style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+									/>
+								</div>
+							</div>
+						</div>
+						<h1 className="text-4xl font-extrabold text-accent">Who watches the wallets?</h1>
 						<p className="text-secondary">
-							Beta version; For content contributions, please see{' '}
-							<a
-								href="https://github.com/walletbeat/walletbeat"
-								target="_blank"
-								rel="noreferrer"
-								className="text-accent underline"
-							>
-								GitHub
-							</a>
-							.
+							This website is still in beta.
+							It aims to provide a comprehensive list of wallets, their functionality, practices, and support for certain standards.
+						</p>
+						<p className="text-secondary">
+							We welcome contributions via the <ExternalLink url="https://github.com/walletbeat/walletbeat" defaultLabel="GitHub Repository" style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }} />.
 						</p>
 					</div>
 					<div className="flex-1 flex justify-center items-center">
