@@ -99,14 +99,14 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 		<span
 			key="listItemIcon"
 			className="inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1"
-			// sx={{
-			// 	minWidth: `${navigationListIconSize}px`,
-			// 	width: `${navigationListIconSize}px`,
-			// 	height: `${navigationListIconSize}px`,
-			// 	display: 'inline-block',
-			// textAlign: 'center',
-			// marginRight: '4px',
-			// }}
+		// sx={{
+		// 	minWidth: `${navigationListIconSize}px`,
+		// 	width: `${navigationListIconSize}px`,
+		// 	height: `${navigationListIconSize}px`,
+		// 	display: 'inline-block',
+		// textAlign: 'center',
+		// marginRight: '4px',
+		// }}
 		>
 			{children}
 		</span>
@@ -381,21 +381,21 @@ export function Navigation({
 				    /* Base styles */
 				    fixed lg:relative h-full z-40
 				    flex flex-col gap-0 overflow-y-auto
-				    
+
 				    /* Full width on mobile, constrained on desktop */
 				    w-full lg:w-auto lg:max-w-xs
-				    
+
 				    /* Positioning */
 				    inset-0 lg:inset-auto
-				    
+
 				    /* Desktop styles - always visible and positioned */
 				    lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-0
-				    
+
 				    /* Mobile styles - controlled by state */
 				    lg:translate-x-0
 				    transition-transform duration-300
 				    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-				    
+
 				    /* Background color */
 				    bg-[var(--navigation-bg)]
 				`}
@@ -425,7 +425,7 @@ export function Navigation({
 				) : null}
 
 				<div className="flex flex-col gap-2 px-4">{nonEmptyMap(groups, renderNavigationGroup)}</div>
-				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-center rounded-lg">
+				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-left rounded-lg">
 					Wallets listed on this page are not official endoresements, and are provided for
 					informational purposes only.
 				</div>

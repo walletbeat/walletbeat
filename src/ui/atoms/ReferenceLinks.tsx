@@ -29,11 +29,11 @@ export function ReferenceLinks({
 				referencesType: Array.isArray(references) ? 'array' : typeof references,
 				firstReference: references[0]
 					? {
-							hasUrls: !!references[0].urls,
-							urlsLength: references[0].urls?.length,
-							hasExplanation: !!references[0].explanation,
-							urls: references[0].urls || references[0].url,
-						}
+						hasUrls: !!references[0].urls,
+						urlsLength: references[0].urls?.length,
+						hasExplanation: !!references[0].explanation,
+						urls: references[0].urls || references[0].url,
+					}
 					: null,
 			},
 			null,

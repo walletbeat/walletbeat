@@ -563,11 +563,11 @@ export function WalletPage({
 							children:
 								section.subsections !== undefined && isNonEmptyArray(section.subsections)
 									? nonEmptyMap(section.subsections, subsection => ({
-											id: sectionHeaderId(subsection),
-											icon: subsection.icon,
-											title: subsection.title,
-											contentId: sectionHeaderId(subsection),
-										}))
+										id: sectionHeaderId(subsection),
+										icon: subsection.icon,
+										title: subsection.title,
+										contentId: sectionHeaderId(subsection),
+									}))
 									: undefined,
 						}),
 					),
@@ -664,7 +664,7 @@ export function WalletPage({
 											</Box>
 										)}
 										{section.subsections?.map(subsection => (
-											<StyledSubsection key={sectionHeaderId(subsection)} sx={subsection.sx}>
+											<div key={sectionHeaderId(subsection)} /*sx={subsection.sx}*/ className="flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border" style={subsection.sx ?? {} as unknown as object}>
 												<ThemeProvider theme={subsectionTheme}>
 													{maybeAddCornerControl(
 														subsection,
@@ -692,7 +692,7 @@ export function WalletPage({
 														<Box key="subsectionBody">{subsection.body}</Box>
 													)}
 												</ThemeProvider>
-											</StyledSubsection>
+											</div>
 										))}
 									</StyledSection>
 								</React.Fragment>

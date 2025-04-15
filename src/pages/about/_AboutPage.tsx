@@ -182,19 +182,26 @@ export function AboutPage(): React.JSX.Element {
 				},
 			]}
 		>
-			<Typography id="aboutHeader" variant="h1" mb={1}>
-				About Walletbeat
-			</Typography>
-			<Typography
-				variant="caption"
-				sx={{ fontStyle: 'italic', fontSize: '1.25rem', opacity: 0.75 }}
-				mb={2}
-			>
-				Who watches the wallets?
-			</Typography>
-			<Box maxWidth="75vw" display="flex" flexDirection="column" alignItems="stretch">
-				<AboutContents />
-			</Box>
+			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
+				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
+
+					<Typography id="aboutHeader" variant="h1" mb={1}>
+						About Walletbeat
+					</Typography>
+					<Typography
+						variant="caption"
+						sx={{ fontStyle: 'italic', fontSize: '1.25rem', opacity: 0.75 }}
+						mb={2}
+					>
+						Who watches the wallets?
+					</Typography>
+					{/* <Box maxWidth="75vw" display="flex" flexDirection="column" alignItems="stretch"> */}
+					<div className="flex flex-col gap-2 items-stretch justify-stretch">
+						<AboutContents />
+					</div>
+					{/* </Box> */}
+				</div>
+			</div>
 		</NavigationPageLayout>
 	)
 }

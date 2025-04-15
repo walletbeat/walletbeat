@@ -112,8 +112,8 @@ export const HomePage: FC = () => (
 			},
 		]}
 	>
-		<div className="flex flex-col">
-			<div>
+		<div className="max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full">
+			<div className="flex flex-col lg:mt-10 mt-24 gap-4">
 				<div className="px-8 py-6 flex justify-between items-center flex-wrap min-h-96 relative">
 					<div className="flex flex-col gap-2 py-8 flex-1">
 						<h1 className="text-5xl font-extrabold text-accent">Who watches the wallets?</h1>
