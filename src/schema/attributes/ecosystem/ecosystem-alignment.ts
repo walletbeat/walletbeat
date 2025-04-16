@@ -54,7 +54,7 @@ export const ecosystemAlignment: Attribute<EcosystemAlignmentValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'All sub-criteria are PASS.'),
+				sentence(() => 'The wallet passes all ecosystem alignment sub-criteria.'),
 				(v: EcosystemAlignmentValue) => v.rating === Rating.PASS,
 			),
 		],
@@ -66,7 +66,7 @@ export const ecosystemAlignment: Attribute<EcosystemAlignmentValue> = {
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'No sub-criteria are PASS.'),
+				sentence(() => 'The wallet fails one or more ecosystem alignment sub-criteria.'),
 				(v: EcosystemAlignmentValue) => v.rating === Rating.FAIL,
 			),
 		],

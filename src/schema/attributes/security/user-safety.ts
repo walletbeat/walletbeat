@@ -1,5 +1,5 @@
 import type { ResolvedFeatures } from '@/schema/features'
-import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
+import { Rating, type Value, type Attribute, type Evaluation, exampleRating } from '@/schema/attributes'
 import { pickWorstRating, unrated } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
@@ -79,11 +79,26 @@ export const userSafety: Attribute<UserSafetyValue> = {
 		`Evaluated based on 18 sub-criteria. PASS if >12/18 PASS, PARTIAL if >6/18 PASS, else FAIL.`,
 	),
 	ratingScale: {
-		display: 'pass-partial-fail',
+		display: 'pass-fail',
 		exhaustive: true,
-		pass: ['More than 12 sub-criteria are PASS'],
-		partial: ['More than 6 sub-criteria are PASS'],
-		fail: ['6 or fewer sub-criteria are PASS'],
+		pass: [
+			exampleRating(
+				sentence(() => 'The hardware wallet passes more than 12 user safety sub-criteria.'),
+				(v: UserSafetyValue) => v.rating === Rating.PASS,
+			),
+		],
+		partial: [
+			exampleRating(
+				sentence(() => 'The hardware wallet passes more than 6 user safety sub-criteria.'),
+				(v: UserSafetyValue) => v.rating === Rating.PARTIAL,
+			),
+		],
+		fail: [
+			exampleRating(
+				sentence(() => 'The hardware wallet passes 6 or fewer user safety sub-criteria.'),
+				(v: UserSafetyValue) => v.rating === Rating.FAIL,
+			),
+		],
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) => {
 		return pickWorstRating<UserSafetyValue>(perVariant)

@@ -59,19 +59,19 @@ export const firmware: Attribute<FirmwareValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'Most sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet passes most firmware sub-criteria.'),
 				(v: FirmwareValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'Some sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet passes some firmware sub-criteria.'),
 				(v: FirmwareValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'Few or no sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet fails most or all firmware sub-criteria.'),
 				(v: FirmwareValue) => v.rating === Rating.FAIL,
 			),
 		],

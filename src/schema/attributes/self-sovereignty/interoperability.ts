@@ -57,7 +57,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'Both sub-criteria are PASS.'),
+				sentence(() => 'The wallet passes both interoperability sub-criteria.'),
 				(v: InteroperabilityValue) => v.rating === Rating.PASS,
 			),
 		],
@@ -69,7 +69,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'No sub-criteria are PASS.'),
+				sentence(() => 'The wallet fails one or both interoperability sub-criteria.'),
 				(v: InteroperabilityValue) => v.rating === Rating.FAIL,
 			),
 		],

@@ -55,19 +55,19 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'All sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet passes all DIY supply chain sub-criteria.'),
 				(v: SupplyChainDIYValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'Some sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet passes some DIY supply chain sub-criteria.'),
 				(v: SupplyChainDIYValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'Few or no sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet fails most or all DIY supply chain sub-criteria.'),
 				(v: SupplyChainDIYValue) => v.rating === Rating.FAIL,
 			),
 		],

@@ -63,19 +63,19 @@ export const reputation: Attribute<ReputationValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'Most sub-criteria are PASS.'),
+				sentence(() => 'The wallet passes most reputation sub-criteria.'),
 				(v: ReputationValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'Some sub-criteria are PASS.'),
+				sentence(() => 'The wallet passes some reputation sub-criteria.'),
 				(v: ReputationValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'Few or no sub-criteria are PASS.'),
+				sentence(() => 'The wallet fails most or all reputation sub-criteria.'),
 				(v: ReputationValue) => v.rating === Rating.FAIL,
 			),
 		],

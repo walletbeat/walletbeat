@@ -64,19 +64,19 @@ export const maintenance: Attribute<MaintenanceValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'Most sub-criteria are PASS.'),
+				sentence(() => 'The wallet passes most maintenance sub-criteria.'),
 				(v: MaintenanceValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'Some sub-criteria are PASS.'),
+				sentence(() => 'The wallet passes some maintenance sub-criteria.'),
 				(v: MaintenanceValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'Few or no sub-criteria are PASS.'),
+				sentence(() => 'The wallet fails most or all maintenance sub-criteria.'),
 				(v: MaintenanceValue) => v.rating === Rating.FAIL,
 			),
 		],

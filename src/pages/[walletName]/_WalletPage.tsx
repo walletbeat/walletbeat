@@ -356,7 +356,10 @@ export function WalletPage({
 				body: null,
 				subsections: mapGroupAttributes<RichSection | null, Vs>(
 					evalGroup,
-					<V extends Value>(evalAttr: EvaluatedAttribute<V>): RichSection | null => {
+					<V extends Value>(
+						evalAttr: EvaluatedAttribute<V>,
+						attributeKey: keyof Vs,
+					): RichSection | null => {
 						if (evalAttr.evaluation.value.rating === Rating.EXEMPT) {
 							return null
 						}
@@ -378,7 +381,7 @@ export function WalletPage({
 											attrGroup={attrGroup}
 											evalGroup={evalGroup}
 											evalAttr={evalAttr}
-											displayedVariant={pickedVariant}
+											attributeKey={String(attributeKey)}
 											variantSpecificity={VariantSpecificity.ALL_SAME}
 										/>
 									),
@@ -426,7 +429,7 @@ export function WalletPage({
 											attrGroup={attrGroup}
 											evalGroup={evalGroup}
 											evalAttr={evalAttr}
-											displayedVariant={relevantVariants[0]}
+											attributeKey={String(attributeKey)}
 											variantSpecificity={VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT}
 										/>
 									),
@@ -499,17 +502,17 @@ export function WalletPage({
 										attrGroup={attrGroup}
 										evalGroup={evalGroup}
 										evalAttr={evalAttr}
-										displayedVariant={pickedVariant}
+										attributeKey={String(attributeKey)}
 										variantSpecificity={VariantSpecificity.NOT_UNIVERSAL}
 									/>
 								),
 							}
 						})()
 						return {
-							header: attrGroup.id,
-							subHeader: evalAttr.attribute.id,
+							header: slugifyCamelCase(String(attributeKey)),
+							subHeader: null,
 							title: evalAttr.attribute.displayName,
-							icon: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
+							icon: evalAttr.attribute.icon,
 							cornerControl,
 							sx: {
 								border: '2px solid',
@@ -563,11 +566,11 @@ export function WalletPage({
 							children:
 								section.subsections !== undefined && isNonEmptyArray(section.subsections)
 									? nonEmptyMap(section.subsections, subsection => ({
-										id: sectionHeaderId(subsection),
-										icon: subsection.icon,
-										title: subsection.title,
-										contentId: sectionHeaderId(subsection),
-									}))
+											id: sectionHeaderId(subsection),
+											icon: subsection.icon,
+											title: subsection.title,
+											contentId: sectionHeaderId(subsection),
+										}))
 									: undefined,
 						}),
 					),
@@ -664,7 +667,11 @@ export function WalletPage({
 											</Box>
 										)}
 										{section.subsections?.map(subsection => (
-											<div key={sectionHeaderId(subsection)} /*sx={subsection.sx}*/ className="flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border" style={subsection.sx ?? {} as unknown as object}>
+											<div
+												key={sectionHeaderId(subsection)}
+												/*sx={subsection.sx}*/ className="flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border"
+												style={subsection.sx ?? ({} as unknown as object)}
+											>
 												<ThemeProvider theme={subsectionTheme}>
 													{maybeAddCornerControl(
 														subsection,

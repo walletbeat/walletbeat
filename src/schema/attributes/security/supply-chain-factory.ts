@@ -68,19 +68,19 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'All sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet passes all factory supply chain sub-criteria.'),
 				(v: SupplyChainFactoryValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'Some sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet passes some factory supply chain sub-criteria.'),
 				(v: SupplyChainFactoryValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'Few or no sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet fails most or all factory supply chain sub-criteria.'),
 				(v: SupplyChainFactoryValue) => v.rating === Rating.FAIL,
 			),
 		],

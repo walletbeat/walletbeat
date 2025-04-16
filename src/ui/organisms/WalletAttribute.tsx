@@ -32,6 +32,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	wallet,
 	attrGroup,
 	evalAttr,
+	attributeKey,
 	variantSpecificity,
 	displayedVariant,
 }: {
@@ -39,6 +40,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	attrGroup: AttributeGroup<Vs>
 	evalGroup: EvaluatedGroup<Vs>
 	evalAttr: EvaluatedAttribute<V>
+	attributeKey: string
 } & (
 	| {
 			variantSpecificity:
@@ -58,7 +60,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		references: qualRefs,
 		value: evalAttr.evaluation.value,
 	})
-	const override = getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id)
+	const override = getAttributeOverride(wallet, attrGroup.id, attributeKey)
 	const variantSpecificCaption: React.ReactNode = (() => {
 		switch (variantSpecificity) {
 			case VariantSpecificity.ALL_SAME:
@@ -122,7 +124,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	}
 	const accordions: NonEmptyArray<AccordionData> = [
 		{
-			id: `why-${evalAttr.attribute.id}`,
+			id: `why-${attributeKey}`,
 			summary:
 				evalAttr.evaluation.value.rating === Rating.PASS ||
 				evalAttr.evaluation.value.rating === Rating.UNRATED
@@ -136,7 +138,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			),
 		},
 		{
-			id: `methodology-${evalAttr.attribute.id}`,
+			id: `methodology-${attributeKey}`,
 			summary:
 				evalAttr.attribute.wording.midSentenceName === null
 					? evalAttr.attribute.wording.howIsEvaluated
@@ -150,7 +152,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove
 	if (howToImprove !== undefined) {
 		accordions.push({
-			id: `how-${evalAttr.attribute.id}`,
+			id: `how-${attributeKey}`,
 			summary:
 				evalAttr.attribute.wording.midSentenceName === null
 					? evalAttr.attribute.wording.whatCanWalletDoAboutIts(wallet.metadata)

@@ -64,19 +64,19 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'Most sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet passes most keys handling sub-criteria.'),
 				(v: KeysHandlingValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'Some sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet passes some keys handling sub-criteria.'),
 				(v: KeysHandlingValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'Few or no sub-criteria are PASS.'),
+				sentence(() => 'The hardware wallet fails most or all keys handling sub-criteria.'),
 				(v: KeysHandlingValue) => v.rating === Rating.FAIL,
 			),
 		],

@@ -121,8 +121,8 @@ type SecurityValues = Dict<{
 	softwareHWIntegration: SoftwareHWIntegrationValue
 	passkeyImplementation: PasskeyImplementationValue
 	bugBountyProgram: BugBountyProgramValue
-	supplyChainDIY: SupplyChainDIYValue
-	supplyChainFactory: SupplyChainFactoryValue
+	supply_chain_diy: SupplyChainDIYValue
+	supply_chain_factory: SupplyChainFactoryValue
 	firmware: FirmwareValue
 	keysHandling: KeysHandlingValue
 	userSafety: UserSafetyValue
@@ -145,8 +145,8 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		softwareHWIntegration,
 		passkeyImplementation,
 		bugBountyProgram,
-		supplyChainDIY,
-		supplyChainFactory,
+		supply_chain_diy: supplyChainDIY,
+		supply_chain_factory: supplyChainFactory,
 		firmware,
 		keysHandling,
 		userSafety,
@@ -160,8 +160,8 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		softwareHWIntegration: 1.0,
 		passkeyImplementation: 1.0,
 		bugBountyProgram: 1.0,
-		supplyChainDIY: 1.0,
-		supplyChainFactory: 1.0,
+		supply_chain_diy: 1.0,
+		supply_chain_factory: 1.0,
 		firmware: 1.0,
 		keysHandling: 1.0,
 		userSafety: 1.0,
@@ -333,6 +333,11 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>
 	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
 	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
+	supply_chain_diy: EvaluatedAttribute<SupplyChainDIYValue>
+	supply_chain_factory: EvaluatedAttribute<SupplyChainFactoryValue>
+	firmware: EvaluatedAttribute<FirmwareValue>
+	keysHandling: EvaluatedAttribute<KeysHandlingValue>
+	userSafety: EvaluatedAttribute<UserSafetyValue>
 }
 
 /** Evaluated privacy attributes for a single wallet. */
@@ -395,8 +400,8 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 			softwareHWIntegration: evalAttr(softwareHWIntegration),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
-			supplyChainDIY: evalAttr(supplyChainDIY),
-			supplyChainFactory: evalAttr(supplyChainFactory),
+			supply_chain_diy: evalAttr(supplyChainDIY),
+			supply_chain_factory: evalAttr(supplyChainFactory),
 			firmware: evalAttr(firmware),
 			keysHandling: evalAttr(keysHandling),
 			userSafety: evalAttr(userSafety),
@@ -459,8 +464,8 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			softwareHWIntegration: attr(tree => tree.security.softwareHWIntegration),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
-			supplyChainDIY: attr(tree => tree.security.supplyChainDIY),
-			supplyChainFactory: attr(tree => tree.security.supplyChainFactory),
+			supply_chain_diy: attr(tree => tree.security.supply_chain_diy),
+			supply_chain_factory: attr(tree => tree.security.supply_chain_factory),
 			firmware: attr(tree => tree.security.firmware),
 			keysHandling: attr(tree => tree.security.keysHandling),
 			userSafety: attr(tree => tree.security.userSafety),
@@ -497,23 +502,45 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
  * Iterate over all attribute groups in a tree, calling `fn` with each group.
  */
 export function mapAttributeGroups<T>(
-	tree: EvaluationTree,
-	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => T,
+	tree: EvaluationTree | undefined | null,
+	fn: <Vs extends ValueSet>(
+		attrGroup: AttributeGroup<Vs>,
+		evalGroup: EvaluatedGroup<Vs> | undefined,
+	) => T,
 ): T[] {
-	return Object.entries(attributeTree).map(([groupName, attrGroup]) =>
-		fn(attrGroup, tree[groupName]),
-	)
+	// If tree is null/undefined, return empty array
+	if (!tree) {
+		console.warn('mapAttributeGroups called with null or undefined tree. Returning empty array.')
+		return []
+	}
+
+	return Object.entries(attributeTree).map(([groupName, attrGroup]) => {
+		// Check if the group exists in the tree
+		const evalGroup = tree[groupName]
+		return fn(attrGroup, evalGroup)
+	})
 }
 
 /**
  * Iterate over all attributes in an attribute group, calling `fn` with each
- * attribute.
+ * attribute and its corresponding key in the group.
  */
 export function mapGroupAttributes<T, Vs extends ValueSet>(
-	evalGroup: EvaluatedGroup<Vs>,
-	fn: <V extends Value>(evalAttr: EvaluatedAttribute<V>) => T,
+	evalGroup: EvaluatedGroup<Vs> | undefined | null,
+	fn: <V extends Value>(evalAttr: EvaluatedAttribute<V>, attributeKey: keyof Vs) => T,
 ): T[] {
-	return Object.values(evalGroup).map(fn)
+	// If evalGroup is null/undefined, return empty array
+	if (!evalGroup) {
+		console.warn(
+			'mapGroupAttributes called with null or undefined evalGroup. Returning empty array.',
+		)
+		return []
+	}
+
+	// Use Object.entries to get both key and value
+	return Object.entries(evalGroup).map(([key, evalAttr]) =>
+		fn(evalAttr as EvaluatedAttribute<Value>, key as keyof Vs),
+	)
 }
 
 /**
@@ -523,19 +550,61 @@ export function mapGroupAttributes<T, Vs extends ValueSet>(
  * various trees.
  */
 export function mapAttributesGetter(
-	templateTree: EvaluationTree,
+	templateTree: EvaluationTree | any, // Allow any type for robust check
 	fn: <V extends Value>(
 		getter: (evalTree: EvaluationTree) => EvaluatedAttribute<V> | undefined,
 	) => void,
 ): void {
-	for (const groupName of Object.keys(templateTree)) {
-		for (const attrName of Object.keys(templateTree[groupName])) {
-			fn(
-				<V extends Value>(evalTree: EvaluationTree): EvaluatedAttribute<V> | undefined =>
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- We know that `evalTree[groupName]` has `attrName` as property, due to how we iterated to get here.
-					(evalTree[groupName] as any)[attrName] as EvaluatedAttribute<V>,
-			)
+	// <<< MORE ROBUST CHECK HERE >>>
+	if (typeof templateTree !== 'object' || templateTree === null) {
+		console.error(
+			'mapAttributesGetter called with invalid templateTree (not an object or null). Skipping. Value:',
+			templateTree,
+		)
+		return // Exit early if templateTree is not a valid object
+	}
+	// <<< END CHECK >>>
+
+	// Now we know templateTree is a non-null object, proceed with caution
+	try {
+		console.log(
+			'[mapAttributesGetter] Inspecting templateTree right before Object.keys:',
+			JSON.stringify(templateTree, null, 2),
+		)
+		for (const groupName of Object.keys(templateTree)) {
+			const group = templateTree[groupName]
+			if (typeof group !== 'object' || group === null) {
+				console.warn(
+					`mapAttributesGetter: Skipping invalid group '${groupName}' (not an object or null) in templateTree. Value:`,
+					group,
+				)
+				continue // Skip to the next group if this one is invalid
+			}
+			for (const attrName of Object.keys(group)) {
+				// Ensure the getter function exists and is callable
+				if (typeof fn === 'function') {
+					fn(<V extends Value>(evalTree: EvaluationTree): EvaluatedAttribute<V> | undefined => {
+						// Add checks inside the getter callback as well
+						if (typeof evalTree !== 'object' || evalTree === null || !evalTree[groupName]) {
+							return undefined
+						}
+						const evalGroup = evalTree[groupName] as any
+						return evalGroup[attrName] as EvaluatedAttribute<V>
+					})
+				} else {
+					console.error('mapAttributesGetter: Provided fn is not a function.')
+					break // Exit inner loop if fn is invalid
+				}
+			}
 		}
+	} catch (error) {
+		console.error(
+			'Error during mapAttributesGetter execution:',
+			error,
+			'TemplateTree:',
+			templateTree,
+		)
+		// Optionally re-throw or handle error further
 	}
 }
 
@@ -553,7 +622,6 @@ export function getEvaluationFromOtherTree<V extends Value>(
 		otherTree,
 		(_, evalGroup): EvaluatedAttribute<V> | undefined => {
 			if (Object.hasOwn(evalGroup, evalAttr.attribute.id)) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Evaluated attributes with the same ID have the same Value type.
 				return evalGroup[evalAttr.attribute.id] as unknown as EvaluatedAttribute<V>
 			}
 			return undefined
@@ -601,8 +669,8 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 
 // Hardware-only attribute IDs for each group
 const hardwareOnlySecurity = [
-	'supplyChainDIY',
-	'supplyChainFactory',
+	'supply_chain_diy',
+	'supply_chain_factory',
 	'firmware',
 	'keysHandling',
 	'userSafety',

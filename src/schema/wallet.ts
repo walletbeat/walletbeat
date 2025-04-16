@@ -270,8 +270,19 @@ export function rateWallet(wallet: Wallet): RatedWallet {
 	const hasMultipleVariants = Object.values(perVariantTree).length > 1
 	const variantSpecificity = nonEmptyRemap(
 		perVariantTree,
-		(variant: Variant, evalTree: EvaluationTree): Map<string, VariantSpecificity> => {
+		(
+			variant: Variant,
+			evalTree: EvaluationTree | null | undefined,
+		): Map<string, VariantSpecificity> => {
 			const variantSpecificityMap = new Map<string, VariantSpecificity>()
+
+			if (!evalTree) {
+				console.warn(
+					`No evaluation tree found for variant ${variant} in wallet. Skipping specificity calculation.`,
+				)
+				return variantSpecificityMap
+			}
+
 			mapAttributesGetter(
 				evalTree,
 				<V extends Value>(getter: (tree: EvaluationTree) => EvaluatedAttribute<V> | undefined) => {
