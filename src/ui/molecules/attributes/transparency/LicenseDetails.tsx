@@ -1,5 +1,11 @@
 import { Typography } from '@mui/material'
-import { FOSS, License, licenseIsFOSS, licenseName, licenseUrl } from '@/schema/features/license'
+import {
+	FOSS,
+	License,
+	licenseIsFOSS,
+	licenseName,
+	licenseUrl,
+} from '@/schema/features/transparency/license'
 import type { LicenseDetailsProps } from '@/types/content/license-details'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 

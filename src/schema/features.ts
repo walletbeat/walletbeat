@@ -1,13 +1,13 @@
 import type { DataCollection } from './features/privacy/data-collection'
-import type { LicenseWithRef } from './features/license'
+import type { LicenseWithRef } from './features/transparency/license'
 import { type ResolvedFeature, resolveFeature, type Variant, type VariantFeature } from './variants'
-import type { Monetization } from './features/monetization'
+import type { Monetization } from './features/transparency/monetization'
 import type { WithRef } from './reference'
 import type { EthereumL1LightClientSupport } from './features/security/light-client'
-import type { ChainConfigurability } from './features/chain-configurability'
+import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { WalletProfile } from './features/profile'
-import type { WalletIntegration } from './features/integration'
-import type { AddressResolution } from './features/address-resolution'
+import type { WalletIntegration } from './features/ecosystem/integration'
+import type { AddressResolution } from './features/privacy/address-resolution'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
 import type { AccountSupport } from './features/account-support'
@@ -18,6 +18,15 @@ import type { HardwareWalletClearSigningSupport } from './features/security/hard
 import type { FeeTransparencySupport } from './features/transparency/fee-transparency'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
 import { type BugBountyProgramImplementation } from './features/security/bug-bounty-program'
+import type { MaintenanceSupport } from './features/transparency/maintenance'
+import type { ReputationSupport } from './features/transparency/reputation'
+import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'
+import type { EcosystemAlignmentSupport } from './features/ecosystem/ecosystem-alignment'
+import type { FirmwareSupport } from './features/security/firmware'
+import type { KeysHandlingSupport } from './features/security/keys-handling'
+import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
+import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
+import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
 
 /**
  * A set of features about a wallet, each of which may or may not depend on
@@ -63,6 +72,11 @@ export interface WalletFeatures {
 
 		/** Bug bounty program implementation (for hardware wallets) */
 		bugBountyProgram?: VariantFeature<BugBountyProgramImplementation>
+
+		firmware: VariantFeature<FirmwareSupport>
+		keysHandling: VariantFeature<KeysHandlingSupport>
+		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
+		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 	}
 
 	/** Privacy features. */
@@ -72,18 +86,25 @@ export interface WalletFeatures {
 
 		/** Privacy policy URL of the wallet. */
 		privacyPolicy: VariantFeature<string>
+
+		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>
 	}
 
 	/** Self-sovereignty features. */
 	selfSovereignty: {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<TransactionSubmission>
+
+		interoperability: VariantFeature<InteroperabilitySupport>
 	}
 
 	/** Transparency features. */
 	transparency: {
 		/** Fee transparency information. */
 		feeTransparency: VariantFeature<FeeTransparencySupport>
+
+		reputation: VariantFeature<ReputationSupport>
+		maintenance: VariantFeature<MaintenanceSupport>
 	}
 
 	/** Level of configurability for chains. */
@@ -106,6 +127,10 @@ export interface WalletFeatures {
 
 	/** The monetization model of the wallet. */
 	monetization: VariantFeature<Monetization>
+
+	ecosystem: {
+		ecosystemAlignment: VariantFeature<EcosystemAlignmentSupport>
+	}
 }
 
 /**
@@ -129,16 +154,27 @@ export interface ResolvedFeatures {
 		hardwareWalletClearSigning: ResolvedFeature<HardwareWalletClearSigningSupport>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram?: ResolvedFeature<BugBountyProgramImplementation>
+		firmware: ResolvedFeature<FirmwareSupport>
+		keysHandling: ResolvedFeature<KeysHandlingSupport>
+		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport>
+		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>
 	}
 	privacy: {
 		dataCollection: ResolvedFeature<DataCollection>
 		privacyPolicy: ResolvedFeature<string>
+		hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport>
 	}
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
+		interoperability: ResolvedFeature<InteroperabilitySupport>
 	}
 	transparency: {
 		feeTransparency: ResolvedFeature<FeeTransparencySupport>
+		reputation: ResolvedFeature<ReputationSupport>
+		maintenance: ResolvedFeature<MaintenanceSupport>
+	}
+	ecosystem: {
+		ecosystemAlignment: ResolvedFeature<EcosystemAlignmentSupport>
 	}
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
 	accountSupport: ResolvedFeature<AccountSupport>
@@ -175,16 +211,27 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 			bugBountyProgram: features.security.bugBountyProgram
 				? feat(features.security.bugBountyProgram)
 				: undefined,
+			firmware: feat(features.security.firmware),
+			keysHandling: feat(features.security.keysHandling),
+			supplyChainDIY: feat(features.security.supplyChainDIY),
+			supplyChainFactory: feat(features.security.supplyChainFactory),
 		},
 		privacy: {
 			dataCollection: feat(features.privacy.dataCollection),
 			privacyPolicy: feat(features.privacy.privacyPolicy),
+			hardwarePrivacy: feat(features.privacy.hardwarePrivacy),
 		},
 		selfSovereignty: {
 			transactionSubmission: feat(features.selfSovereignty.transactionSubmission),
+			interoperability: feat(features.selfSovereignty.interoperability),
 		},
 		transparency: {
 			feeTransparency: feat(features.transparency.feeTransparency),
+			reputation: feat(features.transparency.reputation),
+			maintenance: feat(features.transparency.maintenance),
+		},
+		ecosystem: {
+			ecosystemAlignment: feat(features.ecosystem.ecosystemAlignment),
 		},
 		chainConfigurability: feat(features.chainConfigurability),
 		accountSupport: feat(features.accountSupport),

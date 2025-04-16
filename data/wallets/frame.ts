@@ -9,7 +9,7 @@ import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-v
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { AccountType } from '@/schema/features/account-support'
 
 export const frame: Wallet = {

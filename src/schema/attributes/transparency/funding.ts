@@ -14,7 +14,7 @@ import {
 	type MonetizationStrategy,
 	monetizationStrategyIsUserAligned,
 	monetizationStrategyName,
-} from '@/schema/features/monetization'
+} from '@/schema/features/transparency/monetization'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { fundingDetailsContent } from '@/types/content/funding-details'

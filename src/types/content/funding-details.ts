@@ -1,7 +1,7 @@
 import type { EvaluationData } from '@/schema/attributes'
 import { component, type Renderable } from '../content'
 import type { FundingValue } from '@/schema/attributes/transparency/funding'
-import type { Monetization } from '@/schema/features/monetization'
+import type { Monetization } from '@/schema/features/transparency/monetization'
 
 export interface FundingDetailsProps extends EvaluationData<FundingValue> {
 	monetization: Monetization

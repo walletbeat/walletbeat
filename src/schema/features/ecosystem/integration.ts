@@ -1,5 +1,5 @@
-import type { WithRef } from '../reference'
-import type { Support } from './support'
+import type { WithRef } from '../../reference'
+import type { Support } from '../support'
 
 /**
  * EIPs related to web browser integration standards.

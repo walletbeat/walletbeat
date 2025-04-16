@@ -1,0 +1,130 @@
+import type { ResolvedFeatures } from '@/schema/features'
+import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
+import { pickWorstRating, unrated } from '../common'
+import { markdown, paragraph, sentence } from '@/types/content'
+import type { WalletMetadata } from '@/schema/wallet'
+import type { AtLeastOneVariant } from '@/schema/variants'
+import {
+	HardwarePrivacyType,
+	type HardwarePrivacySupport,
+} from '@/schema/features/privacy/hardware-privacy'
+import { popRefs } from '@/schema/reference'
+import { exampleRating } from '@/schema/attributes'
+import { Variant } from '@/schema/variants'
+
+const brand = 'attributes.hardware_privacy'
+
+export type HardwarePrivacyValue = Value & {
+	phoningHome: HardwarePrivacyType
+	inspectableRemoteCalls: HardwarePrivacyType
+	wirelessPrivacy: HardwarePrivacyType
+	__brand: 'attributes.hardware_privacy'
+}
+
+function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
+	const ratings = [features.phoningHome, features.inspectableRemoteCalls, features.wirelessPrivacy]
+	const passCount = ratings.filter(r => r === HardwarePrivacyType.PASS).length
+	if (passCount === 3) {
+		return Rating.PASS
+	}
+	if (passCount >= 1) {
+		return Rating.PARTIAL
+	}
+	return Rating.FAIL
+}
+
+export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
+	id: 'hardware_privacy',
+	icon: '🔒',
+	displayName: 'Hardware Privacy',
+	wording: {
+		midSentenceName: null,
+		howIsEvaluated: "How is a wallet's hardware privacy evaluated?",
+		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
+			`What can ${walletMetadata.displayName} do to improve its hardware privacy?`,
+	},
+	question: sentence(
+		(walletMetadata: WalletMetadata) =>
+			`Does ${walletMetadata.displayName} protect user privacy at the hardware level?`,
+	),
+	why: markdown(
+		`Hardware privacy ensures that the device does not leak sensitive information during setup or operation.`,
+	),
+	methodology: markdown(
+		`Evaluated based on phoning home, inspectability of remote calls, and wireless communication privacy.`,
+	),
+	ratingScale: {
+		display: 'pass-fail',
+		exhaustive: true,
+		pass: [
+			exampleRating(
+				sentence(
+					() =>
+						'All sub-criteria are PASS: No phoning home, inspectable remote calls, and encrypted wireless communication.',
+				),
+				(v: HardwarePrivacyValue) => v.rating === Rating.PASS,
+			),
+		],
+		partial: [
+			exampleRating(
+				sentence(
+					() =>
+						'At least one sub-criteria is PASS: Some privacy features are present, but not all.',
+				),
+				(v: HardwarePrivacyValue) => v.rating === Rating.PARTIAL,
+			),
+		],
+		fail: [
+			exampleRating(
+				sentence(() => 'No sub-criteria are PASS: Device leaks privacy in all aspects.'),
+				(v: HardwarePrivacyValue) => v.rating === Rating.FAIL,
+			),
+		],
+	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwarePrivacyValue>>) => {
+		return pickWorstRating<HardwarePrivacyValue>(perVariant)
+	},
+	evaluate: (features: ResolvedFeatures): Evaluation<HardwarePrivacyValue> => {
+		if (features.variant !== Variant.HARDWARE) {
+			return unrated(hardwarePrivacy, brand, {
+				phoningHome: HardwarePrivacyType.FAIL,
+				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
+				wirelessPrivacy: HardwarePrivacyType.FAIL,
+			})
+		}
+		const hwPrivacy = features.privacy.hardwarePrivacy
+		if (!hwPrivacy) {
+			return unrated(hardwarePrivacy, brand, {
+				phoningHome: HardwarePrivacyType.FAIL,
+				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
+				wirelessPrivacy: HardwarePrivacyType.FAIL,
+			})
+		}
+
+		const { withoutRefs, refs: extractedRefs } = popRefs<HardwarePrivacySupport>(hwPrivacy)
+		const rating = evaluateHardwarePrivacy(withoutRefs)
+
+		return {
+			value: {
+				id: 'hardware_privacy',
+				rating,
+				displayName: 'Hardware Privacy',
+				shortExplanation: sentence(
+					(walletMetadata: WalletMetadata) =>
+						`${walletMetadata.displayName} has ${rating.toLowerCase()} hardware privacy.`,
+				),
+				...withoutRefs,
+				__brand: brand,
+			},
+			details: paragraph(
+				({ wallet }) =>
+					`${wallet.metadata.displayName} hardware privacy evaluation is ${rating.toLowerCase()}.`,
+			),
+			howToImprove: paragraph(
+				({ wallet }) =>
+					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
+			),
+			...(extractedRefs.length > 0 && { references: extractedRefs }),
+		}
+	},
+}

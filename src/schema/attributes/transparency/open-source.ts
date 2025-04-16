@@ -5,7 +5,7 @@ import {
 	licenseIsFOSS,
 	licenseName,
 	type LicenseWithRef,
-} from '@/schema/features/license'
+} from '@/schema/features/transparency/license'
 import {
 	Rating,
 	type Value,

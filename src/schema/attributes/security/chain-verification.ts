@@ -17,7 +17,7 @@ import {
 import {
 	RpcEndpointConfiguration,
 	type ChainConfigurability,
-} from '../../features/chain-configurability'
+} from '../../features/self-sovereignty/chain-configurability'
 import { type FullyQualifiedReference, popRefs } from '../../reference'
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { isSupported, type Support } from '@/schema/features/support'

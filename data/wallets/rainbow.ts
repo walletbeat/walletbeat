@@ -7,7 +7,7 @@ import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-v
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
-import { License } from '@/schema/features/license'
+import { License } from '@/schema/features/transparency/license'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType } from '@/schema/features/account-support'
 

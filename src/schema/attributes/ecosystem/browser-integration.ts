@@ -14,7 +14,7 @@ import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
 import { eip1193 } from '@/data/eips/eip-1193'
 import { eip6963 } from '@/data/eips/eip-6963'
 import { eip2700 } from '@/data/eips/eip-2700'
-import type { BrowserIntegrationEip } from '../../features/integration'
+import type { BrowserIntegrationEip } from '../../features/ecosystem/integration'
 import { getEip } from '@/data/eips'
 import { commaListFormat } from '@/types/utils/text'
 import {

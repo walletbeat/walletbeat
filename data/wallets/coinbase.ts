@@ -12,7 +12,7 @@ import { cantina } from '../entities/cantina'
 import { code4rena } from '../entities/code4rena'
 import { certora } from '../entities/certora'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { License } from '@/schema/features/license'
+import { License } from '@/schema/features/transparency/license'
 
 export const coinbase: Wallet = {
 	metadata: {

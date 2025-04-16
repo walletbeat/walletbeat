@@ -1,5 +1,5 @@
 import type { ResolvedFeatures } from '@/schema/features'
-import { licenseSourceIsVisible } from '@/schema/features/license'
+import { licenseSourceIsVisible } from '@/schema/features/transparency/license'
 import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
 import { pickWorstRating, unrated } from '../common'
 import { paragraph, sentence } from '@/types/content'

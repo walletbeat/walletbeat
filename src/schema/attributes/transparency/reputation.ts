@@ -1,0 +1,133 @@
+import type { ResolvedFeatures } from '@/schema/features'
+import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
+import { pickWorstRating, unrated } from '../common'
+import { markdown, paragraph, sentence } from '@/types/content'
+import type { WalletMetadata } from '@/schema/wallet'
+import type { AtLeastOneVariant } from '@/schema/variants'
+import { ReputationType, type ReputationSupport } from '@/schema/features/transparency/reputation'
+import { popRefs } from '@/schema/reference'
+import { Variant } from '@/schema/variants'
+import { exampleRating } from '@/schema/attributes'
+
+const brand = 'attributes.reputation'
+
+export type ReputationValue = Value & {
+	originalProduct: ReputationType
+	availability: ReputationType
+	warrantySupportRisk: ReputationType
+	disclosureHistory: ReputationType
+	bugBounty: ReputationType
+	__brand: 'attributes.reputation'
+}
+
+function evaluateReputation(features: ReputationSupport): Rating {
+	const ratings = [
+		features.originalProduct,
+		features.availability,
+		features.warrantySupportRisk,
+		features.disclosureHistory,
+		features.bugBounty,
+	]
+	const passCount = ratings.filter(r => r === ReputationType.PASS).length
+	if (passCount >= 4) {
+		return Rating.PASS
+	}
+	if (passCount >= 2) {
+		return Rating.PARTIAL
+	}
+	return Rating.FAIL
+}
+
+export const reputation: Attribute<ReputationValue> = {
+	id: 'reputation',
+	icon: '🌟',
+	displayName: 'Reputation',
+	wording: {
+		midSentenceName: null,
+		howIsEvaluated: "How is a wallet's reputation evaluated?",
+		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
+			`What can ${walletMetadata.displayName} do to improve its reputation?`,
+	},
+	question: sentence(
+		(walletMetadata: WalletMetadata) =>
+			`Does ${walletMetadata.displayName} have a strong reputation for reliability and transparency?`,
+	),
+	why: markdown(
+		`Reputation is an aggregate of product originality, availability, warranty/support, disclosure history, and bug bounty program.`,
+	),
+	methodology: markdown(
+		`Evaluated based on the lowest score among the sub-criteria unless otherwise justified.`,
+	),
+	ratingScale: {
+		display: 'pass-fail',
+		exhaustive: true,
+		pass: [
+			exampleRating(
+				sentence(() => 'Most sub-criteria are PASS.'),
+				(v: ReputationValue) => v.rating === Rating.PASS,
+			),
+		],
+		partial: [
+			exampleRating(
+				sentence(() => 'Some sub-criteria are PASS.'),
+				(v: ReputationValue) => v.rating === Rating.PARTIAL,
+			),
+		],
+		fail: [
+			exampleRating(
+				sentence(() => 'Few or no sub-criteria are PASS.'),
+				(v: ReputationValue) => v.rating === Rating.FAIL,
+			),
+		],
+	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationValue>>) => {
+		return pickWorstRating<ReputationValue>(perVariant)
+	},
+	evaluate: (features: ResolvedFeatures): Evaluation<ReputationValue> => {
+		if (features.variant !== Variant.HARDWARE) {
+			return unrated(reputation, brand, {
+				originalProduct: ReputationType.FAIL,
+				availability: ReputationType.FAIL,
+				warrantySupportRisk: ReputationType.FAIL,
+				disclosureHistory: ReputationType.FAIL,
+				bugBounty: ReputationType.FAIL,
+			})
+		}
+		const reputationFeature = features.transparency.reputation
+		if (!reputationFeature) {
+			return unrated(reputation, brand, {
+				originalProduct: ReputationType.FAIL,
+				availability: ReputationType.FAIL,
+				warrantySupportRisk: ReputationType.FAIL,
+				disclosureHistory: ReputationType.FAIL,
+				bugBounty: ReputationType.FAIL,
+			})
+		}
+
+		const { withoutRefs, refs: extractedRefs } = popRefs<ReputationSupport>(reputationFeature)
+		const rating = evaluateReputation(withoutRefs)
+
+		return {
+			value: {
+				id: 'reputation',
+				rating,
+				displayName: 'Reputation',
+				shortExplanation: sentence(
+					(walletMetadata: WalletMetadata) =>
+						`${walletMetadata.displayName} has ${rating.toLowerCase()} reputation.`,
+				),
+				...withoutRefs,
+				__brand: brand,
+			},
+			details: paragraph(
+				({ wallet }) =>
+					`${wallet.metadata.displayName} reputation evaluation is ${rating.toLowerCase()}.`,
+			),
+			howToImprove: paragraph(
+				({ wallet }) =>
+					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
+			),
+			...(extractedRefs.length > 0 && { references: extractedRefs }),
+		}
+	},
+}

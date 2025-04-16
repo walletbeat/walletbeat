@@ -10,7 +10,10 @@ import { pickWorstRating, unrated } from '../common'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } from '../../eips'
-import type { AddressResolution, AddressResolutionSupport } from '../../features/address-resolution'
+import type {
+	AddressResolution,
+	AddressResolutionSupport,
+} from '../../features/privacy/address-resolution'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { erc7828 } from '@/data/eips/erc-7828'
 import { erc7831 } from '@/data/eips/erc-7831'

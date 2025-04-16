@@ -9,7 +9,7 @@ import {
 import { pickWorstRating, unrated } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import { RpcEndpointConfiguration } from '../../features/chain-configurability'
+import { RpcEndpointConfiguration } from '../../features/self-sovereignty/chain-configurability'
 import { refs, type ReferenceArray } from '@/schema/reference'
 
 const brand = 'attributes.self_sovereignty.self_hosted_node'

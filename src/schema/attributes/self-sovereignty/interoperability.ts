@@ -1,0 +1,122 @@
+import type { ResolvedFeatures } from '@/schema/features'
+import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
+import { pickWorstRating, unrated } from '../common'
+import { markdown, paragraph, sentence } from '@/types/content'
+import type { WalletMetadata } from '@/schema/wallet'
+import type { AtLeastOneVariant } from '@/schema/variants'
+import {
+	InteroperabilityType,
+	type InteroperabilitySupport,
+} from '@/schema/features/self-sovereignty/interoperability'
+import { popRefs } from '@/schema/reference'
+import { exampleRating } from '@/schema/attributes'
+import { Variant } from '@/schema/variants'
+
+const brand = 'attributes.interoperability'
+
+export type InteroperabilityValue = Value & {
+	thirdPartyCompatibility: InteroperabilityType
+	noSupplierLinkage: InteroperabilityType
+	__brand: 'attributes.interoperability'
+}
+
+function evaluateInteroperability(features: InteroperabilitySupport): Rating {
+	const ratings = [features.thirdPartyCompatibility, features.noSupplierLinkage]
+	const passCount = ratings.filter(r => r === InteroperabilityType.PASS).length
+	if (passCount === 2) {
+		return Rating.PASS
+	}
+	if (passCount === 1) {
+		return Rating.PARTIAL
+	}
+	return Rating.FAIL
+}
+
+export const interoperability: Attribute<InteroperabilityValue> = {
+	id: 'interoperability',
+	icon: '🔗',
+	displayName: 'Interoperability',
+	wording: {
+		midSentenceName: null,
+		howIsEvaluated: "How is a wallet's interoperability evaluated?",
+		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
+			`What can ${walletMetadata.displayName} do to improve its interoperability?`,
+	},
+	question: sentence(
+		(walletMetadata: WalletMetadata) =>
+			`Does ${walletMetadata.displayName} work well with third-party wallets and avoid supplier linkage?`,
+	),
+	why: markdown(
+		`Interoperability ensures the wallet can be used with independent third-party wallets and does not leak identifying metadata to the supplier.`,
+	),
+	methodology: markdown(
+		`Evaluated based on third-party wallet compatibility and supplier independence.`,
+	),
+	ratingScale: {
+		display: 'pass-fail',
+		exhaustive: true,
+		pass: [
+			exampleRating(
+				sentence(() => 'Both sub-criteria are PASS.'),
+				(v: InteroperabilityValue) => v.rating === Rating.PASS,
+			),
+		],
+		partial: [
+			exampleRating(
+				sentence(() => 'One sub-criteria is PASS.'),
+				(v: InteroperabilityValue) => v.rating === Rating.PARTIAL,
+			),
+		],
+		fail: [
+			exampleRating(
+				sentence(() => 'No sub-criteria are PASS.'),
+				(v: InteroperabilityValue) => v.rating === Rating.FAIL,
+			),
+		],
+	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<InteroperabilityValue>>) => {
+		return pickWorstRating<InteroperabilityValue>(perVariant)
+	},
+	evaluate: (features: ResolvedFeatures): Evaluation<InteroperabilityValue> => {
+		if (features.variant !== Variant.HARDWARE) {
+			return unrated(interoperability, brand, {
+				thirdPartyCompatibility: InteroperabilityType.FAIL,
+				noSupplierLinkage: InteroperabilityType.FAIL,
+			})
+		}
+		const interoperabilityFeature = features.selfSovereignty.interoperability
+		if (!interoperabilityFeature) {
+			return unrated(interoperability, brand, {
+				thirdPartyCompatibility: InteroperabilityType.FAIL,
+				noSupplierLinkage: InteroperabilityType.FAIL,
+			})
+		}
+
+		const { withoutRefs, refs: extractedRefs } =
+			popRefs<InteroperabilitySupport>(interoperabilityFeature)
+		const rating = evaluateInteroperability(withoutRefs)
+
+		return {
+			value: {
+				id: 'interoperability',
+				rating,
+				displayName: 'Interoperability',
+				shortExplanation: sentence(
+					(walletMetadata: WalletMetadata) =>
+						`${walletMetadata.displayName} has ${rating.toLowerCase()} interoperability.`,
+				),
+				...withoutRefs,
+				__brand: brand,
+			},
+			details: paragraph(
+				({ wallet }) =>
+					`${wallet.metadata.displayName} interoperability evaluation is ${rating.toLowerCase()}.`,
+			),
+			howToImprove: paragraph(
+				({ wallet }) =>
+					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
+			),
+			...(extractedRefs.length > 0 && { references: extractedRefs }),
+		}
+	},
+}

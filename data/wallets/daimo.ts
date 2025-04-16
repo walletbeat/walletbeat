@@ -1,6 +1,6 @@
 import { Leak, MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
 import type { Wallet } from '@/schema/wallet'
-import { License } from '@/schema/features/license'
+import { License } from '@/schema/features/transparency/license'
 import { daimoInc } from '../entities/daimo'
 import { binance } from '../entities/binance'
 import { openExchangeRates } from '../entities/open-exchange-rates'
@@ -10,7 +10,7 @@ import { merkleManufactory } from '../entities/merkle-manufactory'
 import { pimlico } from '../entities/pimlico'
 import { honeycomb } from '../entities/honeycomb'
 import { WalletProfile } from '@/schema/features/profile'
-import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { veridise } from '../entities/veridise'
 import {
 	TransactionSubmissionL2Support,
