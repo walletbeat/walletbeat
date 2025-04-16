@@ -53,10 +53,16 @@ export const reputation: Attribute<ReputationValue> = {
 			`Does ${walletMetadata.displayName} have a strong reputation for reliability and transparency?`,
 	),
 	why: markdown(
-		`Reputation is an aggregate of product originality, availability, warranty/support, disclosure history, and bug bounty program.`,
+		`A manufacturer's reputation reflects its track record in product design, long-term availability and support, handling of vulnerabilities, and engagement with the security community.
+		A strong reputation builds user trust in the reliability and security of the hardware wallet.`,
 	),
 	methodology: markdown(
-		`Evaluated based on the lowest score among the sub-criteria unless otherwise justified.`,
+		`Evaluated based on an aggregate of factors:
+		- **Product Originality:** Degree of original design versus reliance on third-party components.
+		- **Availability & Support:** History of product availability, risk of discontinuation, and perceived ability to honor warranty/support.
+		- **Vulnerability History:** Track record of security vulnerabilities, their severity, and the transparency/quality of documentation and fixes.
+		- **Bug Bounty Program:** Scope and rewards of the manufacturer's bug bounty program compared to industry standards.
+	`,
 	),
 	ratingScale: {
 		display: 'pass-fail',

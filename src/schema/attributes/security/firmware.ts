@@ -50,10 +50,19 @@ export const firmware: Attribute<FirmwareValue> = {
 		(walletMetadata: WalletMetadata) =>
 			`Does ${walletMetadata.displayName} have secure and open firmware?`,
 	),
-	why: markdown(`Firmware security and openness are critical for trust and upgradability.`),
-	methodology: markdown(
-		`Evaluated based on silent update protection, open source status, reproducible builds, and custom firmware support.`,
-	),
+	why: markdown(`
+		Firmware security and openness are critical for user trust, resistance against attacks, and ensuring the device can be safely upgraded.
+		Users need assurance that the code running on their device is authentic and hasn't been tampered with.
+		Openness allows for independent verification and community audit.
+	`),
+	methodology: markdown(`
+		Evaluated based on several factors:
+		- **Update Security:** Protection against silent/forced updates, authentication requirements for updates, and possibility of downgrades.
+		- **Source Code Openness:** Availability and licensing of firmware source code (full or partial), and isolation between open/closed parts.
+		- **Build Verifiability:** Ability to reproduce firmware builds from source and compare against official binaries (reproducible builds).
+		- **Runtime Integrity:** Mechanisms to check the authenticity of the code running on the device.
+		- **Custom Firmware:** Support for users loading custom firmware and its impact on device security/integrity.
+	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,

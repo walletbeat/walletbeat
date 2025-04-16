@@ -53,12 +53,18 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		(walletMetadata: WalletMetadata) =>
 			`Does ${walletMetadata.displayName} securely generate, protect, and handle keys?`,
 	),
-	why: markdown(
-		`Keys handling is critical for the security of user funds and resistance to attacks.`,
-	),
-	methodology: markdown(
-		`Evaluated based on master secret generation, proprietary mechanisms, key transmission, and physical attack resistance.`,
-	),
+	why: markdown(`
+		Secure key handling is fundamental to the security of user funds. This includes how the master secret (seed) is generated, stored, and used.
+		The device must protect keys from extraction via software or physical attacks (both passive side-channels and active fault injection).
+		It should also ensure that the manufacturer cannot access or recover user keys.
+	`),
+	methodology: markdown(`
+		Evaluated based on:
+		- **Master Secret Generation:** Use of interoperable, well-documented standards for seed generation.
+		- **Key Secrecy:** Resistance against key extraction or recovery by the provider or third parties. Ensuring keys are not transmitted insecurely.
+		- **Proprietary Mechanisms:** Security implications of any non-standard key handling or backup procedures.
+		- **Physical Attack Resistance:** Protection against passive (side-channel analysis) and active (glitching) physical attacks.
+	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,

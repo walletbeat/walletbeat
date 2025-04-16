@@ -1,11 +1,19 @@
 import type { ResolvedFeatures } from '@/schema/features'
-import { Rating, type Value, type Attribute, type Evaluation, exampleRating } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import {
+	Rating,
+	type Value,
+	type Attribute,
+	type Evaluation,
+	exampleRating,
+} from '@/schema/attributes'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
+import type { WalletMetadata, RatedWallet } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { UserSafetyType, type UserSafetySupport } from '@/schema/features/security/user-safety'
 import { popRefs } from '@/schema/reference'
+import { Variant } from '@/schema/variants'
+import { type EvaluationData } from '@/schema/attributes'
 
 const brand = 'attributes.user_safety'
 
@@ -49,10 +57,10 @@ function evaluateUserSafety(features: UserSafetySupport): Rating {
 		features.fullyLocalTxSimulation,
 	]
 	const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
-	if (passCount > 12) {
+	if (passCount >= 11) {
 		return Rating.PASS
 	}
-	if (passCount > 6) {
+	if (passCount >= 6) {
 		return Rating.PARTIAL
 	}
 	return Rating.FAIL
@@ -73,29 +81,37 @@ export const userSafety: Attribute<UserSafetyValue> = {
 			`Does ${walletMetadata.displayName} provide comprehensive user safety features?`,
 	),
 	why: markdown(
-		`User safety covers transaction clarity, risk analysis, simulation, and protection mechanisms for users.`,
+		`User safety features are crucial for ensuring users clearly understand the transactions and messages they are signing on their hardware device.
+		This involves presenting information legibly (human-readable addresses/contracts/parameters), providing tools to verify raw data, offering risk analysis and transaction simulation, and preventing unintended actions.`,
 	),
 	methodology: markdown(
-		`Evaluated based on 18 sub-criteria. PASS if >12/18 PASS, PARTIAL if >6/18 PASS, else FAIL.`,
+		`Evaluated based on 16 sub-criteria:
+		- **Transaction/Message Clarity:** Human-readable display of addresses (e.g., ENS), known contracts, transaction parameters, and EIP-712 message parameters. Ability to review raw data.
+		- **Extensibility:** Ease of adding support for human-readable display of new/unknown transaction or EIP-712 types.
+		- **Expert Mode:** Availability of modes for advanced users to review essential data quickly.
+		- **Risk Analysis:** Support for displaying warnings or risk evaluations for transactions/messages, including options for local or offline analysis.
+		- **Transaction Simulation:** Support for simulating transaction outcomes (e.g., balance changes), including options for local or offline simulation.
+		
+		Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else FAIL.`,
 	),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes more than 12 user safety sub-criteria.'),
+				sentence(() => 'The hardware wallet passes 11 or more user safety sub-criteria.'),
 				(v: UserSafetyValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes more than 6 user safety sub-criteria.'),
+				sentence(() => 'The hardware wallet passes 6 to 10 user safety sub-criteria.'),
 				(v: UserSafetyValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes 6 or fewer user safety sub-criteria.'),
+				sentence(() => 'The hardware wallet passes 5 or fewer user safety sub-criteria.'),
 				(v: UserSafetyValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -104,7 +120,37 @@ export const userSafety: Attribute<UserSafetyValue> = {
 		return pickWorstRating<UserSafetyValue>(perVariant)
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<UserSafetyValue> => {
-		if (!features.userSafety) {
+		if (features.variant !== Variant.HARDWARE) {
+			return exempt(
+				userSafety,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute evaluates hardware wallet user safety features and is not applicable for ${walletMetadata.displayName}.`,
+				),
+				brand,
+				{
+					readableAddress: UserSafetyType.FAIL,
+					contractLabeling: UserSafetyType.FAIL,
+					rawTxReview: UserSafetyType.FAIL,
+					readableTx: UserSafetyType.FAIL,
+					txCoverageExtensibility: UserSafetyType.FAIL,
+					txExpertMode: UserSafetyType.FAIL,
+					rawEip712: UserSafetyType.FAIL,
+					readableEip712: UserSafetyType.FAIL,
+					eip712CoverageExtensibility: UserSafetyType.FAIL,
+					eip712ExpertMode: UserSafetyType.FAIL,
+					riskAnalysis: UserSafetyType.FAIL,
+					riskAnalysisLocal: UserSafetyType.FAIL,
+					fullyLocalRiskAnalysis: UserSafetyType.FAIL,
+					txSimulation: UserSafetyType.FAIL,
+					txSimulationLocal: UserSafetyType.FAIL,
+					fullyLocalTxSimulation: UserSafetyType.FAIL,
+				},
+			)
+		}
+
+		const userSafetyFeature = features.security.userSafety
+		if (!userSafetyFeature) {
 			return unrated(userSafety, brand, {
 				readableAddress: UserSafetyType.FAIL,
 				contractLabeling: UserSafetyType.FAIL,
@@ -122,12 +168,51 @@ export const userSafety: Attribute<UserSafetyValue> = {
 				txSimulation: UserSafetyType.FAIL,
 				txSimulationLocal: UserSafetyType.FAIL,
 				fullyLocalTxSimulation: UserSafetyType.FAIL,
-				__brand: brand,
 			})
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<UserSafetySupport>(features.userSafety)
+		const { withoutRefs, refs: extractedRefs } = popRefs<UserSafetySupport>(userSafetyFeature)
 		const rating = evaluateUserSafety(withoutRefs)
+
+		const passCount = [
+			withoutRefs.readableAddress,
+			withoutRefs.contractLabeling,
+			withoutRefs.rawTxReview,
+			withoutRefs.readableTx,
+			withoutRefs.txCoverageExtensibility,
+			withoutRefs.txExpertMode,
+			withoutRefs.rawEip712,
+			withoutRefs.readableEip712,
+			withoutRefs.eip712CoverageExtensibility,
+			withoutRefs.eip712ExpertMode,
+			withoutRefs.riskAnalysis,
+			withoutRefs.riskAnalysisLocal,
+			withoutRefs.fullyLocalRiskAnalysis,
+			withoutRefs.txSimulation,
+			withoutRefs.txSimulationLocal,
+			withoutRefs.fullyLocalTxSimulation,
+		].filter(r => r === UserSafetyType.PASS).length
+
+		const detailsText = ({ wallet, value }: EvaluationData<UserSafetyValue>) => {
+			let desc = `${wallet.metadata.displayName} user safety evaluation is ${rating.toLowerCase()}.`
+			if (rating !== Rating.EXEMPT) {
+				desc += ` It passes ${passCount} out of 16 sub-criteria.`
+			}
+			return desc
+		}
+
+		const howToImproveText = ({ wallet, value }: EvaluationData<UserSafetyValue>) => {
+			if (rating === Rating.PASS || rating === Rating.EXEMPT) {
+				return ''
+			}
+			return `${wallet.metadata.displayName} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`
+		}
+
+		const improvementText = howToImproveText({
+			wallet: {} as RatedWallet,
+			value: {} as UserSafetyValue,
+			references: [],
+		})
 
 		return {
 			value: {
@@ -141,16 +226,9 @@ export const userSafety: Attribute<UserSafetyValue> = {
 				...withoutRefs,
 				__brand: brand,
 			},
-			details: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} user safety evaluation is ${rating.toLowerCase()}.`,
-			),
-			howToImprove: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
-			),
+			details: paragraph(detailsText),
+			...(improvementText !== '' && { howToImprove: paragraph(howToImproveText) }),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},
-	hardwareOnly: true,
 }

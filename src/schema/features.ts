@@ -27,6 +27,7 @@ import type { KeysHandlingSupport } from './features/security/keys-handling'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
+import type { UserSafetySupport } from './features/security/user-safety'
 
 /**
  * A set of features about a wallet, each of which may or may not depend on
@@ -77,6 +78,7 @@ export interface WalletFeatures {
 		keysHandling?: VariantFeature<KeysHandlingSupport>
 		supplyChainDIY?: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory?: VariantFeature<SupplyChainFactorySupport>
+		userSafety?: VariantFeature<UserSafetySupport>
 	}
 
 	/** Privacy features. */
@@ -158,6 +160,7 @@ export interface ResolvedFeatures {
 		keysHandling: ResolvedFeature<KeysHandlingSupport> | null
 		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport> | null
 		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport> | null
+		userSafety: ResolvedFeature<UserSafetySupport> | null
 	}
 	privacy: {
 		dataCollection: ResolvedFeature<DataCollection>
@@ -209,40 +212,41 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 			hardwareWalletClearSigning: feat(features.security.hardwareWalletClearSigning),
 			passkeyVerification: feat(features.security.passkeyVerification),
 			bugBountyProgram: features.security.bugBountyProgram
-				? feat(features.security.bugBountyProgram)
+				? feat<BugBountyProgramImplementation>(features.security.bugBountyProgram)
 				: undefined,
-			firmware: features.security.firmware ? feat(features.security.firmware) : null,
-			keysHandling: features.security.keysHandling ? feat(features.security.keysHandling) : null,
+			firmware: features.security.firmware ? feat<FirmwareSupport>(features.security.firmware) : null,
+			keysHandling: features.security.keysHandling ? feat<KeysHandlingSupport>(features.security.keysHandling) : null,
 			supplyChainDIY: features.security.supplyChainDIY
-				? feat(features.security.supplyChainDIY)
+				? feat<SupplyChainDIYSupport>(features.security.supplyChainDIY)
 				: null,
 			supplyChainFactory: features.security.supplyChainFactory
-				? feat(features.security.supplyChainFactory)
+				? feat<SupplyChainFactorySupport>(features.security.supplyChainFactory)
 				: null,
+			userSafety: features.security.userSafety ? feat<UserSafetySupport>(features.security.userSafety) : null,
 		},
 		privacy: {
 			dataCollection: feat(features.privacy.dataCollection),
 			privacyPolicy: feat(features.privacy.privacyPolicy),
 			hardwarePrivacy: features.privacy.hardwarePrivacy
-				? feat(features.privacy.hardwarePrivacy)
+				? feat<HardwarePrivacySupport>(features.privacy.hardwarePrivacy)
 				: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: feat(features.selfSovereignty.transactionSubmission),
 			interoperability: features.selfSovereignty.interoperability
-				? feat(features.selfSovereignty.interoperability)
+				? feat<InteroperabilitySupport>(features.selfSovereignty.interoperability)
 				: null,
 		},
 		transparency: {
 			feeTransparency: feat(features.transparency.feeTransparency),
-			reputation: features.transparency.reputation ? feat(features.transparency.reputation) : null,
+			reputation: features.transparency.reputation ? feat<ReputationSupport>(features.transparency.reputation) : null,
 			maintenance: features.transparency.maintenance
-				? feat(features.transparency.maintenance)
+				? feat<MaintenanceSupport>(features.transparency.maintenance)
 				: null,
 		},
 		ecosystem: {
 			ecosystemAlignment: features.ecosystem?.ecosystemAlignment
-				? feat(features.ecosystem.ecosystemAlignment)
+				? feat<EcosystemAlignmentSupport>(features.ecosystem.ecosystemAlignment)
 				: null,
 		},
 		chainConfigurability: feat(features.chainConfigurability),

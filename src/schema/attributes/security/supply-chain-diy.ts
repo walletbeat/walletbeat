@@ -47,9 +47,14 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 			`Does ${walletMetadata.displayName} have a transparent and flexible DIY supply chain?`,
 	),
 	why: markdown(
-		`DIY supply chain criteria ensure that users can source components without NDAs and from multiple suppliers.`,
+		`For Do-It-Yourself (DIY) hardware wallets, a transparent and flexible supply chain allows users to source components independently and verify the hardware they are building.
+		Avoiding components that require Non-Disclosure Agreements (NDAs) is crucial for transparency and auditability.`
 	),
-	methodology: markdown(`Evaluated based on NDA-free sourcing and regional sourcing flexibility.`),
+	methodology: markdown(
+		`Evaluated based on:
+		- **NDA-Free Sourcing:** Whether all necessary components can be acquired without signing NDAs.
+		- **Sourcing Complexity:** The ease with which components can be sourced from multiple suppliers across different regions, promoting resilience against single points of failure.
+	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,

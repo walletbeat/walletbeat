@@ -48,10 +48,15 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 			`Does ${walletMetadata.displayName} protect user privacy at the hardware level?`,
 	),
 	why: markdown(
-		`Hardware privacy ensures that the device does not leak sensitive information during setup or operation.`,
+		`Hardware privacy ensures that the device itself does not leak sensitive user information (like IP address, public keys, or usage patterns) during setup, regular operation, or updates.
+		This is distinct from the privacy features of the transactions created *using* the wallet.`,
 	),
 	methodology: markdown(
-		`Evaluated based on phoning home, inspectability of remote calls, and wireless communication privacy.`,
+		`Evaluated based on:
+		- **Phoning Home:** Whether the device contacts manufacturer servers during setup, operation, or updates, and if these connections are necessary.
+		- **Inspectability:** Ability to monitor and understand data exchanged if the device does phone home.
+		- **Wireless Privacy:** Protection of data transmitted over wireless connections (e.g., BLE, WiFi) against local attackers.
+	`,
 	),
 	ratingScale: {
 		display: 'pass-fail',

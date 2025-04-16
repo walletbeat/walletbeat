@@ -55,10 +55,18 @@ export const maintenance: Attribute<MaintenanceValue> = {
 		(walletMetadata: WalletMetadata) =>
 			`Does ${walletMetadata.displayName} have good maintenance practices?`,
 	),
-	why: markdown(`Maintenance ensures long-term usability and reliability.`),
+	why: markdown(`
+		Good maintenance practices ensure the long-term usability, reliability, and physical durability of a hardware wallet.
+		This includes the device's resistance to physical damage, the availability of repair information and parts, battery longevity and replaceability, and the manufacturer's warranty policy.
+	`),
 	methodology: markdown(
-		`Evaluated based on durability, documentation, repairability, battery handling, and warranty.`,
-	),
+		`Evaluated based on:
+		- **Physical Durability:** Resistance to drops and environmental factors.
+		- **MTBF Documentation:** Availability and reliability of Mean Time Between Failures data.
+		- **Repairability:** Ease of repair, availability of parts and documentation, and potential security implications of repairs.
+		- **Battery:** Presence, replaceability, and device functionality if the battery dies.
+		- **Warranty:** Length of warranty period, coverage limitations, and possibility of extension.
+	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
