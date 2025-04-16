@@ -249,21 +249,8 @@ export function WalletPage({
 			caption: null,
 			icon: null,
 			body: (
-				<div data-testid="wallet-blurb">
-					<div
-						// sx={{
-						// 	display: 'flex',
-						// 	flexDirection: 'row',
-						// 	gap: '1rem',
-						// 	marginTop: '1rem',
-						// 	marginBottom: '24px',
-						// 	alignItems: 'center',
-						// 	flexWrap: 'wrap',
-						// 	padding: '2px',
-						// 	backgroundColor: 'var(--background)',
-						// }}
-						className="flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]"
-					>
+				<div data-testid="wallet-blurb" className="break-words whitespace-normal">
+					<div className="flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]">
 						{[
 							<div className="flex flex-row gap-2 items-center" key="website">
 								<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
@@ -297,10 +284,12 @@ export function WalletPage({
 									),
 							)}
 					</div>
-					<RenderTypographicContent
-						content={wallet.metadata.blurb.render({})}
-						typography={{ variant: 'body1' }}
-					/>
+					<div className="break-words whitespace-normal">
+						<RenderTypographicContent
+							content={wallet.metadata.blurb.render({})}
+							typography={{ variant: 'body1' }}
+						/>
+					</div>
 					<Typography fontSize="0.9rem" marginTop="3rem">
 						<React.Fragment key="begin">
 							<span style={{ color: 'var(--accent)' }}>Platforms: </span>
@@ -383,6 +372,7 @@ export function WalletPage({
 											evalAttr={evalAttr}
 											attributeKey={String(attributeKey)}
 											variantSpecificity={VariantSpecificity.ALL_SAME}
+											displayedVariant={pickedVariant}
 										/>
 									),
 								}
@@ -431,6 +421,7 @@ export function WalletPage({
 											evalAttr={evalAttr}
 											attributeKey={String(attributeKey)}
 											variantSpecificity={VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT}
+											displayedVariant={relevantVariants[0]}
 										/>
 									),
 								}
@@ -504,6 +495,7 @@ export function WalletPage({
 										evalAttr={evalAttr}
 										attributeKey={String(attributeKey)}
 										variantSpecificity={VariantSpecificity.NOT_UNIVERSAL}
+										displayedVariant={pickedVariant}
 									/>
 								),
 							}
@@ -598,7 +590,7 @@ export function WalletPage({
 			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
 				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
 					<div className="flex flex-row">
-						<div className="flex-1">
+						<div className="flex-1 min-w-0">
 							<div style={{ height: headerBottomMargin }}></div>
 							<div className="px-8">
 								<Typography
