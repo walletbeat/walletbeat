@@ -318,7 +318,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet implements passkeys using [WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the less efficient FreshCryptoLib.
+					The wallet implements passkeys using [WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the FreshCryptoLib.
 				`),
 				webAuthnSolImplementation({
 					library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
