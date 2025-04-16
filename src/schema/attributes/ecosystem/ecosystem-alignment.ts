@@ -10,6 +10,7 @@ import {
 } from '@/schema/features/ecosystem/ecosystem-alignment'
 import { popRefs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
+import { exampleRating } from '@/schema/attributes'
 
 const brand = 'attributes.ecosystem_alignment'
 
@@ -49,11 +50,26 @@ export const ecosystemAlignment: Attribute<EcosystemAlignmentValue> = {
 	why: markdown(`Ecosystem alignment ensures compatibility with important Ethereum standards.`),
 	methodology: markdown(`Evaluated based on support for EIP-1559, EIP-7702, and EIP-4337.`),
 	ratingScale: {
-		display: 'pass-partial-fail',
+		display: 'pass-fail',
 		exhaustive: true,
-		pass: ['All sub-criteria are PASS'],
-		partial: ['At least one sub-criteria is PASS'],
-		fail: ['No sub-criteria are PASS'],
+		pass: [
+			exampleRating(
+				sentence(() => 'All sub-criteria are PASS.'),
+				(v: EcosystemAlignmentValue) => v.rating === Rating.PASS,
+			),
+		],
+		partial: [
+			exampleRating(
+				sentence(() => 'At least one sub-criteria is PASS.'),
+				(v: EcosystemAlignmentValue) => v.rating === Rating.PARTIAL,
+			),
+		],
+		fail: [
+			exampleRating(
+				sentence(() => 'No sub-criteria are PASS.'),
+				(v: EcosystemAlignmentValue) => v.rating === Rating.FAIL,
+			),
+		],
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<EcosystemAlignmentValue>>) => {
 		return pickWorstRating<EcosystemAlignmentValue>(perVariant)
@@ -75,9 +91,8 @@ export const ecosystemAlignment: Attribute<EcosystemAlignmentValue> = {
 			})
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<EcosystemAlignmentSupport>(
-			alignmentFeature,
-		)
+		const { withoutRefs, refs: extractedRefs } =
+			popRefs<EcosystemAlignmentSupport>(alignmentFeature)
 		const rating = evaluateEcosystemAlignment(withoutRefs)
 
 		return {

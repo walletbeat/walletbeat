@@ -73,10 +73,10 @@ export interface WalletFeatures {
 		/** Bug bounty program implementation (for hardware wallets) */
 		bugBountyProgram?: VariantFeature<BugBountyProgramImplementation>
 
-		firmware: VariantFeature<FirmwareSupport>
-		keysHandling: VariantFeature<KeysHandlingSupport>
-		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
-		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
+		firmware?: VariantFeature<FirmwareSupport>
+		keysHandling?: VariantFeature<KeysHandlingSupport>
+		supplyChainDIY?: VariantFeature<SupplyChainDIYSupport>
+		supplyChainFactory?: VariantFeature<SupplyChainFactorySupport>
 	}
 
 	/** Privacy features. */
@@ -87,7 +87,7 @@ export interface WalletFeatures {
 		/** Privacy policy URL of the wallet. */
 		privacyPolicy: VariantFeature<string>
 
-		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>
+		hardwarePrivacy?: VariantFeature<HardwarePrivacySupport>
 	}
 
 	/** Self-sovereignty features. */
@@ -95,7 +95,7 @@ export interface WalletFeatures {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<TransactionSubmission>
 
-		interoperability: VariantFeature<InteroperabilitySupport>
+		interoperability?: VariantFeature<InteroperabilitySupport>
 	}
 
 	/** Transparency features. */
@@ -103,8 +103,8 @@ export interface WalletFeatures {
 		/** Fee transparency information. */
 		feeTransparency: VariantFeature<FeeTransparencySupport>
 
-		reputation: VariantFeature<ReputationSupport>
-		maintenance: VariantFeature<MaintenanceSupport>
+		reputation?: VariantFeature<ReputationSupport>
+		maintenance?: VariantFeature<MaintenanceSupport>
 	}
 
 	/** Level of configurability for chains. */
@@ -128,8 +128,8 @@ export interface WalletFeatures {
 	/** The monetization model of the wallet. */
 	monetization: VariantFeature<Monetization>
 
-	ecosystem: {
-		ecosystemAlignment: VariantFeature<EcosystemAlignmentSupport>
+	ecosystem?: {
+		ecosystemAlignment?: VariantFeature<EcosystemAlignmentSupport>
 	}
 }
 
@@ -154,27 +154,27 @@ export interface ResolvedFeatures {
 		hardwareWalletClearSigning: ResolvedFeature<HardwareWalletClearSigningSupport>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram?: ResolvedFeature<BugBountyProgramImplementation>
-		firmware: ResolvedFeature<FirmwareSupport>
-		keysHandling: ResolvedFeature<KeysHandlingSupport>
-		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport>
-		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>
+		firmware: ResolvedFeature<FirmwareSupport> | null
+		keysHandling: ResolvedFeature<KeysHandlingSupport> | null
+		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport> | null
+		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport> | null
 	}
 	privacy: {
 		dataCollection: ResolvedFeature<DataCollection>
 		privacyPolicy: ResolvedFeature<string>
-		hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport>
+		hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport> | null
 	}
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
-		interoperability: ResolvedFeature<InteroperabilitySupport>
+		interoperability: ResolvedFeature<InteroperabilitySupport> | null
 	}
 	transparency: {
 		feeTransparency: ResolvedFeature<FeeTransparencySupport>
-		reputation: ResolvedFeature<ReputationSupport>
-		maintenance: ResolvedFeature<MaintenanceSupport>
+		reputation: ResolvedFeature<ReputationSupport> | null
+		maintenance: ResolvedFeature<MaintenanceSupport> | null
 	}
 	ecosystem: {
-		ecosystemAlignment: ResolvedFeature<EcosystemAlignmentSupport>
+		ecosystemAlignment: ResolvedFeature<EcosystemAlignmentSupport> | null
 	}
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
 	accountSupport: ResolvedFeature<AccountSupport>
@@ -211,27 +211,39 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 			bugBountyProgram: features.security.bugBountyProgram
 				? feat(features.security.bugBountyProgram)
 				: undefined,
-			firmware: feat(features.security.firmware),
-			keysHandling: feat(features.security.keysHandling),
-			supplyChainDIY: feat(features.security.supplyChainDIY),
-			supplyChainFactory: feat(features.security.supplyChainFactory),
+			firmware: features.security.firmware ? feat(features.security.firmware) : null,
+			keysHandling: features.security.keysHandling ? feat(features.security.keysHandling) : null,
+			supplyChainDIY: features.security.supplyChainDIY
+				? feat(features.security.supplyChainDIY)
+				: null,
+			supplyChainFactory: features.security.supplyChainFactory
+				? feat(features.security.supplyChainFactory)
+				: null,
 		},
 		privacy: {
 			dataCollection: feat(features.privacy.dataCollection),
 			privacyPolicy: feat(features.privacy.privacyPolicy),
-			hardwarePrivacy: feat(features.privacy.hardwarePrivacy),
+			hardwarePrivacy: features.privacy.hardwarePrivacy
+				? feat(features.privacy.hardwarePrivacy)
+				: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: feat(features.selfSovereignty.transactionSubmission),
-			interoperability: feat(features.selfSovereignty.interoperability),
+			interoperability: features.selfSovereignty.interoperability
+				? feat(features.selfSovereignty.interoperability)
+				: null,
 		},
 		transparency: {
 			feeTransparency: feat(features.transparency.feeTransparency),
-			reputation: feat(features.transparency.reputation),
-			maintenance: feat(features.transparency.maintenance),
+			reputation: features.transparency.reputation ? feat(features.transparency.reputation) : null,
+			maintenance: features.transparency.maintenance
+				? feat(features.transparency.maintenance)
+				: null,
 		},
 		ecosystem: {
-			ecosystemAlignment: feat(features.ecosystem.ecosystemAlignment),
+			ecosystemAlignment: features.ecosystem?.ecosystemAlignment
+				? feat(features.ecosystem.ecosystemAlignment)
+				: null,
 		},
 		chainConfigurability: feat(features.chainConfigurability),
 		accountSupport: feat(features.accountSupport),

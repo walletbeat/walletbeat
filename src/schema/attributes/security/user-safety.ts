@@ -137,4 +137,5 @@ export const userSafety: Attribute<UserSafetyValue> = {
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},
+	hardwareOnly: true,
 }

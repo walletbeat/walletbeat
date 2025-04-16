@@ -356,4 +356,5 @@ export const hardwareWalletClearSigning: Attribute<HardwareWalletClearSigningVal
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletClearSigningValue>>) =>
 		pickWorstRating<HardwareWalletClearSigningValue>(perVariant),
+	hardwareOnly: true,
 }

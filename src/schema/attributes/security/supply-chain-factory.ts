@@ -89,7 +89,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		return pickWorstRating<SupplyChainFactoryValue>(perVariant)
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainFactoryValue> => {
-		if (!features.supplyChainFactory) {
+		if (features.variant !== Variant.HARDWARE) {
 			return unrated(supplyChainFactory, brand, {
 				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
 				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
@@ -97,13 +97,21 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 				hardwareVerification: SupplyChainFactoryType.FAIL,
 				tamperResistance: SupplyChainFactoryType.FAIL,
 				genuineCheck: SupplyChainFactoryType.FAIL,
-				__brand: brand,
+			})
+		}
+		const factoryFeature = features.security.supplyChainFactory
+		if (!factoryFeature) {
+			return unrated(supplyChainFactory, brand, {
+				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+				tamperEvidence: SupplyChainFactoryType.FAIL,
+				hardwareVerification: SupplyChainFactoryType.FAIL,
+				tamperResistance: SupplyChainFactoryType.FAIL,
+				genuineCheck: SupplyChainFactoryType.FAIL,
 			})
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<SupplyChainFactorySupport>(
-			features.supplyChainFactory,
-		)
+		const { withoutRefs, refs: extractedRefs } = popRefs<SupplyChainFactorySupport>(factoryFeature)
 		const rating = evaluateSupplyChainFactory(withoutRefs)
 
 		return {

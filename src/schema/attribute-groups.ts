@@ -30,7 +30,8 @@ import {
 	type FeeTransparencyValue,
 } from './attributes/transparency/fee-transparency'
 import type { ResolvedFeatures } from './features'
-import type { AtLeastOneVariant, Variant } from './variants'
+import type { AtLeastOneVariant } from './variants'
+import { Variant } from './variants'
 import type { Dict } from '@/types/utils/dict'
 import { funding, type FundingValue } from './attributes/transparency/funding'
 import {
@@ -441,7 +442,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 		).attribute
 		const evaluations = nonEmptyRemap(
 			perVariant,
-			(_: Variant, tree: EvaluationTree) => getter(tree).evaluation,
+			(_, tree: EvaluationTree) => getter(tree).evaluation,
 		)
 		return {
 			attribute,
@@ -596,4 +597,64 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 		}
 		return null
 	}
+}
+
+// Hardware-only attribute IDs for each group
+const hardwareOnlySecurity = [
+	'supplyChainDIY',
+	'supplyChainFactory',
+	'firmware',
+	'keysHandling',
+	'userSafety',
+]
+const hardwareOnlyPrivacy = ['hardwarePrivacy']
+const hardwareOnlyTransparency = ['reputation', 'maintenance']
+const hardwareOnlyEcosystem = ['ecosystemAlignment', 'interoperability']
+
+/**
+ * Returns attribute groups relevant for the wallet.
+ * NOTE: This function currently returns all defined groups, but could be used for filtering later.
+ */
+export function getAttributeGroupsForWallet(features: ResolvedFeatures | undefined) {
+	// TODO: Add logic here if we ever need to return different *sets* of groups
+	// based on features. For now, just return the main attribute tree.
+	// Remove the previous filtering logic that was causing double-filtering.
+	return {
+		security: securityAttributeGroup,
+		privacy: privacyAttributeGroup,
+		selfSovereignty: selfSovereigntyAttributeGroup,
+		transparency: transparencyAttributeGroup,
+		ecosystem: ecosystemAttributeGroup,
+		maintenance: maintenanceAttributeGroup, // Assuming maintenance is always relevant
+	}
+}
+
+/**
+ * Returns only the attributes relevant for the wallet (filters out hardwareOnly attributes for non-hardware wallets).
+ */
+export function getVisibleAttributesForWallet(
+	attrGroup: AttributeGroup<any>,
+	features: any,
+	isHardwareWallet: boolean,
+) {
+	let hardwareOnly: string[] = []
+	switch (attrGroup.id) {
+		case 'security':
+			hardwareOnly = hardwareOnlySecurity
+			break
+		case 'privacy':
+			hardwareOnly = hardwareOnlyPrivacy
+			break
+		case 'transparency':
+			hardwareOnly = hardwareOnlyTransparency
+			break
+		case 'ecosystem':
+			hardwareOnly = hardwareOnlyEcosystem
+			break
+		default:
+			hardwareOnly = []
+	}
+	return Object.entries(attrGroup.attributes).filter(
+		([id, _attr]) => isHardwareWallet || !hardwareOnly.includes(id),
+	)
 }
