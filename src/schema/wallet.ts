@@ -248,7 +248,7 @@ function resolveVariant(wallet: Wallet, variant: Variant): ResolvedWallet | null
 		metadata: wallet.metadata,
 		variant,
 		features: resolvedFeatures,
-		attributes: evaluateAttributes(resolvedFeatures),
+		attributes: evaluateAttributes(resolvedFeatures, wallet.metadata),
 	}
 }
 

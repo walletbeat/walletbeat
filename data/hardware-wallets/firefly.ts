@@ -22,7 +22,7 @@ export const fireflyWallet: Wallet = {
 		repoUrl: null,
 		contributors: [nconsigny],
 		lastUpdated: '2025-03-12',
-		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
 		hardwareWalletModels: [
 			{
 				id: 'firefly-v1',

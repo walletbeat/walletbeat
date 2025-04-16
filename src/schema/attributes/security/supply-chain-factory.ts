@@ -1,6 +1,6 @@
 import type { ResolvedFeatures } from '@/schema/features'
 import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
@@ -11,6 +11,7 @@ import {
 import { popRefs } from '@/schema/reference'
 import { exampleRating } from '@/schema/attributes'
 import { Variant } from '@/schema/variants'
+import { HardwareWalletManufactureType } from '@/schema/features/profile'
 
 const brand = 'attributes.supply_chain_factory'
 
@@ -46,7 +47,7 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 	id: 'supply_chain_factory',
 	icon: '🏭',
-	displayName: 'Supply Chain (Factory)',
+	displayName: 'Supply Chain Factory',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a factory wallet's supply chain evaluated?",
@@ -107,6 +108,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 				genuineCheck: SupplyChainFactoryType.FAIL,
 			})
 		}
+
 		const factoryFeature = features.security.supplyChainFactory
 		if (!factoryFeature) {
 			return unrated(supplyChainFactory, brand, {
@@ -126,7 +128,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 			value: {
 				id: 'supply_chain_factory',
 				rating,
-				displayName: 'Supply Chain (Factory)',
+				displayName: 'Supply Chain Factory',
 				shortExplanation: sentence(
 					(walletMetadata: WalletMetadata) =>
 						`${walletMetadata.displayName} has ${rating.toLowerCase()} factory supply chain.`,

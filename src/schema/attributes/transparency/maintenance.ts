@@ -66,7 +66,8 @@ export const maintenance: Attribute<MaintenanceValue> = {
 		- **Repairability:** Ease of repair, availability of parts and documentation, and potential security implications of repairs.
 		- **Battery:** Presence, replaceability, and device functionality if the battery dies.
 		- **Warranty:** Length of warranty period, coverage limitations, and possibility of extension.
-	`),
+	`,
+	),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,

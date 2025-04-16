@@ -110,6 +110,10 @@ import {
 import { firmware, type FirmwareValue } from './attributes/security/firmware'
 import { keysHandling, type KeysHandlingValue } from './attributes/security/keys-handling'
 import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
+import { exempt } from './attributes/common'
+import { HardwareWalletManufactureType } from './features/profile'
+import { SupplyChainDIYType } from './features/security/supply-chain-diy'
+import { SupplyChainFactoryType } from './features/security/supply-chain-factory'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
@@ -384,12 +388,57 @@ export interface EvaluationTree
 	ecosystem: EcosystemEvaluations
 }
 
-/** Rate a wallet's attributes based on its features. */
-export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
+/** Rate a wallet's attributes based on its features and metadata. */
+export function evaluateAttributes(
+	features: ResolvedFeatures,
+	metadata: WalletMetadata,
+): EvaluationTree {
 	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => ({
 		attribute: attr,
 		evaluation: attr.evaluate(features),
 	})
+
+	// Helper for exempt evaluation
+	const createExemptEvaluation = <V extends Value>(
+		attr: Attribute<V>,
+		reason: string,
+		defaultValue: Omit<V, keyof Value | '__brand'>,
+	): EvaluatedAttribute<V> => ({
+		attribute: attr,
+		evaluation: exempt(attr, sentence(reason), `attributes.${attr.id}` as any, defaultValue),
+	})
+
+	// Determine if DIY/Factory attributes should be exempt
+	const isHardware = features.variant === Variant.HARDWARE
+	const isDIY =
+		isHardware && metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
+	const isFactory =
+		isHardware &&
+		metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE
+
+	const supplyChainDIYEvaluation =
+		!isDIY && isHardware // Exempt if Hardware but not DIY
+			? createExemptEvaluation(supplyChainDIY, 'Attribute only applies to DIY hardware wallets.', {
+					diyNoNda: SupplyChainDIYType.FAIL,
+					componentSourcingComplexity: SupplyChainDIYType.FAIL,
+				})
+			: evalAttr(supplyChainDIY)
+
+	const supplyChainFactoryEvaluation = isDIY // Exempt if DIY
+		? createExemptEvaluation(
+				supplyChainFactory,
+				'Attribute only applies to Factory-Made hardware wallets.',
+				{
+					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+					tamperEvidence: SupplyChainFactoryType.FAIL,
+					hardwareVerification: SupplyChainFactoryType.FAIL,
+					tamperResistance: SupplyChainFactoryType.FAIL,
+					genuineCheck: SupplyChainFactoryType.FAIL,
+				},
+			)
+		: evalAttr(supplyChainFactory)
+
 	return {
 		security: {
 			securityAudits: evalAttr(securityAudits),
@@ -400,8 +449,8 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 			softwareHWIntegration: evalAttr(softwareHWIntegration),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
-			supply_chain_diy: evalAttr(supplyChainDIY),
-			supply_chain_factory: evalAttr(supplyChainFactory),
+			supply_chain_diy: supplyChainDIYEvaluation,
+			supply_chain_factory: supplyChainFactoryEvaluation,
 			firmware: evalAttr(firmware),
 			keysHandling: evalAttr(keysHandling),
 			userSafety: evalAttr(userSafety),
@@ -621,6 +670,11 @@ export function getEvaluationFromOtherTree<V extends Value>(
 	const otherEvalAttr = mapAttributeGroups(
 		otherTree,
 		(_, evalGroup): EvaluatedAttribute<V> | undefined => {
+			// Add check here: If evalGroup is undefined, return undefined immediately
+			if (!evalGroup) {
+				return undefined
+			}
+			// Now it's safe to use Object.hasOwn
 			if (Object.hasOwn(evalGroup, evalAttr.attribute.id)) {
 				return evalGroup[evalAttr.attribute.id] as unknown as EvaluatedAttribute<V>
 			}
