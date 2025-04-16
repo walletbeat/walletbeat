@@ -60,12 +60,12 @@ export const maintenance: Attribute<MaintenanceValue> = {
 		This includes the device's resistance to physical damage, the availability of repair information and parts, battery longevity and replaceability, and the manufacturer's warranty policy.
 	`),
 	methodology: markdown(
-		`Evaluated based on:
-		- **Physical Durability:** Resistance to drops and environmental factors.
-		- **MTBF Documentation:** Availability and reliability of Mean Time Between Failures data.
-		- **Repairability:** Ease of repair, availability of parts and documentation, and potential security implications of repairs.
-		- **Battery:** Presence, replaceability, and device functionality if the battery dies.
-		- **Warranty:** Length of warranty period, coverage limitations, and possibility of extension.
+		`Evaluated based on:  
+		- **Physical Durability:** Resistance to drops and environmental factors.  
+		- **MTBF Documentation:** Availability and reliability of Mean Time Between Failures data.  
+		- **Repairability:** Ease of repair, availability of parts and documentation, and potential security implications of repairs.  
+		- **Battery:** Presence, replaceability, and device functionality if the battery dies.  
+		- **Warranty:** Length of warranty period, coverage limitations, and possibility of extension.  
 	`,
 	),
 	ratingScale: {

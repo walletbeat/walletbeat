@@ -56,12 +56,12 @@ export const firmware: Attribute<FirmwareValue> = {
 		Openness allows for independent verification and community audit.
 	`),
 	methodology: markdown(`
-		Evaluated based on several factors:
-		- **Update Security:** Protection against silent/forced updates, authentication requirements for updates, and possibility of downgrades.
-		- **Source Code Openness:** Availability and licensing of firmware source code (full or partial), and isolation between open/closed parts.
-		- **Build Verifiability:** Ability to reproduce firmware builds from source and compare against official binaries (reproducible builds).
-		- **Runtime Integrity:** Mechanisms to check the authenticity of the code running on the device.
-		- **Custom Firmware:** Support for users loading custom firmware and its impact on device security/integrity.
+		Evaluated based on several factors:  
+		- **Update Security:** Protection against silent/forced updates, authentication requirements for updates, and possibility of downgrades.  
+		- **Source Code Openness:** Availability and licensing of firmware source code (full or partial), and isolation between open/closed parts.  
+		- **Build Verifiability:** Ability to reproduce firmware builds from source and compare against official binaries (reproducible builds).  
+		- **Runtime Integrity:** Mechanisms to check the authenticity of the code running on the device.  
+		- **Custom Firmware:** Support for users loading custom firmware and its impact on device security/integrity.  
 	`),
 	ratingScale: {
 		display: 'pass-fail',
