@@ -18,10 +18,10 @@ import {
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { nconsigny } from '../contributors/nconsigny'
 import { Variant } from '@/schema/variants'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 
 export const daimo: Wallet = {
 	metadata: {
@@ -140,9 +140,8 @@ export const daimo: Wallet = {
 				supportedWallets: {},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
-				details: 'Daimo does not support hardware wallets.',
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.FULL,
 				ref: null,
 			},
 		},

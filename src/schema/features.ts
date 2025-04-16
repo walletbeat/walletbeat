@@ -14,14 +14,13 @@ import type { AccountSupport } from './features/account-support'
 import type { Support } from './features/support'
 import type { ScamAlerts } from './features/security/scam-alerts'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
-import type { HardwareWalletClearSigningSupport } from './features/security/hardware-wallet-clear-signing'
+import type { HardwareWalletDappSigningImplementation } from './features/security/hardware-wallet-dapp-signing'
 import type { FeeTransparencySupport } from './features/transparency/fee-transparency'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
 import { type BugBountyProgramImplementation } from './features/security/bug-bounty-program'
 import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { ReputationSupport } from './features/transparency/reputation'
 import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'
-import type { EcosystemAlignmentSupport } from './features/ecosystem/ecosystem-alignment'
 import type { FirmwareSupport } from './features/security/firmware'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
@@ -65,8 +64,8 @@ export interface WalletFeatures {
 		/** Hardware wallet support */
 		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
 
-		/** Hardware wallet clear signing support */
-		hardwareWalletClearSigning: VariantFeature<HardwareWalletClearSigningSupport>
+		/** Hardware wallet dApp signing support */
+		hardwareWalletDappSigning: VariantFeature<HardwareWalletDappSigningImplementation>
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
@@ -131,7 +130,7 @@ export interface WalletFeatures {
 	monetization: VariantFeature<Monetization>
 
 	ecosystem?: {
-		ecosystemAlignment?: VariantFeature<EcosystemAlignmentSupport>
+		// ecosystemAlignment?: VariantFeature<EcosystemAlignmentSupport>
 	}
 }
 
@@ -153,7 +152,7 @@ export interface ResolvedFeatures {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
-		hardwareWalletClearSigning: ResolvedFeature<HardwareWalletClearSigningSupport>
+		hardwareWalletDappSigning: ResolvedFeature<HardwareWalletDappSigningImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram?: ResolvedFeature<BugBountyProgramImplementation>
 		firmware: ResolvedFeature<FirmwareSupport> | null
@@ -177,7 +176,7 @@ export interface ResolvedFeatures {
 		maintenance: ResolvedFeature<MaintenanceSupport> | null
 	}
 	ecosystem: {
-		ecosystemAlignment: ResolvedFeature<EcosystemAlignmentSupport> | null
+		// ecosystemAlignment: ResolvedFeature<EcosystemAlignmentSupport> | null
 	}
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
 	accountSupport: ResolvedFeature<AccountSupport>
@@ -209,20 +208,26 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 				ethereumL1: feat(features.security.lightClient.ethereumL1),
 			},
 			hardwareWalletSupport: feat(features.security.hardwareWalletSupport),
-			hardwareWalletClearSigning: feat(features.security.hardwareWalletClearSigning),
+			hardwareWalletDappSigning: feat(features.security.hardwareWalletDappSigning),
 			passkeyVerification: feat(features.security.passkeyVerification),
 			bugBountyProgram: features.security.bugBountyProgram
 				? feat<BugBountyProgramImplementation>(features.security.bugBountyProgram)
 				: undefined,
-			firmware: features.security.firmware ? feat<FirmwareSupport>(features.security.firmware) : null,
-			keysHandling: features.security.keysHandling ? feat<KeysHandlingSupport>(features.security.keysHandling) : null,
+			firmware: features.security.firmware
+				? feat<FirmwareSupport>(features.security.firmware)
+				: null,
+			keysHandling: features.security.keysHandling
+				? feat<KeysHandlingSupport>(features.security.keysHandling)
+				: null,
 			supplyChainDIY: features.security.supplyChainDIY
 				? feat<SupplyChainDIYSupport>(features.security.supplyChainDIY)
 				: null,
 			supplyChainFactory: features.security.supplyChainFactory
 				? feat<SupplyChainFactorySupport>(features.security.supplyChainFactory)
 				: null,
-			userSafety: features.security.userSafety ? feat<UserSafetySupport>(features.security.userSafety) : null,
+			userSafety: features.security.userSafety
+				? feat<UserSafetySupport>(features.security.userSafety)
+				: null,
 		},
 		privacy: {
 			dataCollection: feat(features.privacy.dataCollection),
@@ -239,15 +244,17 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 		},
 		transparency: {
 			feeTransparency: feat(features.transparency.feeTransparency),
-			reputation: features.transparency.reputation ? feat<ReputationSupport>(features.transparency.reputation) : null,
+			reputation: features.transparency.reputation
+				? feat<ReputationSupport>(features.transparency.reputation)
+				: null,
 			maintenance: features.transparency.maintenance
 				? feat<MaintenanceSupport>(features.transparency.maintenance)
 				: null,
 		},
 		ecosystem: {
-			ecosystemAlignment: features.ecosystem?.ecosystemAlignment
-				? feat<EcosystemAlignmentSupport>(features.ecosystem.ecosystemAlignment)
-				: null,
+			// ecosystemAlignment: features.ecosystem?.ecosystemAlignment
+			// 	? feat<EcosystemAlignmentSupport>(features.ecosystem.ecosystemAlignment)
+			// 	: null,
 		},
 		chainConfigurability: feat(features.chainConfigurability),
 		accountSupport: feat(features.accountSupport),

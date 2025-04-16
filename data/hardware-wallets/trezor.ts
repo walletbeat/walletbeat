@@ -3,11 +3,11 @@ import type { Wallet } from '@/schema/wallet'
 import { WalletProfile, HardwareWalletManufactureType } from '@/schema/features/profile'
 import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { featureSupported } from '@/schema/features/support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 
 export const trezorWallet: Wallet = {
 	metadata: {
@@ -88,10 +88,10 @@ export const trezorWallet: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.PARTIAL,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.PARTIAL,
 				details:
-					'Trezor provides partial clear signing support with most transaction details displayed on the device screen, but some complex transactions may not show all details.',
+					'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
 				ref: [
 					{
 						url: 'https://youtu.be/7lP_0h-PPvY?si=07dMNswh_9RsuWQ9&t=879',

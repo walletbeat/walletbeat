@@ -3,7 +3,7 @@ import type { Wallet } from '@/schema/wallet'
 import { WalletProfile, HardwareWalletManufactureType } from '@/schema/features/profile'
 import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { featureSupported } from '@/schema/features/support'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -66,8 +66,8 @@ export const fireflyWallet: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
 				details:
 					'Firefly currently does not provide clear signing support as it is still in development.',
 				ref: null,

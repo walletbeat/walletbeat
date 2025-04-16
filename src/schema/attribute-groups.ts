@@ -59,9 +59,9 @@ import {
 } from './attributes/ecosystem/address-resolution'
 import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
 import {
-	hardwareWalletClearSigning,
-	type HardwareWalletClearSigningValue,
-} from './attributes/security/hardware-wallet-clear-signing'
+	hardwareWalletDappSigning,
+	type HardwareWalletDappSigningValue,
+} from './attributes/security/hardware-wallet-dapp-signing'
 import {
 	hardwareWalletSupport,
 	type HardwareWalletSupportValue,
@@ -94,10 +94,6 @@ import { scamPrevention, type ScamPreventionValue } from './attributes/security/
 import { maintenance, type MaintenanceValue } from './attributes/transparency/maintenance'
 import { reputation, type ReputationValue } from './attributes/transparency/reputation'
 import {
-	ecosystemAlignment,
-	type EcosystemAlignmentValue,
-} from './attributes/ecosystem/ecosystem-alignment'
-import {
 	interoperability,
 	type InteroperabilityValue,
 } from './attributes/self-sovereignty/interoperability'
@@ -120,7 +116,7 @@ type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
 	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
-	hardwareWalletClearSigning: HardwareWalletClearSigningValue
+	hardwareWalletDappSigning: HardwareWalletDappSigningValue
 	hardwareWalletSupport: HardwareWalletSupportValue
 	softwareHWIntegration: SoftwareHWIntegrationValue
 	passkeyImplementation: PasskeyImplementationValue
@@ -144,7 +140,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		securityAudits,
 		scamPrevention,
 		chainVerification,
-		hardwareWalletClearSigning,
+		hardwareWalletDappSigning,
 		hardwareWalletSupport,
 		softwareHWIntegration,
 		passkeyImplementation,
@@ -159,7 +155,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		securityAudits: 1.0,
 		scamPrevention: 1.0,
 		chainVerification: 1.0,
-		hardwareWalletClearSigning: 1.0,
+		hardwareWalletDappSigning: 1.0,
 		hardwareWalletSupport: 1.0,
 		softwareHWIntegration: 1.0,
 		passkeyImplementation: 1.0,
@@ -270,7 +266,6 @@ type EcosystemValues = Dict<{
 	accountAbstraction: AccountAbstractionValue
 	addressResolution: AddressResolutionValue
 	browserIntegration: BrowserIntegrationValue
-	ecosystemAlignment: EcosystemAlignmentValue
 	interoperability: InteroperabilityValue
 }>
 
@@ -287,14 +282,12 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		accountAbstraction,
 		addressResolution,
 		browserIntegration,
-		ecosystemAlignment,
 		interoperability,
 	},
 	score: scoreGroup<EcosystemValues>({
 		accountAbstraction: 1.0,
 		addressResolution: 1.0,
 		browserIntegration: 1.0,
-		ecosystemAlignment: 1.0,
 		interoperability: 1.0,
 	}),
 }
@@ -332,7 +325,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
 	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
-	hardwareWalletClearSigning: EvaluatedAttribute<HardwareWalletClearSigningValue>
+	hardwareWalletDappSigning: EvaluatedAttribute<HardwareWalletDappSigningValue>
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
 	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>
 	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
@@ -370,7 +363,7 @@ export interface EcosystemEvaluations extends EvaluatedGroup<EcosystemValues> {
 	accountAbstraction: EvaluatedAttribute<AccountAbstractionValue>
 	addressResolution: EvaluatedAttribute<AddressResolutionValue>
 	browserIntegration: EvaluatedAttribute<BrowserIntegrationValue>
-	ecosystemAlignment: EvaluatedAttribute<EcosystemAlignmentValue>
+	interoperability: EvaluatedAttribute<InteroperabilityValue>
 }
 
 /** Evaluated attributes for a single wallet. */
@@ -444,7 +437,7 @@ export function evaluateAttributes(
 			securityAudits: evalAttr(securityAudits),
 			scamPrevention: evalAttr(scamPrevention),
 			chainVerification: evalAttr(chainVerification),
-			hardwareWalletClearSigning: evalAttr(hardwareWalletClearSigning),
+			hardwareWalletDappSigning: evalAttr(hardwareWalletDappSigning),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			softwareHWIntegration: evalAttr(softwareHWIntegration),
 			passkeyImplementation: evalAttr(passkeyImplementation),
@@ -477,7 +470,6 @@ export function evaluateAttributes(
 			accountAbstraction: evalAttr(accountAbstraction),
 			addressResolution: evalAttr(addressResolution),
 			browserIntegration: evalAttr(browserIntegration),
-			ecosystemAlignment: evalAttr(ecosystemAlignment),
 			interoperability: evalAttr(interoperability),
 		},
 	}
@@ -508,7 +500,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			securityAudits: attr(tree => tree.security.securityAudits),
 			scamPrevention: attr(tree => tree.security.scamPrevention),
 			chainVerification: attr(tree => tree.security.chainVerification),
-			hardwareWalletClearSigning: attr(tree => tree.security.hardwareWalletClearSigning),
+			hardwareWalletDappSigning: attr(tree => tree.security.hardwareWalletDappSigning),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			softwareHWIntegration: attr(tree => tree.security.softwareHWIntegration),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
@@ -541,7 +533,6 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			accountAbstraction: attr(tree => tree.ecosystem.accountAbstraction),
 			addressResolution: attr(tree => tree.ecosystem.addressResolution),
 			browserIntegration: attr(tree => tree.ecosystem.browserIntegration),
-			ecosystemAlignment: attr(tree => tree.ecosystem.ecosystemAlignment),
 			interoperability: attr(tree => tree.ecosystem.interoperability),
 		},
 	}
@@ -731,7 +722,7 @@ const hardwareOnlySecurity = [
 ]
 const hardwareOnlyPrivacy = ['hardwarePrivacy']
 const hardwareOnlyTransparency = ['reputation', 'maintenance']
-const hardwareOnlyEcosystem = ['ecosystemAlignment', 'interoperability']
+const hardwareOnlyEcosystem = ['interoperability']
 
 /**
  * Returns attribute groups relevant for the wallet.

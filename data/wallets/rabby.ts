@@ -317,7 +317,10 @@ export const rabby: Wallet = {
 					],
 				},
 			},
-			hardwareWalletClearSigning: null,
+			hardwareWalletDappSigning: null,
+			bugBountyProgram: {
+				// ... rest of the file ...
+			},
 		},
 		privacy: {
 			dataCollection: {

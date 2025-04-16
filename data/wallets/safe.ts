@@ -1,13 +1,13 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { notSupported, supported } from '@/schema/features/support'
 import { nconsigny } from '../contributors/nconsigny'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 
 export const safe: Wallet = {
 	metadata: {
@@ -87,12 +87,11 @@ export const safe: Wallet = {
 			},
 			hardwareWalletSupport: {
 				supportedWallets: {},
-				ref: null,
+				ref: undefined,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
-				details: 'No hardware wallet clear signing information available.',
-				ref: null,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
+				ref: undefined,
 			},
 		},
 		privacy: {

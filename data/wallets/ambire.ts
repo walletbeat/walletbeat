@@ -1,7 +1,6 @@
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { Variant } from '@/schema/variants'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
@@ -24,6 +23,7 @@ import { lifi } from '../entities/lifi'
 import { github } from '../entities/github'
 import { jiffylabs } from '../entities/jiffyscan'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 
 const v2Audits: SecurityAudit[] = [
 	{
@@ -258,8 +258,9 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 					],
 				},
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.FULL,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.PARTIAL,
+				ref: undefined,
 			},
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.NONE,

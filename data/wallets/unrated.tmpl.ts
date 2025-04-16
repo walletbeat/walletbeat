@@ -49,8 +49,9 @@ export const unratedTemplate: Wallet = {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: null,
-			hardwareWalletClearSigning: null,
+			hardwareWalletDappSigning: null,
 			passkeyVerification: null,
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

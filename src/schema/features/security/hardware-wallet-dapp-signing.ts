@@ -1,9 +1,9 @@
-import { type WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference'
 
 /**
  * Types of clear signing support levels
  */
-export enum ClearSigningLevel {
+export enum DappSigningLevel {
   NONE = 'NONE',
   BASIC = 'BASIC',
   PARTIAL = 'PARTIAL',
@@ -13,13 +13,15 @@ export enum ClearSigningLevel {
 /**
  * A record of hardware wallet types and their clear signing support level
  */
-export type HardwareWalletClearSigningSupport = WithRef<{
+export interface HardwareWalletDappSigningSupport  {
 	/**
 	 * The level of clear signing support
 	 */
-	level: ClearSigningLevel
+	level: DappSigningLevel
 	/**
 	 * Additional details about the clear signing implementation
 	 */
 	details?: string
-}> 
+}
+
+export type HardwareWalletDappSigningImplementation = WithRef<HardwareWalletDappSigningSupport> 

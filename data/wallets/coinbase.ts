@@ -3,7 +3,6 @@ import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
 import { polymutex } from '../contributors/polymutex'
 import { nconsigny } from '../contributors/nconsigny'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported } from '@/schema/features/support'
@@ -13,6 +12,7 @@ import { code4rena } from '../entities/code4rena'
 import { certora } from '../entities/certora'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { License } from '@/schema/features/transparency/license'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 
 export const coinbase: Wallet = {
 	metadata: {
@@ -91,9 +91,8 @@ export const coinbase: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
-				details: 'No hardware wallet clear signing information available.',
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
 				ref: null,
 			},
 			passkeyVerification: {

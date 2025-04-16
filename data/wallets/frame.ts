@@ -4,13 +4,13 @@ import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { AccountType } from '@/schema/features/account-support'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 
 export const frame: Wallet = {
 	metadata: {
@@ -92,8 +92,8 @@ export const frame: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
 				details: 'No hardware wallet clear signing information available.',
 				ref: null,
 			},

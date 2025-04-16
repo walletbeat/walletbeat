@@ -2,7 +2,6 @@ import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
 import { polymutex } from '../contributors/polymutex'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -10,6 +9,7 @@ import { Variant } from '@/schema/variants'
 import { License } from '@/schema/features/transparency/license'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType } from '@/schema/features/account-support'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 
 export const rainbow: Wallet = {
 	metadata: {
@@ -73,9 +73,8 @@ export const rainbow: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
-				details: 'No hardware wallet clear signing information available.',
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.PARTIAL,
 				ref: null,
 			},
 			passkeyVerification: {

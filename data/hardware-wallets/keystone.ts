@@ -3,7 +3,7 @@ import type { Wallet } from '@/schema/wallet'
 import { WalletProfile, HardwareWalletManufactureType } from '@/schema/features/profile'
 import { nconsigny } from '../contributors/nconsigny'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { featureSupported } from '@/schema/features/support'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -66,17 +66,9 @@ export const keystoneWallet: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.FULL,
-				details:
-					'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
-				ref: [
-					{
-						url: 'https://youtu.be/7lP_0h-PPvY?t=1141',
-						explanation:
-							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
-					},
-				],
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
+				ref: null,
 			},
 			bugBountyProgram: {
 				type: BugBountyProgramType.COMPREHENSIVE,
