@@ -53,9 +53,12 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 	),
 	methodology: markdown(
 		`Evaluated based on:
-		- **Phoning Home:** Whether the device contacts manufacturer servers during setup, operation, or updates, and if these connections are necessary.
-		- **Inspectability:** Ability to monitor and understand data exchanged if the device does phone home.
-		- **Wireless Privacy:** Protection of data transmitted over wireless connections (e.g., BLE, WiFi) against local attackers.
+
+- **Phoning Home:** Whether the device contacts manufacturer servers during setup, operation, or updates, and if these connections are necessary.
+
+- **Inspectability:** Ability to monitor and understand data exchanged if the device does phone home.
+
+- **Wireless Privacy:** Protection of data transmitted over wireless connections (e.g., BLE, WiFi) against local attackers.
 	`,
 	),
 	ratingScale: {

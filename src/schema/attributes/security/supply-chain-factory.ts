@@ -63,13 +63,19 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		Users need confidence that the device they receive is genuine and hasn't been maliciously altered.`,
 	),
 	methodology: markdown(
-		`Evaluated based on:  
-		- **Factory OPSEC:** Availability and verification (audits, certifications) of documentation detailing security practices during manufacturing.  
-		- **Tamper Evidence:** Effectiveness of physical seals or mechanisms to detect package tampering.  
-		- **Hardware Verification:** Ease of verifying the received hardware against a Bill of Materials (BOM) or reference design.  
-		- **Tamper Resistance:** Physical device protections (e.g., security mesh) against unauthorized modification.  
-		- **Genuine Check:** Availability and reliability of software/hardware mechanisms to verify device authenticity before and during use.  
-		- **Anti-Kleptography:** Measures to prevent cryptographic keys or randomness from being subtly leaked during operations.  
+		`Evaluated based on:
+
+- **Factory OPSEC:** Availability and verification (audits, certifications) of documentation detailing security practices during manufacturing.
+
+- **Tamper Evidence:** Effectiveness of physical seals or mechanisms to detect package tampering.
+
+- **Hardware Verification:** Ease of verifying the received hardware against a Bill of Materials (BOM) or reference design.
+
+- **Tamper Resistance:** Physical device protections (e.g., security mesh) against unauthorized modification.
+
+- **Genuine Check:** Availability and reliability of software/hardware mechanisms to verify device authenticity before and during use.
+
+- **Anti-Kleptography:** Measures to prevent cryptographic keys or randomness from being subtly leaked during operations.
 	`,
 	),
 	ratingScale: {

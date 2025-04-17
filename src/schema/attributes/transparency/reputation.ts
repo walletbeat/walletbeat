@@ -57,11 +57,15 @@ export const reputation: Attribute<ReputationValue> = {
 		A strong reputation builds user trust in the reliability and security of the hardware wallet.`,
 	),
 	methodology: markdown(
-		`Evaluated based on an aggregate of factors:  
-		- **Product Originality:** Degree of original design versus reliance on third-party components.  
-		- **Availability & Support:** History of product availability, risk of discontinuation, and perceived ability to honor warranty/support.  
-		- **Vulnerability History:** Track record of security vulnerabilities, their severity, and the transparency/quality of documentation and fixes.  
-		- **Bug Bounty Program:** Scope and rewards of the manufacturer's bug bounty program compared to industry standards.  
+		`Evaluated based on an aggregate of factors:
+
+- **Product Originality:** Degree of original design versus reliance on third-party components.
+
+- **Availability & Support:** History of product availability, risk of discontinuation, and perceived ability to honor warranty/support.
+
+- **Vulnerability History:** Track record of security vulnerabilities, their severity, and the transparency/quality of documentation and fixes.
+
+- **Bug Bounty Program:** Scope and rewards of the manufacturer's bug bounty program compared to industry standards.
 	`,
 	),
 	ratingScale: {

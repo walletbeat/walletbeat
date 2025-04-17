@@ -53,8 +53,10 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 	),
 	methodology: markdown(
 		`Evaluated based on:
-		- **NDA-Free Sourcing:** Whether all necessary components can be acquired without signing NDAs.
-		- **Sourcing Complexity:** The ease with which components can be sourced from multiple suppliers across different regions, promoting resilience against single points of failure.
+
+- **NDA-Free Sourcing:** Whether all necessary components can be acquired without signing NDAs.
+
+- **Sourcing Complexity:** The ease with which components can be sourced from multiple suppliers across different regions, promoting resilience against single points of failure.
 	`,
 	),
 	ratingScale: {
