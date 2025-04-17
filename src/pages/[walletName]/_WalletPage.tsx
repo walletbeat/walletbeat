@@ -5,6 +5,10 @@ import {
 	getEvaluationFromOtherTree,
 	mapAttributeGroups,
 	mapGroupAttributes,
+	hardwareOnlyEcosystem,
+	hardwareOnlyPrivacy,
+	hardwareOnlySecurity,
+	hardwareOnlyTransparency,
 } from '@/schema/attribute-groups'
 import {
 	isNonEmptyArray,
@@ -349,6 +353,28 @@ export function WalletPage({
 						evalAttr: EvaluatedAttribute<V>,
 						attributeKey: keyof Vs,
 					): RichSection | null => {
+						// Determine which hardware-only list to use
+						let hardwareOnlyList: string[] = []
+						switch (attrGroup.id) {
+							case 'security':
+								hardwareOnlyList = hardwareOnlySecurity
+								break
+							case 'privacy':
+								hardwareOnlyList = hardwareOnlyPrivacy
+								break
+							case 'transparency':
+								hardwareOnlyList = hardwareOnlyTransparency
+								break
+							case 'ecosystem':
+								hardwareOnlyList = hardwareOnlyEcosystem
+								break
+						}
+
+						// Filter out hardware-only attributes if it's not a hardware wallet
+						if (!isHardwareWallet && hardwareOnlyList.includes(evalAttr.attribute.id)) {
+							return null
+						}
+
 						if (evalAttr.evaluation.value.rating === Rating.EXEMPT) {
 							return null
 						}

@@ -124,7 +124,7 @@ type SecurityValues = Dict<{
 	supply_chain_diy: SupplyChainDIYValue
 	supply_chain_factory: SupplyChainFactoryValue
 	firmware: FirmwareValue
-	keysHandling: KeysHandlingValue
+	keys_handling: KeysHandlingValue
 	userSafety: UserSafetyValue
 }>
 
@@ -148,7 +148,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		supply_chain_diy: supplyChainDIY,
 		supply_chain_factory: supplyChainFactory,
 		firmware,
-		keysHandling,
+		keys_handling: keysHandling,
 		userSafety,
 	},
 	score: scoreGroup<SecurityValues>({
@@ -163,7 +163,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		supply_chain_diy: 1.0,
 		supply_chain_factory: 1.0,
 		firmware: 1.0,
-		keysHandling: 1.0,
+		keys_handling: 1.0,
 		userSafety: 1.0,
 	}),
 }
@@ -172,7 +172,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 type PrivacyValues = Dict<{
 	addressCorrelation: AddressCorrelationValue
 	multiAddressCorrelation: MultiAddressCorrelationValue
-	hardwarePrivacy: HardwarePrivacyValue
+	hardware_privacy: HardwarePrivacyValue
 }>
 
 /** Privacy attributes. */
@@ -187,12 +187,12 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 	attributes: {
 		addressCorrelation,
 		multiAddressCorrelation,
-		hardwarePrivacy,
+		hardware_privacy: hardwarePrivacy,
 	},
 	score: scoreGroup<PrivacyValues>({
 		addressCorrelation: 1.0,
 		multiAddressCorrelation: 1.0,
-		hardwarePrivacy: 1.0,
+		hardware_privacy: 1.0,
 	}),
 }
 
@@ -292,6 +292,20 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	}),
 }
 
+/** Specific score function for the maintenance group */
+const scoreMaintenanceGroup = (
+	evaluations: EvaluatedGroup<{ maintenance: MaintenanceValue }>,
+): MaybeUnratedScore => {
+	const value = evaluations.maintenance.evaluation.value
+	const score = value.score ?? defaultRatingScore(value.rating)
+	if (score === null) {
+		return null
+	}
+	const hasUnratedComponent = value.rating === Rating.UNRATED
+	// Assuming weight 1.0 as per the original scoreGroup call
+	return { score: weightedScore([{ score, weight: 1.0 }]), hasUnratedComponent }
+}
+
 /** Maintenance attributes. */
 export const maintenanceAttributeGroup: AttributeGroup<{ maintenance: MaintenanceValue }> = {
 	id: 'maintenance',
@@ -304,9 +318,7 @@ export const maintenanceAttributeGroup: AttributeGroup<{ maintenance: Maintenanc
 	attributes: {
 		maintenance,
 	},
-	score: scoreGroup({
-		maintenance: 1.0,
-	}),
+	score: scoreMaintenanceGroup, // Use the specific function
 }
 
 /** The set of attribute groups that make up wallet attributes. */
@@ -333,7 +345,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	supply_chain_diy: EvaluatedAttribute<SupplyChainDIYValue>
 	supply_chain_factory: EvaluatedAttribute<SupplyChainFactoryValue>
 	firmware: EvaluatedAttribute<FirmwareValue>
-	keysHandling: EvaluatedAttribute<KeysHandlingValue>
+	keys_handling: EvaluatedAttribute<KeysHandlingValue>
 	userSafety: EvaluatedAttribute<UserSafetyValue>
 }
 
@@ -398,7 +410,7 @@ export function evaluateAttributes(
 		defaultValue: Omit<V, keyof Value | '__brand'>,
 	): EvaluatedAttribute<V> => ({
 		attribute: attr,
-		evaluation: exempt(attr, sentence(reason), `attributes.${attr.id}` as any, defaultValue),
+		evaluation: exempt(attr, sentence(reason), `attributes.${attr.id}` as any, defaultValue as any),
 	})
 
 	// Determine if DIY/Factory attributes should be exempt
@@ -445,13 +457,13 @@ export function evaluateAttributes(
 			supply_chain_diy: supplyChainDIYEvaluation,
 			supply_chain_factory: supplyChainFactoryEvaluation,
 			firmware: evalAttr(firmware),
-			keysHandling: evalAttr(keysHandling),
+			keys_handling: evalAttr(keysHandling),
 			userSafety: evalAttr(userSafety),
 		},
 		privacy: {
 			addressCorrelation: evalAttr(addressCorrelation),
 			multiAddressCorrelation: evalAttr(multiAddressCorrelation),
-			hardwarePrivacy: evalAttr(hardwarePrivacy),
+			hardware_privacy: evalAttr(hardwarePrivacy),
 		},
 		selfSovereignty: {
 			selfHostedNode: evalAttr(selfHostedNode),
@@ -508,13 +520,13 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			supply_chain_diy: attr(tree => tree.security.supply_chain_diy),
 			supply_chain_factory: attr(tree => tree.security.supply_chain_factory),
 			firmware: attr(tree => tree.security.firmware),
-			keysHandling: attr(tree => tree.security.keysHandling),
+			keys_handling: attr(tree => tree.security.keys_handling),
 			userSafety: attr(tree => tree.security.userSafety),
 		},
 		privacy: {
 			addressCorrelation: attr(tree => tree.privacy.addressCorrelation),
 			multiAddressCorrelation: attr(tree => tree.privacy.multiAddressCorrelation),
-			hardwarePrivacy: attr(tree => tree.privacy.hardwarePrivacy),
+			hardware_privacy: attr(tree => tree.privacy.hardware_privacy),
 		},
 		selfSovereignty: {
 			selfHostedNode: attr(tree => tree.selfSovereignty.selfHostedNode),
@@ -713,16 +725,16 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 }
 
 // Hardware-only attribute IDs for each group
-const hardwareOnlySecurity = [
+export const hardwareOnlySecurity = [
 	'supply_chain_diy',
 	'supply_chain_factory',
 	'firmware',
-	'keysHandling',
+	'keys_handling',
 	'userSafety',
 ]
-const hardwareOnlyPrivacy = ['hardwarePrivacy']
-const hardwareOnlyTransparency = ['reputation', 'maintenance']
-const hardwareOnlyEcosystem = ['interoperability']
+export const hardwareOnlyPrivacy = ['hardware_privacy']
+export const hardwareOnlyTransparency = ['reputation', 'maintenance']
+export const hardwareOnlyEcosystem = ['interoperability']
 
 /**
  * Returns attribute groups relevant for the wallet.
