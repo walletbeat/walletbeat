@@ -1037,9 +1037,8 @@ export default function WalletTable(): React.ReactElement {
 								if (!supported) {
 									return null
 								}
-								const display = SMART_WALLET_STANDARD_DISPLAY[std as SmartWalletStandard] || std
 
-								// Add Markdown-style links for ERC standards
+								// Only render tags for specific standards
 								if (std === SmartWalletStandard.ERC_4337) {
 									return (
 										<EipStandardTag
@@ -1058,16 +1057,9 @@ export default function WalletTable(): React.ReactElement {
 											prefix={EipPrefix.EIP}
 										/>
 									)
-								} else {
-									return (
-										<span
-											key={std}
-											className="text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-300"
-										>
-											{display}
-										</span>
-									)
 								}
+								// Removed the else block that rendered 'Other'
+								return null // Return null for other standards like 'OTHER'
 							})}
 						</div>
 					</div>
