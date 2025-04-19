@@ -518,22 +518,24 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets)
 	.sort((a, b) => a.sortPriority - b.sortPriority)
 
 // Create hardware wallet table data
-const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets).map(wallet => {
-	const manufactureType = getHardwareWalletManufactureTypeDisplay(wallet)
-	const websiteUrl =
-		typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
-			? wallet.metadata.url
-			: 'Not available'
+const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets)
+	.map(wallet => {
+		const manufactureType = getHardwareWalletManufactureTypeDisplay(wallet)
+		const websiteUrl =
+			typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
+				? wallet.metadata.url
+				: 'Not available'
 
-	return {
-		id: wallet.metadata.id,
-		name: wallet.metadata.displayName,
-		wallet,
-		manufactureType,
-		websiteUrl,
-		sortPriority: 0,
-	}
-})
+		return {
+			id: wallet.metadata.id,
+			name: wallet.metadata.displayName,
+			wallet,
+			manufactureType,
+			websiteUrl,
+			sortPriority: 0,
+		}
+	})
+	.sort((a, b) => a.name.localeCompare(b.name))
 
 // Create a reusable cell renderer for wallet name columns
 function createWalletNameCell(isHardware: boolean) {

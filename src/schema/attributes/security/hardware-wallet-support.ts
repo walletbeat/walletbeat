@@ -137,12 +137,12 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	methodology: markdown(`
 		Wallets are evaluated based on their support for popular hardware wallet devices.
 		
-		A wallet receives a passing rating if it supports all four major hardware
-		wallet brands: Ledger, Trezor, Keystone, and GridPlus, allowing users to perform all
+		A wallet receives a passing rating if it supports 3 out of 4 major hardware
+		wallet brands: Ledger, Trezor, Keystone, and GridPlus. Allowing users to perform all
 		essential operations using these hardware wallets.
 		
 		A wallet receives a partial rating if it supports at least one hardware wallet
-		brand but doesn't support all four major brands mentioned above.
+		brand but doesn't support 3 out of 4 major brands mentioned above.
 		
 		A wallet fails this attribute if it doesn't support any hardware wallets.
 	`),
@@ -150,9 +150,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			paragraph(`
-				The wallet supports all four major hardware wallet brands: Ledger, Trezor, 
-				Keystone, and GridPlus, with full functionality.
+			paragraph(`  
+				The wallet supports 3 out of 4 major hardware wallet brands: Ledger, Trezor, 
+				Keystone, and GridPlus.
 			`),
 			comprehensiveHardwareWalletSupport([
 				HardwareWalletType.LEDGER,

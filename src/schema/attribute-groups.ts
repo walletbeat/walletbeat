@@ -397,11 +397,25 @@ export interface EvaluationTree
 export function evaluateAttributes(
 	features: ResolvedFeatures,
 	metadata: WalletMetadata,
+	wallet?: any, // Accept wallet context (RatedWallet) as an optional argument
 ): EvaluationTree {
-	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => ({
-		attribute: attr,
-		evaluation: attr.evaluate(features),
-	})
+	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => {
+		const evaluation = attr.evaluate(features)
+		// Attach wallet context if not already present
+		if (!('wallet' in evaluation) || !evaluation.wallet) {
+			return {
+				attribute: attr,
+				evaluation: {
+					...evaluation,
+					wallet: wallet || { metadata },
+				},
+			}
+		}
+		return {
+			attribute: attr,
+			evaluation,
+		}
+	}
 
 	// Helper for exempt evaluation
 	const createExemptEvaluation = <V extends Value>(

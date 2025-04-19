@@ -2,9 +2,20 @@
 import React, { useState, useEffect } from 'react'
 import { Modal, Button, useMediaQuery, useTheme, Typography } from '@mui/material'
 import type { Theme } from '@mui/material'
-import { Rating, type AttributeGroup } from '@/schema/attributes'
+import {
+	Rating,
+	type AttributeGroup,
+	type Evaluation,
+	type EvaluationData,
+	type Value,
+	type EvaluatedAttribute,
+} from '@/schema/attributes'
 import type { EvaluationTree } from '@/schema/attribute-groups'
-import type { FullyQualifiedReference } from '@/schema/reference'
+import {
+	type FullyQualifiedReference,
+	type ReferenceArray,
+	toFullyQualified,
+} from '@/schema/reference'
 import { daimo } from '@/data/wallets/daimo'
 import { metamask } from '@/data/wallets/metamask'
 import { coinbase } from '@/data/wallets/coinbase'
@@ -16,7 +27,9 @@ import { frame } from '@/data/wallets/frame'
 import { elytro } from '@/data/wallets/elytro'
 import { phantom } from '@/data/wallets/phantom'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
-import type { Wallet } from '@/schema/wallet'
+import type { Wallet, RatedWallet, WalletMetadata } from '@/schema/wallet'
+import { ContentType } from '@/types/content'
+import { MarkdownTypography } from '@/ui/atoms/MarkdownTypography'
 
 interface RatingDetailModalProps {
 	open: boolean
@@ -248,7 +261,6 @@ function getAttributeRefs(
 		else if (attrGroupId === 'privacy') {
 			// Address correlation and multi-address correlation
 			if (attributeId === 'addressCorrelation' && features.privacy?.dataCollection) {
-				// Check for references in dataCollection
 				const dataCollection = features.privacy.dataCollection
 				if (dataCollection.onchain?.ref) {
 					processRefToArray(dataCollection.onchain.ref, refs, {
@@ -260,7 +272,8 @@ function getAttributeRefs(
 					dataCollection.collectedByEntities &&
 					Array.isArray(dataCollection.collectedByEntities)
 				) {
-					dataCollection.collectedByEntities.forEach(entity => {
+					// Keep entity as any since DataLeakEntity is not exported
+					dataCollection.collectedByEntities.forEach((entity: any) => {
 						if (entity.leaks?.walletAddress && entity.leaks.ref) {
 							processRefToArray(entity.leaks.ref, refs, {
 								defaultLabel: `Data Collection by ${entity.entity?.name || 'Entity'}`,
@@ -275,13 +288,13 @@ function getAttributeRefs(
 			}
 
 			if (attributeId === 'multiAddressCorrelation' && features.privacy?.dataCollection) {
-				// Check for references in dataCollection
 				const dataCollection = features.privacy.dataCollection
 				if (
 					dataCollection.collectedByEntities &&
 					Array.isArray(dataCollection.collectedByEntities)
 				) {
-					dataCollection.collectedByEntities.forEach(entity => {
+					// Keep entity as any
+					dataCollection.collectedByEntities.forEach((entity: any) => {
 						if (entity.leaks?.multiAddress && entity.leaks.ref) {
 							processRefToArray(entity.leaks.ref, refs, {
 								defaultLabel: `Multi-Address Data Collection by ${entity.entity?.name || 'Entity'}`,
@@ -997,8 +1010,35 @@ export function RatingDetailModal({
 							<div className="flex flex-col gap-2 max-h-[350px] sm:max-h-[300px] overflow-y-auto pr-1">
 								{attributeRatings.map((attr, index) => {
 									const isExpanded = expandedAttribute === attr.id
-									const references = getAttributeRefs(evalTree, attrGroup.id, attr.id, walletId)
+									const categoryKey = attrGroup.id as keyof EvaluationTree
+									const evalGroup = evalTree[categoryKey] as
+										| Record<string, EvaluatedAttribute<any>>
+										| undefined
+									const evalAttr: EvaluatedAttribute<Value> | undefined = evalGroup
+										? evalGroup[attr.id]
+										: undefined
+
+									const evalReferences: ReferenceArray | undefined =
+										evalAttr?.evaluation?.references
+
+									// Use ReferenceArray type and handle different structures in the map
+									const references: ReferenceArray = // Use ReferenceArray type
+										evalReferences && evalReferences.length > 0
+											? evalReferences
+											: getAttributeRefs(evalTree, attrGroup.id, attr.id, walletId) // Fallback still returns FullyQualifiedReference[] which fits in ReferenceArray
+
 									const hasReferences = references.length > 0
+
+									// Get wallet metadata for short explanation, provide default name
+									const walletMetadata: Partial<WalletMetadata> = // Allow partial metadata
+										evalAttr?.evaluation?.wallet?.metadata ||
+											wallet?.metadata || { displayName: walletId || 'This wallet' }
+
+									const shortExplanation = evalAttr?.evaluation?.value?.shortExplanation?.render
+										? evalAttr.evaluation.value.shortExplanation.render(
+												walletMetadata as WalletMetadata,
+											) // Assert type for render
+										: getShortExplanation(evalTree, attrGroup.id, attr.id, walletId)
 
 									// Create proper attribute anchor for links
 									const detailUrl = walletId
@@ -1044,50 +1084,128 @@ export function RatingDetailModal({
 												<div className="pl-8 mt-2 text-sm">
 													{/* Show the short explanation */}
 													<div className="mb-3 font-medium text-gray-800 dark:text-gray-200">
-														{getShortExplanation(evalTree, attrGroup.id, attr.id, walletId)}
+														{typeof shortExplanation === 'string' ? (
+															<Typography variant="body2" component="span">
+																{shortExplanation}
+															</Typography>
+														) : shortExplanation?.contentType === ContentType.MARKDOWN ? (
+															<MarkdownTypography variant="body2">
+																{shortExplanation.markdown}
+															</MarkdownTypography>
+														) : shortExplanation?.contentType === ContentType.TEXT ? (
+															<Typography variant="body2" component="span">
+																{shortExplanation.text}
+															</Typography>
+														) : (
+															// Fallback if it's an unexpected object type
+															(console.warn('Unexpected shortExplanation type:', shortExplanation),
+															(
+																<Typography variant="body2" component="span">
+																	Details unavailable.
+																</Typography>
+															))
+														)}
 													</div>
 
 													{hasReferences ? (
 														<div className="space-y-3">
-															{references.map((ref, refIndex) => (
-																<div
-																	key={refIndex}
-																	className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
-																>
-																	{ref.explanation && (
-																		<p className="mb-2 text-gray-700 dark:text-gray-300">
-																			{ref.explanation}
-																		</p>
-																	)}
-																	<div className="flex flex-wrap gap-2 mt-1">
-																		{ref.urls.map((urlObj, urlIndex) => (
-																			<a
-																				key={urlIndex}
-																				href={urlObj.url}
-																				target="_blank"
-																				rel="noopener noreferrer"
-																				className="text-blue-500 hover:underline inline-flex items-center"
-																			>
-																				<span>{urlObj.label || 'Reference'}</span>
-																				<svg
-																					className="w-3 h-3 ml-1"
-																					fill="none"
-																					stroke="currentColor"
-																					viewBox="0 0 24 24"
-																					xmlns="http://www.w3.org/2000/svg"
+															{references.map((ref: any, refIndex: number) => {
+																// Keep ref as any for flexibility
+																// Handle different reference structures
+																if (typeof ref === 'string') {
+																	// Simple string URL
+																	return (
+																		<div
+																			key={refIndex}
+																			className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
+																		>
+																			<div className="flex flex-wrap gap-2 mt-1">
+																				<a
+																					href={ref}
+																					target="_blank"
+																					rel="noopener noreferrer"
+																					className="text-blue-500 hover:underline inline-flex items-center"
 																				>
-																					<path
-																						strokeLinecap="round"
-																						strokeLinejoin="round"
-																						strokeWidth="2"
-																						d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-																					></path>
-																				</svg>
-																			</a>
-																		))}
-																	</div>
-																</div>
-															))}
+																					<span>Reference</span>
+																					<svg
+																						className="w-3 h-3 ml-1"
+																						fill="none"
+																						stroke="currentColor"
+																						viewBox="0 0 24 24"
+																						xmlns="http://www.w3.org/2000/svg"
+																					>
+																						<path
+																							strokeLinecap="round"
+																							strokeLinejoin="round"
+																							strokeWidth="2"
+																							d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+																						></path>
+																					</svg>
+																				</a>
+																			</div>
+																		</div>
+																	)
+																} else if (ref && typeof ref === 'object') {
+																	if ('urls' in ref && Array.isArray(ref.urls)) {
+																		// FullyQualifiedReference
+																		return (
+																			<div
+																				key={refIndex}
+																				className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
+																			>
+																				{ref.explanation && (
+																					<p className="mb-2 text-gray-700 dark:text-gray-300">
+																						{ref.explanation}
+																					</p>
+																				)}
+																				<div className="flex flex-wrap gap-2 mt-1">
+																					{ref.urls.map((urlObj: any, urlIndex: number) => (
+																						<a
+																							key={urlIndex}
+																							href={urlObj.url}
+																							target="_blank"
+																							rel="noopener noreferrer"
+																							className="text-blue-500 hover:underline inline-flex items-center"
+																						>
+																							<span>{urlObj.label || 'Reference'}</span>
+																							{/* SVG icon */}
+																						</a>
+																					))}
+																				</div>
+																			</div>
+																		)
+																	} else if ('url' in ref) {
+																		// LabeledUrl or LooseReference object
+																		return (
+																			<div
+																				key={refIndex}
+																				className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
+																			>
+																				{ref.explanation && (
+																					<p className="mb-2 text-gray-700 dark:text-gray-300">
+																						{ref.explanation}
+																					</p>
+																				)}
+																				<div className="flex flex-wrap gap-2 mt-1">
+																					<a
+																						key={0} // Only one URL
+																						href={ref.url}
+																						target="_blank"
+																						rel="noopener noreferrer"
+																						className="text-blue-500 hover:underline inline-flex items-center"
+																					>
+																						<span>{ref.label || 'Reference'}</span>
+																						{/* SVG icon */}
+																					</a>
+																				</div>
+																			</div>
+																		)
+																	}
+																}
+																// Fallback for unknown structure
+																console.warn('Unknown reference structure:', ref)
+																return null
+															})}
 														</div>
 													) : (
 														<p className="text-gray-500 dark:text-gray-400 italic">

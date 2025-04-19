@@ -18,6 +18,7 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { licenseDetailsContent } from '@/types/content/license-details'
 import { toFullyQualified } from '@/schema/reference'
+import { refs } from '@/schema/reference'
 
 const brand = 'attributes.transparency.open_source'
 export type OpenSourceValue = Value & {
@@ -204,16 +205,26 @@ export const openSource: Attribute<OpenSourceValue> = {
 			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE })
 		}
 		const license = features.license.license
+		const extractedRefs = refs(features.license)
 		if (license === License.UNLICENSED_VISIBLE) {
-			return unlicensed
+			return { ...unlicensed, ...(extractedRefs.length > 0 && { references: extractedRefs }) }
 		}
 		switch (licenseIsFOSS(license)) {
 			case FOSS.FOSS:
-				return open(features.license)
+				return {
+					...open(features.license),
+					...(extractedRefs.length > 0 && { references: extractedRefs }),
+				}
 			case FOSS.FUTURE_FOSS:
-				return openInTheFuture(features.license)
+				return {
+					...openInTheFuture(features.license),
+					...(extractedRefs.length > 0 && { references: extractedRefs }),
+				}
 			case FOSS.NOT_FOSS:
-				return proprietary(features.license)
+				return {
+					...proprietary(features.license),
+					...(extractedRefs.length > 0 && { references: extractedRefs }),
+				}
 		}
 	},
 	aggregate: pickWorstRating<OpenSourceValue>,

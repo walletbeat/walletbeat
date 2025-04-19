@@ -426,7 +426,7 @@ export function Navigation({
 
 				<div className="flex flex-col gap-2 px-4">{nonEmptyMap(groups, renderNavigationGroup)}</div>
 				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-left rounded-lg">
-					Wallets listed on this page are not official endoresements, and are provided for
+					Wallets listed on this page are not official endorsements, and are provided for
 					informational purposes only.
 				</div>
 			</div>

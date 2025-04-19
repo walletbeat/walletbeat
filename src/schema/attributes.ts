@@ -231,6 +231,11 @@ export interface Evaluation<V extends Value> {
 	 * These references provide sources for the evaluation claims.
 	 */
 	references?: ReferenceArray
+
+	/**
+	 * The wallet context for this evaluation (injected by evaluation logic).
+	 */
+	wallet?: RatedWallet
 }
 
 /**
