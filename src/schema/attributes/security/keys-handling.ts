@@ -1,6 +1,6 @@
 import type { ResolvedFeatures } from '@/schema/features'
 import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
@@ -92,13 +92,22 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<KeysHandlingValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return unrated(keysHandling, brand, {
-				masterSecretGeneration: KeysHandlingType.FAIL,
-				proprietaryKeyMechanisms: KeysHandlingType.FAIL,
-				keyTransmission: KeysHandlingType.FAIL,
-				physicalAttackResistance: KeysHandlingType.FAIL,
-			})
+			return exempt(
+				keysHandling,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute is not applicable for ${walletMetadata.displayName} as it is not a hardware wallet.`,
+				),
+				brand,
+				{
+					masterSecretGeneration: KeysHandlingType.FAIL,
+					proprietaryKeyMechanisms: KeysHandlingType.FAIL,
+					keyTransmission: KeysHandlingType.FAIL,
+					physicalAttackResistance: KeysHandlingType.FAIL,
+				},
+			)
 		}
+
 		const keysHandlingFeature = features.security.keysHandling
 		if (!keysHandlingFeature) {
 			return unrated(keysHandling, brand, {

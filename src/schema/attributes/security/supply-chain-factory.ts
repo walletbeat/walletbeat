@@ -13,7 +13,7 @@ import { exampleRating } from '@/schema/attributes'
 import { Variant } from '@/schema/variants'
 import { HardwareWalletManufactureType } from '@/schema/features/profile'
 
-const brand = 'attributes.supply_chain_factory'
+const brand = 'attributes.security.supply_chain_factory'
 
 export type SupplyChainFactoryValue = Value & {
 	factoryOpsecDocs: SupplyChainFactoryType
@@ -22,7 +22,7 @@ export type SupplyChainFactoryValue = Value & {
 	hardwareVerification: SupplyChainFactoryType
 	tamperResistance: SupplyChainFactoryType
 	genuineCheck: SupplyChainFactoryType
-	__brand: 'attributes.supply_chain_factory'
+	__brand: 'attributes.security.supply_chain_factory'
 }
 
 function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating {
@@ -105,14 +105,22 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainFactoryValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return unrated(supplyChainFactory, brand, {
-				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
-				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
-				tamperEvidence: SupplyChainFactoryType.FAIL,
-				hardwareVerification: SupplyChainFactoryType.FAIL,
-				tamperResistance: SupplyChainFactoryType.FAIL,
-				genuineCheck: SupplyChainFactoryType.FAIL,
-			})
+			return exempt(
+				supplyChainFactory,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute is not applicable for ${walletMetadata.displayName} as it is not a hardware wallet.`,
+				),
+				brand,
+				{
+					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+					tamperEvidence: SupplyChainFactoryType.FAIL,
+					hardwareVerification: SupplyChainFactoryType.FAIL,
+					tamperResistance: SupplyChainFactoryType.FAIL,
+					genuineCheck: SupplyChainFactoryType.FAIL,
+				},
+			)
 		}
 
 		const factoryFeature = features.security.supplyChainFactory

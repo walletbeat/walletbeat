@@ -330,7 +330,15 @@ export function WalletPage({
 	]
 	mapAttributeGroups(
 		evalTree,
-		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => {
+		<Vs extends ValueSet>(
+			attrGroup: AttributeGroup<Vs>,
+			evalGroup: EvaluatedGroup<Vs> | undefined,
+		) => {
+			// Handle case where evalGroup might be undefined (Fixes linter error)
+			if (!evalGroup) {
+				return // Skip this group if there's no evaluation data
+			}
+
 			const section = {
 				header: attrGroup.id,
 				subHeader: null,
@@ -370,12 +378,24 @@ export function WalletPage({
 								break
 						}
 
+						// DEBUG: Check wallet type, attribute ID, and rating before filtering
+						const isHardwareOnly = hardwareOnlyList.includes(evalAttr.attribute.id)
+						console.log(
+							`[Filtering Check] Wallet: ${walletName}, isHardware: ${isHardwareWallet}, Group: ${attrGroup.id}, Attribute ID: ${evalAttr.attribute.id}, Rating: ${evalAttr.evaluation.value.rating}, Is Hardware-Only: ${isHardwareOnly}`,
+						)
+
 						// Filter out hardware-only attributes if it's not a hardware wallet
-						if (!isHardwareWallet && hardwareOnlyList.includes(evalAttr.attribute.id)) {
+						if (!isHardwareWallet && isHardwareOnly) {
+							console.log(
+								`[Filtering] HIDING ${evalAttr.attribute.id} because it's hardware-only for a software wallet.`,
+							)
 							return null
 						}
 
 						if (evalAttr.evaluation.value.rating === Rating.EXEMPT) {
+							console.log(
+								`[Filtering] HIDING ${evalAttr.attribute.id} because its rating is EXEMPT.`,
+							)
 							return null
 						}
 						const relevantVariants: Variant[] =
@@ -557,6 +577,12 @@ export function WalletPage({
 					},
 				).filter(subsection => subsection !== null),
 			}
+
+			// DEBUG: Log remaining subsections for this group after filtering
+			console.log(
+				`[Post-Filter Check] Group: ${attrGroup.id}, Remaining Subsections Count: ${section.subsections.length}, IDs: ${section.subsections.map(s => s?.header ?? 'null').join(', ')}`,
+			)
+
 			if (section.subsections.length > 0) {
 				sections.push(section)
 			}

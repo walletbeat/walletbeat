@@ -86,10 +86,18 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainDIYValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return unrated(supplyChainDIY, brand, {
-				diyNoNda: SupplyChainDIYType.FAIL,
-				componentSourcingComplexity: SupplyChainDIYType.FAIL,
-			})
+			return exempt(
+				supplyChainDIY,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute is not applicable for ${walletMetadata.displayName} as it is not a hardware wallet.`,
+				),
+				brand,
+				{
+					diyNoNda: SupplyChainDIYType.FAIL,
+					componentSourcingComplexity: SupplyChainDIYType.FAIL,
+				},
+			)
 		}
 
 		const diyFeature = features.security.supplyChainDIY
