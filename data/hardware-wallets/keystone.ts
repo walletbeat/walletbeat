@@ -67,8 +67,16 @@ export const keystoneWallet: Wallet = {
 				ref: null,
 			},
 			hardwareWalletDappSigning: {
-				level: DappSigningLevel.NONE,
-				ref: null,
+				level: DappSigningLevel.FULL,
+				details:
+					'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
+				ref: [
+					{
+						url: 'https://youtu.be/7lP_0h-PPvY?t=1141',
+						explanation:
+							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
+					},
+				],
 			},
 			bugBountyProgram: {
 				type: BugBountyProgramType.COMPREHENSIVE,

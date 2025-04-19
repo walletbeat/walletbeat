@@ -132,7 +132,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 
 		return {
 			value: {
-				id: 'supply_chain_factory',
+				id: 'Supply Chain Factory',
 				rating,
 				displayName: 'Supply Chain Factory',
 				shortExplanation: sentence(

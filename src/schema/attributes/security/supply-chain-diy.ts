@@ -34,7 +34,7 @@ function evaluateSupplyChainDIY(features: SupplyChainDIYSupport): Rating {
 }
 
 export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
-	id: 'supply_chain_diy',
+	id: 'Supply Chain DIY',
 	icon: '🛠️',
 	displayName: 'Supply Chain DIY',
 	wording: {

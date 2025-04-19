@@ -121,10 +121,10 @@ type SecurityValues = Dict<{
 	softwareHWIntegration: SoftwareHWIntegrationValue
 	passkeyImplementation: PasskeyImplementationValue
 	bugBountyProgram: BugBountyProgramValue
-	supply_chain_diy: SupplyChainDIYValue
-	supply_chain_factory: SupplyChainFactoryValue
+	supplyChainDIY: SupplyChainDIYValue
+	supplyChainFactory: SupplyChainFactoryValue
 	firmware: FirmwareValue
-	keys_handling: KeysHandlingValue
+	keysHandling: KeysHandlingValue
 	userSafety: UserSafetyValue
 }>
 
@@ -145,10 +145,10 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		softwareHWIntegration,
 		passkeyImplementation,
 		bugBountyProgram,
-		supply_chain_diy: supplyChainDIY,
-		supply_chain_factory: supplyChainFactory,
+		supplyChainDIY,
+		supplyChainFactory,
 		firmware,
-		keys_handling: keysHandling,
+		keysHandling,
 		userSafety,
 	},
 	score: scoreGroup<SecurityValues>({
@@ -160,10 +160,10 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		softwareHWIntegration: 1.0,
 		passkeyImplementation: 1.0,
 		bugBountyProgram: 1.0,
-		supply_chain_diy: 1.0,
-		supply_chain_factory: 1.0,
+		supplyChainDIY: 1.0,
+		supplyChainFactory: 1.0,
 		firmware: 1.0,
-		keys_handling: 1.0,
+		keysHandling: 1.0,
 		userSafety: 1.0,
 	}),
 }
@@ -342,10 +342,10 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>
 	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
 	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
-	supply_chain_diy: EvaluatedAttribute<SupplyChainDIYValue>
-	supply_chain_factory: EvaluatedAttribute<SupplyChainFactoryValue>
+	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYValue>
+	supplyChainFactory: EvaluatedAttribute<SupplyChainFactoryValue>
 	firmware: EvaluatedAttribute<FirmwareValue>
-	keys_handling: EvaluatedAttribute<KeysHandlingValue>
+	keysHandling: EvaluatedAttribute<KeysHandlingValue>
 	userSafety: EvaluatedAttribute<UserSafetyValue>
 }
 
@@ -454,10 +454,10 @@ export function evaluateAttributes(
 			softwareHWIntegration: evalAttr(softwareHWIntegration),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
-			supply_chain_diy: supplyChainDIYEvaluation,
-			supply_chain_factory: supplyChainFactoryEvaluation,
+			supplyChainDIY: supplyChainDIYEvaluation,
+			supplyChainFactory: supplyChainFactoryEvaluation,
 			firmware: evalAttr(firmware),
-			keys_handling: evalAttr(keysHandling),
+			keysHandling: evalAttr(keysHandling),
 			userSafety: evalAttr(userSafety),
 		},
 		privacy: {
@@ -517,10 +517,10 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			softwareHWIntegration: attr(tree => tree.security.softwareHWIntegration),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
-			supply_chain_diy: attr(tree => tree.security.supply_chain_diy),
-			supply_chain_factory: attr(tree => tree.security.supply_chain_factory),
+			supplyChainDIY: attr(tree => tree.security.supplyChainDIY),
+			supplyChainFactory: attr(tree => tree.security.supplyChainFactory),
 			firmware: attr(tree => tree.security.firmware),
-			keys_handling: attr(tree => tree.security.keys_handling),
+			keysHandling: attr(tree => tree.security.keysHandling),
 			userSafety: attr(tree => tree.security.userSafety),
 		},
 		privacy: {
@@ -726,10 +726,10 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 
 // Hardware-only attribute IDs for each group
 export const hardwareOnlySecurity = [
-	'supply_chain_diy',
-	'supply_chain_factory',
+	'supplyChainDIY',
+	'supplyChainFactory',
 	'firmware',
-	'keys_handling',
+	'keysHandling',
 	'userSafety',
 ]
 export const hardwareOnlyPrivacy = ['hardware_privacy']
