@@ -44,21 +44,21 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 	}
 	const scamUrlLeaks: string[] = isSupported(value.scamAlerts.scamUrlWarning)
 		? [
-			value.scamAlerts.scamUrlWarning.leaksIp ? 'your IP' : null,
-			value.scamAlerts.scamUrlWarning.leaksUserAddress ? 'your Ethereum address' : null,
-			((): string | null => {
-				switch (value.scamAlerts.scamUrlWarning.leaksVisitedUrl) {
-					case 'FULL_URL':
-						return 'the full URL of the app'
-					case 'DOMAIN_ONLY':
-						return 'the domain name of the app'
-					case 'PARTIAL_HASH_OF_DOMAIN':
-						return null
-					case 'NO':
-						return null
-				}
-			})(),
-		].filter(val => val !== null)
+				value.scamAlerts.scamUrlWarning.leaksIp ? 'your IP' : null,
+				value.scamAlerts.scamUrlWarning.leaksUserAddress ? 'your Ethereum address' : null,
+				((): string | null => {
+					switch (value.scamAlerts.scamUrlWarning.leaksVisitedUrl) {
+						case 'FULL_URL':
+							return 'the full URL of the app'
+						case 'DOMAIN_ONLY':
+							return 'the domain name of the app'
+						case 'PARTIAL_HASH_OF_DOMAIN':
+							return null
+						case 'NO':
+							return null
+					}
+				})(),
+			].filter(val => val !== null)
 		: []
 	return (
 		<>
@@ -195,8 +195,6 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 									{value.scamAlerts.scamUrlWarning.ref && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.scamUrlWarning.ref)}
-										// TODO: is this correct?
-										// explanation="References:"
 										/>
 									)}
 								</>
