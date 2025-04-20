@@ -159,7 +159,7 @@ function getDetailedWalletDescription(wallet: RatedWallet): string {
 				standards.ERC_4337 ? SMART_WALLET_STANDARD_DISPLAY.ERC_4337 : null,
 				standards.ERC_7702 ? SMART_WALLET_STANDARD_DISPLAY.ERC_7702 : null,
 			]
-				.filter(val => val !== null)
+				.filter((val): val is string => val !== null)
 				.join(', ')})`,
 		)
 	}
@@ -174,8 +174,8 @@ function getDetailedWalletDescription(wallet: RatedWallet): string {
 // Helper function to get hardware wallet manufacture type display name
 function getHardwareWalletManufactureTypeDisplay(wallet: RatedWallet): string {
 	const manufactureType = wallet.metadata.hardwareWalletManufactureType
-	if (manufactureType !== undefined && manufactureType !== null) {
-		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType] || 'Unknown'
+	if (manufactureType !== undefined) {
+		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType] ?? 'Unknown'
 	}
 	return 'Unknown'
 }
@@ -191,7 +191,7 @@ function walletSupportsVariant(wallet: RatedWallet, variant: DeviceVariant): boo
 		return hasVariant(wallet.variants, Variant.HARDWARE)
 	}
 
-	return Boolean(wallet.variants && variant in wallet.variants)
+	return wallet.variants !== undefined && variant in wallet.variants
 }
 
 // Helper function to get device-specific evaluation tree
@@ -201,12 +201,12 @@ function getEvaluationTree(wallet: RatedWallet, selectedVariant: DeviceVariant):
 		return wallet.overall
 	}
 
-	if (selectedVariant === DeviceVariant.NONE || !wallet.variants) {
+	if (selectedVariant === DeviceVariant.NONE || wallet.variants === undefined) {
 		return wallet.overall
 	}
 
 	const variantData = wallet.variants[selectedVariant]
-	return variantData ? variantData.attributes : wallet.overall
+	return variantData !== undefined ? variantData.attributes : wallet.overall
 }
 
 // Pizza Slice Chart Component (inspired by WalletTableStylingExample)
@@ -234,7 +234,7 @@ function PizzaSliceChart<Vs extends ValueSet>({
 	const tooltipText = `${attrGroup.displayName}: ${Math.round(attrGroupScore.score * 100)}% (${attributeCount} attributes)`
 
 	// Create SVG slices for cleaner rendering with gaps
-	const createSlices = () => {
+	const createSlices = (): React.ReactNode[] => {
 		const centerX = 50
 		const centerY = 50
 		const radius = 45
@@ -280,7 +280,7 @@ function PizzaSliceChart<Vs extends ValueSet>({
 	}
 
 	// Handle click on the pie chart
-	const handlePieClick = () => {
+	const handlePieClick = (): void => {
 		if (isSupported) {
 			setModalOpen(true)
 		}
@@ -334,9 +334,9 @@ function getHardwareWalletModels(wallet: RatedWallet): HardwareWalletModel[] {
 function getFlagshipModel(wallet: RatedWallet): HardwareWalletModel | undefined {
 	const models = getHardwareWalletModels(wallet)
 	// First, try to find a model explicitly marked as flagship
-	const flagshipModel = models.find(model => model.isFlagship)
+	const flagshipModel = models.find(model => model.isFlagship === true)
 	// If no flagship is explicitly marked, return the first model as default
-	return flagshipModel || models[0]
+	return flagshipModel ?? models[0]
 }
 
 // TableRow interface for better type safety
@@ -369,13 +369,7 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets)
 		let sortPriority = 3 // Default to EOA only
 
 		if (hasSmartWallet) {
-			if (hasEoa) {
-				sortPriority = 2 // Both Smart Wallet & EOA
-			} else {
-				sortPriority = 1 // Smart Wallet only
-			}
-		} else if (hasEoa) {
-			sortPriority = 3 // EOA only
+			sortPriority = hasEoa ? 2 : 1 // 2 for both, 1 for Smart Wallet only
 		}
 
 		return {
@@ -411,7 +405,9 @@ const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets)
 	.sort((a, b) => a.name.localeCompare(b.name))
 
 // Create a reusable cell renderer for wallet name columns
-function createWalletNameCell(isHardware: boolean) {
+function createWalletNameCell(
+	isHardware: boolean,
+): ({ row }: { row: Row<TableRow> }) => React.ReactNode {
 	return ({ row }: { row: Row<TableRow> }) => {
 		// Regular row rendering with logo
 		const walletId = row.original.wallet.metadata.id
@@ -470,7 +466,7 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 					setTimeout(() => {
 						// Only close if not hovering the modal
 						const modalElement = document.querySelector('.eip-preview-modal')
-						if (modalElement && modalElement.matches(':hover')) {
+						if (modalElement !== null && modalElement.matches(':hover')) {
 							return
 						}
 						setIsHovered(false)
@@ -480,7 +476,7 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 			>
 				#{standard.number}
 			</span>
-			{isHovered && anchorEl && (
+			{isHovered && anchorEl !== null && (
 				<EipPreviewModal
 					eip={standard}
 					anchorEl={anchorEl}
@@ -512,27 +508,28 @@ function ExpandableHardwareWalletRow({
 	// Set the flagship model as the default selected model
 	useEffect(() => {
 		// Always have a selected model, even if there's only one
-		if (models.length > 0 && !selectedModel) {
+		if (models.length > 0 && selectedModel === null) {
 			// If there's a flagship model, use it, otherwise use the first model
-			const modelToSelect = flagshipModel ? flagshipModel.id : models[0].id
+			const modelToSelect = flagshipModel !== undefined ? flagshipModel.id : models[0].id
 			setSelectedModel(modelToSelect)
 		}
 	}, [flagshipModel, models, selectedModel])
 
 	// Get the currently selected model name (used in wallet name column only)
-	const selectedModelName = selectedModel
-		? (models.find(m => m.id === selectedModel)?.name ?? '')
-		: models.length > 0
-			? models[0].name
-			: ''
+	const selectedModelName =
+		selectedModel !== null
+			? (models.find(m => m.id === selectedModel)?.name ?? '')
+			: models.length > 0
+				? models[0].name
+				: ''
 
 	// Toggle expansion of the models list
-	const toggleExpanded = () => {
+	const toggleExpanded = (): void => {
 		setIsExpanded(!isExpanded)
 	}
 
 	// Handle click on a model
-	const handleModelClick = (modelId: string) => {
+	const handleModelClick = (modelId: string): void => {
 		setSelectedModel(modelId)
 	}
 
@@ -550,7 +547,10 @@ function ExpandableHardwareWalletRow({
 	)
 
 	// Create updated cells for rating data
-	const createUpdatedCell = (cell: Cell<TableRow, unknown>, columnIndex: number) => {
+	const createUpdatedCell = (
+		cell: Cell<TableRow, unknown>,
+		columnIndex: number,
+	): React.ReactNode => {
 		// Skip first two columns (Wallet name and Manufacture Type)
 		if (columnIndex < 2) {
 			return flexRender(cell.column.columnDef.cell, cell.getContext())
@@ -560,10 +560,10 @@ function ExpandableHardwareWalletRow({
 
 	// Sort models to place flagship first
 	const sortedModels = [...models].sort((a, b) => {
-		if (a.isFlagship) {
+		if (a.isFlagship === true) {
 			return -1
 		}
-		if (b.isFlagship) {
+		if (b.isFlagship === true) {
 			return 1
 		}
 		return 0
@@ -628,7 +628,7 @@ function ExpandableHardwareWalletRow({
 
 			{isExpanded && models.length > 1 && (
 				<tr className="bg-gray-50 dark:bg-[#1a1a1a]">
-					<td colSpan={columns && columns.length ? columns.length : 8} className="p-0">
+					<td colSpan={columns.length > 0 ? columns.length : 8} className="p-0">
 						<div className="pl-10 pr-4 py-3">
 							<div className="text-sm font-medium mb-2 dark:text-gray-200">Models:</div>
 							<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -640,7 +640,9 @@ function ExpandableHardwareWalletRow({
 											selectedModel === model.id
 												? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-700'
 												: 'border-gray-200 dark:border-gray-700',
-											model.isFlagship ? 'ring-1 ring-purple-300 dark:ring-purple-800' : '',
+											model.isFlagship === true
+												? 'ring-1 ring-purple-300 dark:ring-purple-800'
+												: '',
 											'cursor-pointer hover:border-purple-300 dark:hover:border-purple-500 transition-colors',
 										].join(' ')}
 										onClick={e => {
@@ -655,7 +657,7 @@ function ExpandableHardwareWalletRow({
 										></div>
 										<div className="flex-grow dark:text-gray-200 font-medium">
 											{model.name}
-											{model.isFlagship && (
+											{model.isFlagship === true && (
 												<span className="ml-1 text-xs text-purple-600 dark:text-purple-400 font-medium">
 													(Flagship)
 												</span>
@@ -703,9 +705,6 @@ export default function WalletTable(): React.ReactElement {
 	const eoaOnlyWalletCount = useMemo(
 		() =>
 			softwareWalletData.filter(row => {
-				if (!row.wallet) {
-					return false
-				}
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
 				return hasEoa && !hasSmartWallet
 			}).length,
@@ -715,9 +714,6 @@ export default function WalletTable(): React.ReactElement {
 	const smartWalletOnlyCount = useMemo(
 		() =>
 			softwareWalletData.filter(row => {
-				if (!row.wallet) {
-					return false
-				}
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
 				return hasSmartWallet && !hasEoa
 			}).length,
@@ -727,9 +723,6 @@ export default function WalletTable(): React.ReactElement {
 	const smartWalletAndEoaCount = useMemo(
 		() =>
 			softwareWalletData.filter(row => {
-				if (!row.wallet) {
-					return false
-				}
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
 				return hasSmartWallet && hasEoa
 			}).length,
@@ -743,26 +736,16 @@ export default function WalletTable(): React.ReactElement {
 		}
 
 		return softwareWalletData.filter(row => {
-			if (!row.wallet) {
-				return false
-			}
 			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
 
-			// For EOA_ONLY filter, check if the wallet has only EOA type
-			if (walletTypeFilter === WalletTypeFilter.EOA_ONLY) {
-				return hasEoa && !hasSmartWallet
+			switch (walletTypeFilter) {
+				case WalletTypeFilter.EOA_ONLY:
+					return hasEoa && !hasSmartWallet
+				case WalletTypeFilter.SMART_WALLET_ONLY:
+					return hasSmartWallet && !hasEoa
+				case WalletTypeFilter.SMART_WALLET_AND_EOA:
+					return hasSmartWallet && hasEoa
 			}
-
-			// For SMART_WALLET_ONLY filter
-			if (walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY) {
-				return hasSmartWallet && !hasEoa
-			}
-
-			// For SMART_WALLET_AND_EOA filter
-			if (walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA) {
-				return hasSmartWallet && hasEoa
-			}
-
 			return true
 		})
 	}, [walletTypeFilter])
@@ -774,19 +757,19 @@ export default function WalletTable(): React.ReactElement {
 	)
 
 	// Handler for device variant change
-	const handleVariantChange = (variant: DeviceVariant) => {
+	const handleVariantChange = (variant: DeviceVariant): void => {
 		setSelectedVariant(variant === selectedVariant ? DeviceVariant.NONE : variant)
 	}
 
 	// Handler for tab change
-	const handleTabChange = (tab: WalletTableTab) => {
+	const handleTabChange = (tab: WalletTableTab): void => {
 		setActiveTab(tab)
 		// Reset wallet type filter when switching tabs
 		setWalletTypeFilter(WalletTypeFilter.ALL)
 	}
 
 	// Handler for wallet type filter change
-	const handleWalletTypeFilterChange = (filter: WalletTypeFilter) => {
+	const handleWalletTypeFilterChange = (filter: WalletTypeFilter): void => {
 		setWalletTypeFilter(filter)
 	}
 
@@ -802,7 +785,7 @@ export default function WalletTable(): React.ReactElement {
 	)
 	const walletTypeColumn = columnHelper.display({
 		id: 'type',
-		cell: (info: CellContext<TableRow, unknown>): any => {
+		cell: (info: CellContext<TableRow, unknown>): React.ReactNode => {
 			const { hasEoa, hasSmartWallet, hasHardware, standards } = getWalletTypeInfo(
 				info.row.original.wallet,
 				'ALL_VARIANTS',
@@ -812,7 +795,7 @@ export default function WalletTable(): React.ReactElement {
 				hasSmartWallet ? ('SMART_WALLET' as WalletTypeCategory) : null,
 				hasHardware ? ('HARDWARE_WALLET' as WalletTypeCategory) : null,
 			]
-				.filter(val => val !== null)
+				.filter((val): val is WalletTypeCategory => val !== null)
 				.map(cat => WALLET_TYPE_DISPLAY[cat] || cat)
 				.join(' & ')
 			// If no standards, just return the type string
@@ -845,7 +828,7 @@ export default function WalletTable(): React.ReactElement {
 	const walletVariantColumn = columnHelper.display({
 		id: 'risk',
 		header: 'By device',
-		cell: ({ row }) => {
+		cell: ({ row }): React.ReactNode => {
 			const wallet = row.original.wallet
 			const supportsBrowser = hasVariant(wallet.variants, Variant.BROWSER)
 			const supportsMobile = hasVariant(wallet.variants, Variant.MOBILE)
@@ -944,10 +927,12 @@ export default function WalletTable(): React.ReactElement {
 			)
 		},
 	})
-	const attributeGroupColumnFromAttrGroup = <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>) =>
+	const attributeGroupColumnFromAttrGroup = <Vs extends ValueSet>(
+		attrGroup: AttributeGroup<Vs>,
+	): ColumnDef<TableRow, CellValue> =>
 		columnHelper.display({
 			header: attrGroup.displayName,
-			cell: ({ row }) => {
+			cell: ({ row }): React.ReactNode => {
 				const wallet = row.original.wallet
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
@@ -1051,6 +1036,43 @@ export default function WalletTable(): React.ReactElement {
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 	})
+
+	// Render table body based on active tab
+	const renderTableBody = (): React.ReactNode => {
+		// For hardware wallets tab, use the expandable row component
+		if (activeTab === 'hardware') {
+			return table
+				.getRowModel()
+				.rows.map(row => <ExpandableHardwareWalletRow key={row.id} row={row} columns={columns} />)
+		}
+
+		// Otherwise, render standard rows for software wallets
+		return table.getRowModel().rows.map(row => {
+			const parentWallet = row.original.wallet
+
+			// Support depends on variant; software tab has different logic from hardware tab
+			const isSupported =
+				selectedVariant === DeviceVariant.NONE ||
+				walletSupportsVariant(parentWallet, selectedVariant)
+
+			return (
+				<tr
+					key={row.id}
+					className={
+						isSupported
+							? 'dark:bg-[#141414] dark:hover:bg-[#1a1a1a]'
+							: 'opacity-50 dark:bg-[#141414] dark:hover:bg-[#1a1a1a]'
+					}
+				>
+					{row.getVisibleCells().map(cell => (
+						<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
+							{flexRender(cell.column.columnDef.cell, cell.getContext())}
+						</td>
+					))}
+				</tr>
+			)
+		})
+	}
 
 	return (
 		<div className="overflow-x-auto">
@@ -1199,69 +1221,30 @@ export default function WalletTable(): React.ReactElement {
 					<thead>
 						{table.getHeaderGroups().map(headerGroup => (
 							<tr className="bg-tertiary" key={headerGroup.id}>
-								{headerGroup.headers.map(header => (
-									<th
-										key={header.id}
-										className={`px-4 py-2 text-center text-[14px] text-secondary ${
-											(header.column &&
-												header.column.columnDef &&
-												header.column.columnDef.header === 'Wallet') ||
-											(header.column &&
-												header.column.columnDef &&
-												header.column.columnDef.header === 'Type') ||
-											(header.column &&
-												header.column.columnDef &&
-												header.column.columnDef.header === 'Manufacture Type')
-												? 'font-bold !text-left'
-												: header.column &&
-													  header.column.columnDef &&
-													  header.column.columnDef.header === 'Risk by device'
-													? 'font-semibold'
-													: 'font-normal'
-										}`}
-									>
-										{header &&
-										header.column &&
-										header.column.columnDef &&
-										header.column.columnDef.header
-											? flexRender(header.column.columnDef.header, header.getContext())
-											: null}
-									</th>
-								))}
+								{headerGroup.headers.map(header => {
+									const headerContent = header.column.columnDef.header
+									return (
+										<th
+											key={header.id}
+											className={`px-4 py-2 text-center text-[14px] text-secondary ${
+												headerContent === 'Wallet' ||
+												headerContent === 'Type' ||
+												headerContent === 'Manufacture Type'
+													? 'font-bold !text-left'
+													: headerContent === 'Risk by device'
+														? 'font-semibold'
+														: 'font-normal'
+											}`}
+										>
+											{headerContent ? flexRender(headerContent, header.getContext()) : null}
+										</th>
+									)
+								})}
 							</tr>
 						))}
 					</thead>
 					<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-						{(activeTab as string) === WalletTableTab.HARDWARE
-							? table
-									.getRowModel()
-									.rows.map(row => (
-										<ExpandableHardwareWalletRow key={row.id} row={row} columns={columns} />
-									))
-							: table.getRowModel().rows.map(row => {
-									const parentWallet = row.original.wallet
-									const isSupported =
-										!parentWallet ||
-										(activeTab === WalletTableTab.HARDWARE &&
-											(selectedVariant === DeviceVariant.NONE ||
-												selectedVariant === DeviceVariant.HARDWARE)) ||
-										(activeTab === WalletTableTab.SOFTWARE &&
-											(selectedVariant === DeviceVariant.NONE ||
-												walletSupportsVariant(parentWallet, selectedVariant)))
-
-									return (
-										<tr
-											key={row.id}
-											className={`${!isSupported ? 'opacity-50' : ''} dark:bg-[#141414] dark:hover:bg-[#1a1a1a]`}
-										>
-											{row.getVisibleCells().map(cell => (
-												<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
-													{flexRender(cell.column.columnDef.cell, cell.getContext())}
-												</td>
-											))}
-										</tr>
-									)
-								})}
+						{renderTableBody()}
 					</tbody>
 				</table>
 			</div>

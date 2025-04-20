@@ -40,7 +40,7 @@ function evaluateKeysHandling(features: KeysHandlingSupport): Rating {
 }
 
 export const keysHandling: Attribute<KeysHandlingValue> = {
-	id: 'keys_handling',
+	id: 'keysHandling',
 	icon: '🔑',
 	displayName: 'Keys Handling',
 	wording: {

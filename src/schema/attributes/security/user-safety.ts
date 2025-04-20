@@ -67,7 +67,7 @@ function evaluateUserSafety(features: UserSafetySupport): Rating {
 }
 
 export const userSafety: Attribute<UserSafetyValue> = {
-	id: 'user_safety',
+	id: 'userSafety',
 	icon: '🛡️',
 	displayName: 'User Safety',
 	wording: {

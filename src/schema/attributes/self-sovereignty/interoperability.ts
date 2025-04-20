@@ -63,7 +63,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'One sub-criteria is PASS.'),
+				sentence(() => 'The wallet passes one interoperability sub-criteria.'),
 				(v: InteroperabilityValue) => v.rating === Rating.PARTIAL,
 			),
 		],
