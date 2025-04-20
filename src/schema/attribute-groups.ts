@@ -595,12 +595,6 @@ export function mapAttributeGroupsInTree<T>(
 	tree: EvaluationTree,
 	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => T,
 ): T[] {
-	// If tree is null/undefined, return empty array
-	if (!tree) {
-		console.warn('mapAttributeGroups called with null or undefined tree. Returning empty array.')
-		return []
-	}
-
 	return Object.entries(attributeTree).map(([groupName, attrGroup]) => {
 		// Check if the group exists in the tree
 		const evalGroup = tree[groupName]
@@ -633,61 +627,19 @@ export function numGroupAttributes<Vs extends ValueSet>(evalGroup: EvaluatedGrou
  * various trees.
  */
 export function mapAttributesGetter(
-	templateTree: EvaluationTree | any, // Allow any type for robust check
+	templateTree: EvaluationTree,
 	fn: <V extends Value>(
 		getter: (evalTree: EvaluationTree) => EvaluatedAttribute<V> | undefined,
 	) => void,
 ): void {
-	// <<< MORE ROBUST CHECK HERE >>>
-	if (typeof templateTree !== 'object' || templateTree === null) {
-		console.error(
-			'mapAttributesGetter called with invalid templateTree (not an object or null). Skipping. Value:',
-			templateTree,
-		)
-		return // Exit early if templateTree is not a valid object
-	}
-	// <<< END CHECK >>>
-
-	// Now we know templateTree is a non-null object, proceed with caution
-	try {
-		console.log(
-			'[mapAttributesGetter] Inspecting templateTree right before Object.keys:',
-			JSON.stringify(templateTree, null, 2),
-		)
-		for (const groupName of Object.keys(templateTree)) {
-			const group = templateTree[groupName]
-			if (typeof group !== 'object' || group === null) {
-				console.warn(
-					`mapAttributesGetter: Skipping invalid group '${groupName}' (not an object or null) in templateTree. Value:`,
-					group,
-				)
-				continue // Skip to the next group if this one is invalid
-			}
-			for (const attrName of Object.keys(group)) {
-				// Ensure the getter function exists and is callable
-				if (typeof fn === 'function') {
-					fn(<V extends Value>(evalTree: EvaluationTree): EvaluatedAttribute<V> | undefined => {
-						// Add checks inside the getter callback as well
-						if (typeof evalTree !== 'object' || evalTree === null || !evalTree[groupName]) {
-							return undefined
-						}
-						const evalGroup = evalTree[groupName] as any
-						return evalGroup[attrName] as EvaluatedAttribute<V>
-					})
-				} else {
-					console.error('mapAttributesGetter: Provided fn is not a function.')
-					break // Exit inner loop if fn is invalid
-				}
-			}
+	for (const groupName of Object.keys(templateTree)) {
+		for (const attrName of Object.keys(templateTree[groupName])) {
+			fn(
+				<V extends Value>(evalTree: EvaluationTree): EvaluatedAttribute<V> | undefined =>
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- We know that `evalTree[groupName]` has `attrName` as property, due to how we iterated to get here.
+					(evalTree[groupName] as any)[attrName] as EvaluatedAttribute<V>,
+			)
 		}
-	} catch (error) {
-		console.error(
-			'Error during mapAttributesGetter execution:',
-			error,
-			'TemplateTree:',
-			templateTree,
-		)
-		// Optionally re-throw or handle error further
 	}
 }
 
@@ -704,12 +656,8 @@ export function getEvaluationFromOtherTree<V extends Value>(
 	const otherEvalAttr = mapAttributeGroupsInTree(
 		otherTree,
 		(_, evalGroup): EvaluatedAttribute<V> | undefined => {
-			// Add check here: If evalGroup is undefined, return undefined immediately
-			if (!evalGroup) {
-				return undefined
-			}
-			// Now it's safe to use Object.hasOwn
 			if (Object.hasOwn(evalGroup, evalAttr.attribute.id)) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Evaluated attributes with the same ID have the same Value type.
 				return evalGroup[evalAttr.attribute.id] as unknown as EvaluatedAttribute<V>
 			}
 			return undefined

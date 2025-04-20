@@ -71,14 +71,6 @@ const StyledSection = styled(Box)(({ theme }) => ({
 	flexDirection: 'column',
 }))
 
-const StyledSubsection = styled(Paper)(({ theme }) => ({
-	padding: theme.spacing(3),
-	display: 'flex',
-	flexDirection: 'column',
-	borderRadius: `${subsectionBorderRadius}px`,
-	margin: '0rem 1rem 1rem 1rem',
-}))
-
 interface Section {
 	header: string
 	subHeader: string | null
@@ -143,32 +135,24 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 			for (const subsection of section.subsections) {
 				// Safely check for caption and body
 				if (subsection.caption !== null && subsection.body !== null) {
-					try {
-						// Get a reasonable question text
-						const questionText =
-							typeof subsection.title === 'string' && subsection.title !== ''
-								? subsection.title
-								: 'Feature question'
+					// Get a reasonable question text
+					const questionText =
+						typeof subsection.title === 'string' && subsection.title !== ''
+							? subsection.title
+							: 'Feature question'
 
-						// Get a reasonable answer text
-						const answerText = `${walletName} supports this feature.`
+					// Get a reasonable answer text
+					const answerText = `${walletName} supports this feature.`
 
-						// Add to FAQ entries
-						faqEntries.push({
-							'@type': 'Question',
-							name: questionText,
-							acceptedAnswer: {
-								'@type': 'Answer',
-								text: answerText,
-							},
-						})
-					} catch (error) {
-						// Error handling, silent in production
-						if (process.env.NODE_ENV !== 'production') {
-							// eslint-disable-next-line no-console
-							console.error('Error creating FAQ entry:', error)
-						}
-					}
+					// Add to FAQ entries
+					faqEntries.push({
+						'@type': 'Question',
+						name: questionText,
+						acceptedAnswer: {
+							'@type': 'Answer',
+							text: answerText,
+						},
+					})
 				}
 			}
 		}
@@ -357,10 +341,7 @@ export function WalletPage({
 				body: null,
 				subsections: mapGroupAttributes<RichSection | null, Vs>(
 					evalGroup,
-					<V extends Value>(
-						evalAttr: EvaluatedAttribute<V>,
-						attributeKey: keyof Vs,
-					): RichSection | null => {
+					<V extends Value>(evalAttr: EvaluatedAttribute<V>): RichSection | null => {
 						// Determine which hardware-only list to use
 						let hardwareOnlyList: string[] = []
 						switch (attrGroup.id) {
@@ -380,24 +361,16 @@ export function WalletPage({
 
 						// DEBUG: Check wallet type, attribute ID, and rating before filtering
 						const isHardwareOnly = hardwareOnlyList.includes(evalAttr.attribute.id)
-						console.log(
-							`[Filtering Check] Wallet: ${walletName}, isHardware: ${isHardwareWallet}, Group: ${attrGroup.id}, Attribute ID: ${evalAttr.attribute.id}, Rating: ${evalAttr.evaluation.value.rating}, Is Hardware-Only: ${isHardwareOnly}`,
-						)
 
 						// Filter out hardware-only attributes if it's not a hardware wallet
 						if (!isHardwareWallet && isHardwareOnly) {
-							console.log(
-								`[Filtering] HIDING ${evalAttr.attribute.id} because it's hardware-only for a software wallet.`,
-							)
 							return null
 						}
 
 						if (evalAttr.evaluation.value.rating === Rating.EXEMPT) {
-							console.log(
-								`[Filtering] HIDING ${evalAttr.attribute.id} because its rating is EXEMPT.`,
-							)
 							return null
 						}
+
 						const relevantVariants: Variant[] =
 							attrToRelevantVariants.get(evalAttr.attribute.id) ?? []
 						const {
@@ -416,7 +389,6 @@ export function WalletPage({
 											attrGroup={attrGroup}
 											evalGroup={evalGroup}
 											evalAttr={evalAttr}
-											attributeKey={String(attributeKey)}
 											variantSpecificity={VariantSpecificity.ALL_SAME}
 											displayedVariant={pickedVariant}
 										/>
@@ -465,7 +437,6 @@ export function WalletPage({
 											attrGroup={attrGroup}
 											evalGroup={evalGroup}
 											evalAttr={evalAttr}
-											attributeKey={String(attributeKey)}
 											variantSpecificity={VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT}
 											displayedVariant={relevantVariants[0]}
 										/>
@@ -539,7 +510,6 @@ export function WalletPage({
 										attrGroup={attrGroup}
 										evalGroup={evalGroup}
 										evalAttr={evalAttr}
-										attributeKey={String(attributeKey)}
 										variantSpecificity={VariantSpecificity.NOT_UNIVERSAL}
 										displayedVariant={pickedVariant}
 									/>
@@ -547,8 +517,8 @@ export function WalletPage({
 							}
 						})()
 						return {
-							header: slugifyCamelCase(String(attributeKey)),
-							subHeader: null,
+							header: slugifyCamelCase(attrGroup.id),
+							subHeader: slugifyCamelCase(evalAttr.attribute.id),
 							title: evalAttr.attribute.displayName,
 							icon: evalAttr.attribute.icon,
 							cornerControl,
@@ -577,12 +547,6 @@ export function WalletPage({
 					},
 				).filter(subsection => subsection !== null),
 			}
-
-			// DEBUG: Log remaining subsections for this group after filtering
-			console.log(
-				`[Post-Filter Check] Group: ${attrGroup.id}, Remaining Subsections Count: ${section.subsections.length}, IDs: ${section.subsections.map(s => s?.header ?? 'null').join(', ')}`,
-			)
-
 			if (section.subsections.length > 0) {
 				sections.push(section)
 			}

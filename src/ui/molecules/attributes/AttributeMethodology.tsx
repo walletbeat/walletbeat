@@ -94,11 +94,9 @@ function replaceExampleRatingPrefix(
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring(possessiveWalletTypeMatch[0].length)}`
 		}
 
-		// If no match, log a warning and return the original text
-		console.warn(
+		throw new Error(
 			`Example ratings should ideally begin with the phrase "The wallet" or "The [type] wallet". Using original text: "${unprefixedText}"`,
 		)
-		return text // Return the original full text including any prefix whitespace
 	}
 }
 

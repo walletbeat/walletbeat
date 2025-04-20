@@ -8,10 +8,11 @@ import {
 	type ValueSet,
 } from '@/schema/attributes'
 import { mapGroupAttributes, numGroupAttributes } from '@/schema/attribute-groups'
-import { toFullyQualified } from '@/schema/reference'
+import { toFullyQualified, type FullyQualifiedReference } from '@/schema/reference'
 import type { RatedWallet, WalletMetadata } from '@/schema/wallet'
 import type { HardwareWalletModel } from '@/schema/features/profile'
 import { RenderContent } from '../atoms/RenderContent'
+import type { LabeledUrl } from '@/schema/url'
 
 interface RatingDetailModalProps<Vs extends ValueSet> {
 	open: boolean
@@ -227,17 +228,6 @@ export function RatingDetailModal<Vs extends ValueSet>({
 									const references = toFullyQualified(evalAttr.evaluation.references)
 									const hasReferences = references.length > 0
 
-									// Get wallet metadata for short explanation, provide default name
-									const walletMetadata: Partial<WalletMetadata> = // Allow partial metadata
-										evalAttr?.evaluation?.wallet?.metadata ||
-											wallet?.metadata || { displayName: walletId || 'This wallet' }
-
-									const shortExplanation = evalAttr?.evaluation?.value?.shortExplanation?.render
-										? evalAttr.evaluation.value.shortExplanation.render(
-												walletMetadata as WalletMetadata,
-											) // Assert type for render
-										: getShortExplanation(evalTree, attrGroup.id, attr.id, walletId)
-
 									// Create proper attribute anchor for links
 									const detailUrl = `/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`
 
@@ -289,102 +279,33 @@ export function RatingDetailModal<Vs extends ValueSet>({
 
 													{hasReferences ? (
 														<div className="space-y-3">
-															{references.map((ref: any, refIndex: number) => {
-																// Keep ref as any for flexibility
-																// Handle different reference structures
-																if (typeof ref === 'string') {
-																	// Simple string URL
-																	return (
-																		<div
-																			key={refIndex}
-																			className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
-																		>
-																			<div className="flex flex-wrap gap-2 mt-1">
+															{references.map((ref: FullyQualifiedReference, refIndex: number) => {
+																return (
+																	<div
+																		key={refIndex}
+																		className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
+																	>
+																		{ref.explanation && (
+																			<p className="mb-2 text-gray-700 dark:text-gray-300">
+																				{ref.explanation}
+																			</p>
+																		)}
+																		<div className="flex flex-wrap gap-2 mt-1">
+																			{ref.urls.map((urlObj: LabeledUrl, urlIndex: number) => (
 																				<a
-																					href={ref}
+																					key={urlIndex}
+																					href={urlObj.url}
 																					target="_blank"
 																					rel="noopener noreferrer"
 																					className="text-blue-500 hover:underline inline-flex items-center"
 																				>
-																					<span>Reference</span>
-																					<svg
-																						className="w-3 h-3 ml-1"
-																						fill="none"
-																						stroke="currentColor"
-																						viewBox="0 0 24 24"
-																						xmlns="http://www.w3.org/2000/svg"
-																					>
-																						<path
-																							strokeLinecap="round"
-																							strokeLinejoin="round"
-																							strokeWidth="2"
-																							d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-																						></path>
-																					</svg>
+																					<span>{urlObj.label || 'Reference'}</span>
+																					{/* SVG icon */}
 																				</a>
-																			</div>
+																			))}
 																		</div>
-																	)
-																} else if (ref && typeof ref === 'object') {
-																	if ('urls' in ref && Array.isArray(ref.urls)) {
-																		// FullyQualifiedReference
-																		return (
-																			<div
-																				key={refIndex}
-																				className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
-																			>
-																				{ref.explanation && (
-																					<p className="mb-2 text-gray-700 dark:text-gray-300">
-																						{ref.explanation}
-																					</p>
-																				)}
-																				<div className="flex flex-wrap gap-2 mt-1">
-																					{ref.urls.map((urlObj: any, urlIndex: number) => (
-																						<a
-																							key={urlIndex}
-																							href={urlObj.url}
-																							target="_blank"
-																							rel="noopener noreferrer"
-																							className="text-blue-500 hover:underline inline-flex items-center"
-																						>
-																							<span>{urlObj.label || 'Reference'}</span>
-																							{/* SVG icon */}
-																						</a>
-																					))}
-																				</div>
-																			</div>
-																		)
-																	} else if ('url' in ref) {
-																		// LabeledUrl or LooseReference object
-																		return (
-																			<div
-																				key={refIndex}
-																				className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
-																			>
-																				{ref.explanation && (
-																					<p className="mb-2 text-gray-700 dark:text-gray-300">
-																						{ref.explanation}
-																					</p>
-																				)}
-																				<div className="flex flex-wrap gap-2 mt-1">
-																					<a
-																						key={0} // Only one URL
-																						href={ref.url}
-																						target="_blank"
-																						rel="noopener noreferrer"
-																						className="text-blue-500 hover:underline inline-flex items-center"
-																					>
-																						<span>{ref.label || 'Reference'}</span>
-																						{/* SVG icon */}
-																					</a>
-																				</div>
-																			</div>
-																		)
-																	}
-																}
-																// Fallback for unknown structure
-																console.warn('Unknown reference structure:', ref)
-																return null
+																	</div>
+																)
 															})}
 														</div>
 													) : (
