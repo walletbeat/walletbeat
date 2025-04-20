@@ -1,7 +1,7 @@
-import { type FullyQualifiedReference } from '@/schema/reference'
-import { type LabeledUrl } from '@/schema/url'
+import type { FullyQualifiedReference } from '@/schema/reference'
+import type { LabeledUrl } from '@/schema/url'
 import { Box, Link, Typography } from '@mui/material'
-import React from 'react'
+import type React from 'react'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import LinkIcon from '@mui/icons-material/Link'
 

@@ -17,7 +17,7 @@ import type { HardwareWalletSupport } from './features/security/hardware-wallet-
 import type { HardwareWalletDappSigningImplementation } from './features/security/hardware-wallet-dapp-signing'
 import type { FeeTransparencySupport } from './features/transparency/fee-transparency'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
-import { type BugBountyProgramImplementation } from './features/security/bug-bounty-program'
+import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
 import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { ReputationSupport } from './features/transparency/reputation'
 import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'

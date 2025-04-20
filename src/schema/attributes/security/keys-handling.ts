@@ -87,9 +87,8 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<KeysHandlingValue>>) => {
-		return pickWorstRating<KeysHandlingValue>(perVariant)
-	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<KeysHandlingValue>>) =>
+		pickWorstRating<KeysHandlingValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<KeysHandlingValue> => {
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(

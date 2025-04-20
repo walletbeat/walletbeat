@@ -37,10 +37,8 @@ export const HomePage: FC = () => (
 						icon: <LuWallet />,
 						href: '/',
 						id: 'wallets-nav',
-						children: Object.keys(wallets).map(key => {
-							// Using type-safe keys
-							const safeKey = key as WalletsKey
-							const wallet = wallets[safeKey]
+						children: (Object.keys(wallets) as WalletsKey[]).map(key => {
+							const wallet = wallets[key]
 
 							return {
 								title: wallet.metadata.displayName,
@@ -66,10 +64,8 @@ export const HomePage: FC = () => (
 						icon: <LuKey />,
 						href: '/',
 						id: 'hardware-wallets',
-						children: Object.keys(hardwareWallets).map(key => {
-							// Using type-safe keys
-							const safeKey = key as HardwareWalletsKey
-							const wallet = hardwareWallets[safeKey]
+						children: (Object.keys(hardwareWallets) as HardwareWalletsKey[]).map(key => {
+							const wallet = hardwareWallets[key]
 
 							// Simplified display names for hardware wallets
 							let displayName = wallet.metadata.displayName

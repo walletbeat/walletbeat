@@ -74,9 +74,8 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<InteroperabilityValue>>) => {
-		return pickWorstRating<InteroperabilityValue>(perVariant)
-	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<InteroperabilityValue>>) =>
+		pickWorstRating<InteroperabilityValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<InteroperabilityValue> => {
 		if (features.variant !== Variant.HARDWARE) {
 			return unrated(interoperability, brand, {

@@ -26,7 +26,7 @@ import type { Url } from './url'
 import { Rating, type Attribute, type EvaluatedAttribute, type Value } from './attributes'
 import type { Dict } from '@/types/utils/dict'
 import type { CalendarDate } from '@/types/date'
-import { HardwareWalletManufactureType, type HardwareWalletModel } from './features/profile'
+import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
 import { supportedAccountTypes, type AccountType } from './features/account-support'
 import type { WalletDeveloper } from './entity'
 
@@ -37,7 +37,7 @@ export interface Contributor {
 
 	/** The contributor's affiliation with wallet development organizations. */
 	affiliation:
-		| {
+		| Array<{
 				/**
 				 * The wallet development organization that the contributor works for.
 				 */
@@ -52,7 +52,7 @@ export interface Contributor {
 				 * Whether the contributor has non-zero equity ownership of the company.
 				 */
 				hasEquity: boolean
-		  }[]
+		  }>
 		| 'NO_AFFILIATION'
 }
 
@@ -436,7 +436,7 @@ export function walletSupportedAccountTypes(
 	variant: Variant | 'ALL_VARIANTS',
 ): NonEmptySet<AccountType> | null {
 	if (variant === 'ALL_VARIANTS') {
-		const accountTypeSets: NonEmptySet<AccountType>[] = []
+		const accountTypeSets: Array<NonEmptySet<AccountType>> = []
 		for (const variant of setItems(getWalletVariants(wallet))) {
 			const supportedByVariant = walletSupportedAccountTypes(wallet, variant)
 			if (supportedByVariant === null) {

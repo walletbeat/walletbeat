@@ -6,7 +6,7 @@ import {
 	Rating,
 	type Value,
 } from '../attributes'
-import { type AtLeastOneVariant, Variant } from '../variants'
+import type { AtLeastOneVariant, Variant } from '../variants'
 import { type Sentence, sentence } from '@/types/content'
 import type { WalletMetadata } from '../wallet'
 import { unratedAttributeContent } from '@/types/content/unrated-attribute'

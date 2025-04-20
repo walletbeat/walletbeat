@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import type React from 'react'
+import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { eipEthereumDotOrgUrl, type Eip } from '@/schema/eips'
 
@@ -19,14 +20,13 @@ export function EipPreviewModal({
 	})
 
 	// Format text to be more readable
-	const formatMarkdownText = (text: string): string => {
+	const formatMarkdownText = (text: string): string =>
 		// Remove extra indentation
-		return text
+		text
 			.trim()
 			.replace(/^\t+/gm, '') // Remove tab indentation
 			.replace(/\n\s*\n/g, '\n\n') // Normalize paragraph breaks
 			.replace(/\n{3,}/g, '\n\n') // Limit consecutive line breaks
-	}
 
 	// Process links to make them clickable
 	const processMarkdownLinks = (text: string): React.ReactNode[] => {

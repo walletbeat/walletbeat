@@ -89,9 +89,8 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwarePrivacyValue>>) => {
-		return pickWorstRating<HardwarePrivacyValue>(perVariant)
-	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwarePrivacyValue>>) =>
+		pickWorstRating<HardwarePrivacyValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwarePrivacyValue> => {
 		if (features.variant !== Variant.HARDWARE) {
 			return unrated(hardwarePrivacy, brand, {

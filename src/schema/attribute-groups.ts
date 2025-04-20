@@ -31,8 +31,7 @@ import {
 	type FeeTransparencyValue,
 } from './attributes/transparency/fee-transparency'
 import type { ResolvedFeatures } from './features'
-import type { AtLeastOneVariant } from './variants'
-import { Variant } from './variants'
+import type { AtLeastOneVariant, Variant } from './variants'
 import type { Dict } from '@/types/utils/dict'
 import { funding, type FundingValue } from './attributes/transparency/funding'
 import {

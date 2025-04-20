@@ -29,7 +29,7 @@ import { HardwareWalletManufactureType } from '@/schema/features/profile'
 import { WebIcon, MobileIcon, DesktopIcon } from '@/icons'
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
 import { EipPreviewModal } from '../molecules/EipPreviewModal'
-import { type Eip } from '@/schema/eips'
+import type { Eip } from '@/schema/eips'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
 import { walletSupportedAccountTypes, type RatedWallet } from '@/schema/wallet'
 import { AccountType } from '@/schema/features/account-support'
@@ -500,7 +500,7 @@ function ExpandableHardwareWalletRow({
 	columns,
 }: {
 	row: Row<TableRow>
-	columns: ColumnDef<TableRow, CellValue>[]
+	columns: Array<ColumnDef<TableRow, CellValue>>
 }): React.ReactElement {
 	const [isExpanded, setIsExpanded] = useState(false)
 	const [selectedModel, setSelectedModel] = useState<string | null>(null)
@@ -519,9 +519,9 @@ function ExpandableHardwareWalletRow({
 		}
 	}, [flagshipModel, models, selectedModel])
 
-	// Get the currently selected model name
+	// Get the currently selected model name (used in wallet name column only)
 	const selectedModelName = selectedModel
-		? models.find(m => m.id === selectedModel)?.name
+		? (models.find(m => m.id === selectedModel)?.name ?? '')
 		: models.length > 0
 			? models[0].name
 			: ''
@@ -537,31 +537,25 @@ function ExpandableHardwareWalletRow({
 	}
 
 	const evalTree = getEvaluationTree(wallet, DeviceVariant.HARDWARE)
-	const modelName = selectedModel ? models.find(m => m.id === selectedModel)?.name : ''
 	const perAttributeGroupCells: React.JSX.Element[] = mapNonExemptAttributeGroupsInTree(
 		evalTree,
-		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => {
-			return (
-				<div className="flex flex-col items-center">
-					{modelName && (
-						<div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{modelName}</div>
-					)}
-					<PizzaSliceChart<Vs>
-						attrGroup={attrGroup}
-						evalGroup={evalGroup}
-						isSupported={true}
-						wallet={wallet}
-					/>
-				</div>
-			)
-		},
+		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => (
+			<div className="flex flex-col items-center">
+				<PizzaSliceChart<Vs>
+					attrGroup={attrGroup}
+					evalGroup={evalGroup}
+					isSupported={true}
+					wallet={wallet}
+				/>
+			</div>
+		),
 	)
 
-	// Create updated cells for rating data
-	const createUpdatedCell = (cell: Cell<TableRow, unknown>, columnIndex: number) => {
+	// Create updated cells for rating data (synchronous)
+	const createUpdatedCell = async (cell: Cell<TableRow, unknown>, columnIndex: number) => {
 		// Skip first two columns (Wallet name and Manufacture Type)
 		if (columnIndex < 2) {
-			return flexRender(cell.column.columnDef.cell, cell.getContext())
+			return await flexRender(cell.column.columnDef.cell, cell.getContext())
 		}
 		return perAttributeGroupCells[columnIndex - 2]
 	}
@@ -691,7 +685,7 @@ function ExpandableHardwareWalletRow({
 	)
 }
 
-type WalletTypeCell = {
+interface WalletTypeCell {
 	typeString: string
 	hasSmartWallet: boolean
 	standards: Record<SmartWalletStandard, boolean>
@@ -952,10 +946,8 @@ export default function WalletTable(): React.ReactElement {
 			)
 		},
 	})
-	const attributeGroupColumnFromAttrGroup = <Vs extends ValueSet>(
-		attrGroup: AttributeGroup<Vs>,
-	) => {
-		return columnHelper.display({
+	const attributeGroupColumnFromAttrGroup = <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>) =>
+		columnHelper.display({
 			header: attrGroup.displayName,
 			cell: ({ row }) => {
 				const wallet = row.original.wallet
@@ -974,8 +966,7 @@ export default function WalletTable(): React.ReactElement {
 				)
 			},
 		})
-	}
-	const softwareColumns: ColumnDef<TableRow, CellValue>[] = [
+	const softwareColumns: Array<ColumnDef<TableRow, CellValue>> = [
 		walletNameColumn,
 		walletTypeColumn,
 		walletVariantColumn,
@@ -996,54 +987,51 @@ export default function WalletTable(): React.ReactElement {
 	const hardwareWalletManufactureTypeColumn = columnHelper.display({
 		id: 'manufacture_type',
 		header: 'Manufacture Type',
-		cell: ({ row }: { row: Row<TableRow> }): CellValue => {
-			return getHardwareWalletManufactureTypeDisplay(row.original.wallet)
-		},
+		cell: ({ row }: { row: Row<TableRow> }): CellValue =>
+			getHardwareWalletManufactureTypeDisplay(row.original.wallet),
 	})
 	// Replace web/mobile/desktop device selector with hardware icon for hardware wallets
 	const hardwareWalletVariantColumn = columnHelper.display({
 		id: 'risk_by_device',
 		header: 'Risk by device',
-		cell: () => {
-			return (
-				<div className="flex space-x-0 items-center justify-center">
-					<div className="flex flex-col items-center group">
-						<button
-							className={`p-2 rounded-md transition-colors ${
+		cell: () => (
+			<div className="flex space-x-0 items-center justify-center">
+				<div className="flex flex-col items-center group">
+					<button
+						className={`p-2 rounded-md transition-colors ${
+							selectedVariant === DeviceVariant.NONE
+								? 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
+								: 'text-[var(--active)]'
+						}`}
+						onClick={() => {
+							handleVariantChange(
 								selectedVariant === DeviceVariant.NONE
-									? 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
-									: 'text-[var(--active)]'
-							}`}
-							onClick={() => {
-								handleVariantChange(
-									selectedVariant === DeviceVariant.NONE
-										? DeviceVariant.HARDWARE
-										: DeviceVariant.NONE,
-								)
+									? DeviceVariant.HARDWARE
+									: DeviceVariant.NONE,
+							)
+						}}
+						title="Hardware"
+					>
+						<HardwareIcon
+							style={{
+								width: '24px',
+								height: '24px',
+								fill: selectedVariant === DeviceVariant.NONE ? 'currentColor' : 'var(--active)',
 							}}
-							title="Hardware"
-						>
-							<HardwareIcon
-								style={{
-									width: '24px',
-									height: '24px',
-									fill: selectedVariant === DeviceVariant.NONE ? 'currentColor' : 'var(--active)',
-								}}
-							/>
-						</button>
-						<div
-							className={`w-2 h-2 rounded-full mt-1 transition-colors ${
-								selectedVariant !== DeviceVariant.NONE
-									? 'bg-[var(--active)]'
-									: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
-							}`}
 						/>
-					</div>
+					</button>
+					<div
+						className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+							selectedVariant !== DeviceVariant.NONE
+								? 'bg-[var(--active)]'
+								: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
+						}`}
+					/>
 				</div>
-			)
-		},
+			</div>
+		),
 	})
-	const hardwareColumns: ColumnDef<TableRow, CellValue>[] = [
+	const hardwareColumns: Array<ColumnDef<TableRow, CellValue>> = [
 		hardwareWalletNameColumn,
 		hardwareWalletManufactureTypeColumn,
 		hardwareWalletVariantColumn,
@@ -1054,9 +1042,10 @@ export default function WalletTable(): React.ReactElement {
 	]
 
 	// Use the appropriate columns based on active tab
-	const columns = useMemo<ColumnDef<TableRow, CellValue>[]>(() => {
-		return activeTab === WalletTableTab.SOFTWARE ? softwareColumns : hardwareColumns
-	}, [activeTab])
+	const columns = useMemo<Array<ColumnDef<TableRow, CellValue>>>(
+		() => (activeTab === WalletTableTab.SOFTWARE ? softwareColumns : hardwareColumns),
+		[activeTab],
+	)
 
 	// Create table
 	const table = useReactTable({

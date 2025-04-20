@@ -188,7 +188,7 @@ export function setItems<K extends string | number | symbol>(
 export function setUnion<K extends string | number | symbol>(
 	sets: NonEmptyArray<NonEmptySet<K>>,
 ): NonEmptySet<K> {
-	const union: Map<K, true> = new Map()
+	const union = new Map<K, true>()
 	for (const set of sets) {
 		for (const item of setItems(set)) {
 			union.set(item, true)

@@ -90,9 +90,8 @@ export const reputation: Attribute<ReputationValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationValue>>) => {
-		return pickWorstRating<ReputationValue>(perVariant)
-	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationValue>>) =>
+		pickWorstRating<ReputationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<ReputationValue> => {
 		if (features.variant !== Variant.HARDWARE) {
 			return unrated(reputation, brand, {

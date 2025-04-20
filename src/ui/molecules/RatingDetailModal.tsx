@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import type React from 'react'
+import { useState, useEffect } from 'react'
 import { Modal, Button, useMediaQuery, useTheme, Typography } from '@mui/material'
 import {
 	ratingToColor,
@@ -143,7 +144,9 @@ export function RatingDetailModal<Vs extends ValueSet>({
 							selectedModel !== null && selectedModel.id === model.id ? 'contained' : 'outlined'
 						}
 						size="small"
-						onClick={() => setSelectedModel(model)}
+						onClick={() => {
+							setSelectedModel(model)
+						}}
 						sx={{
 							borderRadius: '16px',
 							textTransform: 'none',
@@ -245,7 +248,9 @@ export function RatingDetailModal<Vs extends ValueSet>({
 												onMouseLeave={() => {
 													setHoveredSliceIndex(null)
 												}}
-												onClick={() => toggleExpandedAttribute(evalAttr.attribute.id)}
+												onClick={() => {
+													toggleExpandedAttribute(evalAttr.attribute.id)
+												}}
 											>
 												<div
 													className="w-3 h-3 rounded-full mr-3 flex-shrink-0 border border-gray-300 dark:border-gray-600"
@@ -279,34 +284,32 @@ export function RatingDetailModal<Vs extends ValueSet>({
 
 													{hasReferences ? (
 														<div className="space-y-3">
-															{references.map((ref: FullyQualifiedReference, refIndex: number) => {
-																return (
-																	<div
-																		key={refIndex}
-																		className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
-																	>
-																		{ref.explanation && (
-																			<p className="mb-2 text-gray-700 dark:text-gray-300">
-																				{ref.explanation}
-																			</p>
-																		)}
-																		<div className="flex flex-wrap gap-2 mt-1">
-																			{ref.urls.map((urlObj: LabeledUrl, urlIndex: number) => (
-																				<a
-																					key={urlIndex}
-																					href={urlObj.url}
-																					target="_blank"
-																					rel="noopener noreferrer"
-																					className="text-blue-500 hover:underline inline-flex items-center"
-																				>
-																					<span>{urlObj.label || 'Reference'}</span>
-																					{/* SVG icon */}
-																				</a>
-																			))}
-																		</div>
+															{references.map((ref: FullyQualifiedReference, refIndex: number) => (
+																<div
+																	key={refIndex}
+																	className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
+																>
+																	{ref.explanation && (
+																		<p className="mb-2 text-gray-700 dark:text-gray-300">
+																			{ref.explanation}
+																		</p>
+																	)}
+																	<div className="flex flex-wrap gap-2 mt-1">
+																		{ref.urls.map((urlObj: LabeledUrl, urlIndex: number) => (
+																			<a
+																				key={urlIndex}
+																				href={urlObj.url}
+																				target="_blank"
+																				rel="noopener noreferrer"
+																				className="text-blue-500 hover:underline inline-flex items-center"
+																			>
+																				<span>{urlObj.label || 'Reference'}</span>
+																				{/* SVG icon */}
+																			</a>
+																		))}
 																	</div>
-																)
-															})}
+																</div>
+															))}
 														</div>
 													) : (
 														<p className="text-gray-500 dark:text-gray-400 italic">

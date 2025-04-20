@@ -1,4 +1,4 @@
-import { type WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference'
 
 /**
  * Types of fee transparency levels

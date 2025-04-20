@@ -17,8 +17,7 @@ import { pickWorstRating, unrated } from '../common'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import { licenseDetailsContent } from '@/types/content/license-details'
-import { toFullyQualified } from '@/schema/reference'
-import { refs } from '@/schema/reference'
+import { toFullyQualified, refs } from '@/schema/reference'
 
 const brand = 'attributes.transparency.open_source'
 export type OpenSourceValue = Value & {

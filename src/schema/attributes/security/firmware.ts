@@ -85,9 +85,8 @@ export const firmware: Attribute<FirmwareValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FirmwareValue>>) => {
-		return pickWorstRating<FirmwareValue>(perVariant)
-	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FirmwareValue>>) =>
+		pickWorstRating<FirmwareValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
 		if (features.variant !== Variant.HARDWARE) {
 			return unrated(firmware, brand, {

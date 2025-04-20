@@ -84,12 +84,12 @@ function replaceExampleRatingPrefix(
 		const walletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet\s+/
 		const possessiveWalletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet's\s+/
 
-		const walletTypeMatch = unprefixedText.match(walletTypeRegex)
+		const walletTypeMatch = walletTypeRegex.exec(unprefixedText)
 		if (walletTypeMatch) {
 			return `${whitespacePrefix}${theWallet}${unprefixedText.substring(walletTypeMatch[0].length)}`
 		}
 
-		const possessiveWalletTypeMatch = unprefixedText.match(possessiveWalletTypeRegex)
+		const possessiveWalletTypeMatch = possessiveWalletTypeRegex.exec(unprefixedText)
 		if (possessiveWalletTypeMatch) {
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring(possessiveWalletTypeMatch[0].length)}`
 		}

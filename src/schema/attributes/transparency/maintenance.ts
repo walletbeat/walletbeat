@@ -95,9 +95,8 @@ export const maintenance: Attribute<MaintenanceValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<MaintenanceValue>>) => {
-		return pickWorstRating<MaintenanceValue>(perVariant)
-	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<MaintenanceValue>>) =>
+		pickWorstRating<MaintenanceValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<MaintenanceValue> => {
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(

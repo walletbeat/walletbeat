@@ -51,7 +51,7 @@ function sliceToData(slice: PieSlice): PieValueType {
 				case 'tooltip':
 					return slice.tooltip
 				case 'arc':
-					return `${slice.arcLabel}`
+					return slice.arcLabel
 			}
 		},
 	}
@@ -234,7 +234,7 @@ export function RatingPie({
 					id: pieId,
 					data: nonEmptyMap(slices, slice => sliceToData(slice)),
 					type: 'pie',
-					arcLabel: arcLabel,
+					arcLabel,
 					arcLabelRadius: computeArcLabel(innerRadius, outerRadius),
 					cx,
 					cy,

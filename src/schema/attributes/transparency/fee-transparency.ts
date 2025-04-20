@@ -249,7 +249,7 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<FeeTransparencyValue> => {
-		if (!features.transparency?.feeTransparency) {
+		if (!features.transparency.feeTransparency) {
 			return unrated(feeTransparency, brand, {
 				feeTransparencyLevel: FeeTransparencyLevel.NONE,
 				disclosesWalletFees: false,
@@ -285,7 +285,6 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 				})
 		}
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) => {
-		return pickWorstRating<FeeTransparencyValue>(perVariant)
-	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) =>
+		pickWorstRating<FeeTransparencyValue>(perVariant),
 }

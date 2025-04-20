@@ -5,6 +5,7 @@ import {
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	type EvaluationData,
 } from '@/schema/attributes'
 import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -13,7 +14,6 @@ import type { AtLeastOneVariant } from '@/schema/variants'
 import { UserSafetyType, type UserSafetySupport } from '@/schema/features/security/user-safety'
 import { popRefs } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import { type EvaluationData } from '@/schema/attributes'
 
 const brand = 'attributes.user_safety'
 
@@ -147,9 +147,8 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) => {
-		return pickWorstRating<UserSafetyValue>(perVariant)
-	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) =>
+		pickWorstRating<UserSafetyValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<UserSafetyValue> => {
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
