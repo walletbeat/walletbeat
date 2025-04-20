@@ -3,8 +3,8 @@ import { ratedHardwareWallets, type HardwareWalletName } from '@/data/hardware-w
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
-	mapAttributeGroupsInTree,
-	mapGroupAttributes,
+	mapNonExemptAttributeGroupsInTree,
+	mapNonExemptGroupAttributes,
 	hardwareOnlyEcosystem,
 	hardwareOnlyPrivacy,
 	hardwareOnlySecurity,
@@ -312,7 +312,7 @@ export function WalletPage({
 			),
 		},
 	]
-	mapAttributeGroupsInTree(
+	mapNonExemptAttributeGroupsInTree(
 		evalTree,
 		<Vs extends ValueSet>(
 			attrGroup: AttributeGroup<Vs>,
@@ -339,7 +339,7 @@ export function WalletPage({
 					/>
 				),
 				body: null,
-				subsections: mapGroupAttributes<RichSection | null, Vs>(
+				subsections: mapNonExemptGroupAttributes<RichSection | null, Vs>(
 					evalGroup,
 					<V extends Value>(evalAttr: EvaluatedAttribute<V>): RichSection | null => {
 						// Determine which hardware-only list to use

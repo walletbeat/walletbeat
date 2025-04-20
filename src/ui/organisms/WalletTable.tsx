@@ -9,17 +9,16 @@ import {
 	type CellContext,
 	createColumnHelper,
 } from '@tanstack/react-table'
-import { ratedWallets } from '@/data/wallets'
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
+import { ratedWallets, unratedWallet } from '@/data/wallets'
+import { ratedHardwareWallets, unratedHardwareWallet } from '@/data/hardware-wallets'
 import {
-	mapGroupAttributes,
-	numGroupAttributes,
-	mapAttributeGroupsInTree,
-	mapAttributeGroups,
+	mapNonExemptGroupAttributes,
+	numNonExemptGroupAttributes,
+	mapNonExemptAttributeGroupsInTree,
 	getAttributeGroupInTree,
-	getVisibleAttributesForWallet,
 } from '@/schema/attribute-groups'
 import {
+	Rating,
 	ratingToColor,
 	type AttributeGroup,
 	type EvaluatedGroup,
@@ -39,7 +38,6 @@ import { setContains, type NonEmptySet } from '@/types/utils/non-empty'
 import { hasVariant, Variant } from '@/schema/variants'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { eip7702 } from '@/data/eips/eip-7702'
-import { getAttributeGroupsForWallet } from '@/schema/attribute-groups'
 
 // Define wallet type constants from the previous implementation
 const WalletTypeCategory = {
@@ -218,22 +216,23 @@ function PizzaSliceChart<Vs extends ValueSet>({
 	evalGroup,
 	isSupported = true,
 	wallet,
-	visibleAttributes,
 }: {
 	attrGroup: AttributeGroup<Vs>
 	evalGroup: EvaluatedGroup<Vs>
 	isSupported?: boolean
 	wallet: RatedWallet
-	visibleAttributes: [string, any][]
 }): React.ReactElement {
 	// Add state for the modal
 	const [modalOpen, setModalOpen] = useState(false)
 
 	const attrGroupScore = attrGroup.score(evalGroup)
-	const overallScore = attrGroupScore === null ? 0 : attrGroupScore.score
-	const attributeCount = numGroupAttributes(evalGroup)
+	if (attrGroupScore === null) {
+		// All attributes in the group are exempt, can't render pie chart.
+		return <></>
+	}
+	const attributeCount = numNonExemptGroupAttributes(evalGroup)
 
-	const tooltipText = `${attrGroup.displayName}: ${Math.round(overallScore * 100)}% (${attributeCount} attributes)`
+	const tooltipText = `${attrGroup.displayName}: ${Math.round(attrGroupScore.score * 100)}% (${attributeCount} attributes)`
 
 	// Create SVG slices for cleaner rendering with gaps
 	const createSlices = () => {
@@ -245,7 +244,7 @@ function PizzaSliceChart<Vs extends ValueSet>({
 
 		const sliceAngle = 360 / attributeCount - gapAngle
 
-		return mapGroupAttributes(evalGroup, (evalAttr, index) => {
+		return mapNonExemptGroupAttributes(evalGroup, (evalAttr, index) => {
 			const startAngle = index * (sliceAngle + gapAngle)
 			const endAngle = startAngle + sliceAngle
 
@@ -540,7 +539,7 @@ function ExpandableHardwareWalletRow({
 
 	const evalTree = getEvaluationTree(wallet, DeviceVariant.HARDWARE)
 	const modelName = selectedModel ? models.find(m => m.id === selectedModel)?.name : ''
-	const perAttributeGroupCells: React.JSX.Element[] = mapAttributeGroupsInTree(
+	const perAttributeGroupCells: React.JSX.Element[] = mapNonExemptAttributeGroupsInTree(
 		evalTree,
 		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => {
 			return (
@@ -553,7 +552,6 @@ function ExpandableHardwareWalletRow({
 						evalGroup={evalGroup}
 						isSupported={true}
 						wallet={wallet}
-						visibleAttributes={Array.from(getVisibleAttributesForWallet(attrGroup, wallet, true))}
 					/>
 				</div>
 			)
@@ -956,36 +954,34 @@ export default function WalletTable(): React.ReactElement {
 			)
 		},
 	})
-	const attributeGroupColumn = mapAttributeGroups<ColumnDef<TableRow, CellValue>>(
-		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>) => {
-			return columnHelper.display({
-				header: attrGroup.displayName,
-				cell: ({ row }) => {
-					const wallet = row.original.wallet
-					const isSupported =
-						selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-					const evalTree = getEvaluationTree(wallet, selectedVariant)
-					const evalGroup = getAttributeGroupInTree(evalTree, attrGroup)
-					const visibleAttrs = Array.from(getVisibleAttributesForWallet(attrGroup, wallet, false))
+	const attributeGroupColumnFromAttrGroup = <Vs extends ValueSet>(
+		attrGroup: AttributeGroup<Vs>,
+	) => {
+		return columnHelper.display({
+			header: attrGroup.displayName,
+			cell: ({ row }) => {
+				const wallet = row.original.wallet
+				const isSupported =
+					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
+				const evalTree = getEvaluationTree(wallet, selectedVariant)
+				const evalGroup = getAttributeGroupInTree(evalTree, attrGroup)
 
-					return (
-						<PizzaSliceChart<Vs>
-							attrGroup={attrGroup}
-							evalGroup={evalGroup}
-							isSupported={isSupported}
-							wallet={wallet}
-							visibleAttributes={visibleAttrs}
-						/>
-					)
-				},
-			})
-		},
-	)
+				return (
+					<PizzaSliceChart<Vs>
+						attrGroup={attrGroup}
+						evalGroup={evalGroup}
+						isSupported={isSupported}
+						wallet={wallet}
+					/>
+				)
+			},
+		})
+	}
 	const softwareColumns: ColumnDef<TableRow, CellValue>[] = [
 		walletNameColumn,
 		walletTypeColumn,
 		walletVariantColumn,
-		...attributeGroupColumn,
+		...mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attributeGroupColumnFromAttrGroup),
 	]
 
 	// Define columns for hardware wallets
@@ -1053,7 +1049,10 @@ export default function WalletTable(): React.ReactElement {
 		hardwareWalletNameColumn,
 		hardwareWalletManufactureTypeColumn,
 		hardwareWalletVariantColumn,
-		...attributeGroupColumn,
+		...mapNonExemptAttributeGroupsInTree(
+			unratedHardwareWallet.overall,
+			attributeGroupColumnFromAttrGroup,
+		),
 	]
 
 	// Use the appropriate columns based on active tab

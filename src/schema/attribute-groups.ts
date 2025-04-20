@@ -432,9 +432,6 @@ export function evaluateAttributes(
 	const isHardware = features.variant === Variant.HARDWARE
 	const isDIY =
 		isHardware && metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
-	const isFactory =
-		isHardware &&
-		metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE
 
 	const supplyChainDIYEvaluation =
 		!isDIY && isHardware // Exempt if Hardware but not DIY
@@ -570,15 +567,6 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 }
 
 /**
- * Iterate over all attribute groups, calling `fn` with each group.
- */
-export function mapAttributeGroups<T>(
-	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>) => T,
-): T[] {
-	return Object.values(attributeTree).map(attrGroup => fn(attrGroup))
-}
-
-/**
  * Get a specific evaluated attribute group from an evaluation tree.
  */
 export function getAttributeGroupInTree<Vs extends ValueSet>(
@@ -589,35 +577,49 @@ export function getAttributeGroupInTree<Vs extends ValueSet>(
 }
 
 /**
- * Iterate over all attribute groups in a tree, calling `fn` with each group.
+ * Iterate over all non-exempt attribute groups in a tree, calling `fn` with each group.
  */
-export function mapAttributeGroupsInTree<T>(
+export function mapNonExemptAttributeGroupsInTree<T>(
 	tree: EvaluationTree,
 	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => T,
 ): T[] {
-	return Object.entries(attributeTree).map(([groupName, attrGroup]) => {
-		// Check if the group exists in the tree
-		const evalGroup = tree[groupName]
-		return fn(attrGroup, evalGroup)
-	})
+	return Object.entries(attributeTree)
+		.filter(
+			<Vs extends ValueSet>([groupName, _]: [string, AttributeGroup<Vs>]): boolean =>
+				numNonExemptGroupAttributes<Vs>(tree[groupName] as EvaluatedGroup<Vs>) > 0,
+		)
+		.map(([groupName, attrGroup]) => {
+			const evalGroup = tree[groupName]
+			return fn(attrGroup, evalGroup)
+		})
 }
 
 /**
- * Iterate over all attributes in an attribute group, calling `fn` with each
- * attribute and its corresponding key in the group.
+ * Iterate over all non-exempt attributes in an evaluated attribute group,
+ * calling `fn` with each attribute.
  */
-export function mapGroupAttributes<T, Vs extends ValueSet>(
+export function mapNonExemptGroupAttributes<T, Vs extends ValueSet>(
 	evalGroup: EvaluatedGroup<Vs>,
 	fn: <V extends Value>(evalAttr: EvaluatedAttribute<V>, index: number) => T,
 ): T[] {
-	return Object.values(evalGroup).map(fn)
+	return Object.values(evalGroup)
+		.filter(
+			<V extends Value>(evalAttr: EvaluatedAttribute<V>): boolean =>
+				evalAttr.evaluation.value.rating !== Rating.EXEMPT,
+		)
+		.map(fn)
 }
 
 /**
- * Return the number of attributes in an attribute group.
+ * Return the number of non-exempt attributes in an evaluated attribute group.
  */
-export function numGroupAttributes<Vs extends ValueSet>(evalGroup: EvaluatedGroup<Vs>): number {
-	return Object.values(evalGroup).length
+export function numNonExemptGroupAttributes<Vs extends ValueSet>(
+	evalGroup: EvaluatedGroup<Vs>,
+): number {
+	return Object.values(evalGroup).filter(
+		<V extends Value>(evalAttr: EvaluatedAttribute<V>): boolean =>
+			evalAttr.evaluation.value.rating !== Rating.EXEMPT,
+	).length
 }
 
 /**
@@ -653,7 +655,7 @@ export function getEvaluationFromOtherTree<V extends Value>(
 	evalAttr: EvaluatedAttribute<V>,
 	otherTree: EvaluationTree,
 ): EvaluatedAttribute<V> {
-	const otherEvalAttr = mapAttributeGroupsInTree(
+	const otherEvalAttr = mapNonExemptAttributeGroupsInTree(
 		otherTree,
 		(_, evalGroup): EvaluatedAttribute<V> | undefined => {
 			if (Object.hasOwn(evalGroup, evalAttr.attribute.id)) {
@@ -714,51 +716,3 @@ export const hardwareOnlySecurity = [
 export const hardwareOnlyPrivacy = ['hardware_privacy']
 export const hardwareOnlyTransparency = ['reputation', 'maintenance']
 export const hardwareOnlyEcosystem = ['interoperability']
-
-/**
- * Returns attribute groups relevant for the wallet.
- * NOTE: This function currently returns all defined groups, but could be used for filtering later.
- */
-export function getAttributeGroupsForWallet(features: ResolvedFeatures | undefined) {
-	// TODO: Add logic here if we ever need to return different *sets* of groups
-	// based on features. For now, just return the main attribute tree.
-	// Remove the previous filtering logic that was causing double-filtering.
-	return {
-		security: securityAttributeGroup,
-		privacy: privacyAttributeGroup,
-		selfSovereignty: selfSovereigntyAttributeGroup,
-		transparency: transparencyAttributeGroup,
-		ecosystem: ecosystemAttributeGroup,
-		maintenance: maintenanceAttributeGroup, // Assuming maintenance is always relevant
-	}
-}
-
-/**
- * Returns only the attributes relevant for the wallet (filters out hardwareOnly attributes for non-hardware wallets).
- */
-export function getVisibleAttributesForWallet(
-	attrGroup: AttributeGroup<any>,
-	features: any,
-	isHardwareWallet: boolean,
-) {
-	let hardwareOnly: string[] = []
-	switch (attrGroup.id) {
-		case 'security':
-			hardwareOnly = hardwareOnlySecurity
-			break
-		case 'privacy':
-			hardwareOnly = hardwareOnlyPrivacy
-			break
-		case 'transparency':
-			hardwareOnly = hardwareOnlyTransparency
-			break
-		case 'ecosystem':
-			hardwareOnly = hardwareOnlyEcosystem
-			break
-		default:
-			hardwareOnly = []
-	}
-	return Object.entries(attrGroup.attributes).filter(
-		([id, _attr]) => isHardwareWallet || !hardwareOnly.includes(id),
-	)
-}

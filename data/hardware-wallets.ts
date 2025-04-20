@@ -4,6 +4,7 @@ import { trezorWallet } from './hardware-wallets/trezor'
 import { gridplusWallet } from './hardware-wallets/gridplus'
 import { keystoneWallet } from './hardware-wallets/keystone'
 import { fireflyWallet } from './hardware-wallets/firefly'
+import { unratedHardwareTemplate } from './hardware-wallets/unrated.tmpl'
 
 /** Set of all known hardware wallets. */
 export const hardwareWallets = {
@@ -27,3 +28,6 @@ export function isValidHardwareWalletName(name: string): name is HardwareWalletN
 export const ratedHardwareWallets: Record<HardwareWalletName, RatedWallet> = Object.fromEntries(
 	Object.entries(hardwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 ) as Record<HardwareWalletName, RatedWallet>
+
+/** The unrated hardware wallet as a rated wallet. */
+export const unratedHardwareWallet = rateWallet(unratedHardwareTemplate)

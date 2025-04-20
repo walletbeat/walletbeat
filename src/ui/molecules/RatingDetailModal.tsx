@@ -7,7 +7,7 @@ import {
 	type EvaluatedGroup,
 	type ValueSet,
 } from '@/schema/attributes'
-import { mapGroupAttributes, numGroupAttributes } from '@/schema/attribute-groups'
+import { mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
 import { toFullyQualified, type FullyQualifiedReference } from '@/schema/reference'
 import type { RatedWallet, WalletMetadata } from '@/schema/wallet'
 import type { HardwareWalletModel } from '@/schema/features/profile'
@@ -70,14 +70,14 @@ export function RatingDetailModal<Vs extends ValueSet>({
 
 	// Create SVG slices for the enlarged chart
 	const createEnlargedSlices = (): React.JSX.Element[] => {
-		const attributeCount = numGroupAttributes(evalGroup)
+		const attributeCount = numNonExemptGroupAttributes(evalGroup)
 		const centerX = 150
 		const centerY = 150
 		const radius = 120
 		const gapAngle = 2 // Gap in degrees
 		const sliceAngle = 360 / attributeCount - gapAngle
 
-		return mapGroupAttributes(evalGroup, (evalAttr, i) => {
+		return mapNonExemptGroupAttributes(evalGroup, (evalAttr, i) => {
 			const startAngle = i * (sliceAngle + gapAngle)
 			const endAngle = startAngle + sliceAngle
 
@@ -221,9 +221,9 @@ export function RatingDetailModal<Vs extends ValueSet>({
 					{/* Attribute details */}
 					<div className="flex-1 w-full">
 						<h3 className="font-bold mb-2 text-base">Attribute Details:</h3>
-						{numGroupAttributes(evalGroup) > 0 ? (
+						{numNonExemptGroupAttributes(evalGroup) > 0 ? (
 							<div className="flex flex-col gap-2 max-h-[350px] sm:max-h-[300px] overflow-y-auto pr-1">
-								{mapGroupAttributes(evalGroup, (evalAttr, index) => {
+								{mapNonExemptGroupAttributes(evalGroup, (evalAttr, index) => {
 									const isExpanded = expandedAttribute === evalAttr.attribute.id
 									const references = toFullyQualified(evalAttr.evaluation.references)
 									const hasReferences = references.length > 0

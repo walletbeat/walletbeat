@@ -9,6 +9,7 @@ import { frame } from './wallets/frame'
 import { safe } from './wallets/safe'
 import { elytro } from './wallets/elytro'
 import { ambire } from './wallets/ambire'
+import { unratedTemplate } from './wallets/unrated.tmpl'
 
 /** Set of all known wallets. */
 export const wallets = {
@@ -37,3 +38,6 @@ export function isValidWalletName(name: string): name is WalletName {
 export const ratedWallets: Record<WalletName, RatedWallet> = Object.fromEntries(
 	Object.entries(wallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 ) as Record<WalletName, RatedWallet>
+
+/** The unrated wallet as a rated wallet. */
+export const unratedWallet = rateWallet(unratedTemplate)
