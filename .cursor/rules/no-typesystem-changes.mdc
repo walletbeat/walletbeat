@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# TypeScript Type System Integrity
+
+- Do not modify existing TypeScript types (interfaces, type aliases, generics, branded types, etc.) or introduce new ones that alter public APIs **without explicit confirmation from the user first**.
+- If a type adjustment is deemed necessary, outline the proposed change and its impact, then wait for user approval before applying it.

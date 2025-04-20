@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- Always avoid putting function definitions in the react native components and or helpers. Unless it is specific to that funtion. 
+
