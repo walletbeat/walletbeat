@@ -26,7 +26,6 @@ import { variantToName, variantUrlQuery } from '../../components/variants'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { slugifyCamelCase } from '@/types/utils/text'
 import { betaSiteRoot } from '@/constants'
-import { refs } from '@/schema/reference'
 import { toFullyQualified } from '@/schema/reference'
 
 /**
@@ -45,7 +44,6 @@ export const walletRatingColumnProps: GridColTypeDef = {
 	headerAlign: 'left',
 }
 
-const ratingPieMargin = 2
 // Reduce the size of the chart to make it less dominant
 const ratingPieHeight = 100
 const ratingPieWidth = 100
@@ -106,13 +104,6 @@ export function WalletRatingCell<Vs extends ValueSet>({
 		return <>N/A</>
 	}
 	const { score, hasUnratedComponent } = groupScore
-	const centerLabel = hasUnratedComponent
-		? ''
-		: score <= 0.0
-			? ''
-			: score >= 1.0
-				? '100'
-				: Math.round(score * 100).toString()
 	const [highlightedSlice, setHighlightedSlice] = useState<{
 		evalAttrId: keyof EvaluatedGroup<Vs>
 		sticky: boolean

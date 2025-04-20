@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
-import { eips, lookupEip } from '@/data/eips'
-import type { Eip, EipNumber } from '@/schema/eips'
+import { eipEthereumDotOrgUrl, type Eip } from '@/schema/eips'
 
 interface EipPreviewModalProps {
-	eipNumber: string
-	eipPrefix: string
+	eip: Eip
 	anchorEl: HTMLElement | null
 	onClose: () => void
 }
 
 export function EipPreviewModal({
-	eipNumber,
-	eipPrefix,
+	eip,
 	anchorEl,
 	onClose,
 }: EipPreviewModalProps): React.ReactElement | null {
@@ -20,47 +17,6 @@ export function EipPreviewModal({
 		top: 0,
 		left: 0,
 	})
-	const [eipData, setEipData] = useState<Eip | null>(null)
-	const [loading, setLoading] = useState<boolean>(true)
-
-	// Load EIP data
-	useEffect(() => {
-		const fetchEipData = async () => {
-			setLoading(true)
-			try {
-				// Normalize the EIP number and look it up in the data
-				const normalizedEipNumber = eipNumber.replace(/^#/, '') as EipNumber
-
-				// Get the EIP data directly from the record
-				if (normalizedEipNumber in eips) {
-					const eipData = eips[normalizedEipNumber]
-					// Only use if the prefix matches (if provided)
-					if (!eipPrefix || eipData.prefix === eipPrefix) {
-						setEipData(eipData)
-					}
-				} else {
-					// Try looking up by number as a fallback
-					const numericEipNumber = parseInt(normalizedEipNumber, 10)
-					if (!isNaN(numericEipNumber)) {
-						const lookedUpEip = lookupEip(numericEipNumber)
-						if (lookedUpEip && (!eipPrefix || lookedUpEip.prefix === eipPrefix)) {
-							setEipData(lookedUpEip)
-						}
-					}
-
-					if (!eipData) {
-						console.error(`EIP ${normalizedEipNumber} not found`)
-					}
-				}
-			} catch (error) {
-				console.error('Error fetching EIP data:', error)
-			} finally {
-				setLoading(false)
-			}
-		}
-
-		fetchEipData()
-	}, [eipNumber, eipPrefix])
 
 	// Format text to be more readable
 	const formatMarkdownText = (text: string): string => {
@@ -154,10 +110,10 @@ export function EipPreviewModal({
 
 			setPopupPosition({ top, left })
 		}
-	}, [anchorEl, eipData])
+	}, [anchorEl, eip.number])
 
 	// Create a portal for the popup
-	if (!anchorEl || !eipData) {
+	if (!anchorEl) {
 		return null
 	}
 
@@ -168,67 +124,57 @@ export function EipPreviewModal({
 			onMouseLeave={onClose}
 		>
 			<div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-5 w-[500px] overflow-hidden border border-gray-200 dark:border-gray-700">
-				{loading ? (
-					<div className="flex justify-center items-center h-32">
-						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+				<div className="flex items-center mb-4">
+					<div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">
+						{eip.prefix}-{eip.number}
 					</div>
-				) : (
-					<>
-						<div className="flex items-center mb-4">
-							<div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">
-								{eipData.prefix}-{eipData.number}
-							</div>
-							<div className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded-full">
-								{eipData.status}
-							</div>
-						</div>
+					<div className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded-full">
+						{eip.status}
+					</div>
+				</div>
 
-						<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-							{eipData.friendlyName || eipData.formalTitle}
-						</h3>
+				<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+					{eip.friendlyName || eip.formalTitle}
+				</h3>
 
-						{eipData.formalTitle && eipData.formalTitle !== eipData.friendlyName && (
-							<h4 className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-								{eipData.formalTitle}
-							</h4>
-						)}
-
-						<div className="prose dark:prose-invert prose-sm max-w-none text-left">
-							{eipData.summaryMarkdown && (
-								<div className="mb-4">
-									<h5 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2">
-										Summary
-									</h5>
-									<div className="text-sm text-gray-700 dark:text-gray-300">
-										{processMarkdownLinks(formatMarkdownText(eipData.summaryMarkdown))}
-									</div>
-								</div>
-							)}
-
-							{eipData.whyItMattersMarkdown && (
-								<div>
-									<h5 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2">
-										Why It Matters
-									</h5>
-									<div className="text-sm text-gray-700 dark:text-gray-300">
-										{processMarkdownLinks(formatMarkdownText(eipData.whyItMattersMarkdown))}
-									</div>
-								</div>
-							)}
-						</div>
-
-						<div className="mt-4 text-right">
-							<a
-								href={`https://eips.ethereum.org/EIPS/eip-${eipData.number}`}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-							>
-								Read full specification →
-							</a>
-						</div>
-					</>
+				{eip.formalTitle && eip.formalTitle !== eip.friendlyName && (
+					<h4 className="text-sm text-gray-700 dark:text-gray-300 mb-4">{eip.formalTitle}</h4>
 				)}
+
+				<div className="prose dark:prose-invert prose-sm max-w-none text-left">
+					{eip.summaryMarkdown && (
+						<div className="mb-4">
+							<h5 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2">
+								Summary
+							</h5>
+							<div className="text-sm text-gray-700 dark:text-gray-300">
+								{processMarkdownLinks(formatMarkdownText(eip.summaryMarkdown))}
+							</div>
+						</div>
+					)}
+
+					{eip.whyItMattersMarkdown && (
+						<div>
+							<h5 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2">
+								Why It Matters
+							</h5>
+							<div className="text-sm text-gray-700 dark:text-gray-300">
+								{processMarkdownLinks(formatMarkdownText(eip.whyItMattersMarkdown))}
+							</div>
+						</div>
+					)}
+				</div>
+
+				<div className="mt-4 text-right">
+					<a
+						href={eipEthereumDotOrgUrl(eip)}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+					>
+						Read full specification →
+					</a>
+				</div>
 			</div>
 		</div>,
 		document.body,

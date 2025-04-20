@@ -25,7 +25,7 @@ import { variantToName } from '../../components/variants'
 import { RenderContent } from '../atoms/RenderContent'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { isTypographicContent } from '@/types/content'
-import { refs, toFullyQualified } from '@/schema/reference'
+import { toFullyQualified } from '@/schema/reference'
 import { ReferenceLinks } from '../atoms/ReferenceLinks'
 
 export function WalletAttribute<Vs extends ValueSet, V extends Value>({

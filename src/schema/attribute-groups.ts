@@ -565,14 +565,30 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 }
 
 /**
- * Iterate over all attribute groups in a tree, calling `fn` with each group.
+ * Iterate over all attribute groups, calling `fn` with each group.
  */
 export function mapAttributeGroups<T>(
-	tree: EvaluationTree | undefined | null,
-	fn: <Vs extends ValueSet>(
-		attrGroup: AttributeGroup<Vs>,
-		evalGroup: EvaluatedGroup<Vs> | undefined,
-	) => T,
+	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>) => T,
+): T[] {
+	return Object.values(attributeTree).map(attrGroup => fn(attrGroup))
+}
+
+/**
+ * Get a specific evaluated attribute group from an evaluation tree.
+ */
+export function getAttributeGroupInTree<Vs extends ValueSet>(
+	tree: EvaluationTree,
+	attrGroup: AttributeGroup<Vs>,
+): EvaluatedGroup<Vs> {
+	return tree[attrGroup.id] as EvaluatedGroup<Vs>
+}
+
+/**
+ * Iterate over all attribute groups in a tree, calling `fn` with each group.
+ */
+export function mapAttributeGroupsInTree<T>(
+	tree: EvaluationTree,
+	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => T,
 ): T[] {
 	// If tree is null/undefined, return empty array
 	if (!tree) {
@@ -592,21 +608,17 @@ export function mapAttributeGroups<T>(
  * attribute and its corresponding key in the group.
  */
 export function mapGroupAttributes<T, Vs extends ValueSet>(
-	evalGroup: EvaluatedGroup<Vs> | undefined | null,
-	fn: <V extends Value>(evalAttr: EvaluatedAttribute<V>, attributeKey: keyof Vs) => T,
+	evalGroup: EvaluatedGroup<Vs>,
+	fn: <V extends Value>(evalAttr: EvaluatedAttribute<V>, index: number) => T,
 ): T[] {
-	// If evalGroup is null/undefined, return empty array
-	if (!evalGroup) {
-		console.warn(
-			'mapGroupAttributes called with null or undefined evalGroup. Returning empty array.',
-		)
-		return []
-	}
+	return Object.values(evalGroup).map(fn)
+}
 
-	// Use Object.entries to get both key and value
-	return Object.entries(evalGroup).map(([key, evalAttr]) =>
-		fn(evalAttr as EvaluatedAttribute<Value>, key as keyof Vs),
-	)
+/**
+ * Return the number of attributes in an attribute group.
+ */
+export function numGroupAttributes<Vs extends ValueSet>(evalGroup: EvaluatedGroup<Vs>): number {
+	return Object.values(evalGroup).length
 }
 
 /**
@@ -684,7 +696,7 @@ export function getEvaluationFromOtherTree<V extends Value>(
 	evalAttr: EvaluatedAttribute<V>,
 	otherTree: EvaluationTree,
 ): EvaluatedAttribute<V> {
-	const otherEvalAttr = mapAttributeGroups(
+	const otherEvalAttr = mapAttributeGroupsInTree(
 		otherTree,
 		(_, evalGroup): EvaluatedAttribute<V> | undefined => {
 			// Add check here: If evalGroup is undefined, return undefined immediately

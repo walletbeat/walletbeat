@@ -59,6 +59,24 @@ export function isRating(value: unknown): value is Rating {
 /**
  * Convert a rating to the icon displayed on the slice tooltip.
  */
+export function ratingToText(rating: Rating): string {
+	switch (rating) {
+		case Rating.PASS:
+			return 'Pass'
+		case Rating.PARTIAL:
+			return 'Partial'
+		case Rating.FAIL:
+			return 'Fail'
+		case Rating.UNRATED:
+			return 'Unrated'
+		case Rating.EXEMPT:
+			return 'Exempt'
+	}
+}
+
+/**
+ * Convert a rating to the icon displayed on the slice tooltip.
+ */
 export function ratingToIcon(rating: Rating): string {
 	switch (rating) {
 		case Rating.FAIL:
@@ -79,18 +97,17 @@ export function ratingToIcon(rating: Rating): string {
  */
 export function ratingToColor(rating: Rating): string {
 	switch (rating) {
-		case Rating.FAIL:
-			return '#e74c3c' // Red
-		case Rating.PARTIAL:
-			return '#f1c40f' // Yellow
 		case Rating.PASS:
-			return '#2ecc71' // Green
-		case Rating.UNRATED:
-			return '#bdc3c7' // Gray
-		case Rating.EXEMPT:
-			return '#bdc3c7' // Gray
+			return 'var(--rating-pass)'
+		case Rating.PARTIAL:
+			return 'var(--rating-partial)'
+		case Rating.FAIL:
+			return 'var(--rating-fail)'
+		default:
+			return 'var(--rating-neutral)'
 	}
 }
+
 export function borderRatingToColor(rating: Rating): string {
 	switch (rating) {
 		case Rating.FAIL:

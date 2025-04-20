@@ -2,7 +2,6 @@ import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import { Box, Tooltip } from '@mui/material'
 import type { SvgIconComponent } from '@mui/icons-material'
 import { IconButton } from './IconButton'
-import { useEffect, useState } from 'react'
 
 export interface PickableVariant<V extends string> {
 	id: V

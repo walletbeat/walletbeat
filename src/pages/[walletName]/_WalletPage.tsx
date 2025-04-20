@@ -3,7 +3,7 @@ import { ratedHardwareWallets, type HardwareWalletName } from '@/data/hardware-w
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
-	mapAttributeGroups,
+	mapAttributeGroupsInTree,
 	mapGroupAttributes,
 	hardwareOnlyEcosystem,
 	hardwareOnlyPrivacy,
@@ -328,7 +328,7 @@ export function WalletPage({
 			),
 		},
 	]
-	mapAttributeGroups(
+	mapAttributeGroupsInTree(
 		evalTree,
 		<Vs extends ValueSet>(
 			attrGroup: AttributeGroup<Vs>,
