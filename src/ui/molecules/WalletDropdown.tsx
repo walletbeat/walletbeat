@@ -65,10 +65,7 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 					<div className="flex items-center gap-2">
 						{wallet !== undefined ? (
 							<>
-								<WalletIcon
-									wallet={wallet}
-									iconSize={24}
-								/>
+								<WalletIcon wallet={wallet} iconSize={24} />
 								<span>{wallet.metadata.displayName}</span>
 							</>
 						) : (
@@ -118,70 +115,68 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 									w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
 									w.id.toLowerCase().includes(search.toLowerCase()),
 							) && (
-									<Command.Group
-										heading="Software Wallets"
-										className="text-xs font-medium text-gray-500 uppercase flex flex-col gap-1 px-1"
-									>
-										{softwareWalletItems
-											.filter(
-												w =>
-													w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
-													w.id.toLowerCase().includes(search.toLowerCase()),
-											)
-											.map(w => (
-												<Command.Item
-													key={w.id}
-													value={w.id}
-													onSelect={handleSelect}
-													className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
-												>
-													<span className="flex items-center gap-2 flex-1 min-w-0">
-														<WalletIcon
-															wallet={w.wallet}
-															iconSize={20}
-														/>
-														<span className="truncate">{w.wallet.metadata.displayName}</span>
-													</span>
-													<LuWallet className="ml-2 flex-shrink-0 opacity-40" size={14} />
-												</Command.Item>
-											))}
-									</Command.Group>
-								)}
+								<Command.Group
+									heading="Software Wallets"
+									className="text-xs font-medium text-gray-500 uppercase flex flex-col gap-1 px-1"
+								>
+									{softwareWalletItems
+										.filter(
+											w =>
+												w.wallet.metadata.displayName
+													.toLowerCase()
+													.includes(search.toLowerCase()) ||
+												w.id.toLowerCase().includes(search.toLowerCase()),
+										)
+										.map(w => (
+											<Command.Item
+												key={w.id}
+												value={w.id}
+												onSelect={handleSelect}
+												className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
+											>
+												<span className="flex items-center gap-2 flex-1 min-w-0">
+													<WalletIcon wallet={w.wallet} iconSize={20} />
+													<span className="truncate">{w.wallet.metadata.displayName}</span>
+												</span>
+												<LuWallet className="ml-2 flex-shrink-0 opacity-40" size={14} />
+											</Command.Item>
+										))}
+								</Command.Group>
+							)}
 
 							{hardwareWalletItems.some(
 								w =>
 									w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
 									w.id.toLowerCase().includes(search.toLowerCase()),
 							) && (
-									<Command.Group
-										heading="Hardware Wallets"
-										className="text-xs font-medium text-gray-500 uppercase flex flex-col gap-1 px-1"
-									>
-										{hardwareWalletItems
-											.filter(
-												w =>
-													w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
-													w.id.toLowerCase().includes(search.toLowerCase()),
-											)
-											.map(w => (
-												<Command.Item
-													key={w.id}
-													value={w.id}
-													onSelect={handleSelect}
-													className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
-												>
-													<span className="flex items-center gap-2 flex-1 min-w-0">
-														<WalletIcon
-															wallet={w.wallet}
-															iconSize={20}
-														/>
-														<span className="truncate">{w.wallet.metadata.displayName}</span>
-													</span>
-													<LuKey className="ml-2 flex-shrink-0 opacity-40" size={14} />
-												</Command.Item>
-											))}
-									</Command.Group>
-								)}
+								<Command.Group
+									heading="Hardware Wallets"
+									className="text-xs font-medium text-gray-500 uppercase flex flex-col gap-1 px-1"
+								>
+									{hardwareWalletItems
+										.filter(
+											w =>
+												w.wallet.metadata.displayName
+													.toLowerCase()
+													.includes(search.toLowerCase()) ||
+												w.id.toLowerCase().includes(search.toLowerCase()),
+										)
+										.map(w => (
+											<Command.Item
+												key={w.id}
+												value={w.id}
+												onSelect={handleSelect}
+												className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
+											>
+												<span className="flex items-center gap-2 flex-1 min-w-0">
+													<WalletIcon wallet={w.wallet} iconSize={20} />
+													<span className="truncate">{w.wallet.metadata.displayName}</span>
+												</span>
+												<LuKey className="ml-2 flex-shrink-0 opacity-40" size={14} />
+											</Command.Item>
+										))}
+								</Command.Group>
+							)}
 						</Command.List>
 						<Command.Empty>
 							<div className="px-2 py-4 text-center text-gray-400">No wallets found</div>

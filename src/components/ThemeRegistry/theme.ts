@@ -6,17 +6,17 @@ import type {} from '@mui/x-data-grid/themeAugmentation'
 
 /** Color options for rating pie slices. */
 export interface RatingThemeOptions {
-	fail: string,
-	partial: string,
-	pass: string,
-	unrated: string,
-	exempt: string,
+	fail: string
+	partial: string
+	pass: string
+	unrated: string
+	exempt: string
 }
 
 /** Expanded ThemeOptions and palette. */
 export type ThemeOptions = MaterialThemeOptions & {
 	palette?: MaterialThemeOptions['palette'] & {
-		rating?: RatingThemeOptions,
+		rating?: RatingThemeOptions
 	}
 }
 

@@ -14,4 +14,4 @@ export interface SupplyChainDIYSupport {
 	componentSourcingComplexity: SupplyChainDIYType
 }
 
-export type SupplyChainDIYImplementation = WithRef<SupplyChainDIYSupport> 
+export type SupplyChainDIYImplementation = WithRef<SupplyChainDIYSupport>

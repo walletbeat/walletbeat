@@ -17,4 +17,4 @@ export interface ReputationSupport {
 	bugBounty: ReputationType
 }
 
-export type ReputationImplementation = WithRef<ReputationSupport> 
+export type ReputationImplementation = WithRef<ReputationSupport>

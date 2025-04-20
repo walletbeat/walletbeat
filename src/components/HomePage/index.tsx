@@ -132,11 +132,17 @@ export const HomePage: FC = () => (
 						</div>
 						<h1 className="text-4xl font-extrabold text-accent">Who watches the wallets?</h1>
 						<p className="text-secondary">
-							This website is still in beta.
-							It aims to provide a comprehensive list of wallets, their functionality, practices, and support for certain standards.
+							This website is still in beta. It aims to provide a comprehensive list of wallets,
+							their functionality, practices, and support for certain standards.
 						</p>
 						<p className="text-secondary">
-							We welcome contributions via the <ExternalLink url="https://github.com/walletbeat/walletbeat" defaultLabel="GitHub Repository" style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }} />.
+							We welcome contributions via the{' '}
+							<ExternalLink
+								url="https://github.com/walletbeat/walletbeat"
+								defaultLabel="GitHub Repository"
+								style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+							/>
+							.
 						</p>
 					</div>
 					<div className="flex-1 flex justify-center items-center">

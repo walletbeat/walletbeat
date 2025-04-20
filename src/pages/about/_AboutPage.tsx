@@ -184,7 +184,6 @@ export function AboutPage(): React.JSX.Element {
 		>
 			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
 				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
-
 					<Typography id="aboutHeader" variant="h1" mb={1}>
 						About Walletbeat
 					</Typography>

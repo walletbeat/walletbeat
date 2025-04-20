@@ -4,16 +4,16 @@ import type { WithRef } from '@/schema/reference'
  * Types of clear signing support levels
  */
 export enum DappSigningLevel {
-  NONE = 'NONE',
-  BASIC = 'BASIC',
-  PARTIAL = 'PARTIAL',
-  FULL = 'FULL'
+	NONE = 'NONE',
+	BASIC = 'BASIC',
+	PARTIAL = 'PARTIAL',
+	FULL = 'FULL',
 }
 
 /**
  * A record of hardware wallet types and their clear signing support level
  */
-export interface HardwareWalletDappSigningSupport  {
+export interface HardwareWalletDappSigningSupport {
 	/**
 	 * The level of clear signing support
 	 */
@@ -24,4 +24,4 @@ export interface HardwareWalletDappSigningSupport  {
 	details?: string
 }
 
-export type HardwareWalletDappSigningImplementation = WithRef<HardwareWalletDappSigningSupport> 
+export type HardwareWalletDappSigningImplementation = WithRef<HardwareWalletDappSigningSupport>

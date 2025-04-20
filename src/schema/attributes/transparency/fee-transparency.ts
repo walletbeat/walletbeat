@@ -136,8 +136,8 @@ function detailedFeeTransparency(
 					!disclosesWalletFees
 						? 'clearly disclosing any additional wallet fees'
 						: !showsTransactionPurpose
-						? 'clearly showing the purpose of each transaction'
-						: 'providing comprehensive fee information including all components of the transaction cost'
+							? 'clearly showing the purpose of each transaction'
+							: 'providing comprehensive fee information including all components of the transaction cost'
 				}.
 			`,
 		),
@@ -288,4 +288,4 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) => {
 		return pickWorstRating<FeeTransparencyValue>(perVariant)
 	},
-} 
+}
