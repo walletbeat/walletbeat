@@ -291,9 +291,9 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		const references = mergeRefs(
 			refs(features.security.hardwareWalletSupport),
 			refs(
-				features.security.hardwareWalletClearSigning == null
+				features.security.hardwareWalletDappSigning == null
 					? {}
-					: features.security.hardwareWalletClearSigning,
+					: features.security.hardwareWalletDappSigning,
 			),
 		)
 
@@ -332,11 +332,11 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 
 		// Placeholder for checking if Safe integration exists with clear signing
 		const hasSafeIntegration =
-			features.security.hardwareWalletClearSigning?.details?.includes('Safe') || false
+			features.security.hardwareWalletDappSigning?.details?.includes('Safe') || false
 
 		// Placeholder for checking if Aave integration exists with clear signing
 		const hasAaveIntegration =
-			features.security.hardwareWalletClearSigning?.details?.includes('Aave') || false
+			features.security.hardwareWalletDappSigning?.details?.includes('Aave') || false
 
 		// Check how many hardware wallet brands are supported for these integrations
 		const supportedHWBrands = supportedHardwareWallets.length

@@ -1,5 +1,4 @@
 import { Typography, Divider } from '@mui/material'
-import { Box } from '@mui/system'
 import type React from 'react'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {

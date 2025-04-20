@@ -11,7 +11,6 @@ import {
 import { popRefs } from '@/schema/reference'
 import { exampleRating } from '@/schema/attributes'
 import { Variant } from '@/schema/variants'
-import { HardwareWalletManufactureType } from '@/schema/features/profile'
 
 const brand = 'attributes.supply_chain_diy'
 

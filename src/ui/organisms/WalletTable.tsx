@@ -18,7 +18,6 @@ import {
 	getAttributeGroupInTree,
 } from '@/schema/attribute-groups'
 import {
-	Rating,
 	ratingToColor,
 	type AttributeGroup,
 	type EvaluatedGroup,
@@ -836,7 +835,6 @@ export default function WalletTable(): React.ReactElement {
 							if (!supported) {
 								return null
 							}
-							const display = SMART_WALLET_STANDARD_DISPLAY[std as SmartWalletStandard] || std
 
 							// Add Markdown-style links for ERC standards
 							if (std === SmartWalletStandard.ERC_4337) {

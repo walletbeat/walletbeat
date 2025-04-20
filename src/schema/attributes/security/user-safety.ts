@@ -7,7 +7,7 @@ import {
 	exampleRating,
 } from '@/schema/attributes'
 import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata, RatedWallet } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { UserSafetyType, type UserSafetySupport } from '@/schema/features/security/user-safety'
@@ -224,7 +224,7 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 			withoutRefs.fullyLocalTxSimulation,
 		].filter(r => r === UserSafetyType.PASS).length
 
-		const detailsText = ({ wallet, value }: EvaluationData<UserSafetyValue>) => {
+		const detailsText = ({ wallet }: EvaluationData<UserSafetyValue>) => {
 			let desc = `${wallet.metadata.displayName} user safety evaluation is ${rating.toLowerCase()}.`
 			if (rating !== Rating.EXEMPT) {
 				desc += ` It passes ${passCount} out of 16 sub-criteria.`
@@ -232,7 +232,7 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 			return desc
 		}
 
-		const howToImproveText = ({ wallet, value }: EvaluationData<UserSafetyValue>) => {
+		const howToImproveText = ({ wallet }: EvaluationData<UserSafetyValue>) => {
 			if (rating === Rating.PASS || rating === Rating.EXEMPT) {
 				return ''
 			}

@@ -419,6 +419,7 @@ export function evaluateAttributes(
 	}
 
 	// Helper for exempt evaluation
+	// TODO: Remove and make the individual attributes return exempt ratings themselves.
 	const createExemptEvaluation = <V extends Value>(
 		attr: Attribute<V>,
 		reason: string,
@@ -706,6 +707,7 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 }
 
 // Hardware-only attribute IDs for each group
+// TODO: Remove and make the hardware-only attributes exempt instead.
 export const hardwareOnlySecurity = [
 	'supplyChainDIY',
 	'supplyChainFactory',

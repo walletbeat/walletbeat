@@ -9,7 +9,7 @@ import {
 } from '@/schema/attributes'
 import { mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
 import { toFullyQualified, type FullyQualifiedReference } from '@/schema/reference'
-import type { RatedWallet, WalletMetadata } from '@/schema/wallet'
+import type { RatedWallet } from '@/schema/wallet'
 import type { HardwareWalletModel } from '@/schema/features/profile'
 import { RenderContent } from '../atoms/RenderContent'
 import type { LabeledUrl } from '@/schema/url'

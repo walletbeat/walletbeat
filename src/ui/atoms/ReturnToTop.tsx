@@ -6,7 +6,7 @@ export const ReturnToTop = () => {
 
 	useEffect(() => {
 		const toggleVisibility = () => {
-			if (window.pageYOffset > window.innerHeight) {
+			if (window.scrollY > window.innerHeight) {
 				setVisible(true)
 			} else {
 				setVisible(false)

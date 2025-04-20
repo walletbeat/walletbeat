@@ -35,7 +35,7 @@ import {
 	type Value,
 	type ValueSet,
 } from '@/schema/attributes'
-import { navigationListIconSize, subsectionBorderRadius } from '@/components/constants'
+import { navigationListIconSize } from '@/components/constants'
 import type { NavigationItem } from '@/ui/organisms/Navigation'
 import {
 	navigationAbout,
@@ -57,7 +57,7 @@ import {
 import { VariantSpecificity, type ResolvedWallet } from '@/schema/wallet'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { commaListPrefix, slugifyCamelCase } from '@/types/utils/text'
-import { ReturnToTop } from '@/ui/organisms/ReturnToTop'
+import { ReturnToTop } from '@/ui/atoms/ReturnToTop'
 import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import LanguageIcon from '@mui/icons-material/Language'

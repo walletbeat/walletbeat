@@ -1,12 +1,10 @@
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import type React from 'react'
 import { useState } from 'react'
-import theme from '../../components/ThemeRegistry/theme'
 import {
 	Accordion,
 	AccordionDetails,
 	AccordionSummary,
-	Box,
 	darken,
 	Typography,
 	useTheme,
@@ -34,7 +32,7 @@ export function Accordions({
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 	const theme = useTheme()
 
-	const handleChange = (id: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+	const handleChange = (id: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
 		setExpanded(prev => ({ ...prev, [id]: isExpanded }))
 	}
 
