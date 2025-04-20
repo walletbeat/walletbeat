@@ -9,12 +9,13 @@
 		"check:astro": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
 		"check:lint": "eslint src data",
 		"check:spelling": "cspell lint .",
+		"check:spelling:quiet": "cspell lint --quiet --no-progress .",
 		"check:syntax": "prettier --check src data",
 		"check:misc": "for script in .husky/checks/*.sh; do echo \"> Running check: $(basename \"${script}\" | cut -d. -f1)...\" >&2; bash \"$script\" || exit \"$?\"; done; echo \"> All checks passed!\" >&2",
 		"dev": "pnpm run astro dev",
 		"lint": "prettier --check --write src data && eslint src data --fix && cspell lint .",
 		"preview": "pnpm run astro preview",
-		"prepare": "pnpm run check:syntax && pnpm run check:spelling && pnpm run check:misc"
+		"prepare": "pnpm run check:syntax && pnpm run check:spelling:quiet && pnpm run check:misc"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.2.0",
