@@ -318,9 +318,7 @@ export const rabby: Wallet = {
 				},
 			},
 			hardwareWalletDappSigning: null,
-			bugBountyProgram: {
-				// ... rest of the file ...
-			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: {

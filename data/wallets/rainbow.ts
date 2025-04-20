@@ -81,6 +81,7 @@ export const rainbow: Wallet = {
 				library: PasskeyVerificationLibrary.NONE,
 				ref: null,
 			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

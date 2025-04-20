@@ -1,6 +1,6 @@
 import type { ResolvedFeatures } from '@/schema/features'
 import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
@@ -100,13 +100,18 @@ export const maintenance: Attribute<MaintenanceValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<MaintenanceValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return unrated(maintenance, brand, {
-				physicalDurability: MaintenanceType.FAIL,
-				mtbfDocumentation: MaintenanceType.FAIL,
-				repairability: MaintenanceType.FAIL,
-				batteryHandling: MaintenanceType.FAIL,
-				warrantyExtensions: MaintenanceType.FAIL,
-			})
+			return exempt(
+				maintenance,
+				sentence('These attributes only refer to hardware wallet maintenance'),
+				brand,
+				{
+					physicalDurability: MaintenanceType.FAIL,
+					mtbfDocumentation: MaintenanceType.FAIL,
+					repairability: MaintenanceType.FAIL,
+					batteryHandling: MaintenanceType.FAIL,
+					warrantyExtensions: MaintenanceType.FAIL,
+				},
+			)
 		}
 		const maintenanceFeature = features.transparency.maintenance
 		if (!maintenanceFeature) {

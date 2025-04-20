@@ -31,6 +31,10 @@ import type { UserSafetySupport } from './features/security/user-safety'
 /**
  * A set of features about a wallet, each of which may or may not depend on
  * the wallet variant.
+ *
+ * None of the fields in this type should be marked as possibly `undefined`.
+ * If you want to add a new field, you need to add it to all existing wallets,
+ * even if unrated (i.e. `null`).
  */
 export interface WalletFeatures {
 	/**
@@ -71,7 +75,7 @@ export interface WalletFeatures {
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
 
 		/** Bug bounty program implementation (for hardware wallets) */
-		bugBountyProgram?: VariantFeature<BugBountyProgramImplementation>
+		bugBountyProgram: VariantFeature<BugBountyProgramImplementation>
 
 		firmware?: VariantFeature<FirmwareSupport>
 		keysHandling?: VariantFeature<KeysHandlingSupport>
@@ -154,7 +158,7 @@ export interface ResolvedFeatures {
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
 		hardwareWalletDappSigning: ResolvedFeature<HardwareWalletDappSigningImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
-		bugBountyProgram?: ResolvedFeature<BugBountyProgramImplementation>
+		bugBountyProgram: ResolvedFeature<BugBountyProgramImplementation>
 		firmware: ResolvedFeature<FirmwareSupport> | null
 		keysHandling: ResolvedFeature<KeysHandlingSupport> | null
 		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport> | null
@@ -210,9 +214,7 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 			hardwareWalletSupport: feat(features.security.hardwareWalletSupport),
 			hardwareWalletDappSigning: feat(features.security.hardwareWalletDappSigning),
 			passkeyVerification: feat(features.security.passkeyVerification),
-			bugBountyProgram: features.security.bugBountyProgram
-				? feat<BugBountyProgramImplementation>(features.security.bugBountyProgram)
-				: undefined,
+			bugBountyProgram: feat<BugBountyProgramImplementation>(features.security.bugBountyProgram),
 			firmware: features.security.firmware
 				? feat<FirmwareSupport>(features.security.firmware)
 				: null,

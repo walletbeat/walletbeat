@@ -65,19 +65,6 @@ export const metamask: Wallet = {
 			},
 		},
 		security: {
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
-				libraryUrl: 'https://github.com/MetaMask/delegation-framework/tree/main/lib',
-				details:
-					'MetaMask uses Smooth Crypto lib for passkey verification in their delegation framework.',
-				ref: [
-					{
-						url: 'https://github.com/MetaMask/delegation-framework/commit/8641eccdedf486832e66e589b8a9bcfd44d00104',
-						explanation:
-							'MetaMask implements P256 verification using Smooth Crypto lib in their delegation framework.',
-					},
-				],
-			},
 			scamAlerts: null,
 			publicSecurityAudits: [
 				{
@@ -132,6 +119,20 @@ export const metamask: Wallet = {
 					},
 				],
 			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
+				libraryUrl: 'https://github.com/MetaMask/delegation-framework/tree/main/lib',
+				details:
+					'MetaMask uses Smooth Crypto lib for passkey verification in their delegation framework.',
+				ref: [
+					{
+						url: 'https://github.com/MetaMask/delegation-framework/commit/8641eccdedf486832e66e589b8a9bcfd44d00104',
+						explanation:
+							'MetaMask implements P256 verification using Smooth Crypto lib in their delegation framework.',
+					},
+				],
+			},
+			bugBountyProgram: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -61,19 +61,6 @@ export const elytro: Wallet = {
 			},
 		},
 		security: {
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
-				libraryUrl:
-					'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
-				details: 'Elytro uses FreshCryptoLib for passkey verification in their WebAuthn library.',
-				ref: [
-					{
-						url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/contracts/libraries/WebAuthn.sol',
-						explanation:
-							'Elytro implements P256 verification using openzeppelin p256 verifier in their WebAuthn library.',
-					},
-				],
-			},
 			scamAlerts: null,
 			publicSecurityAudits: null,
 			lightClient: {
@@ -87,6 +74,20 @@ export const elytro: Wallet = {
 				level: DappSigningLevel.NONE,
 				ref: undefined,
 			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
+				libraryUrl:
+					'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+				details: 'Elytro uses FreshCryptoLib for passkey verification in their WebAuthn library.',
+				ref: [
+					{
+						url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/contracts/libraries/WebAuthn.sol',
+						explanation:
+							'Elytro implements P256 verification using openzeppelin p256 verifier in their WebAuthn library.',
+					},
+				],
+			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

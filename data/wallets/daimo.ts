@@ -89,19 +89,6 @@ export const daimo: Wallet = {
 			browser: 'NOT_A_BROWSER_WALLET',
 		},
 		security: {
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
-				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-				details:
-					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
-				ref: [
-					{
-						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-						explanation:
-							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
-					},
-				],
-			},
 			scamAlerts: {
 				scamUrlWarning: notSupported,
 				contractTransactionWarning: notSupported,
@@ -144,6 +131,20 @@ export const daimo: Wallet = {
 				level: DappSigningLevel.FULL,
 				ref: null,
 			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
+				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
+				details:
+					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
+				ref: [
+					{
+						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
+						explanation:
+							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
+					},
+				],
+			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: {

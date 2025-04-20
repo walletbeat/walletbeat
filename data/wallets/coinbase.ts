@@ -144,6 +144,7 @@ export const coinbase: Wallet = {
 					explanation: 'Coinbase uses the webauthn-sol library for passkey verification.',
 				},
 			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

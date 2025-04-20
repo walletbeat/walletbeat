@@ -101,6 +101,7 @@ export const frame: Wallet = {
 				library: PasskeyVerificationLibrary.NONE,
 				ref: null,
 			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

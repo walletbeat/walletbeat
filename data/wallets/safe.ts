@@ -62,6 +62,19 @@ export const safe: Wallet = {
 			},
 		},
 		security: {
+			scamAlerts: null,
+			publicSecurityAudits: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			hardwareWalletSupport: {
+				supportedWallets: {},
+				ref: undefined,
+			},
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
+				ref: undefined,
+			},
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
 				libraryUrl:
@@ -77,19 +90,7 @@ export const safe: Wallet = {
 					},
 				],
 			},
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			hardwareWalletSupport: {
-				supportedWallets: {},
-				ref: undefined,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.NONE,
-				ref: undefined,
-			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,
