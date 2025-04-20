@@ -303,7 +303,7 @@ walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
 
 lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components || {}, {
 	MuiCssBaseline: {
-		styleOverrites: {
+		styleOverrides: {
 			':root': {
 				'--background-row-border': '#e0f2ff',
 			},
