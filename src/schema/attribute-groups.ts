@@ -231,7 +231,6 @@ type TransparencyValues = Dict<{
 	funding: FundingValue
 	feeTransparency: FeeTransparencyValue
 	reputation: ReputationValue
-	maintenance: MaintenanceValue
 }>
 
 /** Transparency attributes. */
@@ -249,7 +248,6 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		funding,
 		feeTransparency,
 		reputation,
-		maintenance,
 	},
 	score: scoreGroup<TransparencyValues>({
 		openSource: 1.0,
@@ -257,7 +255,6 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		funding: 1.0,
 		feeTransparency: 1.0,
 		reputation: 1.0,
-		maintenance: 1.0,
 	}),
 }
 
@@ -292,22 +289,13 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	}),
 }
 
-/** Specific score function for the maintenance group */
-const scoreMaintenanceGroup = (
-	evaluations: EvaluatedGroup<{ maintenance: MaintenanceValue }>,
-): MaybeUnratedScore => {
-	const value = evaluations.maintenance.evaluation.value
-	const score = value.score ?? defaultRatingScore(value.rating)
-	if (score === null) {
-		return null
-	}
-	const hasUnratedComponent = value.rating === Rating.UNRATED
-	// Assuming weight 1.0 as per the original scoreGroup call
-	return { score: weightedScore([{ score, weight: 1.0 }]), hasUnratedComponent }
-}
+/** A ValueSet for maintenance Values. */
+type MaintenanceValues = Dict<{
+	maintenance: MaintenanceValue
+}>
 
 /** Maintenance attributes. */
-export const maintenanceAttributeGroup: AttributeGroup<{ maintenance: MaintenanceValue }> = {
+export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	id: 'maintenance',
 	icon: '🛠️',
 	displayName: 'Maintenance',
@@ -318,7 +306,9 @@ export const maintenanceAttributeGroup: AttributeGroup<{ maintenance: Maintenanc
 	attributes: {
 		maintenance,
 	},
-	score: scoreMaintenanceGroup, // Use the specific function
+	score: scoreGroup<MaintenanceValues>({
+		maintenance: 1.0,
+	}),
 }
 
 /** The set of attribute groups that make up wallet attributes. */
@@ -378,12 +368,22 @@ export interface EcosystemEvaluations extends EvaluatedGroup<EcosystemValues> {
 	interoperability: EvaluatedAttribute<InteroperabilityValue>
 }
 
+/** Evaluated maintenance attributes for a single wallet. */
+export interface MaintenanceEvaluations extends EvaluatedGroup<MaintenanceValues> {
+	maintenance: EvaluatedAttribute<MaintenanceValue>
+}
+
 /** Evaluated attributes for a single wallet. */
 export interface EvaluationTree
 	extends NonEmptyRecord<
 		string,
 		EvaluatedGroup<
-			SecurityValues | PrivacyValues | SelfSovereigntyValues | TransparencyValues | EcosystemValues
+			| SecurityValues
+			| PrivacyValues
+			| SelfSovereigntyValues
+			| TransparencyValues
+			| EcosystemValues
+			| MaintenanceValues
 		>
 	> {
 	security: SecurityEvaluations
@@ -391,6 +391,7 @@ export interface EvaluationTree
 	selfSovereignty: SelfSovereigntyEvaluations
 	transparency: TransparencyEvaluations
 	ecosystem: EcosystemEvaluations
+	maintenance: MaintenanceEvaluations
 }
 
 /** Rate a wallet's attributes based on its features and metadata. */
@@ -490,13 +491,15 @@ export function evaluateAttributes(
 			funding: evalAttr(funding),
 			feeTransparency: evalAttr(feeTransparency),
 			reputation: evalAttr(reputation),
-			maintenance: evalAttr(maintenance),
 		},
 		ecosystem: {
 			accountAbstraction: evalAttr(accountAbstraction),
 			addressResolution: evalAttr(addressResolution),
 			browserIntegration: evalAttr(browserIntegration),
 			interoperability: evalAttr(interoperability),
+		},
+		maintenance: {
+			maintenance: evalAttr(maintenance),
 		},
 	}
 }
@@ -553,13 +556,15 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			funding: attr(tree => tree.transparency.funding),
 			feeTransparency: attr(tree => tree.transparency.feeTransparency),
 			reputation: attr(tree => tree.transparency.reputation),
-			maintenance: attr(tree => tree.transparency.maintenance),
 		},
 		ecosystem: {
 			accountAbstraction: attr(tree => tree.ecosystem.accountAbstraction),
 			addressResolution: attr(tree => tree.ecosystem.addressResolution),
 			browserIntegration: attr(tree => tree.ecosystem.browserIntegration),
 			interoperability: attr(tree => tree.ecosystem.interoperability),
+		},
+		maintenance: {
+			maintenance: attr(tree => tree.maintenance.maintenance),
 		},
 	}
 }
