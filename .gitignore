@@ -22,7 +22,3 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
-
-formHWW.md
-.cursor
-HWWraw.md
