@@ -5,15 +5,16 @@
 	"scripts": {
 		"astro": "ASTRO_TELEMETRY_DISABLED=1 astro",
 		"build": "pnpm run astro build",
-		"check": "pnpm run astro check",
-		"check:all": "pnpm run check:hint && pnpm run check:lint && pnpm run check:syntax && pnpm run check:spelling",
-		"check:hint": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
+		"check:all": "pnpm run check:astro && pnpm run check:lint && pnpm run check:syntax && pnpm run check:spelling && pnpm run check:misc",
+		"check:astro": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
 		"check:lint": "eslint src data",
 		"check:spelling": "cspell lint .",
 		"check:syntax": "prettier --check src data",
+		"check:misc": "for script in .husky/checks/*.sh; do echo \"> Running check: $(basename \"${script}\" | cut -d. -f1)...\" >&2; bash \"$script\" || exit \"$?\"; done; echo \"> All checks passed!\" >&2",
 		"dev": "pnpm run astro dev",
 		"lint": "prettier --check --write src data && eslint src data --fix && cspell lint .",
-		"preview": "pnpm run astro preview"
+		"preview": "pnpm run astro preview",
+		"prepare": "pnpm run check:misc"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.2.0",
@@ -57,6 +58,7 @@
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-react": "^7.37.4",
 		"globals": "^15.14.0",
+		"husky": "^9.1.7",
 		"pnpm": "10.4.0",
 		"prettier": "^3.5.1",
 		"prettier-plugin-astro": "^0.14.1",
