@@ -1,6 +1,12 @@
 import { isNonEmptyArray, nonEmptyValues, type NonEmptyArray } from '@/types/utils/non-empty'
-import { type Attribute, type Evaluation, Rating, type Value } from '../attributes'
-import type { AtLeastOneVariant, Variant } from '../variants'
+import {
+	type Attribute,
+	type Evaluation,
+	type ExemptEvaluation,
+	Rating,
+	type Value,
+} from '../attributes'
+import { type AtLeastOneVariant, Variant } from '../variants'
 import { type Sentence, sentence } from '@/types/content'
 import type { WalletMetadata } from '../wallet'
 import { unratedAttributeContent } from '@/types/content/unrated-attribute'
@@ -45,19 +51,19 @@ export function exempt<V extends Value>(
 	extraProps: Omit<V, keyof (Value & { __brand: string })> extends Record<string, never>
 		? null
 		: Omit<V, keyof (Value & { __brand: string })>,
-): Evaluation<V> {
-	const value: Value = {
+): ExemptEvaluation<V> {
+	const value: Value & { rating: Rating.EXEMPT } = {
 		id: 'exempt',
 		rating: Rating.EXEMPT,
 		displayName: `${attribute.displayName}: Exempt`,
 		shortExplanation: whyExempt,
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
-	const v: V = {
+	const v: V & { rating: Rating.EXEMPT } = {
 		__brand: brand,
 		...value,
 		...(extraProps ?? {}),
-	} as unknown as V
+	} as unknown as V & { rating: Rating.EXEMPT }
 	return {
 		value: v,
 		details: {

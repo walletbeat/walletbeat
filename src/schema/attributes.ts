@@ -248,18 +248,25 @@ export interface Evaluation<V extends Value> {
 	 * These references provide sources for the evaluation claims.
 	 */
 	references?: ReferenceArray
-
-	/**
-	 * The wallet context for this evaluation (injected by evaluation logic).
-	 */
-	wallet?: RatedWallet
 }
 
 /**
- * Evaluate is a function that takes in wallet features and returns an
- * evaluation for a specific attribute.
+ * An evaluation that is exempt.
  */
-export type Evaluate<V extends Value> = (features: ResolvedFeatures) => Evaluation<V>
+export type ExemptEvaluation<V extends Value> = Evaluation<V> & {
+	value: Evaluation<V>['value'] & {
+		rating: Rating.EXEMPT
+	}
+}
+
+/**
+ * Type predicate for ExemptEvaluation.
+ */
+export function isExempt<V extends Value>(
+	evaluation: Evaluation<V>,
+): evaluation is ExemptEvaluation<V> {
+	return evaluation.value.rating === Rating.EXEMPT
+}
 
 /**
  * A human-readable description of why a wallet may be assigned a certain
@@ -389,8 +396,26 @@ export interface Attribute<V extends Value> {
 	 * This function is the default way in which attributes are evaluated.
 	 * However, a wallet may override the evaluation of an attribute using
 	 * overrides.
+	 *
+	 * This function specifically does **not** take into account the wallet's
+	 * metadata. This is to ensure that wallet ratings remain fair and unbiased
+	 * by preventing their evaluation code from taking any metadata into
+	 * account.
 	 */
-	evaluate: Evaluate<V>
+	evaluate: (features: ResolvedFeatures) => Evaluation<V>
+
+	/**
+	 * Check whether the attribute applies to a wallet, according to its
+	 * features and metadata.
+	 *
+	 * This function is similar to `evaluate`, but may inspect wallet metadata.
+	 * However, it can only return exempt ratings, or `null`.
+	 * If it returns an exempt rating, then that rating is used and `evaluate`
+	 * is not called. If it returns `null`, then `evaluate` is called.
+	 *
+	 * If `exempted` is undefined, then `evaluate` is used unconditionally.
+	 */
+	exempted?: (features: ResolvedFeatures, metadata: WalletMetadata) => null | ExemptEvaluation<V>
 
 	/**
 	 * Aggregates one or more per-variant evaluations into a single one.

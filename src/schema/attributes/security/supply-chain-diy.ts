@@ -1,9 +1,14 @@
 import type { ResolvedFeatures } from '@/schema/features'
-import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
+import {
+	Rating,
+	type Value,
+	type Attribute,
+	type Evaluation,
+	type ExemptEvaluation,
+} from '@/schema/attributes'
 import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import type { AtLeastOneVariant } from '@/schema/variants'
 import {
 	SupplyChainDIYType,
 	type SupplyChainDIYSupport,
@@ -11,6 +16,7 @@ import {
 import { popRefs } from '@/schema/reference'
 import { exampleRating } from '@/schema/attributes'
 import { Variant } from '@/schema/variants'
+import { HardwareWalletManufactureType } from '@/schema/features/profile'
 
 const brand = 'attributes.supply_chain_diy'
 
@@ -80,8 +86,26 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SupplyChainDIYValue>>) => {
-		return pickWorstRating<SupplyChainDIYValue>(perVariant)
+	aggregate: pickWorstRating<SupplyChainDIYValue>,
+	exempted: (
+		features: ResolvedFeatures,
+		metadata: WalletMetadata,
+	): ExemptEvaluation<SupplyChainDIYValue> | null => {
+		if (
+			features.variant === Variant.HARDWARE &&
+			metadata.hardwareWalletManufactureType !== HardwareWalletManufactureType.DIY
+		) {
+			return exempt(
+				supplyChainDIY,
+				sentence('Attribute only applies to DIY hardware wallets.'),
+				brand,
+				{
+					diyNoNda: SupplyChainDIYType.FAIL,
+					componentSourcingComplexity: SupplyChainDIYType.FAIL,
+				},
+			)
+		}
+		return null
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainDIYValue> => {
 		if (features.variant !== Variant.HARDWARE) {

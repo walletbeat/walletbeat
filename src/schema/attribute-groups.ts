@@ -12,6 +12,7 @@ import {
 	type EvaluatedAttribute,
 	evaluatedAttributes,
 	type EvaluatedGroup,
+	isExempt,
 	Rating,
 	type Value,
 	type ValueSet,
@@ -106,10 +107,6 @@ import {
 import { firmware, type FirmwareValue } from './attributes/security/firmware'
 import { keysHandling, type KeysHandlingValue } from './attributes/security/keys-handling'
 import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
-import { exempt } from './attributes/common'
-import { HardwareWalletManufactureType } from './features/profile'
-import { SupplyChainDIYType } from './features/security/supply-chain-diy'
-import { SupplyChainFactoryType } from './features/security/supply-chain-factory'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
@@ -397,66 +394,28 @@ export interface EvaluationTree
 /** Rate a wallet's attributes based on its features and metadata. */
 export function evaluateAttributes(
 	features: ResolvedFeatures,
-	metadata: WalletMetadata,
-	wallet?: any, // Accept wallet context (RatedWallet) as an optional argument
+	walletMetadata: WalletMetadata,
 ): EvaluationTree {
 	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => {
-		const evaluation = attr.evaluate(features)
-		// Attach wallet context if not already present
-		if (!('wallet' in evaluation) || !evaluation.wallet) {
-			return {
-				attribute: attr,
-				evaluation: {
-					...evaluation,
-					wallet: wallet || { metadata },
-				},
+		if (attr.exempted !== undefined) {
+			const maybeExempt = attr.exempted(features, walletMetadata)
+			if (maybeExempt !== null) {
+				if (!isExempt(maybeExempt)) {
+					throw new Error(
+						`Attribute ${attr.id}'s exemption rating function returned a non-exempt rating`,
+					)
+				}
+				return {
+					attribute: attr,
+					evaluation: maybeExempt,
+				}
 			}
 		}
 		return {
 			attribute: attr,
-			evaluation,
+			evaluation: attr.evaluate(features),
 		}
 	}
-
-	// Helper for exempt evaluation
-	// TODO: Remove and make the individual attributes return exempt ratings themselves.
-	const createExemptEvaluation = <V extends Value>(
-		attr: Attribute<V>,
-		reason: string,
-		defaultValue: Omit<V, keyof Value | '__brand'>,
-	): EvaluatedAttribute<V> => ({
-		attribute: attr,
-		evaluation: exempt(attr, sentence(reason), `attributes.${attr.id}` as any, defaultValue as any),
-	})
-
-	// Determine if DIY/Factory attributes should be exempt
-	const isHardware = features.variant === Variant.HARDWARE
-	const isDIY =
-		isHardware && metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
-
-	const supplyChainDIYEvaluation =
-		!isDIY && isHardware // Exempt if Hardware but not DIY
-			? createExemptEvaluation(supplyChainDIY, 'Attribute only applies to DIY hardware wallets.', {
-					diyNoNda: SupplyChainDIYType.FAIL,
-					componentSourcingComplexity: SupplyChainDIYType.FAIL,
-				})
-			: evalAttr(supplyChainDIY)
-
-	const supplyChainFactoryEvaluation = isDIY // Exempt if DIY
-		? createExemptEvaluation(
-				supplyChainFactory,
-				'Attribute only applies to Factory-Made hardware wallets.',
-				{
-					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
-					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
-					tamperEvidence: SupplyChainFactoryType.FAIL,
-					hardwareVerification: SupplyChainFactoryType.FAIL,
-					tamperResistance: SupplyChainFactoryType.FAIL,
-					genuineCheck: SupplyChainFactoryType.FAIL,
-				},
-			)
-		: evalAttr(supplyChainFactory)
-
 	return {
 		security: {
 			securityAudits: evalAttr(securityAudits),
@@ -467,8 +426,8 @@ export function evaluateAttributes(
 			softwareHWIntegration: evalAttr(softwareHWIntegration),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
-			supplyChainDIY: supplyChainDIYEvaluation,
-			supplyChainFactory: supplyChainFactoryEvaluation,
+			supplyChainDIY: evalAttr(supplyChainDIY),
+			supplyChainFactory: evalAttr(supplyChainFactory),
 			firmware: evalAttr(firmware),
 			keysHandling: evalAttr(keysHandling),
 			userSafety: evalAttr(userSafety),

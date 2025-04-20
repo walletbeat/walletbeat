@@ -1,9 +1,14 @@
 import type { ResolvedFeatures } from '@/schema/features'
-import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
+import {
+	Rating,
+	type Value,
+	type Attribute,
+	type Evaluation,
+	type ExemptEvaluation,
+} from '@/schema/attributes'
 import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import type { AtLeastOneVariant } from '@/schema/variants'
 import {
 	SupplyChainFactoryType,
 	type SupplyChainFactorySupport,
@@ -11,6 +16,7 @@ import {
 import { popRefs } from '@/schema/reference'
 import { exampleRating } from '@/schema/attributes'
 import { Variant } from '@/schema/variants'
+import { HardwareWalletManufactureType } from '@/schema/features/profile'
 
 const brand = 'attributes.security.supply_chain_factory'
 
@@ -99,8 +105,30 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SupplyChainFactoryValue>>) => {
-		return pickWorstRating<SupplyChainFactoryValue>(perVariant)
+	aggregate: pickWorstRating<SupplyChainFactoryValue>,
+	exempted: (
+		features: ResolvedFeatures,
+		metadata: WalletMetadata,
+	): ExemptEvaluation<SupplyChainFactoryValue> | null => {
+		if (
+			features.variant === Variant.HARDWARE &&
+			metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
+		) {
+			return exempt(
+				supplyChainFactory,
+				sentence('Attribute only applies to factory-made hardware wallets.'),
+				brand,
+				{
+					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+					tamperEvidence: SupplyChainFactoryType.FAIL,
+					hardwareVerification: SupplyChainFactoryType.FAIL,
+					tamperResistance: SupplyChainFactoryType.FAIL,
+					genuineCheck: SupplyChainFactoryType.FAIL,
+				},
+			)
+		}
+		return null
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainFactoryValue> => {
 		if (features.variant !== Variant.HARDWARE) {
