@@ -418,12 +418,7 @@ export function WalletPage({
 													sx={{
 														opacity: 0.7,
 														lineHeight: 1,
-														color: blend(
-															theme.palette.primary.light,
-															ratingToColor(evalAttr.evaluation.value.rating),
-															0.25,
-															1,
-														),
+														color: theme.palette.primary.light,
 													}}
 												>
 													<VariantIcon />
