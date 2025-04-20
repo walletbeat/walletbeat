@@ -175,9 +175,12 @@ export function WalletPage({
 }): React.JSX.Element {
 	// Determine if this is a hardware wallet or regular wallet
 	const isHardwareWallet = Object.keys(ratedHardwareWallets).includes(walletName)
+
+	// Use type guards to safely access the wallets
 	const wallet = isHardwareWallet
-		? ratedHardwareWallets[walletName as HardwareWalletName]
-		: ratedWallets[walletName as WalletName]
+		? ratedHardwareWallets[walletName as keyof typeof ratedHardwareWallets]
+		: ratedWallets[walletName as keyof typeof ratedWallets]
+
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
 	useEffect(() => {
@@ -319,7 +322,7 @@ export function WalletPage({
 			evalGroup: EvaluatedGroup<Vs> | undefined,
 		) => {
 			// Handle case where evalGroup might be undefined (Fixes linter error)
-			if (!evalGroup) {
+			if (evalGroup === null || evalGroup === undefined) {
 				return // Skip this group if there's no evaluation data
 			}
 

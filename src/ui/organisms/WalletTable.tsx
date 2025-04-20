@@ -540,22 +540,20 @@ function ExpandableHardwareWalletRow({
 	const perAttributeGroupCells: React.JSX.Element[] = mapNonExemptAttributeGroupsInTree(
 		evalTree,
 		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => (
-			<div className="flex flex-col items-center">
-				<PizzaSliceChart<Vs>
-					attrGroup={attrGroup}
-					evalGroup={evalGroup}
-					isSupported={true}
-					wallet={wallet}
-				/>
-			</div>
+			<PizzaSliceChart<Vs>
+				attrGroup={attrGroup}
+				evalGroup={evalGroup}
+				isSupported={true}
+				wallet={wallet}
+			/>
 		),
 	)
 
-	// Create updated cells for rating data (synchronous)
-	const createUpdatedCell = async (cell: Cell<TableRow, unknown>, columnIndex: number) => {
+	// Create updated cells for rating data
+	const createUpdatedCell = (cell: Cell<TableRow, unknown>, columnIndex: number) => {
 		// Skip first two columns (Wallet name and Manufacture Type)
 		if (columnIndex < 2) {
-			return await flexRender(cell.column.columnDef.cell, cell.getContext())
+			return flexRender(cell.column.columnDef.cell, cell.getContext())
 		}
 		return perAttributeGroupCells[columnIndex - 2]
 	}

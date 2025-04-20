@@ -279,19 +279,19 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		}
 
 		// Check if hardware wallet support feature exists
-		if (!features.security.hardwareWalletSupport) {
+		if (features.security.hardwareWalletSupport === null) {
 			return noHardwareWalletSupport()
 		}
 
 		// Check if any hardware wallets are supported
 		const hasHardwareWalletSupport = Object.values(
 			features.security.hardwareWalletSupport.supportedWallets,
-		).some(support => support && isSupported(support))
+		).some(support => support !== null && isSupported(support))
 
 		const references = mergeRefs(
 			refs(features.security.hardwareWalletSupport),
 			refs(
-				features.security.hardwareWalletDappSigning == null
+				features.security.hardwareWalletDappSigning === null
 					? {}
 					: features.security.hardwareWalletDappSigning,
 			),
@@ -308,9 +308,10 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		const supportedHardwareWallets = Object.entries(
 			features.security.hardwareWalletSupport.supportedWallets,
 		)
-			.filter(([_, support]) => support && isSupported(support))
+			.filter(([_, support]) => support !== null && isSupported(support))
 			.map(([walletType]) => {
-				switch (walletType) {
+				const type = walletType as HardwareWalletType
+				switch (type) {
 					case HardwareWalletType.LEDGER:
 						return 'Ledger'
 					case HardwareWalletType.TREZOR:
@@ -332,17 +333,22 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 
 		// Placeholder for checking if Safe integration exists with clear signing
 		const hasSafeIntegration =
-			features.security.hardwareWalletDappSigning?.details?.includes('Safe') || false
+			features.security.hardwareWalletDappSigning !== null &&
+			features.security.hardwareWalletDappSigning.details !== undefined &&
+			features.security.hardwareWalletDappSigning.details.includes('Safe')
 
 		// Placeholder for checking if Aave integration exists with clear signing
 		const hasAaveIntegration =
-			features.security.hardwareWalletDappSigning?.details?.includes('Aave') || false
+			features.security.hardwareWalletDappSigning !== null &&
+			features.security.hardwareWalletDappSigning.details !== undefined &&
+			features.security.hardwareWalletDappSigning.details.includes('Aave')
 
 		// Check how many hardware wallet brands are supported for these integrations
 		const supportedHWBrands = supportedHardwareWallets.length
 
 		// Generate base evaluation result
-		let result: Evaluation<SoftwareHWIntegrationValue>
+		let result: Evaluation<SoftwareHWIntegrationValue> =
+			basicHardwareWalletIntegration(supportedHardwareWallets)
 
 		// Determine integration level based on support
 		if (hasSafeIntegration && hasAaveIntegration && supportedHWBrands >= 2) {
@@ -356,8 +362,6 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 				supportedDApps.push('Aave')
 			}
 			result = goodHardwareWalletIntegration(supportedHardwareWallets, supportedDApps)
-		} else {
-			result = basicHardwareWalletIntegration(supportedHardwareWallets)
 		}
 
 		// Return result with references if any

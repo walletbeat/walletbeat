@@ -291,7 +291,7 @@ export const lightWalletTableTheme = createTheme(
 )
 
 // Add theme-specific CSS variables
-walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
+walletTableTheme.components = deepmerge(walletTableTheme.components ?? {}, {
 	MuiCssBaseline: {
 		styleOverrides: {
 			':root': {
@@ -301,7 +301,7 @@ walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
 	},
 })
 
-lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components || {}, {
+lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components ?? {}, {
 	MuiCssBaseline: {
 		styleOverrides: {
 			':root': {

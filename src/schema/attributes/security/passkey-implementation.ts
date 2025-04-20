@@ -100,7 +100,10 @@ function freshCryptoLibImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
-			libraryUrl: support.libraryUrl || 'https://github.com/rdubois-crypto/FreshCryptoLib',
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/rdubois-crypto/FreshCryptoLib',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -133,7 +136,10 @@ function smoothCryptoLibImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
-			libraryUrl: support.libraryUrl || 'https://github.com/get-smooth/crypto-lib',
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/get-smooth/crypto-lib',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -159,7 +165,10 @@ function daimoP256VerifierImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
-			libraryUrl: support.libraryUrl || 'https://github.com/daimo-eth/p256-verifier',
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/daimo-eth/p256-verifier',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -187,8 +196,9 @@ function openZeppelinP256VerifierImplementation(
 			),
 			library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
 			libraryUrl:
-				support.libraryUrl ||
-				'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -215,7 +225,10 @@ function webAuthnSolImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
-			libraryUrl: support.libraryUrl || 'https://github.com/base/webauthn-sol',
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/base/webauthn-sol',
 			__brand: brand,
 		},
 		details: mdParagraph(
