@@ -1,9 +1,9 @@
 ---
-description: 
+description: No MUI changes
 globs: 
 alwaysApply: true
 ---
 
-# Your rule content
+# MUI deprecation
 
-- Avoid MUI component modifications.
+- This codebase is migrating away from MUI. So avoid MUI component modifications.

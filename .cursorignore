@@ -1,23 +1,23 @@
-# build output
+# Build output
 dist/
 
-# generated types
+# Generated types
 .astro/
 
-# dependencies
+# Dependencies
 node_modules/
 
-# logs
+# Logs
 *.log*
 
-# environment variables
+# Environment variables
 .env
 .env.production
 
-# macOS-specific files
+# MacOS-specific files
 .DS_Store
 
-# jetbrains setting folder
+# JetBrains setting folder
 .idea/
 
 # Lock file
