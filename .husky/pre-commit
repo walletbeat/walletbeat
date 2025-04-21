@@ -1,1 +1,1 @@
-pnpm prepare
+pnpm check:all

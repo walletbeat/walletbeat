@@ -28,6 +28,7 @@
 		"debank",
 		"Defaultized",
 		"dejavu",
+		"Edgeserver",
 		"Eips",
 		"Elytro",
 		"Ercs",
@@ -119,6 +120,7 @@
 		"walletbeat",
 		"Warpcast",
 		"webauthn",
+		"xlabs",
 		"Yanssie"
 	],
 	"flagWords": [],
