@@ -35,7 +35,7 @@ export const HomePage: FC = () => (
 						id: 'wallets-nav',
 						children: mapWallets(wallet => ({
 							title: wallet.metadata.displayName,
-							href: `/${wallet.metadata.id}`,
+							href: `/wallet/${wallet.metadata.id}`,
 							id: wallet.metadata.id,
 							icon: (
 								<img
@@ -77,7 +77,7 @@ export const HomePage: FC = () => (
 
 							return {
 								title: displayName,
-								href: `/${wallet.metadata.id}`,
+								href: `/hww/${wallet.metadata.id}`,
 								id: wallet.metadata.id,
 								icon: (
 									<img
@@ -146,30 +146,6 @@ export const HomePage: FC = () => (
 				</div>
 				<WalletTable />
 			</div>
-
-			<div className="w-full flex flex-col gap-2 p-4 md:p-8">
-				<div className="text-2xl font-bold text-accent" id="criteria">
-					Criteria
-				</div>
-				<p>
-					Our evaluation criteria aim to provide a broad yet comprehensive overview of what wallet
-					options are available for users.
-				</p>
-				<p>
-					Different users might have different priorities, so we have created a few profiles that
-					users might identify with:
-				</p>
-				<ul>
-					<li>- the bare minimum</li>
-					<li>- the average user</li>
-					<li>- the whale</li>
-					<li>- the privacy maximalist</li>
-				</ul>
-			</div>
-			<p>
-				How each of the criteria are evaluated you can find in the footnote on the page of the
-				wallet you are interested in.
-			</p>
 		</div>
 	</NavigationPageLayout>
 )

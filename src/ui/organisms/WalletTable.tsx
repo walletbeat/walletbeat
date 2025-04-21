@@ -419,7 +419,7 @@ function createWalletNameCell(
 			: '/images/wallets/default.svg'
 
 		// Create the wallet detail URL
-		const walletUrl = `/${walletId}`
+		const walletUrl = `/${isHardware ? 'hww' : 'wallet'}/${walletId}`
 
 		return (
 			<div className="flex items-center">
@@ -602,7 +602,7 @@ function ExpandableHardwareWalletRow({
 						{/* Wallet Name */}
 						<div className="flex flex-col items-start">
 							<a
-								href={`/${wallet.metadata.id}`}
+								href={`/hww/${wallet.metadata.id}`}
 								className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
 							>
 								{row.original.name}

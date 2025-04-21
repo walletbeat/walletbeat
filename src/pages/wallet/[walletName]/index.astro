@@ -3,10 +3,10 @@
 export const prerender = true
 
 // Data
-import { isValidWalletName, ratedWallets, wallets } from '@/data/wallets'
+import { isValidWalletName, ratedWallets, wallets } from '@/data/wallets.ts'
 
 // Utils
-import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 // Params
 export const getStaticPaths = () =>
@@ -23,6 +23,9 @@ const walletMetadata = ratedWallets[walletName].metadata
 
 // Layouts
 import Layout from '@/layouts/Layout.astro'
+
+// Components
+import { WalletPage } from '@/components/WalletPage'
 ---
 
 {
@@ -46,14 +49,7 @@ import Layout from '@/layouts/Layout.astro'
 				keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
 			}}
 		>
-			{/* Hacky redirect to `/{walletName}`, maybe there' a better way to do this? */}
-			{/* Probably OK to delete after a few weeks so it's OK if it is hacky. */}
-			<span id="walletName" style="display: none;">
-				{walletName}
-			</span>
-			<script>
-				document.location.href = `/${document.getElementById('walletName')?.innerText}`;
-			</script>
+			<WalletPage {walletName} client:load />
 		</Layout>
 	) : (
 		<Layout
