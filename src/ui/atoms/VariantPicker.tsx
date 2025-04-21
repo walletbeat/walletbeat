@@ -1,5 +1,5 @@
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import { Tooltip } from '@mui/material'
+import { Tooltip } from './Tooltip'
 import type { SvgIconComponent } from '@mui/icons-material'
 import { IconButton } from './IconButton'
 
@@ -48,7 +48,7 @@ export function VariantPicker<V extends string>({
 				}
 
 				return (
-					<Tooltip key={variant.id} title={variant.tooltip} arrow={true} disableInteractive={true}>
+					<Tooltip key={variant.id} content={variant.tooltip}>
 						<div className="flex flex-row items-center">
 							{variant.click === undefined ? (
 								<variant.icon

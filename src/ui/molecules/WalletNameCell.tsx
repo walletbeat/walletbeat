@@ -1,7 +1,7 @@
 import type { ResolvedWallet } from '@/schema/wallet'
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess'
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
-import { Link, Tooltip, Typography } from '@mui/material'
+import { Link, Typography } from '@mui/material'
 import type React from 'react'
 import { shortRowHeight, expandedRowHeight } from '../../components/constants'
 import { ExternalLink } from '../atoms/ExternalLink'
@@ -18,13 +18,14 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../components/variants'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { betaSiteRoot } from '@/constants'
+import { Tooltip } from '../atoms/Tooltip'
 
 const walletIconSize = shortRowHeight * 0.5
 
 function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element {
 	const Icon = variantToIcon(variant)
 	return (
-		<Tooltip title={`No ${variant} version`} arrow={true} disableInteractive={true}>
+		<Tooltip content={`No ${variant} version`}>
 			<div className="flex items-center justify-center relative">
 				<IconButton disabled={true}>
 					<Icon />

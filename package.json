@@ -32,6 +32,7 @@
 		"@mui/x-charts": "^7.25.0",
 		"@mui/x-data-grid": "^7.25.0",
 		"@radix-ui/react-popover": "^1.1.6",
+		"@radix-ui/react-tooltip": "^1.2.3",
 		"@tanstack/match-sorter-utils": "^8.19.4",
 		"@tanstack/react-table": "^8.21.2",
 		"@tanstack/react-virtual": "^3.13.4",
