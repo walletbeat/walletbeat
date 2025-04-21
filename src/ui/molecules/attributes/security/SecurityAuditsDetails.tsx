@@ -12,7 +12,6 @@ import {
 	securityFlawSeverityName,
 } from '@/schema/features/security/security-audits'
 import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
-import { Rating } from '@/schema/attributes'
 
 export function SecurityAuditsDetails({
 	wallet,
@@ -20,17 +19,6 @@ export function SecurityAuditsDetails({
 	auditedInLastYear,
 	hasUnaddressedFlaws,
 }: SecurityAuditsDetailsProps): React.JSX.Element {
-	// Safety check for value and audits
-	if (!value || !value.securityAudits) {
-		return (
-			<WrapRatingIcon rating={Rating.UNRATED}>
-				<Typography fontWeight={subsectionWeight}>
-					No security audit information is available.
-				</Typography>
-			</WrapRatingIcon>
-		)
-	}
-
 	const audits = value.securityAudits
 	if (!isNonEmptyArray(audits)) {
 		return (

@@ -15,8 +15,7 @@ export function ReferenceLinks({
 	references: FullyQualifiedReference[]
 	explanation?: string
 }): React.JSX.Element {
-	// Check if references is undefined, null, or empty
-	if (!references || references.length === 0) {
+	if (references.length === 0) {
 		return <></>
 	}
 
@@ -77,7 +76,7 @@ export function ReferenceLinks({
 						</Box>
 
 						{/* Reference explanation if available in the reference object */}
-						{ref.explanation && (
+						{ref.explanation !== undefined && ref.explanation !== '' && (
 							<Typography
 								variant="caption"
 								sx={{
@@ -97,7 +96,7 @@ export function ReferenceLinks({
 			</Box>
 
 			{/* Global explanation if provided to the component */}
-			{explanation && (
+			{explanation !== undefined && explanation !== '' && (
 				<Typography
 					variant="caption"
 					sx={{

@@ -23,7 +23,7 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 
 	// Update width when popover opens
 	useEffect(() => {
-		if (open && triggerRef !== null && triggerRef.current) {
+		if (open && triggerRef.current !== null) {
 			setWidth(triggerRef.current.offsetWidth)
 		}
 	}, [open])

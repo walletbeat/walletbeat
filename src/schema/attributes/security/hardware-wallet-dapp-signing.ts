@@ -274,84 +274,73 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletDappSigningValue> => {
 		// For hardware wallets themselves:
 		// This evaluates the hardware wallet's own dApp signing capabilities
-		switch (features.variant) {
-			case Variant.HARDWARE:
-				// Check if dApp signing feature exists
-				if (!features.security.hardwareWalletDappSigning) {
-					return unrated(hardwareWalletDappSigning, brand, {
-						dappSigningLevel: DappSigningLevel.NONE,
-					})
-				}
+		if (features.variant === Variant.HARDWARE) {
+			// Check if dApp signing feature exists
+			if (features.security.hardwareWalletDappSigning === null) {
+				return unrated(hardwareWalletDappSigning, brand, {
+					dappSigningLevel: DappSigningLevel.NONE,
+				})
+			}
 
-				// Extract references from the hardware wallet dApp signing feature
-				const references = refs(features.security.hardwareWalletDappSigning)
+			// Extract references from the hardware wallet dApp signing feature
+			const references = refs(features.security.hardwareWalletDappSigning)
 
-				const dappSigningLevel = features.security.hardwareWalletDappSigning.level
+			const dappSigningLevel = features.security.hardwareWalletDappSigning.level
 
-				// Combine extracted references with standard references if any
+			// Combine extracted references with standard references if any
 
-				let result: Evaluation<HardwareWalletDappSigningValue>
-
+			const result = ((): Evaluation<HardwareWalletDappSigningValue> => {
 				switch (dappSigningLevel) {
 					case DappSigningLevel.NONE:
-						result = noDappSigning()
-						break
+						return noDappSigning()
 					case DappSigningLevel.BASIC:
-						result = basicDappSigning(['this hardware wallet'])
-						break
+						return basicDappSigning(['this hardware wallet'])
 					case DappSigningLevel.PARTIAL:
-						result = partialDappSigning(['this hardware wallet'])
-						break
+						return partialDappSigning(['this hardware wallet'])
 					case DappSigningLevel.FULL:
-						result = fullDappSigning(['this hardware wallet'])
-						break
-					default:
-						return unrated(hardwareWalletDappSigning, brand, {
-							dappSigningLevel: DappSigningLevel.NONE,
-						})
+						return fullDappSigning(['this hardware wallet'])
 				}
+			})()
 
-				// Return result with references
-				return {
-					references,
-					...result,
-				}
+			// Return result with references
+			return {
+				...result,
+				references,
+			}
+		}
+		// Check for ERC-4337 smart wallet
+		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
+			return exempt(
+				hardwareWalletDappSigning,
+				sentence(
+					(walletMetadata: WalletMetadata) =>
+						`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`,
+				),
+				brand,
+				{ dappSigningLevel: DappSigningLevel.NONE },
+			)
+		}
 
-			default:
-				// Check for ERC-4337 smart wallet
-				if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
-					return exempt(
-						hardwareWalletDappSigning,
-						sentence(
-							(walletMetadata: WalletMetadata) =>
-								`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`,
-						),
-						brand,
-						{ dappSigningLevel: DappSigningLevel.NONE },
-					)
-				}
-
-				// For software wallets:
-				// Make this attribute exempt as it should only apply to hardware wallets
-				return {
-					value: {
-						id: 'exempt_software_wallet',
-						rating: Rating.EXEMPT,
-						displayName: 'Only applicable for hardware wallets',
-						shortExplanation: sentence(
-							'This attribute evaluates hardware wallet dApp signing capabilities and is not applicable for software wallets.',
-						),
-						dappSigningLevel: DappSigningLevel.NONE,
-						__brand: brand,
-					},
-					details: paragraph(
-						({ wallet }) => `
+		// For software wallets:
+		// Make this attribute exempt as it should only apply to hardware wallets
+		return {
+			value: {
+				id: 'exempt_software_wallet',
+				rating: Rating.EXEMPT,
+				displayName: 'Only applicable for hardware wallets',
+				shortExplanation: sentence(
+					'This attribute evaluates hardware wallet dApp signing capabilities and is not applicable for software wallets.',
+				),
+				dappSigningLevel: DappSigningLevel.NONE,
+				__brand: brand,
+			},
+			details: paragraph(
+				({ wallet }) => `
 							As ${wallet.metadata.displayName} is a software wallet, this attribute which evaluates
 							hardware wallet dApp signing capabilities is not applicable. Please see the hardware wallet
 							integration attribute for how well this software wallet connects to hardware wallets.
 						`,
-					),
-				}
+			),
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletDappSigningValue>>) =>

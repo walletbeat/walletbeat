@@ -208,7 +208,9 @@ const NavigationItem = memo(
 		return (
 			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				<ButtonComponent key="buttonComponent">
-					{item.icon ? <SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon> : null}
+					{item.icon !== undefined ? (
+						<SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>
+					) : null}
 					<span>{item.title}</span>
 				</ButtonComponent>
 

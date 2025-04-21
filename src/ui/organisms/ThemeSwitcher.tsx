@@ -9,7 +9,7 @@ export const ThemeSwitcher: FC = () => {
 		// Check localStorage first
 		const storedTheme = localStorage.getItem('theme')
 
-		if (storedTheme) {
+		if (storedTheme !== null) {
 			// Use stored preference
 			const isDark = storedTheme === 'dark'
 			setIsDarkMode(isDark)
@@ -22,8 +22,8 @@ export const ThemeSwitcher: FC = () => {
 		}
 	}, [])
 
-	const toggleTheme = () => {
-		const newDarkMode = !isDarkMode
+	const toggleTheme = (): void => {
+		const newDarkMode = isDarkMode !== true
 		setIsDarkMode(newDarkMode)
 
 		// Update DOM
