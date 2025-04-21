@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import React from 'react'
 import { subsectionWeight } from '@/components/constants'
 import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
@@ -46,7 +46,7 @@ export function SecurityAuditsDetails({
 					{hasUnaddressedFlaws && ' There remains unaddressed security flaws in the codebase.'}
 				</Typography>
 			</WrapRatingIcon>
-			<Box sx={{ maxHeight: '16rem', overflowY: 'auto' }}>
+			<div className="max-h-48 overflow-y-auto border p-2 rounded-md">
 				<ul>
 					{nonEmptyMap(sortedAudits, audit => (
 						<li key={securityAuditId(audit)}>
@@ -95,7 +95,7 @@ export function SecurityAuditsDetails({
 						</li>
 					))}
 				</ul>
-			</Box>
+			</div>
 		</>
 	)
 }

@@ -1,6 +1,6 @@
 import type { FullyQualifiedReference } from '@/schema/reference'
 import type { LabeledUrl } from '@/schema/url'
-import { Box, Link, Typography } from '@mui/material'
+import { Link, Typography } from '@mui/material'
 import type React from 'react'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import LinkIcon from '@mui/icons-material/Link'
@@ -20,17 +20,7 @@ export function ReferenceLinks({
 	}
 
 	return (
-		<Box
-			sx={{
-				pt: 1,
-				mt: 0.5,
-				borderTop: '1px solid rgba(0,0,0,0.1)',
-				display: 'flex',
-				flexDirection: 'column',
-				gap: 0.5,
-				color: 'var(--text-primary)',
-			}}
-		>
+		<div className="pt-2 mt-1 border-t border-gray-200 flex flex-col gap-1 text-primary">
 			{/* References header */}
 			<Typography
 				variant="caption"
@@ -47,11 +37,11 @@ export function ReferenceLinks({
 			</Typography>
 
 			{/* References content */}
-			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+			<div className="flex flex-col gap-1">
 				{references.map((ref, refIndex) => (
-					<Box key={refIndex}>
+					<div key={refIndex}>
 						{/* Reference links */}
-						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 0.5 }}>
+						<div className="flex flex-wrap gap-1 mb-1">
 							{ref.urls.map((url: LabeledUrl, urlIndex: number) => (
 								<Link
 									key={`${refIndex}-${urlIndex}`}
@@ -73,7 +63,7 @@ export function ReferenceLinks({
 									{url.label}
 								</Link>
 							))}
-						</Box>
+						</div>
 
 						{/* Reference explanation if available in the reference object */}
 						{ref.explanation !== undefined && ref.explanation !== '' && (
@@ -91,9 +81,9 @@ export function ReferenceLinks({
 								{ref.explanation}
 							</Typography>
 						)}
-					</Box>
+					</div>
 				))}
-			</Box>
+			</div>
 
 			{/* Global explanation if provided to the component */}
 			{explanation !== undefined && explanation !== '' && (
@@ -110,6 +100,6 @@ export function ReferenceLinks({
 					{explanation}
 				</Typography>
 			)}
-		</Box>
+		</div>
 	)
 }

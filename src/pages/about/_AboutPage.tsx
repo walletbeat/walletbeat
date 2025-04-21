@@ -193,11 +193,9 @@ export function AboutPage(): React.JSX.Element {
 					>
 						Who watches the wallets?
 					</Typography>
-					{/* <Box maxWidth="75vw" display="flex" flexDirection="column" alignItems="stretch"> */}
 					<div className="flex flex-col gap-2 items-stretch justify-stretch">
 						<AboutContents />
 					</div>
-					{/* </Box> */}
 				</div>
 			</div>
 		</NavigationPageLayout>

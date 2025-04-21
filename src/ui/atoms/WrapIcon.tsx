@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import type React from 'react'
 import type theme from '../../components/ThemeRegistry/theme'
 
@@ -14,36 +13,40 @@ export function WrapIcon({
 	iconWidth: string
 	iconFontSize: typeof theme.typography.body1.fontSize
 	flexBeforeAndAfter?: [number, number]
-	sx?: React.ComponentProps<typeof Box>['sx']
+	sx?: React.CSSProperties
 	children?: React.ReactNode
 }): React.JSX.Element {
 	return (
-		<Box display="flex" flexDirection="row" gap="0px" sx={sx}>
+		<div className="flex flex-row gap-0" style={sx}>
 			{flexBeforeAndAfter === undefined ? (
-				<Box
-					flex="0"
-					minWidth={iconWidth}
-					maxWidth={iconWidth}
-					display="block"
-					textAlign="center"
-					fontSize={iconFontSize}
+				<div
+					className="flex-0"
+					style={{
+						minWidth: iconWidth,
+						maxWidth: iconWidth,
+						display: 'block',
+						textAlign: 'center',
+						fontSize: iconFontSize,
+					}}
 				>
 					{icon}
-				</Box>
+				</div>
 			) : (
-				<Box
-					flex="0"
-					minWidth={iconWidth}
-					maxWidth={iconWidth}
-					display="flex"
-					fontSize={iconFontSize}
+				<div
+					className={`flex-0`}
+					style={{
+						minWidth: iconWidth,
+						maxWidth: iconWidth,
+						display: 'flex',
+						fontSize: iconFontSize,
+					}}
 				>
-					<Box flex={flexBeforeAndAfter[0]} />
-					<Box flex="0">{icon}</Box>
-					<Box flex={flexBeforeAndAfter[1]} />
-				</Box>
+					<div className={`flex-${flexBeforeAndAfter[0]}`} />
+					<div className="flex-0">{icon}</div>
+					<div className={`flex-${flexBeforeAndAfter[1]}`} />
+				</div>
 			)}
-			<Box flex="1">{children}</Box>
-		</Box>
+			<div className="flex-1">{children}</div>
+		</div>
 	)
 }

@@ -50,8 +50,11 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 
 	const handleSelect = useCallback((walletId: string) => {
 		setOpen(false)
+
+		const isHardware = hardwareWalletItems.some(w => w.id === walletId)
+
 		// Use simple navigation instead of router
-		window.location.href = `/${walletId}`
+		window.location.href = `/${isHardware ? 'hww' : 'wallet'}/${walletId}`
 	}, [])
 
 	return (

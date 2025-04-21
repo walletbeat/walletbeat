@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import type React from 'react'
 import { subsectionWeight } from '@/components/constants'
 import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
@@ -67,7 +67,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 					<RenderTypographicContent content={value.shortExplanation.render(wallet.metadata)} />
 				</Typography>
 			</WrapRatingIcon>
-			<Box>
+			<div>
 				<ul>
 					{value.sendTransactionWarning.required && (
 						<li>
@@ -207,7 +207,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 						</li>
 					)}
 				</ul>
-			</Box>
+			</div>
 		</>
 	)
 }

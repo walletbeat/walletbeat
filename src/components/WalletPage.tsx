@@ -22,7 +22,7 @@ import {
 	nonEmptyMap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-import { Box, Typography, styled, Tooltip } from '@mui/material'
+import { Typography, Tooltip } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { WalletIcon } from '@/ui/atoms/WalletIcon'
 import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
@@ -41,13 +41,7 @@ import {
 } from '@/schema/attributes'
 import { navigationListIconSize } from '@/components/constants'
 import type { NavigationItem } from '@/ui/organisms/Navigation'
-import {
-	navigationAbout,
-	navigationFaq,
-	navigationFarcasterChannel,
-	navigationRepository,
-	scrollPastHeaderPixels,
-} from '@/components/navigation'
+import { scrollPastHeaderPixels } from '@/components/navigation'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { type PickableVariant, VariantPicker } from '@/ui/atoms/VariantPicker'
 import { getSingleVariant, type Variant } from '@/schema/variants'
@@ -68,12 +62,6 @@ import LanguageIcon from '@mui/icons-material/Language'
 import GitHubIcon from '@mui/icons-material/GitHub'
 
 const headerBottomMargin = 0
-
-const StyledSection = styled(Box)(({ theme }) => ({
-	padding: theme.spacing(2),
-	display: 'flex',
-	flexDirection: 'column',
-}))
 
 interface Section {
 	header: string
@@ -105,14 +93,10 @@ function maybeAddCornerControl(
 		return anchorHeader
 	}
 	return (
-		<Box key="sectionCornerControl" display="flex" flexDirection="row">
-			<Box flex="1" display="flex" flexDirection="column" justifyContent="center">
-				{anchorHeader}
-			</Box>
-			<Box flex="0" flexDirection="column" justifyContent="center">
-				{section.cornerControl}
-			</Box>
-		</Box>
+		<div key="sectionCornerControl" className="flex flex-row">
+			<div className="flex flex-col justify-center flex-1">{anchorHeader}</div>
+			<div className="flex flex-col justify-center flex-initial">{section.cornerControl}</div>
+		</div>
 	)
 }
 
@@ -402,13 +386,7 @@ export function WalletPage({
 											title={`Only rated on the ${variantToName(relevantVariants[0], false)} version`}
 											arrow={true}
 										>
-											<Box
-												key="variantSpecificEval"
-												display="flex"
-												flexDirection="row"
-												alignItems="center"
-												gap="0.25rem"
-											>
+											<div key="variantSpecificEval" className="flex flex-row items-center gap-2">
 												<Typography variant="caption" sx={{ opacity: 0.7 }}>
 													Only
 												</Typography>
@@ -422,7 +400,7 @@ export function WalletPage({
 												>
 													<VariantIcon />
 												</Typography>
-											</Box>
+											</div>
 										</Tooltip>
 									),
 									body: (
@@ -451,13 +429,7 @@ export function WalletPage({
 							}
 							return {
 								cornerControl: (
-									<Box
-										key="variantSpecificEval"
-										display="flex"
-										flexDirection="row"
-										alignItems="center"
-										gap="0.25rem"
-									>
+									<div key="variantSpecificEval" className="flex flex-row items-center gap-2">
 										<Typography variant="caption" sx={{ opacity: 0.7 }}>
 											{pickedVariant === null ? 'Version' : 'Viewing'}:
 										</Typography>
@@ -496,7 +468,7 @@ export function WalletPage({
 											)}
 											pickedVariant={pickedVariant}
 										/>
-									</Box>
+									</div>
 								),
 								body: (
 									<WalletAttribute
@@ -578,11 +550,11 @@ export function WalletPage({
 					),
 					overflow: true,
 				},
-				{
-					id: 'rest-of-nav',
-					items: [navigationFaq, navigationAbout, navigationRepository, navigationFarcasterChannel],
-					overflow: false,
-				},
+				// {
+				// 	id: 'rest-of-nav',
+				// 	items: [navigationFaq, navigationAbout, navigationRepository, navigationFarcasterChannel],
+				// 	overflow: false,
+				// },
 			]}
 			stickyHeaderId="walletHeader"
 			stickyHeaderMargin={0}
@@ -628,24 +600,28 @@ export function WalletPage({
 									{index > 0 ? (
 										<div key="sectionDivider" className="w-4/5 mx-auto mt-6 mb-6 border-b" />
 									) : null}
-									<StyledSection key="sectionContainer" sx={section.css}>
-										{maybeAddCornerControl(
-											section,
-											<AnchorHeader
-												key="sectionHeader"
-												id={sectionHeaderId(section)}
-												sx={{ scrollMarginTop }}
-												variant="h4"
-												component="h2"
-												marginBottom="0"
-												fontSize="2rem"
-												fontWeight="700"
-												paddingLeft={theme.spacing(2)}
-												paddingRight={theme.spacing(2)}
-											>
-												{section.title}
-											</AnchorHeader>,
-										)}
+									<div key="sectionContainer" className="p-4 flex flex-col" style={section.css}>
+										<div key="sectionCornerControl" className="flex flex-row">
+											<div className="flex flex-col justify-center flex-1">
+												<AnchorHeader
+													key="sectionHeader"
+													id={sectionHeaderId(section)}
+													sx={{ scrollMarginTop }}
+													variant="h4"
+													component="h2"
+													marginBottom="0"
+													fontSize="2rem"
+													fontWeight="700"
+													paddingLeft={theme.spacing(2)}
+													paddingRight={theme.spacing(2)}
+												>
+													{section.title}
+												</AnchorHeader>
+											</div>
+											<div className="flex flex-col justify-center flex-initial">
+												{section.cornerControl}
+											</div>
+										</div>
 										{section.caption === null ? null : (
 											<div
 												key="sectionCaption"
@@ -658,15 +634,13 @@ export function WalletPage({
 											</div>
 										)}
 										{section.body === null ? null : (
-											<Box
+											<div
 												key="sectionBody"
-												color="var(--text-primary)"
+												className="text-primary px-4"
 												// paddingTop={theme.spacing(2)}
-												paddingLeft={theme.spacing(2)}
-												paddingRight={theme.spacing(2)}
 											>
 												{section.body}
-											</Box>
+											</div>
 										)}
 										{section.subsections?.map(subsection => (
 											<div
@@ -688,22 +662,17 @@ export function WalletPage({
 														</AnchorHeader>,
 													)}
 													{subsection.caption === null ? null : (
-														<Box
-															key="subsectionCaption"
-															marginLeft="0"
-															marginBottom="2rem"
-															sx={{ opacity: 0.8 }}
-														>
+														<div key="subsectionCaption" className="mb-8 opacity-80">
 															{subsection.caption}
-														</Box>
+														</div>
 													)}
 													{subsection.body === null ? null : (
-														<Box key="subsectionBody">{subsection.body}</Box>
+														<div key="subsectionBody">{subsection.body}</div>
 													)}
 												</ThemeProvider>
 											</div>
 										))}
-									</StyledSection>
+									</div>
 								</React.Fragment>
 							))}
 						</div>

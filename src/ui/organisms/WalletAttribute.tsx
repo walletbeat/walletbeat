@@ -7,7 +7,7 @@ import {
 	type ValueSet,
 } from '@/schema/attributes'
 import { getAttributeOverride, VariantSpecificity, type RatedWallet } from '@/schema/wallet'
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import React from 'react'
 import { WrapIcon } from '../atoms/WrapIcon'
 import {
@@ -94,7 +94,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			<React.Fragment key="impact">
 				{evalAttr.evaluation.impact === undefined ? null : (
 					<>
-						<Box height="1rem"></Box>
+						<div style={{ height: '1rem' }}></div>
 						<RenderTypographicContent
 							content={evalAttr.evaluation.impact.render({
 								wallet,
@@ -111,9 +111,9 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 
 			{/* Display references if available */}
 			{qualRefs.length > 0 && (
-				<Box sx={{ mt: 2 }}>
+				<div style={{ marginTop: '1rem' }}>
 					<ReferenceLinks references={qualRefs} />
-				</Box>
+				</div>
 			)}
 		</>
 	)

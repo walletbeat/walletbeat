@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import type React from 'react'
 import { subsectionWeight } from '@/components/constants'
 import { ReferenceList } from '../../../atoms/ReferenceList'
@@ -22,7 +21,7 @@ export function FundingDetails({
 	const ref = refs(monetization)
 	return (
 		<WrapRatingIcon rating={value.rating}>
-			<Box style={{ fontWeight: subsectionWeight }}>
+			<div style={{ fontWeight: subsectionWeight }}>
 				<strong>{wallet.metadata.displayName}</strong> is funded by{' '}
 				<JoinedList
 					data={strategies.map(strategy => ({
@@ -31,7 +30,7 @@ export function FundingDetails({
 					}))}
 				/>
 				. <ReferenceList ref={ref} ulStyle={{ paddingLeft: '1.5rem', marginBottom: '0px' }} />
-			</Box>
+			</div>
 		</WrapRatingIcon>
 	)
 }

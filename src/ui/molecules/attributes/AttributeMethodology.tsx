@@ -7,7 +7,6 @@ import {
 	type Value,
 } from '@/schema/attributes'
 import { Divider, Typography } from '@mui/material'
-import { Box } from '@mui/system'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import React from 'react'
 import { mdSentence, type Sentence } from '@/types/content'
@@ -196,13 +195,13 @@ function ExampleRatings<V extends Value>({
 	return (
 		<>
 			<Typography variant="h5">{exhaustive ? '' : 'A few examples'}</Typography>
-			<Box>
+			<div>
 				{renderedExamples.map(renderedExample =>
 					renderedExample.element === null ? null : (
-						<Box key={renderedExample.key}>{renderedExample.element}</Box>
+						<div key={renderedExample.key}>{renderedExample.element}</div>
 					),
 				)}
-			</Box>
+			</div>
 		</>
 	)
 }
@@ -222,12 +221,12 @@ export function AttributeMethodology<V extends Value>({
 }): React.JSX.Element {
 	return (
 		<>
-			<Box key="methodology">
+			<div key="methodology">
 				<RenderTypographicContent
 					content={attribute.methodology.render({})}
 					typography={typographyPropsBody}
 				/>
-			</Box>
+			</div>
 			<Divider
 				key="after-methodology"
 				sx={{
@@ -235,7 +234,7 @@ export function AttributeMethodology<V extends Value>({
 					marginBottom: '1rem',
 				}}
 			/>
-			<Box key="example-ratings">
+			<div key="example-ratings">
 				{attribute.ratingScale.display === 'simple' ? (
 					<RenderTypographicContent
 						content={attribute.ratingScale.content.render({})}
@@ -250,7 +249,7 @@ export function AttributeMethodology<V extends Value>({
 						exhaustive={attribute.ratingScale.exhaustive}
 					/>
 				)}
-			</Box>
+			</div>
 		</>
 	)
 }

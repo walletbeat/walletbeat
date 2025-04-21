@@ -1,5 +1,4 @@
 import { Typography, Divider } from '@mui/material'
-import { Box } from '@mui/system'
 import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion'
 import React from 'react'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
@@ -353,9 +352,9 @@ export function FrequentlyAskedQuestionsPage(): React.JSX.Element {
 			<Typography id="faqHeader" variant="h1">
 				Walletbeat FAQ
 			</Typography>
-			<Box maxWidth="75vw" display="flex" flexDirection="column" alignItems="stretch">
+			<div className="max-w-7xl mx-auto flex flex-col items-stretch">
 				<FrequentlyAskedQuestions />
-			</Box>
+			</div>
 		</NavigationPageLayout>
 	)
 }

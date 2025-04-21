@@ -1,7 +1,6 @@
 import type { EvaluationTree } from '@/schema/attribute-groups'
 import type { Variant } from '@/schema/variants'
 import type { RatedWallet } from '@/schema/wallet'
-import type { SxProps } from '@mui/system'
 
 export interface WalletTableState {
 	readonly variantSelected: Variant | null
@@ -19,7 +18,7 @@ export interface WalletRowStateHandle extends WalletRowState {
 	readonly wallet: RatedWallet
 	readonly evalTree: EvaluationTree
 	readonly table: WalletTableStateHandle
-	readonly rowWideStyle: SxProps
+	readonly rowWideStyle: React.CSSProperties
 	toggleExpanded: () => void
 	setExpanded: (expanded: boolean) => void
 }

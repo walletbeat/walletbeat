@@ -1,5 +1,5 @@
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import { Box, Tooltip } from '@mui/material'
+import { Tooltip } from '@mui/material'
 import type { SvgIconComponent } from '@mui/icons-material'
 import { IconButton } from './IconButton'
 
@@ -19,8 +19,8 @@ export interface VariantPickerProps<V extends string> {
 	opacityDefault?: number
 	opacityPicked?: number
 	colorPicked?: string
-	flexDirection?: React.ComponentProps<typeof Box>['flexDirection']
-	gap?: React.ComponentProps<typeof Box>['gap']
+	flexDirection?: React.CSSProperties['flexDirection']
+	gap?: React.CSSProperties['gap']
 }
 
 export function VariantPicker<V extends string>({
@@ -35,7 +35,7 @@ export function VariantPicker<V extends string>({
 	gap = '0px',
 }: VariantPickerProps<V>): React.JSX.Element {
 	return (
-		<Box key={pickerId} display="flex" flexDirection={flexDirection} gap={gap}>
+		<div key={pickerId} className={`flex`} style={{ flexDirection, gap }}>
 			{nonEmptyMap(variants, variant => {
 				let opacity = opacityDefault
 				const isSelected = pickedVariant === variant.id
@@ -49,11 +49,11 @@ export function VariantPicker<V extends string>({
 
 				return (
 					<Tooltip key={variant.id} title={variant.tooltip} arrow={true} disableInteractive={true}>
-						<Box flexDirection="row" display="flex" alignItems="center">
+						<div className="flex flex-row items-center">
 							{variant.click === undefined ? (
 								<variant.icon
 									data-selected={isSelected}
-									sx={{
+									style={{
 										opacity,
 									}}
 								/>
@@ -67,10 +67,10 @@ export function VariantPicker<V extends string>({
 									<variant.icon data-selected={isSelected} />
 								</IconButton>
 							)}
-						</Box>
+						</div>
 					</Tooltip>
 				)
 			})}
-		</Box>
+		</div>
 	)
 }
