@@ -50,7 +50,7 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 }
 
 export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
-	id: 'supply_chain_factory',
+	id: 'supplyChainFactory',
 	icon: '🏭',
 	displayName: 'Supply Chain Factory',
 	wording: {
