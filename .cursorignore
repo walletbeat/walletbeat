@@ -22,3 +22,6 @@ node_modules/
 
 # Lock file
 pnpm-lock.yaml
+
+# Precommit config
+.husky/
