@@ -9,7 +9,7 @@ import {
 } from '@/schema/attributes'
 import { pickWorstRating, unrated, exempt } from '../common'
 import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata, RatedWallet } from '@/schema/wallet'
+import type { WalletMetadata } from '@/schema/wallet'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { UserSafetyType, type UserSafetySupport } from '@/schema/features/security/user-safety'
 import { popRefs } from '@/schema/reference'
@@ -180,7 +180,7 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 		}
 
 		const userSafetyFeature = features.security.userSafety
-		if (!userSafetyFeature) {
+		if (userSafetyFeature === null) {
 			return unrated(userSafety, brand, {
 				readableAddress: UserSafetyType.FAIL,
 				contractLabeling: UserSafetyType.FAIL,
@@ -223,7 +223,7 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 			withoutRefs.fullyLocalTxSimulation,
 		].filter(r => r === UserSafetyType.PASS).length
 
-		const detailsText = ({ wallet }: EvaluationData<UserSafetyValue>) => {
+		const detailsText = ({ wallet }: EvaluationData<UserSafetyValue>): string => {
 			let desc = `${wallet.metadata.displayName} user safety evaluation is ${rating.toLowerCase()}.`
 			if (rating !== Rating.EXEMPT) {
 				desc += ` It passes ${passCount} out of 16 sub-criteria.`
@@ -231,18 +231,12 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 			return desc
 		}
 
-		const howToImproveText = ({ wallet }: EvaluationData<UserSafetyValue>) => {
+		const howToImproveText = ({ wallet }: EvaluationData<UserSafetyValue>): string => {
 			if (rating === Rating.PASS || rating === Rating.EXEMPT) {
 				return ''
 			}
 			return `${wallet.metadata.displayName} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`
 		}
-
-		const improvementText = howToImproveText({
-			wallet: {} as RatedWallet,
-			value: {} as UserSafetyValue,
-			references: [],
-		})
 
 		return {
 			value: {
@@ -257,8 +251,11 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 				__brand: brand,
 			},
 			details: paragraph(detailsText),
-			...(improvementText !== '' && { howToImprove: paragraph(howToImproveText) }),
-			...(extractedRefs.length > 0 && { references: extractedRefs }),
+			references: extractedRefs,
+			howToImprove:
+				rating === Rating.PASS || rating === Rating.EXEMPT
+					? undefined
+					: paragraph(howToImproveText),
 		}
 	},
 }

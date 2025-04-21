@@ -1,5 +1,9 @@
 import { ratedWallets, type WalletName } from '@/data/wallets'
-import { ratedHardwareWallets, type HardwareWalletName } from '@/data/hardware-wallets'
+import {
+	isValidHardwareWalletName,
+	ratedHardwareWallets,
+	type HardwareWalletName,
+} from '@/data/hardware-wallets'
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
@@ -18,7 +22,7 @@ import {
 	nonEmptyMap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-import { Box, Typography, type Paper, styled, Tooltip } from '@mui/material'
+import { Box, Typography, styled, Tooltip } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { WalletIcon } from '@/ui/atoms/WalletIcon'
 import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
@@ -82,7 +86,7 @@ interface RichSection extends Section {
 	cornerControl: React.ReactNode | null
 	caption: React.ReactNode | null
 	body: React.ReactNode | null
-	sx?: React.ComponentProps<typeof Paper>['sx']
+	css?: React.CSSProperties
 	subsections?: RichSection[] // Only one level of nesting is supported.
 }
 
@@ -130,7 +134,7 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 	// Process all sections except the first one (details section)
 	for (const section of sections.slice(1)) {
 		// Only include sections with subsections
-		if (section.subsections && section.subsections.length > 0) {
+		if (section.subsections !== undefined && section.subsections.length > 0) {
 			// For each attribute in the section, create a FAQ entry
 			for (const subsection of section.subsections) {
 				// Safely check for caption and body
@@ -174,12 +178,12 @@ export function WalletPage({
 	walletName: WalletName | HardwareWalletName
 }): React.JSX.Element {
 	// Determine if this is a hardware wallet or regular wallet
-	const isHardwareWallet = Object.keys(ratedHardwareWallets).includes(walletName)
+	const isHardwareWallet = isValidHardwareWalletName(walletName)
 
 	// Use type guards to safely access the wallets
-	const wallet = isHardwareWallet
-		? ratedHardwareWallets[walletName as keyof typeof ratedHardwareWallets]
-		: ratedWallets[walletName as keyof typeof ratedWallets]
+	const wallet = isValidHardwareWalletName(walletName)
+		? ratedHardwareWallets[walletName]
+		: ratedWallets[walletName]
 
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
@@ -317,15 +321,7 @@ export function WalletPage({
 	]
 	mapNonExemptAttributeGroupsInTree(
 		evalTree,
-		<Vs extends ValueSet>(
-			attrGroup: AttributeGroup<Vs>,
-			evalGroup: EvaluatedGroup<Vs> | undefined,
-		) => {
-			// Handle case where evalGroup might be undefined (Fixes linter error)
-			if (evalGroup === null || evalGroup === undefined) {
-				return // Skip this group if there's no evaluation data
-			}
-
+		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => {
 			const section = {
 				header: attrGroup.id,
 				subHeader: null,
@@ -520,7 +516,7 @@ export function WalletPage({
 							title: evalAttr.attribute.displayName,
 							icon: evalAttr.attribute.icon,
 							cornerControl,
-							sx: {
+							css: {
 								border: '2px solid',
 								color: 'var(--text-primary)',
 								borderColor: blend(
@@ -632,7 +628,7 @@ export function WalletPage({
 									{index > 0 ? (
 										<div key="sectionDivider" className="w-4/5 mx-auto mt-6 mb-6 border-b" />
 									) : null}
-									<StyledSection key="sectionContainer" sx={section.sx}>
+									<StyledSection key="sectionContainer" sx={section.css}>
 										{maybeAddCornerControl(
 											section,
 											<AnchorHeader
@@ -675,8 +671,8 @@ export function WalletPage({
 										{section.subsections?.map(subsection => (
 											<div
 												key={sectionHeaderId(subsection)}
-												/*sx={subsection.sx}*/ className="flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border"
-												style={subsection.sx ?? ({} as unknown as object)}
+												className="flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border"
+												style={subsection.css}
 											>
 												<ThemeProvider theme={subsectionTheme}>
 													{maybeAddCornerControl(

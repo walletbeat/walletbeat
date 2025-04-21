@@ -2,6 +2,8 @@ import type React from 'react'
 import { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { eipEthereumDotOrgUrl, type Eip } from '@/schema/eips'
+import { MarkdownTypography } from '../atoms/MarkdownTypography'
+import { trimWhitespacePrefix } from '@/types/utils/text'
 
 interface EipPreviewModalProps {
 	eip: Eip
@@ -19,101 +21,50 @@ export function EipPreviewModal({
 		left: 0,
 	})
 
-	// Format text to be more readable
-	const formatMarkdownText = (text: string): string =>
-		// Remove extra indentation
-		text
-			.trim()
-			.replace(/^\t+/gm, '') // Remove tab indentation
-			.replace(/\n\s*\n/g, '\n\n') // Normalize paragraph breaks
-			.replace(/\n{3,}/g, '\n\n') // Limit consecutive line breaks
-
-	// Process links to make them clickable
-	const processMarkdownLinks = (text: string): React.ReactNode[] => {
-		if (!text) {
-			return []
-		}
-
-		// Regex to find markdown links: [text](url)
-		const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-		const parts: React.ReactNode[] = []
-
-		let lastIndex = 0
-		let match
-
-		while ((match = linkRegex.exec(text)) !== null) {
-			// Add text before the link
-			if (match.index > lastIndex) {
-				parts.push(text.substring(lastIndex, match.index))
-			}
-
-			// Add the link
-			parts.push(
-				<a
-					key={match.index}
-					href={match[2]}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="text-blue-600 dark:text-blue-400 hover:underline"
-				>
-					{match[1]}
-				</a>,
-			)
-
-			lastIndex = match.index + match[0].length
-		}
-
-		// Add any remaining text
-		if (lastIndex < text.length) {
-			parts.push(text.substring(lastIndex))
-		}
-
-		return parts
-	}
-
 	// Calculate position of popup
 	useEffect(() => {
-		if (anchorEl) {
-			const rect = anchorEl.getBoundingClientRect()
-			const scrollTop = window.scrollY || document.documentElement.scrollTop
-			const scrollLeft = window.scrollX || document.documentElement.scrollLeft
-
-			// Start with a position below the anchor element
-			let top = rect.bottom + scrollTop + 5 // Add small offset for visual separation
-			let left = rect.left + scrollLeft
-
-			// Check if popup would go off the bottom of the screen
-			const popupHeight = 600 // Fixed height
-			const viewportHeight = window.innerHeight
-			if (rect.bottom + popupHeight > viewportHeight) {
-				// Position above the anchor element instead
-				top = rect.top + scrollTop - popupHeight - 5 // Add small offset for visual separation
-			}
-
-			// Check if popup would go off the right of the screen
-			const popupWidth = 500 // Increased width for better readability
-			const viewportWidth = window.innerWidth
-			if (rect.left + popupWidth > viewportWidth) {
-				// Align right edge of popup with right edge of anchor
-				left = rect.right + scrollLeft - popupWidth
-			}
-
-			// Ensure popup doesn't go off the left edge
-			if (left < scrollLeft) {
-				left = scrollLeft + 10 // Add a small margin
-			}
-
-			// Ensure popup doesn't go off the top of the screen
-			if (top < scrollTop) {
-				top = scrollTop + 10 // Add a small margin
-			}
-
-			setPopupPosition({ top, left })
+		if (anchorEl === null) {
+			return
 		}
+		const rect = anchorEl.getBoundingClientRect()
+		const scrollTop = window.scrollY === 0 ? document.documentElement.scrollTop : window.scrollY
+		const scrollLeft = window.scrollX === 0 ? document.documentElement.scrollLeft : window.scrollX
+
+		// Start with a position below the anchor element
+		let top = rect.bottom + scrollTop + 5 // Add small offset for visual separation
+		let left = rect.left + scrollLeft
+
+		// Check if popup would go off the bottom of the screen
+		const popupHeight = 600 // Fixed height
+		const viewportHeight = window.innerHeight
+		if (rect.bottom + popupHeight > viewportHeight) {
+			// Position above the anchor element instead
+			top = rect.top + scrollTop - popupHeight - 5 // Add small offset for visual separation
+		}
+
+		// Check if popup would go off the right of the screen
+		const popupWidth = 500 // Increased width for better readability
+		const viewportWidth = window.innerWidth
+		if (rect.left + popupWidth > viewportWidth) {
+			// Align right edge of popup with right edge of anchor
+			left = rect.right + scrollLeft - popupWidth
+		}
+
+		// Ensure popup doesn't go off the left edge
+		if (left < scrollLeft) {
+			left = scrollLeft + 10 // Add a small margin
+		}
+
+		// Ensure popup doesn't go off the top of the screen
+		if (top < scrollTop) {
+			top = scrollTop + 10 // Add a small margin
+		}
+
+		setPopupPosition({ top, left })
 	}, [anchorEl, eip.number])
 
 	// Create a portal for the popup
-	if (!anchorEl) {
+	if (anchorEl === null) {
 		return null
 	}
 
@@ -134,32 +85,36 @@ export function EipPreviewModal({
 				</div>
 
 				<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-					{eip.friendlyName || eip.formalTitle}
+					{eip.friendlyName !== '' ? eip.friendlyName : eip.formalTitle}
 				</h3>
 
-				{eip.formalTitle && eip.formalTitle !== eip.friendlyName && (
+				{eip.formalTitle !== '' && eip.formalTitle !== eip.friendlyName && (
 					<h4 className="text-sm text-gray-700 dark:text-gray-300 mb-4">{eip.formalTitle}</h4>
 				)}
 
 				<div className="prose dark:prose-invert prose-sm max-w-none text-left">
-					{eip.summaryMarkdown && (
+					{eip.summaryMarkdown !== '' && (
 						<div className="mb-4">
 							<h5 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2">
 								Summary
 							</h5>
 							<div className="text-sm text-gray-700 dark:text-gray-300">
-								{processMarkdownLinks(formatMarkdownText(eip.summaryMarkdown))}
+								<MarkdownTypography variant="caption">
+									{trimWhitespacePrefix(eip.summaryMarkdown)}
+								</MarkdownTypography>
 							</div>
 						</div>
 					)}
 
-					{eip.whyItMattersMarkdown && (
+					{eip.whyItMattersMarkdown !== '' && (
 						<div>
 							<h5 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2">
 								Why It Matters
 							</h5>
 							<div className="text-sm text-gray-700 dark:text-gray-300">
-								{processMarkdownLinks(formatMarkdownText(eip.whyItMattersMarkdown))}
+								<MarkdownTypography variant="caption">
+									{trimWhitespacePrefix(eip.whyItMattersMarkdown)}
+								</MarkdownTypography>
 							</div>
 						</div>
 					)}

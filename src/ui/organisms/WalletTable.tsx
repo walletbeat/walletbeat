@@ -175,7 +175,7 @@ function getDetailedWalletDescription(wallet: RatedWallet): string {
 function getHardwareWalletManufactureTypeDisplay(wallet: RatedWallet): string {
 	const manufactureType = wallet.metadata.hardwareWalletManufactureType
 	if (manufactureType !== undefined) {
-		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType] ?? 'Unknown'
+		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType]
 	}
 	return 'Unknown'
 }
@@ -191,7 +191,7 @@ function walletSupportsVariant(wallet: RatedWallet, variant: DeviceVariant): boo
 		return hasVariant(wallet.variants, Variant.HARDWARE)
 	}
 
-	return wallet.variants !== undefined && variant in wallet.variants
+	return variant in wallet.variants
 }
 
 // Helper function to get device-specific evaluation tree
@@ -201,7 +201,7 @@ function getEvaluationTree(wallet: RatedWallet, selectedVariant: DeviceVariant):
 		return wallet.overall
 	}
 
-	if (selectedVariant === DeviceVariant.NONE || wallet.variants === undefined) {
+	if (selectedVariant === DeviceVariant.NONE) {
 		return wallet.overall
 	}
 
@@ -408,7 +408,7 @@ const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets)
 function createWalletNameCell(
 	isHardware: boolean,
 ): ({ row }: { row: Row<TableRow> }) => React.ReactNode {
-	return ({ row }: { row: Row<TableRow> }) => {
+	const createCell = ({ row }: { row: Row<TableRow> }): React.ReactNode => {
 		// Regular row rendering with logo
 		const walletId = row.original.wallet.metadata.id
 		const logoPath = isHardware
@@ -445,6 +445,7 @@ function createWalletNameCell(
 			</div>
 		)
 	}
+	return createCell
 }
 
 // Helper function for EIP standards with hover preview (non-link version)
@@ -466,11 +467,10 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 					setTimeout(() => {
 						// Only close if not hovering the modal
 						const modalElement = document.querySelector('.eip-preview-modal')
-						if (modalElement !== null && modalElement.matches(':hover')) {
-							return
+						if (modalElement === null || modalElement.matches(':hover')) {
+							setIsHovered(false)
+							setAnchorEl(null)
 						}
-						setIsHovered(false)
-						setAnchorEl(null)
 					}, 100)
 				}}
 			>
@@ -735,17 +735,19 @@ export default function WalletTable(): React.ReactElement {
 			return softwareWalletData
 		}
 
-		return softwareWalletData.filter(row => {
+		return softwareWalletData.filter((row): boolean => {
 			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
 
-			switch (walletTypeFilter) {
-				case WalletTypeFilter.EOA_ONLY:
-					return hasEoa && !hasSmartWallet
-				case WalletTypeFilter.SMART_WALLET_ONLY:
-					return hasSmartWallet && !hasEoa
-				case WalletTypeFilter.SMART_WALLET_AND_EOA:
-					return hasSmartWallet && hasEoa
-			}
+			return ((): boolean => {
+				switch (walletTypeFilter) {
+					case WalletTypeFilter.EOA_ONLY:
+						return hasEoa && !hasSmartWallet
+					case WalletTypeFilter.SMART_WALLET_ONLY:
+						return hasSmartWallet && !hasEoa
+					case WalletTypeFilter.SMART_WALLET_AND_EOA:
+						return hasSmartWallet && hasEoa
+				}
+			})()
 		})
 	}, [walletTypeFilter])
 
@@ -795,7 +797,7 @@ export default function WalletTable(): React.ReactElement {
 				hasHardware ? ('HARDWARE_WALLET' as WalletTypeCategory) : null,
 			]
 				.filter((val): val is WalletTypeCategory => val !== null)
-				.map(cat => WALLET_TYPE_DISPLAY[cat] || cat)
+				.map(cat => (WALLET_TYPE_DISPLAY[cat] !== '' ? WALLET_TYPE_DISPLAY[cat] : cat))
 				.join(' & ')
 			// If no standards, just return the type string
 			if (!hasSmartWallet) {
@@ -1235,7 +1237,8 @@ export default function WalletTable(): React.ReactElement {
 														: 'font-normal'
 											}`}
 										>
-											{headerContent ? flexRender(headerContent, header.getContext()) : null}
+											{headerContent !== undefined &&
+												flexRender(headerContent, header.getContext())}
 										</th>
 									)
 								})}

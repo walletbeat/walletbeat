@@ -56,12 +56,12 @@ export function RatingDetailModal<Vs extends ValueSet>({
 
 	// Get the flagship model if available
 	const flagshipModel = hasHardwareModels
-		? hardwareModels.find(model => model && model.isFlagship) || hardwareModels[0]
+		? (hardwareModels.find(model => model.isFlagship) ?? hardwareModels[0])
 		: null
 
 	// If no model is selected but we have models, default to the flagship
 	useEffect(() => {
-		if (!selectedModel && flagshipModel && flagshipModel.id) {
+		if (selectedModel !== null && flagshipModel !== null && flagshipModel.id !== '') {
 			setSelectedModel(flagshipModel)
 		}
 	}, [flagshipModel, selectedModel])
@@ -289,7 +289,7 @@ export function RatingDetailModal<Vs extends ValueSet>({
 																	key={refIndex}
 																	className="border-l-2 border-gray-300 dark:border-gray-600 pl-3 py-1"
 																>
-																	{ref.explanation && (
+																	{ref.explanation !== undefined && ref.explanation !== '' && (
 																		<p className="mb-2 text-gray-700 dark:text-gray-300">
 																			{ref.explanation}
 																		</p>
@@ -303,7 +303,9 @@ export function RatingDetailModal<Vs extends ValueSet>({
 																				rel="noopener noreferrer"
 																				className="text-blue-500 hover:underline inline-flex items-center"
 																			>
-																				<span>{urlObj.label || 'Reference'}</span>
+																				<span>
+																					{urlObj.label === '' ? 'Reference' : urlObj.label}
+																				</span>
 																				{/* SVG icon */}
 																			</a>
 																		))}
