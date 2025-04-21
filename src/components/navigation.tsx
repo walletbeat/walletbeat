@@ -10,7 +10,7 @@ export const navigationHome: NavigationLinkItem = {
 	id: 'wallet-table',
 	icon: <HomeIcon />,
 	title: 'Walletbeat',
-	href: `${betaSiteRoot}/`,
+	href: `${betaSiteRoot}/#`,
 }
 
 export const navigationFaq: NavigationLinkItem = {
@@ -31,7 +31,7 @@ export const navigationCriteria: NavigationLinkItem = {
 	id: 'criteria',
 	icon: <LuBadgeCheck />,
 	title: 'Evaluation Criteria',
-	href: `${betaSiteRoot}/criteria`,
+	href: `${betaSiteRoot}/#criteria`,
 }
 
 export const navigationRepository: NavigationLinkItem = {

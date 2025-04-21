@@ -18,9 +18,9 @@ export const HomePage: FC = () => (
 				items: [
 					{
 						title: 'Summary',
-						href: '/',
+						href: '/#summary',
 						id: 'summary',
-						icon: '',
+						icon: undefined,
 					},
 				],
 				overflow: false,
@@ -141,8 +141,22 @@ export const HomePage: FC = () => (
 			</div>
 
 			<div className="w-full flex flex-col gap-2 p-4 md:p-8">
+				<div className="text-2xl font-bold text-accent" id="summary">Summary</div>
 				<WalletTable />
 			</div>
+
+			<div className="w-full flex flex-col gap-2 p-4 md:p-8">
+				<div className="text-2xl font-bold text-accent" id="criteria">Criteria</div>
+				<p>Our evaluation criteria aim to provide a broad yet comprehensive overview of what wallet options are available for users.</p>
+				<p>Different users might have different priorities, so we have created a few profiles that users might identify with:</p>
+				<ul>
+					<li>- the bare minimum</li>
+					<li>- the average user</li>
+					<li>- the whale</li>
+					<li>- the privacy maximalist</li>
+				</ul>
+			</div>
+			<p>How each of the criteria are evaluated you can find in the footnote on the page of the wallet you are interested in.</p>
 		</div>
 	</NavigationPageLayout>
 )

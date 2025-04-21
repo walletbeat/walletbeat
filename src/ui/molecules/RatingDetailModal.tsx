@@ -179,7 +179,7 @@ export function RatingDetailModal<Vs extends ValueSet>({
 			onClose={onClose}
 			className="flex items-center justify-center overflow-y-auto"
 		>
-			<div className="bg-white dark:bg-gray-800 rounded-lg p-4 max-w-[90vw] md:max-w-2xl max-h-[90vh] overflow-y-auto">
+			<div className="bg-white dark:bg-gray-800 rounded-lg w-full p-4 max-w-[90vw] md:max-w-3xl max-h-[90vh] overflow-y-auto">
 				<div className="flex justify-between items-center mb-4">
 					<Typography variant="h6" className="dark:text-gray-100 font-bold">
 						{attrGroup.displayName} Details
@@ -237,11 +237,10 @@ export function RatingDetailModal<Vs extends ValueSet>({
 									return (
 										<div key={evalAttr.attribute.id} className="mb-2">
 											<div
-												className={`flex items-center p-2 rounded cursor-pointer text-sm ${
-													hoveredSliceIndex === index
-														? 'bg-gray-200 dark:bg-gray-700'
-														: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
-												}`}
+												className={`flex items-center p-2 rounded cursor-pointer text-sm ${hoveredSliceIndex === index
+													? 'bg-gray-200 dark:bg-gray-700'
+													: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
+													}`}
 												onMouseEnter={() => {
 													setHoveredSliceIndex(index)
 												}}
