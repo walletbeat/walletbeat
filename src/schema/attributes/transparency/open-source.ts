@@ -204,25 +204,25 @@ export const openSource: Attribute<OpenSourceValue> = {
 			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE })
 		}
 		const license = features.license.license
-		const extractedRefs = refs(features.license)
+		const references = refs(features.license)
 		if (license === License.UNLICENSED_VISIBLE) {
-			return { ...unlicensed, ...(extractedRefs.length > 0 && { references: extractedRefs }) }
+			return { references, ...unlicensed }
 		}
 		switch (licenseIsFOSS(license)) {
 			case FOSS.FOSS:
 				return {
+					references,
 					...open(features.license),
-					...(extractedRefs.length > 0 && { references: extractedRefs }),
 				}
 			case FOSS.FUTURE_FOSS:
 				return {
+					references,
 					...openInTheFuture(features.license),
-					...(extractedRefs.length > 0 && { references: extractedRefs }),
 				}
 			case FOSS.NOT_FOSS:
 				return {
+					references,
 					...proprietary(features.license),
-					...(extractedRefs.length > 0 && { references: extractedRefs }),
 				}
 		}
 	},
