@@ -15,7 +15,7 @@
 		"dev": "pnpm run astro dev",
 		"lint": "prettier --check --write src data && eslint src data --fix && cspell lint .",
 		"preview": "pnpm run astro preview",
-		"prepare": "pnpm run check:syntax && pnpm check:astro && pnpm run check:spelling:quiet && pnpm run check:misc"
+		"prepare": "pnpm run check:all"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.2.0",
