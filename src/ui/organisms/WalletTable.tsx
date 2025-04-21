@@ -746,7 +746,6 @@ export default function WalletTable(): React.ReactElement {
 				case WalletTypeFilter.SMART_WALLET_AND_EOA:
 					return hasSmartWallet && hasEoa
 			}
-			return true
 		})
 	}, [walletTypeFilter])
 
