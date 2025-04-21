@@ -99,14 +99,14 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 		<span
 			key="listItemIcon"
 			className="inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1"
-		// sx={{
-		// 	minWidth: `${navigationListIconSize}px`,
-		// 	width: `${navigationListIconSize}px`,
-		// 	height: `${navigationListIconSize}px`,
-		// 	display: 'inline-block',
-		// textAlign: 'center',
-		// marginRight: '4px',
-		// }}
+			// sx={{
+			// 	minWidth: `${navigationListIconSize}px`,
+			// 	width: `${navigationListIconSize}px`,
+			// 	height: `${navigationListIconSize}px`,
+			// 	display: 'inline-block',
+			// textAlign: 'center',
+			// marginRight: '4px',
+			// }}
 		>
 			{children}
 		</span>
