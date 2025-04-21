@@ -84,7 +84,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 			})
 		}
 		const interoperabilityFeature = features.selfSovereignty.interoperability
-		if (!interoperabilityFeature) {
+		if (interoperabilityFeature === null) {
 			return unrated(interoperability, brand, {
 				thirdPartyCompatibility: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,

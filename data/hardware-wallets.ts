@@ -29,5 +29,12 @@ export const ratedHardwareWallets: Record<HardwareWalletName, RatedWallet> = Obj
 	Object.entries(hardwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 ) as Record<HardwareWalletName, RatedWallet>
 
+/**
+ * Map the given function to all rated hardware wallets.
+ */
+export function mapHardwareWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
+	return Object.values(ratedHardwareWallets).map(fn)
+}
+
 /** The unrated hardware wallet as a rated wallet. */
 export const unratedHardwareWallet = rateWallet(unratedHardwareTemplate)

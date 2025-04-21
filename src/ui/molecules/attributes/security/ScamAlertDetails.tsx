@@ -105,7 +105,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 											to a third party which can correlate them.
 										</Typography>
 									)}
-									{value.scamAlerts.sendTransactionWarning.ref && (
+									{toFullyQualified(value.scamAlerts.sendTransactionWarning.ref).length > 0 && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.sendTransactionWarning.ref)}
 											explanation="References:"
@@ -162,7 +162,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 											submitted.
 										</Typography>
 									)}
-									{value.scamAlerts.contractTransactionWarning.ref && (
+									{toFullyQualified(value.scamAlerts.contractTransactionWarning.ref).length > 0 && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.contractTransactionWarning.ref)}
 											explanation="References:"
@@ -192,7 +192,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 											</>
 										)}
 									</Typography>
-									{value.scamAlerts.scamUrlWarning.ref && (
+									{toFullyQualified(value.scamAlerts.scamUrlWarning.ref).length > 0 && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.scamUrlWarning.ref)}
 										/>

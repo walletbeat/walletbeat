@@ -233,7 +233,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SecurityAuditsValue> => {
-		if (features.variant == Variant.HARDWARE) {
+		if (features.variant === Variant.HARDWARE) {
 			return exempt(
 				securityAudits,
 				sentence('This attribute is not applicable to hardware wallets.'),

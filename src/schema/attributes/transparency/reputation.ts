@@ -103,7 +103,7 @@ export const reputation: Attribute<ReputationValue> = {
 			})
 		}
 		const reputationFeature = features.transparency.reputation
-		if (!reputationFeature) {
+		if (reputationFeature === null) {
 			return unrated(reputation, brand, {
 				originalProduct: ReputationType.FAIL,
 				availability: ReputationType.FAIL,

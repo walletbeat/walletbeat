@@ -97,7 +97,7 @@ export const firmware: Attribute<FirmwareValue> = {
 			})
 		}
 		const firmwareFeature = features.security.firmware
-		if (!firmwareFeature) {
+		if (firmwareFeature === null) {
 			return unrated(firmware, brand, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,

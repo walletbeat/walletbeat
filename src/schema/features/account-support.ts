@@ -1,4 +1,9 @@
-import { nonEmptySetFromArray, type NonEmptyArray, type NonEmptySet } from '@/types/utils/non-empty'
+import {
+	nonEmptyFilter,
+	nonEmptySetFromArray,
+	type NonEmptyArray,
+	type NonEmptySet,
+} from '@/types/utils/non-empty'
 import type { WithRef } from '../reference'
 import { isSupported, type NotSupported, type Support, type Supported } from './support'
 
@@ -123,10 +128,11 @@ export function supportsOnlyAccountType(
  * Returns the set of account types supported by AccountSupport.
  */
 export function supportedAccountTypes(accountSupport: AccountSupport): NonEmptySet<AccountType> {
-	const supportedTypes: NonEmptyArray<AccountType> = allAccountTypes.filter(
-		(accountType: AccountType) => supportsAccountType(accountSupport, accountType),
-	) as NonEmptyArray<AccountType>
-	return nonEmptySetFromArray(supportedTypes)
+	return nonEmptySetFromArray(
+		nonEmptyFilter(allAccountTypes, (accountType: AccountType): boolean =>
+			supportsAccountType(accountSupport, accountType),
+		),
+	)
 }
 
 /** Support information for EOA accounts. */

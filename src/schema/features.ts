@@ -132,10 +132,6 @@ export interface WalletFeatures {
 
 	/** The monetization model of the wallet. */
 	monetization: VariantFeature<Monetization>
-
-	ecosystem?: {
-		// ecosystemAlignment?: VariantFeature<EcosystemAlignmentSupport>
-	}
 }
 
 /**

@@ -151,7 +151,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		}
 
 		const factoryFeature = features.security.supplyChainFactory
-		if (!factoryFeature) {
+		if (factoryFeature === null) {
 			return unrated(supplyChainFactory, brand, {
 				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
 				factoryOpsecAudit: SupplyChainFactoryType.FAIL,

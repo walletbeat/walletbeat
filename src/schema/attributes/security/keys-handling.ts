@@ -108,7 +108,7 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		}
 
 		const keysHandlingFeature = features.security.keysHandling
-		if (!keysHandlingFeature) {
+		if (keysHandlingFeature === null) {
 			return unrated(keysHandling, brand, {
 				masterSecretGeneration: KeysHandlingType.FAIL,
 				proprietaryKeyMechanisms: KeysHandlingType.FAIL,

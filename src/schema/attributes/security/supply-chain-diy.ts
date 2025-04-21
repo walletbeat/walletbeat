@@ -124,7 +124,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 		}
 
 		const diyFeature = features.security.supplyChainDIY
-		if (!diyFeature) {
+		if (diyFeature === null) {
 			return unrated(supplyChainDIY, brand, {
 				diyNoNda: SupplyChainDIYType.FAIL,
 				componentSourcingComplexity: SupplyChainDIYType.FAIL,

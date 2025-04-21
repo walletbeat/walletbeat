@@ -5,14 +5,10 @@ import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { navigationAbout, navigationCriteria } from '@/components/navigation'
 import { LuWallet, LuKey } from 'react-icons/lu'
 import type { FC } from 'react'
-import { wallets } from '@/data/wallets'
-import { hardwareWallets } from '@/data/hardware-wallets'
+import { mapWallets } from '@/data/wallets'
+import { mapHardwareWallets } from '@/data/hardware-wallets'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import GitHubIcon from '@mui/icons-material/GitHub'
-
-// Type-safe object key access
-type WalletsKey = keyof typeof wallets
-type HardwareWalletsKey = keyof typeof hardwareWallets
 
 export const HomePage: FC = () => (
 	<NavigationPageLayout
@@ -37,21 +33,17 @@ export const HomePage: FC = () => (
 						icon: <LuWallet />,
 						href: '/',
 						id: 'wallets-nav',
-						children: (Object.keys(wallets) as WalletsKey[]).map(key => {
-							const wallet = wallets[key]
-
-							return {
-								title: wallet.metadata.displayName,
-								href: `/${key}`,
-								id: key,
-								icon: (
-									<img
-										src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-										className="size-4"
-									/>
-								),
-							}
-						}),
+						children: mapWallets(wallet => ({
+							title: wallet.metadata.displayName,
+							href: `/${wallet.metadata.id}`,
+							id: wallet.metadata.id,
+							icon: (
+								<img
+									src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+									className="size-4"
+								/>
+							),
+						})),
 					},
 				],
 				overflow: false,
@@ -64,28 +56,29 @@ export const HomePage: FC = () => (
 						icon: <LuKey />,
 						href: '/',
 						id: 'hardware-wallets',
-						children: (Object.keys(hardwareWallets) as HardwareWalletsKey[]).map(key => {
-							const wallet = hardwareWallets[key]
-
+						children: mapHardwareWallets(wallet => {
 							// Simplified display names for hardware wallets
+							// TODO: Put this into wallet metadata.
 							let displayName = wallet.metadata.displayName
-							if (key === 'ledger') {
-								displayName = 'Ledger'
-							}
-							if (key === 'trezor') {
-								displayName = 'Trezor'
-							}
-							if (key === 'gridplus') {
-								displayName = 'Grid Plus'
-							}
-							if (key === 'keystone') {
-								displayName = 'Keystone'
+							switch (wallet.metadata.id) {
+								case 'ledger':
+									displayName = 'Ledger'
+									break
+								case 'trezor':
+									displayName = 'Trezor'
+									break
+								case 'gridplus':
+									displayName = 'Grid Plus'
+									break
+								case 'keystone':
+									displayName = 'Keystone'
+									break
 							}
 
 							return {
 								title: displayName,
-								href: `/${key}`,
-								id: key,
+								href: `/${wallet.metadata.id}`,
+								id: wallet.metadata.id,
 								icon: (
 									<img
 										src={`/images/hardware-wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}

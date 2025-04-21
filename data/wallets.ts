@@ -39,5 +39,12 @@ export const ratedWallets: Record<WalletName, RatedWallet> = Object.fromEntries(
 	Object.entries(wallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 ) as Record<WalletName, RatedWallet>
 
+/**
+ * Map the given function to all rated wallets.
+ */
+export function mapWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
+	return Object.values(ratedWallets).map(fn)
+}
+
 /** The unrated wallet as a rated wallet. */
 export const unratedWallet = rateWallet(unratedTemplate)

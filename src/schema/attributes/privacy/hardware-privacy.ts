@@ -100,7 +100,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 			})
 		}
 		const hwPrivacy = features.privacy.hardwarePrivacy
-		if (!hwPrivacy) {
+		if (hwPrivacy === null) {
 			return unrated(hardwarePrivacy, brand, {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,

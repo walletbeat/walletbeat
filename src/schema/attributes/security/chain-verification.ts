@@ -151,7 +151,7 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		),
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<ChainVerificationValue> => {
-		if (features.variant == Variant.HARDWARE) {
+		if (features.variant === Variant.HARDWARE) {
 			return exempt(
 				chainVerification,
 				sentence('This attribute is not applicable for hardware wallets.'),

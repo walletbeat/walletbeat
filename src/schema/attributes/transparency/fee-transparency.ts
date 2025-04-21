@@ -249,7 +249,7 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<FeeTransparencyValue> => {
-		if (!features.transparency.feeTransparency) {
+		if (features.transparency.feeTransparency === null) {
 			return unrated(feeTransparency, brand, {
 				feeTransparencyLevel: FeeTransparencyLevel.NONE,
 				disclosesWalletFees: false,
@@ -277,12 +277,6 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 					// If either is false, downgrade to detailed
 					return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose)
 				}
-			default:
-				return unrated(feeTransparency, brand, {
-					feeTransparencyLevel: FeeTransparencyLevel.NONE,
-					disclosesWalletFees: false,
-					showsTransactionPurpose: false,
-				})
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) =>

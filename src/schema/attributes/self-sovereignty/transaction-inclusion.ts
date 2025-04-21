@@ -26,13 +26,19 @@ export type TransactionInclusionValue = Value & {
 
 export type L1BroadcastSupport = 'NO' | 'SELF_GOSSIP' | 'OWN_NODE'
 
-function transactionSubmissionEvaluation(
-	supportsL1Broadcast: L1BroadcastSupport,
-	supportAnyL2Transactions: TransactionSubmissionL2Type[],
-	supportForceWithdrawal: TransactionSubmissionL2Type[],
-	unsupportedL2s: TransactionSubmissionL2Type[],
-	references: ReferenceArray,
-): Evaluation<TransactionInclusionValue> {
+function transactionSubmissionEvaluation({
+	supportsL1Broadcast,
+	supportAnyL2Transactions,
+	supportForceWithdrawal,
+	unsupportedL2s,
+	references,
+}: {
+	supportsL1Broadcast: L1BroadcastSupport
+	supportAnyL2Transactions: TransactionSubmissionL2Type[]
+	supportForceWithdrawal: TransactionSubmissionL2Type[]
+	unsupportedL2s: TransactionSubmissionL2Type[]
+	references: ReferenceArray
+}): Evaluation<TransactionInclusionValue> {
 	if (!isNonEmptyArray(supportAnyL2Transactions) && !isNonEmptyArray(supportForceWithdrawal)) {
 		return {
 			value: {
@@ -215,26 +221,26 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 					be configured to broadcast this transaction using a user's
 					self-hosted L1 node.
 				`),
-				transactionSubmissionEvaluation(
-					'OWN_NODE',
-					[],
-					[TransactionSubmissionL2Type.opStack],
-					[],
-					[],
-				).value,
+				transactionSubmissionEvaluation({
+					supportsL1Broadcast: 'OWN_NODE',
+					supportAnyL2Transactions: [],
+					supportForceWithdrawal: [TransactionSubmissionL2Type.opStack],
+					unsupportedL2s: [],
+					references: [],
+				}).value,
 			),
 			exampleRating(
 				paragraph(`
 					The wallet supports force-withdrawal transactions on L2s, and supports
 					directly gossipping such transactions over the Ethereum L1 network.
 				`),
-				transactionSubmissionEvaluation(
-					'SELF_GOSSIP',
-					[],
-					[TransactionSubmissionL2Type.opStack],
-					[],
-					[],
-				).value,
+				transactionSubmissionEvaluation({
+					supportsL1Broadcast: 'SELF_GOSSIP',
+					supportAnyL2Transactions: [],
+					supportForceWithdrawal: [TransactionSubmissionL2Type.opStack],
+					unsupportedL2s: [],
+					references: [],
+				}).value,
 			),
 		],
 		partial: [
@@ -245,28 +251,39 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 					transaction that it would take to initiate this force-withdrawal
 					transaction.
 				`),
-				transactionSubmissionEvaluation('NO', [], [TransactionSubmissionL2Type.opStack], [], [])
-					.value,
+				transactionSubmissionEvaluation({
+					supportsL1Broadcast: 'NO',
+					supportAnyL2Transactions: [],
+					supportForceWithdrawal: [TransactionSubmissionL2Type.opStack],
+					unsupportedL2s: [],
+					references: [],
+				}).value,
 			),
 			exampleRating(
 				paragraph(`
 					The wallet supports force-withdrawal transactions on some L2s,
 					but not all of the L2s that are configured out of the box.
 				`),
-				transactionSubmissionEvaluation(
-					'NO',
-					[],
-					[TransactionSubmissionL2Type.opStack],
-					[TransactionSubmissionL2Type.arbitrum],
-					[],
-				).value,
+				transactionSubmissionEvaluation({
+					supportsL1Broadcast: 'NO',
+					supportAnyL2Transactions: [],
+					supportForceWithdrawal: [TransactionSubmissionL2Type.opStack],
+					unsupportedL2s: [TransactionSubmissionL2Type.arbitrum],
+					references: [],
+				}).value,
 			),
 		],
 		fail: exampleRating(
 			paragraph(`
 				The wallet does not support force-withdrawal transactions on L2s.
 			`),
-			transactionSubmissionEvaluation('NO', [], [], [], []).value,
+			transactionSubmissionEvaluation({
+				supportsL1Broadcast: 'NO',
+				supportAnyL2Transactions: [],
+				supportForceWithdrawal: [],
+				unsupportedL2s: [],
+				references: [],
+			}).value,
 		),
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<TransactionInclusionValue> => {
@@ -315,16 +332,16 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 					unsupportedL2s.push(l2)
 			}
 		}
-		return transactionSubmissionEvaluation(
+		return transactionSubmissionEvaluation({
 			supportsL1Broadcast,
 			supportAnyL2Transactions,
 			supportForceWithdrawal,
 			unsupportedL2s,
-			mergeRefs(
+			references: mergeRefs(
 				refs(features.selfSovereignty.transactionSubmission.l1),
 				refs(features.selfSovereignty.transactionSubmission.l2),
 			),
-		)
+		})
 	},
 	aggregate: pickWorstRating<TransactionInclusionValue>,
 }

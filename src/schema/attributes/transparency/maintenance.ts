@@ -113,7 +113,7 @@ export const maintenance: Attribute<MaintenanceValue> = {
 			)
 		}
 		const maintenanceFeature = features.transparency.maintenance
-		if (!maintenanceFeature) {
+		if (maintenanceFeature === null) {
 			return unrated(maintenance, brand, {
 				physicalDurability: MaintenanceType.FAIL,
 				mtbfDocumentation: MaintenanceType.FAIL,

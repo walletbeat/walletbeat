@@ -207,10 +207,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 			)
 		}
 
-		if (
-			features.security.hardwareWalletSupport === undefined ||
-			features.security.hardwareWalletSupport === null
-		) {
+		if (features.security.hardwareWalletSupport === null) {
 			return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] })
 		}
 
@@ -222,7 +219,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 
 		// Check which hardware wallets are supported
 		Object.entries(hwSupport).forEach(([walletType, support]) => {
-			if (support && isSupported(support)) {
+			if (isSupported(support)) {
 				// Type assertion is safe because we're iterating over keys of hwSupport
 				// which are HardwareWalletType values
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're iterating over hwSupport keys
@@ -243,13 +240,10 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		// const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
 
 		// Generate the base evaluation result
-		let result: Evaluation<HardwareWalletSupportValue>
-
-		if (hasLedger && hasTrezor && hasKeystone && hasGridplus) {
-			result = comprehensiveHardwareWalletSupport(supportedWallets)
-		} else {
-			result = limitedHardwareWalletSupport(supportedWallets)
-		}
+		const result: Evaluation<HardwareWalletSupportValue> =
+			hasLedger && hasTrezor && hasKeystone && hasGridplus
+				? comprehensiveHardwareWalletSupport(supportedWallets)
+				: limitedHardwareWalletSupport(supportedWallets)
 
 		// Return result with references if any
 		return {

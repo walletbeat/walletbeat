@@ -395,31 +395,24 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		const { withoutRefs, refs: extractedRefs } =
 			popRefs<PasskeyVerificationSupport>(passkeyVerification)
 
-		let result: Evaluation<PasskeyImplementationValue>
-
-		switch (withoutRefs.library) {
-			case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
-				result = smoothCryptoLibImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
-				result = daimoP256VerifierImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
-				result = openZeppelinP256VerifierImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
-				result = freshCryptoLibImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
-				result = webAuthnSolImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.OTHER:
-				result = otherPasskeyImplementation(withoutRefs)
-				break
-			default:
-				result = noPasskeyImplementation()
-				break
-		}
+		const result = ((): Evaluation<PasskeyImplementationValue> => {
+			switch (withoutRefs.library) {
+				case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
+					return smoothCryptoLibImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
+					return daimoP256VerifierImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
+					return openZeppelinP256VerifierImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
+					return freshCryptoLibImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
+					return webAuthnSolImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.OTHER:
+					return otherPasskeyImplementation(withoutRefs)
+				default:
+					return noPasskeyImplementation()
+			}
+		})()
 
 		// Return result with references if any
 		return {

@@ -532,6 +532,7 @@ export function getAttributeGroupInTree<Vs extends ValueSet>(
 	tree: EvaluationTree,
 	attrGroup: AttributeGroup<Vs>,
 ): EvaluatedGroup<Vs> {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each attribute group's ID maps to an evaluated group of its own ValueSet subtype.
 	return tree[attrGroup.id] as EvaluatedGroup<Vs>
 }
 
@@ -542,15 +543,15 @@ export function mapNonExemptAttributeGroupsInTree<T>(
 	tree: EvaluationTree,
 	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => T,
 ): T[] {
-	return Object.entries(attributeTree)
+	return Object.values(attributeTree)
 		.filter(
-			<Vs extends ValueSet>([groupName, _]: [string, AttributeGroup<Vs>]): boolean =>
-				numNonExemptGroupAttributes<Vs>(tree[groupName] as EvaluatedGroup<Vs>) > 0,
+			<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>): boolean =>
+				numNonExemptGroupAttributes<Vs>(getAttributeGroupInTree(tree, attrGroup)) > 0,
 		)
-		.map(([groupName, attrGroup]) => {
-			const evalGroup = tree[groupName]
-			return fn(attrGroup, evalGroup)
-		})
+		.map(
+			<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>): T =>
+				fn(attrGroup, getAttributeGroupInTree(tree, attrGroup)),
+		)
 }
 
 /**

@@ -89,6 +89,21 @@ export function nonEmptyRemap<K extends string | number | symbol, V1, V2>(
 }
 
 /**
+ * Filter an array, asserting that it is non-empty even after filtering.
+ * Will throw an error if this is not true.
+ */
+export function nonEmptyFilter<T>(
+	arr: NonEmptyArray<T>,
+	fn: (val: T, index: number) => boolean,
+): NonEmptyArray<T> {
+	const filtered = arr.filter(fn)
+	if (!isNonEmptyArray(filtered)) {
+		throw new Error('Non-empty array was unexpectedly filtered down to an empty array')
+	}
+	return filtered
+}
+
+/**
  * Get an element of the array. Guaranteed to be defined since the array is
  * non-empty.
  * @param arr The array from which to get the element.
