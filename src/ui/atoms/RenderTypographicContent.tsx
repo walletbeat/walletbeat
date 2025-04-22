@@ -1,6 +1,8 @@
-import type React from 'react'
-import { ContentType, type TypographicContent } from '@/types/content'
 import { Typography } from '@mui/material'
+import type React from 'react'
+
+import { ContentType, type TypographicContent } from '@/types/content'
+
 import { MarkdownTypography } from './MarkdownTypography'
 
 export function RenderTypographicContent({

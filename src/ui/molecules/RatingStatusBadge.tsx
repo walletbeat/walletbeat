@@ -1,6 +1,7 @@
+import type { FC } from 'react'
+
 import theme from '@/components/ThemeRegistry/theme'
 import { type Rating, ratingToColor, ratingToText } from '@/schema/attributes'
-import type { FC } from 'react'
 
 export const RatingStatusBadge: FC<{ rating: Rating }> = ({ rating }) => (
 	<div

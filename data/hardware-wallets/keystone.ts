@@ -1,12 +1,13 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
-import { WalletProfile, HardwareWalletManufactureType } from '@/schema/features/profile'
-import { nconsigny } from '../contributors/nconsigny'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { featureSupported } from '@/schema/features/support'
+import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported } from '@/schema/features/support'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { nconsigny } from '../contributors/nconsigny'
 
 export const keystoneWallet: Wallet = {
 	metadata: {

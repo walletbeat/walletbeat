@@ -1,5 +1,5 @@
 import { type FC, useEffect, useState } from 'react'
-import { LuSun, LuMoon } from 'react-icons/lu'
+import { LuMoon, LuSun } from 'react-icons/lu'
 
 export const ThemeSwitcher: FC = () => {
 	const [isDarkMode, setIsDarkMode] = useState<boolean | null>(null)

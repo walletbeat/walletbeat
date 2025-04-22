@@ -1,6 +1,4 @@
-import type { NonEmptyArray } from '@/types/utils/non-empty'
-import type React from 'react'
-import { useState } from 'react'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import {
 	Accordion,
 	AccordionDetails,
@@ -9,7 +7,10 @@ import {
 	Typography,
 	useTheme,
 } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import type React from 'react'
+import { useState } from 'react'
+
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 export interface AccordionData {
 	id: string

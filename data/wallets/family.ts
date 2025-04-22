@@ -1,12 +1,13 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
+import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { AccountType } from '@/schema/features/account-support'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
 import { lucemans } from '../contributors/lucemans'
 
 export const family: Wallet = {
@@ -64,9 +65,7 @@ export const family: Wallet = {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: {
-				supportedWallets: {
-
-				},
+				supportedWallets: {},
 				ref: null,
 			},
 			hardwareWalletDappSigning: {

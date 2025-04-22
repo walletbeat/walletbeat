@@ -1,20 +1,21 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, paragraph, sentence, mdParagraph, mdSentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	PasskeyVerificationLibrary,
 	type PasskeyVerificationSupport,
 } from '@/schema/features/security/passkey-verification'
 import { popRefs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.passkey_implementation'
 export type PasskeyImplementationValue = Value & {

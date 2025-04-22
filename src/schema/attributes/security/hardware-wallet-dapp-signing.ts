@@ -1,18 +1,19 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
-import { refs } from '@/schema/reference'
+import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { refs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.hardware_wallet_dapp_signing'
 export type HardwareWalletDappSigningValue = Value & {

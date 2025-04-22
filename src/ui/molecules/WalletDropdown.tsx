@@ -1,11 +1,13 @@
-import type { RatedWallet } from '@/schema/wallet'
-import { WalletIcon } from '../atoms/WalletIcon'
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import * as Popover from '@radix-ui/react-popover'
 import { Command } from 'cmdk'
-import { useState, useCallback, useRef, useEffect } from 'react'
-import { LuChevronDown, LuSearch, LuKey, LuWallet } from 'react-icons/lu'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { LuChevronDown, LuKey, LuSearch, LuWallet } from 'react-icons/lu'
+
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedWallets } from '@/data/wallets'
+import type { RatedWallet } from '@/schema/wallet'
+
+import { WalletIcon } from '../atoms/WalletIcon'
 
 // Interface for wallet items with additional metadata
 interface WalletItem {

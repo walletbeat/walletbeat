@@ -1,6 +1,7 @@
 import type { EvaluationData } from '@/schema/attributes'
-import { component, type Renderable } from '../content'
 import type { ScamPreventionValue } from '@/schema/attributes/security/scam-prevention'
+
+import { component, type Renderable } from '../content'
 
 export interface ScamAlertDetailsProps extends EvaluationData<ScamPreventionValue> {}
 

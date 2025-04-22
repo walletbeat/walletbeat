@@ -1,27 +1,28 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import type { ResolvedFeatures } from '@/schema/features'
+import { isSupported, type Support } from '@/schema/features/support'
+import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
+
 import {
 	EthereumL1LightClient,
 	type EthereumL1LightClientSupport,
 } from '../../features/security/light-client'
 import {
-	RpcEndpointConfiguration,
 	type ChainConfigurability,
+	RpcEndpointConfiguration,
 } from '../../features/self-sovereignty/chain-configurability'
 import { type FullyQualifiedReference, popRefs } from '../../reference'
-import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
-import { isSupported, type Support } from '@/schema/features/support'
-import { Variant } from '@/schema/variants'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.chain_verification'
 export type ChainVerificationValue = Value & {

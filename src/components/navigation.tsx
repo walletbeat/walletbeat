@@ -1,10 +1,11 @@
-import type { NavigationLinkItem } from '@/ui/organisms/Navigation'
-import HomeIcon from '@mui/icons-material/Home'
-import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import ForumIcon from '@mui/icons-material/Forum'
 import GitHubIcon from '@mui/icons-material/GitHub'
-import { betaSiteRoot } from '@/constants'
+import HelpCenterIcon from '@mui/icons-material/HelpCenter'
+import HomeIcon from '@mui/icons-material/Home'
 import { LuBadgeCheck, LuBuilding2 } from 'react-icons/lu'
+
+import { betaSiteRoot } from '@/constants'
+import type { NavigationLinkItem } from '@/ui/organisms/Navigation'
 
 export const navigationHome: NavigationLinkItem = {
 	id: 'wallet-table',

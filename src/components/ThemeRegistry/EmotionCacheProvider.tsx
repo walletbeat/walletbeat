@@ -1,7 +1,7 @@
-import type React from 'react'
-import { CacheProvider } from '@emotion/react'
-import { useMemo } from 'react'
 import createCache from '@emotion/cache'
+import { CacheProvider } from '@emotion/react'
+import type React from 'react'
+import { useMemo } from 'react'
 
 export default function EmotionCacheProvider({
 	options,

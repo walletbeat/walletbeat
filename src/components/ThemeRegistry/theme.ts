@@ -1,5 +1,5 @@
-import { deepmerge } from '@mui/utils'
 import { createTheme, type ThemeOptions as MaterialThemeOptions } from '@mui/material/styles'
+import { deepmerge } from '@mui/utils'
 import type {} from '@mui/x-data-grid/themeAugmentation'
 
 /* eslint @typescript-eslint/no-magic-numbers: 0 -- A theme file will have numbers and hex codes in it, this is normal. */

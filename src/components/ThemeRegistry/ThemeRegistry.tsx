@@ -1,8 +1,9 @@
-import type React from 'react'
-import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
-import theme from './theme'
+import { ThemeProvider } from '@mui/material/styles'
+import type React from 'react'
+
 import EmotionCacheProvider from './EmotionCacheProvider'
+import theme from './theme'
 
 export default function ThemeRegistry({
 	children,

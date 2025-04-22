@@ -1,19 +1,20 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, exempt } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { isSupported } from '@/schema/features/support'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { mergeRefs, refs } from '@/schema/reference'
+import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { isSupported } from '@/schema/features/support'
+import { mergeRefs, refs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating } from '../common'
 
 const brand = 'attributes.security.software_hw_integration'
 export type SoftwareHWIntegrationValue = Value & {

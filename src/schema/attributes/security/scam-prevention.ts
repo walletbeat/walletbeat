@@ -1,21 +1,22 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
-import { mergeRefs, type WithRef } from '../../reference'
-import { isSupported, notSupported, supported } from '@/schema/features/support'
+import type { ResolvedFeatures } from '@/schema/features'
 import { WalletProfile } from '@/schema/features/profile'
 import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
-import { commaListFormat } from '@/types/utils/text'
+import { isSupported, notSupported, supported } from '@/schema/features/support'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
+import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
+
+import { mergeRefs, type WithRef } from '../../reference'
+import { pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{
 	feature: string

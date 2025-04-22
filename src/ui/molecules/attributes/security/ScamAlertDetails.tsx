@@ -1,13 +1,15 @@
 import { Typography } from '@mui/material'
 import type React from 'react'
+
 import { subsectionWeight } from '@/components/constants'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
-import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
-import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
-import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { isSupported } from '@/schema/features/support'
-import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
 import { toFullyQualified } from '@/schema/reference'
+import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
+import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
+import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
+
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 function listOrSingleText(prefix: string, items: Array<string | null>): React.ReactNode {
 	const filtered = items.filter(item => item !== null)

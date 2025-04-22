@@ -1,14 +1,14 @@
+import type { Value } from '../schema/attributes'
 import type { AddressCorrelationDetailsContent } from './content/address-correlation-details'
 import type { ChainVerificationDetailsContent } from './content/chain-verification-details'
-import type { UnratedAttributeContent } from './content/unrated-attribute'
-import type { Value } from '../schema/attributes'
-import type { SourceVisibilityDetailsContent } from './content/source-visibility-details'
 import type { FundingDetailsContent } from './content/funding-details'
 import type { LicenseDetailsContent } from './content/license-details'
-import { trimWhitespacePrefix } from './utils/text'
-import type { SecurityAuditsDetailsContent } from './content/security-audits-details'
-import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
 import type { ScamAlertDetailsContent } from './content/scam-alert-details'
+import type { SecurityAuditsDetailsContent } from './content/security-audits-details'
+import type { SourceVisibilityDetailsContent } from './content/source-visibility-details'
+import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
+import type { UnratedAttributeContent } from './content/unrated-attribute'
+import { trimWhitespacePrefix } from './utils/text'
 
 /**
  * Type of content that may be displayed on the UI.

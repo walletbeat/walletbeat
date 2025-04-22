@@ -1,9 +1,10 @@
 import {
-	nonEmptyFilter,
-	nonEmptySetFromArray,
 	type NonEmptyArray,
+	nonEmptyFilter,
 	type NonEmptySet,
+	nonEmptySetFromArray,
 } from '@/types/utils/non-empty'
+
 import type { WithRef } from '../reference'
 import { isSupported, type NotSupported, type Support, type Supported } from './support'
 

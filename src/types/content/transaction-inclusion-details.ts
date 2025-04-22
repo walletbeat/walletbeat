@@ -1,10 +1,11 @@
 import type { EvaluationData } from '@/schema/attributes'
-import { component, type Renderable } from '../content'
 import type {
 	L1BroadcastSupport,
 	TransactionInclusionValue,
 } from '@/schema/attributes/self-sovereignty/transaction-inclusion'
 import type { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+
+import { component, type Renderable } from '../content'
 
 export interface TransactionInclusionDetailsProps
 	extends EvaluationData<TransactionInclusionValue> {

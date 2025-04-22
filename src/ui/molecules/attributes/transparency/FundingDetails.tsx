@@ -1,14 +1,16 @@
 import type React from 'react'
+
 import { subsectionWeight } from '@/components/constants'
-import { ReferenceList } from '../../../atoms/ReferenceList'
 import {
 	monetizationStrategies,
 	monetizationStrategyName,
 } from '@/schema/features/transparency/monetization'
-import { JoinedList } from '../../../atoms/JoinedList'
 import { refs } from '@/schema/reference'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 import type { FundingDetailsProps } from '@/types/content/funding-details'
+
+import { JoinedList } from '../../../atoms/JoinedList'
+import { ReferenceList } from '../../../atoms/ReferenceList'
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 export function FundingDetails({
 	wallet,

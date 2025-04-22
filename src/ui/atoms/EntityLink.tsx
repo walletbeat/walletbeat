@@ -1,7 +1,9 @@
-import type { Entity } from '@/schema/entity'
-import { isUrl } from '@/schema/url'
 import { Tooltip } from '@mui/material'
 import type React from 'react'
+
+import type { Entity } from '@/schema/entity'
+import { isUrl } from '@/schema/url'
+
 import { ExternalLink } from './ExternalLink'
 
 export function EntityLink({ entity }: { entity: Entity }): React.JSX.Element {

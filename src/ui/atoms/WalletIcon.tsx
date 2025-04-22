@@ -1,7 +1,8 @@
-import { betaImagesRoot } from '@/constants'
-import type { RatedWallet } from '@/schema/wallet'
-import { hasVariant, Variant } from '@/schema/variants'
 import type React from 'react'
+
+import { betaImagesRoot } from '@/constants'
+import { hasVariant, Variant } from '@/schema/variants'
+import type { RatedWallet } from '@/schema/wallet'
 
 export function WalletIcon({
 	wallet,

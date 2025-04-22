@@ -1,9 +1,11 @@
-import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
 import React, { memo, useState } from 'react'
-import { ThemeSwitcher } from './ThemeSwitcher'
 import { LuMenu, LuX } from 'react-icons/lu'
+
+import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+
+import { ThemeSwitcher } from './ThemeSwitcher'
 
 /**
  * A navigation item in the navigation menu.

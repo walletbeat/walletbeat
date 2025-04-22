@@ -1,17 +1,6 @@
-import { resolveFeatures, type ResolvedFeatures, type WalletFeatures } from './features'
-import {
-	type AtLeastOneTrueVariant,
-	type AtLeastOneVariant,
-	getVariants,
-	hasVariant,
-	Variant,
-} from './variants'
-import {
-	aggregateAttributes,
-	evaluateAttributes,
-	mapAttributesGetter,
-	type EvaluationTree,
-} from './attribute-groups'
+import type { Paragraph, Renderable, RenderableTypography } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
+import type { Dict } from '@/types/utils/dict'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
@@ -21,14 +10,26 @@ import {
 	setItems,
 	setUnion,
 } from '@/types/utils/non-empty'
-import type { Paragraph, Renderable, RenderableTypography } from '@/types/content'
-import type { Url } from './url'
-import { Rating, type Attribute, type EvaluatedAttribute, type Value } from './attributes'
-import type { Dict } from '@/types/utils/dict'
-import type { CalendarDate } from '@/types/date'
-import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
-import { supportedAccountTypes, type AccountType } from './features/account-support'
+
+import {
+	aggregateAttributes,
+	evaluateAttributes,
+	type EvaluationTree,
+	mapAttributesGetter,
+} from './attribute-groups'
+import { type Attribute, type EvaluatedAttribute, Rating, type Value } from './attributes'
 import type { WalletDeveloper } from './entity'
+import { type ResolvedFeatures, resolveFeatures, type WalletFeatures } from './features'
+import { type AccountType, supportedAccountTypes } from './features/account-support'
+import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
+import type { Url } from './url'
+import {
+	type AtLeastOneTrueVariant,
+	type AtLeastOneVariant,
+	getVariants,
+	hasVariant,
+	Variant,
+} from './variants'
 
 /** A contributor to walletbeat. */
 export interface Contributor {

@@ -1,13 +1,14 @@
-import type { ResolvedFeatures } from '@/schema/features'
-import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { FirmwareType, type FirmwareSupport } from '@/schema/features/security/firmware'
+import type { ResolvedFeatures } from '@/schema/features'
+import { type FirmwareSupport, FirmwareType } from '@/schema/features/security/firmware'
 import { popRefs } from '@/schema/reference'
+import type { AtLeastOneVariant } from '@/schema/variants'
 import { Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.firmware'
 

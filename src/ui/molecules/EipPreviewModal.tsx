@@ -1,9 +1,11 @@
 import type React from 'react'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { eipEthereumDotOrgUrl, type Eip } from '@/schema/eips'
-import { MarkdownTypography } from '../atoms/MarkdownTypography'
+
+import { type Eip, eipEthereumDotOrgUrl } from '@/schema/eips'
 import { trimWhitespacePrefix } from '@/types/utils/text'
+
+import { MarkdownTypography } from '../atoms/MarkdownTypography'
 
 interface EipPreviewModalProps {
 	eip: Eip

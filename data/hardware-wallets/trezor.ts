@@ -1,13 +1,14 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
-import { WalletProfile, HardwareWalletManufactureType } from '@/schema/features/profile'
-import { nconsigny } from '../contributors/nconsigny'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { featureSupported } from '@/schema/features/support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported } from '@/schema/features/support'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { nconsigny } from '../contributors/nconsigny'
 
 export const trezorWallet: Wallet = {
 	metadata: {

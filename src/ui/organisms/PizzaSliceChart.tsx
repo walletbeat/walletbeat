@@ -1,12 +1,14 @@
+import { type ReactElement, useState } from 'react'
+
 import { mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
-import { useState, type ReactElement } from 'react'
-import type { RatedWallet } from '@/schema/wallet'
 import {
-	type EvaluatedGroup,
-	type ValueSet,
 	type AttributeGroup,
+	type EvaluatedGroup,
 	ratingToColor,
+	type ValueSet,
 } from '@/schema/attributes'
+import type { RatedWallet } from '@/schema/wallet'
+
 import { RatingDetailModal } from '../molecules/RatingDetailModal'
 
 // Pizza Slice Chart Component (inspired by WalletTableStylingExample)

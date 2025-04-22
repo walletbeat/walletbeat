@@ -1,5 +1,5 @@
 import * as RadixTooltip from '@radix-ui/react-tooltip'
-import type { ReactNode, JSX, CSSProperties } from 'react'
+import type { CSSProperties, JSX, ReactNode } from 'react'
 
 export interface TooltipProps {
 	content: ReactNode

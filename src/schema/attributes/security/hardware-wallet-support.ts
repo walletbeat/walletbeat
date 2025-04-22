@@ -1,19 +1,20 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { isSupported } from '@/schema/features/support'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
-import { popRefs } from '@/schema/reference'
+import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { isSupported } from '@/schema/features/support'
+import { popRefs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.hardware_wallet_support'
 export type HardwareWalletSupportValue = Value & {

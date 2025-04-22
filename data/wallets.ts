@@ -1,17 +1,18 @@
 import { type RatedWallet, rateWallet } from '@/schema/wallet'
-import { rabby } from './wallets/rabby'
+
+import { ambire } from './wallets/ambire'
+import { coinbase } from './wallets/coinbase'
 import { daimo } from './wallets/daimo'
+import { elytro } from './wallets/elytro'
+import { family } from './wallets/family'
+import { frame } from './wallets/frame'
 import { metamask } from './wallets/metamask'
 import { phantom } from './wallets/phantom'
+import { rabby } from './wallets/rabby'
 import { rainbow } from './wallets/rainbow'
-import { coinbase } from './wallets/coinbase'
-import { frame } from './wallets/frame'
 import { safe } from './wallets/safe'
-import { elytro } from './wallets/elytro'
-import { ambire } from './wallets/ambire'
 import { unratedTemplate } from './wallets/unrated.tmpl'
 import { zerion } from './wallets/zerion'
-import { family } from './wallets/family'
 
 /** Set of all known wallets. */
 export const wallets = {

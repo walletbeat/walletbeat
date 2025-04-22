@@ -1,26 +1,27 @@
-import type { ResolvedFeatures } from '@/schema/features'
+import { eip7702 } from '@/data/eips/eip-7702'
+import { erc4337 } from '@/data/eips/erc-4337'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type AccountType,
-	isAccountTypeSupported,
 	type AccountType7702,
 	type AccountTypeEoa,
 	type AccountTypeMpc,
 	type AccountTypeMutableMultifactor,
+	isAccountTypeSupported,
 } from '@/schema/features/account-support'
-import { eip7702 } from '@/data/eips/eip-7702'
-import { erc4337 } from '@/data/eips/erc-4337'
-import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
+import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
+
+import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.ecosystem.account_abstraction'
 export type AccountAbstractionValue = Value & {

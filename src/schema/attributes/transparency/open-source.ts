@@ -1,23 +1,24 @@
+import {
+	type Attribute,
+	type Evaluation,
+	exampleRating,
+	Rating,
+	type Value,
+} from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
 import {
-	License,
 	FOSS,
+	License,
 	licenseIsFOSS,
 	licenseName,
 	type LicenseWithRef,
 } from '@/schema/features/transparency/license'
-import {
-	Rating,
-	type Value,
-	type Attribute,
-	type Evaluation,
-	exampleRating,
-} from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { refs, toFullyQualified } from '@/schema/reference'
 import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { licenseDetailsContent } from '@/types/content/license-details'
-import { toFullyQualified, refs } from '@/schema/reference'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.open_source'
 export type OpenSourceValue = Value & {

@@ -1,8 +1,10 @@
-import type { RatedWallet } from '@/schema/wallet'
 import type { JSX } from 'react'
-import type { AttributeGroup, ValueSet } from '@/schema/attributes'
-import { PizzaSliceChart } from '../organisms/PizzaSliceChart'
+
 import { getAttributeGroupInTree } from '@/schema/attribute-groups'
+import type { AttributeGroup, ValueSet } from '@/schema/attributes'
+import type { RatedWallet } from '@/schema/wallet'
+
+import { PizzaSliceChart } from '../organisms/PizzaSliceChart'
 
 /**
  * Renders a pizza-chart for a specific attribute group of a wallet.

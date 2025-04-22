@@ -1,19 +1,39 @@
-import { ratedWallets, type WalletName } from '@/data/wallets'
+import GitHubIcon from '@mui/icons-material/GitHub'
+import LanguageIcon from '@mui/icons-material/Language'
+import { Tooltip, Typography } from '@mui/material'
+import { blend, ThemeProvider } from '@mui/system'
+import React, { useEffect, useState } from 'react'
+
+import { navigationListIconSize } from '@/components/constants'
+import { scrollPastHeaderPixels } from '@/components/navigation'
+import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
 import {
+	variantFromUrlQuery,
+	variantToIcon,
+	variantToName,
+	variantToRunsOn,
+	variantUrlQuery,
+} from '@/components/variants'
+import {
+	type HardwareWalletName,
 	isValidHardwareWalletName,
 	ratedHardwareWallets,
-	type HardwareWalletName,
 } from '@/data/hardware-wallets'
+import { ratedWallets, type WalletName } from '@/data/wallets'
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
-	mapNonExemptAttributeGroupsInTree,
-	mapNonExemptGroupAttributes,
 	hardwareOnlyEcosystem,
 	hardwareOnlyPrivacy,
 	hardwareOnlySecurity,
 	hardwareOnlyTransparency,
+	mapNonExemptAttributeGroupsInTree,
+	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
+import { borderRatingToColor, Rating, ratingToColor } from '@/schema/attributes'
+import { getSingleVariant, type Variant } from '@/schema/variants'
+import { type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
@@ -22,37 +42,19 @@ import {
 	nonEmptyMap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-import { Typography, Tooltip } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import { WalletIcon } from '@/ui/atoms/WalletIcon'
-import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
-import { WalletAttribute } from '@/ui/organisms/WalletAttribute'
-import { blend, ThemeProvider } from '@mui/system'
-import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
-import { borderRatingToColor, Rating, ratingToColor } from '@/schema/attributes'
-import { navigationListIconSize } from '@/components/constants'
-import type { NavigationItem } from '@/ui/organisms/Navigation'
-import { scrollPastHeaderPixels } from '@/components/navigation'
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { type PickableVariant, VariantPicker } from '@/ui/atoms/VariantPicker'
-import { getSingleVariant, type Variant } from '@/schema/variants'
-import {
-	variantFromUrlQuery,
-	variantToIcon,
-	variantToName,
-	variantToRunsOn,
-	variantUrlQuery,
-} from '@/components/variants'
-import { VariantSpecificity, type ResolvedWallet } from '@/schema/wallet'
-import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { commaListPrefix, slugifyCamelCase } from '@/types/utils/text'
-import { ReturnToTop } from '@/ui/atoms/ReturnToTop'
-import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
+import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
-import LanguageIcon from '@mui/icons-material/Language'
-import GitHubIcon from '@mui/icons-material/GitHub'
-import { WalletSectionSummary } from './WalletSectionSummary'
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
+import { ReturnToTop } from '@/ui/atoms/ReturnToTop'
+import { type PickableVariant, VariantPicker } from '@/ui/atoms/VariantPicker'
+import { WalletIcon } from '@/ui/atoms/WalletIcon'
 import { AttributeGroupBody } from '@/ui/molecules/AttributeGroupBody'
+import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
+import type { NavigationItem } from '@/ui/organisms/Navigation'
+import { WalletAttribute } from '@/ui/organisms/WalletAttribute'
+
+import { WalletSectionSummary } from './WalletSectionSummary'
 
 const headerBottomMargin = 0
 

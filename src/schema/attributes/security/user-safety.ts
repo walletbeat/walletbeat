@@ -1,19 +1,20 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
-	exampleRating,
 	type EvaluationData,
+	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { UserSafetyType, type UserSafetySupport } from '@/schema/features/security/user-safety'
+import type { ResolvedFeatures } from '@/schema/features'
+import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety'
 import { popRefs } from '@/schema/reference'
+import type { AtLeastOneVariant } from '@/schema/variants'
 import { Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.user_safety'
 

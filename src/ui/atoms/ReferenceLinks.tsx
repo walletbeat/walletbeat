@@ -1,9 +1,10 @@
-import type { FullyQualifiedReference } from '@/schema/reference'
-import type { LabeledUrl } from '@/schema/url'
-import { Link, Typography } from '@mui/material'
-import type React from 'react'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import LinkIcon from '@mui/icons-material/Link'
+import { Link, Typography } from '@mui/material'
+import type React from 'react'
+
+import type { FullyQualifiedReference } from '@/schema/reference'
+import type { LabeledUrl } from '@/schema/url'
 
 /**
  * Component to display reference links with explanations

@@ -1,16 +1,17 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
+import type { ResolvedFeatures } from '@/schema/features'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import type { AtLeastOneVariant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.fee_transparency'
 export type FeeTransparencyValue = Value & {

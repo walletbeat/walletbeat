@@ -1,23 +1,24 @@
-import type { ResolvedFeatures } from '@/schema/features'
+import { erc7828 } from '@/data/eips/erc-7828'
+import { erc7831 } from '@/data/eips/erc-7831'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
+import type { ResolvedFeatures } from '@/schema/features'
+import { type ReferenceArray, refs } from '@/schema/reference'
 import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+
 import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } from '../../eips'
 import type {
 	AddressResolution,
 	AddressResolutionSupport,
 } from '../../features/privacy/address-resolution'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
-import { erc7828 } from '@/data/eips/erc-7828'
-import { erc7831 } from '@/data/eips/erc-7831'
-import { refs, type ReferenceArray } from '@/schema/reference'
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.ecosystem.address_resolution'
 export type AddressResolutionValue = Value & {

@@ -1,17 +1,19 @@
 import { Typography } from '@mui/material'
 import React from 'react'
+
 import { subsectionWeight } from '@/components/constants'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
-import { isNonEmptyArray, nonEmptyGet, nonEmptyMap, nonEmptySorted } from '@/types/utils/non-empty'
-import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
-import { dateCompare } from '@/types/date'
-import { toFullyQualified } from '@/schema/reference'
-import { EntityLink } from '@/ui/atoms/EntityLink'
 import {
 	securityAuditId,
 	securityFlawSeverityName,
 } from '@/schema/features/security/security-audits'
+import { toFullyQualified } from '@/schema/reference'
+import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
+import { dateCompare } from '@/types/date'
+import { isNonEmptyArray, nonEmptyGet, nonEmptyMap, nonEmptySorted } from '@/types/utils/non-empty'
+import { EntityLink } from '@/ui/atoms/EntityLink'
 import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
+
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 export function SecurityAuditsDetails({
 	wallet,

@@ -1,14 +1,14 @@
 // Components
-import WalletTable from '@/ui/organisms/WalletTable'
-
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { navigationAbout, navigationCriteria } from '@/components/navigation'
-import { LuWallet, LuKey } from 'react-icons/lu'
-import type { FC } from 'react'
-import { mapWallets } from '@/data/wallets'
-import { mapHardwareWallets } from '@/data/hardware-wallets'
-import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import GitHubIcon from '@mui/icons-material/GitHub'
+import type { FC } from 'react'
+import { LuKey, LuWallet } from 'react-icons/lu'
+
+import { navigationAbout, navigationCriteria } from '@/components/navigation'
+import { mapHardwareWallets } from '@/data/hardware-wallets'
+import { mapWallets } from '@/data/wallets'
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+import { ExternalLink } from '@/ui/atoms/ExternalLink'
+import WalletTable from '@/ui/organisms/WalletTable'
 
 export const HomePage: FC = () => (
 	<NavigationPageLayout

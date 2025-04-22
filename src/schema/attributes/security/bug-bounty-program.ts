@@ -1,20 +1,21 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, mdParagraph, paragraph, sentence, mdSentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
-	BugBountyProgramType,
 	type BugBountyProgramSupport,
+	BugBountyProgramType,
 } from '@/schema/features/security/bug-bounty-program'
 import { popRefs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.bug_bounty_program'
 export type BugBountyProgramValue = Value & {

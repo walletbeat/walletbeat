@@ -1,4 +1,5 @@
 import type React from 'react'
+
 import type theme from '../../components/ThemeRegistry/theme'
 
 export function WrapIcon({

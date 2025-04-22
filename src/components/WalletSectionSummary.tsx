@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react'
-import type { RatedWallet } from '@/schema/wallet'
-import type { AttributeGroup, ValueSet } from '@/schema/attributes'
+
 import { mapNonExemptGroupAttributes } from '@/schema/attribute-groups'
+import type { AttributeGroup, ValueSet } from '@/schema/attributes'
+import type { RatedWallet } from '@/schema/wallet'
 import { RatingStatusBadge } from '@/ui/molecules/RatingStatusBadge'
 
 /**

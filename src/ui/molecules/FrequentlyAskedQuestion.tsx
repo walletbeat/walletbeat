@@ -1,7 +1,8 @@
-import { MarkdownBox } from '../atoms/MarkdownBox'
-import { AnchorHeader } from '../atoms/AnchorHeader'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import type { Typography } from '@mui/material'
+
+import { AnchorHeader } from '../atoms/AnchorHeader'
+import { MarkdownBox } from '../atoms/MarkdownBox'
 
 export default function FrequentlyAskedQuestion({
 	question,

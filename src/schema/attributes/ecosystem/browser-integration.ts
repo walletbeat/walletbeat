@@ -1,22 +1,15 @@
-import type { ResolvedFeatures } from '@/schema/features'
+import { getEip } from '@/data/eips'
+import { eip1193 } from '@/data/eips/eip-1193'
+import { eip2700 } from '@/data/eips/eip-2700'
+import { eip6963 } from '@/data/eips/eip-6963'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { exempt, pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { Variant } from '../../variants'
-import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
-import { eip1193 } from '@/data/eips/eip-1193'
-import { eip6963 } from '@/data/eips/eip-6963'
-import { eip2700 } from '@/data/eips/eip-2700'
-import type { BrowserIntegrationEip } from '../../features/ecosystem/integration'
-import { getEip } from '@/data/eips'
-import { commaListFormat } from '@/types/utils/text'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	featureSupported,
 	isSupported,
@@ -24,6 +17,14 @@ import {
 	type Support,
 } from '@/schema/features/support'
 import { popRefs, type WithRef } from '@/schema/reference'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+import { commaListFormat } from '@/types/utils/text'
+
+import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
+import type { BrowserIntegrationEip } from '../../features/ecosystem/integration'
+import { Variant } from '../../variants'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 type ResolvedSupport = Record<BrowserIntegrationEip, Support>
 

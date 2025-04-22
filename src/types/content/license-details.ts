@@ -1,6 +1,7 @@
 import type { EvaluationData } from '@/schema/attributes'
-import { component, type Renderable } from '../content'
 import type { OpenSourceValue } from '@/schema/attributes/transparency/open-source'
+
+import { component, type Renderable } from '../content'
 
 export interface LicenseDetailsProps extends EvaluationData<OpenSourceValue> {}
 

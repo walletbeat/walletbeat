@@ -1,4 +1,7 @@
-import { isNonEmptyArray, nonEmptyValues, type NonEmptyArray } from '@/types/utils/non-empty'
+import { type Sentence, sentence } from '@/types/content'
+import { unratedAttributeContent } from '@/types/content/unrated-attribute'
+import { isNonEmptyArray, type NonEmptyArray, nonEmptyValues } from '@/types/utils/non-empty'
+
 import {
 	type Attribute,
 	type Evaluation,
@@ -7,9 +10,7 @@ import {
 	type Value,
 } from '../attributes'
 import type { AtLeastOneVariant, Variant } from '../variants'
-import { type Sentence, sentence } from '@/types/content'
 import type { WalletMetadata } from '../wallet'
-import { unratedAttributeContent } from '@/types/content/unrated-attribute'
 
 /**
  * Helper for constructing "Unrated" values.

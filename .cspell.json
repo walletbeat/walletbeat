@@ -61,6 +61,7 @@
 		"linkcolor",
 		"lualatex",
 		"luatex",
+		"lucemans",
 		"mainfont",
 		"Matomo",
 		"memecoin",
@@ -121,7 +122,8 @@
 		"Warpcast",
 		"webauthn",
 		"xlabs",
-		"Yanssie"
+		"Yanssie",
+		"Zerion"
 	],
 	"flagWords": [],
 	"ignorePaths": [

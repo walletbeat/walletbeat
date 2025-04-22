@@ -1,3 +1,5 @@
+import { sentence } from '@/types/content'
+import type { Dict } from '@/types/utils/dict'
 import {
 	isNonEmptyArray,
 	nonEmptyGet,
@@ -5,6 +7,7 @@ import {
 	nonEmptyRemap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
+
 import {
 	type Attribute,
 	type AttributeGroup,
@@ -18,46 +21,35 @@ import {
 	type ValueSet,
 } from './attributes'
 import {
-	addressCorrelation,
-	type AddressCorrelationValue,
-} from './attributes/privacy/address-correlation'
-import { openSource, type OpenSourceValue } from './attributes/transparency/open-source'
+	accountAbstraction,
+	type AccountAbstractionValue,
+} from './attributes/ecosystem/account-abstraction'
 import {
-	sourceVisibility,
-	type SourceVisibilityValue,
-} from './attributes/transparency/source-visibility'
-import {
-	feeTransparency,
-	type FeeTransparencyValue,
-} from './attributes/transparency/fee-transparency'
-import type { ResolvedFeatures } from './features'
-import type { AtLeastOneVariant, Variant } from './variants'
-import type { Dict } from '@/types/utils/dict'
-import { funding, type FundingValue } from './attributes/transparency/funding'
-import {
-	multiAddressCorrelation,
-	type MultiAddressCorrelationValue,
-} from './attributes/privacy/multi-address-correlation'
-import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score'
-import { sentence } from '@/types/content'
-import type { WalletMetadata } from './wallet'
-import {
-	chainVerification,
-	type ChainVerificationValue,
-} from './attributes/security/chain-verification'
-import {
-	selfHostedNode,
-	type SelfHostedNodeValue,
-} from './attributes/self-sovereignty/self-hosted-node'
+	addressResolution,
+	type AddressResolutionValue,
+} from './attributes/ecosystem/address-resolution'
 import {
 	browserIntegration,
 	type BrowserIntegrationValue,
 } from './attributes/ecosystem/browser-integration'
 import {
-	addressResolution,
-	type AddressResolutionValue,
-} from './attributes/ecosystem/address-resolution'
-import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
+	addressCorrelation,
+	type AddressCorrelationValue,
+} from './attributes/privacy/address-correlation'
+import { hardwarePrivacy, type HardwarePrivacyValue } from './attributes/privacy/hardware-privacy'
+import {
+	multiAddressCorrelation,
+	type MultiAddressCorrelationValue,
+} from './attributes/privacy/multi-address-correlation'
+import {
+	bugBountyProgram,
+	type BugBountyProgramValue,
+} from './attributes/security/bug-bounty-program'
+import {
+	chainVerification,
+	type ChainVerificationValue,
+} from './attributes/security/chain-verification'
+import { firmware, type FirmwareValue } from './attributes/security/firmware'
 import {
 	hardwareWalletDappSigning,
 	type HardwareWalletDappSigningValue,
@@ -66,46 +58,55 @@ import {
 	hardwareWalletSupport,
 	type HardwareWalletSupportValue,
 } from './attributes/security/hardware-wallet-support'
-import {
-	transactionInclusion,
-	type TransactionInclusionValue,
-} from './attributes/self-sovereignty/transaction-inclusion'
-import {
-	accountAbstraction,
-	type AccountAbstractionValue,
-} from './attributes/ecosystem/account-abstraction'
-import {
-	accountPortability,
-	type AccountPortabilityValue,
-} from './attributes/self-sovereignty/account-portability'
+import { keysHandling, type KeysHandlingValue } from './attributes/security/keys-handling'
 import {
 	passkeyImplementation,
 	type PasskeyImplementationValue,
 } from './attributes/security/passkey-implementation'
+import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
+import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
 import {
 	softwareHWIntegration,
 	type SoftwareHWIntegrationValue,
 } from './attributes/security/software-hw-integration'
-import {
-	bugBountyProgram,
-	type BugBountyProgramValue,
-} from './attributes/security/bug-bounty-program'
-import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
-import { maintenance, type MaintenanceValue } from './attributes/transparency/maintenance'
-import { reputation, type ReputationValue } from './attributes/transparency/reputation'
-import {
-	interoperability,
-	type InteroperabilityValue,
-} from './attributes/self-sovereignty/interoperability'
-import { hardwarePrivacy, type HardwarePrivacyValue } from './attributes/privacy/hardware-privacy'
 import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy'
 import {
 	supplyChainFactory,
 	type SupplyChainFactoryValue,
 } from './attributes/security/supply-chain-factory'
-import { firmware, type FirmwareValue } from './attributes/security/firmware'
-import { keysHandling, type KeysHandlingValue } from './attributes/security/keys-handling'
 import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
+import {
+	accountPortability,
+	type AccountPortabilityValue,
+} from './attributes/self-sovereignty/account-portability'
+import {
+	interoperability,
+	type InteroperabilityValue,
+} from './attributes/self-sovereignty/interoperability'
+import {
+	selfHostedNode,
+	type SelfHostedNodeValue,
+} from './attributes/self-sovereignty/self-hosted-node'
+import {
+	transactionInclusion,
+	type TransactionInclusionValue,
+} from './attributes/self-sovereignty/transaction-inclusion'
+import {
+	feeTransparency,
+	type FeeTransparencyValue,
+} from './attributes/transparency/fee-transparency'
+import { funding, type FundingValue } from './attributes/transparency/funding'
+import { maintenance, type MaintenanceValue } from './attributes/transparency/maintenance'
+import { openSource, type OpenSourceValue } from './attributes/transparency/open-source'
+import { reputation, type ReputationValue } from './attributes/transparency/reputation'
+import {
+	sourceVisibility,
+	type SourceVisibilityValue,
+} from './attributes/transparency/source-visibility'
+import type { ResolvedFeatures } from './features'
+import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score'
+import type { AtLeastOneVariant, Variant } from './variants'
+import type { WalletMetadata } from './wallet'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{

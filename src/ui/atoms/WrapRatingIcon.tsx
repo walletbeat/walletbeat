@@ -1,6 +1,8 @@
 import type React from 'react'
-import { subsectionIconWidth } from '../../components/constants'
+
 import { type Rating, ratingToIcon } from '@/schema/attributes'
+
+import { subsectionIconWidth } from '../../components/constants'
 import { WrapIcon } from './WrapIcon'
 
 export function WrapRatingIcon({

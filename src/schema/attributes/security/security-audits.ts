@@ -1,21 +1,22 @@
-import type { ResolvedFeatures } from '@/schema/features'
+import { exampleSecurityAuditor } from '@/data/entities/example'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
-import { daysSince } from '@/types/date'
+import type { ResolvedFeatures } from '@/schema/features'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
-import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
-import { exampleSecurityAuditor } from '@/data/entities/example'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
 import { mergeRefs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
+import { daysSince } from '@/types/date'
+import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.security_audits'
 export type SecurityAuditsValue = Value & {

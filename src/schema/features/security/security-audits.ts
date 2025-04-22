@@ -1,8 +1,9 @@
-import type { NonEmptyArray } from '@/types/utils/non-empty'
-import type { AtLeastOneTrueVariant } from '../../variants'
-import type { MustRef } from '../../reference'
 import type { CalendarDate } from '@/types/date'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+
 import type { SecurityAuditor } from '../../entity'
+import type { MustRef } from '../../reference'
+import type { AtLeastOneTrueVariant } from '../../variants'
 
 /** The severity of a security flaw, as assigned by the security auditor. */
 export enum SecurityFlawSeverity {

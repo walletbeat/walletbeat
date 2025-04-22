@@ -1,23 +1,24 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	TransactionSubmissionL2Support,
-	transactionSubmissionL2Types,
 	TransactionSubmissionL2Type,
+	transactionSubmissionL2Types,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { isNonEmptyArray } from '@/types/utils/non-empty'
-import { transactionInclusionDetailsContent } from '@/types/content/transaction-inclusion-details'
 import { isSupported } from '@/schema/features/support'
-import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
+import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+import { transactionInclusionDetailsContent } from '@/types/content/transaction-inclusion-details'
+import { isNonEmptyArray } from '@/types/utils/non-empty'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.self_sovereignty.transaction_inclusion'
 export type TransactionInclusionValue = Value & {

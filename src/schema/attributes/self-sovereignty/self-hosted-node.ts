@@ -1,16 +1,17 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
+import type { ResolvedFeatures } from '@/schema/features'
+import { type ReferenceArray, refs } from '@/schema/reference'
 import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
 import { RpcEndpointConfiguration } from '../../features/self-sovereignty/chain-configurability'
-import { refs, type ReferenceArray } from '@/schema/reference'
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.self_sovereignty.self_hosted_node'
 export type SelfHostedNodeValue = Value & {

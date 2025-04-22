@@ -1,14 +1,13 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
+	type EvaluationData,
 	exampleRating,
 	exampleRatingUnimplemented,
-	type EvaluationData,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	compareLeakedInfo,
 	inferLeaks,
@@ -22,12 +21,14 @@ import {
 	type Leaks,
 	leaksByDefault,
 } from '@/schema/features/privacy/data-collection'
-import { markdown, paragraph, type RenderableTypography, sentence } from '@/types/content'
 import type { WalletMetadata } from '@/schema/wallet'
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty'
-import { type FullyQualifiedReference, type ReferenceArray, refs } from '../../reference'
-import type { Entity } from '../../entity'
+import { markdown, paragraph, type RenderableTypography, sentence } from '@/types/content'
 import { addressCorrelationDetailsContent } from '@/types/content/address-correlation-details'
+import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty'
+
+import type { Entity } from '../../entity'
+import { type FullyQualifiedReference, type ReferenceArray, refs } from '../../reference'
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.privacy.address_correlation'
 export type AddressCorrelationValue = Value & {

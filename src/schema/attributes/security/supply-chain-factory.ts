@@ -1,22 +1,23 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	type ExemptEvaluation,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
+import { exampleRating } from '@/schema/attributes'
+import type { ResolvedFeatures } from '@/schema/features'
+import { HardwareWalletManufactureType } from '@/schema/features/profile'
 import {
-	SupplyChainFactoryType,
 	type SupplyChainFactorySupport,
+	SupplyChainFactoryType,
 } from '@/schema/features/security/supply-chain-factory'
 import { popRefs } from '@/schema/reference'
-import { exampleRating } from '@/schema/attributes'
 import { Variant } from '@/schema/variants'
-import { HardwareWalletManufactureType } from '@/schema/features/profile'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.supply_chain_factory'
 

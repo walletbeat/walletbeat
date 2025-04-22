@@ -1,9 +1,10 @@
-import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid'
-import LanguageIcon from '@mui/icons-material/Language'
-import MonitorIcon from '@mui/icons-material/Monitor'
-import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet'
-import MemoryIcon from '@mui/icons-material/Memory'
 import type { SvgIconComponent } from '@mui/icons-material'
+import LanguageIcon from '@mui/icons-material/Language'
+import MemoryIcon from '@mui/icons-material/Memory'
+import MonitorIcon from '@mui/icons-material/Monitor'
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid'
+import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet'
+
 import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/variants'
 
 /**

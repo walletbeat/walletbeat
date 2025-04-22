@@ -1,3 +1,7 @@
+import { Divider, Typography } from '@mui/material'
+import { styled } from '@mui/material/styles'
+import React from 'react'
+
 import {
 	type Attribute,
 	type Evaluation,
@@ -6,11 +10,9 @@ import {
 	ratingToIcon,
 	type Value,
 } from '@/schema/attributes'
-import { Divider, Typography } from '@mui/material'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
-import React from 'react'
 import { mdSentence, type Sentence } from '@/types/content'
-import { styled } from '@mui/material/styles'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+
 import { RenderTypographicContent } from '../../atoms/RenderTypographicContent'
 
 const typographyPropsHeader: React.ComponentProps<typeof RenderTypographicContent>['typography'] = {

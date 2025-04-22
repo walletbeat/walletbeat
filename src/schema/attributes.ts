@@ -1,10 +1,11 @@
-import { nonEmptyMap, type NonEmptyArray, type NonEmptyRecord } from '@/types/utils/non-empty'
-import type { ResolvedFeatures } from './features'
-import type { AtLeastOneVariant } from './variants'
-import type { MaybeUnratedScore, Score } from './score'
 import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content'
-import type { RatedWallet, WalletMetadata } from './wallet'
+import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
+
+import type { ResolvedFeatures } from './features'
 import type { FullyQualifiedReference, ReferenceArray } from './reference'
+import type { MaybeUnratedScore, Score } from './score'
+import type { AtLeastOneVariant } from './variants'
+import type { RatedWallet, WalletMetadata } from './wallet'
 
 /**
  * Rating is an enum that should be visually meaningful.

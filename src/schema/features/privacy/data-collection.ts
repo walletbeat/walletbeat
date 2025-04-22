@@ -1,7 +1,8 @@
 import type { WithRef } from '@/schema/reference'
 import type { Dict } from '@/types/utils/dict'
-import type { WalletMetadata } from '../../wallet'
+
 import type { Entity } from '../../entity'
+import type { WalletMetadata } from '../../wallet'
 
 /**
  * An enum representing when data collection or leak occurs.

@@ -1,8 +1,9 @@
-import type React from 'react'
-import { labeledUrl, type Url } from '@/schema/url'
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded'
 import { Link, type TypographyOwnProps } from '@mui/material'
+import type React from 'react'
 import { useState } from 'react'
+
+import { labeledUrl, type Url } from '@/schema/url'
 
 export function ExternalLink({
 	url,

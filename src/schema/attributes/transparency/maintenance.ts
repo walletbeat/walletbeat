@@ -1,16 +1,17 @@
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
+import { exampleRating } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
-import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
-import { exempt, pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import type { AtLeastOneVariant } from '@/schema/variants'
 import {
-	MaintenanceType,
 	type MaintenanceSupport,
+	MaintenanceType,
 } from '@/schema/features/transparency/maintenance'
 import { popRefs } from '@/schema/reference'
+import type { AtLeastOneVariant } from '@/schema/variants'
 import { Variant } from '@/schema/variants'
-import { exampleRating } from '@/schema/attributes'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.maintenance'
 

@@ -2,6 +2,7 @@ import globals from 'globals';
 import react from 'eslint-plugin-react';
 import love from 'eslint-config-love';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 
 export default [
   love,
@@ -32,4 +33,11 @@ export default [
     },
   },
   eslintConfigPrettier,
+  {
+    plugins: { 'simple-import-sort': eslintPluginSimpleImportSort },
+    rules: {
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+    }
+  },
 ];

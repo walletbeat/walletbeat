@@ -1,4 +1,6 @@
 import { Typography } from '@mui/material'
+import type React from 'react'
+
 import {
 	FOSS,
 	License,
@@ -8,7 +10,6 @@ import {
 } from '@/schema/features/transparency/license'
 import type { LicenseDetailsProps } from '@/types/content/license-details'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
-import type React from 'react'
 
 export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JSX.Element {
 	if (value.license === License.PROPRIETARY) {

@@ -1,7 +1,9 @@
-import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import { Tooltip } from './Tooltip'
 import type { SvgIconComponent } from '@mui/icons-material'
+
+import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+
 import { IconButton } from './IconButton'
+import { Tooltip } from './Tooltip'
 
 export interface PickableVariant<V extends string> {
 	id: V

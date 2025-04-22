@@ -1,11 +1,13 @@
 import { styled, Typography, type TypographyProps } from '@mui/material'
+import { Box } from '@mui/system'
 import type React from 'react'
 import Markdown, { type Components } from 'react-markdown'
-import { ExternalLink } from './ExternalLink'
+
 import { lookupEip } from '@/data/eips'
-import { EipLink } from './EipLink'
 import { trimWhitespacePrefix } from '@/types/utils/text'
-import { Box } from '@mui/system'
+
+import { EipLink } from './EipLink'
+import { ExternalLink } from './ExternalLink'
 
 export interface MarkdownOwnProps {
 	markdownTransform?: (markdown: string) => string

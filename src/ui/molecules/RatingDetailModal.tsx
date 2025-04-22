@@ -1,18 +1,20 @@
+import { Button, Modal, Typography, useMediaQuery, useTheme } from '@mui/material'
 import type React from 'react'
-import { useState, useEffect } from 'react'
-import { Modal, Button, useMediaQuery, useTheme, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+
+import { mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
 import {
-	ratingToColor,
 	type AttributeGroup,
 	type EvaluatedGroup,
+	ratingToColor,
 	type ValueSet,
 } from '@/schema/attributes'
-import { mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
-import { toFullyQualified, type FullyQualifiedReference } from '@/schema/reference'
-import type { RatedWallet } from '@/schema/wallet'
 import type { HardwareWalletModel } from '@/schema/features/profile'
-import { RenderContent } from '../atoms/RenderContent'
+import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
 import type { LabeledUrl } from '@/schema/url'
+import type { RatedWallet } from '@/schema/wallet'
+
+import { RenderContent } from '../atoms/RenderContent'
 import { RatingStatusBadge } from './RatingStatusBadge'
 
 interface RatingDetailModalProps<Vs extends ValueSet> {

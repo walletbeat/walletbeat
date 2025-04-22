@@ -1,27 +1,28 @@
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { Leak, MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
-import type { Wallet } from '@/schema/wallet'
-import { License } from '@/schema/features/transparency/license'
-import { daimoInc } from '../entities/daimo'
-import { binance } from '../entities/binance'
-import { openExchangeRates } from '../entities/open-exchange-rates'
-import { polymutex } from '../contributors/polymutex'
-import { paragraph } from '@/types/content'
-import { merkleManufactory } from '../entities/merkle-manufactory'
-import { pimlico } from '../entities/pimlico'
-import { honeycomb } from '../entities/honeycomb'
 import { WalletProfile } from '@/schema/features/profile'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
-import { veridise } from '../entities/veridise'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { nconsigny } from '../contributors/nconsigny'
+import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { nconsigny } from '../contributors/nconsigny'
+import { polymutex } from '../contributors/polymutex'
+import { binance } from '../entities/binance'
+import { daimoInc } from '../entities/daimo'
+import { honeycomb } from '../entities/honeycomb'
+import { merkleManufactory } from '../entities/merkle-manufactory'
+import { openExchangeRates } from '../entities/open-exchange-rates'
+import { pimlico } from '../entities/pimlico'
+import { veridise } from '../entities/veridise'
 
 export const daimo: Wallet = {
 	metadata: {
