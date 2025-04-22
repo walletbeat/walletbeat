@@ -10,6 +10,8 @@ import { safe } from './wallets/safe'
 import { elytro } from './wallets/elytro'
 import { ambire } from './wallets/ambire'
 import { unratedTemplate } from './wallets/unrated.tmpl'
+import { zerion } from './wallets/zerion'
+import { family } from './wallets/family'
 
 /** Set of all known wallets. */
 export const wallets = {
@@ -23,6 +25,8 @@ export const wallets = {
 	rabby,
 	rainbow,
 	safe,
+	zerion,
+	family,
 }
 
 /** A valid wallet name. */

@@ -1,51 +1,32 @@
-import { polymutex } from '../contributors/polymutex'
-import { nconsigny } from '../contributors/nconsigny'
 import { paragraph } from '@/types/content'
 import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { AccountType } from '@/schema/features/account-support'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { lucemans } from '../contributors/lucemans'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 
-export const frame: Wallet = {
+export const zerion: Wallet = {
 	metadata: {
-		id: 'frame',
-		displayName: 'Frame',
-		tableName: 'Frame',
+		id: 'zerion',
+		displayName: 'Zerion',
+		tableName: 'Zerion',
 		iconExtension: 'svg',
-		blurb: paragraph(`
-			Frame...
-		`),
-		url: 'https://frame.sh',
+		blurb: paragraph(``),
+		url: 'https://www.zerion.io',
 		repoUrl: null,
-		contributors: [polymutex, nconsigny, lucemans],
-		lastUpdated: '2025-03-13',
+		contributors: [lucemans],
+		lastUpdated: '2025-04-22',
 	},
 	features: {
 		profile: WalletProfile.GENERIC,
-		chainConfigurability: {
-			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-			customChains: true,
-			ref: [
-				{
-					urls: [
-						{
-							url: 'https://docs.frame.sh/docs/Getting%20Started/Basics/Configuring%20Chains',
-							label: 'Frame node connection documentation',
-						},
-					],
-					explanation: 'Frame allows connecting to your own Ethereum node',
-				},
-			],
-		},
+		chainConfigurability: null,
 		accountSupport: {
+			// BIP support is not verified
 			eoa: supported({
 				canExportPrivateKey: true,
 				keyDerivation: {
@@ -86,12 +67,13 @@ export const frame: Wallet = {
 			hardwareWalletSupport: {
 				supportedWallets: {
 					[HardwareWalletType.LEDGER]: featureSupported,
-					[HardwareWalletType.TREZOR]: featureSupported,
-					[HardwareWalletType.KEYSTONE]: featureSupported,
-					[HardwareWalletType.GRIDPLUS]: featureSupported,
-					[HardwareWalletType.OTHER]: featureSupported,
 				},
-				ref: null,
+				ref: [
+					{
+						url: ['https://www.ledger.com/zerion'],
+						explanation: 'Ledger.com has a page dedicated to Zerion.',
+					},
+				],
 			},
 			hardwareWalletDappSigning: {
 				level: DappSigningLevel.NONE,
@@ -141,9 +123,9 @@ export const frame: Wallet = {
 		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
-		[Variant.BROWSER]: true,
-		[Variant.DESKTOP]: true,
+		[Variant.MOBILE]: true,
+		[Variant.BROWSER]: false,
+		[Variant.DESKTOP]: false,
 		[Variant.EMBEDDED]: false,
 		[Variant.HARDWARE]: false,
 	},
