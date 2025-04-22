@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { Modal, Button, useMediaQuery, useTheme, Typography } from '@mui/material'
 import {
 	ratingToColor,
-	ratingToText,
 	type AttributeGroup,
 	type EvaluatedGroup,
 	type ValueSet,
@@ -232,7 +231,7 @@ export function RatingDetailModal<Vs extends ValueSet>({
 									const references = toFullyQualified(evalAttr.evaluation.references)
 									const hasReferences = references.length > 0
 
-									const walletUrlPrefix = flagshipModel !== null ? 'hww' : 'wallet';
+									const walletUrlPrefix = flagshipModel !== null ? 'hww' : 'wallet'
 
 									// Create proper attribute anchor for links
 									const detailUrl = `/${walletUrlPrefix}/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`
@@ -240,10 +239,11 @@ export function RatingDetailModal<Vs extends ValueSet>({
 									return (
 										<div key={evalAttr.attribute.id} className="mb-2">
 											<div
-												className={`flex items-center p-2 rounded cursor-pointer text-sm ${hoveredSliceIndex === index
-													? 'bg-gray-200 dark:bg-gray-700'
-													: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
-													}`}
+												className={`flex items-center p-2 rounded cursor-pointer text-sm ${
+													hoveredSliceIndex === index
+														? 'bg-gray-200 dark:bg-gray-700'
+														: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
+												}`}
 												onMouseEnter={() => {
 													setHoveredSliceIndex(index)
 												}}
