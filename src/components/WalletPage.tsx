@@ -60,6 +60,8 @@ import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import LanguageIcon from '@mui/icons-material/Language'
 import GitHubIcon from '@mui/icons-material/GitHub'
+import { WalletSectionSummary } from './WalletSectionSummary'
+import { AttributeGroupBody } from '@/ui/molecules/AttributeGroupBody'
 
 const headerBottomMargin = 0
 
@@ -311,7 +313,7 @@ export function WalletPage({
 				subHeader: null,
 				title: attrGroup.displayName,
 				icon: attrGroup.icon,
-				cornerControl: null,
+				cornerControl: <WalletSectionSummary wallet={wallet} attrGroup={attrGroup} />,
 				caption: (
 					<RenderTypographicContent
 						content={attrGroup.perWalletQuestion.render(wallet.metadata)}
@@ -321,7 +323,7 @@ export function WalletPage({
 						}}
 					/>
 				),
-				body: null,
+				body: <AttributeGroupBody wallet={wallet} attrGroup={attrGroup} />,
 				subsections: mapNonExemptGroupAttributes<RichSection | null, Vs>(
 					evalGroup,
 					<V extends Value>(evalAttr: EvaluatedAttribute<V>): RichSection | null => {
@@ -540,11 +542,11 @@ export function WalletPage({
 							children:
 								section.subsections !== undefined && isNonEmptyArray(section.subsections)
 									? nonEmptyMap(section.subsections, subsection => ({
-											id: sectionHeaderId(subsection),
-											icon: subsection.icon,
-											title: subsection.title,
-											contentId: sectionHeaderId(subsection),
-										}))
+										id: sectionHeaderId(subsection),
+										icon: subsection.icon,
+										title: subsection.title,
+										contentId: sectionHeaderId(subsection),
+									}))
 									: undefined,
 						}),
 					),
@@ -618,7 +620,7 @@ export function WalletPage({
 													{section.title}
 												</AnchorHeader>
 											</div>
-											<div className="flex flex-col justify-center flex-initial">
+											<div className="flex flex-col justify-center flex-initial mr-4">
 												{section.cornerControl}
 											</div>
 										</div>
@@ -637,7 +639,7 @@ export function WalletPage({
 											<div
 												key="sectionBody"
 												className="text-primary px-4"
-												// paddingTop={theme.spacing(2)}
+											// paddingTop={theme.spacing(2)}
 											>
 												{section.body}
 											</div>

@@ -14,6 +14,7 @@ import type { RatedWallet } from '@/schema/wallet'
 import type { HardwareWalletModel } from '@/schema/features/profile'
 import { RenderContent } from '../atoms/RenderContent'
 import type { LabeledUrl } from '@/schema/url'
+import { RatingStatusBadge } from './RatingStatusBadge'
 
 interface RatingDetailModalProps<Vs extends ValueSet> {
 	open: boolean
@@ -231,17 +232,18 @@ export function RatingDetailModal<Vs extends ValueSet>({
 									const references = toFullyQualified(evalAttr.evaluation.references)
 									const hasReferences = references.length > 0
 
+									const walletUrlPrefix = flagshipModel !== null ? 'hww' : 'wallet';
+
 									// Create proper attribute anchor for links
-									const detailUrl = `/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`
+									const detailUrl = `/${walletUrlPrefix}/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`
 
 									return (
 										<div key={evalAttr.attribute.id} className="mb-2">
 											<div
-												className={`flex items-center p-2 rounded cursor-pointer text-sm ${
-													hoveredSliceIndex === index
-														? 'bg-gray-200 dark:bg-gray-700'
-														: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
-												}`}
+												className={`flex items-center p-2 rounded cursor-pointer text-sm ${hoveredSliceIndex === index
+													? 'bg-gray-200 dark:bg-gray-700'
+													: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
+													}`}
 												onMouseEnter={() => {
 													setHoveredSliceIndex(index)
 												}}
@@ -259,15 +261,7 @@ export function RatingDetailModal<Vs extends ValueSet>({
 													}}
 												/>
 												<span className="flex-1 text-sm">{evalAttr.attribute.displayName}</span>
-												<div
-													className="px-2 py-1 rounded min-w-[50px] text-center text-xs font-bold"
-													style={{
-														backgroundColor: ratingToColor(evalAttr.evaluation.value.rating),
-														color: theme.palette.primary.main,
-													}}
-												>
-													{ratingToText(evalAttr.evaluation.value.rating)}
-												</div>
+												<RatingStatusBadge rating={evalAttr.evaluation.value.rating} />
 											</div>
 
 											{/* References and Learn More button */}
