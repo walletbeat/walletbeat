@@ -1,13 +1,15 @@
 import { Typography } from '@mui/material'
 import React from 'react'
-import { ExternalLink } from '../../../atoms/ExternalLink'
+
 import { subsectionWeight } from '@/components/constants'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
-import { nonEmptyMap } from '@/types/utils/non-empty'
 import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
-import { ReferenceList } from '../../../atoms/ReferenceList'
 import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
+import { nonEmptyMap } from '@/types/utils/non-empty'
 import { commaListPrefix } from '@/types/utils/text'
+
+import { ExternalLink } from '../../../atoms/ExternalLink'
+import { ReferenceList } from '../../../atoms/ReferenceList'
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 export function ChainVerificationDetails({
 	wallet,

@@ -1,4 +1,4 @@
-import type { WithRef } from '../reference'
+import type { WithRef } from '../../reference'
 
 /**
  * Customization options for each chain.

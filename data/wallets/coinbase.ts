@@ -1,18 +1,20 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { polymutex } from '../contributors/polymutex'
-import { nconsigny } from '../contributors/nconsigny'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { featureSupported } from '@/schema/features/support'
-import { Variant } from '@/schema/variants'
-import { cantina } from '../entities/cantina'
-import { code4rena } from '../entities/code4rena'
-import { certora } from '../entities/certora'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { License } from '@/schema/features/license'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { License } from '@/schema/features/transparency/license'
+import { Variant } from '@/schema/variants'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { nconsigny } from '../contributors/nconsigny'
+import { polymutex } from '../contributors/polymutex'
+import { cantina } from '../entities/cantina'
+import { certora } from '../entities/certora'
+import { code4rena } from '../entities/code4rena'
 
 export const coinbase: Wallet = {
 	metadata: {
@@ -32,7 +34,46 @@ export const coinbase: Wallet = {
 	features: {
 		profile: WalletProfile.GENERIC,
 		chainConfigurability: null,
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eip7702,
+			eoa: supported({
+				canExportPrivateKey: true,
+				canExportSeedPhrase: true,
+				keyDerivation: {
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+					type: 'BIP32',
+					canExportSeedPhrase: true,
+				},
+			}),
+			eip7702: supported({
+				contractCode: {
+					keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
+					controllingSharesInSelfCustodyByDefault: 'YES',
+					tokenTransferTransactionGeneration:
+						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					ref: {
+						url: 'https://github.com/coinbase/smart-wallet',
+						explanation: 'Coinbase Wallet supports EIP-7702 via its smart wallet implementation.',
+					},
+				},
+				ref: {
+					url: 'https://www.coinbase.com/blog/coinbase-wallet-introduces-support-for-eip-7702',
+					explanation: 'Coinbase Wallet announced support for EIP-7702.',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: supported({
+				controllingSharesInSelfCustodyByDefault: 'YES',
+				keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
+				tokenTransferTransactionGeneration:
+					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				ref: {
+					url: 'https://github.com/coinbase/smart-wallet',
+					explanation: 'Coinbase Wallet supports ERC-4337 via its smart wallet implementation.',
+				},
+			}),
+		},
 		multiAddress: null,
 		addressResolution: {
 			nonChainSpecificEnsResolution: null,
@@ -91,9 +132,8 @@ export const coinbase: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
-				details: 'No hardware wallet clear signing information available.',
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
 				ref: null,
 			},
 			passkeyVerification: {
@@ -105,6 +145,7 @@ export const coinbase: Wallet = {
 					explanation: 'Coinbase uses the webauthn-sol library for passkey verification.',
 				},
 			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

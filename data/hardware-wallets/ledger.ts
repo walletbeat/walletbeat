@@ -1,13 +1,14 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
-import { WalletProfile, HardwareWalletManufactureType } from '@/schema/features/profile'
-import { nconsigny } from '../contributors/nconsigny'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { featureSupported } from '@/schema/features/support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported } from '@/schema/features/support'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { nconsigny } from '../contributors/nconsigny'
 
 export const ledgerWallet: Wallet = {
 	metadata: {
@@ -94,10 +95,10 @@ export const ledgerWallet: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.PARTIAL,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.PARTIAL,
 				details:
-					'Ledger provides partial clear signing support with transaction details displayed on the device screen, but some complex transactions may not show all details.',
+					'Ledger provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
 				ref: [
 					{
 						url: 'https://youtu.be/7lP_0h-PPvY?t=720',

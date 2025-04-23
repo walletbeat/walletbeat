@@ -1,32 +1,34 @@
-import type { ResolvedWallet } from '@/schema/wallet'
+import BlockIcon from '@mui/icons-material/Block'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess'
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
-import { Box, Link, Tooltip, Typography } from '@mui/material'
+import { Link, Typography } from '@mui/material'
 import type React from 'react'
-import { shortRowHeight, expandedRowHeight } from '../../components/constants'
-import { ExternalLink } from '../atoms/ExternalLink'
-import { type PickableVariant, VariantPicker } from '../atoms/VariantPicker'
-import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
-import type { Variant } from '@/schema/variants'
-import BlockIcon from '@mui/icons-material/Block'
-import type { WalletRowStateHandle } from '../WalletTableState'
-import { IconButton } from '../atoms/IconButton'
-import theme from '../../components/ThemeRegistry/theme'
-import { WalletIcon } from '../atoms/WalletIcon'
-import { IconLink } from '../atoms/IconLink'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import { variantToTooltip, variantUrlQuery } from '../../components/variants'
-import { variantToIcon } from '../../components/variantIcons'
-import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
-import { betaSiteRoot } from '@/constants'
 
-const walletIconSize = (shortRowHeight) * 0.5;
+import { betaSiteRoot } from '@/constants'
+import type { Variant } from '@/schema/variants'
+import type { ResolvedWallet } from '@/schema/wallet'
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
+
+import { expandedRowHeight, shortRowHeight } from '../../components/constants'
+import theme from '../../components/ThemeRegistry/theme'
+import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../components/variants'
+import { ExternalLink } from '../atoms/ExternalLink'
+import { IconButton } from '../atoms/IconButton'
+import { IconLink } from '../atoms/IconLink'
+import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
+import { Tooltip } from '../atoms/Tooltip'
+import { type PickableVariant, VariantPicker } from '../atoms/VariantPicker'
+import { WalletIcon } from '../atoms/WalletIcon'
+import type { WalletRowStateHandle } from '../WalletTableState'
+
+const walletIconSize = shortRowHeight * 0.5
 
 function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element {
 	const Icon = variantToIcon(variant)
 	return (
-		<Tooltip title={`No ${variant} version`} arrow={true} disableInteractive={true}>
-			<Box display="flex" alignItems="center" justifyContent="center" position="relative">
+		<Tooltip content={`No ${variant} version`}>
+			<div className="flex items-center justify-center relative">
 				<IconButton disabled={true}>
 					<Icon />
 				</IconButton>
@@ -41,7 +43,7 @@ function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element
 						color: theme.palette.error.main,
 					}}
 				/>
-			</Box>
+			</div>
 		</Tooltip>
 	)
 }
@@ -63,27 +65,23 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 		}),
 	)
 	return (
-		<Box display="flex" justifyContent="flex-start" alignItems="flex-start" flexDirection="column">
-			<Box
-				display="flex"
-				flexDirection="row"
-				alignItems="center"
-				justifyContent="flex-start"
-				gap="16px"
-				width="100%"
-				height={shortRowHeight + 40}
+		<div className="flex flex-col justify-start items-start">
+			<div
+				className="flex flex-row items-center justify-start gap-4 w-full"
+				style={{
+					height: shortRowHeight + 40,
+				}}
 			>
-				<Box
-					display="flex"
-					flexDirection="column"
-					justifyContent="center"
-					height={shortRowHeight + 40}
-					sx={row.rowWideStyle}
+				<div
+					className="flex flex-col justify-center"
+					style={{
+						height: shortRowHeight + 40,
+					}}
 				>
 					<IconButton size="small" onClick={row.toggleExpanded.bind(row)}>
 						{row.expanded ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
 					</IconButton>
-				</Box>
+				</div>
 				<Link
 					href={`${betaSiteRoot}/${row.wallet.metadata.id}/${variantUrlQuery(row.wallet.variants, row.table.variantSelected)}`}
 					color="text.primary"
@@ -93,20 +91,20 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 					gap="inherit"
 					sx={row.rowWideStyle}
 				>
-					<Box display="flex" flexDirection="column" justifyContent="center">
+					<div className="flex flex-col justify-center">
 						<WalletIcon wallet={row.wallet} iconSize={walletIconSize} />
-					</Box>
-					<Box flex="1" sx={row.rowWideStyle} display="flex" alignItems="center">
+					</div>
+					<div style={row.rowWideStyle} className="flex-1 flex items-center">
 						<h2 className="text-primary" style={{ fontSize: '1.04rem' }}>
-						{row.wallet.metadata.tableName}
+							{row.wallet.metadata.tableName}
 						</h2>
 						{/* <Typography variant="h2"></Typography> */}
-					</Box>
+					</div>
 				</Link>
 
-				<Box display="flex" flexDirection="row" gap="0px">
+				<div className="flex flex-row gap-0">
 					{row.table.variantSelected !== null &&
-						row.wallet.variants[row.table.variantSelected] === undefined ? (
+					row.wallet.variants[row.table.variantSelected] === undefined ? (
 						<CrossedOutVariant variant={row.table.variantSelected} />
 					) : null}
 					<VariantPicker
@@ -114,24 +112,27 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 						variants={walletVariants}
 						pickedVariant={row.table.variantSelected}
 					/>
-				</Box>
-			</Box>
+				</div>
+			</div>
 			{row.expanded ? (
-				<Box
-					display="flex"
-					flexDirection="column"
-					height={expandedRowHeight - (shortRowHeight + 40)}
-					sx={{ 
-						...row.rowWideStyle, 
-						lineHeight: 1, 
+				<div
+					className="flex flex-col"
+					style={{
+						height: expandedRowHeight - (shortRowHeight + 40),
+						...row.rowWideStyle,
+						lineHeight: 1,
 						whiteSpace: 'normal',
 						color: 'var(--text-primary)',
 					}}
 				>
-					<Box flex="1">
+					<div className="flex-1">
 						{row.table.variantSelected !== null &&
-							row.wallet.variants[row.table.variantSelected] === undefined ? (
-							<Typography variant="body1" marginBottom="0.5rem" sx={{ color: 'var(--text-primary)' }}>
+						row.wallet.variants[row.table.variantSelected] === undefined ? (
+							<Typography
+								variant="body1"
+								marginBottom="0.5rem"
+								sx={{ color: 'var(--text-primary)' }}
+							>
 								{row.wallet.metadata.displayName} does not have a {row.table.variantSelected}{' '}
 								version.
 							</Typography>
@@ -145,7 +146,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 								}}
 							/>
 						)}
-					</Box>
+					</div>
 					<Typography
 						variant="body2"
 						display="flex"
@@ -157,7 +158,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 							color: 'var(--text-primary)',
 							'& a': {
 								color: 'var(--text-primary)',
-							}
+							},
 						}}
 					>
 						<IconLink
@@ -175,15 +176,15 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 						/>
 						|
 						{row.wallet.metadata.repoUrl === null ? null : (
-							<ExternalLink 
-								url={row.wallet.metadata.repoUrl} 
+							<ExternalLink
+								url={row.wallet.metadata.repoUrl}
 								defaultLabel="GitHub"
 								color="text.primary"
 							/>
 						)}
 					</Typography>
-				</Box>
+				</div>
 			) : null}
-		</Box>
+		</div>
 	)
 }

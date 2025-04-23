@@ -1,14 +1,15 @@
-import theme from '@/components/ThemeRegistry/theme'
 import { ThemeProvider } from '@mui/material'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import theme from '@/components/ThemeRegistry/theme'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 import {
+	isNavigationContentItem,
 	Navigation,
 	type NavigationGroup,
-	isNavigationContentItem,
 	type NavigationItem,
 } from '@/ui/organisms/Navigation'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 const scrollNavigationMargin = 8
 

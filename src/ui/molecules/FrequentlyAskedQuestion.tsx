@@ -1,7 +1,8 @@
-import { Box, type Typography } from '@mui/material'
-import { MarkdownBox } from '../atoms/MarkdownBox'
-import { AnchorHeader } from '../atoms/AnchorHeader'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import type { Typography } from '@mui/material'
+
+import { AnchorHeader } from '../atoms/AnchorHeader'
+import { MarkdownBox } from '../atoms/MarkdownBox'
 
 export default function FrequentlyAskedQuestion({
 	question,
@@ -17,11 +18,11 @@ export default function FrequentlyAskedQuestion({
 	children: string
 }): React.JSX.Element {
 	return (
-		<Box key={anchor}>
+		<div key={anchor}>
 			<AnchorHeader id={anchor} {...questionTypographyProps}>
 				<HelpOutlineIcon /> {question}
 			</AnchorHeader>
 			<MarkdownBox pTypography={answerTypographyProps}>{children}</MarkdownBox>
-		</Box>
+		</div>
 	)
 }

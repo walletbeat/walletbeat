@@ -1,19 +1,20 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, exempt } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { isSupported } from '@/schema/features/support'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { mergeRefs, refs } from '@/schema/reference'
+import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { isSupported } from '@/schema/features/support'
+import { mergeRefs, refs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating } from '../common'
 
 const brand = 'attributes.security.software_hw_integration'
 export type SoftwareHWIntegrationValue = Value & {
@@ -83,7 +84,7 @@ function basicHardwareWalletIntegration(
 			({ wallet }) => `
 				${wallet.metadata.displayName} should implement full EIP-712 clear signing support for transactions with
 				Safe, Aave, and other major DeFi platforms. This would ensure users can verify all transaction details on
-				their hardware devices before signing. ${wallet.metadata.displayName} should make sure to support the lastest hardware sdk such as  [Gridplus's](https://github.com/GridPlus/gridplus-sdk) or [Ledger's device management kit](https://developers.ledger.com/docs/device-interaction/getting-started).
+				their hardware devices before signing. ${wallet.metadata.displayName} should make sure to support the latest hardware sdk such as  [Gridplus's](https://github.com/GridPlus/gridplus-sdk) or [Ledger's device management kit](https://developers.ledger.com/docs/device-interaction/getting-started).
 			`,
 		),
 	}
@@ -279,22 +280,18 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		}
 
 		// Check if hardware wallet support feature exists
-		if (!features.security.hardwareWalletSupport) {
+		if (features.security.hardwareWalletSupport === null) {
 			return noHardwareWalletSupport()
 		}
 
 		// Check if any hardware wallets are supported
 		const hasHardwareWalletSupport = Object.values(
 			features.security.hardwareWalletSupport.supportedWallets,
-		).some(support => support && isSupported(support))
+		).some(isSupported)
 
 		const references = mergeRefs(
 			refs(features.security.hardwareWalletSupport),
-			refs(
-				features.security.hardwareWalletClearSigning == null
-					? {}
-					: features.security.hardwareWalletClearSigning,
-			),
+			refs(features.security.hardwareWalletDappSigning ?? {}),
 		)
 
 		if (!hasHardwareWalletSupport) {
@@ -308,9 +305,11 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		const supportedHardwareWallets = Object.entries(
 			features.security.hardwareWalletSupport.supportedWallets,
 		)
-			.filter(([_, support]) => support && isSupported(support))
+			.filter(([_, support]) => isSupported(support))
 			.map(([walletType]) => {
-				switch (walletType) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we are iterating over supportedWallets.
+				const type = walletType as HardwareWalletType
+				switch (type) {
 					case HardwareWalletType.LEDGER:
 						return 'Ledger'
 					case HardwareWalletType.TREZOR:
@@ -331,18 +330,18 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		// For now we'll use a placeholder implementation
 
 		// Placeholder for checking if Safe integration exists with clear signing
-		const hasSafeIntegration =
-			features.security.hardwareWalletClearSigning?.details?.includes('Safe') || false
+		const dappSigningDetails = features.security.hardwareWalletDappSigning?.details ?? ''
+		const hasSafeIntegration = dappSigningDetails.includes('Safe')
 
 		// Placeholder for checking if Aave integration exists with clear signing
-		const hasAaveIntegration =
-			features.security.hardwareWalletClearSigning?.details?.includes('Aave') || false
+		const hasAaveIntegration = dappSigningDetails.includes('Aave')
 
 		// Check how many hardware wallet brands are supported for these integrations
 		const supportedHWBrands = supportedHardwareWallets.length
 
 		// Generate base evaluation result
-		let result: Evaluation<SoftwareHWIntegrationValue>
+		let result: Evaluation<SoftwareHWIntegrationValue> =
+			basicHardwareWalletIntegration(supportedHardwareWallets)
 
 		// Determine integration level based on support
 		if (hasSafeIntegration && hasAaveIntegration && supportedHWBrands >= 2) {
@@ -356,8 +355,6 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 				supportedDApps.push('Aave')
 			}
 			result = goodHardwareWalletIntegration(supportedHardwareWallets, supportedDApps)
-		} else {
-			result = basicHardwareWalletIntegration(supportedHardwareWallets)
 		}
 
 		// Return result with references if any

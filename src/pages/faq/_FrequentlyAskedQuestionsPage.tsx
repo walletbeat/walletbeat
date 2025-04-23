@@ -1,8 +1,11 @@
-import { Typography, Divider } from '@mui/material'
-import { Box } from '@mui/system'
-import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion'
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
+import { Divider, Typography } from '@mui/material'
 import React from 'react'
+
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+import { type NonEmptyArray, nonEmptyConcat, nonEmptyMap } from '@/types/utils/non-empty'
+import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion'
+
 import {
 	navigationAbout,
 	navigationFaq,
@@ -10,9 +13,7 @@ import {
 	navigationHome,
 	navigationRepository,
 } from '../../components/navigation'
-import { type NonEmptyArray, nonEmptyConcat, nonEmptyMap } from '@/types/utils/non-empty'
 import type { NavigationContentItem } from '../../ui/organisms/Navigation'
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 
 interface FAQEntry {
 	anchor: string
@@ -353,9 +354,9 @@ export function FrequentlyAskedQuestionsPage(): React.JSX.Element {
 			<Typography id="faqHeader" variant="h1">
 				Walletbeat FAQ
 			</Typography>
-			<Box maxWidth="75vw" display="flex" flexDirection="column" alignItems="stretch">
+			<div className="max-w-7xl mx-auto flex flex-col items-stretch">
 				<FrequentlyAskedQuestions />
-			</Box>
+			</div>
 		</NavigationPageLayout>
 	)
 }

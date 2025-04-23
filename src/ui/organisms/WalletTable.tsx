@@ -1,29 +1,37 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/strict-boolean-expressions - Disabled for integration with tanstack table */
-import * as React from 'react'
-import { useState, useEffect, useMemo } from 'react'
-import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table'
-import { ratedWallets } from '@/data/wallets'
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import {
-	securityAttributeGroup,
-	privacyAttributeGroup,
-	selfSovereigntyAttributeGroup,
-	transparencyAttributeGroup,
-	ecosystemAttributeGroup,
-} from '@/schema/attribute-groups'
-import { Rating, type AttributeGroup } from '@/schema/attributes'
-import type { EvaluationTree } from '@/schema/attribute-groups'
-import { RatingDetailModal } from '../molecules/RatingDetailModal'
-import { HardwareWalletManufactureType } from '@/schema/features/profile'
-import { WebIcon, MobileIcon, DesktopIcon } from '@/icons'
-import { HardwareIcon } from '@/icons/devices/HardwareIcon'
-import { EipPreviewModal } from '../molecules/EipPreviewModal'
-import { EipPrefix } from '@/schema/eips'
+	type Cell,
+	type CellContext,
+	type ColumnDef,
+	createColumnHelper,
+	flexRender,
+	getCoreRowModel,
+	type Row,
+	useReactTable,
+} from '@tanstack/react-table'
+import React, { useEffect, useMemo, useState } from 'react'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
-import { walletSupportedAccountTypes, type RatedWallet } from '@/schema/wallet'
+import { PiDesktop, PiDeviceMobile, PiDeviceMobileSlash, PiGlobe, PiGlobeX } from 'react-icons/pi'
+
+import { eip7702 } from '@/data/eips/eip-7702'
+import { erc4337 } from '@/data/eips/erc-4337'
+import { ratedHardwareWallets, unratedHardwareWallet } from '@/data/hardware-wallets'
+import { ratedWallets, unratedWallet } from '@/data/wallets'
+import { HardwareIcon } from '@/icons/devices/HardwareIcon'
+import type { EvaluationTree } from '@/schema/attribute-groups'
+import {
+	getAttributeGroupInTree,
+	mapNonExemptAttributeGroupsInTree,
+} from '@/schema/attribute-groups'
+import type { AttributeGroup, ValueSet } from '@/schema/attributes'
+import type { Eip } from '@/schema/eips'
 import { AccountType } from '@/schema/features/account-support'
-import { setContains, type NonEmptySet } from '@/types/utils/non-empty'
+import { HardwareWalletManufactureType } from '@/schema/features/profile'
 import { hasVariant, Variant } from '@/schema/variants'
+import { type RatedWallet, walletSupportedAccountTypes } from '@/schema/wallet'
+import { type NonEmptySet, setContains } from '@/types/utils/non-empty'
+
+import { EipPreviewModal } from '../molecules/EipPreviewModal'
+import { PizzaSliceChart } from './PizzaSliceChart'
 
 // Define wallet type constants from the previous implementation
 const WalletTypeCategory = {
@@ -143,10 +151,10 @@ function getDetailedWalletDescription(wallet: RatedWallet): string {
 	if (hasSmartWallet) {
 		typeDescriptions.push(
 			`Smart Wallet (${[
-				standards.ERC_4337 ? SMART_WALLET_STANDARD_DISPLAY['ERC_4337'] : null,
-				standards.ERC_7702 ? SMART_WALLET_STANDARD_DISPLAY['ERC_7702'] : null,
+				standards.ERC_4337 ? SMART_WALLET_STANDARD_DISPLAY.ERC_4337 : null,
+				standards.ERC_7702 ? SMART_WALLET_STANDARD_DISPLAY.ERC_7702 : null,
 			]
-				.filter(val => val !== null)
+				.filter((val): val is string => val !== null)
 				.join(', ')})`,
 		)
 	}
@@ -161,8 +169,8 @@ function getDetailedWalletDescription(wallet: RatedWallet): string {
 // Helper function to get hardware wallet manufacture type display name
 function getHardwareWalletManufactureTypeDisplay(wallet: RatedWallet): string {
 	const manufactureType = wallet.metadata.hardwareWalletManufactureType
-	if (manufactureType !== undefined && manufactureType !== null) {
-		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType] || 'Unknown'
+	if (manufactureType !== undefined) {
+		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType]
 	}
 	return 'Unknown'
 }
@@ -178,7 +186,7 @@ function walletSupportsVariant(wallet: RatedWallet, variant: DeviceVariant): boo
 		return hasVariant(wallet.variants, Variant.HARDWARE)
 	}
 
-	return Boolean(wallet.variants && variant in wallet.variants)
+	return variant in wallet.variants
 }
 
 // Helper function to get device-specific evaluation tree
@@ -188,208 +196,12 @@ function getEvaluationTree(wallet: RatedWallet, selectedVariant: DeviceVariant):
 		return wallet.overall
 	}
 
-	if (selectedVariant === DeviceVariant.NONE || !wallet.variants) {
+	if (selectedVariant === DeviceVariant.NONE) {
 		return wallet.overall
 	}
 
 	const variantData = wallet.variants[selectedVariant]
-	return variantData ? variantData.attributes : wallet.overall
-}
-
-// Helper function to extract attribute ratings from evaluation tree
-function getAttributeRatings(
-	attrGroup: AttributeGroup<any>,
-	evalTree: EvaluationTree,
-): { rating: Rating; id: string }[] {
-	const attributes: { rating: Rating; id: string }[] = []
-
-	try {
-		// Get the category key and data safely
-		const categoryKey = attrGroup.id as keyof EvaluationTree
-		const categoryData = evalTree[categoryKey]
-
-		if (!categoryData) {
-			return attributes
-		}
-
-		// We need to handle the categoryData as a dynamic object
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const dataObj = categoryData as Record<string, any>
-
-		// Extract ratings from attributes
-		for (const key in dataObj) {
-			if (Object.prototype.hasOwnProperty.call(dataObj, key)) {
-				const evalAttr = dataObj[key]
-
-				// Check if evaluation data is present and has a rating
-				if (evalAttr?.evaluation?.value?.rating !== undefined) {
-					const rating = evalAttr.evaluation.value.rating
-
-					// Skip exempt ratings
-					if (rating !== Rating.EXEMPT) {
-						attributes.push({
-							id: key,
-							rating: rating as Rating,
-						})
-					}
-				}
-			}
-		}
-	} catch (e) {
-		// eslint-disable-next-line no-console -- Error logging needed for debugging
-		console.error(`Error extracting ratings for ${attrGroup.id}:`, e)
-	}
-
-	return attributes
-}
-
-// Pizza Slice Chart Component (inspired by WalletTableStylingExample)
-function PizzaSliceChart({
-	attrGroup,
-	evalTree,
-	isSupported = true,
-	walletId,
-}: {
-	attrGroup: AttributeGroup<any>
-	evalTree: EvaluationTree
-	isSupported?: boolean
-	walletId: string
-}): React.ReactElement {
-	// Add state for the modal
-	const [modalOpen, setModalOpen] = useState(false)
-
-	// Get attribute ratings and calculate overall score
-	const attributeRatings = getAttributeRatings(attrGroup, evalTree)
-	const attributeCount = attributeRatings.length > 0 ? attributeRatings.length : 4 // Default to 4 if no attributes
-	let overallScore = 0
-
-	try {
-		// Calculate the overall score safely
-		const categoryKey = attrGroup.id as keyof EvaluationTree
-		const categoryData = evalTree[categoryKey]
-
-		// Only proceed if we have both category data and a score function
-		if (!categoryData || typeof attrGroup.score !== 'function') {
-			// If missing data, leave overallScore as 0
-		} else {
-			// Type assertions needed due to complexity of types
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call
-			const scoreResult = attrGroup.score(categoryData as any)
-
-			// Check for valid score result with safe object property access
-			if (typeof scoreResult === 'object' && scoreResult !== null && 'score' in scoreResult) {
-				// Safe access to score property
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-				overallScore = scoreResult.score
-			}
-		}
-	} catch (e) {
-		// eslint-disable-next-line no-console -- Error logging needed for debugging
-		console.error(`Error calculating score for ${attrGroup.id}:`, e)
-	}
-
-	const tooltipText = `${attrGroup.displayName}: ${Math.round(overallScore * 100)}% (${attributeCount} attributes)`
-
-	// Generate the actual slice colors from the real data
-	const sliceColors = attributeRatings.map(attr => {
-		switch (attr.rating) {
-			case Rating.PASS:
-				return 'var(--rating-pass)'
-			case Rating.PARTIAL:
-				return 'var(--rating-partial)'
-			case Rating.FAIL:
-				return 'var(--rating-fail)'
-			default:
-				return 'var(--rating-neutral)'
-		}
-	})
-
-	// If we don't have any ratings, use default colors
-	if (sliceColors.length === 0) {
-		for (let i = 0; i < 4; i++) {
-			sliceColors.push('var(--rating-neutral)')
-		}
-	}
-
-	// Create SVG slices for cleaner rendering with gaps
-	const createSlices = () => {
-		const slices = []
-		const centerX = 50
-		const centerY = 50
-		const radius = 45
-		const gapAngle = 2 // Gap in degrees
-
-		const sliceAngle = 360 / attributeCount - gapAngle
-
-		for (let i = 0; i < attributeCount; i++) {
-			const startAngle = i * (sliceAngle + gapAngle)
-			const endAngle = startAngle + sliceAngle
-
-			// Convert angles to radians
-			const startRad = ((startAngle - 90) * Math.PI) / 180
-			const endRad = ((endAngle - 90) * Math.PI) / 180
-
-			// Calculate coordinates
-			const x1 = centerX + radius * Math.cos(startRad)
-			const y1 = centerY + radius * Math.sin(startRad)
-			const x2 = centerX + radius * Math.cos(endRad)
-			const y2 = centerY + radius * Math.sin(endRad)
-
-			// Create path for the slice
-			const largeArcFlag = sliceAngle > 180 ? 1 : 0
-
-			const pathData = `
-				M ${centerX} ${centerY}
-				L ${x1} ${y1}
-				A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
-				Z
-			`
-
-			slices.push(
-				<path key={i} d={pathData} fill={sliceColors[i]} stroke="#ffffff" strokeWidth="1" />,
-			)
-		}
-
-		return slices
-	}
-
-	// Handle click on the pie chart
-	const handlePieClick = () => {
-		if (isSupported) {
-			setModalOpen(true)
-		}
-	}
-
-	// Create the pizza slice visualization with the correct number of slices
-	return (
-		<>
-			<div className={`flex flex-col items-center ${!isSupported ? 'opacity-40' : ''}`}>
-				<div
-					className={`w-10 h-10 rounded-full bg-white overflow-hidden relative ${isSupported ? 'cursor-pointer hover:shadow-md' : 'cursor-help'}`}
-					title={tooltipText}
-					onClick={handlePieClick}
-				>
-					<svg viewBox="0 0 100 100" className="w-full h-full">
-						{createSlices()}
-					</svg>
-				</div>
-			</div>
-
-			{/* Rating Detail Modal */}
-			{isSupported && (
-				<RatingDetailModal
-					open={modalOpen}
-					onClose={() => {
-						setModalOpen(false)
-					}}
-					attrGroup={attrGroup}
-					evalTree={evalTree}
-					attributeRatings={attributeRatings}
-					walletId={walletId}
-				/>
-			)}
-		</>
-	)
+	return variantData !== undefined ? variantData.attributes : wallet.overall
 }
 
 // Define hardware wallet models
@@ -400,116 +212,18 @@ interface HardwareWalletModel {
 	isFlagship?: boolean
 }
 
-// Hardware wallet models by brand
-const hardwareWalletModels: Record<string, HardwareWalletModel[]> = {
-	ledger: [
-		{
-			id: 'ledger-stax',
-			name: 'Ledger Stax',
-			url: 'https://shop.ledger.com/products/ledger-stax',
-			isFlagship: true,
-		},
-		{
-			id: 'ledger-nano-s',
-			name: 'Ledger Nano S',
-			url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
-			isFlagship: false,
-		},
-		{
-			id: 'ledger-nano-s-plus',
-			name: 'Ledger Nano S+',
-			url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
-			isFlagship: false,
-		},
-		{
-			id: 'ledger-nano-x',
-			name: 'Ledger Nano X',
-			url: 'https://shop.ledger.com/products/ledger-nano-x',
-			isFlagship: false,
-		},
-		{
-			id: 'ledger-flex',
-			name: 'Ledger Flex',
-			url: 'https://shop.ledger.com/products/ledger-flex',
-			isFlagship: false,
-		},
-	],
-	trezor: [
-		{
-			id: 'trezor-safe-5',
-			name: 'Trezor Safe 5',
-			url: 'https://trezor.io/trezor-safe-5',
-			isFlagship: true,
-		},
-		{
-			id: 'trezor-safe-3',
-			name: 'Trezor Safe 3',
-			url: 'https://trezor.io/trezor-safe-3',
-			isFlagship: false,
-		},
-		{
-			id: 'trezor-model-one',
-			name: 'Trezor Model One',
-			url: 'https://trezor.io/trezor-model-one',
-			isFlagship: false,
-		},
-		{
-			id: 'trezor-model-t',
-			name: 'Trezor Model T',
-			url: 'https://trezor.io/trezor-model-t',
-			isFlagship: false,
-		},
-	],
-	keystone: [
-		{
-			id: 'keystone-pro',
-			name: 'Keystone Pro',
-			url: 'https://keyst.one/pro',
-			isFlagship: true,
-		},
-		{
-			id: 'keystone-essential',
-			name: 'Keystone Essential',
-			url: 'https://keyst.one/essential',
-			isFlagship: false,
-		},
-	],
-	gridplus: [
-		{
-			id: 'gridplus-lattice1',
-			name: 'GridPlus Lattice1',
-			url: 'https://gridplus.io/products/lattice1',
-			isFlagship: true,
-		},
-	],
-	firefly: [
-		{ id: 'firefly-v1', name: 'Firefly V1', url: 'https://firefly.technology/', isFlagship: true },
-	],
-}
-
 // Helper function to get models for a wallet brand
-function getHardwareWalletModels(walletId: string): HardwareWalletModel[] {
-	// First check if the wallet has models in its metadata
-	const wallet = ratedHardwareWallets[walletId as keyof typeof ratedHardwareWallets]
-	if (
-		wallet &&
-		wallet.metadata.hardwareWalletModels &&
-		wallet.metadata.hardwareWalletModels.length > 0
-	) {
-		return wallet.metadata.hardwareWalletModels
-	}
-
-	// Fallback to the hardcoded models if no models in metadata
-	return hardwareWalletModels[walletId] || []
+function getHardwareWalletModels(wallet: RatedWallet): HardwareWalletModel[] {
+	return wallet.metadata.hardwareWalletModels ?? []
 }
 
 // Helper function to get flagship model for a wallet brand
-function getFlagshipModel(walletId: string): HardwareWalletModel | undefined {
-	const models = getHardwareWalletModels(walletId)
+function getFlagshipModel(wallet: RatedWallet): HardwareWalletModel | undefined {
+	const models = getHardwareWalletModels(wallet)
 	// First, try to find a model explicitly marked as flagship
-	const flagshipModel = models.find(model => model.isFlagship)
+	const flagshipModel = models.find(model => model.isFlagship === true)
 	// If no flagship is explicitly marked, return the first model as default
-	return flagshipModel || models[0]
+	return flagshipModel ?? models[0]
 }
 
 // TableRow interface for better type safety
@@ -542,19 +256,13 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets)
 		let sortPriority = 3 // Default to EOA only
 
 		if (hasSmartWallet) {
-			if (hasEoa) {
-				sortPriority = 2 // Both Smart Wallet & EOA
-			} else {
-				sortPriority = 1 // Smart Wallet only
-			}
-		} else if (hasEoa) {
-			sortPriority = 3 // EOA only
+			sortPriority = hasEoa ? 2 : 1 // 2 for both, 1 for Smart Wallet only
 		}
 
 		return {
 			id: wallet.metadata.id,
 			name: wallet.metadata.displayName,
-			wallet: wallet,
+			wallet,
 			typeDescription: detailedType,
 			standards,
 			websiteUrl,
@@ -564,26 +272,30 @@ const softwareWalletData: TableRow[] = Object.values(ratedWallets)
 	.sort((a, b) => a.sortPriority - b.sortPriority)
 
 // Create hardware wallet table data
-const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets).map(wallet => {
-	const manufactureType = getHardwareWalletManufactureTypeDisplay(wallet)
-	const websiteUrl =
-		typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
-			? wallet.metadata.url
-			: 'Not available'
+const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets)
+	.map(wallet => {
+		const manufactureType = getHardwareWalletManufactureTypeDisplay(wallet)
+		const websiteUrl =
+			typeof wallet.metadata.url === 'string' && wallet.metadata.url !== ''
+				? wallet.metadata.url
+				: 'Not available'
 
-	return {
-		id: wallet.metadata.id,
-		name: wallet.metadata.displayName,
-		wallet: wallet,
-		manufactureType,
-		websiteUrl,
-		sortPriority: 0,
-	}
-})
+		return {
+			id: wallet.metadata.id,
+			name: wallet.metadata.displayName,
+			wallet,
+			manufactureType,
+			websiteUrl,
+			sortPriority: 0,
+		}
+	})
+	.sort((a, b) => a.name.localeCompare(b.name))
 
 // Create a reusable cell renderer for wallet name columns
-function createWalletNameCell(isHardware: boolean) {
-	return ({ row, getValue }: { row: any; getValue: () => any }) => {
+function createWalletNameCell(
+	isHardware: boolean,
+): ({ row }: { row: Row<TableRow> }) => React.ReactNode {
+	const createCell = ({ row }: { row: Row<TableRow> }): React.ReactNode => {
 		// Regular row rendering with logo
 		const walletId = row.original.wallet.metadata.id
 		const logoPath = isHardware
@@ -594,7 +306,7 @@ function createWalletNameCell(isHardware: boolean) {
 			: '/images/wallets/default.svg'
 
 		// Create the wallet detail URL
-		const walletUrl = `/${walletId}`
+		const walletUrl = `/${isHardware ? 'hww' : 'wallet'}/${walletId}`
 
 		return (
 			<div className="flex items-center">
@@ -615,23 +327,16 @@ function createWalletNameCell(isHardware: boolean) {
 					href={walletUrl}
 					className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
 				>
-					{getValue()}
+					{row.original.wallet.metadata.displayName}
 				</a>
 			</div>
 		)
 	}
+	return createCell
 }
 
 // Helper function for EIP standards with hover preview (non-link version)
-function EipStandardTag({
-	standard,
-	standardNumber,
-	prefix,
-}: {
-	standard: string
-	standardNumber: string
-	prefix: string
-}): React.ReactElement {
+function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 	const [isHovered, setIsHovered] = useState<boolean>(false)
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
@@ -639,7 +344,7 @@ function EipStandardTag({
 		<React.Fragment>
 			<span
 				className="eip-tag text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f] relative z-10 cursor-help"
-				title={`${prefix}-${standardNumber} - Hover for details`}
+				title={`${standard.prefix}-${standard.number} - Hover for details`}
 				onMouseEnter={e => {
 					setIsHovered(true)
 					setAnchorEl(e.currentTarget)
@@ -649,20 +354,18 @@ function EipStandardTag({
 					setTimeout(() => {
 						// Only close if not hovering the modal
 						const modalElement = document.querySelector('.eip-preview-modal')
-						if (modalElement && modalElement.matches(':hover')) {
-							return
+						if (modalElement === null || modalElement.matches(':hover')) {
+							setIsHovered(false)
+							setAnchorEl(null)
 						}
-						setIsHovered(false)
-						setAnchorEl(null)
 					}, 100)
 				}}
 			>
-				#{standardNumber}
+				#{standard.number}
 			</span>
-			{isHovered && anchorEl && (
+			{isHovered && anchorEl !== null && (
 				<EipPreviewModal
-					eipNumber={standardNumber}
-					eipPrefix={prefix}
+					eip={standard}
 					anchorEl={anchorEl}
 					onClose={() => {
 						setIsHovered(false)
@@ -679,135 +382,75 @@ function ExpandableHardwareWalletRow({
 	row,
 	columns,
 }: {
-	row: any
-	columns: any[]
+	row: Row<TableRow>
+	columns: Array<ColumnDef<TableRow, CellValue>>
 }): React.ReactElement {
 	const [isExpanded, setIsExpanded] = useState(false)
 	const [selectedModel, setSelectedModel] = useState<string | null>(null)
-	const [selectedModelVariant, setSelectedModelVariant] = useState<DeviceVariant>(
-		DeviceVariant.HARDWARE,
-	)
 
-	const walletId = row.original.id
 	const wallet = row.original.wallet
-	const models = getHardwareWalletModels(walletId)
-	const flagshipModel = getFlagshipModel(walletId)
+	const models = getHardwareWalletModels(wallet)
+	const flagshipModel = getFlagshipModel(wallet)
 
 	// Set the flagship model as the default selected model
 	useEffect(() => {
 		// Always have a selected model, even if there's only one
-		if (models.length > 0 && !selectedModel) {
+		if (models.length > 0 && selectedModel === null) {
 			// If there's a flagship model, use it, otherwise use the first model
-			const modelToSelect = flagshipModel ? flagshipModel.id : models[0].id
+			const modelToSelect = flagshipModel !== undefined ? flagshipModel.id : models[0].id
 			setSelectedModel(modelToSelect)
 		}
 	}, [flagshipModel, models, selectedModel])
 
-	// Get the currently selected model name
-	const selectedModelName = selectedModel
-		? models.find(m => m.id === selectedModel)?.name
-		: models.length > 0
-			? models[0].name
-			: ''
-
-	// Check if the selected model is the flagship
-	const isSelectedFlagship = selectedModel
-		? models.find(m => m.id === selectedModel)?.isFlagship
-		: false
+	// Get the currently selected model name (used in wallet name column only)
+	const selectedModelName =
+		selectedModel !== null
+			? (models.find(m => m.id === selectedModel)?.name ?? '')
+			: models.length > 0
+				? models[0].name
+				: ''
 
 	// Toggle expansion of the models list
-	const toggleExpanded = () => {
+	const toggleExpanded = (): void => {
 		setIsExpanded(!isExpanded)
 	}
 
 	// Handle click on a model
-	const handleModelClick = (modelId: string) => {
+	const handleModelClick = (modelId: string): void => {
 		setSelectedModel(modelId)
 	}
 
+	const evalTree = getEvaluationTree(wallet, DeviceVariant.HARDWARE)
+	const perAttributeGroupCells: React.JSX.Element[] = mapNonExemptAttributeGroupsInTree(
+		evalTree,
+		(attrGroup, evalGroup) => (
+			<PizzaSliceChart
+				attrGroup={attrGroup}
+				evalGroup={evalGroup}
+				isSupported={true}
+				wallet={wallet}
+			/>
+		),
+	)
+
 	// Create updated cells for rating data
-	const createUpdatedCell = (cell: any, columnIndex: number) => {
+	const createUpdatedCell = (
+		cell: Cell<TableRow, unknown>,
+		columnIndex: number,
+	): React.ReactNode => {
 		// Skip first two columns (Wallet name and Manufacture Type)
 		if (columnIndex < 2) {
-			return cell && cell.column && cell.column.columnDef && cell.column.columnDef.cell
-				? flexRender(cell.column.columnDef.cell, cell.getContext())
-				: null
+			return flexRender(cell.column.columnDef.cell, cell.getContext())
 		}
-
-		// Handle Rating data columns (Security, Privacy, etc.)
-		if (columnIndex >= 3) {
-			if (!cell || !cell.getValue) {
-				return null
-			}
-
-			const cellValue = cell.getValue()
-
-			if (!cellValue) {
-				return null
-			}
-
-			const { evalTree, walletId } = cellValue
-
-			// Get the column name from the header to determine which attribute group to use
-			if (!cell.column || !cell.column.columnDef || !cell.column.columnDef.header) {
-				return null
-			}
-
-			const headerText = cell.column.columnDef.header as string
-			let attrGroup
-
-			switch (headerText) {
-				case 'Security':
-					attrGroup = securityAttributeGroup
-					break
-				case 'Privacy':
-					attrGroup = privacyAttributeGroup
-					break
-				case 'Sovereignty':
-					attrGroup = selfSovereigntyAttributeGroup
-					break
-				case 'Transparency':
-					attrGroup = transparencyAttributeGroup
-					break
-				case 'Ecosystem':
-					attrGroup = ecosystemAttributeGroup
-					break
-				default:
-					// For other columns, just render the default cell
-					return cell && cell.column && cell.column.columnDef && cell.column.columnDef.cell
-						? flexRender(cell.column.columnDef.cell, cell.getContext())
-						: null
-			}
-
-			// For now, with mock model data, we simply return the same pizza slice chart
-			// When model-specific data is available, we would modify evalTree based on the model
-			const modelName = selectedModel ? models.find(m => m.id === selectedModel)?.name : ''
-
-			return (
-				<div className="flex flex-col items-center">
-					{modelName && (
-						<div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{modelName}</div>
-					)}
-					<PizzaSliceChart
-						attrGroup={attrGroup}
-						evalTree={evalTree}
-						isSupported={true}
-						walletId={walletId}
-					/>
-				</div>
-			)
-		}
-
-		// For other columns (like the device icon column)
-		return flexRender(cell.column.columnDef.cell, cell.getContext())
+		return perAttributeGroupCells[columnIndex - 2]
 	}
 
 	// Sort models to place flagship first
 	const sortedModels = [...models].sort((a, b) => {
-		if (a.isFlagship) {
+		if (a.isFlagship === true) {
 			return -1
 		}
-		if (b.isFlagship) {
+		if (b.isFlagship === true) {
 			return 1
 		}
 		return 0
@@ -820,6 +463,9 @@ function ExpandableHardwareWalletRow({
 				className={`dark:bg-[#141414] dark:hover:bg-[#1a1a1a] cursor-pointer`}
 				onClick={toggleExpanded}
 			>
+				{/* Rank column */}
+				<td className="px-4 py-2 dark:text-gray-200 text-center">{row.index + 1}</td>
+				{/* Wallet cell */}
 				<td className="px-4 py-2 dark:text-gray-200">
 					<div className="flex items-center">
 						{models.length > 1 ? (
@@ -834,7 +480,7 @@ function ExpandableHardwareWalletRow({
 						{/* Wallet Logo */}
 						<div className="flex-shrink-0 mr-3">
 							<img
-								src={`/images/hardware-wallets/${walletId}.svg`}
+								src={`/images/hardware-wallets/${wallet.metadata.id}.svg`}
 								alt=""
 								className="w-6 h-6 object-contain"
 								onError={e => {
@@ -844,55 +490,51 @@ function ExpandableHardwareWalletRow({
 							/>
 						</div>
 						{/* Wallet Name */}
-						<a
-							href={`/${walletId}`}
-							className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
-						>
-							{row.original.name}
-						</a>
-						{/* Always show model name, but only show flagship indicator in expanded view */}
-						<span className="ml-2 text-xs flex items-center">
-							<span className="text-purple-500 dark:text-purple-400 font-medium">
-								{selectedModelName}
+						<div className="flex flex-col items-start">
+							<a
+								href={`/hww/${wallet.metadata.id}`}
+								className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
+							>
+								{row.original.name}
+							</a>
+							{/* Always show model name, but only show flagship indicator in expanded view */}
+							<span className="text-xs flex items-center">
+								<span className="text-purple-500 dark:text-purple-400 font-medium">
+									{selectedModelName}
+								</span>
 							</span>
-						</span>
+						</div>
 					</div>
 				</td>
-				{row &&
-					row.getVisibleCells &&
-					row
-						.getVisibleCells()
-						.slice(1)
-						.map((cell: any, index: number) => (
-							<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
-								{index === 0 &&
-								cell &&
-								cell.column &&
-								cell.column.columnDef &&
-								cell.column.columnDef.cell
-									? // This is the "Manufacture Type" column
-										flexRender(cell.column.columnDef.cell, cell.getContext())
-									: createUpdatedCell(cell, index + 1)}
-							</td>
-						))}
+				{row
+					.getVisibleCells()
+					.slice(2)
+					.map((cell: Cell<TableRow, unknown>, index: number) => (
+						<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
+							{createUpdatedCell(cell, index)}
+						</td>
+					))}
 			</tr>
 
 			{isExpanded && models.length > 1 && (
 				<tr className="bg-gray-50 dark:bg-[#1a1a1a]">
-					<td colSpan={columns && columns.length ? columns.length : 8} className="p-0">
+					<td colSpan={columns.length > 0 ? columns.length : 8} className="p-0">
 						<div className="pl-10 pr-4 py-3">
 							<div className="text-sm font-medium mb-2 dark:text-gray-200">Models:</div>
 							<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-								{sortedModels.map((model, index) => (
+								{sortedModels.map(model => (
 									<div
 										key={model.id}
-										className={`p-2 border rounded flex items-center ${
+										className={[
+											'p-2 border rounded flex items-center',
 											selectedModel === model.id
 												? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 dark:border-purple-700'
-												: 'border-gray-200 dark:border-gray-700'
-										} ${
-											model.isFlagship ? 'ring-1 ring-purple-300 dark:ring-purple-800' : ''
-										} cursor-pointer hover:border-purple-300 dark:hover:border-purple-500 transition-colors`}
+												: 'border-gray-200 dark:border-gray-700',
+											model.isFlagship === true
+												? 'ring-1 ring-purple-300 dark:ring-purple-800'
+												: '',
+											'cursor-pointer hover:border-purple-300 dark:hover:border-purple-500 transition-colors',
+										].join(' ')}
 										onClick={e => {
 											e.stopPropagation()
 											handleModelClick(model.id)
@@ -905,7 +547,7 @@ function ExpandableHardwareWalletRow({
 										></div>
 										<div className="flex-grow dark:text-gray-200 font-medium">
 											{model.name}
-											{model.isFlagship && (
+											{model.isFlagship === true && (
 												<span className="ml-1 text-xs text-purple-600 dark:text-purple-400 font-medium">
 													(Flagship)
 												</span>
@@ -916,7 +558,9 @@ function ExpandableHardwareWalletRow({
 											target="_blank"
 											rel="noopener noreferrer"
 											className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-											onClick={e => e.stopPropagation()}
+											onClick={e => {
+												e.stopPropagation()
+											}}
 										>
 											Website
 										</a>
@@ -931,6 +575,14 @@ function ExpandableHardwareWalletRow({
 	)
 }
 
+interface WalletTypeCell {
+	typeString: string
+	hasSmartWallet: boolean
+	standards: Record<SmartWalletStandard, boolean>
+}
+
+type CellValue = string | WalletTypeCell
+
 export default function WalletTable(): React.ReactElement {
 	// Add state for selected device variant and active tab
 	const [selectedVariant, setSelectedVariant] = useState<DeviceVariant>(DeviceVariant.NONE)
@@ -940,35 +592,32 @@ export default function WalletTable(): React.ReactElement {
 	// Calculate counts for each filter type
 	// IMPORTANT: We calculate these from the original data, not the filtered data
 	// to prevent circular dependencies and infinite loops
-	const eoaOnlyWalletCount = useMemo(() => {
-		return softwareWalletData.filter(row => {
-			if (!row || !row.wallet) {
-				return false
-			}
-			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
-			return hasEoa && !hasSmartWallet
-		}).length
-	}, [])
+	const eoaOnlyWalletCount = useMemo(
+		() =>
+			softwareWalletData.filter(row => {
+				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+				return hasEoa && !hasSmartWallet
+			}).length,
+		[],
+	)
 
-	const smartWalletOnlyCount = useMemo(() => {
-		return softwareWalletData.filter(row => {
-			if (!row || !row.wallet) {
-				return false
-			}
-			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
-			return hasSmartWallet && !hasEoa
-		}).length
-	}, [])
+	const smartWalletOnlyCount = useMemo(
+		() =>
+			softwareWalletData.filter(row => {
+				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+				return hasSmartWallet && !hasEoa
+			}).length,
+		[],
+	)
 
-	const smartWalletAndEoaCount = useMemo(() => {
-		return softwareWalletData.filter(row => {
-			if (!row || !row.wallet) {
-				return false
-			}
-			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
-			return hasSmartWallet && hasEoa
-		}).length
-	}, [])
+	const smartWalletAndEoaCount = useMemo(
+		() =>
+			softwareWalletData.filter(row => {
+				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+				return hasSmartWallet && hasEoa
+			}).length,
+		[],
+	)
 
 	// Filter the software wallet data based on the selected wallet type filter
 	const filteredSoftwareWalletData = useMemo(() => {
@@ -976,630 +625,321 @@ export default function WalletTable(): React.ReactElement {
 			return softwareWalletData
 		}
 
-		return softwareWalletData.filter(row => {
-			if (!row || !row.wallet) {
-				return false
-			}
+		return softwareWalletData.filter((row): boolean => {
 			const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
 
-			// For EOA_ONLY filter, check if the wallet has only EOA type
-			if (walletTypeFilter === WalletTypeFilter.EOA_ONLY) {
-				return hasEoa && !hasSmartWallet
-			}
-
-			// For SMART_WALLET_ONLY filter
-			if (walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY) {
-				return hasSmartWallet && !hasEoa
-			}
-
-			// For SMART_WALLET_AND_EOA filter
-			if (walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA) {
-				return hasSmartWallet && hasEoa
-			}
-
-			return true
+			return ((): boolean => {
+				switch (walletTypeFilter) {
+					case WalletTypeFilter.EOA_ONLY:
+						return hasEoa && !hasSmartWallet
+					case WalletTypeFilter.SMART_WALLET_ONLY:
+						return hasSmartWallet && !hasEoa
+					case WalletTypeFilter.SMART_WALLET_AND_EOA:
+						return hasSmartWallet && hasEoa
+				}
+			})()
 		})
 	}, [walletTypeFilter])
 
-	// Use the appropriate data based on active tab and filters
+	// Helper to compute overall score by summing each attribute group's score
+	function getOverallScore(wallet: RatedWallet): number {
+		const groupScores = mapNonExemptAttributeGroupsInTree(
+			wallet.overall,
+			(attrGroup, evalGroup) => attrGroup.score(evalGroup)?.score ?? 0,
+		)
+		return groupScores.reduce((sum, score) => sum + score, 0)
+	}
+
+	// Use the appropriate data based on active tab and filters and sort by overall score
 	const tableData = useMemo(() => {
-		return activeTab === WalletTableTab.SOFTWARE ? filteredSoftwareWalletData : hardwareWalletData
-	}, [activeTab, filteredSoftwareWalletData])
+		const data =
+			activeTab === WalletTableTab.SOFTWARE
+				? [...filteredSoftwareWalletData]
+				: [...hardwareWalletData]
+		data.sort((a, b) => getOverallScore(b.wallet) - getOverallScore(a.wallet))
+		return data
+	}, [activeTab, filteredSoftwareWalletData, hardwareWalletData])
 
 	// Handler for device variant change
-	const handleVariantChange = (variant: DeviceVariant) => {
+	const handleVariantChange = (variant: DeviceVariant): void => {
 		setSelectedVariant(variant === selectedVariant ? DeviceVariant.NONE : variant)
 	}
 
 	// Handler for tab change
-	const handleTabChange = (tab: WalletTableTab) => {
+	const handleTabChange = (tab: WalletTableTab): void => {
 		setActiveTab(tab)
 		// Reset wallet type filter when switching tabs
 		setWalletTypeFilter(WalletTypeFilter.ALL)
 	}
 
 	// Handler for wallet type filter change
-	const handleWalletTypeFilterChange = (filter: WalletTypeFilter) => {
+	const handleWalletTypeFilterChange = (filter: WalletTypeFilter): void => {
 		setWalletTypeFilter(filter)
 	}
 
 	// Define columns for software wallets
-	const softwareColumns = [
+	const columnHelper = createColumnHelper<TableRow>()
+	const rankColumn = columnHelper.display({
+		id: 'rank',
+		header: '#',
+		cell: ({ row }): React.ReactNode => row.index + 1,
+	})
+	const walletNameColumn = columnHelper.accessor(
+		(row: TableRow): CellValue => row.wallet.metadata.displayName,
 		{
+			id: 'wallet',
 			header: 'Wallet',
-			accessorKey: 'name',
-			cell: createWalletNameCell(false), // Use the shared function for software wallets
+			cell: createWalletNameCell(false),
 		},
-		{
-			header: 'Type',
-			accessorFn: (row: any) => {
-				const { hasEoa, hasSmartWallet, hasHardware, standards } = getWalletTypeInfo(
-					row.wallet,
-					'ALL_VARIANTS',
-				)
-				const typeString = [
-					hasEoa ? ('EOA' as WalletTypeCategory) : null,
-					hasSmartWallet ? ('SMART_WALLET' as WalletTypeCategory) : null,
-					hasHardware ? ('HARDWARE_WALLET' as WalletTypeCategory) : null,
-				]
-					.filter(val => val !== null)
-					.map(cat => WALLET_TYPE_DISPLAY[cat] || cat)
-					.join(' & ')
-				return { typeString, hasSmartWallet, standards }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
+	)
+	const walletTypeColumn = columnHelper.display({
+		id: 'type',
+		cell: (info: CellContext<TableRow, unknown>): React.ReactNode => {
+			const { hasEoa, hasSmartWallet, hasHardware, standards } = getWalletTypeInfo(
+				info.row.original.wallet,
+				'ALL_VARIANTS',
+			)
+			const typeString = [
+				hasEoa ? ('EOA' as WalletTypeCategory) : null,
+				hasSmartWallet ? ('SMART_WALLET' as WalletTypeCategory) : null,
+				hasHardware ? ('HARDWARE_WALLET' as WalletTypeCategory) : null,
+			]
+				.filter((val): val is WalletTypeCategory => val !== null)
+				.map(cat => (WALLET_TYPE_DISPLAY[cat] !== '' ? WALLET_TYPE_DISPLAY[cat] : cat))
+				.join(' & ')
+			// If no standards, just return the type string
+			if (!hasSmartWallet) {
+				return typeString
+			}
+			return (
+				<div>
+					<span>{typeString}</span>
+					<div className="mt-1 flex flex-wrap gap-1">
+						{Object.entries(standards).map(([std, supported]: [string, boolean]) => {
+							if (!supported) {
+								return null
+							}
 
-				const {
-					typeString,
-					hasSmartWallet,
-					standards,
-				}: {
-					typeString: string
-					hasSmartWallet: boolean
-					standards: Record<SmartWalletStandard, boolean>
-				} = value
-
-				// If no standards, just return the type string
-				if (!hasSmartWallet) {
-					return typeString
-				}
-
-				return (
-					<div>
-						<span>{typeString}</span>
-						<div className="mt-1 flex flex-wrap gap-1">
-							{Object.entries(standards).map(([std, supported]: [string, boolean]) => {
-								if (!supported) {
-									return null
-								}
-								const display = SMART_WALLET_STANDARD_DISPLAY[std as SmartWalletStandard] || std
-
-								// Add Markdown-style links for ERC standards
-								if (std === SmartWalletStandard.ERC_4337) {
-									return (
-										<EipStandardTag
-											key={std}
-											standard={std}
-											standardNumber="4337"
-											prefix={EipPrefix.ERC}
-										/>
-									)
-								} else if (std === SmartWalletStandard.ERC_7702) {
-									return (
-										<EipStandardTag
-											key={std}
-											standard={std}
-											standardNumber="7702"
-											prefix={EipPrefix.EIP}
-										/>
-									)
-								} else {
-									return (
-										<span
-											key={std}
-											className="text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-300"
-										>
-											{display}
-										</span>
-									)
-								}
-							})}
-						</div>
+							// Add Markdown-style links for ERC standards
+							if (std === SmartWalletStandard.ERC_4337) {
+								return <EipStandardTag key={std} standard={erc4337} />
+							} else if (std === SmartWalletStandard.ERC_7702) {
+								return <EipStandardTag key={std} standard={eip7702} />
+							} else {
+								return null // Return null for other standards like 'OTHER'
+							}
+						})}
 					</div>
-				)
-			},
+				</div>
+			)
 		},
-		// Remove Website column
-		// Add Device Support column
-		{
-			header: 'Risk by device',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const supportsWeb = Boolean(wallet.variants?.browser)
-				const supportsMobile = Boolean(wallet.variants?.mobile)
-				const supportsDesktop = Boolean(wallet.variants?.desktop)
-				const hasVariants = supportsWeb || supportsMobile || supportsDesktop
+	})
+	const walletVariantColumn = columnHelper.display({
+		id: 'risk',
+		header: 'By device',
+		cell: ({ row }): React.ReactNode => {
+			const wallet = row.original.wallet
+			const supportsBrowser = hasVariant(wallet.variants, Variant.BROWSER)
+			const supportsMobile = hasVariant(wallet.variants, Variant.MOBILE)
+			const supportsDesktop = hasVariant(wallet.variants, Variant.DESKTOP)
 
-				return {
-					supportsWeb,
-					supportsMobile,
-					supportsDesktop,
-					hasVariants,
-				}
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { supportsWeb, supportsMobile, supportsDesktop } = value
-
-				return (
-					<div className="flex space-x-0 items-center">
-						<div className="flex flex-col items-center group">
-							<button
-								className={`p-2 rounded-md transition-colors ${
-									!supportsWeb
-										? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
-										: selectedVariant === DeviceVariant.WEB
-											? 'text-[var(--active)]'
-											: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
-								}`}
-								onClick={() => {
-									if (supportsWeb) {
-										handleVariantChange(DeviceVariant.WEB)
-									}
-								}}
-								title={supportsWeb ? 'Web/Browser' : 'Web/Browser (Not Supported)'}
-								disabled={!supportsWeb}
-							>
-								<WebIcon />
-							</button>
-							<div
-								className={`w-2 h-2 rounded-full mt-1 transition-colors ${
-									!supportsWeb
-										? 'bg-[var(--background-tertiary)]'
-										: selectedVariant === DeviceVariant.WEB
-											? 'bg-[var(--active)]'
-											: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
-								}`}
-							/>
-						</div>
-						<div className="flex flex-col items-center group">
-							<button
-								className={`p-2 rounded-md transition-colors ${
-									!supportsMobile
-										? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
-										: selectedVariant === DeviceVariant.MOBILE
-											? 'text-[var(--active)]'
-											: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
-								}`}
-								onClick={() => {
-									if (supportsMobile) {
-										handleVariantChange(DeviceVariant.MOBILE)
-									}
-								}}
-								title={supportsMobile ? 'Mobile' : 'Mobile (Not Supported)'}
-								disabled={!supportsMobile}
-							>
-								<MobileIcon />
-							</button>
-							<div
-								className={`w-2 h-2 rounded-full mt-1 transition-colors ${
-									!supportsMobile
-										? 'bg-[var(--background-tertiary)]'
-										: selectedVariant === DeviceVariant.MOBILE
-											? 'bg-[var(--active)]'
-											: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
-								}`}
-							/>
-						</div>
-						<div className="flex flex-col items-center group">
-							<button
-								className={`p-2 rounded-md transition-colors ${
-									!supportsDesktop
-										? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
-										: selectedVariant === DeviceVariant.DESKTOP
-											? 'text-[var(--active)]'
-											: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
-								}`}
-								onClick={() => {
-									if (supportsDesktop) {
-										handleVariantChange(DeviceVariant.DESKTOP)
-									}
-								}}
-								title={supportsDesktop ? 'Desktop' : 'Desktop (Not Supported)'}
-								disabled={!supportsDesktop}
-							>
-								<DesktopIcon />
-							</button>
-							<div
-								className={`w-2 h-2 rounded-full mt-1 transition-colors ${
-									!supportsDesktop
-										? 'bg-[var(--background-tertiary)]'
-										: selectedVariant === DeviceVariant.DESKTOP
-											? 'bg-[var(--active)]'
-											: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
-								}`}
-							/>
-						</div>
+			return (
+				<div className="flex space-x-0 items-center">
+					<div className="flex flex-col items-center group">
+						<button
+							className={`text-2xl p-2 rounded-md transition-colors ${
+								!supportsBrowser
+									? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
+									: selectedVariant === DeviceVariant.WEB
+										? 'text-[var(--active)]'
+										: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
+							}`}
+							onClick={() => {
+								if (supportsBrowser) {
+									handleVariantChange(DeviceVariant.WEB)
+								}
+							}}
+							title={supportsBrowser ? 'Web/Browser' : 'Web/Browser (Not Supported)'}
+							disabled={!supportsBrowser}
+						>
+							{supportsBrowser ? <PiGlobe /> : <PiGlobeX />}
+						</button>
+						<div
+							className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+								!supportsBrowser
+									? 'bg-[var(--background-tertiary)]'
+									: selectedVariant === DeviceVariant.WEB
+										? 'bg-[var(--active)]'
+										: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
+							}`}
+						/>
 					</div>
-				)
-			},
+					<div className="flex flex-col items-center group">
+						<button
+							className={`text-2xl p-2 rounded-md transition-colors ${
+								!supportsMobile
+									? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
+									: selectedVariant === DeviceVariant.MOBILE
+										? 'text-[var(--active)]'
+										: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
+							}`}
+							onClick={() => {
+								if (supportsMobile) {
+									handleVariantChange(DeviceVariant.MOBILE)
+								}
+							}}
+							title={supportsMobile ? 'Mobile' : 'Mobile (Not Supported)'}
+							disabled={!supportsMobile}
+						>
+							{supportsMobile ? <PiDeviceMobile /> : <PiDeviceMobileSlash />}
+						</button>
+						<div
+							className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+								!supportsMobile
+									? 'bg-[var(--background-tertiary)]'
+									: selectedVariant === DeviceVariant.MOBILE
+										? 'bg-[var(--active)]'
+										: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
+							}`}
+						/>
+					</div>
+					<div className="flex flex-col items-center group">
+						<button
+							className={`text-2xl p-2 rounded-md transition-colors ${
+								!supportsDesktop
+									? 'opacity-40 cursor-not-allowed text-[var(--text-tertiary)]'
+									: selectedVariant === DeviceVariant.DESKTOP
+										? 'text-[var(--active)]'
+										: 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
+							}`}
+							onClick={() => {
+								if (supportsDesktop) {
+									handleVariantChange(DeviceVariant.DESKTOP)
+								}
+							}}
+							title={supportsDesktop ? 'Desktop' : 'Desktop (Not Supported)'}
+							disabled={!supportsDesktop}
+						>
+							<PiDesktop />
+						</button>
+						<div
+							className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+								!supportsDesktop
+									? 'bg-[var(--background-tertiary)]'
+									: selectedVariant === DeviceVariant.DESKTOP
+										? 'bg-[var(--active)]'
+										: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
+							}`}
+						/>
+					</div>
+				</div>
+			)
 		},
-		// Add the five category columns
-		{
-			header: 'Security',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
+	})
+	const attributeGroupColumnFromAttrGroup = <Vs extends ValueSet>(
+		attrGroup: AttributeGroup<Vs>,
+	): ColumnDef<TableRow, CellValue> =>
+		columnHelper.display({
+			header: attrGroup.displayName,
+			cell: ({ row }): React.ReactNode => {
+				const wallet = row.original.wallet
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
+				const evalGroup = getAttributeGroupInTree(evalTree, attrGroup)
 
 				return (
 					<PizzaSliceChart
-						attrGroup={securityAttributeGroup}
-						evalTree={evalTree}
+						attrGroup={attrGroup}
+						evalGroup={evalGroup}
 						isSupported={isSupported}
-						walletId={walletId}
+						wallet={wallet}
 					/>
 				)
 			},
-		},
-		{
-			header: 'Privacy',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={privacyAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
-					/>
-				)
-			},
-		},
-		{
-			header: 'Sovereignty',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={selfSovereigntyAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
-					/>
-				)
-			},
-		},
-		{
-			header: 'Transparency',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={transparencyAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
-					/>
-				)
-			},
-		},
-		{
-			header: 'Ecosystem',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={ecosystemAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
-					/>
-				)
-			},
-		},
+		})
+	const softwareColumns: Array<ColumnDef<TableRow, CellValue>> = [
+		rankColumn,
+		walletNameColumn,
+		walletTypeColumn,
+		walletVariantColumn,
+		...mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attributeGroupColumnFromAttrGroup),
 	]
 
 	// Define columns for hardware wallets
-	const hardwareColumns = [
+	const hardwareWalletNameColumn = columnHelper.accessor(
+		(row: TableRow): CellValue => row.wallet.metadata.displayName,
 		{
+			id: 'wallet',
 			header: 'Wallet',
-			accessorKey: 'name',
 			// For hardware wallets, we just use a simple accessor since ExpandableHardwareWalletRow handles display
-			cell: (info: any) => info.getValue(),
+			cell: ({ row }: { row: Row<TableRow> }): CellValue =>
+				row.original.wallet.metadata.displayName,
 		},
-		{
-			header: 'Manufacture Type',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				return getHardwareWalletManufactureTypeDisplay(wallet)
-			},
-			cell: (info: any) => info.getValue(),
-		},
-		// Replace web/mobile/desktop device selector with hardware icon for hardware wallets
-		{
-			header: 'Risk by device',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				// For hardware wallets, we just need the wallet and whether it has hardware attributes
-				return { wallet }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				return (
-					<div className="flex space-x-0 items-center justify-center">
-						<div className="flex flex-col items-center group">
-							<button
-								className={`p-2 rounded-md transition-colors ${
-									selectedVariant === DeviceVariant.NONE
-										? 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
-										: 'text-[var(--active)]'
-								}`}
-								onClick={() => {
-									handleVariantChange(
-										selectedVariant === DeviceVariant.NONE
-											? DeviceVariant.HARDWARE
-											: DeviceVariant.NONE,
-									)
-								}}
-								title="Hardware"
-							>
-								<HardwareIcon
-									style={{
-										width: '24px',
-										height: '24px',
-										fill: selectedVariant === DeviceVariant.NONE ? 'currentColor' : 'var(--active)',
-									}}
-								/>
-							</button>
-							<div
-								className={`w-2 h-2 rounded-full mt-1 transition-colors ${
-									selectedVariant !== DeviceVariant.NONE
-										? 'bg-[var(--active)]'
-										: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
-								}`}
-							/>
-						</div>
-					</div>
-				)
-			},
-		},
-		// Add the five category columns with device variant support for hardware wallets
-		{
-			header: 'Security',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={securityAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
+	)
+	const hardwareWalletManufactureTypeColumn = columnHelper.display({
+		id: 'manufacture_type',
+		header: 'Manufacture Type',
+		cell: ({ row }: { row: Row<TableRow> }): CellValue =>
+			getHardwareWalletManufactureTypeDisplay(row.original.wallet),
+	})
+	// Replace web/mobile/desktop device selector with hardware icon for hardware wallets
+	const hardwareWalletVariantColumn = columnHelper.display({
+		id: 'risk_by_device',
+		header: 'Risk by device',
+		cell: () => (
+			<div className="flex space-x-0 items-center justify-center">
+				<div className="flex flex-col items-center group">
+					<button
+						className={`p-2 rounded-md transition-colors ${
+							selectedVariant === DeviceVariant.NONE
+								? 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
+								: 'text-[var(--active)]'
+						}`}
+						onClick={() => {
+							handleVariantChange(
+								selectedVariant === DeviceVariant.NONE
+									? DeviceVariant.HARDWARE
+									: DeviceVariant.NONE,
+							)
+						}}
+						title="Hardware"
+					>
+						<HardwareIcon
+							style={{
+								width: '24px',
+								height: '24px',
+								fill: selectedVariant === DeviceVariant.NONE ? 'currentColor' : 'var(--active)',
+							}}
+						/>
+					</button>
+					<div
+						className={`w-2 h-2 rounded-full mt-1 transition-colors ${
+							selectedVariant !== DeviceVariant.NONE
+								? 'bg-[var(--active)]'
+								: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]'
+						}`}
 					/>
-				)
-			},
-		},
-		{
-			header: 'Privacy',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={privacyAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
-					/>
-				)
-			},
-		},
-		{
-			header: 'Sovereignty',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={selfSovereigntyAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
-					/>
-				)
-			},
-		},
-		{
-			header: 'Transparency',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={transparencyAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
-					/>
-				)
-			},
-		},
-		{
-			header: 'Ecosystem',
-			accessorFn: (row: any) => {
-				const wallet = row.wallet
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const walletId = wallet.metadata?.id || row.id
-
-				return { wallet, isSupported, evalTree, walletId }
-			},
-			cell: (info: any) => {
-				const value = info.getValue()
-				if (!value) {
-					return null
-				}
-
-				const { wallet, isSupported, evalTree, walletId } = value
-
-				return (
-					<PizzaSliceChart
-						attrGroup={ecosystemAttributeGroup}
-						evalTree={evalTree}
-						isSupported={isSupported}
-						walletId={walletId}
-					/>
-				)
-			},
-		},
+				</div>
+			</div>
+		),
+	})
+	const hardwareColumns: Array<ColumnDef<TableRow, CellValue>> = [
+		rankColumn,
+		hardwareWalletNameColumn,
+		hardwareWalletManufactureTypeColumn,
+		hardwareWalletVariantColumn,
+		...mapNonExemptAttributeGroupsInTree(
+			unratedHardwareWallet.overall,
+			attributeGroupColumnFromAttrGroup,
+		),
 	]
 
 	// Use the appropriate columns based on active tab
-	const columns = useMemo(() => {
-		return activeTab === WalletTableTab.SOFTWARE ? softwareColumns : hardwareColumns
-	}, [activeTab])
+	const columns = useMemo<Array<ColumnDef<TableRow, CellValue>>>(
+		() => (activeTab === WalletTableTab.SOFTWARE ? softwareColumns : hardwareColumns),
+		[activeTab],
+	)
 
 	// Create table
 	const table = useReactTable({
@@ -1608,213 +948,222 @@ export default function WalletTable(): React.ReactElement {
 		getCoreRowModel: getCoreRowModel(),
 	})
 
+	// Render table body based on active tab
+	const renderTableBody = (): React.ReactNode => {
+		// For hardware wallets tab, use the expandable row component
+		if (activeTab === 'hardware') {
+			return table
+				.getRowModel()
+				.rows.map(row => <ExpandableHardwareWalletRow key={row.id} row={row} columns={columns} />)
+		}
+
+		// Otherwise, render standard rows for software wallets
+		return table.getRowModel().rows.map(row => {
+			const parentWallet = row.original.wallet
+
+			// Support depends on variant; software tab has different logic from hardware tab
+			const isSupported =
+				selectedVariant === DeviceVariant.NONE ||
+				walletSupportsVariant(parentWallet, selectedVariant)
+
+			return (
+				<tr
+					key={row.id}
+					className={
+						isSupported
+							? 'dark:bg-[#141414] dark:hover:bg-[#1a1a1a]'
+							: 'opacity-50 dark:bg-[#141414] dark:hover:bg-[#1a1a1a]'
+					}
+				>
+					{row.getVisibleCells().map(cell => (
+						<td
+							key={cell.id}
+							className={`px-4 py-2 dark:text-gray-200 ${
+								cell.column.id === 'rank' ? 'text-center' : ''
+							}`}
+						>
+							{flexRender(cell.column.columnDef.cell, cell.getContext())}
+						</td>
+					))}
+				</tr>
+			)
+		})
+	}
+
 	return (
 		<div className="overflow-x-auto">
 			{/* Tabs - now fixed */}
 			<div className="sticky top-0 bg-white dark:bg-[#141414] z-10">
-				<div className="flex">
-					<button
-						className={`px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform ${
-							activeTab === WalletTableTab.SOFTWARE
-								? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
-								: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]'
-						}`}
-						onClick={() => {
-							handleTabChange(WalletTableTab.SOFTWARE)
-						}}
-					>
-						Software wallets
-						<span
-							className={`ml-2 px-2 py-0.5 text-xs text-white font-medium rounded-full ${
-								activeTab === WalletTableTab.SOFTWARE ? 'bg-purple-500' : 'bg-[#3B0E45]'
-							}`}
-						>
-							{filteredSoftwareWalletData.length}
-						</span>
-					</button>
-					<button
-						className={`px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform ${
-							activeTab === WalletTableTab.HARDWARE
-								? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
-								: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]'
-						}`}
-						onClick={() => {
-							handleTabChange(WalletTableTab.HARDWARE)
-						}}
-					>
-						Hardware wallets
-						<span
-							className={`ml-2 px-2 py-0.5 text-xs text-white font-medium rounded-full ${
-								activeTab === WalletTableTab.HARDWARE ? 'bg-purple-500' : 'bg-[#3B0E45]'
-							}`}
-						>
-							{hardwareWalletData.length}
-						</span>
-					</button>
-				</div>
-
-				{/* Wallet Type Filter Buttons - only show for Software wallets tab */}
-				{activeTab === WalletTableTab.SOFTWARE && (
-					<div className="flex flex-wrap gap-2 mt-4 mb-2 px-1">
-						<span className="text-sm font-medium text-gray-600 dark:text-gray-300 self-center mr-2">
-							Filter by:
-						</span>
+				<div className="flex gap-4">
+					<div className="flex gap-1">
 						<button
-							className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-								walletTypeFilter === WalletTypeFilter.ALL
-									? 'bg-purple-500 text-white'
-									: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+							className={`px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform ${
+								activeTab === WalletTableTab.SOFTWARE
+									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
+									: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]'
 							}`}
-							onClick={() => handleWalletTypeFilterChange(WalletTypeFilter.ALL)}
+							onClick={() => {
+								handleTabChange(WalletTableTab.SOFTWARE)
+							}}
 						>
-							All
+							Software wallets
 							<span
-								className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
-									walletTypeFilter === WalletTypeFilter.ALL
-										? 'bg-white bg-opacity-30 text-white'
-										: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+								className={`ml-2 px-2 py-0.5 text-xs text-white font-medium rounded-full ${
+									activeTab === WalletTableTab.SOFTWARE ? 'bg-purple-500' : 'bg-[#3B0E45]'
 								}`}
 							>
-								{softwareWalletData.length}
+								{filteredSoftwareWalletData.length}
 							</span>
 						</button>
 						<button
-							className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-								walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY
-									? 'bg-purple-500 text-white'
-									: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+							className={`px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform ${
+								activeTab === WalletTableTab.HARDWARE
+									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
+									: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]'
 							}`}
-							onClick={() => handleWalletTypeFilterChange(WalletTypeFilter.SMART_WALLET_ONLY)}
+							onClick={() => {
+								handleTabChange(WalletTableTab.HARDWARE)
+							}}
 						>
-							Smart Wallet
+							Hardware wallets
 							<span
-								className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
-									walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY
-										? 'bg-white bg-opacity-30 text-white'
-										: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+								className={`ml-2 px-2 py-0.5 text-xs text-white font-medium rounded-full ${
+									activeTab === WalletTableTab.HARDWARE ? 'bg-purple-500' : 'bg-[#3B0E45]'
 								}`}
 							>
-								{smartWalletOnlyCount}
-							</span>
-						</button>
-						<button
-							className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-								walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA
-									? 'bg-purple-500 text-white'
-									: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
-							}`}
-							onClick={() => handleWalletTypeFilterChange(WalletTypeFilter.SMART_WALLET_AND_EOA)}
-						>
-							Smart Wallet & EOA
-							<span
-								className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
-									walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA
-										? 'bg-white bg-opacity-30 text-white'
-										: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
-								}`}
-							>
-								{smartWalletAndEoaCount}
-							</span>
-						</button>
-						<button
-							className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-								walletTypeFilter === WalletTypeFilter.EOA_ONLY
-									? 'bg-purple-500 text-white'
-									: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
-							}`}
-							onClick={() => handleWalletTypeFilterChange(WalletTypeFilter.EOA_ONLY)}
-						>
-							EOA
-							<span
-								className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
-									walletTypeFilter === WalletTypeFilter.EOA_ONLY
-										? 'bg-white bg-opacity-30 text-white'
-										: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
-								}`}
-							>
-								{eoaOnlyWalletCount}
+								{hardwareWalletData.length}
 							</span>
 						</button>
 					</div>
-				)}
+					{/* Wallet Type Filter Buttons - only show for Software wallets tab */}
+					{activeTab === WalletTableTab.SOFTWARE && (
+						<div className="flex flex-wrap gap-2 py-1 px-1">
+							<span className="text-sm font-medium text-gray-600 dark:text-gray-300 self-center mr-2">
+								Filter by:
+							</span>
+							<button
+								className={[
+									'px-3 py-0.5 text-xs font-medium rounded-full transition-colors',
+									walletTypeFilter === WalletTypeFilter.ALL
+										? 'bg-purple-500 text-white'
+										: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600',
+								].join(' ')}
+								onClick={() => {
+									handleWalletTypeFilterChange(WalletTypeFilter.ALL)
+								}}
+							>
+								All
+								<span
+									className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+										walletTypeFilter === WalletTypeFilter.ALL
+											? 'bg-white bg-opacity-30 text-white'
+											: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+									}`}
+								>
+									{softwareWalletData.length}
+								</span>
+							</button>
+							<button
+								className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+									walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY
+										? 'bg-purple-500 text-white'
+										: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+								}`}
+								onClick={() => {
+									handleWalletTypeFilterChange(WalletTypeFilter.SMART_WALLET_ONLY)
+								}}
+							>
+								Smart Wallet
+								<span
+									className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+										walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY
+											? 'bg-white bg-opacity-30 text-white'
+											: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+									}`}
+								>
+									{smartWalletOnlyCount}
+								</span>
+							</button>
+							<button
+								className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+									walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA
+										? 'bg-purple-500 text-white'
+										: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+								}`}
+								onClick={() => {
+									handleWalletTypeFilterChange(WalletTypeFilter.SMART_WALLET_AND_EOA)
+								}}
+							>
+								Smart Wallet & EOA
+								<span
+									className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+										walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA
+											? 'bg-white bg-opacity-30 text-white'
+											: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+									}`}
+								>
+									{smartWalletAndEoaCount}
+								</span>
+							</button>
+							<button
+								className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+									walletTypeFilter === WalletTypeFilter.EOA_ONLY
+										? 'bg-purple-500 text-white'
+										: 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+								}`}
+								onClick={() => {
+									handleWalletTypeFilterChange(WalletTypeFilter.EOA_ONLY)
+								}}
+							>
+								EOA
+								<span
+									className={`inline-block ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+										walletTypeFilter === WalletTypeFilter.EOA_ONLY
+											? 'bg-white bg-opacity-30 text-white'
+											: 'bg-gray-500 bg-opacity-20 text-gray-700 dark:bg-gray-500 dark:bg-opacity-30 dark:text-gray-200'
+									}`}
+								>
+									{eoaOnlyWalletCount}
+								</span>
+							</button>
+						</div>
+					)}
+				</div>
 			</div>
 
 			{/* Table */}
 			<div className="overflow-x-auto">
-				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border">
 					<thead>
 						{table.getHeaderGroups().map(headerGroup => (
 							<tr className="bg-tertiary" key={headerGroup.id}>
-								{headerGroup.headers.map(header => (
-									<th
-										key={header.id}
-										className={`px-4 py-2 text-center text-[14px] text-secondary ${
-											(header.column &&
-												header.column.columnDef &&
-												header.column.columnDef.header === 'Wallet') ||
-											(header.column &&
-												header.column.columnDef &&
-												header.column.columnDef.header === 'Type') ||
-											(header.column &&
-												header.column.columnDef &&
-												header.column.columnDef.header === 'Manufacture Type')
-												? 'font-bold !text-left'
-												: header.column &&
-													  header.column.columnDef &&
-													  header.column.columnDef.header === 'Risk by device'
-													? 'font-semibold'
-													: 'font-normal'
-										}`}
-									>
-										{header &&
-										header.column &&
-										header.column.columnDef &&
-										header.column.columnDef.header
-											? flexRender(header.column.columnDef.header, header.getContext())
-											: null}
-									</th>
-								))}
+								{headerGroup.headers.map(header => {
+									const headerContent = header.column.columnDef.header
+									return (
+										<th
+											key={header.id}
+											className={`px-4 py-2 text-[14px] text-secondary ${
+												header.column.id === 'rank' ? 'text-center' : 'text-left'
+											} ${
+												headerContent === 'Wallet' ||
+												headerContent === 'Type' ||
+												headerContent === 'Manufacture Type'
+													? 'font-bold'
+													: headerContent === 'Risk by device'
+														? 'font-semibold'
+														: 'font-normal'
+											}`}
+										>
+											{headerContent !== undefined &&
+												flexRender(headerContent, header.getContext())}
+										</th>
+									)
+								})}
 							</tr>
 						))}
 					</thead>
 					<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-						{(activeTab as string) === WalletTableTab.HARDWARE
-							? table
-									.getRowModel()
-									.rows.map(row => (
-										<ExpandableHardwareWalletRow key={row.id} row={row} columns={columns} />
-									))
-							: table.getRowModel().rows.map(row => {
-									const parentWallet = row.original.wallet
-									const isSupported =
-										!parentWallet ||
-										(activeTab === WalletTableTab.HARDWARE &&
-											(selectedVariant === DeviceVariant.NONE ||
-												selectedVariant === DeviceVariant.HARDWARE)) ||
-										(activeTab === WalletTableTab.SOFTWARE &&
-											(selectedVariant === DeviceVariant.NONE ||
-												walletSupportsVariant(parentWallet, selectedVariant)))
-
-									return (
-										<tr
-											key={row.id}
-											className={`${!isSupported ? 'opacity-50' : ''} dark:bg-[#141414] dark:hover:bg-[#1a1a1a]`}
-										>
-											{row &&
-												row.getVisibleCells &&
-												row.getVisibleCells().map(cell => (
-													<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
-														{cell &&
-														cell.column &&
-														cell.column.columnDef &&
-														cell.column.columnDef.cell
-															? flexRender(cell.column.columnDef.cell, cell.getContext())
-															: null}
-													</td>
-												))}
-										</tr>
-									)
-								})}
+						{renderTableBody()}
 					</tbody>
 				</table>
 			</div>

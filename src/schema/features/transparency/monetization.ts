@@ -1,4 +1,4 @@
-import type { WithRef } from '../reference'
+import type { WithRef } from '../../reference'
 
 /**
  * A set of possible ways by which a wallet may fund its development.

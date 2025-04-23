@@ -1,8 +1,9 @@
 import type { EvaluationData } from '@/schema/attributes'
-import { component, type Renderable } from '../content'
 import type { SourceVisibilityValue } from '@/schema/attributes/transparency/source-visibility'
 
-export interface SourceVisibilityDetailsProps extends EvaluationData<SourceVisibilityValue> { }
+import { component, type Renderable } from '../content'
+
+export interface SourceVisibilityDetailsProps extends EvaluationData<SourceVisibilityValue> {}
 
 export interface SourceVisibilityDetailsContent {
 	component: 'SourceVisibilityDetails'

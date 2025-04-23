@@ -1,8 +1,9 @@
-import type React from 'react'
-import { labeledUrl, type Url } from '@/schema/url'
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded'
-import { Box, Link, type TypographyOwnProps } from '@mui/material'
+import { Link, type TypographyOwnProps } from '@mui/material'
+import type React from 'react'
 import { useState } from 'react'
+
+import { labeledUrl, type Url } from '@/schema/url'
 
 export function ExternalLink({
 	url,
@@ -22,7 +23,7 @@ export function ExternalLink({
 	const labeled = labeledUrl(url, defaultLabel)
 	const [hovered, setHovered] = useState(false)
 	return (
-		<Box component="span" display="inline-block">
+		<span className="inline-block">
 			<Link
 				href={labeled.url}
 				target="_blank"
@@ -46,15 +47,14 @@ export function ExternalLink({
 					color,
 				}}
 			>
-				<Box
-					component="span"
-					display="inline-block"
-					sx={{ textDecoration: hovered ? 'underline' : 'inherit' }}
+				<span
+					className="inline-block"
+					style={{ textDecoration: hovered ? 'underline' : 'inherit' }}
 				>
 					{children ?? labeled.label}
-				</Box>{' '}
+				</span>{' '}
 				<OpenInNewRoundedIcon color="inherit" fontSize="inherit" />
 			</Link>
-		</Box>
+		</span>
 	)
 }

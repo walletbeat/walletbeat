@@ -1,4 +1,5 @@
 import type { Contributor } from '@/schema/wallet'
+
 import { exampleWalletDevelopmentCompany } from '../entities/example'
 
 export const exampleContributor: Contributor = {

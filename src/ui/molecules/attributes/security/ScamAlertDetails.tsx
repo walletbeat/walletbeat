@@ -1,13 +1,15 @@
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import type React from 'react'
+
 import { subsectionWeight } from '@/components/constants'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
-import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
-import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
-import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { isSupported } from '@/schema/features/support'
-import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
 import { toFullyQualified } from '@/schema/reference'
+import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
+import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
+import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
+
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 function listOrSingleText(prefix: string, items: Array<string | null>): React.ReactNode {
 	const filtered = items.filter(item => item !== null)
@@ -67,7 +69,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 					<RenderTypographicContent content={value.shortExplanation.render(wallet.metadata)} />
 				</Typography>
 			</WrapRatingIcon>
-			<Box>
+			<div>
 				<ul>
 					{value.sendTransactionWarning.required && (
 						<li>
@@ -105,7 +107,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 											to a third party which can correlate them.
 										</Typography>
 									)}
-									{value.scamAlerts.sendTransactionWarning.ref && (
+									{toFullyQualified(value.scamAlerts.sendTransactionWarning.ref).length > 0 && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.sendTransactionWarning.ref)}
 											explanation="References:"
@@ -162,7 +164,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 											submitted.
 										</Typography>
 									)}
-									{value.scamAlerts.contractTransactionWarning.ref && (
+									{toFullyQualified(value.scamAlerts.contractTransactionWarning.ref).length > 0 && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.contractTransactionWarning.ref)}
 											explanation="References:"
@@ -192,10 +194,9 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 											</>
 										)}
 									</Typography>
-									{value.scamAlerts.scamUrlWarning.ref && (
+									{toFullyQualified(value.scamAlerts.scamUrlWarning.ref).length > 0 && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.scamUrlWarning.ref)}
-											explanation="References:"
 										/>
 									)}
 								</>
@@ -208,7 +209,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 						</li>
 					)}
 				</ul>
-			</Box>
+			</div>
 		</>
 	)
 }

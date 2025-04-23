@@ -1,9 +1,16 @@
-import type { NonEmptyArray } from '@/types/utils/non-empty'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import {
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	darken,
+	Typography,
+	useTheme,
+} from '@mui/material'
 import type React from 'react'
 import { useState } from 'react'
-import theme from '../../components/ThemeRegistry/theme'
-import { Accordion, AccordionDetails, AccordionSummary, darken, Typography } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 export interface AccordionData {
 	id: string
@@ -24,6 +31,12 @@ export function Accordions({
 	interAccordionMargin?: string
 }): React.JSX.Element {
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+	const theme = useTheme()
+
+	const handleChange = (id: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
+		setExpanded(prev => ({ ...prev, [id]: isExpanded }))
+	}
+
 	return (
 		<>
 			{accordions.map((accordion, index) => {
@@ -34,43 +47,57 @@ export function Accordions({
 					expanded[accordion.id]
 				return (
 					<Accordion
-						key={`accordion-${accordion.id}`}
+						key={accordion.id}
+						disableGutters
 						expanded={expanded[accordion.id] ?? false}
-						onChange={(_, newExpanded) => {
-							setExpanded(previous => ({ ...previous, [accordion.id]: newExpanded }))
-						}}
-						square={true}
+						onChange={handleChange(accordion.id)}
 						sx={{
-							marginTop: blankTop ? interAccordionMargin : '0px',
-							':before': blankTop ? { display: 'none' } : { opacity: 0.25 },
-							backgroundColor: theme.palette.background.paper,
+							boxShadow: 'none',
 							borderTopLeftRadius: blankTop ? borderRadius : '0px',
 							borderTopRightRadius: blankTop ? borderRadius : '0px',
-							borderBottomLeftRadius: blankBottom ? borderRadius : '0px',
-							borderBottomRightRadius: blankBottom ? borderRadius : '0px',
+							borderBottomLeftRadius: !expanded[accordion.id] && blankBottom ? borderRadius : '0px',
+							borderBottomRightRadius:
+								!expanded[accordion.id] && blankBottom ? borderRadius : '0px',
+							'&:not(:first-of-type)': {
+								marginTop: interAccordionMargin,
+							},
+							'&:before': {
+								display: 'none', // Remove the default top border
+							},
 						}}
-						className="bg-secondary text-primary shadow-none"
 					>
 						<AccordionSummary
-							key={accordion.id}
-							aria-controls={accordion.id}
-							id={accordion.id}
+							key={`${accordion.id}-summary`}
 							expandIcon={<ExpandMoreIcon />}
+							aria-controls={`${accordion.id}-content`}
+							id={`${accordion.id}-header`}
+							sx={{
+								backgroundColor: theme.palette.background.paper,
+								borderTopLeftRadius: blankTop ? borderRadius : '0px',
+								borderTopRightRadius: blankTop ? borderRadius : '0px',
+								borderBottomLeftRadius:
+									!expanded[accordion.id] && blankBottom ? borderRadius : '0px',
+								borderBottomRightRadius:
+									!expanded[accordion.id] && blankBottom ? borderRadius : '0px',
+							}}
 						>
 							<Typography variant={summaryTypographyVariant}>{accordion.summary}</Typography>
 						</AccordionSummary>
 						<AccordionDetails
 							key={`${accordion.id}-details`}
 							sx={{
-								paddingTop: '16px',
-								paddingBottom: '16px',
-								paddingLeft: '16px',
-								paddingRight: '16px',
-								backgroundColor: darken(theme.palette.background.paper, 0.1),
+								padding: '16px',
+								backgroundColor:
+									theme.palette.mode === 'light'
+										? theme.palette.grey[100] // Light grey background for light mode
+										: darken(theme.palette.background.paper, 0.1), // Dark grey for dark mode
+								color:
+									theme.palette.mode === 'light'
+										? '#ffffff' // White text for light mode
+										: theme.palette.text.primary, // Default primary text (light) for dark mode
 								borderBottomLeftRadius: blankBottom ? borderRadius : '0px',
 								borderBottomRightRadius: blankBottom ? borderRadius : '0px',
 							}}
-							className="bg-secondary text-primary"
 						>
 							{accordion.contents}
 						</AccordionDetails>

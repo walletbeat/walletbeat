@@ -1,12 +1,16 @@
-import { Box } from '@mui/material'
 import type React from 'react'
+
 import { subsectionWeight } from '@/components/constants'
-import { ReferenceList } from '../../../atoms/ReferenceList'
-import { monetizationStrategies, monetizationStrategyName } from '@/schema/features/monetization'
-import { JoinedList } from '../../../atoms/JoinedList'
+import {
+	monetizationStrategies,
+	monetizationStrategyName,
+} from '@/schema/features/transparency/monetization'
 import { refs } from '@/schema/reference'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 import type { FundingDetailsProps } from '@/types/content/funding-details'
+
+import { JoinedList } from '../../../atoms/JoinedList'
+import { ReferenceList } from '../../../atoms/ReferenceList'
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 export function FundingDetails({
 	wallet,
@@ -19,7 +23,7 @@ export function FundingDetails({
 	const ref = refs(monetization)
 	return (
 		<WrapRatingIcon rating={value.rating}>
-			<Box style={{ fontWeight: subsectionWeight }}>
+			<div style={{ fontWeight: subsectionWeight }}>
 				<strong>{wallet.metadata.displayName}</strong> is funded by{' '}
 				<JoinedList
 					data={strategies.map(strategy => ({
@@ -28,7 +32,7 @@ export function FundingDetails({
 					}))}
 				/>
 				. <ReferenceList ref={ref} ulStyle={{ paddingLeft: '1.5rem', marginBottom: '0px' }} />
-			</Box>
+			</div>
 		</WrapRatingIcon>
 	)
 }

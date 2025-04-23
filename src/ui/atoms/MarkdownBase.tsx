@@ -1,10 +1,13 @@
-import { Box, styled, Typography, type TypographyProps } from '@mui/material'
+import { styled, Typography, type TypographyProps } from '@mui/material'
+import { Box } from '@mui/system'
 import type React from 'react'
 import Markdown, { type Components } from 'react-markdown'
-import { ExternalLink } from './ExternalLink'
+
 import { lookupEip } from '@/data/eips'
-import { EipLink } from './EipLink'
 import { trimWhitespacePrefix } from '@/types/utils/text'
+
+import { EipLink } from './EipLink'
+import { ExternalLink } from './ExternalLink'
 
 export interface MarkdownOwnProps {
 	markdownTransform?: (markdown: string) => string
@@ -45,14 +48,16 @@ const StyledMarkdown = styled(Box, {
 		margin-top: 0px;
 	}
 
-	${pSpacing === undefined
+	${
+		pSpacing === undefined
 			? ''
 			: `p + p {
 		margin-top: ${pSpacing};
 	}`
-		}
+	}
 
-	${liSpacing === undefined
+	${
+		liSpacing === undefined
 			? ''
 			: `li + li:not(li li), li li:not(li li + li) {
 		margin-top: ${pSpacing};
@@ -60,7 +65,7 @@ const StyledMarkdown = styled(Box, {
 	li li + li {
 		margin-top: calc(${pSpacing} / 2);
 	}`
-		}
+	}
 `,
 )
 

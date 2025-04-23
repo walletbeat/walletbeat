@@ -1,3 +1,5 @@
+import { sentence } from '@/types/content'
+import type { Dict } from '@/types/utils/dict'
 import {
 	isNonEmptyArray,
 	nonEmptyGet,
@@ -5,6 +7,7 @@ import {
 	nonEmptyRemap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
+
 import {
 	type Attribute,
 	type AttributeGroup,
@@ -12,95 +15,114 @@ import {
 	type EvaluatedAttribute,
 	evaluatedAttributes,
 	type EvaluatedGroup,
+	isExempt,
 	Rating,
 	type Value,
 	type ValueSet,
 } from './attributes'
 import {
-	addressCorrelation,
-	type AddressCorrelationValue,
-} from './attributes/privacy/address-correlation'
-import { openSource, type OpenSourceValue } from './attributes/transparency/open-source'
+	accountAbstraction,
+	type AccountAbstractionValue,
+} from './attributes/ecosystem/account-abstraction'
 import {
-	sourceVisibility,
-	type SourceVisibilityValue,
-} from './attributes/transparency/source-visibility'
-import { feeTransparency, type FeeTransparencyValue } from './attributes/transparency/fee-transparency'
-import type { ResolvedFeatures } from './features'
-import type { AtLeastOneVariant, Variant } from './variants'
-import type { Dict } from '@/types/utils/dict'
-import { funding, type FundingValue } from './attributes/transparency/funding'
-import {
-	multiAddressCorrelation,
-	type MultiAddressCorrelationValue,
-} from './attributes/privacy/multi-address-correlation'
-import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score'
-import { sentence } from '@/types/content'
-import type { WalletMetadata } from './wallet'
-import {
-	chainVerification,
-	type ChainVerificationValue,
-} from './attributes/security/chain-verification'
-import {
-	selfHostedNode,
-	type SelfHostedNodeValue,
-} from './attributes/self-sovereignty/self-hosted-node'
+	addressResolution,
+	type AddressResolutionValue,
+} from './attributes/ecosystem/address-resolution'
 import {
 	browserIntegration,
 	type BrowserIntegrationValue,
 } from './attributes/ecosystem/browser-integration'
 import {
-	addressResolution,
-	type AddressResolutionValue,
-} from './attributes/ecosystem/address-resolution'
-import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
+	addressCorrelation,
+	type AddressCorrelationValue,
+} from './attributes/privacy/address-correlation'
+import { hardwarePrivacy, type HardwarePrivacyValue } from './attributes/privacy/hardware-privacy'
 import {
-	hardwareWalletClearSigning,
-	type HardwareWalletClearSigningValue,
-} from './attributes/security/hardware-wallet-clear-signing'
-import {
-	hardwareWalletSupport,
-	type HardwareWalletSupportValue,
-} from './attributes/security/hardware-wallet-support'
-import {
-	transactionInclusion,
-	type TransactionInclusionValue,
-} from './attributes/self-sovereignty/transaction-inclusion'
-import {
-	accountAbstraction,
-	type AccountAbstractionValue,
-} from './attributes/ecosystem/account-abstraction'
-import {
-	accountPortability,
-	type AccountPortabilityValue,
-} from './attributes/self-sovereignty/account-portability'
-import {
-	passkeyImplementation,
-	type PasskeyImplementationValue,
-} from './attributes/security/passkey-implementation'
-import {
-	softwareHWIntegration,
-	type SoftwareHWIntegrationValue,
-} from './attributes/security/software-hw-integration'
+	multiAddressCorrelation,
+	type MultiAddressCorrelationValue,
+} from './attributes/privacy/multi-address-correlation'
 import {
 	bugBountyProgram,
 	type BugBountyProgramValue,
 } from './attributes/security/bug-bounty-program'
 import {
-	scamPrevention,
-	type ScamPreventionValue,
-} from './attributes/security/scam-prevention'
+	chainVerification,
+	type ChainVerificationValue,
+} from './attributes/security/chain-verification'
+import { firmware, type FirmwareValue } from './attributes/security/firmware'
+import {
+	hardwareWalletDappSigning,
+	type HardwareWalletDappSigningValue,
+} from './attributes/security/hardware-wallet-dapp-signing'
+import {
+	hardwareWalletSupport,
+	type HardwareWalletSupportValue,
+} from './attributes/security/hardware-wallet-support'
+import { keysHandling, type KeysHandlingValue } from './attributes/security/keys-handling'
+import {
+	passkeyImplementation,
+	type PasskeyImplementationValue,
+} from './attributes/security/passkey-implementation'
+import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
+import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
+import {
+	softwareHWIntegration,
+	type SoftwareHWIntegrationValue,
+} from './attributes/security/software-hw-integration'
+import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy'
+import {
+	supplyChainFactory,
+	type SupplyChainFactoryValue,
+} from './attributes/security/supply-chain-factory'
+import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
+import {
+	accountPortability,
+	type AccountPortabilityValue,
+} from './attributes/self-sovereignty/account-portability'
+import {
+	interoperability,
+	type InteroperabilityValue,
+} from './attributes/self-sovereignty/interoperability'
+import {
+	selfHostedNode,
+	type SelfHostedNodeValue,
+} from './attributes/self-sovereignty/self-hosted-node'
+import {
+	transactionInclusion,
+	type TransactionInclusionValue,
+} from './attributes/self-sovereignty/transaction-inclusion'
+import {
+	feeTransparency,
+	type FeeTransparencyValue,
+} from './attributes/transparency/fee-transparency'
+import { funding, type FundingValue } from './attributes/transparency/funding'
+import { maintenance, type MaintenanceValue } from './attributes/transparency/maintenance'
+import { openSource, type OpenSourceValue } from './attributes/transparency/open-source'
+import { reputation, type ReputationValue } from './attributes/transparency/reputation'
+import {
+	sourceVisibility,
+	type SourceVisibilityValue,
+} from './attributes/transparency/source-visibility'
+import type { ResolvedFeatures } from './features'
+import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score'
+import type { AtLeastOneVariant, Variant } from './variants'
+import type { WalletMetadata } from './wallet'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
 	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
-	hardwareWalletClearSigning: HardwareWalletClearSigningValue
+	hardwareWalletDappSigning: HardwareWalletDappSigningValue
 	hardwareWalletSupport: HardwareWalletSupportValue
 	softwareHWIntegration: SoftwareHWIntegrationValue
 	passkeyImplementation: PasskeyImplementationValue
 	bugBountyProgram: BugBountyProgramValue
+	supplyChainDIY: SupplyChainDIYValue
+	supplyChainFactory: SupplyChainFactoryValue
+	firmware: FirmwareValue
+	keysHandling: KeysHandlingValue
+	userSafety: UserSafetyValue
 }>
 
 /** Security attributes. */
@@ -115,21 +137,31 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		securityAudits,
 		scamPrevention,
 		chainVerification,
-		hardwareWalletClearSigning,
+		hardwareWalletDappSigning,
 		hardwareWalletSupport,
 		softwareHWIntegration,
 		passkeyImplementation,
 		bugBountyProgram,
+		supplyChainDIY,
+		supplyChainFactory,
+		firmware,
+		keysHandling,
+		userSafety,
 	},
 	score: scoreGroup<SecurityValues>({
 		securityAudits: 1.0,
 		scamPrevention: 1.0,
 		chainVerification: 1.0,
-		hardwareWalletClearSigning: 1.0,
+		hardwareWalletDappSigning: 1.0,
 		hardwareWalletSupport: 1.0,
 		softwareHWIntegration: 1.0,
 		passkeyImplementation: 1.0,
 		bugBountyProgram: 1.0,
+		supplyChainDIY: 1.0,
+		supplyChainFactory: 1.0,
+		firmware: 1.0,
+		keysHandling: 1.0,
+		userSafety: 1.0,
 	}),
 }
 
@@ -137,6 +169,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 type PrivacyValues = Dict<{
 	addressCorrelation: AddressCorrelationValue
 	multiAddressCorrelation: MultiAddressCorrelationValue
+	hardware_privacy: HardwarePrivacyValue
 }>
 
 /** Privacy attributes. */
@@ -151,10 +184,12 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 	attributes: {
 		addressCorrelation,
 		multiAddressCorrelation,
+		hardware_privacy: hardwarePrivacy,
 	},
 	score: scoreGroup<PrivacyValues>({
 		addressCorrelation: 1.0,
 		multiAddressCorrelation: 1.0,
+		hardware_privacy: 1.0,
 	}),
 }
 
@@ -192,6 +227,7 @@ type TransparencyValues = Dict<{
 	sourceVisibility: SourceVisibilityValue
 	funding: FundingValue
 	feeTransparency: FeeTransparencyValue
+	reputation: ReputationValue
 }>
 
 /** Transparency attributes. */
@@ -208,12 +244,14 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		sourceVisibility,
 		funding,
 		feeTransparency,
+		reputation,
 	},
 	score: scoreGroup<TransparencyValues>({
 		openSource: 1.0,
 		sourceVisibility: 1.0,
 		funding: 1.0,
 		feeTransparency: 1.0,
+		reputation: 1.0,
 	}),
 }
 
@@ -222,26 +260,51 @@ type EcosystemValues = Dict<{
 	accountAbstraction: AccountAbstractionValue
 	addressResolution: AddressResolutionValue
 	browserIntegration: BrowserIntegrationValue
+	interoperability: InteroperabilityValue
 }>
 
 /** Ecosystem attributes. */
 export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	id: 'ecosystem',
-	icon: '\u{1f331}', // Seedling
+	icon: '🌐',
 	displayName: 'Ecosystem',
 	perWalletQuestion: sentence<WalletMetadata>(
 		(walletMetadata: WalletMetadata): string =>
-			`Does ${walletMetadata.displayName} follow the Ethereum ecosystem's standards and direction?`,
+			`How well does ${walletMetadata.displayName} align with the ecosystem?`,
 	),
 	attributes: {
 		accountAbstraction,
 		addressResolution,
 		browserIntegration,
+		interoperability,
 	},
 	score: scoreGroup<EcosystemValues>({
 		accountAbstraction: 1.0,
 		addressResolution: 1.0,
 		browserIntegration: 1.0,
+		interoperability: 1.0,
+	}),
+}
+
+/** A ValueSet for maintenance Values. */
+type MaintenanceValues = Dict<{
+	maintenance: MaintenanceValue
+}>
+
+/** Maintenance attributes. */
+export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
+	id: 'maintenance',
+	icon: '🛠️',
+	displayName: 'Maintenance',
+	perWalletQuestion: sentence<WalletMetadata>(
+		(walletMetadata: WalletMetadata): string =>
+			`How well-maintained is ${walletMetadata.displayName}?`,
+	),
+	attributes: {
+		maintenance,
+	},
+	score: scoreGroup<MaintenanceValues>({
+		maintenance: 1.0,
 	}),
 }
 
@@ -253,6 +316,7 @@ export const attributeTree: NonEmptyRecord<string, AttributeGroup<any>> = {
 	selfSovereignty: selfSovereigntyAttributeGroup,
 	transparency: transparencyAttributeGroup,
 	ecosystem: ecosystemAttributeGroup,
+	maintenance: maintenanceAttributeGroup,
 }
 
 /** Evaluated security attributes for a single wallet. */
@@ -260,11 +324,16 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
 	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
-	hardwareWalletClearSigning: EvaluatedAttribute<HardwareWalletClearSigningValue>
+	hardwareWalletDappSigning: EvaluatedAttribute<HardwareWalletDappSigningValue>
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
 	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>
 	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
 	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
+	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYValue>
+	supplyChainFactory: EvaluatedAttribute<SupplyChainFactoryValue>
+	firmware: EvaluatedAttribute<FirmwareValue>
+	keysHandling: EvaluatedAttribute<KeysHandlingValue>
+	userSafety: EvaluatedAttribute<UserSafetyValue>
 }
 
 /** Evaluated privacy attributes for a single wallet. */
@@ -293,6 +362,12 @@ export interface EcosystemEvaluations extends EvaluatedGroup<EcosystemValues> {
 	accountAbstraction: EvaluatedAttribute<AccountAbstractionValue>
 	addressResolution: EvaluatedAttribute<AddressResolutionValue>
 	browserIntegration: EvaluatedAttribute<BrowserIntegrationValue>
+	interoperability: EvaluatedAttribute<InteroperabilityValue>
+}
+
+/** Evaluated maintenance attributes for a single wallet. */
+export interface MaintenanceEvaluations extends EvaluatedGroup<MaintenanceValues> {
+	maintenance: EvaluatedAttribute<MaintenanceValue>
 }
 
 /** Evaluated attributes for a single wallet. */
@@ -300,7 +375,12 @@ export interface EvaluationTree
 	extends NonEmptyRecord<
 		string,
 		EvaluatedGroup<
-			SecurityValues | PrivacyValues | SelfSovereigntyValues | TransparencyValues | EcosystemValues
+			| SecurityValues
+			| PrivacyValues
+			| SelfSovereigntyValues
+			| TransparencyValues
+			| EcosystemValues
+			| MaintenanceValues
 		>
 	> {
 	security: SecurityEvaluations
@@ -308,28 +388,54 @@ export interface EvaluationTree
 	selfSovereignty: SelfSovereigntyEvaluations
 	transparency: TransparencyEvaluations
 	ecosystem: EcosystemEvaluations
+	maintenance: MaintenanceEvaluations
 }
 
-/** Rate a wallet's attributes based on its features. */
-export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
-	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => ({
-		attribute: attr,
-		evaluation: attr.evaluate(features),
-	})
+/** Rate a wallet's attributes based on its features and metadata. */
+export function evaluateAttributes(
+	features: ResolvedFeatures,
+	walletMetadata: WalletMetadata,
+): EvaluationTree {
+	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => {
+		if (attr.exempted !== undefined) {
+			const maybeExempt = attr.exempted(features, walletMetadata)
+			if (maybeExempt !== null) {
+				if (!isExempt(maybeExempt)) {
+					throw new Error(
+						`Attribute ${attr.id}'s exemption rating function returned a non-exempt rating`,
+					)
+				}
+				return {
+					attribute: attr,
+					evaluation: maybeExempt,
+				}
+			}
+		}
+		return {
+			attribute: attr,
+			evaluation: attr.evaluate(features),
+		}
+	}
 	return {
 		security: {
 			securityAudits: evalAttr(securityAudits),
 			scamPrevention: evalAttr(scamPrevention),
 			chainVerification: evalAttr(chainVerification),
-			hardwareWalletClearSigning: evalAttr(hardwareWalletClearSigning),
+			hardwareWalletDappSigning: evalAttr(hardwareWalletDappSigning),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			softwareHWIntegration: evalAttr(softwareHWIntegration),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
+			supplyChainDIY: evalAttr(supplyChainDIY),
+			supplyChainFactory: evalAttr(supplyChainFactory),
+			firmware: evalAttr(firmware),
+			keysHandling: evalAttr(keysHandling),
+			userSafety: evalAttr(userSafety),
 		},
 		privacy: {
 			addressCorrelation: evalAttr(addressCorrelation),
 			multiAddressCorrelation: evalAttr(multiAddressCorrelation),
+			hardware_privacy: evalAttr(hardwarePrivacy),
 		},
 		selfSovereignty: {
 			selfHostedNode: evalAttr(selfHostedNode),
@@ -341,11 +447,16 @@ export function evaluateAttributes(features: ResolvedFeatures): EvaluationTree {
 			sourceVisibility: evalAttr(sourceVisibility),
 			funding: evalAttr(funding),
 			feeTransparency: evalAttr(feeTransparency),
+			reputation: evalAttr(reputation),
 		},
 		ecosystem: {
 			accountAbstraction: evalAttr(accountAbstraction),
 			addressResolution: evalAttr(addressResolution),
 			browserIntegration: evalAttr(browserIntegration),
+			interoperability: evalAttr(interoperability),
+		},
+		maintenance: {
+			maintenance: evalAttr(maintenance),
 		},
 	}
 }
@@ -363,7 +474,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 		).attribute
 		const evaluations = nonEmptyRemap(
 			perVariant,
-			(_: Variant, tree: EvaluationTree) => getter(tree).evaluation,
+			(_, tree: EvaluationTree) => getter(tree).evaluation,
 		)
 		return {
 			attribute,
@@ -375,15 +486,21 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			securityAudits: attr(tree => tree.security.securityAudits),
 			scamPrevention: attr(tree => tree.security.scamPrevention),
 			chainVerification: attr(tree => tree.security.chainVerification),
-			hardwareWalletClearSigning: attr(tree => tree.security.hardwareWalletClearSigning),
+			hardwareWalletDappSigning: attr(tree => tree.security.hardwareWalletDappSigning),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			softwareHWIntegration: attr(tree => tree.security.softwareHWIntegration),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
+			supplyChainDIY: attr(tree => tree.security.supplyChainDIY),
+			supplyChainFactory: attr(tree => tree.security.supplyChainFactory),
+			firmware: attr(tree => tree.security.firmware),
+			keysHandling: attr(tree => tree.security.keysHandling),
+			userSafety: attr(tree => tree.security.userSafety),
 		},
 		privacy: {
 			addressCorrelation: attr(tree => tree.privacy.addressCorrelation),
 			multiAddressCorrelation: attr(tree => tree.privacy.multiAddressCorrelation),
+			hardware_privacy: attr(tree => tree.privacy.hardware_privacy),
 		},
 		selfSovereignty: {
 			selfHostedNode: attr(tree => tree.selfSovereignty.selfHostedNode),
@@ -395,36 +512,75 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			sourceVisibility: attr(tree => tree.transparency.sourceVisibility),
 			funding: attr(tree => tree.transparency.funding),
 			feeTransparency: attr(tree => tree.transparency.feeTransparency),
+			reputation: attr(tree => tree.transparency.reputation),
 		},
 		ecosystem: {
 			accountAbstraction: attr(tree => tree.ecosystem.accountAbstraction),
 			addressResolution: attr(tree => tree.ecosystem.addressResolution),
 			browserIntegration: attr(tree => tree.ecosystem.browserIntegration),
+			interoperability: attr(tree => tree.ecosystem.interoperability),
+		},
+		maintenance: {
+			maintenance: attr(tree => tree.maintenance.maintenance),
 		},
 	}
 }
 
 /**
- * Iterate over all attribute groups in a tree, calling `fn` with each group.
+ * Get a specific evaluated attribute group from an evaluation tree.
  */
-export function mapAttributeGroups<T>(
+export function getAttributeGroupInTree<Vs extends ValueSet>(
 	tree: EvaluationTree,
-	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => T,
-): T[] {
-	return Object.entries(attributeTree).map(([groupName, attrGroup]) =>
-		fn(attrGroup, tree[groupName]),
-	)
+	attrGroup: AttributeGroup<Vs>,
+): EvaluatedGroup<Vs> {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each attribute group's ID maps to an evaluated group of its own ValueSet subtype.
+	return tree[attrGroup.id] as EvaluatedGroup<Vs>
 }
 
 /**
- * Iterate over all attributes in an attribute group, calling `fn` with each
- * attribute.
+ * Iterate over all non-exempt attribute groups in a tree, calling `fn` with each group.
  */
-export function mapGroupAttributes<T, Vs extends ValueSet>(
-	evalGroup: EvaluatedGroup<Vs>,
-	fn: <V extends Value>(evalAttr: EvaluatedAttribute<V>) => T,
+export function mapNonExemptAttributeGroupsInTree<T>(
+	tree: EvaluationTree,
+	fn: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => T,
 ): T[] {
-	return Object.values(evalGroup).map(fn)
+	return Object.values(attributeTree)
+		.filter(
+			<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>): boolean =>
+				numNonExemptGroupAttributes<Vs>(getAttributeGroupInTree(tree, attrGroup)) > 0,
+		)
+		.map(
+			<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>): T =>
+				fn(attrGroup, getAttributeGroupInTree(tree, attrGroup)),
+		)
+}
+
+/**
+ * Iterate over all non-exempt attributes in an evaluated attribute group,
+ * calling `fn` with each attribute.
+ */
+export function mapNonExemptGroupAttributes<T, Vs extends ValueSet>(
+	evalGroup: EvaluatedGroup<Vs>,
+	fn: <V extends Value>(evalAttr: EvaluatedAttribute<V>, index: number) => T,
+): T[] {
+	return Object.values(evalGroup)
+		.filter(
+			<V extends Value>(evalAttr: EvaluatedAttribute<V>): boolean =>
+				evalAttr.evaluation.value.rating !== Rating.EXEMPT,
+		)
+		.map(fn)
+}
+
+/**
+ * Return the number of non-exempt attributes in an evaluated attribute group.
+ */
+export function numNonExemptGroupAttributes<Vs extends ValueSet>(
+	evalGroup: EvaluatedGroup<Vs>,
+): number {
+	return Object.values(evalGroup).filter(
+		<V extends Value>(evalAttr: EvaluatedAttribute<V>): boolean =>
+			evalAttr.evaluation.value.rating !== Rating.EXEMPT,
+	).length
 }
 
 /**
@@ -460,7 +616,7 @@ export function getEvaluationFromOtherTree<V extends Value>(
 	evalAttr: EvaluatedAttribute<V>,
 	otherTree: EvaluationTree,
 ): EvaluatedAttribute<V> {
-	const otherEvalAttr = mapAttributeGroups(
+	const otherEvalAttr = mapNonExemptAttributeGroupsInTree(
 		otherTree,
 		(_, evalGroup): EvaluatedAttribute<V> | undefined => {
 			if (Object.hasOwn(evalGroup, evalAttr.attribute.id)) {
@@ -494,9 +650,9 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 				return score === null
 					? null
 					: {
-						score,
-						weight,
-					}
+							score,
+							weight,
+						}
 			}),
 		).filter(score => score !== null)
 		if (isNonEmptyArray(subScores)) {
@@ -509,3 +665,16 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 		return null
 	}
 }
+
+// Hardware-only attribute IDs for each group
+// TODO: Remove and make the hardware-only attributes exempt instead.
+export const hardwareOnlySecurity = [
+	'supplyChainDIY',
+	'supplyChainFactory',
+	'firmware',
+	'keysHandling',
+	'userSafety',
+]
+export const hardwareOnlyPrivacy = ['hardware_privacy']
+export const hardwareOnlyTransparency = ['reputation', 'maintenance']
+export const hardwareOnlyEcosystem = ['interoperability']

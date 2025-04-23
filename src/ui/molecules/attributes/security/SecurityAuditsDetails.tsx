@@ -1,18 +1,19 @@
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import React from 'react'
+
 import { subsectionWeight } from '@/components/constants'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
-import { isNonEmptyArray, nonEmptyGet, nonEmptyMap, nonEmptySorted } from '@/types/utils/non-empty'
-import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
-import { dateCompare } from '@/types/date'
-import { toFullyQualified } from '@/schema/reference'
-import { EntityLink } from '@/ui/atoms/EntityLink'
 import {
 	securityAuditId,
 	securityFlawSeverityName,
 } from '@/schema/features/security/security-audits'
+import { toFullyQualified } from '@/schema/reference'
+import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
+import { dateCompare } from '@/types/date'
+import { isNonEmptyArray, nonEmptyGet, nonEmptyMap, nonEmptySorted } from '@/types/utils/non-empty'
+import { EntityLink } from '@/ui/atoms/EntityLink'
 import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
-import { Rating } from '@/schema/attributes'
+
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 export function SecurityAuditsDetails({
 	wallet,
@@ -20,17 +21,6 @@ export function SecurityAuditsDetails({
 	auditedInLastYear,
 	hasUnaddressedFlaws,
 }: SecurityAuditsDetailsProps): React.JSX.Element {
-	// Safety check for value and audits
-	if (!value || !value.securityAudits) {
-		return (
-			<WrapRatingIcon rating={Rating.UNRATED}>
-				<Typography fontWeight={subsectionWeight}>
-					No security audit information is available.
-				</Typography>
-			</WrapRatingIcon>
-		)
-	}
-
 	const audits = value.securityAudits
 	if (!isNonEmptyArray(audits)) {
 		return (
@@ -58,7 +48,7 @@ export function SecurityAuditsDetails({
 					{hasUnaddressedFlaws && ' There remains unaddressed security flaws in the codebase.'}
 				</Typography>
 			</WrapRatingIcon>
-			<Box sx={{ maxHeight: '16rem', overflowY: 'auto' }}>
+			<div className="max-h-48 overflow-y-auto border p-2 rounded-md">
 				<ul>
 					{nonEmptyMap(sortedAudits, audit => (
 						<li key={securityAuditId(audit)}>
@@ -107,7 +97,7 @@ export function SecurityAuditsDetails({
 						</li>
 					))}
 				</ul>
-			</Box>
+			</div>
 		</>
 	)
 }

@@ -1,20 +1,21 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, paragraph, sentence, mdParagraph, mdSentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	PasskeyVerificationLibrary,
 	type PasskeyVerificationSupport,
 } from '@/schema/features/security/passkey-verification'
 import { popRefs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.passkey_implementation'
 export type PasskeyImplementationValue = Value & {
@@ -100,7 +101,10 @@ function freshCryptoLibImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
-			libraryUrl: support.libraryUrl || 'https://github.com/rdubois-crypto/FreshCryptoLib',
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/rdubois-crypto/FreshCryptoLib',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -133,7 +137,10 @@ function smoothCryptoLibImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
-			libraryUrl: support.libraryUrl || 'https://github.com/get-smooth/crypto-lib',
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/get-smooth/crypto-lib',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -159,7 +166,10 @@ function daimoP256VerifierImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
-			libraryUrl: support.libraryUrl || 'https://github.com/daimo-eth/p256-verifier',
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/daimo-eth/p256-verifier',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -187,8 +197,9 @@ function openZeppelinP256VerifierImplementation(
 			),
 			library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
 			libraryUrl:
-				support.libraryUrl ||
-				'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -215,7 +226,10 @@ function webAuthnSolImplementation(
 				`,
 			),
 			library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
-			libraryUrl: support.libraryUrl || 'https://github.com/base/webauthn-sol',
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/base/webauthn-sol',
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -318,7 +332,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet implements passkeys using [WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the less efficient FreshCryptoLib.
+					The wallet implements passkeys using [WebAuthn.sol](https://github.com/base/webauthn-sol), which builds on Daimo's WebAuthn.sol but falls back to the FreshCryptoLib.
 				`),
 				webAuthnSolImplementation({
 					library: PasskeyVerificationLibrary.WEB_AUTHN_SOL,
@@ -382,31 +396,24 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		const { withoutRefs, refs: extractedRefs } =
 			popRefs<PasskeyVerificationSupport>(passkeyVerification)
 
-		let result: Evaluation<PasskeyImplementationValue>
-
-		switch (withoutRefs.library) {
-			case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
-				result = smoothCryptoLibImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
-				result = daimoP256VerifierImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
-				result = openZeppelinP256VerifierImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
-				result = freshCryptoLibImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
-				result = webAuthnSolImplementation(withoutRefs)
-				break
-			case PasskeyVerificationLibrary.OTHER:
-				result = otherPasskeyImplementation(withoutRefs)
-				break
-			default:
-				result = noPasskeyImplementation()
-				break
-		}
+		const result = ((): Evaluation<PasskeyImplementationValue> => {
+			switch (withoutRefs.library) {
+				case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
+					return smoothCryptoLibImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
+					return daimoP256VerifierImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
+					return openZeppelinP256VerifierImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
+					return freshCryptoLibImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
+					return webAuthnSolImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.OTHER:
+					return otherPasskeyImplementation(withoutRefs)
+				default:
+					return noPasskeyImplementation()
+			}
+		})()
 
 		// Return result with references if any
 		return {

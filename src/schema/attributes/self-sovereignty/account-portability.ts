@@ -1,29 +1,30 @@
-import type { ResolvedFeatures } from '@/schema/features'
+import { eip7702 } from '@/data/eips/eip-7702'
+import { erc4337 } from '@/data/eips/erc-4337'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
+import { eipMarkdownLink } from '@/schema/eips'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
-	AccountType,
-	TransactionGenerationCapability,
 	type AccountSupport,
+	AccountType,
 	type AccountType7702,
 	type AccountTypeEoa,
 	type AccountTypeMpc,
 	type AccountTypeMutableMultifactor,
+	TransactionGenerationCapability,
 } from '@/schema/features/account-support'
-import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
-import { eipMarkdownLink } from '@/schema/eips'
-import { erc4337 } from '@/data/eips/erc-4337'
-import { eip7702 } from '@/data/eips/eip-7702'
 import { isSupported } from '@/schema/features/support'
-import { mergeRefs, refs, type ReferenceArray } from '@/schema/reference'
+import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.self_sovereignty.account_portability'
 export type AccountPortabilityValue = Value & {

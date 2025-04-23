@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
 import { Divider, Link, styled, Typography } from '@mui/material'
 import Tooltip, { tooltipClasses, type TooltipProps } from '@mui/material/Tooltip'
+import React, { useState } from 'react'
+
 import { type Eip, eipEthereumDotOrgUrl, eipLabel, eipShortLabel } from '@/schema/eips'
+
 import { MarkdownBox } from './MarkdownBox'
 
 const EipTooltip = styled(({ className, ...props }: TooltipProps) => (

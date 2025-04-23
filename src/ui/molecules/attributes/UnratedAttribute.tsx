@@ -1,8 +1,10 @@
-import { WrapRatingIcon } from '../../atoms/WrapRatingIcon'
-import { Rating, type Value } from '@/schema/attributes'
 import { Typography } from '@mui/material'
-import { ExternalLink } from '../../atoms/ExternalLink'
+
+import { Rating, type Value } from '@/schema/attributes'
 import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
+
+import { ExternalLink } from '../../atoms/ExternalLink'
+import { WrapRatingIcon } from '../../atoms/WrapRatingIcon'
 
 export function UnratedAttribute<V extends Value>({
 	wallet,

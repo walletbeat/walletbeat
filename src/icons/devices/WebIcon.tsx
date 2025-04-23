@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 export const WebIcon: React.FC<React.SVGProps<SVGSVGElement>> = props => (
 	<svg

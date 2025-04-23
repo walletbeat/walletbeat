@@ -16,17 +16,18 @@
  * ```
  */
 
-import { nonEmptyGet, type NonEmptyArray } from '@/types/utils/non-empty'
+import type { CalendarDate } from '@/types/date'
+import { type NonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
+
 import {
 	getUrlLabel,
 	isLabeledUrl,
 	isUrl,
+	type LabeledUrl,
 	labeledUrl,
 	mergeLabeledUrls,
-	type LabeledUrl,
 	type Url,
 } from './url'
-import type { CalendarDate } from '@/types/date'
 
 /**
  * A loose reference which can be converted to a FullyQualifiedReference.

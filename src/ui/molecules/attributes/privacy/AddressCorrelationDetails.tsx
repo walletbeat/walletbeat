@@ -1,17 +1,19 @@
+import { Typography } from '@mui/material'
+import type React from 'react'
+
+import { subsectionWeight } from '@/components/constants'
 import type { WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
 import { compareLeakedInfo, leakedInfoName } from '@/schema/features/privacy/data-collection'
 import { mergeRefs } from '@/schema/reference'
-import { type NonEmptyArray, nonEmptyGet, nonEmptySorted } from '@/types/utils/non-empty'
-import { Typography } from '@mui/material'
-import type React from 'react'
-import { JoinedList } from '../../../atoms/JoinedList'
-import { ExternalLink } from '../../../atoms/ExternalLink'
-import { ReferenceLinks } from '../../../atoms/ReferenceLinks'
-import { subsectionWeight } from '@/components/constants'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 import { isUrl } from '@/schema/url'
 import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
+import { type NonEmptyArray, nonEmptyGet, nonEmptySorted } from '@/types/utils/non-empty'
 import { EntityLink } from '@/ui/atoms/EntityLink'
+
+import { ExternalLink } from '../../../atoms/ExternalLink'
+import { JoinedList } from '../../../atoms/JoinedList'
+import { ReferenceLinks } from '../../../atoms/ReferenceLinks'
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 export function AddressCorrelationDetails({
 	wallet,
@@ -93,4 +95,3 @@ export function AddressCorrelationDetails({
 		</>
 	)
 }
-

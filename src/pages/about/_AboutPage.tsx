@@ -1,7 +1,9 @@
-import { Typography, Divider } from '@mui/material'
-import { Box } from '@mui/system'
+import ForumIcon from '@mui/icons-material/Forum'
+import GitHubIcon from '@mui/icons-material/GitHub'
+import HelpCenterIcon from '@mui/icons-material/HelpCenter'
+import { Divider, Typography } from '@mui/material'
 import type React from 'react'
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+
 import {
 	navigationAbout,
 	navigationFaq,
@@ -9,12 +11,10 @@ import {
 	navigationHome,
 	navigationRepository,
 } from '@/components/navigation'
+import { betaSiteRoot } from '@/constants'
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import { IconLink } from '@/ui/atoms/IconLink'
-import HelpCenterIcon from '@mui/icons-material/HelpCenter'
-import ForumIcon from '@mui/icons-material/Forum'
-import GitHubIcon from '@mui/icons-material/GitHub'
-import { betaSiteRoot } from '@/constants'
 
 function AboutContents(): React.JSX.Element {
 	return (
@@ -182,19 +182,23 @@ export function AboutPage(): React.JSX.Element {
 				},
 			]}
 		>
-			<Typography id="aboutHeader" variant="h1" mb={1}>
-				About Walletbeat
-			</Typography>
-			<Typography
-				variant="caption"
-				sx={{ fontStyle: 'italic', fontSize: '1.25rem', opacity: 0.75 }}
-				mb={2}
-			>
-				Who watches the wallets?
-			</Typography>
-			<Box maxWidth="75vw" display="flex" flexDirection="column" alignItems="stretch">
-				<AboutContents />
-			</Box>
+			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
+				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
+					<Typography id="aboutHeader" variant="h1" mb={1}>
+						About Walletbeat
+					</Typography>
+					<Typography
+						variant="caption"
+						sx={{ fontStyle: 'italic', fontSize: '1.25rem', opacity: 0.75 }}
+						mb={2}
+					>
+						Who watches the wallets?
+					</Typography>
+					<div className="flex flex-col gap-2 items-stretch justify-stretch">
+						<AboutContents />
+					</div>
+				</div>
+			</div>
 		</NavigationPageLayout>
 	)
 }

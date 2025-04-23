@@ -1,6 +1,6 @@
-import * as React from 'react'
+import type { FC, SVGProps } from 'react'
 
-export const DesktopIcon: React.FC<React.SVGProps<SVGSVGElement>> = props => (
+export const DesktopIcon: FC<SVGProps<SVGSVGElement>> = props => (
 	<svg
 		width="24"
 		height="24"

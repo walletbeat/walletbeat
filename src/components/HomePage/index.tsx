@@ -1,16 +1,14 @@
 // Components
-import WalletTable from '@/ui/organisms/WalletTable'
-
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { navigationAbout, navigationCriteria } from '@/components/navigation'
-import { LuWallet, LuKey } from 'react-icons/lu'
+import GitHubIcon from '@mui/icons-material/GitHub'
 import type { FC } from 'react'
-import { wallets } from '@/data/wallets'
-import { hardwareWallets } from '@/data/hardware-wallets'
+import { LuKey, LuWallet } from 'react-icons/lu'
 
-// Type-safe object key access
-type WalletsKey = keyof typeof wallets
-type HardwareWalletsKey = keyof typeof hardwareWallets
+import { navigationAbout, navigationCriteria } from '@/components/navigation'
+import { mapHardwareWallets } from '@/data/hardware-wallets'
+import { mapWallets } from '@/data/wallets'
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+import { ExternalLink } from '@/ui/atoms/ExternalLink'
+import WalletTable from '@/ui/organisms/WalletTable'
 
 export const HomePage: FC = () => (
 	<NavigationPageLayout
@@ -20,9 +18,9 @@ export const HomePage: FC = () => (
 				items: [
 					{
 						title: 'Summary',
-						href: '/',
+						href: '/#summary',
 						id: 'summary',
-						icon: '',
+						icon: undefined,
 					},
 				],
 				overflow: false,
@@ -35,23 +33,17 @@ export const HomePage: FC = () => (
 						icon: <LuWallet />,
 						href: '/',
 						id: 'wallets-nav',
-						children: Object.keys(wallets).map(key => {
-							// Using type-safe keys
-							const safeKey = key as WalletsKey
-							const wallet = wallets[safeKey]
-
-							return {
-								title: wallet.metadata.displayName,
-								href: `/${key}`,
-								id: key,
-								icon: (
-									<img
-										src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-										className="size-4"
-									/>
-								),
-							}
-						}),
+						children: mapWallets(wallet => ({
+							title: wallet.metadata.displayName,
+							href: `/wallet/${wallet.metadata.id}`,
+							id: wallet.metadata.id,
+							icon: (
+								<img
+									src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+									className="size-4"
+								/>
+							),
+						})),
 					},
 				],
 				overflow: false,
@@ -64,30 +56,29 @@ export const HomePage: FC = () => (
 						icon: <LuKey />,
 						href: '/',
 						id: 'hardware-wallets',
-						children: Object.keys(hardwareWallets).map(key => {
-							// Using type-safe keys
-							const safeKey = key as HardwareWalletsKey
-							const wallet = hardwareWallets[safeKey]
-
+						children: mapHardwareWallets(wallet => {
 							// Simplified display names for hardware wallets
+							// TODO: Put this into wallet metadata.
 							let displayName = wallet.metadata.displayName
-							if (key === 'ledger') {
-								displayName = 'Ledger'
-							}
-							if (key === 'trezor') {
-								displayName = 'Trezor'
-							}
-							if (key === 'gridplus') {
-								displayName = 'Grid Plus'
-							}
-							if (key === 'keystone') {
-								displayName = 'Keystone'
+							switch (wallet.metadata.id) {
+								case 'ledger':
+									displayName = 'Ledger'
+									break
+								case 'trezor':
+									displayName = 'Trezor'
+									break
+								case 'gridplus':
+									displayName = 'Grid Plus'
+									break
+								case 'keystone':
+									displayName = 'Keystone'
+									break
 							}
 
 							return {
 								title: displayName,
-								href: `/${key}`,
-								id: key,
+								href: `/hww/${wallet.metadata.id}`,
+								id: wallet.metadata.id,
 								icon: (
 									<img
 										src={`/images/hardware-wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
@@ -112,21 +103,34 @@ export const HomePage: FC = () => (
 			},
 		]}
 	>
-		<div className="flex flex-col">
-			<div>
-				<div className="px-8 py-6 flex justify-between items-center flex-wrap min-h-96 relative">
-					<div className="flex flex-col gap-2 py-8 flex-1">
-						<h1 className="text-5xl font-extrabold text-accent">Who watches the wallets?</h1>
+		<div className="max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full">
+			<div className="flex flex-col lg:mt-10 mt-24 gap-4">
+				<div className="px-8 py-6 flex justify-between items-start flex-wrap min-h-96 relative">
+					<div className="flex flex-col gap-4 py-8 flex-1">
+						<div className="flex gap-2">
+							<div className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary">
+								<div className="flex flex-row gap-2 items-center" key="repo">
+									<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+									<ExternalLink
+										url="https://github.com/walletbeat/walletbeat"
+										defaultLabel="GitHub Repository"
+										style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+									/>
+								</div>
+							</div>
+						</div>
+						<h1 className="text-4xl font-extrabold text-accent">Who watches the wallets?</h1>
 						<p className="text-secondary">
-							Beta version; For content contributions, please see{' '}
-							<a
-								href="https://github.com/walletbeat/walletbeat"
-								target="_blank"
-								rel="noreferrer"
-								className="text-accent underline"
-							>
-								GitHub
-							</a>
+							This website is still in beta. It aims to provide a comprehensive list of wallets,
+							their functionality, practices, and support for certain standards.
+						</p>
+						<p className="text-secondary">
+							We welcome contributions via the{' '}
+							<ExternalLink
+								url="https://github.com/walletbeat/walletbeat"
+								defaultLabel="GitHub Repository"
+								style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+							/>
 							.
 						</p>
 					</div>
@@ -137,6 +141,9 @@ export const HomePage: FC = () => (
 			</div>
 
 			<div className="w-full flex flex-col gap-2 p-4 md:p-8">
+				<div className="text-2xl font-bold text-accent" id="summary">
+					Summary
+				</div>
 				<WalletTable />
 			</div>
 		</div>

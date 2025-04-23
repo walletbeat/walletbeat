@@ -7,7 +7,7 @@ import Layout from '../layouts/Layout.astro'
 
 // Components
 import { IconLink } from '@/ui/atoms/IconLink'
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import HomeIcon from '@mui/icons-material/Home'
 ---
 
@@ -16,18 +16,10 @@ import HomeIcon from '@mui/icons-material/Home'
 		title: 'Page not found | Walletbeat',
 	}}
 >
-	<Box maxWidth="100vw" display="flex" flexDirection="column" alignItems="center">
-		<Box
-			minHeight="100vh"
-			maxWidth="100vw"
-			display="flex"
-			flexDirection="column"
-			alignItems="center"
-			justifyContent="center"
-			px={2}
-		>
+	<div class="max-w-full flex flex-col items-center">
+		<div class="min-h-screen max-w-full flex flex-col items-center justify-center px-2">
 			<Typography variant="h1" fontWeight={600} mt={1} maxWidth="90vw"> 404 </Typography>
 			<IconLink href={`${betaSiteRoot}/`} IconComponent={HomeIcon}> Home </IconLink>
-		</Box>
-	</Box>
+		</div>
+	</div>
 </Layout>

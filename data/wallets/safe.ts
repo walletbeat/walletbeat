@@ -1,13 +1,14 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
-import { WalletProfile } from '@/schema/features/profile'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { notSupported, supported } from '@/schema/features/support'
-import { nconsigny } from '../contributors/nconsigny'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
-import { Variant } from '@/schema/variants'
+import { WalletProfile } from '@/schema/features/profile'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { notSupported, supported } from '@/schema/features/support'
+import { Variant } from '@/schema/variants'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { nconsigny } from '../contributors/nconsigny'
 
 export const safe: Wallet = {
 	metadata: {
@@ -62,6 +63,19 @@ export const safe: Wallet = {
 			},
 		},
 		security: {
+			scamAlerts: null,
+			publicSecurityAudits: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			hardwareWalletSupport: {
+				supportedWallets: {},
+				ref: undefined,
+			},
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
+				ref: undefined,
+			},
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
 				libraryUrl:
@@ -70,30 +84,14 @@ export const safe: Wallet = {
 				ref: [
 					{
 						url: 'https://github.com/safe-global/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
-						explanation:
-							'Safe implements P256 verification using FreshCryptoLib in their 4337 modules.',
 					},
 					{
 						url: 'https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
-						explanation:
-							'Safe implements P256 verification using FreshCryptoLib in their 4337 modules.',
+						explanation: 'Safe uses FCL P256 verifier for passkey verification.',
 					},
 				],
 			},
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			hardwareWalletSupport: {
-				supportedWallets: {},
-				ref: null,
-			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
-				details: 'No hardware wallet clear signing information available.',
-				ref: null,
-			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

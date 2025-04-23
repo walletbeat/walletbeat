@@ -1,7 +1,7 @@
+import LinkIcon from '@mui/icons-material/Link'
 import { Link, Typography, type TypographyProps } from '@mui/material'
 import type React from 'react'
 import { useState } from 'react'
-import LinkIcon from '@mui/icons-material/Link'
 
 export function AnchorHeader(props: TypographyProps & { id?: string }): React.JSX.Element {
 	const [hovered, setHovered] = useState<boolean>(false)

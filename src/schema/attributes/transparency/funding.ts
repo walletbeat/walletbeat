@@ -1,24 +1,25 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
 	exampleRatingUnimplemented,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type Monetization,
 	monetizationStrategies,
 	type MonetizationStrategy,
 	monetizationStrategyIsUserAligned,
 	monetizationStrategyName,
-} from '@/schema/features/monetization'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { fundingDetailsContent } from '@/types/content/funding-details'
+} from '@/schema/features/transparency/monetization'
 import { toFullyQualified } from '@/schema/reference'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+import { fundingDetailsContent } from '@/types/content/funding-details'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.funding'
 export type FundingValue = Value & {

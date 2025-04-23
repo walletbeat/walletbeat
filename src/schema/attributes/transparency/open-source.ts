@@ -1,23 +1,24 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	License,
-	FOSS,
-	licenseIsFOSS,
-	licenseName,
-	type LicenseWithRef,
-} from '@/schema/features/license'
-import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import type { ResolvedFeatures } from '@/schema/features'
+import {
+	FOSS,
+	License,
+	licenseIsFOSS,
+	licenseName,
+	type LicenseWithRef,
+} from '@/schema/features/transparency/license'
+import { refs, toFullyQualified } from '@/schema/reference'
 import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { licenseDetailsContent } from '@/types/content/license-details'
-import { toFullyQualified } from '@/schema/reference'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.open_source'
 export type OpenSourceValue = Value & {
@@ -204,16 +205,26 @@ export const openSource: Attribute<OpenSourceValue> = {
 			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE })
 		}
 		const license = features.license.license
+		const references = refs(features.license)
 		if (license === License.UNLICENSED_VISIBLE) {
-			return unlicensed
+			return { references, ...unlicensed }
 		}
 		switch (licenseIsFOSS(license)) {
 			case FOSS.FOSS:
-				return open(features.license)
+				return {
+					references,
+					...open(features.license),
+				}
 			case FOSS.FUTURE_FOSS:
-				return openInTheFuture(features.license)
+				return {
+					references,
+					...openInTheFuture(features.license),
+				}
 			case FOSS.NOT_FOSS:
-				return proprietary(features.license)
+				return {
+					references,
+					...proprietary(features.license),
+				}
 		}
 	},
 	aggregate: pickWorstRating<OpenSourceValue>,

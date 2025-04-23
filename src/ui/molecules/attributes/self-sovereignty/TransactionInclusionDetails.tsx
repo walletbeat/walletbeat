@@ -1,10 +1,12 @@
 import { Typography } from '@mui/material'
 import React from 'react'
+
 import { subsectionWeight } from '@/components/constants'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
-import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
 import { transactionSubmissionL2TypeName } from '@/schema/features/self-sovereignty/transaction-submission'
+import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
 import { commaListPrefix } from '@/types/utils/text'
+
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 export function TransactionInclusionDetails({
 	wallet,

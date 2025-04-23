@@ -1,27 +1,40 @@
-import type { DataCollection } from './features/privacy/data-collection'
-import type { LicenseWithRef } from './features/license'
-import { type ResolvedFeature, resolveFeature, type Variant, type VariantFeature } from './variants'
-import type { Monetization } from './features/monetization'
-import type { WithRef } from './reference'
-import type { EthereumL1LightClientSupport } from './features/security/light-client'
-import type { ChainConfigurability } from './features/chain-configurability'
-import type { WalletProfile } from './features/profile'
-import type { WalletIntegration } from './features/integration'
-import type { AddressResolution } from './features/address-resolution'
-import type { SecurityAudit } from './features/security/security-audits'
-import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
 import type { AccountSupport } from './features/account-support'
-import type { Support } from './features/support'
-import type { ScamAlerts } from './features/security/scam-alerts'
+import type { WalletIntegration } from './features/ecosystem/integration'
+import type { AddressResolution } from './features/privacy/address-resolution'
+import type { DataCollection } from './features/privacy/data-collection'
+import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'
+import type { WalletProfile } from './features/profile'
+import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
+import type { FirmwareSupport } from './features/security/firmware'
+import type { HardwareWalletDappSigningImplementation } from './features/security/hardware-wallet-dapp-signing'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
-import type { HardwareWalletClearSigningSupport } from './features/security/hardware-wallet-clear-signing'
-import type { FeeTransparencySupport } from './features/transparency/fee-transparency'
+import type { KeysHandlingSupport } from './features/security/keys-handling'
+import type { EthereumL1LightClientSupport } from './features/security/light-client'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
-import { type BugBountyProgramImplementation } from './features/security/bug-bounty-program'
+import type { ScamAlerts } from './features/security/scam-alerts'
+import type { SecurityAudit } from './features/security/security-audits'
+import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
+import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
+import type { UserSafetySupport } from './features/security/user-safety'
+import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
+import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
+import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
+import type { Support } from './features/support'
+import type { FeeTransparencySupport } from './features/transparency/fee-transparency'
+import type { LicenseWithRef } from './features/transparency/license'
+import type { MaintenanceSupport } from './features/transparency/maintenance'
+import type { Monetization } from './features/transparency/monetization'
+import type { ReputationSupport } from './features/transparency/reputation'
+import type { WithRef } from './reference'
+import { type ResolvedFeature, resolveFeature, type Variant, type VariantFeature } from './variants'
 
 /**
  * A set of features about a wallet, each of which may or may not depend on
  * the wallet variant.
+ *
+ * None of the fields in this type should be marked as possibly `undefined`.
+ * If you want to add a new field, you need to add it to all existing wallets,
+ * even if unrated (i.e. `null`).
  */
 export interface WalletFeatures {
 	/**
@@ -55,14 +68,20 @@ export interface WalletFeatures {
 		/** Hardware wallet support */
 		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
 
-		/** Hardware wallet clear signing support */
-		hardwareWalletClearSigning: VariantFeature<HardwareWalletClearSigningSupport>
+		/** Hardware wallet dApp signing support */
+		hardwareWalletDappSigning: VariantFeature<HardwareWalletDappSigningImplementation>
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
 
 		/** Bug bounty program implementation (for hardware wallets) */
-		bugBountyProgram?: VariantFeature<BugBountyProgramImplementation>
+		bugBountyProgram: VariantFeature<BugBountyProgramImplementation>
+
+		firmware?: VariantFeature<FirmwareSupport>
+		keysHandling?: VariantFeature<KeysHandlingSupport>
+		supplyChainDIY?: VariantFeature<SupplyChainDIYSupport>
+		supplyChainFactory?: VariantFeature<SupplyChainFactorySupport>
+		userSafety?: VariantFeature<UserSafetySupport>
 	}
 
 	/** Privacy features. */
@@ -72,18 +91,25 @@ export interface WalletFeatures {
 
 		/** Privacy policy URL of the wallet. */
 		privacyPolicy: VariantFeature<string>
+
+		hardwarePrivacy?: VariantFeature<HardwarePrivacySupport>
 	}
 
 	/** Self-sovereignty features. */
 	selfSovereignty: {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<TransactionSubmission>
+
+		interoperability?: VariantFeature<InteroperabilitySupport>
 	}
 
 	/** Transparency features. */
 	transparency: {
 		/** Fee transparency information. */
 		feeTransparency: VariantFeature<FeeTransparencySupport>
+
+		reputation?: VariantFeature<ReputationSupport>
+		maintenance?: VariantFeature<MaintenanceSupport>
 	}
 
 	/** Level of configurability for chains. */
@@ -126,20 +152,30 @@ export interface ResolvedFeatures {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
-		hardwareWalletClearSigning: ResolvedFeature<HardwareWalletClearSigningSupport>
+		hardwareWalletDappSigning: ResolvedFeature<HardwareWalletDappSigningImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
-		bugBountyProgram?: ResolvedFeature<BugBountyProgramImplementation>
+		bugBountyProgram: ResolvedFeature<BugBountyProgramImplementation>
+		firmware: ResolvedFeature<FirmwareSupport> | null
+		keysHandling: ResolvedFeature<KeysHandlingSupport> | null
+		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport> | null
+		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport> | null
+		userSafety: ResolvedFeature<UserSafetySupport> | null
 	}
 	privacy: {
 		dataCollection: ResolvedFeature<DataCollection>
 		privacyPolicy: ResolvedFeature<string>
+		hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport> | null
 	}
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
+		interoperability: ResolvedFeature<InteroperabilitySupport> | null
 	}
 	transparency: {
 		feeTransparency: ResolvedFeature<FeeTransparencySupport>
+		reputation: ResolvedFeature<ReputationSupport> | null
+		maintenance: ResolvedFeature<MaintenanceSupport> | null
 	}
+	ecosystem: Record<string, unknown>
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
 	accountSupport: ResolvedFeature<AccountSupport>
 	multiAddress: ResolvedFeature<Support>
@@ -170,22 +206,57 @@ export function resolveFeatures(features: WalletFeatures, variant: Variant): Res
 				ethereumL1: feat(features.security.lightClient.ethereumL1),
 			},
 			hardwareWalletSupport: feat(features.security.hardwareWalletSupport),
-			hardwareWalletClearSigning: feat(features.security.hardwareWalletClearSigning),
+			hardwareWalletDappSigning: feat(features.security.hardwareWalletDappSigning),
 			passkeyVerification: feat(features.security.passkeyVerification),
-			bugBountyProgram: features.security.bugBountyProgram
-				? feat(features.security.bugBountyProgram)
-				: undefined,
+			bugBountyProgram: feat<BugBountyProgramImplementation>(features.security.bugBountyProgram),
+			firmware:
+				features.security.firmware !== undefined
+					? feat<FirmwareSupport>(features.security.firmware)
+					: null,
+			keysHandling:
+				features.security.keysHandling !== undefined
+					? feat<KeysHandlingSupport>(features.security.keysHandling)
+					: null,
+			supplyChainDIY:
+				features.security.supplyChainDIY !== undefined
+					? feat<SupplyChainDIYSupport>(features.security.supplyChainDIY)
+					: null,
+			supplyChainFactory:
+				features.security.supplyChainFactory !== undefined
+					? feat<SupplyChainFactorySupport>(features.security.supplyChainFactory)
+					: null,
+			userSafety:
+				features.security.userSafety !== undefined
+					? feat<UserSafetySupport>(features.security.userSafety)
+					: null,
 		},
 		privacy: {
 			dataCollection: feat(features.privacy.dataCollection),
 			privacyPolicy: feat(features.privacy.privacyPolicy),
+			hardwarePrivacy:
+				features.privacy.hardwarePrivacy !== undefined
+					? feat<HardwarePrivacySupport>(features.privacy.hardwarePrivacy)
+					: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: feat(features.selfSovereignty.transactionSubmission),
+			interoperability:
+				features.selfSovereignty.interoperability !== undefined
+					? feat<InteroperabilitySupport>(features.selfSovereignty.interoperability)
+					: null,
 		},
 		transparency: {
 			feeTransparency: feat(features.transparency.feeTransparency),
+			reputation:
+				features.transparency.reputation !== undefined
+					? feat<ReputationSupport>(features.transparency.reputation)
+					: null,
+			maintenance:
+				features.transparency.maintenance !== undefined
+					? feat<MaintenanceSupport>(features.transparency.maintenance)
+					: null,
 		},
+		ecosystem: {},
 		chainConfigurability: feat(features.chainConfigurability),
 		accountSupport: feat(features.accountSupport),
 		multiAddress: feat(features.multiAddress),

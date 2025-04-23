@@ -1,27 +1,28 @@
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { Leak, MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
-import type { Wallet } from '@/schema/wallet'
-import { License } from '@/schema/features/license'
-import { daimoInc } from '../entities/daimo'
-import { binance } from '../entities/binance'
-import { openExchangeRates } from '../entities/open-exchange-rates'
-import { polymutex } from '../contributors/polymutex'
-import { paragraph } from '@/types/content'
-import { merkleManufactory } from '../entities/merkle-manufactory'
-import { pimlico } from '../entities/pimlico'
-import { honeycomb } from '../entities/honeycomb'
 import { WalletProfile } from '@/schema/features/profile'
-import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
-import { veridise } from '../entities/veridise'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { nconsigny } from '../contributors/nconsigny'
+import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { nconsigny } from '../contributors/nconsigny'
+import { polymutex } from '../contributors/polymutex'
+import { binance } from '../entities/binance'
+import { daimoInc } from '../entities/daimo'
+import { honeycomb } from '../entities/honeycomb'
+import { merkleManufactory } from '../entities/merkle-manufactory'
+import { openExchangeRates } from '../entities/open-exchange-rates'
+import { pimlico } from '../entities/pimlico'
+import { veridise } from '../entities/veridise'
 
 export const daimo: Wallet = {
 	metadata: {
@@ -89,19 +90,6 @@ export const daimo: Wallet = {
 			browser: 'NOT_A_BROWSER_WALLET',
 		},
 		security: {
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
-				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-				details:
-					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
-				ref: [
-					{
-						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-						explanation:
-							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
-					},
-				],
-			},
 			scamAlerts: {
 				scamUrlWarning: notSupported,
 				contractTransactionWarning: notSupported,
@@ -140,11 +128,24 @@ export const daimo: Wallet = {
 				supportedWallets: {},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
-				details: 'Daimo does not support hardware wallets.',
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.FULL,
 				ref: null,
 			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
+				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
+				details:
+					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
+				ref: [
+					{
+						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
+						explanation:
+							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
+					},
+				],
+			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: {

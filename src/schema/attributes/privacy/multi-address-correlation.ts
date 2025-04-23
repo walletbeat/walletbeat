@@ -1,13 +1,12 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
 	exampleRatingUnimplemented,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type EntityData,
 	inferLeaks,
@@ -15,10 +14,12 @@ import {
 	type MultiAddressHandling,
 	MultiAddressPolicy,
 } from '@/schema/features/privacy/data-collection'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
 import { isSupported } from '@/schema/features/support'
-import { refs, type ReferenceArray } from '@/schema/reference'
+import { type ReferenceArray, refs } from '@/schema/reference'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.privacy.multi_address_correlation'
 export type MultiAddressCorrelationValue = Value & {

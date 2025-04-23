@@ -1,9 +1,11 @@
-import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
 import React, { memo, useState } from 'react'
-import { ThemeSwitcher } from './ThemeSwitcher'
 import { LuMenu, LuX } from 'react-icons/lu'
+
+import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+
+import { ThemeSwitcher } from './ThemeSwitcher'
 
 /**
  * A navigation item in the navigation menu.
@@ -128,7 +130,7 @@ const NavigationItem = memo(
 	function NavigationItem({ item, active }: NavigationItemProps): React.JSX.Element {
 		const [isOpen, setIsOpen] = useState(false)
 		const linkStyles =
-			'whitespace-nowrap flex flex-row items-center gap-2 py-1 px-2 hover:bg-backgroundSecondary rounded-md'
+			'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 hover:bg-backgroundSecondary rounded-md'
 		const hasChildren = (item.children?.length ?? 0) > 0
 
 		const toggleDropdown = (e: React.MouseEvent): void => {
@@ -229,7 +231,7 @@ const NavigationItem = memo(
 				{hasChildren && (
 					<ul
 						key={`subitems-${item.id}`}
-						className={`pl-1 border-l ml-2 flex flex-col gap-0 overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+						className={`pl-2 border-l ml-3 flex flex-col gap-0.5 overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
 					>
 						{item.children?.map(subitem => (
 							<NavigationItem
@@ -273,7 +275,7 @@ export const NavigationGroup = memo(
 								key={`item-${item.id}`}
 								item={item}
 								active={activeItemId === item.id}
-								depth="primary"
+								depth="secondary"
 								onContentItemClick={onContentItemClick}
 							/>
 						</React.Fragment>
@@ -343,20 +345,6 @@ export function Navigation({
 		}
 	}
 
-	// Helper function for mapping navigation groups to avoid linter errors
-	const renderNavigationGroup = (
-		group: NavigationGroup,
-		groupIndex: number,
-	): React.ReactElement => (
-		<NavigationGroup
-			key={`navigationGroup-${group.id}`}
-			group={group}
-			groupIndex={groupIndex}
-			onContentItemClick={onContentItemClick}
-			activeItemId={activeItemId}
-		/>
-	)
-
 	return (
 		<>
 			{/* Fixed top bar for mobile */}
@@ -395,21 +383,21 @@ export function Navigation({
 				    /* Base styles */
 				    fixed lg:relative h-full z-40
 				    flex flex-col gap-0 overflow-y-auto
-				    
+
 				    /* Full width on mobile, constrained on desktop */
 				    w-full lg:w-auto lg:max-w-xs
-				    
+
 				    /* Positioning */
 				    inset-0 lg:inset-auto
-				    
+
 				    /* Desktop styles - always visible and positioned */
 				    lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-0
-				    
+
 				    /* Mobile styles - controlled by state */
 				    lg:translate-x-0
 				    transition-transform duration-300
 				    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-				    
+
 				    /* Background color */
 				    bg-[var(--navigation-bg)]
 				`}
@@ -438,9 +426,19 @@ export function Navigation({
 					<div className="px-4 mb-2 w-full">{prefix}</div>
 				) : null}
 
-				<div className="flex flex-col gap-2 px-4">{nonEmptyMap(groups, renderNavigationGroup)}</div>
-				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-center rounded-lg">
-					Wallets listed on this page are not official endoresements, and are provided for
+				<div className="flex flex-col gap-2 px-3">
+					{nonEmptyMap(groups, (group, groupIndex) => (
+						<NavigationGroup
+							key={`navigationGroup-${group.id}`}
+							group={group}
+							groupIndex={groupIndex}
+							onContentItemClick={onContentItemClick}
+							activeItemId={activeItemId}
+						/>
+					))}
+				</div>
+				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-left rounded-lg">
+					Wallets listed on this page are not official endorsements, and are provided for
 					informational purposes only.
 				</div>
 			</div>

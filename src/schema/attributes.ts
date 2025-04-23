@@ -1,10 +1,11 @@
-import { nonEmptyMap, type NonEmptyArray, type NonEmptyRecord } from '@/types/utils/non-empty'
-import type { ResolvedFeatures } from './features'
-import type { AtLeastOneVariant } from './variants'
-import type { MaybeUnratedScore, Score } from './score'
 import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content'
-import type { RatedWallet, WalletMetadata } from './wallet'
+import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
+
+import type { ResolvedFeatures } from './features'
 import type { FullyQualifiedReference, ReferenceArray } from './reference'
+import type { MaybeUnratedScore, Score } from './score'
+import type { AtLeastOneVariant } from './variants'
+import type { RatedWallet, WalletMetadata } from './wallet'
 
 /**
  * Rating is an enum that should be visually meaningful.
@@ -59,6 +60,24 @@ export function isRating(value: unknown): value is Rating {
 /**
  * Convert a rating to the icon displayed on the slice tooltip.
  */
+export function ratingToText(rating: Rating): string {
+	switch (rating) {
+		case Rating.PASS:
+			return 'Pass'
+		case Rating.PARTIAL:
+			return 'Partial'
+		case Rating.FAIL:
+			return 'Fail'
+		case Rating.UNRATED:
+			return 'Unrated'
+		case Rating.EXEMPT:
+			return 'Exempt'
+	}
+}
+
+/**
+ * Convert a rating to the icon displayed on the slice tooltip.
+ */
 export function ratingToIcon(rating: Rating): string {
 	switch (rating) {
 		case Rating.FAIL:
@@ -79,18 +98,17 @@ export function ratingToIcon(rating: Rating): string {
  */
 export function ratingToColor(rating: Rating): string {
 	switch (rating) {
-		case Rating.FAIL:
-			return '#e74c3c' // Red
-		case Rating.PARTIAL:
-			return '#f1c40f' // Yellow
 		case Rating.PASS:
-			return '#2ecc71' // Green
-		case Rating.UNRATED:
-			return '#bdc3c7' // Gray
-		case Rating.EXEMPT:
-			return '#bdc3c7' // Gray
+			return 'var(--rating-pass)'
+		case Rating.PARTIAL:
+			return 'var(--rating-partial)'
+		case Rating.FAIL:
+			return 'var(--rating-fail)'
+		default:
+			return 'var(--rating-neutral)'
 	}
 }
+
 export function borderRatingToColor(rating: Rating): string {
 	switch (rating) {
 		case Rating.FAIL:
@@ -234,10 +252,22 @@ export interface Evaluation<V extends Value> {
 }
 
 /**
- * Evaluate is a function that takes in wallet features and returns an
- * evaluation for a specific attribute.
+ * An evaluation that is exempt.
  */
-export type Evaluate<V extends Value> = (features: ResolvedFeatures) => Evaluation<V>
+export type ExemptEvaluation<V extends Value> = Evaluation<V> & {
+	value: Evaluation<V>['value'] & {
+		rating: Rating.EXEMPT
+	}
+}
+
+/**
+ * Type predicate for ExemptEvaluation.
+ */
+export function isExempt<V extends Value>(
+	evaluation: Evaluation<V>,
+): evaluation is ExemptEvaluation<V> {
+	return evaluation.value.rating === Rating.EXEMPT
+}
 
 /**
  * A human-readable description of why a wallet may be assigned a certain
@@ -367,8 +397,26 @@ export interface Attribute<V extends Value> {
 	 * This function is the default way in which attributes are evaluated.
 	 * However, a wallet may override the evaluation of an attribute using
 	 * overrides.
+	 *
+	 * This function specifically does **not** take into account the wallet's
+	 * metadata. This is to ensure that wallet ratings remain fair and unbiased
+	 * by preventing their evaluation code from taking any metadata into
+	 * account.
 	 */
-	evaluate: Evaluate<V>
+	evaluate: (features: ResolvedFeatures) => Evaluation<V>
+
+	/**
+	 * Check whether the attribute applies to a wallet, according to its
+	 * features and metadata.
+	 *
+	 * This function is similar to `evaluate`, but may inspect wallet metadata.
+	 * However, it can only return exempt ratings, or `null`.
+	 * If it returns an exempt rating, then that rating is used and `evaluate`
+	 * is not called. If it returns `null`, then `evaluate` is called.
+	 *
+	 * If `exempted` is undefined, then `evaluate` is used unconditionally.
+	 */
+	exempted?: (features: ResolvedFeatures, metadata: WalletMetadata) => null | ExemptEvaluation<V>
 
 	/**
 	 * Aggregates one or more per-variant evaluations into a single one.

@@ -1,4 +1,4 @@
-import type { Support } from './support'
+import type { Support } from '../support'
 
 /** Which methods of address resolution a wallet supports. */
 export interface AddressResolution<ARS = AddressResolutionSupport | null> {

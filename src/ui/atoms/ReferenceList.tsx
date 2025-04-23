@@ -1,5 +1,7 @@
-import { type FullyQualifiedReference, mergeRefs } from '@/schema/reference'
 import React from 'react'
+
+import { type FullyQualifiedReference, mergeRefs } from '@/schema/reference'
+
 import { ReferenceLinks } from './ReferenceLinks'
 
 export function ReferenceList({

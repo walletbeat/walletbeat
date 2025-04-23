@@ -1,16 +1,18 @@
-import { polymutex } from '../contributors/polymutex'
-import { nconsigny } from '../contributors/nconsigny'
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
-import { WalletProfile } from '@/schema/features/profile'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { Variant } from '@/schema/variants'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { RpcEndpointConfiguration } from '@/schema/features/chain-configurability'
 import { AccountType } from '@/schema/features/account-support'
+import { WalletProfile } from '@/schema/features/profile'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { Variant } from '@/schema/variants'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { lucemans } from '../contributors/lucemans'
+import { nconsigny } from '../contributors/nconsigny'
+import { polymutex } from '../contributors/polymutex'
 
 export const frame: Wallet = {
 	metadata: {
@@ -23,7 +25,7 @@ export const frame: Wallet = {
 		`),
 		url: 'https://frame.sh',
 		repoUrl: null,
-		contributors: [polymutex, nconsigny],
+		contributors: [polymutex, nconsigny, lucemans],
 		lastUpdated: '2025-03-13',
 	},
 	features: {
@@ -92,8 +94,8 @@ export const frame: Wallet = {
 				},
 				ref: null,
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.NONE,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.NONE,
 				details: 'No hardware wallet clear signing information available.',
 				ref: null,
 			},
@@ -101,6 +103,7 @@ export const frame: Wallet = {
 				library: PasskeyVerificationLibrary.NONE,
 				ref: null,
 			},
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

@@ -1,3 +1,7 @@
+import { Divider, Typography } from '@mui/material'
+import { styled } from '@mui/material/styles'
+import React from 'react'
+
 import {
 	type Attribute,
 	type Evaluation,
@@ -6,12 +10,9 @@ import {
 	ratingToIcon,
 	type Value,
 } from '@/schema/attributes'
-import { Divider, Typography } from '@mui/material'
-import { Box } from '@mui/system'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
-import React from 'react'
 import { mdSentence, type Sentence } from '@/types/content'
-import { styled } from '@mui/material/styles'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+
 import { RenderTypographicContent } from '../../atoms/RenderTypographicContent'
 
 const typographyPropsHeader: React.ComponentProps<typeof RenderTypographicContent>['typography'] = {
@@ -29,7 +30,7 @@ interface ListItemProps {
 	spaceBetweenItems?: string
 }
 
-const StyledListItem = styled('li') <ListItemProps>`
+const StyledListItem = styled('li')<ListItemProps>`
 	margin-top: ${props => (props.isFirstItem ? '0px' : (props.spaceBetweenItems ?? '0.75rem'))};
 	padding-bottom: 0.5rem;
 	&::marker {
@@ -49,53 +50,53 @@ function replaceExampleRatingPrefix(
 			whitespacePrefixLength === 0 ? '' : text.substring(0, whitespacePrefixLength)
 		const unprefixedText =
 			whitespacePrefixLength === 0 ? text : text.substring(whitespacePrefix.length)
-		
+
 		// Accept "The wallet" as before
 		if (unprefixedText.startsWith('The wallet ')) {
 			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The wallet '.length)}`
 		}
-		
+
 		// Accept "The wallet's" as before
 		if (unprefixedText.startsWith("The wallet's ")) {
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The wallet's ".length)}`
 		}
-		
+
 		// Accept "The hardware wallet"
 		if (unprefixedText.startsWith('The hardware wallet ')) {
 			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The hardware wallet '.length)}`
 		}
-		
+
 		// Accept "The hardware wallet's"
 		if (unprefixedText.startsWith("The hardware wallet's ")) {
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The hardware wallet's ".length)}`
 		}
-		
+
 		// Accept "The smart wallet"
 		if (unprefixedText.startsWith('The smart wallet ')) {
 			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The smart wallet '.length)}`
 		}
-		
+
 		// Accept "The smart wallet's"
 		if (unprefixedText.startsWith("The smart wallet's ")) {
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The smart wallet's ".length)}`
 		}
-		
+
 		// More general approach to handle any wallet type
-		const walletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet\s+/;
-		const possessiveWalletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet's\s+/;
-		
-		const walletTypeMatch = unprefixedText.match(walletTypeRegex);
-		if (walletTypeMatch) {
+		const walletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet\s+/
+		const possessiveWalletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet's\s+/
+
+		const walletTypeMatch = walletTypeRegex.exec(unprefixedText)
+		if (walletTypeMatch !== null) {
 			return `${whitespacePrefix}${theWallet}${unprefixedText.substring(walletTypeMatch[0].length)}`
 		}
-		
-		const possessiveWalletTypeMatch = unprefixedText.match(possessiveWalletTypeRegex);
-		if (possessiveWalletTypeMatch) {
+
+		const possessiveWalletTypeMatch = possessiveWalletTypeRegex.exec(unprefixedText)
+		if (possessiveWalletTypeMatch !== null) {
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring(possessiveWalletTypeMatch[0].length)}`
 		}
-		
+
 		throw new Error(
-			`Example ratings should always begin with the phrase "The wallet" or "The [type] wallet"; got: "${unprefixedText}"`,
+			`Example ratings should ideally begin with the phrase "The wallet" or "The [type] wallet". Using original text: "${unprefixedText}"`,
 		)
 	}
 }
@@ -158,7 +159,7 @@ function ExampleRatings<V extends Value>({
 						content={preamble.render({})}
 						typography={typographyPropsHeader}
 					/>
-					<ul style={{ paddingLeft: "2rem" }}>
+					<ul style={{ paddingLeft: '2rem' }}>
 						{ratingsList.map((exampleRating, index) =>
 							renderListItem(exampleRating, index, rating),
 						)}
@@ -196,13 +197,13 @@ function ExampleRatings<V extends Value>({
 	return (
 		<>
 			<Typography variant="h5">{exhaustive ? '' : 'A few examples'}</Typography>
-			<Box>
+			<div>
 				{renderedExamples.map(renderedExample =>
 					renderedExample.element === null ? null : (
-						<Box key={renderedExample.key}>{renderedExample.element}</Box>
+						<div key={renderedExample.key}>{renderedExample.element}</div>
 					),
 				)}
-			</Box>
+			</div>
 		</>
 	)
 }
@@ -222,12 +223,12 @@ export function AttributeMethodology<V extends Value>({
 }): React.JSX.Element {
 	return (
 		<>
-			<Box key="methodology">
+			<div key="methodology">
 				<RenderTypographicContent
 					content={attribute.methodology.render({})}
 					typography={typographyPropsBody}
 				/>
-			</Box>
+			</div>
 			<Divider
 				key="after-methodology"
 				sx={{
@@ -235,7 +236,7 @@ export function AttributeMethodology<V extends Value>({
 					marginBottom: '1rem',
 				}}
 			/>
-			<Box key="example-ratings">
+			<div key="example-ratings">
 				{attribute.ratingScale.display === 'simple' ? (
 					<RenderTypographicContent
 						content={attribute.ratingScale.content.render({})}
@@ -250,7 +251,7 @@ export function AttributeMethodology<V extends Value>({
 						exhaustive={attribute.ratingScale.exhaustive}
 					/>
 				)}
-			</Box>
+			</div>
 		</>
 	)
 }

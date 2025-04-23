@@ -1,5 +1,5 @@
-import type { LabeledUrl } from '../url'
-import type { WithRef } from '../reference'
+import type { WithRef } from '../../reference'
+import type { LabeledUrl } from '../../url'
 
 /**
  * An enum of licenses mapping to their SPDX ID.

@@ -1,14 +1,16 @@
-import type { FullyQualifiedReference } from '@/schema/reference'
-import type { LabeledUrl } from '@/schema/url'
 import {
 	Divider,
 	styled,
 	Tooltip,
 	tooltipClasses,
-	Typography,
 	type TooltipProps,
+	Typography,
 } from '@mui/material'
 import React from 'react'
+
+import type { FullyQualifiedReference } from '@/schema/reference'
+import type { LabeledUrl } from '@/schema/url'
+
 import { ExternalLink } from './ExternalLink'
 import { MarkdownTypography } from './MarkdownTypography'
 

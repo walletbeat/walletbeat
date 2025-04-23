@@ -1,32 +1,34 @@
+import { Typography } from '@mui/material'
+import React from 'react'
+
 import {
-	Rating,
 	type AttributeGroup,
 	type EvaluatedAttribute,
 	type EvaluatedGroup,
+	Rating,
 	type Value,
 	type ValueSet,
 } from '@/schema/attributes'
-import { getAttributeOverride, VariantSpecificity, type RatedWallet } from '@/schema/wallet'
-import { Box, Typography } from '@mui/material'
-import React from 'react'
-import { WrapIcon } from '../atoms/WrapIcon'
+import { toFullyQualified } from '@/schema/reference'
+import type { Variant } from '@/schema/variants'
+import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet'
+import { isTypographicContent } from '@/types/content'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
+import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology'
+
 import {
 	subsectionBorderRadius,
 	subsectionIconWidth,
 	subsectionWeight,
 } from '../../components/constants'
-import { type AccordionData, Accordions } from '../atoms/Accordions'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
-import { WrapRatingIcon } from '../atoms/WrapRatingIcon'
-import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology'
 import { subsectionTheme } from '../../components/ThemeRegistry/theme'
-import type { Variant } from '@/schema/variants'
 import { variantToName } from '../../components/variants'
+import { type AccordionData, Accordions } from '../atoms/Accordions'
+import { ReferenceLinks } from '../atoms/ReferenceLinks'
 import { RenderContent } from '../atoms/RenderContent'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
-import { isTypographicContent } from '@/types/content'
-import { refs, toFullyQualified } from '@/schema/reference'
-import { ReferenceLinks } from '../atoms/ReferenceLinks'
+import { WrapIcon } from '../atoms/WrapIcon'
+import { WrapRatingIcon } from '../atoms/WrapRatingIcon'
 
 export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	wallet,
@@ -94,7 +96,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			<React.Fragment key="impact">
 				{evalAttr.evaluation.impact === undefined ? null : (
 					<>
-						<Box height="1rem"></Box>
+						<div style={{ height: '1rem' }}></div>
 						<RenderTypographicContent
 							content={evalAttr.evaluation.impact.render({
 								wallet,
@@ -111,9 +113,9 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 
 			{/* Display references if available */}
 			{qualRefs.length > 0 && (
-				<Box sx={{ mt: 2 }}>
+				<div style={{ marginTop: '1rem' }}>
 					<ReferenceLinks references={qualRefs} />
-				</Box>
+				</div>
 			)}
 		</>
 	)

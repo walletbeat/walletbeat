@@ -1,19 +1,20 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated, exempt } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
-import { isSupported } from '@/schema/features/support'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { Variant, type AtLeastOneVariant } from '@/schema/variants'
-import { popRefs } from '@/schema/reference'
+import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { isSupported } from '@/schema/features/support'
+import { popRefs } from '@/schema/reference'
+import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.hardware_wallet_support'
 export type HardwareWalletSupportValue = Value & {
@@ -137,12 +138,12 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	methodology: markdown(`
 		Wallets are evaluated based on their support for popular hardware wallet devices.
 		
-		A wallet receives a passing rating if it supports all four major hardware
-		wallet brands: Ledger, Trezor, Keystone, and GridPlus, allowing users to perform all
+		A wallet receives a passing rating if it supports 3 out of 4 major hardware
+		wallet brands: Ledger, Trezor, Keystone, and GridPlus. Allowing users to perform all
 		essential operations using these hardware wallets.
 		
 		A wallet receives a partial rating if it supports at least one hardware wallet
-		brand but doesn't support all four major brands mentioned above.
+		brand but doesn't support 3 out of 4 major brands mentioned above.
 		
 		A wallet fails this attribute if it doesn't support any hardware wallets.
 	`),
@@ -150,9 +151,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			paragraph(`
-				The wallet supports all four major hardware wallet brands: Ledger, Trezor, 
-				Keystone, and GridPlus, with full functionality.
+			paragraph(`  
+				The wallet supports 3 out of 4 major hardware wallet brands: Ledger, Trezor, 
+				Keystone, and GridPlus.
 			`),
 			comprehensiveHardwareWalletSupport([
 				HardwareWalletType.LEDGER,
@@ -207,10 +208,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 			)
 		}
 
-		if (
-			features.security.hardwareWalletSupport === undefined ||
-			features.security.hardwareWalletSupport === null
-		) {
+		if (features.security.hardwareWalletSupport === null) {
 			return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] })
 		}
 
@@ -222,7 +220,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 
 		// Check which hardware wallets are supported
 		Object.entries(hwSupport).forEach(([walletType, support]) => {
-			if (support && isSupported(support)) {
+			if (isSupported(support)) {
 				// Type assertion is safe because we're iterating over keys of hwSupport
 				// which are HardwareWalletType values
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're iterating over hwSupport keys
@@ -243,13 +241,10 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		// const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
 
 		// Generate the base evaluation result
-		let result: Evaluation<HardwareWalletSupportValue>
-
-		if (hasLedger && hasTrezor && hasKeystone && hasGridplus) {
-			result = comprehensiveHardwareWalletSupport(supportedWallets)
-		} else {
-			result = limitedHardwareWalletSupport(supportedWallets)
-		}
+		const result: Evaluation<HardwareWalletSupportValue> =
+			hasLedger && hasTrezor && hasKeystone && hasGridplus
+				? comprehensiveHardwareWalletSupport(supportedWallets)
+				: limitedHardwareWalletSupport(supportedWallets)
 
 		// Return result with references if any
 		return {

@@ -1,10 +1,11 @@
+import type { EvaluationData } from '@/schema/attributes'
 import type {
 	AddressCorrelationValue,
 	WalletAddressLinkableBy,
 } from '@/schema/attributes/privacy/address-correlation'
-import type { NonEmptyArray } from '../utils/non-empty'
-import type { EvaluationData } from '@/schema/attributes'
+
 import { component, type Renderable } from '../content'
+import type { NonEmptyArray } from '../utils/non-empty'
 
 export interface AddressCorrelationDetailsProps extends EvaluationData<AddressCorrelationValue> {
 	linkables: NonEmptyArray<WalletAddressLinkableBy>

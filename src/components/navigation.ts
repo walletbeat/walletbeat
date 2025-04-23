@@ -1,17 +1,17 @@
-import type { NavigationLinkItem } from '@/ui/organisms/Navigation'
-import HomeIcon from '@mui/icons-material/Home'
-import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import ForumIcon from '@mui/icons-material/Forum'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import { betaSiteRoot } from '@/constants'
 import LuBadgeCheck from 'lucide-static/icons/badge-check.svg?raw'
 import LuBuilding2 from 'lucide-static/icons/building-2.svg?raw'
+import HelpCenterIcon from '@mui/icons-material/HelpCenter'
+import HomeIcon from '@mui/icons-material/Home'
+import type { NavigationLinkItem } from '@/ui/organisms/Navigation'
 
 export const navigationHome: NavigationLinkItem = {
 	id: 'wallet-table',
 	icon: HomeIcon,
 	title: 'Walletbeat',
-	href: `${betaSiteRoot}/`,
+	href: `${betaSiteRoot}/#`,
 }
 
 export const navigationFaq: NavigationLinkItem = {
@@ -32,7 +32,7 @@ export const navigationCriteria: NavigationLinkItem = {
 	id: 'criteria',
 	icon: { raw: LuBadgeCheck },
 	title: 'Evaluation Criteria',
-	href: `${betaSiteRoot}/criteria`,
+	href: `${betaSiteRoot}/#criteria`,
 }
 
 export const navigationRepository: NavigationLinkItem = {

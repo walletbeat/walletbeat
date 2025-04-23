@@ -1,9 +1,10 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
 import { WalletProfile } from '@/schema/features/profile'
-import { exampleContributor } from '../contributors/example'
-import { Variant } from '@/schema/variants'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { Variant } from '@/schema/variants'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { exampleContributor } from '../contributors/example'
 
 export const unratedTemplate: Wallet = {
 	metadata: {
@@ -49,8 +50,9 @@ export const unratedTemplate: Wallet = {
 				ethereumL1: null,
 			},
 			hardwareWalletSupport: null,
-			hardwareWalletClearSigning: null,
+			hardwareWalletDappSigning: null,
 			passkeyVerification: null,
+			bugBountyProgram: null,
 		},
 		privacy: {
 			dataCollection: null,

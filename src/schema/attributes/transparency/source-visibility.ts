@@ -1,11 +1,12 @@
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
-import { licenseSourceIsVisible } from '@/schema/features/license'
-import { Rating, type Value, type Attribute, type Evaluation } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { paragraph, sentence } from '@/types/content'
+import { licenseSourceIsVisible } from '@/schema/features/transparency/license'
+import { type ReferenceArray, toFullyQualified } from '@/schema/reference'
 import type { WalletMetadata } from '@/schema/wallet'
+import { paragraph, sentence } from '@/types/content'
 import { sourceVisibilityDetailsContent } from '@/types/content/source-visibility-details'
-import { toFullyQualified, type ReferenceArray } from '@/schema/reference'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.source_visibility'
 export type SourceVisibilityValue = Value & {

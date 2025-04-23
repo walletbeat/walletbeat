@@ -89,6 +89,21 @@ export function nonEmptyRemap<K extends string | number | symbol, V1, V2>(
 }
 
 /**
+ * Filter an array, asserting that it is non-empty even after filtering.
+ * Will throw an error if this is not true.
+ */
+export function nonEmptyFilter<T>(
+	arr: NonEmptyArray<T>,
+	fn: (val: T, index: number) => boolean,
+): NonEmptyArray<T> {
+	const filtered = arr.filter(fn)
+	if (!isNonEmptyArray(filtered)) {
+		throw new Error('Non-empty array was unexpectedly filtered down to an empty array')
+	}
+	return filtered
+}
+
+/**
  * Get an element of the array. Guaranteed to be defined since the array is
  * non-empty.
  * @param arr The array from which to get the element.
@@ -158,6 +173,7 @@ export function nonEmptySet<K extends string | number | symbol>(
 export function nonEmptySetFromArray<K extends string | number | symbol>(
 	keys: NonEmptyArray<K>,
 ): NonEmptySet<K> {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input array was non-empty.
 	return Object.fromEntries(nonEmptyMap<K, [K, true]>(keys, key => [key, true])) as NonEmptySet<K>
 }
 
@@ -177,8 +193,9 @@ export function setContains<K extends string | number | symbol>(
 export function setItems<K extends string | number | symbol>(
 	set: NonEmptySet<K>,
 ): NonEmptyArray<K> {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input set was non-empty and contained at least one true value.
 	return Object.entries(set)
-		.filter(([_, v]) => v)
+		.filter(([_, v]): boolean => v as boolean) // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because NonEmptySet maps to boolean values.
 		.map(([k, _]) => k) as NonEmptyArray<K>
 }
 
@@ -188,11 +205,12 @@ export function setItems<K extends string | number | symbol>(
 export function setUnion<K extends string | number | symbol>(
 	sets: NonEmptyArray<NonEmptySet<K>>,
 ): NonEmptySet<K> {
-	const union: Map<K, true> = new Map()
+	const union = new Map<K, true>()
 	for (const set of sets) {
 		for (const item of setItems(set)) {
 			union.set(item, true)
 		}
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we had at least one set as input and each set was non-empty.
 	return Object.fromEntries(union.entries()) as NonEmptySet<K>
 }

@@ -1,16 +1,17 @@
-import type { ResolvedFeatures } from '@/schema/features'
 import {
-	Rating,
-	type Value,
 	type Attribute,
 	type Evaluation,
 	exampleRating,
+	Rating,
+	type Value,
 } from '@/schema/attributes'
-import { pickWorstRating, unrated } from '../common'
-import { markdown, paragraph, sentence } from '@/types/content'
-import type { WalletMetadata } from '@/schema/wallet'
+import type { ResolvedFeatures } from '@/schema/features'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import type { AtLeastOneVariant } from '@/schema/variants'
+import type { WalletMetadata } from '@/schema/wallet'
+import { markdown, paragraph, sentence } from '@/types/content'
+
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.fee_transparency'
 export type FeeTransparencyValue = Value & {
@@ -136,8 +137,8 @@ function detailedFeeTransparency(
 					!disclosesWalletFees
 						? 'clearly disclosing any additional wallet fees'
 						: !showsTransactionPurpose
-						? 'clearly showing the purpose of each transaction'
-						: 'providing comprehensive fee information including all components of the transaction cost'
+							? 'clearly showing the purpose of each transaction'
+							: 'providing comprehensive fee information including all components of the transaction cost'
 				}.
 			`,
 		),
@@ -249,7 +250,7 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<FeeTransparencyValue> => {
-		if (!features.transparency?.feeTransparency) {
+		if (features.transparency.feeTransparency === null) {
 			return unrated(feeTransparency, brand, {
 				feeTransparencyLevel: FeeTransparencyLevel.NONE,
 				disclosesWalletFees: false,
@@ -277,15 +278,8 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 					// If either is false, downgrade to detailed
 					return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose)
 				}
-			default:
-				return unrated(feeTransparency, brand, {
-					feeTransparencyLevel: FeeTransparencyLevel.NONE,
-					disclosesWalletFees: false,
-					showsTransactionPurpose: false,
-				})
 		}
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) => {
-		return pickWorstRating<FeeTransparencyValue>(perVariant)
-	},
-} 
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) =>
+		pickWorstRating<FeeTransparencyValue>(perVariant),
+}

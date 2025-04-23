@@ -1,22 +1,22 @@
-import { deepmerge } from '@mui/utils'
 import { createTheme, type ThemeOptions as MaterialThemeOptions } from '@mui/material/styles'
+import { deepmerge } from '@mui/utils'
 import type {} from '@mui/x-data-grid/themeAugmentation'
 
 /* eslint @typescript-eslint/no-magic-numbers: 0 -- A theme file will have numbers and hex codes in it, this is normal. */
 
 /** Color options for rating pie slices. */
 export interface RatingThemeOptions {
-	fail: string,
-	partial: string,
-	pass: string,
-	unrated: string,
-	exempt: string,
+	fail: string
+	partial: string
+	pass: string
+	unrated: string
+	exempt: string
 }
 
 /** Expanded ThemeOptions and palette. */
 export type ThemeOptions = MaterialThemeOptions & {
 	palette?: MaterialThemeOptions['palette'] & {
-		rating?: RatingThemeOptions,
+		rating?: RatingThemeOptions
 	}
 }
 
@@ -291,7 +291,7 @@ export const lightWalletTableTheme = createTheme(
 )
 
 // Add theme-specific CSS variables
-walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
+walletTableTheme.components = deepmerge(walletTableTheme.components ?? {}, {
 	MuiCssBaseline: {
 		styleOverrides: {
 			':root': {
@@ -301,9 +301,9 @@ walletTableTheme.components = deepmerge(walletTableTheme.components || {}, {
 	},
 })
 
-lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components || {}, {
+lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components ?? {}, {
 	MuiCssBaseline: {
-		styleOverrites: {
+		styleOverrides: {
 			':root': {
 				'--background-row-border': '#e0f2ff',
 			},

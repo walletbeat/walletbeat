@@ -1,7 +1,8 @@
 import type { EvaluationData, Value } from '@/schema/attributes'
+
 import { component, type Renderable } from '../content'
 
-export interface UnratedAttributeProps<V extends Value> extends EvaluationData<V> { }
+export interface UnratedAttributeProps<V extends Value> extends EvaluationData<V> {}
 
 export interface UnratedAttributeContent<V extends Value> {
 	component: 'UnratedAttribute'

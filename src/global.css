@@ -246,3 +246,8 @@ code {
 [data-radix-popper-content-wrapper] {
 	z-index: 100 !important;
 }
+
+/* This will apply in light mode (when html does NOT have .dark) */
+html:not(.dark) .MuiSvgIcon-root[data-testid='ExpandMoreIcon'] {
+	color: #fff !important;
+}

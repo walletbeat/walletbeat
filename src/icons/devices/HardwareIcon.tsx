@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 
 export const HardwareIcon: React.FC<React.SVGProps<SVGSVGElement>> = props => (
 	<svg

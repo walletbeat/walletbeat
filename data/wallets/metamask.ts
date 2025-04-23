@@ -1,17 +1,18 @@
-import { paragraph } from '@/types/content'
-import type { Wallet } from '@/schema/wallet'
-import { WalletProfile } from '@/schema/features/profile'
-import { polymutex } from '../contributors/polymutex'
-import { ClearSigningLevel } from '@/schema/features/security/hardware-wallet-clear-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { nconsigny } from '../contributors/nconsigny'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { diligence } from '../entities/diligence'
-import { cure53 } from '../entities/cure53'
-import { Variant } from '@/schema/variants'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { AccountType } from '@/schema/features/account-support'
+import { WalletProfile } from '@/schema/features/profile'
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { Variant } from '@/schema/variants'
+import type { Wallet } from '@/schema/wallet'
+import { paragraph } from '@/types/content'
+
+import { nconsigny } from '../contributors/nconsigny'
+import { polymutex } from '../contributors/polymutex'
+import { cure53 } from '../entities/cure53'
+import { diligence } from '../entities/diligence'
 
 export const metamask: Wallet = {
 	metadata: {
@@ -65,19 +66,6 @@ export const metamask: Wallet = {
 			},
 		},
 		security: {
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
-				libraryUrl: 'https://github.com/MetaMask/delegation-framework/tree/main/lib',
-				details:
-					'MetaMask uses Smooth Crypto lib for passkey verification in their delegation framework.',
-				ref: [
-					{
-						url: 'https://github.com/MetaMask/delegation-framework/commit/8641eccdedf486832e66e589b8a9bcfd44d00104',
-						explanation:
-							'MetaMask implements P256 verification using Smooth Crypto lib in their delegation framework.',
-					},
-				],
-			},
 			scamAlerts: null,
 			publicSecurityAudits: [
 				{
@@ -120,8 +108,8 @@ export const metamask: Wallet = {
 					},
 				],
 			},
-			hardwareWalletClearSigning: {
-				level: ClearSigningLevel.PARTIAL,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.PARTIAL,
 				details:
 					'MetaMask provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
 				ref: [
@@ -132,10 +120,20 @@ export const metamask: Wallet = {
 					},
 				],
 			},
-		},
-		privacy: {
-			dataCollection: null,
-			privacyPolicy: 'https://consensys.io/privacy-notice',
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB,
+				libraryUrl: 'https://github.com/MetaMask/delegation-framework/tree/main/lib',
+				details:
+					'MetaMask uses Smooth Crypto lib for passkey verification in their delegation framework.',
+				ref: [
+					{
+						url: 'https://github.com/MetaMask/delegation-framework/commit/8641eccdedf486832e66e589b8a9bcfd44d00104',
+						explanation:
+							'MetaMask implements P256 verification using Smooth Crypto lib in their delegation framework.',
+					},
+				],
+			},
+			bugBountyProgram: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -167,6 +165,10 @@ export const metamask: Wallet = {
 				governanceTokenMostlyDistributed: null,
 			},
 			ref: null,
+		},
+		privacy: {
+			dataCollection: null,
+			privacyPolicy: 'https://consensys.io/privacy-notice',
 		},
 	},
 	variants: {
