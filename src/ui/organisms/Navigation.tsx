@@ -4,6 +4,7 @@ import React, { memo, useState } from 'react'
 import { LuMenu, LuX } from 'react-icons/lu'
 
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+import { cx } from '@/utils/cx'
 
 import { ThemeSwitcher } from './ThemeSwitcher'
 
@@ -165,7 +166,7 @@ const NavigationItem = memo(
 									height="1em"
 									width="1em"
 									xmlns="http://www.w3.org/2000/svg"
-									className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+									className={cx('transition-transform', isOpen ? 'rotate-180' : '')}
 								>
 									<polyline points="6 9 12 15 18 9"></polyline>
 								</svg>
@@ -196,7 +197,7 @@ const NavigationItem = memo(
 									height="1em"
 									width="1em"
 									xmlns="http://www.w3.org/2000/svg"
-									className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+									className={cx('transition-transform', isOpen ? 'rotate-180' : '')}
 								>
 									<polyline points="6 9 12 15 18 9"></polyline>
 								</svg>
@@ -219,7 +220,10 @@ const NavigationItem = memo(
 				{hasChildren && (
 					<ul
 						key={`subitems-${item.id}`}
-						className={`pl-2 border-l ml-3 flex flex-col gap-0.5 overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+						className={cx(
+							'pl-2 border-l ml-3 flex flex-col gap-0.5 overflow-hidden transition-all',
+							isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0',
+						)}
 					>
 						{item.children?.map(subitem => (
 							<NavigationItem
@@ -367,28 +371,27 @@ export function Navigation({
 			{/* Navigation sidebar - desktop behavior differs from mobile */}
 			<div
 				key="navigationBox"
-				className={`
-				    /* Base styles */
-				    fixed lg:relative h-full z-40
-				    flex flex-col gap-0 overflow-y-auto
+				className={cx(
+					/* Base styles */
+					'fixed lg:relative h-full z-40 flex flex-col gap-0 overflow-y-auto',
 
-				    /* Full width on mobile, constrained on desktop */
-				    w-full lg:w-auto lg:max-w-xs
+					/* Full width on mobile, constrained on desktop */
+					'w-full lg:w-auto lg:max-w-xs',
 
-				    /* Positioning */
-				    inset-0 lg:inset-auto
+					/* Positioning */
+					'inset-0 lg:inset-auto',
 
-				    /* Desktop styles - always visible and positioned */
-				    lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-0
+					/* Desktop styles - always visible and positioned */
+					'lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-0',
 
-				    /* Mobile styles - controlled by state */
-				    lg:translate-x-0
-				    transition-transform duration-300
-				    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+					/* Mobile styles - controlled by state */
+					'lg:translate-x-0 transition-transform duration-300',
 
-				    /* Background color */
-				    bg-[var(--navigation-bg)]
-				`}
+					isOpen ? 'translate-x-0' : '-translate-x-full',
+
+					/* Background color */
+					'bg-[var(--navigation-bg)]',
+				)}
 			>
 				{/* Logo area */}
 				<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-16 lg:pt-0 h-[34px]">

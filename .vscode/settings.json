@@ -3,5 +3,8 @@
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"editor.insertSpaces": false,
 	"editor.detectIndentation": false,
-	"editor.tabSize": 2
+	"editor.tabSize": 2,
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	}
 }

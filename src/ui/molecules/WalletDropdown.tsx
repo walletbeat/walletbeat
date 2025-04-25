@@ -6,6 +6,7 @@ import { LuChevronDown, LuKey, LuSearch, LuWallet } from 'react-icons/lu'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedWallets } from '@/data/wallets'
 import type { RatedWallet } from '@/schema/wallet'
+import { cx } from '@/utils/cx'
 
 import { WalletIcon } from '../atoms/WalletIcon'
 
@@ -77,7 +78,7 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 							<span className="text-gray-400">Select a wallet</span>
 						)}
 					</div>
-					<LuChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+					<LuChevronDown className={cx('transition-transform', open ? 'rotate-180' : '')} />
 				</button>
 			</Popover.Trigger>
 

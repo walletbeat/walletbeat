@@ -37,7 +37,7 @@ export function VariantPicker<V extends string>({
 	gap = '0px',
 }: VariantPickerProps<V>): React.JSX.Element {
 	return (
-		<div key={pickerId} className={`flex`} style={{ flexDirection, gap }}>
+		<div key={pickerId} className="flex" style={{ flexDirection, gap }}>
 			{nonEmptyMap(variants, variant => {
 				let opacity = opacityDefault
 				const isSelected = pickedVariant === variant.id

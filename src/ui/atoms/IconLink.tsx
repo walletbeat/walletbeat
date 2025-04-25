@@ -1,6 +1,8 @@
 import type SvgIcon from '@mui/material/SvgIcon'
 import type React from 'react'
 
+import { cx } from '@/utils/cx'
+
 export function IconLink({
 	href,
 	IconComponent,
@@ -33,7 +35,11 @@ export function IconLink({
 				target={target}
 				rel={rel}
 				style={style}
-				className={`inline-flex flex-row ${gapClass} items-baseline no-underline ${colorClass} hover:underline`}
+				className={cx(
+					'inline-flex flex-row items-baseline no-underline hover:underline',
+					gapClass,
+					colorClass,
+				)}
 			>
 				<IconComponent className="inline-block" fontSize="inherit" />
 				<span className="inline-block">{children}</span>
