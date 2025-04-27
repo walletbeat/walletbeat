@@ -1,5 +1,9 @@
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
-import { Leak, MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
+import {
+	Leak,
+	MultiAddressPolicy,
+	RegularEndpoint,
+} from '@/schema/features/privacy/data-collection'
 import { WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
@@ -280,6 +284,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							multiAddress: {
 								type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
 							},
+							endpoint: RegularEndpoint,
 							mempoolTransactions: Leak.ALWAYS,
 							cexAccount: Leak.NEVER,
 							ref: dataLeakReferences.ambire,
@@ -295,6 +300,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							},
 							mempoolTransactions: Leak.ALWAYS,
 							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
 							ref: dataLeakReferences.pimlico,
 						},
 					},
@@ -308,6 +314,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							},
 							mempoolTransactions: Leak.ALWAYS,
 							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
 							ref: dataLeakReferences.biconomy,
 						},
 					},
@@ -318,6 +325,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							walletAddress: Leak.NEVER,
 							mempoolTransactions: Leak.NEVER,
 							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
 							ref: dataLeakReferences.lifi,
 						},
 					},
@@ -328,6 +336,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							walletAddress: Leak.NEVER,
 							mempoolTransactions: Leak.NEVER,
 							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
 							ref: dataLeakReferences.github,
 						},
 					},
@@ -338,6 +347,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							walletAddress: Leak.NEVER,
 							mempoolTransactions: Leak.NEVER,
 							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
 							ref: dataLeakReferences.jiffylabs,
 						},
 					},

@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { MustRef, WithRef } from '@/schema/reference'
 import type { Dict } from '@/types/utils/dict'
 
 import type { Entity } from '../../entity'
@@ -143,6 +143,98 @@ export type MultiAddressHandling =
 			 *   request).
 			 */
 			timing: 'SIMULTANEOUS' | 'STAGGERED'
+	  }
+
+/**
+ * Represents a regular (non-enclave) server endpoint.
+ */
+export const RegularEndpoint = {
+	/**
+	 * The endpoint is a regular server.
+	 * The entity can see all traffic going in/out of it.
+	 */
+	type: 'REGULAR',
+} as const
+
+/**
+ * The environment in which the server endpoint is running.
+ * A server can either be running as a regular server (`RegularEndpoint`),
+ * or in a secure enclave which potentially gives it more privacy properties.
+ */
+export type Endpoint =
+	| typeof RegularEndpoint
+	| {
+			/**
+			 * The server is running in a secure enclave.
+			 */
+			type: 'SECURE_ENCLAVE'
+
+			/**
+			 * Whether the software running within the enclave is verifiable
+			 * by the client.
+			 */
+			verifiability: WithRef<{
+				/**
+				 * Whether the source code of the server software is available.
+				 */
+				sourceAvailable: boolean
+
+				/**
+				 * Whether the source code of the server software can be reproducibly
+				 * built.
+				 */
+				reproducibleBuilds: boolean
+
+				/**
+				 * How the client verifies that the endpoint is running in a secure enclave.
+				 */
+				clientVerification:
+					| {
+							/** The client does not do any verification. */
+							type: 'NOT_VERIFIED'
+					  }
+					| {
+							/**
+							 * The client claims to verify but has not made the source code that
+							 * does this available.
+							 */
+							type: 'VERIFIED_BUT_NO_SOURCE_AVAILABLE'
+					  }
+					| MustRef<{
+							/**
+							 * The client verifies this. Must also come with a code reference.
+							 */
+							type: 'VERIFIED'
+					  }>
+			}>
+
+			/**
+			 * Whether the endpoint running in a secure enclave logs anything
+			 * outside of the enclave, thereby removing the privacy advantage
+			 * of enclaves.
+			 */
+			externalLogging:
+				| {
+						/**
+						 * It is not known whether the software running within the enclave
+						 * logs any data externally.
+						 */
+						type: 'UNKNOWN'
+				  }
+				| {
+						/**
+						 * This server software is known to log data externally to the
+						 * enclave.
+						 */
+						type: 'YES'
+				  }
+				| {
+						/**
+						 * This server software does not log data externally to the
+						 * enclave.
+						 */
+						type: 'NO'
+				  }
 	  }
 
 /**
@@ -386,6 +478,11 @@ export type QualifiedLeaks<T extends LeakedInfo> = Dict<
 		 * How multiple addresses are handled, if at all.
 		 */
 		multiAddress?: MultiAddressHandling
+
+		/**
+		 * Information about the endpoint that receives this data.
+		 */
+		endpoint: Endpoint
 	}
 >
 
@@ -407,7 +504,6 @@ export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
 		walletActions: leaks.walletActions ?? Leak.NEVER,
 		walletAddress:
 			first(leaks.walletAddress, leaks.mempoolTransactions, leaks.walletBalance) ?? Leak.NEVER,
-		multiAddress: leaks.multiAddress,
 		walletBalance:
 			first(leaks.walletBalance, leaks.walletAddress, leaks.mempoolTransactions) ?? Leak.NEVER,
 		walletAssets:
@@ -430,6 +526,8 @@ export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
 		face: first(leaks.face, leaks.governmentId) ?? Leak.NEVER,
 		cexAccount: leaks.cexAccount ?? Leak.NEVER,
 		governmentId: leaks.governmentId ?? Leak.NEVER,
+		multiAddress: leaks.multiAddress,
+		endpoint: leaks.endpoint ?? RegularEndpoint,
 		ref: leaks.ref,
 	}
 }
@@ -440,6 +538,7 @@ export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
 export interface EntityData {
 	/** The entity to which the data may be sent. */
 	entity: Entity
+
 	/** The type of data that an entity may be sent. */
 	leaks: Leaks
 }

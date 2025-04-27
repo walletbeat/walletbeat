@@ -10,6 +10,7 @@ import {
 import type { ResolvedFeatures } from '@/schema/features'
 import {
 	compareLeakedInfo,
+	type Endpoint,
 	inferLeaks,
 	Leak,
 	type LeakedInfo,
@@ -158,6 +159,37 @@ function linkable(
 	}
 }
 
+/**
+ * Checks whether the given endpoint is running in a secure enclave such that
+ * the code running it known, verifiable and verified by the client, and does
+ * not log any data outside of the enclave.
+ */
+function isSealedSecureEnclave(endpoint?: Endpoint): boolean {
+	if (endpoint === undefined) {
+		return false
+	}
+	if (endpoint.type === 'REGULAR') {
+		return false
+	}
+	if (endpoint.externalLogging.type !== 'NO') {
+		return false
+	}
+	if (!endpoint.verifiability.sourceAvailable || !endpoint.verifiability.reproducibleBuilds) {
+		// Server can be running any code, so all bets are off.
+		return false
+	}
+	if (endpoint.verifiability.clientVerification.type === 'NOT_VERIFIED') {
+		// Client does not check that the server is actually running in an
+		// enclave, so all bets are off.
+		return false
+	}
+	if (endpoint.verifiability.clientVerification.type === 'VERIFIED_BUT_NO_SOURCE_AVAILABLE') {
+		// Client checks but we can't check that the client is checking. Heh.
+		return false
+	}
+	return true
+}
+
 export function linkableToWalletAddress(leaks: Leaks): WalletAddressLinkableTo[] {
 	const qualLeaks = inferLeaks(leaks)
 	if (!leaksByDefault(qualLeaks.walletAddress)) {
@@ -171,6 +203,14 @@ export function linkableToWalletAddress(leaks: Leaks): WalletAddressLinkableTo[]
 		}
 		if (!leaksByDefault(qualLeaks[info])) {
 			continue
+		}
+		if (info === LeakedPersonalInfo.IP_ADDRESS) {
+			// Check if the server is running in a secure enclave with all
+			// desirable properties to shield the IP address from being a
+			// privacy leak.
+			if (isSealedSecureEnclave(leaks.endpoint)) {
+				continue
+			}
 		}
 		linkables.push({ info, leak: qualLeaks[info], refs: qualRefs })
 	}

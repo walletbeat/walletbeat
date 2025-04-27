@@ -8,6 +8,7 @@ import {
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
 import {
+	type Endpoint,
 	type EntityData,
 	inferLeaks,
 	leaksByDefault,
@@ -315,18 +316,47 @@ function unsupported(): Evaluation<MultiAddressCorrelationValue> {
 	}
 }
 
-function rateHandling(handling: MultiAddressHandling): number {
+function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): number {
 	switch (handling.type) {
 		case MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES:
 			return 0
-
 		case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
 			return 1000
 		case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS: {
-			const destinationScore = { SAME_FOR_ALL: 0, ISOLATED: 1 }[handling.destination] * 100
+			const destinationScore = { SAME_FOR_ALL: 0, ISOLATED: 1 }[handling.destination] * 1000
+			const enclaveScore =
+				(() => {
+					switch (endpoint.type) {
+						case 'REGULAR':
+							return 0
+						case 'SECURE_ENCLAVE':
+							switch (endpoint.externalLogging.type) {
+								case 'UNKNOWN':
+									return 0
+								case 'YES':
+									return 0
+								case 'NO':
+									if (
+										!endpoint.verifiability.sourceAvailable ||
+										!endpoint.verifiability.reproducibleBuilds
+									) {
+										// Server can be running anything, so all bets are off.
+										return 0
+									}
+									switch (endpoint.verifiability.clientVerification.type) {
+										case 'NOT_VERIFIED':
+											return 1
+										case 'VERIFIED':
+											return 2
+										case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
+											return 3
+									}
+							}
+					}
+				})() * 100
 			const proxyScore = { NONE: 0, SAME_CIRCUIT: 1, SEPARATE_CIRCUITS: 2 }[handling.proxy] * 10
 			const timingScore = { SIMULTANEOUS: 0, STAGGERED: 1 }[handling.timing]
-			return 1 + destinationScore + proxyScore + timingScore
+			return 1 + destinationScore + enclaveScore + proxyScore + timingScore
 		}
 	}
 }
@@ -475,10 +505,10 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 				continue
 			}
 			if (leaks.multiAddress === undefined) {
-				continue
+				return unrated(multiAddressCorrelation, brand, null)
 			}
 			allRefs.push(...refs(collected.leaks))
-			const score = rateHandling(leaks.multiAddress)
+			const score = rateHandling(leaks.multiAddress, leaks.endpoint)
 			if (worstHandling === null || score < worstHandlingScore) {
 				worstHandling = collected
 				worstHandlingScore = score
@@ -487,10 +517,10 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		if (worstHandling === null) {
 			return unrated(multiAddressCorrelation, brand, null)
 		}
-		if (worstHandling.leaks.multiAddress === undefined) {
+		const handling = worstHandling.leaks.multiAddress
+		if (handling === undefined) {
 			return unrated(multiAddressCorrelation, brand, null)
 		}
-		const handling = worstHandling.leaks.multiAddress
 		switch (handling.type) {
 			case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
 				// If the wallet has a concept of a singular "active address" and only

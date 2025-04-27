@@ -1,5 +1,9 @@
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
-import { Leak, MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
+import {
+	Leak,
+	MultiAddressPolicy,
+	RegularEndpoint,
+} from '@/schema/features/privacy/data-collection'
 import { WalletProfile } from '@/schema/features/profile'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
@@ -168,6 +172,7 @@ export const daimo: Wallet = {
 							},
 							mempoolTransactions: Leak.ALWAYS,
 							pseudonym: Leak.ALWAYS,
+							endpoint: RegularEndpoint,
 							ref: {
 								explanation:
 									'Wallet operations are routed through Daimo.com servers without proxying.',
@@ -184,6 +189,7 @@ export const daimo: Wallet = {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							mempoolTransactions: Leak.ALWAYS,
+							endpoint: RegularEndpoint,
 							ref: {
 								explanation:
 									'Sending bundled transactions uses the Pimlico API via api.pimlico.io as Paymaster.',
@@ -202,6 +208,7 @@ export const daimo: Wallet = {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							pseudonym: Leak.ALWAYS,
+							endpoint: RegularEndpoint,
 							ref: {
 								explanation:
 									'Daimo records telemetry events to Honeycomb. This data includes your Daimo username. Since this username is also linked to your wallet address onchain, Honeycomb can associate the username they receive with your wallet address.',
@@ -215,6 +222,7 @@ export const daimo: Wallet = {
 						entity: daimoInc,
 						leaks: {
 							farcasterAccount: Leak.OPT_IN,
+							endpoint: RegularEndpoint,
 							ref: [
 								{
 									explanation:
@@ -233,6 +241,7 @@ export const daimo: Wallet = {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							cexAccount: Leak.OPT_IN,
+							endpoint: RegularEndpoint,
 							ref: [
 								{
 									explanation:
@@ -246,6 +255,7 @@ export const daimo: Wallet = {
 						entity: openExchangeRates,
 						leaks: {
 							ipAddress: Leak.ALWAYS,
+							endpoint: RegularEndpoint,
 							ref: [
 								{
 									explanation:
@@ -262,6 +272,7 @@ export const daimo: Wallet = {
 						entity: merkleManufactory,
 						leaks: {
 							ipAddress: Leak.OPT_IN,
+							endpoint: RegularEndpoint,
 							ref: [
 								{
 									explanation:

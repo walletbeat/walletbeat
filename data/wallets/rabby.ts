@@ -1,5 +1,9 @@
 import { AccountType } from '@/schema/features/account-support'
-import { Leak, MultiAddressPolicy } from '@/schema/features/privacy/data-collection'
+import {
+	Leak,
+	MultiAddressPolicy,
+	RegularEndpoint,
+} from '@/schema/features/privacy/data-collection'
 import { WalletProfile } from '@/schema/features/profile'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
@@ -337,6 +341,7 @@ export const rabby: Wallet = {
 								},
 								mempoolTransactions: Leak.ALWAYS,
 								cexAccount: Leak.NEVER, // There appears to be code to link to a Coinbase account but no way to reach it from the UI?
+								endpoint: RegularEndpoint,
 								ref: [
 									{
 										explanation: 'All wallet traffic goes through api.rabby.io without proxying.',
