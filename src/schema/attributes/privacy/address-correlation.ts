@@ -174,6 +174,10 @@ function isSealedSecureEnclave(endpoint?: Endpoint): boolean {
 	if (endpoint.externalLogging.type !== 'NO') {
 		return false
 	}
+	if (endpoint.endToEndEncryption.type !== 'TERMINATED_INSIDE_ENCLAVE') {
+		// End-to-end encryption not terminated inside enclave, so can be MitM'd.
+		return false
+	}
 	if (!endpoint.verifiability.sourceAvailable || !endpoint.verifiability.reproducibleBuilds) {
 		// Server can be running any code, so all bets are off.
 		return false

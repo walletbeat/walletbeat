@@ -235,6 +235,30 @@ export type Endpoint =
 						 */
 						type: 'NO'
 				  }
+
+			/**
+			 * Info about the use of end-to-end encryption to the endpoint.
+			 * In most cases, this means where does the TLS handshake happens?
+			 * If this does not happen within the enclave (such as if terminated
+			 * at the load balancer level), then the connection is susceptible to
+			 * be man-in-the-middle'd.
+			 */
+			endToEndEncryption:
+				| {
+						/** No end-to-end encryption (really? in this day and age?) */
+						type: 'NONE'
+				  }
+				| {
+						/**
+						 * End-to-end encryption terminated outside of the enclave,
+						 * for example at the load balancer level.
+						 */
+						type: 'TERMINATED_OUT_OF_ENCLAVE'
+				  }
+				| {
+						/** End-to-end encryption terminated inside the enclave. */
+						type: 'TERMINATED_INSIDE_ENCLAVE'
+				  }
 	  }
 
 /**

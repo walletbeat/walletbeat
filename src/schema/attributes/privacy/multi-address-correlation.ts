@@ -336,20 +336,27 @@ function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): numbe
 								case 'YES':
 									return 0
 								case 'NO':
-									if (
-										!endpoint.verifiability.sourceAvailable ||
-										!endpoint.verifiability.reproducibleBuilds
-									) {
-										// Server can be running anything, so all bets are off.
-										return 0
-									}
-									switch (endpoint.verifiability.clientVerification.type) {
-										case 'NOT_VERIFIED':
-											return 1
-										case 'VERIFIED':
-											return 2
-										case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
-											return 3
+									switch (endpoint.endToEndEncryption.type) {
+										case 'NONE':
+											return 0
+										case 'TERMINATED_OUT_OF_ENCLAVE':
+											return 0
+										case 'TERMINATED_INSIDE_ENCLAVE':
+											if (
+												!endpoint.verifiability.sourceAvailable ||
+												!endpoint.verifiability.reproducibleBuilds
+											) {
+												// Server can be running anything, so all bets are off.
+												return 0
+											}
+											switch (endpoint.verifiability.clientVerification.type) {
+												case 'NOT_VERIFIED':
+													return 1
+												case 'VERIFIED':
+													return 2
+												case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
+													return 3
+											}
 									}
 							}
 					}
