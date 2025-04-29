@@ -1,11 +1,9 @@
-// Components
 import GitHubIcon from '@mui/icons-material/GitHub'
 import type { FC } from 'react'
-import { LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout, navigationCriteria } from '@/components/navigation'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { getValidAttributeGroups } from '@/schema/attribute-groups'
+import { walletNavigationGroups } from '@/pages/criteria/[type]'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import WalletTable from '@/ui/organisms/WalletTable'
 
@@ -24,40 +22,7 @@ export const HomePage: FC = () => (
 				],
 				overflow: false,
 			},
-			{
-				id: 'wallets',
-				items: [
-					{
-						title: 'Wallets',
-						icon: <LuWallet />,
-						href: '/',
-						id: 'wallets-nav',
-						children: getValidAttributeGroups(false).map(attr => ({
-							title: attr.displayName,
-							href: `/criteria/hardware/${attr.id}`,
-							id: attr.id,
-						})),
-					},
-				],
-				overflow: false,
-			},
-			{
-				id: 'hardware-wallets',
-				items: [
-					{
-						title: 'Hardware Wallets',
-						icon: <LuKey />,
-						href: '/',
-						id: 'hardware-wallets',
-						children: getValidAttributeGroups(true).map(attr => ({
-							title: attr.displayName,
-							href: `/criteria/hardware/${attr.id}`,
-							id: '/bare/' + attr.id,
-						})),
-					},
-				],
-				overflow: false,
-			},
+			...walletNavigationGroups,
 			{
 				id: 'criteria',
 				items: [navigationCriteria],

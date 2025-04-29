@@ -6,6 +6,44 @@ import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { getAttributeGroupById, getValidAttributeGroups } from '@/schema/attribute-groups'
 import type { WalletMetadata } from '@/schema/wallet'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
+import type { NavigationGroup } from '@/ui/organisms/Navigation'
+
+export const walletNavigationGroups: NavigationGroup[] = [
+	{
+		id: 'wallets',
+		items: [
+			{
+				title: 'Wallets',
+				icon: <LuWallet />,
+				href: '/',
+				id: 'wallets',
+				children: getValidAttributeGroups(false).map(attr => ({
+					title: attr.displayName,
+					href: `/criteria/software/${attr.id}`,
+					id: attr.id,
+				})),
+			},
+		],
+		overflow: false,
+	},
+	{
+		id: 'hardware-wallets',
+		items: [
+			{
+				title: 'Hardware Wallets',
+				icon: <LuKey />,
+				href: '/',
+				id: 'hardware-wallets',
+				children: getValidAttributeGroups(true).map(attr => ({
+					title: attr.displayName,
+					href: `/criteria/hardware/${attr.id}`,
+					id: attr.id,
+				})),
+			},
+		],
+		overflow: false,
+	},
+]
 
 export const CriteriaPage: FC<{
 	criteria: string
@@ -26,40 +64,7 @@ export const CriteriaPage: FC<{
 					],
 					overflow: false,
 				},
-				{
-					id: 'wallets',
-					items: [
-						{
-							title: 'Wallets',
-							icon: <LuWallet />,
-							href: '/',
-							id: 'wallets',
-							children: getValidAttributeGroups(false).map(attr => ({
-								title: attr.displayName,
-								href: `/criteria/hardware/${attr.id}`,
-								id: attr.id,
-							})),
-						},
-					],
-					overflow: false,
-				},
-				{
-					id: 'hardware-wallets',
-					items: [
-						{
-							title: 'Hardware Wallets',
-							icon: <LuKey />,
-							href: '/',
-							id: 'hardware-wallets',
-							children: getValidAttributeGroups(true).map(attr => ({
-								title: attr.displayName,
-								href: `/criteria/hardware/${attr.id}`,
-								id: attr.id,
-							})),
-						},
-					],
-					overflow: false,
-				},
+				...walletGroups,
 				{
 					id: 'criteria',
 					items: [navigationCriteria],
