@@ -169,6 +169,9 @@ export const metamask: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://consensys.io/privacy-notice',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 	},
 	variants: {

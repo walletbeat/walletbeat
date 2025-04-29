@@ -82,6 +82,9 @@ export const family: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: null,
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -125,6 +125,7 @@ export const ledgerWallet: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://ledger.com/privacy-policy',
+			transactionPrivacy: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

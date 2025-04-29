@@ -354,6 +354,9 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 				],
 			},
 			privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

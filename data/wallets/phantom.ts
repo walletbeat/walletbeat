@@ -88,6 +88,9 @@ export const phantom: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://www.phantom.com/privacy',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

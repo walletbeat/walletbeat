@@ -363,6 +363,9 @@ export const rabby: Wallet = {
 				},
 			},
 			privacyPolicy: 'https://rabby.io/docs/privacy',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

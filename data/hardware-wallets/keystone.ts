@@ -97,6 +97,7 @@ export const keystoneWallet: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://keyst.one/privacy-policy',
+			transactionPrivacy: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -150,6 +150,9 @@ export const coinbase: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://wallet.coinbase.com/privacy-policy',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

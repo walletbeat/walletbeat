@@ -87,6 +87,9 @@ export const rainbow: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://rainbow.me/privacy',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

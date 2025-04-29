@@ -119,6 +119,7 @@ export const trezorWallet: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://trezor.io/privacy-policy',
+			transactionPrivacy: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

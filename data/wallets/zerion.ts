@@ -90,6 +90,9 @@ export const zerion: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: null,
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

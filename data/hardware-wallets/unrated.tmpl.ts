@@ -57,6 +57,7 @@ export const unratedHardwareTemplate: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://example.com/privacy-policy',
+			transactionPrivacy: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -108,6 +108,9 @@ export const frame: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: null,
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

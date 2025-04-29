@@ -285,6 +285,9 @@ export const daimo: Wallet = {
 				],
 			},
 			privacyPolicy: 'https://daimo.com/privacy',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

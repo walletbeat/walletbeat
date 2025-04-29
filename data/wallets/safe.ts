@@ -96,6 +96,9 @@ export const safe: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://safe.global/privacy',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

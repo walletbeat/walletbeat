@@ -84,6 +84,7 @@ export const fireflyWallet: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: '',
+			transactionPrivacy: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

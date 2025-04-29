@@ -3,6 +3,7 @@ import type { WalletIntegration } from './features/ecosystem/integration'
 import type { AddressResolution } from './features/privacy/address-resolution'
 import type { DataCollection } from './features/privacy/data-collection'
 import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'
+import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
 import type { FirmwareSupport } from './features/security/firmware'
@@ -91,6 +92,9 @@ export interface WalletFeatures {
 
 		/** Privacy policy URL of the wallet. */
 		privacyPolicy: VariantFeature<string>
+
+		/** Transaction privacy features. */
+		transactionPrivacy: VariantFeature<TransactionPrivacy>
 
 		hardwarePrivacy?: VariantFeature<HardwarePrivacySupport>
 	}

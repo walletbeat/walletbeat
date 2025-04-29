@@ -93,6 +93,9 @@ export const elytro: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://github.com/Elytro-eth',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

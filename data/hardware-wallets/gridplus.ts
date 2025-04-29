@@ -97,6 +97,7 @@ export const gridplusWallet: Wallet = {
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://gridplus.io/privacy',
+			transactionPrivacy: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
