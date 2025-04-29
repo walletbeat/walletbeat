@@ -678,3 +678,30 @@ export const hardwareOnlySecurity = [
 export const hardwareOnlyPrivacy = ['hardware_privacy']
 export const hardwareOnlyTransparency = ['reputation', 'maintenance']
 export const hardwareOnlyEcosystem = ['interoperability']
+
+export function getValidAttributeGroups<Vs extends ValueSet>(
+	isHardwareWallet: boolean,
+): Array<AttributeGroup<Vs>> {
+	const hardwareOnlyAttributes = new Set<string>([
+		...hardwareOnlySecurity,
+		...hardwareOnlyPrivacy,
+		...hardwareOnlyTransparency,
+		...hardwareOnlyEcosystem,
+	])
+
+	return Object.values(attributeTree).filter((attrGroup): attrGroup is AttributeGroup<Vs> => {
+		if (isHardwareWallet) {
+			return true
+		}
+		// For software wallets, include groups that have at least one non-hardware-only attribute
+		const attrIds = Object.keys(attrGroup.attributes)
+		const allHardwareOnly = attrIds.every(attrId => hardwareOnlyAttributes.has(attrId))
+		return !allHardwareOnly
+	})
+}
+
+export function getAttributeGroupById<Vs extends ValueSet>(
+	id: string,
+): AttributeGroup<Vs> | undefined {
+	return attributeTree[id] as AttributeGroup<Vs> | undefined
+}

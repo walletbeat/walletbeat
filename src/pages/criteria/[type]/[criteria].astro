@@ -1,0 +1,35 @@
+---
+export const prerender = true
+import Layout from '@/layouts/Layout.astro'
+import { getAttributeGroupById, getValidAttributeGroups } from '@/schema/attribute-groups'
+import { CriteriaPage } from './index'
+
+export const getStaticPaths = () => {
+	return [
+		...getValidAttributeGroups(false).map(criteria => ({
+			params: {
+				type: 'software',
+				criteria: criteria.id,
+			},
+		})),
+		...getValidAttributeGroups(true).map(criteria => ({
+			params: {
+				type: 'hardware',
+				criteria: criteria.id,
+			},
+		})),
+	]
+}
+const { criteria } = Astro.params
+const criteriaData = getAttributeGroupById(criteria)
+---
+
+<Layout
+	metadata={{
+		title: `${criteriaData?.displayName} - Walletbeat`,
+		description: `Learn how ${criteriaData?.displayName} impacts your wallet experience.`,
+		keywordsBefore: ['Ethereum' + criteriaData?.displayName],
+	}}
+>
+	<CriteriaPage criteria={criteria} client:load />
+</Layout>
