@@ -19,11 +19,11 @@ export const walletNavigationGroups: NavigationGroup[] = [
 				icon: <LuWallet />,
 				href: '/',
 				id: 'wallets',
-				children: mapNonExemptAttributeGroupsInTree(unratedWallet.overall, (attr => ({
+				children: mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attr => ({
 					title: attr.displayName,
 					href: `/criteria/software/${attr.id}`,
 					id: attr.id,
-				}))),
+				})),
 			},
 		],
 		overflow: false,
@@ -36,11 +36,11 @@ export const walletNavigationGroups: NavigationGroup[] = [
 				icon: <LuKey />,
 				href: '/',
 				id: 'hardware-wallets',
-				children: mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, (attr => ({
+				children: mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, attr => ({
 					title: attr.displayName,
 					href: `/criteria/hardware/${attr.id}`,
 					id: attr.id,
-				}))),
+				})),
 			},
 		],
 		overflow: false,
