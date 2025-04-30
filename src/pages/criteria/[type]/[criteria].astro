@@ -1,21 +1,23 @@
 ---
 export const prerender = true
 import Layout from '@/layouts/Layout.astro'
-import { getAttributeGroupById, getValidAttributeGroups } from '@/schema/attribute-groups'
+import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { CriteriaPage } from './index'
+import { unratedWallet } from '@/data/wallets'
+import { unratedHardwareWallet } from '@/data/hardware-wallets'
 
 export const getStaticPaths = () => {
 	return [
-		...getValidAttributeGroups(false).map(criteria => ({
+		...mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attr => ({
 			params: {
+				criteria: attr.id,
 				type: 'software',
-				criteria: criteria.id,
 			},
 		})),
-		...getValidAttributeGroups(true).map(criteria => ({
+		...mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, attr => ({
 			params: {
+				criteria: attr.id,
 				type: 'hardware',
-				criteria: criteria.id,
 			},
 		})),
 	]

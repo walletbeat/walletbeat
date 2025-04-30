@@ -2,8 +2,10 @@ import type { FC } from 'react'
 import { LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout, navigationCriteria } from '@/components/navigation'
+import { unratedHardwareWallet } from '@/data/hardware-wallets'
+import { unratedWallet } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { getAttributeGroupById, getValidAttributeGroups } from '@/schema/attribute-groups'
+import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import type { WalletMetadata } from '@/schema/wallet'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
@@ -17,11 +19,11 @@ export const walletNavigationGroups: NavigationGroup[] = [
 				icon: <LuWallet />,
 				href: '/',
 				id: 'wallets',
-				children: getValidAttributeGroups(false).map(attr => ({
+				children: mapNonExemptAttributeGroupsInTree(unratedWallet.overall, (attr => ({
 					title: attr.displayName,
 					href: `/criteria/software/${attr.id}`,
 					id: attr.id,
-				})),
+				}))),
 			},
 		],
 		overflow: false,
@@ -34,11 +36,11 @@ export const walletNavigationGroups: NavigationGroup[] = [
 				icon: <LuKey />,
 				href: '/',
 				id: 'hardware-wallets',
-				children: getValidAttributeGroups(true).map(attr => ({
+				children: mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, (attr => ({
 					title: attr.displayName,
 					href: `/criteria/hardware/${attr.id}`,
 					id: attr.id,
-				})),
+				}))),
 			},
 		],
 		overflow: false,
@@ -64,7 +66,7 @@ export const CriteriaPage: FC<{
 					],
 					overflow: false,
 				},
-				...walletGroups,
+				...walletNavigationGroups,
 				{
 					id: 'criteria',
 					items: [navigationCriteria],
