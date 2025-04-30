@@ -1,9 +1,9 @@
 import GitHubIcon from '@mui/icons-material/GitHub'
 import type { FC } from 'react'
 
-import { navigationAbout, navigationCriteria } from '@/components/navigation'
+import { navigationAbout } from '@/components/navigation'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { walletNavigationGroups } from '@/pages/criteria/[type]'
+import { walletNavigationGroups } from '@/pages/[type]/criteria'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import WalletTable from '@/ui/organisms/WalletTable'
 
@@ -23,11 +23,6 @@ export const HomePage: FC = () => (
 				overflow: false,
 			},
 			...walletNavigationGroups,
-			{
-				id: 'criteria',
-				items: [navigationCriteria],
-				overflow: false,
-			},
 			{
 				id: 'about',
 				items: [navigationAbout],

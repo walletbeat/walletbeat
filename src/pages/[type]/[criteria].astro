@@ -1,0 +1,66 @@
+---
+export const prerender = true
+import Layout from '@/layouts/Layout.astro'
+import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
+import { CriteriaPage } from './criteria'
+import { isValidWalletName, unratedWallet, wallets } from '@/data/wallets'
+import {
+	hardwareWallets,
+	isValidHardwareWalletName,
+	unratedHardwareWallet,
+} from '@/data/hardware-wallets'
+
+export const getStaticPaths = () => {
+	return [
+		...mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attr => ({
+			params: {
+				type: 'wallet',
+				criteria: attr.id,
+			},
+		})),
+		...mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, attr => ({
+			params: {
+				criteria: attr.id,
+				type: 'hww',
+			},
+		})),
+		// Redirects
+		...Object.entries(wallets).map(([_walletId, wallet]) => ({
+			params: {
+				type: 'wallet',
+				criteria: wallet.metadata.id,
+			},
+		})),
+		...Object.entries(hardwareWallets).map(([_walletId, wallet]) => ({
+			params: {
+				type: 'hww',
+				criteria: wallet.metadata.id,
+			},
+		})),
+	]
+}
+const { criteria, type } = Astro.params
+
+// if is wallet or hardware wallet redirect to projects/[walletName]
+const isWallet = isValidHardwareWalletName(criteria) || isValidWalletName(criteria)
+
+if (isWallet) {
+	return Astro.redirect('/' + type + `/projects/${criteria}`)
+}
+
+if (!['wallet', 'hww'].includes(type)) {
+	return Astro.redirect('/')
+}
+
+const criteriaData = getAttributeGroupById(criteria)
+---
+
+<Layout
+	metadata={{
+		title: `${criteriaData?.displayName} - Walletbeat`,
+		description: `Learn how ${criteriaData?.displayName} impacts your wallet experience.`,
+		keywordsBefore: ['Ethereum' + criteriaData?.displayName],
+	}}
+>
+	<CriteriaPage criteria={criteria} client:load />
+</Layout>

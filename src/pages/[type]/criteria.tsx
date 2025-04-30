@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 import { LuKey, LuWallet } from 'react-icons/lu'
 
-import { navigationAbout, navigationCriteria } from '@/components/navigation'
+import { navigationAbout } from '@/components/navigation'
 import { unratedHardwareWallet } from '@/data/hardware-wallets'
 import { unratedWallet } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
@@ -17,11 +17,11 @@ export const walletNavigationGroups: NavigationGroup[] = [
 			{
 				title: 'Wallets',
 				icon: <LuWallet />,
-				href: '/',
+				href: '/wallet',
 				id: 'wallets',
 				children: mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attr => ({
 					title: attr.displayName,
-					href: `/criteria/software/${attr.id}`,
+					href: `/wallet/${attr.id}`,
 					id: attr.id,
 				})),
 			},
@@ -29,16 +29,16 @@ export const walletNavigationGroups: NavigationGroup[] = [
 		overflow: false,
 	},
 	{
-		id: 'hardware-wallets',
+		id: 'hww',
 		items: [
 			{
 				title: 'Hardware Wallets',
 				icon: <LuKey />,
-				href: '/',
-				id: 'hardware-wallets',
+				href: '/hww',
+				id: 'hww',
 				children: mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, attr => ({
 					title: attr.displayName,
-					href: `/criteria/hardware/${attr.id}`,
+					href: `/hww/${attr.id}`,
 					id: attr.id,
 				})),
 			},
@@ -68,11 +68,6 @@ export const CriteriaPage: FC<{
 				},
 				...walletNavigationGroups,
 				{
-					id: 'criteria',
-					items: [navigationCriteria],
-					overflow: false,
-				},
-				{
 					id: 'about',
 					items: [navigationAbout],
 					overflow: false,
@@ -86,7 +81,6 @@ export const CriteriaPage: FC<{
 							{criteriaData != null && (
 								<>
 									<h1 className="text-4xl font-extrabold text-accent">
-										{criteriaData.icon}
 										{criteriaData.displayName}
 									</h1>
 									<p className="text-secondary">
@@ -101,11 +95,14 @@ export const CriteriaPage: FC<{
 											}}
 										/>
 									</p>
+									{Object.values(criteriaData.attributes).map(attr => (
+										<div key={attr.id}>
+											<h2>{attr.displayName}</h2>
+											<p>{attr.id}</p>
+										</div>
+									))}
 								</>
 							)}
-						</div>
-						<div className="flex-1 flex justify-center items-center">
-							<img src="/robot.png" alt="Walletbeat Robot" className="h-80 w-auto object-contain" />
 						</div>
 					</div>
 				</div>

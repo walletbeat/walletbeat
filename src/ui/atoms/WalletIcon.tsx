@@ -15,7 +15,7 @@ export function WalletIcon({
 	const isHardwareWallet = hasVariant(wallet.variants, Variant.HARDWARE)
 
 	// Determine the correct folder based on wallet type
-	const folderPath = isHardwareWallet ? 'hardware-wallets' : 'wallets'
+	const folderPath = isHardwareWallet ? 'hww' : 'wallets'
 
 	return (
 		<div style={{ width: iconSize, height: iconSize, overflow: 'hidden' }} className="flex">

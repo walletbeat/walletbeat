@@ -9,34 +9,47 @@ import { isValidWalletName, ratedWallets, wallets } from '@/data/wallets.ts'
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 // Params
-export const getStaticPaths = () =>
-	nonEmptyMap(nonEmptyKeys(wallets), walletName => ({
+export const getStaticPaths = () => [
+	...nonEmptyMap(nonEmptyKeys(wallets), walletName => ({
 		params: {
+			type: 'wallet',
 			walletName,
 		},
-	}))
+	})),
+	...nonEmptyMap(nonEmptyKeys(hardwareWallets), walletName => ({
+		params: {
+			type: 'hww',
+			walletName,
+		},
+	})),
+]
 
 const { walletName } = Astro.params
 
 // Derived
-const walletMetadata = ratedWallets[walletName].metadata
+const walletType = isValidWalletName(walletName) ? 'wallet' : 'hww'
+const walletMetadata =
+	walletName && isValidWalletName(walletName)
+		? ratedWallets[walletName].metadata
+		: hardwareWallets[walletName].metadata
 
 // Layouts
 import Layout from '@/layouts/Layout.astro'
 
 // Components
 import { WalletPage } from '@/components/WalletPage'
+import { hardwareWallets } from '@/data/hardware-wallets'
 ---
 
 {
-	walletName && isValidWalletName(walletName) ? (
+	walletName && walletMetadata ? (
 		<Layout
 			metadata={{
 				title: `${walletMetadata.displayName} - Walletbeat`,
 				description: `How does ${walletMetadata.displayName} stack up as an Ethereum wallet?`,
 				icons: [
 					{
-						url: `/images/wallets/${walletMetadata.id}.${walletMetadata.iconExtension}`,
+						url: `/images/${walletType}/${walletMetadata.id}.${walletMetadata.iconExtension}`,
 					},
 				],
 				keywordsBefore: [

@@ -299,15 +299,11 @@ function createWalletNameCell(
 	const createCell = ({ row }: { row: Row<TableRow> }): React.ReactNode => {
 		// Regular row rendering with logo
 		const walletId = row.original.wallet.metadata.id
-		const logoPath = isHardware
-			? `/images/hardware-wallets/${walletId}.svg`
-			: `/images/wallets/${walletId}.svg`
-		const defaultLogo = isHardware
-			? '/images/hardware-wallets/default.svg'
-			: '/images/wallets/default.svg'
+		const logoPath = isHardware ? `/images/hww/${walletId}.svg` : `/images/wallets/${walletId}.svg`
+		const defaultLogo = isHardware ? '/images/hww/default.svg' : '/images/wallets/default.svg'
 
 		// Create the wallet detail URL
-		const walletUrl = `/${isHardware ? 'hww' : 'wallet'}/${walletId}`
+		const walletUrl = `/${isHardware ? 'hww' : 'wallet'}/projects/${walletId}`
 
 		return (
 			<div className="flex items-center">
@@ -481,19 +477,19 @@ function ExpandableHardwareWalletRow({
 						{/* Wallet Logo */}
 						<div className="flex-shrink-0 mr-3">
 							<img
-								src={`/images/hardware-wallets/${wallet.metadata.id}.svg`}
+								src={`/images/hww/${wallet.metadata.id}.svg`}
 								alt=""
 								className="w-6 h-6 object-contain"
 								onError={e => {
 									// Fallback for missing logos
-									e.currentTarget.src = '/images/hardware-wallets/default.svg'
+									e.currentTarget.src = '/images/hww/default.svg'
 								}}
 							/>
 						</div>
 						{/* Wallet Name */}
 						<div className="flex flex-col items-start">
 							<a
-								href={`/hww/${wallet.metadata.id}`}
+								href={`/hww/projects/${wallet.metadata.id}`}
 								className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
 							>
 								{row.original.name}
@@ -1005,11 +1001,11 @@ export default function WalletTable(): React.ReactElement {
 		<div className="overflow-x-auto">
 			{/* Tabs - now fixed */}
 			<div className="sticky top-0 bg-white dark:bg-[#141414] z-10">
-				<div className="flex gap-4">
+				<div className="flex gap-4 items-end">
 					<div className="flex gap-1">
 						<button
 							className={cx(
-								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform',
+								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
 								activeTab === WalletTableTab.SOFTWARE
 									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
 									: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]',
@@ -1030,7 +1026,7 @@ export default function WalletTable(): React.ReactElement {
 						</button>
 						<button
 							className={cx(
-								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform',
+								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
 								activeTab === WalletTableTab.HARDWARE
 									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
 									: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]',
@@ -1052,7 +1048,7 @@ export default function WalletTable(): React.ReactElement {
 					</div>
 					{/* Wallet Type Filter Buttons - only show for Software wallets tab */}
 					{activeTab === WalletTableTab.SOFTWARE && (
-						<div className="flex flex-wrap gap-2 py-1 px-1">
+						<div className="flex flex-wrap gap-2 py-1 px-1 justify-end">
 							<span className="text-sm font-medium text-gray-600 dark:text-gray-300 self-center mr-2">
 								Filter by:
 							</span>
