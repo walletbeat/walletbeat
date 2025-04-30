@@ -1,0 +1,37 @@
+---
+export const prerender = true
+import Layout from '@/layouts/Layout.astro'
+import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
+import { CriteriaPage } from './index'
+import { unratedWallet } from '@/data/wallets'
+import { unratedHardwareWallet } from '@/data/hardware-wallets'
+
+export const getStaticPaths = () => {
+	return [
+		...mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attr => ({
+			params: {
+				criteria: attr.id,
+				type: 'software',
+			},
+		})),
+		...mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, attr => ({
+			params: {
+				criteria: attr.id,
+				type: 'hardware',
+			},
+		})),
+	]
+}
+const { criteria } = Astro.params
+const criteriaData = getAttributeGroupById(criteria)
+---
+
+<Layout
+	metadata={{
+		title: `${criteriaData?.displayName} - Walletbeat`,
+		description: `Learn how ${criteriaData?.displayName} impacts your wallet experience.`,
+		keywordsBefore: ['Ethereum' + criteriaData?.displayName],
+	}}
+>
+	<CriteriaPage criteria={criteria} client:load />
+</Layout>

@@ -1,12 +1,9 @@
-// Components
 import GitHubIcon from '@mui/icons-material/GitHub'
 import type { FC } from 'react'
-import { LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout, navigationCriteria } from '@/components/navigation'
-import { mapHardwareWallets } from '@/data/hardware-wallets'
-import { mapWallets } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+import { walletNavigationGroups } from '@/pages/criteria/[type]'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import WalletTable from '@/ui/organisms/WalletTable'
 
@@ -25,72 +22,7 @@ export const HomePage: FC = () => (
 				],
 				overflow: false,
 			},
-			{
-				id: 'wallets',
-				items: [
-					{
-						title: 'Wallets',
-						icon: <LuWallet />,
-						href: '/',
-						id: 'wallets-nav',
-						children: mapWallets(wallet => ({
-							title: wallet.metadata.displayName,
-							href: `/wallet/${wallet.metadata.id}`,
-							id: wallet.metadata.id,
-							icon: (
-								<img
-									src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-									className="size-4"
-								/>
-							),
-						})),
-					},
-				],
-				overflow: false,
-			},
-			{
-				id: 'hardware-wallets',
-				items: [
-					{
-						title: 'Hardware Wallets',
-						icon: <LuKey />,
-						href: '/',
-						id: 'hardware-wallets',
-						children: mapHardwareWallets(wallet => {
-							// Simplified display names for hardware wallets
-							// TODO: Put this into wallet metadata.
-							let displayName = wallet.metadata.displayName
-							switch (wallet.metadata.id) {
-								case 'ledger':
-									displayName = 'Ledger'
-									break
-								case 'trezor':
-									displayName = 'Trezor'
-									break
-								case 'gridplus':
-									displayName = 'Grid Plus'
-									break
-								case 'keystone':
-									displayName = 'Keystone'
-									break
-							}
-
-							return {
-								title: displayName,
-								href: `/hww/${wallet.metadata.id}`,
-								id: wallet.metadata.id,
-								icon: (
-									<img
-										src={`/images/hardware-wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-										className="size-4"
-									/>
-								),
-							}
-						}),
-					},
-				],
-				overflow: false,
-			},
+			...walletNavigationGroups,
 			{
 				id: 'criteria',
 				items: [navigationCriteria],

@@ -678,3 +678,7 @@ export const hardwareOnlySecurity = [
 export const hardwareOnlyPrivacy = ['hardware_privacy']
 export const hardwareOnlyTransparency = ['reputation', 'maintenance']
 export const hardwareOnlyEcosystem = ['interoperability']
+
+export function getAttributeGroupById(id: string): AttributeGroup<ValueSet> | undefined {
+	return attributeTree[id] as AttributeGroup<ValueSet> | undefined
+}
