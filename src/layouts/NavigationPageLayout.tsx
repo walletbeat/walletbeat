@@ -20,6 +20,8 @@ export function NavigationPageLayout({
 	stickyHeaderId = undefined,
 	stickyHeaderMargin = undefined,
 	prefix,
+	selectedItemId = undefined,
+	selectedGroupId = undefined,
 }: {
 	/**
 	 * Set of navigation item groups.
@@ -54,6 +56,9 @@ export function NavigationPageLayout({
 	 * Prefix to display in the navigation bar.
 	 */
 	prefix?: React.ReactNode
+
+	selectedItemId?: string
+	selectedGroupId?: string
 }): React.JSX.Element {
 	const [activeItemId, setActiveItemId] = useState<string>('')
 
@@ -165,7 +170,14 @@ export function NavigationPageLayout({
 	return (
 		<ThemeProvider theme={theme}>
 			<div className="flex flex-col lg:flex-row w-full min-h-screen max-w-screen">
-				<Navigation key="navigation" groups={groups} activeItemId={activeItemId} prefix={prefix} />
+				<Navigation
+					key="navigation"
+					groups={groups}
+					activeItemId={activeItemId}
+					prefix={prefix}
+					selectedItemId={selectedItemId}
+					selectedGroupId={selectedGroupId}
+				/>
 
 				<div key="contentContainer" className="flex-grow overflow-y-auto min-h-screen w-full pb-24">
 					<div className="mx-auto w-full">{children}</div>

@@ -102,14 +102,6 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 		<span
 			key="listItemIcon"
 			className="inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1"
-			// sx={{
-			// 	minWidth: `${navigationListIconSize}px`,
-			// 	width: `${navigationListIconSize}px`,
-			// 	height: `${navigationListIconSize}px`,
-			// 	display: 'inline-block',
-			// textAlign: 'center',
-			// marginRight: '4px',
-			// }}
 		>
 			{children}
 		</span>
@@ -120,18 +112,43 @@ interface NavigationItemProps {
 	item: NavigationItem
 	active: boolean
 	depth: 'primary' | 'secondary'
-	// sx?: React.ComponentProps<typeof ListItem>['sx']
+	selectedItemId?: string
+	selectedGroupId?: string
 	onContentItemClick?: (item: NavigationContentItem) => void
+}
+
+function itemOrChildMatches(item: NavigationItem, selectedItemId?: string): boolean {
+	if (!selectedItemId) {
+		return false
+	}
+	if (item.id === selectedItemId) {
+		return true
+	}
+	return (item.children ?? []).some(child => itemOrChildMatches(child, selectedItemId))
 }
 
 /**
  * A single navigation list item.
  */
 const NavigationItem = memo(
-	function NavigationItem({ item, active }: NavigationItemProps): React.JSX.Element {
-		const [isOpen, setIsOpen] = useState(false)
-		const linkStyles =
-			'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 hover:bg-backgroundSecondary rounded-md'
+	function NavigationItem({
+		item,
+		active,
+		selectedItemId,
+		selectedGroupId,
+	}: NavigationItemProps): React.JSX.Element {
+		const shouldHighlight = item.id === selectedItemId && selectedGroupId !== undefined
+		const initiallyOpen = itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined
+		const [isOpen, setIsOpen] = useState(initiallyOpen)
+		React.useEffect(() => {
+			if (itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined) {
+				setIsOpen(true)
+			}
+		}, [selectedItemId, item, selectedGroupId])
+		const linkStyles = cx(
+			'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
+			shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-backgroundSecondary',
+		)
 		const hasChildren = (item.children?.length ?? 0) > 0
 
 		const toggleDropdown = (e: React.MouseEvent): void => {
@@ -231,6 +248,8 @@ const NavigationItem = memo(
 								item={subitem}
 								depth="secondary"
 								active={active}
+								selectedItemId={selectedItemId}
+								selectedGroupId={selectedGroupId}
 								onContentItemClick={undefined}
 							/>
 						))}
@@ -242,7 +261,9 @@ const NavigationItem = memo(
 	(prevProps: Readonly<NavigationItemProps>, nextProps: Readonly<NavigationItemProps>): boolean =>
 		prevProps.item.id === nextProps.item.id &&
 		prevProps.depth === nextProps.depth &&
-		prevProps.active === nextProps.active,
+		prevProps.active === nextProps.active &&
+		prevProps.selectedItemId === nextProps.selectedItemId &&
+		prevProps.selectedGroupId === nextProps.selectedGroupId,
 )
 
 interface NavigationGroupProps {
@@ -250,6 +271,8 @@ interface NavigationGroupProps {
 	groupIndex: number
 	activeItemId?: string
 	onContentItemClick?: (item: NavigationContentItem) => void
+	selectedItemId?: string
+	selectedGroupId?: string
 }
 
 export const NavigationGroup = memo(
@@ -257,10 +280,13 @@ export const NavigationGroup = memo(
 		group,
 		activeItemId,
 		onContentItemClick,
+		selectedItemId,
+		selectedGroupId,
 	}: NavigationGroupProps): React.JSX.Element {
+		const isSelectedGroup = group.id === selectedGroupId
 		return (
 			<>
-				<ul className="flex flex-col gap-0 p-0 m-0">
+				<ul className={cx('flex flex-col gap-0 p-0 m-0')} id={`navigationGroup-${group.id}`}>
 					{nonEmptyMap(group.items, item => (
 						<React.Fragment key={`fragment-${item.id}`}>
 							<NavigationItem
@@ -268,6 +294,8 @@ export const NavigationGroup = memo(
 								item={item}
 								active={activeItemId === item.id}
 								depth="secondary"
+								selectedItemId={isSelectedGroup ? selectedItemId : undefined}
+								selectedGroupId={isSelectedGroup ? selectedGroupId : undefined}
 								onContentItemClick={onContentItemClick}
 							/>
 						</React.Fragment>
@@ -289,17 +317,29 @@ export const NavigationGroup = memo(
 		if (prevProps.onContentItemClick !== nextProps.onContentItemClick) {
 			return false
 		}
-		if (prevProps.activeItemId === nextProps.activeItemId) {
+		if (
+			prevProps.activeItemId === nextProps.activeItemId &&
+			prevProps.selectedItemId === nextProps.selectedItemId &&
+			prevProps.selectedGroupId === nextProps.selectedGroupId
+		) {
 			return true
 		}
-		// Check if active item ID is one of the sub-items of this group.
+		// Check if active item ID or selected item ID is one of the sub-items of this group.
 		for (const props of [prevProps, nextProps]) {
 			for (const item of props.group.items) {
-				if (item.id === props.activeItemId) {
+				if (
+					item.id === props.activeItemId ||
+					item.id === props.selectedItemId ||
+					props.group.id === props.selectedGroupId
+				) {
 					return false
 				}
 				for (const subItem of item.children ?? []) {
-					if (subItem.id === props.activeItemId) {
+					if (
+						subItem.id === props.activeItemId ||
+						subItem.id === props.selectedItemId ||
+						props.group.id === props.selectedGroupId
+					) {
 						return false
 					}
 				}
@@ -317,12 +357,16 @@ export function Navigation({
 	activeItemId,
 	onContentItemClick = undefined,
 	prefix,
+	selectedItemId,
+	selectedGroupId,
 }: {
 	groups: NonEmptyArray<NavigationGroup>
 	activeItemId?: string
 	flex?: React.ComponentProps<typeof Box>['flex']
 	onContentItemClick?: (item: NavigationContentItem) => void
 	prefix?: React.ReactNode
+	selectedItemId?: string
+	selectedGroupId?: string
 }): React.JSX.Element {
 	const [isOpen, setIsOpen] = useState(false)
 
@@ -425,6 +469,8 @@ export function Navigation({
 							groupIndex={groupIndex}
 							onContentItemClick={onContentItemClick}
 							activeItemId={activeItemId}
+							selectedItemId={selectedItemId}
+							selectedGroupId={selectedGroupId}
 						/>
 					))}
 				</div>

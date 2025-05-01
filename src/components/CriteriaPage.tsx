@@ -104,6 +104,9 @@ export function CriteriaPage({
 					overflow: false,
 				},
 			]}
+			selectedItemId={attrGroupId}
+			// wallets, hww, embedded
+			selectedGroupId={walletTypeToUrlSlug(walletType).toLowerCase().replace('s', '')}
 		>
 			<div className="max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full">
 				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
