@@ -13,6 +13,8 @@ import {
 	isValidHardwareWalletName,
 	unratedHardwareWallet,
 } from '@/data/hardware-wallets'
+import { representativeWalletForType } from '@/data/wallets'
+import { urlSlugToWalletType } from '@/schema/wallet-types'
 
 export const getStaticPaths = () => {
 	return [
@@ -52,19 +54,25 @@ if (isWallet) {
 	return Astro.redirect('/' + type + `/projects/${criteria}`)
 }
 
-if (!['wallet', 'hww'].includes(type)) {
+const walletType = urlSlugToWalletType(type)
+
+if (walletType === null) {
 	return Astro.redirect('/')
 }
 
-const criteriaData = getAttributeGroupById(criteria)
+const attrGroup = getAttributeGroupById(criteria, representativeWalletForType(walletType).overall)
+
+if (attrGroup === null) {
+	throw new Error('Invalid attribute group')
+}
 ---
 
 <Layout
 	metadata={{
-		title: `${criteriaData?.displayName} - Walletbeat`,
-		description: `Learn how ${criteriaData?.displayName} impacts your wallet experience.`,
-		keywordsBefore: ['Ethereum' + criteriaData?.displayName],
+		title: `${attrGroup.displayName} - Walletbeat`,
+		description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
+		keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
 	}}
 >
-	<CriteriaPage criteria={criteria} client:load />
+	<CriteriaPage walletType={walletType} attrGroupId={criteria} client:load />
 </Layout>

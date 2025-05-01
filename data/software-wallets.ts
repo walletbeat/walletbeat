@@ -45,7 +45,7 @@ export const ratedSoftwareWallets: Record<SoftwareWalletName, RatedWallet> = Obj
 ) as Record<SoftwareWalletName, RatedWallet>
 
 /**
- * Map the given function to all rated wallets.
+ * Map the given function to all rated software wallets.
  */
 export function mapSoftwareWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
 	return Object.values(ratedSoftwareWallets).map(fn)

@@ -451,7 +451,7 @@ export function getAttributeOverride(
 /**
  * Returns the set of variants the wallet supports.
  */
-export function getWalletVariants(wallet: RatedWallet): NonEmptySet<Variant> {
+export function getWalletVariants(wallet: RatedWallet | BaseWallet): NonEmptySet<Variant> {
 	return getVariants(wallet.variants)
 }
 

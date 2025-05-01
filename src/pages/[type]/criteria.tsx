@@ -1,12 +1,14 @@
-import type { FC } from 'react'
+import type React from 'react'
 import { LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout } from '@/components/navigation'
 import { unratedHardwareWallet } from '@/data/hardware-wallets'
 import { unratedSoftwareWallet } from '@/data/software-wallets'
+import { representativeWalletForType } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import type { WalletMetadata } from '@/schema/wallet'
+import type { WalletType } from '@/schema/wallet-types'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
 
@@ -47,10 +49,20 @@ export const walletNavigationGroups: NavigationGroup[] = [
 	},
 ]
 
-export const CriteriaPage: FC<{
-	criteria: string
-}> = ({ criteria }) => {
-	const criteriaData = getAttributeGroupById(criteria)
+export function CriteriaPage({
+	walletType,
+	attrGroupId,
+}: {
+	walletType: WalletType
+	attrGroupId: string
+}): React.JSX.Element {
+	const attrGroup = getAttributeGroupById(
+		attrGroupId,
+		representativeWalletForType(walletType).overall,
+	)
+	if (attrGroup === null) {
+		throw new Error('Invalid attribute group')
+	}
 	return (
 		<NavigationPageLayout
 			groups={[
@@ -78,31 +90,25 @@ export const CriteriaPage: FC<{
 				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
 					<div className="px-8 py-6 flex justify-between items-start flex-wrap min-h-96 relative">
 						<div className="flex flex-col gap-4 py-8 flex-1">
-							{criteriaData != null && (
-								<>
-									<h1 className="text-4xl font-extrabold text-accent">
-										{criteriaData.displayName}
-									</h1>
-									<p className="text-secondary">
-										<RenderTypographicContent
-											// eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- We only need a subset of WalletMetadata
-											content={criteriaData.perWalletQuestion.render({
-												displayName: 'your wallet',
-											} as WalletMetadata)}
-											typography={{
-												variant: 'caption',
-												fontStyle: 'italic',
-											}}
-										/>
-									</p>
-									{Object.values(criteriaData.attributes).map(attr => (
-										<div key={attr.id}>
-											<h2>{attr.displayName}</h2>
-											<p>{attr.id}</p>
-										</div>
-									))}
-								</>
-							)}
+							<h1 className="text-4xl font-extrabold text-accent">{attrGroup.displayName}</h1>
+							<p className="text-secondary">
+								<RenderTypographicContent
+									// eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- We only need a subset of WalletMetadata
+									content={attrGroup.perWalletQuestion.render({
+										displayName: 'your wallet',
+									} as WalletMetadata)}
+									typography={{
+										variant: 'caption',
+										fontStyle: 'italic',
+									}}
+								/>
+							</p>
+							{Object.values(attrGroup.attributes).map(attr => (
+								<div key={attr.id}>
+									<h2>{attr.displayName}</h2>
+									<p>{attr.id}</p>
+								</div>
+							))}
 						</div>
 					</div>
 				</div>

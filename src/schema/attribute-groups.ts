@@ -679,6 +679,25 @@ export const hardwareOnlyPrivacy = ['hardware_privacy']
 export const hardwareOnlyTransparency = ['reputation', 'maintenance']
 export const hardwareOnlyEcosystem = ['interoperability']
 
-export function getAttributeGroupById(id: string): AttributeGroup<ValueSet> | undefined {
-	return attributeTree[id] as AttributeGroup<ValueSet> | undefined
+/**
+ * Look up an attribute group by ID, verifying that it exists and is not
+ * entirely exempt from the given EvaluationTree.
+ */
+export function getAttributeGroupById(
+	id: string,
+	tree: EvaluationTree,
+): AttributeGroup<ValueSet> | null {
+	const attrGroup = attributeTree[id] as AttributeGroup<ValueSet> | undefined
+	if (attrGroup === undefined) {
+		return null
+	}
+	if (
+		!mapNonExemptAttributeGroupsInTree(
+			tree,
+			attrGroupInTree => attrGroup.id === attrGroupInTree.id,
+		).some(val => val)
+	) {
+		return null
+	}
+	return attrGroup
 }
