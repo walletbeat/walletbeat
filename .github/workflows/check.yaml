@@ -1,5 +1,14 @@
 name: Run code checks
-on: push
+on:
+  push: {}
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+      - ready_for_review
+      - review_requested
 jobs:
   check:
     runs-on: ubuntu-latest
