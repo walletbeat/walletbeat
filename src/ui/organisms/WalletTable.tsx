@@ -15,7 +15,7 @@ import { PiDesktop, PiDeviceMobile, PiDeviceMobileSlash, PiGlobe, PiGlobeX } fro
 import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { ratedHardwareWallets, unratedHardwareWallet } from '@/data/hardware-wallets'
-import { ratedWallets, unratedWallet } from '@/data/wallets'
+import { ratedWallets, unratedWallet } from '@/data/software-wallets'
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
 import type { EvaluationTree } from '@/schema/attribute-groups'
 import {

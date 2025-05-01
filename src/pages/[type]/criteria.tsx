@@ -3,7 +3,7 @@ import { LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout } from '@/components/navigation'
 import { unratedHardwareWallet } from '@/data/hardware-wallets'
-import { unratedWallet } from '@/data/wallets'
+import { unratedWallet } from '@/data/software-wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import type { WalletMetadata } from '@/schema/wallet'

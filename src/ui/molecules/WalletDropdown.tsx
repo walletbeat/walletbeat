@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { LuChevronDown, LuKey, LuSearch, LuWallet } from 'react-icons/lu'
 
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
-import { ratedWallets } from '@/data/wallets'
+import { ratedWallets } from '@/data/software-wallets'
 import type { RatedWallet } from '@/schema/wallet'
 import { cx } from '@/utils/cx'
 

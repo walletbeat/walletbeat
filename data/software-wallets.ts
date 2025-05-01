@@ -1,20 +1,20 @@
 import { type RatedWallet, rateWallet } from '@/schema/wallet'
 
-import { ambire } from './wallets/ambire'
-import { coinbase } from './wallets/coinbase'
-import { daimo } from './wallets/daimo'
-import { elytro } from './wallets/elytro'
-import { family } from './wallets/family'
-import { frame } from './wallets/frame'
-import { metamask } from './wallets/metamask'
-import { phantom } from './wallets/phantom'
-import { rabby } from './wallets/rabby'
-import { rainbow } from './wallets/rainbow'
-import { safe } from './wallets/safe'
-import { unratedTemplate } from './wallets/unrated.tmpl'
-import { zerion } from './wallets/zerion'
+import { ambire } from './software-wallets/ambire'
+import { coinbase } from './software-wallets/coinbase'
+import { daimo } from './software-wallets/daimo'
+import { elytro } from './software-wallets/elytro'
+import { family } from './software-wallets/family'
+import { frame } from './software-wallets/frame'
+import { metamask } from './software-wallets/metamask'
+import { phantom } from './software-wallets/phantom'
+import { rabby } from './software-wallets/rabby'
+import { rainbow } from './software-wallets/rainbow'
+import { safe } from './software-wallets/safe'
+import { unratedTemplate } from './software-wallets/unrated.tmpl'
+import { zerion } from './software-wallets/zerion'
 
-/** Set of all known wallets. */
+/** Set of all known software wallets. */
 export const wallets = {
 	ambire,
 	coinbase,

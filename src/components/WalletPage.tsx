@@ -16,7 +16,7 @@ import {
 	isValidHardwareWalletName,
 	ratedHardwareWallets,
 } from '@/data/hardware-wallets'
-import { ratedWallets, type WalletName } from '@/data/wallets'
+import { ratedWallets, type WalletName } from '@/data/software-wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
 	type EvaluationTree,
