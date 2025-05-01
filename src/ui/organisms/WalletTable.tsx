@@ -15,7 +15,7 @@ import { PiDesktop, PiDeviceMobile, PiDeviceMobileSlash, PiGlobe, PiGlobeX } fro
 import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { ratedHardwareWallets, unratedHardwareWallet } from '@/data/hardware-wallets'
-import { ratedWallets, unratedWallet } from '@/data/software-wallets'
+import { ratedSoftwareWallets, unratedSoftwareWallet } from '@/data/software-wallets'
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
 import type { EvaluationTree } from '@/schema/attribute-groups'
 import {
@@ -240,7 +240,7 @@ interface TableRow {
 }
 
 // Create software wallet table data
-const softwareWalletData: TableRow[] = Object.values(ratedWallets)
+const softwareWalletData: TableRow[] = Object.values(ratedSoftwareWallets)
 	.map(wallet => {
 		const detailedType = getDetailedWalletDescription(wallet)
 		const { standards, hasEoa, hasSmartWallet } = getWalletTypeInfo(wallet, 'ALL_VARIANTS')
@@ -867,7 +867,10 @@ export default function WalletTable(): React.ReactElement {
 		walletNameColumn,
 		walletTypeColumn,
 		walletVariantColumn,
-		...mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attributeGroupColumnFromAttrGroup),
+		...mapNonExemptAttributeGroupsInTree(
+			unratedSoftwareWallet.overall,
+			attributeGroupColumnFromAttrGroup,
+		),
 	]
 
 	// Define columns for hardware wallets

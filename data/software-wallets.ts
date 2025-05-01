@@ -11,11 +11,11 @@ import { phantom } from './software-wallets/phantom'
 import { rabby } from './software-wallets/rabby'
 import { rainbow } from './software-wallets/rainbow'
 import { safe } from './software-wallets/safe'
-import { unratedTemplate } from './software-wallets/unrated.tmpl'
+import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
 import { zerion } from './software-wallets/zerion'
 
 /** Set of all known software wallets. */
-export const wallets = {
+export const softwareWallets = {
 	ambire,
 	coinbase,
 	daimo,
@@ -30,26 +30,26 @@ export const wallets = {
 	zerion,
 }
 
-/** A valid wallet name. */
-export type WalletName = keyof typeof wallets
+/** A valid software wallet name. */
+export type SoftwareWalletName = keyof typeof softwareWallets
 
-/** Type predicate for WalletName. */
-export function isValidWalletName(name: string): name is WalletName {
-	return Object.prototype.hasOwnProperty.call(wallets, name)
+/** Type predicate for SoftwareWalletName. */
+export function isValidSoftwareWalletName(name: string): name is SoftwareWalletName {
+	return Object.prototype.hasOwnProperty.call(softwareWallets, name)
 }
 
-/** All rated wallets. */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `wallets`.
-export const ratedWallets: Record<WalletName, RatedWallet> = Object.fromEntries(
-	Object.entries(wallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
-) as Record<WalletName, RatedWallet>
+/** All rated software wallets. */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `softwareWallets`.
+export const ratedSoftwareWallets: Record<SoftwareWalletName, RatedWallet> = Object.fromEntries(
+	Object.entries(softwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
+) as Record<SoftwareWalletName, RatedWallet>
 
 /**
  * Map the given function to all rated wallets.
  */
-export function mapWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
-	return Object.values(ratedWallets).map(fn)
+export function mapSoftwareWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
+	return Object.values(ratedSoftwareWallets).map(fn)
 }
 
-/** The unrated wallet as a rated wallet. */
-export const unratedWallet = rateWallet(unratedTemplate)
+/** The unrated software wallet as a rated wallet. */
+export const unratedSoftwareWallet = rateWallet(unratedSoftwareTemplate)

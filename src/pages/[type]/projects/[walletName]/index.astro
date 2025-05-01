@@ -3,14 +3,18 @@
 export const prerender = true
 
 // Data
-import { isValidWalletName, ratedWallets, wallets } from '@/data/software-wallets'
+import {
+	isValidSoftwareWalletName,
+	ratedSoftwareWallets,
+	softwareWallets,
+} from '@/data/software-wallets'
 
 // Utils
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 // Params
 export const getStaticPaths = () => [
-	...nonEmptyMap(nonEmptyKeys(wallets), walletName => ({
+	...nonEmptyMap(nonEmptyKeys(softwareWallets), walletName => ({
 		params: {
 			type: 'wallet',
 			walletName,
@@ -27,10 +31,10 @@ export const getStaticPaths = () => [
 const { walletName } = Astro.params
 
 // Derived
-const walletType = isValidWalletName(walletName) ? 'wallet' : 'hww'
+const walletType = isValidSoftwareWalletName(walletName) ? 'wallet' : 'hww'
 const walletMetadata =
-	walletName && isValidWalletName(walletName)
-		? ratedWallets[walletName].metadata
+	walletName && isValidSoftwareWalletName(walletName)
+		? ratedSoftwareWallets[walletName].metadata
 		: hardwareWallets[walletName].metadata
 
 // Layouts

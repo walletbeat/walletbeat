@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { LuChevronDown, LuKey, LuSearch, LuWallet } from 'react-icons/lu'
 
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
-import { ratedWallets } from '@/data/software-wallets'
+import { ratedSoftwareWallets } from '@/data/software-wallets'
 import type { RatedWallet } from '@/schema/wallet'
 import { cx } from '@/utils/cx'
 
@@ -34,7 +34,7 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 	// Convert all wallets to a unified array with type information
 	const allWalletItems: WalletItem[] = [
 		// Regular wallets
-		...Object.entries(ratedWallets).map(([id, walletData]) => ({
+		...Object.entries(ratedSoftwareWallets).map(([id, walletData]) => ({
 			id,
 			type: 'software' as const,
 			wallet: walletData,

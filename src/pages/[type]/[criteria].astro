@@ -3,7 +3,11 @@ export const prerender = true
 import Layout from '@/layouts/Layout.astro'
 import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { CriteriaPage } from './criteria'
-import { isValidWalletName, unratedWallet, wallets } from '@/data/software-wallets'
+import {
+	isValidSoftwareWalletName,
+	unratedSoftwareWallet,
+	softwareWallets,
+} from '@/data/software-wallets'
 import {
 	hardwareWallets,
 	isValidHardwareWalletName,
@@ -12,7 +16,7 @@ import {
 
 export const getStaticPaths = () => {
 	return [
-		...mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attr => ({
+		...mapNonExemptAttributeGroupsInTree(unratedSoftwareWallet.overall, attr => ({
 			params: {
 				type: 'wallet',
 				criteria: attr.id,
@@ -25,7 +29,7 @@ export const getStaticPaths = () => {
 			},
 		})),
 		// Redirects
-		...Object.entries(wallets).map(([_walletId, wallet]) => ({
+		...Object.entries(softwareWallets).map(([_walletId, wallet]) => ({
 			params: {
 				type: 'wallet',
 				criteria: wallet.metadata.id,
@@ -42,7 +46,7 @@ export const getStaticPaths = () => {
 const { criteria, type } = Astro.params
 
 // if is wallet or hardware wallet redirect to projects/[walletName]
-const isWallet = isValidHardwareWalletName(criteria) || isValidWalletName(criteria)
+const isWallet = isValidHardwareWalletName(criteria) || isValidSoftwareWalletName(criteria)
 
 if (isWallet) {
 	return Astro.redirect('/' + type + `/projects/${criteria}`)

@@ -3,7 +3,7 @@ import { LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout } from '@/components/navigation'
 import { unratedHardwareWallet } from '@/data/hardware-wallets'
-import { unratedWallet } from '@/data/software-wallets'
+import { unratedSoftwareWallet } from '@/data/software-wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import type { WalletMetadata } from '@/schema/wallet'
@@ -19,7 +19,7 @@ export const walletNavigationGroups: NavigationGroup[] = [
 				icon: <LuWallet />,
 				href: '/wallet',
 				id: 'wallets',
-				children: mapNonExemptAttributeGroupsInTree(unratedWallet.overall, attr => ({
+				children: mapNonExemptAttributeGroupsInTree(unratedSoftwareWallet.overall, attr => ({
 					title: attr.displayName,
 					href: `/wallet/${attr.id}`,
 					id: attr.id,

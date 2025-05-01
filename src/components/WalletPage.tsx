@@ -16,7 +16,7 @@ import {
 	isValidHardwareWalletName,
 	ratedHardwareWallets,
 } from '@/data/hardware-wallets'
-import { ratedWallets, type WalletName } from '@/data/software-wallets'
+import { ratedSoftwareWallets, type SoftwareWalletName } from '@/data/software-wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
 	type EvaluationTree,
@@ -150,7 +150,7 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 export function WalletPage({
 	walletName,
 }: {
-	walletName: WalletName | HardwareWalletName
+	walletName: SoftwareWalletName | HardwareWalletName
 }): React.JSX.Element {
 	// Determine if this is a hardware wallet or regular wallet
 	const isHardwareWallet = isValidHardwareWalletName(walletName)
@@ -158,7 +158,7 @@ export function WalletPage({
 	// Use type guards to safely access the wallets
 	const wallet = isValidHardwareWalletName(walletName)
 		? ratedHardwareWallets[walletName]
-		: ratedWallets[walletName]
+		: ratedSoftwareWallets[walletName]
 
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
