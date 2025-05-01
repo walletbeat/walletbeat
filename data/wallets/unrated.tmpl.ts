@@ -11,30 +11,28 @@ export const unratedTemplate: Wallet = {
 		id: 'unrated',
 		displayName: 'Unrated wallet template',
 		tableName: 'Unrated',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			This is a fictitious wallet with all of its fields unrated.
 			It is meant to be useful to copy-paste to other wallet files
 			when initially creating the skeleton structure for their data.
 		`),
-		url: 'https://example.com',
-		repoUrl: 'https://example.com/repo',
 		contributors: [exampleContributor],
+		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',
+		repoUrl: 'https://example.com/repo',
+		url: 'https://example.com',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: null,
-		multiAddress: null,
 		addressResolution: {
-			nonChainSpecificEnsResolution: null,
 			chainSpecificAddressing: {
 				erc7828: null,
 				erc7831: null,
 			},
+			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainConfigurability: null,
 		integration: {
 			browser: {
 				'1193': null,
@@ -43,21 +41,39 @@ export const unratedTemplate: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
+		license: null,
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
 			},
-			hardwareWalletSupport: null,
-			hardwareWalletDappSigning: null,
-			passkeyVerification: null,
-			bugBountyProgram: null,
 		},
+		multiAddress: null,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://example.com/privacy-policy',
 			transactionPrivacy: null,
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: null,
+			hardwareWalletDappSigning: null,
+			hardwareWalletSupport: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -73,22 +89,6 @@ export const unratedTemplate: Wallet = {
 		},
 		transparency: {
 			feeTransparency: null,
-		},
-		license: null,
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
 		},
 	},
 	variants: {

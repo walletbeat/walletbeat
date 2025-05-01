@@ -14,38 +14,36 @@ export const gridplusWallet: Wallet = {
 		id: 'gridplus',
 		displayName: 'GridPlus Wallet',
 		tableName: 'GridPlus',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			GridPlus Wallet is a secure hardware wallet that combines secure key storage
 			with convenient authentication methods.
 		`),
-		url: 'https://gridplus.io/',
-		repoUrl: 'https://github.com/GridPlus',
 		contributors: [nconsigny],
-		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
 				id: 'gridplus-lattice1',
 				name: 'GridPlus Lattice1',
-				url: 'https://gridplus.io/products/lattice1',
 				isFlagship: true,
+				url: 'https://gridplus.io/products/lattice1',
 			},
 		],
+		iconExtension: 'svg',
+		lastUpdated: '2025-03-12',
+		repoUrl: 'https://github.com/GridPlus',
+		url: 'https://gridplus.io/',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: null,
-		multiAddress: null,
 		addressResolution: {
-			nonChainSpecificEnsResolution: null,
 			chainSpecificAddressing: {
 				erc7828: null,
 				erc7831: null,
 			},
+			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainConfigurability: null,
 		integration: {
 			browser: {
 				'1193': null,
@@ -54,50 +52,68 @@ export const gridplusWallet: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
-			passkeyVerification: null,
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			hardwareWalletSupport: {
-				supportedWallets: {
-					[HardwareWalletType.GRIDPLUS]: featureSupported,
-				},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.PARTIAL,
-				details:
-					'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.',
-				ref: [
-					{
-						url: 'https://youtu.be/7lP_0h-PPvY?t=1141',
-						explanation:
-							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
-					},
-				],
-			},
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
-				url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
-				details:
-					'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
-				upgradePathAvailable: true,
-				ref: [
-					{
-						url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
-						explanation:
-							'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
-					},
-				],
+		license: null,
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
 			},
 		},
+		multiAddress: null,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://gridplus.io/privacy',
 			transactionPrivacy: null,
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: {
+				type: BugBountyProgramType.COMPREHENSIVE,
+				details:
+					'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
+				ref: [
+					{
+						explanation:
+							'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
+						url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
+					},
+				],
+				upgradePathAvailable: true,
+				url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
+			},
+			hardwareWalletDappSigning: {
+				details:
+					'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.',
+				level: DappSigningLevel.PARTIAL,
+				ref: [
+					{
+						explanation:
+							"Independent video demonstration of Keystone's clear signing implementation on Safe.",
+						url: 'https://youtu.be/7lP_0h-PPvY?t=1141',
+					},
+				],
+			},
+			hardwareWalletSupport: {
+				ref: null,
+				supportedWallets: {
+					[HardwareWalletType.GRIDPLUS]: featureSupported,
+				},
+			},
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -114,28 +130,12 @@ export const gridplusWallet: Wallet = {
 		transparency: {
 			feeTransparency: null,
 		},
-		license: null,
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
-		},
 	},
 	variants: {
-		mobile: false,
 		browser: false,
 		desktop: false,
 		embedded: false,
 		hardware: true,
+		mobile: false,
 	},
 }

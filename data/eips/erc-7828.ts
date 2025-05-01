@@ -1,10 +1,10 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
 
 export const erc7828: Eip = {
-	prefix: EipPrefix.ERC,
-	number: '7828',
 	friendlyName: 'Chain-specific addresses using ENS',
 	formalTitle: 'Chain-specific addresses using ENS',
+	number: '7828',
+	prefix: EipPrefix.ERC,
 	status: EipStatus.DRAFT,
 	summaryMarkdown: `
 		Chain-specific address format that allows specifying both an

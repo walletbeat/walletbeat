@@ -1,12 +1,12 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
 
 export const erc4337: Eip = {
-	prefix: EipPrefix.ERC,
-	number: '4337',
 	// Yes this is not exactly what this ERC is implementing, but it is
 	// roughly what it unlocks.
 	friendlyName: 'Account Abstraction for smart contract wallets',
 	formalTitle: 'Account Abstraction Using Alt Mempool',
+	number: '4337',
+	prefix: EipPrefix.ERC,
 	status: EipStatus.DRAFT,
 	summaryMarkdown: `
 		ERC-4337 defines a standard for account abstraction without changes to

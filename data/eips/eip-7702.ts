@@ -1,10 +1,10 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
 
 export const eip7702: Eip = {
-	prefix: EipPrefix.EIP,
-	number: '7702',
 	friendlyName: 'Account Abstraction via smart contract authority delegation',
 	formalTitle: 'Set EOA account code',
+	number: '7702',
+	prefix: EipPrefix.EIP,
 	status: EipStatus.LAST_CALL,
 	summaryMarkdown: `
 		Smart contract accounts require their own Ethereum address by definition.

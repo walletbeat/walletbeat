@@ -9,11 +9,11 @@ import { unratedHardwareTemplate } from './hardware-wallets/unrated.tmpl'
 
 /** Set of all known hardware wallets. */
 export const hardwareWallets = {
-	ledger: ledgerWallet,
-	trezor: trezorWallet,
+	firefly: fireflyWallet,
 	gridplus: gridplusWallet,
 	keystone: keystoneWallet,
-	firefly: fireflyWallet,
+	ledger: ledgerWallet,
+	trezor: trezorWallet,
 }
 
 /** A valid hardware wallet name. */

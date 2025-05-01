@@ -14,38 +14,36 @@ export const fireflyWallet: Wallet = {
 		id: 'firefly',
 		displayName: 'Firefly Wallet',
 		tableName: 'Firefly',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			Firefly Wallet is a hardware wallet that uses biometrics
 			for user authentication and secure private key management.
 		`),
-		url: 'https://firefly.technology/',
-		repoUrl: null,
 		contributors: [nconsigny],
-		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
 		hardwareWalletModels: [
 			{
 				id: 'firefly-v1',
 				name: 'Firefly V1',
-				url: 'https://firefly.technology/',
 				isFlagship: true,
+				url: 'https://firefly.technology/',
 			},
 		],
+		iconExtension: 'svg',
+		lastUpdated: '2025-03-12',
+		repoUrl: null,
+		url: 'https://firefly.technology/',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: null,
-		multiAddress: null,
 		addressResolution: {
-			nonChainSpecificEnsResolution: null,
 			chainSpecificAddressing: {
 				erc7828: null,
 				erc7831: null,
 			},
+			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainConfigurability: null,
 		integration: {
 			browser: {
 				'1193': null,
@@ -54,37 +52,55 @@ export const fireflyWallet: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
-			passkeyVerification: null,
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			hardwareWalletSupport: {
-				supportedWallets: {
-					[HardwareWalletType.FIREFLY]: featureSupported,
-				},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.NONE,
-				details:
-					'Firefly currently does not provide clear signing support as it is still in development.',
-				ref: null,
-			},
-			bugBountyProgram: {
-				type: BugBountyProgramType.NONE,
-				url: '',
-				details: 'No formal bug bounty program has been established for the Firefly DIY wallet.',
-				upgradePathAvailable: false,
-				ref: undefined,
+		license: null,
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
 			},
 		},
+		multiAddress: null,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: '',
 			transactionPrivacy: null,
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: {
+				type: BugBountyProgramType.NONE,
+				details: 'No formal bug bounty program has been established for the Firefly DIY wallet.',
+				ref: undefined,
+				upgradePathAvailable: false,
+				url: '',
+			},
+			hardwareWalletDappSigning: {
+				details:
+					'Firefly currently does not provide clear signing support as it is still in development.',
+				level: DappSigningLevel.NONE,
+				ref: null,
+			},
+			hardwareWalletSupport: {
+				ref: null,
+				supportedWallets: {
+					[HardwareWalletType.FIREFLY]: featureSupported,
+				},
+			},
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -101,28 +117,12 @@ export const fireflyWallet: Wallet = {
 		transparency: {
 			feeTransparency: null,
 		},
-		license: null,
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
-		},
 	},
 	variants: {
-		mobile: false,
 		browser: false,
 		desktop: false,
 		embedded: false,
 		hardware: true,
+		mobile: false,
 	},
 }

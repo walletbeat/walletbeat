@@ -14,13 +14,13 @@ export const openExchangeRates: CorporateEntity & OffchainDataProvider = {
 		transactionBroadcastProvider: false,
 		walletDeveloper: false,
 	},
+	crunchbase: 'https://www.crunchbase.com/organization/open-exchange-rates',
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	icon: 'NO_ICON',
 	jurisdiction: { type: 'UNKNOWN' }, // Unclear
-	url: 'https://openexchangerates.org/',
-	repoUrl: 'https://github.com/openexchangerates',
-	privacyPolicy: 'https://openexchangerates.org/privacy',
-	crunchbase: 'https://www.crunchbase.com/organization/open-exchange-rates',
 	linkedin: { type: 'NO_LINKEDIN_URL' },
+	privacyPolicy: 'https://openexchangerates.org/privacy',
+	repoUrl: 'https://github.com/openexchangerates',
 	twitter: { type: 'NO_TWITTER_URL' },
-	farcaster: { type: 'NO_FARCASTER_PROFILE' },
+	url: 'https://openexchangerates.org/',
 }

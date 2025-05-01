@@ -17,42 +17,40 @@ export const rainbow: Wallet = {
 		id: 'rainbow',
 		displayName: 'Rainbow',
 		tableName: 'Rainbow',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			Rainbow Extension. Built for speed. Built for power. Built for You.
 		`),
-		url: 'https://rainbow.me',
-		repoUrl: 'https://github.com/rainbow-me/rainbow',
 		contributors: [polymutex],
+		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
+		repoUrl: 'https://github.com/rainbow-me/rainbow',
+		url: 'https://rainbow.me',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupported,
 			eoa: supported({
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
-					seedPhrase: 'BIP39',
-					derivationPath: 'BIP44',
 					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
 				},
 			}),
 			mpc: notSupported,
 			rawErc4337: notSupported,
-			eip7702: notSupported,
-			defaultAccountType: AccountType.eoa,
 		},
-		multiAddress: null,
 		addressResolution: {
-			nonChainSpecificEnsResolution: null,
 			chainSpecificAddressing: {
 				erc7828: null,
 				erc7831: null,
 			},
+			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainConfigurability: null,
 		integration: {
 			browser: {
 				'1193': null,
@@ -61,35 +59,62 @@ export const rainbow: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			hardwareWalletSupport: {
-				supportedWallets: {
-					[HardwareWalletType.LEDGER]: featureSupported,
-					[HardwareWalletType.TREZOR]: featureSupported,
+		license: {
+			license: License.GPL_3_0,
+			ref: [
+				{
+					explanation: 'Rainbow uses the GPL-3.0 license for its source code',
+					label: 'Rainbow License File',
+					url: 'https://github.com/rainbow-me/rainbow/blob/develop/LICENSE',
 				},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.PARTIAL,
-				ref: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
-			bugBountyProgram: null,
+			],
 		},
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
+			},
+		},
+		multiAddress: null,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://rainbow.me/privacy',
 			transactionPrivacy: {
 				stealthAddresses: notSupported,
 			},
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: null,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.PARTIAL,
+				ref: null,
+			},
+			hardwareWalletSupport: {
+				ref: null,
+				supportedWallets: {
+					[HardwareWalletType.LEDGER]: featureSupported,
+					[HardwareWalletType.TREZOR]: featureSupported,
+				},
+			},
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
+			publicSecurityAudits: null,
+			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -105,31 +130,6 @@ export const rainbow: Wallet = {
 		},
 		transparency: {
 			feeTransparency: null,
-		},
-		license: {
-			license: License.GPL_3_0,
-			ref: [
-				{
-					url: 'https://github.com/rainbow-me/rainbow/blob/develop/LICENSE',
-					label: 'Rainbow License File',
-					explanation: 'Rainbow uses the GPL-3.0 license for its source code',
-				},
-			],
-		},
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
 		},
 	},
 	variants: {

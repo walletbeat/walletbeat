@@ -16,44 +16,42 @@ export const phantom: Wallet = {
 		id: 'phantom',
 		displayName: 'Phantom',
 		tableName: 'Phantom',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			Phantom is a user-friendly Ethereum and Solana wallet. It focuses
 			on ease of use, easy swapping of tokens and NFTs, and integration
 			with popular DeFi and NFT exchange protocols within the wallet.
 		`),
-		url: 'https://www.phantom.com',
-		repoUrl: null,
 		contributors: [nconsigny],
+		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
+		repoUrl: null,
+		url: 'https://www.phantom.com',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupported,
 			eoa: supported({
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
-					seedPhrase: 'BIP39',
-					derivationPath: 'BIP44',
 					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
 				},
 			}),
 			mpc: notSupported,
 			rawErc4337: notSupported,
-			eip7702: notSupported,
-			defaultAccountType: AccountType.eoa,
 		},
-		multiAddress: null,
 		addressResolution: {
-			nonChainSpecificEnsResolution: null,
 			chainSpecificAddressing: {
 				erc7828: null,
 				erc7831: null,
 			},
+			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainConfigurability: null,
 		integration: {
 			browser: {
 				'1193': null,
@@ -62,35 +60,53 @@ export const phantom: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
+		license: null,
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
 			},
-			hardwareWalletSupport: {
-				supportedWallets: {
-					[HardwareWalletType.LEDGER]: featureSupported,
-				},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.PARTIAL,
-				details: 'No hardware wallet clear signing information available.',
-				ref: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
-			bugBountyProgram: null,
 		},
+		multiAddress: null,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://www.phantom.com/privacy',
 			transactionPrivacy: {
 				stealthAddresses: notSupported,
 			},
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: null,
+			hardwareWalletDappSigning: {
+				details: 'No hardware wallet clear signing information available.',
+				level: DappSigningLevel.PARTIAL,
+				ref: null,
+			},
+			hardwareWalletSupport: {
+				ref: null,
+				supportedWallets: {
+					[HardwareWalletType.LEDGER]: featureSupported,
+				},
+			},
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
+			publicSecurityAudits: null,
+			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -106,22 +122,6 @@ export const phantom: Wallet = {
 		},
 		transparency: {
 			feeTransparency: null,
-		},
-		license: null,
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
 		},
 	},
 	variants: {

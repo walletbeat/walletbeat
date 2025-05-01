@@ -33,163 +33,133 @@ export const daimo: Wallet = {
 		id: 'daimo',
 		displayName: 'Daimo',
 		tableName: 'Daimo',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			Daimo aims to replicate a Venmo-like experience onchain.
 			It focuses on cheap stablecoin payments and fast onramp and
 			offramp of USD / USDC with minimal fees.
 		`),
-		pseudonymType: {
-			singular: 'Daimo username',
-			plural: 'Daimo usernames',
-		},
-		url: 'https://daimo.com',
-		repoUrl: 'https://github.com/daimo-eth/daimo',
 		contributors: [polymutex, nconsigny],
+		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
+		pseudonymType: {
+			plural: 'Daimo usernames',
+			singular: 'Daimo username',
+		},
+		repoUrl: 'https://github.com/daimo-eth/daimo',
+		url: 'https://daimo.com',
 	},
 	features: {
-		profile: WalletProfile.PAYMENTS,
-		chainConfigurability: {
-			l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,
-			otherRpcEndpoints: RpcEndpointConfiguration.NO,
-			customChains: false,
-		},
 		accountSupport: {
 			defaultAccountType: AccountType.rawErc4337,
+			eip7702: notSupported,
 			eoa: notSupported,
 			mpc: notSupported,
-			eip7702: notSupported,
 			rawErc4337: supported({
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 				ref: {
-					url: 'https://github.com/daimo-eth/daimo/blob/master/apps/daimo-mobile/src/view/screen/keyRotation/AddKeySlotButton.tsx',
 					explanation:
 						'Key rotation changes are supported in the UI and result in onchain transactions with a well-known structure',
+					url: 'https://github.com/daimo-eth/daimo/blob/master/apps/daimo-mobile/src/view/screen/keyRotation/AddKeySlotButton.tsx',
 				},
+				tokenTransferTransactionGeneration:
+					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 		},
-		multiAddress: featureSupported,
 		addressResolution: {
-			nonChainSpecificEnsResolution: supported({
-				medium: 'CHAIN_CLIENT',
-			}),
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
+			nonChainSpecificEnsResolution: supported({
+				medium: 'CHAIN_CLIENT',
+			}),
 			ref: [
 				{
-					url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/packages/daimo-api/src/network/viemClient.ts#L128',
 					explanation:
 						'Daimo resolves plain ENS addresses by querying the ENS Universal Resolver Contract on L1 using the Viem library.',
+					url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/packages/daimo-api/src/network/viemClient.ts#L128',
 				},
 			],
+		},
+		chainConfigurability: {
+			customChains: false,
+			l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,
+			otherRpcEndpoints: RpcEndpointConfiguration.NO,
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
 		},
-		security: {
-			scamAlerts: {
-				scamUrlWarning: notSupported,
-				contractTransactionWarning: notSupported,
-				sendTransactionWarning: supported({
-					newRecipientWarning: true,
-					userWhitelist: false,
-					leaksRecipient: false,
-					leaksUserAddress: false,
-					leaksUserIp: false,
-					ref: [
-						{
-							url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/apps/daimo-mobile/src/view/screen/send/SendTransferScreen.tsx#L234-L238',
-							explanation:
-								'Daimo shows a warning when sending funds to a user that you have not sent funds to in the past.',
-						},
-					],
-				}),
-			},
-			publicSecurityAudits: [
+		license: {
+			license: License.GPL_3_0,
+			ref: [
 				{
-					auditor: veridise,
-					auditDate: '2023-10-06',
-					ref: 'https://github.com/daimo-eth/daimo/blob/master/audits/2023-10-veridise-daimo.pdf',
-					variantsScope: { [Variant.MOBILE]: true },
-					codeSnapshot: {
-						date: '2023-09-12',
-						commit: 'f0dc56d68852c1488461e88a506ff7b0f027f245',
-					},
-					unpatchedFlaws: 'ALL_FIXED',
+					explanation: 'Daimo is licensed under the GPL-3.0 license.',
+					url: 'https://github.com/daimo-eth/daimo/blob/master/LICENSE',
 				},
 			],
-			lightClient: {
-				ethereumL1: notSupported,
-			},
-			hardwareWalletSupport: {
-				supportedWallets: {},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.FULL,
-				ref: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
-				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-				details:
-					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
-				ref: [
-					{
-						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-						explanation:
-							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
-					},
-				],
-			},
-			bugBountyProgram: null,
 		},
+		monetization: {
+			ref: [
+				{
+					explanation: 'Daimo is funded by venture capital.',
+					url: 'https://www.crunchbase.com/funding_round/daimo-seed--8722ae6a',
+				},
+				{
+					explanation: 'Daimo has received grant funding from the Ethereum Foundation.',
+					url: 'https://blog.ethereum.org/2024/02/20/esp-allocation-q423',
+				},
+				{
+					explanation:
+						'Daimo has received grant funding from Optimism RetroPGF Round 3 for its P256Verifier contract.',
+					url: 'https://vote.optimism.io/retropgf/3/application/0x118a000851cf4c736497bab89993418517ac7cd9c8ede074aff408a8e0f84060',
+				},
+			],
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: false,
+				ecosystemGrants: true,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: false,
+				publicOffering: false,
+				selfFunded: false,
+				transparentConvenienceFees: false,
+				ventureCapital: true,
+			},
+		},
+		multiAddress: featureSupported,
 		privacy: {
 			dataCollection: {
-				onchain: {
-					pseudonym: Leak.ALWAYS,
-					ref: {
-						explanation:
-							"Creating a Daimo wallet creates a transaction publicly registering your name and address in Daimo's nameRegistry contract on Ethereum.",
-						url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/contract/nameRegistry.ts#L183-L197',
-					},
-				},
 				collectedByEntities: [
 					{
 						entity: daimoInc,
 						leaks: {
+							endpoint: RegularEndpoint,
 							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.ALWAYS,
+							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
-							mempoolTransactions: Leak.ALWAYS,
 							pseudonym: Leak.ALWAYS,
-							endpoint: RegularEndpoint,
 							ref: {
 								explanation:
 									'Wallet operations are routed through Daimo.com servers without proxying.',
 								url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/viemClient.ts#L35-L50',
 							},
+							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: pimlico,
 						leaks: {
+							endpoint: RegularEndpoint,
 							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.ALWAYS,
+							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
-							mempoolTransactions: Leak.ALWAYS,
-							endpoint: RegularEndpoint,
 							ref: {
 								explanation:
 									'Sending bundled transactions uses the Pimlico API via api.pimlico.io as Paymaster.',
@@ -197,18 +167,18 @@ export const daimo: Wallet = {
 									'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/bundlerClient.ts#L131-L133',
 								],
 							},
+							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: honeycomb,
 						leaks: {
+							endpoint: RegularEndpoint,
 							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							pseudonym: Leak.ALWAYS,
-							endpoint: RegularEndpoint,
 							ref: {
 								explanation:
 									'Daimo records telemetry events to Honeycomb. This data includes your Daimo username. Since this username is also linked to your wallet address onchain, Honeycomb can associate the username they receive with your wallet address.',
@@ -216,13 +186,14 @@ export const daimo: Wallet = {
 									'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/server/telemetry.ts#L101-L111',
 								],
 							},
+							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: daimoInc,
 						leaks: {
-							farcasterAccount: Leak.OPT_IN,
 							endpoint: RegularEndpoint,
+							farcasterAccount: Leak.OPT_IN,
 							ref: [
 								{
 									explanation:
@@ -235,13 +206,12 @@ export const daimo: Wallet = {
 					{
 						entity: binance,
 						leaks: {
+							cexAccount: Leak.OPT_IN,
+							endpoint: RegularEndpoint,
 							ipAddress: Leak.OPT_IN,
-							walletAddress: Leak.OPT_IN,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
-							cexAccount: Leak.OPT_IN,
-							endpoint: RegularEndpoint,
 							ref: [
 								{
 									explanation:
@@ -249,13 +219,14 @@ export const daimo: Wallet = {
 									url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/binanceClient.ts#L132',
 								},
 							],
+							walletAddress: Leak.OPT_IN,
 						},
 					},
 					{
 						entity: openExchangeRates,
 						leaks: {
-							ipAddress: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
+							ipAddress: Leak.ALWAYS,
 							ref: [
 								{
 									explanation:
@@ -271,8 +242,8 @@ export const daimo: Wallet = {
 					{
 						entity: merkleManufactory,
 						leaks: {
-							ipAddress: Leak.OPT_IN,
 							endpoint: RegularEndpoint,
+							ipAddress: Leak.OPT_IN,
 							ref: [
 								{
 									explanation:
@@ -283,10 +254,77 @@ export const daimo: Wallet = {
 						},
 					},
 				],
+				onchain: {
+					pseudonym: Leak.ALWAYS,
+					ref: {
+						explanation:
+							"Creating a Daimo wallet creates a transaction publicly registering your name and address in Daimo's nameRegistry contract on Ethereum.",
+						url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/contract/nameRegistry.ts#L183-L197',
+					},
+				},
 			},
 			privacyPolicy: 'https://daimo.com/privacy',
 			transactionPrivacy: {
 				stealthAddresses: notSupported,
+			},
+		},
+		profile: WalletProfile.PAYMENTS,
+		security: {
+			bugBountyProgram: null,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.FULL,
+				ref: null,
+			},
+			hardwareWalletSupport: {
+				ref: null,
+				supportedWallets: {},
+			},
+			lightClient: {
+				ethereumL1: notSupported,
+			},
+			passkeyVerification: {
+				details:
+					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
+				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
+				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
+				ref: [
+					{
+						explanation:
+							'Daimo implements P256 verification using a verifier based on FreshCryptoLib in their P256Verifier contract.',
+						url: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
+					},
+				],
+			},
+			publicSecurityAudits: [
+				{
+					auditDate: '2023-10-06',
+					auditor: veridise,
+					codeSnapshot: {
+						commit: 'f0dc56d68852c1488461e88a506ff7b0f027f245',
+						date: '2023-09-12',
+					},
+					ref: 'https://github.com/daimo-eth/daimo/blob/master/audits/2023-10-veridise-daimo.pdf',
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.MOBILE]: true },
+				},
+			],
+			scamAlerts: {
+				contractTransactionWarning: notSupported,
+				scamUrlWarning: notSupported,
+				sendTransactionWarning: supported({
+					leaksRecipient: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					newRecipientWarning: true,
+					ref: [
+						{
+							explanation:
+								'Daimo shows a warning when sending funds to a user that you have not sent funds to in the past.',
+							url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/apps/daimo-mobile/src/view/screen/send/SendTransferScreen.tsx#L234-L238',
+						},
+					],
+					userWhitelist: false,
+				}),
 			},
 		},
 		selfSovereignty: {
@@ -305,44 +343,6 @@ export const daimo: Wallet = {
 		},
 		transparency: {
 			feeTransparency: null,
-		},
-		license: {
-			license: License.GPL_3_0,
-			ref: [
-				{
-					explanation: 'Daimo is licensed under the GPL-3.0 license.',
-					url: 'https://github.com/daimo-eth/daimo/blob/master/LICENSE',
-				},
-			],
-		},
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: false,
-				donations: false,
-				ecosystemGrants: true,
-				publicOffering: false,
-				ventureCapital: true,
-				transparentConvenienceFees: false,
-				hiddenConvenienceFees: false,
-				governanceTokenLowFloat: false,
-				governanceTokenMostlyDistributed: false,
-			},
-			ref: [
-				{
-					explanation: 'Daimo is funded by venture capital.',
-					url: 'https://www.crunchbase.com/funding_round/daimo-seed--8722ae6a',
-				},
-				{
-					explanation: 'Daimo has received grant funding from the Ethereum Foundation.',
-					url: 'https://blog.ethereum.org/2024/02/20/esp-allocation-q423',
-				},
-				{
-					explanation:
-						'Daimo has received grant funding from Optimism RetroPGF Round 3 for its P256Verifier contract.',
-					url: 'https://vote.optimism.io/retropgf/3/application/0x118a000851cf4c736497bab89993418517ac7cd9c8ede074aff408a8e0f84060',
-				},
-			],
 		},
 	},
 	overrides: {

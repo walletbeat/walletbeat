@@ -15,56 +15,54 @@ export const trezorWallet: Wallet = {
 		id: 'trezor',
 		displayName: 'Trezor Wallet',
 		tableName: 'Trezor',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			Trezor Wallet is a self-custodial hardware wallet built by SatoshiLabs. It
 			provides secure storage for cryptocurrencies with an easy-to-use interface.
 		`),
-		url: 'https://trezor.io/',
-		repoUrl: 'https://github.com/trezor/trezor-suite',
 		contributors: [nconsigny],
-		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
 				id: 'trezor-safe-5',
 				name: 'Trezor Safe 5',
-				url: 'https://trezor.io/trezor-safe-5',
 				isFlagship: true,
+				url: 'https://trezor.io/trezor-safe-5',
 			},
 			{
 				id: 'trezor-safe-3',
 				name: 'Trezor Safe 3',
-				url: 'https://trezor.io/trezor-safe-3',
 				isFlagship: false,
+				url: 'https://trezor.io/trezor-safe-3',
 			},
 			{
 				id: 'trezor-model-one',
 				name: 'Trezor Model One',
-				url: 'https://trezor.io/trezor-model-one',
 				isFlagship: false,
+				url: 'https://trezor.io/trezor-model-one',
 			},
 			{
 				id: 'trezor-model-t',
 				name: 'Trezor Model T',
-				url: 'https://trezor.io/trezor-model-t',
 				isFlagship: false,
+				url: 'https://trezor.io/trezor-model-t',
 			},
 		],
+		iconExtension: 'svg',
+		lastUpdated: '2025-03-12',
+		repoUrl: 'https://github.com/trezor/trezor-suite',
+		url: 'https://trezor.io/',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: null,
-		multiAddress: null,
 		addressResolution: {
-			nonChainSpecificEnsResolution: null,
 			chainSpecificAddressing: {
 				erc7828: null,
 				erc7831: null,
 			},
+			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainConfigurability: null,
 		integration: {
 			browser: {
 				'1193': null,
@@ -73,53 +71,71 @@ export const trezorWallet: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			hardwareWalletSupport: {
-				supportedWallets: {
-					[HardwareWalletType.TREZOR]: featureSupported,
-				},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.PARTIAL,
-				details:
-					'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-				ref: [
-					{
-						url: 'https://youtu.be/7lP_0h-PPvY?si=07dMNswh_9RsuWQ9&t=879',
-						explanation:
-							"Independent video demonstration of Trezor's clear signing implementation on Safe.",
-					},
-				],
-			},
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
-				url: 'https://trezor.io/support/a/how-to-report-a-security-issue',
-				details:
-					'At SatoshiLabs and Trezor, the safety of our products and services is a top priority. If you have identified a security vulnerability, we would greatly appreciate your assistance in disclosing it to us in a responsible manner.',
-				upgradePathAvailable: true,
-				ref: [
-					{
-						url: 'https://trezor.io/support/a/how-to-report-a-security-issue',
-						explanation:
-							'At SatoshiLabs and Trezor, the safety of our products and services is a top priority. If you have identified a security vulnerability, we would greatly appreciate your assistance in disclosing it to us in a responsible manner.',
-					},
-				],
+		license: null,
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
 			},
 		},
+		multiAddress: null,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://trezor.io/privacy-policy',
 			transactionPrivacy: null,
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: {
+				type: BugBountyProgramType.COMPREHENSIVE,
+				details:
+					'At SatoshiLabs and Trezor, the safety of our products and services is a top priority. If you have identified a security vulnerability, we would greatly appreciate your assistance in disclosing it to us in a responsible manner.',
+				ref: [
+					{
+						explanation:
+							'At SatoshiLabs and Trezor, the safety of our products and services is a top priority. If you have identified a security vulnerability, we would greatly appreciate your assistance in disclosing it to us in a responsible manner.',
+						url: 'https://trezor.io/support/a/how-to-report-a-security-issue',
+					},
+				],
+				upgradePathAvailable: true,
+				url: 'https://trezor.io/support/a/how-to-report-a-security-issue',
+			},
+			hardwareWalletDappSigning: {
+				details:
+					'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
+				level: DappSigningLevel.PARTIAL,
+				ref: [
+					{
+						explanation:
+							"Independent video demonstration of Trezor's clear signing implementation on Safe.",
+						url: 'https://youtu.be/7lP_0h-PPvY?si=07dMNswh_9RsuWQ9&t=879',
+					},
+				],
+			},
+			hardwareWalletSupport: {
+				ref: null,
+				supportedWallets: {
+					[HardwareWalletType.TREZOR]: featureSupported,
+				},
+			},
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
+			publicSecurityAudits: null,
+			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -136,29 +152,13 @@ export const trezorWallet: Wallet = {
 		transparency: {
 			feeTransparency: null,
 		},
-		license: null,
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
-		},
 	},
 	variants: {
-		mobile: false,
 		browser: false,
 		desktop: false,
 		embedded: false,
 		hardware: true,
+		mobile: false,
 	},
 }
 

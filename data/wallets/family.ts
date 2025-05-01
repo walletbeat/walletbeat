@@ -15,41 +15,39 @@ export const family: Wallet = {
 		id: 'family',
 		displayName: 'Family',
 		tableName: 'Family',
-		iconExtension: 'svg',
 		blurb: paragraph(``),
-		url: 'https://family.co',
-		repoUrl: null,
 		contributors: [lucemans],
+		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
+		repoUrl: null,
+		url: 'https://family.co',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupported,
 			// BIP support is not verified
 			eoa: supported({
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
-					seedPhrase: 'BIP39',
-					derivationPath: 'BIP44',
 					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
 				},
 			}),
 			mpc: notSupported,
 			rawErc4337: notSupported,
-			eip7702: notSupported,
-			defaultAccountType: AccountType.eoa,
 		},
-		multiAddress: null,
 		addressResolution: {
-			nonChainSpecificEnsResolution: null,
 			chainSpecificAddressing: {
 				erc7828: null,
 				erc7831: null,
 			},
+			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainConfigurability: null,
 		integration: {
 			browser: {
 				'1193': null,
@@ -58,33 +56,51 @@ export const family: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
+		license: null,
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
 			},
-			hardwareWalletSupport: {
-				supportedWallets: {},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.NONE,
-				details: 'No hardware wallet clear signing information available.',
-				ref: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
-			bugBountyProgram: null,
 		},
+		multiAddress: null,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: {
 				stealthAddresses: notSupported,
 			},
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: null,
+			hardwareWalletDappSigning: {
+				details: 'No hardware wallet clear signing information available.',
+				level: DappSigningLevel.NONE,
+				ref: null,
+			},
+			hardwareWalletSupport: {
+				ref: null,
+				supportedWallets: {},
+			},
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
+			publicSecurityAudits: null,
+			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -100,22 +116,6 @@ export const family: Wallet = {
 		},
 		transparency: {
 			feeTransparency: null,
-		},
-		license: null,
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
 		},
 	},
 	variants: {

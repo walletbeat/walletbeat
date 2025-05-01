@@ -20,6 +20,7 @@ export const wallets = {
 	coinbase,
 	daimo,
 	elytro,
+	family,
 	frame,
 	metamask,
 	phantom,
@@ -27,7 +28,6 @@ export const wallets = {
 	rainbow,
 	safe,
 	zerion,
-	family,
 }
 
 /** A valid wallet name. */

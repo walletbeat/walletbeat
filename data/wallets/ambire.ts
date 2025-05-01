@@ -32,28 +32,28 @@ import { pimlico } from '../entities/pimlico'
 
 const v2Audits: SecurityAudit[] = [
 	{
-		variantsScope: { [Variant.BROWSER]: true },
-		unpatchedFlaws: 'ALL_FIXED',
-		auditor: pashov,
 		auditDate: '2024-01-26',
+		auditor: pashov,
 		codeSnapshot: {
-			date: '2023-11-08',
 			commit:
 				'https://github.com/AmbireTech/ambire-common/tree/da3ba641a004d1f0143a20ddde48049b619431ad',
+			date: '2023-11-08',
 		},
 		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Pashov-Ambire-third-security-review.md',
+		unpatchedFlaws: 'ALL_FIXED',
+		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		variantsScope: { [Variant.BROWSER]: true },
-		unpatchedFlaws: 'NONE_FOUND',
-		auditor: hunterSecurity,
 		auditDate: '2025-02-20',
+		auditor: hunterSecurity,
 		codeSnapshot: {
-			date: '2025-02-17',
 			commit:
 				'https://github.com/AmbireTech/ambire-common/commit/de88e26041db8777468f384e56d5ad0cb96e29a5',
+			date: '2025-02-17',
 		},
 		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+		unpatchedFlaws: 'NONE_FOUND',
+		variantsScope: { [Variant.BROWSER]: true },
 	},
 ]
 
@@ -79,22 +79,10 @@ const dataLeakReferences: Record<string, References> = {
 			url: 'https://nftcdn.ambire.com',
 		},
 	],
-	pimlico: [
-		{
-			explanation: 'Pimlico is used as a Bundler and gas estimation helper.',
-			url: 'https://api.pimlico.io',
-		},
-	],
 	biconomy: [
 		{
 			explanation: 'Pimlico is used as a Bundler and gas estimation helper.',
 			url: 'https://bundler.biconomy.io',
-		},
-	],
-	lifi: [
-		{
-			explanation: 'Ambire uses LiFi as bridge and swap API.',
-			url: 'https://li.quest',
 		},
 	],
 	github: [
@@ -109,6 +97,18 @@ const dataLeakReferences: Record<string, References> = {
 			url: 'https://api.jiffyscan.xyz',
 		},
 	],
+	lifi: [
+		{
+			explanation: 'Ambire uses LiFi as bridge and swap API.',
+			url: 'https://li.quest',
+		},
+	],
+	pimlico: [
+		{
+			explanation: 'Pimlico is used as a Bundler and gas estimation helper.',
+			url: 'https://api.pimlico.io',
+		},
+	],
 }
 
 export const ambire: Wallet = {
@@ -116,60 +116,44 @@ export const ambire: Wallet = {
 		id: 'ambire',
 		displayName: 'Ambire',
 		tableName: 'Ambire',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
 			improving security and user experience.
 			`),
-		url: 'https://ambire.com',
-		repoUrl: 'https://github.com/AmbireTech/extension',
 		contributors: [jiojosbg],
+		iconExtension: 'svg',
 		lastUpdated: '2025-03-20',
+		repoUrl: 'https://github.com/AmbireTech/extension',
+		url: 'https://ambire.com',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: {
-			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-			customChains: true,
-			ref: {
-				url: [
-					'https://github.com/AmbireTech/ambire-common/blob/v2/src/consts/networks.ts',
-					'https://github.com/AmbireTech/ambire-common/blob/v2/src/services/ensDomains/ensDomains.ts',
-					'https://github.com/AmbireTech/ambire-common/blob/v2/src/libs/portfolio/getOnchainBalances.ts',
-				],
-				label: 'List of RPCs Ambire uses for default chains',
-				explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
-			},
-		},
-
 		accountSupport: {
 			defaultAccountType: AccountType.eip7702,
+			eip7702: supported({
+				contractCode: {
+					controllingSharesInSelfCustodyByDefault: 'YES',
+					keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
+					ref: {
+						explanation: 'Ambire supports EIP-7702 smart contract wallets',
+						url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount7702.sol',
+					},
+					tokenTransferTransactionGeneration:
+						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				},
+				ref: {
+					explanation:
+						'Ambire is AA wallet by default. With the introduction of EIP-7702 it allows you to use your existing EOA just like you would use any smart account wallet!',
+					url: 'https://blog.ambire.com/eip-7702-wallet',
+				},
+			}),
 			eoa: supported({
 				canExportPrivateKey: true,
 				canExportSeedPhrase: true,
 				keyDerivation: {
-					derivationPath: 'BIP44',
-					seedPhrase: 'BIP39',
 					type: 'BIP32',
 					canExportSeedPhrase: true,
-				},
-			}),
-			eip7702: supported({
-				contractCode: {
-					keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
-					controllingSharesInSelfCustodyByDefault: 'YES',
-					tokenTransferTransactionGeneration:
-						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-					ref: {
-						url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount7702.sol',
-						explanation: 'Ambire supports EIP-7702 smart contract wallets',
-					},
-				},
-				ref: {
-					url: 'https://blog.ambire.com/eip-7702-wallet',
-					explanation:
-						'Ambire is AA wallet by default. With the introduction of EIP-7702 it allows you to use your existing EOA just like you would use any smart account wallet!',
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
 				},
 			}),
 			mpc: notSupported,
@@ -177,23 +161,35 @@ export const ambire: Wallet = {
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				ref: {
+					explanation: 'Ambire supports ERC-4337 smart contract wallets',
+					url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount.sol',
+				},
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				ref: {
-					url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount.sol',
-					explanation: 'Ambire supports ERC-4337 smart contract wallets',
-				},
 			}),
 		},
-
-		multiAddress: featureSupported,
 		addressResolution: {
-			nonChainSpecificEnsResolution: supported({
-				medium: 'CHAIN_CLIENT',
-			}),
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
+			},
+			nonChainSpecificEnsResolution: supported({
+				medium: 'CHAIN_CLIENT',
+			}),
+		},
+		chainConfigurability: {
+			customChains: true,
+			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			ref: {
+				explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
+				label: 'List of RPCs Ambire uses for default chains',
+				url: [
+					'https://github.com/AmbireTech/ambire-common/blob/v2/src/consts/networks.ts',
+					'https://github.com/AmbireTech/ambire-common/blob/v2/src/services/ensDomains/ensDomains.ts',
+					'https://github.com/AmbireTech/ambire-common/blob/v2/src/libs/portfolio/getOnchainBalances.ts',
+				],
 			},
 		},
 		integration: {
@@ -206,10 +202,117 @@ export const ambire: Wallet = {
 				},
 			},
 		},
+		license: {
+			license: License.GPL_3_0,
+			ref: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
+		},
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: false,
+				ecosystemGrants: true,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: true,
+				publicOffering: false,
+				selfFunded: true,
+				transparentConvenienceFees: false,
+				ventureCapital: true,
+			},
+		},
+
+		multiAddress: featureSupported,
+		privacy: {
+			dataCollection: {
+				collectedByEntities: [
+					{
+						entity: ambireEntity,
+						leaks: {
+							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
+							ipAddress: Leak.ALWAYS,
+							mempoolTransactions: Leak.ALWAYS,
+							multiAddress: {
+								type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+							},
+							ref: dataLeakReferences.ambire,
+							walletAddress: Leak.ALWAYS,
+						},
+					},
+					{
+						entity: pimlico,
+						leaks: {
+							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
+							ipAddress: Leak.ALWAYS,
+							mempoolTransactions: Leak.ALWAYS,
+							multiAddress: {
+								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+							},
+							ref: dataLeakReferences.pimlico,
+							walletAddress: Leak.ALWAYS,
+						},
+					},
+					{
+						entity: biconomy,
+						leaks: {
+							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
+							ipAddress: Leak.ALWAYS,
+							mempoolTransactions: Leak.ALWAYS,
+							multiAddress: {
+								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
+							},
+							ref: dataLeakReferences.biconomy,
+							walletAddress: Leak.ALWAYS,
+						},
+					},
+					{
+						entity: lifi,
+						leaks: {
+							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
+							ipAddress: Leak.ALWAYS,
+							mempoolTransactions: Leak.NEVER,
+							ref: dataLeakReferences.lifi,
+							walletAddress: Leak.NEVER,
+						},
+					},
+					{
+						entity: github,
+						leaks: {
+							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
+							ipAddress: Leak.ALWAYS,
+							mempoolTransactions: Leak.NEVER,
+							ref: dataLeakReferences.github,
+							walletAddress: Leak.NEVER,
+						},
+					},
+					{
+						entity: jiffylabs,
+						leaks: {
+							cexAccount: Leak.NEVER,
+							endpoint: RegularEndpoint,
+							ipAddress: Leak.ALWAYS,
+							mempoolTransactions: Leak.NEVER,
+							ref: dataLeakReferences.jiffylabs,
+							walletAddress: Leak.NEVER,
+						},
+					},
+				],
+				onchain: {},
+			},
+			privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
+			transactionPrivacy: {
+				stealthAddresses: notSupported,
+			},
+		},
+		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: {
 				type: BugBountyProgramType.COMPREHENSIVE,
-				url: 'https://immunefi.com/bug-bounty/ambire/information/',
 
 				details: `Rewards are distributed according to the impact of the vulnerability based on the Immunefi Vulnerability Severity Classification System V2.2. This is a simplified 5-level scale, with separate scales for websites/apps and smart contracts/blockchains, encompassing everything from consequence of exploitation to privilege required to likelihood of a successful exploit.
 
@@ -221,33 +324,19 @@ https://github.com/AmbireTech/code4rena#known-tradeoffs
 
 Payouts are handled by the Ambire team directly and are denominated in USD. However, payouts are done in ETH unless agreed otherwise.`,
 				upgradePathAvailable: false,
+				url: 'https://immunefi.com/bug-bounty/ambire/information/',
 			},
-			scamAlerts: {
-				scamUrlWarning: supported({
-					leaksVisitedUrl: 'NO',
-					leaksUserAddress: false,
-					leaksIp: false,
-					ref: {
-						urls: [
-							{
-								url: 'https://github.com/AmbireTech/ambire-common/blob/v2/src/controllers/phishing/phishing.ts',
-								label: 'Implementation',
-							},
-						],
-						explanation:
-							"Every 6 hours, Ambire downloads a list of publicly available known scam URLs from an external API. Then, it checks if the website you're connecting to is on that list. If it is, a warning is displayed.",
-						lastRetrieved: '2025-04-02',
-					},
-				}),
-				contractTransactionWarning: notSupported,
-				sendTransactionWarning: notSupported,
-			},
-			publicSecurityAudits: v2Audits,
-			lightClient: {
-				ethereumL1: notSupported,
+			hardwareWalletDappSigning: {
+				level: DappSigningLevel.PARTIAL,
+				ref: undefined,
 			},
 			hardwareWalletSupport: {
 				[Variant.BROWSER]: {
+					ref: [
+						{
+							url: 'https://www.ambire.com/',
+						},
+					],
 					supportedWallets: {
 						[HardwareWalletType.LEDGER]: featureSupported,
 						[HardwareWalletType.GRIDPLUS]: featureSupported,
@@ -256,106 +345,35 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 						[HardwareWalletType.KEEPKEY]: notSupported,
 						[HardwareWalletType.KEYSTONE]: notSupported,
 					},
-					ref: [
-						{
-							url: 'https://www.ambire.com/',
-						},
-					],
 				},
 			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.PARTIAL,
-				ref: undefined,
+			lightClient: {
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: {
 				library: PasskeyVerificationLibrary.NONE,
 				ref: null,
 			},
-		},
-		privacy: {
-			dataCollection: {
-				onchain: {},
-				collectedByEntities: [
-					{
-						entity: ambireEntity,
-						leaks: {
-							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.ALWAYS,
-							multiAddress: {
-								type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+			publicSecurityAudits: v2Audits,
+			scamAlerts: {
+				contractTransactionWarning: notSupported,
+				scamUrlWarning: supported({
+					leaksIp: false,
+					leaksUserAddress: false,
+					leaksVisitedUrl: 'NO',
+					ref: {
+						explanation:
+							"Every 6 hours, Ambire downloads a list of publicly available known scam URLs from an external API. Then, it checks if the website you're connecting to is on that list. If it is, a warning is displayed.",
+						lastRetrieved: '2025-04-02',
+						urls: [
+							{
+								label: 'Implementation',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/v2/src/controllers/phishing/phishing.ts',
 							},
-							endpoint: RegularEndpoint,
-							mempoolTransactions: Leak.ALWAYS,
-							cexAccount: Leak.NEVER,
-							ref: dataLeakReferences.ambire,
-						},
+						],
 					},
-					{
-						entity: pimlico,
-						leaks: {
-							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.ALWAYS,
-							multiAddress: {
-								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
-							},
-							mempoolTransactions: Leak.ALWAYS,
-							cexAccount: Leak.NEVER,
-							endpoint: RegularEndpoint,
-							ref: dataLeakReferences.pimlico,
-						},
-					},
-					{
-						entity: biconomy,
-						leaks: {
-							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.ALWAYS,
-							multiAddress: {
-								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
-							},
-							mempoolTransactions: Leak.ALWAYS,
-							cexAccount: Leak.NEVER,
-							endpoint: RegularEndpoint,
-							ref: dataLeakReferences.biconomy,
-						},
-					},
-					{
-						entity: lifi,
-						leaks: {
-							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.NEVER,
-							mempoolTransactions: Leak.NEVER,
-							cexAccount: Leak.NEVER,
-							endpoint: RegularEndpoint,
-							ref: dataLeakReferences.lifi,
-						},
-					},
-					{
-						entity: github,
-						leaks: {
-							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.NEVER,
-							mempoolTransactions: Leak.NEVER,
-							cexAccount: Leak.NEVER,
-							endpoint: RegularEndpoint,
-							ref: dataLeakReferences.github,
-						},
-					},
-					{
-						entity: jiffylabs,
-						leaks: {
-							ipAddress: Leak.ALWAYS,
-							walletAddress: Leak.NEVER,
-							mempoolTransactions: Leak.NEVER,
-							cexAccount: Leak.NEVER,
-							endpoint: RegularEndpoint,
-							ref: dataLeakReferences.jiffylabs,
-						},
-					},
-				],
-			},
-			privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
-			transactionPrivacy: {
-				stealthAddresses: notSupported,
+				}),
+				sendTransactionWarning: notSupported,
 			},
 		},
 		selfSovereignty: {
@@ -370,29 +388,10 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 				},
 			},
 		},
-		license: {
-			license: License.GPL_3_0,
-			ref: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
-		},
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: true,
-				donations: false,
-				ecosystemGrants: true,
-				publicOffering: false,
-				ventureCapital: true,
-				transparentConvenienceFees: false,
-				hiddenConvenienceFees: true,
-				governanceTokenLowFloat: false,
-				governanceTokenMostlyDistributed: false,
-			},
-			ref: null,
-		},
 		transparency: {
 			feeTransparency: {
-				level: FeeTransparencyLevel.DETAILED,
 				disclosesWalletFees: true,
+				level: FeeTransparencyLevel.DETAILED,
 				showsTransactionPurpose: true,
 			},
 		},

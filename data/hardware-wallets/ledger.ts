@@ -15,62 +15,60 @@ export const ledgerWallet: Wallet = {
 		id: 'ledger',
 		displayName: 'Ledger Wallet',
 		tableName: 'Ledger',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			Ledger Wallet is a self-custodial wallet built by Ledger. It
 			integrates with Ledger hardware wallets to provide secure cryptocurrency management.
 		`),
-		url: 'https://www.ledger.com/',
-		repoUrl: 'https://github.com/LedgerHQ/',
 		contributors: [nconsigny],
-		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
 				id: 'ledger-stax',
 				name: 'Ledger Stax',
-				url: 'https://shop.ledger.com/products/ledger-stax',
 				isFlagship: true,
+				url: 'https://shop.ledger.com/products/ledger-stax',
 			},
 			{
 				id: 'ledger-nano-s',
 				name: 'Ledger Nano S',
-				url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
 				isFlagship: false,
+				url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
 			},
 			{
 				id: 'ledger-nano-s-plus',
 				name: 'Ledger Nano S+',
-				url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
 				isFlagship: false,
+				url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
 			},
 			{
 				id: 'ledger-nano-x',
 				name: 'Ledger Nano X',
-				url: 'https://shop.ledger.com/products/ledger-nano-x',
 				isFlagship: false,
+				url: 'https://shop.ledger.com/products/ledger-nano-x',
 			},
 			{
 				id: 'ledger-flex',
 				name: 'Ledger Flex',
-				url: 'https://shop.ledger.com/products/ledger-flex',
 				isFlagship: false,
+				url: 'https://shop.ledger.com/products/ledger-flex',
 			},
 		],
+		iconExtension: 'svg',
+		lastUpdated: '2025-03-12',
+		repoUrl: 'https://github.com/LedgerHQ/',
+		url: 'https://www.ledger.com/',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: null,
-		multiAddress: null,
 		addressResolution: {
-			nonChainSpecificEnsResolution: null,
 			chainSpecificAddressing: {
 				erc7828: null,
 				erc7831: null,
 			},
+			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainConfigurability: null,
 		integration: {
 			browser: {
 				'1193': null,
@@ -79,53 +77,71 @@ export const ledgerWallet: Wallet = {
 				ref: null,
 			},
 		},
-		security: {
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
-			scamAlerts: null,
-			publicSecurityAudits: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			hardwareWalletSupport: {
-				supportedWallets: {
-					[HardwareWalletType.LEDGER]: featureSupported,
-				},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.PARTIAL,
-				details:
-					'Ledger provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-				ref: [
-					{
-						url: 'https://youtu.be/7lP_0h-PPvY?t=720',
-						explanation:
-							"Independent video demonstration of Ledger's clear signing implementation on Safe.",
-					},
-				],
-			},
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
-				url: 'https://donjon.ledger.com/bounty/',
-				details:
-					'Ledger offers a comprehensive bug bounty program through their Donjon security team. The program offers competitive rewards based on the severity of findings and has a clear disclosure process.',
-				upgradePathAvailable: true,
-				ref: [
-					{
-						url: 'https://donjon.ledger.com/bounty/',
-						explanation:
-							'Ledger maintains a well-documented bug bounty program through their Donjon security team, offering rewards up to $10,000 for critical vulnerabilities.',
-					},
-				],
+		license: null,
+		monetization: {
+			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
 			},
 		},
+		multiAddress: null,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://ledger.com/privacy-policy',
 			transactionPrivacy: null,
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: {
+				type: BugBountyProgramType.COMPREHENSIVE,
+				details:
+					'Ledger offers a comprehensive bug bounty program through their Donjon security team. The program offers competitive rewards based on the severity of findings and has a clear disclosure process.',
+				ref: [
+					{
+						explanation:
+							'Ledger maintains a well-documented bug bounty program through their Donjon security team, offering rewards up to $10,000 for critical vulnerabilities.',
+						url: 'https://donjon.ledger.com/bounty/',
+					},
+				],
+				upgradePathAvailable: true,
+				url: 'https://donjon.ledger.com/bounty/',
+			},
+			hardwareWalletDappSigning: {
+				details:
+					'Ledger provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
+				level: DappSigningLevel.PARTIAL,
+				ref: [
+					{
+						explanation:
+							"Independent video demonstration of Ledger's clear signing implementation on Safe.",
+						url: 'https://youtu.be/7lP_0h-PPvY?t=720',
+					},
+				],
+			},
+			hardwareWalletSupport: {
+				ref: null,
+				supportedWallets: {
+					[HardwareWalletType.LEDGER]: featureSupported,
+				},
+			},
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
+			publicSecurityAudits: null,
+			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
@@ -142,29 +158,13 @@ export const ledgerWallet: Wallet = {
 		transparency: {
 			feeTransparency: null,
 		},
-		license: null,
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
-		},
 	},
 	variants: {
-		mobile: false,
 		browser: false,
 		desktop: false,
 		embedded: false,
 		hardware: true,
+		mobile: false,
 	},
 }
 
