@@ -7,7 +7,6 @@ import { unratedSoftwareWallet } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
-import type { WalletMetadata } from '@/schema/wallet'
 import type { WalletType } from '@/schema/wallet-types'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
@@ -93,10 +92,9 @@ export function CriteriaPage({
 							<h1 className="text-4xl font-extrabold text-accent">{attrGroup.displayName}</h1>
 							<p className="text-secondary">
 								<RenderTypographicContent
-									// eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- We only need a subset of WalletMetadata
 									content={attrGroup.perWalletQuestion.render({
 										displayName: 'your wallet',
-									} as WalletMetadata)}
+									})}
 									typography={{
 										variant: 'caption',
 										fontStyle: 'italic',

@@ -130,8 +130,9 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	id: 'security',
 	icon: '\u{1f512}', // Lock
 	displayName: 'Security',
-	perWalletQuestion: sentence<WalletMetadata>(
-		(walletMetadata: WalletMetadata): string => `How secure is ${walletMetadata.displayName}?`,
+	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
+		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
+			`How secure is ${walletMetadata.displayName}?`,
 	),
 	attributes: {
 		securityAudits,
@@ -177,8 +178,8 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 	id: 'privacy',
 	icon: '\u{1f575}', // Detective
 	displayName: 'Privacy',
-	perWalletQuestion: sentence<WalletMetadata>(
-		(walletMetadata: WalletMetadata): string =>
+	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
+		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
 			`How well does ${walletMetadata.displayName} protect your privacy?`,
 	),
 	attributes: {
@@ -205,8 +206,8 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 	id: 'selfSovereignty',
 	icon: '\u{1f3f0}', // Castle
 	displayName: 'Self-sovereignty',
-	perWalletQuestion: sentence<WalletMetadata>(
-		(walletMetadata: WalletMetadata): string =>
+	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
+		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
 			`How much control and ownership over your wallet does ${walletMetadata.displayName} give you?`,
 	),
 	attributes: {
@@ -235,8 +236,8 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 	id: 'transparency',
 	icon: '\u{1f50d}', // Looking glass
 	displayName: 'Transparency',
-	perWalletQuestion: sentence<WalletMetadata>(
-		(walletMetadata: WalletMetadata): string =>
+	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
+		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
 			`How transparent and sustainable is ${walletMetadata.displayName}'s development model?`,
 	),
 	attributes: {
@@ -268,8 +269,8 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	id: 'ecosystem',
 	icon: '🌐',
 	displayName: 'Ecosystem',
-	perWalletQuestion: sentence<WalletMetadata>(
-		(walletMetadata: WalletMetadata): string =>
+	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
+		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
 			`How well does ${walletMetadata.displayName} align with the ecosystem?`,
 	),
 	attributes: {
@@ -296,8 +297,8 @@ export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	id: 'maintenance',
 	icon: '🛠️',
 	displayName: 'Maintenance',
-	perWalletQuestion: sentence<WalletMetadata>(
-		(walletMetadata: WalletMetadata): string =>
+	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
+		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
 			`How well-maintained is ${walletMetadata.displayName}?`,
 	),
 	attributes: {
