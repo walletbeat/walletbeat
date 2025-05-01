@@ -1003,7 +1003,7 @@ export default function WalletTable(): React.ReactElement {
 		<div className="overflow-x-auto">
 			{/* Tabs - now fixed */}
 			<div className="sticky top-0 bg-white dark:bg-[#141414] z-10">
-				<div className="flex gap-4 items-end">
+				<div className="flex gap-4 xl:items-end xl:flex-row flex-col-reverse items-start">
 					<div className="flex gap-1">
 						<button
 							className={cx(
@@ -1050,7 +1050,7 @@ export default function WalletTable(): React.ReactElement {
 					</div>
 					{/* Wallet Type Filter Buttons - only show for Software wallets tab */}
 					{activeTab === WalletTableTab.SOFTWARE && (
-						<div className="flex flex-wrap gap-2 py-1 px-1 justify-end">
+						<div className="flex flex-wrap gap-2 py-1 px-1 justify-start">
 							<span className="text-sm font-medium text-gray-600 dark:text-gray-300 self-center mr-2">
 								Filter by:
 							</span>

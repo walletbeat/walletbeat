@@ -404,11 +404,11 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							children:
 								section.subsections !== undefined && isNonEmptyArray(section.subsections)
 									? nonEmptyMap(section.subsections, subsection => ({
-											id: sectionHeaderId(subsection),
-											icon: subsection.icon,
-											title: subsection.title,
-											contentId: sectionHeaderId(subsection),
-										}))
+										id: sectionHeaderId(subsection),
+										icon: subsection.icon,
+										title: subsection.title,
+										contentId: sectionHeaderId(subsection),
+									}))
 									: undefined,
 						}),
 					),
@@ -434,7 +434,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 
 			<ReturnToTop />
 			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
-				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
+				<div className="flex flex-col lg:mt-10 gap-4">
 					<div className="flex flex-row">
 						<div className="flex-1 min-w-0">
 							<div style={{ height: headerBottomMargin }}></div>
@@ -501,7 +501,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 											<div
 												key="sectionBody"
 												className="text-primary px-4"
-												// paddingTop={theme.spacing(2)}
+											// paddingTop={theme.spacing(2)}
 											>
 												{section.body}
 											</div>
