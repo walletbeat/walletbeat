@@ -118,7 +118,7 @@ interface NavigationItemProps {
 }
 
 function itemOrChildMatches(item: NavigationItem, selectedItemId?: string): boolean {
-	if (!selectedItemId) {
+	if (selectedItemId == null) {
 		return false
 	}
 	if (item.id === selectedItemId) {
