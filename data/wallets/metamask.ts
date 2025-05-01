@@ -119,7 +119,7 @@ export const metamask: Wallet = {
 				},
 			},
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: {
 				details:
