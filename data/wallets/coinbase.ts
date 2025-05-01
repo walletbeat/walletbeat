@@ -1,13 +1,12 @@
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { nconsigny } from '../contributors/nconsigny'
@@ -16,7 +15,7 @@ import { cantina } from '../entities/cantina'
 import { certora } from '../entities/certora'
 import { code4rena } from '../entities/code4rena'
 
-export const coinbase: Wallet = {
+export const coinbase: SoftwareWallet = {
 	metadata: {
 		id: 'coinbase',
 		displayName: 'Coinbase Wallet',
@@ -127,10 +126,6 @@ export const coinbase: Wallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.NONE,
-				ref: null,
-			},
 			hardwareWalletSupport: {
 				ref: null,
 				supportedWallets: {

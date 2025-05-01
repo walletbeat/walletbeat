@@ -1,16 +1,15 @@
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { lucemans } from '../contributors/lucemans'
 
-export const family: Wallet = {
+export const family: SoftwareWallet = {
 	metadata: {
 		id: 'family',
 		displayName: 'Family',
@@ -83,11 +82,6 @@ export const family: Wallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: {
-				details: 'No hardware wallet clear signing information available.',
-				level: DappSigningLevel.NONE,
-				ref: null,
-			},
 			hardwareWalletSupport: {
 				ref: null,
 				supportedWallets: {},

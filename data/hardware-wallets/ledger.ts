@@ -1,16 +1,13 @@
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported } from '@/schema/features/support'
-import type { Wallet } from '@/schema/wallet'
+import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { nconsigny } from '../contributors/nconsigny'
 
-export const ledgerWallet: Wallet = {
+export const ledgerWallet: HardwareWallet = {
 	metadata: {
 		id: 'ledger',
 		displayName: 'Ledger Wallet',
@@ -60,23 +57,6 @@ export const ledgerWallet: Wallet = {
 	},
 	features: {
 		accountSupport: null,
-		addressResolution: {
-			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
-			},
-			nonChainSpecificEnsResolution: null,
-			ref: null,
-		},
-		chainConfigurability: null,
-		integration: {
-			browser: {
-				'1193': null,
-				'2700': null,
-				'6963': null,
-				ref: null,
-			},
-		},
 		license: null,
 		monetization: {
 			ref: null,
@@ -96,6 +76,7 @@ export const ledgerWallet: Wallet = {
 		multiAddress: null,
 		privacy: {
 			dataCollection: null,
+			hardwarePrivacy: null,
 			privacyPolicy: 'https://ledger.com/privacy-policy',
 			transactionPrivacy: null,
 		},
@@ -115,6 +96,7 @@ export const ledgerWallet: Wallet = {
 				upgradePathAvailable: true,
 				url: 'https://donjon.ledger.com/bounty/',
 			},
+			firmware: null,
 			hardwareWalletDappSigning: {
 				details:
 					'Ledger provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
@@ -127,12 +109,7 @@ export const ledgerWallet: Wallet = {
 					},
 				],
 			},
-			hardwareWalletSupport: {
-				ref: null,
-				supportedWallets: {
-					[HardwareWalletType.LEDGER]: featureSupported,
-				},
-			},
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
@@ -141,22 +118,17 @@ export const ledgerWallet: Wallet = {
 				ref: null,
 			},
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			supplyChainDIY: null,
+			supplyChainFactory: null,
+			userSafety: null,
 		},
 		selfSovereignty: {
-			transactionSubmission: {
-				l1: {
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
-				},
-				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
-				},
-			},
+			interoperability: null,
 		},
 		transparency: {
 			feeTransparency: null,
+			maintenance: null,
+			reputation: null,
 		},
 	},
 	variants: {

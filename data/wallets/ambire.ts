@@ -6,7 +6,6 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
@@ -17,7 +16,7 @@ import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transpa
 import { License } from '@/schema/features/transparency/license'
 import type { References } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { jiojosbg } from '../contributors/jiojosbg'
@@ -111,7 +110,7 @@ const dataLeakReferences: Record<string, References> = {
 	],
 }
 
-export const ambire: Wallet = {
+export const ambire: SoftwareWallet = {
 	metadata: {
 		id: 'ambire',
 		displayName: 'Ambire',
@@ -325,10 +324,6 @@ https://github.com/AmbireTech/code4rena#known-tradeoffs
 Payouts are handled by the Ambire team directly and are denominated in USD. However, payouts are done in ETH unless agreed otherwise.`,
 				upgradePathAvailable: false,
 				url: 'https://immunefi.com/bug-bounty/ambire/information/',
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.PARTIAL,
-				ref: undefined,
 			},
 			hardwareWalletSupport: {
 				[Variant.BROWSER]: {

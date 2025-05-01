@@ -1,20 +1,19 @@
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { lucemans } from '../contributors/lucemans'
 import { nconsigny } from '../contributors/nconsigny'
 import { polymutex } from '../contributors/polymutex'
 
-export const frame: Wallet = {
+export const frame: SoftwareWallet = {
 	metadata: {
 		id: 'frame',
 		displayName: 'Frame',
@@ -103,11 +102,6 @@ export const frame: Wallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: {
-				details: 'No hardware wallet clear signing information available.',
-				level: DappSigningLevel.NONE,
-				ref: null,
-			},
 			hardwareWalletSupport: {
 				ref: null,
 				supportedWallets: {

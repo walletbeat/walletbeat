@@ -1,12 +1,11 @@
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { nconsigny } from '../contributors/nconsigny'
@@ -14,7 +13,7 @@ import { polymutex } from '../contributors/polymutex'
 import { cure53 } from '../entities/cure53'
 import { diligence } from '../entities/diligence'
 
-export const metamask: Wallet = {
+export const metamask: SoftwareWallet = {
 	metadata: {
 		id: 'metamask',
 		displayName: 'MetaMask',
@@ -90,18 +89,6 @@ export const metamask: Wallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: {
-				details:
-					'MetaMask provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-				level: DappSigningLevel.PARTIAL,
-				ref: [
-					{
-						explanation:
-							'MetaMask Hardware Wallet Hub supports transaction signing with hardware wallets, displaying basic transaction information on the device.',
-						url: 'https://support.metamask.io/more-web3/wallets/hardware-wallet-hub/',
-					},
-				],
-			},
 			hardwareWalletSupport: {
 				ref: [
 					{

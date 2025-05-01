@@ -19,7 +19,13 @@ import {
 } from './attribute-groups'
 import { type Attribute, type EvaluatedAttribute, Rating, type Value } from './attributes'
 import type { WalletDeveloper } from './entity'
-import { type ResolvedFeatures, resolveFeatures, type WalletFeatures } from './features'
+import {
+	type ResolvedFeatures,
+	resolveFeatures,
+	type WalletBaseFeatures,
+	type WalletHardwareFeatures,
+	type WalletSoftwareFeatures,
+} from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
 import type { Url } from './url'
@@ -156,7 +162,7 @@ export interface WalletOverrides {
  * never in UI code. UI code should only deal with fully-rated wallet data.
  * See `RatedWallet` instead.
  */
-export interface Wallet {
+export interface BaseWallet {
 	/** Wallet metadata (name, URL, icon, etc.) */
 	metadata: WalletMetadata
 
@@ -164,10 +170,33 @@ export interface Wallet {
 	variants: Record<Variant, boolean> & AtLeastOneTrueVariant
 
 	/** All wallet features. */
-	features: WalletFeatures
+	features: WalletBaseFeatures
 
 	/** Overrides for specific attributes. */
 	overrides?: WalletOverrides
+}
+
+/**
+ * The interface used to describe software wallets.
+ * This should only be used for data entry and in attribute rating logic,
+ * never in UI code. UI code should only deal with fully-rated wallet data.
+ * See `RatedWallet` instead.
+ */
+export type SoftwareWallet = BaseWallet & {
+	features: BaseWallet['features'] & WalletSoftwareFeatures
+}
+
+/**
+ * The interface used to describe hardware wallets.
+ * This should only be used for data entry and in attribute rating logic,
+ * never in UI code. UI code should only deal with fully-rated wallet data.
+ * See `RatedWallet` instead.
+ */
+export type HardwareWallet = BaseWallet & {
+	features: BaseWallet['features'] & WalletHardwareFeatures
+	variants: BaseWallet['variants'] & {
+		[Variant.HARDWARE]: true
+	}
 }
 
 export interface ResolvedWallet {
@@ -240,7 +269,7 @@ export interface RatedWallet {
 	overrides: WalletOverrides
 }
 
-function resolveVariant(wallet: Wallet, variant: Variant): ResolvedWallet | null {
+function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | null {
 	if (!wallet.variants[variant]) {
 		return null
 	}
@@ -253,7 +282,7 @@ function resolveVariant(wallet: Wallet, variant: Variant): ResolvedWallet | null
 	}
 }
 
-export function rateWallet(wallet: Wallet): RatedWallet {
+export function rateWallet(wallet: BaseWallet): RatedWallet {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each feature must already have at least one variant populated.
 	const perVariantWallets: AtLeastOneVariant<ResolvedWallet> = Object.fromEntries(
 		Object.entries({

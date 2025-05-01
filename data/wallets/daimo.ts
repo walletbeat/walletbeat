@@ -5,7 +5,6 @@ import {
 	RegularEndpoint,
 } from '@/schema/features/privacy/data-collection'
 import { WalletProfile } from '@/schema/features/profile'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
@@ -15,7 +14,7 @@ import {
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { nconsigny } from '../contributors/nconsigny'
@@ -28,7 +27,7 @@ import { openExchangeRates } from '../entities/open-exchange-rates'
 import { pimlico } from '../entities/pimlico'
 import { veridise } from '../entities/veridise'
 
-export const daimo: Wallet = {
+export const daimo: SoftwareWallet = {
 	metadata: {
 		id: 'daimo',
 		displayName: 'Daimo',
@@ -271,10 +270,6 @@ export const daimo: Wallet = {
 		profile: WalletProfile.PAYMENTS,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.FULL,
-				ref: null,
-			},
 			hardwareWalletSupport: {
 				ref: null,
 				supportedWallets: {},

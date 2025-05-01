@@ -1,12 +1,12 @@
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { exampleContributor } from '../contributors/example'
 
-export const unratedTemplate: Wallet = {
+export const unratedTemplate: SoftwareWallet = {
 	metadata: {
 		id: 'unrated',
 		displayName: 'Unrated wallet template',
@@ -66,7 +66,6 @@ export const unratedTemplate: Wallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: null,
 			hardwareWalletSupport: null,
 			lightClient: {
 				ethereumL1: null,

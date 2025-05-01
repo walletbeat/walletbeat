@@ -1,16 +1,13 @@
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported } from '@/schema/features/support'
-import type { Wallet } from '@/schema/wallet'
+import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { nconsigny } from '../contributors/nconsigny'
 
-export const trezorWallet: Wallet = {
+export const trezorWallet: HardwareWallet = {
 	metadata: {
 		id: 'trezor',
 		displayName: 'Trezor Wallet',
@@ -54,23 +51,6 @@ export const trezorWallet: Wallet = {
 	},
 	features: {
 		accountSupport: null,
-		addressResolution: {
-			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
-			},
-			nonChainSpecificEnsResolution: null,
-			ref: null,
-		},
-		chainConfigurability: null,
-		integration: {
-			browser: {
-				'1193': null,
-				'2700': null,
-				'6963': null,
-				ref: null,
-			},
-		},
 		license: null,
 		monetization: {
 			ref: null,
@@ -90,6 +70,7 @@ export const trezorWallet: Wallet = {
 		multiAddress: null,
 		privacy: {
 			dataCollection: null,
+			hardwarePrivacy: null,
 			privacyPolicy: 'https://trezor.io/privacy-policy',
 			transactionPrivacy: null,
 		},
@@ -109,6 +90,7 @@ export const trezorWallet: Wallet = {
 				upgradePathAvailable: true,
 				url: 'https://trezor.io/support/a/how-to-report-a-security-issue',
 			},
+			firmware: null,
 			hardwareWalletDappSigning: {
 				details:
 					'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
@@ -121,12 +103,7 @@ export const trezorWallet: Wallet = {
 					},
 				],
 			},
-			hardwareWalletSupport: {
-				ref: null,
-				supportedWallets: {
-					[HardwareWalletType.TREZOR]: featureSupported,
-				},
-			},
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
@@ -135,22 +112,17 @@ export const trezorWallet: Wallet = {
 				ref: null,
 			},
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			supplyChainDIY: null,
+			supplyChainFactory: null,
+			userSafety: null,
 		},
 		selfSovereignty: {
-			transactionSubmission: {
-				l1: {
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
-				},
-				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
-				},
-			},
+			interoperability: null,
 		},
 		transparency: {
 			feeTransparency: null,
+			maintenance: null,
+			reputation: null,
 		},
 	},
 	variants: {

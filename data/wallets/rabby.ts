@@ -16,7 +16,7 @@ import {
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { polymutex } from '../contributors/polymutex'
@@ -25,7 +25,7 @@ import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
 
-export const rabby: Wallet = {
+export const rabby: SoftwareWallet = {
 	metadata: {
 		id: 'rabby',
 		displayName: 'Rabby',
@@ -173,7 +173,6 @@ export const rabby: Wallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: null,
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
 					ref: [

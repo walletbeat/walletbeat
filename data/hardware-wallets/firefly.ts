@@ -1,15 +1,12 @@
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported } from '@/schema/features/support'
-import type { Wallet } from '@/schema/wallet'
+import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { nconsigny } from '../contributors/nconsigny'
 
-export const fireflyWallet: Wallet = {
+export const fireflyWallet: HardwareWallet = {
 	metadata: {
 		id: 'firefly',
 		displayName: 'Firefly Wallet',
@@ -35,23 +32,6 @@ export const fireflyWallet: Wallet = {
 	},
 	features: {
 		accountSupport: null,
-		addressResolution: {
-			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
-			},
-			nonChainSpecificEnsResolution: null,
-			ref: null,
-		},
-		chainConfigurability: null,
-		integration: {
-			browser: {
-				'1193': null,
-				'2700': null,
-				'6963': null,
-				ref: null,
-			},
-		},
 		license: null,
 		monetization: {
 			ref: null,
@@ -71,6 +51,7 @@ export const fireflyWallet: Wallet = {
 		multiAddress: null,
 		privacy: {
 			dataCollection: null,
+			hardwarePrivacy: null,
 			privacyPolicy: '',
 			transactionPrivacy: null,
 		},
@@ -83,39 +64,30 @@ export const fireflyWallet: Wallet = {
 				upgradePathAvailable: false,
 				url: '',
 			},
+			firmware: null,
 			hardwareWalletDappSigning: {
 				details:
 					'Firefly currently does not provide clear signing support as it is still in development.',
 				level: DappSigningLevel.NONE,
 				ref: null,
 			},
-			hardwareWalletSupport: {
-				ref: null,
-				supportedWallets: {
-					[HardwareWalletType.FIREFLY]: featureSupported,
-				},
-			},
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			supplyChainDIY: null,
+			supplyChainFactory: null,
+			userSafety: null,
 		},
 		selfSovereignty: {
-			transactionSubmission: {
-				l1: {
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
-				},
-				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
-				},
-			},
+			interoperability: null,
 		},
 		transparency: {
 			feeTransparency: null,
+			maintenance: null,
+			reputation: null,
 		},
 	},
 	variants: {

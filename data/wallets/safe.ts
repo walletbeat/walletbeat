@@ -1,16 +1,15 @@
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { nconsigny } from '../contributors/nconsigny'
 
-export const safe: Wallet = {
+export const safe: SoftwareWallet = {
 	metadata: {
 		id: 'safe',
 		displayName: 'Safe',
@@ -87,10 +86,6 @@ export const safe: Wallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.NONE,
-				ref: undefined,
-			},
 			hardwareWalletSupport: {
 				ref: undefined,
 				supportedWallets: {},

@@ -1,18 +1,17 @@
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { polymutex } from '../contributors/polymutex'
 
-export const rainbow: Wallet = {
+export const rainbow: SoftwareWallet = {
 	metadata: {
 		id: 'rainbow',
 		displayName: 'Rainbow',
@@ -95,10 +94,6 @@ export const rainbow: Wallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.PARTIAL,
-				ref: null,
-			},
 			hardwareWalletSupport: {
 				ref: null,
 				supportedWallets: {

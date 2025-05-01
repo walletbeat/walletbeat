@@ -1,12 +1,11 @@
 import { WalletProfile } from '@/schema/features/profile'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { Variant } from '@/schema/variants'
-import type { Wallet } from '@/schema/wallet'
+import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { exampleContributor } from '../contributors/example'
 
-export const unratedHardwareTemplate: Wallet = {
+export const unratedHardwareTemplate: HardwareWallet = {
 	metadata: {
 		id: 'unrated',
 		displayName: 'Unrated hardware wallet template',
@@ -24,23 +23,6 @@ export const unratedHardwareTemplate: Wallet = {
 	},
 	features: {
 		accountSupport: null,
-		addressResolution: {
-			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
-			},
-			nonChainSpecificEnsResolution: null,
-			ref: null,
-		},
-		chainConfigurability: null,
-		integration: {
-			browser: {
-				'1193': null,
-				'2700': null,
-				'6963': null,
-				ref: null,
-			},
-		},
 		license: null,
 		monetization: {
 			ref: null,
@@ -60,35 +42,32 @@ export const unratedHardwareTemplate: Wallet = {
 		multiAddress: null,
 		privacy: {
 			dataCollection: null,
+			hardwarePrivacy: null,
 			privacyPolicy: 'https://example.com/privacy-policy',
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
+			firmware: null,
 			hardwareWalletDappSigning: null,
-			hardwareWalletSupport: null,
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			supplyChainDIY: null,
+			supplyChainFactory: null,
+			userSafety: null,
 		},
 		selfSovereignty: {
-			transactionSubmission: {
-				l1: {
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
-				},
-				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
-				},
-			},
+			interoperability: null,
 		},
 		transparency: {
 			feeTransparency: null,
+			maintenance: null,
+			reputation: null,
 		},
 	},
 	variants: {
