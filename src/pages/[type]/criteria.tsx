@@ -6,7 +6,12 @@ import { unratedHardwareWallet } from '@/data/hardware-wallets'
 import { unratedSoftwareWallet } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
+import {
+	getAttributeGroupById,
+	getAttributeGroupInTree,
+	mapNonExemptAttributeGroupsInTree,
+	mapNonExemptGroupAttributes,
+} from '@/schema/attribute-groups'
 import type { WalletType } from '@/schema/wallet-types'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
@@ -55,13 +60,12 @@ export function CriteriaPage({
 	walletType: WalletType
 	attrGroupId: string
 }): React.JSX.Element {
-	const attrGroup = getAttributeGroupById(
-		attrGroupId,
-		representativeWalletForType(walletType).overall,
-	)
+	const representativeWallet = representativeWalletForType(walletType)
+	const attrGroup = getAttributeGroupById(attrGroupId, representativeWallet.overall)
 	if (attrGroup === null) {
 		throw new Error('Invalid attribute group')
 	}
+	const evalGroup = getAttributeGroupInTree(representativeWallet.overall, attrGroup)
 	return (
 		<NavigationPageLayout
 			groups={[
@@ -101,10 +105,10 @@ export function CriteriaPage({
 									}}
 								/>
 							</p>
-							{Object.values(attrGroup.attributes).map(attr => (
-								<div key={attr.id}>
-									<h2>{attr.displayName}</h2>
-									<p>{attr.id}</p>
+							{mapNonExemptGroupAttributes(evalGroup, evalAttr => (
+								<div key={evalAttr.attribute.id}>
+									<h2>{evalAttr.attribute.displayName}</h2>
+									<p>{evalAttr.attribute.id}</p>
 								</div>
 							))}
 						</div>
