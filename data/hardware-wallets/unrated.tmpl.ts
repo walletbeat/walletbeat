@@ -71,10 +71,6 @@ export const unratedHardwareTemplate: HardwareWallet = {
 		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
 		[Variant.HARDWARE]: true,
 	},
 }

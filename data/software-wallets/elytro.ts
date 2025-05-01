@@ -127,8 +127,5 @@ export const elytro: SoftwareWallet = {
 	variants: {
 		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: false,
 	},
 }

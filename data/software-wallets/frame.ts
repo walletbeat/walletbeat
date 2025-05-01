@@ -139,10 +139,7 @@ export const frame: SoftwareWallet = {
 		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
 		[Variant.BROWSER]: true,
 		[Variant.DESKTOP]: true,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: false,
 	},
 }

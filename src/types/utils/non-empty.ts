@@ -154,8 +154,26 @@ export function nonEmptyConcat<T>([arr, rest]:
 /**
  * A set that contains at least one true element.
  */
-export type NonEmptySet<K extends string | number | symbol> = NonEmptyRecord<K, true> &
-	Record<K, boolean>
+export type NonEmptySet<K extends string | number | symbol> = NonEmptyRecord<K, true>
+
+/**
+ * Type predicate for NonEmptySet.
+ */
+export function isNonEmptySet<K extends string | number | symbol>(
+	obj: Partial<Record<K, unknown>>,
+): obj is NonEmptySet<K> {
+	if (Object.keys(obj).length === 0) {
+		return false
+	}
+	let oneTrue = false
+	for (const val of Object.values(obj)) {
+		if (typeof val !== 'boolean') {
+			return false
+		}
+		oneTrue ||= val
+	}
+	return oneTrue
+}
 
 /**
  * Initialize a non-empty set from at least one key.

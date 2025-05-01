@@ -1,4 +1,5 @@
 import {
+	type NonEmptyArray,
 	nonEmptyEntries,
 	nonEmptyKeySet,
 	type NonEmptyRecord,
@@ -18,13 +19,19 @@ export enum Variant {
 	HARDWARE = 'hardware',
 }
 
+export const allVariants: NonEmptyArray<Variant> = [
+	Variant.MOBILE,
+	Variant.DESKTOP,
+	Variant.BROWSER,
+	Variant.EMBEDDED,
+	Variant.HARDWARE,
+]
+
 /** Maps at least one variant to a T. */
 export type AtLeastOneVariant<T> = NonEmptyRecord<Variant, T>
 
 /** Maps at least one variant to a T. */
-export type AtLeastOneTrueVariant = {
-	[V in Variant]: Record<V, true> & Partial<Record<Exclude<Variant, V>, boolean>>
-}[Variant]
+export type AtLeastOneTrueVariant = NonEmptySet<Variant>
 
 /**
  * A feature that may or may not depend on the wallet variant.

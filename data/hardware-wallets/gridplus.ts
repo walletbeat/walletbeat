@@ -1,6 +1,7 @@
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
@@ -104,10 +105,6 @@ export const gridplusWallet: HardwareWallet = {
 		},
 	},
 	variants: {
-		browser: false,
-		desktop: false,
-		embedded: false,
-		hardware: true,
-		mobile: false,
+		[Variant.HARDWARE]: true,
 	},
 }

@@ -113,13 +113,13 @@ function getWalletTypeInfo(
 	const accountTypes = walletSupportedAccountTypes(wallet, variant)
 	const hasEoa =
 		accountTypes !== null &&
-		(setContains(accountTypes, AccountType.eip7702) ||
-			setContains(accountTypes, AccountType.eoa) ||
-			setContains(accountTypes, AccountType.mpc))
+		(setContains<AccountType>(accountTypes, AccountType.eip7702) ||
+			setContains<AccountType>(accountTypes, AccountType.eoa) ||
+			setContains<AccountType>(accountTypes, AccountType.mpc))
 	const hasSmartWallet =
 		accountTypes !== null &&
-		(setContains(accountTypes, AccountType.eip7702) ||
-			setContains(accountTypes, AccountType.rawErc4337))
+		(setContains<AccountType>(accountTypes, AccountType.eip7702) ||
+			setContains<AccountType>(accountTypes, AccountType.rawErc4337))
 	const hasHardware = hasVariant(wallet.variants, Variant.HARDWARE)
 	return {
 		accountTypes,
@@ -127,11 +127,14 @@ function getWalletTypeInfo(
 		hasSmartWallet,
 		hasHardware,
 		standards: {
-			ERC_4337: accountTypes !== null && setContains(accountTypes, AccountType.rawErc4337),
-			ERC_7702: accountTypes !== null && setContains(accountTypes, AccountType.eip7702),
+			ERC_4337:
+				accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.rawErc4337),
+			ERC_7702:
+				accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eip7702),
 			OTHER:
 				accountTypes !== null &&
-				(setContains(accountTypes, AccountType.eoa) || setContains(accountTypes, AccountType.mpc)),
+				(setContains<AccountType>(accountTypes, AccountType.eoa) ||
+					setContains<AccountType>(accountTypes, AccountType.mpc)),
 		},
 	}
 }

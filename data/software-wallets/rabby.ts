@@ -426,7 +426,5 @@ export const rabby: SoftwareWallet = {
 		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
 		[Variant.DESKTOP]: true,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: false,
 	},
 }

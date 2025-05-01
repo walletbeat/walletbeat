@@ -114,9 +114,5 @@ export const family: SoftwareWallet = {
 	},
 	variants: {
 		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: false,
 	},
 }

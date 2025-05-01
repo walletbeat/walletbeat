@@ -91,10 +91,8 @@ export const unratedTemplate: SoftwareWallet = {
 		},
 	},
 	variants: {
-		[Variant.MOBILE]: false,
+		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: false,
+		[Variant.DESKTOP]: true,
 	},
 }

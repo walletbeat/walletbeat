@@ -2,6 +2,7 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
@@ -126,11 +127,7 @@ export const trezorWallet: HardwareWallet = {
 		},
 	},
 	variants: {
-		browser: false,
-		desktop: false,
-		embedded: false,
-		hardware: true,
-		mobile: false,
+		[Variant.HARDWARE]: true,
 	},
 }
 

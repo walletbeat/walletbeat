@@ -167,7 +167,7 @@ export interface BaseWallet {
 	metadata: WalletMetadata
 
 	/** Set of variants for which the wallet has an implementation. */
-	variants: Record<Variant, boolean> & AtLeastOneTrueVariant
+	variants: AtLeastOneTrueVariant
 
 	/** All wallet features. */
 	features: WalletBaseFeatures
@@ -183,7 +183,17 @@ export interface BaseWallet {
  * See `RatedWallet` instead.
  */
 export type SoftwareWallet = BaseWallet & {
-	features: BaseWallet['features'] & WalletSoftwareFeatures
+	features: WalletSoftwareFeatures
+	variants:
+		| {
+				[Variant.BROWSER]: true
+		  }
+		| {
+				[Variant.DESKTOP]: true
+		  }
+		| {
+				[Variant.MOBILE]: true
+		  }
 }
 
 /**
@@ -193,8 +203,8 @@ export type SoftwareWallet = BaseWallet & {
  * See `RatedWallet` instead.
  */
 export type HardwareWallet = BaseWallet & {
-	features: BaseWallet['features'] & WalletHardwareFeatures
-	variants: BaseWallet['variants'] & {
+	features: WalletHardwareFeatures
+	variants: {
 		[Variant.HARDWARE]: true
 	}
 }

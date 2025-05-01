@@ -358,9 +358,5 @@ export const daimo: SoftwareWallet = {
 	},
 	variants: {
 		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: false,
-		[Variant.DESKTOP]: false,
-		[Variant.EMBEDDED]: false,
-		[Variant.HARDWARE]: false,
 	},
 }
