@@ -8,7 +8,7 @@ import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.firmware'
 
@@ -90,7 +90,7 @@ export const firmware: Attribute<FirmwareValue> = {
 		pickWorstRating<FirmwareValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return unrated(firmware, brand, {
+			return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), brand, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,

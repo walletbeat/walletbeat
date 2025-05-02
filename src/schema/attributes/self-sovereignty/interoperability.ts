@@ -11,7 +11,7 @@ import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.interoperability'
 
@@ -79,7 +79,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 		pickWorstRating<InteroperabilityValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<InteroperabilityValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return unrated(interoperability, brand, {
+			return exempt(interoperability, sentence('Only rated for hardware wallets'), brand, {
 				thirdPartyCompatibility: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,
 			})
