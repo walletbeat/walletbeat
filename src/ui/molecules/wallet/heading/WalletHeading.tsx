@@ -5,9 +5,8 @@ import { type FC, Fragment } from 'react'
 import React from 'react'
 
 import { variantToName, variantToRunsOn } from '@/components/variants'
-import { isValidHardwareWalletName } from '@/data/hardware-wallets'
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
-import type { Variant } from '@/schema/variants'
+import { hasVariant, Variant } from '@/schema/variants'
 import type { RatedWallet } from '@/schema/wallet'
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
 import { commaListPrefix } from '@/types/utils/text'
@@ -19,7 +18,6 @@ export const WalletHeading: FC<{
 	pickedVariant: Variant | null
 	singleVariant: Variant | null
 }> = ({ wallet, pickedVariant, singleVariant }) => {
-	const isHardwareWallet = isValidHardwareWalletName(wallet.metadata.id)
 	const needsVariantFiltering = singleVariant === null
 
 	return (
@@ -44,7 +42,7 @@ export const WalletHeading: FC<{
 							/>
 						</div>
 					) : undefined,
-					isHardwareWallet ? (
+					hasVariant(wallet.variants, Variant.HARDWARE) ? (
 						<div className="flex flex-row gap-2 items-center" key="hardware">
 							<HardwareIcon fontSize="small" />
 						</div>

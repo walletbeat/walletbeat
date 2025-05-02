@@ -11,12 +11,7 @@ import {
 	variantToName,
 	variantUrlQuery,
 } from '@/components/variants'
-import {
-	type HardwareWalletName,
-	isValidHardwareWalletName,
-	ratedHardwareWallets,
-} from '@/data/hardware-wallets'
-import { ratedSoftwareWallets, type SoftwareWalletName } from '@/data/software-wallets'
+import { allRatedWallets, type WalletName } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
 	type EvaluationTree,
@@ -143,16 +138,8 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 	return JSON.stringify(faqSchema)
 }
 
-export function WalletPage({
-	walletName,
-}: {
-	walletName: SoftwareWalletName | HardwareWalletName
-}): React.JSX.Element {
-	// Use type guards to safely access the wallets
-	const wallet = isValidHardwareWalletName(walletName)
-		? ratedHardwareWallets[walletName]
-		: ratedSoftwareWallets[walletName]
-
+export function WalletPage({ walletName }: { walletName: WalletName }): React.JSX.Element {
+	const wallet = allRatedWallets[walletName]
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
 	useEffect(() => {

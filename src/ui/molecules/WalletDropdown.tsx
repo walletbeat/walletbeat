@@ -3,19 +3,13 @@ import { Command } from 'cmdk'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LuChevronDown, LuKey, LuSearch, LuWallet } from 'react-icons/lu'
 
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
-import { ratedSoftwareWallets } from '@/data/software-wallets'
+import { allRatedWallets } from '@/data/wallets'
 import type { RatedWallet } from '@/schema/wallet'
+import { mapWalletTypes, WalletType } from '@/schema/wallet-types'
+import { isNonEmptyArray, nonEmptyMap, setContains } from '@/types/utils/non-empty'
 import { cx } from '@/utils/cx'
 
 import { WalletIcon } from '../atoms/WalletIcon'
-
-// Interface for wallet items with additional metadata
-interface WalletItem {
-	id: string
-	type: 'software' | 'hardware'
-	wallet: RatedWallet
-}
 
 export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.Element {
 	const [open, setOpen] = useState(false)
@@ -30,26 +24,6 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 			setWidth(triggerRef.current.offsetWidth)
 		}
 	}, [open])
-
-	// Convert all wallets to a unified array with type information
-	const allWalletItems: WalletItem[] = [
-		// Regular wallets
-		...Object.entries(ratedSoftwareWallets).map(([id, walletData]) => ({
-			id,
-			type: 'software' as const,
-			wallet: walletData,
-		})),
-		// Hardware wallets
-		...Object.entries(ratedHardwareWallets).map(([id, walletData]) => ({
-			id,
-			type: 'hardware' as const,
-			wallet: walletData,
-		})),
-	]
-
-	// Filter wallets for each category
-	const softwareWalletItems = allWalletItems.filter(w => w.type === 'software')
-	const hardwareWalletItems = allWalletItems.filter(w => w.type === 'hardware')
 
 	const handleSelect = useCallback((walletId: string) => {
 		setOpen(false)
@@ -114,72 +88,56 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 
 						<Command.List className="max-h-[350px] overflow-auto">
 							{/* Only show section headers when there are matching items */}
-							{softwareWalletItems.some(
-								w =>
-									w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
-									w.id.toLowerCase().includes(search.toLowerCase()),
-							) && (
-								<Command.Group
-									heading="Software Wallets"
-									className="text-xs font-medium text-gray-500 uppercase flex flex-col gap-1 px-1"
-								>
-									{softwareWalletItems
-										.filter(
-											w =>
-												w.wallet.metadata.displayName
-													.toLowerCase()
-													.includes(search.toLowerCase()) ||
-												w.id.toLowerCase().includes(search.toLowerCase()),
-										)
-										.map(w => (
-											<Command.Item
-												key={w.id}
-												value={w.id}
-												onSelect={handleSelect}
-												className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
-											>
-												<span className="flex items-center gap-2 flex-1 min-w-0">
-													<WalletIcon wallet={w.wallet} iconSize={20} />
-													<span className="truncate">{w.wallet.metadata.displayName}</span>
-												</span>
-												<LuWallet className="ml-2 flex-shrink-0 opacity-40" size={14} />
-											</Command.Item>
-										))}
-								</Command.Group>
-							)}
-
-							{hardwareWalletItems.some(
-								w =>
-									w.wallet.metadata.displayName.toLowerCase().includes(search.toLowerCase()) ||
-									w.id.toLowerCase().includes(search.toLowerCase()),
-							) && (
-								<Command.Group
-									heading="Hardware Wallets"
-									className="text-xs font-medium text-gray-500 uppercase flex flex-col gap-1 px-1"
-								>
-									{hardwareWalletItems
-										.filter(
-											w =>
-												w.wallet.metadata.displayName
-													.toLowerCase()
-													.includes(search.toLowerCase()) ||
-												w.id.toLowerCase().includes(search.toLowerCase()),
-										)
-										.map(w => (
-											<Command.Item
-												key={w.id}
-												value={w.id}
-												onSelect={handleSelect}
-												className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
-											>
-												<span className="flex items-center gap-2 flex-1 min-w-0">
-													<WalletIcon wallet={w.wallet} iconSize={20} />
-													<span className="truncate">{w.wallet.metadata.displayName}</span>
-												</span>
-												<LuKey className="ml-2 flex-shrink-0 opacity-40" size={14} />
-											</Command.Item>
-										))}
-								</Command.Group>
+							{Object.values(
+								mapWalletTypes((walletType: WalletType): React.ReactNode | null => {
+									const searchLower = search.toLowerCase()
+									const results = Object.values(allRatedWallets).filter(
+										wallet =>
+											setContains(wallet.types, walletType) &&
+											(wallet.metadata.id.toLowerCase().includes(searchLower) ||
+												wallet.metadata.displayName.toLowerCase().includes(searchLower)),
+									)
+									if (!isNonEmptyArray(results)) {
+										return null
+									}
+									const { heading, icon } = (() => {
+										switch (walletType) {
+											case WalletType.SOFTWARE:
+												return {
+													heading: 'Software Wallets',
+													icon: <LuWallet className="ml-2 flex-shrink-0 opacity-40" size={14} />,
+												}
+											case WalletType.HARDWARE:
+												return {
+													heading: 'Hardware Wallets',
+													icon: <LuKey className="ml-2 flex-shrink-0 opacity-40" size={14} />,
+												}
+											case WalletType.EMBEDDED:
+												return { heading: 'Embedded Wallets', icon: null }
+										}
+									})()
+									return (
+										<Command.Group
+											heading={heading}
+											className="text-xs font-medium text-gray-500 uppercase flex flex-col gap-1 px-1"
+										>
+											{nonEmptyMap(results, wallet => (
+												<Command.Item
+													key={wallet.metadata.id}
+													value={wallet.metadata.id}
+													onSelect={handleSelect}
+													className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer hover:bg-backgroundSecondary aria-selected:bg-backgroundSecondary"
+												>
+													<span className="flex items-center gap-2 flex-1 min-w-0">
+														<WalletIcon wallet={wallet} iconSize={20} />
+														<span className="truncate">{wallet.metadata.displayName}</span>
+													</span>
+													{icon}
+												</Command.Item>
+											))}
+										</Command.Group>
+									)
+								}),
 							)}
 						</Command.List>
 						<Command.Empty>

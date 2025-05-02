@@ -37,6 +37,7 @@ import {
 	hasVariant,
 	Variant,
 } from './variants'
+import { type WalletType, walletTypes } from './wallet-types'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -280,6 +281,9 @@ export interface RatedWallet {
 	/** Wallet metadata. */
 	metadata: WalletMetadata
 
+	/** The types of the wallet. */
+	types: NonEmptySet<WalletType>
+
 	/** Per-variant evaluation. */
 	variants: AtLeastOneVariant<ResolvedWallet>
 
@@ -398,6 +402,7 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 	)
 	return {
 		metadata: wallet.metadata,
+		types: walletTypes(wallet),
 		variants: perVariantWallets,
 		variantSpecificity,
 		overall: aggregateAttributes(perVariantTree),
