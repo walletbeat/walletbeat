@@ -23,6 +23,7 @@ import {
 	type ResolvedFeatures,
 	resolveFeatures,
 	type WalletBaseFeatures,
+	type WalletEmbeddedFeatures,
 	type WalletHardwareFeatures,
 	type WalletSoftwareFeatures,
 } from './features'
@@ -206,6 +207,19 @@ export type HardwareWallet = BaseWallet & {
 	features: WalletHardwareFeatures
 	variants: {
 		[Variant.HARDWARE]: true
+	}
+}
+
+/**
+ * The interface used to describe embedded wallets.
+ * This should only be used for data entry and in attribute rating logic,
+ * never in UI code. UI code should only deal with fully-rated wallet data.
+ * See `RatedWallet` instead.
+ */
+export type EmbeddedWallet = BaseWallet & {
+	features: WalletEmbeddedFeatures
+	variants: {
+		[Variant.EMBEDDED]: true
 	}
 }
 

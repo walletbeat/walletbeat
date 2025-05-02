@@ -187,6 +187,15 @@ export function isWalletHardwareFeatures(
 }
 
 /**
+ * A set of features for any embedded wallet.
+ *
+ * None of the fields in this type should be marked as possibly `undefined`.
+ * If you want to add a new field, you need to add it to all existing wallets,
+ * even if unrated (i.e. `null`).
+ */
+export type WalletEmbeddedFeatures = WalletBaseFeatures & {}
+
+/**
  * A set of features about a specific wallet variant.
  * All features are resolved to a single variant here.
  */

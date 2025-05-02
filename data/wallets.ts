@@ -1,6 +1,7 @@
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 
+import { unratedEmbeddedWallet } from './embedded-wallets'
 import {
 	type HardwareWalletName,
 	hardwareWallets,
@@ -53,6 +54,6 @@ export function representativeWalletForType(walletType: WalletType): RatedWallet
 		case WalletType.HARDWARE:
 			return unratedHardwareWallet
 		case WalletType.EMBEDDED:
-			throw new Error('Embedded wallets not implemented yet')
+			return unratedEmbeddedWallet
 	}
 }
