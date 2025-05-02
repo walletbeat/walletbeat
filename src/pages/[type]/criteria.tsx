@@ -2,8 +2,6 @@ import type React from 'react'
 import { LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout } from '@/components/navigation'
-import { unratedHardwareWallet } from '@/data/hardware-wallets'
-import { unratedSoftwareWallet } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
@@ -12,46 +10,52 @@ import {
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
-import type { WalletType } from '@/schema/wallet-types'
+import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
 
-export const walletNavigationGroups: NavigationGroup[] = [
-	{
-		id: 'wallets',
-		items: [
-			{
-				title: 'Wallets',
-				icon: <LuWallet />,
-				href: '/wallet',
-				id: 'wallets',
-				children: mapNonExemptAttributeGroupsInTree(unratedSoftwareWallet.overall, attr => ({
-					title: attr.displayName,
-					href: `/wallet/${attr.id}`,
-					id: attr.id,
-				})),
-			},
-		],
-		overflow: false,
-	},
-	{
-		id: 'hww',
-		items: [
-			{
-				title: 'Hardware Wallets',
-				icon: <LuKey />,
-				href: '/hww',
-				id: 'hww',
-				children: mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, attr => ({
-					title: attr.displayName,
-					href: `/hww/${attr.id}`,
-					id: attr.id,
-				})),
-			},
-		],
-		overflow: false,
-	},
-]
+export const walletNavigationGroups: NavigationGroup[] = Object.values(
+	mapWalletTypes(
+		(walletType: WalletType): NavigationGroup => ({
+			id: walletTypeToUrlSlug(walletType),
+			items: [
+				{
+					title: ((): string => {
+						switch (walletType) {
+							case WalletType.SOFTWARE:
+								return 'Wallets'
+							case WalletType.HARDWARE:
+								return 'Hardware Wallets'
+							case WalletType.EMBEDDED:
+								return 'Embedded Wallets'
+						}
+					})(),
+					icon: ((): React.ReactNode => {
+						switch (walletType) {
+							case WalletType.SOFTWARE:
+								return <LuWallet />
+							case WalletType.HARDWARE:
+								return <LuKey />
+							case WalletType.EMBEDDED:
+								return null
+						}
+					})(),
+					href: `/${walletTypeToUrlSlug(walletType)}`,
+					id: `${walletTypeToUrlSlug(walletType)}s`,
+					children: mapNonExemptAttributeGroupsInTree(
+						representativeWalletForType(walletType).overall,
+						attr => ({
+							title: attr.displayName,
+							href: `/${walletTypeToUrlSlug(walletType)}/${attr.id}`,
+							id: attr.id,
+						}),
+					),
+				},
+			],
+			overflow: false,
+		}),
+	),
+)
 
 export function CriteriaPage({
 	walletType,

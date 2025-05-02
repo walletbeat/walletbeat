@@ -3,43 +3,41 @@ export const prerender = true
 import Layout from '@/layouts/Layout.astro'
 import { getAttributeGroupById, mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { CriteriaPage } from './criteria'
-import {
-	isValidSoftwareWalletName,
-	unratedSoftwareWallet,
-	softwareWallets,
-} from '@/data/software-wallets'
-import {
-	hardwareWallets,
-	isValidHardwareWalletName,
-	unratedHardwareWallet,
-} from '@/data/hardware-wallets'
+import { isValidSoftwareWalletName, softwareWallets } from '@/data/software-wallets'
+import { hardwareWallets, isValidHardwareWalletName } from '@/data/hardware-wallets'
 import { representativeWalletForType } from '@/data/wallets'
-import { urlSlugToWalletType } from '@/schema/wallet-types'
+import {
+	mapWalletTypes,
+	urlSlugToWalletType,
+	walletTypeToUrlSlug,
+	WalletType,
+} from '@/schema/wallet-types'
 
 export const getStaticPaths = () => {
 	return [
-		...mapNonExemptAttributeGroupsInTree(unratedSoftwareWallet.overall, attr => ({
-			params: {
-				type: 'wallet',
-				criteria: attr.id,
-			},
-		})),
-		...mapNonExemptAttributeGroupsInTree(unratedHardwareWallet.overall, attr => ({
-			params: {
-				criteria: attr.id,
-				type: 'hww',
-			},
-		})),
+		...Object.values(
+			mapWalletTypes(walletType =>
+				mapNonExemptAttributeGroupsInTree(
+					representativeWalletForType(walletType).overall,
+					attr => ({
+						params: {
+							type: walletTypeToUrlSlug(walletType),
+							criteria: attr.id,
+						},
+					}),
+				),
+			),
+		).flat(1),
 		// Redirects
-		...Object.entries(softwareWallets).map(([_walletId, wallet]) => ({
+		...Object.values(softwareWallets).map(wallet => ({
 			params: {
-				type: 'wallet',
+				type: walletTypeToUrlSlug(WalletType.SOFTWARE),
 				criteria: wallet.metadata.id,
 			},
 		})),
-		...Object.entries(hardwareWallets).map(([_walletId, wallet]) => ({
+		...Object.values(hardwareWallets).map(wallet => ({
 			params: {
-				type: 'hww',
+				type: walletTypeToUrlSlug(WalletType.HARDWARE),
 				criteria: wallet.metadata.id,
 			},
 		})),
