@@ -21,14 +21,10 @@ import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
-	hardwareOnlyEcosystem,
-	hardwareOnlyPrivacy,
-	hardwareOnlySecurity,
-	hardwareOnlyTransparency,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
-import { borderRatingToColor, Rating, ratingToColor } from '@/schema/attributes'
+import { borderRatingToColor, ratingToColor } from '@/schema/attributes'
 import { getSingleVariant, type Variant } from '@/schema/variants'
 import { type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import {
@@ -152,9 +148,6 @@ export function WalletPage({
 }: {
 	walletName: SoftwareWalletName | HardwareWalletName
 }): React.JSX.Element {
-	// Determine if this is a hardware wallet or regular wallet
-	const isHardwareWallet = isValidHardwareWalletName(walletName)
-
 	// Use type guards to safely access the wallets
 	const wallet = isValidHardwareWalletName(walletName)
 		? ratedHardwareWallets[walletName]
@@ -245,35 +238,6 @@ export function WalletPage({
 			),
 			body: <AttributeGroupBody wallet={wallet} attrGroup={attrGroup} />,
 			subsections: mapNonExemptGroupAttributes(evalGroup, (evalAttr): RichSection | null => {
-				// Determine which hardware-only list to use
-				let hardwareOnlyList: string[] = []
-				switch (attrGroup.id) {
-					case 'security':
-						hardwareOnlyList = hardwareOnlySecurity
-						break
-					case 'privacy':
-						hardwareOnlyList = hardwareOnlyPrivacy
-						break
-					case 'transparency':
-						hardwareOnlyList = hardwareOnlyTransparency
-						break
-					case 'ecosystem':
-						hardwareOnlyList = hardwareOnlyEcosystem
-						break
-				}
-
-				// DEBUG: Check wallet type, attribute ID, and rating before filtering
-				const isHardwareOnly = hardwareOnlyList.includes(evalAttr.attribute.id)
-
-				// Filter out hardware-only attributes if it's not a hardware wallet
-				if (!isHardwareWallet && isHardwareOnly) {
-					return null
-				}
-
-				if (evalAttr.evaluation.value.rating === Rating.EXEMPT) {
-					return null
-				}
-
 				const relevantVariants: Variant[] = attrToRelevantVariants.get(evalAttr.attribute.id) ?? []
 				const {
 					cornerControl,

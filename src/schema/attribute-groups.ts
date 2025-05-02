@@ -667,19 +667,6 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 	}
 }
 
-// Hardware-only attribute IDs for each group
-// TODO: Remove and make the hardware-only attributes exempt instead.
-export const hardwareOnlySecurity = [
-	'supplyChainDIY',
-	'supplyChainFactory',
-	'firmware',
-	'keysHandling',
-	'userSafety',
-]
-export const hardwareOnlyPrivacy = ['hardware_privacy']
-export const hardwareOnlyTransparency = ['reputation', 'maintenance']
-export const hardwareOnlyEcosystem = ['interoperability']
-
 /**
  * Look up an attribute group by ID, verifying that it exists and is not
  * entirely exempt from the given EvaluationTree.
