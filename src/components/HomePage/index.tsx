@@ -1,9 +1,9 @@
 import GitHubIcon from '@mui/icons-material/GitHub'
 import type { FC } from 'react'
 
+import { walletNavigationGroups } from '@/components/CriteriaPage'
 import { navigationAbout } from '@/components/navigation'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { walletNavigationGroups } from '@/pages/[type]/criteria'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import WalletTable from '@/ui/organisms/WalletTable'
 

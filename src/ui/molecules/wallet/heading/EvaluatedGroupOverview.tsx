@@ -125,10 +125,8 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 					{numNonExemptGroupAttributes(evalGroup) > 0 ? (
 						<div className="flex flex-col gap-2 max-h-[350px] sm:max-h-[300px] overflow-y-auto pr-1">
 							{mapNonExemptGroupAttributes(evalGroup, (evalAttr, index) => {
-								const walletUrlPrefix = flagshipModel !== null ? 'hww' : 'wallet'
-
 								// Create proper attribute anchor for links
-								const detailUrl = `/${walletUrlPrefix}/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`
+								const detailUrl = `/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`
 
 								return (
 									<div key={evalAttr.attribute.id} className="mb-2">

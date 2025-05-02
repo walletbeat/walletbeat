@@ -296,17 +296,13 @@ const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets)
 	.sort((a, b) => a.name.localeCompare(b.name))
 
 // Create a reusable cell renderer for wallet name columns
-function createWalletNameCell(
-	isHardware: boolean,
-): ({ row }: { row: Row<TableRow> }) => React.ReactNode {
+function createWalletNameCell(): ({ row }: { row: Row<TableRow> }) => React.ReactNode {
 	const createCell = ({ row }: { row: Row<TableRow> }): React.ReactNode => {
 		// Regular row rendering with logo
 		const walletId = row.original.wallet.metadata.id
-		const logoPath = isHardware ? `/images/hww/${walletId}.svg` : `/images/wallets/${walletId}.svg`
-		const defaultLogo = isHardware ? '/images/hww/default.svg' : '/images/wallets/default.svg'
-
-		// Create the wallet detail URL
-		const walletUrl = `/${isHardware ? 'hww' : 'wallet'}/projects/${walletId}`
+		const logoPath = `/images/wallets/${walletId}.${row.original.wallet.metadata.iconExtension}`
+		const defaultLogo = '/images/wallets/default.svg'
+		const walletUrl = `/${walletId}`
 
 		return (
 			<div className="flex items-center">
@@ -480,19 +476,19 @@ function ExpandableHardwareWalletRow({
 						{/* Wallet Logo */}
 						<div className="flex-shrink-0 mr-3">
 							<img
-								src={`/images/hww/${wallet.metadata.id}.svg`}
+								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
 								alt=""
 								className="w-6 h-6 object-contain"
 								onError={e => {
 									// Fallback for missing logos
-									e.currentTarget.src = '/images/hww/default.svg'
+									e.currentTarget.src = '/images/wallets/default.svg'
 								}}
 							/>
 						</div>
 						{/* Wallet Name */}
 						<div className="flex flex-col items-start">
 							<a
-								href={`/hww/projects/${wallet.metadata.id}`}
+								href={`/${wallet.metadata.id}`}
 								className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
 							>
 								{row.original.name}
@@ -690,7 +686,7 @@ export default function WalletTable(): React.ReactElement {
 		{
 			id: 'wallet',
 			header: 'Wallet',
-			cell: createWalletNameCell(false),
+			cell: createWalletNameCell(),
 		},
 	)
 	const walletTypeColumn = columnHelper.display({

@@ -57,6 +57,18 @@ export const walletNavigationGroups: NavigationGroup[] = Object.values(
 	),
 )
 
+export function getStaticPathsForWalletType(walletType: WalletType) {
+	return (): Array<{ params: { attrGroupId: string } }> =>
+		mapNonExemptAttributeGroupsInTree(
+			representativeWalletForType(walletType).overall,
+			attrGroup => ({
+				params: {
+					attrGroupId: attrGroup.id,
+				},
+			}),
+		)
+}
+
 export function CriteriaPage({
 	walletType,
 	attrGroupId,
