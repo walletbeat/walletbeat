@@ -32,7 +32,7 @@ export const HomePage: FC = () => (
 	>
 		<div className="max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full">
 			<div className="flex flex-col lg:mt-10 gap-4">
-				<div className="px-8 py-6 flex justify-between items-start flex-wrap min-h-96 relative">
+				<div className="px-8 py-6 flex justify-between items-start flex-wrap min-h-96 relative flex-col">
 					<div className="flex flex-col gap-4 py-8 flex-1">
 						<div className="flex gap-2">
 							<div className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary">
