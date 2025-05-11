@@ -19,9 +19,9 @@
 		"fix": "pnpm run check:lint --fix && pnpm run check:syntax --write"
 	},
 	"dependencies": {
-		"@astrojs/react": "^4.2.5",
+		"@astrojs/react": "^4.2.7",
 		"@astrojs/sitemap": "^3.3.1",
-		"@astrojs/svelte": "^7.0.11",
+		"@astrojs/svelte": "^7.0.13",
 		"@emotion/cache": "^11.14.0",
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.0",
@@ -40,7 +40,7 @@
 		"@tanstack/react-virtual": "^3.13.6",
 		"@types/react": "^19.1.2",
 		"@types/react-dom": "^19.1.2",
-		"astro": "^5.7.8",
+		"astro": "^5.7.12",
 		"autoprefixer": "^10.4.21",
 		"classnames": "^2.5.1",
 		"cmdk": "^1.1.1",
