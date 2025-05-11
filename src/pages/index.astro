@@ -1,8 +1,8 @@
 ---
 // Constants
-import { wallets } from '@/data/wallets'
+import { allWallets } from '@/data/wallets'
 import { hardwareWallets } from '@/data/hardware-wallets'
-import { ratedWallets } from '@/data/wallets'
+import { allRatedWallets } from '@/data/wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 
 // Layouts
@@ -60,10 +60,10 @@ const attributeGroups = [
 						icon: { raw: LuWallet },
 						href: '/',
 						id: 'wallets-nav',
-						children: Object.keys(wallets).map(key => {
+						children: Object.keys(allWallets).map(key => {
 							// Using type-safe keys
-							const safeKey = key as keyof typeof wallets
-							const wallet = wallets[safeKey]
+							const safeKey = key as keyof typeof allWallets
+							const wallet = allWallets[safeKey]
 
 							return {
 								title: wallet.metadata.displayName,
@@ -159,7 +159,7 @@ const attributeGroups = [
 						<WalletTable
 							client:load
 							wallets={
-								Object.entries(ratedWallets)
+								Object.entries(allRatedWallets)
 									.map(([id, wallet]) => ({ id, wallet }))
 							}
 							{attributeGroups}
