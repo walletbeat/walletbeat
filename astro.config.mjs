@@ -1,8 +1,13 @@
 // @ts-check
 import { defineConfig } from 'astro/config'
+import { resolve } from 'node:path'
 
 import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
+import { shield } from '@kindspells/astro-shield'
+
+const rootDir = new URL('.', import.meta.url).pathname
+const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,7 +16,13 @@ export default defineConfig({
 	output: 'static',
 	integrations: [
 		react(),
-		sitemap(), // Adds sitemap integration
+		sitemap(),
+		shield({
+			sri: {
+				enableMiddleware: true,
+				hashesModule: modulePath,
+			},
+		}),
 	],
 	vite: {
 		ssr: {

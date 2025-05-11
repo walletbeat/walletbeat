@@ -54,6 +54,7 @@
 		"jiffyscan",
 		"jiojosbg",
 		"KEEPKEY",
+		"kindspells",
 		"Kleptography",
 		"LDJSON",
 		"lifi",
@@ -131,6 +132,7 @@
 		"public/**/*.svg",
 		"node_modules/**",
 		"src/legacy/**",
+		"src/generated/**",
 		"pnpm-lock.yaml"
 	]
 }
