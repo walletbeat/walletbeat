@@ -1,19 +1,7 @@
 ---
 // Constants
-import { allWallets } from '@/data/wallets'
-import { hardwareWallets } from '@/data/hardware-wallets'
-import { allRatedWallets } from '@/data/wallets'
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
-
-// Layouts
-import Layout from '../layouts/Layout.astro'
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-
-// Components
-import LuKey from 'lucide-static/icons/key.svg?raw'
-import LuWallet from 'lucide-static/icons/wallet.svg?raw'
-import { navigationAbout, navigationCriteria } from '@/components/navigation'
-import WalletTable from '@/ui/organisms/WalletTable.svelte'
+import { allWallets, allRatedWallets } from '@/data/wallets'
+import { hardwareWallets, ratedHardwareWallets } from '@/data/hardware-wallets'
 
 import {
 	ecosystemAttributeGroup,
@@ -30,6 +18,18 @@ const attributeGroups = [
 	transparencyAttributeGroup,
 	ecosystemAttributeGroup,
 ]
+
+
+// Layouts
+import Layout from '../layouts/Layout.astro'
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+
+
+// Components
+import LuKey from 'lucide-static/icons/key.svg?raw'
+import LuWallet from 'lucide-static/icons/wallet.svg?raw'
+import { navigationAbout, navigationCriteria } from '@/components/navigation'
+import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
 
 
