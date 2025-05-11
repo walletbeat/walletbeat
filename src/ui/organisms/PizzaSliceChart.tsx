@@ -8,6 +8,7 @@ import {
 	type ValueSet,
 } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
+import { cx } from '@/utils/cx'
 
 import { RatingDetailModal } from '../molecules/RatingDetailModal'
 
@@ -91,9 +92,12 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 	// Create the pizza slice visualization with the correct number of slices
 	return (
 		<>
-			<div className={`flex flex-col items-center ${!isSupported ? 'opacity-40' : ''}`}>
+			<div className={cx('flex flex-col items-center', !isSupported ? 'opacity-40' : '')}>
 				<div
-					className={`w-10 h-10 rounded-full bg-white overflow-hidden relative ${isSupported ? 'cursor-pointer hover:shadow-md' : 'cursor-help'}`}
+					className={cx(
+						'w-10 h-10 rounded-full bg-white overflow-hidden relative',
+						isSupported ? 'cursor-pointer hover:shadow-md' : 'cursor-help',
+					)}
 					title={tooltipText}
 					onClick={handlePieClick}
 				>

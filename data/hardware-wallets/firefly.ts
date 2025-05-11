@@ -1,127 +1,97 @@
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported } from '@/schema/features/support'
-import type { Wallet } from '@/schema/wallet'
+import { Variant } from '@/schema/variants'
+import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { nconsigny } from '../contributors/nconsigny'
 
-export const fireflyWallet: Wallet = {
+export const fireflyWallet: HardwareWallet = {
 	metadata: {
 		id: 'firefly',
 		displayName: 'Firefly Wallet',
 		tableName: 'Firefly',
-		iconExtension: 'svg',
 		blurb: paragraph(`
 			Firefly Wallet is a hardware wallet that uses biometrics
 			for user authentication and secure private key management.
 		`),
-		url: 'https://firefly.technology/',
-		repoUrl: null,
 		contributors: [nconsigny],
-		lastUpdated: '2025-03-12',
 		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
 		hardwareWalletModels: [
 			{
 				id: 'firefly-v1',
 				name: 'Firefly V1',
-				url: 'https://firefly.technology/',
 				isFlagship: true,
+				url: 'https://firefly.technology/',
 			},
 		],
+		iconExtension: 'svg',
+		lastUpdated: '2025-03-12',
+		repoUrl: null,
+		url: 'https://firefly.technology/',
 	},
 	features: {
-		profile: WalletProfile.GENERIC,
-		chainConfigurability: null,
 		accountSupport: null,
-		multiAddress: null,
-		addressResolution: {
-			nonChainSpecificEnsResolution: null,
-			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
-			},
+		license: null,
+		monetization: {
 			ref: null,
+			revenueBreakdownIsPublic: false,
+			strategies: {
+				donations: null,
+				ecosystemGrants: null,
+				governanceTokenLowFloat: null,
+				governanceTokenMostlyDistributed: null,
+				hiddenConvenienceFees: null,
+				publicOffering: null,
+				selfFunded: null,
+				transparentConvenienceFees: null,
+				ventureCapital: null,
+			},
 		},
-		integration: {
-			browser: {
-				'1193': null,
-				'2700': null,
-				'6963': null,
+		multiAddress: null,
+		privacy: {
+			dataCollection: null,
+			hardwarePrivacy: null,
+			privacyPolicy: '',
+			transactionPrivacy: null,
+		},
+		profile: WalletProfile.GENERIC,
+		security: {
+			bugBountyProgram: {
+				type: BugBountyProgramType.NONE,
+				details: 'No formal bug bounty program has been established for the Firefly DIY wallet.',
+				ref: undefined,
+				upgradePathAvailable: false,
+				url: '',
+			},
+			firmware: null,
+			hardwareWalletDappSigning: {
+				details:
+					'Firefly currently does not provide clear signing support as it is still in development.',
+				level: DappSigningLevel.NONE,
 				ref: null,
 			},
-		},
-		security: {
-			passkeyVerification: null,
-			scamAlerts: null,
-			publicSecurityAudits: null,
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},
-			hardwareWalletSupport: {
-				supportedWallets: {
-					[HardwareWalletType.FIREFLY]: featureSupported,
-				},
-				ref: null,
-			},
-			hardwareWalletDappSigning: {
-				level: DappSigningLevel.NONE,
-				details:
-					'Firefly currently does not provide clear signing support as it is still in development.',
-				ref: null,
-			},
-			bugBountyProgram: {
-				type: BugBountyProgramType.NONE,
-				url: '',
-				details: 'No formal bug bounty program has been established for the Firefly DIY wallet.',
-				upgradePathAvailable: false,
-				ref: undefined,
-			},
-		},
-		privacy: {
-			dataCollection: null,
-			privacyPolicy: '',
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			supplyChainDIY: null,
+			supplyChainFactory: null,
+			userSafety: null,
 		},
 		selfSovereignty: {
-			transactionSubmission: {
-				l1: {
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
-				},
-				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
-				},
-			},
+			interoperability: null,
 		},
 		transparency: {
 			feeTransparency: null,
-		},
-		license: null,
-		monetization: {
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				selfFunded: null,
-				donations: null,
-				ecosystemGrants: null,
-				publicOffering: null,
-				ventureCapital: null,
-				transparentConvenienceFees: null,
-				hiddenConvenienceFees: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-			},
-			ref: null,
+			maintenance: null,
+			reputation: null,
 		},
 	},
 	variants: {
-		mobile: false,
-		browser: false,
-		desktop: false,
-		embedded: false,
-		hardware: true,
+		[Variant.HARDWARE]: true,
 	},
 }

@@ -1,5 +1,3 @@
-import GitHubIcon from '@mui/icons-material/GitHub'
-import LanguageIcon from '@mui/icons-material/Language'
 import { Tooltip, Typography } from '@mui/material'
 import { blend, ThemeProvider } from '@mui/system'
 import React, { useEffect, useState } from 'react'
@@ -11,54 +9,34 @@ import {
 	variantFromUrlQuery,
 	variantToIcon,
 	variantToName,
-	variantToRunsOn,
 	variantUrlQuery,
 } from '@/components/variants'
-import {
-	type HardwareWalletName,
-	isValidHardwareWalletName,
-	ratedHardwareWallets,
-} from '@/data/hardware-wallets'
-import { ratedWallets, type WalletName } from '@/data/wallets'
+import { allRatedWallets, type WalletName } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
-	hardwareOnlyEcosystem,
-	hardwareOnlyPrivacy,
-	hardwareOnlySecurity,
-	hardwareOnlyTransparency,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
-import {
-	borderRatingToColor,
-	Rating,
-	ratingToColor,
-	type AttributeGroup,
-	type EvaluatedAttribute,
-	type EvaluatedGroup,
-	type Value,
-	type ValueSet,
-} from '@/schema/attributes'
+import { borderRatingToColor, ratingToColor } from '@/schema/attributes'
 import { getSingleVariant, type Variant } from '@/schema/variants'
 import { type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
 	nonEmptyEntries,
-	nonEmptyKeys,
 	nonEmptyMap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-import { commaListPrefix, slugifyCamelCase } from '@/types/utils/text'
+import { slugifyCamelCase } from '@/types/utils/text'
 import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
-import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import { ReturnToTop } from '@/ui/atoms/ReturnToTop'
 import { type PickableVariant, VariantPicker } from '@/ui/atoms/VariantPicker'
 import { WalletIcon } from '@/ui/atoms/WalletIcon'
 import { AttributeGroupBody } from '@/ui/molecules/AttributeGroupBody'
+import { WalletHeading } from '@/ui/molecules/wallet/heading/WalletHeading'
 import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
 import type { NavigationItem } from '@/ui/organisms/Navigation'
 import { WalletAttribute } from '@/ui/organisms/WalletAttribute'
@@ -160,19 +138,8 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 	return JSON.stringify(faqSchema)
 }
 
-export function WalletPage({
-	walletName,
-}: {
-	walletName: WalletName | HardwareWalletName
-}): React.JSX.Element {
-	// Determine if this is a hardware wallet or regular wallet
-	const isHardwareWallet = isValidHardwareWalletName(walletName)
-
-	// Use type guards to safely access the wallets
-	const wallet = isValidHardwareWalletName(walletName)
-		? ratedHardwareWallets[walletName]
-		: ratedWallets[walletName]
-
+export function WalletPage({ walletName }: { walletName: WalletName }): React.JSX.Element {
+	const wallet = allRatedWallets[walletName]
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
 	useEffect(() => {
@@ -232,78 +199,11 @@ export function WalletPage({
 			caption: null,
 			icon: null,
 			body: (
-				<div data-testid="wallet-blurb" className="break-words whitespace-normal">
-					<div className="flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]">
-						{[
-							<div className="flex flex-row gap-2 items-center" key="website">
-								<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
-								<ExternalLink
-									url={wallet.metadata.url}
-									defaultLabel={`${wallet.metadata.displayName} website`}
-									style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
-								/>
-							</div>,
-							wallet.metadata.repoUrl !== null ? (
-								<div className="flex flex-row gap-2 items-center" key="repo">
-									<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
-									<ExternalLink
-										url={wallet.metadata.repoUrl}
-										defaultLabel="GitHub Repository"
-										style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
-									/>
-								</div>
-							) : undefined,
-						]
-							.filter(Boolean)
-							.map(
-								value =>
-									value !== undefined && (
-										<div
-											key={value.key ?? 'hi'}
-											className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary"
-										>
-											{value}
-										</div>
-									),
-							)}
-					</div>
-					<div className="break-words whitespace-normal">
-						<RenderTypographicContent
-							content={wallet.metadata.blurb.render({})}
-							typography={{ variant: 'body1' }}
-						/>
-					</div>
-					<Typography fontSize="0.9rem" marginTop="3rem">
-						<React.Fragment key="begin">
-							<span style={{ color: 'var(--accent)' }}>Platforms: </span>
-						</React.Fragment>
-						{nonEmptyMap(nonEmptyKeys(wallet.variants), (variant, variantIndex) => (
-							<React.Fragment key={variant}>
-								{commaListPrefix(variantIndex, Object.keys(wallet.variants).length)}
-								<strong>{variantToRunsOn(variant)}</strong>
-							</React.Fragment>
-						))}
-						<React.Fragment key="afterVariants">.</React.Fragment>
-						{needsVariantFiltering && (
-							<React.Fragment key="variantSpecifier">
-								<React.Fragment key="variantDisclaimer">
-									{' '}
-									The ratings below vary depending on the version.{' '}
-								</React.Fragment>
-								{pickedVariant === null ? (
-									<React.Fragment key="variantReminder">
-										Select a version to see version-specific ratings.
-									</React.Fragment>
-								) : (
-									<React.Fragment key="variantReminder">
-										You are currently viewing the ratings for the{' '}
-										<strong>{variantToName(pickedVariant, false)}</strong> version.
-									</React.Fragment>
-								)}
-							</React.Fragment>
-						)}
-					</Typography>
-				</div>
+				<WalletHeading
+					wallet={wallet}
+					pickedVariant={pickedVariant}
+					singleVariant={singleVariant}
+				/>
 			),
 		},
 	]
@@ -325,35 +225,6 @@ export function WalletPage({
 			),
 			body: <AttributeGroupBody wallet={wallet} attrGroup={attrGroup} />,
 			subsections: mapNonExemptGroupAttributes(evalGroup, (evalAttr): RichSection | null => {
-				// Determine which hardware-only list to use
-				let hardwareOnlyList: string[] = []
-				switch (attrGroup.id) {
-					case 'security':
-						hardwareOnlyList = hardwareOnlySecurity
-						break
-					case 'privacy':
-						hardwareOnlyList = hardwareOnlyPrivacy
-						break
-					case 'transparency':
-						hardwareOnlyList = hardwareOnlyTransparency
-						break
-					case 'ecosystem':
-						hardwareOnlyList = hardwareOnlyEcosystem
-						break
-				}
-
-				// DEBUG: Check wallet type, attribute ID, and rating before filtering
-				const isHardwareOnly = hardwareOnlyList.includes(evalAttr.attribute.id)
-
-				// Filter out hardware-only attributes if it's not a hardware wallet
-				if (!isHardwareWallet && isHardwareOnly) {
-					return null
-				}
-
-				if (evalAttr.evaluation.value.rating === Rating.EXEMPT) {
-					return null
-				}
-
 				const relevantVariants: Variant[] = attrToRelevantVariants.get(evalAttr.attribute.id) ?? []
 				const {
 					cornerControl,
@@ -563,7 +434,7 @@ export function WalletPage({
 
 			<ReturnToTop />
 			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
-				<div className="flex flex-col lg:mt-10 mt-24 gap-4">
+				<div className="flex flex-col lg:mt-10 gap-4">
 					<div className="flex flex-row">
 						<div className="flex-1 min-w-0">
 							<div style={{ height: headerBottomMargin }}></div>

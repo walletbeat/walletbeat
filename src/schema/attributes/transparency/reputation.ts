@@ -8,7 +8,7 @@ import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.reputation'
 
@@ -95,7 +95,7 @@ export const reputation: Attribute<ReputationValue> = {
 		pickWorstRating<ReputationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<ReputationValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return unrated(reputation, brand, {
+			return exempt(reputation, sentence('Only rated for hardware wallets'), brand, {
 				originalProduct: ReputationType.FAIL,
 				availability: ReputationType.FAIL,
 				warrantySupportRisk: ReputationType.FAIL,

@@ -11,7 +11,7 @@ import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
-import { pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.hardware_privacy'
 
@@ -94,7 +94,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 		pickWorstRating<HardwarePrivacyValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwarePrivacyValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return unrated(hardwarePrivacy, brand, {
+			return exempt(hardwarePrivacy, sentence('Only rated for hardware wallets'), brand, {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
 				wirelessPrivacy: HardwarePrivacyType.FAIL,

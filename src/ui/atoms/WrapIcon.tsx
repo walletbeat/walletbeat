@@ -34,7 +34,7 @@ export function WrapIcon({
 				</div>
 			) : (
 				<div
-					className={`flex-0`}
+					className="flex-0"
 					style={{
 						minWidth: iconWidth,
 						maxWidth: iconWidth,

@@ -4,7 +4,7 @@ import { getAttributeGroupInTree } from '@/schema/attribute-groups'
 import type { AttributeGroup, ValueSet } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
 
-import { PizzaSliceChart } from '../organisms/PizzaSliceChart'
+import { EvaluatedGroupOverview } from './wallet/heading/EvaluatedGroupOverview'
 
 /**
  * Renders a pizza-chart for a specific attribute group of a wallet.
@@ -17,8 +17,13 @@ export function AttributeGroupBody<Vs extends ValueSet>(props: {
 	const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup)
 
 	return (
-		<div>
-			<PizzaSliceChart attrGroup={attrGroup} evalGroup={evalGroup} wallet={wallet} />
+		<div className="pb-2 mb-2">
+			<EvaluatedGroupOverview
+				wallet={wallet}
+				// attrGroup={attrGroup}
+				evalGroup={evalGroup}
+				hardwareWalletModel={undefined}
+			/>
 		</div>
 	)
 }

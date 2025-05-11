@@ -457,7 +457,7 @@ export interface AttributeGroup<Vs extends ValueSet> {
 	 * For example, for an attribute group about privacy, a good question
 	 * might be "How well does {wallet} protect your privacy?".
 	 */
-	perWalletQuestion: Sentence<WalletMetadata>
+	perWalletQuestion: Sentence<Pick<WalletMetadata, 'displayName'>>
 
 	/** The actual set of attributes belonging to this group. */
 	attributes: { [K in keyof Vs]: Attribute<Vs[K]> }

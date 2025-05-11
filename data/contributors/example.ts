@@ -7,8 +7,8 @@ export const exampleContributor: Contributor = {
 	affiliation: [
 		{
 			developer: exampleWalletDevelopmentCompany,
-			role: 'FOUNDER',
 			hasEquity: true,
+			role: 'FOUNDER',
 		},
 	],
 }

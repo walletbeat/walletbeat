@@ -1,10 +1,10 @@
 import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
 
 export const eip2700: Eip = {
-	prefix: EipPrefix.EIP,
-	number: '2700',
 	friendlyName: 'JavaScript Provider Events',
 	formalTitle: 'JavaScript Provider Event Emitter',
+	number: '2700',
+	prefix: EipPrefix.EIP,
 	status: EipStatus.FINAL,
 	summaryMarkdown: `
 		A standard mechanism for JavaScript Ethereum Providers to notify clients about chain state changes when both are able to interface with each other via a shared JavaScript object.

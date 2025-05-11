@@ -15,18 +15,18 @@ export const certik: SecurityAuditor = {
 		transactionBroadcastProvider: false,
 		walletDeveloper: false,
 	},
+	crunchbase: 'https://www.crunchbase.com/organization/certik',
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	// @TODO
 	icon: {
 		extension: 'svg',
 	},
 	// @TODO
 	jurisdiction: { type: 'UNKNOWN' },
-	url: 'https://www.certik.com/',
-	repoUrl: 'https://github.com/CertiKProject',
+	linkedin: 'https://www.linkedin.com/company/certik',
 	// @TODO
 	privacyPolicy: 'https://www.certik.com/company/privacy-policy',
-	crunchbase: 'https://www.crunchbase.com/organization/certik',
-	linkedin: 'https://www.linkedin.com/company/certik',
+	repoUrl: 'https://github.com/CertiKProject',
 	twitter: 'https://x.com/CertiK',
-	farcaster: { type: 'NO_FARCASTER_PROFILE' },
+	url: 'https://www.certik.com/',
 }

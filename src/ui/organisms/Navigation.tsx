@@ -4,6 +4,7 @@ import React, { memo, useState } from 'react'
 import { LuMenu, LuX } from 'react-icons/lu'
 
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+import { cx } from '@/utils/cx'
 
 import { ThemeSwitcher } from './ThemeSwitcher'
 
@@ -101,14 +102,6 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 		<span
 			key="listItemIcon"
 			className="inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1"
-			// sx={{
-			// 	minWidth: `${navigationListIconSize}px`,
-			// 	width: `${navigationListIconSize}px`,
-			// 	height: `${navigationListIconSize}px`,
-			// 	display: 'inline-block',
-			// textAlign: 'center',
-			// marginRight: '4px',
-			// }}
 		>
 			{children}
 		</span>
@@ -119,18 +112,43 @@ interface NavigationItemProps {
 	item: NavigationItem
 	active: boolean
 	depth: 'primary' | 'secondary'
-	// sx?: React.ComponentProps<typeof ListItem>['sx']
+	selectedItemId?: string
+	selectedGroupId?: string
 	onContentItemClick?: (item: NavigationContentItem) => void
+}
+
+function itemOrChildMatches(item: NavigationItem, selectedItemId?: string): boolean {
+	if (selectedItemId == null) {
+		return false
+	}
+	if (item.id === selectedItemId) {
+		return true
+	}
+	return (item.children ?? []).some(child => itemOrChildMatches(child, selectedItemId))
 }
 
 /**
  * A single navigation list item.
  */
 const NavigationItem = memo(
-	function NavigationItem({ item, active }: NavigationItemProps): React.JSX.Element {
-		const [isOpen, setIsOpen] = useState(false)
-		const linkStyles =
-			'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 hover:bg-backgroundSecondary rounded-md'
+	function NavigationItem({
+		item,
+		active,
+		selectedItemId,
+		selectedGroupId,
+	}: NavigationItemProps): React.JSX.Element {
+		const shouldHighlight = item.id === selectedItemId && selectedGroupId !== undefined
+		const initiallyOpen = itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined
+		const [isOpen, setIsOpen] = useState(initiallyOpen)
+		React.useEffect(() => {
+			if (itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined) {
+				setIsOpen(true)
+			}
+		}, [selectedItemId, item, selectedGroupId])
+		const linkStyles = cx(
+			'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
+			shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-backgroundSecondary',
+		)
 		const hasChildren = (item.children?.length ?? 0) > 0
 
 		const toggleDropdown = (e: React.MouseEvent): void => {
@@ -165,7 +183,7 @@ const NavigationItem = memo(
 									height="1em"
 									width="1em"
 									xmlns="http://www.w3.org/2000/svg"
-									className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+									className={cx('transition-transform', isOpen ? 'rotate-180' : '')}
 								>
 									<polyline points="6 9 12 15 18 9"></polyline>
 								</svg>
@@ -196,7 +214,7 @@ const NavigationItem = memo(
 									height="1em"
 									width="1em"
 									xmlns="http://www.w3.org/2000/svg"
-									className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+									className={cx('transition-transform', isOpen ? 'rotate-180' : '')}
 								>
 									<polyline points="6 9 12 15 18 9"></polyline>
 								</svg>
@@ -231,7 +249,10 @@ const NavigationItem = memo(
 				{hasChildren && (
 					<ul
 						key={`subitems-${item.id}`}
-						className={`pl-2 border-l ml-3 flex flex-col gap-0.5 overflow-hidden transition-all ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+						className={cx(
+							'pl-2 border-l ml-3 flex flex-col gap-0.5 overflow-hidden transition-all',
+							isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0',
+						)}
 					>
 						{item.children?.map(subitem => (
 							<NavigationItem
@@ -239,6 +260,8 @@ const NavigationItem = memo(
 								item={subitem}
 								depth="secondary"
 								active={active}
+								selectedItemId={selectedItemId}
+								selectedGroupId={selectedGroupId}
 								onContentItemClick={undefined}
 							/>
 						))}
@@ -250,7 +273,9 @@ const NavigationItem = memo(
 	(prevProps: Readonly<NavigationItemProps>, nextProps: Readonly<NavigationItemProps>): boolean =>
 		prevProps.item.id === nextProps.item.id &&
 		prevProps.depth === nextProps.depth &&
-		prevProps.active === nextProps.active,
+		prevProps.active === nextProps.active &&
+		prevProps.selectedItemId === nextProps.selectedItemId &&
+		prevProps.selectedGroupId === nextProps.selectedGroupId,
 )
 
 interface NavigationGroupProps {
@@ -258,6 +283,8 @@ interface NavigationGroupProps {
 	groupIndex: number
 	activeItemId?: string
 	onContentItemClick?: (item: NavigationContentItem) => void
+	selectedItemId?: string
+	selectedGroupId?: string
 }
 
 export const NavigationGroup = memo(
@@ -265,10 +292,13 @@ export const NavigationGroup = memo(
 		group,
 		activeItemId,
 		onContentItemClick,
+		selectedItemId,
+		selectedGroupId,
 	}: NavigationGroupProps): React.JSX.Element {
+		const isSelectedGroup = group.id === selectedGroupId
 		return (
 			<>
-				<ul className="flex flex-col gap-0 p-0 m-0">
+				<ul className={cx('flex flex-col gap-0 p-0 m-0')} id={`navigationGroup-${group.id}`}>
 					{nonEmptyMap(group.items, item => (
 						<React.Fragment key={`fragment-${item.id}`}>
 							<NavigationItem
@@ -276,6 +306,8 @@ export const NavigationGroup = memo(
 								item={item}
 								active={activeItemId === item.id}
 								depth="secondary"
+								selectedItemId={isSelectedGroup ? selectedItemId : undefined}
+								selectedGroupId={isSelectedGroup ? selectedGroupId : undefined}
 								onContentItemClick={onContentItemClick}
 							/>
 						</React.Fragment>
@@ -297,17 +329,29 @@ export const NavigationGroup = memo(
 		if (prevProps.onContentItemClick !== nextProps.onContentItemClick) {
 			return false
 		}
-		if (prevProps.activeItemId === nextProps.activeItemId) {
+		if (
+			prevProps.activeItemId === nextProps.activeItemId &&
+			prevProps.selectedItemId === nextProps.selectedItemId &&
+			prevProps.selectedGroupId === nextProps.selectedGroupId
+		) {
 			return true
 		}
-		// Check if active item ID is one of the sub-items of this group.
+		// Check if active item ID or selected item ID is one of the sub-items of this group.
 		for (const props of [prevProps, nextProps]) {
 			for (const item of props.group.items) {
-				if (item.id === props.activeItemId) {
+				if (
+					item.id === props.activeItemId ||
+					item.id === props.selectedItemId ||
+					props.group.id === props.selectedGroupId
+				) {
 					return false
 				}
 				for (const subItem of item.children ?? []) {
-					if (subItem.id === props.activeItemId) {
+					if (
+						subItem.id === props.activeItemId ||
+						subItem.id === props.selectedItemId ||
+						props.group.id === props.selectedGroupId
+					) {
 						return false
 					}
 				}
@@ -325,12 +369,16 @@ export function Navigation({
 	activeItemId,
 	onContentItemClick = undefined,
 	prefix,
+	selectedItemId,
+	selectedGroupId,
 }: {
 	groups: NonEmptyArray<NavigationGroup>
 	activeItemId?: string
 	flex?: React.ComponentProps<typeof Box>['flex']
 	onContentItemClick?: (item: NavigationContentItem) => void
 	prefix?: React.ReactNode
+	selectedItemId?: string
+	selectedGroupId?: string
 }): React.JSX.Element {
 	const [isOpen, setIsOpen] = useState(false)
 
@@ -379,28 +427,27 @@ export function Navigation({
 			{/* Navigation sidebar - desktop behavior differs from mobile */}
 			<div
 				key="navigationBox"
-				className={`
-				    /* Base styles */
-				    fixed lg:relative h-full z-40
-				    flex flex-col gap-0 overflow-y-auto
+				className={cx(
+					/* Base styles */
+					'fixed lg:relative h-full z-40 flex flex-col gap-0 overflow-y-auto',
 
-				    /* Full width on mobile, constrained on desktop */
-				    w-full lg:w-auto lg:max-w-xs
+					/* Full width on mobile, constrained on desktop */
+					'w-full lg:w-auto lg:max-w-xs',
 
-				    /* Positioning */
-				    inset-0 lg:inset-auto
+					/* Positioning */
+					'inset-0 lg:inset-auto',
 
-				    /* Desktop styles - always visible and positioned */
-				    lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-0
+					/* Desktop styles - always visible and positioned */
+					'lg:sticky lg:top-0 lg:h-screen lg:flex lg:flex-0',
 
-				    /* Mobile styles - controlled by state */
-				    lg:translate-x-0
-				    transition-transform duration-300
-				    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+					/* Mobile styles - controlled by state */
+					'lg:translate-x-0 transition-transform duration-300',
 
-				    /* Background color */
-				    bg-[var(--navigation-bg)]
-				`}
+					isOpen ? 'translate-x-0' : '-translate-x-full',
+
+					/* Background color */
+					'bg-[var(--navigation-bg)]',
+				)}
 			>
 				{/* Logo area */}
 				<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-16 lg:pt-0 h-[34px]">
@@ -434,6 +481,8 @@ export function Navigation({
 							groupIndex={groupIndex}
 							onContentItemClick={onContentItemClick}
 							activeItemId={activeItemId}
+							selectedItemId={selectedItemId}
+							selectedGroupId={selectedGroupId}
 						/>
 					))}
 				</div>

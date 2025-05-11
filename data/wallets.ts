@@ -1,55 +1,59 @@
-import { type RatedWallet, rateWallet } from '@/schema/wallet'
+import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
+import { WalletType } from '@/schema/wallet-types'
 
-import { ambire } from './wallets/ambire'
-import { coinbase } from './wallets/coinbase'
-import { daimo } from './wallets/daimo'
-import { elytro } from './wallets/elytro'
-import { family } from './wallets/family'
-import { frame } from './wallets/frame'
-import { metamask } from './wallets/metamask'
-import { phantom } from './wallets/phantom'
-import { rabby } from './wallets/rabby'
-import { rainbow } from './wallets/rainbow'
-import { safe } from './wallets/safe'
-import { unratedTemplate } from './wallets/unrated.tmpl'
-import { zerion } from './wallets/zerion'
+import { unratedEmbeddedWallet } from './embedded-wallets'
+import {
+	type HardwareWalletName,
+	hardwareWallets,
+	isValidHardwareWalletName,
+	unratedHardwareWallet,
+} from './hardware-wallets'
+import {
+	isValidSoftwareWalletName,
+	type SoftwareWalletName,
+	softwareWallets,
+	unratedSoftwareWallet,
+} from './software-wallets'
 
-/** Set of all known wallets. */
-export const wallets = {
-	ambire,
-	coinbase,
-	daimo,
-	elytro,
-	frame,
-	metamask,
-	phantom,
-	rabby,
-	rainbow,
-	safe,
-	zerion,
-	family,
-}
+/** Set of all known software wallets. */
+export const allWallets = Object.fromEntries(
+	([] as Array<[string, BaseWallet]>).concat(
+		Object.entries(softwareWallets),
+		Object.entries(hardwareWallets),
+	),
+)
 
 /** A valid wallet name. */
-export type WalletName = keyof typeof wallets
+export type WalletName = SoftwareWalletName | HardwareWalletName
 
 /** Type predicate for WalletName. */
 export function isValidWalletName(name: string): name is WalletName {
-	return Object.prototype.hasOwnProperty.call(wallets, name)
+	return isValidSoftwareWalletName(name) || isValidHardwareWalletName(name)
 }
 
 /** All rated wallets. */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `wallets`.
-export const ratedWallets: Record<WalletName, RatedWallet> = Object.fromEntries(
-	Object.entries(wallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `allWallets`.
+export const allRatedWallets: Record<WalletName, RatedWallet> = Object.fromEntries(
+	Object.entries(allWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 ) as Record<WalletName, RatedWallet>
 
 /**
  * Map the given function to all rated wallets.
  */
 export function mapWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
-	return Object.values(ratedWallets).map(fn)
+	return Object.values(allRatedWallets).map(fn)
 }
 
-/** The unrated wallet as a rated wallet. */
-export const unratedWallet = rateWallet(unratedTemplate)
+/**
+ * Given a specific wallet type, return a RatedWallet of that type.
+ */
+export function representativeWalletForType(walletType: WalletType): RatedWallet {
+	switch (walletType) {
+		case WalletType.SOFTWARE:
+			return unratedSoftwareWallet
+		case WalletType.HARDWARE:
+			return unratedHardwareWallet
+		case WalletType.EMBEDDED:
+			return unratedEmbeddedWallet
+	}
+}

@@ -14,16 +14,16 @@ export const github: CorporateEntity & OffchainDataProvider = {
 		transactionBroadcastProvider: false,
 		walletDeveloper: false,
 	},
+	crunchbase: 'https://www.crunchbase.com/organization/github',
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	icon: {
 		extension: 'svg',
 	},
 	jurisdiction: 'UNKNOWN',
-	url: 'https://github.com/',
-	repoUrl: 'https://github.com',
+	linkedin: 'https://www.linkedin.com/company/github/',
 	privacyPolicy:
 		'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement',
-	crunchbase: 'https://www.crunchbase.com/organization/github',
-	linkedin: 'https://www.linkedin.com/company/github/',
+	repoUrl: 'https://github.com',
 	twitter: 'https://x.com/github',
-	farcaster: { type: 'NO_FARCASTER_PROFILE' },
+	url: 'https://github.com/',
 }

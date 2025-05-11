@@ -14,16 +14,16 @@ export const hunterSecurity: CorporateEntity & SecurityAuditor = {
 		transactionBroadcastProvider: false,
 		walletDeveloper: false,
 	},
+	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
+	farcaster: { type: 'NO_FARCASTER_PROFILE' },
 	// @TODO
 	icon: {
 		extension: 'svg',
 	},
 	jurisdiction: { type: 'UNKNOWN' },
-	url: 'https://www.huntersec.co/',
-	repoUrl: 'https://github.com/GeorgeHNTR',
-	privacyPolicy: { type: 'NO_PRIVACY_POLICY' },
-	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
 	linkedin: { type: 'NO_LINKEDIN_URL' },
+	privacyPolicy: { type: 'NO_PRIVACY_POLICY' },
+	repoUrl: 'https://github.com/GeorgeHNTR',
 	twitter: 'https://x.com/HunterBlockSec',
-	farcaster: { type: 'NO_FARCASTER_PROFILE' },
+	url: 'https://www.huntersec.co/',
 }

@@ -19,7 +19,14 @@ import {
 } from './attribute-groups'
 import { type Attribute, type EvaluatedAttribute, Rating, type Value } from './attributes'
 import type { WalletDeveloper } from './entity'
-import { type ResolvedFeatures, resolveFeatures, type WalletFeatures } from './features'
+import {
+	type ResolvedFeatures,
+	resolveFeatures,
+	type WalletBaseFeatures,
+	type WalletEmbeddedFeatures,
+	type WalletHardwareFeatures,
+	type WalletSoftwareFeatures,
+} from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
 import type { Url } from './url'
@@ -30,6 +37,7 @@ import {
 	hasVariant,
 	Variant,
 } from './variants'
+import { type WalletType, walletTypes } from './wallet-types'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -156,18 +164,64 @@ export interface WalletOverrides {
  * never in UI code. UI code should only deal with fully-rated wallet data.
  * See `RatedWallet` instead.
  */
-export interface Wallet {
+export interface BaseWallet {
 	/** Wallet metadata (name, URL, icon, etc.) */
 	metadata: WalletMetadata
 
 	/** Set of variants for which the wallet has an implementation. */
-	variants: Record<Variant, boolean> & AtLeastOneTrueVariant
+	variants: AtLeastOneTrueVariant
 
 	/** All wallet features. */
-	features: WalletFeatures
+	features: WalletBaseFeatures
 
 	/** Overrides for specific attributes. */
 	overrides?: WalletOverrides
+}
+
+/**
+ * The interface used to describe software wallets.
+ * This should only be used for data entry and in attribute rating logic,
+ * never in UI code. UI code should only deal with fully-rated wallet data.
+ * See `RatedWallet` instead.
+ */
+export type SoftwareWallet = BaseWallet & {
+	features: WalletSoftwareFeatures
+	variants:
+		| {
+				[Variant.BROWSER]: true
+		  }
+		| {
+				[Variant.DESKTOP]: true
+		  }
+		| {
+				[Variant.MOBILE]: true
+		  }
+}
+
+/**
+ * The interface used to describe hardware wallets.
+ * This should only be used for data entry and in attribute rating logic,
+ * never in UI code. UI code should only deal with fully-rated wallet data.
+ * See `RatedWallet` instead.
+ */
+export type HardwareWallet = BaseWallet & {
+	features: WalletHardwareFeatures
+	variants: {
+		[Variant.HARDWARE]: true
+	}
+}
+
+/**
+ * The interface used to describe embedded wallets.
+ * This should only be used for data entry and in attribute rating logic,
+ * never in UI code. UI code should only deal with fully-rated wallet data.
+ * See `RatedWallet` instead.
+ */
+export type EmbeddedWallet = BaseWallet & {
+	features: WalletEmbeddedFeatures
+	variants: {
+		[Variant.EMBEDDED]: true
+	}
 }
 
 export interface ResolvedWallet {
@@ -227,6 +281,9 @@ export interface RatedWallet {
 	/** Wallet metadata. */
 	metadata: WalletMetadata
 
+	/** The types of the wallet. */
+	types: NonEmptySet<WalletType>
+
 	/** Per-variant evaluation. */
 	variants: AtLeastOneVariant<ResolvedWallet>
 
@@ -240,7 +297,7 @@ export interface RatedWallet {
 	overrides: WalletOverrides
 }
 
-function resolveVariant(wallet: Wallet, variant: Variant): ResolvedWallet | null {
+function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | null {
 	if (!wallet.variants[variant]) {
 		return null
 	}
@@ -253,7 +310,7 @@ function resolveVariant(wallet: Wallet, variant: Variant): ResolvedWallet | null
 	}
 }
 
-export function rateWallet(wallet: Wallet): RatedWallet {
+export function rateWallet(wallet: BaseWallet): RatedWallet {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each feature must already have at least one variant populated.
 	const perVariantWallets: AtLeastOneVariant<ResolvedWallet> = Object.fromEntries(
 		Object.entries({
@@ -345,6 +402,7 @@ export function rateWallet(wallet: Wallet): RatedWallet {
 	)
 	return {
 		metadata: wallet.metadata,
+		types: walletTypes(wallet),
 		variants: perVariantWallets,
 		variantSpecificity,
 		overall: aggregateAttributes(perVariantTree),
@@ -412,7 +470,7 @@ export function getAttributeOverride(
 /**
  * Returns the set of variants the wallet supports.
  */
-export function getWalletVariants(wallet: RatedWallet): NonEmptySet<Variant> {
+export function getWalletVariants(wallet: RatedWallet | BaseWallet): NonEmptySet<Variant> {
 	return getVariants(wallet.variants)
 }
 
