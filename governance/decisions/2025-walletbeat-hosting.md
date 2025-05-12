@@ -90,7 +90,7 @@ Vercel is a popular web2 hosting platform for Next.js applications. While it has
 - **Naming**: ❌ DNS-only
 - **Updates**: ❌ Centralized
 - **Access**: ✅ Standard website
-- **Maintenance**: ✅ Extremely easy, this is basically Vercel's selling point
+- **Maintenance**: ✨ Extremely easy, this is basically Vercel's selling point
 - **Payments**: ❌ Does not accept crypto payments
 - **Special mentions**: _None_
 
@@ -125,7 +125,7 @@ Orbiter supports wallet-based sign up, but Orbiter accounts still need to have a
 
 Orbiter supports KYC-free crypto payments via [loopcrypto](https://loopcrypto.xyz/), making it possible for a multisig wallet to fund an Orbiter account.
 
-Orbiter relies by default on its own offchain resolver for IPCM lookups. While the Walletbeat multisig can still override the ENS records away from Orbiter in case of an Orbiter compromise, so the domain remains unruggable. However, this still means that in the non-compromise case, Orbiter is in a position to collect analytics about who is visiting the website based on queries to its resolver at `api.orbiter.host`, even when browsing sites using a non-Orbiter IPFS gateway. This is not a huge deal for a non-sensitive, non-personalized website such as Walletbeat, but may be a dealbreaker for more sensitive websites.
+Orbiter relies by default on its own offchain resolver at `api.orbiter.host` for IPCM lookups. The multisig owning the ENS name can still override the ENS resolver record away from Orbiter in case of an Orbiter compromise, so the domain remains unruggable. However, this still means that in the non-compromise case, Orbiter is in a position to collect analytics about who is visiting the website based on queries to its resolver, even when browsing sites using a non-Orbiter IPFS gateway. This is not a huge deal for a non-sensitive, non-personalized website such as Walletbeat, but may be a dealbreaker for more sensitive websites.
 
 Orbiter's gateway [returns IPFS CIDs in its HTTP responses](https://warpcast.com/polluterofminds/0x8ed7e33a). This is a cool feature, but browsers currently ignore this header. To make this more useful, it would be nice if it performed [service-worker-based client-side integrity verification](https://github.com/ipfs/service-worker-gateway) and/or supported DNSLink, as that is the de-facto standard for propagating this information to web browsers. Nonetheless, this is currently irrelevant for Walletbeat's purposes, as we cannot use the Orbiter gateway until wallet-controlled accounts are implemented.
 
@@ -197,7 +197,7 @@ Blumen does not support [service-worker-based client-side integrity verification
 
 #### Blumen scorecard
 
-- **Hosting**: ✅ Multi-provider IPFS hosting
+- **Hosting**: ✨ Multi-provider IPFS hosting
 - **Naming**: ✅ ENS
 - **Updates**: ✅ Automated ENS content hash CID updates
 - **Access**: 🚧 Bring-your-own IPFS gateway
@@ -216,16 +216,54 @@ Blumen does not support [service-worker-based client-side integrity verification
 
 TODO: Fill this in.
 
+### Quilibrium
+
+[Quilibrium](https://quilibrium.com/) is a decentralized compute network capable of hosting web applications. One of its components is [QStorage](https://www.qstorage.quilibrium.com/) which can be used for decentralized storage similar to IPFS. Data can be uploaded to QStorage via an S3-compatible API, or by running a Quilibrium node directly.
+
+Today, QStorage data can be accessed via a public CDN run by Quilibrium Inc. For example, the [Quorum homepage is on this CDN](https://quorum-www.qstorage.quilibrium.com/).
+
+Other necessary bits such as QNS (Quilibrium Name System) for addressing are on the roadmap but not ready yet; notably, there is no DNS or HTTP gateway for QNS-addressed sites at this time. Content on QStorage currently needs to be addressed by a traditional DNS domain, for which control cannot easily be distributed across multiple people.
+
+Unlike all other options on this list, QStorage credits can be purchased using KYC-free crypto payments via native crypto rails, **without dependency on payment providers** such as Stripe.
+
+Overall, Quilibrium offers a promising solution for decentralized hosting, though its stack looks very different from all other options on this list. It is more recent and therefore not as mature as other options, but starts from a stronger and more crypto-native foundation, with the remaining work on the roadmap.
+
+#### Quilibrium scorecard
+
+- **Hosting**: ✅ QStorage
+- **Naming**:
+  - ❌ DNS-only at this time
+  - ⏳ QNS on roadmap
+- **Updates**: ✅ S3-like API or BYO node
+- **Access**: ✅ DNS name pointed at QStorage data
+- **Maintenance**:
+  - ✅ One-time CI/CD integration work
+  - 🚧 Potential semi-ongoing work to top up QStorage credits if exceeding free tier limits
+- **Payments**: ✨ KYC-free crypto payments on crypto rails
+- **Special mentions**:
+  - Very different but more crypto-native stack from all other options.
+  - Supports more complex sites than static sites like Walletbeat.
+
 ## Summary
 
-| **Provider**   | **Hosting** | **Naming** | **Updates** | **Access** | **Maintenance** | **Payments** |
-| -------------- | ----------- | ---------- | ----------- | ---------- | --------------- | ------------ |
-| **Vercel**     | ❌          | ❌         | ❌          | ✅         | ✅              | ❌           |
-| **Fleek**      | ✅          | ✅         | 🙁          | 🚧         | ✅              | ✅           |
-| **Orbiter**    | ✅          | ✅         | ✅          | 🚧         | ✅              | ✅           |
-| **Earthfast**  | ⏳ / ❌     | ❌         | ✅          | 🙁         | ✅              | ✅           |
-| **Blumen**     | ✅          | ✅         | ✅          | 🚧         | 🚧              | ✅           |
-| **Edgeserver** | ✅          | TODO       | TODO        | TODO       | TODO            | TODO         |
+**Key**:
+
+- ❌: Dealbreaker
+- ❌ / ⏳: Dealbreaker, but may change at a later date
+- ✅: OK
+- ✅ / 🙁: Technically OK, but not great
+- ✅ / 🚧: OK, but requires extra work
+- ✅ / ✨: OK, and outclasses the rest
+
+| **Provider**   | **Hosting** | **Naming** | **Updates** | **Access** | **Maintenance** | **Payments** | **Special mentions**                |
+| -------------- | ----------- | ---------- | ----------- | ---------- | --------------- | ------------ | ----------------------------------- |
+| **Vercel**     | ❌          | ❌         | ❌          | ✅         | ✅ / ✨         | ❌           |                                     |
+| **Fleek**      | ✅          | ✅         | ✅ / 🙁     | ✅ / 🚧    | ✅              | ✅           |                                     |
+| **Orbiter**    | ✅          | ✅         | ✅          | ✅ / 🚧    | ✅              | ✅           | Open-source (GPL) components        |
+| **Earthfast**  | ❌ / ⏳     | ❌         | ✅          | ✅ / 🙁    | ✅              | ✅           | Client-side integrity verification  |
+| **Blumen**     | ✅ / ✨     | ✅         | ✅          | ✅ / 🚧    | ✅ / 🚧         | ✅           | Multi-provider tool, incl. non-IPFS |
+| **Quilibrium** | ✅          | ❌ / ⏳    | ✅          | ✅         | ✅              | ✅ / ✨      | More crypto-native stack            |
+| **Edgeserver** | ✅          | TODO       | TODO        | TODO       | TODO            | TODO         |                                     |
 
 The two leading options here are Orbiter and Blumen. Both of them tick all of the boxes, although Blumen requires more upfront work due to the need for separately look for one or more IPFS providers. Note that both of these options require a BYO approach for the IPFS gateway, as Blumen does not have a gateway (since it is not a service) and Orbiter's gateway is tied to Orbiter accounts which are controlled by email addresses. Therefore, the main differences between these two options comes down to pricing and to maintenance work (which is also a cost). Additionally, the use of an external IPFS gateway in both options means that the choice between these two options will not impact the URL of the site.
 
