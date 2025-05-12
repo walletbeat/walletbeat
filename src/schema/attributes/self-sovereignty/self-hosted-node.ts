@@ -25,20 +25,10 @@ function supportsSelfHostedNode(references: ReferenceArray): Evaluation<SelfHost
 			rating: Rating.PASS,
 			icon: '\u{1f3e1}', // House with garden
 			displayName: 'Supports self-hosted nodes',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} lets you use your own self-hosted
-					Ethereum node to interact with the Ethereum chain.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} lets you use your own self-hosted Ethereum node to interact with the Ethereum chain.`),
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} lets you use your own self-hosted
-				Ethereum node to interact with the Ethereum chain.
-			`,
-		),
+		details: paragraph(`{{WALLET_NAME}} lets you use your own self-hosted Ethereum node to interact with the Ethereum chain.`),
 		references,
 	}
 }
@@ -51,29 +41,11 @@ function supportsSelfHostedNodeAfterRequests(
 			id: 'self_hosted_node_after_requests',
 			rating: Rating.PARTIAL,
 			displayName: 'Partially supports self-hosted nodes',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} contacts a third-party RPC endpoint
-					before letting you configure a self-hosted node.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} contacts a third-party RPC endpoint before letting you configure a self-hosted node.`),
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} lets you use a self-hosted Ethereum
-				node, but you cannot configure this before a sensitive request is
-				already made to a third-party RPC provider.
-			`,
-		),
-		howToImprove: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} should modify the wallet creation flow
-				to allow the user to configure the RPC endpoint for L1 before making
-				any requests, or should avoid making any such requests until the
-				user can access the RPC endpoint configuration options.
-			`,
-		),
+		details: paragraph(`{{WALLET_NAME}} lets you use a self-hosted Ethereum node, but you cannot configure this before a sensitive request is already made to a third-party RPC provider.`),
+		howToImprove: paragraph(`{{WALLET_NAME}} should modify the wallet creation flow to allow the user to configure the RPC endpoint for L1 before making any requests, or should avoid making any such requests until the user can access the RPC endpoint configuration options.`),
 		references,
 	}
 }
@@ -84,27 +56,11 @@ function customChainOnly(references: ReferenceArray): Evaluation<SelfHostedNodeV
 			id: 'self_hosted_node_via_custom_chain',
 			rating: Rating.PARTIAL,
 			displayName: 'Self-hosted node as custom chain',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} lets you use your own self-hosted
-					Ethereum node if configured as a custom chain.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} lets you use your own self-hosted Ethereum node if configured as a custom chain.`),
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} lets you use a self-hosted Ethereum
-				node, but it needs to be set up as a custom chain rather than
-				replacing the wallet's default Ethereum L1 RPC configuration.
-			`,
-		),
-		howToImprove: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} should let the user configure the
-				endpoint used for Ethereum mainnet.
-			`,
-		),
+		details: paragraph(`{{WALLET_NAME}} lets you use a self-hosted Ethereum node, but it needs to be set up as a custom chain rather than replacing the wallet\'s default Ethereum L1 RPC configuration.`),
+		howToImprove: paragraph(`{{WALLET_NAME}} should let the user configure the endpoint used for Ethereum mainnet.`),
 		references,
 	}
 }
@@ -116,26 +72,11 @@ function noSelfHostedNode(references: ReferenceArray): Evaluation<SelfHostedNode
 			rating: Rating.FAIL,
 			icon: '\u{1f3da}', // Derelict house
 			displayName: 'Cannot use self-hosted node',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} does not let you use your own
-					self-hosted node to interact with the Ethereum chain.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} does not let you use your own self-hosted node to interact with the Ethereum chain.`),
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} does not let you use your own
-				self-hosted Ethereum node when interacting with the Ethereum chain.
-			`,
-		),
-		howToImprove: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} should let the user configure the
-				endpoint used for Ethereum mainnet.
-			`,
-		),
+		details: paragraph(`{{WALLET_NAME}} does not let you use your own self-hosted Ethereum node when interacting with the Ethereum chain.`),
+		howToImprove: paragraph(`{{WALLET_NAME}} should let the user configure the endpoint used for Ethereum mainnet.`),
 		references,
 	}
 }
@@ -147,9 +88,7 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 	wording: {
 		midSentenceName: 'support for self-hosted nodes',
 	},
-	question: sentence(`
-		Can the wallet be used with your own self-hosted Ethereum node?
-	`),
+	question: sentence(`Can the wallet be used with your own self-hosted Ethereum node?`),
 	why: markdown(`
 		Ethereum's design goes to painstaking lengths to ensure that users can
 		run an Ethereum L1 node on commodity consumer-grade hardware and
@@ -184,35 +123,21 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			paragraph(`
-				The wallet lets you configure the RPC endpoint used for Ethereum
-				mainnet.
-			`),
+			paragraph(`The wallet lets you configure the RPC endpoint used for Ethereum mainnet.`),
 			supportsSelfHostedNode([]).value,
 		),
 		partial: [
 			exampleRating(
-				paragraph(`
-					The wallet does not let you configure the RPC endpoint used for
-					Ethereum mainnet, but lets you add a custom chain with your own
-					self-hosted node as RPC endpoint.
-				`),
+				paragraph(`The wallet does not let you configure the RPC endpoint used for Ethereum mainnet, but lets you add a custom chain with your own self-hosted node as RPC endpoint.`),
 				customChainOnly([]).value,
 			),
 			exampleRating(
-				paragraph(`
-					The wallet lets you configure the RPC endpoint used for Ethereum
-					mainnet, but makes requests to a third-party RPC provider before
-					the user has a chance to modify this RPC endpoint configuration.
-				`),
+				paragraph(`The wallet lets you configure the RPC endpoint used for Ethereum mainnet, but makes requests to a third-party RPC provider before the user has a chance to modify this RPC endpoint configuration.`),
 				supportsSelfHostedNodeAfterRequests([]).value,
 			),
 		],
 		fail: exampleRating(
-			paragraph(`
-				The wallet uses a third-party Ethereum node provider and does not
-				let you change this setting.
-		`),
+			paragraph(`The wallet uses a third-party Ethereum node provider and does not let you change this setting.`),
 			noSelfHostedNode([]).value,
 		),
 	},

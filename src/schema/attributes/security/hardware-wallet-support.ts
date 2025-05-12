@@ -11,7 +11,6 @@ import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-s
 import { isSupported } from '@/schema/features/support'
 import { popRefs } from '@/schema/reference'
 import { type AtLeastOneVariant, Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -28,25 +27,12 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletSupportValue> {
 			id: 'no_hardware_wallet_support',
 			rating: Rating.FAIL,
 			displayName: 'No hardware wallet support',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} does not support any hardware wallets.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} does not support any hardware wallets.`),
 			supportedHardwareWallets: [],
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} does not support connecting to any hardware wallets.
-				Hardware wallets provide an additional layer of security by keeping private keys offline.
-			`,
-		),
-		howToImprove: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} should add support for popular hardware wallets to improve security options for users.
-			`,
-		),
+		details: paragraph(`{{WALLET_NAME}} does not support connecting to any hardware wallets. Hardware wallets provide an additional layer of security by keeping private keys offline.`),
+		howToImprove: paragraph(`{{WALLET_NAME}} should add support for popular hardware wallets to improve security options for users.`),
 	}
 }
 
@@ -58,26 +44,12 @@ function limitedHardwareWalletSupport(
 			id: 'limited_hardware_wallet_support',
 			rating: Rating.PARTIAL,
 			displayName: 'Limited hardware wallet support',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} supports a limited selection of hardware wallets.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} supports a limited selection of hardware wallets.`),
 			supportedHardwareWallets: supportedWallets,
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} supports some hardware wallets, but not all major ones.
-				Hardware wallets provide an additional layer of security by keeping private keys offline.
-			`,
-		),
-		howToImprove: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} should expand support to include more popular hardware wallets
-				to provide users with more security options.
-			`,
-		),
+		details: paragraph(`{{WALLET_NAME}} supports some hardware wallets, but not all major ones. Hardware wallets provide an additional layer of security by keeping private keys offline.`),
+		howToImprove: paragraph(`{{WALLET_NAME}} should expand support to include more popular hardware wallets to provide users with more security options.`),
 	}
 }
 
@@ -89,21 +61,11 @@ function comprehensiveHardwareWalletSupport(
 			id: 'comprehensive_hardware_wallet_support',
 			rating: Rating.PASS,
 			displayName: 'Comprehensive hardware wallet support',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} supports a wide range of hardware wallets.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} supports a wide range of hardware wallets.`),
 			supportedHardwareWallets: supportedWallets,
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} supports a comprehensive range of hardware wallets,
-				including the most popular options. Hardware wallets provide an additional layer of
-				security by keeping private keys offline.
-			`,
-		),
+		details: paragraph(`{{WALLET_NAME}} supports a comprehensive range of hardware wallets, including the most popular options. Hardware wallets provide an additional layer of security by keeping private keys offline.`),
 	}
 }
 
@@ -114,12 +76,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware wallet support evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve hardware wallet support?`,
+		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve hardware wallet support?`,
 	},
-	question: sentence(`
-		Does the wallet support connecting to hardware wallets?
-	`),
+	question: sentence(`Does the wallet support connecting to hardware wallets?`),
 	why: markdown(`
 		Hardware wallets are physical devices that store a user's private keys offline,
 		providing an additional layer of security against online threats. By keeping
@@ -185,10 +144,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		if (features.variant === Variant.HARDWARE) {
 			return exempt(
 				hardwareWalletSupport,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is a hardware wallet itself.`,
-				),
+				sentence(`This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet itself.`),
 				brand,
 				{ supportedHardwareWallets: [] },
 			)
@@ -199,10 +155,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(
 				hardwareWalletSupport,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is an ERC-4337 smart contract wallet.`,
-				),
+				sentence(`This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.`),
 				brand,
 				{ supportedHardwareWallets: [] },
 			)

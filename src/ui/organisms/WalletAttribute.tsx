@@ -55,11 +55,12 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	  }
 )): React.JSX.Element {
 	const qualRefs = toFullyQualified(evalAttr.evaluation.references)
-	const details = evalAttr.evaluation.details.render({
+	const evaluationData = {
 		wallet,
 		references: qualRefs,
 		value: evalAttr.evaluation.value,
-	})
+	}
+	const details = evalAttr.evaluation.details
 	const override = getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id)
 	const variantSpecificCaption: React.ReactNode = (() => {
 		switch (variantSpecificity) {
@@ -87,6 +88,11 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			<React.Fragment key="details">
 				<RenderContent
 					content={details}
+					strings={{
+						WALLET_NAME: wallet.metadata.displayName,
+						WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+						WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+					}}
 					typography={{
 						fontWeight: subsectionWeight,
 					}}
@@ -98,11 +104,12 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					<>
 						<div style={{ height: '1rem' }}></div>
 						<RenderTypographicContent
-							content={evalAttr.evaluation.impact.render({
-								wallet,
-								references: qualRefs,
-								value: evalAttr.evaluation.value,
-							})}
+							content={evalAttr.evaluation.impact}
+							strings={{
+								WALLET_NAME: wallet.metadata.displayName,
+								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+								WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+							}}
 							typography={{
 								fontWeight: subsectionWeight,
 							}}
@@ -132,7 +139,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					: 'Why should I care?',
 			contents: (
 				<RenderContent
-					content={evalAttr.attribute.why.render({})}
+					content={evalAttr.attribute.why}
 					typography={{ variant: 'body2' }}
 				/>
 			),
@@ -155,15 +162,16 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			id: `how-${evalAttr.attribute.id}`,
 			summary:
 				evalAttr.attribute.wording.midSentenceName === null
-					? evalAttr.attribute.wording.whatCanWalletDoAboutIts(wallet.metadata)
-					: `What can ${wallet.metadata.displayName} do about its ${evalAttr.attribute.wording.midSentenceName}?`,
+					? evalAttr.attribute.wording.whatCanWalletDoAboutIts
+					: `What can {{WALLET_NAME}} do about its ${evalAttr.attribute.wording.midSentenceName}?`,
 			contents: (
 				<RenderTypographicContent
-					content={howToImprove.render({
-						wallet,
-						references: qualRefs,
-						value: evalAttr.evaluation.value,
-					})}
+					content={howToImprove}
+					strings={{
+						WALLET_NAME: wallet.metadata.displayName,
+						WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+						WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+					}}
 					typography={{ variant: 'body2' }}
 				/>
 			),
@@ -179,7 +187,14 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					iconWidth={subsectionIconWidth}
 					sx={{ marginTop: '1rem' }}
 				>
-					<RenderContent content={override.note.render({ wallet })} />
+					<RenderContent
+						content={override.note}
+						strings={{
+							WALLET_NAME: wallet.metadata.displayName,
+							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+						}}
+					/>
 				</WrapIcon>
 			) : null}
 			<Accordions

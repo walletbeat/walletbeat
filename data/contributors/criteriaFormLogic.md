@@ -89,25 +89,13 @@ function noFeatureImplementation(): Evaluation<NewFeatureValue> {
 			id: 'no_implementation',
 			rating: Rating.FAIL,
 			displayName: 'No implementation',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-          ${walletMetadata.displayName} does not implement this feature.
-        `,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} does not implement this feature.`),
 			featureType: NewFeatureType.NONE,
 			additionalProperty: false,
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-        ${wallet.metadata.displayName} does not implement this feature.
-      `,
-		),
-		howToImprove: paragraph(
-			({ wallet }) => `
-        ${wallet.metadata.displayName} should implement this feature to improve security.
-      `,
-		),
+		details: paragraph(`{{WALLET_NAME}} does not implement this feature.`),
+		howToImprove: paragraph(`{{WALLET_NAME}} should implement this feature to improve security.`),
 	}
 }
 
@@ -121,13 +109,9 @@ export const newFeature: Attribute<NewFeatureValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's new feature evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve its new feature?`,
+		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its new feature?`,
 	},
-	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} implement this new feature?`,
-	),
+	question: sentence(`Does {{WALLET_NAME}} implement this new feature?`),
 	why: markdown(`
     Explanation of why this feature is important.
   `),
@@ -220,9 +204,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	id: 'security',
 	icon: '\u{1f512}', // Lock
 	displayName: 'Security',
-	perWalletQuestion: sentence<WalletMetadata>(
-		(walletMetadata: WalletMetadata): string => `How secure is ${walletMetadata.displayName}?`,
-	),
+	perWalletQuestion: sentence(`How secure is {{WALLET_NAME}}?`),
 	attributes: {
 		securityAudits,
 		chainVerification,

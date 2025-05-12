@@ -1,4 +1,4 @@
-import type { Paragraph, Renderable, RenderableTypography } from '@/types/content'
+import type { Paragraph, Content, TypographicContent } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 import type { Dict } from '@/types/utils/dict'
 import {
@@ -140,13 +140,13 @@ export interface AttributeOverride {
 	 * Contextual notes about why the wallet has this rating, or clarifications
 	 * about its rating.
 	 */
-	note?: Renderable<{ wallet: RatedWallet }>
+	note?: Content<{ wallet: RatedWallet }>
 
 	/**
 	 * What the wallet should do to improve its rating on this attribute.
 	 * Overrides the eponymous field in `Evaluation`.
 	 */
-	howToImprove?: RenderableTypography<{ wallet: RatedWallet }>
+	howToImprove?: TypographicContent<{ wallet: RatedWallet }>
 }
 
 /** Per-wallet overrides for attributes. */

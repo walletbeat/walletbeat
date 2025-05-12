@@ -38,12 +38,7 @@ function supportsChainVerification(
 			id: `chain_verification_l1_${lightClients.join('_')}`,
 			rating: Rating.PASS,
 			displayName: 'L1 chain state verification',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} verifies chain integrity of the
-					Ethereum L1.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} verifies chain integrity of the Ethereum L1.`),
 			__brand: brand,
 		},
 		details: chainVerificationDetailsContent({ lightClients, refs }),
@@ -60,41 +55,22 @@ function noChainVerification(
 			rating: Rating.FAIL,
 			icon: '\u{1f648}', // See-no-evil monkey
 			displayName: 'No L1 chain state verification',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} does not verify chain integrity of the Ethereum L1.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} does not verify chain integrity of the Ethereum L1.`),
 			__brand: brand,
 		},
-		details: markdown(({ wallet }) => {
-			const l1Configurability = chainConfigurability?.l1RpcEndpoint ?? RpcEndpointConfiguration.NO
-			const canConfigureL1 =
-				l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
-				l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
-			return `
-					${wallet.metadata.displayName} does not verify the integrity of the
-					Ethereum L1 blockchain when retrieving chain state or simulating
-					transactions.
+		details: markdown(`
+			{{WALLET_NAME}} does not verify the integrity of the Ethereum L1 blockchain when retrieving chain state or simulating transactions.
 
-					${
-						canConfigureL1
-							? `
-					Users may work around this by setting a custom RPC endpoint for the
-					L1 chain and running their own node or external light client.
-					`
-							: ''
-					}
-				`
-		}),
-		howToImprove: mdParagraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} should integrate
-				[light client functionality](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/)
-				to verify the integrity of Ethereum chain data.
-			`,
-		),
+			${canConfigureL1() ? `Users may work around this by setting a custom RPC endpoint for the L1 chain and running their own node or external light client.` : ''}
+		`),
+		howToImprove: mdParagraph(`{{WALLET_NAME}} should integrate [light client functionality](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/) to verify the integrity of Ethereum chain data.`),
 		references: [],
+	}
+
+	function canConfigureL1() {
+		const l1Configurability = chainConfigurability?.l1RpcEndpoint ?? RpcEndpointConfiguration.NO
+		return l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
+			l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
 	}
 }
 
@@ -105,9 +81,7 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 	wording: {
 		midSentenceName: 'chain verification',
 	},
-	question: sentence(`
-		Does the wallet verify the integrity of the chain(s) it interacts with?
-	`),
+	question: sentence(`Does the wallet verify the integrity of the chain(s) it interacts with?`),
 	why: markdown(`
 		"Trust but verify" is one of the foundational principles of blockchains.
 		It refers to the ability for participants to verify that the chain data
@@ -137,17 +111,11 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			mdParagraph(`
-				The wallet verifies the integrity of the Ethereum L1 chain using a
-				[light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/).
-			`),
+			mdParagraph(`The wallet verifies the integrity of the Ethereum L1 chain using a [light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/).`),
 			supportsChainVerification([EthereumL1LightClient.helios], []).value,
 		),
 		fail: exampleRating(
-			paragraph(`
-				The wallet does not verify the integrity of the Ethereum L1 chain,
-				relying on the honesty of third-party RPC providers instead.
-			`),
+			paragraph(`The wallet does not verify the integrity of the Ethereum L1 chain, relying on the honesty of third-party RPC providers instead.`),
 			noChainVerification(null).value,
 		),
 	},
@@ -155,7 +123,7 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		if (features.variant === Variant.HARDWARE) {
 			return exempt(
 				chainVerification,
-				sentence('This attribute is not applicable for hardware wallets.'),
+				sentence(`This attribute is not applicable for hardware wallets.`),
 				brand,
 				null,
 			)

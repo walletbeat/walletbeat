@@ -47,13 +47,9 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's key handling evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve its key handling?`,
+		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its key handling?`,
 	},
-	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} securely generate, protect, and handle keys?`,
-	),
+	question: sentence(`Does {{WALLET_NAME}} securely generate, protect, and handle keys?`),
 	why: markdown(`
 		Secure key handling is fundamental to the security of user funds. This includes how the master secret (seed) is generated, stored, and used.
 		The device must protect keys from extraction via software or physical attacks (both passive side-channels and active fault injection).
@@ -71,19 +67,19 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes most keys handling sub-criteria.'),
+				sentence(`The hardware wallet passes most keys handling sub-criteria.`),
 				(v: KeysHandlingValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes some keys handling sub-criteria.'),
+				sentence(`The hardware wallet passes some keys handling sub-criteria.`),
 				(v: KeysHandlingValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'The hardware wallet fails most or all keys handling sub-criteria.'),
+				sentence(`The hardware wallet fails most or all keys handling sub-criteria.`),
 				(v: KeysHandlingValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -94,10 +90,7 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				keysHandling,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is not a hardware wallet.`,
-				),
+				sentence(`This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.`),
 				brand,
 				{
 					masterSecretGeneration: KeysHandlingType.FAIL,
@@ -126,21 +119,12 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 				id: 'keys_handling',
 				rating,
 				displayName: 'Keys Handling',
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) =>
-						`${walletMetadata.displayName} has ${rating.toLowerCase()} key handling.`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} key handling.`),
 				...withoutRefs,
 				__brand: brand,
 			},
-			details: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} key handling evaluation is ${rating.toLowerCase()}.`,
-			),
-			howToImprove: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
-			),
+			details: paragraph(`{{WALLET_NAME}} key handling evaluation is ${rating.toLowerCase()}.`),
+			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},

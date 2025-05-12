@@ -115,9 +115,12 @@ export function CriteriaPage({
 							<h1 className="text-4xl font-extrabold text-accent">{attrGroup.displayName}</h1>
 							<p className="text-secondary">
 								<RenderTypographicContent
-									content={attrGroup.perWalletQuestion.render({
-										displayName: 'your wallet',
-									})}
+									content={attrGroup.perWalletQuestion}
+									strings={{
+										WALLET_NAME: 'your wallet',
+										WALLET_PSEUDONYM_SINGULAR: 'username',
+										WALLET_PSEUDONYM_PLURAL: 'usernames',
+									}}
 									typography={{
 										variant: 'caption',
 										fontStyle: 'italic',

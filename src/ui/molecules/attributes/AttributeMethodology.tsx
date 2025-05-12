@@ -129,7 +129,7 @@ function ExampleRatings<V extends Value>({
 			spaceBetweenItems="0.75rem"
 		>
 			<RenderTypographicContent
-				content={exampleRating.description.render({})}
+				content={exampleRating.description}
 				typography={typographyPropsBody}
 				textTransform={replaceExampleRatingPrefix('It ', 'Its ')}
 			/>
@@ -156,7 +156,7 @@ function ExampleRatings<V extends Value>({
 			element: (
 				<React.Fragment>
 					<RenderTypographicContent
-						content={preamble.render({})}
+						content={preamble}
 						typography={typographyPropsHeader}
 					/>
 					<ul style={{ paddingLeft: '2rem' }}>
@@ -225,7 +225,7 @@ export function AttributeMethodology<V extends Value>({
 		<>
 			<div key="methodology">
 				<RenderTypographicContent
-					content={attribute.methodology.render({})}
+					content={attribute.methodology}
 					typography={typographyPropsBody}
 				/>
 			</div>
@@ -239,7 +239,7 @@ export function AttributeMethodology<V extends Value>({
 			<div key="example-ratings">
 				{attribute.ratingScale.display === 'simple' ? (
 					<RenderTypographicContent
-						content={attribute.ratingScale.content.render({})}
+						content={attribute.ratingScale.content}
 						typography={typographyPropsBody}
 					/>
 				) : (

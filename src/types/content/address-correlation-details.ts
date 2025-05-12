@@ -4,7 +4,7 @@ import type {
 	WalletAddressLinkableBy,
 } from '@/schema/attributes/privacy/address-correlation'
 
-import { component, type Renderable } from '../content'
+import { component, type Content } from '../content'
 import type { NonEmptyArray } from '../utils/non-empty'
 
 export interface AddressCorrelationDetailsProps extends EvaluationData<AddressCorrelationValue> {
@@ -18,7 +18,7 @@ export interface AddressCorrelationDetailsContent {
 
 export function addressCorrelationDetailsContent(
 	bakedProps: Omit<AddressCorrelationDetailsProps, keyof EvaluationData<AddressCorrelationValue>>,
-): Renderable<EvaluationData<AddressCorrelationValue>> {
+): Content<EvaluationData<AddressCorrelationValue>> {
 	return component<AddressCorrelationDetailsContent, keyof typeof bakedProps>(
 		'AddressCorrelationDetails',
 		bakedProps,

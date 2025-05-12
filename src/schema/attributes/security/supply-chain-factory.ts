@@ -57,13 +57,9 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a factory wallet's supply chain evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve its factory supply chain?`,
+		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its factory supply chain?`,
 	},
-	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} have a secure and transparent factory supply chain?`,
-	),
+	question: sentence(`Does {{WALLET_NAME}} have a secure and transparent factory supply chain?`),
 	why: markdown(
 		`Ensuring the security and transparency of the factory supply chain is vital to prevent tampering or compromise during manufacturing, packaging, and delivery.
 		Users need confidence that the device they receive is genuine and hasn't been maliciously altered.`,
@@ -89,19 +85,19 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes all factory supply chain sub-criteria.'),
+				sentence(`The hardware wallet passes all factory supply chain sub-criteria.`),
 				(v: SupplyChainFactoryValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes some factory supply chain sub-criteria.'),
+				sentence(`The hardware wallet passes some factory supply chain sub-criteria.`),
 				(v: SupplyChainFactoryValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'The hardware wallet fails most or all factory supply chain sub-criteria.'),
+				sentence(`The hardware wallet fails most or all factory supply chain sub-criteria.`),
 				(v: SupplyChainFactoryValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -117,7 +113,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		) {
 			return exempt(
 				supplyChainFactory,
-				sentence('Attribute only applies to factory-made hardware wallets.'),
+				sentence(`Attribute only applies to factory-made hardware wallets.`),
 				brand,
 				{
 					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
@@ -135,10 +131,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				supplyChainFactory,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is not a hardware wallet.`,
-				),
+				sentence(`This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.`),
 				brand,
 				{
 					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
@@ -171,21 +164,12 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 				id: 'Supply Chain Factory',
 				rating,
 				displayName: 'Supply Chain Factory',
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) =>
-						`${walletMetadata.displayName} has ${rating.toLowerCase()} factory supply chain.`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} factory supply chain.`),
 				...withoutRefs,
 				__brand: brand,
 			},
-			details: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} factory supply chain evaluation is ${rating.toLowerCase()}.`,
-			),
-			howToImprove: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
-			),
+			details: paragraph(`{{WALLET_NAME}} factory supply chain evaluation is ${rating.toLowerCase()}.`),
+			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},

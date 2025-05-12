@@ -449,7 +449,6 @@ export function compareLeakedInfo(a: LeakedInfo, b: LeakedInfo): number {
 /** Human-friendly names to refer to the type of info being leaked. */
 export function leakedInfoName(
 	leakedInfo: LeakedInfo,
-	walletMetadata?: WalletMetadata,
 ): { short: string; long: string } {
 	switch (leakedInfo) {
 		case LeakedPersonalInfo.IP_ADDRESS:
@@ -465,13 +464,10 @@ export function leakedInfoName(
 		case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
 			return { short: 'outgoing transactions', long: 'outgoing wallet transactions' }
 		case LeakedPersonalInfo.PSEUDONYM:
-			if (walletMetadata?.pseudonymType !== undefined) {
-				return {
-					short: walletMetadata.pseudonymType.singular,
-					long: walletMetadata.pseudonymType.singular,
-				}
+			return {
+				short: '{{WALLET_PSEUDONYM_SINGULAR|username}}',
+				long: '{{WALLET_PSEUDONYM_SINGULAR|pseudonym}}',
 			}
-			return { short: 'username', long: 'pseudonym' }
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
 			return { short: 'Farcaster account', long: 'Farcaster account' }
 		case LeakedPersonalInfo.X_DOT_COM_ACCOUNT:

@@ -1,7 +1,7 @@
 import type { EvaluationData } from '@/schema/attributes'
 import type { SecurityAuditsValue } from '@/schema/attributes/security/security-audits'
 
-import { component, type Renderable } from '../content'
+import { component, type Content } from '../content'
 
 export interface SecurityAuditsDetailsProps extends EvaluationData<SecurityAuditsValue> {
 	auditedInLastYear: boolean
@@ -15,7 +15,7 @@ export interface SecurityAuditsDetailsContent {
 
 export function securityAuditsDetailsContent(
 	bakedProps: Omit<SecurityAuditsDetailsProps, keyof EvaluationData<SecurityAuditsValue>>,
-): Renderable<EvaluationData<SecurityAuditsValue>> {
+): Content<EvaluationData<SecurityAuditsValue>> {
 	return component<SecurityAuditsDetailsContent, keyof typeof bakedProps>(
 		'SecurityAuditsDetails',
 		bakedProps,
