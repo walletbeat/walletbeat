@@ -88,6 +88,7 @@ export const rabby: SoftwareWallet = {
 					},
 				],
 			},
+			eip5792: null,
 		},
 		license: {
 			license: License.MIT,

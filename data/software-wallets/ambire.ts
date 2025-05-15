@@ -28,6 +28,8 @@ import { jiffylabs } from '../entities/jiffyscan'
 import { lifi } from '../entities/lifi'
 import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
+import { ambireAccountContract } from '../wallet-contracts/ambire-account'
+import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
 
 const v2Audits: SecurityAudit[] = [
 	{
@@ -129,16 +131,7 @@ export const ambire: SoftwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eip7702,
 			eip7702: supported({
-				contractCode: {
-					controllingSharesInSelfCustodyByDefault: 'YES',
-					keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
-					ref: {
-						explanation: 'Ambire supports EIP-7702 smart contract wallets',
-						url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount7702.sol',
-					},
-					tokenTransferTransactionGeneration:
-						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				},
+				contract: ambireDelegatorContract,
 				ref: {
 					explanation:
 						'Ambire is AA wallet by default. With the introduction of EIP-7702 it allows you to use your existing EOA just like you would use any smart account wallet!',
@@ -157,6 +150,7 @@ export const ambire: SoftwareWallet = {
 			}),
 			mpc: notSupported,
 			rawErc4337: supported({
+				contract: ambireAccountContract,
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
@@ -200,6 +194,7 @@ export const ambire: SoftwareWallet = {
 					url: 'https://github.com/AmbireTech/extension/blob/v2/src/web/extension-services/background/background.ts',
 				},
 			},
+			eip5792: featureSupported,
 		},
 		license: {
 			license: License.GPL_3_0,

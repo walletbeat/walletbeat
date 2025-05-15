@@ -54,6 +54,7 @@ export const daimo: SoftwareWallet = {
 			eoa: notSupported,
 			mpc: notSupported,
 			rawErc4337: supported({
+				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
@@ -89,6 +90,7 @@ export const daimo: SoftwareWallet = {
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
+			eip5792: null,
 		},
 		license: {
 			license: License.GPL_3_0,

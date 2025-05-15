@@ -57,6 +57,7 @@ export const rainbow: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
+			eip5792: null,
 		},
 		license: {
 			license: License.GPL_3_0,
