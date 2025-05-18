@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 
 import { type Eip, eipEthereumDotOrgUrl } from '@/schema/eips'
@@ -10,73 +10,72 @@ import { MarkdownTypography } from '../atoms/MarkdownTypography'
 interface EipPreviewModalProps {
 	eip: Eip
 	anchorEl: HTMLElement | null
-	onClose: () => void
+	onMouseEnter?: () => void
+	onMouseLeave?: () => void
 }
 
 export function EipPreviewModal({
 	eip,
 	anchorEl,
-	onClose,
+	onMouseEnter,
+	onMouseLeave,
 }: EipPreviewModalProps): React.ReactElement | null {
+	const modalRef = useRef<HTMLDivElement>(null)
 	const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({
 		top: 0,
 		left: 0,
 	})
 
-	// Calculate position of popup
-	useEffect(() => {
-		if (anchorEl === null) {
-			return
+	useLayoutEffect(() => {
+		if (anchorEl !== null && modalRef.current !== null) {
+			const modalDiv = modalRef.current
+			const rect = anchorEl.getBoundingClientRect()
+
+			const actualPopupHeight = modalDiv.offsetHeight
+			const actualPopupWidth = modalDiv.offsetWidth
+
+			// Default position: to the right of the anchor, vertically centered
+			let top = rect.top + rect.height / 2 - actualPopupHeight / 2
+			let left = rect.right + 10 // 10px offset
+
+			// Adjust horizontal position
+			if (left + actualPopupWidth > window.innerWidth - 10) {
+				// Check right overflow (10px margin)
+				left = rect.left - actualPopupWidth - 10 // Move to the left
+			}
+			if (left < 10) {
+				// Ensure 10px left margin
+				left = 10
+			}
+
+			// Clamp top position to be within viewport with 10px margins
+			const maxPossibleTop = window.innerHeight - actualPopupHeight - 10
+			top = Math.max(10, Math.min(top, maxPossibleTop))
+
+			setPopupPosition({ top, left })
 		}
-		const rect = anchorEl.getBoundingClientRect()
-		const scrollTop = window.scrollY === 0 ? document.documentElement.scrollTop : window.scrollY
-		const scrollLeft = window.scrollX === 0 ? document.documentElement.scrollLeft : window.scrollX
+	}, [anchorEl, eip]) // Added eip to dependencies, modalRef implicitly stable
 
-		// Start with a position below the anchor element
-		let top = rect.bottom + scrollTop + 5 // Add small offset for visual separation
-		let left = rect.left + scrollLeft
-
-		// Check if popup would go off the bottom of the screen
-		const popupHeight = 600 // Fixed height
-		const viewportHeight = window.innerHeight
-		if (rect.bottom + popupHeight > viewportHeight) {
-			// Position above the anchor element instead
-			top = rect.top + scrollTop - popupHeight - 5 // Add small offset for visual separation
-		}
-
-		// Check if popup would go off the right of the screen
-		const popupWidth = 500 // Increased width for better readability
-		const viewportWidth = window.innerWidth
-		if (rect.left + popupWidth > viewportWidth) {
-			// Align right edge of popup with right edge of anchor
-			left = rect.right + scrollLeft - popupWidth
-		}
-
-		// Ensure popup doesn't go off the left edge
-		if (left < scrollLeft) {
-			left = scrollLeft + 10 // Add a small margin
-		}
-
-		// Ensure popup doesn't go off the top of the screen
-		if (top < scrollTop) {
-			top = scrollTop + 10 // Add a small margin
-		}
-
-		setPopupPosition({ top, left })
-	}, [anchorEl, eip.number])
-
-	// Create a portal for the popup
 	if (anchorEl === null) {
 		return null
 	}
 
 	return ReactDOM.createPortal(
 		<div
-			className="fixed z-50 eip-preview-modal"
-			style={{ top: `${popupPosition.top}px`, left: `${popupPosition.left}px` }}
-			onMouseLeave={onClose}
+			ref={modalRef}
+			className="eip-preview-modal fixed z-50"
+			style={{
+				top: `${popupPosition.top}px`,
+				left: `${popupPosition.left}px`,
+				width: 500,
+				maxWidth: '95vw',
+				maxHeight: 'calc(100vh - 20px)',
+				overflowY: 'auto',
+			}}
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
 		>
-			<div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-5 w-[500px] overflow-hidden border border-gray-200 dark:border-gray-700">
+			<div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-5 w-full border border-gray-200 dark:border-gray-700">
 				<div className="flex items-center mb-4">
 					<div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">
 						{eip.prefix}-{eip.number}
@@ -122,7 +121,14 @@ export function EipPreviewModal({
 					)}
 				</div>
 
-				<div className="mt-4 text-right">
+				<div className="mt-4 flex justify-between items-center">
+					<button
+						type="button"
+						onClick={onMouseLeave}
+						className="text-xs text-gray-600 dark:text-gray-400 hover:underline cursor-pointer"
+					>
+						Close
+					</button>
 					<a
 						href={eipEthereumDotOrgUrl(eip)}
 						target="_blank"
