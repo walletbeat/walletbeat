@@ -214,7 +214,7 @@ Blumen does not support [service-worker-based client-side integrity verification
 
 [Edgeserver](https://github.com/v3xlabs/edgeserver) is an IPFS + ENS deployment solution that also features an open-source (GPL-licensed), self-hostable web server that can serve the site from a traditional web server. There is also a hosted `edgeserver.io` service which acts as a common gateway to Edgeserver sites.
 
-TODO: Fill this in.
+(Needs additional research.)
 
 ### Quilibrium
 
@@ -255,18 +255,37 @@ Overall, Quilibrium offers a promising solution for decentralized hosting, thoug
 - ✅ / 🚧: OK, but requires extra work
 - ✅ / ✨: OK, and outclasses the rest
 
-| **Provider**   | **Hosting** | **Naming** | **Updates** | **Access** | **Maintenance** | **Payments** | **Special mentions**                |
-| -------------- | ----------- | ---------- | ----------- | ---------- | --------------- | ------------ | ----------------------------------- |
-| **Vercel**     | ❌          | ❌         | ❌          | ✅         | ✅ / ✨         | ❌           |                                     |
-| **Fleek**      | ✅          | ✅         | ✅ / 🙁     | ✅ / 🚧    | ✅              | ✅           |                                     |
-| **Orbiter**    | ✅          | ✅         | ✅          | ✅ / 🚧    | ✅              | ✅           | Open-source (GPL) components        |
-| **Earthfast**  | ❌ / ⏳     | ❌         | ✅          | ✅ / 🙁    | ✅              | ✅           | Client-side integrity verification  |
-| **Blumen**     | ✅ / ✨     | ✅         | ✅          | ✅ / 🚧    | ✅ / 🚧         | ✅           | Multi-provider tool, incl. non-IPFS |
-| **Quilibrium** | ✅          | ❌ / ⏳    | ✅          | ✅         | ✅              | ✅ / ✨      | More crypto-native stack            |
-| **Edgeserver** | ✅          | TODO       | TODO        | TODO       | TODO            | TODO         |                                     |
+| **Provider**   | **Hosting** | **Naming**     | **Updates**    | **Access**     | **Maintenance** | **Payments**   | **Special mentions**                |
+| -------------- | ----------- | -------------- | -------------- | -------------- | --------------- | -------------- | ----------------------------------- |
+| **Vercel**     | ❌          | ❌             | ❌             | ✅             | ✅ / ✨         | ❌             |                                     |
+| **Fleek**      | ✅          | ✅             | ✅ / 🙁        | ✅ / 🚧        | ✅              | ✅             |                                     |
+| **Orbiter**    | ✅          | ✅             | ✅             | ✅ / 🚧        | ✅              | ✅             | Open-source (GPL) components        |
+| **Earthfast**  | ❌ / ⏳     | ❌             | ✅             | ✅ / 🙁        | ✅              | ✅             | Client-side integrity verification  |
+| **Blumen**     | ✅ / ✨     | ✅             | ✅             | ✅ / 🚧        | ✅ / 🚧         | ✅             | Multi-provider tool, incl. non-IPFS |
+| **Quilibrium** | ✅          | ❌ / ⏳        | ✅             | ✅             | ✅              | ✅ / ✨        | More crypto-native stack            |
+| **Edgeserver** | ✅          | Needs research | Needs research | Needs research | Needs research  | Needs research |                                     |
 
 The two leading options here are Orbiter and Blumen. Both of them tick all of the boxes, although Blumen requires more upfront work due to the need for separately look for one or more IPFS providers. Note that both of these options require a BYO approach for the IPFS gateway, as Blumen does not have a gateway (since it is not a service) and Orbiter's gateway is tied to Orbiter accounts which are controlled by email addresses. Therefore, the main differences between these two options comes down to pricing and to maintenance work (which is also a cost). Additionally, the use of an external IPFS gateway in both options means that the choice between these two options will not impact the URL of the site.
 
 ## Conclusion
 
-TODO
+The above table suggests using a combination of **Orbiter as an IPFS provider** (even though we would not use any of its other features), then **Blumen for updating the ENS records**.
+
+We can continue relying on the [`.eth.limo` IPFS gateway](https://eth.limo/) as the canonical HTTP URL. Traffic to Walletbeat should be similar or lower in volume than traffic to `vitalik.eth.limo`, so this should not overwhelm the gateway's capacity.
+
+This means Walletbeat's canonical HTTP URL will be `https://walletbeat.eth.limo`, which will resolve the `walletbeat.eth` ENS content hash record and serve IPFS content hosted by Orbiter's underlying IPFS provider(s).
+
+## Alternatives considered
+
+### Just use Blumen with one of its supported IPFS providers
+
+This would also be a good option that simplifies the number of tools required for deployment. It may also bring down costs, as Orbiter uses downstream IPFS providers that Blumen could deploy to directly.
+
+However, Orbiter may eventually change its account system and/or integrate Blumen's missing features, which would tip the scales in favor of using it entirely.
+
+In the meantime, Walletbeat is happy to support Orbiter as a business, as their stack is fully open-source and they are doing great work to make decentralized hosting easy for other projects with related but different needs than Walletbeat.
+
+### Just use Orbiter and stop using Blumen
+
+Not an option until Orbiter changes its account system to avoid potential takeover by a single human.
+Additionally, Blumen already supports unique features such as Swarm deployment and plans to support ERC-5219 deployments, making it a great option to add additional deployment mechanism that other projects can use as inspiration for setting up their own decentralized hosting deployment pipeline.
