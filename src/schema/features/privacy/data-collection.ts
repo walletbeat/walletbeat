@@ -447,47 +447,45 @@ export function compareLeakedInfo(a: LeakedInfo, b: LeakedInfo): number {
 }
 
 /** Human-friendly names to refer to the type of info being leaked. */
-export function leakedInfoName(
-	leakedInfo: LeakedInfo,
-): { short: string; long: string } {
+export function leakedInfoName(leakedInfo: LeakedInfo) {
 	switch (leakedInfo) {
 		case LeakedPersonalInfo.IP_ADDRESS:
-			return { short: 'IP', long: 'IP address' }
+			return { short: 'IP', long: 'IP address' } as const
 		case LeakedWalletInfo.WALLET_ACTIONS:
-			return { short: 'wallet actions', long: 'wallet actions' }
+			return { short: 'wallet actions', long: 'wallet actions' } as const
 		case LeakedWalletInfo.WALLET_ASSETS:
-			return { short: 'wallet assets', long: 'wallet asset types' }
+			return { short: 'wallet assets', long: 'wallet asset types' } as const
 		case LeakedWalletInfo.WALLET_BALANCE:
-			return { short: 'wallet balance', long: 'wallet assets and balances' }
+			return { short: 'wallet balance', long: 'wallet assets and balances' } as const
 		case LeakedWalletInfo.WALLET_ADDRESS:
-			return { short: 'wallet address', long: 'wallet address' }
+			return { short: 'wallet address', long: 'wallet address' } as const
 		case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
-			return { short: 'outgoing transactions', long: 'outgoing wallet transactions' }
+			return { short: 'outgoing transactions', long: 'outgoing wallet transactions' } as const
 		case LeakedPersonalInfo.PSEUDONYM:
 			return {
 				short: '{{WALLET_PSEUDONYM_SINGULAR|username}}',
 				long: '{{WALLET_PSEUDONYM_SINGULAR|pseudonym}}',
-			}
+			} as const
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
-			return { short: 'Farcaster account', long: 'Farcaster account' }
+			return { short: 'Farcaster account', long: 'Farcaster account' } as const
 		case LeakedPersonalInfo.X_DOT_COM_ACCOUNT:
-			return { short: 'X.com account', long: 'X.com account' }
+			return { short: 'X.com account', long: 'X.com account' } as const
 		case LeakedPersonalInfo.EMAIL:
-			return { short: 'email', long: 'email address' }
+			return { short: 'email', long: 'email address' } as const
 		case LeakedPersonalInfo.LEGAL_NAME:
-			return { short: 'name', long: 'legal name' }
+			return { short: 'name', long: 'legal name' } as const
 		case LeakedPersonalInfo.PHONE:
-			return { short: 'phone', long: 'phone number' }
+			return { short: 'phone', long: 'phone number' } as const
 		case LeakedPersonalInfo.CONTACTS:
-			return { short: 'contacts', long: 'personal contact list' }
+			return { short: 'contacts', long: 'personal contact list' } as const
 		case LeakedPersonalInfo.PHYSICAL_ADDRESS:
-			return { short: 'physical address', long: 'geographical address' }
+			return { short: 'physical address', long: 'geographical address' } as const
 		case LeakedPersonalInfo.CEX_ACCOUNT:
-			return { short: 'CEX account', long: 'centralized exchange account' }
+			return { short: 'CEX account', long: 'centralized exchange account' } as const
 		case LeakedPersonalInfo.FACE:
-			return { short: 'face', long: 'facial recognition data' }
+			return { short: 'face', long: 'facial recognition data' } as const
 		case LeakedPersonalInfo.GOVERNMENT_ID:
-			return { short: 'government ID', long: 'government-issued ID' }
+			return { short: 'government ID', long: 'government-issued ID' } as const
 	}
 }
 
