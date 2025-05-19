@@ -138,7 +138,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 							</Typography>
 						) : (
 							<RenderTypographicContent
-								content={row.wallet.metadata.blurb.render({})}
+								content={row.wallet.metadata.blurb}
 								typography={{
 									variant: 'body1',
 									marginBottom: '0.5rem',

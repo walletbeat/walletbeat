@@ -1,6 +1,4 @@
-import type React from 'react'
-
-import { type Content, isTypographicContent } from '@/types/content'
+import { type CustomContent } from '@/types/content'
 import { AddressCorrelationDetails } from '@/ui/molecules/attributes/privacy/AddressCorrelationDetails'
 import { ChainVerificationDetails } from '@/ui/molecules/attributes/security/ChainVerificationDetails'
 import { ScamAlertDetails } from '@/ui/molecules/attributes/security/ScamAlertDetails'
@@ -11,18 +9,16 @@ import { LicenseDetails } from '@/ui/molecules/attributes/transparency/LicenseDe
 import { SourceVisibilityDetails } from '@/ui/molecules/attributes/transparency/SourceVisibilityDetails'
 import { UnratedAttribute } from '@/ui/molecules/attributes/UnratedAttribute'
 
-import { RenderTypographicContent } from './RenderTypographicContent'
-
-export function RenderContent({
+export function RenderCustomContent<
+	CustomContent_ extends CustomContent,
+>({
 	content,
 	...otherProps
-}:
-	| { content: Content }
-	| React.ComponentProps<typeof RenderTypographicContent>): React.JSX.Element {
-	if (isTypographicContent(content)) {
-		return <RenderTypographicContent content={content} {...otherProps} />
-	}
+}: {
+	content: CustomContent_,
+} & CustomContent_['component']['componentProps']) {
 	const { component, componentProps } = content.component
+
 	switch (component) {
 		case 'AddressCorrelationDetails':
 			return <AddressCorrelationDetails {...componentProps} {...otherProps} />

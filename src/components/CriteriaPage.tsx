@@ -11,7 +11,6 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
-import { RenderContent } from '@/ui/atoms/RenderContent'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
 
@@ -123,9 +122,10 @@ export function CriteriaPage({
 							<h1 className="text-4xl font-extrabold text-accent">{attrGroup.displayName}</h1>
 							<p className="text-secondary">
 								<RenderTypographicContent
-									content={attrGroup.perWalletQuestion.render({
-										displayName: 'your wallet',
-									})}
+									content={attrGroup.perWalletQuestion}
+									strings={{
+										WALLET_NAME: 'your wallet',
+									}}
 									typography={{
 										variant: 'caption',
 										fontStyle: 'italic',
@@ -138,8 +138,8 @@ export function CriteriaPage({
 										{evalAttr.attribute.displayName}
 									</h2>
 									<div className="card">
-										<RenderContent
-											content={evalAttr.attribute.why.render({})}
+										<RenderTypographicContent
+											content={evalAttr.attribute.why}
 											typography={{ variant: 'body2' }}
 										/>
 									</div>

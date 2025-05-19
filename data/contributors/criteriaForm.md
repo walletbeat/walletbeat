@@ -4,16 +4,16 @@
 - **ID**: example_criteria
 - **Display Name**: Example Criteria
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} implements [feature] using [implementation details].
+- **Short Explanation**: {{WALLET_NAME}} implements [feature] using [implementation details].
 
 ## Details
 
-${walletMetadata.displayName} implements [feature] using [specific details about implementation]. This [explains why this implementation is good/bad/partial] and provides [benefits/drawbacks] for users.
+{{WALLET_NAME}} implements [feature] using [specific details about implementation]. This [explains why this implementation is good/bad/partial] and provides [benefits/drawbacks] for users.
 The implementation uses ${libraryUrl} which is [describe qualities of the library/technology - e.g., "well-audited", "gas-efficient", etc.].
 
 ## How To Improve
 
-${walletMetadata.displayName} could improve its implementation by [specific recommendations]:
+{{WALLET_NAME}} could improve its implementation by [specific recommendations]:
 
 - Consider upgrading to [better alternative] for [specific benefit]
 - Implement [additional feature] to enhance [specific aspect]
@@ -31,7 +31,7 @@ The wallet implements [feature] using [acceptable but suboptimal implementation]
 
 ### Fail
 
-${walletMetadata.displayName} does not implement [feature] or uses an implementation that [describe critical issues]. This creates [specific risks or problems] for users.
+{{WALLET_NAME}} does not implement [feature] or uses an implementation that [describe critical issues]. This creates [specific risks or problems] for users.
 
 ---
 
@@ -43,18 +43,18 @@ ${walletMetadata.displayName} does not implement [feature] or uses an implementa
 - **ID**: Bug Bounty Program
 - **Display Name**: Bug Bounty Program
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} implements [feature] using [implementation details].
+- **Short Explanation**: {{WALLET_NAME}} implements [feature] using [implementation details].
 - **WalletType**: Hardware wallet
 
 ## Details
 
-${walletMetadata.displayName} implements [feature] using [specific details about implementation]. This [explains why this implementation is good/bad/partial] and provides [benefits/drawbacks] for users.
+{{WALLET_NAME}} implements [feature] using [specific details about implementation]. This [explains why this implementation is good/bad/partial] and provides [benefits/drawbacks] for users.
 
 The implementation uses ${libraryUrl} which is [describe qualities of the library/technology - e.g., "well-audited", "gas-efficient", etc.].
 
 ## How To Improve
 
-${walletMetadata.displayName} could improve its implementation by:
+{{WALLET_NAME}} could improve its implementation by:
 
 - Offering customer an upgrade path to another device for security purposes.
 - Fix the vulnerabilities to address and/or implement a bug bounty program
@@ -71,7 +71,7 @@ The wallet implements a disclosure policy but doesn't disclose a reward or bount
 
 ### Fail
 
-${walletMetadata.displayName} does not implement a bug bounty and doesn't provide security updates. Or use a wallet that has an unpatchable critical vulnerability. This creates a high risk for users.
+{{WALLET_NAME}} does not implement a bug bounty and doesn't provide security updates. Or use a wallet that has an unpatchable critical vulnerability. This creates a high risk for users.
 
 # Wallet Criteria Entries
 
@@ -81,17 +81,17 @@ ${walletMetadata.displayName} does not implement a bug bounty and doesn't provid
 - **ID**: securityAudits
 - **Display Name**: Security Audits
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} has undergone a recent security audit with all faults addressed.
+- **Short Explanation**: {{WALLET_NAME}} has undergone a recent security audit with all faults addressed.
 
 ## Details
 
-${walletMetadata.displayName} has had its source code reviewed by independent security auditors. Security audits are an important part of ensuring the wallet's code is secure, as they involve professionals looking for vulnerabilities and potential security issues.
+{{WALLET_NAME}} has had its source code reviewed by independent security auditors. Security audits are an important part of ensuring the wallet's code is secure, as they involve professionals looking for vulnerabilities and potential security issues.
 
 The most recent audit was conducted on [date] by [auditor name]. All identified issues of medium severity or higher have been addressed by the development team.
 
 ## How To Improve
 
-${walletMetadata.displayName} should maintain its commitment to security by:
+{{WALLET_NAME}} should maintain its commitment to security by:
 
 - Scheduling regular security audits (at least annually)
 - Promptly addressing any security flaws identified in audits
@@ -124,18 +124,18 @@ The wallet either:
 - **ID**: chainVerification
 - **Display Name**: Chain Verification
 - **Rating**: PASS/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [verifies/does not verify] the integrity of the Ethereum L1 chain.
+- **Short Explanation**: {{WALLET_NAME}} [verifies/does not verify] the integrity of the Ethereum L1 chain.
 
 ## Details
 
-${walletMetadata.displayName} [uses/does not use] light client verification to ensure the integrity of blockchain data when interacting with the Ethereum network. Chain verification is crucial for maintaining the "trust but verify" principle of blockchains, ensuring that users don't have to rely solely on third-party RPC providers for blockchain state information.
+{{WALLET_NAME}} [uses/does not use] light client verification to ensure the integrity of blockchain data when interacting with the Ethereum network. Chain verification is crucial for maintaining the "trust but verify" principle of blockchains, ensuring that users don't have to rely solely on third-party RPC providers for blockchain state information.
 
 [If PASS: The wallet integrates light client functionality to verify block headers and chain state.]
 [If FAIL: The wallet relies on third-party RPC providers without additional verification mechanisms.]
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its chain verification by:
+{{WALLET_NAME}} could enhance its chain verification by:
 
 - Integrating light client functionality to verify the integrity of Ethereum chain data
 - Supporting multiple light client implementations (such as Helios)
@@ -158,11 +158,11 @@ The wallet does not verify the integrity of the Ethereum L1 chain, relying on th
 - **ID**: bugBountyProgram
 - **Display Name**: Bug Bounty Program
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [implements/partially implements/does not implement] a bug bounty program and security update process.
+- **Short Explanation**: {{WALLET_NAME}} [implements/partially implements/does not implement] a bug bounty program and security update process.
 
 ## Details
 
-${walletMetadata.displayName} [has/has a limited/does not have] a bug bounty program to incentivize security researchers to responsibly discover and disclose vulnerabilities. This is critical for hardware wallets which manage sensitive cryptographic keys and access to users' funds.
+{{WALLET_NAME}} [has/has a limited/does not have] a bug bounty program to incentivize security researchers to responsibly discover and disclose vulnerabilities. This is critical for hardware wallets which manage sensitive cryptographic keys and access to users' funds.
 
 [If PASS: The wallet offers competitive rewards based on severity, has a transparent disclosure process, and provides upgrade paths when security issues are identified.]
 [If PARTIAL: The wallet has a basic vulnerability disclosure policy but with limitations in scope, rewards, or responsiveness.]
@@ -173,7 +173,7 @@ ${walletMetadata.displayName} [has/has a limited/does not have] a bug bounty pro
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its security practices by:
+{{WALLET_NAME}} could enhance its security practices by:
 
 - Implementing a comprehensive bug bounty program with clear guidelines
 - Offering appropriate rewards based on vulnerability severity
@@ -205,11 +205,11 @@ The hardware wallet has no bug bounty program or vulnerability disclosure policy
 - **ID**: passkeyImplementation
 - **Display Name**: Passkey Implementation
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [uses/partially uses/does not use] a secure and efficient passkey verification library.
+- **Short Explanation**: {{WALLET_NAME}} [uses/partially uses/does not use] a secure and efficient passkey verification library.
 
 ## Details
 
-${walletMetadata.displayName} [implements/partially implements/does not implement] passkeys using [library name], which provides [excellent/good/limited] security and gas efficiency for P256/R1 curve operations on-chain.
+{{WALLET_NAME}} [implements/partially implements/does not implement] passkeys using [library name], which provides [excellent/good/limited] security and gas efficiency for P256/R1 curve operations on-chain.
 
 Passkeys provide a secure and phishing-resistant way to authenticate users without relying on seed phrases. The choice of verification library directly impacts both the security and cost-effectiveness of the implementation.
 
@@ -219,7 +219,7 @@ Passkeys provide a secure and phishing-resistant way to authenticate users witho
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its passkey implementation by:
+{{WALLET_NAME}} could enhance its passkey implementation by:
 
 - Adopting a more gas-efficient and well-audited verification library
 - Upgrading to the latest version of their current library
@@ -256,11 +256,11 @@ Note: Hardware wallets and EOA-only wallets are exempt from this rating since th
 - **ID**: scamPrevention
 - **Display Name**: Scam Prevention
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [implements/partially implements/does not implement] features to warn users about potential scams.
+- **Short Explanation**: {{WALLET_NAME}} [implements/partially implements/does not implement] features to warn users about potential scams.
 
 ## Details
 
-${walletMetadata.displayName} [provides/partially provides/does not provide] warnings about potential scam activities when using the wallet. Given that blockchain transactions are very difficult to reverse, these warnings help users avoid falling victim to scams.
+{{WALLET_NAME}} [provides/partially provides/does not provide] warnings about potential scam activities when using the wallet. Given that blockchain transactions are very difficult to reverse, these warnings help users avoid falling victim to scams.
 
 The wallet implements the following types of warnings:
 [If applicable: - Warnings when sending funds to an address the user has never previously transacted with]
@@ -274,7 +274,7 @@ The wallet implements the following types of warnings:
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its scam prevention by:
+{{WALLET_NAME}} could enhance its scam prevention by:
 
 - Adding warnings for first-time transactions to unknown addresses
 - Implementing contract security checks before transaction approval
@@ -305,17 +305,17 @@ The wallet has minimal or no scam prevention features to warn users about potent
 - **ID**: hardwareWalletSupport
 - **Display Name**: Hardware Wallet Support
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} supports a wide range of hardware wallets.
+- **Short Explanation**: {{WALLET_NAME}} supports a wide range of hardware wallets.
 
 ## Details
 
-${walletMetadata.displayName} offers integration with hardware wallets, providing users with enhanced security by keeping their private keys offline. This integration allows users to enjoy the features of the software wallet while maintaining the security benefits of hardware wallets.
+{{WALLET_NAME}} offers integration with hardware wallets, providing users with enhanced security by keeping their private keys offline. This integration allows users to enjoy the features of the software wallet while maintaining the security benefits of hardware wallets.
 
 The wallet supports the following hardware wallet brands: [list supported hardware wallets]. This comprehensive support gives users flexibility to choose the hardware solution that best fits their needs and preferences.
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its hardware wallet support by:
+{{WALLET_NAME}} could enhance its hardware wallet support by:
 
 - Adding support for additional hardware wallet brands
 - Improving the integration experience with existing supported hardware wallets
@@ -342,17 +342,17 @@ The wallet does not support any hardware wallets.
 - **ID**: addressCorrelation
 - **Display Name**: Address Correlation
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [prevents/allows] third parties from correlating your wallet address with personal information.
+- **Short Explanation**: {{WALLET_NAME}} [prevents/allows] third parties from correlating your wallet address with personal information.
 
 ## Details
 
-${walletMetadata.displayName} [prevents/allows] your wallet address from being correlated with personal information such as your email address, phone number, or IP address. This is a critical privacy consideration, as such correlations can potentially be used to identify you and track your on-chain activity.
+{{WALLET_NAME}} [prevents/allows] your wallet address from being correlated with personal information such as your email address, phone number, or IP address. This is a critical privacy consideration, as such correlations can potentially be used to identify you and track your on-chain activity.
 
 The wallet [does/does not] require explicit user consent before allowing any such correlations, and [does/does not] make it clear when such correlations might occur.
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its address correlation privacy by:
+{{WALLET_NAME}} could enhance its address correlation privacy by:
 
 - Implementing proxy techniques to prevent IP address correlation
 - Requiring explicit user consent before allowing personal information to be linked to wallet addresses
@@ -379,17 +379,17 @@ The wallet allows correlation between wallet addresses and sensitive personal in
 - **ID**: openSource
 - **Display Name**: Open Source
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} uses a [license type] license for its source code.
+- **Short Explanation**: {{WALLET_NAME}} uses a [license type] license for its source code.
 
 ## Details
 
-${walletMetadata.displayName} uses a [license type] license for its source code. This means the code is [free and open source/proprietary/planning to become open source in the future].
+{{WALLET_NAME}} uses a [license type] license for its source code. This means the code is [free and open source/proprietary/planning to become open source in the future].
 
 Open source software allows anyone to inspect, modify, and enhance the code, increasing transparency and allowing the community to verify the security and functionality of the wallet.
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its open source status by:
+{{WALLET_NAME}} could enhance its open source status by:
 
 - [For proprietary wallets] Re-licensing under a Free and Open Source Software license
 - [For unlicensed wallets] Adding a proper license file to its source code
@@ -416,17 +416,17 @@ The wallet uses a proprietary source code license or has no valid license for it
 - **ID**: sourceVisibility
 - **Display Name**: Source Visibility
 - **Rating**: PASS/FAIL
-- **Short Explanation**: ${walletMetadata.displayName}'s source code [is/is not] visible to the public.
+- **Short Explanation**: {{WALLET_NAME}}'s source code [is/is not] visible to the public.
 
 ## Details
 
-${walletMetadata.displayName}'s source code [is/is not] publicly visible. When a wallet's source code is visible, it can be inspected for security vulnerabilities and potential malicious code, which improves the wallet's security and trustworthiness.
+{{WALLET_NAME}}'s source code [is/is not] publicly visible. When a wallet's source code is visible, it can be inspected for security vulnerabilities and potential malicious code, which improves the wallet's security and trustworthiness.
 
 Public visibility of source code is distinct from the license - a wallet can have publicly visible source code without being open source.
 
 ## How To Improve
 
-${walletMetadata.displayName} should make its source code publicly viewable, which would allow independent security researchers to inspect the code for vulnerabilities.
+{{WALLET_NAME}} should make its source code publicly viewable, which would allow independent security researchers to inspect the code for vulnerabilities.
 
 ## Rating Criteria
 
@@ -444,17 +444,17 @@ The source code for the wallet is not available to the public.
 - **ID**: accountPortability
 - **Display Name**: Account Portability
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [allows/restricts] you to export your account and use it with other wallets.
+- **Short Explanation**: {{WALLET_NAME}} [allows/restricts] you to export your account and use it with other wallets.
 
 ## Details
 
-${walletMetadata.displayName} [uses standard key derivation/uses non-standard key derivation/does not allow key export] for your accounts. This [enables/partially enables/prevents] you from using your accounts with other wallet applications.
+{{WALLET_NAME}} [uses standard key derivation/uses non-standard key derivation/does not allow key export] for your accounts. This [enables/partially enables/prevents] you from using your accounts with other wallet applications.
 
 Account portability is important for maintaining self-sovereignty over your crypto assets, ensuring you're not locked into one specific wallet provider.
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its account portability by:
+{{WALLET_NAME}} could enhance its account portability by:
 
 - Following standard key derivation methods for all account types
 - Implementing export functionality for private keys and seed phrases
@@ -481,17 +481,17 @@ The wallet locks users in by not allowing them to export their account's private
 - **ID**: transactionInclusion
 - **Display Name**: Transaction Inclusion
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [allows/restricts] you to submit transactions directly to the blockchain.
+- **Short Explanation**: {{WALLET_NAME}} [allows/restricts] you to submit transactions directly to the blockchain.
 
 ## Details
 
-${walletMetadata.displayName} [supports/partially supports/does not support] direct transaction submission to the blockchain without relying on intermediaries that could potentially censor transactions.
+{{WALLET_NAME}} [supports/partially supports/does not support] direct transaction submission to the blockchain without relying on intermediaries that could potentially censor transactions.
 
 For Layer 1 transactions, the wallet [uses direct broadcast methods/allows connecting to your own node/relies on intermediaries]. For Layer 2 transactions, the wallet [does/does not] support force-withdrawal mechanisms that allow users to exit even if the L2 operators become uncooperative.
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its transaction inclusion by:
+{{WALLET_NAME}} could enhance its transaction inclusion by:
 
 - Adding support for broadcasting L1 transactions directly over Ethereum's gossip layer
 - Allowing users to connect to their own self-hosted Ethereum nodes
@@ -518,11 +518,11 @@ The wallet relies solely on intermediaries for transaction submission and does n
 - **ID**: selfHostedNode
 - **Display Name**: Self-hosted Node
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [allows/restricts] you to use your own self-hosted Ethereum node.
+- **Short Explanation**: {{WALLET_NAME}} [allows/restricts] you to use your own self-hosted Ethereum node.
 
 ## Details
 
-${walletMetadata.displayName} [supports/partially supports/does not support] the use of self-hosted Ethereum nodes. Self-hosted nodes provide important benefits including enhanced privacy, data integrity, censorship resistance, and protection from third-party downtime.
+{{WALLET_NAME}} [supports/partially supports/does not support] the use of self-hosted Ethereum nodes. Self-hosted nodes provide important benefits including enhanced privacy, data integrity, censorship resistance, and protection from third-party downtime.
 
 [If applicable: The wallet lets you configure the RPC endpoint used for Ethereum mainnet.]
 [If applicable: The wallet lets you add a custom chain with your own self-hosted node as RPC endpoint.]
@@ -530,7 +530,7 @@ ${walletMetadata.displayName} [supports/partially supports/does not support] the
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its self-hosted node support by:
+{{WALLET_NAME}} could enhance its self-hosted node support by:
 
 - Allowing users to configure the RPC endpoint for Ethereum mainnet
 - Ensuring configuration is possible before any requests are made to third-party RPC endpoints
@@ -560,11 +560,11 @@ The wallet uses a third-party Ethereum node provider and does not let you change
 - **ID**: nodeVerification
 - **Display Name**: Node Verification
 - **Rating**: PASS/PARTIAL/FAIL
-- **Short Explanation**: ${walletMetadata.displayName} [verifies/partially verifies/does not verify] authenticity of RPC nodes.
+- **Short Explanation**: {{WALLET_NAME}} [verifies/partially verifies/does not verify] authenticity of RPC nodes.
 
 ## Details
 
-${walletMetadata.displayName} [uses/partially uses/does not use] mechanisms to verify the authenticity and integrity of RPC node responses. Node verification is crucial for ensuring that the blockchain data you interact with is accurate and hasn't been tampered with.
+{{WALLET_NAME}} [uses/partially uses/does not use] mechanisms to verify the authenticity and integrity of RPC node responses. Node verification is crucial for ensuring that the blockchain data you interact with is accurate and hasn't been tampered with.
 
 [If applicable: The wallet verifies block headers with external sources.]
 [If applicable: The wallet uses light client verification.]
@@ -572,7 +572,7 @@ ${walletMetadata.displayName} [uses/partially uses/does not use] mechanisms to v
 
 ## How To Improve
 
-${walletMetadata.displayName} could enhance its node verification by:
+{{WALLET_NAME}} could enhance its node verification by:
 
 - Implementing light client verification for block headers
 - Adding support for connecting to multiple RPC endpoints simultaneously

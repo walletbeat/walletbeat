@@ -74,13 +74,9 @@ export const userSafety: Attribute<UserSafetyValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's user safety evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve its user safety?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its user safety?`),
 	},
-	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} provide comprehensive user safety features?`,
-	),
+	question: sentence(`Does {{WALLET_NAME}} provide comprehensive user safety features?`),
 	why: markdown(
 		`User safety features are crucial for ensuring users clearly understand the transactions and messages they are signing on their hardware device.
 		This involves presenting information legibly (human-readable addresses/contracts/parameters), providing tools to verify raw data, offering risk analysis and transaction simulation, and preventing unintended actions.`,
@@ -131,19 +127,19 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes 11 or more user safety sub-criteria.'),
+				sentence(`The hardware wallet passes 11 or more user safety sub-criteria.`),
 				(v: UserSafetyValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes 6 to 10 user safety sub-criteria.'),
+				sentence(`The hardware wallet passes 6 to 10 user safety sub-criteria.`),
 				(v: UserSafetyValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes 5 or fewer user safety sub-criteria.'),
+				sentence(`The hardware wallet passes 5 or fewer user safety sub-criteria.`),
 				(v: UserSafetyValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -154,10 +150,7 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				userSafety,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute evaluates hardware wallet user safety features and is not applicable for ${walletMetadata.displayName}.`,
-				),
+				sentence(`This attribute evaluates hardware wallet user safety features and is not applicable for {{WALLET_NAME}}.`),
 				brand,
 				{
 					readableAddress: UserSafetyType.FAIL,
@@ -224,30 +217,20 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 			withoutRefs.fullyLocalTxSimulation,
 		].filter(r => r === UserSafetyType.PASS).length
 
-		const detailsText = ({ wallet }: EvaluationData<UserSafetyValue>): string => {
-			let desc = `${wallet.metadata.displayName} user safety evaluation is ${rating.toLowerCase()}.`
-			if (rating !== Rating.EXEMPT) {
-				desc += ` It passes ${passCount} out of 16 sub-criteria.`
-			}
-			return desc
-		}
-
-		const howToImproveText = ({ wallet }: EvaluationData<UserSafetyValue>): string => {
-			if (rating === Rating.PASS || rating === Rating.EXEMPT) {
-				return ''
-			}
-			return `${wallet.metadata.displayName} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`
-		}
+		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}.${
+			rating !== Rating.EXEMPT ? ` It passes ${passCount} out of 16 sub-criteria.` : ''
+		}`
+		
+		const howToImproveText = rating !== Rating.PASS && rating !== Rating.EXEMPT
+			? `{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`
+			: ''
 
 		return {
 			value: {
 				id: 'user_safety',
 				rating,
 				displayName: 'User Safety',
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) =>
-						`${walletMetadata.displayName} has ${rating.toLowerCase()} user safety.`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} user safety.`),
 				...withoutRefs,
 				__brand: brand,
 			},

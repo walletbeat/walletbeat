@@ -12,7 +12,7 @@ import {
 import { toFullyQualified } from '@/schema/reference'
 import type { Variant } from '@/schema/variants'
 import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet'
-import { isTypographicContent } from '@/types/content'
+import { isTypographicContent, sentence, type TypographicContent } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology'
 
@@ -25,7 +25,7 @@ import { subsectionTheme } from '../../components/ThemeRegistry/theme'
 import { variantToName } from '../../components/variants'
 import { type AccordionData, Accordions } from '../atoms/Accordions'
 import { ReferenceLinks } from '../atoms/ReferenceLinks'
-import { RenderContent } from '../atoms/RenderContent'
+import { RenderCustomContent } from '../atoms/RenderCustomContent'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { WrapIcon } from '../atoms/WrapIcon'
 import { WrapRatingIcon } from '../atoms/WrapRatingIcon'
@@ -55,11 +55,12 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	  }
 )): React.JSX.Element {
 	const qualRefs = toFullyQualified(evalAttr.evaluation.references)
-	const details = evalAttr.evaluation.details.render({
+	const evaluationData = {
 		wallet,
 		references: qualRefs,
 		value: evalAttr.evaluation.value,
-	})
+	}
+	const details = evalAttr.evaluation.details
 	const override = getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id)
 	const variantSpecificCaption: React.ReactNode = (() => {
 		switch (variantSpecificity) {
@@ -85,12 +86,24 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	let rendered = (
 		<>
 			<React.Fragment key="details">
-				<RenderContent
-					content={details}
-					typography={{
-						fontWeight: subsectionWeight,
-					}}
-				/>
+				{isTypographicContent(details) ? (
+					<RenderTypographicContent
+						content={details}
+						strings={{
+							WALLET_NAME: wallet.metadata.displayName,
+						}}
+						typography={{
+							fontWeight: subsectionWeight,
+						}}
+					/>
+				) : (
+					<RenderCustomContent
+						content={details}
+						value={evalAttr.evaluation.value}
+						wallet={wallet}
+						references={qualRefs}
+					/>
+				)}
 			</React.Fragment>
 			<React.Fragment key="variantSpecific">{variantSpecificCaption}</React.Fragment>
 			<React.Fragment key="impact">
@@ -98,11 +111,10 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					<>
 						<div style={{ height: '1rem' }}></div>
 						<RenderTypographicContent
-							content={evalAttr.evaluation.impact.render({
-								wallet,
-								references: qualRefs,
-								value: evalAttr.evaluation.value,
-							})}
+							content={evalAttr.evaluation.impact}
+							strings={{
+								WALLET_NAME: wallet.metadata.displayName,
+							}}
 							typography={{
 								fontWeight: subsectionWeight,
 							}}
@@ -125,24 +137,40 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	const accordions: NonEmptyArray<AccordionData> = [
 		{
 			id: `why-${evalAttr.attribute.id}`,
-			summary:
-				evalAttr.evaluation.value.rating === Rating.PASS ||
-				evalAttr.evaluation.value.rating === Rating.UNRATED
-					? 'Why does this matter?'
-					: 'Why should I care?',
-			contents: (
-				<RenderContent
-					content={evalAttr.attribute.why.render({})}
+			summary: (
+				<RenderTypographicContent
+					content={
+						sentence(
+							evalAttr.evaluation.value.rating === Rating.PASS ||
+							evalAttr.evaluation.value.rating === Rating.UNRATED
+								? 'Why does this matter?'
+								: 'Why should I care?'
+						)
+					}
+					typography={{ variant: 'h4' }}
+				/>
+			),
+			contents: 	(
+				<RenderTypographicContent
+					content={evalAttr.attribute.why}
 					typography={{ variant: 'body2' }}
 				/>
 			),
 		},
 		{
 			id: `methodology-${evalAttr.attribute.id}`,
-			summary:
-				evalAttr.attribute.wording.midSentenceName === null
-					? evalAttr.attribute.wording.howIsEvaluated
-					: `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`,
+			summary: (
+				<RenderTypographicContent
+					content={
+						sentence(
+							evalAttr.attribute.wording.midSentenceName === null
+								? evalAttr.attribute.wording.howIsEvaluated
+								: `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`
+						)
+					}
+					typography={{ variant: 'h4' }}
+				/>
+			),
 			contents: (
 				<AttributeMethodology attribute={evalAttr.attribute} evaluation={evalAttr.evaluation} />
 			),
@@ -153,17 +181,27 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	if (howToImprove !== undefined) {
 		accordions.push({
 			id: `how-${evalAttr.attribute.id}`,
-			summary:
-				evalAttr.attribute.wording.midSentenceName === null
-					? evalAttr.attribute.wording.whatCanWalletDoAboutIts(wallet.metadata)
-					: `What can ${wallet.metadata.displayName} do about its ${evalAttr.attribute.wording.midSentenceName}?`,
+			summary: (
+				<RenderTypographicContent
+					content={
+						evalAttr.attribute.wording.midSentenceName === null
+							? evalAttr.attribute.wording.whatCanWalletDoAboutIts
+							: sentence(`What can {{WALLET_NAME}} do about its ${evalAttr.attribute.wording.midSentenceName}?`)
+					}
+					strings={{
+						WALLET_NAME: wallet.metadata.displayName,
+					}}
+					typography={{ variant: 'h4' }}
+				/>
+			),
 			contents: (
 				<RenderTypographicContent
-					content={howToImprove.render({
-						wallet,
-						references: qualRefs,
-						value: evalAttr.evaluation.value,
-					})}
+					content={howToImprove}
+					strings={{
+						WALLET_NAME: wallet.metadata.displayName,
+						WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+						WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+					}}
 					typography={{ variant: 'body2' }}
 				/>
 			),
@@ -179,13 +217,17 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					iconWidth={subsectionIconWidth}
 					sx={{ marginTop: '1rem' }}
 				>
-					<RenderContent content={override.note.render({ wallet })} />
+					<RenderTypographicContent
+						content={override.note}
+						strings={{
+							WALLET_NAME: wallet.metadata.displayName,
+						}}
+					/>
 				</WrapIcon>
 			) : null}
 			<Accordions
 				accordions={accordions}
 				borderRadius={`${subsectionBorderRadius}px`}
-				summaryTypographyVariant="h4"
 				interAccordionMargin="1rem"
 			/>
 		</>

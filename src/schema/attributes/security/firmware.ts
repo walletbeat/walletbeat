@@ -44,13 +44,9 @@ export const firmware: Attribute<FirmwareValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's firmware evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve its firmware?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its firmware?`),
 	},
-	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} have secure and open firmware?`,
-	),
+	question: sentence(`Does {{WALLET_NAME}} have secure and open firmware?`),
 	why: markdown(`
 		Firmware security and openness are critical for user trust, resistance against attacks, and ensuring the device can be safely upgraded.
 		Users need assurance that the code running on their device is authentic and hasn't been tampered with.
@@ -69,19 +65,19 @@ export const firmware: Attribute<FirmwareValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes most firmware sub-criteria.'),
+				sentence(`The hardware wallet passes most firmware sub-criteria.`),
 				(v: FirmwareValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes some firmware sub-criteria.'),
+				sentence(`The hardware wallet passes some firmware sub-criteria.`),
 				(v: FirmwareValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'The hardware wallet fails most or all firmware sub-criteria.'),
+				sentence(`The hardware wallet fails most or all firmware sub-criteria.`),
 				(v: FirmwareValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -90,7 +86,7 @@ export const firmware: Attribute<FirmwareValue> = {
 		pickWorstRating<FirmwareValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), brand, {
+			return exempt(firmware, sentence(`Firmware is only rated for hardware wallets`), brand, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
@@ -115,21 +111,12 @@ export const firmware: Attribute<FirmwareValue> = {
 				id: 'firmware',
 				rating,
 				displayName: 'Firmware',
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) =>
-						`${walletMetadata.displayName} has ${rating.toLowerCase()} firmware.`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} firmware.`),
 				...withoutRefs,
 				__brand: brand,
 			},
-			details: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} firmware evaluation is ${rating.toLowerCase()}.`,
-			),
-			howToImprove: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
-			),
+			details: paragraph(`{{WALLET_NAME}} firmware evaluation is ${rating.toLowerCase()}.`),
+			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},

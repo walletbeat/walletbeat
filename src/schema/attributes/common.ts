@@ -1,4 +1,4 @@
-import { type Sentence, sentence } from '@/types/content'
+import { type Sentence, sentence, type Content } from '@/types/content'
 import { unratedAttributeContent } from '@/types/content/unrated-attribute'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyValues } from '@/types/utils/non-empty'
 
@@ -27,7 +27,7 @@ export function unrated<V extends Value>(
 		id: 'unrated',
 		rating: Rating.UNRATED,
 		displayName: `${attribute.displayName}: Unrated`,
-		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
+		shortExplanation: sentence(`Walletbeat lacks the information needed to determine this.`),
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
 	const v: V = {
@@ -47,7 +47,7 @@ export function unrated<V extends Value>(
  */
 export function exempt<V extends Value>(
 	attribute: Attribute<V>,
-	whyExempt: Sentence<WalletMetadata>,
+	whyExempt: Sentence<{ WALLET_NAME: string }>,
 	brand: string,
 	extraProps: Omit<V, keyof (Value & { __brand: string })> extends Record<string, never>
 		? null
@@ -67,9 +67,7 @@ export function exempt<V extends Value>(
 	} as unknown as V & { rating: Rating.EXEMPT }
 	return {
 		value: v,
-		details: {
-			render: ({ wallet }) => whyExempt.render(wallet.metadata),
-		},
+		details: whyExempt,
 	}
 }
 
