@@ -41,3 +41,9 @@ jobs:
           ORBITER_ACCESS_TOKEN: ${{ secrets.ORBITER_ACCESS_TOKEN }}
           ORBITER_ACCESS_TOKEN_CREATION_DATE: ${{ secrets.ORBITER_ACCESS_TOKEN_CREATION_DATE }}
           DEPLOY_DIRECTORY: dist
+      - name: Update beta.walletbeat.eth ENS records
+        run: ./deploy/update-ens.sh
+        env:
+          ENS_DOMAIN: beta.walletbeat.eth
+          DEPLOY_DIRECTORY: dist
+          BLUMEN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}

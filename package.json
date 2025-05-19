@@ -16,7 +16,8 @@
 		"lint": "prettier --check --write src data && eslint src data --fix && cspell lint .",
 		"preview": "pnpm run astro preview",
 		"prepare": "test -d .git && pnpm husky || true",
-		"fix": "pnpm run check:lint --fix && pnpm run check:syntax --write"
+		"fix": "pnpm run check:lint --fix && pnpm run check:syntax --write",
+		"ipfs": "deploy/ipfs/ipfs.sh"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.2.0",
@@ -58,6 +59,7 @@
 		"@fleek-platform/cli": "^3.8.2",
 		"@kindspells/astro-shield": "^1.7.1",
 		"@types/classnames": "^2.3.4",
+		"blumen": "^0.16.3",
 		"cspell": "^8.17.3",
 		"eslint": "^9.19.0",
 		"eslint-config-love": "^118.0.0",
