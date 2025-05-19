@@ -2,7 +2,7 @@
 	// Types/constants
 	import { Variant } from '@/schema/variants'
 	import type { RatedWallet } from '@/schema/wallet'
-	import type { AttributeGroup } from '@/schema/attribute-groups'
+	import type { AttributeGroup } from '@/schema/attributes'
 
 
 	// Props
@@ -24,6 +24,7 @@
 	// Functions
 	import { variantUrlQuery } from '@/components/variants'
 	import { isLabeledUrl } from '@/schema/url'
+	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
 
 
 	// Components
@@ -222,9 +223,9 @@
 				</div>
 			</div>
 		{:else}
-			{@const attrGroup = attributeGroups.find(attributeGroup => attributeGroup.id === column.id)}
+			{@const attrGroup = attributeGroups.find(attributeGroup => attributeGroup.id === column.id)!}
 			{@const evalGroup = wallet.overall[attrGroup.id]}
-			{@const groupScore = attrGroup.score?.(wallet.overall[attrGroup.id])}
+			{@const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
 
 			<WalletAttributeGroupRating
 				{wallet}
