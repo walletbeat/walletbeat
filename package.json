@@ -16,7 +16,10 @@
 		"lint": "prettier --check --write src data && eslint src data --fix && cspell lint .",
 		"preview": "pnpm run astro preview",
 		"prepare": "test -d .git && pnpm husky || true",
-		"fix": "pnpm run check:lint --fix && pnpm run check:syntax --write"
+		"fix": "pnpm run check:lint --fix && pnpm run check:syntax --write",
+		"ipfs": "deploy/ipfs/ipfs.sh",
+		"helios": "deploy/helios/helios.sh",
+		"helios:wrap": "deploy/helios/helios-wrap.sh"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.2.7",
@@ -59,7 +62,9 @@
 	"devDependencies": {
 		"@astrojs/check": "^0.9.4",
 		"@fleek-platform/cli": "^3.8.3",
+		"@kindspells/astro-shield": "^1.7.1",
 		"@types/classnames": "^2.3.4",
+		"blumen": "^0.16.3",
 		"cspell": "^8.19.3",
 		"eslint": "^9.25.1",
 		"eslint-config-love": "^118.0.0",
@@ -69,6 +74,7 @@
 		"eslint-plugin-sort-keys-custom-order": "^2.2.1",
 		"globals": "^15.15.0",
 		"husky": "^9.1.7",
+		"orbiter-cli": "^0.8.2",
 		"pnpm": "10.4.0",
 		"prettier": "^3.5.3",
 		"prettier-plugin-astro": "^0.14.1",

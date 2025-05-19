@@ -42,19 +42,14 @@ export function RatingDetailModal<Vs extends ValueSet>({
 			onClose={onClose}
 			className="flex items-center justify-center overflow-y-auto"
 		>
-			<div className="bg-white dark:bg-gray-800 rounded-lg w-full p-4 max-w-[90vw] md:max-w-3xl max-h-[90vh] overflow-y-auto">
+			<div className="bg-backgroundSecondary rounded-lg w-full p-4 max-w-[90vw] md:max-w-3xl max-h-[90vh] overflow-y-auto">
 				<div className="flex justify-between items-center mb-4">
 					<Typography variant="h6" className="dark:text-gray-100 font-bold">
 						{attrGroup.displayName} Details
 					</Typography>
-					<Button
-						variant="outlined"
-						size="small"
-						onClick={onClose}
-						className="dark:text-gray-200 dark:border-gray-500"
-					>
+					<button onClick={onClose} className="btn !py-1">
 						Close
-					</Button>
+					</button>
 				</div>
 
 				<RatingDetailContent
@@ -262,8 +257,8 @@ export function RatingDetailContent<Vs extends ValueSet>({
 											className={cx(
 												'flex items-center p-2 rounded cursor-pointer text-sm',
 												hoveredSliceIndex === index
-													? 'bg-gray-200 dark:bg-gray-700'
-													: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700',
+													? 'bg-backgroundSecondary'
+													: 'bg-background hover:bg-backgroundSecondary',
 											)}
 											onMouseEnter={() => {
 												setHoveredSliceIndex(index)

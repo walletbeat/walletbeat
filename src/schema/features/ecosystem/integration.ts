@@ -1,5 +1,12 @@
+import {
+	type ResolvedFeature,
+	resolveFeature,
+	type Variant,
+	type VariantFeature,
+} from '@/schema/variants'
+
 import type { WithRef } from '../../reference'
-import type { Support } from '../support'
+import { notSupported, type Support } from '../support'
 
 /**
  * EIPs related to web browser integration standards.
@@ -21,4 +28,29 @@ export interface WalletIntegration {
 	 *   - EIP-6963: Check https://eip6963.org/
 	 */
 	browser: 'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>
+
+	/** EIP-5792: Wallet Call API support for transaction batching. */
+	eip5792: VariantFeature<Support>
+}
+
+/** Variant-specific resolution of `WalletIntegration`. */
+export interface ResolvedWalletIntegration {
+	browser: WalletIntegration['browser']
+	eip5792: ResolvedFeature<Support>
+}
+
+/** A WalletIntegration stand-in used for non-software wallets. */
+export const notApplicableWalletIntegration: WalletIntegration = {
+	browser: 'NOT_A_BROWSER_WALLET',
+	eip5792: notSupported,
+}
+
+export function resolveWalletIntegrationFeatures(
+	walletIntegration: WalletIntegration,
+	variant: Variant,
+): ResolvedWalletIntegration {
+	return {
+		browser: walletIntegration.browser,
+		eip5792: resolveFeature(walletIntegration.eip5792, variant),
+	}
 }

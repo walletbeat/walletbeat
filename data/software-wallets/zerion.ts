@@ -55,6 +55,7 @@ export const zerion: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
+			eip5792: null,
 		},
 		license: null,
 		monetization: {

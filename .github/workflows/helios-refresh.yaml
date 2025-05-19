@@ -1,0 +1,19 @@
+name: Update Helios checkpoint
+on:
+  workflow_dispatch: {} # On demand
+  schedule: # On schedule
+    - cron: '0 0 */4 * *' # Every 4 days
+permissions:
+  contents: write
+jobs:
+  update-checkpoint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refresh Helios checkpoint
+        run: ./deploy/helios/helios-update.sh --checkpoint-only
+      - name: Commit checkpoint
+        run: |
+          git config --global user.name 'walletbeat-bot'
+          git config --global user.email 'walletbeat-bot@users.noreply.github.com'
+          ./deploy/helios/helios-checkpoint-push.sh

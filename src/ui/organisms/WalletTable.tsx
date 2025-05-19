@@ -8,7 +8,7 @@ import {
 	type Row,
 	useReactTable,
 } from '@tanstack/react-table'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
 import { PiDesktop, PiDeviceMobile, PiDeviceMobileSlash, PiGlobe, PiGlobeX } from 'react-icons/pi'
 
@@ -333,29 +333,52 @@ function createWalletNameCell(): ({ row }: { row: Row<TableRow> }) => React.Reac
 
 // Helper function for EIP standards with hover preview (non-link version)
 function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
-	const [isHovered, setIsHovered] = useState<boolean>(false)
+	const [isTagHovered, setIsTagHovered] = useState<boolean>(false)
+	const [isModalHovered, setIsModalHovered] = useState<boolean>(false)
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+	// Show modal if either tag or modal is hovered
+	const isHovered = isTagHovered || isModalHovered
+
+	// Timeout ref to avoid closing too quickly
+	const closeTimeout = useRef<NodeJS.Timeout | null>(null)
+
+	const handleTagMouseEnter = (e: React.MouseEvent<HTMLElement>): void => {
+		if (closeTimeout.current !== null) {
+			clearTimeout(closeTimeout.current)
+		}
+		setIsTagHovered(true)
+		setAnchorEl(e.currentTarget)
+	}
+
+	const handleTagMouseLeave = (): void => {
+		closeTimeout.current = setTimeout(() => {
+			setIsTagHovered(false)
+			setAnchorEl(null)
+		}, 100)
+	}
+
+	const handleModalMouseEnter = (): void => {
+		if (closeTimeout.current !== null) {
+			clearTimeout(closeTimeout.current)
+		}
+		setIsModalHovered(true)
+	}
+
+	const handleModalMouseLeave = (): void => {
+		closeTimeout.current = setTimeout(() => {
+			setIsModalHovered(false)
+			setAnchorEl(null)
+		}, 100)
+	}
 
 	return (
 		<React.Fragment>
 			<span
-				className="eip-tag text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f] relative z-10 cursor-help"
+				className="eip-tag inline-block text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f] relative z-10 cursor-help"
 				title={`${standard.prefix}-${standard.number} - Hover for details`}
-				onMouseEnter={e => {
-					setIsHovered(true)
-					setAnchorEl(e.currentTarget)
-				}}
-				onMouseLeave={() => {
-					// Use a timeout to allow moving the mouse to the modal
-					setTimeout(() => {
-						// Only close if not hovering the modal
-						const modalElement = document.querySelector('.eip-preview-modal')
-						if (modalElement === null || modalElement.matches(':hover')) {
-							setIsHovered(false)
-							setAnchorEl(null)
-						}
-					}, 100)
-				}}
+				onMouseEnter={handleTagMouseEnter}
+				onMouseLeave={handleTagMouseLeave}
 			>
 				#{standard.number}
 			</span>
@@ -363,10 +386,8 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 				<EipPreviewModal
 					eip={standard}
 					anchorEl={anchorEl}
-					onClose={() => {
-						setIsHovered(false)
-						setAnchorEl(null)
-					}}
+					onMouseEnter={handleModalMouseEnter}
+					onMouseLeave={handleModalMouseLeave}
 				/>
 			)}
 		</React.Fragment>
@@ -385,26 +406,28 @@ function ExpandableHardwareWalletRow({
 	const [selectedModel, setSelectedModel] = useState<string | null>(null)
 
 	const wallet = row.original.wallet
-	const models = getHardwareWalletModels(wallet)
+	const models: HardwareWalletModel[] = getHardwareWalletModels(wallet)
 	const flagshipModel = getFlagshipModel(wallet)
 
 	// Set the flagship model as the default selected model
-	useEffect(() => {
+	useEffect((): void => {
 		// Always have a selected model, even if there's only one
-		if (models.length > 0 && selectedModel === null) {
-			// If there's a flagship model, use it, otherwise use the first model
-			const modelToSelect = flagshipModel !== undefined ? flagshipModel.id : models[0].id
-			setSelectedModel(modelToSelect)
+		if (selectedModel === null && models.length > 0) {
+			// If flagshipModel.id exists, use it. Otherwise, use models[0].id.
+			// models[0].id is guaranteed to exist and be a string here because:
+			// 1. models.length > 0 (ensured by the if condition)
+			// 2. The lint error implies HardwareWalletModel.id is a non-nullable string.
+			// Therefore, the fallback `?? ''` was redundant.
+			const modelIdToSelect = flagshipModel?.id ?? models[0].id
+			setSelectedModel(modelIdToSelect)
 		}
 	}, [flagshipModel, models, selectedModel])
 
 	// Get the currently selected model name (used in wallet name column only)
-	const selectedModelName =
+	const selectedModelName: string =
 		selectedModel !== null
-			? (models.find(m => m.id === selectedModel)?.name ?? '')
-			: models.length > 0
-				? models[0].name
-				: ''
+			? (models.find((m: HardwareWalletModel): boolean => m.id === selectedModel)?.name ?? '')
+			: (models[0]?.name ?? '')
 
 	// Toggle expansion of the models list
 	const toggleExpanded = (): void => {
@@ -1002,14 +1025,14 @@ export default function WalletTable(): React.ReactElement {
 	return (
 		<div className="overflow-x-auto">
 			{/* Tabs - now fixed */}
-			<div className="sticky top-0 bg-white dark:bg-[#141414] z-10">
+			<div className="sticky top-0 z-10">
 				<div className="flex gap-4 xl:items-end xl:flex-row flex-col-reverse items-start">
 					<div className="flex gap-1">
 						<button
 							className={cx(
 								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
 								activeTab === WalletTableTab.SOFTWARE
-									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
+									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100'
 									: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]',
 							)}
 							onClick={() => {
@@ -1030,7 +1053,7 @@ export default function WalletTable(): React.ReactElement {
 							className={cx(
 								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
 								activeTab === WalletTableTab.HARDWARE
-									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
+									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100'
 									: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]',
 							)}
 							onClick={() => {
@@ -1153,7 +1176,7 @@ export default function WalletTable(): React.ReactElement {
 
 			{/* Table */}
 			<div className="overflow-x-auto">
-				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border">
+				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-background">
 					<thead>
 						{table.getHeaderGroups().map(headerGroup => (
 							<tr className="bg-tertiary" key={headerGroup.id}>

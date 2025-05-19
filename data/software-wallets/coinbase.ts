@@ -34,16 +34,7 @@ export const coinbase: SoftwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eip7702,
 			eip7702: supported({
-				contractCode: {
-					controllingSharesInSelfCustodyByDefault: 'YES',
-					keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
-					ref: {
-						explanation: 'Coinbase Wallet supports EIP-7702 via its smart wallet implementation.',
-						url: 'https://github.com/coinbase/smart-wallet',
-					},
-					tokenTransferTransactionGeneration:
-						TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				},
+				contract: 'UNKNOWN',
 				ref: {
 					explanation: 'Coinbase Wallet announced support for EIP-7702.',
 					url: 'https://www.coinbase.com/blog/coinbase-wallet-introduces-support-for-eip-7702',
@@ -61,6 +52,7 @@ export const coinbase: SoftwareWallet = {
 			}),
 			mpc: notSupported,
 			rawErc4337: supported({
+				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
 				ref: {
@@ -87,6 +79,7 @@ export const coinbase: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
+			eip5792: null,
 		},
 		license: {
 			license: License.BSD_3_CLAUSE,

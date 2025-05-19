@@ -1,5 +1,5 @@
 import type React from 'react'
-import { LuKey, LuWallet } from 'react-icons/lu'
+import { LuCpu, LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout } from '@/components/navigation'
 import { representativeWalletForType } from '@/data/wallets'
@@ -11,6 +11,7 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
+import { RenderContent } from '@/ui/atoms/RenderContent'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
 
@@ -37,19 +38,26 @@ export const walletNavigationGroups: NavigationGroup[] = Object.values(
 							case WalletType.HARDWARE:
 								return <LuKey />
 							case WalletType.EMBEDDED:
-								return null
+								return <LuCpu />
 						}
 					})(),
 					href: `/${walletTypeToUrlSlug(walletType)}`,
 					id: `${walletTypeToUrlSlug(walletType)}s`,
-					children: mapNonExemptAttributeGroupsInTree(
-						representativeWalletForType(walletType).overall,
-						attr => ({
-							title: attr.displayName,
-							href: `/${walletTypeToUrlSlug(walletType)}/${attr.id}`,
-							id: attr.id,
-						}),
-					),
+					children: [
+						{
+							title: 'Summary',
+							id: `summary`,
+							href: `/${walletTypeToUrlSlug(walletType)}/summary`,
+						},
+						...mapNonExemptAttributeGroupsInTree(
+							representativeWalletForType(walletType).overall,
+							attr => ({
+								title: attr.displayName,
+								href: `/${walletTypeToUrlSlug(walletType)}/${attr.id}`,
+								id: attr.id,
+							}),
+						),
+					],
 				},
 			],
 			overflow: false,
@@ -85,18 +93,18 @@ export function CriteriaPage({
 	return (
 		<NavigationPageLayout
 			groups={[
-				{
-					id: 'home',
-					items: [
-						{
-							title: 'Summary',
-							href: '/#summary',
-							id: 'summary',
-							icon: undefined,
-						},
-					],
-					overflow: false,
-				},
+				// {
+				// 	id: 'home',
+				// 	items: [
+				// 		{
+				// 			title: 'Summary',
+				// 			href: '/#summary',
+				// 			id: 'summary',
+				// 			icon: undefined,
+				// 		},
+				// 	],
+				// 	overflow: false,
+				// },
 				...walletNavigationGroups,
 				{
 					id: 'about',
@@ -125,9 +133,16 @@ export function CriteriaPage({
 								/>
 							</p>
 							{mapNonExemptGroupAttributes(evalGroup, evalAttr => (
-								<div key={evalAttr.attribute.id}>
-									<h2>{evalAttr.attribute.displayName}</h2>
-									<p>{evalAttr.attribute.id}</p>
+								<div key={evalAttr.attribute.id} className="space-y-2">
+									<h2 className="text-2xl font-extrabold text-accent">
+										{evalAttr.attribute.displayName}
+									</h2>
+									<div className="card">
+										<RenderContent
+											content={evalAttr.attribute.why.render({})}
+											typography={{ variant: 'body2' }}
+										/>
+									</div>
 								</div>
 							))}
 						</div>

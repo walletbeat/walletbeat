@@ -363,7 +363,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							1,
 							1,
 						),
-						backgroundColor: 'transparent',
+						backgroundColor: 'var(--background-primary)',
 					},
 					caption: (
 						<RenderTypographicContent
@@ -464,7 +464,11 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 									{index > 0 ? (
 										<div key="sectionDivider" className="w-4/5 mx-auto mt-6 mb-6 border-b" />
 									) : null}
-									<div key="sectionContainer" className="p-4 flex flex-col" style={section.css}>
+									<div
+										key="sectionContainer"
+										className="p-4 flex flex-col gap-4"
+										style={section.css}
+									>
 										<div key="sectionCornerControl" className="flex flex-row">
 											<div className="flex flex-col justify-center flex-1">
 												<AnchorHeader
