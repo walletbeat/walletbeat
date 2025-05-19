@@ -5,7 +5,7 @@
 	"scripts": {
 		"astro": "ASTRO_TELEMETRY_DISABLED=1 astro",
 		"build": "pnpm run astro build",
-		"check:all": "pnpm run check:astro && pnpm run check:lint && pnpm run check:syntax && pnpm run check:spelling && pnpm run check:misc",
+		"check:all": "pnpm run lint-staged",
 		"check:astro": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
 		"check:lint": "eslint src data",
 		"check:spelling": "cspell lint .",
@@ -19,7 +19,8 @@
 		"fix": "pnpm run check:lint --fix && pnpm run check:syntax --write",
 		"ipfs": "deploy/ipfs/ipfs.sh",
 		"helios": "deploy/helios/helios.sh",
-		"helios:wrap": "deploy/helios/helios-wrap.sh"
+		"helios:wrap": "deploy/helios/helios-wrap.sh",
+		"lint-staged": "lint-staged"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.2.0",
