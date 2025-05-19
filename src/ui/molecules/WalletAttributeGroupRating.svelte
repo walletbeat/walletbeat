@@ -186,7 +186,7 @@
 			</h4>
 
 			<p>
-				{#if typeof currentEvaluationAttribute.evaluation.value.shortExplanation?.render === 'function'}
+				{#if typeof currentEvaluationAttribute.evaluation.value.shortExplanation}
 					{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
 
 					<Typography
@@ -208,17 +208,6 @@
 							This is only the case on the {variantToName(selectedVariant, false)} version.
 						{/if}
 					{/if}
-				{:else if currentEvaluationAttribute.evaluation.value.shortExplanation}
-					{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
-
-					<Typography
-						content={currentEvaluationAttribute.evaluation.value.shortExplanation}
-						strings={{
-							WALLET_NAME: wallet.metadata.displayName,
-							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
-						}}
-					/>
 				{/if}
 			</p>
 
