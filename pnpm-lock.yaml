@@ -26,9 +26,6 @@ importers:
       '@fontsource/montserrat':
         specifier: ^5.2.5
         version: 5.2.5
-      '@fontsource/work-sans':
-        specifier: ^5.1.1
-        version: 5.1.1
       '@mui/icons-material':
         specifier: ^6.4.3
         version: 6.4.3(@mui/material@6.4.3(@emotion/react@11.14.0(@types/react@19.0.8)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.8)(react@19.0.0))(@types/react@19.0.8)(react@19.0.0))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.8)(react@19.0.0)
@@ -1225,9 +1222,6 @@ packages:
 
   '@fontsource/montserrat@5.2.5':
     resolution: {integrity: sha512-/OA+bdg1yqUArDUnEeCqDwgTDiIpvED56TxYskje8UKpsvjl/0A9eNod7IcdHz6/Osi70vo7briRO3la8/u+5Q==}
-
-  '@fontsource/work-sans@5.1.1':
-    resolution: {integrity: sha512-fKxyO68szc0pg1GMVP87lVwfDAU/Ku3gjJK5G8TonOjSQAyQjcHlnC7HENeyIgboC/+hocGklSnMYmldjyAJtw==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -7890,8 +7884,6 @@ snapshots:
   '@floating-ui/utils@0.2.9': {}
 
   '@fontsource/montserrat@5.2.5': {}
-
-  '@fontsource/work-sans@5.1.1': {}
 
   '@humanfs/core@0.19.1': {}
 
