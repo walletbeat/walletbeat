@@ -8,7 +8,7 @@ export type ValidateText<
 	Text extends string,
 	Strings_ extends Strings,
 > = (
-	FindFirstInvalidStringKey<Text, Strings_> extends infer StringKey ?
+	FindInvalidStringKeys<Text, Strings_> extends infer StringKey ?
 		StringKey extends string ?
 			[`${FormatStringKey<StringKey>} is not a valid string interpolation. Available interpolations:`, FormatStringKey<keyof Strings_ & string>]
 		:
@@ -17,26 +17,29 @@ export type ValidateText<
 		Ok
 )
 
-type FindFirstInvalidStringKey<
+type FindInvalidStringKeys<
 	Text extends string,
 	Strings_ extends Strings
 > = (
-	ExtractStringKeys<Text> extends infer StringKeys ?
-		StringKeys extends keyof Strings_ ?
-			never
-		:
-			StringKeys
-	:
-		never
+	Exclude<ExtractStringKeys<Text>, keyof Strings_>
 )
 
 type ExtractStringKeys<T extends string> = (
-	T extends `${infer _Before}${FormatStringKey<infer StringKey>}${infer After}` ?
-		StringKey | ExtractStringKeys<After>
+	T extends `${infer Before}${FormatStringKeyWithFallback<infer Key, infer Fallback>}${infer After}` ?
+		| Key
+		| (Fallback extends string ? ExtractStringKeys<Fallback> : never)
+		| ExtractStringKeys<After>
 	:
 		never
 )
 
 type FormatStringKey<StringKey extends string> = (
 	`{{${StringKey}}}`
+)
+
+type FormatStringKeyWithFallback<
+	StringKey extends string,
+	Fallback extends string | any
+> = (
+	`{{${Fallback extends string ? `${StringKey}|${Fallback}` : StringKey}}}`
 )
