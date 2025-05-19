@@ -28,6 +28,7 @@ export const elytro: SoftwareWallet = {
 			eoa: notSupported,
 			mpc: notSupported,
 			rawErc4337: supported({
+				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
@@ -55,6 +56,7 @@ export const elytro: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
+			eip5792: null,
 		},
 		license: null,
 		monetization: {

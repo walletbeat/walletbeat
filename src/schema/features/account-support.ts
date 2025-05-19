@@ -5,6 +5,7 @@ import {
 	nonEmptySetFromArray,
 } from '@/types/utils/non-empty'
 
+import type { SmartWalletContract } from '../contracts'
 import type { WithRef } from '../reference'
 import { isSupported, type NotSupported, type Support, type Supported } from './support'
 
@@ -85,7 +86,7 @@ export type AccountSupport = Exclude<
 		 * Support for smart accounts (pure ERC-4337 accounts for which the
 		 * address matches the contract code).
 		 */
-		rawErc4337: AccountTypeSupport<AccountTypeMutableMultifactor>
+		rawErc4337: AccountTypeSupport<AccountType4337>
 	},
 	// At least one account type must be supported.
 	Record<AccountType, NotSupported>
@@ -197,13 +198,15 @@ export type AccountTypeMutableMultifactor = AccountTypeMultifactor & {
 	keyRotationTransactionGeneration: TransactionGenerationCapability
 }
 
+/** A wallet backed by a smart contract. */
+export interface SmartAccountType {
+	contract: 'UNKNOWN' | SmartWalletContract
+}
+
+/** Support information for ERC-4337 accounts. */
+export type AccountType4337 = AccountTypeMutableMultifactor & SmartAccountType
+
 /**
  * Support information for EIP-7702 accounts.
  */
-export interface AccountType7702 {
-	/**
-	 * Information about the contract code that the wallet uses with EIP-7702
-	 * transactions.
-	 */
-	contractCode: AccountTypeMutableMultifactor
-}
+export type AccountType7702 = SmartAccountType

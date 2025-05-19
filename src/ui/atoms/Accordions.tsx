@@ -1,13 +1,7 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import {
-	Accordion,
-	AccordionDetails,
-	AccordionSummary,
-	darken,
-	useTheme,
-} from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import type React from 'react'
 import { useState } from 'react'
+import { LuChevronDown } from 'react-icons/lu'
 
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
@@ -28,7 +22,6 @@ export function Accordions({
 	interAccordionMargin?: string
 }): React.JSX.Element {
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({})
-	const theme = useTheme()
 
 	const handleChange = (id: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
 		setExpanded(prev => ({ ...prev, [id]: isExpanded }))
@@ -49,6 +42,7 @@ export function Accordions({
 						expanded={expanded[accordion.id] ?? false}
 						onChange={handleChange(accordion.id)}
 						sx={{
+							backgroundColor: 'var(--background-secondary)',
 							boxShadow: 'none',
 							borderTopLeftRadius: blankTop ? borderRadius : '0px',
 							borderTopRightRadius: blankTop ? borderRadius : '0px',
@@ -65,11 +59,16 @@ export function Accordions({
 					>
 						<AccordionSummary
 							key={`${accordion.id}-summary`}
-							expandIcon={<ExpandMoreIcon />}
+							expandIcon={
+								<div className="text-base text-primary">
+									<LuChevronDown />
+								</div>
+							}
 							aria-controls={`${accordion.id}-content`}
 							id={`${accordion.id}-header`}
 							sx={{
-								backgroundColor: theme.palette.background.paper,
+								color: 'var(--text-primary)',
+								backgroundColor: 'var(--background-secondary)', //theme.palette.background.paper,
 								borderTopLeftRadius: blankTop ? borderRadius : '0px',
 								borderTopRightRadius: blankTop ? borderRadius : '0px',
 								borderBottomLeftRadius:
@@ -84,14 +83,15 @@ export function Accordions({
 							key={`${accordion.id}-details`}
 							sx={{
 								padding: '16px',
-								backgroundColor:
-									theme.palette.mode === 'light'
-										? theme.palette.grey[100] // Light grey background for light mode
-										: darken(theme.palette.background.paper, 0.1), // Dark grey for dark mode
-								color:
-									theme.palette.mode === 'light'
-										? '#ffffff' // White text for light mode
-										: theme.palette.text.primary, // Default primary text (light) for dark mode
+								backgroundColor: 'var(--background-secondary)', //theme.palette.background.paper,
+								// backgroundColor:
+								// 	theme.palette.mode === 'light'
+								// 		? theme.palette.grey[100] // Light grey background for light mode
+								// 		: darken(theme.palette.background.paper, 0.1), // Dark grey for dark mode
+								color: 'var(--text-secondary)', //theme.palette.text.primary,
+								// theme.palette.mode === 'light'
+								// ? '#ffffff' // White text for light mode
+								// : theme.palette.text.primary, // Default primary text (light) for dark mode
 								borderBottomLeftRadius: blankBottom ? borderRadius : '0px',
 								borderBottomRightRadius: blankBottom ? borderRadius : '0px',
 							}}

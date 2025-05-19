@@ -7,21 +7,21 @@ import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import WalletTable from '@/ui/organisms/WalletTable'
 
-export const HomePage: FC = () => (
+export const HomePage: FC<{ selectedGroupId?: string }> = ({ selectedGroupId }) => (
 	<NavigationPageLayout
 		groups={[
-			{
-				id: 'home',
-				items: [
-					{
-						title: 'Summary',
-						href: '/#summary',
-						id: 'summary',
-						icon: undefined,
-					},
-				],
-				overflow: false,
-			},
+			// {
+			// 	id: 'home',
+			// 	items: [
+			// 		{
+			// 			title: 'Summary',
+			// 			href: '/#summary',
+			// 			id: 'summary',
+			// 			icon: undefined,
+			// 		},
+			// 	],
+			// 	overflow: false,
+			// },
 			...walletNavigationGroups,
 			{
 				id: 'about',
@@ -29,13 +29,15 @@ export const HomePage: FC = () => (
 				overflow: false,
 			},
 		]}
+		selectedGroupId={selectedGroupId}
+		selectedItemId={'summary'}
 	>
 		<div className="max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full">
 			<div className="flex flex-col lg:mt-10 gap-4">
-				<div className="px-8 py-6 flex justify-between items-start flex-wrap min-h-96 relative flex-col">
+				<div className="px-8 py-6 flex justify-between items-start flex-wrap min-h-96 relative flex-col md:flex-row">
 					<div className="flex flex-col gap-4 py-8 flex-1">
 						<div className="flex gap-2">
-							<div className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary">
+							<div className="bg-primary border px-2 py-1 rounded-md hover:bg-primary">
 								<div className="flex flex-row gap-2 items-center" key="repo">
 									<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
 									<ExternalLink
@@ -62,7 +64,7 @@ export const HomePage: FC = () => (
 						</p>
 					</div>
 					<div className="flex-1 flex justify-center items-center">
-						<img src="robot.png" alt="Walletbeat Robot" className="h-80 w-auto object-contain" />
+						<img src="/robot.png" alt="Walletbeat Robot" className="h-80 w-auto object-contain" />
 					</div>
 				</div>
 			</div>

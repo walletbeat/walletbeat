@@ -1,5 +1,10 @@
 import type { AccountSupport } from './features/account-support'
-import type { WalletIntegration } from './features/ecosystem/integration'
+import {
+	notApplicableWalletIntegration,
+	type ResolvedWalletIntegration,
+	resolveWalletIntegrationFeatures,
+	type WalletIntegration,
+} from './features/ecosystem/integration'
 import type { AddressResolution } from './features/privacy/address-resolution'
 import type { DataCollection } from './features/privacy/data-collection'
 import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'
@@ -236,11 +241,10 @@ export interface ResolvedFeatures {
 		reputation: ResolvedFeature<ReputationSupport> | null
 		maintenance: ResolvedFeature<MaintenanceSupport> | null
 	}
-	ecosystem: Record<string, unknown>
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
 	accountSupport: ResolvedFeature<AccountSupport>
 	multiAddress: ResolvedFeature<Support>
-	integration: WalletIntegration
+	integration: ResolvedWalletIntegration
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
 	license: ResolvedFeature<LicenseWithRef>
 	monetization: ResolvedFeature<Monetization>
@@ -312,13 +316,13 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 			reputation: hardwareFeat(features => features.transparency.reputation),
 			maintenance: hardwareFeat(features => features.transparency.maintenance),
 		},
-		ecosystem: {},
 		chainConfigurability: softwareFeat(features => features.chainConfigurability),
 		accountSupport: baseFeat(features => features.accountSupport),
 		multiAddress: baseFeat(features => features.multiAddress),
-		integration: isWalletSoftwareFeatures(features)
-			? features.integration
-			: { browser: 'NOT_A_BROWSER_WALLET' },
+		integration: resolveWalletIntegrationFeatures(
+			isWalletSoftwareFeatures(features) ? features.integration : notApplicableWalletIntegration,
+			variant,
+		),
 		addressResolution: softwareFeat(features => features.addressResolution),
 		license: baseFeat(features => features.license),
 		monetization: baseFeat(features => features.monetization),
