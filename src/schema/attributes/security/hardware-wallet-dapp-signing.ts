@@ -119,7 +119,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware wallet dApp signing support evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve hardware wallet dApp signing support?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve hardware wallet dApp signing support?`),
 	},
 	question: sentence(`Does the wallet support secure dApp signing with hardware wallets?`),
 	why: markdown(`

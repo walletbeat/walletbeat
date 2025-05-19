@@ -44,7 +44,7 @@ export const firmware: Attribute<FirmwareValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's firmware evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its firmware?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its firmware?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} have secure and open firmware?`),
 	why: markdown(`

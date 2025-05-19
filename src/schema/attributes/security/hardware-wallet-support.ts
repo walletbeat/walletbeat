@@ -76,7 +76,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware wallet support evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve hardware wallet support?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve hardware wallet support?`),
 	},
 	question: sentence(`Does the wallet support connecting to hardware wallets?`),
 	why: markdown(`

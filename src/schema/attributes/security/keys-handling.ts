@@ -47,7 +47,7 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's key handling evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its key handling?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its key handling?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} securely generate, protect, and handle keys?`),
 	why: markdown(`

@@ -46,7 +46,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a DIY wallet's supply chain evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its DIY supply chain?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its DIY supply chain?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} have a transparent and flexible DIY supply chain?`),
 	why: markdown(

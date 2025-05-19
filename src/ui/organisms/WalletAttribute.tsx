@@ -12,7 +12,7 @@ import {
 import { toFullyQualified } from '@/schema/reference'
 import type { Variant } from '@/schema/variants'
 import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet'
-import { isTypographicContent } from '@/types/content'
+import { isTypographicContent, sentence, type TypographicContent } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology'
 
@@ -137,12 +137,20 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	const accordions: NonEmptyArray<AccordionData> = [
 		{
 			id: `why-${evalAttr.attribute.id}`,
-			summary:
-				evalAttr.evaluation.value.rating === Rating.PASS ||
-				evalAttr.evaluation.value.rating === Rating.UNRATED
-					? 'Why does this matter?'
-					: 'Why should I care?',
-			contents: (
+			summary: (
+				<RenderTypographicContent
+					content={
+						sentence(
+							evalAttr.evaluation.value.rating === Rating.PASS ||
+							evalAttr.evaluation.value.rating === Rating.UNRATED
+								? 'Why does this matter?'
+								: 'Why should I care?'
+						)
+					}
+					typography={{ variant: 'h4' }}
+				/>
+			),
+			contents: 	(
 				<RenderTypographicContent
 					content={evalAttr.attribute.why}
 					typography={{ variant: 'body2' }}
@@ -151,10 +159,18 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		},
 		{
 			id: `methodology-${evalAttr.attribute.id}`,
-			summary:
-				evalAttr.attribute.wording.midSentenceName === null
-					? evalAttr.attribute.wording.howIsEvaluated
-					: `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`,
+			summary: (
+				<RenderTypographicContent
+					content={
+						sentence(
+							evalAttr.attribute.wording.midSentenceName === null
+								? evalAttr.attribute.wording.howIsEvaluated
+								: `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`
+						)
+					}
+					typography={{ variant: 'h4' }}
+				/>
+			),
 			contents: (
 				<AttributeMethodology attribute={evalAttr.attribute} evaluation={evalAttr.evaluation} />
 			),
@@ -165,10 +181,19 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	if (howToImprove !== undefined) {
 		accordions.push({
 			id: `how-${evalAttr.attribute.id}`,
-			summary:
-				evalAttr.attribute.wording.midSentenceName === null
-					? evalAttr.attribute.wording.whatCanWalletDoAboutIts
-					: `What can {{WALLET_NAME}} do about its ${evalAttr.attribute.wording.midSentenceName}?`,
+			summary: (
+				<RenderTypographicContent
+					content={
+						evalAttr.attribute.wording.midSentenceName === null
+							? evalAttr.attribute.wording.whatCanWalletDoAboutIts
+							: sentence(`What can {{WALLET_NAME}} do about its ${evalAttr.attribute.wording.midSentenceName}?`)
+					}
+					strings={{
+						WALLET_NAME: wallet.metadata.displayName,
+					}}
+					typography={{ variant: 'h4' }}
+				/>
+			),
 			contents: (
 				<RenderTypographicContent
 					content={howToImprove}
@@ -203,7 +228,6 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			<Accordions
 				accordions={accordions}
 				borderRadius={`${subsectionBorderRadius}px`}
-				summaryTypographyVariant="h4"
 				interAccordionMargin="1rem"
 			/>
 		</>

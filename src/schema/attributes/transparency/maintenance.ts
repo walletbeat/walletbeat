@@ -48,7 +48,7 @@ export const maintenance: Attribute<MaintenanceValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's maintenance evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its maintenance?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its maintenance?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} have good maintenance practices?`),
 	why: markdown(`

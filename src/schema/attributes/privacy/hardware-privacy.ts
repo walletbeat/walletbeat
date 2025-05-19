@@ -41,7 +41,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware privacy evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its hardware privacy?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its hardware privacy?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} protect user privacy at the hardware level?`),
 	why: markdown(

@@ -57,7 +57,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a factory wallet's supply chain evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its factory supply chain?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its factory supply chain?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} have a secure and transparent factory supply chain?`),
 	why: markdown(

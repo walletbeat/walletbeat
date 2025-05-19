@@ -101,7 +101,7 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's fee transparency evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve fee transparency?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve fee transparency?`),
 	},
 	question: sentence(`Does the wallet clearly display all transaction fees and their purpose?`),
 	why: markdown(`

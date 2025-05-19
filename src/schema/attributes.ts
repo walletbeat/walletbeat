@@ -342,7 +342,7 @@ export interface Attribute<V extends Value> {
 				howIsEvaluated: string
 
 				/** The sentence "What can <wallet> do about its <attribute>?" */
-				whatCanWalletDoAboutIts: string
+				whatCanWalletDoAboutIts: Sentence<{ WALLET_NAME: string }>
 		  }
 
 	/** A question explaining what question the attribute is answering. */

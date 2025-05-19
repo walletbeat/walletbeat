@@ -45,7 +45,7 @@ export const reputation: Attribute<ReputationValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's reputation evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its reputation?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its reputation?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} have a strong reputation for reliability and transparency?`),
 	why: markdown(

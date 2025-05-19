@@ -102,7 +102,7 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a hardware wallet's bug bounty program evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its bug bounty program?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its bug bounty program?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} implement a bug bounty program and provide security updates?`),
 	why: markdown(`

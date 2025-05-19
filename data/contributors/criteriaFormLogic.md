@@ -109,7 +109,7 @@ export const newFeature: Attribute<NewFeatureValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's new feature evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its new feature?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its new feature?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} implement this new feature?`),
 	why: markdown(`

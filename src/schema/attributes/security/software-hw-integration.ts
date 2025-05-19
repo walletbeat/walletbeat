@@ -107,7 +107,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a software wallet's hardware wallet integration evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its hardware wallet integration?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its hardware wallet integration?`),
 	},
 	question: sentence(`How well does the software wallet integrate with hardware wallets for clear signing?`),
 	why: markdown(`

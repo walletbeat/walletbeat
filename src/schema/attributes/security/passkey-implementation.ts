@@ -157,7 +157,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's passkey implementation evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its passkey implementation?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its passkey implementation?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} use a secure and efficient passkey verification library?`),
 	why: markdown(`

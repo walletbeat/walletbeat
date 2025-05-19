@@ -74,7 +74,7 @@ export const userSafety: Attribute<UserSafetyValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's user safety evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do to improve its user safety?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its user safety?`),
 	},
 	question: sentence(`Does {{WALLET_NAME}} provide comprehensive user safety features?`),
 	why: markdown(

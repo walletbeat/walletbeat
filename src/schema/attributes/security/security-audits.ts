@@ -112,7 +112,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's security auditing track record evaluated?",
-		whatCanWalletDoAboutIts: `What can {{WALLET_NAME}} do on the security auditing front?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do on the security auditing front?`),
 	},
 	question: sentence(`Has the wallet's source code been reviewed by security auditors?`),
 	why: markdown(`
