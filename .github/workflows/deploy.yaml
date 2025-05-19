@@ -1,20 +1,11 @@
-name: Deploy site via Edgeserver
-on:
-  push:
-    branches:
-      - beta
+name: Deploy site
+on: push
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
@@ -43,3 +34,10 @@ jobs:
           token: ${{ secrets.EDGE_TOKEN2 }}
           directory: dist
           context: true
+      - name: Deploy to Orbiter
+        run: ./deploy/deploy-orbiter.sh
+        env:
+          ORBITER_DOMAIN: walletbeat-beta
+          ORBITER_ACCESS_TOKEN: ${{ secrets.ORBITER_ACCESS_TOKEN }}
+          ORBITER_ACCESS_TOKEN_CREATION_DATE: ${{ secrets.ORBITER_ACCESS_TOKEN_CREATION_DATE }}
+          DEPLOY_DIRECTORY: dist
