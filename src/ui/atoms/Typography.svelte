@@ -1,31 +1,28 @@
-<script lang="ts" generics="
-	Context extends Record<string, any>
-">
+<script
+	lang="ts"
+	generics="
+		Content extends TypographicContent
+	"
+>
 	// Types
-	import { type Renderable, ContentType } from "@/types/content"
+	import { ContentType, type TypographicContent } from '@/types/content'
+	import { renderStrings } from '@/types/utils/text'
 
 
 	// Props
 	let {
-		renderable,
-		context,
+		content,
+		strings,
 	}: {
-		renderable: Renderable<Context>
-		context?: Context
+		content: Content
+		strings?: Content extends TypographicContent<infer Strings> ? Strings : undefined
 	} = $props()
-
-
-	// (Derived)
-	let content = $derived(
-		renderable.render(context)
-	)
 </script>
 
 
 {#if content.contentType === ContentType.TEXT}
-	{content.text}
+	{strings ? renderStrings(content.text, strings) : content.text}
 
 <!-- {:else if content.contentType === ContentType.MARKDOWN}
 	{content.markdown} -->
-
 {/if}

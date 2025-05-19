@@ -174,8 +174,10 @@
 
 			<p>
 				<Typography
-					renderable={attrGroup.perWalletQuestion}
-					context={wallet.metadata}	
+					content={attrGroup.perWalletQuestion}
+					strings={{
+						WALLET_NAME: wallet.metadata.displayName,
+					}}
 				/>
 			</p>
 		{:else if currentEvaluationAttribute?.evaluation?.value}
@@ -188,8 +190,12 @@
 					{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
 
 					<Typography
-						renderable={currentEvaluationAttribute.evaluation.value.shortExplanation}
-						context={wallet.metadata}
+						content={currentEvaluationAttribute.evaluation.value.shortExplanation}
+						strings={{
+							WALLET_NAME: wallet.metadata.displayName,
+							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+						}}
 					/>
 
 					{#if selectedVariant && wallet.variants[selectedVariant]}
@@ -206,8 +212,12 @@
 					{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
 
 					<Typography
-						renderable={currentEvaluationAttribute.evaluation.value.shortExplanation}
-						context={wallet.metadata}
+						content={currentEvaluationAttribute.evaluation.value.shortExplanation}
+						strings={{
+							WALLET_NAME: wallet.metadata.displayName,
+							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+						}}
 					/>
 				{/if}
 			</p>

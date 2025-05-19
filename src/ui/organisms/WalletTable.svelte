@@ -179,7 +179,10 @@
 					{#if !walletTableState.selectedVariant || wallet.variants[walletTableState.selectedVariant]}
 						<p class="blurb">
 							<Typography
-								renderable={wallet.metadata.blurb}
+								content={wallet.metadata.blurb}
+								strings={{
+									WALLET_NAME: wallet.metadata.displayName,
+								}}
 							/>
 						</p>
 					{:else}
