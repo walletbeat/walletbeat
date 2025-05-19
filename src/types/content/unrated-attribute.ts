@@ -9,6 +9,6 @@ export interface UnratedAttributeContent<V extends Value> {
 	componentProps: UnratedAttributeProps<V>
 }
 
-export function unratedAttributeContent<V extends Value>(): Content<EvaluationData<V>> {
+export function unratedAttributeContent<V extends Value>(): Content<{ WALLET_NAME: string }> {
 	return component<UnratedAttributeContent<V>, never>('UnratedAttribute', {})
 }

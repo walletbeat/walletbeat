@@ -21,11 +21,8 @@ export interface TransactionInclusionDetailsContent {
 }
 
 export function transactionInclusionDetailsContent(
-	bakedProps: Omit<
-		TransactionInclusionDetailsProps,
-		keyof EvaluationData<TransactionInclusionValue>
-	>,
-): Content<EvaluationData<TransactionInclusionValue>> {
+	bakedProps: Omit<TransactionInclusionDetailsProps, keyof EvaluationData<TransactionInclusionValue>>,
+): Content<{ WALLET_NAME: string }> {
 	return component<TransactionInclusionDetailsContent, keyof typeof bakedProps>(
 		'TransactionInclusionDetails',
 		bakedProps,

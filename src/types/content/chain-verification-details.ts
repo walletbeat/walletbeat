@@ -18,7 +18,7 @@ export interface ChainVerificationDetailsContent {
 
 export function chainVerificationDetailsContent(
 	bakedProps: Omit<ChainVerificationDetailsProps, keyof EvaluationData<ChainVerificationValue>>,
-): Content<EvaluationData<ChainVerificationValue>> {
+): Content<{ WALLET_NAME: string }> {
 	return component<ChainVerificationDetailsContent, keyof typeof bakedProps>(
 		'ChainVerificationDetails',
 		bakedProps,

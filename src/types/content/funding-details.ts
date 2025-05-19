@@ -15,6 +15,6 @@ export interface FundingDetailsContent {
 
 export function fundingDetailsContent(
 	bakedProps: Omit<FundingDetailsProps, keyof EvaluationData<FundingValue>>,
-): Content<EvaluationData<FundingValue>> {
+): Content<{ WALLET_NAME: string }> {
 	return component<FundingDetailsContent, keyof typeof bakedProps>('FundingDetails', bakedProps)
 }

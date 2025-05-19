@@ -10,6 +10,6 @@ export interface LicenseDetailsContent {
 	componentProps: LicenseDetailsProps
 }
 
-export function licenseDetailsContent(): Content<EvaluationData<OpenSourceValue>> {
+export function licenseDetailsContent(): Content<{ WALLET_NAME: string }> {
 	return component<LicenseDetailsContent, never>('LicenseDetails', {})
 }

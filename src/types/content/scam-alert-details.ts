@@ -12,6 +12,6 @@ export interface ScamAlertDetailsContent {
 
 export function scamAlertsDetailsContent(
 	bakedProps: Omit<ScamAlertDetailsProps, keyof EvaluationData<ScamPreventionValue>>,
-): Content<EvaluationData<ScamPreventionValue>> {
+): Content<{ WALLET_NAME: string }> {
 	return component<ScamAlertDetailsContent, keyof typeof bakedProps>('ScamAlertDetails', bakedProps)
 }

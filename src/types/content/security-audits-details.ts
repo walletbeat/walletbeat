@@ -15,7 +15,7 @@ export interface SecurityAuditsDetailsContent {
 
 export function securityAuditsDetailsContent(
 	bakedProps: Omit<SecurityAuditsDetailsProps, keyof EvaluationData<SecurityAuditsValue>>,
-): Content<EvaluationData<SecurityAuditsValue>> {
+): Content<{ WALLET_NAME: string }> {
 	return component<SecurityAuditsDetailsContent, keyof typeof bakedProps>(
 		'SecurityAuditsDetails',
 		bakedProps,

@@ -98,7 +98,7 @@ export interface WalletMetadata {
 	 * A short (two or three sentences) description about the wallet.
 	 * This is shown under the wallet's name in expanded view.
 	 */
-	blurb: Paragraph
+	blurb: Paragraph<{ WALLET_NAME: string }>
 
 	/**
 	 * If the wallet has a built-in username scheme, this should refer to
@@ -140,13 +140,17 @@ export interface AttributeOverride {
 	 * Contextual notes about why the wallet has this rating, or clarifications
 	 * about its rating.
 	 */
-	note?: Content<{ wallet: RatedWallet }>
+	note?: Content<{ WALLET_NAME: string }>
 
 	/**
 	 * What the wallet should do to improve its rating on this attribute.
 	 * Overrides the eponymous field in `Evaluation`.
 	 */
-	howToImprove?: TypographicContent<{ wallet: RatedWallet }>
+	howToImprove?: TypographicContent<{ 
+		WALLET_NAME: string;
+		WALLET_PSEUDONYM_SINGULAR?: string;
+		WALLET_PSEUDONYM_PLURAL?: string;
+	}>
 }
 
 /** Per-wallet overrides for attributes. */

@@ -10,6 +10,6 @@ export interface SourceVisibilityDetailsContent {
 	componentProps: SourceVisibilityDetailsProps
 }
 
-export function sourceVisibilityDetailsContent(): Content<EvaluationData<SourceVisibilityValue>> {
+export function sourceVisibilityDetailsContent(): Content<{ WALLET_NAME: string }> {
 	return component<SourceVisibilityDetailsContent, never>('SourceVisibilityDetails', {})
 }

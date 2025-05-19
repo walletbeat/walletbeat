@@ -18,7 +18,7 @@ export interface AddressCorrelationDetailsContent {
 
 export function addressCorrelationDetailsContent(
 	bakedProps: Omit<AddressCorrelationDetailsProps, keyof EvaluationData<AddressCorrelationValue>>,
-): Content<EvaluationData<AddressCorrelationValue>> {
+): Content<{ WALLET_NAME: string }> {
 	return component<AddressCorrelationDetailsContent, keyof typeof bakedProps>(
 		'AddressCorrelationDetails',
 		bakedProps,

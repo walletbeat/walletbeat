@@ -47,7 +47,7 @@ export function unrated<V extends Value>(
  */
 export function exempt<V extends Value>(
 	attribute: Attribute<V>,
-	whyExempt: Sentence,
+	whyExempt: Sentence<{ WALLET_NAME: string }>,
 	brand: string,
 	extraProps: Omit<V, keyof (Value & { __brand: string })> extends Record<string, never>
 		? null
