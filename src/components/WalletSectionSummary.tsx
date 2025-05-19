@@ -2,7 +2,7 @@ import cx from 'classnames'
 import type { ReactElement } from 'react'
 import { LuInfo } from 'react-icons/lu'
 
-import { getAttributeGroupInTree } from '@/schema/attribute-groups'
+import { getAttributeGroupInTree, calculateAttributeGroupScore } from '@/schema/attribute-groups'
 import type { AttributeGroup, ValueSet } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
 import { Tooltip } from '@/ui/atoms/Tooltip'
@@ -17,7 +17,7 @@ export function WalletSectionSummary<Vs extends ValueSet>(props: {
 }): ReactElement {
 	const { wallet, attrGroup } = props
 	const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup)
-	const score = attrGroup.score(evalGroup)
+	const score = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)
 	const percentageScore = score != null ? `${Math.round(score.score * 100)}%` : null
 
 	const color =

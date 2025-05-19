@@ -463,11 +463,9 @@ export interface AttributeGroup<Vs extends ValueSet> {
 	attributes: { [K in keyof Vs]: Attribute<Vs[K]> }
 
 	/**
-	 * A scoring function for the attributes.
-	 * @param evaluations The set of evaluated attributes.
-	 * @return A score between 0.0 (lowest) and 1.0 (highest).
+	 * The weights for each attribute when calculating the score for this attribute group.
 	 */
-	score: (evaluations: EvaluatedGroup<Vs>) => MaybeUnratedScore
+	attributeWeights: { [K in keyof Vs]: number }
 }
 
 /**
