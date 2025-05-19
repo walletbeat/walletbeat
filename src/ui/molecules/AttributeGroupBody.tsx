@@ -17,7 +17,7 @@ export function AttributeGroupBody<Vs extends ValueSet>(props: {
 	const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup)
 
 	return (
-		<div className="pb-2 mb-2">
+		<div className="pb-2 mb-2 card">
 			<EvaluatedGroupOverview
 				wallet={wallet}
 				// attrGroup={attrGroup}

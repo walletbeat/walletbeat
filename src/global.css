@@ -22,7 +22,7 @@
 		--banner-gradient-from: #ecedfd;
 		--banner-gradient-to: #e8f6f2;
 		--icon-color: #222222; /* Add icon color for light mode */
-		--navigation-bg: #f7f7f7; /* Navigation background color for light mode */
+		--navigation-bg: var(--background-secondary); /* Navigation background color for light mode */
 		--disabled-text: #b1b2b9;
 		--pass: #2ecc71;
 		--fail: #e74c3c;
@@ -62,7 +62,7 @@ html.dark {
 	--banner-gradient-from: #15151a;
 	--banner-gradient-to: #212126;
 	--icon-color: #efefef; /* Add icon color for dark mode */
-	--navigation-bg: #000000; /* Navigation background color for dark mode */
+	--navigation-bg: var(--background-secondary); /* Navigation background color for dark mode */
 	--disabled-text: #656566;
 	--pass: #2ecc71;
 	--fail: #e74c3c;
@@ -89,8 +89,8 @@ html.dark {
 html,
 body {
 	color: var(--text-primary) !important;
-	background-color: var(--background-primary) !important;
-	background: var(--background-primary) !important;
+	background-color: var(--background-secondary) !important;
+	background: var(--background-secondary) !important;
 	font-size: 16px !important;
 }
 
@@ -118,7 +118,7 @@ body {
 }
 
 .card {
-	background-color: var(--background-secondary);
+	background-color: var(--background-primary);
 	border-radius: 8px;
 }
 
@@ -169,7 +169,7 @@ html.dark {
 }
 
 * {
-	font-family: 'Montserrat', 'Noto Color Emoji';
+	font-family: 'Montserrat', sans-serif, 'Noto Color Emoji';
 }
 
 code {

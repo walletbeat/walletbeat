@@ -4,9 +4,9 @@
 		{
 			"label": "PNPM Dev",
 			"type": "shell",
-			"command": "nix-shell --run 'pnpm install && pnpm dev'",
+			"command": "pnpm install && pnpm dev",
 			"options": {
-				"cwd": "${workspaceFolder}/web"
+				"cwd": "${workspaceFolder}"
 			},
 			"problemMatcher": [],
 			"isBackground": true,
@@ -15,15 +15,5 @@
 				"panel": "shared"
 			}
 		},
-		{
-			"label": "Start Dev Environment",
-			"dependsOn": ["Docker Compose Up", "PNPM Dev", "Bacon", "Cargo Run"],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"dependsOrder": "parallel",
-			"problemMatcher": []
-		}
 	]
 }

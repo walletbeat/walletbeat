@@ -1025,14 +1025,14 @@ export default function WalletTable(): React.ReactElement {
 	return (
 		<div className="overflow-x-auto">
 			{/* Tabs - now fixed */}
-			<div className="sticky top-0 bg-white dark:bg-[#141414] z-10">
+			<div className="sticky top-0 z-10">
 				<div className="flex gap-4 xl:items-end xl:flex-row flex-col-reverse items-start">
 					<div className="flex gap-1">
 						<button
 							className={cx(
 								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
 								activeTab === WalletTableTab.SOFTWARE
-									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
+									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100'
 									: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]',
 							)}
 							onClick={() => {
@@ -1053,7 +1053,7 @@ export default function WalletTable(): React.ReactElement {
 							className={cx(
 								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
 								activeTab === WalletTableTab.HARDWARE
-									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100 border border-b-0 border-[#DE69BB]'
+									? 'bg-white dark:bg-[#292C34] shadow-sm text-gray-800 dark:text-gray-100'
 									: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-[#EAEAEA] dark:bg-[#17191f]',
 							)}
 							onClick={() => {
@@ -1176,7 +1176,7 @@ export default function WalletTable(): React.ReactElement {
 
 			{/* Table */}
 			<div className="overflow-x-auto">
-				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border">
+				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-background">
 					<thead>
 						{table.getHeaderGroups().map(headerGroup => (
 							<tr className="bg-tertiary" key={headerGroup.id}>

@@ -54,7 +54,7 @@ export const WalletHeading: FC<{
 							value !== undefined && (
 								<div
 									key={value.key ?? 'hi'}
-									className="bg-primary border px-2 py-1 rounded-md hover:bg-secondary"
+									className="bg-primary border px-2 py-1 rounded-md hover:bg-primary"
 								>
 									{value}
 								</div>

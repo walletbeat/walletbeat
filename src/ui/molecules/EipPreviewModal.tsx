@@ -75,7 +75,7 @@ export function EipPreviewModal({
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
 		>
-			<div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-5 w-full border border-gray-200 dark:border-gray-700">
+			<div className="bg-background shadow-lg rounded-lg p-5 w-full border border-gray-200 dark:border-gray-700">
 				<div className="flex items-center mb-4">
 					<div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">
 						{eip.prefix}-{eip.number}
