@@ -17,7 +17,9 @@
 		"preview": "pnpm run astro preview",
 		"prepare": "test -d .git && pnpm husky || true",
 		"fix": "pnpm run check:lint --fix && pnpm run check:syntax --write",
-		"ipfs": "deploy/ipfs/ipfs.sh"
+		"ipfs": "deploy/ipfs/ipfs.sh",
+		"helios": "deploy/helios/helios.sh",
+		"helios:wrap": "deploy/helios/helios-wrap.sh"
 	},
 	"dependencies": {
 		"@astrojs/react": "^4.2.0",

@@ -17,4 +17,4 @@ if [[ -z "${BLUMEN_PK:-}" ]]; then
 fi
 
 DIRECTORY_CID="$(pnpm --silent ipfs add -Qr --only-hash --cid-version 1 "$DEPLOY_DIRECTORY")"
-pnpm blumen ens "$DIRECTORY_CID" "$ENS_DOMAIN"
+pnpm helios:wrap pnpm blumen ens --rpc-url='$HELIOS_RPC_ENDPOINT' "$DIRECTORY_CID" "$ENS_DOMAIN"
