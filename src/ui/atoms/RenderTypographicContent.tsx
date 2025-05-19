@@ -6,14 +6,16 @@ import { renderStrings } from '@/types/utils/text'
 
 import { MarkdownTypography } from './MarkdownTypography'
 
-export function RenderTypographicContent({
+export function RenderTypographicContent<
+	TypographicContent_ extends TypographicContent,
+>({
 	content,
 	textTransform,
 	typography,
-	strings = {},
+	strings,
 }: {
 	/** The typographic content to render. */
-	content: TypographicContent
+	content: TypographicContent_
 
 	/**
 	 * A text transformation applied to the text.
@@ -39,14 +41,15 @@ export function RenderTypographicContent({
 	>
 
 	/** A set of strings to be expanded in the text. */
-	strings?: Record<string, string | undefined>
+	strings?: TypographicContent_ extends TypographicContent<infer Strings> ? Strings : undefined,
 }): React.JSX.Element {
 	const processText = (text: string) => {
 		if (textTransform) {
 			text = textTransform(text)
 		}
 
-		text = renderStrings(text, strings)
+		if(strings)
+			text = renderStrings(text, strings)
 
 		return text.trim()
 	}

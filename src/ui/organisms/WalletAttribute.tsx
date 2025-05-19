@@ -25,7 +25,7 @@ import { subsectionTheme } from '../../components/ThemeRegistry/theme'
 import { variantToName } from '../../components/variants'
 import { type AccordionData, Accordions } from '../atoms/Accordions'
 import { ReferenceLinks } from '../atoms/ReferenceLinks'
-import { RenderContent } from '../atoms/RenderContent'
+import { RenderCustomContent } from '../atoms/RenderCustomContent'
 import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { WrapIcon } from '../atoms/WrapIcon'
 import { WrapRatingIcon } from '../atoms/WrapRatingIcon'
@@ -86,17 +86,24 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	let rendered = (
 		<>
 			<React.Fragment key="details">
-				<RenderContent
-					content={details}
-					strings={{
-						WALLET_NAME: wallet.metadata.displayName,
-						WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-						WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
-					}}
-					typography={{
-						fontWeight: subsectionWeight,
-					}}
-				/>
+				{isTypographicContent(details) ? (
+					<RenderTypographicContent
+						content={details}
+						strings={{
+							WALLET_NAME: wallet.metadata.displayName,
+						}}
+						typography={{
+							fontWeight: subsectionWeight,
+						}}
+					/>
+				) : (
+					<RenderCustomContent
+						content={details}
+						value={evalAttr.evaluation.value}
+						wallet={wallet}
+						references={qualRefs}
+					/>
+				)}
 			</React.Fragment>
 			<React.Fragment key="variantSpecific">{variantSpecificCaption}</React.Fragment>
 			<React.Fragment key="impact">
@@ -107,8 +114,6 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 							content={evalAttr.evaluation.impact}
 							strings={{
 								WALLET_NAME: wallet.metadata.displayName,
-								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-								WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
 							}}
 							typography={{
 								fontWeight: subsectionWeight,
@@ -138,7 +143,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					? 'Why does this matter?'
 					: 'Why should I care?',
 			contents: (
-				<RenderContent
+				<RenderTypographicContent
 					content={evalAttr.attribute.why}
 					typography={{ variant: 'body2' }}
 				/>
@@ -187,12 +192,10 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					iconWidth={subsectionIconWidth}
 					sx={{ marginTop: '1rem' }}
 				>
-					<RenderContent
+					<RenderTypographicContent
 						content={override.note}
 						strings={{
 							WALLET_NAME: wallet.metadata.displayName,
-							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
 						}}
 					/>
 				</WrapIcon>

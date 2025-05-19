@@ -140,7 +140,7 @@ export interface AttributeOverride {
 	 * Contextual notes about why the wallet has this rating, or clarifications
 	 * about its rating.
 	 */
-	note?: Content<{ WALLET_NAME: string }>
+	note?: Paragraph<{ WALLET_NAME: string }>
 
 	/**
 	 * What the wallet should do to improve its rating on this attribute.
