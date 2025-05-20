@@ -54,6 +54,10 @@ jobs:
         env:
           DEPLOY_DIRECTORY: dist
           BLUMEN_LIGHTHOUSE_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_LIGHTHOUSE_API_KEY }}
+      - name: Ping IPFS gateways
+        run: ./deploy/ping-gateways.sh
+        env:
+          DEPLOY_DIRECTORY: dist
       - name: Update beta.walletbeat.eth ENS records
         run: ./deploy/update-ens.sh
         env:
