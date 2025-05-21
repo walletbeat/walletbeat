@@ -209,9 +209,9 @@ html.dark {
 
 .stack {
 	display: grid;
-	grid: "stack";
+	grid: 'stack';
 
-	&>*,
+	& > *,
 	&::before,
 	&::after {
 		grid-area: stack;
