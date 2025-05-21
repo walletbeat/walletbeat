@@ -7,6 +7,7 @@
 		arcLabel: string
 		tooltip: string
 		tooltipValue: string
+		href?: string
 	}
 
 	export const Layout = {
@@ -198,7 +199,7 @@
 		style:--rotationAngle={sliceParams.rotationAngle(i)}
 		class:highlighted={highlightedSliceId === slice.id}
 		data-slice-id={slice.id}
-		role="button"
+		role={slice.href ? 'link' : 'button'}
 		tabindex="0"
 		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
@@ -216,9 +217,17 @@
 			}
 		}}
 	>
-		<path d={sliceParams.path} fill={slice.color}>
-			<title>{slice.tooltip}: {slice.tooltipValue}</title>
-		</path>
+		{#if slice.href}
+			<a href={slice.href}>
+				<path d={sliceParams.path} fill={slice.color}>
+					<title>{slice.tooltip}: {slice.tooltipValue}</title>
+				</path>
+			</a>
+		{:else}
+			<path d={sliceParams.path} fill={slice.color}>
+				<title>{slice.tooltip}: {slice.tooltipValue}</title>
+			</path>
+		{/if}
 
 		<line x1="0" y1="0" x2="0" y2={-sliceParams.innerRadius} class="label-line" />
 		<text class="slice-label" aria-hidden="true">
