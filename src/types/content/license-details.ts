@@ -1,7 +1,7 @@
 import type { EvaluationData } from '@/schema/attributes'
 import type { OpenSourceValue } from '@/schema/attributes/transparency/open-source'
 
-import { component, type Renderable } from '../content'
+import { component, type Content } from '../content'
 
 export interface LicenseDetailsProps extends EvaluationData<OpenSourceValue> {}
 
@@ -10,6 +10,6 @@ export interface LicenseDetailsContent {
 	componentProps: LicenseDetailsProps
 }
 
-export function licenseDetailsContent(): Renderable<EvaluationData<OpenSourceValue>> {
+export function licenseDetailsContent(): Content<{ WALLET_NAME: string }> {
 	return component<LicenseDetailsContent, never>('LicenseDetails', {})
 }

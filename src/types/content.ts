@@ -8,6 +8,7 @@ import type { SecurityAuditsDetailsContent } from './content/security-audits-det
 import type { SourceVisibilityDetailsContent } from './content/source-visibility-details'
 import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
 import type { UnratedAttributeContent } from './content/unrated-attribute'
+import type { Strings, ValidateText } from './utils/string-templates'
 import { trimWhitespacePrefix } from './utils/text'
 
 /**
@@ -41,23 +42,26 @@ export type ComponentAndProps =
 /**
  * Text-based content that may be displayed on the UI.
  */
-export interface TextContent {
+export type TextContent<Strings_ extends Strings = Strings> = {
 	contentType: ContentType.TEXT
 	text: string
+	strings?: Strings_
 }
 
 /**
  * Markdown-based content that may be displayed on the UI.
+ * Also includes a text property to make it compatible with TypographicContent interfaces.
  */
-export interface MarkdownContent {
+export type MarkdownContent<Strings_ extends Strings = Strings> = {
 	contentType: ContentType.MARKDOWN
 	markdown: string
+	strings?: Strings_
 }
 
 /**
  * Custom-component-based content that may be displayed on the UI.
  */
-export interface CustomContent {
+export type CustomContent = {
 	contentType: ContentType.COMPONENT
 	component: ComponentAndProps
 }
@@ -65,143 +69,132 @@ export interface CustomContent {
 /**
  * Typographic content that may be displayed on the UI.
  */
-export type TypographicContent = TextContent | MarkdownContent
+export type TypographicContent<Strings_ extends Strings = Strings> = (
+	| TextContent<Strings_>
+	| MarkdownContent<Strings_>
+)
 
 /**
  * Represents any type of content that may be displayed on the UI.
  */
-export type Content = TypographicContent | CustomContent
+export type Content<Strings_ extends Strings = Strings> = (
+	| TypographicContent<Strings_>
+	| CustomContent
+)
 
 /**
  * Type predicate for TypographicContent.
  * @param content The content to check.
  * @returns Whether `content` is of type `TypographicContent`.
  */
-export function isTypographicContent(content: Content): content is TypographicContent {
+export function isTypographicContent<Strings_ extends Strings>(content: Content): content is TypographicContent<Strings_> {
 	return content.contentType === ContentType.TEXT || content.contentType === ContentType.MARKDOWN
 }
 
-/** An input template for rendering. */
-type Input = object
-
-/** Arbitrary renderable content. */
-export interface Renderable<I extends Input = Input> {
-	/** Renders the element given an input template. */
-	render: (input: I) => Content
-}
-
-/** A Renderable that renders typographic content. */
-export interface RenderableTypography<I extends Input = Input> extends Renderable<I> {
-	render: (input: I) => TypographicContent
-}
-
-function textContent<I extends Input = Input>(
-	text: string | ((input: I) => string),
-	input: I,
-): TextContent {
+/**
+ * Create text content with optional template variables
+ */
+function textContent<
+	Strings_ extends Strings,
+	_Text extends string = string,
+>(
+	text: _Text,
+	strings?: Strings_,
+) {
 	return {
 		contentType: ContentType.TEXT,
-		text: trimWhitespacePrefix(typeof text === 'string' ? text : text(input)),
-	}
+		text: trimWhitespacePrefix(text),
+		...strings && { strings },
+	} as ValidateText<TextContent<Strings_>, _Text, Strings_>
 }
 
-function markdownContent<I extends Input = Input>(
-	md: string | ((input: I) => string),
-	input: I,
-): MarkdownContent {
+export function markdown<
+	Strings_ extends Strings,
+	_Text extends string = string,
+>(
+	markdownText: _Text,
+	strings?: Strings_,
+) {
 	return {
 		contentType: ContentType.MARKDOWN,
-		markdown: trimWhitespacePrefix(typeof md === 'string' ? md : md(input)),
-	}
+		markdown: trimWhitespacePrefix(markdownText),
+		...strings && { strings },
+	} as ValidateText<MarkdownContent<Strings_>, _Text, Strings_>
 }
 
-const sentenceBrand = 'sentence'
 const sentenceMaxLength = 384
 
-/** A single sentence. */
-export type Sentence<I extends Input = Input> = RenderableTypography<I> & {
-	__brand: 'sentence'
-}
+export type Sentence<Strings_ extends Strings> = (
+	TypographicContent<Strings_>
+)
 
-/** A renderable sentence. */
-export function sentence<I extends Input = Input>(
-	text: string | ((input: I) => string),
-	isMarkdown?: boolean,
-): Sentence<I> {
+/** A single sentence. */
+export function sentence<
+	Strings_ extends Strings,
+	_Text extends string = string,
+>(
+	text: _Text,
+	strings?: Strings_,
+) {
 	if (text.length > sentenceMaxLength) {
 		throw new Error(
 			`Sentence text is too long (${text.length} characters is over the maximum length of ${sentenceMaxLength} characters).`,
 		)
 	}
-	if (isMarkdown ?? false) {
-		return {
-			render: (input: I) => markdownContent(text, input),
-			__brand: sentenceBrand,
-		}
-	}
-	return {
-		render: (input: I) => textContent(text, input),
-		__brand: sentenceBrand,
-	}
+
+	return textContent(text, strings)
 }
 
 /** A renderable Markdown-rendered sentence. */
-export function mdSentence<I extends Input = Input>(
-	text: string | ((input: I) => string),
-): Sentence<I> {
-	return sentence(text, true /* isMarkdown */)
+export function mdSentence<
+	Strings_ extends Strings,
+	_Text extends string = string,
+>(
+	text: _Text,
+	strings?: Strings_,
+) {
+	return markdown(text, strings)
 }
 
-const paragraphBrand = 'paragraph'
 const paragraphMaxLength = 1024
 
 /** A short amount of text that fits in a single paragraph. */
-export type Paragraph<I extends Input = Input> = RenderableTypography<I> & {
-	__brand: 'paragraph'
-}
+
+export type Paragraph<Strings_ extends Strings> = (
+	TextContent<Strings_>
+)
 
 /** A renderable paragraph. */
-export function paragraph<I extends Input = Input>(
-	text: string | ((input: I) => string),
-	isMarkdown?: boolean,
-): Paragraph<I> {
+export function paragraph<
+	Strings_ extends Strings,
+	_Text extends string = string,
+>(
+	text: _Text,
+	strings?: Strings_,
+) {
 	if (text.length > paragraphMaxLength) {
 		throw new Error(
 			`Paragraph text is too long (${text.length} characters is over the maximum length of ${paragraphMaxLength} characters).`,
 		)
 	}
-	if (isMarkdown ?? false) {
-		return {
-			render: (input: I) => markdownContent(text, input),
-			__brand: paragraphBrand,
-		}
-	}
-	return {
-		render: (input: I) => textContent(text, input),
-		__brand: paragraphBrand,
-	}
+
+	return textContent(text, strings)
 }
 
 /** A renderable Markdown-rendered paragraph. */
-export function mdParagraph<I extends Input = Input>(
-	text: string | ((input: I) => string),
-): Paragraph<I> {
-	return paragraph(text, true /* isMarkdown */)
-}
+export function mdParagraph<
+	Strings_ extends Strings,
+	_Text extends string = string,
+>(
+	text: _Text,
+	strings?: Strings_,
+) {
+	if (text.length > paragraphMaxLength)
+		throw new Error(
+			`Paragraph text is too long (${text.length} characters is over the maximum length of ${paragraphMaxLength} characters).`,
+		)
 
-const markdownBrand = 'markdown'
-
-export type Markdown<I extends Input> = RenderableTypography<I> & {
-	__brand: 'markdown'
-}
-
-export function markdown<I extends Input = Input>(
-	md: string | ((input: I) => string),
-): Markdown<I> {
-	return {
-		render: (input: I) => markdownContent(md, input),
-		__brand: markdownBrand,
-	}
+	return markdown(text, strings)
 }
 
 /**
@@ -220,38 +213,24 @@ function mergeProps<XY extends object, X extends keyof XY>(
 
 /**
  * Custom content with a custom component type.
- *
- * Type parameters:
- *   - C: One of the possible components in ComponentAndProps.
- *   - B: Set of keys in C's component props that will get baked in at
- *     the `component` function call site, as opposed to being specified
- *     as part of the `render` function's `input`.
- *   - I: The `Input` type passed to `render`. Must contain all of C's
- *     props that were not baked in B.
- *
- * @param component The custom component name.
- * @param bakedProps A subset of the component's props; the rest will need
- *                   to be passed to `render`.
- * @returns A `Renderable` that renders using a custom component.
  */
 export function component<
 	C extends ComponentAndProps,
 	B extends keyof C['componentProps'],
-	I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
-		Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
->(componentName: C['component'], bakedProps: Pick<C['componentProps'], B>): Renderable<I> {
+// I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
+// 	Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
+>(
+	componentName: C['component'],
+	componentProps: Pick<C['componentProps'], B>
+): CustomContent {
 	return {
-		render: (input: I): CustomContent => {
-			const comp: { component: C['component']; componentProps: C['componentProps'] } = {
-				component: componentName,
-				componentProps: {
-					...mergeProps<C['componentProps'], B>(bakedProps, input),
-				},
-			}
-			return {
-				contentType: ContentType.COMPONENT,
-				component: comp as C, // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- We've already typechecked that both the component and its props correspond to C.
-			}
-		},
+		contentType: ContentType.COMPONENT,
+		component: {
+			component: componentName,
+			componentProps,
+			// componentProps: {
+			// 	...mergeProps<C['componentProps'], B>(, input),
+			// },
+		} as C
 	}
 }

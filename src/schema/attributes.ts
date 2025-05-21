@@ -1,4 +1,4 @@
-import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content'
+import type { Paragraph, Content, TypographicContent, Sentence } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
 
 import type { ResolvedFeatures } from './features'
@@ -166,7 +166,7 @@ export interface Value {
 	 * Should be similar to `displayName` but may be formatted with the name
 	 * of the wallet.
 	 */
-	shortExplanation: Sentence<WalletMetadata>
+	shortExplanation: Sentence<{ WALLET_NAME: string; WALLET_PSEUDONYM_SINGULAR?: string; WALLET_PSEUDONYM_PLURAL?: string }>
 
 	/**
 	 * The visual representation of this value.
@@ -224,7 +224,7 @@ export interface Evaluation<V extends Value> {
 	 * This can be more verbose but should still avoid repeating information
 	 * already stated in the attribute explanation.
 	 */
-	details: Renderable<EvaluationData<V>>
+	details: Content<{ WALLET_NAME: string }>
 
 	/**
 	 * An optional paragraph explaining the consequence of this value on the
@@ -235,14 +235,18 @@ export interface Evaluation<V extends Value> {
 	 * should explain the upsides or downsides of FOSS licensing on the wallet
 	 * software (e.g. "FOSS means more contributors").
 	 */
-	impact?: Paragraph<EvaluationData<V>>
+	impact?: Paragraph<{ WALLET_NAME: string }>
 
 	/**
 	 * An optional paragraph or list of suggestions on what the wallet can do
 	 * to improve this rating. Should only be populated for ratings that are
 	 * not perfect.
 	 */
-	howToImprove?: RenderableTypography<EvaluationData<V>>
+	howToImprove?: TypographicContent<{ 
+		WALLET_NAME: string;
+		WALLET_PSEUDONYM_SINGULAR?: string;
+		WALLET_PSEUDONYM_PLURAL?: string;
+	}>
 
 	/**
 	 * Optional array of references with URLs and explanations.
@@ -280,7 +284,7 @@ export interface ExampleRating<V extends Value> {
 	 * Must start with "The wallet " (possibly after whitespace) or
 	 * "The wallet's ".
 	 */
-	description: Sentence | Paragraph
+	description: Sentence<{ WALLET_NAME: string }> | Paragraph<{ WALLET_NAME: string }>
 
 	/**
 	 * Match function that determines whether the given `value` matches this
@@ -338,17 +342,17 @@ export interface Attribute<V extends Value> {
 				howIsEvaluated: string
 
 				/** The sentence "What can <wallet> do about its <attribute>?" */
-				whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) => string
+				whatCanWalletDoAboutIts: Sentence<{ WALLET_NAME: string }>
 		  }
 
 	/** A question explaining what question the attribute is answering. */
-	question: Sentence<WalletMetadata>
+	question: Sentence<{ WALLET_NAME: string }>
 
 	/** A paragraph explaining why this attribute is important to users. */
-	why: RenderableTypography
+	why: TypographicContent<{ WALLET_NAME: string }>
 
 	/** General explanation of how wallets are rated on this attribute. */
-	methodology: RenderableTypography
+	methodology: TypographicContent<{ WALLET_NAME: string }>
 
 	/** Explanations of what a wallet can do to achieve each rating. */
 	ratingScale:
@@ -361,7 +365,7 @@ export interface Attribute<V extends Value> {
 				display: 'simple'
 
 				/** The content to display to explain the rating scale. */
-				content: RenderableTypography
+				content: TypographicContent<{ WALLET_NAME: string }>
 		  }
 		| {
 				/**
@@ -457,17 +461,15 @@ export interface AttributeGroup<Vs extends ValueSet> {
 	 * For example, for an attribute group about privacy, a good question
 	 * might be "How well does {wallet} protect your privacy?".
 	 */
-	perWalletQuestion: Sentence<Pick<WalletMetadata, 'displayName'>>
+	perWalletQuestion: Sentence<{ WALLET_NAME: string }>
 
 	/** The actual set of attributes belonging to this group. */
 	attributes: { [K in keyof Vs]: Attribute<Vs[K]> }
 
 	/**
-	 * A scoring function for the attributes.
-	 * @param evaluations The set of evaluated attributes.
-	 * @return A score between 0.0 (lowest) and 1.0 (highest).
+	 * The weights for each attribute when calculating the score for this attribute group.
 	 */
-	score: (evaluations: EvaluatedGroup<Vs>) => MaybeUnratedScore
+	attributeWeights: { [K in keyof Vs]: number }
 }
 
 /**

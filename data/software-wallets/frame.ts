@@ -18,9 +18,7 @@ export const frame: SoftwareWallet = {
 		id: 'frame',
 		displayName: 'Frame',
 		tableName: 'Frame',
-		blurb: paragraph(`
-			Frame...
-		`),
+		blurb: paragraph(`Frame...`),
 		contributors: [polymutex, nconsigny, lucemans],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-13',

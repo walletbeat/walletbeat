@@ -21,8 +21,10 @@
 		--border: #cecece;
 		--banner-gradient-from: #ecedfd;
 		--banner-gradient-to: #e8f6f2;
-		--icon-color: #222222; /* Add icon color for light mode */
-		--navigation-bg: var(--background-secondary); /* Navigation background color for light mode */
+		--icon-color: #222222;
+		/* Add icon color for light mode */
+		--navigation-bg: var(--background-secondary);
+		/* Navigation background color for light mode */
 		--disabled-text: #b1b2b9;
 		--pass: #2ecc71;
 		--fail: #e74c3c;
@@ -30,7 +32,8 @@
 		--active: #e683c7;
 		--hover: #e683c7;
 		/* Hashtag styling for light mode */
-		--hashtag-text: #1976d2; /* Blue that's readable on light background */
+		--hashtag-text: #1976d2;
+		/* Blue that's readable on light background */
 		--hashtag-bg: rgba(25, 118, 210, 0.08);
 		--hashtag-bg-hover: rgba(25, 118, 210, 0.12);
 
@@ -40,10 +43,14 @@
 		--eip-border: rgba(108, 36, 224, 0.2);
 
 		/* Rating colors */
-		--rating-pass: #2ecc71; /* Green */
-		--rating-partial: #f1c40f; /* Yellow */
-		--rating-fail: #e74c3c; /* Red */
-		--rating-neutral: #bdc3c7; /* Gray */
+		--rating-pass: #2ecc71;
+		/* Green */
+		--rating-partial: #f1c40f;
+		/* Yellow */
+		--rating-fail: #e74c3c;
+		/* Red */
+		--rating-neutral: #bdc3c7;
+		/* Gray */
 	}
 }
 
@@ -61,8 +68,10 @@ html.dark {
 	--border: #313131;
 	--banner-gradient-from: #15151a;
 	--banner-gradient-to: #212126;
-	--icon-color: #efefef; /* Add icon color for dark mode */
-	--navigation-bg: var(--background-secondary); /* Navigation background color for dark mode */
+	--icon-color: #efefef;
+	/* Add icon color for dark mode */
+	--navigation-bg: var(--background-secondary);
+	/* Navigation background color for dark mode */
 	--disabled-text: #656566;
 	--pass: #2ecc71;
 	--fail: #e74c3c;
@@ -70,7 +79,8 @@ html.dark {
 	--active: #b14f92;
 	--hover: #b14f92;
 	/* Hashtag styling for dark mode */
-	--hashtag-text: #90caf9; /* Lighter blue that's readable on dark background */
+	--hashtag-text: #90caf9;
+	/* Lighter blue that's readable on dark background */
 	--hashtag-bg: rgba(144, 202, 249, 0.08);
 	--hashtag-bg-hover: rgba(144, 202, 249, 0.12);
 
@@ -80,10 +90,14 @@ html.dark {
 	--eip-border: rgba(108, 36, 224, 0.3);
 
 	/* Rating colors - keep same as light mode since they represent statuses */
-	--rating-pass: #2ecc71; /* Green */
-	--rating-partial: #f1c40f; /* Yellow */
-	--rating-fail: #e74c3c; /* Red */
-	--rating-neutral: #bdc3c7; /* Gray */
+	--rating-pass: #2ecc71;
+	/* Green */
+	--rating-partial: #f1c40f;
+	/* Yellow */
+	--rating-fail: #e74c3c;
+	/* Red */
+	--rating-neutral: #bdc3c7;
+	/* Gray */
 }
 
 html,
@@ -165,11 +179,65 @@ html.dark {
 }
 
 :root {
+	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
+
+	--active-transitionInDuration: 0.125s;
+	--active-transitionOutDuration: 0.2s;
+	--active-scale: 0.99;
+	--active-opacity: 0.8;
+
 	scroll-behavior: smooth;
+
+	transition-duration: 0.2s;
+	transition-timing-function: var(--transition-easeOutExpo);
+
+
+	font-family: 'Montserrat', 'Noto Color Emoji';
 }
 
 * {
-	font-family: 'Montserrat', sans-serif, 'Noto Color Emoji';
+	margin: 0;
+	text-box-trim: trim-both;
+	transition-duration: inherit;
+	transition-timing-function: inherit;
+	transition-behavior: allow-discrete;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+.stack {
+	display: grid;
+	grid: "stack";
+
+	&>*,
+	&::before,
+	&::after {
+		grid-area: stack;
+	}
+}
+
+.column {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 1rem;
+	align-content: start;
+
+	&.inline {
+		gap: 0.25rem;
+	}
+}
+
+.row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.75em;
+
+	&.inline {
+		gap: 0.5ch;
+	}
 }
 
 code {

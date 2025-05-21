@@ -81,9 +81,9 @@ export function variantToTooltip(variants: AtLeastOneVariant<unknown>, variant: 
  */
 export function variantUrlQuery(
 	variants: AtLeastOneVariant<unknown>,
-	variant: Variant | null,
+	variant?: Variant | undefined,
 ): string {
-	if (variant === null || hasSingleVariant(variants) || !Object.hasOwn(variants, variant)) {
+	if (!variant || hasSingleVariant(variants) || !Object.hasOwn(variants, variant)) {
 		return ''
 	}
 	return `?${variant}`

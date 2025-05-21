@@ -112,7 +112,7 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 							: 'Feature question'
 
 					// Get a reasonable answer text
-					const answerText = `${walletName} supports this feature.`
+					const answerText = `{{WALLET_NAME}} supports this feature.`
 
 					// Add to FAQ entries
 					faqEntries.push({
@@ -155,7 +155,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 		window.history.replaceState(
 			null,
 			'',
-			`${window.location.pathname}${variantUrlQuery(wallet.variants, variant)}${window.location.hash}`,
+			`${window.location.pathname}${variantUrlQuery(wallet.variants, variant || undefined)}${window.location.hash}`,
 		)
 		setPickedVariant(variant)
 	}
@@ -216,7 +216,12 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			cornerControl: <WalletSectionSummary wallet={wallet} attrGroup={attrGroup} />,
 			caption: (
 				<RenderTypographicContent
-					content={attrGroup.perWalletQuestion.render(wallet.metadata)}
+					content={attrGroup.perWalletQuestion}
+					strings={{
+						WALLET_NAME: wallet.metadata.displayName,
+						WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+						WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+					}}
 					typography={{
 						variant: 'caption',
 						fontStyle: 'italic',
@@ -367,7 +372,12 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 					},
 					caption: (
 						<RenderTypographicContent
-							content={evalAttr.attribute.question.render(wallet.metadata)}
+							content={evalAttr.attribute.question}
+							strings={{
+								WALLET_NAME: wallet.metadata.displayName,
+								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+								WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+							}}
 							typography={{
 								variant: 'caption',
 								fontStyle: 'italic',
@@ -398,14 +408,14 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 						nonHeaderSections,
 						(section): NavigationItem => ({
 							id: sectionHeaderId(section),
-							icon: section.icon,
+							icon: typeof section.icon === 'function' ? section.icon : undefined,
 							title: section.title,
 							contentId: sectionHeaderId(section),
 							children:
 								section.subsections !== undefined && isNonEmptyArray(section.subsections)
 									? nonEmptyMap(section.subsections, subsection => ({
 											id: sectionHeaderId(subsection),
-											icon: subsection.icon,
+											icon: typeof subsection.icon === 'function' ? subsection.icon : undefined,
 											title: subsection.title,
 											contentId: sectionHeaderId(subsection),
 										}))

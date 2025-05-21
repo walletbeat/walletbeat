@@ -28,7 +28,7 @@ export const WalletHeading: FC<{
 						<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
 						<ExternalLink
 							url={wallet.metadata.url}
-							defaultLabel={`${wallet.metadata.displayName} website`}
+							defaultLabel={`{{WALLET_NAME}} website`}
 							style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
 						/>
 					</div>,
@@ -63,7 +63,7 @@ export const WalletHeading: FC<{
 			</div>
 			<div className="break-words whitespace-normal">
 				<RenderTypographicContent
-					content={wallet.metadata.blurb.render({})}
+					content={wallet.metadata.blurb}
 					typography={{ variant: 'body1' }}
 				/>
 			</div>

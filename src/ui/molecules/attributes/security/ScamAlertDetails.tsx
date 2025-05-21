@@ -66,7 +66,14 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 		<>
 			<WrapRatingIcon rating={value.rating}>
 				<Typography fontWeight={subsectionWeight}>
-					<RenderTypographicContent content={value.shortExplanation.render(wallet.metadata)} />
+					<RenderTypographicContent
+						content={value.shortExplanation}
+						strings={{
+							WALLET_NAME: wallet.metadata.displayName,
+							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+						}}
+					/>
 				</Typography>
 			</WrapRatingIcon>
 			<div>
@@ -76,7 +83,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 							{isSupported(value.scamAlerts.sendTransactionWarning) ? (
 								<>
 									{listOrSingleText(
-										`${wallet.metadata.displayName} helps you stay safe when sending funds by`,
+										`{{WALLET_NAME}} helps you stay safe when sending funds by`,
 										[
 											value.scamAlerts.sendTransactionWarning.newRecipientWarning
 												? `
@@ -127,7 +134,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 							{isSupported(value.scamAlerts.contractTransactionWarning) ? (
 								<>
 									{listOrSingleText(
-										`${wallet.metadata.displayName} helps you stay safe when doing onchain transactions by`,
+										`{{WALLET_NAME}} helps you stay safe when doing onchain transactions by`,
 										[
 											value.scamAlerts.contractTransactionWarning.contractRegistry
 												? `

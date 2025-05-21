@@ -130,10 +130,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	id: 'security',
 	icon: '\u{1f512}', // Lock
 	displayName: 'Security',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How secure is ${walletMetadata.displayName}?`,
-	),
+	perWalletQuestion: sentence(`How secure is {{WALLET_NAME}}?`),
 	attributes: {
 		securityAudits,
 		scamPrevention,
@@ -149,7 +146,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		keysHandling,
 		userSafety,
 	},
-	score: scoreGroup<SecurityValues>({
+	attributeWeights: {
 		securityAudits: 1.0,
 		scamPrevention: 1.0,
 		chainVerification: 1.0,
@@ -163,7 +160,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		firmware: 1.0,
 		keysHandling: 1.0,
 		userSafety: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for privacy Values. */
@@ -178,20 +175,17 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 	id: 'privacy',
 	icon: '\u{1f575}', // Detective
 	displayName: 'Privacy',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How well does ${walletMetadata.displayName} protect your privacy?`,
-	),
+	perWalletQuestion: sentence(`How well does {{WALLET_NAME}} protect your privacy?`),
 	attributes: {
 		addressCorrelation,
 		multiAddressCorrelation,
 		hardware_privacy: hardwarePrivacy,
 	},
-	score: scoreGroup<PrivacyValues>({
+	attributeWeights: {
 		addressCorrelation: 1.0,
 		multiAddressCorrelation: 1.0,
 		hardware_privacy: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for self-sovereignty Values. */
@@ -206,20 +200,17 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 	id: 'selfSovereignty',
 	icon: '\u{1f3f0}', // Castle
 	displayName: 'Self-sovereignty',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How much control and ownership over your wallet does ${walletMetadata.displayName} give you?`,
-	),
+	perWalletQuestion: sentence(`How much control and ownership over your wallet does {{WALLET_NAME}} give you?`),
 	attributes: {
 		selfHostedNode,
 		accountPortability,
 		transactionInclusion,
 	},
-	score: scoreGroup<SelfSovereigntyValues>({
+	attributeWeights: {
 		selfHostedNode: 1.0,
 		accountPortability: 1.0,
 		transactionInclusion: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for transparency Values. */
@@ -236,10 +227,7 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 	id: 'transparency',
 	icon: '\u{1f50d}', // Looking glass
 	displayName: 'Transparency',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How transparent and sustainable is ${walletMetadata.displayName}'s development model?`,
-	),
+	perWalletQuestion: sentence(`How transparent and sustainable is {{WALLET_NAME}}'s development model?`),
 	attributes: {
 		openSource,
 		sourceVisibility,
@@ -247,13 +235,13 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		feeTransparency,
 		reputation,
 	},
-	score: scoreGroup<TransparencyValues>({
+	attributeWeights: {
 		openSource: 1.0,
 		sourceVisibility: 1.0,
 		funding: 1.0,
 		feeTransparency: 1.0,
 		reputation: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for ecosystem Values. */
@@ -269,22 +257,19 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	id: 'ecosystem',
 	icon: '🌐',
 	displayName: 'Ecosystem',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How well does ${walletMetadata.displayName} align with the ecosystem?`,
-	),
+	perWalletQuestion: sentence(`How well does {{WALLET_NAME}} align with the ecosystem?`),
 	attributes: {
 		accountAbstraction,
 		addressResolution,
 		browserIntegration,
 		interoperability,
 	},
-	score: scoreGroup<EcosystemValues>({
+	attributeWeights: {
 		accountAbstraction: 1.0,
 		addressResolution: 1.0,
 		browserIntegration: 1.0,
 		interoperability: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for maintenance Values. */
@@ -297,16 +282,13 @@ export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	id: 'maintenance',
 	icon: '🛠️',
 	displayName: 'Maintenance',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How well-maintained is ${walletMetadata.displayName}?`,
-	),
+	perWalletQuestion: sentence(`How well-maintained is {{WALLET_NAME}}?`),
 	attributes: {
 		maintenance,
 	},
-	score: scoreGroup<MaintenanceValues>({
+	attributeWeights: {
 		maintenance: 1.0,
-	}),
+	},
 }
 
 /** The set of attribute groups that make up wallet attributes. */
@@ -636,35 +618,35 @@ export function getEvaluationFromOtherTree<V extends Value>(
 }
 
 /**
- * Generic function for scoring a group of evaluations.
- * @param weights A map from attribute name to its relative weight.
- * @returns A function to score the group of evaluations.
+ * Calculate a score for an attribute group based on its weights and evaluations.
+ * @param weights The weights for each attribute in the group.
+ * @param evaluations The evaluations to score.
+ * @returns A score between 0.0 (lowest) and 1.0 (highest) or null if exempt.
  */
-function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): (
+export function calculateAttributeGroupScore<Vs extends ValueSet>(
+	weights: AttributeGroup<Vs>['attributeWeights'],
 	evaluations: EvaluatedGroup<Vs>,
-) => MaybeUnratedScore {
-	return (evaluations: EvaluatedGroup<Vs>): MaybeUnratedScore => {
-		const subScores: WeightedScore[] = nonEmptyValues<keyof Vs, WeightedScore | null>(
-			nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
-				const value = evaluations[key].evaluation.value
-				const score = value.score ?? defaultRatingScore(value.rating)
-				return score === null
-					? null
-					: {
-							score,
-							weight,
-						}
-			}),
-		).filter(score => score !== null)
-		if (isNonEmptyArray(subScores)) {
-			let hasUnratedComponent = false
-			for (const evalAttr of evaluatedAttributes(evaluations)) {
-				hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED
-			}
-			return { score: weightedScore(subScores), hasUnratedComponent }
+): MaybeUnratedScore {
+	const subScores: WeightedScore[] = nonEmptyValues<keyof Vs, WeightedScore | null>(
+		nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
+			const value = evaluations[key].evaluation.value
+			const score = value.score ?? defaultRatingScore(value.rating)
+			return score === null
+				? null
+				: {
+					score,
+					weight,
+				}
+		}),
+	).filter(score => score !== null)
+	if (isNonEmptyArray(subScores)) {
+		let hasUnratedComponent = false
+		for (const evalAttr of evaluatedAttributes(evaluations)) {
+			hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED
 		}
-		return null
+		return { score: weightedScore(subScores), hasUnratedComponent }
 	}
+	return null
 }
 
 /**
