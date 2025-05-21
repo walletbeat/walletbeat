@@ -201,6 +201,8 @@ html.dark {
 	transition-duration: inherit;
 	transition-timing-function: inherit;
 	transition-behavior: allow-discrete;
+
+	scroll-behavior: smooth;
 }
 
 [hidden] {
