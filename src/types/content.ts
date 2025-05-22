@@ -101,6 +101,7 @@ function textContent<
 	text: _Text,
 	strings?: Strings,
 ) {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Needed to enable type-level string validation.
 	return {
 		contentType: ContentType.TEXT,
 		text: trimWhitespacePrefix(text),
@@ -115,6 +116,7 @@ export function markdown<
 	markdownText: _Text,
 	strings?: Strings,
 ) {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Needed to enable type-level string validation.
 	return {
 		contentType: ContentType.MARKDOWN,
 		markdown: trimWhitespacePrefix(markdownText),
