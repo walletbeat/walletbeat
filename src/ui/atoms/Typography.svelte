@@ -20,11 +20,13 @@
 
 
 	// Functions
-	import { marked } from 'marked'
+	import { micromark } from 'micromark'
 
-	marked.setOptions({
-		gfm: false,
-	})
+	const parseMarkdown = (markdown: string) => {
+		return micromark(markdown, {
+			allowDangerousHtml: false,
+		})
+	}
 </script>
 
 
@@ -35,11 +37,7 @@
 	{@const text = strings ? renderStrings(content.markdown, strings) : content.markdown}
 
 	<div class="markdown">
-		{#await marked.parse(text, {})}
-			...
-		{:then html}
-			{@html html}
-		{/await}
+		{@html parseMarkdown(text)}
 	</div>
 {/if}
 

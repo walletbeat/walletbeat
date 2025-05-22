@@ -89,6 +89,9 @@ importers:
       marked:
         specifier: ^15.0.12
         version: 15.0.12
+      micromark:
+        specifier: ^4.0.2
+        version: 4.0.2
       postcss:
         specifier: ^8.5.3
         version: 8.5.3
