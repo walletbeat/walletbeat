@@ -105,7 +105,7 @@ function textContent<
 	return {
 		contentType: ContentType.TEXT,
 		text: trimWhitespacePrefix(text),
-		...strings && { strings },
+		...Boolean(strings) && { strings },
 	} as ValidateText<TextContent<Strings>, _Text, Strings>
 }
 
@@ -120,7 +120,7 @@ export function markdown<
 	return {
 		contentType: ContentType.MARKDOWN,
 		markdown: trimWhitespacePrefix(markdownText),
-		...strings && { strings },
+		...Boolean(strings) && { strings },
 	} as ValidateText<MarkdownContent<Strings>, _Text, Strings>
 }
 
