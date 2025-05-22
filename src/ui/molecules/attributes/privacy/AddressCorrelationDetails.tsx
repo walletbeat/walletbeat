@@ -48,7 +48,7 @@ export function AddressCorrelationDetails({
 			<JoinedList
 				data={linkables.map(linkable => ({
 					key: linkable.info,
-					value: <strong>{leakedInfoName(linkable.info, wallet.metadata).long}</strong>,
+					value: <strong>{leakedInfoName(linkable.info).long}</strong>,
 				}))}
 			/>
 		)

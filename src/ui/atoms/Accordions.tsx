@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary } from '@mui/material'
 import type React from 'react'
 import { useState } from 'react'
 import { LuChevronDown } from 'react-icons/lu'
@@ -7,7 +7,7 @@ import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 export interface AccordionData {
 	id: string
-	summary: string
+	summary: React.ReactNode
 	contents: React.ReactNode
 }
 
@@ -15,12 +15,10 @@ export interface AccordionData {
 export function Accordions({
 	accordions,
 	borderRadius,
-	summaryTypographyVariant = 'h1',
 	interAccordionMargin = '1rem',
 }: {
 	accordions: NonEmptyArray<AccordionData>
 	borderRadius: string
-	summaryTypographyVariant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 	interAccordionMargin?: string
 }): React.JSX.Element {
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({})
@@ -79,7 +77,7 @@ export function Accordions({
 									!expanded[accordion.id] && blankBottom ? borderRadius : '0px',
 							}}
 						>
-							<Typography variant={summaryTypographyVariant}>{accordion.summary}</Typography>
+							{accordion.summary}
 						</AccordionSummary>
 						<AccordionDetails
 							key={`${accordion.id}-details`}

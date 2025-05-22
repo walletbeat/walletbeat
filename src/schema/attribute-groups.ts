@@ -130,10 +130,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	id: 'security',
 	icon: '\u{1f512}', // Lock
 	displayName: 'Security',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How secure is ${walletMetadata.displayName}?`,
-	),
+	perWalletQuestion: sentence(`How secure is {{WALLET_NAME}}?`),
 	attributes: {
 		securityAudits,
 		scamPrevention,
@@ -178,10 +175,7 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 	id: 'privacy',
 	icon: '\u{1f575}', // Detective
 	displayName: 'Privacy',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How well does ${walletMetadata.displayName} protect your privacy?`,
-	),
+	perWalletQuestion: sentence(`How well does {{WALLET_NAME}} protect your privacy?`),
 	attributes: {
 		addressCorrelation,
 		multiAddressCorrelation,
@@ -206,10 +200,7 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 	id: 'selfSovereignty',
 	icon: '\u{1f3f0}', // Castle
 	displayName: 'Self-sovereignty',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How much control and ownership over your wallet does ${walletMetadata.displayName} give you?`,
-	),
+	perWalletQuestion: sentence(`How much control and ownership over your wallet does {{WALLET_NAME}} give you?`),
 	attributes: {
 		selfHostedNode,
 		accountPortability,
@@ -236,10 +227,7 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 	id: 'transparency',
 	icon: '\u{1f50d}', // Looking glass
 	displayName: 'Transparency',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How transparent and sustainable is ${walletMetadata.displayName}'s development model?`,
-	),
+	perWalletQuestion: sentence(`How transparent and sustainable is {{WALLET_NAME}}'s development model?`),
 	attributes: {
 		openSource,
 		sourceVisibility,
@@ -269,10 +257,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	id: 'ecosystem',
 	icon: '🌐',
 	displayName: 'Ecosystem',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How well does ${walletMetadata.displayName} align with the ecosystem?`,
-	),
+	perWalletQuestion: sentence(`How well does {{WALLET_NAME}} align with the ecosystem?`),
 	attributes: {
 		accountAbstraction,
 		addressResolution,
@@ -297,10 +282,7 @@ export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	id: 'maintenance',
 	icon: '🛠️',
 	displayName: 'Maintenance',
-	perWalletQuestion: sentence<Pick<WalletMetadata, 'displayName'>>(
-		(walletMetadata: Pick<WalletMetadata, 'displayName'>): string =>
-			`How well-maintained is ${walletMetadata.displayName}?`,
-	),
+	perWalletQuestion: sentence(`How well-maintained is {{WALLET_NAME}}?`),
 	attributes: {
 		maintenance,
 	},

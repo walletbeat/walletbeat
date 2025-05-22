@@ -16,7 +16,7 @@ import type { LabeledUrl } from '@/schema/url'
 import type { RatedWallet } from '@/schema/wallet'
 import { toKebabCase } from '@/utils/kebab'
 
-import { RenderContent } from '../atoms/RenderContent'
+import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
 import { RatingStatusBadge } from './RatingStatusBadge'
 
 interface RatingDetailModalProps<Vs extends ValueSet> {
@@ -285,10 +285,13 @@ export function RatingDetailContent<Vs extends ValueSet>({
 											<div className="pl-8 mt-2 text-sm">
 												{/* Show the short explanation */}
 												<div className="mb-3 font-medium text-gray-800 dark:text-gray-200">
-													<RenderContent
-														content={evalAttr.evaluation.value.shortExplanation.render(
-															wallet.metadata,
-														)}
+													<RenderTypographicContent
+														content={evalAttr.evaluation.value.shortExplanation}
+														strings={{
+															WALLET_NAME: wallet.metadata.displayName,
+															WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
+															WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+														}}
 													/>
 												</div>
 

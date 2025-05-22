@@ -41,51 +41,39 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware privacy evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve its hardware privacy?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its hardware privacy?`),
 	},
-	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} protect user privacy at the hardware level?`,
-	),
+	question: sentence(`Does {{WALLET_NAME}} protect user privacy at the hardware level?`),
 	why: markdown(
-		`Hardware privacy ensures that the device itself does not leak sensitive user information (like IP address, public keys, or usage patterns) during setup, regular operation, or updates.
-		This is distinct from the privacy features of the transactions created *using* the wallet.`,
+		'Hardware privacy ensures that the device itself does not leak sensitive user information (like IP address, public keys, or usage patterns) during setup, regular operation, or updates.\nThis is distinct from the privacy features of the transactions created *using* the wallet.',
 	),
-	methodology: markdown(
-		`Evaluated based on:
+	methodology: markdown(`
+		Evaluated based on:
 
-- **Phoning Home:** Whether the device contacts manufacturer servers during setup, operation, or updates, and if these connections are necessary.
+		- **Phoning Home:** Whether the device contacts manufacturer servers during setup, operation, or updates, and if these connections are necessary.
 
-- **Inspectability:** Ability to monitor and understand data exchanged if the device does phone home.
+		- **Inspectability:** Ability to monitor and understand data exchanged if the device does phone home.
 
-- **Wireless Privacy:** Protection of data transmitted over wireless connections (e.g., BLE, WiFi) against local attackers.
-	`,
-	),
+		- **Wireless Privacy:** Protection of data transmitted over wireless connections (e.g., BLE, WiFi) against local attackers.
+	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(
-					() =>
-						'The hardware wallet passes all hardware privacy sub-criteria: No phoning home, inspectable remote calls, and encrypted wireless communication.',
-				),
+				sentence(`The hardware wallet passes all hardware privacy sub-criteria: No phoning home, inspectable remote calls, and encrypted wireless communication.`),
 				(v: HardwarePrivacyValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes some hardware privacy sub-criteria.'),
+				sentence(`The hardware wallet passes some hardware privacy sub-criteria.`),
 				(v: HardwarePrivacyValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(
-					() =>
-						'The hardware wallet fails all hardware privacy sub-criteria: Device leaks privacy in all aspects.',
-				),
+				sentence(`The hardware wallet fails all hardware privacy sub-criteria: Device leaks privacy in all aspects.`),
 				(v: HardwarePrivacyValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -94,7 +82,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 		pickWorstRating<HardwarePrivacyValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwarePrivacyValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return exempt(hardwarePrivacy, sentence('Only rated for hardware wallets'), brand, {
+			return exempt(hardwarePrivacy, sentence(`Only rated for hardware wallets`), brand, {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
 				wirelessPrivacy: HardwarePrivacyType.FAIL,
@@ -117,21 +105,12 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 				id: 'hardware_privacy',
 				rating,
 				displayName: 'Hardware Privacy',
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) =>
-						`${walletMetadata.displayName} has ${rating.toLowerCase()} hardware privacy.`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} hardware privacy.`),
 				...withoutRefs,
 				__brand: brand,
 			},
-			details: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} hardware privacy evaluation is ${rating.toLowerCase()}.`,
-			),
-			howToImprove: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
-			),
+			details: paragraph(`{{WALLET_NAME}} hardware privacy evaluation is ${rating.toLowerCase()}.`),
+			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},

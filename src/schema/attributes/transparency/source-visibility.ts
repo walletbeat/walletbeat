@@ -19,11 +19,9 @@ function sourcePublic(references: ReferenceArray): Evaluation<SourceVisibilityVa
 			id: 'public',
 			rating: Rating.PASS,
 			displayName: 'Source code publicly available',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					The source code for ${walletMetadata.displayName} is public.
-				`,
-			),
+			shortExplanation: sentence(`
+				The source code for {{WALLET_NAME}} is public.
+			`),
 			__brand: brand,
 		},
 		details: sourceVisibilityDetailsContent(),
@@ -37,25 +35,19 @@ function sourcePrivate(references: ReferenceArray): Evaluation<SourceVisibilityV
 			id: 'private',
 			rating: Rating.FAIL,
 			displayName: 'Source code not publicly available',
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					The source code for ${walletMetadata.displayName} is not public.
-				`,
-			),
+			shortExplanation: sentence(`
+				The source code for {{WALLET_NAME}} is not public.
+			`),
 			__brand: brand,
 		},
-		details: paragraph(
-			({ wallet }) => `
-				The source code for ${wallet.metadata.displayName} is not available
-				to the public.
-			`,
-		),
-		howToImprove: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} should make its source code publicly
-				viewable.
-			`,
-		),
+		details: paragraph(`
+			The source code for {{WALLET_NAME}} is not available
+			to the public.
+		`),
+		howToImprove: paragraph(`
+			{{WALLET_NAME}} should make its source code publicly
+			viewable.
+		`),
 		references,
 	}
 }
@@ -67,7 +59,7 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 	wording: {
 		midSentenceName: 'source visibility',
 	},
-	question: sentence('Is the source code for the wallet visible to the public?'),
+	question: sentence(`Is the source code for the wallet visible to the public?`),
 	why: paragraph(`
 		When using a wallet, users are entrusting it to preserve their funds
 		safely. This requires a high level of trust in the wallet's source code

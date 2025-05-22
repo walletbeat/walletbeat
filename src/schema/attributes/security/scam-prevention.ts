@@ -190,12 +190,7 @@ function evaluateScamAlerts(
 				id: 'none_implemented',
 				displayName: 'No scam prevention',
 				rating: Rating.FAIL,
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) => `
-						${walletMetadata.displayName} makes no attempt to warn the user
-						about potential scams.
-					`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} makes no attempt to warn the user about potential scams.`),
 				scamAlerts,
 				sendTransactionWarning,
 				contractTransactionWarning,
@@ -203,11 +198,7 @@ function evaluateScamAlerts(
 				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
-			howToImprove: paragraph(
-				({ wallet }) => `
-					${wallet.metadata.displayName} should implement scam alerting features.
-				`,
-			),
+			howToImprove: paragraph(`{{WALLET_NAME}} should implement scam alerting features.`),
 			references: allRefs,
 		}
 	}
@@ -224,12 +215,7 @@ function evaluateScamAlerts(
 					id: 'leak_full_url',
 					displayName: 'Scam prevention feature leaks history',
 					rating: Rating.FAIL,
-					shortExplanation: sentence(
-						(walletMetadata: WalletMetadata) => `
-							${walletMetadata.displayName} warns you about potential scams,
-							but leaks your browsing history in the process.
-						`,
-					),
+					shortExplanation: sentence(`{{WALLET_NAME}} warns you about potential scams, but leaks your browsing history in the process.`),
 					scamAlerts,
 					sendTransactionWarning,
 					contractTransactionWarning,
@@ -237,17 +223,11 @@ function evaluateScamAlerts(
 					__brand: brand,
 				},
 				details: scamAlertsDetailsContent({}),
-				howToImprove: mdParagraph(
-					({ wallet }) => `
-						No application should ever send your browsing history to a
-						third-party, and neither should ${wallet.metadata.displayName}.
+				howToImprove: markdown(`
+					No application should ever send your browsing history to a third-party, and neither should {{WALLET_NAME}}.
 
-						Scam URL detection can be implemented in a privacy-preserving
-						manner using a local database or downloading a list of known-bad
-						domains with the
-						[same domain name hash prefix](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
-					`,
-				),
+					Scam URL detection can be implemented in a privacy-preserving manner using a local database or downloading a list of known-bad domains with the [same domain name hash prefix](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
+				`),
 				references: allRefs,
 			}
 		}
@@ -260,12 +240,7 @@ function evaluateScamAlerts(
 					id: 'leak_domain',
 					displayName: 'Scam prevention feature leaks website history',
 					rating: Rating.FAIL,
-					shortExplanation: sentence(
-						(walletMetadata: WalletMetadata) => `
-							${walletMetadata.displayName} warns you about potential scams,
-							but leaks your browsed websites in the process.
-						`,
-					),
+					shortExplanation: sentence(`{{WALLET_NAME}} warns you about potential scams, but leaks your browsed websites in the process.`),
 					scamAlerts,
 					sendTransactionWarning,
 					contractTransactionWarning,
@@ -273,17 +248,11 @@ function evaluateScamAlerts(
 					__brand: brand,
 				},
 				details: scamAlertsDetailsContent({}),
-				howToImprove: mdParagraph(
-					({ wallet }) => `
-						No application should ever send your browsing history to a
-						third-party, and neither should ${wallet.metadata.displayName}.
+				howToImprove: markdown(`
+					No application should ever send your browsing history to a third-party, and neither should {{WALLET_NAME}}.
 
-						Scam URL detection can be implemented in a privacy-preserving
-						manner using a local database or downloading a list of known-bad
-						domains with the
-						[same domain name hash prefix](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
-					`,
-				),
+					Scam URL detection can be implemented in a privacy-preserving manner using a local database or downloading a list of known-bad domains with the [same domain name hash prefix](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
+				`),
 				references: allRefs,
 			}
 		}
@@ -295,13 +264,7 @@ function evaluateScamAlerts(
 				id: 'partially_supported',
 				displayName: 'Some scam prevention features',
 				rating: Rating.PARTIAL,
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) => `
-						${walletMetadata.displayName} warns the user about
-						${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}
-						but not about ${commaListFormat(unsupportedFeatures.map(sas => sas.humanFeature))}
-					`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} but not about ${commaListFormat(unsupportedFeatures.map(sas => sas.humanFeature))}`),
 				scamAlerts,
 				sendTransactionWarning,
 				contractTransactionWarning,
@@ -309,19 +272,17 @@ function evaluateScamAlerts(
 				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
-			howToImprove: paragraph(
-				({ wallet }) => `
-					${wallet.metadata.displayName} should implement the following features:
+			howToImprove: markdown(
+				`{{WALLET_NAME}} should implement the following features:
 
-					${unsupportedFeatures
-						.map(
-							sas => `
-							*	${sas.listFeature}
-						`,
-						)
-						.join('\n')}
-				`,
-			),
+				${unsupportedFeatures
+					.map(
+						sas => `
+						*	${sas.listFeature}
+					`,
+					)
+					.join('\n')}
+			`),
 			references: allRefs,
 		}
 	}
@@ -334,13 +295,7 @@ function evaluateScamAlerts(
 				id: 'need_privacy',
 				displayName: 'Privacy-invasive scam prevention',
 				rating: Rating.PARTIAL,
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) => `
-						${walletMetadata.displayName} warns the user about
-						${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}
-						in a privacy-invasive way.
-					`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} in a privacy-invasive way.`),
 				scamAlerts,
 				sendTransactionWarning,
 				contractTransactionWarning,
@@ -348,41 +303,23 @@ function evaluateScamAlerts(
 				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
-			howToImprove: mdParagraph(
-				({ wallet }) => `
-					${wallet.metadata.displayName} should ensure all scam alerting
-					features are implemented in a privacy-preserving manner.
+			howToImprove: markdown(`
+				{{WALLET_NAME}} should ensure all scam alerting features are implemented in a privacy-preserving manner.
 
-					${
-						needsImprovement(sendTransactionWarning)
-							? ''
-							: `
-					* Sending a transaction should not allow a third-party to learn
-						a link between any of the sender's IP or Ethereum address
-						and the recipient's address.
-					`
-					}
-					${
-						needsImprovement(contractTransactionWarning)
-							? ''
-							: `
-					* Checking arbitrary transactions for potential scams should
-						not allow a third-party to link your IP or Ethereum address
-						to the contract you are about to interact with or your upcoming
-						transaction.
-					`
-					}
-					${
-						needsImprovement(scamUrlWarning)
-							? ''
-							: `
-					* Checking arbitrary transactions for potential scams should
-						not allow a third-party to link your browsing history with your
-						IP or Ethereum address.
-					`
-					}
-				`,
-			),
+				${[
+					!needsImprovement(sendTransactionWarning) && `
+						* Sending a transaction should not allow a third-party to learn a link between any of the sender's IP or Ethereum address and the recipient's address.
+					`,
+					!needsImprovement(contractTransactionWarning) && `
+						* Checking arbitrary transactions for potential scams should not allow a third-party to link your IP or Ethereum address to the contract you are about to interact with or your upcoming transaction.
+					`,
+					!needsImprovement(scamUrlWarning) && `
+						* Checking arbitrary transactions for potential scams should not allow a third-party to link your browsing history with your IP or Ethereum address.
+					`,
+				]
+					.filter(Boolean)
+					.join('\n\n')}
+			`),
 			references: allRefs,
 		}
 	}
@@ -392,12 +329,7 @@ function evaluateScamAlerts(
 			id: 'all_implemented',
 			displayName: 'Full-featured scam prevention',
 			rating: Rating.PASS,
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} warns the user about
-					${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}.`),
 			scamAlerts,
 			sendTransactionWarning,
 			contractTransactionWarning,
@@ -416,14 +348,8 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 	wording: {
 		midSentenceName: 'scam prevention',
 	},
-	question: sentence(`
-		Does the wallet warn the user about potential scams?
-	`),
-	why: markdown(`
-		Transactions in Ethereum are very difficult to reverse, and there is no
-		shortage of scams. Wallets have a role to play in helping users avoid
-		known scams ahead of the user making the transaction.
-	`),
+	question: sentence(`Does the wallet warn the user about potential scams?`),
+	why: markdown(`Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction.`),
 	methodology: markdown(`
 		Wallets are rated based on whether they alert the user about potential
 		scams. This is measured along three scenarios:
@@ -485,9 +411,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		exhaustive: false,
 		fail: [
 			exampleRating(
-				sentence(`
-					The wallet does not implement any form of scam alerting.
-				`),
+				sentence(`The wallet does not implement any form of scam alerting.`),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
 					scamUrlWarning: notSupported,
@@ -495,10 +419,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 				}).value,
 			),
 			exampleRating(
-				sentence(`
-					The wallet leaks visited URLs to a third-party as part of its
-					malicious app warning feature.
-				`),
+				sentence(`The wallet leaks visited URLs to a third-party as part of its malicious app warning feature.`),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
 					scamUrlWarning: supported({
@@ -512,10 +433,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		],
 		partial: [
 			exampleRating(
-				sentence(`
-					The wallet implements some but not all of the required scam warning
-					features.
-				`),
+				sentence(`The wallet implements some but not all of the required scam warning features.`),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
 					scamUrlWarning: supported({
@@ -533,10 +451,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 				}).value,
 			),
 			exampleRating(
-				sentence(`
-					The wallet implements all required scam warning features, but not in
-					a privacy-preserving manner.
-				`),
+				sentence(`The wallet implements all required scam warning features, but not in a privacy-preserving manner.`),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: supported({
 						contractRegistry: true,
@@ -562,10 +477,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 			),
 		],
 		pass: exampleRating(
-			sentence(`
-				The wallet implements all required scam warning features in a
-				privacy-preserving manner.
-			`),
+			sentence(`The wallet implements all required scam warning features in a privacy-preserving manner.`),
 			evaluateScamAlerts(WalletProfile.GENERIC, {
 				contractTransactionWarning: supported({
 					contractRegistry: true,

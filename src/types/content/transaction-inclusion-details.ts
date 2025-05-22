@@ -5,7 +5,7 @@ import type {
 } from '@/schema/attributes/self-sovereignty/transaction-inclusion'
 import type { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 
-import { component, type Renderable } from '../content'
+import { component, type Content } from '../content'
 
 export interface TransactionInclusionDetailsProps
 	extends EvaluationData<TransactionInclusionValue> {
@@ -21,11 +21,8 @@ export interface TransactionInclusionDetailsContent {
 }
 
 export function transactionInclusionDetailsContent(
-	bakedProps: Omit<
-		TransactionInclusionDetailsProps,
-		keyof EvaluationData<TransactionInclusionValue>
-	>,
-): Renderable<EvaluationData<TransactionInclusionValue>> {
+	bakedProps: Omit<TransactionInclusionDetailsProps, keyof EvaluationData<TransactionInclusionValue>>,
+): Content<{ WALLET_NAME: string }> {
 	return component<TransactionInclusionDetailsContent, keyof typeof bakedProps>(
 		'TransactionInclusionDetails',
 		bakedProps,

@@ -16,8 +16,7 @@ export const rainbow: SoftwareWallet = {
 		id: 'rainbow',
 		displayName: 'Rainbow',
 		tableName: 'Rainbow',
-		blurb: paragraph(`
-			Rainbow Extension. Built for speed. Built for power. Built for You.
+		blurb: paragraph(`Rainbow Extension. Built for speed. Built for power. Built for You.
 		`),
 		contributors: [polymutex],
 		iconExtension: 'svg',

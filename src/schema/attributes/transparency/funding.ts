@@ -37,11 +37,7 @@ function transparent(
 			id: `transparent_${id.toLocaleLowerCase()}`,
 			rating: Rating.PASS,
 			displayName: `Transparent funding (${sourceName})`,
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} is transparently funded.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} is transparently funded.`),
 			__brand: brand,
 		},
 		details: fundingDetailsContent({ monetization }),
@@ -61,22 +57,11 @@ function extractive(
 			rating: Rating.PARTIAL,
 			icon: '\u{1f911}', // Money mouth face
 			displayName: `User-extractive funding${sourceName !== '' ? ` (${sourceName})` : ''}`,
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
-					${walletMetadata.displayName} is funded through user-extractive
-					means${sourceName !== '' ? ` (${sourceName})` : ''}.
-				`,
-			),
+			shortExplanation: sentence(`{{WALLET_NAME}} is funded through user-extractive means${sourceName !== '' ? ` (${sourceName})` : ''}.`),
 			__brand: brand,
 		},
 		details: fundingDetailsContent({ monetization }),
-		howToImprove: paragraph(
-			({ wallet }) => `
-				${wallet.metadata.displayName} should change its funding sources
-				to non-user-extractive means such as transparent convenience fees,
-				donations, or ecosystem grants.
-			`,
-		),
+		howToImprove: paragraph(`{{WALLET_NAME}} should change its funding sources to non-user-extractive means such as transparent convenience fees, donations, or ecosystem grants.`),
 		references: toFullyQualified(monetization.ref),
 	}
 }
@@ -87,27 +72,11 @@ const noFunding: Evaluation<FundingValue> = {
 		id: 'noFunding',
 		rating: Rating.FAIL,
 		displayName: 'No funding source',
-		shortExplanation: sentence(
-			(walletMetadata: WalletMetadata) => `
-				${walletMetadata.displayName} has no funding sources.
-			`,
-		),
+		shortExplanation: sentence(`{{WALLET_NAME}} has no funding sources.`),
 		__brand: brand,
 	},
-	details: paragraph(
-		({ wallet }) => `
-			${wallet.metadata.displayName} has no funding sources, making its future
-			unclear. Wallets need a consistent source of funding to ensure they keep
-			up with security vulnerabilities and ecosystem progress.
-		`,
-	),
-	howToImprove: paragraph(
-		({ wallet }) => `
-			While most software projects inevitably start small and unfunded,
-			${wallet.metadata.displayName} should seek a reliable source of funding
-			once feasible.
-		`,
-	),
+	details: paragraph(`{{WALLET_NAME}} has no funding sources, making its future unclear. Wallets need a consistent source of funding to ensure they keep up with security vulnerabilities and ecosystem progress.`),
+	howToImprove: paragraph(`While most software projects inevitably start small and unfunded, {{WALLET_NAME}} should seek a reliable source of funding once feasible.`),
 	references: [],
 }
 
@@ -117,24 +86,11 @@ const unclear: Evaluation<FundingValue> = {
 		id: 'unclear',
 		rating: Rating.FAIL,
 		displayName: 'Unclear funding source',
-		shortExplanation: sentence(
-			(walletMetadata: WalletMetadata) => `
-				How ${walletMetadata.displayName} is funded is unclear.
-			`,
-		),
+		shortExplanation: sentence(`How {{WALLET_NAME}} is funded is unclear.`),
 		__brand: brand,
 	},
-	details: paragraph(
-		({ wallet }) => `
-			How ${wallet.metadata.displayName} is funded is unclear.
-		`,
-	),
-	howToImprove: paragraph(
-		({ wallet }) => `
-			${wallet.metadata.displayName} should publish how it is funded, or how it
-			plans to fund itself.
-		`,
-	),
+	details: paragraph(`How {{WALLET_NAME}} is funded is unclear.`),
+	howToImprove: paragraph(`{{WALLET_NAME}} should publish how it is funded, or how it plans to fund itself.`),
 	references: [],
 }
 
@@ -168,15 +124,8 @@ export const funding: Attribute<FundingValue> = {
 	wording: {
 		midSentenceName: 'funding',
 	},
-	question: sentence(`
-		How is the wallet's development team funded?
-	`),
-	why: paragraph(`
-		Wallets are complex, high-stakes pieces of software. They must be
-		maintained, regularly audited, and follow the continuous improvements
-		in the ecosystem.
-		This requires a reliable, transparent source of funding.
-	`),
+	question: sentence(`How is the wallet's development team funded?`),
+	why: paragraph(`Wallets are complex, high-stakes pieces of software. They must be maintained, regularly audited, and follow the continuous improvements in the ecosystem. This requires a reliable, transparent source of funding.`),
 	methodology: markdown(`
 		Wallets are assessed based on how sustainable, transparent, and
 		user-aligned their funding mechanisms are.
@@ -215,63 +164,35 @@ export const funding: Attribute<FundingValue> = {
 		exhaustive: false,
 		fail: [
 			exampleRating(
-				paragraph(`
-					The wallet has funding but has not revealed this publicly and
-					transparently to users.
-				`),
+				paragraph(`The wallet has funding but has not revealed this publicly and transparently to users.`),
 				unclear.value,
 			),
 			exampleRating(
-				paragraph(`
-					The wallet does not have any funding.
-					Wallets must have sustainable funding sources in order to remain
-					secure and up-to-date.
-				`),
+				paragraph(`The wallet does not have any funding. Wallets must have sustainable funding sources in order to remain secure and up-to-date.`),
 				noFunding.value,
 			),
 		],
 		partial: [
 			exampleRating(
-				paragraph(`
-					The wallet is funded from hidden swap fees. While users can look this
-					up onchain to see how much revenue the wallet is generating from this,
-					making this funding source technically transparent, it is not
-					user-aligned.
-				`),
+				paragraph(`The wallet is funded from hidden swap fees. While users can look this up onchain to see how much revenue the wallet is generating from this, making this funding source technically transparent, it is not user-aligned.`),
 				exampleRatingUnimplemented,
 			),
 			exampleRating(
-				paragraph(`
-					The wallet is funded from user-visible swap fees and governance token
-					sales with undisclosed vesting schedule. While users can use onchain
-					lookups to determine how much revenue is generated from both sources,
-					making the funding technically transparent, the undisclosed nature of
-					governance token makes makes this not user-aligned.
-				`),
+				paragraph(`The wallet is funded from user-visible swap fees and governance token sales with undisclosed vesting schedule. While users can use onchain lookups to determine how much revenue is generated from both sources, making the funding technically transparent, the undisclosed nature of governance token makes makes this not user-aligned.`),
 				exampleRatingUnimplemented,
 			),
 		],
 		pass: [
 			exampleRating(
-				paragraph(`
-					The wallet is funded from user-visible swap fees and pre-disclosed
-					governance token sales.
-				`),
+				paragraph(`The wallet is funded from user-visible swap fees and pre-disclosed governance token sales.`),
 				exampleRatingUnimplemented,
 			),
 			exampleRating(
-				paragraph(`
-					The wallet is funded from venture capital and publishes regulatory
-					filings showing the amount raised in each round and the top investors
-					of each round.
-				`),
+				paragraph(`The wallet is funded from venture capital and publishes regulatory filings showing the amount raised in each round and the top investors of each round.`),
 				exampleRatingUnimplemented,
 			),
 			exampleRating(
-				paragraph(`
-					The wallet is funded from onchain donations, onchain ecosystem
-					grants, and commemorative NFT sales.
-				`),
+				paragraph(`The wallet is funded from onchain donations, onchain ecosystem grants, and commemorative NFT sales.`),
 				exampleRatingUnimplemented,
 			),
 		],

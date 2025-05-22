@@ -8,7 +8,6 @@ import {
 import { popRefs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -49,13 +48,9 @@ export const maintenance: Attribute<MaintenanceValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's maintenance evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve its maintenance?`,
+		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its maintenance?`),
 	},
-	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} have good maintenance practices?`,
-	),
+	question: sentence(`Does {{WALLET_NAME}} have good maintenance practices?`),
 	why: markdown(`
 		Good maintenance practices ensure the long-term usability, reliability, and physical durability of a hardware wallet.
 		This includes the device's resistance to physical damage, the availability of repair information and parts, battery longevity and replaceability, and the manufacturer's warranty policy.
@@ -79,19 +74,19 @@ export const maintenance: Attribute<MaintenanceValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(() => 'The wallet passes most maintenance sub-criteria.'),
+				sentence(`The wallet passes most maintenance sub-criteria.`),
 				(v: MaintenanceValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'The wallet passes some maintenance sub-criteria.'),
+				sentence(`The wallet passes some maintenance sub-criteria.`),
 				(v: MaintenanceValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'The wallet fails most or all maintenance sub-criteria.'),
+				sentence(`The wallet fails most or all maintenance sub-criteria.`),
 				(v: MaintenanceValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -102,7 +97,7 @@ export const maintenance: Attribute<MaintenanceValue> = {
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				maintenance,
-				sentence('These attributes only refer to hardware wallet maintenance'),
+				sentence(`These attributes only refer to hardware wallet maintenance`),
 				brand,
 				{
 					physicalDurability: MaintenanceType.FAIL,
@@ -132,21 +127,12 @@ export const maintenance: Attribute<MaintenanceValue> = {
 				id: 'maintenance',
 				rating,
 				displayName: 'Maintenance',
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) =>
-						`${walletMetadata.displayName} has ${rating.toLowerCase()} maintenance practices.`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} maintenance practices.`),
 				...withoutRefs,
 				__brand: brand,
 			},
-			details: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} maintenance evaluation is ${rating.toLowerCase()}.`,
-			),
-			howToImprove: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
-			),
+			details: paragraph(`{{WALLET_NAME}} maintenance evaluation is ${rating.toLowerCase()}.`),
+			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},
