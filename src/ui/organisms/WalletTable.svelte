@@ -22,7 +22,7 @@
 
 
 	// Functions
-	import { variantUrlQuery } from '@/components/variants'
+	import { variants, variantUrlQuery } from '@/components/variants'
 	import { isLabeledUrl } from '@/schema/url'
 	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
 
@@ -37,35 +37,6 @@
 
 	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 	import OpenInNewRoundedIcon from '@material-icons/svg/svg/open_in_new//baseline.svg?raw'
-
-	import PhoneAndroidIcon from '@material-icons/svg/svg/phone_android/baseline.svg?raw'
-	import LanguageIcon from '@material-icons/svg/svg/language/baseline.svg?raw'
-	import MonitorIcon from '@material-icons/svg/svg/monitor/baseline.svg?raw'
-	import SettingsEthernetIcon from '@material-icons/svg/svg/settings_ethernet/baseline.svg?raw'
-	import HardwareIcon from '@material-icons/svg/svg/hardware/baseline.svg?raw'
-
-	const variants = {
-		[Variant.BROWSER]: {
-			label: 'Browser extension',
-			icon: LanguageIcon,
-		},
-		[Variant.DESKTOP]: {
-			label: 'Desktop app',
-			icon: MonitorIcon,
-		},
-		[Variant.MOBILE]: {
-			label: 'Mobile app',
-			icon: PhoneAndroidIcon,
-		},
-		[Variant.EMBEDDED]: {
-			label: 'Embedded wallet',
-			icon: SettingsEthernetIcon,
-		},
-		[Variant.HARDWARE]: {
-			label: 'Hardware wallet',
-			icon: HardwareIcon,
-		},
-	} as const satisfies Record<Variant, { label: string, icon: string }>
 </script>
 
 
