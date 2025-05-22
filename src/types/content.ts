@@ -8,7 +8,7 @@ import type { SecurityAuditsDetailsContent } from './content/security-audits-det
 import type { SourceVisibilityDetailsContent } from './content/source-visibility-details'
 import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
 import type { UnratedAttributeContent } from './content/unrated-attribute'
-import type { Strings, ValidateText } from './utils/string-templates'
+import type { Strings as _Strings, ValidateText } from './utils/string-templates'
 import { trimWhitespacePrefix } from './utils/text'
 
 /**
@@ -42,20 +42,20 @@ export type ComponentAndProps =
 /**
  * Text-based content that may be displayed on the UI.
  */
-export type TextContent<Strings_ extends Strings = Strings> = {
+export type TextContent<Strings extends _Strings = _Strings> = {
 	contentType: ContentType.TEXT
 	text: string
-	strings?: Strings_
+	strings?: Strings
 }
 
 /**
  * Markdown-based content that may be displayed on the UI.
  * Also includes a text property to make it compatible with TypographicContent interfaces.
  */
-export type MarkdownContent<Strings_ extends Strings = Strings> = {
+export type MarkdownContent<Strings extends _Strings = _Strings> = {
 	contentType: ContentType.MARKDOWN
 	markdown: string
-	strings?: Strings_
+	strings?: Strings
 }
 
 /**
@@ -69,16 +69,16 @@ export type CustomContent = {
 /**
  * Typographic content that may be displayed on the UI.
  */
-export type TypographicContent<Strings_ extends Strings = Strings> = (
-	| TextContent<Strings_>
-	| MarkdownContent<Strings_>
+export type TypographicContent<Strings extends _Strings = _Strings> = (
+	| TextContent<Strings>
+	| MarkdownContent<Strings>
 )
 
 /**
  * Represents any type of content that may be displayed on the UI.
  */
-export type Content<Strings_ extends Strings = Strings> = (
-	| TypographicContent<Strings_>
+export type Content<Strings extends _Strings = _Strings> = (
+	| TypographicContent<Strings>
 	| CustomContent
 )
 
@@ -87,7 +87,7 @@ export type Content<Strings_ extends Strings = Strings> = (
  * @param content The content to check.
  * @returns Whether `content` is of type `TypographicContent`.
  */
-export function isTypographicContent<Strings_ extends Strings>(content: Content): content is TypographicContent<Strings_> {
+export function isTypographicContent<Strings extends _Strings>(content: Content): content is TypographicContent<Strings> {
 	return content.contentType === ContentType.TEXT || content.contentType === ContentType.MARKDOWN
 }
 
@@ -95,46 +95,46 @@ export function isTypographicContent<Strings_ extends Strings>(content: Content)
  * Create text content with optional template variables
  */
 function textContent<
-	Strings_ extends Strings,
+	Strings extends _Strings,
 	_Text extends string = string,
 >(
 	text: _Text,
-	strings?: Strings_,
+	strings?: Strings,
 ) {
 	return {
 		contentType: ContentType.TEXT,
 		text: trimWhitespacePrefix(text),
 		...strings && { strings },
-	} as ValidateText<TextContent<Strings_>, _Text, Strings_>
+	} as ValidateText<TextContent<Strings>, _Text, Strings>
 }
 
 export function markdown<
-	Strings_ extends Strings,
+	Strings extends _Strings,
 	_Text extends string = string,
 >(
 	markdownText: _Text,
-	strings?: Strings_,
+	strings?: Strings,
 ) {
 	return {
 		contentType: ContentType.MARKDOWN,
 		markdown: trimWhitespacePrefix(markdownText),
 		...strings && { strings },
-	} as ValidateText<MarkdownContent<Strings_>, _Text, Strings_>
+	} as ValidateText<MarkdownContent<Strings>, _Text, Strings>
 }
 
 const sentenceMaxLength = 384
 
-export type Sentence<Strings_ extends Strings> = (
-	TypographicContent<Strings_>
+export type Sentence<Strings extends _Strings> = (
+	TypographicContent<Strings>
 )
 
 /** A single sentence. */
 export function sentence<
-	Strings_ extends Strings,
+	Strings extends _Strings,
 	_Text extends string = string,
 >(
 	text: _Text,
-	strings?: Strings_,
+	strings?: Strings,
 ) {
 	if (text.length > sentenceMaxLength) {
 		throw new Error(
@@ -147,11 +147,11 @@ export function sentence<
 
 /** A renderable Markdown-rendered sentence. */
 export function mdSentence<
-	Strings_ extends Strings,
+	Strings extends _Strings,
 	_Text extends string = string,
 >(
 	text: _Text,
-	strings?: Strings_,
+	strings?: Strings,
 ) {
 	return markdown(text, strings)
 }
@@ -160,17 +160,17 @@ const paragraphMaxLength = 1024
 
 /** A short amount of text that fits in a single paragraph. */
 
-export type Paragraph<Strings_ extends Strings> = (
-	TextContent<Strings_>
+export type Paragraph<Strings extends _Strings> = (
+	TextContent<Strings>
 )
 
 /** A renderable paragraph. */
 export function paragraph<
-	Strings_ extends Strings,
+	Strings extends _Strings,
 	_Text extends string = string,
 >(
 	text: _Text,
-	strings?: Strings_,
+	strings?: Strings,
 ) {
 	if (text.length > paragraphMaxLength) {
 		throw new Error(
@@ -183,11 +183,11 @@ export function paragraph<
 
 /** A renderable Markdown-rendered paragraph. */
 export function mdParagraph<
-	Strings_ extends Strings,
+	Strings extends _Strings,
 	_Text extends string = string,
 >(
 	text: _Text,
-	strings?: Strings_,
+	strings?: Strings,
 ) {
 	if (text.length > paragraphMaxLength)
 		throw new Error(
@@ -217,8 +217,8 @@ function mergeProps<XY extends object, X extends keyof XY>(
 export function component<
 	C extends ComponentAndProps,
 	B extends keyof C['componentProps'],
-	// I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
-	// 	Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
+// I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
+// 	Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
 >(
 	componentName: C['component'],
 	componentProps: Pick<C['componentProps'], B>
