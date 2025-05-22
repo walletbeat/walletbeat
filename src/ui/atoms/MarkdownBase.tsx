@@ -10,65 +10,64 @@ import { EipLink } from './EipLink';
 import { ExternalLink } from './ExternalLink';
 
 export interface MarkdownOwnProps {
-	markdownTransform?: (markdown: string) => string;
-	pVariant?: React.ComponentProps<typeof Typography>['variant'];
-	pFontWeight?: React.ComponentProps<typeof Typography>['fontWeight'];
-	textColor?: React.ComponentProps<typeof Typography>['color'];
-	pSpacing?: React.ComponentProps<typeof Typography>['marginTop'] & string;
-	liSpacing?: React.ComponentProps<typeof Typography>['marginTop'] & string;
+  markdownTransform?: (markdown: string) => string;
+  pVariant?: React.ComponentProps<typeof Typography>['variant'];
+  pFontWeight?: React.ComponentProps<typeof Typography>['fontWeight'];
+  textColor?: React.ComponentProps<typeof Typography>['color'];
+  pSpacing?: React.ComponentProps<typeof Typography>['marginTop'] & string;
+  liSpacing?: React.ComponentProps<typeof Typography>['marginTop'] & string;
 }
 
 export function deriveMarkdownPropsFromTypography(
-	typographyProps?: TypographyProps,
-	markdownProps?: MarkdownOwnProps,
+  typographyProps?: TypographyProps,
+  markdownProps?: MarkdownOwnProps,
 ): MarkdownOwnProps {
-	let marginTop: string | undefined = undefined;
+  let marginTop: string | undefined = undefined;
 
-	if (typographyProps?.marginTop !== undefined) {
-		if (typeof typographyProps.marginTop === 'number') {
-			marginTop = `${typographyProps.marginTop}px`;
-		} else if (typeof typographyProps.marginTop === 'string') {
-			// eslint-disable-next-line prefer-destructuring
-			marginTop = typographyProps.marginTop;
-		}
-	}
+  if (typographyProps?.marginTop !== undefined) {
+    if (typeof typographyProps.marginTop === 'number') {
+      marginTop = `${typographyProps.marginTop}px`;
+    } else if (typeof typographyProps.marginTop === 'string') {
+      marginTop = typographyProps.marginTop;
+    }
+  }
 
-	return {
-		markdownTransform: markdownProps?.markdownTransform,
-		textColor: markdownProps?.textColor ?? typographyProps?.color,
-		pFontWeight: markdownProps?.pFontWeight ?? typographyProps?.fontWeight,
-		pVariant: markdownProps?.pVariant ?? typographyProps?.variant,
-		pSpacing: markdownProps?.pSpacing ?? marginTop,
-		liSpacing: markdownProps?.liSpacing ?? markdownProps?.pSpacing ?? marginTop,
-	};
+  return {
+    markdownTransform: markdownProps?.markdownTransform,
+    textColor: markdownProps?.textColor ?? typographyProps?.color,
+    pFontWeight: markdownProps?.pFontWeight ?? typographyProps?.fontWeight,
+    pVariant: markdownProps?.pVariant ?? typographyProps?.variant,
+    pSpacing: markdownProps?.pSpacing ?? marginTop,
+    liSpacing: markdownProps?.liSpacing ?? markdownProps?.pSpacing ?? marginTop,
+  };
 }
 
 const StyledMarkdown = styled(Box, {
-	shouldForwardProp: prop => prop !== 'pSpacing' && prop !== 'liSpacing',
+  shouldForwardProp: prop => prop !== 'pSpacing' && prop !== 'liSpacing',
 })(
-	({ pSpacing, liSpacing }: MarkdownOwnProps) => `
+  ({ pSpacing, liSpacing }: MarkdownOwnProps) => `
 	p, li {
 		margin-top: 0px;
 	}
 
 	${
-		pSpacing === undefined
-			? ''
-			: `p + p {
+    pSpacing === undefined
+      ? ''
+      : `p + p {
 		margin-top: ${pSpacing};
 	}`
-	}
+  }
 
 	${
-		liSpacing === undefined
-			? ''
-			: `li + li:not(li li), li li:not(li li + li) {
+    liSpacing === undefined
+      ? ''
+      : `li + li:not(li li), li li:not(li li + li) {
 		margin-top: ${pSpacing};
 	}
 	li li + li {
 		margin-top: calc(${pSpacing} / 2);
 	}`
-	}
+  }
 `,
 );
 
@@ -78,64 +77,60 @@ const StyledMarkdown = styled(Box, {
  * Should not be used directly; use MarkdownBox or MarkdownTypography.
  */
 export function MarkdownBase({
-	markdown,
-	markdownTransform = undefined,
-	pVariant = undefined,
-	pFontWeight = undefined,
-	pSpacing = '1rem',
-	liSpacing = '0.25rem',
-	textColor = 'inherit',
+  markdown,
+  markdownTransform = undefined,
+  pVariant = undefined,
+  pFontWeight = undefined,
+  pSpacing = '1rem',
+  liSpacing = '0.25rem',
+  textColor = 'inherit',
 }: {
-	markdown: string;
+  markdown: string;
 } & MarkdownOwnProps): React.JSX.Element {
-	const componentsMap: Components = {
-		a: ({ href, children }) => {
-			const hrefStr = href ?? '#';
-			const eipRegexp =
-				/^https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+)#wb-format=(short|long)$/i.exec(
-					hrefStr,
-				);
+  const componentsMap: Components = {
+    a: ({ href, children }) => {
+      const hrefStr = href ?? '#';
+      const eipRegexp =
+        /^https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+)#wb-format=(short|long)$/i.exec(hrefStr);
 
-			if (eipRegexp !== null) {
-				const eip = lookupEip(+eipRegexp[1]);
+      if (eipRegexp !== null) {
+        const eip = lookupEip(+eipRegexp[1]);
 
-				if (eip !== undefined) {
-					return (
-						<EipLink eip={eip} format={eipRegexp[2] === 'short' ? 'SHORT' : 'LONG'} />
-					);
-				}
-			}
+        if (eip !== undefined) {
+          return <EipLink eip={eip} format={eipRegexp[2] === 'short' ? 'SHORT' : 'LONG'} />;
+        }
+      }
 
-			if (/^[-_\w+:]/.exec(hrefStr) !== null) {
-				// External link.
-				return <ExternalLink url={hrefStr}>{children}</ExternalLink>;
-			}
+      if (/^[-_\w+:]/.exec(hrefStr) !== null) {
+        // External link.
+        return <ExternalLink url={hrefStr}>{children}</ExternalLink>;
+      }
 
-			return <a href={hrefStr}>{children}</a>;
-		},
-		p: ({ children }) => (
-			<Typography variant={pVariant} color={textColor} fontWeight={pFontWeight}>
-				{children}
-			</Typography>
-		),
-		li: ({ children }) => (
-			<li>
-				<Typography variant={pVariant} color={textColor} fontWeight={pFontWeight}>
-					{children}
-				</Typography>
-			</li>
-		),
-	};
+      return <a href={hrefStr}>{children}</a>;
+    },
+    p: ({ children }) => (
+      <Typography variant={pVariant} color={textColor} fontWeight={pFontWeight}>
+        {children}
+      </Typography>
+    ),
+    li: ({ children }) => (
+      <li>
+        <Typography variant={pVariant} color={textColor} fontWeight={pFontWeight}>
+          {children}
+        </Typography>
+      </li>
+    ),
+  };
 
-	markdown = trimWhitespacePrefix(markdown);
+  markdown = trimWhitespacePrefix(markdown);
 
-	if (markdownTransform !== undefined) {
-		markdown = markdownTransform(markdown);
-	}
+  if (markdownTransform !== undefined) {
+    markdown = markdownTransform(markdown);
+  }
 
-	return (
-		<StyledMarkdown pSpacing={pSpacing} liSpacing={liSpacing}>
-			<Markdown components={componentsMap}>{markdown}</Markdown>
-		</StyledMarkdown>
-	);
+  return (
+    <StyledMarkdown pSpacing={pSpacing} liSpacing={liSpacing}>
+      <Markdown components={componentsMap}>{markdown}</Markdown>
+    </StyledMarkdown>
+  );
 }

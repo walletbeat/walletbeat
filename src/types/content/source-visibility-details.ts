@@ -6,12 +6,12 @@ import { component, type Renderable } from '../content';
 export interface SourceVisibilityDetailsProps extends EvaluationData<SourceVisibilityValue> {}
 
 export interface SourceVisibilityDetailsContent {
-	component: 'SourceVisibilityDetails';
-	componentProps: SourceVisibilityDetailsProps;
+  component: 'SourceVisibilityDetails';
+  componentProps: SourceVisibilityDetailsProps;
 }
 
 export function sourceVisibilityDetailsContent(): Renderable<
-	EvaluationData<SourceVisibilityValue>
+  EvaluationData<SourceVisibilityValue>
 > {
-	return component<SourceVisibilityDetailsContent, never>('SourceVisibilityDetails', {});
+  return component<SourceVisibilityDetailsContent, never>('SourceVisibilityDetails', {});
 }

@@ -12,33 +12,33 @@ import { percentageToColor } from '@/utils/colors';
  * Renders a list of rating badges for each non-exempt attribute in the group.
  */
 export function WalletSectionSummary<Vs extends ValueSet>(props: {
-	wallet: RatedWallet;
-	attrGroup: AttributeGroup<Vs>;
+  wallet: RatedWallet;
+  attrGroup: AttributeGroup<Vs>;
 }): ReactElement {
-	const { wallet, attrGroup } = props;
-	const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup);
-	const score = attrGroup.score(evalGroup);
-	const percentageScore = score != null ? `${Math.round(score.score * 100)}%` : null;
+  const { wallet, attrGroup } = props;
+  const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup);
+  const score = attrGroup.score(evalGroup);
+  const percentageScore = score != null ? `${Math.round(score.score * 100)}%` : null;
 
-	const color =
-		score != null
-			? score.hasUnratedComponent
-				? 'bg-neutral-100 dark:bg-neutral-800'
-				: percentageToColor(score.score)
-			: '';
+  const color =
+    score != null
+      ? score.hasUnratedComponent
+        ? 'bg-neutral-100 dark:bg-neutral-800'
+        : percentageToColor(score.score)
+      : '';
 
-	return (
-		<div>
-			{score != null && (
-				<div className={cx('flex flex-row gap-2 items-center w-fit p-2', color)}>
-					{percentageScore}
-					{score.hasUnratedComponent && (
-						<Tooltip content='This attribute group contains unrated components.'>
-							<LuInfo />
-						</Tooltip>
-					)}
-				</div>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      {score != null && (
+        <div className={cx('flex flex-row gap-2 items-center w-fit p-2', color)}>
+          {percentageScore}
+          {score.hasUnratedComponent && (
+            <Tooltip content='This attribute group contains unrated components.'>
+              <LuInfo />
+            </Tooltip>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }

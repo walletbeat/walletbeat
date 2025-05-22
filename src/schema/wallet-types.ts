@@ -1,10 +1,10 @@
 import {
-	nonEmptyFilter,
-	nonEmptyKeys,
-	nonEmptyMap,
-	type NonEmptyRecord,
-	type NonEmptySet,
-	nonEmptySetFromArray,
+  nonEmptyFilter,
+  nonEmptyKeys,
+  nonEmptyMap,
+  type NonEmptyRecord,
+  type NonEmptySet,
+  nonEmptySetFromArray,
 } from '@/types/utils/non-empty';
 
 import { allVariants, Variant } from './variants';
@@ -22,61 +22,59 @@ import { type BaseWallet, getWalletVariants, type RatedWallet } from './wallet';
  * (e.g. Ledger Live) would be both a hardware and software wallet.
  */
 export enum WalletType {
-	/** Software wallet. */
-	SOFTWARE = 'SOFTWARE',
+  /** Software wallet. */
+  SOFTWARE = 'SOFTWARE',
 
-	/** Hardware wallet. */
-	HARDWARE = 'HARDWARE',
+  /** Hardware wallet. */
+  HARDWARE = 'HARDWARE',
 
-	/** Embedded wallet. */
-	EMBEDDED = 'EMBEDDED',
+  /** Embedded wallet. */
+  EMBEDDED = 'EMBEDDED',
 }
 
 /**
  * Map over all possible wallet types.
  */
 export function mapWalletTypes<T>(
-	fn: (walletType: WalletType) => T,
+  fn: (walletType: WalletType) => T,
 ): Record<WalletType, T> & NonEmptyRecord<WalletType, T> {
-	return {
-		[WalletType.SOFTWARE]: fn(WalletType.SOFTWARE),
-		[WalletType.HARDWARE]: fn(WalletType.HARDWARE),
-		[WalletType.EMBEDDED]: fn(WalletType.EMBEDDED),
-	};
+  return {
+    [WalletType.SOFTWARE]: fn(WalletType.SOFTWARE),
+    [WalletType.HARDWARE]: fn(WalletType.HARDWARE),
+    [WalletType.EMBEDDED]: fn(WalletType.EMBEDDED),
+  };
 }
 
 /**
  * Return the URL slug for a wallet type.
  */
 export function walletTypeToUrlSlug(walletType: WalletType): string {
-	switch (walletType) {
-		case WalletType.SOFTWARE:
-			return 'wallet';
-		case WalletType.HARDWARE:
-			return 'hww';
-		case WalletType.EMBEDDED:
-			return 'embedded';
-	}
+  switch (walletType) {
+    case WalletType.SOFTWARE:
+      return 'wallet';
+    case WalletType.HARDWARE:
+      return 'hww';
+    case WalletType.EMBEDDED:
+      return 'embedded';
+  }
 }
 
 /**
  * Look up the wallet type for a given URL slug.
  */
 export function urlSlugToWalletType(slug: string): WalletType | null {
-	const found = Object.values(
-		mapWalletTypes(walletType =>
-			walletTypeToUrlSlug(walletType) === slug ? walletType : null,
-		),
-	).filter(val => val !== null);
+  const found = Object.values(
+    mapWalletTypes(walletType => (walletTypeToUrlSlug(walletType) === slug ? walletType : null)),
+  ).filter(val => val !== null);
 
-	return found.length === 0 ? null : found[0];
+  return found.length === 0 ? null : found[0];
 }
 
 /**
  * Type predicate for WalletType.
  */
 export function isWalletType(str: string): str is WalletType {
-	return Object.values(mapWalletTypes(walletType => str === walletType)).some(val => val);
+  return Object.values(mapWalletTypes(walletType => str === walletType)).some(val => val);
 }
 
 /**
@@ -85,9 +83,9 @@ export function isWalletType(str: string): str is WalletType {
  * returned set.
  */
 export function walletTypeToVariants(walletType: WalletType): NonEmptySet<Variant> {
-	return nonEmptySetFromArray(
-		nonEmptyFilter(allVariants, variant => variantToWalletType(variant) === walletType),
-	);
+  return nonEmptySetFromArray(
+    nonEmptyFilter(allVariants, variant => variantToWalletType(variant) === walletType),
+  );
 }
 
 /**
@@ -95,25 +93,25 @@ export function walletTypeToVariants(walletType: WalletType): NonEmptySet<Varian
  * have if it implements that variant.
  */
 export function variantToWalletType(variant: Variant): WalletType {
-	switch (variant) {
-		case Variant.BROWSER:
-			return WalletType.SOFTWARE;
-		case Variant.DESKTOP:
-			return WalletType.SOFTWARE;
-		case Variant.MOBILE:
-			return WalletType.SOFTWARE;
-		case Variant.EMBEDDED:
-			return WalletType.EMBEDDED;
-		case Variant.HARDWARE:
-			return WalletType.HARDWARE;
-	}
+  switch (variant) {
+    case Variant.BROWSER:
+      return WalletType.SOFTWARE;
+    case Variant.DESKTOP:
+      return WalletType.SOFTWARE;
+    case Variant.MOBILE:
+      return WalletType.SOFTWARE;
+    case Variant.EMBEDDED:
+      return WalletType.EMBEDDED;
+    case Variant.HARDWARE:
+      return WalletType.HARDWARE;
+  }
 }
 
 /**
  * Returns the types of a given wallet.
  */
 export function walletTypes(wallet: BaseWallet | RatedWallet): NonEmptySet<WalletType> {
-	return nonEmptySetFromArray(
-		nonEmptyMap(nonEmptyKeys(getWalletVariants(wallet)), variantToWalletType),
-	);
+  return nonEmptySetFromArray(
+    nonEmptyMap(nonEmptyKeys(getWalletVariants(wallet)), variantToWalletType),
+  );
 }

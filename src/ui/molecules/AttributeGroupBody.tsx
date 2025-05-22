@@ -10,20 +10,20 @@ import { EvaluatedGroupOverview } from './wallet/heading/EvaluatedGroupOverview'
  * Renders a pizza-chart for a specific attribute group of a wallet.
  */
 export function AttributeGroupBody<Vs extends ValueSet>(props: {
-	wallet: RatedWallet;
-	attrGroup: AttributeGroup<Vs>;
+  wallet: RatedWallet;
+  attrGroup: AttributeGroup<Vs>;
 }): JSX.Element {
-	const { wallet, attrGroup } = props;
-	const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup);
+  const { wallet, attrGroup } = props;
+  const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup);
 
-	return (
-		<div className='pb-2 mb-2 card'>
-			<EvaluatedGroupOverview
-				wallet={wallet}
-				// attrGroup={attrGroup}
-				evalGroup={evalGroup}
-				hardwareWalletModel={undefined}
-			/>
-		</div>
-	);
+  return (
+    <div className='pb-2 mb-2 card'>
+      <EvaluatedGroupOverview
+        wallet={wallet}
+        // attrGroup={attrGroup}
+        evalGroup={evalGroup}
+        hardwareWalletModel={undefined}
+      />
+    </div>
+  );
 }

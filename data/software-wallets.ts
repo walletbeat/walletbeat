@@ -16,18 +16,18 @@ import { zerion } from './software-wallets/zerion';
 
 /** Set of all known software wallets. */
 export const softwareWallets = {
-	ambire,
-	coinbase,
-	daimo,
-	elytro,
-	family,
-	frame,
-	metamask,
-	phantom,
-	rabby,
-	rainbow,
-	safe,
-	zerion,
+  ambire,
+  coinbase,
+  daimo,
+  elytro,
+  family,
+  frame,
+  metamask,
+  phantom,
+  rabby,
+  rainbow,
+  safe,
+  zerion,
 };
 
 /** A valid software wallet name. */
@@ -35,20 +35,20 @@ export type SoftwareWalletName = keyof typeof softwareWallets;
 
 /** Type predicate for SoftwareWalletName. */
 export function isValidSoftwareWalletName(name: string): name is SoftwareWalletName {
-	return Object.prototype.hasOwnProperty.call(softwareWallets, name);
+  return Object.prototype.hasOwnProperty.call(softwareWallets, name);
 }
 
 /** All rated software wallets. */
 
 export const ratedSoftwareWallets: Record<SoftwareWalletName, RatedWallet> = Object.fromEntries(
-	Object.entries(softwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
+  Object.entries(softwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 ) as Record<SoftwareWalletName, RatedWallet>;
 
 /**
  * Map the given function to all rated software wallets.
  */
 export function mapSoftwareWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
-	return Object.values(ratedSoftwareWallets).map(fn);
+  return Object.values(ratedSoftwareWallets).map(fn);
 }
 
 /** The unrated software wallet as a rated wallet. */

@@ -13,8 +13,8 @@ end_of_line = lf
 insert_final_newline = true
 
 # Kill trailing whitespace.
-trim_trailing_whitespace = true
+trim_trailing_whitespace = false
 
 # Indent style.
-indent_style = tab
+indent_style = space
 indent_size = 2

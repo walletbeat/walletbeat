@@ -14,35 +14,35 @@ import { UnratedAttribute } from '@/ui/molecules/attributes/UnratedAttribute';
 import { RenderTypographicContent } from './RenderTypographicContent';
 
 export function RenderContent({
-	content,
-	...otherProps
+  content,
+  ...otherProps
 }:
-	| { content: Content }
-	| React.ComponentProps<typeof RenderTypographicContent>): React.JSX.Element {
-	if (isTypographicContent(content)) {
-		return <RenderTypographicContent content={content} {...otherProps} />;
-	}
+  | { content: Content }
+  | React.ComponentProps<typeof RenderTypographicContent>): React.JSX.Element {
+  if (isTypographicContent(content)) {
+    return <RenderTypographicContent content={content} {...otherProps} />;
+  }
 
-	const { component, componentProps } = content.component;
+  const { component, componentProps } = content.component;
 
-	switch (component) {
-		case 'AddressCorrelationDetails':
-			return <AddressCorrelationDetails {...componentProps} {...otherProps} />;
-		case 'ChainVerificationDetails':
-			return <ChainVerificationDetails {...componentProps} {...otherProps} />;
-		case 'FundingDetails':
-			return <FundingDetails {...componentProps} {...otherProps} />;
-		case 'LicenseDetails':
-			return <LicenseDetails {...componentProps} {...otherProps} />;
-		case 'ScamAlertDetails':
-			return <ScamAlertDetails {...componentProps} {...otherProps} />;
-		case 'SecurityAuditsDetails':
-			return <SecurityAuditsDetails {...componentProps} {...otherProps} />;
-		case 'SourceVisibilityDetails':
-			return <SourceVisibilityDetails {...componentProps} {...otherProps} />;
-		case 'TransactionInclusionDetails':
-			return <TransactionInclusionDetails {...componentProps} {...otherProps} />;
-		case 'UnratedAttribute':
-			return <UnratedAttribute {...componentProps} {...otherProps} />;
-	}
+  switch (component) {
+    case 'AddressCorrelationDetails':
+      return <AddressCorrelationDetails {...componentProps} {...otherProps} />;
+    case 'ChainVerificationDetails':
+      return <ChainVerificationDetails {...componentProps} {...otherProps} />;
+    case 'FundingDetails':
+      return <FundingDetails {...componentProps} {...otherProps} />;
+    case 'LicenseDetails':
+      return <LicenseDetails {...componentProps} {...otherProps} />;
+    case 'ScamAlertDetails':
+      return <ScamAlertDetails {...componentProps} {...otherProps} />;
+    case 'SecurityAuditsDetails':
+      return <SecurityAuditsDetails {...componentProps} {...otherProps} />;
+    case 'SourceVisibilityDetails':
+      return <SourceVisibilityDetails {...componentProps} {...otherProps} />;
+    case 'TransactionInclusionDetails':
+      return <TransactionInclusionDetails {...componentProps} {...otherProps} />;
+    case 'UnratedAttribute':
+      return <UnratedAttribute {...componentProps} {...otherProps} />;
+  }
 }

@@ -5,38 +5,38 @@ import { type FullyQualifiedReference, mergeRefs } from '@/schema/reference';
 import { ReferenceLinks } from './ReferenceLinks';
 
 export function ReferenceList({
-	key,
-	ref,
-	ifEmpty = undefined,
-	ulStyle = undefined,
+  key,
+  ref,
+  ifEmpty = undefined,
+  ulStyle = undefined,
 }: {
-	key?: string;
-	ref: FullyQualifiedReference | FullyQualifiedReference[];
-	ifEmpty?: React.JSX.Element;
-	ulStyle?: React.CSSProperties;
+  key?: string;
+  ref: FullyQualifiedReference | FullyQualifiedReference[];
+  ifEmpty?: React.JSX.Element;
+  ulStyle?: React.CSSProperties;
 }): React.JSX.Element | undefined {
-	let refs = ref;
+  let refs = ref;
 
-	if (!Array.isArray(refs)) {
-		refs = [refs];
-	}
+  if (!Array.isArray(refs)) {
+    refs = [refs];
+  }
 
-	if (refs.length === 0) {
-		return ifEmpty;
-	}
+  if (refs.length === 0) {
+    return ifEmpty;
+  }
 
-	refs = mergeRefs(...refs);
+  refs = mergeRefs(...refs);
 
-	return (
-		<React.Fragment key={key}>
-			<ul style={ulStyle}>
-				{refs.map(ref => (
-					<li key={ref.urls[0].url}>
-						{ref.explanation ?? 'Reference:'}
-						<ReferenceLinks references={[ref]} />
-					</li>
-				))}
-			</ul>
-		</React.Fragment>
-	);
+  return (
+    <React.Fragment key={key}>
+      <ul style={ulStyle}>
+        {refs.map(ref => (
+          <li key={ref.urls[0].url}>
+            {ref.explanation ?? 'Reference:'}
+            <ReferenceLinks references={[ref]} />
+          </li>
+        ))}
+      </ul>
+    </React.Fragment>
+  );
 }

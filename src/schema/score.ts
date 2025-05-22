@@ -5,8 +5,8 @@ export type Score = number;
 
 /** A score and a weight. */
 export interface WeightedScore {
-	score: Score;
-	weight: number;
+  score: Score;
+  weight: number;
 }
 
 /**
@@ -14,19 +14,19 @@ export interface WeightedScore {
  * May also be null in case of complete exemption.
  */
 export type MaybeUnratedScore = null | {
-	score: Score;
-	hasUnratedComponent: boolean;
+  score: Score;
+  hasUnratedComponent: boolean;
 };
 
 /** Compute a weighted aggregate score. */
 export function weightedScore(scores: NonEmptyArray<WeightedScore>): Score {
-	let totalScore = 0.0;
-	let totalWeight = 0.0;
+  let totalScore = 0.0;
+  let totalWeight = 0.0;
 
-	nonEmptyMap(scores, ({ score, weight }) => {
-		totalScore += score * weight;
-		totalWeight += weight;
-	});
+  nonEmptyMap(scores, ({ score, weight }) => {
+    totalScore += score * weight;
+    totalWeight += weight;
+  });
 
-	return totalWeight === 0.0 ? 0.0 : totalScore / totalWeight;
+  return totalWeight === 0.0 ? 0.0 : totalScore / totalWeight;
 }

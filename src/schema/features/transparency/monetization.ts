@@ -7,39 +7,39 @@ import type { WithRef } from '../../reference';
  * the wallet features.
  */
 export enum MonetizationStrategy {
-	SELF_FUNDED = 'selfFunded',
-	DONATIONS = 'donations',
-	ECOSYSTEM_GRANTS = 'ecosystemGrants',
-	PUBLIC_OFFERING = 'publicOffering',
-	VENTURE_CAPITAL = 'ventureCapital',
-	TRANSPARENT_CONVENIENCE_FEES = 'transparentConvenienceFees',
-	HIDDEN_CONVENIENCE_FEES = 'hiddenConvenienceFees',
-	GOVERNANCE_TOKEN_LOW_FLOAT = 'governanceTokenLowFloat',
-	GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED = 'governanceTokenMostlyDistributed',
+  SELF_FUNDED = 'selfFunded',
+  DONATIONS = 'donations',
+  ECOSYSTEM_GRANTS = 'ecosystemGrants',
+  PUBLIC_OFFERING = 'publicOffering',
+  VENTURE_CAPITAL = 'ventureCapital',
+  TRANSPARENT_CONVENIENCE_FEES = 'transparentConvenienceFees',
+  HIDDEN_CONVENIENCE_FEES = 'hiddenConvenienceFees',
+  GOVERNANCE_TOKEN_LOW_FLOAT = 'governanceTokenLowFloat',
+  GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED = 'governanceTokenMostlyDistributed',
 }
 
 /** Human-readable name for a monetization strategy. */
 export function monetizationStrategyName(monetization: MonetizationStrategy): string {
-	switch (monetization) {
-		case MonetizationStrategy.SELF_FUNDED:
-			return 'self-funding';
-		case MonetizationStrategy.DONATIONS:
-			return 'donations';
-		case MonetizationStrategy.ECOSYSTEM_GRANTS:
-			return 'ecosystem grants';
-		case MonetizationStrategy.PUBLIC_OFFERING:
-			return 'public offering';
-		case MonetizationStrategy.VENTURE_CAPITAL:
-			return 'venture capital';
-		case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
-			return 'hidden fees';
-		case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
-			return 'transparent fees';
-		case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
-			return 'a low-float governance token';
-		case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
-			return 'a well-distributed governance token';
-	}
+  switch (monetization) {
+    case MonetizationStrategy.SELF_FUNDED:
+      return 'self-funding';
+    case MonetizationStrategy.DONATIONS:
+      return 'donations';
+    case MonetizationStrategy.ECOSYSTEM_GRANTS:
+      return 'ecosystem grants';
+    case MonetizationStrategy.PUBLIC_OFFERING:
+      return 'public offering';
+    case MonetizationStrategy.VENTURE_CAPITAL:
+      return 'venture capital';
+    case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
+      return 'hidden fees';
+    case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
+      return 'transparent fees';
+    case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
+      return 'a low-float governance token';
+    case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
+      return 'a well-distributed governance token';
+  }
 }
 
 /**
@@ -51,41 +51,41 @@ export function monetizationStrategyName(monetization: MonetizationStrategy): st
  * anti-correlated.
  */
 export function monetizationStrategyIsUserAligned(monetization: MonetizationStrategy): boolean {
-	switch (monetization) {
-		case MonetizationStrategy.SELF_FUNDED:
-			return true;
-		case MonetizationStrategy.DONATIONS:
-			return true;
-		case MonetizationStrategy.ECOSYSTEM_GRANTS:
-			return true;
-		case MonetizationStrategy.PUBLIC_OFFERING:
-			return true;
-		case MonetizationStrategy.VENTURE_CAPITAL:
-			return true;
-		case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
-			return true;
-		case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
-			return false;
-		case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
-			return false;
-		case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
-			return true;
-	}
+  switch (monetization) {
+    case MonetizationStrategy.SELF_FUNDED:
+      return true;
+    case MonetizationStrategy.DONATIONS:
+      return true;
+    case MonetizationStrategy.ECOSYSTEM_GRANTS:
+      return true;
+    case MonetizationStrategy.PUBLIC_OFFERING:
+      return true;
+    case MonetizationStrategy.VENTURE_CAPITAL:
+      return true;
+    case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
+      return true;
+    case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
+      return false;
+    case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
+      return false;
+    case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
+      return true;
+  }
 }
 
 export type Monetization = WithRef<{
-	revenueBreakdownIsPublic: boolean;
-	strategies: Record<MonetizationStrategy, boolean | null>;
+  revenueBreakdownIsPublic: boolean;
+  strategies: Record<MonetizationStrategy, boolean | null>;
 }>;
 
 /**
  * Iterate over the monetization strategies in the given object.
  */
 export function monetizationStrategies(
-	monetization: Monetization,
+  monetization: Monetization,
 ): Array<{ strategy: MonetizationStrategy; value: boolean | null }> {
-	return Object.entries(monetization.strategies).map(([key, value]) => ({
-		strategy: key as MonetizationStrategy,
-		value,
-	}));
+  return Object.entries(monetization.strategies).map(([key, value]) => ({
+    strategy: key as MonetizationStrategy,
+    value,
+  }));
 }

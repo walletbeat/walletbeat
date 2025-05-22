@@ -2,13 +2,13 @@
 	"singleQuote": true,
 	"trailingComma": "all",
 	"printWidth": 100,
-	"tabWidth": 4,
+	"tabWidth": 2,
 	"semi": true,
 	"jsxSingleQuote": true,
 	"bracketSameLine": false,
 	"arrowParens": "avoid",
 	"endOfLine": "auto",
-	"useTabs": true,
+	"useTabs": false,
 	"plugins": [
 		"prettier-plugin-astro",
 		"prettier-plugin-curly"

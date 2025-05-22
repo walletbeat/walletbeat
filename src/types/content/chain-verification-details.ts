@@ -7,20 +7,20 @@ import { component, type Renderable } from '../content';
 import type { NonEmptyArray } from '../utils/non-empty';
 
 export interface ChainVerificationDetailsProps extends EvaluationData<ChainVerificationValue> {
-	lightClients: NonEmptyArray<EthereumL1LightClient>;
-	refs: FullyQualifiedReference[];
+  lightClients: NonEmptyArray<EthereumL1LightClient>;
+  refs: FullyQualifiedReference[];
 }
 
 export interface ChainVerificationDetailsContent {
-	component: 'ChainVerificationDetails';
-	componentProps: ChainVerificationDetailsProps;
+  component: 'ChainVerificationDetails';
+  componentProps: ChainVerificationDetailsProps;
 }
 
 export function chainVerificationDetailsContent(
-	bakedProps: Omit<ChainVerificationDetailsProps, keyof EvaluationData<ChainVerificationValue>>,
+  bakedProps: Omit<ChainVerificationDetailsProps, keyof EvaluationData<ChainVerificationValue>>,
 ): Renderable<EvaluationData<ChainVerificationValue>> {
-	return component<ChainVerificationDetailsContent, keyof typeof bakedProps>(
-		'ChainVerificationDetails',
-		bakedProps,
-	);
+  return component<ChainVerificationDetailsContent, keyof typeof bakedProps>(
+    'ChainVerificationDetails',
+    bakedProps,
+  );
 }

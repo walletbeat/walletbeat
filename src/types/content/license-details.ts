@@ -6,10 +6,10 @@ import { component, type Renderable } from '../content';
 export interface LicenseDetailsProps extends EvaluationData<OpenSourceValue> {}
 
 export interface LicenseDetailsContent {
-	component: 'LicenseDetails';
-	componentProps: LicenseDetailsProps;
+  component: 'LicenseDetails';
+  componentProps: LicenseDetailsProps;
 }
 
 export function licenseDetailsContent(): Renderable<EvaluationData<OpenSourceValue>> {
-	return component<LicenseDetailsContent, never>('LicenseDetails', {});
+  return component<LicenseDetailsContent, never>('LicenseDetails', {});
 }

@@ -1,16 +1,16 @@
 import {
-	type Attribute,
-	type Evaluation,
-	type ExemptEvaluation,
-	Rating,
-	type Value,
+  type Attribute,
+  type Evaluation,
+  type ExemptEvaluation,
+  Rating,
+  type Value,
 } from '@/schema/attributes';
 import { exampleRating } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { HardwareWalletManufactureType } from '@/schema/features/profile';
 import {
-	type SupplyChainFactorySupport,
-	SupplyChainFactoryType,
+  type SupplyChainFactorySupport,
+  SupplyChainFactoryType,
 } from '@/schema/features/security/supply-chain-factory';
 import { popRefs } from '@/schema/reference';
 import { Variant } from '@/schema/variants';
@@ -22,57 +22,57 @@ import { exempt, pickWorstRating, unrated } from '../common';
 const brand = 'attributes.security.supply_chain_factory';
 
 export type SupplyChainFactoryValue = Value & {
-	factoryOpsecDocs: SupplyChainFactoryType;
-	factoryOpsecAudit: SupplyChainFactoryType;
-	tamperEvidence: SupplyChainFactoryType;
-	hardwareVerification: SupplyChainFactoryType;
-	tamperResistance: SupplyChainFactoryType;
-	genuineCheck: SupplyChainFactoryType;
-	__brand: 'attributes.security.supply_chain_factory';
+  factoryOpsecDocs: SupplyChainFactoryType;
+  factoryOpsecAudit: SupplyChainFactoryType;
+  tamperEvidence: SupplyChainFactoryType;
+  hardwareVerification: SupplyChainFactoryType;
+  tamperResistance: SupplyChainFactoryType;
+  genuineCheck: SupplyChainFactoryType;
+  __brand: 'attributes.security.supply_chain_factory';
 };
 
 function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating {
-	const ratings = [
-		features.factoryOpsecDocs,
-		features.factoryOpsecAudit,
-		features.tamperEvidence,
-		features.hardwareVerification,
-		features.tamperResistance,
-		features.genuineCheck,
-	];
-	const passCount = ratings.filter(r => r === SupplyChainFactoryType.PASS).length;
+  const ratings = [
+    features.factoryOpsecDocs,
+    features.factoryOpsecAudit,
+    features.tamperEvidence,
+    features.hardwareVerification,
+    features.tamperResistance,
+    features.genuineCheck,
+  ];
+  const passCount = ratings.filter(r => r === SupplyChainFactoryType.PASS).length;
 
-	if (passCount >= 5) {
-		return Rating.PASS;
-	}
+  if (passCount >= 5) {
+    return Rating.PASS;
+  }
 
-	if (passCount >= 3) {
-		return Rating.PARTIAL;
-	}
+  if (passCount >= 3) {
+    return Rating.PARTIAL;
+  }
 
-	return Rating.FAIL;
+  return Rating.FAIL;
 }
 
 export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
-	id: 'supplyChainFactory',
-	icon: '🏭',
-	displayName: 'Supply Chain Factory',
-	wording: {
-		midSentenceName: null,
-		howIsEvaluated: "How is a factory wallet's supply chain evaluated?",
-		whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
-			`What can ${walletMetadata.displayName} do to improve its factory supply chain?`,
-	},
-	question: sentence(
-		(walletMetadata: WalletMetadata) =>
-			`Does ${walletMetadata.displayName} have a secure and transparent factory supply chain?`,
-	),
-	why: markdown(
-		`Ensuring the security and transparency of the factory supply chain is vital to prevent tampering or compromise during manufacturing, packaging, and delivery.
+  id: 'supplyChainFactory',
+  icon: '🏭',
+  displayName: 'Supply Chain Factory',
+  wording: {
+    midSentenceName: null,
+    howIsEvaluated: "How is a factory wallet's supply chain evaluated?",
+    whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) =>
+      `What can ${walletMetadata.displayName} do to improve its factory supply chain?`,
+  },
+  question: sentence(
+    (walletMetadata: WalletMetadata) =>
+      `Does ${walletMetadata.displayName} have a secure and transparent factory supply chain?`,
+  ),
+  why: markdown(
+    `Ensuring the security and transparency of the factory supply chain is vital to prevent tampering or compromise during manufacturing, packaging, and delivery.
 		Users need confidence that the device they receive is genuine and hasn't been maliciously altered.`,
-	),
-	methodology: markdown(
-		`Evaluated based on:
+  ),
+  methodology: markdown(
+    `Evaluated based on:
 
 - **Factory OPSEC:** Availability and verification (audits, certifications) of documentation detailing security practices during manufacturing.
 
@@ -86,118 +86,112 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 
 - **Anti-Kleptography:** Measures to prevent cryptographic keys or randomness from being subtly leaked during operations.
 	`,
-	),
-	ratingScale: {
-		display: 'pass-fail',
-		exhaustive: true,
-		pass: [
-			exampleRating(
-				sentence(() => 'The hardware wallet passes all factory supply chain sub-criteria.'),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.PASS,
-			),
-		],
-		partial: [
-			exampleRating(
-				sentence(
-					() => 'The hardware wallet passes some factory supply chain sub-criteria.',
-				),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.PARTIAL,
-			),
-		],
-		fail: [
-			exampleRating(
-				sentence(
-					() =>
-						'The hardware wallet fails most or all factory supply chain sub-criteria.',
-				),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.FAIL,
-			),
-		],
-	},
-	aggregate: pickWorstRating<SupplyChainFactoryValue>,
-	exempted: (
-		features: ResolvedFeatures,
-		metadata: WalletMetadata,
-	): ExemptEvaluation<SupplyChainFactoryValue> | null => {
-		if (
-			features.variant === Variant.HARDWARE &&
-			metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
-		) {
-			return exempt(
-				supplyChainFactory,
-				sentence('Attribute only applies to factory-made hardware wallets.'),
-				brand,
-				{
-					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
-					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
-					tamperEvidence: SupplyChainFactoryType.FAIL,
-					hardwareVerification: SupplyChainFactoryType.FAIL,
-					tamperResistance: SupplyChainFactoryType.FAIL,
-					genuineCheck: SupplyChainFactoryType.FAIL,
-				},
-			);
-		}
+  ),
+  ratingScale: {
+    display: 'pass-fail',
+    exhaustive: true,
+    pass: [
+      exampleRating(
+        sentence(() => 'The hardware wallet passes all factory supply chain sub-criteria.'),
+        (v: SupplyChainFactoryValue) => v.rating === Rating.PASS,
+      ),
+    ],
+    partial: [
+      exampleRating(
+        sentence(() => 'The hardware wallet passes some factory supply chain sub-criteria.'),
+        (v: SupplyChainFactoryValue) => v.rating === Rating.PARTIAL,
+      ),
+    ],
+    fail: [
+      exampleRating(
+        sentence(() => 'The hardware wallet fails most or all factory supply chain sub-criteria.'),
+        (v: SupplyChainFactoryValue) => v.rating === Rating.FAIL,
+      ),
+    ],
+  },
+  aggregate: pickWorstRating<SupplyChainFactoryValue>,
+  exempted: (
+    features: ResolvedFeatures,
+    metadata: WalletMetadata,
+  ): ExemptEvaluation<SupplyChainFactoryValue> | null => {
+    if (
+      features.variant === Variant.HARDWARE &&
+      metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
+    ) {
+      return exempt(
+        supplyChainFactory,
+        sentence('Attribute only applies to factory-made hardware wallets.'),
+        brand,
+        {
+          factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+          factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+          tamperEvidence: SupplyChainFactoryType.FAIL,
+          hardwareVerification: SupplyChainFactoryType.FAIL,
+          tamperResistance: SupplyChainFactoryType.FAIL,
+          genuineCheck: SupplyChainFactoryType.FAIL,
+        },
+      );
+    }
 
-		return null;
-	},
-	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainFactoryValue> => {
-		if (features.variant !== Variant.HARDWARE) {
-			return exempt(
-				supplyChainFactory,
-				sentence(
-					(walletMetadata: WalletMetadata) =>
-						`This attribute is not applicable for ${walletMetadata.displayName} as it is not a hardware wallet.`,
-				),
-				brand,
-				{
-					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
-					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
-					tamperEvidence: SupplyChainFactoryType.FAIL,
-					hardwareVerification: SupplyChainFactoryType.FAIL,
-					tamperResistance: SupplyChainFactoryType.FAIL,
-					genuineCheck: SupplyChainFactoryType.FAIL,
-				},
-			);
-		}
+    return null;
+  },
+  evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainFactoryValue> => {
+    if (features.variant !== Variant.HARDWARE) {
+      return exempt(
+        supplyChainFactory,
+        sentence(
+          (walletMetadata: WalletMetadata) =>
+            `This attribute is not applicable for ${walletMetadata.displayName} as it is not a hardware wallet.`,
+        ),
+        brand,
+        {
+          factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+          factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+          tamperEvidence: SupplyChainFactoryType.FAIL,
+          hardwareVerification: SupplyChainFactoryType.FAIL,
+          tamperResistance: SupplyChainFactoryType.FAIL,
+          genuineCheck: SupplyChainFactoryType.FAIL,
+        },
+      );
+    }
 
-		const factoryFeature = features.security.supplyChainFactory;
+    const factoryFeature = features.security.supplyChainFactory;
 
-		if (factoryFeature === null) {
-			return unrated(supplyChainFactory, brand, {
-				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
-				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
-				tamperEvidence: SupplyChainFactoryType.FAIL,
-				hardwareVerification: SupplyChainFactoryType.FAIL,
-				tamperResistance: SupplyChainFactoryType.FAIL,
-				genuineCheck: SupplyChainFactoryType.FAIL,
-			});
-		}
+    if (factoryFeature === null) {
+      return unrated(supplyChainFactory, brand, {
+        factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+        factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+        tamperEvidence: SupplyChainFactoryType.FAIL,
+        hardwareVerification: SupplyChainFactoryType.FAIL,
+        tamperResistance: SupplyChainFactoryType.FAIL,
+        genuineCheck: SupplyChainFactoryType.FAIL,
+      });
+    }
 
-		const { withoutRefs, refs: extractedRefs } =
-			popRefs<SupplyChainFactorySupport>(factoryFeature);
-		const rating = evaluateSupplyChainFactory(withoutRefs);
+    const { withoutRefs, refs: extractedRefs } = popRefs<SupplyChainFactorySupport>(factoryFeature);
+    const rating = evaluateSupplyChainFactory(withoutRefs);
 
-		return {
-			value: {
-				id: 'Supply Chain Factory',
-				rating,
-				displayName: 'Supply Chain Factory',
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) =>
-						`${walletMetadata.displayName} has ${rating.toLowerCase()} factory supply chain.`,
-				),
-				...withoutRefs,
-				__brand: brand,
-			},
-			details: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} factory supply chain evaluation is ${rating.toLowerCase()}.`,
-			),
-			howToImprove: paragraph(
-				({ wallet }) =>
-					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
-			),
-			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		};
-	},
+    return {
+      value: {
+        id: 'Supply Chain Factory',
+        rating,
+        displayName: 'Supply Chain Factory',
+        shortExplanation: sentence(
+          (walletMetadata: WalletMetadata) =>
+            `${walletMetadata.displayName} has ${rating.toLowerCase()} factory supply chain.`,
+        ),
+        ...withoutRefs,
+        __brand: brand,
+      },
+      details: paragraph(
+        ({ wallet }) =>
+          `${wallet.metadata.displayName} factory supply chain evaluation is ${rating.toLowerCase()}.`,
+      ),
+      howToImprove: paragraph(
+        ({ wallet }) =>
+          `${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
+      ),
+      ...(extractedRefs.length > 0 && { references: extractedRefs }),
+    };
+  },
 };
