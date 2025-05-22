@@ -109,9 +109,11 @@ export function licenseUrl(license: License): LabeledUrl | null {
 	if (license === License.PROPRIETARY) {
 		return null;
 	}
+
 	if (license === License.UNLICENSED_VISIBLE) {
 		return null;
 	}
+
 	return {
 		url: `https://spdx.org/licenses/${license}.html`,
 		label: licenseName(license),

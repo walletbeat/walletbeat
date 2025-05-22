@@ -21,7 +21,10 @@ export function getBaseUrl(): string {
 		return `${import.meta.env.NEXT_PUBLIC_SITE_URL}`;
 	}
 
-	if (import.meta.env.VERCEL_BRANCH_URL !== undefined && import.meta.env.VERCEL_BRANCH_URL !== '') {
+	if (
+		import.meta.env.VERCEL_BRANCH_URL !== undefined &&
+		import.meta.env.VERCEL_BRANCH_URL !== ''
+	) {
 		return `https://${import.meta.env.VERCEL_BRANCH_URL}`;
 	}
 

@@ -19,6 +19,7 @@ import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty';
 import { exempt, pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.security.security_audits';
+
 export type SecurityAuditsValue = Value & {
 	securityAudits: SecurityAudit[];
 	__brand: 'attributes.security.security_audits';
@@ -74,6 +75,7 @@ function audited(
 				),
 			};
 		}
+
 		if (!auditedInLastYear) {
 			return {
 				rating: Rating.PARTIAL,
@@ -91,6 +93,7 @@ function audited(
 				),
 			};
 		}
+
 		if (hasUnaddressedFlaws) {
 			return {
 				rating: Rating.PARTIAL,
@@ -110,6 +113,7 @@ function audited(
 				),
 			};
 		}
+
 		return {
 			rating: Rating.PASS,
 			displayName: 'Recent flawless security audit',
@@ -121,6 +125,7 @@ function audited(
 			howToImprove: undefined,
 		};
 	})();
+
 	return {
 		value: {
 			id: `audited_${auditedInLastYear}_${hasUnaddressedFlaws}`,
@@ -140,7 +145,7 @@ function audited(
 }
 
 const sampleSecurityAudit: SecurityAudit = {
-	auditDate: `2020-01-01`,
+	auditDate: '2020-01-01',
 	auditor: exampleSecurityAuditor,
 	ref: 'https://example.com/audit.pdf',
 	unpatchedFlaws: 'ALL_FIXED',
@@ -246,16 +251,20 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		if (features.security.publicSecurityAudits === null) {
 			return unrated(securityAudits, brand, { securityAudits: [] });
 		}
+
 		if (!isNonEmptyArray(features.security.publicSecurityAudits)) {
 			return noAudits();
 		}
+
 		const audits = features.security.publicSecurityAudits;
 		let auditedInLastYear = false;
 		let hasUnaddressedFlaws = false;
+
 		for (const audit of audits) {
 			if (daysSince(audit.auditDate) <= 366) {
 				auditedInLastYear = true;
 			}
+
 			if (Array.isArray(audit.unpatchedFlaws)) {
 				for (const flaw of audit.unpatchedFlaws) {
 					if (flaw.presentStatus === 'NOT_FIXED') {
@@ -264,15 +273,18 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 				}
 			}
 		}
+
 		return audited(audits, auditedInLastYear, hasUnaddressedFlaws);
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsValue>>) => {
 		const worstEvaluation = pickWorstRating<SecurityAuditsValue>(perVariant);
 		const allAudits: SecurityAudit[] = [];
 		const auditsIdSet = new Set<string>();
+
 		for (const evaluation of Object.values(perVariant)) {
 			for (const audit of evaluation.value.securityAudits) {
 				const auditId = securityAuditId(audit);
+
 				if (!auditsIdSet.has(auditId)) {
 					allAudits.push(audit);
 					auditsIdSet.add(auditId);
@@ -280,6 +292,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 			}
 		}
 		worstEvaluation.value.securityAudits = allAudits;
+
 		return worstEvaluation;
 	},
 };

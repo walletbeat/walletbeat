@@ -17,7 +17,11 @@ export function JoinedList({
 			{data.map((datum, index) => (
 				<React.Fragment key={datum.key}>
 					{datum.value}
-					{index === data.length - 2 ? lastSeparator : index !== data.length - 1 ? separator : ''}
+					{index === data.length - 2
+						? lastSeparator
+						: index !== data.length - 1
+							? separator
+							: ''}
 				</React.Fragment>
 			))}
 		</React.Fragment>

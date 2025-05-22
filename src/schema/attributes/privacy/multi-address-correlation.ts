@@ -23,6 +23,7 @@ import { markdown, paragraph, sentence } from '@/types/content';
 import { pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.privacy.multi_address_correlation';
+
 export type MultiAddressCorrelationValue = Value & {
 	__brand: 'attributes.privacy.multi_address_correlation';
 };
@@ -349,7 +350,10 @@ function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): numbe
 												// Server can be running anything, so all bets are off.
 												return 0;
 											}
-											switch (endpoint.verifiability.clientVerification.type) {
+
+											switch (
+												endpoint.verifiability.clientVerification.type
+											) {
 												case 'NOT_VERIFIED':
 													return 1;
 												case 'VERIFIED':
@@ -361,8 +365,10 @@ function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): numbe
 							}
 					}
 				})() * 100;
-			const proxyScore = { NONE: 0, SAME_CIRCUIT: 1, SEPARATE_CIRCUITS: 2 }[handling.proxy] * 10;
+			const proxyScore =
+				{ NONE: 0, SAME_CIRCUIT: 1, SEPARATE_CIRCUITS: 2 }[handling.proxy] * 10;
 			const timingScore = { SIMULTANEOUS: 0, STAGGERED: 1 }[handling.timing];
+
 			return 1 + destinationScore + enclaveScore + proxyScore + timingScore;
 		}
 	}
@@ -497,37 +503,49 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		if (features.multiAddress === null) {
 			return unrated(multiAddressCorrelation, brand, null);
 		}
+
 		if (!isSupported(features.multiAddress)) {
 			return unsupported();
 		}
+
 		if (features.privacy.dataCollection === null) {
 			return unrated(multiAddressCorrelation, brand, null);
 		}
+
 		let worstHandling: EntityData | null = null;
 		let worstHandlingScore = -1;
 		const allRefs: ReferenceArray = [];
+
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
 			const leaks = inferLeaks(collected.leaks);
+
 			if (!leaksByDefault(leaks.walletAddress)) {
 				continue;
 			}
+
 			if (leaks.multiAddress === undefined) {
 				return unrated(multiAddressCorrelation, brand, null);
 			}
+
 			allRefs.push(...refs(collected.leaks));
 			const score = rateHandling(leaks.multiAddress, leaks.endpoint);
+
 			if (worstHandling === null || score < worstHandlingScore) {
 				worstHandling = collected;
 				worstHandlingScore = score;
 			}
 		}
+
 		if (worstHandling === null) {
 			return unrated(multiAddressCorrelation, brand, null);
 		}
+
 		const handling = worstHandling.leaks.multiAddress;
+
 		if (handling === undefined) {
 			return unrated(multiAddressCorrelation, brand, null);
 		}
+
 		switch (handling.type) {
 			case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
 				// If the wallet has a concept of a singular "active address" and only
@@ -544,21 +562,25 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 					// address, so they are not correlatable.
 					return uniqueDestinations(allRefs);
 				}
+
 				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
 					// The wallet mitigates correlation both at the network level and by
 					// time. Not correlated.
 					return staggeredAndSeparateCircuits(allRefs);
 				}
+
 				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing !== 'STAGGERED') {
 					// Requests not staggered, but coming from different IPs.
 					// Better than nothing.
 					return separateCircuits(allRefs);
 				}
+
 				if (handling.proxy !== 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
 					// Requests staggered, but coming from the same IP.
 					// Better than nothing.
 					return staggeredRequests(allRefs);
 				}
+
 				// Requests not staggered, and all coming from the same IP.
 				// That is correlated.
 				return correlatableRequests(allRefs);

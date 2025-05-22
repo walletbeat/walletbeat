@@ -21,21 +21,25 @@ export function AddressCorrelationDetails({
 	linkables,
 }: AddressCorrelationDetailsProps): React.JSX.Element {
 	const bySource = new Map<string, NonEmptyArray<WalletAddressLinkableBy>>();
+
 	for (const linkable of nonEmptySorted(
 		linkables,
 		(linkableA: WalletAddressLinkableBy, linkableB: WalletAddressLinkableBy) => {
 			if (linkableA.by === 'onchain') {
 				return 1;
 			}
+
 			if (linkableB.by === 'onchain') {
 				return -1;
 			}
+
 			return compareLeakedInfo(linkableA.info, linkableB.info);
 		},
 		true,
 	)) {
 		const sourceName = typeof linkable.by === 'string' ? linkable.by : linkable.by.name;
 		const forSource = bySource.get(sourceName);
+
 		if (forSource === undefined) {
 			bySource.set(sourceName, [linkable]);
 		} else {
@@ -43,6 +47,7 @@ export function AddressCorrelationDetails({
 		}
 	}
 	const leaksList: React.ReactNode[] = [];
+
 	bySource.forEach((linkables, sourceName) => {
 		const linkableInfos = (
 			<JoinedList
@@ -54,17 +59,20 @@ export function AddressCorrelationDetails({
 		);
 		const refs = mergeRefs(...linkables.flatMap(linkable => linkable.refs));
 		const entity = nonEmptyGet(linkables).by;
+
 		if (entity === 'onchain') {
 			leaksList.push(
 				<li key={sourceName}>
 					<Typography>
-						An onchain record permanently associates your {linkableInfos} with your wallet address.{' '}
-						<ReferenceLinks references={refs} />
+						An onchain record permanently associates your {linkableInfos} with your
+						wallet address. <ReferenceLinks references={refs} />
 					</Typography>
 				</li>,
 			);
+
 			return;
 		}
+
 		leaksList.push(
 			<li key={sourceName}>
 				<Typography>
@@ -72,23 +80,34 @@ export function AddressCorrelationDetails({
 					{isUrl(entity.privacyPolicy) ? (
 						<>
 							{' ('}
-							<ExternalLink url={entity.privacyPolicy} defaultLabel="Privacy policy" />
+							<ExternalLink
+								url={entity.privacyPolicy}
+								defaultLabel='Privacy policy'
+							/>
 							{')'}
 						</>
 					) : null}{' '}
-					may link your wallet address to your {linkableInfos}. <ReferenceLinks references={refs} />
+					may link your wallet address to your {linkableInfos}.{' '}
+					<ReferenceLinks references={refs} />
 				</Typography>
 			</li>,
 		);
 	});
+
 	return (
 		<>
 			<WrapRatingIcon rating={value.rating}>
 				<Typography fontWeight={subsectionWeight}>
-					By default, {wallet.metadata.displayName} allows your wallet address to be correlated with
-					your personal information:
+					By default, {wallet.metadata.displayName} allows your wallet address to be
+					correlated with your personal information:
 				</Typography>
-				<ul style={{ paddingLeft: '1.5rem', marginBottom: '0px', fontWeight: subsectionWeight }}>
+				<ul
+					style={{
+						paddingLeft: '1.5rem',
+						marginBottom: '0px',
+						fontWeight: subsectionWeight,
+					}}
+				>
 					{leaksList}
 				</ul>
 			</WrapRatingIcon>

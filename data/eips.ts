@@ -25,14 +25,17 @@ export function getEip(eip: EipNumber | Eip): Eip {
 	if (typeof eip !== 'string') {
 		return eip;
 	}
+
 	return eips[eip];
 }
 
 /** Look up EIP information for a given number. */
 export function lookupEip(eip: number): Eip | undefined {
 	const eipNumber = eip.toString() as EipNumber;
+
 	if (Object.hasOwn(eips, eipNumber)) {
 		return eips[eipNumber];
 	}
+
 	return undefined;
 }

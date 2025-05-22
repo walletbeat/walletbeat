@@ -38,6 +38,7 @@ export function Accordions({
 					index === accordions.length - 1 ||
 					expanded[accordions[index + 1].id] ||
 					expanded[accordion.id];
+
 				return (
 					<Accordion
 						key={accordion.id}
@@ -49,7 +50,8 @@ export function Accordions({
 							boxShadow: 'none',
 							borderTopLeftRadius: blankTop ? borderRadius : '0px',
 							borderTopRightRadius: blankTop ? borderRadius : '0px',
-							borderBottomLeftRadius: !expanded[accordion.id] && blankBottom ? borderRadius : '0px',
+							borderBottomLeftRadius:
+								!expanded[accordion.id] && blankBottom ? borderRadius : '0px',
 							borderBottomRightRadius:
 								!expanded[accordion.id] && blankBottom ? borderRadius : '0px',
 							'&:not(:first-of-type)': {
@@ -63,7 +65,7 @@ export function Accordions({
 						<AccordionSummary
 							key={`${accordion.id}-summary`}
 							expandIcon={
-								<div className="text-base text-primary">
+								<div className='text-base text-primary'>
 									<LuChevronDown />
 								</div>
 							}
@@ -80,7 +82,9 @@ export function Accordions({
 									!expanded[accordion.id] && blankBottom ? borderRadius : '0px',
 							}}
 						>
-							<Typography variant={summaryTypographyVariant}>{accordion.summary}</Typography>
+							<Typography variant={summaryTypographyVariant}>
+								{accordion.summary}
+							</Typography>
 						</AccordionSummary>
 						<AccordionDetails
 							key={`${accordion.id}-details`}

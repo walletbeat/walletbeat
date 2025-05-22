@@ -471,6 +471,7 @@ export function leakedInfoName(
 					long: walletMetadata.pseudonymType.singular,
 				};
 			}
+
 			return { short: 'username', long: 'pseudonym' };
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
 			return { short: 'Farcaster account', long: 'Farcaster account' };
@@ -522,14 +523,18 @@ export type PersonalInfoLeaks = WithRef<Partial<QualifiedLeaks<LeakedPersonalInf
  * @returns A fully-qualified set of leaks.
  */
 export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
-	const first = (...ls: Array<Leak | undefined>): Leak | undefined => ls.find(l => l !== undefined);
+	const first = (...ls: Array<Leak | undefined>): Leak | undefined =>
+		ls.find(l => l !== undefined);
+
 	return {
 		ipAddress: leaks.ipAddress ?? Leak.NEVER,
 		walletActions: leaks.walletActions ?? Leak.NEVER,
 		walletAddress:
-			first(leaks.walletAddress, leaks.mempoolTransactions, leaks.walletBalance) ?? Leak.NEVER,
+			first(leaks.walletAddress, leaks.mempoolTransactions, leaks.walletBalance) ??
+			Leak.NEVER,
 		walletBalance:
-			first(leaks.walletBalance, leaks.walletAddress, leaks.mempoolTransactions) ?? Leak.NEVER,
+			first(leaks.walletBalance, leaks.walletAddress, leaks.mempoolTransactions) ??
+			Leak.NEVER,
 		walletAssets:
 			first(
 				leaks.walletAssets,

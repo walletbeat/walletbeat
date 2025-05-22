@@ -17,6 +17,7 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
 import { exempt, pickWorstRating } from '../common';
 
 const brand = 'attributes.security.software_hw_integration';
+
 export type SoftwareHWIntegrationValue = Value & {
 	integrationLevel: number; // 0 = none, 1 = basic, 2 = good, 3 = excellent
 	__brand: 'attributes.security.software_hw_integration';
@@ -308,6 +309,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 			.filter(([_, support]) => isSupported(support))
 			.map(([walletType]) => {
 				const type = walletType as HardwareWalletType;
+
 				switch (type) {
 					case HardwareWalletType.LEDGER:
 						return 'Ledger';
@@ -347,12 +349,15 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 			result = excellentHardwareWalletIntegration(supportedHardwareWallets);
 		} else if ((hasSafeIntegration || hasAaveIntegration) && supportedHWBrands >= 1) {
 			const supportedDApps = [];
+
 			if (hasSafeIntegration) {
 				supportedDApps.push('Safe');
 			}
+
 			if (hasAaveIntegration) {
 				supportedDApps.push('Aave');
 			}
+
 			result = goodHardwareWalletIntegration(supportedHardwareWallets, supportedDApps);
 		}
 

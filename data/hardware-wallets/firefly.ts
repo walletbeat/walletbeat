@@ -60,7 +60,8 @@ export const fireflyWallet: HardwareWallet = {
 		security: {
 			bugBountyProgram: {
 				type: BugBountyProgramType.NONE,
-				details: 'No formal bug bounty program has been established for the Firefly DIY wallet.',
+				details:
+					'No formal bug bounty program has been established for the Firefly DIY wallet.',
 				ref: undefined,
 				upgradePathAvailable: false,
 				url: '',

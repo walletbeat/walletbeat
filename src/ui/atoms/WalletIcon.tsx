@@ -11,7 +11,7 @@ export function WalletIcon({
 	iconSize: number;
 }): React.JSX.Element {
 	return (
-		<div style={{ width: iconSize, height: iconSize, overflow: 'hidden' }} className="flex">
+		<div style={{ width: iconSize, height: iconSize, overflow: 'hidden' }} className='flex'>
 			<img
 				alt={wallet.metadata.displayName}
 				width={iconSize}

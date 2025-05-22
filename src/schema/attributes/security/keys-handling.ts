@@ -31,12 +31,15 @@ function evaluateKeysHandling(features: KeysHandlingSupport): Rating {
 		features.physicalAttackResistance,
 	];
 	const passCount = ratings.filter(r => r === KeysHandlingType.PASS).length;
+
 	if (passCount >= 3) {
 		return Rating.PASS;
 	}
+
 	if (passCount >= 1) {
 		return Rating.PARTIAL;
 	}
+
 	return Rating.FAIL;
 }
 
@@ -109,6 +112,7 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		}
 
 		const keysHandlingFeature = features.security.keysHandling;
+
 		if (keysHandlingFeature === null) {
 			return unrated(keysHandling, brand, {
 				masterSecretGeneration: KeysHandlingType.FAIL,
@@ -118,7 +122,8 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<KeysHandlingSupport>(keysHandlingFeature);
+		const { withoutRefs, refs: extractedRefs } =
+			popRefs<KeysHandlingSupport>(keysHandlingFeature);
 		const rating = evaluateKeysHandling(withoutRefs);
 
 		return {

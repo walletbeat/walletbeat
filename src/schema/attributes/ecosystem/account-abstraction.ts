@@ -24,6 +24,7 @@ import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips';
 import { pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.ecosystem.account_abstraction';
+
 export type AccountAbstractionValue = Value & {
 	__brand: 'attributes.ecosystem.account_abstraction';
 };
@@ -308,6 +309,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 		if (features.accountSupport === null) {
 			return unrated(accountAbstraction, brand, null);
 		}
+
 		const supported: Record<AccountType, boolean> = {
 			eoa: isAccountTypeSupported<AccountTypeEoa>(features.accountSupport.eoa),
 			mpc: isAccountTypeSupported<AccountTypeMpc>(features.accountSupport.mpc),
@@ -322,24 +324,31 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 			refs(features.accountSupport.rawErc4337),
 			refs(features.accountSupport.eip7702),
 		);
+
 		if (supported.rawErc4337 && supported.eip7702) {
 			return supportsErc4337AndEip7702(allRefs);
 		}
+
 		if (supported.rawErc4337) {
 			return supportsErc4337(allRefs);
 		}
+
 		if (supported.eip7702) {
 			return supportsEip7702(allRefs);
 		}
+
 		if (supported.eoa && supported.mpc) {
 			return supportsEoaAndMpc(allRefs);
 		}
+
 		if (supported.mpc) {
 			return supportsMpcOnly(allRefs);
 		}
+
 		if (supported.eoa) {
 			return supportsRawEoaOnly(allRefs);
 		}
+
 		throw new Error('Wallet supports no account type');
 	},
 	aggregate: pickWorstRating<AccountAbstractionValue>,

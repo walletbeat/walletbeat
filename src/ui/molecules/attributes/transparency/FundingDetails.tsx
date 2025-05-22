@@ -21,6 +21,7 @@ export function FundingDetails({
 		.filter(({ value }) => value === true)
 		.map(({ strategy }) => strategy);
 	const ref = refs(monetization);
+
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			<div style={{ fontWeight: subsectionWeight }}>
@@ -31,7 +32,8 @@ export function FundingDetails({
 						value: monetizationStrategyName(strategy),
 					}))}
 				/>
-				. <ReferenceList ref={ref} ulStyle={{ paddingLeft: '1.5rem', marginBottom: '0px' }} />
+				.{' '}
+				<ReferenceList ref={ref} ulStyle={{ paddingLeft: '1.5rem', marginBottom: '0px' }} />
 			</div>
 		</WrapRatingIcon>
 	);

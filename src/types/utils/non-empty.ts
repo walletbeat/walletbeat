@@ -97,9 +97,11 @@ export function nonEmptyFilter<T>(
 	fn: (val: T, index: number) => boolean,
 ): NonEmptyArray<T> {
 	const filtered = arr.filter(fn);
+
 	if (!isNonEmptyArray(filtered)) {
 		throw new Error('Non-empty array was unexpectedly filtered down to an empty array');
 	}
+
 	return filtered;
 }
 
@@ -120,7 +122,9 @@ export function nonEmptySorted<T>(
 	reverse?: boolean,
 ): NonEmptyArray<T> {
 	const arrCopy = [...arr] as NonEmptyArray<T>;
+
 	arrCopy.sort(reverse === true ? (a, b) => compare(b, a) : compare);
+
 	return arrCopy;
 }
 
@@ -163,13 +167,17 @@ export function isNonEmptySet<K extends string | number | symbol>(
 	if (Object.keys(obj).length === 0) {
 		return false;
 	}
+
 	let oneTrue = false;
+
 	for (const val of Object.values(obj)) {
 		if (typeof val !== 'boolean') {
 			return false;
 		}
+
 		oneTrue ||= val;
 	}
+
 	return oneTrue;
 }
 
@@ -189,7 +197,9 @@ export function nonEmptySet<K extends string | number | symbol>(
 export function nonEmptySetFromArray<K extends string | number | symbol>(
 	keys: NonEmptyArray<K>,
 ): NonEmptySet<K> {
-	return Object.fromEntries(nonEmptyMap<K, [K, true]>(keys, key => [key, true])) as NonEmptySet<K>;
+	return Object.fromEntries(
+		nonEmptyMap<K, [K, true]>(keys, key => [key, true]),
+	) as NonEmptySet<K>;
 }
 
 /**
@@ -220,6 +230,7 @@ export function setUnion<K extends string | number | symbol>(
 	sets: NonEmptyArray<NonEmptySet<K>>,
 ): NonEmptySet<K> {
 	const union = new Map<K, true>();
+
 	for (const set of sets) {
 		for (const item of setItems(set)) {
 			union.set(item, true);

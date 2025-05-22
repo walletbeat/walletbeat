@@ -95,7 +95,8 @@ export const elytro: SoftwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: {
-				details: 'Elytro uses FreshCryptoLib for passkey verification in their WebAuthn library.',
+				details:
+					'Elytro uses FreshCryptoLib for passkey verification in their WebAuthn library.',
 				library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
 				libraryUrl:
 					'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',

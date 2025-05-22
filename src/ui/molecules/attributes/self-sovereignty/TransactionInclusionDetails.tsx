@@ -20,12 +20,14 @@ export function TransactionInclusionDetails({
 		.concat(supportForceWithdrawal)
 		.slice()
 		.sort();
+
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			{allSupportedForceWithdrawals.length > 0 && (
 				<>
 					<Typography fontWeight={subsectionWeight}>
-						{wallet.metadata.displayName} supports L2 force-inclusion withdrawal transactions on{' '}
+						{wallet.metadata.displayName} supports L2 force-inclusion withdrawal
+						transactions on{' '}
 						{allSupportedForceWithdrawals.map((l2Type, index) => (
 							<React.Fragment key={l2Type}>
 								{commaListPrefix(index, allSupportedForceWithdrawals.length)}
@@ -35,7 +37,8 @@ export function TransactionInclusionDetails({
 						L2s.
 					</Typography>
 					<Typography fontWeight={subsectionWeight}>
-						This means users may withdraw funds from these L2s without relying on intermediaries.
+						This means users may withdraw funds from these L2s without relying on
+						intermediaries.
 					</Typography>
 				</>
 			)}
@@ -55,7 +58,8 @@ export function TransactionInclusionDetails({
 						L2s.
 					</Typography>
 					<Typography fontWeight={subsectionWeight}>
-						This means users rely on intermediaries in order to withdraw their funds from these L2s.
+						This means users rely on intermediaries in order to withdraw their funds
+						from these L2s.
 					</Typography>
 				</>
 			)}
@@ -65,28 +69,30 @@ export function TransactionInclusionDetails({
 						return (
 							<>
 								<Typography fontWeight={subsectionWeight}>
-									{wallet.metadata.displayName} does not support Ethereum peer-to-peer gossipping
-									nor connecting to a user&apos;s self-hosted Ethereum node.
+									{wallet.metadata.displayName} does not support Ethereum
+									peer-to-peer gossipping nor connecting to a user&apos;s
+									self-hosted Ethereum node.
 								</Typography>
 								<Typography fontWeight={subsectionWeight}>
-									Therefore, L1 transactions are subject to censorship by intermediaries.
+									Therefore, L1 transactions are subject to censorship by
+									intermediaries.
 								</Typography>
 							</>
 						);
 					case 'OWN_NODE':
 						return (
 							<Typography fontWeight={subsectionWeight}>
-								{wallet.metadata.displayName} supports connecting to a user&apos;s self-hosted
-								Ethereum node, which can be used to broadcast L1 transactions without trusting
-								intermediaries.
+								{wallet.metadata.displayName} supports connecting to a user&apos;s
+								self-hosted Ethereum node, which can be used to broadcast L1
+								transactions without trusting intermediaries.
 							</Typography>
 						);
 					case 'SELF_GOSSIP':
 						return (
 							<Typography fontWeight={subsectionWeight}>
-								{wallet.metadata.displayName} supports directly gossipping over Ethereum&apos;s
-								peer-to-peer network, allowing L1 transactions to be reliably included without
-								trusting intermediaries.
+								{wallet.metadata.displayName} supports directly gossipping over
+								Ethereum&apos;s peer-to-peer network, allowing L1 transactions to be
+								reliably included without trusting intermediaries.
 							</Typography>
 						);
 				}

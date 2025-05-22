@@ -58,12 +58,15 @@ function evaluateUserSafety(features: UserSafetySupport): Rating {
 		features.fullyLocalTxSimulation,
 	];
 	const passCount = ratings.filter(r => r === UserSafetyType.PASS).length;
+
 	if (passCount >= 11) {
 		return Rating.PASS;
 	}
+
 	if (passCount >= 6) {
 		return Rating.PARTIAL;
 	}
+
 	return Rating.FAIL;
 }
 
@@ -181,6 +184,7 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 		}
 
 		const userSafetyFeature = features.security.userSafety;
+
 		if (userSafetyFeature === null) {
 			return unrated(userSafety, brand, {
 				readableAddress: UserSafetyType.FAIL,
@@ -226,9 +230,11 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 
 		const detailsText = ({ wallet }: EvaluationData<UserSafetyValue>): string => {
 			let desc = `${wallet.metadata.displayName} user safety evaluation is ${rating.toLowerCase()}.`;
+
 			if (rating !== Rating.EXEMPT) {
 				desc += ` It passes ${passCount} out of 16 sub-criteria.`;
 			}
+
 			return desc;
 		};
 
@@ -236,6 +242,7 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 			if (rating === Rating.PASS || rating === Rating.EXEMPT) {
 				return '';
 			}
+
 			return `${wallet.metadata.displayName} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`;
 		};
 

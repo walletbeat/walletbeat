@@ -14,6 +14,7 @@ import { RpcEndpointConfiguration } from '../../features/self-sovereignty/chain-
 import { pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.self_sovereignty.self_hosted_node';
+
 export type SelfHostedNodeValue = Value & {
 	__brand: 'attributes.self_sovereignty.self_hosted_node';
 };
@@ -220,22 +221,27 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 		if (features.chainConfigurability === null) {
 			return unrated(selfHostedNode, brand, null);
 		}
+
 		const allRefs = refs(features.chainConfigurability);
+
 		if (
 			features.chainConfigurability.l1RpcEndpoint ===
 			RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST
 		) {
 			return supportsSelfHostedNode(allRefs);
 		}
+
 		if (
 			features.chainConfigurability.l1RpcEndpoint ===
 			RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
 		) {
 			return supportsSelfHostedNodeAfterRequests(allRefs);
 		}
+
 		if (features.chainConfigurability.customChains) {
 			return customChainOnly(allRefs);
 		}
+
 		return noSelfHostedNode(allRefs);
 	},
 	aggregate: pickWorstRating<SelfHostedNodeValue>,

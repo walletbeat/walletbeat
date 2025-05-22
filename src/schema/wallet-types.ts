@@ -64,8 +64,11 @@ export function walletTypeToUrlSlug(walletType: WalletType): string {
  */
 export function urlSlugToWalletType(slug: string): WalletType | null {
 	const found = Object.values(
-		mapWalletTypes(walletType => (walletTypeToUrlSlug(walletType) === slug ? walletType : null)),
+		mapWalletTypes(walletType =>
+			walletTypeToUrlSlug(walletType) === slug ? walletType : null,
+		),
 	).filter(val => val !== null);
+
 	return found.length === 0 ? null : found[0];
 }
 

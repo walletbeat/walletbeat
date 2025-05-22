@@ -16,6 +16,7 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
 import { exempt, pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.security.hardware_wallet_dapp_signing';
+
 export type HardwareWalletDappSigningValue = Value & {
 	dappSigningLevel: DappSigningLevel;
 	__brand: 'attributes.security.hardware_wallet_dapp_signing';
@@ -309,6 +310,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 				references,
 			};
 		}
+
 		// Check for ERC-4337 smart wallet
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(

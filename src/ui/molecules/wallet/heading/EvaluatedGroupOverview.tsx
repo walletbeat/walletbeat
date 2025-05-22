@@ -88,8 +88,8 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 					key={i}
 					d={pathData}
 					fill={ratingToColor(evalAttr.evaluation.value.rating)}
-					stroke="#ffffff"
-					strokeWidth="2"
+					stroke='#ffffff'
+					strokeWidth='2'
 					style={{
 						opacity: hoveredSliceIndex === null || hoveredSliceIndex === i ? 1 : 0.4,
 						transition: 'opacity 0.2s ease-in-out',
@@ -116,23 +116,23 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 				)}
 			>
 				{/* Chart */}
-				<div className="w-[280px] h-[280px] flex-shrink-0 rounded p-1">
-					<svg viewBox="0 0 300 300" width="100%" height="100%">
+				<div className='w-[280px] h-[280px] flex-shrink-0 rounded p-1'>
+					<svg viewBox='0 0 300 300' width='100%' height='100%'>
 						{createEnlargedSlices()}
 					</svg>
 				</div>
 
 				{/* Attribute details */}
-				<div className="flex-1 w-full">
-					<h3 className="font-bold mb-2 text-base">Attribute Details:</h3>
+				<div className='flex-1 w-full'>
+					<h3 className='font-bold mb-2 text-base'>Attribute Details:</h3>
 					{numNonExemptGroupAttributes(evalGroup) > 0 ? (
-						<div className="flex flex-col gap-2 max-h-[350px] sm:max-h-[300px] overflow-y-auto pr-1">
+						<div className='flex flex-col gap-2 max-h-[350px] sm:max-h-[300px] overflow-y-auto pr-1'>
 							{mapNonExemptGroupAttributes(evalGroup, (evalAttr, index) => {
 								// Create proper attribute anchor for links
 								const detailUrl = `/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`;
 
 								return (
-									<div key={evalAttr.attribute.id} className="mb-2">
+									<div key={evalAttr.attribute.id} className='mb-2'>
 										<a
 											href={detailUrl}
 											className={cx(
@@ -152,20 +152,26 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 											}}
 										>
 											<div
-												className="w-3 h-3 rounded-full mr-3 flex-shrink-0 border border-gray-300 dark:border-gray-600"
+												className='w-3 h-3 rounded-full mr-3 flex-shrink-0 border border-gray-300 dark:border-gray-600'
 												style={{
-													backgroundColor: ratingToColor(evalAttr.evaluation.value.rating),
+													backgroundColor: ratingToColor(
+														evalAttr.evaluation.value.rating,
+													),
 												}}
 											/>
-											<span className="flex-1 text-sm">{evalAttr.attribute.displayName}</span>
-											<RatingStatusBadge rating={evalAttr.evaluation.value.rating} />
+											<span className='flex-1 text-sm'>
+												{evalAttr.attribute.displayName}
+											</span>
+											<RatingStatusBadge
+												rating={evalAttr.evaluation.value.rating}
+											/>
 										</a>
 									</div>
 								);
 							})}
 						</div>
 					) : (
-						<p className="text-gray-500 dark:text-gray-400 text-sm">
+						<p className='text-gray-500 dark:text-gray-400 text-sm'>
 							No attribute ratings available for this category.
 						</p>
 					)}

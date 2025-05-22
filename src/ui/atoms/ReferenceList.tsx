@@ -16,13 +16,17 @@ export function ReferenceList({
 	ulStyle?: React.CSSProperties;
 }): React.JSX.Element | undefined {
 	let refs = ref;
+
 	if (!Array.isArray(refs)) {
 		refs = [refs];
 	}
+
 	if (refs.length === 0) {
 		return ifEmpty;
 	}
+
 	refs = mergeRefs(...refs);
+
 	return (
 		<React.Fragment key={key}>
 			<ul style={ulStyle}>

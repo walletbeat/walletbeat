@@ -30,12 +30,15 @@ export type SupplyChainDIYValue = Value & {
 function evaluateSupplyChainDIY(features: SupplyChainDIYSupport): Rating {
 	const ratings = [features.diyNoNda, features.componentSourcingComplexity];
 	const passCount = ratings.filter(r => r === SupplyChainDIYType.PASS).length;
+
 	if (passCount === 2) {
 		return Rating.PASS;
 	}
+
 	if (passCount === 1) {
 		return Rating.PARTIAL;
 	}
+
 	return Rating.FAIL;
 }
 
@@ -82,7 +85,9 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'The hardware wallet fails most or all DIY supply chain sub-criteria.'),
+				sentence(
+					() => 'The hardware wallet fails most or all DIY supply chain sub-criteria.',
+				),
 				(v: SupplyChainDIYValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -106,6 +111,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 				},
 			);
 		}
+
 		return null;
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainDIYValue> => {
@@ -125,6 +131,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 		}
 
 		const diyFeature = features.security.supplyChainDIY;
+
 		if (diyFeature === null) {
 			return unrated(supplyChainDIY, brand, {
 				diyNoNda: SupplyChainDIYType.FAIL,

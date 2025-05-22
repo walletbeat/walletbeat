@@ -36,8 +36,7 @@ const v2Audits: SecurityAudit[] = [
 		auditDate: '2024-01-26',
 		auditor: pashov,
 		codeSnapshot: {
-			commit:
-				'https://github.com/AmbireTech/ambire-common/tree/da3ba641a004d1f0143a20ddde48049b619431ad',
+			commit: 'https://github.com/AmbireTech/ambire-common/tree/da3ba641a004d1f0143a20ddde48049b619431ad',
 			date: '2023-11-08',
 		},
 		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Pashov-Ambire-third-security-review.md',
@@ -48,8 +47,7 @@ const v2Audits: SecurityAudit[] = [
 		auditDate: '2025-02-20',
 		auditor: hunterSecurity,
 		codeSnapshot: {
-			commit:
-				'https://github.com/AmbireTech/ambire-common/commit/de88e26041db8777468f384e56d5ad0cb96e29a5',
+			commit: 'https://github.com/AmbireTech/ambire-common/commit/de88e26041db8777468f384e56d5ad0cb96e29a5',
 			date: '2025-02-17',
 		},
 		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
@@ -89,7 +87,11 @@ const dataLeakReferences: Record<string, References> = {
 	github: [
 		{
 			explanation: 'Used for static content and info lists.',
-			url: ['https://raw.githubusercontent.com', 'https://github.com', 'https://api.github.com'],
+			url: [
+				'https://raw.githubusercontent.com',
+				'https://github.com',
+				'https://api.github.com',
+			],
 		},
 	],
 	jiffylabs: [
@@ -298,7 +300,8 @@ export const ambire: SoftwareWallet = {
 				],
 				onchain: {},
 			},
-			privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
+			privacyPolicy:
+				'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
 			transactionPrivacy: {
 				stealthAddresses: notSupported,
 			},

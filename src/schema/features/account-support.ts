@@ -102,6 +102,7 @@ export function supportsAccountType(
 	if (accountSupport === undefined || accountSupport === null) {
 		return false;
 	}
+
 	return isSupported<Support<unknown>>(accountSupport[accountType]);
 }
 
@@ -115,14 +116,17 @@ export function supportsOnlyAccountType(
 	if (!supportsAccountType(accountSupport, accountType)) {
 		return false;
 	}
+
 	for (const otherType of allAccountTypes) {
 		if (otherType === accountType) {
 			continue;
 		}
+
 		if (supportsAccountType(accountSupport, otherType)) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -179,7 +183,10 @@ interface AccountTypeMultifactor {
  */
 export type AccountTypeMpc = AccountTypeMultifactor & {
 	/** How is the underlying key generation performed before shares are distributed? */
-	initialKeyGeneration: 'ON_USER_DEVICE' | 'BY_THIRD_PARTY_IN_TEE' | 'BY_THIRD_PARTY_IN_THE_CLEAR';
+	initialKeyGeneration:
+		| 'ON_USER_DEVICE'
+		| 'BY_THIRD_PARTY_IN_TEE'
+		| 'BY_THIRD_PARTY_IN_THE_CLEAR';
 };
 
 /**

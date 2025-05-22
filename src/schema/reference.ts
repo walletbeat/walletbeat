@@ -88,33 +88,43 @@ export function toFullyQualified(
 	if (reference === null || reference === undefined) {
 		return [];
 	}
+
 	if (Array.isArray(reference)) {
 		const qualified: FullyQualifiedReference[] = [];
+
 		for (const ref of reference) {
 			qualified.push(...toFullyQualified(ref));
 		}
+
 		return mergeRefs(...qualified);
 	}
+
 	if (isFullyQualifiedReference(reference)) {
 		return [reference];
 	}
+
 	if (typeof reference === 'string') {
 		return toFullyQualified({ url: reference });
 	}
+
 	let explanation: string | undefined = undefined;
+
 	if (
 		Object.hasOwn(reference, 'explanation') &&
 		typeof (reference as { explanation: unknown }).explanation === 'string'
 	) {
 		explanation = (reference as { explanation: string }).explanation;
 	}
+
 	let lastRetrieved: CalendarDate | undefined = undefined;
+
 	if (
 		Object.hasOwn(reference, 'lastRetrieved') &&
 		typeof (reference as { lastRetrieved: unknown }).lastRetrieved === 'string'
 	) {
 		lastRetrieved = (reference as { lastRetrieved: CalendarDate }).lastRetrieved;
 	}
+
 	if (isLabeledUrl(reference)) {
 		return [
 			{
@@ -124,6 +134,7 @@ export function toFullyQualified(
 			},
 		];
 	}
+
 	if (isUrl(reference.url)) {
 		return [
 			{
@@ -133,8 +144,10 @@ export function toFullyQualified(
 			},
 		];
 	}
+
 	if (reference.url.length === 1) {
 		const url = nonEmptyGet(reference.url);
+
 		return [
 			{
 				urls: [labeledUrl(url, reference.label)],
@@ -143,7 +156,9 @@ export function toFullyQualified(
 			},
 		];
 	}
+
 	const labelCounter = new Map<string, number>();
+
 	return reference.url.map(url => {
 		if (isLabeledUrl(url)) {
 			return {
@@ -152,9 +167,12 @@ export function toFullyQualified(
 				lastRetrieved,
 			};
 		}
+
 		const label = getUrlLabel(url);
 		const count = labelCounter.get(label) ?? 0;
+
 		labelCounter.set(label, count + 1);
+
 		return {
 			urls: [
 				{
@@ -173,16 +191,21 @@ export function refs(withRef: WithRef<unknown>): FullyQualifiedReference[] {
 	if (withRef.ref === undefined || withRef.ref === null) {
 		return [];
 	}
+
 	let refs = withRef.ref;
+
 	if (!Array.isArray(refs)) {
 		refs = [refs];
 	}
+
 	const qualifiedRefs: FullyQualifiedReference[] = [];
+
 	for (const reference of refs) {
 		for (const qualRef of toFullyQualified(reference)) {
 			qualifiedRefs.push(qualRef);
 		}
 	}
+
 	return mergeRefs(...qualifiedRefs);
 }
 
@@ -194,6 +217,7 @@ export function popRefs<T>(withRef: WithRef<T>): {
 	const withoutRefs = Object.fromEntries(
 		Object.entries(withRef).filter(([key]) => key !== 'ref'),
 	) as T;
+
 	return { withoutRefs, refs: refs(withRef) };
 }
 
@@ -202,10 +226,12 @@ export function mergeRefs(
 	...refs: Array<References | ReferenceArray | FullyQualifiedReference | null | undefined>
 ): FullyQualifiedReference[] {
 	const qualifiedRefs = [];
+
 	for (const ref of refs) {
 		if (ref === null || ref === undefined) {
 			continue;
 		}
+
 		if (!Array.isArray(ref) && isFullyQualifiedReference(ref)) {
 			qualifiedRefs.push(ref);
 		} else {
@@ -214,17 +240,22 @@ export function mergeRefs(
 	}
 	const byExplanation = new Map<string, FullyQualifiedReference>();
 	const mergedRefs: FullyQualifiedReference[] = [];
+
 	for (const ref of qualifiedRefs) {
 		if (ref.explanation === undefined) {
 			mergedRefs.push(ref);
 			continue;
 		}
+
 		const existing = byExplanation.get(ref.explanation);
+
 		if (existing === undefined) {
 			byExplanation.set(ref.explanation, ref);
 			continue;
 		}
+
 		let newUrls = existing.urls;
+
 		for (const url of ref.urls) {
 			newUrls = mergeLabeledUrls(newUrls, url);
 		}
@@ -237,5 +268,6 @@ export function mergeRefs(
 	byExplanation.forEach(ref => {
 		mergedRefs.push(ref);
 	});
+
 	return mergedRefs;
 }

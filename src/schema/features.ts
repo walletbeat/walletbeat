@@ -267,6 +267,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 		if (!isWalletSoftwareFeatures(features)) {
 			return null;
 		}
+
 		return resolveFeature<F>(featureFn(features), variant);
 	};
 	const hardwareFeat = <F>(
@@ -275,6 +276,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 		if (!isWalletHardwareFeatures(features)) {
 			return null;
 		}
+
 		return resolveFeature<F>(featureFn(features), variant);
 	};
 
@@ -288,12 +290,15 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 					? null
 					: features.security.publicSecurityAudits.filter(
 							audit =>
-								audit.variantsScope === 'ALL_VARIANTS' || audit.variantsScope[variant] === true,
+								audit.variantsScope === 'ALL_VARIANTS' ||
+								audit.variantsScope[variant] === true,
 						),
 			lightClient: {
 				ethereumL1: softwareFeat(features => features.security.lightClient.ethereumL1),
 			},
-			hardwareWalletSupport: softwareFeat(features => features.security.hardwareWalletSupport),
+			hardwareWalletSupport: softwareFeat(
+				features => features.security.hardwareWalletSupport,
+			),
 			hardwareWalletDappSigning: hardwareFeat(
 				features => features.security.hardwareWalletDappSigning,
 			),
@@ -325,7 +330,9 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 		accountSupport: baseFeat(features => features.accountSupport),
 		multiAddress: baseFeat(features => features.multiAddress),
 		integration: resolveWalletIntegrationFeatures(
-			isWalletSoftwareFeatures(features) ? features.integration : notApplicableWalletIntegration,
+			isWalletSoftwareFeatures(features)
+				? features.integration
+				: notApplicableWalletIntegration,
 			variant,
 		),
 		addressResolution: softwareFeat(features => features.addressResolution),

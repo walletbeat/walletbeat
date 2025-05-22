@@ -67,13 +67,14 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 				return null;
 			case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
 				return (
-					<Typography variant="caption" sx={{ opacity: 0.8 }}>
-						This rating is only relevant for the {variantToName(displayedVariant, false)} version.
+					<Typography variant='caption' sx={{ opacity: 0.8 }}>
+						This rating is only relevant for the{' '}
+						{variantToName(displayedVariant, false)} version.
 					</Typography>
 				);
 			default:
 				return (
-					<Typography variant="caption" sx={{ opacity: 0.8 }}>
+					<Typography variant='caption' sx={{ opacity: 0.8 }}>
 						{displayedVariant === null
 							? 'This rating differs across versions. Select a specific version for details.'
 							: `This rating is specific to the ${variantToName(displayedVariant, false)} version.`}
@@ -84,7 +85,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 
 	let rendered = (
 		<>
-			<React.Fragment key="details">
+			<React.Fragment key='details'>
 				<RenderContent
 					content={details}
 					typography={{
@@ -92,8 +93,8 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					}}
 				/>
 			</React.Fragment>
-			<React.Fragment key="variantSpecific">{variantSpecificCaption}</React.Fragment>
-			<React.Fragment key="impact">
+			<React.Fragment key='variantSpecific'>{variantSpecificCaption}</React.Fragment>
+			<React.Fragment key='impact'>
 				{evalAttr.evaluation.impact === undefined ? null : (
 					<>
 						<div style={{ height: '1rem' }}></div>
@@ -119,11 +120,13 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			)}
 		</>
 	);
+
 	if (isTypographicContent(details)) {
 		rendered = (
 			<WrapRatingIcon rating={evalAttr.evaluation.value.rating}>{rendered}</WrapRatingIcon>
 		);
 	}
+
 	const accordions: NonEmptyArray<AccordionData> = [
 		{
 			id: `why-${evalAttr.attribute.id}`,
@@ -146,12 +149,18 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					? evalAttr.attribute.wording.howIsEvaluated
 					: `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`,
 			contents: (
-				<AttributeMethodology attribute={evalAttr.attribute} evaluation={evalAttr.evaluation} />
+				<AttributeMethodology
+					attribute={evalAttr.attribute}
+					evaluation={evalAttr.evaluation}
+				/>
 			),
 		},
 	];
 	const howToImprove =
-		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove;
+		override?.howToImprove !== undefined
+			? override.howToImprove
+			: evalAttr.evaluation.howToImprove;
+
 	if (howToImprove !== undefined) {
 		accordions.push({
 			id: `how-${evalAttr.attribute.id}`,
@@ -171,6 +180,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			),
 		});
 	}
+
 	return (
 		<>
 			{rendered}
@@ -187,8 +197,8 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			<Accordions
 				accordions={accordions}
 				borderRadius={`${subsectionBorderRadius}px`}
-				summaryTypographyVariant="h4"
-				interAccordionMargin="1rem"
+				summaryTypographyVariant='h4'
+				interAccordionMargin='1rem'
 			/>
 		</>
 	);

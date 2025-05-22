@@ -14,7 +14,7 @@ export const family: SoftwareWallet = {
 		id: 'family',
 		displayName: 'Family',
 		tableName: 'Family',
-		blurb: paragraph(``),
+		blurb: paragraph(''),
 		contributors: [lucemans],
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',

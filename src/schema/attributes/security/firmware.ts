@@ -28,12 +28,15 @@ function evaluateFirmware(features: FirmwareSupport): Rating {
 		features.customFirmware,
 	];
 	const passCount = ratings.filter(r => r === FirmwareType.PASS).length;
+
 	if (passCount >= 3) {
 		return Rating.PASS;
 	}
+
 	if (passCount >= 1) {
 		return Rating.PARTIAL;
 	}
+
 	return Rating.FAIL;
 }
 
@@ -90,14 +93,21 @@ export const firmware: Attribute<FirmwareValue> = {
 		pickWorstRating<FirmwareValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), brand, {
-				silentUpdateProtection: FirmwareType.FAIL,
-				firmwareOpenSource: FirmwareType.FAIL,
-				reproducibleBuilds: FirmwareType.FAIL,
-				customFirmware: FirmwareType.FAIL,
-			});
+			return exempt(
+				firmware,
+				sentence('Firmware is only rated for hardware wallets'),
+				brand,
+				{
+					silentUpdateProtection: FirmwareType.FAIL,
+					firmwareOpenSource: FirmwareType.FAIL,
+					reproducibleBuilds: FirmwareType.FAIL,
+					customFirmware: FirmwareType.FAIL,
+				},
+			);
 		}
+
 		const firmwareFeature = features.security.firmware;
+
 		if (firmwareFeature === null) {
 			return unrated(firmware, brand, {
 				silentUpdateProtection: FirmwareType.FAIL,

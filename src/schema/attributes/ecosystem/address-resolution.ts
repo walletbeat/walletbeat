@@ -21,6 +21,7 @@ import type {
 import { pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.ecosystem.address_resolution';
+
 export type AddressResolutionValue = Value & {
 	addressResolution?: AddressResolution<AddressResolutionSupport>;
 	__brand: 'attributes.ecosystem.address_resolution';
@@ -40,6 +41,7 @@ function getOffchainProviderInfo(
 			walletShould: undefined,
 		};
 	}
+
 	if (support.offchainDataVerifiability === 'VERIFIABLE') {
 		return {
 			rating: Rating.PARTIAL,
@@ -49,6 +51,7 @@ function getOffchainProviderInfo(
 				'contact the third-party provider using traffic anonymizing techniques, such as Tor or Oblivious HTTP.',
 		};
 	}
+
 	if (support.offchainProviderConnection === 'UNIQUE_PROXY_CIRCUIT') {
 		return {
 			rating: Rating.PARTIAL,
@@ -58,6 +61,7 @@ function getOffchainProviderInfo(
 				'ensure the response from the third-party provider is correct using onchain data verified by a light client.',
 		};
 	}
+
 	return {
 		rating: Rating.PARTIAL,
 		offchainInfo:
@@ -75,10 +79,12 @@ function evaluateAddressResolution(
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
 	];
+
 	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificErcs) {
 		if (chainSpecificSupport.support !== 'SUPPORTED') {
 			continue;
 		}
+
 		if (chainSpecificSupport.medium === 'CHAIN_CLIENT') {
 			return {
 				value: {
@@ -111,7 +117,10 @@ function evaluateAddressResolution(
 				references,
 			};
 		}
-		const { rating, offchainInfo, walletShould } = getOffchainProviderInfo(chainSpecificSupport);
+
+		const { rating, offchainInfo, walletShould } =
+			getOffchainProviderInfo(chainSpecificSupport);
+
 		return {
 			value: {
 				id: `support_via_erc${erc.number}_${chainSpecificSupport.offchainDataVerifiability.toLowerCase()}_${chainSpecificSupport.offchainProviderConnection.toLowerCase()}_provider`,
@@ -151,6 +160,7 @@ function evaluateAddressResolution(
 			references,
 		};
 	}
+
 	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
 		return {
 			value: {
@@ -183,10 +193,11 @@ function evaluateAddressResolution(
 			references,
 		};
 	}
+
 	if (addressResolution.nonChainSpecificEnsResolution.medium === 'CHAIN_CLIENT') {
 		return {
 			value: {
-				id: `support_basic_resolution_onchain`,
+				id: 'support_basic_resolution_onchain',
 				rating: Rating.PARTIAL,
 				displayName: 'Resolves basic ENS addresses',
 				addressResolution,
@@ -224,14 +235,16 @@ function evaluateAddressResolution(
 			references,
 		};
 	}
+
 	const { offchainInfo, walletShould } = getOffchainProviderInfo(
 		addressResolution.nonChainSpecificEnsResolution,
 	);
+
 	return {
 		value: {
 			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
 			rating: Rating.PARTIAL,
-			displayName: `Resolves basic ENS addresses offchain`,
+			displayName: 'Resolves basic ENS addresses offchain',
 			addressResolution,
 			shortExplanation: sentence(
 				(walletMetadata: WalletMetadata) => `
@@ -487,6 +500,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		if (features.addressResolution === null) {
 			return unrated(addressResolution, brand, {});
 		}
+
 		if (
 			features.addressResolution.nonChainSpecificEnsResolution === null ||
 			features.addressResolution.chainSpecificAddressing.erc7828 === null ||
@@ -494,6 +508,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		) {
 			return unrated(addressResolution, brand, {});
 		}
+
 		// We've checked all the nulls, so recreate the object without nulls in
 		// the type description.
 		const resolvedResolution: AddressResolution<AddressResolutionSupport> = {
@@ -503,6 +518,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 			},
 			nonChainSpecificEnsResolution: features.addressResolution.nonChainSpecificEnsResolution,
 		};
+
 		return evaluateAddressResolution(resolvedResolution, refs(features.addressResolution));
 	},
 	aggregate: pickWorstRating<AddressResolutionValue>,

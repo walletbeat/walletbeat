@@ -18,6 +18,7 @@ import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/
 import { exempt, pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.security.passkey_implementation';
+
 export type PasskeyImplementationValue = Value & {
 	library: PasskeyVerificationLibrary;
 	libraryUrl?: string;
@@ -374,9 +375,12 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			);
 		}
 
-		const passkeyVerification = features.security.passkeyVerification;
+		const { passkeyVerification } = features.security;
+
 		if (passkeyVerification === null) {
-			return unrated(passkeyImplementation, brand, { library: PasskeyVerificationLibrary.NONE });
+			return unrated(passkeyImplementation, brand, {
+				library: PasskeyVerificationLibrary.NONE,
+			});
 		}
 
 		// If the library is explicitly set to NONE, this means the wallet doesn't support passkeys

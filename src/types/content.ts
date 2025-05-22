@@ -133,12 +133,14 @@ export function sentence<I extends Input = Input>(
 			`Sentence text is too long (${text.length} characters is over the maximum length of ${sentenceMaxLength} characters).`,
 		);
 	}
+
 	if (isMarkdown ?? false) {
 		return {
 			render: (input: I) => markdownContent(text, input),
 			__brand: sentenceBrand,
 		};
 	}
+
 	return {
 		render: (input: I) => textContent(text, input),
 		__brand: sentenceBrand,
@@ -170,12 +172,14 @@ export function paragraph<I extends Input = Input>(
 			`Paragraph text is too long (${text.length} characters is over the maximum length of ${paragraphMaxLength} characters).`,
 		);
 	}
+
 	if (isMarkdown ?? false) {
 		return {
 			render: (input: I) => markdownContent(text, input),
 			__brand: paragraphBrand,
 		};
 	}
+
 	return {
 		render: (input: I) => textContent(text, input),
 		__brand: paragraphBrand,
@@ -246,6 +250,7 @@ export function component<
 					...mergeProps<C['componentProps'], B>(bakedProps, input),
 				},
 			};
+
 			return {
 				contentType: ContentType.COMPONENT,
 				component: comp as C,

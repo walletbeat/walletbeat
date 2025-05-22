@@ -46,7 +46,9 @@ export function RenderTypographicContent({
 		case ContentType.TEXT:
 			return (
 				<Typography {...typography}>
-					{textTransform === undefined ? content.text.trim() : textTransform(content.text).trim()}
+					{textTransform === undefined
+						? content.text.trim()
+						: textTransform(content.text).trim()}
 				</Typography>
 			);
 	}

@@ -56,7 +56,8 @@ export const coinbase: SoftwareWallet = {
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
 				ref: {
-					explanation: 'Coinbase Wallet supports ERC-4337 via its smart wallet implementation.',
+					explanation:
+						'Coinbase Wallet supports ERC-4337 via its smart wallet implementation.',
 					url: 'https://github.com/coinbase/smart-wallet',
 				},
 				tokenTransferTransactionGeneration:

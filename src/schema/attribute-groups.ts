@@ -400,23 +400,27 @@ export function evaluateAttributes(
 	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => {
 		if (attr.exempted !== undefined) {
 			const maybeExempt = attr.exempted(features, walletMetadata);
+
 			if (maybeExempt !== null) {
 				if (!isExempt(maybeExempt)) {
 					throw new Error(
 						`Attribute ${attr.id}'s exemption rating function returned a non-exempt rating`,
 					);
 				}
+
 				return {
 					attribute: attr,
 					evaluation: maybeExempt,
 				};
 			}
 		}
+
 		return {
 			attribute: attr,
 			evaluation: attr.evaluate(features),
 		};
 	};
+
 	return {
 		security: {
 			securityAudits: evalAttr(securityAudits),
@@ -470,18 +474,20 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 	const attr = <V extends Value>(
 		getter: (tree: EvaluationTree) => EvaluatedAttribute<V>,
 	): EvaluatedAttribute<V> => {
-		const attribute = getter(
+		const { attribute } = getter(
 			nonEmptyGet(nonEmptyValues<Variant, EvaluationTree>(perVariant)),
-		).attribute;
+		);
 		const evaluations = nonEmptyRemap(
 			perVariant,
 			(_, tree: EvaluationTree) => getter(tree).evaluation,
 		);
+
 		return {
 			attribute,
 			evaluation: attribute.aggregate(evaluations),
 		};
 	};
+
 	return {
 		security: {
 			securityAudits: attr(tree => tree.security.securityAudits),
@@ -622,14 +628,17 @@ export function getEvaluationFromOtherTree<V extends Value>(
 			if (Object.hasOwn(evalGroup, evalAttr.attribute.id)) {
 				return evalGroup[evalAttr.attribute.id] as unknown as EvaluatedAttribute<V>;
 			}
+
 			return undefined;
 		},
 	).find(v => v !== undefined);
+
 	if (otherEvalAttr === undefined) {
 		throw new Error(
 			`Incomplete evaluation tree; did not found evaluation for attribute ${evalAttr.attribute.id}`,
 		);
 	}
+
 	return otherEvalAttr;
 }
 
@@ -644,8 +653,9 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 	return (evaluations: EvaluatedGroup<Vs>): MaybeUnratedScore => {
 		const subScores: WeightedScore[] = nonEmptyValues<keyof Vs, WeightedScore | null>(
 			nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
-				const value = evaluations[key].evaluation.value;
+				const { value } = evaluations[key].evaluation;
 				const score = value.score ?? defaultRatingScore(value.rating);
+
 				return score === null
 					? null
 					: {
@@ -654,13 +664,17 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 						};
 			}),
 		).filter(score => score !== null);
+
 		if (isNonEmptyArray(subScores)) {
 			let hasUnratedComponent = false;
+
 			for (const evalAttr of evaluatedAttributes(evaluations)) {
 				hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED;
 			}
+
 			return { score: weightedScore(subScores), hasUnratedComponent };
 		}
+
 		return null;
 	};
 }
@@ -674,9 +688,11 @@ export function getAttributeGroupById(
 	tree: EvaluationTree,
 ): AttributeGroup<ValueSet> | null {
 	const attrGroup = attributeTree[id] as AttributeGroup<ValueSet> | undefined;
+
 	if (attrGroup === undefined) {
 		return null;
 	}
+
 	if (
 		!mapNonExemptAttributeGroupsInTree(
 			tree,
@@ -685,5 +701,6 @@ export function getAttributeGroupById(
 	) {
 		return null;
 	}
+
 	return attrGroup;
 }

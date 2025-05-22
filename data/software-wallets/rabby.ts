@@ -146,7 +146,8 @@ export const rabby: SoftwareWallet = {
 								},
 								ref: [
 									{
-										explanation: 'All wallet traffic goes through api.rabby.io without proxying.',
+										explanation:
+											'All wallet traffic goes through api.rabby.io without proxying.',
 										url: 'https://github.com/RabbyHub/Rabby/blob/356ed60957d61d508a89d71c63a33b7474d6b311/src/constant/index.ts#L468',
 									},
 									{
@@ -155,7 +156,8 @@ export const rabby: SoftwareWallet = {
 										url: 'https://github.com/search?q=repo%3ARabbyHub%2FRabby%20matomoRequestEvent&type=code',
 									},
 									{
-										explanation: 'Balance refresh requests are made about the active address only.',
+										explanation:
+											'Balance refresh requests are made about the active address only.',
 										url: 'https://github.com/RabbyHub/Rabby/blob/356ed60957d61d508a89d71c63a33b7474d6b311/src/background/controller/wallet.ts#L1622',
 									},
 								],

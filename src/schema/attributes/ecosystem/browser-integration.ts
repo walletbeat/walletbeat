@@ -29,6 +29,7 @@ import { exempt, pickWorstRating, unrated } from '../common';
 type ResolvedSupport = Record<BrowserIntegrationEip, Support>;
 
 const brand = 'attributes.ecosystem.browser_integration';
+
 export type BrowserIntegrationValue = Value & {
 	support?: ResolvedSupport;
 	__brand: 'attributes.ecosystem.browser_integration';
@@ -77,7 +78,9 @@ function browserIntegrationSupport(
 			references: refs,
 		};
 	}
+
 	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL;
+
 	return {
 		value: {
 			id: `support_${supported.join('_')}`,
@@ -190,21 +193,26 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 		if (features.variant !== Variant.BROWSER) {
 			return exempt(
 				browserIntegration,
-				sentence('Only browser-based wallets are rated on their browser integration support.'),
+				sentence(
+					'Only browser-based wallets are rated on their browser integration support.',
+				),
 				brand,
 				{},
 			);
 		}
+
 		if (features.integration.browser === 'NOT_A_BROWSER_WALLET') {
 			throw new Error(
 				'Attempted to rate a browser-wallet with features.integration.browser set to NOT_A_BROWSER_WALLET',
 			);
 		}
+
 		if (Object.values(features.integration.browser).includes(null)) {
 			return unrated(browserIntegration, brand, {});
 		}
 
 		const browserIntegrationEips = features.integration.browser as WithRef<ResolvedSupport>;
+
 		return browserIntegrationSupport(browserIntegrationEips);
 	},
 	aggregate: pickWorstRating<BrowserIntegrationValue>,

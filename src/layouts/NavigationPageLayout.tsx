@@ -24,6 +24,7 @@ function debounce<T extends (...args: Parameters<T>) => void>(
 		if (timer !== null) {
 			clearTimeout(timer);
 		}
+
 		timer = setTimeout(() => {
 			fn(...args);
 		}, delay);
@@ -82,22 +83,29 @@ export function NavigationPageLayout({
 	const scrollNavigationTo = useCallback(
 		(itemId: string): void => {
 			const listItem = document.getElementById(`listItem-${itemId}`);
+
 			if (listItem === null) {
 				return;
 			}
+
 			const itemGroup: NavigationGroup | undefined = groups.find(
 				(group: NavigationGroup): boolean =>
 					group.items.some((navItem: NavigationItem): boolean => navItem.id === itemId),
 			);
+
 			if (itemGroup === undefined) {
 				return;
 			}
+
 			const navigation = document.getElementById(`navigationGroup-${itemGroup.id}`);
+
 			if (navigation === null) {
 				return;
 			}
+
 			const navigationRect = navigation.getBoundingClientRect();
 			const listItemRect = listItem.getBoundingClientRect();
+
 			if (listItemRect.top < navigationRect.top) {
 				navigation.scrollBy({
 					top: listItemRect.top - navigationRect.top - scrollNavigationMargin,
@@ -123,6 +131,7 @@ export function NavigationPageLayout({
 
 	const onHashChange = useCallback((e: HashChangeEvent) => {
 		const newUrl = new URL(e.newURL);
+
 		if (newUrl.hash !== '') {
 			setActiveItemId(newUrl.hash.slice(1));
 		}
@@ -145,6 +154,7 @@ export function NavigationPageLayout({
 
 	useEffect(() => {
 		window.addEventListener('hashchange', onHashChange, { passive: true });
+
 		return () => {
 			window.removeEventListener('hashchange', onHashChange);
 		};
@@ -160,11 +170,15 @@ export function NavigationPageLayout({
 				stickyHeaderId !== undefined ? document.getElementById(stickyHeaderId) : undefined;
 
 			const topBound =
-				(stickyHeaderElement?.getBoundingClientRect().bottom ?? 0) + (stickyHeaderMargin ?? 0);
+				(stickyHeaderElement?.getBoundingClientRect().bottom ?? 0) +
+				(stickyHeaderMargin ?? 0);
 
 			const items = groups
 				.flatMap(group =>
-					group.items.flatMap(topLevelItem => [topLevelItem, ...(topLevelItem.children ?? [])]),
+					group.items.flatMap(topLevelItem => [
+						topLevelItem,
+						...(topLevelItem.children ?? []),
+					]),
 				)
 				.filter(isNavigationContentItem);
 
@@ -174,7 +188,11 @@ export function NavigationPageLayout({
 				}
 
 				const headingElement = document.getElementById(item.contentId);
-				return headingElement !== null && headingElement.getBoundingClientRect().bottom > topBound;
+
+				return (
+					headingElement !== null &&
+					headingElement.getBoundingClientRect().bottom > topBound
+				);
 			});
 
 			setActiveItemId(activeItem === undefined ? '' : activeItem.id);
@@ -187,6 +205,7 @@ export function NavigationPageLayout({
 
 	useEffect(() => {
 		window.addEventListener('scroll', debouncedScrollHandler, { passive: true });
+
 		return () => {
 			window.removeEventListener('scroll', debouncedScrollHandler);
 		};
@@ -194,9 +213,9 @@ export function NavigationPageLayout({
 
 	return (
 		<ThemeProvider theme={theme}>
-			<div className="flex flex-col lg:flex-row w-full min-h-screen max-w-screen">
+			<div className='flex flex-col lg:flex-row w-full min-h-screen max-w-screen'>
 				<Navigation
-					key="navigation"
+					key='navigation'
 					groups={groups}
 					activeItemId={activeItemId}
 					prefix={prefix}
@@ -204,8 +223,11 @@ export function NavigationPageLayout({
 					selectedGroupId={selectedGroupId}
 				/>
 
-				<div key="contentContainer" className="flex-grow overflow-y-auto min-h-screen w-full pb-24">
-					<div className="mx-auto w-full">{children}</div>
+				<div
+					key='contentContainer'
+					className='flex-grow overflow-y-auto min-h-screen w-full pb-24'
+				>
+					<div className='mx-auto w-full'>{children}</div>
 				</div>
 			</div>
 		</ThemeProvider>

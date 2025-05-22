@@ -18,6 +18,7 @@ import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/
 import { exempt, pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.security.bug_bounty_program';
+
 export type BugBountyProgramValue = Value & {
 	programType: BugBountyProgramType;
 	upgradePathAvailable: boolean;
@@ -80,8 +81,8 @@ function disclosureOnlyProgram(
 				which may limit the motivation for researchers to find and report vulnerabilities.
 				${
 					support.upgradePathAvailable
-						? `\n\nPositively, the wallet does provide an upgrade path for users when security issues are identified.`
-						: `\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.`
+						? '\n\nPositively, the wallet does provide an upgrade path for users when security issues are identified.'
+						: '\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.'
 				}
 			`,
 		),
@@ -120,8 +121,8 @@ function basicBugBountyProgram(
 				of scope, reward size, or responsiveness.
 				${
 					support.upgradePathAvailable
-						? `\n\nPositively, the wallet provides an upgrade path for users when security issues are identified.`
-						: `\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.`
+						? '\n\nPositively, the wallet provides an upgrade path for users when security issues are identified.'
+						: '\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.'
 				}
 			`,
 		),
@@ -160,8 +161,8 @@ function comprehensiveBugBountyProgram(
 				and a responsive disclosure process.
 				${
 					support.upgradePathAvailable
-						? `\n\nAdditionally, the wallet provides a clear upgrade path for users when security issues are identified.`
-						: `\n\nHowever, the wallet should still improve by providing a clearer upgrade path for users when security issues are identified.`
+						? '\n\nAdditionally, the wallet provides a clear upgrade path for users when security issues are identified.'
+						: '\n\nHowever, the wallet should still improve by providing a clearer upgrade path for users when security issues are identified.'
 				}
 			`,
 		),

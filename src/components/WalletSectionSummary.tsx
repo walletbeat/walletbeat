@@ -33,7 +33,7 @@ export function WalletSectionSummary<Vs extends ValueSet>(props: {
 				<div className={cx('flex flex-row gap-2 items-center w-fit p-2', color)}>
 					{percentageScore}
 					{score.hasUnratedComponent && (
-						<Tooltip content="This attribute group contains unrated components.">
+						<Tooltip content='This attribute group contains unrated components.'>
 							<LuInfo />
 						</Tooltip>
 					)}

@@ -22,6 +22,7 @@ import { fundingDetailsContent } from '@/types/content/funding-details';
 import { pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.transparency.funding';
+
 export type FundingValue = Value & {
 	__brand: 'attributes.transparency.funding';
 };
@@ -280,7 +281,9 @@ export const funding: Attribute<FundingValue> = {
 		if (features.monetization === null) {
 			return unrated(funding, brand, null);
 		}
+
 		const strategies: MonetizationStrategy[] = [];
+
 		for (const { strategy, value } of monetizationStrategies(features.monetization)) {
 			switch (value) {
 				case null:
@@ -293,11 +296,14 @@ export const funding: Attribute<FundingValue> = {
 			}
 		}
 		const numStrategies = strategies.length;
+
 		if (numStrategies === 0) {
 			return unclear;
 		}
+
 		const extractiveStrategies = [];
 		const userAlignedStrategies = [];
+
 		for (const strategy of strategies) {
 			if (monetizationStrategyIsUserAligned(strategy)) {
 				userAlignedStrategies.push(strategy);
@@ -305,6 +311,7 @@ export const funding: Attribute<FundingValue> = {
 				extractiveStrategies.push(strategy);
 			}
 		}
+
 		if (!features.monetization.revenueBreakdownIsPublic && extractiveStrategies.length > 0) {
 			if (extractiveStrategies.length === 1) {
 				return extractive(
@@ -313,8 +320,10 @@ export const funding: Attribute<FundingValue> = {
 					features.monetization,
 				);
 			}
+
 			return extractive('multi', '', features.monetization);
 		}
+
 		if (numStrategies === 1) {
 			return transparent(
 				strategies[0],
@@ -322,6 +331,7 @@ export const funding: Attribute<FundingValue> = {
 				features.monetization,
 			);
 		}
+
 		return transparent('multi', 'Multiple sources', features.monetization);
 	},
 	aggregate: pickWorstRating<FundingValue>,

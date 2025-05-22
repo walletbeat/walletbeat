@@ -41,12 +41,15 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 		features.genuineCheck,
 	];
 	const passCount = ratings.filter(r => r === SupplyChainFactoryType.PASS).length;
+
 	if (passCount >= 5) {
 		return Rating.PASS;
 	}
+
 	if (passCount >= 3) {
 		return Rating.PARTIAL;
 	}
+
 	return Rating.FAIL;
 }
 
@@ -95,13 +98,18 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		],
 		partial: [
 			exampleRating(
-				sentence(() => 'The hardware wallet passes some factory supply chain sub-criteria.'),
+				sentence(
+					() => 'The hardware wallet passes some factory supply chain sub-criteria.',
+				),
 				(v: SupplyChainFactoryValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(() => 'The hardware wallet fails most or all factory supply chain sub-criteria.'),
+				sentence(
+					() =>
+						'The hardware wallet fails most or all factory supply chain sub-criteria.',
+				),
 				(v: SupplyChainFactoryValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -129,6 +137,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 				},
 			);
 		}
+
 		return null;
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainFactoryValue> => {
@@ -152,6 +161,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		}
 
 		const factoryFeature = features.security.supplyChainFactory;
+
 		if (factoryFeature === null) {
 			return unrated(supplyChainFactory, brand, {
 				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
@@ -163,7 +173,8 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<SupplyChainFactorySupport>(factoryFeature);
+		const { withoutRefs, refs: extractedRefs } =
+			popRefs<SupplyChainFactorySupport>(factoryFeature);
 		const rating = evaluateSupplyChainFactory(withoutRefs);
 
 		return {
