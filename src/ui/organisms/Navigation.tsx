@@ -155,7 +155,7 @@ const NavigationItem = memo(
       () =>
         cx(
           'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
-          shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-backgroundSecondary',
+          shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-background',
         ),
       [shouldHighlight],
     );
@@ -218,7 +218,7 @@ const NavigationItem = memo(
           >
             {children}
             {hasChildren && (
-              <span className='ml-auto'>
+              <span className=''>
                 <svg
                   stroke='currentColor'
                   fill='none'

@@ -173,8 +173,7 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 			otherwise act as an intermediary.
 		* **No downtime**: Because the L1 node is running on your own hardware,
 			you are not at risk of losing funds or opportunities due to downtime
-			from a third-party RPC provider.
-	`),
+			from a third-party RPC provider.`),
   methodology: markdown(`
 		Wallets are rated based on whether they allow the user to configure the
 		RPC endpoint used for Ethereum mainnet, and whether such configuration is
