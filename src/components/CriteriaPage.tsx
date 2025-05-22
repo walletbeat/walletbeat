@@ -126,8 +126,6 @@ export function CriteriaPage({
 									content={attrGroup.perWalletQuestion}
 									strings={{
 										WALLET_NAME: 'your wallet',
-										WALLET_PSEUDONYM_SINGULAR: 'username',
-										WALLET_PSEUDONYM_PLURAL: 'usernames',
 									}}
 									typography={{
 										variant: 'caption',
