@@ -1,13 +1,13 @@
 import { Typography } from '@mui/material'
 import type React from 'react'
 
-import { ContentType, type TypographicContent } from '@/types/content'
+import { ContentType, type TypographicContent as _TypographicContent } from '@/types/content'
 import { renderStrings } from '@/types/utils/text'
 
 import { MarkdownTypography } from './MarkdownTypography'
 
 export function RenderTypographicContent<
-	TypographicContent_ extends TypographicContent,
+	TypographicContent extends _TypographicContent,
 >({
 	content,
 	textTransform,
@@ -15,7 +15,7 @@ export function RenderTypographicContent<
 	strings,
 }: {
 	/** The typographic content to render. */
-	content: TypographicContent_
+	content: TypographicContent
 
 	/**
 	 * A text transformation applied to the text.
@@ -41,7 +41,7 @@ export function RenderTypographicContent<
 	>
 
 	/** A set of strings to be expanded in the text. */
-	strings?: TypographicContent_ extends TypographicContent<infer Strings> ? Strings : undefined,
+	strings?: TypographicContent extends _TypographicContent<infer Strings> ? Strings : undefined,
 }): React.JSX.Element {
 	const processText = (text: string) => {
 		if (textTransform) {
