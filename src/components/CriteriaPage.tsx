@@ -137,8 +137,8 @@ export function CriteriaPage({
     >
       <div className='max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full'>
         <div className='flex flex-col lg:mt-10 gap-4'>
-          <div className='px-8 py-6 flex justify-between items-start flex-wrap min-h-96 relative'>
-            <div className='flex flex-col gap-4 py-8 flex-1'>
+          <div className='px-8 py-6 flex justify-between items-start flex-wrap min-h-96 w-full relative'>
+            <div className='flex flex-col gap-4 py-8 flex-1 w-full'>
               <h1 className='text-4xl font-extrabold text-accent'>{attrGroup.displayName}</h1>
               <p className='text-secondary'>
                 <RenderTypographicContent
@@ -274,11 +274,11 @@ export const AttributeGroupSummary = ({
                 <div
                   className={cx(
                     'py-1 px-1.5 text-center font-medium rounded-md',
-                    rating === Rating.PASS && 'bg-[color:var(--rating-pass)] text-primary',
-                    rating === Rating.FAIL && 'bg-[color:var(--rating-fail)] text-primary',
-                    rating === Rating.PARTIAL && 'bg-[color:var(--rating-partial)] text-primary',
+                    rating === Rating.PASS && 'bg-rating-pass text-primary',
+                    rating === Rating.FAIL && 'bg-rating-fail text-primary',
+                    rating === Rating.PARTIAL && 'bg-rating-partial text-primary',
                     (rating === Rating.EXEMPT || rating === Rating.UNRATED) &&
-                      'bg-[color:var(--rating-neutral)] text-primary',
+                      'bg-rating-neutral text-primary',
                   )}
                 >
                   {ratingText}
@@ -298,9 +298,9 @@ export const AttributeGroupSummary = ({
   });
 
   return (
-    <div className='overflow-x-auto rounded-lg border border-[color:var(--border)] shadow-sm'>
-      <table className='min-w-full divide-y divide-[color:var(--border)]'>
-        <thead className='bg-[color:var(--background-secondary)]'>
+    <div className='overflow-x-auto rounded-lg border border-border shadow-sm w-full'>
+      <table className='min-w-full divide-y divide-border'>
+        <thead className='bg-background'>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map(header => (
@@ -316,7 +316,7 @@ export const AttributeGroupSummary = ({
             </tr>
           ))}
         </thead>
-        <tbody className='bg-[color:var(--background-primary)] divide-y divide-[color:var(--border)]'>
+        <tbody className='bg-background divide-y divide-border'>
           {table.getRowModel().rows.map(row => (
             <tr key={row.id}>
               {row.getVisibleCells().map(cell => (
