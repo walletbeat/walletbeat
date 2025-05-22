@@ -1,35 +1,35 @@
-import { useEffect, useState } from 'react'
-import { LuChevronUp } from 'react-icons/lu'
+import { useEffect, useState } from 'react';
+import { LuChevronUp } from 'react-icons/lu';
 
 export function ReturnToTop(): React.JSX.Element {
-	const [visible, setVisible] = useState(false)
+	const [visible, setVisible] = useState(false);
 
 	useEffect(() => {
 		const toggleVisibility = (): void => {
 			if (window.scrollY > window.innerHeight) {
-				setVisible(true)
+				setVisible(true);
 			} else {
-				setVisible(false)
+				setVisible(false);
 			}
-		}
+		};
 
-		window.addEventListener('scroll', toggleVisibility)
+		window.addEventListener('scroll', toggleVisibility);
 
 		return () => {
-			window.removeEventListener('scroll', toggleVisibility)
-		}
-	}, [])
+			window.removeEventListener('scroll', toggleVisibility);
+		};
+	}, []);
 
 	const scrollToTop = (): void => {
 		window.scrollTo({
 			top: 0,
 			behavior: 'smooth',
-		})
-		setVisible(false)
-	}
+		});
+		setVisible(false);
+	};
 
 	if (!visible) {
-		return <></>
+		return <></>;
 	}
 
 	return (
@@ -42,5 +42,5 @@ export function ReturnToTop(): React.JSX.Element {
 				<LuChevronUp className="h-5 w-5" aria-hidden="true" />
 			</button>
 		</div>
-	)
+	);
 }

@@ -1,11 +1,11 @@
-import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
+import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import { Variant } from '@/schema/variants';
+import type { HardwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny'
+import { nconsigny } from '../contributors/nconsigny';
 
 export const fireflyWallet: HardwareWallet = {
 	metadata: {
@@ -94,4 +94,4 @@ export const fireflyWallet: HardwareWallet = {
 	variants: {
 		[Variant.HARDWARE]: true,
 	},
-}
+};

@@ -1,4 +1,4 @@
-import type { SecurityAuditor } from '@/schema/entity'
+import type { SecurityAuditor } from '@/schema/entity';
 
 export const pashov: SecurityAuditor = {
 	id: 'pashov-audit-group',
@@ -29,4 +29,4 @@ export const pashov: SecurityAuditor = {
 	repoUrl: 'https://github.com/pashov/audits',
 	twitter: 'https://x.com/pashovkrum',
 	url: 'https://www.pashov.net/',
-}
+};

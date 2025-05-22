@@ -1,5 +1,5 @@
-import { IconButton as OriginalIconButton, type IconButtonProps } from '@mui/material'
-import type React from 'react'
+import { IconButton as OriginalIconButton, type IconButtonProps } from '@mui/material';
+import type React from 'react';
 
 /**
  * Wrapper for IconButton that reduces the very large margins around it.
@@ -18,5 +18,5 @@ export function IconButton(props: IconButtonProps): React.JSX.Element {
 		>
 			{props.children}
 		</OriginalIconButton>
-	)
+	);
 }

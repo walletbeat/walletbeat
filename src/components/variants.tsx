@@ -1,11 +1,11 @@
-import type { SvgIconComponent } from '@mui/icons-material'
-import LanguageIcon from '@mui/icons-material/Language'
-import MemoryIcon from '@mui/icons-material/Memory'
-import MonitorIcon from '@mui/icons-material/Monitor'
-import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid'
-import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet'
+import type { SvgIconComponent } from '@mui/icons-material';
+import LanguageIcon from '@mui/icons-material/Language';
+import MemoryIcon from '@mui/icons-material/Memory';
+import MonitorIcon from '@mui/icons-material/Monitor';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 
-import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/variants'
+import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/variants';
 
 /**
  * @returns An SVG icon representing the given variant.
@@ -14,15 +14,15 @@ export function variantToIcon(variant: Variant): SvgIconComponent {
 	// We return the direct MUI icon component. Consumers can style via the parent element.
 	switch (variant) {
 		case Variant.BROWSER:
-			return LanguageIcon
+			return LanguageIcon;
 		case Variant.DESKTOP:
-			return MonitorIcon
+			return MonitorIcon;
 		case Variant.MOBILE:
-			return PhoneAndroidIcon
+			return PhoneAndroidIcon;
 		case Variant.EMBEDDED:
-			return SettingsEthernetIcon
+			return SettingsEthernetIcon;
 		case Variant.HARDWARE:
-			return MemoryIcon
+			return MemoryIcon;
 	}
 }
 
@@ -32,15 +32,15 @@ export function variantToIcon(variant: Variant): SvgIconComponent {
 export function variantToName(variant: Variant, titleCase: boolean): string {
 	switch (variant) {
 		case Variant.BROWSER:
-			return titleCase ? 'Browser' : 'browser'
+			return titleCase ? 'Browser' : 'browser';
 		case Variant.DESKTOP:
-			return titleCase ? 'Desktop' : 'desktop'
+			return titleCase ? 'Desktop' : 'desktop';
 		case Variant.MOBILE:
-			return titleCase ? 'Mobile' : 'mobile'
+			return titleCase ? 'Mobile' : 'mobile';
 		case Variant.EMBEDDED:
-			return titleCase ? 'Embedded' : 'embedded'
+			return titleCase ? 'Embedded' : 'embedded';
 		case Variant.HARDWARE:
-			return titleCase ? 'Hardware' : 'hardware'
+			return titleCase ? 'Hardware' : 'hardware';
 	}
 }
 
@@ -51,15 +51,15 @@ export function variantToName(variant: Variant, titleCase: boolean): string {
 export function variantToRunsOn(variant: Variant): string {
 	switch (variant) {
 		case Variant.BROWSER:
-			return 'as a browser extension'
+			return 'as a browser extension';
 		case Variant.DESKTOP:
-			return 'as a desktop application'
+			return 'as a desktop application';
 		case Variant.MOBILE:
-			return 'on mobile'
+			return 'on mobile';
 		case Variant.EMBEDDED:
-			return 'within other applications'
+			return 'within other applications';
 		case Variant.HARDWARE:
-			return 'as a hardware wallet'
+			return 'as a hardware wallet';
 	}
 }
 
@@ -68,9 +68,9 @@ export function variantToRunsOn(variant: Variant): string {
  */
 export function variantToTooltip(variants: AtLeastOneVariant<unknown>, variant: Variant): string {
 	if (hasSingleVariant(variants)) {
-		return `${variantToName(variant, true)}-only wallet`
+		return `${variantToName(variant, true)}-only wallet`;
 	}
-	return `View ${variantToName(variant, false)} version`
+	return `View ${variantToName(variant, false)} version`;
 }
 
 /**
@@ -84,9 +84,9 @@ export function variantUrlQuery(
 	variant: Variant | null,
 ): string {
 	if (variant === null || hasSingleVariant(variants) || !Object.hasOwn(variants, variant)) {
-		return ''
+		return '';
 	}
-	return `?${variant}`
+	return `?${variant}`;
 }
 
 /**
@@ -96,11 +96,11 @@ export function variantUrlQuery(
  */
 export function variantFromUrlQuery(variants: AtLeastOneVariant<unknown>): Variant | null {
 	if (window.location.search === '') {
-		return null
+		return null;
 	}
-	const maybeVariant = window.location.search.substring(1)
+	const maybeVariant = window.location.search.substring(1);
 	if (maybeVariant !== '' && Object.hasOwn(variants, maybeVariant)) {
-		return maybeVariant as Variant // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that it is a valid Variant.
+		return maybeVariant as Variant;
 	}
-	return null
+	return null;
 }

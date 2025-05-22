@@ -4,23 +4,23 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { isSupported } from '@/schema/features/support'
-import { popRefs } from '@/schema/reference'
-import { type AtLeastOneVariant, Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support';
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import { isSupported } from '@/schema/features/support';
+import { popRefs } from '@/schema/reference';
+import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.security.hardware_wallet_support'
+const brand = 'attributes.security.hardware_wallet_support';
 export type HardwareWalletSupportValue = Value & {
-	supportedHardwareWallets: HardwareWalletType[]
-	__brand: 'attributes.security.hardware_wallet_support'
-}
+	supportedHardwareWallets: HardwareWalletType[];
+	__brand: 'attributes.security.hardware_wallet_support';
+};
 
 function noHardwareWalletSupport(): Evaluation<HardwareWalletSupportValue> {
 	return {
@@ -47,7 +47,7 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletSupportValue> {
 				${wallet.metadata.displayName} should add support for popular hardware wallets to improve security options for users.
 			`,
 		),
-	}
+	};
 }
 
 function limitedHardwareWalletSupport(
@@ -78,7 +78,7 @@ function limitedHardwareWalletSupport(
 				to provide users with more security options.
 			`,
 		),
-	}
+	};
 }
 
 function comprehensiveHardwareWalletSupport(
@@ -104,7 +104,7 @@ function comprehensiveHardwareWalletSupport(
 				security by keeping private keys offline.
 			`,
 		),
-	}
+	};
 }
 
 export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
@@ -191,7 +191,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				),
 				brand,
 				{ supportedHardwareWallets: [] },
-			)
+			);
 		}
 		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
 		// 	all such wallet have the opportunity to support hardware wallet to provide better security for the user
@@ -205,37 +205,37 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				),
 				brand,
 				{ supportedHardwareWallets: [] },
-			)
+			);
 		}
 
 		if (features.security.hardwareWalletSupport === null) {
-			return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] })
+			return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] });
 		}
 
 		// Extract references from the hardware wallet support feature
-		const { withoutRefs, refs: extractedRefs } = popRefs(features.security.hardwareWalletSupport)
+		const { withoutRefs, refs: extractedRefs } = popRefs(features.security.hardwareWalletSupport);
 
-		const supportedWallets: HardwareWalletType[] = []
-		const hwSupport = withoutRefs.supportedWallets
+		const supportedWallets: HardwareWalletType[] = [];
+		const hwSupport = withoutRefs.supportedWallets;
 
 		// Check which hardware wallets are supported
 		Object.entries(hwSupport).forEach(([walletType, support]) => {
 			if (isSupported(support)) {
 				// Type assertion is safe because we're iterating over keys of hwSupport
 				// which are HardwareWalletType values
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're iterating over hwSupport keys
-				supportedWallets.push(walletType as HardwareWalletType)
+
+				supportedWallets.push(walletType as HardwareWalletType);
 			}
-		})
+		});
 
 		if (supportedWallets.length === 0) {
-			return noHardwareWalletSupport()
+			return noHardwareWalletSupport();
 		}
 
-		const hasLedger = supportedWallets.includes(HardwareWalletType.LEDGER)
-		const hasTrezor = supportedWallets.includes(HardwareWalletType.TREZOR)
-		const hasKeystone = supportedWallets.includes(HardwareWalletType.KEYSTONE)
-		const hasGridplus = supportedWallets.includes(HardwareWalletType.GRIDPLUS)
+		const hasLedger = supportedWallets.includes(HardwareWalletType.LEDGER);
+		const hasTrezor = supportedWallets.includes(HardwareWalletType.TREZOR);
+		const hasKeystone = supportedWallets.includes(HardwareWalletType.KEYSTONE);
+		const hasGridplus = supportedWallets.includes(HardwareWalletType.GRIDPLUS);
 
 		// Used for future expansion
 		// const hasKeepkey = supportedWallets.includes(HardwareWalletType.KEEPKEY)
@@ -244,27 +244,27 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		const result: Evaluation<HardwareWalletSupportValue> =
 			hasLedger && hasTrezor && hasKeystone && hasGridplus
 				? comprehensiveHardwareWalletSupport(supportedWallets)
-				: limitedHardwareWalletSupport(supportedWallets)
+				: limitedHardwareWalletSupport(supportedWallets);
 
 		// Return result with references if any
 		return {
 			...result,
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletSupportValue>>) => {
-		const worstEvaluation = pickWorstRating<HardwareWalletSupportValue>(perVariant)
+		const worstEvaluation = pickWorstRating<HardwareWalletSupportValue>(perVariant);
 
 		// Combine all supported hardware wallets across variants
-		const allSupportedWallets = new Set<HardwareWalletType>()
+		const allSupportedWallets = new Set<HardwareWalletType>();
 
 		Object.values(perVariant).forEach(evaluation => {
 			evaluation.value.supportedHardwareWallets.forEach(wallet => {
-				allSupportedWallets.add(wallet)
-			})
-		})
+				allSupportedWallets.add(wallet);
+			});
+		});
 
-		worstEvaluation.value.supportedHardwareWallets = Array.from(allSupportedWallets)
-		return worstEvaluation
+		worstEvaluation.value.supportedHardwareWallets = Array.from(allSupportedWallets);
+		return worstEvaluation;
 	},
-}
+};

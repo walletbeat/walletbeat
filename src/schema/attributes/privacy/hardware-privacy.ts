@@ -1,37 +1,37 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
-import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes';
+import { exampleRating } from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type HardwarePrivacySupport,
 	HardwarePrivacyType,
-} from '@/schema/features/privacy/hardware-privacy'
-import { popRefs } from '@/schema/reference'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/features/privacy/hardware-privacy';
+import { popRefs } from '@/schema/reference';
+import type { AtLeastOneVariant } from '@/schema/variants';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.hardware_privacy'
+const brand = 'attributes.hardware_privacy';
 
 export type HardwarePrivacyValue = Value & {
-	phoningHome: HardwarePrivacyType
-	inspectableRemoteCalls: HardwarePrivacyType
-	wirelessPrivacy: HardwarePrivacyType
-	__brand: 'attributes.hardware_privacy'
-}
+	phoningHome: HardwarePrivacyType;
+	inspectableRemoteCalls: HardwarePrivacyType;
+	wirelessPrivacy: HardwarePrivacyType;
+	__brand: 'attributes.hardware_privacy';
+};
 
 function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
-	const ratings = [features.phoningHome, features.inspectableRemoteCalls, features.wirelessPrivacy]
-	const passCount = ratings.filter(r => r === HardwarePrivacyType.PASS).length
+	const ratings = [features.phoningHome, features.inspectableRemoteCalls, features.wirelessPrivacy];
+	const passCount = ratings.filter(r => r === HardwarePrivacyType.PASS).length;
 	if (passCount === 3) {
-		return Rating.PASS
+		return Rating.PASS;
 	}
 	if (passCount >= 1) {
-		return Rating.PARTIAL
+		return Rating.PARTIAL;
 	}
-	return Rating.FAIL
+	return Rating.FAIL;
 }
 
 export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
@@ -98,19 +98,19 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
 				wirelessPrivacy: HardwarePrivacyType.FAIL,
-			})
+			});
 		}
-		const hwPrivacy = features.privacy.hardwarePrivacy
+		const hwPrivacy = features.privacy.hardwarePrivacy;
 		if (hwPrivacy === null) {
 			return unrated(hardwarePrivacy, brand, {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
 				wirelessPrivacy: HardwarePrivacyType.FAIL,
-			})
+			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<HardwarePrivacySupport>(hwPrivacy)
-		const rating = evaluateHardwarePrivacy(withoutRefs)
+		const { withoutRefs, refs: extractedRefs } = popRefs<HardwarePrivacySupport>(hwPrivacy);
+		const rating = evaluateHardwarePrivacy(withoutRefs);
 
 		return {
 			value: {
@@ -133,6 +133,6 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
 			),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+};

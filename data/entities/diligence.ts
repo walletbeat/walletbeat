@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
 
 export const diligence: CorporateEntity & SecurityAuditor = {
 	id: 'diligence',
@@ -27,4 +27,4 @@ export const diligence: CorporateEntity & SecurityAuditor = {
 	repoUrl: 'https://github.com/Consensys',
 	twitter: 'https://x.com/ConsensysAudits',
 	url: 'https://diligence.consensys.io/',
-}
+};

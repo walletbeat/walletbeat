@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 export enum InteroperabilityType {
 	PASS = 'PASS',
@@ -7,11 +7,11 @@ export enum InteroperabilityType {
 }
 
 export interface InteroperabilitySupport {
-	type: InteroperabilityType
-	url?: string
-	details?: string
-	thirdPartyCompatibility: InteroperabilityType
-	noSupplierLinkage: InteroperabilityType
+	type: InteroperabilityType;
+	url?: string;
+	details?: string;
+	thirdPartyCompatibility: InteroperabilityType;
+	noSupplierLinkage: InteroperabilityType;
 }
 
-export type InteroperabilityImplementation = WithRef<InteroperabilitySupport>
+export type InteroperabilityImplementation = WithRef<InteroperabilitySupport>;

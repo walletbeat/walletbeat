@@ -1,4 +1,4 @@
-import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { type Eip, EipPrefix, EipStatus } from '@/schema/eips';
 
 export const eip6963: Eip = {
 	friendlyName: 'Multiple JavaScript Providers',
@@ -20,4 +20,4 @@ export const eip6963: Eip = {
 		web applications to interact with the wallet and the Ethereum blockchain
 		without needing to implement wallet-specific code.
 	`,
-}
+};

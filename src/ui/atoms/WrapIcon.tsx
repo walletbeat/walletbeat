@@ -1,6 +1,6 @@
-import type React from 'react'
+import type React from 'react';
 
-import type theme from '../../components/ThemeRegistry/theme'
+import type theme from '../../components/ThemeRegistry/theme';
 
 export function WrapIcon({
 	icon,
@@ -10,12 +10,12 @@ export function WrapIcon({
 	sx = undefined,
 	children = undefined,
 }: {
-	icon: React.ReactNode
-	iconWidth: string
-	iconFontSize: typeof theme.typography.body1.fontSize
-	flexBeforeAndAfter?: [number, number]
-	sx?: React.CSSProperties
-	children?: React.ReactNode
+	icon: React.ReactNode;
+	iconWidth: string;
+	iconFontSize: typeof theme.typography.body1.fontSize;
+	flexBeforeAndAfter?: [number, number];
+	sx?: React.CSSProperties;
+	children?: React.ReactNode;
 }): React.JSX.Element {
 	return (
 		<div className="flex flex-row gap-0" style={sx}>
@@ -49,5 +49,5 @@ export function WrapIcon({
 			)}
 			<div className="flex-1">{children}</div>
 		</div>
-	)
+	);
 }

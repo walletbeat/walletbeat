@@ -1,5 +1,5 @@
-import type { WithRef } from '../../reference'
-import type { LabeledUrl } from '../../url'
+import type { WithRef } from '../../reference';
+import type { LabeledUrl } from '../../url';
 
 /**
  * An enum of licenses mapping to their SPDX ID.
@@ -19,8 +19,8 @@ export enum License {
  * A structure that contains both the license value and optional references
  */
 export type LicenseWithRef = WithRef<{
-	license: License
-}>
+	license: License;
+}>;
 
 /**
  * An enum representing whether a given license is FOSS
@@ -39,19 +39,19 @@ export enum FOSS {
 export function licenseName(license: License): string {
 	switch (license) {
 		case License.APACHE_2_0:
-			return 'Apache 2.0'
+			return 'Apache 2.0';
 		case License.BUSL_1_1:
-			return 'BUSL 1.1'
+			return 'BUSL 1.1';
 		case License.GPL_3_0:
-			return 'GPL 3.0'
+			return 'GPL 3.0';
 		case License.BSD_3_CLAUSE:
-			return 'BSD 3-Clause'
+			return 'BSD 3-Clause';
 		case License.MIT:
-			return 'MIT'
+			return 'MIT';
 		case License.PROPRIETARY:
-			return 'Proprietary'
+			return 'Proprietary';
 		case License.UNLICENSED_VISIBLE:
-			return 'Unlicensed'
+			return 'Unlicensed';
 	}
 }
 
@@ -62,19 +62,19 @@ export function licenseName(license: License): string {
 export function licenseIsFOSS(license: License): FOSS {
 	switch (license) {
 		case License.APACHE_2_0:
-			return FOSS.FOSS
+			return FOSS.FOSS;
 		case License.BUSL_1_1:
-			return FOSS.FUTURE_FOSS
+			return FOSS.FUTURE_FOSS;
 		case License.GPL_3_0:
-			return FOSS.FOSS
+			return FOSS.FOSS;
 		case License.BSD_3_CLAUSE:
-			return FOSS.FOSS
+			return FOSS.FOSS;
 		case License.MIT:
-			return FOSS.FOSS
+			return FOSS.FOSS;
 		case License.PROPRIETARY:
-			return FOSS.NOT_FOSS
+			return FOSS.NOT_FOSS;
 		case License.UNLICENSED_VISIBLE:
-			return FOSS.NOT_FOSS
+			return FOSS.NOT_FOSS;
 	}
 }
 
@@ -85,19 +85,19 @@ export function licenseIsFOSS(license: License): FOSS {
 export function licenseSourceIsVisible(license: License): boolean {
 	switch (license) {
 		case License.APACHE_2_0:
-			return true
+			return true;
 		case License.BUSL_1_1:
-			return true
+			return true;
 		case License.GPL_3_0:
-			return true
+			return true;
 		case License.BSD_3_CLAUSE:
-			return true
+			return true;
 		case License.MIT:
-			return true
+			return true;
 		case License.PROPRIETARY:
-			return false
+			return false;
 		case License.UNLICENSED_VISIBLE:
-			return true
+			return true;
 	}
 }
 
@@ -107,13 +107,13 @@ export function licenseSourceIsVisible(license: License): boolean {
  */
 export function licenseUrl(license: License): LabeledUrl | null {
 	if (license === License.PROPRIETARY) {
-		return null
+		return null;
 	}
 	if (license === License.UNLICENSED_VISIBLE) {
-		return null
+		return null;
 	}
 	return {
 		url: `https://spdx.org/licenses/${license}.html`,
 		label: licenseName(license),
-	}
+	};
 }

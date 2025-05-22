@@ -1,6 +1,6 @@
-import type { Contributor } from '@/schema/wallet'
+import type { Contributor } from '@/schema/wallet';
 
-import { exampleWalletDevelopmentCompany } from '../entities/example'
+import { exampleWalletDevelopmentCompany } from '../entities/example';
 
 export const exampleContributor: Contributor = {
 	name: 'example-contributor',
@@ -11,4 +11,4 @@ export const exampleContributor: Contributor = {
 			role: 'FOUNDER',
 		},
 	],
-}
+};

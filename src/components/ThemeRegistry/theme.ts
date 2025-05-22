@@ -1,24 +1,24 @@
-import { createTheme, type ThemeOptions as MaterialThemeOptions } from '@mui/material/styles'
-import { deepmerge } from '@mui/utils'
-import type {} from '@mui/x-data-grid/themeAugmentation'
+import { createTheme, type ThemeOptions as MaterialThemeOptions } from '@mui/material/styles';
+import { deepmerge } from '@mui/utils';
+import type {} from '@mui/x-data-grid/themeAugmentation';
 
 /* eslint @typescript-eslint/no-magic-numbers: 0 -- A theme file will have numbers and hex codes in it, this is normal. */
 
 /** Color options for rating pie slices. */
 export interface RatingThemeOptions {
-	fail: string
-	partial: string
-	pass: string
-	unrated: string
-	exempt: string
+	fail: string;
+	partial: string;
+	pass: string;
+	unrated: string;
+	exempt: string;
 }
 
 /** Expanded ThemeOptions and palette. */
 export type ThemeOptions = MaterialThemeOptions & {
 	palette?: MaterialThemeOptions['palette'] & {
-		rating?: RatingThemeOptions
-	}
-}
+		rating?: RatingThemeOptions;
+	};
+};
 
 const themeOptions: ThemeOptions = {
 	palette: {
@@ -155,11 +155,11 @@ const themeOptions: ThemeOptions = {
 			},
 		},
 	},
-}
+};
 
-const theme = createTheme(themeOptions)
+const theme = createTheme(themeOptions);
 
-export default theme
+export default theme;
 
 const subsectionThemeOptions: ThemeOptions = {
 	typography: {
@@ -202,9 +202,9 @@ const subsectionThemeOptions: ThemeOptions = {
 			fontSize: '1rem',
 		},
 	},
-}
+};
 
-export const subsectionTheme = createTheme(deepmerge(themeOptions, subsectionThemeOptions))
+export const subsectionTheme = createTheme(deepmerge(themeOptions, subsectionThemeOptions));
 
 const walletTableThemeOptions: ThemeOptions = {
 	typography: {
@@ -252,7 +252,7 @@ const walletTableThemeOptions: ThemeOptions = {
 			},
 		},
 	},
-}
+};
 
 // Create light mode version of the wallet table theme
 const lightWalletTableThemeOptions: ThemeOptions = {
@@ -282,13 +282,13 @@ const lightWalletTableThemeOptions: ThemeOptions = {
 			exempt: '#f0f0f0', // Light gray
 		},
 	},
-}
+};
 
 // Create walletTableTheme with theme-specific CSS variables
-export const walletTableTheme = createTheme(deepmerge(themeOptions, walletTableThemeOptions))
+export const walletTableTheme = createTheme(deepmerge(themeOptions, walletTableThemeOptions));
 export const lightWalletTableTheme = createTheme(
 	deepmerge(deepmerge(themeOptions, lightWalletTableThemeOptions), walletTableThemeOptions),
-)
+);
 
 // Add theme-specific CSS variables
 walletTableTheme.components = deepmerge(walletTableTheme.components ?? {}, {
@@ -299,7 +299,7 @@ walletTableTheme.components = deepmerge(walletTableTheme.components ?? {}, {
 			},
 		},
 	},
-})
+});
 
 lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components ?? {}, {
 	MuiCssBaseline: {
@@ -309,7 +309,7 @@ lightWalletTableTheme.components = deepmerge(lightWalletTableTheme.components ??
 			},
 		},
 	},
-})
+});
 
 // Add light theme options
 export const lightThemeOptions: ThemeOptions = {
@@ -334,4 +334,4 @@ export const lightThemeOptions: ThemeOptions = {
 			exempt: '#f0f0f0', // Light gray
 		},
 	},
-}
+};

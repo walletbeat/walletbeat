@@ -1,14 +1,14 @@
-import { AccountType } from '@/schema/features/account-support'
-import { WalletProfile } from '@/schema/features/profile'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { AccountType } from '@/schema/features/account-support';
+import { WalletProfile } from '@/schema/features/profile';
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
+import { featureSupported, notSupported, supported } from '@/schema/features/support';
+import { Variant } from '@/schema/variants';
+import type { SoftwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { lucemans } from '../contributors/lucemans'
+import { lucemans } from '../contributors/lucemans';
 
 export const zerion: SoftwareWallet = {
 	metadata: {
@@ -124,4 +124,4 @@ export const zerion: SoftwareWallet = {
 	variants: {
 		[Variant.MOBILE]: true,
 	},
-}
+};

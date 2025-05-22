@@ -1,19 +1,19 @@
-import { Typography } from '@mui/material'
-import React from 'react'
+import { Typography } from '@mui/material';
+import React from 'react';
 
-import { subsectionWeight } from '@/components/constants'
+import { subsectionWeight } from '@/components/constants';
 import {
 	securityAuditId,
 	securityFlawSeverityName,
-} from '@/schema/features/security/security-audits'
-import { toFullyQualified } from '@/schema/reference'
-import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
-import { dateCompare } from '@/types/date'
-import { isNonEmptyArray, nonEmptyGet, nonEmptyMap, nonEmptySorted } from '@/types/utils/non-empty'
-import { EntityLink } from '@/ui/atoms/EntityLink'
-import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
+} from '@/schema/features/security/security-audits';
+import { toFullyQualified } from '@/schema/reference';
+import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details';
+import { dateCompare } from '@/types/date';
+import { isNonEmptyArray, nonEmptyGet, nonEmptyMap, nonEmptySorted } from '@/types/utils/non-empty';
+import { EntityLink } from '@/ui/atoms/EntityLink';
+import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks';
 
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
 
 export function SecurityAuditsDetails({
 	wallet,
@@ -21,7 +21,7 @@ export function SecurityAuditsDetails({
 	auditedInLastYear,
 	hasUnaddressedFlaws,
 }: SecurityAuditsDetailsProps): React.JSX.Element {
-	const audits = value.securityAudits
+	const audits = value.securityAudits;
 	if (!isNonEmptyArray(audits)) {
 		return (
 			<WrapRatingIcon rating={value.rating}>
@@ -29,15 +29,15 @@ export function SecurityAuditsDetails({
 					{wallet.metadata.displayName} has not undergone any security audits.
 				</Typography>
 			</WrapRatingIcon>
-		)
+		);
 	}
 
 	const sortedAudits = nonEmptySorted(
 		audits,
 		(audit1, audit2) => dateCompare(audit1.auditDate, audit2.auditDate),
 		true /* Reverse */,
-	)
-	const mostRecentAudit = nonEmptyGet(sortedAudits)
+	);
+	const mostRecentAudit = nonEmptyGet(sortedAudits);
 	return (
 		<>
 			<WrapRatingIcon rating={value.rating}>
@@ -99,5 +99,5 @@ export function SecurityAuditsDetails({
 				</ul>
 			</div>
 		</>
-	)
+	);
 }

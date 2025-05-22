@@ -48,8 +48,8 @@
 }
 
 html.dark {
-	--background-primary: #141414;
-	--background-secondary: #17191f;
+	--background-primary: #17191f;
+	--background-secondary: #141414;
 	--background-tertiary: #17191f;
 	--accent: #e683c7;
 	--accent-light: #4d1957;

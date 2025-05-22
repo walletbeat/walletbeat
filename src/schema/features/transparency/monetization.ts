@@ -1,4 +1,4 @@
-import type { WithRef } from '../../reference'
+import type { WithRef } from '../../reference';
 
 /**
  * A set of possible ways by which a wallet may fund its development.
@@ -22,23 +22,23 @@ export enum MonetizationStrategy {
 export function monetizationStrategyName(monetization: MonetizationStrategy): string {
 	switch (monetization) {
 		case MonetizationStrategy.SELF_FUNDED:
-			return 'self-funding'
+			return 'self-funding';
 		case MonetizationStrategy.DONATIONS:
-			return 'donations'
+			return 'donations';
 		case MonetizationStrategy.ECOSYSTEM_GRANTS:
-			return 'ecosystem grants'
+			return 'ecosystem grants';
 		case MonetizationStrategy.PUBLIC_OFFERING:
-			return 'public offering'
+			return 'public offering';
 		case MonetizationStrategy.VENTURE_CAPITAL:
-			return 'venture capital'
+			return 'venture capital';
 		case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
-			return 'hidden fees'
+			return 'hidden fees';
 		case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
-			return 'transparent fees'
+			return 'transparent fees';
 		case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
-			return 'a low-float governance token'
+			return 'a low-float governance token';
 		case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
-			return 'a well-distributed governance token'
+			return 'a well-distributed governance token';
 	}
 }
 
@@ -53,30 +53,30 @@ export function monetizationStrategyName(monetization: MonetizationStrategy): st
 export function monetizationStrategyIsUserAligned(monetization: MonetizationStrategy): boolean {
 	switch (monetization) {
 		case MonetizationStrategy.SELF_FUNDED:
-			return true
+			return true;
 		case MonetizationStrategy.DONATIONS:
-			return true
+			return true;
 		case MonetizationStrategy.ECOSYSTEM_GRANTS:
-			return true
+			return true;
 		case MonetizationStrategy.PUBLIC_OFFERING:
-			return true
+			return true;
 		case MonetizationStrategy.VENTURE_CAPITAL:
-			return true
+			return true;
 		case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
-			return true
+			return true;
 		case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
-			return false
+			return false;
 		case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
-			return false
+			return false;
 		case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
-			return true
+			return true;
 	}
 }
 
 export type Monetization = WithRef<{
-	revenueBreakdownIsPublic: boolean
-	strategies: Record<MonetizationStrategy, boolean | null>
-}>
+	revenueBreakdownIsPublic: boolean;
+	strategies: Record<MonetizationStrategy, boolean | null>;
+}>;
 
 /**
  * Iterate over the monetization strategies in the given object.
@@ -85,7 +85,7 @@ export function monetizationStrategies(
 	monetization: Monetization,
 ): Array<{ strategy: MonetizationStrategy; value: boolean | null }> {
 	return Object.entries(monetization.strategies).map(([key, value]) => ({
-		strategy: key as MonetizationStrategy, // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the keys of the object are all MonetizationStrategy enum values.
+		strategy: key as MonetizationStrategy,
 		value,
-	}))
+	}));
 }

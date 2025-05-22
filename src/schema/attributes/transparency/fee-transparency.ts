@@ -4,22 +4,22 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency';
+import type { AtLeastOneVariant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.transparency.fee_transparency'
+const brand = 'attributes.transparency.fee_transparency';
 export type FeeTransparencyValue = Value & {
-	feeTransparencyLevel: FeeTransparencyLevel
-	disclosesWalletFees: boolean
-	showsTransactionPurpose: boolean
-	__brand: 'attributes.transparency.fee_transparency'
-}
+	feeTransparencyLevel: FeeTransparencyLevel;
+	disclosesWalletFees: boolean;
+	showsTransactionPurpose: boolean;
+	__brand: 'attributes.transparency.fee_transparency';
+};
 
 function noFeeTransparency(): Evaluation<FeeTransparencyValue> {
 	return {
@@ -51,7 +51,7 @@ function noFeeTransparency(): Evaluation<FeeTransparencyValue> {
 				by the wallet.
 			`,
 		),
-	}
+	};
 }
 
 function basicFeeTransparency(
@@ -95,7 +95,7 @@ function basicFeeTransparency(
 				}${!showsTransactionPurpose ? ', and clearly showing the purpose of each transaction' : ''}.
 			`,
 		),
-	}
+	};
 }
 
 function detailedFeeTransparency(
@@ -142,7 +142,7 @@ function detailedFeeTransparency(
 				}.
 			`,
 		),
-	}
+	};
 }
 
 function comprehensiveFeeTransparency(): Evaluation<FeeTransparencyValue> {
@@ -169,7 +169,7 @@ function comprehensiveFeeTransparency(): Evaluation<FeeTransparencyValue> {
 				Users can make fully informed decisions about the cost of their transactions.
 			`,
 		),
-	}
+	};
 }
 
 export const feeTransparency: Attribute<FeeTransparencyValue> = {
@@ -255,31 +255,31 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 				feeTransparencyLevel: FeeTransparencyLevel.NONE,
 				disclosesWalletFees: false,
 				showsTransactionPurpose: false,
-			})
+			});
 		}
 
-		const feeTransparencySupport = features.transparency.feeTransparency
-		const level = feeTransparencySupport.level
-		const disclosesWalletFees = feeTransparencySupport.disclosesWalletFees
-		const showsTransactionPurpose = feeTransparencySupport.showsTransactionPurpose
+		const feeTransparencySupport = features.transparency.feeTransparency;
+		const level = feeTransparencySupport.level;
+		const disclosesWalletFees = feeTransparencySupport.disclosesWalletFees;
+		const showsTransactionPurpose = feeTransparencySupport.showsTransactionPurpose;
 
 		switch (level) {
 			case FeeTransparencyLevel.NONE:
-				return noFeeTransparency()
+				return noFeeTransparency();
 			case FeeTransparencyLevel.BASIC:
-				return basicFeeTransparency(disclosesWalletFees, showsTransactionPurpose)
+				return basicFeeTransparency(disclosesWalletFees, showsTransactionPurpose);
 			case FeeTransparencyLevel.DETAILED:
-				return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose)
+				return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose);
 			case FeeTransparencyLevel.COMPREHENSIVE:
 				// For comprehensive level, both disclosesWalletFees and showsTransactionPurpose must be true
 				if (disclosesWalletFees && showsTransactionPurpose) {
-					return comprehensiveFeeTransparency()
+					return comprehensiveFeeTransparency();
 				} else {
 					// If either is false, downgrade to detailed
-					return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose)
+					return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose);
 				}
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) =>
 		pickWorstRating<FeeTransparencyValue>(perVariant),
-}
+};

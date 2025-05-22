@@ -1,19 +1,19 @@
-import type { EvaluationData } from '@/schema/attributes'
-import type { ChainVerificationValue } from '@/schema/attributes/security/chain-verification'
-import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
-import type { FullyQualifiedReference } from '@/schema/reference'
+import type { EvaluationData } from '@/schema/attributes';
+import type { ChainVerificationValue } from '@/schema/attributes/security/chain-verification';
+import type { EthereumL1LightClient } from '@/schema/features/security/light-client';
+import type { FullyQualifiedReference } from '@/schema/reference';
 
-import { component, type Renderable } from '../content'
-import type { NonEmptyArray } from '../utils/non-empty'
+import { component, type Renderable } from '../content';
+import type { NonEmptyArray } from '../utils/non-empty';
 
 export interface ChainVerificationDetailsProps extends EvaluationData<ChainVerificationValue> {
-	lightClients: NonEmptyArray<EthereumL1LightClient>
-	refs: FullyQualifiedReference[]
+	lightClients: NonEmptyArray<EthereumL1LightClient>;
+	refs: FullyQualifiedReference[];
 }
 
 export interface ChainVerificationDetailsContent {
-	component: 'ChainVerificationDetails'
-	componentProps: ChainVerificationDetailsProps
+	component: 'ChainVerificationDetails';
+	componentProps: ChainVerificationDetailsProps;
 }
 
 export function chainVerificationDetailsContent(
@@ -22,5 +22,5 @@ export function chainVerificationDetailsContent(
 	return component<ChainVerificationDetailsContent, keyof typeof bakedProps>(
 		'ChainVerificationDetails',
 		bakedProps,
-	)
+	);
 }

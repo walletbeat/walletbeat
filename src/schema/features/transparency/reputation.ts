@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 export enum ReputationType {
 	PASS = 'PASS',
@@ -7,14 +7,14 @@ export enum ReputationType {
 }
 
 export interface ReputationSupport {
-	type: ReputationType
-	url?: string
-	details?: string
-	originalProduct: ReputationType
-	availability: ReputationType
-	warrantySupportRisk: ReputationType
-	disclosureHistory: ReputationType
-	bugBounty: ReputationType
+	type: ReputationType;
+	url?: string;
+	details?: string;
+	originalProduct: ReputationType;
+	availability: ReputationType;
+	warrantySupportRisk: ReputationType;
+	disclosureHistory: ReputationType;
+	bugBounty: ReputationType;
 }
 
-export type ReputationImplementation = WithRef<ReputationSupport>
+export type ReputationImplementation = WithRef<ReputationSupport>;

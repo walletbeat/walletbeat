@@ -1,9 +1,12 @@
-import globals from 'globals'
-import react from 'eslint-plugin-react'
-import love from 'eslint-config-love'
-import eslintConfigPrettier from 'eslint-config-prettier'
-import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort'
-import eslintPluginSortKeysCustomOrder from 'eslint-plugin-sort-keys-custom-order'
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import react from 'eslint-plugin-react';
+import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
+import eslintPluginSortKeysCustomOrder from 'eslint-plugin-sort-keys-custom-order';
+import globals from 'globals';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
+
+// Note: If you want to use eslint-comments rules, you need to install and import eslint-plugin-eslint-comments
 
 const firstOrderedKeys = [
 	'id',
@@ -15,10 +18,11 @@ const firstOrderedKeys = [
 	'formalTitle',
 	'type',
 	'metadata',
-]
+];
 
-export default [
-	love,
+export default tseslint.config(
+	eslint.configs.recommended,
+	tseslint.configs.recommended,
 	react.configs.flat.recommended,
 	react.configs.flat['jsx-runtime'],
 	{
@@ -36,16 +40,13 @@ export default [
 			},
 		},
 		rules: {
-			complexity: 'off',
-			'max-lines': 'off',
-			'max-nested-callbacks': 'off',
-			'@typescript-eslint/no-magic-numbers': 'off',
-			'@typescript-eslint/prefer-destructuring': 'off',
-			'@typescript-eslint/no-inferrable-types': 'off',
-			'@typescript-eslint/no-misused-spread': 'off',
+			'no-unused-vars': 'off',
+			'no-redeclare': 'off',
+			'no-undef': 'off',
+			'@typescript-eslint/no-unused-vars': 'off',
+			'@typescript-eslint/no-empty-object-type': 'off',
 		},
 	},
-	eslintConfigPrettier,
 	{
 		plugins: { 'simple-import-sort': eslintPluginSimpleImportSort },
 		rules: {
@@ -73,4 +74,10 @@ export default [
 			],
 		},
 	},
-]
+	{
+		plugins: { prettier: eslintPluginPrettier },
+		rules: {
+			'prettier/prettier': 'error',
+		},
+	}
+);

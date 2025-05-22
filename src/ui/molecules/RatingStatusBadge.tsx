@@ -1,7 +1,7 @@
-import type { FC } from 'react'
+import type { FC } from 'react';
 
-import theme from '@/components/ThemeRegistry/theme'
-import { type Rating, ratingToColor, ratingToText } from '@/schema/attributes'
+import theme from '@/components/ThemeRegistry/theme';
+import { type Rating, ratingToColor, ratingToText } from '@/schema/attributes';
 
 export const RatingStatusBadge: FC<{ rating: Rating }> = ({ rating }) => (
 	<div
@@ -13,4 +13,4 @@ export const RatingStatusBadge: FC<{ rating: Rating }> = ({ rating }) => (
 	>
 		{ratingToText(rating)}
 	</div>
-)
+);

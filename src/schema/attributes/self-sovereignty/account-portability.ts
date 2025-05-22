@@ -1,14 +1,14 @@
-import { eip7702 } from '@/data/eips/eip-7702'
-import { erc4337 } from '@/data/eips/erc-4337'
+import { eip7702 } from '@/data/eips/eip-7702';
+import { erc4337 } from '@/data/eips/erc-4337';
 import {
 	type Attribute,
 	type Evaluation,
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import { eipMarkdownLink } from '@/schema/eips'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import { eipMarkdownLink } from '@/schema/eips';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type AccountSupport,
 	AccountType,
@@ -17,19 +17,19 @@ import {
 	type AccountTypeMpc,
 	type AccountTypeMutableMultifactor,
 	TransactionGenerationCapability,
-} from '@/schema/features/account-support'
-import { isSupported } from '@/schema/features/support'
-import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
+} from '@/schema/features/account-support';
+import { isSupported } from '@/schema/features/support';
+import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
+import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty';
 
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.self_sovereignty.account_portability'
+const brand = 'attributes.self_sovereignty.account_portability';
 export type AccountPortabilityValue = Value & {
-	__brand: 'attributes.self_sovereignty.account_portability'
-}
+	__brand: 'attributes.self_sovereignty.account_portability';
+};
 
 function evaluateEoa(
 	eoa: AccountTypeEoa,
@@ -40,7 +40,7 @@ function evaluateEoa(
 		eoa.keyDerivation.seedPhrase === 'BIP39' &&
 		eoa.keyDerivation.derivationPath === 'BIP44'
 	) {
-		const canExportSeedPhrase = eoa.keyDerivation.canExportSeedPhrase
+		const canExportSeedPhrase = eoa.keyDerivation.canExportSeedPhrase;
 		return {
 			value: {
 				id: 'standard_eoa_exportable',
@@ -76,7 +76,7 @@ function evaluateEoa(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	if (eoa.canExportPrivateKey) {
 		return {
@@ -113,7 +113,7 @@ function evaluateEoa(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	return {
 		value: {
@@ -147,7 +147,7 @@ function evaluateEoa(
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function evaluateMpc(
@@ -194,7 +194,7 @@ function evaluateMpc(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	if (
 		mpc.tokenTransferTransactionGeneration ===
@@ -238,7 +238,7 @@ function evaluateMpc(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	if (
 		mpc.tokenTransferTransactionGeneration ===
@@ -283,7 +283,7 @@ function evaluateMpc(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	return {
 		value: {
@@ -307,7 +307,7 @@ function evaluateMpc(
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function evaluateMultifactor(
@@ -315,7 +315,7 @@ function evaluateMultifactor(
 	multifactorType: 'erc4337' | 'eip7702',
 	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
-	const eip = multifactorType === 'erc4337' ? erc4337 : eip7702
+	const eip = multifactorType === 'erc4337' ? erc4337 : eip7702;
 	if (multifactor.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
 		return {
 			value: {
@@ -354,7 +354,7 @@ function evaluateMultifactor(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	if (multifactor.controllingSharesInSelfCustodyByDefault === 'NO') {
 		if (
@@ -398,7 +398,7 @@ function evaluateMultifactor(
 					`,
 				),
 				references,
-			}
+			};
 		}
 		if (
 			multifactor.keyRotationTransactionGeneration ===
@@ -441,7 +441,7 @@ function evaluateMultifactor(
 					`,
 				),
 				references,
-			}
+			};
 		}
 	}
 	if (
@@ -482,7 +482,7 @@ function evaluateMultifactor(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	if (
 		multifactor.tokenTransferTransactionGeneration ===
@@ -523,7 +523,7 @@ function evaluateMultifactor(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	if (
 		multifactor.controllingSharesInSelfCustodyByDefault === 'NO' &&
@@ -560,7 +560,7 @@ function evaluateMultifactor(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	return {
 		value: {
@@ -586,7 +586,7 @@ function evaluateMultifactor(
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function evaluateEip7702(
@@ -594,16 +594,16 @@ function evaluateEip7702(
 	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	if (!isSupported<AccountType7702>(accountSupport.eip7702)) {
-		throw new Error('EIP-7702 account type is not supported')
+		throw new Error('EIP-7702 account type is not supported');
 	}
 	// TODO: Add specific evaluations for EIP-7702 features on top of this.
 	if (isSupported<AccountTypeEoa>(accountSupport.eoa)) {
-		return evaluateEoa(accountSupport.eoa, references)
+		return evaluateEoa(accountSupport.eoa, references);
 	}
 	if (isSupported<AccountTypeMpc>(accountSupport.mpc)) {
-		return evaluateMpc(accountSupport.mpc, references)
+		return evaluateMpc(accountSupport.mpc, references);
 	}
-	throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported')
+	throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported');
 }
 
 export const accountPortability: Attribute<AccountPortabilityValue> = {
@@ -919,52 +919,56 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<AccountPortabilityValue> => {
 		if (features.accountSupport === null) {
-			return unrated(accountPortability, brand, null)
+			return unrated(accountPortability, brand, null);
 		}
 		const allRefs = mergeRefs(
 			refs(features.accountSupport.eoa),
 			refs(features.accountSupport.mpc),
 			refs(features.accountSupport.rawErc4337),
 			refs(features.accountSupport.eip7702),
-		)
-		const evaluations: Array<Evaluation<AccountPortabilityValue>> = []
-		let defaultEvaluation: Evaluation<AccountPortabilityValue> | null = null
+		);
+		const evaluations: Array<Evaluation<AccountPortabilityValue>> = [];
+		let defaultEvaluation: Evaluation<AccountPortabilityValue> | null = null;
 		if (isSupported<AccountTypeEoa>(features.accountSupport.eoa)) {
-			const evaluation = evaluateEoa(features.accountSupport.eoa, allRefs)
-			evaluations.push(evaluation)
+			const evaluation = evaluateEoa(features.accountSupport.eoa, allRefs);
+			evaluations.push(evaluation);
 			if (features.accountSupport.defaultAccountType === AccountType.eoa) {
-				defaultEvaluation = evaluation
+				defaultEvaluation = evaluation;
 			}
 		}
 		if (isSupported<AccountTypeMpc>(features.accountSupport.mpc)) {
-			const evaluation = evaluateMpc(features.accountSupport.mpc, allRefs)
-			evaluations.push(evaluation)
+			const evaluation = evaluateMpc(features.accountSupport.mpc, allRefs);
+			evaluations.push(evaluation);
 			if (features.accountSupport.defaultAccountType === AccountType.mpc) {
-				defaultEvaluation = evaluation
+				defaultEvaluation = evaluation;
 			}
 		}
 		if (isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)) {
-			const evaluation = evaluateMultifactor(features.accountSupport.rawErc4337, 'erc4337', allRefs)
-			evaluations.push(evaluation)
+			const evaluation = evaluateMultifactor(
+				features.accountSupport.rawErc4337,
+				'erc4337',
+				allRefs,
+			);
+			evaluations.push(evaluation);
 			if (features.accountSupport.defaultAccountType === AccountType.rawErc4337) {
-				defaultEvaluation = evaluation
+				defaultEvaluation = evaluation;
 			}
 		}
 		if (isSupported<AccountType7702>(features.accountSupport.eip7702)) {
-			const evaluation = evaluateEip7702(features.accountSupport, allRefs)
-			evaluations.push(evaluation)
+			const evaluation = evaluateEip7702(features.accountSupport, allRefs);
+			evaluations.push(evaluation);
 			if (features.accountSupport.defaultAccountType === AccountType.eip7702) {
-				defaultEvaluation = evaluation
+				defaultEvaluation = evaluation;
 			}
 		}
 		if (!isNonEmptyArray(evaluations) || defaultEvaluation === null) {
-			throw new Error('No account type evaluations; should be impossible from type system')
+			throw new Error('No account type evaluations; should be impossible from type system');
 		}
-		const oneRating = nonEmptyGet(evaluations).value.rating
+		const oneRating = nonEmptyGet(evaluations).value.rating;
 		if (evaluations.every(evaluation => evaluation.value.rating === oneRating)) {
-			return defaultEvaluation
+			return defaultEvaluation;
 		}
-		return pickWorstRating<AccountPortabilityValue>(evaluations)
+		return pickWorstRating<AccountPortabilityValue>(evaluations);
 	},
 	aggregate: pickWorstRating<AccountPortabilityValue>,
-}
+};

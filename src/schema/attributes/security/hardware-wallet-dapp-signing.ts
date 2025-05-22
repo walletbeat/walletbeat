@@ -4,22 +4,22 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { refs } from '@/schema/reference'
-import { type AtLeastOneVariant, Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support';
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import { refs } from '@/schema/reference';
+import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.security.hardware_wallet_dapp_signing'
+const brand = 'attributes.security.hardware_wallet_dapp_signing';
 export type HardwareWalletDappSigningValue = Value & {
-	dappSigningLevel: DappSigningLevel
-	__brand: 'attributes.security.hardware_wallet_dapp_signing'
-}
+	dappSigningLevel: DappSigningLevel;
+	__brand: 'attributes.security.hardware_wallet_dapp_signing';
+};
 
 function noHardwareWalletSupport(): Evaluation<HardwareWalletDappSigningValue> {
 	return {
@@ -48,7 +48,7 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletDappSigningValue> {
 				which enhances security by allowing users to verify transaction details on a separate device.
 			`,
 		),
-	}
+	};
 }
 
 function noDappSigning(): Evaluation<HardwareWalletDappSigningValue> {
@@ -78,14 +78,14 @@ function noDappSigning(): Evaluation<HardwareWalletDappSigningValue> {
 				to improve security by allowing users to verify transaction details on their hardware device.
 			`,
 		),
-	}
+	};
 }
 
 function basicDappSigning(
 	supportedWallets: string[] = [],
 ): Evaluation<HardwareWalletDappSigningValue> {
 	const supportedWalletsText =
-		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : ''
+		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : '';
 
 	return {
 		value: {
@@ -114,14 +114,14 @@ function basicDappSigning(
 				full transparency for all transaction details on the hardware wallet screen.
 			`,
 		),
-	}
+	};
 }
 
 function partialDappSigning(
 	supportedWallets: string[] = [],
 ): Evaluation<HardwareWalletDappSigningValue> {
 	const supportedWalletsText =
-		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : ''
+		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : '';
 
 	return {
 		value: {
@@ -150,7 +150,7 @@ function partialDappSigning(
 				all transaction types and ensure all details are clearly displayed on the hardware wallet screen.
 			`,
 		),
-	}
+	};
 }
 
 function fullDappSigning(
@@ -158,7 +158,7 @@ function fullDappSigning(
 	refs: Array<{ url: string; explanation: string }> = [],
 ): Evaluation<HardwareWalletDappSigningValue> {
 	const supportedWalletsText =
-		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : ''
+		supportedWallets.length > 0 ? ` through ${supportedWallets.join(', ')}` : '';
 
 	return {
 		value: {
@@ -182,7 +182,7 @@ function fullDappSigning(
 		),
 		// Include references if provided
 		references: refs.length > 0 ? refs : undefined,
-	}
+	};
 }
 
 export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue> = {
@@ -280,34 +280,34 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 			if (features.security.hardwareWalletDappSigning === null) {
 				return unrated(hardwareWalletDappSigning, brand, {
 					dappSigningLevel: DappSigningLevel.NONE,
-				})
+				});
 			}
 
 			// Extract references from the hardware wallet dApp signing feature
-			const references = refs(features.security.hardwareWalletDappSigning)
+			const references = refs(features.security.hardwareWalletDappSigning);
 
-			const dappSigningLevel = features.security.hardwareWalletDappSigning.level
+			const dappSigningLevel = features.security.hardwareWalletDappSigning.level;
 
 			// Combine extracted references with standard references if any
 
 			const result = ((): Evaluation<HardwareWalletDappSigningValue> => {
 				switch (dappSigningLevel) {
 					case DappSigningLevel.NONE:
-						return noDappSigning()
+						return noDappSigning();
 					case DappSigningLevel.BASIC:
-						return basicDappSigning(['this hardware wallet'])
+						return basicDappSigning(['this hardware wallet']);
 					case DappSigningLevel.PARTIAL:
-						return partialDappSigning(['this hardware wallet'])
+						return partialDappSigning(['this hardware wallet']);
 					case DappSigningLevel.FULL:
-						return fullDappSigning(['this hardware wallet'])
+						return fullDappSigning(['this hardware wallet']);
 				}
-			})()
+			})();
 
 			// Return result with references
 			return {
 				...result,
 				references,
-			}
+			};
 		}
 		// Check for ERC-4337 smart wallet
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
@@ -319,7 +319,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 				),
 				brand,
 				{ dappSigningLevel: DappSigningLevel.NONE },
-			)
+			);
 		}
 
 		// For software wallets:
@@ -342,8 +342,8 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 							integration attribute for how well this software wallet connects to hardware wallets.
 						`,
 			),
-		}
+		};
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletDappSigningValue>>) =>
 		pickWorstRating<HardwareWalletDappSigningValue>(perVariant),
-}
+};

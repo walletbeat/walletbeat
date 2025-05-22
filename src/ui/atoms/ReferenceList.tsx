@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react';
 
-import { type FullyQualifiedReference, mergeRefs } from '@/schema/reference'
+import { type FullyQualifiedReference, mergeRefs } from '@/schema/reference';
 
-import { ReferenceLinks } from './ReferenceLinks'
+import { ReferenceLinks } from './ReferenceLinks';
 
 export function ReferenceList({
 	key,
@@ -10,19 +10,19 @@ export function ReferenceList({
 	ifEmpty = undefined,
 	ulStyle = undefined,
 }: {
-	key?: string
-	ref: FullyQualifiedReference | FullyQualifiedReference[]
-	ifEmpty?: React.JSX.Element
-	ulStyle?: React.CSSProperties
+	key?: string;
+	ref: FullyQualifiedReference | FullyQualifiedReference[];
+	ifEmpty?: React.JSX.Element;
+	ulStyle?: React.CSSProperties;
 }): React.JSX.Element | undefined {
-	let refs = ref
+	let refs = ref;
 	if (!Array.isArray(refs)) {
-		refs = [refs]
+		refs = [refs];
 	}
 	if (refs.length === 0) {
-		return ifEmpty
+		return ifEmpty;
 	}
-	refs = mergeRefs(...refs)
+	refs = mergeRefs(...refs);
 	return (
 		<React.Fragment key={key}>
 			<ul style={ulStyle}>
@@ -34,5 +34,5 @@ export function ReferenceList({
 				))}
 			</ul>
 		</React.Fragment>
-	)
+	);
 }

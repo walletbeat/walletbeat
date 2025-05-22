@@ -1,25 +1,25 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
-import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { type ReputationSupport, ReputationType } from '@/schema/features/transparency/reputation'
-import { popRefs } from '@/schema/reference'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes';
+import { exampleRating } from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { type ReputationSupport, ReputationType } from '@/schema/features/transparency/reputation';
+import { popRefs } from '@/schema/reference';
+import type { AtLeastOneVariant } from '@/schema/variants';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.reputation'
+const brand = 'attributes.reputation';
 
 export type ReputationValue = Value & {
-	originalProduct: ReputationType
-	availability: ReputationType
-	warrantySupportRisk: ReputationType
-	disclosureHistory: ReputationType
-	bugBounty: ReputationType
-	__brand: 'attributes.reputation'
-}
+	originalProduct: ReputationType;
+	availability: ReputationType;
+	warrantySupportRisk: ReputationType;
+	disclosureHistory: ReputationType;
+	bugBounty: ReputationType;
+	__brand: 'attributes.reputation';
+};
 
 function evaluateReputation(features: ReputationSupport): Rating {
 	const ratings = [
@@ -28,15 +28,15 @@ function evaluateReputation(features: ReputationSupport): Rating {
 		features.warrantySupportRisk,
 		features.disclosureHistory,
 		features.bugBounty,
-	]
-	const passCount = ratings.filter(r => r === ReputationType.PASS).length
+	];
+	const passCount = ratings.filter(r => r === ReputationType.PASS).length;
 	if (passCount >= 4) {
-		return Rating.PASS
+		return Rating.PASS;
 	}
 	if (passCount >= 2) {
-		return Rating.PARTIAL
+		return Rating.PARTIAL;
 	}
-	return Rating.FAIL
+	return Rating.FAIL;
 }
 
 export const reputation: Attribute<ReputationValue> = {
@@ -101,9 +101,9 @@ export const reputation: Attribute<ReputationValue> = {
 				warrantySupportRisk: ReputationType.FAIL,
 				disclosureHistory: ReputationType.FAIL,
 				bugBounty: ReputationType.FAIL,
-			})
+			});
 		}
-		const reputationFeature = features.transparency.reputation
+		const reputationFeature = features.transparency.reputation;
 		if (reputationFeature === null) {
 			return unrated(reputation, brand, {
 				originalProduct: ReputationType.FAIL,
@@ -111,11 +111,11 @@ export const reputation: Attribute<ReputationValue> = {
 				warrantySupportRisk: ReputationType.FAIL,
 				disclosureHistory: ReputationType.FAIL,
 				bugBounty: ReputationType.FAIL,
-			})
+			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<ReputationSupport>(reputationFeature)
-		const rating = evaluateReputation(withoutRefs)
+		const { withoutRefs, refs: extractedRefs } = popRefs<ReputationSupport>(reputationFeature);
+		const rating = evaluateReputation(withoutRefs);
 
 		return {
 			value: {
@@ -138,6 +138,6 @@ export const reputation: Attribute<ReputationValue> = {
 					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
 			),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+};

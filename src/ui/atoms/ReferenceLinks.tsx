@@ -1,10 +1,10 @@
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import LinkIcon from '@mui/icons-material/Link'
-import { Link, Typography } from '@mui/material'
-import type React from 'react'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LinkIcon from '@mui/icons-material/Link';
+import { Link, Typography } from '@mui/material';
+import type React from 'react';
 
-import type { FullyQualifiedReference } from '@/schema/reference'
-import type { LabeledUrl } from '@/schema/url'
+import type { FullyQualifiedReference } from '@/schema/reference';
+import type { LabeledUrl } from '@/schema/url';
 
 /**
  * Component to display reference links with explanations
@@ -13,11 +13,11 @@ export function ReferenceLinks({
 	references,
 	explanation,
 }: {
-	references: FullyQualifiedReference[]
-	explanation?: string
+	references: FullyQualifiedReference[];
+	explanation?: string;
 }): React.JSX.Element {
 	if (references.length === 0) {
-		return <></>
+		return <></>;
 	}
 
 	return (
@@ -102,5 +102,5 @@ export function ReferenceLinks({
 				</Typography>
 			)}
 		</div>
-	)
+	);
 }

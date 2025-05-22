@@ -1,4 +1,4 @@
-import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { type Eip, EipPrefix, EipStatus } from '@/schema/eips';
 
 export const eip2700: Eip = {
 	friendlyName: 'JavaScript Provider Events',
@@ -15,4 +15,4 @@ export const eip2700: Eip = {
 		failures. This allows web applications to interact with the wallet and
 		Ethereum blockchain without needing to implement wallet-specific code.
 	`,
-}
+};

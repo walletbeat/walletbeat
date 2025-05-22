@@ -1,5 +1,5 @@
-import { Typography } from '@mui/material'
-import React from 'react'
+import { Typography } from '@mui/material';
+import React from 'react';
 
 import {
 	type AttributeGroup,
@@ -8,27 +8,27 @@ import {
 	Rating,
 	type Value,
 	type ValueSet,
-} from '@/schema/attributes'
-import { toFullyQualified } from '@/schema/reference'
-import type { Variant } from '@/schema/variants'
-import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet'
-import { isTypographicContent } from '@/types/content'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
-import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology'
+} from '@/schema/attributes';
+import { toFullyQualified } from '@/schema/reference';
+import type { Variant } from '@/schema/variants';
+import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet';
+import { isTypographicContent } from '@/types/content';
+import type { NonEmptyArray } from '@/types/utils/non-empty';
+import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology';
 
 import {
 	subsectionBorderRadius,
 	subsectionIconWidth,
 	subsectionWeight,
-} from '../../components/constants'
-import { subsectionTheme } from '../../components/ThemeRegistry/theme'
-import { variantToName } from '../../components/variants'
-import { type AccordionData, Accordions } from '../atoms/Accordions'
-import { ReferenceLinks } from '../atoms/ReferenceLinks'
-import { RenderContent } from '../atoms/RenderContent'
-import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
-import { WrapIcon } from '../atoms/WrapIcon'
-import { WrapRatingIcon } from '../atoms/WrapRatingIcon'
+} from '../../components/constants';
+import { subsectionTheme } from '../../components/ThemeRegistry/theme';
+import { variantToName } from '../../components/variants';
+import { type AccordionData, Accordions } from '../atoms/Accordions';
+import { ReferenceLinks } from '../atoms/ReferenceLinks';
+import { RenderContent } from '../atoms/RenderContent';
+import { RenderTypographicContent } from '../atoms/RenderTypographicContent';
+import { WrapIcon } from '../atoms/WrapIcon';
+import { WrapRatingIcon } from '../atoms/WrapRatingIcon';
 
 export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	wallet,
@@ -37,40 +37,40 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	variantSpecificity,
 	displayedVariant,
 }: {
-	wallet: RatedWallet
-	attrGroup: AttributeGroup<Vs>
-	evalGroup: EvaluatedGroup<Vs>
-	evalAttr: EvaluatedAttribute<V>
+	wallet: RatedWallet;
+	attrGroup: AttributeGroup<Vs>;
+	evalGroup: EvaluatedGroup<Vs>;
+	evalAttr: EvaluatedAttribute<V>;
 } & (
 	| {
 			variantSpecificity:
 				| VariantSpecificity.ALL_SAME
 				| VariantSpecificity.NOT_UNIVERSAL
-				| VariantSpecificity.UNIQUE_TO_VARIANT
-			displayedVariant: Variant | null
+				| VariantSpecificity.UNIQUE_TO_VARIANT;
+			displayedVariant: Variant | null;
 	  }
 	| {
-			variantSpecificity: VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT
-			displayedVariant: Variant
+			variantSpecificity: VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT;
+			displayedVariant: Variant;
 	  }
 )): React.JSX.Element {
-	const qualRefs = toFullyQualified(evalAttr.evaluation.references)
+	const qualRefs = toFullyQualified(evalAttr.evaluation.references);
 	const details = evalAttr.evaluation.details.render({
 		wallet,
 		references: qualRefs,
 		value: evalAttr.evaluation.value,
-	})
-	const override = getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id)
+	});
+	const override = getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id);
 	const variantSpecificCaption: React.ReactNode = (() => {
 		switch (variantSpecificity) {
 			case VariantSpecificity.ALL_SAME:
-				return null
+				return null;
 			case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
 				return (
 					<Typography variant="caption" sx={{ opacity: 0.8 }}>
 						This rating is only relevant for the {variantToName(displayedVariant, false)} version.
 					</Typography>
-				)
+				);
 			default:
 				return (
 					<Typography variant="caption" sx={{ opacity: 0.8 }}>
@@ -78,9 +78,9 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 							? 'This rating differs across versions. Select a specific version for details.'
 							: `This rating is specific to the ${variantToName(displayedVariant, false)} version.`}
 					</Typography>
-				)
+				);
 		}
-	})()
+	})();
 
 	let rendered = (
 		<>
@@ -118,9 +118,11 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 				</div>
 			)}
 		</>
-	)
+	);
 	if (isTypographicContent(details)) {
-		rendered = <WrapRatingIcon rating={evalAttr.evaluation.value.rating}>{rendered}</WrapRatingIcon>
+		rendered = (
+			<WrapRatingIcon rating={evalAttr.evaluation.value.rating}>{rendered}</WrapRatingIcon>
+		);
 	}
 	const accordions: NonEmptyArray<AccordionData> = [
 		{
@@ -147,9 +149,9 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 				<AttributeMethodology attribute={evalAttr.attribute} evaluation={evalAttr.evaluation} />
 			),
 		},
-	]
+	];
 	const howToImprove =
-		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove
+		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove;
 	if (howToImprove !== undefined) {
 		accordions.push({
 			id: `how-${evalAttr.attribute.id}`,
@@ -167,7 +169,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					typography={{ variant: 'body2' }}
 				/>
 			),
-		})
+		});
 	}
 	return (
 		<>
@@ -189,5 +191,5 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 				interAccordionMargin="1rem"
 			/>
 		</>
-	)
+	);
 }

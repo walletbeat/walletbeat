@@ -1,11 +1,11 @@
-import GitHubIcon from '@mui/icons-material/GitHub'
-import type { FC } from 'react'
+import type { FC } from 'react';
+import { LuGithub } from 'react-icons/lu';
 
-import { walletNavigationGroups } from '@/components/CriteriaPage'
-import { navigationAbout } from '@/components/navigation'
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { ExternalLink } from '@/ui/atoms/ExternalLink'
-import WalletTable from '@/ui/organisms/WalletTable'
+import { walletNavigationGroups } from '@/components/CriteriaPage';
+import { navigationAbout } from '@/components/navigation';
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
+import { ExternalLink } from '@/ui/atoms/ExternalLink';
+import WalletTable from '@/ui/organisms/WalletTable';
 
 export const HomePage: FC<{ selectedGroupId?: string }> = ({ selectedGroupId }) => (
 	<NavigationPageLayout
@@ -39,7 +39,7 @@ export const HomePage: FC<{ selectedGroupId?: string }> = ({ selectedGroupId }) 
 						<div className="flex gap-2">
 							<div className="bg-primary border px-2 py-1 rounded-md hover:bg-primary">
 								<div className="flex flex-row gap-2 items-center" key="repo">
-									<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+									<LuGithub />
 									<ExternalLink
 										url="https://github.com/walletbeat/walletbeat"
 										defaultLabel="GitHub Repository"
@@ -77,4 +77,4 @@ export const HomePage: FC<{ selectedGroupId?: string }> = ({ selectedGroupId }) 
 			</div>
 		</div>
 	</NavigationPageLayout>
-)
+);

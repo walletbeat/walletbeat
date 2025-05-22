@@ -1,9 +1,9 @@
-import type { CalendarDate } from '@/types/date'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
+import type { CalendarDate } from '@/types/date';
+import type { NonEmptyArray } from '@/types/utils/non-empty';
 
-import type { SecurityAuditor } from '../../entity'
-import type { MustRef } from '../../reference'
-import type { AtLeastOneTrueVariant } from '../../variants'
+import type { SecurityAuditor } from '../../entity';
+import type { MustRef } from '../../reference';
+import type { AtLeastOneTrueVariant } from '../../variants';
 
 /** The severity of a security flaw, as assigned by the security auditor. */
 export enum SecurityFlawSeverity {
@@ -20,25 +20,25 @@ export enum SecurityFlawSeverity {
 export function securityFlawSeverityName(severity: SecurityFlawSeverity): string {
 	switch (severity) {
 		case SecurityFlawSeverity.CRITICAL:
-			return 'Critical'
+			return 'Critical';
 		case SecurityFlawSeverity.HIGH:
-			return 'High'
+			return 'High';
 		case SecurityFlawSeverity.MEDIUM:
-			return 'Medium'
+			return 'Medium';
 	}
 }
 
 /** A security flaw which was not addressed at audit publication time. */
 export type UnpatchedSecurityFlaw = {
 	/** The name/description of the security flaw. */
-	name: string
+	name: string;
 
 	/** The severity level of the security flaw. */
-	severityAtAuditPublication: SecurityFlawSeverity
+	severityAtAuditPublication: SecurityFlawSeverity;
 } & (
 	| {
 			/** The status of this flaw in the present day. */
-			presentStatus: 'NOT_FIXED'
+			presentStatus: 'NOT_FIXED';
 	  }
 	| MustRef<{
 			/**
@@ -47,12 +47,12 @@ export type UnpatchedSecurityFlaw = {
 			 * reference, such as a link to a code commit or to a statement or
 			 * newer audit from the same auditor.
 			 */
-			presentStatus: 'FIXED'
+			presentStatus: 'FIXED';
 
 			/** The date at which the flaw was fixed. */
-			fixedDate: CalendarDate
+			fixedDate: CalendarDate;
 	  }>
-)
+);
 
 /**
  * A single security audit.
@@ -60,29 +60,29 @@ export type UnpatchedSecurityFlaw = {
  */
 export type SecurityAudit = MustRef<{
 	/** The entity that performed the security audit. */
-	auditor: SecurityAuditor
+	auditor: SecurityAuditor;
 
 	/** The date the audit report was done or published. */
-	auditDate: CalendarDate
+	auditDate: CalendarDate;
 
 	/**
 	 * The snapshot of the code being audited, if provided in the report.
 	 */
 	codeSnapshot?: {
 		/** When the snapshot of code was taken. */
-		date: CalendarDate
+		date: CalendarDate;
 
 		/** The commit hash of the code snapshot, if known. */
-		commit?: string
+		commit?: string;
 
 		/** The release tag of the code snapshot, if known. */
-		tag?: string
-	}
+		tag?: string;
+	};
 
 	/**
 	 * Which variants of the wallet were audited.
 	 */
-	variantsScope: AtLeastOneTrueVariant | 'ALL_VARIANTS'
+	variantsScope: AtLeastOneTrueVariant | 'ALL_VARIANTS';
 
 	/**
 	 * The set of security flaws that were found but not addressed by the time
@@ -95,10 +95,10 @@ export type SecurityAudit = MustRef<{
 	 * either fixed by time the audit was published, or were of a lower
 	 * severity than MEDIUM.
 	 */
-	unpatchedFlaws: 'NONE_FOUND' | 'ALL_FIXED' | NonEmptyArray<UnpatchedSecurityFlaw>
-}>
+	unpatchedFlaws: 'NONE_FOUND' | 'ALL_FIXED' | NonEmptyArray<UnpatchedSecurityFlaw>;
+}>;
 
 /** Unique ID for a given security audit. */
 export function securityAuditId(audit: SecurityAudit): string {
-	return `${audit.auditor.id}-${audit.auditDate}`
+	return `${audit.auditor.id}-${audit.auditDate}`;
 }

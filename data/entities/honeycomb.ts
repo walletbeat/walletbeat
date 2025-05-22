@@ -1,4 +1,4 @@
-import type { CorporateEntity, DataBroker } from '@/schema/entity'
+import type { CorporateEntity, DataBroker } from '@/schema/entity';
 
 export const honeycomb: CorporateEntity & DataBroker = {
 	id: 'honeycomb',
@@ -25,4 +25,4 @@ export const honeycomb: CorporateEntity & DataBroker = {
 	repoUrl: 'https://github.com/honeycombio',
 	twitter: 'https://x.com/honeycombio',
 	url: 'https://www.honeycomb.io/',
-}
+};

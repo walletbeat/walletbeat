@@ -1,30 +1,30 @@
-import { erc7828 } from '@/data/eips/erc-7828'
-import { erc7831 } from '@/data/eips/erc-7831'
+import { erc7828 } from '@/data/eips/erc-7828';
+import { erc7831 } from '@/data/eips/erc-7831';
 import {
 	type Attribute,
 	type Evaluation,
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { type ReferenceArray, refs } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { type ReferenceArray, refs } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content';
+import type { NonEmptyArray } from '@/types/utils/non-empty';
 
-import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } from '../../eips'
+import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } from '../../eips';
 import type {
 	AddressResolution,
 	AddressResolutionSupport,
-} from '../../features/privacy/address-resolution'
-import { pickWorstRating, unrated } from '../common'
+} from '../../features/privacy/address-resolution';
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.ecosystem.address_resolution'
+const brand = 'attributes.ecosystem.address_resolution';
 export type AddressResolutionValue = Value & {
-	addressResolution?: AddressResolution<AddressResolutionSupport>
-	__brand: 'attributes.ecosystem.address_resolution'
-}
+	addressResolution?: AddressResolution<AddressResolutionSupport>;
+	__brand: 'attributes.ecosystem.address_resolution';
+};
 
 function getOffchainProviderInfo(
 	support: AddressResolutionSupport & { support: 'SUPPORTED'; medium: 'OFFCHAIN' },
@@ -38,7 +38,7 @@ function getOffchainProviderInfo(
 			offchainInfo:
 				'It relies on an offchain data source to do so, but does so in a verifiable and privacy-preserving manner.',
 			walletShould: undefined,
-		}
+		};
 	}
 	if (support.offchainDataVerifiability === 'VERIFIABLE') {
 		return {
@@ -47,7 +47,7 @@ function getOffchainProviderInfo(
 				'It relies on an offchain third-party provider to do so. The wallet verifies that the address is correct, but the offchain provider may learn your IP address.',
 			walletShould:
 				'contact the third-party provider using traffic anonymizing techniques, such as Tor or Oblivious HTTP.',
-		}
+		};
 	}
 	if (support.offchainProviderConnection === 'UNIQUE_PROXY_CIRCUIT') {
 		return {
@@ -56,7 +56,7 @@ function getOffchainProviderInfo(
 				'It relies on an offchain third-party provider to do so. This offchain provider trick the wallet into sending funds to a different address than intended.',
 			walletShould:
 				'ensure the response from the third-party provider is correct using onchain data verified by a light client.',
-		}
+		};
 	}
 	return {
 		rating: Rating.PARTIAL,
@@ -64,7 +64,7 @@ function getOffchainProviderInfo(
 			'It relies on an offchain third-party provider to do so. This offchain provider may trick the wallet into sending funds to a different address than intended, and may learn your IP address.',
 		walletShould:
 			'contact the third-party provider using traffic anonymizing techniques (such as Tor or Oblivious HTTP), and ensure the response from the third-party provider is correct using onchain data verified by a light client.',
-	}
+	};
 }
 
 function evaluateAddressResolution(
@@ -74,10 +74,10 @@ function evaluateAddressResolution(
 	const chainSpecificErcs: NonEmptyArray<[Eip, AddressResolutionSupport, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
-	]
+	];
 	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificErcs) {
 		if (chainSpecificSupport.support !== 'SUPPORTED') {
-			continue
+			continue;
 		}
 		if (chainSpecificSupport.medium === 'CHAIN_CLIENT') {
 			return {
@@ -109,9 +109,9 @@ function evaluateAddressResolution(
 					`,
 				),
 				references,
-			}
+			};
 		}
-		const { rating, offchainInfo, walletShould } = getOffchainProviderInfo(chainSpecificSupport)
+		const { rating, offchainInfo, walletShould } = getOffchainProviderInfo(chainSpecificSupport);
 		return {
 			value: {
 				id: `support_via_erc${erc.number}_${chainSpecificSupport.offchainDataVerifiability.toLowerCase()}_${chainSpecificSupport.offchainProviderConnection.toLowerCase()}_provider`,
@@ -149,7 +149,7 @@ function evaluateAddressResolution(
 							`,
 						),
 			references,
-		}
+		};
 	}
 	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
 		return {
@@ -181,7 +181,7 @@ function evaluateAddressResolution(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	if (addressResolution.nonChainSpecificEnsResolution.medium === 'CHAIN_CLIENT') {
 		return {
@@ -222,11 +222,11 @@ function evaluateAddressResolution(
 				`,
 			),
 			references,
-		}
+		};
 	}
 	const { offchainInfo, walletShould } = getOffchainProviderInfo(
 		addressResolution.nonChainSpecificEnsResolution,
-	)
+	);
 	return {
 		value: {
 			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
@@ -269,7 +269,7 @@ function evaluateAddressResolution(
 						`,
 					),
 		references,
-	}
+	};
 }
 
 export const addressResolution: Attribute<AddressResolutionValue> = {
@@ -485,14 +485,14 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<AddressResolutionValue> => {
 		if (features.addressResolution === null) {
-			return unrated(addressResolution, brand, {})
+			return unrated(addressResolution, brand, {});
 		}
 		if (
 			features.addressResolution.nonChainSpecificEnsResolution === null ||
 			features.addressResolution.chainSpecificAddressing.erc7828 === null ||
 			features.addressResolution.chainSpecificAddressing.erc7831 === null
 		) {
-			return unrated(addressResolution, brand, {})
+			return unrated(addressResolution, brand, {});
 		}
 		// We've checked all the nulls, so recreate the object without nulls in
 		// the type description.
@@ -502,8 +502,8 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 				erc7831: features.addressResolution.chainSpecificAddressing.erc7831,
 			},
 			nonChainSpecificEnsResolution: features.addressResolution.nonChainSpecificEnsResolution,
-		}
-		return evaluateAddressResolution(resolvedResolution, refs(features.addressResolution))
+		};
+		return evaluateAddressResolution(resolvedResolution, refs(features.addressResolution));
 	},
 	aggregate: pickWorstRating<AddressResolutionValue>,
-}
+};

@@ -1,12 +1,12 @@
-import * as RadixTooltip from '@radix-ui/react-tooltip'
-import type { CSSProperties, JSX, ReactNode } from 'react'
+import * as RadixTooltip from '@radix-ui/react-tooltip';
+import type { CSSProperties, JSX, ReactNode } from 'react';
 
 export interface TooltipProps {
-	content: ReactNode
-	children: ReactNode
-	side?: RadixTooltip.TooltipContentProps['side']
-	contentClassName?: string
-	contentStyle?: CSSProperties
+	content: ReactNode;
+	children: ReactNode;
+	side?: RadixTooltip.TooltipContentProps['side'];
+	contentClassName?: string;
+	contentStyle?: CSSProperties;
 }
 
 export function Tooltip({
@@ -16,11 +16,11 @@ export function Tooltip({
 	contentClassName,
 	contentStyle,
 }: TooltipProps): JSX.Element {
-	const baseClass = 'bg-black text-white p-2 rounded text-sm z-50'
+	const baseClass = 'bg-black text-white p-2 rounded text-sm z-50';
 	const combinedClass: string =
 		typeof contentClassName === 'string' && contentClassName.length > 0
 			? `${baseClass} ${contentClassName}`
-			: baseClass
+			: baseClass;
 	return (
 		<RadixTooltip.Provider>
 			<RadixTooltip.Root delayDuration={0}>
@@ -36,5 +36,5 @@ export function Tooltip({
 				</RadixTooltip.Content>
 			</RadixTooltip.Root>
 		</RadixTooltip.Provider>
-	)
+	);
 }

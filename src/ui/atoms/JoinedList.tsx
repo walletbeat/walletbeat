@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 /** Join a list of nodes with grammatical separators. */
 export function JoinedList({
@@ -7,10 +7,10 @@ export function JoinedList({
 	separator = ', ',
 	lastSeparator = ' and ',
 }: {
-	data: Array<{ key: string; value: React.ReactNode }>
-	key?: string
-	separator?: React.ReactNode
-	lastSeparator?: React.ReactNode
+	data: Array<{ key: string; value: React.ReactNode }>;
+	key?: string;
+	separator?: React.ReactNode;
+	lastSeparator?: React.ReactNode;
 }): React.JSX.Element {
 	return (
 		<React.Fragment key={key}>
@@ -21,5 +21,5 @@ export function JoinedList({
 				</React.Fragment>
 			))}
 		</React.Fragment>
-	)
+	);
 }

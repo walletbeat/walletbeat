@@ -1,4 +1,4 @@
-import type { CorporateEntity, TransactionBroadcastProvider } from '@/schema/entity'
+import type { CorporateEntity, TransactionBroadcastProvider } from '@/schema/entity';
 
 export const pimlico: CorporateEntity & TransactionBroadcastProvider = {
 	id: 'pimlico',
@@ -27,4 +27,4 @@ export const pimlico: CorporateEntity & TransactionBroadcastProvider = {
 	repoUrl: 'https://github.com/pimlicolabs',
 	twitter: 'https://x.com/pimlicoHQ',
 	url: 'https://www.pimlico.io/',
-}
+};

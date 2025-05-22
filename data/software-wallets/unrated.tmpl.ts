@@ -1,10 +1,10 @@
-import { WalletProfile } from '@/schema/features/profile'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { WalletProfile } from '@/schema/features/profile';
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
+import { Variant } from '@/schema/variants';
+import type { SoftwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { exampleContributor } from '../contributors/example'
+import { exampleContributor } from '../contributors/example';
 
 export const unratedTemplate: SoftwareWallet = {
 	metadata: {
@@ -96,4 +96,4 @@ export const unratedTemplate: SoftwareWallet = {
 		[Variant.BROWSER]: true,
 		[Variant.DESKTOP]: true,
 	},
-}
+};

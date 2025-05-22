@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 /**
  * Types of passkey verification libraries that can be used
@@ -20,20 +20,20 @@ export interface PasskeyVerificationSupport {
 	/**
 	 * The library used for passkey verification
 	 */
-	library: PasskeyVerificationLibrary
+	library: PasskeyVerificationLibrary;
 
 	/**
 	 * The URL to the library's repository or documentation
 	 */
-	libraryUrl?: string
+	libraryUrl?: string;
 
 	/**
 	 * Additional details about the passkey verification implementation
 	 */
-	details?: string
+	details?: string;
 }
 
 /**
  * A record of passkey verification support
  */
-export type PasskeyVerificationImplementation = WithRef<PasskeyVerificationSupport>
+export type PasskeyVerificationImplementation = WithRef<PasskeyVerificationSupport>;

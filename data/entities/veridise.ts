@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
 
 export const veridise: CorporateEntity & SecurityAuditor = {
 	id: 'veridise',
@@ -25,4 +25,4 @@ export const veridise: CorporateEntity & SecurityAuditor = {
 	repoUrl: 'https://github.com/Veridise',
 	twitter: 'https://x.com/VeridiseInc',
 	url: 'https://veridise.com/',
-}
+};

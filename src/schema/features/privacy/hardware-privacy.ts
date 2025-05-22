@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 export enum HardwarePrivacyType {
 	PASS = 'PASS',
@@ -7,12 +7,12 @@ export enum HardwarePrivacyType {
 }
 
 export interface HardwarePrivacySupport {
-	type: HardwarePrivacyType
-	url?: string
-	details?: string
-	phoningHome: HardwarePrivacyType
-	inspectableRemoteCalls: HardwarePrivacyType
-	wirelessPrivacy: HardwarePrivacyType
+	type: HardwarePrivacyType;
+	url?: string;
+	details?: string;
+	phoningHome: HardwarePrivacyType;
+	inspectableRemoteCalls: HardwarePrivacyType;
+	wirelessPrivacy: HardwarePrivacyType;
 }
 
-export type HardwarePrivacyImplementation = WithRef<HardwarePrivacySupport>
+export type HardwarePrivacyImplementation = WithRef<HardwarePrivacySupport>;

@@ -1,48 +1,48 @@
-import { Typography } from '@mui/material'
-import type React from 'react'
+import { Typography } from '@mui/material';
+import type React from 'react';
 
-import { subsectionWeight } from '@/components/constants'
-import { isSupported } from '@/schema/features/support'
-import { toFullyQualified } from '@/schema/reference'
-import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
-import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
-import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks'
-import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
+import { subsectionWeight } from '@/components/constants';
+import { isSupported } from '@/schema/features/support';
+import { toFullyQualified } from '@/schema/reference';
+import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details';
+import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text';
+import { ReferenceLinks } from '@/ui/atoms/ReferenceLinks';
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent';
 
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
 
 function listOrSingleText(prefix: string, items: Array<string | null>): React.ReactNode {
-	const filtered = items.filter(item => item !== null)
+	const filtered = items.filter(item => item !== null);
 	if (filtered.length === 1) {
-		const stripped = trimWhitespacePrefix(filtered[0]).trim()
+		const stripped = trimWhitespacePrefix(filtered[0]).trim();
 		return (
 			<Typography variant="body1">
 				{prefix} {stripped[0].toLocaleLowerCase() + stripped.slice(1)}.
 			</Typography>
-		)
+		);
 	}
 	return (
 		<>
 			<Typography variant="body1">{prefix}:</Typography>
 			<ul>
 				{filtered.map(item => {
-					const stripped = trimWhitespacePrefix(item).trim()
+					const stripped = trimWhitespacePrefix(item).trim();
 					return (
 						<li key={stripped}>
 							<Typography variant="body1">
 								{stripped[0].toUpperCase() + stripped.slice(1)}.
 							</Typography>
 						</li>
-					)
+					);
 				})}
 			</ul>
 		</>
-	)
+	);
 }
 
 export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): React.JSX.Element {
 	if (value.scamAlerts === null) {
-		throw new Error('Cannot render ScamAlertDetails for undefined data')
+		throw new Error('Cannot render ScamAlertDetails for undefined data');
 	}
 	const scamUrlLeaks: string[] = isSupported(value.scamAlerts.scamUrlWarning)
 		? [
@@ -51,17 +51,17 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 				((): string | null => {
 					switch (value.scamAlerts.scamUrlWarning.leaksVisitedUrl) {
 						case 'FULL_URL':
-							return 'the full URL of the app'
+							return 'the full URL of the app';
 						case 'DOMAIN_ONLY':
-							return 'the domain name of the app'
+							return 'the domain name of the app';
 						case 'PARTIAL_HASH_OF_DOMAIN':
-							return null
+							return null;
 						case 'NO':
-							return null
+							return null;
 					}
 				})(),
 			].filter(val => val !== null)
-		: []
+		: [];
 	return (
 		<>
 			<WrapRatingIcon rating={value.rating}>
@@ -211,5 +211,5 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 				</ul>
 			</div>
 		</>
-	)
+	);
 }

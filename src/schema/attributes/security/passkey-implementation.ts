@@ -4,25 +4,25 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	PasskeyVerificationLibrary,
 	type PasskeyVerificationSupport,
-} from '@/schema/features/security/passkey-verification'
-import { popRefs } from '@/schema/reference'
-import { type AtLeastOneVariant, Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
+} from '@/schema/features/security/passkey-verification';
+import { popRefs } from '@/schema/reference';
+import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.security.passkey_implementation'
+const brand = 'attributes.security.passkey_implementation';
 export type PasskeyImplementationValue = Value & {
-	library: PasskeyVerificationLibrary
-	libraryUrl?: string
-	__brand: 'attributes.security.passkey_implementation'
-}
+	library: PasskeyVerificationLibrary;
+	libraryUrl?: string;
+	__brand: 'attributes.security.passkey_implementation';
+};
 
 function noPasskeyImplementation(): Evaluation<PasskeyImplementationValue> {
 	return {
@@ -51,7 +51,7 @@ function noPasskeyImplementation(): Evaluation<PasskeyImplementationValue> {
 				such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) 159K gas.
 			`,
 		),
-	}
+	};
 }
 
 function otherPasskeyImplementation(
@@ -84,7 +84,7 @@ function otherPasskeyImplementation(
 				and audited verification library such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) (159K gas).
 			`,
 		),
-	}
+	};
 }
 
 function freshCryptoLibImplementation(
@@ -120,7 +120,7 @@ function freshCryptoLibImplementation(
 				which has undergone more extensive [auditing and testing.](https://github.com/get-smooth/crypto-lib/tree/main/doc/Audits)
 			`,
 		),
-	}
+	};
 }
 
 function smoothCryptoLibImplementation(
@@ -149,7 +149,7 @@ function smoothCryptoLibImplementation(
 			`,
 		),
 		howToImprove: undefined,
-	}
+	};
 }
 
 function daimoP256VerifierImplementation(
@@ -179,7 +179,7 @@ function daimoP256VerifierImplementation(
 			`,
 		),
 		howToImprove: undefined,
-	}
+	};
 }
 
 function openZeppelinP256VerifierImplementation(
@@ -209,7 +209,7 @@ function openZeppelinP256VerifierImplementation(
 			`,
 		),
 		howToImprove: undefined,
-	}
+	};
 }
 
 function webAuthnSolImplementation(
@@ -244,7 +244,7 @@ function webAuthnSolImplementation(
 				${wallet.metadata.displayName} could improve by updating the fallback mechanism to use Smooth Crypto Library instead of FreshCryptoLib for better performance and security.
 			`,
 		),
-	}
+	};
 }
 
 export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
@@ -371,12 +371,12 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 				),
 				brand,
 				{ library: PasskeyVerificationLibrary.NONE },
-			)
+			);
 		}
 
-		const passkeyVerification = features.security.passkeyVerification
+		const passkeyVerification = features.security.passkeyVerification;
 		if (passkeyVerification === null) {
-			return unrated(passkeyImplementation, brand, { library: PasskeyVerificationLibrary.NONE })
+			return unrated(passkeyImplementation, brand, { library: PasskeyVerificationLibrary.NONE });
 		}
 
 		// If the library is explicitly set to NONE, this means the wallet doesn't support passkeys
@@ -390,35 +390,35 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 				),
 				brand,
 				{ library: PasskeyVerificationLibrary.NONE },
-			)
+			);
 		}
 
 		const { withoutRefs, refs: extractedRefs } =
-			popRefs<PasskeyVerificationSupport>(passkeyVerification)
+			popRefs<PasskeyVerificationSupport>(passkeyVerification);
 
 		const result = ((): Evaluation<PasskeyImplementationValue> => {
 			switch (withoutRefs.library) {
 				case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
-					return smoothCryptoLibImplementation(withoutRefs)
+					return smoothCryptoLibImplementation(withoutRefs);
 				case PasskeyVerificationLibrary.DAIMO_P256_VERIFIER:
-					return daimoP256VerifierImplementation(withoutRefs)
+					return daimoP256VerifierImplementation(withoutRefs);
 				case PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER:
-					return openZeppelinP256VerifierImplementation(withoutRefs)
+					return openZeppelinP256VerifierImplementation(withoutRefs);
 				case PasskeyVerificationLibrary.FRESH_CRYPTO_LIB:
-					return freshCryptoLibImplementation(withoutRefs)
+					return freshCryptoLibImplementation(withoutRefs);
 				case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
-					return webAuthnSolImplementation(withoutRefs)
+					return webAuthnSolImplementation(withoutRefs);
 				case PasskeyVerificationLibrary.OTHER:
-					return otherPasskeyImplementation(withoutRefs)
+					return otherPasskeyImplementation(withoutRefs);
 				default:
-					return noPasskeyImplementation()
+					return noPasskeyImplementation();
 			}
-		})()
+		})();
 
 		// Return result with references if any
 		return {
 			...result,
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+};

@@ -1,9 +1,9 @@
-import { WalletProfile } from '@/schema/features/profile'
-import { Variant } from '@/schema/variants'
-import type { EmbeddedWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { WalletProfile } from '@/schema/features/profile';
+import { Variant } from '@/schema/variants';
+import type { EmbeddedWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { exampleContributor } from '../contributors/example'
+import { exampleContributor } from '../contributors/example';
 
 export const unratedEmbeddedTemplate: EmbeddedWallet = {
 	metadata: {
@@ -64,4 +64,4 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 	variants: {
 		[Variant.EMBEDDED]: true,
 	},
-}
+};

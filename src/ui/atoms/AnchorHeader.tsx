@@ -1,11 +1,11 @@
-import LinkIcon from '@mui/icons-material/Link'
-import { Link, Typography, type TypographyProps } from '@mui/material'
-import type React from 'react'
-import { useState } from 'react'
+import LinkIcon from '@mui/icons-material/Link';
+import { Link, Typography, type TypographyProps } from '@mui/material';
+import type React from 'react';
+import { useState } from 'react';
 
 export function AnchorHeader(props: TypographyProps & { id?: string }): React.JSX.Element {
-	const [hovered, setHovered] = useState<boolean>(false)
-	const typographyProps = { onClick: undefined, ...props }
+	const [hovered, setHovered] = useState<boolean>(false);
+	const typographyProps = { onClick: undefined, ...props };
 	return (
 		<Typography {...typographyProps}>
 			<Link
@@ -13,10 +13,10 @@ export function AnchorHeader(props: TypographyProps & { id?: string }): React.JS
 				href={props.id === undefined ? undefined : `#${props.id}`}
 				underline="none"
 				onMouseEnter={() => {
-					setHovered(true)
+					setHovered(true);
 				}}
 				onMouseLeave={() => {
-					setHovered(false)
+					setHovered(false);
 				}}
 				onClick={props.onClick}
 				color="inherit"
@@ -30,5 +30,5 @@ export function AnchorHeader(props: TypographyProps & { id?: string }): React.JS
 				) : null}
 			</Link>
 		</Typography>
-	)
+	);
 }

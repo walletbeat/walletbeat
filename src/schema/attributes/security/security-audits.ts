@@ -1,28 +1,28 @@
-import { exampleSecurityAuditor } from '@/data/entities/example'
+import { exampleSecurityAuditor } from '@/data/entities/example';
 import {
 	type Attribute,
 	type Evaluation,
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
-import { mergeRefs } from '@/schema/reference'
-import { type AtLeastOneVariant, Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
-import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
-import { daysSince } from '@/types/date'
-import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits';
+import { mergeRefs } from '@/schema/reference';
+import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
+import { securityAuditsDetailsContent } from '@/types/content/security-audits-details';
+import { daysSince } from '@/types/date';
+import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.security.security_audits'
+const brand = 'attributes.security.security_audits';
 export type SecurityAuditsValue = Value & {
-	securityAudits: SecurityAudit[]
-	__brand: 'attributes.security.security_audits'
-}
+	securityAudits: SecurityAudit[];
+	__brand: 'attributes.security.security_audits';
+};
 
 function noAudits(): Evaluation<SecurityAuditsValue> {
 	return {
@@ -44,7 +44,7 @@ function noAudits(): Evaluation<SecurityAuditsValue> {
 			`,
 		),
 		references: [],
-	}
+	};
 }
 
 function audited(
@@ -72,7 +72,7 @@ function audited(
 						audit.
 					`,
 				),
-			}
+			};
 		}
 		if (!auditedInLastYear) {
 			return {
@@ -89,7 +89,7 @@ function audited(
 						audit.
 					`,
 				),
-			}
+			};
 		}
 		if (hasUnaddressedFlaws) {
 			return {
@@ -108,7 +108,7 @@ function audited(
 						undergoing a new security audit.
 					`,
 				),
-			}
+			};
 		}
 		return {
 			rating: Rating.PASS,
@@ -119,8 +119,8 @@ function audited(
 				`,
 			),
 			howToImprove: undefined,
-		}
-	})()
+		};
+	})();
 	return {
 		value: {
 			id: `audited_${auditedInLastYear}_${hasUnaddressedFlaws}`,
@@ -136,7 +136,7 @@ function audited(
 		}),
 		howToImprove,
 		references: mergeRefs(...audits.map(audit => audit.ref)),
-	}
+	};
 }
 
 const sampleSecurityAudit: SecurityAudit = {
@@ -145,7 +145,7 @@ const sampleSecurityAudit: SecurityAudit = {
 	ref: 'https://example.com/audit.pdf',
 	unpatchedFlaws: 'ALL_FIXED',
 	variantsScope: 'ALL_VARIANTS',
-}
+};
 
 export const securityAudits: Attribute<SecurityAuditsValue> = {
 	id: 'securityAudits',
@@ -240,46 +240,46 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 				sentence('This attribute is not applicable to hardware wallets.'),
 				brand,
 				{ securityAudits: [] },
-			)
+			);
 		}
 
 		if (features.security.publicSecurityAudits === null) {
-			return unrated(securityAudits, brand, { securityAudits: [] })
+			return unrated(securityAudits, brand, { securityAudits: [] });
 		}
 		if (!isNonEmptyArray(features.security.publicSecurityAudits)) {
-			return noAudits()
+			return noAudits();
 		}
-		const audits = features.security.publicSecurityAudits
-		let auditedInLastYear = false
-		let hasUnaddressedFlaws = false
+		const audits = features.security.publicSecurityAudits;
+		let auditedInLastYear = false;
+		let hasUnaddressedFlaws = false;
 		for (const audit of audits) {
 			if (daysSince(audit.auditDate) <= 366) {
-				auditedInLastYear = true
+				auditedInLastYear = true;
 			}
 			if (Array.isArray(audit.unpatchedFlaws)) {
 				for (const flaw of audit.unpatchedFlaws) {
 					if (flaw.presentStatus === 'NOT_FIXED') {
-						hasUnaddressedFlaws = true
+						hasUnaddressedFlaws = true;
 					}
 				}
 			}
 		}
-		return audited(audits, auditedInLastYear, hasUnaddressedFlaws)
+		return audited(audits, auditedInLastYear, hasUnaddressedFlaws);
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsValue>>) => {
-		const worstEvaluation = pickWorstRating<SecurityAuditsValue>(perVariant)
-		const allAudits: SecurityAudit[] = []
-		const auditsIdSet = new Set<string>()
+		const worstEvaluation = pickWorstRating<SecurityAuditsValue>(perVariant);
+		const allAudits: SecurityAudit[] = [];
+		const auditsIdSet = new Set<string>();
 		for (const evaluation of Object.values(perVariant)) {
 			for (const audit of evaluation.value.securityAudits) {
-				const auditId = securityAuditId(audit)
+				const auditId = securityAuditId(audit);
 				if (!auditsIdSet.has(auditId)) {
-					allAudits.push(audit)
-					auditsIdSet.add(auditId)
+					allAudits.push(audit);
+					auditsIdSet.add(auditId);
 				}
 			}
 		}
-		worstEvaluation.value.securityAudits = allAudits
-		return worstEvaluation
+		worstEvaluation.value.securityAudits = allAudits;
+		return worstEvaluation;
 	},
-}
+};

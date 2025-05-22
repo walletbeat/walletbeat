@@ -4,28 +4,28 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 	transactionSubmissionL2Types,
-} from '@/schema/features/self-sovereignty/transaction-submission'
-import { isSupported } from '@/schema/features/support'
-import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
-import { transactionInclusionDetailsContent } from '@/types/content/transaction-inclusion-details'
-import { isNonEmptyArray } from '@/types/utils/non-empty'
+} from '@/schema/features/self-sovereignty/transaction-submission';
+import { isSupported } from '@/schema/features/support';
+import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
+import { transactionInclusionDetailsContent } from '@/types/content/transaction-inclusion-details';
+import { isNonEmptyArray } from '@/types/utils/non-empty';
 
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.self_sovereignty.transaction_inclusion'
+const brand = 'attributes.self_sovereignty.transaction_inclusion';
 export type TransactionInclusionValue = Value & {
-	__brand: 'attributes.self_sovereignty.transaction_inclusion'
-}
+	__brand: 'attributes.self_sovereignty.transaction_inclusion';
+};
 
-export type L1BroadcastSupport = 'NO' | 'SELF_GOSSIP' | 'OWN_NODE'
+export type L1BroadcastSupport = 'NO' | 'SELF_GOSSIP' | 'OWN_NODE';
 
 function transactionSubmissionEvaluation({
 	supportsL1Broadcast,
@@ -34,11 +34,11 @@ function transactionSubmissionEvaluation({
 	unsupportedL2s,
 	references,
 }: {
-	supportsL1Broadcast: L1BroadcastSupport
-	supportAnyL2Transactions: TransactionSubmissionL2Type[]
-	supportForceWithdrawal: TransactionSubmissionL2Type[]
-	unsupportedL2s: TransactionSubmissionL2Type[]
-	references: ReferenceArray
+	supportsL1Broadcast: L1BroadcastSupport;
+	supportAnyL2Transactions: TransactionSubmissionL2Type[];
+	supportForceWithdrawal: TransactionSubmissionL2Type[];
+	unsupportedL2s: TransactionSubmissionL2Type[];
+	references: ReferenceArray;
 }): Evaluation<TransactionInclusionValue> {
 	if (!isNonEmptyArray(supportAnyL2Transactions) && !isNonEmptyArray(supportForceWithdrawal)) {
 		return {
@@ -68,7 +68,7 @@ function transactionSubmissionEvaluation({
 				`,
 			),
 			references,
-		}
+		};
 	}
 	if (supportsL1Broadcast === 'NO') {
 		return {
@@ -100,9 +100,9 @@ function transactionSubmissionEvaluation({
 				`,
 			),
 			references,
-		}
+		};
 	}
-	const valueId = `l1${supportsL1Broadcast.toLowerCase()}_any${[...supportAnyL2Transactions].sort().join('-').toLocaleLowerCase()}_withdrawal${[...supportForceWithdrawal].sort().join('-').toLowerCase()}_no${[...unsupportedL2s].sort().join('-').toLowerCase()}`
+	const valueId = `l1${supportsL1Broadcast.toLowerCase()}_any${[...supportAnyL2Transactions].sort().join('-').toLocaleLowerCase()}_withdrawal${[...supportForceWithdrawal].sort().join('-').toLowerCase()}_no${[...unsupportedL2s].sort().join('-').toLowerCase()}`;
 	if (unsupportedL2s.length > 0) {
 		return {
 			value: {
@@ -130,7 +130,7 @@ function transactionSubmissionEvaluation({
 				`,
 			),
 			references,
-		}
+		};
 	}
 	return {
 		value: {
@@ -152,7 +152,7 @@ function transactionSubmissionEvaluation({
 			unsupportedL2s,
 		}),
 		references,
-	}
+	};
 }
 
 export const transactionInclusion: Attribute<TransactionInclusionValue> = {
@@ -289,13 +289,13 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<TransactionInclusionValue> => {
 		if (features.selfSovereignty.transactionSubmission === null) {
-			return unrated(transactionInclusion, brand, null)
+			return unrated(transactionInclusion, brand, null);
 		}
 		if (
 			features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaDirectGossip === null ||
 			features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaSelfHostedNode === null
 		) {
-			return unrated(transactionInclusion, brand, null)
+			return unrated(transactionInclusion, brand, null);
 		}
 		const supportsL1Broadcast: L1BroadcastSupport = isSupported(
 			features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaDirectGossip,
@@ -305,32 +305,32 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 						features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaSelfHostedNode,
 				  )
 				? 'OWN_NODE'
-				: 'NO'
-		const supportAnyL2Transactions: TransactionSubmissionL2Type[] = []
-		const supportForceWithdrawal: TransactionSubmissionL2Type[] = []
-		const unsupportedL2s: TransactionSubmissionL2Type[] = []
+				: 'NO';
+		const supportAnyL2Transactions: TransactionSubmissionL2Type[] = [];
+		const supportForceWithdrawal: TransactionSubmissionL2Type[] = [];
+		const unsupportedL2s: TransactionSubmissionL2Type[] = [];
 		for (const l2Type of transactionSubmissionL2Types) {
 			if (!Object.hasOwn(features.selfSovereignty.transactionSubmission.l2, l2Type)) {
-				continue
+				continue;
 			}
 
-			const l2 = l2Type
-			const support = features.selfSovereignty.transactionSubmission.l2[l2]
+			const l2 = l2Type;
+			const support = features.selfSovereignty.transactionSubmission.l2[l2];
 			if (support === null) {
-				return unrated(transactionInclusion, brand, null)
+				return unrated(transactionInclusion, brand, null);
 			}
 			if (support === TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT) {
-				continue
+				continue;
 			}
 			switch (support) {
 				case TransactionSubmissionL2Support.SUPPORTED_WITH_FORCE_INCLUSION_OF_ARBITRARY_TRANSACTIONS:
-					supportAnyL2Transactions.push(l2)
+					supportAnyL2Transactions.push(l2);
 				// Fallthrough
 				case TransactionSubmissionL2Support.SUPPORTED_WITH_FORCE_INCLUSION_OF_WITHDRAWALS:
-					supportForceWithdrawal.push(l2)
-					break
+					supportForceWithdrawal.push(l2);
+					break;
 				case TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION:
-					unsupportedL2s.push(l2)
+					unsupportedL2s.push(l2);
 			}
 		}
 		return transactionSubmissionEvaluation({
@@ -342,7 +342,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 				refs(features.selfSovereignty.transactionSubmission.l1),
 				refs(features.selfSovereignty.transactionSubmission.l2),
 			),
-		})
+		});
 	},
 	aggregate: pickWorstRating<TransactionInclusionValue>,
-}
+};

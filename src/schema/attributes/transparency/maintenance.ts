@@ -1,28 +1,28 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
-import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes';
+import { exampleRating } from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type MaintenanceSupport,
 	MaintenanceType,
-} from '@/schema/features/transparency/maintenance'
-import { popRefs } from '@/schema/reference'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/features/transparency/maintenance';
+import { popRefs } from '@/schema/reference';
+import type { AtLeastOneVariant } from '@/schema/variants';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.maintenance'
+const brand = 'attributes.maintenance';
 
 export type MaintenanceValue = Value & {
-	physicalDurability: MaintenanceType
-	mtbfDocumentation: MaintenanceType
-	repairability: MaintenanceType
-	batteryHandling: MaintenanceType
-	warrantyExtensions: MaintenanceType
-	__brand: 'attributes.maintenance'
-}
+	physicalDurability: MaintenanceType;
+	mtbfDocumentation: MaintenanceType;
+	repairability: MaintenanceType;
+	batteryHandling: MaintenanceType;
+	warrantyExtensions: MaintenanceType;
+	__brand: 'attributes.maintenance';
+};
 
 function evaluateMaintenance(features: MaintenanceSupport): Rating {
 	const ratings = [
@@ -31,15 +31,15 @@ function evaluateMaintenance(features: MaintenanceSupport): Rating {
 		features.repairability,
 		features.batteryHandling,
 		features.warrantyExtensions,
-	]
-	const passCount = ratings.filter(r => r === MaintenanceType.PASS).length
+	];
+	const passCount = ratings.filter(r => r === MaintenanceType.PASS).length;
 	if (passCount >= 4) {
-		return Rating.PASS
+		return Rating.PASS;
 	}
 	if (passCount >= 2) {
-		return Rating.PARTIAL
+		return Rating.PARTIAL;
 	}
-	return Rating.FAIL
+	return Rating.FAIL;
 }
 
 export const maintenance: Attribute<MaintenanceValue> = {
@@ -111,9 +111,9 @@ export const maintenance: Attribute<MaintenanceValue> = {
 					batteryHandling: MaintenanceType.FAIL,
 					warrantyExtensions: MaintenanceType.FAIL,
 				},
-			)
+			);
 		}
-		const maintenanceFeature = features.transparency.maintenance
+		const maintenanceFeature = features.transparency.maintenance;
 		if (maintenanceFeature === null) {
 			return unrated(maintenance, brand, {
 				physicalDurability: MaintenanceType.FAIL,
@@ -121,11 +121,11 @@ export const maintenance: Attribute<MaintenanceValue> = {
 				repairability: MaintenanceType.FAIL,
 				batteryHandling: MaintenanceType.FAIL,
 				warrantyExtensions: MaintenanceType.FAIL,
-			})
+			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<MaintenanceSupport>(maintenanceFeature)
-		const rating = evaluateMaintenance(withoutRefs)
+		const { withoutRefs, refs: extractedRefs } = popRefs<MaintenanceSupport>(maintenanceFeature);
+		const rating = evaluateMaintenance(withoutRefs);
 
 		return {
 			value: {
@@ -148,6 +148,6 @@ export const maintenance: Attribute<MaintenanceValue> = {
 					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
 			),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+};

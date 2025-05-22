@@ -4,27 +4,27 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	FOSS,
 	License,
 	licenseIsFOSS,
 	licenseName,
 	type LicenseWithRef,
-} from '@/schema/features/transparency/license'
-import { refs, toFullyQualified } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import { licenseDetailsContent } from '@/types/content/license-details'
+} from '@/schema/features/transparency/license';
+import { refs, toFullyQualified } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
+import { licenseDetailsContent } from '@/types/content/license-details';
 
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.transparency.open_source'
+const brand = 'attributes.transparency.open_source';
 export type OpenSourceValue = Value & {
-	license: License
-	__brand: 'attributes.transparency.open_source'
-}
+	license: License;
+	__brand: 'attributes.transparency.open_source';
+};
 
 function open({ license, ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
 	return {
@@ -44,7 +44,7 @@ function open({ license, ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
 		},
 		details: licenseDetailsContent(),
 		references: toFullyQualified(ref),
-	}
+	};
 }
 
 function openInTheFuture({ license, ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
@@ -65,7 +65,7 @@ function openInTheFuture({ license, ref }: LicenseWithRef): Evaluation<OpenSourc
 		},
 		details: licenseDetailsContent(),
 		references: toFullyQualified(ref),
-	}
+	};
 }
 
 function proprietary({ ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
@@ -96,7 +96,7 @@ function proprietary({ ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
 			`,
 		),
 		references: toFullyQualified(ref),
-	}
+	};
 }
 
 const unlicensed: Evaluation<OpenSourceValue> = {
@@ -133,7 +133,7 @@ const unlicensed: Evaluation<OpenSourceValue> = {
 		`,
 	),
 	references: [],
-}
+};
 
 export const openSource: Attribute<OpenSourceValue> = {
 	id: 'openSource',
@@ -202,30 +202,30 @@ export const openSource: Attribute<OpenSourceValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<OpenSourceValue> => {
 		if (features.license === null) {
-			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE })
+			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE });
 		}
-		const license = features.license.license
-		const references = refs(features.license)
+		const license = features.license.license;
+		const references = refs(features.license);
 		if (license === License.UNLICENSED_VISIBLE) {
-			return { references, ...unlicensed }
+			return { references, ...unlicensed };
 		}
 		switch (licenseIsFOSS(license)) {
 			case FOSS.FOSS:
 				return {
 					references,
 					...open(features.license),
-				}
+				};
 			case FOSS.FUTURE_FOSS:
 				return {
 					references,
 					...openInTheFuture(features.license),
-				}
+				};
 			case FOSS.NOT_FOSS:
 				return {
 					references,
 					...proprietary(features.license),
-				}
+				};
 		}
 	},
 	aggregate: pickWorstRating<OpenSourceValue>,
-}
+};

@@ -1,10 +1,10 @@
-import { Divider, Link, styled, Typography } from '@mui/material'
-import Tooltip, { tooltipClasses, type TooltipProps } from '@mui/material/Tooltip'
-import React, { useState } from 'react'
+import { Divider, Link, styled, Typography } from '@mui/material';
+import Tooltip, { tooltipClasses, type TooltipProps } from '@mui/material/Tooltip';
+import React, { useState } from 'react';
 
-import { type Eip, eipEthereumDotOrgUrl, eipLabel, eipShortLabel } from '@/schema/eips'
+import { type Eip, eipEthereumDotOrgUrl, eipLabel, eipShortLabel } from '@/schema/eips';
 
-import { MarkdownBox } from './MarkdownBox'
+import { MarkdownBox } from './MarkdownBox';
 
 const EipTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -12,16 +12,16 @@ const EipTooltip = styled(({ className, ...props }: TooltipProps) => (
 	[`& .${tooltipClasses.tooltip}`]: {
 		minWidth: '400px',
 	},
-})
+});
 
 export function EipLink({
 	eip,
 	format,
 }: {
-	eip: Eip
-	format: 'SHORT' | 'LONG'
+	eip: Eip;
+	format: 'SHORT' | 'LONG';
 }): React.JSX.Element {
-	const [hovered, setHovered] = useState(false)
+	const [hovered, setHovered] = useState(false);
 
 	return (
 		<EipTooltip
@@ -99,10 +99,10 @@ export function EipLink({
 				alignItems="baseline"
 				underline="none"
 				onMouseEnter={() => {
-					setHovered(true)
+					setHovered(true);
 				}}
 				onMouseLeave={() => {
-					setHovered(false)
+					setHovered(false);
 				}}
 				sx={{
 					color: 'var(--accent)',
@@ -113,5 +113,5 @@ export function EipLink({
 				{format === 'SHORT' ? eipShortLabel(eip) : eipLabel(eip)}
 			</Link>
 		</EipTooltip>
-	)
+	);
 }

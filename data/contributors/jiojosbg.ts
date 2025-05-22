@@ -1,6 +1,6 @@
-import type { Contributor } from '@/schema/wallet'
+import type { Contributor } from '@/schema/wallet';
 
-import { ambireEntity } from '../entities/ambire'
+import { ambireEntity } from '../entities/ambire';
 
 export const jiojosbg: Contributor = {
 	name: 'JIOjoBG',
@@ -12,4 +12,4 @@ export const jiojosbg: Contributor = {
 		},
 	],
 	url: 'https://x.com/josifhamed',
-}
+};

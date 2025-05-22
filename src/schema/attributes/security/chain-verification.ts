@@ -4,30 +4,30 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { isSupported, type Support } from '@/schema/features/support'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { isSupported, type Support } from '@/schema/features/support';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
+import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details';
+import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty';
 
 import {
 	EthereumL1LightClient,
 	type EthereumL1LightClientSupport,
-} from '../../features/security/light-client'
+} from '../../features/security/light-client';
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
-} from '../../features/self-sovereignty/chain-configurability'
-import { type FullyQualifiedReference, popRefs } from '../../reference'
-import { exempt, pickWorstRating, unrated } from '../common'
+} from '../../features/self-sovereignty/chain-configurability';
+import { type FullyQualifiedReference, popRefs } from '../../reference';
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.security.chain_verification'
+const brand = 'attributes.security.chain_verification';
 export type ChainVerificationValue = Value & {
-	__brand: 'attributes.security.chain_verification'
-}
+	__brand: 'attributes.security.chain_verification';
+};
 
 function supportsChainVerification(
 	lightClients: NonEmptyArray<EthereumL1LightClient>,
@@ -48,7 +48,7 @@ function supportsChainVerification(
 		},
 		details: chainVerificationDetailsContent({ lightClients, refs }),
 		references: refs,
-	}
+	};
 }
 
 function noChainVerification(
@@ -68,10 +68,10 @@ function noChainVerification(
 			__brand: brand,
 		},
 		details: markdown(({ wallet }) => {
-			const l1Configurability = chainConfigurability?.l1RpcEndpoint ?? RpcEndpointConfiguration.NO
+			const l1Configurability = chainConfigurability?.l1RpcEndpoint ?? RpcEndpointConfiguration.NO;
 			const canConfigureL1 =
 				l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
-				l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
+				l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS;
 			return `
 					${wallet.metadata.displayName} does not verify the integrity of the
 					Ethereum L1 blockchain when retrieving chain state or simulating
@@ -85,7 +85,7 @@ function noChainVerification(
 					`
 							: ''
 					}
-				`
+				`;
 		}),
 		howToImprove: mdParagraph(
 			({ wallet }) => `
@@ -95,7 +95,7 @@ function noChainVerification(
 			`,
 		),
 		references: [],
-	}
+	};
 }
 
 export const chainVerification: Attribute<ChainVerificationValue> = {
@@ -158,29 +158,31 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 				sentence('This attribute is not applicable for hardware wallets.'),
 				brand,
 				null,
-			)
+			);
 		}
 
-		const l1Client = features.security.lightClient.ethereumL1
+		const l1Client = features.security.lightClient.ethereumL1;
 		if (l1Client === null) {
-			return unrated(chainVerification, brand, null)
+			return unrated(chainVerification, brand, null);
 		}
 		if (!isSupported(l1Client)) {
-			return noChainVerification(features.chainConfigurability)
+			return noChainVerification(features.chainConfigurability);
 		}
-		const { withoutRefs, refs } = popRefs<EthereumL1LightClientSupport>(l1Client)
-		const supportedLightClients: EthereumL1LightClient[] = []
+		const { withoutRefs, refs } = popRefs<EthereumL1LightClientSupport>(l1Client);
+		const supportedLightClients: EthereumL1LightClient[] = [];
 		for (const [lightClient, supported] of nonEmptyEntries<EthereumL1LightClient, Support>(
 			withoutRefs,
 		)) {
 			if (isSupported(supported)) {
-				supportedLightClients.push(lightClient)
+				supportedLightClients.push(lightClient);
 			}
 		}
 		if (!isNonEmptyArray(supportedLightClients)) {
-			throw new Error('No supported light clients found; this should be impossible per type system')
+			throw new Error(
+				'No supported light clients found; this should be impossible per type system',
+			);
 		}
-		return supportsChainVerification(supportedLightClients, refs)
+		return supportsChainVerification(supportedLightClients, refs);
 	},
 	aggregate: pickWorstRating<ChainVerificationValue>,
-}
+};

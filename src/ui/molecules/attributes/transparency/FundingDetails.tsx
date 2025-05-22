@@ -1,16 +1,16 @@
-import type React from 'react'
+import type React from 'react';
 
-import { subsectionWeight } from '@/components/constants'
+import { subsectionWeight } from '@/components/constants';
 import {
 	monetizationStrategies,
 	monetizationStrategyName,
-} from '@/schema/features/transparency/monetization'
-import { refs } from '@/schema/reference'
-import type { FundingDetailsProps } from '@/types/content/funding-details'
+} from '@/schema/features/transparency/monetization';
+import { refs } from '@/schema/reference';
+import type { FundingDetailsProps } from '@/types/content/funding-details';
 
-import { JoinedList } from '../../../atoms/JoinedList'
-import { ReferenceList } from '../../../atoms/ReferenceList'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
+import { JoinedList } from '../../../atoms/JoinedList';
+import { ReferenceList } from '../../../atoms/ReferenceList';
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
 
 export function FundingDetails({
 	wallet,
@@ -19,8 +19,8 @@ export function FundingDetails({
 }: FundingDetailsProps): React.JSX.Element {
 	const strategies = monetizationStrategies(monetization)
 		.filter(({ value }) => value === true)
-		.map(({ strategy }) => strategy)
-	const ref = refs(monetization)
+		.map(({ strategy }) => strategy);
+	const ref = refs(monetization);
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			<div style={{ fontWeight: subsectionWeight }}>
@@ -34,5 +34,5 @@ export function FundingDetails({
 				. <ReferenceList ref={ref} ulStyle={{ paddingLeft: '1.5rem', marginBottom: '0px' }} />
 			</div>
 		</WrapRatingIcon>
-	)
+	);
 }

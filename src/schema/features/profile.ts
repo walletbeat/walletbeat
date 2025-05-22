@@ -49,21 +49,21 @@ export interface HardwareWalletModel {
 	/**
 	 * Unique identifier for this model
 	 */
-	id: string
+	id: string;
 
 	/**
 	 * Display name of the hardware wallet model
 	 */
-	name: string
+	name: string;
 
 	/**
 	 * URL to the product page
 	 */
-	url: string
+	url: string;
 
 	/**
 	 * Whether this model is the flagship product
 	 * The flagship will be displayed by default when viewing wallet details
 	 */
-	isFlagship: boolean
+	isFlagship: boolean;
 }

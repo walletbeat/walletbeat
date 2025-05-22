@@ -4,19 +4,19 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { type ReferenceArray, refs } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { type ReferenceArray, refs } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { RpcEndpointConfiguration } from '../../features/self-sovereignty/chain-configurability'
-import { pickWorstRating, unrated } from '../common'
+import { RpcEndpointConfiguration } from '../../features/self-sovereignty/chain-configurability';
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.self_sovereignty.self_hosted_node'
+const brand = 'attributes.self_sovereignty.self_hosted_node';
 export type SelfHostedNodeValue = Value & {
-	__brand: 'attributes.self_sovereignty.self_hosted_node'
-}
+	__brand: 'attributes.self_sovereignty.self_hosted_node';
+};
 
 function supportsSelfHostedNode(references: ReferenceArray): Evaluation<SelfHostedNodeValue> {
 	return {
@@ -40,7 +40,7 @@ function supportsSelfHostedNode(references: ReferenceArray): Evaluation<SelfHost
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function supportsSelfHostedNodeAfterRequests(
@@ -75,7 +75,7 @@ function supportsSelfHostedNodeAfterRequests(
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function customChainOnly(references: ReferenceArray): Evaluation<SelfHostedNodeValue> {
@@ -106,7 +106,7 @@ function customChainOnly(references: ReferenceArray): Evaluation<SelfHostedNodeV
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function noSelfHostedNode(references: ReferenceArray): Evaluation<SelfHostedNodeValue> {
@@ -137,7 +137,7 @@ function noSelfHostedNode(references: ReferenceArray): Evaluation<SelfHostedNode
 			`,
 		),
 		references,
-	}
+	};
 }
 
 export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
@@ -218,25 +218,25 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SelfHostedNodeValue> => {
 		if (features.chainConfigurability === null) {
-			return unrated(selfHostedNode, brand, null)
+			return unrated(selfHostedNode, brand, null);
 		}
-		const allRefs = refs(features.chainConfigurability)
+		const allRefs = refs(features.chainConfigurability);
 		if (
 			features.chainConfigurability.l1RpcEndpoint ===
 			RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST
 		) {
-			return supportsSelfHostedNode(allRefs)
+			return supportsSelfHostedNode(allRefs);
 		}
 		if (
 			features.chainConfigurability.l1RpcEndpoint ===
 			RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
 		) {
-			return supportsSelfHostedNodeAfterRequests(allRefs)
+			return supportsSelfHostedNodeAfterRequests(allRefs);
 		}
 		if (features.chainConfigurability.customChains) {
-			return customChainOnly(allRefs)
+			return customChainOnly(allRefs);
 		}
-		return noSelfHostedNode(allRefs)
+		return noSelfHostedNode(allRefs);
 	},
 	aggregate: pickWorstRating<SelfHostedNodeValue>,
-}
+};

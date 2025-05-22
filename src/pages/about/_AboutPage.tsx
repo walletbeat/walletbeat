@@ -1,8 +1,8 @@
-import ForumIcon from '@mui/icons-material/Forum'
-import GitHubIcon from '@mui/icons-material/GitHub'
-import HelpCenterIcon from '@mui/icons-material/HelpCenter'
-import { Divider, Typography } from '@mui/material'
-import type React from 'react'
+import ForumIcon from '@mui/icons-material/Forum';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import HelpCenterIcon from '@mui/icons-material/HelpCenter';
+import { Divider, Typography } from '@mui/material';
+import type React from 'react';
 
 import {
 	navigationAbout,
@@ -10,11 +10,11 @@ import {
 	navigationFarcasterChannel,
 	navigationHome,
 	navigationRepository,
-} from '@/components/navigation'
-import { betaSiteRoot } from '@/constants'
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { ExternalLink } from '@/ui/atoms/ExternalLink'
-import { IconLink } from '@/ui/atoms/IconLink'
+} from '@/components/navigation';
+import { betaSiteRoot } from '@/constants';
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
+import { ExternalLink } from '@/ui/atoms/ExternalLink';
+import { IconLink } from '@/ui/atoms/IconLink';
 
 function AboutContents(): React.JSX.Element {
 	return (
@@ -151,7 +151,7 @@ function AboutContents(): React.JSX.Element {
 				!
 			</Typography>
 		</>
-	)
+	);
 }
 
 export function AboutPage(): React.JSX.Element {
@@ -200,5 +200,5 @@ export function AboutPage(): React.JSX.Element {
 				</div>
 			</div>
 		</NavigationPageLayout>
-	)
+	);
 }

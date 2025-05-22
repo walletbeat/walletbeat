@@ -1,6 +1,6 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
-import type { Support } from '../support'
+import type { Support } from '../support';
 
 /** L2 types considered for transaction submission. */
 export enum TransactionSubmissionL2Type {
@@ -11,15 +11,15 @@ export enum TransactionSubmissionL2Type {
 export const transactionSubmissionL2Types: TransactionSubmissionL2Type[] = [
 	TransactionSubmissionL2Type.arbitrum,
 	TransactionSubmissionL2Type.opStack,
-]
+];
 
 /** Human-friendly name for an L2 type. */
 export function transactionSubmissionL2TypeName(l2Type: TransactionSubmissionL2Type): string {
 	switch (l2Type) {
 		case TransactionSubmissionL2Type.arbitrum:
-			return 'Arbitrum'
+			return 'Arbitrum';
 		case TransactionSubmissionL2Type.opStack:
-			return 'OP Stack'
+			return 'OP Stack';
 	}
 }
 
@@ -56,7 +56,7 @@ export interface TransactionSubmission {
 		 * Whether the wallet is able to self-broadcast by acting as its own
 		 * gossipping node in the Ethereum L1.
 		 */
-		selfBroadcastViaDirectGossip: Support | null
+		selfBroadcastViaDirectGossip: Support | null;
 
 		/**
 		 * Whether the wallet is able to self-broadcast when configured to use
@@ -66,9 +66,9 @@ export interface TransactionSubmission {
 		 * otherwise use a user's self-hosted node, so this needs explicit
 		 * verification.
 		 */
-		selfBroadcastViaSelfHostedNode: Support | null
-	}>
+		selfBroadcastViaSelfHostedNode: Support | null;
+	}>;
 
 	/** Options for broadcasting transactions to L2 chains. */
-	l2: WithRef<Record<TransactionSubmissionL2Type, TransactionSubmissionL2Support | null>>
+	l2: WithRef<Record<TransactionSubmissionL2Type, TransactionSubmissionL2Support | null>>;
 }

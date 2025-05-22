@@ -5,26 +5,26 @@ import {
 	exampleRatingUnimplemented,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type Monetization,
 	monetizationStrategies,
 	type MonetizationStrategy,
 	monetizationStrategyIsUserAligned,
 	monetizationStrategyName,
-} from '@/schema/features/transparency/monetization'
-import { toFullyQualified } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
-import { fundingDetailsContent } from '@/types/content/funding-details'
+} from '@/schema/features/transparency/monetization';
+import { toFullyQualified } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
+import { fundingDetailsContent } from '@/types/content/funding-details';
 
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.transparency.funding'
+const brand = 'attributes.transparency.funding';
 export type FundingValue = Value & {
-	__brand: 'attributes.transparency.funding'
-}
+	__brand: 'attributes.transparency.funding';
+};
 
 /** Funding is transparent and at least partially non-extractive. */
 function transparent(
@@ -46,7 +46,7 @@ function transparent(
 		},
 		details: fundingDetailsContent({ monetization }),
 		references: toFullyQualified(monetization.ref),
-	}
+	};
 }
 
 /** Funding is entirely extractive. */
@@ -78,7 +78,7 @@ function extractive(
 			`,
 		),
 		references: toFullyQualified(monetization.ref),
-	}
+	};
 }
 
 /** Wallet has no funding. */
@@ -109,7 +109,7 @@ const noFunding: Evaluation<FundingValue> = {
 		`,
 	),
 	references: [],
-}
+};
 
 /** Funding is not transparent. */
 const unclear: Evaluation<FundingValue> = {
@@ -136,7 +136,7 @@ const unclear: Evaluation<FundingValue> = {
 		`,
 	),
 	references: [],
-}
+};
 
 /**
  * Funding encodes the transparency and user-alignment of the monetization
@@ -278,31 +278,31 @@ export const funding: Attribute<FundingValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<FundingValue> => {
 		if (features.monetization === null) {
-			return unrated(funding, brand, null)
+			return unrated(funding, brand, null);
 		}
-		const strategies: MonetizationStrategy[] = []
+		const strategies: MonetizationStrategy[] = [];
 		for (const { strategy, value } of monetizationStrategies(features.monetization)) {
 			switch (value) {
 				case null:
-					return unrated(funding, brand, null)
+					return unrated(funding, brand, null);
 				case true:
-					strategies.push(strategy)
-					break
+					strategies.push(strategy);
+					break;
 				case false:
-					break // Do nothing.
+					break; // Do nothing.
 			}
 		}
-		const numStrategies = strategies.length
+		const numStrategies = strategies.length;
 		if (numStrategies === 0) {
-			return unclear
+			return unclear;
 		}
-		const extractiveStrategies = []
-		const userAlignedStrategies = []
+		const extractiveStrategies = [];
+		const userAlignedStrategies = [];
 		for (const strategy of strategies) {
 			if (monetizationStrategyIsUserAligned(strategy)) {
-				userAlignedStrategies.push(strategy)
+				userAlignedStrategies.push(strategy);
 			} else {
-				extractiveStrategies.push(strategy)
+				extractiveStrategies.push(strategy);
 			}
 		}
 		if (!features.monetization.revenueBreakdownIsPublic && extractiveStrategies.length > 0) {
@@ -311,18 +311,18 @@ export const funding: Attribute<FundingValue> = {
 					extractiveStrategies[0],
 					monetizationStrategyName(extractiveStrategies[0]),
 					features.monetization,
-				)
+				);
 			}
-			return extractive('multi', '', features.monetization)
+			return extractive('multi', '', features.monetization);
 		}
 		if (numStrategies === 1) {
 			return transparent(
 				strategies[0],
 				monetizationStrategyName(strategies[0]),
 				features.monetization,
-			)
+			);
 		}
-		return transparent('multi', 'Multiple sources', features.monetization)
+		return transparent('multi', 'Multiple sources', features.monetization);
 	},
 	aggregate: pickWorstRating<FundingValue>,
-}
+};

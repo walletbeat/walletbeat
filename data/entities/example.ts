@@ -5,7 +5,7 @@ import type {
 	SecurityAuditor,
 	TransactionBroadcastProvider,
 	WalletDeveloper,
-} from '@/schema/entity'
+} from '@/schema/entity';
 
 export const exampleNodeCompany: CorporateEntity &
 	ChainDataProvider &
@@ -32,7 +32,7 @@ export const exampleNodeCompany: CorporateEntity &
 	repoUrl: 'https://github.com/example-node-company',
 	twitter: { type: 'NO_TWITTER_URL' },
 	url: 'https://example.com/',
-}
+};
 
 export const exampleSecurityAuditor: CorporateEntity & SecurityAuditor = {
 	id: 'exampleSecurityAuditor',
@@ -57,7 +57,7 @@ export const exampleSecurityAuditor: CorporateEntity & SecurityAuditor = {
 	repoUrl: 'https://github.com/example-security-auditor',
 	twitter: { type: 'NO_TWITTER_URL' },
 	url: 'https://example.com/',
-}
+};
 
 export const exampleCex: CorporateEntity & Exchange = {
 	id: 'exampleCex',
@@ -82,7 +82,7 @@ export const exampleCex: CorporateEntity & Exchange = {
 	repoUrl: 'https://github.com/example-centralized-exchange',
 	twitter: { type: 'NO_TWITTER_URL' },
 	url: 'https://example.com/',
-}
+};
 
 export const exampleWalletDevelopmentCompany: CorporateEntity & WalletDeveloper = {
 	id: 'exampleWalletDevelopmentCompany',
@@ -107,4 +107,4 @@ export const exampleWalletDevelopmentCompany: CorporateEntity & WalletDeveloper 
 	repoUrl: 'https://github.com/example-wallet-company',
 	twitter: { type: 'NO_TWITTER_URL' },
 	url: 'https://example.com/',
-}
+};

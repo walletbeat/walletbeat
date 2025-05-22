@@ -1,4 +1,4 @@
-import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
+import type { CorporateEntity, WalletDeveloper } from '@/schema/entity';
 
 export const ledger: CorporateEntity & WalletDeveloper = {
 	id: 'ledger',
@@ -25,4 +25,4 @@ export const ledger: CorporateEntity & WalletDeveloper = {
 	repoUrl: 'https://github.com/LedgerHQ/',
 	twitter: 'https://x.com/Ledger',
 	url: 'https://www.ledger.com/',
-}
+};

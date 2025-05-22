@@ -1,4 +1,4 @@
-import type { WithRef } from '../../reference'
+import type { WithRef } from '../../reference';
 
 /**
  * Customization options for each chain.
@@ -35,13 +35,13 @@ export enum RpcEndpointConfiguration {
  */
 export type ChainConfigurability = WithRef<{
 	/** Can set a custom RPC endpoint address for L1. */
-	l1RpcEndpoint: RpcEndpointConfiguration
+	l1RpcEndpoint: RpcEndpointConfiguration;
 
 	/**
 	 * Can override the RPC endpoint for built-in chains other than L1.
 	 */
-	otherRpcEndpoints: RpcEndpointConfiguration
+	otherRpcEndpoints: RpcEndpointConfiguration;
 
 	/** Can add custom chains. */
-	customChains: boolean
-}>
+	customChains: boolean;
+}>;

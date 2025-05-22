@@ -1,24 +1,24 @@
-import GitHubIcon from '@mui/icons-material/GitHub'
-import LanguageIcon from '@mui/icons-material/Language'
-import { Typography } from '@mui/material'
-import { type FC, Fragment } from 'react'
-import React from 'react'
+import LanguageIcon from '@mui/icons-material/Language';
+import { Typography } from '@mui/material';
+import { type FC, Fragment } from 'react';
+import React from 'react';
+import { LuGithub } from 'react-icons/lu';
 
-import { variantToName, variantToRunsOn } from '@/components/variants'
-import { HardwareIcon } from '@/icons/devices/HardwareIcon'
-import { hasVariant, Variant } from '@/schema/variants'
-import type { RatedWallet } from '@/schema/wallet'
-import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
-import { commaListPrefix } from '@/types/utils/text'
-import { ExternalLink } from '@/ui/atoms/ExternalLink'
-import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
+import { variantToName, variantToRunsOn } from '@/components/variants';
+import { HardwareIcon } from '@/icons/devices/HardwareIcon';
+import { hasVariant, Variant } from '@/schema/variants';
+import type { RatedWallet } from '@/schema/wallet';
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty';
+import { commaListPrefix } from '@/types/utils/text';
+import { ExternalLink } from '@/ui/atoms/ExternalLink';
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent';
 
 export const WalletHeading: FC<{
-	wallet: RatedWallet
-	pickedVariant: Variant | null
-	singleVariant: Variant | null
+	wallet: RatedWallet;
+	pickedVariant: Variant | null;
+	singleVariant: Variant | null;
 }> = ({ wallet, pickedVariant, singleVariant }) => {
-	const needsVariantFiltering = singleVariant === null
+	const needsVariantFiltering = singleVariant === null;
 
 	return (
 		<div data-testid="wallet-blurb" className="break-words whitespace-normal">
@@ -34,7 +34,7 @@ export const WalletHeading: FC<{
 					</div>,
 					wallet.metadata.repoUrl !== null ? (
 						<div className="flex flex-row gap-2 items-center" key="repo">
-							<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+							<LuGithub />
 							<ExternalLink
 								url={wallet.metadata.repoUrl}
 								defaultLabel="GitHub Repository"
@@ -99,5 +99,5 @@ export const WalletHeading: FC<{
 				)}
 			</Typography>
 		</div>
-	)
-}
+	);
+};

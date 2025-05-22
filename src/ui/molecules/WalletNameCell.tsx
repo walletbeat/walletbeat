@@ -1,31 +1,31 @@
-import BlockIcon from '@mui/icons-material/Block'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import UnfoldLessIcon from '@mui/icons-material/UnfoldLess'
-import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore'
-import { Link, Typography } from '@mui/material'
-import type React from 'react'
+import BlockIcon from '@mui/icons-material/Block';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
+import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import { Link, Typography } from '@mui/material';
+import type React from 'react';
 
-import { betaSiteRoot } from '@/constants'
-import type { Variant } from '@/schema/variants'
-import type { ResolvedWallet } from '@/schema/wallet'
-import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
+import { betaSiteRoot } from '@/constants';
+import type { Variant } from '@/schema/variants';
+import type { ResolvedWallet } from '@/schema/wallet';
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty';
 
-import { expandedRowHeight, shortRowHeight } from '../../components/constants'
-import theme from '../../components/ThemeRegistry/theme'
-import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../components/variants'
-import { ExternalLink } from '../atoms/ExternalLink'
-import { IconButton } from '../atoms/IconButton'
-import { IconLink } from '../atoms/IconLink'
-import { RenderTypographicContent } from '../atoms/RenderTypographicContent'
-import { Tooltip } from '../atoms/Tooltip'
-import { type PickableVariant, VariantPicker } from '../atoms/VariantPicker'
-import { WalletIcon } from '../atoms/WalletIcon'
-import type { WalletRowStateHandle } from '../WalletTableState'
+import { expandedRowHeight, shortRowHeight } from '../../components/constants';
+import theme from '../../components/ThemeRegistry/theme';
+import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../components/variants';
+import { ExternalLink } from '../atoms/ExternalLink';
+import { IconButton } from '../atoms/IconButton';
+import { IconLink } from '../atoms/IconLink';
+import { RenderTypographicContent } from '../atoms/RenderTypographicContent';
+import { Tooltip } from '../atoms/Tooltip';
+import { type PickableVariant, VariantPicker } from '../atoms/VariantPicker';
+import { WalletIcon } from '../atoms/WalletIcon';
+import type { WalletRowStateHandle } from '../WalletTableState';
 
-const walletIconSize = shortRowHeight * 0.5
+const walletIconSize = shortRowHeight * 0.5;
 
 function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element {
-	const Icon = variantToIcon(variant)
+	const Icon = variantToIcon(variant);
 	return (
 		<Tooltip content={`No ${variant} version`}>
 			<div className="flex items-center justify-center relative">
@@ -45,7 +45,7 @@ function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element
 				/>
 			</div>
 		</Tooltip>
-	)
+	);
 }
 
 /** The first column's cell in the wallet comparison table. */
@@ -60,10 +60,10 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 					? 'Remove version filter'
 					: variantToTooltip(row.wallet.variants, variant),
 			click: () => {
-				row.table.variantClick(variant)
+				row.table.variantClick(variant);
 			},
 		}),
-	)
+	);
 	return (
 		<div className="flex flex-col justify-start items-start">
 			<div
@@ -186,5 +186,5 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 				</div>
 			) : null}
 		</div>
-	)
+	);
 }

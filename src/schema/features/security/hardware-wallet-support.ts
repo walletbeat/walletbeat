@@ -1,5 +1,5 @@
-import type { Support } from '@/schema/features/support'
-import type { WithRef } from '@/schema/reference'
+import type { Support } from '@/schema/features/support';
+import type { WithRef } from '@/schema/reference';
 
 /**
  * Types of hardware wallets that can be supported
@@ -21,5 +21,5 @@ export type HardwareWalletSupport = WithRef<{
 	/**
 	 * Record of hardware wallet types and their support status
 	 */
-	supportedWallets: Partial<Record<HardwareWalletType, Support>>
-}>
+	supportedWallets: Partial<Record<HardwareWalletType, Support>>;
+}>;

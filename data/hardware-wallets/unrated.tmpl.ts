@@ -1,9 +1,9 @@
-import { WalletProfile } from '@/schema/features/profile'
-import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { WalletProfile } from '@/schema/features/profile';
+import { Variant } from '@/schema/variants';
+import type { HardwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { exampleContributor } from '../contributors/example'
+import { exampleContributor } from '../contributors/example';
 
 export const unratedHardwareTemplate: HardwareWallet = {
 	metadata: {
@@ -73,4 +73,4 @@ export const unratedHardwareTemplate: HardwareWallet = {
 	variants: {
 		[Variant.HARDWARE]: true,
 	},
-}
+};

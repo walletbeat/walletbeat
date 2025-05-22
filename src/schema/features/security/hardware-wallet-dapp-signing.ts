@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 /**
  * Types of clear signing support levels
@@ -17,11 +17,11 @@ export interface HardwareWalletDappSigningSupport {
 	/**
 	 * The level of clear signing support
 	 */
-	level: DappSigningLevel
+	level: DappSigningLevel;
 	/**
 	 * Additional details about the clear signing implementation
 	 */
-	details?: string
+	details?: string;
 }
 
-export type HardwareWalletDappSigningImplementation = WithRef<HardwareWalletDappSigningSupport>
+export type HardwareWalletDappSigningImplementation = WithRef<HardwareWalletDappSigningSupport>;

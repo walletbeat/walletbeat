@@ -4,39 +4,39 @@ import {
 	type ExemptEvaluation,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { HardwareWalletManufactureType } from '@/schema/features/profile'
+} from '@/schema/attributes';
+import { exampleRating } from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { HardwareWalletManufactureType } from '@/schema/features/profile';
 import {
 	type SupplyChainDIYSupport,
 	SupplyChainDIYType,
-} from '@/schema/features/security/supply-chain-diy'
-import { popRefs } from '@/schema/reference'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/features/security/supply-chain-diy';
+import { popRefs } from '@/schema/reference';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.supply_chain_diy'
+const brand = 'attributes.supply_chain_diy';
 
 export type SupplyChainDIYValue = Value & {
-	diyNoNda: SupplyChainDIYType
-	componentSourcingComplexity: SupplyChainDIYType
-	__brand: 'attributes.supply_chain_diy'
-}
+	diyNoNda: SupplyChainDIYType;
+	componentSourcingComplexity: SupplyChainDIYType;
+	__brand: 'attributes.supply_chain_diy';
+};
 
 function evaluateSupplyChainDIY(features: SupplyChainDIYSupport): Rating {
-	const ratings = [features.diyNoNda, features.componentSourcingComplexity]
-	const passCount = ratings.filter(r => r === SupplyChainDIYType.PASS).length
+	const ratings = [features.diyNoNda, features.componentSourcingComplexity];
+	const passCount = ratings.filter(r => r === SupplyChainDIYType.PASS).length;
 	if (passCount === 2) {
-		return Rating.PASS
+		return Rating.PASS;
 	}
 	if (passCount === 1) {
-		return Rating.PARTIAL
+		return Rating.PARTIAL;
 	}
-	return Rating.FAIL
+	return Rating.FAIL;
 }
 
 export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
@@ -104,9 +104,9 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 					diyNoNda: SupplyChainDIYType.FAIL,
 					componentSourcingComplexity: SupplyChainDIYType.FAIL,
 				},
-			)
+			);
 		}
-		return null
+		return null;
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainDIYValue> => {
 		if (features.variant !== Variant.HARDWARE) {
@@ -121,19 +121,19 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 					diyNoNda: SupplyChainDIYType.FAIL,
 					componentSourcingComplexity: SupplyChainDIYType.FAIL,
 				},
-			)
+			);
 		}
 
-		const diyFeature = features.security.supplyChainDIY
+		const diyFeature = features.security.supplyChainDIY;
 		if (diyFeature === null) {
 			return unrated(supplyChainDIY, brand, {
 				diyNoNda: SupplyChainDIYType.FAIL,
 				componentSourcingComplexity: SupplyChainDIYType.FAIL,
-			})
+			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<SupplyChainDIYSupport>(diyFeature)
-		const rating = evaluateSupplyChainDIY(withoutRefs)
+		const { withoutRefs, refs: extractedRefs } = popRefs<SupplyChainDIYSupport>(diyFeature);
+		const rating = evaluateSupplyChainDIY(withoutRefs);
 
 		return {
 			value: {
@@ -156,6 +156,6 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
 			),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+};

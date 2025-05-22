@@ -1,19 +1,20 @@
-import type React from 'react'
-import { LuCpu, LuKey, LuWallet } from 'react-icons/lu'
+import type React from 'react';
+import { LuCpu, LuKey, LuWallet } from 'react-icons/lu';
 
-import { navigationAbout } from '@/components/navigation'
-import { representativeWalletForType } from '@/data/wallets'
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+import { navigationAbout } from '@/components/navigation';
+import { allRatedWallets, representativeWalletForType } from '@/data/wallets';
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
 import {
 	getAttributeGroupById,
 	getAttributeGroupInTree,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
-} from '@/schema/attribute-groups'
-import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
-import { RenderContent } from '@/ui/atoms/RenderContent'
-import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
-import type { NavigationGroup } from '@/ui/organisms/Navigation'
+} from '@/schema/attribute-groups';
+import type { RatedWallet } from '@/schema/wallet';
+import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types';
+import { RenderContent } from '@/ui/atoms/RenderContent';
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent';
+import type { NavigationGroup } from '@/ui/organisms/Navigation';
 
 export const walletNavigationGroups: NavigationGroup[] = Object.values(
 	mapWalletTypes(
@@ -24,21 +25,21 @@ export const walletNavigationGroups: NavigationGroup[] = Object.values(
 					title: ((): string => {
 						switch (walletType) {
 							case WalletType.SOFTWARE:
-								return 'Wallets'
+								return 'Wallets';
 							case WalletType.HARDWARE:
-								return 'Hardware Wallets'
+								return 'Hardware Wallets';
 							case WalletType.EMBEDDED:
-								return 'Embedded Wallets'
+								return 'Embedded Wallets';
 						}
 					})(),
 					icon: ((): React.ReactNode => {
 						switch (walletType) {
 							case WalletType.SOFTWARE:
-								return <LuWallet />
+								return <LuWallet />;
 							case WalletType.HARDWARE:
-								return <LuKey />
+								return <LuKey />;
 							case WalletType.EMBEDDED:
-								return <LuCpu />
+								return <LuCpu />;
 						}
 					})(),
 					href: `/${walletTypeToUrlSlug(walletType)}`,
@@ -63,7 +64,7 @@ export const walletNavigationGroups: NavigationGroup[] = Object.values(
 			overflow: false,
 		}),
 	),
-)
+);
 
 export function getStaticPathsForWalletType(walletType: WalletType) {
 	return (): Array<{ params: { attrGroupId: string } }> =>
@@ -74,22 +75,29 @@ export function getStaticPathsForWalletType(walletType: WalletType) {
 					attrGroupId: attrGroup.id,
 				},
 			}),
-		)
+		);
 }
 
 export function CriteriaPage({
 	walletType,
 	attrGroupId,
 }: {
-	walletType: WalletType
-	attrGroupId: string
+	walletType: WalletType;
+	attrGroupId: string;
 }): React.JSX.Element {
-	const representativeWallet = representativeWalletForType(walletType)
-	const attrGroup = getAttributeGroupById(attrGroupId, representativeWallet.overall)
+	const representativeWallet = representativeWalletForType(walletType);
+	const attrGroup = getAttributeGroupById(attrGroupId, representativeWallet.overall);
 	if (attrGroup === null) {
-		throw new Error('Invalid attribute group')
+		throw new Error('Invalid attribute group');
 	}
-	const evalGroup = getAttributeGroupInTree(representativeWallet.overall, attrGroup)
+	const evalGroup = getAttributeGroupInTree(representativeWallet.overall, attrGroup);
+	const wallets = Object.values(allRatedWallets).filter(wallet => {
+		if (wallet.types[walletType]) {
+			return true;
+		}
+		return false;
+	});
+
 	return (
 		<NavigationPageLayout
 			groups={[
@@ -132,6 +140,7 @@ export function CriteriaPage({
 									}}
 								/>
 							</p>
+							<AttributeGroupSummary wallets={wallets} />
 							{mapNonExemptGroupAttributes(evalGroup, evalAttr => (
 								<div key={evalAttr.attribute.id} className="space-y-2">
 									<h2 className="text-2xl font-extrabold text-accent">
@@ -150,5 +159,16 @@ export function CriteriaPage({
 				</div>
 			</div>
 		</NavigationPageLayout>
-	)
+	);
 }
+
+export const AttributeGroupSummary = ({
+	wallets,
+}: {
+	wallets: RatedWallet[];
+}): React.JSX.Element => (
+	<div className="whitespace-pre-wrap">
+		Attribute group summary
+		<div>{wallets.map(wallet => wallet.metadata.displayName)}</div>
+	</div>
+);

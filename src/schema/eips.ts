@@ -1,7 +1,7 @@
 /**
  * The set of all EIP numbers tracked by Walletbeat.
  */
-export type EipNumber = '1193' | '2700' | '4337' | '6963' | '7702' | '7828' | '7831'
+export type EipNumber = '1193' | '2700' | '4337' | '6963' | '7702' | '7828' | '7831';
 
 /**
  * The status of an Ethereum Improvement Proposal (EIP).
@@ -26,56 +26,56 @@ export enum EipPrefix {
  */
 export interface Eip {
 	/** EIP prefix (EIP or ERC) */
-	prefix: EipPrefix
+	prefix: EipPrefix;
 
 	/** Number of the EIP, as a string. */
-	number: EipNumber
+	number: EipNumber;
 
 	/** Walletbeat-specific friendly name. */
-	friendlyName: string
+	friendlyName: string;
 
 	/** Formal title as from the EIP repository. */
-	formalTitle: string
+	formalTitle: string;
 
 	/** EIP status as from the EIP repository. */
-	status: EipStatus
+	status: EipStatus;
 
 	/** EIP summary, as from the EIP repository with some minor tweaks if needed. */
-	summaryMarkdown: string
+	summaryMarkdown: string;
 
 	/** Walletbeat-specific explanation of why this EIP matters. */
-	whyItMattersMarkdown: string
+	whyItMattersMarkdown: string;
 
 	/** Walletbeat-specific notes (e.g. precedent/alternative EIPs). */
-	noteMarkdown?: string
+	noteMarkdown?: string;
 }
 
 /** Return a short label for an EIP (example: "ERC-20"). */
 export function eipShortLabel(eip: Eip): string {
-	return `${eip.prefix}-${eip.number}`
+	return `${eip.prefix}-${eip.number}`;
 }
 
 /** Return a label for an EIP (example: "ERC-20 (fungible tokens)"). */
 export function eipLabel(eip: Eip): string {
-	return `${eipShortLabel(eip)}: ${eip.friendlyName}`
+	return `${eipShortLabel(eip)}: ${eip.friendlyName}`;
 }
 
 /** Return the eips.ethereum.org URL for an EIP. */
 export function eipEthereumDotOrgUrl(eip: EipNumber | Eip): string {
-	return `https://eips.ethereum.org/EIPS/eip-${typeof eip === 'string' ? eip : eip.number}`
+	return `https://eips.ethereum.org/EIPS/eip-${typeof eip === 'string' ? eip : eip.number}`;
 }
 
 /** Return a magic URL which the Markdown parser can turn into an EIP link. */
 function markdownMagicUrl(eip: EipNumber | Eip, format: 'long' | 'short'): string {
-	return `${eipEthereumDotOrgUrl(eip)}#wb-format=${format}`
+	return `${eipEthereumDotOrgUrl(eip)}#wb-format=${format}`;
 }
 
 /**  Return a markdown link for an EIP. */
 export function eipMarkdownLink(eip: Eip): string {
-	return `[${eipLabel(eip)}](${markdownMagicUrl(eip, 'short')})`
+	return `[${eipLabel(eip)}](${markdownMagicUrl(eip, 'short')})`;
 }
 
 /** Return a markdown link and a title for an EIP. */
 export function eipMarkdownLinkAndTitle(eip: Eip): string {
-	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${markdownMagicUrl(eip, 'long')})`
+	return `[${eipShortLabel(eip)} ${eip.friendlyName}](${markdownMagicUrl(eip, 'long')})`;
 }

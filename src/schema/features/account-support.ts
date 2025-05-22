@@ -3,19 +3,19 @@ import {
 	nonEmptyFilter,
 	type NonEmptySet,
 	nonEmptySetFromArray,
-} from '@/types/utils/non-empty'
+} from '@/types/utils/non-empty';
 
-import type { SmartWalletContract } from '../contracts'
-import type { WithRef } from '../reference'
-import { isSupported, type NotSupported, type Support, type Supported } from './support'
+import type { SmartWalletContract } from '../contracts';
+import type { WithRef } from '../reference';
+import { isSupported, type NotSupported, type Support, type Supported } from './support';
 
-export type AccountTypeSupport<T> = WithRef<Support<T>>
+export type AccountTypeSupport<T> = WithRef<Support<T>>;
 
 /** Type predicate for AccountTypeSupported<T>. */
 export function isAccountTypeSupported<T>(
 	accountTypeSupport: AccountTypeSupport<T>,
 ): accountTypeSupport is WithRef<Supported<T>> {
-	return isSupported<T>(accountTypeSupport)
+	return isSupported<T>(accountTypeSupport);
 }
 
 /** Set of possible account types. */
@@ -41,7 +41,7 @@ const allAccountTypes: NonEmptyArray<AccountType> = [
 	AccountType.mpc,
 	AccountType.rawErc4337,
 	AccountType.eip7702,
-]
+];
 
 /** The ability (or lack thereof) to generate a transaction of a specific type. */
 export enum TransactionGenerationCapability {
@@ -62,7 +62,7 @@ export enum TransactionGenerationCapability {
 export type PossibleTransactionGenerationCapability = Exclude<
 	TransactionGenerationCapability,
 	TransactionGenerationCapability.IMPOSSIBLE
->
+>;
 
 /** Account support features. */
 export type AccountSupport = Exclude<
@@ -71,26 +71,26 @@ export type AccountSupport = Exclude<
 		 * Support for raw EOA accounts.
 		 * Leave as NOT_SUPPORTED if the wallet only supports EIP-7702-type EOAs.
 		 */
-		eoa: AccountTypeSupport<AccountTypeEoa>
+		eoa: AccountTypeSupport<AccountTypeEoa>;
 
 		/** Support for MPC-based (sharded key) accounts. */
-		mpc: AccountTypeSupport<AccountTypeMpc>
+		mpc: AccountTypeSupport<AccountTypeMpc>;
 
 		/**
 		 * Support for EIP-7702 EOA accounts.
 		 * This usually also implies `rawEoa` support.
 		 */
-		eip7702: AccountTypeSupport<AccountType7702>
+		eip7702: AccountTypeSupport<AccountType7702>;
 
 		/**
 		 * Support for smart accounts (pure ERC-4337 accounts for which the
 		 * address matches the contract code).
 		 */
-		rawErc4337: AccountTypeSupport<AccountType4337>
+		rawErc4337: AccountTypeSupport<AccountType4337>;
 	},
 	// At least one account type must be supported.
 	Record<AccountType, NotSupported>
-> & { defaultAccountType: AccountType }
+> & { defaultAccountType: AccountType };
 
 /**
  * Returns whether the given AccountSupport data supports the given account type.
@@ -100,9 +100,9 @@ export function supportsAccountType(
 	accountType: AccountType,
 ): boolean {
 	if (accountSupport === undefined || accountSupport === null) {
-		return false
+		return false;
 	}
-	return isSupported<Support<unknown>>(accountSupport[accountType])
+	return isSupported<Support<unknown>>(accountSupport[accountType]);
 }
 
 /**
@@ -113,17 +113,17 @@ export function supportsOnlyAccountType(
 	accountType: AccountType,
 ): boolean {
 	if (!supportsAccountType(accountSupport, accountType)) {
-		return false
+		return false;
 	}
 	for (const otherType of allAccountTypes) {
 		if (otherType === accountType) {
-			continue
+			continue;
 		}
 		if (supportsAccountType(accountSupport, otherType)) {
-			return false
+			return false;
 		}
 	}
-	return true
+	return true;
 }
 
 /**
@@ -134,7 +134,7 @@ export function supportedAccountTypes(accountSupport: AccountSupport): NonEmptyS
 		nonEmptyFilter(allAccountTypes, (accountType: AccountType): boolean =>
 			supportsAccountType(accountSupport, accountType),
 		),
-	)
+	);
 }
 
 /** Support information for EOA accounts. */
@@ -142,16 +142,16 @@ export interface AccountTypeEoa {
 	/** Type of standards used to deterministically derive private keys. */
 	keyDerivation:
 		| {
-				type: 'NONSTANDARD'
+				type: 'NONSTANDARD';
 		  }
 		| {
-				type: 'BIP32'
-				seedPhrase: 'NONSTANDARD' | 'BIP39'
-				derivationPath: 'NONSTANDARD' | 'BIP44'
-				canExportSeedPhrase: boolean
-		  }
+				type: 'BIP32';
+				seedPhrase: 'NONSTANDARD' | 'BIP39';
+				derivationPath: 'NONSTANDARD' | 'BIP44';
+				canExportSeedPhrase: boolean;
+		  };
 	/** Can the wallet export EOA private keys directly? */
-	canExportPrivateKey: boolean
+	canExportPrivateKey: boolean;
 }
 
 interface AccountTypeMultifactor {
@@ -160,7 +160,7 @@ interface AccountTypeMultifactor {
 	 * own self-custody to control the wallet?
 	 * "Control" here means the ability to sign arbitrary transactions.
 	 */
-	controllingSharesInSelfCustodyByDefault: 'YES' | 'NO' | 'USER_MAKES_EXPLICIT_CHOICE'
+	controllingSharesInSelfCustodyByDefault: 'YES' | 'NO' | 'USER_MAKES_EXPLICIT_CHOICE';
 
 	/**
 	 * Is it possible to create and broadcast an Ethereum transaction that
@@ -170,7 +170,7 @@ interface AccountTypeMultifactor {
 	 * This implies that the code to create such a transaction already exists
 	 * and does not rely on any network request to a proprietary API or service.
 	 */
-	tokenTransferTransactionGeneration: PossibleTransactionGenerationCapability
+	tokenTransferTransactionGeneration: PossibleTransactionGenerationCapability;
 }
 
 /**
@@ -179,8 +179,8 @@ interface AccountTypeMultifactor {
  */
 export type AccountTypeMpc = AccountTypeMultifactor & {
 	/** How is the underlying key generation performed before shares are distributed? */
-	initialKeyGeneration: 'ON_USER_DEVICE' | 'BY_THIRD_PARTY_IN_TEE' | 'BY_THIRD_PARTY_IN_THE_CLEAR'
-}
+	initialKeyGeneration: 'ON_USER_DEVICE' | 'BY_THIRD_PARTY_IN_TEE' | 'BY_THIRD_PARTY_IN_THE_CLEAR';
+};
 
 /**
  * Support information for accounts with multiple authentication factors
@@ -195,18 +195,18 @@ export type AccountTypeMutableMultifactor = AccountTypeMultifactor & {
 	 * This implies that the code to create such a transaction is open-source
 	 * and does not rely on any network request to a proprietary API or service.
 	 */
-	keyRotationTransactionGeneration: TransactionGenerationCapability
-}
+	keyRotationTransactionGeneration: TransactionGenerationCapability;
+};
 
 /** A wallet backed by a smart contract. */
 export interface SmartAccountType {
-	contract: 'UNKNOWN' | SmartWalletContract
+	contract: 'UNKNOWN' | SmartWalletContract;
 }
 
 /** Support information for ERC-4337 accounts. */
-export type AccountType4337 = AccountTypeMutableMultifactor & SmartAccountType
+export type AccountType4337 = AccountTypeMutableMultifactor & SmartAccountType;
 
 /**
  * Support information for EIP-7702 accounts.
  */
-export type AccountType7702 = SmartAccountType
+export type AccountType7702 = SmartAccountType;

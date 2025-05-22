@@ -1,21 +1,24 @@
-import { useMediaQuery, useTheme } from '@mui/material'
-import type React from 'react'
-import { useEffect, useState } from 'react'
+import { useMediaQuery, useTheme } from '@mui/material';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
-import { mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
-import { type EvaluatedGroup, ratingToColor, type ValueSet } from '@/schema/attributes'
-import type { HardwareWalletModel } from '@/schema/features/profile'
-import type { RatedWallet } from '@/schema/wallet'
-import { cx } from '@/utils/cx'
-import { toKebabCase } from '@/utils/kebab'
+import {
+	mapNonExemptGroupAttributes,
+	numNonExemptGroupAttributes,
+} from '@/schema/attribute-groups';
+import { type EvaluatedGroup, ratingToColor, type ValueSet } from '@/schema/attributes';
+import type { HardwareWalletModel } from '@/schema/features/profile';
+import type { RatedWallet } from '@/schema/wallet';
+import { cx } from '@/utils/cx';
+import { toKebabCase } from '@/utils/kebab';
 
-import { RatingStatusBadge } from '../../RatingStatusBadge'
+import { RatingStatusBadge } from '../../RatingStatusBadge';
 
 interface EvaluatedGroupOverviewProps<Vs extends ValueSet> {
-	wallet: RatedWallet
+	wallet: RatedWallet;
 	// attrGroup: AttributeGroup<Vs>
-	evalGroup: EvaluatedGroup<Vs>
-	hardwareWalletModel?: HardwareWalletModel
+	evalGroup: EvaluatedGroup<Vs>;
+	hardwareWalletModel?: HardwareWalletModel;
 }
 
 export function EvaluatedGroupOverview<Vs extends ValueSet>({
@@ -24,61 +27,61 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 	wallet,
 	hardwareWalletModel,
 }: EvaluatedGroupOverviewProps<Vs>): React.ReactElement {
-	const theme = useTheme()
-	const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+	const theme = useTheme();
+	const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 	const [selectedModel, setSelectedModel] = useState<HardwareWalletModel | null>(
 		hardwareWalletModel ?? null,
-	)
-	const [hoveredSliceIndex, setHoveredSliceIndex] = useState<number | null>(null)
+	);
+	const [hoveredSliceIndex, setHoveredSliceIndex] = useState<number | null>(null);
 
 	// Get hardware wallet models if applicable
-	const hardwareModels = wallet.metadata.hardwareWalletModels ?? []
-	const hasHardwareModels = hardwareModels.length > 0
+	const hardwareModels = wallet.metadata.hardwareWalletModels ?? [];
+	const hasHardwareModels = hardwareModels.length > 0;
 
 	// Get the flagship model if available
 	const flagshipModel = hasHardwareModels
 		? (hardwareModels.find(model => model.isFlagship) ?? hardwareModels[0])
-		: null
+		: null;
 
 	// If no model is selected but we have models, default to the flagship
 	useEffect(() => {
 		if (selectedModel !== null && flagshipModel !== null && flagshipModel.id !== '') {
-			setSelectedModel(flagshipModel)
+			setSelectedModel(flagshipModel);
 		}
-	}, [flagshipModel, selectedModel])
+	}, [flagshipModel, selectedModel]);
 
 	// Create SVG slices for the enlarged chart
 	const createEnlargedSlices = (): React.JSX.Element[] => {
-		const attributeCount = numNonExemptGroupAttributes(evalGroup)
-		const centerX = 150
-		const centerY = 150
-		const radius = 120
-		const gapAngle = 2 // Gap in degrees
-		const sliceAngle = 360 / attributeCount - gapAngle
+		const attributeCount = numNonExemptGroupAttributes(evalGroup);
+		const centerX = 150;
+		const centerY = 150;
+		const radius = 120;
+		const gapAngle = 2; // Gap in degrees
+		const sliceAngle = 360 / attributeCount - gapAngle;
 
 		return mapNonExemptGroupAttributes(evalGroup, (evalAttr, i) => {
-			const startAngle = i * (sliceAngle + gapAngle)
-			const endAngle = startAngle + sliceAngle
+			const startAngle = i * (sliceAngle + gapAngle);
+			const endAngle = startAngle + sliceAngle;
 
 			// Convert angles to radians
-			const startRad = ((startAngle - 90) * Math.PI) / 180
-			const endRad = ((endAngle - 90) * Math.PI) / 180
+			const startRad = ((startAngle - 90) * Math.PI) / 180;
+			const endRad = ((endAngle - 90) * Math.PI) / 180;
 
 			// Calculate coordinates
-			const x1 = centerX + radius * Math.cos(startRad)
-			const y1 = centerY + radius * Math.sin(startRad)
-			const x2 = centerX + radius * Math.cos(endRad)
-			const y2 = centerY + radius * Math.sin(endRad)
+			const x1 = centerX + radius * Math.cos(startRad);
+			const y1 = centerY + radius * Math.sin(startRad);
+			const x2 = centerX + radius * Math.cos(endRad);
+			const y2 = centerY + radius * Math.sin(endRad);
 
 			// Create path for the slice
-			const largeArcFlag = sliceAngle > 180 ? 1 : 0
+			const largeArcFlag = sliceAngle > 180 ? 1 : 0;
 
 			const pathData = `
                 M ${centerX} ${centerY}
                 L ${x1} ${y1}
                 A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
                 Z
-            `
+            `;
 
 			return (
 				<path
@@ -93,15 +96,15 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 						cursor: 'pointer',
 					}}
 					onMouseEnter={() => {
-						setHoveredSliceIndex(i)
+						setHoveredSliceIndex(i);
 					}}
 					onMouseLeave={() => {
-						setHoveredSliceIndex(null)
+						setHoveredSliceIndex(null);
 					}}
 				/>
-			)
-		})
-	}
+			);
+		});
+	};
 
 	return (
 		<>
@@ -126,7 +129,7 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 						<div className="flex flex-col gap-2 max-h-[350px] sm:max-h-[300px] overflow-y-auto pr-1">
 							{mapNonExemptGroupAttributes(evalGroup, (evalAttr, index) => {
 								// Create proper attribute anchor for links
-								const detailUrl = `/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`
+								const detailUrl = `/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`;
 
 								return (
 									<div key={evalAttr.attribute.id} className="mb-2">
@@ -139,10 +142,10 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 													: 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700',
 											)}
 											onMouseEnter={() => {
-												setHoveredSliceIndex(index)
+												setHoveredSliceIndex(index);
 											}}
 											onMouseLeave={() => {
-												setHoveredSliceIndex(null)
+												setHoveredSliceIndex(null);
 											}}
 											onClick={() => {
 												// toggleExpandedAttribute(evalAttr.attribute.id)
@@ -158,7 +161,7 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 											<RatingStatusBadge rating={evalAttr.evaluation.value.rating} />
 										</a>
 									</div>
-								)
+								);
 							})}
 						</div>
 					) : (
@@ -169,5 +172,5 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 				</div>
 			</div>
 		</>
-	)
+	);
 }

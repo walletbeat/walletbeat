@@ -4,7 +4,7 @@ import type {
 	OffchainDataProvider,
 	TransactionBroadcastProvider,
 	WalletDeveloper,
-} from '@/schema/entity'
+} from '@/schema/entity';
 
 export const ambireEntity: OffchainDataProvider &
 	WalletDeveloper &
@@ -35,4 +35,4 @@ export const ambireEntity: OffchainDataProvider &
 	repoUrl: 'https://github.com/AmbireTech',
 	twitter: 'https://x.com/ambireWallet',
 	url: 'https://ambire.com/',
-}
+};

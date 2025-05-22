@@ -1,4 +1,4 @@
-import type { ChainDataProvider, OffchainDataProvider } from '@/schema/entity'
+import type { ChainDataProvider, OffchainDataProvider } from '@/schema/entity';
 
 export const jiffylabs: ChainDataProvider & OffchainDataProvider = {
 	id: 'jiffylabs',
@@ -27,4 +27,4 @@ export const jiffylabs: ChainDataProvider & OffchainDataProvider = {
 	repoUrl: 'https://github.com/jiffy-labs/',
 	twitter: 'https://x.com/JiffyScan',
 	url: 'https://jiffyscan.xyz/',
-}
+};

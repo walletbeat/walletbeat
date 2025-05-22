@@ -1,12 +1,12 @@
-import { sentence } from '@/types/content'
-import type { Dict } from '@/types/utils/dict'
+import { sentence } from '@/types/content';
+import type { Dict } from '@/types/utils/dict';
 import {
 	isNonEmptyArray,
 	nonEmptyGet,
 	type NonEmptyRecord,
 	nonEmptyRemap,
 	nonEmptyValues,
-} from '@/types/utils/non-empty'
+} from '@/types/utils/non-empty';
 
 import {
 	type Attribute,
@@ -19,111 +19,111 @@ import {
 	Rating,
 	type Value,
 	type ValueSet,
-} from './attributes'
+} from './attributes';
 import {
 	accountAbstraction,
 	type AccountAbstractionValue,
-} from './attributes/ecosystem/account-abstraction'
+} from './attributes/ecosystem/account-abstraction';
 import {
 	addressResolution,
 	type AddressResolutionValue,
-} from './attributes/ecosystem/address-resolution'
+} from './attributes/ecosystem/address-resolution';
 import {
 	browserIntegration,
 	type BrowserIntegrationValue,
-} from './attributes/ecosystem/browser-integration'
+} from './attributes/ecosystem/browser-integration';
 import {
 	addressCorrelation,
 	type AddressCorrelationValue,
-} from './attributes/privacy/address-correlation'
-import { hardwarePrivacy, type HardwarePrivacyValue } from './attributes/privacy/hardware-privacy'
+} from './attributes/privacy/address-correlation';
+import { hardwarePrivacy, type HardwarePrivacyValue } from './attributes/privacy/hardware-privacy';
 import {
 	multiAddressCorrelation,
 	type MultiAddressCorrelationValue,
-} from './attributes/privacy/multi-address-correlation'
+} from './attributes/privacy/multi-address-correlation';
 import {
 	bugBountyProgram,
 	type BugBountyProgramValue,
-} from './attributes/security/bug-bounty-program'
+} from './attributes/security/bug-bounty-program';
 import {
 	chainVerification,
 	type ChainVerificationValue,
-} from './attributes/security/chain-verification'
-import { firmware, type FirmwareValue } from './attributes/security/firmware'
+} from './attributes/security/chain-verification';
+import { firmware, type FirmwareValue } from './attributes/security/firmware';
 import {
 	hardwareWalletDappSigning,
 	type HardwareWalletDappSigningValue,
-} from './attributes/security/hardware-wallet-dapp-signing'
+} from './attributes/security/hardware-wallet-dapp-signing';
 import {
 	hardwareWalletSupport,
 	type HardwareWalletSupportValue,
-} from './attributes/security/hardware-wallet-support'
-import { keysHandling, type KeysHandlingValue } from './attributes/security/keys-handling'
+} from './attributes/security/hardware-wallet-support';
+import { keysHandling, type KeysHandlingValue } from './attributes/security/keys-handling';
 import {
 	passkeyImplementation,
 	type PasskeyImplementationValue,
-} from './attributes/security/passkey-implementation'
-import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
-import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
+} from './attributes/security/passkey-implementation';
+import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention';
+import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits';
 import {
 	softwareHWIntegration,
 	type SoftwareHWIntegrationValue,
-} from './attributes/security/software-hw-integration'
-import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy'
+} from './attributes/security/software-hw-integration';
+import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy';
 import {
 	supplyChainFactory,
 	type SupplyChainFactoryValue,
-} from './attributes/security/supply-chain-factory'
-import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
+} from './attributes/security/supply-chain-factory';
+import { userSafety, type UserSafetyValue } from './attributes/security/user-safety';
 import {
 	accountPortability,
 	type AccountPortabilityValue,
-} from './attributes/self-sovereignty/account-portability'
+} from './attributes/self-sovereignty/account-portability';
 import {
 	interoperability,
 	type InteroperabilityValue,
-} from './attributes/self-sovereignty/interoperability'
+} from './attributes/self-sovereignty/interoperability';
 import {
 	selfHostedNode,
 	type SelfHostedNodeValue,
-} from './attributes/self-sovereignty/self-hosted-node'
+} from './attributes/self-sovereignty/self-hosted-node';
 import {
 	transactionInclusion,
 	type TransactionInclusionValue,
-} from './attributes/self-sovereignty/transaction-inclusion'
+} from './attributes/self-sovereignty/transaction-inclusion';
 import {
 	feeTransparency,
 	type FeeTransparencyValue,
-} from './attributes/transparency/fee-transparency'
-import { funding, type FundingValue } from './attributes/transparency/funding'
-import { maintenance, type MaintenanceValue } from './attributes/transparency/maintenance'
-import { openSource, type OpenSourceValue } from './attributes/transparency/open-source'
-import { reputation, type ReputationValue } from './attributes/transparency/reputation'
+} from './attributes/transparency/fee-transparency';
+import { funding, type FundingValue } from './attributes/transparency/funding';
+import { maintenance, type MaintenanceValue } from './attributes/transparency/maintenance';
+import { openSource, type OpenSourceValue } from './attributes/transparency/open-source';
+import { reputation, type ReputationValue } from './attributes/transparency/reputation';
 import {
 	sourceVisibility,
 	type SourceVisibilityValue,
-} from './attributes/transparency/source-visibility'
-import type { ResolvedFeatures } from './features'
-import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score'
-import type { AtLeastOneVariant, Variant } from './variants'
-import type { WalletMetadata } from './wallet'
+} from './attributes/transparency/source-visibility';
+import type { ResolvedFeatures } from './features';
+import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score';
+import type { AtLeastOneVariant, Variant } from './variants';
+import type { WalletMetadata } from './wallet';
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
-	securityAudits: SecurityAuditsValue
-	scamPrevention: ScamPreventionValue
-	chainVerification: ChainVerificationValue
-	hardwareWalletDappSigning: HardwareWalletDappSigningValue
-	hardwareWalletSupport: HardwareWalletSupportValue
-	softwareHWIntegration: SoftwareHWIntegrationValue
-	passkeyImplementation: PasskeyImplementationValue
-	bugBountyProgram: BugBountyProgramValue
-	supplyChainDIY: SupplyChainDIYValue
-	supplyChainFactory: SupplyChainFactoryValue
-	firmware: FirmwareValue
-	keysHandling: KeysHandlingValue
-	userSafety: UserSafetyValue
-}>
+	securityAudits: SecurityAuditsValue;
+	scamPrevention: ScamPreventionValue;
+	chainVerification: ChainVerificationValue;
+	hardwareWalletDappSigning: HardwareWalletDappSigningValue;
+	hardwareWalletSupport: HardwareWalletSupportValue;
+	softwareHWIntegration: SoftwareHWIntegrationValue;
+	passkeyImplementation: PasskeyImplementationValue;
+	bugBountyProgram: BugBountyProgramValue;
+	supplyChainDIY: SupplyChainDIYValue;
+	supplyChainFactory: SupplyChainFactoryValue;
+	firmware: FirmwareValue;
+	keysHandling: KeysHandlingValue;
+	userSafety: UserSafetyValue;
+}>;
 
 /** Security attributes. */
 export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
@@ -164,14 +164,14 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		keysHandling: 1.0,
 		userSafety: 1.0,
 	}),
-}
+};
 
 /** A ValueSet for privacy Values. */
 type PrivacyValues = Dict<{
-	addressCorrelation: AddressCorrelationValue
-	multiAddressCorrelation: MultiAddressCorrelationValue
-	hardware_privacy: HardwarePrivacyValue
-}>
+	addressCorrelation: AddressCorrelationValue;
+	multiAddressCorrelation: MultiAddressCorrelationValue;
+	hardware_privacy: HardwarePrivacyValue;
+}>;
 
 /** Privacy attributes. */
 export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
@@ -192,14 +192,14 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 		multiAddressCorrelation: 1.0,
 		hardware_privacy: 1.0,
 	}),
-}
+};
 
 /** A ValueSet for self-sovereignty Values. */
 type SelfSovereigntyValues = Dict<{
-	selfHostedNode: SelfHostedNodeValue
-	accountPortability: AccountPortabilityValue
-	transactionInclusion: TransactionInclusionValue
-}>
+	selfHostedNode: SelfHostedNodeValue;
+	accountPortability: AccountPortabilityValue;
+	transactionInclusion: TransactionInclusionValue;
+}>;
 
 /** Self-sovereignty attributes. */
 export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues> = {
@@ -220,16 +220,16 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 		accountPortability: 1.0,
 		transactionInclusion: 1.0,
 	}),
-}
+};
 
 /** A ValueSet for transparency Values. */
 type TransparencyValues = Dict<{
-	openSource: OpenSourceValue
-	sourceVisibility: SourceVisibilityValue
-	funding: FundingValue
-	feeTransparency: FeeTransparencyValue
-	reputation: ReputationValue
-}>
+	openSource: OpenSourceValue;
+	sourceVisibility: SourceVisibilityValue;
+	funding: FundingValue;
+	feeTransparency: FeeTransparencyValue;
+	reputation: ReputationValue;
+}>;
 
 /** Transparency attributes. */
 export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
@@ -254,15 +254,15 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		feeTransparency: 1.0,
 		reputation: 1.0,
 	}),
-}
+};
 
 /** A ValueSet for ecosystem Values. */
 type EcosystemValues = Dict<{
-	accountAbstraction: AccountAbstractionValue
-	addressResolution: AddressResolutionValue
-	browserIntegration: BrowserIntegrationValue
-	interoperability: InteroperabilityValue
-}>
+	accountAbstraction: AccountAbstractionValue;
+	addressResolution: AddressResolutionValue;
+	browserIntegration: BrowserIntegrationValue;
+	interoperability: InteroperabilityValue;
+}>;
 
 /** Ecosystem attributes. */
 export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
@@ -285,12 +285,12 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		browserIntegration: 1.0,
 		interoperability: 1.0,
 	}),
-}
+};
 
 /** A ValueSet for maintenance Values. */
 type MaintenanceValues = Dict<{
-	maintenance: MaintenanceValue
-}>
+	maintenance: MaintenanceValue;
+}>;
 
 /** Maintenance attributes. */
 export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
@@ -307,7 +307,7 @@ export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	score: scoreGroup<MaintenanceValues>({
 		maintenance: 1.0,
 	}),
-}
+};
 
 /** The set of attribute groups that make up wallet attributes. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Necessary to allow any Attribute implementation.
@@ -318,57 +318,57 @@ export const attributeTree: NonEmptyRecord<string, AttributeGroup<any>> = {
 	transparency: transparencyAttributeGroup,
 	ecosystem: ecosystemAttributeGroup,
 	maintenance: maintenanceAttributeGroup,
-}
+};
 
 /** Evaluated security attributes for a single wallet. */
 export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
-	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
-	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
-	chainVerification: EvaluatedAttribute<ChainVerificationValue>
-	hardwareWalletDappSigning: EvaluatedAttribute<HardwareWalletDappSigningValue>
-	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
-	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>
-	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
-	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
-	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYValue>
-	supplyChainFactory: EvaluatedAttribute<SupplyChainFactoryValue>
-	firmware: EvaluatedAttribute<FirmwareValue>
-	keysHandling: EvaluatedAttribute<KeysHandlingValue>
-	userSafety: EvaluatedAttribute<UserSafetyValue>
+	securityAudits: EvaluatedAttribute<SecurityAuditsValue>;
+	scamPrevention: EvaluatedAttribute<ScamPreventionValue>;
+	chainVerification: EvaluatedAttribute<ChainVerificationValue>;
+	hardwareWalletDappSigning: EvaluatedAttribute<HardwareWalletDappSigningValue>;
+	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>;
+	softwareHWIntegration: EvaluatedAttribute<SoftwareHWIntegrationValue>;
+	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>;
+	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>;
+	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYValue>;
+	supplyChainFactory: EvaluatedAttribute<SupplyChainFactoryValue>;
+	firmware: EvaluatedAttribute<FirmwareValue>;
+	keysHandling: EvaluatedAttribute<KeysHandlingValue>;
+	userSafety: EvaluatedAttribute<UserSafetyValue>;
 }
 
 /** Evaluated privacy attributes for a single wallet. */
 export interface PrivacyEvaluations extends EvaluatedGroup<PrivacyValues> {
-	addressCorrelation: EvaluatedAttribute<AddressCorrelationValue>
-	multiAddressCorrelation: EvaluatedAttribute<MultiAddressCorrelationValue>
+	addressCorrelation: EvaluatedAttribute<AddressCorrelationValue>;
+	multiAddressCorrelation: EvaluatedAttribute<MultiAddressCorrelationValue>;
 }
 
 /** Evaluated self-sovereignty attributes for a single wallet. */
 export interface SelfSovereigntyEvaluations extends EvaluatedGroup<SelfSovereigntyValues> {
-	selfHostedNode: EvaluatedAttribute<SelfHostedNodeValue>
-	accountPortability: EvaluatedAttribute<AccountPortabilityValue>
-	transactionInclusion: EvaluatedAttribute<TransactionInclusionValue>
+	selfHostedNode: EvaluatedAttribute<SelfHostedNodeValue>;
+	accountPortability: EvaluatedAttribute<AccountPortabilityValue>;
+	transactionInclusion: EvaluatedAttribute<TransactionInclusionValue>;
 }
 
 /** Evaluated transparency attributes for a single wallet. */
 export interface TransparencyEvaluations extends EvaluatedGroup<TransparencyValues> {
-	openSource: EvaluatedAttribute<OpenSourceValue>
-	sourceVisibility: EvaluatedAttribute<SourceVisibilityValue>
-	funding: EvaluatedAttribute<FundingValue>
-	feeTransparency: EvaluatedAttribute<FeeTransparencyValue>
+	openSource: EvaluatedAttribute<OpenSourceValue>;
+	sourceVisibility: EvaluatedAttribute<SourceVisibilityValue>;
+	funding: EvaluatedAttribute<FundingValue>;
+	feeTransparency: EvaluatedAttribute<FeeTransparencyValue>;
 }
 
 /** Evaluated ecosystem attributes for a single wallet. */
 export interface EcosystemEvaluations extends EvaluatedGroup<EcosystemValues> {
-	accountAbstraction: EvaluatedAttribute<AccountAbstractionValue>
-	addressResolution: EvaluatedAttribute<AddressResolutionValue>
-	browserIntegration: EvaluatedAttribute<BrowserIntegrationValue>
-	interoperability: EvaluatedAttribute<InteroperabilityValue>
+	accountAbstraction: EvaluatedAttribute<AccountAbstractionValue>;
+	addressResolution: EvaluatedAttribute<AddressResolutionValue>;
+	browserIntegration: EvaluatedAttribute<BrowserIntegrationValue>;
+	interoperability: EvaluatedAttribute<InteroperabilityValue>;
 }
 
 /** Evaluated maintenance attributes for a single wallet. */
 export interface MaintenanceEvaluations extends EvaluatedGroup<MaintenanceValues> {
-	maintenance: EvaluatedAttribute<MaintenanceValue>
+	maintenance: EvaluatedAttribute<MaintenanceValue>;
 }
 
 /** Evaluated attributes for a single wallet. */
@@ -384,12 +384,12 @@ export interface EvaluationTree
 			| MaintenanceValues
 		>
 	> {
-	security: SecurityEvaluations
-	privacy: PrivacyEvaluations
-	selfSovereignty: SelfSovereigntyEvaluations
-	transparency: TransparencyEvaluations
-	ecosystem: EcosystemEvaluations
-	maintenance: MaintenanceEvaluations
+	security: SecurityEvaluations;
+	privacy: PrivacyEvaluations;
+	selfSovereignty: SelfSovereigntyEvaluations;
+	transparency: TransparencyEvaluations;
+	ecosystem: EcosystemEvaluations;
+	maintenance: MaintenanceEvaluations;
 }
 
 /** Rate a wallet's attributes based on its features and metadata. */
@@ -399,24 +399,24 @@ export function evaluateAttributes(
 ): EvaluationTree {
 	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => {
 		if (attr.exempted !== undefined) {
-			const maybeExempt = attr.exempted(features, walletMetadata)
+			const maybeExempt = attr.exempted(features, walletMetadata);
 			if (maybeExempt !== null) {
 				if (!isExempt(maybeExempt)) {
 					throw new Error(
 						`Attribute ${attr.id}'s exemption rating function returned a non-exempt rating`,
-					)
+					);
 				}
 				return {
 					attribute: attr,
 					evaluation: maybeExempt,
-				}
+				};
 			}
 		}
 		return {
 			attribute: attr,
 			evaluation: attr.evaluate(features),
-		}
-	}
+		};
+	};
 	return {
 		security: {
 			securityAudits: evalAttr(securityAudits),
@@ -459,7 +459,7 @@ export function evaluateAttributes(
 		maintenance: {
 			maintenance: evalAttr(maintenance),
 		},
-	}
+	};
 }
 
 /**
@@ -472,16 +472,16 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 	): EvaluatedAttribute<V> => {
 		const attribute = getter(
 			nonEmptyGet(nonEmptyValues<Variant, EvaluationTree>(perVariant)),
-		).attribute
+		).attribute;
 		const evaluations = nonEmptyRemap(
 			perVariant,
 			(_, tree: EvaluationTree) => getter(tree).evaluation,
-		)
+		);
 		return {
 			attribute,
 			evaluation: attribute.aggregate(evaluations),
-		}
-	}
+		};
+	};
 	return {
 		security: {
 			securityAudits: attr(tree => tree.security.securityAudits),
@@ -524,7 +524,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 		maintenance: {
 			maintenance: attr(tree => tree.maintenance.maintenance),
 		},
-	}
+	};
 }
 
 /**
@@ -534,8 +534,7 @@ export function getAttributeGroupInTree<Vs extends ValueSet>(
 	tree: EvaluationTree,
 	attrGroup: AttributeGroup<Vs>,
 ): EvaluatedGroup<Vs> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each attribute group's ID maps to an evaluated group of its own ValueSet subtype.
-	return tree[attrGroup.id] as EvaluatedGroup<Vs>
+	return tree[attrGroup.id] as EvaluatedGroup<Vs>;
 }
 
 /**
@@ -553,7 +552,7 @@ export function mapNonExemptAttributeGroupsInTree<T>(
 		.map(
 			<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>): T =>
 				fn(attrGroup, getAttributeGroupInTree(tree, attrGroup)),
-		)
+		);
 }
 
 /**
@@ -569,7 +568,7 @@ export function mapNonExemptGroupAttributes<T, Vs extends ValueSet>(
 			<V extends Value>(evalAttr: EvaluatedAttribute<V>): boolean =>
 				evalAttr.evaluation.value.rating !== Rating.EXEMPT,
 		)
-		.map(fn)
+		.map(fn);
 }
 
 /**
@@ -581,7 +580,7 @@ export function numNonExemptGroupAttributes<Vs extends ValueSet>(
 	return Object.values(evalGroup).filter(
 		<V extends Value>(evalAttr: EvaluatedAttribute<V>): boolean =>
 			evalAttr.evaluation.value.rating !== Rating.EXEMPT,
-	).length
+	).length;
 }
 
 /**
@@ -600,9 +599,9 @@ export function mapAttributesGetter(
 		for (const attrName of Object.keys(templateTree[groupName])) {
 			fn(
 				<V extends Value>(evalTree: EvaluationTree): EvaluatedAttribute<V> | undefined =>
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- We know that `evalTree[groupName]` has `attrName` as property, due to how we iterated to get here.
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any -- We know that `evalTree[groupName]` has `attrName` as property, due to how we iterated to get here.
 					(evalTree[groupName] as any)[attrName] as EvaluatedAttribute<V>,
-			)
+			);
 		}
 	}
 }
@@ -621,18 +620,17 @@ export function getEvaluationFromOtherTree<V extends Value>(
 		otherTree,
 		(_, evalGroup): EvaluatedAttribute<V> | undefined => {
 			if (Object.hasOwn(evalGroup, evalAttr.attribute.id)) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Evaluated attributes with the same ID have the same Value type.
-				return evalGroup[evalAttr.attribute.id] as unknown as EvaluatedAttribute<V>
+				return evalGroup[evalAttr.attribute.id] as unknown as EvaluatedAttribute<V>;
 			}
-			return undefined
+			return undefined;
 		},
-	).find(v => v !== undefined)
+	).find(v => v !== undefined);
 	if (otherEvalAttr === undefined) {
 		throw new Error(
 			`Incomplete evaluation tree; did not found evaluation for attribute ${evalAttr.attribute.id}`,
-		)
+		);
 	}
-	return otherEvalAttr
+	return otherEvalAttr;
 }
 
 /**
@@ -646,25 +644,25 @@ function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): 
 	return (evaluations: EvaluatedGroup<Vs>): MaybeUnratedScore => {
 		const subScores: WeightedScore[] = nonEmptyValues<keyof Vs, WeightedScore | null>(
 			nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
-				const value = evaluations[key].evaluation.value
-				const score = value.score ?? defaultRatingScore(value.rating)
+				const value = evaluations[key].evaluation.value;
+				const score = value.score ?? defaultRatingScore(value.rating);
 				return score === null
 					? null
 					: {
 							score,
 							weight,
-						}
+						};
 			}),
-		).filter(score => score !== null)
+		).filter(score => score !== null);
 		if (isNonEmptyArray(subScores)) {
-			let hasUnratedComponent = false
+			let hasUnratedComponent = false;
 			for (const evalAttr of evaluatedAttributes(evaluations)) {
-				hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED
+				hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED;
 			}
-			return { score: weightedScore(subScores), hasUnratedComponent }
+			return { score: weightedScore(subScores), hasUnratedComponent };
 		}
-		return null
-	}
+		return null;
+	};
 }
 
 /**
@@ -675,9 +673,9 @@ export function getAttributeGroupById(
 	id: string,
 	tree: EvaluationTree,
 ): AttributeGroup<ValueSet> | null {
-	const attrGroup = attributeTree[id] as AttributeGroup<ValueSet> | undefined
+	const attrGroup = attributeTree[id] as AttributeGroup<ValueSet> | undefined;
 	if (attrGroup === undefined) {
-		return null
+		return null;
 	}
 	if (
 		!mapNonExemptAttributeGroupsInTree(
@@ -685,7 +683,7 @@ export function getAttributeGroupById(
 			attrGroupInTree => attrGroup.id === attrGroupInTree.id,
 		).some(val => val)
 	) {
-		return null
+		return null;
 	}
-	return attrGroup
+	return attrGroup;
 }

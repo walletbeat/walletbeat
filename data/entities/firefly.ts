@@ -1,4 +1,4 @@
-import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
+import type { CorporateEntity, WalletDeveloper } from '@/schema/entity';
 
 export const firefly: CorporateEntity & WalletDeveloper = {
 	id: 'firefly',
@@ -25,4 +25,4 @@ export const firefly: CorporateEntity & WalletDeveloper = {
 	repoUrl: 'https://github.com/firefly',
 	twitter: 'https://x.com/FireflyPocket',
 	url: 'https://firefly.city/',
-}
+};

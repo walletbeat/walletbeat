@@ -1,31 +1,31 @@
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support';
 import {
 	Leak,
 	MultiAddressPolicy,
 	RegularEndpoint,
-} from '@/schema/features/privacy/data-collection'
-import { WalletProfile } from '@/schema/features/profile'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+} from '@/schema/features/privacy/data-collection';
+import { WalletProfile } from '@/schema/features/profile';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability';
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
-} from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { License } from '@/schema/features/transparency/license'
-import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+} from '@/schema/features/self-sovereignty/transaction-submission';
+import { featureSupported, notSupported, supported } from '@/schema/features/support';
+import { License } from '@/schema/features/transparency/license';
+import { Variant } from '@/schema/variants';
+import type { SoftwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny'
-import { polymutex } from '../contributors/polymutex'
-import { binance } from '../entities/binance'
-import { daimoInc } from '../entities/daimo'
-import { honeycomb } from '../entities/honeycomb'
-import { merkleManufactory } from '../entities/merkle-manufactory'
-import { openExchangeRates } from '../entities/open-exchange-rates'
-import { pimlico } from '../entities/pimlico'
-import { veridise } from '../entities/veridise'
+import { nconsigny } from '../contributors/nconsigny';
+import { polymutex } from '../contributors/polymutex';
+import { binance } from '../entities/binance';
+import { daimoInc } from '../entities/daimo';
+import { honeycomb } from '../entities/honeycomb';
+import { merkleManufactory } from '../entities/merkle-manufactory';
+import { openExchangeRates } from '../entities/open-exchange-rates';
+import { pimlico } from '../entities/pimlico';
+import { veridise } from '../entities/veridise';
 
 export const daimo: SoftwareWallet = {
 	metadata: {
@@ -361,4 +361,4 @@ export const daimo: SoftwareWallet = {
 	variants: {
 		[Variant.MOBILE]: true,
 	},
-}
+};

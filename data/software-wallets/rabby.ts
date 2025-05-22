@@ -1,29 +1,29 @@
-import { AccountType } from '@/schema/features/account-support'
+import { AccountType } from '@/schema/features/account-support';
 import {
 	Leak,
 	MultiAddressPolicy,
 	RegularEndpoint,
-} from '@/schema/features/privacy/data-collection'
-import { WalletProfile } from '@/schema/features/profile'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+} from '@/schema/features/privacy/data-collection';
+import { WalletProfile } from '@/schema/features/profile';
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { SecurityFlawSeverity } from '@/schema/features/security/security-audits';
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability';
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
-} from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { License } from '@/schema/features/transparency/license'
-import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+} from '@/schema/features/self-sovereignty/transaction-submission';
+import { featureSupported, notSupported, supported } from '@/schema/features/support';
+import { License } from '@/schema/features/transparency/license';
+import { Variant } from '@/schema/variants';
+import type { SoftwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { polymutex } from '../contributors/polymutex'
-import { cure53 } from '../entities/cure53'
-import { deBank } from '../entities/debank'
-import { leastAuthority } from '../entities/least-authority'
-import { slowMist } from '../entities/slowmist'
+import { polymutex } from '../contributors/polymutex';
+import { cure53 } from '../entities/cure53';
+import { deBank } from '../entities/debank';
+import { leastAuthority } from '../entities/least-authority';
+import { slowMist } from '../entities/slowmist';
 
 export const rabby: SoftwareWallet = {
 	metadata: {
@@ -428,4 +428,4 @@ export const rabby: SoftwareWallet = {
 		[Variant.BROWSER]: true,
 		[Variant.DESKTOP]: true,
 	},
-}
+};

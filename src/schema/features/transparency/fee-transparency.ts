@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 /**
  * Types of fee transparency levels
@@ -17,20 +17,20 @@ export type FeeTransparencySupport = WithRef<{
 	/**
 	 * The level of fee transparency provided by the wallet
 	 */
-	level: FeeTransparencyLevel
+	level: FeeTransparencyLevel;
 
 	/**
 	 * Whether the wallet clearly discloses any additional fees it charges
 	 */
-	disclosesWalletFees: boolean
+	disclosesWalletFees: boolean;
 
 	/**
 	 * Whether transaction purpose/reason is clearly displayed
 	 */
-	showsTransactionPurpose: boolean
+	showsTransactionPurpose: boolean;
 
 	/**
 	 * Additional details about the fee transparency implementation
 	 */
-	details?: string
-}>
+	details?: string;
+}>;

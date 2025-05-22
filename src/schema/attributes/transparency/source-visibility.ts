@@ -1,17 +1,17 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { licenseSourceIsVisible } from '@/schema/features/transparency/license'
-import { type ReferenceArray, toFullyQualified } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { paragraph, sentence } from '@/types/content'
-import { sourceVisibilityDetailsContent } from '@/types/content/source-visibility-details'
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { licenseSourceIsVisible } from '@/schema/features/transparency/license';
+import { type ReferenceArray, toFullyQualified } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { paragraph, sentence } from '@/types/content';
+import { sourceVisibilityDetailsContent } from '@/types/content/source-visibility-details';
 
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.transparency.source_visibility'
+const brand = 'attributes.transparency.source_visibility';
 export type SourceVisibilityValue = Value & {
-	__brand: 'attributes.transparency.source_visibility'
-}
+	__brand: 'attributes.transparency.source_visibility';
+};
 
 function sourcePublic(references: ReferenceArray): Evaluation<SourceVisibilityValue> {
 	return {
@@ -28,7 +28,7 @@ function sourcePublic(references: ReferenceArray): Evaluation<SourceVisibilityVa
 		},
 		details: sourceVisibilityDetailsContent(),
 		references,
-	}
+	};
 }
 
 function sourcePrivate(references: ReferenceArray): Evaluation<SourceVisibilityValue> {
@@ -57,7 +57,7 @@ function sourcePrivate(references: ReferenceArray): Evaluation<SourceVisibilityV
 			`,
 		),
 		references,
-	}
+	};
 }
 
 export const sourceVisibility: Attribute<SourceVisibilityValue> = {
@@ -88,13 +88,13 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SourceVisibilityValue> => {
 		if (features.license === null) {
-			return unrated(sourceVisibility, brand, null)
+			return unrated(sourceVisibility, brand, null);
 		}
 
 		if (licenseSourceIsVisible(features.license.license)) {
-			return sourcePublic(toFullyQualified(features.license.ref))
+			return sourcePublic(toFullyQualified(features.license.ref));
 		}
-		return sourcePrivate(toFullyQualified(features.license.ref))
+		return sourcePrivate(toFullyQualified(features.license.ref));
 	},
 	aggregate: pickWorstRating<SourceVisibilityValue>,
-}
+};

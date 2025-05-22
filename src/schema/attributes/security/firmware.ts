@@ -1,24 +1,24 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
-import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { type FirmwareSupport, FirmwareType } from '@/schema/features/security/firmware'
-import { popRefs } from '@/schema/reference'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes';
+import { exampleRating } from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { type FirmwareSupport, FirmwareType } from '@/schema/features/security/firmware';
+import { popRefs } from '@/schema/reference';
+import type { AtLeastOneVariant } from '@/schema/variants';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.firmware'
+const brand = 'attributes.firmware';
 
 export type FirmwareValue = Value & {
-	silentUpdateProtection: FirmwareType
-	firmwareOpenSource: FirmwareType
-	reproducibleBuilds: FirmwareType
-	customFirmware: FirmwareType
-	__brand: 'attributes.firmware'
-}
+	silentUpdateProtection: FirmwareType;
+	firmwareOpenSource: FirmwareType;
+	reproducibleBuilds: FirmwareType;
+	customFirmware: FirmwareType;
+	__brand: 'attributes.firmware';
+};
 
 function evaluateFirmware(features: FirmwareSupport): Rating {
 	const ratings = [
@@ -26,15 +26,15 @@ function evaluateFirmware(features: FirmwareSupport): Rating {
 		features.firmwareOpenSource,
 		features.reproducibleBuilds,
 		features.customFirmware,
-	]
-	const passCount = ratings.filter(r => r === FirmwareType.PASS).length
+	];
+	const passCount = ratings.filter(r => r === FirmwareType.PASS).length;
 	if (passCount >= 3) {
-		return Rating.PASS
+		return Rating.PASS;
 	}
 	if (passCount >= 1) {
-		return Rating.PARTIAL
+		return Rating.PARTIAL;
 	}
-	return Rating.FAIL
+	return Rating.FAIL;
 }
 
 export const firmware: Attribute<FirmwareValue> = {
@@ -95,20 +95,20 @@ export const firmware: Attribute<FirmwareValue> = {
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
 				customFirmware: FirmwareType.FAIL,
-			})
+			});
 		}
-		const firmwareFeature = features.security.firmware
+		const firmwareFeature = features.security.firmware;
 		if (firmwareFeature === null) {
 			return unrated(firmware, brand, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
 				customFirmware: FirmwareType.FAIL,
-			})
+			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<FirmwareSupport>(firmwareFeature)
-		const rating = evaluateFirmware(withoutRefs)
+		const { withoutRefs, refs: extractedRefs } = popRefs<FirmwareSupport>(firmwareFeature);
+		const rating = evaluateFirmware(withoutRefs);
 
 		return {
 			value: {
@@ -131,6 +131,6 @@ export const firmware: Attribute<FirmwareValue> = {
 					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
 			),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+};

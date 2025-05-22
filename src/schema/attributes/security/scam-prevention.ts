@@ -4,72 +4,72 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { WalletProfile } from '@/schema/features/profile'
-import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
-import { isSupported, notSupported, supported } from '@/schema/features/support'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
-import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
-import { commaListFormat } from '@/types/utils/text'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { WalletProfile } from '@/schema/features/profile';
+import type { ScamAlerts } from '@/schema/features/security/scam-alerts';
+import { isSupported, notSupported, supported } from '@/schema/features/support';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
+import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details';
+import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty';
+import { commaListFormat } from '@/types/utils/text';
 
-import { mergeRefs, type WithRef } from '../../reference'
-import { pickWorstRating, unrated } from '../common'
+import { mergeRefs, type WithRef } from '../../reference';
+import { pickWorstRating, unrated } from '../common';
 
 export type ScamAlertSupport = WithRef<{
-	feature: string
-	supported: boolean
-	required: boolean
-	privacyPreserving: boolean
-	humanFeature: string
-	listFeature: string
-}>
+	feature: string;
+	supported: boolean;
+	required: boolean;
+	privacyPreserving: boolean;
+	humanFeature: string;
+	listFeature: string;
+}>;
 
-const brand = 'attributes.security.scam_alert'
+const brand = 'attributes.security.scam_alert';
 export type ScamPreventionValue = Value &
 	(
 		| {
-				scamAlerts: ScamAlerts
+				scamAlerts: ScamAlerts;
 				scamUrlWarning: ScamAlertSupport & {
-					feature: 'scamUrlWarning'
-				}
+					feature: 'scamUrlWarning';
+				};
 				sendTransactionWarning: ScamAlertSupport & {
-					feature: 'sendTransactionWarning'
-				}
+					feature: 'sendTransactionWarning';
+				};
 				contractTransactionWarning: ScamAlertSupport & {
-					feature: 'contractTransactionWarning'
-				}
+					feature: 'contractTransactionWarning';
+				};
 		  }
 		| { scamAlerts: null }
 	) & {
-		__brand: 'attributes.security.scam_alert'
-	}
+		__brand: 'attributes.security.scam_alert';
+	};
 
 function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
-	feature: 'sendTransactionWarning'
+	feature: 'sendTransactionWarning';
 } {
 	const baseProps = {
 		feature: 'sendTransactionWarning',
 		humanFeature: 'outgoing transactions to unknown addresses',
 		listFeature: 'Warning you when sending funds to unknown addresses',
 		required: false,
-	} as const
+	} as const;
 	if (!isSupported(scamAlerts.sendTransactionWarning)) {
 		return {
 			supported: false,
 			privacyPreserving: false,
 			...baseProps,
-		}
+		};
 	}
 	const supported =
 		scamAlerts.sendTransactionWarning.newRecipientWarning ||
-		scamAlerts.sendTransactionWarning.userWhitelist
+		scamAlerts.sendTransactionWarning.userWhitelist;
 	if (!supported) {
 		throw new Error(
 			'sendTransactionWarning: If supported, at least one implementation mechanism must be enabled',
-		)
+		);
 	}
 	return {
 		supported,
@@ -81,33 +81,33 @@ function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & 
 			].filter(x => x).length <= 1,
 		ref: scamAlerts.sendTransactionWarning.ref,
 		...baseProps,
-	}
+	};
 }
 
 function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
-	feature: 'contractTransactionWarning'
+	feature: 'contractTransactionWarning';
 } {
 	const baseProps = {
 		feature: 'contractTransactionWarning',
 		humanFeature: 'transactions with potential scam contracts',
 		listFeature: 'Warning you when interacting with potential scam contracts',
 		required: false,
-	} as const
+	} as const;
 	if (!isSupported(scamAlerts.contractTransactionWarning)) {
 		return {
 			supported: false,
 			privacyPreserving: false,
 			...baseProps,
-		}
+		};
 	}
 	const supported =
 		scamAlerts.contractTransactionWarning.contractRegistry ||
 		scamAlerts.contractTransactionWarning.previousContractInteractionWarning ||
-		scamAlerts.contractTransactionWarning.recentContractWarning
+		scamAlerts.contractTransactionWarning.recentContractWarning;
 	if (!supported) {
 		throw new Error(
 			'contractTransactionWarning: If supported, at least one implementation mechanism must be enabled',
-		)
+		);
 	}
 	return {
 		supported,
@@ -119,70 +119,70 @@ function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSuppor
 			].filter(x => x).length <= 1,
 		ref: scamAlerts.contractTransactionWarning.ref,
 		...baseProps,
-	}
+	};
 }
 
 function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
-	feature: 'scamUrlWarning'
+	feature: 'scamUrlWarning';
 } {
 	const baseProps = {
 		feature: 'scamUrlWarning',
 		humanFeature: 'connections to potential scam applications',
 		listFeature: 'Warning you when connecting to potential scam applications',
 		required: false,
-	} as const
-	const scamUrlWarning = scamAlerts.scamUrlWarning
+	} as const;
+	const scamUrlWarning = scamAlerts.scamUrlWarning;
 	if (!isSupported(scamUrlWarning)) {
 		return {
 			supported: false,
 			privacyPreserving: false,
 			...baseProps,
-		}
+		};
 	}
 	return {
 		supported: true,
 		privacyPreserving: ((): boolean => {
 			switch (scamUrlWarning.leaksVisitedUrl) {
 				case 'NO':
-					return true
+					return true;
 				case 'PARTIAL_HASH_OF_DOMAIN':
-					return true
+					return true;
 				case 'FULL_URL':
-					return false
+					return false;
 				case 'DOMAIN_ONLY':
-					return !scamUrlWarning.leaksIp && !scamUrlWarning.leaksUserAddress
+					return !scamUrlWarning.leaksIp && !scamUrlWarning.leaksUserAddress;
 			}
 		})(),
 		ref: scamUrlWarning.ref,
 		...baseProps,
-	}
+	};
 }
 
 function evaluateScamAlerts(
 	walletProfile: WalletProfile,
 	scamAlerts: ScamAlerts,
 ): Evaluation<ScamPreventionValue> {
-	const sendTransactionWarning = rateSendTransactionWarning(scamAlerts)
-	const contractTransactionWarning = rateContractTransactionWarning(scamAlerts)
-	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
+	const sendTransactionWarning = rateSendTransactionWarning(scamAlerts);
+	const contractTransactionWarning = rateContractTransactionWarning(scamAlerts);
+	const scamUrlWarning = rateScamUrlWarning(scamAlerts);
 	const allRefs = mergeRefs(
 		sendTransactionWarning.ref,
 		contractTransactionWarning.ref,
 		scamUrlWarning.ref,
-	)
+	);
 	const requiredFeatures = ((): NonEmptyArray<ScamAlertSupport> => {
 		switch (walletProfile) {
 			case WalletProfile.GENERIC:
-				return [sendTransactionWarning, contractTransactionWarning, scamUrlWarning]
+				return [sendTransactionWarning, contractTransactionWarning, scamUrlWarning];
 			case WalletProfile.PAYMENTS:
-				return [sendTransactionWarning, scamUrlWarning]
+				return [sendTransactionWarning, scamUrlWarning];
 		}
-	})()
+	})();
 	for (const feature of requiredFeatures) {
-		feature.required = true
+		feature.required = true;
 	}
-	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
-	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
+	const supportedFeatures = requiredFeatures.filter(sas => sas.supported);
+	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported);
 	if (!isNonEmptyArray(supportedFeatures)) {
 		// No features supported.
 		return {
@@ -209,9 +209,9 @@ function evaluateScamAlerts(
 				`,
 			),
 			references: allRefs,
-		}
+		};
 	}
-	const privacyPreservingFeatures = supportedFeatures.filter(sas => sas.privacyPreserving)
+	const privacyPreservingFeatures = supportedFeatures.filter(sas => sas.privacyPreserving);
 	if (
 		requiredFeatures.includes(scamUrlWarning) &&
 		isSupported(scamAlerts.scamUrlWarning) &&
@@ -249,7 +249,7 @@ function evaluateScamAlerts(
 					`,
 				),
 				references: allRefs,
-			}
+			};
 		}
 		if (
 			scamAlerts.scamUrlWarning.leaksVisitedUrl === 'DOMAIN_ONLY' &&
@@ -285,7 +285,7 @@ function evaluateScamAlerts(
 					`,
 				),
 				references: allRefs,
-			}
+			};
 		}
 	}
 	if (unsupportedFeatures.length > 0) {
@@ -323,11 +323,11 @@ function evaluateScamAlerts(
 				`,
 			),
 			references: allRefs,
-		}
+		};
 	}
 	if (privacyPreservingFeatures.length < supportedFeatures.length) {
 		const needsImprovement = (sas: ScamAlertSupport): boolean =>
-			sas.required && sas.supported && !sas.privacyPreserving
+			sas.required && sas.supported && !sas.privacyPreserving;
 		// Not all features implemented with privacy support.
 		return {
 			value: {
@@ -384,7 +384,7 @@ function evaluateScamAlerts(
 				`,
 			),
 			references: allRefs,
-		}
+		};
 	}
 	// All features implements with privacy.
 	return {
@@ -406,7 +406,7 @@ function evaluateScamAlerts(
 		},
 		details: scamAlertsDetailsContent({}),
 		references: allRefs,
-	}
+	};
 }
 
 export const scamPrevention: Attribute<ScamPreventionValue> = {
@@ -592,9 +592,9 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<ScamPreventionValue> => {
 		if (features.security.scamAlerts === null) {
-			return unrated(scamPrevention, brand, { scamAlerts: null })
+			return unrated(scamPrevention, brand, { scamAlerts: null });
 		}
-		return evaluateScamAlerts(features.profile, features.security.scamAlerts)
+		return evaluateScamAlerts(features.profile, features.security.scamAlerts);
 	},
 	aggregate: pickWorstRating<ScamPreventionValue>,
-}
+};

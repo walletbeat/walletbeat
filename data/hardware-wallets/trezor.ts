@@ -1,12 +1,12 @@
-import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
+import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
+import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { Variant } from '@/schema/variants';
+import type { HardwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny'
+import { nconsigny } from '../contributors/nconsigny';
 
 export const trezorWallet: HardwareWallet = {
 	metadata: {
@@ -129,7 +129,7 @@ export const trezorWallet: HardwareWallet = {
 	variants: {
 		[Variant.HARDWARE]: true,
 	},
-}
+};
 
 // Flagship : Trezor safe 5 : @https://trezor.io/trezor-safe-5
 // Trezor safe 3 : @https://trezor.io/trezor-safe-3

@@ -5,38 +5,38 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
-import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety'
-import { popRefs } from '@/schema/reference'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
+import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety';
+import { popRefs } from '@/schema/reference';
+import type { AtLeastOneVariant } from '@/schema/variants';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.user_safety'
+const brand = 'attributes.user_safety';
 
 export type UserSafetyValue = Value & {
-	readableAddress: UserSafetyType
-	contractLabeling: UserSafetyType
-	rawTxReview: UserSafetyType
-	readableTx: UserSafetyType
-	txCoverageExtensibility: UserSafetyType
-	txExpertMode: UserSafetyType
-	rawEip712: UserSafetyType
-	readableEip712: UserSafetyType
-	eip712CoverageExtensibility: UserSafetyType
-	eip712ExpertMode: UserSafetyType
-	riskAnalysis: UserSafetyType
-	riskAnalysisLocal: UserSafetyType
-	fullyLocalRiskAnalysis: UserSafetyType
-	txSimulation: UserSafetyType
-	txSimulationLocal: UserSafetyType
-	fullyLocalTxSimulation: UserSafetyType
-	__brand: 'attributes.user_safety'
-}
+	readableAddress: UserSafetyType;
+	contractLabeling: UserSafetyType;
+	rawTxReview: UserSafetyType;
+	readableTx: UserSafetyType;
+	txCoverageExtensibility: UserSafetyType;
+	txExpertMode: UserSafetyType;
+	rawEip712: UserSafetyType;
+	readableEip712: UserSafetyType;
+	eip712CoverageExtensibility: UserSafetyType;
+	eip712ExpertMode: UserSafetyType;
+	riskAnalysis: UserSafetyType;
+	riskAnalysisLocal: UserSafetyType;
+	fullyLocalRiskAnalysis: UserSafetyType;
+	txSimulation: UserSafetyType;
+	txSimulationLocal: UserSafetyType;
+	fullyLocalTxSimulation: UserSafetyType;
+	__brand: 'attributes.user_safety';
+};
 
 function evaluateUserSafety(features: UserSafetySupport): Rating {
 	const ratings = [
@@ -56,15 +56,15 @@ function evaluateUserSafety(features: UserSafetySupport): Rating {
 		features.txSimulation,
 		features.txSimulationLocal,
 		features.fullyLocalTxSimulation,
-	]
-	const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
+	];
+	const passCount = ratings.filter(r => r === UserSafetyType.PASS).length;
 	if (passCount >= 11) {
-		return Rating.PASS
+		return Rating.PASS;
 	}
 	if (passCount >= 6) {
-		return Rating.PARTIAL
+		return Rating.PARTIAL;
 	}
-	return Rating.FAIL
+	return Rating.FAIL;
 }
 
 export const userSafety: Attribute<UserSafetyValue> = {
@@ -177,10 +177,10 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 					txSimulationLocal: UserSafetyType.FAIL,
 					fullyLocalTxSimulation: UserSafetyType.FAIL,
 				},
-			)
+			);
 		}
 
-		const userSafetyFeature = features.security.userSafety
+		const userSafetyFeature = features.security.userSafety;
 		if (userSafetyFeature === null) {
 			return unrated(userSafety, brand, {
 				readableAddress: UserSafetyType.FAIL,
@@ -199,11 +199,11 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 				txSimulation: UserSafetyType.FAIL,
 				txSimulationLocal: UserSafetyType.FAIL,
 				fullyLocalTxSimulation: UserSafetyType.FAIL,
-			})
+			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<UserSafetySupport>(userSafetyFeature)
-		const rating = evaluateUserSafety(withoutRefs)
+		const { withoutRefs, refs: extractedRefs } = popRefs<UserSafetySupport>(userSafetyFeature);
+		const rating = evaluateUserSafety(withoutRefs);
 
 		const passCount = [
 			withoutRefs.readableAddress,
@@ -222,22 +222,22 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 			withoutRefs.txSimulation,
 			withoutRefs.txSimulationLocal,
 			withoutRefs.fullyLocalTxSimulation,
-		].filter(r => r === UserSafetyType.PASS).length
+		].filter(r => r === UserSafetyType.PASS).length;
 
 		const detailsText = ({ wallet }: EvaluationData<UserSafetyValue>): string => {
-			let desc = `${wallet.metadata.displayName} user safety evaluation is ${rating.toLowerCase()}.`
+			let desc = `${wallet.metadata.displayName} user safety evaluation is ${rating.toLowerCase()}.`;
 			if (rating !== Rating.EXEMPT) {
-				desc += ` It passes ${passCount} out of 16 sub-criteria.`
+				desc += ` It passes ${passCount} out of 16 sub-criteria.`;
 			}
-			return desc
-		}
+			return desc;
+		};
 
 		const howToImproveText = ({ wallet }: EvaluationData<UserSafetyValue>): string => {
 			if (rating === Rating.PASS || rating === Rating.EXEMPT) {
-				return ''
+				return '';
 			}
-			return `${wallet.metadata.displayName} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`
-		}
+			return `${wallet.metadata.displayName} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`;
+		};
 
 		return {
 			value: {
@@ -257,6 +257,6 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 				rating === Rating.PASS || rating === Rating.EXEMPT
 					? undefined
 					: paragraph(howToImproveText),
-		}
+		};
 	},
-}
+};

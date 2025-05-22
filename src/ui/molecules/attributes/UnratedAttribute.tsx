@@ -1,10 +1,10 @@
-import { Typography } from '@mui/material'
+import { Typography } from '@mui/material';
 
-import { Rating, type Value } from '@/schema/attributes'
-import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
+import { Rating, type Value } from '@/schema/attributes';
+import type { UnratedAttributeProps } from '@/types/content/unrated-attribute';
 
-import { ExternalLink } from '../../atoms/ExternalLink'
-import { WrapRatingIcon } from '../../atoms/WrapRatingIcon'
+import { ExternalLink } from '../../atoms/ExternalLink';
+import { WrapRatingIcon } from '../../atoms/WrapRatingIcon';
 
 export function UnratedAttribute<V extends Value>({
 	wallet,
@@ -23,5 +23,5 @@ export function UnratedAttribute<V extends Value>({
 				!
 			</Typography>
 		</WrapRatingIcon>
-	)
+	);
 }

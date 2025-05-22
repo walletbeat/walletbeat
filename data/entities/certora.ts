@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
 
 export const certora: CorporateEntity & SecurityAuditor = {
 	id: 'certora',
@@ -27,4 +27,4 @@ export const certora: CorporateEntity & SecurityAuditor = {
 	repoUrl: 'https://github.com/Certora',
 	twitter: 'https://x.com/CertoraInc',
 	url: 'https://www.certora.com/',
-}
+};

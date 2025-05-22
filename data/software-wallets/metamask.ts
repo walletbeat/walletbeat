@@ -1,17 +1,17 @@
-import { AccountType } from '@/schema/features/account-support'
-import { WalletProfile } from '@/schema/features/profile'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { AccountType } from '@/schema/features/account-support';
+import { WalletProfile } from '@/schema/features/profile';
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
+import { featureSupported, notSupported, supported } from '@/schema/features/support';
+import { Variant } from '@/schema/variants';
+import type { SoftwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny'
-import { polymutex } from '../contributors/polymutex'
-import { cure53 } from '../entities/cure53'
-import { diligence } from '../entities/diligence'
+import { nconsigny } from '../contributors/nconsigny';
+import { polymutex } from '../contributors/polymutex';
+import { cure53 } from '../entities/cure53';
+import { diligence } from '../entities/diligence';
 
 export const metamask: SoftwareWallet = {
 	metadata: {
@@ -166,4 +166,4 @@ export const metamask: SoftwareWallet = {
 		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
 	},
-}
+};

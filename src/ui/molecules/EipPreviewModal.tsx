@@ -1,17 +1,17 @@
-import type React from 'react'
-import { useLayoutEffect, useRef, useState } from 'react'
-import ReactDOM from 'react-dom'
+import type React from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 
-import { type Eip, eipEthereumDotOrgUrl } from '@/schema/eips'
-import { trimWhitespacePrefix } from '@/types/utils/text'
+import { type Eip, eipEthereumDotOrgUrl } from '@/schema/eips';
+import { trimWhitespacePrefix } from '@/types/utils/text';
 
-import { MarkdownTypography } from '../atoms/MarkdownTypography'
+import { MarkdownTypography } from '../atoms/MarkdownTypography';
 
 interface EipPreviewModalProps {
-	eip: Eip
-	anchorEl: HTMLElement | null
-	onMouseEnter?: () => void
-	onMouseLeave?: () => void
+	eip: Eip;
+	anchorEl: HTMLElement | null;
+	onMouseEnter?: () => void;
+	onMouseLeave?: () => void;
 }
 
 export function EipPreviewModal({
@@ -20,44 +20,44 @@ export function EipPreviewModal({
 	onMouseEnter,
 	onMouseLeave,
 }: EipPreviewModalProps): React.ReactElement | null {
-	const modalRef = useRef<HTMLDivElement>(null)
+	const modalRef = useRef<HTMLDivElement>(null);
 	const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({
 		top: 0,
 		left: 0,
-	})
+	});
 
 	useLayoutEffect(() => {
 		if (anchorEl !== null && modalRef.current !== null) {
-			const modalDiv = modalRef.current
-			const rect = anchorEl.getBoundingClientRect()
+			const modalDiv = modalRef.current;
+			const rect = anchorEl.getBoundingClientRect();
 
-			const actualPopupHeight = modalDiv.offsetHeight
-			const actualPopupWidth = modalDiv.offsetWidth
+			const actualPopupHeight = modalDiv.offsetHeight;
+			const actualPopupWidth = modalDiv.offsetWidth;
 
 			// Default position: to the right of the anchor, vertically centered
-			let top = rect.top + rect.height / 2 - actualPopupHeight / 2
-			let left = rect.right + 10 // 10px offset
+			let top = rect.top + rect.height / 2 - actualPopupHeight / 2;
+			let left = rect.right + 10; // 10px offset
 
 			// Adjust horizontal position
 			if (left + actualPopupWidth > window.innerWidth - 10) {
 				// Check right overflow (10px margin)
-				left = rect.left - actualPopupWidth - 10 // Move to the left
+				left = rect.left - actualPopupWidth - 10; // Move to the left
 			}
 			if (left < 10) {
 				// Ensure 10px left margin
-				left = 10
+				left = 10;
 			}
 
 			// Clamp top position to be within viewport with 10px margins
-			const maxPossibleTop = window.innerHeight - actualPopupHeight - 10
-			top = Math.max(10, Math.min(top, maxPossibleTop))
+			const maxPossibleTop = window.innerHeight - actualPopupHeight - 10;
+			top = Math.max(10, Math.min(top, maxPossibleTop));
 
-			setPopupPosition({ top, left })
+			setPopupPosition({ top, left });
 		}
-	}, [anchorEl, eip]) // Added eip to dependencies, modalRef implicitly stable
+	}, [anchorEl, eip]); // Added eip to dependencies, modalRef implicitly stable
 
 	if (anchorEl === null) {
-		return null
+		return null;
 	}
 
 	return ReactDOM.createPortal(
@@ -141,5 +141,5 @@ export function EipPreviewModal({
 			</div>
 		</div>,
 		document.body,
-	)
+	);
 }

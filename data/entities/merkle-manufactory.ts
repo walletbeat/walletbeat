@@ -1,4 +1,4 @@
-import type { CorporateEntity } from '@/schema/entity'
+import type { CorporateEntity } from '@/schema/entity';
 
 export const merkleManufactory: CorporateEntity = {
 	id: 'merkle-manufactory',
@@ -23,4 +23,4 @@ export const merkleManufactory: CorporateEntity = {
 	repoUrl: 'https://github.com/farcasterxyz',
 	twitter: 'https://x.com/farcaster_xyz',
 	url: 'https://merklemanufactory.com/',
-}
+};

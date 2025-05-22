@@ -1,11 +1,11 @@
-import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content'
-import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
+import type { Paragraph, Renderable, RenderableTypography, Sentence } from '@/types/content';
+import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty';
 
-import type { ResolvedFeatures } from './features'
-import type { FullyQualifiedReference, ReferenceArray } from './reference'
-import type { MaybeUnratedScore, Score } from './score'
-import type { AtLeastOneVariant } from './variants'
-import type { RatedWallet, WalletMetadata } from './wallet'
+import type { ResolvedFeatures } from './features';
+import type { FullyQualifiedReference, ReferenceArray } from './reference';
+import type { MaybeUnratedScore, Score } from './score';
+import type { AtLeastOneVariant } from './variants';
+import type { RatedWallet, WalletMetadata } from './wallet';
 
 /**
  * Rating is an enum that should be visually meaningful.
@@ -54,7 +54,7 @@ export function isRating(value: unknown): value is Rating {
 		value === Rating.PARTIAL ||
 		value === Rating.FAIL ||
 		value === Rating.EXEMPT
-	)
+	);
 }
 
 /**
@@ -63,15 +63,15 @@ export function isRating(value: unknown): value is Rating {
 export function ratingToText(rating: Rating): string {
 	switch (rating) {
 		case Rating.PASS:
-			return 'Pass'
+			return 'Pass';
 		case Rating.PARTIAL:
-			return 'Partial'
+			return 'Partial';
 		case Rating.FAIL:
-			return 'Fail'
+			return 'Fail';
 		case Rating.UNRATED:
-			return 'Unrated'
+			return 'Unrated';
 		case Rating.EXEMPT:
-			return 'Exempt'
+			return 'Exempt';
 	}
 }
 
@@ -81,15 +81,15 @@ export function ratingToText(rating: Rating): string {
 export function ratingToIcon(rating: Rating): string {
 	switch (rating) {
 		case Rating.FAIL:
-			return '\u{274c}' // Red X
+			return '\u{274c}'; // Red X
 		case Rating.PARTIAL:
-			return '\u{26a0}' // Warning sign
+			return '\u{26a0}'; // Warning sign
 		case Rating.PASS:
-			return '\u{2705}' // Green checkmark
+			return '\u{2705}'; // Green checkmark
 		case Rating.UNRATED:
-			return '\u{2753}' // Question mark
+			return '\u{2753}'; // Question mark
 		case Rating.EXEMPT:
-			return '\u{26aa}' // White circle
+			return '\u{26aa}'; // White circle
 	}
 }
 
@@ -99,28 +99,28 @@ export function ratingToIcon(rating: Rating): string {
 export function ratingToColor(rating: Rating): string {
 	switch (rating) {
 		case Rating.PASS:
-			return 'var(--rating-pass)'
+			return 'var(--rating-pass)';
 		case Rating.PARTIAL:
-			return 'var(--rating-partial)'
+			return 'var(--rating-partial)';
 		case Rating.FAIL:
-			return 'var(--rating-fail)'
+			return 'var(--rating-fail)';
 		default:
-			return 'var(--rating-neutral)'
+			return 'var(--rating-neutral)';
 	}
 }
 
 export function borderRatingToColor(rating: Rating): string {
 	switch (rating) {
 		case Rating.FAIL:
-			return '#e74c3c' // Red
+			return '#e74c3c'; // Red
 		case Rating.PARTIAL:
-			return '#f1c40f' // Yellow
+			return '#f1c40f'; // Yellow
 		case Rating.PASS:
-			return '#2ecc71' // Green
+			return '#2ecc71'; // Green
 		case Rating.UNRATED:
-			return '#bdc3c7' // Gray
+			return '#bdc3c7'; // Gray
 		case Rating.EXEMPT:
-			return '#bdc3c7' // Gray
+			return '#bdc3c7'; // Gray
 	}
 }
 
@@ -141,7 +141,7 @@ export interface Value {
 	 * For example, when evaluating an attribute like open-source licensing,
 	 * the attribute of the value may be the ID of the license.
 	 */
-	id: string
+	id: string;
 
 	/**
 	 * An icon that represents the *attribute* when this value is used to
@@ -149,7 +149,7 @@ export interface Value {
 	 * For example, if an attribute has the "chain" icon, one of the ratings
 	 * might use the "broken chain" icon.
 	 */
-	icon?: string
+	icon?: string;
 
 	/**
 	 * A very short, human-readable explanation of this value.
@@ -159,14 +159,14 @@ export interface Value {
 	 * this could say "Apache 2.0 license", not just "Apache 2.0" as that would
 	 * be meaningless out of context.
 	 */
-	displayName: string
+	displayName: string;
 
 	/**
 	 * A very short, human-readable explanation of this value.
 	 * Should be similar to `displayName` but may be formatted with the name
 	 * of the wallet.
 	 */
-	shortExplanation: Sentence<WalletMetadata>
+	shortExplanation: Sentence<WalletMetadata>;
 
 	/**
 	 * The visual representation of this value.
@@ -175,7 +175,7 @@ export interface Value {
 	 * "PARTIAL" if the wallet is BUSL-licensed, or "FAIL" if the wallet is
 	 * proprietary.
 	 */
-	rating: Rating
+	rating: Rating;
 
 	/**
 	 * A score representing this value on this specific attribute.
@@ -183,29 +183,29 @@ export interface Value {
 	 * score of 1.0.
 	 * If unspecified, the score is derived  using `defaultRatingScore`.
 	 */
-	score?: Score
+	score?: Score;
 }
 
 /** The numerical score corresponding to a rating by default. */
 export function defaultRatingScore(rating: Rating): Score | null {
 	switch (rating) {
 		case Rating.FAIL:
-			return 0.0
+			return 0.0;
 		case Rating.PARTIAL:
-			return 0.5
+			return 0.5;
 		case Rating.PASS:
-			return 1.0
+			return 1.0;
 		case Rating.UNRATED:
-			return 0.0
+			return 0.0;
 		case Rating.EXEMPT:
-			return null
+			return null;
 	}
 }
 
 export interface EvaluationData<V extends Value> {
-	value: V
-	references: FullyQualifiedReference[]
-	wallet: RatedWallet
+	value: V;
+	references: FullyQualifiedReference[];
+	wallet: RatedWallet;
 }
 
 /**
@@ -216,7 +216,7 @@ export interface Evaluation<V extends Value> {
 	/**
 	 * The value representing how well the wallet fulfills the attribute.
 	 */
-	value: V
+	value: V;
 
 	/**
 	 * A long, human-readable explanation of this evaluation.
@@ -224,7 +224,7 @@ export interface Evaluation<V extends Value> {
 	 * This can be more verbose but should still avoid repeating information
 	 * already stated in the attribute explanation.
 	 */
-	details: Renderable<EvaluationData<V>>
+	details: Renderable<EvaluationData<V>>;
 
 	/**
 	 * An optional paragraph explaining the consequence of this value on the
@@ -235,20 +235,20 @@ export interface Evaluation<V extends Value> {
 	 * should explain the upsides or downsides of FOSS licensing on the wallet
 	 * software (e.g. "FOSS means more contributors").
 	 */
-	impact?: Paragraph<EvaluationData<V>>
+	impact?: Paragraph<EvaluationData<V>>;
 
 	/**
 	 * An optional paragraph or list of suggestions on what the wallet can do
 	 * to improve this rating. Should only be populated for ratings that are
 	 * not perfect.
 	 */
-	howToImprove?: RenderableTypography<EvaluationData<V>>
+	howToImprove?: RenderableTypography<EvaluationData<V>>;
 
 	/**
 	 * Optional array of references with URLs and explanations.
 	 * These references provide sources for the evaluation claims.
 	 */
-	references?: ReferenceArray
+	references?: ReferenceArray;
 }
 
 /**
@@ -256,9 +256,9 @@ export interface Evaluation<V extends Value> {
  */
 export type ExemptEvaluation<V extends Value> = Evaluation<V> & {
 	value: Evaluation<V>['value'] & {
-		rating: Rating.EXEMPT
-	}
-}
+		rating: Rating.EXEMPT;
+	};
+};
 
 /**
  * Type predicate for ExemptEvaluation.
@@ -266,7 +266,7 @@ export type ExemptEvaluation<V extends Value> = Evaluation<V> & {
 export function isExempt<V extends Value>(
 	evaluation: Evaluation<V>,
 ): evaluation is ExemptEvaluation<V> {
-	return evaluation.value.rating === Rating.EXEMPT
+	return evaluation.value.rating === Rating.EXEMPT;
 }
 
 /**
@@ -280,13 +280,13 @@ export interface ExampleRating<V extends Value> {
 	 * Must start with "The wallet " (possibly after whitespace) or
 	 * "The wallet's ".
 	 */
-	description: Sentence | Paragraph
+	description: Sentence | Paragraph;
 
 	/**
 	 * Match function that determines whether the given `value` matches this
 	 * example.
 	 */
-	matchesValue: (value: V) => boolean
+	matchesValue: (value: V) => boolean;
 }
 
 /**
@@ -300,10 +300,10 @@ export interface Attribute<V extends Value> {
 	 * Unique ID representing the attribute in camelCase.
 	 * For example: "sourceVisibility".
 	 */
-	id: string
+	id: string;
 
 	/** An icon representing the attribute. Shown on rating charts. */
-	icon: string
+	icon: string;
 
 	/**
 	 * A very short, human-readable title for the attribute.
@@ -311,7 +311,7 @@ export interface Attribute<V extends Value> {
 	 * Used in the context of section titles, so it should stand on its own
 	 * outside of any sentence context, and should be capitalized appropriately.
 	 */
-	displayName: string
+	displayName: string;
 
 	wording:
 		| {
@@ -325,30 +325,30 @@ export interface Attribute<V extends Value> {
 				 * In more complex cases, this should be omitted and the more complex
 				 * variation of `wording` should be used.
 				 */
-				midSentenceName: string
+				midSentenceName: string;
 		  }
 		| {
 				/**
 				 * midSentenceName can be set to `null` for more complex attribute
 				 * names.
 				 */
-				midSentenceName: null
+				midSentenceName: null;
 
 				/** The sentence "How is <attribute> evaluated?"  */
-				howIsEvaluated: string
+				howIsEvaluated: string;
 
 				/** The sentence "What can <wallet> do about its <attribute>?" */
-				whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) => string
-		  }
+				whatCanWalletDoAboutIts: (walletMetadata: WalletMetadata) => string;
+		  };
 
 	/** A question explaining what question the attribute is answering. */
-	question: Sentence<WalletMetadata>
+	question: Sentence<WalletMetadata>;
 
 	/** A paragraph explaining why this attribute is important to users. */
-	why: RenderableTypography
+	why: RenderableTypography;
 
 	/** General explanation of how wallets are rated on this attribute. */
-	methodology: RenderableTypography
+	methodology: RenderableTypography;
 
 	/** Explanations of what a wallet can do to achieve each rating. */
 	ratingScale:
@@ -358,10 +358,10 @@ export interface Attribute<V extends Value> {
 				 * "simple" means to render a simple renderable block of text, useful for
 				 * simple yes/no-type attributes.
 				 */
-				display: 'simple'
+				display: 'simple';
 
 				/** The content to display to explain the rating scale. */
-				content: RenderableTypography
+				content: RenderableTypography;
 		  }
 		| {
 				/**
@@ -371,26 +371,26 @@ export interface Attribute<V extends Value> {
 				 * - "fail-pass": Failing examples first, passing examples last
 				 *   (partial examples in the middle, if any).
 				 */
-				display: 'pass-fail' | 'fail-pass'
+				display: 'pass-fail' | 'fail-pass';
 
 				/**
 				 * Whether the examples below exhaustively cover all cases that
 				 * are possible. This affects the wording around the examples.
 				 */
-				exhaustive: boolean
+				exhaustive: boolean;
 
 				/** One or more ways in which a wallet can achieve a passing rating. */
-				pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+				pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>;
 
 				/**
 				 * Ways in which a wallet can achieve a partial rating.
 				 * Unlike passing/failing, there may be zero ways to get a partial rating.
 				 */
-				partial?: ExampleRating<V> | Array<ExampleRating<V>>
+				partial?: ExampleRating<V> | Array<ExampleRating<V>>;
 
 				/** One or more ways in which a wallet can achieve a failing rating. */
-				fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
-		  }
+				fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>;
+		  };
 
 	/**
 	 * Evaluate the attribute for a given set of wallet features.
@@ -403,7 +403,7 @@ export interface Attribute<V extends Value> {
 	 * by preventing their evaluation code from taking any metadata into
 	 * account.
 	 */
-	evaluate: (features: ResolvedFeatures) => Evaluation<V>
+	evaluate: (features: ResolvedFeatures) => Evaluation<V>;
 
 	/**
 	 * Check whether the attribute applies to a wallet, according to its
@@ -416,26 +416,26 @@ export interface Attribute<V extends Value> {
 	 *
 	 * If `exempted` is undefined, then `evaluate` is used unconditionally.
 	 */
-	exempted?: (features: ResolvedFeatures, metadata: WalletMetadata) => null | ExemptEvaluation<V>
+	exempted?: (features: ResolvedFeatures, metadata: WalletMetadata) => null | ExemptEvaluation<V>;
 
 	/**
 	 * Aggregates one or more per-variant evaluations into a single one.
 	 * @param perVariant One or more per-variant evaluations.
 	 * @returns The aggregated evaluation for these per-variant evaluations.
 	 */
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<V>>) => Evaluation<V>
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<V>>) => Evaluation<V>;
 }
 
 export interface EvaluatedAttribute<V extends Value> {
-	attribute: Attribute<V>
-	evaluation: Evaluation<V>
+	attribute: Attribute<V>;
+	evaluation: Evaluation<V>;
 }
 
 /**
  * A map of values. Should be a dictionary, i.e. its set of properties should
  * be fixed. Used to define attribute groups.
  */
-export type ValueSet = NonEmptyRecord<string, Value>
+export type ValueSet = NonEmptyRecord<string, Value>;
 
 /**
  * An attribute group is a collection of attributes that are related to one
@@ -444,30 +444,30 @@ export type ValueSet = NonEmptyRecord<string, Value>
  */
 export interface AttributeGroup<Vs extends ValueSet> {
 	/** Unique ID of the attribute group. */
-	id: string
+	id: string;
 
 	/** A friendly icon for the group. */
-	icon: string
+	icon: string;
 
 	/** A human-readable name for the group. */
-	displayName: string
+	displayName: string;
 
 	/**
 	 * A short question to which this attribute group is the answer.
 	 * For example, for an attribute group about privacy, a good question
 	 * might be "How well does {wallet} protect your privacy?".
 	 */
-	perWalletQuestion: Sentence<Pick<WalletMetadata, 'displayName'>>
+	perWalletQuestion: Sentence<Pick<WalletMetadata, 'displayName'>>;
 
 	/** The actual set of attributes belonging to this group. */
-	attributes: { [K in keyof Vs]: Attribute<Vs[K]> }
+	attributes: { [K in keyof Vs]: Attribute<Vs[K]> };
 
 	/**
 	 * A scoring function for the attributes.
 	 * @param evaluations The set of evaluated attributes.
 	 * @return A score between 0.0 (lowest) and 1.0 (highest).
 	 */
-	score: (evaluations: EvaluatedGroup<Vs>) => MaybeUnratedScore
+	score: (evaluations: EvaluatedGroup<Vs>) => MaybeUnratedScore;
 }
 
 /**
@@ -476,8 +476,8 @@ export interface AttributeGroup<Vs extends ValueSet> {
  * be in the same evaluation group.
  */
 export type EvaluatedGroup<Vs extends ValueSet> = {
-	[K in keyof Vs]: EvaluatedAttribute<Vs[K]>
-}
+	[K in keyof Vs]: EvaluatedAttribute<Vs[K]>;
+};
 
 /**
  * Convenience method to iterate over all evaluated attributes in a group.
@@ -487,8 +487,7 @@ export type EvaluatedGroup<Vs extends ValueSet> = {
 export function evaluatedAttributes<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
 ): NonEmptyArray<EvaluatedAttribute<Value>> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.values(evaluatedGroup) as NonEmptyArray<EvaluatedAttribute<Value>>
+	return Object.values(evaluatedGroup) as NonEmptyArray<EvaluatedAttribute<Value>>;
 }
 
 /**
@@ -500,12 +499,11 @@ export function evaluatedAttributes<Vs extends ValueSet>(
 export function evaluatedAttributesEntries<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
 ): NonEmptyArray<[keyof Vs, EvaluatedAttribute<Value>]> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.entries(evaluatedGroup) as NonEmptyArray<[keyof Vs, EvaluatedAttribute<Value>]>
+	return Object.entries(evaluatedGroup) as NonEmptyArray<[keyof Vs, EvaluatedAttribute<Value>]>;
 }
 
 /** Represents an unimplemented ExampleRating. See below. */
-export const exampleRatingUnimplemented = 'UNIMPLEMENTED'
+export const exampleRatingUnimplemented = 'UNIMPLEMENTED';
 
 /**
  * Helper function to build an `ExampleRating`.
@@ -529,18 +527,18 @@ export function exampleRating<V extends Value>(
 		matchesValue: (value: V): boolean =>
 			nonEmptyMap(matchers, matcher => {
 				if (matcher === exampleRatingUnimplemented) {
-					return false
+					return false;
 				}
 				if (isRating(matcher)) {
-					return value.rating === matcher
+					return value.rating === matcher;
 				}
 				if (typeof matcher === 'string') {
-					return value.id === matcher
+					return value.id === matcher;
 				}
 				if (typeof matcher === 'function') {
-					return matcher(value)
+					return matcher(value);
 				}
-				return matcher.id === value.id
+				return matcher.id === value.id;
 			}).includes(true),
-	}
+	};
 }

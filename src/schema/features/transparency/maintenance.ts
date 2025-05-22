@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 export enum MaintenanceType {
 	PASS = 'PASS',
@@ -7,14 +7,14 @@ export enum MaintenanceType {
 }
 
 export interface MaintenanceSupport {
-	type: MaintenanceType
-	url?: string
-	details?: string
-	physicalDurability: MaintenanceType
-	mtbfDocumentation: MaintenanceType
-	repairability: MaintenanceType
-	batteryHandling: MaintenanceType
-	warrantyExtensions: MaintenanceType
+	type: MaintenanceType;
+	url?: string;
+	details?: string;
+	physicalDurability: MaintenanceType;
+	mtbfDocumentation: MaintenanceType;
+	repairability: MaintenanceType;
+	batteryHandling: MaintenanceType;
+	warrantyExtensions: MaintenanceType;
 }
 
-export type MaintenanceImplementation = WithRef<MaintenanceSupport>
+export type MaintenanceImplementation = WithRef<MaintenanceSupport>;

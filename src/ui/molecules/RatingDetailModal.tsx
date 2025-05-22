@@ -1,31 +1,34 @@
-import { Button, Modal, Typography, useMediaQuery, useTheme } from '@mui/material'
-import cx from 'classnames'
-import type React from 'react'
-import { useEffect, useState } from 'react'
+import { Button, Modal, Typography, useMediaQuery, useTheme } from '@mui/material';
+import cx from 'classnames';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
-import { mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
+import {
+	mapNonExemptGroupAttributes,
+	numNonExemptGroupAttributes,
+} from '@/schema/attribute-groups';
 import {
 	type AttributeGroup,
 	type EvaluatedGroup,
 	ratingToColor,
 	type ValueSet,
-} from '@/schema/attributes'
-import type { HardwareWalletModel } from '@/schema/features/profile'
-import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference'
-import type { LabeledUrl } from '@/schema/url'
-import type { RatedWallet } from '@/schema/wallet'
-import { toKebabCase } from '@/utils/kebab'
+} from '@/schema/attributes';
+import type { HardwareWalletModel } from '@/schema/features/profile';
+import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference';
+import type { LabeledUrl } from '@/schema/url';
+import type { RatedWallet } from '@/schema/wallet';
+import { toKebabCase } from '@/utils/kebab';
 
-import { RenderContent } from '../atoms/RenderContent'
-import { RatingStatusBadge } from './RatingStatusBadge'
+import { RenderContent } from '../atoms/RenderContent';
+import { RatingStatusBadge } from './RatingStatusBadge';
 
 interface RatingDetailModalProps<Vs extends ValueSet> {
-	open: boolean
-	onClose: () => void
-	wallet: RatedWallet
-	attrGroup: AttributeGroup<Vs>
-	evalGroup: EvaluatedGroup<Vs>
-	hardwareWalletModel?: HardwareWalletModel
+	open: boolean;
+	onClose: () => void;
+	wallet: RatedWallet;
+	attrGroup: AttributeGroup<Vs>;
+	evalGroup: EvaluatedGroup<Vs>;
+	hardwareWalletModel?: HardwareWalletModel;
 }
 
 export function RatingDetailModal<Vs extends ValueSet>({
@@ -60,14 +63,14 @@ export function RatingDetailModal<Vs extends ValueSet>({
 				/>
 			</div>
 		</Modal>
-	)
+	);
 }
 
 interface RatingDetailContentProps<Vs extends ValueSet> {
-	wallet: RatedWallet
-	attrGroup: AttributeGroup<Vs>
-	evalGroup: EvaluatedGroup<Vs>
-	hardwareWalletModel?: HardwareWalletModel
+	wallet: RatedWallet;
+	attrGroup: AttributeGroup<Vs>;
+	evalGroup: EvaluatedGroup<Vs>;
+	hardwareWalletModel?: HardwareWalletModel;
 }
 
 export function RatingDetailContent<Vs extends ValueSet>({
@@ -76,65 +79,65 @@ export function RatingDetailContent<Vs extends ValueSet>({
 	wallet,
 	hardwareWalletModel,
 }: RatingDetailContentProps<Vs>): React.ReactElement {
-	const theme = useTheme()
-	const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
-	const [expandedAttribute, setExpandedAttribute] = useState<string | null>(null)
+	const theme = useTheme();
+	const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+	const [expandedAttribute, setExpandedAttribute] = useState<string | null>(null);
 	const [selectedModel, setSelectedModel] = useState<HardwareWalletModel | null>(
 		hardwareWalletModel ?? null,
-	)
-	const [hoveredSliceIndex, setHoveredSliceIndex] = useState<number | null>(null)
+	);
+	const [hoveredSliceIndex, setHoveredSliceIndex] = useState<number | null>(null);
 
 	// Get hardware wallet models if applicable
-	const hardwareModels = wallet.metadata.hardwareWalletModels ?? []
-	const hasHardwareModels = hardwareModels.length > 0
+	const hardwareModels = wallet.metadata.hardwareWalletModels ?? [];
+	const hasHardwareModels = hardwareModels.length > 0;
 
 	// Get the flagship model if available
 	const flagshipModel = hasHardwareModels
 		? (hardwareModels.find(model => model.isFlagship) ?? hardwareModels[0])
-		: null
+		: null;
 
 	// If no model is selected but we have models, default to the flagship
 	useEffect(() => {
 		if (selectedModel !== null && flagshipModel !== null && flagshipModel.id !== '') {
-			setSelectedModel(flagshipModel)
+			setSelectedModel(flagshipModel);
 		}
-	}, [flagshipModel, selectedModel])
+	}, [flagshipModel, selectedModel]);
 
-	const attrGroupScore = attrGroup.score(evalGroup)
-	const overallScore = attrGroupScore === null ? 0 : attrGroupScore.score
+	const attrGroupScore = attrGroup.score(evalGroup);
+	const overallScore = attrGroupScore === null ? 0 : attrGroupScore.score;
 
 	// Create SVG slices for the enlarged chart
 	const createEnlargedSlices = (): React.JSX.Element[] => {
-		const attributeCount = numNonExemptGroupAttributes(evalGroup)
-		const centerX = 150
-		const centerY = 150
-		const radius = 120
-		const gapAngle = 2 // Gap in degrees
-		const sliceAngle = 360 / attributeCount - gapAngle
+		const attributeCount = numNonExemptGroupAttributes(evalGroup);
+		const centerX = 150;
+		const centerY = 150;
+		const radius = 120;
+		const gapAngle = 2; // Gap in degrees
+		const sliceAngle = 360 / attributeCount - gapAngle;
 
 		return mapNonExemptGroupAttributes(evalGroup, (evalAttr, i) => {
-			const startAngle = i * (sliceAngle + gapAngle)
-			const endAngle = startAngle + sliceAngle
+			const startAngle = i * (sliceAngle + gapAngle);
+			const endAngle = startAngle + sliceAngle;
 
 			// Convert angles to radians
-			const startRad = ((startAngle - 90) * Math.PI) / 180
-			const endRad = ((endAngle - 90) * Math.PI) / 180
+			const startRad = ((startAngle - 90) * Math.PI) / 180;
+			const endRad = ((endAngle - 90) * Math.PI) / 180;
 
 			// Calculate coordinates
-			const x1 = centerX + radius * Math.cos(startRad)
-			const y1 = centerY + radius * Math.sin(startRad)
-			const x2 = centerX + radius * Math.cos(endRad)
-			const y2 = centerY + radius * Math.sin(endRad)
+			const x1 = centerX + radius * Math.cos(startRad);
+			const y1 = centerY + radius * Math.sin(startRad);
+			const x2 = centerX + radius * Math.cos(endRad);
+			const y2 = centerY + radius * Math.sin(endRad);
 
 			// Create path for the slice
-			const largeArcFlag = sliceAngle > 180 ? 1 : 0
+			const largeArcFlag = sliceAngle > 180 ? 1 : 0;
 
 			const pathData = `
                 M ${centerX} ${centerY}
                 L ${x1} ${y1}
                 A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
                 Z
-            `
+            `;
 
 			return (
 				<path
@@ -149,20 +152,20 @@ export function RatingDetailContent<Vs extends ValueSet>({
 						cursor: 'pointer',
 					}}
 					onMouseEnter={() => {
-						setHoveredSliceIndex(i)
+						setHoveredSliceIndex(i);
 					}}
 					onMouseLeave={() => {
-						setHoveredSliceIndex(null)
+						setHoveredSliceIndex(null);
 					}}
 				/>
-			)
-		})
-	}
+			);
+		});
+	};
 
 	// Toggle expanded state for an attribute
 	const toggleExpandedAttribute = (attributeId: string): void => {
-		setExpandedAttribute(expandedAttribute === attributeId ? null : attributeId)
-	}
+		setExpandedAttribute(expandedAttribute === attributeId ? null : attributeId);
+	};
 
 	// Add the model selector component
 	const modelSelector = hasHardwareModels ? (
@@ -179,7 +182,7 @@ export function RatingDetailContent<Vs extends ValueSet>({
 						}
 						size="small"
 						onClick={() => {
-							setSelectedModel(model)
+							setSelectedModel(model);
 						}}
 						sx={{
 							borderRadius: '16px',
@@ -205,7 +208,7 @@ export function RatingDetailContent<Vs extends ValueSet>({
 				))}
 			</div>
 		</div>
-	) : null
+	) : null;
 
 	return (
 		<>
@@ -246,10 +249,10 @@ export function RatingDetailContent<Vs extends ValueSet>({
 					{numNonExemptGroupAttributes(evalGroup) > 0 ? (
 						<div className="flex flex-col gap-2 max-h-[350px] sm:max-h-[300px] overflow-y-auto pr-1">
 							{mapNonExemptGroupAttributes(evalGroup, (evalAttr, index) => {
-								const isExpanded = expandedAttribute === evalAttr.attribute.id
-								const references = toFullyQualified(evalAttr.evaluation.references)
-								const hasReferences = references.length > 0
-								const detailUrl = `/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`
+								const isExpanded = expandedAttribute === evalAttr.attribute.id;
+								const references = toFullyQualified(evalAttr.evaluation.references);
+								const hasReferences = references.length > 0;
+								const detailUrl = `/${wallet.metadata.id}#${toKebabCase(evalAttr.attribute.id)}`;
 
 								return (
 									<div key={evalAttr.attribute.id} className="mb-2">
@@ -261,13 +264,13 @@ export function RatingDetailContent<Vs extends ValueSet>({
 													: 'bg-background hover:bg-backgroundSecondary',
 											)}
 											onMouseEnter={() => {
-												setHoveredSliceIndex(index)
+												setHoveredSliceIndex(index);
 											}}
 											onMouseLeave={() => {
-												setHoveredSliceIndex(null)
+												setHoveredSliceIndex(null);
 											}}
 											onClick={() => {
-												toggleExpandedAttribute(evalAttr.attribute.id)
+												toggleExpandedAttribute(evalAttr.attribute.id);
 											}}
 										>
 											<div
@@ -355,7 +358,7 @@ export function RatingDetailContent<Vs extends ValueSet>({
 											</div>
 										)}
 									</div>
-								)
+								);
 							})}
 						</div>
 					) : (
@@ -366,5 +369,5 @@ export function RatingDetailContent<Vs extends ValueSet>({
 				</div>
 			</div>
 		</>
-	)
+	);
 }

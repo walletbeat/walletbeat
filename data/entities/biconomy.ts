@@ -1,4 +1,4 @@
-import type { CorporateEntity, TransactionBroadcastProvider } from '@/schema/entity'
+import type { CorporateEntity, TransactionBroadcastProvider } from '@/schema/entity';
 
 export const biconomy: CorporateEntity & TransactionBroadcastProvider = {
 	id: 'biconomy',
@@ -27,4 +27,4 @@ export const biconomy: CorporateEntity & TransactionBroadcastProvider = {
 	repoUrl: 'https://github.com/bcnmy',
 	twitter: 'https://x.com/biconomy',
 	url: 'https://www.biconomy.io/',
-}
+};

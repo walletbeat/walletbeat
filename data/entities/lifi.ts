@@ -1,4 +1,4 @@
-import type { ChainDataProvider, OffchainDataProvider } from '@/schema/entity'
+import type { ChainDataProvider, OffchainDataProvider } from '@/schema/entity';
 
 export const lifi: ChainDataProvider & OffchainDataProvider = {
 	id: 'lifi',
@@ -27,4 +27,4 @@ export const lifi: ChainDataProvider & OffchainDataProvider = {
 	repoUrl: 'https://github.com/lifinance',
 	twitter: 'https://x.com/lifiprotocol',
 	url: 'https://li.fi/',
-}
+};

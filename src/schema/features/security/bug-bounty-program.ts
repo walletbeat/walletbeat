@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 /**
  * Types of bug bounty programs that can be implemented
@@ -17,25 +17,25 @@ export interface BugBountyProgramSupport {
 	/**
 	 * The type of bug bounty program implemented
 	 */
-	type: BugBountyProgramType
+	type: BugBountyProgramType;
 
 	/**
 	 * URL to the bug bounty program details
 	 */
-	url?: string
+	url?: string;
 
 	/**
 	 * Additional details about the bug bounty program implementation
 	 */
-	details?: string
+	details?: string;
 
 	/**
 	 * Whether the wallet offers an upgrade path for security issues
 	 */
-	upgradePathAvailable: boolean
+	upgradePathAvailable: boolean;
 }
 
 /**
  * A record of bug bounty program support
  */
-export type BugBountyProgramImplementation = WithRef<BugBountyProgramSupport>
+export type BugBountyProgramImplementation = WithRef<BugBountyProgramSupport>;

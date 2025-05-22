@@ -1,53 +1,51 @@
-import { getEip } from '@/data/eips'
-import { eip1193 } from '@/data/eips/eip-1193'
-import { eip2700 } from '@/data/eips/eip-2700'
-import { eip6963 } from '@/data/eips/eip-6963'
+import { getEip } from '@/data/eips';
+import { eip1193 } from '@/data/eips/eip-1193';
+import { eip2700 } from '@/data/eips/eip-2700';
+import { eip6963 } from '@/data/eips/eip-6963';
 import {
 	type Attribute,
 	type Evaluation,
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	featureSupported,
 	isSupported,
 	notSupported,
 	type Support,
-} from '@/schema/features/support'
-import { popRefs, type WithRef } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
-import { commaListFormat } from '@/types/utils/text'
+} from '@/schema/features/support';
+import { popRefs, type WithRef } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
+import { commaListFormat } from '@/types/utils/text';
 
-import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
-import type { BrowserIntegrationEip } from '../../features/ecosystem/integration'
-import { Variant } from '../../variants'
-import { exempt, pickWorstRating, unrated } from '../common'
+import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips';
+import type { BrowserIntegrationEip } from '../../features/ecosystem/integration';
+import { Variant } from '../../variants';
+import { exempt, pickWorstRating, unrated } from '../common';
 
-type ResolvedSupport = Record<BrowserIntegrationEip, Support>
+type ResolvedSupport = Record<BrowserIntegrationEip, Support>;
 
-const brand = 'attributes.ecosystem.browser_integration'
+const brand = 'attributes.ecosystem.browser_integration';
 export type BrowserIntegrationValue = Value & {
-	support?: ResolvedSupport
-	__brand: 'attributes.ecosystem.browser_integration'
-}
+	support?: ResolvedSupport;
+	__brand: 'attributes.ecosystem.browser_integration';
+};
 
 function browserIntegrationSupport(
 	support: WithRef<ResolvedSupport>,
 ): Evaluation<BrowserIntegrationValue> {
-	const { refs, withoutRefs } = popRefs<ResolvedSupport>(support)
+	const { refs, withoutRefs } = popRefs<ResolvedSupport>(support);
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
 	const supported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
 		.filter(([_, v]) => isSupported(v))
-		.map(([k, _]) => k) as BrowserIntegrationEip[]
+		.map(([k, _]) => k) as BrowserIntegrationEip[];
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
 	const unsupported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
 		.filter(([_, v]) => !isSupported(v))
-		.map(([k, _]) => k) as BrowserIntegrationEip[]
+		.map(([k, _]) => k) as BrowserIntegrationEip[];
 
 	if (supported.length === 0) {
 		return {
@@ -77,9 +75,9 @@ function browserIntegrationSupport(
 				`,
 			),
 			references: refs,
-		}
+		};
 	}
-	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL
+	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL;
 	return {
 		value: {
 			id: `support_${supported.join('_')}`,
@@ -119,7 +117,7 @@ function browserIntegrationSupport(
 						`,
 					),
 		references: refs,
-	}
+	};
 }
 
 export const browserIntegration: Attribute<BrowserIntegrationValue> = {
@@ -195,19 +193,19 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 				sentence('Only browser-based wallets are rated on their browser integration support.'),
 				brand,
 				{},
-			)
+			);
 		}
 		if (features.integration.browser === 'NOT_A_BROWSER_WALLET') {
 			throw new Error(
 				'Attempted to rate a browser-wallet with features.integration.browser set to NOT_A_BROWSER_WALLET',
-			)
+			);
 		}
 		if (Object.values(features.integration.browser).includes(null)) {
-			return unrated(browserIntegration, brand, {})
+			return unrated(browserIntegration, brand, {});
 		}
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that none of the values are null.
-		const browserIntegrationEips = features.integration.browser as WithRef<ResolvedSupport>
-		return browserIntegrationSupport(browserIntegrationEips)
+
+		const browserIntegrationEips = features.integration.browser as WithRef<ResolvedSupport>;
+		return browserIntegrationSupport(browserIntegrationEips);
 	},
 	aggregate: pickWorstRating<BrowserIntegrationValue>,
-}
+};

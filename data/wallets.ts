@@ -1,19 +1,19 @@
-import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
-import { WalletType } from '@/schema/wallet-types'
+import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet';
+import { WalletType } from '@/schema/wallet-types';
 
-import { unratedEmbeddedWallet } from './embedded-wallets'
+import { unratedEmbeddedWallet } from './embedded-wallets';
 import {
 	type HardwareWalletName,
 	hardwareWallets,
 	isValidHardwareWalletName,
 	unratedHardwareWallet,
-} from './hardware-wallets'
+} from './hardware-wallets';
 import {
 	isValidSoftwareWalletName,
 	type SoftwareWalletName,
 	softwareWallets,
 	unratedSoftwareWallet,
-} from './software-wallets'
+} from './software-wallets';
 
 /** Set of all known software wallets. */
 export const allWallets = Object.fromEntries(
@@ -21,27 +21,27 @@ export const allWallets = Object.fromEntries(
 		Object.entries(softwareWallets),
 		Object.entries(hardwareWallets),
 	),
-)
+);
 
 /** A valid wallet name. */
-export type WalletName = SoftwareWalletName | HardwareWalletName
+export type WalletName = SoftwareWalletName | HardwareWalletName;
 
 /** Type predicate for WalletName. */
 export function isValidWalletName(name: string): name is WalletName {
-	return isValidSoftwareWalletName(name) || isValidHardwareWalletName(name)
+	return isValidSoftwareWalletName(name) || isValidHardwareWalletName(name);
 }
 
 /** All rated wallets. */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `allWallets`.
+
 export const allRatedWallets: Record<WalletName, RatedWallet> = Object.fromEntries(
 	Object.entries(allWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
-) as Record<WalletName, RatedWallet>
+) as Record<WalletName, RatedWallet>;
 
 /**
  * Map the given function to all rated wallets.
  */
 export function mapWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
-	return Object.values(allRatedWallets).map(fn)
+	return Object.values(allRatedWallets).map(fn);
 }
 
 /**
@@ -50,10 +50,10 @@ export function mapWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[
 export function representativeWalletForType(walletType: WalletType): RatedWallet {
 	switch (walletType) {
 		case WalletType.SOFTWARE:
-			return unratedSoftwareWallet
+			return unratedSoftwareWallet;
 		case WalletType.HARDWARE:
-			return unratedHardwareWallet
+			return unratedHardwareWallet;
 		case WalletType.EMBEDDED:
-			return unratedEmbeddedWallet
+			return unratedEmbeddedWallet;
 	}
 }

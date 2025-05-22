@@ -5,10 +5,10 @@ import {
 	type NonEmptyRecord,
 	type NonEmptySet,
 	nonEmptySetFromArray,
-} from '@/types/utils/non-empty'
+} from '@/types/utils/non-empty';
 
-import { allVariants, Variant } from './variants'
-import { type BaseWallet, getWalletVariants, type RatedWallet } from './wallet'
+import { allVariants, Variant } from './variants';
+import { type BaseWallet, getWalletVariants, type RatedWallet } from './wallet';
 
 /**
  * A high-level wallet "type".
@@ -42,7 +42,7 @@ export function mapWalletTypes<T>(
 		[WalletType.SOFTWARE]: fn(WalletType.SOFTWARE),
 		[WalletType.HARDWARE]: fn(WalletType.HARDWARE),
 		[WalletType.EMBEDDED]: fn(WalletType.EMBEDDED),
-	}
+	};
 }
 
 /**
@@ -51,11 +51,11 @@ export function mapWalletTypes<T>(
 export function walletTypeToUrlSlug(walletType: WalletType): string {
 	switch (walletType) {
 		case WalletType.SOFTWARE:
-			return 'wallet'
+			return 'wallet';
 		case WalletType.HARDWARE:
-			return 'hww'
+			return 'hww';
 		case WalletType.EMBEDDED:
-			return 'embedded'
+			return 'embedded';
 	}
 }
 
@@ -65,16 +65,15 @@ export function walletTypeToUrlSlug(walletType: WalletType): string {
 export function urlSlugToWalletType(slug: string): WalletType | null {
 	const found = Object.values(
 		mapWalletTypes(walletType => (walletTypeToUrlSlug(walletType) === slug ? walletType : null)),
-	).filter(val => val !== null)
-	return found.length === 0 ? null : found[0]
+	).filter(val => val !== null);
+	return found.length === 0 ? null : found[0];
 }
 
 /**
  * Type predicate for WalletType.
  */
 export function isWalletType(str: string): str is WalletType {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- Comparing string to enum to see if the string is indeed one of the enum values.
-	return Object.values(mapWalletTypes(walletType => str === walletType)).some(val => val)
+	return Object.values(mapWalletTypes(walletType => str === walletType)).some(val => val);
 }
 
 /**
@@ -85,7 +84,7 @@ export function isWalletType(str: string): str is WalletType {
 export function walletTypeToVariants(walletType: WalletType): NonEmptySet<Variant> {
 	return nonEmptySetFromArray(
 		nonEmptyFilter(allVariants, variant => variantToWalletType(variant) === walletType),
-	)
+	);
 }
 
 /**
@@ -95,15 +94,15 @@ export function walletTypeToVariants(walletType: WalletType): NonEmptySet<Varian
 export function variantToWalletType(variant: Variant): WalletType {
 	switch (variant) {
 		case Variant.BROWSER:
-			return WalletType.SOFTWARE
+			return WalletType.SOFTWARE;
 		case Variant.DESKTOP:
-			return WalletType.SOFTWARE
+			return WalletType.SOFTWARE;
 		case Variant.MOBILE:
-			return WalletType.SOFTWARE
+			return WalletType.SOFTWARE;
 		case Variant.EMBEDDED:
-			return WalletType.EMBEDDED
+			return WalletType.EMBEDDED;
 		case Variant.HARDWARE:
-			return WalletType.HARDWARE
+			return WalletType.HARDWARE;
 	}
 }
 
@@ -113,5 +112,5 @@ export function variantToWalletType(variant: Variant): WalletType {
 export function walletTypes(wallet: BaseWallet | RatedWallet): NonEmptySet<WalletType> {
 	return nonEmptySetFromArray(
 		nonEmptyMap(nonEmptyKeys(getWalletVariants(wallet)), variantToWalletType),
-	)
+	);
 }

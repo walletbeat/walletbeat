@@ -1,13 +1,13 @@
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
-import { WalletProfile } from '@/schema/features/profile'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
-import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support';
+import { WalletProfile } from '@/schema/features/profile';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
+import { notSupported, supported } from '@/schema/features/support';
+import { Variant } from '@/schema/variants';
+import type { SoftwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny'
+import { nconsigny } from '../contributors/nconsigny';
 
 export const safe: SoftwareWallet = {
 	metadata: {
@@ -133,4 +133,4 @@ export const safe: SoftwareWallet = {
 		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
 	},
-}
+};

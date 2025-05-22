@@ -1,4 +1,4 @@
-import type { CorporateEntity, OffchainDataProvider } from '@/schema/entity'
+import type { CorporateEntity, OffchainDataProvider } from '@/schema/entity';
 
 export const github: CorporateEntity & OffchainDataProvider = {
 	id: 'github',
@@ -26,4 +26,4 @@ export const github: CorporateEntity & OffchainDataProvider = {
 	repoUrl: 'https://github.com',
 	twitter: 'https://x.com/github',
 	url: 'https://github.com/',
-}
+};

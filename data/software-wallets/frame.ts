@@ -1,17 +1,17 @@
-import { AccountType } from '@/schema/features/account-support'
-import { WalletProfile } from '@/schema/features/profile'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { AccountType } from '@/schema/features/account-support';
+import { WalletProfile } from '@/schema/features/profile';
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability';
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
+import { featureSupported, notSupported, supported } from '@/schema/features/support';
+import { Variant } from '@/schema/variants';
+import type { SoftwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { lucemans } from '../contributors/lucemans'
-import { nconsigny } from '../contributors/nconsigny'
-import { polymutex } from '../contributors/polymutex'
+import { lucemans } from '../contributors/lucemans';
+import { nconsigny } from '../contributors/nconsigny';
+import { polymutex } from '../contributors/polymutex';
 
 export const frame: SoftwareWallet = {
 	metadata: {
@@ -143,4 +143,4 @@ export const frame: SoftwareWallet = {
 		[Variant.BROWSER]: true,
 		[Variant.DESKTOP]: true,
 	},
-}
+};

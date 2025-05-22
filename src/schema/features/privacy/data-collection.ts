@@ -1,8 +1,8 @@
-import type { MustRef, WithRef } from '@/schema/reference'
-import type { Dict } from '@/types/utils/dict'
+import type { MustRef, WithRef } from '@/schema/reference';
+import type { Dict } from '@/types/utils/dict';
 
-import type { Entity } from '../../entity'
-import type { WalletMetadata } from '../../wallet'
+import type { Entity } from '../../entity';
+import type { WalletMetadata } from '../../wallet';
 
 /**
  * An enum representing when data collection or leak occurs.
@@ -106,15 +106,15 @@ export enum MultiAddressPolicy {
 export type MultiAddressHandling =
 	| {
 			/** How the wallet handles refreshing data for multiple addresses. */
-			type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY
+			type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY;
 	  }
 	| {
 			/** How the wallet handles refreshing data for multiple addresses. */
-			type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES
+			type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES;
 	  }
 	| {
 			/** How the wallet handles refreshing data for multiple addresses. */
-			type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS
+			type: MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS;
 
 			/**
 			 * Diversity of endpoints on the receiving end of the requests.
@@ -122,7 +122,7 @@ export type MultiAddressHandling =
 			 * a pool of multiple endpoints such that each address is only mapped to
 			 * one of them?
 			 */
-			destination: 'SAME_FOR_ALL' | 'ISOLATED'
+			destination: 'SAME_FOR_ALL' | 'ISOLATED';
 
 			/**
 			 * How individual requests are proxied: separate circuits (such that they
@@ -130,7 +130,7 @@ export type MultiAddressHandling =
 			 * same circuit (same IP perceived on the destination endpoint), or not
 			 * proxied at all?
 			 */
-			proxy: 'NONE' | 'SAME_CIRCUIT' | 'SEPARATE_CIRCUITS'
+			proxy: 'NONE' | 'SAME_CIRCUIT' | 'SEPARATE_CIRCUITS';
 
 			/**
 			 * Whether individual requests are staggered across time to reduce the
@@ -142,8 +142,8 @@ export type MultiAddressHandling =
 			 *   over a period of time (e.g. by waiting a minute between each
 			 *   request).
 			 */
-			timing: 'SIMULTANEOUS' | 'STAGGERED'
-	  }
+			timing: 'SIMULTANEOUS' | 'STAGGERED';
+	  };
 
 /**
  * Represents a regular (non-enclave) server endpoint.
@@ -154,7 +154,7 @@ export const RegularEndpoint = {
 	 * The entity can see all traffic going in/out of it.
 	 */
 	type: 'REGULAR',
-} as const
+} as const;
 
 /**
  * The environment in which the server endpoint is running.
@@ -167,7 +167,7 @@ export type Endpoint =
 			/**
 			 * The server is running in a secure enclave.
 			 */
-			type: 'SECURE_ENCLAVE'
+			type: 'SECURE_ENCLAVE';
 
 			/**
 			 * Whether the software running within the enclave is verifiable
@@ -177,13 +177,13 @@ export type Endpoint =
 				/**
 				 * Whether the source code of the server software is available.
 				 */
-				sourceAvailable: boolean
+				sourceAvailable: boolean;
 
 				/**
 				 * Whether the source code of the server software can be reproducibly
 				 * built.
 				 */
-				reproducibleBuilds: boolean
+				reproducibleBuilds: boolean;
 
 				/**
 				 * How the client verifies that the endpoint is running in a secure enclave.
@@ -191,22 +191,22 @@ export type Endpoint =
 				clientVerification:
 					| {
 							/** The client does not do any verification. */
-							type: 'NOT_VERIFIED'
+							type: 'NOT_VERIFIED';
 					  }
 					| {
 							/**
 							 * The client claims to verify but has not made the source code that
 							 * does this available.
 							 */
-							type: 'VERIFIED_BUT_NO_SOURCE_AVAILABLE'
+							type: 'VERIFIED_BUT_NO_SOURCE_AVAILABLE';
 					  }
 					| MustRef<{
 							/**
 							 * The client verifies this. Must also come with a code reference.
 							 */
-							type: 'VERIFIED'
-					  }>
-			}>
+							type: 'VERIFIED';
+					  }>;
+			}>;
 
 			/**
 			 * Whether the endpoint running in a secure enclave logs anything
@@ -219,22 +219,22 @@ export type Endpoint =
 						 * It is not known whether the software running within the enclave
 						 * logs any data externally.
 						 */
-						type: 'UNKNOWN'
+						type: 'UNKNOWN';
 				  }
 				| {
 						/**
 						 * This server software is known to log data externally to the
 						 * enclave.
 						 */
-						type: 'YES'
+						type: 'YES';
 				  }
 				| {
 						/**
 						 * This server software does not log data externally to the
 						 * enclave.
 						 */
-						type: 'NO'
-				  }
+						type: 'NO';
+				  };
 
 			/**
 			 * Info about the use of end-to-end encryption to the endpoint.
@@ -246,27 +246,27 @@ export type Endpoint =
 			endToEndEncryption:
 				| {
 						/** No end-to-end encryption (really? in this day and age?) */
-						type: 'NONE'
+						type: 'NONE';
 				  }
 				| {
 						/**
 						 * End-to-end encryption terminated outside of the enclave,
 						 * for example at the load balancer level.
 						 */
-						type: 'TERMINATED_OUT_OF_ENCLAVE'
+						type: 'TERMINATED_OUT_OF_ENCLAVE';
 				  }
 				| {
 						/** End-to-end encryption terminated inside the enclave. */
-						type: 'TERMINATED_INSIDE_ENCLAVE'
-				  }
-	  }
+						type: 'TERMINATED_INSIDE_ENCLAVE';
+				  };
+	  };
 
 /**
  * @param leak Some leak level.
  * @returns If the data collection happens by default.
  */
 export function leaksByDefault(leak: Leak): boolean {
-	return leak >= Leak.BY_DEFAULT
+	return leak >= Leak.BY_DEFAULT;
 }
 
 /** Personal information types. */
@@ -339,12 +339,12 @@ export enum LeakedWalletInfo {
 	MEMPOOL_TRANSACTIONS = 'mempoolTransactions',
 }
 
-export type LeakedInfo = LeakedPersonalInfo | LeakedWalletInfo
+export type LeakedInfo = LeakedPersonalInfo | LeakedWalletInfo;
 
 /** List of all LeakedInfos. */
 export const leakedInfos = (Object.values(LeakedPersonalInfo) as LeakedInfo[]).concat(
 	Object.values(LeakedWalletInfo),
-)
+);
 
 /**
  * Rough ordering score for comparing LeakedInfo.
@@ -353,42 +353,42 @@ export const leakedInfos = (Object.values(LeakedPersonalInfo) as LeakedInfo[]).c
 function leakedInfoScore(leakedInfo: LeakedInfo): number {
 	switch (leakedInfo) {
 		case LeakedPersonalInfo.IP_ADDRESS:
-			return 0
+			return 0;
 		case LeakedWalletInfo.WALLET_ACTIONS:
-			return 1
+			return 1;
 		case LeakedWalletInfo.WALLET_ASSETS:
-			return 2
+			return 2;
 		case LeakedWalletInfo.WALLET_BALANCE:
-			return 3
+			return 3;
 		case LeakedWalletInfo.WALLET_ADDRESS:
-			return 4
+			return 4;
 		case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
-			return 5
+			return 5;
 		case LeakedPersonalInfo.PSEUDONYM:
-			return 6
+			return 6;
 
 		// All the social-media-y entries are roughly the same as email.
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
-			return 7
+			return 7;
 		case LeakedPersonalInfo.X_DOT_COM_ACCOUNT:
-			return 7
+			return 7;
 		case LeakedPersonalInfo.EMAIL:
-			return 7
+			return 7;
 
 		case LeakedPersonalInfo.LEGAL_NAME:
-			return 8
+			return 8;
 		case LeakedPersonalInfo.PHONE:
-			return 9
+			return 9;
 		case LeakedPersonalInfo.CONTACTS:
-			return 10
+			return 10;
 		case LeakedPersonalInfo.PHYSICAL_ADDRESS:
-			return 11
+			return 11;
 		case LeakedPersonalInfo.CEX_ACCOUNT:
-			return 12
+			return 12;
 		case LeakedPersonalInfo.FACE:
-			return 13
+			return 13;
 		case LeakedPersonalInfo.GOVERNMENT_ID:
-			return 14
+			return 14;
 	}
 }
 
@@ -405,45 +405,45 @@ export enum LeakedInfoType {
 export function leakedInfoType(leakedInfo: LeakedInfo): LeakedInfoType {
 	switch (leakedInfo) {
 		case LeakedPersonalInfo.IP_ADDRESS:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedWalletInfo.WALLET_ACTIONS:
-			return LeakedInfoType.WALLET_RELATED
+			return LeakedInfoType.WALLET_RELATED;
 		case LeakedWalletInfo.WALLET_ASSETS:
-			return LeakedInfoType.WALLET_RELATED
+			return LeakedInfoType.WALLET_RELATED;
 		case LeakedWalletInfo.WALLET_BALANCE:
-			return LeakedInfoType.WALLET_RELATED
+			return LeakedInfoType.WALLET_RELATED;
 		case LeakedWalletInfo.WALLET_ADDRESS:
-			return LeakedInfoType.WALLET_RELATED
+			return LeakedInfoType.WALLET_RELATED;
 		case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
-			return LeakedInfoType.WALLET_RELATED
+			return LeakedInfoType.WALLET_RELATED;
 		case LeakedPersonalInfo.PSEUDONYM:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.X_DOT_COM_ACCOUNT:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.EMAIL:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.LEGAL_NAME:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.PHONE:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.CONTACTS:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.PHYSICAL_ADDRESS:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.CEX_ACCOUNT:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.FACE:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 		case LeakedPersonalInfo.GOVERNMENT_ID:
-			return LeakedInfoType.PERSONAL_DATA
+			return LeakedInfoType.PERSONAL_DATA;
 	}
 }
 
 /** Compare two LeakedInfo scores (higher score is more sensitive). */
 export function compareLeakedInfo(a: LeakedInfo, b: LeakedInfo): number {
-	return leakedInfoScore(a) - leakedInfoScore(b)
+	return leakedInfoScore(a) - leakedInfoScore(b);
 }
 
 /** Human-friendly names to refer to the type of info being leaked. */
@@ -453,45 +453,45 @@ export function leakedInfoName(
 ): { short: string; long: string } {
 	switch (leakedInfo) {
 		case LeakedPersonalInfo.IP_ADDRESS:
-			return { short: 'IP', long: 'IP address' }
+			return { short: 'IP', long: 'IP address' };
 		case LeakedWalletInfo.WALLET_ACTIONS:
-			return { short: 'wallet actions', long: 'wallet actions' }
+			return { short: 'wallet actions', long: 'wallet actions' };
 		case LeakedWalletInfo.WALLET_ASSETS:
-			return { short: 'wallet assets', long: 'wallet asset types' }
+			return { short: 'wallet assets', long: 'wallet asset types' };
 		case LeakedWalletInfo.WALLET_BALANCE:
-			return { short: 'wallet balance', long: 'wallet assets and balances' }
+			return { short: 'wallet balance', long: 'wallet assets and balances' };
 		case LeakedWalletInfo.WALLET_ADDRESS:
-			return { short: 'wallet address', long: 'wallet address' }
+			return { short: 'wallet address', long: 'wallet address' };
 		case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
-			return { short: 'outgoing transactions', long: 'outgoing wallet transactions' }
+			return { short: 'outgoing transactions', long: 'outgoing wallet transactions' };
 		case LeakedPersonalInfo.PSEUDONYM:
 			if (walletMetadata?.pseudonymType !== undefined) {
 				return {
 					short: walletMetadata.pseudonymType.singular,
 					long: walletMetadata.pseudonymType.singular,
-				}
+				};
 			}
-			return { short: 'username', long: 'pseudonym' }
+			return { short: 'username', long: 'pseudonym' };
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
-			return { short: 'Farcaster account', long: 'Farcaster account' }
+			return { short: 'Farcaster account', long: 'Farcaster account' };
 		case LeakedPersonalInfo.X_DOT_COM_ACCOUNT:
-			return { short: 'X.com account', long: 'X.com account' }
+			return { short: 'X.com account', long: 'X.com account' };
 		case LeakedPersonalInfo.EMAIL:
-			return { short: 'email', long: 'email address' }
+			return { short: 'email', long: 'email address' };
 		case LeakedPersonalInfo.LEGAL_NAME:
-			return { short: 'name', long: 'legal name' }
+			return { short: 'name', long: 'legal name' };
 		case LeakedPersonalInfo.PHONE:
-			return { short: 'phone', long: 'phone number' }
+			return { short: 'phone', long: 'phone number' };
 		case LeakedPersonalInfo.CONTACTS:
-			return { short: 'contacts', long: 'personal contact list' }
+			return { short: 'contacts', long: 'personal contact list' };
 		case LeakedPersonalInfo.PHYSICAL_ADDRESS:
-			return { short: 'physical address', long: 'geographical address' }
+			return { short: 'physical address', long: 'geographical address' };
 		case LeakedPersonalInfo.CEX_ACCOUNT:
-			return { short: 'CEX account', long: 'centralized exchange account' }
+			return { short: 'CEX account', long: 'centralized exchange account' };
 		case LeakedPersonalInfo.FACE:
-			return { short: 'face', long: 'facial recognition data' }
+			return { short: 'face', long: 'facial recognition data' };
 		case LeakedPersonalInfo.GOVERNMENT_ID:
-			return { short: 'government ID', long: 'government-issued ID' }
+			return { short: 'government ID', long: 'government-issued ID' };
 	}
 }
 
@@ -501,20 +501,20 @@ export type QualifiedLeaks<T extends LeakedInfo> = Dict<
 		/**
 		 * How multiple addresses are handled, if at all.
 		 */
-		multiAddress?: MultiAddressHandling
+		multiAddress?: MultiAddressHandling;
 
 		/**
 		 * Information about the endpoint that receives this data.
 		 */
-		endpoint: Endpoint
+		endpoint: Endpoint;
 	}
->
+>;
 
 /** A partially-known set of leaks, with reference information. */
-export type Leaks = WithRef<Partial<QualifiedLeaks<LeakedInfo>>>
+export type Leaks = WithRef<Partial<QualifiedLeaks<LeakedInfo>>>;
 
 /** A partially-known set of personal info leaks, with reference information. */
-export type PersonalInfoLeaks = WithRef<Partial<QualifiedLeaks<LeakedPersonalInfo>>>
+export type PersonalInfoLeaks = WithRef<Partial<QualifiedLeaks<LeakedPersonalInfo>>>;
 
 /**
  * Infer what leaks from a given partial set of known leaks.
@@ -522,7 +522,7 @@ export type PersonalInfoLeaks = WithRef<Partial<QualifiedLeaks<LeakedPersonalInf
  * @returns A fully-qualified set of leaks.
  */
 export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
-	const first = (...ls: Array<Leak | undefined>): Leak | undefined => ls.find(l => l !== undefined)
+	const first = (...ls: Array<Leak | undefined>): Leak | undefined => ls.find(l => l !== undefined);
 	return {
 		ipAddress: leaks.ipAddress ?? Leak.NEVER,
 		walletActions: leaks.walletActions ?? Leak.NEVER,
@@ -553,7 +553,7 @@ export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
 		multiAddress: leaks.multiAddress,
 		endpoint: leaks.endpoint ?? RegularEndpoint,
 		ref: leaks.ref,
-	}
+	};
 }
 
 /**
@@ -561,10 +561,10 @@ export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
  */
 export interface EntityData {
 	/** The entity to which the data may be sent. */
-	entity: Entity
+	entity: Entity;
 
 	/** The type of data that an entity may be sent. */
-	leaks: Leaks
+	leaks: Leaks;
 }
 
 /**
@@ -572,8 +572,8 @@ export interface EntityData {
  */
 export interface DataCollection {
 	/** Personal data exported out onchain in public view. */
-	onchain: PersonalInfoLeaks
+	onchain: PersonalInfoLeaks;
 
 	/** The data collected by corporate entities. */
-	collectedByEntities: EntityData[]
+	collectedByEntities: EntityData[];
 }

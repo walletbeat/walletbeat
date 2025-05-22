@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
 
 export const slowMist: CorporateEntity & SecurityAuditor = {
 	id: 'slowmist',
@@ -27,4 +27,4 @@ export const slowMist: CorporateEntity & SecurityAuditor = {
 	repoUrl: 'https://github.com/slowmist',
 	twitter: 'https://x.com/SlowMist_Team',
 	url: 'https://www.slowmist.com/',
-}
+};

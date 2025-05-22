@@ -1,4 +1,4 @@
-import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { type Eip, EipPrefix, EipStatus } from '@/schema/eips';
 
 export const erc4337: Eip = {
 	// Yes this is not exactly what this ERC is implementing, but it is
@@ -28,4 +28,4 @@ export const erc4337: Eip = {
 		[Account Abstraction](https://ethereum.org/en/roadmap/account-abstraction/)
 		for more information.
 	`,
-}
+};

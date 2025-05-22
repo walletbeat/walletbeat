@@ -1,9 +1,9 @@
-import { Typography } from '@mui/material'
-import type React from 'react'
+import { Typography } from '@mui/material';
+import type React from 'react';
 
-import { ContentType, type TypographicContent } from '@/types/content'
+import { ContentType, type TypographicContent } from '@/types/content';
 
-import { MarkdownTypography } from './MarkdownTypography'
+import { MarkdownTypography } from './MarkdownTypography';
 
 export function RenderTypographicContent({
 	content,
@@ -11,13 +11,13 @@ export function RenderTypographicContent({
 	typography,
 }: {
 	/** The typographic content to render. */
-	content: TypographicContent
+	content: TypographicContent;
 
 	/**
 	 * A text transformation applied to the text.
 	 * This happens after expansion of the text, but before rendering.
 	 */
-	textTransform?: (resolvedText: string) => string
+	textTransform?: (resolvedText: string) => string;
 
 	/** A subset of supported typography props. */
 	typography?: Partial<
@@ -34,7 +34,7 @@ export function RenderTypographicContent({
 			| 'paddingTop'
 			| 'variant'
 		>
-	>
+	>;
 }): React.JSX.Element {
 	switch (content.contentType) {
 		case ContentType.MARKDOWN:
@@ -42,12 +42,12 @@ export function RenderTypographicContent({
 				<MarkdownTypography markdownTransform={textTransform} {...typography}>
 					{content.markdown}
 				</MarkdownTypography>
-			)
+			);
 		case ContentType.TEXT:
 			return (
 				<Typography {...typography}>
 					{textTransform === undefined ? content.text.trim() : textTransform(content.text).trim()}
 				</Typography>
-			)
+			);
 	}
 }

@@ -1,6 +1,6 @@
-import { Divider, Typography } from '@mui/material'
-import { styled } from '@mui/material/styles'
-import React from 'react'
+import { Divider, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import React from 'react';
 
 import {
 	type Attribute,
@@ -9,25 +9,25 @@ import {
 	Rating,
 	ratingToIcon,
 	type Value,
-} from '@/schema/attributes'
-import { mdSentence, type Sentence } from '@/types/content'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
+} from '@/schema/attributes';
+import { mdSentence, type Sentence } from '@/types/content';
+import type { NonEmptyArray } from '@/types/utils/non-empty';
 
-import { RenderTypographicContent } from '../../atoms/RenderTypographicContent'
+import { RenderTypographicContent } from '../../atoms/RenderTypographicContent';
 
 const typographyPropsHeader: React.ComponentProps<typeof RenderTypographicContent>['typography'] = {
 	variant: 'h6',
-}
+};
 
 const typographyPropsBody: React.ComponentProps<typeof RenderTypographicContent>['typography'] = {
 	variant: 'body2',
-}
+};
 
 interface ListItemProps {
-	isFirstItem: boolean
-	bulletText: string
-	bulletFontSize?: string
-	spaceBetweenItems?: string
+	isFirstItem: boolean;
+	bulletText: string;
+	bulletFontSize?: string;
+	spaceBetweenItems?: string;
 }
 
 const StyledListItem = styled('li')<ListItemProps>`
@@ -38,67 +38,67 @@ const StyledListItem = styled('li')<ListItemProps>`
 		font-size: ${props => props.bulletFontSize ?? 'inherit'};
 		padding-right: 0.5rem;
 	}
-`
+`;
 
 function replaceExampleRatingPrefix(
 	theWallet: string,
 	theWalletPossessive: string,
 ): (text: string) => string {
 	return (text: string): string => {
-		const whitespacePrefixLength = text.length - text.trimStart().length
+		const whitespacePrefixLength = text.length - text.trimStart().length;
 		const whitespacePrefix =
-			whitespacePrefixLength === 0 ? '' : text.substring(0, whitespacePrefixLength)
+			whitespacePrefixLength === 0 ? '' : text.substring(0, whitespacePrefixLength);
 		const unprefixedText =
-			whitespacePrefixLength === 0 ? text : text.substring(whitespacePrefix.length)
+			whitespacePrefixLength === 0 ? text : text.substring(whitespacePrefix.length);
 
 		// Accept "The wallet" as before
 		if (unprefixedText.startsWith('The wallet ')) {
-			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The wallet '.length)}`
+			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The wallet '.length)}`;
 		}
 
 		// Accept "The wallet's" as before
 		if (unprefixedText.startsWith("The wallet's ")) {
-			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The wallet's ".length)}`
+			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The wallet's ".length)}`;
 		}
 
 		// Accept "The hardware wallet"
 		if (unprefixedText.startsWith('The hardware wallet ')) {
-			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The hardware wallet '.length)}`
+			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The hardware wallet '.length)}`;
 		}
 
 		// Accept "The hardware wallet's"
 		if (unprefixedText.startsWith("The hardware wallet's ")) {
-			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The hardware wallet's ".length)}`
+			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The hardware wallet's ".length)}`;
 		}
 
 		// Accept "The smart wallet"
 		if (unprefixedText.startsWith('The smart wallet ')) {
-			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The smart wallet '.length)}`
+			return `${whitespacePrefix}${theWallet}${unprefixedText.substring('The smart wallet '.length)}`;
 		}
 
 		// Accept "The smart wallet's"
 		if (unprefixedText.startsWith("The smart wallet's ")) {
-			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The smart wallet's ".length)}`
+			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring("The smart wallet's ".length)}`;
 		}
 
 		// More general approach to handle any wallet type
-		const walletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet\s+/
-		const possessiveWalletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet's\s+/
+		const walletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet\s+/;
+		const possessiveWalletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet's\s+/;
 
-		const walletTypeMatch = walletTypeRegex.exec(unprefixedText)
+		const walletTypeMatch = walletTypeRegex.exec(unprefixedText);
 		if (walletTypeMatch !== null) {
-			return `${whitespacePrefix}${theWallet}${unprefixedText.substring(walletTypeMatch[0].length)}`
+			return `${whitespacePrefix}${theWallet}${unprefixedText.substring(walletTypeMatch[0].length)}`;
 		}
 
-		const possessiveWalletTypeMatch = possessiveWalletTypeRegex.exec(unprefixedText)
+		const possessiveWalletTypeMatch = possessiveWalletTypeRegex.exec(unprefixedText);
 		if (possessiveWalletTypeMatch !== null) {
-			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring(possessiveWalletTypeMatch[0].length)}`
+			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring(possessiveWalletTypeMatch[0].length)}`;
 		}
 
 		throw new Error(
 			`Example ratings should ideally begin with the phrase "The wallet" or "The [type] wallet". Using original text: "${unprefixedText}"`,
-		)
-	}
+		);
+	};
 }
 
 function ExampleRatings<V extends Value>({
@@ -108,11 +108,11 @@ function ExampleRatings<V extends Value>({
 	failExamples,
 	exhaustive,
 }: {
-	displayOrder: 'pass-fail' | 'fail-pass'
-	passExamples: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
-	partialExamples: ExampleRating<V> | Array<ExampleRating<V>> | undefined
-	failExamples: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
-	exhaustive: boolean
+	displayOrder: 'pass-fail' | 'fail-pass';
+	passExamples: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>;
+	partialExamples: ExampleRating<V> | Array<ExampleRating<V>> | undefined;
+	failExamples: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>;
+	exhaustive: boolean;
 }): React.JSX.Element {
 	const renderListItem = (
 		exampleRating: ExampleRating<V>,
@@ -134,7 +134,7 @@ function ExampleRatings<V extends Value>({
 				textTransform={replaceExampleRatingPrefix('It ', 'Its ')}
 			/>
 		</StyledListItem>
-	)
+	);
 	const renderExamples = (
 		rating: Rating,
 		singularPreamble: Sentence,
@@ -146,11 +146,11 @@ function ExampleRatings<V extends Value>({
 				? []
 				: Array.isArray(exampleRatings)
 					? exampleRatings
-					: [exampleRatings]
+					: [exampleRatings];
 		if (ratingsList.length === 0) {
-			return { key: rating, element: null }
+			return { key: rating, element: null };
 		}
-		const preamble = ratingsList.length === 1 ? singularPreamble : pluralPreamble
+		const preamble = ratingsList.length === 1 ? singularPreamble : pluralPreamble;
 		return {
 			key: rating,
 			element: (
@@ -166,34 +166,34 @@ function ExampleRatings<V extends Value>({
 					</ul>
 				</React.Fragment>
 			),
-		}
-	}
+		};
+	};
 	const passRendered = renderExamples(
 		Rating.PASS,
 		mdSentence('A wallet would get a **passing** rating if...'),
 		mdSentence('A wallet would get a **passing** rating in any of these cases:'),
 		passExamples,
-	)
+	);
 	const partialRendered = renderExamples(
 		Rating.PARTIAL,
 		mdSentence('A wallet would get a **partial** rating if...'),
 		mdSentence('A wallet would get a **partial** rating in any of these cases:'),
 		partialExamples,
-	)
+	);
 	const failRendered = renderExamples(
 		Rating.FAIL,
 		mdSentence('A wallet would get a **failing** rating if...'),
 		mdSentence('A wallet would get a **failing** rating in any of these cases:'),
 		failExamples,
-	)
+	);
 	const renderedExamples: Array<{ key: string; element: React.JSX.Element | null }> = (() => {
 		switch (displayOrder) {
 			case 'pass-fail':
-				return [passRendered, partialRendered, failRendered]
+				return [passRendered, partialRendered, failRendered];
 			case 'fail-pass':
-				return [failRendered, partialRendered, passRendered]
+				return [failRendered, partialRendered, passRendered];
 		}
-	})()
+	})();
 	return (
 		<>
 			<Typography variant="h5">{exhaustive ? '' : 'A few examples'}</Typography>
@@ -205,7 +205,7 @@ function ExampleRatings<V extends Value>({
 				)}
 			</div>
 		</>
-	)
+	);
 }
 
 /**
@@ -218,8 +218,8 @@ function ExampleRatings<V extends Value>({
 export function AttributeMethodology<V extends Value>({
 	attribute,
 }: {
-	attribute: Attribute<V>
-	evaluation?: Evaluation<V>
+	attribute: Attribute<V>;
+	evaluation?: Evaluation<V>;
 }): React.JSX.Element {
 	return (
 		<>
@@ -253,5 +253,5 @@ export function AttributeMethodology<V extends Value>({
 				)}
 			</div>
 		</>
-	)
+	);
 }

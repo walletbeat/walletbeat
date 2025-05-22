@@ -1,4 +1,4 @@
-import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { type Eip, EipPrefix, EipStatus } from '@/schema/eips';
 
 export const eip7702: Eip = {
 	friendlyName: 'Account Abstraction via smart contract authority delegation',
@@ -26,4 +26,4 @@ export const eip7702: Eip = {
 		[Account Abstraction](https://ethereum.org/en/roadmap/account-abstraction/)
 		for more information.
 	`,
-}
+};

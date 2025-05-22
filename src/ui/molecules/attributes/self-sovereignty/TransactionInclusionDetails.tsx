@@ -1,12 +1,12 @@
-import { Typography } from '@mui/material'
-import React from 'react'
+import { Typography } from '@mui/material';
+import React from 'react';
 
-import { subsectionWeight } from '@/components/constants'
-import { transactionSubmissionL2TypeName } from '@/schema/features/self-sovereignty/transaction-submission'
-import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
-import { commaListPrefix } from '@/types/utils/text'
+import { subsectionWeight } from '@/components/constants';
+import { transactionSubmissionL2TypeName } from '@/schema/features/self-sovereignty/transaction-submission';
+import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details';
+import { commaListPrefix } from '@/types/utils/text';
 
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
 
 export function TransactionInclusionDetails({
 	wallet,
@@ -19,7 +19,7 @@ export function TransactionInclusionDetails({
 	const allSupportedForceWithdrawals = supportAnyL2Transactions
 		.concat(supportForceWithdrawal)
 		.slice()
-		.sort()
+		.sort();
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			{allSupportedForceWithdrawals.length > 0 && (
@@ -72,7 +72,7 @@ export function TransactionInclusionDetails({
 									Therefore, L1 transactions are subject to censorship by intermediaries.
 								</Typography>
 							</>
-						)
+						);
 					case 'OWN_NODE':
 						return (
 							<Typography fontWeight={subsectionWeight}>
@@ -80,7 +80,7 @@ export function TransactionInclusionDetails({
 								Ethereum node, which can be used to broadcast L1 transactions without trusting
 								intermediaries.
 							</Typography>
-						)
+						);
 					case 'SELF_GOSSIP':
 						return (
 							<Typography fontWeight={subsectionWeight}>
@@ -88,9 +88,9 @@ export function TransactionInclusionDetails({
 								peer-to-peer network, allowing L1 transactions to be reliably included without
 								trusting intermediaries.
 							</Typography>
-						)
+						);
 				}
 			})()}
 		</WrapRatingIcon>
-	)
+	);
 }

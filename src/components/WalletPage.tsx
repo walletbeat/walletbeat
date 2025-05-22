@@ -1,70 +1,70 @@
-import { Tooltip, Typography } from '@mui/material'
-import { blend, ThemeProvider } from '@mui/system'
-import React, { useEffect, useState } from 'react'
+import { Tooltip, Typography } from '@mui/material';
+import { blend, ThemeProvider } from '@mui/system';
+import React, { useEffect, useState } from 'react';
 
-import { navigationListIconSize } from '@/components/constants'
-import { scrollPastHeaderPixels } from '@/components/navigation'
-import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
+import { navigationListIconSize } from '@/components/constants';
+import { scrollPastHeaderPixels } from '@/components/navigation';
+import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme';
 import {
 	variantFromUrlQuery,
 	variantToIcon,
 	variantToName,
 	variantUrlQuery,
-} from '@/components/variants'
-import { allRatedWallets, type WalletName } from '@/data/wallets'
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+} from '@/components/variants';
+import { allRatedWallets, type WalletName } from '@/data/wallets';
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
 import {
 	type EvaluationTree,
 	getEvaluationFromOtherTree,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
-} from '@/schema/attribute-groups'
-import { borderRatingToColor, ratingToColor } from '@/schema/attributes'
-import { getSingleVariant, type Variant } from '@/schema/variants'
-import { type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
+} from '@/schema/attribute-groups';
+import { borderRatingToColor, ratingToColor } from '@/schema/attributes';
+import { getSingleVariant, type Variant } from '@/schema/variants';
+import { type ResolvedWallet, VariantSpecificity } from '@/schema/wallet';
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
 	nonEmptyEntries,
 	nonEmptyMap,
 	nonEmptyValues,
-} from '@/types/utils/non-empty'
-import { slugifyCamelCase } from '@/types/utils/text'
-import { AnchorHeader } from '@/ui/atoms/AnchorHeader'
-import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
-import { ReturnToTop } from '@/ui/atoms/ReturnToTop'
-import { type PickableVariant, VariantPicker } from '@/ui/atoms/VariantPicker'
-import { WalletIcon } from '@/ui/atoms/WalletIcon'
-import { AttributeGroupBody } from '@/ui/molecules/AttributeGroupBody'
-import { WalletHeading } from '@/ui/molecules/wallet/heading/WalletHeading'
-import { WalletDropdown } from '@/ui/molecules/WalletDropdown'
-import type { NavigationItem } from '@/ui/organisms/Navigation'
-import { WalletAttribute } from '@/ui/organisms/WalletAttribute'
+} from '@/types/utils/non-empty';
+import { slugifyCamelCase } from '@/types/utils/text';
+import { AnchorHeader } from '@/ui/atoms/AnchorHeader';
+import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent';
+import { ReturnToTop } from '@/ui/atoms/ReturnToTop';
+import { type PickableVariant, VariantPicker } from '@/ui/atoms/VariantPicker';
+import { WalletIcon } from '@/ui/atoms/WalletIcon';
+import { AttributeGroupBody } from '@/ui/molecules/AttributeGroupBody';
+import { WalletHeading } from '@/ui/molecules/wallet/heading/WalletHeading';
+import { WalletDropdown } from '@/ui/molecules/WalletDropdown';
+import type { NavigationItem } from '@/ui/organisms/Navigation';
+import { WalletAttribute } from '@/ui/organisms/WalletAttribute';
 
-import { WalletSectionSummary } from './WalletSectionSummary'
+import { WalletSectionSummary } from './WalletSectionSummary';
 
-const headerBottomMargin = 0
+const headerBottomMargin = 0;
 
 interface Section {
-	header: string
-	subHeader: string | null
+	header: string;
+	subHeader: string | null;
 }
 
 interface RichSection extends Section {
-	icon: React.ReactNode
-	title: string
-	cornerControl: React.ReactNode | null
-	caption: React.ReactNode | null
-	body: React.ReactNode | null
-	css?: React.CSSProperties
-	subsections?: RichSection[] // Only one level of nesting is supported.
+	icon: React.ReactNode;
+	title: string;
+	cornerControl: React.ReactNode | null;
+	caption: React.ReactNode | null;
+	body: React.ReactNode | null;
+	css?: React.CSSProperties;
+	subsections?: RichSection[]; // Only one level of nesting is supported.
 }
 
 function sectionHeaderId(section: Section): string {
 	if (section.subHeader !== null) {
-		return slugifyCamelCase(section.subHeader)
+		return slugifyCamelCase(section.subHeader);
 	}
-	return slugifyCamelCase(section.header)
+	return slugifyCamelCase(section.header);
 }
 
 function maybeAddCornerControl(
@@ -72,30 +72,30 @@ function maybeAddCornerControl(
 	anchorHeader: React.JSX.Element,
 ): React.JSX.Element {
 	if (section.cornerControl === null) {
-		return anchorHeader
+		return anchorHeader;
 	}
 	return (
 		<div key="sectionCornerControl" className="flex flex-row">
 			<div className="flex flex-col justify-center flex-1">{anchorHeader}</div>
 			<div className="flex flex-col justify-center flex-initial">{section.cornerControl}</div>
 		</div>
-	)
+	);
 }
 
 // Helper type for FAQ schema generation
 interface FAQSchemaEntry {
-	'@type': 'Question'
-	name: string
+	'@type': 'Question';
+	name: string;
 	acceptedAnswer: {
-		'@type': 'Answer'
-		text: string
-	}
+		'@type': 'Answer';
+		text: string;
+	};
 }
 
 // Function to generate FAQ structured data in LDJSON format
 function generateFaqSchema(sections: RichSection[], walletName: string): string {
 	// Extract questions and answers from sections
-	const faqEntries: FAQSchemaEntry[] = []
+	const faqEntries: FAQSchemaEntry[] = [];
 
 	// Process all sections except the first one (details section)
 	for (const section of sections.slice(1)) {
@@ -109,10 +109,10 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 					const questionText =
 						typeof subsection.title === 'string' && subsection.title !== ''
 							? subsection.title
-							: 'Feature question'
+							: 'Feature question';
 
 					// Get a reasonable answer text
-					const answerText = `${walletName} supports this feature.`
+					const answerText = `${walletName} supports this feature.`;
 
 					// Add to FAQ entries
 					faqEntries.push({
@@ -122,7 +122,7 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 							'@type': 'Answer',
 							text: answerText,
 						},
-					})
+					});
 				}
 			}
 		}
@@ -133,59 +133,59 @@ function generateFaqSchema(sections: RichSection[], walletName: string): string 
 		'@context': 'https://schema.org',
 		'@type': 'FAQPage',
 		mainEntity: faqEntries,
-	}
+	};
 
-	return JSON.stringify(faqSchema)
+	return JSON.stringify(faqSchema);
 }
 
 export function WalletPage({ walletName }: { walletName: WalletName }): React.JSX.Element {
-	const wallet = allRatedWallets[walletName]
-	const { singleVariant } = getSingleVariant(wallet.variants)
-	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
+	const wallet = allRatedWallets[walletName];
+	const { singleVariant } = getSingleVariant(wallet.variants);
+	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant);
 	useEffect(() => {
 		if (singleVariant !== null) {
-			return
+			return;
 		}
-		setPickedVariant(variantFromUrlQuery(wallet.variants))
-	}, [singleVariant])
+		setPickedVariant(variantFromUrlQuery(wallet.variants));
+	}, [singleVariant]);
 	const updatePickedVariant = (variant: Variant | null): void => {
 		if (singleVariant !== null) {
-			return // If there is a single variant, do not pollute the URL with it.
+			return; // If there is a single variant, do not pollute the URL with it.
 		}
 		window.history.replaceState(
 			null,
 			'',
 			`${window.location.pathname}${variantUrlQuery(wallet.variants, variant)}${window.location.hash}`,
-		)
-		setPickedVariant(variant)
-	}
+		);
+		setPickedVariant(variant);
+	};
 	const evalTree: EvaluationTree =
 		pickedVariant === null || wallet.variants[pickedVariant] === undefined
 			? wallet.overall
-			: wallet.variants[pickedVariant].attributes
-	const attrToRelevantVariants = new Map<string, NonEmptyArray<Variant>>()
-	let needsVariantFiltering = singleVariant === null
+			: wallet.variants[pickedVariant].attributes;
+	const attrToRelevantVariants = new Map<string, NonEmptyArray<Variant>>();
+	let needsVariantFiltering = singleVariant === null;
 	for (const [variant, variantSpecificityMap] of nonEmptyEntries<
 		Variant,
 		Map<string, VariantSpecificity>
 	>(wallet.variantSpecificity)) {
 		for (const [evalAttrId, variantSpecificity] of variantSpecificityMap.entries()) {
-			let relevantVariants: NonEmptyArray<Variant> | undefined = undefined
+			let relevantVariants: NonEmptyArray<Variant> | undefined = undefined;
 			switch (variantSpecificity) {
 				case VariantSpecificity.ALL_SAME:
-					break // Nothing.
+					break; // Nothing.
 				case VariantSpecificity.EXEMPT_FOR_THIS_VARIANT:
-					break // Nothing.
+					break; // Nothing.
 				case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
-					attrToRelevantVariants.set(evalAttrId, [variant])
-					break
+					attrToRelevantVariants.set(evalAttrId, [variant]);
+					break;
 				default:
-					needsVariantFiltering = true
-					relevantVariants = attrToRelevantVariants.get(evalAttrId)
+					needsVariantFiltering = true;
+					relevantVariants = attrToRelevantVariants.get(evalAttrId);
 					if (relevantVariants === undefined) {
-						attrToRelevantVariants.set(evalAttrId, [variant])
+						attrToRelevantVariants.set(evalAttrId, [variant]);
 					} else {
-						relevantVariants.push(variant)
+						relevantVariants.push(variant);
 					}
 			}
 		}
@@ -206,7 +206,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				/>
 			),
 		},
-	]
+	];
 	mapNonExemptAttributeGroupsInTree(evalTree, (attrGroup, evalGroup) => {
 		const section = {
 			header: attrGroup.id,
@@ -225,13 +225,13 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			),
 			body: <AttributeGroupBody wallet={wallet} attrGroup={attrGroup} />,
 			subsections: mapNonExemptGroupAttributes(evalGroup, (evalAttr): RichSection | null => {
-				const relevantVariants: Variant[] = attrToRelevantVariants.get(evalAttr.attribute.id) ?? []
+				const relevantVariants: Variant[] = attrToRelevantVariants.get(evalAttr.attribute.id) ?? [];
 				const {
 					cornerControl,
 					body,
 				}: {
-					cornerControl: React.ReactNode
-					body: React.ReactNode
+					cornerControl: React.ReactNode;
+					body: React.ReactNode;
 				} = (() => {
 					if (!needsVariantFiltering || relevantVariants.length === 0) {
 						return {
@@ -246,10 +246,10 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 									displayedVariant={pickedVariant}
 								/>
 							),
-						}
+						};
 					}
 					if (relevantVariants.length === 1) {
-						const VariantIcon = variantToIcon(relevantVariants[0])
+						const VariantIcon = variantToIcon(relevantVariants[0]);
 						return {
 							cornerControl: (
 								<Tooltip
@@ -283,17 +283,17 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 									displayedVariant={relevantVariants[0]}
 								/>
 							),
-						}
+						};
 					}
 					const pickerVariants = nonEmptyValues<Variant, ResolvedWallet>(wallet.variants).filter(
 						resolvedWallet =>
 							resolvedWallet.variant === pickedVariant ||
 							relevantVariants.includes(resolvedWallet.variant),
-					)
+					);
 					if (!isNonEmptyArray(pickerVariants)) {
 						throw new Error(
 							`Found no relevant variants to pick from in ${wallet.metadata.id} with picked variant ${pickedVariant}`,
-						)
+						);
 					}
 					return {
 						cornerControl: (
@@ -309,7 +309,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 											const variantRating = getEvaluationFromOtherTree(
 												evalAttr,
 												variantWallet.attributes,
-											).evaluation.value.rating
+											).evaluation.value.rating;
 											return {
 												id: variantWallet.variant,
 												icon: variantToIcon(variantWallet.variant),
@@ -327,9 +327,9 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 												click: () => {
 													updatePickedVariant(
 														pickedVariant === variantWallet.variant ? null : variantWallet.variant,
-													)
+													);
 												},
-											}
+											};
 										},
 									)}
 									pickedVariant={pickedVariant}
@@ -346,8 +346,8 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 								displayedVariant={pickedVariant}
 							/>
 						),
-					}
-				})()
+					};
+				})();
 				return {
 					header: slugifyCamelCase(attrGroup.id),
 					subHeader: slugifyCamelCase(evalAttr.attribute.id),
@@ -375,18 +375,18 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 						/>
 					),
 					body,
-				}
+				};
 			}).filter(subsection => subsection !== null),
-		}
+		};
 		if (section.subsections.length > 0) {
-			sections.push(section)
+			sections.push(section);
 		}
-	})
-	const scrollMarginTop = `${headerBottomMargin + scrollPastHeaderPixels}px`
+	});
+	const scrollMarginTop = `${headerBottomMargin + scrollPastHeaderPixels}px`;
 
-	const nonHeaderSections: RichSection[] = sections.slice(1)
+	const nonHeaderSections: RichSection[] = sections.slice(1);
 	if (!isNonEmptyArray(nonHeaderSections)) {
-		throw new Error('No non-header sections defined for navigation')
+		throw new Error('No non-header sections defined for navigation');
 	}
 	return (
 		<NavigationPageLayout
@@ -548,5 +548,5 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				</div>
 			</div>
 		</NavigationPageLayout>
-	)
+	);
 }

@@ -1,27 +1,27 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
-import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes';
+import { exampleRating } from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type KeysHandlingSupport,
 	KeysHandlingType,
-} from '@/schema/features/security/keys-handling'
-import { popRefs } from '@/schema/reference'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/features/security/keys-handling';
+import { popRefs } from '@/schema/reference';
+import type { AtLeastOneVariant } from '@/schema/variants';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.keys_handling'
+const brand = 'attributes.keys_handling';
 
 export type KeysHandlingValue = Value & {
-	masterSecretGeneration: KeysHandlingType
-	proprietaryKeyMechanisms: KeysHandlingType
-	keyTransmission: KeysHandlingType
-	physicalAttackResistance: KeysHandlingType
-	__brand: 'attributes.keys_handling'
-}
+	masterSecretGeneration: KeysHandlingType;
+	proprietaryKeyMechanisms: KeysHandlingType;
+	keyTransmission: KeysHandlingType;
+	physicalAttackResistance: KeysHandlingType;
+	__brand: 'attributes.keys_handling';
+};
 
 function evaluateKeysHandling(features: KeysHandlingSupport): Rating {
 	const ratings = [
@@ -29,15 +29,15 @@ function evaluateKeysHandling(features: KeysHandlingSupport): Rating {
 		features.proprietaryKeyMechanisms,
 		features.keyTransmission,
 		features.physicalAttackResistance,
-	]
-	const passCount = ratings.filter(r => r === KeysHandlingType.PASS).length
+	];
+	const passCount = ratings.filter(r => r === KeysHandlingType.PASS).length;
 	if (passCount >= 3) {
-		return Rating.PASS
+		return Rating.PASS;
 	}
 	if (passCount >= 1) {
-		return Rating.PARTIAL
+		return Rating.PARTIAL;
 	}
-	return Rating.FAIL
+	return Rating.FAIL;
 }
 
 export const keysHandling: Attribute<KeysHandlingValue> = {
@@ -105,21 +105,21 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 					keyTransmission: KeysHandlingType.FAIL,
 					physicalAttackResistance: KeysHandlingType.FAIL,
 				},
-			)
+			);
 		}
 
-		const keysHandlingFeature = features.security.keysHandling
+		const keysHandlingFeature = features.security.keysHandling;
 		if (keysHandlingFeature === null) {
 			return unrated(keysHandling, brand, {
 				masterSecretGeneration: KeysHandlingType.FAIL,
 				proprietaryKeyMechanisms: KeysHandlingType.FAIL,
 				keyTransmission: KeysHandlingType.FAIL,
 				physicalAttackResistance: KeysHandlingType.FAIL,
-			})
+			});
 		}
 
-		const { withoutRefs, refs: extractedRefs } = popRefs<KeysHandlingSupport>(keysHandlingFeature)
-		const rating = evaluateKeysHandling(withoutRefs)
+		const { withoutRefs, refs: extractedRefs } = popRefs<KeysHandlingSupport>(keysHandlingFeature);
+		const rating = evaluateKeysHandling(withoutRefs);
 
 		return {
 			value: {
@@ -142,6 +142,6 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
 			),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+};

@@ -1,4 +1,4 @@
-import type { FC, SVGProps } from 'react'
+import type { FC, SVGProps } from 'react';
 
 export const DesktopIcon: FC<SVGProps<SVGSVGElement>> = props => (
 	<svg
@@ -14,4 +14,4 @@ export const DesktopIcon: FC<SVGProps<SVGSVGElement>> = props => (
 			fill="currentColor"
 		/>
 	</svg>
-)
+);

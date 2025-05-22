@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
 
 export const hunterSecurity: CorporateEntity & SecurityAuditor = {
 	id: 'hunter-security',
@@ -26,4 +26,4 @@ export const hunterSecurity: CorporateEntity & SecurityAuditor = {
 	repoUrl: 'https://github.com/GeorgeHNTR',
 	twitter: 'https://x.com/HunterBlockSec',
 	url: 'https://www.huntersec.co/',
-}
+};

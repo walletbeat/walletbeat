@@ -1,5 +1,5 @@
-import type { SmartWalletContract } from '@/schema/contracts'
-import { featureSupported } from '@/schema/features/support'
+import type { SmartWalletContract } from '@/schema/contracts';
+import { featureSupported } from '@/schema/features/support';
 
 export const ambireAccountContract: SmartWalletContract = {
 	address: '0x0f2aa7bcda3d9d210df69a394b6965cb2566c828',
@@ -15,4 +15,4 @@ export const ambireAccountContract: SmartWalletContract = {
 			url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount.sol',
 		},
 	},
-}
+};

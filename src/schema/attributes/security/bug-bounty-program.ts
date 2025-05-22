@@ -4,25 +4,25 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type BugBountyProgramSupport,
 	BugBountyProgramType,
-} from '@/schema/features/security/bug-bounty-program'
-import { popRefs } from '@/schema/reference'
-import { type AtLeastOneVariant, Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
+} from '@/schema/features/security/bug-bounty-program';
+import { popRefs } from '@/schema/reference';
+import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.security.bug_bounty_program'
+const brand = 'attributes.security.bug_bounty_program';
 export type BugBountyProgramValue = Value & {
-	programType: BugBountyProgramType
-	upgradePathAvailable: boolean
-	__brand: 'attributes.security.bug_bounty_program'
-}
+	programType: BugBountyProgramType;
+	upgradePathAvailable: boolean;
+	__brand: 'attributes.security.bug_bounty_program';
+};
 
 function noBugBountyProgram(): Evaluation<BugBountyProgramValue> {
 	return {
@@ -53,7 +53,7 @@ function noBugBountyProgram(): Evaluation<BugBountyProgramValue> {
 				disclosure policy and ensure a process exists for providing security updates to users.
 			`,
 		),
-	}
+	};
 }
 
 function disclosureOnlyProgram(
@@ -93,7 +93,7 @@ function disclosureOnlyProgram(
 				- Provide transparent communication about security issues and their resolutions
 			`,
 		),
-	}
+	};
 }
 
 function basicBugBountyProgram(
@@ -133,7 +133,7 @@ function basicBugBountyProgram(
 				- Improve response times and transparency in the vulnerability handling process
 			`,
 		),
-	}
+	};
 }
 
 function comprehensiveBugBountyProgram(
@@ -173,7 +173,7 @@ function comprehensiveBugBountyProgram(
 				such as offering discounted replacements or firmware updates when possible.
 			`,
 				),
-	}
+	};
 }
 
 export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
@@ -286,42 +286,42 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 					programType: BugBountyProgramType.NONE,
 					upgradePathAvailable: false,
 				},
-			)
+			);
 		}
 
 		if (features.security.bugBountyProgram === null) {
 			return unrated(bugBountyProgram, brand, {
 				programType: BugBountyProgramType.NONE,
 				upgradePathAvailable: false,
-			})
+			});
 		}
 
 		const { withoutRefs, refs } = popRefs<BugBountyProgramSupport>(
 			features.security.bugBountyProgram,
-		)
+		);
 
 		// Initialize result with a default value
-		let result: Evaluation<BugBountyProgramValue> = noBugBountyProgram()
+		let result: Evaluation<BugBountyProgramValue> = noBugBountyProgram();
 
 		switch (withoutRefs.type) {
 			case BugBountyProgramType.COMPREHENSIVE:
-				result = comprehensiveBugBountyProgram(withoutRefs)
-				break
+				result = comprehensiveBugBountyProgram(withoutRefs);
+				break;
 			case BugBountyProgramType.BASIC:
-				result = basicBugBountyProgram(withoutRefs)
-				break
+				result = basicBugBountyProgram(withoutRefs);
+				break;
 			case BugBountyProgramType.DISCLOSURE_ONLY:
-				result = disclosureOnlyProgram(withoutRefs)
-				break
+				result = disclosureOnlyProgram(withoutRefs);
+				break;
 			case BugBountyProgramType.NONE:
-				result = noBugBountyProgram()
-				break
+				result = noBugBountyProgram();
+				break;
 		}
 
 		// Return result with references if any
 		return {
 			...result,
 			...(refs.length > 0 && { references: refs }),
-		}
+		};
 	},
-}
+};

@@ -1,14 +1,14 @@
-import CssBaseline from '@mui/material/CssBaseline'
-import { ThemeProvider } from '@mui/material/styles'
-import type React from 'react'
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider } from '@mui/material/styles';
+import type React from 'react';
 
-import EmotionCacheProvider from './EmotionCacheProvider'
-import theme from './theme'
+import EmotionCacheProvider from './EmotionCacheProvider';
+import theme from './theme';
 
 export default function ThemeRegistry({
 	children,
 }: {
-	children: React.ReactNode
+	children: React.ReactNode;
 }): React.ReactNode {
 	return (
 		<EmotionCacheProvider options={{ key: 'mui' }}>
@@ -18,5 +18,5 @@ export default function ThemeRegistry({
 				{children}
 			</ThemeProvider>
 		</EmotionCacheProvider>
-	)
+	);
 }

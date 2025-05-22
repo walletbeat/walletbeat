@@ -4,7 +4,7 @@ import {
 	nonEmptyKeySet,
 	type NonEmptyRecord,
 	type NonEmptySet,
-} from '@/types/utils/non-empty'
+} from '@/types/utils/non-empty';
 
 /**
  * An enum of wallet variants.
@@ -25,27 +25,27 @@ export const allVariants: NonEmptyArray<Variant> = [
 	Variant.BROWSER,
 	Variant.EMBEDDED,
 	Variant.HARDWARE,
-]
+];
 
 /** Maps at least one variant to a T. */
-export type AtLeastOneVariant<T> = NonEmptyRecord<Variant, T>
+export type AtLeastOneVariant<T> = NonEmptyRecord<Variant, T>;
 
 /** Maps at least one variant to a T. */
-export type AtLeastOneTrueVariant = NonEmptySet<Variant>
+export type AtLeastOneTrueVariant = NonEmptySet<Variant>;
 
 /**
  * A feature that may or may not depend on the wallet variant.
  * 'null' represents the fact that the feature was not evaluated on a wallet.
  */
-export type VariantFeature<T> = T | AtLeastOneVariant<T> | null
+export type VariantFeature<T> = T | AtLeastOneVariant<T> | null;
 
 /** Type guard for the AtLeastOneVariant<T> branch of VariantsFeature<T>. */
 function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneVariant<T> {
 	if (value === null || typeof value !== 'object') {
-		return false
+		return false;
 	}
-	let foundVariant = false
-	let foundNonVariant = false
+	let foundVariant = false;
+	let foundNonVariant = false;
 	Object.keys(value).forEach(key => {
 		if (
 			key === 'mobile' ||
@@ -54,33 +54,33 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 			key === 'embedded' ||
 			key === 'hardware'
 		) {
-			foundVariant = true
+			foundVariant = true;
 		} else {
-			foundNonVariant = true
+			foundNonVariant = true;
 		}
-	})
-	return foundVariant && !foundNonVariant // eslint-disable-line @typescript-eslint/no-unnecessary-condition -- Not sure why it thinks this is an unnecessary conditional.
+	});
+	return foundVariant && !foundNonVariant;
 }
 
 /**
  * Returns a set of variants populated in `value`.
  */
 export function getVariants(value: AtLeastOneVariant<unknown>): NonEmptySet<Variant> {
-	return nonEmptyKeySet(value)
+	return nonEmptyKeySet(value);
 }
 
 /**
  * Returns whether `obj` contains an entry for the given `variant`.
  */
 export function hasVariant(obj: AtLeastOneVariant<unknown>, variant: Variant): boolean {
-	return Object.hasOwn(obj, variant)
+	return Object.hasOwn(obj, variant);
 }
 
 /**
  * Returns whether `obj` has a hardware variant.
  */
 export function hasHardwareVariant(obj: AtLeastOneVariant<unknown>): boolean {
-	return hasVariant(obj, Variant.HARDWARE)
+	return hasVariant(obj, Variant.HARDWARE);
 }
 
 /**
@@ -90,18 +90,18 @@ export function hasHardwareVariant(obj: AtLeastOneVariant<unknown>): boolean {
 export function getSingleVariant<T>(
 	obj: AtLeastOneVariant<T>,
 ): { singleVariant: Variant; val: T } | { singleVariant: null; val: null } {
-	const values = nonEmptyEntries<Variant, T>(obj).filter(([_, val]) => val !== undefined)
+	const values = nonEmptyEntries<Variant, T>(obj).filter(([_, val]) => val !== undefined);
 	if (values.length === 1) {
-		return { singleVariant: values[0][0], val: values[0][1] }
+		return { singleVariant: values[0][0], val: values[0][1] };
 	}
-	return { singleVariant: null, val: null }
+	return { singleVariant: null, val: null };
 }
 
 /**
  * @returns Whether the given object has exactly one variant.
  */
 export function hasSingleVariant(obj: AtLeastOneVariant<unknown>): boolean {
-	return getSingleVariant(obj).singleVariant !== null
+	return getSingleVariant(obj).singleVariant !== null;
 }
 
 /**
@@ -111,7 +111,7 @@ export function hasSingleVariant(obj: AtLeastOneVariant<unknown>): boolean {
  * to begin with.
  * 'null' represents the fact that the feature was not evaluated on a wallet.
  */
-export type ResolvedFeature<T> = T | null
+export type ResolvedFeature<T> = T | null;
 
 /** Resolve a single feature according to the given variant. */
 export function resolveFeature<T>(
@@ -119,10 +119,10 @@ export function resolveFeature<T>(
 	variant: Variant,
 ): ResolvedFeature<T> {
 	if (feature === null) {
-		return null
+		return null;
 	}
 	if (isAtLeastOneVariants(feature)) {
-		return feature[variant] ?? null
+		return feature[variant] ?? null;
 	}
-	return feature
+	return feature;
 }

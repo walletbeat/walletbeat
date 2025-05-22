@@ -5,8 +5,8 @@ import {
 	exampleRatingUnimplemented,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type Endpoint,
 	type EntityData,
@@ -14,18 +14,18 @@ import {
 	leaksByDefault,
 	type MultiAddressHandling,
 	MultiAddressPolicy,
-} from '@/schema/features/privacy/data-collection'
-import { isSupported } from '@/schema/features/support'
-import { type ReferenceArray, refs } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/features/privacy/data-collection';
+import { isSupported } from '@/schema/features/support';
+import { type ReferenceArray, refs } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.privacy.multi_address_correlation'
+const brand = 'attributes.privacy.multi_address_correlation';
 export type MultiAddressCorrelationValue = Value & {
-	__brand: 'attributes.privacy.multi_address_correlation'
-}
+	__brand: 'attributes.privacy.multi_address_correlation';
+};
 
 function uniqueDestinations(references: ReferenceArray): Evaluation<MultiAddressCorrelationValue> {
 	return {
@@ -49,7 +49,7 @@ function uniqueDestinations(references: ReferenceArray): Evaluation<MultiAddress
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function activeAddressOnly(references: ReferenceArray): Evaluation<MultiAddressCorrelationValue> {
@@ -85,7 +85,7 @@ function activeAddressOnly(references: ReferenceArray): Evaluation<MultiAddressC
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function bulkRequests(references: ReferenceArray): Evaluation<MultiAddressCorrelationValue> {
@@ -128,7 +128,7 @@ function bulkRequests(references: ReferenceArray): Evaluation<MultiAddressCorrel
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function correlatableRequests(
@@ -174,7 +174,7 @@ function correlatableRequests(
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function staggeredRequests(references: ReferenceArray): Evaluation<MultiAddressCorrelationValue> {
@@ -214,7 +214,7 @@ function staggeredRequests(references: ReferenceArray): Evaluation<MultiAddressC
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function separateCircuits(references: ReferenceArray): Evaluation<MultiAddressCorrelationValue> {
@@ -254,7 +254,7 @@ function separateCircuits(references: ReferenceArray): Evaluation<MultiAddressCo
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function staggeredAndSeparateCircuits(
@@ -289,7 +289,7 @@ function staggeredAndSeparateCircuits(
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function unsupported(): Evaluation<MultiAddressCorrelationValue> {
@@ -313,57 +313,57 @@ function unsupported(): Evaluation<MultiAddressCorrelationValue> {
 			`,
 		),
 		references: [],
-	}
+	};
 }
 
 function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): number {
 	switch (handling.type) {
 		case MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES:
-			return 0
+			return 0;
 		case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
-			return 1000
+			return 1000;
 		case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS: {
-			const destinationScore = { SAME_FOR_ALL: 0, ISOLATED: 1 }[handling.destination] * 1000
+			const destinationScore = { SAME_FOR_ALL: 0, ISOLATED: 1 }[handling.destination] * 1000;
 			const enclaveScore =
 				(() => {
 					switch (endpoint.type) {
 						case 'REGULAR':
-							return 0
+							return 0;
 						case 'SECURE_ENCLAVE':
 							switch (endpoint.externalLogging.type) {
 								case 'UNKNOWN':
-									return 0
+									return 0;
 								case 'YES':
-									return 0
+									return 0;
 								case 'NO':
 									switch (endpoint.endToEndEncryption.type) {
 										case 'NONE':
-											return 0
+											return 0;
 										case 'TERMINATED_OUT_OF_ENCLAVE':
-											return 0
+											return 0;
 										case 'TERMINATED_INSIDE_ENCLAVE':
 											if (
 												!endpoint.verifiability.sourceAvailable ||
 												!endpoint.verifiability.reproducibleBuilds
 											) {
 												// Server can be running anything, so all bets are off.
-												return 0
+												return 0;
 											}
 											switch (endpoint.verifiability.clientVerification.type) {
 												case 'NOT_VERIFIED':
-													return 1
+													return 1;
 												case 'VERIFIED':
-													return 2
+													return 2;
 												case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
-													return 3
+													return 3;
 											}
 									}
 							}
 					}
-				})() * 100
-			const proxyScore = { NONE: 0, SAME_CIRCUIT: 1, SEPARATE_CIRCUITS: 2 }[handling.proxy] * 10
-			const timingScore = { SIMULTANEOUS: 0, STAGGERED: 1 }[handling.timing]
-			return 1 + destinationScore + enclaveScore + proxyScore + timingScore
+				})() * 100;
+			const proxyScore = { NONE: 0, SAME_CIRCUIT: 1, SEPARATE_CIRCUITS: 2 }[handling.proxy] * 10;
+			const timingScore = { SIMULTANEOUS: 0, STAGGERED: 1 }[handling.timing];
+			return 1 + destinationScore + enclaveScore + proxyScore + timingScore;
 		}
 	}
 }
@@ -495,74 +495,74 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<MultiAddressCorrelationValue> => {
 		if (features.multiAddress === null) {
-			return unrated(multiAddressCorrelation, brand, null)
+			return unrated(multiAddressCorrelation, brand, null);
 		}
 		if (!isSupported(features.multiAddress)) {
-			return unsupported()
+			return unsupported();
 		}
 		if (features.privacy.dataCollection === null) {
-			return unrated(multiAddressCorrelation, brand, null)
+			return unrated(multiAddressCorrelation, brand, null);
 		}
-		let worstHandling: EntityData | null = null
-		let worstHandlingScore = -1
-		const allRefs: ReferenceArray = []
+		let worstHandling: EntityData | null = null;
+		let worstHandlingScore = -1;
+		const allRefs: ReferenceArray = [];
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
-			const leaks = inferLeaks(collected.leaks)
+			const leaks = inferLeaks(collected.leaks);
 			if (!leaksByDefault(leaks.walletAddress)) {
-				continue
+				continue;
 			}
 			if (leaks.multiAddress === undefined) {
-				return unrated(multiAddressCorrelation, brand, null)
+				return unrated(multiAddressCorrelation, brand, null);
 			}
-			allRefs.push(...refs(collected.leaks))
-			const score = rateHandling(leaks.multiAddress, leaks.endpoint)
+			allRefs.push(...refs(collected.leaks));
+			const score = rateHandling(leaks.multiAddress, leaks.endpoint);
 			if (worstHandling === null || score < worstHandlingScore) {
-				worstHandling = collected
-				worstHandlingScore = score
+				worstHandling = collected;
+				worstHandlingScore = score;
 			}
 		}
 		if (worstHandling === null) {
-			return unrated(multiAddressCorrelation, brand, null)
+			return unrated(multiAddressCorrelation, brand, null);
 		}
-		const handling = worstHandling.leaks.multiAddress
+		const handling = worstHandling.leaks.multiAddress;
 		if (handling === undefined) {
-			return unrated(multiAddressCorrelation, brand, null)
+			return unrated(multiAddressCorrelation, brand, null);
 		}
 		switch (handling.type) {
 			case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
 				// If the wallet has a concept of a singular "active address" and only
 				// ever makes requests about it, then other addresses are never exposed
 				// and therefore not correlatable.
-				return activeAddressOnly(allRefs)
+				return activeAddressOnly(allRefs);
 			case MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES:
 				// If the wallet makes a single request with multiple addresses,
 				// they are clearly correlatable.
-				return bulkRequests(allRefs)
+				return bulkRequests(allRefs);
 			case MultiAddressPolicy.SEPARATE_REQUEST_PER_ADDRESS:
 				if (handling.destination === 'ISOLATED') {
 					// The wallet makes requests to different endpoints for each
 					// address, so they are not correlatable.
-					return uniqueDestinations(allRefs)
+					return uniqueDestinations(allRefs);
 				}
 				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
 					// The wallet mitigates correlation both at the network level and by
 					// time. Not correlated.
-					return staggeredAndSeparateCircuits(allRefs)
+					return staggeredAndSeparateCircuits(allRefs);
 				}
 				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing !== 'STAGGERED') {
 					// Requests not staggered, but coming from different IPs.
 					// Better than nothing.
-					return separateCircuits(allRefs)
+					return separateCircuits(allRefs);
 				}
 				if (handling.proxy !== 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
 					// Requests staggered, but coming from the same IP.
 					// Better than nothing.
-					return staggeredRequests(allRefs)
+					return staggeredRequests(allRefs);
 				}
 				// Requests not staggered, and all coming from the same IP.
 				// That is correlated.
-				return correlatableRequests(allRefs)
+				return correlatableRequests(allRefs);
 		}
 	},
 	aggregate: pickWorstRating<MultiAddressCorrelationValue>,
-}
+};

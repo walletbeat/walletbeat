@@ -1,36 +1,36 @@
-import * as Popover from '@radix-ui/react-popover'
-import { Command } from 'cmdk'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { LuChevronDown, LuKey, LuSearch, LuWallet } from 'react-icons/lu'
+import * as Popover from '@radix-ui/react-popover';
+import { Command } from 'cmdk';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { LuChevronDown, LuKey, LuSearch, LuWallet } from 'react-icons/lu';
 
-import { allRatedWallets } from '@/data/wallets'
-import type { RatedWallet } from '@/schema/wallet'
-import { mapWalletTypes, WalletType } from '@/schema/wallet-types'
-import { isNonEmptyArray, nonEmptyMap, setContains } from '@/types/utils/non-empty'
-import { cx } from '@/utils/cx'
+import { allRatedWallets } from '@/data/wallets';
+import type { RatedWallet } from '@/schema/wallet';
+import { mapWalletTypes, WalletType } from '@/schema/wallet-types';
+import { isNonEmptyArray, nonEmptyMap, setContains } from '@/types/utils/non-empty';
+import { cx } from '@/utils/cx';
 
-import { WalletIcon } from '../atoms/WalletIcon'
+import { WalletIcon } from '../atoms/WalletIcon';
 
 export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.Element {
-	const [open, setOpen] = useState(false)
-	const [search, setSearch] = useState('')
-	const inputRef = useRef<HTMLInputElement>(null)
-	const triggerRef = useRef<HTMLButtonElement>(null)
-	const [width, setWidth] = useState(0)
+	const [open, setOpen] = useState(false);
+	const [search, setSearch] = useState('');
+	const inputRef = useRef<HTMLInputElement>(null);
+	const triggerRef = useRef<HTMLButtonElement>(null);
+	const [width, setWidth] = useState(0);
 
 	// Update width when popover opens
 	useEffect(() => {
 		if (open && triggerRef.current !== null) {
-			setWidth(triggerRef.current.offsetWidth)
+			setWidth(triggerRef.current.offsetWidth);
 		}
-	}, [open])
+	}, [open]);
 
 	const handleSelect = useCallback((walletId: string) => {
-		setOpen(false)
+		setOpen(false);
 
 		// Use simple navigation instead of router
-		window.location.href = `/${walletId}`
-	}, [])
+		window.location.href = `/${walletId}`;
+	}, []);
 
 	return (
 		<Popover.Root open={open} onOpenChange={setOpen}>
@@ -61,8 +61,8 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 					sideOffset={8}
 					align="start"
 					onOpenAutoFocus={e => {
-						e.preventDefault()
-						inputRef.current?.focus()
+						e.preventDefault();
+						inputRef.current?.focus();
 					}}
 				>
 					<Command
@@ -70,9 +70,9 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 						filter={(value, search) => {
 							// Custom filter function to search in wallet name
 							if (value.includes(search.toLowerCase())) {
-								return 1
+								return 1;
 							}
-							return 0
+							return 0;
 						}}
 					>
 						<div className="flex items-center border-b px-2">
@@ -90,15 +90,15 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 							{/* Only show section headers when there are matching items */}
 							{Object.values(
 								mapWalletTypes((walletType: WalletType): React.ReactNode | null => {
-									const searchLower = search.toLowerCase()
+									const searchLower = search.toLowerCase();
 									const results = Object.values(allRatedWallets).filter(
 										wallet =>
 											setContains(wallet.types, walletType) &&
 											(wallet.metadata.id.toLowerCase().includes(searchLower) ||
 												wallet.metadata.displayName.toLowerCase().includes(searchLower)),
-									)
+									);
 									if (!isNonEmptyArray(results)) {
-										return null
+										return null;
 									}
 									const { heading, icon } = (() => {
 										switch (walletType) {
@@ -106,16 +106,16 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 												return {
 													heading: 'Software Wallets',
 													icon: <LuWallet className="ml-2 flex-shrink-0 opacity-40" size={14} />,
-												}
+												};
 											case WalletType.HARDWARE:
 												return {
 													heading: 'Hardware Wallets',
 													icon: <LuKey className="ml-2 flex-shrink-0 opacity-40" size={14} />,
-												}
+												};
 											case WalletType.EMBEDDED:
-												return { heading: 'Embedded Wallets', icon: null }
+												return { heading: 'Embedded Wallets', icon: null };
 										}
-									})()
+									})();
 									return (
 										<Command.Group
 											heading={heading}
@@ -136,7 +136,7 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 												</Command.Item>
 											))}
 										</Command.Group>
-									)
+									);
 								}),
 							)}
 						</Command.List>
@@ -147,5 +147,5 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 				</Popover.Content>
 			</Popover.Portal>
 		</Popover.Root>
-	)
+	);
 }

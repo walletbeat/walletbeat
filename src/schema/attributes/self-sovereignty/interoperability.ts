@@ -1,36 +1,36 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
-import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes';
+import { exampleRating } from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type InteroperabilitySupport,
 	InteroperabilityType,
-} from '@/schema/features/self-sovereignty/interoperability'
-import { popRefs } from '@/schema/reference'
-import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
+} from '@/schema/features/self-sovereignty/interoperability';
+import { popRefs } from '@/schema/reference';
+import type { AtLeastOneVariant } from '@/schema/variants';
+import { Variant } from '@/schema/variants';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { exempt, pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.interoperability'
+const brand = 'attributes.interoperability';
 
 export type InteroperabilityValue = Value & {
-	thirdPartyCompatibility: InteroperabilityType
-	noSupplierLinkage: InteroperabilityType
-	__brand: 'attributes.interoperability'
-}
+	thirdPartyCompatibility: InteroperabilityType;
+	noSupplierLinkage: InteroperabilityType;
+	__brand: 'attributes.interoperability';
+};
 
 function evaluateInteroperability(features: InteroperabilitySupport): Rating {
-	const ratings = [features.thirdPartyCompatibility, features.noSupplierLinkage]
-	const passCount = ratings.filter(r => r === InteroperabilityType.PASS).length
+	const ratings = [features.thirdPartyCompatibility, features.noSupplierLinkage];
+	const passCount = ratings.filter(r => r === InteroperabilityType.PASS).length;
 	if (passCount === 2) {
-		return Rating.PASS
+		return Rating.PASS;
 	}
 	if (passCount === 1) {
-		return Rating.PARTIAL
+		return Rating.PARTIAL;
 	}
-	return Rating.FAIL
+	return Rating.FAIL;
 }
 
 export const interoperability: Attribute<InteroperabilityValue> = {
@@ -82,19 +82,19 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 			return exempt(interoperability, sentence('Only rated for hardware wallets'), brand, {
 				thirdPartyCompatibility: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,
-			})
+			});
 		}
-		const interoperabilityFeature = features.selfSovereignty.interoperability
+		const interoperabilityFeature = features.selfSovereignty.interoperability;
 		if (interoperabilityFeature === null) {
 			return unrated(interoperability, brand, {
 				thirdPartyCompatibility: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,
-			})
+			});
 		}
 
 		const { withoutRefs, refs: extractedRefs } =
-			popRefs<InteroperabilitySupport>(interoperabilityFeature)
-		const rating = evaluateInteroperability(withoutRefs)
+			popRefs<InteroperabilitySupport>(interoperabilityFeature);
+		const rating = evaluateInteroperability(withoutRefs);
 
 		return {
 			value: {
@@ -117,6 +117,6 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 					`${wallet.metadata.displayName} should improve sub-criteria rated PARTIAL or FAIL.`,
 			),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		};
 	},
-}
+};

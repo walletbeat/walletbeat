@@ -5,14 +5,14 @@ import {
 	tooltipClasses,
 	type TooltipProps,
 	Typography,
-} from '@mui/material'
-import React from 'react'
+} from '@mui/material';
+import React from 'react';
 
-import type { FullyQualifiedReference } from '@/schema/reference'
-import type { LabeledUrl } from '@/schema/url'
+import type { FullyQualifiedReference } from '@/schema/reference';
+import type { LabeledUrl } from '@/schema/url';
 
-import { ExternalLink } from './ExternalLink'
-import { MarkdownTypography } from './MarkdownTypography'
+import { ExternalLink } from './ExternalLink';
+import { MarkdownTypography } from './MarkdownTypography';
 
 const ReferenceStyledTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -20,7 +20,7 @@ const ReferenceStyledTooltip = styled(({ className, ...props }: TooltipProps) =>
 	[`& .${tooltipClasses.tooltip}`]: {
 		minWidth: '400px',
 	},
-})
+});
 
 export function ReferenceTooltip({
 	ref,
@@ -28,10 +28,10 @@ export function ReferenceTooltip({
 	showExplanation = true,
 	children,
 }: {
-	ref: FullyQualifiedReference
-	url: LabeledUrl
-	showExplanation?: boolean
-	children: React.ComponentProps<typeof ReferenceStyledTooltip>['children']
+	ref: FullyQualifiedReference;
+	url: LabeledUrl;
+	showExplanation?: boolean;
+	children: React.ComponentProps<typeof ReferenceStyledTooltip>['children'];
 }): React.JSX.Element {
 	return (
 		<ReferenceStyledTooltip
@@ -64,5 +64,5 @@ export function ReferenceTooltip({
 		>
 			{children}
 		</ReferenceStyledTooltip>
-	)
+	);
 }

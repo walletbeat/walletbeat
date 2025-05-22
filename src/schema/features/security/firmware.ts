@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 export enum FirmwareType {
 	PASS = 'PASS',
@@ -7,13 +7,13 @@ export enum FirmwareType {
 }
 
 export interface FirmwareSupport {
-	type: FirmwareType
-	url?: string
-	details?: string
-	silentUpdateProtection: FirmwareType
-	firmwareOpenSource: FirmwareType
-	reproducibleBuilds: FirmwareType
-	customFirmware: FirmwareType
+	type: FirmwareType;
+	url?: string;
+	details?: string;
+	silentUpdateProtection: FirmwareType;
+	firmwareOpenSource: FirmwareType;
+	reproducibleBuilds: FirmwareType;
+	customFirmware: FirmwareType;
 }
 
-export type FirmwareImplementation = WithRef<FirmwareSupport>
+export type FirmwareImplementation = WithRef<FirmwareSupport>;

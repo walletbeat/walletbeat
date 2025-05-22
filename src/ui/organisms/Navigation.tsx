@@ -1,12 +1,12 @@
-import type { ListItemButton } from '@mui/material'
-import type { Box } from '@mui/system'
-import React, { memo, useState } from 'react'
-import { LuMenu, LuX } from 'react-icons/lu'
+import type { ListItemButton } from '@mui/material';
+import type { Box } from '@mui/system';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { LuMenu, LuX } from 'react-icons/lu';
 
-import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-import { cx } from '@/utils/cx'
+import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty';
+import { cx } from '@/utils/cx';
 
-import { ThemeSwitcher } from './ThemeSwitcher'
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 /**
  * A navigation item in the navigation menu.
@@ -15,23 +15,23 @@ interface NavigationItemBase {
 	/**
 	 * Unique string identifying the item.
 	 */
-	id: string
+	id: string;
 
 	/**
 	 * Item icon shown next to the item name in the navigation menu.
 	 */
-	icon?: React.ReactNode
+	icon?: React.ReactNode;
 
 	/**
 	 * Item name in the navigation menu.
 	 */
-	title: string
+	title: string;
 
 	/**
 	 * Set of children navigation items.
 	 * Only one level of nesting is supported.
 	 */
-	children?: NavigationItem[]
+	children?: NavigationItem[];
 }
 
 /**
@@ -43,30 +43,30 @@ export interface NavigationContentItem extends NavigationItemBase {
 	 * The DOM `id` of the content block that the navigation item represents.
 	 * Also used as URL anchor for that content section.
 	 */
-	contentId: string
+	contentId: string;
 }
 
 export interface NavigationLinkItem extends NavigationItemBase {
 	/**
 	 * URL to navigate to when clicked.
 	 */
-	href: string
+	href: string;
 }
 
-export type NavigationItem = NavigationContentItem | NavigationLinkItem
+export type NavigationItem = NavigationContentItem | NavigationLinkItem;
 
 /**
  * Type predicate for `NavigationContentItem`.
  */
 export function isNavigationContentItem(item: NavigationItem): item is NavigationContentItem {
-	return Object.hasOwn(item, 'contentId')
+	return Object.hasOwn(item, 'contentId');
 }
 
 /**
  * Type predicate for `NavigationLinkItem`.
  */
 export function isNavigationLinkItem(item: NavigationItem): item is NavigationLinkItem {
-	return Object.hasOwn(item, 'href')
+	return Object.hasOwn(item, 'href');
 }
 
 /**
@@ -76,7 +76,7 @@ export interface NavigationGroup {
 	/**
 	 * Unique name for the group of items.
 	 */
-	id: string
+	id: string;
 
 	/**
 	 * Set of navigation items in the group.
@@ -84,14 +84,14 @@ export interface NavigationGroup {
 	 * Each item within may contain sub-items (with only one
 	 * level of nesting).
 	 */
-	items: NonEmptyArray<NavigationItem>
+	items: NonEmptyArray<NavigationItem>;
 
 	/**
 	 * If true, allow this navigation group to scroll on the Y axis if it
 	 * overflows, and expand this group to take as much height as possible.
 	 * This should be true on at most one group in a set of navigation groups.
 	 */
-	overflow: boolean
+	overflow: boolean;
 }
 
 /**
@@ -105,26 +105,26 @@ function SingleListItemIcon({ children }: { children: React.ReactNode }): React.
 		>
 			{children}
 		</span>
-	)
+	);
 }
 
 interface NavigationItemProps {
-	item: NavigationItem
-	active: boolean
-	depth: 'primary' | 'secondary'
-	selectedItemId?: string
-	selectedGroupId?: string
-	onContentItemClick?: (item: NavigationContentItem) => void
+	item: NavigationItem;
+	active: boolean;
+	depth: 'primary' | 'secondary';
+	selectedItemId?: string;
+	selectedGroupId?: string;
+	onContentItemClick?: (_item: NavigationContentItem) => void;
 }
 
 function itemOrChildMatches(item: NavigationItem, selectedItemId?: string): boolean {
 	if (selectedItemId == null) {
-		return false
+		return false;
 	}
 	if (item.id === selectedItemId) {
-		return true
+		return true;
 	}
-	return (item.children ?? []).some(child => itemOrChildMatches(child, selectedItemId))
+	return (item.children ?? []).some(child => itemOrChildMatches(child, selectedItemId));
 }
 
 /**
@@ -137,31 +137,43 @@ const NavigationItem = memo(
 		selectedItemId,
 		selectedGroupId,
 	}: NavigationItemProps): React.JSX.Element {
-		const shouldHighlight = item.id === selectedItemId && selectedGroupId !== undefined
-		const initiallyOpen = itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined
-		const [isOpen, setIsOpen] = useState(initiallyOpen)
-		React.useEffect(() => {
-			if (itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined) {
-				setIsOpen(true)
-			}
-		}, [selectedItemId, item, selectedGroupId])
-		const linkStyles = cx(
-			'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
-			shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-backgroundSecondary',
-		)
-		const hasChildren = (item.children?.length ?? 0) > 0
+		const shouldHighlight = item.id === selectedItemId && selectedGroupId !== undefined;
+		const initiallyOpen = itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined;
+		const [isOpen, setIsOpen] = useState(initiallyOpen);
 
-		const toggleDropdown = (e: React.MouseEvent): void => {
-			if (hasChildren) {
-				e.preventDefault()
-				setIsOpen(!isOpen)
+		// Use useEffect to handle changes to selectedItemId
+		useEffect(() => {
+			if (itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined) {
+				setIsOpen(true);
 			}
-		}
+		}, [selectedItemId, item, selectedGroupId]);
+
+		// Memoize link styles to prevent recalculations
+		const linkStyles = useMemo(
+			() =>
+				cx(
+					'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
+					shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-backgroundSecondary',
+				),
+			[shouldHighlight],
+		);
+
+		const hasChildren = useMemo(() => (item.children?.length ?? 0) > 0, [item.children]);
+
+		const toggleDropdown = useCallback(
+			(e: React.MouseEvent): void => {
+				if (hasChildren) {
+					e.preventDefault();
+					setIsOpen(!isOpen);
+				}
+			},
+			[hasChildren, isOpen],
+		);
 
 		const ButtonComponent = ({
 			children,
 		}: {
-			children: React.ComponentProps<typeof ListItemButton>['children']
+			children: React.ComponentProps<typeof ListItemButton>['children'];
 		}): React.JSX.Element => {
 			if (isNavigationContentItem(item)) {
 				return (
@@ -190,7 +202,7 @@ const NavigationItem = memo(
 							</span>
 						)}
 					</a>
-				)
+				);
 			}
 			if (isNavigationLinkItem(item)) {
 				return (
@@ -221,10 +233,10 @@ const NavigationItem = memo(
 							</span>
 						)}
 					</a>
-				)
+				);
 			}
-			throw new Error('Invalid navigation item')
-		}
+			throw new Error('Invalid navigation item');
+		};
 		return (
 			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				{/* {selectedItemId} - {selectedGroupId} */}
@@ -257,7 +269,7 @@ const NavigationItem = memo(
 					</ul>
 				)}
 			</li>
-		)
+		);
 	},
 	(prevProps: Readonly<NavigationItemProps>, nextProps: Readonly<NavigationItemProps>): boolean =>
 		prevProps.item.id === nextProps.item.id &&
@@ -265,15 +277,15 @@ const NavigationItem = memo(
 		prevProps.active === nextProps.active &&
 		prevProps.selectedItemId === nextProps.selectedItemId &&
 		prevProps.selectedGroupId === nextProps.selectedGroupId,
-)
+);
 
 interface NavigationGroupProps {
-	group: NavigationGroup
-	groupIndex: number
-	activeItemId?: string
-	onContentItemClick?: (item: NavigationContentItem) => void
-	selectedItemId?: string
-	selectedGroupId?: string
+	group: NavigationGroup;
+	groupIndex: number;
+	activeItemId?: string;
+	onContentItemClick?: (_item: NavigationContentItem) => void;
+	selectedItemId?: string;
+	selectedGroupId?: string;
 }
 
 export const NavigationGroup = memo(
@@ -284,7 +296,7 @@ export const NavigationGroup = memo(
 		selectedItemId,
 		selectedGroupId,
 	}: NavigationGroupProps): React.JSX.Element {
-		const isSelectedGroup = group.id === selectedGroupId
+		const isSelectedGroup = group.id === selectedGroupId;
 		return (
 			<>
 				<ul className={cx('flex flex-col gap-0 p-0 m-0')} id={`navigationGroup-${group.id}`}>
@@ -303,27 +315,27 @@ export const NavigationGroup = memo(
 					))}
 				</ul>
 			</>
-		)
+		);
 	},
 	(
 		prevProps: Readonly<NavigationGroupProps>,
 		nextProps: Readonly<NavigationGroupProps>,
 	): boolean => {
 		if (prevProps.group !== nextProps.group) {
-			return false
+			return false;
 		}
 		if (prevProps.groupIndex !== nextProps.groupIndex) {
-			return false
+			return false;
 		}
 		if (prevProps.onContentItemClick !== nextProps.onContentItemClick) {
-			return false
+			return false;
 		}
 		if (
 			prevProps.activeItemId === nextProps.activeItemId &&
 			prevProps.selectedItemId === nextProps.selectedItemId &&
 			prevProps.selectedGroupId === nextProps.selectedGroupId
 		) {
-			return true
+			return true;
 		}
 		// Check if active item ID or selected item ID is one of the sub-items of this group.
 		for (const props of [prevProps, nextProps]) {
@@ -333,7 +345,7 @@ export const NavigationGroup = memo(
 					item.id === props.selectedItemId ||
 					props.group.id === props.selectedGroupId
 				) {
-					return false
+					return false;
 				}
 				for (const subItem of item.children ?? []) {
 					if (
@@ -341,14 +353,14 @@ export const NavigationGroup = memo(
 						subItem.id === props.selectedItemId ||
 						props.group.id === props.selectedGroupId
 					) {
-						return false
+						return false;
 					}
 				}
 			}
 		}
-		return true
+		return true;
 	},
-)
+);
 
 /**
  * The navigation bar on a page.
@@ -361,26 +373,34 @@ export function Navigation({
 	selectedItemId,
 	selectedGroupId,
 }: {
-	groups: NonEmptyArray<NavigationGroup>
-	activeItemId?: string
-	flex?: React.ComponentProps<typeof Box>['flex']
-	onContentItemClick?: (item: NavigationContentItem) => void
-	prefix?: React.ReactNode
-	selectedItemId?: string
-	selectedGroupId?: string
+	groups: NonEmptyArray<NavigationGroup>;
+	activeItemId?: string;
+	flex?: React.ComponentProps<typeof Box>['flex'];
+	onContentItemClick?: (_item: NavigationContentItem) => void;
+	prefix?: React.ReactNode;
+	selectedItemId?: string;
+	selectedGroupId?: string;
 }): React.JSX.Element {
-	const [isOpen, setIsOpen] = useState(false)
+	const [isOpen, setIsOpen] = useState(false);
 
 	// Toggle menu
 	const toggleMenu = (): void => {
-		setIsOpen(!isOpen)
+		setIsOpen(!isOpen);
 		// Toggle body scroll lock when the mobile menu is toggled
 		if (!isOpen) {
-			document.body.style.overflow = 'hidden'
+			document.body.style.overflow = 'hidden';
 		} else {
-			document.body.style.overflow = ''
+			document.body.style.overflow = '';
 		}
-	}
+	};
+
+	// Ensure body overflow is reset when component unmounts
+	React.useEffect(
+		() => () => {
+			document.body.style.overflow = '';
+		},
+		[],
+	);
 
 	return (
 		<>
@@ -490,5 +510,5 @@ export function Navigation({
 				/>
 			)}
 		</>
-	)
+	);
 }

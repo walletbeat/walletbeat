@@ -1,6 +1,6 @@
-import type { Paragraph, Renderable, RenderableTypography } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
-import type { Dict } from '@/types/utils/dict'
+import type { Paragraph, Renderable, RenderableTypography } from '@/types/content';
+import type { CalendarDate } from '@/types/date';
+import type { Dict } from '@/types/utils/dict';
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
@@ -9,16 +9,16 @@ import {
 	type NonEmptySet,
 	setItems,
 	setUnion,
-} from '@/types/utils/non-empty'
+} from '@/types/utils/non-empty';
 
 import {
 	aggregateAttributes,
 	evaluateAttributes,
 	type EvaluationTree,
 	mapAttributesGetter,
-} from './attribute-groups'
-import { type Attribute, type EvaluatedAttribute, Rating, type Value } from './attributes'
-import type { WalletDeveloper } from './entity'
+} from './attribute-groups';
+import { type Attribute, type EvaluatedAttribute, Rating, type Value } from './attributes';
+import type { WalletDeveloper } from './entity';
 import {
 	type ResolvedFeatures,
 	resolveFeatures,
@@ -26,23 +26,23 @@ import {
 	type WalletEmbeddedFeatures,
 	type WalletHardwareFeatures,
 	type WalletSoftwareFeatures,
-} from './features'
-import { type AccountType, supportedAccountTypes } from './features/account-support'
-import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
-import type { Url } from './url'
+} from './features';
+import { type AccountType, supportedAccountTypes } from './features/account-support';
+import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile';
+import type { Url } from './url';
 import {
 	type AtLeastOneTrueVariant,
 	type AtLeastOneVariant,
 	getVariants,
 	hasVariant,
 	Variant,
-} from './variants'
-import { type WalletType, walletTypes } from './wallet-types'
+} from './variants';
+import { type WalletType, walletTypes } from './wallet-types';
 
 /** A contributor to walletbeat. */
 export interface Contributor {
-	name: string
-	url?: Url
+	name: string;
+	url?: Url;
 
 	/** The contributor's affiliation with wallet development organizations. */
 	affiliation:
@@ -50,19 +50,19 @@ export interface Contributor {
 				/**
 				 * The wallet development organization that the contributor works for.
 				 */
-				developer: WalletDeveloper
+				developer: WalletDeveloper;
 
 				/**
 				 * Role at the organization that the contributor works for.
 				 */
-				role: 'EMPLOYEE' | 'FOUNDER' | 'CONSULTANT'
+				role: 'EMPLOYEE' | 'FOUNDER' | 'CONSULTANT';
 
 				/**
 				 * Whether the contributor has non-zero equity ownership of the company.
 				 */
-				hasEquity: boolean
+				hasEquity: boolean;
 		  }>
-		| 'NO_AFFILIATION'
+		| 'NO_AFFILIATION';
 }
 
 /** Basic wallet metadata. */
@@ -72,33 +72,33 @@ export interface WalletMetadata {
 	 * It is expected that a wallet image exists at
 	 * `/public/images/wallets/${id}.${iconExtension}`.
 	 */
-	id: string
+	id: string;
 
 	/**
 	 * Human-readable name of the wallet, when written in a sentence.
 	 * For example, `Users of ${displayName} are happy with their experience`
 	 * should make sense.
 	 */
-	displayName: string
+	displayName: string;
 
 	/**
 	 * Human-readable name of the wallet, when written standalone in the
 	 * comparison table.
 	 */
-	tableName: string
+	tableName: string;
 
 	/** Extension of the wallet icon image at
 	 * `/public/images/wallets/${id}.${iconExtension}`.
 	 * Wallet icons should be cropped to touch all edges, then minimal margins
 	 * added to make the image aspect ratio be 1:1 (square).
 	 */
-	iconExtension: 'png' | 'svg'
+	iconExtension: 'png' | 'svg';
 
 	/**
 	 * A short (two or three sentences) description about the wallet.
 	 * This is shown under the wallet's name in expanded view.
 	 */
-	blurb: Paragraph
+	blurb: Paragraph;
 
 	/**
 	 * If the wallet has a built-in username scheme, this should refer to
@@ -107,31 +107,31 @@ export interface WalletMetadata {
 	 * this should be "cb.id handle" or similar.
 	 */
 	pseudonymType?: {
-		singular: string
-		plural: string
-	}
+		singular: string;
+		plural: string;
+	};
 
 	/** External link to the wallet's website. */
-	url: Url
+	url: Url;
 
 	/** Link to the wallet's source code repository, if public. */
-	repoUrl: Url | null
+	repoUrl: Url | null;
 
 	/** The last date the wallet information was updated. */
-	lastUpdated: CalendarDate
+	lastUpdated: CalendarDate;
 
 	/** List of people who contributed to the information for this wallet. */
-	contributors: NonEmptyArray<Contributor>
+	contributors: NonEmptyArray<Contributor>;
 
 	/**
 	 * For hardware wallets, indicates whether it's factory-made or DIY
 	 */
-	hardwareWalletManufactureType?: HardwareWalletManufactureType
+	hardwareWalletManufactureType?: HardwareWalletManufactureType;
 
 	/**
 	 * For hardware wallets, list of available models/devices
 	 */
-	hardwareWalletModels?: HardwareWalletModel[]
+	hardwareWalletModels?: HardwareWalletModel[];
 }
 
 /** Per-wallet, per-attribute override. */
@@ -140,22 +140,22 @@ export interface AttributeOverride {
 	 * Contextual notes about why the wallet has this rating, or clarifications
 	 * about its rating.
 	 */
-	note?: Renderable<{ wallet: RatedWallet }>
+	note?: Renderable<{ wallet: RatedWallet }>;
 
 	/**
 	 * What the wallet should do to improve its rating on this attribute.
 	 * Overrides the eponymous field in `Evaluation`.
 	 */
-	howToImprove?: RenderableTypography<{ wallet: RatedWallet }>
+	howToImprove?: RenderableTypography<{ wallet: RatedWallet }>;
 }
 
 /** Per-wallet overrides for attributes. */
 export interface WalletOverrides {
 	attributes: Dict<{
 		[attrGroup in keyof EvaluationTree]?: {
-			[_ in keyof EvaluationTree[attrGroup]]?: AttributeOverride
-		}
-	}>
+			[_ in keyof EvaluationTree[attrGroup]]?: AttributeOverride;
+		};
+	}>;
 }
 
 /**
@@ -166,16 +166,16 @@ export interface WalletOverrides {
  */
 export interface BaseWallet {
 	/** Wallet metadata (name, URL, icon, etc.) */
-	metadata: WalletMetadata
+	metadata: WalletMetadata;
 
 	/** Set of variants for which the wallet has an implementation. */
-	variants: AtLeastOneTrueVariant
+	variants: AtLeastOneTrueVariant;
 
 	/** All wallet features. */
-	features: WalletBaseFeatures
+	features: WalletBaseFeatures;
 
 	/** Overrides for specific attributes. */
-	overrides?: WalletOverrides
+	overrides?: WalletOverrides;
 }
 
 /**
@@ -185,18 +185,18 @@ export interface BaseWallet {
  * See `RatedWallet` instead.
  */
 export type SoftwareWallet = BaseWallet & {
-	features: WalletSoftwareFeatures
+	features: WalletSoftwareFeatures;
 	variants:
 		| {
-				[Variant.BROWSER]: true
+				[Variant.BROWSER]: true;
 		  }
 		| {
-				[Variant.DESKTOP]: true
+				[Variant.DESKTOP]: true;
 		  }
 		| {
-				[Variant.MOBILE]: true
-		  }
-}
+				[Variant.MOBILE]: true;
+		  };
+};
 
 /**
  * The interface used to describe hardware wallets.
@@ -205,11 +205,11 @@ export type SoftwareWallet = BaseWallet & {
  * See `RatedWallet` instead.
  */
 export type HardwareWallet = BaseWallet & {
-	features: WalletHardwareFeatures
+	features: WalletHardwareFeatures;
 	variants: {
-		[Variant.HARDWARE]: true
-	}
-}
+		[Variant.HARDWARE]: true;
+	};
+};
 
 /**
  * The interface used to describe embedded wallets.
@@ -218,24 +218,24 @@ export type HardwareWallet = BaseWallet & {
  * See `RatedWallet` instead.
  */
 export type EmbeddedWallet = BaseWallet & {
-	features: WalletEmbeddedFeatures
+	features: WalletEmbeddedFeatures;
 	variants: {
-		[Variant.EMBEDDED]: true
-	}
-}
+		[Variant.EMBEDDED]: true;
+	};
+};
 
 export interface ResolvedWallet {
 	/** Wallet metadata (name, URL, icon, etc.) */
-	metadata: WalletMetadata
+	metadata: WalletMetadata;
 
 	/** The variant for which all features were resolved to. */
-	variant: Variant
+	variant: Variant;
 
 	/** All wallet features. */
-	features: ResolvedFeatures
+	features: ResolvedFeatures;
 
 	/** Attribute tree for the wallet variant. */
-	attributes: EvaluationTree
+	attributes: EvaluationTree;
 }
 
 /** Whether a Value is specific to a variant within the same wallet. */
@@ -279,39 +279,38 @@ export enum VariantSpecificity {
 /** A fully-rated wallet ready for display. */
 export interface RatedWallet {
 	/** Wallet metadata. */
-	metadata: WalletMetadata
+	metadata: WalletMetadata;
 
 	/** The types of the wallet. */
-	types: NonEmptySet<WalletType>
+	types: NonEmptySet<WalletType>;
 
 	/** Per-variant evaluation. */
-	variants: AtLeastOneVariant<ResolvedWallet>
+	variants: AtLeastOneVariant<ResolvedWallet>;
 
 	/** For each variant, map attribute IDs to whether they are variant-specific. */
-	variantSpecificity: AtLeastOneVariant<Map<string, VariantSpecificity>>
+	variantSpecificity: AtLeastOneVariant<Map<string, VariantSpecificity>>;
 
 	/** Aggregate evaluation across all variants. */
-	overall: EvaluationTree
+	overall: EvaluationTree;
 
 	/** Overrides for specific attributes. */
-	overrides: WalletOverrides
+	overrides: WalletOverrides;
 }
 
 function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | null {
 	if (!wallet.variants[variant]) {
-		return null
+		return null;
 	}
-	const resolvedFeatures = resolveFeatures(wallet.features, variant)
+	const resolvedFeatures = resolveFeatures(wallet.features, variant);
 	return {
 		metadata: wallet.metadata,
 		variant,
 		features: resolvedFeatures,
 		attributes: evaluateAttributes(resolvedFeatures, wallet.metadata),
-	}
+	};
 }
 
 export function rateWallet(wallet: BaseWallet): RatedWallet {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each feature must already have at least one variant populated.
 	const perVariantWallets: AtLeastOneVariant<ResolvedWallet> = Object.fromEntries(
 		Object.entries({
 			embedded: resolveVariant(wallet, Variant.EMBEDDED),
@@ -320,86 +319,86 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 			mobile: resolveVariant(wallet, Variant.MOBILE),
 			hardware: resolveVariant(wallet, Variant.HARDWARE),
 		}).filter(([_, val]) => val !== null),
-	) as AtLeastOneVariant<ResolvedWallet>
+	) as AtLeastOneVariant<ResolvedWallet>;
 	const perVariantTree: AtLeastOneVariant<EvaluationTree> = nonEmptyRemap(
 		perVariantWallets,
 		(_: Variant, wallet: ResolvedWallet) => wallet.attributes,
-	)
-	const hasMultipleVariants = Object.values(perVariantTree).length > 1
+	);
+	const hasMultipleVariants = Object.values(perVariantTree).length > 1;
 	const variantSpecificity = nonEmptyRemap(
 		perVariantTree,
 		(variant: Variant, evalTree: EvaluationTree): Map<string, VariantSpecificity> => {
-			const variantSpecificityMap = new Map<string, VariantSpecificity>()
+			const variantSpecificityMap = new Map<string, VariantSpecificity>();
 			mapAttributesGetter(
 				evalTree,
 				<V extends Value>(getter: (tree: EvaluationTree) => EvaluatedAttribute<V> | undefined) => {
-					const currentVariantEval = getter(evalTree)
+					const currentVariantEval = getter(evalTree);
 					if (currentVariantEval === undefined) {
-						return
+						return;
 					}
 					if (currentVariantEval.evaluation.value.rating === Rating.EXEMPT) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.EXEMPT_FOR_THIS_VARIANT,
-						)
-						return
+						);
+						return;
 					}
 					if (!hasMultipleVariants) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT,
-						)
-						return
+						);
+						return;
 					}
-					const currentVariantEvalId = currentVariantEval.evaluation.value.id
-					let allOthersExempt = true
-					let foundDifferentValue = false
-					let foundSameValue = false
+					const currentVariantEvalId = currentVariantEval.evaluation.value.id;
+					let allOthersExempt = true;
+					let foundDifferentValue = false;
+					let foundSameValue = false;
 					for (const [versusVariant, versusTree] of nonEmptyEntries<Variant, EvaluationTree>(
 						perVariantTree,
 					)) {
 						if (versusVariant === variant) {
-							continue
+							continue;
 						}
-						const versusEval = getter(versusTree)
+						const versusEval = getter(versusTree);
 						if (versusEval === undefined) {
-							continue
+							continue;
 						}
 						if (versusEval.evaluation.value.rating === Rating.EXEMPT) {
-							continue
+							continue;
 						}
-						allOthersExempt = false
+						allOthersExempt = false;
 						if (versusEval.evaluation.value.id === currentVariantEvalId) {
-							foundSameValue = true
+							foundSameValue = true;
 						} else {
-							foundDifferentValue = true
+							foundDifferentValue = true;
 						}
 					}
 					if (allOthersExempt) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT,
-						)
+						);
 					} else if (foundDifferentValue && foundSameValue) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.NOT_UNIVERSAL,
-						)
+						);
 					} else if (foundDifferentValue && !foundSameValue) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.UNIQUE_TO_VARIANT,
-						)
+						);
 					} else if (!foundDifferentValue && foundSameValue) {
-						variantSpecificityMap.set(currentVariantEval.attribute.id, VariantSpecificity.ALL_SAME)
+						variantSpecificityMap.set(currentVariantEval.attribute.id, VariantSpecificity.ALL_SAME);
 					} else {
-						throw new Error('Logic error in rateWallet variant specificity computation')
+						throw new Error('Logic error in rateWallet variant specificity computation');
 					}
 				},
-			)
-			return variantSpecificityMap
+			);
+			return variantSpecificityMap;
 		},
-	)
+	);
 	return {
 		metadata: wallet.metadata,
 		types: walletTypes(wallet),
@@ -407,7 +406,7 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 		variantSpecificity,
 		overall: aggregateAttributes(perVariantTree),
 		overrides: wallet.overrides ?? { attributes: {} },
-	}
+	};
 }
 
 /**
@@ -428,15 +427,15 @@ export function attributeVariantSpecificity<V extends Value>(
 	variant: Variant,
 	attribute: Attribute<V>,
 ): VariantSpecificity {
-	const variantSpecificityMap = ratedWallet.variantSpecificity[variant]
+	const variantSpecificityMap = ratedWallet.variantSpecificity[variant];
 	if (variantSpecificityMap === undefined) {
-		throw new Error(`Wallet ${ratedWallet.metadata.id} does not have variant ${variant}`)
+		throw new Error(`Wallet ${ratedWallet.metadata.id} does not have variant ${variant}`);
 	}
-	const specificity = variantSpecificityMap.get(attribute.id)
+	const specificity = variantSpecificityMap.get(attribute.id);
 	if (specificity === undefined) {
-		throw new Error(`Invalid attribute ID: ${attribute.id}`)
+		throw new Error(`Invalid attribute ID: ${attribute.id}`);
 	}
-	return specificity
+	return specificity;
 }
 
 /**
@@ -448,30 +447,30 @@ export function getAttributeOverride(
 	attrId: string,
 ): AttributeOverride | null {
 	if (!Object.hasOwn(ratedWallet.overall, attrGroup)) {
-		throw new Error(`Invalid attribute group name: ${attrGroup}`)
+		throw new Error(`Invalid attribute group name: ${attrGroup}`);
 	}
 	if (!Object.hasOwn(ratedWallet.overall[attrGroup], attrId)) {
-		throw new Error(`Invalid attribute name ${attrId} in attribute group ${attrGroup}`)
+		throw new Error(`Invalid attribute name ${attrId} in attribute group ${attrGroup}`);
 	}
 	if (!Object.hasOwn(ratedWallet.overrides.attributes, attrGroup)) {
-		return null
+		return null;
 	}
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-member-access -- Safe because we just checked the property exists.
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Safe because we just checked the property exists.
 	const attributeGroup = (ratedWallet.overrides.attributes as any)[attrGroup] as
 		| Record<string, AttributeOverride | undefined> // Safe because all attribute group overrides are structured this way.
-		| undefined
+		| undefined;
 	if (attributeGroup === undefined || !Object.hasOwn(attributeGroup, attrId)) {
-		return null
+		return null;
 	}
-	const override = attributeGroup[attrId]
-	return override ?? null
+	const override = attributeGroup[attrId];
+	return override ?? null;
 }
 
 /**
  * Returns the set of variants the wallet supports.
  */
 export function getWalletVariants(wallet: RatedWallet | BaseWallet): NonEmptySet<Variant> {
-	return getVariants(wallet.variants)
+	return getVariants(wallet.variants);
 }
 
 export function getVariantResolvedWallet(
@@ -479,9 +478,9 @@ export function getVariantResolvedWallet(
 	variant: Variant,
 ): ResolvedWallet | null {
 	if (!hasVariant(wallet.variants, variant) || wallet.variants[variant] === undefined) {
-		return null
+		return null;
 	}
-	return wallet.variants[variant]
+	return wallet.variants[variant];
 }
 
 /**
@@ -495,25 +494,25 @@ export function walletSupportedAccountTypes(
 	variant: Variant | 'ALL_VARIANTS',
 ): NonEmptySet<AccountType> | null {
 	if (variant === 'ALL_VARIANTS') {
-		const accountTypeSets: Array<NonEmptySet<AccountType>> = []
+		const accountTypeSets: Array<NonEmptySet<AccountType>> = [];
 		for (const variant of setItems(getWalletVariants(wallet))) {
-			const supportedByVariant = walletSupportedAccountTypes(wallet, variant)
+			const supportedByVariant = walletSupportedAccountTypes(wallet, variant);
 			if (supportedByVariant === null) {
-				return null
+				return null;
 			}
-			accountTypeSets.push(supportedByVariant)
+			accountTypeSets.push(supportedByVariant);
 		}
 		if (!isNonEmptyArray(accountTypeSets)) {
-			return null
+			return null;
 		}
-		return setUnion(accountTypeSets)
+		return setUnion(accountTypeSets);
 	}
-	const resolvedWallet = getVariantResolvedWallet(wallet, variant)
+	const resolvedWallet = getVariantResolvedWallet(wallet, variant);
 	if (resolvedWallet === null) {
-		return null
+		return null;
 	}
 	if (resolvedWallet.features.accountSupport === null) {
-		return null
+		return null;
 	}
-	return supportedAccountTypes(resolvedWallet.features.accountSupport)
+	return supportedAccountTypes(resolvedWallet.features.accountSupport);
 }

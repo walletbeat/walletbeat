@@ -1,10 +1,10 @@
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
-import { Divider, Typography } from '@mui/material'
-import React from 'react'
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import { Divider, Typography } from '@mui/material';
+import React from 'react';
 
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import { type NonEmptyArray, nonEmptyConcat, nonEmptyMap } from '@/types/utils/non-empty'
-import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion'
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
+import { type NonEmptyArray, nonEmptyConcat, nonEmptyMap } from '@/types/utils/non-empty';
+import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion';
 
 import {
 	navigationAbout,
@@ -12,14 +12,14 @@ import {
 	navigationFarcasterChannel,
 	navigationHome,
 	navigationRepository,
-} from '../../components/navigation'
-import type { NavigationContentItem } from '../../ui/organisms/Navigation'
+} from '../../components/navigation';
+import type { NavigationContentItem } from '../../ui/organisms/Navigation';
 
 interface FAQEntry {
-	anchor: string
-	question: string
-	navTitle: string
-	answerMarkdown: string
+	anchor: string;
+	question: string;
+	navTitle: string;
+	answerMarkdown: string;
 }
 
 const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
@@ -275,7 +275,7 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			[contribute to our repository!](https://github.com/walletbeat/walletbeat).
 		`,
 	},
-]
+];
 
 function FrequentlyAskedQuestions(): React.JSX.Element {
 	return (
@@ -312,7 +312,7 @@ function FrequentlyAskedQuestions(): React.JSX.Element {
 				</React.Fragment>
 			))}
 		</>
-	)
+	);
 }
 
 export function FrequentlyAskedQuestionsPage(): React.JSX.Element {
@@ -358,5 +358,5 @@ export function FrequentlyAskedQuestionsPage(): React.JSX.Element {
 				<FrequentlyAskedQuestions />
 			</div>
 		</NavigationPageLayout>
-	)
+	);
 }

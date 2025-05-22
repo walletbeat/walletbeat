@@ -1,28 +1,28 @@
-import type { SvgIconComponent } from '@mui/icons-material'
+import type { SvgIconComponent } from '@mui/icons-material';
 
-import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty';
 
-import { IconButton } from './IconButton'
-import { Tooltip } from './Tooltip'
+import { IconButton } from './IconButton';
+import { Tooltip } from './Tooltip';
 
 export interface PickableVariant<V extends string> {
-	id: V
-	icon: SvgIconComponent
-	tooltip: string | React.ReactNode
-	colorTransform?: (color: string | undefined) => string
-	click?: () => void
+	id: V;
+	icon: SvgIconComponent;
+	tooltip: string | React.ReactNode;
+	colorTransform?: (color: string | undefined) => string;
+	click?: () => void;
 }
 
 export interface VariantPickerProps<V extends string> {
-	pickerId: string
-	variants: NonEmptyArray<PickableVariant<V>>
-	pickedVariant: V | null
-	opacityFaded?: number
-	opacityDefault?: number
-	opacityPicked?: number
-	colorPicked?: string
-	flexDirection?: React.CSSProperties['flexDirection']
-	gap?: React.CSSProperties['gap']
+	pickerId: string;
+	variants: NonEmptyArray<PickableVariant<V>>;
+	pickedVariant: V | null;
+	opacityFaded?: number;
+	opacityDefault?: number;
+	opacityPicked?: number;
+	colorPicked?: string;
+	flexDirection?: React.CSSProperties['flexDirection'];
+	gap?: React.CSSProperties['gap'];
 }
 
 export function VariantPicker<V extends string>({
@@ -39,13 +39,13 @@ export function VariantPicker<V extends string>({
 	return (
 		<div key={pickerId} className="flex" style={{ flexDirection, gap }}>
 			{nonEmptyMap(variants, variant => {
-				let opacity = opacityDefault
-				const isSelected = pickedVariant === variant.id
+				let opacity = opacityDefault;
+				const isSelected = pickedVariant === variant.id;
 
 				if (pickedVariant !== null) {
-					opacity = opacityFaded
+					opacity = opacityFaded;
 					if (isSelected) {
-						opacity = opacityPicked
+						opacity = opacityPicked;
 					}
 				}
 
@@ -71,8 +71,8 @@ export function VariantPicker<V extends string>({
 							)}
 						</div>
 					</Tooltip>
-				)
+				);
 			})}
 		</div>
-	)
+	);
 }

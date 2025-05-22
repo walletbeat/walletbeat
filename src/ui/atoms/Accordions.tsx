@@ -1,14 +1,14 @@
-import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material'
-import type React from 'react'
-import { useState } from 'react'
-import { LuChevronDown } from 'react-icons/lu'
+import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material';
+import type React from 'react';
+import { useState } from 'react';
+import { LuChevronDown } from 'react-icons/lu';
 
-import type { NonEmptyArray } from '@/types/utils/non-empty'
+import type { NonEmptyArray } from '@/types/utils/non-empty';
 
 export interface AccordionData {
-	id: string
-	summary: string
-	contents: React.ReactNode
+	id: string;
+	summary: string;
+	contents: React.ReactNode;
 }
 
 /** Expandable set of Material Accordion controls. */
@@ -18,25 +18,26 @@ export function Accordions({
 	summaryTypographyVariant = 'h1',
 	interAccordionMargin = '1rem',
 }: {
-	accordions: NonEmptyArray<AccordionData>
-	borderRadius: string
-	summaryTypographyVariant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
-	interAccordionMargin?: string
+	accordions: NonEmptyArray<AccordionData>;
+	borderRadius: string;
+	summaryTypographyVariant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+	interAccordionMargin?: string;
 }): React.JSX.Element {
-	const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+	const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
 	const handleChange = (id: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
-		setExpanded(prev => ({ ...prev, [id]: isExpanded }))
-	}
+		setExpanded(prev => ({ ...prev, [id]: isExpanded }));
+	};
 
 	return (
 		<>
 			{accordions.map((accordion, index) => {
-				const blankTop = index === 0 || expanded[accordions[index - 1].id] || expanded[accordion.id]
+				const blankTop =
+					index === 0 || expanded[accordions[index - 1].id] || expanded[accordion.id];
 				const blankBottom =
 					index === accordions.length - 1 ||
 					expanded[accordions[index + 1].id] ||
-					expanded[accordion.id]
+					expanded[accordion.id];
 				return (
 					<Accordion
 						key={accordion.id}
@@ -101,8 +102,8 @@ export function Accordions({
 							{accordion.contents}
 						</AccordionDetails>
 					</Accordion>
-				)
+				);
 			})}
 		</>
-	)
+	);
 }

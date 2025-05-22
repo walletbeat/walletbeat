@@ -1,4 +1,4 @@
-import type { SecurityAuditor } from '@/schema/entity'
+import type { SecurityAuditor } from '@/schema/entity';
 
 export const certik: SecurityAuditor = {
 	id: 'certik',
@@ -29,4 +29,4 @@ export const certik: SecurityAuditor = {
 	repoUrl: 'https://github.com/CertiKProject',
 	twitter: 'https://x.com/CertiK',
 	url: 'https://www.certik.com/',
-}
+};

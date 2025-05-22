@@ -1,4 +1,4 @@
-import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { type Eip, EipPrefix, EipStatus } from '@/schema/eips';
 
 export const erc7831: Eip = {
 	friendlyName: 'Multi-chain addresses',
@@ -18,4 +18,4 @@ export const erc7831: Eip = {
 		errors such as accidentally sending funds on the wrong chain, and for
 		wallets to automatically bridge funds to the intended destination chain.
 	`,
-}
+};

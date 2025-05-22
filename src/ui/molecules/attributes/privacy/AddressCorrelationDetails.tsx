@@ -1,48 +1,48 @@
-import { Typography } from '@mui/material'
-import type React from 'react'
+import { Typography } from '@mui/material';
+import type React from 'react';
 
-import { subsectionWeight } from '@/components/constants'
-import type { WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
-import { compareLeakedInfo, leakedInfoName } from '@/schema/features/privacy/data-collection'
-import { mergeRefs } from '@/schema/reference'
-import { isUrl } from '@/schema/url'
-import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
-import { type NonEmptyArray, nonEmptyGet, nonEmptySorted } from '@/types/utils/non-empty'
-import { EntityLink } from '@/ui/atoms/EntityLink'
+import { subsectionWeight } from '@/components/constants';
+import type { WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation';
+import { compareLeakedInfo, leakedInfoName } from '@/schema/features/privacy/data-collection';
+import { mergeRefs } from '@/schema/reference';
+import { isUrl } from '@/schema/url';
+import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details';
+import { type NonEmptyArray, nonEmptyGet, nonEmptySorted } from '@/types/utils/non-empty';
+import { EntityLink } from '@/ui/atoms/EntityLink';
 
-import { ExternalLink } from '../../../atoms/ExternalLink'
-import { JoinedList } from '../../../atoms/JoinedList'
-import { ReferenceLinks } from '../../../atoms/ReferenceLinks'
-import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
+import { ExternalLink } from '../../../atoms/ExternalLink';
+import { JoinedList } from '../../../atoms/JoinedList';
+import { ReferenceLinks } from '../../../atoms/ReferenceLinks';
+import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon';
 
 export function AddressCorrelationDetails({
 	wallet,
 	value,
 	linkables,
 }: AddressCorrelationDetailsProps): React.JSX.Element {
-	const bySource = new Map<string, NonEmptyArray<WalletAddressLinkableBy>>()
+	const bySource = new Map<string, NonEmptyArray<WalletAddressLinkableBy>>();
 	for (const linkable of nonEmptySorted(
 		linkables,
 		(linkableA: WalletAddressLinkableBy, linkableB: WalletAddressLinkableBy) => {
 			if (linkableA.by === 'onchain') {
-				return 1
+				return 1;
 			}
 			if (linkableB.by === 'onchain') {
-				return -1
+				return -1;
 			}
-			return compareLeakedInfo(linkableA.info, linkableB.info)
+			return compareLeakedInfo(linkableA.info, linkableB.info);
 		},
 		true,
 	)) {
-		const sourceName = typeof linkable.by === 'string' ? linkable.by : linkable.by.name
-		const forSource = bySource.get(sourceName)
+		const sourceName = typeof linkable.by === 'string' ? linkable.by : linkable.by.name;
+		const forSource = bySource.get(sourceName);
 		if (forSource === undefined) {
-			bySource.set(sourceName, [linkable])
+			bySource.set(sourceName, [linkable]);
 		} else {
-			forSource.push(linkable)
+			forSource.push(linkable);
 		}
 	}
-	const leaksList: React.ReactNode[] = []
+	const leaksList: React.ReactNode[] = [];
 	bySource.forEach((linkables, sourceName) => {
 		const linkableInfos = (
 			<JoinedList
@@ -51,9 +51,9 @@ export function AddressCorrelationDetails({
 					value: <strong>{leakedInfoName(linkable.info, wallet.metadata).long}</strong>,
 				}))}
 			/>
-		)
-		const refs = mergeRefs(...linkables.flatMap(linkable => linkable.refs))
-		const entity = nonEmptyGet(linkables).by
+		);
+		const refs = mergeRefs(...linkables.flatMap(linkable => linkable.refs));
+		const entity = nonEmptyGet(linkables).by;
 		if (entity === 'onchain') {
 			leaksList.push(
 				<li key={sourceName}>
@@ -62,8 +62,8 @@ export function AddressCorrelationDetails({
 						<ReferenceLinks references={refs} />
 					</Typography>
 				</li>,
-			)
-			return
+			);
+			return;
 		}
 		leaksList.push(
 			<li key={sourceName}>
@@ -79,8 +79,8 @@ export function AddressCorrelationDetails({
 					may link your wallet address to your {linkableInfos}. <ReferenceLinks references={refs} />
 				</Typography>
 			</li>,
-		)
-	})
+		);
+	});
 	return (
 		<>
 			<WrapRatingIcon rating={value.rating}>
@@ -93,5 +93,5 @@ export function AddressCorrelationDetails({
 				</ul>
 			</WrapRatingIcon>
 		</>
-	)
+	);
 }

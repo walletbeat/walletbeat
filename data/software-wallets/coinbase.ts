@@ -1,19 +1,19 @@
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
-import { WalletProfile } from '@/schema/features/profile'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { License } from '@/schema/features/transparency/license'
-import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support';
+import { WalletProfile } from '@/schema/features/profile';
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
+import { featureSupported, notSupported, supported } from '@/schema/features/support';
+import { License } from '@/schema/features/transparency/license';
+import { Variant } from '@/schema/variants';
+import type { SoftwareWallet } from '@/schema/wallet';
+import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny'
-import { polymutex } from '../contributors/polymutex'
-import { cantina } from '../entities/cantina'
-import { certora } from '../entities/certora'
-import { code4rena } from '../entities/code4rena'
+import { nconsigny } from '../contributors/nconsigny';
+import { polymutex } from '../contributors/polymutex';
+import { cantina } from '../entities/cantina';
+import { certora } from '../entities/certora';
+import { code4rena } from '../entities/code4rena';
 
 export const coinbase: SoftwareWallet = {
 	metadata: {
@@ -189,4 +189,4 @@ export const coinbase: SoftwareWallet = {
 		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
 	},
-}
+};

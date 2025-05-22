@@ -1,33 +1,33 @@
-import { styled, Typography, type TypographyProps } from '@mui/material'
-import { Box } from '@mui/system'
-import type React from 'react'
-import Markdown, { type Components } from 'react-markdown'
+import { styled, Typography, type TypographyProps } from '@mui/material';
+import { Box } from '@mui/system';
+import type React from 'react';
+import Markdown, { type Components } from 'react-markdown';
 
-import { lookupEip } from '@/data/eips'
-import { trimWhitespacePrefix } from '@/types/utils/text'
+import { lookupEip } from '@/data/eips';
+import { trimWhitespacePrefix } from '@/types/utils/text';
 
-import { EipLink } from './EipLink'
-import { ExternalLink } from './ExternalLink'
+import { EipLink } from './EipLink';
+import { ExternalLink } from './ExternalLink';
 
 export interface MarkdownOwnProps {
-	markdownTransform?: (markdown: string) => string
-	pVariant?: React.ComponentProps<typeof Typography>['variant']
-	pFontWeight?: React.ComponentProps<typeof Typography>['fontWeight']
-	textColor?: React.ComponentProps<typeof Typography>['color']
-	pSpacing?: React.ComponentProps<typeof Typography>['marginTop'] & string
-	liSpacing?: React.ComponentProps<typeof Typography>['marginTop'] & string
+	markdownTransform?: (markdown: string) => string;
+	pVariant?: React.ComponentProps<typeof Typography>['variant'];
+	pFontWeight?: React.ComponentProps<typeof Typography>['fontWeight'];
+	textColor?: React.ComponentProps<typeof Typography>['color'];
+	pSpacing?: React.ComponentProps<typeof Typography>['marginTop'] & string;
+	liSpacing?: React.ComponentProps<typeof Typography>['marginTop'] & string;
 }
 
 export function deriveMarkdownPropsFromTypography(
 	typographyProps?: TypographyProps,
 	markdownProps?: MarkdownOwnProps,
 ): MarkdownOwnProps {
-	let marginTop: string | undefined = undefined
+	let marginTop: string | undefined = undefined;
 	if (typographyProps?.marginTop !== undefined) {
 		if (typeof typographyProps.marginTop === 'number') {
-			marginTop = `${typographyProps.marginTop}px`
+			marginTop = `${typographyProps.marginTop}px`;
 		} else if (typeof typographyProps.marginTop === 'string') {
-			marginTop = typographyProps.marginTop
+			marginTop = typographyProps.marginTop;
 		}
 	}
 	return {
@@ -37,7 +37,7 @@ export function deriveMarkdownPropsFromTypography(
 		pVariant: markdownProps?.pVariant ?? typographyProps?.variant,
 		pSpacing: markdownProps?.pSpacing ?? marginTop,
 		liSpacing: markdownProps?.liSpacing ?? markdownProps?.pSpacing ?? marginTop,
-	}
+	};
 }
 
 const StyledMarkdown = styled(Box, {
@@ -67,7 +67,7 @@ const StyledMarkdown = styled(Box, {
 	}`
 	}
 `,
-)
+);
 
 /**
  * Markdown rendering.
@@ -83,24 +83,24 @@ export function MarkdownBase({
 	liSpacing = '0.25rem',
 	textColor = 'inherit',
 }: {
-	markdown: string
+	markdown: string;
 } & MarkdownOwnProps): React.JSX.Element {
 	const componentsMap: Components = {
 		a: ({ href, children }) => {
-			const hrefStr = href ?? '#'
+			const hrefStr = href ?? '#';
 			const eipRegexp =
-				/^https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+)#wb-format=(short|long)$/i.exec(hrefStr)
+				/^https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+)#wb-format=(short|long)$/i.exec(hrefStr);
 			if (eipRegexp !== null) {
-				const eip = lookupEip(+eipRegexp[1])
+				const eip = lookupEip(+eipRegexp[1]);
 				if (eip !== undefined) {
-					return <EipLink eip={eip} format={eipRegexp[2] === 'short' ? 'SHORT' : 'LONG'} />
+					return <EipLink eip={eip} format={eipRegexp[2] === 'short' ? 'SHORT' : 'LONG'} />;
 				}
 			}
 			if (/^[-_\w+:]/.exec(hrefStr) !== null) {
 				// External link.
-				return <ExternalLink url={hrefStr}>{children}</ExternalLink>
+				return <ExternalLink url={hrefStr}>{children}</ExternalLink>;
 			}
-			return <a href={hrefStr}>{children}</a>
+			return <a href={hrefStr}>{children}</a>;
 		},
 		p: ({ children }) => (
 			<Typography variant={pVariant} color={textColor} fontWeight={pFontWeight}>
@@ -114,14 +114,14 @@ export function MarkdownBase({
 				</Typography>
 			</li>
 		),
-	}
-	markdown = trimWhitespacePrefix(markdown)
+	};
+	markdown = trimWhitespacePrefix(markdown);
 	if (markdownTransform !== undefined) {
-		markdown = markdownTransform(markdown)
+		markdown = markdownTransform(markdown);
 	}
 	return (
 		<StyledMarkdown pSpacing={pSpacing} liSpacing={liSpacing}>
 			<Markdown components={componentsMap}>{markdown}</Markdown>
 		</StyledMarkdown>
-	)
+	);
 }

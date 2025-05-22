@@ -1,13 +1,13 @@
-import { eip7702 } from '@/data/eips/eip-7702'
-import { erc4337 } from '@/data/eips/erc-4337'
+import { eip7702 } from '@/data/eips/eip-7702';
+import { erc4337 } from '@/data/eips/erc-4337';
 import {
 	type Attribute,
 	type Evaluation,
 	exampleRating,
 	Rating,
 	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
 	type AccountType,
 	type AccountType7702,
@@ -15,18 +15,18 @@ import {
 	type AccountTypeMpc,
 	type AccountTypeMutableMultifactor,
 	isAccountTypeSupported,
-} from '@/schema/features/account-support'
-import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
+} from '@/schema/features/account-support';
+import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content';
 
-import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
-import { pickWorstRating, unrated } from '../common'
+import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips';
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.ecosystem.account_abstraction'
+const brand = 'attributes.ecosystem.account_abstraction';
 export type AccountAbstractionValue = Value & {
-	__brand: 'attributes.ecosystem.account_abstraction'
-}
+	__brand: 'attributes.ecosystem.account_abstraction';
+};
 
 function supportsErc4337AndEip7702(
 	references: ReferenceArray,
@@ -52,7 +52,7 @@ function supportsErc4337AndEip7702(
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function supportsErc4337(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
@@ -76,7 +76,7 @@ function supportsErc4337(references: ReferenceArray): Evaluation<AccountAbstract
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function supportsEip7702(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
@@ -100,7 +100,7 @@ function supportsEip7702(references: ReferenceArray): Evaluation<AccountAbstract
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function supportsEoaAndMpc(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
@@ -136,7 +136,7 @@ function supportsEoaAndMpc(references: ReferenceArray): Evaluation<AccountAbstra
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function supportsMpcOnly(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
@@ -172,7 +172,7 @@ function supportsMpcOnly(references: ReferenceArray): Evaluation<AccountAbstract
 			`,
 		),
 		references,
-	}
+	};
 }
 
 function supportsRawEoaOnly(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
@@ -208,7 +208,7 @@ function supportsRawEoaOnly(references: ReferenceArray): Evaluation<AccountAbstr
 			`,
 		),
 		references,
-	}
+	};
 }
 
 export const accountAbstraction: Attribute<AccountAbstractionValue> = {
@@ -306,7 +306,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<AccountAbstractionValue> => {
 		if (features.accountSupport === null) {
-			return unrated(accountAbstraction, brand, null)
+			return unrated(accountAbstraction, brand, null);
 		}
 		const supported: Record<AccountType, boolean> = {
 			eoa: isAccountTypeSupported<AccountTypeEoa>(features.accountSupport.eoa),
@@ -315,32 +315,32 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 				features.accountSupport.rawErc4337,
 			),
 			eip7702: isAccountTypeSupported<AccountType7702>(features.accountSupport.eip7702),
-		}
+		};
 		const allRefs = mergeRefs(
 			refs(features.accountSupport.eoa),
 			refs(features.accountSupport.mpc),
 			refs(features.accountSupport.rawErc4337),
 			refs(features.accountSupport.eip7702),
-		)
+		);
 		if (supported.rawErc4337 && supported.eip7702) {
-			return supportsErc4337AndEip7702(allRefs)
+			return supportsErc4337AndEip7702(allRefs);
 		}
 		if (supported.rawErc4337) {
-			return supportsErc4337(allRefs)
+			return supportsErc4337(allRefs);
 		}
 		if (supported.eip7702) {
-			return supportsEip7702(allRefs)
+			return supportsEip7702(allRefs);
 		}
 		if (supported.eoa && supported.mpc) {
-			return supportsEoaAndMpc(allRefs)
+			return supportsEoaAndMpc(allRefs);
 		}
 		if (supported.mpc) {
-			return supportsMpcOnly(allRefs)
+			return supportsMpcOnly(allRefs);
 		}
 		if (supported.eoa) {
-			return supportsRawEoaOnly(allRefs)
+			return supportsRawEoaOnly(allRefs);
 		}
-		throw new Error('Wallet supports no account type')
+		throw new Error('Wallet supports no account type');
 	},
 	aggregate: pickWorstRating<AccountAbstractionValue>,
-}
+};

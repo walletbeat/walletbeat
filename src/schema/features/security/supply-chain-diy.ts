@@ -1,4 +1,4 @@
-import type { WithRef } from '@/schema/reference'
+import type { WithRef } from '@/schema/reference';
 
 export enum SupplyChainDIYType {
 	PASS = 'PASS',
@@ -7,11 +7,11 @@ export enum SupplyChainDIYType {
 }
 
 export interface SupplyChainDIYSupport {
-	type: SupplyChainDIYType
-	url?: string
-	details?: string
-	diyNoNda: SupplyChainDIYType
-	componentSourcingComplexity: SupplyChainDIYType
+	type: SupplyChainDIYType;
+	url?: string;
+	details?: string;
+	diyNoNda: SupplyChainDIYType;
+	componentSourcingComplexity: SupplyChainDIYType;
 }
 
-export type SupplyChainDIYImplementation = WithRef<SupplyChainDIYSupport>
+export type SupplyChainDIYImplementation = WithRef<SupplyChainDIYSupport>;

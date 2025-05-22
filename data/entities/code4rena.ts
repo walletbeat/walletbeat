@@ -1,4 +1,4 @@
-import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
+import type { CorporateEntity, SecurityAuditor } from '@/schema/entity';
 
 export const code4rena: CorporateEntity & SecurityAuditor = {
 	id: 'code4rena',
@@ -27,4 +27,4 @@ export const code4rena: CorporateEntity & SecurityAuditor = {
 	repoUrl: 'https://github.com/code-423n4',
 	twitter: 'https://x.com/code4rena',
 	url: 'https://code4rena.com/',
-}
+};
