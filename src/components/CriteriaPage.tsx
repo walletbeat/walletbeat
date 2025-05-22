@@ -142,7 +142,7 @@ export function CriteriaPage({
 									</h2>
 									<div className="card">
 										<RenderContent
-											content={evalAttr.attribute.why.render({})}
+											content={evalAttr.attribute.why}
 											typography={{ variant: 'body2' }}
 										/>
 									</div>
