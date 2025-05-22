@@ -128,8 +128,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		is secure, and remains that way over time. Wallet development teams
 		typically publish such audits so that wallet users can feel safer knowing
 		that the wallet's source code was independently audited.
-			
-		`),
+	`),
 	methodology: markdown(`
 		Wallets are evaluated by their track record of published security audits.
 
