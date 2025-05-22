@@ -7,10 +7,10 @@ import { scrollPastHeaderPixels } from '@/components/navigation'
 import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
 import {
 	variantFromUrlQuery,
-	variantToIcon,
 	variantToName,
 	variantUrlQuery,
 } from '@/components/variants'
+import { variantToIcon } from '@/components/variants-react'
 import { allRatedWallets, type WalletName } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
