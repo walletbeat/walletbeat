@@ -69,35 +69,32 @@ export type CustomContent = {
 /**
  * Typographic content that may be displayed on the UI.
  */
-export type TypographicContent<Strings extends _Strings = _Strings> = (
+export type TypographicContent<Strings extends _Strings = _Strings> =
 	| TextContent<Strings>
 	| MarkdownContent<Strings>
-)
 
 /**
  * Represents any type of content that may be displayed on the UI.
  */
-export type Content<Strings extends _Strings = _Strings> = (
+export type Content<Strings extends _Strings = _Strings> =
 	| TypographicContent<Strings>
 	| CustomContent
-)
 
 /**
  * Type predicate for TypographicContent.
  * @param content The content to check.
  * @returns Whether `content` is of type `TypographicContent`.
  */
-export function isTypographicContent<Strings extends _Strings>(content: Content): content is TypographicContent<Strings> {
+export function isTypographicContent<Strings extends _Strings>(
+	content: Content,
+): content is TypographicContent<Strings> {
 	return content.contentType === ContentType.TEXT || content.contentType === ContentType.MARKDOWN
 }
 
 /**
  * Create text content with optional template variables
  */
-function textContent<
-	Strings extends _Strings,
-	_Text extends string = string,
->(
+function textContent<Strings extends _Strings, _Text extends string = string>(
 	text: _Text,
 	strings?: Strings,
 ) {
@@ -105,14 +102,11 @@ function textContent<
 	return {
 		contentType: ContentType.TEXT,
 		text: trimWhitespacePrefix(text),
-		...Boolean(strings) && { strings },
+		...(Boolean(strings) && { strings }),
 	} as ValidateText<TextContent<Strings>, _Text, Strings>
 }
 
-export function markdown<
-	Strings extends _Strings,
-	_Text extends string = string,
->(
+export function markdown<Strings extends _Strings, _Text extends string = string>(
 	markdownText: _Text,
 	strings?: Strings,
 ) {
@@ -120,21 +114,16 @@ export function markdown<
 	return {
 		contentType: ContentType.MARKDOWN,
 		markdown: trimWhitespacePrefix(markdownText),
-		...Boolean(strings) && { strings },
+		...(Boolean(strings) && { strings }),
 	} as ValidateText<MarkdownContent<Strings>, _Text, Strings>
 }
 
 const sentenceMaxLength = 384
 
-export type Sentence<Strings extends _Strings> = (
-	TypographicContent<Strings>
-)
+export type Sentence<Strings extends _Strings> = TypographicContent<Strings>
 
 /** A single sentence. */
-export function sentence<
-	Strings extends _Strings,
-	_Text extends string = string,
->(
+export function sentence<Strings extends _Strings, _Text extends string = string>(
 	text: _Text,
 	strings?: Strings,
 ) {
@@ -148,10 +137,7 @@ export function sentence<
 }
 
 /** A renderable Markdown-rendered sentence. */
-export function mdSentence<
-	Strings extends _Strings,
-	_Text extends string = string,
->(
+export function mdSentence<Strings extends _Strings, _Text extends string = string>(
 	text: _Text,
 	strings?: Strings,
 ) {
@@ -162,15 +148,10 @@ const paragraphMaxLength = 1024
 
 /** A short amount of text that fits in a single paragraph. */
 
-export type Paragraph<Strings extends _Strings> = (
-	TextContent<Strings>
-)
+export type Paragraph<Strings extends _Strings> = TextContent<Strings>
 
 /** A renderable paragraph. */
-export function paragraph<
-	Strings extends _Strings,
-	_Text extends string = string,
->(
+export function paragraph<Strings extends _Strings, _Text extends string = string>(
 	text: _Text,
 	strings?: Strings,
 ) {
@@ -184,17 +165,15 @@ export function paragraph<
 }
 
 /** A renderable Markdown-rendered paragraph. */
-export function mdParagraph<
-	Strings extends _Strings,
-	_Text extends string = string,
->(
+export function mdParagraph<Strings extends _Strings, _Text extends string = string>(
 	text: _Text,
 	strings?: Strings,
 ) {
-	if (text.length > paragraphMaxLength)
+	if (text.length > paragraphMaxLength) {
 		throw new Error(
 			`Paragraph text is too long (${text.length} characters is over the maximum length of ${paragraphMaxLength} characters).`,
 		)
+	}
 
 	return markdown(text, strings)
 }
@@ -219,12 +198,9 @@ function mergeProps<XY extends object, X extends keyof XY>(
 export function component<
 	C extends ComponentAndProps,
 	B extends keyof C['componentProps'],
-// I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
-// 	Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
->(
-	componentName: C['component'],
-	componentProps: Pick<C['componentProps'], B>
-): CustomContent {
+	// I extends Input & Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>> = Input &
+	// 	Pick<C['componentProps'], Exclude<keyof C['componentProps'], B>>,
+>(componentName: C['component'], componentProps: Pick<C['componentProps'], B>): CustomContent {
 	return {
 		contentType: ContentType.COMPONENT,
 		component: {
@@ -233,6 +209,6 @@ export function component<
 			// componentProps: {
 			// 	...mergeProps<C['componentProps'], B>(, input),
 			// },
-		} as C
+		} as C,
 	}
 }

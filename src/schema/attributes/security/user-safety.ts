@@ -1,7 +1,6 @@
 import {
 	type Attribute,
 	type Evaluation,
-	type EvaluationData,
 	exampleRating,
 	Rating,
 	type Value,
@@ -11,7 +10,6 @@ import { type UserSafetySupport, UserSafetyType } from '@/schema/features/securi
 import { popRefs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -150,7 +148,9 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				userSafety,
-				sentence(`This attribute evaluates hardware wallet user safety features and is not applicable for {{WALLET_NAME}}.`),
+				sentence(
+					`This attribute evaluates hardware wallet user safety features and is not applicable for {{WALLET_NAME}}.`,
+				),
 				brand,
 				{
 					readableAddress: UserSafetyType.FAIL,
@@ -220,10 +220,11 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
 		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}.${
 			rating !== Rating.EXEMPT ? ` It passes ${passCount} out of 16 sub-criteria.` : ''
 		}`
-		
-		const howToImproveText = rating !== Rating.PASS && rating !== Rating.EXEMPT
-			? `{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`
-			: ''
+
+		const howToImproveText =
+			rating !== Rating.PASS && rating !== Rating.EXEMPT
+				? `{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.`
+				: ''
 
 		return {
 			value: {

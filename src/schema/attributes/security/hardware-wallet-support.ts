@@ -31,8 +31,12 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletSupportValue> {
 			supportedHardwareWallets: [],
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} does not support connecting to any hardware wallets. Hardware wallets provide an additional layer of security by keeping private keys offline.`),
-		howToImprove: paragraph(`{{WALLET_NAME}} should add support for popular hardware wallets to improve security options for users.`),
+		details: paragraph(
+			`{{WALLET_NAME}} does not support connecting to any hardware wallets. Hardware wallets provide an additional layer of security by keeping private keys offline.`,
+		),
+		howToImprove: paragraph(
+			`{{WALLET_NAME}} should add support for popular hardware wallets to improve security options for users.`,
+		),
 	}
 }
 
@@ -44,12 +48,18 @@ function limitedHardwareWalletSupport(
 			id: 'limited_hardware_wallet_support',
 			rating: Rating.PARTIAL,
 			displayName: 'Limited hardware wallet support',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports a limited selection of hardware wallets.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports a limited selection of hardware wallets.`,
+			),
 			supportedHardwareWallets: supportedWallets,
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} supports some hardware wallets, but not all major ones. Hardware wallets provide an additional layer of security by keeping private keys offline.`),
-		howToImprove: paragraph(`{{WALLET_NAME}} should expand support to include more popular hardware wallets to provide users with more security options.`),
+		details: paragraph(
+			`{{WALLET_NAME}} supports some hardware wallets, but not all major ones. Hardware wallets provide an additional layer of security by keeping private keys offline.`,
+		),
+		howToImprove: paragraph(
+			`{{WALLET_NAME}} should expand support to include more popular hardware wallets to provide users with more security options.`,
+		),
 	}
 }
 
@@ -65,7 +75,9 @@ function comprehensiveHardwareWalletSupport(
 			supportedHardwareWallets: supportedWallets,
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} supports a comprehensive range of hardware wallets, including the most popular options. Hardware wallets provide an additional layer of security by keeping private keys offline.`),
+		details: paragraph(
+			`{{WALLET_NAME}} supports a comprehensive range of hardware wallets, including the most popular options. Hardware wallets provide an additional layer of security by keeping private keys offline.`,
+		),
 	}
 }
 
@@ -76,7 +88,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware wallet support evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve hardware wallet support?`),
+		whatCanWalletDoAboutIts: sentence(
+			`What can {{WALLET_NAME}} do to improve hardware wallet support?`,
+		),
 	},
 	question: sentence(`Does the wallet support connecting to hardware wallets?`),
 	why: markdown(`
@@ -144,7 +158,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		if (features.variant === Variant.HARDWARE) {
 			return exempt(
 				hardwareWalletSupport,
-				sentence(`This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet itself.`),
+				sentence(
+					`This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet itself.`,
+				),
 				brand,
 				{ supportedHardwareWallets: [] },
 			)
@@ -155,7 +171,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(
 				hardwareWalletSupport,
-				sentence(`This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.`),
+				sentence(
+					`This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.`,
+				),
 				brand,
 				{ supportedHardwareWallets: [] },
 			)

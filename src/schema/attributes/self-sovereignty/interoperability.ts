@@ -8,7 +8,6 @@ import {
 import { popRefs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -40,11 +39,19 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's interoperability evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its interoperability?`),
+		whatCanWalletDoAboutIts: sentence(
+			`What can {{WALLET_NAME}} do to improve its interoperability?`,
+		),
 	},
-	question: sentence(`Does {{WALLET_NAME}} work well with third-party wallets and avoid supplier linkage?`),
-	why: markdown(`Interoperability ensures the wallet can be used with independent third-party wallets and does not leak identifying metadata to the supplier.`),
-	methodology: markdown(`Evaluated based on third-party wallet compatibility and supplier independence.`),
+	question: sentence(
+		`Does {{WALLET_NAME}} work well with third-party wallets and avoid supplier linkage?`,
+	),
+	why: markdown(
+		`Interoperability ensures the wallet can be used with independent third-party wallets and does not leak identifying metadata to the supplier.`,
+	),
+	methodology: markdown(
+		`Evaluated based on third-party wallet compatibility and supplier independence.`,
+	),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,

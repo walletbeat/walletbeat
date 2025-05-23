@@ -11,7 +11,7 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
-import { RenderContent } from '@/ui/atoms/RenderContent'
+import type { TypographicContent } from '@/types/content'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
 
@@ -139,7 +139,7 @@ export function CriteriaPage({
 										{evalAttr.attribute.displayName}
 									</h2>
 									<div className="card">
-										<RenderContent
+										<RenderTypographicContent<TypographicContent<null>>
 											content={evalAttr.attribute.why}
 											typography={{ variant: 'body2' }}
 										/>

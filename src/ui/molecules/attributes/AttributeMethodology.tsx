@@ -10,7 +10,7 @@ import {
 	ratingToIcon,
 	type Value,
 } from '@/schema/attributes'
-import { mdSentence, type Sentence } from '@/types/content'
+import { mdSentence, type Paragraph, type Sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { RenderTypographicContent } from '../../atoms/RenderTypographicContent'
@@ -128,7 +128,7 @@ function ExampleRatings<V extends Value>({
 			isFirstItem={index === 0}
 			spaceBetweenItems="0.75rem"
 		>
-			<RenderTypographicContent
+			<RenderTypographicContent<Sentence<null> | Paragraph<null>>
 				content={exampleRating.description}
 				typography={typographyPropsBody}
 				textTransform={replaceExampleRatingPrefix('It ', 'Its ')}
@@ -137,8 +137,8 @@ function ExampleRatings<V extends Value>({
 	)
 	const renderExamples = (
 		rating: Rating,
-		singularPreamble: Sentence,
-		pluralPreamble: Sentence,
+		singularPreamble: Sentence<null>,
+		pluralPreamble: Sentence<null>,
 		exampleRatings: ExampleRating<V> | Array<ExampleRating<V>> | undefined,
 	): { key: string; element: React.JSX.Element | null } => {
 		const ratingsList: Array<ExampleRating<V>> =
@@ -155,7 +155,7 @@ function ExampleRatings<V extends Value>({
 			key: rating,
 			element: (
 				<React.Fragment>
-					<RenderTypographicContent
+					<RenderTypographicContent<Sentence<null>>
 						content={preamble}
 						typography={typographyPropsHeader}
 					/>
@@ -224,7 +224,7 @@ export function AttributeMethodology<V extends Value>({
 	return (
 		<>
 			<div key="methodology">
-				<RenderTypographicContent
+				<RenderTypographicContent<typeof attribute.methodology>
 					content={attribute.methodology}
 					typography={typographyPropsBody}
 				/>
@@ -238,7 +238,7 @@ export function AttributeMethodology<V extends Value>({
 			/>
 			<div key="example-ratings">
 				{attribute.ratingScale.display === 'simple' ? (
-					<RenderTypographicContent
+					<RenderTypographicContent<typeof attribute.ratingScale.content>
 						content={attribute.ratingScale.content}
 						typography={typographyPropsBody}
 					/>

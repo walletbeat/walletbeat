@@ -9,8 +9,7 @@ import type { ResolvedFeatures } from '@/schema/features'
 import { WalletProfile } from '@/schema/features/profile'
 import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { markdown, paragraph, sentence } from '@/types/content'
 import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
@@ -190,7 +189,9 @@ function evaluateScamAlerts(
 				id: 'none_implemented',
 				displayName: 'No scam prevention',
 				rating: Rating.FAIL,
-				shortExplanation: sentence(`{{WALLET_NAME}} makes no attempt to warn the user about potential scams.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} makes no attempt to warn the user about potential scams.`,
+				),
 				scamAlerts,
 				sendTransactionWarning,
 				contractTransactionWarning,
@@ -215,7 +216,9 @@ function evaluateScamAlerts(
 					id: 'leak_full_url',
 					displayName: 'Scam prevention feature leaks history',
 					rating: Rating.FAIL,
-					shortExplanation: sentence(`{{WALLET_NAME}} warns you about potential scams, but leaks your browsing history in the process.`),
+					shortExplanation: sentence(
+						`{{WALLET_NAME}} warns you about potential scams, but leaks your browsing history in the process.`,
+					),
 					scamAlerts,
 					sendTransactionWarning,
 					contractTransactionWarning,
@@ -240,7 +243,9 @@ function evaluateScamAlerts(
 					id: 'leak_domain',
 					displayName: 'Scam prevention feature leaks website history',
 					rating: Rating.FAIL,
-					shortExplanation: sentence(`{{WALLET_NAME}} warns you about potential scams, but leaks your browsed websites in the process.`),
+					shortExplanation: sentence(
+						`{{WALLET_NAME}} warns you about potential scams, but leaks your browsed websites in the process.`,
+					),
 					scamAlerts,
 					sendTransactionWarning,
 					contractTransactionWarning,
@@ -264,7 +269,9 @@ function evaluateScamAlerts(
 				id: 'partially_supported',
 				displayName: 'Some scam prevention features',
 				rating: Rating.PARTIAL,
-				shortExplanation: sentence(`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} but not about ${commaListFormat(unsupportedFeatures.map(sas => sas.humanFeature))}`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} but not about ${commaListFormat(unsupportedFeatures.map(sas => sas.humanFeature))}`,
+				),
 				scamAlerts,
 				sendTransactionWarning,
 				contractTransactionWarning,
@@ -282,7 +289,8 @@ function evaluateScamAlerts(
 					`,
 					)
 					.join('\n')}
-			`),
+			`,
+			),
 			references: allRefs,
 		}
 	}
@@ -295,7 +303,9 @@ function evaluateScamAlerts(
 				id: 'need_privacy',
 				displayName: 'Privacy-invasive scam prevention',
 				rating: Rating.PARTIAL,
-				shortExplanation: sentence(`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} in a privacy-invasive way.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} in a privacy-invasive way.`,
+				),
 				scamAlerts,
 				sendTransactionWarning,
 				contractTransactionWarning,
@@ -307,13 +317,16 @@ function evaluateScamAlerts(
 				{{WALLET_NAME}} should ensure all scam alerting features are implemented in a privacy-preserving manner.
 
 				${[
-					!needsImprovement(sendTransactionWarning) && `
+					!needsImprovement(sendTransactionWarning) &&
+						`
 						* Sending a transaction should not allow a third-party to learn a link between any of the sender's IP or Ethereum address and the recipient's address.
 					`,
-					!needsImprovement(contractTransactionWarning) && `
+					!needsImprovement(contractTransactionWarning) &&
+						`
 						* Checking arbitrary transactions for potential scams should not allow a third-party to link your IP or Ethereum address to the contract you are about to interact with or your upcoming transaction.
 					`,
-					!needsImprovement(scamUrlWarning) && `
+					!needsImprovement(scamUrlWarning) &&
+						`
 						* Checking arbitrary transactions for potential scams should not allow a third-party to link your browsing history with your IP or Ethereum address.
 					`,
 				]
@@ -329,7 +342,9 @@ function evaluateScamAlerts(
 			id: 'all_implemented',
 			displayName: 'Full-featured scam prevention',
 			rating: Rating.PASS,
-			shortExplanation: sentence(`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}.`,
+			),
 			scamAlerts,
 			sendTransactionWarning,
 			contractTransactionWarning,
@@ -349,7 +364,9 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		midSentenceName: 'scam prevention',
 	},
 	question: sentence(`Does the wallet warn the user about potential scams?`),
-	why: markdown(`Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction.`),
+	why: markdown(
+		`Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction.`,
+	),
 	methodology: markdown(`
 		Wallets are rated based on whether they alert the user about potential
 		scams. This is measured along three scenarios:
@@ -419,7 +436,9 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 				}).value,
 			),
 			exampleRating(
-				sentence(`The wallet leaks visited URLs to a third-party as part of its malicious app warning feature.`),
+				sentence(
+					`The wallet leaks visited URLs to a third-party as part of its malicious app warning feature.`,
+				),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
 					scamUrlWarning: supported({
@@ -451,7 +470,9 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 				}).value,
 			),
 			exampleRating(
-				sentence(`The wallet implements all required scam warning features, but not in a privacy-preserving manner.`),
+				sentence(
+					`The wallet implements all required scam warning features, but not in a privacy-preserving manner.`,
+				),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: supported({
 						contractRegistry: true,
@@ -477,7 +498,9 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 			),
 		],
 		pass: exampleRating(
-			sentence(`The wallet implements all required scam warning features in a privacy-preserving manner.`),
+			sentence(
+				`The wallet implements all required scam warning features in a privacy-preserving manner.`,
+			),
 			evaluateScamAlerts(WalletProfile.GENERIC, {
 				contractTransactionWarning: supported({
 					contractRegistry: true,

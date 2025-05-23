@@ -200,7 +200,9 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 	id: 'selfSovereignty',
 	icon: '\u{1f3f0}', // Castle
 	displayName: 'Self-sovereignty',
-	perWalletQuestion: sentence(`How much control and ownership over your wallet does {{WALLET_NAME}} give you?`),
+	perWalletQuestion: sentence(
+		`How much control and ownership over your wallet does {{WALLET_NAME}} give you?`,
+	),
 	attributes: {
 		selfHostedNode,
 		accountPortability,
@@ -227,7 +229,9 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 	id: 'transparency',
 	icon: '\u{1f50d}', // Looking glass
 	displayName: 'Transparency',
-	perWalletQuestion: sentence(`How transparent and sustainable is {{WALLET_NAME}}'s development model?`),
+	perWalletQuestion: sentence(
+		`How transparent and sustainable is {{WALLET_NAME}}'s development model?`,
+	),
 	attributes: {
 		openSource,
 		sourceVisibility,

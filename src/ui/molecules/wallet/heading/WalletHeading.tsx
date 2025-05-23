@@ -65,6 +65,9 @@ export const WalletHeading: FC<{
 				<RenderTypographicContent
 					content={wallet.metadata.blurb}
 					typography={{ variant: 'body1' }}
+					strings={{
+						WALLET_NAME: wallet.metadata.displayName,
+					}}
 				/>
 			</div>
 			<Typography fontSize="0.9rem" marginTop="3rem">

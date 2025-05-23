@@ -47,7 +47,9 @@ export const reputation: Attribute<ReputationValue> = {
 		howIsEvaluated: "How is a wallet's reputation evaluated?",
 		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its reputation?`),
 	},
-	question: sentence(`Does {{WALLET_NAME}} have a strong reputation for reliability and transparency?`),
+	question: sentence(
+		`Does {{WALLET_NAME}} have a strong reputation for reliability and transparency?`,
+	),
 	why: markdown(
 		`A manufacturer's reputation reflects its track record in product design, long-term availability and support, handling of vulnerabilities, and engagement with the security community.
 		A strong reputation builds user trust in the reliability and security of the hardware wallet.`,

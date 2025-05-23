@@ -12,7 +12,7 @@ import {
 import { toFullyQualified } from '@/schema/reference'
 import type { Variant } from '@/schema/variants'
 import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet'
-import { isTypographicContent, sentence, type TypographicContent } from '@/types/content'
+import { isTypographicContent, type Sentence, sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology'
 
@@ -55,11 +55,6 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	  }
 )): React.JSX.Element {
 	const qualRefs = toFullyQualified(evalAttr.evaluation.references)
-	const evaluationData = {
-		wallet,
-		references: qualRefs,
-		value: evalAttr.evaluation.value,
-	}
 	const details = evalAttr.evaluation.details
 	const override = getAttributeOverride(wallet, attrGroup.id, evalAttr.attribute.id)
 	const variantSpecificCaption: React.ReactNode = (() => {
@@ -138,20 +133,18 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		{
 			id: `why-${evalAttr.attribute.id}`,
 			summary: (
-				<RenderTypographicContent
-					content={
-						sentence(
-							evalAttr.evaluation.value.rating === Rating.PASS ||
+				<RenderTypographicContent<Sentence<null>>
+					content={sentence<null>(
+						evalAttr.evaluation.value.rating === Rating.PASS ||
 							evalAttr.evaluation.value.rating === Rating.UNRATED
-								? 'Why does this matter?'
-								: 'Why should I care?'
-						)
-					}
+							? 'Why does this matter?'
+							: 'Why should I care?',
+					)}
 					typography={{ variant: 'h4' }}
 				/>
 			),
-			contents: 	(
-				<RenderTypographicContent
+			contents: (
+				<RenderTypographicContent<typeof evalAttr.attribute.why>
 					content={evalAttr.attribute.why}
 					typography={{ variant: 'body2' }}
 				/>
@@ -160,14 +153,12 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		{
 			id: `methodology-${evalAttr.attribute.id}`,
 			summary: (
-				<RenderTypographicContent
-					content={
-						sentence(
-							evalAttr.attribute.wording.midSentenceName === null
-								? evalAttr.attribute.wording.howIsEvaluated
-								: `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`
-						)
-					}
+				<RenderTypographicContent<Sentence<null>>
+					content={sentence<null>(
+						evalAttr.attribute.wording.midSentenceName === null
+							? evalAttr.attribute.wording.howIsEvaluated
+							: `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`,
+					)}
 					typography={{ variant: 'h4' }}
 				/>
 			),
@@ -182,11 +173,13 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		accordions.push({
 			id: `how-${evalAttr.attribute.id}`,
 			summary: (
-				<RenderTypographicContent
+				<RenderTypographicContent<Sentence<{ WALLET_NAME: string }>>
 					content={
 						evalAttr.attribute.wording.midSentenceName === null
 							? evalAttr.attribute.wording.whatCanWalletDoAboutIts
-							: sentence(`What can {{WALLET_NAME}} do about its ${evalAttr.attribute.wording.midSentenceName}?`)
+							: sentence<{ WALLET_NAME: string }>(
+									`What can {{WALLET_NAME}} do about its ${evalAttr.attribute.wording.midSentenceName}?`,
+								)
 					}
 					strings={{
 						WALLET_NAME: wallet.metadata.displayName,
@@ -199,8 +192,14 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					content={howToImprove}
 					strings={{
 						WALLET_NAME: wallet.metadata.displayName,
-						WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-						WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+						WALLET_PSEUDONYM_SINGULAR:
+							wallet.metadata.pseudonymType === undefined
+								? null
+								: wallet.metadata.pseudonymType.singular,
+						WALLET_PSEUDONYM_PLURAL:
+							wallet.metadata.pseudonymType === undefined
+								? null
+								: wallet.metadata.pseudonymType.plural,
 					}}
 					typography={{ variant: 'body2' }}
 				/>

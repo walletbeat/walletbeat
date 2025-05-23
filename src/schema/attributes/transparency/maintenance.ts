@@ -127,7 +127,9 @@ export const maintenance: Attribute<MaintenanceValue> = {
 				id: 'maintenance',
 				rating,
 				displayName: 'Maintenance',
-				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} maintenance practices.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} has ${rating.toLowerCase()} maintenance practices.`,
+				),
 				...withoutRefs,
 				__brand: brand,
 			},

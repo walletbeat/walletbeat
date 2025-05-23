@@ -8,7 +8,6 @@ import {
 import { popRefs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -90,7 +89,9 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				keysHandling,
-				sentence(`This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.`),
+				sentence(
+					`This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.`,
+				),
 				brand,
 				{
 					masterSecretGeneration: KeysHandlingType.FAIL,

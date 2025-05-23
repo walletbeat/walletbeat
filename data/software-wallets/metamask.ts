@@ -18,7 +18,9 @@ export const metamask: SoftwareWallet = {
 		id: 'metamask',
 		displayName: 'MetaMask',
 		tableName: 'MetaMask',
-		blurb: paragraph(`MetaMask is a popular Ethereum wallet created by Consensys and that has been around for a long time. It is a jack-of-all-trades wallet that can be extended through MetaMask Snaps.`),
+		blurb: paragraph(
+			`MetaMask is a popular Ethereum wallet created by Consensys and that has been around for a long time. It is a jack-of-all-trades wallet that can be extended through MetaMask Snaps.`,
+		),
 		contributors: [polymutex, nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',

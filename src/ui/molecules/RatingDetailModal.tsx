@@ -285,12 +285,20 @@ export function RatingDetailContent<Vs extends ValueSet>({
 											<div className="pl-8 mt-2 text-sm">
 												{/* Show the short explanation */}
 												<div className="mb-3 font-medium text-gray-800 dark:text-gray-200">
-													<RenderTypographicContent
+													<RenderTypographicContent<
+														typeof evalAttr.evaluation.value.shortExplanation
+													>
 														content={evalAttr.evaluation.value.shortExplanation}
 														strings={{
 															WALLET_NAME: wallet.metadata.displayName,
-															WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-															WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+															WALLET_PSEUDONYM_SINGULAR:
+																wallet.metadata.pseudonymType === undefined
+																	? null
+																	: wallet.metadata.pseudonymType.singular,
+															WALLET_PSEUDONYM_PLURAL:
+																wallet.metadata.pseudonymType === undefined
+																	? null
+																	: wallet.metadata.pseudonymType.plural,
 														}}
 													/>
 												</div>

@@ -8,7 +8,6 @@ import {
 import type { ResolvedFeatures } from '@/schema/features'
 import { isSupported, type Support } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty'
@@ -55,7 +54,9 @@ function noChainVerification(
 			rating: Rating.FAIL,
 			icon: '\u{1f648}', // See-no-evil monkey
 			displayName: 'No L1 chain state verification',
-			shortExplanation: sentence(`{{WALLET_NAME}} does not verify chain integrity of the Ethereum L1.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} does not verify chain integrity of the Ethereum L1.`,
+			),
 			__brand: brand,
 		},
 		details: markdown(`
@@ -63,14 +64,18 @@ function noChainVerification(
 
 			${canConfigureL1() ? `Users may work around this by setting a custom RPC endpoint for the L1 chain and running their own node or external light client.` : ''}
 		`),
-		howToImprove: mdParagraph(`{{WALLET_NAME}} should integrate [light client functionality](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/) to verify the integrity of Ethereum chain data.`),
+		howToImprove: mdParagraph(
+			`{{WALLET_NAME}} should integrate [light client functionality](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/) to verify the integrity of Ethereum chain data.`,
+		),
 		references: [],
 	}
 
 	function canConfigureL1() {
 		const l1Configurability = chainConfigurability?.l1RpcEndpoint ?? RpcEndpointConfiguration.NO
-		return l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
+		return (
+			l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
 			l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
+		)
 	}
 }
 
@@ -111,11 +116,15 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			mdParagraph(`The wallet verifies the integrity of the Ethereum L1 chain using a [light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/).`),
+			mdParagraph(
+				`The wallet verifies the integrity of the Ethereum L1 chain using a [light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/).`,
+			),
 			supportsChainVerification([EthereumL1LightClient.helios], []).value,
 		),
 		fail: exampleRating(
-			paragraph(`The wallet does not verify the integrity of the Ethereum L1 chain, relying on the honesty of third-party RPC providers instead.`),
+			paragraph(
+				`The wallet does not verify the integrity of the Ethereum L1 chain, relying on the honesty of third-party RPC providers instead.`,
+			),
 			noChainVerification(null).value,
 		),
 	},

@@ -6,14 +6,7 @@ import { renderStrings } from '@/types/utils/text'
 
 import { MarkdownTypography } from './MarkdownTypography'
 
-export function RenderTypographicContent<
-	TypographicContent extends _TypographicContent,
->({
-	content,
-	textTransform,
-	typography,
-	strings,
-}: {
+type BaseProps<TypographicContent extends _TypographicContent> = {
 	/** The typographic content to render. */
 	content: TypographicContent
 
@@ -39,17 +32,26 @@ export function RenderTypographicContent<
 			| 'variant'
 		>
 	>
+}
 
-	/** A set of strings to be expanded in the text. */
-	strings?: TypographicContent extends _TypographicContent<infer Strings> ? Strings : undefined,
-}): React.JSX.Element {
+export function RenderTypographicContent<TypographicContent extends _TypographicContent>(
+	props: (TypographicContent extends _TypographicContent<null>
+		? object
+		: TypographicContent extends _TypographicContent<infer Strings>
+			? { strings: Strings }
+			: never) &
+		BaseProps<_TypographicContent>,
+): React.JSX.Element {
+	const { content, textTransform, typography } = props
+	const strings = Object.hasOwn(content, 'strings') ? content.strings : undefined
 	const processText = (text: string) => {
-		if (textTransform) {
+		if (textTransform !== undefined) {
 			text = textTransform(text)
 		}
 
-		if(strings)
+		if (strings !== undefined) {
 			text = renderStrings(text, strings)
+		}
 
 		return text.trim()
 	}
@@ -57,18 +59,11 @@ export function RenderTypographicContent<
 	switch (content.contentType) {
 		case ContentType.MARKDOWN:
 			return (
-				<MarkdownTypography
-					markdownTransform={processText}
-					{...typography}
-				>
+				<MarkdownTypography markdownTransform={processText} {...typography}>
 					{content.markdown}
 				</MarkdownTypography>
 			)
 		case ContentType.TEXT:
-			return (
-				<Typography {...typography}>
-					{processText(content.text)}
-				</Typography>
-			)
+			return <Typography {...typography}>{processText(content.text)}</Typography>
 	}
 }

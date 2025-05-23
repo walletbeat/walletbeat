@@ -17,7 +17,6 @@ import {
 	type Support,
 } from '@/schema/features/support'
 import { popRefs, type WithRef } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
 
@@ -56,11 +55,17 @@ function browserIntegrationSupport(
 				rating: Rating.FAIL,
 				displayName: 'No browser integration',
 				support,
-				shortExplanation: sentence(`{{WALLET_NAME}} does not integrate with the browser in a standard way.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} does not integrate with the browser in a standard way.`,
+				),
 				__brand: brand,
 			},
-			details: paragraph(`{{WALLET_NAME}} does not adhere to any of the Ethereum standards for integration in web browsers.`),
-			howToImprove: markdown(`{{WALLET_NAME}} should integrate with the browser using an Ethereum standard, such as ${eipMarkdownLink(eip1193)} or the newer ${eipMarkdownLink(eip6963)}.`),
+			details: paragraph(
+				`{{WALLET_NAME}} does not adhere to any of the Ethereum standards for integration in web browsers.`,
+			),
+			howToImprove: markdown(
+				`{{WALLET_NAME}} should integrate with the browser using an Ethereum standard, such as ${eipMarkdownLink(eip1193)} or the newer ${eipMarkdownLink(eip6963)}.`,
+			),
 			references: refs,
 		}
 	}
@@ -74,7 +79,9 @@ function browserIntegrationSupport(
 					? 'Fully-compliant browser integration'
 					: 'Partially-compliant browser integration',
 			support,
-			shortExplanation: sentence(`{{WALLET_NAME}} supports ${unsupported.length === 0 ? 'all' : 'a subset of'} the prominent standards for web browser integration.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports ${unsupported.length === 0 ? 'all' : 'a subset of'} the prominent standards for web browser integration.`,
+			),
 			__brand: brand,
 		},
 		details: markdown(`
@@ -87,7 +94,9 @@ function browserIntegrationSupport(
 		howToImprove:
 			unsupported.length === 0
 				? undefined
-				: markdown(`{{WALLET_NAME}} should implement ${commaListFormat(unsupported.map(eipNum => eipMarkdownLink(getEip(eipNum))))}.`),
+				: markdown(
+						`{{WALLET_NAME}} should implement ${commaListFormat(unsupported.map(eipNum => eipMarkdownLink(getEip(eipNum))))}.`,
+					),
 		references: refs,
 	}
 }

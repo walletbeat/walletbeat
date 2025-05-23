@@ -1,4 +1,4 @@
-import { type Sentence, sentence, type Content } from '@/types/content'
+import { type Sentence, sentence } from '@/types/content'
 import { unratedAttributeContent } from '@/types/content/unrated-attribute'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyValues } from '@/types/utils/non-empty'
 
@@ -10,7 +10,6 @@ import {
 	type Value,
 } from '../attributes'
 import type { AtLeastOneVariant, Variant } from '../variants'
-import type { WalletMetadata } from '../wallet'
 
 /**
  * Helper for constructing "Unrated" values.
@@ -47,7 +46,11 @@ export function unrated<V extends Value>(
  */
 export function exempt<V extends Value>(
 	attribute: Attribute<V>,
-	whyExempt: Sentence<{ WALLET_NAME: string }>,
+	whyExempt: Sentence<{
+		WALLET_NAME: string
+		WALLET_PSEUDONYM_SINGULAR: string | null
+		WALLET_PSEUDONYM_PLURAL: string | null
+	}>,
 	brand: string,
 	extraProps: Omit<V, keyof (Value & { __brand: string })> extends Record<string, never>
 		? null

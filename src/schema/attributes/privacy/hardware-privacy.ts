@@ -8,7 +8,6 @@ import {
 import { popRefs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -41,7 +40,9 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware privacy evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its hardware privacy?`),
+		whatCanWalletDoAboutIts: sentence(
+			`What can {{WALLET_NAME}} do to improve its hardware privacy?`,
+		),
 	},
 	question: sentence(`Does {{WALLET_NAME}} protect user privacy at the hardware level?`),
 	why: markdown(
@@ -61,7 +62,9 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(`The hardware wallet passes all hardware privacy sub-criteria: No phoning home, inspectable remote calls, and encrypted wireless communication.`),
+				sentence(
+					`The hardware wallet passes all hardware privacy sub-criteria: No phoning home, inspectable remote calls, and encrypted wireless communication.`,
+				),
 				(v: HardwarePrivacyValue) => v.rating === Rating.PASS,
 			),
 		],
@@ -73,7 +76,9 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 		],
 		fail: [
 			exampleRating(
-				sentence(`The hardware wallet fails all hardware privacy sub-criteria: Device leaks privacy in all aspects.`),
+				sentence(
+					`The hardware wallet fails all hardware privacy sub-criteria: Device leaks privacy in all aspects.`,
+				),
 				(v: HardwarePrivacyValue) => v.rating === Rating.FAIL,
 			),
 		],

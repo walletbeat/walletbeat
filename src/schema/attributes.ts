@@ -1,4 +1,4 @@
-import type { Paragraph, Content, TypographicContent, Sentence } from '@/types/content'
+import type { Content, Paragraph, Sentence, TypographicContent } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
 
 import type { ResolvedFeatures } from './features'
@@ -166,7 +166,11 @@ export interface Value {
 	 * Should be similar to `displayName` but may be formatted with the name
 	 * of the wallet.
 	 */
-	shortExplanation: Sentence<{ WALLET_NAME: string; WALLET_PSEUDONYM_SINGULAR?: string; WALLET_PSEUDONYM_PLURAL?: string }>
+	shortExplanation: Sentence<{
+		WALLET_NAME: string
+		WALLET_PSEUDONYM_SINGULAR: string | null
+		WALLET_PSEUDONYM_PLURAL: string | null
+	}>
 
 	/**
 	 * The visual representation of this value.
@@ -242,10 +246,10 @@ export interface Evaluation<V extends Value> {
 	 * to improve this rating. Should only be populated for ratings that are
 	 * not perfect.
 	 */
-	howToImprove?: TypographicContent<{ 
-		WALLET_NAME: string;
-		WALLET_PSEUDONYM_SINGULAR?: string;
-		WALLET_PSEUDONYM_PLURAL?: string;
+	howToImprove?: TypographicContent<{
+		WALLET_NAME: string
+		WALLET_PSEUDONYM_SINGULAR: string | null
+		WALLET_PSEUDONYM_PLURAL: string | null
 	}>
 
 	/**
@@ -284,7 +288,7 @@ export interface ExampleRating<V extends Value> {
 	 * Must start with "The wallet " (possibly after whitespace) or
 	 * "The wallet's ".
 	 */
-	description: Sentence<{ WALLET_NAME: string }> | Paragraph<{ WALLET_NAME: string }>
+	description: Sentence<null> | Paragraph<null>
 
 	/**
 	 * Match function that determines whether the given `value` matches this
@@ -349,10 +353,10 @@ export interface Attribute<V extends Value> {
 	question: Sentence<{ WALLET_NAME: string }>
 
 	/** A paragraph explaining why this attribute is important to users. */
-	why: TypographicContent<{ WALLET_NAME: string }>
+	why: TypographicContent<null>
 
 	/** General explanation of how wallets are rated on this attribute. */
-	methodology: TypographicContent<{ WALLET_NAME: string }>
+	methodology: TypographicContent<null>
 
 	/** Explanations of what a wallet can do to achieve each rating. */
 	ratingScale:
@@ -365,7 +369,7 @@ export interface Attribute<V extends Value> {
 				display: 'simple'
 
 				/** The content to display to explain the rating scale. */
-				content: TypographicContent<{ WALLET_NAME: string }>
+				content: TypographicContent<null>
 		  }
 		| {
 				/**
