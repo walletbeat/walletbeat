@@ -219,8 +219,6 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 					content={attrGroup.perWalletQuestion}
 					strings={{
 						WALLET_NAME: wallet.metadata.displayName,
-						WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-						WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
 					}}
 					typography={{
 						variant: 'caption',

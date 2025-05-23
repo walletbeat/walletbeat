@@ -1,4 +1,5 @@
 // Text manipulation utility functions.
+import type { Strings } from './string-templates'
 
 /**
  * Recursively replaces `{{KEY}}` or `{{KEY|fallback text}}` in the text with values from the given `strings` object.
@@ -22,13 +23,13 @@
  */
 export const renderStrings = (
 	text: string,
-	strings: Record<string, string | undefined>
+	strings: Strings,
 ): string => (
 	text.replaceAll(
 		/\{\{(?<key>[^|{}]+)(?:\|(?<fallback>[^{}]+))?\}\}/g,
-		(match, key, fallback) => (
+		(match, key: string, fallback: string | undefined) => (
 			renderStrings(
-				strings[key as keyof typeof strings] ?? fallback ?? match,
+				key in strings ? strings[key] : fallback ?? match,
 				strings
 			)
 		)

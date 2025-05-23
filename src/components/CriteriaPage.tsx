@@ -126,8 +126,6 @@ export function CriteriaPage({
 									content={attrGroup.perWalletQuestion}
 									strings={{
 										WALLET_NAME: 'your wallet',
-										WALLET_PSEUDONYM_SINGULAR: 'username',
-										WALLET_PSEUDONYM_PLURAL: 'usernames',
 									}}
 									typography={{
 										variant: 'caption',
@@ -142,7 +140,7 @@ export function CriteriaPage({
 									</h2>
 									<div className="card">
 										<RenderContent
-											content={evalAttr.attribute.why.render({})}
+											content={evalAttr.attribute.why}
 											typography={{ variant: 'body2' }}
 										/>
 									</div>
