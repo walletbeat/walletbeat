@@ -128,7 +128,7 @@ function ExampleRatings<V extends Value>({
 			isFirstItem={index === 0}
 			spaceBetweenItems="0.75rem"
 		>
-			<RenderTypographicContent<Sentence<null> | Paragraph<null>>
+			<RenderTypographicContent
 				content={exampleRating.description}
 				typography={typographyPropsBody}
 				textTransform={replaceExampleRatingPrefix('It ', 'Its ')}
@@ -137,8 +137,8 @@ function ExampleRatings<V extends Value>({
 	)
 	const renderExamples = (
 		rating: Rating,
-		singularPreamble: Sentence<null>,
-		pluralPreamble: Sentence<null>,
+		singularPreamble: Sentence,
+		pluralPreamble: Sentence,
 		exampleRatings: ExampleRating<V> | Array<ExampleRating<V>> | undefined,
 	): { key: string; element: React.JSX.Element | null } => {
 		const ratingsList: Array<ExampleRating<V>> =
@@ -155,7 +155,7 @@ function ExampleRatings<V extends Value>({
 			key: rating,
 			element: (
 				<React.Fragment>
-					<RenderTypographicContent<Sentence<null>>
+					<RenderTypographicContent
 						content={preamble}
 						typography={typographyPropsHeader}
 					/>
@@ -224,7 +224,7 @@ export function AttributeMethodology<V extends Value>({
 	return (
 		<>
 			<div key="methodology">
-				<RenderTypographicContent<typeof attribute.methodology>
+				<RenderTypographicContent
 					content={attribute.methodology}
 					typography={typographyPropsBody}
 				/>
@@ -238,7 +238,7 @@ export function AttributeMethodology<V extends Value>({
 			/>
 			<div key="example-ratings">
 				{attribute.ratingScale.display === 'simple' ? (
-					<RenderTypographicContent<typeof attribute.ratingScale.content>
+					<RenderTypographicContent
 						content={attribute.ratingScale.content}
 						typography={typographyPropsBody}
 					/>

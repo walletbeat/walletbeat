@@ -139,7 +139,7 @@ export function CriteriaPage({
 										{evalAttr.attribute.displayName}
 									</h2>
 									<div className="card">
-										<RenderTypographicContent<TypographicContent<null>>
+										<RenderTypographicContent
 											content={evalAttr.attribute.why}
 											typography={{ variant: 'body2' }}
 										/>

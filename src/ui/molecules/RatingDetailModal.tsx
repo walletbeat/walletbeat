@@ -285,9 +285,7 @@ export function RatingDetailContent<Vs extends ValueSet>({
 											<div className="pl-8 mt-2 text-sm">
 												{/* Show the short explanation */}
 												<div className="mb-3 font-medium text-gray-800 dark:text-gray-200">
-													<RenderTypographicContent<
-														typeof evalAttr.evaluation.value.shortExplanation
-													>
+													<RenderTypographicContent
 														content={evalAttr.evaluation.value.shortExplanation}
 														strings={{
 															WALLET_NAME: wallet.metadata.displayName,

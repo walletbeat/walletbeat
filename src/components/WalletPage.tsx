@@ -369,7 +369,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 						backgroundColor: 'var(--background-primary)',
 					},
 					caption: (
-						<RenderTypographicContent<typeof evalAttr.attribute.question>
+						<RenderTypographicContent
 							content={evalAttr.attribute.question}
 							strings={{
 								WALLET_NAME: wallet.metadata.displayName,
