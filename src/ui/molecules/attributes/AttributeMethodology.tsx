@@ -10,7 +10,7 @@ import {
 	ratingToIcon,
 	type Value,
 } from '@/schema/attributes'
-import { mdSentence, type Paragraph, type Sentence } from '@/types/content'
+import { mdSentence, type Sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { RenderTypographicContent } from '../../atoms/RenderTypographicContent'
@@ -155,10 +155,7 @@ function ExampleRatings<V extends Value>({
 			key: rating,
 			element: (
 				<React.Fragment>
-					<RenderTypographicContent
-						content={preamble}
-						typography={typographyPropsHeader}
-					/>
+					<RenderTypographicContent content={preamble} typography={typographyPropsHeader} />
 					<ul style={{ paddingLeft: '2rem' }}>
 						{ratingsList.map((exampleRating, index) =>
 							renderListItem(exampleRating, index, rating),
