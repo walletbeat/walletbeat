@@ -42,7 +42,7 @@ export type ComponentAndProps =
 /**
  * Text-based content that may be displayed on the UI.
  */
-export type TextContent<Strings extends _Strings = _Strings> = {
+export type TextContent<Strings extends _Strings = null> = {
 	contentType: ContentType.TEXT
 	text: string
 	strings?: Strings
@@ -52,7 +52,7 @@ export type TextContent<Strings extends _Strings = _Strings> = {
  * Markdown-based content that may be displayed on the UI.
  * Also includes a text property to make it compatible with TypographicContent interfaces.
  */
-export type MarkdownContent<Strings extends _Strings = _Strings> = {
+export type MarkdownContent<Strings extends _Strings = null> = {
 	contentType: ContentType.MARKDOWN
 	markdown: string
 	strings?: Strings
@@ -69,14 +69,14 @@ export type CustomContent = {
 /**
  * Typographic content that may be displayed on the UI.
  */
-export type TypographicContent<Strings extends _Strings = _Strings> =
+export type TypographicContent<Strings extends _Strings = null> =
 	| TextContent<Strings>
 	| MarkdownContent<Strings>
 
 /**
  * Represents any type of content that may be displayed on the UI.
  */
-export type Content<Strings extends _Strings = _Strings> =
+export type Content<Strings extends _Strings = null> =
 	| TypographicContent<Strings>
 	| CustomContent
 
@@ -85,8 +85,8 @@ export type Content<Strings extends _Strings = _Strings> =
  * @param content The content to check.
  * @returns Whether `content` is of type `TypographicContent`.
  */
-export function isTypographicContent<Strings extends _Strings>(
-	content: Content,
+export function isTypographicContent<Strings extends _Strings = null>(
+	content: Content<Strings>,
 ): content is TypographicContent<Strings> {
 	return content.contentType === ContentType.TEXT || content.contentType === ContentType.MARKDOWN
 }
@@ -120,7 +120,7 @@ export function markdown<Strings extends _Strings, _Text extends string = string
 
 const sentenceMaxLength = 384
 
-export type Sentence<Strings extends _Strings> = TypographicContent<Strings>
+export type Sentence<Strings extends _Strings = null> = TypographicContent<Strings>
 
 /** A single sentence. */
 export function sentence<Strings extends _Strings, _Text extends string = string>(
@@ -148,7 +148,7 @@ const paragraphMaxLength = 1024
 
 /** A short amount of text that fits in a single paragraph. */
 
-export type Paragraph<Strings extends _Strings> = TextContent<Strings>
+export type Paragraph<Strings extends _Strings = null> = TextContent<Strings>
 
 /** A renderable paragraph. */
 export function paragraph<Strings extends _Strings, _Text extends string = string>(

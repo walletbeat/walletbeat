@@ -1,12 +1,12 @@
 import { Typography } from '@mui/material'
-import type React from 'react'
 
-import { ContentType, type TypographicContent as _TypographicContent } from '@/types/content'
+import { type TypographicContent as _TypographicContent, ContentType } from '@/types/content'
+import type { Strings as _Strings } from '@/types/utils/string-templates'
 import { renderStrings } from '@/types/utils/text'
 
 import { MarkdownTypography } from './MarkdownTypography'
 
-type BaseProps<TypographicContent extends _TypographicContent> = {
+type Props<TypographicContent extends _TypographicContent> = {
 	/** The typographic content to render. */
 	content: TypographicContent
 
@@ -34,24 +34,32 @@ type BaseProps<TypographicContent extends _TypographicContent> = {
 	>
 }
 
-export function RenderTypographicContent<TypographicContent extends _TypographicContent>(
-	props: (TypographicContent extends _TypographicContent<null>
-		? object
-		: TypographicContent extends _TypographicContent<infer Strings>
-			? { strings: Strings }
-			: never) &
-		BaseProps<_TypographicContent>,
-): React.JSX.Element {
-	const { content, textTransform, typography } = props
-	const strings = Object.hasOwn(content, 'strings') ? content.strings : undefined
+export function RenderTypographicContent<TypographicContent extends _TypographicContent<any>>(
+	props: Props<TypographicContent> & 
+		(TypographicContent extends _TypographicContent<null> ?
+			{ strings?: never }
+		: TypographicContent extends _TypographicContent<infer _Strings> ?
+				{ strings: _Strings }
+		:
+			never
+	)
+)
+export function RenderTypographicContent(props: Props<_TypographicContent> & ({ strings?: never } | { strings: _Strings })) {
+	const { content, textTransform, typography, strings } = props
+
 	const processText = (text: string) => {
 		if (textTransform !== undefined) {
 			text = textTransform(text)
 		}
 
-		if (strings !== undefined) {
-			text = renderStrings(text, strings)
+		if (strings !== undefined)
+			text = textTransform(text)
 		}
+
+		if (strings)
+		if (strings !== undefined)
+		if (strings)
+			text = renderStrings(text, props.strings)
 
 		return text.trim()
 	}
