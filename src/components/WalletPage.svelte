@@ -42,7 +42,6 @@
 	import { onMount } from 'svelte'
 	import Pie from '@/ui/atoms/Pie.svelte'
 	import RenderCustomContent from '@/ui/atoms/RenderCustomContent.svelte'
-	import SourceVisibilityDetails from '@/ui/molecules/attributes/transparency/SourceVisibilityDetails.svelte'
 
 
 	// Props
@@ -60,9 +59,13 @@
 	
 	// Update pickedVariant from URL only on mount
 	onMount(() => {
-		pickedVariant = singleVariant !== null 
-			? singleVariant 
-			: wallet ? variantFromUrlQuery(wallet.variants) : null
+		pickedVariant = (
+			singleVariant !== null 
+				? singleVariant 
+				: wallet 
+					? variantFromUrlQuery(wallet.variants) 
+					: null
+		)
 	})
 
 	// Update the picked variant and update URL
@@ -112,20 +115,15 @@
 	})
 
 	const sections: {
-		header: string
-		subHeader: string | null
+		id: string
 		title: string
 		icon: string
-		cornerControl: any | null
 		caption: any
 		subsections: {
-			header: string
 			subHeader: string | null
 			title: string
 			icon: string
-			cornerControl: any | null
 			caption: any
-			body: any | null
 			relevantVariants: Variant[]
 			evalAttr: EvaluatedAttribute<Value>
 			attrGroup: AttributeGroup<ValueSet>
@@ -133,57 +131,29 @@
 	}[] = $derived(
 		evalTree ?
 			mapNonExemptAttributeGroupsInTree(evalTree, (attrGroup, evalGroup) => ({
-				header: attrGroup.id,
-				subHeader: null,
+				id: attrGroup.id,
 				title: attrGroup.displayName,
 				icon: attrGroup.icon,
-				cornerControl: null,
 				caption: attrGroup.perWalletQuestion,
-				body: null,
 				subsections: (
-					mapNonExemptGroupAttributes(evalGroup, (evalAttr) => ({
-						header: slugifyCamelCase(attrGroup.id),
-						subHeader: slugifyCamelCase(evalAttr.attribute.id),
-						title: evalAttr.attribute.displayName,
-						icon: evalAttr.attribute.icon,
-						cornerControl: null,
-						caption: evalAttr.attribute.question,
-						body: null,
-						relevantVariants: attrToRelevantVariants.get(evalAttr.attribute.id) ?? [],
-						evalAttr,
-						attrGroup
-					}))
+					mapNonExemptGroupAttributes(evalGroup, (evalAttr) => {
+						const relevantVariants = attrToRelevantVariants.get(evalAttr.attribute.id) ?? []
+						return {
+							subHeader: slugifyCamelCase(evalAttr.attribute.id),
+							title: evalAttr.attribute.displayName,
+							icon: evalAttr.attribute.icon,
+							caption: evalAttr.attribute.question,
+							relevantVariants,
+							evalAttr,
+							attrGroup
+						}
+					})
 				),
 			}))
-				.filter(section => section.subsections.length > 0 && section.header !== 'details')
+				.filter(section => section.subsections.length > 0)
 		:
 			[]
 	)
-
-	// Pre-calculate section data for performance
-	const sectionData = $derived.by(() => {
-		if (!wallet || !evalTree) return new Map()
-
-		const data = new Map()
-		
-		for (const section of sections) {
-			const attrGroup = attributeTree[section.header]
-			const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup)
-			const score = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)
-			const scoreLevel = score 
-				? score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low'
-				: undefined
-			
-			data.set(section.header, { 
-				attrGroup, 
-				evalGroup, 
-				score, 
-				scoreLevel
-			})
-		}
-		
-		return data
-	})
 
 
 	// UI constants
@@ -244,9 +214,11 @@
 				<article class="wallet-overview">
 					<nav class="wallet-links">
 						<a 
-							href={typeof wallet.metadata.url === 'string' 
-								? wallet.metadata.url 
-								: wallet.metadata.url?.url || '#'} 
+							href={(
+								typeof wallet.metadata.url === 'string' 
+									? wallet.metadata.url 
+									: wallet.metadata.url?.url || '#'
+							)} 
 							class="wallet-link website" 
 							target="_blank" 
 							rel="noopener noreferrer"
@@ -256,9 +228,11 @@
 						
 						{#if wallet.metadata.repoUrl}
 							<a 
-								href={typeof wallet.metadata.repoUrl === 'string' 
-									? wallet.metadata.repoUrl 
-									: wallet.metadata.repoUrl?.url || '#'} 
+								href={(
+									typeof wallet.metadata.repoUrl === 'string' 
+										? wallet.metadata.repoUrl 
+										: wallet.metadata.repoUrl?.url || '#'
+								)} 
 								class="wallet-link repo" 
 								target="_blank" 
 								rel="noopener noreferrer"
@@ -298,34 +272,44 @@
 		</header>
 
 		{#each sections as section}
+			{@const attrGroup = attributeTree[section.id]}
+			{@const evalGroup = getAttributeGroupInTree(wallet.overall, attrGroup)}
+			{@const score = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
+			{@const scoreLevel = (
+				score 
+					? score.score >= 0.7 
+						? 'high' 
+						: score.score >= 0.4 
+							? 'medium' 
+							: 'low'
+					: undefined
+			)}
+			
 			<hr />
 
 			<section 
-				id={section.subHeader !== null ? slugifyCamelCase(section.subHeader) : slugifyCamelCase(section.header)} 
+				id={slugifyCamelCase(section.id)} 
 				class="wallet-section"
 				aria-label={section.title}
-				data-score={sectionData.get(section.header)?.scoreLevel}
+				data-score={scoreLevel}
 				data-icon={section.icon}
-				style:--accent={sectionData.get(section.header)?.score 
-					? percentageToCSS(sectionData.get(section.header).score.score)
-					: 'transparent'
-				}
+				style:--accent={(
+					score 
+						? percentageToCSS(score.score)
+						: 'transparent'
+				)}
 			>
 				<header class="section-header">
 					<h2>{section.title}</h2>
 					<div class="section-controls">
-						{#if sectionData.get(section.header)?.score}
+						{#if score}
 							<div class="section-score">
-								{Math.round(sectionData.get(section.header).score.score * 100)}%
+								{Math.round(score.score * 100)}%
 								
-								{#if sectionData.get(section.header).score.hasUnratedComponent}
+								{#if score.hasUnratedComponent}
 									<span class="unrated-hint" title="This section contains unrated components">ⓘ</span>
 								{/if}
 							</div>
-						{/if}
-						
-						{#if section.cornerControl}
-							{section.cornerControl}
 						{/if}
 					</div>
 				</header>
@@ -333,18 +317,18 @@
 				{#if section.caption}
 					<div class="section-caption">
 						<Typography 
-							content={typeof section.caption === 'string' 
-								? sentence(section.caption) 
-								: section.caption}
+							content={(
+								typeof section.caption === 'string' 
+									? sentence(section.caption) 
+									: section.caption
+							)}
 							strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
 						/>
 					</div>
 				{/if}
 				
 				<div class="section-body">
-					{#if sectionData.get(section.header)}
-						{@const sectionInfo = sectionData.get(section.header)}
-						{@const evalGroup = sectionInfo.evalGroup}
+					{#if wallet && evalTree}
 						{@const attributeCount = numNonExemptGroupAttributes(evalGroup)}
 
 						<div class="attribute-group-body">
@@ -404,12 +388,16 @@
 						</div>
 					{/if}
 				</div>
-				
+
 				{#if section.subsections}
 					<div class="subsections-grid">
 						{#each section.subsections as subsection}
 							<details 
-								id={subsection.subHeader !== null ? slugifyCamelCase(subsection.subHeader) : slugifyCamelCase(subsection.header)}
+								id={(
+									subsection.subHeader !== null 
+										? slugifyCamelCase(subsection.subHeader) 
+										: slugifyCamelCase(subsection.title)
+								)}
 								aria-label={subsection.title}
 								data-icon={subsection.icon}
 								class="subsection"
@@ -421,39 +409,44 @@
 									<div class="summary-content">
 										<h3>{subsection.title}</h3>
 										
-										{#if subsection.cornerControl}
-											<div class="subsection-controls">{subsection.cornerControl}</div>
-										{:else if subsection.relevantVariants?.length > 0}
-											<div class="variant-controls">
-												{#if subsection.relevantVariants.length === 1}
-													<div class="variant-indicator">
-														<span class="variant-label">Only for</span>
-														<span class="variant-badge">
-															<span class="variant-icon">{@html variants[subsection.relevantVariants[0]].icon}</span>
-															<span>{variants[subsection.relevantVariants[0]].label}</span>
-														</span>
+										{#if subsection.relevantVariants.length === 1}
+											<div class="subsection-controls">
+												<div class="variant-indicator" title={`Only rated on the ${variantToName(subsection.relevantVariants[0], false)} version`}>
+													<span class="variant-label">Only</span>
+													<span class="variant-badge">
+														<span class="variant-icon">{@html variants[subsection.relevantVariants[0]].icon}</span>
+													</span>
+												</div>
+											</div>
+										{:else if subsection.relevantVariants.length > 1}
+											<div class="subsection-controls">
+												<div class="variant-selector">
+													<span class="variant-label">
+														{(
+															pickedVariant === null 
+																? 'Version:' 
+																: 'Viewing:'
+														)}
+													</span>
+													<div class="variant-buttons">
+														{#each subsection.relevantVariants as variant}
+															<button 
+																class="variant-button"
+																class:active={pickedVariant === variant}
+																onclick={() => updatePickedVariant(pickedVariant === variant ? null : variant)}
+																aria-pressed={pickedVariant === variant ? true : false}
+																title={(
+																	pickedVariant === variant 
+																		? 'Remove version filter' 
+																		: `View rating for ${variantToName(variant, false)} version`
+																)}
+															>
+																<span class="variant-icon">{@html variants[variant].icon}</span>
+																<span class="variant-name">{variants[variant].label}</span>
+															</button>
+														{/each}
 													</div>
-												{:else if subsection.relevantVariants.length > 1}
-													<div class="variant-selector">
-														<span class="variant-label">
-															{pickedVariant === null ? 'Select version:' : 'Viewing:'}
-														</span>
-														<div class="variant-buttons">
-															{#each subsection.relevantVariants as variant}
-																<button 
-																	class="variant-button"
-																	class:active={pickedVariant === variant}
-																	onclick={() => updatePickedVariant(pickedVariant === variant ? null : variant)}
-																	aria-pressed={pickedVariant === variant ? true : false}
-																	title={pickedVariant === variant ? 'Remove version filter' : `View rating for ${variantToName(variant, false)} version`}
-																>
-																	<span class="variant-icon">{@html variants[variant].icon}</span>
-																	<span class="variant-name">{variants[variant].label}</span>
-																</button>
-															{/each}
-														</div>
-													</div>
-												{/if}
+												</div>
 											</div>
 										{/if}
 									</div>
@@ -463,9 +456,11 @@
 									{#if subsection.caption}
 										<div class="subsection-caption">
 											<Typography 
-												content={typeof subsection.caption === 'string' 
-													? sentence(subsection.caption) 
-													: subsection.caption}
+												content={(
+													typeof subsection.caption === 'string' 
+														? sentence(subsection.caption) 
+														: subsection.caption
+												)}
 												strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
 											/>
 										</div>
@@ -474,35 +469,43 @@
 									<div class="subsection-body">
 										{#if subsection.evalAttr}
 											{@const relevantVariants = subsection.relevantVariants || []}
-											{@const thisVariantSpecificity = 
+											{@const thisVariantSpecificity = (
 												relevantVariants.length === 0 
 													? VariantSpecificity.ALL_SAME 
 													: relevantVariants.length === 1 
 														? VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT 
 														: VariantSpecificity.NOT_UNIVERSAL
-											}
-											{@const thisDisplayedVariant = 
+											)}
+											{@const thisDisplayedVariant = (
 												relevantVariants.length === 1 
 													? relevantVariants[0] 
 													: pickedVariant
-											}
+											)}
 											{@const evalAttrDetails = subsection.evalAttr.evaluation.details}
 											{@const qualRefs = toFullyQualified(subsection.evalAttr.evaluation.references || [])}
 											{@const override = getAttributeOverride(wallet, subsection.attrGroup.id, subsection.evalAttr.attribute.id)}
-											{@const howToImprove = override?.howToImprove !== undefined ? override.howToImprove : subsection.evalAttr.evaluation.howToImprove}
+											{@const howToImprove = (
+												override?.howToImprove !== undefined 
+													? override.howToImprove 
+													: subsection.evalAttr.evaluation.howToImprove
+											)}
 											
 											{@const variantSpecificCaption = (() => {
 												switch (thisVariantSpecificity) {
 													case VariantSpecificity.ALL_SAME:
 														return null
 													case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
-														return thisDisplayedVariant ? 
-															`This rating is only relevant for the ${variantToName(thisDisplayedVariant, false)} version.` : 
-															null
+														return (
+															thisDisplayedVariant 
+																? `This rating is only relevant for the ${variantToName(thisDisplayedVariant, false)} version.` 
+																: null
+														)
 													default:
-														return thisDisplayedVariant === null
-															? 'This rating differs across versions. Select a specific version for details.'
-															: `This rating is specific to the ${variantToName(thisDisplayedVariant, false)} version.`
+														return (
+															thisDisplayedVariant === null
+																? 'This rating differs across versions. Select a specific version for details.'
+																: `This rating is specific to the ${variantToName(thisDisplayedVariant, false)} version.`
+														)
 												}
 											})()}
 
@@ -574,20 +577,26 @@
 														<h5>Supported Hardware Wallets:</h5>
 														<div class="hw-wallet-list">
 															{#each subsection.evalAttr.evaluation.value.supportedHardwareWallets as hwWallet}
-																<div class="hw-wallet-badge" data-type={typeof hwWallet === 'string' ? hwWallet.toLowerCase() : ''}>
-																	{typeof hwWallet === 'string' ? 
-																		(() => {
-																			switch (hwWallet) {
-																				case 'LEDGER': return 'Ledger'
-																				case 'TREZOR': return 'Trezor'
-																				case 'KEYSTONE': return 'Keystone'
-																				case 'GRIDPLUS': return 'GridPlus'
-																				case 'KEEPKEY': return 'KeepKey'
-																				case 'FIREFLY': return 'FireFly'
-																				default: return hwWallet
-																			}
-																		})() : 'Unknown'
-																	}
+																<div class="hw-wallet-badge" data-type={(
+																	typeof hwWallet === 'string' 
+																		? hwWallet.toLowerCase() 
+																		: ''
+																)}>
+																	{(
+																		typeof hwWallet === 'string' 
+																			? (() => {
+																				switch (hwWallet) {
+																					case 'LEDGER': return 'Ledger'
+																					case 'TREZOR': return 'Trezor'
+																					case 'KEYSTONE': return 'Keystone'
+																					case 'GRIDPLUS': return 'GridPlus'
+																					case 'KEEPKEY': return 'KeepKey'
+																					case 'FIREFLY': return 'FireFly'
+																					default: return hwWallet
+																				}
+																			})() 
+																			: 'Unknown'
+																	)}
 																</div>
 															{/each}
 														</div>
@@ -598,11 +607,12 @@
 													<details class="accordion">
 														<summary>
 															<h4>
-																{subsection.evalAttr.evaluation.value.rating === Rating.PASS || 
-																subsection.evalAttr.evaluation.value.rating === Rating.UNRATED
-																	? 'Why does this matter?'
-																	: 'Why should I care?'
-																}
+																{(
+																	subsection.evalAttr.evaluation.value.rating === Rating.PASS || 
+																	subsection.evalAttr.evaluation.value.rating === Rating.UNRATED
+																		? 'Why does this matter?'
+																		: 'Why should I care?'
+																)}
 															</h4>
 														</summary>
 														<div class="accordion-content">
@@ -620,10 +630,11 @@
 													<details class="accordion">
 														<summary>
 															<h4>
-																{subsection.evalAttr.attribute.wording?.midSentenceName === null
-																	? (subsection.evalAttr.attribute.wording?.howIsEvaluated || 'How is this evaluated?')
-																	: `How is ${subsection.evalAttr.attribute.wording?.midSentenceName || 'this'} evaluated?`
-																}
+																{(
+																	subsection.evalAttr.attribute.wording?.midSentenceName === null
+																		? (subsection.evalAttr.attribute.wording?.howIsEvaluated || 'How is this evaluated?')
+																		: `How is ${subsection.evalAttr.attribute.wording?.midSentenceName || 'this'} evaluated?`
+																)}
 															</h4>
 														</summary>
 														<div class="accordion-content">
@@ -650,9 +661,9 @@
 																						<span>{mode}</span>
 																					{:else if mode && typeof mode === 'object' && 'contentType' in mode}
 																						<Typography 
-																							content={mode as TypographicContent}
-																							strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
-																						/>
+																								content={mode as TypographicContent}
+																								strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
+																							/>
 																					{:else}
 																						<span>Invalid content format</span>
 																					{/if}
@@ -675,24 +686,32 @@
 																		
 																		{#if subsection.evalAttr.attribute.ratingScale.pass}
 																			<div class="example-rating pass">
-																				<h6><span class="rating-icon pass">✓</span> Passing Rating Example</h6>
+																				<div class="example-header">
+																					<span class="rating-icon pass">✓</span>
+																					<Typography 
+																						content={{
+																								contentType: ContentType.MARKDOWN,
+																								markdown: 'A wallet would get a **passing** rating if...'
+																						}}
+																					/>
+																				</div>
 																				<ul>
 																					{#if Array.isArray(subsection.evalAttr.attribute.ratingScale.pass)}
 																						{#each subsection.evalAttr.attribute.ratingScale.pass as example}
-																							<li>
-																								<Typography 
-																									content={example.description}
-																									strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
-																								/>
-																							</li>
+																								<li>
+																									<Typography 
+																										content={example.description}
+																										strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
+																									/>
+																								</li>
 																						{/each}
 																					{:else}
 																						<li>
-																							<Typography 
-																								content={subsection.evalAttr.attribute.ratingScale.pass.description}
-																								strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
-																							/>
-																						</li>
+																								<Typography 
+																									content={subsection.evalAttr.attribute.ratingScale.pass.description}
+																									strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
+																								/>
+																							</li>
 																					{/if}
 																				</ul>
 																			</div>
@@ -700,24 +719,32 @@
 																		
 																		{#if subsection.evalAttr.attribute.ratingScale.partial}
 																			<div class="example-rating partial">
-																				<h6><span class="rating-icon partial">⚠️</span> Partial Rating Example</h6>
+																				<div class="example-header">
+																					<span class="rating-icon partial">⚠️</span>
+																					<Typography 
+																						content={{
+																								contentType: ContentType.MARKDOWN,
+																								markdown: 'A wallet would get a **partial** rating if...'
+																						}}
+																					/>
+																				</div>
 																				<ul>
 																					{#if Array.isArray(subsection.evalAttr.attribute.ratingScale.partial)}
 																						{#each subsection.evalAttr.attribute.ratingScale.partial as example}
-																							<li>
-																								<Typography 
-																									content={example.description}
-																									strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
-																								/>
-																							</li>
+																								<li>
+																									<Typography 
+																										content={example.description}
+																										strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
+																									/>
+																								</li>
 																						{/each}
 																					{:else}
 																						<li>
-																							<Typography 
-																								content={subsection.evalAttr.attribute.ratingScale.partial.description}
-																								strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
-																							/>
-																						</li>
+																								<Typography 
+																									content={subsection.evalAttr.attribute.ratingScale.partial.description}
+																									strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
+																								/>
+																							</li>
 																					{/if}
 																				</ul>
 																			</div>
@@ -725,24 +752,32 @@
 																		
 																		{#if subsection.evalAttr.attribute.ratingScale.fail}
 																			<div class="example-rating fail">
-																				<h6><span class="rating-icon fail">✗</span> Failing Rating Example</h6>
+																				<div class="example-header">
+																					<span class="rating-icon fail">✗</span>
+																					<Typography 
+																						content={{
+																								contentType: ContentType.MARKDOWN,
+																								markdown: 'A wallet would get a **failing** rating if...'
+																						}}
+																					/>
+																				</div>
 																				<ul>
 																					{#if Array.isArray(subsection.evalAttr.attribute.ratingScale.fail)}
 																						{#each subsection.evalAttr.attribute.ratingScale.fail as example}
-																							<li>
-																								<Typography 
-																									content={example.description}
-																									strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
-																								/>
-																							</li>
+																								<li>
+																									<Typography 
+																										content={example.description}
+																										strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
+																									/>
+																								</li>
 																						{/each}
 																					{:else}
 																						<li>
-																							<Typography 
-																								content={subsection.evalAttr.attribute.ratingScale.fail.description}
-																								strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
-																							/>
-																						</li>
+																								<Typography 
+																									content={subsection.evalAttr.attribute.ratingScale.fail.description}
+																									strings={{ WALLET_NAME: wallet?.metadata.displayName || '' }}
+																								/>
+																							</li>
 																					{/if}
 																				</ul>
 																			</div>
@@ -757,10 +792,20 @@
 														<details class="accordion">
 															<summary>
 																<h4>
-																	{subsection.evalAttr.attribute.wording?.midSentenceName === null
-																		? (subsection.evalAttr.attribute.wording?.whatCanWalletDoAboutIts || `What can ${wallet?.metadata.displayName} do about this?`)
-																		: `What can ${wallet?.metadata.displayName} do about its ${subsection.evalAttr.attribute.wording?.midSentenceName || 'feature'}?`
-																	}
+																	{#if subsection.evalAttr.attribute.wording?.midSentenceName === null}
+																		{#if subsection.evalAttr.attribute.wording?.whatCanWalletDoAboutIts}
+																			<Typography 
+																				content={subsection.evalAttr.attribute.wording?.whatCanWalletDoAboutIts}
+																				strings={{ 
+																					WALLET_NAME: wallet?.metadata.displayName || '',
+																				}}
+																			/>
+																		{:else}
+																				{`What can ${wallet?.metadata.displayName} do about this?`}
+																		{/if}
+																	{:else}
+																		{`What can ${wallet?.metadata.displayName} do about its ${subsection.evalAttr.attribute.wording?.midSentenceName || 'feature'}?`}
+																	{/if}
 																</h4>
 															</summary>
 															<div class="accordion-content">
@@ -778,7 +823,7 @@
 																		<div class="note-icon">ℹ️</div>
 																		<div class="note-content">
 																			<p>
-																				Note: This recommendation is specific to {wallet?.metadata.displayName} from the Wallet Beat team, not our general recommendation for all wallets of this type.
+																				{`Note: This recommendation is specific to ${wallet?.metadata.displayName} from the Wallet Beat team, not our general recommendation for all wallets of this type.`}
 																			</p>
 																		</div>
 																	</div>
@@ -1167,7 +1212,7 @@
 									font-weight: 600;
 								}
 
-								.variant-controls {
+								.subsection-controls {
 									display: flex;
 									align-items: center;
 									font-size: 0.85rem;
@@ -1193,6 +1238,10 @@
 											
 											.variant-icon {
 												font-size: 1rem;
+
+												:global(svg) {
+													fill: currentColor;
+												}
 											}
 										}
 									}
@@ -1301,9 +1350,13 @@
 										.attribute-details {
 											font-weight: 400;
 
-											.custom-content, .no-details {
-												font-style: italic;
+											.custom-content {
 												color: var(--text-secondary);
+											}
+
+											.no-details {
+												color: var(--text-secondary);
+												font-style: italic;
 											}
 										}
 									}
@@ -1364,6 +1417,14 @@
 
 											&:first-child {
 												margin-top: var(--spacing-md);
+											}
+
+											&::details-content {
+												transition-duration: 0.25s;
+											}
+
+											&:not([open])::details-content {
+												transform: translateY(-4px);
 											}
 
 											summary {
@@ -1462,7 +1523,7 @@
 																	margin-bottom: 0;
 																}
 																
-																h6 {
+																.example-header {
 																	margin: 0 0 0.5rem 0;
 																	font-size: 0.9rem;
 																	font-weight: 600;
