@@ -1,11 +1,11 @@
 <script
 	lang="ts"
 	generics="
-		Content extends TypographicContent
+		TypographicContent extends _TypographicContent
 	"
 >
 	// Types
-	import { ContentType, type TypographicContent } from '@/types/content'
+	import { ContentType, type TypographicContent as _TypographicContent } from '@/types/content'
 	import { renderStrings } from '@/types/utils/text'
 
 
@@ -14,8 +14,8 @@
 		content,
 		strings,
 	}: {
-		content: Content
-		strings?: Content extends TypographicContent<infer Strings> ? Strings : undefined
+		content: TypographicContent
+		strings?: TypographicContent extends _TypographicContent<infer Strings> ? Strings : undefined
 	} = $props()
 
 
