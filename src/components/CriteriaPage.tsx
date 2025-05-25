@@ -11,7 +11,6 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
-import type { TypographicContent } from '@/types/content'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
 import type { NavigationGroup } from '@/ui/organisms/Navigation'
 
