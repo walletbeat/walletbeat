@@ -43,6 +43,7 @@
 	import { onMount } from 'svelte'
 	import Pie from '@/ui/atoms/Pie.svelte'
 	import RenderCustomContent from '@/ui/atoms/RenderCustomContent.svelte'
+	import ReferenceLinks from '@/ui/atoms/ReferenceLinks.svelte'
 
 
 	// Props
@@ -580,20 +581,7 @@
 												</div>
 											{/if}
 
-											{#if qualRefs.length > 0}
-												<div class="attribute-references">
-													<h4>References</h4>
-													<ul>
-														{#each qualRefs as ref}
-															<li>
-																<a href={ref.urls?.[0]?.url || '#'} target="_blank" rel="noopener noreferrer">
-																	{ref.urls?.[0]?.label || ref.explanation || 'Reference'}
-																</a>
-															</li>
-														{/each}
-													</ul>
-												</div>
-											{/if}
+											<ReferenceLinks references={qualRefs} />
 
 											{#if attribute.id === 'hardwareWalletSupport' && 
 												evalAttr.evaluation.value && 
