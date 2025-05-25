@@ -1184,19 +1184,18 @@
 							}
 
 							.summary-content {
-								display: grid;
-								grid-template-columns: 1fr auto;
+								display: flex;
+								flex-wrap: wrap;
+								justify-content: space-between;
 								align-items: center;
 								position: relative;
 
 								&::after {
 									content: "▼";
 									font-size: 0.8rem;
-									position: absolute;
-									right: -1.5rem;
-									top: 50%;
-									transform: translateY(-50%);
+									padding-top: 0.15em;
 									opacity: 0.5;
+									transition: transform 0.2s ease;
 								}
 
 								h3 {
@@ -1258,7 +1257,7 @@
 						}
 
 						&[open] .summary-content::after {
-							content: "▲";
+							transform: rotateX(180deg);
 						}
 
 						.subsection-caption {
@@ -1343,6 +1342,9 @@
 
 											.custom-content {
 												color: var(--text-secondary);
+
+												display: grid;
+												gap: 1em;
 											}
 
 											.no-details {
@@ -1434,7 +1436,7 @@
 
 												&::after {
 													content: '▼';
-													margin-left: var(--spacing-md);
+													padding-top: 0.15em;
 													font-size: 0.8rem;
 													transition: transform 0.2s;
 												}
@@ -1445,7 +1447,7 @@
 											}
 
 											&[open] summary::after {
-												transform: rotate(180deg);
+												transform: rotateX(180deg);
 											}
 
 											.accordion-content {
