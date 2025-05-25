@@ -26,7 +26,6 @@
 	import { variantToName, variantUrlQuery } from '@/components/variants'
 	import type { MaybeUnratedScore } from '@/schema/score'
 
-
 	// Props
 	let {
 		wallet,
@@ -48,39 +47,34 @@
 		toggleExpanded?: (id: string) => void
 	} = $props()
 
-
 	// State
 	let activeEvaluationAttribute: string | undefined = $state(undefined)
 
-	let evalEntries = $derived(
-		evaluatedAttributesEntries(evalGroup)
-			.filter(([_, evalAttr]) => (
-				evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
-			))
-	)
-
-	let currentEvaluationAttribute = $derived(
-		activeEvaluationAttribute ?
-			evalGroup[activeEvaluationAttribute]
-		: selectedEvaluationAttribute ?
-			evalGroup[selectedEvaluationAttribute]
-		:
-			undefined
-	)
-
-
-	// Componnets
+	// Components
 	import Pie from '../atoms/Pie.svelte'
 	import Typography from '../atoms/Typography.svelte'
 	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 </script>
-
 
 <div 
 	class="container column"
 	role="button"
 	tabindex="0"
 >
+	{@const evalEntries = evaluatedAttributesEntries(evalGroup)
+		.filter(([_, evalAttr]) => (
+			evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
+		))}
+
+	{@const currentEvaluationAttribute = (
+		activeEvaluationAttribute ?
+			evalGroup[activeEvaluationAttribute]
+		: selectedEvaluationAttribute ?
+			evalGroup[selectedEvaluationAttribute]
+		:
+			undefined
+	)}
+
 	<!-- Rating Pie Chart -->
 	{#if groupScore === undefined || !isNonEmptyArray(evalEntries)}
 		<div>N/A</div>
@@ -193,8 +187,8 @@
 						content={currentEvaluationAttribute.evaluation.value.shortExplanation}
 						strings={{
 							WALLET_NAME: wallet.metadata.displayName,
-							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
 						}}
 					/>
 
