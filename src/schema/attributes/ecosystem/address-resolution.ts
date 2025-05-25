@@ -85,10 +85,14 @@ function evaluateAddressResolution(
 					rating: Rating.PASS,
 					displayName: `Resolves human-readable ${eipShortLabel(erc)} addresses`,
 					addressResolution,
-					shortExplanation: sentence(`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format.`),
+					shortExplanation: sentence(
+						`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format.`,
+					),
 					__brand: brand,
 				},
-				details: mdParagraph(`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format, such as \`${exampleAddress}\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. For more information on ${eipShortLabel(erc)} addresses, see ${eipMarkdownLinkAndTitle(erc)}.`),
+				details: mdParagraph(
+					`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format, such as \`${exampleAddress}\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. For more information on ${eipShortLabel(erc)} addresses, see ${eipMarkdownLinkAndTitle(erc)}.`,
+				),
 				references,
 			}
 		}
@@ -99,14 +103,20 @@ function evaluateAddressResolution(
 				rating,
 				displayName: `Resolves human-readable ${eipShortLabel(erc)} addresses offchain`,
 				addressResolution,
-				shortExplanation: sentence(`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format using an offchain provider.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format using an offchain provider.`,
+				),
 				__brand: brand,
 			},
-			details: mdParagraph(`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format, such as \`${exampleAddress}\`. ${offchainInfo} For more information on ${eipShortLabel(erc)} addresses, see ${eipMarkdownLinkAndTitle(erc)}.`),
+			details: mdParagraph(
+				`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format, such as \`${exampleAddress}\`. ${offchainInfo} For more information on ${eipShortLabel(erc)} addresses, see ${eipMarkdownLinkAndTitle(erc)}.`,
+			),
 			howToImprove:
 				walletShould === undefined
 					? undefined
-					: mdParagraph(`{{WALLET_NAME}} should use fully-onchain resolution to resolve the address, or should ${walletShould}.`),
+					: mdParagraph(
+							`{{WALLET_NAME}} should use fully-onchain resolution to resolve the address, or should ${walletShould}.`,
+						),
 			references,
 		}
 	}
@@ -117,11 +127,17 @@ function evaluateAddressResolution(
 				rating: Rating.FAIL,
 				displayName: 'No human-readable address resolution',
 				addressResolution,
-				shortExplanation: sentence(`{{WALLET_NAME}} does not resolve human-readable addresses such as ENS names.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} does not resolve human-readable addresses such as ENS names.`,
+				),
 				__brand: brand,
 			},
-			details: paragraph(`{{WALLET_NAME}} does not support resolving human-readable addresses, such as ENS (.eth) names.`),
-			howToImprove: markdown(`When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ENS (.eth) names.`),
+			details: paragraph(
+				`{{WALLET_NAME}} does not support resolving human-readable addresses, such as ENS (.eth) names.`,
+			),
+			howToImprove: markdown(
+				`When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ENS (.eth) names.`,
+			),
 			references,
 		}
 	}
@@ -132,10 +148,14 @@ function evaluateAddressResolution(
 				rating: Rating.PARTIAL,
 				displayName: 'Resolves basic ENS addresses',
 				addressResolution,
-				shortExplanation: sentence(`{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.`,
+				),
 				__brand: brand,
 			},
-			details: markdown(`{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. However, because such addresses do not contain information about the chain that the recipient would like to receive funds on, it is possible for the user to mistakenly send funds on the wrong chain.`),
+			details: markdown(
+				`{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. However, because such addresses do not contain information about the chain that the recipient would like to receive funds on, it is possible for the user to mistakenly send funds on the wrong chain.`,
+			),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should support sending funds to chain-specific human-readable addresses, as specified by either:
 
@@ -154,7 +174,9 @@ function evaluateAddressResolution(
 			rating: Rating.PARTIAL,
 			displayName: `Resolves basic ENS addresses offchain`,
 			addressResolution,
-			shortExplanation: sentence(`{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.`,
+			),
 			__brand: brand,
 		},
 		details: markdown(`
@@ -248,7 +270,9 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		exhaustive: false,
 		pass: [
 			exampleRating(
-				mdSentence(`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using onchain data.`),
+				mdSentence(
+					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using onchain data.`,
+				),
 				evaluateAddressResolution(
 					{
 						chainSpecificAddressing: {
@@ -269,7 +293,9 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 				).value,
 			),
 			exampleRating(
-				mdSentence(`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain provider in a verifiable and privacy-preserving manner.`),
+				mdSentence(
+					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain provider in a verifiable and privacy-preserving manner.`,
+				),
 				evaluateAddressResolution(
 					{
 						chainSpecificAddressing: {
@@ -287,13 +313,15 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 							support: 'NOT_SUPPORTED',
 						},
 					},
-					refs({})
+					refs({}),
 				).value,
 			),
 		],
 		partial: [
 			exampleRating(
-				mdSentence(`The wallet only resolves plain ENS addresses (\`username.eth\`) which do not include a destination chain.`),
+				mdSentence(
+					`The wallet only resolves plain ENS addresses (\`username.eth\`) which do not include a destination chain.`,
+				),
 				evaluateAddressResolution(
 					{
 						chainSpecificAddressing: {
@@ -313,7 +341,9 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 				).value,
 			),
 			exampleRating(
-				mdSentence(`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain third-party provider, without verifying the address.`),
+				mdSentence(
+					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain third-party provider, without verifying the address.`,
+				),
 				evaluateAddressResolution(
 					{
 						chainSpecificAddressing: {
@@ -335,7 +365,9 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 				).value,
 			),
 			exampleRating(
-				mdSentence(`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain third-party provider which may learn the user's IP address.`),
+				mdSentence(
+					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain third-party provider which may learn the user's IP address.`,
+				),
 				evaluateAddressResolution(
 					{
 						chainSpecificAddressing: {

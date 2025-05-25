@@ -1,22 +1,12 @@
 import { Typography } from '@mui/material'
-import type React from 'react'
 
-import { ContentType, type TypographicContent } from '@/types/content'
+import { ContentType, type TypographicContent as _TypographicContent } from '@/types/content'
+import type { Strings } from '@/types/utils/string-templates'
 import { renderStrings } from '@/types/utils/text'
 
 import { MarkdownTypography } from './MarkdownTypography'
 
-export function RenderTypographicContent<
-	TypographicContent_ extends TypographicContent,
->({
-	content,
-	textTransform,
-	typography,
-	strings,
-}: {
-	/** The typographic content to render. */
-	content: TypographicContent_
-
+type Props = {
 	/**
 	 * A text transformation applied to the text.
 	 * This happens after expansion of the text, but before rendering.
@@ -39,17 +29,46 @@ export function RenderTypographicContent<
 			| 'variant'
 		>
 	>
+}
 
-	/** A set of strings to be expanded in the text. */
-	strings?: TypographicContent_ extends TypographicContent<infer Strings> ? Strings : undefined,
-}): React.JSX.Element {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Override default null
+export function RenderTypographicContent<TypographicContent extends _TypographicContent<any>>(
+	props: (
+		& Props
+		& {
+			/** The typographic content to render. */
+			content: TypographicContent
+		}
+		& (
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments -- Explicitly handle null case for clarity
+			TypographicContent extends _TypographicContent<null> ?
+				{ strings?: never }
+			: TypographicContent extends _TypographicContent<infer _Strings> ?
+				{ strings: _Strings }
+			:
+				never
+		)
+	),
+): React.JSX.Element
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Override default null
+export function RenderTypographicContent<TypographicContent extends _TypographicContent<any>>(
+	props: (
+		& Props
+		& {
+			content: TypographicContent
+		}
+		& ({ strings?: never } | { strings: Strings })
+	),
+) {
+	const { content, textTransform, typography, strings } = props
+
 	const processText = (text: string) => {
-		if (textTransform) {
+		if (textTransform !== undefined) {
 			text = textTransform(text)
 		}
 
-		if(strings)
-			text = renderStrings(text, strings)
+		if (strings !== undefined)
+			text = renderStrings(text, props.strings)
 
 		return text.trim()
 	}
@@ -57,18 +76,11 @@ export function RenderTypographicContent<
 	switch (content.contentType) {
 		case ContentType.MARKDOWN:
 			return (
-				<MarkdownTypography
-					markdownTransform={processText}
-					{...typography}
-				>
+				<MarkdownTypography markdownTransform={processText} {...typography}>
 					{content.markdown}
 				</MarkdownTypography>
 			)
 		case ContentType.TEXT:
-			return (
-				<Typography {...typography}>
-					{processText(content.text)}
-				</Typography>
-			)
+			return <Typography {...typography}>{processText(content.text)}</Typography>
 	}
 }

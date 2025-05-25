@@ -10,7 +10,6 @@ import type { ResolvedFeatures } from '@/schema/features'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
 import { mergeRefs } from '@/schema/reference'
 import { type AtLeastOneVariant, Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
 import { daysSince } from '@/types/date'
@@ -52,15 +51,21 @@ function audited(
 			return {
 				rating: Rating.FAIL,
 				displayName: 'Last security audit older than a year, has unaddressed flaws',
-				shortExplanation: sentence(`The most recent security audit for {{WALLET_NAME}} is over a year old and some security flaws remain.`),
-				howToImprove: paragraph(`{{WALLET_NAME}} should fix the security flaws pointed out in past audits, then should undergo a new security audit.`),
+				shortExplanation: sentence(
+					`The most recent security audit for {{WALLET_NAME}} is over a year old and some security flaws remain.`,
+				),
+				howToImprove: paragraph(
+					`{{WALLET_NAME}} should fix the security flaws pointed out in past audits, then should undergo a new security audit.`,
+				),
 			}
 		}
 		if (!auditedInLastYear) {
 			return {
 				rating: Rating.PARTIAL,
 				displayName: 'Last security audit older than a year',
-				shortExplanation: sentence(`The most recent security audit for {{WALLET_NAME}} is over a year old.`),
+				shortExplanation: sentence(
+					`The most recent security audit for {{WALLET_NAME}} is over a year old.`,
+				),
 				howToImprove: paragraph(`{{WALLET_NAME}} should undergo a new security audit.`),
 			}
 		}
@@ -68,14 +73,20 @@ function audited(
 			return {
 				rating: Rating.PARTIAL,
 				displayName: 'Unaddressed security flaws',
-				shortExplanation: sentence(`{{WALLET_NAME}} has undergone a recent security audit, but some security flaws have not been addressed.`),
-				howToImprove: paragraph(`{{WALLET_NAME}} should fix the security flaws pointed out in past security audits, then should consider undergoing a new security audit.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} has undergone a recent security audit, but some security flaws have not been addressed.`,
+				),
+				howToImprove: paragraph(
+					`{{WALLET_NAME}} should fix the security flaws pointed out in past security audits, then should consider undergoing a new security audit.`,
+				),
 			}
 		}
 		return {
 			rating: Rating.PASS,
 			displayName: 'Recent flawless security audit',
-			shortExplanation: sentence(`{{WALLET_NAME}} has undergone a recent security audit with all faults addressed.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} has undergone a recent security audit with all faults addressed.`,
+			),
 			howToImprove: undefined,
 		}
 	})()
@@ -112,7 +123,9 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's security auditing track record evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do on the security auditing front?`),
+		whatCanWalletDoAboutIts: sentence(
+			`What can {{WALLET_NAME}} do on the security auditing front?`,
+		),
 	},
 	question: sentence(`Has the wallet's source code been reviewed by security auditors?`),
 	why: markdown(`
@@ -128,8 +141,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		is secure, and remains that way over time. Wallet development teams
 		typically publish such audits so that wallet users can feel safer knowing
 		that the wallet's source code was independently audited.
-			
-		`),
+	`),
 	methodology: markdown(`
 		Wallets are evaluated by their track record of published security audits.
 
@@ -151,7 +163,9 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			paragraph(`The wallet was audited within the last year, and all flaws of severity "medium" or higher are addressed.`),
+			paragraph(
+				`The wallet was audited within the last year, and all flaws of severity "medium" or higher are addressed.`,
+			),
 			audited([sampleSecurityAudit], true, false).value,
 		),
 		partial: [
@@ -160,7 +174,9 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 				audited([sampleSecurityAudit], false, false).value,
 			),
 			exampleRating(
-				paragraph(`The wallet was audited within the last year, and there remains at least one unaddressed security flaw of severity "medium" or higher.`),
+				paragraph(
+					`The wallet was audited within the last year, and there remains at least one unaddressed security flaw of severity "medium" or higher.`,
+				),
 				audited([sampleSecurityAudit], true, true).value,
 			),
 		],
@@ -170,7 +186,9 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 				noAudits().value,
 			),
 			exampleRating(
-				paragraph(`The wallet was audited over a year ago, has not been audited since, and there remains at least one unaddressed security flaw of severity "medium" or higher.`),
+				paragraph(
+					`The wallet was audited over a year ago, has not been audited since, and there remains at least one unaddressed security flaw of severity "medium" or higher.`,
+				),
 				audited([sampleSecurityAudit], false, true).value,
 			),
 		],

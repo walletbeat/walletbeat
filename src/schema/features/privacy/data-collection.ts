@@ -2,7 +2,6 @@ import type { MustRef, WithRef } from '@/schema/reference'
 import type { Dict } from '@/types/utils/dict'
 
 import type { Entity } from '../../entity'
-import type { WalletMetadata } from '../../wallet'
 
 /**
  * An enum representing when data collection or leak occurs.
@@ -463,8 +462,8 @@ export function leakedInfoName(leakedInfo: LeakedInfo) {
 			return { short: 'outgoing transactions', long: 'outgoing wallet transactions' } as const
 		case LeakedPersonalInfo.PSEUDONYM:
 			return {
-				short: '{{WALLET_PSEUDONYM_SINGULAR|username}}',
-				long: '{{WALLET_PSEUDONYM_SINGULAR|pseudonym}}',
+				short: '{{WALLET_PSEUDONYM_SINGULAR}}',
+				long: '{{WALLET_PSEUDONYM_SINGULAR}}',
 			} as const
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
 			return { short: 'Farcaster account', long: 'Farcaster account' } as const

@@ -93,7 +93,7 @@ interface FAQSchemaEntry {
 }
 
 // Function to generate FAQ structured data in LDJSON format
-function generateFaqSchema(sections: RichSection[], walletName: string): string {
+function generateFaqSchema(sections: RichSection[]): string {
 	// Extract questions and answers from sections
 	const faqEntries: FAQSchemaEntry[] = []
 
@@ -219,8 +219,6 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 					content={attrGroup.perWalletQuestion}
 					strings={{
 						WALLET_NAME: wallet.metadata.displayName,
-						WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-						WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
 					}}
 					typography={{
 						variant: 'caption',
@@ -375,8 +373,6 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							content={evalAttr.attribute.question}
 							strings={{
 								WALLET_NAME: wallet.metadata.displayName,
-								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-								WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
 							}}
 							typography={{
 								variant: 'caption',
@@ -438,7 +434,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			<script
 				type="application/ld+json"
 				dangerouslySetInnerHTML={{
-					__html: generateFaqSchema(sections, wallet.metadata.displayName),
+					__html: generateFaqSchema(sections),
 				}}
 			/>
 

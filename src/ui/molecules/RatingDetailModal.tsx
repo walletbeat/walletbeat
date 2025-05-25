@@ -289,8 +289,14 @@ export function RatingDetailContent<Vs extends ValueSet>({
 														content={evalAttr.evaluation.value.shortExplanation}
 														strings={{
 															WALLET_NAME: wallet.metadata.displayName,
-															WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-															WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+															WALLET_PSEUDONYM_SINGULAR:
+																wallet.metadata.pseudonymType === undefined
+																	? null
+																	: wallet.metadata.pseudonymType.singular,
+															WALLET_PSEUDONYM_PLURAL:
+																wallet.metadata.pseudonymType === undefined
+																	? null
+																	: wallet.metadata.pseudonymType.plural,
 														}}
 													/>
 												</div>

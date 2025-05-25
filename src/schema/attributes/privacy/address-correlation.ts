@@ -1,7 +1,6 @@
 import {
 	type Attribute,
 	type Evaluation,
-	type EvaluationData,
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
@@ -77,12 +76,12 @@ function linkable(
 				if (by === 'onchain') {
 					return {
 						rating: Rating.PARTIAL,
-						howToImprove: `The onchain registry for {{WALLET_PSEUDONYM_PLURAL|{{WALLET_NAME}} ${`${leakName}s`}}} should either not exist onchain, or should be structured such that a user's main wallet address may not be derived from it. The latter may be implemented using a stealth address registry.`,
+						howToImprove: `The onchain registry for {{WALLET_PSEUDONYM_PLURAL}} should either not exist onchain, or should be structured such that a user's main wallet address may not be derived from it. The latter may be implemented using a stealth address registry.`,
 					}
 				}
 				return {
 					rating: Rating.PARTIAL,
-					howToImprove: `{{WALLET_NAME}} should require user consent before allowing your {{WALLET_PSEUDONYM_SINGULAR|${leakName}}} to be linkable to your wallet address, and make it clear that this association will be known to ${by.name}.`,
+					howToImprove: `{{WALLET_NAME}} should require user consent before allowing your {{WALLET_PSEUDONYM_SINGULAR}} to be linkable to your wallet address, and make it clear that this association will be known to ${by.name}.`,
 				}
 			case LeakedPersonalInfo.IP_ADDRESS:
 				return {
@@ -104,7 +103,7 @@ function linkable(
 			shortExplanation: sentence(
 				worstLeak.by === 'onchain'
 					? `{{WALLET_NAME}} publishes your ${leakedInfoName(worstLeak.info).short} onchain.`
-					: `{{WALLET_NAME}} allows ${worstLeak.by.name} to link your wallet address with your ${leakedInfoName(worstLeak.info).short}.`
+					: `{{WALLET_NAME}} allows ${worstLeak.by.name} to link your wallet address with your ${leakedInfoName(worstLeak.info).short}.`,
 			),
 			worstLeak,
 			__brand: brand,
@@ -185,7 +184,9 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		midSentenceName: 'wallet address privacy',
 	},
 	question: sentence(`Is your wallet address linkable to other information about yourself?`),
-	why: paragraph(`Your wallet address is unique and permanent, which makes it easy for applications and companies like Chainalysis to track your activity. In web-privacy terms, it is worse than cookies: its record is permanent, publicly visible, and even tracks across multiple devices and websites. The more personal information is linkable to your wallet address, the more effective such tracking can be. It is therefore important to use a wallet that does its best to protect your information from being linked to your wallet address.`),
+	why: paragraph(
+		`Your wallet address is unique and permanent, which makes it easy for applications and companies like Chainalysis to track your activity. In web-privacy terms, it is worse than cookies: its record is permanent, publicly visible, and even tracks across multiple devices and websites. The more personal information is linkable to your wallet address, the more effective such tracking can be. It is therefore important to use a wallet that does its best to protect your information from being linked to your wallet address.`,
+	),
 	methodology: markdown(`
 		In order to qualify for a perfect rating on wallet address privacy, a
 		wallet must not, *by default*, allow any third-party to link your wallet
@@ -283,7 +284,9 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		}
 		return {
 			value: uncorrelated,
-			details: paragraph(`{{WALLET_NAME}} does not allow any third-party to link your wallet address to any personal information.`),
+			details: paragraph(
+				`{{WALLET_NAME}} does not allow any third-party to link your wallet address to any personal information.`,
+			),
 			references: allRefs,
 		}
 	},

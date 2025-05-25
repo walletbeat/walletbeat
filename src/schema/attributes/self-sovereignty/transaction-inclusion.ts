@@ -13,7 +13,6 @@ import {
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { isSupported } from '@/schema/features/support'
 import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { transactionInclusionDetailsContent } from '@/types/content/transaction-inclusion-details'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
@@ -46,7 +45,9 @@ function transactionSubmissionEvaluation({
 				id: 'no_l2_transaction_inclusion_support',
 				rating: Rating.FAIL,
 				displayName: 'No L2 force-inclusion support',
-				shortExplanation: sentence(`{{WALLET_NAME}} requires trusting intermediaries in order to withdraw funds from L2s.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} requires trusting intermediaries in order to withdraw funds from L2s.`,
+				),
 				__brand: brand,
 			},
 			details: transactionInclusionDetailsContent({
@@ -55,7 +56,9 @@ function transactionSubmissionEvaluation({
 				supportForceWithdrawal,
 				unsupportedL2s,
 			}),
-			howToImprove: paragraph(`{{WALLET_NAME}} should add support for creating force-withdrawal transactions for L2s and broadcasting them on L1.`),
+			howToImprove: paragraph(
+				`{{WALLET_NAME}} should add support for creating force-withdrawal transactions for L2s and broadcasting them on L1.`,
+			),
 			references,
 		}
 	}
@@ -65,7 +68,9 @@ function transactionSubmissionEvaluation({
 				id: 'l2_transaction_inclusion_supported_but_no_l1',
 				rating: Rating.PARTIAL,
 				displayName: 'Intermediaries required for L1 transactions',
-				shortExplanation: sentence(`{{WALLET_NAME}} relies on intermediaries when performing L1 transactions. This makes it possible for L1 transactions to be censored.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} relies on intermediaries when performing L1 transactions. This makes it possible for L1 transactions to be censored.`,
+				),
 				__brand: brand,
 			},
 			details: transactionInclusionDetailsContent({
@@ -74,7 +79,9 @@ function transactionSubmissionEvaluation({
 				supportForceWithdrawal,
 				unsupportedL2s,
 			}),
-			howToImprove: paragraph(`{{WALLET_NAME}} should add support for broadcasting L1 transaction over Ethereum\'s gossip layer if possible, or to allow users to use their own self-hosted Ethereum node to broadcast L1 transactions.`),
+			howToImprove: paragraph(
+				`{{WALLET_NAME}} should add support for broadcasting L1 transaction over Ethereum's gossip layer if possible, or to allow users to use their own self-hosted Ethereum node to broadcast L1 transactions.`,
+			),
 			references,
 		}
 	}
@@ -85,7 +92,9 @@ function transactionSubmissionEvaluation({
 				id: valueId,
 				rating: Rating.PARTIAL,
 				displayName: 'No force-withdrawal for some L2s',
-				shortExplanation: sentence(`{{WALLET_NAME}} does not implement L2 force-withdrawal transactions for all types of L2s.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} does not implement L2 force-withdrawal transactions for all types of L2s.`,
+				),
 				__brand: brand,
 			},
 			details: transactionInclusionDetailsContent({
@@ -94,7 +103,9 @@ function transactionSubmissionEvaluation({
 				supportForceWithdrawal,
 				unsupportedL2s,
 			}),
-			howToImprove: paragraph(`{{WALLET_NAME}} should add support for force-withdrawal transactions on all L2 types it supports.`),
+			howToImprove: paragraph(
+				`{{WALLET_NAME}} should add support for force-withdrawal transactions on all L2 types it supports.`,
+			),
 			references,
 		}
 	}
@@ -103,7 +114,9 @@ function transactionSubmissionEvaluation({
 			id: valueId,
 			rating: Rating.PASS,
 			displayName: 'Can force-withdraw from L2s',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports L2 force-withdrawal transactions for all L2 types.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports L2 force-withdrawal transactions for all L2 types.`,
+			),
 			__brand: brand,
 		},
 		details: transactionInclusionDetailsContent({
@@ -123,7 +136,9 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 	wording: {
 		midSentenceName: 'transaction inclusion',
 	},
-	question: sentence(`Can the wallet withdraw L2 funds to Ethereum L1 without relying on intermediaries?`),
+	question: sentence(
+		`Can the wallet withdraw L2 funds to Ethereum L1 without relying on intermediaries?`,
+	),
 	why: markdown(`
 		One of the core tenets of Ethereum is **censorship resistance**.
 		This means that users must be able to reliably get transactions
@@ -175,7 +190,9 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				paragraph(`The wallet supports force-withdrawal transactions on L2s, and can be configured to broadcast this transaction using a user's self-hosted L1 node.`),
+				paragraph(
+					`The wallet supports force-withdrawal transactions on L2s, and can be configured to broadcast this transaction using a user's self-hosted L1 node.`,
+				),
 				transactionSubmissionEvaluation({
 					supportsL1Broadcast: 'OWN_NODE',
 					supportAnyL2Transactions: [],
@@ -185,7 +202,9 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 				}).value,
 			),
 			exampleRating(
-				paragraph(`The wallet supports force-withdrawal transactions on L2s, and supports directly gossipping such transactions over the Ethereum L1 network.`),
+				paragraph(
+					`The wallet supports force-withdrawal transactions on L2s, and supports directly gossipping such transactions over the Ethereum L1 network.`,
+				),
 				transactionSubmissionEvaluation({
 					supportsL1Broadcast: 'SELF_GOSSIP',
 					supportAnyL2Transactions: [],
@@ -197,7 +216,9 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 		],
 		partial: [
 			exampleRating(
-				paragraph(`The wallet supports force-withdrawal transactions on L2s, but requires the use of a third-party RPC provider to submit the L1 transaction that it would take to initiate this force-withdrawal transaction.`),
+				paragraph(
+					`The wallet supports force-withdrawal transactions on L2s, but requires the use of a third-party RPC provider to submit the L1 transaction that it would take to initiate this force-withdrawal transaction.`,
+				),
 				transactionSubmissionEvaluation({
 					supportsL1Broadcast: 'NO',
 					supportAnyL2Transactions: [],
@@ -207,7 +228,9 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 				}).value,
 			),
 			exampleRating(
-				paragraph(`The wallet supports force-withdrawal transactions on some L2s, but not all of the L2s that are configured out of the box.`),
+				paragraph(
+					`The wallet supports force-withdrawal transactions on some L2s, but not all of the L2s that are configured out of the box.`,
+				),
 				transactionSubmissionEvaluation({
 					supportsL1Broadcast: 'NO',
 					supportAnyL2Transactions: [],

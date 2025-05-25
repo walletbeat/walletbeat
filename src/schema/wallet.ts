@@ -1,4 +1,4 @@
-import type { Paragraph, Content, TypographicContent } from '@/types/content'
+import type { Paragraph, TypographicContent } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 import type { Dict } from '@/types/utils/dict'
 import {
@@ -146,10 +146,10 @@ export interface AttributeOverride {
 	 * What the wallet should do to improve its rating on this attribute.
 	 * Overrides the eponymous field in `Evaluation`.
 	 */
-	howToImprove?: TypographicContent<{ 
-		WALLET_NAME: string;
-		WALLET_PSEUDONYM_SINGULAR?: string;
-		WALLET_PSEUDONYM_PLURAL?: string;
+	howToImprove?: TypographicContent<{
+		WALLET_NAME: string
+		WALLET_PSEUDONYM_SINGULAR: string | null
+		WALLET_PSEUDONYM_PLURAL: string | null
 	}>
 }
 

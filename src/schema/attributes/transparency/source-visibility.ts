@@ -2,7 +2,6 @@ import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/at
 import type { ResolvedFeatures } from '@/schema/features'
 import { licenseSourceIsVisible } from '@/schema/features/transparency/license'
 import { type ReferenceArray, toFullyQualified } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
 import { paragraph, sentence } from '@/types/content'
 import { sourceVisibilityDetailsContent } from '@/types/content/source-visibility-details'
 

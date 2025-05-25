@@ -8,7 +8,6 @@ import {
 import type { ResolvedFeatures } from '@/schema/features'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import type { AtLeastOneVariant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
@@ -27,14 +26,20 @@ function noFeeTransparency(): Evaluation<FeeTransparencyValue> {
 			id: 'no_fee_transparency',
 			rating: Rating.FAIL,
 			displayName: 'No fee transparency',
-			shortExplanation: sentence(`{{WALLET_NAME}} does not provide clear information about transaction fees.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} does not provide clear information about transaction fees.`,
+			),
 			feeTransparencyLevel: FeeTransparencyLevel.NONE,
 			disclosesWalletFees: false,
 			showsTransactionPurpose: false,
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} does not provide clear information about transaction fees before users confirm transactions. Users cannot easily understand how much they will pay in network fees or if there are any additional fees charged by the wallet.`),
-		howToImprove: paragraph(`{{WALLET_NAME}} should implement fee transparency by clearly displaying network fees before transaction confirmation and disclosing any additional fees charged by the wallet.`),
+		details: paragraph(
+			`{{WALLET_NAME}} does not provide clear information about transaction fees before users confirm transactions. Users cannot easily understand how much they will pay in network fees or if there are any additional fees charged by the wallet.`,
+		),
+		howToImprove: paragraph(
+			`{{WALLET_NAME}} should implement fee transparency by clearly displaying network fees before transaction confirmation and disclosing any additional fees charged by the wallet.`,
+		),
 	}
 }
 
@@ -47,14 +52,20 @@ function basicFeeTransparency(
 			id: 'basic_fee_transparency',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic fee transparency',
-			shortExplanation: sentence(`{{WALLET_NAME}} provides basic information about transaction fees.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} provides basic information about transaction fees.`,
+			),
 			feeTransparencyLevel: FeeTransparencyLevel.BASIC,
 			disclosesWalletFees,
 			showsTransactionPurpose,
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} provides basic information about network fees before transaction confirmation, but the information is limited. ${disclosesWalletFees ? 'The wallet does disclose any additional fees it charges.' : 'The wallet does not clearly disclose if it charges any additional fees.'} ${showsTransactionPurpose ? 'The wallet clearly shows the purpose of the transaction.' : 'The wallet does not clearly show the purpose of the transaction.'}`),
-		howToImprove: paragraph(`{{WALLET_NAME}} should improve fee transparency by providing more detailed breakdowns of network fees${!disclosesWalletFees ? ', clearly disclosing any additional wallet fees' : ''}${!showsTransactionPurpose ? ', and clearly showing the purpose of each transaction' : ''}.`),
+		details: paragraph(
+			`{{WALLET_NAME}} provides basic information about network fees before transaction confirmation, but the information is limited. ${disclosesWalletFees ? 'The wallet does disclose any additional fees it charges.' : 'The wallet does not clearly disclose if it charges any additional fees.'} ${showsTransactionPurpose ? 'The wallet clearly shows the purpose of the transaction.' : 'The wallet does not clearly show the purpose of the transaction.'}`,
+		),
+		howToImprove: paragraph(
+			`{{WALLET_NAME}} should improve fee transparency by providing more detailed breakdowns of network fees${!disclosesWalletFees ? ', clearly disclosing any additional wallet fees' : ''}${!showsTransactionPurpose ? ', and clearly showing the purpose of each transaction' : ''}.`,
+		),
 	}
 }
 
@@ -67,14 +78,20 @@ function detailedFeeTransparency(
 			id: 'detailed_fee_transparency',
 			rating: Rating.PARTIAL,
 			displayName: 'Detailed fee transparency',
-			shortExplanation: sentence(`{{WALLET_NAME}} provides detailed information about transaction fees.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} provides detailed information about transaction fees.`,
+			),
 			feeTransparencyLevel: FeeTransparencyLevel.DETAILED,
 			disclosesWalletFees,
 			showsTransactionPurpose,
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} provides detailed information about network fees before transaction confirmation, including a breakdown of gas costs. ${disclosesWalletFees ? 'The wallet does disclose any additional fees it charges.' : 'The wallet does not clearly disclose if it charges any additional fees.'} ${showsTransactionPurpose ? 'The wallet clearly shows the purpose of the transaction.' : 'The wallet does not clearly show the purpose of the transaction.'}`),
-		howToImprove: paragraph(`{{WALLET_NAME}} should improve fee transparency by ${!disclosesWalletFees ? 'clearly disclosing any additional wallet fees' : !showsTransactionPurpose ? 'clearly showing the purpose of each transaction' : 'providing comprehensive fee information including all components of the transaction cost'}.`),
+		details: paragraph(
+			`{{WALLET_NAME}} provides detailed information about network fees before transaction confirmation, including a breakdown of gas costs. ${disclosesWalletFees ? 'The wallet does disclose any additional fees it charges.' : 'The wallet does not clearly disclose if it charges any additional fees.'} ${showsTransactionPurpose ? 'The wallet clearly shows the purpose of the transaction.' : 'The wallet does not clearly show the purpose of the transaction.'}`,
+		),
+		howToImprove: paragraph(
+			`{{WALLET_NAME}} should improve fee transparency by ${!disclosesWalletFees ? 'clearly disclosing any additional wallet fees' : !showsTransactionPurpose ? 'clearly showing the purpose of each transaction' : 'providing comprehensive fee information including all components of the transaction cost'}.`,
+		),
 	}
 }
 
@@ -84,13 +101,17 @@ function comprehensiveFeeTransparency(): Evaluation<FeeTransparencyValue> {
 			id: 'comprehensive_fee_transparency',
 			rating: Rating.PASS,
 			displayName: 'Comprehensive fee transparency',
-			shortExplanation: sentence(`{{WALLET_NAME}} provides comprehensive information about all transaction fees.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} provides comprehensive information about all transaction fees.`,
+			),
 			feeTransparencyLevel: FeeTransparencyLevel.COMPREHENSIVE,
 			disclosesWalletFees: true,
 			showsTransactionPurpose: true,
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} provides comprehensive information about all fees before transaction confirmation. This includes a detailed breakdown of network fees, clear disclosure of any additional fees charged by the wallet, and a clear explanation of the transaction purpose. Users can make fully informed decisions about the cost of their transactions.`),
+		details: paragraph(
+			`{{WALLET_NAME}} provides comprehensive information about all fees before transaction confirmation. This includes a detailed breakdown of network fees, clear disclosure of any additional fees charged by the wallet, and a clear explanation of the transaction purpose. Users can make fully informed decisions about the cost of their transactions.`,
+		),
 	}
 }
 
@@ -135,22 +156,30 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			paragraph(`The wallet provides comprehensive fee information, including detailed breakdowns of network fees, clear disclosure of any additional wallet fees, and clear explanation of transaction purposes.`),
+			paragraph(
+				`The wallet provides comprehensive fee information, including detailed breakdowns of network fees, clear disclosure of any additional wallet fees, and clear explanation of transaction purposes.`,
+			),
 			comprehensiveFeeTransparency().value,
 		),
 		partial: [
 			exampleRating(
-				paragraph(`The wallet provides detailed information about network fees, but may not fully disclose additional wallet fees or clearly show transaction purposes.`),
+				paragraph(
+					`The wallet provides detailed information about network fees, but may not fully disclose additional wallet fees or clearly show transaction purposes.`,
+				),
 				detailedFeeTransparency(true, false).value,
 			),
 			exampleRating(
-				paragraph(`The wallet provides basic information about transaction fees, but the information is limited and may not include a breakdown of costs.`),
+				paragraph(
+					`The wallet provides basic information about transaction fees, but the information is limited and may not include a breakdown of costs.`,
+				),
 				basicFeeTransparency(false, true).value,
 			),
 		],
 		fail: [
 			exampleRating(
-				paragraph(`The wallet does not provide clear information about transaction fees before users confirm transactions.`),
+				paragraph(
+					`The wallet does not provide clear information about transaction fees before users confirm transactions.`,
+				),
 				noFeeTransparency().value,
 			),
 		],

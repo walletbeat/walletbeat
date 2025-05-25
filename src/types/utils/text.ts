@@ -1,39 +1,34 @@
 // Text manipulation utility functions.
+import type { Strings } from './string-templates'
 
 /**
- * Recursively replaces `{{KEY}}` or `{{KEY|fallback text}}` in the text with values from the given `strings` object.
- * 
+ * Recursively replaces `{{KEY}}` in the text with values from the given `strings` object.
+ *
  * @param text - The text to interpolate.
- * @param strings - The strings to use.
- * 
+ * @param strings - The strings to use. Some keys may map to null, but if the template contains this key, this function will fail.
+ *
  * @returns The interpolated text.
- * 
+ *
  * @example
  * ```ts
  * renderStrings('Hello {{NAME}}!'', { NAME: "John Doe" })
  * // -> "Hello John Doe!"
  * ```
- * 
- * @example
- * ```ts
- * renderStrings("Hello {{NAME|John Doe}}!", { NAME: undefined })
- * // -> "Hello John Doe!"
- * ```
  */
-export const renderStrings = (
-	text: string,
-	strings: Record<string, string | undefined>
-): string => (
-	text.replaceAll(
-		/\{\{(?<key>[^|{}]+)(?:\|(?<fallback>[^{}]+))?\}\}/g,
-		(match, key, fallback) => (
-			renderStrings(
-				strings[key as keyof typeof strings] ?? fallback ?? match,
-				strings
-			)
-		)
-	)
-)
+export function renderStrings(text: string, strings: Strings): string {
+	return text.replaceAll(/\{\{(?<key>[^|{}]+)\}\}/g, (_, key: string) => {
+		if (strings === null) {
+			throw new Error(`Tried to render template with unknown key ${key} (no replacements expected)`)
+		}
+		if (key in strings && strings[key] !== null) {
+			return renderStrings(strings[key], strings)
+		}
+		if (key in strings) {
+			throw new Error(`Tried to render template with key ${key} which was null`)
+		}
+		throw new Error(`Tried to render template with unknown key ${key}`)
+	})
+}
 
 /**
  * Slugify a camelCaseString into a-slug-like-this.

@@ -1,4 +1,4 @@
-import { type CustomContent } from '@/types/content'
+import type { CustomContent } from '@/types/content'
 import { AddressCorrelationDetails } from '@/ui/molecules/attributes/privacy/AddressCorrelationDetails'
 import { ChainVerificationDetails } from '@/ui/molecules/attributes/security/ChainVerificationDetails'
 import { ScamAlertDetails } from '@/ui/molecules/attributes/security/ScamAlertDetails'
@@ -9,13 +9,11 @@ import { LicenseDetails } from '@/ui/molecules/attributes/transparency/LicenseDe
 import { SourceVisibilityDetails } from '@/ui/molecules/attributes/transparency/SourceVisibilityDetails'
 import { UnratedAttribute } from '@/ui/molecules/attributes/UnratedAttribute'
 
-export function RenderCustomContent<
-	CustomContent_ extends CustomContent,
->({
+export function RenderCustomContent<CustomContent_ extends CustomContent>({
 	content,
 	...otherProps
 }: {
-	content: CustomContent_,
+	content: CustomContent_
 } & CustomContent_['component']['componentProps']) {
 	const { component, componentProps } = content.component
 

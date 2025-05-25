@@ -1,4 +1,4 @@
-import type { Paragraph, Content, TypographicContent, Sentence } from '@/types/content'
+import type { Content, Paragraph, Sentence, TypographicContent } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
 
 import type { ResolvedFeatures } from './features'
@@ -166,7 +166,11 @@ export interface Value {
 	 * Should be similar to `displayName` but may be formatted with the name
 	 * of the wallet.
 	 */
-	shortExplanation: Sentence<{ WALLET_NAME: string; WALLET_PSEUDONYM_SINGULAR?: string; WALLET_PSEUDONYM_PLURAL?: string }>
+	shortExplanation: Sentence<{
+		WALLET_NAME: string
+		WALLET_PSEUDONYM_SINGULAR: string | null
+		WALLET_PSEUDONYM_PLURAL: string | null
+	}>
 
 	/**
 	 * The visual representation of this value.
@@ -242,10 +246,10 @@ export interface Evaluation<V extends Value> {
 	 * to improve this rating. Should only be populated for ratings that are
 	 * not perfect.
 	 */
-	howToImprove?: TypographicContent<{ 
-		WALLET_NAME: string;
-		WALLET_PSEUDONYM_SINGULAR?: string;
-		WALLET_PSEUDONYM_PLURAL?: string;
+	howToImprove?: TypographicContent<{
+		WALLET_NAME: string
+		WALLET_PSEUDONYM_SINGULAR: string | null
+		WALLET_PSEUDONYM_PLURAL: string | null
 	}>
 
 	/**
@@ -284,7 +288,7 @@ export interface ExampleRating<V extends Value> {
 	 * Must start with "The wallet " (possibly after whitespace) or
 	 * "The wallet's ".
 	 */
-	description: Sentence<{ WALLET_NAME: string }> | Paragraph<{ WALLET_NAME: string }>
+	description: Sentence | Paragraph
 
 	/**
 	 * Match function that determines whether the given `value` matches this
@@ -318,83 +322,83 @@ export interface Attribute<V extends Value> {
 	displayName: string
 
 	wording:
-		| {
-				/**
-				 * A very short, human-readable name for the attribute in a sentence.
-				 * Should be no more than 3 or 4 words.
-				 * Used in the context of mid-sentence descriptions. For example, the
-				 * following string should make sense:
-				 * "Is this wallet's ${midSentenceName} good or bad?"
-				 * In most cases, a lowercase version of `displayName` will be appropriate.
-				 * In more complex cases, this should be omitted and the more complex
-				 * variation of `wording` should be used.
-				 */
-				midSentenceName: string
-		  }
-		| {
-				/**
-				 * midSentenceName can be set to `null` for more complex attribute
-				 * names.
-				 */
-				midSentenceName: null
+	| {
+		/**
+		 * A very short, human-readable name for the attribute in a sentence.
+		 * Should be no more than 3 or 4 words.
+		 * Used in the context of mid-sentence descriptions. For example, the
+		 * following string should make sense:
+		 * "Is this wallet's ${midSentenceName} good or bad?"
+		 * In most cases, a lowercase version of `displayName` will be appropriate.
+		 * In more complex cases, this should be omitted and the more complex
+		 * variation of `wording` should be used.
+		 */
+		midSentenceName: string
+	}
+	| {
+		/**
+		 * midSentenceName can be set to `null` for more complex attribute
+		 * names.
+		 */
+		midSentenceName: null
 
-				/** The sentence "How is <attribute> evaluated?"  */
-				howIsEvaluated: string
+		/** The sentence "How is <attribute> evaluated?"  */
+		howIsEvaluated: string
 
-				/** The sentence "What can <wallet> do about its <attribute>?" */
-				whatCanWalletDoAboutIts: Sentence<{ WALLET_NAME: string }>
-		  }
+		/** The sentence "What can <wallet> do about its <attribute>?" */
+		whatCanWalletDoAboutIts: Sentence<{ WALLET_NAME: string }>
+	}
 
 	/** A question explaining what question the attribute is answering. */
 	question: Sentence<{ WALLET_NAME: string }>
 
 	/** A paragraph explaining why this attribute is important to users. */
-	why: TypographicContent<{ WALLET_NAME: string }>
+	why: TypographicContent
 
 	/** General explanation of how wallets are rated on this attribute. */
-	methodology: TypographicContent<{ WALLET_NAME: string }>
+	methodology: TypographicContent
 
 	/** Explanations of what a wallet can do to achieve each rating. */
 	ratingScale:
-		| {
-				/**
-				 * The type of display used to render the rating scale.
-				 * "simple" means to render a simple renderable block of text, useful for
-				 * simple yes/no-type attributes.
-				 */
-				display: 'simple'
+	| {
+		/**
+		 * The type of display used to render the rating scale.
+		 * "simple" means to render a simple renderable block of text, useful for
+		 * simple yes/no-type attributes.
+		 */
+		display: 'simple'
 
-				/** The content to display to explain the rating scale. */
-				content: TypographicContent<{ WALLET_NAME: string }>
-		  }
-		| {
-				/**
-				 * The order in which each explanation below is displayed:
-				 * - "pass-fail": Passing examples first, failing examples last
-				 *   (partial examples in the middle, if any).
-				 * - "fail-pass": Failing examples first, passing examples last
-				 *   (partial examples in the middle, if any).
-				 */
-				display: 'pass-fail' | 'fail-pass'
+		/** The content to display to explain the rating scale. */
+		content: TypographicContent
+	}
+	| {
+		/**
+		 * The order in which each explanation below is displayed:
+		 * - "pass-fail": Passing examples first, failing examples last
+		 *   (partial examples in the middle, if any).
+		 * - "fail-pass": Failing examples first, passing examples last
+		 *   (partial examples in the middle, if any).
+		 */
+		display: 'pass-fail' | 'fail-pass'
 
-				/**
-				 * Whether the examples below exhaustively cover all cases that
-				 * are possible. This affects the wording around the examples.
-				 */
-				exhaustive: boolean
+		/**
+		 * Whether the examples below exhaustively cover all cases that
+		 * are possible. This affects the wording around the examples.
+		 */
+		exhaustive: boolean
 
-				/** One or more ways in which a wallet can achieve a passing rating. */
-				pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+		/** One or more ways in which a wallet can achieve a passing rating. */
+		pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
 
-				/**
-				 * Ways in which a wallet can achieve a partial rating.
-				 * Unlike passing/failing, there may be zero ways to get a partial rating.
-				 */
-				partial?: ExampleRating<V> | Array<ExampleRating<V>>
+		/**
+		 * Ways in which a wallet can achieve a partial rating.
+		 * Unlike passing/failing, there may be zero ways to get a partial rating.
+		 */
+		partial?: ExampleRating<V> | Array<ExampleRating<V>>
 
-				/** One or more ways in which a wallet can achieve a failing rating. */
-				fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
-		  }
+		/** One or more ways in which a wallet can achieve a failing rating. */
+		fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+	}
 
 	/**
 	 * Evaluate the attribute for a given set of wallet features.

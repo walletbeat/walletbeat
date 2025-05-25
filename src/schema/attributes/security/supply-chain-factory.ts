@@ -57,7 +57,9 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a factory wallet's supply chain evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its factory supply chain?`),
+		whatCanWalletDoAboutIts: sentence(
+			`What can {{WALLET_NAME}} do to improve its factory supply chain?`,
+		),
 	},
 	question: sentence(`Does {{WALLET_NAME}} have a secure and transparent factory supply chain?`),
 	why: markdown(
@@ -131,7 +133,9 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		if (features.variant !== Variant.HARDWARE) {
 			return exempt(
 				supplyChainFactory,
-				sentence(`This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.`),
+				sentence(
+					`This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.`,
+				),
 				brand,
 				{
 					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
@@ -164,11 +168,15 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 				id: 'Supply Chain Factory',
 				rating,
 				displayName: 'Supply Chain Factory',
-				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} factory supply chain.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} has ${rating.toLowerCase()} factory supply chain.`,
+				),
 				...withoutRefs,
 				__brand: brand,
 			},
-			details: paragraph(`{{WALLET_NAME}} factory supply chain evaluation is ${rating.toLowerCase()}.`),
+			details: paragraph(
+				`{{WALLET_NAME}} factory supply chain evaluation is ${rating.toLowerCase()}.`,
+			),
 			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}

@@ -27,16 +27,22 @@ export type AccountAbstractionValue = Value & {
 	__brand: 'attributes.ecosystem.account_abstraction'
 }
 
-function supportsErc4337AndEip7702(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
+function supportsErc4337AndEip7702(
+	references: ReferenceArray,
+): Evaluation<AccountAbstractionValue> {
 	return {
 		value: {
 			id: 'erc4337_and_eip7702_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports Account Abstraction via ERC-4337 and EIP-7702.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports Account Abstraction via ERC-4337 and EIP-7702.`,
+			),
 			__brand: brand,
 		},
-		details: markdown(`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)} and ${eipMarkdownLinkAndTitle(eip7702)}.`),
+		details: markdown(
+			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)} and ${eipMarkdownLinkAndTitle(eip7702)}.`,
+		),
 		references,
 	}
 }
@@ -50,7 +56,9 @@ function supportsErc4337(references: ReferenceArray): Evaluation<AccountAbstract
 			shortExplanation: sentence(`{{WALLET_NAME}} supports Account Abstraction via ERC-4337.`),
 			__brand: brand,
 		},
-		details: markdown(`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)}.`),
+		details: markdown(
+			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)}.`,
+		),
 		references,
 	}
 }
@@ -64,7 +72,9 @@ function supportsEip7702(references: ReferenceArray): Evaluation<AccountAbstract
 			shortExplanation: sentence(`{{WALLET_NAME}} supports Account Abstraction via EIP-7702.`),
 			__brand: brand,
 		},
-		details: markdown(`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(eip7702)}.`),
+		details: markdown(
+			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(eip7702)}.`,
+		),
 		references,
 	}
 }
@@ -75,12 +85,20 @@ function supportsEoaAndMpc(references: ReferenceArray): Evaluation<AccountAbstra
 			id: 'eoa_and_mpc_only',
 			rating: Rating.FAIL,
 			displayName: 'EOA & MPC only',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.`,
+			),
 			__brand: brand,
 		},
-		details: markdown(`{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.`),
-		impact: mdParagraph(`Users cannot use Account Abstraction features. However, EOA created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`),
-		howToImprove: markdown(`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`),
+		details: markdown(
+			`{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.`,
+		),
+		impact: mdParagraph(
+			`Users cannot use Account Abstraction features. However, EOA created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`,
+		),
+		howToImprove: markdown(
+			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
+		),
 		references,
 	}
 }
@@ -91,12 +109,20 @@ function supportsMpcOnly(references: ReferenceArray): Evaluation<AccountAbstract
 			id: 'mpc_only',
 			rating: Rating.FAIL,
 			displayName: 'MPC only',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.`,
+			),
 			__brand: brand,
 		},
-		details: markdown(`{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.`),
-		impact: mdParagraph(`Users cannot use Account Abstraction features. However, accounts created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`),
-		howToImprove: markdown(`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`),
+		details: markdown(
+			`{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.`,
+		),
+		impact: mdParagraph(
+			`Users cannot use Account Abstraction features. However, accounts created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`,
+		),
+		howToImprove: markdown(
+			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
+		),
 		references,
 	}
 }
@@ -107,12 +133,18 @@ function supportsRawEoaOnly(references: ReferenceArray): Evaluation<AccountAbstr
 			id: 'eoa_only',
 			rating: Rating.FAIL,
 			displayName: 'EOA only',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.`,
+			),
 			__brand: brand,
 		},
 		details: markdown(`{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.`),
-		impact: mdParagraph(`Users cannot use Account Abstraction features. However, accounts created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`),
-		howToImprove: markdown(`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`),
+		impact: mdParagraph(
+			`Users cannot use Account Abstraction features. However, accounts created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`,
+		),
+		howToImprove: markdown(
+			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
+		),
 		references,
 	}
 }
@@ -149,11 +181,15 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 		exhaustive: false,
 		pass: [
 			exampleRating(
-				mdSentence(`The wallet supports EOA accounts and can use Account Abstraction features via ${eipMarkdownLinkAndTitle(eip7702)}.`),
+				mdSentence(
+					`The wallet supports EOA accounts and can use Account Abstraction features via ${eipMarkdownLinkAndTitle(eip7702)}.`,
+				),
 				supportsEip7702([]).value,
 			),
 			exampleRating(
-				mdSentence(`The wallet supports smart wallet accounts using ${eipMarkdownLinkAndTitle(erc4337)}.`),
+				mdSentence(
+					`The wallet supports smart wallet accounts using ${eipMarkdownLinkAndTitle(erc4337)}.`,
+				),
 				supportsErc4337([]).value,
 			),
 		],
@@ -187,7 +223,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 			refs(features.accountSupport.rawErc4337),
 			refs(features.accountSupport.eip7702),
 		)
-		
+
 		if (supported.rawErc4337 && supported.eip7702) {
 			return supportsErc4337AndEip7702(allRefs)
 		}

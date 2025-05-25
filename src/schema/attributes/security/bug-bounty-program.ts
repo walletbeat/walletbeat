@@ -29,13 +29,19 @@ function noBugBountyProgram(): Evaluation<BugBountyProgramValue> {
 			id: 'no_bug_bounty_program',
 			rating: Rating.FAIL,
 			displayName: 'No bug bounty program',
-			shortExplanation: sentence(`{{WALLET_NAME}} does not implement a bug bounty program and doesn\'t provide security updates.`),
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} does not implement a bug bounty program and doesn't provide security updates.`,
+			),
 			programType: BugBountyProgramType.NONE,
 			upgradePathAvailable: false,
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} does not implement a bug bounty program and does not provide a clear path for security researchers to report vulnerabilities. The wallet also lacks a documented process for providing security updates to address critical issues.`),
-		howToImprove: paragraph(`{{WALLET_NAME}} should implement a bug bounty program to incentivize security researchers to responsibly disclose vulnerabilities. At minimum, the wallet should provide a clear vulnerability disclosure policy and ensure a process exists for providing security updates to users.`),
+		details: paragraph(
+			`{{WALLET_NAME}} does not implement a bug bounty program and does not provide a clear path for security researchers to report vulnerabilities. The wallet also lacks a documented process for providing security updates to address critical issues.`,
+		),
+		howToImprove: paragraph(
+			`{{WALLET_NAME}} should implement a bug bounty program to incentivize security researchers to responsibly disclose vulnerabilities. At minimum, the wallet should provide a clear vulnerability disclosure policy and ensure a process exists for providing security updates to users.`,
+		),
 	}
 }
 
@@ -47,13 +53,28 @@ function disclosureOnlyProgram(
 			id: 'disclosure_only_program',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic disclosure policy',
-			shortExplanation: mdSentence('{{WALLET_NAME}} implements a basic vulnerability disclosure policy but no formal bounty program.'),
+			shortExplanation: mdSentence(
+				`{{WALLET_NAME}} implements a basic vulnerability disclosure policy but no formal bounty program.`,
+			),
 			programType: BugBountyProgramType.DISCLOSURE_ONLY,
 			upgradePathAvailable: support.upgradePathAvailable,
 			__brand: brand,
 		},
-		details: mdParagraph(`{{WALLET_NAME}} implements a basic vulnerability disclosure policy, allowing security researchers to report issues. However, it does not offer financial incentives or a formal bug bounty program, which may limit the motivation for researchers to find and report vulnerabilities.\n${support.upgradePathAvailable ? "\n\nPositively, the wallet does provide an upgrade path for users when security issues are identified." : "\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified."}`),
-		howToImprove: mdParagraph(`{{WALLET_NAME}} should:\n- Implement a formal bug bounty program with clear rewards to incentivize security researchers\n${!support.upgradePathAvailable ? "- Establish a clear upgrade path for users when security vulnerabilities are discovered" : ""}\n- Provide transparent communication about security issues and their resolutions`),
+		details: markdown(`
+			{{WALLET_NAME}} implements a basic vulnerability disclosure policy, allowing security researchers to report issues. However, it does not offer financial incentives or a formal bug bounty program, which may limit the motivation for researchers to find and report vulnerabilities.
+
+			${
+				support.upgradePathAvailable
+					? `Positively, the wallet does provide an upgrade path for users when security issues are identified.`
+					: `Unfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.`
+			}
+		`),
+		howToImprove: markdown(`
+			{{WALLET_NAME}} should:
+			- Implement a formal bug bounty program with clear rewards to incentivize security researchers
+			${!support.upgradePathAvailable ? `- Establish a clear upgrade path for users when security vulnerabilities are discovered` : ''}
+			- Provide transparent communication about security issues and their resolutions
+		`),
 	}
 }
 
@@ -65,13 +86,24 @@ function basicBugBountyProgram(
 			id: 'basic_bug_bounty_program',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic bug bounty program',
-			shortExplanation: mdSentence('{{WALLET_NAME}} implements a basic bug bounty program but with limited scope or rewards.'),
+			shortExplanation: mdSentence(
+				`{{WALLET_NAME}} implements a basic bug bounty program but with limited scope or rewards.`,
+			),
 			programType: BugBountyProgramType.BASIC,
 			upgradePathAvailable: support.upgradePathAvailable,
 			__brand: brand,
 		},
-		details: mdParagraph(`{{WALLET_NAME}} implements a basic bug bounty program that offers some incentives for security researchers to find and report vulnerabilities. However, the program has limitations in terms of scope, reward size, or responsiveness.\n${support.upgradePathAvailable ? "\n\nPositively, the wallet provides an upgrade path for users when security issues are identified." : "\n\nUnfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified."}`),
-		howToImprove: mdParagraph(`{{WALLET_NAME}} should:\n- Expand the scope and increase rewards for their bug bounty program\n${!support.upgradePathAvailable ? "- Establish a clear upgrade path for users when security vulnerabilities are discovered" : ""}\n- Improve response times and transparency in the vulnerability handling process`),
+		details: markdown(`
+			{{WALLET_NAME}} implements a basic bug bounty program that offers some incentives for security researchers to find and report vulnerabilities. However, the program has limitations in terms of scope, reward size, or responsiveness.
+
+			${support.upgradePathAvailable ? `Positively, the wallet provides an upgrade path for users when security issues are identified.` : `Unfortunately, the wallet does not provide a clear upgrade path for users when security issues are identified.`}
+		`),
+		howToImprove: markdown(`
+			{{WALLET_NAME}} should:
+			- Expand the scope and increase rewards for their bug bounty program
+			${!support.upgradePathAvailable ? `- Establish a clear upgrade path for users when security vulnerabilities are discovered` : ''}
+			- Improve response times and transparency in the vulnerability handling process
+		`),
 	}
 }
 
@@ -83,15 +115,27 @@ function comprehensiveBugBountyProgram(
 			id: 'comprehensive_bug_bounty_program',
 			rating: Rating.PASS,
 			displayName: 'Comprehensive bug bounty program',
-			shortExplanation: mdSentence('{{WALLET_NAME}} implements a comprehensive bug bounty program with clear incentives and processes.'),
+			shortExplanation: mdSentence(
+				`{{WALLET_NAME}} implements a comprehensive bug bounty program with clear incentives and processes.`,
+			),
 			programType: BugBountyProgramType.COMPREHENSIVE,
 			upgradePathAvailable: support.upgradePathAvailable,
 			__brand: brand,
 		},
-		details: mdParagraph(`{{WALLET_NAME}} implements a comprehensive bug bounty program that offers strong incentives for security researchers to find and report vulnerabilities. The program has a wide scope, competitive rewards, and a responsive disclosure process.\n${support.upgradePathAvailable ? "\n\nAdditionally, the wallet provides a clear upgrade path for users when security issues are identified." : "\n\nHowever, the wallet should still improve by providing a clearer upgrade path for users when security issues are identified."}`),
+		details: markdown(`
+			{{WALLET_NAME}} implements a comprehensive bug bounty program that offers strong incentives for security researchers to find and report vulnerabilities. The program has a wide scope, competitive rewards, and a responsive disclosure process.
+
+			${
+				support.upgradePathAvailable
+					? `Additionally, the wallet provides a clear upgrade path for users when security issues are identified.`
+					: `However, the wallet should still improve by providing a clearer upgrade path for users when security issues are identified.`
+			}
+		`),
 		howToImprove: support.upgradePathAvailable
 			? undefined
-			: mdParagraph(`{{WALLET_NAME}} should establish a clearer upgrade path for users when security vulnerabilities are discovered, such as offering discounted replacements or firmware updates when possible.`),
+			: mdParagraph(
+					`{{WALLET_NAME}} should establish a clearer upgrade path for users when security vulnerabilities are discovered, such as offering discounted replacements or firmware updates when possible.`,
+				),
 	}
 }
 
@@ -102,9 +146,13 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a hardware wallet's bug bounty program evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its bug bounty program?`),
+		whatCanWalletDoAboutIts: sentence(
+			`What can {{WALLET_NAME}} do to improve its bug bounty program?`,
+		),
 	},
-	question: sentence(`Does {{WALLET_NAME}} implement a bug bounty program and provide security updates?`),
+	question: sentence(
+		`Does {{WALLET_NAME}} implement a bug bounty program and provide security updates?`,
+	),
 	why: markdown(`
 		Hardware wallets manage sensitive cryptographic keys and access to users' funds, making them high-value targets for attackers.
 		Bug bounty programs incentivize security researchers to responsibly discover and disclose vulnerabilities, rather than exploit them.

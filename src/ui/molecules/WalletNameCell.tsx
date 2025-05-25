@@ -145,6 +145,9 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 									marginBottom: '0.5rem',
 									color: 'var(--text-primary)',
 								}}
+								strings={{
+									WALLET_NAME: row.wallet.metadata.displayName,
+								}}
 							/>
 						)}
 					</div>

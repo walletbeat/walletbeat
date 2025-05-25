@@ -70,8 +70,14 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 						content={value.shortExplanation}
 						strings={{
 							WALLET_NAME: wallet.metadata.displayName,
-							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular,
-							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural,
+							WALLET_PSEUDONYM_SINGULAR:
+								wallet.metadata.pseudonymType === undefined
+									? null
+									: wallet.metadata.pseudonymType.singular,
+							WALLET_PSEUDONYM_PLURAL:
+								wallet.metadata.pseudonymType === undefined
+									? null
+									: wallet.metadata.pseudonymType.plural,
 						}}
 					/>
 				</Typography>
@@ -82,23 +88,20 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 						<li>
 							{isSupported(value.scamAlerts.sendTransactionWarning) ? (
 								<>
-									{listOrSingleText(
-										`{{WALLET_NAME}} helps you stay safe when sending funds by`,
-										[
-											value.scamAlerts.sendTransactionWarning.newRecipientWarning
-												? `
+									{listOrSingleText(`{{WALLET_NAME}} helps you stay safe when sending funds by`, [
+										value.scamAlerts.sendTransactionWarning.newRecipientWarning
+											? `
 													warning you when sending funds to an address you have
 													not sent or received funds from in the past
 												`
-												: null,
-											value.scamAlerts.sendTransactionWarning.userWhitelist
-												? `
+											: null,
+										value.scamAlerts.sendTransactionWarning.userWhitelist
+											? `
 													Allowing you to build a contact book of addresses and
 													warning you when sending funds to addresses not in it
 												`
-												: null,
-										],
-									)}
+											: null,
+									])}
 									{!value.sendTransactionWarning.privacyPreserving && (
 										<Typography variant="body1">
 											However, in doing so, it leaks{' '}

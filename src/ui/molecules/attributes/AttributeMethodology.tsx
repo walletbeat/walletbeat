@@ -155,10 +155,7 @@ function ExampleRatings<V extends Value>({
 			key: rating,
 			element: (
 				<React.Fragment>
-					<RenderTypographicContent
-						content={preamble}
-						typography={typographyPropsHeader}
-					/>
+					<RenderTypographicContent content={preamble} typography={typographyPropsHeader} />
 					<ul style={{ paddingLeft: '2rem' }}>
 						{ratingsList.map((exampleRating, index) =>
 							renderListItem(exampleRating, index, rating),
