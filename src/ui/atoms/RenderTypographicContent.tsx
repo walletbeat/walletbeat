@@ -1,15 +1,12 @@
 import { Typography } from '@mui/material'
 
-import { type TypographicContent as _TypographicContent, ContentType } from '@/types/content'
+import { ContentType, type TypographicContent as _TypographicContent } from '@/types/content'
 import type { Strings } from '@/types/utils/string-templates'
 import { renderStrings } from '@/types/utils/text'
 
 import { MarkdownTypography } from './MarkdownTypography'
 
-type Props<TypographicContent extends _TypographicContent> = {
-	/** The typographic content to render. */
-	content: TypographicContent
-
+type Props = {
 	/**
 	 * A text transformation applied to the text.
 	 * This happens after expansion of the text, but before rendering.
@@ -34,20 +31,34 @@ type Props<TypographicContent extends _TypographicContent> = {
 	>
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Explicitly handle null case for clarity
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Override default null
 export function RenderTypographicContent<TypographicContent extends _TypographicContent<any>>(
-	props: Props<TypographicContent> & (
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments -- Explicitly handle null case for clarity
-		TypographicContent extends _TypographicContent<null> ?
-			{ strings?: never }
-		: TypographicContent extends _TypographicContent<infer _Strings> ?
-			{ strings: _Strings }
-		:
-			never
+	props: (
+		& Props
+		& {
+			/** The typographic content to render. */
+			content: TypographicContent
+		}
+		& (
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments -- Explicitly handle null case for clarity
+			TypographicContent extends _TypographicContent<null> ?
+				{ strings?: never }
+			: TypographicContent extends _TypographicContent<infer _Strings> ?
+				{ strings: _Strings }
+			:
+				never
+		)
 	),
 ): React.JSX.Element
-export function RenderTypographicContent(
-	props: Props<_TypographicContent> & ({ strings?: never } | { strings: Strings }),
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Override default null
+export function RenderTypographicContent<TypographicContent extends _TypographicContent<any>>(
+	props: (
+		& Props
+		& {
+			content: TypographicContent
+		}
+		& ({ strings?: never } | { strings: Strings })
+	),
 ) {
 	const { content, textTransform, typography, strings } = props
 
