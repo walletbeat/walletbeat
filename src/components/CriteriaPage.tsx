@@ -157,7 +157,7 @@ export function CriteriaPage({
 									<h2 className="text-2xl font-extrabold text-accent">
 										{evalAttr.attribute.displayName}
 									</h2>
-									<div className="card">
+									<div className="card whitespace-pre-wrap">
 										<RenderContent
 											content={evalAttr.attribute.why.render({})}
 											typography={{ variant: 'body2' }}
