@@ -149,7 +149,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		keysHandling,
 		userSafety,
 	},
-	score: scoreGroup<SecurityValues>({
+	attributeWeights: {
 		securityAudits: 1.0,
 		scamPrevention: 1.0,
 		chainVerification: 1.0,
@@ -163,7 +163,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		firmware: 1.0,
 		keysHandling: 1.0,
 		userSafety: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for privacy Values. */
@@ -187,11 +187,11 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 		multiAddressCorrelation,
 		hardware_privacy: hardwarePrivacy,
 	},
-	score: scoreGroup<PrivacyValues>({
+	attributeWeights: {
 		addressCorrelation: 1.0,
 		multiAddressCorrelation: 1.0,
 		hardware_privacy: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for self-sovereignty Values. */
@@ -215,11 +215,11 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 		accountPortability,
 		transactionInclusion,
 	},
-	score: scoreGroup<SelfSovereigntyValues>({
+	attributeWeights: {
 		selfHostedNode: 1.0,
 		accountPortability: 1.0,
 		transactionInclusion: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for transparency Values. */
@@ -247,13 +247,13 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 		feeTransparency,
 		reputation,
 	},
-	score: scoreGroup<TransparencyValues>({
+	attributeWeights: {
 		openSource: 1.0,
 		sourceVisibility: 1.0,
 		funding: 1.0,
 		feeTransparency: 1.0,
 		reputation: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for ecosystem Values. */
@@ -279,12 +279,12 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		browserIntegration,
 		interoperability,
 	},
-	score: scoreGroup<EcosystemValues>({
+	attributeWeights: {
 		accountAbstraction: 1.0,
 		addressResolution: 1.0,
 		browserIntegration: 1.0,
 		interoperability: 1.0,
-	}),
+	},
 }
 
 /** A ValueSet for maintenance Values. */
@@ -304,9 +304,9 @@ export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	attributes: {
 		maintenance,
 	},
-	score: scoreGroup<MaintenanceValues>({
+	attributeWeights: {
 		maintenance: 1.0,
-	}),
+	},
 }
 
 /** The set of attribute groups that make up wallet attributes. */
@@ -643,40 +643,40 @@ export function getEvaluationFromOtherTree<V extends Value>(
 }
 
 /**
- * Generic function for scoring a group of evaluations.
- * @param weights A map from attribute name to its relative weight.
- * @returns A function to score the group of evaluations.
+ * Calculate a score for an attribute group based on its weights and evaluations.
+ * @param weights The weights for each attribute in the group.
+ * @param evaluations The evaluations to score.
+ * @returns A score between 0.0 (lowest) and 1.0 (highest) or null if exempt.
  */
-function scoreGroup<Vs extends ValueSet>(weights: { [k in keyof Vs]: number }): (
+export function calculateAttributeGroupScore<Vs extends ValueSet>(
+	weights: AttributeGroup<Vs>['attributeWeights'],
 	evaluations: EvaluatedGroup<Vs>,
-) => MaybeUnratedScore {
-	return (evaluations: EvaluatedGroup<Vs>): MaybeUnratedScore => {
-		const subScores: WeightedScore[] = nonEmptyValues<keyof Vs, WeightedScore | null>(
-			nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
-				const { value } = evaluations[key].evaluation
-				const score = value.score ?? defaultRatingScore(value.rating)
+): MaybeUnratedScore {
+	const subScores: WeightedScore[] = nonEmptyValues<keyof Vs, WeightedScore | null>(
+		nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
+			const { value } = evaluations[key].evaluation
+			const score = value.score ?? defaultRatingScore(value.rating)
 
-				return score === null
-					? null
-					: {
-							score,
-							weight,
-						}
-			}),
-		).filter(score => score !== null)
+			return score === null
+				? null
+				: {
+						score,
+						weight,
+					}
+		}),
+	).filter(score => score !== null)
 
-		if (isNonEmptyArray(subScores)) {
-			let hasUnratedComponent = false
+	if (isNonEmptyArray(subScores)) {
+		let hasUnratedComponent = false
 
-			for (const evalAttr of evaluatedAttributes(evaluations)) {
-				hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED
-			}
-
-			return { score: weightedScore(subScores), hasUnratedComponent }
+		for (const evalAttr of evaluatedAttributes(evaluations)) {
+			hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED
 		}
 
-		return null
+		return { score: weightedScore(subScores), hasUnratedComponent }
 	}
+
+	return null
 }
 
 /**

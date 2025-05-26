@@ -19,6 +19,7 @@ import { ratedSoftwareWallets, unratedSoftwareWallet } from '@/data/software-wal
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
 import type { EvaluationTree } from '@/schema/attribute-groups'
 import {
+	calculateAttributeGroupScore,
 	getAttributeGroupInTree,
 	mapNonExemptAttributeGroupsInTree,
 } from '@/schema/attribute-groups'
@@ -680,7 +681,8 @@ export default function WalletTable(): React.ReactElement {
 	function getOverallScore(wallet: RatedWallet): number {
 		const groupScores = mapNonExemptAttributeGroupsInTree(
 			wallet.overall,
-			(attrGroup, evalGroup) => attrGroup.score(evalGroup)?.score ?? 0,
+			(attrGroup, evalGroup) =>
+				calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)?.score ?? 0,
 		)
 
 		return groupScores.reduce((sum, score) => sum + score, 0)

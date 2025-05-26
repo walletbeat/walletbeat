@@ -1,6 +1,10 @@
 import { type ReactElement, useState } from 'react'
 
-import { mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
+import {
+	calculateAttributeGroupScore,
+	mapNonExemptGroupAttributes,
+	numNonExemptGroupAttributes,
+} from '@/schema/attribute-groups'
 import {
 	type AttributeGroup,
 	type EvaluatedGroup,
@@ -27,7 +31,7 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 	// Add state for the modal
 	const [modalOpen, setModalOpen] = useState(false)
 
-	const attrGroupScore = attrGroup.score(evalGroup)
+	const attrGroupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)
 
 	if (attrGroupScore === null) {
 		// All attributes in the group are exempt, can't render pie chart.
