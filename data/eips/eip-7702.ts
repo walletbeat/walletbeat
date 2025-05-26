@@ -1,12 +1,12 @@
-import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
+import { type Eip, EipPrefix, EipStatus } from '@/schema/eips';
 
 export const eip7702: Eip = {
-	friendlyName: 'Account Abstraction via smart contract authority delegation',
-	formalTitle: 'Set EOA account code',
-	number: '7702',
-	prefix: EipPrefix.EIP,
-	status: EipStatus.LAST_CALL,
-	summaryMarkdown: `
+  friendlyName: 'Account Abstraction via smart contract authority delegation',
+  formalTitle: 'Set EOA account code',
+  number: '7702',
+  prefix: EipPrefix.EIP,
+  status: EipStatus.LAST_CALL,
+  summaryMarkdown: `
 		Smart contract accounts require their own Ethereum address by definition.
 		EIP-7702 builds on top of ERC-4337 by allowing non-smart-contract accounts
 		(EOAs) to delegate their authority to smart contract accounts,
@@ -17,7 +17,7 @@ export const eip7702: Eip = {
 		effectively delegating control of the account to the smart contract
 		without requiring the user's address to change.
 	`,
-	whyItMattersMarkdown: `
+  whyItMattersMarkdown: `
 		EIP-7702 allows users of Ethereum to use smart contract account features
 		with minimal changes to the protocol. This gives users better UX and more
 		flexibility over how their wallet is secured and recoverable, can be
@@ -26,4 +26,4 @@ export const eip7702: Eip = {
 		[Account Abstraction](https://ethereum.org/en/roadmap/account-abstraction/)
 		for more information.
 	`,
-}
+};

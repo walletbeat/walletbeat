@@ -3,11 +3,14 @@
 	"trailingComma": "all",
 	"printWidth": 100,
 	"tabWidth": 2,
-	"semi": false,
-	"jsxSingleQuote": false,
+	"semi": true,
+	"jsxSingleQuote": true,
 	"bracketSameLine": false,
 	"arrowParens": "avoid",
 	"endOfLine": "auto",
-	"useTabs": true,
-	"plugins": ["prettier-plugin-astro", "prettier-plugin-curly"]
+	"useTabs": false,
+	"plugins": [
+		"prettier-plugin-astro",
+		"prettier-plugin-curly"
+	]
 }

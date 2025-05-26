@@ -4,6 +4,7 @@ import '../global.css'
 
 // Props
 import type { ComponentProps } from 'astro/types'
+import { ClientRouter } from 'astro:transitions'
 
 type Props = {
 	metadata: ComponentProps<typeof Metadata>['metadata']
@@ -14,6 +15,7 @@ const { metadata } = Astro.props
 // Components
 import Metadata from '@/components/Metadata.astro'
 import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
+import { NavigationStateManager } from '@/components/NavigationStateManager'
 ---
 
 <!doctype html>
@@ -22,6 +24,7 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<Metadata {metadata} />
+		<ClientRouter />
 		<!-- Theme initialization script -->
 		<script is:inline>
 			// Initialize theme from localStorage or system preference
@@ -47,6 +50,7 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 	</head>
 	<body>
 		<ThemeRegistry>
+			<NavigationStateManager client:load />
 			<slot />
 		</ThemeRegistry>
 	</body>

@@ -1,105 +1,106 @@
-import { getEip } from '@/data/eips'
-import { eip1193 } from '@/data/eips/eip-1193'
-import { eip2700 } from '@/data/eips/eip-2700'
-import { eip6963 } from '@/data/eips/eip-6963'
+import { getEip } from '@/data/eips';
+import { eip1193 } from '@/data/eips/eip-1193';
+import { eip2700 } from '@/data/eips/eip-2700';
+import { eip6963 } from '@/data/eips/eip-6963';
 import {
-	type Attribute,
-	type Evaluation,
-	exampleRating,
-	Rating,
-	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+  type Attribute,
+  type Evaluation,
+  exampleRating,
+  Rating,
+  type Value,
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
-	featureSupported,
-	isSupported,
-	notSupported,
-	type Support,
-} from '@/schema/features/support'
-import { popRefs, type WithRef } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
-import { commaListFormat } from '@/types/utils/text'
+  featureSupported,
+  isSupported,
+  notSupported,
+  type Support,
+} from '@/schema/features/support';
+import { popRefs, type WithRef } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
+import { commaListFormat } from '@/types/utils/text';
 
-import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
-import type { BrowserIntegrationEip } from '../../features/ecosystem/integration'
-import { Variant } from '../../variants'
-import { exempt, pickWorstRating, unrated } from '../common'
+import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips';
+import type { BrowserIntegrationEip } from '../../features/ecosystem/integration';
+import { Variant } from '../../variants';
+import { exempt, pickWorstRating, unrated } from '../common';
 
-type ResolvedSupport = Record<BrowserIntegrationEip, Support>
+type ResolvedSupport = Record<BrowserIntegrationEip, Support>;
 
-const brand = 'attributes.ecosystem.browser_integration'
+const brand = 'attributes.ecosystem.browser_integration';
+
 export type BrowserIntegrationValue = Value & {
-	support?: ResolvedSupport
-	__brand: 'attributes.ecosystem.browser_integration'
-}
+  support?: ResolvedSupport;
+  __brand: 'attributes.ecosystem.browser_integration';
+};
 
 function browserIntegrationSupport(
-	support: WithRef<ResolvedSupport>,
+  support: WithRef<ResolvedSupport>,
 ): Evaluation<BrowserIntegrationValue> {
-	const { refs, withoutRefs } = popRefs<ResolvedSupport>(support)
+  const { refs, withoutRefs } = popRefs<ResolvedSupport>(support);
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
-	const supported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
-		.filter(([_, v]) => isSupported(v))
-		.map(([k, _]) => k) as BrowserIntegrationEip[]
+  const supported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
+    .filter(([_, v]) => isSupported(v))
+    .map(([k, _]) => k) as BrowserIntegrationEip[];
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
-	const unsupported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
-		.filter(([_, v]) => !isSupported(v))
-		.map(([k, _]) => k) as BrowserIntegrationEip[]
+  const unsupported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
+    .filter(([_, v]) => !isSupported(v))
+    .map(([k, _]) => k) as BrowserIntegrationEip[];
 
-	if (supported.length === 0) {
-		return {
-			value: {
-				id: 'no_support',
-				rating: Rating.FAIL,
-				displayName: 'No browser integration',
-				support,
-				shortExplanation: sentence(
-					(walletMetadata: WalletMetadata) => `
+  if (supported.length === 0) {
+    return {
+      value: {
+        id: 'no_support',
+        rating: Rating.FAIL,
+        displayName: 'No browser integration',
+        support,
+        shortExplanation: sentence(
+          (walletMetadata: WalletMetadata) => `
 						${walletMetadata.displayName} does not integrate with the browser in a standard way.
 					`,
-				),
-				__brand: brand,
-			},
-			details: paragraph(
-				({ wallet }) => `
+        ),
+        __brand: brand,
+      },
+      details: paragraph(
+        ({ wallet }) => `
 					${wallet.metadata.displayName} does not adhere to any of the Ethereum standards for
 					integration in web browsers.
 				`,
-			),
-			howToImprove: markdown(
-				({ wallet }) => `
+      ),
+      howToImprove: markdown(
+        ({ wallet }) => `
 					${wallet.metadata.displayName} should integrate with the browser
 					using an Ethereum standard, such as ${eipMarkdownLink(eip1193)}
 					or the newer ${eipMarkdownLink(eip6963)}.
 				`,
-			),
-			references: refs,
-		}
-	}
-	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL
-	return {
-		value: {
-			id: `support_${supported.join('_')}`,
-			rating,
-			displayName:
-				unsupported.length === 0
-					? 'Fully-compliant browser integration'
-					: 'Partially-compliant browser integration',
-			support,
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
+      ),
+      references: refs,
+    };
+  }
+
+  const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL;
+
+  return {
+    value: {
+      id: `support_${supported.join('_')}`,
+      rating,
+      displayName:
+        unsupported.length === 0
+          ? 'Fully-compliant browser integration'
+          : 'Partially-compliant browser integration',
+      support,
+      shortExplanation: sentence(
+        (walletMetadata: WalletMetadata) => `
 					${walletMetadata.displayName} supports
 					${unsupported.length === 0 ? 'all' : 'a subset of'} the prominent standards for
 					web browser integration.
 				`,
-			),
-			__brand: brand,
-		},
-		details: markdown(
-			({ wallet }) => `
+      ),
+      __brand: brand,
+    },
+    details: markdown(
+      ({ wallet }) => `
 				${wallet.metadata.displayName} supports
 				${unsupported.length === 0 ? 'all' : 'a subset of'} the prominent standards for
 				web browser integration:
@@ -108,31 +109,31 @@ function browserIntegrationSupport(
 				${isSupported(support['2700']) ? `* ${eipMarkdownLinkAndTitle(eip2700)}` : ''}
 				${isSupported(support['6963']) ? `* ${eipMarkdownLinkAndTitle(eip6963)}` : ''}
 			`,
-		),
-		howToImprove:
-			unsupported.length === 0
-				? undefined
-				: markdown(
-						({ wallet }) => `
+    ),
+    howToImprove:
+      unsupported.length === 0
+        ? undefined
+        : markdown(
+            ({ wallet }) => `
 							${wallet.metadata.displayName} should implement
 							${commaListFormat(unsupported.map(eipNum => eipMarkdownLink(getEip(eipNum))))}.
 						`,
-					),
-		references: refs,
-	}
+          ),
+    references: refs,
+  };
 }
 
 export const browserIntegration: Attribute<BrowserIntegrationValue> = {
-	id: 'browserIntegration',
-	icon: '\u{1f310}', // Globe with Meridians
-	displayName: 'Browser integration',
-	wording: {
-		midSentenceName: 'browser integration',
-	},
-	question: sentence(`
+  id: 'browserIntegration',
+  icon: '\u{1f310}', // Globe with Meridians
+  displayName: 'Browser integration',
+  wording: {
+    midSentenceName: 'browser integration',
+  },
+  question: sentence(`
 		Does the wallet comply with web browser integration standards?
 	`),
-	why: markdown(`
+  why: markdown(`
 		Web applications that want to integrate with Ethereum should not have to
 		write code specific to the wallet that the user has installed. For this
 		reason, the Ethereum community has defined web browser integration
@@ -144,7 +145,7 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 		ensures compatibility across wallets, and ensures that the Ethereum wallet
 		ecosystem remains competitive thanks to wallet interoperability.
 	`),
-	methodology: markdown(`
+  methodology: markdown(`
 		Wallets are rated based on whether they implement the following Ethereum
 		standards for web browser integration:
 
@@ -154,60 +155,63 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 
 		For multi-platform wallets, only the web browser version is assessed.
 	`),
-	ratingScale: {
-		display: 'pass-fail',
-		exhaustive: true,
-		pass: exampleRating(
-			sentence(`
+  ratingScale: {
+    display: 'pass-fail',
+    exhaustive: true,
+    pass: exampleRating(
+      sentence(`
 				The wallet implements all listed web browser integration standards.
 			`),
-			browserIntegrationSupport({
-				'1193': featureSupported,
-				'2700': featureSupported,
-				'6963': featureSupported,
-			}).value,
-		),
-		partial: exampleRating(
-			sentence(`
+      browserIntegrationSupport({
+        '1193': featureSupported,
+        '2700': featureSupported,
+        '6963': featureSupported,
+      }).value,
+    ),
+    partial: exampleRating(
+      sentence(`
 				The wallet implements some but not all listed web browser integration standards.
 			`),
-			browserIntegrationSupport({
-				'1193': featureSupported,
-				'2700': featureSupported,
-				'6963': notSupported,
-			}).value,
-		),
-		fail: exampleRating(
-			sentence(`
+      browserIntegrationSupport({
+        '1193': featureSupported,
+        '2700': featureSupported,
+        '6963': notSupported,
+      }).value,
+    ),
+    fail: exampleRating(
+      sentence(`
 				The wallet implements none of the listed web browser integration standards.
 			`),
-			browserIntegrationSupport({
-				'1193': notSupported,
-				'2700': notSupported,
-				'6963': notSupported,
-			}).value,
-		),
-	},
-	evaluate: (features: ResolvedFeatures): Evaluation<BrowserIntegrationValue> => {
-		if (features.variant !== Variant.BROWSER) {
-			return exempt(
-				browserIntegration,
-				sentence('Only browser-based wallets are rated on their browser integration support.'),
-				brand,
-				{},
-			)
-		}
-		if (features.integration.browser === 'NOT_A_BROWSER_WALLET') {
-			throw new Error(
-				'Attempted to rate a browser-wallet with features.integration.browser set to NOT_A_BROWSER_WALLET',
-			)
-		}
-		if (Object.values(features.integration.browser).includes(null)) {
-			return unrated(browserIntegration, brand, {})
-		}
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that none of the values are null.
-		const browserIntegrationEips = features.integration.browser as WithRef<ResolvedSupport>
-		return browserIntegrationSupport(browserIntegrationEips)
-	},
-	aggregate: pickWorstRating<BrowserIntegrationValue>,
-}
+      browserIntegrationSupport({
+        '1193': notSupported,
+        '2700': notSupported,
+        '6963': notSupported,
+      }).value,
+    ),
+  },
+  evaluate: (features: ResolvedFeatures): Evaluation<BrowserIntegrationValue> => {
+    if (features.variant !== Variant.BROWSER) {
+      return exempt(
+        browserIntegration,
+        sentence('Only browser-based wallets are rated on their browser integration support.'),
+        brand,
+        {},
+      );
+    }
+
+    if (features.integration.browser === 'NOT_A_BROWSER_WALLET') {
+      throw new Error(
+        'Attempted to rate a browser-wallet with features.integration.browser set to NOT_A_BROWSER_WALLET',
+      );
+    }
+
+    if (Object.values(features.integration.browser).includes(null)) {
+      return unrated(browserIntegration, brand, {});
+    }
+
+    const browserIntegrationEips = features.integration.browser as WithRef<ResolvedSupport>;
+
+    return browserIntegrationSupport(browserIntegrationEips);
+  },
+  aggregate: pickWorstRating<BrowserIntegrationValue>,
+};

@@ -1,20 +1,20 @@
-import { remap } from './remap'
+import { remap } from './remap';
 
 /**
  * A Partial<Record<K, V>> that is guaranteed to have at least one element.
  */
 export type NonEmptyRecord<K extends string | number | symbol, V> = {
-	[P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, V>>
-}[K]
+  [P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, V>>;
+}[K];
 
 /**
  * An array that is guaranteed to have at least one element.
  */
-export type NonEmptyArray<T> = T[] & ([T, ...T[]] | [...T[], T])
+export type NonEmptyArray<T> = T[] & ([T, ...T[]] | [...T[], T]);
 
 /** Type predicate for NonEmptyArray. */
 export function isNonEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
-	return arr.length > 0
+  return arr.length > 0;
 }
 
 /**
@@ -23,20 +23,20 @@ export function isNonEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
  * @returns A non-empty array of keys.
  */
 export function nonEmptyKeys<
-	K extends string | number | symbol,
-	V,
-	R extends NonEmptyRecord<K, V> = NonEmptyRecord<K, V>,
+  K extends string | number | symbol,
+  V,
+  R extends NonEmptyRecord<K, V> = NonEmptyRecord<K, V>,
 >(rec: R): NonEmptyArray<keyof R> {
-	return Object.keys(rec) as NonEmptyArray<keyof R> // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input record was non-empty.
+  return Object.keys(rec) as NonEmptyArray<keyof R>;
 }
 
 /**
  * Returns the set of keys of the given record.
  */
 export function nonEmptyKeySet<K extends string | number | symbol>(
-	rec: NonEmptyRecord<K, unknown>,
+  rec: NonEmptyRecord<K, unknown>,
 ): NonEmptySet<K> {
-	return nonEmptySetFromArray(nonEmptyKeys(rec))
+  return nonEmptySetFromArray(nonEmptyKeys(rec));
 }
 
 /**
@@ -45,9 +45,9 @@ export function nonEmptyKeySet<K extends string | number | symbol>(
  * @returns A non-empty array of values.
  */
 export function nonEmptyValues<K extends string | number | symbol, V>(
-	rec: NonEmptyRecord<K, V>,
+  rec: NonEmptyRecord<K, V>,
 ): NonEmptyArray<V> {
-	return Object.values(rec) as NonEmptyArray<V> // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input record was non-empty.
+  return Object.values(rec) as NonEmptyArray<V>;
 }
 
 /**
@@ -56,11 +56,11 @@ export function nonEmptyValues<K extends string | number | symbol, V>(
  * @returns A non-empty array of entries.
  */
 export function nonEmptyEntries<
-	K extends string | number | symbol,
-	V,
-	R extends NonEmptyRecord<K, V> = NonEmptyRecord<K, V>,
+  K extends string | number | symbol,
+  V,
+  R extends NonEmptyRecord<K, V> = NonEmptyRecord<K, V>,
 >(rec: R): NonEmptyArray<[keyof R, V]> {
-	return Object.entries(rec) as NonEmptyArray<[keyof R, V]> // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input record was non-empty.
+  return Object.entries(rec) as NonEmptyArray<[keyof R, V]>;
 }
 
 /**
@@ -69,10 +69,10 @@ export function nonEmptyEntries<
  * @param fn A mapping function that is guaranteed to be called at least once.
  */
 export function nonEmptyMap<T, R>(
-	arr: NonEmptyArray<T>,
-	fn: (val: T, index: number) => R,
+  arr: NonEmptyArray<T>,
+  fn: (val: T, index: number) => R,
 ): NonEmptyArray<R> {
-	return arr.map(fn) as NonEmptyArray<R> // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input array was non-empty.
+  return arr.map(fn) as NonEmptyArray<R>;
 }
 
 /**
@@ -82,10 +82,10 @@ export function nonEmptyMap<T, R>(
  * @returns A non-empty record with the same keys as `rec` and mapped values.
  */
 export function nonEmptyRemap<K extends string | number | symbol, V1, V2>(
-	rec: NonEmptyRecord<K, V1>,
-	map: (k: K, v: V1) => V2,
+  rec: NonEmptyRecord<K, V1>,
+  map: (k: K, v: V1) => V2,
 ): NonEmptyRecord<K, V2> {
-	return remap(rec, map)
+  return remap(rec, map);
 }
 
 /**
@@ -93,14 +93,16 @@ export function nonEmptyRemap<K extends string | number | symbol, V1, V2>(
  * Will throw an error if this is not true.
  */
 export function nonEmptyFilter<T>(
-	arr: NonEmptyArray<T>,
-	fn: (val: T, index: number) => boolean,
+  arr: NonEmptyArray<T>,
+  fn: (val: T, index: number) => boolean,
 ): NonEmptyArray<T> {
-	const filtered = arr.filter(fn)
-	if (!isNonEmptyArray(filtered)) {
-		throw new Error('Non-empty array was unexpectedly filtered down to an empty array')
-	}
-	return filtered
+  const filtered = arr.filter(fn);
+
+  if (!isNonEmptyArray(filtered)) {
+    throw new Error('Non-empty array was unexpectedly filtered down to an empty array');
+  }
+
+  return filtered;
 }
 
 /**
@@ -110,19 +112,20 @@ export function nonEmptyFilter<T>(
  * @returns An element of the array.
  */
 export function nonEmptyGet<T>(arr: NonEmptyArray<T>): T {
-	return arr[0]
+  return arr[0];
 }
 
 /** Return a sorted copy of the array. */
 export function nonEmptySorted<T>(
-	arr: NonEmptyArray<T>,
-	compare: (a: T, b: T) => number,
-	reverse?: boolean,
+  arr: NonEmptyArray<T>,
+  compare: (a: T, b: T) => number,
+  reverse?: boolean,
 ): NonEmptyArray<T> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input array was non-empty.
-	const arrCopy = [...arr] as NonEmptyArray<T>
-	arrCopy.sort(reverse === true ? (a, b) => compare(b, a) : compare)
-	return arrCopy
+  const arrCopy = [...arr] as NonEmptyArray<T>;
+
+  arrCopy.sort(reverse === true ? (a, b) => compare(b, a) : compare);
+
+  return arrCopy;
 }
 
 /**
@@ -134,101 +137,103 @@ export function nonEmptySorted<T>(
  * @returns The first element of the array if it was sorted.
  */
 export function nonEmptyFirst<T>(
-	arr: NonEmptyArray<T>,
-	compare: (a: T, b: T) => number,
-	reverse?: boolean,
+  arr: NonEmptyArray<T>,
+  compare: (a: T, b: T) => number,
+  reverse?: boolean,
 ): T {
-	return nonEmptySorted(arr, compare)[reverse === true ? arr.length - 1 : 0]
+  return nonEmptySorted(arr, compare)[reverse === true ? arr.length - 1 : 0];
 }
 
 /**
  * Concatenate a non-empty array and an array together.
  */
 export function nonEmptyConcat<T>([arr, rest]:
-	| [T[], NonEmptyArray<T>]
-	| [NonEmptyArray<T>, T[]]): NonEmptyArray<T> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know one of the two input arrays was non-empty.
-	return arr.concat(...rest) as NonEmptyArray<T>
+  | [T[], NonEmptyArray<T>]
+  | [NonEmptyArray<T>, T[]]): NonEmptyArray<T> {
+  return arr.concat(...rest) as NonEmptyArray<T>;
 }
 
 /**
  * A set that contains at least one true element.
  */
-export type NonEmptySet<K extends string | number | symbol> = NonEmptyRecord<K, true>
+export type NonEmptySet<K extends string | number | symbol> = NonEmptyRecord<K, true>;
 
 /**
  * Type predicate for NonEmptySet.
  */
 export function isNonEmptySet<K extends string | number | symbol>(
-	obj: Partial<Record<K, unknown>>,
+  obj: Partial<Record<K, unknown>>,
 ): obj is NonEmptySet<K> {
-	if (Object.keys(obj).length === 0) {
-		return false
-	}
-	let oneTrue = false
-	for (const val of Object.values(obj)) {
-		if (typeof val !== 'boolean') {
-			return false
-		}
-		oneTrue ||= val
-	}
-	return oneTrue
+  if (Object.keys(obj).length === 0) {
+    return false;
+  }
+
+  let oneTrue = false;
+
+  for (const val of Object.values(obj)) {
+    if (typeof val !== 'boolean') {
+      return false;
+    }
+
+    oneTrue ||= val;
+  }
+
+  return oneTrue;
 }
 
 /**
  * Initialize a non-empty set from at least one key.
  */
 export function nonEmptySet<K extends string | number | symbol>(
-	key: K,
-	...keys: K[]
+  key: K,
+  ...keys: K[]
 ): NonEmptySet<K> {
-	return nonEmptySetFromArray([key, ...keys])
+  return nonEmptySetFromArray([key, ...keys]);
 }
 
 /**
  * Initialize a non-empty set from a non-empty array of keys.
  */
 export function nonEmptySetFromArray<K extends string | number | symbol>(
-	keys: NonEmptyArray<K>,
+  keys: NonEmptyArray<K>,
 ): NonEmptySet<K> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input array was non-empty.
-	return Object.fromEntries(nonEmptyMap<K, [K, true]>(keys, key => [key, true])) as NonEmptySet<K>
+  return Object.fromEntries(nonEmptyMap<K, [K, true]>(keys, key => [key, true])) as NonEmptySet<K>;
 }
 
 /**
  * Returns whether `set` contains `key` with a `true` value.
  */
 export function setContains<K extends string | number | symbol>(
-	set: NonEmptySet<K>,
-	key: K,
+  set: NonEmptySet<K>,
+  key: K,
 ): boolean {
-	return Object.hasOwn(set, key) && set[key]
+  return Object.hasOwn(set, key) && set[key];
 }
 
 /**
  * Iterates over the items in the set. Guaranteed to be non-empty.
  */
 export function setItems<K extends string | number | symbol>(
-	set: NonEmptySet<K>,
+  set: NonEmptySet<K>,
 ): NonEmptyArray<K> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input set was non-empty and contained at least one true value.
-	return Object.entries(set)
-		.filter(([_, v]): boolean => v as boolean) // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because NonEmptySet maps to boolean values.
-		.map(([k, _]) => k) as NonEmptyArray<K>
+  return Object.entries(set)
+    .filter(([_, v]): boolean => v as boolean)
+    .map(([k, _]) => k) as NonEmptyArray<K>;
 }
 
 /**
  * Returns the union of one or more non-empty sets.
  */
 export function setUnion<K extends string | number | symbol>(
-	sets: NonEmptyArray<NonEmptySet<K>>,
+  sets: NonEmptyArray<NonEmptySet<K>>,
 ): NonEmptySet<K> {
-	const union = new Map<K, true>()
-	for (const set of sets) {
-		for (const item of setItems(set)) {
-			union.set(item, true)
-		}
-	}
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we had at least one set as input and each set was non-empty.
-	return Object.fromEntries(union.entries()) as NonEmptySet<K>
+  const union = new Map<K, true>();
+
+  for (const set of sets) {
+    for (const item of setItems(set)) {
+      union.set(item, true);
+    }
+  }
+
+  return Object.fromEntries(union.entries()) as NonEmptySet<K>;
 }
