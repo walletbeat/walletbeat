@@ -248,7 +248,7 @@ export const AttributeGroupSummary = ({
 			evalAttr =>
 				columnHelper.accessor(
 					row =>
-						row.attributes[evalAttr.attribute.id] || {
+						row.attributes[evalAttr.attribute.id] ?? {
 							attributeId: evalAttr.attribute.id,
 							rating: Rating.UNRATED,
 						},
