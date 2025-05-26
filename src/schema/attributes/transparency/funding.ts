@@ -1,143 +1,143 @@
 import {
-	type Attribute,
-	type Evaluation,
-	exampleRating,
-	exampleRatingUnimplemented,
-	Rating,
-	type Value,
-} from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
+  type Attribute,
+  type Evaluation,
+  exampleRating,
+  exampleRatingUnimplemented,
+  Rating,
+  type Value,
+} from '@/schema/attributes';
+import type { ResolvedFeatures } from '@/schema/features';
 import {
-	type Monetization,
-	monetizationStrategies,
-	type MonetizationStrategy,
-	monetizationStrategyIsUserAligned,
-	monetizationStrategyName,
-} from '@/schema/features/transparency/monetization'
-import { toFullyQualified } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
-import { markdown, paragraph, sentence } from '@/types/content'
-import { fundingDetailsContent } from '@/types/content/funding-details'
+  type Monetization,
+  monetizationStrategies,
+  type MonetizationStrategy,
+  monetizationStrategyIsUserAligned,
+  monetizationStrategyName,
+} from '@/schema/features/transparency/monetization';
+import { toFullyQualified } from '@/schema/reference';
+import type { WalletMetadata } from '@/schema/wallet';
+import { markdown, paragraph, sentence } from '@/types/content';
+import { fundingDetailsContent } from '@/types/content/funding-details';
 
-import { pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common';
 
-const brand = 'attributes.transparency.funding'
+const brand = 'attributes.transparency.funding';
 
 export type FundingValue = Value & {
-	__brand: 'attributes.transparency.funding'
-}
+  __brand: 'attributes.transparency.funding';
+};
 
 /** Funding is transparent and at least partially non-extractive. */
 function transparent(
-	id: string,
-	sourceName: string,
-	monetization: Monetization,
+  id: string,
+  sourceName: string,
+  monetization: Monetization,
 ): Evaluation<FundingValue> {
-	return {
-		value: {
-			id: `transparent_${id.toLocaleLowerCase()}`,
-			rating: Rating.PASS,
-			displayName: `Transparent funding (${sourceName})`,
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
+  return {
+    value: {
+      id: `transparent_${id.toLocaleLowerCase()}`,
+      rating: Rating.PASS,
+      displayName: `Transparent funding (${sourceName})`,
+      shortExplanation: sentence(
+        (walletMetadata: WalletMetadata) => `
 					${walletMetadata.displayName} is transparently funded.
 				`,
-			),
-			__brand: brand,
-		},
-		details: fundingDetailsContent({ monetization }),
-		references: toFullyQualified(monetization.ref),
-	}
+      ),
+      __brand: brand,
+    },
+    details: fundingDetailsContent({ monetization }),
+    references: toFullyQualified(monetization.ref),
+  };
 }
 
 /** Funding is entirely extractive. */
 function extractive(
-	id: string,
-	sourceName: string,
-	monetization: Monetization,
+  id: string,
+  sourceName: string,
+  monetization: Monetization,
 ): Evaluation<FundingValue> {
-	return {
-		value: {
-			id: `extractive_${id.toLocaleLowerCase()}`,
-			rating: Rating.PARTIAL,
-			icon: '\u{1f911}', // Money mouth face
-			displayName: `User-extractive funding${sourceName !== '' ? ` (${sourceName})` : ''}`,
-			shortExplanation: sentence(
-				(walletMetadata: WalletMetadata) => `
+  return {
+    value: {
+      id: `extractive_${id.toLocaleLowerCase()}`,
+      rating: Rating.PARTIAL,
+      icon: '\u{1f911}', // Money mouth face
+      displayName: `User-extractive funding${sourceName !== '' ? ` (${sourceName})` : ''}`,
+      shortExplanation: sentence(
+        (walletMetadata: WalletMetadata) => `
 					${walletMetadata.displayName} is funded through user-extractive
 					means${sourceName !== '' ? ` (${sourceName})` : ''}.
 				`,
-			),
-			__brand: brand,
-		},
-		details: fundingDetailsContent({ monetization }),
-		howToImprove: paragraph(
-			({ wallet }) => `
+      ),
+      __brand: brand,
+    },
+    details: fundingDetailsContent({ monetization }),
+    howToImprove: paragraph(
+      ({ wallet }) => `
 				${wallet.metadata.displayName} should change its funding sources
 				to non-user-extractive means such as transparent convenience fees,
 				donations, or ecosystem grants.
 			`,
-		),
-		references: toFullyQualified(monetization.ref),
-	}
+    ),
+    references: toFullyQualified(monetization.ref),
+  };
 }
 
 /** Wallet has no funding. */
 const noFunding: Evaluation<FundingValue> = {
-	value: {
-		id: 'noFunding',
-		rating: Rating.FAIL,
-		displayName: 'No funding source',
-		shortExplanation: sentence(
-			(walletMetadata: WalletMetadata) => `
+  value: {
+    id: 'noFunding',
+    rating: Rating.FAIL,
+    displayName: 'No funding source',
+    shortExplanation: sentence(
+      (walletMetadata: WalletMetadata) => `
 				${walletMetadata.displayName} has no funding sources.
 			`,
-		),
-		__brand: brand,
-	},
-	details: paragraph(
-		({ wallet }) => `
+    ),
+    __brand: brand,
+  },
+  details: paragraph(
+    ({ wallet }) => `
 			${wallet.metadata.displayName} has no funding sources, making its future
 			unclear. Wallets need a consistent source of funding to ensure they keep
 			up with security vulnerabilities and ecosystem progress.
 		`,
-	),
-	howToImprove: paragraph(
-		({ wallet }) => `
+  ),
+  howToImprove: paragraph(
+    ({ wallet }) => `
 			While most software projects inevitably start small and unfunded,
 			${wallet.metadata.displayName} should seek a reliable source of funding
 			once feasible.
 		`,
-	),
-	references: [],
-}
+  ),
+  references: [],
+};
 
 /** Funding is not transparent. */
 const unclear: Evaluation<FundingValue> = {
-	value: {
-		id: 'unclear',
-		rating: Rating.FAIL,
-		displayName: 'Unclear funding source',
-		shortExplanation: sentence(
-			(walletMetadata: WalletMetadata) => `
+  value: {
+    id: 'unclear',
+    rating: Rating.FAIL,
+    displayName: 'Unclear funding source',
+    shortExplanation: sentence(
+      (walletMetadata: WalletMetadata) => `
 				How ${walletMetadata.displayName} is funded is unclear.
 			`,
-		),
-		__brand: brand,
-	},
-	details: paragraph(
-		({ wallet }) => `
+    ),
+    __brand: brand,
+  },
+  details: paragraph(
+    ({ wallet }) => `
 			How ${wallet.metadata.displayName} is funded is unclear.
 		`,
-	),
-	howToImprove: paragraph(
-		({ wallet }) => `
+  ),
+  howToImprove: paragraph(
+    ({ wallet }) => `
 			${wallet.metadata.displayName} should publish how it is funded, or how it
 			plans to fund itself.
 		`,
-	),
-	references: [],
-}
+  ),
+  references: [],
+};
 
 /**
  * Funding encodes the transparency and user-alignment of the monetization
@@ -163,22 +163,22 @@ const unclear: Evaluation<FundingValue> = {
  * its monetization strategies.
  */
 export const funding: Attribute<FundingValue> = {
-	id: 'funding',
-	icon: '\u{1fa99}', // Coin
-	displayName: 'Funding',
-	wording: {
-		midSentenceName: 'funding',
-	},
-	question: sentence(`
+  id: 'funding',
+  icon: '\u{1fa99}', // Coin
+  displayName: 'Funding',
+  wording: {
+    midSentenceName: 'funding',
+  },
+  question: sentence(`
 		How is the wallet's development team funded?
 	`),
-	why: paragraph(`
+  why: paragraph(`
 		Wallets are complex, high-stakes pieces of software. They must be
 		maintained, regularly audited, and follow the continuous improvements
 		in the ecosystem.
 		This requires a reliable, transparent source of funding.
 	`),
-	methodology: markdown(`
+  methodology: markdown(`
 		Wallets are assessed based on how sustainable, transparent, and
 		user-aligned their funding mechanisms are.
 
@@ -211,128 +211,128 @@ export const funding: Attribute<FundingValue> = {
 		publication of a revenue breakdown page, public regulatory filings,
 		or token allocation and vesting disclosures.
 	`),
-	ratingScale: {
-		display: 'fail-pass',
-		exhaustive: false,
-		fail: [
-			exampleRating(
-				paragraph(`
+  ratingScale: {
+    display: 'fail-pass',
+    exhaustive: false,
+    fail: [
+      exampleRating(
+        paragraph(`
 					The wallet has funding but has not revealed this publicly and
 					transparently to users.
 				`),
-				unclear.value,
-			),
-			exampleRating(
-				paragraph(`
+        unclear.value,
+      ),
+      exampleRating(
+        paragraph(`
 					The wallet does not have any funding.
 					Wallets must have sustainable funding sources in order to remain
 					secure and up-to-date.
 				`),
-				noFunding.value,
-			),
-		],
-		partial: [
-			exampleRating(
-				paragraph(`
+        noFunding.value,
+      ),
+    ],
+    partial: [
+      exampleRating(
+        paragraph(`
 					The wallet is funded from hidden swap fees. While users can look this
 					up onchain to see how much revenue the wallet is generating from this,
 					making this funding source technically transparent, it is not
 					user-aligned.
 				`),
-				exampleRatingUnimplemented,
-			),
-			exampleRating(
-				paragraph(`
+        exampleRatingUnimplemented,
+      ),
+      exampleRating(
+        paragraph(`
 					The wallet is funded from user-visible swap fees and governance token
 					sales with undisclosed vesting schedule. While users can use onchain
 					lookups to determine how much revenue is generated from both sources,
 					making the funding technically transparent, the undisclosed nature of
 					governance token makes makes this not user-aligned.
 				`),
-				exampleRatingUnimplemented,
-			),
-		],
-		pass: [
-			exampleRating(
-				paragraph(`
+        exampleRatingUnimplemented,
+      ),
+    ],
+    pass: [
+      exampleRating(
+        paragraph(`
 					The wallet is funded from user-visible swap fees and pre-disclosed
 					governance token sales.
 				`),
-				exampleRatingUnimplemented,
-			),
-			exampleRating(
-				paragraph(`
+        exampleRatingUnimplemented,
+      ),
+      exampleRating(
+        paragraph(`
 					The wallet is funded from venture capital and publishes regulatory
 					filings showing the amount raised in each round and the top investors
 					of each round.
 				`),
-				exampleRatingUnimplemented,
-			),
-			exampleRating(
-				paragraph(`
+        exampleRatingUnimplemented,
+      ),
+      exampleRating(
+        paragraph(`
 					The wallet is funded from onchain donations, onchain ecosystem
 					grants, and commemorative NFT sales.
 				`),
-				exampleRatingUnimplemented,
-			),
-		],
-	},
-	evaluate: (features: ResolvedFeatures): Evaluation<FundingValue> => {
-		if (features.monetization === null) {
-			return unrated(funding, brand, null)
-		}
+        exampleRatingUnimplemented,
+      ),
+    ],
+  },
+  evaluate: (features: ResolvedFeatures): Evaluation<FundingValue> => {
+    if (features.monetization === null) {
+      return unrated(funding, brand, null);
+    }
 
-		const strategies: MonetizationStrategy[] = []
+    const strategies: MonetizationStrategy[] = [];
 
-		for (const { strategy, value } of monetizationStrategies(features.monetization)) {
-			switch (value) {
-				case null:
-					return unrated(funding, brand, null)
-				case true:
-					strategies.push(strategy)
-					break
-				case false:
-					break // Do nothing.
-			}
-		}
-		const numStrategies = strategies.length
+    for (const { strategy, value } of monetizationStrategies(features.monetization)) {
+      switch (value) {
+        case null:
+          return unrated(funding, brand, null);
+        case true:
+          strategies.push(strategy);
+          break;
+        case false:
+          break; // Do nothing.
+      }
+    }
+    const numStrategies = strategies.length;
 
-		if (numStrategies === 0) {
-			return unclear
-		}
+    if (numStrategies === 0) {
+      return unclear;
+    }
 
-		const extractiveStrategies = []
-		const userAlignedStrategies = []
+    const extractiveStrategies = [];
+    const userAlignedStrategies = [];
 
-		for (const strategy of strategies) {
-			if (monetizationStrategyIsUserAligned(strategy)) {
-				userAlignedStrategies.push(strategy)
-			} else {
-				extractiveStrategies.push(strategy)
-			}
-		}
+    for (const strategy of strategies) {
+      if (monetizationStrategyIsUserAligned(strategy)) {
+        userAlignedStrategies.push(strategy);
+      } else {
+        extractiveStrategies.push(strategy);
+      }
+    }
 
-		if (!features.monetization.revenueBreakdownIsPublic && extractiveStrategies.length > 0) {
-			if (extractiveStrategies.length === 1) {
-				return extractive(
-					extractiveStrategies[0],
-					monetizationStrategyName(extractiveStrategies[0]),
-					features.monetization,
-				)
-			}
+    if (!features.monetization.revenueBreakdownIsPublic && extractiveStrategies.length > 0) {
+      if (extractiveStrategies.length === 1) {
+        return extractive(
+          extractiveStrategies[0],
+          monetizationStrategyName(extractiveStrategies[0]),
+          features.monetization,
+        );
+      }
 
-			return extractive('multi', '', features.monetization)
-		}
+      return extractive('multi', '', features.monetization);
+    }
 
-		if (numStrategies === 1) {
-			return transparent(
-				strategies[0],
-				monetizationStrategyName(strategies[0]),
-				features.monetization,
-			)
-		}
+    if (numStrategies === 1) {
+      return transparent(
+        strategies[0],
+        monetizationStrategyName(strategies[0]),
+        features.monetization,
+      );
+    }
 
-		return transparent('multi', 'Multiple sources', features.monetization)
-	},
-	aggregate: pickWorstRating<FundingValue>,
-}
+    return transparent('multi', 'Multiple sources', features.monetization);
+  },
+  aggregate: pickWorstRating<FundingValue>,
+};

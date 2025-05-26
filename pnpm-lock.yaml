@@ -23,6 +23,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.0
         version: 11.14.0(@emotion/react@11.14.0(@types/react@19.0.8)(react@19.0.0))(@types/react@19.0.8)(react@19.0.0)
+      '@eslint/js':
+        specifier: ^9.27.0
+        version: 9.27.0
       '@fontsource/montserrat':
         specifier: ^5.2.5
         version: 5.2.5
@@ -77,9 +80,15 @@ importers:
       cmdk:
         specifier: ^1.0.4
         version: 1.0.4(@types/react-dom@19.0.3(@types/react@19.0.8))(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      eslint-plugin-import:
+        specifier: ^2.31.0
+        version: 2.31.0(@typescript-eslint/parser@8.32.1(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.19.0(jiti@2.4.2))
       eslint-plugin-prettier:
         specifier: ^5.4.0
         version: 5.4.0(eslint-config-prettier@10.0.1(eslint@9.19.0(jiti@2.4.2)))(eslint@9.19.0(jiti@2.4.2))(prettier@3.5.1)
+      eslint-plugin-unused-imports:
+        specifier: ^4.1.4
+        version: 4.1.4(@typescript-eslint/eslint-plugin@8.32.1(@typescript-eslint/parser@8.32.1(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.19.0(jiti@2.4.2))
       postcss:
         specifier: ^8.5.1
         version: 8.5.1
@@ -114,9 +123,6 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.4
         version: 0.9.4(prettier-plugin-astro@0.14.1)(prettier@3.5.1)(typescript@5.7.3)
-      '@eslint/js':
-        specifier: ^9.27.0
-        version: 9.27.0
       '@fleek-platform/cli':
         specifier: ^3.8.2
         version: 3.8.2(@types/node@22.13.1)(typescript@5.7.3)
@@ -141,9 +147,6 @@ importers:
       eslint-config-prettier:
         specifier: ^10.0.1
         version: 10.0.1(eslint@9.19.0(jiti@2.4.2))
-      eslint-plugin-import:
-        specifier: ^2.31.0
-        version: 2.31.0(@typescript-eslint/parser@8.32.1(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.19.0(jiti@2.4.2))
       eslint-plugin-react:
         specifier: ^7.37.4
         version: 7.37.4(eslint@9.19.0(jiti@2.4.2))
@@ -153,9 +156,6 @@ importers:
       eslint-plugin-sort-keys-custom-order:
         specifier: ^2.2.1
         version: 2.2.1(@typescript-eslint/utils@8.32.1(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.19.0(jiti@2.4.2))
-      eslint-plugin-unused-imports:
-        specifier: ^4.1.4
-        version: 4.1.4(@typescript-eslint/eslint-plugin@8.32.1(@typescript-eslint/parser@8.32.1(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.19.0(jiti@2.4.2))
       globals:
         specifier: ^15.14.0
         version: 15.14.0

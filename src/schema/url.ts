@@ -1,30 +1,30 @@
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+import { isNonEmptyArray, type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty';
 
 /** A URL and a label. */
 export interface LabeledUrl {
-	url: string
-	label: string
+  url: string;
+  label: string;
 }
 
 /** A Url is either a simple URL string or a LabeledUrl. */
-export type Url = string | LabeledUrl
+export type Url = string | LabeledUrl;
 
 /** A URL with a specific domain name. */
-type WithDomain<D extends string> = `${'http' | 'https'}://${D | `www.${D}`}${'' | `/${string}`}`
+type WithDomain<D extends string> = `${'http' | 'https'}://${D | `www.${D}`}${'' | `/${string}`}`;
 
 /** DomainUrl is a Url with a specific domain name. */
 export type DomainUrl<D extends string> = Url &
-	(WithDomain<D> | (LabeledUrl & { url: WithDomain<D> }))
+  (WithDomain<D> | (LabeledUrl & { url: WithDomain<D> }));
 
 /** Get the domain part of a URL. */
 export function getDomain(url: Url): string {
-	let { hostname } = new URL(isLabeledUrl(url) ? url.url : url)
+  let { hostname } = new URL(isLabeledUrl(url) ? url.url : url);
 
-	if (hostname.startsWith('www.')) {
-		hostname = hostname.substring('www.'.length)
-	}
+  if (hostname.startsWith('www.')) {
+    hostname = hostname.substring('www.'.length);
+  }
 
-	return hostname
+  return hostname;
 }
 
 /**
@@ -33,28 +33,28 @@ export function getDomain(url: Url): string {
  * will be used as label instead.
  */
 const wellKnownDomainsToLabels: Record<string, string> = {
-	'crunchbase.com': 'Crunchbase',
-	'github.com': 'GitHub',
-	'warpcast.com': 'Warpcast',
-}
+  'crunchbase.com': 'Crunchbase',
+  'github.com': 'GitHub',
+  'warpcast.com': 'Warpcast',
+};
 
 function getDefaultUrlLabel(url: string): string {
-	const hostname = getDomain(url)
+  const hostname = getDomain(url);
 
-	if (Object.hasOwn(wellKnownDomainsToLabels, hostname)) {
-		return wellKnownDomainsToLabels[hostname]
-	}
+  if (Object.hasOwn(wellKnownDomainsToLabels, hostname)) {
+    return wellKnownDomainsToLabels[hostname];
+  }
 
-	return hostname
+  return hostname;
 }
 
 /** Return the label for a URL. */
 export function getUrlLabel(url: Url): string {
-	if (isLabeledUrl(url)) {
-		return url.label
-	}
+  if (isLabeledUrl(url)) {
+    return url.label;
+  }
 
-	return getDefaultUrlLabel(url)
+  return getDefaultUrlLabel(url);
 }
 
 /**
@@ -65,26 +65,26 @@ export function getUrlLabel(url: Url): string {
  * @return A labeled URL.
  */
 export function labeledUrl(url: Url, defaultLabel?: string): LabeledUrl {
-	if (typeof url === 'string') {
-		return { label: defaultLabel ?? getUrlLabel(url), url }
-	}
+  if (typeof url === 'string') {
+    return { label: defaultLabel ?? getUrlLabel(url), url };
+  }
 
-	return url
+  return url;
 }
 
 /** Type predicate for `LabeledUrl`. */
 export function isLabeledUrl(obj: unknown): obj is LabeledUrl {
-	return (
-		typeof obj === 'object' &&
-		obj !== null &&
-		Object.hasOwn(obj, 'label') &&
-		Object.hasOwn(obj, 'url')
-	)
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    Object.hasOwn(obj, 'label') &&
+    Object.hasOwn(obj, 'url')
+  );
 }
 
 /** Type predicate for `Url`. */
 export function isUrl(obj: unknown): obj is Url {
-	return typeof obj === 'string' || isLabeledUrl(obj)
+  return typeof obj === 'string' || isLabeledUrl(obj);
 }
 
 /**
@@ -94,39 +94,39 @@ export function isUrl(obj: unknown): obj is Url {
  * to the end. `urls` is not modified.
  */
 export function mergeLabeledUrls(
-	urls: LabeledUrl[],
-	newUrl: LabeledUrl,
+  urls: LabeledUrl[],
+  newUrl: LabeledUrl,
 ): NonEmptyArray<LabeledUrl> {
-	if (!isNonEmptyArray(urls)) {
-		return [newUrl]
-	}
+  if (!isNonEmptyArray(urls)) {
+    return [newUrl];
+  }
 
-	let foundMatch = false
-	const merged = nonEmptyMap(urls, oldUrl => {
-		if (oldUrl.url !== newUrl.url) {
-			return oldUrl
-		}
+  let foundMatch = false;
+  const merged = nonEmptyMap(urls, oldUrl => {
+    if (oldUrl.url !== newUrl.url) {
+      return oldUrl;
+    }
 
-		foundMatch = true
-		const defaultLabel = getDefaultUrlLabel(newUrl.url)
-		const betterLabel =
-			oldUrl.label !== '' || oldUrl.label !== defaultLabel
-				? oldUrl.label
-				: newUrl.label !== ''
-					? newUrl.label
-					: defaultLabel
+    foundMatch = true;
+    const defaultLabel = getDefaultUrlLabel(newUrl.url);
+    const betterLabel =
+      oldUrl.label !== '' || oldUrl.label !== defaultLabel
+        ? oldUrl.label
+        : newUrl.label !== ''
+          ? newUrl.label
+          : defaultLabel;
 
-		return {
-			label: betterLabel,
-			url: newUrl.url,
-		}
-	})
+    return {
+      label: betterLabel,
+      url: newUrl.url,
+    };
+  });
 
-	// The cast to `boolean` is necessary here as ESLint does not realize that
-	// the function passed above can modify `foundMatch` as a side-effect.
-	if (!(foundMatch as boolean)) {
-		return [...merged, newUrl]
-	}
+  // The cast to `boolean` is necessary here as ESLint does not realize that
+  // the function passed above can modify `foundMatch` as a side-effect.
+  if (!(foundMatch as boolean)) {
+    return [...merged, newUrl];
+  }
 
-	return merged
+  return merged;
 }
