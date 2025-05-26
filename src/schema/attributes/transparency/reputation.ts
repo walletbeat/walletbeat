@@ -30,12 +30,15 @@ function evaluateReputation(features: ReputationSupport): Rating {
 		features.bugBounty,
 	]
 	const passCount = ratings.filter(r => r === ReputationType.PASS).length
+
 	if (passCount >= 4) {
 		return Rating.PASS
 	}
+
 	if (passCount >= 2) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -103,7 +106,9 @@ export const reputation: Attribute<ReputationValue> = {
 				bugBounty: ReputationType.FAIL,
 			})
 		}
+
 		const reputationFeature = features.transparency.reputation
+
 		if (reputationFeature === null) {
 			return unrated(reputation, brand, {
 				originalProduct: ReputationType.FAIL,

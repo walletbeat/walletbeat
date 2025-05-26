@@ -13,20 +13,24 @@ import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 function listOrSingleText(prefix: string, items: Array<string | null>): React.ReactNode {
 	const filtered = items.filter(item => item !== null)
+
 	if (filtered.length === 1) {
 		const stripped = trimWhitespacePrefix(filtered[0]).trim()
+
 		return (
 			<Typography variant="body1">
 				{prefix} {stripped[0].toLocaleLowerCase() + stripped.slice(1)}.
 			</Typography>
 		)
 	}
+
 	return (
 		<>
 			<Typography variant="body1">{prefix}:</Typography>
 			<ul>
 				{filtered.map(item => {
 					const stripped = trimWhitespacePrefix(item).trim()
+
 					return (
 						<li key={stripped}>
 							<Typography variant="body1">
@@ -44,6 +48,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 	if (value.scamAlerts === null) {
 		throw new Error('Cannot render ScamAlertDetails for undefined data')
 	}
+
 	const scamUrlLeaks: string[] = isSupported(value.scamAlerts.scamUrlWarning)
 		? [
 				value.scamAlerts.scamUrlWarning.leaksIp ? 'your IP' : null,
@@ -62,6 +67,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 				})(),
 			].filter(val => val !== null)
 		: []
+
 	return (
 		<>
 			<WrapRatingIcon rating={value.rating}>

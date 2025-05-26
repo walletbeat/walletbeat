@@ -25,12 +25,15 @@ export type HardwarePrivacyValue = Value & {
 function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
 	const ratings = [features.phoningHome, features.inspectableRemoteCalls, features.wirelessPrivacy]
 	const passCount = ratings.filter(r => r === HardwarePrivacyType.PASS).length
+
 	if (passCount === 3) {
 		return Rating.PASS
 	}
+
 	if (passCount >= 1) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -100,7 +103,9 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 				wirelessPrivacy: HardwarePrivacyType.FAIL,
 			})
 		}
+
 		const hwPrivacy = features.privacy.hardwarePrivacy
+
 		if (hwPrivacy === null) {
 			return unrated(hardwarePrivacy, brand, {
 				phoningHome: HardwarePrivacyType.FAIL,

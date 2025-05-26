@@ -70,6 +70,7 @@ export function variantToTooltip(variants: AtLeastOneVariant<unknown>, variant: 
 	if (hasSingleVariant(variants)) {
 		return `${variantToName(variant, true)}-only wallet`
 	}
+
 	return `View ${variantToName(variant, false)} version`
 }
 
@@ -86,6 +87,7 @@ export function variantUrlQuery(
 	if (variant === null || hasSingleVariant(variants) || !Object.hasOwn(variants, variant)) {
 		return ''
 	}
+
 	return `?${variant}`
 }
 
@@ -98,9 +100,12 @@ export function variantFromUrlQuery(variants: AtLeastOneVariant<unknown>): Varia
 	if (window.location.search === '') {
 		return null
 	}
+
 	const maybeVariant = window.location.search.substring(1)
+
 	if (maybeVariant !== '' && Object.hasOwn(variants, maybeVariant)) {
 		return maybeVariant as Variant // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that it is a valid Variant.
 	}
+
 	return null
 }

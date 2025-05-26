@@ -28,6 +28,7 @@ export type ScamAlertSupport = WithRef<{
 }>
 
 const brand = 'attributes.security.scam_alert'
+
 export type ScamPreventionValue = Value &
 	(
 		| {
@@ -56,6 +57,7 @@ function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & 
 		listFeature: 'Warning you when sending funds to unknown addresses',
 		required: false,
 	} as const
+
 	if (!isSupported(scamAlerts.sendTransactionWarning)) {
 		return {
 			supported: false,
@@ -63,14 +65,17 @@ function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & 
 			...baseProps,
 		}
 	}
+
 	const supported =
 		scamAlerts.sendTransactionWarning.newRecipientWarning ||
 		scamAlerts.sendTransactionWarning.userWhitelist
+
 	if (!supported) {
 		throw new Error(
 			'sendTransactionWarning: If supported, at least one implementation mechanism must be enabled',
 		)
 	}
+
 	return {
 		supported,
 		privacyPreserving:
@@ -93,6 +98,7 @@ function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSuppor
 		listFeature: 'Warning you when interacting with potential scam contracts',
 		required: false,
 	} as const
+
 	if (!isSupported(scamAlerts.contractTransactionWarning)) {
 		return {
 			supported: false,
@@ -100,15 +106,18 @@ function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSuppor
 			...baseProps,
 		}
 	}
+
 	const supported =
 		scamAlerts.contractTransactionWarning.contractRegistry ||
 		scamAlerts.contractTransactionWarning.previousContractInteractionWarning ||
 		scamAlerts.contractTransactionWarning.recentContractWarning
+
 	if (!supported) {
 		throw new Error(
 			'contractTransactionWarning: If supported, at least one implementation mechanism must be enabled',
 		)
 	}
+
 	return {
 		supported,
 		privacyPreserving:
@@ -131,7 +140,8 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 		listFeature: 'Warning you when connecting to potential scam applications',
 		required: false,
 	} as const
-	const scamUrlWarning = scamAlerts.scamUrlWarning
+	const { scamUrlWarning } = scamAlerts
+
 	if (!isSupported(scamUrlWarning)) {
 		return {
 			supported: false,
@@ -139,6 +149,7 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 			...baseProps,
 		}
 	}
+
 	return {
 		supported: true,
 		privacyPreserving: ((): boolean => {
@@ -178,11 +189,13 @@ function evaluateScamAlerts(
 				return [sendTransactionWarning, scamUrlWarning]
 		}
 	})()
+
 	for (const feature of requiredFeatures) {
 		feature.required = true
 	}
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
+
 	if (!isNonEmptyArray(supportedFeatures)) {
 		// No features supported.
 		return {
@@ -211,7 +224,9 @@ function evaluateScamAlerts(
 			references: allRefs,
 		}
 	}
+
 	const privacyPreservingFeatures = supportedFeatures.filter(sas => sas.privacyPreserving)
+
 	if (
 		requiredFeatures.includes(scamUrlWarning) &&
 		isSupported(scamAlerts.scamUrlWarning) &&
@@ -251,6 +266,7 @@ function evaluateScamAlerts(
 				references: allRefs,
 			}
 		}
+
 		if (
 			scamAlerts.scamUrlWarning.leaksVisitedUrl === 'DOMAIN_ONLY' &&
 			(scamAlerts.scamUrlWarning.leaksUserAddress || scamAlerts.scamUrlWarning.leaksIp)
@@ -288,6 +304,7 @@ function evaluateScamAlerts(
 			}
 		}
 	}
+
 	if (unsupportedFeatures.length > 0) {
 		// Some but not all features supported.
 		return {
@@ -325,9 +342,11 @@ function evaluateScamAlerts(
 			references: allRefs,
 		}
 	}
+
 	if (privacyPreservingFeatures.length < supportedFeatures.length) {
 		const needsImprovement = (sas: ScamAlertSupport): boolean =>
 			sas.required && sas.supported && !sas.privacyPreserving
+
 		// Not all features implemented with privacy support.
 		return {
 			value: {
@@ -386,6 +405,7 @@ function evaluateScamAlerts(
 			references: allRefs,
 		}
 	}
+
 	// All features implements with privacy.
 	return {
 		value: {
@@ -594,6 +614,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		if (features.security.scamAlerts === null) {
 			return unrated(scamPrevention, brand, { scamAlerts: null })
 		}
+
 		return evaluateScamAlerts(features.profile, features.security.scamAlerts)
 	},
 	aggregate: pickWorstRating<ScamPreventionValue>,

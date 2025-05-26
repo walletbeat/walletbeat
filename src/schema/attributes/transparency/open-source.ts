@@ -21,6 +21,7 @@ import { licenseDetailsContent } from '@/types/content/license-details'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.open_source'
+
 export type OpenSourceValue = Value & {
 	license: License
 	__brand: 'attributes.transparency.open_source'
@@ -204,11 +205,14 @@ export const openSource: Attribute<OpenSourceValue> = {
 		if (features.license === null) {
 			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE })
 		}
-		const license = features.license.license
+
+		const { license } = features.license
 		const references = refs(features.license)
+
 		if (license === License.UNLICENSED_VISIBLE) {
 			return { references, ...unlicensed }
 		}
+
 		switch (licenseIsFOSS(license)) {
 			case FOSS.FOSS:
 				return {

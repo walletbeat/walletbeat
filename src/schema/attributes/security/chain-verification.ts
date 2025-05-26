@@ -25,6 +25,7 @@ import { type FullyQualifiedReference, popRefs } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.chain_verification'
+
 export type ChainVerificationValue = Value & {
 	__brand: 'attributes.security.chain_verification'
 }
@@ -72,6 +73,7 @@ function noChainVerification(
 			const canConfigureL1 =
 				l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
 				l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
+
 			return `
 					${wallet.metadata.displayName} does not verify the integrity of the
 					Ethereum L1 blockchain when retrieving chain state or simulating
@@ -162,14 +164,18 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		}
 
 		const l1Client = features.security.lightClient.ethereumL1
+
 		if (l1Client === null) {
 			return unrated(chainVerification, brand, null)
 		}
+
 		if (!isSupported(l1Client)) {
 			return noChainVerification(features.chainConfigurability)
 		}
+
 		const { withoutRefs, refs } = popRefs<EthereumL1LightClientSupport>(l1Client)
 		const supportedLightClients: EthereumL1LightClient[] = []
+
 		for (const [lightClient, supported] of nonEmptyEntries<EthereumL1LightClient, Support>(
 			withoutRefs,
 		)) {
@@ -177,9 +183,11 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 				supportedLightClients.push(lightClient)
 			}
 		}
+
 		if (!isNonEmptyArray(supportedLightClients)) {
 			throw new Error('No supported light clients found; this should be impossible per type system')
 		}
+
 		return supportsChainVerification(supportedLightClients, refs)
 	},
 	aggregate: pickWorstRating<ChainVerificationValue>,

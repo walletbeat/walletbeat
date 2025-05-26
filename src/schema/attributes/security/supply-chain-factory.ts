@@ -41,12 +41,15 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 		features.genuineCheck,
 	]
 	const passCount = ratings.filter(r => r === SupplyChainFactoryType.PASS).length
+
 	if (passCount >= 5) {
 		return Rating.PASS
 	}
+
 	if (passCount >= 3) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -129,6 +132,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 				},
 			)
 		}
+
 		return null
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainFactoryValue> => {
@@ -152,6 +156,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		}
 
 		const factoryFeature = features.security.supplyChainFactory
+
 		if (factoryFeature === null) {
 			return unrated(supplyChainFactory, brand, {
 				factoryOpsecDocs: SupplyChainFactoryType.FAIL,

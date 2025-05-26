@@ -20,6 +20,7 @@ export function TransactionInclusionDetails({
 		.concat(supportForceWithdrawal)
 		.slice()
 		.sort()
+
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			{allSupportedForceWithdrawals.length > 0 && (

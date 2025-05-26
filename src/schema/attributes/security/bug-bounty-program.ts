@@ -18,6 +18,7 @@ import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/
 import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.bug_bounty_program'
+
 export type BugBountyProgramValue = Value & {
 	programType: BugBountyProgramType
 	upgradePathAvailable: boolean

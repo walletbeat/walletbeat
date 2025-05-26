@@ -37,6 +37,7 @@ export function Accordions({
 					index === accordions.length - 1 ||
 					expanded[accordions[index + 1].id] ||
 					expanded[accordion.id]
+
 				return (
 					<Accordion
 						key={accordion.id}

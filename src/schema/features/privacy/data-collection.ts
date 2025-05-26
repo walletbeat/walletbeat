@@ -471,6 +471,7 @@ export function leakedInfoName(
 					long: walletMetadata.pseudonymType.singular,
 				}
 			}
+
 			return { short: 'username', long: 'pseudonym' }
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
 			return { short: 'Farcaster account', long: 'Farcaster account' }
@@ -523,6 +524,7 @@ export type PersonalInfoLeaks = WithRef<Partial<QualifiedLeaks<LeakedPersonalInf
  */
 export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
 	const first = (...ls: Array<Leak | undefined>): Leak | undefined => ls.find(l => l !== undefined)
+
 	return {
 		ipAddress: leaks.ipAddress ?? Leak.NEVER,
 		walletActions: leaks.walletActions ?? Leak.NEVER,

@@ -121,9 +121,11 @@ function itemOrChildMatches(item: NavigationItem, selectedItemId?: string): bool
 	if (selectedItemId == null) {
 		return false
 	}
+
 	if (item.id === selectedItemId) {
 		return true
 	}
+
 	return (item.children ?? []).some(child => itemOrChildMatches(child, selectedItemId))
 }
 
@@ -204,6 +206,7 @@ const NavigationItem = memo(
 					</a>
 				)
 			}
+
 			if (isNavigationLinkItem(item)) {
 				return (
 					<a
@@ -235,8 +238,10 @@ const NavigationItem = memo(
 					</a>
 				)
 			}
+
 			throw new Error('Invalid navigation item')
 		}
+
 		return (
 			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				{/* {selectedItemId} - {selectedGroupId} */}
@@ -288,35 +293,38 @@ interface NavigationGroupProps {
 	selectedGroupId?: string
 }
 
+function NavigationGroupFn({
+	group,
+	activeItemId,
+	onContentItemClick,
+	selectedItemId,
+	selectedGroupId,
+}: NavigationGroupProps): React.JSX.Element {
+	const isSelectedGroup = group.id === selectedGroupId
+
+	return (
+		<>
+			<ul className={cx('flex flex-col gap-0 p-0 m-0')} id={`navigationGroup-${group.id}`}>
+				{nonEmptyMap(group.items, item => (
+					<React.Fragment key={`fragment-${item.id}`}>
+						<NavigationItem
+							key={`item-${item.id}`}
+							item={item}
+							active={activeItemId === item.id}
+							depth="secondary"
+							selectedItemId={isSelectedGroup ? selectedItemId : undefined}
+							selectedGroupId={isSelectedGroup ? selectedGroupId : undefined}
+							onContentItemClick={onContentItemClick}
+						/>
+					</React.Fragment>
+				))}
+			</ul>
+		</>
+	)
+}
+
 export const NavigationGroup = memo(
-	function NavigationGroup({
-		group,
-		activeItemId,
-		onContentItemClick,
-		selectedItemId,
-		selectedGroupId,
-	}: NavigationGroupProps): React.JSX.Element {
-		const isSelectedGroup = group.id === selectedGroupId
-		return (
-			<>
-				<ul className={cx('flex flex-col gap-0 p-0 m-0')} id={`navigationGroup-${group.id}`}>
-					{nonEmptyMap(group.items, item => (
-						<React.Fragment key={`fragment-${item.id}`}>
-							<NavigationItem
-								key={`item-${item.id}`}
-								item={item}
-								active={activeItemId === item.id}
-								depth="secondary"
-								selectedItemId={isSelectedGroup ? selectedItemId : undefined}
-								selectedGroupId={isSelectedGroup ? selectedGroupId : undefined}
-								onContentItemClick={onContentItemClick}
-							/>
-						</React.Fragment>
-					))}
-				</ul>
-			</>
-		)
-	},
+	NavigationGroupFn,
 	(
 		prevProps: Readonly<NavigationGroupProps>,
 		nextProps: Readonly<NavigationGroupProps>,
@@ -324,12 +332,15 @@ export const NavigationGroup = memo(
 		if (prevProps.group !== nextProps.group) {
 			return false
 		}
+
 		if (prevProps.groupIndex !== nextProps.groupIndex) {
 			return false
 		}
+
 		if (prevProps.onContentItemClick !== nextProps.onContentItemClick) {
 			return false
 		}
+
 		if (
 			prevProps.activeItemId === nextProps.activeItemId &&
 			prevProps.selectedItemId === nextProps.selectedItemId &&
@@ -337,6 +348,7 @@ export const NavigationGroup = memo(
 		) {
 			return true
 		}
+
 		// Check if active item ID or selected item ID is one of the sub-items of this group.
 		for (const props of [prevProps, nextProps]) {
 			for (const item of props.group.items) {
@@ -347,6 +359,7 @@ export const NavigationGroup = memo(
 				) {
 					return false
 				}
+
 				for (const subItem of item.children ?? []) {
 					if (
 						subItem.id === props.activeItemId ||
@@ -358,6 +371,7 @@ export const NavigationGroup = memo(
 				}
 			}
 		}
+
 		return true
 	},
 )
@@ -386,6 +400,7 @@ export function Navigation({
 	// Toggle menu
 	const toggleMenu = (): void => {
 		setIsOpen(!isOpen)
+
 		// Toggle body scroll lock when the mobile menu is toggled
 		if (!isOpen) {
 			document.body.style.overflow = 'hidden'

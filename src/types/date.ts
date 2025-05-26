@@ -23,6 +23,7 @@ export interface CalendarDateParts {
 /** Break a CalendarDate into its components. */
 export function calendarParts(calendarDate: CalendarDate): CalendarDateParts {
 	const [year, month, day] = calendarDate.split('-')
+
 	return {
 		year: +year,
 		month: +month,
@@ -33,6 +34,7 @@ export function calendarParts(calendarDate: CalendarDate): CalendarDateParts {
 /** Convert a CalendarDate to a JavaScript Date. */
 export function calendarDateToDate(calendarDate: CalendarDate): Date {
 	const { year, month, day } = calendarParts(calendarDate)
+
 	return new Date(year, month - 1, day)
 }
 
@@ -44,15 +46,19 @@ export function today(): CalendarDate {
 	const day = date.getDate().toString().padStart(2, '0')
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We assume that today's date is within the set of allowed dates in CalendarDate.
 	const calendarDate = `${year}-${month}-${day}` as CalendarDate
+
 	return calendarDate
 }
 
 /** Return the number of days between two CalendarDates. */
 export function daysBetween(calendarDate1: CalendarDate, calendarDate2: CalendarDate): number {
 	const date1 = calendarDateToDate(calendarDate1)
+
 	date1.setMinutes(date1.getMinutes() - date1.getTimezoneOffset()) // Convert to UTC.
 	const date2 = calendarDateToDate(calendarDate2)
+
 	date2.setMinutes(date2.getMinutes() - date2.getTimezoneOffset()) // Convert to UTC.
+
 	return Math.floor((date2.valueOf() - date1.valueOf()) / (1000 * 60 * 60 * 24))
 }
 
@@ -64,5 +70,6 @@ export function daysSince(calendarDate: CalendarDate): number {
 /** Compare two dates; usable as a date sorting function. */
 export function dateCompare(calendarDate1: CalendarDate, calendarDate2: CalendarDate): -1 | 0 | 1 {
 	const days = daysBetween(calendarDate1, calendarDate2)
+
 	return days < 0 ? 1 : days > 0 ? -1 : 0
 }

@@ -21,6 +21,7 @@ import { isNonEmptyArray } from '@/types/utils/non-empty'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.self_sovereignty.transaction_inclusion'
+
 export type TransactionInclusionValue = Value & {
 	__brand: 'attributes.self_sovereignty.transaction_inclusion'
 }
@@ -70,6 +71,7 @@ function transactionSubmissionEvaluation({
 			references,
 		}
 	}
+
 	if (supportsL1Broadcast === 'NO') {
 		return {
 			value: {
@@ -102,7 +104,9 @@ function transactionSubmissionEvaluation({
 			references,
 		}
 	}
+
 	const valueId = `l1${supportsL1Broadcast.toLowerCase()}_any${[...supportAnyL2Transactions].sort().join('-').toLocaleLowerCase()}_withdrawal${[...supportForceWithdrawal].sort().join('-').toLowerCase()}_no${[...unsupportedL2s].sort().join('-').toLowerCase()}`
+
 	if (unsupportedL2s.length > 0) {
 		return {
 			value: {
@@ -132,6 +136,7 @@ function transactionSubmissionEvaluation({
 			references,
 		}
 	}
+
 	return {
 		value: {
 			id: valueId,
@@ -291,12 +296,14 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 		if (features.selfSovereignty.transactionSubmission === null) {
 			return unrated(transactionInclusion, brand, null)
 		}
+
 		if (
 			features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaDirectGossip === null ||
 			features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaSelfHostedNode === null
 		) {
 			return unrated(transactionInclusion, brand, null)
 		}
+
 		const supportsL1Broadcast: L1BroadcastSupport = isSupported(
 			features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaDirectGossip,
 		)
@@ -309,6 +316,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 		const supportAnyL2Transactions: TransactionSubmissionL2Type[] = []
 		const supportForceWithdrawal: TransactionSubmissionL2Type[] = []
 		const unsupportedL2s: TransactionSubmissionL2Type[] = []
+
 		for (const l2Type of transactionSubmissionL2Types) {
 			if (!Object.hasOwn(features.selfSovereignty.transactionSubmission.l2, l2Type)) {
 				continue
@@ -316,12 +324,15 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 
 			const l2 = l2Type
 			const support = features.selfSovereignty.transactionSubmission.l2[l2]
+
 			if (support === null) {
 				return unrated(transactionInclusion, brand, null)
 			}
+
 			if (support === TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT) {
 				continue
 			}
+
 			switch (support) {
 				case TransactionSubmissionL2Support.SUPPORTED_WITH_FORCE_INCLUSION_OF_ARBITRARY_TRANSACTIONS:
 					supportAnyL2Transactions.push(l2)
@@ -333,6 +344,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 					unsupportedL2s.push(l2)
 			}
 		}
+
 		return transactionSubmissionEvaluation({
 			supportsL1Broadcast,
 			supportAnyL2Transactions,

@@ -72,6 +72,7 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 							if (value.includes(search.toLowerCase())) {
 								return 1
 							}
+
 							return 0
 						}}
 					>
@@ -97,9 +98,11 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 											(wallet.metadata.id.toLowerCase().includes(searchLower) ||
 												wallet.metadata.displayName.toLowerCase().includes(searchLower)),
 									)
+
 									if (!isNonEmptyArray(results)) {
 										return null
 									}
+
 									const { heading, icon } = (() => {
 										switch (walletType) {
 											case WalletType.SOFTWARE:
@@ -116,6 +119,7 @@ export function WalletDropdown({ wallet }: { wallet?: RatedWallet }): React.JSX.
 												return { heading: 'Embedded Wallets', icon: null }
 										}
 									})()
+
 									return (
 										<Command.Group
 											heading={heading}

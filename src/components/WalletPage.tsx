@@ -64,6 +64,7 @@ function sectionHeaderId(section: Section): string {
 	if (section.subHeader !== null) {
 		return slugifyCamelCase(section.subHeader)
 	}
+
 	return slugifyCamelCase(section.header)
 }
 
@@ -74,6 +75,7 @@ function maybeAddCornerControl(
 	if (section.cornerControl === null) {
 		return anchorHeader
 	}
+
 	return (
 		<div key="sectionCornerControl" className="flex flex-row">
 			<div className="flex flex-col justify-center flex-1">{anchorHeader}</div>
@@ -142,16 +144,19 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 	const wallet = allRatedWallets[walletName]
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
+
 	useEffect(() => {
 		if (singleVariant !== null) {
 			return
 		}
+
 		setPickedVariant(variantFromUrlQuery(wallet.variants))
 	}, [singleVariant])
 	const updatePickedVariant = (variant: Variant | null): void => {
 		if (singleVariant !== null) {
 			return // If there is a single variant, do not pollute the URL with it.
 		}
+
 		window.history.replaceState(
 			null,
 			'',
@@ -165,12 +170,14 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			: wallet.variants[pickedVariant].attributes
 	const attrToRelevantVariants = new Map<string, NonEmptyArray<Variant>>()
 	let needsVariantFiltering = singleVariant === null
+
 	for (const [variant, variantSpecificityMap] of nonEmptyEntries<
 		Variant,
 		Map<string, VariantSpecificity>
 	>(wallet.variantSpecificity)) {
 		for (const [evalAttrId, variantSpecificity] of variantSpecificityMap.entries()) {
 			let relevantVariants: NonEmptyArray<Variant> | undefined = undefined
+
 			switch (variantSpecificity) {
 				case VariantSpecificity.ALL_SAME:
 					break // Nothing.
@@ -182,6 +189,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				default:
 					needsVariantFiltering = true
 					relevantVariants = attrToRelevantVariants.get(evalAttrId)
+
 					if (relevantVariants === undefined) {
 						attrToRelevantVariants.set(evalAttrId, [variant])
 					} else {
@@ -207,6 +215,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			),
 		},
 	]
+
 	mapNonExemptAttributeGroupsInTree(evalTree, (attrGroup, evalGroup) => {
 		const section = {
 			header: attrGroup.id,
@@ -248,8 +257,10 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							),
 						}
 					}
+
 					if (relevantVariants.length === 1) {
 						const VariantIcon = variantToIcon(relevantVariants[0])
+
 						return {
 							cornerControl: (
 								<Tooltip
@@ -285,16 +296,19 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							),
 						}
 					}
+
 					const pickerVariants = nonEmptyValues<Variant, ResolvedWallet>(wallet.variants).filter(
 						resolvedWallet =>
 							resolvedWallet.variant === pickedVariant ||
 							relevantVariants.includes(resolvedWallet.variant),
 					)
+
 					if (!isNonEmptyArray(pickerVariants)) {
 						throw new Error(
 							`Found no relevant variants to pick from in ${wallet.metadata.id} with picked variant ${pickedVariant}`,
 						)
 					}
+
 					return {
 						cornerControl: (
 							<div key="variantSpecificEval" className="flex flex-row items-center gap-2">
@@ -310,6 +324,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 												evalAttr,
 												variantWallet.attributes,
 											).evaluation.value.rating
+
 											return {
 												id: variantWallet.variant,
 												icon: variantToIcon(variantWallet.variant),
@@ -348,6 +363,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 						),
 					}
 				})()
+
 				return {
 					header: slugifyCamelCase(attrGroup.id),
 					subHeader: slugifyCamelCase(evalAttr.attribute.id),
@@ -378,6 +394,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				}
 			}).filter(subsection => subsection !== null),
 		}
+
 		if (section.subsections.length > 0) {
 			sections.push(section)
 		}
@@ -385,9 +402,11 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 	const scrollMarginTop = `${headerBottomMargin + scrollPastHeaderPixels}px`
 
 	const nonHeaderSections: RichSection[] = sections.slice(1)
+
 	if (!isNonEmptyArray(nonHeaderSections)) {
 		throw new Error('No non-header sections defined for navigation')
 	}
+
 	return (
 		<NavigationPageLayout
 			prefix={<WalletDropdown wallet={wallet} />}

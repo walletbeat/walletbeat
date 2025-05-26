@@ -12,11 +12,13 @@ export const ThemeSwitcher: FC = () => {
 		if (storedTheme !== null) {
 			// Use stored preference
 			const isDark = storedTheme === 'dark'
+
 			setIsDarkMode(isDark)
 			document.body.parentElement?.classList.toggle('dark', isDark)
 		} else {
 			// Check system preference
 			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
 			setIsDarkMode(prefersDark)
 			document.body.parentElement?.classList.toggle('dark', prefersDark)
 		}
@@ -24,6 +26,7 @@ export const ThemeSwitcher: FC = () => {
 
 	const toggleTheme = (): void => {
 		const newDarkMode = isDarkMode !== true
+
 		setIsDarkMode(newDarkMode)
 
 		// Update DOM

@@ -24,12 +24,15 @@ export type InteroperabilityValue = Value & {
 function evaluateInteroperability(features: InteroperabilitySupport): Rating {
 	const ratings = [features.thirdPartyCompatibility, features.noSupplierLinkage]
 	const passCount = ratings.filter(r => r === InteroperabilityType.PASS).length
+
 	if (passCount === 2) {
 		return Rating.PASS
 	}
+
 	if (passCount === 1) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -84,7 +87,9 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 				noSupplierLinkage: InteroperabilityType.FAIL,
 			})
 		}
+
 		const interoperabilityFeature = features.selfSovereignty.interoperability
+
 		if (interoperabilityFeature === null) {
 			return unrated(interoperability, brand, {
 				thirdPartyCompatibility: InteroperabilityType.FAIL,

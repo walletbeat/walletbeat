@@ -9,6 +9,7 @@ import { sourceVisibilityDetailsContent } from '@/types/content/source-visibilit
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.source_visibility'
+
 export type SourceVisibilityValue = Value & {
 	__brand: 'attributes.transparency.source_visibility'
 }
@@ -94,6 +95,7 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 		if (licenseSourceIsVisible(features.license.license)) {
 			return sourcePublic(toFullyQualified(features.license.ref))
 		}
+
 		return sourcePrivate(toFullyQualified(features.license.ref))
 	},
 	aggregate: pickWorstRating<SourceVisibilityValue>,

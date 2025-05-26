@@ -6,6 +6,7 @@ import { useState } from 'react'
 export function AnchorHeader(props: TypographyProps & { id?: string }): React.JSX.Element {
 	const [hovered, setHovered] = useState<boolean>(false)
 	const typographyProps = { onClick: undefined, ...props }
+
 	return (
 		<Typography {...typographyProps}>
 			<Link

@@ -43,6 +43,7 @@ export function EipPreviewModal({
 				// Check right overflow (10px margin)
 				left = rect.left - actualPopupWidth - 10 // Move to the left
 			}
+
 			if (left < 10) {
 				// Ensure 10px left margin
 				left = 10
@@ -50,6 +51,7 @@ export function EipPreviewModal({
 
 			// Clamp top position to be within viewport with 10px margins
 			const maxPossibleTop = window.innerHeight - actualPopupHeight - 10
+
 			top = Math.max(10, Math.min(top, maxPossibleTop))
 
 			setPopupPosition({ top, left })

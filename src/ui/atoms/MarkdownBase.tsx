@@ -22,14 +22,20 @@ export function deriveMarkdownPropsFromTypography(
 	typographyProps?: TypographyProps,
 	markdownProps?: MarkdownOwnProps,
 ): MarkdownOwnProps {
-	let marginTop: string | undefined = undefined
-	if (typographyProps?.marginTop !== undefined) {
-		if (typeof typographyProps.marginTop === 'number') {
-			marginTop = `${typographyProps.marginTop}px`
-		} else if (typeof typographyProps.marginTop === 'string') {
-			marginTop = typographyProps.marginTop
+	const marginTop = ((): string | undefined => {
+		if (typographyProps?.marginTop !== undefined) {
+			if (typeof typographyProps.marginTop === 'number') {
+				return `${typographyProps.marginTop}px`
+			}
+
+			if (typeof typographyProps.marginTop === 'string') {
+				return typographyProps.marginTop
+			}
 		}
-	}
+
+		return undefined
+	})()
+
 	return {
 		markdownTransform: markdownProps?.markdownTransform,
 		textColor: markdownProps?.textColor ?? typographyProps?.color,
@@ -90,16 +96,20 @@ export function MarkdownBase({
 			const hrefStr = href ?? '#'
 			const eipRegexp =
 				/^https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+)#wb-format=(short|long)$/i.exec(hrefStr)
+
 			if (eipRegexp !== null) {
 				const eip = lookupEip(+eipRegexp[1])
+
 				if (eip !== undefined) {
 					return <EipLink eip={eip} format={eipRegexp[2] === 'short' ? 'SHORT' : 'LONG'} />
 				}
 			}
+
 			if (/^[-_\w+:]/.exec(hrefStr) !== null) {
 				// External link.
 				return <ExternalLink url={hrefStr}>{children}</ExternalLink>
 			}
+
 			return <a href={hrefStr}>{children}</a>
 		},
 		p: ({ children }) => (
@@ -115,10 +125,13 @@ export function MarkdownBase({
 			</li>
 		),
 	}
+
 	markdown = trimWhitespacePrefix(markdown)
+
 	if (markdownTransform !== undefined) {
 		markdown = markdownTransform(markdown)
 	}
+
 	return (
 		<StyledMarkdown pSpacing={pSpacing} liSpacing={liSpacing}>
 			<Markdown components={componentsMap}>{markdown}</Markdown>

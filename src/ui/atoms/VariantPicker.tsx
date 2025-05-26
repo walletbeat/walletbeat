@@ -44,6 +44,7 @@ export function VariantPicker<V extends string>({
 
 				if (pickedVariant !== null) {
 					opacity = opacityFaded
+
 					if (isSelected) {
 						opacity = opacityPicked
 					}

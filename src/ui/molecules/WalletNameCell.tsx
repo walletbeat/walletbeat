@@ -26,6 +26,7 @@ const walletIconSize = shortRowHeight * 0.5
 
 function CrossedOutVariant({ variant }: { variant: Variant }): React.JSX.Element {
 	const Icon = variantToIcon(variant)
+
 	return (
 		<Tooltip content={`No ${variant} version`}>
 			<div className="flex items-center justify-center relative">
@@ -64,6 +65,7 @@ export function WalletNameCell({ row }: { row: WalletRowStateHandle }): React.JS
 			},
 		}),
 	)
+
 	return (
 		<div className="flex flex-col justify-start items-start">
 			<div

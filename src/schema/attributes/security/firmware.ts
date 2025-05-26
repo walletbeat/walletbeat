@@ -28,12 +28,15 @@ function evaluateFirmware(features: FirmwareSupport): Rating {
 		features.customFirmware,
 	]
 	const passCount = ratings.filter(r => r === FirmwareType.PASS).length
+
 	if (passCount >= 3) {
 		return Rating.PASS
 	}
+
 	if (passCount >= 1) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -97,7 +100,9 @@ export const firmware: Attribute<FirmwareValue> = {
 				customFirmware: FirmwareType.FAIL,
 			})
 		}
+
 		const firmwareFeature = features.security.firmware
+
 		if (firmwareFeature === null) {
 			return unrated(firmware, brand, {
 				silentUpdateProtection: FirmwareType.FAIL,

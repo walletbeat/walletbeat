@@ -22,6 +22,7 @@ export function ExternalLink({
 }): React.JSX.Element {
 	const labeled = labeledUrl(url, defaultLabel)
 	const [hovered, setHovered] = useState(false)
+
 	return (
 		<span className="inline-block">
 			<Link

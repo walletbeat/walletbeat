@@ -32,6 +32,7 @@ import { type FullyQualifiedReference, type ReferenceArray, refs } from '../../r
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.privacy.address_correlation'
+
 export type AddressCorrelationValue = Value & {
 	worstLeak: WalletAddressLinkableBy | null
 	__brand: 'attributes.privacy.address_correlation'
@@ -76,7 +77,8 @@ function linkable(
 		howToImprove: RenderableTypography<EvaluationData<AddressCorrelationValue>>
 	} => {
 		const leakName = leakedInfoName(worstLeak.info).long
-		const by = worstLeak.by
+		const { by } = worstLeak
+
 		switch (worstLeak.info) {
 			case LeakedPersonalInfo.PSEUDONYM:
 				if (by === 'onchain') {
@@ -94,6 +96,7 @@ function linkable(
 						),
 					}
 				}
+
 				return {
 					rating: Rating.PARTIAL,
 					howToImprove: paragraph(
@@ -131,6 +134,7 @@ function linkable(
 				}
 		}
 	})()
+
 	return {
 		value: {
 			id: `address_and_${worstLeak.info}`,
@@ -144,6 +148,7 @@ function linkable(
 						onchain.
 					`
 				}
+
 				return `
 					${walletMetadata.displayName} allows ${worstLeak.by.name}
 					to link your wallet address with your
@@ -168,46 +173,58 @@ function isSealedSecureEnclave(endpoint?: Endpoint): boolean {
 	if (endpoint === undefined) {
 		return false
 	}
+
 	if (endpoint.type === 'REGULAR') {
 		return false
 	}
+
 	if (endpoint.externalLogging.type !== 'NO') {
 		return false
 	}
+
 	if (endpoint.endToEndEncryption.type !== 'TERMINATED_INSIDE_ENCLAVE') {
 		// End-to-end encryption not terminated inside enclave, so can be MitM'd.
 		return false
 	}
+
 	if (!endpoint.verifiability.sourceAvailable || !endpoint.verifiability.reproducibleBuilds) {
 		// Server can be running any code, so all bets are off.
 		return false
 	}
+
 	if (endpoint.verifiability.clientVerification.type === 'NOT_VERIFIED') {
 		// Client does not check that the server is actually running in an
 		// enclave, so all bets are off.
 		return false
 	}
+
 	if (endpoint.verifiability.clientVerification.type === 'VERIFIED_BUT_NO_SOURCE_AVAILABLE') {
 		// Client checks but we can't check that the client is checking. Heh.
 		return false
 	}
+
 	return true
 }
 
 export function linkableToWalletAddress(leaks: Leaks): WalletAddressLinkableTo[] {
 	const qualLeaks = inferLeaks(leaks)
+
 	if (!leaksByDefault(qualLeaks.walletAddress)) {
 		return []
 	}
+
 	const linkables: WalletAddressLinkableTo[] = []
 	const qualRefs = refs(leaks)
+
 	for (const info of leakedInfos) {
 		if (leakedInfoType(info) !== LeakedInfoType.PERSONAL_DATA) {
 			continue
 		}
+
 		if (!leaksByDefault(qualLeaks[info])) {
 			continue
 		}
+
 		if (info === LeakedPersonalInfo.IP_ADDRESS) {
 			// Check if the server is running in a secure enclave with all
 			// desirable properties to shield the IP address from being a
@@ -216,8 +233,10 @@ export function linkableToWalletAddress(leaks: Leaks): WalletAddressLinkableTo[]
 				continue
 			}
 		}
+
 		linkables.push({ info, leak: qualLeaks[info], refs: qualRefs })
 	}
+
 	return linkables
 }
 
@@ -319,23 +338,29 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		if (features.privacy.dataCollection === null) {
 			return unrated(addressCorrelation, brand, { worstLeak: null })
 		}
+
 		const linkables: WalletAddressLinkableBy[] = []
 		const allRefs: ReferenceArray = refs(features.privacy.dataCollection.onchain)
+
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
 			allRefs.push(...refs(collected.leaks))
+
 			for (const linkable of linkableToWalletAddress(collected.leaks)) {
 				linkables.push({ by: collected.entity, ...linkable })
 			}
 		}
+
 		for (const linkable of linkableToWalletAddress({
 			...features.privacy.dataCollection.onchain,
 			walletAddress: Leak.ALWAYS,
 		})) {
 			linkables.push({ by: 'onchain', ...linkable })
 		}
+
 		if (isNonEmptyArray(linkables)) {
 			return linkable(linkables, allRefs)
 		}
+
 		return {
 			value: uncorrelated,
 			details: paragraph(

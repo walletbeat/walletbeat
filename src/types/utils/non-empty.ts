@@ -97,9 +97,11 @@ export function nonEmptyFilter<T>(
 	fn: (val: T, index: number) => boolean,
 ): NonEmptyArray<T> {
 	const filtered = arr.filter(fn)
+
 	if (!isNonEmptyArray(filtered)) {
 		throw new Error('Non-empty array was unexpectedly filtered down to an empty array')
 	}
+
 	return filtered
 }
 
@@ -121,7 +123,9 @@ export function nonEmptySorted<T>(
 ): NonEmptyArray<T> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input array was non-empty.
 	const arrCopy = [...arr] as NonEmptyArray<T>
+
 	arrCopy.sort(reverse === true ? (a, b) => compare(b, a) : compare)
+
 	return arrCopy
 }
 
@@ -165,13 +169,17 @@ export function isNonEmptySet<K extends string | number | symbol>(
 	if (Object.keys(obj).length === 0) {
 		return false
 	}
+
 	let oneTrue = false
+
 	for (const val of Object.values(obj)) {
 		if (typeof val !== 'boolean') {
 			return false
 		}
+
 		oneTrue ||= val
 	}
+
 	return oneTrue
 }
 
@@ -224,11 +232,13 @@ export function setUnion<K extends string | number | symbol>(
 	sets: NonEmptyArray<NonEmptySet<K>>,
 ): NonEmptySet<K> {
 	const union = new Map<K, true>()
+
 	for (const set of sets) {
 		for (const item of setItems(set)) {
 			union.set(item, true)
 		}
 	}
+
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we had at least one set as input and each set was non-empty.
 	return Object.fromEntries(union.entries()) as NonEmptySet<K>
 }

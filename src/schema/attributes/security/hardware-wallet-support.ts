@@ -17,6 +17,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.hardware_wallet_support'
+
 export type HardwareWalletSupportValue = Value & {
 	supportedHardwareWallets: HardwareWalletType[]
 	__brand: 'attributes.security.hardware_wallet_support'
@@ -193,6 +194,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				{ supportedHardwareWallets: [] },
 			)
 		}
+
 		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
 		// 	all such wallet have the opportunity to support hardware wallet to provide better security for the user
 		// Check for ERC-4337 smart wallet support
@@ -265,6 +267,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		})
 
 		worstEvaluation.value.supportedHardwareWallets = Array.from(allSupportedWallets)
+
 		return worstEvaluation
 	},
 }

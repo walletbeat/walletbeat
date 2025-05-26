@@ -33,12 +33,15 @@ function evaluateMaintenance(features: MaintenanceSupport): Rating {
 		features.warrantyExtensions,
 	]
 	const passCount = ratings.filter(r => r === MaintenanceType.PASS).length
+
 	if (passCount >= 4) {
 		return Rating.PASS
 	}
+
 	if (passCount >= 2) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -113,7 +116,9 @@ export const maintenance: Attribute<MaintenanceValue> = {
 				},
 			)
 		}
+
 		const maintenanceFeature = features.transparency.maintenance
+
 		if (maintenanceFeature === null) {
 			return unrated(maintenance, brand, {
 				physicalDurability: MaintenanceType.FAIL,

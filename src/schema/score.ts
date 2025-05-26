@@ -22,9 +22,11 @@ export type MaybeUnratedScore = null | {
 export function weightedScore(scores: NonEmptyArray<WeightedScore>): Score {
 	let totalScore = 0.0
 	let totalWeight = 0.0
+
 	nonEmptyMap(scores, ({ score, weight }) => {
 		totalScore += score * weight
 		totalWeight += weight
 	})
+
 	return totalWeight === 0.0 ? 0.0 : totalScore / totalWeight
 }

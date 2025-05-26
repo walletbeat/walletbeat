@@ -22,7 +22,9 @@ export function RenderContent({
 	if (isTypographicContent(content)) {
 		return <RenderTypographicContent content={content} {...otherProps} />
 	}
+
 	const { component, componentProps } = content.component
+
 	switch (component) {
 		case 'AddressCorrelationDetails':
 			return <AddressCorrelationDetails {...componentProps} {...otherProps} />

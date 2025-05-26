@@ -18,6 +18,7 @@ export function NavigationStateManager(): null {
 		const handlePageLoad = (): void => {
 			// Restore scroll position if saved
 			const scrollPosition = sessionStorage.getItem('scrollPosition')
+
 			if (scrollPosition !== null && scrollPosition !== '') {
 				window.scrollTo({
 					top: parseInt(scrollPosition, 10),

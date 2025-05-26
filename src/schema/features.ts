@@ -262,6 +262,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 		if (!isWalletSoftwareFeatures(features)) {
 			return null
 		}
+
 		return resolveFeature<F>(featureFn(features), variant)
 	}
 	const hardwareFeat = <F>(
@@ -270,6 +271,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 		if (!isWalletHardwareFeatures(features)) {
 			return null
 		}
+
 		return resolveFeature<F>(featureFn(features), variant)
 	}
 

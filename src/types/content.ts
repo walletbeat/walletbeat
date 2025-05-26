@@ -133,12 +133,14 @@ export function sentence<I extends Input = Input>(
 			`Sentence text is too long (${text.length} characters is over the maximum length of ${sentenceMaxLength} characters).`,
 		)
 	}
+
 	if (isMarkdown ?? false) {
 		return {
 			render: (input: I) => markdownContent(text, input),
 			__brand: sentenceBrand,
 		}
 	}
+
 	return {
 		render: (input: I) => textContent(text, input),
 		__brand: sentenceBrand,
@@ -170,12 +172,14 @@ export function paragraph<I extends Input = Input>(
 			`Paragraph text is too long (${text.length} characters is over the maximum length of ${paragraphMaxLength} characters).`,
 		)
 	}
+
 	if (isMarkdown ?? false) {
 		return {
 			render: (input: I) => markdownContent(text, input),
 			__brand: paragraphBrand,
 		}
 	}
+
 	return {
 		render: (input: I) => textContent(text, input),
 		__brand: paragraphBrand,
@@ -214,6 +218,7 @@ function mergeProps<XY extends object, X extends keyof XY>(
 	/* eslint-disable eslint-comments/no-unlimited-disable -- The set of ESLint failures on this next block varies depending on some versions. */
 	/* eslint-disable -- This is valid because xy is the union of two objects which add up to the set of keys in XY. */
 	const xy: XY = { ...x, ...y } as XY
+
 	/* eslint-enable */
 	return xy
 }
@@ -248,6 +253,7 @@ export function component<
 					...mergeProps<C['componentProps'], B>(bakedProps, input),
 				},
 			}
+
 			return {
 				contentType: ContentType.COMPONENT,
 				component: comp as C, // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- We've already typechecked that both the component and its props correspond to C.

@@ -531,15 +531,19 @@ export function exampleRating<V extends Value>(
 				if (matcher === exampleRatingUnimplemented) {
 					return false
 				}
+
 				if (isRating(matcher)) {
 					return value.rating === matcher
 				}
+
 				if (typeof matcher === 'string') {
 					return value.id === matcher
 				}
+
 				if (typeof matcher === 'function') {
 					return matcher(value)
 				}
+
 				return matcher.id === value.id
 			}).includes(true),
 	}

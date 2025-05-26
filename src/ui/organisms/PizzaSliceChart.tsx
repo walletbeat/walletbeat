@@ -28,10 +28,12 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 	const [modalOpen, setModalOpen] = useState(false)
 
 	const attrGroupScore = attrGroup.score(evalGroup)
+
 	if (attrGroupScore === null) {
 		// All attributes in the group are exempt, can't render pie chart.
 		return <></>
 	}
+
 	const attributeCount = numNonExemptGroupAttributes(evalGroup)
 
 	const tooltipText = `${attrGroup.displayName}: ${Math.round(attrGroupScore.score * 100)}% (${attributeCount} attributes)`

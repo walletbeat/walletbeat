@@ -119,9 +119,11 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			)}
 		</>
 	)
+
 	if (isTypographicContent(details)) {
 		rendered = <WrapRatingIcon rating={evalAttr.evaluation.value.rating}>{rendered}</WrapRatingIcon>
 	}
+
 	const accordions: NonEmptyArray<AccordionData> = [
 		{
 			id: `why-${evalAttr.attribute.id}`,
@@ -149,6 +151,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		},
 	]
 	const howToImprove = override?.howToImprove ?? evalAttr.evaluation.howToImprove
+
 	if (howToImprove !== undefined) {
 		accordions.push({
 			id: `how-${evalAttr.attribute.id}`,
@@ -168,6 +171,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			),
 		})
 	}
+
 	return (
 		<>
 			{rendered}

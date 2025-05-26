@@ -22,6 +22,7 @@ export function SecurityAuditsDetails({
 	hasUnaddressedFlaws,
 }: SecurityAuditsDetailsProps): React.JSX.Element {
 	const audits = value.securityAudits
+
 	if (!isNonEmptyArray(audits)) {
 		return (
 			<WrapRatingIcon rating={value.rating}>
@@ -38,6 +39,7 @@ export function SecurityAuditsDetails({
 		true /* Reverse */,
 	)
 	const mostRecentAudit = nonEmptyGet(sortedAudits)
+
 	return (
 		<>
 			<WrapRatingIcon rating={value.rating}>

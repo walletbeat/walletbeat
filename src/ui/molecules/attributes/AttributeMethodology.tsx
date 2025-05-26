@@ -86,11 +86,13 @@ function replaceExampleRatingPrefix(
 		const possessiveWalletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet's\s+/
 
 		const walletTypeMatch = walletTypeRegex.exec(unprefixedText)
+
 		if (walletTypeMatch !== null) {
 			return `${whitespacePrefix}${theWallet}${unprefixedText.substring(walletTypeMatch[0].length)}`
 		}
 
 		const possessiveWalletTypeMatch = possessiveWalletTypeRegex.exec(unprefixedText)
+
 		if (possessiveWalletTypeMatch !== null) {
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring(possessiveWalletTypeMatch[0].length)}`
 		}
@@ -147,10 +149,13 @@ function ExampleRatings<V extends Value>({
 				: Array.isArray(exampleRatings)
 					? exampleRatings
 					: [exampleRatings]
+
 		if (ratingsList.length === 0) {
 			return { key: rating, element: null }
 		}
+
 		const preamble = ratingsList.length === 1 ? singularPreamble : pluralPreamble
+
 		return {
 			key: rating,
 			element: (
@@ -194,6 +199,7 @@ function ExampleRatings<V extends Value>({
 				return [failRendered, partialRendered, passRendered]
 		}
 	})()
+
 	return (
 		<>
 			<Typography variant="h5">{exhaustive ? '' : 'A few examples'}</Typography>

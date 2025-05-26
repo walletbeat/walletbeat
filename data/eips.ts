@@ -25,14 +25,17 @@ export function getEip(eip: EipNumber | Eip): Eip {
 	if (typeof eip !== 'string') {
 		return eip
 	}
+
 	return eips[eip]
 }
 
 /** Look up EIP information for a given number. */
 export function lookupEip(eip: number): Eip | undefined {
 	const eipNumber = eip.toString() as EipNumber // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we will check whether this is correct on the very next line.
+
 	if (Object.hasOwn(eips, eipNumber)) {
 		return eips[eipNumber]
 	}
+
 	return undefined
 }

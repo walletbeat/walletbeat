@@ -19,6 +19,7 @@ export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JS
 			</Typography>
 		)
 	}
+
 	if (value.license === License.UNLICENSED_VISIBLE) {
 		return (
 			<Typography variant="body2">
@@ -27,10 +28,13 @@ export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JS
 			</Typography>
 		)
 	}
+
 	const url = licenseUrl(value.license)
+
 	if (url === null) {
 		throw new Error(`Invalid license: ${value.license}`)
 	}
+
 	const fossText = ((): string => {
 		switch (licenseIsFOSS(value.license)) {
 			case FOSS.FOSS:
@@ -41,6 +45,7 @@ export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JS
 				return 'a non-open-source (non-FOSS) license.'
 		}
 	})()
+
 	return (
 		<Typography variant="body2">
 			{wallet.metadata.displayName} is licensed under the{' '}

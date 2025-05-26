@@ -121,6 +121,7 @@ function getWalletTypeInfo(
 		(setContains<AccountType>(accountTypes, AccountType.eip7702) ||
 			setContains<AccountType>(accountTypes, AccountType.rawErc4337))
 	const hasHardware = hasVariant(wallet.variants, Variant.HARDWARE)
+
 	return {
 		accountTypes,
 		hasEoa,
@@ -173,9 +174,11 @@ function getDetailedWalletDescription(wallet: RatedWallet): string {
 // Helper function to get hardware wallet manufacture type display name
 function getHardwareWalletManufactureTypeDisplay(wallet: RatedWallet): string {
 	const manufactureType = wallet.metadata.hardwareWalletManufactureType
+
 	if (manufactureType !== undefined) {
 		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType]
 	}
+
 	return 'Unknown'
 }
 
@@ -205,6 +208,7 @@ function getEvaluationTree(wallet: RatedWallet, selectedVariant: DeviceVariant):
 	}
 
 	const variantData = wallet.variants[selectedVariant]
+
 	return variantData !== undefined ? variantData.attributes : wallet.overall
 }
 
@@ -226,6 +230,7 @@ function getFlagshipModel(wallet: RatedWallet): HardwareWalletModel | undefined 
 	const models = getHardwareWalletModels(wallet)
 	// First, try to find a model explicitly marked as flagship
 	const flagshipModel = models.find(model => model.isFlagship === true)
+
 	// If no flagship is explicitly marked, return the first model as default
 	return flagshipModel ?? models[0]
 }
@@ -328,6 +333,7 @@ function createWalletNameCell(): ({ row }: { row: Row<TableRow> }) => React.Reac
 			</div>
 		)
 	}
+
 	return createCell
 }
 
@@ -347,6 +353,7 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 		if (closeTimeout.current !== null) {
 			clearTimeout(closeTimeout.current)
 		}
+
 		setIsTagHovered(true)
 		setAnchorEl(e.currentTarget)
 	}
@@ -362,6 +369,7 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 		if (closeTimeout.current !== null) {
 			clearTimeout(closeTimeout.current)
 		}
+
 		setIsModalHovered(true)
 	}
 
@@ -405,7 +413,7 @@ function ExpandableHardwareWalletRow({
 	const [isExpanded, setIsExpanded] = useState(false)
 	const [selectedModel, setSelectedModel] = useState<string | null>(null)
 
-	const wallet = row.original.wallet
+	const { wallet } = row.original
 	const models: HardwareWalletModel[] = getHardwareWalletModels(wallet)
 	const flagshipModel = getFlagshipModel(wallet)
 
@@ -419,6 +427,7 @@ function ExpandableHardwareWalletRow({
 			// 2. The lint error implies HardwareWalletModel.id is a non-nullable string.
 			// Therefore, the fallback `?? ''` was redundant.
 			const modelIdToSelect = flagshipModel?.id ?? models[0].id
+
 			setSelectedModel(modelIdToSelect)
 		}
 	}, [flagshipModel, models, selectedModel])
@@ -461,6 +470,7 @@ function ExpandableHardwareWalletRow({
 		if (columnIndex < 2) {
 			return flexRender(cell.column.columnDef.cell, cell.getContext())
 		}
+
 		return perAttributeGroupCells[columnIndex - 2]
 	}
 
@@ -469,9 +479,11 @@ function ExpandableHardwareWalletRow({
 		if (a.isFlagship === true) {
 			return -1
 		}
+
 		if (b.isFlagship === true) {
 			return 1
 		}
+
 		return 0
 	})
 
@@ -616,6 +628,7 @@ export default function WalletTable(): React.ReactElement {
 		() =>
 			softwareWalletData.filter(row => {
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+
 				return hasEoa && !hasSmartWallet
 			}).length,
 		[],
@@ -625,6 +638,7 @@ export default function WalletTable(): React.ReactElement {
 		() =>
 			softwareWalletData.filter(row => {
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+
 				return hasSmartWallet && !hasEoa
 			}).length,
 		[],
@@ -634,6 +648,7 @@ export default function WalletTable(): React.ReactElement {
 		() =>
 			softwareWalletData.filter(row => {
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+
 				return hasSmartWallet && hasEoa
 			}).length,
 		[],
@@ -667,6 +682,7 @@ export default function WalletTable(): React.ReactElement {
 			wallet.overall,
 			(attrGroup, evalGroup) => attrGroup.score(evalGroup)?.score ?? 0,
 		)
+
 		return groupScores.reduce((sum, score) => sum + score, 0)
 	}
 
@@ -676,7 +692,9 @@ export default function WalletTable(): React.ReactElement {
 			activeTab === WalletTableTab.SOFTWARE
 				? [...filteredSoftwareWalletData]
 				: [...hardwareWalletData]
+
 		data.sort((a, b) => getOverallScore(b.wallet) - getOverallScore(a.wallet))
+
 		return data
 	}, [activeTab, filteredSoftwareWalletData, hardwareWalletData])
 
@@ -727,10 +745,12 @@ export default function WalletTable(): React.ReactElement {
 				.filter((val): val is WalletTypeCategory => val !== null)
 				.map(cat => (WALLET_TYPE_DISPLAY[cat] !== '' ? WALLET_TYPE_DISPLAY[cat] : cat))
 				.join(' & ')
+
 			// If no standards, just return the type string
 			if (!hasSmartWallet) {
 				return typeString
 			}
+
 			return (
 				<div>
 					<span>{typeString}</span>
@@ -758,7 +778,7 @@ export default function WalletTable(): React.ReactElement {
 		id: 'risk',
 		header: 'By device',
 		cell: ({ row }): React.ReactNode => {
-			const wallet = row.original.wallet
+			const { wallet } = row.original
 			const supportsBrowser = hasVariant(wallet.variants, Variant.BROWSER)
 			const supportsMobile = hasVariant(wallet.variants, Variant.MOBILE)
 			const supportsDesktop = hasVariant(wallet.variants, Variant.DESKTOP)
@@ -868,7 +888,7 @@ export default function WalletTable(): React.ReactElement {
 		columnHelper.display({
 			header: attrGroup.displayName,
 			cell: ({ row }): React.ReactNode => {
-				const wallet = row.original.wallet
+				const { wallet } = row.original
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
@@ -1182,6 +1202,7 @@ export default function WalletTable(): React.ReactElement {
 							<tr className="bg-tertiary" key={headerGroup.id}>
 								{headerGroup.headers.map(header => {
 									const headerContent = header.column.columnDef.header
+
 									return (
 										<th
 											key={header.id}

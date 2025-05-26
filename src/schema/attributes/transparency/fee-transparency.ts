@@ -14,6 +14,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.fee_transparency'
+
 export type FeeTransparencyValue = Value & {
 	feeTransparencyLevel: FeeTransparencyLevel
 	disclosesWalletFees: boolean
@@ -258,10 +259,8 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 			})
 		}
 
-		const feeTransparencySupport = features.transparency.feeTransparency
-		const level = feeTransparencySupport.level
-		const disclosesWalletFees = feeTransparencySupport.disclosesWalletFees
-		const showsTransactionPurpose = feeTransparencySupport.showsTransactionPurpose
+		const { level, disclosesWalletFees, showsTransactionPurpose } =
+			features.transparency.feeTransparency
 
 		switch (level) {
 			case FeeTransparencyLevel.NONE:

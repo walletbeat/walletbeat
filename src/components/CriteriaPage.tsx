@@ -87,14 +87,17 @@ export function CriteriaPage({
 }): React.JSX.Element {
 	const representativeWallet = representativeWalletForType(walletType)
 	const attrGroup = getAttributeGroupById(attrGroupId, representativeWallet.overall)
+
 	if (attrGroup === null) {
 		throw new Error('Invalid attribute group')
 	}
+
 	const evalGroup = getAttributeGroupInTree(representativeWallet.overall, attrGroup)
 	const wallets = Object.values(allRatedWallets).filter(wallet => {
 		if (wallet.types[walletType]) {
 			return true
 		}
+
 		return false
 	})
 
