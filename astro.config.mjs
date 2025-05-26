@@ -25,6 +25,22 @@ export default defineConfig({
 		}),
 	],
 	vite: {
+		optimizeDeps: {
+			exclude: ['@mui/x-internals'],
+		},
+		build: {
+			// Improve chunking strategy
+			chunkSizeWarningLimit: 1000,
+			rollupOptions: {
+				output: {
+					manualChunks: {
+						react: ['react', 'react-dom'],
+						mui: ['@mui/material', '@mui/icons-material'],
+						reactIcons: ['react-icons'],
+					},
+				},
+			},
+		},
 		ssr: {
 			noExternal: ['@mui/*'],
 			external: ['@mui/x-internals'],

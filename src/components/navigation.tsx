@@ -1,8 +1,7 @@
 import ForumIcon from '@mui/icons-material/Forum'
-import GitHubIcon from '@mui/icons-material/GitHub'
 import HelpCenterIcon from '@mui/icons-material/HelpCenter'
 import HomeIcon from '@mui/icons-material/Home'
-import { LuBadgeCheck, LuBuilding2 } from 'react-icons/lu'
+import { LuBadgeCheck, LuBuilding2, LuGithub } from 'react-icons/lu'
 
 import { betaSiteRoot } from '@/constants'
 import type { NavigationLinkItem } from '@/ui/organisms/Navigation'
@@ -37,7 +36,7 @@ export const navigationCriteria: NavigationLinkItem = {
 
 export const navigationRepository: NavigationLinkItem = {
 	id: 'code-repository',
-	icon: <GitHubIcon />,
+	icon: <LuGithub />,
 	title: 'Contribute on GitHub',
 	href: 'https://github.com/walletbeat/walletbeat',
 }

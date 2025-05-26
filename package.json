@@ -6,6 +6,7 @@
 		"astro": "ASTRO_TELEMETRY_DISABLED=1 astro",
 		"build": "pnpm run astro build",
 		"check:all": "pnpm run check:astro && pnpm run check:lint && pnpm run check:syntax && pnpm run check:spelling && pnpm run check:misc",
+		"check:precommit": "pnpm run check:lint && pnpm run check:spelling && pnpm run check:misc",
 		"check:astro": "pnpm run astro check --minimumSeverity=hint --minimumFailingSeverity=hint",
 		"check:lint": "eslint --cache src data",
 		"check:spelling": "cspell lint .",
@@ -45,6 +46,7 @@
 		"autoprefixer": "^10.4.21",
 		"classnames": "^2.5.1",
 		"cmdk": "^1.0.4",
+		"eslint-plugin-prettier": "^5.4.0",
 		"postcss": "^8.5.1",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
@@ -53,10 +55,12 @@
 		"sass-embedded": "^1.85.1",
 		"tailwind-merge": "^2.5.5",
 		"tailwindcss": "3.4.3",
-		"tailwindcss-animate": "^1.0.7"
+		"tailwindcss-animate": "^1.0.7",
+		"typescript-eslint": "^8.32.1"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.4",
+		"@eslint/js": "^9.27.0",
 		"@fleek-platform/cli": "^3.8.2",
 		"@kindspells/astro-shield": "^1.7.1",
 		"@types/classnames": "^2.3.4",

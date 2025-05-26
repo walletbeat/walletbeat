@@ -1,8 +1,8 @@
-import GitHubIcon from '@mui/icons-material/GitHub'
 import LanguageIcon from '@mui/icons-material/Language'
 import { Typography } from '@mui/material'
 import { type FC, Fragment } from 'react'
 import React from 'react'
+import { LuGithub } from 'react-icons/lu'
 
 import { variantToName, variantToRunsOn } from '@/components/variants'
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
@@ -34,7 +34,7 @@ export const WalletHeading: FC<{
 					</div>,
 					wallet.metadata.repoUrl !== null ? (
 						<div className="flex flex-row gap-2 items-center" key="repo">
-							<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
+							<LuGithub />
 							<ExternalLink
 								url={wallet.metadata.repoUrl}
 								defaultLabel="GitHub Repository"

@@ -1,4 +1,6 @@
 import globals from 'globals'
+import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
 import react from 'eslint-plugin-react'
 import love from 'eslint-config-love'
 import eslintConfigPrettier from 'eslint-config-prettier'
@@ -17,7 +19,9 @@ const firstOrderedKeys = [
 	'metadata',
 ]
 
-export default [
+export default tseslint.config(
+	eslint.configs.recommended,
+	tseslint.configs.recommended,
 	love,
 	react.configs.flat.recommended,
 	react.configs.flat['jsx-runtime'],
@@ -73,4 +77,4 @@ export default [
 			],
 		},
 	},
-]
+)

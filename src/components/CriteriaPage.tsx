@@ -2,7 +2,7 @@ import type React from 'react'
 import { LuCpu, LuKey, LuWallet } from 'react-icons/lu'
 
 import { navigationAbout } from '@/components/navigation'
-import { representativeWalletForType } from '@/data/wallets'
+import { allRatedWallets, representativeWalletForType } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import {
 	getAttributeGroupById,
@@ -10,6 +10,7 @@ import {
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
+import type { RatedWallet } from '@/schema/wallet'
 import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types'
 import { RenderContent } from '@/ui/atoms/RenderContent'
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent'
@@ -90,6 +91,13 @@ export function CriteriaPage({
 		throw new Error('Invalid attribute group')
 	}
 	const evalGroup = getAttributeGroupInTree(representativeWallet.overall, attrGroup)
+	const wallets = Object.values(allRatedWallets).filter(wallet => {
+		if (wallet.types[walletType]) {
+			return true
+		}
+		return false
+	})
+
 	return (
 		<NavigationPageLayout
 			groups={[
@@ -132,6 +140,7 @@ export function CriteriaPage({
 									}}
 								/>
 							</p>
+							<AttributeGroupSummary wallets={wallets} />
 							{mapNonExemptGroupAttributes(evalGroup, evalAttr => (
 								<div key={evalAttr.attribute.id} className="space-y-2">
 									<h2 className="text-2xl font-extrabold text-accent">
@@ -152,3 +161,14 @@ export function CriteriaPage({
 		</NavigationPageLayout>
 	)
 }
+
+export const AttributeGroupSummary = ({
+	wallets,
+}: {
+	wallets: RatedWallet[]
+}): React.JSX.Element => (
+	<div className="whitespace-pre-wrap">
+		Attribute group summary
+		<div>{wallets.map(wallet => wallet.metadata.displayName)}</div>
+	</div>
+)

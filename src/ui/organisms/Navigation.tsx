@@ -1,6 +1,6 @@
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
-import React, { memo, useState } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { LuMenu, LuX } from 'react-icons/lu'
 
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
@@ -114,7 +114,7 @@ interface NavigationItemProps {
 	depth: 'primary' | 'secondary'
 	selectedItemId?: string
 	selectedGroupId?: string
-	onContentItemClick?: (item: NavigationContentItem) => void
+	onContentItemClick?: (_item: NavigationContentItem) => void
 }
 
 function itemOrChildMatches(item: NavigationItem, selectedItemId?: string): boolean {
@@ -140,23 +140,35 @@ const NavigationItem = memo(
 		const shouldHighlight = item.id === selectedItemId && selectedGroupId !== undefined
 		const initiallyOpen = itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined
 		const [isOpen, setIsOpen] = useState(initiallyOpen)
-		React.useEffect(() => {
+
+		// Use useEffect to handle changes to selectedItemId
+		useEffect(() => {
 			if (itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined) {
 				setIsOpen(true)
 			}
 		}, [selectedItemId, item, selectedGroupId])
-		const linkStyles = cx(
-			'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
-			shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-backgroundSecondary',
-		)
-		const hasChildren = (item.children?.length ?? 0) > 0
 
-		const toggleDropdown = (e: React.MouseEvent): void => {
-			if (hasChildren) {
-				e.preventDefault()
-				setIsOpen(!isOpen)
-			}
-		}
+		// Memoize link styles to prevent recalculations
+		const linkStyles = useMemo(
+			() =>
+				cx(
+					'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
+					shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-backgroundSecondary',
+				),
+			[shouldHighlight],
+		)
+
+		const hasChildren = useMemo(() => (item.children?.length ?? 0) > 0, [item.children])
+
+		const toggleDropdown = useCallback(
+			(e: React.MouseEvent): void => {
+				if (hasChildren) {
+					e.preventDefault()
+					setIsOpen(!isOpen)
+				}
+			},
+			[hasChildren, isOpen],
+		)
 
 		const ButtonComponent = ({
 			children,
@@ -271,7 +283,7 @@ interface NavigationGroupProps {
 	group: NavigationGroup
 	groupIndex: number
 	activeItemId?: string
-	onContentItemClick?: (item: NavigationContentItem) => void
+	onContentItemClick?: (_item: NavigationContentItem) => void
 	selectedItemId?: string
 	selectedGroupId?: string
 }
@@ -364,7 +376,7 @@ export function Navigation({
 	groups: NonEmptyArray<NavigationGroup>
 	activeItemId?: string
 	flex?: React.ComponentProps<typeof Box>['flex']
-	onContentItemClick?: (item: NavigationContentItem) => void
+	onContentItemClick?: (_item: NavigationContentItem) => void
 	prefix?: React.ReactNode
 	selectedItemId?: string
 	selectedGroupId?: string
@@ -381,6 +393,14 @@ export function Navigation({
 			document.body.style.overflow = ''
 		}
 	}
+
+	// Ensure body overflow is reset when component unmounts
+	React.useEffect(
+		() => () => {
+			document.body.style.overflow = ''
+		},
+		[],
+	)
 
 	return (
 		<>

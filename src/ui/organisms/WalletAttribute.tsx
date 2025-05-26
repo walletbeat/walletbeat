@@ -148,8 +148,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			),
 		},
 	]
-	const howToImprove =
-		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove
+	const howToImprove = override?.howToImprove ?? evalAttr.evaluation.howToImprove
 	if (howToImprove !== undefined) {
 		accordions.push({
 			id: `how-${evalAttr.attribute.id}`,

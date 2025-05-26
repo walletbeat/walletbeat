@@ -13,6 +13,23 @@ import {
 
 const scrollNavigationMargin = 8
 
+// Debounce function to limit how often a function is called
+function debounce<T extends (...args: Parameters<T>) => void>(
+	fn: T,
+	delay: number,
+): (...args: Parameters<T>) => void {
+	let timer: ReturnType<typeof setTimeout> | null = null
+
+	return (...args: Parameters<T>) => {
+		if (timer !== null) {
+			clearTimeout(timer)
+		}
+		timer = setTimeout(() => {
+			fn(...args)
+		}, delay)
+	}
+}
+
 export function NavigationPageLayout({
 	groups,
 	children,
@@ -62,41 +79,45 @@ export function NavigationPageLayout({
 }): React.JSX.Element {
 	const [activeItemId, setActiveItemId] = useState<string>('')
 
-	const scrollNavigationTo = (itemId: string): void => {
-		const listItem = document.getElementById(`listItem-${itemId}`)
-		if (listItem === null) {
-			return
-		}
-		const itemGroup: NavigationGroup | undefined = groups.find((group: NavigationGroup): boolean =>
-			group.items.some((navItem: NavigationItem): boolean => navItem.id === itemId),
-		)
-		if (itemGroup === undefined) {
-			return
-		}
-		const navigation = document.getElementById(`navigationGroup-${itemGroup.id}`)
-		if (navigation === null) {
-			return
-		}
-		const navigationRect = navigation.getBoundingClientRect()
-		const listItemRect = listItem.getBoundingClientRect()
-		if (listItemRect.top < navigationRect.top) {
-			navigation.scrollBy({
-				top: listItemRect.top - navigationRect.top - scrollNavigationMargin,
-				behavior: 'smooth',
-			})
-		} else if (listItemRect.bottom > navigationRect.bottom) {
-			navigation.scrollBy({
-				top: listItemRect.bottom - navigationRect.bottom + scrollNavigationMargin,
-				behavior: 'smooth',
-			})
-		}
-	}
+	const scrollNavigationTo = useCallback(
+		(itemId: string): void => {
+			const listItem = document.getElementById(`listItem-${itemId}`)
+			if (listItem === null) {
+				return
+			}
+			const itemGroup: NavigationGroup | undefined = groups.find(
+				(group: NavigationGroup): boolean =>
+					group.items.some((navItem: NavigationItem): boolean => navItem.id === itemId),
+			)
+			if (itemGroup === undefined) {
+				return
+			}
+			const navigation = document.getElementById(`navigationGroup-${itemGroup.id}`)
+			if (navigation === null) {
+				return
+			}
+			const navigationRect = navigation.getBoundingClientRect()
+			const listItemRect = listItem.getBoundingClientRect()
+			if (listItemRect.top < navigationRect.top) {
+				navigation.scrollBy({
+					top: listItemRect.top - navigationRect.top - scrollNavigationMargin,
+					behavior: 'smooth',
+				})
+			} else if (listItemRect.bottom > navigationRect.bottom) {
+				navigation.scrollBy({
+					top: listItemRect.bottom - navigationRect.bottom + scrollNavigationMargin,
+					behavior: 'smooth',
+				})
+			}
+		},
+		[groups],
+	)
 
 	useEffect(() => {
 		if (activeItemId !== '') {
 			scrollNavigationTo(activeItemId)
 		}
-	}, [activeItemId])
+	}, [activeItemId, scrollNavigationTo])
 
 	const isPageSmoothScrolling = useRef(false)
 
@@ -116,9 +137,10 @@ export function NavigationPageLayout({
 			{ once: true },
 		)
 
+		// Set a timeout to reset the flag in case scrollend doesn't fire
 		setTimeout(() => {
 			isPageSmoothScrolling.current = false
-		}, 1250)
+		}, 1000)
 	}, [])
 
 	useEffect(() => {
@@ -126,7 +148,7 @@ export function NavigationPageLayout({
 		return () => {
 			window.removeEventListener('hashchange', onHashChange)
 		}
-	}, [groups, onHashChange])
+	}, [onHashChange])
 
 	const onScroll = useCallback(
 		(_: Event) => {
@@ -157,15 +179,18 @@ export function NavigationPageLayout({
 
 			setActiveItemId(activeItem === undefined ? '' : activeItem.id)
 		},
-		[groups],
+		[groups, stickyHeaderId, stickyHeaderMargin],
 	)
 
+	// Debounce the scroll handler to improve performance
+	const debouncedScrollHandler = useCallback(debounce(onScroll, 100), [onScroll])
+
 	useEffect(() => {
-		window.addEventListener('scroll', onScroll, { passive: true })
+		window.addEventListener('scroll', debouncedScrollHandler, { passive: true })
 		return () => {
-			window.removeEventListener('scroll', onScroll)
+			window.removeEventListener('scroll', debouncedScrollHandler)
 		}
-	}, [groups, onScroll, ...contentDependencies])
+	}, [debouncedScrollHandler, ...contentDependencies])
 
 	return (
 		<ThemeProvider theme={theme}>
