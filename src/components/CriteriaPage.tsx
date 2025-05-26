@@ -273,7 +273,7 @@ export const AttributeGroupSummary = ({
 							return (
 								<div
 									className={cx(
-										'py-1 px-1.5 text-center font-medium rounded-md',
+										'py-1 px-1.5 text-center text-sm rounded-md max-w-[96px]',
 										rating === Rating.PASS && 'bg-rating-pass text-primary',
 										rating === Rating.FAIL && 'bg-rating-fail text-primary',
 										rating === Rating.PARTIAL && 'bg-rating-partial text-primary',
@@ -306,7 +306,7 @@ export const AttributeGroupSummary = ({
 							{headerGroup.headers.map(header => (
 								<th
 									key={header.id}
-									className="px-4 py-3 text-left text-xs font-medium text-secondary uppercase tracking-wider"
+									className="px-2 first:pl-4 py-2 text-left text-xs font-medium text-secondary uppercase tracking-wider"
 								>
 									{header.isPlaceholder
 										? null
@@ -320,7 +320,7 @@ export const AttributeGroupSummary = ({
 					{table.getRowModel().rows.map(row => (
 						<tr key={row.id}>
 							{row.getVisibleCells().map(cell => (
-								<td key={cell.id} className="px-4 py-0.5">
+								<td key={cell.id} className="px-2 first:pl-4 py-0.5">
 									{flexRender(cell.column.columnDef.cell, cell.getContext())}
 								</td>
 							))}
