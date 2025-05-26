@@ -52,7 +52,13 @@
 				list-style-type: revert;
 				padding-inline-start: 1.5em;
 
-				li + li {
+				> * + * {
+					margin-top: 1em;
+				}
+			}
+
+			li {
+				> * + * {
 					margin-top: 1em;
 				}
 			}
