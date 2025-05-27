@@ -1,66 +1,66 @@
 ---
 // Global CSS
-import '../global.css'
+import '../global.css';
 
 // Props
-import type { ComponentProps } from 'astro/types'
-import { ClientRouter } from 'astro:transitions'
+import type { ComponentProps } from 'astro/types';
+import { ClientRouter } from 'astro:transitions';
 
 type Props = {
-	metadata: ComponentProps<typeof Metadata>['metadata']
-}
+  metadata: ComponentProps<typeof Metadata>['metadata'];
+};
 
-const { metadata } = Astro.props
+const { metadata } = Astro.props;
 
 // Components
-import Metadata from '@/components/Metadata.astro'
-import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
-import { NavigationStateManager } from '@/components/NavigationStateManager'
+import Metadata from '@/components/Metadata.astro';
+import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry';
+import { NavigationStateManager } from '@/components/NavigationStateManager';
 ---
 
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<Metadata {metadata} />
-		<ClientRouter />
-		<!-- Theme initialization script -->
-		<script is:inline>
-			// Initialize theme from localStorage or system preference
-			function initializeTheme() {
-				// Check localStorage first
-				const storedTheme = localStorage.getItem('theme')
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width' />
+    <Metadata {metadata} />
+    <ClientRouter />
+    <!-- Theme initialization script -->
+    <script is:inline>
+      // Initialize theme from localStorage or system preference
+      function initializeTheme() {
+        // Check localStorage first
+        const storedTheme = localStorage.getItem('theme');
 
-				if (storedTheme) {
-					// Use stored preference
-					document.documentElement.classList.toggle('dark', storedTheme === 'dark')
-				} else {
-					// Check system preference
-					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-					document.documentElement.classList.toggle('dark', prefersDark)
-					// Store the initial preference
-					localStorage.setItem('theme', prefersDark ? 'dark' : 'light')
-				}
-			}
+        if (storedTheme) {
+          // Use stored preference
+          document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+        } else {
+          // Check system preference
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.classList.toggle('dark', prefersDark);
+          // Store the initial preference
+          localStorage.setItem('theme', prefersDark ? 'dark' : 'light');
+        }
+      }
 
-			// Run immediately
-			initializeTheme()
-		</script>
-	</head>
-	<body>
-		<ThemeRegistry>
-			<NavigationStateManager client:load />
-			<slot />
-		</ThemeRegistry>
-	</body>
+      // Run immediately
+      initializeTheme();
+    </script>
+  </head>
+  <body>
+    <ThemeRegistry>
+      <NavigationStateManager client:load />
+      <slot />
+    </ThemeRegistry>
+  </body>
 </html>
 
 <style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
 </style>
