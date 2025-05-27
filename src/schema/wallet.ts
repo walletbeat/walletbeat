@@ -313,6 +313,7 @@ function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | 
 }
 
 export function rateWallet(wallet: BaseWallet): RatedWallet {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each feature must already have at least one variant populated.
   const perVariantWallets: AtLeastOneVariant<ResolvedWallet> = Object.fromEntries(
     Object.entries({
       embedded: resolveVariant(wallet, Variant.EMBEDDED),
@@ -480,7 +481,7 @@ export function getAttributeOverride(
     return null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Safe because we just checked the property exists.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-member-access -- Safe because we just checked the property exists.
   const attributeGroup = (ratedWallet.overrides.attributes as any)[attrGroup] as
     | Record<string, AttributeOverride | undefined> // Safe because all attribute group overrides are structured this way.
     | undefined;

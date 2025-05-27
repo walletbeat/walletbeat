@@ -538,6 +538,7 @@ export function getAttributeGroupInTree<Vs extends ValueSet>(
   tree: EvaluationTree,
   attrGroup: AttributeGroup<Vs>,
 ): EvaluatedGroup<Vs> {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each attribute group's ID maps to an evaluated group of its own ValueSet subtype.
   return tree[attrGroup.id] as EvaluatedGroup<Vs>;
 }
 
@@ -603,7 +604,7 @@ export function mapAttributesGetter(
     for (const attrName of Object.keys(templateTree[groupName])) {
       fn(
         <V extends Value>(evalTree: EvaluationTree): EvaluatedAttribute<V> | undefined =>
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- We know that `evalTree[groupName]` has `attrName` as property, due to how we iterated to get here.
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access -- We know that `evalTree[groupName]` has `attrName` as property, due to how we iterated to get here.
           (evalTree[groupName] as any)[attrName] as EvaluatedAttribute<V>,
       );
     }
@@ -624,6 +625,7 @@ export function getEvaluationFromOtherTree<V extends Value>(
     otherTree,
     (_, evalGroup): EvaluatedAttribute<V> | undefined => {
       if (Object.hasOwn(evalGroup, evalAttr.attribute.id)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Evaluated attributes with the same ID have the same Value type.
         return evalGroup[evalAttr.attribute.id] as unknown as EvaluatedAttribute<V>;
       }
 

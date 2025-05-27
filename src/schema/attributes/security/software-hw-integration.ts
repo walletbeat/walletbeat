@@ -308,6 +308,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
     )
       .filter(([_, support]) => isSupported(support))
       .map(([walletType]) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we are iterating over supportedWallets.
         const type = walletType as HardwareWalletType;
 
         switch (type) {

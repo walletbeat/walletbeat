@@ -44,7 +44,7 @@ export function today(): CalendarDate {
   const year = date.getFullYear().toString();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const day = date.getDate().toString().padStart(2, '0');
-
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We assume that today's date is within the set of allowed dates in CalendarDate.
   const calendarDate = `${year}-${month}-${day}` as CalendarDate;
 
   return calendarDate;

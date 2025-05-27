@@ -111,8 +111,9 @@ export function toFullyQualified(
 
   if (
     Object.hasOwn(reference, 'explanation') &&
-    typeof (reference as { explanation: unknown }).explanation === 'string'
+    typeof (reference as { explanation: unknown }).explanation === 'string' // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "explanation" field exists.
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just verified the "explanation" field exists and is a string.
     explanation = (reference as { explanation: string }).explanation;
   }
 
@@ -120,8 +121,9 @@ export function toFullyQualified(
 
   if (
     Object.hasOwn(reference, 'lastRetrieved') &&
-    typeof (reference as { lastRetrieved: unknown }).lastRetrieved === 'string'
+    typeof (reference as { lastRetrieved: unknown }).lastRetrieved === 'string' // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "lastRetrieved" field exists.
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we verify the "lastRetrieved" field exists, and the only possible string type for it is CalendarDate.
     lastRetrieved = (reference as { lastRetrieved: CalendarDate }).lastRetrieved;
   }
 
@@ -214,6 +216,7 @@ export function popRefs<T>(withRef: WithRef<T>): {
   withoutRefs: T;
   refs: FullyQualifiedReference[];
 } {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we are reconstructing the object with its prior set of entries.
   const withoutRefs = Object.fromEntries(
     Object.entries(withRef).filter(([key]) => key !== 'ref'),
   ) as T;

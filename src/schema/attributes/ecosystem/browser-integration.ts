@@ -40,10 +40,12 @@ function browserIntegrationSupport(
 ): Evaluation<BrowserIntegrationValue> {
   const { refs, withoutRefs } = popRefs<ResolvedSupport>(support);
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
   const supported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
     .filter(([_, v]) => isSupported(v))
     .map(([k, _]) => k) as BrowserIntegrationEip[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
   const unsupported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
     .filter(([_, v]) => !isSupported(v))
     .map(([k, _]) => k) as BrowserIntegrationEip[];
@@ -209,6 +211,7 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
       return unrated(browserIntegration, brand, {});
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that none of the values are null.
     const browserIntegrationEips = features.integration.browser as WithRef<ResolvedSupport>;
 
     return browserIntegrationSupport(browserIntegrationEips);

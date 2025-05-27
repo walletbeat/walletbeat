@@ -39,7 +39,7 @@ export function isValidSoftwareWalletName(name: string): name is SoftwareWalletN
 }
 
 /** All rated software wallets. */
-
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `softwareWallets`.
 export const ratedSoftwareWallets: Record<SoftwareWalletName, RatedWallet> = Object.fromEntries(
   Object.entries(softwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 ) as Record<SoftwareWalletName, RatedWallet>;

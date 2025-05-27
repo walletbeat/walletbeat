@@ -25,7 +25,7 @@ export function isValidHardwareWalletName(name: string): name is HardwareWalletN
 }
 
 /** Rated hardware wallets. */
-
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `hardwareWallets`.
 export const ratedHardwareWallets: Record<HardwareWalletName, RatedWallet> = Object.fromEntries(
   Object.entries(hardwareWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
 ) as Record<HardwareWalletName, RatedWallet>;

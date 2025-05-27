@@ -215,8 +215,11 @@ function mergeProps<XY extends object, X extends keyof XY>(
   x: Pick<XY, X>,
   y: Pick<XY, Exclude<keyof XY, X>>,
 ): XY {
+  /* eslint-disable @eslint-community/eslint-comments/no-unlimited-disable -- The set of ESLint failures on this next block varies depending on some versions. */
+  /* eslint-disable -- This is valid because xy is the union of two objects which add up to the set of keys in XY. */
   const xy: XY = { ...x, ...y } as XY;
 
+  /* eslint-enable */
   return xy;
 }
 
@@ -253,7 +256,7 @@ export function component<
 
       return {
         contentType: ContentType.COMPONENT,
-        component: comp as C,
+        component: comp as C, // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- We've already typechecked that both the component and its props correspond to C.
       };
     },
   };

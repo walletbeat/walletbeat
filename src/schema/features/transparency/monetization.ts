@@ -85,7 +85,7 @@ export function monetizationStrategies(
   monetization: Monetization,
 ): Array<{ strategy: MonetizationStrategy; value: boolean | null }> {
   return Object.entries(monetization.strategies).map(([key, value]) => ({
-    strategy: key as MonetizationStrategy,
+    strategy: key as MonetizationStrategy, // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the keys of the object are all MonetizationStrategy enum values.
     value,
   }));
 }

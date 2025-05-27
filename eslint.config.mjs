@@ -5,6 +5,7 @@ import react from 'eslint-plugin-react';
 import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort';
 import eslintPluginSortKeysCustomOrder from 'eslint-plugin-sort-keys-custom-order';
 import eslintPluginUnusedImports from 'eslint-plugin-unused-imports';
+import eslintPluginEslintComments from "@eslint-community/eslint-plugin-eslint-comments/configs"
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -23,8 +24,17 @@ const firstOrderedKeys = [
 ];
 
 export default tseslint.config(
+  eslintPluginEslintComments.recommended,
   eslint.configs.recommended,
-  tseslint.configs.recommended,
+  process.env.WALLETBEAT_PRECOMMIT_FAST === 'true' ? tseslint.configs.recommended : tseslint.configs.recommendedTypeChecked,
+  process.env.WALLETBEAT_PRECOMMIT_FAST === 'true' ? {} : {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
   {
@@ -111,6 +121,18 @@ export default tseslint.config(
           next: ['const', 'let'],
         },
       ],
+
+      // Slow vs fast rules.
+      ...(process.env.WALLETBEAT_PRECOMMIT_FAST === 'true' ? {
+        // Disable eslint-disable checks, as they may be referring to
+        // checks that are only enforced in slow mode.
+        '@eslint-community/eslint-comments/no-unlimited-disable': 'off',
+        '@eslint-community/eslint-comments/no-unused-disable': 'off',
+      } : {
+        '@eslint-community/eslint-comments/no-unlimited-disable': 'error',
+        '@eslint-community/eslint-comments/no-unused-disable': 'error',
+        '@typescript-eslint/no-unsafe-type-assertion': 'error',
+      }),
     },
   },
   {

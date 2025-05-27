@@ -74,6 +74,7 @@ export function urlSlugToWalletType(slug: string): WalletType | null {
  * Type predicate for WalletType.
  */
 export function isWalletType(str: string): str is WalletType {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- Comparing string to enum to see if the string is indeed one of the enum values.
   return Object.values(mapWalletTypes(walletType => str === walletType)).some(val => val);
 }
 

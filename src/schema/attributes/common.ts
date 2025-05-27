@@ -29,7 +29,7 @@ export function unrated<V extends Value>(
     displayName: `${attribute.displayName}: Unrated`,
     shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
   };
-
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
   const v: V = {
     __brand: brand,
     ...value,
@@ -60,7 +60,7 @@ export function exempt<V extends Value>(
     displayName: `${attribute.displayName}: Exempt`,
     shortExplanation: whyExempt,
   };
-
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
   const v: V & { rating: Rating.EXEMPT } = {
     __brand: brand,
     ...value,

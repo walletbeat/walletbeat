@@ -104,7 +104,7 @@ export function variantFromUrlQuery(variants: AtLeastOneVariant<unknown>): Varia
   const maybeVariant = window.location.search.substring(1);
 
   if (maybeVariant !== '' && Object.hasOwn(variants, maybeVariant)) {
-    return maybeVariant as Variant;
+    return maybeVariant as Variant; // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that it is a valid Variant.
   }
 
   return null;

@@ -225,7 +225,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
       if (isSupported(support)) {
         // Type assertion is safe because we're iterating over keys of hwSupport
         // which are HardwareWalletType values
-
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're iterating over hwSupport keys
         supportedWallets.push(walletType as HardwareWalletType);
       }
     });
