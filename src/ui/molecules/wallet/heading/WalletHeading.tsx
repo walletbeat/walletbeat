@@ -28,7 +28,7 @@ export const WalletHeading: FC<{
             <LanguageIcon fontSize='small' sx={{ color: 'var(--text-primary)' }} />
             <ExternalLink
               url={wallet.metadata.url}
-              defaultLabel={'{{WALLET_NAME}} website'}
+              defaultLabel={`${wallet.metadata.displayName} website`}
               style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
             />
           </div>,
