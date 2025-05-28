@@ -1,5 +1,5 @@
 // Text manipulation utility functions.
-import type { Strings } from './string-templates'
+import type { Strings } from './string-templates';
 
 /**
  * Recursively replaces `{{KEY}}` in the text with values from the given `strings` object.
@@ -16,27 +16,32 @@ import type { Strings } from './string-templates'
  * ```
  */
 export function renderStrings(text: string, strings: Strings): string {
-	return text.replaceAll(/\{\{(?<key>[^|{}]+)\}\}/g, (_, key: string) => {
-		if (strings === null) {
-			throw new Error(`Tried to render template with unknown key ${key} (no replacements expected)`)
-		}
-		if (key in strings && strings[key] !== null) {
-			return renderStrings(strings[key], strings)
-		}
-		if (key in strings) {
-			throw new Error(`Tried to render template with key ${key} which was null`)
-		}
-		throw new Error(`Tried to render template with unknown key ${key}`)
-	})
+  return text.replaceAll(/\{\{(?<key>[^|{}]+)\}\}/g, (_, key: string) => {
+    if (strings === null) {
+      throw new Error(
+        `Tried to render template with unknown key ${key} (no replacements expected)`,
+      );
+    }
+
+    if (key in strings && strings[key] !== null) {
+      return renderStrings(strings[key], strings);
+    }
+
+    if (key in strings) {
+      throw new Error(`Tried to render template with key ${key} which was null`);
+    }
+
+    throw new Error(`Tried to render template with unknown key ${key}`);
+  });
 }
 
 /**
  * Slugify a camelCaseString into a-slug-like-this.
  */
 export function slugifyCamelCase(camelCaseString: string): string {
-	return camelCaseString
-		.replaceAll('_', '-')
-		.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)
+  return camelCaseString
+    .replaceAll('_', '-')
+    .replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
 }
 
 /**
@@ -47,10 +52,11 @@ export function slugifyCamelCase(camelCaseString: string): string {
  * @returns The prefix to use before the element.
  */
 export function commaListPrefix(index: number, listSize: number, and?: string): string {
-	if (index === 0) {
-		return ''
-	}
-	return index < listSize - 1 ? ', ' : ` ${and ?? 'and'} `
+  if (index === 0) {
+    return '';
+  }
+
+  return index < listSize - 1 ? ', ' : ` ${and ?? 'and'} `;
 }
 
 /**
@@ -58,8 +64,9 @@ export function commaListPrefix(index: number, listSize: number, and?: string): 
  * Null values, undefined values, and empty strings are ignored.
  */
 export function commaListFormat(items: Array<string | null | undefined>, and?: string): string {
-	const filtered = items.filter(item => typeof item === 'string' && item !== '')
-	return filtered.map((item, i) => `${commaListPrefix(i, filtered.length, and)}${item}`).join('')
+  const filtered = items.filter(item => typeof item === 'string' && item !== '');
+
+  return filtered.map((item, i) => `${commaListPrefix(i, filtered.length, and)}${item}`).join('');
 }
 
 /**
@@ -70,40 +77,49 @@ export function commaListFormat(items: Array<string | null | undefined>, and?: s
  * no indentation in its input.
  */
 export function trimWhitespacePrefix(str: string): string {
-	const lines = str.split('\n')
-	let longestCommonPrefix: string | null = null
-	for (const line of lines) {
-		if (line.trim() === '') {
-			continue // Ignore whitespace-only lines.
-		}
-		const whitespacePrefixReg = /^\s+/.exec(line)
-		if (whitespacePrefixReg === null) {
-			return str // No common whitespace prefix. Short circuit.
-		}
-		let whitespacePrefix = whitespacePrefixReg[0]
-		if (longestCommonPrefix === null) {
-			// First non-whitespace-only line.
-			// Set the common prefix to the current one.
-			longestCommonPrefix = whitespacePrefix
-			continue
-		}
-		if (whitespacePrefix.length > longestCommonPrefix.length) {
-			// Trim to match length of common prefix.
-			whitespacePrefix = whitespacePrefix.substring(0, longestCommonPrefix.length)
-		} else if (whitespacePrefix.length < longestCommonPrefix.length) {
-			// Trim to match length of current line prefix.
-			longestCommonPrefix = longestCommonPrefix.substring(0, whitespacePrefix.length)
-		}
-		if (whitespacePrefix !== longestCommonPrefix) {
-			return str // No common whitespace prefix. Short circuit.
-		}
-	}
-	if (longestCommonPrefix === null || longestCommonPrefix === '') {
-		return str
-	}
-	return lines
-		.map(line =>
-			line.startsWith(longestCommonPrefix) ? line.substring(longestCommonPrefix.length) : line,
-		)
-		.join('\n')
+  const lines = str.split('\n');
+  let longestCommonPrefix: string | null = null;
+
+  for (const line of lines) {
+    if (line.trim() === '') {
+      continue; // Ignore whitespace-only lines.
+    }
+
+    const whitespacePrefixReg = /^\s+/.exec(line);
+
+    if (whitespacePrefixReg === null) {
+      return str; // No common whitespace prefix. Short circuit.
+    }
+
+    let whitespacePrefix = whitespacePrefixReg[0];
+
+    if (longestCommonPrefix === null) {
+      // First non-whitespace-only line.
+      // Set the common prefix to the current one.
+      longestCommonPrefix = whitespacePrefix;
+      continue;
+    }
+
+    if (whitespacePrefix.length > longestCommonPrefix.length) {
+      // Trim to match length of common prefix.
+      whitespacePrefix = whitespacePrefix.substring(0, longestCommonPrefix.length);
+    } else if (whitespacePrefix.length < longestCommonPrefix.length) {
+      // Trim to match length of current line prefix.
+      longestCommonPrefix = longestCommonPrefix.substring(0, whitespacePrefix.length);
+    }
+
+    if (whitespacePrefix !== longestCommonPrefix) {
+      return str; // No common whitespace prefix. Short circuit.
+    }
+  }
+
+  if (longestCommonPrefix === null || longestCommonPrefix === '') {
+    return str;
+  }
+
+  return lines
+    .map(line =>
+      line.startsWith(longestCommonPrefix) ? line.substring(longestCommonPrefix.length) : line,
+    )
+    .join('\n');
 }

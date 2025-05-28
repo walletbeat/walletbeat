@@ -1,12 +1,12 @@
 ---
-import Layout from '../../layouts/Layout.astro'
-import { HomePage } from '../../components/HomePage'
+import Layout from '../../layouts/Layout.astro';
+import { HomePage } from '../../components/HomePage';
 ---
 
 <Layout
-	metadata={{
-		title: 'Walletbeat',
-	}}
+  metadata={{
+    title: 'Walletbeat',
+  }}
 >
-	<HomePage client:load selectedGroupId="wallet" />
+  <HomePage client:load selectedGroupId='wallet' />
 </Layout>

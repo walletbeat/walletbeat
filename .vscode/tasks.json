@@ -1,19 +1,19 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "PNPM Dev",
-			"type": "shell",
-			"command": "pnpm install && pnpm dev",
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [],
-			"isBackground": true,
-			"presentation": {
-				"reveal": "always",
-				"panel": "shared"
-			}
-		},
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PNPM Dev",
+      "type": "shell",
+      "command": "pnpm install && pnpm dev",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
 }
