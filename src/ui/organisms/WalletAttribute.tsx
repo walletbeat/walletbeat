@@ -12,7 +12,7 @@ import {
 import { toFullyQualified } from '@/schema/reference';
 import type { Variant } from '@/schema/variants';
 import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet';
-import { isTypographicContent, sentence } from '@/types/content';
+import { isTypographicContent, type Sentence, sentence } from '@/types/content';
 import type { NonEmptyArray } from '@/types/utils/non-empty';
 import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology';
 
@@ -137,13 +137,14 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
     {
       id: `why-${evalAttr.attribute.id}`,
       summary: (
-        <RenderTypographicContent
+        <RenderTypographicContent<Sentence<null>>
           content={sentence(
             evalAttr.evaluation.value.rating === Rating.PASS ||
               evalAttr.evaluation.value.rating === Rating.UNRATED
               ? 'Why does this matter?'
               : 'Why should I care?',
           )}
+          typography={{ variant: 'h4' }}
         />
       ),
       contents: (
@@ -156,12 +157,13 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
     {
       id: `methodology-${evalAttr.attribute.id}`,
       summary: (
-        <RenderTypographicContent
+        <RenderTypographicContent<Sentence<null>>
           content={sentence(
             evalAttr.attribute.wording.midSentenceName === null
               ? evalAttr.attribute.wording.howIsEvaluated
               : `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`,
           )}
+          typography={{ variant: 'h4' }}
         />
       ),
       contents: (
