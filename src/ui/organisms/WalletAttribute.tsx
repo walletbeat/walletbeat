@@ -144,7 +144,6 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
               ? 'Why does this matter?'
               : 'Why should I care?',
           )}
-          typography={{ variant: 'h4' }}
         />
       ),
       contents: (
@@ -163,7 +162,6 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
               ? evalAttr.attribute.wording.howIsEvaluated
               : `How is ${evalAttr.attribute.wording.midSentenceName} evaluated?`,
           )}
-          typography={{ variant: 'h4' }}
         />
       ),
       contents: (

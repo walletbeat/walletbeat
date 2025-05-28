@@ -4,6 +4,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 
 import {
+  calculateAttributeGroupScore,
   mapNonExemptGroupAttributes,
   numNonExemptGroupAttributes,
 } from '@/schema/attribute-groups';
@@ -103,7 +104,7 @@ export function RatingDetailContent<Vs extends ValueSet>({
     }
   }, [flagshipModel, selectedModel]);
 
-  const attrGroupScore = attrGroup.score(evalGroup);
+  const attrGroupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup);
   const overallScore = attrGroupScore === null ? 0 : attrGroupScore.score;
 
   // Create SVG slices for the enlarged chart
