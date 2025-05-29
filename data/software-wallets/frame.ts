@@ -95,6 +95,7 @@ export const frame: SoftwareWallet = {
       dataCollection: null,
       privacyPolicy: null,
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

@@ -30,7 +30,7 @@ interface ListItemProps {
   spaceBetweenItems?: string;
 }
 
-const StyledListItem = styled('li')<ListItemProps>`
+export const StyledListItem = styled('li')<ListItemProps>`
   margin-top: ${props => (props.isFirstItem ? '0px' : (props.spaceBetweenItems ?? '0.75rem'))};
   padding-bottom: 0.5rem;
   &::marker {

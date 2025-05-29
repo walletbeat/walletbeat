@@ -42,6 +42,10 @@ import {
   type MultiAddressCorrelationValue,
 } from './attributes/privacy/multi-address-correlation';
 import {
+  privateTransfers,
+  type PrivateTransfersValue,
+} from './attributes/privacy/private-transfers';
+import {
   bugBountyProgram,
   type BugBountyProgramValue,
 } from './attributes/security/bug-bounty-program';
@@ -167,6 +171,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 type PrivacyValues = Dict<{
   addressCorrelation: AddressCorrelationValue;
   multiAddressCorrelation: MultiAddressCorrelationValue;
+  privateTransfers: PrivateTransfersValue;
   hardware_privacy: HardwarePrivacyValue;
 }>;
 
@@ -181,11 +186,13 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
   attributes: {
     addressCorrelation,
     multiAddressCorrelation,
+    privateTransfers,
     hardware_privacy: hardwarePrivacy,
   },
   attributeWeights: {
     addressCorrelation: 1.0,
     multiAddressCorrelation: 1.0,
+    privateTransfers: 1.0,
     hardware_privacy: 1.0,
   },
 };
@@ -331,6 +338,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 export interface PrivacyEvaluations extends EvaluatedGroup<PrivacyValues> {
   addressCorrelation: EvaluatedAttribute<AddressCorrelationValue>;
   multiAddressCorrelation: EvaluatedAttribute<MultiAddressCorrelationValue>;
+  privateTransfers: EvaluatedAttribute<PrivateTransfersValue>;
 }
 
 /** Evaluated self-sovereignty attributes for a single wallet. */
@@ -430,6 +438,7 @@ export function evaluateAttributes(
     privacy: {
       addressCorrelation: evalAttr(addressCorrelation),
       multiAddressCorrelation: evalAttr(multiAddressCorrelation),
+      privateTransfers: evalAttr(privateTransfers),
       hardware_privacy: evalAttr(hardwarePrivacy),
     },
     selfSovereignty: {
@@ -497,6 +506,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
     privacy: {
       addressCorrelation: attr(tree => tree.privacy.addressCorrelation),
       multiAddressCorrelation: attr(tree => tree.privacy.multiAddressCorrelation),
+      privateTransfers: attr(tree => tree.privacy.privateTransfers),
       hardware_privacy: attr(tree => tree.privacy.hardware_privacy),
     },
     selfSovereignty: {

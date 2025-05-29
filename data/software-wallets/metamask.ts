@@ -84,6 +84,7 @@ export const metamask: SoftwareWallet = {
       dataCollection: null,
       privacyPolicy: 'https://consensys.io/privacy-notice',
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

@@ -78,6 +78,7 @@ export const zerion: SoftwareWallet = {
       dataCollection: null,
       privacyPolicy: null,
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

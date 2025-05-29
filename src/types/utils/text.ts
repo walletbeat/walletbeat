@@ -1,4 +1,5 @@
 // Text manipulation utility functions.
+import { isNonEmptyArray } from './non-empty';
 import type { Strings } from './string-templates';
 
 /**
@@ -67,6 +68,60 @@ export function commaListFormat(items: Array<string | null | undefined>, and?: s
   const filtered = items.filter(item => typeof item === 'string' && item !== '');
 
   return filtered.map((item, i) => `${commaListPrefix(i, filtered.length, and)}${item}`).join('');
+}
+
+/**
+ * Format a set of items as either an inline sentence (if there is only one item)
+ * or as a markdown list if there are more than one.
+ *
+ * @param items The set of items. Leading and trailing whitespace will be removed. First letter should be lowercase if meant to be part of a sentence.
+ * @param settings: Set of settings for formatting. `singleItemTemplate` and `listItemTemplate` must each contain the substring "ITEM".
+ * @returns
+ */
+export function markdownListFormat(
+  items: Array<string | null | undefined>,
+  settings: {
+    uppercaseFirstCharacterOfListItems: boolean;
+    singleItemTemplate: string;
+    multiItemPrefix?: string;
+    multiItemTemplate: string;
+    multiItemSuffix?: string;
+    ifEmpty?: string | { behavior: 'THROW_ERROR' };
+  },
+): string {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we checked `typeof item === 'string'` on each item
+  const filtered = items.filter(item => typeof item === 'string' && item.trim() !== '') as string[];
+  const trimmed = filtered.map(item => item.trim());
+
+  if (!isNonEmptyArray(trimmed)) {
+    if (settings.ifEmpty === undefined) {
+      return '';
+    }
+
+    if (typeof settings.ifEmpty === 'string') {
+      return settings.ifEmpty;
+    }
+
+    throw new Error('Tried to format a markdown list of zero items');
+  }
+
+  if (trimmed.length === 1) {
+    return settings.singleItemTemplate.replace('ITEM', trimmed[0]);
+  }
+
+  return (
+    (settings.multiItemPrefix ?? '') +
+    trimmed
+      .map(item => {
+        if (item !== '' && settings.uppercaseFirstCharacterOfListItems) {
+          item = item.charAt(0).toUpperCase() + item.slice(1);
+        }
+
+        return settings.multiItemTemplate.replace('ITEM', item);
+      })
+      .join('') +
+    (settings.multiItemSuffix ?? '')
+  );
 }
 
 /**

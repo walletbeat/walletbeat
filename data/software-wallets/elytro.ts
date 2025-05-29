@@ -81,6 +81,7 @@ export const elytro: SoftwareWallet = {
       dataCollection: null,
       privacyPolicy: 'https://github.com/Elytro-eth',
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

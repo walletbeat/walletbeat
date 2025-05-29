@@ -82,6 +82,7 @@ export const safe: SoftwareWallet = {
       dataCollection: null,
       privacyPolicy: 'https://safe.global/privacy',
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

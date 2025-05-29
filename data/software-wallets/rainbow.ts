@@ -89,6 +89,7 @@ export const rainbow: SoftwareWallet = {
       dataCollection: null,
       privacyPolicy: 'https://rainbow.me/privacy',
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

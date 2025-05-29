@@ -21,9 +21,9 @@ export const coinbase: SoftwareWallet = {
     displayName: 'Coinbase Wallet',
     tableName: 'Coinbase',
     blurb: paragraph(`
-			Coinbase Wallet is a self-custodial wallet built by Coinbase. It
-			integrates with Coinbase exchange accounts to bring them onchain.
-		`),
+        Coinbase Wallet is a self-custodial wallet built by Coinbase. It
+        integrates with Coinbase exchange accounts to bring them onchain.
+    `),
     contributors: [polymutex, nconsigny],
     iconExtension: 'svg',
     lastUpdated: '2025-03-14',
@@ -113,6 +113,7 @@ export const coinbase: SoftwareWallet = {
       dataCollection: null,
       privacyPolicy: 'https://wallet.coinbase.com/privacy-policy',
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

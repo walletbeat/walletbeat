@@ -168,6 +168,7 @@ export const rabby: SoftwareWallet = {
       },
       privacyPolicy: 'https://rabby.io/docs/privacy',
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

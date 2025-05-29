@@ -17,6 +17,15 @@ export function isNonEmptyArray<T>(arr: T[]): arr is NonEmptyArray<T> {
   return arr.length > 0;
 }
 
+/** Throws error if the given array is empty. */
+export function assertNonEmptyArray<T>(arr: T[]): NonEmptyArray<T> {
+  if (!isNonEmptyArray(arr)) {
+    throw new Error('Got an empty array when we expected at least one entry.');
+  }
+
+  return arr;
+}
+
 /**
  * Like Object.keys but guarantees at least one key.
  * @param rec The record to get the keys from.

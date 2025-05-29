@@ -77,6 +77,7 @@ export const family: SoftwareWallet = {
       dataCollection: null,
       privacyPolicy: null,
       transactionPrivacy: {
+        defaultFungibleTokenTransferMode: 'PUBLIC',
         stealthAddresses: notSupported,
       },
     },

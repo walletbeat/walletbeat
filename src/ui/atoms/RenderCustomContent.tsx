@@ -9,6 +9,8 @@ import { LicenseDetails } from '@/ui/molecules/attributes/transparency/LicenseDe
 import { SourceVisibilityDetails } from '@/ui/molecules/attributes/transparency/SourceVisibilityDetails';
 import { UnratedAttribute } from '@/ui/molecules/attributes/UnratedAttribute';
 
+import { PrivateTransfersDetails } from '../molecules/attributes/privacy/PrivateTransfersDetails';
+
 export function RenderCustomContent<CustomContent_ extends CustomContent>({
   content,
   ...otherProps
@@ -26,6 +28,8 @@ export function RenderCustomContent<CustomContent_ extends CustomContent>({
       return <FundingDetails {...componentProps} {...otherProps} />;
     case 'LicenseDetails':
       return <LicenseDetails {...componentProps} {...otherProps} />;
+    case 'PrivateTransfersDetails':
+      return <PrivateTransfersDetails {...componentProps} {...otherProps} />;
     case 'ScamAlertDetails':
       return <ScamAlertDetails {...componentProps} {...otherProps} />;
     case 'SecurityAuditsDetails':

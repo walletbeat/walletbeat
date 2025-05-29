@@ -1,7 +1,7 @@
 /**
  * The set of all EIP numbers tracked by Walletbeat.
  */
-export type EipNumber = '1193' | '2700' | '4337' | '6963' | '7702' | '7828' | '7831';
+export type EipNumber = '1193' | '2700' | '4337' | '5564' | '6963' | '7702' | '7828' | '7831';
 
 /**
  * The status of an Ethereum Improvement Proposal (EIP).

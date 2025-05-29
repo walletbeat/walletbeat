@@ -217,7 +217,7 @@ export interface ResolvedFeatures {
   profile: WalletProfile;
 
   security: {
-    scamAlerts: ResolvedFeature<ScamAlerts> | null;
+    scamAlerts: ResolvedFeature<ScamAlerts>;
     publicSecurityAudits: SecurityAudit[] | null;
     lightClient: {
       ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>;
@@ -226,25 +226,26 @@ export interface ResolvedFeatures {
     hardwareWalletDappSigning: ResolvedFeature<HardwareWalletDappSigningImplementation>;
     passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>;
     bugBountyProgram: ResolvedFeature<BugBountyProgramImplementation>;
-    firmware: ResolvedFeature<FirmwareSupport> | null;
-    keysHandling: ResolvedFeature<KeysHandlingSupport> | null;
-    supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport> | null;
-    supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport> | null;
-    userSafety: ResolvedFeature<UserSafetySupport> | null;
+    firmware: ResolvedFeature<FirmwareSupport>;
+    keysHandling: ResolvedFeature<KeysHandlingSupport>;
+    supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport>;
+    supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>;
+    userSafety: ResolvedFeature<UserSafetySupport>;
   };
   privacy: {
     dataCollection: ResolvedFeature<DataCollection>;
     privacyPolicy: ResolvedFeature<string>;
-    hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport> | null;
+    hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport>;
+    transactionPrivacy: ResolvedFeature<TransactionPrivacy>;
   };
   selfSovereignty: {
     transactionSubmission: ResolvedFeature<TransactionSubmission>;
-    interoperability: ResolvedFeature<InteroperabilitySupport> | null;
+    interoperability: ResolvedFeature<InteroperabilitySupport>;
   };
   transparency: {
     feeTransparency: ResolvedFeature<FeeTransparencySupport>;
-    reputation: ResolvedFeature<ReputationSupport> | null;
-    maintenance: ResolvedFeature<MaintenanceSupport> | null;
+    reputation: ResolvedFeature<ReputationSupport>;
+    maintenance: ResolvedFeature<MaintenanceSupport>;
   };
   chainConfigurability: ResolvedFeature<ChainConfigurability>;
   accountSupport: ResolvedFeature<AccountSupport>;
@@ -311,6 +312,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
       dataCollection: baseFeat(features => features.privacy.dataCollection),
       privacyPolicy: baseFeat(features => features.privacy.privacyPolicy),
       hardwarePrivacy: hardwareFeat(features => features.privacy.hardwarePrivacy),
+      transactionPrivacy: baseFeat(features => features.privacy.transactionPrivacy),
     },
     selfSovereignty: {
       transactionSubmission: softwareFeat(

@@ -18,7 +18,7 @@ export type DomainUrl<D extends string> = Url &
 
 /** Get the domain part of a URL. */
 export function getDomain(url: Url): string {
-  let { hostname } = new URL(isLabeledUrl(url) ? url.url : url);
+  let hostname = new URL(isLabeledUrl(url) ? url.url : url).hostname;
 
   if (hostname.startsWith('www.')) {
     hostname = hostname.substring('www.'.length);
@@ -129,4 +129,32 @@ export function mergeLabeledUrls(
   }
 
   return merged;
+}
+
+/**
+ * A Markdown-formatted link to a URL.
+ */
+export function markdownUrlLink(
+  url: Url,
+  options?: { defaultLabel?: string; forceLabel?: string; bold?: boolean },
+): string {
+  let labeled = labeledUrl(url, options?.defaultLabel);
+
+  if (options !== undefined) {
+    if (options.forceLabel !== undefined) {
+      labeled = {
+        url: labeled.url,
+        label: options.forceLabel,
+      };
+    }
+
+    if (options.bold ?? false) {
+      labeled = {
+        url: labeled.url,
+        label: `**${labeled.label}**`,
+      };
+    }
+  }
+
+  return `[${labeled.label}](${labeled.url})`;
 }

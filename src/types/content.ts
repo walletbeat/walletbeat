@@ -3,6 +3,7 @@ import type { AddressCorrelationDetailsContent } from './content/address-correla
 import type { ChainVerificationDetailsContent } from './content/chain-verification-details';
 import type { FundingDetailsContent } from './content/funding-details';
 import type { LicenseDetailsContent } from './content/license-details';
+import type { PrivateTransfersDetailsContent } from './content/private-transfers-details';
 import type { ScamAlertDetailsContent } from './content/scam-alert-details';
 import type { SecurityAuditsDetailsContent } from './content/security-audits-details';
 import type { SourceVisibilityDetailsContent } from './content/source-visibility-details';
@@ -33,6 +34,7 @@ export type ComponentAndProps =
   | ChainVerificationDetailsContent
   | FundingDetailsContent
   | LicenseDetailsContent
+  | PrivateTransfersDetailsContent
   | ScamAlertDetailsContent
   | SecurityAuditsDetailsContent
   | SourceVisibilityDetailsContent
@@ -65,6 +67,30 @@ export type CustomContent = {
   contentType: ContentType.COMPONENT;
   component: ComponentAndProps;
 };
+
+/** Type predicate for CustomContent. */
+export function isCustomContent(content: unknown): content is CustomContent {
+  if (typeof content !== 'object') {
+    return false;
+  }
+
+  if (content === null) {
+    return false;
+  }
+
+  if (!Object.hasOwn(content, 'component') || !Object.hasOwn(content, 'contentType')) {
+    return false;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe as we just determined it has the right properties. We will check the `contentType` value just after this.
+  const customContent = content as CustomContent;
+
+  if (customContent.contentType !== ContentType.COMPONENT) {
+    return false;
+  }
+
+  return true;
+}
 
 /**
  * Typographic content that may be displayed on the UI.
