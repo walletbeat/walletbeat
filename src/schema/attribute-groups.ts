@@ -172,7 +172,7 @@ type PrivacyValues = Dict<{
   addressCorrelation: AddressCorrelationValue;
   multiAddressCorrelation: MultiAddressCorrelationValue;
   privateTransfers: PrivateTransfersValue;
-  hardware_privacy: HardwarePrivacyValue;
+  hardwarePrivacy: HardwarePrivacyValue;
 }>;
 
 /** Privacy attributes. */
@@ -187,13 +187,13 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
     addressCorrelation,
     multiAddressCorrelation,
     privateTransfers,
-    hardware_privacy: hardwarePrivacy,
+    hardwarePrivacy,
   },
   attributeWeights: {
     addressCorrelation: 1.0,
     multiAddressCorrelation: 1.0,
     privateTransfers: 1.0,
-    hardware_privacy: 1.0,
+    hardwarePrivacy: 1.0,
   },
 };
 
@@ -439,7 +439,7 @@ export function evaluateAttributes(
       addressCorrelation: evalAttr(addressCorrelation),
       multiAddressCorrelation: evalAttr(multiAddressCorrelation),
       privateTransfers: evalAttr(privateTransfers),
-      hardware_privacy: evalAttr(hardwarePrivacy),
+      hardwarePrivacy: evalAttr(hardwarePrivacy),
     },
     selfSovereignty: {
       selfHostedNode: evalAttr(selfHostedNode),
@@ -507,7 +507,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
       addressCorrelation: attr(tree => tree.privacy.addressCorrelation),
       multiAddressCorrelation: attr(tree => tree.privacy.multiAddressCorrelation),
       privateTransfers: attr(tree => tree.privacy.privateTransfers),
-      hardware_privacy: attr(tree => tree.privacy.hardware_privacy),
+      hardwarePrivacy: attr(tree => tree.privacy.hardwarePrivacy),
     },
     selfSovereignty: {
       selfHostedNode: attr(tree => tree.selfSovereignty.selfHostedNode),

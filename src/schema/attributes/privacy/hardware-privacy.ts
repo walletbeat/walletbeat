@@ -37,7 +37,7 @@ function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
 }
 
 export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
-  id: 'hardware_privacy',
+  id: 'hardwarePrivacy',
   icon: '🔒',
   displayName: 'Hardware Privacy',
   wording: {
