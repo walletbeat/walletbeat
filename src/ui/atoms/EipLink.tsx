@@ -93,10 +93,7 @@ export function EipLink({
         href={eipEthereumDotOrgUrl(eip)}
         target='_blank'
         color='primary'
-        display='flex'
-        flexDirection='row'
-        gap='2px'
-        alignItems='baseline'
+        display='inline-block'
         underline='none'
         onMouseEnter={() => {
           setHovered(true);
