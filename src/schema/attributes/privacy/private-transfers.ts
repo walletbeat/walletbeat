@@ -516,7 +516,7 @@ function rateStealthAddressSupport(
     derivationDetails === null ||
     worstPrivateTransfersPrivacyLevel([labelingPrivacy, derivationPrivacy]) === labelingPrivacy
       ? [labelingPrivacy, labelingDetails]
-      : [derivationPrivacy, labelingDetails];
+      : [derivationPrivacy, derivationDetails];
   const perTechnology = singleTechnology<PrivateTransfersPrivacyLevels>(
     PrivateTransferTechnology.STEALTH_ADDRESSES,
     {
