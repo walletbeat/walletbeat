@@ -94,20 +94,23 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
             <li>
               {isSupported(value.scamAlerts.sendTransactionWarning) ? (
                 <>
-                  {listOrSingleText('{{WALLET_NAME}} helps you stay safe when sending funds by', [
-                    value.scamAlerts.sendTransactionWarning.newRecipientWarning
-                      ? `
+                  {listOrSingleText(
+                    `${wallet.metadata.displayName} helps you stay safe when sending funds by`,
+                    [
+                      value.scamAlerts.sendTransactionWarning.newRecipientWarning
+                        ? `
 													warning you when sending funds to an address you have
 													not sent or received funds from in the past
 												`
-                      : null,
-                    value.scamAlerts.sendTransactionWarning.userWhitelist
-                      ? `
+                        : null,
+                      value.scamAlerts.sendTransactionWarning.userWhitelist
+                        ? `
 													Allowing you to build a contact book of addresses and
 													warning you when sending funds to addresses not in it
 												`
-                      : null,
-                  ])}
+                        : null,
+                    ],
+                  )}
                   {!value.sendTransactionWarning.privacyPreserving && (
                     <Typography variant='body1'>
                       However, in doing so, it leaks{' '}
@@ -143,7 +146,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
               {isSupported(value.scamAlerts.contractTransactionWarning) ? (
                 <>
                   {listOrSingleText(
-                    '{{WALLET_NAME}} helps you stay safe when doing onchain transactions by',
+                    `${wallet.metadata.displayName} helps you stay safe when doing onchain transactions by`,
                     [
                       value.scamAlerts.contractTransactionWarning.contractRegistry
                         ? `
