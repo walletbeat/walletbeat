@@ -24,6 +24,10 @@ const firstOrderedKeys = [
 ];
 
 export default tseslint.config(
+  // Ignore generated files
+  {
+    ignores: ['src/generated/**'],
+  },
   eslintPluginEslintComments.recommended,
   eslint.configs.recommended,
   process.env.WALLETBEAT_PRECOMMIT_FAST === 'true'
