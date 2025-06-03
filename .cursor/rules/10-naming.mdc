@@ -3,11 +3,6 @@ description:
 globs: 
 alwaysApply: true
 ---
----
-description: 
-globs: 
-alwaysApply: true
----
 ## Naming Conventions
 - Use PascalCase for type names and interfaces
 - Use camelCase for variables and functions

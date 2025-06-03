@@ -20,16 +20,28 @@ alwaysApply: true
 
 - To check your own code for validity before committing, also run `pnpm prepare` in the repository's root directory before each commit. This must succeed before you can commit anything.
 
-## Dealing with precommit failures
+## Running tests
+
+After editing code, if you want to whether your edits broke anything, you can run the precommit hook manually using `pnpm run check:precommit`.
+
+At the end of a task, to double-check your work more thoroughly, you should run the entire test of tests using `pnpm check:all`. Do not do this until you are confident you are done.
+
+If any of these commands fail, you must fix their failures before you may consider your task complete.
+
+### Dealing with specific failures
 
 - If the `prettier` syntax check fails, run `pnpm lint` to fix it.
 - If the `cspell` spellchecker fails, consider editing `.cspell.json` in the repository's root directory to add exceptions. However, you should prompt the user if the words you are about to add are not actually valid English words, or if they are jargon.
 
-## Config files
+### Config files
 
 Respect the configuration described in these files:
 
 @package.json @eslint.config.mjs @.gitignore @.cursorignore @astro.config.mjs @.prettierrc @.editorconfig @.cspell.json
+
+## Accessing the site
+
+You can run `pnpm dev` in the terminal to run the site locally, then access it in a browser at `http://localhost:4321`.
 
 ## Do not bypass
 
