@@ -23,7 +23,7 @@ export default function Home(): React.JSX.Element {
           An open repository of EVM-compatible wallets.
         </Typography>
         <Typography variant="h4" mb={4} textAlign="center" fontWeight={300} maxWidth="90vw">
-          Check out our new beta website at <Link href='https://beta.walletbeat.eth.limo/'>beta.walletbeat.eth</Link>.
+          Check out our new beta website at <Link href='https://beta.walletbeat.eth.limo'>beta.walletbeat.eth</Link>.
         </Typography>
         <ComparisonTable />
         <Box my={6} mb={10} mx={1}>
