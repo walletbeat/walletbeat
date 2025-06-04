@@ -5,6 +5,7 @@ import { aurox } from './wallets/aurox';
 import { bitget } from './wallets/bitget';
 import { block } from './wallets/block';
 import { blocto } from './wallets/blocto';
+import { clearwallet } from './wallets/clear-wallet';
 import { coinbase } from './wallets/coinbase';
 import { core } from './wallets/core';
 import { den } from './wallets/den';
@@ -69,4 +70,5 @@ export const wallets: Record<string, Info> = {
   'Timeless X': timeless,
   Rabby: rabby,
   Talisman: talisman,
+  'Clear Wallet': clearwallet,
 };
