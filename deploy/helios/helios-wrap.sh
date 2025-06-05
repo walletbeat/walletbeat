@@ -28,7 +28,7 @@ for arg; do
 done
 echo '[Helios] Starting Helios...' >&2
 "${SCRIPT_DIR}/helios.sh" ethereum \
-  --network=mainnet \
+	--network=mainnet \
 	--rpc-bind-ip="$HELIOS_IP" \
 	--rpc-port="$HELIOS_PORT" \
 	--execution-rpc="$NON_SECURE_RPC_ENDPOINT" \

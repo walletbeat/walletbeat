@@ -1,14 +1,14 @@
-import { type Eip, EipPrefix, EipStatus } from '@/schema/eips';
+import { type Eip, EipPrefix, EipStatus } from '@/schema/eips'
 
 export const erc4337: Eip = {
-  // Yes this is not exactly what this ERC is implementing, but it is
-  // roughly what it unlocks.
-  friendlyName: 'Account Abstraction for smart contract wallets',
-  formalTitle: 'Account Abstraction Using Alt Mempool',
-  number: '4337',
-  prefix: EipPrefix.ERC,
-  status: EipStatus.DRAFT,
-  summaryMarkdown: `
+	// Yes this is not exactly what this ERC is implementing, but it is
+	// roughly what it unlocks.
+	friendlyName: 'Account Abstraction for smart contract wallets',
+	formalTitle: 'Account Abstraction Using Alt Mempool',
+	number: '4337',
+	prefix: EipPrefix.ERC,
+	status: EipStatus.DRAFT,
+	summaryMarkdown: `
 		ERC-4337 defines a standard for account abstraction without changes to
 		the Ethereum protocol, relying on a separate transaction mempool that
 		contains operations to be submitted and executed onchain by external
@@ -19,7 +19,7 @@ export const erc4337: Eip = {
 		accounts (EOAs) to delegate their authority to smart contract accounts,
 		extending the power of ERC-4337 to all Ethereum users.
 	`,
-  whyItMattersMarkdown: `
+	whyItMattersMarkdown: `
 		ERC-4337 allows users of Ethereum to use smart contract account features
 		without changes to the protocol. This gives users better UX and more
 		flexibility over how their wallet is secured and recoverable, can be
@@ -28,4 +28,4 @@ export const erc4337: Eip = {
 		[Account Abstraction](https://ethereum.org/en/roadmap/account-abstraction/)
 		for more information.
 	`,
-};
+}

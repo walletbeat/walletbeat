@@ -1,9 +1,9 @@
 {
-  "editor.formatOnSave": false,
-  "editor.insertSpaces": true,
-  "editor.detectIndentation": false,
-  "editor.tabSize": 4,
-  "[jsonc]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  }
+	"editor.formatOnSave": false,
+	"editor.insertSpaces": true,
+	"editor.detectIndentation": false,
+	"editor.tabSize": 4,
+	"[jsonc]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	}
 }
