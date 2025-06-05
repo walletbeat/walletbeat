@@ -23,6 +23,7 @@ import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.ecosystem.account_abstraction'
+
 export type AccountAbstractionValue = Value & {
 	__brand: 'attributes.ecosystem.account_abstraction'
 }
@@ -36,7 +37,7 @@ function supportsErc4337AndEip7702(
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} supports Account Abstraction via ERC-4337 and EIP-7702.`,
+				'{{WALLET_NAME}} supports Account Abstraction via ERC-4337 and EIP-7702.',
 			),
 			__brand: brand,
 		},
@@ -53,7 +54,7 @@ function supportsErc4337(references: ReferenceArray): Evaluation<AccountAbstract
 			id: 'erc4337_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports Account Abstraction via ERC-4337.`),
+			shortExplanation: sentence('{{WALLET_NAME}} supports Account Abstraction via ERC-4337.'),
 			__brand: brand,
 		},
 		details: markdown(
@@ -69,7 +70,7 @@ function supportsEip7702(references: ReferenceArray): Evaluation<AccountAbstract
 			id: 'eip7702_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports Account Abstraction via EIP-7702.`),
+			shortExplanation: sentence('{{WALLET_NAME}} supports Account Abstraction via EIP-7702.'),
 			__brand: brand,
 		},
 		details: markdown(
@@ -86,12 +87,12 @@ function supportsEoaAndMpc(references: ReferenceArray): Evaluation<AccountAbstra
 			rating: Rating.FAIL,
 			displayName: 'EOA & MPC only',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.`,
+				'{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.',
 			),
 			__brand: brand,
 		},
 		details: markdown(
-			`{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.`,
+			'{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.',
 		),
 		impact: mdParagraph(
 			`Users cannot use Account Abstraction features. However, EOA created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`,
@@ -110,12 +111,12 @@ function supportsMpcOnly(references: ReferenceArray): Evaluation<AccountAbstract
 			rating: Rating.FAIL,
 			displayName: 'MPC only',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.`,
+				'{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.',
 			),
 			__brand: brand,
 		},
 		details: markdown(
-			`{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.`,
+			'{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.',
 		),
 		impact: mdParagraph(
 			`Users cannot use Account Abstraction features. However, accounts created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`,
@@ -134,11 +135,11 @@ function supportsRawEoaOnly(references: ReferenceArray): Evaluation<AccountAbstr
 			rating: Rating.FAIL,
 			displayName: 'EOA only',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.`,
+				'{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.',
 			),
 			__brand: brand,
 		},
-		details: markdown(`{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.`),
+		details: markdown('{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.'),
 		impact: mdParagraph(
 			`Users cannot use Account Abstraction features. However, accounts created in this wallet can be imported in other wallets that do support ${eipMarkdownLink(eip7702)}.`,
 		),
@@ -156,7 +157,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 	wording: {
 		midSentenceName: 'account abstraction support',
 	},
-	question: sentence(`Is the wallet Account Abstraction ready?`),
+	question: sentence('Is the wallet Account Abstraction ready?'),
 	why: markdown(`
 		User experience on Ethereum has historically suffered from the limitations of Externally-Owned Accounts (EOAs), which is the type of account most Ethereum users use today. By contrast, smart wallet accounts offer many UX and security improvements, such as the ability to:
 
@@ -196,11 +197,11 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 		partial: [],
 		fail: [
 			exampleRating(
-				mdSentence(`The wallet only supports plain EOAs without Account Abstraction features.`),
+				mdSentence('The wallet only supports plain EOAs without Account Abstraction features.'),
 				supportsRawEoaOnly([]).value,
 			),
 			exampleRating(
-				mdSentence(`The wallet only supports MPC wallets without Account Abstraction features.`),
+				mdSentence('The wallet only supports MPC wallets without Account Abstraction features.'),
 				supportsMpcOnly([]).value,
 			),
 		],
@@ -209,6 +210,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 		if (features.accountSupport === null) {
 			return unrated(accountAbstraction, brand, null)
 		}
+
 		const supported: Record<AccountType, boolean> = {
 			eoa: isAccountTypeSupported<AccountTypeEoa>(features.accountSupport.eoa),
 			mpc: isAccountTypeSupported<AccountTypeMpc>(features.accountSupport.mpc),
@@ -227,21 +229,27 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 		if (supported.rawErc4337 && supported.eip7702) {
 			return supportsErc4337AndEip7702(allRefs)
 		}
+
 		if (supported.rawErc4337) {
 			return supportsErc4337(allRefs)
 		}
+
 		if (supported.eip7702) {
 			return supportsEip7702(allRefs)
 		}
+
 		if (supported.eoa && supported.mpc) {
 			return supportsEoaAndMpc(allRefs)
 		}
+
 		if (supported.mpc) {
 			return supportsMpcOnly(allRefs)
 		}
+
 		if (supported.eoa) {
 			return supportsRawEoaOnly(allRefs)
 		}
+
 		throw new Error('Wallet supports no account type')
 	},
 	aggregate: pickWorstRating<AccountAbstractionValue>,

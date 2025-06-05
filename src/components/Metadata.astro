@@ -63,13 +63,13 @@ const metadata = generateBasicMetadata(rawMetadata)
 ---
 
 <title>{metadata.title}</title>
-<meta name="application-name" content={metadata.applicationName} />
-<meta name="description" content={metadata.description} />
-<meta name="keywords" content={metadata.keywords.join(', ')} />
-{metadata.icons.map(icon => <link rel="icon" href={icon.url} sizes={icon.sizes} />)}
-<meta property="og:type" content={metadata.openGraph.type} />
-<meta property="og:determiner" content={metadata.openGraph.determiner} />
-<meta property="og:title" content={metadata.openGraph.title} />
-<meta property="og:description" content={metadata.openGraph.description} />
-<meta property="og:siteName" content={metadata.openGraph.siteName} />
-<meta property="og:locale" content={metadata.openGraph.locale} />
+<meta name='application-name' content={metadata.applicationName} />
+<meta name='description' content={metadata.description} />
+<meta name='keywords' content={metadata.keywords.join(', ')} />
+{metadata.icons.map(icon => <link rel='icon' href={icon.url} sizes={icon.sizes} />)}
+<meta property='og:type' content={metadata.openGraph.type} />
+<meta property='og:determiner' content={metadata.openGraph.determiner} />
+<meta property='og:title' content={metadata.openGraph.title} />
+<meta property='og:description' content={metadata.openGraph.description} />
+<meta property='og:siteName' content={metadata.openGraph.siteName} />
+<meta property='og:locale' content={metadata.openGraph.locale} />

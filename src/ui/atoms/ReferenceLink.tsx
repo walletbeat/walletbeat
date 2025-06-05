@@ -39,10 +39,10 @@ export function ReferenceTooltip({
 				<React.Fragment key={url.url}>
 					{!showExplanation || ref.explanation === undefined ? null : (
 						<>
-							<MarkdownTypography variant="caption">{ref.explanation}</MarkdownTypography>
+							<MarkdownTypography variant='caption'>{ref.explanation}</MarkdownTypography>
 							<Divider
-								orientation="horizontal"
-								variant="middle"
+								orientation='horizontal'
+								variant='middle'
 								flexItem={true}
 								sx={{
 									marginLeft: '10%',
@@ -55,7 +55,7 @@ export function ReferenceTooltip({
 							/>
 						</>
 					)}
-					<Typography variant="caption" sx={{ opacity: 0.95 }}>
+					<Typography variant='caption' sx={{ opacity: 0.95 }}>
 						Source: <ExternalLink url={url} />
 					</Typography>
 				</React.Fragment>

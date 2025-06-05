@@ -22,6 +22,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.privacy.multi_address_correlation'
+
 export type MultiAddressCorrelationValue = Value & {
 	__brand: 'attributes.privacy.multi_address_correlation'
 }
@@ -34,12 +35,12 @@ function uniqueDestinations(references: ReferenceArray): Evaluation<MultiAddress
 			icon: '\u{26d3}', // Broken chain
 			displayName: 'Wallet uses unique endpoints per address',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} uses unique endpoints for each wallet address, which keeps them uncorrelated.`,
+				'{{WALLET_NAME}} uses unique endpoints for each wallet address, which keeps them uncorrelated.',
 			),
 			__brand: brand,
 		},
 		details: paragraph(
-			`When configured with multiple addresses, {{WALLET_NAME}} uses unique RPC endpoints for each wallet address. Therefore, no single RPC endpoint gets to learn about more than one of your addresses.`,
+			'When configured with multiple addresses, {{WALLET_NAME}} uses unique RPC endpoints for each wallet address. Therefore, no single RPC endpoint gets to learn about more than one of your addresses.',
 		),
 		references,
 	}
@@ -53,15 +54,15 @@ function activeAddressOnly(references: ReferenceArray): Evaluation<MultiAddressC
 			icon: '\u{1f4ce}', // Single paperclip
 			displayName: 'Wallet only handles one active address at a time',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} only makes requests about one active address at a time, so it can't be correlated with other addresses.`,
+				"{{WALLET_NAME}} only makes requests about one active address at a time, so it can't be correlated with other addresses.",
 			),
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} only has one active address at a time, and all outgoing RPC requests are only about that address. Additionally, the account switching UI does not perform bulk queries about all configured addresses in close succession.`,
+			'{{WALLET_NAME}} only has one active address at a time, and all outgoing RPC requests are only about that address. Additionally, the account switching UI does not perform bulk queries about all configured addresses in close succession.',
 		),
 		impact: paragraph(
-			`Multi-address privacy is generally well-preserved by {{WALLET_NAME}}. However, you should avoid quickly switching between active addresses in order to avoid making successive requests to the same RPC endpoint about different addresses.`,
+			'Multi-address privacy is generally well-preserved by {{WALLET_NAME}}. However, you should avoid quickly switching between active addresses in order to avoid making successive requests to the same RPC endpoint about different addresses.',
 		),
 		references,
 	}
@@ -74,18 +75,18 @@ function bulkRequests(references: ReferenceArray): Evaluation<MultiAddressCorrel
 			rating: Rating.FAIL,
 			displayName: 'Multiple addresses are correlatable by a third party',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} makes bulk requests containing multiple addresses to the same endpoint, which allows it to correlate your addresses.`,
+				'{{WALLET_NAME}} makes bulk requests containing multiple addresses to the same endpoint, which allows it to correlate your addresses.',
 			),
 			__brand: brand,
 		},
 		details: paragraph(
-			`When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain multiple addresses simultaneously.`,
+			'When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain multiple addresses simultaneously.',
 		),
 		impact: paragraph(
-			`Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by a third-party. You should avoid configuring multiple addresses with {{WALLET_NAME}}.`,
+			'Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by a third-party. You should avoid configuring multiple addresses with {{WALLET_NAME}}.',
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should first ensure that it never makes requests containing multiple addresses simultaneously. Next, it should ensure that these requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.`,
+			'{{WALLET_NAME}} should first ensure that it never makes requests containing multiple addresses simultaneously. Next, it should ensure that these requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 		references,
 	}
@@ -100,18 +101,18 @@ function correlatableRequests(
 			rating: Rating.FAIL,
 			displayName: 'Multiple addresses are correlatable by a third party',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} makes requests about multiple addresses simultaneously to the same endpoint, which allows it to correlate your addresses.`,
+				'{{WALLET_NAME}} makes requests about multiple addresses simultaneously to the same endpoint, which allows it to correlate your addresses.',
 			),
 			__brand: brand,
 		},
 		details: paragraph(
-			`When configured with multiple addresses, {{WALLET_NAME}} makes separate requests for each wallet address, but these requests are sent simultaneously and without proxying. This allows the RPC endpoint to correlate your addresses.`,
+			'When configured with multiple addresses, {{WALLET_NAME}} makes separate requests for each wallet address, but these requests are sent simultaneously and without proxying. This allows the RPC endpoint to correlate your addresses.',
 		),
 		impact: paragraph(
-			`Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by a third-party. You should avoid configuring multiple addresses with {{WALLET_NAME}}.`,
+			'Using multiple addresses in {{WALLET_NAME}} will allow them to be correlated by a third-party. You should avoid configuring multiple addresses with {{WALLET_NAME}}.',
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should ensure that its requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.`,
+			'{{WALLET_NAME}} should ensure that its requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 		references,
 	}
@@ -124,15 +125,15 @@ function staggeredRequests(references: ReferenceArray): Evaluation<MultiAddressC
 			rating: Rating.PARTIAL,
 			displayName: 'Requests for multiple addresses are staggered across time',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} staggers requests about multiple addresses over time time, which makes it harder to correlate your addresses.`,
+				'{{WALLET_NAME}} staggers requests about multiple addresses over time time, which makes it harder to correlate your addresses.',
 			),
 			__brand: brand,
 		},
 		details: paragraph(
-			`When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they are staggered over time. Depending on the delay between such requests, this can provide an imperfect degree of privacy, as this makes it harder for the endpoint to correlate these requests as coming from the same user due to the time elapsed between the requests. However, since these requests are still unproxied, the endpoint is still able to correlate the requests due to their identical origin IP address.`,
+			'When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they are staggered over time. Depending on the delay between such requests, this can provide an imperfect degree of privacy, as this makes it harder for the endpoint to correlate these requests as coming from the same user due to the time elapsed between the requests. However, since these requests are still unproxied, the endpoint is still able to correlate the requests due to their identical origin IP address.',
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should ensure requests are proxied through distinct proxies in order to prevent the RPC endpoint from learning the correlation between addresses. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.`,
+			'{{WALLET_NAME}} should ensure requests are proxied through distinct proxies in order to prevent the RPC endpoint from learning the correlation between addresses. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 		references,
 	}
@@ -145,15 +146,15 @@ function separateCircuits(references: ReferenceArray): Evaluation<MultiAddressCo
 			rating: Rating.PARTIAL,
 			displayName: 'Requests for multiple addresses use separate proxies',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} uses distinct proxies to make requests about multiple addresses, which makes it harder to correlate your addresses.`,
+				'{{WALLET_NAME}} uses distinct proxies to make requests about multiple addresses, which makes it harder to correlate your addresses.',
 			),
 			__brand: brand,
 		},
 		details: paragraph(
-			`When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they each use a different proxy circuit in order to appear as coming from different IPs from the perspective of the endpoint. This provides an imperfect degree of privacy, as it makes it harder for the endpoint to correlate these requests as coming from the same user. However, since these requests are all made together simultaneously, the endpoint is still able to correlate them by grouping them across time.`,
+			'When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they each use a different proxy circuit in order to appear as coming from different IPs from the perspective of the endpoint. This provides an imperfect degree of privacy, as it makes it harder for the endpoint to correlate these requests as coming from the same user. However, since these requests are all made together simultaneously, the endpoint is still able to correlate them by grouping them across time.',
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should add randomized delays between refreshes of separate addresses in order to reduce time-based correlatability of addresses by the RPC endpoint.`,
+			'{{WALLET_NAME}} should add randomized delays between refreshes of separate addresses in order to reduce time-based correlatability of addresses by the RPC endpoint.',
 		),
 		references,
 	}
@@ -169,12 +170,12 @@ function staggeredAndSeparateCircuits(
 			icon: '\u{26d3}', // Broken chain
 			displayName: 'Requests for multiple addresses are uncorrelated',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} uses distinct proxies and staggers requests about multiple addresses over time, which makes it harder to correlate your addresses.`,
+				'{{WALLET_NAME}} uses distinct proxies and staggers requests about multiple addresses over time, which makes it harder to correlate your addresses.',
 			),
 			__brand: brand,
 		},
 		details: paragraph(
-			`When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they each use a different proxy circuit in order to appear as coming from different IPs from the perspective of the endpoint, and they are staggered over time. This provides a good degree of privacy, as it makes it harder for the endpoint to correlate these requests as coming from the same user. From the perspective of the endpoint, these requests come in from random IPs at random times, avoiding both IP-based and time-based correlation.`,
+			'When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they each use a different proxy circuit in order to appear as coming from different IPs from the perspective of the endpoint, and they are staggered over time. This provides a good degree of privacy, as it makes it harder for the endpoint to correlate these requests as coming from the same user. From the perspective of the endpoint, these requests come in from random IPs at random times, avoiding both IP-based and time-based correlation.',
 		),
 		references,
 	}
@@ -187,11 +188,11 @@ function unsupported(): Evaluation<MultiAddressCorrelationValue> {
 			rating: Rating.UNRATED,
 			icon: '\u{1f4ce}', // Single paperclip
 			displayName: 'Multiple addresses unsupported',
-			shortExplanation: sentence(`You can only use one address in {{WALLET_NAME}}.`),
+			shortExplanation: sentence('You can only use one address in {{WALLET_NAME}}.'),
 			__brand: brand,
 		},
 		details: paragraph(
-			`You can only use one address in {{WALLET_NAME}}, so multi-address privacy is irrelevant.`,
+			'You can only use one address in {{WALLET_NAME}}, so multi-address privacy is irrelevant.',
 		),
 		references: [],
 	}
@@ -230,6 +231,7 @@ function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): numbe
 												// Server can be running anything, so all bets are off.
 												return 0
 											}
+
 											switch (endpoint.verifiability.clientVerification.type) {
 												case 'NOT_VERIFIED':
 													return 1
@@ -244,6 +246,7 @@ function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): numbe
 				})() * 100
 			const proxyScore = { NONE: 0, SAME_CIRCUIT: 1, SEPARATE_CIRCUITS: 2 }[handling.proxy] * 10
 			const timingScore = { SIMULTANEOUS: 0, STAGGERED: 1 }[handling.timing]
+
 			return 1 + destinationScore + enclaveScore + proxyScore + timingScore
 		}
 	}
@@ -256,9 +259,9 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 	wording: {
 		midSentenceName: 'multi-address privacy',
 	},
-	question: sentence(`Can the wallet correlate your different wallet addresses with each other?`),
+	question: sentence('Can the wallet correlate your different wallet addresses with each other?'),
 	why: paragraph(
-		`You probably have more than one wallet address configured in your wallet, which you use for different purposes and perhaps as different identities. These wallet addresses all belong to you, but you would rather keep that fact private. It is therefore important to use a wallet that does not reveal that fact.`,
+		'You probably have more than one wallet address configured in your wallet, which you use for different purposes and perhaps as different identities. These wallet addresses all belong to you, but you would rather keep that fact private. It is therefore important to use a wallet that does not reveal that fact.',
 	),
 	methodology: markdown(`
 		Wallets are assessed based on whether a third-party can learn that
@@ -298,13 +301,13 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		fail: [
 			exampleRating(
 				paragraph(
-					`The wallet refreshes multiple address balances by grouping all of these addresses in the same request.`,
+					'The wallet refreshes multiple address balances by grouping all of these addresses in the same request.',
 				),
 				bulkRequests([]).value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet makes multiple simultaneous requests about each of the user's wallet balances, without proxying or staggering the requests.`,
+					"The wallet makes multiple simultaneous requests about each of the user's wallet balances, without proxying or staggering the requests.",
 				),
 				correlatableRequests([]).value,
 			),
@@ -312,13 +315,13 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		partial: [
 			exampleRating(
 				paragraph(
-					`The wallet makes multiple simultaneous requests about each of the user's wallet balances, proxying each of them through a different proxy circuit (e.g. Tor with unique circuits for each wallet address). The receiving endpoint may still correlate these addresses through time-based correlation.`,
+					"The wallet makes multiple simultaneous requests about each of the user's wallet balances, proxying each of them through a different proxy circuit (e.g. Tor with unique circuits for each wallet address). The receiving endpoint may still correlate these addresses through time-based correlation.",
 				),
 				separateCircuits([]).value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet makes multiple requests about each of the user's wallet balances, staggering them over time to avoid time-based correlation. The receiving endpoint may still correlate these addresses through IP-address-based correlation.`,
+					"The wallet makes multiple requests about each of the user's wallet balances, staggering them over time to avoid time-based correlation. The receiving endpoint may still correlate these addresses through IP-address-based correlation.",
 				),
 				staggeredRequests([]).value,
 			),
@@ -326,25 +329,25 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		pass: [
 			exampleRating(
 				paragraph(
-					`The wallet makes multiple requests about each of the user's wallet balances, staggering them over time to avoid time-based correlation, and using unique proxy circuits for each wallet address to avoid IP-address-based correlation.`,
+					"The wallet makes multiple requests about each of the user's wallet balances, staggering them over time to avoid time-based correlation, and using unique proxy circuits for each wallet address to avoid IP-address-based correlation.",
 				),
 				staggeredAndSeparateCircuits([]).value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet distributes requests about each of the user's wallet balances across unique RPC endpoints owned by different entities, preventing any single entity from learning about more than one wallet address.`,
+					"The wallet distributes requests about each of the user's wallet balances across unique RPC endpoints owned by different entities, preventing any single entity from learning about more than one wallet address.",
 				),
 				uniqueDestinations([]).value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet only has one active wallet address at a time, and only ever makes requests about this wallet address and no other.`,
+					'The wallet only has one active wallet address at a time, and only ever makes requests about this wallet address and no other.',
 				),
 				activeAddressOnly([]).value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet runs by default with a user's own self-hosted node, preventing any third-party from learning about any of the user's wallet addresses.`,
+					"The wallet runs by default with a user's own self-hosted node, preventing any third-party from learning about any of the user's wallet addresses.",
 				),
 				exampleRatingUnimplemented,
 			),
@@ -354,37 +357,49 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		if (features.multiAddress === null) {
 			return unrated(multiAddressCorrelation, brand, null)
 		}
+
 		if (!isSupported(features.multiAddress)) {
 			return unsupported()
 		}
+
 		if (features.privacy.dataCollection === null) {
 			return unrated(multiAddressCorrelation, brand, null)
 		}
+
 		let worstHandling: EntityData | null = null
 		let worstHandlingScore = -1
 		const allRefs: ReferenceArray = []
+
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
 			const leaks = inferLeaks(collected.leaks)
+
 			if (!leaksByDefault(leaks.walletAddress)) {
 				continue
 			}
+
 			if (leaks.multiAddress === undefined) {
 				return unrated(multiAddressCorrelation, brand, null)
 			}
+
 			allRefs.push(...refs(collected.leaks))
 			const score = rateHandling(leaks.multiAddress, leaks.endpoint)
+
 			if (worstHandling === null || score < worstHandlingScore) {
 				worstHandling = collected
 				worstHandlingScore = score
 			}
 		}
+
 		if (worstHandling === null) {
 			return unrated(multiAddressCorrelation, brand, null)
 		}
+
 		const handling = worstHandling.leaks.multiAddress
+
 		if (handling === undefined) {
 			return unrated(multiAddressCorrelation, brand, null)
 		}
+
 		switch (handling.type) {
 			case MultiAddressPolicy.ACTIVE_ADDRESS_ONLY:
 				// If the wallet has a concept of a singular "active address" and only
@@ -401,21 +416,25 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 					// address, so they are not correlatable.
 					return uniqueDestinations(allRefs)
 				}
+
 				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
 					// The wallet mitigates correlation both at the network level and by
 					// time. Not correlated.
 					return staggeredAndSeparateCircuits(allRefs)
 				}
+
 				if (handling.proxy === 'SEPARATE_CIRCUITS' && handling.timing !== 'STAGGERED') {
 					// Requests not staggered, but coming from different IPs.
 					// Better than nothing.
 					return separateCircuits(allRefs)
 				}
+
 				if (handling.proxy !== 'SEPARATE_CIRCUITS' && handling.timing === 'STAGGERED') {
 					// Requests staggered, but coming from the same IP.
 					// Better than nothing.
 					return staggeredRequests(allRefs)
 				}
+
 				// Requests not staggered, and all coming from the same IP.
 				// That is correlated.
 				return correlatableRequests(allRefs)

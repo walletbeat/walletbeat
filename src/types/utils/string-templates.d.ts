@@ -25,7 +25,7 @@ type FindInvalidStringKeys<Text extends string, Strings_ extends Strings> = Excl
 >
 
 type ExtractStringKeys<T extends string> =
-	T extends `${infer Before}${FormatStringKey<infer Key>}${infer After}`
+	T extends `${infer _Before}${FormatStringKey<infer Key>}${infer After}`
 		? Key | ExtractStringKeys<After>
 		: never
 

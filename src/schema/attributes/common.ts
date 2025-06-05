@@ -26,7 +26,7 @@ export function unrated<V extends Value>(
 		id: 'unrated',
 		rating: Rating.UNRATED,
 		displayName: `${attribute.displayName}: Unrated`,
-		shortExplanation: sentence(`Walletbeat lacks the information needed to determine this.`),
+		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
 	const v: V = {
@@ -34,6 +34,7 @@ export function unrated<V extends Value>(
 		...value,
 		...(extraProps ?? {}),
 	} as unknown as V
+
 	return {
 		value: v,
 		details: unratedAttributeContent<V>(),
@@ -68,6 +69,7 @@ export function exempt<V extends Value>(
 		...value,
 		...(extraProps ?? {}),
 	} as unknown as V & { rating: Rating.EXEMPT }
+
 	return {
 		value: v,
 		details: whyExempt,
@@ -87,36 +89,43 @@ export function pickWorstRating<V extends Value>(
 		Array.isArray(evaluations) && isNonEmptyArray(evaluations)
 			? evaluations
 			: nonEmptyValues<Variant, Evaluation<V>>(evaluations)
+
 	for (const evaluation of evaluationsArray) {
 		if (evaluation.value.rating === Rating.UNRATED) {
 			// If any evaluation is UNRATED, then the aggregated rating also is.
 			// So return it immediately.
 			return evaluation
 		}
+
 		if (worst === null) {
 			// The first rating sets the initial value of `worst`.
 			worst = evaluation
 			continue
 		}
+
 		if (evaluation.value.rating === Rating.EXEMPT) {
 			// Exempt ratings are ignored, unless they are the only rating we have.
 			continue
 		}
+
 		if (worst.value.rating === Rating.EXEMPT) {
 			// Any non-EXEMPT rating takes precedence over an EXEMPT rating.
 			worst = evaluation
 			continue
 		}
+
 		if (worst.value.rating === Rating.PASS) {
 			// Any non-EXEMPT, non-UNRATED rating is worse or equal to PASS, so pick it.
 			worst = evaluation
 			continue
 		}
+
 		if (worst.value.rating === Rating.PARTIAL && evaluation.value.rating === Rating.FAIL) {
 			// If the worst rating is PARTIAL, pick FAIL over it.
 			worst = evaluation
 			continue
 		}
 	}
-	return worst! // eslint-disable-line @typescript-eslint/no-non-null-assertion -- Safe because we've just iterated over a NonEmptyArray and the first iteration would have set `worst` away from `null`.
+
+	return worst!
 }

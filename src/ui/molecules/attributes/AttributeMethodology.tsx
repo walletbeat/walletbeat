@@ -30,7 +30,7 @@ interface ListItemProps {
 	spaceBetweenItems?: string
 }
 
-const StyledListItem = styled('li')<ListItemProps>`
+export const StyledListItem = styled('li')<ListItemProps>`
 	margin-top: ${props => (props.isFirstItem ? '0px' : (props.spaceBetweenItems ?? '0.75rem'))};
 	padding-bottom: 0.5rem;
 	&::marker {
@@ -86,11 +86,13 @@ function replaceExampleRatingPrefix(
 		const possessiveWalletTypeRegex = /^The\s+([a-zA-Z]+\s+)?wallet's\s+/
 
 		const walletTypeMatch = walletTypeRegex.exec(unprefixedText)
+
 		if (walletTypeMatch !== null) {
 			return `${whitespacePrefix}${theWallet}${unprefixedText.substring(walletTypeMatch[0].length)}`
 		}
 
 		const possessiveWalletTypeMatch = possessiveWalletTypeRegex.exec(unprefixedText)
+
 		if (possessiveWalletTypeMatch !== null) {
 			return `${whitespacePrefix}${theWalletPossessive}${unprefixedText.substring(possessiveWalletTypeMatch[0].length)}`
 		}
@@ -124,9 +126,9 @@ function ExampleRatings<V extends Value>({
 		<StyledListItem
 			key={`example-${index}`}
 			bulletText={ratingToIcon(rating)}
-			bulletFontSize="75%"
+			bulletFontSize='75%'
 			isFirstItem={index === 0}
-			spaceBetweenItems="0.75rem"
+			spaceBetweenItems='0.75rem'
 		>
 			<RenderTypographicContent
 				content={exampleRating.description}
@@ -147,10 +149,13 @@ function ExampleRatings<V extends Value>({
 				: Array.isArray(exampleRatings)
 					? exampleRatings
 					: [exampleRatings]
+
 		if (ratingsList.length === 0) {
 			return { key: rating, element: null }
 		}
+
 		const preamble = ratingsList.length === 1 ? singularPreamble : pluralPreamble
+
 		return {
 			key: rating,
 			element: (
@@ -191,9 +196,10 @@ function ExampleRatings<V extends Value>({
 				return [failRendered, partialRendered, passRendered]
 		}
 	})()
+
 	return (
 		<>
-			<Typography variant="h5">{exhaustive ? '' : 'A few examples'}</Typography>
+			<Typography variant='h5'>{exhaustive ? '' : 'A few examples'}</Typography>
 			<div>
 				{renderedExamples.map(renderedExample =>
 					renderedExample.element === null ? null : (
@@ -220,20 +226,20 @@ export function AttributeMethodology<V extends Value>({
 }): React.JSX.Element {
 	return (
 		<>
-			<div key="methodology">
+			<div key='methodology'>
 				<RenderTypographicContent
 					content={attribute.methodology}
 					typography={typographyPropsBody}
 				/>
 			</div>
 			<Divider
-				key="after-methodology"
+				key='after-methodology'
 				sx={{
 					marginTop: '1rem',
 					marginBottom: '1rem',
 				}}
 			/>
-			<div key="example-ratings">
+			<div key='example-ratings'>
 				{attribute.ratingScale.display === 'simple' ? (
 					<RenderTypographicContent
 						content={attribute.ratingScale.content}

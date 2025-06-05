@@ -158,10 +158,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 
 						<WalletTable
 							client:load
-							wallets={
-								Object.entries(allRatedWallets)
-									.map(([id, wallet]) => ({ id, wallet }))
-							}
+							wallets={Object.entries(allRatedWallets).map(([id, wallet]) => ({ id, wallet }))}
 							{attributeGroups}
 						/>
 					</div>
@@ -171,10 +168,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 
 						<WalletTable
 							client:load
-							wallets={
-								Object.entries(ratedHardwareWallets)
-									.map(([id, wallet]) => ({ id, wallet }))
-							}
+							wallets={Object.entries(ratedHardwareWallets).map(([id, wallet]) => ({ id, wallet }))}
 							{attributeGroups}
 						/>
 					</div>
@@ -183,7 +177,6 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 		</div>
 	</NavigationPageLayout>
 </Layout>
-
 
 <style>
 	.wallet-tables {

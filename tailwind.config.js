@@ -5,16 +5,16 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				border: 'hsl(var(--border))',
-				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
+				border: 'var(--border)',
+				input: 'var(--input)',
+				ring: 'var(--ring)',
 				background: 'var(--background-primary)',
 				backgroundSecondary: 'var(--background-secondary)',
 				primary: {
 					DEFAULT: 'var(--primary)',
 				},
 				card: {
-					DEFAULT: 'hsl(var(--background-secondary))',
+					DEFAULT: 'var(--background-secondary)',
 				},
 				accent: 'var(--accent)',
 				rating: {

@@ -102,6 +102,7 @@ export function supportsAccountType(
 	if (accountSupport === undefined || accountSupport === null) {
 		return false
 	}
+
 	return isSupported<Support<unknown>>(accountSupport[accountType])
 }
 
@@ -115,14 +116,17 @@ export function supportsOnlyAccountType(
 	if (!supportsAccountType(accountSupport, accountType)) {
 		return false
 	}
+
 	for (const otherType of allAccountTypes) {
 		if (otherType === accountType) {
 			continue
 		}
+
 		if (supportsAccountType(accountSupport, otherType)) {
 			return false
 		}
 	}
+
 	return true
 }
 

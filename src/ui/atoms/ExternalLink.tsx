@@ -1,7 +1,7 @@
-import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded'
 import { Link, type TypographyOwnProps } from '@mui/material'
 import type React from 'react'
 import { useState } from 'react'
+import { LuExternalLink } from 'react-icons/lu'
 
 import { labeledUrl, type Url } from '@/schema/url'
 
@@ -22,21 +22,17 @@ export function ExternalLink({
 }): React.JSX.Element {
 	const labeled = labeledUrl(url, defaultLabel)
 	const [hovered, setHovered] = useState(false)
+
 	return (
-		<span className="inline-block">
+		<span className='inline-block'>
 			<Link
 				href={labeled.url}
-				target="_blank"
+				target='_blank'
 				rel={rel}
-				className="text-accent" // overwrite mui primary color
 				style={{
 					...style,
 				}}
-				display="flex"
-				flexDirection="row"
-				gap="2px"
-				alignItems="baseline"
-				underline="none"
+				className='flex flex-row gap-2 items-baseline'
 				onMouseEnter={() => {
 					setHovered(true)
 				}}
@@ -48,12 +44,12 @@ export function ExternalLink({
 				}}
 			>
 				<span
-					className="inline-block"
+					className='inline-block'
 					style={{ textDecoration: hovered ? 'underline' : 'inherit' }}
 				>
 					{children ?? labeled.label}
 				</span>{' '}
-				<OpenInNewRoundedIcon color="inherit" fontSize="inherit" />
+				<LuExternalLink />
 			</Link>
 		</span>
 	)

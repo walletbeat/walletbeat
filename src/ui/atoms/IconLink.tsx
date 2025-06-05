@@ -29,7 +29,7 @@ export function IconLink({
 	const colorClass = color ?? 'text-primary'
 
 	return (
-		<span className="inline-block">
+		<span className='inline-block'>
 			<a
 				href={href}
 				target={target}
@@ -41,8 +41,8 @@ export function IconLink({
 					colorClass,
 				)}
 			>
-				<IconComponent className="inline-block" fontSize="inherit" />
-				<span className="inline-block">{children}</span>
+				<IconComponent className='inline-block' fontSize='inherit' />
+				<span className='inline-block'>{children}</span>
 			</a>
 		</span>
 	)

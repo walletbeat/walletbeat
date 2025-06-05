@@ -284,8 +284,8 @@ function FrequentlyAskedQuestions(): React.JSX.Element {
 				<React.Fragment key={entry.anchor}>
 					{index === 0 ? null : (
 						<Divider
-							orientation="horizontal"
-							variant="middle"
+							orientation='horizontal'
+							variant='middle'
 							flexItem={true}
 							sx={{
 								marginTop: '1rem',
@@ -351,10 +351,10 @@ export function FrequentlyAskedQuestionsPage(): React.JSX.Element {
 				},
 			]}
 		>
-			<Typography id="faqHeader" variant="h1">
+			<Typography id='faqHeader' variant='h1'>
 				Walletbeat FAQ
 			</Typography>
-			<div className="max-w-7xl mx-auto flex flex-col items-stretch">
+			<div className='max-w-7xl mx-auto flex flex-col items-stretch'>
 				<FrequentlyAskedQuestions />
 			</div>
 		</NavigationPageLayout>

@@ -18,7 +18,7 @@ export const frame: SoftwareWallet = {
 		id: 'frame',
 		displayName: 'Frame',
 		tableName: 'Frame',
-		blurb: paragraph(`Frame...`),
+		blurb: paragraph('Frame...'),
 		contributors: [polymutex, nconsigny, lucemans],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-13',
@@ -95,6 +95,7 @@ export const frame: SoftwareWallet = {
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
 				stealthAddresses: notSupported,
 			},
 		},

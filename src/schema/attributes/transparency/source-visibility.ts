@@ -8,6 +8,7 @@ import { sourceVisibilityDetailsContent } from '@/types/content/source-visibilit
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.source_visibility'
+
 export type SourceVisibilityValue = Value & {
 	__brand: 'attributes.transparency.source_visibility'
 }
@@ -58,7 +59,7 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 	wording: {
 		midSentenceName: 'source visibility',
 	},
-	question: sentence(`Is the source code for the wallet visible to the public?`),
+	question: sentence('Is the source code for the wallet visible to the public?'),
 	why: paragraph(`
 		When using a wallet, users are entrusting it to preserve their funds
 		safely. This requires a high level of trust in the wallet's source code
@@ -85,6 +86,7 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 		if (licenseSourceIsVisible(features.license.license)) {
 			return sourcePublic(toFullyQualified(features.license.ref))
 		}
+
 		return sourcePrivate(toFullyQualified(features.license.ref))
 	},
 	aggregate: pickWorstRating<SourceVisibilityValue>,

@@ -1,6 +1,10 @@
 import { type ReactElement, useState } from 'react'
 
-import { calculateAttributeGroupScore, mapNonExemptGroupAttributes, numNonExemptGroupAttributes } from '@/schema/attribute-groups'
+import {
+	calculateAttributeGroupScore,
+	mapNonExemptGroupAttributes,
+	numNonExemptGroupAttributes,
+} from '@/schema/attribute-groups'
 import {
 	type AttributeGroup,
 	type EvaluatedGroup,
@@ -28,10 +32,12 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 	const [modalOpen, setModalOpen] = useState(false)
 
 	const attrGroupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)
+
 	if (attrGroupScore === null) {
 		// All attributes in the group are exempt, can't render pie chart.
 		return <></>
 	}
+
 	const attributeCount = numNonExemptGroupAttributes(evalGroup)
 
 	const tooltipText = `${attrGroup.displayName}: ${Math.round(attrGroupScore.score * 100)}% (${attributeCount} attributes)`
@@ -75,8 +81,8 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 					key={evalAttr.attribute.id}
 					d={pathData}
 					fill={ratingToColor(evalAttr.evaluation.value.rating)}
-					stroke="#ffffff"
-					strokeWidth="1"
+					stroke='#ffffff'
+					strokeWidth='1'
 				/>
 			)
 		})
@@ -101,7 +107,7 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 					title={tooltipText}
 					onClick={handlePieClick}
 				>
-					<svg viewBox="0 0 100 100" className="w-full h-full">
+					<svg viewBox='0 0 100 100' className='w-full h-full'>
 						{createSlices()}
 					</svg>
 				</div>

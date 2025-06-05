@@ -15,6 +15,7 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.hardware_wallet_dapp_signing'
+
 export type HardwareWalletDappSigningValue = Value & {
 	dappSigningLevel: DappSigningLevel
 	__brand: 'attributes.security.hardware_wallet_dapp_signing'
@@ -27,16 +28,16 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletDappSigningValue> {
 			rating: Rating.FAIL,
 			displayName: 'No dApp signing due to no hardware wallet support',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} does not support hardware wallets, so dApp signing is not possible.`,
+				'{{WALLET_NAME}} does not support hardware wallets, so dApp signing is not possible.',
 			),
 			dappSigningLevel: DappSigningLevel.NONE,
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} does not support connecting to any hardware wallets. Without hardware wallet support, dApp signing is not possible. dApp signing allows users to verify transaction details directly on the hardware wallet's screen before signing.`,
+			"{{WALLET_NAME}} does not support connecting to any hardware wallets. Without hardware wallet support, dApp signing is not possible. dApp signing allows users to verify transaction details directly on the hardware wallet's screen before signing.",
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should add support for hardware wallets to enable dApp signing, which enhances security by allowing users to verify transaction details on a separate device.`,
+			'{{WALLET_NAME}} should add support for hardware wallets to enable dApp signing, which enhances security by allowing users to verify transaction details on a separate device.',
 		),
 	}
 }
@@ -48,16 +49,16 @@ function noDappSigning(): Evaluation<HardwareWalletDappSigningValue> {
 			rating: Rating.FAIL,
 			displayName: 'No dApp signing support',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} supports hardware wallets but without dApp signing.`,
+				'{{WALLET_NAME}} supports hardware wallets but without dApp signing.',
 			),
 			dappSigningLevel: DappSigningLevel.NONE,
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} supports hardware wallets but does not implement dApp signing. dApp signing is important for security as it allows users to verify transaction details on their hardware wallet screen before signing.`,
+			'{{WALLET_NAME}} supports hardware wallets but does not implement dApp signing. dApp signing is important for security as it allows users to verify transaction details on their hardware wallet screen before signing.',
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should implement dApp signing support for hardware wallets to improve security by allowing users to verify transaction details on their hardware device.`,
+			'{{WALLET_NAME}} should implement dApp signing support for hardware wallets to improve security by allowing users to verify transaction details on their hardware device.',
 		),
 	}
 }
@@ -83,7 +84,7 @@ function basicDappSigning(
 			`{{WALLET_NAME}} supports hardware wallets with basic dApp signing${supportedWalletsText}, but the implementation does not provide full transparency for all transaction details. dApp signing allows users to verify transaction details on their hardware wallet screen before signing, which is crucial for security.`,
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should improve its dApp signing implementation to provide full transparency for all transaction details on the hardware wallet screen.`,
+			'{{WALLET_NAME}} should improve its dApp signing implementation to provide full transparency for all transaction details on the hardware wallet screen.',
 		),
 	}
 }
@@ -109,7 +110,7 @@ function partialDappSigning(
 			`{{WALLET_NAME}} supports hardware wallets with partial dApp signing${supportedWalletsText}. Most transaction details are displayed on the hardware wallet screen for verification, but some complex transactions may not show all details. dApp signing is crucial for security as it allows users to verify transaction details before signing.`,
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should extend its dApp signing implementation to cover all transaction types and ensure all details are clearly displayed on the hardware wallet screen.`,
+			'{{WALLET_NAME}} should extend its dApp signing implementation to cover all transaction types and ensure all details are clearly displayed on the hardware wallet screen.',
 		),
 	}
 }
@@ -148,42 +149,40 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's hardware wallet dApp signing support evaluated?",
 		whatCanWalletDoAboutIts: sentence(
-			`What can {{WALLET_NAME}} do to improve hardware wallet dApp signing support?`,
+			'What can {{WALLET_NAME}} do to improve hardware wallet dApp signing support?',
 		),
 	},
-	question: sentence(`Does the wallet support secure dApp signing with hardware wallets?`),
+	question: sentence('Does the wallet support secure dApp signing with hardware wallets?'),
 	why: markdown(`
 		dApp Signing is a critical security feature for hardware wallets that allows users to verify
 		transaction details directly on their hardware wallet's screen before signing. This verification
 		step is crucial for preventing attacks where malicious software might attempt to trick users
 		into signing transactions with different parameters than what they intended.
-		
+
 		Without dApp signing, users must trust that the software wallet is displaying the correct
 		transaction details and not manipulating them. With dApp signing, the hardware wallet shows
 		the actual transaction details that will be signed, providing an independent verification
 		mechanism that significantly enhances security.
-		
+
 		Full dApp signing implementations ensure that all relevant transaction details (recipient
 		address, amount, fees, etc.) are clearly displayed on the hardware wallet screen, allowing
 		users to make informed decisions before authorizing transactions.
 	`),
 	methodology: markdown(`
 		Hardware wallets are evaluated based on their implementation of dApp signing capabilities.
-		
+
 		A hardware wallet receives a passing rating if it implements full dApp signing, where all transaction
 		details are clearly displayed on the hardware wallet screen for verification before signing. This includes
 		support for standard transactions, ERC-20 token transfers, 712 messages and complex contract interactions. 
 
 		The hardware should be able to **display clearly all transaction types on Safe, Aave and Uniswap.**
 		To do so **the hardware MUST be able to connect directly to the dapp or allow the user to use at least two different software wallets independent from the hardware manufacturer**.
-    
-		
+
 		A hardware wallet receives a partial rating if it implements dApp signing but with limitations, such
 		as not displaying all transaction details or not supporting dApp signing for all transaction types. Or if the hardware supports only one independent software wallet. Or if the hardware supports only 1/3 of the dapps.
-		
+
 		A hardware wallet fails this attribute if it doesn't properly implement dApp signing functionality,
 		requiring users to trust the connected software wallet without independent verification.
-		
 	`),
 	ratingScale: {
 		display: 'pass-fail',
@@ -263,12 +262,13 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 				references,
 			}
 		}
+
 		// Check for ERC-4337 smart wallet
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(
 				hardwareWalletDappSigning,
 				sentence(
-					`This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.`,
+					'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
 				),
 				brand,
 				{ dappSigningLevel: DappSigningLevel.NONE },
@@ -283,14 +283,14 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 				rating: Rating.EXEMPT,
 				displayName: 'Only applicable for hardware wallets',
 				shortExplanation: sentence(
-					`This attribute evaluates hardware wallet dApp signing capabilities and is not applicable for software wallets.`,
+					'This attribute evaluates hardware wallet dApp signing capabilities and is not applicable for software wallets.',
 				),
 				dappSigningLevel: DappSigningLevel.NONE,
 				__brand: brand,
 			},
-			details: paragraph(
-				`As {{WALLET_NAME}} is a software wallet, this attribute which evaluates hardware wallet dApp signing capabilities is not applicable. Please see the hardware wallet integration attribute for how well this software wallet connects to hardware wallets.`,
-			),
+			details: paragraph(`
+				As {{WALLET_NAME}} is a software wallet, this attribute which evaluates hardware wallet dApp signing capabilities is not applicable. Please see the hardware wallet integration attribute for how well this software wallet connects to hardware wallets.
+			`),
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletDappSigningValue>>) =>

@@ -12,7 +12,7 @@ import {
 import { toFullyQualified } from '@/schema/reference'
 import type { Variant } from '@/schema/variants'
 import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet'
-import { isTypographicContent, sentence } from '@/types/content'
+import { isTypographicContent, type Sentence, sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology'
 
@@ -63,13 +63,13 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 				return null
 			case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
 				return (
-					<Typography variant="caption" sx={{ opacity: 0.8 }}>
+					<Typography variant='caption' sx={{ opacity: 0.8 }}>
 						This rating is only relevant for the {variantToName(displayedVariant, false)} version.
 					</Typography>
 				)
 			default:
 				return (
-					<Typography variant="caption" sx={{ opacity: 0.8 }}>
+					<Typography variant='caption' sx={{ opacity: 0.8 }}>
 						{displayedVariant === null
 							? 'This rating differs across versions. Select a specific version for details.'
 							: `This rating is specific to the ${variantToName(displayedVariant, false)} version.`}
@@ -80,7 +80,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 
 	let rendered = (
 		<>
-			<React.Fragment key="details">
+			<React.Fragment key='details'>
 				{isTypographicContent(details) ? (
 					<RenderTypographicContent
 						content={details}
@@ -100,8 +100,8 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					/>
 				)}
 			</React.Fragment>
-			<React.Fragment key="variantSpecific">{variantSpecificCaption}</React.Fragment>
-			<React.Fragment key="impact">
+			<React.Fragment key='variantSpecific'>{variantSpecificCaption}</React.Fragment>
+			<React.Fragment key='impact'>
 				{evalAttr.evaluation.impact === undefined ? null : (
 					<>
 						<div style={{ height: '1rem' }}></div>
@@ -126,14 +126,16 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			)}
 		</>
 	)
+
 	if (isTypographicContent(details)) {
 		rendered = <WrapRatingIcon rating={evalAttr.evaluation.value.rating}>{rendered}</WrapRatingIcon>
 	}
+
 	const accordions: NonEmptyArray<AccordionData> = [
 		{
 			id: `why-${evalAttr.attribute.id}`,
 			summary: (
-				<RenderTypographicContent
+				<RenderTypographicContent<Sentence<null>>
 					content={sentence(
 						evalAttr.evaluation.value.rating === Rating.PASS ||
 							evalAttr.evaluation.value.rating === Rating.UNRATED
@@ -153,7 +155,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 		{
 			id: `methodology-${evalAttr.attribute.id}`,
 			summary: (
-				<RenderTypographicContent
+				<RenderTypographicContent<Sentence<null>>
 					content={sentence(
 						evalAttr.attribute.wording.midSentenceName === null
 							? evalAttr.attribute.wording.howIsEvaluated
@@ -169,6 +171,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 	]
 	const howToImprove =
 		override?.howToImprove !== undefined ? override.howToImprove : evalAttr.evaluation.howToImprove
+
 	if (howToImprove !== undefined) {
 		accordions.push({
 			id: `how-${evalAttr.attribute.id}`,
@@ -206,6 +209,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			),
 		})
 	}
+
 	return (
 		<>
 			{rendered}
@@ -227,7 +231,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			<Accordions
 				accordions={accordions}
 				borderRadius={`${subsectionBorderRadius}px`}
-				interAccordionMargin="1rem"
+				interAccordionMargin='1rem'
 			/>
 		</>
 	)

@@ -20,6 +20,7 @@ import type {
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.ecosystem.address_resolution'
+
 export type AddressResolutionValue = Value & {
 	addressResolution?: AddressResolution<AddressResolutionSupport>
 	__brand: 'attributes.ecosystem.address_resolution'
@@ -39,6 +40,7 @@ function getOffchainProviderInfo(
 			walletShould: undefined,
 		}
 	}
+
 	if (support.offchainDataVerifiability === 'VERIFIABLE') {
 		return {
 			rating: Rating.PARTIAL,
@@ -48,6 +50,7 @@ function getOffchainProviderInfo(
 				'contact the third-party provider using traffic anonymizing techniques, such as Tor or Oblivious HTTP.',
 		}
 	}
+
 	if (support.offchainProviderConnection === 'UNIQUE_PROXY_CIRCUIT') {
 		return {
 			rating: Rating.PARTIAL,
@@ -57,6 +60,7 @@ function getOffchainProviderInfo(
 				'ensure the response from the third-party provider is correct using onchain data verified by a light client.',
 		}
 	}
+
 	return {
 		rating: Rating.PARTIAL,
 		offchainInfo:
@@ -74,10 +78,12 @@ function evaluateAddressResolution(
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
 	]
+
 	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificErcs) {
 		if (chainSpecificSupport.support !== 'SUPPORTED') {
 			continue
 		}
+
 		if (chainSpecificSupport.medium === 'CHAIN_CLIENT') {
 			return {
 				value: {
@@ -96,7 +102,9 @@ function evaluateAddressResolution(
 				references,
 			}
 		}
+
 		const { rating, offchainInfo, walletShould } = getOffchainProviderInfo(chainSpecificSupport)
+
 		return {
 			value: {
 				id: `support_via_erc${erc.number}_${chainSpecificSupport.offchainDataVerifiability.toLowerCase()}_${chainSpecificSupport.offchainProviderConnection.toLowerCase()}_provider`,
@@ -120,6 +128,7 @@ function evaluateAddressResolution(
 			references,
 		}
 	}
+
 	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
 		return {
 			value: {
@@ -128,34 +137,35 @@ function evaluateAddressResolution(
 				displayName: 'No human-readable address resolution',
 				addressResolution,
 				shortExplanation: sentence(
-					`{{WALLET_NAME}} does not resolve human-readable addresses such as ENS names.`,
+					'{{WALLET_NAME}} does not resolve human-readable addresses such as ENS names.',
 				),
 				__brand: brand,
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} does not support resolving human-readable addresses, such as ENS (.eth) names.`,
+				'{{WALLET_NAME}} does not support resolving human-readable addresses, such as ENS (.eth) names.',
 			),
 			howToImprove: markdown(
-				`When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ENS (.eth) names.`,
+				'When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ENS (.eth) names.',
 			),
 			references,
 		}
 	}
+
 	if (addressResolution.nonChainSpecificEnsResolution.medium === 'CHAIN_CLIENT') {
 		return {
 			value: {
-				id: `support_basic_resolution_onchain`,
+				id: 'support_basic_resolution_onchain',
 				rating: Rating.PARTIAL,
 				displayName: 'Resolves basic ENS addresses',
 				addressResolution,
 				shortExplanation: sentence(
-					`{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.`,
+					'{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.',
 				),
 				__brand: brand,
 			},
-			details: markdown(
-				`{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. However, because such addresses do not contain information about the chain that the recipient would like to receive funds on, it is possible for the user to mistakenly send funds on the wrong chain.`,
-			),
+			details: markdown(`
+				{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. However, because such addresses do not contain information about the chain that the recipient would like to receive funds on, it is possible for the user to mistakenly send funds to the wrong chain.
+			`),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should support sending funds to chain-specific human-readable addresses, as specified by either:
 
@@ -165,17 +175,19 @@ function evaluateAddressResolution(
 			references,
 		}
 	}
+
 	const { offchainInfo, walletShould } = getOffchainProviderInfo(
 		addressResolution.nonChainSpecificEnsResolution,
 	)
+
 	return {
 		value: {
 			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
 			rating: Rating.PARTIAL,
-			displayName: `Resolves basic ENS addresses offchain`,
+			displayName: 'Resolves basic ENS addresses offchain',
 			addressResolution,
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.`,
+				'{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.',
 			),
 			__brand: brand,
 		},
@@ -208,7 +220,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 	wording: {
 		midSentenceName: 'address resolution',
 	},
-	question: sentence(`Can you send funds to human-readable Ethereum addresses?`),
+	question: sentence('Can you send funds to human-readable Ethereum addresses?'),
 	why: markdown(`
 		Ethereum addresses are hexadecimal strings (\`0x...\`) which are
 		unreadable to humans. Phishing scams and exploits have used this to
@@ -320,7 +332,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		partial: [
 			exampleRating(
 				mdSentence(
-					`The wallet only resolves plain ENS addresses (\`username.eth\`) which do not include a destination chain.`,
+					'The wallet only resolves plain ENS addresses (`username.eth`) which do not include a destination chain.',
 				),
 				evaluateAddressResolution(
 					{
@@ -390,7 +402,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 			),
 		],
 		fail: exampleRating(
-			mdSentence(`The wallet only supports sending funds to raw (\`0x...\`) addresses.`),
+			mdSentence('The wallet only supports sending funds to raw (`0x...`) addresses.'),
 			evaluateAddressResolution(
 				{
 					chainSpecificAddressing: {
@@ -413,6 +425,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		if (features.addressResolution === null) {
 			return unrated(addressResolution, brand, {})
 		}
+
 		if (
 			features.addressResolution.nonChainSpecificEnsResolution === null ||
 			features.addressResolution.chainSpecificAddressing.erc7828 === null ||
@@ -420,6 +433,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		) {
 			return unrated(addressResolution, brand, {})
 		}
+
 		// We've checked all the nulls, so recreate the object without nulls in
 		// the type description.
 		const resolvedResolution: AddressResolution<AddressResolutionSupport> = {
@@ -429,6 +443,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 			},
 			nonChainSpecificEnsResolution: features.addressResolution.nonChainSpecificEnsResolution,
 		}
+
 		return evaluateAddressResolution(resolvedResolution, refs(features.addressResolution))
 	},
 	aggregate: pickWorstRating<AddressResolutionValue>,

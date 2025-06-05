@@ -19,6 +19,7 @@ import { ratedSoftwareWallets, unratedSoftwareWallet } from '@/data/software-wal
 import { HardwareIcon } from '@/icons/devices/HardwareIcon'
 import type { EvaluationTree } from '@/schema/attribute-groups'
 import {
+	calculateAttributeGroupScore,
 	getAttributeGroupInTree,
 	mapNonExemptAttributeGroupsInTree,
 } from '@/schema/attribute-groups'
@@ -121,6 +122,7 @@ function getWalletTypeInfo(
 		(setContains<AccountType>(accountTypes, AccountType.eip7702) ||
 			setContains<AccountType>(accountTypes, AccountType.rawErc4337))
 	const hasHardware = hasVariant(wallet.variants, Variant.HARDWARE)
+
 	return {
 		accountTypes,
 		hasEoa,
@@ -173,9 +175,11 @@ function getDetailedWalletDescription(wallet: RatedWallet): string {
 // Helper function to get hardware wallet manufacture type display name
 function getHardwareWalletManufactureTypeDisplay(wallet: RatedWallet): string {
 	const manufactureType = wallet.metadata.hardwareWalletManufactureType
+
 	if (manufactureType !== undefined) {
 		return HARDWARE_WALLET_MANUFACTURE_TYPE_DISPLAY[manufactureType]
 	}
+
 	return 'Unknown'
 }
 
@@ -205,6 +209,7 @@ function getEvaluationTree(wallet: RatedWallet, selectedVariant: DeviceVariant):
 	}
 
 	const variantData = wallet.variants[selectedVariant]
+
 	return variantData !== undefined ? variantData.attributes : wallet.overall
 }
 
@@ -226,6 +231,7 @@ function getFlagshipModel(wallet: RatedWallet): HardwareWalletModel | undefined 
 	const models = getHardwareWalletModels(wallet)
 	// First, try to find a model explicitly marked as flagship
 	const flagshipModel = models.find(model => model.isFlagship === true)
+
 	// If no flagship is explicitly marked, return the first model as default
 	return flagshipModel ?? models[0]
 }
@@ -305,13 +311,13 @@ function createWalletNameCell(): ({ row }: { row: Row<TableRow> }) => React.Reac
 		const walletUrl = `/${walletId}`
 
 		return (
-			<div className="flex items-center">
+			<div className='flex items-center'>
 				{/* Wallet Logo */}
-				<div className="flex-shrink-0 mr-3">
+				<div className='flex-shrink-0 mr-3'>
 					<img
 						src={logoPath}
-						alt=""
-						className="w-6 h-6 object-contain"
+						alt=''
+						className='w-6 h-6 object-contain'
 						onError={e => {
 							// Fallback for missing logos
 							e.currentTarget.src = defaultLogo
@@ -321,13 +327,14 @@ function createWalletNameCell(): ({ row }: { row: Row<TableRow> }) => React.Reac
 				{/* Wallet Name */}
 				<a
 					href={walletUrl}
-					className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
+					className='text-base font-medium hover:text-blue-600 hover:underline cursor-pointer'
 				>
 					{row.original.wallet.metadata.displayName}
 				</a>
 			</div>
 		)
 	}
+
 	return createCell
 }
 
@@ -347,6 +354,7 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 		if (closeTimeout.current !== null) {
 			clearTimeout(closeTimeout.current)
 		}
+
 		setIsTagHovered(true)
 		setAnchorEl(e.currentTarget)
 	}
@@ -362,6 +370,7 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 		if (closeTimeout.current !== null) {
 			clearTimeout(closeTimeout.current)
 		}
+
 		setIsModalHovered(true)
 	}
 
@@ -375,7 +384,7 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 	return (
 		<React.Fragment>
 			<span
-				className="eip-tag inline-block text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f] relative z-10 cursor-help"
+				className='eip-tag inline-block text-xs bg-gray-100 px-2 py-1 rounded dark:bg-[#17191f] dark:text-gray-100 dark:border-[#3f3f3f] relative z-10 cursor-help'
 				title={`${standard.prefix}-${standard.number} - Hover for details`}
 				onMouseEnter={handleTagMouseEnter}
 				onMouseLeave={handleTagMouseLeave}
@@ -405,7 +414,7 @@ function ExpandableHardwareWalletRow({
 	const [isExpanded, setIsExpanded] = useState(false)
 	const [selectedModel, setSelectedModel] = useState<string | null>(null)
 
-	const wallet = row.original.wallet
+	const { wallet } = row.original
 	const models: HardwareWalletModel[] = getHardwareWalletModels(wallet)
 	const flagshipModel = getFlagshipModel(wallet)
 
@@ -419,6 +428,7 @@ function ExpandableHardwareWalletRow({
 			// 2. The lint error implies HardwareWalletModel.id is a non-nullable string.
 			// Therefore, the fallback `?? ''` was redundant.
 			const modelIdToSelect = flagshipModel?.id ?? models[0].id
+
 			setSelectedModel(modelIdToSelect)
 		}
 	}, [flagshipModel, models, selectedModel])
@@ -461,6 +471,7 @@ function ExpandableHardwareWalletRow({
 		if (columnIndex < 2) {
 			return flexRender(cell.column.columnDef.cell, cell.getContext())
 		}
+
 		return perAttributeGroupCells[columnIndex - 2]
 	}
 
@@ -469,9 +480,11 @@ function ExpandableHardwareWalletRow({
 		if (a.isFlagship === true) {
 			return -1
 		}
+
 		if (b.isFlagship === true) {
 			return 1
 		}
+
 		return 0
 	})
 
@@ -479,29 +492,29 @@ function ExpandableHardwareWalletRow({
 	return (
 		<>
 			<tr
-				className="dark:bg-[#141414] dark:hover:bg-[#1a1a1a] cursor-pointer"
+				className='dark:bg-[#141414] dark:hover:bg-[#1a1a1a] cursor-pointer'
 				onClick={toggleExpanded}
 			>
 				{/* Rank column */}
-				<td className="px-4 py-2 dark:text-gray-200 text-center">{row.index + 1}</td>
+				<td className='px-4 py-2 dark:text-gray-200 text-center'>{row.index + 1}</td>
 				{/* Wallet cell */}
-				<td className="px-4 py-2 dark:text-gray-200">
-					<div className="flex items-center">
+				<td className='px-4 py-2 dark:text-gray-200'>
+					<div className='flex items-center'>
 						{models.length > 1 ? (
-							<span className="mr-2">
+							<span className='mr-2'>
 								{isExpanded ? (
-									<LuChevronDown className="w-4 h-4" />
+									<LuChevronDown className='w-4 h-4' />
 								) : (
-									<LuChevronRight className="w-4 h-4" />
+									<LuChevronRight className='w-4 h-4' />
 								)}
 							</span>
 						) : null}
 						{/* Wallet Logo */}
-						<div className="flex-shrink-0 mr-3">
+						<div className='flex-shrink-0 mr-3'>
 							<img
 								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-								alt=""
-								className="w-6 h-6 object-contain"
+								alt=''
+								className='w-6 h-6 object-contain'
 								onError={e => {
 									// Fallback for missing logos
 									e.currentTarget.src = '/images/wallets/default.svg'
@@ -509,16 +522,16 @@ function ExpandableHardwareWalletRow({
 							/>
 						</div>
 						{/* Wallet Name */}
-						<div className="flex flex-col items-start">
+						<div className='flex flex-col items-start'>
 							<a
 								href={`/${wallet.metadata.id}`}
-								className="text-base font-medium hover:text-blue-600 hover:underline cursor-pointer"
+								className='text-base font-medium hover:text-blue-600 hover:underline cursor-pointer'
 							>
 								{row.original.name}
 							</a>
 							{/* Always show model name, but only show flagship indicator in expanded view */}
-							<span className="text-xs flex items-center">
-								<span className="text-purple-500 dark:text-purple-400 font-medium">
+							<span className='text-xs flex items-center'>
+								<span className='text-purple-500 dark:text-purple-400 font-medium'>
 									{selectedModelName}
 								</span>
 							</span>
@@ -529,18 +542,18 @@ function ExpandableHardwareWalletRow({
 					.getVisibleCells()
 					.slice(2)
 					.map((cell: Cell<TableRow, unknown>, index: number) => (
-						<td key={cell.id} className="px-4 py-2 dark:text-gray-200">
+						<td key={cell.id} className='px-4 py-2 dark:text-gray-200'>
 							{createUpdatedCell(cell, index)}
 						</td>
 					))}
 			</tr>
 
 			{isExpanded && models.length > 1 && (
-				<tr className="bg-gray-50 dark:bg-[#1a1a1a]">
-					<td colSpan={columns.length > 0 ? columns.length : 8} className="p-0">
-						<div className="pl-10 pr-4 py-3">
-							<div className="text-sm font-medium mb-2 dark:text-gray-200">Models:</div>
-							<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+				<tr className='bg-gray-50 dark:bg-[#1a1a1a]'>
+					<td colSpan={columns.length > 0 ? columns.length : 8} className='p-0'>
+						<div className='pl-10 pr-4 py-3'>
+							<div className='text-sm font-medium mb-2 dark:text-gray-200'>Models:</div>
+							<div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>
 								{sortedModels.map(model => (
 									<div
 										key={model.id}
@@ -565,19 +578,19 @@ function ExpandableHardwareWalletRow({
 												selectedModel === model.id ? 'bg-purple-500' : 'bg-gray-400',
 											)}
 										></div>
-										<div className="flex-grow dark:text-gray-200 font-medium">
+										<div className='flex-grow dark:text-gray-200 font-medium'>
 											{model.name}
 											{model.isFlagship === true && (
-												<span className="ml-1 text-xs text-purple-600 dark:text-purple-400 font-medium">
+												<span className='ml-1 text-xs text-purple-600 dark:text-purple-400 font-medium'>
 													(Flagship)
 												</span>
 											)}
 										</div>
 										<a
 											href={model.url}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+											target='_blank'
+											rel='noopener noreferrer'
+											className='text-xs text-blue-600 dark:text-blue-400 hover:underline'
 											onClick={e => {
 												e.stopPropagation()
 											}}
@@ -616,6 +629,7 @@ export default function WalletTable(): React.ReactElement {
 		() =>
 			softwareWalletData.filter(row => {
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+
 				return hasEoa && !hasSmartWallet
 			}).length,
 		[],
@@ -625,6 +639,7 @@ export default function WalletTable(): React.ReactElement {
 		() =>
 			softwareWalletData.filter(row => {
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+
 				return hasSmartWallet && !hasEoa
 			}).length,
 		[],
@@ -634,6 +649,7 @@ export default function WalletTable(): React.ReactElement {
 		() =>
 			softwareWalletData.filter(row => {
 				const { hasEoa, hasSmartWallet } = getWalletTypeInfo(row.wallet, 'ALL_VARIANTS')
+
 				return hasSmartWallet && hasEoa
 			}).length,
 		[],
@@ -665,8 +681,10 @@ export default function WalletTable(): React.ReactElement {
 	function getOverallScore(wallet: RatedWallet): number {
 		const groupScores = mapNonExemptAttributeGroupsInTree(
 			wallet.overall,
-			(attrGroup, evalGroup) => attrGroup.score(evalGroup)?.score ?? 0,
+			(attrGroup, evalGroup) =>
+				calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)?.score ?? 0,
 		)
+
 		return groupScores.reduce((sum, score) => sum + score, 0)
 	}
 
@@ -676,7 +694,9 @@ export default function WalletTable(): React.ReactElement {
 			activeTab === WalletTableTab.SOFTWARE
 				? [...filteredSoftwareWalletData]
 				: [...hardwareWalletData]
+
 		data.sort((a, b) => getOverallScore(b.wallet) - getOverallScore(a.wallet))
+
 		return data
 	}, [activeTab, filteredSoftwareWalletData, hardwareWalletData])
 
@@ -727,14 +747,16 @@ export default function WalletTable(): React.ReactElement {
 				.filter((val): val is WalletTypeCategory => val !== null)
 				.map(cat => (WALLET_TYPE_DISPLAY[cat] !== '' ? WALLET_TYPE_DISPLAY[cat] : cat))
 				.join(' & ')
+
 			// If no standards, just return the type string
 			if (!hasSmartWallet) {
 				return typeString
 			}
+
 			return (
 				<div>
 					<span>{typeString}</span>
-					<div className="mt-1 flex flex-wrap gap-1">
+					<div className='mt-1 flex flex-wrap gap-1'>
 						{Object.entries(standards).map(([std, supported]: [string, boolean]) => {
 							if (!supported) {
 								return null
@@ -758,14 +780,14 @@ export default function WalletTable(): React.ReactElement {
 		id: 'risk',
 		header: 'By device',
 		cell: ({ row }): React.ReactNode => {
-			const wallet = row.original.wallet
+			const { wallet } = row.original
 			const supportsBrowser = hasVariant(wallet.variants, Variant.BROWSER)
 			const supportsMobile = hasVariant(wallet.variants, Variant.MOBILE)
 			const supportsDesktop = hasVariant(wallet.variants, Variant.DESKTOP)
 
 			return (
-				<div className="flex space-x-0 items-center">
-					<div className="flex flex-col items-center group">
+				<div className='flex space-x-0 items-center'>
+					<div className='flex flex-col items-center group'>
 						<button
 							className={cx(
 								'text-2xl p-2 rounded-md transition-colors',
@@ -796,7 +818,7 @@ export default function WalletTable(): React.ReactElement {
 							)}
 						/>
 					</div>
-					<div className="flex flex-col items-center group">
+					<div className='flex flex-col items-center group'>
 						<button
 							className={cx(
 								'text-2xl p-2 rounded-md transition-colors',
@@ -827,7 +849,7 @@ export default function WalletTable(): React.ReactElement {
 							)}
 						/>
 					</div>
-					<div className="flex flex-col items-center group">
+					<div className='flex flex-col items-center group'>
 						<button
 							className={cx(
 								'text-2xl p-2 rounded-md transition-colors',
@@ -868,7 +890,7 @@ export default function WalletTable(): React.ReactElement {
 		columnHelper.display({
 			header: attrGroup.displayName,
 			cell: ({ row }): React.ReactNode => {
-				const wallet = row.original.wallet
+				const { wallet } = row.original
 				const isSupported =
 					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
 				const evalTree = getEvaluationTree(wallet, selectedVariant)
@@ -917,8 +939,8 @@ export default function WalletTable(): React.ReactElement {
 		id: 'risk_by_device',
 		header: 'Risk by device',
 		cell: () => (
-			<div className="flex space-x-0 items-center justify-center">
-				<div className="flex flex-col items-center group">
+			<div className='flex space-x-0 items-center justify-center'>
+				<div className='flex flex-col items-center group'>
 					<button
 						className={cx(
 							'p-2 rounded-md transition-colors',
@@ -933,7 +955,7 @@ export default function WalletTable(): React.ReactElement {
 									: DeviceVariant.NONE,
 							)
 						}}
-						title="Hardware"
+						title='Hardware'
 					>
 						<HardwareIcon
 							style={{
@@ -1023,11 +1045,11 @@ export default function WalletTable(): React.ReactElement {
 	}
 
 	return (
-		<div className="overflow-x-auto">
+		<div className='overflow-x-auto'>
 			{/* Tabs - now fixed */}
-			<div className="sticky top-0 z-10">
-				<div className="flex gap-4 xl:items-end xl:flex-row flex-col-reverse items-start">
-					<div className="flex gap-1">
+			<div className='sticky top-0 z-10'>
+				<div className='flex gap-4 xl:items-end xl:flex-row flex-col-reverse items-start'>
+					<div className='flex gap-1'>
 						<button
 							className={cx(
 								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
@@ -1073,8 +1095,8 @@ export default function WalletTable(): React.ReactElement {
 					</div>
 					{/* Wallet Type Filter Buttons - only show for Software wallets tab */}
 					{activeTab === WalletTableTab.SOFTWARE && (
-						<div className="flex flex-wrap gap-2 py-1 px-1 justify-start">
-							<span className="text-sm font-medium text-gray-600 dark:text-gray-300 self-center mr-2">
+						<div className='flex flex-wrap gap-2 py-1 px-1 justify-start'>
+							<span className='text-sm font-medium text-gray-600 dark:text-gray-300 self-center mr-2'>
 								Filter by:
 							</span>
 							<button
@@ -1175,13 +1197,14 @@ export default function WalletTable(): React.ReactElement {
 			</div>
 
 			{/* Table */}
-			<div className="overflow-x-auto">
-				<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-background">
+			<div className='overflow-x-auto'>
+				<table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-background'>
 					<thead>
 						{table.getHeaderGroups().map(headerGroup => (
-							<tr className="bg-tertiary" key={headerGroup.id}>
+							<tr className='bg-tertiary' key={headerGroup.id}>
 								{headerGroup.headers.map(header => {
 									const headerContent = header.column.columnDef.header
+
 									return (
 										<th
 											key={header.id}
@@ -1205,7 +1228,7 @@ export default function WalletTable(): React.ReactElement {
 							</tr>
 						))}
 					</thead>
-					<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+					<tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
 						{renderTableBody()}
 					</tbody>
 				</table>

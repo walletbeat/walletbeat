@@ -23,12 +23,15 @@ export type InteroperabilityValue = Value & {
 function evaluateInteroperability(features: InteroperabilitySupport): Rating {
 	const ratings = [features.thirdPartyCompatibility, features.noSupplierLinkage]
 	const passCount = ratings.filter(r => r === InteroperabilityType.PASS).length
+
 	if (passCount === 2) {
 		return Rating.PASS
 	}
+
 	if (passCount === 1) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -40,36 +43,36 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's interoperability evaluated?",
 		whatCanWalletDoAboutIts: sentence(
-			`What can {{WALLET_NAME}} do to improve its interoperability?`,
+			'What can {{WALLET_NAME}} do to improve its interoperability?',
 		),
 	},
 	question: sentence(
-		`Does {{WALLET_NAME}} work well with third-party wallets and avoid supplier linkage?`,
+		'Does {{WALLET_NAME}} work well with third-party wallets and avoid supplier linkage?',
 	),
 	why: markdown(
-		`Interoperability ensures the wallet can be used with independent third-party wallets and does not leak identifying metadata to the supplier.`,
+		'Interoperability ensures the wallet can be used with independent third-party wallets and does not leak identifying metadata to the supplier.',
 	),
 	methodology: markdown(
-		`Evaluated based on third-party wallet compatibility and supplier independence.`,
+		'Evaluated based on third-party wallet compatibility and supplier independence.',
 	),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(`The wallet passes both interoperability sub-criteria.`),
+				sentence('The wallet passes both interoperability sub-criteria.'),
 				(v: InteroperabilityValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(`The wallet passes one interoperability sub-criteria.`),
+				sentence('The wallet passes one interoperability sub-criteria.'),
 				(v: InteroperabilityValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(`The wallet fails one or both interoperability sub-criteria.`),
+				sentence('The wallet fails one or both interoperability sub-criteria.'),
 				(v: InteroperabilityValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -78,12 +81,14 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 		pickWorstRating<InteroperabilityValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<InteroperabilityValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return exempt(interoperability, sentence(`Only rated for hardware wallets`), brand, {
+			return exempt(interoperability, sentence('Only rated for hardware wallets'), brand, {
 				thirdPartyCompatibility: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,
 			})
 		}
+
 		const interoperabilityFeature = features.selfSovereignty.interoperability
+
 		if (interoperabilityFeature === null) {
 			return unrated(interoperability, brand, {
 				thirdPartyCompatibility: InteroperabilityType.FAIL,
@@ -105,7 +110,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} interoperability evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},

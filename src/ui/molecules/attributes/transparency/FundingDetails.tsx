@@ -21,6 +21,7 @@ export function FundingDetails({
 		.filter(({ value }) => value === true)
 		.map(({ strategy }) => strategy)
 	const ref = refs(monetization)
+
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			<div style={{ fontWeight: subsectionWeight }}>

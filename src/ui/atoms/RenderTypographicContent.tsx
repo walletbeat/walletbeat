@@ -33,32 +33,20 @@ type Props = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Override default null
 export function RenderTypographicContent<TypographicContent extends _TypographicContent<any>>(
-	props: (
-		& Props
-		& {
-			/** The typographic content to render. */
-			content: TypographicContent
-		}
-		& (
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments -- Explicitly handle null case for clarity
-			TypographicContent extends _TypographicContent<null> ?
-				{ strings?: never }
-			: TypographicContent extends _TypographicContent<infer _Strings> ?
-				{ strings: _Strings }
-			:
-				never
-		)
-	),
+	props: Props & {
+		/** The typographic content to render. */
+		content: TypographicContent
+	} & (TypographicContent extends _TypographicContent<null>
+			? { strings?: never }
+			: TypographicContent extends _TypographicContent<infer _Strings>
+				? { strings: _Strings }
+				: never),
 ): React.JSX.Element
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Override default null
 export function RenderTypographicContent<TypographicContent extends _TypographicContent<any>>(
-	props: (
-		& Props
-		& {
-			content: TypographicContent
-		}
-		& ({ strings?: never } | { strings: Strings })
-	),
+	props: Props & {
+		content: TypographicContent
+	} & ({ strings?: never } | { strings: Strings }),
 ) {
 	const { content, textTransform, typography, strings } = props
 
@@ -67,8 +55,9 @@ export function RenderTypographicContent<TypographicContent extends _Typographic
 			text = textTransform(text)
 		}
 
-		if (strings !== undefined)
+		if (strings !== undefined) {
 			text = renderStrings(text, props.strings)
+		}
 
 		return text.trim()
 	}

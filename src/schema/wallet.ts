@@ -305,7 +305,9 @@ function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | 
 	if (!wallet.variants[variant]) {
 		return null
 	}
+
 	const resolvedFeatures = resolveFeatures(wallet.features, variant)
+
 	return {
 		metadata: wallet.metadata,
 		variant,
@@ -334,51 +336,65 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 		perVariantTree,
 		(variant: Variant, evalTree: EvaluationTree): Map<string, VariantSpecificity> => {
 			const variantSpecificityMap = new Map<string, VariantSpecificity>()
+
 			mapAttributesGetter(
 				evalTree,
 				<V extends Value>(getter: (tree: EvaluationTree) => EvaluatedAttribute<V> | undefined) => {
 					const currentVariantEval = getter(evalTree)
+
 					if (currentVariantEval === undefined) {
 						return
 					}
+
 					if (currentVariantEval.evaluation.value.rating === Rating.EXEMPT) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.EXEMPT_FOR_THIS_VARIANT,
 						)
+
 						return
 					}
+
 					if (!hasMultipleVariants) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT,
 						)
+
 						return
 					}
+
 					const currentVariantEvalId = currentVariantEval.evaluation.value.id
 					let allOthersExempt = true
 					let foundDifferentValue = false
 					let foundSameValue = false
+
 					for (const [versusVariant, versusTree] of nonEmptyEntries<Variant, EvaluationTree>(
 						perVariantTree,
 					)) {
 						if (versusVariant === variant) {
 							continue
 						}
+
 						const versusEval = getter(versusTree)
+
 						if (versusEval === undefined) {
 							continue
 						}
+
 						if (versusEval.evaluation.value.rating === Rating.EXEMPT) {
 							continue
 						}
+
 						allOthersExempt = false
+
 						if (versusEval.evaluation.value.id === currentVariantEvalId) {
 							foundSameValue = true
 						} else {
 							foundDifferentValue = true
 						}
 					}
+
 					if (allOthersExempt) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
@@ -401,9 +417,11 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 					}
 				},
 			)
+
 			return variantSpecificityMap
 		},
 	)
+
 	return {
 		metadata: wallet.metadata,
 		types: walletTypes(wallet),
@@ -433,13 +451,17 @@ export function attributeVariantSpecificity<V extends Value>(
 	attribute: Attribute<V>,
 ): VariantSpecificity {
 	const variantSpecificityMap = ratedWallet.variantSpecificity[variant]
+
 	if (variantSpecificityMap === undefined) {
 		throw new Error(`Wallet ${ratedWallet.metadata.id} does not have variant ${variant}`)
 	}
+
 	const specificity = variantSpecificityMap.get(attribute.id)
+
 	if (specificity === undefined) {
 		throw new Error(`Invalid attribute ID: ${attribute.id}`)
 	}
+
 	return specificity
 }
 
@@ -454,20 +476,26 @@ export function getAttributeOverride(
 	if (!Object.hasOwn(ratedWallet.overall, attrGroup)) {
 		throw new Error(`Invalid attribute group name: ${attrGroup}`)
 	}
+
 	if (!Object.hasOwn(ratedWallet.overall[attrGroup], attrId)) {
 		throw new Error(`Invalid attribute name ${attrId} in attribute group ${attrGroup}`)
 	}
+
 	if (!Object.hasOwn(ratedWallet.overrides.attributes, attrGroup)) {
 		return null
 	}
+
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-member-access -- Safe because we just checked the property exists.
 	const attributeGroup = (ratedWallet.overrides.attributes as any)[attrGroup] as
 		| Record<string, AttributeOverride | undefined> // Safe because all attribute group overrides are structured this way.
 		| undefined
+
 	if (attributeGroup === undefined || !Object.hasOwn(attributeGroup, attrId)) {
 		return null
 	}
+
 	const override = attributeGroup[attrId]
+
 	return override ?? null
 }
 
@@ -485,6 +513,7 @@ export function getVariantResolvedWallet(
 	if (!hasVariant(wallet.variants, variant) || wallet.variants[variant] === undefined) {
 		return null
 	}
+
 	return wallet.variants[variant]
 }
 
@@ -500,24 +529,33 @@ export function walletSupportedAccountTypes(
 ): NonEmptySet<AccountType> | null {
 	if (variant === 'ALL_VARIANTS') {
 		const accountTypeSets: Array<NonEmptySet<AccountType>> = []
+
 		for (const variant of setItems(getWalletVariants(wallet))) {
 			const supportedByVariant = walletSupportedAccountTypes(wallet, variant)
+
 			if (supportedByVariant === null) {
 				return null
 			}
+
 			accountTypeSets.push(supportedByVariant)
 		}
+
 		if (!isNonEmptyArray(accountTypeSets)) {
 			return null
 		}
+
 		return setUnion(accountTypeSets)
 	}
+
 	const resolvedWallet = getVariantResolvedWallet(wallet, variant)
+
 	if (resolvedWallet === null) {
 		return null
 	}
+
 	if (resolvedWallet.features.accountSupport === null) {
 		return null
 	}
+
 	return supportedAccountTypes(resolvedWallet.features.accountSupport)
 }

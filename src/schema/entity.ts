@@ -1,4 +1,4 @@
-import type { DomainUrl, Url } from './url'
+import { type DomainUrl, isUrl, markdownUrlLink, type Url } from './url'
 
 export enum EntityType {
 	chainDataProvider = 'chainDataProvider',
@@ -97,3 +97,36 @@ export type OffchainDataProvider = EntityWithType<EntityType.offchainDataProvide
 export type TransactionBroadcastProvider = EntityWithType<EntityType.transactionBroadcastProvider>
 export type SecurityAuditor = EntityWithType<EntityType.securityAuditor>
 export type WalletDeveloper = EntityWithType<EntityType.walletDeveloper>
+
+/**
+ * A Markdown link to an Entity.
+ */
+export function entityMarkdownLink(entity: Entity): string {
+	const url = entityUrl(entity)
+
+	if (url === null) {
+		return `**${entity.name}**`
+	}
+
+	return markdownUrlLink(url, { forceLabel: entity.name, bold: true })
+}
+
+/**
+ * Returns the most relevant URL associated with an entity.
+ */
+export function entityUrl(entity: Entity): Url | null {
+	for (const maybeUrl of [
+		entity.url,
+		entity.repoUrl,
+		entity.twitter,
+		entity.farcaster,
+		entity.crunchbase,
+		entity.linkedin,
+	]) {
+		if (isUrl(maybeUrl)) {
+			return maybeUrl
+		}
+	}
+
+	return null
+}
