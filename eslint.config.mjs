@@ -175,7 +175,7 @@ export default tseslint.config(
   {
     plugins: { prettier: eslintPluginPrettier },
     rules: {
-      'prettier/prettier': ['error', { singleQuote: true }],
+      'prettier/prettier': ['error', { singleQuote: true, useTabs: true, semi: false }],
       quotes: ['error', 'single', { avoidEscape: true }],
     },
   },
