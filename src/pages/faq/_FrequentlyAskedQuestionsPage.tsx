@@ -1,44 +1,44 @@
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { Divider, Typography } from '@mui/material';
-import React from 'react';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
+import { Divider, Typography } from '@mui/material'
+import React from 'react'
 
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
-import { type NonEmptyArray, nonEmptyConcat, nonEmptyMap } from '@/types/utils/non-empty';
-import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion';
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+import { type NonEmptyArray, nonEmptyConcat, nonEmptyMap } from '@/types/utils/non-empty'
+import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion'
 
 import {
-  navigationAbout,
-  navigationFaq,
-  navigationFarcasterChannel,
-  navigationHome,
-  navigationRepository,
-} from '../../components/navigation';
-import type { NavigationContentItem } from '../../ui/organisms/Navigation';
+	navigationAbout,
+	navigationFaq,
+	navigationFarcasterChannel,
+	navigationHome,
+	navigationRepository,
+} from '../../components/navigation'
+import type { NavigationContentItem } from '../../ui/organisms/Navigation'
 
 interface FAQEntry {
-  anchor: string;
-  question: string;
-  navTitle: string;
-  answerMarkdown: string;
+	anchor: string
+	question: string
+	navTitle: string
+	answerMarkdown: string
 }
 
 const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
-  {
-    anchor: 'what-is-walletbeat',
-    question: 'What is Walletbeat?',
-    navTitle: 'What is Walletbeat?',
-    answerMarkdown: `
+	{
+		anchor: 'what-is-walletbeat',
+		question: 'What is Walletbeat?',
+		navTitle: 'What is Walletbeat?',
+		answerMarkdown: `
 			**Walletbeat is an Ethereum wallet rating site.**
 
 			It aims to provide a trustworthy, up-to-date source of information
 			about the state of the Ethereum wallet ecosystem.
 		`,
-  },
-  {
-    anchor: 'why-does-walletbeat-exist',
-    question: 'Why does Walletbeat exist?',
-    navTitle: 'What is Walletbeat for?',
-    answerMarkdown: `
+	},
+	{
+		anchor: 'why-does-walletbeat-exist',
+		question: 'Why does Walletbeat exist?',
+		navTitle: 'What is Walletbeat for?',
+		answerMarkdown: `
 			The Ethereum wallet ecosystem today is fragmented and it is difficult
 			for users to find a wallet that meets all of their requirements.
 
@@ -63,12 +63,12 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			Walletbeat aims to push the Ethereum wallet ecosystem towards similar
 			Ethereum-aligned values.
 		`,
-  },
-  {
-    anchor: 'why-should-i-care',
-    question: 'Why should I care?',
-    navTitle: 'Why should I care?',
-    answerMarkdown: `
+	},
+	{
+		anchor: 'why-should-i-care',
+		question: 'Why should I care?',
+		navTitle: 'Why should I care?',
+		answerMarkdown: `
 			**As an Ethereum user**, Walletbeat helps you make an informed decision
 			about which wallet to use, and which wallet you may want to fund.
 
@@ -76,12 +76,12 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			own wallet against competitors, and a source of inspiration for roadmap
 			items to work on.
 		`,
-  },
-  {
-    anchor: 'how-are-wallets-evaluated',
-    question: 'How are wallets evaluated?',
-    navTitle: 'Wallet evaluation',
-    answerMarkdown: `
+	},
+	{
+		anchor: 'how-are-wallets-evaluated',
+		question: 'How are wallets evaluated?',
+		navTitle: 'Wallet evaluation',
+		answerMarkdown: `
 			Wallets are evaluated on a set of pass-fail rules that evaluate
 			specific **attributes**.
 
@@ -160,12 +160,12 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 				extension capabilities, these capabilities may change over time and
 				rules will be updated accordingly.
 		`,
-  },
-  {
-    anchor: 'rating-categories',
-    question: 'What do the rating categories mean?',
-    navTitle: 'Rating categories',
-    answerMarkdown: `
+	},
+	{
+		anchor: 'rating-categories',
+		question: 'What do the rating categories mean?',
+		navTitle: 'Rating categories',
+		answerMarkdown: `
 			Wallets are rated based on various attributes which are grouped under
 			five high-level buckets:
 
@@ -206,12 +206,12 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			high-level buckets, refer to these attributes on a wallet-specific
 			page.
 		`,
-  },
-  {
-    anchor: 'score-computation',
-    question: "How are wallets' score computed?",
-    navTitle: 'How is the score computed?',
-    answerMarkdown: `
+	},
+	{
+		anchor: 'score-computation',
+		question: "How are wallets' score computed?",
+		navTitle: 'How is the score computed?',
+		answerMarkdown: `
 			Scores are computed as a weighted average of all the criteria that go
 			into assessing wallets.
 
@@ -230,12 +230,12 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			encourages wallet developers to reduce per-version differences and
 			reuse as much code and components as possible.
 		`,
-  },
-  {
-    anchor: 'who-is-behind-walletbeat',
-    question: 'Who is behind Walletbeat?',
-    navTitle: 'Who runs Walletbeat?',
-    answerMarkdown: `
+	},
+	{
+		anchor: 'who-is-behind-walletbeat',
+		question: 'Who is behind Walletbeat?',
+		navTitle: 'Who runs Walletbeat?',
+		answerMarkdown: `
 			Walletbeat was originally created by
 			[moritz](https://warpcast.com/moritz/) as an open-source effort to
 			document the state of the wallet ecosystem.
@@ -254,12 +254,12 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			reaches a higher level of maturity and a broader set of regular
 			contributors.
 		`,
-  },
-  {
-    anchor: 'how-can-i-help',
-    question: 'How can I help?',
-    navTitle: 'How can I help?',
-    answerMarkdown: `
+	},
+	{
+		anchor: 'how-can-i-help',
+		question: 'How can I help?',
+		navTitle: 'How can I help?',
+		answerMarkdown: `
 			Walletbeat is a work in progress and we would love your help!
 
 			**The best way to help is to help with wallet research**. There are
@@ -274,89 +274,89 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			If you would like to help with this, please
 			[contribute to our repository!](https://github.com/walletbeat/walletbeat).
 		`,
-  },
-];
+	},
+]
 
 function FrequentlyAskedQuestions(): React.JSX.Element {
-  return (
-    <>
-      {frequentlyAskedQuestions.map((entry, index) => (
-        <React.Fragment key={entry.anchor}>
-          {index === 0 ? null : (
-            <Divider
-              orientation='horizontal'
-              variant='middle'
-              flexItem={true}
-              sx={{
-                marginTop: '1rem',
-                marginBottom: '1rem',
-                marginLeft: '10%',
-                marginRight: '10%',
-              }}
-            />
-          )}
-          <FrequentlyAskedQuestion
-            anchor={entry.anchor}
-            question={entry.question}
-            questionTypographyProps={{
-              variant: 'h3',
-              marginTop: '1rem',
-              marginBottom: '1rem',
-            }}
-            answerTypographyProps={{
-              variant: 'body1',
-            }}
-          >
-            {entry.answerMarkdown}
-          </FrequentlyAskedQuestion>
-        </React.Fragment>
-      ))}
-    </>
-  );
+	return (
+		<>
+			{frequentlyAskedQuestions.map((entry, index) => (
+				<React.Fragment key={entry.anchor}>
+					{index === 0 ? null : (
+						<Divider
+							orientation="horizontal"
+							variant="middle"
+							flexItem={true}
+							sx={{
+								marginTop: '1rem',
+								marginBottom: '1rem',
+								marginLeft: '10%',
+								marginRight: '10%',
+							}}
+						/>
+					)}
+					<FrequentlyAskedQuestion
+						anchor={entry.anchor}
+						question={entry.question}
+						questionTypographyProps={{
+							variant: 'h3',
+							marginTop: '1rem',
+							marginBottom: '1rem',
+						}}
+						answerTypographyProps={{
+							variant: 'body1',
+						}}
+					>
+						{entry.answerMarkdown}
+					</FrequentlyAskedQuestion>
+				</React.Fragment>
+			))}
+		</>
+	)
 }
 
 export function FrequentlyAskedQuestionsPage(): React.JSX.Element {
-  return (
-    <NavigationPageLayout
-      groups={[
-        {
-          id: 'nav',
-          items: [navigationHome],
-          overflow: false,
-        },
-        {
-          id: 'faq-group',
-          items: nonEmptyConcat<NavigationContentItem>([
-            [
-              {
-                id: 'faq',
-                title: navigationFaq.title,
-                icon: navigationFaq.icon,
-                contentId: 'faqHeader',
-              },
-            ],
-            nonEmptyMap(frequentlyAskedQuestions, faq => ({
-              id: faq.anchor,
-              title: faq.navTitle,
-              icon: <QuestionMarkIcon />,
-              contentId: faq.anchor,
-            })),
-          ]),
-          overflow: true,
-        },
-        {
-          id: 'rest-of-nav',
-          items: [navigationAbout, navigationRepository, navigationFarcasterChannel],
-          overflow: false,
-        },
-      ]}
-    >
-      <Typography id='faqHeader' variant='h1'>
-        Walletbeat FAQ
-      </Typography>
-      <div className='max-w-7xl mx-auto flex flex-col items-stretch'>
-        <FrequentlyAskedQuestions />
-      </div>
-    </NavigationPageLayout>
-  );
+	return (
+		<NavigationPageLayout
+			groups={[
+				{
+					id: 'nav',
+					items: [navigationHome],
+					overflow: false,
+				},
+				{
+					id: 'faq-group',
+					items: nonEmptyConcat<NavigationContentItem>([
+						[
+							{
+								id: 'faq',
+								title: navigationFaq.title,
+								icon: navigationFaq.icon,
+								contentId: 'faqHeader',
+							},
+						],
+						nonEmptyMap(frequentlyAskedQuestions, faq => ({
+							id: faq.anchor,
+							title: faq.navTitle,
+							icon: <QuestionMarkIcon />,
+							contentId: faq.anchor,
+						})),
+					]),
+					overflow: true,
+				},
+				{
+					id: 'rest-of-nav',
+					items: [navigationAbout, navigationRepository, navigationFarcasterChannel],
+					overflow: false,
+				},
+			]}
+		>
+			<Typography id="faqHeader" variant="h1">
+				Walletbeat FAQ
+			</Typography>
+			<div className="max-w-7xl mx-auto flex flex-col items-stretch">
+				<FrequentlyAskedQuestions />
+			</div>
+		</NavigationPageLayout>
+	)
 }

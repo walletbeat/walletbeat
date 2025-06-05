@@ -1,28 +1,28 @@
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import type { Typography } from '@mui/material';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import type { Typography } from '@mui/material'
 
-import { AnchorHeader } from '../atoms/AnchorHeader';
-import { MarkdownBox } from '../atoms/MarkdownBox';
+import { AnchorHeader } from '../atoms/AnchorHeader'
+import { MarkdownBox } from '../atoms/MarkdownBox'
 
 export default function FrequentlyAskedQuestion({
-  question,
-  anchor,
-  questionTypographyProps = undefined,
-  answerTypographyProps = undefined,
-  children,
+	question,
+	anchor,
+	questionTypographyProps = undefined,
+	answerTypographyProps = undefined,
+	children,
 }: {
-  question: string;
-  anchor: string;
-  questionTypographyProps?: React.ComponentProps<typeof Typography>;
-  answerTypographyProps?: React.ComponentProps<typeof Typography>;
-  children: string;
+	question: string
+	anchor: string
+	questionTypographyProps?: React.ComponentProps<typeof Typography>
+	answerTypographyProps?: React.ComponentProps<typeof Typography>
+	children: string
 }): React.JSX.Element {
-  return (
-    <div key={anchor}>
-      <AnchorHeader id={anchor} {...questionTypographyProps}>
-        <HelpOutlineIcon /> {question}
-      </AnchorHeader>
-      <MarkdownBox pTypography={answerTypographyProps}>{children}</MarkdownBox>
-    </div>
-  );
+	return (
+		<div key={anchor}>
+			<AnchorHeader id={anchor} {...questionTypographyProps}>
+				<HelpOutlineIcon /> {question}
+			</AnchorHeader>
+			<MarkdownBox pTypography={answerTypographyProps}>{children}</MarkdownBox>
+		</div>
+	)
 }
