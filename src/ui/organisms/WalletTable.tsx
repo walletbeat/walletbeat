@@ -8,7 +8,7 @@ import {
 	getCoreRowModel,
 	useReactTable,
 } from '@tanstack/react-table'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { LuChevronDown, LuChevronRight } from 'react-icons/lu'
 import { PiDesktop, PiDeviceMobile, PiDeviceMobileSlash, PiGlobe, PiGlobeX } from 'react-icons/pi'
 
@@ -494,6 +494,13 @@ function ExpandableHardwareWalletRow({
 			<tr
 				className="dark:bg-[#141414] dark:hover:bg-[#1a1a1a] cursor-pointer"
 				onClick={toggleExpanded}
+				onKeyDown={e => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault()
+						toggleExpanded()
+					}
+				}}
+				tabIndex={0}
 			>
 				{/* Rank column */}
 				<td className="px-4 py-2 dark:text-gray-200 text-center">{row.index + 1}</td>
@@ -571,13 +578,20 @@ function ExpandableHardwareWalletRow({
 											e.stopPropagation()
 											handleModelClick(model.id)
 										}}
+										onKeyDown={e => {
+											if (e.key === 'Enter' || e.key === ' ') {
+												e.preventDefault()
+												e.stopPropagation()
+												handleModelClick(model.id)
+											}
+										}}
 									>
 										<div
 											className={cx(
 												'w-3 h-3 rounded-full mr-2',
 												selectedModel === model.id ? 'bg-purple-500' : 'bg-gray-400',
 											)}
-										></div>
+										/>
 										<div className="flex-grow dark:text-gray-200 font-medium">
 											{model.name}
 											{model.isFlagship === true && (
@@ -678,7 +692,7 @@ export default function WalletTable(): React.ReactElement {
 	}, [walletTypeFilter])
 
 	// Helper to compute overall score by summing each attribute group's score
-	function getOverallScore(wallet: RatedWallet): number {
+	const getOverallScore = useCallback((wallet: RatedWallet): number => {
 		const groupScores = mapNonExemptAttributeGroupsInTree(
 			wallet.overall,
 			(attrGroup, evalGroup) =>
@@ -686,7 +700,7 @@ export default function WalletTable(): React.ReactElement {
 		)
 
 		return groupScores.reduce((sum, score) => sum + score, 0)
-	}
+	}, [])
 
 	// Use the appropriate data based on active tab and filters and sort by overall score
 	const tableData = useMemo(() => {
@@ -698,7 +712,7 @@ export default function WalletTable(): React.ReactElement {
 		data.sort((a, b) => getOverallScore(b.wallet) - getOverallScore(a.wallet))
 
 		return data
-	}, [activeTab, filteredSoftwareWalletData, hardwareWalletData])
+	}, [activeTab, filteredSoftwareWalletData, getOverallScore])
 
 	// Handler for device variant change
 	const handleVariantChange = (variant: DeviceVariant): void => {
@@ -765,11 +779,11 @@ export default function WalletTable(): React.ReactElement {
 							// Add Markdown-style links for ERC standards
 							if (std === SmartWalletStandard.ERC_4337) {
 								return <EipStandardTag key={std} standard={erc4337} />
-							} else if (std === SmartWalletStandard.ERC_7702) {
-								return <EipStandardTag key={std} standard={eip7702} />
-							} else {
-								return null // Return null for other standards like 'OTHER'
 							}
+							if (std === SmartWalletStandard.ERC_7702) {
+								return <EipStandardTag key={std} standard={eip7702} />
+							}
+							return null // Return null for other standards like 'OTHER'
 						})}
 					</div>
 				</div>
@@ -789,6 +803,7 @@ export default function WalletTable(): React.ReactElement {
 				<div className="flex space-x-0 items-center">
 					<div className="flex flex-col items-center group">
 						<button
+							type="button"
 							className={cx(
 								'text-2xl p-2 rounded-md transition-colors',
 								!supportsBrowser
@@ -820,6 +835,7 @@ export default function WalletTable(): React.ReactElement {
 					</div>
 					<div className="flex flex-col items-center group">
 						<button
+							type="button"
 							className={cx(
 								'text-2xl p-2 rounded-md transition-colors',
 								!supportsMobile
@@ -851,6 +867,7 @@ export default function WalletTable(): React.ReactElement {
 					</div>
 					<div className="flex flex-col items-center group">
 						<button
+							type="button"
 							className={cx(
 								'text-2xl p-2 rounded-md transition-colors',
 								!supportsDesktop
@@ -884,38 +901,48 @@ export default function WalletTable(): React.ReactElement {
 			)
 		},
 	})
-	const attributeGroupColumnFromAttrGroup = <Vs extends ValueSet>(
-		attrGroup: AttributeGroup<Vs>,
-	): ColumnDef<TableRow, CellValue> =>
-		columnHelper.display({
-			header: attrGroup.displayName,
-			cell: ({ row }): React.ReactNode => {
-				const { wallet } = row.original
-				const isSupported =
-					selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
-				const evalTree = getEvaluationTree(wallet, selectedVariant)
-				const evalGroup = getAttributeGroupInTree(evalTree, attrGroup)
+	const attributeGroupColumnFromAttrGroup = useCallback(
+		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>): ColumnDef<TableRow, CellValue> =>
+			columnHelper.display({
+				header: attrGroup.displayName,
+				cell: ({ row }): React.ReactNode => {
+					const { wallet } = row.original
+					const isSupported =
+						selectedVariant === DeviceVariant.NONE || walletSupportsVariant(wallet, selectedVariant)
+					const evalTree = getEvaluationTree(wallet, selectedVariant)
+					const evalGroup = getAttributeGroupInTree(evalTree, attrGroup)
 
-				return (
-					<PizzaSliceChart
-						attrGroup={attrGroup}
-						evalGroup={evalGroup}
-						isSupported={isSupported}
-						wallet={wallet}
-					/>
-				)
-			},
-		})
-	const softwareColumns: Array<ColumnDef<TableRow, CellValue>> = [
-		rankColumn,
-		walletNameColumn,
-		walletTypeColumn,
-		walletVariantColumn,
-		...mapNonExemptAttributeGroupsInTree(
-			unratedSoftwareWallet.overall,
+					return (
+						<PizzaSliceChart
+							attrGroup={attrGroup}
+							evalGroup={evalGroup}
+							isSupported={isSupported}
+							wallet={wallet}
+						/>
+					)
+				},
+			}),
+		[selectedVariant, columnHelper],
+	)
+	const softwareColumns: Array<ColumnDef<TableRow, CellValue>> = useMemo(
+		() => [
+			rankColumn,
+			walletNameColumn,
+			walletTypeColumn,
+			walletVariantColumn,
+			...mapNonExemptAttributeGroupsInTree(
+				unratedSoftwareWallet.overall,
+				attributeGroupColumnFromAttrGroup,
+			),
+		],
+		[
+			rankColumn,
+			walletNameColumn,
+			walletTypeColumn,
+			walletVariantColumn,
 			attributeGroupColumnFromAttrGroup,
-		),
-	]
+		],
+	)
 
 	// Define columns for hardware wallets
 	const hardwareWalletNameColumn = columnHelper.accessor(
@@ -942,6 +969,7 @@ export default function WalletTable(): React.ReactElement {
 			<div className="flex space-x-0 items-center justify-center">
 				<div className="flex flex-col items-center group">
 					<button
+						type="button"
 						className={cx(
 							'p-2 rounded-md transition-colors',
 							selectedVariant === DeviceVariant.NONE
@@ -977,21 +1005,30 @@ export default function WalletTable(): React.ReactElement {
 			</div>
 		),
 	})
-	const hardwareColumns: Array<ColumnDef<TableRow, CellValue>> = [
-		rankColumn,
-		hardwareWalletNameColumn,
-		hardwareWalletManufactureTypeColumn,
-		hardwareWalletVariantColumn,
-		...mapNonExemptAttributeGroupsInTree(
-			unratedHardwareWallet.overall,
+	const hardwareColumns: Array<ColumnDef<TableRow, CellValue>> = useMemo(
+		() => [
+			rankColumn,
+			hardwareWalletNameColumn,
+			hardwareWalletManufactureTypeColumn,
+			hardwareWalletVariantColumn,
+			...mapNonExemptAttributeGroupsInTree(
+				unratedHardwareWallet.overall,
+				attributeGroupColumnFromAttrGroup,
+			),
+		],
+		[
+			rankColumn,
+			hardwareWalletNameColumn,
+			hardwareWalletManufactureTypeColumn,
+			hardwareWalletVariantColumn,
 			attributeGroupColumnFromAttrGroup,
-		),
-	]
+		],
+	)
 
 	// Use the appropriate columns based on active tab
 	const columns = useMemo<Array<ColumnDef<TableRow, CellValue>>>(
 		() => (activeTab === WalletTableTab.SOFTWARE ? softwareColumns : hardwareColumns),
-		[activeTab],
+		[activeTab, softwareColumns, hardwareColumns],
 	)
 
 	// Create table
@@ -1051,6 +1088,7 @@ export default function WalletTable(): React.ReactElement {
 				<div className="flex gap-4 xl:items-end xl:flex-row flex-col-reverse items-start">
 					<div className="flex gap-1">
 						<button
+							type="button"
 							className={cx(
 								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
 								activeTab === WalletTableTab.SOFTWARE
@@ -1072,6 +1110,7 @@ export default function WalletTable(): React.ReactElement {
 							</span>
 						</button>
 						<button
+							type="button"
 							className={cx(
 								'px-4 py-3 font-medium text-sm rounded-tr-lg rounded-tl-lg transition-transform whitespace-nowrap',
 								activeTab === WalletTableTab.HARDWARE
@@ -1100,6 +1139,7 @@ export default function WalletTable(): React.ReactElement {
 								Filter by:
 							</span>
 							<button
+								type="button"
 								className={[
 									'px-3 py-0.5 text-xs font-medium rounded-full transition-colors',
 									walletTypeFilter === WalletTypeFilter.ALL
@@ -1123,6 +1163,7 @@ export default function WalletTable(): React.ReactElement {
 								</span>
 							</button>
 							<button
+								type="button"
 								className={cx(
 									'px-3 py-1.5 text-xs font-medium rounded-full transition-colors',
 									walletTypeFilter === WalletTypeFilter.SMART_WALLET_ONLY
@@ -1146,6 +1187,7 @@ export default function WalletTable(): React.ReactElement {
 								</span>
 							</button>
 							<button
+								type="button"
 								className={cx(
 									'px-3 py-1.5 text-xs font-medium rounded-full transition-colors',
 									walletTypeFilter === WalletTypeFilter.SMART_WALLET_AND_EOA

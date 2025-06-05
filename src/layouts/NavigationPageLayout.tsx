@@ -194,7 +194,7 @@ export function NavigationPageLayout({
 	)
 
 	// Debounce the scroll handler to improve performance
-	const debouncedScrollHandler = useCallback(debounce(onScroll, 100), [onScroll])
+	const debouncedScrollHandler = useCallback(debounce(onScroll, 100), [])
 
 	useEffect(() => {
 		window.addEventListener('scroll', debouncedScrollHandler, {

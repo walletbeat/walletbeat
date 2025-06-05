@@ -104,7 +104,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			<React.Fragment key="impact">
 				{evalAttr.evaluation.impact === undefined ? null : (
 					<>
-						<div style={{ height: '1rem' }}></div>
+						<div style={{ height: '1rem' }} />
 						<RenderTypographicContent
 							content={evalAttr.evaluation.impact}
 							strings={{

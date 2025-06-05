@@ -152,7 +152,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 		}
 
 		setPickedVariant(variantFromUrlQuery(wallet.variants))
-	}, [singleVariant])
+	}, [singleVariant, wallet.variants])
 	const updatePickedVariant = (variant: Variant | null): void => {
 		if (singleVariant !== null) {
 			return // If there is a single variant, do not pollute the URL with it.
@@ -461,7 +461,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				<div className="flex flex-col lg:mt-10 gap-4">
 					<div className="flex flex-row">
 						<div className="flex-1 min-w-0">
-							<div style={{ height: headerBottomMargin }}></div>
+							<div style={{ height: headerBottomMargin }} />
 							<div className="px-8">
 								<Typography
 									variant="h4"
