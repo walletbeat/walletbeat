@@ -1,4 +1,4 @@
-import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/variants';
+import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/variants'
 
 /**
  * Human-readable variant name.

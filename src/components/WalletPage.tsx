@@ -5,11 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { navigationListIconSize } from '@/components/constants'
 import { scrollPastHeaderPixels } from '@/components/navigation'
 import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
-import {
-	variantFromUrlQuery,
-	variantToName,
-	variantUrlQuery,
-} from '@/components/variants';
+import { variantFromUrlQuery, variantToName, variantUrlQuery } from '@/components/variants'
 import { variantToIcon } from '@/components/variants-react'
 import { allRatedWallets, type WalletName } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
