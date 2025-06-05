@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "@biomejs/biome": "^1.9.4",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
     "@fleek-platform/cli": "^3.8.2",
     "@kindspells/astro-shield": "^1.7.1",
