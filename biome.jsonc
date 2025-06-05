@@ -4,7 +4,7 @@
 	"files": { "ignoreUnknown": false, "ignore": [] },
 	"formatter": {
 		"enabled": true,
-		"useEditorconfig": true,
+		"useEditorconfig": false,
 		"formatWithErrors": false,
 		"indentStyle": "space",
 		"indentWidth": 2,
@@ -25,7 +25,8 @@
 				"noUselessCatch": "error",
 				"noUselessThisAlias": "error",
 				"noUselessTypeConstraint": "error",
-				"noWith": "error"
+				"noWith": "error",
+				"useArrowFunction": "warn"
 			},
 			"correctness": {
 				"noChildrenProp": "error",
@@ -48,7 +49,8 @@
 				"noUnsafeOptionalChaining": "error",
 				"noUnusedLabels": "error",
 				"noUnusedPrivateClassMembers": "error",
-				"noUnusedVariables": "error",
+				"noUnusedVariables": "warn",
+				"noUnusedImports": "error",
 				"useArrayLiterals": "off",
 				"useIsNan": "error",
 				"useJsxKeyInIterable": "error",
@@ -57,8 +59,11 @@
 			},
 			"security": { "noDangerouslySetInnerHtmlWithChildren": "error" },
 			"style": {
-				"noNamespace": "error",
+				"noNamespace": "warn",
+				"noNonNullAssertion": "off",
+				"noVar": "error",
 				"useAsConstAssertion": "error",
+				"useConst": "error",
 				"useThrowOnlyError": "error"
 			},
 			"suspicious": {
@@ -68,6 +73,10 @@
 				"noClassAssign": "error",
 				"noCommentText": "error",
 				"noCompareNegZero": "error",
+				"noConsole": {
+					"level": "warn",
+					"options": { "allow": ["warn", "error"] }
+				},
 				"noControlCharactersInRegex": "error",
 				"noDebugger": "error",
 				"noDuplicateCase": "error",
@@ -76,7 +85,8 @@
 				"noDuplicateObjectKeys": "error",
 				"noDuplicateParameters": "error",
 				"noEmptyBlockStatements": "error",
-				"noExplicitAny": "error",
+				"noEmptyInterface": "off",
+				"noExplicitAny": "warn",
 				"noExtraNonNullAssertion": "error",
 				"noFallthroughSwitchClause": "error",
 				"noFunctionAssign": "error",
@@ -112,7 +122,22 @@
 		},
 		"globals": []
 	},
+	"css": {
+		"formatter": {
+			"quoteStyle": "single"
+		}
+	},
 	"overrides": [
+		{
+			"include": ["**/*.astro"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noUnusedImports": "off"
+					}
+				}
+			}
+		},
 		{
 			"include": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
 			"linter": {
@@ -277,35 +302,32 @@
 					"onmousewheel",
 					"ononline"
 				]
-			},
-			"linter": {
-				"rules": {
-					"complexity": { "useArrowFunction": "warn" },
-					"correctness": {
-						"noUndeclaredVariables": "off",
-						"noUnusedImports": "error",
-						"noUnusedVariables": "warn"
-					},
-					"style": {
-						"noNonNullAssertion": "off",
-						"noVar": "error",
-						"useConst": "error"
-					},
-					"suspicious": {
-						"noConsole": {
-							"level": "warn",
-							"options": { "allow": ["warn", "error"] }
-						},
-						"noEmptyInterface": "off",
-						"noExplicitAny": "warn",
-						"noRedeclare": "off"
-					}
-				}
 			}
 		},
 		{
 			"include": ["data/**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
-			"linter": { "rules": {} }
+			"linter": {
+				"rules": {
+					"style": {
+						"useNamingConvention": {
+							"level": "error",
+							"options": {
+								"strictCase": false,
+								"requireAscii": false,
+								"enumMemberCase": "camelCase",
+								"conventions": [
+									{
+										"selector": {
+											"kind": "objectLiteralProperty"
+										},
+										"formats": ["camelCase"]
+									}
+								]
+							}
+						}
+					}
+				}
+			}
 		}
 	]
 }
