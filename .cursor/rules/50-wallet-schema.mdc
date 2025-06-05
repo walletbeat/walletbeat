@@ -10,18 +10,18 @@ This site deals with Ethereum wallets. The processing pipeline is as follows:
 
 Wallet data is stored under `/data`. It contains:
 
-  - Wallet metadata, such as the name of the wallet project, which entity funds its development, etc.
-  - Wallet *feature* data, i.e. objectively-observable facts about each Ethereum wallet the site tracks.
+- Wallet metadata, such as the name of the wallet project, which entity funds its development, etc.
+- Wallet *feature* data, i.e. objectively-observable facts about each Ethereum wallet the site tracks.
 
 Wallet feature data is unopinionated and objective. This data is the input of the next part of the processing pipeline: **Attributes**.
 
 Attributes take feature data (and no other input) and return an `Evaluation` object. An `Evaluation` contains an attribute-specific `Value` interface which contains one of 5 possible **ratings**:
 
-  - `PASS`: The wallet passes the attribute's criteria.
-  - `FAIL`: The wallet does not pass the attribute's criteria.
-  - `PARTIAL`: The wallet partially passes the attribute's criteria.
-  - `UNRATED`: The wallet feature data is insufficient for the attribute's criteria to be evaluated.
-  - `EXEMPT`: The wallet is such that it does not make sense to evaluate this attribute for this specific wallet.
+- `PASS`: The wallet passes the attribute's criteria.
+- `FAIL`: The wallet does not pass the attribute's criteria.
+- `PARTIAL`: The wallet partially passes the attribute's criteria.
+- `UNRATED`: The wallet feature data is insufficient for the attribute's criteria to be evaluated.
+- `EXEMPT`: The wallet is such that it does not make sense to evaluate this attribute for this specific wallet.
 
 Attributes are part of **attribute groups**, which are logical groupings of attributes. Attribute groups form a attribute-group-specific "score" for each wallet on this attribute group.
 
