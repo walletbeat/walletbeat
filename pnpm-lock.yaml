@@ -161,9 +161,6 @@ importers:
       globals:
         specifier: ^15.14.0
         version: 15.14.0
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       orbiter-cli:
         specifier: ^0.8.2
         version: 0.8.2(@types/node@22.13.1)
@@ -6915,14 +6912,6 @@ packages:
         integrity: sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==,
       }
     engines: { node: '>= 0.8' }
-
-  husky@9.1.7:
-    resolution:
-      {
-        integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==,
-      }
-    engines: { node: '>=18' }
-    hasBin: true
 
   iconv-lite@0.4.24:
     resolution:
@@ -15993,8 +15982,6 @@ snapshots:
       setprototypeof: 1.2.0
       statuses: 2.0.1
       toidentifier: 1.0.1
-
-  husky@9.1.7: {}
 
   iconv-lite@0.4.24:
     dependencies:
