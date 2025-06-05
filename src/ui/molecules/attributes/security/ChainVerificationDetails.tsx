@@ -20,7 +20,7 @@ export function ChainVerificationDetails({
 	return (
 		<WrapRatingIcon rating={value.rating}>
 			<Typography fontWeight={subsectionWeight}>
-				<React.Fragment key='start'>
+				<React.Fragment key="start">
 					{wallet.metadata.displayName} performs L1 chain state verification using the{' '}
 				</React.Fragment>
 				{nonEmptyMap(lightClients, (lightClient, index) => (
@@ -29,14 +29,14 @@ export function ChainVerificationDetails({
 						<ExternalLink url={ethereumL1LightClientUrl(lightClient)} />
 					</React.Fragment>
 				))}
-				<React.Fragment key='end'>
+				<React.Fragment key="end">
 					{' '}
 					light client{lightClients.length === 1 ? '' : 's'}.
 				</React.Fragment>
 				{refs.length === 0 ? null : (
-					<React.Fragment key='refs'>
+					<React.Fragment key="refs">
 						{' '}
-						<ReferenceList key='refList' ref={refs} />
+						<ReferenceList key="refList" ref={refs} />
 					</React.Fragment>
 				)}
 			</Typography>

@@ -112,8 +112,8 @@ export function PrivateTransfersDetails({
 									<StyledListItem
 										isFirstItem={true}
 										bulletText={privateTransferLevelToIcon(levels.sendingPrivacy)}
-										bulletFontSize='60%'
-										spaceBetweenItems='0.5rem'
+										bulletFontSize="60%"
+										spaceBetweenItems="0.5rem"
 									>
 										<strong>Sending tokens privately</strong>:{' '}
 										<RenderTypographicContent content={details.sendingDetails} />
@@ -121,8 +121,8 @@ export function PrivateTransfersDetails({
 									<StyledListItem
 										isFirstItem={false}
 										bulletText={privateTransferLevelToIcon(levels.receivingPrivacy)}
-										bulletFontSize='60%'
-										spaceBetweenItems='0.5rem'
+										bulletFontSize="60%"
+										spaceBetweenItems="0.5rem"
 									>
 										<strong>Receiving tokens privately</strong>:{' '}
 										<RenderTypographicContent content={details.receivingDetails} />
@@ -130,8 +130,8 @@ export function PrivateTransfersDetails({
 									<StyledListItem
 										isFirstItem={false}
 										bulletText={privateTransferLevelToIcon(levels.spendingPrivacy)}
-										bulletFontSize='60%'
-										spaceBetweenItems='0.5rem'
+										bulletFontSize="60%"
+										spaceBetweenItems="0.5rem"
 									>
 										<strong>Spending privately-received tokens</strong>:{' '}
 										<RenderTypographicContent content={details.spendingDetails} />

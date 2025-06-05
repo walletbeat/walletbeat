@@ -78,9 +78,9 @@ function maybeAddCornerControl(
 	}
 
 	return (
-		<div key='sectionCornerControl' className='flex flex-row'>
-			<div className='flex flex-col justify-center flex-1'>{anchorHeader}</div>
-			<div className='flex flex-col justify-center flex-initial'>{section.cornerControl}</div>
+		<div key="sectionCornerControl" className="flex flex-row">
+			<div className="flex flex-col justify-center flex-1">{anchorHeader}</div>
+			<div className="flex flex-col justify-center flex-initial">{section.cornerControl}</div>
 		</div>
 	)
 }
@@ -269,12 +269,12 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 									title={`Only rated on the ${variantToName(relevantVariants[0], false)} version`}
 									arrow={true}
 								>
-									<div key='variantSpecificEval' className='flex flex-row items-center gap-2'>
-										<Typography variant='caption' sx={{ opacity: 0.7 }}>
+									<div key="variantSpecificEval" className="flex flex-row items-center gap-2">
+										<Typography variant="caption" sx={{ opacity: 0.7 }}>
 											Only
 										</Typography>
 										<Typography
-											variant='caption'
+											variant="caption"
 											sx={{
 												opacity: 0.7,
 												lineHeight: 1,
@@ -313,8 +313,8 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 
 					return {
 						cornerControl: (
-							<div key='variantSpecificEval' className='flex flex-row items-center gap-2'>
-								<Typography variant='caption' sx={{ opacity: 0.7 }}>
+							<div key="variantSpecificEval" className="flex flex-row items-center gap-2">
+								<Typography variant="caption" sx={{ opacity: 0.7 }}>
 									{pickedVariant === null ? 'Version' : 'Viewing'}:
 								</Typography>
 								<VariantPicker
@@ -444,39 +444,39 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				// 	overflow: false,
 				// },
 			]}
-			stickyHeaderId='walletHeader'
+			stickyHeaderId="walletHeader"
 			stickyHeaderMargin={0}
 			contentDependencies={[wallet, pickedVariant]}
 		>
 			{/* Add structured data for FAQs */}
 			<script
-				type='application/ld+json'
+				type="application/ld+json"
 				dangerouslySetInnerHTML={{
 					__html: generateFaqSchema(sections, wallet.metadata.displayName),
 				}}
 			/>
 
 			<ReturnToTop />
-			<div className='max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full'>
-				<div className='flex flex-col lg:mt-10 gap-4'>
-					<div className='flex flex-row'>
-						<div className='flex-1 min-w-0'>
+			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
+				<div className="flex flex-col lg:mt-10 gap-4">
+					<div className="flex flex-row">
+						<div className="flex-1 min-w-0">
 							<div style={{ height: headerBottomMargin }}></div>
-							<div className='px-8'>
+							<div className="px-8">
 								<Typography
-									variant='h4'
-									component='h1'
-									display='flex'
-									flexDirection='row'
-									alignItems='center'
-									gap='12px'
+									variant="h4"
+									component="h1"
+									display="flex"
+									flexDirection="row"
+									alignItems="center"
+									gap="12px"
 									sx={{
 										fontSize: '2.25rem', // equivalent to text-4xl
 										color: 'var(--text-primary)',
 									}}
 								>
 									<WalletIcon
-										key='walletIcon'
+										key="walletIcon"
 										wallet={wallet}
 										iconSize={navigationListIconSize * 2}
 									/>
@@ -486,38 +486,38 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							{nonEmptyMap(sections, (section, index) => (
 								<React.Fragment key={sectionHeaderId(section)}>
 									{index > 0 ? (
-										<div key='sectionDivider' className='w-4/5 mx-auto mt-6 mb-6 border-b' />
+										<div key="sectionDivider" className="w-4/5 mx-auto mt-6 mb-6 border-b" />
 									) : null}
 									<div
-										key='sectionContainer'
-										className='p-4 flex flex-col gap-4'
+										key="sectionContainer"
+										className="p-4 flex flex-col gap-4"
 										style={section.css}
 									>
-										<div key='sectionCornerControl' className='flex flex-row'>
-											<div className='flex flex-col justify-center flex-1'>
+										<div key="sectionCornerControl" className="flex flex-row">
+											<div className="flex flex-col justify-center flex-1">
 												<AnchorHeader
-													key='sectionHeader'
+													key="sectionHeader"
 													id={sectionHeaderId(section)}
 													sx={{ scrollMarginTop }}
-													variant='h4'
-													component='h2'
-													marginBottom='0'
-													fontSize='2rem'
-													fontWeight='700'
+													variant="h4"
+													component="h2"
+													marginBottom="0"
+													fontSize="2rem"
+													fontWeight="700"
 													paddingLeft={theme.spacing(2)}
 													paddingRight={theme.spacing(2)}
 												>
 													{section.title}
 												</AnchorHeader>
 											</div>
-											<div className='flex flex-col justify-center flex-initial mr-4'>
+											<div className="flex flex-col justify-center flex-initial mr-4">
 												{section.cornerControl}
 											</div>
 										</div>
 										{section.caption === null ? null : (
 											<div
-												key='sectionCaption'
-												className='mb-4 opacity-80'
+												key="sectionCaption"
+												className="mb-4 opacity-80"
 												style={{
 													marginLeft: '16px',
 												}}
@@ -527,8 +527,8 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 										)}
 										{section.body === null ? null : (
 											<div
-												key='sectionBody'
-												className='text-primary px-4'
+												key="sectionBody"
+												className="text-primary px-4"
 												// paddingTop={theme.spacing(2)}
 											>
 												{section.body}
@@ -537,29 +537,29 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 										{section.subsections?.map(subsection => (
 											<div
 												key={sectionHeaderId(subsection)}
-												className='flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border'
+												className="flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border"
 												style={subsection.css}
 											>
 												<ThemeProvider theme={subsectionTheme}>
 													{maybeAddCornerControl(
 														subsection,
 														<AnchorHeader
-															key='subsectionHeader'
+															key="subsectionHeader"
 															id={sectionHeaderId(subsection)}
 															sx={{ scrollMarginTop }}
-															variant='h3'
-															marginBottom='.3rem'
+															variant="h3"
+															marginBottom=".3rem"
 														>
 															{subsection.title}
 														</AnchorHeader>,
 													)}
 													{subsection.caption === null ? null : (
-														<div key='subsectionCaption' className='mb-8 opacity-80'>
+														<div key="subsectionCaption" className="mb-8 opacity-80">
 															{subsection.caption}
 														</div>
 													)}
 													{subsection.body === null ? null : (
-														<div key='subsectionBody'>{subsection.body}</div>
+														<div key="subsectionBody">{subsection.body}</div>
 													)}
 												</ThemeProvider>
 											</div>

@@ -134,12 +134,12 @@ export function CriteriaPage({
 			// wallets, hww, embedded
 			selectedGroupId={walletTypeToUrlSlug(walletType).toLowerCase().replace('s', '')}
 		>
-			<div className='max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full'>
-				<div className='flex flex-col lg:mt-10 gap-4'>
-					<div className='px-8 py-6 flex justify-between items-start flex-wrap min-h-96 w-full relative'>
-						<div className='flex flex-col gap-4 py-8 flex-1 w-full'>
-							<h1 className='text-4xl font-extrabold text-accent'>{attrGroup.displayName}</h1>
-							<p className='text-secondary'>
+			<div className="max-w-screen-xl 3xl:max-w-screen-2xl mx-auto w-full">
+				<div className="flex flex-col lg:mt-10 gap-4">
+					<div className="px-8 py-6 flex justify-between items-start flex-wrap min-h-96 w-full relative">
+						<div className="flex flex-col gap-4 py-8 flex-1 w-full">
+							<h1 className="text-4xl font-extrabold text-accent">{attrGroup.displayName}</h1>
+							<p className="text-secondary">
 								<RenderTypographicContent
 									content={attrGroup.perWalletQuestion}
 									strings={{ WALLET_NAME: 'your wallet' }}
@@ -151,11 +151,11 @@ export function CriteriaPage({
 							</p>
 							<AttributeGroupSummary wallets={wallets} attrGroup={attrGroup} />
 							{mapNonExemptGroupAttributes(evalGroup, evalAttr => (
-								<div key={evalAttr.attribute.id} className='space-y-2'>
-									<h2 className='text-2xl font-extrabold text-accent'>
+								<div key={evalAttr.attribute.id} className="space-y-2">
+									<h2 className="text-2xl font-extrabold text-accent">
 										{evalAttr.attribute.displayName}
 									</h2>
-									<div className='card whitespace-pre-wrap'>
+									<div className="card whitespace-pre-wrap">
 										<RenderTypographicContent
 											content={evalAttr.attribute.why}
 											typography={{ variant: 'body2' }}
@@ -237,7 +237,7 @@ export const AttributeGroupSummary = ({
 		columnHelper.accessor('wallet', {
 			id: 'wallet',
 			header: 'Wallet',
-			cell: info => <div className='py-2 font-medium'>{info.getValue().metadata.displayName}</div>,
+			cell: info => <div className="py-2 font-medium">{info.getValue().metadata.displayName}</div>,
 		}),
 
 		// Dynamic columns for each attribute
@@ -296,15 +296,15 @@ export const AttributeGroupSummary = ({
 	})
 
 	return (
-		<div className='overflow-x-auto rounded-lg border border-border shadow-sm w-full'>
-			<table className='min-w-full divide-y divide-border'>
-				<thead className='bg-background'>
+		<div className="overflow-x-auto rounded-lg border border-border shadow-sm w-full">
+			<table className="min-w-full divide-y divide-border">
+				<thead className="bg-background">
 					{table.getHeaderGroups().map(headerGroup => (
 						<tr key={headerGroup.id}>
 							{headerGroup.headers.map(header => (
 								<th
 									key={header.id}
-									className='px-2 first:pl-4 py-2 text-left text-xs font-medium text-secondary uppercase tracking-wider'
+									className="px-2 first:pl-4 py-2 text-left text-xs font-medium text-secondary uppercase tracking-wider"
 								>
 									{header.isPlaceholder
 										? null
@@ -314,11 +314,11 @@ export const AttributeGroupSummary = ({
 						</tr>
 					))}
 				</thead>
-				<tbody className='bg-background divide-y divide-border'>
+				<tbody className="bg-background divide-y divide-border">
 					{table.getRowModel().rows.map(row => (
 						<tr key={row.id}>
 							{row.getVisibleCells().map(cell => (
-								<td key={cell.id} className='px-2 first:pl-4 py-0.5'>
+								<td key={cell.id} className="px-2 first:pl-4 py-0.5">
 									{flexRender(cell.column.columnDef.cell, cell.getContext())}
 								</td>
 							))}

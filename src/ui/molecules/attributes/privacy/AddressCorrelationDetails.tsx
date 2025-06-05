@@ -80,7 +80,7 @@ export function AddressCorrelationDetails({
 					{isUrl(entity.privacyPolicy) ? (
 						<>
 							{' ('}
-							<ExternalLink url={entity.privacyPolicy} defaultLabel='Privacy policy' />
+							<ExternalLink url={entity.privacyPolicy} defaultLabel="Privacy policy" />
 							{')'}
 						</>
 					) : null}{' '}

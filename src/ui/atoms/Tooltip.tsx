@@ -33,7 +33,7 @@ export function Tooltip({
 					style={contentStyle}
 				>
 					{content}
-					<RadixTooltip.Arrow className='fill-black' />
+					<RadixTooltip.Arrow className="fill-black" />
 				</RadixTooltip.Content>
 			</RadixTooltip.Root>
 		</RadixTooltip.Provider>

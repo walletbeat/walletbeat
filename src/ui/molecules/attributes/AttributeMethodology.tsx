@@ -126,9 +126,9 @@ function ExampleRatings<V extends Value>({
 		<StyledListItem
 			key={`example-${index}`}
 			bulletText={ratingToIcon(rating)}
-			bulletFontSize='75%'
+			bulletFontSize="75%"
 			isFirstItem={index === 0}
-			spaceBetweenItems='0.75rem'
+			spaceBetweenItems="0.75rem"
 		>
 			<RenderTypographicContent
 				content={exampleRating.description}
@@ -202,7 +202,7 @@ function ExampleRatings<V extends Value>({
 
 	return (
 		<>
-			<Typography variant='h5'>{exhaustive ? '' : 'A few examples'}</Typography>
+			<Typography variant="h5">{exhaustive ? '' : 'A few examples'}</Typography>
 			<div>
 				{renderedExamples.map(renderedExample =>
 					renderedExample.element === null ? null : (
@@ -229,20 +229,20 @@ export function AttributeMethodology<V extends Value>({
 }): React.JSX.Element {
 	return (
 		<>
-			<div key='methodology'>
+			<div key="methodology">
 				<RenderTypographicContent
 					content={attribute.methodology}
 					typography={typographyPropsBody}
 				/>
 			</div>
 			<Divider
-				key='after-methodology'
+				key="after-methodology"
 				sx={{
 					marginTop: '1rem',
 					marginBottom: '1rem',
 				}}
 			/>
-			<div key='example-ratings'>
+			<div key="example-ratings">
 				{attribute.ratingScale.display === 'simple' ? (
 					<RenderTypographicContent
 						content={attribute.ratingScale.content}

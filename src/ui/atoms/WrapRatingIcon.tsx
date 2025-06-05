@@ -16,7 +16,7 @@ export function WrapRatingIcon({
 		<WrapIcon
 			icon={ratingToIcon(rating)}
 			iconWidth={subsectionIconWidth}
-			iconFontSize='inherit'
+			iconFontSize="inherit"
 			flexBeforeAndAfter={[2, 7]}
 		>
 			{children}

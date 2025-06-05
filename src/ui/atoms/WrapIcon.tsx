@@ -18,10 +18,10 @@ export function WrapIcon({
 	children?: React.ReactNode
 }): React.JSX.Element {
 	return (
-		<div className='flex flex-row gap-0' style={sx}>
+		<div className="flex flex-row gap-0" style={sx}>
 			{flexBeforeAndAfter === undefined ? (
 				<div
-					className='flex-0'
+					className="flex-0"
 					style={{
 						minWidth: iconWidth,
 						maxWidth: iconWidth,
@@ -34,7 +34,7 @@ export function WrapIcon({
 				</div>
 			) : (
 				<div
-					className='flex-0'
+					className="flex-0"
 					style={{
 						minWidth: iconWidth,
 						maxWidth: iconWidth,
@@ -43,11 +43,11 @@ export function WrapIcon({
 					}}
 				>
 					<div className={`flex-${flexBeforeAndAfter[0]}`} />
-					<div className='flex-0'>{icon}</div>
+					<div className="flex-0">{icon}</div>
 					<div className={`flex-${flexBeforeAndAfter[1]}`} />
 				</div>
 			)}
-			<div className='flex-1'>{children}</div>
+			<div className="flex-1">{children}</div>
 		</div>
 	)
 }

@@ -81,8 +81,8 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 					key={evalAttr.attribute.id}
 					d={pathData}
 					fill={ratingToColor(evalAttr.evaluation.value.rating)}
-					stroke='#ffffff'
-					strokeWidth='1'
+					stroke="#ffffff"
+					strokeWidth="1"
 				/>
 			)
 		})
@@ -107,7 +107,7 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 					title={tooltipText}
 					onClick={handlePieClick}
 				>
-					<svg viewBox='0 0 100 100' className='w-full h-full'>
+					<svg viewBox="0 0 100 100" className="w-full h-full">
 						{createSlices()}
 					</svg>
 				</div>

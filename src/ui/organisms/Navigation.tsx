@@ -100,8 +100,8 @@ export interface NavigationGroup {
 function SingleListItemIcon({ children }: { children: React.ReactNode }): React.JSX.Element {
 	return (
 		<span
-			key='listItemIcon'
-			className='inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1'
+			key="listItemIcon"
+			className="inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1"
 		>
 			{children}
 		</span>
@@ -186,20 +186,20 @@ const NavigationItem = memo(
 					>
 						{children}
 						{hasChildren && (
-							<span className=''>
+							<span className="">
 								<svg
-									stroke='currentColor'
-									fill='none'
-									strokeWidth='2'
-									viewBox='0 0 24 24'
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									height='1em'
-									width='1em'
-									xmlns='http://www.w3.org/2000/svg'
+									stroke="currentColor"
+									fill="none"
+									strokeWidth="2"
+									viewBox="0 0 24 24"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									height="1em"
+									width="1em"
+									xmlns="http://www.w3.org/2000/svg"
 									className={cx('transition-transform', isOpen ? '' : 'rotate-90')}
 								>
-									<polyline points='6 9 12 15 18 9'></polyline>
+									<polyline points="6 9 12 15 18 9"></polyline>
 								</svg>
 							</span>
 						)}
@@ -212,26 +212,26 @@ const NavigationItem = memo(
 					<a
 						href={hasChildren ? '#' : item.href}
 						target={!hasChildren && item.href.startsWith('https://') ? '_blank' : undefined}
-						rel='noreferrer'
+						rel="noreferrer"
 						className={linkStyles}
 						onClick={toggleDropdown}
 					>
 						{children}
 						{hasChildren && (
-							<span className=''>
+							<span className="">
 								<svg
-									stroke='currentColor'
-									fill='none'
-									strokeWidth='2'
-									viewBox='0 0 24 24'
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									height='1em'
-									width='1em'
-									xmlns='http://www.w3.org/2000/svg'
+									stroke="currentColor"
+									fill="none"
+									strokeWidth="2"
+									viewBox="0 0 24 24"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									height="1em"
+									width="1em"
+									xmlns="http://www.w3.org/2000/svg"
 									className={cx('transition-transform', isOpen ? 'rotate-180' : '')}
 								>
-									<polyline points='6 9 12 15 18 9'></polyline>
+									<polyline points="6 9 12 15 18 9"></polyline>
 								</svg>
 							</span>
 						)}
@@ -245,9 +245,9 @@ const NavigationItem = memo(
 		return (
 			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				{/* {selectedItemId} - {selectedGroupId} */}
-				<ButtonComponent key='buttonComponent'>
+				<ButtonComponent key="buttonComponent">
 					{item.icon !== undefined ? (
-						<SingleListItemIcon key='icon'>{item.icon}</SingleListItemIcon>
+						<SingleListItemIcon key="icon">{item.icon}</SingleListItemIcon>
 					) : null}
 					<span>{item.title}</span>
 				</ButtonComponent>
@@ -264,7 +264,7 @@ const NavigationItem = memo(
 							<NavigationItem
 								key={`subitem-${subitem.id}`}
 								item={subitem}
-								depth='secondary'
+								depth="secondary"
 								active={active}
 								selectedItemId={selectedItemId}
 								selectedGroupId={selectedGroupId}
@@ -312,7 +312,7 @@ export const NavigationGroup = memo(
 								key={`item-${item.id}`}
 								item={item}
 								active={activeItemId === item.id}
-								depth='secondary'
+								depth="secondary"
 								selectedItemId={isSelectedGroup ? selectedItemId : undefined}
 								selectedGroupId={isSelectedGroup ? selectedGroupId : undefined}
 								onContentItemClick={onContentItemClick}
@@ -418,24 +418,24 @@ export function Navigation({
 	return (
 		<>
 			{/* Fixed top bar for mobile */}
-			<div className='lg:hidden fixed top-0 left-0 right-0 flex justify-between items-center px-4 bg-background z-50 border-b border-borderColor h-16'>
-				<a href='/' className='flex items-center'>
+			<div className="lg:hidden fixed top-0 left-0 right-0 flex justify-between items-center px-4 bg-background z-50 border-b border-borderColor h-16">
+				<a href="/" className="flex items-center">
 					<img
-						src='/logo-light.svg'
-						alt='WalletBeat Logo'
-						className='h-8 w-auto block dark:hidden transition-all'
+						src="/logo-light.svg"
+						alt="WalletBeat Logo"
+						className="h-8 w-auto block dark:hidden transition-all"
 					/>
 					<img
-						src='/logo-dark.svg'
-						alt='WalletBeat Logo'
-						className='h-8 w-auto hidden dark:block transition-all'
+						src="/logo-dark.svg"
+						alt="WalletBeat Logo"
+						className="h-8 w-auto hidden dark:block transition-all"
 					/>
 				</a>
-				<div className='flex items-center gap-2 h-[34px]'>
+				<div className="flex items-center gap-2 h-[34px]">
 					<ThemeSwitcher />
 					<button
 						onClick={toggleMenu}
-						className='btn'
+						className="btn"
 						aria-label={isOpen ? 'Close menu' : 'Open menu'}
 					>
 						{isOpen ? <LuX size={16} /> : <LuMenu size={16} />}
@@ -444,11 +444,11 @@ export function Navigation({
 			</div>
 
 			{/* Placeholder div to push content down on mobile */}
-			<div className='lg:hidden h-16'></div>
+			<div className="lg:hidden h-16"></div>
 
 			{/* Navigation sidebar - desktop behavior differs from mobile */}
 			<div
-				key='navigationBox'
+				key="navigationBox"
 				className={cx(
 					/* Base styles */
 					'fixed lg:relative h-full z-40 flex flex-col gap-0 overflow-y-auto',
@@ -472,30 +472,30 @@ export function Navigation({
 				)}
 			>
 				{/* Logo area */}
-				<div className='flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-16 lg:pt-0 h-[34px]'>
-					<a href='/' className='hidden lg:flex items-center'>
+				<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-16 lg:pt-0 h-[34px]">
+					<a href="/" className="hidden lg:flex items-center">
 						<img
-							src='/logo-light.svg'
-							alt='WalletBeat Logo'
-							className='h-8 w-auto block dark:hidden transition-all'
+							src="/logo-light.svg"
+							alt="WalletBeat Logo"
+							className="h-8 w-auto block dark:hidden transition-all"
 						/>
 						<img
-							src='/logo-dark.svg'
-							alt='WalletBeat Logo'
-							className='h-8 w-auto hidden dark:block transition-all'
+							src="/logo-dark.svg"
+							alt="WalletBeat Logo"
+							className="h-8 w-auto hidden dark:block transition-all"
 						/>
 					</a>
-					<div className='hidden lg:block'>
+					<div className="hidden lg:block">
 						<ThemeSwitcher />
 					</div>
 				</div>
 
 				{/* Search/prefix component */}
 				{typeof prefix !== 'undefined' && prefix !== null ? (
-					<div className='px-4 mb-2 w-full'>{prefix}</div>
+					<div className="px-4 mb-2 w-full">{prefix}</div>
 				) : null}
 
-				<div className='flex flex-col gap-2 px-3'>
+				<div className="flex flex-col gap-2 px-3">
 					{nonEmptyMap(groups, (group, groupIndex) => (
 						<NavigationGroup
 							key={`navigationGroup-${group.id}`}
@@ -508,7 +508,7 @@ export function Navigation({
 						/>
 					))}
 				</div>
-				<div className='mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-left rounded-lg'>
+				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-left rounded-lg">
 					Wallets listed on this page are not official endorsements, and are provided for
 					informational purposes only.
 				</div>
@@ -517,9 +517,9 @@ export function Navigation({
 			{/* Overlay for mobile menu - only visible when menu is open on mobile */}
 			{isOpen && (
 				<div
-					className='lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30'
+					className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
 					onClick={toggleMenu}
-					aria-hidden='true'
+					aria-hidden="true"
 				/>
 			)}
 		</>

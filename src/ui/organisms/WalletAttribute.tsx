@@ -63,13 +63,13 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 				return null
 			case VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT:
 				return (
-					<Typography variant='caption' sx={{ opacity: 0.8 }}>
+					<Typography variant="caption" sx={{ opacity: 0.8 }}>
 						This rating is only relevant for the {variantToName(displayedVariant, false)} version.
 					</Typography>
 				)
 			default:
 				return (
-					<Typography variant='caption' sx={{ opacity: 0.8 }}>
+					<Typography variant="caption" sx={{ opacity: 0.8 }}>
 						{displayedVariant === null
 							? 'This rating differs across versions. Select a specific version for details.'
 							: `This rating is specific to the ${variantToName(displayedVariant, false)} version.`}
@@ -80,7 +80,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 
 	let rendered = (
 		<>
-			<React.Fragment key='details'>
+			<React.Fragment key="details">
 				{isTypographicContent(details) ? (
 					<RenderTypographicContent
 						content={details}
@@ -100,8 +100,8 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 					/>
 				)}
 			</React.Fragment>
-			<React.Fragment key='variantSpecific'>{variantSpecificCaption}</React.Fragment>
-			<React.Fragment key='impact'>
+			<React.Fragment key="variantSpecific">{variantSpecificCaption}</React.Fragment>
+			<React.Fragment key="impact">
 				{evalAttr.evaluation.impact === undefined ? null : (
 					<>
 						<div style={{ height: '1rem' }}></div>
@@ -231,7 +231,7 @@ export function WalletAttribute<Vs extends ValueSet, V extends Value>({
 			<Accordions
 				accordions={accordions}
 				borderRadius={`${subsectionBorderRadius}px`}
-				interAccordionMargin='1rem'
+				interAccordionMargin="1rem"
 			/>
 		</>
 	)

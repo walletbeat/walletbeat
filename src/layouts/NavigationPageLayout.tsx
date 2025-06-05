@@ -208,9 +208,9 @@ export function NavigationPageLayout({
 
 	return (
 		<ThemeProvider theme={theme}>
-			<div className='flex flex-col lg:flex-row w-full min-h-screen max-w-screen'>
+			<div className="flex flex-col lg:flex-row w-full min-h-screen max-w-screen">
 				<Navigation
-					key='navigation'
+					key="navigation"
 					groups={groups}
 					activeItemId={activeItemId}
 					prefix={prefix}
@@ -218,8 +218,8 @@ export function NavigationPageLayout({
 					selectedGroupId={selectedGroupId}
 				/>
 
-				<div key='contentContainer' className='flex-grow overflow-y-auto min-h-screen w-full pb-24'>
-					<div className='mx-auto w-full'>{children}</div>
+				<div key="contentContainer" className="flex-grow overflow-y-auto min-h-screen w-full pb-24">
+					<div className="mx-auto w-full">{children}</div>
 				</div>
 			</div>
 		</ThemeProvider>

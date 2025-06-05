@@ -21,11 +21,11 @@ export const WalletHeading: FC<{
 	const needsVariantFiltering = singleVariant === null
 
 	return (
-		<div data-testid='wallet-blurb' className='break-words whitespace-normal'>
-			<div className='flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]'>
+		<div data-testid="wallet-blurb" className="break-words whitespace-normal">
+			<div className="flex flex-row gap-2 mt-2 mb-[24px] items-center flex-wrap p-[2px]">
 				{[
-					<div className='flex flex-row gap-2 items-center' key='website'>
-						<LanguageIcon fontSize='small' sx={{ color: 'var(--text-primary)' }} />
+					<div className="flex flex-row gap-2 items-center" key="website">
+						<LanguageIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
 						<ExternalLink
 							url={wallet.metadata.url}
 							defaultLabel={`${wallet.metadata.displayName} website`}
@@ -37,11 +37,11 @@ export const WalletHeading: FC<{
 						/>
 					</div>,
 					wallet.metadata.repoUrl !== null ? (
-						<div className='flex flex-row gap-2 items-center' key='repo'>
-							<GitHubIcon fontSize='small' sx={{ color: 'var(--text-primary)' }} />
+						<div className="flex flex-row gap-2 items-center" key="repo">
+							<GitHubIcon fontSize="small" sx={{ color: 'var(--text-primary)' }} />
 							<ExternalLink
 								url={wallet.metadata.repoUrl}
-								defaultLabel='GitHub Repository'
+								defaultLabel="GitHub Repository"
 								style={{
 									fontWeight: 500,
 									color: 'var(--text-primary)',
@@ -51,8 +51,8 @@ export const WalletHeading: FC<{
 						</div>
 					) : undefined,
 					hasVariant(wallet.variants, Variant.HARDWARE) ? (
-						<div className='flex flex-row gap-2 items-center' key='hardware'>
-							<HardwareIcon fontSize='small' />
+						<div className="flex flex-row gap-2 items-center" key="hardware">
+							<HardwareIcon fontSize="small" />
 						</div>
 					) : undefined,
 				]
@@ -62,14 +62,14 @@ export const WalletHeading: FC<{
 							value !== undefined && (
 								<div
 									key={value.key ?? 'hi'}
-									className='bg-primary border px-2 py-1 rounded-md hover:bg-primary'
+									className="bg-primary border px-2 py-1 rounded-md hover:bg-primary"
 								>
 									{value}
 								</div>
 							),
 					)}
 			</div>
-			<div className='break-words whitespace-normal'>
+			<div className="break-words whitespace-normal">
 				<RenderTypographicContent
 					content={wallet.metadata.blurb}
 					typography={{ variant: 'body1' }}
@@ -78,8 +78,8 @@ export const WalletHeading: FC<{
 					}}
 				/>
 			</div>
-			<Typography fontSize='0.9rem' marginTop='3rem'>
-				<React.Fragment key='begin'>
+			<Typography fontSize="0.9rem" marginTop="3rem">
+				<React.Fragment key="begin">
 					<span style={{ color: 'var(--accent)' }}>Platforms: </span>
 				</React.Fragment>
 				{nonEmptyMap(nonEmptyKeys(wallet.variants), (variant, variantIndex) => (
@@ -88,20 +88,20 @@ export const WalletHeading: FC<{
 						<strong>{variantToRunsOn(variant)}</strong>
 					</React.Fragment>
 				))}
-				<Fragment key='afterVariants'>.</Fragment>
+				<Fragment key="afterVariants">.</Fragment>
 				{/* TODO: Is this ever actually shown for the heading? */}
 				{needsVariantFiltering && (
-					<React.Fragment key='variantSpecifier'>
-						<React.Fragment key='variantDisclaimer'>
+					<React.Fragment key="variantSpecifier">
+						<React.Fragment key="variantDisclaimer">
 							{' '}
 							The ratings below vary depending on the version.{' '}
 						</React.Fragment>
 						{pickedVariant === null ? (
-							<React.Fragment key='variantReminder'>
+							<React.Fragment key="variantReminder">
 								Select a version to see version-specific ratings.
 							</React.Fragment>
 						) : (
-							<React.Fragment key='variantReminder'>
+							<React.Fragment key="variantReminder">
 								You are currently viewing the ratings for the{' '}
 								<strong>{variantToName(pickedVariant, false)}</strong> version.
 							</React.Fragment>

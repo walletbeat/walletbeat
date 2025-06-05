@@ -14,7 +14,7 @@ import { ExternalLink } from '@/ui/atoms/ExternalLink'
 export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JSX.Element {
 	if (value.license === License.PROPRIETARY) {
 		return (
-			<Typography variant='body2'>
+			<Typography variant="body2">
 				{wallet.metadata.displayName} is licensed under a proprietary non-open-source license.
 			</Typography>
 		)
@@ -22,7 +22,7 @@ export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JS
 
 	if (value.license === License.UNLICENSED_VISIBLE) {
 		return (
-			<Typography variant='body2'>
+			<Typography variant="body2">
 				{wallet.metadata.displayName} has no visible license information. Consequently, it should be
 				assumed to be proprietary (not open-source).
 			</Typography>
@@ -47,7 +47,7 @@ export function LicenseDetails({ wallet, value }: LicenseDetailsProps): React.JS
 	})()
 
 	return (
-		<Typography variant='body2'>
+		<Typography variant="body2">
 			{wallet.metadata.displayName} is licensed under the{' '}
 			<ExternalLink url={url} defaultLabel={licenseName(value.license)} /> license, {fossText}
 		</Typography>

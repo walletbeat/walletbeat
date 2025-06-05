@@ -50,14 +50,14 @@ export function SecurityAuditsDetails({
 					{hasUnaddressedFlaws && ' There remains unaddressed security flaws in the codebase.'}
 				</Typography>
 			</WrapRatingIcon>
-			<div className='max-h-48 overflow-y-auto border p-2 rounded-md'>
+			<div className="max-h-48 overflow-y-auto border p-2 rounded-md">
 				<ul>
 					{nonEmptyMap(sortedAudits, audit => (
 						<li key={securityAuditId(audit)}>
 							<strong>{audit.auditDate}</strong>{' '}
 							<ReferenceLinks references={toFullyQualified(audit.ref)} /> by{' '}
 							<EntityLink entity={audit.auditor} />.{' '}
-							<React.Fragment key='unpatchedFlaws'>
+							<React.Fragment key="unpatchedFlaws">
 								{audit.unpatchedFlaws === 'NONE_FOUND' &&
 									'No security flaws of severity level medium or higher were found.'}
 								{audit.unpatchedFlaws === 'ALL_FIXED' &&

@@ -119,7 +119,7 @@ export function MarkdownBase({
 		),
 		li: ({ children }) => (
 			<li>
-				<Typography component='span' variant={pVariant} color={textColor} fontWeight={pFontWeight}>
+				<Typography component="span" variant={pVariant} color={textColor} fontWeight={pFontWeight}>
 					{children}
 				</Typography>
 			</li>

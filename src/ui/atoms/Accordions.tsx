@@ -61,7 +61,7 @@ export function Accordions({
 						<AccordionSummary
 							key={`${accordion.id}-summary`}
 							expandIcon={
-								<div className='text-base text-primary'>
+								<div className="text-base text-primary">
 									<LuChevronDown />
 								</div>
 							}

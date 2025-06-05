@@ -10,9 +10,9 @@ export function AnchorHeader(props: TypographyProps & { id?: string }): React.JS
 	return (
 		<Typography {...typographyProps}>
 			<Link
-				key='link'
+				key="link"
 				href={props.id === undefined ? undefined : `#${props.id}`}
-				underline='none'
+				underline="none"
 				onMouseEnter={() => {
 					setHovered(true)
 				}}
@@ -20,13 +20,13 @@ export function AnchorHeader(props: TypographyProps & { id?: string }): React.JS
 					setHovered(false)
 				}}
 				onClick={props.onClick}
-				color='inherit'
+				color="inherit"
 			>
 				{props.children}
 				{hovered ? (
 					<>
 						{' '}
-						<LinkIcon fontSize='small' sx={{ opacity: 0.75 }} />
+						<LinkIcon fontSize="small" sx={{ opacity: 0.75 }} />
 					</>
 				) : null}
 			</Link>

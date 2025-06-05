@@ -28,7 +28,7 @@ export function EipLink({
 			title={
 				<React.Fragment key={`eip-tooltip-${eip.number}`}>
 					<Typography
-						variant='h4'
+						variant="h4"
 						sx={{
 							marginTop: '0.5rem',
 							marginBottom: '0.5rem',
@@ -37,8 +37,8 @@ export function EipLink({
 						{eipLabel(eip)}
 					</Typography>
 					<Divider
-						orientation='horizontal'
-						variant='middle'
+						orientation="horizontal"
+						variant="middle"
 						flexItem={true}
 						sx={{
 							marginLeft: '1%',
@@ -52,8 +52,8 @@ export function EipLink({
 						{eip.summaryMarkdown}
 					</MarkdownBox>
 					<Divider
-						orientation='horizontal'
-						variant='middle'
+						orientation="horizontal"
+						variant="middle"
 						flexItem={true}
 						sx={{
 							marginLeft: '20%',
@@ -69,8 +69,8 @@ export function EipLink({
 					{eip.noteMarkdown === undefined ? null : (
 						<>
 							<Divider
-								orientation='horizontal'
-								variant='middle'
+								orientation="horizontal"
+								variant="middle"
 								flexItem={true}
 								sx={{
 									marginLeft: '20%',
@@ -91,10 +91,10 @@ export function EipLink({
 		>
 			<Link
 				href={eipEthereumDotOrgUrl(eip)}
-				target='_blank'
-				color='primary'
-				display='inline-block'
-				underline='none'
+				target="_blank"
+				color="primary"
+				display="inline-block"
+				underline="none"
 				onMouseEnter={() => {
 					setHovered(true)
 				}}
