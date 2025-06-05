@@ -1,89 +1,89 @@
 import {
-  type Attribute,
-  type Evaluation,
-  exampleRating,
-  Rating,
-  type Value,
-} from '@/schema/attributes';
-import type { ResolvedFeatures } from '@/schema/features';
-import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety';
-import { popRefs } from '@/schema/reference';
-import type { AtLeastOneVariant } from '@/schema/variants';
-import { Variant } from '@/schema/variants';
-import { markdown, paragraph, sentence } from '@/types/content';
+	type Attribute,
+	type Evaluation,
+	exampleRating,
+	Rating,
+	type Value,
+} from '@/schema/attributes'
+import type { ResolvedFeatures } from '@/schema/features'
+import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety'
+import { popRefs } from '@/schema/reference'
+import type { AtLeastOneVariant } from '@/schema/variants'
+import { Variant } from '@/schema/variants'
+import { markdown, paragraph, sentence } from '@/types/content'
 
-import { exempt, pickWorstRating, unrated } from '../common';
+import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.user_safety';
+const brand = 'attributes.user_safety'
 
 export type UserSafetyValue = Value & {
-  readableAddress: UserSafetyType;
-  contractLabeling: UserSafetyType;
-  rawTxReview: UserSafetyType;
-  readableTx: UserSafetyType;
-  txCoverageExtensibility: UserSafetyType;
-  txExpertMode: UserSafetyType;
-  rawEip712: UserSafetyType;
-  readableEip712: UserSafetyType;
-  eip712CoverageExtensibility: UserSafetyType;
-  eip712ExpertMode: UserSafetyType;
-  riskAnalysis: UserSafetyType;
-  riskAnalysisLocal: UserSafetyType;
-  fullyLocalRiskAnalysis: UserSafetyType;
-  txSimulation: UserSafetyType;
-  txSimulationLocal: UserSafetyType;
-  fullyLocalTxSimulation: UserSafetyType;
-  __brand: 'attributes.user_safety';
-};
+	readableAddress: UserSafetyType
+	contractLabeling: UserSafetyType
+	rawTxReview: UserSafetyType
+	readableTx: UserSafetyType
+	txCoverageExtensibility: UserSafetyType
+	txExpertMode: UserSafetyType
+	rawEip712: UserSafetyType
+	readableEip712: UserSafetyType
+	eip712CoverageExtensibility: UserSafetyType
+	eip712ExpertMode: UserSafetyType
+	riskAnalysis: UserSafetyType
+	riskAnalysisLocal: UserSafetyType
+	fullyLocalRiskAnalysis: UserSafetyType
+	txSimulation: UserSafetyType
+	txSimulationLocal: UserSafetyType
+	fullyLocalTxSimulation: UserSafetyType
+	__brand: 'attributes.user_safety'
+}
 
 function evaluateUserSafety(features: UserSafetySupport): Rating {
-  const ratings = [
-    features.readableAddress,
-    features.contractLabeling,
-    features.rawTxReview,
-    features.readableTx,
-    features.txCoverageExtensibility,
-    features.txExpertMode,
-    features.rawEip712,
-    features.readableEip712,
-    features.eip712CoverageExtensibility,
-    features.eip712ExpertMode,
-    features.riskAnalysis,
-    features.riskAnalysisLocal,
-    features.fullyLocalRiskAnalysis,
-    features.txSimulation,
-    features.txSimulationLocal,
-    features.fullyLocalTxSimulation,
-  ];
-  const passCount = ratings.filter(r => r === UserSafetyType.PASS).length;
+	const ratings = [
+		features.readableAddress,
+		features.contractLabeling,
+		features.rawTxReview,
+		features.readableTx,
+		features.txCoverageExtensibility,
+		features.txExpertMode,
+		features.rawEip712,
+		features.readableEip712,
+		features.eip712CoverageExtensibility,
+		features.eip712ExpertMode,
+		features.riskAnalysis,
+		features.riskAnalysisLocal,
+		features.fullyLocalRiskAnalysis,
+		features.txSimulation,
+		features.txSimulationLocal,
+		features.fullyLocalTxSimulation,
+	]
+	const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
 
-  if (passCount >= 11) {
-    return Rating.PASS;
-  }
+	if (passCount >= 11) {
+		return Rating.PASS
+	}
 
-  if (passCount >= 6) {
-    return Rating.PARTIAL;
-  }
+	if (passCount >= 6) {
+		return Rating.PARTIAL
+	}
 
-  return Rating.FAIL;
+	return Rating.FAIL
 }
 
 export const userSafety: Attribute<UserSafetyValue> = {
-  id: 'userSafety',
-  icon: '🛡️',
-  displayName: 'User Safety',
-  wording: {
-    midSentenceName: null,
-    howIsEvaluated: "How is a wallet's user safety evaluated?",
-    whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its user safety?'),
-  },
-  question: sentence('Does {{WALLET_NAME}} provide comprehensive user safety features?'),
-  why: markdown(
-    `User safety features are crucial for ensuring users clearly understand the transactions and messages they are signing on their hardware device.
+	id: 'userSafety',
+	icon: '🛡️',
+	displayName: 'User Safety',
+	wording: {
+		midSentenceName: null,
+		howIsEvaluated: "How is a wallet's user safety evaluated?",
+		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its user safety?'),
+	},
+	question: sentence('Does {{WALLET_NAME}} provide comprehensive user safety features?'),
+	why: markdown(
+		`User safety features are crucial for ensuring users clearly understand the transactions and messages they are signing on their hardware device.
 		This involves presenting information legibly (human-readable addresses/contracts/parameters), providing tools to verify raw data, offering risk analysis and transaction simulation, and preventing unintended actions.`,
-  ),
-  methodology: markdown(
-    `Evaluated based on the following criteria (mapped to 16 internal sub-criteria):   
+	),
+	methodology: markdown(
+		`Evaluated based on the following criteria (mapped to 16 internal sub-criteria):   
 
 - **Human readable addresses:** Are raw addresses easy to review? Is the HWW displaying the ENS linked to an address if available?   
 
@@ -122,129 +122,129 @@ export const userSafety: Attribute<UserSafetyValue> = {
 - **Fully local TX simulation possible:** Is it possible to run the simulation locally? Describe the components provided by the HWW provider and the setup.   
 
 Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else FAIL.`,
-  ),
-  ratingScale: {
-    display: 'pass-fail',
-    exhaustive: true,
-    pass: [
-      exampleRating(
-        sentence('The hardware wallet passes 11 or more user safety sub-criteria.'),
-        (v: UserSafetyValue) => v.rating === Rating.PASS,
-      ),
-    ],
-    partial: [
-      exampleRating(
-        sentence('The hardware wallet passes 6 to 10 user safety sub-criteria.'),
-        (v: UserSafetyValue) => v.rating === Rating.PARTIAL,
-      ),
-    ],
-    fail: [
-      exampleRating(
-        sentence('The hardware wallet passes 5 or fewer user safety sub-criteria.'),
-        (v: UserSafetyValue) => v.rating === Rating.FAIL,
-      ),
-    ],
-  },
-  aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) =>
-    pickWorstRating<UserSafetyValue>(perVariant),
-  evaluate: (features: ResolvedFeatures): Evaluation<UserSafetyValue> => {
-    if (features.variant !== Variant.HARDWARE) {
-      return exempt(
-        userSafety,
-        sentence(
-          'This attribute evaluates hardware wallet user safety features and is not applicable for {{WALLET_NAME}}.',
-        ),
-        brand,
-        {
-          readableAddress: UserSafetyType.FAIL,
-          contractLabeling: UserSafetyType.FAIL,
-          rawTxReview: UserSafetyType.FAIL,
-          readableTx: UserSafetyType.FAIL,
-          txCoverageExtensibility: UserSafetyType.FAIL,
-          txExpertMode: UserSafetyType.FAIL,
-          rawEip712: UserSafetyType.FAIL,
-          readableEip712: UserSafetyType.FAIL,
-          eip712CoverageExtensibility: UserSafetyType.FAIL,
-          eip712ExpertMode: UserSafetyType.FAIL,
-          riskAnalysis: UserSafetyType.FAIL,
-          riskAnalysisLocal: UserSafetyType.FAIL,
-          fullyLocalRiskAnalysis: UserSafetyType.FAIL,
-          txSimulation: UserSafetyType.FAIL,
-          txSimulationLocal: UserSafetyType.FAIL,
-          fullyLocalTxSimulation: UserSafetyType.FAIL,
-        },
-      );
-    }
+	),
+	ratingScale: {
+		display: 'pass-fail',
+		exhaustive: true,
+		pass: [
+			exampleRating(
+				sentence('The hardware wallet passes 11 or more user safety sub-criteria.'),
+				(v: UserSafetyValue) => v.rating === Rating.PASS,
+			),
+		],
+		partial: [
+			exampleRating(
+				sentence('The hardware wallet passes 6 to 10 user safety sub-criteria.'),
+				(v: UserSafetyValue) => v.rating === Rating.PARTIAL,
+			),
+		],
+		fail: [
+			exampleRating(
+				sentence('The hardware wallet passes 5 or fewer user safety sub-criteria.'),
+				(v: UserSafetyValue) => v.rating === Rating.FAIL,
+			),
+		],
+	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) =>
+		pickWorstRating<UserSafetyValue>(perVariant),
+	evaluate: (features: ResolvedFeatures): Evaluation<UserSafetyValue> => {
+		if (features.variant !== Variant.HARDWARE) {
+			return exempt(
+				userSafety,
+				sentence(
+					'This attribute evaluates hardware wallet user safety features and is not applicable for {{WALLET_NAME}}.',
+				),
+				brand,
+				{
+					readableAddress: UserSafetyType.FAIL,
+					contractLabeling: UserSafetyType.FAIL,
+					rawTxReview: UserSafetyType.FAIL,
+					readableTx: UserSafetyType.FAIL,
+					txCoverageExtensibility: UserSafetyType.FAIL,
+					txExpertMode: UserSafetyType.FAIL,
+					rawEip712: UserSafetyType.FAIL,
+					readableEip712: UserSafetyType.FAIL,
+					eip712CoverageExtensibility: UserSafetyType.FAIL,
+					eip712ExpertMode: UserSafetyType.FAIL,
+					riskAnalysis: UserSafetyType.FAIL,
+					riskAnalysisLocal: UserSafetyType.FAIL,
+					fullyLocalRiskAnalysis: UserSafetyType.FAIL,
+					txSimulation: UserSafetyType.FAIL,
+					txSimulationLocal: UserSafetyType.FAIL,
+					fullyLocalTxSimulation: UserSafetyType.FAIL,
+				},
+			)
+		}
 
-    const userSafetyFeature = features.security.userSafety;
+		const userSafetyFeature = features.security.userSafety
 
-    if (userSafetyFeature === null) {
-      return unrated(userSafety, brand, {
-        readableAddress: UserSafetyType.FAIL,
-        contractLabeling: UserSafetyType.FAIL,
-        rawTxReview: UserSafetyType.FAIL,
-        readableTx: UserSafetyType.FAIL,
-        txCoverageExtensibility: UserSafetyType.FAIL,
-        txExpertMode: UserSafetyType.FAIL,
-        rawEip712: UserSafetyType.FAIL,
-        readableEip712: UserSafetyType.FAIL,
-        eip712CoverageExtensibility: UserSafetyType.FAIL,
-        eip712ExpertMode: UserSafetyType.FAIL,
-        riskAnalysis: UserSafetyType.FAIL,
-        riskAnalysisLocal: UserSafetyType.FAIL,
-        fullyLocalRiskAnalysis: UserSafetyType.FAIL,
-        txSimulation: UserSafetyType.FAIL,
-        txSimulationLocal: UserSafetyType.FAIL,
-        fullyLocalTxSimulation: UserSafetyType.FAIL,
-      });
-    }
+		if (userSafetyFeature === null) {
+			return unrated(userSafety, brand, {
+				readableAddress: UserSafetyType.FAIL,
+				contractLabeling: UserSafetyType.FAIL,
+				rawTxReview: UserSafetyType.FAIL,
+				readableTx: UserSafetyType.FAIL,
+				txCoverageExtensibility: UserSafetyType.FAIL,
+				txExpertMode: UserSafetyType.FAIL,
+				rawEip712: UserSafetyType.FAIL,
+				readableEip712: UserSafetyType.FAIL,
+				eip712CoverageExtensibility: UserSafetyType.FAIL,
+				eip712ExpertMode: UserSafetyType.FAIL,
+				riskAnalysis: UserSafetyType.FAIL,
+				riskAnalysisLocal: UserSafetyType.FAIL,
+				fullyLocalRiskAnalysis: UserSafetyType.FAIL,
+				txSimulation: UserSafetyType.FAIL,
+				txSimulationLocal: UserSafetyType.FAIL,
+				fullyLocalTxSimulation: UserSafetyType.FAIL,
+			})
+		}
 
-    const { withoutRefs, refs: extractedRefs } = popRefs<UserSafetySupport>(userSafetyFeature);
-    const rating = evaluateUserSafety(withoutRefs);
+		const { withoutRefs, refs: extractedRefs } = popRefs<UserSafetySupport>(userSafetyFeature)
+		const rating = evaluateUserSafety(withoutRefs)
 
-    const passCount = [
-      withoutRefs.readableAddress,
-      withoutRefs.contractLabeling,
-      withoutRefs.rawTxReview,
-      withoutRefs.readableTx,
-      withoutRefs.txCoverageExtensibility,
-      withoutRefs.txExpertMode,
-      withoutRefs.rawEip712,
-      withoutRefs.readableEip712,
-      withoutRefs.eip712CoverageExtensibility,
-      withoutRefs.eip712ExpertMode,
-      withoutRefs.riskAnalysis,
-      withoutRefs.riskAnalysisLocal,
-      withoutRefs.fullyLocalRiskAnalysis,
-      withoutRefs.txSimulation,
-      withoutRefs.txSimulationLocal,
-      withoutRefs.fullyLocalTxSimulation,
-    ].filter(r => r === UserSafetyType.PASS).length;
+		const passCount = [
+			withoutRefs.readableAddress,
+			withoutRefs.contractLabeling,
+			withoutRefs.rawTxReview,
+			withoutRefs.readableTx,
+			withoutRefs.txCoverageExtensibility,
+			withoutRefs.txExpertMode,
+			withoutRefs.rawEip712,
+			withoutRefs.readableEip712,
+			withoutRefs.eip712CoverageExtensibility,
+			withoutRefs.eip712ExpertMode,
+			withoutRefs.riskAnalysis,
+			withoutRefs.riskAnalysisLocal,
+			withoutRefs.fullyLocalRiskAnalysis,
+			withoutRefs.txSimulation,
+			withoutRefs.txSimulationLocal,
+			withoutRefs.fullyLocalTxSimulation,
+		].filter(r => r === UserSafetyType.PASS).length
 
-    const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}.${
-      rating !== Rating.EXEMPT ? ` It passes ${passCount} out of 16 sub-criteria.` : ''
-    }`;
+		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}.${
+			rating !== Rating.EXEMPT ? ` It passes ${passCount} out of 16 sub-criteria.` : ''
+		}`
 
-    const howToImproveText =
-      rating !== Rating.PASS && rating !== Rating.EXEMPT
-        ? '{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.'
-        : '';
+		const howToImproveText =
+			rating !== Rating.PASS && rating !== Rating.EXEMPT
+				? '{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.'
+				: ''
 
-    return {
-      value: {
-        id: 'user_safety',
-        rating,
-        displayName: 'User Safety',
-        shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} user safety.`),
-        ...withoutRefs,
-        __brand: brand,
-      },
-      details: paragraph(detailsText),
-      references: extractedRefs,
-      howToImprove:
-        rating === Rating.PASS || rating === Rating.EXEMPT
-          ? undefined
-          : paragraph(howToImproveText),
-    };
-  },
-};
+		return {
+			value: {
+				id: 'user_safety',
+				rating,
+				displayName: 'User Safety',
+				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} user safety.`),
+				...withoutRefs,
+				__brand: brand,
+			},
+			details: paragraph(detailsText),
+			references: extractedRefs,
+			howToImprove:
+				rating === Rating.PASS || rating === Rating.EXEMPT
+					? undefined
+					: paragraph(howToImproveText),
+		}
+	},
+}
