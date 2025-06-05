@@ -100,32 +100,32 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		private keys isolated from internet-connected devices, hardware wallets protect
 		users from malware, phishing attacks, and other security vulnerabilities that
 		could compromise their funds.
-		
+
 		When a software wallet supports hardware wallet integration, users can enjoy
 		the convenience and features of the software wallet while maintaining the
 		security benefits of keeping their private keys offline. This combination
 		offers the best of both worlds: a user-friendly interface with enhanced security.
-		
+
 		Supporting multiple hardware wallet options gives users flexibility to choose
 		the hardware solution that best fits their needs and preferences.
 	`),
 	methodology: markdown(`
 		Wallets are evaluated based on their support for popular hardware wallet devices.
-		
+
 		A wallet receives a passing rating if it supports 3 out of 4 major hardware
 		wallet brands: Ledger, Trezor, Keystone, and GridPlus. Allowing users to perform all
 		essential operations using these hardware wallets.
-		
+
 		A wallet receives a partial rating if it supports at least one hardware wallet
 		brand but doesn't support 3 out of 4 major brands mentioned above.
-		
+
 		A wallet fails this attribute if it doesn't support any hardware wallets.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			paragraph(`  
+			paragraph(`
 				The wallet supports 3 out of 4 major hardware wallet brands: Ledger, Trezor, 
 				Keystone, and GridPlus.
 			`),
@@ -168,7 +168,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		}
 
 		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
-		// 	all such wallet have the opportunity to support hardware wallet to provide better security for the user
+		//	all such wallet have the opportunity to support hardware wallet to provide better security for the user
 		// Check for ERC-4337 smart wallet support
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(

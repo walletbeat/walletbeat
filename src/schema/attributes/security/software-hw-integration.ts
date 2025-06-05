@@ -61,9 +61,9 @@ function basicHardwareWalletIntegration(
 		details: paragraph(
 			`{{WALLET_NAME}} supports hardware wallet integration${supportedWalletsText}, but with limited functionality. It lacks full EIP-712 clear signing support when connecting to important DeFi applications like Safe or Aave. This means users cannot fully verify complex transaction details on their hardware device screens, which could potentially compromise security for advanced DeFi operations.`,
 		),
-		howToImprove: mdParagraph(
-			"{{WALLET_NAME}} should implement full EIP-712 clear signing support for transactions with Safe, Aave, and other major DeFi platforms. This would ensure users can verify all transaction details on their hardware devices before signing. {{WALLET_NAME}} should make sure to support the latest hardware sdk such as  [Gridplus's](https://github.com/GridPlus/gridplus-sdk) or [Ledger's device management kit](https://developers.ledger.com/docs/device-interaction/getting-started).",
-		),
+		howToImprove: mdParagraph(`
+			{{WALLET_NAME}} should implement full EIP-712 clear signing support for transactions with Safe, Aave, and other major DeFi platforms. This would ensure users can verify all transaction details on their hardware devices before signing. {{WALLET_NAME}} should make sure to support the latest hardware sdk such as [Gridplus\'s](https://github.com/GridPlus/gridplus-sdk) or [Ledger's device management kit](https://developers.ledger.com/docs/device-interaction/getting-started).
+		`),
 	}
 }
 
@@ -215,7 +215,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		}
 
 		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
-		// 	all such wallet have the opportunity to support hardware wallet to provide better security for the user
+		//	all such wallet have the opportunity to support hardware wallet to provide better security for the user
 		// Check for ERC-4337 smart wallet
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(

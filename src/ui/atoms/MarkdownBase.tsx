@@ -46,33 +46,37 @@ const StyledMarkdown = styled(Box, {
 	shouldForwardProp: prop => prop !== 'pSpacing' && prop !== 'liSpacing',
 })(
 	({ pSpacing, liSpacing }: MarkdownOwnProps) => `
-    ul {
-        list-style: disc;
-        padding-left: 1rem;
-    }
-    p, li {
-        margin-top: 0px;
-    }
-
-    ${
-			pSpacing === undefined
-				? ''
-				: `p + p {
-        margin-top: ${pSpacing};
-    }`
+		ul {
+			list-style: disc;
+			padding-left: 1rem;
+		}
+		p, li {
+			margin-top: 0px;
 		}
 
-    ${
-			liSpacing === undefined
-				? ''
-				: `li + li:not(li li), li li:not(li li + li), p + ul > li {
-        margin-top: ${pSpacing};
-    }
-    li li + li {
-        margin-top: calc(${pSpacing} / 2);
-    }`
+		${
+			pSpacing !== undefined
+				? `
+					p + p {
+						margin-top: ${pSpacing};
+					}
+				`
+				: ''
 		}
-`,
+
+		${
+			liSpacing !== undefined
+				? `
+					li + li:not(li li), li li:not(li li + li), p + ul > li {
+						margin-top: ${pSpacing};
+					}
+					li li + li {
+						margin-top: calc(${pSpacing} / 2);
+					}
+				`
+				: ''
+		}
+	`,
 )
 
 /**

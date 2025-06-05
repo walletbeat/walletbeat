@@ -152,46 +152,40 @@ const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
 		perTechnology: new Map(),
 		__brand: brand,
 	},
-	details: mdParagraph(
-		`
-      {{WALLET_NAME}} does not support any type of private token transfers.
+	details: mdParagraph(`
+		{{WALLET_NAME}} does not support any type of private token transfers.
 
-      This means all token transfers made using {{WALLET_NAME}} are public
-      information and are recorded forever.
-      Therefore, {{WALLET_NAME}} users should only make token transfers if they
-      would also be comfortable with continuously publishing their bank account
-      statement or payment app transaction history for all to see online, as
-      their level of privacy would be similar.
-    `,
-	),
-	impact: mdParagraph<{ WALLET_NAME: string }>(
-		`
-      As all token transfers will be recorded publicly onchain forever,
-      {{WALLET_NAME}} should only be used for transactions where privacy is not
-      and will never be needed, such as public DAO treasury operations.
+		This means all token transfers made using {{WALLET_NAME}} are public
+		information and are recorded forever.
+		Therefore, {{WALLET_NAME}} users should only make token transfers if they
+		would also be comfortable with continuously publishing their bank account
+		statement or payment app transaction history for all to see online, as
+		their level of privacy would be similar.
+	`),
+	impact: mdParagraph<{ WALLET_NAME: string }>(`
+		As all token transfers will be recorded publicly onchain forever,
+		{{WALLET_NAME}} should only be used for transactions where privacy is not
+		and will never be needed, such as public DAO treasury operations.
 
-      {{WALLET_NAME}} **should not be used for peer-to-peer transfers**, and
-      users should keep their addresses to themselves to avoid creating
-      permanent associations between their public transactions and their
-      personal identity.
+		{{WALLET_NAME}} **should not be used for peer-to-peer transfers**, and
+		users should keep their addresses to themselves to avoid creating
+		permanent associations between their public transactions and their
+		personal identity.
 
-      Usage of {{WALLET_NAME}} for conducting real-world transactions is
-      especially **not advisable**, as it exposes the user to the risk of the
-      merchant looking up their customer's balance and initiating a
-      [**wrench attack**](https://github.com/jlopp/physical-bitcoin-attacks/blob/master/README.md)
-      on the user. This puts users of {{WALLET_NAME}} at risk of physical
-      and financial harm.
-    `,
-	),
-	howToImprove: mdParagraph(
-		`
-      {{WALLET_NAME}} should support some form of private token transfers,
-      such as ${eipMarkdownLink(erc5564)}, and should make this the primary
-      way to perform token transfers. Public token transfers should either be
-      hidden under a power-user-only menu, come with important user safety
-      warnings, or deleted from the wallet's feature set.
-    `,
-	),
+		Usage of {{WALLET_NAME}} for conducting real-world transactions is
+		especially **not advisable**, as it exposes the user to the risk of the
+		merchant looking up their customer's balance and initiating a
+		[**wrench attack**](https://github.com/jlopp/physical-bitcoin-attacks/blob/master/README.md)
+		on the user. This puts users of {{WALLET_NAME}} at risk of physical
+		and financial harm.
+	`),
+	howToImprove: mdParagraph(`
+		{{WALLET_NAME}} should support some form of private token transfers,
+		such as ${eipMarkdownLink(erc5564)}, and should make this the primary
+		way to perform token transfers. Public token transfers should either be
+		hidden under a power-user-only menu, come with important user safety
+		warnings, or deleted from the wallet's feature set.
+	`),
 }
 
 const nonDefault: Evaluation<PrivateTransfersValue> = {
@@ -206,29 +200,23 @@ const nonDefault: Evaluation<PrivateTransfersValue> = {
 		perTechnology: new Map(),
 		__brand: brand,
 	},
-	details: paragraph(
-		`
-      Token transfers with {{WALLET_NAME}} are public by default, despite it
-      supporting private token transfers.
+	details: paragraph(`
+		Token transfers with {{WALLET_NAME}} are public by default, despite it
+		supporting private token transfers.
 
-      This means token transfers made using {{WALLET_NAME}} are by default
-      public information that is recorded forever.
-    `,
-	),
-	impact: paragraph(
-		`
-      {{WALLET_NAME}} users should always use private token transfers
-      to protect their privacy.
-    `,
-	),
-	howToImprove: paragraph(
-		`
-      {{WALLET_NAME}} should make token transfers private by default.
-      Public token transfers should either be hidden under a
-      power-user-only menu, come with important user safety warnings,
-      or deleted from the wallet's feature set.
-    `,
-	),
+		This means token transfers made using {{WALLET_NAME}} are by default
+		public information that is recorded forever.
+	`),
+	impact: paragraph(`
+		{{WALLET_NAME}} users should always use private token transfers
+		to protect their privacy.
+	`),
+	howToImprove: paragraph(`
+		{{WALLET_NAME}} should make token transfers private by default.
+		Public token transfers should either be hidden under a
+		power-user-only menu, come with important user safety warnings,
+		or deleted from the wallet's feature set.
+	`),
 }
 
 function rateStealthAddressSupport(
@@ -268,10 +256,10 @@ function rateStealthAddressSupport(
 						return {
 							sendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 							sendingDetails: mdParagraph(`
-                Sending funds relies on ${thirdPartyLink} for address resolution, which learns ${learnedElements} in the process.
-                While the onchain transaction data does not reveal these details, ${thirdPartyLink} is in a position to learn
-                a link between the sender and the recipient.
-              `),
+								Sending funds relies on ${thirdPartyLink} for address resolution, which learns ${learnedElements} in the process.
+								While the onchain transaction data does not reveal these details, ${thirdPartyLink} is in a position to learn
+								a link between the sender and the recipient.
+							`),
 							sendingImprovements: [
 								`avoid sending sender and recipient information to ${thirdPartyLink}`,
 							],
@@ -282,10 +270,10 @@ function rateStealthAddressSupport(
 						return {
 							sendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 							sendingDetails: mdParagraph(`
-                Sending funds relies on ${thirdPartyLink} for address resolution, which learns ${learnedElements} in the process.
-                While the onchain transaction data does not reveal these details, ${thirdPartyLink} is in a position to learn
-                who the intended recipient of the transaction is.
-              `),
+								Sending funds relies on ${thirdPartyLink} for address resolution, which learns ${learnedElements} in the process.
+								While the onchain transaction data does not reveal these details, ${thirdPartyLink} is in a position to learn
+								who the intended recipient of the transaction is.
+							`),
 							sendingImprovements: [`avoid sending recipient information to ${thirdPartyLink}`],
 						}
 					}
@@ -300,15 +288,15 @@ function rateStealthAddressSupport(
 						return {
 							sendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 							sendingDetails: mdParagraph(`
-                Sending funds relies on ${thirdPartyLink} for address resolution, which learns ${learnedElements} in the process.
-                In addition, this same provider is used for performing balance lookups, and learns your stealth meta-address
-                in the process.
-                This means that while the onchain transaction data does not reveal these details,
-                ${thirdPartyLink} is in a position to know that you (as a stealth address user)
-                have recently refreshed your balance, and which recipient *some* stealth address user
-                may have recently sent funds to, allowing it to infer a link between you and your
-                intended recipient.
-              `),
+								Sending funds relies on ${thirdPartyLink} for address resolution, which learns ${learnedElements} in the process.
+								In addition, this same provider is used for performing balance lookups, and learns your stealth meta-address
+								in the process.
+								This means that while the onchain transaction data does not reveal these details,
+								${thirdPartyLink} is in a position to know that you (as a stealth address user)
+								have recently refreshed your balance, and which recipient *some* stealth address user
+								may have recently sent funds to, allowing it to infer a link between you and your
+								intended recipient.
+							`),
 							sendingImprovements: [
 								`avoid relying on ${thirdPartyLink} for both recipient address resolution and balance lookups`,
 							],
@@ -318,10 +306,10 @@ function rateStealthAddressSupport(
 					return {
 						sendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 						sendingDetails: mdParagraph(`
-              Sending funds relies on ${thirdPartyLink}, but it cannot learn any association between your IP address,
-              stealth meta-address, recipient meta-address, or recipient generated stealth address.
-              Onchain transaction data is fully private as well.
-            `),
+							Sending funds relies on ${thirdPartyLink}, but it cannot learn any association between your IP address,
+							stealth meta-address, recipient meta-address, or recipient generated stealth address.
+							Onchain transaction data is fully private as well.
+						`),
 						sendingImprovements: [],
 					}
 				})()
@@ -346,13 +334,13 @@ function rateStealthAddressSupport(
 						return {
 							receivingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 							receivingDetails: mdParagraph(`
-                Looking up your stealth address balance relies on
-                ${thirdPartyLink}, which learns your stealth meta-address and
-                generated stealth addresses.
-                This means that while onchain transaction data is still private,
-                ${thirdPartyLink} is in a position to de-anonymize all your past
-                transactions.
-              `),
+								Looking up your stealth address balance relies on
+								${thirdPartyLink}, which learns your stealth meta-address and
+								generated stealth addresses.
+								This means that while onchain transaction data is still private,
+								${thirdPartyLink} is in a position to de-anonymize all your past
+								transactions.
+							`),
 							receivingImprovements: [
 								'perform stealth address derivation from the meta-address locally',
 							],
@@ -363,12 +351,12 @@ function rateStealthAddressSupport(
 						return {
 							receivingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 							receivingDetails: mdParagraph(`
-                Looking up your balance relies on ${thirdPartyLink}, which
-                learns your generated stealth addresses.
-                This means that while onchain transaction data is still private,
-                ${thirdPartyLink} is in a position to de-anonymize all your past
-                transactions.
-              `),
+								Looking up your balance relies on ${thirdPartyLink}, which
+								learns your generated stealth addresses.
+								This means that while onchain transaction data is still private,
+								${thirdPartyLink} is in a position to de-anonymize all your past
+								transactions.
+							`),
 							receivingImprovements: [
 								'perform stealth address balance lookups across multiple providers, using unique proxy circuits for each address, in a time-staggered manner',
 							],
@@ -378,9 +366,9 @@ function rateStealthAddressSupport(
 					return {
 						receivingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 						receivingDetails: mdParagraph(`
-              Looking up your balance relies on ${thirdPartyLink}, but does not
-              leak sensitive information in the process.
-            `),
+							Looking up your balance relies on ${thirdPartyLink}, but does not
+							leak sensitive information in the process.
+						`),
 						receivingImprovements: [],
 					}
 				})()
@@ -399,11 +387,11 @@ function rateStealthAddressSupport(
 			return {
 				labelingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
 				labelingDetails: mdParagraph(`
-          It is not possible to select which of your stealth addresses to use
-          when spending your stealth address balance. This means spending funds
-          received in your wallet may inadvertently create publicly-visible
-          onchain links between your generated stealth addresses.
-        `),
+					It is not possible to select which of your stealth addresses to use
+					when spending your stealth address balance. This means spending funds
+					received in your wallet may inadvertently create publicly-visible
+					onchain links between your generated stealth addresses.
+				`),
 				labelingImprovements: [
 					'add support for labeling or bucketing of generated stealth addresses',
 				],
@@ -415,12 +403,12 @@ function rateStealthAddressSupport(
 				return {
 					labelingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
 					labelingDetails: mdParagraph(`
-            When spending funds from your stealth address balance, unlabeled
-            receiving stealth addresses are treated as a single bucket and funds
-            may be spent from multiple of them in the same transaction.
-            This may inadvertently create undesired publicly-visible links
-            between these generated stealth addresses.
-          `),
+						When spending funds from your stealth address balance, unlabeled
+						receiving stealth addresses are treated as a single bucket and funds
+						may be spent from multiple of them in the same transaction.
+						This may inadvertently create undesired publicly-visible links
+						between these generated stealth addresses.
+					`),
 					labelingImprovements: [
 						'never spend funds from stealth addresses that have not been labeled',
 					],
@@ -429,22 +417,22 @@ function rateStealthAddressSupport(
 				return {
 					labelingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 					labelingDetails: mdParagraph(`
-            When spending funds from your stealth address balance, unlabeled
-            receiving stealth addresses cannot be spent. This ensures that
-            you do not inadvertently create undesired publicly-visible links
-            between these generated stealth addresses.
-          `),
+						When spending funds from your stealth address balance, unlabeled
+						receiving stealth addresses cannot be spent. This ensures that
+						you do not inadvertently create undesired publicly-visible links
+						between these generated stealth addresses.
+					`),
 					labelingImprovements: [],
 				}
 			case StealthAddressUnlabeledBehavior.TREAT_EACH_UNLABELED_AS_OWN_BUCKET:
 				return {
 					labelingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 					labelingDetails: mdParagraph(`
-            When spending funds from your stealth address balance, unlabeled
-            receiving stealth addresses are treated as unique.
-            This ensures that you do not inadvertently create undesired
-            publicly-visible links between these generated stealth addresses.
-          `),
+						When spending funds from your stealth address balance, unlabeled
+						receiving stealth addresses are treated as unique.
+						This ensures that you do not inadvertently create undesired
+						publicly-visible links between these generated stealth addresses.
+					`),
 					labelingImprovements: [],
 				}
 		}
@@ -465,20 +453,20 @@ function rateStealthAddressSupport(
 				return {
 					derivationPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 					derivationDetails: mdParagraph(`
-            Deriving the private key of your generated stealth addresses
-            uses the default chain provider, who is in a position to learn
-            this private key and to spend your funds.
-          `),
+						Deriving the private key of your generated stealth addresses
+						uses the default chain provider, who is in a position to learn
+						this private key and to spend your funds.
+					`),
 					derivationImprovements: ['perform stealth address private key derivation locally'],
 				}
 			case 'THIRD_PARTY_SERVICE':
 				return {
 					derivationPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 					derivationDetails: mdParagraph(`
-            Deriving the private key of your generated stealth addresses relies on
-            ${entityMarkdownLink(stealthAddresses.privateKeyDerivation.thirdParty)},
-            who is in a position to learn this private key and to spend your funds.
-          `),
+						Deriving the private key of your generated stealth addresses relies on
+						${entityMarkdownLink(stealthAddresses.privateKeyDerivation.thirdParty)},
+						who is in a position to learn this private key and to spend your funds.
+					`),
 					derivationImprovements: ['perform stealth address private key derivation locally'],
 				}
 		}
@@ -488,23 +476,21 @@ function rateStealthAddressSupport(
 		.concat(labelingImprovements)
 		.concat(derivationImprovements)
 	const howToImprove = isNonEmptyArray(walletShould)
-		? mdParagraph<{ WALLET_NAME: string }>(
-				`
-          {{WALLET_NAME}} should${markdownListFormat(walletShould, {
-						ifEmpty: { behavior: 'THROW_ERROR' },
-						singleItemTemplate: ' ITEM.',
-						uppercaseFirstCharacterOfListItems: true,
-						multiItemPrefix: `:
-          
-          `,
-						multiItemTemplate: `
-          - ITEM`,
-						multiItemSuffix: `
-          
-          `,
-					})}
-        `,
-			)
+		? mdParagraph<{ WALLET_NAME: string }>(`
+			{{WALLET_NAME}} should${markdownListFormat(walletShould, {
+				ifEmpty: { behavior: 'THROW_ERROR' },
+				singleItemTemplate: ' ITEM.',
+				uppercaseFirstCharacterOfListItems: true,
+				multiItemPrefix: `:
+
+			`,
+				multiItemTemplate: `
+			- ITEM`,
+				multiItemSuffix: `
+
+			`,
+			})}
+		`)
 		: undefined
 	const worstLevel = worstPrivateTransfersPrivacyLevel([
 		sendingPrivacy,
@@ -600,55 +586,55 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		'Can you send and receive tokens without revealing your transaction history to others?',
 	),
 	why: mdParagraph(`
-    Data posted on public blockchains like Ethereum is publicly available to
-    everyone. This means that anyone can see your transaction history.
-    You would not voluntarily post your bank statements or private purchase
-    history online, yet this is what happens by default when transacting
-    on public blockchains.
+		Data posted on public blockchains like Ethereum is publicly available to
+		everyone. This means that anyone can see your transaction history.
+		You would not voluntarily post your bank statements or private purchase
+		history online, yet this is what happens by default when transacting
+		on public blockchains.
 
-    Many privacy solutions have emerged to solve this problem. However, to
-    be actually usable by users, **these solutions must be tightly integrated
-    in wallets** and easy to use. Walletbeat looks at whether wallets
-    let users send, receive, and spend tokens privately by default.
-  `),
+		Many privacy solutions have emerged to solve this problem. However, to
+		be actually usable by users, **these solutions must be tightly integrated
+		in wallets** and easy to use. Walletbeat looks at whether wallets
+		let users send, receive, and spend tokens privately by default.
+	`),
 	methodology: markdown(`
-    In order to get a passing rating, wallets must ensure that sending Ether
-    or ERC-20 tokens to other addresses comes with privacy guarantees
-    **by default**. In addition, they must ensure that users can receive and
-    spend such tokens privately.
+		In order to get a passing rating, wallets must ensure that sending Ether
+		or ERC-20 tokens to other addresses comes with privacy guarantees
+		**by default**. In addition, they must ensure that users can receive and
+		spend such tokens privately.
 
-    "Privately" here means that other than the wallet user, no single entity
-    (including any third-party provider) can infer or reconstruct the user's
-    transaction history.
+		"Privately" here means that other than the wallet user, no single entity
+		(including any third-party provider) can infer or reconstruct the user's
+		transaction history.
 
-    Walletbeat currently recognizes the following privacy-preserving token
-    transfer solutions:
+		Walletbeat currently recognizes the following privacy-preserving token
+		transfer solutions:
 
-      - ${eipMarkdownLinkAndTitle(erc5564)}
-  `),
+		- ${eipMarkdownLinkAndTitle(erc5564)}
+	`),
 	ratingScale: {
 		display: 'fail-pass',
 		exhaustive: false,
 		fail: [
 			exampleRating(
 				paragraph(`
-          The wallet does not support private token transfers.
-        `),
+					The wallet does not support private token transfers.
+				`),
 				noPrivateTransfers.value,
 			),
 			exampleRating(
 				paragraph(`
-          The wallet's default option when sending tokens is to perform a public token transfer.
-        `),
+					The wallet's default option when sending tokens is to perform a public token transfer.
+				`),
 				nonDefault.value,
 			),
 			exampleRating(
 				mdParagraph(`
-          The wallet implements ${eipMarkdownLink(erc5564)} Stealth Addresses and uses it by default for transfers.
-          However, it does not let the user control which stealth addresses' balance is used when spending
-          private balances, thereby potentially exposing unintended public onchain links between their
-          stealth addresses.
-        `),
+					The wallet implements ${eipMarkdownLink(erc5564)} Stealth Addresses and uses it by default for transfers.
+					However, it does not let the user control which stealth addresses' balance is used when spending
+					private balances, thereby potentially exposing unintended public onchain links between their
+					stealth addresses.
+				`),
 				rateStealthAddressSupport(
 					supported({
 						balanceLookup: {
@@ -680,9 +666,9 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		partial: [
 			exampleRating(
 				mdParagraph(`
-          The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
-          However, a third-party provider may learn of the correlation between the user's stealth addresses.
-        `),
+					The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
+					However, a third-party provider may learn of the correlation between the user's stealth addresses.
+				`),
 				rateStealthAddressSupport(
 					supported({
 						balanceLookup: {
@@ -714,10 +700,10 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-          The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
-          However, when sending tokens, a third-party provider may learn of the correlation between the recipient's
-          meta-address and their newly-generated stealth address, thereby de-anonymizing the recipient.
-        `),
+					The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
+					However, when sending tokens, a third-party provider may learn of the correlation between the recipient's
+					meta-address and their newly-generated stealth address, thereby de-anonymizing the recipient.
+				`),
 				rateStealthAddressSupport(
 					supported({
 						balanceLookup: {
@@ -749,11 +735,11 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-          The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
-          However, when sending tokens, a third-party provider may learn of the correlation between the sender's
-          meta-address or IP, and the recipient's newly-generated stealth address, thereby de-anonymizing the
-          sender and recipient of the transfer.
-        `),
+					The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
+					However, when sending tokens, a third-party provider may learn of the correlation between the sender's
+					meta-address or IP, and the recipient's newly-generated stealth address, thereby de-anonymizing the
+					sender and recipient of the transfer.
+				`),
 				rateStealthAddressSupport(
 					supported({
 						balanceLookup: {
@@ -787,14 +773,14 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		pass: [
 			exampleRating(
 				mdParagraph(`
-          The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
-          Each stealth address is refreshed in such a way that no third-party may learn about the
-          correlation between these stealth addresses.
-          When spending private balances, users control which stealth addresses are used.
-          When sending tokens to another user's stealth address, no third-party may learn of the correlation between
-          the sender and the recipient, or of the correlation between the recipient's meta-address and their
-          newly-generated stealth address.
-        `),
+					The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
+					Each stealth address is refreshed in such a way that no third-party may learn about the
+					correlation between these stealth addresses.
+					When spending private balances, users control which stealth addresses are used.
+					When sending tokens to another user's stealth address, no third-party may learn of the correlation between
+					the sender and the recipient, or of the correlation between the recipient's meta-address and their
+					newly-generated stealth address.
+				`),
 				rateStealthAddressSupport(
 					supported({
 						balanceLookup: {

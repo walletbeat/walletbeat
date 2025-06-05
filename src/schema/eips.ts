@@ -70,7 +70,7 @@ function markdownMagicUrl(eip: EipNumber | Eip, format: 'long' | 'short'): strin
 	return `${eipEthereumDotOrgUrl(eip)}#wb-format=${format}`
 }
 
-/**  Return a markdown link for an EIP. */
+/** Return a markdown link for an EIP. */
 export function eipMarkdownLink(eip: Eip): string {
 	return `[${eipLabel(eip)}](${markdownMagicUrl(eip, 'short')})`
 }

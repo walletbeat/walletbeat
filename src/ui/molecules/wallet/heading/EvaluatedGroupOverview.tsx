@@ -74,11 +74,11 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 			const largeArcFlag = sliceAngle > 180 ? 1 : 0
 
 			const pathData = `
-                M ${centerX} ${centerY}
-                L ${x1} ${y1}
-                A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
-                Z
-            `
+				M ${centerX} ${centerY}
+				L ${x1} ${y1}
+				A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}
+				Z
+			`
 
 			return (
 				<path

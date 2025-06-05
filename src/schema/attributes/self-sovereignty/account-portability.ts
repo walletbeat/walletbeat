@@ -53,7 +53,7 @@ function evaluateEoa(
 			details: mdParagraph(`
 				{{WALLET_NAME}} generates EOA keys in a
 				standards-compliant way:
-				
+
 				* [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
 					for deriving a binary seed from a seed phrase.
 				* [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)
@@ -462,7 +462,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 		Specifically:
 
 		* **EOA wallets** are rated based on the exportability of their private
-		  key material, and on whether such private key material is derived using
+			key material, and on whether such private key material is derived using
 			the following standards:
 
 			* [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)

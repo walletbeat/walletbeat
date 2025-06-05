@@ -185,7 +185,7 @@ export interface Value {
 	 * A score representing this value on this specific attribute.
 	 * For any given Attribute, there should be at least one way to get a
 	 * score of 1.0.
-	 * If unspecified, the score is derived  using `defaultRatingScore`.
+	 * If unspecified, the score is derived using `defaultRatingScore`.
 	 */
 	score?: Score
 }

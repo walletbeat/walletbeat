@@ -134,9 +134,9 @@ function comprehensiveBugBountyProgram(
 		`),
 		howToImprove: support.upgradePathAvailable
 			? undefined
-			: mdParagraph(
-					'{{WALLET_NAME}} should establish a clearer upgrade path for users when security vulnerabilities are discovered, such as offering discounted replacements or firmware updates when possible.',
-				),
+			: mdParagraph(`
+				{{WALLET_NAME}} should establish a clearer upgrade path for users when security vulnerabilities are discovered, such as offering discounted replacements or firmware updates when possible.
+			`),
 	}
 }
 

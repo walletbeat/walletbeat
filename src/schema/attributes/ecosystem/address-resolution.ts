@@ -163,9 +163,9 @@ function evaluateAddressResolution(
 				),
 				__brand: brand,
 			},
-			details: markdown(
-				'{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as `username.eth`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. However, because such addresses do not contain information about the chain that the recipient would like to receive funds on, it is possible for the user to mistakenly send funds on the wrong chain.',
-			),
+			details: markdown(`
+				{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. However, because such addresses do not contain information about the chain that the recipient would like to receive funds on, it is possible for the user to mistakenly send funds to the wrong chain.
+			`),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should support sending funds to chain-specific human-readable addresses, as specified by either:
 

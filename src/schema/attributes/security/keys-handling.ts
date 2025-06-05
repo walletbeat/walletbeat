@@ -58,10 +58,10 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		It should also ensure that the manufacturer cannot access or recover user keys.
 	`),
 	methodology: markdown(`
-		Evaluated based on:  
+		Evaluated based on:	 
 		- **Master Secret Generation:** Use of interoperable, well-documented standards for seed generation.  
 		- **Key Secrecy:** Resistance against key extraction or recovery by the provider or third parties. Ensuring keys are not transmitted insecurely.  
-		- **Proprietary Mechanisms:** Security implications of any non-standard key handling or backup procedures.  
+		- **Proprietary Mechanisms:** Security implications of any non-standard key handling or backup procedures.	
 		- **Physical Attack Resistance:** Protection against passive (side-channel analysis) and active (glitching) physical attacks.  
 	`),
 	ratingScale: {

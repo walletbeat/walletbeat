@@ -414,7 +414,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		in a privacy-preserving manner. Specifically:
 
 		* When sending funds, does the lookup for past interactions with that
-		  address unconditionally reveal the sender and recipient addresses to a
+			address unconditionally reveal the sender and recipient addresses to a
 			third-party other than the wallet's default RPC provider for this chain?
 
 			* Wallets can implement this feature in a privacy-preserving manner by
