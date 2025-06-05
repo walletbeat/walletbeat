@@ -1,28 +1,28 @@
 ---
-export const prerender = true;
-import Layout from '@/layouts/Layout.astro';
-import { getAttributeGroupById } from '@/schema/attribute-groups';
-import { CriteriaPage, getStaticPathsForWalletType } from '@/components/CriteriaPage';
-import { representativeWalletForType } from '@/data/wallets';
-import { WalletType } from '@/schema/wallet-types';
+export const prerender = true
+import Layout from '@/layouts/Layout.astro'
+import { getAttributeGroupById } from '@/schema/attribute-groups'
+import { CriteriaPage, getStaticPathsForWalletType } from '@/components/CriteriaPage'
+import { representativeWalletForType } from '@/data/wallets'
+import { WalletType } from '@/schema/wallet-types'
 
-export const getStaticPaths = getStaticPathsForWalletType(WalletType.HARDWARE);
-const { attrGroupId } = Astro.params;
+export const getStaticPaths = getStaticPathsForWalletType(WalletType.HARDWARE)
+const { attrGroupId } = Astro.params
 const attrGroup = getAttributeGroupById(
-  attrGroupId,
-  representativeWalletForType(WalletType.HARDWARE).overall,
-);
+	attrGroupId,
+	representativeWalletForType(WalletType.HARDWARE).overall,
+)
 if (attrGroup === null) {
-  throw new Error('Invalid attribute group');
+	throw new Error('Invalid attribute group')
 }
 ---
 
 <Layout
-  metadata={{
-    title: `${attrGroup.displayName} - Walletbeat`,
-    description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
-    keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
-  }}
+	metadata={{
+		title: `${attrGroup.displayName} - Walletbeat`,
+		description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
+		keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
+	}}
 >
-  <CriteriaPage walletType={WalletType.HARDWARE} attrGroupId={attrGroupId} client:load />
+	<CriteriaPage walletType={WalletType.HARDWARE} attrGroupId={attrGroupId} client:load />
 </Layout>
