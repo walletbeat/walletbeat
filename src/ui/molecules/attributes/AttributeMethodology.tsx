@@ -7,10 +7,10 @@ import {
   type Evaluation,
   type ExampleRating,
   Rating,
-  ratingToIcon,
   type Value,
+  ratingToIcon,
 } from '@/schema/attributes';
-import { mdSentence, type Sentence } from '@/types/content';
+import { type Sentence, mdSentence } from '@/types/content';
 import type { NonEmptyArray } from '@/types/utils/non-empty';
 
 import { RenderTypographicContent } from '../../atoms/RenderTypographicContent';
@@ -188,7 +188,10 @@ function ExampleRatings<V extends Value>({
     mdSentence('A wallet would get a **failing** rating in any of these cases:'),
     failExamples,
   );
-  const renderedExamples: Array<{ key: string; element: React.JSX.Element | null }> = (() => {
+  const renderedExamples: Array<{
+    key: string;
+    element: React.JSX.Element | null;
+  }> = (() => {
     switch (displayOrder) {
       case 'pass-fail':
         return [passRendered, partialRendered, failRendered];

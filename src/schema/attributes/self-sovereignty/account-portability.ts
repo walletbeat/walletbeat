@@ -3,9 +3,9 @@ import { erc4337 } from '@/data/eips/erc-4337';
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import { eipMarkdownLink } from '@/schema/eips';
 import type { ResolvedFeatures } from '@/schema/features';
@@ -19,7 +19,7 @@ import {
   TransactionGenerationCapability,
 } from '@/schema/features/account-support';
 import { isSupported } from '@/schema/features/support';
-import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference';
+import { type ReferenceArray, mergeRefs, refs } from '@/schema/reference';
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
 import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty';
 

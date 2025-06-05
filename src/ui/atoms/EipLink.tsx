@@ -1,4 +1,4 @@
-import { Divider, Link, styled, Typography } from '@mui/material';
+import { Divider, Link, Typography, styled } from '@mui/material';
 import Tooltip, { tooltipClasses, type TooltipProps } from '@mui/material/Tooltip';
 import React, { useState } from 'react';
 

@@ -1,16 +1,16 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
-import { isSupported, type Support } from '@/schema/features/support';
+import { type Support, isSupported } from '@/schema/features/support';
 import { Variant } from '@/schema/variants';
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details';
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty';
+import { type NonEmptyArray, isNonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty';
 
 import {
   EthereumL1LightClient,

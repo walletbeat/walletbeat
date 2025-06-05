@@ -209,7 +209,8 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
                       <>
                         {' '}
                         However, in doing so, it leaks {commaListFormat(scamUrlLeaks)} to a third
-                        party{scamUrlLeaks.length > 1 && ' which can correlate them'}.
+                        party
+                        {scamUrlLeaks.length > 1 && ' which can correlate them'}.
                       </>
                     )}
                   </Typography>

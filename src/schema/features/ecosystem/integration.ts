@@ -1,12 +1,12 @@
 import {
   type ResolvedFeature,
-  resolveFeature,
   type Variant,
   type VariantFeature,
+  resolveFeature,
 } from '@/schema/variants';
 
 import type { WithRef } from '../../reference';
-import { notSupported, type Support } from '../support';
+import { type Support, notSupported } from '../support';
 
 /**
  * EIPs related to web browser integration standards.

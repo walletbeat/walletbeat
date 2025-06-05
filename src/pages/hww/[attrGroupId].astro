@@ -1,9 +1,9 @@
 ---
 export const prerender = true;
-import Layout from '@/layouts/Layout.astro';
-import { getAttributeGroupById } from '@/schema/attribute-groups';
 import { CriteriaPage, getStaticPathsForWalletType } from '@/components/CriteriaPage';
 import { representativeWalletForType } from '@/data/wallets';
+import Layout from '@/layouts/Layout.astro';
+import { getAttributeGroupById } from '@/schema/attribute-groups';
 import { WalletType } from '@/schema/wallet-types';
 
 export const getStaticPaths = getStaticPathsForWalletType(WalletType.HARDWARE);

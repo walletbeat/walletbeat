@@ -3,9 +3,9 @@ import { exampleNodeCompany } from '@/data/entities/example';
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '@/schema/eips';
 import type { ResolvedFeatures } from '@/schema/features';
@@ -15,12 +15,12 @@ import {
   type StealthAddressSupport,
   StealthAddressUnlabeledBehavior,
 } from '@/schema/features/privacy/transaction-privacy';
-import { isSupported, notSupported, type Supported, supported } from '@/schema/features/support';
+import { type Supported, isSupported, notSupported, supported } from '@/schema/features/support';
 import {
+  type Paragraph,
   markdown,
   mdParagraph,
   mdSentence,
-  type Paragraph,
   paragraph,
   sentence,
 } from '@/types/content';
@@ -29,11 +29,11 @@ import {
   mergePrivateTransferDetails,
   privateTransfersDetailsContent,
 } from '@/types/content/private-transfers-details';
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty';
+import { type NonEmptyArray, isNonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty';
 import { commaListFormat, markdownListFormat } from '@/types/utils/text';
 
 import { entityMarkdownLink } from '../../entity';
-import { mergeRefs, type ReferenceArray } from '../../reference';
+import { type ReferenceArray, mergeRefs } from '../../reference';
 import { pickWorstRating, unrated } from '../common';
 
 const brand = 'attributes.privacy.private_transfers';

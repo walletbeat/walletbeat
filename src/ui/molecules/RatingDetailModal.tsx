@@ -11,8 +11,8 @@ import {
 import {
   type AttributeGroup,
   type EvaluatedGroup,
-  ratingToColor,
   type ValueSet,
+  ratingToColor,
 } from '@/schema/attributes';
 import type { HardwareWalletModel } from '@/schema/features/profile';
 import { type FullyQualifiedReference, toFullyQualified } from '@/schema/reference';

@@ -1,13 +1,13 @@
 import {
   type NonEmptyArray,
-  nonEmptyFilter,
   type NonEmptySet,
+  nonEmptyFilter,
   nonEmptySetFromArray,
 } from '@/types/utils/non-empty';
 
 import type { SmartWalletContract } from '../contracts';
 import type { WithRef } from '../reference';
-import { isSupported, type NotSupported, type Support, type Supported } from './support';
+import { type NotSupported, type Support, type Supported, isSupported } from './support';
 
 export type AccountTypeSupport<T> = WithRef<Support<T>>;
 

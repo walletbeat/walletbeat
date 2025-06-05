@@ -1,9 +1,9 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support';
@@ -182,7 +182,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
     }
 
     if (features.security.hardwareWalletSupport === null) {
-      return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] });
+      return unrated(hardwareWalletSupport, brand, {
+        supportedHardwareWallets: [],
+      });
     }
 
     // Extract references from the hardware wallet support feature

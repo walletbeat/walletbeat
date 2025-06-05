@@ -79,7 +79,12 @@ export function SecurityAuditsDetails({
                             :{' '}
                             {flaw.presentStatus === 'FIXED' ? (
                               <>
-                                <Typography sx={{ textDecoration: 'line-through', opacity: 0.75 }}>
+                                <Typography
+                                  sx={{
+                                    textDecoration: 'line-through',
+                                    opacity: 0.75,
+                                  }}
+                                >
                                   {flaw.name}
                                 </Typography>{' '}
                                 (<strong>Fixed</strong>)

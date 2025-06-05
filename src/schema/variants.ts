@@ -1,9 +1,9 @@
 import {
   type NonEmptyArray,
-  nonEmptyEntries,
-  nonEmptyKeySet,
   type NonEmptyRecord,
   type NonEmptySet,
+  nonEmptyEntries,
+  nonEmptyKeySet,
 } from '@/types/utils/non-empty';
 
 /**

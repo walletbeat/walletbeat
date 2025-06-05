@@ -1,19 +1,19 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
-  exampleRatingUnimplemented,
   Rating,
   type Value,
+  exampleRating,
+  exampleRatingUnimplemented,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import {
   type Endpoint,
   type EntityData,
-  inferLeaks,
-  leaksByDefault,
   type MultiAddressHandling,
   MultiAddressPolicy,
+  inferLeaks,
+  leaksByDefault,
 } from '@/schema/features/privacy/data-collection';
 import { isSupported } from '@/schema/features/support';
 import { type ReferenceArray, refs } from '@/schema/reference';

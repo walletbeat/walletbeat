@@ -2,7 +2,7 @@ import type { EvaluationData } from '@/schema/attributes';
 import type { FundingValue } from '@/schema/attributes/transparency/funding';
 import type { Monetization } from '@/schema/features/transparency/monetization';
 
-import { component, type Content } from '../content';
+import { type Content, component } from '../content';
 
 export interface FundingDetailsProps extends EvaluationData<FundingValue> {
   monetization: Monetization;

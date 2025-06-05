@@ -3,9 +3,9 @@ import { erc4337 } from '@/data/eips/erc-4337';
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import {
@@ -16,7 +16,7 @@ import {
   type AccountTypeMutableMultifactor,
   isAccountTypeSupported,
 } from '@/schema/features/account-support';
-import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference';
+import { type ReferenceArray, mergeRefs, refs } from '@/schema/reference';
 import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content';
 
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips';

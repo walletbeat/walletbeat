@@ -1,9 +1,9 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { WalletProfile } from '@/schema/features/profile';
@@ -11,10 +11,10 @@ import type { ScamAlerts } from '@/schema/features/security/scam-alerts';
 import { isSupported, notSupported, supported } from '@/schema/features/support';
 import { markdown, paragraph, sentence } from '@/types/content';
 import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details';
-import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty';
+import { type NonEmptyArray, isNonEmptyArray } from '@/types/utils/non-empty';
 import { commaListFormat } from '@/types/utils/text';
 
-import { mergeRefs, type WithRef } from '../../reference';
+import { type WithRef, mergeRefs } from '../../reference';
 import { pickWorstRating, unrated } from '../common';
 
 export type ScamAlertSupport = WithRef<{

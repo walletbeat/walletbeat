@@ -1,17 +1,17 @@
 import { Tooltip, Typography } from '@mui/material';
-import { blend, ThemeProvider } from '@mui/system';
+import { ThemeProvider, blend } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 
+import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme';
 import { navigationListIconSize } from '@/components/constants';
 import { scrollPastHeaderPixels } from '@/components/navigation';
-import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme';
 import {
   variantFromUrlQuery,
   variantToIcon,
   variantToName,
   variantUrlQuery,
 } from '@/components/variants';
-import { allRatedWallets, type WalletName } from '@/data/wallets';
+import { type WalletName, allRatedWallets } from '@/data/wallets';
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
 import {
   type EvaluationTree,
@@ -20,12 +20,12 @@ import {
   mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups';
 import { borderRatingToColor, ratingToColor } from '@/schema/attributes';
-import { getSingleVariant, type Variant } from '@/schema/variants';
+import { type Variant, getSingleVariant } from '@/schema/variants';
 import { type ResolvedWallet, VariantSpecificity } from '@/schema/wallet';
 import type { Sentence } from '@/types/content';
 import {
-  isNonEmptyArray,
   type NonEmptyArray,
+  isNonEmptyArray,
   nonEmptyEntries,
   nonEmptyMap,
   nonEmptyValues,
@@ -37,8 +37,8 @@ import { ReturnToTop } from '@/ui/atoms/ReturnToTop';
 import { type PickableVariant, VariantPicker } from '@/ui/atoms/VariantPicker';
 import { WalletIcon } from '@/ui/atoms/WalletIcon';
 import { AttributeGroupBody } from '@/ui/molecules/AttributeGroupBody';
-import { WalletHeading } from '@/ui/molecules/wallet/heading/WalletHeading';
 import { WalletDropdown } from '@/ui/molecules/WalletDropdown';
+import { WalletHeading } from '@/ui/molecules/wallet/heading/WalletHeading';
 import type { NavigationItem } from '@/ui/organisms/Navigation';
 import { WalletAttribute } from '@/ui/organisms/WalletAttribute';
 

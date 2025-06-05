@@ -1,9 +1,9 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support';

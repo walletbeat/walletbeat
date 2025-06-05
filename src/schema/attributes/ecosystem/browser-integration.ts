@@ -5,18 +5,18 @@ import { eip6963 } from '@/data/eips/eip-6963';
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import {
+  type Support,
   featureSupported,
   isSupported,
   notSupported,
-  type Support,
 } from '@/schema/features/support';
-import { popRefs, type WithRef } from '@/schema/reference';
+import { type WithRef, popRefs } from '@/schema/reference';
 import { markdown, paragraph, sentence } from '@/types/content';
 import { commaListFormat } from '@/types/utils/text';
 

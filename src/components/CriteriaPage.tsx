@@ -16,9 +16,9 @@ import {
   mapNonExemptAttributeGroupsInTree,
   mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups';
-import { defaultRatingScore, Rating } from '@/schema/attributes';
+import { Rating, defaultRatingScore } from '@/schema/attributes';
 import type { RatedWallet } from '@/schema/wallet';
-import { mapWalletTypes, WalletType, walletTypeToUrlSlug } from '@/schema/wallet-types';
+import { WalletType, mapWalletTypes, walletTypeToUrlSlug } from '@/schema/wallet-types';
 import { RenderTypographicContent } from '@/ui/atoms/RenderTypographicContent';
 import type { NavigationGroup } from '@/ui/organisms/Navigation';
 import { cx } from '@/utils/cx';

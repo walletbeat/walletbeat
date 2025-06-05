@@ -4,7 +4,7 @@ import type {
   WalletAddressLinkableBy,
 } from '@/schema/attributes/privacy/address-correlation';
 
-import { component, type Content } from '../content';
+import { type Content, component } from '../content';
 import type { NonEmptyArray } from '../utils/non-empty';
 
 export interface AddressCorrelationDetailsProps extends EvaluationData<AddressCorrelationValue> {

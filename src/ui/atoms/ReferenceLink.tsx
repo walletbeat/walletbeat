@@ -1,10 +1,10 @@
 import {
   Divider,
-  styled,
   Tooltip,
-  tooltipClasses,
   type TooltipProps,
   Typography,
+  styled,
+  tooltipClasses,
 } from '@mui/material';
 import React from 'react';
 

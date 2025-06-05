@@ -97,7 +97,13 @@ export function AddressCorrelationDetails({
           By default, {wallet.metadata.displayName} allows your wallet address to be correlated with
           your personal information:
         </Typography>
-        <ul style={{ paddingLeft: '1.5rem', marginBottom: '0px', fontWeight: subsectionWeight }}>
+        <ul
+          style={{
+            paddingLeft: '1.5rem',
+            marginBottom: '0px',
+            fontWeight: subsectionWeight,
+          }}
+        >
           {leaksList}
         </ul>
       </WrapRatingIcon>

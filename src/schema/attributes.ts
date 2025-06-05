@@ -1,5 +1,5 @@
 import type { Content, Paragraph, Sentence, TypographicContent } from '@/types/content';
-import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty';
+import { type NonEmptyArray, type NonEmptyRecord, nonEmptyMap } from '@/types/utils/non-empty';
 
 import type { ResolvedFeatures } from './features';
 import type { FullyQualifiedReference, ReferenceArray } from './reference';

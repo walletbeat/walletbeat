@@ -1,14 +1,14 @@
 import {
+  type NonEmptyRecord,
+  type NonEmptySet,
   nonEmptyFilter,
   nonEmptyKeys,
   nonEmptyMap,
-  type NonEmptyRecord,
-  type NonEmptySet,
   nonEmptySetFromArray,
 } from '@/types/utils/non-empty';
 
-import { allVariants, Variant } from './variants';
-import { type BaseWallet, getWalletVariants, type RatedWallet } from './wallet';
+import { Variant, allVariants } from './variants';
+import { type BaseWallet, type RatedWallet, getWalletVariants } from './wallet';
 
 /**
  * A high-level wallet "type".

@@ -1,29 +1,29 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
-  exampleRatingUnimplemented,
   Rating,
   type Value,
+  exampleRating,
+  exampleRatingUnimplemented,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import {
-  compareLeakedInfo,
   type Endpoint,
-  inferLeaks,
   Leak,
   type LeakedInfo,
-  leakedInfoName,
-  leakedInfos,
   LeakedInfoType,
-  leakedInfoType,
   LeakedPersonalInfo,
   type Leaks,
+  compareLeakedInfo,
+  inferLeaks,
+  leakedInfoName,
+  leakedInfoType,
+  leakedInfos,
   leaksByDefault,
 } from '@/schema/features/privacy/data-collection';
 import { markdown, paragraph, sentence } from '@/types/content';
 import { addressCorrelationDetailsContent } from '@/types/content/address-correlation-details';
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty';
+import { type NonEmptyArray, isNonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty';
 
 import type { Entity } from '../../entity';
 import { type FullyQualifiedReference, type ReferenceArray, refs } from '../../reference';

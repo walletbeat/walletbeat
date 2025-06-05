@@ -6,7 +6,7 @@ import React from 'react';
 
 import { variantToName, variantToRunsOn } from '@/components/variants';
 import { HardwareIcon } from '@/icons/devices/HardwareIcon';
-import { hasVariant, Variant } from '@/schema/variants';
+import { Variant, hasVariant } from '@/schema/variants';
 import type { RatedWallet } from '@/schema/wallet';
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty';
 import { commaListPrefix } from '@/types/utils/text';
@@ -29,7 +29,11 @@ export const WalletHeading: FC<{
             <ExternalLink
               url={wallet.metadata.url}
               defaultLabel={`${wallet.metadata.displayName} website`}
-              style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+              style={{
+                fontWeight: 500,
+                color: 'var(--text-primary)',
+                fontSize: '0.9rem',
+              }}
             />
           </div>,
           wallet.metadata.repoUrl !== null ? (
@@ -38,7 +42,11 @@ export const WalletHeading: FC<{
               <ExternalLink
                 url={wallet.metadata.repoUrl}
                 defaultLabel='GitHub Repository'
-                style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.9rem' }}
+                style={{
+                  fontWeight: 500,
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                }}
               />
             </div>
           ) : undefined,

@@ -1,4 +1,4 @@
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty';
+import { type NonEmptyArray, isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty';
 
 /** A URL and a label. */
 export interface LabeledUrl {

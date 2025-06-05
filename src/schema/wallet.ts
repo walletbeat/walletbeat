@@ -2,30 +2,30 @@ import type { Paragraph, TypographicContent } from '@/types/content';
 import type { CalendarDate } from '@/types/date';
 import type { Dict } from '@/types/utils/dict';
 import {
-  isNonEmptyArray,
   type NonEmptyArray,
+  type NonEmptySet,
+  isNonEmptyArray,
   nonEmptyEntries,
   nonEmptyRemap,
-  type NonEmptySet,
   setItems,
   setUnion,
 } from '@/types/utils/non-empty';
 
 import {
+  type EvaluationTree,
   aggregateAttributes,
   evaluateAttributes,
-  type EvaluationTree,
   mapAttributesGetter,
 } from './attribute-groups';
 import { type Attribute, type EvaluatedAttribute, Rating, type Value } from './attributes';
 import type { WalletDeveloper } from './entity';
 import {
   type ResolvedFeatures,
-  resolveFeatures,
   type WalletBaseFeatures,
   type WalletEmbeddedFeatures,
   type WalletHardwareFeatures,
   type WalletSoftwareFeatures,
+  resolveFeatures,
 } from './features';
 import { type AccountType, supportedAccountTypes } from './features/account-support';
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile';
@@ -33,9 +33,9 @@ import type { Url } from './url';
 import {
   type AtLeastOneTrueVariant,
   type AtLeastOneVariant,
+  Variant,
   getVariants,
   hasVariant,
-  Variant,
 } from './variants';
 import { type WalletType, walletTypes } from './wallet-types';
 

@@ -1,9 +1,9 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import {
@@ -12,7 +12,7 @@ import {
   transactionSubmissionL2Types,
 } from '@/schema/features/self-sovereignty/transaction-submission';
 import { isSupported } from '@/schema/features/support';
-import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference';
+import { type ReferenceArray, mergeRefs, refs } from '@/schema/reference';
 import { markdown, paragraph, sentence } from '@/types/content';
 import { transactionInclusionDetailsContent } from '@/types/content/transaction-inclusion-details';
 import { isNonEmptyArray } from '@/types/utils/non-empty';

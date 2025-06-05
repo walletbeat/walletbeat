@@ -2,9 +2,9 @@ import { exampleSecurityAuditor } from '@/data/entities/example';
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits';
@@ -13,7 +13,7 @@ import { type AtLeastOneVariant, Variant } from '@/schema/variants';
 import { markdown, paragraph, sentence } from '@/types/content';
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details';
 import { daysSince } from '@/types/date';
-import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty';
+import { type NonEmptyArray, isNonEmptyArray } from '@/types/utils/non-empty';
 
 import { exempt, pickWorstRating, unrated } from '../common';
 

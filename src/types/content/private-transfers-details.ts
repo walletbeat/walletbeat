@@ -3,11 +3,11 @@ import type { PrivateTransfersValue } from '@/schema/attributes/privacy/private-
 import type { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy';
 
 import {
-  component,
   type ComponentAndProps,
   type Content,
-  isCustomContent,
   type Paragraph,
+  component,
+  isCustomContent,
 } from '../content';
 import type { Strings } from '../utils/string-templates';
 

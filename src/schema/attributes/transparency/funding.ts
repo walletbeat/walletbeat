@@ -1,16 +1,16 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
-  exampleRatingUnimplemented,
   Rating,
   type Value,
+  exampleRating,
+  exampleRatingUnimplemented,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import {
   type Monetization,
-  monetizationStrategies,
   type MonetizationStrategy,
+  monetizationStrategies,
   monetizationStrategyIsUserAligned,
   monetizationStrategyName,
 } from '@/schema/features/transparency/monetization';

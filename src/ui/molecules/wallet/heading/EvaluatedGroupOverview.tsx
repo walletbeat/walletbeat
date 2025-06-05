@@ -6,7 +6,7 @@ import {
   mapNonExemptGroupAttributes,
   numNonExemptGroupAttributes,
 } from '@/schema/attribute-groups';
-import { type EvaluatedGroup, ratingToColor, type ValueSet } from '@/schema/attributes';
+import { type EvaluatedGroup, type ValueSet, ratingToColor } from '@/schema/attributes';
 import type { HardwareWalletModel } from '@/schema/features/profile';
 import type { RatedWallet } from '@/schema/wallet';
 import { cx } from '@/utils/cx';

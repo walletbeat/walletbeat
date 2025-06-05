@@ -1,9 +1,9 @@
 import { sentence } from '@/types/content';
 import type { Dict } from '@/types/utils/dict';
 import {
+  type NonEmptyRecord,
   isNonEmptyArray,
   nonEmptyGet,
-  type NonEmptyRecord,
   nonEmptyRemap,
   nonEmptyValues,
 } from '@/types/utils/non-empty';
@@ -11,101 +11,101 @@ import {
 import {
   type Attribute,
   type AttributeGroup,
-  defaultRatingScore,
   type EvaluatedAttribute,
-  evaluatedAttributes,
   type EvaluatedGroup,
-  isExempt,
   Rating,
   type Value,
   type ValueSet,
+  defaultRatingScore,
+  evaluatedAttributes,
+  isExempt,
 } from './attributes';
 import {
-  accountAbstraction,
   type AccountAbstractionValue,
+  accountAbstraction,
 } from './attributes/ecosystem/account-abstraction';
 import {
-  addressResolution,
   type AddressResolutionValue,
+  addressResolution,
 } from './attributes/ecosystem/address-resolution';
 import {
-  browserIntegration,
   type BrowserIntegrationValue,
+  browserIntegration,
 } from './attributes/ecosystem/browser-integration';
 import {
-  addressCorrelation,
   type AddressCorrelationValue,
+  addressCorrelation,
 } from './attributes/privacy/address-correlation';
-import { hardwarePrivacy, type HardwarePrivacyValue } from './attributes/privacy/hardware-privacy';
+import { type HardwarePrivacyValue, hardwarePrivacy } from './attributes/privacy/hardware-privacy';
 import {
-  multiAddressCorrelation,
   type MultiAddressCorrelationValue,
+  multiAddressCorrelation,
 } from './attributes/privacy/multi-address-correlation';
 import {
-  privateTransfers,
   type PrivateTransfersValue,
+  privateTransfers,
 } from './attributes/privacy/private-transfers';
 import {
-  bugBountyProgram,
   type BugBountyProgramValue,
+  bugBountyProgram,
 } from './attributes/security/bug-bounty-program';
 import {
-  chainVerification,
   type ChainVerificationValue,
+  chainVerification,
 } from './attributes/security/chain-verification';
-import { firmware, type FirmwareValue } from './attributes/security/firmware';
+import { type FirmwareValue, firmware } from './attributes/security/firmware';
 import {
-  hardwareWalletDappSigning,
   type HardwareWalletDappSigningValue,
+  hardwareWalletDappSigning,
 } from './attributes/security/hardware-wallet-dapp-signing';
 import {
-  hardwareWalletSupport,
   type HardwareWalletSupportValue,
+  hardwareWalletSupport,
 } from './attributes/security/hardware-wallet-support';
-import { keysHandling, type KeysHandlingValue } from './attributes/security/keys-handling';
+import { type KeysHandlingValue, keysHandling } from './attributes/security/keys-handling';
 import {
-  passkeyImplementation,
   type PasskeyImplementationValue,
+  passkeyImplementation,
 } from './attributes/security/passkey-implementation';
-import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention';
-import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits';
+import { type ScamPreventionValue, scamPrevention } from './attributes/security/scam-prevention';
+import { type SecurityAuditsValue, securityAudits } from './attributes/security/security-audits';
 import {
-  softwareHWIntegration,
   type SoftwareHWIntegrationValue,
+  softwareHWIntegration,
 } from './attributes/security/software-hw-integration';
-import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy';
+import { type SupplyChainDIYValue, supplyChainDIY } from './attributes/security/supply-chain-diy';
 import {
-  supplyChainFactory,
   type SupplyChainFactoryValue,
+  supplyChainFactory,
 } from './attributes/security/supply-chain-factory';
-import { userSafety, type UserSafetyValue } from './attributes/security/user-safety';
+import { type UserSafetyValue, userSafety } from './attributes/security/user-safety';
 import {
-  accountPortability,
   type AccountPortabilityValue,
+  accountPortability,
 } from './attributes/self-sovereignty/account-portability';
 import {
-  interoperability,
   type InteroperabilityValue,
+  interoperability,
 } from './attributes/self-sovereignty/interoperability';
 import {
-  selfHostedNode,
   type SelfHostedNodeValue,
+  selfHostedNode,
 } from './attributes/self-sovereignty/self-hosted-node';
 import {
-  transactionInclusion,
   type TransactionInclusionValue,
+  transactionInclusion,
 } from './attributes/self-sovereignty/transaction-inclusion';
 import {
-  feeTransparency,
   type FeeTransparencyValue,
+  feeTransparency,
 } from './attributes/transparency/fee-transparency';
-import { funding, type FundingValue } from './attributes/transparency/funding';
-import { maintenance, type MaintenanceValue } from './attributes/transparency/maintenance';
-import { openSource, type OpenSourceValue } from './attributes/transparency/open-source';
-import { reputation, type ReputationValue } from './attributes/transparency/reputation';
+import { type FundingValue, funding } from './attributes/transparency/funding';
+import { type MaintenanceValue, maintenance } from './attributes/transparency/maintenance';
+import { type OpenSourceValue, openSource } from './attributes/transparency/open-source';
+import { type ReputationValue, reputation } from './attributes/transparency/reputation';
 import {
-  sourceVisibility,
   type SourceVisibilityValue,
+  sourceVisibility,
 } from './attributes/transparency/source-visibility';
 import type { ResolvedFeatures } from './features';
 import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score';

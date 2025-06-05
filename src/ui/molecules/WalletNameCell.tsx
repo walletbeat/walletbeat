@@ -10,9 +10,10 @@ import type { Variant } from '@/schema/variants';
 import type { ResolvedWallet } from '@/schema/wallet';
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty';
 
-import { expandedRowHeight, shortRowHeight } from '../../components/constants';
 import theme from '../../components/ThemeRegistry/theme';
+import { expandedRowHeight, shortRowHeight } from '../../components/constants';
 import { variantToIcon, variantToTooltip, variantUrlQuery } from '../../components/variants';
+import type { WalletRowStateHandle } from '../WalletTableState';
 import { ExternalLink } from '../atoms/ExternalLink';
 import { IconButton } from '../atoms/IconButton';
 import { IconLink } from '../atoms/IconLink';
@@ -20,7 +21,6 @@ import { RenderTypographicContent } from '../atoms/RenderTypographicContent';
 import { Tooltip } from '../atoms/Tooltip';
 import { type PickableVariant, VariantPicker } from '../atoms/VariantPicker';
 import { WalletIcon } from '../atoms/WalletIcon';
-import type { WalletRowStateHandle } from '../WalletTableState';
 
 const walletIconSize = shortRowHeight * 0.5;
 

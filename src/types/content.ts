@@ -9,7 +9,7 @@ import type { SecurityAuditsDetailsContent } from './content/security-audits-det
 import type { SourceVisibilityDetailsContent } from './content/source-visibility-details';
 import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details';
 import type { UnratedAttributeContent } from './content/unrated-attribute';
-import type { Strings as _Strings, ValidateText } from './utils/string-templates';
+import type { ValidateText, Strings as _Strings } from './utils/string-templates';
 import { trimWhitespacePrefix } from './utils/text';
 
 /**

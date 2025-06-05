@@ -8,8 +8,8 @@ import {
   worstPrivateTransfersPrivacyLevel,
 } from '@/schema/attributes/privacy/private-transfers';
 import {
-  isPrivateTransferTechnology,
   PrivateTransferTechnology,
+  isPrivateTransferTechnology,
 } from '@/schema/features/privacy/transaction-privacy';
 import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details';
 import { assertNonEmptyArray } from '@/types/utils/non-empty';

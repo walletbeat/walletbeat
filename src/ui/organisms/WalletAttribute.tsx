@@ -11,17 +11,17 @@ import {
 } from '@/schema/attributes';
 import { toFullyQualified } from '@/schema/reference';
 import type { Variant } from '@/schema/variants';
-import { getAttributeOverride, type RatedWallet, VariantSpecificity } from '@/schema/wallet';
-import { isTypographicContent, type Sentence, sentence } from '@/types/content';
+import { type RatedWallet, VariantSpecificity, getAttributeOverride } from '@/schema/wallet';
+import { type Sentence, isTypographicContent, sentence } from '@/types/content';
 import type { NonEmptyArray } from '@/types/utils/non-empty';
 import { AttributeMethodology } from '@/ui/molecules/attributes/AttributeMethodology';
 
+import { subsectionTheme } from '../../components/ThemeRegistry/theme';
 import {
   subsectionBorderRadius,
   subsectionIconWidth,
   subsectionWeight,
 } from '../../components/constants';
-import { subsectionTheme } from '../../components/ThemeRegistry/theme';
 import { variantToName } from '../../components/variants';
 import { type AccordionData, Accordions } from '../atoms/Accordions';
 import { ReferenceLinks } from '../atoms/ReferenceLinks';

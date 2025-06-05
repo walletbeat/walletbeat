@@ -1,6 +1,6 @@
 import { type Sentence, sentence } from '@/types/content';
 import { unratedAttributeContent } from '@/types/content/unrated-attribute';
-import { isNonEmptyArray, type NonEmptyArray, nonEmptyValues } from '@/types/utils/non-empty';
+import { type NonEmptyArray, isNonEmptyArray, nonEmptyValues } from '@/types/utils/non-empty';
 
 import {
   type Attribute,

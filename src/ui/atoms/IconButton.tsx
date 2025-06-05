@@ -1,4 +1,4 @@
-import { IconButton as OriginalIconButton, type IconButtonProps } from '@mui/material';
+import { type IconButtonProps, IconButton as OriginalIconButton } from '@mui/material';
 import type React from 'react';
 
 /**

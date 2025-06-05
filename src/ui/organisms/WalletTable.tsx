@@ -2,10 +2,10 @@ import {
   type Cell,
   type CellContext,
   type ColumnDef,
+  type Row,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  type Row,
   useReactTable,
 } from '@tanstack/react-table';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -27,7 +27,7 @@ import type { AttributeGroup, ValueSet } from '@/schema/attributes';
 import type { Eip } from '@/schema/eips';
 import { AccountType } from '@/schema/features/account-support';
 import { HardwareWalletManufactureType } from '@/schema/features/profile';
-import { hasVariant, Variant } from '@/schema/variants';
+import { Variant, hasVariant } from '@/schema/variants';
 import { type RatedWallet, walletSupportedAccountTypes } from '@/schema/wallet';
 import { type NonEmptySet, setContains } from '@/types/utils/non-empty';
 import { cx } from '@/utils/cx';

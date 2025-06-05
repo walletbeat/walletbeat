@@ -21,7 +21,10 @@ export function EipPreviewModal({
   onMouseLeave,
 }: EipPreviewModalProps): React.ReactElement | null {
   const modalRef = useRef<HTMLDivElement>(null);
-  const [popupPosition, setPopupPosition] = useState<{ top: number; left: number }>({
+  const [popupPosition, setPopupPosition] = useState<{
+    top: number;
+    left: number;
+  }>({
     top: 0,
     left: 0,
   });

@@ -8,8 +8,8 @@ import {
 import {
   type AttributeGroup,
   type EvaluatedGroup,
-  ratingToColor,
   type ValueSet,
+  ratingToColor,
 } from '@/schema/attributes';
 import type { RatedWallet } from '@/schema/wallet';
 import { cx } from '@/utils/cx';

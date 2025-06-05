@@ -1,4 +1,4 @@
-import { createTheme, type ThemeOptions as MaterialThemeOptions } from '@mui/material/styles';
+import { type ThemeOptions as MaterialThemeOptions, createTheme } from '@mui/material/styles';
 import { deepmerge } from '@mui/utils';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 

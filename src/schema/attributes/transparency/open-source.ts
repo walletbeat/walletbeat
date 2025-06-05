@@ -1,17 +1,17 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import {
   FOSS,
   License,
+  type LicenseWithRef,
   licenseIsFOSS,
   licenseName,
-  type LicenseWithRef,
 } from '@/schema/features/transparency/license';
 import { refs, toFullyQualified } from '@/schema/reference';
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
@@ -149,7 +149,9 @@ export const openSource: Attribute<OpenSourceValue> = {
   },
   evaluate: (features: ResolvedFeatures): Evaluation<OpenSourceValue> => {
     if (features.license === null) {
-      return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE });
+      return unrated(openSource, brand, {
+        license: License.UNLICENSED_VISIBLE,
+      });
     }
 
     const license = features.license.license;

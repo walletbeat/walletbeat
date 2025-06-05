@@ -1,9 +1,9 @@
 import type { AccountSupport } from './features/account-support';
 import {
-  notApplicableWalletIntegration,
   type ResolvedWalletIntegration,
-  resolveWalletIntegrationFeatures,
   type WalletIntegration,
+  notApplicableWalletIntegration,
+  resolveWalletIntegrationFeatures,
 } from './features/ecosystem/integration';
 import type { AddressResolution } from './features/privacy/address-resolution';
 import type { DataCollection } from './features/privacy/data-collection';
@@ -34,9 +34,9 @@ import type { ReputationSupport } from './features/transparency/reputation';
 import type { WithRef } from './reference';
 import {
   type ResolvedFeature,
-  resolveFeature,
   type Variant,
   type VariantFeature,
+  resolveFeature,
 } from './variants';
 
 /**

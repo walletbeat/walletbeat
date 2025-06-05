@@ -1,4 +1,4 @@
-import { type DomainUrl, isUrl, markdownUrlLink, type Url } from './url';
+import { type DomainUrl, type Url, isUrl, markdownUrlLink } from './url';
 
 export enum EntityType {
   chainDataProvider = 'chainDataProvider',

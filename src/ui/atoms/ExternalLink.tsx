@@ -3,7 +3,7 @@ import type React from 'react';
 import { useState } from 'react';
 import { LuExternalLink } from 'react-icons/lu';
 
-import { labeledUrl, type Url } from '@/schema/url';
+import { type Url, labeledUrl } from '@/schema/url';
 
 export function ExternalLink({
   url,

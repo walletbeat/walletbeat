@@ -5,7 +5,7 @@ import { LuChevronDown, LuKey, LuSearch, LuWallet } from 'react-icons/lu';
 
 import { allRatedWallets } from '@/data/wallets';
 import type { RatedWallet } from '@/schema/wallet';
-import { mapWalletTypes, WalletType } from '@/schema/wallet-types';
+import { WalletType, mapWalletTypes } from '@/schema/wallet-types';
 import { isNonEmptyArray, nonEmptyMap, setContains } from '@/types/utils/non-empty';
 import { cx } from '@/utils/cx';
 

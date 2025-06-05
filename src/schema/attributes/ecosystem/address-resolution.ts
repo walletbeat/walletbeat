@@ -3,9 +3,9 @@ import { erc7831 } from '@/data/eips/erc-7831';
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { type ReferenceArray, refs } from '@/schema/reference';
@@ -27,7 +27,10 @@ export type AddressResolutionValue = Value & {
 };
 
 function getOffchainProviderInfo(
-  support: AddressResolutionSupport & { support: 'SUPPORTED'; medium: 'OFFCHAIN' },
+  support: AddressResolutionSupport & {
+    support: 'SUPPORTED';
+    medium: 'OFFCHAIN';
+  },
 ): { rating: Rating; offchainInfo: string; walletShould?: string } {
   if (
     support.offchainDataVerifiability === 'VERIFIABLE' &&

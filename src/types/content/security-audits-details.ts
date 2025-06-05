@@ -1,7 +1,7 @@
 import type { EvaluationData } from '@/schema/attributes';
 import type { SecurityAuditsValue } from '@/schema/attributes/security/security-audits';
 
-import { component, type Content } from '../content';
+import { type Content, component } from '../content';
 
 export interface SecurityAuditsDetailsProps extends EvaluationData<SecurityAuditsValue> {
   auditedInLastYear: boolean;

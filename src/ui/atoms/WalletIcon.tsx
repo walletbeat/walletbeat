@@ -17,7 +17,9 @@ export function WalletIcon({
         width={iconSize}
         height={iconSize}
         src={`${betaImagesRoot}/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-        style={{ filter: `drop-shadow(0 0 ${iconSize / 6}px rgba(255, 255, 255, 0.1))` }}
+        style={{
+          filter: `drop-shadow(0 0 ${iconSize / 6}px rgba(255, 255, 255, 0.1))`,
+        }}
       />
     </div>
   );

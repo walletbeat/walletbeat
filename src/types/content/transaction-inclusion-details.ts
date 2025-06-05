@@ -5,7 +5,7 @@ import type {
 } from '@/schema/attributes/self-sovereignty/transaction-inclusion';
 import type { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
 
-import { component, type Content } from '../content';
+import { type Content, component } from '../content';
 
 export interface TransactionInclusionDetailsProps
   extends EvaluationData<TransactionInclusionValue> {

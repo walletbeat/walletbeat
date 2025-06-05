@@ -62,7 +62,10 @@ export const exampleSecurityAuditor: CorporateEntity & SecurityAuditor = {
 export const exampleCex: CorporateEntity & Exchange = {
   id: 'exampleCex',
   name: 'Example Centralized Exchange',
-  legalName: { name: 'Example Centralized Exchange Corp', soundsDifferent: false },
+  legalName: {
+    name: 'Example Centralized Exchange Corp',
+    soundsDifferent: false,
+  },
   type: {
     chainDataProvider: false,
     corporate: true,

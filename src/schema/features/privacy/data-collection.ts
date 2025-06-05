@@ -455,11 +455,17 @@ export function leakedInfoName(leakedInfo: LeakedInfo) {
     case LeakedWalletInfo.WALLET_ASSETS:
       return { short: 'wallet assets', long: 'wallet asset types' } as const;
     case LeakedWalletInfo.WALLET_BALANCE:
-      return { short: 'wallet balance', long: 'wallet assets and balances' } as const;
+      return {
+        short: 'wallet balance',
+        long: 'wallet assets and balances',
+      } as const;
     case LeakedWalletInfo.WALLET_ADDRESS:
       return { short: 'wallet address', long: 'wallet address' } as const;
     case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
-      return { short: 'outgoing transactions', long: 'outgoing wallet transactions' } as const;
+      return {
+        short: 'outgoing transactions',
+        long: 'outgoing wallet transactions',
+      } as const;
     case LeakedPersonalInfo.PSEUDONYM:
       return {
         short: '{{WALLET_PSEUDONYM_SINGULAR}}',
@@ -478,9 +484,15 @@ export function leakedInfoName(leakedInfo: LeakedInfo) {
     case LeakedPersonalInfo.CONTACTS:
       return { short: 'contacts', long: 'personal contact list' } as const;
     case LeakedPersonalInfo.PHYSICAL_ADDRESS:
-      return { short: 'physical address', long: 'geographical address' } as const;
+      return {
+        short: 'physical address',
+        long: 'geographical address',
+      } as const;
     case LeakedPersonalInfo.CEX_ACCOUNT:
-      return { short: 'CEX account', long: 'centralized exchange account' } as const;
+      return {
+        short: 'CEX account',
+        long: 'centralized exchange account',
+      } as const;
     case LeakedPersonalInfo.FACE:
       return { short: 'face', long: 'facial recognition data' } as const;
     case LeakedPersonalInfo.GOVERNMENT_ID:

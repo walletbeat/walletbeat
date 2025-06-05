@@ -9,8 +9,8 @@ import {
   unratedHardwareWallet,
 } from './hardware-wallets';
 import {
-  isValidSoftwareWalletName,
   type SoftwareWalletName,
+  isValidSoftwareWalletName,
   softwareWallets,
   unratedSoftwareWallet,
 } from './software-wallets';

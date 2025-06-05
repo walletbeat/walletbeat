@@ -2,9 +2,9 @@ import { Box, type BoxProps, type TypographyProps } from '@mui/material';
 import type React from 'react';
 
 import {
-  deriveMarkdownPropsFromTypography,
   MarkdownBase,
   type MarkdownOwnProps,
+  deriveMarkdownPropsFromTypography,
 } from './MarkdownBase';
 
 interface MarkdownBoxProps extends BoxProps, MarkdownOwnProps {

@@ -20,13 +20,13 @@ import type { CalendarDate } from '@/types/date';
 import { type NonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty';
 
 import {
+  type LabeledUrl,
+  type Url,
   getUrlLabel,
   isLabeledUrl,
   isUrl,
-  type LabeledUrl,
   labeledUrl,
   mergeLabeledUrls,
-  type Url,
 } from './url';
 
 /**

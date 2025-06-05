@@ -5,7 +5,7 @@ import MonitorIcon from '@mui/icons-material/Monitor';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 
-import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/variants';
+import { type AtLeastOneVariant, Variant, hasSingleVariant } from '@/schema/variants';
 
 /**
  * @returns An SVG icon representing the given variant.

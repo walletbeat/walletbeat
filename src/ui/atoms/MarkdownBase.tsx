@@ -1,4 +1,4 @@
-import { styled, Typography, type TypographyProps } from '@mui/material';
+import { Typography, type TypographyProps, styled } from '@mui/material';
 import { Box } from '@mui/system';
 import type React from 'react';
 import Markdown, { type Components } from 'react-markdown';

@@ -1,4 +1,5 @@
 import type { CustomContent } from '@/types/content';
+import { UnratedAttribute } from '@/ui/molecules/attributes/UnratedAttribute';
 import { AddressCorrelationDetails } from '@/ui/molecules/attributes/privacy/AddressCorrelationDetails';
 import { ChainVerificationDetails } from '@/ui/molecules/attributes/security/ChainVerificationDetails';
 import { ScamAlertDetails } from '@/ui/molecules/attributes/security/ScamAlertDetails';
@@ -7,7 +8,6 @@ import { TransactionInclusionDetails } from '@/ui/molecules/attributes/self-sove
 import { FundingDetails } from '@/ui/molecules/attributes/transparency/FundingDetails';
 import { LicenseDetails } from '@/ui/molecules/attributes/transparency/LicenseDetails';
 import { SourceVisibilityDetails } from '@/ui/molecules/attributes/transparency/SourceVisibilityDetails';
-import { UnratedAttribute } from '@/ui/molecules/attributes/UnratedAttribute';
 
 import { PrivateTransfersDetails } from '../molecules/attributes/privacy/PrivateTransfersDetails';
 

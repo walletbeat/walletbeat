@@ -5,10 +5,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import theme from '@/components/ThemeRegistry/theme';
 import type { NonEmptyArray } from '@/types/utils/non-empty';
 import {
-  isNavigationContentItem,
   Navigation,
   type NavigationGroup,
   type NavigationItem,
+  isNavigationContentItem,
 } from '@/ui/organisms/Navigation';
 
 const scrollNavigationMargin = 8;
@@ -197,7 +197,9 @@ export function NavigationPageLayout({
   const debouncedScrollHandler = useCallback(debounce(onScroll, 100), [onScroll]);
 
   useEffect(() => {
-    window.addEventListener('scroll', debouncedScrollHandler, { passive: true });
+    window.addEventListener('scroll', debouncedScrollHandler, {
+      passive: true,
+    });
 
     return () => {
       window.removeEventListener('scroll', debouncedScrollHandler);

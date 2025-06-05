@@ -1,9 +1,9 @@
 import {
   type Attribute,
   type Evaluation,
-  exampleRating,
   Rating,
   type Value,
+  exampleRating,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import {
@@ -323,7 +323,9 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
     const passkeyVerification = features.security.passkeyVerification;
 
     if (passkeyVerification === null) {
-      return unrated(passkeyImplementation, brand, { library: PasskeyVerificationLibrary.NONE });
+      return unrated(passkeyImplementation, brand, {
+        library: PasskeyVerificationLibrary.NONE,
+      });
     }
 
     // If the library is explicitly set to NONE, this means the wallet doesn't support passkeys
