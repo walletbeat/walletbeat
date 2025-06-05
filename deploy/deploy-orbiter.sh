@@ -8,7 +8,7 @@ if [[ -z "${ORBITER_DOMAIN:-}" ]]; then
 	exit 1
 fi
 if [[ -z "${DEPLOY_DIRECTORY:-}" ]]; then
-  echo 'Missing DEPLOY_DIRECTORY' >&2
+	echo 'Missing DEPLOY_DIRECTORY' >&2
 	exit 1
 fi
 if [[ -z "${ORBITER_ACCESS_TOKEN:-}" ]]; then
@@ -22,7 +22,7 @@ fi
 
 cat > "$HOME/.orbiter.json" <<EOF
 {
-  "access_token": "${ORBITER_ACCESS_TOKEN}",
+	"access_token": "${ORBITER_ACCESS_TOKEN}",
 	"created_at": "${ORBITER_ACCESS_TOKEN_CREATION_DATE}",
 	"keyType": "apikey"
 }

@@ -112,7 +112,7 @@ _Note: Fleek used to feature a free hosting tier which Walletbeat used for a whi
 - **Naming**: ✅ ENS
 - **Updates**: 🙁 Automated IPNS updates
 - **Access**: 🚧 Requires non-Fleek IPFS gateway
-  - **How can Fleek fix this**: Implement wallet-controlled accounts
+	- **How can Fleek fix this**: Implement wallet-controlled accounts
 - **Maintenance**: ✅ One-time CI/CD integration work
 - **Payments**: ✅ KYC-free crypto payments
 - **Special mentions**: _None_
@@ -135,13 +135,13 @@ Orbiter's gateway [returns IPFS CIDs in its HTTP responses](https://warpcast.com
 - **Naming**: ✅ ENS
 - **Updates**: ✅ Automated IPCM contract updates
 - **Access**: 🚧 Requires non-Orbiter IPFS gateway
-  - **How can Orbiter fix this**: Implement wallet-controlled accounts
+	- **How can Orbiter fix this**: Implement wallet-controlled accounts
 - **Maintenance**: ✅ One-time CI/CD integration work
 - **Payments**: ✅ KYC-free crypto payments
 - **Special mentions**:
-  - Gateway returns IPFS CIDs which is cool but not practically useful without further browser integration.
-  - All components are GPL-licensed.
-  - Potential privacy leak due to reliance on Orbiter's offchain resolver.
+	- Gateway returns IPFS CIDs which is cool but not practically useful without further browser integration.
+	- All components are GPL-licensed.
+	- Potential privacy leak due to reliance on Orbiter's offchain resolver.
 
 ### EarthFast
 
@@ -156,13 +156,13 @@ The service worker performs requests to EarthFast content nodes (e.g. `https://c
 Despite the promising technology it offers, this setup currently makes a number of (potentially fixable) compromises which weaken the promise of bringing end-to-end integrity verification to the browser:
 
 - The integrity verification is only TOFU-based. It should be possible to extend this further to secure the first load.
-  - **How to fix**: This can be done by using DNSLink for the root page, and SRI for securing the expected hash of the service worker code.
+	- **How to fix**: This can be done by using DNSLink for the root page, and SRI for securing the expected hash of the service worker code.
 - EarthFast content nodes are currently all operated by EarthFast-the-company. EarthFast is currently in testing, and non-EarthFast nodes are expected to be available in the future, reducing the reliance on EarthFast-the-company for EarthFast-served website, but this has not happened yet at time of writing.
-  - **How to fix**: Should happen naturally with time. It is also possible for Walletbeat to [run its own content nodes](https://docs.earthfast.com/node-operators/content-node-setup) to help with this in the meantime.
+	- **How to fix**: Should happen naturally with time. It is also possible for Walletbeat to [run its own content nodes](https://docs.earthfast.com/node-operators/content-node-setup) to help with this in the meantime.
 - EarthFast content nodes are fully trusted by the service worker code to return accurate content hashes. This means a compromised EarthFast node can still return a fake content hash and trick the service client into downloading a malicious version of site resources.
-  - **How to fix**: It is possible to remove this trust assumption by making EarthFast nodes return [light client proofs](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/) as part of its response to the service worker, such that the service worker can verify that these content hashes are indeed coming from fresh onchain data.
+	- **How to fix**: It is possible to remove this trust assumption by making EarthFast nodes return [light client proofs](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/) as part of its response to the service worker, such that the service worker can verify that these content hashes are indeed coming from fresh onchain data.
 - EarthFast domain nodes are currently all operated by EarthFast-the-company, and there does not appear to be a way for other entities to operate their own. This means EarthFast-the-company is in a position to take down or censor the site for first-time users, as well as collect analytics data for first-time visitors to the site.
-  - **How to fix**: Make it possible for other entities to operate their own domain nodes.
+	- **How to fix**: Make it possible for other entities to operate their own domain nodes.
 
 EarthFast currently only supports DNS names, so control over the domain cannot be fully decentralized.
 
@@ -171,17 +171,17 @@ _Note: EarthFast graciously hosts a copy of Walletbeat at `walletbeat.earthfast.
 #### EarthFast scorecard
 
 - **Hosting**:
-  - ⏳ Not-yet-decentralized content nodes
-  - ❌ Dependency on EarthFast-only domain nodes for first-time users
+	- ⏳ Not-yet-decentralized content nodes
+	- ❌ Dependency on EarthFast-only domain nodes for first-time users
 - **Naming**: ❌ DNS-only
 - **Updates**: ✅ Automated EarthFast contract updates
 - **Access**: 🙁 Requires DNS
 - **Maintenance**: ✅ One-time CI/CD integration work
-  - However, may need ongoing maintenance work in case Walletbeat needs to run its own content nodes to ensure sufficient decentralization.
+	- However, may need ongoing maintenance work in case Walletbeat needs to run its own content nodes to ensure sufficient decentralization.
 - **Payments**: ✅ Not yet required (service free to use until then), but planning to support KYC-free crypto payments.
 - **Special mentions**:
-  - Relies on non-standard solutions, i.e. not using IPFS for hosting, and not using ENS records or ERC-5219 for onchain CID storage.
-  - EarthFast is currently the closest practical solution to making end-to-end integrity verification happen, but important compromises remain.
+	- Relies on non-standard solutions, i.e. not using IPFS for hosting, and not using ENS records or ERC-5219 for onchain CID storage.
+	- EarthFast is currently the closest practical solution to making end-to-end integrity verification happen, but important compromises remain.
 
 ### Blumen
 
@@ -202,13 +202,13 @@ Blumen does not support [service-worker-based client-side integrity verification
 - **Updates**: ✅ Automated ENS content hash CID updates
 - **Access**: 🚧 Bring-your-own IPFS gateway
 - **Maintenance**:
-  - ✅ One-time CI/CD integration work
-  - ✅ One-time work to look for suitable IPFS providers
-  - 🚧 Semi-ongoing work either to keep the ENS-updating EOA funded, either to approve ENS updates via multisig
+	- ✅ One-time CI/CD integration work
+	- ✅ One-time work to look for suitable IPFS providers
+	- 🚧 Semi-ongoing work either to keep the ENS-updating EOA funded, either to approve ENS updates via multisig
 - **Payments**: ✅ Not a service, so no payments required
 - **Special mentions**:
-  - Support for Safe multisig proposals for ENS updates is a very cool feature.
-  - Support for Swarm helps mitigate [IPFS centralization concerns](https://docs.ipfs.tech/concepts/ipni/).
+	- Support for Safe multisig proposals for ENS updates is a very cool feature.
+	- Support for Swarm helps mitigate [IPFS centralization concerns](https://docs.ipfs.tech/concepts/ipni/).
 
 ### Edgeserver
 
@@ -232,17 +232,17 @@ Overall, Quilibrium offers a promising solution for decentralized hosting, thoug
 
 - **Hosting**: ✅ QStorage
 - **Naming**:
-  - ❌ DNS-only at this time
-  - ⏳ QNS on roadmap
+	- ❌ DNS-only at this time
+	- ⏳ QNS on roadmap
 - **Updates**: ✅ S3-like API or BYO node
 - **Access**: ✅ DNS name pointed at QStorage data
 - **Maintenance**:
-  - ✅ One-time CI/CD integration work
-  - 🚧 Potential semi-ongoing work to top up QStorage credits if exceeding free tier limits
+	- ✅ One-time CI/CD integration work
+	- 🚧 Potential semi-ongoing work to top up QStorage credits if exceeding free tier limits
 - **Payments**: ✨ KYC-free crypto payments on crypto rails
 - **Special mentions**:
-  - Very different but more crypto-native stack from all other options.
-  - Supports more complex sites than static sites like Walletbeat.
+	- Very different but more crypto-native stack from all other options.
+	- Supports more complex sites than static sites like Walletbeat.
 
 ## Summary
 
