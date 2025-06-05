@@ -90,7 +90,6 @@ html,
 body {
 	color: var(--text-primary) !important;
 	background-color: var(--background-secondary) !important;
-	background: var(--background-secondary) !important;
 	font-size: 16px !important;
 }
 
@@ -175,7 +174,7 @@ html.dark {
 
 code {
 	/* Why monospace twice? See https://github.com/necolas/normalize.css/issues/519#issuecomment-197131966 */
-	font-family: monospace, monospace;
+	font-family: monospace;
 }
 
 [cmdk-list] {
