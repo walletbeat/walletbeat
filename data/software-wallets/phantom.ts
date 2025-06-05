@@ -81,6 +81,7 @@ export const phantom: SoftwareWallet = {
 			dataCollection: null,
 			privacyPolicy: 'https://www.phantom.com/privacy',
 			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
 				stealthAddresses: notSupported,
 			},
 		},

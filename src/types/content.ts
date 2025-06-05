@@ -3,6 +3,7 @@ import type { AddressCorrelationDetailsContent } from './content/address-correla
 import type { ChainVerificationDetailsContent } from './content/chain-verification-details'
 import type { FundingDetailsContent } from './content/funding-details'
 import type { LicenseDetailsContent } from './content/license-details'
+import type { PrivateTransfersDetailsContent } from './content/private-transfers-details'
 import type { ScamAlertDetailsContent } from './content/scam-alert-details'
 import type { SecurityAuditsDetailsContent } from './content/security-audits-details'
 import type { SourceVisibilityDetailsContent } from './content/source-visibility-details'
@@ -33,6 +34,7 @@ export type ComponentAndProps =
 	| ChainVerificationDetailsContent
 	| FundingDetailsContent
 	| LicenseDetailsContent
+	| PrivateTransfersDetailsContent
 	| ScamAlertDetailsContent
 	| SecurityAuditsDetailsContent
 	| SourceVisibilityDetailsContent
@@ -66,6 +68,30 @@ export type CustomContent = {
 	component: ComponentAndProps
 }
 
+/** Type predicate for CustomContent. */
+export function isCustomContent(content: unknown): content is CustomContent {
+	if (typeof content !== 'object') {
+		return false
+	}
+
+	if (content === null) {
+		return false
+	}
+
+	if (!Object.hasOwn(content, 'component') || !Object.hasOwn(content, 'contentType')) {
+		return false
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe as we just determined it has the right properties. We will check the `contentType` value just after this.
+	const customContent = content as CustomContent
+
+	if (customContent.contentType !== ContentType.COMPONENT) {
+		return false
+	}
+
+	return true
+}
+
 /**
  * Typographic content that may be displayed on the UI.
  */
@@ -76,9 +102,7 @@ export type TypographicContent<Strings extends _Strings = null> =
 /**
  * Represents any type of content that may be displayed on the UI.
  */
-export type Content<Strings extends _Strings = null> =
-	| TypographicContent<Strings>
-	| CustomContent
+export type Content<Strings extends _Strings = null> = TypographicContent<Strings> | CustomContent
 
 /**
  * Type predicate for TypographicContent.
@@ -179,20 +203,6 @@ export function mdParagraph<Strings extends _Strings, _Text extends string = str
 }
 
 /**
- * Merge two objects that add up to a complete XY.
- */
-function mergeProps<XY extends object, X extends keyof XY>(
-	x: Pick<XY, X>,
-	y: Pick<XY, Exclude<keyof XY, X>>,
-): XY {
-	/* eslint-disable eslint-comments/no-unlimited-disable -- The set of ESLint failures on this next block varies depending on some versions. */
-	/* eslint-disable -- This is valid because xy is the union of two objects which add up to the set of keys in XY. */
-	const xy: XY = { ...x, ...y } as XY
-	/* eslint-enable */
-	return xy
-}
-
-/**
  * Custom content with a custom component type.
  */
 export function component<
@@ -203,12 +213,10 @@ export function component<
 >(componentName: C['component'], componentProps: Pick<C['componentProps'], B>): CustomContent {
 	return {
 		contentType: ContentType.COMPONENT,
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- This is actually not safe; `componentProps` is actually only a `Partial` version here. This is meant to be merged later when rendering to make a complete `componentProps`.
 		component: {
 			component: componentName,
 			componentProps,
-			// componentProps: {
-			// 	...mergeProps<C['componentProps'], B>(, input),
-			// },
 		} as C,
 	}
 }

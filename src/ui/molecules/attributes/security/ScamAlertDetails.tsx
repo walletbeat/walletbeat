@@ -13,23 +13,27 @@ import { WrapRatingIcon } from '../../../atoms/WrapRatingIcon'
 
 function listOrSingleText(prefix: string, items: Array<string | null>): React.ReactNode {
 	const filtered = items.filter(item => item !== null)
+
 	if (filtered.length === 1) {
 		const stripped = trimWhitespacePrefix(filtered[0]).trim()
+
 		return (
-			<Typography variant="body1">
+			<Typography variant='body1'>
 				{prefix} {stripped[0].toLocaleLowerCase() + stripped.slice(1)}.
 			</Typography>
 		)
 	}
+
 	return (
 		<>
-			<Typography variant="body1">{prefix}:</Typography>
+			<Typography variant='body1'>{prefix}:</Typography>
 			<ul>
 				{filtered.map(item => {
 					const stripped = trimWhitespacePrefix(item).trim()
+
 					return (
 						<li key={stripped}>
-							<Typography variant="body1">
+							<Typography variant='body1'>
 								{stripped[0].toUpperCase() + stripped.slice(1)}.
 							</Typography>
 						</li>
@@ -44,6 +48,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 	if (value.scamAlerts === null) {
 		throw new Error('Cannot render ScamAlertDetails for undefined data')
 	}
+
 	const scamUrlLeaks: string[] = isSupported(value.scamAlerts.scamUrlWarning)
 		? [
 				value.scamAlerts.scamUrlWarning.leaksIp ? 'your IP' : null,
@@ -62,6 +67,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 				})(),
 			].filter(val => val !== null)
 		: []
+
 	return (
 		<>
 			<WrapRatingIcon rating={value.rating}>
@@ -88,22 +94,25 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 						<li>
 							{isSupported(value.scamAlerts.sendTransactionWarning) ? (
 								<>
-									{listOrSingleText(`{{WALLET_NAME}} helps you stay safe when sending funds by`, [
-										value.scamAlerts.sendTransactionWarning.newRecipientWarning
-											? `
+									{listOrSingleText(
+										`${wallet.metadata.displayName} helps you stay safe when sending funds by`,
+										[
+											value.scamAlerts.sendTransactionWarning.newRecipientWarning
+												? `
 													warning you when sending funds to an address you have
 													not sent or received funds from in the past
 												`
-											: null,
-										value.scamAlerts.sendTransactionWarning.userWhitelist
-											? `
+												: null,
+											value.scamAlerts.sendTransactionWarning.userWhitelist
+												? `
 													Allowing you to build a contact book of addresses and
 													warning you when sending funds to addresses not in it
 												`
-											: null,
-									])}
+												: null,
+										],
+									)}
 									{!value.sendTransactionWarning.privacyPreserving && (
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											However, in doing so, it leaks{' '}
 											{commaListFormat([
 												value.scamAlerts.sendTransactionWarning.leaksUserIp ? 'your IP' : null,
@@ -120,12 +129,12 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 									{toFullyQualified(value.scamAlerts.sendTransactionWarning.ref).length > 0 && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.sendTransactionWarning.ref)}
-											explanation="References:"
+											explanation='References:'
 										/>
 									)}
 								</>
 							) : (
-								<Typography variant="body1">
+								<Typography variant='body1'>
 									{wallet.metadata.displayName} does not warn you when sending funds to suspicious
 									addresses.
 								</Typography>
@@ -137,7 +146,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 							{isSupported(value.scamAlerts.contractTransactionWarning) ? (
 								<>
 									{listOrSingleText(
-										`{{WALLET_NAME}} helps you stay safe when doing onchain transactions by`,
+										`${wallet.metadata.displayName} helps you stay safe when doing onchain transactions by`,
 										[
 											value.scamAlerts.contractTransactionWarning.contractRegistry
 												? `
@@ -159,7 +168,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 										],
 									)}
 									{!value.contractTransactionWarning.privacyPreserving && (
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											However, in doing so, it leaks{' '}
 											{commaListFormat([
 												value.scamAlerts.contractTransactionWarning.leaksUserIp ? 'your IP' : null,
@@ -177,12 +186,12 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 									{toFullyQualified(value.scamAlerts.contractTransactionWarning.ref).length > 0 && (
 										<ReferenceLinks
 											references={toFullyQualified(value.scamAlerts.contractTransactionWarning.ref)}
-											explanation="References:"
+											explanation='References:'
 										/>
 									)}
 								</>
 							) : (
-								<Typography variant="body1">
+								<Typography variant='body1'>
 									{wallet.metadata.displayName} does not warn you when making arbitrary onchain
 									transactions.
 								</Typography>
@@ -193,7 +202,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 						<li>
 							{isSupported(value.scamAlerts.scamUrlWarning) ? (
 								<>
-									<Typography variant="body1">
+									<Typography variant='body1'>
 										{wallet.metadata.displayName} helps you stay safe when connecting to onchain
 										apps by checking its URL against a set of known scam apps.
 										{!value.scamUrlWarning.privacyPreserving && (
@@ -211,7 +220,7 @@ export function ScamAlertDetails({ wallet, value }: ScamAlertDetailsProps): Reac
 									)}
 								</>
 							) : (
-								<Typography variant="body1">
+								<Typography variant='body1'>
 									{wallet.metadata.displayName} does not warn you when making arbitrary onchain
 									transactions.
 								</Typography>

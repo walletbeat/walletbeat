@@ -16,5 +16,6 @@ interface MarkdownTypographyProps extends TypographyProps, MarkdownOwnProps {
  */
 export function MarkdownTypography(props: MarkdownTypographyProps): React.JSX.Element {
 	const derivedMarkdownProps = deriveMarkdownPropsFromTypography(props, props)
+
 	return <MarkdownBase markdown={props.children.trim()} {...derivedMarkdownProps} />
 }

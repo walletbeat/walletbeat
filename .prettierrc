@@ -4,10 +4,10 @@
 	"printWidth": 100,
 	"tabWidth": 2,
 	"semi": false,
-	"jsxSingleQuote": false,
+	"jsxSingleQuote": true,
 	"bracketSameLine": false,
 	"arrowParens": "avoid",
-	"endOfLine": "auto",
+	"endOfLine": "lf",
 	"useTabs": true,
 	"plugins": ["prettier-plugin-astro", "prettier-plugin-curly"]
 }

@@ -21,10 +21,10 @@ export function ReferenceLinks({
 	}
 
 	return (
-		<div className="pt-2 mt-1 border-t border-gray-200 flex flex-col gap-1 text-primary">
+		<div className='pt-2 mt-1 border-t border-gray-200 flex flex-col gap-1 text-primary'>
 			{/* References header */}
 			<Typography
-				variant="caption"
+				variant='caption'
 				sx={{
 					display: 'flex',
 					alignItems: 'center',
@@ -38,18 +38,18 @@ export function ReferenceLinks({
 			</Typography>
 
 			{/* References content */}
-			<div className="flex flex-col gap-1">
+			<div className='flex flex-col gap-1'>
 				{references.map((ref, refIndex) => (
 					<div key={refIndex}>
 						{/* Reference links */}
-						<div className="flex flex-wrap gap-1 mb-1">
+						<div className='flex flex-wrap gap-1 mb-1'>
 							{ref.urls.map((url: LabeledUrl, urlIndex: number) => (
 								<Link
 									key={`${refIndex}-${urlIndex}`}
 									href={url.url}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="text-accent"
+									target='_blank'
+									rel='noopener noreferrer'
+									className='text-accent'
 									sx={{
 										display: 'inline-flex',
 										alignItems: 'center',
@@ -60,7 +60,7 @@ export function ReferenceLinks({
 										'&:hover': { textDecoration: 'underline' },
 									}}
 								>
-									<LinkIcon fontSize="inherit" />
+									<LinkIcon fontSize='inherit' />
 									{url.label}
 								</Link>
 							))}
@@ -69,7 +69,7 @@ export function ReferenceLinks({
 						{/* Reference explanation if available in the reference object */}
 						{ref.explanation !== undefined && ref.explanation !== '' && (
 							<Typography
-								variant="caption"
+								variant='caption'
 								sx={{
 									color: 'var(--text-primary)',
 									display: 'block',
@@ -89,7 +89,7 @@ export function ReferenceLinks({
 			{/* Global explanation if provided to the component */}
 			{explanation !== undefined && explanation !== '' && (
 				<Typography
-					variant="caption"
+					variant='caption'
 					sx={{
 						color: 'var(--text-primary)',
 						display: 'block',

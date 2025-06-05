@@ -5,11 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { navigationListIconSize } from '@/components/constants'
 import { scrollPastHeaderPixels } from '@/components/navigation'
 import theme, { subsectionTheme } from '@/components/ThemeRegistry/theme'
-import {
-	variantFromUrlQuery,
-	variantToName,
-	variantUrlQuery,
-} from '@/components/variants'
+import { variantFromUrlQuery, variantToName, variantUrlQuery } from '@/components/variants'
 import { variantToIcon } from '@/components/variants-react'
 import { allRatedWallets, type WalletName } from '@/data/wallets'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
@@ -22,6 +18,7 @@ import {
 import { borderRatingToColor, ratingToColor } from '@/schema/attributes'
 import { getSingleVariant, type Variant } from '@/schema/variants'
 import { type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
+import type { Sentence } from '@/types/content'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
@@ -64,6 +61,7 @@ function sectionHeaderId(section: Section): string {
 	if (section.subHeader !== null) {
 		return slugifyCamelCase(section.subHeader)
 	}
+
 	return slugifyCamelCase(section.header)
 }
 
@@ -74,10 +72,11 @@ function maybeAddCornerControl(
 	if (section.cornerControl === null) {
 		return anchorHeader
 	}
+
 	return (
-		<div key="sectionCornerControl" className="flex flex-row">
-			<div className="flex flex-col justify-center flex-1">{anchorHeader}</div>
-			<div className="flex flex-col justify-center flex-initial">{section.cornerControl}</div>
+		<div key='sectionCornerControl' className='flex flex-row'>
+			<div className='flex flex-col justify-center flex-1'>{anchorHeader}</div>
+			<div className='flex flex-col justify-center flex-initial'>{section.cornerControl}</div>
 		</div>
 	)
 }
@@ -93,7 +92,7 @@ interface FAQSchemaEntry {
 }
 
 // Function to generate FAQ structured data in LDJSON format
-function generateFaqSchema(sections: RichSection[]): string {
+function generateFaqSchema(sections: RichSection[], _walletName: string): string {
 	// Extract questions and answers from sections
 	const faqEntries: FAQSchemaEntry[] = []
 
@@ -112,7 +111,7 @@ function generateFaqSchema(sections: RichSection[]): string {
 							: 'Feature question'
 
 					// Get a reasonable answer text
-					const answerText = `{{WALLET_NAME}} supports this feature.`
+					const answerText = '{{WALLET_NAME}} supports this feature.'
 
 					// Add to FAQ entries
 					faqEntries.push({
@@ -142,20 +141,23 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 	const wallet = allRatedWallets[walletName]
 	const { singleVariant } = getSingleVariant(wallet.variants)
 	const [pickedVariant, setPickedVariant] = useState<Variant | null>(singleVariant)
+
 	useEffect(() => {
 		if (singleVariant !== null) {
 			return
 		}
+
 		setPickedVariant(variantFromUrlQuery(wallet.variants))
 	}, [singleVariant])
 	const updatePickedVariant = (variant: Variant | null): void => {
 		if (singleVariant !== null) {
 			return // If there is a single variant, do not pollute the URL with it.
 		}
+
 		window.history.replaceState(
 			null,
 			'',
-			`${window.location.pathname}${variantUrlQuery(wallet.variants, variant || undefined)}${window.location.hash}`,
+			`${window.location.pathname}${variantUrlQuery(wallet.variants, variant)}${window.location.hash}`,
 		)
 		setPickedVariant(variant)
 	}
@@ -165,12 +167,14 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			: wallet.variants[pickedVariant].attributes
 	const attrToRelevantVariants = new Map<string, NonEmptyArray<Variant>>()
 	let needsVariantFiltering = singleVariant === null
+
 	for (const [variant, variantSpecificityMap] of nonEmptyEntries<
 		Variant,
 		Map<string, VariantSpecificity>
 	>(wallet.variantSpecificity)) {
 		for (const [evalAttrId, variantSpecificity] of variantSpecificityMap.entries()) {
 			let relevantVariants: NonEmptyArray<Variant> | undefined = undefined
+
 			switch (variantSpecificity) {
 				case VariantSpecificity.ALL_SAME:
 					break // Nothing.
@@ -182,6 +186,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				default:
 					needsVariantFiltering = true
 					relevantVariants = attrToRelevantVariants.get(evalAttrId)
+
 					if (relevantVariants === undefined) {
 						attrToRelevantVariants.set(evalAttrId, [variant])
 					} else {
@@ -207,6 +212,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			),
 		},
 	]
+
 	mapNonExemptAttributeGroupsInTree(evalTree, (attrGroup, evalGroup) => {
 		const section = {
 			header: attrGroup.id,
@@ -217,9 +223,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 			caption: (
 				<RenderTypographicContent
 					content={attrGroup.perWalletQuestion}
-					strings={{
-						WALLET_NAME: wallet.metadata.displayName,
-					}}
+					strings={{ WALLET_NAME: wallet.metadata.displayName }}
 					typography={{
 						variant: 'caption',
 						fontStyle: 'italic',
@@ -251,20 +255,22 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							),
 						}
 					}
+
 					if (relevantVariants.length === 1) {
 						const VariantIcon = variantToIcon(relevantVariants[0])
+
 						return {
 							cornerControl: (
 								<Tooltip
 									title={`Only rated on the ${variantToName(relevantVariants[0], false)} version`}
 									arrow={true}
 								>
-									<div key="variantSpecificEval" className="flex flex-row items-center gap-2">
-										<Typography variant="caption" sx={{ opacity: 0.7 }}>
+									<div key='variantSpecificEval' className='flex flex-row items-center gap-2'>
+										<Typography variant='caption' sx={{ opacity: 0.7 }}>
 											Only
 										</Typography>
 										<Typography
-											variant="caption"
+											variant='caption'
 											sx={{
 												opacity: 0.7,
 												lineHeight: 1,
@@ -288,20 +294,23 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							),
 						}
 					}
+
 					const pickerVariants = nonEmptyValues<Variant, ResolvedWallet>(wallet.variants).filter(
 						resolvedWallet =>
 							resolvedWallet.variant === pickedVariant ||
 							relevantVariants.includes(resolvedWallet.variant),
 					)
+
 					if (!isNonEmptyArray(pickerVariants)) {
 						throw new Error(
 							`Found no relevant variants to pick from in ${wallet.metadata.id} with picked variant ${pickedVariant}`,
 						)
 					}
+
 					return {
 						cornerControl: (
-							<div key="variantSpecificEval" className="flex flex-row items-center gap-2">
-								<Typography variant="caption" sx={{ opacity: 0.7 }}>
+							<div key='variantSpecificEval' className='flex flex-row items-center gap-2'>
+								<Typography variant='caption' sx={{ opacity: 0.7 }}>
 									{pickedVariant === null ? 'Version' : 'Viewing'}:
 								</Typography>
 								<VariantPicker
@@ -313,6 +322,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 												evalAttr,
 												variantWallet.attributes,
 											).evaluation.value.rating
+
 											return {
 												id: variantWallet.variant,
 												icon: variantToIcon(variantWallet.variant),
@@ -351,6 +361,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 						),
 					}
 				})()
+
 				return {
 					header: slugifyCamelCase(attrGroup.id),
 					subHeader: slugifyCamelCase(evalAttr.attribute.id),
@@ -369,7 +380,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 						backgroundColor: 'var(--background-primary)',
 					},
 					caption: (
-						<RenderTypographicContent
+						<RenderTypographicContent<Sentence<{ WALLET_NAME: string }>>
 							content={evalAttr.attribute.question}
 							strings={{
 								WALLET_NAME: wallet.metadata.displayName,
@@ -384,6 +395,7 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				}
 			}).filter(subsection => subsection !== null),
 		}
+
 		if (section.subsections.length > 0) {
 			sections.push(section)
 		}
@@ -391,9 +403,11 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 	const scrollMarginTop = `${headerBottomMargin + scrollPastHeaderPixels}px`
 
 	const nonHeaderSections: RichSection[] = sections.slice(1)
+
 	if (!isNonEmptyArray(nonHeaderSections)) {
 		throw new Error('No non-header sections defined for navigation')
 	}
+
 	return (
 		<NavigationPageLayout
 			prefix={<WalletDropdown wallet={wallet} />}
@@ -404,14 +418,14 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 						nonHeaderSections,
 						(section): NavigationItem => ({
 							id: sectionHeaderId(section),
-							icon: typeof section.icon === 'function' ? section.icon : undefined,
+							icon: section.icon,
 							title: section.title,
 							contentId: sectionHeaderId(section),
 							children:
 								section.subsections !== undefined && isNonEmptyArray(section.subsections)
 									? nonEmptyMap(section.subsections, subsection => ({
 											id: sectionHeaderId(subsection),
-											icon: typeof subsection.icon === 'function' ? subsection.icon : undefined,
+											icon: subsection.icon,
 											title: subsection.title,
 											contentId: sectionHeaderId(subsection),
 										}))
@@ -426,39 +440,39 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 				// 	overflow: false,
 				// },
 			]}
-			stickyHeaderId="walletHeader"
+			stickyHeaderId='walletHeader'
 			stickyHeaderMargin={0}
 			contentDependencies={[wallet, pickedVariant]}
 		>
 			{/* Add structured data for FAQs */}
 			<script
-				type="application/ld+json"
+				type='application/ld+json'
 				dangerouslySetInnerHTML={{
-					__html: generateFaqSchema(sections),
+					__html: generateFaqSchema(sections, wallet.metadata.displayName),
 				}}
 			/>
 
 			<ReturnToTop />
-			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
-				<div className="flex flex-col lg:mt-10 gap-4">
-					<div className="flex flex-row">
-						<div className="flex-1 min-w-0">
+			<div className='max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full'>
+				<div className='flex flex-col lg:mt-10 gap-4'>
+					<div className='flex flex-row'>
+						<div className='flex-1 min-w-0'>
 							<div style={{ height: headerBottomMargin }}></div>
-							<div className="px-8">
+							<div className='px-8'>
 								<Typography
-									variant="h4"
-									component="h1"
-									display="flex"
-									flexDirection="row"
-									alignItems="center"
-									gap="12px"
+									variant='h4'
+									component='h1'
+									display='flex'
+									flexDirection='row'
+									alignItems='center'
+									gap='12px'
 									sx={{
 										fontSize: '2.25rem', // equivalent to text-4xl
 										color: 'var(--text-primary)',
 									}}
 								>
 									<WalletIcon
-										key="walletIcon"
+										key='walletIcon'
 										wallet={wallet}
 										iconSize={navigationListIconSize * 2}
 									/>
@@ -468,38 +482,38 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 							{nonEmptyMap(sections, (section, index) => (
 								<React.Fragment key={sectionHeaderId(section)}>
 									{index > 0 ? (
-										<div key="sectionDivider" className="w-4/5 mx-auto mt-6 mb-6 border-b" />
+										<div key='sectionDivider' className='w-4/5 mx-auto mt-6 mb-6 border-b' />
 									) : null}
 									<div
-										key="sectionContainer"
-										className="p-4 flex flex-col gap-4"
+										key='sectionContainer'
+										className='p-4 flex flex-col gap-4'
 										style={section.css}
 									>
-										<div key="sectionCornerControl" className="flex flex-row">
-											<div className="flex flex-col justify-center flex-1">
+										<div key='sectionCornerControl' className='flex flex-row'>
+											<div className='flex flex-col justify-center flex-1'>
 												<AnchorHeader
-													key="sectionHeader"
+													key='sectionHeader'
 													id={sectionHeaderId(section)}
 													sx={{ scrollMarginTop }}
-													variant="h4"
-													component="h2"
-													marginBottom="0"
-													fontSize="2rem"
-													fontWeight="700"
+													variant='h4'
+													component='h2'
+													marginBottom='0'
+													fontSize='2rem'
+													fontWeight='700'
 													paddingLeft={theme.spacing(2)}
 													paddingRight={theme.spacing(2)}
 												>
 													{section.title}
 												</AnchorHeader>
 											</div>
-											<div className="flex flex-col justify-center flex-initial mr-4">
+											<div className='flex flex-col justify-center flex-initial mr-4'>
 												{section.cornerControl}
 											</div>
 										</div>
 										{section.caption === null ? null : (
 											<div
-												key="sectionCaption"
-												className="mb-4 opacity-80"
+												key='sectionCaption'
+												className='mb-4 opacity-80'
 												style={{
 													marginLeft: '16px',
 												}}
@@ -509,8 +523,8 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 										)}
 										{section.body === null ? null : (
 											<div
-												key="sectionBody"
-												className="text-primary px-4"
+												key='sectionBody'
+												className='text-primary px-4'
 												// paddingTop={theme.spacing(2)}
 											>
 												{section.body}
@@ -519,29 +533,29 @@ export function WalletPage({ walletName }: { walletName: WalletName }): React.JS
 										{section.subsections?.map(subsection => (
 											<div
 												key={sectionHeaderId(subsection)}
-												className="flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border"
+												className='flex flex-col p-6 mt-0 mr-4 mb-4 ml-4 rounded-md border'
 												style={subsection.css}
 											>
 												<ThemeProvider theme={subsectionTheme}>
 													{maybeAddCornerControl(
 														subsection,
 														<AnchorHeader
-															key="subsectionHeader"
+															key='subsectionHeader'
 															id={sectionHeaderId(subsection)}
 															sx={{ scrollMarginTop }}
-															variant="h3"
-															marginBottom=".3rem"
+															variant='h3'
+															marginBottom='.3rem'
 														>
 															{subsection.title}
 														</AnchorHeader>,
 													)}
 													{subsection.caption === null ? null : (
-														<div key="subsectionCaption" className="mb-8 opacity-80">
+														<div key='subsectionCaption' className='mb-8 opacity-80'>
 															{subsection.caption}
 														</div>
 													)}
 													{subsection.body === null ? null : (
-														<div key="subsectionBody">{subsection.body}</div>
+														<div key='subsectionBody'>{subsection.body}</div>
 													)}
 												</ThemeProvider>
 											</div>

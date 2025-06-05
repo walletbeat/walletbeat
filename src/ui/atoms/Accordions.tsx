@@ -35,6 +35,7 @@ export function Accordions({
 					index === accordions.length - 1 ||
 					expanded[accordions[index + 1].id] ||
 					expanded[accordion.id]
+
 				return (
 					<Accordion
 						key={accordion.id}
@@ -60,7 +61,7 @@ export function Accordions({
 						<AccordionSummary
 							key={`${accordion.id}-summary`}
 							expandIcon={
-								<div className="text-base text-primary">
+								<div className='text-base text-primary'>
 									<LuChevronDown />
 								</div>
 							}

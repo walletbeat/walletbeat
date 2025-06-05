@@ -2,7 +2,7 @@ import cx from 'classnames'
 import type { ReactElement } from 'react'
 import { LuInfo } from 'react-icons/lu'
 
-import { getAttributeGroupInTree, calculateAttributeGroupScore } from '@/schema/attribute-groups'
+import { calculateAttributeGroupScore, getAttributeGroupInTree } from '@/schema/attribute-groups'
 import type { AttributeGroup, ValueSet } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
 import { Tooltip } from '@/ui/atoms/Tooltip'
@@ -33,7 +33,7 @@ export function WalletSectionSummary<Vs extends ValueSet>(props: {
 				<div className={cx('flex flex-row gap-2 items-center w-fit p-2', color)}>
 					{percentageScore}
 					{score.hasUnratedComponent && (
-						<Tooltip content="This attribute group contains unrated components.">
+						<Tooltip content='This attribute group contains unrated components.'>
 							<LuInfo />
 						</Tooltip>
 					)}

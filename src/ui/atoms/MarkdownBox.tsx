@@ -16,8 +16,9 @@ interface MarkdownBoxProps extends BoxProps, MarkdownOwnProps {
  * Styled Markdown Box.
  */
 export function MarkdownBox(props: MarkdownBoxProps): React.JSX.Element {
-	const { markdownTransform, pTypography, pSpacing, liSpacing, ...boxProps } = props
+	const { pTypography, ...boxProps } = props
 	const derivedMarkdownProps = deriveMarkdownPropsFromTypography(pTypography, props)
+
 	return (
 		<Box {...boxProps}>
 			<MarkdownBase markdown={props.children} {...derivedMarkdownProps} />

@@ -1,6 +1,6 @@
 import type { ListItemButton } from '@mui/material'
 import type { Box } from '@mui/system'
-import React, { memo, useState } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { LuMenu, LuX } from 'react-icons/lu'
 
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
@@ -20,7 +20,7 @@ interface NavigationItemBase {
 	/**
 	 * Item icon shown next to the item name in the navigation menu.
 	 */
-	icon?: string | { raw: string } | React.FC
+	icon?: React.ReactNode
 
 	/**
 	 * Item name in the navigation menu.
@@ -100,8 +100,8 @@ export interface NavigationGroup {
 function SingleListItemIcon({ children }: { children: React.ReactNode }): React.JSX.Element {
 	return (
 		<span
-			key="listItemIcon"
-			className="inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1"
+			key='listItemIcon'
+			className='inline-block min-w-[20px] w-[20px] h-[20px] text-center mr-1'
 		>
 			{children}
 		</span>
@@ -114,16 +114,18 @@ interface NavigationItemProps {
 	depth: 'primary' | 'secondary'
 	selectedItemId?: string
 	selectedGroupId?: string
-	onContentItemClick?: (item: NavigationContentItem) => void
+	onContentItemClick?: (_item: NavigationContentItem) => void
 }
 
 function itemOrChildMatches(item: NavigationItem, selectedItemId?: string): boolean {
 	if (selectedItemId == null) {
 		return false
 	}
+
 	if (item.id === selectedItemId) {
 		return true
 	}
+
 	return (item.children ?? []).some(child => itemOrChildMatches(child, selectedItemId))
 }
 
@@ -140,23 +142,35 @@ const NavigationItem = memo(
 		const shouldHighlight = item.id === selectedItemId && selectedGroupId !== undefined
 		const initiallyOpen = itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined
 		const [isOpen, setIsOpen] = useState(initiallyOpen)
-		React.useEffect(() => {
+
+		// Use useEffect to handle changes to selectedItemId
+		useEffect(() => {
 			if (itemOrChildMatches(item, selectedItemId) && selectedGroupId !== undefined) {
 				setIsOpen(true)
 			}
 		}, [selectedItemId, item, selectedGroupId])
-		const linkStyles = cx(
-			'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
-			shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-backgroundSecondary',
-		)
-		const hasChildren = (item.children?.length ?? 0) > 0
 
-		const toggleDropdown = (e: React.MouseEvent): void => {
-			if (hasChildren) {
-				e.preventDefault()
-				setIsOpen(!isOpen)
-			}
-		}
+		// Memoize link styles to prevent recalculations
+		const linkStyles = useMemo(
+			() =>
+				cx(
+					'whitespace-nowrap flex flex-row items-center gap-2 py-1.5 px-2 rounded-md',
+					shouldHighlight ? 'bg-accent text-inverse font-semibold' : 'hover:bg-background',
+				),
+			[shouldHighlight],
+		)
+
+		const hasChildren = useMemo(() => (item.children?.length ?? 0) > 0, [item.children])
+
+		const toggleDropdown = useCallback(
+			(e: React.MouseEvent): void => {
+				if (hasChildren) {
+					e.preventDefault()
+					setIsOpen(!isOpen)
+				}
+			},
+			[hasChildren, isOpen],
+		)
 
 		const ButtonComponent = ({
 			children,
@@ -172,77 +186,68 @@ const NavigationItem = memo(
 					>
 						{children}
 						{hasChildren && (
-							<span className="">
+							<span className=''>
 								<svg
-									stroke="currentColor"
-									fill="none"
-									strokeWidth="2"
-									viewBox="0 0 24 24"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									height="1em"
-									width="1em"
-									xmlns="http://www.w3.org/2000/svg"
+									stroke='currentColor'
+									fill='none'
+									strokeWidth='2'
+									viewBox='0 0 24 24'
+									strokeLinecap='round'
+									strokeLinejoin='round'
+									height='1em'
+									width='1em'
+									xmlns='http://www.w3.org/2000/svg'
 									className={cx('transition-transform', isOpen ? '' : 'rotate-90')}
 								>
-									<polyline points="6 9 12 15 18 9"></polyline>
+									<polyline points='6 9 12 15 18 9'></polyline>
 								</svg>
 							</span>
 						)}
 					</a>
 				)
 			}
+
 			if (isNavigationLinkItem(item)) {
 				return (
 					<a
 						href={hasChildren ? '#' : item.href}
 						target={!hasChildren && item.href.startsWith('https://') ? '_blank' : undefined}
-						rel="noreferrer"
+						rel='noreferrer'
 						className={linkStyles}
 						onClick={toggleDropdown}
 					>
 						{children}
 						{hasChildren && (
-							<span className="ml-auto">
+							<span className=''>
 								<svg
-									stroke="currentColor"
-									fill="none"
-									strokeWidth="2"
-									viewBox="0 0 24 24"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									height="1em"
-									width="1em"
-									xmlns="http://www.w3.org/2000/svg"
+									stroke='currentColor'
+									fill='none'
+									strokeWidth='2'
+									viewBox='0 0 24 24'
+									strokeLinecap='round'
+									strokeLinejoin='round'
+									height='1em'
+									width='1em'
+									xmlns='http://www.w3.org/2000/svg'
 									className={cx('transition-transform', isOpen ? 'rotate-180' : '')}
 								>
-									<polyline points="6 9 12 15 18 9"></polyline>
+									<polyline points='6 9 12 15 18 9'></polyline>
 								</svg>
 							</span>
 						)}
 					</a>
 				)
 			}
+
 			throw new Error('Invalid navigation item')
 		}
+
 		return (
 			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				{/* {selectedItemId} - {selectedGroupId} */}
-				<ButtonComponent key="buttonComponent">
-					{item.icon ? (
-						<SingleListItemIcon key="icon">
-							{typeof item.icon === 'string' ? (
-								item.icon.length <= 2 ? (
-									item.icon
-								) : (
-									<img src={item.icon} />
-								)
-							) : 'raw' in item.icon ? (
-								<span dangerouslySetInnerHTML={{ __html: item.icon.raw }} />
-							) : (
-								<item.icon />
-							)}
-						</SingleListItemIcon>
+				<ButtonComponent key='buttonComponent'>
+					{item.icon !== undefined ? (
+						<SingleListItemIcon key='icon'>{item.icon}</SingleListItemIcon>
 					) : null}
 					<span>{item.title}</span>
 				</ButtonComponent>
@@ -259,7 +264,7 @@ const NavigationItem = memo(
 							<NavigationItem
 								key={`subitem-${subitem.id}`}
 								item={subitem}
-								depth="secondary"
+								depth='secondary'
 								active={active}
 								selectedItemId={selectedItemId}
 								selectedGroupId={selectedGroupId}
@@ -283,20 +288,21 @@ interface NavigationGroupProps {
 	group: NavigationGroup
 	groupIndex: number
 	activeItemId?: string
-	onContentItemClick?: (item: NavigationContentItem) => void
+	onContentItemClick?: (_item: NavigationContentItem) => void
 	selectedItemId?: string
 	selectedGroupId?: string
 }
 
 export const NavigationGroup = memo(
-	function NavigationGroup({
+	({
 		group,
 		activeItemId,
 		onContentItemClick,
 		selectedItemId,
 		selectedGroupId,
-	}: NavigationGroupProps): React.JSX.Element {
+	}: NavigationGroupProps): React.JSX.Element => {
 		const isSelectedGroup = group.id === selectedGroupId
+
 		return (
 			<>
 				<ul className={cx('flex flex-col gap-0 p-0 m-0')} id={`navigationGroup-${group.id}`}>
@@ -306,7 +312,7 @@ export const NavigationGroup = memo(
 								key={`item-${item.id}`}
 								item={item}
 								active={activeItemId === item.id}
-								depth="secondary"
+								depth='secondary'
 								selectedItemId={isSelectedGroup ? selectedItemId : undefined}
 								selectedGroupId={isSelectedGroup ? selectedGroupId : undefined}
 								onContentItemClick={onContentItemClick}
@@ -324,12 +330,15 @@ export const NavigationGroup = memo(
 		if (prevProps.group !== nextProps.group) {
 			return false
 		}
+
 		if (prevProps.groupIndex !== nextProps.groupIndex) {
 			return false
 		}
+
 		if (prevProps.onContentItemClick !== nextProps.onContentItemClick) {
 			return false
 		}
+
 		if (
 			prevProps.activeItemId === nextProps.activeItemId &&
 			prevProps.selectedItemId === nextProps.selectedItemId &&
@@ -337,6 +346,7 @@ export const NavigationGroup = memo(
 		) {
 			return true
 		}
+
 		// Check if active item ID or selected item ID is one of the sub-items of this group.
 		for (const props of [prevProps, nextProps]) {
 			for (const item of props.group.items) {
@@ -347,6 +357,7 @@ export const NavigationGroup = memo(
 				) {
 					return false
 				}
+
 				for (const subItem of item.children ?? []) {
 					if (
 						subItem.id === props.activeItemId ||
@@ -358,6 +369,7 @@ export const NavigationGroup = memo(
 				}
 			}
 		}
+
 		return true
 	},
 )
@@ -376,7 +388,7 @@ export function Navigation({
 	groups: NonEmptyArray<NavigationGroup>
 	activeItemId?: string
 	flex?: React.ComponentProps<typeof Box>['flex']
-	onContentItemClick?: (item: NavigationContentItem) => void
+	onContentItemClick?: (_item: NavigationContentItem) => void
 	prefix?: React.ReactNode
 	selectedItemId?: string
 	selectedGroupId?: string
@@ -386,6 +398,7 @@ export function Navigation({
 	// Toggle menu
 	const toggleMenu = (): void => {
 		setIsOpen(!isOpen)
+
 		// Toggle body scroll lock when the mobile menu is toggled
 		if (!isOpen) {
 			document.body.style.overflow = 'hidden'
@@ -394,27 +407,35 @@ export function Navigation({
 		}
 	}
 
+	// Ensure body overflow is reset when component unmounts
+	React.useEffect(
+		() => () => {
+			document.body.style.overflow = ''
+		},
+		[],
+	)
+
 	return (
 		<>
 			{/* Fixed top bar for mobile */}
-			<div className="lg:hidden fixed top-0 left-0 right-0 flex justify-between items-center px-4 bg-background z-50 border-b border-borderColor h-16">
-				<a href="/" className="flex items-center">
+			<div className='lg:hidden fixed top-0 left-0 right-0 flex justify-between items-center px-4 bg-background z-50 border-b border-borderColor h-16'>
+				<a href='/' className='flex items-center'>
 					<img
-						src="/logo-light.svg"
-						alt="WalletBeat Logo"
-						className="h-8 w-auto block dark:hidden transition-all"
+						src='/logo-light.svg'
+						alt='WalletBeat Logo'
+						className='h-8 w-auto block dark:hidden transition-all'
 					/>
 					<img
-						src="/logo-dark.svg"
-						alt="WalletBeat Logo"
-						className="h-8 w-auto hidden dark:block transition-all"
+						src='/logo-dark.svg'
+						alt='WalletBeat Logo'
+						className='h-8 w-auto hidden dark:block transition-all'
 					/>
 				</a>
-				<div className="flex items-center gap-2 h-[34px]">
+				<div className='flex items-center gap-2 h-[34px]'>
 					<ThemeSwitcher />
 					<button
 						onClick={toggleMenu}
-						className="btn"
+						className='btn'
 						aria-label={isOpen ? 'Close menu' : 'Open menu'}
 					>
 						{isOpen ? <LuX size={16} /> : <LuMenu size={16} />}
@@ -423,11 +444,11 @@ export function Navigation({
 			</div>
 
 			{/* Placeholder div to push content down on mobile */}
-			<div className="lg:hidden h-16"></div>
+			<div className='lg:hidden h-16'></div>
 
 			{/* Navigation sidebar - desktop behavior differs from mobile */}
 			<div
-				key="navigationBox"
+				key='navigationBox'
 				className={cx(
 					/* Base styles */
 					'fixed lg:relative h-full z-40 flex flex-col gap-0 overflow-y-auto',
@@ -451,30 +472,30 @@ export function Navigation({
 				)}
 			>
 				{/* Logo area */}
-				<div className="flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-16 lg:pt-0 h-[34px]">
-					<a href="/" className="hidden lg:flex items-center">
+				<div className='flex justify-between items-center w-full gap-4 pl-6 pr-4 mb-5 lg:mt-8 pt-16 lg:pt-0 h-[34px]'>
+					<a href='/' className='hidden lg:flex items-center'>
 						<img
-							src="/logo-light.svg"
-							alt="WalletBeat Logo"
-							className="h-8 w-auto block dark:hidden transition-all"
+							src='/logo-light.svg'
+							alt='WalletBeat Logo'
+							className='h-8 w-auto block dark:hidden transition-all'
 						/>
 						<img
-							src="/logo-dark.svg"
-							alt="WalletBeat Logo"
-							className="h-8 w-auto hidden dark:block transition-all"
+							src='/logo-dark.svg'
+							alt='WalletBeat Logo'
+							className='h-8 w-auto hidden dark:block transition-all'
 						/>
 					</a>
-					<div className="hidden lg:block">
+					<div className='hidden lg:block'>
 						<ThemeSwitcher />
 					</div>
 				</div>
 
 				{/* Search/prefix component */}
 				{typeof prefix !== 'undefined' && prefix !== null ? (
-					<div className="px-4 mb-2 w-full">{prefix}</div>
+					<div className='px-4 mb-2 w-full'>{prefix}</div>
 				) : null}
 
-				<div className="flex flex-col gap-2 px-3">
+				<div className='flex flex-col gap-2 px-3'>
 					{nonEmptyMap(groups, (group, groupIndex) => (
 						<NavigationGroup
 							key={`navigationGroup-${group.id}`}
@@ -487,7 +508,7 @@ export function Navigation({
 						/>
 					))}
 				</div>
-				<div className="mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-left rounded-lg">
+				<div className='mt-auto mx-4 mb-4 px-4 py-3 text-secondary bg-[var(--accent-very-light)] text-sm text-left rounded-lg'>
 					Wallets listed on this page are not official endorsements, and are provided for
 					informational purposes only.
 				</div>
@@ -496,9 +517,9 @@ export function Navigation({
 			{/* Overlay for mobile menu - only visible when menu is open on mobile */}
 			{isOpen && (
 				<div
-					className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+					className='lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30'
 					onClick={toggleMenu}
-					aria-hidden="true"
+					aria-hidden='true'
 				/>
 			)}
 		</>

@@ -1,9 +1,8 @@
 {
 	"editor.formatOnSave": false,
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"editor.insertSpaces": false,
+	"editor.insertSpaces": true,
 	"editor.detectIndentation": false,
-	"editor.tabSize": 2,
+	"editor.tabSize": 4,
 	"[jsonc]": {
 		"editor.defaultFormatter": "vscode.json-language-features"
 	}

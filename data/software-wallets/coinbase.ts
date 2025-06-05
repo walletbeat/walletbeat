@@ -113,6 +113,7 @@ export const coinbase: SoftwareWallet = {
 			dataCollection: null,
 			privacyPolicy: 'https://wallet.coinbase.com/privacy-policy',
 			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
 				stealthAddresses: notSupported,
 			},
 		},

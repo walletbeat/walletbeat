@@ -30,12 +30,15 @@ function evaluateKeysHandling(features: KeysHandlingSupport): Rating {
 		features.physicalAttackResistance,
 	]
 	const passCount = ratings.filter(r => r === KeysHandlingType.PASS).length
+
 	if (passCount >= 3) {
 		return Rating.PASS
 	}
+
 	if (passCount >= 1) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -46,19 +49,19 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's key handling evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its key handling?`),
+		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its key handling?'),
 	},
-	question: sentence(`Does {{WALLET_NAME}} securely generate, protect, and handle keys?`),
+	question: sentence('Does {{WALLET_NAME}} securely generate, protect, and handle keys?'),
 	why: markdown(`
 		Secure key handling is fundamental to the security of user funds. This includes how the master secret (seed) is generated, stored, and used.
 		The device must protect keys from extraction via software or physical attacks (both passive side-channels and active fault injection).
 		It should also ensure that the manufacturer cannot access or recover user keys.
 	`),
 	methodology: markdown(`
-		Evaluated based on:  
+		Evaluated based on:	 
 		- **Master Secret Generation:** Use of interoperable, well-documented standards for seed generation.  
 		- **Key Secrecy:** Resistance against key extraction or recovery by the provider or third parties. Ensuring keys are not transmitted insecurely.  
-		- **Proprietary Mechanisms:** Security implications of any non-standard key handling or backup procedures.  
+		- **Proprietary Mechanisms:** Security implications of any non-standard key handling or backup procedures.	
 		- **Physical Attack Resistance:** Protection against passive (side-channel analysis) and active (glitching) physical attacks.  
 	`),
 	ratingScale: {
@@ -66,19 +69,19 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(`The hardware wallet passes most keys handling sub-criteria.`),
+				sentence('The hardware wallet passes most keys handling sub-criteria.'),
 				(v: KeysHandlingValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(`The hardware wallet passes some keys handling sub-criteria.`),
+				sentence('The hardware wallet passes some keys handling sub-criteria.'),
 				(v: KeysHandlingValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(`The hardware wallet fails most or all keys handling sub-criteria.`),
+				sentence('The hardware wallet fails most or all keys handling sub-criteria.'),
 				(v: KeysHandlingValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -90,7 +93,7 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 			return exempt(
 				keysHandling,
 				sentence(
-					`This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.`,
+					'This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.',
 				),
 				brand,
 				{
@@ -103,6 +106,7 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 		}
 
 		const keysHandlingFeature = features.security.keysHandling
+
 		if (keysHandlingFeature === null) {
 			return unrated(keysHandling, brand, {
 				masterSecretGeneration: KeysHandlingType.FAIL,
@@ -125,7 +129,7 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
 				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} key handling evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},

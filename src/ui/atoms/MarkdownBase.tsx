@@ -23,6 +23,7 @@ export function deriveMarkdownPropsFromTypography(
 	markdownProps?: MarkdownOwnProps,
 ): MarkdownOwnProps {
 	let marginTop: string | undefined = undefined
+
 	if (typographyProps?.marginTop !== undefined) {
 		if (typeof typographyProps.marginTop === 'number') {
 			marginTop = `${typographyProps.marginTop}px`
@@ -30,6 +31,7 @@ export function deriveMarkdownPropsFromTypography(
 			marginTop = typographyProps.marginTop
 		}
 	}
+
 	return {
 		markdownTransform: markdownProps?.markdownTransform,
 		textColor: markdownProps?.textColor ?? typographyProps?.color,
@@ -44,29 +46,37 @@ const StyledMarkdown = styled(Box, {
 	shouldForwardProp: prop => prop !== 'pSpacing' && prop !== 'liSpacing',
 })(
 	({ pSpacing, liSpacing }: MarkdownOwnProps) => `
-	p, li {
-		margin-top: 0px;
-	}
+		ul {
+			list-style: disc;
+			padding-left: 1rem;
+		}
+		p, li {
+			margin-top: 0px;
+		}
 
-	${
-		pSpacing === undefined
-			? ''
-			: `p + p {
-		margin-top: ${pSpacing};
-	}`
-	}
+		${
+			pSpacing !== undefined
+				? `
+					p + p {
+						margin-top: ${pSpacing};
+					}
+				`
+				: ''
+		}
 
-	${
-		liSpacing === undefined
-			? ''
-			: `li + li:not(li li), li li:not(li li + li) {
-		margin-top: ${pSpacing};
-	}
-	li li + li {
-		margin-top: calc(${pSpacing} / 2);
-	}`
-	}
-`,
+		${
+			liSpacing !== undefined
+				? `
+					li + li:not(li li), li li:not(li li + li), p + ul > li {
+						margin-top: ${pSpacing};
+					}
+					li li + li {
+						margin-top: calc(${pSpacing} / 2);
+					}
+				`
+				: ''
+		}
+	`,
 )
 
 /**
@@ -90,16 +100,20 @@ export function MarkdownBase({
 			const hrefStr = href ?? '#'
 			const eipRegexp =
 				/^https:\/\/eips\.ethereum\.org\/EIPS\/eip-(\d+)#wb-format=(short|long)$/i.exec(hrefStr)
+
 			if (eipRegexp !== null) {
 				const eip = lookupEip(+eipRegexp[1])
+
 				if (eip !== undefined) {
 					return <EipLink eip={eip} format={eipRegexp[2] === 'short' ? 'SHORT' : 'LONG'} />
 				}
 			}
+
 			if (/^[-_\w+:]/.exec(hrefStr) !== null) {
 				// External link.
 				return <ExternalLink url={hrefStr}>{children}</ExternalLink>
 			}
+
 			return <a href={hrefStr}>{children}</a>
 		},
 		p: ({ children }) => (
@@ -109,16 +123,19 @@ export function MarkdownBase({
 		),
 		li: ({ children }) => (
 			<li>
-				<Typography variant={pVariant} color={textColor} fontWeight={pFontWeight}>
+				<Typography component='span' variant={pVariant} color={textColor} fontWeight={pFontWeight}>
 					{children}
 				</Typography>
 			</li>
 		),
 	}
+
 	markdown = trimWhitespacePrefix(markdown)
+
 	if (markdownTransform !== undefined) {
 		markdown = markdownTransform(markdown)
 	}
+
 	return (
 		<StyledMarkdown pSpacing={pSpacing} liSpacing={liSpacing}>
 			<Markdown components={componentsMap}>{markdown}</Markdown>

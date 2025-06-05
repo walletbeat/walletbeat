@@ -21,21 +21,25 @@ export function AddressCorrelationDetails({
 	linkables,
 }: AddressCorrelationDetailsProps): React.JSX.Element {
 	const bySource = new Map<string, NonEmptyArray<WalletAddressLinkableBy>>()
+
 	for (const linkable of nonEmptySorted(
 		linkables,
 		(linkableA: WalletAddressLinkableBy, linkableB: WalletAddressLinkableBy) => {
 			if (linkableA.by === 'onchain') {
 				return 1
 			}
+
 			if (linkableB.by === 'onchain') {
 				return -1
 			}
+
 			return compareLeakedInfo(linkableA.info, linkableB.info)
 		},
 		true,
 	)) {
 		const sourceName = typeof linkable.by === 'string' ? linkable.by : linkable.by.name
 		const forSource = bySource.get(sourceName)
+
 		if (forSource === undefined) {
 			bySource.set(sourceName, [linkable])
 		} else {
@@ -43,6 +47,7 @@ export function AddressCorrelationDetails({
 		}
 	}
 	const leaksList: React.ReactNode[] = []
+
 	bySource.forEach((linkables, sourceName) => {
 		const linkableInfos = (
 			<JoinedList
@@ -54,6 +59,7 @@ export function AddressCorrelationDetails({
 		)
 		const refs = mergeRefs(...linkables.flatMap(linkable => linkable.refs))
 		const entity = nonEmptyGet(linkables).by
+
 		if (entity === 'onchain') {
 			leaksList.push(
 				<li key={sourceName}>
@@ -63,8 +69,10 @@ export function AddressCorrelationDetails({
 					</Typography>
 				</li>,
 			)
+
 			return
 		}
+
 		leaksList.push(
 			<li key={sourceName}>
 				<Typography>
@@ -72,7 +80,7 @@ export function AddressCorrelationDetails({
 					{isUrl(entity.privacyPolicy) ? (
 						<>
 							{' ('}
-							<ExternalLink url={entity.privacyPolicy} defaultLabel="Privacy policy" />
+							<ExternalLink url={entity.privacyPolicy} defaultLabel='Privacy policy' />
 							{')'}
 						</>
 					) : null}{' '}
@@ -81,6 +89,7 @@ export function AddressCorrelationDetails({
 			</li>,
 		)
 	})
+
 	return (
 		<>
 			<WrapRatingIcon rating={value.rating}>

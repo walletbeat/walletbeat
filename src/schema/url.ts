@@ -19,9 +19,11 @@ export type DomainUrl<D extends string> = Url &
 /** Get the domain part of a URL. */
 export function getDomain(url: Url): string {
 	let hostname = new URL(isLabeledUrl(url) ? url.url : url).hostname
+
 	if (hostname.startsWith('www.')) {
 		hostname = hostname.substring('www.'.length)
 	}
+
 	return hostname
 }
 
@@ -38,9 +40,11 @@ const wellKnownDomainsToLabels: Record<string, string> = {
 
 function getDefaultUrlLabel(url: string): string {
 	const hostname = getDomain(url)
+
 	if (Object.hasOwn(wellKnownDomainsToLabels, hostname)) {
 		return wellKnownDomainsToLabels[hostname]
 	}
+
 	return hostname
 }
 
@@ -49,6 +53,7 @@ export function getUrlLabel(url: Url): string {
 	if (isLabeledUrl(url)) {
 		return url.label
 	}
+
 	return getDefaultUrlLabel(url)
 }
 
@@ -63,6 +68,7 @@ export function labeledUrl(url: Url, defaultLabel?: string): LabeledUrl {
 	if (typeof url === 'string') {
 		return { label: defaultLabel ?? getUrlLabel(url), url }
 	}
+
 	return url
 }
 
@@ -94,11 +100,13 @@ export function mergeLabeledUrls(
 	if (!isNonEmptyArray(urls)) {
 		return [newUrl]
 	}
+
 	let foundMatch = false
 	const merged = nonEmptyMap(urls, oldUrl => {
 		if (oldUrl.url !== newUrl.url) {
 			return oldUrl
 		}
+
 		foundMatch = true
 		const defaultLabel = getDefaultUrlLabel(newUrl.url)
 		const betterLabel =
@@ -107,15 +115,46 @@ export function mergeLabeledUrls(
 				: newUrl.label !== ''
 					? newUrl.label
 					: defaultLabel
+
 		return {
 			label: betterLabel,
 			url: newUrl.url,
 		}
 	})
+
 	// The cast to `boolean` is necessary here as ESLint does not realize that
 	// the function passed above can modify `foundMatch` as a side-effect.
 	if (!(foundMatch as boolean)) {
 		return [...merged, newUrl]
 	}
+
 	return merged
+}
+
+/**
+ * A Markdown-formatted link to a URL.
+ */
+export function markdownUrlLink(
+	url: Url,
+	options?: { defaultLabel?: string; forceLabel?: string; bold?: boolean },
+): string {
+	let labeled = labeledUrl(url, options?.defaultLabel)
+
+	if (options !== undefined) {
+		if (options.forceLabel !== undefined) {
+			labeled = {
+				url: labeled.url,
+				label: options.forceLabel,
+			}
+		}
+
+		if (options.bold ?? false) {
+			labeled = {
+				url: labeled.url,
+				label: `**${labeled.label}**`,
+			}
+		}
+	}
+
+	return `[${labeled.label}](${labeled.url})`
 }

@@ -28,6 +28,7 @@ import { exempt, pickWorstRating, unrated } from '../common'
 type ResolvedSupport = Record<BrowserIntegrationEip, Support>
 
 const brand = 'attributes.ecosystem.browser_integration'
+
 export type BrowserIntegrationValue = Value & {
 	support?: ResolvedSupport
 	__brand: 'attributes.ecosystem.browser_integration'
@@ -56,12 +57,12 @@ function browserIntegrationSupport(
 				displayName: 'No browser integration',
 				support,
 				shortExplanation: sentence(
-					`{{WALLET_NAME}} does not integrate with the browser in a standard way.`,
+					'{{WALLET_NAME}} does not integrate with the browser in a standard way.',
 				),
 				__brand: brand,
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} does not adhere to any of the Ethereum standards for integration in web browsers.`,
+				'{{WALLET_NAME}} does not adhere to any of the Ethereum standards for integration in web browsers.',
 			),
 			howToImprove: markdown(
 				`{{WALLET_NAME}} should integrate with the browser using an Ethereum standard, such as ${eipMarkdownLink(eip1193)} or the newer ${eipMarkdownLink(eip6963)}.`,
@@ -69,7 +70,9 @@ function browserIntegrationSupport(
 			references: refs,
 		}
 	}
+
 	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL
+
 	return {
 		value: {
 			id: `support_${supported.join('_')}`,
@@ -108,7 +111,7 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 	wording: {
 		midSentenceName: 'browser integration',
 	},
-	question: sentence(`Does the wallet comply with web browser integration standards?`),
+	question: sentence('Does the wallet comply with web browser integration standards?'),
 	why: markdown(`
 		Web applications that want to integrate with Ethereum should not have to
 		write code specific to the wallet that the user has installed. For this
@@ -135,7 +138,7 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: exampleRating(
-			sentence(`The wallet implements all listed web browser integration standards.`),
+			sentence('The wallet implements all listed web browser integration standards.'),
 			browserIntegrationSupport({
 				'1193': featureSupported,
 				'2700': featureSupported,
@@ -143,7 +146,7 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 			}).value,
 		),
 		partial: exampleRating(
-			sentence(`The wallet implements some but not all listed web browser integration standards.`),
+			sentence('The wallet implements some but not all listed web browser integration standards.'),
 			browserIntegrationSupport({
 				'1193': featureSupported,
 				'2700': featureSupported,
@@ -151,7 +154,7 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 			}).value,
 		),
 		fail: exampleRating(
-			sentence(`The wallet implements none of the listed web browser integration standards.`),
+			sentence('The wallet implements none of the listed web browser integration standards.'),
 			browserIntegrationSupport({
 				'1193': notSupported,
 				'2700': notSupported,
@@ -163,21 +166,25 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 		if (features.variant !== Variant.BROWSER) {
 			return exempt(
 				browserIntegration,
-				sentence(`Only browser-based wallets are rated on their browser integration support.`),
+				sentence('Only browser-based wallets are rated on their browser integration support.'),
 				brand,
 				{},
 			)
 		}
+
 		if (features.integration.browser === 'NOT_A_BROWSER_WALLET') {
 			throw new Error(
 				'Attempted to rate a browser-wallet with features.integration.browser set to NOT_A_BROWSER_WALLET',
 			)
 		}
+
 		if (Object.values(features.integration.browser).includes(null)) {
 			return unrated(browserIntegration, brand, {})
 		}
+
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that none of the values are null.
 		const browserIntegrationEips = features.integration.browser as WithRef<ResolvedSupport>
+
 		return browserIntegrationSupport(browserIntegrationEips)
 	},
 	aggregate: pickWorstRating<BrowserIntegrationValue>,

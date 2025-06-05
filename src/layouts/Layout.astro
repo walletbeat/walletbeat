@@ -1,16 +1,10 @@
 ---
 // Global CSS
 import '../global.css'
-import '@fontsource/montserrat/300.css'
-import '@fontsource/montserrat/400.css'
-import '@fontsource/montserrat/500.css'
-import '@fontsource/montserrat/600.css'
-import '@fontsource/montserrat/700.css'
-import '@fontsource/montserrat/800.css'
-import '@fontsource/montserrat/900.css'
 
 // Props
 import type { ComponentProps } from 'astro/types'
+import { ClientRouter } from 'astro:transitions'
 
 type Props = {
 	metadata: ComponentProps<typeof Metadata>['metadata']
@@ -21,14 +15,16 @@ const { metadata } = Astro.props
 // Components
 import Metadata from '@/components/Metadata.astro'
 import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
+// import { NavigationStateManager } from '@/components/NavigationStateManager'
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang='en'>
 	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta charset='UTF-8' />
+		<meta name='viewport' content='width=device-width' />
 		<Metadata {metadata} />
+		<ClientRouter />
 		<!-- Theme initialization script -->
 		<script is:inline>
 			// Initialize theme from localStorage or system preference
@@ -54,6 +50,7 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 	</head>
 	<body>
 		<ThemeRegistry>
+			<!-- <NavigationStateManager client:load /> -->
 			<slot />
 		</ThemeRegistry>
 	</body>

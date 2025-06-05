@@ -21,6 +21,7 @@ export function Tooltip({
 		typeof contentClassName === 'string' && contentClassName.length > 0
 			? `${baseClass} ${contentClassName}`
 			: baseClass
+
 	return (
 		<RadixTooltip.Provider>
 			<RadixTooltip.Root delayDuration={0}>
@@ -32,7 +33,7 @@ export function Tooltip({
 					style={contentStyle}
 				>
 					{content}
-					<RadixTooltip.Arrow className="fill-black" />
+					<RadixTooltip.Arrow className='fill-black' />
 				</RadixTooltip.Content>
 			</RadixTooltip.Root>
 		</RadixTooltip.Provider>

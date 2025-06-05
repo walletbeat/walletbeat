@@ -43,6 +43,7 @@ export function EipPreviewModal({
 				// Check right overflow (10px margin)
 				left = rect.left - actualPopupWidth - 10 // Move to the left
 			}
+
 			if (left < 10) {
 				// Ensure 10px left margin
 				left = 10
@@ -50,6 +51,7 @@ export function EipPreviewModal({
 
 			// Clamp top position to be within viewport with 10px margins
 			const maxPossibleTop = window.innerHeight - actualPopupHeight - 10
+
 			top = Math.max(10, Math.min(top, maxPossibleTop))
 
 			setPopupPosition({ top, left })
@@ -63,7 +65,7 @@ export function EipPreviewModal({
 	return ReactDOM.createPortal(
 		<div
 			ref={modalRef}
-			className="eip-preview-modal fixed z-50"
+			className='eip-preview-modal fixed z-50'
 			style={{
 				top: `${popupPosition.top}px`,
 				left: `${popupPosition.left}px`,
@@ -75,32 +77,32 @@ export function EipPreviewModal({
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
 		>
-			<div className="bg-background shadow-lg rounded-lg p-5 w-full border border-gray-200 dark:border-gray-700">
-				<div className="flex items-center mb-4">
-					<div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2">
+			<div className='bg-background shadow-lg rounded-lg p-5 w-full border border-gray-200 dark:border-gray-700'>
+				<div className='flex items-center mb-4'>
+					<div className='bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 text-xs font-medium px-2.5 py-0.5 rounded-full mr-2'>
 						{eip.prefix}-{eip.number}
 					</div>
-					<div className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded-full">
+					<div className='bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs font-medium px-2.5 py-0.5 rounded-full'>
 						{eip.status}
 					</div>
 				</div>
 
-				<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+				<h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2'>
 					{eip.friendlyName !== '' ? eip.friendlyName : eip.formalTitle}
 				</h3>
 
 				{eip.formalTitle !== '' && eip.formalTitle !== eip.friendlyName && (
-					<h4 className="text-sm text-gray-700 dark:text-gray-300 mb-4">{eip.formalTitle}</h4>
+					<h4 className='text-sm text-gray-700 dark:text-gray-300 mb-4'>{eip.formalTitle}</h4>
 				)}
 
-				<div className="prose dark:prose-invert prose-sm max-w-none text-left">
+				<div className='prose dark:prose-invert prose-sm max-w-none text-left'>
 					{eip.summaryMarkdown !== '' && (
-						<div className="mb-4">
-							<h5 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2">
+						<div className='mb-4'>
+							<h5 className='text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2'>
 								Summary
 							</h5>
-							<div className="text-sm text-gray-700 dark:text-gray-300">
-								<MarkdownTypography variant="caption">
+							<div className='text-sm text-gray-700 dark:text-gray-300'>
+								<MarkdownTypography variant='caption'>
 									{trimWhitespacePrefix(eip.summaryMarkdown)}
 								</MarkdownTypography>
 							</div>
@@ -109,11 +111,11 @@ export function EipPreviewModal({
 
 					{eip.whyItMattersMarkdown !== '' && (
 						<div>
-							<h5 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2">
+							<h5 className='text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-semibold mb-2'>
 								Why It Matters
 							</h5>
-							<div className="text-sm text-gray-700 dark:text-gray-300">
-								<MarkdownTypography variant="caption">
+							<div className='text-sm text-gray-700 dark:text-gray-300'>
+								<MarkdownTypography variant='caption'>
 									{trimWhitespacePrefix(eip.whyItMattersMarkdown)}
 								</MarkdownTypography>
 							</div>
@@ -121,19 +123,19 @@ export function EipPreviewModal({
 					)}
 				</div>
 
-				<div className="mt-4 flex justify-between items-center">
+				<div className='mt-4 flex justify-between items-center'>
 					<button
-						type="button"
+						type='button'
 						onClick={onMouseLeave}
-						className="text-xs text-gray-600 dark:text-gray-400 hover:underline cursor-pointer"
+						className='text-xs text-gray-600 dark:text-gray-400 hover:underline cursor-pointer'
 					>
 						Close
 					</button>
 					<a
 						href={eipEthereumDotOrgUrl(eip)}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+						target='_blank'
+						rel='noopener noreferrer'
+						className='text-xs text-blue-600 dark:text-blue-400 hover:underline'
 					>
 						Read full specification →
 					</a>

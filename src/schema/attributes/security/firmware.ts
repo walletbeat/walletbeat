@@ -27,12 +27,15 @@ function evaluateFirmware(features: FirmwareSupport): Rating {
 		features.customFirmware,
 	]
 	const passCount = ratings.filter(r => r === FirmwareType.PASS).length
+
 	if (passCount >= 3) {
 		return Rating.PASS
 	}
+
 	if (passCount >= 1) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -43,40 +46,40 @@ export const firmware: Attribute<FirmwareValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's firmware evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its firmware?`),
+		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its firmware?'),
 	},
-	question: sentence(`Does {{WALLET_NAME}} have secure and open firmware?`),
+	question: sentence('Does {{WALLET_NAME}} have secure and open firmware?'),
 	why: markdown(`
 		Firmware security and openness are critical for user trust, resistance against attacks, and ensuring the device can be safely upgraded.
 		Users need assurance that the code running on their device is authentic and hasn't been tampered with.
 		Openness allows for independent verification and community audit.
 	`),
 	methodology: markdown(`
-		Evaluated based on several factors:  
-		- **Update Security:** Protection against silent/forced updates, authentication requirements for updates, and possibility of downgrades.  
-		- **Source Code Openness:** Availability and licensing of firmware source code (full or partial), and isolation between open/closed parts.  
-		- **Build Verifiability:** Ability to reproduce firmware builds from source and compare against official binaries (reproducible builds).  
-		- **Runtime Integrity:** Mechanisms to check the authenticity of the code running on the device.  
-		- **Custom Firmware:** Support for users loading custom firmware and its impact on device security/integrity.  
+		Evaluated based on several factors:
+		- **Update Security:** Protection against silent/forced updates, authentication requirements for updates, and possibility of downgrades.
+		- **Source Code Openness:** Availability and licensing of firmware source code (full or partial), and isolation between open/closed parts.
+		- **Build Verifiability:** Ability to reproduce firmware builds from source and compare against official binaries (reproducible builds).
+		- **Runtime Integrity:** Mechanisms to check the authenticity of the code running on the device.
+		- **Custom Firmware:** Support for users loading custom firmware and its impact on device security/integrity.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(`The hardware wallet passes most firmware sub-criteria.`),
+				sentence('The hardware wallet passes most firmware sub-criteria.'),
 				(v: FirmwareValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(`The hardware wallet passes some firmware sub-criteria.`),
+				sentence('The hardware wallet passes some firmware sub-criteria.'),
 				(v: FirmwareValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(`The hardware wallet fails most or all firmware sub-criteria.`),
+				sentence('The hardware wallet fails most or all firmware sub-criteria.'),
 				(v: FirmwareValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -85,14 +88,16 @@ export const firmware: Attribute<FirmwareValue> = {
 		pickWorstRating<FirmwareValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return exempt(firmware, sentence(`Firmware is only rated for hardware wallets`), brand, {
+			return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), brand, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
 				customFirmware: FirmwareType.FAIL,
 			})
 		}
+
 		const firmwareFeature = features.security.firmware
+
 		if (firmwareFeature === null) {
 			return unrated(firmware, brand, {
 				silentUpdateProtection: FirmwareType.FAIL,
@@ -115,7 +120,7 @@ export const firmware: Attribute<FirmwareValue> = {
 				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} firmware evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},

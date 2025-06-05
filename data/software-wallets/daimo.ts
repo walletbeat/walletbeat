@@ -266,6 +266,7 @@ export const daimo: SoftwareWallet = {
 			},
 			privacyPolicy: 'https://daimo.com/privacy',
 			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
 				stealthAddresses: notSupported,
 			},
 		},

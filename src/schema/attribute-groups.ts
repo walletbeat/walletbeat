@@ -42,6 +42,10 @@ import {
 	type MultiAddressCorrelationValue,
 } from './attributes/privacy/multi-address-correlation'
 import {
+	privateTransfers,
+	type PrivateTransfersValue,
+} from './attributes/privacy/private-transfers'
+import {
 	bugBountyProgram,
 	type BugBountyProgramValue,
 } from './attributes/security/bug-bounty-program'
@@ -130,7 +134,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	id: 'security',
 	icon: '\u{1f512}', // Lock
 	displayName: 'Security',
-	perWalletQuestion: sentence(`How secure is {{WALLET_NAME}}?`),
+	perWalletQuestion: sentence<{ WALLET_NAME: string }>('How secure is {{WALLET_NAME}}?'),
 	attributes: {
 		securityAudits,
 		scamPrevention,
@@ -167,7 +171,8 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 type PrivacyValues = Dict<{
 	addressCorrelation: AddressCorrelationValue
 	multiAddressCorrelation: MultiAddressCorrelationValue
-	hardware_privacy: HardwarePrivacyValue
+	privateTransfers: PrivateTransfersValue
+	hardwarePrivacy: HardwarePrivacyValue
 }>
 
 /** Privacy attributes. */
@@ -175,16 +180,20 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 	id: 'privacy',
 	icon: '\u{1f575}', // Detective
 	displayName: 'Privacy',
-	perWalletQuestion: sentence(`How well does {{WALLET_NAME}} protect your privacy?`),
+	perWalletQuestion: sentence<{ WALLET_NAME: string }>(
+		'How well does {{WALLET_NAME}} protect your privacy?',
+	),
 	attributes: {
 		addressCorrelation,
 		multiAddressCorrelation,
-		hardware_privacy: hardwarePrivacy,
+		privateTransfers,
+		hardwarePrivacy,
 	},
 	attributeWeights: {
 		addressCorrelation: 1.0,
 		multiAddressCorrelation: 1.0,
-		hardware_privacy: 1.0,
+		privateTransfers: 1.0,
+		hardwarePrivacy: 1.0,
 	},
 }
 
@@ -200,8 +209,8 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 	id: 'selfSovereignty',
 	icon: '\u{1f3f0}', // Castle
 	displayName: 'Self-sovereignty',
-	perWalletQuestion: sentence(
-		`How much control and ownership over your wallet does {{WALLET_NAME}} give you?`,
+	perWalletQuestion: sentence<{ WALLET_NAME: string }>(
+		'How much control and ownership over your account does {{WALLET_NAME}} give you?',
 	),
 	attributes: {
 		selfHostedNode,
@@ -229,8 +238,8 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 	id: 'transparency',
 	icon: '\u{1f50d}', // Looking glass
 	displayName: 'Transparency',
-	perWalletQuestion: sentence(
-		`How transparent and sustainable is {{WALLET_NAME}}'s development model?`,
+	perWalletQuestion: sentence<{ WALLET_NAME: string }>(
+		"How transparent and sustainable is {{WALLET_NAME}}'s development model?",
 	),
 	attributes: {
 		openSource,
@@ -261,7 +270,9 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	id: 'ecosystem',
 	icon: '🌐',
 	displayName: 'Ecosystem',
-	perWalletQuestion: sentence(`How well does {{WALLET_NAME}} align with the ecosystem?`),
+	perWalletQuestion: sentence<{ WALLET_NAME: string }>(
+		'How well does {{WALLET_NAME}} align with the ecosystem?',
+	),
 	attributes: {
 		accountAbstraction,
 		addressResolution,
@@ -286,7 +297,7 @@ export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	id: 'maintenance',
 	icon: '🛠️',
 	displayName: 'Maintenance',
-	perWalletQuestion: sentence(`How well-maintained is {{WALLET_NAME}}?`),
+	perWalletQuestion: sentence<{ WALLET_NAME: string }>('How well-maintained is {{WALLET_NAME}}?'),
 	attributes: {
 		maintenance,
 	},
@@ -327,6 +338,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 export interface PrivacyEvaluations extends EvaluatedGroup<PrivacyValues> {
 	addressCorrelation: EvaluatedAttribute<AddressCorrelationValue>
 	multiAddressCorrelation: EvaluatedAttribute<MultiAddressCorrelationValue>
+	privateTransfers: EvaluatedAttribute<PrivateTransfersValue>
 }
 
 /** Evaluated self-sovereignty attributes for a single wallet. */
@@ -386,23 +398,27 @@ export function evaluateAttributes(
 	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => {
 		if (attr.exempted !== undefined) {
 			const maybeExempt = attr.exempted(features, walletMetadata)
+
 			if (maybeExempt !== null) {
 				if (!isExempt(maybeExempt)) {
 					throw new Error(
 						`Attribute ${attr.id}'s exemption rating function returned a non-exempt rating`,
 					)
 				}
+
 				return {
 					attribute: attr,
 					evaluation: maybeExempt,
 				}
 			}
 		}
+
 		return {
 			attribute: attr,
 			evaluation: attr.evaluate(features),
 		}
 	}
+
 	return {
 		security: {
 			securityAudits: evalAttr(securityAudits),
@@ -422,7 +438,8 @@ export function evaluateAttributes(
 		privacy: {
 			addressCorrelation: evalAttr(addressCorrelation),
 			multiAddressCorrelation: evalAttr(multiAddressCorrelation),
-			hardware_privacy: evalAttr(hardwarePrivacy),
+			privateTransfers: evalAttr(privateTransfers),
+			hardwarePrivacy: evalAttr(hardwarePrivacy),
 		},
 		selfSovereignty: {
 			selfHostedNode: evalAttr(selfHostedNode),
@@ -463,11 +480,13 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			perVariant,
 			(_, tree: EvaluationTree) => getter(tree).evaluation,
 		)
+
 		return {
 			attribute,
 			evaluation: attribute.aggregate(evaluations),
 		}
 	}
+
 	return {
 		security: {
 			securityAudits: attr(tree => tree.security.securityAudits),
@@ -487,7 +506,8 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 		privacy: {
 			addressCorrelation: attr(tree => tree.privacy.addressCorrelation),
 			multiAddressCorrelation: attr(tree => tree.privacy.multiAddressCorrelation),
-			hardware_privacy: attr(tree => tree.privacy.hardware_privacy),
+			privateTransfers: attr(tree => tree.privacy.privateTransfers),
+			hardwarePrivacy: attr(tree => tree.privacy.hardwarePrivacy),
 		},
 		selfSovereignty: {
 			selfHostedNode: attr(tree => tree.selfSovereignty.selfHostedNode),
@@ -610,14 +630,17 @@ export function getEvaluationFromOtherTree<V extends Value>(
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Evaluated attributes with the same ID have the same Value type.
 				return evalGroup[evalAttr.attribute.id] as unknown as EvaluatedAttribute<V>
 			}
+
 			return undefined
 		},
 	).find(v => v !== undefined)
+
 	if (otherEvalAttr === undefined) {
 		throw new Error(
 			`Incomplete evaluation tree; did not found evaluation for attribute ${evalAttr.attribute.id}`,
 		)
 	}
+
 	return otherEvalAttr
 }
 
@@ -633,23 +656,28 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 ): MaybeUnratedScore {
 	const subScores: WeightedScore[] = nonEmptyValues<keyof Vs, WeightedScore | null>(
 		nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
-			const value = evaluations[key].evaluation.value
+			const { value } = evaluations[key].evaluation
 			const score = value.score ?? defaultRatingScore(value.rating)
+
 			return score === null
 				? null
 				: {
-					score,
-					weight,
-				}
+						score,
+						weight,
+					}
 		}),
 	).filter(score => score !== null)
+
 	if (isNonEmptyArray(subScores)) {
 		let hasUnratedComponent = false
+
 		for (const evalAttr of evaluatedAttributes(evaluations)) {
 			hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED
 		}
+
 		return { score: weightedScore(subScores), hasUnratedComponent }
 	}
+
 	return null
 }
 
@@ -662,9 +690,11 @@ export function getAttributeGroupById(
 	tree: EvaluationTree,
 ): AttributeGroup<ValueSet> | null {
 	const attrGroup = attributeTree[id] as AttributeGroup<ValueSet> | undefined
+
 	if (attrGroup === undefined) {
 		return null
 	}
+
 	if (
 		!mapNonExemptAttributeGroupsInTree(
 			tree,
@@ -673,5 +703,6 @@ export function getAttributeGroupById(
 	) {
 		return null
 	}
+
 	return attrGroup
 }

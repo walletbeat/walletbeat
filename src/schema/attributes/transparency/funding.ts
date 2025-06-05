@@ -21,6 +21,7 @@ import { fundingDetailsContent } from '@/types/content/funding-details'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.funding'
+
 export type FundingValue = Value & {
 	__brand: 'attributes.transparency.funding'
 }
@@ -36,7 +37,7 @@ function transparent(
 			id: `transparent_${id.toLocaleLowerCase()}`,
 			rating: Rating.PASS,
 			displayName: `Transparent funding (${sourceName})`,
-			shortExplanation: sentence(`{{WALLET_NAME}} is transparently funded.`),
+			shortExplanation: sentence('{{WALLET_NAME}} is transparently funded.'),
 			__brand: brand,
 		},
 		details: fundingDetailsContent({ monetization }),
@@ -63,7 +64,7 @@ function extractive(
 		},
 		details: fundingDetailsContent({ monetization }),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should change its funding sources to non-user-extractive means such as transparent convenience fees, donations, or ecosystem grants.`,
+			'{{WALLET_NAME}} should change its funding sources to non-user-extractive means such as transparent convenience fees, donations, or ecosystem grants.',
 		),
 		references: toFullyQualified(monetization.ref),
 	}
@@ -75,14 +76,14 @@ const noFunding: Evaluation<FundingValue> = {
 		id: 'noFunding',
 		rating: Rating.FAIL,
 		displayName: 'No funding source',
-		shortExplanation: sentence(`{{WALLET_NAME}} has no funding sources.`),
+		shortExplanation: sentence('{{WALLET_NAME}} has no funding sources.'),
 		__brand: brand,
 	},
 	details: paragraph(
-		`{{WALLET_NAME}} has no funding sources, making its future unclear. Wallets need a consistent source of funding to ensure they keep up with security vulnerabilities and ecosystem progress.`,
+		'{{WALLET_NAME}} has no funding sources, making its future unclear. Wallets need a consistent source of funding to ensure they keep up with security vulnerabilities and ecosystem progress.',
 	),
 	howToImprove: paragraph(
-		`While most software projects inevitably start small and unfunded, {{WALLET_NAME}} should seek a reliable source of funding once feasible.`,
+		'While most software projects inevitably start small and unfunded, {{WALLET_NAME}} should seek a reliable source of funding once feasible.',
 	),
 	references: [],
 }
@@ -93,12 +94,12 @@ const unclear: Evaluation<FundingValue> = {
 		id: 'unclear',
 		rating: Rating.FAIL,
 		displayName: 'Unclear funding source',
-		shortExplanation: sentence(`How {{WALLET_NAME}} is funded is unclear.`),
+		shortExplanation: sentence('How {{WALLET_NAME}} is funded is unclear.'),
 		__brand: brand,
 	},
-	details: paragraph(`How {{WALLET_NAME}} is funded is unclear.`),
+	details: paragraph('How {{WALLET_NAME}} is funded is unclear.'),
 	howToImprove: paragraph(
-		`{{WALLET_NAME}} should publish how it is funded, or how it plans to fund itself.`,
+		'{{WALLET_NAME}} should publish how it is funded, or how it plans to fund itself.',
 	),
 	references: [],
 }
@@ -133,9 +134,9 @@ export const funding: Attribute<FundingValue> = {
 	wording: {
 		midSentenceName: 'funding',
 	},
-	question: sentence(`How is the wallet's development team funded?`),
+	question: sentence("How is the wallet's development team funded?"),
 	why: paragraph(
-		`Wallets are complex, high-stakes pieces of software. They must be maintained, regularly audited, and follow the continuous improvements in the ecosystem. This requires a reliable, transparent source of funding.`,
+		'Wallets are complex, high-stakes pieces of software. They must be maintained, regularly audited, and follow the continuous improvements in the ecosystem. This requires a reliable, transparent source of funding.',
 	),
 	methodology: markdown(`
 		Wallets are assessed based on how sustainable, transparent, and
@@ -176,13 +177,13 @@ export const funding: Attribute<FundingValue> = {
 		fail: [
 			exampleRating(
 				paragraph(
-					`The wallet has funding but has not revealed this publicly and transparently to users.`,
+					'The wallet has funding but has not revealed this publicly and transparently to users.',
 				),
 				unclear.value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet does not have any funding. Wallets must have sustainable funding sources in order to remain secure and up-to-date.`,
+					'The wallet does not have any funding. Wallets must have sustainable funding sources in order to remain secure and up-to-date.',
 				),
 				noFunding.value,
 			),
@@ -190,13 +191,13 @@ export const funding: Attribute<FundingValue> = {
 		partial: [
 			exampleRating(
 				paragraph(
-					`The wallet is funded from hidden swap fees. While users can look this up onchain to see how much revenue the wallet is generating from this, making this funding source technically transparent, it is not user-aligned.`,
+					'The wallet is funded from hidden swap fees. While users can look this up onchain to see how much revenue the wallet is generating from this, making this funding source technically transparent, it is not user-aligned.',
 				),
 				exampleRatingUnimplemented,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet is funded from user-visible swap fees and governance token sales with undisclosed vesting schedule. While users can use onchain lookups to determine how much revenue is generated from both sources, making the funding technically transparent, the undisclosed nature of governance token makes makes this not user-aligned.`,
+					'The wallet is funded from user-visible swap fees and governance token sales with undisclosed vesting schedule. While users can use onchain lookups to determine how much revenue is generated from both sources, making the funding technically transparent, the undisclosed nature of governance token makes makes this not user-aligned.',
 				),
 				exampleRatingUnimplemented,
 			),
@@ -204,19 +205,19 @@ export const funding: Attribute<FundingValue> = {
 		pass: [
 			exampleRating(
 				paragraph(
-					`The wallet is funded from user-visible swap fees and pre-disclosed governance token sales.`,
+					'The wallet is funded from user-visible swap fees and pre-disclosed governance token sales.',
 				),
 				exampleRatingUnimplemented,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet is funded from venture capital and publishes regulatory filings showing the amount raised in each round and the top investors of each round.`,
+					'The wallet is funded from venture capital and publishes regulatory filings showing the amount raised in each round and the top investors of each round.',
 				),
 				exampleRatingUnimplemented,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet is funded from onchain donations, onchain ecosystem grants, and commemorative NFT sales.`,
+					'The wallet is funded from onchain donations, onchain ecosystem grants, and commemorative NFT sales.',
 				),
 				exampleRatingUnimplemented,
 			),
@@ -226,7 +227,9 @@ export const funding: Attribute<FundingValue> = {
 		if (features.monetization === null) {
 			return unrated(funding, brand, null)
 		}
+
 		const strategies: MonetizationStrategy[] = []
+
 		for (const { strategy, value } of monetizationStrategies(features.monetization)) {
 			switch (value) {
 				case null:
@@ -239,11 +242,14 @@ export const funding: Attribute<FundingValue> = {
 			}
 		}
 		const numStrategies = strategies.length
+
 		if (numStrategies === 0) {
 			return unclear
 		}
+
 		const extractiveStrategies = []
 		const userAlignedStrategies = []
+
 		for (const strategy of strategies) {
 			if (monetizationStrategyIsUserAligned(strategy)) {
 				userAlignedStrategies.push(strategy)
@@ -251,6 +257,7 @@ export const funding: Attribute<FundingValue> = {
 				extractiveStrategies.push(strategy)
 			}
 		}
+
 		if (!features.monetization.revenueBreakdownIsPublic && extractiveStrategies.length > 0) {
 			if (extractiveStrategies.length === 1) {
 				return extractive(
@@ -259,8 +266,10 @@ export const funding: Attribute<FundingValue> = {
 					features.monetization,
 				)
 			}
+
 			return extractive('multi', '', features.monetization)
 		}
+
 		if (numStrategies === 1) {
 			return transparent(
 				strategies[0],
@@ -268,6 +277,7 @@ export const funding: Attribute<FundingValue> = {
 				features.monetization,
 			)
 		}
+
 		return transparent('multi', 'Multiple sources', features.monetization)
 	},
 	aggregate: pickWorstRating<FundingValue>,

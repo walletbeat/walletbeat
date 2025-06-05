@@ -20,6 +20,7 @@ import { licenseDetailsContent } from '@/types/content/license-details'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.open_source'
+
 export type OpenSourceValue = Value & {
 	license: License
 	__brand: 'attributes.transparency.open_source'
@@ -68,15 +69,15 @@ function proprietary({ ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
 			rating: Rating.FAIL,
 			icon: '\u{1f494}', // Broken heart
 			displayName: 'Proprietary code license',
-			shortExplanation: sentence(`{{WALLET_NAME}} uses a proprietary source code license.`),
+			shortExplanation: sentence('{{WALLET_NAME}} uses a proprietary source code license.'),
 			license: License.PROPRIETARY,
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} uses a proprietary or non-FOSS source code license. Therefore, it is not Free and Open Source Software.`,
+			'{{WALLET_NAME}} uses a proprietary or non-FOSS source code license. Therefore, it is not Free and Open Source Software.',
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should consider re-licensing under a Free and Open Source Software license.`,
+			'{{WALLET_NAME}} should consider re-licensing under a Free and Open Source Software license.',
 		),
 		references: toFullyQualified(ref),
 	}
@@ -89,15 +90,15 @@ const unlicensed: Evaluation<OpenSourceValue> = {
 		icon: '\u{2754}', // White question mark
 		displayName: 'Unlicensed or missing license file',
 		shortExplanation: sentence(
-			`{{WALLET_NAME}} does not have a valid license for its source code.`,
+			'{{WALLET_NAME}} does not have a valid license for its source code.',
 		),
 		license: License.UNLICENSED_VISIBLE,
 		__brand: brand,
 	},
 	details: paragraph(
-		`{{WALLET_NAME}} does not have a valid license for its source code. This is most likely an accidental omission, but a lack of license means that even if {{WALLET_NAME}} is functionally identical to an open-source project, it may later decide to set its license to a proprietary license. Therefore, {{WALLET_NAME}} is assumed to not be Free and Open Source Software until it does have a valid license file.`,
+		'{{WALLET_NAME}} does not have a valid license for its source code. This is most likely an accidental omission, but a lack of license means that even if {{WALLET_NAME}} is functionally identical to an open-source project, it may later decide to set its license to a proprietary license. Therefore, {{WALLET_NAME}} is assumed to not be Free and Open Source Software until it does have a valid license file.',
 	),
-	howToImprove: paragraph(`{{WALLET_NAME}} should add a license file to its source code.`),
+	howToImprove: paragraph('{{WALLET_NAME}} should add a license file to its source code.'),
 	references: [],
 }
 
@@ -109,10 +110,10 @@ export const openSource: Attribute<OpenSourceValue> = {
 		midSentenceName: 'source code license',
 	},
 	question: sentence(
-		`Is the wallet's source code licensed under a Free and Open Source Software (FOSS) license?`,
+		"Is the wallet's source code licensed under a Free and Open Source Software (FOSS) license?",
 	),
 	why: mdParagraph(
-		`[Free and Open Source Software (FOSS) licensing](https://en.wikipedia.org/wiki/Open-source_license) allows a software project's source code to be freely used, modified and distributed. This allows better collaboration, more transparency into the software development practices that go into the project, and allows security researchers to more easily identify and report security vulnerabilities. In short, it turns software projects into public goods.`,
+		"[Free and Open Source Software (FOSS) licensing](https://en.wikipedia.org/wiki/Open-source_license) allows a software project's source code to be freely used, modified and distributed. This allows better collaboration, more transparency into the software development practices that go into the project, and allows security researchers to more easily identify and report security vulnerabilities. In short, it turns software projects into public goods.",
 	),
 	methodology: markdown(`
 		Wallets are assessed based whether the license of their source code meets
@@ -123,24 +124,24 @@ export const openSource: Attribute<OpenSourceValue> = {
 		exhaustive: true,
 		pass: exampleRating(
 			mdParagraph(
-				`The wallet is licensed under a Free and Open Source Software (FOSS) license. Examples of such licenses include [MIT](https://opensource.org/license/MIT), [Apache](https://opensource.org/license/apache-2-0), [BSD](https://opensource.org/license/bsd-1-clause), and [GPL](https://opensource.org/license/gpl-2-0).`,
+				'The wallet is licensed under a Free and Open Source Software (FOSS) license. Examples of such licenses include [MIT](https://opensource.org/license/MIT), [Apache](https://opensource.org/license/apache-2-0), [BSD](https://opensource.org/license/bsd-1-clause), and [GPL](https://opensource.org/license/gpl-2-0).',
 			),
 			Rating.PASS,
 		),
 		partial: exampleRating(
 			mdParagraph(
-				`The wallet is licensed under a license that represents a commitment to switch to a Free and Open Source Software (FOSS) license by a specific date. Examples of such licenses include [BUSL](https://spdx.org/licenses/BUSL-1.1.html).`,
+				'The wallet is licensed under a license that represents a commitment to switch to a Free and Open Source Software (FOSS) license by a specific date. Examples of such licenses include [BUSL](https://spdx.org/licenses/BUSL-1.1.html).',
 			),
 			Rating.PARTIAL,
 		),
 		fail: [
 			exampleRating(
-				paragraph(`The wallet is licensed under any non-FOSS (proprietary) license.`),
+				paragraph('The wallet is licensed under any non-FOSS (proprietary) license.'),
 				proprietary({ license: License.PROPRIETARY }).value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet's source code repository is missing a license file. The lack of a license file may be an accidental omission on the wallet developers' part, but also may indicate that the wallet may set its license to a proprietary license. Therefore, Walletbeat makes the conservative assumption that the wallet is not be Free and Open Open Source Software until it does have a valid license file.`,
+					"The wallet's source code repository is missing a license file. The lack of a license file may be an accidental omission on the wallet developers' part, but also may indicate that the wallet may set its license to a proprietary license. Therefore, Walletbeat makes the conservative assumption that the wallet is not be Free and Open Open Source Software until it does have a valid license file.",
 				),
 				unlicensed.value,
 			),
@@ -150,11 +151,14 @@ export const openSource: Attribute<OpenSourceValue> = {
 		if (features.license === null) {
 			return unrated(openSource, brand, { license: License.UNLICENSED_VISIBLE })
 		}
+
 		const license = features.license.license
 		const references = refs(features.license)
+
 		if (license === License.UNLICENSED_VISIBLE) {
 			return { references, ...unlicensed }
 		}
+
 		switch (licenseIsFOSS(license)) {
 			case FOSS.FOSS:
 				return {

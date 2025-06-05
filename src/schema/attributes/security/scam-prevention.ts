@@ -27,6 +27,7 @@ export type ScamAlertSupport = WithRef<{
 }>
 
 const brand = 'attributes.security.scam_alert'
+
 export type ScamPreventionValue = Value &
 	(
 		| {
@@ -55,6 +56,7 @@ function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & 
 		listFeature: 'Warning you when sending funds to unknown addresses',
 		required: false,
 	} as const
+
 	if (!isSupported(scamAlerts.sendTransactionWarning)) {
 		return {
 			supported: false,
@@ -62,14 +64,17 @@ function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & 
 			...baseProps,
 		}
 	}
+
 	const supported =
 		scamAlerts.sendTransactionWarning.newRecipientWarning ||
 		scamAlerts.sendTransactionWarning.userWhitelist
+
 	if (!supported) {
 		throw new Error(
 			'sendTransactionWarning: If supported, at least one implementation mechanism must be enabled',
 		)
 	}
+
 	return {
 		supported,
 		privacyPreserving:
@@ -92,6 +97,7 @@ function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSuppor
 		listFeature: 'Warning you when interacting with potential scam contracts',
 		required: false,
 	} as const
+
 	if (!isSupported(scamAlerts.contractTransactionWarning)) {
 		return {
 			supported: false,
@@ -99,15 +105,18 @@ function rateContractTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSuppor
 			...baseProps,
 		}
 	}
+
 	const supported =
 		scamAlerts.contractTransactionWarning.contractRegistry ||
 		scamAlerts.contractTransactionWarning.previousContractInteractionWarning ||
 		scamAlerts.contractTransactionWarning.recentContractWarning
+
 	if (!supported) {
 		throw new Error(
 			'contractTransactionWarning: If supported, at least one implementation mechanism must be enabled',
 		)
 	}
+
 	return {
 		supported,
 		privacyPreserving:
@@ -131,6 +140,7 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 		required: false,
 	} as const
 	const scamUrlWarning = scamAlerts.scamUrlWarning
+
 	if (!isSupported(scamUrlWarning)) {
 		return {
 			supported: false,
@@ -138,6 +148,7 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 			...baseProps,
 		}
 	}
+
 	return {
 		supported: true,
 		privacyPreserving: ((): boolean => {
@@ -177,11 +188,13 @@ function evaluateScamAlerts(
 				return [sendTransactionWarning, scamUrlWarning]
 		}
 	})()
+
 	for (const feature of requiredFeatures) {
 		feature.required = true
 	}
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
+
 	if (!isNonEmptyArray(supportedFeatures)) {
 		// No features supported.
 		return {
@@ -190,7 +203,7 @@ function evaluateScamAlerts(
 				displayName: 'No scam prevention',
 				rating: Rating.FAIL,
 				shortExplanation: sentence(
-					`{{WALLET_NAME}} makes no attempt to warn the user about potential scams.`,
+					'{{WALLET_NAME}} makes no attempt to warn the user about potential scams.',
 				),
 				scamAlerts,
 				sendTransactionWarning,
@@ -199,11 +212,13 @@ function evaluateScamAlerts(
 				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
-			howToImprove: paragraph(`{{WALLET_NAME}} should implement scam alerting features.`),
+			howToImprove: paragraph('{{WALLET_NAME}} should implement scam alerting features.'),
 			references: allRefs,
 		}
 	}
+
 	const privacyPreservingFeatures = supportedFeatures.filter(sas => sas.privacyPreserving)
+
 	if (
 		requiredFeatures.includes(scamUrlWarning) &&
 		isSupported(scamAlerts.scamUrlWarning) &&
@@ -217,7 +232,7 @@ function evaluateScamAlerts(
 					displayName: 'Scam prevention feature leaks history',
 					rating: Rating.FAIL,
 					shortExplanation: sentence(
-						`{{WALLET_NAME}} warns you about potential scams, but leaks your browsing history in the process.`,
+						'{{WALLET_NAME}} warns you about potential scams, but leaks your browsing history in the process.',
 					),
 					scamAlerts,
 					sendTransactionWarning,
@@ -234,6 +249,7 @@ function evaluateScamAlerts(
 				references: allRefs,
 			}
 		}
+
 		if (
 			scamAlerts.scamUrlWarning.leaksVisitedUrl === 'DOMAIN_ONLY' &&
 			(scamAlerts.scamUrlWarning.leaksUserAddress || scamAlerts.scamUrlWarning.leaksIp)
@@ -244,7 +260,7 @@ function evaluateScamAlerts(
 					displayName: 'Scam prevention feature leaks website history',
 					rating: Rating.FAIL,
 					shortExplanation: sentence(
-						`{{WALLET_NAME}} warns you about potential scams, but leaks your browsed websites in the process.`,
+						'{{WALLET_NAME}} warns you about potential scams, but leaks your browsed websites in the process.',
 					),
 					scamAlerts,
 					sendTransactionWarning,
@@ -262,6 +278,7 @@ function evaluateScamAlerts(
 			}
 		}
 	}
+
 	if (unsupportedFeatures.length > 0) {
 		// Some but not all features supported.
 		return {
@@ -294,9 +311,11 @@ function evaluateScamAlerts(
 			references: allRefs,
 		}
 	}
+
 	if (privacyPreservingFeatures.length < supportedFeatures.length) {
 		const needsImprovement = (sas: ScamAlertSupport): boolean =>
 			sas.required && sas.supported && !sas.privacyPreserving
+
 		// Not all features implemented with privacy support.
 		return {
 			value: {
@@ -336,6 +355,7 @@ function evaluateScamAlerts(
 			references: allRefs,
 		}
 	}
+
 	// All features implements with privacy.
 	return {
 		value: {
@@ -363,9 +383,9 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 	wording: {
 		midSentenceName: 'scam prevention',
 	},
-	question: sentence(`Does the wallet warn the user about potential scams?`),
+	question: sentence('Does the wallet warn the user about potential scams?'),
 	why: markdown(
-		`Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction.`,
+		'Transactions in Ethereum are very difficult to reverse, and there is no shortage of scams. Wallets have a role to play in helping users avoid known scams ahead of the user making the transaction.',
 	),
 	methodology: markdown(`
 		Wallets are rated based on whether they alert the user about potential
@@ -394,7 +414,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		in a privacy-preserving manner. Specifically:
 
 		* When sending funds, does the lookup for past interactions with that
-		  address unconditionally reveal the sender and recipient addresses to a
+			address unconditionally reveal the sender and recipient addresses to a
 			third-party other than the wallet's default RPC provider for this chain?
 
 			* Wallets can implement this feature in a privacy-preserving manner by
@@ -428,7 +448,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		exhaustive: false,
 		fail: [
 			exampleRating(
-				sentence(`The wallet does not implement any form of scam alerting.`),
+				sentence('The wallet does not implement any form of scam alerting.'),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
 					scamUrlWarning: notSupported,
@@ -437,7 +457,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 			),
 			exampleRating(
 				sentence(
-					`The wallet leaks visited URLs to a third-party as part of its malicious app warning feature.`,
+					'The wallet leaks visited URLs to a third-party as part of its malicious app warning feature.',
 				),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
@@ -452,7 +472,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		],
 		partial: [
 			exampleRating(
-				sentence(`The wallet implements some but not all of the required scam warning features.`),
+				sentence('The wallet implements some but not all of the required scam warning features.'),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
 					scamUrlWarning: supported({
@@ -471,7 +491,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 			),
 			exampleRating(
 				sentence(
-					`The wallet implements all required scam warning features, but not in a privacy-preserving manner.`,
+					'The wallet implements all required scam warning features, but not in a privacy-preserving manner.',
 				),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: supported({
@@ -499,7 +519,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		],
 		pass: exampleRating(
 			sentence(
-				`The wallet implements all required scam warning features in a privacy-preserving manner.`,
+				'The wallet implements all required scam warning features in a privacy-preserving manner.',
 			),
 			evaluateScamAlerts(WalletProfile.GENERIC, {
 				contractTransactionWarning: supported({
@@ -529,6 +549,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		if (features.security.scamAlerts === null) {
 			return unrated(scamPrevention, brand, { scamAlerts: null })
 		}
+
 		return evaluateScamAlerts(features.profile, features.security.scamAlerts)
 	},
 	aggregate: pickWorstRating<ScamPreventionValue>,

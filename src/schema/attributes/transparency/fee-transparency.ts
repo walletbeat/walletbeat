@@ -13,6 +13,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transparency.fee_transparency'
+
 export type FeeTransparencyValue = Value & {
 	feeTransparencyLevel: FeeTransparencyLevel
 	disclosesWalletFees: boolean
@@ -27,7 +28,7 @@ function noFeeTransparency(): Evaluation<FeeTransparencyValue> {
 			rating: Rating.FAIL,
 			displayName: 'No fee transparency',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} does not provide clear information about transaction fees.`,
+				'{{WALLET_NAME}} does not provide clear information about transaction fees.',
 			),
 			feeTransparencyLevel: FeeTransparencyLevel.NONE,
 			disclosesWalletFees: false,
@@ -35,10 +36,10 @@ function noFeeTransparency(): Evaluation<FeeTransparencyValue> {
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} does not provide clear information about transaction fees before users confirm transactions. Users cannot easily understand how much they will pay in network fees or if there are any additional fees charged by the wallet.`,
+			'{{WALLET_NAME}} does not provide clear information about transaction fees before users confirm transactions. Users cannot easily understand how much they will pay in network fees or if there are any additional fees charged by the wallet.',
 		),
 		howToImprove: paragraph(
-			`{{WALLET_NAME}} should implement fee transparency by clearly displaying network fees before transaction confirmation and disclosing any additional fees charged by the wallet.`,
+			'{{WALLET_NAME}} should implement fee transparency by clearly displaying network fees before transaction confirmation and disclosing any additional fees charged by the wallet.',
 		),
 	}
 }
@@ -53,7 +54,7 @@ function basicFeeTransparency(
 			rating: Rating.PARTIAL,
 			displayName: 'Basic fee transparency',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} provides basic information about transaction fees.`,
+				'{{WALLET_NAME}} provides basic information about transaction fees.',
 			),
 			feeTransparencyLevel: FeeTransparencyLevel.BASIC,
 			disclosesWalletFees,
@@ -79,7 +80,7 @@ function detailedFeeTransparency(
 			rating: Rating.PARTIAL,
 			displayName: 'Detailed fee transparency',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} provides detailed information about transaction fees.`,
+				'{{WALLET_NAME}} provides detailed information about transaction fees.',
 			),
 			feeTransparencyLevel: FeeTransparencyLevel.DETAILED,
 			disclosesWalletFees,
@@ -102,7 +103,7 @@ function comprehensiveFeeTransparency(): Evaluation<FeeTransparencyValue> {
 			rating: Rating.PASS,
 			displayName: 'Comprehensive fee transparency',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} provides comprehensive information about all transaction fees.`,
+				'{{WALLET_NAME}} provides comprehensive information about all transaction fees.',
 			),
 			feeTransparencyLevel: FeeTransparencyLevel.COMPREHENSIVE,
 			disclosesWalletFees: true,
@@ -110,7 +111,7 @@ function comprehensiveFeeTransparency(): Evaluation<FeeTransparencyValue> {
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} provides comprehensive information about all fees before transaction confirmation. This includes a detailed breakdown of network fees, clear disclosure of any additional fees charged by the wallet, and a clear explanation of the transaction purpose. Users can make fully informed decisions about the cost of their transactions.`,
+			'{{WALLET_NAME}} provides comprehensive information about all fees before transaction confirmation. This includes a detailed breakdown of network fees, clear disclosure of any additional fees charged by the wallet, and a clear explanation of the transaction purpose. Users can make fully informed decisions about the cost of their transactions.',
 		),
 	}
 }
@@ -122,9 +123,9 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's fee transparency evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve fee transparency?`),
+		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve fee transparency?'),
 	},
-	question: sentence(`Does the wallet clearly display all transaction fees and their purpose?`),
+	question: sentence('Does the wallet clearly display all transaction fees and their purpose?'),
 	why: markdown(`
 		Fee transparency is crucial for users to understand the full cost of their transactions.
 		Without clear fee information, users may be surprised by high transaction costs or
@@ -157,20 +158,20 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		exhaustive: true,
 		pass: exampleRating(
 			paragraph(
-				`The wallet provides comprehensive fee information, including detailed breakdowns of network fees, clear disclosure of any additional wallet fees, and clear explanation of transaction purposes.`,
+				'The wallet provides comprehensive fee information, including detailed breakdowns of network fees, clear disclosure of any additional wallet fees, and clear explanation of transaction purposes.',
 			),
 			comprehensiveFeeTransparency().value,
 		),
 		partial: [
 			exampleRating(
 				paragraph(
-					`The wallet provides detailed information about network fees, but may not fully disclose additional wallet fees or clearly show transaction purposes.`,
+					'The wallet provides detailed information about network fees, but may not fully disclose additional wallet fees or clearly show transaction purposes.',
 				),
 				detailedFeeTransparency(true, false).value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet provides basic information about transaction fees, but the information is limited and may not include a breakdown of costs.`,
+					'The wallet provides basic information about transaction fees, but the information is limited and may not include a breakdown of costs.',
 				),
 				basicFeeTransparency(false, true).value,
 			),
@@ -178,7 +179,7 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		fail: [
 			exampleRating(
 				paragraph(
-					`The wallet does not provide clear information about transaction fees before users confirm transactions.`,
+					'The wallet does not provide clear information about transaction fees before users confirm transactions.',
 				),
 				noFeeTransparency().value,
 			),

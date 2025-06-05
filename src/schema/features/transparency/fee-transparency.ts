@@ -4,10 +4,25 @@ import type { WithRef } from '@/schema/reference'
  * Types of fee transparency levels
  */
 export enum FeeTransparencyLevel {
-	NONE = 'NONE', // No fee transparency
-	BASIC = 'BASIC', // Basic fee information shown
-	DETAILED = 'DETAILED', // Detailed breakdown of network fees
-	COMPREHENSIVE = 'COMPREHENSIVE', // Full transparency of all fees including wallet fees
+	/**
+	 * No fee transparency
+	 */
+	NONE = 'NONE',
+
+	/**
+	 * Basic fee information shown
+	 */
+	BASIC = 'BASIC',
+
+	/**
+	 * Detailed breakdown of network fees
+	 */
+	DETAILED = 'DETAILED',
+
+	/**
+	 * Full transparency of all fees including wallet fees
+	 */
+	COMPREHENSIVE = 'COMPREHENSIVE',
 }
 
 /**

@@ -113,11 +113,11 @@ export const newFeature: Attribute<NewFeatureValue> = {
 	},
 	question: sentence(`Does {{WALLET_NAME}} implement this new feature?`),
 	why: markdown(`
-    Explanation of why this feature is important.
-  `),
+		Explanation of why this feature is important.
+	`),
 	methodology: markdown(`
-    Description of how wallets are evaluated on this feature.
-  `),
+		Description of how wallets are evaluated on this feature.
+	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,

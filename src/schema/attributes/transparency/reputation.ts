@@ -29,12 +29,15 @@ function evaluateReputation(features: ReputationSupport): Rating {
 		features.bugBounty,
 	]
 	const passCount = ratings.filter(r => r === ReputationType.PASS).length
+
 	if (passCount >= 4) {
 		return Rating.PASS
 	}
+
 	if (passCount >= 2) {
 		return Rating.PARTIAL
 	}
+
 	return Rating.FAIL
 }
 
@@ -45,10 +48,10 @@ export const reputation: Attribute<ReputationValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's reputation evaluated?",
-		whatCanWalletDoAboutIts: sentence(`What can {{WALLET_NAME}} do to improve its reputation?`),
+		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its reputation?'),
 	},
 	question: sentence(
-		`Does {{WALLET_NAME}} have a strong reputation for reliability and transparency?`,
+		'Does {{WALLET_NAME}} have a strong reputation for reliability and transparency?',
 	),
 	why: markdown(
 		`A manufacturer's reputation reflects its track record in product design, long-term availability and support, handling of vulnerabilities, and engagement with the security community.
@@ -71,19 +74,19 @@ export const reputation: Attribute<ReputationValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence(`The wallet passes most reputation sub-criteria.`),
+				sentence('The wallet passes most reputation sub-criteria.'),
 				(v: ReputationValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence(`The wallet passes some reputation sub-criteria.`),
+				sentence('The wallet passes some reputation sub-criteria.'),
 				(v: ReputationValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence(`The wallet fails most or all reputation sub-criteria.`),
+				sentence('The wallet fails most or all reputation sub-criteria.'),
 				(v: ReputationValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -92,7 +95,7 @@ export const reputation: Attribute<ReputationValue> = {
 		pickWorstRating<ReputationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<ReputationValue> => {
 		if (features.variant !== Variant.HARDWARE) {
-			return exempt(reputation, sentence(`Only rated for hardware wallets`), brand, {
+			return exempt(reputation, sentence('Only rated for hardware wallets'), brand, {
 				originalProduct: ReputationType.FAIL,
 				availability: ReputationType.FAIL,
 				warrantySupportRisk: ReputationType.FAIL,
@@ -100,7 +103,9 @@ export const reputation: Attribute<ReputationValue> = {
 				bugBounty: ReputationType.FAIL,
 			})
 		}
+
 		const reputationFeature = features.transparency.reputation
+
 		if (reputationFeature === null) {
 			return unrated(reputation, brand, {
 				originalProduct: ReputationType.FAIL,
@@ -124,7 +129,7 @@ export const reputation: Attribute<ReputationValue> = {
 				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} reputation evaluation is ${rating.toLowerCase()}.`),
-			howToImprove: paragraph(`{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.`),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
 			...(extractedRefs.length > 0 && { references: extractedRefs }),
 		}
 	},

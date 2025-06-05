@@ -18,6 +18,7 @@ import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.security_audits'
+
 export type SecurityAuditsValue = Value & {
 	securityAudits: SecurityAudit[]
 	__brand: 'attributes.security.security_audits'
@@ -29,11 +30,11 @@ function noAudits(): Evaluation<SecurityAuditsValue> {
 			id: 'no_audits',
 			rating: Rating.FAIL,
 			displayName: 'No security audits',
-			shortExplanation: sentence(`{{WALLET_NAME}} has not undergone security auditing.`),
+			shortExplanation: sentence('{{WALLET_NAME}} has not undergone security auditing.'),
 			securityAudits: [],
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} has not undergone any security auditing.`),
+		details: paragraph('{{WALLET_NAME}} has not undergone any security auditing.'),
 		references: [],
 	}
 }
@@ -52,44 +53,48 @@ function audited(
 				rating: Rating.FAIL,
 				displayName: 'Last security audit older than a year, has unaddressed flaws',
 				shortExplanation: sentence(
-					`The most recent security audit for {{WALLET_NAME}} is over a year old and some security flaws remain.`,
+					'The most recent security audit for {{WALLET_NAME}} is over a year old and some security flaws remain.',
 				),
 				howToImprove: paragraph(
-					`{{WALLET_NAME}} should fix the security flaws pointed out in past audits, then should undergo a new security audit.`,
+					'{{WALLET_NAME}} should fix the security flaws pointed out in past audits, then should undergo a new security audit.',
 				),
 			}
 		}
+
 		if (!auditedInLastYear) {
 			return {
 				rating: Rating.PARTIAL,
 				displayName: 'Last security audit older than a year',
 				shortExplanation: sentence(
-					`The most recent security audit for {{WALLET_NAME}} is over a year old.`,
+					'The most recent security audit for {{WALLET_NAME}} is over a year old.',
 				),
-				howToImprove: paragraph(`{{WALLET_NAME}} should undergo a new security audit.`),
+				howToImprove: paragraph('{{WALLET_NAME}} should undergo a new security audit.'),
 			}
 		}
+
 		if (hasUnaddressedFlaws) {
 			return {
 				rating: Rating.PARTIAL,
 				displayName: 'Unaddressed security flaws',
 				shortExplanation: sentence(
-					`{{WALLET_NAME}} has undergone a recent security audit, but some security flaws have not been addressed.`,
+					'{{WALLET_NAME}} has undergone a recent security audit, but some security flaws have not been addressed.',
 				),
 				howToImprove: paragraph(
-					`{{WALLET_NAME}} should fix the security flaws pointed out in past security audits, then should consider undergoing a new security audit.`,
+					'{{WALLET_NAME}} should fix the security flaws pointed out in past security audits, then should consider undergoing a new security audit.',
 				),
 			}
 		}
+
 		return {
 			rating: Rating.PASS,
 			displayName: 'Recent flawless security audit',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} has undergone a recent security audit with all faults addressed.`,
+				'{{WALLET_NAME}} has undergone a recent security audit with all faults addressed.',
 			),
 			howToImprove: undefined,
 		}
 	})()
+
 	return {
 		value: {
 			id: `audited_${auditedInLastYear}_${hasUnaddressedFlaws}`,
@@ -109,7 +114,7 @@ function audited(
 }
 
 const sampleSecurityAudit: SecurityAudit = {
-	auditDate: `2020-01-01`,
+	auditDate: '2020-01-01',
 	auditor: exampleSecurityAuditor,
 	ref: 'https://example.com/audit.pdf',
 	unpatchedFlaws: 'ALL_FIXED',
@@ -124,10 +129,10 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's security auditing track record evaluated?",
 		whatCanWalletDoAboutIts: sentence(
-			`What can {{WALLET_NAME}} do on the security auditing front?`,
+			'What can {{WALLET_NAME}} do on the security auditing front?',
 		),
 	},
-	question: sentence(`Has the wallet's source code been reviewed by security auditors?`),
+	question: sentence("Has the wallet's source code been reviewed by security auditors?"),
 	why: markdown(`
 		Wallets are high-stakes piece of software as they deal with sensitive
 		user data and funds. To ensure that their code is secure, industry best
@@ -164,30 +169,30 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		exhaustive: true,
 		pass: exampleRating(
 			paragraph(
-				`The wallet was audited within the last year, and all flaws of severity "medium" or higher are addressed.`,
+				'The wallet was audited within the last year, and all flaws of severity "medium" or higher are addressed.',
 			),
 			audited([sampleSecurityAudit], true, false).value,
 		),
 		partial: [
 			exampleRating(
-				paragraph(`The wallet was audited over a year ago, and has not been audited since.`),
+				paragraph('The wallet was audited over a year ago, and has not been audited since.'),
 				audited([sampleSecurityAudit], false, false).value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet was audited within the last year, and there remains at least one unaddressed security flaw of severity "medium" or higher.`,
+					'The wallet was audited within the last year, and there remains at least one unaddressed security flaw of severity "medium" or higher.',
 				),
 				audited([sampleSecurityAudit], true, true).value,
 			),
 		],
 		fail: [
 			exampleRating(
-				paragraph(`The wallet was never audited by a third-party security auditor.`),
+				paragraph('The wallet was never audited by a third-party security auditor.'),
 				noAudits().value,
 			),
 			exampleRating(
 				paragraph(
-					`The wallet was audited over a year ago, has not been audited since, and there remains at least one unaddressed security flaw of severity "medium" or higher.`,
+					'The wallet was audited over a year ago, has not been audited since, and there remains at least one unaddressed security flaw of severity "medium" or higher.',
 				),
 				audited([sampleSecurityAudit], false, true).value,
 			),
@@ -197,7 +202,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		if (features.variant === Variant.HARDWARE) {
 			return exempt(
 				securityAudits,
-				sentence(`This attribute is not applicable to hardware wallets.`),
+				sentence('This attribute is not applicable to hardware wallets.'),
 				brand,
 				{ securityAudits: [] },
 			)
@@ -206,16 +211,20 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		if (features.security.publicSecurityAudits === null) {
 			return unrated(securityAudits, brand, { securityAudits: [] })
 		}
+
 		if (!isNonEmptyArray(features.security.publicSecurityAudits)) {
 			return noAudits()
 		}
+
 		const audits = features.security.publicSecurityAudits
 		let auditedInLastYear = false
 		let hasUnaddressedFlaws = false
+
 		for (const audit of audits) {
 			if (daysSince(audit.auditDate) <= 366) {
 				auditedInLastYear = true
 			}
+
 			if (Array.isArray(audit.unpatchedFlaws)) {
 				for (const flaw of audit.unpatchedFlaws) {
 					if (flaw.presentStatus === 'NOT_FIXED') {
@@ -224,15 +233,18 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 				}
 			}
 		}
+
 		return audited(audits, auditedInLastYear, hasUnaddressedFlaws)
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsValue>>) => {
 		const worstEvaluation = pickWorstRating<SecurityAuditsValue>(perVariant)
 		const allAudits: SecurityAudit[] = []
 		const auditsIdSet = new Set<string>()
+
 		for (const evaluation of Object.values(perVariant)) {
 			for (const audit of evaluation.value.securityAudits) {
 				const auditId = securityAuditId(audit)
+
 				if (!auditsIdSet.has(auditId)) {
 					allAudits.push(audit)
 					auditsIdSet.add(auditId)
@@ -240,6 +252,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 			}
 		}
 		worstEvaluation.value.securityAudits = allAudits
+
 		return worstEvaluation
 	},
 }

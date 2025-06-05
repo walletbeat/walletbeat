@@ -14,6 +14,11 @@ jobs:
         run: ./deploy/helios/helios-update.sh --checkpoint-only
       - name: Commit checkpoint
         run: |
-          git config --global user.name 'walletbeat-bot'
-          git config --global user.email 'walletbeat-bot@users.noreply.github.com'
+          ./deploy/setup-git.sh
           ./deploy/helios/helios-checkpoint-push.sh
+        env:
+          GIT_USERNAME: walletbeat-bot
+          GIT_EMAIL: walletbeat-bot@users.noreply.github.com
+          GIT_SSH_SIGNING_KEY_TYPE: ed25519
+          GIT_SSH_SIGNING_KEY_PUBLIC: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBw+NZEg1p71wrjIngH8PZQ1GDeACirHUjposkeYdurM walletbeat-bot@walletbeat.eth'
+          GIT_SSH_SIGNING_KEY_PRIVATE: ${{ secrets.WALLETBEAT_BOT_GIT_SSH_SIGNING_KEY_PRIVATE }}

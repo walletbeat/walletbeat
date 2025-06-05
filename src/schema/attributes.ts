@@ -3,7 +3,7 @@ import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/ut
 
 import type { ResolvedFeatures } from './features'
 import type { FullyQualifiedReference, ReferenceArray } from './reference'
-import type { MaybeUnratedScore, Score } from './score'
+import type { Score } from './score'
 import type { AtLeastOneVariant } from './variants'
 import type { RatedWallet, WalletMetadata } from './wallet'
 
@@ -185,7 +185,7 @@ export interface Value {
 	 * A score representing this value on this specific attribute.
 	 * For any given Attribute, there should be at least one way to get a
 	 * score of 1.0.
-	 * If unspecified, the score is derived  using `defaultRatingScore`.
+	 * If unspecified, the score is derived using `defaultRatingScore`.
 	 */
 	score?: Score
 }
@@ -322,32 +322,32 @@ export interface Attribute<V extends Value> {
 	displayName: string
 
 	wording:
-	| {
-		/**
-		 * A very short, human-readable name for the attribute in a sentence.
-		 * Should be no more than 3 or 4 words.
-		 * Used in the context of mid-sentence descriptions. For example, the
-		 * following string should make sense:
-		 * "Is this wallet's ${midSentenceName} good or bad?"
-		 * In most cases, a lowercase version of `displayName` will be appropriate.
-		 * In more complex cases, this should be omitted and the more complex
-		 * variation of `wording` should be used.
-		 */
-		midSentenceName: string
-	}
-	| {
-		/**
-		 * midSentenceName can be set to `null` for more complex attribute
-		 * names.
-		 */
-		midSentenceName: null
+		| {
+				/**
+				 * A very short, human-readable name for the attribute in a sentence.
+				 * Should be no more than 3 or 4 words.
+				 * Used in the context of mid-sentence descriptions. For example, the
+				 * following string should make sense:
+				 * "Is this wallet's ${midSentenceName} good or bad?"
+				 * In most cases, a lowercase version of `displayName` will be appropriate.
+				 * In more complex cases, this should be omitted and the more complex
+				 * variation of `wording` should be used.
+				 */
+				midSentenceName: string
+		  }
+		| {
+				/**
+				 * midSentenceName can be set to `null` for more complex attribute
+				 * names.
+				 */
+				midSentenceName: null
 
-		/** The sentence "How is <attribute> evaluated?"  */
-		howIsEvaluated: string
+				/** The sentence "How is <attribute> evaluated?"  */
+				howIsEvaluated: string
 
-		/** The sentence "What can <wallet> do about its <attribute>?" */
-		whatCanWalletDoAboutIts: Sentence<{ WALLET_NAME: string }>
-	}
+				/** The sentence "What can <wallet> do about its <attribute>?" */
+				whatCanWalletDoAboutIts: Sentence<{ WALLET_NAME: string }>
+		  }
 
 	/** A question explaining what question the attribute is answering. */
 	question: Sentence<{ WALLET_NAME: string }>
@@ -360,45 +360,45 @@ export interface Attribute<V extends Value> {
 
 	/** Explanations of what a wallet can do to achieve each rating. */
 	ratingScale:
-	| {
-		/**
-		 * The type of display used to render the rating scale.
-		 * "simple" means to render a simple renderable block of text, useful for
-		 * simple yes/no-type attributes.
-		 */
-		display: 'simple'
+		| {
+				/**
+				 * The type of display used to render the rating scale.
+				 * "simple" means to render a simple renderable block of text, useful for
+				 * simple yes/no-type attributes.
+				 */
+				display: 'simple'
 
-		/** The content to display to explain the rating scale. */
-		content: TypographicContent
-	}
-	| {
-		/**
-		 * The order in which each explanation below is displayed:
-		 * - "pass-fail": Passing examples first, failing examples last
-		 *   (partial examples in the middle, if any).
-		 * - "fail-pass": Failing examples first, passing examples last
-		 *   (partial examples in the middle, if any).
-		 */
-		display: 'pass-fail' | 'fail-pass'
+				/** The content to display to explain the rating scale. */
+				content: TypographicContent
+		  }
+		| {
+				/**
+				 * The order in which each explanation below is displayed:
+				 * - "pass-fail": Passing examples first, failing examples last
+				 *   (partial examples in the middle, if any).
+				 * - "fail-pass": Failing examples first, passing examples last
+				 *   (partial examples in the middle, if any).
+				 */
+				display: 'pass-fail' | 'fail-pass'
 
-		/**
-		 * Whether the examples below exhaustively cover all cases that
-		 * are possible. This affects the wording around the examples.
-		 */
-		exhaustive: boolean
+				/**
+				 * Whether the examples below exhaustively cover all cases that
+				 * are possible. This affects the wording around the examples.
+				 */
+				exhaustive: boolean
 
-		/** One or more ways in which a wallet can achieve a passing rating. */
-		pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+				/** One or more ways in which a wallet can achieve a passing rating. */
+				pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
 
-		/**
-		 * Ways in which a wallet can achieve a partial rating.
-		 * Unlike passing/failing, there may be zero ways to get a partial rating.
-		 */
-		partial?: ExampleRating<V> | Array<ExampleRating<V>>
+				/**
+				 * Ways in which a wallet can achieve a partial rating.
+				 * Unlike passing/failing, there may be zero ways to get a partial rating.
+				 */
+				partial?: ExampleRating<V> | Array<ExampleRating<V>>
 
-		/** One or more ways in which a wallet can achieve a failing rating. */
-		fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
-	}
+				/** One or more ways in which a wallet can achieve a failing rating. */
+				fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+		  }
 
 	/**
 	 * Evaluate the attribute for a given set of wallet features.
@@ -537,15 +537,19 @@ export function exampleRating<V extends Value>(
 				if (matcher === exampleRatingUnimplemented) {
 					return false
 				}
+
 				if (isRating(matcher)) {
 					return value.rating === matcher
 				}
+
 				if (typeof matcher === 'string') {
 					return value.id === matcher
 				}
+
 				if (typeof matcher === 'function') {
 					return matcher(value)
 				}
+
 				return matcher.id === value.id
 			}).includes(true),
 	}

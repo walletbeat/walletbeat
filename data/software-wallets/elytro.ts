@@ -15,7 +15,7 @@ export const elytro: SoftwareWallet = {
 		displayName: 'Elytro',
 		tableName: 'Elytro',
 		blurb: paragraph(
-			`Coming soon. We build secured and decentralized public infra for humanity on Ethereum. We believe in a free, open and self-own internet. We start by building a smart contract account.`,
+			'Coming soon. We build secured and decentralized public infra for humanity on Ethereum. We believe in a free, open and self-own internet. We start by building a smart contract account.',
 		),
 		contributors: [nconsigny],
 		iconExtension: 'svg',
@@ -81,6 +81,7 @@ export const elytro: SoftwareWallet = {
 			dataCollection: null,
 			privacyPolicy: 'https://github.com/Elytro-eth',
 			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
 				stealthAddresses: notSupported,
 			},
 		},

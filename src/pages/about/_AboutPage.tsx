@@ -19,18 +19,18 @@ import { IconLink } from '@/ui/atoms/IconLink'
 function AboutContents(): React.JSX.Element {
 	return (
 		<>
-			<Typography variant="body1">
+			<Typography variant='body1'>
 				Walletbeat is a public good project that brings transparency to the Ethereum wallet
 				ecosystem.
 				<br />
 				<strong>
-					As <ExternalLink url="https://l2beat.com">L2Beat</ExternalLink> has done for Ethereum
+					As <ExternalLink url='https://l2beat.com'>L2Beat</ExternalLink> has done for Ethereum
 					Layer 2s, Walletbeat aims to do the same for Ethereum wallets.
 				</strong>
 			</Typography>
 			<Divider
-				orientation="horizontal"
-				variant="middle"
+				orientation='horizontal'
+				variant='middle'
 				flexItem={true}
 				sx={{
 					marginTop: '1rem',
@@ -39,14 +39,14 @@ function AboutContents(): React.JSX.Element {
 					marginRight: '10%',
 				}}
 			/>
-			<Typography variant="body1">
+			<Typography variant='body1'>
 				Walletbeat aims to be fair, objective and impartial in its assessment methodology of
 				Ethereum wallets.
 				<br />
 				Where there is inherent subjectivity, such as in the decision of <em>which</em> criteria are
 				used to rate and categorize wallets, Walletbeat aims to follow Ethereum&apos;s ethos and
 				cypherpunk values as a guiding principle. See{' '}
-				<ExternalLink url="https://vitalik.eth.limo/general/2024/12/03/wallets.html">
+				<ExternalLink url='https://vitalik.eth.limo/general/2024/12/03/wallets.html'>
 					Vitalik&apos;s blog post on wallets
 				</ExternalLink>{' '}
 				and the{' '}
@@ -56,8 +56,8 @@ function AboutContents(): React.JSX.Element {
 				for more details.
 			</Typography>
 			<Divider
-				orientation="horizontal"
-				variant="middle"
+				orientation='horizontal'
+				variant='middle'
 				flexItem={true}
 				sx={{
 					marginTop: '1rem',
@@ -66,29 +66,29 @@ function AboutContents(): React.JSX.Element {
 					marginRight: '10%',
 				}}
 			/>
-			<Typography variant="body1">
+			<Typography variant='body1'>
 				Walletbeat is committed to transparency. Contributors reveal their affiliation and / or
 				shares in wallet companies. It is an{' '}
 				<IconLink
 					IconComponent={GitHubIcon}
-					href="https://github.com/walletbeat/walletbeat"
-					target="_blank"
+					href='https://github.com/walletbeat/walletbeat'
+					target='_blank'
 				>
 					open-source project
 				</IconLink>{' '}
 				licensed under the Free and Open-Source MIT license. Discussions are held on the{' '}
 				<IconLink
 					IconComponent={ForumIcon}
-					href="https://warpcast.com/~/channel/walletbeat"
-					target="_blank"
+					href='https://warpcast.com/~/channel/walletbeat'
+					target='_blank'
 				>
 					public /walletbeat Farcaster channel
 				</IconLink>
 				.
 			</Typography>
 			<Divider
-				orientation="horizontal"
-				variant="middle"
+				orientation='horizontal'
+				variant='middle'
 				flexItem={true}
 				sx={{
 					marginTop: '1rem',
@@ -97,7 +97,7 @@ function AboutContents(): React.JSX.Element {
 					marginRight: '10%',
 				}}
 			/>
-			<Typography variant="body1">
+			<Typography variant='body1'>
 				As of 2025-01, Walletbeat has received no funding and is not in need of any.
 				<br />
 				If funding becomes a necessity in the future, Walletbeat aims to raise funds through
@@ -106,8 +106,8 @@ function AboutContents(): React.JSX.Element {
 				funding.
 			</Typography>
 			<Divider
-				orientation="horizontal"
-				variant="middle"
+				orientation='horizontal'
+				variant='middle'
 				flexItem={true}
 				sx={{
 					marginTop: '1rem',
@@ -116,11 +116,11 @@ function AboutContents(): React.JSX.Element {
 					marginRight: '10%',
 				}}
 			/>
-			<Typography variant="body1">
+			<Typography variant='body1'>
 				Walletbeat refuses and will continue to refuse funding from wallet-related entities.
 				<br />
 				Walletbeat however was originally created and is currently hosted by{' '}
-				<ExternalLink url="https://fluidkey.com/">Fluidkey</ExternalLink>, an incorporated company
+				<ExternalLink url='https://fluidkey.com/'>Fluidkey</ExternalLink>, an incorporated company
 				in Switzerland with a wallet offering. In order to maximize credible neutrality,
 				Walletbeat&apos;s long-term ownership goal is to become an independent DAO or foundation
 				(similar to L2Beat) once Walletbeat reaches a higher level of maturity and a broader set of
@@ -128,8 +128,8 @@ function AboutContents(): React.JSX.Element {
 				software from Fluidkey.
 			</Typography>
 			<Divider
-				orientation="horizontal"
-				variant="middle"
+				orientation='horizontal'
+				variant='middle'
 				flexItem={true}
 				sx={{
 					marginTop: '1rem',
@@ -138,13 +138,13 @@ function AboutContents(): React.JSX.Element {
 					marginRight: '10%',
 				}}
 			/>
-			<Typography variant="body1">
+			<Typography variant='body1'>
 				Wallets listed on Walletbeat do not represent an endorsement and is for informational
 				purposes only. If you find that something is wrong, please help Walletbeat by{' '}
 				<IconLink
 					IconComponent={GitHubIcon}
-					href="https://github.com/walletbeat/walletbeat"
-					target="_blank"
+					href='https://github.com/walletbeat/walletbeat'
+					target='_blank'
 				>
 					contributing
 				</IconLink>
@@ -182,19 +182,19 @@ export function AboutPage(): React.JSX.Element {
 				},
 			]}
 		>
-			<div className="max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full">
-				<div className="flex flex-col lg:mt-10 gap-4">
-					<Typography id="aboutHeader" variant="h1" mb={1}>
+			<div className='max-w-screen-lg 3xl:max-w-screen-xl mx-auto w-full'>
+				<div className='flex flex-col lg:mt-10 gap-4'>
+					<Typography id='aboutHeader' variant='h1' mb={1}>
 						About Walletbeat
 					</Typography>
 					<Typography
-						variant="caption"
+						variant='caption'
 						sx={{ fontStyle: 'italic', fontSize: '1.25rem', opacity: 0.75 }}
 						mb={2}
 					>
 						Who watches the wallets?
 					</Typography>
-					<div className="flex flex-col gap-2 items-stretch justify-stretch">
+					<div className='flex flex-col gap-2 items-stretch justify-stretch'>
 						<AboutContents />
 					</div>
 				</div>

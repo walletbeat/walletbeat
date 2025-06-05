@@ -44,8 +44,10 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 	if (value === null || typeof value !== 'object') {
 		return false
 	}
+
 	let foundVariant = false
 	let foundNonVariant = false
+
 	Object.keys(value).forEach(key => {
 		if (
 			key === 'mobile' ||
@@ -59,7 +61,8 @@ function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneV
 			foundNonVariant = true
 		}
 	})
-	return foundVariant && !foundNonVariant // eslint-disable-line @typescript-eslint/no-unnecessary-condition -- Not sure why it thinks this is an unnecessary conditional.
+
+	return foundVariant && !foundNonVariant
 }
 
 /**
@@ -91,9 +94,11 @@ export function getSingleVariant<T>(
 	obj: AtLeastOneVariant<T>,
 ): { singleVariant: Variant; val: T } | { singleVariant: null; val: null } {
 	const values = nonEmptyEntries<Variant, T>(obj).filter(([_, val]) => val !== undefined)
+
 	if (values.length === 1) {
 		return { singleVariant: values[0][0], val: values[0][1] }
 	}
+
 	return { singleVariant: null, val: null }
 }
 
@@ -121,8 +126,10 @@ export function resolveFeature<T>(
 	if (feature === null) {
 		return null
 	}
+
 	if (isAtLeastOneVariants(feature)) {
 		return feature[variant] ?? null
 	}
+
 	return feature
 }

@@ -15,7 +15,7 @@ export const zerion: SoftwareWallet = {
 		id: 'zerion',
 		displayName: 'Zerion',
 		tableName: 'Zerion',
-		blurb: paragraph(``),
+		blurb: paragraph(''),
 		contributors: [lucemans],
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
@@ -78,6 +78,7 @@ export const zerion: SoftwareWallet = {
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
 				stealthAddresses: notSupported,
 			},
 		},

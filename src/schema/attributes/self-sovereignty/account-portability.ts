@@ -26,6 +26,7 @@ import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.self_sovereignty.account_portability'
+
 export type AccountPortabilityValue = Value & {
 	__brand: 'attributes.self_sovereignty.account_portability'
 }
@@ -40,18 +41,19 @@ function evaluateEoa(
 		eoa.keyDerivation.derivationPath === 'BIP44'
 	) {
 		const canExportSeedPhrase = eoa.keyDerivation.canExportSeedPhrase
+
 		return {
 			value: {
 				id: 'standard_eoa_exportable',
 				rating: Rating.PASS,
 				displayName: 'Standards-compliant EOA with seed phrase',
-				shortExplanation: sentence(`{{WALLET_NAME}} follows EOA key derivation standards.`),
+				shortExplanation: sentence('{{WALLET_NAME}} follows EOA key derivation standards.'),
 				__brand: brand,
 			},
 			details: mdParagraph(`
 				{{WALLET_NAME}} generates EOA keys in a
 				standards-compliant way:
-				
+
 				* [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
 					for deriving a binary seed from a seed phrase.
 				* [BIP-32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)
@@ -71,6 +73,7 @@ function evaluateEoa(
 			references,
 		}
 	}
+
 	if (eoa.canExportPrivateKey) {
 		return {
 			value: {
@@ -78,22 +81,23 @@ function evaluateEoa(
 				rating: Rating.PARTIAL,
 				displayName: 'Non-standard but exportable EOA',
 				shortExplanation: sentence(
-					`{{WALLET_NAME}} does not follow key derivation standards for EOA keys, but lets you export them to other wallets.`,
+					'{{WALLET_NAME}} does not follow key derivation standards for EOA keys, but lets you export them to other wallets.',
 				),
 				__brand: brand,
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} generates EOA keys in a non-standard way. However, these keys can be exported into other wallets, avoiding lock-in.`,
+				'{{WALLET_NAME}} generates EOA keys in a non-standard way. However, these keys can be exported into other wallets, avoiding lock-in.',
 			),
 			impact: paragraph(
-				`Using {{WALLET_NAME}} requires keeping backups of your keys in order to ensure portability of your account down the line.`,
+				'Using {{WALLET_NAME}} requires keeping backups of your keys in order to ensure portability of your account down the line.',
 			),
 			howToImprove: paragraph(
-				`{{WALLET_NAME}} should follow key derivation standards to avoid requiring users to back up each private key.`,
+				'{{WALLET_NAME}} should follow key derivation standards to avoid requiring users to back up each private key.',
 			),
 			references,
 		}
 	}
+
 	return {
 		value: {
 			id: 'no_export_eoa',
@@ -101,15 +105,15 @@ function evaluateEoa(
 			icon: '\u{1faa4}', // Mouse trap
 			displayName: 'Cannot export account key',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} locks you in by not allowing you to export your account's private key.`,
+				"{{WALLET_NAME}} locks you in by not allowing you to export your account's private key.",
 			),
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} does not allow you to export your account's private key.`),
+		details: paragraph("{{WALLET_NAME}} does not allow you to export your account's private key."),
 		impact: paragraph(
-			`Using {{WALLET_NAME}} locks you into it, as you cannot export your account into another wallet.`,
+			'Using {{WALLET_NAME}} locks you into it, as you cannot export your account into another wallet.',
 		),
-		howToImprove: paragraph(`{{WALLET_NAME}} should let users export private keys.`),
+		howToImprove: paragraph('{{WALLET_NAME}} should let users export private keys.'),
 		references,
 	}
 }
@@ -126,22 +130,23 @@ function evaluateMpc(
 				icon: '\u{1faa4}', // Mouse trap
 				displayName: 'Non-custodial MPC shares',
 				shortExplanation: sentence(
-					`By default, users of {{WALLET_NAME}} do not custody enough shares of the account's private key to control it.`,
+					"By default, users of {{WALLET_NAME}} do not custody enough shares of the account's private key to control it.",
 				),
 				__brand: brand,
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. By default, the user does not custody enough shares of this private key in order to control the account. Therefore, {{WALLET_NAME}} is not a self-custodial wallet.`,
+				'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. By default, the user does not custody enough shares of this private key in order to control the account. Therefore, {{WALLET_NAME}} is not a self-custodial wallet.',
 			),
 			impact: paragraph(
-				`Users of {{WALLET_NAME}} do not have unilateral control over their account, and need to rely on a third-party to authorize transactions or transfer assets out of the account.`,
+				'Users of {{WALLET_NAME}} do not have unilateral control over their account, and need to rely on a third-party to authorize transactions or transfer assets out of the account.',
 			),
 			howToImprove: mdParagraph(
-				`{{WALLET_NAME}} should provide a way for users to obtain enough key shares in self-custody such that users no longer *need* to rely on third parties for transactions.`,
+				'{{WALLET_NAME}} should provide a way for users to obtain enough key shares in self-custody such that users no longer *need* to rely on third parties for transactions.',
 			),
 			references,
 		}
 	}
+
 	if (
 		mpc.tokenTransferTransactionGeneration ===
 		TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API
@@ -153,22 +158,23 @@ function evaluateMpc(
 				icon: '\u{1faa4}', // Mouse trap
 				displayName: 'Cannot withdraw assets without third party',
 				shortExplanation: sentence(
-					`Withdrawing assets out of {{WALLET_NAME}} cannot be done without relying on a third party.`,
+					'Withdrawing assets out of {{WALLET_NAME}} cannot be done without relying on a third party.',
 				),
 				__brand: brand,
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully own the account, but generating an asset withdrawal transaction nonetheless requires interaction with a third-party.`,
+				'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully own the account, but generating an asset withdrawal transaction nonetheless requires interaction with a third-party.',
 			),
 			impact: paragraph(
-				`While users of {{WALLET_NAME}} have unilateral control over their account, the reliance on a third-party to generate valid transactions means that transactions can be censored by that third-party and effectively freeze the account in place.`,
+				'While users of {{WALLET_NAME}} have unilateral control over their account, the reliance on a third-party to generate valid transactions means that transactions can be censored by that third-party and effectively freeze the account in place.',
 			),
 			howToImprove: paragraph(
-				`{{WALLET_NAME}} should release an open-source standalone application that allows users to sign transactions using their self-custodial key shares.`,
+				'{{WALLET_NAME}} should release an open-source standalone application that allows users to sign transactions using their self-custodial key shares.',
 			),
 			references,
 		}
 	}
+
 	if (
 		mpc.tokenTransferTransactionGeneration ===
 		TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
@@ -179,34 +185,35 @@ function evaluateMpc(
 				rating: Rating.PARTIAL,
 				displayName: 'Requires proprietary app to withdraw assets',
 				shortExplanation: sentence(
-					`Withdrawing assets out of {{WALLET_NAME}} requires the use of a proprietary application.`,
+					'Withdrawing assets out of {{WALLET_NAME}} requires the use of a proprietary application.',
 				),
 				__brand: brand,
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully own the account, but generating an asset withdrawal transaction nonetheless requires the use of a proprietary application.`,
+				'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully own the account, but generating an asset withdrawal transaction nonetheless requires the use of a proprietary application.',
 			),
 			impact: paragraph(
-				`While users of {{WALLET_NAME}} have unilateral control over their account, the reliance on a proprietary application to generate valid transactions means that the user's effective ability to generate transactions may be hampered by the limitations of the proprietary application.`,
+				"While users of {{WALLET_NAME}} have unilateral control over their account, the reliance on a proprietary application to generate valid transactions means that the user's effective ability to generate transactions may be hampered by the limitations of the proprietary application.",
 			),
 			howToImprove: paragraph(
-				`{{WALLET_NAME}} should release an open-source standalone application that allows users to sign transactions using their self-custodial key shares.`,
+				'{{WALLET_NAME}} should release an open-source standalone application that allows users to sign transactions using their self-custodial key shares.',
 			),
 			references,
 		}
 	}
+
 	return {
 		value: {
 			id: 'mpc_ok',
 			rating: Rating.PASS,
 			displayName: 'Self-custodial MPC wallet',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} puts the user in control of their MPC private key.`,
+				'{{WALLET_NAME}} puts the user in control of their MPC private key.',
 			),
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully control the account, and can generate transactions without relying on a third-party.`,
+			'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully control the account, and can generate transactions without relying on a third-party.',
 		),
 		references,
 	}
@@ -218,6 +225,7 @@ function evaluateMultifactor(
 	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	const eip = multifactorType === 'erc4337' ? erc4337 : eip7702
+
 	if (multifactor.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
 		return {
 			value: {
@@ -226,7 +234,7 @@ function evaluateMultifactor(
 				icon: '\u{1faa4}', // Mouse trap
 				displayName: 'Not a self-custodial wallet',
 				shortExplanation: sentence(
-					`{{WALLET_NAME}} is not self-custodial, and cannot be converted to become self-custodial.`,
+					'{{WALLET_NAME}} is not self-custodial, and cannot be converted to become self-custodial.',
 				),
 				__brand: brand,
 			},
@@ -234,14 +242,15 @@ function evaluateMultifactor(
 				`{{WALLET_NAME}} is an ${eipMarkdownLink(eip)} (Smart Contract) wallet. The account control logic in the smart contract cannot be updated to put the user fully in control of the account.`,
 			),
 			impact: paragraph(
-				`{{WALLET_NAME}} is not a self-custodial wallet and users cannot updated it into one. Users of {{WALLET_NAME}} are therefore not in control of their account.`,
+				'{{WALLET_NAME}} is not a self-custodial wallet and users cannot updated it into one. Users of {{WALLET_NAME}} are therefore not in control of their account.',
 			),
 			howToImprove: paragraph(
-				`{{WALLET_NAME}} should update the smart contract control logic to allow users to take full control of the account.`,
+				'{{WALLET_NAME}} should update the smart contract control logic to allow users to take full control of the account.',
 			),
 			references,
 		}
 	}
+
 	if (multifactor.controllingSharesInSelfCustodyByDefault === 'NO') {
 		if (
 			multifactor.keyRotationTransactionGeneration ===
@@ -254,7 +263,7 @@ function evaluateMultifactor(
 					icon: '\u{1faa4}', // Mouse trap
 					displayName: 'Not self-custodial by default',
 					shortExplanation: sentence(
-						`{{WALLET_NAME}} is not self-custodial by default, and changing this requires cooperation from a third-party.`,
+						'{{WALLET_NAME}} is not self-custodial by default, and changing this requires cooperation from a third-party.',
 					),
 					__brand: brand,
 				},
@@ -265,11 +274,12 @@ function evaluateMultifactor(
 					The user *may* update the smart contract control logic such that the account becomes effectively self-custodied. However, this process requires the cooperation of a third-party and is therefore at risk that the third-party prevents this switch from taking place.
 				`),
 				howToImprove: mdParagraph(
-					`{{WALLET_NAME}} should either change the smart contract's default control configuration such that the account is self-custodied by the user from the start, or should release an open-source standalone application that allows users to switch their account to be effectively self-custodied.`,
+					"{{WALLET_NAME}} should either change the smart contract's default control configuration such that the account is self-custodied by the user from the start, or should release an open-source standalone application that allows users to switch their account to be effectively self-custodied.",
 				),
 				references,
 			}
 		}
+
 		if (
 			multifactor.keyRotationTransactionGeneration ===
 			TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
@@ -281,7 +291,7 @@ function evaluateMultifactor(
 					icon: '\u{1faa4}', // Mouse trap
 					displayName: 'Not self-custodial by default',
 					shortExplanation: sentence(
-						`{{WALLET_NAME}} is not self-custodial by default, and changing this requires a proprietary application.`,
+						'{{WALLET_NAME}} is not self-custodial by default, and changing this requires a proprietary application.',
 					),
 					__brand: brand,
 				},
@@ -292,12 +302,13 @@ function evaluateMultifactor(
 					The user *may* update the smart contract control logic such that the account becomes effectively self-custodied. However, this process requires the use of a proprietary application, and is therefore at risk that the application prevents this switch from taking place.
 				`),
 				howToImprove: mdParagraph(
-					`{{WALLET_NAME}} should either change the smart contract's default control configuration such that the account is self-custodied by the user from the start, or should release an open-source standalone application that allows users to switch their account to be effectively self-custodied.`,
+					"{{WALLET_NAME}} should either change the smart contract's default control configuration such that the account is self-custodied by the user from the start, or should release an open-source standalone application that allows users to switch their account to be effectively self-custodied.",
 				),
 				references,
 			}
 		}
 	}
+
 	if (
 		multifactor.tokenTransferTransactionGeneration ===
 		TransactionGenerationCapability.RELYING_ON_THIRD_PARTY_API
@@ -309,22 +320,23 @@ function evaluateMultifactor(
 				icon: '\u{1faa4}', // Mouse trap
 				displayName: 'Cannot withdraw assets without third party',
 				shortExplanation: sentence(
-					`Withdrawing assets out of {{WALLET_NAME}} cannot be done without relying on a third party.`,
+					'Withdrawing assets out of {{WALLET_NAME}} cannot be done without relying on a third party.',
 				),
 				__brand: brand,
 			},
 			details: mdParagraph(
-				`Users of {{WALLET_NAME}} cannot generate asset transfer transactions without relying on a third-party.`,
+				'Users of {{WALLET_NAME}} cannot generate asset transfer transactions without relying on a third-party.',
 			),
 			impact: paragraph(
-				`The reliance on a third-party to generate valid transactions means that transactions can be censored by that third-party, opening up the risk that the third-party effectively freezes the account in place.`,
+				'The reliance on a third-party to generate valid transactions means that transactions can be censored by that third-party, opening up the risk that the third-party effectively freezes the account in place.',
 			),
 			howToImprove: paragraph(
-				`{{WALLET_NAME}} should open-source sufficient wallet components such that users can sign and broadcast arbitrary transactions without relying on any third party.`,
+				'{{WALLET_NAME}} should open-source sufficient wallet components such that users can sign and broadcast arbitrary transactions without relying on any third party.',
 			),
 			references,
 		}
 	}
+
 	if (
 		multifactor.tokenTransferTransactionGeneration ===
 		TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
@@ -336,22 +348,23 @@ function evaluateMultifactor(
 				icon: '\u{1faa4}', // Mouse trap
 				displayName: 'Requires proprietary app to withdraw assets',
 				shortExplanation: sentence(
-					`Withdrawing assets out of {{WALLET_NAME}} requires the use of a proprietary application.`,
+					'Withdrawing assets out of {{WALLET_NAME}} requires the use of a proprietary application.',
 				),
 				__brand: brand,
 			},
 			details: mdParagraph(
-				`Generating an asset transfer transaction with {{WALLET_NAME}} requires the user of a proprietary application.`,
+				'Generating an asset transfer transaction with {{WALLET_NAME}} requires the user of a proprietary application.',
 			),
 			impact: paragraph(
-				`The reliance on a proprietary application to generate valid transactions means that the application may opaquely decide to reject the generation of certain transactions, opening up the risk that the account is effectively frozen in place.`,
+				'The reliance on a proprietary application to generate valid transactions means that the application may opaquely decide to reject the generation of certain transactions, opening up the risk that the account is effectively frozen in place.',
 			),
 			howToImprove: paragraph(
-				`{{WALLET_NAME}} should open-source sufficient wallet components such that users can sign and broadcast arbitrary transactions without relying on any third party.`,
+				'{{WALLET_NAME}} should open-source sufficient wallet components such that users can sign and broadcast arbitrary transactions without relying on any third party.',
 			),
 			references,
 		}
 	}
+
 	if (
 		multifactor.controllingSharesInSelfCustodyByDefault === 'NO' &&
 		multifactor.keyRotationTransactionGeneration ===
@@ -362,25 +375,26 @@ function evaluateMultifactor(
 				id: `${multifactorType}_no_control_by_default`,
 				rating: Rating.PARTIAL,
 				displayName: 'Not self-custodial by default',
-				shortExplanation: sentence(`{{WALLET_NAME}} is not self-custodial by default.`),
+				shortExplanation: sentence('{{WALLET_NAME}} is not self-custodial by default.'),
 				__brand: brand,
 			},
 			details: mdParagraph(
 				`{{WALLET_NAME}} is an ${eipMarkdownLink(erc4337)} (Smart Contract) wallet. By default, the user does not have the ability to unilaterally control the account. Therefore, {{WALLET_NAME}} is not a self-custodial wallet. However, the user *can* update the smart contract control logic to turn the account into a self-custodial wallet.`,
 			),
 			howToImprove: mdParagraph(
-				`{{WALLET_NAME}} should change the smart contract's default control configuration such that the account is self-custodied by the user from the start.`,
+				"{{WALLET_NAME}} should change the smart contract's default control configuration such that the account is self-custodied by the user from the start.",
 			),
 			references,
 		}
 	}
+
 	return {
 		value: {
 			id: `${multifactorType}_ok`,
 			rating: Rating.PASS,
 			displayName: 'Self-custodial smart wallet',
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} is self-custodial and puts the user in control of their smart contract wallet without lock-in.`,
+				'{{WALLET_NAME}} is self-custodial and puts the user in control of their smart contract wallet without lock-in.',
 			),
 			__brand: brand,
 		},
@@ -398,13 +412,16 @@ function evaluateEip7702(
 	if (!isSupported<AccountType7702>(accountSupport.eip7702)) {
 		throw new Error('EIP-7702 account type is not supported')
 	}
+
 	// TODO: Add specific evaluations for EIP-7702 features on top of this.
 	if (isSupported<AccountTypeEoa>(accountSupport.eoa)) {
 		return evaluateEoa(accountSupport.eoa, references)
 	}
+
 	if (isSupported<AccountTypeMpc>(accountSupport.mpc)) {
 		return evaluateMpc(accountSupport.mpc, references)
 	}
+
 	throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported')
 }
 
@@ -445,7 +462,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 		Specifically:
 
 		* **EOA wallets** are rated based on the exportability of their private
-		  key material, and on whether such private key material is derived using
+			key material, and on whether such private key material is derived using
 			the following standards:
 
 			* [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
@@ -723,6 +740,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 		if (features.accountSupport === null) {
 			return unrated(accountPortability, brand, null)
 		}
+
 		const allRefs = mergeRefs(
 			refs(features.accountSupport.eoa),
 			refs(features.accountSupport.mpc),
@@ -731,41 +749,57 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 		)
 		const evaluations: Array<Evaluation<AccountPortabilityValue>> = []
 		let defaultEvaluation: Evaluation<AccountPortabilityValue> | null = null
+
 		if (isSupported<AccountTypeEoa>(features.accountSupport.eoa)) {
 			const evaluation = evaluateEoa(features.accountSupport.eoa, allRefs)
+
 			evaluations.push(evaluation)
+
 			if (features.accountSupport.defaultAccountType === AccountType.eoa) {
 				defaultEvaluation = evaluation
 			}
 		}
+
 		if (isSupported<AccountTypeMpc>(features.accountSupport.mpc)) {
 			const evaluation = evaluateMpc(features.accountSupport.mpc, allRefs)
+
 			evaluations.push(evaluation)
+
 			if (features.accountSupport.defaultAccountType === AccountType.mpc) {
 				defaultEvaluation = evaluation
 			}
 		}
+
 		if (isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)) {
 			const evaluation = evaluateMultifactor(features.accountSupport.rawErc4337, 'erc4337', allRefs)
+
 			evaluations.push(evaluation)
+
 			if (features.accountSupport.defaultAccountType === AccountType.rawErc4337) {
 				defaultEvaluation = evaluation
 			}
 		}
+
 		if (isSupported<AccountType7702>(features.accountSupport.eip7702)) {
 			const evaluation = evaluateEip7702(features.accountSupport, allRefs)
+
 			evaluations.push(evaluation)
+
 			if (features.accountSupport.defaultAccountType === AccountType.eip7702) {
 				defaultEvaluation = evaluation
 			}
 		}
+
 		if (!isNonEmptyArray(evaluations) || defaultEvaluation === null) {
 			throw new Error('No account type evaluations; should be impossible from type system')
 		}
+
 		const oneRating = nonEmptyGet(evaluations).value.rating
+
 		if (evaluations.every(evaluation => evaluation.value.rating === oneRating)) {
 			return defaultEvaluation
 		}
+
 		return pickWorstRating<AccountPortabilityValue>(evaluations)
 	},
 	aggregate: pickWorstRating<AccountPortabilityValue>,
