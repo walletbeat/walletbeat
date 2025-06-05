@@ -27,6 +27,9 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
+			"a11y": {
+				"noSvgWithoutTitle": "off"
+			},
 			"complexity": {
 				"useArrowFunction": "warn"
 			},
@@ -89,6 +92,7 @@
 			"linter": {
 				"rules": {
 					"correctness": {
+						"noUnusedVariables": "off",
 						"noUnusedImports": "off"
 					}
 				}
@@ -96,7 +100,7 @@
 		},
 		{
 			"include": [
-				"**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx,mts,cts}"
+				"**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"
 			],
 			"linter": {
 				"rules": {

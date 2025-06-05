@@ -1,1 +1,1 @@
-export { default as cx } from 'classnames';
+export { default as cx } from 'classnames'

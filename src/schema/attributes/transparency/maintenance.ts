@@ -1,65 +1,65 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes';
-import { exampleRating } from '@/schema/attributes';
-import type { ResolvedFeatures } from '@/schema/features';
+import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
+import { exampleRating } from '@/schema/attributes'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
-  type MaintenanceSupport,
-  MaintenanceType,
-} from '@/schema/features/transparency/maintenance';
-import { popRefs } from '@/schema/reference';
-import type { AtLeastOneVariant } from '@/schema/variants';
-import { Variant } from '@/schema/variants';
-import { markdown, paragraph, sentence } from '@/types/content';
+	type MaintenanceSupport,
+	MaintenanceType,
+} from '@/schema/features/transparency/maintenance'
+import { popRefs } from '@/schema/reference'
+import type { AtLeastOneVariant } from '@/schema/variants'
+import { Variant } from '@/schema/variants'
+import { markdown, paragraph, sentence } from '@/types/content'
 
-import { exempt, pickWorstRating, unrated } from '../common';
+import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.maintenance';
+const brand = 'attributes.maintenance'
 
 export type MaintenanceValue = Value & {
-  physicalDurability: MaintenanceType;
-  mtbfDocumentation: MaintenanceType;
-  repairability: MaintenanceType;
-  batteryHandling: MaintenanceType;
-  warrantyExtensions: MaintenanceType;
-  __brand: 'attributes.maintenance';
-};
+	physicalDurability: MaintenanceType
+	mtbfDocumentation: MaintenanceType
+	repairability: MaintenanceType
+	batteryHandling: MaintenanceType
+	warrantyExtensions: MaintenanceType
+	__brand: 'attributes.maintenance'
+}
 
 function evaluateMaintenance(features: MaintenanceSupport): Rating {
-  const ratings = [
-    features.physicalDurability,
-    features.mtbfDocumentation,
-    features.repairability,
-    features.batteryHandling,
-    features.warrantyExtensions,
-  ];
-  const passCount = ratings.filter(r => r === MaintenanceType.PASS).length;
+	const ratings = [
+		features.physicalDurability,
+		features.mtbfDocumentation,
+		features.repairability,
+		features.batteryHandling,
+		features.warrantyExtensions,
+	]
+	const passCount = ratings.filter(r => r === MaintenanceType.PASS).length
 
-  if (passCount >= 4) {
-    return Rating.PASS;
-  }
+	if (passCount >= 4) {
+		return Rating.PASS
+	}
 
-  if (passCount >= 2) {
-    return Rating.PARTIAL;
-  }
+	if (passCount >= 2) {
+		return Rating.PARTIAL
+	}
 
-  return Rating.FAIL;
+	return Rating.FAIL
 }
 
 export const maintenance: Attribute<MaintenanceValue> = {
-  id: 'maintenance',
-  icon: '🛠️',
-  displayName: 'Maintenance',
-  wording: {
-    midSentenceName: null,
-    howIsEvaluated: "How is a wallet's maintenance evaluated?",
-    whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its maintenance?'),
-  },
-  question: sentence('Does {{WALLET_NAME}} have good maintenance practices?'),
-  why: markdown(`
+	id: 'maintenance',
+	icon: '🛠️',
+	displayName: 'Maintenance',
+	wording: {
+		midSentenceName: null,
+		howIsEvaluated: "How is a wallet's maintenance evaluated?",
+		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its maintenance?'),
+	},
+	question: sentence('Does {{WALLET_NAME}} have good maintenance practices?'),
+	why: markdown(`
 		Good maintenance practices ensure the long-term usability, reliability, and physical durability of a hardware wallet.
 		This includes the device's resistance to physical damage, the availability of repair information and parts, battery longevity and replaceability, and the manufacturer's warranty policy.
 	`),
-  methodology: markdown(
-    `Evaluated based on:
+	methodology: markdown(
+		`Evaluated based on:
 
 - **Physical Durability:** Resistance to drops and environmental factors.
 
@@ -71,76 +71,76 @@ export const maintenance: Attribute<MaintenanceValue> = {
 
 - **Warranty:** Length of warranty period, coverage limitations, and possibility of extension.
 	`,
-  ),
-  ratingScale: {
-    display: 'pass-fail',
-    exhaustive: true,
-    pass: [
-      exampleRating(
-        sentence('The wallet passes most maintenance sub-criteria.'),
-        (v: MaintenanceValue) => v.rating === Rating.PASS,
-      ),
-    ],
-    partial: [
-      exampleRating(
-        sentence('The wallet passes some maintenance sub-criteria.'),
-        (v: MaintenanceValue) => v.rating === Rating.PARTIAL,
-      ),
-    ],
-    fail: [
-      exampleRating(
-        sentence('The wallet fails most or all maintenance sub-criteria.'),
-        (v: MaintenanceValue) => v.rating === Rating.FAIL,
-      ),
-    ],
-  },
-  aggregate: (perVariant: AtLeastOneVariant<Evaluation<MaintenanceValue>>) =>
-    pickWorstRating<MaintenanceValue>(perVariant),
-  evaluate: (features: ResolvedFeatures): Evaluation<MaintenanceValue> => {
-    if (features.variant !== Variant.HARDWARE) {
-      return exempt(
-        maintenance,
-        sentence('These attributes only refer to hardware wallet maintenance'),
-        brand,
-        {
-          physicalDurability: MaintenanceType.FAIL,
-          mtbfDocumentation: MaintenanceType.FAIL,
-          repairability: MaintenanceType.FAIL,
-          batteryHandling: MaintenanceType.FAIL,
-          warrantyExtensions: MaintenanceType.FAIL,
-        },
-      );
-    }
+	),
+	ratingScale: {
+		display: 'pass-fail',
+		exhaustive: true,
+		pass: [
+			exampleRating(
+				sentence('The wallet passes most maintenance sub-criteria.'),
+				(v: MaintenanceValue) => v.rating === Rating.PASS,
+			),
+		],
+		partial: [
+			exampleRating(
+				sentence('The wallet passes some maintenance sub-criteria.'),
+				(v: MaintenanceValue) => v.rating === Rating.PARTIAL,
+			),
+		],
+		fail: [
+			exampleRating(
+				sentence('The wallet fails most or all maintenance sub-criteria.'),
+				(v: MaintenanceValue) => v.rating === Rating.FAIL,
+			),
+		],
+	},
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<MaintenanceValue>>) =>
+		pickWorstRating<MaintenanceValue>(perVariant),
+	evaluate: (features: ResolvedFeatures): Evaluation<MaintenanceValue> => {
+		if (features.variant !== Variant.HARDWARE) {
+			return exempt(
+				maintenance,
+				sentence('These attributes only refer to hardware wallet maintenance'),
+				brand,
+				{
+					physicalDurability: MaintenanceType.FAIL,
+					mtbfDocumentation: MaintenanceType.FAIL,
+					repairability: MaintenanceType.FAIL,
+					batteryHandling: MaintenanceType.FAIL,
+					warrantyExtensions: MaintenanceType.FAIL,
+				},
+			)
+		}
 
-    const maintenanceFeature = features.transparency.maintenance;
+		const maintenanceFeature = features.transparency.maintenance
 
-    if (maintenanceFeature === null) {
-      return unrated(maintenance, brand, {
-        physicalDurability: MaintenanceType.FAIL,
-        mtbfDocumentation: MaintenanceType.FAIL,
-        repairability: MaintenanceType.FAIL,
-        batteryHandling: MaintenanceType.FAIL,
-        warrantyExtensions: MaintenanceType.FAIL,
-      });
-    }
+		if (maintenanceFeature === null) {
+			return unrated(maintenance, brand, {
+				physicalDurability: MaintenanceType.FAIL,
+				mtbfDocumentation: MaintenanceType.FAIL,
+				repairability: MaintenanceType.FAIL,
+				batteryHandling: MaintenanceType.FAIL,
+				warrantyExtensions: MaintenanceType.FAIL,
+			})
+		}
 
-    const { withoutRefs, refs: extractedRefs } = popRefs<MaintenanceSupport>(maintenanceFeature);
-    const rating = evaluateMaintenance(withoutRefs);
+		const { withoutRefs, refs: extractedRefs } = popRefs<MaintenanceSupport>(maintenanceFeature)
+		const rating = evaluateMaintenance(withoutRefs)
 
-    return {
-      value: {
-        id: 'maintenance',
-        rating,
-        displayName: 'Maintenance',
-        shortExplanation: sentence(
-          `{{WALLET_NAME}} has ${rating.toLowerCase()} maintenance practices.`,
-        ),
-        ...withoutRefs,
-        __brand: brand,
-      },
-      details: paragraph(`{{WALLET_NAME}} maintenance evaluation is ${rating.toLowerCase()}.`),
-      howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-      ...(extractedRefs.length > 0 && { references: extractedRefs }),
-    };
-  },
-};
+		return {
+			value: {
+				id: 'maintenance',
+				rating,
+				displayName: 'Maintenance',
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} has ${rating.toLowerCase()} maintenance practices.`,
+				),
+				...withoutRefs,
+				__brand: brand,
+			},
+			details: paragraph(`{{WALLET_NAME}} maintenance evaluation is ${rating.toLowerCase()}.`),
+			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
+			...(extractedRefs.length > 0 && { references: extractedRefs }),
+		}
+	},
+}

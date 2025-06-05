@@ -1,21 +1,21 @@
 ---
 // Global CSS
-import '../global.css';
+import '../global.css'
 
-import { ClientRouter } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions'
 // Props
-import type { ComponentProps } from 'astro/types';
+import type { ComponentProps } from 'astro/types'
 
 type Props = {
-  metadata: ComponentProps<typeof Metadata>['metadata'];
-};
+	metadata: ComponentProps<typeof Metadata>['metadata']
+}
 
-const { metadata } = Astro.props;
+const { metadata } = Astro.props
 
 // Components
-import Metadata from '@/components/Metadata.astro';
-import { NavigationStateManager } from '@/components/NavigationStateManager';
-import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry';
+import type Metadata from '@/components/Metadata.astro'
+import { NavigationStateManager } from '@/components/NavigationStateManager'
+import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 ---
 
 <!doctype html>
