@@ -123,7 +123,6 @@ export function pickWorstRating<V extends Value>(
 		if (worst.value.rating === Rating.PARTIAL && evaluation.value.rating === Rating.FAIL) {
 			// If the worst rating is PARTIAL, pick FAIL over it.
 			worst = evaluation
-			continue
 		}
 	}
 

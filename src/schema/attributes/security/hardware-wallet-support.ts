@@ -190,18 +190,11 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		// Extract references from the hardware wallet support feature
 		const { withoutRefs, refs: extractedRefs } = popRefs(features.security.hardwareWalletSupport)
 
-		const supportedWallets: HardwareWalletType[] = []
 		const hwSupport = withoutRefs.supportedWallets
 
-		// Check which hardware wallets are supported
-		Object.entries(hwSupport).forEach(([walletType, support]) => {
-			if (isSupported(support)) {
-				// Type assertion is safe because we're iterating over keys of hwSupport
-				// which are HardwareWalletType values
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're iterating over hwSupport keys
-				supportedWallets.push(walletType as HardwareWalletType)
-			}
-		})
+		const supportedWallets: HardwareWalletType[] = Object.entries(hwSupport)
+			.filter(([walletType, support]) => walletType !== 'ref' && isSupported(support))
+			.map(([walletType]) => walletType as HardwareWalletType)
 
 		if (supportedWallets.length === 0) {
 			return noHardwareWalletSupport()
@@ -230,16 +223,11 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwareWalletSupportValue>>) => {
 		const worstEvaluation = pickWorstRating<HardwareWalletSupportValue>(perVariant)
 
-		// Combine all supported hardware wallets across variants
-		const allSupportedWallets = new Set<HardwareWalletType>()
-
-		Object.values(perVariant).forEach(evaluation => {
-			evaluation.value.supportedHardwareWallets.forEach(wallet => {
-				allSupportedWallets.add(wallet)
-			})
-		})
-
-		worstEvaluation.value.supportedHardwareWallets = Array.from(allSupportedWallets)
+		worstEvaluation.value.supportedHardwareWallets = Array.from(
+			new Set(
+				Object.values(perVariant).flatMap(evaluation => evaluation.value.supportedHardwareWallets),
+			),
+		)
 
 		return worstEvaluation
 	},

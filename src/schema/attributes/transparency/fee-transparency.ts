@@ -207,13 +207,11 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 			case FeeTransparencyLevel.DETAILED:
 				return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose)
 			case FeeTransparencyLevel.COMPREHENSIVE:
-				// For comprehensive level, both disclosesWalletFees and showsTransactionPurpose must be true
 				if (disclosesWalletFees && showsTransactionPurpose) {
 					return comprehensiveFeeTransparency()
-				} else {
-					// If either is false, downgrade to detailed
-					return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose)
 				}
+				// If either is false, downgrade to detailed
+				return detailedFeeTransparency(disclosesWalletFees, showsTransactionPurpose)
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) =>

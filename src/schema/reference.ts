@@ -268,9 +268,6 @@ export function mergeRefs(
 			lastRetrieved: existing.lastRetrieved ?? ref.lastRetrieved,
 		})
 	}
-	byExplanation.forEach(ref => {
-		mergedRefs.push(ref)
-	})
 
-	return mergedRefs
+	return [...mergedRefs, ...byExplanation.values()]
 }
