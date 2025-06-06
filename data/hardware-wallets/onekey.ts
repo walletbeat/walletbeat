@@ -7,39 +7,47 @@ import {
   MessageExtraction,
   ShowsTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny';
+import { patrickalphac } from '../contributors/patrickalphac';
 
-export const keystoneWallet: HardwareWallet = {
+export const onekeyWallet: HardwareWallet = {
   metadata: {
-    id: 'keystone',
-    displayName: 'Keystone Wallet',
-    tableName: 'Keystone',
+    id: 'onekey',
+    displayName: 'OneKey Pro',
+    tableName: 'OneKey Pro',
     blurb: paragraph(`
-			Keystone Wallet is a self-custodial hardware wallet that provides secure private
-			key storage. It uses QR codes for air-gapped transaction signing.
+			OneKey Pro is a hardware wallet with excellent haptic feedback, air gap mode, and EAL6+ secure element.
 		`),
-    contributors: [nconsigny],
+    contributors: [patrickalphac],
     hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
     hardwareWalletModels: [
       {
-        id: 'keystone-pro',
-        name: 'Keystone Pro',
+        id: 'onekey-pro',
+        name: 'OneKey Pro',
         isFlagship: true,
-        url: 'https://keyst.one/pro',
+        url: 'https://onekey.so/products/onekey-pro',
       },
     ],
     iconExtension: 'svg',
-    lastUpdated: '2025-03-12',
-    repoUrl: 'https://github.com/KeystoneHQ',
-    url: 'https://keyst.one/',
+    lastUpdated: '2025-01-06',
+    repoUrl: 'https://github.com/OneKeyHQ',
+    url: 'https://onekey.so/',
   },
   features: {
     accountSupport: null,
-    license: null,
+    license: {
+      license: License.GPL_3_0,
+      ref: [
+        {
+          explanation: 'OneKey has mixed licensing (GPLv3/LGPLv3/MIT)',
+          url: 'https://walletscrutiny.com/hardware/onekey.pro/',
+        },
+      ],
+    },
     monetization: {
       ref: null,
       revenueBreakdownIsPublic: false,
@@ -59,7 +67,7 @@ export const keystoneWallet: HardwareWallet = {
     privacy: {
       dataCollection: null,
       hardwarePrivacy: null,
-      privacyPolicy: 'https://keyst.one/privacy-policy',
+      privacyPolicy: 'https://help.onekey.so/hc/en-us/articles/360002003315-Privacy-Policy',
       transactionPrivacy: null,
     },
     profile: WalletProfile.GENERIC,
@@ -67,42 +75,41 @@ export const keystoneWallet: HardwareWallet = {
       bugBountyProgram: {
         type: BugBountyProgramType.COMPREHENSIVE,
         details:
-          'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users.',
+          'OneKey offers a comprehensive bug bounty program covering app monorepo, firmware, hardware SDK, and websites. Rewards range from $100-$10,000 USDC based on severity, with higher rewards for firmware vulnerabilities.',
         ref: [
           {
             explanation:
-              'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users',
-            url: 'https://keyst.one/bug-bounty-program',
+              'OneKey maintains a well-structured bug bounty program with clear scope, rewards up to $10,000 USDC for critical vulnerabilities, and separate categories for different components.',
+            url: 'https://bugrap.io/bounties/OneKey',
           },
         ],
         upgradePathAvailable: false,
-        url: 'https://keyst.one/bug-bounty-program',
+        url: 'https://bugrap.io/bounties/OneKey',
       },
       firmware: {
-        type: FirmwareType.PASS,
-        customFirmware: null,
-        firmwareOpenSource: FirmwareType.PASS,
-        reproducibleBuilds: FirmwareType.PASS,
-        silentUpdateProtection: FirmwareType.PASS,
+        type: FirmwareType.FAIL,
+        customFirmware: FirmwareType.FAIL,
+        firmwareOpenSource: FirmwareType.FAIL,
+        reproducibleBuilds: FirmwareType.FAIL,
+        silentUpdateProtection: null,
       },
       hardwareWalletDappSigning: {
         messageSigning: {
           details:
-            'Keystone provides full message signing support for many transactions, however, it is buggy on many transactions like with a Safe{Wallet}, making it unreliable in some cases. In some cases, it shows no data. This is mitigated by the fact that the wallet supports QR code transaction extraction.',
-          extraction: MessageExtraction.QRCODE,
+            'OneKey Pro shows EIP-712 domain types and message data but does not display domain hash or message hash for easier verification.',
+          extraction: MessageExtraction.EYES,
         },
         ref: [
           {
-            explanation:
-              "Independent video demonstration of Keystone's clear signing implementation on Safe.",
-            url: 'https://youtu.be/9YmPWxAvKYY?t=759',
+            explanation: "Independent video demonstration of OneKey Pro's signing implementation.",
+            url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
           },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.BASIC, // Basic, do to buggy implementation
-          calldataExtraction: CalldataExtraction.QRCODE,
+          calldataDecoding: CalldataDecoding.NONE,
+          calldataExtraction: CalldataExtraction.EYES,
           details:
-            'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
+            'OneKey Pro shows all calldata but does not decode it, requiring users to manually interpret the transaction data.',
           showsTransactionDetails: ShowsTransactionDetails.FULL,
         },
       },

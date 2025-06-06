@@ -26,3 +26,6 @@ pnpm-debug.log*
 
 # JetBrains setting folder
 .idea/
+
+# For playing with claude code
+scrap.md 

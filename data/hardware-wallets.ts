@@ -1,18 +1,22 @@
 import { type RatedWallet, rateWallet } from '@/schema/wallet';
 
+import { cypherockWallet } from './hardware-wallets/cypherock';
 import { fireflyWallet } from './hardware-wallets/firefly';
 import { gridplusWallet } from './hardware-wallets/gridplus';
 import { keystoneWallet } from './hardware-wallets/keystone';
 import { ledgerWallet } from './hardware-wallets/ledger';
+import { onekeyWallet } from './hardware-wallets/onekey';
 import { trezorWallet } from './hardware-wallets/trezor';
 import { unratedHardwareTemplate } from './hardware-wallets/unrated.tmpl';
 
 /** Set of all known hardware wallets. */
 export const hardwareWallets = {
+  cypherock: cypherockWallet,
   firefly: fireflyWallet,
   gridplus: gridplusWallet,
   keystone: keystoneWallet,
   ledger: ledgerWallet,
+  onekey: onekeyWallet,
   trezor: trezorWallet,
 };
 
