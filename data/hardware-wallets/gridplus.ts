@@ -1,6 +1,11 @@
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import {
+  CalldataDecoding,
+  CalldataExtraction,
+  MessageExtraction,
+  ShowsTransactionDetails,
+} from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
@@ -74,16 +79,25 @@ export const gridplusWallet: HardwareWallet = {
       },
       firmware: null,
       hardwareWalletDappSigning: {
-        details:
-          'GridPlus Lattice1 provides clear signing support in some contexts but not all of them with detailed transaction information clearly displayed on device screen for all operations.',
-        level: DappSigningLevel.PARTIAL,
+        messageSigning: {
+          details:
+            'GridPlus Lattice1 provides message signing support, but does not show EIP-712 digests or hashes.',
+          extraction: MessageExtraction.EYES,
+        },
         ref: [
           {
             explanation:
-              "Independent video demonstration of Keystone's clear signing implementation on Safe.",
-            url: 'https://youtu.be/7lP_0h-PPvY?t=1141',
+              "Independent video demonstration of GridPlus's clear signing implementation on Safe.",
+            url: 'https://youtu.be/9YmPWxAvKYY?t=2079',
           },
         ],
+        transactionSigning: {
+          calldataDecoding: CalldataDecoding.NESTED,
+          calldataExtraction: CalldataExtraction.EYES,
+          details:
+            'GridPlus Lattice1 provides clear transaction support, showing all transaction data, and even doing nested calldata decoding in some cases.',
+          showsTransactionDetails: ShowsTransactionDetails.FULL,
+        },
       },
       keysHandling: null,
       lightClient: {

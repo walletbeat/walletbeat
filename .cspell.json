@@ -1,4 +1,3 @@
-// cSpell Settings
 {
   "version": "0.2",
   "language": "en",
@@ -21,8 +20,11 @@
     "checkmark",
     "classnames",
     "clineignore",
+    "cypherock",
+    "QRCODE",
     "cmdk",
     "codesandbox",
+    "unreviewed",
     "colorlinks",
     "Consensys",
     "correlatability",
@@ -105,6 +107,7 @@
     "Opsec",
     "pandoc",
     "Pashov",
+    "patrickalphac",
     "Pectra",
     "permissionless",
     "permissionlessly",

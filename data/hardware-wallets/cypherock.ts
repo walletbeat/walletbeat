@@ -7,39 +7,47 @@ import {
   MessageExtraction,
   ShowsTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny';
+import { patrickalphac } from '../contributors/patrickalphac';
 
-export const keystoneWallet: HardwareWallet = {
+export const cypherockWallet: HardwareWallet = {
   metadata: {
-    id: 'keystone',
-    displayName: 'Keystone Wallet',
-    tableName: 'Keystone',
+    id: 'cypherock',
+    displayName: 'Cypherock Wallet',
+    tableName: 'Cypherock',
     blurb: paragraph(`
-			Keystone Wallet is a self-custodial hardware wallet that provides secure private
-			key storage. It uses QR codes for air-gapped transaction signing.
+			The Cypherock has a secure element (EAL6+ rated) and uses a unique card-tapping system for transaction authorization.
 		`),
-    contributors: [nconsigny],
+    contributors: [patrickalphac],
     hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
     hardwareWalletModels: [
       {
-        id: 'keystone-pro',
-        name: 'Keystone Pro',
+        id: 'cypherock-x1',
+        name: 'Cypherock X1',
         isFlagship: true,
-        url: 'https://keyst.one/pro',
+        url: 'https://www.cypherock.com/product/cypherock-x1',
       },
     ],
     iconExtension: 'svg',
-    lastUpdated: '2025-03-12',
-    repoUrl: 'https://github.com/KeystoneHQ',
-    url: 'https://keyst.one/',
+    lastUpdated: '2025-01-06',
+    repoUrl: 'https://github.com/Cypherock',
+    url: 'https://cypherock.com/',
   },
   features: {
     accountSupport: null,
-    license: null,
+    license: {
+      license: License.MIT_WITH_CLAUSE,
+      ref: [
+        {
+          explanation: 'Cypherock is open-source and reproducible',
+          url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/main/LICENSE.md',
+        },
+      ],
+    },
     monetization: {
       ref: null,
       revenueBreakdownIsPublic: false,
@@ -59,24 +67,24 @@ export const keystoneWallet: HardwareWallet = {
     privacy: {
       dataCollection: null,
       hardwarePrivacy: null,
-      privacyPolicy: 'https://keyst.one/privacy-policy',
+      privacyPolicy: 'https://www.cypherock.com/privacy',
       transactionPrivacy: null,
     },
     profile: WalletProfile.GENERIC,
     security: {
       bugBountyProgram: {
-        type: BugBountyProgramType.COMPREHENSIVE,
+        type: BugBountyProgramType.BASIC,
         details:
-          'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users.',
+          'Cypherock provides legal protection for security researchers and discretionary rewards for valid security issues affecting X1 Wallet and X1 Card.',
         ref: [
           {
             explanation:
-              'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users',
-            url: 'https://keyst.one/bug-bounty-program',
+              'Bug bounty program with responsible disclosure policy and discretionary rewards',
+            url: 'https://cypherock.com/bug-bounty',
           },
         ],
-        upgradePathAvailable: false,
-        url: 'https://keyst.one/bug-bounty-program',
+        upgradePathAvailable: true,
+        url: 'https://cypherock.com/bug-bounty',
       },
       firmware: {
         type: FirmwareType.PASS,
@@ -88,22 +96,21 @@ export const keystoneWallet: HardwareWallet = {
       hardwareWalletDappSigning: {
         messageSigning: {
           details:
-            'Keystone provides full message signing support for many transactions, however, it is buggy on many transactions like with a Safe{Wallet}, making it unreliable in some cases. In some cases, it shows no data. This is mitigated by the fact that the wallet supports QR code transaction extraction.',
-          extraction: MessageExtraction.QRCODE,
+            'Shows EIP-712 signature data only in the companion application, not on the hardware wallet itself.',
+          extraction: MessageExtraction.EYES,
         },
         ref: [
           {
-            explanation:
-              "Independent video demonstration of Keystone's clear signing implementation on Safe.",
-            url: 'https://youtu.be/9YmPWxAvKYY?t=759',
+            explanation: "Independent video demonstration of Cypherock's signing implementation.",
+            url: 'https://youtu.be/9YmPWxAvKYY?t=534',
           },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.BASIC, // Basic, do to buggy implementation
-          calldataExtraction: CalldataExtraction.QRCODE,
+          calldataDecoding: CalldataDecoding.NONE,
+          calldataExtraction: CalldataExtraction.NONE,
           details:
-            'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
-          showsTransactionDetails: ShowsTransactionDetails.FULL,
+            'Completely fails to display calldata for transactions on either the application or the hardware wallet itself.',
+          showsTransactionDetails: ShowsTransactionDetails.SOME, // Gas, To, Value, Technically From with derivation path
         },
       },
       keysHandling: null,

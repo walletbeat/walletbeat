@@ -1,6 +1,11 @@
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import {
+  CalldataDecoding,
+  CalldataExtraction,
+  MessageExtraction,
+  ShowsTransactionDetails,
+} from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
@@ -93,16 +98,25 @@ export const trezorWallet: HardwareWallet = {
       },
       firmware: null,
       hardwareWalletDappSigning: {
-        details:
-          'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-        level: DappSigningLevel.PARTIAL,
+        messageSigning: {
+          details:
+            'Trezor provides basic message signing details when using hardware wallets, but some complex interactions may be difficult to verify off device.',
+          extraction: MessageExtraction.EYES,
+        },
         ref: [
           {
             explanation:
               "Independent video demonstration of Trezor's clear signing implementation on Safe.",
-            url: 'https://youtu.be/7lP_0h-PPvY?si=07dMNswh_9RsuWQ9&t=879',
+            url: 'https://youtu.be/9YmPWxAvKYY?t=1108',
           },
         ],
+        transactionSigning: {
+          calldataDecoding: CalldataDecoding.NONE,
+          calldataExtraction: CalldataExtraction.EYES,
+          details:
+            'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
+          showsTransactionDetails: ShowsTransactionDetails.FULL,
+        },
       },
       keysHandling: null,
       lightClient: {

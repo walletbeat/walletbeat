@@ -1,6 +1,11 @@
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import {
+  CalldataDecoding,
+  CalldataExtraction,
+  MessageExtraction,
+  ShowsTransactionDetails,
+} from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
@@ -99,16 +104,25 @@ export const ledgerWallet: HardwareWallet = {
       },
       firmware: null,
       hardwareWalletDappSigning: {
-        details:
-          'Ledger provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-        level: DappSigningLevel.PARTIAL,
+        messageSigning: {
+          details:
+            'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
+          extraction: MessageExtraction.HASHES,
+        },
         ref: [
           {
             explanation:
               "Independent video demonstration of Ledger's clear signing implementation on Safe.",
-            url: 'https://youtu.be/7lP_0h-PPvY?t=720',
+            url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
           },
         ],
+        transactionSigning: {
+          calldataDecoding: CalldataDecoding.NONE,
+          calldataExtraction: CalldataExtraction.EYES,
+          details:
+            'Ledger provides basic message signing details when using hardware wallets, but complex interactions are very difficult to verify on the device.',
+          showsTransactionDetails: ShowsTransactionDetails.FULL,
+        },
       },
       keysHandling: null,
       lightClient: {
