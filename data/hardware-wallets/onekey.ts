@@ -43,8 +43,7 @@ export const onekeyWallet: HardwareWallet = {
       license: License.GPL_3_0,
       ref: [
         {
-          explanation:
-            'OneKey has mixed licensing (GPLv3/LGPLv3/MIT)',
+          explanation: 'OneKey has mixed licensing (GPLv3/LGPLv3/MIT)',
           url: 'https://walletscrutiny.com/hardware/onekey.pro/',
         },
       ],
@@ -68,7 +67,7 @@ export const onekeyWallet: HardwareWallet = {
     privacy: {
       dataCollection: null,
       hardwarePrivacy: null,
-        privacyPolicy: 'https://help.onekey.so/hc/en-us/articles/360002003315-Privacy-Policy',
+      privacyPolicy: 'https://help.onekey.so/hc/en-us/articles/360002003315-Privacy-Policy',
       transactionPrivacy: null,
     },
     profile: WalletProfile.GENERIC,
@@ -100,6 +99,12 @@ export const onekeyWallet: HardwareWallet = {
             'OneKey Pro shows EIP-712 domain types and message data but does not display domain hash or message hash for easier verification.',
           extraction: MessageExtraction.EYES,
         },
+        ref: [
+          {
+            explanation: "Independent video demonstration of OneKey Pro's signing implementation.",
+            url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
+          },
+        ],
         transactionSigning: {
           calldataDecoding: CalldataDecoding.NONE,
           calldataExtraction: CalldataExtraction.EYES,
@@ -107,12 +112,6 @@ export const onekeyWallet: HardwareWallet = {
             'OneKey Pro shows all calldata but does not decode it, requiring users to manually interpret the transaction data.',
           showsTransactionDetails: ShowsTransactionDetails.FULL,
         },
-        ref: [
-            {
-                explanation: "Independent video demonstration of OneKey Pro's signing implementation.",
-                url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
-            },
-        ],
       },
       keysHandling: null,
       lightClient: {
