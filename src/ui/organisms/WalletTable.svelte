@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import type { ColumnDef } from '@/lib/DataTable.svelte'
 	import { Variant } from '@/schema/variants'
 	import type { RatedWallet } from '@/schema/wallet'
 	import type { AttributeGroup } from '@/schema/attributes'
@@ -41,51 +42,47 @@
 
 
 <Table
-	columns={[
-		{
-			id: 'displayName',
-			key: 'displayName',
-			name: 'Wallet',
-			getValue: ({ wallet }) => (
-				wallet.metadata.displayName
+	rows={wallets}
+	getId={wallet => wallet.metadata.id}
+	getDisabled={(wallet, table) => (
+		Boolean(
+			(walletTableState.selectedVariant && !(walletTableState.selectedVariant in wallet.variants))
+			|| (table.sortState?.direction && table.columns.find(column => column.id === table.sortState!.columnId)?.getValue?.(wallet) === undefined)
+		)
+	)}
+	onRowClick={wallet => {
+		walletTableState.toggleRowExpanded(wallet.metadata.id)
+	}}
+
+	columns={
+		[
+			{
+				id: 'displayName',
+				name: 'Wallet',
+				getValue: wallet => (
+					wallet.metadata.displayName
+				),
+			} satisfies ColumnDef<RatedWallet>,
+			...(
+				attributeGroups
+					.map(attrGroup => ({
+						id: attrGroup.id,
+						name: `${attrGroup.icon} ${attrGroup.displayName}`,
+						getValue: wallet => (
+							calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])?.score ?? undefined
+						),
+						defaultSortDirection: 'desc' as const,
+					} satisfies ColumnDef<RatedWallet>))
 			),
-		},
-		...(
-			attributeGroups
-				.map(attrGroup => ({
-					id: attrGroup.id,
-					key: attrGroup.id,
-					name: `${attrGroup.icon} ${attrGroup.displayName}`,
-					getValue: ({ wallet }) => (
-						wallet.overall[attrGroup.id] && attrGroup.score?.(wallet.overall[attrGroup.id])?.score || undefined
-					),
-					defaultSortDirection: 'desc',
-				}))
-		),
-	]}
+		] as ColumnDef<RatedWallet, number | string | undefined>[]
+	}
 	defaultSort={{
 		columnId: 'displayName',
 		direction: 'asc',
 	}}
-	rows={
-		wallets
-			.map(wallet => ({
-				id: wallet.metadata.id,
-				wallet,
-			}))
-	}
-	getId={({ id }) => id}
-	getDisabled={(row, table) => (
-		(walletTableState.selectedVariant && !(walletTableState.selectedVariant in row.wallet.variants))
-		|| (table.sortState?.direction && table.columns.find(column => column.id === table.sortState.columnId)?.getValue?.(row) === undefined)
-	)}
-	onRowClick={({ id }) => {
-		walletTableState.toggleRowExpanded(id)
-	}}
-	class="wallet-table"
 >
 	{#snippet cellSnippet({
-		row: { wallet },
+		row: wallet,
 		column,
 		value,
 	})}
@@ -128,7 +125,7 @@
 
 					<div class="variants row inline">
 						{#each (
-							Object.entries(wallet.variants)
+							(Object.entries(wallet.variants) as unknown as [Variant, boolean][])
 								.filter(([, hasVariant]) => hasVariant)
 								.map(([variant]) => variant)
 						) as variant}
@@ -172,7 +169,7 @@
 					
 					<div class="links">
 						<a
-							href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, walletTableState.selectedVariant)}`}
+							href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, walletTableState.selectedVariant ?? null)}`}
 							class="info-link"
 						>
 							<span class="icon">{@html InfoIcon}</span>
@@ -221,11 +218,8 @@
 	{/snippet}
 </Table>
 
-<style>
-	:global(.wallet-table) {
-		font-size: 1.1em;
-	}
 
+<style>
 	.wallet-name-cell {
 		transition-property: gap;
 
