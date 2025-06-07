@@ -20,7 +20,7 @@ interface NavigationItemBase {
 	/**
 	 * Item icon shown next to the item name in the navigation menu.
 	 */
-	icon?: React.ReactNode
+	icon?: React.ReactNode | { raw: string }
 
 	/**
 	 * Item name in the navigation menu.
@@ -246,8 +246,12 @@ const NavigationItem = memo(
 			<li key={`listItem-${item.id}`} id={`listItem-${item.id}`}>
 				{/* {selectedItemId} - {selectedGroupId} */}
 				<ButtonComponent key='buttonComponent'>
-					{item.icon !== undefined ? (
-						<SingleListItemIcon key='icon'>{item.icon}</SingleListItemIcon>
+					{item.icon ? (
+						typeof item.icon === 'object' && 'raw' in item.icon ? (
+							<span dangerouslySetInnerHTML={{ __html: item.icon.raw }} />
+						) : (
+							<SingleListItemIcon key='icon'>{item.icon}</SingleListItemIcon>
+						)
 					) : null}
 					<span>{item.title}</span>
 				</ButtonComponent>
