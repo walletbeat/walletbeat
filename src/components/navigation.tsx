@@ -8,42 +8,42 @@ import type { NavigationLinkItem } from '@/ui/organisms/Navigation'
 
 export const navigationHome: NavigationLinkItem = {
 	id: 'wallet-table',
-	icon: <HomeIcon />,
+	icon: HomeIcon,
 	title: 'Walletbeat',
 	href: `${betaSiteRoot}/#`,
 }
 
 export const navigationFaq: NavigationLinkItem = {
 	id: 'faq',
-	icon: <HelpCenterIcon />,
+	icon: HelpCenterIcon,
 	title: 'FAQ',
 	href: `${betaSiteRoot}/faq`,
 }
 
 export const navigationAbout: NavigationLinkItem = {
 	id: 'about',
-	icon: <LuBuilding2 />,
+	icon: LuBuilding2,
 	title: 'About Walletbeat',
 	href: `${betaSiteRoot}/about`,
 }
 
 export const navigationCriteria: NavigationLinkItem = {
 	id: 'criteria',
-	icon: <LuBadgeCheck />,
+	icon: LuBadgeCheck,
 	title: 'Evaluation Criteria',
 	href: `${betaSiteRoot}/#criteria`,
 }
 
 export const navigationRepository: NavigationLinkItem = {
 	id: 'code-repository',
-	icon: <LuGithub />,
+	icon: LuGithub,
 	title: 'Contribute on GitHub',
 	href: 'https://github.com/walletbeat/walletbeat',
 }
 
 export const navigationFarcasterChannel: NavigationLinkItem = {
 	id: 'farcaster-channel',
-	icon: <ForumIcon />,
+	icon: ForumIcon,
 	title: 'Discuss on Farcaster',
 	href: 'https://warpcast.com/~/channel/walletbeat',
 }
