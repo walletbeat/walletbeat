@@ -67,7 +67,13 @@
 		columnId: 'displayName',
 		direction: 'asc',
 	}}
-	rows={wallets}
+	rows={
+		wallets
+			.map(wallet => ({
+				id: wallet.metadata.id,
+				wallet,
+			}))
+	}
 	getId={({ id }) => id}
 	getDisabled={(row, table) => (
 		(walletTableState.selectedVariant && !(walletTableState.selectedVariant in row.wallet.variants))
