@@ -61,24 +61,24 @@
 	role="button"
 	tabindex="0"
 >
-	{@const evalEntries = evaluatedAttributesEntries(evalGroup)
-		.filter(([_, evalAttr]) => (
-			evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
-		))}
-
-	{@const currentEvaluationAttribute = (
-		activeEvaluationAttribute ?
-			evalGroup[activeEvaluationAttribute]
-		: selectedEvaluationAttribute ?
-			evalGroup[selectedEvaluationAttribute]
-		:
-			undefined
-	)}
-
 	<!-- Rating Pie Chart -->
-	{#if groupScore === undefined || !isNonEmptyArray(evalEntries)}
+	{#if groupScore === undefined || !isNonEmptyArray(evaluatedAttributesEntries(evalGroup).filter(([_, evalAttr]) => evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT))}
 		<div>N/A</div>
 	{:else}
+		{@const evalEntries = evaluatedAttributesEntries(evalGroup)
+			.filter(([_, evalAttr]) => (
+				evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
+			))}
+
+		{@const currentEvaluationAttribute = (
+			activeEvaluationAttribute ?
+				evalGroup[activeEvaluationAttribute]
+			: selectedEvaluationAttribute ?
+				evalGroup[selectedEvaluationAttribute]
+			:
+				undefined
+		)}
+
 		<Pie
 			slices={	
 				!isNonEmptyArray(evalEntries) ?
@@ -161,7 +161,7 @@
 		class="details column"
 		hidden={!isExpanded}
 	>
-		{#if !currentEvaluationAttribute}
+		{#if !((activeEvaluationAttribute ? evalGroup[activeEvaluationAttribute] : selectedEvaluationAttribute ? evalGroup[selectedEvaluationAttribute] : undefined))}
 			<h3>
 				{attrGroup.icon} {attrGroup.displayName}
 			</h3>
@@ -174,43 +174,54 @@
 					}}
 				/>
 			</p>
-		{:else if currentEvaluationAttribute?.evaluation?.value}
-			<h4>
-				{currentEvaluationAttribute.evaluation.value.icon ?? currentEvaluationAttribute.attribute.icon} {currentEvaluationAttribute.attribute.displayName}
-			</h4>
+		{:else}
+			{@const currentEvaluationAttribute = (
+				activeEvaluationAttribute ?
+					evalGroup[activeEvaluationAttribute]
+				: selectedEvaluationAttribute ?
+					evalGroup[selectedEvaluationAttribute]
+				:
+					undefined
+			)}
 
-			<p>
-				{#if typeof currentEvaluationAttribute.evaluation.value.shortExplanation}
-					{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
+			{#if currentEvaluationAttribute?.evaluation?.value}
+				<h4>
+					{currentEvaluationAttribute.evaluation.value.icon ?? currentEvaluationAttribute.attribute.icon} {currentEvaluationAttribute.attribute.displayName}
+				</h4>
 
-					<Typography
-						content={currentEvaluationAttribute.evaluation.value.shortExplanation}
-						strings={{
-							WALLET_NAME: wallet.metadata.displayName,
-							WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-							WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
-						}}
-					/>
+				<p>
+					{#if typeof currentEvaluationAttribute.evaluation.value.shortExplanation}
+						{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
 
-					{#if selectedVariant && wallet.variants[selectedVariant]}
-						{@const specificity = attributeVariantSpecificity(wallet, selectedVariant, currentEvaluationAttribute.attribute)}
+						<Typography
+							content={currentEvaluationAttribute.evaluation.value.shortExplanation}
+							strings={{
+								WALLET_NAME: wallet.metadata.displayName,
+								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+								WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
+							}}
+						/>
 
-						{#if specificity === VariantSpecificity.NOT_UNIVERSAL}
-							This is the case on the {variantToName(selectedVariant, false)} version.
+						{#if selectedVariant && wallet.variants[selectedVariant]}
+							{@const specificity = attributeVariantSpecificity(wallet, selectedVariant, currentEvaluationAttribute.attribute)}
 
-						{:else if specificity === VariantSpecificity.UNIQUE_TO_VARIANT}
-							This is only the case on the {variantToName(selectedVariant, false)} version.
+							{#if specificity === VariantSpecificity.NOT_UNIVERSAL}
+								This is the case on the {variantToName(selectedVariant, false)} version.
+
+							{:else if specificity === VariantSpecificity.UNIQUE_TO_VARIANT}
+								This is only the case on the {variantToName(selectedVariant, false)} version.
+							{/if}
 						{/if}
 					{/if}
-				{/if}
-			</p>
+				</p>
 
-			<a 
-				href="{betaSiteRoot}/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, selectedVariant)}#{slugifyCamelCase(currentEvaluationAttribute.attribute.id)}"
-			>
-				<span class="icon">{@html InfoIcon}</span>
-				Learn more
-			</a>
+				<a 
+					href="{betaSiteRoot}/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, selectedVariant)}#{slugifyCamelCase(currentEvaluationAttribute.attribute.id)}"
+				>
+					<span class="icon">{@html InfoIcon}</span>
+					Learn more
+				</a>
+			{/if}
 		{/if}
 	</div>
 </div>
