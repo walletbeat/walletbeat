@@ -1,13 +1,17 @@
 <script
 	lang="ts"
 	generics="
-		Datum extends any,
-		CellValue extends any,
+		RowValue,
+		CellValue,
+		ColumnId extends string,
 	"
 >
 	// Types
 	import { DataTable, type ColumnDef } from '@/lib/DataTable.svelte'
 	import type { Snippet } from 'svelte'
+
+	type _DataTable = DataTable<RowValue, CellValue, ColumnId>
+	type _ColumnDef = ColumnDef<RowValue, CellValue, ColumnId>
 
 
 	// Inputs
@@ -23,29 +27,27 @@
 		displaceDisabledRows = false,
 		...restProps
 	}: {
-		columns: (
-			& ColumnDef<Datum, CellValue>
-		)[]
-		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<Datum>>[0]['defaultSort']>
-		rows: Datum[]
-		getId?: (row: Datum, index: number) => any
-		getDisabled: (row: Datum, table: DataTable<Datum>) => boolean
+		columns: _ColumnDef[]
+		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<RowValue, CellValue, ColumnId>>[0]['defaultSort']>
+		rows: RowValue[]
+		getId?: (row: RowValue, index: number) => any
+		getDisabled: (row: RowValue, table: _DataTable) => boolean
 		cellSnippet?: Snippet<[{
-			row: Datum
-			column: ColumnDef<Datum, CellValue>
+			row: RowValue
+			column: _ColumnDef
 			value: CellValue
 		}]>
 		columnCellSnippet?: Snippet<[{
-			column: ColumnDef<Datum, CellValue>
+			column: _ColumnDef
 		}]>
-		onRowClick?: (row: Datum) => void
+		onRowClick?: (row: RowValue) => void
 		displaceDisabledRows?: boolean
 	} = $props()
 
 
 	// State
 	let table = $state(
-		new DataTable<Datum>({
+		new DataTable({
 			data: rows,
 			columns,
 			defaultSort,
@@ -55,7 +57,7 @@
 	)
 
 	$effect(() => {
-		table = new DataTable<Datum>({
+		table = new DataTable({
 			data: rows,
 			columns,
 			defaultSort,
@@ -66,7 +68,7 @@
 
 
 	// Actions
-	const toggleColumnSort = (column: ColumnDef<Datum, CellValue>) => {
+	const toggleColumnSort = (column: _ColumnDef) => {
 		if (table.isSortable(column.id))
 			table.toggleSort(column.id)
 	}
@@ -159,7 +161,7 @@
 </div>
 
 
-<style>
+<style>	
 	.container {
 		--table-backgroundColor: #22242b;
 		--table-outerBorderColor: rgba(20, 21, 25, 1);

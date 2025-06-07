@@ -1,60 +1,88 @@
-type ValueGetter<T, V> = (row: T) => V
-type Sorter<T, V> = (a: V, b: V, rowA: T, rowB: T) => number
-type Filter<T, V> = (value: V, filterValue: V, row: T) => boolean
+type ValueGetter<
+	RowValue = any,
+	CellValue = any
+> = (
+	(row: RowValue) => CellValue
+)
 
-export interface ColumnDef<T, V = any> {
-	id: string
-	key: keyof T
+type Sorter<
+	RowValue = any,
+	CellValue = any
+> = (
+	(a: CellValue, b: CellValue, rowA: RowValue, rowB: RowValue) => number
+)
+
+type Filter<
+	RowValue = any,
+	CellValue = any
+> = (
+	(value: CellValue, filterValue: CellValue, row: RowValue) => boolean
+)
+
+export interface ColumnDef<
+	RowValue = any,
+	CellValue = any,
+	ColumnId extends string = string
+> {
+	id: ColumnId
 	name: string
 	sortable?: boolean
 	defaultSortDirection?: SortDirection
-	getValue?: ValueGetter<T, V>
-	sorter?: Sorter<T, V>
-	filter?: Filter<T, V>
+	getValue: ValueGetter<RowValue, CellValue>
+	sorter?: Sorter<RowValue, CellValue>
+	filter?: Filter<RowValue, CellValue>
 }
 
 type SortDirection = 'asc' | 'desc'
 
-type SortState = {
-	columnId: string
+type SortState<
+	ColumnId extends string = string
+> = {
+	columnId: ColumnId
 	direction: SortDirection
 }
 
-type TableConfig<T> = {
-	data: T[]
-	columns: ColumnDef<T>[]
+type TableConfig<
+	RowValue = any,
+	CellValue = any,
+	ColumnId extends string = string
+> = {
+	data: RowValue[]
+	columns: ColumnDef<RowValue, CellValue, ColumnId>[]
 	pageSize?: number
-	defaultSort?: SortState
-	initialFilters?: { [id: string]: any[] }
-	getDisabled?: (row: T, table: DataTable<T>) => boolean
+	defaultSort?: SortState<ColumnId>
+	initialFilters?: { [key in ColumnId]?: any[] }
+	getDisabled?: (row: RowValue, table: DataTable<RowValue, CellValue, ColumnId>) => boolean
 	displaceDisabledRows?: boolean
 }
 
 /**
  * Represents a data table with sorting, filtering, and pagination capabilities.
- * @template T The type of data items in the table.
+ * @template RowValue The type of data items in the table.
  */
-export class DataTable<T> {
-	#columns: ColumnDef<T>[]
+export class DataTable<
+	RowValue = any,
+	CellValue = any,
+	ColumnId extends string = string
+> {
+	#columns: ColumnDef<RowValue, CellValue, ColumnId>[]
 	#pageSize: number
-	#defaultSort?: SortState
-	#getDisabled?: (row: T, table: DataTable<T>) => boolean
+	#defaultSort?: SortState<ColumnId>
+	#getDisabled?: (row: RowValue, table: DataTable<RowValue, CellValue, ColumnId>) => boolean
 	#displaceDisabledRows: boolean
 
-	#originalData = $state<T[]>([])
+	#originalData = $state<RowValue[]>([])
 	#currentPage = $state(1)
-	#sortState?: SortState = $state()
+	#sortState?: SortState<ColumnId> = $state()
 	#filterState = $state<{
-		[id: string]: Set<any>
+		[key in ColumnId]?: Set<CellValue>
 	}>({})
 	#globalFilter = $state<string>('')
 
 	#globalFilterRegex: RegExp | null = null
 
 	#filteredData = $derived(
-		this.#originalData.filter((row) => (
-			this.#matchesGlobalFilter(row) && this.#matchesFilters(row)
-		))
+		this.#originalData.filter(row => this.#matchesGlobalFilter(row) && this.#matchesFilters(row)),
 	)
 
 	#sortedData = $derived.by(() => {
@@ -106,9 +134,9 @@ export class DataTable<T> {
 
 	/**
 	 * Creates a new DataTable instance.
-	 * @param {TableConfig<T>} config - The configuration object for the data table.
+	 * @param {TableConfig<RowValue>} config - The configuration object for the data table.
 	 */
-	constructor(config: TableConfig<T>) {
+	constructor(config: TableConfig<RowValue, CellValue, ColumnId>) {
 		this.#originalData = [...config.data]
 		this.#columns = config.columns
 		this.#pageSize = config.pageSize || 10
@@ -118,9 +146,10 @@ export class DataTable<T> {
 		this.#initializeFilterState(config.initialFilters)
 	}
 
-	#initializeFilterState(initialFilters?: { [id: string]: any[] }) {
-		this.#columns.forEach((column) => {
+	#initializeFilterState(initialFilters?: { [key in ColumnId]?: any[] }) {
+		this.#columns.forEach(column => {
 			const initialFilterValues = initialFilters?.[column.id]
+
 			if (initialFilterValues) {
 				this.#filterState[column.id] = new Set(initialFilterValues)
 			} else {
@@ -129,31 +158,44 @@ export class DataTable<T> {
 		})
 	}
 
-	#getColumnDef(id: string): ColumnDef<T> | undefined {
-		return this.#columns.find((col) => col.id === id)
+	#getColumnDef(id: ColumnId): ColumnDef<RowValue, CellValue, ColumnId> {
+		const column = this.#columns.find(col => col.id === id)
+
+		if (!column)
+			throw new Error(`Column "${id}" was not found`)
+
+		return column
 	}
 
-	#getValue(row: T, columnId: string): any {
+	#getValue(row: RowValue, columnId: ColumnId): CellValue {
 		const colDef = this.#getColumnDef(columnId)
-		if (!colDef) return undefined
-		return colDef.getValue ? colDef.getValue(row) : row[colDef.key]
+
+		return colDef.getValue(row)
 	}
 
-	#matchesGlobalFilter = (row: T): boolean => {
-		if (!this.#globalFilterRegex) return true
+	#matchesGlobalFilter = (row: RowValue): boolean => {
+		if (!this.#globalFilterRegex) {
+			return true
+		}
 
-		return this.#columns.some((col) => {
+		return this.#columns.some(col => {
 			const value = this.#getValue(row, col.id)
+
 			return typeof value === 'string' && this.#globalFilterRegex!.test(value)
 		})
 	}
 
-	#matchesFilters = (row: T): boolean => {
+	#matchesFilters = (row: RowValue): boolean => {
 		return Object.entries(this.#filterState).every(([columnId, filterSet]) => {
-			if (!filterSet || filterSet.size === 0) return true
+			if (!filterSet || filterSet.size === 0) {
+				return true
+			}
 
 			const colDef = this.#getColumnDef(columnId)
-			if (!colDef) return true
+
+			if (!colDef) {
+				return true
+			}
 
 			const value = this.#getValue(row, columnId)
 
@@ -163,6 +205,7 @@ export class DataTable<T> {
 						return true
 					}
 				}
+
 				return false
 			}
 
@@ -172,23 +215,23 @@ export class DataTable<T> {
 
 	/**
 	 * Gets or sets the base data rows without any filtering or sorting applied.
-	 * @returns {T[]} An array of all rows.
+	 * @returns {RowValue[]} An array of all rows.
 	 */
 	get baseRows() {
 		return this.#originalData
 	}
 
 	/**
-	 * @param {T[]} rows - The array of rows to reset the base data to.
+	 * @param {RowValue[]} rows - The array of rows to reset the base data to.
 	 */
-	set baseRows(rows: T[]) {
+	set baseRows(rows: RowValue[]) {
 		this.#currentPage = 1
 		this.#originalData = [...rows]
 	}
 
 	/**
 	 * Returns all filtered and sorted rows without pagination.
-	 * @returns {T[]} An array of all filtered and sorted rows.
+	 * @returns {RowValue[]} An array of all filtered and sorted rows.
 	 */
 	get allRows() {
 		return this.#sortedData
@@ -196,17 +239,18 @@ export class DataTable<T> {
 
 	/**
 	 * The current page of rows based on applied filters and sorting.
-	 * @returns {T[]} An array of rows for the current page.
+	 * @returns {RowValue[]} An array of rows for the current page.
 	 */
 	get rows() {
 		const startIndex = (this.#currentPage - 1) * this.#pageSize
 		const endIndex = startIndex + this.#pageSize
+
 		return this.allRows.slice(startIndex, endIndex)
 	}
 
 	/**
 	 * The column definitions for the table.
-	 * @returns {ColumnDef<T>[]} An array of column definitions.
+	 * @returns {ColumnDef<RowValue>[]} An array of column definitions.
 	 */
 	get columns() {
 		return this.#columns
@@ -214,7 +258,7 @@ export class DataTable<T> {
 
 	/**
 	 * The current filter state for all columns.
-	 * @returns {{ [K in keyof T]: Set<any> }} An object representing the filter state that maps column keys to filter values.
+	 * @returns {{ [K in keyof RowValue]: Set<any> }} An object representing the filter state that maps column keys to filter values.
 	 */
 	get filterState() {
 		return this.#filterState
@@ -222,7 +266,7 @@ export class DataTable<T> {
 
 	/**
 	 * The current sort state for the table.
-	 * @returns {{ column: keyof T | null direction: SortDirection }} An object representing the sort state with a column key and direction.
+	 * @returns {{ column: keyof RowValue | null direction: SortDirection }} An object representing the sort state with a column key and direction.
 	 */
 	get sortState() {
 		return this.#sortState
@@ -295,9 +339,12 @@ export class DataTable<T> {
 	 * Toggles the sort direction for the specified column.
 	 * @param {string} columnId - The column id to toggle sorting for.
 	 */
-	toggleSort = (columnId: string) => {
+	toggleSort = (columnId: ColumnId) => {
 		const colDef = this.#getColumnDef(columnId)
-		if (!colDef || colDef.sortable === false) return
+
+		if (!colDef || colDef.sortable === false) {
+			return
+		}
 
 		const defaultSortDirection = colDef.defaultSortDirection ?? 'asc'
 		const currentDirection = this.#sortState?.direction
@@ -305,12 +352,12 @@ export class DataTable<T> {
 		if (this.#sortState?.columnId !== columnId) {
 			this.#sortState = {
 				columnId,
-				direction: defaultSortDirection
+				direction: defaultSortDirection,
 			}
 		} else if (currentDirection === defaultSortDirection) {
 			this.#sortState = {
 				columnId,
-				direction: defaultSortDirection === 'asc' ? 'desc' : 'asc'
+				direction: defaultSortDirection === 'asc' ? 'desc' : 'asc',
 			}
 		} else {
 			this.#sortState = this.#defaultSort
@@ -321,7 +368,7 @@ export class DataTable<T> {
 	 * Gets the current sort state for the specified column.
 	 * @param {string} columnId - The column id to get the sort state for.
 	 */
-	getSortState = (columnId: string) => {
+	getSortState = (columnId: ColumnId) => {
 		return this.#sortState?.columnId === columnId ? this.#sortState.direction : undefined
 	}
 
@@ -329,8 +376,9 @@ export class DataTable<T> {
 	 * Indicates whether the specified column is sortable.
 	 * @param {string} columnId - The column id to check.
 	 */
-	isSortable = (columnId: string): boolean => {
+	isSortable = (columnId: ColumnId): boolean => {
 		const colDef = this.#getColumnDef(columnId)
+
 		return colDef?.sortable !== false
 	}
 
@@ -339,7 +387,7 @@ export class DataTable<T> {
 	 * @param {string} columnId - The column id to set the filter values for.
 	 * @param {any[]} values - The filter values to set.
 	 */
-	setFilter = (columnId: string, values: any[]) => {
+	setFilter = (columnId: ColumnId, values: any[]) => {
 		this.#filterState = { ...this.#filterState, [columnId]: new Set(values) }
 		this.#currentPage = 1
 	}
@@ -348,7 +396,7 @@ export class DataTable<T> {
 	 * Clears the filter values for the specified column.
 	 * @param {string} columnId - The column id to clear the filter values for.
 	 */
-	clearFilter = (columnId: string) => {
+	clearFilter = (columnId: ColumnId) => {
 		this.#filterState = { ...this.#filterState, [columnId]: new Set() }
 		this.#currentPage = 1
 	}
@@ -358,12 +406,12 @@ export class DataTable<T> {
 	 * @param {string} columnId - The column id to toggle the filter value for.
 	 * @param {any} value - The filter value to toggle.
 	 */
-	toggleFilter = (columnId: string, value: any) => {
+	toggleFilter = (columnId: ColumnId, value: any) => {
 		this.#filterState = {
 			...this.#filterState,
 			[columnId]: this.isFilterActive(columnId, value)
-				? new Set([...this.#filterState[columnId]].filter((v) => v !== value))
-				: new Set([...this.#filterState[columnId], value])
+				? new Set([...this.#filterState[columnId]].filter(v => v !== value))
+				: new Set([...this.#filterState[columnId], value]),
 		}
 
 		this.#currentPage = 1
@@ -374,7 +422,7 @@ export class DataTable<T> {
 	 * @param {string} columnId - The column id to check.
 	 * @param {any} value - The filter value to check.
 	 */
-	isFilterActive = (columnId: string, value: any): boolean => {
-		return this.#filterState[columnId].has(value)
+	isFilterActive = (columnId: ColumnId, value: any): boolean => {
+		return this.#filterState[columnId]?.has(value) ?? false
 	}
 }
