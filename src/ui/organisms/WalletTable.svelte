@@ -304,5 +304,6 @@
 	.icon {
 		display: inline-flex;
 		vertical-align: middle;
+		fill: currentColor;
 	}
 </style>
