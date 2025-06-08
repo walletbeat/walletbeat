@@ -30,16 +30,43 @@
 
 	// Components
 	import WalletAttributeGroupRating from '@/ui/molecules/WalletAttributeGroupRating.svelte'
+	import CombinedWalletRating from '@/ui/molecules/CombinedWalletRating.svelte'
 	import Table from '@/ui/atoms/Table.svelte'
 	import Typography from '@/ui/atoms/Typography.svelte'
 
 	import UnfoldLessIcon from '@material-icons/svg/svg/unfold_less/baseline.svg?raw'
 	import UnfoldMoreIcon from '@material-icons/svg/svg/unfold_more/baseline.svg?raw'
+	import DefaultViewIcon from '@material-icons/svg/svg/looks/baseline.svg?raw'
+	import CombinedViewIcon from '@material-icons/svg/svg/filter_vintage/baseline.svg?raw'
 
 	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 	import OpenInNewRoundedIcon from '@material-icons/svg/svg/open_in_new//baseline.svg?raw'
 </script>
 
+
+<div class="wallet-table-container">
+	<div class="table-controls">
+		<button
+			class="display-toggle"
+			onclick={() => {
+				walletTableState.toggleDisplayMode()
+			}}
+			title={
+				walletTableState.displayMode === 'separated' ?
+					'Switch to combined view'
+				:
+					'Switch to separated view'
+			}
+		>
+			{#if walletTableState.displayMode === 'separated'}
+				<span class="icon">{@html CombinedViewIcon}</span>
+				<span class="label">Combined View</span>
+			{:else}
+				<span class="icon">{@html DefaultViewIcon}</span>
+				<span class="label">Detailed View</span>
+			{/if}
+		</button>
+	</div>
 
 <Table
 	rows={wallets}
@@ -64,8 +91,16 @@
 				),
 			} satisfies ColumnDef<RatedWallet>,
 			...(
-				attributeGroups
-					.map(attrGroup => ({
+				walletTableState.displayMode === 'combined' ?
+					[
+						{
+							id: 'combined',
+							name: 'Overall Rating',
+							getValue: wallet => wallet,
+						} satisfies ColumnDef<RatedWallet>,
+					]
+				:
+					attributeGroups.map(attrGroup => ({
 						id: attrGroup.id,
 						name: `${attrGroup.icon} ${attrGroup.displayName}`,
 						getValue: wallet => (
@@ -74,7 +109,7 @@
 						defaultSortDirection: 'desc' as const,
 					} satisfies ColumnDef<RatedWallet>))
 			),
-		] as ColumnDef<RatedWallet, number | string | undefined>[]
+		]
 	}
 	defaultSort={{
 		columnId: 'displayName',
@@ -197,6 +232,19 @@
 					</div>
 				</div>
 			</div>
+
+		{:else if column.id === 'combined'}
+			<CombinedWalletRating
+				{wallet}
+				{attributeGroups}
+				bind:selectedEvaluationAttribute={walletTableState.selectedEvaluationAttribute}
+				bind:selectedVariant={walletTableState.selectedVariant}
+				{isExpanded}
+				toggleExpanded={id => {
+					walletTableState.toggleRowExpanded(id)
+				}}
+			/>
+
 		{:else}
 			{@const attrGroup = attributeGroups.find(attributeGroup => attributeGroup.id === column.id)!}
 			{@const evalGroup = wallet.overall[attrGroup.id]}
@@ -217,9 +265,50 @@
 		{/if}
 	{/snippet}
 </Table>
+</div>
 
 
 <style>
+	.wallet-table-container {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.table-controls {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 1rem;
+	}
+
+	.display-toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 1rem;
+		color: white;
+		border-radius: 4px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(255, 255, 255, 0.05);
+		cursor: pointer;
+		transition: background 0.2s ease;
+
+		&:hover {
+			background: rgba(255, 255, 255, 0.1);
+		}
+
+		.icon {
+			display: flex;
+			align-items: center;
+
+			:global(svg) {
+				fill: currentColor;
+				width: 1.2rem;
+				height: 1.2rem;
+			}
+		}
+	}
+
 	.wallet-name-cell {
 		transition-property: gap;
 
