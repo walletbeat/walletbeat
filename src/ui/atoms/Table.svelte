@@ -1,17 +1,17 @@
 <script
 	lang="ts"
 	generics="
-		RowValue,
-		CellValue,
-		ColumnId extends string,
+		_DataTable extends DataTable
 	"
 >
 	// Types
 	import { DataTable, type ColumnDef } from '@/lib/DataTable.svelte'
 	import type { Snippet } from 'svelte'
 
-	type _DataTable = DataTable<RowValue, CellValue, ColumnId>
-	type _ColumnDef = ColumnDef<RowValue, CellValue, ColumnId>
+	type _RowValue = _DataTable extends DataTable<infer RowValue, any, any> ? RowValue : any
+	type _CellValue = _DataTable extends DataTable<any, infer CellValue, any> ? CellValue : any
+	type _ColumnId = _DataTable extends DataTable<any, any, infer ColumnId> ? ColumnId : string
+	type _ColumnDef = ColumnDef<_RowValue, _CellValue, _ColumnId>
 
 
 	// Inputs
@@ -28,19 +28,19 @@
 		...restProps
 	}: {
 		columns: _ColumnDef[]
-		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<RowValue, CellValue, ColumnId>>[0]['defaultSort']>
-		rows: RowValue[]
-		getId?: (row: RowValue, index: number) => any
-		getDisabled: (row: RowValue, table: _DataTable) => boolean
+		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<_RowValue, _CellValue, _ColumnId>>[0]['defaultSort']>
+		rows: _RowValue[]
+		getId?: (row: _RowValue, index: number) => any
+		getDisabled: (row: _RowValue, table: DataTable<_RowValue, _CellValue, _ColumnId>) => boolean
 		cellSnippet?: Snippet<[{
-			row: RowValue
+			row: _RowValue
 			column: _ColumnDef
-			value: CellValue
+			value: _CellValue
 		}]>
 		columnCellSnippet?: Snippet<[{
 			column: _ColumnDef
 		}]>
-		onRowClick?: (row: RowValue) => void
+		onRowClick?: (row: _RowValue) => void
 		displaceDisabledRows?: boolean
 	} = $props()
 
