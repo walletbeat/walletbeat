@@ -339,7 +339,13 @@ function createWalletNameCell(): ({ row }: { row: Row<TableRow> }) => React.Reac
 }
 
 // Helper function for EIP standards with hover preview (non-link version)
-function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
+export function EipStandardTag({
+  standard,
+  usePrefix,
+}: {
+  standard: Eip;
+  usePrefix: boolean;
+}): React.ReactElement {
   const [isTagHovered, setIsTagHovered] = useState<boolean>(false);
   const [isModalHovered, setIsModalHovered] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -389,7 +395,8 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
         onMouseEnter={handleTagMouseEnter}
         onMouseLeave={handleTagMouseLeave}
       >
-        #{standard.number}
+        {usePrefix ? `${standard.prefix}-` : '#'}
+        {standard.number}
       </span>
       {isHovered && anchorEl !== null && (
         <EipPreviewModal
@@ -764,9 +771,9 @@ export default function WalletTable(): React.ReactElement {
 
               // Add Markdown-style links for ERC standards
               if (std === SmartWalletStandard.ERC_4337) {
-                return <EipStandardTag key={std} standard={erc4337} />;
+                return <EipStandardTag key={std} usePrefix={false} standard={erc4337} />;
               } else if (std === SmartWalletStandard.ERC_7702) {
-                return <EipStandardTag key={std} standard={eip7702} />;
+                return <EipStandardTag key={std} usePrefix={false} standard={eip7702} />;
               } else {
                 return null; // Return null for other standards like 'OTHER'
               }

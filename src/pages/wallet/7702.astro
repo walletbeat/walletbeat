@@ -1,0 +1,28 @@
+---
+import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
+import Layout from '../../layouts/Layout.astro';
+import { walletNavigationGroups } from '@/components/CriteriaPage';
+import { navigationAbout } from '@/components/navigation';
+import { Eip7702Adoption } from '@/ui/organisms/Eip7702Adoption';
+---
+
+<Layout
+  metadata={{
+    title: 'Walletbeat - EIP-7702 wallet adoption',
+  }}
+>
+  <NavigationPageLayout
+    groups={[
+      ...walletNavigationGroups,
+      {
+        id: 'about',
+        items: [navigationAbout],
+        overflow: false,
+      },
+    ]}
+    selectedGroupId='wallet'
+    selectedItemId='eip-7702-tracker'
+  >
+    <Eip7702Adoption />
+  </NavigationPageLayout>
+</Layout>

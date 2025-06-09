@@ -12,6 +12,7 @@ import { nconsigny } from '../contributors/nconsigny';
 import { polymutex } from '../contributors/polymutex';
 import { cure53 } from '../entities/cure53';
 import { diligence } from '../entities/diligence';
+import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator';
 
 export const metamask: SoftwareWallet = {
   metadata: {
@@ -32,7 +33,9 @@ export const metamask: SoftwareWallet = {
   features: {
     accountSupport: {
       defaultAccountType: AccountType.eoa,
-      eip7702: notSupported,
+      eip7702: supported({
+        contract: metamask7702DelegatorContract,
+      }),
       eoa: supported({
         canExportPrivateKey: true,
         keyDerivation: {

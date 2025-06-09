@@ -2,6 +2,7 @@ import type { SmartWalletContract } from '@/schema/contracts';
 import { featureSupported } from '@/schema/features/support';
 
 export const ambireDelegatorContract: SmartWalletContract = {
+  name: 'Ambire Delegator',
   address: '0x5a7fc11397e9a8ad41bf10bf13f22b0a63f96f6d',
   eip7702Delegatable: true,
   methods: {
