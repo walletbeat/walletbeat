@@ -2,7 +2,6 @@ import type { WithRef } from '@/schema/reference';
 
 /**
  * Basic Transaction Details
- *
  * - gas
  * - nonce
  * - from

@@ -116,6 +116,15 @@ export const firmware: Attribute<FirmwareValue> = {
     const { withoutRefs, refs: extractedRefs } = popRefs<FirmwareSupport>(firmwareFeature);
     const rating = evaluateFirmware(withoutRefs);
 
+    if (rating === Rating.UNRATED) {
+      return unrated(firmware, brand, {
+        silentUpdateProtection: FirmwareType.FAIL,
+        firmwareOpenSource: FirmwareType.FAIL,
+        reproducibleBuilds: FirmwareType.FAIL,
+        customFirmware: FirmwareType.FAIL,
+      });
+    }
+
     return {
       value: {
         id: 'firmware',
