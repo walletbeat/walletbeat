@@ -120,14 +120,14 @@
 
 							const row = e.currentTarget.previousElementSibling ?? e.currentTarget.parentElement?.lastElementChild
 							if(row instanceof HTMLElement)
-								row.focus({ focusVisible: true })
+								row.focus()
 						}
 						else if(e.code === 'ArrowDown'){
 							e.preventDefault()
 
 							const row = e.currentTarget.nextElementSibling ?? e.currentTarget.parentElement?.firstElementChild
 							if(row instanceof HTMLElement)
-								row.focus({ focusVisible: true })
+								row.focus()
 						}
 					}}
 					animate:flip={{ duration: 300, easing: expoOut }}
