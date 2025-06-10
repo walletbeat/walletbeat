@@ -1,28 +1,17 @@
-type ValueGetter<
-	RowValue = any,
-	CellValue = any
-> = (
-	(row: RowValue) => CellValue
-)
+/* eslint-disable */
 
-type Sorter<
-	RowValue = any,
-	CellValue = any
-> = (
-	(a: CellValue, b: CellValue, rowA: RowValue, rowB: RowValue) => number
-)
-
-export interface ColumnDef<
+// Types
+export type Column<
 	RowValue = any,
 	CellValue = any,
 	ColumnId extends string = string
-> {
+> = {
 	id: ColumnId
 	name: string
-	sortable?: boolean
+	isSortable?: boolean
 	defaultSortDirection?: SortDirection
-	getValue: ValueGetter<RowValue, CellValue>
-	sorter?: Sorter<RowValue, CellValue>
+	getValue: (row: RowValue) => CellValue
+	sorter?: (a: CellValue, b: CellValue, rowA: RowValue, rowB: RowValue) => number
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -34,248 +23,183 @@ type SortState<
 	direction: SortDirection
 }
 
-type TableConfig<
-	RowValue = any,
-	CellValue = any,
-	ColumnId extends string = string
-> = {
-	data: RowValue[]
-	columns: ColumnDef<RowValue, CellValue, ColumnId>[]
-	pageSize?: number
-	defaultSort?: SortState<ColumnId>
-	getDisabled?: (row: RowValue, table: DataTable<RowValue, CellValue, ColumnId>) => boolean
-	displaceDisabledRows?: boolean
-}
+import { SvelteSet, SvelteMap } from 'svelte/reactivity'
 
-/**
- * Represents a data table with sorting and pagination capabilities.
- * @template RowValue The type of data items in the table.
- */
+
+// State
 export class DataTable<
 	RowValue = any,
 	CellValue = any,
 	ColumnId extends string = string
 > {
-	#columns: ColumnDef<RowValue, CellValue, ColumnId>[]
-	#pageSize: number
-	#defaultSort?: SortState<ColumnId>
-	#getDisabled?: (row: RowValue, table: DataTable<RowValue, CellValue, ColumnId>) => boolean
+	columns: Column<RowValue, CellValue, ColumnId>[] = $state(
+		[]
+	)
+
+	#columnsById = $derived(
+		new SvelteMap(
+			this.columns
+				.map(column => [
+					column.id,
+					column
+				])
+		)
+	)
+
+	#isColumnExpanded = $state(
+		new SvelteSet<ColumnId>()
+	)
+
+	rows = $state<RowValue[]>(
+		[]
+	)
+
+	pageSize: number = $state(
+		10
+	)
+	currentPage = $state(
+		1
+	)
+
+	#defaultColumnSort?: SortState<ColumnId>
+	columnSort?: SortState<ColumnId> = $state(
+		this.#defaultColumnSort
+	)
+
+	#isRowDisabled?: (row: RowValue, table: DataTable<RowValue, CellValue, ColumnId>) => boolean
 	#displaceDisabledRows: boolean
 
-	#originalData = $state<RowValue[]>([])
-	#currentPage = $state(1)
-	#sortState?: SortState<ColumnId> = $state()
+	rowsSorted = $derived.by(() => {
+		if(!this.columnSort)
+			return this.rows
 
-	#sortedData = $derived.by(() => {
-		if (this.#sortState) {
-			const { columnId, direction } = this.#sortState
+		const { columnId, direction } = this.columnSort
 
-			const colDef = this.#getColumnDef(columnId)
+		const column = this.#columnsById.get(columnId)
 
-			return [...this.#originalData].sort((a, b) => {
-				if (this.#displaceDisabledRows && this.#getDisabled) {
-					const isRowADisplaced = this.#getDisabled(a, this)
-					const isRowBDisplaced = this.#getDisabled(b, this)
+		return (
+			this.rows
+				.toSorted((a, b) => {
+					if (this.#displaceDisabledRows && this.#isRowDisabled) {
+						const isRowADisplaced = this.#isRowDisabled(a, this)
+						const isRowBDisplaced = this.#isRowDisabled(b, this)
 
-					if(isRowADisplaced || isRowBDisplaced)
-						return (
-							isRowADisplaced && isRowBDisplaced ?
-								0
-							: isRowADisplaced ?
-								1
+						if(isRowADisplaced || isRowBDisplaced)
+							return (
+								isRowADisplaced && isRowBDisplaced ?
+									0
+								: isRowADisplaced ?
+									1
+								:
+									-1
+							)
+					}
+
+					const aVal = column?.getValue(a)
+					const bVal = column?.getValue(b)
+
+					return (
+						aVal === undefined || aVal === null ?
+							direction === 'asc' ? 1 : -1
+
+						: bVal === undefined || bVal === null ?
+							direction === 'asc' ? -1 : 1
+
+						: column?.sorter ?
+							direction === 'asc' ?
+								column.sorter(aVal, bVal, a, b)
 							:
-								-1
-						)
-				}
+								column.sorter(bVal, aVal, b, a)
 
-				const aVal = this.#getValue(a, columnId)
-				const bVal = this.#getValue(b, columnId)
+						: typeof aVal === 'string' && typeof bVal === 'string' ?
+							direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
 
-				if (aVal === undefined || aVal === null) return direction === 'asc' ? 1 : -1
-				if (bVal === undefined || bVal === null) return direction === 'asc' ? -1 : 1
+						: aVal < bVal ?
+							direction === 'asc' ? -1 : 1
 
-				if (colDef && colDef.sorter) {
-					return direction === 'asc'
-						? colDef.sorter(aVal, bVal, a, b)
-						: colDef.sorter(bVal, aVal, b, a)
-				}
+						: aVal > bVal ?
+							direction === 'asc' ? 1 : -1
 
-				if (typeof aVal === 'string' && typeof bVal === 'string') {
-					return direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
-				}
-
-				if (aVal < bVal) return direction === 'asc' ? -1 : 1
-				if (aVal > bVal) return direction === 'asc' ? 1 : -1
-				return 0
-			})
-		} else {
-			return this.#originalData
-		}
+						:
+							0
+					)
+				})
+		)
 	})
 
-	/**
-	 * Creates a new DataTable instance.
-	 * @param {TableConfig<RowValue>} config - The configuration object for the data table.
-	 */
-	constructor(config: TableConfig<RowValue, CellValue, ColumnId>) {
-		this.#originalData = [...config.data]
-		this.#columns = config.columns
-		this.#pageSize = config.pageSize || 10
-		this.#defaultSort = config.defaultSort
-		this.#getDisabled = config.getDisabled
-		this.#displaceDisabledRows = config.displaceDisabledRows ?? false
+	rowsVisible = $derived(
+		this.rowsSorted
+			.slice(
+				(this.currentPage - 1) * this.pageSize,
+				(this.currentPage - 1) * this.pageSize + this.pageSize
+			)
+	)
+
+	totalPages = $derived(
+		Math.max(1, Math.ceil(this.rows.length / this.pageSize))
+	)
+
+	canGoBack = $derived(
+		this.rows.length > 0 && this.currentPage > 1
+	)
+
+	canGoForward = $derived(
+		this.rows.length > 0 && this.currentPage < this.totalPages
+	)
+
+	columnsVisible = $derived(
+		[...this.#columnsById.values()]
+			.filter(column => (
+				!column.children?.length || !this.#isColumnExpanded.has(column.id)
+			))
+	)
+
+	constructor({
+		data,
+		columns,
+		pageSize,
+		defaultSort,
+		isRowDisabled,
+		displaceDisabledRows,
+	}: {
+		data: RowValue[]
+		columns: Column<RowValue, CellValue, ColumnId>[]
+		pageSize?: number
+		defaultSort?: SortState<ColumnId>
+		isRowDisabled?: (row: RowValue, table: DataTable<RowValue, CellValue, ColumnId>) => boolean
+		displaceDisabledRows?: boolean
+	}) {
+		this.rows = [...data]
+		this.columns = columns
+		this.pageSize = pageSize || 10
+		this.#defaultColumnSort = defaultSort
+		this.#isRowDisabled = isRowDisabled
+		this.#displaceDisabledRows = displaceDisabledRows ?? false
 	}
 
-	#getColumnDef(id: ColumnId): ColumnDef<RowValue, CellValue, ColumnId> {
-		const column = this.#columns.find(col => col.id === id)
+	toggleColumnSort = (columnId: ColumnId) => {
+		const column = this.#columnsById.get(columnId)
 
-		if (!column) {
-			throw new Error(`Column "${id}" was not found`)
-		}
+		if (!column || !(column.isSortable ?? true))
+			return false
 
-		return column
-	}
+		const defaultSortDirection = column.defaultSortDirection ?? 'asc'
 
-	#getValue(row: RowValue, columnId: ColumnId): CellValue {
-		const colDef = this.#getColumnDef(columnId)
+		this.columnSort = (
+			this.columnSort?.columnId !== columnId ?
+				{
+					columnId,
+					direction: defaultSortDirection,
+				}
+			: this.columnSort?.direction === defaultSortDirection ?
+				{
+					columnId,
+					direction: defaultSortDirection === 'asc' ? 'desc' : 'asc',
+				}
+			:
+				this.#defaultColumnSort
+		)
 
-		return colDef.getValue(row)
-	}
-
-	/**
-	 * Gets or sets the base data rows without any filtering or sorting applied.
-	 * @returns {RowValue[]} An array of all rows.
-	 */
-	get baseRows() {
-		return this.#originalData
-	}
-
-	/**
-	 * @param {RowValue[]} rows - The array of rows to reset the base data to.
-	 */
-	set baseRows(rows: RowValue[]) {
-		this.#currentPage = 1
-		this.#originalData = [...rows]
-	}
-
-	/**
-	 * Returns all sorted rows without pagination.
-	 * @returns {RowValue[]} An array of all sorted rows.
-	 */
-	get allRows() {
-		return this.#sortedData
-	}
-
-	/**
-	 * The current page of rows based on applied sorting.
-	 * @returns {RowValue[]} An array of rows for the current page.
-	 */
-	get rows() {
-		const startIndex = (this.#currentPage - 1) * this.#pageSize
-		const endIndex = startIndex + this.#pageSize
-
-		return this.allRows.slice(startIndex, endIndex)
-	}
-
-	/**
-	 * The column definitions for the table.
-	 * @returns {ColumnDef<RowValue>[]} An array of column definitions.
-	 */
-	get columns() {
-		return this.#columns
-	}
-
-	/**
-	 * The current sort state for the table.
-	 * @returns {{ column: keyof RowValue | null direction: SortDirection }} An object representing the sort state with a column key and direction.
-	 */
-	get sortState() {
-		return this.#sortState
-	}
-
-	/**
-	 * The total number of pages based on the page size.
-	 * @returns {number} The total number of pages.
-	 */
-	get totalPages() {
-		return Math.max(1, Math.ceil(this.#originalData.length / this.#pageSize))
-	}
-
-	/**
-	 * Gets or sets the current page number.
-	 * @returns {number} The current page number.
-	 */
-	get currentPage() {
-		return this.#currentPage
-	}
-
-	/**
-	 * @param {number} page - The page number to set.
-	 */
-	set currentPage(page: number) {
-		this.#currentPage = Math.max(1, Math.min(page, this.totalPages))
-	}
-
-	/**
-	 * Indicates whether the user can navigate to the previous page.
-	 * @returns {boolean} True if there's a previous page available, false otherwise.
-	 */
-	get canGoBack() {
-		return this.currentPage > 1 && this.#originalData.length > 0
-	}
-
-	/**
-	 * Indicates whether the user can navigate to the next page.
-	 * @returns {boolean} True if there's a next page available, false otherwise.
-	 */
-	get canGoForward() {
-		return this.currentPage < this.totalPages && this.#originalData.length > 0
-	}
-
-	/**
-	 * Toggles the sort direction for the specified column.
-	 * @param {string} columnId - The column id to toggle sorting for.
-	 */
-	toggleSort = (columnId: ColumnId) => {
-		const colDef = this.#getColumnDef(columnId)
-
-		if (!colDef || colDef.sortable === false) {
-			return
-		}
-
-		const defaultSortDirection = colDef.defaultSortDirection ?? 'asc'
-		const currentDirection = this.#sortState?.direction
-
-		if (this.#sortState?.columnId !== columnId) {
-			this.#sortState = {
-				columnId,
-				direction: defaultSortDirection,
-			}
-		} else if (currentDirection === defaultSortDirection) {
-			this.#sortState = {
-				columnId,
-				direction: defaultSortDirection === 'asc' ? 'desc' : 'asc',
-			}
-		} else {
-			this.#sortState = this.#defaultSort
-		}
-	}
-
-	/**
-	 * Gets the current sort state for the specified column.
-	 * @param {string} columnId - The column id to get the sort state for.
-	 */
-	getSortState = (columnId: ColumnId) => {
-		return this.#sortState?.columnId === columnId ? this.#sortState.direction : undefined
-	}
-
-	/**
-	 * Indicates whether the specified column is sortable.
-	 * @param {string} columnId - The column id to check.
-	 */
-	isSortable = (columnId: ColumnId): boolean => {
-		const colDef = this.#getColumnDef(columnId)
-
-		return colDef?.sortable !== false
+		return true
 	}
 }

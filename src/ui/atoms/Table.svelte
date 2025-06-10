@@ -5,13 +5,13 @@
 	"
 >
 	// Types
-	import { DataTable, type ColumnDef } from '@/lib/DataTable.svelte'
+	import { DataTable, type Column } from '@/lib/DataTable.svelte'
 	import type { Snippet } from 'svelte'
 
 	type _RowValue = _DataTable extends DataTable<infer RowValue, any, any> ? RowValue : any
 	type _CellValue = _DataTable extends DataTable<any, infer CellValue, any> ? CellValue : any
 	type _ColumnId = _DataTable extends DataTable<any, any, infer ColumnId> ? ColumnId : string
-	type _ColumnDef = ColumnDef<_RowValue, _CellValue, _ColumnId>
+	type _Column = Column<_RowValue, _CellValue, _ColumnId>
 
 
 	// Inputs
@@ -20,25 +20,25 @@
 		defaultSort,
 		rows,
 		getId,
-		getDisabled,
+		isRowDisabled,
 		cellSnippet,
 		columnCellSnippet,
 		onRowClick,
 		displaceDisabledRows = false,
 		...restProps
 	}: {
-		columns: _ColumnDef[]
+		columns: _Column[]
 		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<_RowValue, _CellValue, _ColumnId>>[0]['defaultSort']>
 		rows: _RowValue[]
 		getId?: (row: _RowValue, index: number) => any
-		getDisabled: (row: _RowValue, table: DataTable<_RowValue, _CellValue, _ColumnId>) => boolean
+		isRowDisabled: (row: _RowValue, table: DataTable<_RowValue, _CellValue, _ColumnId>) => boolean
 		cellSnippet?: Snippet<[{
 			row: _RowValue
-			column: _ColumnDef
+			column: _Column
 			value: _CellValue
 		}]>
 		columnCellSnippet?: Snippet<[{
-			column: _ColumnDef
+			column: _Column
 		}]>
 		onRowClick?: (row: _RowValue) => void
 		displaceDisabledRows?: boolean
@@ -51,7 +51,7 @@
 			data: rows,
 			columns,
 			defaultSort,
-			getDisabled,
+			isRowDisabled,
 			displaceDisabledRows,
 		})
 	)
@@ -61,17 +61,10 @@
 			data: rows,
 			columns,
 			defaultSort,
-			getDisabled,
+			isRowDisabled,
 			displaceDisabledRows,
 		})
 	})
-
-
-	// Actions
-	const toggleColumnSort = (column: _ColumnDef) => {
-		if (table.isSortable(column.id))
-			table.toggleSort(column.id)
-	}
 
 
 	// Transitions/animations
@@ -89,10 +82,12 @@
 			<tr>
 				{#each table.columns as column (column.id)}
 					<th
-						data-sort={table.isSortable(column.id) ? table.getSortState(column.id) ?? 'none' : undefined}
+						data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
 						tabIndex={0}
 						role="button"
-						onclick={() => toggleColumnSort(column)}
+						onclick={() => {
+							table.toggleColumnSort(column.id)
+						}}
 						animate:flip={{ duration: 300, easing: expoOut }}
 					>
 						{#if columnCellSnippet}
@@ -104,8 +99,9 @@
 				{/each}
 			</tr>
 		</thead>
+
 		<tbody>
-			{#each table.rows as row, index (getId?.(row, index))}
+			{#each table.rowsVisible as row, index (getId?.(row, index))}
 				<tr
 					tabIndex={0}
 					onclick={e => {
@@ -135,9 +131,9 @@
 						}
 					}}
 					animate:flip={{ duration: 300, easing: expoOut }}
-					data-disabled={getDisabled?.(row, table) ? '' : undefined}
+					data-disabled={isRowDisabled?.(row, table) ? '' : undefined}
 				>
-					{#each table.columns as column (column.id)}
+					{#each table.columnsVisible as column (column.id)}
 						{@const value = column.getValue?.(row)}
 
 						<td

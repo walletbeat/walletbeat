@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { ColumnDef } from '@/lib/DataTable.svelte'
+	import type { Column } from '@/lib/DataTable.svelte'
 	import { Variant } from '@/schema/variants'
 	import type { RatedWallet } from '@/schema/wallet'
 	import type { AttributeGroup } from '@/schema/attributes'
@@ -71,10 +71,10 @@
 <Table
 	rows={wallets}
 	getId={wallet => wallet.metadata.id}
-	getDisabled={(wallet, table) => (
+	isRowDisabled={(wallet, table) => (
 		Boolean(
 			(walletTableState.selectedVariant && !(walletTableState.selectedVariant in wallet.variants))
-			|| (table.sortState?.direction && table.columns.find(column => column.id === table.sortState!.columnId)?.getValue?.(wallet) === undefined)
+			|| (table.columnSort?.direction && table.columns.find(column => column.id === table.columnSort!.columnId)?.getValue?.(wallet) === undefined)
 		)
 	)}
 	onRowClick={wallet => {
@@ -89,7 +89,7 @@
 				getValue: wallet => (
 					wallet.metadata.displayName
 				),
-			} satisfies ColumnDef<RatedWallet>,
+			} satisfies Column<RatedWallet>,
 			...(
 				walletTableState.displayMode === 'combined' ?
 					[
@@ -97,7 +97,7 @@
 							id: 'combined',
 							name: 'Overall Rating',
 							getValue: wallet => wallet,
-						} satisfies ColumnDef<RatedWallet>,
+						} satisfies Column<RatedWallet>,
 					]
 				:
 					attributeGroups.map(attrGroup => ({
@@ -107,7 +107,7 @@
 							calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])?.score ?? undefined
 						),
 						defaultSortDirection: 'desc' as const,
-					} satisfies ColumnDef<RatedWallet>))
+					} satisfies Column<RatedWallet>))
 			),
 		]
 	}
