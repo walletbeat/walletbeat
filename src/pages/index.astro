@@ -145,20 +145,19 @@ const navigationItems = [
 
 <style>
 	.layout {
-		display: flex;
-		min-height: 100vh;
-		max-width: 100vw;
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		max-width: 100dvw;
+		min-height: 100dvh;
 
 		@media (max-width: 1024px) {
-			flex-direction: column;
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 
-
-
 	main {
-		flex: 1;
 		overflow-y: auto;
+		max-height: 100dvh;
 		padding-bottom: 6rem;
 
 		header {
