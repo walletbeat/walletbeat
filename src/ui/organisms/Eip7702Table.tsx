@@ -12,7 +12,7 @@ import React from 'react';
 import { eip7702 } from '@/data/eips/eip-7702';
 import { erc4337 } from '@/data/eips/erc-4337';
 import { ratedSoftwareWallets } from '@/data/software-wallets';
-import type { SmartWalletContract } from '@/schema/contracts';
+import type { EVMAddress, SmartWalletContract } from '@/schema/contracts';
 import { AccountType, isAccountTypeSupported } from '@/schema/features/account-support';
 import { refs } from '@/schema/reference';
 import { isLabeledUrl } from '@/schema/url';
@@ -44,6 +44,13 @@ interface TableRow {
   typeFor7702: WalletTypeFor7702;
   contract: SmartWalletContract | 'UNKNOWN' | 'NONE';
   sortPriority: number;
+}
+
+function walletContractUrl(contractAddress: EVMAddress, anchor?: string): string {
+  return (
+    `https://etherscan.io/address/${contractAddress}` +
+    (anchor !== undefined && anchor !== '' ? `#${anchor}` : '')
+  );
 }
 
 // Create software wallet table data
@@ -206,10 +213,7 @@ export default function Eip7702Table(): React.JSX.Element {
       }
 
       return (
-        <ExternalLink
-          url={`https://etherscan.io/address/${contract.address}`}
-          defaultLabel={contract.name}
-        />
+        <ExternalLink url={walletContractUrl(contract.address)} defaultLabel={contract.name} />
       );
     },
   });
@@ -234,7 +238,7 @@ export default function Eip7702Table(): React.JSX.Element {
       const sourceRefs = refs(contract.sourceCode);
       const sourceUrl = isNonEmptyArray(sourceRefs)
         ? nonEmptyGet(nonEmptyGet(sourceRefs).urls)
-        : `https://etherscan.io/address/${contract.address}#code`;
+        : walletContractUrl(contract.address, 'code');
       const rawUrl = isLabeledUrl(sourceUrl) ? sourceUrl.url : sourceUrl;
 
       return <ExternalLink url={rawUrl} defaultLabel='Available' />;
