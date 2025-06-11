@@ -1,5 +1,6 @@
 import { Typography } from '@mui/material';
 
+import { repositoryUrl } from '@/constants';
 import { Rating, type Value } from '@/schema/attributes';
 import type { UnratedAttributeProps } from '@/types/content/unrated-attribute';
 
@@ -17,7 +18,7 @@ export function UnratedAttribute<V extends Value>({
       </Typography>
       <Typography>
         Please help us by contributing your knowledge on{' '}
-        <ExternalLink url='https://github.com/walletbeat/walletbeat' rel=''>
+        <ExternalLink url={repositoryUrl} rel=''>
           our repository
         </ExternalLink>
         !

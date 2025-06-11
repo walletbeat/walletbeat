@@ -1,6 +1,8 @@
 import type React from 'react';
 import { LuGithub } from 'react-icons/lu';
 
+import { repositoryUrl } from '@/constants';
+
 import { ExternalLink } from '../atoms/ExternalLink';
 import Eip7702Table from './Eip7702Table';
 
@@ -71,7 +73,7 @@ export function Eip7702Adoption(): React.JSX.Element {
           <div className='flex flex-row gap-2 items-center' key='repo'>
             <LuGithub />
             <ExternalLink
-              url='https://github.com/walletbeat/walletbeat'
+              url={repositoryUrl}
               defaultLabel='GitHub Repository'
               style={{
                 fontWeight: 500,

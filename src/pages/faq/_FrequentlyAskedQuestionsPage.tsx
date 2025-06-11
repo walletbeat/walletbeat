@@ -2,6 +2,7 @@ import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { Divider, Typography } from '@mui/material';
 import React from 'react';
 
+import { repositoryUrl } from '@/constants';
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout';
 import { type NonEmptyArray, nonEmptyConcat, nonEmptyMap } from '@/types/utils/non-empty';
 import FrequentlyAskedQuestion from '@/ui/molecules/FrequentlyAskedQuestion';
@@ -272,7 +273,7 @@ const frequentlyAskedQuestions: NonEmptyArray<FAQEntry> = [
 			process a lot.
 
 			If you would like to help with this, please
-			[contribute to our repository!](https://github.com/walletbeat/walletbeat).
+			[contribute to our repository!](${repositoryUrl}).
 		`,
   },
 ];
