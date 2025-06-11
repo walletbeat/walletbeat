@@ -4,7 +4,6 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  type Row,
   useReactTable,
 } from '@tanstack/react-table';
 import React from 'react';
@@ -27,7 +26,7 @@ import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/uti
 import { cx } from '@/utils/cx';
 
 import { ExternalLink } from '../atoms/ExternalLink';
-import { EipStandardTag } from './WalletTable';
+import { EipStandardTag, walletNameCell } from './WalletTable';
 
 enum WalletTypeFor7702 {
   EIP7702 = 'EIP7702',
@@ -115,43 +114,6 @@ const softwareWalletData: TableRow[] = Object.values(ratedSoftwareWallets)
   })
   .sort((a, b) => a.sortPriority - b.sortPriority);
 
-// Create a reusable cell renderer for wallet name columns
-function createWalletNameCell(): ({ row }: { row: Row<TableRow> }) => React.ReactNode {
-  const createCell = ({ row }: { row: Row<TableRow> }): React.ReactNode => {
-    // Regular row rendering with logo
-    const walletId = row.original.wallet.metadata.id;
-    const logoPath = `/images/wallets/${walletId}.${row.original.wallet.metadata.iconExtension}`;
-    const defaultLogo = '/images/wallets/default.svg';
-    const walletUrl = `/${walletId}`;
-
-    return (
-      <div className='flex items-center'>
-        {/* Wallet Logo */}
-        <div className='flex-shrink-0 mr-3'>
-          <img
-            src={logoPath}
-            alt=''
-            className='w-6 h-6 object-contain'
-            onError={e => {
-              // Fallback for missing logos
-              e.currentTarget.src = defaultLogo;
-            }}
-          />
-        </div>
-        {/* Wallet Name */}
-        <a
-          href={walletUrl}
-          className='text-base font-medium hover:text-blue-600 hover:underline cursor-pointer'
-        >
-          {row.original.wallet.metadata.displayName}
-        </a>
-      </div>
-    );
-  };
-
-  return createCell;
-}
-
 interface WalletTypeCell {
   typeString: string;
   hasSmartWallet: boolean;
@@ -171,7 +133,7 @@ export default function Eip7702Table(): React.JSX.Element {
     {
       id: 'wallet',
       header: 'Wallet',
-      cell: createWalletNameCell(),
+      cell: walletNameCell<TableRow>,
     },
   );
   const walletTypeColumn = columnHelper.display({
