@@ -294,40 +294,35 @@ export default function Eip7702Table(): React.JSX.Element {
 
   return (
     <div className='overflow-x-auto'>
-      <div className='overflow-x-auto'>
-        <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-background'>
-          <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr className='bg-tertiary' key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  const headerContent = header.column.columnDef.header;
+      <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-background'>
+        <thead>
+          {table.getHeaderGroups().map(headerGroup => (
+            <tr className='bg-tertiary' key={headerGroup.id}>
+              {headerGroup.headers.map(header => {
+                const headerContent = header.column.columnDef.header;
 
-                  return (
-                    <th
-                      key={header.id}
-                      className={cx(
-                        'px-4 py-2 text-[14px] text-secondary',
-                        header.column.id === 'rank' ? 'text-center' : 'text-left',
-                        header.column.id === 'wallet'
-                          ? 'font-bold'
-                          : header.column.id === 'type'
-                            ? 'font-semibold'
-                            : 'font-normal',
-                      )}
-                    >
-                      {headerContent !== undefined &&
-                        flexRender(headerContent, header.getContext())}
-                    </th>
-                  );
-                })}
-              </tr>
-            ))}
-          </thead>
-          <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>
-            {renderTableBody()}
-          </tbody>
-        </table>
-      </div>
+                return (
+                  <th
+                    key={header.id}
+                    className={cx(
+                      'px-4 py-2 text-[14px] text-secondary',
+                      header.column.id === 'rank' ? 'text-center' : 'text-left',
+                      header.column.id === 'wallet'
+                        ? 'font-bold'
+                        : header.column.id === 'type'
+                          ? 'font-semibold'
+                          : 'font-normal',
+                    )}
+                  >
+                    {headerContent !== undefined && flexRender(headerContent, header.getContext())}
+                  </th>
+                );
+              })}
+            </tr>
+          ))}
+        </thead>
+        <tbody className='divide-y divide-gray-200 dark:divide-gray-700'>{renderTableBody()}</tbody>
+      </table>
     </div>
   );
 }
