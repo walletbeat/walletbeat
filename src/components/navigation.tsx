@@ -3,7 +3,7 @@ import HelpCenterIcon from '@mui/icons-material/HelpCenter';
 import HomeIcon from '@mui/icons-material/Home';
 import { LuBadgeCheck, LuBuilding2, LuGithub } from 'react-icons/lu';
 
-import { betaSiteRoot, repositoryUrl } from '@/constants';
+import { betaSiteRoot, repositoryUrl, socialChannel } from '@/constants';
 import type { NavigationLinkItem } from '@/ui/organisms/Navigation';
 
 export const navigationHome: NavigationLinkItem = {
@@ -45,7 +45,7 @@ export const navigationFarcasterChannel: NavigationLinkItem = {
   id: 'farcaster-channel',
   icon: <ForumIcon />,
   title: 'Discuss on Farcaster',
-  href: 'https://warpcast.com/~/channel/walletbeat',
+  href: socialChannel,
 };
 
 export const scrollPastHeaderPixels = 16;

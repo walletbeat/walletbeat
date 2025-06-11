@@ -84,7 +84,7 @@ export interface Entity<Ts extends EntityType[] = []> {
   twitter: DomainUrl<'x.com'> | { type: 'NO_TWITTER_URL' };
 
   /** The Farcaster profile name of the entity, as a Warpcast URL, if any. */
-  farcaster: DomainUrl<'warpcast.com'> | { type: 'NO_FARCASTER_PROFILE' };
+  farcaster: DomainUrl<'warpcast.com' | 'farcaster.xyz'> | { type: 'NO_FARCASTER_PROFILE' };
 }
 
 type EntityWithType<T extends EntityType> = Entity & Entity<[T]>;
