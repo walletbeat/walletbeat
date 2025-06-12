@@ -249,24 +249,3 @@ code {
 	/* Why monospace twice? See https://github.com/necolas/normalize.css/issues/519#issuecomment-197131966 */
 	font-family: monospace, monospace;
 }
-
-[cmdk-list] {
-	@apply pb-2 pt-3;
-}
-
-[cmdk-group-heading] {
-	@apply px-2;
-}
-
-[cmdk-list-sizer] {
-	@apply space-y-2;
-}
-
-[data-radix-popper-content-wrapper] {
-	z-index: 100 !important;
-}
-
-/* This will apply in light mode (when html does NOT have .dark) */
-html:not(.dark) .MuiSvgIcon-root[data-testid='ExpandMoreIcon'] {
-	color: #fff !important;
-}
