@@ -14,7 +14,6 @@ const { metadata } = Astro.props
 
 // Components
 import Metadata from '@/components/Metadata.astro'
-import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 // import { NavigationStateManager } from '@/components/NavigationStateManager'
 ---
 
@@ -32,9 +31,7 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 		</script>
 	</head>
 	<body>
-		<ThemeRegistry>
-			<!-- <NavigationStateManager client:load /> -->
-			<slot />
-		</ThemeRegistry>
+		<!-- <NavigationStateManager client:load /> -->
+		<slot />
 	</body>
 </html>
