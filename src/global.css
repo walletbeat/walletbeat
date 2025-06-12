@@ -1,5 +1,6 @@
 /* cSpell:disable */
 
+@import '@fontsource/montserrat/latin.css';
 
 :root {
 	--background-primary: light-dark(#fff, #17191f);
