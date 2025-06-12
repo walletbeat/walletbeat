@@ -4,6 +4,9 @@ import { allWallets } from '@/data/wallets'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import LuKey from 'lucide-static/icons/key.svg?raw'
 import LuWallet from 'lucide-static/icons/wallet.svg?raw'
+import LuMoon from 'lucide-static/icons/moon.svg?raw'
+import LuSun from 'lucide-static/icons/sun.svg?raw'
+import LuMenu from 'lucide-static/icons/menu.svg?raw'
 
 interface Props {
 	navigationItems: NavigationLinkItem[]
@@ -11,6 +14,14 @@ interface Props {
 
 const { navigationItems } = Astro.props
 ---
+
+
+<script>
+	document.getElementById('theme-toggle')?.addEventListener('click', () => {
+		document.documentElement.style.colorScheme = document.documentElement.style.colorScheme === 'dark' ? 'light' : 'dark'
+		localStorage.setItem('theme', document.documentElement.style.colorScheme)
+	})
+</script>
 
 <nav>
 	<header>
@@ -20,6 +31,17 @@ const { navigationItems } = Astro.props
 				<img src="/logo-light.svg" alt="WalletBeat Logo">
 			</picture>
 		</a>
+		
+		<div>
+			<button id="theme-toggle" type="button">
+				<span set:html={LuSun} />
+				<span set:html={LuMoon} />
+			</button>
+
+			<button id="menu-toggle" type="button">
+				<span set:html={LuMenu} />
+			</button>
+		</div>
 	</header>
 
 	<div>
