@@ -44,16 +44,6 @@
 	--rating-neutral: #bdc3c7;
 }
 
-.card {
-	background-color: var(--background-primary);
-	border-radius: 8px;
-	border: 1px solid var(--border);
-}
-
-.card:not(.no-padding) {
-	padding: 16px;
-}
-
 .text-accent {
 	color: var(--accent);
 }
@@ -224,6 +214,13 @@ details {
 code {
 	/* Why monospace twice? See https://github.com/necolas/normalize.css/issues/519#issuecomment-197131966 */
 	font-family: monospace, monospace;
+}
+
+.card {
+	background-color: var(--background-primary);
+	border-radius: 8px;
+	border: 1px solid var(--border);
+	padding: 16px;
 }
 
 .tag {
