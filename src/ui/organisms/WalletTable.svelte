@@ -89,6 +89,7 @@
 				getValue: wallet => (
 					wallet.metadata.displayName
 				),
+				isSticky: true,
 			} satisfies Column<RatedWallet>,
 			...(
 				walletTableState.displayMode === 'combined' ?

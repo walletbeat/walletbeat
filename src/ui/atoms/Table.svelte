@@ -82,7 +82,8 @@
 			<tr>
 				{#each table.columns as column (column.id)}
 					<th
-						data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
+						data-column-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
+						data-column-is-sticky={column.isSticky ? '' : undefined}
 						tabIndex={0}
 						role="button"
 						onclick={() => {
@@ -137,6 +138,8 @@
 						{@const value = column.getValue?.(row)}
 
 						<td
+							data-column-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
+							data-column-is-sticky={column.isSticky ? '' : undefined}
 							animate:flip={{ duration: 300, easing: expoOut }}
 						>
 							{#if cellSnippet}
@@ -204,20 +207,20 @@
 				th {
 					/* color: color-mix(in oklch, currentColor 50%, transparent); */
 
-					&[data-sort] {
+					&[data-column-sort] {
 						cursor: pointer;
 
-						&[data-sort='none'] {
+						&[data-column-sort='none'] {
 							--column-sortIndicator-transform: perspective(1000px) scale(0);
 							--column-sortIndicator-fontSize: 0;
 						}
 
-						&[data-sort='asc'] {
+						&[data-column-sort='asc'] {
 							--column-sortIndicator-transform: perspective(1000px);
 							--column-sortIndicator-fontSize: 1em;
 						}
 
-						&[data-sort='desc'] {
+						&[data-column-sort='desc'] {
 							--column-sortIndicator-transform: perspective(1000px) rotateX(180deg);
 							--column-sortIndicator-fontSize: 1em;
 						}
@@ -242,6 +245,8 @@
 		}
 
 		tbody {
+			isolation: isolate;
+
 			tr {
 				--table-row-backgroundColor: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.03));
 
@@ -316,17 +321,12 @@
 				transform-origin: right;
 			}
 
-			&.sticky {
+			&[data-column-is-sticky] {
 				position: sticky;
 				backdrop-filter: blur(20px);
-
-				&:is(th:not(:has(> :not([hidden])))) {
-					opacity: 0;
-				}
-
-				&:last-child {
-					inset-inline-end: 0;
-				}
+				z-index: 1;
+				inset-inline-start: 0;
+				inset-inline-end: 0;
 			}
 		}
 	}

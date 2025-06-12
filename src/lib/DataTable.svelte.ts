@@ -8,6 +8,7 @@ export type Column<
 > = {
 	id: ColumnId
 	name: string
+	isSticky?: boolean
 	isSortable?: boolean
 	defaultSortDirection?: SortDirection
 	getValue: (row: RowValue) => CellValue
