@@ -50,17 +50,6 @@
 	color-scheme: light dark;
 }
 
-/* Force SVG icons to use the appropriate color based on theme */
-.MuiSvgIcon-root {
-	color: var(--icon-color) !important;
-}
-
-/* When icons are selected, use the accent color */
-.variant-filter-icon[data-selected='true'],
-.MuiSvgIcon-root[data-selected='true'] {
-	color: var(--accent) !important;
-}
-
 /* Styling for EIP/ERC tags */
 .eip-tag {
 	background-color: var(--eip-bg);
@@ -139,13 +128,19 @@ html.dark {
 }
 
 * {
+	box-sizing: border-box;
 	margin: 0;
+	padding: 0;
 	text-box-trim: trim-both;
 	transition-duration: inherit;
 	transition-timing-function: inherit;
 	transition-behavior: allow-discrete;
 
 	scroll-behavior: smooth;
+}
+
+[popover] {
+	all: unset;
 }
 
 [hidden] {
