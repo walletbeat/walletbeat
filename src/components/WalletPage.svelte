@@ -35,7 +35,6 @@
 
 
 	// Components
-	import { onMount } from 'svelte'
 	import Typography from '@/ui/atoms/Typography.svelte'
 	import Pie from '@/ui/atoms/Pie.svelte'
 	import RenderCustomContent from '@/ui/atoms/RenderCustomContent.svelte'
@@ -67,7 +66,7 @@
 	)
 
 
-	onMount(() => {
+	$effect(() => {
 		pickedVariant = singleVariant !== null ? singleVariant : wallet ? variantFromUrlQuery(wallet.variants) : null
 	})
 
