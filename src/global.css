@@ -1,51 +1,44 @@
 /* cSpell:disable */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-/* Theme */
+:root {
+	--background-primary: light-dark(#fff, #17191f);
+	--background-secondary: light-dark(#efefef, #141414);
+	--background-tertiary: light-dark(#eeeff4, #17191f);
+	--accent: light-dark(#4d1957, #e683c7);
+	--accent-light: light-dark(#e683c7, #4d1957);
+	--accent-very-light: light-dark(#ffdbf4, #440530);
+	--logo-color: var(--accent);
+	--text-primary: light-dark(#222222, #efefef);
+	--text-secondary: light-dark(#3f4046, #b1b2b9);
+	--text-inverse: #ffffff;
+	--border: light-dark(#cecece, #313131);
+	--banner-gradient-from: light-dark(#ecedfd, #15151a);
+	--banner-gradient-to: light-dark(#e8f6f2, #212126);
+	--icon-color: light-dark(#222222, #efefef);
+	--navigation-bg: var(--background-secondary);
+	--disabled-text: light-dark(#b1b2b9, #656566);
+	--pass: #2ecc71;
+	--fail: #e74c3c;
+	--partial: #f1c40f;
+	--active: light-dark(#e683c7, #b14f92);
+	--hover: light-dark(#e683c7, #b14f92);
 
-@layer base {
-	:root {
-		--background-primary: light-dark(#fff, #17191f);
-		--background-secondary: light-dark(#efefef, #141414);
-		--background-tertiary: light-dark(#eeeff4, #17191f);
-		--accent: light-dark(#4d1957, #e683c7);
-		--accent-light: light-dark(#e683c7, #4d1957);
-		--accent-very-light: light-dark(#ffdbf4, #440530);
-		--logo-color: var(--accent);
-		--text-primary: light-dark(#222222, #efefef);
-		--text-secondary: light-dark(#3f4046, #b1b2b9);
-		--text-inverse: #ffffff;
-		--border: light-dark(#cecece, #313131);
-		--banner-gradient-from: light-dark(#ecedfd, #15151a);
-		--banner-gradient-to: light-dark(#e8f6f2, #212126);
-		--icon-color: light-dark(#222222, #efefef);
-		--navigation-bg: var(--background-secondary);
-		--disabled-text: light-dark(#b1b2b9, #656566);
-		--pass: #2ecc71;
-		--fail: #e74c3c;
-		--partial: #f1c40f;
-		--active: light-dark(#e683c7, #b14f92);
-		--hover: light-dark(#e683c7, #b14f92);
+	/* Hashtag styling */
+	--hashtag-text: light-dark(#1976d2, #90caf9);
+	--hashtag-bg: light-dark(rgba(25, 118, 210, 0.08), rgba(144, 202, 249, 0.08));
+	--hashtag-bg-hover: light-dark(rgba(25, 118, 210, 0.12), rgba(144, 202, 249, 0.12));
 
-		/* Hashtag styling */
-		--hashtag-text: light-dark(#1976d2, #90caf9);
-		--hashtag-bg: light-dark(rgba(25, 118, 210, 0.08), rgba(144, 202, 249, 0.08));
-		--hashtag-bg-hover: light-dark(rgba(25, 118, 210, 0.12), rgba(144, 202, 249, 0.12));
+	/* EIP/ERC tag styling */
+	--eip-bg: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
+	--eip-text: light-dark(var(--accent), rgb(187, 147, 255));
+	--eip-border: light-dark(rgba(108, 36, 224, 0.2), rgba(108, 36, 224, 0.3));
 
-		/* EIP/ERC tag styling */
-		--eip-bg: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
-		--eip-text: light-dark(var(--accent), rgb(187, 147, 255));
-		--eip-border: light-dark(rgba(108, 36, 224, 0.2), rgba(108, 36, 224, 0.3));
-
-		/* Rating colors */
-		--rating-pass: #2ecc71;
-		--rating-partial: #f1c40f;
-		--rating-fail: #e74c3c;
-		--rating-neutral: #bdc3c7;
-	}
+	/* Rating colors */
+	--rating-pass: #2ecc71;
+	--rating-partial: #f1c40f;
+	--rating-fail: #e74c3c;
+	--rating-neutral: #bdc3c7;
 }
 
 :root {
