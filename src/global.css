@@ -3,6 +3,13 @@
 @import '@fontsource/montserrat/latin.css';
 
 :root {
+	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
+
+	--active-transitionInDuration: 0.125s;
+	--active-transitionOutDuration: 0.2s;
+	--active-scale: 0.99;
+	--active-opacity: 0.8;
+
 	--background-primary: light-dark(#fff, #17191f);
 	--background-secondary: light-dark(#efefef, #141414);
 	--background-tertiary: light-dark(#eeeff4, #17191f);
@@ -13,11 +20,11 @@
 	--text-primary: light-dark(#222222, #efefef);
 	--text-secondary: light-dark(#3f4046, #b1b2b9);
 	--text-inverse: #ffffff;
-	--border: light-dark(#cecece, #313131);
+	--border-color: light-dark(#cecece, #313131);
 	--banner-gradient-from: light-dark(#ecedfd, #15151a);
 	--banner-gradient-to: light-dark(#e8f6f2, #212126);
 	--icon-color: light-dark(#222222, #efefef);
-	--navigation-bg: var(--background-secondary);
+	--navigation-backgroundColor: light-dark(#efefefcc, #141414cc);
 	--disabled-text: light-dark(#b1b2b9, #656566);
 	--pass: #2ecc71;
 	--fail: #e74c3c;
@@ -40,15 +47,6 @@
 	--rating-partial: #f1c40f;
 	--rating-fail: #e74c3c;
 	--rating-neutral: #bdc3c7;
-}
-
-:root {
-	color: var(--text-primary) !important;
-	background-color: var(--background-secondary) !important;
-	background: var(--background-secondary) !important;
-	font-size: 16px !important;
-
-	color-scheme: light dark;
 }
 
 /* Styling for EIP/ERC tags */
@@ -112,20 +110,18 @@ html.dark {
 }
 
 :root {
-	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
-
-	--active-transitionInDuration: 0.125s;
-	--active-transitionOutDuration: 0.2s;
-	--active-scale: 0.99;
-	--active-opacity: 0.8;
-
 	scroll-behavior: smooth;
 
 	transition-duration: 0.2s;
 	transition-timing-function: var(--transition-easeOutExpo);
 
-
 	font-family: 'Montserrat', 'Noto Color Emoji';
+	font-size: 16px;
+
+	color-scheme: light dark;
+	color: var(--text-primary);
+	background-color: var(--background-secondary);
+	outline-color: var(--accent);
 }
 
 * {
