@@ -321,7 +321,8 @@
 				transform-origin: right;
 			}
 
-			&[data-column-is-sticky] {
+			&[data-column-is-sticky],
+			&[data-column-sort]:not([data-column-is-sticky]) {
 				position: sticky;
 				backdrop-filter: blur(20px);
 				z-index: 1;
