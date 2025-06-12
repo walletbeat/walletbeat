@@ -65,14 +65,6 @@
 	cursor: pointer;
 }
 
-.link {
-	color: var(--accent);
-}
-
-.link:hover {
-	text-decoration: underline;
-}
-
 html.dark {
 	color-scheme: dark;
 }
@@ -125,6 +117,15 @@ html.dark {
 
 [hidden] {
 	display: none !important;
+}
+
+a {
+	color: var(--accent);
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
 }
 
 details {
