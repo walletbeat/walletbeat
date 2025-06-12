@@ -1,8 +1,5 @@
-import { ThemeProvider } from '@mui/material'
 import type React from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-
-import theme from '@/components/ThemeRegistry/theme'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 import {
 	isNavigationContentItem,
@@ -205,21 +202,19 @@ export function NavigationPageLayout({
 	}, [debouncedScrollHandler, ...contentDependencies])
 
 	return (
-		<ThemeProvider theme={theme}>
-			<div className='flex flex-col lg:flex-row w-full min-h-screen max-w-screen'>
-				<Navigation
-					key='navigation'
-					groups={groups}
-					activeItemId={activeItemId}
-					prefix={prefix}
-					selectedItemId={selectedItemId}
-					selectedGroupId={selectedGroupId}
-				/>
+		<div className='flex flex-col lg:flex-row w-full min-h-screen max-w-screen'>
+			<Navigation
+				key='navigation'
+				groups={groups}
+				activeItemId={activeItemId}
+				prefix={prefix}
+				selectedItemId={selectedItemId}
+				selectedGroupId={selectedGroupId}
+			/>
 
-				<div key='contentContainer' className='flex-grow overflow-y-auto min-h-screen w-full pb-24'>
-					<div className='mx-auto w-full'>{children}</div>
-				</div>
+			<div key='contentContainer' className='flex-grow overflow-y-auto min-h-screen w-full pb-24'>
+				<div className='mx-auto w-full'>{children}</div>
 			</div>
-		</ThemeProvider>
+		</div>
 	)
 }
