@@ -37,28 +37,11 @@
 	--hashtag-bg: light-dark(rgba(25, 118, 210, 0.08), rgba(144, 202, 249, 0.08));
 	--hashtag-bg-hover: light-dark(rgba(25, 118, 210, 0.12), rgba(144, 202, 249, 0.12));
 
-	/* EIP/ERC tag styling */
-	--eip-bg: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
-	--eip-text: light-dark(var(--accent), rgb(187, 147, 255));
-	--eip-border: light-dark(rgba(108, 36, 224, 0.2), rgba(108, 36, 224, 0.3));
-
 	/* Rating colors */
 	--rating-pass: #2ecc71;
 	--rating-partial: #f1c40f;
 	--rating-fail: #e74c3c;
 	--rating-neutral: #bdc3c7;
-}
-
-/* Styling for EIP/ERC tags */
-.eip-tag {
-	background-color: var(--eip-bg);
-	color: var(--eip-text) !important;
-	padding: 0.3rem 0.6rem;
-	border-radius: 9999px;
-	font-weight: 500;
-	border: 1px solid var(--eip-border);
-	display: inline-block;
-	margin: 0 0.2rem;
 }
 
 .card {
@@ -240,4 +223,19 @@ details {
 code {
 	/* Why monospace twice? See https://github.com/necolas/normalize.css/issues/519#issuecomment-197131966 */
 	font-family: monospace, monospace;
+}
+
+.tag {
+	--tag-backgroundColor: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
+	--tag-color: light-dark(var(--accent), rgb(187, 147, 255));
+	--tag-borderColor: light-dark(rgba(108, 36, 224, 0.2), rgba(108, 36, 224, 0.3));
+
+	background-color: var(--tag-backgroundColor);
+	color: var(--tag-color);
+	padding: 0.3rem 0.6rem;
+	border-radius: 9999px;
+	font-weight: 500;
+	border: 1px solid var(--tag-borderColor);
+	display: inline-block;
+	margin: 0 0.2rem;
 }
