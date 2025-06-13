@@ -83,27 +83,24 @@ html.dark {
 
 :root,
 ::before,
-::after,
-:where(
-	::details-content
-) {
+::after {
 	transition-duration: 0.25s;
 	transition-timing-function: var(--transition-easeOutExpo);
 }
+::details-content {
+	transition-duration: 0.25s;
+	transition-timing-function: var(--transition-easeOutExpo);
+	transition-behavior: allow-discrete;
+}
 
-*,
-[popover] {
+* {
 	transition-duration: inherit;
 	transition-timing-function: inherit;
 }
 
 *,
 ::before,
-::after,
-:where(
-	[popover],
-	::details-content
-) {
+::after {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
@@ -132,33 +129,35 @@ a {
 }
 
 details {
-	--details-transition-duration: 0.3s;
-	--details-transform-closed: translateY(-6px);
-
 	&::details-content {
-		transition: 
-			content-visibility var(--details-transition-duration) ease allow-discrete,
-			opacity var(--details-transition-duration) ease,
-			transform var(--details-transition-duration) ease,
-			height var(--details-transition-duration) ease allow-keywords;
+		transition-property:
+			content-visibility,
+			height,
+			opacity,
+			filter,
+			transform
+		;
+
+		display: grid;
+		content-visibility: visible;
+		height: auto;
+		transform: perspective(100px);
+		transform-origin: center top;
+
+		/* @starting-style {
+			height: 0;
+			opacity: 0;
+			filter: blur(4px);
+			transform: perspective(1000px) rotateX(-1deg);
+		} */
 	}
 
 	&:not([open])::details-content {
 		content-visibility: hidden;
-		opacity: 0;
-		transform: var(--details-transform-closed);
 		height: 0;
-	}
-
-	&[open]::details-content {
-		content-visibility: visible;
-		opacity: 1;
-		transform: translateY(0);
-		height: auto;
-
-		@starting-style {
-			height: 0;
-		}
+		opacity: 0;
+		filter: blur(4px);
+		transform: perspective(1000px) rotateX(-1deg);
 	}
 
 	> summary {
@@ -178,11 +177,11 @@ details {
 			width: 0.75em;
 			height: 0.75em;
 			background-color: currentColor;
-			mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
+			mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E") no-repeat;
 			opacity: 0.66;
 
-			transform: perspective(100px);
-			transition: transform var(--details-transition-duration) ease;
+			transform: perspective(100px) rotateX(0deg);
+			transition-property: transform;
 		}
 	}
 
