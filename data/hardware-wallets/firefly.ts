@@ -1,10 +1,9 @@
+import { nconsigny } from '@/data/contributors/nconsigny';
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
-
-import { nconsigny } from '../contributors/nconsigny';
 
 export const fireflyWallet: HardwareWallet = {
   metadata: {

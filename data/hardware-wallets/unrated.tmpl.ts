@@ -1,9 +1,8 @@
+import { exampleContributor } from '@/data/contributors/example';
 import { WalletProfile } from '@/schema/features/profile';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
-
-import { exampleContributor } from '../contributors/example';
 
 export const unratedHardwareTemplate: HardwareWallet = {
   metadata: {

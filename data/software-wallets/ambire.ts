@@ -1,3 +1,4 @@
+import { jiojosbg } from '@/data/contributors/jiojosbg';
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support';
 import {
   Leak,
@@ -19,7 +20,6 @@ import { Variant } from '@/schema/variants';
 import type { SoftwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
 
-import { jiojosbg } from '../contributors/jiojosbg';
 import { ambireEntity } from '../entities/ambire';
 import { biconomy } from '../entities/biconomy';
 import { github } from '../entities/github';

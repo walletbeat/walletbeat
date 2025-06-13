@@ -1,3 +1,5 @@
+import { nconsigny } from '@/data/contributors/nconsigny';
+import { polymutex } from '@/data/contributors/polymutex';
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support';
 import {
   Leak,
@@ -17,8 +19,6 @@ import { Variant } from '@/schema/variants';
 import type { SoftwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny';
-import { polymutex } from '../contributors/polymutex';
 import { binance } from '../entities/binance';
 import { daimoInc } from '../entities/daimo';
 import { honeycomb } from '../entities/honeycomb';

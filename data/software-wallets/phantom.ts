@@ -1,3 +1,4 @@
+import { nconsigny } from '@/data/contributors/nconsigny';
 import { AccountType } from '@/schema/features/account-support';
 import { WalletProfile } from '@/schema/features/profile';
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
@@ -7,8 +8,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { Variant } from '@/schema/variants';
 import type { SoftwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
-
-import { nconsigny } from '../contributors/nconsigny';
 
 export const phantom: SoftwareWallet = {
   metadata: {

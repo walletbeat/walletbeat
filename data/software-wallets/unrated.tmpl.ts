@@ -1,10 +1,9 @@
+import { exampleContributor } from '@/data/contributors/example';
 import { WalletProfile } from '@/schema/features/profile';
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
 import { Variant } from '@/schema/variants';
 import type { SoftwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
-
-import { exampleContributor } from '../contributors/example';
 
 export const unratedTemplate: SoftwareWallet = {
   metadata: {

@@ -1,3 +1,4 @@
+import { nconsigny, patrickalphac } from '@/data/contributors';
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import {
@@ -10,8 +11,6 @@ import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny';
-
 export const trezorWallet: HardwareWallet = {
   metadata: {
     id: 'trezor',
@@ -21,7 +20,7 @@ export const trezorWallet: HardwareWallet = {
 			Trezor Wallet is a self-custodial hardware wallet built by SatoshiLabs. It
 			provides secure storage for cryptocurrencies with an easy-to-use interface.
 		`),
-    contributors: [nconsigny],
+    contributors: [nconsigny, patrickalphac],
     hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
     hardwareWalletModels: [
       {

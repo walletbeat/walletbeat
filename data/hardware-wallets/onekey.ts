@@ -1,3 +1,4 @@
+import { patrickalphac } from '@/data/contributors';
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import { FirmwareType } from '@/schema/features/security/firmware';
@@ -10,8 +11,6 @@ import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
-
-import { patrickalphac } from '../contributors/patrickalphac';
 
 export const onekeyWallet: HardwareWallet = {
   metadata: {
