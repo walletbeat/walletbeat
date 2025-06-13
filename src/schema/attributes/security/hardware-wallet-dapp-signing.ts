@@ -7,13 +7,13 @@ import {
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support';
+import type { DisplayedTransactionDetails } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import {
   CalldataDecoding,
   DataExtraction,
+  displaysFullTransactionDetails,
   displaysNoTransactionDetails,
-  displaysFullTransactionDetails
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
-import type {DisplayedTransactionDetails} from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { refs } from '@/schema/reference';
 import { type AtLeastOneVariant, Variant } from '@/schema/variants';
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
@@ -61,7 +61,7 @@ function noDappSigning(
   messageDecoding: CalldataDecoding | null,
   calldataExtraction: DataExtraction | null,
   calldataDecoding: CalldataDecoding | null,
-  displayedTransactionDetails: DisplayedTransactionDetails | null
+  displayedTransactionDetails: DisplayedTransactionDetails | null,
 ): Evaluation<HardwareWalletDappSigningValue> {
   return {
     value: {
@@ -267,7 +267,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
             ...displaysNoTransactionDetails,
             gas: true,
             nonce: true,
-        },
+          },
         ).value,
       ),
       exampleRating(
@@ -284,7 +284,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
             ...displaysNoTransactionDetails,
             gas: true,
             nonce: true,
-        },
+          },
         ).value,
       ),
     ],
@@ -352,33 +352,43 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
         }
 
         // PASS: Full support across all dimensions
-        const messageExtractionPass: boolean = (messageExtraction === DataExtraction.QRCODE || messageExtraction === DataExtraction.HASHES)
+        const messageExtractionPass: boolean =
+          messageExtraction === DataExtraction.QRCODE ||
+          messageExtraction === DataExtraction.HASHES;
         // NOTE: In the future, having multi-send decoded will be required
-        const messageDecodingPass: boolean = (messageDecoding === CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND || messageDecoding === CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED)
-        const calldataExtractionPass: boolean = (calldataExtraction === DataExtraction.QRCODE || calldataExtraction === DataExtraction.HASHES)
-        const calldataDecodingPass: boolean = (calldataDecoding === CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND || calldataDecoding === CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED)
-        const displayedTransactionDetailsPass: boolean = displayedTransactionDetails === displaysFullTransactionDetails
-        if(
-            messageExtractionPass &&
-            messageDecodingPass &&
-            calldataExtractionPass &&
-            calldataDecodingPass &&
-            displayedTransactionDetailsPass
+        const messageDecodingPass: boolean =
+          messageDecoding ===
+            CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND ||
+          messageDecoding === CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED;
+        const calldataExtractionPass: boolean =
+          calldataExtraction === DataExtraction.QRCODE ||
+          calldataExtraction === DataExtraction.HASHES;
+        const calldataDecodingPass: boolean =
+          calldataDecoding ===
+            CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND ||
+          calldataDecoding === CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED;
+        const displayedTransactionDetailsPass: boolean =
+          displayedTransactionDetails === displaysFullTransactionDetails;
+
+        if (
+          messageExtractionPass &&
+          messageDecodingPass &&
+          calldataExtractionPass &&
+          calldataDecodingPass &&
+          displayedTransactionDetailsPass
         ) {
-            return Rating.PASS
+          return Rating.PASS;
         }
 
         // FAIL: No support or very poor support
         // At this time, we do not consider not decoding to be a fail
-        const messageExtractionFail: boolean = messageExtraction === DataExtraction.NONE
-        const calldataExtractionFail: boolean = calldataExtraction === DataExtraction.NONE
-        const displayedTransactionDetailsFail: boolean = displayedTransactionDetails !== displaysFullTransactionDetails
-        if (
-            (messageExtractionFail ||
-            calldataExtractionFail) && 
-            displayedTransactionDetailsFail
-        ) {
-            return Rating.FAIL
+        const messageExtractionFail: boolean = messageExtraction === DataExtraction.NONE;
+        const calldataExtractionFail: boolean = calldataExtraction === DataExtraction.NONE;
+        const displayedTransactionDetailsFail: boolean =
+          displayedTransactionDetails !== displaysFullTransactionDetails;
+
+        if ((messageExtractionFail || calldataExtractionFail) && displayedTransactionDetailsFail) {
+          return Rating.FAIL;
         }
 
         // PARTIAL: Everything else
@@ -415,7 +425,8 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
           );
         } else {
           // Determine if it's basic or partial based on some features working
-          const hasPartialSupport = (messageDecoding !== CalldataDecoding.NONE || calldataDecoding !== CalldataDecoding.NONE)
+          const hasPartialSupport =
+            messageDecoding !== CalldataDecoding.NONE || calldataDecoding !== CalldataDecoding.NONE;
 
           if (hasPartialSupport) {
             return partialDappSigning(

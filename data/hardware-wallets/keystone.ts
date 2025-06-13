@@ -3,9 +3,8 @@ import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-prog
 import { FirmwareType } from '@/schema/features/security/firmware';
 import {
   CalldataDecoding,
-  CalldataExtraction,
-  MessageExtraction,
-  DisplayedTransactionDetails,
+  DataExtraction,
+  displaysFullTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
@@ -87,23 +86,29 @@ export const keystoneWallet: HardwareWallet = {
       },
       hardwareWalletDappSigning: {
         messageSigning: {
+          calldataDecoding: CalldataDecoding.AAVE_SUPPLY,
           details:
             'Keystone provides full message signing support for many transactions, however, it is buggy on many transactions like with a Safe{Wallet}, making it unreliable in some cases. In some cases, it shows no data. This is mitigated by the fact that the wallet supports QR code transaction extraction.',
-          extraction: MessageExtraction.QRCODE,
+          messageExtraction: DataExtraction.QRCODE,
         },
         ref: [
           {
             explanation:
-              "Independent video demonstration of Keystone's clear signing implementation on Safe.",
+              "Independent video demonstration of Keystone's signing implementation on a Safe.",
             url: 'https://youtu.be/9YmPWxAvKYY?t=759',
+          },
+          {
+            explanation:
+              "Independent video demonstration of Keystone's transaction implementation on a Safe.",
+            url: 'https://youtube.com/shorts/Ly9lo4g5NpA',
           },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.BASIC, // Basic, do to buggy implementation
-          calldataExtraction: CalldataExtraction.QRCODE,
+          calldataDecoding: CalldataDecoding.AAVE_SUPPLY, // Basic, breaks down for complex transactions, this should be fixed in the future or this may be changed to NONE
+          calldataExtraction: DataExtraction.QRCODE,
           details:
-            'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
-          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
+            'Keystone provides almost full clear signing support, it breaks down for more complex transactions.',
+          displayedTransactionDetails: { ...displaysFullTransactionDetails, nonce: false },
         },
       },
       keysHandling: null,

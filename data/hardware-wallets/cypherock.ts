@@ -4,10 +4,7 @@ import { FirmwareType } from '@/schema/features/security/firmware';
 import {
   CalldataDecoding,
   DataExtraction,
-  displaysNoTransactionDetails,
-  displaysFullTransactionDetails
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
-import type {DisplayedTransactionDetails}  from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
@@ -96,15 +93,20 @@ export const cypherockWallet: HardwareWallet = {
       },
       hardwareWalletDappSigning: {
         messageSigning: {
+          calldataDecoding: CalldataDecoding.NONE,
           details:
             'Shows EIP-712 signature data only in the companion application, not on the hardware wallet itself.',
           messageExtraction: DataExtraction.EYES,
-          calldataDecoding: CalldataDecoding.NONE,
         },
         ref: [
           {
             explanation: "Independent video demonstration of Cypherock's signing implementation.",
             url: 'https://youtu.be/9YmPWxAvKYY?t=534',
+          },
+          {
+            explanation:
+              "Independent video demonstration of Cypherock's transaction implementation.",
+            url: 'https://youtube.com/shorts/YG6lzwTUojE',
           },
         ],
         transactionSigning: {
@@ -112,7 +114,14 @@ export const cypherockWallet: HardwareWallet = {
           calldataExtraction: DataExtraction.NONE,
           details:
             'Completely fails to display calldata for transactions on either the application or the hardware wallet itself.',
-          displayedTransactionDetails: DisplayedTransactionDetails.SOME, // TODO
+          displayedTransactionDetails: {
+            chain: false,
+            from: true, // derivation path counts
+            gas: true, // tx fee
+            nonce: false,
+            to: true, // contract address
+            value: true,
+          },
         },
       },
       keysHandling: null,

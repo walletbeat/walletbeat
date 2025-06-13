@@ -94,6 +94,7 @@
     "mtbf",
     "mtsx",
     "Multifactor",
+    "multisend",
     "multisigs",
     "nconsigny",
     "nftstorage",
@@ -126,6 +127,7 @@
     "riscv",
     "Rollups",
     "ruggable",
+    "safewallet",
     "Satoshi",
     "scamminess",
     "setmonofont",
@@ -157,7 +159,8 @@
     "webauthn",
     "xlabs",
     "Yanssie",
-    "Zerion"
+    "Zerion",
+    "zksync"
   ],
   "flagWords": [],
   "ignorePaths": [

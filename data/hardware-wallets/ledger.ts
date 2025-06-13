@@ -2,9 +2,8 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import {
   CalldataDecoding,
-  CalldataExtraction,
-  MessageExtraction,
-  DisplayedTransactionDetails,
+  DataExtraction,
+  displaysFullTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
@@ -105,23 +104,24 @@ export const ledgerWallet: HardwareWallet = {
       firmware: null,
       hardwareWalletDappSigning: {
         messageSigning: {
+          calldataDecoding: CalldataDecoding.NONE,
           details:
             'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
-          extraction: MessageExtraction.HASHES,
+          messageExtraction: DataExtraction.HASHES, // Fantastic
         },
         ref: [
           {
             explanation:
-              "Independent video demonstration of Ledger's clear signing implementation on Safe.",
+              "Independent video demonstration of Ledger's signing implementation on a Safe.",
             url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
           },
         ],
         transactionSigning: {
           calldataDecoding: CalldataDecoding.NONE,
-          calldataExtraction: CalldataExtraction.EYES,
+          calldataExtraction: DataExtraction.EYES, // VERY hard to verify, very weird format
           details:
             'Ledger provides basic message signing details when using hardware wallets, but complex interactions are very difficult to verify on the device.',
-          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
+          displayedTransactionDetails: displaysFullTransactionDetails,
         },
       },
       keysHandling: null,

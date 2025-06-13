@@ -2,9 +2,8 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import {
   CalldataDecoding,
-  CalldataExtraction,
-  MessageExtraction,
-  DisplayedTransactionDetails,
+  DataExtraction,
+  displaysFullTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
@@ -99,23 +98,32 @@ export const trezorWallet: HardwareWallet = {
       firmware: null,
       hardwareWalletDappSigning: {
         messageSigning: {
+          calldataDecoding: CalldataDecoding.NONE,
           details:
             'Trezor provides basic message signing details when using hardware wallets, but some complex interactions may be difficult to verify off device.',
-          extraction: MessageExtraction.EYES,
+          messageExtraction: DataExtraction.EYES,
         },
         ref: [
           {
             explanation:
-              "Independent video demonstration of Trezor's clear signing implementation on Safe.",
+              "Independent video demonstration of Trezor's signing implementation on Safe.",
             url: 'https://youtu.be/9YmPWxAvKYY?t=1108',
+          },
+          {
+            explanation: 'Independent video showing transaction details on Trezor Safe 5',
+            url: 'https://youtube.com/shorts/4LayLrSuHNg',
           },
         ],
         transactionSigning: {
           calldataDecoding: CalldataDecoding.NONE,
-          calldataExtraction: CalldataExtraction.EYES,
+          calldataExtraction: DataExtraction.EYES,
           details:
             'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
+          displayedTransactionDetails: {
+            ...displaysFullTransactionDetails,
+            chain: false,
+            nonce: false,
+          },
         },
       },
       keysHandling: null,

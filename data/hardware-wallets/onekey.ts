@@ -3,9 +3,8 @@ import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-prog
 import { FirmwareType } from '@/schema/features/security/firmware';
 import {
   CalldataDecoding,
-  CalldataExtraction,
-  MessageExtraction,
-  DisplayedTransactionDetails,
+  DataExtraction,
+  displaysFullTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
@@ -95,22 +94,32 @@ export const onekeyWallet: HardwareWallet = {
       },
       hardwareWalletDappSigning: {
         messageSigning: {
+          calldataDecoding: CalldataDecoding.NONE,
           details:
             'OneKey Pro shows EIP-712 domain types and message data but does not display domain hash or message hash for easier verification.',
-          extraction: MessageExtraction.EYES,
+          messageExtraction: DataExtraction.EYES,
         },
         ref: [
           {
-            explanation: "Independent video demonstration of OneKey Pro's signing implementation.",
+            explanation:
+              "Independent video demonstration of OneKey Pro's signing implementation with a Safe.",
             url: 'https://youtu.be/9YmPWxAvKYY?t=1958',
+          },
+          {
+            explanation: "Independent video showing OneKey Pro's transaction details",
+            url: 'https://youtube.com/shorts/J_XG7cNOVhM',
           },
         ],
         transactionSigning: {
           calldataDecoding: CalldataDecoding.NONE,
-          calldataExtraction: CalldataExtraction.EYES,
+          calldataExtraction: DataExtraction.EYES,
           details:
             'OneKey Pro shows all calldata but does not decode it, requiring users to manually interpret the transaction data.',
-          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
+          displayedTransactionDetails: {
+            ...displaysFullTransactionDetails,
+            chain: false,
+            nonce: false,
+          },
         },
       },
       keysHandling: null,

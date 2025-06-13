@@ -2,9 +2,8 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import {
   CalldataDecoding,
-  CalldataExtraction,
-  MessageExtraction,
-  DisplayedTransactionDetails,
+  DataExtraction,
+  displaysFullTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
@@ -80,9 +79,10 @@ export const gridplusWallet: HardwareWallet = {
       firmware: null,
       hardwareWalletDappSigning: {
         messageSigning: {
+          calldataDecoding: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
           details:
             'GridPlus Lattice1 provides message signing support, but does not show EIP-712 digests or hashes.',
-          extraction: MessageExtraction.EYES,
+          messageExtraction: DataExtraction.EYES,
         },
         ref: [
           {
@@ -90,13 +90,18 @@ export const gridplusWallet: HardwareWallet = {
               "Independent video demonstration of GridPlus's clear signing implementation on Safe.",
             url: 'https://youtu.be/9YmPWxAvKYY?t=2079',
           },
+          {
+            explanation:
+              "Independent video demonstration of GridPlus's transaction implementation on Safe.",
+            url: 'https://youtube.com/shorts/_s5PjZhgBig',
+          },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.NESTED,
-          calldataExtraction: CalldataExtraction.EYES,
+          calldataDecoding: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
+          calldataExtraction: DataExtraction.EYES,
           details:
             'GridPlus Lattice1 provides clear transaction support, showing all transaction data, and even doing nested calldata decoding in some cases.',
-          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
+          displayedTransactionDetails: displaysFullTransactionDetails,
         },
       },
       keysHandling: null,

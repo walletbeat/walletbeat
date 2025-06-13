@@ -67,9 +67,10 @@ export const fireflyWallet: HardwareWallet = {
       firmware: null,
       hardwareWalletDappSigning: {
         messageSigning: {
+          calldataDecoding: null,
           details:
             'Firefly currently does not provide message signing support as it is still in development.',
-          extraction: null,
+          messageExtraction: null,
         },
         ref: null,
         transactionSigning: {
@@ -77,7 +78,7 @@ export const fireflyWallet: HardwareWallet = {
           calldataExtraction: null,
           details:
             'Firefly currently does not provide clear transaction signing support as it is still in development.',
-          DisplayedTransactionDetails: null,
+          displayedTransactionDetails: null,
         },
       },
       keysHandling: null,
