@@ -70,9 +70,6 @@ html.dark {
 :root {
 	scroll-behavior: smooth;
 
-	transition-duration: 0.2s;
-	transition-timing-function: var(--transition-easeOutExpo);
-
 	font-family: 'Montserrat', 'Noto Color Emoji';
 	font-size: 16px;
 
@@ -80,16 +77,39 @@ html.dark {
 	color: var(--text-primary);
 	background-color: var(--background-secondary);
 	outline-color: var(--accent);
+
+	transition-property: background-color, color;
 }
 
-* {
+:root,
+::before,
+::after,
+:where(
+	::details-content
+) {
+	transition-duration: 0.25s;
+	transition-timing-function: var(--transition-easeOutExpo);
+}
+
+*,
+[popover] {
+	transition-duration: inherit;
+	transition-timing-function: inherit;
+}
+
+*,
+::before,
+::after,
+:where(
+	[popover],
+	::details-content
+) {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
 	text-box-trim: trim-both;
-	transition-duration: inherit;
-	transition-timing-function: inherit;
 	transition-behavior: allow-discrete;
+	interpolate-size: allow-keywords;
 
 	scroll-behavior: smooth;
 }
