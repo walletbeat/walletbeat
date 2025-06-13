@@ -289,7 +289,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
       basicHardwareWalletIntegration(supportedHardwareWallets);
 
     // TODO: Implement evaluation logic using the new structured dApp signing features
-    // Check calldataDecoding, calldataExtraction, and showsTransactionDetails
+    // Check calldataDecoding, calldataExtraction, and DisplayedTransactionDetails
     // from features.security.hardwareWalletDappSigning.transactionSigning
 
     // Determine integration level based on hardware wallet support count

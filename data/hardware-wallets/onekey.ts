@@ -5,7 +5,7 @@ import {
   CalldataDecoding,
   CalldataExtraction,
   MessageExtraction,
-  ShowsTransactionDetails,
+  DisplayedTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
@@ -110,7 +110,7 @@ export const onekeyWallet: HardwareWallet = {
           calldataExtraction: CalldataExtraction.EYES,
           details:
             'OneKey Pro shows all calldata but does not decode it, requiring users to manually interpret the transaction data.',
-          showsTransactionDetails: ShowsTransactionDetails.FULL,
+          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
         },
       },
       keysHandling: null,

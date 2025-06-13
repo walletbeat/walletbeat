@@ -4,7 +4,7 @@ import {
   CalldataDecoding,
   CalldataExtraction,
   MessageExtraction,
-  ShowsTransactionDetails,
+  DisplayedTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
@@ -115,7 +115,7 @@ export const trezorWallet: HardwareWallet = {
           calldataExtraction: CalldataExtraction.EYES,
           details:
             'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-          showsTransactionDetails: ShowsTransactionDetails.FULL,
+          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
         },
       },
       keysHandling: null,

@@ -3,10 +3,11 @@ import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-prog
 import { FirmwareType } from '@/schema/features/security/firmware';
 import {
   CalldataDecoding,
-  CalldataExtraction,
-  MessageExtraction,
-  ShowsTransactionDetails,
+  DataExtraction,
+  displaysNoTransactionDetails,
+  displaysFullTransactionDetails
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import type {DisplayedTransactionDetails}  from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
@@ -97,7 +98,8 @@ export const cypherockWallet: HardwareWallet = {
         messageSigning: {
           details:
             'Shows EIP-712 signature data only in the companion application, not on the hardware wallet itself.',
-          extraction: MessageExtraction.EYES,
+          messageExtraction: DataExtraction.EYES,
+          calldataDecoding: CalldataDecoding.NONE,
         },
         ref: [
           {
@@ -107,10 +109,10 @@ export const cypherockWallet: HardwareWallet = {
         ],
         transactionSigning: {
           calldataDecoding: CalldataDecoding.NONE,
-          calldataExtraction: CalldataExtraction.NONE,
+          calldataExtraction: DataExtraction.NONE,
           details:
             'Completely fails to display calldata for transactions on either the application or the hardware wallet itself.',
-          showsTransactionDetails: ShowsTransactionDetails.SOME, // Gas, To, Value, Technically From with derivation path
+          displayedTransactionDetails: DisplayedTransactionDetails.SOME, // TODO
         },
       },
       keysHandling: null,

@@ -4,7 +4,7 @@ import {
   CalldataDecoding,
   CalldataExtraction,
   MessageExtraction,
-  ShowsTransactionDetails,
+  DisplayedTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
@@ -96,7 +96,7 @@ export const gridplusWallet: HardwareWallet = {
           calldataExtraction: CalldataExtraction.EYES,
           details:
             'GridPlus Lattice1 provides clear transaction support, showing all transaction data, and even doing nested calldata decoding in some cases.',
-          showsTransactionDetails: ShowsTransactionDetails.FULL,
+          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
         },
       },
       keysHandling: null,

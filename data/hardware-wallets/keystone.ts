@@ -5,7 +5,7 @@ import {
   CalldataDecoding,
   CalldataExtraction,
   MessageExtraction,
-  ShowsTransactionDetails,
+  DisplayedTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
@@ -103,7 +103,7 @@ export const keystoneWallet: HardwareWallet = {
           calldataExtraction: CalldataExtraction.QRCODE,
           details:
             'Keystone provides full clear signing support with detailed transaction information displayed on device screen. This was verified through independent reviews showing its robust hardware wallet security features.',
-          showsTransactionDetails: ShowsTransactionDetails.FULL,
+          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
         },
       },
       keysHandling: null,

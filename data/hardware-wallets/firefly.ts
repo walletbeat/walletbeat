@@ -77,7 +77,7 @@ export const fireflyWallet: HardwareWallet = {
           calldataExtraction: null,
           details:
             'Firefly currently does not provide clear transaction signing support as it is still in development.',
-          showsTransactionDetails: null,
+          DisplayedTransactionDetails: null,
         },
       },
       keysHandling: null,

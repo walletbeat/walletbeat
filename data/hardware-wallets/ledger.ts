@@ -4,7 +4,7 @@ import {
   CalldataDecoding,
   CalldataExtraction,
   MessageExtraction,
-  ShowsTransactionDetails,
+  DisplayedTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
@@ -121,7 +121,7 @@ export const ledgerWallet: HardwareWallet = {
           calldataExtraction: CalldataExtraction.EYES,
           details:
             'Ledger provides basic message signing details when using hardware wallets, but complex interactions are very difficult to verify on the device.',
-          showsTransactionDetails: ShowsTransactionDetails.FULL,
+          displayedTransactionDetails: DisplayedTransactionDetails.FULL,
         },
       },
       keysHandling: null,
