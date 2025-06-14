@@ -78,10 +78,20 @@ export const gridplusWallet: HardwareWallet = {
       firmware: null,
       hardwareWalletDappSigning: {
         messageSigning: {
-          calldataDecoding: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
+          calldataDecoding: {
+            [CalldataDecoding.ETH_USDC_TRANSFER]: true,
+            [CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+            [CalldataDecoding.AAVE_SUPPLY]: true,
+            [CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
+            [CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+          },
           details:
             'GridPlus Lattice1 provides message signing support, but does not show EIP-712 digests or hashes.',
-          messageExtraction: DataExtraction.EYES,
+          messageExtraction: {
+            [DataExtraction.EYES]: true,
+            [DataExtraction.HASHES]: false,
+            [DataExtraction.QRCODE]: false,
+          },
         },
         ref: [
           {
@@ -96,8 +106,18 @@ export const gridplusWallet: HardwareWallet = {
           },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
-          calldataExtraction: DataExtraction.EYES,
+          calldataDecoding: {
+            [CalldataDecoding.ETH_USDC_TRANSFER]: true,
+            [CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+            [CalldataDecoding.AAVE_SUPPLY]: true,
+            [CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
+            [CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+          },
+          calldataExtraction: {
+            [DataExtraction.EYES]: true,
+            [DataExtraction.HASHES]: false,
+            [DataExtraction.QRCODE]: false,
+          },
           details:
             'GridPlus Lattice1 provides clear transaction support, showing all transaction data, and even doing nested calldata decoding in some cases.',
           displayedTransactionDetails: displaysFullTransactionDetails,
