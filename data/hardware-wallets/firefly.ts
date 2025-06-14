@@ -1,11 +1,9 @@
+import { nconsigny } from '@/data/contributors/nconsigny';
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
-
-import { nconsigny } from '../contributors/nconsigny';
 
 export const fireflyWallet: HardwareWallet = {
   metadata: {
@@ -67,10 +65,20 @@ export const fireflyWallet: HardwareWallet = {
       },
       firmware: null,
       hardwareWalletDappSigning: {
-        details:
-          'Firefly currently does not provide clear signing support as it is still in development.',
-        level: DappSigningLevel.NONE,
+        messageSigning: {
+          calldataDecoding: null,
+          details:
+            'Firefly currently does not provide message signing support as it is still in development.',
+          messageExtraction: null,
+        },
         ref: null,
+        transactionSigning: {
+          calldataDecoding: null,
+          calldataExtraction: null,
+          details:
+            'Firefly currently does not provide clear transaction signing support as it is still in development.',
+          displayedTransactionDetails: null,
+        },
       },
       keysHandling: null,
       lightClient: {

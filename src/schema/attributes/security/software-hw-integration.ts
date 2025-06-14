@@ -279,12 +279,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
     // This would need to be added to the features schema to track this data
     // For now we'll use a placeholder implementation
 
-    // Placeholder for checking if Safe integration exists with clear signing
-    const dappSigningDetails = features.security.hardwareWalletDappSigning?.details ?? '';
-    const hasSafeIntegration = dappSigningDetails.includes('Safe');
-
-    // Placeholder for checking if Aave integration exists with clear signing
-    const hasAaveIntegration = dappSigningDetails.includes('Aave');
+    // Use the new structured dApp signing data instead of text parsing
 
     // Check how many hardware wallet brands are supported for these integrations
     const supportedHWBrands = supportedHardwareWallets.length;
@@ -293,21 +288,15 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
     let result: Evaluation<SoftwareHWIntegrationValue> =
       basicHardwareWalletIntegration(supportedHardwareWallets);
 
-    // Determine integration level based on support
-    if (hasSafeIntegration && hasAaveIntegration && supportedHWBrands >= 2) {
+    // TODO: Implement evaluation logic using the new structured dApp signing features
+    // Check calldataDecoding, calldataExtraction, and DisplayedTransactionDetails
+    // from features.security.hardwareWalletDappSigning.transactionSigning
+
+    // Determine integration level based on hardware wallet support count
+    if (supportedHWBrands >= 2) {
       result = excellentHardwareWalletIntegration(supportedHardwareWallets);
-    } else if ((hasSafeIntegration || hasAaveIntegration) && supportedHWBrands >= 1) {
-      const supportedDApps = [];
-
-      if (hasSafeIntegration) {
-        supportedDApps.push('Safe');
-      }
-
-      if (hasAaveIntegration) {
-        supportedDApps.push('Aave');
-      }
-
-      result = goodHardwareWalletIntegration(supportedHardwareWallets, supportedDApps);
+    } else if (supportedHWBrands >= 1) {
+      result = goodHardwareWalletIntegration(supportedHardwareWallets, []);
     }
 
     // Return result with references if any

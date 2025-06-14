@@ -12,10 +12,10 @@ import { exempt, pickWorstRating, unrated } from '../common';
 const brand = 'attributes.firmware';
 
 export type FirmwareValue = Value & {
-  silentUpdateProtection: FirmwareType;
-  firmwareOpenSource: FirmwareType;
-  reproducibleBuilds: FirmwareType;
-  customFirmware: FirmwareType;
+  silentUpdateProtection: FirmwareType | null;
+  firmwareOpenSource: FirmwareType | null;
+  reproducibleBuilds: FirmwareType | null;
+  customFirmware: FirmwareType | null;
   __brand: 'attributes.firmware';
 };
 
@@ -26,6 +26,12 @@ function evaluateFirmware(features: FirmwareSupport): Rating {
     features.reproducibleBuilds,
     features.customFirmware,
   ];
+
+  // If any rating is null (unreviewed), return UNRATED
+  if (ratings.some(r => r === null)) {
+    return Rating.UNRATED;
+  }
+
   const passCount = ratings.filter(r => r === FirmwareType.PASS).length;
 
   if (passCount >= 3) {
@@ -109,6 +115,15 @@ export const firmware: Attribute<FirmwareValue> = {
 
     const { withoutRefs, refs: extractedRefs } = popRefs<FirmwareSupport>(firmwareFeature);
     const rating = evaluateFirmware(withoutRefs);
+
+    if (rating === Rating.UNRATED) {
+      return unrated(firmware, brand, {
+        silentUpdateProtection: FirmwareType.FAIL,
+        firmwareOpenSource: FirmwareType.FAIL,
+        reproducibleBuilds: FirmwareType.FAIL,
+        customFirmware: FirmwareType.FAIL,
+      });
+    }
 
     return {
       value: {

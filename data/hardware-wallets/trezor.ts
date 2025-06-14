@@ -1,12 +1,15 @@
+import { nconsigny, patrickalphac } from '@/data/contributors';
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import {
+  CalldataDecoding,
+  DataExtraction,
+  displaysFullTransactionDetails,
+} from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
 import type { HardwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
-
-import { nconsigny } from '../contributors/nconsigny';
 
 export const trezorWallet: HardwareWallet = {
   metadata: {
@@ -17,7 +20,7 @@ export const trezorWallet: HardwareWallet = {
 			Trezor Wallet is a self-custodial hardware wallet built by SatoshiLabs. It
 			provides secure storage for cryptocurrencies with an easy-to-use interface.
 		`),
-    contributors: [nconsigny],
+    contributors: [nconsigny, patrickalphac],
     hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
     hardwareWalletModels: [
       {
@@ -93,16 +96,34 @@ export const trezorWallet: HardwareWallet = {
       },
       firmware: null,
       hardwareWalletDappSigning: {
-        details:
-          'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-        level: DappSigningLevel.PARTIAL,
+        messageSigning: {
+          calldataDecoding: CalldataDecoding.NONE,
+          details:
+            'Trezor provides basic message signing details when using hardware wallets, but some complex interactions may be difficult to verify off device.',
+          messageExtraction: DataExtraction.EYES,
+        },
         ref: [
           {
             explanation:
-              "Independent video demonstration of Trezor's clear signing implementation on Safe.",
-            url: 'https://youtu.be/7lP_0h-PPvY?si=07dMNswh_9RsuWQ9&t=879',
+              "Independent video demonstration of Trezor's signing implementation on Safe.",
+            url: 'https://youtu.be/9YmPWxAvKYY?t=1108',
+          },
+          {
+            explanation: 'Independent video showing transaction details on Trezor Safe 5',
+            url: 'https://youtube.com/shorts/4LayLrSuHNg',
           },
         ],
+        transactionSigning: {
+          calldataDecoding: CalldataDecoding.NONE,
+          calldataExtraction: DataExtraction.EYES,
+          details:
+            'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
+          displayedTransactionDetails: {
+            ...displaysFullTransactionDetails,
+            chain: false,
+            nonce: false,
+          },
+        },
       },
       keysHandling: null,
       lightClient: {

@@ -1,3 +1,4 @@
+import { polymutex } from '@/data/contributors/polymutex';
 import { AccountType } from '@/schema/features/account-support';
 import {
   Leak,
@@ -19,7 +20,6 @@ import { Variant } from '@/schema/variants';
 import type { SoftwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
 
-import { polymutex } from '../contributors/polymutex';
 import { cure53 } from '../entities/cure53';
 import { deBank } from '../entities/debank';
 import { leastAuthority } from '../entities/least-authority';

@@ -1,3 +1,5 @@
+import { nconsigny } from '@/data/contributors/nconsigny';
+import { polymutex } from '@/data/contributors/polymutex';
 import { AccountType } from '@/schema/features/account-support';
 import { WalletProfile } from '@/schema/features/profile';
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
@@ -8,8 +10,6 @@ import { Variant } from '@/schema/variants';
 import type { SoftwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
 
-import { nconsigny } from '../contributors/nconsigny';
-import { polymutex } from '../contributors/polymutex';
 import { cure53 } from '../entities/cure53';
 import { diligence } from '../entities/diligence';
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator';

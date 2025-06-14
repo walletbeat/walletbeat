@@ -7,7 +7,13 @@ import {
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support';
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import type { DisplayedTransactionDetails } from '@/schema/features/security/hardware-wallet-dapp-signing';
+import {
+  CalldataDecoding,
+  DataExtraction,
+  displaysFullTransactionDetails,
+  displaysNoTransactionDetails,
+} from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { refs } from '@/schema/reference';
 import { type AtLeastOneVariant, Variant } from '@/schema/variants';
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
@@ -17,7 +23,11 @@ import { exempt, pickWorstRating, unrated } from '../common';
 const brand = 'attributes.security.hardware_wallet_dapp_signing';
 
 export type HardwareWalletDappSigningValue = Value & {
-  dappSigningLevel: DappSigningLevel;
+  messageExtraction: DataExtraction | null;
+  messageDecoding: CalldataDecoding | null;
+  calldataExtraction: DataExtraction | null;
+  calldataDecoding: CalldataDecoding | null;
+  displayedTransactionDetails: DisplayedTransactionDetails | null;
   __brand: 'attributes.security.hardware_wallet_dapp_signing';
 };
 
@@ -30,7 +40,11 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletDappSigningValue> {
       shortExplanation: sentence(
         '{{WALLET_NAME}} does not support hardware wallets, so dApp signing is not possible.',
       ),
-      dappSigningLevel: DappSigningLevel.NONE,
+      messageExtraction: DataExtraction.NONE,
+      messageDecoding: CalldataDecoding.NONE,
+      calldataDecoding: CalldataDecoding.NONE,
+      calldataExtraction: DataExtraction.NONE,
+      displayedTransactionDetails: displaysNoTransactionDetails,
       __brand: brand,
     },
     details: paragraph(
@@ -42,28 +56,43 @@ function noHardwareWalletSupport(): Evaluation<HardwareWalletDappSigningValue> {
   };
 }
 
-function noDappSigning(): Evaluation<HardwareWalletDappSigningValue> {
+function noDappSigning(
+  messageExtraction: DataExtraction | null,
+  messageDecoding: CalldataDecoding | null,
+  calldataExtraction: DataExtraction | null,
+  calldataDecoding: CalldataDecoding | null,
+  displayedTransactionDetails: DisplayedTransactionDetails | null,
+): Evaluation<HardwareWalletDappSigningValue> {
   return {
     value: {
       id: 'no_dapp_signing',
       rating: Rating.FAIL,
       displayName: 'No dApp signing support',
       shortExplanation: sentence(
-        '{{WALLET_NAME}} supports hardware wallets but without dApp signing.',
+        '{{WALLET_NAME}} supports hardware wallets but without effective dApp signing.',
       ),
-      dappSigningLevel: DappSigningLevel.NONE,
+      messageExtraction,
+      messageDecoding,
+      calldataDecoding,
+      calldataExtraction,
+      displayedTransactionDetails,
       __brand: brand,
     },
     details: paragraph(
-      '{{WALLET_NAME}} supports hardware wallets but does not implement dApp signing. dApp signing is important for security as it allows users to verify transaction details on their hardware wallet screen before signing.',
+      '{{WALLET_NAME}} supports hardware wallets but does not implement effective dApp signing. dApp signing is important for security as it allows users to verify transaction details on their hardware wallet screen before signing.',
     ),
     howToImprove: paragraph(
-      '{{WALLET_NAME}} should implement dApp signing support for hardware wallets to improve security by allowing users to verify transaction details on their hardware device.',
+      '{{WALLET_NAME}} should implement comprehensive dApp signing support for hardware wallets to improve security by allowing users to verify transaction details on their hardware device.',
     ),
   };
 }
 
 function basicDappSigning(
+  messageExtraction: DataExtraction | null,
+  messageDecoding: CalldataDecoding | null,
+  calldataExtraction: DataExtraction | null,
+  calldataDecoding: CalldataDecoding | null,
+  displayedTransactionDetails: DisplayedTransactionDetails | null,
   supportedWallets: string[] = [],
 ): Evaluation<HardwareWalletDappSigningValue> {
   const supportedWalletsText =
@@ -77,19 +106,28 @@ function basicDappSigning(
       shortExplanation: sentence(
         `{{WALLET_NAME}} supports hardware wallets with basic dApp signing${supportedWalletsText}.`,
       ),
-      dappSigningLevel: DappSigningLevel.BASIC,
+      messageExtraction,
+      messageDecoding,
+      calldataExtraction,
+      calldataDecoding,
+      displayedTransactionDetails,
       __brand: brand,
     },
     details: paragraph(
       `{{WALLET_NAME}} supports hardware wallets with basic dApp signing${supportedWalletsText}, but the implementation does not provide full transparency for all transaction details. dApp signing allows users to verify transaction details on their hardware wallet screen before signing, which is crucial for security.`,
     ),
     howToImprove: paragraph(
-      '{{WALLET_NAME}} should improve its dApp signing implementation to provide full transparency for all transaction details on the hardware wallet screen.',
+      '{{WALLET_NAME}} should improve its dApp signing implementation to provide full transparency for all transaction details and better calldata extraction methods.',
     ),
   };
 }
 
 function partialDappSigning(
+  messageExtraction: DataExtraction | null,
+  messageDecoding: CalldataDecoding | null,
+  calldataExtraction: DataExtraction | null,
+  calldataDecoding: CalldataDecoding | null,
+  displayedTransactionDetails: DisplayedTransactionDetails | null,
   supportedWallets: string[] = [],
 ): Evaluation<HardwareWalletDappSigningValue> {
   const supportedWalletsText =
@@ -103,19 +141,28 @@ function partialDappSigning(
       shortExplanation: sentence(
         `{{WALLET_NAME}} supports hardware wallets with partial dApp signing${supportedWalletsText}.`,
       ),
-      dappSigningLevel: DappSigningLevel.PARTIAL,
+      messageExtraction,
+      messageDecoding,
+      calldataExtraction,
+      calldataDecoding,
+      displayedTransactionDetails,
       __brand: brand,
     },
     details: paragraph(
       `{{WALLET_NAME}} supports hardware wallets with partial dApp signing${supportedWalletsText}. Most transaction details are displayed on the hardware wallet screen for verification, but some complex transactions may not show all details. dApp signing is crucial for security as it allows users to verify transaction details before signing.`,
     ),
     howToImprove: paragraph(
-      '{{WALLET_NAME}} should extend its dApp signing implementation to cover all transaction types and ensure all details are clearly displayed on the hardware wallet screen.',
+      '{{WALLET_NAME}} should extend its dApp signing implementation to cover all transaction types and ensure all details are clearly displayed with better extraction methods.',
     ),
   };
 }
 
 function fullDappSigning(
+  messageExtraction: DataExtraction | null,
+  messageDecoding: CalldataDecoding | null,
+  calldataExtraction: DataExtraction | null,
+  calldataDecoding: CalldataDecoding | null,
+  displayedTransactionDetails: DisplayedTransactionDetails | null,
   supportedWallets: string[] = [],
   refs: Array<{ url: string; explanation: string }> = [],
 ): Evaluation<HardwareWalletDappSigningValue> {
@@ -130,7 +177,11 @@ function fullDappSigning(
       shortExplanation: sentence(
         `{{WALLET_NAME}} supports hardware wallets with full dApp signing${supportedWalletsText}.`,
       ),
-      dappSigningLevel: DappSigningLevel.FULL,
+      messageExtraction,
+      messageDecoding,
+      calldataExtraction,
+      calldataDecoding,
+      displayedTransactionDetails,
       __brand: brand,
     },
     details: mdParagraph(
@@ -165,8 +216,8 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 		mechanism that significantly enhances security.
 		
 		Full dApp signing implementations ensure that all relevant transaction details (recipient
-		address, amount, fees, etc.) are clearly displayed on the hardware wallet screen, allowing
-		users to make informed decisions before authorizing transactions.
+		address, amount, fees, etc.) are clearly displayed on the hardware wallet screen, EIP-712 message hashes,
+        and decoded calldata, allowing users to make informed decisions before authorizing transactions.
 	`),
   methodology: markdown(`
 		Hardware wallets are evaluated based on their implementation of dApp signing capabilities.
@@ -177,7 +228,6 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 
 		The hardware should be able to **display clearly all transaction types on Safe, Aave and Uniswap.**
 		To do so **the hardware MUST be able to connect directly to the dapp or allow the user to use at least two different software wallets independent from the hardware manufacturer**.
-    
 		
 		A hardware wallet receives a partial rating if it implements dApp signing but with limitations, such
 		as not displaying all transaction details or not supporting dApp signing for all transaction types. Or if the hardware supports only one independent software wallet. Or if the hardware supports only 1/3 of the dapps.
@@ -194,7 +244,13 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 				The wallet implements full dApp signing with hardware wallets, displaying all
 				transaction details on the hardware wallet screen for verification before signing.
 			`),
-      fullDappSigning().value,
+      fullDappSigning(
+        DataExtraction.QRCODE,
+        CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
+        DataExtraction.QRCODE,
+        CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
+        displaysFullTransactionDetails,
+      ).value,
     ),
     partial: [
       exampleRating(
@@ -202,22 +258,48 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 					The wallet implements partial dApp signing, where most but not all transaction
 					details are displayed on the hardware wallet screen.
 				`),
-        partialDappSigning().value,
+        partialDappSigning(
+          DataExtraction.EYES,
+          CalldataDecoding.ETH_USDC_TRANSFER,
+          DataExtraction.EYES,
+          CalldataDecoding.ETH_USDC_TRANSFER,
+          {
+            ...displaysNoTransactionDetails,
+            gas: true,
+            nonce: true,
+          },
+        ).value,
       ),
       exampleRating(
         paragraph(`
 					The wallet implements basic dApp signing, but the implementation is limited
 					and doesn't provide full transparency for all transaction details.
 				`),
-        basicDappSigning().value,
+        basicDappSigning(
+          DataExtraction.EYES,
+          CalldataDecoding.NONE,
+          DataExtraction.EYES,
+          CalldataDecoding.NONE,
+          {
+            ...displaysNoTransactionDetails,
+            gas: true,
+            nonce: true,
+          },
+        ).value,
       ),
     ],
     fail: [
       exampleRating(
         paragraph(`
-					The wallet supports hardware wallets but does not implement dApp signing.
+					The wallet supports hardware wallets but does not implement effective dApp signing.
 				`),
-        noDappSigning().value,
+        noDappSigning(
+          DataExtraction.NONE,
+          CalldataDecoding.NONE,
+          DataExtraction.NONE,
+          CalldataDecoding.NONE,
+          displaysNoTransactionDetails,
+        ).value,
       ),
       exampleRating(
         paragraph(`
@@ -234,27 +316,137 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
       // Check if dApp signing feature exists
       if (features.security.hardwareWalletDappSigning === null) {
         return unrated(hardwareWalletDappSigning, brand, {
-          dappSigningLevel: DappSigningLevel.NONE,
+          messageExtraction: null,
+          messageDecoding: null,
+          calldataDecoding: null,
+          calldataExtraction: null,
+          displayedTransactionDetails: null,
         });
       }
 
       // Extract references from the hardware wallet dApp signing feature
       const references = refs(features.security.hardwareWalletDappSigning);
 
-      const dappSigningLevel = features.security.hardwareWalletDappSigning.level;
+      const messageExtraction =
+        features.security.hardwareWalletDappSigning.messageSigning.messageExtraction;
+      const messageDecoding =
+        features.security.hardwareWalletDappSigning.messageSigning.calldataDecoding;
+      const calldataExtraction =
+        features.security.hardwareWalletDappSigning.transactionSigning.calldataExtraction;
+      const calldataDecoding =
+        features.security.hardwareWalletDappSigning.transactionSigning.calldataDecoding;
+      const displayedTransactionDetails =
+        features.security.hardwareWalletDappSigning.transactionSigning.displayedTransactionDetails;
 
-      // Combine extracted references with standard references if any
+      // Determine overall rating based on all features
+      const getOverallRating = (): Rating => {
+        // If any feature is null (unreviewed), return UNRATED
+        if (
+          messageExtraction === null ||
+          messageDecoding === null ||
+          calldataDecoding === null ||
+          calldataExtraction === null ||
+          displayedTransactionDetails === null
+        ) {
+          return Rating.UNRATED;
+        }
+
+        // PASS: Full support across all dimensions
+        const messageExtractionPass: boolean =
+          messageExtraction === DataExtraction.QRCODE ||
+          messageExtraction === DataExtraction.HASHES;
+        // NOTE: In the future, having multi-send decoded will be required
+        const messageDecodingPass: boolean =
+          messageDecoding ===
+            CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND ||
+          messageDecoding === CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED;
+        const calldataExtractionPass: boolean =
+          calldataExtraction === DataExtraction.QRCODE ||
+          calldataExtraction === DataExtraction.HASHES;
+        const calldataDecodingPass: boolean =
+          calldataDecoding ===
+            CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND ||
+          calldataDecoding === CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED;
+        const displayedTransactionDetailsPass: boolean =
+          displayedTransactionDetails === displaysFullTransactionDetails;
+
+        if (
+          messageExtractionPass &&
+          messageDecodingPass &&
+          calldataExtractionPass &&
+          calldataDecodingPass &&
+          displayedTransactionDetailsPass
+        ) {
+          return Rating.PASS;
+        }
+
+        // FAIL: No support or very poor support
+        // At this time, we do not consider not decoding to be a fail
+        const messageExtractionFail: boolean = messageExtraction === DataExtraction.NONE;
+        const calldataExtractionFail: boolean = calldataExtraction === DataExtraction.NONE;
+        const displayedTransactionDetailsFail: boolean =
+          displayedTransactionDetails !== displaysFullTransactionDetails;
+
+        if ((messageExtractionFail || calldataExtractionFail) && displayedTransactionDetailsFail) {
+          return Rating.FAIL;
+        }
+
+        // PARTIAL: Everything else
+        return Rating.PARTIAL;
+      };
+
+      const overallRating = getOverallRating();
 
       const result = ((): Evaluation<HardwareWalletDappSigningValue> => {
-        switch (dappSigningLevel) {
-          case DappSigningLevel.NONE:
-            return noDappSigning();
-          case DappSigningLevel.BASIC:
-            return basicDappSigning(['this hardware wallet']);
-          case DappSigningLevel.PARTIAL:
-            return partialDappSigning(['this hardware wallet']);
-          case DappSigningLevel.FULL:
-            return fullDappSigning(['this hardware wallet']);
+        if (overallRating === Rating.UNRATED) {
+          return unrated(hardwareWalletDappSigning, brand, {
+            messageExtraction,
+            messageDecoding,
+            calldataExtraction,
+            calldataDecoding,
+            displayedTransactionDetails,
+          });
+        } else if (overallRating === Rating.FAIL) {
+          return noDappSigning(
+            messageExtraction,
+            messageDecoding,
+            calldataExtraction,
+            calldataDecoding,
+            displayedTransactionDetails,
+          );
+        } else if (overallRating === Rating.PASS) {
+          return fullDappSigning(
+            messageExtraction,
+            messageDecoding,
+            calldataExtraction,
+            calldataDecoding,
+            displayedTransactionDetails,
+            ['this hardware wallet'],
+          );
+        } else {
+          // Determine if it's basic or partial based on some features working
+          const hasPartialSupport =
+            messageDecoding !== CalldataDecoding.NONE || calldataDecoding !== CalldataDecoding.NONE;
+
+          if (hasPartialSupport) {
+            return partialDappSigning(
+              messageExtraction,
+              messageDecoding,
+              calldataExtraction,
+              calldataDecoding,
+              displayedTransactionDetails,
+              ['this hardware wallet'],
+            );
+          } else {
+            return basicDappSigning(
+              messageExtraction,
+              messageDecoding,
+              calldataExtraction,
+              calldataDecoding,
+              displayedTransactionDetails,
+              ['this hardware wallet'],
+            );
+          }
         }
       })();
 
@@ -273,7 +465,13 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
           'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
         ),
         brand,
-        { dappSigningLevel: DappSigningLevel.NONE },
+        {
+          messageExtraction: null,
+          messageDecoding: null,
+          calldataExtraction: null,
+          calldataDecoding: null,
+          displayedTransactionDetails: null,
+        },
       );
     }
 
@@ -287,7 +485,11 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
         shortExplanation: sentence(
           'This attribute evaluates hardware wallet dApp signing capabilities and is not applicable for software wallets.',
         ),
-        dappSigningLevel: DappSigningLevel.NONE,
+        messageExtraction: null,
+        messageDecoding: null,
+        calldataExtraction: null,
+        calldataDecoding: null,
+        displayedTransactionDetails: null,
         __brand: brand,
       },
       details: paragraph(
