@@ -16,7 +16,6 @@ import { eip7702 } from '@/data/eips/eip-7702';
 import { erc4337 } from '@/data/eips/erc-4337';
 import { ratedHardwareWallets, unratedHardwareWallet } from '@/data/hardware-wallets';
 import { ratedSoftwareWallets, unratedSoftwareWallet } from '@/data/software-wallets';
-import { HardwareIcon } from '@/icons/devices/HardwareIcon';
 import type { EvaluationTree } from '@/schema/attribute-groups';
 import {
   calculateAttributeGroupScore,
@@ -941,54 +940,10 @@ export default function WalletTable(): React.ReactElement {
     cell: ({ row }: { row: Row<TableRow> }): CellValue =>
       getHardwareWalletManufactureTypeDisplay(row.original.wallet),
   });
-  // Replace web/mobile/desktop device selector with hardware icon for hardware wallets
-  const hardwareWalletVariantColumn = columnHelper.display({
-    id: 'risk_by_device',
-    header: 'Risk by device',
-    cell: () => (
-      <div className='flex space-x-0 items-center justify-center'>
-        <div className='flex flex-col items-center group'>
-          <button
-            className={cx(
-              'p-2 rounded-md transition-colors',
-              selectedVariant === DeviceVariant.NONE
-                ? 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
-                : 'text-[var(--active)]',
-            )}
-            onClick={() => {
-              handleVariantChange(
-                selectedVariant === DeviceVariant.NONE
-                  ? DeviceVariant.HARDWARE
-                  : DeviceVariant.NONE,
-              );
-            }}
-            title='Hardware'
-          >
-            <HardwareIcon
-              style={{
-                width: '24px',
-                height: '24px',
-                fill: selectedVariant === DeviceVariant.NONE ? 'currentColor' : 'var(--active)',
-              }}
-            />
-          </button>
-          <div
-            className={cx(
-              'w-2 h-2 rounded-full mt-1 transition-colors',
-              selectedVariant !== DeviceVariant.NONE
-                ? 'bg-[var(--active)]'
-                : 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]',
-            )}
-          />
-        </div>
-      </div>
-    ),
-  });
   const hardwareColumns: Array<ColumnDef<TableRow, CellValue>> = [
     rankColumn,
     hardwareWalletNameColumn,
     hardwareWalletManufactureTypeColumn,
-    hardwareWalletVariantColumn,
     ...mapNonExemptAttributeGroupsInTree(
       unratedHardwareWallet.overall,
       attributeGroupColumnFromAttrGroup,
@@ -1222,9 +1177,7 @@ export default function WalletTable(): React.ReactElement {
                           headerContent === 'Type' ||
                           headerContent === 'Manufacture Type'
                           ? 'font-bold'
-                          : headerContent === 'Risk by device'
-                            ? 'font-semibold'
-                            : 'font-normal',
+                          : 'font-normal',
                       )}
                     >
                       {headerContent !== undefined &&
