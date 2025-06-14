@@ -2,9 +2,9 @@ import { nconsigny, patrickalphac } from '@/data/contributors';
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import {
-  CalldataDecoding,
   DataExtraction,
   displaysFullTransactionDetails,
+  noCalldataDecoding,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
@@ -97,10 +97,14 @@ export const trezorWallet: HardwareWallet = {
       firmware: null,
       hardwareWalletDappSigning: {
         messageSigning: {
-          calldataDecoding: CalldataDecoding.NONE,
+          calldataDecoding: noCalldataDecoding,
           details:
             'Trezor provides basic message signing details when using hardware wallets, but some complex interactions may be difficult to verify off device.',
-          messageExtraction: DataExtraction.EYES,
+          messageExtraction: {
+            [DataExtraction.EYES]: true,
+            [DataExtraction.HASHES]: false,
+            [DataExtraction.QRCODE]: false,
+          },
         },
         ref: [
           {
@@ -114,8 +118,12 @@ export const trezorWallet: HardwareWallet = {
           },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.NONE,
-          calldataExtraction: DataExtraction.EYES,
+          calldataDecoding: noCalldataDecoding,
+          calldataExtraction: {
+            [DataExtraction.EYES]: true,
+            [DataExtraction.HASHES]: false,
+            [DataExtraction.QRCODE]: false,
+          },
           details:
             'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
           displayedTransactionDetails: {

@@ -2,9 +2,9 @@ import { nconsigny, patrickalphac } from '@/data/contributors';
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import {
-  CalldataDecoding,
   DataExtraction,
   displaysFullTransactionDetails,
+  noCalldataDecoding,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { Variant } from '@/schema/variants';
@@ -103,10 +103,14 @@ export const ledgerWallet: HardwareWallet = {
       firmware: null,
       hardwareWalletDappSigning: {
         messageSigning: {
-          calldataDecoding: CalldataDecoding.NONE,
+          calldataDecoding: noCalldataDecoding,
           details:
             'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
-          messageExtraction: DataExtraction.HASHES, // Fantastic
+          messageExtraction: {
+            [DataExtraction.EYES]: false,
+            [DataExtraction.HASHES]: true, // Fantastic
+            [DataExtraction.QRCODE]: false,
+          },
         },
         ref: [
           {
@@ -116,8 +120,12 @@ export const ledgerWallet: HardwareWallet = {
           },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.NONE,
-          calldataExtraction: DataExtraction.EYES, // VERY hard to verify, very weird format
+          calldataDecoding: noCalldataDecoding,
+          calldataExtraction: {
+            [DataExtraction.EYES]: true, // VERY hard to verify, very weird format
+            [DataExtraction.HASHES]: false,
+            [DataExtraction.QRCODE]: false,
+          },
           details:
             'Ledger provides basic message signing details when using hardware wallets, but complex interactions are very difficult to verify on the device.',
           displayedTransactionDetails: displaysFullTransactionDetails,

@@ -3,8 +3,9 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import { FirmwareType } from '@/schema/features/security/firmware';
 import {
-  CalldataDecoding,
   DataExtraction,
+  noCalldataDecoding,
+  noDataExtraction,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
@@ -92,10 +93,14 @@ export const cypherockWallet: HardwareWallet = {
       },
       hardwareWalletDappSigning: {
         messageSigning: {
-          calldataDecoding: CalldataDecoding.NONE,
+          calldataDecoding: noCalldataDecoding,
           details:
             'Shows EIP-712 signature data only in the companion application, not on the hardware wallet itself.',
-          messageExtraction: DataExtraction.EYES,
+          messageExtraction: {
+            [DataExtraction.EYES]: true,
+            [DataExtraction.HASHES]: false,
+            [DataExtraction.QRCODE]: false,
+          },
         },
         ref: [
           {
@@ -109,8 +114,8 @@ export const cypherockWallet: HardwareWallet = {
           },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.NONE,
-          calldataExtraction: DataExtraction.NONE,
+          calldataDecoding: noCalldataDecoding,
+          calldataExtraction: noDataExtraction,
           details:
             'Completely fails to display calldata for transactions on either the application or the hardware wallet itself.',
           displayedTransactionDetails: {
