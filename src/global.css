@@ -10,6 +10,8 @@
 	--active-scale: 0.99;
 	--active-opacity: 0.8;
 
+	--separator-width: 1px;
+
 	--background-primary: light-dark(#fff, #17191f);
 	--background-secondary: light-dark(#efefef, #141414);
 	--background-tertiary: light-dark(#eeeff4, #17191f);
@@ -126,6 +128,12 @@ a {
 	&:hover {
 		text-decoration: underline;
 	}
+}
+
+hr {
+	margin-inline: 10%;
+	border: none;
+	border-top: var(--separator-width) solid var(--border-color);
 }
 
 details {
