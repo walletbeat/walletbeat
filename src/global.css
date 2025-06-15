@@ -136,6 +136,10 @@ hr {
 	border-top: var(--separator-width) solid var(--border-color);
 }
 
+strong {
+	font-weight: 600;
+}
+
 details {
 	&::details-content {
 		transition-property:
