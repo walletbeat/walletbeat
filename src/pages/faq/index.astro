@@ -327,26 +327,24 @@ import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?r
 			<header id="faq-header">
 				<h1>Walletbeat FAQ</h1>
 			</header>
-			
-			<section class="column">
-				{frequentlyAskedQuestions.map((entry, index) => (
-					<div class="faq-item">
-						{index > 0 && <hr />}
-						<div id={entry.anchor} class="column">
-							<h3 class="question row">
-								<span set:html={HelpOutlineIcon} />
-								{entry.question}
-							</h3>
-							<div class="answer">
-								<Typography
-									client:load
-									content={entry.answer}
-								/>
-							</div>
-						</div>
-					</div>
-				))}
-			</section>
+
+			{frequentlyAskedQuestions.map((entry, index) => (
+				<>
+					<hr>
+
+					<section id={entry.anchor}>
+						<h2>
+							<span set:html={HelpOutlineIcon} />
+							{entry.question}
+						</h2>
+
+						<Typography
+							client:load
+							content={entry.answer}
+						/>
+					</section>
+				</>
+			))}
 		</main>
 	</div>
 </Layout>
@@ -365,50 +363,38 @@ import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?r
 	}
 
 	main {
-		display: grid;
-		grid-template-rows: auto 1fr;
 		overflow-y: auto;
-		padding-bottom: 6rem;
-	}
+		display: grid;
+		grid-template-columns: minmax(0, 42rem);
+		justify-content: center;
+		padding: 3rem 1.5rem;
+		gap: 1.66rem;
+		line-height: 1.8;
 
-	header {
-		padding: 3rem 2rem 2rem;
-		border-bottom: 1px solid var(--border-color);
-	}
-
-	h1 {
-		font-size: 2.5rem;
-		font-weight: 600;
-		color: var(--text-primary);
+		> header {
+			> p {
+				font-size: 1.25rem;
+				font-style: italic;
+				color: var(--text-secondary);
+				opacity: 0.75;
+			}
+		}
 	}
 
 	section {
-		max-width: 56rem;
-		margin: 0 auto;
-		padding: 2rem;
-	}
+		display: grid;
+		gap: 1.5rem;
 
-	.faq-item hr {
-		margin: 2rem 10%;
-		border: none;
-		border-top: 1px solid var(--border-color);
-	}
+		h2 {
+			position: relative;
 
-	.question {
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: var(--text-primary);
-		justify-content: start;
-		gap: 0.5rem;
-	}
-
-	.question svg {
-		fill: currentColor;
-		vertical-align: -0.15em;
-	}
-
-	.answer {
-		color: var(--text-secondary);
-		line-height: 1.6;
+			span {
+				position: absolute;
+				right: 100%;
+				top: 0;
+				transform: translateX(-0.5em);
+				color: var(--text-secondary);
+			}
+		}
 	}
 </style>
