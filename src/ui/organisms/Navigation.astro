@@ -27,21 +27,39 @@ const { navigationItems } = Astro.props
 	<header>
 		<a href="/">
 			<picture>
-				<source srcset="/logo-dark.svg" media="(prefers-color-scheme: dark)">
-				<img src="/logo-light.svg" alt="WalletBeat Logo">
+				<source
+					srcset="/logo-dark.svg"
+					media="(prefers-color-scheme: dark)"
+				/>
+				<img
+					src="/logo-light.svg"
+					alt="WalletBeat Logo"
+				/>
 			</picture>
 		</a>
-		
-		<div>
-			<button id="theme-toggle" type="button">
-				<span set:html={LuSun} />
-				<span set:html={LuMoon} />
-			</button>
 
-			<button id="menu-toggle" type="button">
-				<span set:html={LuMenu} />
-			</button>
-		</div>
+		<menu>
+			<li>
+				<button
+					id="theme-toggle"
+					type="button"
+					class="stack"
+				>
+					<span set:html={LuSun} />
+					<span set:html={LuMoon} />
+				</button>
+			</li>
+
+			<li>
+				<button
+					id="menu-toggle"
+					type="button"
+					popovertarget="nav-menu"
+				>
+					<span set:html={LuMenu} />
+				</button>
+			</li>
+		</menu>
 	</header>
 
 	<div>
@@ -171,6 +189,31 @@ const { navigationItems } = Astro.props
 		@media (max-width: 1024px) {
 			padding-top: 4rem;
 			margin-top: 0;
+		}
+
+		menu {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+
+			li {
+				display: contents;
+			}
+
+			button {
+				svg {
+					transition-property: color;
+				}
+			}
+
+			#theme-toggle {
+				> :first-child {
+					color: light-dark(currentColor, transparent);
+				}
+				> :last-child {
+					color: light-dark(transparent, currentColor);
+				}
+			}
 		}
 
 		a {
