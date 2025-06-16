@@ -278,70 +278,56 @@ import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?r
 		keywordsAfter: ['faq'],
 	}}
 >
-	<div class="layout">
-		<Navigation
-			navigationItems={[
-				navigationHome,
-				navigationAbout,
-				{
-					id: 'faq',
-					title: 'FAQ',
-					icon: HelpCircleIcon,
-					href: '/faq#top',
-					children: [
-						...frequentlyAskedQuestions.map(faq => ({
-							id: faq.anchor,
-							title: faq.navTitle,
-							href: `#${faq.anchor}`,
-						})),
-					],
-				},
-				navigationRepository,
-				navigationFarcasterChannel,
-			]}
-		/>
+	<Navigation
+		navigationItems={[
+			navigationHome,
+			navigationAbout,
+			{
+				id: 'faq',
+				title: 'FAQ',
+				icon: HelpCircleIcon,
+				href: '/faq#top',
+				children: [
+					...frequentlyAskedQuestions.map(faq => ({
+						id: faq.anchor,
+						title: faq.navTitle,
+						href: `#${faq.anchor}`,
+					})),
+				],
+			},
+			navigationRepository,
+			navigationFarcasterChannel,
+		]}
+	/>
 
-		<main>
-			<header id="top">
-				<h1>Walletbeat FAQ</h1>
-			</header>
+	<main>
+		<header id="top">
+			<h1>Walletbeat FAQ</h1>
+		</header>
 
-			{frequentlyAskedQuestions.map((entry, index) => (
-				<>
-					<hr>
+		{frequentlyAskedQuestions.map((entry, index) => (
+			<>
+				<hr>
 
-					<section id={entry.anchor}>
-						<h2>
-							<span set:html={HelpOutlineIcon} />
-							{entry.question}
-						</h2>
+				<section id={entry.anchor}>
+					<h2>
+						<span set:html={HelpOutlineIcon} />
+						{entry.question}
+					</h2>
 
-						<Typography
-							client:load
-							content={entry.answer}
-						/>
-					</section>
-				</>
-			))}
-		</main>
-	</div>
+					<Typography
+						client:load
+						content={entry.answer}
+					/>
+				</section>
+			</>
+		))}
+	</main>
 </Layout>
 
 
 <style>
-	.layout {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		min-height: 100vh;
-		max-width: 100vw;
-
-		@media (max-width: 1024px) {
-			grid-template-columns: 1fr;
-		}
-	}
-
 	main {
-		overflow-y: auto;
 		display: grid;
 		grid-template-columns: minmax(0, 42rem);
 		justify-content: center;

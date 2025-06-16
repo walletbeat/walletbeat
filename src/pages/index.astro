@@ -36,75 +36,54 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 		title: 'Walletbeat',
 	}}
 >
-	<div class="layout">
-		<Navigation
-			navigationItems={defaultNavigationItems}
-		/>
+	<Navigation
+		navigationItems={defaultNavigationItems}
+	/>
 
-		<main>
-			<header>
-				<div>
-					<h1>Who watches the wallets?</h1>
-					<p>
-						Beta version; For content contributions, please see{' '}
-						<a href="https://github.com/walletbeat/walletbeat" target="_blank" rel="noreferrer">
-							GitHub
-						</a>
-						.
-					</p>
-				</div>
-				<div>
-					<img src="robot.png" alt="Walletbeat Robot" />
-				</div>
+	<main data-sticky-container>
+		<header
+			data-sticky="inline"
+		>
+			<h1>Who watches the wallets?</h1>
+
+			<p>Beta version. For content contributions, please see <a href="https://github.com/walletbeat/walletbeat" target="_blank" rel="noreferrer">GitHub</a>.</p>
+		</header>
+
+		<section>
+			<header data-sticky="inline">
+				<h2>Software Wallets</h2>
 			</header>
 
-			<section id="summary">
-				<div>
-					<h2>Software Wallets</h2>
-					<WalletTable
-						client:load
-						wallets={
-							Object
-								.values(allRatedWallets)
-						}
-						{attributeGroups}
-					/>
-				</div>
+			<WalletTable
+				client:load
+				wallets={
+					Object
+						.values(allRatedWallets)
+				}
+				{attributeGroups}
+			/>
+		</section>
 
-				<div>
-					<h2>Hardware Wallets</h2>
-					<WalletTable
-						client:load
-						wallets={
-							Object
-								.values(ratedHardwareWallets)
-						}
-						{attributeGroups}
-					/>
-				</div>
-			</section>
-		</main>
-	</div>
+		<section>
+			<header data-sticky="inline">
+				<h2>Hardware Wallets</h2>
+			</header>
+
+			<WalletTable
+				client:load
+				wallets={
+					Object
+						.values(ratedHardwareWallets)
+				}
+				{attributeGroups}
+			/>
+		</section>
+	</main>
 </Layout>
 
 
 <style>
-	.layout {
-		display: grid;
-		grid-template-columns: auto minmax(0, 1fr);
-		max-width: 100dvw;
-		min-height: 100dvh;
-
-		@media (max-width: 1024px) {
-			grid-template-columns: minmax(0, 1fr);
-		}
-	}
-
 	main {
-		overflow-y: auto;
-		max-height: 100dvh;
-		padding-bottom: 6rem;
-
 		header {
 			display: flex;
 			align-items: center;
@@ -174,7 +153,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 		section {
 			padding: 2rem;
 			display: grid;
-			gap: 3rem;
+			gap: 2rem;
 			max-width: 80rem;
 			margin: 0 auto;
 

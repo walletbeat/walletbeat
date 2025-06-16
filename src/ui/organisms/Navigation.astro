@@ -1,9 +1,9 @@
 ---
 import type { NavigationItem } from '@/components/navigation'
 import NavigationItems from './NavigationItems.svelte'
+import LuMenu from 'lucide-static/icons/menu.svg?raw'
 import LuMoon from 'lucide-static/icons/moon.svg?raw'
 import LuSun from 'lucide-static/icons/sun.svg?raw'
-import LuMenu from 'lucide-static/icons/menu.svg?raw'
 
 interface Props {
 	navigationItems: NavigationItem[]
@@ -21,8 +21,15 @@ const { navigationItems } = Astro.props
 </script>
 
 
-<nav>
-	<header>
+<nav
+	id="nav"
+	popover="auto"
+	data-sticky
+	data-scroll-container data-sticky-container
+>
+	<header
+		data-sticky
+	>
 		<a href="/">
 			<picture>
 				<source
@@ -39,8 +46,8 @@ const { navigationItems } = Astro.props
 		<menu>
 			<li>
 				<button
-					id="theme-toggle"
 					type="button"
+					id="theme-toggle"
 					class="stack"
 				>
 					<span set:html={LuSun} />
@@ -50,9 +57,9 @@ const { navigationItems } = Astro.props
 
 			<li>
 				<button
-					id="menu-toggle"
 					type="button"
-					popovertarget="nav-menu"
+					id="menu-toggle"
+					popovertarget="nav"
 				>
 					<span set:html={LuMenu} />
 				</button>
@@ -60,51 +67,53 @@ const { navigationItems } = Astro.props
 		</menu>
 	</header>
 
-	<div>
-		<NavigationItems items={navigationItems} client:load />
+	<div
+		id="nav-menu"
+		data-sticky-container
+	>
+		<NavigationItems
+			items={navigationItems}
+			client:load
+		/>
 	</div>
 
-	<footer>
-		<p>
-			Wallets listed on this page are not official endorsements, and are provided for informational
-			purposes only.
-		</p>
+	<footer
+		data-sticky
+	>
+		<p>Wallets listed on this page are not official endorsements, and are provided for informational purposes only.</p>
 	</footer>
 </nav>
 
 
 <style>
 	nav {
-		width: 20rem;
-		max-width: 20rem;
-		position: sticky;
-		top: 0;
-		height: 100vh;
-		
-		background: var(--navigation-bg);
-		border-right: 1px solid var(--border-color);
+		height: 100dvh;
 		display: grid;
 		grid-template-rows: auto 1fr auto;
-		gap: 0.25rem;
-		overflow-y: auto;
-		z-index: 40;
 
-		@media (max-width: 1024px) {
-			width: 100%;
-			height: auto;
-			position: relative;
+		background-color: var(--navigation-bg);
+
+		&[data-sticky-container] {
+			--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
 		}
 
 		> header {
-			display: grid;
-			grid-template-columns: 1fr auto;
-			gap: 1rem;
-			padding: 1rem;
-			align-items: center;
+			block-size: var(--navigation-mobile-blockSize);
+			box-shadow: 0 0 0 var(--separator-width) var(--border-color);
 
-			@media (max-width: 1024px) {
-				padding-top: 4rem;
-				margin-top: 0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem;
+
+			a {
+				display: flex;
+				text-decoration: none;
+
+				img {
+					display: block;
+					height: 2rem;
+				}
 			}
 
 			menu {
@@ -120,6 +129,7 @@ const { navigationItems } = Astro.props
 					svg {
 						width: 1.25em;
 						height: 1.25em;
+
 						transition-property: color;
 					}
 				}
@@ -133,56 +143,60 @@ const { navigationItems } = Astro.props
 					}
 				}
 			}
+		}
 
-			a {
-				display: flex;
-				align-items: center;
-				border-radius: 0.25rem;
-				transition: opacity 0.2s ease;
+		#nav-menu {
+			display: grid;
+			align-content: start;
+			gap: 1em;
+			padding: 1rem 0.75rem;
 
-				&:hover {
-					opacity: 0.8;
-				}
-
-				picture {
-					display: flex;
-					align-items: center;
-				}
-
-				img {
-					height: 2rem;
-					width: auto;
-					transition: all 0.3s ease;
-				}
+			&[data-sticky-container] {
+				--sticky-paddingBlockStart: 1rem;
+				--sticky-paddingBlockEnd: 1rem;
+				--sticky-paddingInlineStart: 0.75rem;
+				--sticky-paddingInlineEnd: 0.75rem;
 			}
 		}
 
-		> div {
-			font-size: smaller;
+		footer {
 			padding: 1rem;
+
+			p {
+				padding: 0.75rem 1rem;
+				line-height: 1.4;
+				background-color: var(--accent-very-light);
+				border-radius: 0.5rem;
+				font-size: 0.875rem;
+				color: var(--text-secondary);
+			}
 		}
 	}
 
-	footer {
-		position: sticky;
-		bottom: 1rem;
-		margin: 0.75em;
-		padding: 1rem;
-		background: var(--accent-very-light);
-		border-radius: 0.5rem;
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-		text-align: left;
-		border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-		transition: all 0.2s ease;
-
-		&:hover {
-			background: color-mix(in srgb, var(--accent-very-light) 80%, var(--accent));
+	@media not (max-width: 1024px) {
+		li:has(#menu-toggle) {
+			display: none;
 		}
+	}
 
-		p {
-			margin: 0;
-			line-height: 1.4;
+	@media (max-width: 1024px) {
+		nav {
+			transition-property: block-size;
+
+			block-size: auto;
+			
+			&[popover]:not(:popover-open) {
+				block-size: var(--navigation-mobile-blockSize);
+				overflow: hidden;
+				overscroll-behavior: none;
+
+				header ~ * {
+					display: none;
+					interactivity: inert;
+					opacity: 0;
+					pointer-events: none;
+				}
+			}
 		}
 	}
 </style>

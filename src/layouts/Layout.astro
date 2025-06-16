@@ -14,7 +14,6 @@ const { metadata } = Astro.props
 
 // Components
 import Metadata from '@/components/Metadata.astro'
-// import { NavigationStateManager } from '@/components/NavigationStateManager'
 ---
 
 <!doctype html>
@@ -31,7 +30,62 @@ import Metadata from '@/components/Metadata.astro'
 		</script>
 	</head>
 	<body>
-		<!-- <NavigationStateManager client:load /> -->
-		<slot />
+		<div
+			id="layout"
+			data-scroll-container data-sticky-container
+		>
+			<slot />
+		</div>
 	</body>
 </html>
+
+
+<style>
+	#layout {
+		/* Constants */
+		--navigation-desktop-inlineSize: 20rem;
+		--navigation-mobile-blockSize: 4rem;
+
+		/* Rules */
+		width: 100dvw;
+		height: 100dvh;
+		display: grid;
+		align-items: start;
+		gap: var(--separator-width);
+
+		@media not (max-width: 1024px) {
+			grid-template:
+				'Nav Main' 100dvh
+				/ var(--navigation-desktop-inlineSize) minmax(0, 1fr);
+			;
+
+			&[data-sticky-container] {
+				--sticky-paddingInlineStart: var(--navigation-desktop-inlineSize);
+			}
+		}
+
+		@media (max-width: 1024px) {
+			grid-template:
+				'Nav' var(--navigation-mobile-blockSize)
+				'Main' 1fr
+				/ minmax(0, 1fr)
+			;
+
+			&[data-sticky-container] {
+				--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
+			}
+		}
+
+		> * {
+			box-shadow: 0 0 0 var(--separator-width) var(--border-color);
+		}
+
+		> nav {
+			grid-area: Nav;
+		}
+
+		> main {
+			grid-area: Main;
+		}
+	}
+</style>

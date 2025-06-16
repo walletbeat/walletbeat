@@ -16,13 +16,13 @@
 
 
 {#snippet navigationItems(items: NavigationItem[])}
-	<ul>
+	<menu>
 		{#each items as item (item.id)}
 			<li>
 				{@render navigationItem(item)}
 			</li>
 		{/each}
-	</ul>
+	</menu>
 {/snippet}
 
 
@@ -30,8 +30,11 @@
 	{#if !item.children?.length}
 		{@render linkable(item)}
 	{:else}
-		<details open={!item.defaultIsCollapsed}>
-			<summary>
+		<details
+			open={!item.defaultIsCollapsed}
+			data-sticky-container
+		>
+			<summary data-sticky>
 				{@render linkable(item)}
 			</summary>
 
@@ -67,7 +70,7 @@
 
 
 <style>
-	ul {
+	menu {
 		display: grid;
 		gap: 2px;
 		list-style: none;
@@ -134,8 +137,17 @@
 		}
 	}
 
+	details:not([open]) > summary::after {
+		transform: perspective(100px) rotateX(180deg) rotate(-90deg);
+	}
+
 	summary ~ * {
 		margin-inline-start: 2em;
 		margin-block-start: 2px;
+
+		margin-inline-start: 1.25em;
+		margin-block-start: 2px;
+		padding-inline-start: 0.75em;
+		box-shadow: -1px 0 var(--border-color);
 	}
 </style>
