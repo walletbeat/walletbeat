@@ -75,108 +75,112 @@ export const navigationFarcasterChannel = {
 } as const satisfies NavigationItem
 
 export const defaultNavigationItems = [
-	navigationHome,
 	{
-		id: 'software-wallets',
-		title: 'Software Wallets',
-		href: '/wallet/summary',
-		icon: AppWindowIcon,
+		...navigationHome,
 		children: [
 			{
-				id: 'software-by-rating',
-				title: 'By Rating',
-				icon: ChartPieIcon,
-				defaultIsCollapsed: true,
-				children: (
-					mapNonExemptAttributeGroupsInTree(
-						representativeWalletForType(WalletType.SOFTWARE).overall,
-						attrGroup => ({
-							id: `software-${attrGroup.id}`,
-							title: attrGroup.displayName,
-							icon: attrGroup.icon,
-							href: `/wallet/${attrGroup.id}`,
-						}),
-					)
-				),
-			},
-			{
-				id: 'software-by-wallet',
-				title: 'By Wallet',
-				icon: WalletIcon,
-				defaultIsCollapsed: true,
-				children: (
-					Object.entries(allWallets)
-						.map(([key, wallet]) => ({
-							id: key,
-							title: wallet.metadata.displayName,
-							href: `/${key}`,
-							icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
-						}))
-				),
-			},
-		],
-	},
-	{
-		id: 'hardware-wallets',
-		title: 'Hardware Wallets',
-		href: '/hww/summary',
-		icon: KeyIcon,
-		children: [
-			{
-				id: 'hardware-by-rating',
-				title: 'By Rating',
-				icon: ChartPieIcon,
-				defaultIsCollapsed: true,
+				id: 'software-wallets',
+				title: 'Software Wallets',
+				href: '/wallet/summary',
+				icon: AppWindowIcon,
 				children: [
-					...mapNonExemptAttributeGroupsInTree(
-						representativeWalletForType(WalletType.HARDWARE).overall,
-						attrGroup => ({
-							id: `hardware-${attrGroup.id}`,
-							title: attrGroup.displayName,
-							icon: attrGroup.icon,
-							href: `/hww/${attrGroup.id}`,
-						}),
-					),
+					{
+						id: 'software-by-rating',
+						title: 'By Rating',
+						icon: ChartPieIcon,
+						defaultIsCollapsed: true,
+						children: (
+							mapNonExemptAttributeGroupsInTree(
+								representativeWalletForType(WalletType.SOFTWARE).overall,
+								attrGroup => ({
+									id: `software-${attrGroup.id}`,
+									title: attrGroup.displayName,
+									icon: attrGroup.icon,
+									href: `/wallet/${attrGroup.id}`,
+								}),
+							)
+						),
+					},
+					{
+						id: 'software-by-wallet',
+						title: 'By Wallet',
+						icon: WalletIcon,
+						defaultIsCollapsed: true,
+						children: (
+							Object.entries(allWallets)
+								.map(([key, wallet]) => ({
+									id: key,
+									title: wallet.metadata.displayName,
+									href: `/${key}`,
+									icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
+								}))
+						),
+					},
 				],
 			},
 			{
-				id: 'hardware-by-wallet',
-				title: 'By Wallet',
-				icon: WalletIcon,
-				defaultIsCollapsed: true,
-				children: (
-					Object.entries(hardwareWallets)
-						.map(([key, wallet]) => ({
-							id: key,
-							title: wallet.metadata.displayName.replace(' Wallet', ''),
-							href: `/${key}`,
-							icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
-						}))
-				),
-			},
-		],
-	},
-	{
-		id: 'embedded-wallets',
-		title: 'Embedded Wallets',
-		href: '/embedded/summary',
-		icon: CpuIcon,
-		children: [
-			{
-				id: 'embedded-by-rating',
-				title: 'By Rating',
-				icon: ChartPieIcon,
-				defaultIsCollapsed: true,
+				id: 'hardware-wallets',
+				title: 'Hardware Wallets',
+				href: '/hww/summary',
+				icon: KeyIcon,
 				children: [
-					...mapNonExemptAttributeGroupsInTree(
-						representativeWalletForType(WalletType.EMBEDDED).overall,
-						attrGroup => ({
-							id: `embedded-${attrGroup.id}`,
-							title: attrGroup.displayName,
-							icon: attrGroup.icon,
-							href: `/embedded/${attrGroup.id}`,
-						}),
-					),
+					{
+						id: 'hardware-by-rating',
+						title: 'By Rating',
+						icon: ChartPieIcon,
+						defaultIsCollapsed: true,
+						children: [
+							...mapNonExemptAttributeGroupsInTree(
+								representativeWalletForType(WalletType.HARDWARE).overall,
+								attrGroup => ({
+									id: `hardware-${attrGroup.id}`,
+									title: attrGroup.displayName,
+									icon: attrGroup.icon,
+									href: `/hww/${attrGroup.id}`,
+								}),
+							),
+						],
+					},
+					{
+						id: 'hardware-by-wallet',
+						title: 'By Wallet',
+						icon: WalletIcon,
+						defaultIsCollapsed: true,
+						children: (
+							Object.entries(hardwareWallets)
+								.map(([key, wallet]) => ({
+									id: key,
+									title: wallet.metadata.displayName.replace(' Wallet', ''),
+									href: `/${key}`,
+									icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
+								}))
+						),
+					},
+				],
+			},
+			{
+				id: 'embedded-wallets',
+				title: 'Embedded Wallets',
+				href: '/embedded/summary',
+				icon: CpuIcon,
+				children: [
+					{
+						id: 'embedded-by-rating',
+						title: 'By Rating',
+						icon: ChartPieIcon,
+						defaultIsCollapsed: true,
+						children: [
+							...mapNonExemptAttributeGroupsInTree(
+								representativeWalletForType(WalletType.EMBEDDED).overall,
+								attrGroup => ({
+									id: `embedded-${attrGroup.id}`,
+									title: attrGroup.displayName,
+									icon: attrGroup.icon,
+									href: `/embedded/${attrGroup.id}`,
+								}),
+							),
+						],
+					},
 				],
 			},
 		],
