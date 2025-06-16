@@ -1,4 +1,4 @@
-// Types/constants
+// Types
 export type NavigationItem = {
 	id: string
 	title: string
@@ -9,53 +9,180 @@ export type NavigationItem = {
 }
 
 
-// Images
-import HomeIcon from 'lucide-static/icons/house.svg?raw'
-import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
-import BuildingIcon from 'lucide-static/icons/building-2.svg?raw'
+// Constants
+import { hardwareWallets } from '@/data/hardware-wallets'
+import { allWallets, representativeWalletForType } from '@/data/wallets'
+import { WalletType } from '@/schema/wallet-types'
+
+
+// Functions
+import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
+
+
+// Icons
+import AppWindowIcon from 'lucide-static/icons/app-window.svg?raw'
 import BadgeCheckIcon from 'lucide-static/icons/badge-check.svg?raw'
+import BuildingIcon from 'lucide-static/icons/building-2.svg?raw'
+import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
+import CpuIcon from 'lucide-static/icons/cpu.svg?raw'
 import GithubIcon from 'lucide-static/icons/github.svg?raw'
+import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
+import KeyIcon from 'lucide-static/icons/key.svg?raw'
 import MessageCircleIcon from 'lucide-static/icons/message-circle.svg?raw'
+import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
+// Constants
+export const navigationHome = {
+	id: 'home',
+	title: 'Wallets',
+	href: '/',
+	icon: WalletIcon,
+} as const satisfies NavigationItem
 
-export const navigationHome: NavigationItem = {
-	id: 'wallet-table',
-	icon: HomeIcon,
-	title: 'Walletbeat',
-	href: '/#',
-}
-
-export const navigationFaq: NavigationItem = {
+export const navigationFaq = {
 	id: 'faq',
 	icon: HelpCircleIcon,
 	title: 'FAQ',
 	href: '/faq',
-}
+} as const satisfies NavigationItem
 
-export const navigationAbout: NavigationItem = {
+export const navigationAbout = {
 	id: 'about',
 	icon: BuildingIcon,
 	title: 'About Walletbeat',
 	href: '/about',
-}
+} as const satisfies NavigationItem
 
-export const navigationCriteria: NavigationItem = {
+export const navigationCriteria = {
 	id: 'criteria',
 	icon: BadgeCheckIcon,
 	title: 'Evaluation Criteria',
 	href: '/#criteria',
-}
+} as const satisfies NavigationItem
 
-export const navigationRepository: NavigationItem = {
+export const navigationRepository = {
 	id: 'code-repository',
 	icon: GithubIcon,
 	title: 'Contribute on GitHub',
 	href: 'https://github.com/walletbeat/walletbeat',
-}
+} as const satisfies NavigationItem
 
-export const navigationFarcasterChannel: NavigationItem = {
+export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
 	icon: MessageCircleIcon,
 	title: 'Discuss on Farcaster',
 	href: 'https://farcaster.xyz/~/channel/walletbeat',
-}
+} as const satisfies NavigationItem
+
+export const defaultNavigationItems = [
+	navigationHome,
+	{
+		id: 'software-wallets',
+		title: 'Software Wallets',
+		href: '/wallet/summary',
+		icon: AppWindowIcon,
+		children: [
+			{
+				id: 'software-by-rating',
+				title: 'By Rating',
+				icon: ChartPieIcon,
+				defaultIsCollapsed: true,
+				children: (
+					mapNonExemptAttributeGroupsInTree(
+						representativeWalletForType(WalletType.SOFTWARE).overall,
+						attrGroup => ({
+							id: `software-${attrGroup.id}`,
+							title: attrGroup.displayName,
+							icon: attrGroup.icon,
+							href: `/wallet/${attrGroup.id}`,
+						}),
+					)
+				),
+			},
+			{
+				id: 'software-by-wallet',
+				title: 'By Wallet',
+				icon: WalletIcon,
+				defaultIsCollapsed: true,
+				children: (
+					Object.entries(allWallets)
+						.map(([key, wallet]) => ({
+							id: key,
+							title: wallet.metadata.displayName,
+							href: `/${key}`,
+							icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
+						}))
+				),
+			},
+		],
+	},
+	{
+		id: 'hardware-wallets',
+		title: 'Hardware Wallets',
+		href: '/hww/summary',
+		icon: KeyIcon,
+		children: [
+			{
+				id: 'hardware-by-rating',
+				title: 'By Rating',
+				icon: ChartPieIcon,
+				defaultIsCollapsed: true,
+				children: [
+					...mapNonExemptAttributeGroupsInTree(
+						representativeWalletForType(WalletType.HARDWARE).overall,
+						attrGroup => ({
+							id: `hardware-${attrGroup.id}`,
+							title: attrGroup.displayName,
+							icon: attrGroup.icon,
+							href: `/hww/${attrGroup.id}`,
+						}),
+					),
+				],
+			},
+			{
+				id: 'hardware-by-wallet',
+				title: 'By Wallet',
+				icon: WalletIcon,
+				defaultIsCollapsed: true,
+				children: (
+					Object.entries(hardwareWallets)
+						.map(([key, wallet]) => ({
+							id: key,
+							title: wallet.metadata.displayName.replace(' Wallet', ''),
+							href: `/${key}`,
+							icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
+						}))
+				),
+			},
+		],
+	},
+	{
+		id: 'embedded-wallets',
+		title: 'Embedded Wallets',
+		href: '/embedded/summary',
+		icon: CpuIcon,
+		children: [
+			{
+				id: 'embedded-by-rating',
+				title: 'By Rating',
+				icon: ChartPieIcon,
+				defaultIsCollapsed: true,
+				children: [
+					...mapNonExemptAttributeGroupsInTree(
+						representativeWalletForType(WalletType.EMBEDDED).overall,
+						attrGroup => ({
+							id: `embedded-${attrGroup.id}`,
+							title: attrGroup.displayName,
+							icon: attrGroup.icon,
+							href: `/embedded/${attrGroup.id}`,
+						}),
+					),
+				],
+			},
+		],
+	},
+	navigationAbout,
+	navigationFaq,
+	navigationRepository,
+	navigationFarcasterChannel,
+] as const satisfies NavigationItem[]
