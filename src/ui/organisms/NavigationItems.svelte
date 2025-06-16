@@ -1,0 +1,141 @@
+<script lang="ts">
+	// Types
+	import type { NavigationItem } from '@/components/navigation'
+
+
+	// Props
+	let {
+		items,
+	}: {
+		items: NavigationItem[]
+	} = $props()
+</script>
+
+
+{@render navigationItems(items)}
+
+
+{#snippet navigationItems(items: NavigationItem[])}
+	<ul>
+		{#each items as item (item.id)}
+			<li>
+				{@render navigationItem(item)}
+			</li>
+		{/each}
+	</ul>
+{/snippet}
+
+
+{#snippet navigationItem(item: NavigationItem)}
+	{#if !item.children?.length}
+		{@render linkable(item)}
+	{:else}
+		<details open={!item.defaultIsCollapsed}>
+			<summary>
+				{@render linkable(item)}
+			</summary>
+
+			{@render navigationItems(item.children)}
+		</details>
+	{/if}
+{/snippet}
+
+
+{#snippet linkable(item: NavigationItem)}
+	{#if item.href}
+		<a
+			href={item.href}
+			{...item.href.startsWith('http') && {
+				target: '_blank',
+				rel: 'noreferrer',
+			}}
+		>
+			{#if item.icon}
+				<span>{@html item.icon}</span>
+			{/if}
+
+			{item.title}
+		</a>
+	{:else}
+		{#if item.icon}
+			<span>{@html item.icon}</span>
+		{/if}
+
+		{item.title}
+	{/if}
+{/snippet}
+
+
+<style>
+	ul {
+		display: grid;
+		gap: 2px;
+		list-style: none;
+		font-size: 0.975em;
+
+		li {
+			display: grid;
+		}
+	}
+
+	a {
+		color: inherit;
+
+		&:hover {
+			color: var(--accent);
+			text-decoration: none;
+		}
+	}
+
+	summary,
+	a {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		> span {
+			display: flex;
+			font-size: 1.25em;
+			width: 1em;
+			height: 1em;
+			line-height: 1;
+
+			:global(
+				img,
+				svg
+			) {
+				border-radius: 0.125rem;
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+
+	summary,
+	a:not(summary a) {
+		padding: 0.45rem 0.45rem;
+		border-radius: 0.375rem;
+		font-weight: 500;
+
+		transition-property: background-color, color, outline;
+
+		&:hover:not(:has(a:hover)) {
+			background-color: var(--background-primary);
+			color: var(--accent);
+		}
+
+		&:focus {
+			outline: 2px solid var(--accent);
+			outline-offset: -1px;
+		}
+
+		&:active {
+			background-color: var(--background-primary);
+		}
+	}
+
+	summary ~ * {
+		margin-inline-start: 2em;
+		margin-block-start: 2px;
+	}
+</style>
