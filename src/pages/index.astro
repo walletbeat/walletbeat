@@ -1,8 +1,8 @@
 ---
 // Constants
-import { allWallets, allRatedWallets, representativeWalletForType } from '@/data/wallets'
-import { hardwareWallets, ratedHardwareWallets } from '@/data/hardware-wallets'
-import { WalletType, walletTypeToUrlSlug, mapWalletTypes } from '@/schema/wallet-types'
+import { defaultNavigationItems } from '@/components/navigation'
+import { allRatedWallets } from '@/data/wallets'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
 
 import {
 	ecosystemAttributeGroup,
@@ -21,68 +21,13 @@ const attributeGroups = [
 	ecosystemAttributeGroup,
 ]
 
-// Dynamic navigation generation similar to walletNavigationGroups from HomePage
-const walletNavigationGroups = Object.values(
-	mapWalletTypes(
-		(walletType) => ({
-			id: walletTypeToUrlSlug(walletType),
-			title: (() => {
-				switch (walletType) {
-					case WalletType.SOFTWARE:
-						return 'Software Wallets'
-					case WalletType.HARDWARE:
-						return 'Hardware Wallets'
-					case WalletType.EMBEDDED:
-						return 'Embedded Wallets'
-				}
-			})(),
-			icon: (() => {
-				switch (walletType) {
-					case WalletType.SOFTWARE:
-						return '💳'
-					case WalletType.HARDWARE:
-						return '🔐'
-					case WalletType.EMBEDDED:
-						return '💻'
-				}
-			})(),
-			href: `/${walletTypeToUrlSlug(walletType)}`,
-			children: [
-				{
-					id: 'summary',
-					title: 'Summary',
-					icon: '📋',
-					href: `/${walletTypeToUrlSlug(walletType)}/summary`,
-				},
-				...mapNonExemptAttributeGroupsInTree(
-					representativeWalletForType(walletType).overall,
-					attr => ({
-						id: attr.id,
-						title: attr.displayName,
-						icon: '📊',
-						href: `/${walletTypeToUrlSlug(walletType)}/${attr.id}`,
-					}),
-				),
-			],
-		}),
-	),
-)
 
 // Layouts
 import Layout from '../layouts/Layout.astro'
 
 // Components
-import { navigationAbout, navigationCriteria, navigationFaq, navigationRepository, navigationFarcasterChannel } from '@/components/navigation'
 import Navigation from '@/ui/organisms/Navigation.astro'
 import WalletTable from '@/ui/organisms/WalletTable.svelte'
-
-const navigationItems = [
-	...walletNavigationGroups,
-	navigationAbout,
-	navigationFaq,
-	navigationRepository,
-	navigationFarcasterChannel,
-]
 ---
 
 
@@ -93,7 +38,7 @@ const navigationItems = [
 >
 	<div class="layout">
 		<Navigation
-			{navigationItems}
+			navigationItems={defaultNavigationItems}
 		/>
 
 		<main>
