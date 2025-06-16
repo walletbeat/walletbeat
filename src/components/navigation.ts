@@ -10,8 +10,9 @@ export type NavigationItem = {
 
 
 // Constants
+import { softwareWallets } from '@/data/software-wallets'
 import { hardwareWallets } from '@/data/hardware-wallets'
-import { allWallets, representativeWalletForType } from '@/data/wallets'
+import { representativeWalletForType } from '@/data/wallets'
 import { WalletType } from '@/schema/wallet-types'
 
 
@@ -107,7 +108,7 @@ export const defaultNavigationItems = [
 						icon: WalletIcon,
 						defaultIsCollapsed: true,
 						children: (
-							Object.entries(allWallets)
+							Object.entries(softwareWallets)
 								.map(([key, wallet]) => ({
 									id: key,
 									title: wallet.metadata.displayName,
