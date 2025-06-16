@@ -57,7 +57,7 @@ const StyledMarkdown = styled(Box, {
     ${
       pSpacing === undefined
         ? ''
-        : `p + p {
+        : `p + p, ul + p {
         margin-top: ${pSpacing};
     }`
     }
