@@ -367,7 +367,7 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
   methodology: markdown(`
     Wallets are rated based on how much of the complexity involved in dealing
     with multiple chains is abstracted away from users, while keeping risks
-    and fees transparent to the user.
+    and fees transparent.
 
     To get a passing rating, wallets must be cross-chain aware in how they
     display account value and individual token balances:
@@ -375,7 +375,6 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
     - When displaying the user account's total value, this value should sum
       up the user's valuations across all chains the wallet supports by
       default.
-
     - When displaying a specific token's balance, the balance should reflect
       the user's total balance for this token across all chains that the
       wallet supports by default (and on which the token exists). For rating
@@ -389,10 +388,8 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
       across chains. Our friends at [L2BEAT](https://l2beat.com/) do a
       fantastic job documenting this, but wallet developers also have a duty
       to explain these risks to their users.
-
     - For bridge operations where the net fee is larger than 1bps, the wallet
       must display the fee breakdown by default.
-
     - When the user attempts to send tokens to an address on a chain where the
       user's own balance is insufficient, but for which there is sufficient
       balance on another chain, the wallet should automatically propose to use
@@ -423,7 +420,7 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
         }).value,
       ),
       exampleRating(
-        sentence('The wallet does not have a cross-chain bridging feature.'),
+        sentence('The wallet does not have a built-in cross-chain bridging feature.'),
         evaluateChainAbstraction({
           crossChainBalances: fullySupportedCrossChainBalances,
           bridging: {
@@ -436,7 +433,7 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
     partial: [
       exampleRating(
         sentence(
-          'The wallet displays global cross-chain account value, but not of individual token balances across chains.',
+          'The wallet displays global cross-chain account value, but not individual token balances across chains.',
         ),
         evaluateChainAbstraction({
           crossChainBalances: {
