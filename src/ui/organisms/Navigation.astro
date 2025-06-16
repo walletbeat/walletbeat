@@ -1,5 +1,6 @@
 ---
 import type { NavigationItem } from '@/components/navigation'
+import NavigationItems from './NavigationItems.svelte'
 import LuMoon from 'lucide-static/icons/moon.svg?raw'
 import LuSun from 'lucide-static/icons/sun.svg?raw'
 import LuMenu from 'lucide-static/icons/menu.svg?raw'
@@ -51,6 +52,7 @@ const { navigationItems } = Astro.props
 				<button
 					id="menu-toggle"
 					type="button"
+					popovertarget="nav-menu"
 				>
 					<span set:html={LuMenu} />
 				</button>
@@ -59,124 +61,7 @@ const { navigationItems } = Astro.props
 	</header>
 
 	<div>
-		{navigationItems?.map(item => (
-			!item.children?.length ?
-				item.href ?
-					<a
-						href={item.href}
-						{...item.href.startsWith('http') ? {
-							target: '_blank',
-							rel: 'noreferrer',
-						} : {}}
-					>
-						{item.icon && <span set:html={item.icon} />}
-						{item.title}
-					</a>
-				:
-					<>
-						{item.icon && <span set:html={item.icon} />}
-						{item.title}
-					</>
-
-			:
-				<details open>
-					<summary>
-						{
-							item.href ?
-								<a
-									href={item.href}
-									{...item.href.startsWith('http') ? {
-										target: '_blank',
-										rel: 'noreferrer',
-									} : {}}
-								>
-									{item.icon && <span set:html={item.icon} />}
-									{item.title}
-								</a>
-							:
-								<>
-									{item.icon && <span set:html={item.icon} />}
-									{item.title}
-								</>
-						}
-					</summary>
-
-					<ul>
-						{item.children.map(item => (
-							<li>
-								{
-									!item.children?.length ?
-										item.href ?
-											<a
-												href={item.href}
-												{...item.href.startsWith('http') ? {
-													target: '_blank',
-													rel: 'noreferrer',
-												} : {}}
-											>
-												{item.icon && <span set:html={item.icon} />}
-												{item.title}
-											</a>
-										:
-											<>
-												{item.icon && <span set:html={item.icon} />}
-												{item.title}
-											</>
-
-									:
-										<details open>
-											<summary>
-												{
-													item.href ?
-														<a
-															href={item.href}
-															{...item.href.startsWith('http') ? {
-																target: '_blank',
-																rel: 'noreferrer',
-															} : {}}
-														>
-															{item.icon && <span set:html={item.icon} />}
-															{item.title}
-														</a>
-													:
-														<>
-															{item.icon && <span set:html={item.icon} />}
-															{item.title}
-														</>
-												}
-											</summary>
-
-											<ul>
-												{item.children.map(item => (
-													<li>
-														{
-															item.href ?
-																<a
-																	href={item.href}
-																	{...item.href.startsWith('http') ? {
-																		target: '_blank',
-																		rel: 'noreferrer',
-																	} : {}}
-																>
-																	{item.icon && <span set:html={item.icon} />}
-																	{item.title}
-																</a>
-															:
-																<>
-																	{item.icon && <span set:html={item.icon} />}
-																	{item.title}
-																</>
-														}
-													</li>
-												))}
-											</ul>
-										</details>
-								}
-							</li>
-						))}
-					</ul>
-				</details>
-		))}
+		<NavigationItems items={navigationItems} client:load />
 	</div>
 
 	<footer>
@@ -274,80 +159,7 @@ const { navigationItems } = Astro.props
 
 		> div {
 			font-size: smaller;
-
-			display: grid;
-			gap: 1em;
-			padding: 0.5rem;
-
-			a {
-				color: inherit;
-
-				&:hover {
-					color: var(--accent);
-					text-decoration: none;
-				}
-			}
-
-			summary,
-			a {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-
-				> span {
-					display: flex;
-					font-size: 1.25em;
-					width: 1em;
-					height: 1em;
-					line-height: 1;
-
-					img,
-					svg {
-						border-radius: 0.125rem;
-						width: 100%;
-						height: 100%;
-					}
-				}
-			}
-
-			summary,
-			a:not(summary a) {
-				padding: 0.45rem 0.45rem;
-				border-radius: 0.375rem;
-				font-weight: 500;
-
-				transition-property: background-color, color, outline;
-
-				&:hover:not(:has(a:hover)) {
-					background-color: var(--background-primary);
-					color: var(--accent);
-				}
-
-				&:focus {
-					outline: 2px solid var(--accent);
-					outline-offset: -1px;
-				}
-
-				&:active {
-					background-color: var(--background-primary);
-				}
-			}
-
-			summary ~ * {
-				margin-inline-start: 2em;
-				margin-block-start: 2px;
-			}
-
-			ul {
-				font-size: 0.95em;
-
-				display: grid;
-				gap: 2px;
-
-				li {
-					display: grid;
-				}
-			}
+			padding: 1rem;
 		}
 	}
 
