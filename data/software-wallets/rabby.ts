@@ -70,6 +70,7 @@ export const rabby: SoftwareWallet = {
         },
       ],
     },
+    chainAbstraction: null,
     chainConfigurability: {
       customChains: true,
       l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,

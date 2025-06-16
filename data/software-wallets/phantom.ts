@@ -49,6 +49,7 @@ export const phantom: SoftwareWallet = {
       nonChainSpecificEnsResolution: null,
       ref: null,
     },
+    chainAbstraction: null,
     chainConfigurability: null,
     integration: {
       browser: {

@@ -83,6 +83,7 @@ export const daimo: SoftwareWallet = {
         },
       ],
     },
+    chainAbstraction: null,
     chainConfigurability: {
       customChains: false,
       l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,

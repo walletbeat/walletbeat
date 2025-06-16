@@ -45,6 +45,7 @@ export const family: SoftwareWallet = {
       nonChainSpecificEnsResolution: null,
       ref: null,
     },
+    chainAbstraction: null,
     chainConfigurability: null,
     integration: {
       browser: {

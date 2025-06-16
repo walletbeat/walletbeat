@@ -1,4 +1,5 @@
 import type { AccountSupport } from './features/account-support';
+import type { ChainAbstraction } from './features/ecosystem/chain-abstraction';
 import {
   notApplicableWalletIntegration,
   type ResolvedWalletIntegration,
@@ -146,6 +147,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
   /** How the wallet resolves Ethereum addresses. */
   addressResolution: VariantFeature<WithRef<AddressResolution>>;
+
+  /** How well does the wallet abstract over chains? */
+  chainAbstraction: VariantFeature<ChainAbstraction>;
 };
 
 /**
@@ -247,6 +251,7 @@ export interface ResolvedFeatures {
     reputation: ResolvedFeature<ReputationSupport>;
     maintenance: ResolvedFeature<MaintenanceSupport>;
   };
+  chainAbstraction: ResolvedFeature<ChainAbstraction>;
   chainConfigurability: ResolvedFeature<ChainConfigurability>;
   accountSupport: ResolvedFeature<AccountSupport>;
   multiAddress: ResolvedFeature<Support>;
@@ -325,6 +330,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
       reputation: hardwareFeat(features => features.transparency.reputation),
       maintenance: hardwareFeat(features => features.transparency.maintenance),
     },
+    chainAbstraction: softwareFeat(features => features.chainAbstraction),
     chainConfigurability: softwareFeat(features => features.chainConfigurability),
     accountSupport: baseFeat(features => features.accountSupport),
     multiAddress: baseFeat(features => features.multiAddress),

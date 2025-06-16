@@ -56,6 +56,7 @@ export const metamask: SoftwareWallet = {
       nonChainSpecificEnsResolution: null,
       ref: null,
     },
+    chainAbstraction: null,
     chainConfigurability: null,
     integration: {
       browser: {
