@@ -265,10 +265,9 @@ import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/ui/organisms/Navigation.astro'
 import Typography from '@/ui/atoms/Typography.svelte'
 
-import BuildingIcon from 'lucide-static/icons/building-2.svg?raw'
+import { navigationAbout, navigationFarcasterChannel, navigationHome, navigationRepository } from '@/components/navigation'
+
 import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
-import GithubIcon from 'lucide-static/icons/github.svg?raw'
-import MessageCircleIcon from 'lucide-static/icons/message-circle.svg?raw'
 import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?raw'
 ---
 
@@ -282,49 +281,28 @@ import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?r
 	<div class="layout">
 		<Navigation
 			navigationItems={[
-				{
-					id: 'about',
-					title: 'About Walletbeat',
-					icon: BuildingIcon,
-					href: '/about',
-				},
+				navigationHome,
+				navigationAbout,
 				{
 					id: 'faq',
 					title: 'FAQ',
 					icon: HelpCircleIcon,
-					href: '/faq',
+					href: '/faq#top',
 					children: [
-						{
-							id: 'faq-header',
-							title: 'FAQ Overview',
-							icon: HelpCircleIcon,
-							href: '#faq-header',
-						},
 						...frequentlyAskedQuestions.map(faq => ({
 							id: faq.anchor,
 							title: faq.navTitle,
-							icon: HelpCircleIcon,
 							href: `#${faq.anchor}`,
 						})),
 					],
 				},
-				{
-					id: 'code-repository',
-					title: 'Contribute on GitHub',
-					icon: GithubIcon,
-					href: 'https://github.com/walletbeat/walletbeat',
-				},
-				{
-					id: 'farcaster-channel',
-					title: 'Discuss on Farcaster',
-					icon: MessageCircleIcon,
-					href: 'https://farcaster.xyz/~/channel/walletbeat',
-				},
+				navigationRepository,
+				navigationFarcasterChannel,
 			]}
 		/>
-		
+
 		<main>
-			<header id="faq-header">
+			<header id="top">
 				<h1>Walletbeat FAQ</h1>
 			</header>
 
