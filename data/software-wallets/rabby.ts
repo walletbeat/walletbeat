@@ -70,7 +70,27 @@ export const rabby: SoftwareWallet = {
         },
       ],
     },
-    chainAbstraction: null,
+    chainAbstraction: {
+      bridging: {
+        builtInBridging: supported({
+          feesLargerThan1bps: 'HIDDEN_BY_DEFAULT',
+          risksExplained: 'NOT_IN_UI',
+        }),
+        suggestedBridging: notSupported,
+      },
+      crossChainBalances: {
+        ether: {
+          crossChainSumView: notSupported,
+          perChainBalanceViewAcrossMultipleChains: featureSupported,
+        },
+        globalAccountValue: featureSupported,
+        perChainAccountValue: featureSupported,
+        usdc: {
+          crossChainSumView: notSupported,
+          perChainBalanceViewAcrossMultipleChains: featureSupported,
+        },
+      },
+    },
     chainConfigurability: {
       customChains: true,
       l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,

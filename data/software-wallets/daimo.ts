@@ -83,7 +83,27 @@ export const daimo: SoftwareWallet = {
         },
       ],
     },
-    chainAbstraction: null,
+    chainAbstraction: {
+      bridging: {
+        builtInBridging: supported({
+          feesLargerThan1bps: 'VISIBLE_BY_DEFAULT',
+          risksExplained: 'NOT_IN_UI',
+        }),
+        suggestedBridging: notSupported,
+      },
+      crossChainBalances: {
+        ether: {
+          crossChainSumView: notSupported,
+          perChainBalanceViewAcrossMultipleChains: notSupported,
+        },
+        globalAccountValue: notSupported,
+        perChainAccountValue: notSupported,
+        usdc: {
+          crossChainSumView: notSupported,
+          perChainBalanceViewAcrossMultipleChains: notSupported,
+        },
+      },
+    },
     chainConfigurability: {
       customChains: false,
       l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,
