@@ -84,92 +84,44 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 
 <style>
 	main {
-		header {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 3rem 2rem;
-			min-height: 24rem;
+		container-type: inline-size;
 
-			@media (max-width: 768px) {
-				flex-direction: column;
-				text-align: center;
-				padding: 2rem 1rem;
+		> header {
+			background:
+				linear-gradient(to right, var(--background-primary) 33cqi, transparent 125%),
+				url('./robot.png') 98% 1rem / clamp(12rem, 24cqi, 20rem) no-repeat
+			;
+
+			padding: clamp(1.5rem, 8cqi, 12rem) clamp(1.5rem, 6cqi, 2rem);
+
+			text-shadow:
+				0 0 1em var(--background-primary),
+				0 0 2em var(--background-primary),
+				0 0 3em var(--background-primary)
+			;
+
+			h1 {
+				font-size: clamp(1.5em, 5cqi, 3em);
+				font-weight: 800;
+				color: var(--accent);
+				margin: 0 0 1rem 0;
+				line-height: 1.1;
 			}
 
-			div:first-child {
-				flex: 1;
-				max-width: 32rem;
-
-				h1 {
-					font-size: 3rem;
-					font-weight: 800;
-					color: var(--accent);
-					margin: 0 0 1rem 0;
-					line-height: 1.1;
-
-					@media (max-width: 768px) {
-						font-size: 2.5rem;
-					}
-				}
-
-				p {
-					font-size: 1.125rem;
-					color: var(--text-secondary);
-					line-height: 1.6;
-					margin: 0;
-
-					a {
-						color: var(--accent);
-						text-decoration: underline;
-						font-weight: 500;
-
-						&:hover {
-							text-decoration: none;
-						}
-					}
-				}
-			}
-
-			div:last-child {
-				flex: 1;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-
-				img {
-					height: 20rem;
-					width: auto;
-					object-fit: contain;
-
-					@media (max-width: 768px) {
-						height: 16rem;
-						margin-top: 2rem;
-					}
-				}
+			p {
+				font-size: smaller;
+				color: var(--text-secondary);
+				line-height: 1.6;
+				margin: 0;
 			}
 		}
 
 		section {
-			padding: 2rem;
 			display: grid;
-			gap: 2rem;
+			padding: clamp(1.5rem, 6cqi, 2rem);
+			gap: 1.5rem;
 			max-width: 80rem;
 			margin: 0 auto;
-
-			@media (max-width: 768px) {
-				padding: 1rem;
-				gap: 2rem;
-			}
-
-			div {
-				h2 {
-					font-size: 1.5rem;
-					font-weight: 600;
-					color: var(--text-primary);
-					margin: 0;
-				}
-			}
 		}
 	}
 </style>
