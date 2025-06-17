@@ -139,11 +139,25 @@
 		startAngle: number
 		endAngle: number
 	}) => {
+		const angleDiff = Math.abs(endAngle - startAngle)
+		
+		// Handle full circles (or nearly full circles)
+		if (angleDiff >= 359.99) {
+			return [
+				`M ${cx + outerRadius} ${cy}`,
+				`A ${outerRadius} ${outerRadius} 0 1 0 ${cx - outerRadius} ${cy}`,
+				`A ${outerRadius} ${outerRadius} 0 1 0 ${cx + outerRadius} ${cy}`,
+				`M ${cx + innerRadius} ${cy}`,
+				`A ${innerRadius} ${innerRadius} 0 1 1 ${cx - innerRadius} ${cy}`,
+				`A ${innerRadius} ${innerRadius} 0 1 1 ${cx + innerRadius} ${cy}`,
+			].join(' ')
+		}
+
 		const start = polarToCartesian(cx, cy, outerRadius, endAngle)
 		const end = polarToCartesian(cx, cy, outerRadius, startAngle)
 		const innerStart = polarToCartesian(cx, cy, innerRadius, endAngle)
 		const innerEnd = polarToCartesian(cx, cy, innerRadius, startAngle)
-		const largeArcFlag = Math.abs(endAngle - startAngle) > 180 ? 1 : 0
+		const largeArcFlag = angleDiff > 180 ? 1 : 0
 
 		return (
 			[
