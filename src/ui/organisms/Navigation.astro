@@ -1,112 +1,85 @@
 ---
-import type { NavigationLinkItem } from '@/components/navigation'
-import { allWallets } from '@/data/wallets'
-import { hardwareWallets } from '@/data/hardware-wallets'
-import LuKey from 'lucide-static/icons/key.svg?raw'
-import LuWallet from 'lucide-static/icons/wallet.svg?raw'
+import type { NavigationItem } from '@/components/navigation'
+import NavigationItems from './NavigationItems.svelte'
+import LuMenu from 'lucide-static/icons/menu.svg?raw'
+import LuMoon from 'lucide-static/icons/moon.svg?raw'
+import LuSun from 'lucide-static/icons/sun.svg?raw'
 
 interface Props {
-	navigationItems: NavigationLinkItem[]
+	navigationItems: NavigationItem[]
 }
 
 const { navigationItems } = Astro.props
 ---
 
-<nav>
-	<header>
+
+<script>
+	document.getElementById('theme-toggle')?.addEventListener('click', () => {
+		document.documentElement.style.colorScheme = document.documentElement.style.colorScheme === 'dark' ? 'light' : 'dark'
+		localStorage.setItem('theme', document.documentElement.style.colorScheme)
+	})
+</script>
+
+
+<nav
+	id="nav"
+	popover="auto"
+	data-sticky
+	data-scroll-container data-sticky-container
+>
+	<header
+		data-sticky
+	>
 		<a href="/">
 			<picture>
-				<source srcset="/logo-dark.svg" media="(prefers-color-scheme: dark)">
-				<img src="/logo-light.svg" alt="WalletBeat Logo">
+				<source
+					srcset="/logo-dark.svg"
+					media="(prefers-color-scheme: dark)"
+				/>
+				<img
+					src="/logo-light.svg"
+					alt="WalletBeat Logo"
+				/>
 			</picture>
 		</a>
+
+		<menu>
+			<li>
+				<button
+					type="button"
+					id="theme-toggle"
+					class="stack"
+				>
+					<span set:html={LuSun} />
+					<span set:html={LuMoon} />
+				</button>
+			</li>
+
+			<li>
+				<button
+					type="button"
+					id="menu-toggle"
+					popovertarget="nav"
+				>
+					<span set:html={LuMenu} />
+				</button>
+			</li>
+		</menu>
 	</header>
 
-	<div>
-		<section>
-			<h3>Home</h3>
-
-			<ul>
-				<li><a href="/#summary">Summary</a></li>
-			</ul>
-		</section>
-
-		<details open>
-			<summary>
-				<span set:html={LuWallet} />
-				Wallets
-			</summary>
-
-			<ul>
-				{
-					Object.entries(allWallets).map(([key, wallet]) => (
-						<li>
-							<a href={`/${key}`}>
-								<img
-									src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-									alt=""
-								/>
-								{wallet.metadata.displayName}
-							</a>
-						</li>
-					))
-				}
-			</ul>
-		</details>
-
-		<details open>
-			<summary>
-				<span set:html={LuKey} />
-				Hardware Wallets
-			</summary>
-
-			<ul>
-				{
-					Object.entries(hardwareWallets).map(([key, wallet]) => {
-						let displayName = wallet.metadata.displayName
-						if (key === 'ledger') displayName = 'Ledger'
-						if (key === 'trezor') displayName = 'Trezor'
-						if (key === 'gridplus') displayName = 'Grid Plus'
-						if (key === 'keystone') displayName = 'Keystone'
-
-						return (
-							<li>
-								<a href={`/${key}`}>
-									<img
-										src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-										alt=""
-									/>
-									{displayName}
-								</a>
-							</li>
-						)
-					})
-				}
-			</ul>
-		</details>
-
-		<details open>
-			<summary>About</summary>
-
-			<ul>
-				{
-					navigationItems.map(item => (
-						<li>
-							<a 
-								href={item.href}
-								{...(item.href.startsWith('http') ? { target: '_blank', rel: 'noreferrer' } : {})}
-							>
-								<span set:html={item.icon} />
-								{item.title}
-							</a>
-						</li>
-					))
-				}
-			</ul>
-		</details>
+	<div
+		id="nav-menu"
+		data-sticky-container
+	>
+		<NavigationItems
+			items={navigationItems}
+			client:load
+		/>
 	</div>
 
-	<footer>
+	<footer
+		data-sticky
+	>
 		<p>Wallets listed on this page are not official endorsements, and are provided for informational purposes only.</p>
 	</footer>
 </nav>
@@ -114,227 +87,116 @@ const { navigationItems } = Astro.props
 
 <style>
 	nav {
-		width: 20rem;
-		max-width: 20rem;
-		position: sticky;
-		top: 0;
-		height: 100vh;
-		
-		background: var(--navigation-bg);
-		border-right: 1px solid var(--border-color);
-		
-		display: flex;
-		flex-direction: column;
-		overflow-y: auto;
-		z-index: 40;
+		height: 100dvh;
+		display: grid;
+		grid-template-rows: auto 1fr auto;
 
-		@media (max-width: 1024px) {
-			width: 100%;
-			height: auto;
-			position: relative;
-		}
-	}
+		background-color: var(--navigation-bg);
 
-	header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		width: 100%;
-		gap: 1rem;
-		padding: 1.5rem 1rem 1.25rem;
-		margin-bottom: 1.25rem;
-		margin-top: 2rem;
-		height: 34px;
-
-		@media (max-width: 1024px) {
-			padding-top: 4rem;
-			margin-top: 0;
+		&[data-sticky-container] {
+			--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
 		}
 
-		a {
+		> header {
+			block-size: var(--navigation-mobile-blockSize);
+			box-shadow: 0 0 0 var(--separator-width) var(--border-color);
+
 			display: flex;
+			justify-content: space-between;
 			align-items: center;
-			text-decoration: none;
-			transition: opacity 0.2s ease;
+			padding: 1rem;
 
-			&:hover {
-				opacity: 0.8;
-			}
-
-			&:focus {
-				outline: 2px solid var(--accent);
-				outline-offset: 2px;
-				border-radius: 0.25rem;
-			}
-
-			picture {
-				display: flex;
-				align-items: center;
-			}
-
-			img {
-				height: 2rem;
-				width: auto;
-				transition: all 0.3s ease;
-			}
-		}
-	}
-
-	nav > div {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		padding: 0 0.75rem;
-	}
-
-	section,
-	details {
-		margin-bottom: 0.5rem;
-	}
-
-	section h3,
-	summary {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--text-secondary);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin: 0 0 0.5rem 0;
-		padding: 0.375rem 0.5rem;
-		border-radius: 0.375rem;
-		transition: all 0.2s ease;
-		cursor: pointer;
-		user-select: none;
-
-		&:hover {
-			color: var(--text-primary);
-			background-color: var(--background-secondary);
-		}
-
-		&:focus {
-			outline: 2px solid var(--accent);
-			outline-offset: 2px;
-		}
-
-		span {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			width: 1rem;
-			height: 1rem;
-			min-width: 1rem;
-			flex-shrink: 0;
-
-			:global(svg) {
-				width: 100%;
-				height: 100%;
-				transition: transform 0.2s ease;
-			}
-		}
-
-		&:hover span :global(svg) {
-			transform: scale(1.1);
-		}
-	}
-
-	details[open] summary {
-		color: var(--text-primary);
-		background-color: var(--background-secondary);
-	}
-
-	/* Lists */
-	ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0;
-
-		li {
 			a {
+				display: flex;
+				text-decoration: none;
+
+				img {
+					display: block;
+					height: 2rem;
+				}
+			}
+
+			menu {
 				display: flex;
 				align-items: center;
 				gap: 0.5rem;
-				padding: 0.375rem 0.5rem;
-				border-radius: 0.375rem;
-				color: var(--text-primary);
-				text-decoration: none;
-				transition: all 0.2s ease;
-				font-weight: 500;
-				white-space: nowrap;
 
-				&:hover {
-					background-color: var(--background-secondary);
+				li {
+					display: contents;
 				}
 
-				&:focus {
-					outline: 2px solid var(--accent);
-					outline-offset: 2px;
-					background-color: var(--background-secondary);
-				}
+				button {
+					svg {
+						width: 1.25em;
+						height: 1.25em;
 
-				&:active {
-					background-color: var(--background-tertiary);
-				}
-
-				img {
-					width: 1rem;
-					height: 1rem;
-					border-radius: 0.125rem;
-					transition: transform 0.2s ease;
-					flex-shrink: 0;
-				}
-
-				span {
-					display: inline-flex;
-					align-items: center;
-					justify-content: center;
-					width: 1.25rem;
-					height: 1.25rem;
-					min-width: 1.25rem;
-					flex-shrink: 0;
-
-					:global(svg) {
-						width: 100%;
-						height: 100%;
-						transition: transform 0.2s ease;
+						transition-property: color;
 					}
 				}
 
-				&:hover img,
-				&:hover span :global(svg) {
-					transform: scale(1.1);
+				#theme-toggle {
+					> :first-child {
+						color: light-dark(currentColor, transparent);
+					}
+					> :last-child {
+						color: light-dark(transparent, currentColor);
+					}
 				}
+			}
+		}
+
+		#nav-menu {
+			display: grid;
+			align-content: start;
+			gap: 1em;
+			padding: 1rem 0.75rem;
+
+			&[data-sticky-container] {
+				--sticky-paddingBlockStart: 1rem;
+				--sticky-paddingBlockEnd: 1rem;
+				--sticky-paddingInlineStart: 0.75rem;
+				--sticky-paddingInlineEnd: 0.75rem;
+			}
+		}
+
+		footer {
+			padding: 1rem;
+
+			p {
+				padding: 0.75rem 1rem;
+				line-height: 1.4;
+				background-color: var(--accent-very-light);
+				border-radius: 0.5rem;
+				font-size: 0.875rem;
+				color: var(--text-secondary);
 			}
 		}
 	}
 
-	footer {
-		position: sticky;
-		bottom: 1rem;
-		margin-top: auto;
-		margin: 1rem;
-		padding: 1rem;
-		background: var(--accent-very-light);
-		border-radius: 0.5rem;
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-		text-align: left;
-		border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-		transition: all 0.2s ease;
-
-		&:hover {
-			background: color-mix(in srgb, var(--accent-very-light) 80%, var(--accent));
-		}
-
-		p {
-			margin: 0;
-			line-height: 1.4;
+	@media not (max-width: 1024px) {
+		li:has(#menu-toggle) {
+			display: none;
 		}
 	}
-</style> 
+
+	@media (max-width: 1024px) {
+		nav {
+			transition-property: block-size;
+
+			block-size: auto;
+			
+			&[popover]:not(:popover-open) {
+				block-size: var(--navigation-mobile-blockSize);
+				overflow: hidden;
+				overscroll-behavior: none;
+
+				header ~ * {
+					display: none;
+					interactivity: inert;
+					opacity: 0;
+					pointer-events: none;
+				}
+			}
+		}
+	}
+</style>

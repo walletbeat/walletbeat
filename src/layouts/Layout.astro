@@ -14,8 +14,6 @@ const { metadata } = Astro.props
 
 // Components
 import Metadata from '@/components/Metadata.astro'
-import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
-// import { NavigationStateManager } from '@/components/NavigationStateManager'
 ---
 
 <!doctype html>
@@ -25,42 +23,69 @@ import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
 		<meta name='viewport' content='width=device-width' />
 		<Metadata {metadata} />
 		<ClientRouter />
-		<!-- Theme initialization script -->
 		<script is:inline>
-			// Initialize theme from localStorage or system preference
-			function initializeTheme() {
-				// Check localStorage first
-				const storedTheme = localStorage.getItem('theme')
-
-				if (storedTheme) {
-					// Use stored preference
-					document.documentElement.classList.toggle('dark', storedTheme === 'dark')
-				} else {
-					// Check system preference
-					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-					document.documentElement.classList.toggle('dark', prefersDark)
-					// Store the initial preference
-					localStorage.setItem('theme', prefersDark ? 'dark' : 'light')
-				}
-			}
-
-			// Run immediately
-			initializeTheme()
+			// `color-scheme` override
+			const colorScheme = localStorage.getItem('theme')
+			if (colorScheme) document.documentElement.style.colorScheme = colorScheme
 		</script>
 	</head>
 	<body>
-		<ThemeRegistry>
-			<!-- <NavigationStateManager client:load /> -->
+		<div
+			id="layout"
+			data-scroll-container data-sticky-container
+		>
 			<slot />
-		</ThemeRegistry>
+		</div>
 	</body>
 </html>
 
+
 <style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
+	#layout {
+		/* Constants */
+		--navigation-desktop-inlineSize: 20rem;
+		--navigation-mobile-blockSize: 4rem;
+
+		/* Rules */
+		width: 100dvw;
+		height: 100dvh;
+		display: grid;
+		align-items: start;
+		gap: var(--separator-width);
+
+		@media not (max-width: 1024px) {
+			grid-template:
+				'Nav Main' 100dvh
+				/ var(--navigation-desktop-inlineSize) minmax(0, 1fr);
+			;
+
+			&[data-sticky-container] {
+				--sticky-paddingInlineStart: var(--navigation-desktop-inlineSize);
+			}
+		}
+
+		@media (max-width: 1024px) {
+			grid-template:
+				'Nav' var(--navigation-mobile-blockSize)
+				'Main' 1fr
+				/ minmax(0, 1fr)
+			;
+
+			&[data-sticky-container] {
+				--sticky-paddingBlockStart: var(--navigation-mobile-blockSize);
+			}
+		}
+
+		> * {
+			box-shadow: 0 0 0 var(--separator-width) var(--border-color);
+		}
+
+		> nav {
+			grid-area: Nav;
+		}
+
+		> main {
+			grid-area: Main;
+		}
 	}
 </style>

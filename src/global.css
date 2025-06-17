@@ -1,149 +1,53 @@
 /* cSpell:disable */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import '@fontsource/montserrat/latin.css';
 
-/* Theme */
+:root {
+	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
 
-@layer base {
-	:root {
-		--background-primary: #fff;
-		--background-secondary: #efefef;
-		--background-tertiary: #eeeff4;
-		--accent: #4d1957;
-		--accent-light: #e683c7;
-		--accent-very-light: #ffdbf4;
-		--logo-color: var(--accent);
-		--text-primary: #222222;
-		--text-secondary: #3f4046;
-		--text-inverse: #ffffff;
-		--border: #cecece;
-		--banner-gradient-from: #ecedfd;
-		--banner-gradient-to: #e8f6f2;
-		--icon-color: #222222; /* Add icon color for light mode */
-		--navigation-bg: var(--background-secondary); /* Navigation background color for light mode */
-		--disabled-text: #b1b2b9;
-		--pass: #2ecc71;
-		--fail: #e74c3c;
-		--partial: #f1c40f;
-		--active: #e683c7;
-		--hover: #e683c7;
-		/* Hashtag styling for light mode */
-		--hashtag-text: #1976d2; /* Blue that's readable on light background */
-		--hashtag-bg: rgba(25, 118, 210, 0.08);
-		--hashtag-bg-hover: rgba(25, 118, 210, 0.12);
+	--active-transitionInDuration: 0.125s;
+	--active-transitionOutDuration: 0.2s;
+	--active-scale: 0.99;
+	--active-opacity: 0.8;
 
-		/* EIP/ERC tag styling for light mode */
-		--eip-bg: rgba(108, 36, 224, 0.08);
-		--eip-text: var(--accent);
-		--eip-border: rgba(108, 36, 224, 0.2);
+	--separator-width: 1px;
 
-		/* Rating colors */
-		--rating-pass: #2ecc71; /* Green */
-		--rating-partial: #f1c40f; /* Yellow */
-		--rating-fail: #e74c3c; /* Red */
-		--rating-neutral: #bdc3c7; /* Gray */
-	}
-}
-
-html.dark {
-	--background-primary: #17191f;
-	--background-secondary: #141414;
-	--background-tertiary: #17191f;
-	--accent: #e683c7;
-	--accent-light: #4d1957;
-	--accent-very-light: #440530;
-	--logo-color: var(--text-primary);
-	--text-primary: #efefef;
-	--text-secondary: #b1b2b9;
+	--background-primary: light-dark(#fff, #17191f);
+	--background-secondary: light-dark(#efefef, #141414);
+	--background-tertiary: light-dark(#eeeff4, #17191f);
+	--accent: light-dark(#4d1957, #e683c7);
+	--accent-light: light-dark(#e683c7, #4d1957);
+	--accent-very-light: light-dark(#ffdbf4, #440530);
+	--logo-color: var(--accent);
+	--text-primary: light-dark(#222222, #efefef);
+	--text-secondary: light-dark(#3f4046, #b1b2b9);
 	--text-inverse: #ffffff;
-	--border: #313131;
-	--banner-gradient-from: #15151a;
-	--banner-gradient-to: #212126;
-	--icon-color: #efefef; /* Add icon color for dark mode */
-	--navigation-bg: var(--background-secondary); /* Navigation background color for dark mode */
-	--disabled-text: #656566;
+	--border-color: light-dark(#cecece, #313131);
+	--banner-gradient-from: light-dark(#ecedfd, #15151a);
+	--banner-gradient-to: light-dark(#e8f6f2, #212126);
+	--icon-color: light-dark(#222222, #efefef);
+	--navigation-backgroundColor: light-dark(#efefefcc, #141414cc);
+	--disabled-text: light-dark(#b1b2b9, #656566);
 	--pass: #2ecc71;
 	--fail: #e74c3c;
 	--partial: #f1c40f;
-	--active: #b14f92;
-	--hover: #b14f92;
-	/* Hashtag styling for dark mode */
-	--hashtag-text: #90caf9; /* Lighter blue that's readable on dark background */
-	--hashtag-bg: rgba(144, 202, 249, 0.08);
-	--hashtag-bg-hover: rgba(144, 202, 249, 0.12);
+	--active: light-dark(#e683c7, #b14f92);
+	--hover: light-dark(#e683c7, #b14f92);
 
-	/* EIP/ERC tag styling for dark mode */
-	--eip-bg: rgba(108, 36, 224, 0.12);
-	--eip-text: rgb(187, 147, 255);
-	--eip-border: rgba(108, 36, 224, 0.3);
+	/* Hashtag styling */
+	--hashtag-text: light-dark(#1976d2, #90caf9);
+	--hashtag-bg: light-dark(rgba(25, 118, 210, 0.08), rgba(144, 202, 249, 0.08));
+	--hashtag-bg-hover: light-dark(rgba(25, 118, 210, 0.12), rgba(144, 202, 249, 0.12));
 
-	/* Rating colors - keep same as light mode since they represent statuses */
-	--rating-pass: #2ecc71; /* Green */
-	--rating-partial: #f1c40f; /* Yellow */
-	--rating-fail: #e74c3c; /* Red */
-	--rating-neutral: #bdc3c7; /* Gray */
-}
-
-html,
-body {
-	color: var(--text-primary) !important;
-	background-color: var(--background-secondary) !important;
-	background: var(--background-secondary) !important;
-	font-size: 16px !important;
-}
-
-/* Force SVG icons to use the appropriate color based on theme */
-.MuiSvgIcon-root {
-	color: var(--icon-color) !important;
-}
-
-/* When icons are selected, use the accent color */
-.variant-filter-icon[data-selected='true'],
-.MuiSvgIcon-root[data-selected='true'] {
-	color: var(--accent) !important;
-}
-
-/* Styling for EIP/ERC tags */
-.eip-tag {
-	background-color: var(--eip-bg);
-	color: var(--eip-text) !important;
-	padding: 0.3rem 0.6rem;
-	border-radius: 9999px;
-	font-weight: 500;
-	border: 1px solid var(--eip-border);
-	display: inline-block;
-	margin: 0 0.2rem;
-}
-
-.card {
-	background-color: var(--background-primary);
-	border-radius: 8px;
-	border: 1px solid var(--border);
-}
-
-.card:not(.no-padding) {
-	padding: 16px;
+	/* Rating colors */
+	--rating-pass: #2ecc71;
+	--rating-partial: #f1c40f;
+	--rating-fail: #e74c3c;
+	--rating-neutral: #bdc3c7;
 }
 
 .text-accent {
 	color: var(--accent);
-}
-
-.btn {
-	border: 1px solid var(--border);
-	padding: 0.5rem;
-	border-radius: 0.375rem;
-	cursor: pointer;
-}
-
-.link {
-	color: var(--accent);
-}
-
-.link:hover {
-	text-decoration: underline;
 }
 
 html.dark {
@@ -166,64 +70,106 @@ html.dark {
 }
 
 :root {
-	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
-
-	--active-transitionInDuration: 0.125s;
-	--active-transitionOutDuration: 0.2s;
-	--active-scale: 0.99;
-	--active-opacity: 0.8;
-
 	scroll-behavior: smooth;
 
-	transition-duration: 0.2s;
-	transition-timing-function: var(--transition-easeOutExpo);
-
-
 	font-family: 'Montserrat', 'Noto Color Emoji';
+	font-size: 16px;
+
+	color-scheme: light dark;
+	color: var(--text-primary);
+	background-color: var(--background-secondary);
+	outline-color: var(--accent);
+
+	transition-property: background-color, color;
+}
+
+:root,
+::before,
+::after {
+	transition-duration: 0.25s;
+	transition-timing-function: var(--transition-easeOutExpo);
+}
+::details-content {
+	transition-duration: 0.25s;
+	transition-timing-function: var(--transition-easeOutExpo);
+	transition-behavior: allow-discrete;
 }
 
 * {
-	margin: 0;
-	text-box-trim: trim-both;
 	transition-duration: inherit;
 	transition-timing-function: inherit;
+}
+
+*,
+::before,
+::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	text-box-trim: trim-both;
 	transition-behavior: allow-discrete;
+	interpolate-size: allow-keywords;
 
 	scroll-behavior: smooth;
+}
+
+[popover] {
+	all: unset;
 }
 
 [hidden] {
 	display: none !important;
 }
 
-details {
-	--details-transition-duration: 0.3s;
-	--details-transform-closed: translateY(-6px);
+a {
+	color: var(--accent);
+	text-decoration: none;
 
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+hr {
+	margin-inline: 10%;
+	border: none;
+	border-top: var(--separator-width) solid var(--border-color);
+}
+
+strong {
+	font-weight: 600;
+}
+
+details {
 	&::details-content {
-		transition: 
-			content-visibility var(--details-transition-duration) ease allow-discrete,
-			opacity var(--details-transition-duration) ease,
-			transform var(--details-transition-duration) ease,
-			height var(--details-transition-duration) ease allow-keywords;
+		transition-property:
+			content-visibility,
+			height,
+			opacity,
+			filter,
+			transform
+		;
+
+		display: grid;
+		content-visibility: visible;
+		height: auto;
+		transform: perspective(100px);
+		transform-origin: center top;
+
+		/* @starting-style {
+			height: 0;
+			opacity: 0;
+			filter: blur(4px);
+			transform: perspective(1000px) rotateX(-1deg);
+		} */
 	}
 
 	&:not([open])::details-content {
 		content-visibility: hidden;
-		opacity: 0;
-		transform: var(--details-transform-closed);
 		height: 0;
-	}
-
-	&[open]::details-content {
-		content-visibility: visible;
-		opacity: 1;
-		transform: translateY(0);
-		height: auto;
-
-		@starting-style {
-			height: 0;
-		}
+		opacity: 0;
+		filter: blur(4px);
+		transform: perspective(1000px) rotateX(-1deg);
 	}
 
 	> summary {
@@ -243,17 +189,26 @@ details {
 			width: 0.75em;
 			height: 0.75em;
 			background-color: currentColor;
-			mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
+			mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E") no-repeat;
 			opacity: 0.66;
 
-			transform: perspective(100px);
-			transition: transform var(--details-transition-duration) ease;
+			transform: perspective(100px) rotateX(0deg);
+			transition-property: transform;
 		}
 	}
 
 	&[open] > summary::after {
 		transform: perspective(100px) rotateX(180deg);
 	}
+}
+
+button {
+	cursor: pointer;
+
+	background-color: var(--background-primary);
+	border: 1px solid var(--border-color);
+	border-radius: 0.5em;
+	padding: 0.5em;
 }
 
 .stack {
@@ -294,23 +249,202 @@ code {
 	font-family: monospace, monospace;
 }
 
-[cmdk-list] {
-	@apply pb-2 pt-3;
+span svg {
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	width: 1.15em;
+	height: 1.15em;
+	vertical-align: -0.2em;
+
+	&[fill="none"] {
+		stroke: currentColor;
+	}
+
+	&:not([fill="none"]) {
+		fill: currentColor;
+	}
 }
 
-[cmdk-group-heading] {
-	@apply px-2;
+.card {
+	background-color: var(--background-primary);
+	border-radius: 8px;
+	border: 1px solid var(--border);
+	padding: 16px;
 }
 
-[cmdk-list-sizer] {
-	@apply space-y-2;
+.tag {
+	--tag-backgroundColor: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
+	--tag-color: light-dark(var(--accent), rgb(187, 147, 255));
+	--tag-borderColor: light-dark(rgba(108, 36, 224, 0.2), rgba(108, 36, 224, 0.3));
+
+	background-color: var(--tag-backgroundColor);
+	color: var(--tag-color);
+	padding: 0.3rem 0.6rem;
+	border-radius: 9999px;
+	font-weight: 500;
+	border: 1px solid var(--tag-borderColor);
+	display: inline-block;
+	margin: 0 0.2rem;
 }
 
-[data-radix-popper-content-wrapper] {
-	z-index: 100 !important;
+[data-sticky-container] {
+	/* Inputs */
+	--sticky-marginBlockStart: 0px;
+	--sticky-marginBlockEnd: 0px;
+	--sticky-marginInlineStart: 0px;
+	--sticky-marginInlineEnd: 0px;
+	--sticky-paddingBlockStart: 0px;
+	--sticky-paddingBlockEnd: 0px;
+	--sticky-paddingInlineStart: 0px;
+	--sticky-paddingInlineEnd: 0px;
+
+	/* Rules */
+	isolation: isolate;
 }
 
-/* This will apply in light mode (when html does NOT have .dark) */
-html:not(.dark) .MuiSvgIcon-root[data-testid='ExpandMoreIcon'] {
-	color: #fff !important;
+[data-scroll-container] {
+	/* Rules */
+	container-type: scroll-state;
+	overflow: auto;
+
+	/* Derived */
+	--sticky-level: 0;
+
+	--sticky0-insetBlockStart: var(--sticky-marginBlockStart);
+	--sticky0-insetBlockEnd: var(--sticky-marginBlockEnd);
+	--sticky0-insetInlineStart: var(--sticky-marginInlineStart);
+	--sticky0-insetInlineEnd: var(--sticky-marginInlineEnd);
+
+	--sticky0-paddingBlockStart: var(--sticky-paddingBlockStart);
+	--sticky0-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+	--sticky0-paddingInlineStart: var(--sticky-paddingInlineStart);
+	--sticky0-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+
+	--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
+	--sticky-insetBlockEnd: var(--sticky0-insetBlockEnd);
+	--sticky-insetInlineStart: var(--sticky0-insetInlineStart);
+	--sticky-insetInlineEnd: var(--sticky0-insetInlineEnd);
+
+	:is(
+		& > *,
+		& > :not([data-sticky-container]):not([data-scroll-container]) > *,
+		& > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > *,
+		& > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > *
+	)[data-sticky-container]:not([data-scroll-container]) {
+		--sticky-level: 1;
+
+		--sticky1-insetBlockStart: calc(var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) + var(--sticky-marginBlockStart));
+		--sticky1-insetBlockEnd: calc(var(--sticky0-insetBlockEnd) + var(--sticky0-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+		--sticky1-insetInlineStart: calc(var(--sticky0-insetInlineStart) + var(--sticky0-paddingInlineStart) + var(--sticky-marginInlineStart));
+		--sticky1-insetInlineEnd: calc(var(--sticky0-insetInlineEnd) + var(--sticky0-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+	
+		--sticky1-paddingBlockStart: var(--sticky-paddingBlockStart);
+		--sticky1-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+		--sticky1-paddingInlineStart: var(--sticky-paddingInlineStart);
+		--sticky1-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+	
+		--sticky-insetBlockStart: var(--sticky1-insetBlockStart);
+		--sticky-insetBlockEnd: var(--sticky1-insetBlockEnd);
+		--sticky-insetInlineStart: var(--sticky1-insetInlineStart);
+		--sticky-insetInlineEnd: var(--sticky1-insetInlineEnd);
+
+		:is(
+			& > *,
+			& > :not([data-sticky-container]):not([data-scroll-container]) > *,
+			& > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > *,
+			& > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > *
+		)[data-sticky-container]:not([data-scroll-container]) {
+			--sticky-level: 2;
+	
+			--sticky2-insetBlockStart: calc(var(--sticky1-insetBlockStart) + var(--sticky1-paddingBlockStart) + var(--sticky-marginBlockStart));
+			--sticky2-insetBlockEnd: calc(var(--sticky1-insetBlockEnd) + var(--sticky1-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+			--sticky2-insetInlineStart: calc(var(--sticky1-insetInlineStart) + var(--sticky1-paddingInlineStart) + var(--sticky-marginInlineStart));
+			--sticky2-insetInlineEnd: calc(var(--sticky1-insetInlineEnd) + var(--sticky1-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+		
+			--sticky2-paddingBlockStart: var(--sticky-paddingBlockStart);
+			--sticky2-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+			--sticky2-paddingInlineStart: var(--sticky-paddingInlineStart);
+			--sticky2-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+		
+			--sticky-insetBlockStart: var(--sticky2-insetBlockStart);
+			--sticky-insetBlockEnd: var(--sticky2-insetBlockEnd);
+			--sticky-insetInlineStart: var(--sticky2-insetInlineStart);
+			--sticky-insetInlineEnd: var(--sticky2-insetInlineEnd);
+
+			:is(
+				& > *,
+				& > :not([data-sticky-container]):not([data-scroll-container]) > *,
+				& > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > *,
+				& > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > *
+			)[data-sticky-container]:not([data-scroll-container]) {
+				--sticky-level: 3;
+		
+				--sticky3-insetBlockStart: calc(var(--sticky2-insetBlockStart) + var(--sticky2-paddingBlockStart) + var(--sticky-marginBlockStart));
+				--sticky3-insetBlockEnd: calc(var(--sticky2-insetBlockEnd) + var(--sticky2-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+				--sticky3-insetInlineStart: calc(var(--sticky2-insetInlineStart) + var(--sticky2-paddingInlineStart) + var(--sticky-marginInlineStart));
+				--sticky3-insetInlineEnd: calc(var(--sticky2-insetInlineEnd) + var(--sticky2-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+			
+				--sticky3-paddingBlockStart: var(--sticky-paddingBlockStart);
+				--sticky3-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+				--sticky3-paddingInlineStart: var(--sticky-paddingInlineStart);
+				--sticky3-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+			
+				--sticky-insetBlockStart: var(--sticky3-insetBlockStart);
+				--sticky-insetBlockEnd: var(--sticky3-insetBlockEnd);
+				--sticky-insetInlineStart: var(--sticky3-insetInlineStart);
+				--sticky-insetInlineEnd: var(--sticky3-insetInlineEnd);
+
+				:is(
+					& > *,
+					& > :not([data-sticky-container]):not([data-scroll-container]) > *,
+					& > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > *,
+					& > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > :not([data-sticky-container]):not([data-scroll-container]) > *
+				)[data-sticky-container]:not([data-scroll-container]) {
+					--sticky-level: 4;
+
+					--sticky4-insetBlockStart: calc(var(--sticky3-insetBlockStart) + var(--sticky3-paddingBlockStart) + var(--sticky-marginBlockStart));
+					--sticky4-insetBlockEnd: calc(var(--sticky3-insetBlockEnd) + var(--sticky3-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+					--sticky4-insetInlineStart: calc(var(--sticky3-insetInlineStart) + var(--sticky3-paddingInlineStart) + var(--sticky-marginInlineStart));
+					--sticky4-insetInlineEnd: calc(var(--sticky3-insetInlineEnd) + var(--sticky3-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+
+					--sticky4-paddingBlockStart: var(--sticky-paddingBlockStart);
+					--sticky4-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+					--sticky4-paddingInlineStart: var(--sticky-paddingInlineStart);
+					--sticky4-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+				
+					--sticky-insetBlockStart: var(--sticky4-insetBlockStart);
+					--sticky-insetBlockEnd: var(--sticky4-insetBlockEnd);
+					--sticky-insetInlineStart: var(--sticky4-insetInlineStart);
+					--sticky-insetInlineEnd: var(--sticky4-insetInlineEnd);
+				}
+			}
+		}
+	}
+}
+
+[data-sticky] {
+	/* Inputs */
+	--sticky-backgroundColor: light-dark(#efefefcc, #141414cc);
+	--sticky-backdropFilter: blur(8px);
+	--sticky-backdropMaskImage: none;
+
+	/* Rules */
+	z-index: 1;
+
+	position: sticky;
+
+	&[data-sticky=""],
+	&[data-sticky="block"] {
+		inset-block-start: var(--sticky-insetBlockStart);
+		inset-block-end: var(--sticky-insetBlockEnd);
+	}
+	&[data-sticky=""],
+	&[data-sticky="inline"] {
+		inset-inline-start: var(--sticky-insetInlineStart);
+		inset-inline-end: var(--sticky-insetInlineEnd);
+	}
+
+	background-color: var(--sticky-backgroundColor);
+	backdrop-filter: var(--sticky-backdropFilter);
 }

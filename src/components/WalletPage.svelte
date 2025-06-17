@@ -35,7 +35,6 @@
 
 
 	// Components
-	import { onMount } from 'svelte'
 	import Typography from '@/ui/atoms/Typography.svelte'
 	import Pie from '@/ui/atoms/Pie.svelte'
 	import RenderCustomContent from '@/ui/atoms/RenderCustomContent.svelte'
@@ -67,7 +66,7 @@
 	)
 
 
-	onMount(() => {
+	$effect(() => {
 		pickedVariant = singleVariant !== null ? singleVariant : wallet ? variantFromUrlQuery(wallet.variants) : null
 	})
 
@@ -846,14 +845,6 @@
 		width: var(--wallet-icon-size);
 		height: var(--wallet-icon-size);
 		filter: drop-shadow(0 0 0.5rem rgba(255, 255, 255, 0.1));
-	}
-
-	hr {
-		width: 80%;
-		height: 1px;
-		border: 0;
-		border-bottom: 1px solid #313131;
-		margin-inline: auto;
 	}
 
 	.wallet-overview {
