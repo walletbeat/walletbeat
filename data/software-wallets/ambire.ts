@@ -171,6 +171,7 @@ export const ambire: SoftwareWallet = {
         medium: 'CHAIN_CLIENT',
       }),
     },
+    chainAbstraction: null,
     chainConfigurability: {
       customChains: true,
       l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
@@ -215,7 +216,6 @@ export const ambire: SoftwareWallet = {
         ventureCapital: true,
       },
     },
-
     multiAddress: featureSupported,
     privacy: {
       dataCollection: {

@@ -48,6 +48,7 @@ export const frame: SoftwareWallet = {
       nonChainSpecificEnsResolution: null,
       ref: null,
     },
+    chainAbstraction: null,
     chainConfigurability: {
       customChains: true,
       l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,

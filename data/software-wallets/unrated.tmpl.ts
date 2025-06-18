@@ -31,6 +31,7 @@ export const unratedTemplate: SoftwareWallet = {
       nonChainSpecificEnsResolution: null,
       ref: null,
     },
+    chainAbstraction: null,
     chainConfigurability: null,
     integration: {
       browser: {
