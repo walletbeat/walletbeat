@@ -67,6 +67,7 @@
 
 	// Transitions/animations
 	import { flip } from 'svelte/animate'
+	import { fade } from 'svelte/transition'
 	import { expoOut } from 'svelte/easing'
 </script>
 
@@ -78,22 +79,42 @@
 	<table>
 		<thead>
 			<tr>
-				{#each table.columns as column (column.id)}
+				{#each columns as column, index (column.id)}
+					{@const isSortable = column.isSortable !== false}
+
 					<th
-						data-column-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
-						data-column-is-sticky={column.isSticky ? '' : undefined}
-						tabIndex={0}
-						role="button"
-						onclick={() => {
-							table.toggleColumnSort(column.id)
-						}}
+						data-sortable={isSortable ? '' : undefined}
+						data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
+						data-is-sticky={column.isSticky ? '' : undefined}
 						animate:flip={{ duration: 300, easing: expoOut }}
 					>
-						{#if headerCellSnippet}
-							{@render headerCellSnippet({ column })}
-						{:else}
-							{column.name}
-						{/if}
+						<div class="header-cell-content">
+							{#if isSortable}
+								<label class="sort-label">
+									{#if headerCellSnippet}
+										{@render headerCellSnippet({ column })}
+									{:else}
+										<span>{column.name}</span>
+									{/if}
+
+									<button
+										type="button"
+										aria-label={`Sort by ${column.name}`}
+										class="sort-button"
+										onclick={() => {
+											table.toggleColumnSort(column.id)
+										}}
+										disabled={column.isSortable === false}
+									></button>
+								</label>
+							{:else}
+								{#if headerCellSnippet}
+									{@render headerCellSnippet({ column })}
+								{:else}
+									<span>{column.name}</span>
+								{/if}
+							{/if}
+						</div>
 					</th>
 				{/each}
 			</tr>
@@ -135,12 +156,15 @@
 					data-disabled={isRowDisabled?.(row, table) ? '' : undefined}
 				>
 					{#each table.columnsVisible as column (column.id)}
+						{@const isSortable = column.isSortable !== false}
 						{@const value = column.getValue?.(row)}
 
 						<td
-							data-column-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
-							data-column-is-sticky={column.isSticky ? '' : undefined}
-							animate:flip={{ duration: 300, easing: expoOut }}
+							data-sortable={isSortable ? '' : undefined}
+							data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
+							data-is-sticky={column.isSticky ? '' : undefined}
+							animate:flip={{ duration: 250, easing: expoOut }}
+							in:fade={{ duration: 250, easing: expoOut }}
 						>
 							{#if cellSnippet}
 								{@render cellSnippet({
@@ -197,47 +221,70 @@
 			font-size: 0.75em;
 			text-wrap: nowrap;
 
-			background-color: var(--table-backgroundColor);
-			box-shadow: 0 0 0 var(--table-borderWidth) var(--table-innerBorderColor);
 			position: sticky;
 			top: 0;
 			z-index: 1;
 
 			tr {
 				th {
-					/* color: color-mix(in oklch, currentColor 50%, transparent); */
+					> .header-cell-content {
+						display: grid;
+						grid-auto-flow: column;
+						grid-template-columns: 1fr;
+						grid-auto-columns: auto;
+						align-items: center;
+						gap: 0.25em;
+					}
 
-					&[data-column-sort] {
-						cursor: pointer;
+					&[data-sortable] {
+						--column-sortIndicator-transform: perspective(1000px) scale(0);
+						--column-sortIndicator-fontSize: 0;
 
-						&[data-column-sort='none'] {
-							--column-sortIndicator-transform: perspective(1000px) scale(0);
-							--column-sortIndicator-fontSize: 0;
-						}
-
-						&[data-column-sort='asc'] {
+						&[data-sort='asc'] {
 							--column-sortIndicator-transform: perspective(1000px);
 							--column-sortIndicator-fontSize: 1em;
 						}
 
-						&[data-column-sort='desc'] {
+						&[data-sort='desc'] {
 							--column-sortIndicator-transform: perspective(1000px) rotateX(180deg);
 							--column-sortIndicator-fontSize: 1em;
 						}
 
-						&:after {
-							content: '↑';
+						.sort-label {
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							cursor: pointer;
 
-							display: inline-block;
+							.sort-button {
+								margin-inline-start: 0.5em;
+								display: inline-block;
+								padding: 0;
 
-							font-size: var(--column-sortIndicator-fontSize);
-							margin-inline-start: 0.5em;
+								background-color: transparent;
+								border: none;
+								outline: none;
 
-							transform: var(--column-sortIndicator-transform);
+								&::after {
+									content: '↑';
 
-							transition-property: transform, font-size;
-							transition-duration: 0.2s;
-							transition-timing-function: ease-out;
+									display: inline-block;
+
+									font-size: var(--column-sortIndicator-fontSize);
+									font-family: system-ui;
+
+									transform: var(--column-sortIndicator-transform);
+
+									transition-property: transform, font-size;
+									transition-duration: 0.2s;
+									transition-timing-function: ease-out;
+								}
+							}
+						}
+
+						&:has(.sort-button:focus) {
+							outline: 1px solid var(--accent);
+							border-radius: 0.5em;
 						}
 					}
 				}
@@ -321,8 +368,8 @@
 				transform-origin: right;
 			}
 
-			&[data-column-is-sticky],
-			&[data-column-sort]:not([data-column-is-sticky]) {
+			&[data-is-sticky],
+			&[data-sort]:not([data-is-sticky]) {
 				position: sticky;
 				backdrop-filter: blur(20px);
 				z-index: 1;
