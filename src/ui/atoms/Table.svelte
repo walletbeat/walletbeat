@@ -197,13 +197,13 @@
 			font-size: 0.75em;
 			text-wrap: nowrap;
 
-			tr {
-				background-color: var(--table-backgroundColor);
-				box-shadow: 0 0 0 var(--table-borderWidth) var(--table-innerBorderColor);
-				position: sticky;
-				top: 0;
-				z-index: 1;
+			background-color: var(--table-backgroundColor);
+			box-shadow: 0 0 0 var(--table-borderWidth) var(--table-innerBorderColor);
+			position: sticky;
+			top: 0;
+			z-index: 1;
 
+			tr {
 				th {
 					/* color: color-mix(in oklch, currentColor 50%, transparent); */
 
