@@ -56,7 +56,7 @@ export class DataTable<
 	)
 
 	pageSize: number = $state(
-		10
+		Infinity
 	)
 	currentPage = $state(
 		1
@@ -131,8 +131,8 @@ export class DataTable<
 	rowsVisible = $derived(
 		this.rowsSorted
 			.slice(
-				(this.currentPage - 1) * this.pageSize,
-				(this.currentPage - 1) * this.pageSize + this.pageSize
+				((this.currentPage - 1) * this.pageSize || 0),
+				((this.currentPage - 1) * this.pageSize || 0) + this.pageSize
 			)
 	)
 
@@ -172,7 +172,7 @@ export class DataTable<
 	}) {
 		this.rows = [...data]
 		this.columns = columns
-		this.pageSize = pageSize || 10
+		this.pageSize = pageSize || Infinity
 		this.#defaultColumnSort = defaultSort
 		this.#isRowDisabled = isRowDisabled
 		this.#displaceDisabledRows = displaceDisabledRows ?? false
