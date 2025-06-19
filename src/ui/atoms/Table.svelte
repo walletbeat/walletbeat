@@ -20,7 +20,7 @@
 		getId,
 		isRowDisabled,
 		cellSnippet,
-		columnCellSnippet,
+		headerCellSnippet,
 		onRowClick,
 		displaceDisabledRows = false,
 		...restProps
@@ -35,7 +35,7 @@
 			column: _Column
 			value: _CellValue
 		}]>
-		columnCellSnippet?: Snippet<[{
+		headerCellSnippet?: Snippet<[{
 			column: _Column
 		}]>
 		onRowClick?: (row: _RowValue, rowId?: RowId) => void
@@ -89,8 +89,8 @@
 						}}
 						animate:flip={{ duration: 300, easing: expoOut }}
 					>
-						{#if columnCellSnippet}
-							{@render columnCellSnippet({ column })}
+						{#if headerCellSnippet}
+							{@render headerCellSnippet({ column })}
 						{:else}
 							{column.name}
 						{/if}
