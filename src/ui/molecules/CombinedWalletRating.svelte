@@ -195,14 +195,14 @@
 >
 	<Pie
 		slices={slices}
-		layout={PieLayout.Full}
-		padding={2}
-		radius={75}
+		layout={PieLayout.FullTop}
+		padding={8}
+		radius={80}
 		levels={[
 			{
 				outerRadiusFraction: 0.7,
 				innerRadiusFraction: 0.3,
-				gap: 8,
+				gap: 4,
 				angleGap: 0
 			},
 			{
