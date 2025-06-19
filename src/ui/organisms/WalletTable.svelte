@@ -20,6 +20,29 @@
 		attributeGroups: AttributeGroup<any>[]
 	} = $props()
 
+	// (Derived)
+	const displayedAttributeGroups = $derived(
+		wallets.find(w => w.variants.browser || w.variants.desktop || w.variants.mobile) ?
+			// Filter attribute groups to only include non-exempt attributes
+			attributeGroups
+				.map(attrGroup => ({
+					...attrGroup,
+					attributes: (
+						Object.fromEntries(
+							Object.entries(attrGroup.attributes).filter(([attrId, _]) => 
+								wallets.find(w => w.variants.browser || w.variants.desktop || w.variants.mobile)
+									?.overall[attrGroup.id]?.[attrId]?.evaluation?.value?.rating !== Rating.EXEMPT
+							)
+						)
+					)
+				}))
+				.filter(attrGroup => (
+					Object.keys(attrGroup.attributes).length > 0
+				))
+		:
+			attributeGroups
+	)
+
 
 	// State
 	import { WalletTableState } from '../WalletTableState.svelte'
@@ -215,7 +238,7 @@
 				defaultSortDirection: 'desc',
 				defaultIsExpanded: true,
 				children: (
-					attributeGroups
+					displayedAttributeGroups
 						.map(attrGroup => ({
 							id: attrGroup.id,
 							// name: `${attrGroup.icon} ${attrGroup.displayName}`,
@@ -384,7 +407,7 @@
 
 		<!-- Attribute group rating -->
 		{:else if !column.id.includes('.')}
-			{@const attrGroup = attributeGroups.find(attributeGroup => attributeGroup.id === column.id)!}
+			{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === column.id)!}
 			{@const evalGroup = wallet.overall[attrGroup.id]}
 			{@const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
 
@@ -404,7 +427,7 @@
 		<!-- Attribute rating -->
 		{:else}
 			{@const [groupId, attrId] = column.id.split('.')}
-			{@const attrGroup = attributeGroups.find(attrGroup => attrGroup.id === groupId)!}
+			{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === groupId)!}
 			{@const attribute = attrGroup.attributes[attrId]}
 			{@const evalAttr = wallet.overall[groupId][attrId]}
 
