@@ -107,7 +107,7 @@ export const ledgerWallet: HardwareWallet = {
           details:
             'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
           messageExtraction: {
-            [DataExtraction.EYES]: false,
+            [DataExtraction.EYES]: true,
             [DataExtraction.HASHES]: true, // Fantastic
             [DataExtraction.QRCODE]: false,
           },

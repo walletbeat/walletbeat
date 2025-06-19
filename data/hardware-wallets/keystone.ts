@@ -95,7 +95,7 @@ export const keystoneWallet: HardwareWallet = {
           details:
             'Keystone provides full message signing support for many transactions, however, it is buggy on many transactions like with a Safe{Wallet}, making it unreliable in some cases. In some cases, it shows no data. This is mitigated by the fact that the wallet supports QR code transaction extraction.',
           messageExtraction: {
-            [DataExtraction.EYES]: false,
+            [DataExtraction.EYES]: true,
             [DataExtraction.HASHES]: false,
             [DataExtraction.QRCODE]: true,
           },
