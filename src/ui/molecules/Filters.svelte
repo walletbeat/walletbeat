@@ -89,7 +89,9 @@
 						.filter(filter => filterItems(new Set([filter])).length > 0)
 				)
 			}))
-			.filter(({ visibleFilters }) => visibleFilters.length > 1)
+			.filter(({ group, visibleFilters }) => (
+				visibleFilters.filter(filter => filter.id).length > 1
+			))
 	) as { group, visibleFilters } (group.id)}
 		{@const filters = new Set(visibleFilters)}
 		{@const filterById = new Map(visibleFilters.map(f => [f.id, f]))}
