@@ -212,19 +212,33 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 
 	font: inherit;
 	font-size: smaller;
+	line-height: 1;
 
 	display: flex;
 	align-items: center;
-	padding: 0.6em 0.85em;
+	padding: 0.66em;
 	gap: 0.5em;
 
 	background-color: var(--background-primary);
 	border: 1px solid var(--border-color);
 	border-radius: 0.5em;
+
+	text-box: trim-both cap alphabetic;
+
+	transition-property: opacity;
+
+	&:active {
+		opacity: 0.8;
+	}
+
+	:disabled {
+		cursor: not-allowed;
+		opacity: 0.6;
+	}
 }
 option,
 label:has(> input:is([type="checkbox"], [type="radio"])) {
-	padding: 0.75em 1em;
+	padding: 0.6em 0.8em;
 }
 
 .stack {
