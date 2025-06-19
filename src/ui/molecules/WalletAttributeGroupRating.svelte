@@ -80,6 +80,17 @@
 		)}
 
 		<Pie
+			layout={PieLayout.FullTop}
+			radius={44}
+			levels={[
+				{
+					outerRadiusFraction: 1,
+					innerRadiusFraction: 0.3,
+					gap: 2,
+					angleGap: 0
+				}
+			]}
+			padding={4}
 			slices={	
 				!isNonEmptyArray(evalEntries) ?
 					[]
