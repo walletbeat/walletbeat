@@ -369,7 +369,7 @@
 													AccountType.eoa in accountTypes && {
 														label: 'EOA',
 														filterId: 'accountType-eoa',
-														type: 'eip',
+														type: 'account-type',
 													},
 													AccountType.rawErc4337 in accountTypes && {
 														label: `#${erc4337.number}`,
@@ -386,7 +386,7 @@
 													AccountType.mpc in accountTypes && {
 														label: 'MPC',
 														filterId: 'accountType-mpc',
-														type: 'eip',
+														type: 'account-type',
 													},
 												]
 											:
@@ -653,30 +653,39 @@
 
 			.tag {
 				&[data-tag-type='wallet-type'] {
-					--tag-backgroundColor: light-dark(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.12));
-					--tag-textColor: light-dark(rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0.9));
-					--tag-borderColor: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.2));
-					--tag-hover-backgroundColor: light-dark(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.2));
-					--tag-hover-textColor: light-dark(rgba(0, 0, 0, 0.9), rgba(255, 255, 255, 1));
-					--tag-hover-borderColor: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.3));
+					--tag-backgroundColor: light-dark(oklch(0.95 0.00 0), oklch(0.25 0.00 0));
+					--tag-textColor: light-dark(oklch(0.65 0.00 0), oklch(0.80 0.00 0));
+					--tag-borderColor: light-dark(oklch(0.90 0.00 0), oklch(0.40 0.00 0));
+					--tag-hover-backgroundColor: light-dark(oklch(0.92 0.00 0), oklch(0.30 0.00 0));
+					--tag-hover-textColor: light-dark(oklch(0.60 0.00 0), oklch(0.85 0.00 0));
+					--tag-hover-borderColor: light-dark(oklch(0.85 0.00 0), oklch(0.50 0.00 0));
 				}
 
-				&[data-tag-type='manufacture-type'] {
-					--tag-backgroundColor: light-dark(rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.15));
-					--tag-textColor: light-dark(#7c3aed, #a855f7);
-					--tag-borderColor: light-dark(rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0.4));
-					--tag-hover-backgroundColor: light-dark(rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.25));
-					--tag-hover-textColor: light-dark(#6d28d9, #8b5cf6);
-					--tag-hover-borderColor: light-dark(rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.5));
+				&[data-tag-type='account-type'] {
+					--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
+					--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.70 0.25 145));
+					--tag-borderColor: light-dark(oklch(0.90 0.06 145), oklch(0.40 0.08 145));
+					--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
+					--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
+					--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
 				}
 
 				&[data-tag-type='eip'] {
-					--tag-backgroundColor: light-dark(rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.15));
-					--tag-textColor: light-dark(#16a34a, #22c55e);
-					--tag-borderColor: light-dark(rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.4));
-					--tag-hover-backgroundColor: light-dark(rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.25));
-					--tag-hover-textColor: light-dark(#15803d, #16a34a);
-					--tag-hover-borderColor: light-dark(rgba(34, 197, 94, 0.4), rgba(34, 197, 94, 0.5));
+					--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
+					--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.70 0.25 300));
+					--tag-borderColor: light-dark(oklch(0.90 0.06 300), oklch(0.40 0.08 300));
+					--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.30 0.07 300));
+					--tag-hover-textColor: light-dark(oklch(0.60 0.18 300), oklch(0.85 0.15 300));
+					--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.50 0.10 300));
+				}
+
+				&[data-tag-type='manufacture-type'] {
+					--tag-backgroundColor: light-dark(oklch(0.95 0.03 290), oklch(0.25 0.05 290));
+					--tag-textColor: light-dark(oklch(0.65 0.15 290), oklch(0.70 0.25 290));
+					--tag-borderColor: light-dark(oklch(0.90 0.06 290), oklch(0.40 0.08 290));
+					--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 290), oklch(0.30 0.07 290));
+					--tag-hover-textColor: light-dark(oklch(0.60 0.18 290), oklch(0.85 0.15 290));
+					--tag-hover-borderColor: light-dark(oklch(0.85 0.08 290), oklch(0.50 0.10 290));
 				}
 			}
 		}
