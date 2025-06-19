@@ -267,8 +267,8 @@
 		]
 	}
 	defaultSort={{
-		columnId: 'displayName',
-		direction: 'asc',
+		columnId: 'overall',
+		direction: 'desc',
 	}}
 >
 	{#snippet headerCellSnippet({ column })}
