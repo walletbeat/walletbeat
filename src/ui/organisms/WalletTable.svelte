@@ -1,9 +1,14 @@
 <script lang="ts">
 	// Types/constants
 	import type { Column } from '@/lib/DataTable.svelte'
+	import type { Filter } from '@/ui/molecules/Filters.svelte'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { type AttributeGroup, Rating } from '@/schema/attributes'
 	import { Variant } from '@/schema/variants'
+	import { variants } from '@/components/variants'
+	import { AccountType } from '@/schema/features/account-support'
+	import { erc4337 } from '@/data/eips/erc-4337'
+	import { eip7702 } from '@/data/eips/eip-7702'
 
 
 	// Props
@@ -21,19 +26,36 @@
 
 	let walletTableState = new WalletTableState()
 
+	let activeFilters = $state(
+		new Set<Filter<RatedWallet>>()
+	)
+
+	let filteredWallets = $state(
+		wallets
+	)
+
 
 	// Functions
-	import { variants, variantUrlQuery } from '@/components/variants'
-	import { isLabeledUrl } from '@/schema/url'
+	import { setContains } from '@/types/utils/non-empty'
+	import { variantUrlQuery } from '@/components/variants'
+	import { hasVariant } from '@/schema/variants'
+	import { walletSupportedAccountTypes } from '@/schema/wallet'
 	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
+	import { isLabeledUrl } from '@/schema/url'
 
 
 	// Components
 	import WalletAttributeGroupRating from '@/ui/molecules/WalletAttributeGroupRating.svelte'
 	import CombinedWalletRating from '@/ui/molecules/CombinedWalletRating.svelte'
+	import Filters from '@/ui/molecules/Filters.svelte'
 	import Pie, { PieLayout } from '@/ui/atoms/Pie.svelte'
 	import Table from '@/ui/atoms/Table.svelte'
 	import Typography from '@/ui/atoms/Typography.svelte'
+
+	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
+	import AppWindowIcon from 'lucide-static/icons/app-window.svg?raw'
+	import KeyIcon from 'lucide-static/icons/key.svg?raw'
+	import HardwareIcon from '@material-icons/svg/svg/hardware/baseline.svg?raw'
 
 	import UnfoldLessIcon from '@material-icons/svg/svg/unfold_less/baseline.svg?raw'
 	import UnfoldMoreIcon from '@material-icons/svg/svg/unfold_more/baseline.svg?raw'
@@ -43,13 +65,121 @@
 </script>
 
 
+<Filters 
+	items={wallets}
+	filterGroups={
+		[
+			{
+				id: 'walletType',
+				label: 'Type',
+				displayType: 'select',
+				exclusive: true,
+				defaultFilter: '',
+				filters: [
+					{
+						id: '',
+						label: 'All',
+					},
+					{
+						id: 'walletType-software',
+						label: 'Software',
+						icon: AppWindowIcon,
+						filterFunction: wallet => !hasVariant(wallet.variants, Variant.HARDWARE)
+					},
+					{
+						id: 'walletType-hardware',
+						label: 'Hardware',
+						icon: HardwareIcon,
+						filterFunction: wallet => hasVariant(wallet.variants, Variant.HARDWARE)
+					},
+					{
+						id: 'walletType-embedded',
+						label: 'Embedded',
+						icon: WalletIcon,
+						filterFunction: wallet => hasVariant(wallet.variants, Variant.EMBEDDED)
+					},
+				],
+			},
+			{
+				id: 'variant',
+				label: 'Variant',
+				// displayType: 'select',
+				// exclusive: true,
+				displayType: 'group',
+				exclusive: false,
+				filters: [
+					// {
+					// 	id: '',
+					// 	label: 'All',
+					// },
+					...(
+						(Object.entries(variants) as [Variant, { label: string, icon: string }][])
+							.map(([variant, { label, icon }]) => ({
+								id: `variant-${variant}`,
+								label,
+								icon,
+								filterFunction: (wallet: RatedWallet) => Boolean(wallet.variants[variant])
+							}))
+					),
+				],
+			},
+			{
+				id: 'accountType',
+				label: 'Account Type',
+				displayType: 'group',
+				exclusive: false,
+				filters: [
+					{
+						id: 'accountType-eoa',
+						label: 'EOA',
+						icon: KeyIcon,
+						filterFunction: wallet => {
+							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+							return accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eoa)
+						}
+					},
+					{
+						id: 'accountType-eip7702',
+						label: 'EIP-7702',
+						icon: KeyIcon,
+						filterFunction: wallet => {
+							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+							return accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eip7702)
+						}
+					},
+					{
+						id: 'accountType-erc4337',
+						label: 'ERC-4337',
+						icon: KeyIcon,
+						filterFunction: wallet => {
+							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+							return accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.rawErc4337)
+						}
+					},
+					{
+						id: 'accountType-mpc',
+						label: 'MPC',
+						icon: KeyIcon,
+						filterFunction: wallet => {
+							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+							return accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.mpc)
+						}
+					},
+				],
+			},
+		]
+	}
+	bind:activeFilters
+	bind:filteredItems={filteredWallets}
+/>
+
 <Table
 	rows={wallets}
 	getId={wallet => wallet.metadata.id}
 	isRowDisabled={(wallet, table) => (
 		Boolean(
-			(walletTableState.selectedVariant && !(walletTableState.selectedVariant in wallet.variants))
-			|| (table.columnSort?.direction && table.columns.find(column => column.id === table.columnSort!.columnId)?.getValue?.(wallet) === undefined)
+			(table.columnSort?.direction && table.columns.find(column => column.id === table.columnSort!.columnId)?.getValue?.(wallet) === undefined)
+			|| !filteredWallets.includes(wallet)
 		)
 	)}
 	onRowClick={(wallet, walletId) => {
