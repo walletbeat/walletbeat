@@ -10,11 +10,6 @@ export class WalletTableState {
 		'separated'
 	)
 
-	toggleDisplayMode() {
-		this.displayMode = this.displayMode === 'separated' ? 'combined' : 'separated'
-	}
-
-
 	selectedVariant: Variant | undefined = $state(undefined)
 
 	selectVariant(variant: Variant) {

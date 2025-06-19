@@ -1,9 +1,9 @@
 <script lang="ts">
 	// Types/constants
 	import type { Column } from '@/lib/DataTable.svelte'
-	import { Variant } from '@/schema/variants'
 	import type { RatedWallet } from '@/schema/wallet'
-	import type { AttributeGroup } from '@/schema/attributes'
+	import { type AttributeGroup, Rating } from '@/schema/attributes'
+	import { Variant } from '@/schema/variants'
 
 
 	// Props
@@ -31,42 +31,17 @@
 	// Components
 	import WalletAttributeGroupRating from '@/ui/molecules/WalletAttributeGroupRating.svelte'
 	import CombinedWalletRating from '@/ui/molecules/CombinedWalletRating.svelte'
+	import Pie, { PieLayout } from '@/ui/atoms/Pie.svelte'
 	import Table from '@/ui/atoms/Table.svelte'
 	import Typography from '@/ui/atoms/Typography.svelte'
 
 	import UnfoldLessIcon from '@material-icons/svg/svg/unfold_less/baseline.svg?raw'
 	import UnfoldMoreIcon from '@material-icons/svg/svg/unfold_more/baseline.svg?raw'
-	import DefaultViewIcon from '@material-icons/svg/svg/looks/baseline.svg?raw'
-	import CombinedViewIcon from '@material-icons/svg/svg/filter_vintage/baseline.svg?raw'
 
 	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 	import OpenInNewRoundedIcon from '@material-icons/svg/svg/open_in_new//baseline.svg?raw'
 </script>
 
-
-<div class="wallet-table-container">
-	<div class="table-controls">
-		<button
-			class="display-toggle"
-			onclick={() => {
-				walletTableState.toggleDisplayMode()
-			}}
-			title={
-				walletTableState.displayMode === 'separated' ?
-					'Switch to combined view'
-				:
-					'Switch to separated view'
-			}
-		>
-			{#if walletTableState.displayMode === 'separated'}
-				<span class="icon">{@html CombinedViewIcon}</span>
-				<span class="label">Combined View</span>
-			{:else}
-				<span class="icon">{@html DefaultViewIcon}</span>
-				<span class="label">Detailed View</span>
-			{/if}
-		</button>
-	</div>
 
 <Table
 	rows={wallets}
@@ -91,25 +66,50 @@
 				),
 				isSticky: true,
 			} satisfies Column<RatedWallet>,
-			...(
-				walletTableState.displayMode === 'combined' ?
-					[
-						{
-							id: 'combined',
-							name: 'Overall Rating',
-							getValue: wallet => wallet,
-						} satisfies Column<RatedWallet>,
-					]
-				:
-					attributeGroups.map(attrGroup => ({
-						id: attrGroup.id,
-						name: `${attrGroup.icon} ${attrGroup.displayName}`,
-						getValue: wallet => (
-							calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])?.score ?? undefined
-						),
-						defaultSortDirection: 'desc' as const,
-					} satisfies Column<RatedWallet>))
-			),
+			{
+				id: 'overall',
+				name: 'Rating',
+				getValue(wallet) {
+					// Calculate aggregate score across all attribute groups
+					const scores = (
+						this.children!
+							.map(column => column.getValue(wallet))
+							.filter(score => score !== undefined)
+					)
+
+					if (!scores.length) return undefined
+
+					return scores.reduce((sum, score) => sum + score, 0) / scores.length
+				},
+				defaultSortDirection: 'desc',
+				defaultIsExpanded: true,
+				children: (
+					attributeGroups
+						.map(attrGroup => ({
+							id: attrGroup.id,
+							// name: `${attrGroup.icon} ${attrGroup.displayName}`,
+							name: attrGroup.displayName,
+							getValue: wallet => (
+								calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])?.score ?? undefined
+							),
+							defaultSortDirection: 'desc',
+							defaultIsExpanded: false,
+							children: (
+								Object.entries(attrGroup.attributes)
+									.map(([attrId, attribute]) => ({
+										id: `${attrGroup.id}.${attrId}`,
+										// name: `${attribute.icon} ${attribute.displayName}`,
+										name: attribute.displayName,
+										getValue: wallet => {
+											const evalAttr = wallet.overall[attrGroup.id]?.[attrId]
+											return evalAttr?.evaluation?.value?.rating || undefined
+										},
+										defaultSortDirection: 'desc',
+									} satisfies Column<RatedWallet>))
+							),
+						} satisfies Column<RatedWallet>))
+				),
+			} satisfies Column<RatedWallet>,
 		]
 	}
 	defaultSort={{
@@ -117,6 +117,10 @@
 		direction: 'asc',
 	}}
 >
+	{#snippet headerCellSnippet({ column })}
+		<span class="header-title">{column.name}</span>
+	{/snippet}
+
 	{#snippet cellSnippet({
 		row: wallet,
 		column,
@@ -234,7 +238,8 @@
 				</div>
 			</div>
 
-		{:else if column.id === 'combined'}
+		<!-- Overall rating -->
+		{:else if column.id === 'overall'}
 			<CombinedWalletRating
 				{wallet}
 				{attributeGroups}
@@ -246,7 +251,8 @@
 				}}
 			/>
 
-		{:else}
+		<!-- Attribute group rating -->
+		{:else if !column.id.includes('.')}
 			{@const attrGroup = attributeGroups.find(attributeGroup => attributeGroup.id === column.id)!}
 			{@const evalGroup = wallet.overall[attrGroup.id]}
 			{@const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
@@ -263,51 +269,56 @@
 					walletTableState.toggleRowExpanded(id)
 				}}
 			/>
+
+		<!-- Attribute rating -->
+		{:else}
+			{@const [groupId, attrId] = column.id.split('.')}
+			{@const attrGroup = attributeGroups.find(attrGroup => attrGroup.id === groupId)!}
+			{@const attribute = attrGroup.attributes[attrId]}
+			{@const evalAttr = wallet.overall[groupId][attrId]}
+
+			<div class="wallet-attribute-rating">
+				<Pie
+					layout={PieLayout.HalfTop}
+					radius={24}
+					levels={
+						[
+							{
+								outerRadiusFraction: 1,
+								innerRadiusFraction: 0.3,
+								gap: 20,
+								angleGap: 0,
+							}
+						]
+					}
+					padding={4}
+					slices={
+						[
+							{
+								id: attrId,
+								color: evalAttr.evaluation.value.rating === Rating.PASS ? '#22c55e' : 
+									evalAttr.evaluation.value.rating === Rating.PARTIAL ? '#eab308' : 
+									evalAttr.evaluation.value.rating === Rating.FAIL ? '#ef4444' : '#6b7280',
+								weight: 1,
+								arcLabel: attribute.icon,
+								tooltip: `${attribute.icon} ${attribute.displayName}`,
+								tooltipValue: evalAttr.evaluation.value.rating,
+							}
+						]
+					}
+					centerLabel={evalAttr.evaluation.value.rating}
+				/>
+			</div>
 		{/if}
 	{/snippet}
 </Table>
-</div>
 
 
 <style>
-	.wallet-table-container {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.table-controls {
-		display: flex;
-		justify-content: flex-end;
-		margin-bottom: 1rem;
-	}
-
-	.display-toggle {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.5rem 1rem;
-		color: white;
-		border-radius: 4px;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		background: rgba(255, 255, 255, 0.05);
-		cursor: pointer;
-		transition: background 0.2s ease;
-
-		&:hover {
-			background: rgba(255, 255, 255, 0.1);
-		}
-
-		.icon {
-			display: flex;
-			align-items: center;
-
-			:global(svg) {
-				fill: currentColor;
-				width: 1.2rem;
-				height: 1.2rem;
-			}
-		}
+	.header-title {
+		white-space: wrap;
+		flex: 0 0 0;
+		min-width: fit-content;
 	}
 
 	.wallet-name-cell {
@@ -366,10 +377,6 @@
 						opacity: 0.5;
 					}
 				}
-
-				:global(svg) {
-					fill: currentColor;
-				}
 			}
 		}
 
@@ -391,9 +398,7 @@
 		}
 	}
 
-	.icon {
-		display: inline-flex;
-		vertical-align: middle;
-		fill: currentColor;
+	.wallet-attribute-rating {
+		margin-inline: -1em;
 	}
 </style>
