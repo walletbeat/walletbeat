@@ -441,6 +441,10 @@
 					pointer-events: none;
 					translate: 0 calc(var(--slice-labelRadius) * -1px);
 					rotate: calc(var(--slice-midAngle) * -1deg);
+					transition-property: filter;
+				}
+				&:not(:hover, :focus) > .label {
+					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
 				}
 
 				> .slices {
