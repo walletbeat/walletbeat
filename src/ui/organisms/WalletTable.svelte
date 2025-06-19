@@ -57,6 +57,22 @@
 		wallets
 	)
 
+	// (Derived)
+	const selectedVariant = $derived.by(() => {
+		// Derive selected variant from active filters
+		const activeVariantFilters = Array.from(activeFilters).filter(filter => 
+			filter.id.startsWith('variant-') && filter.id !== 'variant-all'
+		)
+
+		// Only return a variant if exactly one variant filter is active
+		return (
+			activeVariantFilters.length === 1 ?
+				activeVariantFilters[0].id.replace('variant-', '') as Variant
+			:
+				undefined
+		)
+	})
+
 
 	// Functions
 	import { variantUrlQuery } from '@/components/variants'
@@ -290,7 +306,11 @@
 
 		{#if column.id === 'displayName'}
 			{@const displayName = value}
-			{@const accountTypes = walletSupportedAccountTypes(wallet, walletTableState.selectedVariant ?? 'ALL_VARIANTS')}
+			{@const accountTypes = walletSupportedAccountTypes(wallet, selectedVariant ?? 'ALL_VARIANTS')}
+			{@const supportedVariants = (
+				[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
+					.filter(variant => variant in wallet.variants)
+			)}
 
 			<div
 				class="wallet-name-cell column"
@@ -298,7 +318,7 @@
 			>
 				<div class="wallet-name-title row">
 					<div class="row">
-						<span class="icon">
+						<span>
 							{#if isExpanded}
 								{@html UnfoldLessIcon}
 							{:else}
@@ -316,9 +336,9 @@
 						<div class="column inline">
 							<span>{displayName}</span>
 
-							{#if walletTableState.selectedVariant && walletTableState.selectedVariant in wallet.variants}
+							{#if selectedVariant && selectedVariant in wallet.variants}
 								<small class="variant">
-									{variants[walletTableState.selectedVariant].label}
+									{variants[selectedVariant].label}
 								</small>
 							{/if}
 
@@ -391,35 +411,36 @@
 						</div>
 					</div>
 
-					<div class="variants row inline">
-						{#each (
-							(Object.entries(wallet.variants) as unknown as [Variant, boolean][])
-								.filter(([, hasVariant]) => hasVariant)
-								.map(([variant]) => variant)
-						) as variant}
-							<button
-								data-selected={variant === walletTableState.selectedVariant ? '' : undefined}
-								onclick={e => {
-									e.stopPropagation()
-									walletTableState.selectVariant(variant as Variant)
-								}}
-							>
-								<span
-									class="icon"
-									title={variant}
+					{#if supportedVariants.length}
+						<div class="variants row inline">
+							{#each supportedVariants as variant}
+								<button
+									data-selected={variant === selectedVariant ? '' : undefined}
+									aria-label={`Select ${variants[variant].label} variant`}
+									aria-pressed={variant === selectedVariant}
+									onclick={e => {
+										e.stopPropagation()
+										toggleFilterById!(`variant-${variant}`, true)
+									}}
 								>
-									{@html variants[variant].icon}
-								</span>
-							</button>
-						{/each}
-					</div>
+									<span
+										class="icon"
+										title={variants[variant].label}
+										aria-hidden="true"
+									>
+										{@html variants[variant].icon}
+									</span>
+								</button>
+							{/each}
+						</div>
+					{/if}
 				</div>
 
 				<div
 					class="expanded-content column"
 					hidden={!isExpanded}
 				>
-					{#if !walletTableState.selectedVariant || wallet.variants[walletTableState.selectedVariant]}
+					{#if !selectedVariant || wallet.variants[selectedVariant]}
 						<p class="blurb">
 							<Typography
 								content={wallet.metadata.blurb}
@@ -431,13 +452,13 @@
 						</p>
 					{:else}
 						<p class="blurb">
-							{wallet.metadata.displayName} does not have a {walletTableState.selectedVariant} version.
+							{wallet.metadata.displayName} does not have a {selectedVariant} version.
 						</p>
 					{/if}
 					
 					<div class="links">
 						<a
-							href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, walletTableState.selectedVariant ?? null)}`}
+							href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, selectedVariant ?? null)}`}
 							class="info-link"
 						>
 							<span class="icon">{@html InfoIcon}</span>
@@ -575,33 +596,33 @@
 				gap: 0.1em;
 
 				button {
-					all: unset;
-					cursor: pointer;
-
 					display: inline-flex;
 					place-items: center;
 					aspect-ratio: 1;
 					padding: 0.33em;
 					border-radius: 50%;
+					background-color: transparent;
 
 					transition-property: background-color, opacity;
-					transition-duration: inherit;
-					transition-timing-function: inherit;
 
 					&[data-selected] {
 						background-color: rgba(255, 255, 255, 0.1);
-						box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.33);
+						border: 1px solid rgba(255, 255, 255, 0.33);
 					}
 
 					&:focus {
 						background-color: rgba(255, 255, 255, 0.15);
 					}
 
-					&:hover {
+					&:hover:not(:disabled) {
 						background-color: rgba(255, 255, 255, 0.2);
 					}
 
-					.variants:has([data-selected]) &:not([data-selected]) {
+					&:disabled {
+						opacity: 0.4;
+					}
+
+					.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
 						opacity: 0.5;
 					}
 				}
