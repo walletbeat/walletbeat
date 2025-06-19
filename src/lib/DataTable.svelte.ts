@@ -186,7 +186,7 @@ export class DataTable<
 		this.rows = [...data]
 		this.columns = columns
 		this.pageSize = pageSize || Infinity
-		this.#defaultColumnSort = defaultSort
+		this.#defaultColumnSort = this.columnSort = defaultSort
 		this.#isRowDisabled = isRowDisabled
 		this.#displaceDisabledRows = displaceDisabledRows ?? false
 
