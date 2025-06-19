@@ -55,6 +55,7 @@
 	onRowClick={(wallet, walletId) => {
 		walletTableState.toggleRowExpanded(walletId)
 	}}
+	displaceDisabledRows={true}
 
 	columns={
 		[
