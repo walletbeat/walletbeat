@@ -38,7 +38,7 @@
 		columnCellSnippet?: Snippet<[{
 			column: _Column
 		}]>
-		onRowClick?: (row: _RowValue) => void
+		onRowClick?: (row: _RowValue, rowId?: RowId) => void
 		displaceDisabledRows?: boolean
 	} = $props()
 
@@ -101,16 +101,18 @@
 
 		<tbody>
 			{#each table.rowsVisible as row, index (getId?.(row, index))}
+				{@const rowId = getId?.(row, index)}
+
 				<tr
 					tabIndex={0}
 					onclick={e => {
 						e.stopPropagation()
-						onRowClick?.(row)
+						onRowClick?.(row, rowId)
 					}}
 					onkeypress={e => {
 						if(e.code === 'Enter' || e.code === 'Space'){
 							e.stopPropagation()
-							onRowClick?.(row)
+							onRowClick?.(row, rowId)
 						}
 					}}
 					onkeyup={e => {
