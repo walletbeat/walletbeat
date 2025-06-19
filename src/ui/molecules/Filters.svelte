@@ -37,12 +37,16 @@
 		filterGroups,
 		activeFilters = $bindable(new Set<Filter<Item>>()),
 		filteredItems = $bindable(items),
+		toggleFilter = $bindable(),
+		toggleFilterById = $bindable(),
 		...restProps
 	}: {
 		items: Item[]
 		filterGroups: FilterGroup<Item>[]
 		activeFilters?: Set<Filter<Item>>
-		filteredItems: Item[],
+		filteredItems: Item[]
+		toggleFilter?: typeof _toggleFilter
+		toggleFilterById?: typeof _toggleFilterById
 	} = $props()
 
 
@@ -58,6 +62,36 @@
 	$effect(() => {
 		filteredItems = filterItems(activeFilters)
 	})
+
+
+	// Actions
+	const _toggleFilter = (filter: Filter<Item>, exclusive = false) => {
+		if (!activeFilters.has(filter)) {
+			const filterGroup = (
+				filterGroups
+					.find(group => group.filters.includes(filter))
+			)
+
+			if (exclusive || filterGroup?.exclusive)
+				activeFilters = activeFilters.difference(new Set(filterGroup.filters))
+
+			activeFilters = activeFilters.union(new Set([filter]))
+		} else {
+			activeFilters = activeFilters.difference(new Set([filter]))
+		}
+	}
+	toggleFilter = _toggleFilter
+
+	const _toggleFilterById = (filterId: string, exclusive = false) => {
+		const filter = filterGroups
+			.flatMap(group => group.filters)
+			.find(filter => filter.id === filterId)
+		
+		if (!filter) return
+		
+		toggleFilter(filter, exclusive)
+	}
+	toggleFilterById = _toggleFilterById
 
 
 	// Components
