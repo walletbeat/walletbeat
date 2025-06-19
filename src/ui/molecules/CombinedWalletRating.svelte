@@ -184,7 +184,7 @@
 
 	// Components
 	import { type WalletTableState } from '../WalletTableState.svelte'
-	import Pie, { Layout as PieLayout } from '../atoms/Pie.svelte'
+	import Pie, { PieLayout } from '../atoms/Pie.svelte'
 </script>
 
 
@@ -242,7 +242,7 @@
 				<!-- Show attribute slices for this group -->
 				<div class="attribute-pie-container">
 					<Pie
-						layout="TopHalf"
+						layout={PieLayout.HalfTop}
 						radius={45}
 						slices={getAttributeSlices(highlightedGroup.id, highlightedGroup.evalGroup)}
 						levels={[

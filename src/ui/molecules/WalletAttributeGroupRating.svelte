@@ -51,7 +51,7 @@
 	let activeEvaluationAttribute: string | undefined = $state(undefined)
 
 	// Components
-	import Pie from '../atoms/Pie.svelte'
+	import Pie, { PieLayout } from '../atoms/Pie.svelte'
 	import Typography from '../atoms/Typography.svelte'
 	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 </script>

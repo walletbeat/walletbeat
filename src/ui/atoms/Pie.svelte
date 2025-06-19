@@ -11,9 +11,10 @@
 		children?: Slice[]
 	}
 
-	export const Layout = {
-		TopHalf: 'TopHalf',
-		Full: 'Full',
+	export const PieLayout = {
+		HalfTop: 'TopHalf',
+		FullLeft: 'FullLeft',
+		FullTop: 'FullTop',
 	}
 
 	export type LevelConfig = {
@@ -50,7 +51,7 @@
 		centerLabel,
 
 		// View options
-		layout = Layout.TopHalf,
+		layout = PieLayout.HalfTop,
 		padding = 0,
 		radius = 47,
 		levels = [
@@ -86,7 +87,7 @@
 		centerLabel?: string
 
 		// View options
-		layout?: (typeof Layout)[keyof typeof Layout]
+		layout?: (typeof PieLayout)[keyof typeof PieLayout]
 		radius?: number
 		padding?: number
 		levels?: LevelConfig[]
@@ -138,6 +139,7 @@
 		endAngle: number
 	}) => {
 		const angleDiff = Math.abs(endAngle - startAngle)
+		const orientation = Math.sign(endAngle - startAngle)
 		
 		// Handle full circles (or nearly full circles)
 		if (angleDiff >= 359.99) {
@@ -156,13 +158,14 @@
 		const innerStart = polarToCartesian(cx, cy, innerRadius, endAngle)
 		const innerEnd = polarToCartesian(cx, cy, innerRadius, startAngle)
 		const largeArcFlag = angleDiff > 180 ? 1 : 0
+		const sweepFlag = orientation === 1 ? 0 : 1
 
 		return (
 			[
 				`M ${start.x} ${start.y}`,
-				`A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`,
+				`A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`,
 				`L ${innerEnd.x} ${innerEnd.y}`,
-				`A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${innerStart.x} ${innerStart.y}`,
+				`A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} ${1 - sweepFlag} ${innerStart.x} ${innerStart.y}`,
 				`L ${start.x} ${start.y}`,
 			]
 				.join(' ')
@@ -243,12 +246,17 @@
 			{
 				slices,
 				...(
-					layout === Layout.Full ?
+					layout === PieLayout.FullLeft ?
 						{
 							startAngle: -90 + getLevelConfig(0).angleGap / 2,
 							endAngle: 270 - getLevelConfig(0).angleGap / 2,
 						}
-					:
+					: layout === PieLayout.FullTop ?
+						{
+							startAngle: 360 - getLevelConfig(0).angleGap / 2,
+							endAngle: 0 + getLevelConfig(0).angleGap / 2,
+						}
+					: // layout === PieLayout.HalfTop ?
 						{
 							startAngle: -90,
 							endAngle: 90,
@@ -264,7 +272,7 @@
 		const maxRadius = radius * maxRadiusMultiplier + maxGap
 
 		const width = padding * 2 + maxRadius * 2
-		const height = padding * 2 + maxRadius * (layout === Layout.TopHalf ? 1 : 2)
+		const height = padding * 2 + maxRadius * (layout === PieLayout.HalfTop ? 1 : 2)
 		const viewBoxX = -(padding + maxRadius)
 		const viewBoxY = -(padding + maxRadius)
 
@@ -336,7 +344,10 @@
 {/snippet}
 
 
-<div class="container" data-arc-type={layout}>
+<div
+	class="container"
+	data-layout={layout}
+>
 	<svg {...svgAttributes}>
 		<g class="slices">
 			{#each computedSlices as slice}
@@ -364,10 +375,11 @@
 		--hover-brightness: 1.1;
 		--hover-scale: 1.05;
 
-		&[data-arc-type="TopHalf"] {
+		&[data-layout="TopHalf"] {
 			--center-label-baseline: text-after-edge;
 		}
-		&[data-arc-type="Full"] {
+		&[data-layout="FullLeft"],
+		&[data-layout="FullTop"] {
 			--center-label-baseline: central;
 		}
 
