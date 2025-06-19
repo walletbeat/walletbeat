@@ -72,7 +72,7 @@
 					.find(group => group.filters.includes(filter))
 			)
 
-			if (exclusive || filterGroup?.exclusive)
+			if (filterGroup && (exclusive || filterGroup.exclusive))
 				activeFilters = activeFilters.difference(new Set(filterGroup.filters))
 
 			activeFilters = activeFilters.union(new Set([filter]))
