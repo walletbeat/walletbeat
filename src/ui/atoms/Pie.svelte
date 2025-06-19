@@ -385,6 +385,7 @@
 		}
 
 		display: grid;
+		justify-content: center;
 		transform: translateZ(0);
 		will-change: transform;
 		backface-visibility: hidden;
