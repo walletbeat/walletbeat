@@ -59,7 +59,6 @@
 
 
 	// Functions
-	import { setContains } from '@/types/utils/non-empty'
 	import { variantUrlQuery } from '@/components/variants'
 	import { hasVariant } from '@/schema/variants'
 	import { walletSupportedAccountTypes } from '@/schema/wallet'
@@ -158,7 +157,7 @@
 						icon: KeyIcon,
 						filterFunction: wallet => {
 							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-							return accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eoa)
+							return accountTypes !== null && AccountType.eoa in accountTypes
 						}
 					},
 					{
@@ -167,7 +166,7 @@
 						icon: KeyIcon,
 						filterFunction: wallet => {
 							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-							return accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eip7702)
+							return accountTypes !== null && AccountType.eip7702 in accountTypes
 						}
 					},
 					{
@@ -176,7 +175,7 @@
 						icon: KeyIcon,
 						filterFunction: wallet => {
 							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-							return accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.rawErc4337)
+							return accountTypes !== null && AccountType.rawErc4337 in accountTypes
 						}
 					},
 					{
@@ -185,7 +184,7 @@
 						icon: KeyIcon,
 						filterFunction: wallet => {
 							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-							return accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.mpc)
+							return accountTypes !== null && AccountType.mpc in accountTypes
 						}
 					},
 				],
