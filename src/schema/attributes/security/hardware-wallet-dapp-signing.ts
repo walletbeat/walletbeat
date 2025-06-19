@@ -436,6 +436,16 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
       const overallRating = getOverallRating();
 
       const result = ((): Evaluation<HardwareWalletDappSigningValue> => {
+        if (overallRating === Rating.UNRATED) {
+          return unrated(hardwareWalletDappSigning, brand, {
+            messageExtraction,
+            messageDecoding,
+            calldataExtraction,
+            calldataDecoding,
+            displayedTransactionDetails,
+          });
+        }
+
         // Necessary check to appease the TypeScript typechecker, as it can't
         // guarantee that the `null` checks we've already performed are still
         // true when executing this inner function. This should never happen.
@@ -451,15 +461,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
           );
         }
 
-        if (overallRating === Rating.UNRATED) {
-          return unrated(hardwareWalletDappSigning, brand, {
-            messageExtraction,
-            messageDecoding,
-            calldataExtraction,
-            calldataDecoding,
-            displayedTransactionDetails,
-          });
-        } else if (overallRating === Rating.FAIL) {
+        if (overallRating === Rating.FAIL) {
           return noDappSigning(
             messageExtraction,
             messageDecoding,
