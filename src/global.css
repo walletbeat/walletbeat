@@ -305,17 +305,43 @@ span svg {
 
 .tag {
 	--tag-backgroundColor: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
-	--tag-color: light-dark(var(--accent), rgb(187, 147, 255));
+	--tag-textColor: light-dark(var(--accent), rgb(187, 147, 255));
 	--tag-borderColor: light-dark(rgba(108, 36, 224, 0.2), rgba(108, 36, 224, 0.3));
+	--tag-hover-backgroundColor: light-dark(rgba(108, 36, 224, 0.12), rgba(108, 36, 224, 0.16));
+	--tag-hover-textColor: light-dark(var(--accent), rgb(187, 147, 255));
+	--tag-hover-borderColor: light-dark(rgba(108, 36, 224, 0.3), rgba(108, 36, 224, 0.4));
+
+	font-size: 0.55em;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.4em 0.66em;
+	border-radius: 9999px;
 
 	background-color: var(--tag-backgroundColor);
-	color: var(--tag-color);
-	padding: 0.3rem 0.6rem;
-	border-radius: 9999px;
-	font-weight: 500;
+	color: var(--tag-textColor);
 	border: 1px solid var(--tag-borderColor);
-	display: inline-block;
-	margin: 0 0.2rem;
+	font-weight: 500;
+	line-height: 1;
+
+	cursor: pointer;
+	transition-property: background-color, border-color, color, transform, box-shadow;
+
+	&:is(button) {
+		&:hover {
+			background-color: var(--tag-hover-backgroundColor);
+			color: var(--tag-hover-textColor);
+			border-color: var(--tag-hover-borderColor);
+			transform: translateY(-1px);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+		}
+
+		&:active {
+			transform: translateY(0);
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+		}
+	}
 }
 
 [data-sticky-container] {
