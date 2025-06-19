@@ -66,6 +66,11 @@
 	import { isLabeledUrl } from '@/schema/url'
 
 
+	// Actions
+	let toggleFilterById: Filters<RatedWallet>['$$prop_def']['toggleFilterById'] = $state()
+	let toggleFilter: Filters<RatedWallet>['$$prop_def']['toggleFilter'] = $state()
+
+
 	// Components
 	import WalletAttributeGroupRating from '@/ui/molecules/WalletAttributeGroupRating.svelte'
 	import CombinedWalletRating from '@/ui/molecules/CombinedWalletRating.svelte'
@@ -193,6 +198,8 @@
 	}
 	bind:activeFilters
 	bind:filteredItems={filteredWallets}
+	bind:toggleFilter
+	bind:toggleFilterById
 />
 
 <Table
@@ -283,6 +290,7 @@
 
 		{#if column.id === 'displayName'}
 			{@const displayName = value}
+			{@const accountTypes = walletSupportedAccountTypes(wallet, walletTableState.selectedVariant ?? 'ALL_VARIANTS')}
 
 			<div
 				class="wallet-name-cell column"
@@ -313,6 +321,73 @@
 									{variants[walletTableState.selectedVariant].label}
 								</small>
 							{/if}
+
+							<div class="tags">
+								{#each (
+									[
+										// Wallet type tags
+										hasVariant(wallet.variants, Variant.HARDWARE) && {
+											label: 'Hardware',
+											filterId: 'walletType-hardware',
+											type: 'wallet-type',
+										},
+										!hasVariant(wallet.variants, Variant.HARDWARE) && {
+											label: 'Software',
+											filterId: 'walletType-software',
+											type: 'wallet-type',
+										},
+										// Manufacture type tags
+										hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
+											label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
+											filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
+											type: 'manufacture-type',
+										},
+										// Account type tags
+										...(
+											accountTypes !== null ?
+												[
+													AccountType.eoa in accountTypes && {
+														label: 'EOA',
+														filterId: 'accountType-eoa',
+														type: 'eip',
+													},
+													AccountType.rawErc4337 in accountTypes && {
+														label: `#${erc4337.number}`,
+														filterId: 'accountType-erc4337',
+														type: 'eip',
+														eipTooltipContent: erc4337,
+													},
+													AccountType.eip7702 in accountTypes && {
+														label: `#${eip7702.number}`,
+														filterId: 'accountType-eip7702',
+														type: 'eip',
+														eipTooltipContent: eip7702,
+													},
+													AccountType.mpc in accountTypes && {
+														label: 'MPC',
+														filterId: 'accountType-mpc',
+														type: 'eip',
+													},
+												]
+											:
+												[]
+										),
+									]
+										.filter(Boolean)
+								) as tag (tag.label)}
+									<button
+										class="tag"
+										data-tag-type={tag.type}
+										aria-label="Filter by {tag.label}"
+										onclick={(e) => {
+											e.stopPropagation()
+											toggleFilterById!(tag.filterId)
+										}}
+									>
+										{tag.label}
+									</button>
+								{/each}
+							</div>
 						</div>
 					</div>
 
@@ -547,6 +622,41 @@
 			p {
 				width: 0;
 				min-width: 100%;
+			}
+		}
+
+		.tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.25em;
+
+			.tag {
+				&[data-tag-type='wallet-type'] {
+					--tag-backgroundColor: light-dark(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.12));
+					--tag-textColor: light-dark(rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0.9));
+					--tag-borderColor: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.2));
+					--tag-hover-backgroundColor: light-dark(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.2));
+					--tag-hover-textColor: light-dark(rgba(0, 0, 0, 0.9), rgba(255, 255, 255, 1));
+					--tag-hover-borderColor: light-dark(rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.3));
+				}
+
+				&[data-tag-type='manufacture-type'] {
+					--tag-backgroundColor: light-dark(rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.15));
+					--tag-textColor: light-dark(#7c3aed, #a855f7);
+					--tag-borderColor: light-dark(rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0.4));
+					--tag-hover-backgroundColor: light-dark(rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.25));
+					--tag-hover-textColor: light-dark(#6d28d9, #8b5cf6);
+					--tag-hover-borderColor: light-dark(rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.5));
+				}
+
+				&[data-tag-type='eip'] {
+					--tag-backgroundColor: light-dark(rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.15));
+					--tag-textColor: light-dark(#16a34a, #22c55e);
+					--tag-borderColor: light-dark(rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.4));
+					--tag-hover-backgroundColor: light-dark(rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.25));
+					--tag-hover-textColor: light-dark(#15803d, #16a34a);
+					--tag-hover-borderColor: light-dark(rgba(34, 197, 94, 0.4), rgba(34, 197, 94, 0.5));
+				}
 			}
 		}
 	}
