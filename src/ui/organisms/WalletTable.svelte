@@ -77,8 +77,8 @@
 			|| (table.columnSort?.direction && table.columns.find(column => column.id === table.columnSort!.columnId)?.getValue?.(wallet) === undefined)
 		)
 	)}
-	onRowClick={wallet => {
-		walletTableState.toggleRowExpanded(wallet.metadata.id)
+	onRowClick={(wallet, walletId) => {
+		walletTableState.toggleRowExpanded(walletId)
 	}}
 
 	columns={
