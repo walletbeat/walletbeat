@@ -1,7 +1,7 @@
 ---
 // Constants
 import { defaultNavigationItems } from '@/components/navigation'
-import { allRatedWallets } from '@/data/wallets'
+import { ratedSoftwareWallets } from '@/data/software-wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 
 import {
@@ -58,7 +58,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 				client:load
 				wallets={
 					Object
-						.values(allRatedWallets)
+						.values(ratedSoftwareWallets)
 				}
 				{attributeGroups}
 			/>
