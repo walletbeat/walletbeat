@@ -187,7 +187,7 @@
 		const levelConfig = getLevelConfig(level)
 		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
 		const totalAngle = endAngle - startAngle
-		const totalGapAngle = Math.min(levelConfig.angleGap * (slices.length - 1), totalAngle * 0.3)
+		const totalGapAngle = levelConfig.angleGap * (slices.length - 1)
 		const totalEffectiveAngle = totalAngle - totalGapAngle
 
 		const outerRadius = radius * levelConfig.outerRadiusFraction
