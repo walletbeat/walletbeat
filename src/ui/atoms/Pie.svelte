@@ -24,8 +24,6 @@
 	}
 
 	// (Internal)
-	import type { Snippet } from 'svelte'
-
 	type ComputedSlice = Slice & {
 		computed: {
 			path: string
