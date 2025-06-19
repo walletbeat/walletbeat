@@ -65,9 +65,27 @@
 	})
 
 
+	// Functions
+	const getColumnSpan = (column: _Column): number => (
+		!column.children?.length ?
+			1
+		:
+			column.children
+				.reduce(
+					(sum, childColumn) => (
+						!childColumn.children?.length ?
+							sum + 1
+						:
+							sum + getColumnSpan(childColumn)
+					),
+					0
+				)
+	)
+
+
 	// Transitions/animations
 	import { flip } from 'svelte/animate'
-	import { fade } from 'svelte/transition'
+	import { fade, fly } from 'svelte/transition'
 	import { expoOut } from 'svelte/easing'
 </script>
 
@@ -78,46 +96,92 @@
 >
 	<table>
 		<thead>
-			<tr>
-				{#each columns as column, index (column.id)}
-					{@const isSortable = column.isSortable !== false}
+			{@render headerRows(table.columns, 0)}
 
-					<th
-						data-sortable={isSortable ? '' : undefined}
-						data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
-						data-is-sticky={column.isSticky ? '' : undefined}
-						animate:flip={{ duration: 300, easing: expoOut }}
-					>
-						<div class="header-cell-content">
-							{#if isSortable}
-								<label class="sort-label">
-									{#if headerCellSnippet}
-										{@render headerCellSnippet({ column })}
-									{:else}
-										<span>{column.name}</span>
-									{/if}
+			{#snippet headerRows(columns: (_Column | undefined)[], level: number)}
+				{@const nextLevelColumns = (
+					columns
+						.flatMap(column => (
+							!column ?
+								[undefined]
+							: column.children?.length && table.isColumnExpanded(column.id) ?
+								column.children
+							:
+								Array.from({ length: getColumnSpan(column) }, () => undefined)
+						))
+				)}
 
-									<button
-										type="button"
-										aria-label={`Sort by ${column.name}`}
-										class="sort-button"
-										onclick={() => {
-											table.toggleColumnSort(column.id)
-										}}
-										disabled={column.isSortable === false}
-									></button>
-								</label>
-							{:else}
+				<tr in:fly={{ y: '-50%', duration: 250, easing: expoOut }}>
+					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
+						{#if column}
+							{@render headerCell(column, level)}
+						{:else}
+							<th class="blank-cell"></th>
+						{/if}
+					{/each}
+				</tr>
+
+				{#if nextLevelColumns.some(column => column)}
+					{@render headerRows(nextLevelColumns, level + 1)}
+				{/if}
+			{/snippet}
+
+			{#snippet headerCell(column: _Column, level: number)}
+				{@const colspan = getColumnSpan(column)}
+				{@const isSortable = column.isSortable !== false}
+				{@const isExpandable = !!column.children?.length}
+				{@const isExpanded = table.isColumnExpanded(column.id)}
+
+				<th
+					{colspan}
+					data-header-level={level}
+					data-sortable={isSortable ? '' : undefined}
+					data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
+					data-is-sticky={column.isSticky ? '' : undefined}
+					data-expandable={isExpandable ? '' : undefined}
+					data-expanded={isExpandable && isExpanded ? '' : undefined}
+				>
+					<div class="header-cell-content">
+						{#if isSortable}
+							<label class="sort-label">
 								{#if headerCellSnippet}
 									{@render headerCellSnippet({ column })}
 								{:else}
 									<span>{column.name}</span>
 								{/if}
+
+								<button
+									type="button"
+									aria-label={`Sort by ${column.name}`}
+									class="sort-button"
+									onclick={() => {
+										table.toggleColumnSort(column.id)
+									}}
+									disabled={column.isSortable === false}
+								></button>
+							</label>
+						{:else}
+							{#if headerCellSnippet}
+								{@render headerCellSnippet({ column })}
+							{:else}
+								<span>{column.name}</span>
 							{/if}
-						</div>
-					</th>
-				{/each}
-			</tr>
+						{/if}
+
+						{#if isExpandable}
+							<button 
+								type="button"
+								class="expansion-button"
+								onclick={() => {
+									table.toggleIsColumnExpanded(column.id)
+								}}
+								title={isExpanded ? 'Collapse' : 'Expand'}
+								aria-label={isExpanded ? 'Collapse' : 'Expand'}
+							></button>
+						{/if}
+					</div>
+				</th>
+			{/snippet}
 		</thead>
 
 		<tbody>
@@ -158,8 +222,10 @@
 					{#each table.columnsVisible as column (column.id)}
 						{@const isSortable = column.isSortable !== false}
 						{@const value = column.getValue?.(row)}
+						{@const columnSpan = getColumnSpan(column)}
 
 						<td
+							colspan={columnSpan}
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
 							data-is-sticky={column.isSticky ? '' : undefined}
@@ -227,6 +293,31 @@
 
 			tr {
 				th {
+					&:not(:empty) {
+						backdrop-filter: blur(20px);
+					}
+
+					&[data-header-level='0'] {
+						font-weight: 700;
+						font-size: 1.1em;
+						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.02));
+					}
+					&[data-header-level='1'] {
+						font-weight: 500;
+						font-size: 0.825em;
+						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.01));
+					}
+					&[data-header-level='2'] {
+						font-weight: 400;
+						font-size: 0.7em;
+						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.005));
+					}
+					&[data-header-level='3'] {
+						font-weight: 100;
+						font-size: 0.7em;
+						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.0025));
+					}
+
 					> .header-cell-content {
 						display: grid;
 						grid-auto-flow: column;
@@ -285,6 +376,42 @@
 						&:has(.sort-button:focus) {
 							outline: 1px solid var(--accent);
 							border-radius: 0.5em;
+						}
+					}
+
+					&[data-expandable] {
+						--isExpanded: 0;
+
+						cursor: pointer;
+
+						&[data-expanded] {
+							--isExpanded: 1;
+						}
+
+						.expansion-button {
+							background-color: transparent;
+
+							flex: 0 0 auto;
+							font-size: 0.75em;
+							padding: 0.33em;
+							border: none;
+							margin-inline-end: -0.25em;
+
+							transition-property: background-color, transform, opacity;
+
+							&:hover {
+								background-color: rgba(255, 255, 255, 0.15);
+							}
+
+							&:after {
+								content: '';
+								width: 1em;
+								height: 1em;
+								background-color: currentColor;
+								mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
+								transform: perspective(100px) rotateX(calc(var(--isExpanded) * -180deg));
+								transition-property: transform;
+							}
 						}
 					}
 				}

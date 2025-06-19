@@ -13,6 +13,8 @@ export type Column<
 	defaultSortDirection?: SortDirection
 	getValue: (row: RowValue) => CellValue
 	sorter?: (a: CellValue, b: CellValue, rowA: RowValue, rowB: RowValue) => number
+	children?: Column<RowValue, CellValue, ColumnId>[]
+	defaultIsExpanded?: boolean
 }
 
 type SortDirection = 'asc' | 'desc'
@@ -40,6 +42,12 @@ export class DataTable<
 	#columnsById = $derived(
 		new SvelteMap(
 			this.columns
+				.flatMap(function flatten(column): typeof column[] {
+					return [
+						column,
+						...column.children?.flatMap(flatten) ?? [],
+					]
+				})
 				.map(column => [
 					column.id,
 					column
@@ -148,12 +156,17 @@ export class DataTable<
 		this.rows.length > 0 && this.currentPage < this.totalPages
 	)
 
-	columnsVisible = $derived(
-		[...this.#columnsById.values()]
-			.filter(column => (
-				!column.children?.length || !this.#isColumnExpanded.has(column.id)
+	columnsVisible = $derived.by(() => {
+		const getVisibleColumns = (columns: Column<RowValue, CellValue, ColumnId>[]): Column<RowValue, CellValue, ColumnId>[] => (
+			columns.flatMap(column => (
+				column.children?.length && this.#isColumnExpanded.has(column.id) ?
+					getVisibleColumns(column.children)
+				:
+					[column]
 			))
-	)
+		)
+		return getVisibleColumns(this.columns)
+	})
 
 	constructor({
 		data,
@@ -176,6 +189,17 @@ export class DataTable<
 		this.#defaultColumnSort = defaultSort
 		this.#isRowDisabled = isRowDisabled
 		this.#displaceDisabledRows = displaceDisabledRows ?? false
+
+		const initializeIsColumnExpanded = (columns: Column<RowValue, CellValue, ColumnId>[]) => {
+			columns.forEach(column => {
+				if (column.defaultIsExpanded)
+					this.#isColumnExpanded.add(column.id)
+
+				if (column.children?.length)
+					initializeIsColumnExpanded(column.children)
+			})
+		}
+		initializeIsColumnExpanded(columns)
 	}
 
 	toggleColumnSort = (columnId: ColumnId) => {
@@ -202,5 +226,16 @@ export class DataTable<
 		)
 
 		return true
+	}
+
+	isColumnExpanded = (columnId: ColumnId): boolean => (
+		this.#isColumnExpanded.has(columnId)
+	)
+
+	toggleIsColumnExpanded = (columnId: ColumnId) => {
+		if (this.#isColumnExpanded.has(columnId))
+			this.#isColumnExpanded.delete(columnId)
+		else
+			this.#isColumnExpanded.add(columnId)
 	}
 }
