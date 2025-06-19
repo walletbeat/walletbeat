@@ -1,9 +1,7 @@
-<script
-	lang="ts"
-	generics="
-		_DataTable extends DataTable
-	"
->
+<script lang="ts" generics="
+	_DataTable extends DataTable,
+	RowId
+">
 	// Types
 	import { DataTable, type Column } from '@/lib/DataTable.svelte'
 	import type { Snippet } from 'svelte'
@@ -30,7 +28,7 @@
 		columns: _Column[]
 		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<_RowValue, _CellValue, _ColumnId>>[0]['defaultSort']>
 		rows: _RowValue[]
-		getId?: (row: _RowValue, index: number) => any
+		getId?: (row: _RowValue, index: number) => RowId
 		isRowDisabled: (row: _RowValue, table: DataTable<_RowValue, _CellValue, _ColumnId>) => boolean
 		cellSnippet?: Snippet<[{
 			row: _RowValue
