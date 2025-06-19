@@ -3,9 +3,9 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import { FirmwareType } from '@/schema/features/security/firmware';
 import {
-  CalldataDecoding,
   DataExtraction,
   displaysFullTransactionDetails,
+  noCalldataDecoding,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
@@ -93,10 +93,14 @@ export const onekeyWallet: HardwareWallet = {
       },
       hardwareWalletDappSigning: {
         messageSigning: {
-          calldataDecoding: CalldataDecoding.NONE,
+          calldataDecoding: noCalldataDecoding,
           details:
             'OneKey Pro shows EIP-712 domain types and message data but does not display domain hash or message hash for easier verification.',
-          messageExtraction: DataExtraction.EYES,
+          messageExtraction: {
+            [DataExtraction.EYES]: true,
+            [DataExtraction.HASHES]: false,
+            [DataExtraction.QRCODE]: false,
+          },
         },
         ref: [
           {
@@ -110,8 +114,12 @@ export const onekeyWallet: HardwareWallet = {
           },
         ],
         transactionSigning: {
-          calldataDecoding: CalldataDecoding.NONE,
-          calldataExtraction: DataExtraction.EYES,
+          calldataDecoding: noCalldataDecoding,
+          calldataExtraction: {
+            [DataExtraction.EYES]: true,
+            [DataExtraction.HASHES]: false,
+            [DataExtraction.QRCODE]: false,
+          },
           details:
             'OneKey Pro shows all calldata but does not decode it, requiring users to manually interpret the transaction data.',
           displayedTransactionDetails: {
