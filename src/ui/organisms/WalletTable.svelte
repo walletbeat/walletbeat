@@ -7,6 +7,7 @@
 	import { Variant } from '@/schema/variants'
 	import { variants } from '@/components/variants'
 	import { AccountType } from '@/schema/features/account-support'
+	import { HardwareWalletManufactureType } from '@/schema/features/profile'
 	import { erc4337 } from '@/data/eips/erc-4337'
 	import { eip7702 } from '@/data/eips/eip-7702'
 
@@ -57,6 +58,8 @@
 		wallets
 	)
 
+	let activeEvaluationAttribute: string | undefined = $state(undefined)
+
 	// (Derived)
 	const selectedVariant = $derived.by(() => {
 		// Derive selected variant from active filters
@@ -75,11 +78,14 @@
 
 
 	// Functions
-	import { variantUrlQuery } from '@/components/variants'
+	import { variantUrlQuery, variantToName } from '@/components/variants'
 	import { hasVariant } from '@/schema/variants'
-	import { walletSupportedAccountTypes } from '@/schema/wallet'
+	import { walletSupportedAccountTypes, attributeVariantSpecificity, VariantSpecificity } from '@/schema/wallet'
 	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
 	import { isLabeledUrl } from '@/schema/url'
+	import { evaluatedAttributesEntries, ratingToIcon, ratingToColor } from '@/schema/attributes'
+	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+	import { slugifyCamelCase } from '@/types/utils/text'
 
 
 	// Actions
@@ -88,9 +94,10 @@
 
 
 	// Components
-	import WalletAttributeGroupRating from '@/ui/molecules/WalletAttributeGroupRating.svelte'
 	import CombinedWalletRating from '@/ui/molecules/CombinedWalletRating.svelte'
 	import Filters from '@/ui/molecules/Filters.svelte'
+	import WalletAttributeSummary from '@/ui/molecules/WalletAttributeSummary.svelte'
+
 	import Pie, { PieLayout } from '@/ui/atoms/Pie.svelte'
 	import Table from '@/ui/atoms/Table.svelte'
 	import Typography from '@/ui/atoms/Typography.svelte'
@@ -506,18 +513,136 @@
 			{@const evalGroup = wallet.overall[attrGroup.id]}
 			{@const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
 
-			<WalletAttributeGroupRating
-				{wallet}
-				{attrGroup}
-				{evalGroup}
-				{groupScore}
-				bind:selectedEvaluationAttribute={walletTableState.selectedEvaluationAttribute}
-				bind:selectedVariant={walletTableState.selectedVariant}
-				{isExpanded}
-				toggleExpanded={id => {
-					walletTableState.toggleRowExpanded(id)
-				}}
-			/>
+			{@const evalEntries = evaluatedAttributesEntries(evalGroup)
+				.filter(([_, evalAttr]) => (
+					evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
+				))}
+
+			{@const currentEvaluationAttribute = (
+				activeEvaluationAttribute ?
+					evalGroup[activeEvaluationAttribute]
+				: walletTableState.selectedEvaluationAttribute ?
+					evalGroup[walletTableState.selectedEvaluationAttribute]
+				:
+					undefined
+			)}
+
+			<div class="attribute-group-rating">
+				<Pie
+					layout={PieLayout.FullTop}
+					radius={44}
+					levels={[
+						{
+							outerRadiusFraction: 1,
+							innerRadiusFraction: 0.3,
+							gap: 2,
+							angleGap: 0
+						}
+					]}
+					padding={4}
+					slices={	
+						!isNonEmptyArray(evalEntries) ?
+							[]
+						
+						: nonEmptyMap(
+							evalEntries,
+							([evalAttrId, evalAttr]) => {
+								const icon = evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon
+
+								const tooltipSuffix = (() => {
+									const variant = selectedVariant
+
+									if(!variant || !wallet.variants[variant])
+										return
+
+									const specificity = attributeVariantSpecificity(wallet, variant, evalAttr.attribute)
+
+									return (
+										specificity === VariantSpecificity.UNIQUE_TO_VARIANT ?
+											` (${variantToName(variant, false)} only)`
+										: specificity === VariantSpecificity.NOT_UNIVERSAL ?
+											` (${variantToName(variant, false)} specific)`
+										:
+											undefined
+									)
+								})()
+								
+								return {
+									id: evalAttrId.toString(),
+									color: ratingToColor(evalAttr.evaluation.value.rating),
+									weight: 1,
+									arcLabel: icon,
+									tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
+									tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
+								}
+							}
+						)
+					}
+					highlightedSliceId={currentEvaluationAttribute?.attribute.id}
+					centerLabel={
+						groupScore ?
+							groupScore.hasUnratedComponent ?
+								ratingToIcon(Rating.UNRATED)
+							: groupScore.score <= 0.0 ?
+								'\u{1f480}'
+							: groupScore.score >= 1.0 ?
+									'\u{1f4af}'
+							:
+								(groupScore.score * 100).toFixed(0)
+						:
+							'❓'
+					}
+					onSliceClick={id => {
+						walletTableState.selectedEvaluationAttribute = activeEvaluationAttribute = (
+							walletTableState.selectedEvaluationAttribute === id ? undefined : id
+						)
+
+						if (!isExpanded)
+							walletTableState.toggleRowExpanded(wallet.metadata.id)
+					}}
+					onSliceMouseEnter={id => {
+						activeEvaluationAttribute = id
+					}}
+					onSliceMouseLeave={id => {
+						if (activeEvaluationAttribute === id)
+							activeEvaluationAttribute = undefined
+					}}
+					onSliceFocus={id => {
+						activeEvaluationAttribute = id
+					}}
+					onSliceBlur={id => {
+						if (activeEvaluationAttribute === id)
+							activeEvaluationAttribute = undefined
+					}}
+				/>
+
+				<div
+					class="details"
+					hidden={!isExpanded}
+				>
+					{#if !((activeEvaluationAttribute ? evalGroup[activeEvaluationAttribute] : walletTableState.selectedEvaluationAttribute ? evalGroup[walletTableState.selectedEvaluationAttribute] : undefined))}
+						<WalletAttributeSummary
+							{wallet}
+							attributeGroup={attrGroup}
+						/>
+					{:else}
+						{@const evaluatedAttribute = (
+							activeEvaluationAttribute ?
+								evalGroup[activeEvaluationAttribute]
+							: walletTableState.selectedEvaluationAttribute ?
+								evalGroup[walletTableState.selectedEvaluationAttribute]
+							:
+								undefined
+						)}
+
+						<WalletAttributeSummary
+							{wallet}
+							{evaluatedAttribute}
+							selectedVariant={selectedVariant}
+						/>
+					{/if}
+				</div>
+			</div>
 
 		<!-- Attribute rating -->
 		{:else}
@@ -693,5 +818,17 @@
 
 	.wallet-attribute-rating {
 		margin-inline: -1em;
+	}
+
+	.attribute-group-rating {
+		display: grid;
+		gap: 0.75em;
+
+		.details {
+			width: 10rem;
+			min-width: 100%;
+			font-size: 0.66em;
+			text-align: center;
+		}
 	}
 </style>
