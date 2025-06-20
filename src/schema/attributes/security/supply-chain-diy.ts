@@ -15,6 +15,7 @@ import {
 import { popRefs } from '@/schema/reference';
 import { Variant } from '@/schema/variants';
 import type { WalletMetadata } from '@/schema/wallet';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -111,7 +112,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
     return null;
   },
   evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainDIYValue> => {
-    if (features.variant !== Variant.HARDWARE) {
+    if (features.type !== WalletType.HARDWARE) {
       return exempt(
         supplyChainDIY,
         sentence(

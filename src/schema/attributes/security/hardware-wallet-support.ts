@@ -10,7 +10,8 @@ import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
 import { isSupported } from '@/schema/features/support';
 import { popRefs } from '@/schema/reference';
-import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import { type AtLeastOneVariant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -156,7 +157,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
   },
   evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletSupportValue> => {
     // If this is a hardware wallet, mark as exempt since hardware wallets inherently support themselves
-    if (features.variant === Variant.HARDWARE) {
+    if (features.type === WalletType.HARDWARE) {
       return exempt(
         hardwareWalletSupport,
         sentence(

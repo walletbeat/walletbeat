@@ -12,7 +12,7 @@ import type {
 } from '@/schema/features/ecosystem/chain-abstraction';
 import { featureSupported, isSupported, notSupported, supported } from '@/schema/features/support';
 import { mergeRefs, refs } from '@/schema/reference';
-import { variantToWalletType, WalletType } from '@/schema/wallet-types';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -493,7 +493,7 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
     ),
   },
   evaluate: (features: ResolvedFeatures): Evaluation<ChainAbstractionValue> => {
-    if (variantToWalletType(features.variant) !== WalletType.SOFTWARE) {
+    if (features.type !== WalletType.SOFTWARE) {
       return exempt(
         chainAbstraction,
         sentence('Only software wallets are expected to deal with chain abstraction.'),

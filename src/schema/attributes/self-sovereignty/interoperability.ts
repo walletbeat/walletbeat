@@ -7,7 +7,7 @@ import {
 } from '@/schema/features/self-sovereignty/interoperability';
 import { popRefs } from '@/schema/reference';
 import type { AtLeastOneVariant } from '@/schema/variants';
-import { Variant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -80,7 +80,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
   aggregate: (perVariant: AtLeastOneVariant<Evaluation<InteroperabilityValue>>) =>
     pickWorstRating<InteroperabilityValue>(perVariant),
   evaluate: (features: ResolvedFeatures): Evaluation<InteroperabilityValue> => {
-    if (features.variant !== Variant.HARDWARE) {
+    if (features.type !== WalletType.HARDWARE) {
       return exempt(interoperability, sentence('Only rated for hardware wallets'), brand, {
         thirdPartyCompatibility: InteroperabilityType.FAIL,
         noSupplierLinkage: InteroperabilityType.FAIL,

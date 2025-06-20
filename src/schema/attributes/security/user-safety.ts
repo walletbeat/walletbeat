@@ -9,7 +9,7 @@ import type { ResolvedFeatures } from '@/schema/features';
 import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety';
 import { popRefs } from '@/schema/reference';
 import type { AtLeastOneVariant } from '@/schema/variants';
-import { Variant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -148,7 +148,7 @@ Rating thresholds: PASS if >=11/16 criteria pass, PARTIAL if >=6/16 pass, else F
   aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) =>
     pickWorstRating<UserSafetyValue>(perVariant),
   evaluate: (features: ResolvedFeatures): Evaluation<UserSafetyValue> => {
-    if (features.variant !== Variant.HARDWARE) {
+    if (features.type !== WalletType.HARDWARE) {
       return exempt(
         userSafety,
         sentence(
