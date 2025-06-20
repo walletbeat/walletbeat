@@ -10,12 +10,12 @@
 		wallet,
 		attributeGroup,
 		attribute,
-		selectedVariant,
+		variant,
 	}: {
 		wallet: RatedWallet
 		attributeGroup?: AttributeGroup<any>
 		attribute: EvaluatedAttribute<any>
-		selectedVariant?: Variant
+		variant?: Variant
 	} = $props()
 
 
@@ -65,20 +65,20 @@
 				}}
 			/>
 
-			{#if selectedVariant && wallet.variants[selectedVariant]}
-				{@const specificity = attributeVariantSpecificity(wallet, selectedVariant, attribute.attribute)}
+			{#if variant && wallet.variants[variant]}
+				{@const specificity = attributeVariantSpecificity(wallet, variant, attribute.attribute)}
 
 				{#if specificity === VariantSpecificity.NOT_UNIVERSAL}
-					This is the case on the {variantToName(selectedVariant, false)} version.
+					This is the case on the {variantToName(variant, false)} version.
 				{:else if specificity === VariantSpecificity.UNIQUE_TO_VARIANT}
-					This is only the case on the {variantToName(selectedVariant, false)} version.
+					This is only the case on the {variantToName(variant, false)} version.
 				{/if}
 			{/if}
 		</p>
 
 		<div>
 			<a 
-				href="/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, selectedVariant)}#{slugifyCamelCase(attribute.attribute.id)}"
+				href="/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, variant ?? null)}#{slugifyCamelCase(attribute.attribute.id)}"
 			>
 				<span>{@html InfoIcon}</span>
 				Learn more
