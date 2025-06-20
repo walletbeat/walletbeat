@@ -103,8 +103,10 @@ html.dark {
 
 *,
 ::before,
-::after {
+::after,
+[popover] {
 	box-sizing: border-box;
+	border: none;
 	outline-color: inherit;
 	margin: 0;
 	padding: 0;
@@ -113,10 +115,6 @@ html.dark {
 	interpolate-size: allow-keywords;
 
 	scroll-behavior: smooth;
-}
-
-[popover] {
-	all: unset;
 }
 
 [hidden] {
