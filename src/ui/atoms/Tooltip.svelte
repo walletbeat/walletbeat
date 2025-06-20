@@ -114,12 +114,20 @@
 		backdrop-filter: blur(10px);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 
-		transition-property: opacity, scale;
+		transition-property: display, content-visibility, opacity, scale;
 
-		&:not(:popover-open) {
+		@starting-style {
 			opacity: 0;
 			scale: 0.95;
+		}
+
+		&:not(:popover-open) {
+			display: none;
+			content-visibility: none;
 			pointer-events: none;
+
+			opacity: 0;
+			scale: 0.95;
 		}
 	}
 </style>
