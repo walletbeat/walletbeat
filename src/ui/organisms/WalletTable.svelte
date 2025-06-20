@@ -688,7 +688,7 @@
 					{#if displayedAttribute}
 						<WalletAttributeSummary
 							{wallet}
-							evaluatedAttribute={displayedAttribute}
+							attribute={displayedAttribute}
 							selectedVariant={selectedVariant}
 						/>
 					{:else if displayedGroup}
@@ -838,7 +838,7 @@
 					{#if displayedAttribute}
 						<WalletAttributeSummary
 							{wallet}
-							evaluatedAttribute={displayedAttribute}
+							attribute={displayedAttribute}
 							selectedVariant={selectedVariant}
 						/>
 					{:else}
@@ -910,7 +910,7 @@
 				{#snippet expandedContent()}
 					<WalletAttributeSummary
 						{wallet}
-						evaluatedAttribute={evalAttr}
+						attribute={evalAttr}
 						{selectedVariant}
 					/>
 				{/snippet}

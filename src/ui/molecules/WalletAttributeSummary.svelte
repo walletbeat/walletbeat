@@ -9,12 +9,12 @@
 	let {
 		wallet,
 		attributeGroup,
-		evaluatedAttribute,
+		attribute,
 		selectedVariant,
 	}: {
 		wallet: RatedWallet
 		attributeGroup?: AttributeGroup<any>
-		evaluatedAttribute?: EvaluatedAttribute<any>
+		attribute: EvaluatedAttribute<any>
 		selectedVariant?: Variant
 	} = $props()
 
@@ -31,7 +31,7 @@
 
 
 <div>
-	{#if attributeGroup && !evaluatedAttribute?.evaluation?.value}
+	{#if attributeGroup && !attribute?.evaluation?.value}
 		<!-- Attribute group -->
 		<h3>
 			<span>{attributeGroup.icon}</span> {attributeGroup.displayName}
@@ -49,15 +49,15 @@
 	{:else}
 		<!-- Attribute -->
 		<h4>
-			<span>{evaluatedAttribute.evaluation.value.icon ?? evaluatedAttribute.attribute.icon}</span>
-			{evaluatedAttribute.attribute.displayName}
+			<span>{attribute.evaluation.value.icon ?? attribute.attribute.icon}</span>
+			{attribute.attribute.displayName}
 		</h4>
 
 		<p>
-			{ratingToIcon(evaluatedAttribute.evaluation.value.rating)}
+			{ratingToIcon(attribute.evaluation.value.rating)}
 
 			<Typography
-				content={evaluatedAttribute.evaluation.value.shortExplanation}
+				content={attribute.evaluation.value.shortExplanation}
 				strings={{
 					WALLET_NAME: wallet.metadata.displayName,
 					WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
@@ -66,7 +66,7 @@
 			/>
 
 			{#if selectedVariant && wallet.variants[selectedVariant]}
-				{@const specificity = attributeVariantSpecificity(wallet, selectedVariant, evaluatedAttribute.attribute)}
+				{@const specificity = attributeVariantSpecificity(wallet, selectedVariant, attribute.attribute)}
 
 				{#if specificity === VariantSpecificity.NOT_UNIVERSAL}
 					This is the case on the {variantToName(selectedVariant, false)} version.
@@ -78,7 +78,7 @@
 
 		<div>
 			<a 
-				href="/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, selectedVariant)}#{slugifyCamelCase(evaluatedAttribute.attribute.id)}"
+				href="/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, selectedVariant)}#{slugifyCamelCase(attribute.attribute.id)}"
 			>
 				<span>{@html InfoIcon}</span>
 				Learn more
