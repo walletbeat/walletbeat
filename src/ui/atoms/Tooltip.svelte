@@ -100,10 +100,10 @@
 
 	[popover] {
 		position: absolute;
-		position-area: block-end;
-		position-try-order: most-block-size;
-		position-try-fallbacks: block-end, block-start, inline-start, inline-end;
 		position-visibility: anchors-visible;
+		position-area: block-end;
+		position-try-fallbacks: flip-block;
+		position-try-order: most-block-size;
 
 		margin: var(--offset);
 
