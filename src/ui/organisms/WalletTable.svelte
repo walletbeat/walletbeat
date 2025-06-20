@@ -46,9 +46,7 @@
 
 
 	// State
-	import { WalletTableState } from '../WalletTableState.svelte'
-
-	let walletTableState = new WalletTableState()
+	import { SvelteSet } from 'svelte/reactivity'
 
 	let activeFilters = $state(
 		new Set<Filter<RatedWallet>>()
@@ -57,6 +55,10 @@
 	let filteredWallets = $state(
 		wallets
 	)
+
+	let selectedAttribute: string | undefined = $state(undefined)
+
+	let expandedRowIds = $state(new SvelteSet<string>())
 
 	let activeAttributeId: { walletId: string; attributeGroupId: string; attributeId: string } | undefined = $state(undefined)
 
@@ -91,6 +93,17 @@
 	// Actions
 	let toggleFilterById: Filters<RatedWallet>['$$prop_def']['toggleFilterById'] = $state()
 	let toggleFilter: Filters<RatedWallet>['$$prop_def']['toggleFilter'] = $state()
+
+	const toggleRowExpanded = (id: string) => {
+		if (expandedRowIds.has(id))
+			expandedRowIds.delete(id)
+		else
+			expandedRowIds.add(id)
+	}
+
+	const isRowExpanded = (walletId: string) => (
+		expandedRowIds.has(walletId)
+	)
 
 
 	// Components
@@ -236,7 +249,7 @@
 		)
 	)}
 	onRowClick={(wallet, walletId) => {
-		walletTableState.toggleRowExpanded(walletId)
+		toggleRowExpanded(walletId)
 	}}
 	displaceDisabledRows={true}
 
@@ -310,7 +323,7 @@
 		column,
 		value,
 	})}
-		{@const isExpanded = walletTableState.isRowExpanded(wallet.metadata.id)}
+		{@const isExpanded = isRowExpanded(wallet.metadata.id)}
 
 		{#snippet withExpandedContent({
 			content,
@@ -527,9 +540,9 @@
 
 		{:else}
 			{@const selectedSliceId = (
-				walletTableState.selectedAttribute ?
-					attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id]) ?
-						`${attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id])!.id}:${walletTableState.selectedAttribute}`
+				selectedAttribute ?
+					attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id]) ?
+						`${attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id])!.id}:${selectedAttribute}`
 					:
 						undefined
 				:
@@ -619,12 +632,12 @@
 						onSliceClick={sliceId => {
 							const [groupId, attrId] = sliceId.split(':')
 
-							walletTableState.selectedAttribute = (
-								walletTableState.selectedAttribute === attrId ? undefined : attrId
+							selectedAttribute = (
+								selectedAttribute === attrId ? undefined : attrId
 							)
 
 							if (!isExpanded)
-								walletTableState.toggleRowExpanded(wallet.metadata.id)
+								toggleRowExpanded(wallet.metadata.id)
 						}}
 						onSliceMouseEnter={sliceId => {
 							const [groupId, attrId] = sliceId.split(':')
@@ -654,9 +667,9 @@
 								wallet.overall[activeAttributeId.attributeGroupId]?.[activeAttributeId.attributeId]
 							:
 								undefined
-						: walletTableState.selectedAttribute ?
-							attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id]) ?
-								wallet.overall[attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id])!.id]?.[walletTableState.selectedAttribute]
+						: selectedAttribute ?
+							attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id]) ?
+								wallet.overall[attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id])!.id]?.[selectedAttribute]
 							:
 								undefined
 						:
@@ -666,8 +679,8 @@
 					{@const displayedGroup = (
 						activeAttributeId?.walletId === wallet.metadata.id ?
 							attributeGroups.find(g => g.id === activeAttributeId.attributeGroupId)
-						: walletTableState.selectedAttribute ?
-							attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id])
+						: selectedAttribute ?
+							attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id])
 						:
 							undefined
 					)}
@@ -710,8 +723,8 @@
 				{@const currentAttribute = (
 					hasActiveAttribute && activeAttributeId ?
 						evalGroup[activeAttributeId.attributeId]
-					: walletTableState.selectedAttribute ?
-						evalGroup[walletTableState.selectedAttribute]
+											: selectedAttribute ?
+							evalGroup[selectedAttribute]
 					:
 						undefined
 				)}
@@ -782,12 +795,12 @@
 								'❓'
 						}
 						onSliceClick={attributeId => {
-							walletTableState.selectedAttribute = (
-								walletTableState.selectedAttribute === attributeId ? undefined : attributeId
+							selectedAttribute = (
+								selectedAttribute === attributeId ? undefined : attributeId
 							)
 
 							if (!isExpanded)
-								walletTableState.toggleRowExpanded(wallet.metadata.id)
+								toggleRowExpanded(wallet.metadata.id)
 						}}
 						onSliceMouseEnter={attributeId => {
 							activeAttributeId = {
@@ -816,8 +829,8 @@
 					{@const displayedAttribute = (
 						activeAttributeId?.walletId === wallet.metadata.id && activeAttributeId?.attributeGroupId === attrGroup.id ?
 							evalGroup[activeAttributeId.attributeId]
-						: walletTableState.selectedAttribute ?
-							evalGroup[walletTableState.selectedAttribute]
+						: selectedAttribute ?
+							evalGroup[selectedAttribute]
 						:
 							undefined
 					)}
