@@ -19,6 +19,7 @@
 		rows,
 		getId,
 		isRowDisabled,
+		getCellVerticalAlign,
 		cellSnippet,
 		headerCellSnippet,
 		onRowClick,
@@ -30,6 +31,11 @@
 		rows: _RowValue[]
 		getId?: (row: _RowValue, index: number) => RowId
 		isRowDisabled: (row: _RowValue, table: DataTable<_RowValue, _CellValue, _ColumnId>) => boolean
+		getCellVerticalAlign?: (args: {
+			row: _RowValue
+			column: _Column
+			value: _CellValue
+		}) => 'top' | 'middle' | 'bottom' | 'baseline' | undefined
 		cellSnippet?: Snippet<[{
 			row: _RowValue
 			column: _Column
@@ -229,6 +235,13 @@
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
 							data-is-sticky={column.isSticky ? '' : undefined}
+							style:--table-cell-verticalAlign={
+								getCellVerticalAlign?.({
+									row,
+									column,
+									value,
+								})
+							}
 							animate:flip={{ duration: 250, easing: expoOut }}
 							in:fade={{ duration: 250, easing: expoOut }}
 						>
@@ -257,7 +270,7 @@
 		--table-innerBorderColor: rgba(20, 21, 25, 1);
 		--table-borderWidth: 1px;
 		--table-cornerRadius: 1rem;
-		--table-cell-verticalAlign: top;
+		--table-cell-verticalAlign: middle;
 		--table-cell-padding: 0.5em 1em;
 
 		scroll-padding: var(--table-borderWidth);
