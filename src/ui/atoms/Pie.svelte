@@ -285,6 +285,7 @@
 	})
 </script>
 
+
 {#snippet sliceSnippet(slice: ComputedSlice)}
 	<g
 		class="slice"
@@ -343,7 +344,6 @@
 		{/if}
 	</g>
 {/snippet}
-
 
 <div
 	class="container"
