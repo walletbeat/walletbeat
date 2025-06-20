@@ -6,8 +6,7 @@ export class WalletTableState {
 		'separated'
 	)
 
-	selectedEvaluationAttribute: string | undefined = $state(undefined)
-
+	selectedAttribute: string | undefined = $state(undefined)
 
 	expandedRowIds = $state(
 		new SvelteSet<string>()

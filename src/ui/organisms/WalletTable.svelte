@@ -58,7 +58,7 @@
 		wallets
 	)
 
-	let activeEvaluationAttribute: string | undefined = $state(undefined)
+	let activeAttribute: { walletId: string; attributeGroupId: string; attributeId: string } | undefined = $state(undefined)
 
 	// (Derived)
 	const selectedVariant = $derived.by(() => {
@@ -499,7 +499,7 @@
 			<CombinedWalletRating
 				{wallet}
 				{attributeGroups}
-				bind:selectedEvaluationAttribute={walletTableState.selectedEvaluationAttribute}
+				bind:selectedAttribute={walletTableState.selectedAttribute}
 				bind:selectedVariant={walletTableState.selectedVariant}
 				{isExpanded}
 				toggleExpanded={id => {
@@ -518,11 +518,13 @@
 					evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
 				))}
 
-			{@const currentEvaluationAttribute = (
-				activeEvaluationAttribute ?
-					evalGroup[activeEvaluationAttribute]
-				: walletTableState.selectedEvaluationAttribute ?
-					evalGroup[walletTableState.selectedEvaluationAttribute]
+			{@const hasActiveAttribute = activeAttribute?.walletId === wallet.metadata.id && activeAttribute?.attributeGroupId === attrGroup.id}
+
+			{@const currentAttribute = (
+				hasActiveAttribute && activeAttribute ?
+					evalGroup[activeAttribute.attributeId]
+				: walletTableState.selectedAttribute ?
+					evalGroup[walletTableState.selectedAttribute]
 				:
 					undefined
 			)}
@@ -578,7 +580,7 @@
 							}
 						)
 					}
-					highlightedSliceId={currentEvaluationAttribute?.attribute.id}
+					highlightedSliceId={currentAttribute?.attribute.id}
 					centerLabel={
 						groupScore ?
 							groupScore.hasUnratedComponent ?
@@ -592,27 +594,33 @@
 						:
 							'❓'
 					}
-					onSliceClick={id => {
-						walletTableState.selectedEvaluationAttribute = activeEvaluationAttribute = (
-							walletTableState.selectedEvaluationAttribute === id ? undefined : id
+					onSliceClick={attributeId => {
+						walletTableState.selectedAttribute = (
+							walletTableState.selectedAttribute === attributeId ? undefined : attributeId
 						)
 
 						if (!isExpanded)
 							walletTableState.toggleRowExpanded(wallet.metadata.id)
 					}}
-					onSliceMouseEnter={id => {
-						activeEvaluationAttribute = id
+					onSliceMouseEnter={attributeId => {
+						activeAttribute = {
+							walletId: wallet.metadata.id,
+							attributeGroupId: attrGroup.id,
+							attributeId,
+						}
 					}}
-					onSliceMouseLeave={id => {
-						if (activeEvaluationAttribute === id)
-							activeEvaluationAttribute = undefined
+					onSliceMouseLeave={attributeId => {
+						activeAttribute = undefined
 					}}
-					onSliceFocus={id => {
-						activeEvaluationAttribute = id
+					onSliceFocus={attributeId => {
+						activeAttribute = {
+							walletId: wallet.metadata.id,
+							attributeGroupId: attrGroup.id,
+							attributeId,
+						}
 					}}
-					onSliceBlur={id => {
-						if (activeEvaluationAttribute === id)
-							activeEvaluationAttribute = undefined
+					onSliceBlur={attributeId => {
+						activeAttribute = undefined
 					}}
 				/>
 
@@ -620,17 +628,17 @@
 					class="details"
 					hidden={!isExpanded}
 				>
-					{#if !((activeEvaluationAttribute ? evalGroup[activeEvaluationAttribute] : walletTableState.selectedEvaluationAttribute ? evalGroup[walletTableState.selectedEvaluationAttribute] : undefined))}
+					{#if !((hasActiveAttribute && activeAttribute ? evalGroup[activeAttribute.attributeId] : walletTableState.selectedAttribute ? evalGroup[walletTableState.selectedAttribute] : undefined))}
 						<WalletAttributeSummary
 							{wallet}
 							attributeGroup={attrGroup}
 						/>
 					{:else}
 						{@const evaluatedAttribute = (
-							activeEvaluationAttribute ?
-								evalGroup[activeEvaluationAttribute]
-							: walletTableState.selectedEvaluationAttribute ?
-								evalGroup[walletTableState.selectedEvaluationAttribute]
+							hasActiveAttribute && activeAttribute ?
+								evalGroup[activeAttribute.attributeId]
+							: walletTableState.selectedAttribute ?
+								evalGroup[walletTableState.selectedAttribute]
 							:
 								undefined
 						)}
@@ -646,10 +654,10 @@
 
 		<!-- Attribute rating -->
 		{:else}
-			{@const [groupId, attrId] = column.id.split('.')}
-			{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === groupId)!}
+			{@const [attributeGroupId, attrId] = column.id.split('.')}
+			{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === attributeGroupId)!}
 			{@const attribute = attrGroup.attributes[attrId]}
-			{@const evalAttr = wallet.overall[groupId][attrId]}
+			{@const evalAttr = wallet.overall[attributeGroupId][attrId]}
 
 			<div class="wallet-attribute-rating">
 				<Pie
