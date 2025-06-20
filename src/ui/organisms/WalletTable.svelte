@@ -95,6 +95,7 @@
 
 	// Components
 	import Filters from '@/ui/molecules/Filters.svelte'
+	import WalletAttributeGroupSummary from '@/ui/molecules/WalletAttributeGroupSummary.svelte'
 	import WalletAttributeSummary from '@/ui/molecules/WalletAttributeSummary.svelte'
 
 	import Pie, { PieLayout } from '@/ui/atoms/Pie.svelte'
@@ -692,7 +693,7 @@
 							variant={selectedVariant}
 						/>
 					{:else if displayedGroup}
-						<WalletAttributeSummary
+						<WalletAttributeGroupSummary
 							{wallet}
 							attributeGroup={displayedGroup}
 						/>
@@ -842,7 +843,7 @@
 							variant={selectedVariant}
 						/>
 					{:else}
-						<WalletAttributeSummary
+						<WalletAttributeGroupSummary
 							{wallet}
 							attributeGroup={attrGroup}
 						/>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import { type AttributeGroup, type EvaluatedGroup, type EvaluatedAttribute, Rating, ratingToIcon } from '@/schema/attributes'
+	import { type EvaluatedAttribute, ratingToIcon } from '@/schema/attributes'
 	import { attributeVariantSpecificity, VariantSpecificity, type RatedWallet } from '@/schema/wallet'
 	import type { Variant } from '@/schema/variants'
 
@@ -8,12 +8,10 @@
 	// Props
 	let {
 		wallet,
-		attributeGroup,
 		attribute,
 		variant,
 	}: {
 		wallet: RatedWallet
-		attributeGroup?: AttributeGroup<any>
 		attribute: EvaluatedAttribute<any>
 		variant?: Variant
 	} = $props()
@@ -31,60 +29,42 @@
 
 
 <div>
-	{#if attributeGroup && !attribute?.evaluation?.value}
-		<!-- Attribute group -->
-		<h3>
-			<span>{attributeGroup.icon}</span> {attributeGroup.displayName}
-		</h3>
+	<h4>
+		<span>{attribute.evaluation.value.icon ?? attribute.attribute.icon}</span>
+		{attribute.attribute.displayName}
+	</h4>
 
-		<p>
-			<Typography
-				content={attributeGroup.perWalletQuestion}
-				strings={{
-					WALLET_NAME: wallet.metadata.displayName,
-				}}
-			/>
-		</p>
+	<p>
+		{ratingToIcon(attribute.evaluation.value.rating)}
 
-	{:else}
-		<!-- Attribute -->
-		<h4>
-			<span>{attribute.evaluation.value.icon ?? attribute.attribute.icon}</span>
-			{attribute.attribute.displayName}
-		</h4>
+		<Typography
+			content={attribute.evaluation.value.shortExplanation}
+			strings={{
+				WALLET_NAME: wallet.metadata.displayName,
+				WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+				WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
+			}}
+		/>
 
-		<p>
-			{ratingToIcon(attribute.evaluation.value.rating)}
+		{#if variant && wallet.variants[variant]}
+			{@const specificity = attributeVariantSpecificity(wallet, variant, attribute.attribute)}
 
-			<Typography
-				content={attribute.evaluation.value.shortExplanation}
-				strings={{
-					WALLET_NAME: wallet.metadata.displayName,
-					WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-					WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
-				}}
-			/>
-
-			{#if variant && wallet.variants[variant]}
-				{@const specificity = attributeVariantSpecificity(wallet, variant, attribute.attribute)}
-
-				{#if specificity === VariantSpecificity.NOT_UNIVERSAL}
-					This is the case on the {variantToName(variant, false)} version.
-				{:else if specificity === VariantSpecificity.UNIQUE_TO_VARIANT}
-					This is only the case on the {variantToName(variant, false)} version.
-				{/if}
+			{#if specificity === VariantSpecificity.NOT_UNIVERSAL}
+				This is the case on the {variantToName(variant, false)} version.
+			{:else if specificity === VariantSpecificity.UNIQUE_TO_VARIANT}
+				This is only the case on the {variantToName(variant, false)} version.
 			{/if}
-		</p>
+		{/if}
+	</p>
 
-		<div>
-			<a 
-				href="/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, variant ?? null)}#{slugifyCamelCase(attribute.attribute.id)}"
-			>
-				<span>{@html InfoIcon}</span>
-				Learn more
-			</a>
-		</div>
-	{/if}
+	<div>
+		<a 
+			href="/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, variant ?? null)}#{slugifyCamelCase(attribute.attribute.id)}"
+		>
+			<span>{@html InfoIcon}</span>
+			Learn more
+		</a>
+	</div>
 </div>
 
 
