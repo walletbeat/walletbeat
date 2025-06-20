@@ -311,6 +311,37 @@
 	})}
 		{@const isExpanded = walletTableState.isRowExpanded(wallet.metadata.id)}
 
+		{#snippet withExpandedContent({
+			content,
+			expandedContent,
+		}: {
+			content: Snippet
+			expandedContent: Snippet
+		})}
+			<div
+				class="with-expanded-content"
+				data-is-expanded={isExpanded ? '' : undefined}
+			>
+				<Tooltip
+					isEnabled={!isExpanded}
+				>
+					{@render content()}
+
+					{#snippet tooltip()}
+						{#if !isExpanded}
+							{@render expandedContent()}
+						{/if}
+					{/snippet}
+				</Tooltip>
+
+				{#if isExpanded}
+					<div class="expanded-content">
+						{@render expandedContent()}
+					</div>
+				{/if}
+			</div>
+		{/snippet}
+
 		{#if column.id === 'displayName'}
 			{@const displayName = value}
 			{@const accountTypes = walletSupportedAccountTypes(wallet, selectedVariant ?? 'ALL_VARIANTS')}
@@ -319,10 +350,7 @@
 					.filter(variant => variant in wallet.variants)
 			)}
 
-			<div
-				class="wallet-name-cell column"
-				data-is-expanded={isExpanded ? '' : undefined}
-			>
+			<div class="wallet-name-cell column">
 				<div class="wallet-name-title row">
 					<div class="row">
 						<span>
@@ -535,142 +563,123 @@
 			{#if column.id === 'overall'}
 				{@const score = value}
 
-				<div class="overall-rating">
-					<Tooltip
-						isEnabled={!isExpanded}
-					>
-						<Pie
-							slices={
-								attributeGroups.map(group => {
-									const groupScore = calculateAttributeGroupScore(group.attributeWeights, wallet.overall[group.id])
-									const evalGroup = wallet.overall[group.id]
+				{#snippet content()}
+					<Pie
+						slices={
+							attributeGroups.map(group => {
+								const groupScore = calculateAttributeGroupScore(group.attributeWeights, wallet.overall[group.id])
+								const evalGroup = wallet.overall[group.id]
 
-									return {
-										id: group.id,
-										arcLabel: group.icon,
-										color: (
-											groupScore && !groupScore.hasUnratedComponent ?
-												`hsl(${Math.round(groupScore.score * 120)}, 80%, 45%)`
+								return {
+									id: group.id,
+									arcLabel: group.icon,
+									color: (
+										groupScore && !groupScore.hasUnratedComponent ?
+											`hsl(${Math.round(groupScore.score * 120)}, 80%, 45%)`
+										:
+											'#666'
+									),
+									tooltip: group.displayName,
+									tooltipValue: (
+										groupScore ?
+											groupScore.hasUnratedComponent ?
+												'Unrated'
 											:
-												'#666'
+												(groupScore.score * 100).toFixed(0) + '%'
+										:
+											'N/A'
+									),
+									weight: 1,
+									...evalGroup && {
+										children: (
+											evaluatedAttributesEntries(evalGroup)
+												.filter(([_, evalAttr]) => (
+													evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
+												))
+												.map(([evalAttrId, evalAttr]) => ({
+													id: `${group.id}:${evalAttrId}`,
+													color: ratingToColor(evalAttr.evaluation.value.rating),
+													weight: 1,
+													arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
+													tooltip: `${evalAttr.attribute.displayName}`,
+													tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
+												}))
 										),
-										tooltip: group.displayName,
-										tooltipValue: (
-											groupScore ?
-												groupScore.hasUnratedComponent ?
-													'Unrated'
-												:
-													(groupScore.score * 100).toFixed(0) + '%'
-											:
-												'N/A'
-										),
-										weight: 1,
-										...evalGroup && {
-											children: (
-												evaluatedAttributesEntries(evalGroup)
-													.filter(([_, evalAttr]) => (
-														evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
-													))
-													.map(([evalAttrId, evalAttr]) => ({
-														id: `${group.id}:${evalAttrId}`,
-														color: ratingToColor(evalAttr.evaluation.value.rating),
-														weight: 1,
-														arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
-														tooltip: `${evalAttr.attribute.displayName}`,
-														tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
-													}))
-											),
-										},
-									}
-								})
-							}
-							layout={PieLayout.FullTop}
-							padding={8}
-							radius={80}
-							levels={[
-								{
-									outerRadiusFraction: 0.705,
-									innerRadiusFraction: 0.3,
-									gap: 4,
-									angleGap: 0
-								},
-								{
-									outerRadiusFraction: 1,
-									innerRadiusFraction: 0.7,
-									gap: 2,
-									angleGap: 1,
+									},
 								}
-							]}
-							{highlightedSliceId}
-							onSliceClick={sliceId => {
-								const [groupId, attrId] = sliceId.split(':')
-
-								walletTableState.selectedAttribute = (
-									walletTableState.selectedAttribute === attrId ? undefined : attrId
-								)
-
-								if (!isExpanded)
-									walletTableState.toggleRowExpanded(wallet.metadata.id)
-							}}
-							onSliceMouseEnter={sliceId => {
-								const [groupId, attrId] = sliceId.split(':')
-
-								activeAttribute = {
-									walletId: wallet.metadata.id,
-									attributeGroupId: groupId,
-									attributeId: attrId,
-								}
-							}}
-							onSliceMouseLeave={sliceId => {
-								activeAttribute = undefined
-							}}
-							centerLabel={
-								score ?
-									(score * 100).toFixed(0)
-								:
-									'❓'
+							})
+						}
+						layout={PieLayout.FullTop}
+						padding={8}
+						radius={80}
+						levels={[
+							{
+								outerRadiusFraction: 0.705,
+								innerRadiusFraction: 0.3,
+								gap: 4,
+								angleGap: 0
+							},
+							{
+								outerRadiusFraction: 1,
+								innerRadiusFraction: 0.7,
+								gap: 2,
+								angleGap: 1,
 							}
+						]}
+						{highlightedSliceId}
+						onSliceClick={sliceId => {
+							const [groupId, attrId] = sliceId.split(':')
+
+							walletTableState.selectedAttribute = (
+								walletTableState.selectedAttribute === attrId ? undefined : attrId
+							)
+
+							if (!isExpanded)
+								walletTableState.toggleRowExpanded(wallet.metadata.id)
+						}}
+						onSliceMouseEnter={sliceId => {
+							const [groupId, attrId] = sliceId.split(':')
+
+							activeAttribute = {
+								walletId: wallet.metadata.id,
+								attributeGroupId: groupId,
+								attributeId: attrId,
+							}
+						}}
+						onSliceMouseLeave={sliceId => {
+							activeAttribute = undefined
+						}}
+						centerLabel={
+							score ?
+								(score * 100).toFixed(0)
+							:
+								'❓'
+						}
+					/>
+				{/snippet}
+
+				{#snippet expandedContent()}
+					{#if highlightedGroup && highlightedAttribute}
+						<WalletAttributeSummary
+							{wallet}
+							evaluatedAttribute={highlightedAttribute}
+							selectedVariant={selectedVariant}
 						/>
-
-						{#snippet tooltip()}
-							{#if highlightedGroup && highlightedAttribute}
-								<WalletAttributeSummary
-									{wallet}
-									evaluatedAttribute={highlightedAttribute}
-									selectedVariant={selectedVariant}
-								/>
-							{:else if highlightedGroup}
-								<WalletAttributeSummary
-									{wallet}
-									attributeGroup={highlightedGroup}
-								/>
-							{:else}
-								<div class="fallback-tooltip">
-									<strong>{wallet.metadata.displayName}</strong>
-									<div>Overall Rating: {score ? (score * 100).toFixed(0) + '%' : 'N/A'}</div>
-									<div class="tooltip-hint">Hover over sections for details</div>
-								</div>
-							{/if}
-						{/snippet}
-					</Tooltip>
-
-					{#if isExpanded}
-						<div class="details">
-							{#if !highlightedAttribute}
-								<WalletAttributeSummary
-									{wallet}
-									attributeGroup={highlightedGroup}
-								/>
-							{:else}
-								<WalletAttributeSummary
-									{wallet}
-									evaluatedAttribute={highlightedAttribute}
-									selectedVariant={selectedVariant}
-								/>
-							{/if}
-						</div>
+					{:else if highlightedGroup}
+						<WalletAttributeSummary
+							{wallet}
+							attributeGroup={highlightedGroup}
+						/>
+					{:else}
+						<strong>{wallet.metadata.displayName}</strong>
+						<div>Overall Rating: {score ? (score * 100).toFixed(0) + '%' : 'N/A'}</div>
 					{/if}
-				</div>
+				{/snippet}
+
+				{@render withExpandedContent({
+					content,
+					expandedContent,
+				})}
 
 			<!-- Attribute group rating -->
 			{:else if !column.id.includes('.')}
@@ -694,147 +703,121 @@
 						undefined
 				)}
 
-				<div class="attribute-group-rating">
-					<Tooltip
-						placement="block-end"
-						isEnabled={!isExpanded}
-					>
-						<Pie
-							layout={PieLayout.FullTop}
-							radius={44}
-							levels={[
-								{
-									outerRadiusFraction: 1,
-									innerRadiusFraction: 0.3,
-									gap: 2,
-									angleGap: 0
-								}
-							]}
-							padding={4}
-							slices={	
-								!isNonEmptyArray(evalEntries) ?
-									[]
-								
-								: nonEmptyMap(
-									evalEntries,
-									([evalAttrId, evalAttr]) => {
-										const icon = evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon
+				{#snippet content()}
+					<Pie
+						layout={PieLayout.FullTop}
+						radius={44}
+						levels={[
+							{
+								outerRadiusFraction: 1,
+								innerRadiusFraction: 0.3,
+								gap: 2,
+								angleGap: 0
+							}
+						]}
+						padding={4}
+						slices={	
+							!isNonEmptyArray(evalEntries) ?
+								[]
+							
+							: nonEmptyMap(
+								evalEntries,
+								([evalAttrId, evalAttr]) => {
+									const icon = evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon
 
-										const tooltipSuffix = (() => {
-											const variant = selectedVariant
+									const tooltipSuffix = (() => {
+										const variant = selectedVariant
 
-											if(!variant || !wallet.variants[variant])
-												return
+										if(!variant || !wallet.variants[variant])
+											return
 
-											const specificity = attributeVariantSpecificity(wallet, variant, evalAttr.attribute)
+										const specificity = attributeVariantSpecificity(wallet, variant, evalAttr.attribute)
 
-											return (
-												specificity === VariantSpecificity.UNIQUE_TO_VARIANT ?
-													` (${variantToName(variant, false)} only)`
-												: specificity === VariantSpecificity.NOT_UNIVERSAL ?
-													` (${variantToName(variant, false)} specific)`
-												:
-													undefined
-											)
-										})()
-										
-										return {
-											id: evalAttrId.toString(),
-											color: ratingToColor(evalAttr.evaluation.value.rating),
-											weight: 1,
-											arcLabel: icon,
-											tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
-											tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
-										}
+										return (
+											specificity === VariantSpecificity.UNIQUE_TO_VARIANT ?
+												` (${variantToName(variant, false)} only)`
+											: specificity === VariantSpecificity.NOT_UNIVERSAL ?
+												` (${variantToName(variant, false)} specific)`
+											:
+												undefined
+										)
+									})()
+									
+									return {
+										id: evalAttrId.toString(),
+										color: ratingToColor(evalAttr.evaluation.value.rating),
+										weight: 1,
+										arcLabel: icon,
+										tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
+										tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
 									}
-								)
-							}
-							highlightedSliceId={currentAttribute?.attribute.id}
-							centerLabel={
-								groupScore ?
-									groupScore.hasUnratedComponent ?
-										ratingToIcon(Rating.UNRATED)
-									: groupScore.score <= 0.0 ?
-										'\u{1f480}'
-									: groupScore.score >= 1.0 ?
-											'\u{1f4af}'
-									:
-										(groupScore.score * 100).toFixed(0)
+								}
+							)
+						}
+						highlightedSliceId={currentAttribute?.attribute.id}
+						centerLabel={
+							groupScore ?
+								groupScore.hasUnratedComponent ?
+									ratingToIcon(Rating.UNRATED)
+								: groupScore.score <= 0.0 ?
+									'\u{1f480}'
+								: groupScore.score >= 1.0 ?
+										'\u{1f4af}'
 								:
-									'❓'
+									(groupScore.score * 100).toFixed(0)
+							:
+								'❓'
+						}
+						onSliceClick={attributeId => {
+							walletTableState.selectedAttribute = (
+								walletTableState.selectedAttribute === attributeId ? undefined : attributeId
+							)
+
+							if (!isExpanded)
+								walletTableState.toggleRowExpanded(wallet.metadata.id)
+						}}
+						onSliceMouseEnter={attributeId => {
+							activeAttribute = {
+								walletId: wallet.metadata.id,
+								attributeGroupId: attrGroup.id,
+								attributeId,
 							}
-							onSliceClick={attributeId => {
-								walletTableState.selectedAttribute = (
-									walletTableState.selectedAttribute === attributeId ? undefined : attributeId
-								)
+						}}
+						onSliceMouseLeave={attributeId => {
+							activeAttribute = undefined
+						}}
+						onSliceFocus={attributeId => {
+							activeAttribute = {
+								walletId: wallet.metadata.id,
+								attributeGroupId: attrGroup.id,
+								attributeId,
+							}
+						}}
+						onSliceBlur={attributeId => {
+							activeAttribute = undefined
+						}}
+					/>
+				{/snippet}
 
-								if (!isExpanded)
-									walletTableState.toggleRowExpanded(wallet.metadata.id)
-							}}
-							onSliceMouseEnter={attributeId => {
-								activeAttribute = {
-									walletId: wallet.metadata.id,
-									attributeGroupId: attrGroup.id,
-									attributeId,
-								}
-							}}
-							onSliceMouseLeave={attributeId => {
-								activeAttribute = undefined
-							}}
-							onSliceFocus={attributeId => {
-								activeAttribute = {
-									walletId: wallet.metadata.id,
-									attributeGroupId: attrGroup.id,
-									attributeId,
-								}
-							}}
-							onSliceBlur={attributeId => {
-								activeAttribute = undefined
-							}}
+				{#snippet expandedContent()}
+					{#if hasActiveAttribute && activeAttribute}
+						<WalletAttributeSummary
+							{wallet}
+							evaluatedAttribute={evalGroup[activeAttribute.attributeId]}
+							selectedVariant={selectedVariant}
 						/>
-
-						{#snippet tooltip()}
-							{#if hasActiveAttribute && activeAttribute}
-								<WalletAttributeSummary
-									{wallet}
-									evaluatedAttribute={evalGroup[activeAttribute.attributeId]}
-									selectedVariant={selectedVariant}
-								/>
-							{:else}
-								<WalletAttributeSummary
-									{wallet}
-									attributeGroup={attrGroup}
-								/>
-							{/if}
-						{/snippet}
-					</Tooltip>
-
-					{#if isExpanded}
-						<div class="details">
-							{#if !((hasActiveAttribute && activeAttribute ? evalGroup[activeAttribute.attributeId] : walletTableState.selectedAttribute ? evalGroup[walletTableState.selectedAttribute] : undefined))}
-								<WalletAttributeSummary
-									{wallet}
-									attributeGroup={attrGroup}
-								/>
-							{:else}
-								{@const evaluatedAttribute = (
-									hasActiveAttribute && activeAttribute ?
-										evalGroup[activeAttribute.attributeId]
-									: walletTableState.selectedAttribute ?
-										evalGroup[walletTableState.selectedAttribute]
-									:
-										undefined
-								)}
-
-								<WalletAttributeSummary
-									{wallet}
-									{evaluatedAttribute}
-									selectedVariant={selectedVariant}
-								/>
-							{/if}
-						</div>
+					{:else}
+						<WalletAttributeSummary
+							{wallet}
+							attributeGroup={attrGroup}
+						/>
 					{/if}
-				</div>
+				{/snippet}
+
+				{@render withExpandedContent({
+					content,
+					expandedContent,
+				})}
 
 			<!-- Attribute rating -->
 			{:else}
@@ -843,62 +826,63 @@
 				{@const attribute = attrGroup.attributes[attrId]}
 				{@const evalAttr = wallet.overall[attributeGroupId][attrId]}
 
-				<div class="wallet-attribute-rating">
-					<Tooltip
-						isEnabled={!isExpanded}
-					>
-						<Pie
-							layout={PieLayout.HalfTop}
-							radius={24}
-							levels={
+				{#snippet content()}
+					<Pie
+						layout={PieLayout.HalfTop}
+						radius={24}
+						levels={
+							[
+								{
+									outerRadiusFraction: 1,
+									innerRadiusFraction: 0.3,
+									gap: evalAttr.evaluation.value.rating !== Rating.EXEMPT ? 20 : 0,
+									angleGap: 0,
+								}
+							]
+						}
+						padding={4}
+						slices={
+							evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
 								[
 									{
-										outerRadiusFraction: 1,
-										innerRadiusFraction: 0.3,
-										gap: evalAttr.evaluation.value.rating !== Rating.EXEMPT ? 20 : 0,
-										angleGap: 0,
+										id: attrId,
+										color: evalAttr.evaluation.value.rating === Rating.PASS ? '#22c55e' : 
+											evalAttr.evaluation.value.rating === Rating.PARTIAL ? '#eab308' : 
+											evalAttr.evaluation.value.rating === Rating.FAIL ? '#ef4444' : '#6b7280',
+										weight: 1,
+										arcLabel: attribute.icon,
+										tooltip: `${attribute.icon} ${attribute.displayName}`,
+										tooltipValue: evalAttr.evaluation.value.rating,
 									}
 								]
+							:
+								[]
+						}
+						centerLabel={evalAttr.evaluation.value.rating}
+						onSliceMouseEnter={attributeId => {
+							highlightedAttributeInfo = { wallet, attributeGroupId: groupId, attributeId }
+							highlightedGroupInfo = null
+						}}
+						onSliceMouseLeave={attributeId => {
+							if (highlightedAttributeInfo?.attributeId === attributeId) {
+								highlightedAttributeInfo = null
 							}
-							padding={4}
-							slices={
-								evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
-									[
-										{
-											id: attrId,
-											color: evalAttr.evaluation.value.rating === Rating.PASS ? '#22c55e' : 
-												evalAttr.evaluation.value.rating === Rating.PARTIAL ? '#eab308' : 
-												evalAttr.evaluation.value.rating === Rating.FAIL ? '#ef4444' : '#6b7280',
-											weight: 1,
-											arcLabel: attribute.icon,
-											tooltip: `${attribute.icon} ${attribute.displayName}`,
-											tooltipValue: evalAttr.evaluation.value.rating,
-										}
-									]
-								:
-									[]
-							}
-							centerLabel={evalAttr.evaluation.value.rating}
-							onSliceMouseEnter={attributeId => {
-								highlightedAttributeInfo = { wallet, attributeGroupId: groupId, attributeId }
-								highlightedGroupInfo = null
-							}}
-							onSliceMouseLeave={attributeId => {
-								if (highlightedAttributeInfo?.attributeId === attributeId) {
-									highlightedAttributeInfo = null
-								}
-							}}
-						/>
+						}}
+					/>
+				{/snippet}
 
-						{#snippet tooltip()}
-							<WalletAttributeSummary
-								{wallet}
-								evaluatedAttribute={evalAttr}
-								{selectedVariant}
-							/>
-						{/snippet}
-					</Tooltip>
-				</div>
+				{#snippet expandedContent()}
+					<WalletAttributeSummary
+						{wallet}
+						evaluatedAttribute={evalAttr}
+						{selectedVariant}
+					/>
+				{/snippet}
+
+				{@render withExpandedContent({
+					content,
+					expandedContent,
+				})}
 			{/if}
 		{/if}
 	{/snippet}
@@ -918,10 +902,6 @@
 
 	.wallet-name-cell {
 		transition-property: gap;
-
-		&:not([data-is-expanded]) {
-			gap: 0;
-		}
 
 		.wallet-name-title {
 			img {
@@ -1039,12 +1019,18 @@
 		margin-inline: -1em;
 	}
 
-	.overall-rating,
-	.attribute-group-rating {
+	.with-expanded-content {
 		display: grid;
-		gap: 0.75em;
+		justify-content: center;
+		gap: 0;
 
-		.details {
+		transition-property: gap;
+
+		&[data-is-expanded] {
+			gap: 0.75em;
+		}
+
+		.expanded-content {
 			inline-size: 0;
 			min-inline-size: 100%;
 
