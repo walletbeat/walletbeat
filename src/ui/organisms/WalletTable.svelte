@@ -661,16 +661,40 @@
 				{/snippet}
 
 				{#snippet expandedContent()}
-					{#if highlightedGroup && highlightedAttribute}
+					{@const displayedAttribute = (
+						activeAttributeId?.walletId === wallet.metadata.id ?
+							activeAttributeId.attributeId ?
+								wallet.overall[activeAttributeId.attributeGroupId]?.[activeAttributeId.attributeId]
+							:
+								undefined
+						: walletTableState.selectedAttribute ?
+							attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id]) ?
+								wallet.overall[attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id])!.id]?.[walletTableState.selectedAttribute]
+							:
+								undefined
+						:
+							undefined
+					)}
+		
+					{@const displayedGroup = (
+						activeAttributeId?.walletId === wallet.metadata.id ?
+							attributeGroups.find(g => g.id === activeAttributeId.attributeGroupId)
+						: walletTableState.selectedAttribute ?
+							attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id])
+						:
+							undefined
+					)}
+
+					{#if displayedAttribute}
 						<WalletAttributeSummary
 							{wallet}
-							evaluatedAttribute={highlightedAttribute}
+							evaluatedAttribute={displayedAttribute}
 							selectedVariant={selectedVariant}
 						/>
-					{:else if highlightedGroup}
+					{:else if displayedGroup}
 						<WalletAttributeSummary
 							{wallet}
-							attributeGroup={highlightedGroup}
+							attributeGroup={displayedGroup}
 						/>
 					{:else}
 						<strong>{wallet.metadata.displayName}</strong>
@@ -802,10 +826,19 @@
 				{/snippet}
 
 				{#snippet expandedContent()}
-					{#if hasActiveAttribute && activeAttributeId}
+					{@const displayedAttribute = (
+						activeAttributeId?.walletId === wallet.metadata.id && activeAttributeId?.attributeGroupId === attrGroup.id ?
+							evalGroup[activeAttributeId.attributeId]
+						: walletTableState.selectedAttribute ?
+							evalGroup[walletTableState.selectedAttribute]
+						:
+							undefined
+					)}
+
+					{#if displayedAttribute}
 						<WalletAttributeSummary
 							{wallet}
-							evaluatedAttribute={evalGroup[activeAttributeId.attributeId]}
+							evaluatedAttribute={displayedAttribute}
 							selectedVariant={selectedVariant}
 						/>
 					{:else}
