@@ -8,12 +8,14 @@
 		placement = 'block-end',
 		offset = 8,
 		tooltip,
+		isEnabled = true,
 		children,
 		...restProps
 	}: {
 		placement?: 'block-start' | 'block-end' | 'inline-start' | 'inline-end'
 		offset?: number
 		tooltip: Snippet
+		isEnabled?: boolean
 		children: Snippet
 	} & Record<string, any> = $props()
 
@@ -25,49 +27,50 @@
 </script>
 
 
-<button
-	style:anchor-name={anchorName}
-	popovertarget={popoverId}
-	{...restProps}
+{#if isEnabled}
+	<button
+		style:anchor-name={anchorName}
+		popovertarget={popoverId}
+		{...restProps}
 
-	{@attach node => {
-		const abortController = new AbortController()
+		{@attach node => {
+			const abortController = new AbortController()
 
-		node.addEventListener(
-			'mouseenter',
-			() => {
-				node.popoverTargetElement?.showPopover()
-			},
-			{ signal: abortController.signal }
-		)
-		node.addEventListener(
-			'mouseleave',
-			() => {
-				node.popoverTargetElement?.hidePopover()
-			},
-			{ signal: abortController.signal }
-		)
+			node.addEventListener(
+				'mouseenter',
+				() => {
+					node.popoverTargetElement?.showPopover()
+				},
+				{ signal: abortController.signal }
+			)
+			node.addEventListener(
+				'mouseleave',
+				() => {
+					node.popoverTargetElement?.hidePopover()
+				},
+				{ signal: abortController.signal }
+			)
 
-		return () => {
-			abortController.abort()
-		}
-	}}
->
-	<div>
-		{@render children()}
-	</div>
-
-	<div
-		popover="auto"
-		class="tooltip"
-		id={popoverId}
-		style:position-area={placement}
-		style:position-anchor={anchorName}
-		style:--offset={`${offset}px`}
+			return () => {
+				abortController.abort()
+			}
+		}}
 	>
-		{@render tooltip()}
-	</div>
-</button>
+		{@render children()}
+
+		<div
+			popover="auto"
+			id={popoverId}
+			style:position-area={placement}
+			style:position-anchor={anchorName}
+			style:--offset={`${offset}px`}
+		>
+			{@render tooltip()}
+		</div>
+	</button>
+{:else}
+	{@render children()}
+{/if}
 
 
 <style>
