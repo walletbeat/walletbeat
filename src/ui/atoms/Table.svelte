@@ -430,11 +430,6 @@
 
 				&:nth-of-type(odd) {
 					background-color: var(--table-row-backgroundColor);
-
-					> td {
-						box-shadow: var(--table-borderWidth) 0 var(--table-row-backgroundColor);
-						vertical-align: var(--table-cell-verticalAlign);
-					}
 				}
 
 				&[tabIndex='0'] {
@@ -476,6 +471,11 @@
 				&[data-disabled] {
 					filter: grayscale();
 					opacity: 0.3;
+				}
+
+				> td {
+					box-shadow: var(--table-borderWidth) 0 var(--table-row-backgroundColor);
+					vertical-align: var(--table-cell-verticalAlign);
 				}
 			}
 		}
