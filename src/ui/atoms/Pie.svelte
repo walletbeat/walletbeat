@@ -81,6 +81,8 @@
 
 		// Snippets
 		centerContentSnippet,
+
+		...restProps
 	}: {
 		// Content
 		slices: Slice[]
@@ -346,7 +348,8 @@
 {/snippet}
 
 <div
-	class="container"
+	{...restProps}
+	class="container {'class' in restProps ? restProps.class : ''}"
 	data-layout={layout}
 >
 	<svg {...svgAttributes}>
