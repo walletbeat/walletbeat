@@ -273,7 +273,7 @@
 		--table-borderWidth: 1px;
 		--table-cornerRadius: 1rem;
 		--table-cell-verticalAlign: middle;
-		--table-cell-padding: 0.5em 1em;
+		--table-cell-padding: 0.75em;
 
 		scroll-padding: var(--table-borderWidth);
 
