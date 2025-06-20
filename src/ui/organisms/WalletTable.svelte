@@ -329,7 +329,9 @@
 
 					{#snippet tooltip()}
 						{#if !isExpanded}
-							{@render expandedContent()}
+							<div class="expanded-tooltip-content">
+								{@render expandedContent()}
+							</div>
 						{/if}
 					{/snippet}
 				</Tooltip>
@@ -1033,6 +1035,10 @@
 
 			font-size: 0.66em;
 			text-align: center;
+		}
+
+		.expanded-tooltip-content {
+			max-width: 13rem;
 		}
 	}
 
