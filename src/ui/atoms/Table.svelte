@@ -232,6 +232,8 @@
 
 						<td
 							colspan={columnSpan}
+							data-column={column.id}
+							data-row={rowId}
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
 							data-is-sticky={column.isSticky ? '' : undefined}
