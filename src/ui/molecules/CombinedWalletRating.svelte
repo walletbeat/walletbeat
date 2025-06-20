@@ -200,14 +200,14 @@
 		radius={80}
 		levels={[
 			{
-				outerRadiusFraction: 0.7,
+				outerRadiusFraction: 0.705,
 				innerRadiusFraction: 0.3,
 				gap: 4,
 				angleGap: 0
 			},
 			{
 				outerRadiusFraction: 1,
-				innerRadiusFraction: 0.75,
+				innerRadiusFraction: 0.7,
 				gap: 2,
 				angleGap: 1,
 			}
