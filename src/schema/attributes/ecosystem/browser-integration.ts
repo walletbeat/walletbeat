@@ -17,6 +17,7 @@ import {
   type Support,
 } from '@/schema/features/support';
 import { popRefs, type WithRef } from '@/schema/reference';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, paragraph, sentence } from '@/types/content';
 import { commaListFormat } from '@/types/utils/text';
 
@@ -163,7 +164,7 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
     ),
   },
   evaluate: (features: ResolvedFeatures): Evaluation<BrowserIntegrationValue> => {
-    if (features.variant !== Variant.BROWSER) {
+    if (features.type !== WalletType.SOFTWARE || features.variant !== Variant.BROWSER) {
       return exempt(
         browserIntegration,
         sentence('Only browser-based wallets are rated on their browser integration support.'),

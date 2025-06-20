@@ -10,7 +10,8 @@ import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
 import { isSupported } from '@/schema/features/support';
 import { mergeRefs, refs } from '@/schema/reference';
-import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import { type AtLeastOneVariant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating } from '../common';
@@ -196,7 +197,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
   },
   evaluate: (features: ResolvedFeatures): Evaluation<SoftwareHWIntegrationValue> => {
     // For hardware wallets, this evaluation doesn't apply
-    if (features.variant === Variant.HARDWARE) {
+    if (features.type !== WalletType.HARDWARE) {
       return {
         value: {
           id: 'exempt_hardware_wallet',

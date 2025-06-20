@@ -39,6 +39,7 @@ import {
   type Variant,
   type VariantFeature,
 } from './variants';
+import { variantToWalletType, type WalletType } from './wallet-types';
 
 /**
  * A set of features about any type of wallet.
@@ -214,8 +215,17 @@ export type WalletEmbeddedFeatures = WalletBaseFeatures & {};
  * All features are resolved to a single variant here.
  */
 export interface ResolvedFeatures {
-  /** The wallet variant which was used to resolve the feature tree. */
+  /**
+   * The wallet variant which was used to resolve the feature tree.
+   */
   variant: Variant;
+
+  /**
+   * The type of the wallet.
+   * This is a shorthand for `variantToWalletType(variant)`, meant to be used
+   * for easy filtering in attribute evaluation code.
+   */
+  type: WalletType;
 
   /** The profile of the wallet. */
   profile: WalletProfile;
@@ -288,6 +298,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 
   return {
     variant,
+    type: variantToWalletType(variant),
     profile: features.profile,
     security: {
       scamAlerts: softwareFeat(features => features.security.scamAlerts),

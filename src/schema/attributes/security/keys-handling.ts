@@ -7,7 +7,7 @@ import {
 } from '@/schema/features/security/keys-handling';
 import { popRefs } from '@/schema/reference';
 import type { AtLeastOneVariant } from '@/schema/variants';
-import { Variant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -89,7 +89,7 @@ export const keysHandling: Attribute<KeysHandlingValue> = {
   aggregate: (perVariant: AtLeastOneVariant<Evaluation<KeysHandlingValue>>) =>
     pickWorstRating<KeysHandlingValue>(perVariant),
   evaluate: (features: ResolvedFeatures): Evaluation<KeysHandlingValue> => {
-    if (features.variant !== Variant.HARDWARE) {
+    if (features.type !== WalletType.HARDWARE) {
       return exempt(
         keysHandling,
         sentence(

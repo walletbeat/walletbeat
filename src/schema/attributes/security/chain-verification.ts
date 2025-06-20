@@ -7,7 +7,7 @@ import {
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
 import { isSupported, type Support } from '@/schema/features/support';
-import { Variant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details';
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyEntries } from '@/types/utils/non-empty';
@@ -131,7 +131,7 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
     ),
   },
   evaluate: (features: ResolvedFeatures): Evaluation<ChainVerificationValue> => {
-    if (features.variant === Variant.HARDWARE) {
+    if (features.type === WalletType.HARDWARE) {
       return exempt(
         chainVerification,
         sentence('This attribute is not applicable for hardware wallets.'),

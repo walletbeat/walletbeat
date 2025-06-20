@@ -23,7 +23,8 @@ import {
   supportsAnyDataExtraction,
 } from '@/schema/features/security/hardware-wallet-dapp-signing';
 import { refs } from '@/schema/reference';
-import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import { type AtLeastOneVariant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -352,7 +353,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
   evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletDappSigningValue> => {
     // For hardware wallets themselves:
     // This evaluates the hardware wallet's own dApp signing capabilities
-    if (features.variant === Variant.HARDWARE) {
+    if (features.type === WalletType.HARDWARE) {
       // Check if dApp signing feature exists
       if (features.security.hardwareWalletDappSigning === null) {
         return unrated(hardwareWalletDappSigning, brand, {

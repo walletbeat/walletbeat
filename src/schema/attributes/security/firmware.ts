@@ -4,7 +4,7 @@ import type { ResolvedFeatures } from '@/schema/features';
 import { type FirmwareSupport, FirmwareType } from '@/schema/features/security/firmware';
 import { popRefs } from '@/schema/reference';
 import type { AtLeastOneVariant } from '@/schema/variants';
-import { Variant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -93,7 +93,7 @@ export const firmware: Attribute<FirmwareValue> = {
   aggregate: (perVariant: AtLeastOneVariant<Evaluation<FirmwareValue>>) =>
     pickWorstRating<FirmwareValue>(perVariant),
   evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
-    if (features.variant !== Variant.HARDWARE) {
+    if (features.type !== WalletType.HARDWARE) {
       return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), brand, {
         silentUpdateProtection: FirmwareType.FAIL,
         firmwareOpenSource: FirmwareType.FAIL,

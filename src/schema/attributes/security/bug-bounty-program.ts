@@ -11,7 +11,8 @@ import {
   BugBountyProgramType,
 } from '@/schema/features/security/bug-bounty-program';
 import { popRefs } from '@/schema/reference';
-import { type AtLeastOneVariant, Variant } from '@/schema/variants';
+import { type AtLeastOneVariant } from '@/schema/variants';
+import { WalletType } from '@/schema/wallet-types';
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content';
 
 import { exempt, pickWorstRating, unrated } from '../common';
@@ -241,7 +242,7 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
   evaluate: (features: ResolvedFeatures): Evaluation<BugBountyProgramValue> => {
     // This attribute is only applicable for hardware wallets
     // For software wallets, we exempt them from this attribute
-    if (features.variant !== Variant.HARDWARE) {
+    if (features.type !== WalletType.HARDWARE) {
       return exempt(
         bugBountyProgram,
         sentence('This attribute is only applicable for hardware wallets.'),
