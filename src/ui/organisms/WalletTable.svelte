@@ -99,6 +99,7 @@
 
 	import Pie, { PieLayout } from '@/ui/atoms/Pie.svelte'
 	import Table from '@/ui/atoms/Table.svelte'
+	import Tooltip from '@/ui/atoms/Tooltip.svelte'
 	import Typography from '@/ui/atoms/Typography.svelte'
 
 	import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
@@ -534,98 +535,123 @@
 			{@const score = value}
 
 			<div class="overall-rating">
-				<Pie
-					slices={
-						attributeGroups.map(group => {
-							const groupScore = calculateAttributeGroupScore(group.attributeWeights, wallet.overall[group.id])
-							const evalGroup = wallet.overall[group.id]
+				<Tooltip
+					isEnabled={!isExpanded}
+				>
+					<Pie
+						slices={
+							attributeGroups.map(group => {
+								const groupScore = calculateAttributeGroupScore(group.attributeWeights, wallet.overall[group.id])
+								const evalGroup = wallet.overall[group.id]
 
-							return {
-								id: group.id,
-								arcLabel: group.icon,
-								color: (
-									groupScore && !groupScore.hasUnratedComponent ?
-										`hsl(${Math.round(groupScore.score * 120)}, 80%, 45%)`
-									:
-										'#666'
-								),
-								tooltip: group.displayName,
-								tooltipValue: (
-									groupScore ?
-										groupScore.hasUnratedComponent ?
-											'Unrated'
+								return {
+									id: group.id,
+									arcLabel: group.icon,
+									color: (
+										groupScore && !groupScore.hasUnratedComponent ?
+											`hsl(${Math.round(groupScore.score * 120)}, 80%, 45%)`
 										:
-											(groupScore.score * 100).toFixed(0) + '%'
-									:
-										'N/A'
-								),
-								weight: 1,
-								...evalGroup && {
-									children: (
-										evaluatedAttributesEntries(evalGroup)
-											.filter(([_, evalAttr]) => (
-												evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
-											))
-											.map(([evalAttrId, evalAttr]) => ({
-												id: `${group.id}:${evalAttrId}`,
-												color: ratingToColor(evalAttr.evaluation.value.rating),
-												weight: 1,
-												arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
-												tooltip: `${evalAttr.attribute.displayName}`,
-												tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
-											}))
+											'#666'
 									),
-								},
+									tooltip: group.displayName,
+									tooltipValue: (
+										groupScore ?
+											groupScore.hasUnratedComponent ?
+												'Unrated'
+											:
+												(groupScore.score * 100).toFixed(0) + '%'
+										:
+											'N/A'
+									),
+									weight: 1,
+									...evalGroup && {
+										children: (
+											evaluatedAttributesEntries(evalGroup)
+												.filter(([_, evalAttr]) => (
+													evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
+												))
+												.map(([evalAttrId, evalAttr]) => ({
+													id: `${group.id}:${evalAttrId}`,
+													color: ratingToColor(evalAttr.evaluation.value.rating),
+													weight: 1,
+													arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
+													tooltip: `${evalAttr.attribute.displayName}`,
+													tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
+												}))
+										),
+									},
+								}
+							})
+						}
+						layout={PieLayout.FullTop}
+						padding={8}
+						radius={80}
+						levels={[
+							{
+								outerRadiusFraction: 0.705,
+								innerRadiusFraction: 0.3,
+								gap: 4,
+								angleGap: 0
+							},
+							{
+								outerRadiusFraction: 1,
+								innerRadiusFraction: 0.7,
+								gap: 2,
+								angleGap: 1,
 							}
-						})
-					}
-					layout={PieLayout.FullTop}
-					padding={8}
-					radius={80}
-					levels={[
-						{
-							outerRadiusFraction: 0.705,
-							innerRadiusFraction: 0.3,
-							gap: 4,
-							angleGap: 0
-						},
-						{
-							outerRadiusFraction: 1,
-							innerRadiusFraction: 0.7,
-							gap: 2,
-							angleGap: 1,
+						]}
+						{highlightedSliceId}
+						onSliceClick={sliceId => {
+							const [groupId, attrId] = sliceId.split(':')
+
+							walletTableState.selectedAttribute = (
+								walletTableState.selectedAttribute === attrId ? undefined : attrId
+							)
+
+							if (!isExpanded)
+								walletTableState.toggleRowExpanded(wallet.metadata.id)
+						}}
+						onSliceMouseEnter={sliceId => {
+							const [groupId, attrId] = sliceId.split(':')
+
+							activeAttribute = {
+								walletId: wallet.metadata.id,
+								attributeGroupId: groupId,
+								attributeId: attrId,
+							}
+						}}
+						onSliceMouseLeave={sliceId => {
+							activeAttribute = undefined
+						}}
+						centerLabel={
+							score ?
+								(score * 100).toFixed(0)
+							:
+								'❓'
 						}
-					]}
-					{highlightedSliceId}
-					onSliceClick={sliceId => {
-						const [groupId, attrId] = sliceId.split(':')
+					/>
 
-						walletTableState.selectedAttribute = (
-							walletTableState.selectedAttribute === attrId ? undefined : attrId
-						)
-
-						if (!isExpanded)
-							walletTableState.toggleRowExpanded(wallet.metadata.id)
-					}}
-					onSliceMouseEnter={sliceId => {
-						const [groupId, attrId] = sliceId.split(':')
-
-						activeAttribute = {
-							walletId: wallet.metadata.id,
-							attributeGroupId: groupId,
-							attributeId: attrId,
-						}
-					}}
-					onSliceMouseLeave={sliceId => {
-						activeAttribute = undefined
-					}}
-					centerLabel={
-						score ?
-							(score * 100).toFixed(0)
-						:
-							'❓'
-					}
-				/>
+					{#snippet tooltip()}
+						{#if highlightedGroup && highlightedAttribute}
+							<WalletAttributeSummary
+								{wallet}
+								evaluatedAttribute={highlightedAttribute}
+								selectedVariant={selectedVariant}
+							/>
+						{:else if highlightedGroup}
+							<WalletAttributeSummary
+								{wallet}
+								attributeGroup={highlightedGroup}
+							/>
+						{:else}
+							<div class="fallback-tooltip">
+								<strong>{wallet.metadata.displayName}</strong>
+								<div>Overall Rating: {score ? (score * 100).toFixed(0) + '%' : 'N/A'}</div>
+								<div class="tooltip-hint">Hover over sections for details</div>
+							</div>
+						{/if}
+					{/snippet}
+				</Tooltip>
 
 				{#if isExpanded && highlightedGroup}
 					<div class="details">
@@ -668,99 +694,119 @@
 			)}
 
 			<div class="attribute-group-rating">
-				<Pie
-					layout={PieLayout.FullTop}
-					radius={44}
-					levels={[
-						{
-							outerRadiusFraction: 1,
-							innerRadiusFraction: 0.3,
-							gap: 2,
-							angleGap: 0
-						}
-					]}
-					padding={4}
-					slices={	
-						!isNonEmptyArray(evalEntries) ?
-							[]
-						
-						: nonEmptyMap(
-							evalEntries,
-							([evalAttrId, evalAttr]) => {
-								const icon = evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon
-
-								const tooltipSuffix = (() => {
-									const variant = selectedVariant
-
-									if(!variant || !wallet.variants[variant])
-										return
-
-									const specificity = attributeVariantSpecificity(wallet, variant, evalAttr.attribute)
-
-									return (
-										specificity === VariantSpecificity.UNIQUE_TO_VARIANT ?
-											` (${variantToName(variant, false)} only)`
-										: specificity === VariantSpecificity.NOT_UNIVERSAL ?
-											` (${variantToName(variant, false)} specific)`
-										:
-											undefined
-									)
-								})()
-								
-								return {
-									id: evalAttrId.toString(),
-									color: ratingToColor(evalAttr.evaluation.value.rating),
-									weight: 1,
-									arcLabel: icon,
-									tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
-									tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
-								}
+				<Tooltip
+					placement="block-end"
+					isEnabled={!isExpanded}
+				>
+					<Pie
+						layout={PieLayout.FullTop}
+						radius={44}
+						levels={[
+							{
+								outerRadiusFraction: 1,
+								innerRadiusFraction: 0.3,
+								gap: 2,
+								angleGap: 0
 							}
-						)
-					}
-					highlightedSliceId={currentAttribute?.attribute.id}
-					centerLabel={
-						groupScore ?
-							groupScore.hasUnratedComponent ?
-								ratingToIcon(Rating.UNRATED)
-							: groupScore.score <= 0.0 ?
-								'\u{1f480}'
-							: groupScore.score >= 1.0 ?
-									'\u{1f4af}'
-							:
-								(groupScore.score * 100).toFixed(0)
-						:
-							'❓'
-					}
-					onSliceClick={attributeId => {
-						walletTableState.selectedAttribute = (
-							walletTableState.selectedAttribute === attributeId ? undefined : attributeId
-						)
+						]}
+						padding={4}
+						slices={	
+							!isNonEmptyArray(evalEntries) ?
+								[]
+							
+							: nonEmptyMap(
+								evalEntries,
+								([evalAttrId, evalAttr]) => {
+									const icon = evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon
 
-						if (!isExpanded)
-							walletTableState.toggleRowExpanded(wallet.metadata.id)
-					}}
-					onSliceMouseEnter={attributeId => {
-						activeAttribute = {
-							walletId: wallet.metadata.id,
-							attributeGroupId: attrGroup.id,
-							attributeId,
+									const tooltipSuffix = (() => {
+										const variant = selectedVariant
+
+										if(!variant || !wallet.variants[variant])
+											return
+
+										const specificity = attributeVariantSpecificity(wallet, variant, evalAttr.attribute)
+
+										return (
+											specificity === VariantSpecificity.UNIQUE_TO_VARIANT ?
+												` (${variantToName(variant, false)} only)`
+											: specificity === VariantSpecificity.NOT_UNIVERSAL ?
+												` (${variantToName(variant, false)} specific)`
+											:
+												undefined
+										)
+									})()
+									
+									return {
+										id: evalAttrId.toString(),
+										color: ratingToColor(evalAttr.evaluation.value.rating),
+										weight: 1,
+										arcLabel: icon,
+										tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
+										tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
+									}
+								}
+							)
 						}
-					}}
-					onSliceMouseLeave={attributeId => {
-						activeAttribute = undefined
-					}}
-					onSliceFocus={attributeId => {
-						activeAttribute = {
-							walletId: wallet.metadata.id,
-							attributeGroupId: attrGroup.id,
-							attributeId,
+						highlightedSliceId={currentAttribute?.attribute.id}
+						centerLabel={
+							groupScore ?
+								groupScore.hasUnratedComponent ?
+									ratingToIcon(Rating.UNRATED)
+								: groupScore.score <= 0.0 ?
+									'\u{1f480}'
+								: groupScore.score >= 1.0 ?
+										'\u{1f4af}'
+								:
+									(groupScore.score * 100).toFixed(0)
+							:
+								'❓'
 						}
-					}}
-					onSliceBlur={attributeId => {
-						activeAttribute = undefined
-					}}
-				/>
+						onSliceClick={attributeId => {
+							walletTableState.selectedAttribute = (
+								walletTableState.selectedAttribute === attributeId ? undefined : attributeId
+							)
+
+							if (!isExpanded)
+								walletTableState.toggleRowExpanded(wallet.metadata.id)
+						}}
+						onSliceMouseEnter={attributeId => {
+							activeAttribute = {
+								walletId: wallet.metadata.id,
+								attributeGroupId: attrGroup.id,
+								attributeId,
+							}
+						}}
+						onSliceMouseLeave={attributeId => {
+							activeAttribute = undefined
+						}}
+						onSliceFocus={attributeId => {
+							activeAttribute = {
+								walletId: wallet.metadata.id,
+								attributeGroupId: attrGroup.id,
+								attributeId,
+							}
+						}}
+						onSliceBlur={attributeId => {
+							activeAttribute = undefined
+						}}
+					/>
+
+					{#snippet tooltip()}
+						{#if hasActiveAttribute && activeAttribute}
+							<WalletAttributeSummary
+								{wallet}
+								evaluatedAttribute={evalGroup[activeAttribute.attributeId]}
+								selectedVariant={selectedVariant}
+							/>
+						{:else}
+							<WalletAttributeSummary
+								{wallet}
+								attributeGroup={attrGroup}
+							/>
+						{/if}
+					{/snippet}
+				</Tooltip>
 
 				<div
 					class="details"
@@ -798,36 +844,60 @@
 			{@const evalAttr = wallet.overall[attributeGroupId][attrId]}
 
 			<div class="wallet-attribute-rating">
-				<Pie
-					layout={PieLayout.HalfTop}
-					radius={24}
-					levels={
-						[
-							{
-								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.3,
-								gap: 20,
-								angleGap: 0,
+				<Tooltip
+					isEnabled={!isExpanded}
+				>
+					<Pie
+						layout={PieLayout.HalfTop}
+						radius={24}
+						levels={
+							[
+								{
+									outerRadiusFraction: 1,
+									innerRadiusFraction: 0.3,
+									gap: evalAttr.evaluation.value.rating !== Rating.EXEMPT ? 20 : 0,
+									angleGap: 0,
+								}
+							]
+						}
+						padding={4}
+						slices={
+							evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
+								[
+									{
+										id: attrId,
+										color: evalAttr.evaluation.value.rating === Rating.PASS ? '#22c55e' : 
+											evalAttr.evaluation.value.rating === Rating.PARTIAL ? '#eab308' : 
+											evalAttr.evaluation.value.rating === Rating.FAIL ? '#ef4444' : '#6b7280',
+										weight: 1,
+										arcLabel: attribute.icon,
+										tooltip: `${attribute.icon} ${attribute.displayName}`,
+										tooltipValue: evalAttr.evaluation.value.rating,
+									}
+								]
+							:
+								[]
+						}
+						centerLabel={evalAttr.evaluation.value.rating}
+						onSliceMouseEnter={attributeId => {
+							highlightedAttributeInfo = { wallet, attributeGroupId: groupId, attributeId }
+							highlightedGroupInfo = null
+						}}
+						onSliceMouseLeave={attributeId => {
+							if (highlightedAttributeInfo?.attributeId === attributeId) {
+								highlightedAttributeInfo = null
 							}
-						]
-					}
-					padding={4}
-					slices={
-						[
-							{
-								id: attrId,
-								color: evalAttr.evaluation.value.rating === Rating.PASS ? '#22c55e' : 
-									evalAttr.evaluation.value.rating === Rating.PARTIAL ? '#eab308' : 
-									evalAttr.evaluation.value.rating === Rating.FAIL ? '#ef4444' : '#6b7280',
-								weight: 1,
-								arcLabel: attribute.icon,
-								tooltip: `${attribute.icon} ${attribute.displayName}`,
-								tooltipValue: evalAttr.evaluation.value.rating,
-							}
-						]
-					}
-					centerLabel={evalAttr.evaluation.value.rating}
-				/>
+						}}
+					/>
+
+					{#snippet tooltip()}
+						<WalletAttributeSummary
+							{wallet}
+							evaluatedAttribute={evalAttr}
+							{selectedVariant}
+						/>
+					{/snippet}
+				</Tooltip>
 			</div>
 		{/if}
 	{/snippet}
