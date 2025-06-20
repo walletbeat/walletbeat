@@ -868,6 +868,7 @@
 								highlightedAttributeInfo = null
 							}
 						}}
+						class="wallet-attribute-rating-pie"
 					/>
 				{/snippet}
 
@@ -1015,10 +1016,6 @@
 		}
 	}
 
-	.wallet-attribute-rating {
-		margin-inline: -1em;
-	}
-
 	.with-expanded-content {
 		display: grid;
 		justify-content: center;
@@ -1037,5 +1034,9 @@
 			font-size: 0.66em;
 			text-align: center;
 		}
+	}
+
+	:global(.wallet-attribute-rating-pie) {
+		margin-inline: -1em;
 	}
 </style>
