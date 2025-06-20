@@ -60,6 +60,7 @@
 
 	let activeAttribute: { walletId: string; attributeGroupId: string; attributeId: string } | undefined = $state(undefined)
 
+
 	// (Derived)
 	const selectedVariant = $derived.by(() => {
 		// Derive selected variant from active filters
@@ -85,7 +86,6 @@
 	import { isLabeledUrl } from '@/schema/url'
 	import { evaluatedAttributesEntries, ratingToIcon, ratingToColor } from '@/schema/attributes'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-	import { slugifyCamelCase } from '@/types/utils/text'
 
 
 	// Actions
@@ -94,7 +94,6 @@
 
 
 	// Components
-	import CombinedWalletRating from '@/ui/molecules/CombinedWalletRating.svelte'
 	import Filters from '@/ui/molecules/Filters.svelte'
 	import WalletAttributeSummary from '@/ui/molecules/WalletAttributeSummary.svelte'
 
@@ -496,16 +495,159 @@
 
 		<!-- Overall rating -->
 		{:else if column.id === 'overall'}
-			<CombinedWalletRating
-				{wallet}
-				{attributeGroups}
-				bind:selectedAttribute={walletTableState.selectedAttribute}
-				bind:selectedVariant={walletTableState.selectedVariant}
-				{isExpanded}
-				toggleExpanded={id => {
-					walletTableState.toggleRowExpanded(id)
-				}}
-			/>
+			{@const selectedSliceId = (
+				walletTableState.selectedAttribute ?
+					attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id]) ?
+						`${attributeGroups.find(g => g.id in wallet.overall && walletTableState.selectedAttribute in wallet.overall[g.id])!.id}:${walletTableState.selectedAttribute}`
+					:
+						undefined
+				:
+					undefined
+			)}
+
+			{@const activeSliceId = (
+				activeAttribute?.walletId === wallet.metadata.id ?
+					activeAttribute.attributeId ?
+						`${activeAttribute.attributeGroupId}:${activeAttribute.attributeId}`
+					:
+						activeAttribute.attributeGroupId
+				:
+					undefined
+			)}
+
+			{@const highlightedSliceId = selectedSliceId ?? activeSliceId}
+
+			{@const highlightedGroup = (
+				highlightedSliceId ?
+					attributeGroups.find(g => highlightedSliceId.startsWith(g.id))
+				:
+					undefined
+			)}
+
+			{@const highlightedAttribute = (
+				highlightedGroup && highlightedSliceId?.includes(':') ?
+					wallet.overall[highlightedGroup.id]?.[highlightedSliceId.split(':')[1]]
+				:
+					undefined
+			)}
+
+			<div class="overall-rating">
+				<Pie
+					slices={
+						attributeGroups.map(group => {
+							const groupScore = calculateAttributeGroupScore(group.attributeWeights, wallet.overall[group.id])
+							const evalGroup = wallet.overall[group.id]
+
+							return {
+								id: group.id,
+								arcLabel: group.icon,
+								color: (
+									groupScore && !groupScore.hasUnratedComponent ?
+										`hsl(${Math.round(groupScore.score * 120)}, 80%, 45%)`
+									:
+										'#666'
+								),
+								tooltip: group.displayName,
+								tooltipValue: (
+									groupScore ?
+										groupScore.hasUnratedComponent ?
+											'Unrated'
+										:
+											(groupScore.score * 100).toFixed(0) + '%'
+									:
+										'N/A'
+								),
+								weight: 1,
+								...evalGroup && {
+									children: (
+										evaluatedAttributesEntries(evalGroup)
+											.filter(([_, evalAttr]) => (
+												evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
+											))
+											.map(([evalAttrId, evalAttr]) => ({
+												id: `${group.id}:${evalAttrId}`,
+												color: ratingToColor(evalAttr.evaluation.value.rating),
+												weight: 1,
+												arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
+												tooltip: `${evalAttr.attribute.displayName}`,
+												tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
+											}))
+									),
+								},
+							}
+						})
+					}
+					layout={PieLayout.FullTop}
+					padding={8}
+					radius={80}
+					levels={[
+						{
+							outerRadiusFraction: 0.705,
+							innerRadiusFraction: 0.3,
+							gap: 4,
+							angleGap: 0
+						},
+						{
+							outerRadiusFraction: 1,
+							innerRadiusFraction: 0.7,
+							gap: 2,
+							angleGap: 1,
+						}
+					]}
+					{highlightedSliceId}
+					onSliceClick={sliceId => {
+						const [groupId, attrId] = sliceId.split(':')
+
+						walletTableState.selectedAttribute = (
+							walletTableState.selectedAttribute === attrId ? undefined : attrId
+						)
+
+						if (!isExpanded)
+							walletTableState.toggleRowExpanded(wallet.metadata.id)
+					}}
+					onSliceMouseEnter={sliceId => {
+						const [groupId, attrId] = sliceId.split(':')
+
+						activeAttribute = {
+							walletId: wallet.metadata.id,
+							attributeGroupId: groupId,
+							attributeId: attrId,
+						}
+					}}
+					onSliceMouseLeave={sliceId => {
+						activeAttribute = undefined
+					}}
+				>
+					{#snippet centerContentSnippet()}
+						<image
+							href={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+							x="-15"
+							y="-15"
+							width="30"
+							height="30"
+						>
+							<title>{wallet.metadata.displayName}</title>
+						</image>
+					{/snippet}
+				</Pie>
+
+				{#if isExpanded && highlightedGroup}
+					<div class="details">
+						{#if !highlightedAttribute}
+							<WalletAttributeSummary
+								{wallet}
+								attributeGroup={highlightedGroup}
+							/>
+						{:else}
+							<WalletAttributeSummary
+								{wallet}
+								evaluatedAttribute={highlightedAttribute}
+								selectedVariant={selectedVariant}
+							/>
+						{/if}
+					</div>
+				{/if}
+			</div>
 
 		<!-- Attribute group rating -->
 		{:else if !column.id.includes('.')}
@@ -828,6 +970,7 @@
 		margin-inline: -1em;
 	}
 
+	.overall-rating,
 	.attribute-group-rating {
 		display: grid;
 		gap: 0.75em;
