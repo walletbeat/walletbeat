@@ -1,3 +1,20 @@
+<script module lang="ts">
+	declare global {
+		interface HTMLButtonElement {
+			popoverTargetElement?: HTMLElement & {
+				showPopover(): void
+				hidePopover(): void
+			}
+		}
+		
+		interface HTMLElement {
+			showPopover(): void
+			hidePopover(): void
+		}
+	}
+</script>
+
+
 <script lang="ts">
 	// Types/constants
 	import type { Snippet } from 'svelte'
