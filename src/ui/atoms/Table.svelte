@@ -436,8 +436,16 @@
 		tbody {
 			isolation: isolate;
 
+			counter-reset: TableRowCount;
+
 			tr {
 				--table-row-backgroundColor: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.03));
+
+				&:not([data-disabled]) {
+					counter-increment: TableRowCount;
+				}
+
+				counter-reset: TableColumnCount;
 
 				box-shadow:
 					0 var(--table-borderWidth) var(--table-outerBorderColor),
@@ -491,6 +499,8 @@
 				> td {
 					box-shadow: var(--table-borderWidth) 0 var(--table-row-backgroundColor);
 					vertical-align: var(--table-cell-verticalAlign);
+
+					counter-increment: TableColumnCount;
 				}
 			}
 		}
