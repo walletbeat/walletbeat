@@ -548,20 +548,6 @@
 
 			{@const highlightedSliceId = selectedSliceId ?? activeSliceId}
 
-			{@const highlightedGroup = (
-				highlightedSliceId ?
-					attributeGroups.find(g => highlightedSliceId.startsWith(g.id))
-				:
-					undefined
-			)}
-
-			{@const highlightedAttribute = (
-				highlightedGroup && highlightedSliceId?.includes(':') ?
-					wallet.overall[highlightedGroup.id]?.[highlightedSliceId.split(':')[1]]
-				:
-					undefined
-			)}
-
 			<!-- Overall rating -->
 			{#if column.id === 'overall'}
 				{@const score = value}
@@ -895,15 +881,6 @@
 								[]
 						}
 						centerLabel={evalAttr.evaluation.value.rating}
-						onSliceMouseEnter={attributeId => {
-							highlightedAttributeInfo = { wallet, attributeGroupId: groupId, attributeId }
-							highlightedGroupInfo = null
-						}}
-						onSliceMouseLeave={attributeId => {
-							if (highlightedAttributeInfo?.attributeId === attributeId) {
-								highlightedAttributeInfo = null
-							}
-						}}
 						class="wallet-attribute-rating-pie"
 					/>
 				{/snippet}
