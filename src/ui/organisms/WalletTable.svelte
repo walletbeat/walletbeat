@@ -58,7 +58,7 @@
 		wallets
 	)
 
-	let activeAttribute: { walletId: string; attributeGroupId: string; attributeId: string } | undefined = $state(undefined)
+	let activeAttributeId: { walletId: string; attributeGroupId: string; attributeId: string } | undefined = $state(undefined)
 
 
 	// (Derived)
@@ -536,11 +536,11 @@
 			)}
 
 			{@const activeSliceId = (
-				activeAttribute?.walletId === wallet.metadata.id ?
-					activeAttribute.attributeId ?
-						`${activeAttribute.attributeGroupId}:${activeAttribute.attributeId}`
+				activeAttributeId?.walletId === wallet.metadata.id ?
+					activeAttributeId.attributeId ?
+						`${activeAttributeId.attributeGroupId}:${activeAttributeId.attributeId}`
 					:
-						activeAttribute.attributeGroupId
+						activeAttributeId.attributeGroupId
 				:
 					undefined
 			)}
@@ -642,14 +642,14 @@
 						onSliceMouseEnter={sliceId => {
 							const [groupId, attrId] = sliceId.split(':')
 
-							activeAttribute = {
+							activeAttributeId = {
 								walletId: wallet.metadata.id,
 								attributeGroupId: groupId,
 								attributeId: attrId,
 							}
 						}}
 						onSliceMouseLeave={sliceId => {
-							activeAttribute = undefined
+							activeAttributeId = undefined
 						}}
 						centerLabel={
 							score ?
@@ -694,11 +694,11 @@
 						evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
 					))}
 
-				{@const hasActiveAttribute = activeAttribute?.walletId === wallet.metadata.id && activeAttribute?.attributeGroupId === attrGroup.id}
+				{@const hasActiveAttribute = activeAttributeId?.walletId === wallet.metadata.id && activeAttributeId?.attributeGroupId === attrGroup.id}
 
 				{@const currentAttribute = (
-					hasActiveAttribute && activeAttribute ?
-						evalGroup[activeAttribute.attributeId]
+					hasActiveAttribute && activeAttributeId ?
+						evalGroup[activeAttributeId.attributeId]
 					: walletTableState.selectedAttribute ?
 						evalGroup[walletTableState.selectedAttribute]
 					:
@@ -779,33 +779,33 @@
 								walletTableState.toggleRowExpanded(wallet.metadata.id)
 						}}
 						onSliceMouseEnter={attributeId => {
-							activeAttribute = {
+							activeAttributeId = {
 								walletId: wallet.metadata.id,
 								attributeGroupId: attrGroup.id,
 								attributeId,
 							}
 						}}
 						onSliceMouseLeave={attributeId => {
-							activeAttribute = undefined
+							activeAttributeId = undefined
 						}}
 						onSliceFocus={attributeId => {
-							activeAttribute = {
+							activeAttributeId = {
 								walletId: wallet.metadata.id,
 								attributeGroupId: attrGroup.id,
 								attributeId,
 							}
 						}}
 						onSliceBlur={attributeId => {
-							activeAttribute = undefined
+							activeAttributeId = undefined
 						}}
 					/>
 				{/snippet}
 
 				{#snippet expandedContent()}
-					{#if hasActiveAttribute && activeAttribute}
+					{#if hasActiveAttribute && activeAttributeId}
 						<WalletAttributeSummary
 							{wallet}
-							evaluatedAttribute={evalGroup[activeAttribute.attributeId]}
+							evaluatedAttribute={evalGroup[activeAttributeId.attributeId]}
 							selectedVariant={selectedVariant}
 						/>
 					{:else}
