@@ -90,8 +90,10 @@
 
 <style>
 	div {
+		font-size: smaller;
+
 		display: grid;
-		gap: 0.5em;
+		gap: 1em;
 		line-height: 1.4;
 	}
 </style>

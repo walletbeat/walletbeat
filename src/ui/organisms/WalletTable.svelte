@@ -913,6 +913,10 @@
 		min-width: fit-content;
 	}
 
+	:global(td:has(> .wallet-name-cell)) {
+		--table-cell-verticalAlign: middle;
+	}
+
 	.wallet-name-cell {
 		transition-property: gap;
 
@@ -921,8 +925,6 @@
 		}
 
 		.wallet-name-title {
-			min-height: 4rem;
-
 			img {
 				filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
 				width: auto;
@@ -1044,8 +1046,9 @@
 		gap: 0.75em;
 
 		.details {
-			width: 10rem;
-			min-width: 100%;
+			inline-size: 0;
+			min-inline-size: 100%;
+
 			font-size: 0.66em;
 			text-align: center;
 		}
