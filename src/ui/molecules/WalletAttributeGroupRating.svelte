@@ -52,8 +52,7 @@
 
 	// Components
 	import Pie, { PieLayout } from '../atoms/Pie.svelte'
-	import Typography from '../atoms/Typography.svelte'
-	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
+	import WalletAttributeSummary from './WalletAttributeSummary.svelte'
 </script>
 
 <div 
@@ -169,24 +168,16 @@
 	{/if}
 
 	<div
-		class="details column"
+		class="details"
 		hidden={!isExpanded}
 	>
 		{#if !((activeEvaluationAttribute ? evalGroup[activeEvaluationAttribute] : selectedEvaluationAttribute ? evalGroup[selectedEvaluationAttribute] : undefined))}
-			<h3>
-				{attrGroup.icon} {attrGroup.displayName}
-			</h3>
-
-			<p>
-				<Typography
-					content={attrGroup.perWalletQuestion}
-					strings={{
-						WALLET_NAME: wallet.metadata.displayName,
-					}}
-				/>
-			</p>
+			<WalletAttributeSummary
+				{wallet}
+				attributeGroup={attrGroup}
+			/>
 		{:else}
-			{@const currentEvaluationAttribute = (
+			{@const evaluatedAttribute = (
 				activeEvaluationAttribute ?
 					evalGroup[activeEvaluationAttribute]
 				: selectedEvaluationAttribute ?
@@ -195,44 +186,11 @@
 					undefined
 			)}
 
-			{#if currentEvaluationAttribute?.evaluation?.value}
-				<h4>
-					{currentEvaluationAttribute.evaluation.value.icon ?? currentEvaluationAttribute.attribute.icon} {currentEvaluationAttribute.attribute.displayName}
-				</h4>
-
-				<p>
-					{#if typeof currentEvaluationAttribute.evaluation.value.shortExplanation}
-						{ratingToIcon(currentEvaluationAttribute.evaluation.value.rating)}
-
-						<Typography
-							content={currentEvaluationAttribute.evaluation.value.shortExplanation}
-							strings={{
-								WALLET_NAME: wallet.metadata.displayName,
-								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-								WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
-							}}
-						/>
-
-						{#if selectedVariant && wallet.variants[selectedVariant]}
-							{@const specificity = attributeVariantSpecificity(wallet, selectedVariant, currentEvaluationAttribute.attribute)}
-
-							{#if specificity === VariantSpecificity.NOT_UNIVERSAL}
-								This is the case on the {variantToName(selectedVariant, false)} version.
-
-							{:else if specificity === VariantSpecificity.UNIQUE_TO_VARIANT}
-								This is only the case on the {variantToName(selectedVariant, false)} version.
-							{/if}
-						{/if}
-					{/if}
-				</p>
-
-				<a 
-					href="{betaSiteRoot}/{wallet.metadata.id}/{variantUrlQuery(wallet.variants, selectedVariant)}#{slugifyCamelCase(currentEvaluationAttribute.attribute.id)}"
-				>
-					<span class="icon">{@html InfoIcon}</span>
-					Learn more
-				</a>
-			{/if}
+			<WalletAttributeSummary
+				{wallet}
+				{evaluatedAttribute}
+				{selectedVariant}
+			/>
 		{/if}
 	</div>
 </div>
@@ -240,39 +198,14 @@
 
 <style>
 	.container {
-		justify-items: center;
-		align-content: start;
-		gap: 1em;
+		display: grid;
+		gap: 0.75em;
 	}
 
 	.details {
-		display: grid;
-		/* grid-template-columns: minmax(0, 32ch); */
-		max-width: 32ch;
-		justify-items: center;
-		align-content: start;
-
-		line-height: 1;
+		width: 10rem;
+		min-width: 100%;
+		font-size: 0.66em;
 		text-align: center;
-
-		font-size: 0.8em;
-
-		h3 {
-			margin: 0;
-			font-size: 1em;
-		}
-
-		h4 {
-			margin: 0;
-			font-size: 1.1em;
-		}
-
-		p {
-			margin: 0;
-			font-size: 0.9em;
-
-			width: 0;
-			min-width: 100%;
-		}
 	}
 </style>
