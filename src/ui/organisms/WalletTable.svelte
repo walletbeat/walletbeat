@@ -654,7 +654,7 @@
 						{/snippet}
 					</Tooltip>
 
-					{#if isExpanded && highlightedGroup}
+					{#if isExpanded}
 						<div class="details">
 							{#if !highlightedAttribute}
 								<WalletAttributeSummary
@@ -809,32 +809,31 @@
 						{/snippet}
 					</Tooltip>
 
-					<div
-						class="details"
-						hidden={!isExpanded}
-					>
-						{#if !((hasActiveAttribute && activeAttribute ? evalGroup[activeAttribute.attributeId] : walletTableState.selectedAttribute ? evalGroup[walletTableState.selectedAttribute] : undefined))}
-							<WalletAttributeSummary
-								{wallet}
-								attributeGroup={attrGroup}
-							/>
-						{:else}
-							{@const evaluatedAttribute = (
-								hasActiveAttribute && activeAttribute ?
-									evalGroup[activeAttribute.attributeId]
-								: walletTableState.selectedAttribute ?
-									evalGroup[walletTableState.selectedAttribute]
-								:
-									undefined
-							)}
+					{#if isExpanded}
+						<div class="details">
+							{#if !((hasActiveAttribute && activeAttribute ? evalGroup[activeAttribute.attributeId] : walletTableState.selectedAttribute ? evalGroup[walletTableState.selectedAttribute] : undefined))}
+								<WalletAttributeSummary
+									{wallet}
+									attributeGroup={attrGroup}
+								/>
+							{:else}
+								{@const evaluatedAttribute = (
+									hasActiveAttribute && activeAttribute ?
+										evalGroup[activeAttribute.attributeId]
+									: walletTableState.selectedAttribute ?
+										evalGroup[walletTableState.selectedAttribute]
+									:
+										undefined
+								)}
 
-							<WalletAttributeSummary
-								{wallet}
-								{evaluatedAttribute}
-								selectedVariant={selectedVariant}
-							/>
-						{/if}
-					</div>
+								<WalletAttributeSummary
+									{wallet}
+									{evaluatedAttribute}
+									selectedVariant={selectedVariant}
+								/>
+							{/if}
+						</div>
+					{/if}
 				</div>
 
 			<!-- Attribute rating -->
