@@ -25,16 +25,23 @@
 		placement = 'block-end',
 		offset = 8,
 		tooltip,
+		hideDelay = 200,
 		isEnabled = true,
 		children,
 		...restProps
 	}: {
 		placement?: 'block-start' | 'block-end' | 'inline-start' | 'inline-end'
 		offset?: number
+		hideDelay?: number
 		tooltip: Snippet
 		isEnabled?: boolean
 		children: Snippet
 	} & Record<string, any> = $props()
+
+
+	// State
+	let isTriggerHovered = $state(false)
+	let isPopoverHovered = $state(false)
 
 
 	// IDs
@@ -50,34 +57,40 @@
 		popovertarget={popoverId}
 		{...restProps}
 
-		{@attach node => {
-			const abortController = new AbortController()
-
-			node.addEventListener(
-				'mouseenter',
-				() => {
-					node.popoverTargetElement?.showPopover()
-				},
-				{ signal: abortController.signal }
-			)
-			node.addEventListener(
-				'mouseleave',
-				() => {
-					node.popoverTargetElement?.hidePopover()
-				},
-				{ signal: abortController.signal }
-			)
-
-			return () => {
-				abortController.abort()
-			}
+		onmouseenter={() => {
+			isTriggerHovered = true
+		}}
+		onmouseleave={() => {
+			isTriggerHovered = false
 		}}
 	>
 		{@render children()}
 
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			popover="auto"
 			id={popoverId}
+
+			onmouseenter={() => {
+				isPopoverHovered = true
+			}}
+			onmouseleave={() => {
+				isPopoverHovered = false
+			}}
+			{@attach node => {
+				if (isTriggerHovered || isPopoverHovered) {
+					node.showPopover()
+				} else {
+					const timeoutId = setTimeout(() => {
+						node.hidePopover()
+					}, hideDelay)
+
+					return () => {
+						clearTimeout(timeoutId)
+					}
+				}
+			}}
+
 			style:position-area={placement}
 			style:position-anchor={anchorName}
 			style:--offset={`${offset}px`}
