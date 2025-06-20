@@ -2,10 +2,6 @@
 import { SvelteSet } from 'svelte/reactivity'
 
 export class WalletTableState {
-	displayMode: 'separated' | 'combined' = $state(
-		'separated'
-	)
-
 	selectedAttribute: string | undefined = $state(undefined)
 
 	expandedRowIds = $state(
