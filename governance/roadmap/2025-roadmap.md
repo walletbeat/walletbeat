@@ -8,7 +8,7 @@ _The purpose of this document is to come to a consensus of what Walletbeat needs
 
 Walletbeat was kicked off by [Fluidkey](https://fluidkey.com/)'s [mozrt2](https://github.com/mozrt2) in December 2023, documenting the state of Ethereum wallets, at [walletbeat.fyi](https://walletbeat.fyi). The idea was to follow the lead of [L2BEAT], and to do for Ethereum wallets what L2BEAT has done for Ethereum rollups. Walletbeat rates Ethereum wallets on criteria such as multi-chain support, ENS integration, open-source licensing, account recovery, etc.
 
-In November 2024, inspired by [Vitalik Buterin's post on Ethereum alignment](https://vitalik.eth.limo/general/2024/09/28/alignment.html), [polymutex](https://github.com/polymutex) kicked off an effort to revamp Walletbeat. This work took on the name of "Walletbeat Beta". The purpose of this effort was to go deeper into each wallet and expand the way wallets in which are evaluated to closely map with Ethereum values. See [Ethereum Magicians kickoff thread on this](https://ethereum-magicians.org/t/making-ethereum-alignment-legible-wallets/21841). Shortly thereafter, Vitalik Buterin published a [blog post on what Ethereum wallets should implement](https://vitalik.eth.limo/general/2024/12/03/wallets.html). Other contributors have joined the effort: [darrylyeo](https://github.com/darrylyeo), [nconsigny](https://github.com/nconsigny), [lucemans](https://github.com/lucemans), [nloureiro](https://github.com/nloureiro), [Jontes-Tech](https://github.com/Jontes-Tech), [minimalsm](https://github.com/minimalsm), and [PatrickAlphaC](https://github.com/PatrickAlphaC).
+In November 2024, inspired by [Vitalik Buterin's post on Ethereum alignment](https://vitalik.eth.limo/general/2024/09/28/alignment.html), [polymutex](https://github.com/polymutex) kicked off an effort to revamp Walletbeat. This work took on the name of "Walletbeat Beta". The purpose of this effort was to go deeper into each wallet and expand the way wallets in which are evaluated to closely map with Ethereum values. See [Ethereum Magicians kickoff thread on this](https://ethereum-magicians.org/t/making-ethereum-alignment-legible-wallets/21841). Shortly thereafter, Vitalik Buterin published a [blog post on what Ethereum wallets should implement](https://vitalik.eth.limo/general/2024/12/03/wallets.html). Other contributors have joined the effort: [darrylyeo](https://github.com/darrylyeo), [nconsigny](https://github.com/nconsigny), [lucemans](https://github.com/lucemans), [nloureiro](https://github.com/nloureiro), [Jontes-Tech](https://github.com/Jontes-Tech), [minimalsm](https://github.com/minimalsm), [Hugoo](https://github.com/Hugoo), and [PatrickAlphaC](https://github.com/PatrickAlphaC).
 
 Whereas Walletbeat was a single large comparison table, Walletbeat Beta goes in depth on all of the attributes it rates. Each attribute comes with rationale as to its importance, and each wallet rating comes with a reason for the rating, a set of steps the wallets can take to improve its rating, etc. Attributes are grouped around Ethereum values: **Security**, **privacy**, **self-sovereignty**, **transparency**, and **ecosystem alignment**.
 
@@ -34,10 +34,10 @@ We have also achieved recognition from important parts of the ecosystem (Ethereu
   - _Why a goal for launch_:
     - Launching with a lot of data unpopulated with make the site useless to wallet users.
     - Wallet development teams would not be motivated to fill in their wallets' data when so few of their competitors are fully rated.
-- **Finalizing the "stage" system**:
+- **Finalize the "stage" system**:
   - _Why important_: The stage system is similar to L2BEAT's rollup stage system, which Ethereum users are familiar with and would expect out of a site named similarly to L2BEAT. This stage system gives users a meaningful summarization of the quality of a wallet.
   - _Why a goal for launch_: Upon launch, almost all wallets will look rather bad. The stage system (similar to L2BEAT's rollup stage system) gives wallets a specific, realistically-achievable, cross-attribute target to aim for.
-- **Making wallet data easy to fill in or rectify**:
+- **Make wallet data easy to fill in or rectify**:
   - _Why important_: We cannot rely on Walletbeat contributors alone to fill in wallet feature data.
   - _Why a goal for launch_:
     - We expect a large initial influx of wallet review data to come in from wallet development teams shortly after launch. We need to make the data ingestion process easy and streamlined.
@@ -65,7 +65,7 @@ We have also achieved recognition from important parts of the ecosystem (Ethereu
   - _Details_: Make Walletbeat wallet rating data exportable as JSON (for machine readability) and Markdown (for LLMs) to consume.
   - _Why important_: Walletbeat is at its core an informational site, and the value in that information lies in how trustworthy, reliable, and widespread it is. Expanding the reach of this data helps all of these goals.
   - _Why non-goal for launch_: The primary audience of the launch is humans, not machines.
-- **Establishing governance structure**:
+- **Establish governance structure**:
   - _Details_: Need a long-term governance structure more formalized than the current one. See "Governance structure" section below for more details.
   - _Why important_:
     - Necessary for current contributors to feel that they have legitimate ownership of the project, which is critical to Walletbeat being a decentralized, community-owned project.
@@ -81,9 +81,21 @@ We have also achieved recognition from important parts of the ecosystem (Ethereu
   - _Why important_: Useful for wallet users as an indication of their relative popularity, and can be a good sorting signal for the comparison table.
   - _Why non-goal for 2025_: Not very important relative to other types of data for Walletbeat to keep track of, and only valuable after a few months' worth of data can be gathered.
 
-## Responsibilities
+## Responsibilities for launch priorities
 
-TBD
+- **polymutex**:
+  - Finalize wallet attribute set
+  - Finalize the stage system (non-UI components)
+- **nconsigny**:
+- **lucemans**:
+- **darrylyeo**:
+  - Finish migration to Astro/Svelte
+- **Hugoo**:
+- **Unassigned**:
+  - Finish rating at least 6 wallets
+  - Make wallet data easy to fill in or rectify
+  - Establish a common UX theme for the site
+  - Flesh out EIP-7702 adoption tracker
 
 ## Governance structure
 
@@ -95,7 +107,13 @@ Walletbeat's governance structure is currently a nebulous combination of the fol
 
 The ideal state for Walletbeat's post-launch, pre-2026 governance structure should have the following properties:
 
-- `walletbeat.eth` is owned by a multisig with at least 5 active members.
+- `walletbeat.eth` shall be owned by a multisig with at least 5 active members. Volunteers so far:
+  - polymutex
+  - lucemans
+  - darrylyeo (maybe)
+  - Multisig membership goals:
+    - None of the members share the same organization as each other
+    - None of the members are associated with an organization which develops a wallet reviewed on Walletbeat
 - Fluidkey formally recognizes this multisig as owning "Walletbeat" as a name.
 - Walletbeat may have a [BDFL](https://en.wikipedia.org/wiki/Benevolent_dictator_for_life)-like structure for maintainership, but that person should not have unilateral authority over the `walletbeat.eth` multisig.
 
