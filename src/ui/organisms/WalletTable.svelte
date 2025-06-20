@@ -107,6 +107,7 @@
 
 
 	// Components
+	import EipDetails from '@/ui/molecules/EipDetails.svelte'
 	import Filters from '@/ui/molecules/Filters.svelte'
 	import WalletAttributeGroupSummary from '@/ui/molecules/WalletAttributeGroupSummary.svelte'
 	import WalletAttributeSummary from '@/ui/molecules/WalletAttributeSummary.svelte'
@@ -453,17 +454,51 @@
 									]
 										.filter(Boolean)
 								) as tag (tag.label)}
-									<button
-										class="tag"
-										data-tag-type={tag.type}
-										aria-label="Filter by {tag.label}"
-										onclick={(e) => {
-											e.stopPropagation()
-											toggleFilterById!(tag.filterId)
-										}}
-									>
-										{tag.label}
-									</button>
+									{#if tag.eipTooltipContent}
+										<Tooltip 
+											placement="inline-end"
+										>
+											<div
+												class="tag"
+												role="button"
+												tabindex="0"
+												data-tag-type={tag.type}
+												aria-label="Filter by {tag.label}"
+												onclick={e => {
+													e.stopPropagation()
+													toggleFilterById!(tag.filterId)
+												}}
+												onkeydown={e => {
+													if (e.key !== 'Enter' && e.key !== ' ') return
+
+													e.stopPropagation()
+													toggleFilterById!(tag.filterId)
+												}}
+											>
+												{tag.label}
+											</div>
+
+											{#snippet tooltip()}
+												<div class="eip-tooltip-content">
+													<EipDetails
+														eip={tag.eipTooltipContent}
+													/>
+												</div>
+											{/snippet}
+										</Tooltip>
+									{:else}
+										<button
+											class="tag"
+											data-tag-type={tag.type}
+											aria-label="Filter by {tag.label}"
+											onclick={(e) => {
+												e.stopPropagation()
+												toggleFilterById!(tag.filterId)
+											}}
+										>
+											{tag.label}
+										</button>
+									{/if}
 								{/each}
 							</div>
 						</div>
@@ -1071,5 +1106,9 @@
 
 	:global(.wallet-attribute-rating-pie) {
 		margin-inline: -1em;
+	}
+
+	.eip-tooltip-content {
+		width: 34rem;
 	}
 </style>
