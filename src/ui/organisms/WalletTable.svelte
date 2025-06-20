@@ -313,6 +313,13 @@
 		columnId: 'overall',
 		direction: 'desc',
 	}}
+
+	getCellVerticalAlign={({ row }) => (
+		isRowExpanded(row.metadata.id) ?
+			'top'
+		:
+			undefined
+	)}
 >
 	{#snippet headerCellSnippet({ column })}
 		<span class="header-title">{column.name}</span>
@@ -921,10 +928,6 @@
 		white-space: wrap;
 		flex: 0 0 0;
 		min-width: fit-content;
-	}
-
-	:global(td:has(> .wallet-name-cell)) {
-		--table-cell-verticalAlign: middle;
 	}
 
 	.wallet-name-cell {
