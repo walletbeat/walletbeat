@@ -531,6 +531,8 @@
 					undefined
 			)}
 
+			{@const score = value}
+
 			<div class="overall-rating">
 				<Pie
 					slices={
@@ -617,19 +619,13 @@
 					onSliceMouseLeave={sliceId => {
 						activeAttribute = undefined
 					}}
-				>
-					{#snippet centerContentSnippet()}
-						<image
-							href={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-							x="-15"
-							y="-15"
-							width="30"
-							height="30"
-						>
-							<title>{wallet.metadata.displayName}</title>
-						</image>
-					{/snippet}
-				</Pie>
+					centerLabel={
+						score ?
+							(score * 100).toFixed(0)
+						:
+							'❓'
+					}
+				/>
 
 				{#if isExpanded && highlightedGroup}
 					<div class="details">
