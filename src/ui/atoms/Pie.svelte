@@ -299,7 +299,7 @@
 		class:highlighted={highlightedSliceId === slice.id}
 		data-slice-id={slice.id}
 		role={slice.href ? 'link' : 'button'}
-		tabindex="0"
+		tabIndex="0"
 		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
 		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
 		onfocus={() => { onSliceFocus?.(slice.id) }}
