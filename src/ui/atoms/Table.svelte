@@ -24,6 +24,7 @@
 		headerCellSnippet,
 		onRowClick,
 		displaceDisabledRows = false,
+		sortedColumn = $bindable(),
 		...restProps
 	}: {
 		columns: _Column[]
@@ -46,7 +47,34 @@
 		}]>
 		onRowClick?: (row: _RowValue, rowId?: RowId) => void
 		displaceDisabledRows?: boolean
+		sortedColumn?: _Column | undefined
 	} = $props()
+
+	// (Derived)
+	let columnsById = $derived.by(() => {
+		const columnsById = new Map<_ColumnId, _Column>()
+		
+		const addColumns = (columns: _Column[]) => {
+			for (const column of columns) {
+				columnsById.set(column.id, column)
+
+				if(column.children?.length)
+					addColumns(column.children)
+			}
+		}
+		
+		addColumns(columns)
+
+		return columnsById
+	})
+
+	$effect(() => {
+		sortedColumn = (
+			table.columnSort?.columnId && (
+				columnsById.get(table.columnSort.columnId)
+			)
+		)
+	})
 
 
 	// State
