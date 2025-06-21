@@ -442,6 +442,7 @@
 					text-anchor: middle;
 					dominant-baseline: central;
 					fill: currentColor;
+					stroke: none;
 					font-size: 10px;
 					pointer-events: none;
 					translate: 0 calc(var(--slice-labelRadius) * -1px);
