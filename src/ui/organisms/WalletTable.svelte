@@ -377,13 +377,17 @@
 			<div class="wallet-name-cell column">
 				<div class="wallet-name-title row">
 					<div class="row">
-						<span>
-							{#if isExpanded}
-								{@html UnfoldLessIcon}
-							{:else}
-								{@html UnfoldMoreIcon}
-							{/if}
-						</span>
+						<div class="row inline">
+							<span class="row-expand-toggle">
+								{#if isExpanded}
+									{@html UnfoldLessIcon}
+								{:else}
+									{@html UnfoldMoreIcon}
+								{/if}
+							</span>
+
+							<span class="row-count"></span>
+						</div>
 
 						<img
 							alt={displayName}
@@ -969,6 +973,26 @@
 		transition-property: gap;
 
 		.wallet-name-title {
+			.row-expand-toggle {
+				display: flex;
+			}
+
+			.row-count {
+				font-size: 0.8em;
+
+				display: inline-flex;
+				justify-content: center;
+				align-items: center;
+				width: 1.25em;
+				height: 1.25em;
+
+				text-align: center;
+
+				&::before {
+					content: counter(TableRowCount);
+				}
+			}
+
 			img {
 				filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
 				width: auto;
