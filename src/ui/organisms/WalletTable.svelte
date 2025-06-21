@@ -68,6 +68,13 @@
 
 
 	// (Derived)
+	const allSupportedVariants = $derived(
+		Object.values(Variant)
+			.filter(variant => (
+				wallets.some(wallet => variant in wallet.variants)
+			))
+	)
+
 	const selectedVariant = $derived.by(() => {
 		// Derive selected variant from active filters
 		const activeVariantFilters = Array.from(activeFilters).filter(filter => 
@@ -552,7 +559,7 @@
 						</div>
 					</div>
 
-					{#if supportedVariants.length}
+					{#if allSupportedVariants.length > 1}
 						<div class="variants inline">
 							{#each supportedVariants as variant}
 								<button
