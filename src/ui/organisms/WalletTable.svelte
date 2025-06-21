@@ -140,6 +140,10 @@
 	// Transitions
 	import { fade } from 'svelte/transition'
 	import { expoOut } from 'svelte/easing'
+
+
+	// Styles
+	import { scoreToColor } from '@/utils/colors'
 </script>
 
 
@@ -683,7 +687,7 @@
 									arcLabel: `${attrGroup.icon}${groupScore?.hasUnratedComponent ? '*' : ''}`,
 									color: (
 										groupScore ?
-											`hsl(${Math.round(groupScore.score * 120)}, 80%, 45%)`
+											scoreToColor(groupScore.score)
 										:
 											'var(--rating-unrated)'
 									),

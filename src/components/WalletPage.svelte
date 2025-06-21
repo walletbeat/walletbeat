@@ -31,7 +31,7 @@
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
-	import { percentageToCSS } from '@/utils/colors'
+	import { scoreToColor } from '@/utils/colors'
 
 
 	// Components
@@ -310,7 +310,7 @@
 			aria-label={attrGroup.displayName}
 			data-score={scoreLevel}
 			data-icon={attrGroup.icon}
-			style:--accent={score ? percentageToCSS(score.score) : 'transparent'}
+			style:--accent={score ? scoreToColor(score.score) : 'transparent'}
 		>
 			<header>
 				<h2>{attrGroup.displayName}</h2>
