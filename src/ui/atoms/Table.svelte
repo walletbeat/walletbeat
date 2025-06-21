@@ -129,6 +129,19 @@
 	 class="container {'class' in restProps ? restProps.class : ''}"
 >
 	<table>
+		<colgroup>
+			{#each table.columnsVisible as column (column.id)}
+				{@const columnSpan = getColumnSpan(column)}
+				{@const isSortable = column.isSortable !== false}
+
+				<col
+					span={columnSpan}
+					data-sortable={isSortable ? '' : undefined}
+					data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
+				/>
+			{/each}
+		</colgroup>
+
 		<thead>
 			{@render headerRows(table.columns, 0)}
 
