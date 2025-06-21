@@ -552,7 +552,7 @@
 						</div>
 					</div>
 
-					{#if supportedVariants.length}
+					{#if supportedVariants.length > 1}
 						<div class="variants inline">
 							{#each supportedVariants as variant}
 								<button
