@@ -20,6 +20,12 @@
 	import type { Snippet } from 'svelte'
 
 
+	// IDs
+	const id = $props.id()
+	const popoverId = `tooltip-popover-${id}`
+	const anchorName = `--anchor-${id}`
+
+
 	// Props
 	let {
 		placement = 'block-end',
@@ -42,12 +48,6 @@
 	// State
 	let isTriggerHovered = $state(false)
 	let isPopoverHovered = $state(false)
-
-
-	// IDs
-	const id = $props.id()
-	const popoverId = `tooltip-popover-${id}`
-	const anchorName = `--anchor-${id}`
 </script>
 
 
