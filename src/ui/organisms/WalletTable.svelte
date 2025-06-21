@@ -733,7 +733,25 @@
 						}}
 						centerLabel={
 							score ?
-								(score * 100).toFixed(0)
+								`${
+									score === 0 ?
+										'\u{1f480}'
+									: score === 1 ?
+										'\u{1f4af}'
+									:
+										(score * 100).toFixed(0)
+								}${
+									(
+										displayedAttributeGroups
+											.some(attrGroup => (
+												calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
+													?.hasUnratedComponent
+											))
+									) ?
+										'*'
+									:
+										''
+								}`
 							:
 								'❓'
 						}
