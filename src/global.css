@@ -110,7 +110,6 @@ html.dark {
 	outline-color: inherit;
 	margin: 0;
 	padding: 0;
-	text-box-trim: trim-both;
 	transition-behavior: allow-discrete;
 	interpolate-size: allow-keywords;
 
@@ -220,8 +219,6 @@ label:has(> input:is([type="checkbox"], [type="radio"])) {
 	background-color: var(--background-primary);
 	border: 1px solid var(--border-color);
 	border-radius: 0.5em;
-
-	text-box: trim-both cap alphabetic;
 
 	transition-property: opacity;
 
