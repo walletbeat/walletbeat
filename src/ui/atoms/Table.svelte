@@ -356,6 +356,10 @@
 							--column-sortIndicator-fontSize: 1em;
 						}
 
+						&[data-sort] {
+							filter: brightness(150%);
+						}
+
 						.sort-label {
 							display: flex;
 							align-items: center;
