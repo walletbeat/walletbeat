@@ -414,8 +414,6 @@
 									transform: var(--column-sortIndicator-transform);
 
 									transition-property: transform, font-size;
-									transition-duration: 0.2s;
-									transition-timing-function: ease-out;
 								}
 							}
 						}
