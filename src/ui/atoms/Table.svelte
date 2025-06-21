@@ -22,6 +22,7 @@
 		getCellVerticalAlign,
 		cellSnippet,
 		headerCellSnippet,
+		expandHeaderCells = true,
 		onRowClick,
 		displaceDisabledRows = false,
 		sortedColumn = $bindable(),
@@ -47,6 +48,7 @@
 		}]>
 		onRowClick?: (row: _RowValue, rowId?: RowId) => void
 		displaceDisabledRows?: boolean
+		expandHeaderCells?: boolean
 		sortedColumn?: _Column | undefined
 	} = $props()
 
@@ -66,6 +68,26 @@
 		addColumns(columns)
 
 		return columnsById
+	})
+
+	let maxHeaderLevel = $derived.by(() => {
+		const getMaxLevel = (columns: _Column[]): number => (
+			Math.max(
+				1,
+				...columns.map(column => (
+					!column.children?.length ?
+						1
+					:
+						1 + getMaxLevel(column.children)
+				))
+			)
+		)
+		return (
+			expandHeaderCells ?
+				getMaxLevel(columns)
+			:
+				1
+		)
 	})
 
 	$effect(() => {
@@ -162,7 +184,7 @@
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
 						{#if column}
 							{@render headerCell(column, level)}
-						{:else}
+						{:else if !expandHeaderCells}
 							<th class="blank-cell"></th>
 						{/if}
 					{/each}
@@ -181,6 +203,12 @@
 
 				<th
 					{colspan}
+					rowspan={
+						expandHeaderCells && (!isExpandable || !isExpanded) ?
+							maxHeaderLevel - level
+						:
+							undefined
+					}
 					data-header-level={level}
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.columnSort?.columnId === column.id ? table.columnSort?.direction : undefined}
