@@ -318,17 +318,17 @@
 						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.02));
 					}
 					&[data-header-level='1'] {
-						font-weight: 500;
+						font-weight: 600;
 						font-size: 0.825em;
 						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.01));
 					}
 					&[data-header-level='2'] {
-						font-weight: 400;
+						font-weight: 500;
 						font-size: 0.7em;
 						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.005));
 					}
 					&[data-header-level='3'] {
-						font-weight: 100;
+						font-weight: 400;
 						font-size: 0.7em;
 						background-color: color-mix(in oklch, var(--table-backgroundColor), rgba(255, 255, 255, 0.0025));
 					}
