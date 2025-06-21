@@ -53,6 +53,10 @@
 
 {#if isEnabled}
 	<button
+		type="button"
+		onclick={e => {
+			e.preventDefault()
+		}}
 		style:anchor-name={anchorName}
 		popovertarget={popoverId}
 		{...restProps}
