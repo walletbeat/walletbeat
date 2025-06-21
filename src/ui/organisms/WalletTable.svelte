@@ -122,11 +122,13 @@
 	import KeyIcon from 'lucide-static/icons/key.svg?raw'
 	import HardwareIcon from '@material-icons/svg/svg/hardware/baseline.svg?raw'
 
-	import UnfoldLessIcon from '@material-icons/svg/svg/unfold_less/baseline.svg?raw'
-	import UnfoldMoreIcon from '@material-icons/svg/svg/unfold_more/baseline.svg?raw'
-
 	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
 	import OpenInNewRoundedIcon from '@material-icons/svg/svg/open_in_new//baseline.svg?raw'
+
+
+	// Transitions
+	import { fade } from 'svelte/transition'
+	import { expoOut } from 'svelte/easing'
 </script>
 
 
@@ -249,9 +251,6 @@
 			|| !filteredWallets.includes(wallet)
 		)
 	)}
-	onRowClick={(wallet, walletId) => {
-		toggleRowExpanded(walletId)
-	}}
 	displaceDisabledRows={true}
 
 	columns={
@@ -340,30 +339,45 @@
 			content: Snippet
 			expandedContent: Snippet
 		})}
-			<div
+			<details
 				class="with-expanded-content"
-				data-is-expanded={isExpanded ? '' : undefined}
+				bind:open={
+					() => (
+						isExpanded
+					),
+					open => {
+						if(open)
+							expandedRowIds.add(wallet.metadata.id)
+						else
+							expandedRowIds.delete(wallet.metadata.id)
+					}
+				}
 			>
-				<Tooltip
-					isEnabled={!isExpanded}
-				>
-					{@render content()}
+				<summary>
+					<Tooltip
+						isEnabled={!isExpanded}
+					>
+						{@render content()}
 
-					{#snippet tooltip()}
-						{#if !isExpanded}
-							<div class="expanded-tooltip-content">
-								{@render expandedContent()}
-							</div>
-						{/if}
-					{/snippet}
-				</Tooltip>
+						{#snippet tooltip()}
+							{#if !isExpanded}
+								<div class="expanded-tooltip-content">
+									{@render expandedContent()}
+								</div>
+							{/if}
+						{/snippet}
+					</Tooltip>
+				</summary>
 
 				{#if isExpanded}
-					<div class="expanded-content">
+					<div
+						class="expanded-content"
+						transition:fade={{ duration: 200, easing: expoOut }}
+					>
 						{@render expandedContent()}
 					</div>
 				{/if}
-			</div>
+			</details>
 		{/snippet}
 
 		{#if column.id === 'displayName'}
@@ -521,14 +535,6 @@
 							{/each}
 						</div>
 					{/if}
-
-					<span class="row-expand-toggle">
-						{#if isExpanded}
-							{@html UnfoldLessIcon}
-						{:else}
-							{@html UnfoldMoreIcon}
-						{/if}
-					</span>
 				</div>
 			{/snippet}
 
@@ -978,10 +984,6 @@
 		align-items: center;
 		gap: 0.85em;
 
-		.row-expand-toggle {
-			display: flex;
-		}
-
 		.row-count {
 			display: inline-flex;
 			justify-content: center;
@@ -1128,8 +1130,18 @@
 
 		transition-property: gap;
 
-		&[data-is-expanded] {
+		&[open] {
 			gap: 0.75em;
+		}
+
+		summary {
+			:global([data-column]:not([data-is-sticky])) & {
+				display: contents;
+
+				&::after {
+					display: none;
+				}
+			}
 		}
 
 		.expanded-content {
