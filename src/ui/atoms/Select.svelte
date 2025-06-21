@@ -50,7 +50,12 @@
 	{@render selectedContent()}
 	{#snippet selectedContent()}
 		<!-- svelte-ignore a11y_consider_explicit_label -->
-		<button>
+		<button
+			type="button"
+			onclick={e => {
+				e.stopPropagation()
+			}}
+		>
 			<selectedcontent></selectedcontent>
 		</button>
 	{/snippet}
