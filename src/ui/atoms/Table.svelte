@@ -145,7 +145,7 @@
 						))
 				)}
 
-				<tr in:fly={{ y: '-50%', duration: 250, easing: expoOut }}>
+				<tr in:fly={{ y: '-50%', duration: 300, easing: expoOut }}>
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
 						{#if column}
 							{@render headerCell(column, level)}
@@ -272,8 +272,8 @@
 									value,
 								})
 							}
-							animate:flip={{ duration: 250, easing: expoOut }}
-							in:fade={{ duration: 250, easing: expoOut }}
+							animate:flip={{ duration: 300, easing: expoOut }}
+							in:fade={{ duration: 300, easing: expoOut }}
 						>
 							{#if cellSnippet}
 								{@render cellSnippet({
