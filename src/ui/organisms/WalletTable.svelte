@@ -374,142 +374,132 @@
 					.filter(variant => variant in wallet.variants)
 			)}
 
-			<div class="wallet-name-cell column">
-				<div class="wallet-name-title row">
-					<div class="row">
-						<div class="row inline">
-							<span class="row-expand-toggle">
-								{#if isExpanded}
-									{@html UnfoldLessIcon}
-								{:else}
-									{@html UnfoldMoreIcon}
-								{/if}
-							</span>
+			{#snippet content()}
+				<div class="wallet-info">
+					<span class="row-count"></span>
 
-							<span class="row-count"></span>
-						</div>
+					<img
+						alt={displayName}
+						src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+						width="16"
+						height="16"
+					/>
 
-						<img
-							alt={displayName}
-							src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-							width="16"
-							height="16"
-						/>
-
-						<div class="column inline">
-							<span>{displayName}</span>
+					<div class="name-and-tags">
+						<div class="name">
+							<h3>{displayName}</h3>
 
 							{#if selectedVariant && selectedVariant in wallet.variants}
-								<small class="variant">
+								<div class="variant">
 									{variants[selectedVariant].label}
-								</small>
+								</div>
 							{/if}
+						</div>
 
-							<div class="tags">
-								{#each (
-									[
-										// Wallet type tags
-										hasVariant(wallet.variants, Variant.HARDWARE) && {
-											label: 'Hardware',
-											filterId: 'walletType-hardware',
-											type: 'wallet-type',
-										},
-										!hasVariant(wallet.variants, Variant.HARDWARE) && {
-											label: 'Software',
-											filterId: 'walletType-software',
-											type: 'wallet-type',
-										},
-										// Manufacture type tags
-										hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
-											label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
-											filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
-											type: 'manufacture-type',
-										},
-										// Account type tags
-										...(
-											accountTypes !== null ?
-												[
-													AccountType.eoa in accountTypes && {
-														label: 'EOA',
-														filterId: 'accountType-eoa',
-														type: 'account-type',
-													},
-													AccountType.rawErc4337 in accountTypes && {
-														label: `#${erc4337.number}`,
-														filterId: 'accountType-erc4337',
-														type: 'eip',
-														eipTooltipContent: erc4337,
-													},
-													AccountType.eip7702 in accountTypes && {
-														label: `#${eip7702.number}`,
-														filterId: 'accountType-eip7702',
-														type: 'eip',
-														eipTooltipContent: eip7702,
-													},
-													AccountType.mpc in accountTypes && {
-														label: 'MPC',
-														filterId: 'accountType-mpc',
-														type: 'account-type',
-													},
-												]
-											:
-												[]
-										),
-									]
-										.filter(Boolean)
-								) as tag (tag.label)}
-									{#if tag.eipTooltipContent}
-										<Tooltip 
-											placement="inline-end"
-										>
-											<div
-												class="tag"
-												role="button"
-												tabindex="0"
-												data-tag-type={tag.type}
-												aria-label="Filter by {tag.label}"
-												onclick={e => {
-													e.stopPropagation()
-													toggleFilterById!(tag.filterId)
-												}}
-												onkeydown={e => {
-													if (e.key !== 'Enter' && e.key !== ' ') return
-
-													e.stopPropagation()
-													toggleFilterById!(tag.filterId)
-												}}
-											>
-												{tag.label}
-											</div>
-
-											{#snippet tooltip()}
-												<div class="eip-tooltip-content">
-													<EipDetails
-														eip={tag.eipTooltipContent}
-													/>
-												</div>
-											{/snippet}
-										</Tooltip>
-									{:else}
-										<button
+						<div class="tags">
+							{#each (
+								[
+									// Wallet type tags
+									hasVariant(wallet.variants, Variant.HARDWARE) && {
+										label: 'Hardware',
+										filterId: 'walletType-hardware',
+										type: 'wallet-type',
+									},
+									!hasVariant(wallet.variants, Variant.HARDWARE) && {
+										label: 'Software',
+										filterId: 'walletType-software',
+										type: 'wallet-type',
+									},
+									// Manufacture type tags
+									hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
+										label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
+										filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
+										type: 'manufacture-type',
+									},
+									// Account type tags
+									...(
+										accountTypes !== null ?
+											[
+												AccountType.eoa in accountTypes && {
+													label: 'EOA',
+													filterId: 'accountType-eoa',
+													type: 'account-type',
+												},
+												AccountType.rawErc4337 in accountTypes && {
+													label: `#${erc4337.number}`,
+													filterId: 'accountType-erc4337',
+													type: 'eip',
+													eipTooltipContent: erc4337,
+												},
+												AccountType.eip7702 in accountTypes && {
+													label: `#${eip7702.number}`,
+													filterId: 'accountType-eip7702',
+													type: 'eip',
+													eipTooltipContent: eip7702,
+												},
+												AccountType.mpc in accountTypes && {
+													label: 'MPC',
+													filterId: 'accountType-mpc',
+													type: 'account-type',
+												},
+											]
+										:
+											[]
+									),
+								]
+									.filter(Boolean)
+							) as tag (tag.label)}
+								{#if tag.eipTooltipContent}
+									<Tooltip 
+										placement="inline-end"
+									>
+										<div
 											class="tag"
+											role="button"
+											tabindex="0"
 											data-tag-type={tag.type}
 											aria-label="Filter by {tag.label}"
-											onclick={(e) => {
+											onclick={e => {
+												e.stopPropagation()
+												toggleFilterById!(tag.filterId)
+											}}
+											onkeydown={e => {
+												if (e.key !== 'Enter' && e.key !== ' ') return
+
 												e.stopPropagation()
 												toggleFilterById!(tag.filterId)
 											}}
 										>
 											{tag.label}
-										</button>
-									{/if}
-								{/each}
-							</div>
+										</div>
+
+										{#snippet tooltip()}
+											<div class="eip-tooltip-content">
+												<EipDetails
+													eip={tag.eipTooltipContent}
+												/>
+											</div>
+										{/snippet}
+									</Tooltip>
+								{:else}
+									<button
+										class="tag"
+										data-tag-type={tag.type}
+										aria-label="Filter by {tag.label}"
+										onclick={(e) => {
+											e.stopPropagation()
+											toggleFilterById!(tag.filterId)
+										}}
+									>
+										{tag.label}
+									</button>
+								{/if}
+							{/each}
 						</div>
 					</div>
 
 					{#if supportedVariants.length}
-						<div class="variants row inline">
+						<div class="variants inline">
 							{#each supportedVariants as variant}
 								<button
 									data-selected={variant === selectedVariant ? '' : undefined}
@@ -531,58 +521,70 @@
 							{/each}
 						</div>
 					{/if}
-				</div>
 
-				<div
-					class="expanded-content column"
-					hidden={!isExpanded}
-				>
-					{#if !selectedVariant || wallet.variants[selectedVariant]}
-						<p class="blurb">
-							<Typography
-								content={wallet.metadata.blurb}
-								strings={{
-									WALLET_NAME: wallet.metadata.displayName,
-									WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-								}}
-							/>
-						</p>
-					{:else}
-						<p class="blurb">
-							{wallet.metadata.displayName} does not have a {selectedVariant} version.
-						</p>
-					{/if}
-					
-					<div class="links">
-						<a
-							href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, selectedVariant ?? null)}`}
-							class="info-link"
-						>
-							<span class="icon">{@html InfoIcon}</span>
-							Learn more
-						</a>
+					<span class="row-expand-toggle">
+						{#if isExpanded}
+							{@html UnfoldLessIcon}
+						{:else}
+							{@html UnfoldMoreIcon}
+						{/if}
+					</span>
+				</div>
+			{/snippet}
+
+			{#snippet expandedContent()}
+				{#if !selectedVariant || wallet.variants[selectedVariant]}
+					<p class="blurb">
+						<Typography
+							content={wallet.metadata.blurb}
+							strings={{
+								WALLET_NAME: wallet.metadata.displayName,
+								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+							}}
+						/>
+					</p>
+				{:else}
+					<p class="blurb">
+						{wallet.metadata.displayName} does not have a {selectedVariant} version.
+					</p>
+				{/if}
+				
+				<div class="links">
+					<a
+						href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, selectedVariant ?? null)}`}
+						class="info-link"
+					>
+						<span aria-hidden="true">{@html InfoIcon}</span>
+						Learn more
+					</a>
+					|
+					<a
+						href={isLabeledUrl(wallet.metadata.url) ? wallet.metadata.url.url : wallet.metadata.url}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="external-link"
+					>
+						{wallet.metadata.displayName} website
+					</a>
+					{#if wallet.metadata.repoUrl}
 						|
 						<a
-							href={isLabeledUrl(wallet.metadata.url) ? wallet.metadata.url.url : wallet.metadata.url}
+							href={isLabeledUrl(wallet.metadata.repoUrl) ? wallet.metadata.repoUrl.url : wallet.metadata.repoUrl}
 							target="_blank"
+							rel="noopener noreferrer"
 							class="external-link"
 						>
-							{wallet.metadata.displayName} website
+							Code
+							<span aria-hidden="true">{@html OpenInNewRoundedIcon}</span>
 						</a>
-						{#if wallet.metadata.repoUrl}
-							|
-							<a
-								href={isLabeledUrl(wallet.metadata.repoUrl) ? wallet.metadata.repoUrl.url : wallet.metadata.repoUrl}
-								target="_blank"
-								class="external-link"
-							>
-								Code
-								<span class="icon">{@html OpenInNewRoundedIcon}</span>
-							</a>
-						{/if}
-					</div>
+					{/if}
 				</div>
-			</div>
+			{/snippet}
+
+			{@render withExpandedContent({
+				content,
+				expandedContent,
+			})}
 
 		{:else}
 			{@const selectedSliceId = (
@@ -969,138 +971,155 @@
 		min-width: fit-content;
 	}
 
-	.wallet-name-cell {
-		transition-property: gap;
+	.wallet-info {
+		text-align: start;
 
-		.wallet-name-title {
-			.row-expand-toggle {
-				display: flex;
+		display: flex;
+		align-items: center;
+		gap: 0.85em;
+
+		.row-expand-toggle {
+			display: flex;
+		}
+
+		.row-count {
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			width: 1.25em;
+			height: 1.25em;
+
+			text-align: center;
+			font-weight: 600;
+			color: var(--text-secondary);
+
+			&::before {
+				content: counter(TableRowCount);
 			}
 
-			.row-count {
-				font-size: 0.8em;
+			:global([data-disabled]) &::before {
+				content: '–';
+			}
+		}
 
-				display: inline-flex;
-				justify-content: center;
-				align-items: center;
-				width: 1.25em;
-				height: 1.25em;
+		img {
+			filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
+			width: 2.25em;
+			height: 2.25em;
+			object-fit: contain;
+			border-radius: 0.25em;
+		}
 
-				text-align: center;
+		.name-and-tags {
+			font-size: 0.85em;
 
-				&::before {
-					content: counter(TableRowCount);
+			display: grid;
+			gap: 0.5em;
+
+			.name {
+				display: grid;
+				gap: 0.25em;
+
+				h3 {
+					font-weight: 600;
 				}
-			}
-
-			img {
-				filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
-				width: auto;
-				height: 1.66rem;
-				vertical-align: middle;
 			}
 
 			.variant {
-				font-size: 0.6em;
+				font-size: smaller;
 				opacity: 0.6;
 			}
 
-			.variants {
-				gap: 0.1em;
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.25em;
 
-				button {
-					display: inline-flex;
-					place-items: center;
-					aspect-ratio: 1;
-					padding: 0.33em;
-					border-radius: 50%;
-					background-color: transparent;
-
-					transition-property: background-color, opacity;
-
-					&[data-selected] {
-						background-color: rgba(255, 255, 255, 0.1);
-						border: 1px solid rgba(255, 255, 255, 0.33);
+				.tag {
+					&[data-tag-type='wallet-type'] {
+						--tag-backgroundColor: light-dark(oklch(0.95 0.00 0), oklch(0.25 0.00 0));
+						--tag-textColor: light-dark(oklch(0.65 0.00 0), oklch(0.80 0.00 0));
+						--tag-borderColor: light-dark(oklch(0.90 0.00 0), oklch(0.40 0.00 0));
+						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.00 0), oklch(0.30 0.00 0));
+						--tag-hover-textColor: light-dark(oklch(0.60 0.00 0), oklch(0.85 0.00 0));
+						--tag-hover-borderColor: light-dark(oklch(0.85 0.00 0), oklch(0.50 0.00 0));
 					}
 
-					&:focus {
-						background-color: rgba(255, 255, 255, 0.15);
+					&[data-tag-type='account-type'] {
+						--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
+						--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.70 0.25 145));
+						--tag-borderColor: light-dark(oklch(0.90 0.06 145), oklch(0.40 0.08 145));
+						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
+						--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
+						--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
 					}
 
-					&:hover:not(:disabled) {
-						background-color: rgba(255, 255, 255, 0.2);
+					&[data-tag-type='eip'] {
+						--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
+						--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.70 0.25 300));
+						--tag-borderColor: light-dark(oklch(0.90 0.06 300), oklch(0.40 0.08 300));
+						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.30 0.07 300));
+						--tag-hover-textColor: light-dark(oklch(0.60 0.18 300), oklch(0.85 0.15 300));
+						--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.50 0.10 300));
 					}
 
-					&:disabled {
-						opacity: 0.4;
-					}
-
-					.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
-						opacity: 0.5;
+					&[data-tag-type='manufacture-type'] {
+						--tag-backgroundColor: light-dark(oklch(0.95 0.03 290), oklch(0.25 0.05 290));
+						--tag-textColor: light-dark(oklch(0.65 0.15 290), oklch(0.70 0.25 290));
+						--tag-borderColor: light-dark(oklch(0.90 0.06 290), oklch(0.40 0.08 290));
+						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 290), oklch(0.30 0.07 290));
+						--tag-hover-textColor: light-dark(oklch(0.60 0.18 290), oklch(0.85 0.15 290));
+						--tag-hover-borderColor: light-dark(oklch(0.85 0.08 290), oklch(0.50 0.10 290));
 					}
 				}
 			}
 		}
 
-		.expanded-content {
-			font-size: 0.64em;
-			max-width: 40ch;
+		.variants {
+			margin-inline-start: auto;
 
-			overflow: hidden;
-			transition-property: height, display;
+			font-size: 1.25em;
 
-			&[hidden] {
-				height: 0;
-			}
-
-			p {
-				width: 0;
-				min-width: 100%;
-			}
-		}
-
-		.tags {
 			display: flex;
-			flex-wrap: wrap;
-			gap: 0.25em;
+			align-items: center;
+			gap: 0.1em;
 
-			.tag {
-				&[data-tag-type='wallet-type'] {
-					--tag-backgroundColor: light-dark(oklch(0.95 0.00 0), oklch(0.25 0.00 0));
-					--tag-textColor: light-dark(oklch(0.65 0.00 0), oklch(0.80 0.00 0));
-					--tag-borderColor: light-dark(oklch(0.90 0.00 0), oklch(0.40 0.00 0));
-					--tag-hover-backgroundColor: light-dark(oklch(0.92 0.00 0), oklch(0.30 0.00 0));
-					--tag-hover-textColor: light-dark(oklch(0.60 0.00 0), oklch(0.85 0.00 0));
-					--tag-hover-borderColor: light-dark(oklch(0.85 0.00 0), oklch(0.50 0.00 0));
+			button {
+				display: inline-flex;
+				place-items: center;
+				aspect-ratio: 1;
+				padding: 0.33em;
+
+				background-color: transparent;
+				border-radius: 50%;
+
+				transition-property: background-color, opacity;
+
+				&[data-selected] {
+					background-color: rgba(255, 255, 255, 0.1);
+					border-color: rgba(255, 255, 255, 0.33);
 				}
 
-				&[data-tag-type='account-type'] {
-					--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
-					--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.70 0.25 145));
-					--tag-borderColor: light-dark(oklch(0.90 0.06 145), oklch(0.40 0.08 145));
-					--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
-					--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
-					--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
+				&:focus {
+					background-color: rgba(255, 255, 255, 0.15);
 				}
 
-				&[data-tag-type='eip'] {
-					--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
-					--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.70 0.25 300));
-					--tag-borderColor: light-dark(oklch(0.90 0.06 300), oklch(0.40 0.08 300));
-					--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.30 0.07 300));
-					--tag-hover-textColor: light-dark(oklch(0.60 0.18 300), oklch(0.85 0.15 300));
-					--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.50 0.10 300));
+				&:hover:not(:disabled) {
+					background-color: rgba(255, 255, 255, 0.2);
 				}
 
-				&[data-tag-type='manufacture-type'] {
-					--tag-backgroundColor: light-dark(oklch(0.95 0.03 290), oklch(0.25 0.05 290));
-					--tag-textColor: light-dark(oklch(0.65 0.15 290), oklch(0.70 0.25 290));
-					--tag-borderColor: light-dark(oklch(0.90 0.06 290), oklch(0.40 0.08 290));
-					--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 290), oklch(0.30 0.07 290));
-					--tag-hover-textColor: light-dark(oklch(0.60 0.18 290), oklch(0.85 0.15 290));
-					--tag-hover-borderColor: light-dark(oklch(0.85 0.08 290), oklch(0.50 0.10 290));
+				&:disabled {
+					opacity: 0.4;
+				}
+
+				.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
+					opacity: 0.5;
 				}
 			}
+		}
+
+		.row-expand-toggle {
+			display: flex;
 		}
 	}
 
