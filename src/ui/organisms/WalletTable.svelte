@@ -587,21 +587,22 @@
 
 			{#snippet expandedContent()}
 				<div class="wallet-summary">
-					<p>
-						{#if !selectedVariant || wallet.variants[selectedVariant]}
-							<Typography
-								content={wallet.metadata.blurb}
-								strings={{
-									WALLET_NAME: wallet.metadata.displayName,
-									WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-								}}
-							/>
-						{:else}
+					{#if selectedVariant && !wallet.variants[selectedVariant]}
+						<p>
 							{wallet.metadata.displayName} does not have a {selectedVariant} version.
-						{/if}
-					</p>
-					
-					<div>
+						</p>
+
+					{:else if wallet.metadata.blurb}
+						<Typography
+							content={wallet.metadata.blurb}
+							strings={{
+								WALLET_NAME: wallet.metadata.displayName,
+								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+							}}
+						/>
+					{/if}
+
+					<div class="links">
 						<a
 							href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, selectedVariant ?? null)}`}
 							class="info-link"
@@ -609,7 +610,9 @@
 							<span aria-hidden="true">{@html InfoIcon}</span>
 							Learn more
 						</a>
-						|
+
+						<hr>
+
 						<a
 							href={isLabeledUrl(wallet.metadata.url) ? wallet.metadata.url.url : wallet.metadata.url}
 							target="_blank"
@@ -618,8 +621,10 @@
 						>
 							{wallet.metadata.displayName} website
 						</a>
+
 						{#if wallet.metadata.repoUrl}
-							|
+							<hr>
+
 							<a
 								href={isLabeledUrl(wallet.metadata.repoUrl) ? wallet.metadata.repoUrl.url : wallet.metadata.repoUrl}
 								target="_blank"
@@ -1041,6 +1046,42 @@
 		min-width: fit-content;
 	}
 
+	.with-expanded-content {
+		display: grid;
+
+		transition-property: gap;
+
+		&[open] {
+			gap: 0.75em;
+		}
+
+		summary {
+			:global([data-column]:not([data-is-sticky])) & {
+				display: contents;
+
+				&::after {
+					display: none;
+				}
+			}
+		}
+
+		.expanded-content {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+
+			inline-size: 0;
+			min-inline-size: 100%;
+			min-inline-size: -webkit-fill-available;
+
+			font-size: 0.66em;
+			text-align: center;
+		}
+
+		.expanded-tooltip-content {
+			max-width: 13rem;
+		}
+	}
+
 	.wallet-info {
 		text-align: start;
 
@@ -1192,41 +1233,31 @@
 		gap: 1em;
 		line-height: 1.6;
 		text-align: start;
-	}
 
-	.with-expanded-content {
-		display: grid;
-
-		transition-property: gap;
-
-		&[open] {
-			gap: 0.75em;
+		.expanded-tooltip-content & {
+			font-size: 0.75em;
 		}
 
-		summary {
-			:global([data-column]:not([data-is-sticky])) & {
-				display: contents;
+		.expanded-tooltip-content:has(&) {
+			max-width: 18rem;
+		}
 
-				&::after {
-					display: none;
-				}
+		.links {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+
+			gap: 0.5rem;
+
+			hr {
+				margin: 0;
+				width: 0;
+				height: 1.25em;
+
+				border: none;
+				border-inline-start: var(--separator-width) solid currentColor;
+				opacity: 0.5;
 			}
-		}
-
-		.expanded-content {
-			display: grid;
-			grid-template-columns: minmax(0, 1fr);
-
-			inline-size: 0;
-			min-inline-size: 100%;
-			min-inline-size: -webkit-fill-available;
-
-			font-size: 0.66em;
-			text-align: center;
-		}
-
-		.expanded-tooltip-content {
-			max-width: 13rem;
 		}
 	}
 
