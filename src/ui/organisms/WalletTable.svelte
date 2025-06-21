@@ -168,6 +168,32 @@
 				],
 			},
 			{
+				id: 'manufactureType',
+				label: 'Manufacture Type',
+				displayType: 'group',
+				exclusive: false,
+				filters: [
+					{
+						id: `manufactureType-${HardwareWalletManufactureType.FACTORY_MADE}`,
+						label: 'Factory-Made',
+						icon: HardwareIcon,
+						filterFunction: wallet => (
+							hasVariant(wallet.variants, Variant.HARDWARE) &&
+							wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE
+						)
+					},
+					{
+						id: `manufactureType-${HardwareWalletManufactureType.DIY}`,
+						label: 'DIY',
+						icon: HardwareIcon,
+						filterFunction: wallet => (
+							hasVariant(wallet.variants, Variant.HARDWARE) &&
+							wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
+						)
+					},
+				],
+			},
+			{
 				id: 'variant',
 				label: 'Variant',
 				// displayType: 'select',
