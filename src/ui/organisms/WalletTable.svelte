@@ -1106,8 +1106,6 @@
 
 	.with-expanded-content {
 		display: grid;
-		justify-content: center;
-		gap: 0;
 
 		transition-property: gap;
 
@@ -1116,8 +1114,12 @@
 		}
 
 		.expanded-content {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+
 			inline-size: 0;
 			min-inline-size: 100%;
+			min-inline-size: -webkit-fill-available;
 
 			font-size: 0.66em;
 			text-align: center;
