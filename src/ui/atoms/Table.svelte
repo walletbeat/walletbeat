@@ -505,6 +505,11 @@
 					vertical-align: var(--table-cell-verticalAlign);
 
 					counter-increment: TableColumnCount;
+
+					/* When sorting a non-sticky column, fade cells from other non-sticky columns */
+					tr:has(:not([data-is-sticky])[data-sort]) &:not([data-sort], [data-is-sticky], :hover, :focus-within) {
+						opacity: 0.66;
+					}
 				}
 			}
 		}
