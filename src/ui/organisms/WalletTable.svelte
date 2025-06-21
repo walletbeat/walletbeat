@@ -961,9 +961,7 @@
 								[
 									{
 										id: attrId,
-										color: evalAttr.evaluation.value.rating === Rating.PASS ? '#22c55e' : 
-											evalAttr.evaluation.value.rating === Rating.PARTIAL ? '#eab308' : 
-											evalAttr.evaluation.value.rating === Rating.FAIL ? '#ef4444' : '#6b7280',
+										color: ratingToColor(evalAttr.evaluation.value.rating),
 										weight: 1,
 										arcLabel: attribute.icon,
 										tooltip: `${attribute.icon} ${attribute.displayName}`,
