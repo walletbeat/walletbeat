@@ -63,6 +63,12 @@
 		onmouseleave={() => {
 			isTriggerHovered = false
 		}}
+		onfocus={() => {
+			isTriggerHovered = true
+		}}
+		onblur={() => {
+			isTriggerHovered = false
+		}}
 	>
 		{@render children()}
 
