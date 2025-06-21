@@ -44,6 +44,7 @@
 	--rating-partial: #f1c40f;
 	--rating-fail: #e74c3c;
 	--rating-neutral: #bdc3c7;
+	--rating-unrated: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.2));
 }
 
 .text-accent {
