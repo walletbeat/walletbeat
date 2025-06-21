@@ -14,6 +14,7 @@
 
 	// Inputs
 	let {
+		tableId,
 		columns,
 		defaultSort,
 		rows,
@@ -28,6 +29,7 @@
 		sortedColumn = $bindable(),
 		...restProps
 	}: {
+		tableId?: string
 		columns: _Column[]
 		defaultSort?: NonNullable<ConstructorParameters<typeof DataTable<_RowValue, _CellValue, _ColumnId>>[0]['defaultSort']>
 		rows: _RowValue[]
@@ -148,6 +150,7 @@
 
 <div
 	{...restProps}
+	id={tableId}
 	 class="container {'class' in restProps ? restProps.class : ''}"
 >
 	<table>

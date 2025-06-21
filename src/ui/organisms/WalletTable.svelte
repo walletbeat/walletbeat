@@ -14,13 +14,15 @@
 
 	// Props
 	let {
+		tableId,
+		title,
 		wallets,
 		attributeGroups,
-		title,
 	}: {
+		tableId?: string,
+		title?: string
 		wallets: RatedWallet[]
 		attributeGroups: AttributeGroup<any>[]
-		title?: string
 	} = $props()
 
 	// (Derived)
@@ -293,6 +295,7 @@
 </header>
 
 <Table
+	{tableId}
 	rows={wallets}
 	getId={wallet => wallet.metadata.id}
 	isRowDisabled={wallet => (
