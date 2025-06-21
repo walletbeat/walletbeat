@@ -539,51 +539,51 @@
 			{/snippet}
 
 			{#snippet expandedContent()}
-				{#if !selectedVariant || wallet.variants[selectedVariant]}
-					<p class="blurb">
-						<Typography
-							content={wallet.metadata.blurb}
-							strings={{
-								WALLET_NAME: wallet.metadata.displayName,
-								WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-							}}
-						/>
+				<div class="wallet-summary">
+					<p>
+						{#if !selectedVariant || wallet.variants[selectedVariant]}
+							<Typography
+								content={wallet.metadata.blurb}
+								strings={{
+									WALLET_NAME: wallet.metadata.displayName,
+									WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+								}}
+							/>
+						{:else}
+							{wallet.metadata.displayName} does not have a {selectedVariant} version.
+						{/if}
 					</p>
-				{:else}
-					<p class="blurb">
-						{wallet.metadata.displayName} does not have a {selectedVariant} version.
-					</p>
-				{/if}
-				
-				<div class="links">
-					<a
-						href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, selectedVariant ?? null)}`}
-						class="info-link"
-					>
-						<span aria-hidden="true">{@html InfoIcon}</span>
-						Learn more
-					</a>
-					|
-					<a
-						href={isLabeledUrl(wallet.metadata.url) ? wallet.metadata.url.url : wallet.metadata.url}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="external-link"
-					>
-						{wallet.metadata.displayName} website
-					</a>
-					{#if wallet.metadata.repoUrl}
+					
+					<div>
+						<a
+							href={`/${wallet.metadata.id}/${variantUrlQuery(wallet.variants, selectedVariant ?? null)}`}
+							class="info-link"
+						>
+							<span aria-hidden="true">{@html InfoIcon}</span>
+							Learn more
+						</a>
 						|
 						<a
-							href={isLabeledUrl(wallet.metadata.repoUrl) ? wallet.metadata.repoUrl.url : wallet.metadata.repoUrl}
+							href={isLabeledUrl(wallet.metadata.url) ? wallet.metadata.url.url : wallet.metadata.url}
 							target="_blank"
 							rel="noopener noreferrer"
 							class="external-link"
 						>
-							Code
-							<span aria-hidden="true">{@html OpenInNewRoundedIcon}</span>
+							{wallet.metadata.displayName} website
 						</a>
-					{/if}
+						{#if wallet.metadata.repoUrl}
+							|
+							<a
+								href={isLabeledUrl(wallet.metadata.repoUrl) ? wallet.metadata.repoUrl.url : wallet.metadata.repoUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="external-link"
+							>
+								Code
+								<span aria-hidden="true">{@html OpenInNewRoundedIcon}</span>
+							</a>
+						{/if}
+					</div>
 				</div>
 			{/snippet}
 
@@ -982,6 +982,7 @@
 
 		display: flex;
 		align-items: center;
+		padding: 0.5em 0;
 		gap: 0.85em;
 
 		.row-count {
@@ -1119,10 +1120,14 @@
 				}
 			}
 		}
+	}
 
-		.row-expand-toggle {
-			display: flex;
-		}
+	.wallet-summary {
+		display: grid;
+		padding: 0 0.5em;
+		gap: 1em;
+		line-height: 1.6;
+		text-align: start;
 	}
 
 	.with-expanded-content {
