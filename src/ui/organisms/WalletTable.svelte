@@ -648,26 +648,27 @@
 				{#snippet content()}
 					<Pie
 						slices={
-							attributeGroups.map(group => {
-								const groupScore = calculateAttributeGroupScore(group.attributeWeights, wallet.overall[group.id])
-								const evalGroup = wallet.overall[group.id]
+							displayedAttributeGroups.map(attrGroup => {
+								const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
+								const evalGroup = wallet.overall[attrGroup.id]
 
 								return {
-									id: group.id,
-									arcLabel: group.icon,
+									id: attrGroup.id,
+									arcLabel: `${attrGroup.icon}${groupScore?.hasUnratedComponent ? '*' : ''}`,
 									color: (
-										groupScore && !groupScore.hasUnratedComponent ?
+										groupScore ?
 											`hsl(${Math.round(groupScore.score * 120)}, 80%, 45%)`
 										:
-											'#666'
+											'var(--rating-unrated)'
 									),
-									tooltip: group.displayName,
+									tooltip: attrGroup.displayName,
 									tooltipValue: (
 										groupScore ?
-											groupScore.hasUnratedComponent ?
-												'Unrated'
-											:
-												(groupScore.score * 100).toFixed(0) + '%'
+											`${
+												(groupScore.score * 100).toFixed(0)
+											}%${
+												groupScore.hasUnratedComponent ? ' (has unrated components)' : ''
+											}`
 										:
 											'N/A'
 									),
@@ -679,7 +680,7 @@
 													evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
 												))
 												.map(([evalAttrId, evalAttr]) => ({
-													id: `${group.id}:${evalAttrId}`,
+													id: `${attrGroup.id}:${evalAttrId}`,
 													color: ratingToColor(evalAttr.evaluation.value.rating),
 													weight: 1,
 													arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
