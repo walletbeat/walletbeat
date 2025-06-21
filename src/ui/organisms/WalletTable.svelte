@@ -64,6 +64,8 @@
 
 	let activeAttributeId: { walletId: string; attributeGroupId: string; attributeId: string } | undefined = $state(undefined)
 
+	let sortedColumn: Column<RatedWallet> | undefined = $state(undefined)
+
 
 	// (Derived)
 	const selectedVariant = $derived.by(() => {
@@ -282,10 +284,10 @@
 <Table
 	rows={wallets}
 	getId={wallet => wallet.metadata.id}
-	isRowDisabled={(wallet, table) => (
-		Boolean(
-			(table.columnSort?.direction && table.columns.find(column => column.id === table.columnSort!.columnId)?.getValue?.(wallet) === undefined)
-			|| !filteredWallets.includes(wallet)
+	isRowDisabled={wallet => (
+		!(
+			filteredWallets.includes(wallet)
+			&& (!sortedColumn?.getValue || sortedColumn.getValue(wallet) !== undefined)
 		)
 	)}
 	displaceDisabledRows={true}
@@ -350,6 +352,7 @@
 		columnId: 'overall',
 		direction: 'desc',
 	}}
+	bind:sortedColumn
 
 	getCellVerticalAlign={({ row }) => (
 		isRowExpanded(row.metadata.id) ?
