@@ -86,7 +86,8 @@ html.dark {
 
 :root,
 ::before,
-::after {
+::after,
+[popover] {
 	transition-duration: 0.25s;
 	transition-timing-function: var(--transition-easeOutExpo);
 }
