@@ -520,8 +520,9 @@
 				transform-origin: right;
 			}
 
-			&[data-is-sticky],
-			&[data-sort]:not([data-is-sticky]) {
+			/* &[data-is-sticky],
+			&[data-sort]:not([data-is-sticky]) { */
+			&[data-is-sticky] {
 				position: sticky;
 				backdrop-filter: blur(20px);
 				z-index: 1;
