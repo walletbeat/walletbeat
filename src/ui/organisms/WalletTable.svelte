@@ -863,14 +863,14 @@
 						highlightedSliceId={currentAttribute?.attribute.id}
 						centerLabel={
 							groupScore ?
-								groupScore.hasUnratedComponent ?
-									ratingToIcon(Rating.UNRATED)
-								: groupScore.score <= 0.0 ?
-									'\u{1f480}'
-								: groupScore.score >= 1.0 ?
+								`${
+									groupScore.score === 0 ?
+										'\u{1f480}'
+									: groupScore.score === 1 ?
 										'\u{1f4af}'
-								:
-									(groupScore.score * 100).toFixed(0)
+									:
+										(groupScore.score * 100).toFixed(0)
+								}${groupScore.hasUnratedComponent ? '*' : ''}`
 							:
 								'❓'
 						}
