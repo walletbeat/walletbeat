@@ -16,9 +16,11 @@
 	let {
 		wallets,
 		attributeGroups,
+		title,
 	}: {
 		wallets: RatedWallet[]
 		attributeGroups: AttributeGroup<any>[]
+		title?: string
 	} = $props()
 
 	// (Derived)
@@ -132,141 +134,150 @@
 </script>
 
 
-<Filters 
-	items={wallets}
-	filterGroups={
-		[
-			{
-				id: 'walletType',
-				label: 'Type',
-				displayType: 'select',
-				exclusive: true,
-				defaultFilter: '',
-				filters: [
-					{
-						id: '',
-						label: 'All',
-					},
-					{
-						id: 'walletType-software',
-						label: 'Software',
-						icon: AppWindowIcon,
-						filterFunction: wallet => !hasVariant(wallet.variants, Variant.HARDWARE)
-					},
-					{
-						id: 'walletType-hardware',
-						label: 'Hardware',
-						icon: HardwareIcon,
-						filterFunction: wallet => hasVariant(wallet.variants, Variant.HARDWARE)
-					},
-					{
-						id: 'walletType-embedded',
-						label: 'Embedded',
-						icon: WalletIcon,
-						filterFunction: wallet => hasVariant(wallet.variants, Variant.EMBEDDED)
-					},
-				],
-			},
-			{
-				id: 'manufactureType',
-				label: 'Manufacture Type',
-				displayType: 'group',
-				exclusive: false,
-				filters: [
-					{
-						id: `manufactureType-${HardwareWalletManufactureType.FACTORY_MADE}`,
-						label: 'Factory-Made',
-						icon: HardwareIcon,
-						filterFunction: wallet => (
-							hasVariant(wallet.variants, Variant.HARDWARE) &&
-							wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE
-						)
-					},
-					{
-						id: `manufactureType-${HardwareWalletManufactureType.DIY}`,
-						label: 'DIY',
-						icon: HardwareIcon,
-						filterFunction: wallet => (
-							hasVariant(wallet.variants, Variant.HARDWARE) &&
-							wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
-						)
-					},
-				],
-			},
-			{
-				id: 'variant',
-				label: 'Variant',
-				// displayType: 'select',
-				// exclusive: true,
-				displayType: 'group',
-				exclusive: false,
-				filters: [
-					// {
-					// 	id: '',
-					// 	label: 'All',
-					// },
-					...(
-						(Object.entries(variants) as [Variant, { label: string, icon: string }][])
-							.map(([variant, { label, icon }]) => ({
-								id: `variant-${variant}`,
-								label,
-								icon,
-								filterFunction: (wallet: RatedWallet) => Boolean(wallet.variants[variant])
-							}))
-					),
-				],
-			},
-			{
-				id: 'accountType',
-				label: 'Account Type',
-				displayType: 'group',
-				exclusive: false,
-				filters: [
-					{
-						id: 'accountType-eoa',
-						label: 'EOA',
-						icon: KeyIcon,
-						filterFunction: wallet => {
-							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-							return accountTypes !== null && AccountType.eoa in accountTypes
-						}
-					},
-					{
-						id: 'accountType-eip7702',
-						label: 'EIP-7702',
-						icon: KeyIcon,
-						filterFunction: wallet => {
-							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-							return accountTypes !== null && AccountType.eip7702 in accountTypes
-						}
-					},
-					{
-						id: 'accountType-erc4337',
-						label: 'ERC-4337',
-						icon: KeyIcon,
-						filterFunction: wallet => {
-							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-							return accountTypes !== null && AccountType.rawErc4337 in accountTypes
-						}
-					},
-					{
-						id: 'accountType-mpc',
-						label: 'MPC',
-						icon: KeyIcon,
-						filterFunction: wallet => {
-							const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
-							return accountTypes !== null && AccountType.mpc in accountTypes
-						}
-					},
-				],
-			},
-		]
-	}
-	bind:activeFilters
-	bind:filteredItems={filteredWallets}
-	bind:toggleFilter
-	bind:toggleFilterById
-/>
+<header
+	data-sticky="inline"
+	class="row wrap"
+>
+	{#if title}
+		<h2>{title}</h2>
+	{/if}
+
+	<Filters
+		items={wallets}
+		filterGroups={
+			[
+				{
+					id: 'walletType',
+					label: 'Type',
+					displayType: 'select',
+					exclusive: true,
+					defaultFilter: '',
+					filters: [
+						{
+							id: '',
+							label: 'All',
+						},
+						{
+							id: 'walletType-software',
+							label: 'Software',
+							icon: AppWindowIcon,
+							filterFunction: wallet => !hasVariant(wallet.variants, Variant.HARDWARE)
+						},
+						{
+							id: 'walletType-hardware',
+							label: 'Hardware',
+							icon: HardwareIcon,
+							filterFunction: wallet => hasVariant(wallet.variants, Variant.HARDWARE)
+						},
+						{
+							id: 'walletType-embedded',
+							label: 'Embedded',
+							icon: WalletIcon,
+							filterFunction: wallet => hasVariant(wallet.variants, Variant.EMBEDDED)
+						},
+					],
+				},
+				{
+					id: 'manufactureType',
+					label: 'Manufacture Type',
+					displayType: 'group',
+					exclusive: false,
+					filters: [
+						{
+							id: `manufactureType-${HardwareWalletManufactureType.FACTORY_MADE}`,
+							label: 'Factory-Made',
+							icon: HardwareIcon,
+							filterFunction: wallet => (
+								hasVariant(wallet.variants, Variant.HARDWARE) &&
+								wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE
+							)
+						},
+						{
+							id: `manufactureType-${HardwareWalletManufactureType.DIY}`,
+							label: 'DIY',
+							icon: HardwareIcon,
+							filterFunction: wallet => (
+								hasVariant(wallet.variants, Variant.HARDWARE) &&
+								wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
+							)
+						},
+					],
+				},
+				{
+					id: 'variant',
+					label: 'Variant',
+					// displayType: 'select',
+					// exclusive: true,
+					displayType: 'group',
+					exclusive: false,
+					filters: [
+						// {
+						// 	id: '',
+						// 	label: 'All',
+						// },
+						...(
+							(Object.entries(variants) as [Variant, { label: string, icon: string }][])
+								.map(([variant, { label, icon }]) => ({
+									id: `variant-${variant}`,
+									label,
+									icon,
+									filterFunction: (wallet: RatedWallet) => Boolean(wallet.variants[variant])
+								}))
+						),
+					],
+				},
+				{
+					id: 'accountType',
+					label: 'Account Type',
+					displayType: 'group',
+					exclusive: false,
+					filters: [
+						{
+							id: 'accountType-eoa',
+							label: 'EOA',
+							icon: KeyIcon,
+							filterFunction: wallet => {
+								const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+								return accountTypes !== null && AccountType.eoa in accountTypes
+							}
+						},
+						{
+							id: 'accountType-eip7702',
+							label: 'EIP-7702',
+							icon: KeyIcon,
+							filterFunction: wallet => {
+								const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+								return accountTypes !== null && AccountType.eip7702 in accountTypes
+							}
+						},
+						{
+							id: 'accountType-erc4337',
+							label: 'ERC-4337',
+							icon: KeyIcon,
+							filterFunction: wallet => {
+								const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+								return accountTypes !== null && AccountType.rawErc4337 in accountTypes
+							}
+						},
+						{
+							id: 'accountType-mpc',
+							label: 'MPC',
+							icon: KeyIcon,
+							filterFunction: wallet => {
+								const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+								return accountTypes !== null && AccountType.mpc in accountTypes
+							}
+						},
+					],
+				},
+			]
+		}
+		bind:activeFilters
+		bind:filteredItems={filteredWallets}
+		bind:toggleFilter
+		bind:toggleFilterById
+	/>
+</header>
 
 <Table
 	rows={wallets}

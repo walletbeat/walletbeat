@@ -50,12 +50,9 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 		</header>
 
 		<section>
-			<header data-sticky="inline">
-				<h2>Software Wallets</h2>
-			</header>
-
 			<WalletTable
 				client:load
+				title="Software Wallets"
 				wallets={
 					Object
 						.values(ratedSoftwareWallets)
@@ -65,12 +62,9 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 		</section>
 
 		<section>
-			<header data-sticky="inline">
-				<h2>Hardware Wallets</h2>
-			</header>
-
 			<WalletTable
 				client:load
+				title="Hardware Wallets"
 				wallets={
 					Object
 						.values(ratedHardwareWallets)
