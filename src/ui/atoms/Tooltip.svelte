@@ -105,6 +105,7 @@
 
 <style>
 	button {
+		display: grid;
 		font: inherit;
 		padding: 0;
 		background-color: transparent;
