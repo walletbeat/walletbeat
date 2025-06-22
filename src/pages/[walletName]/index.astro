@@ -1,17 +1,15 @@
 ---
-// Astro settings
-export const prerender = true
-
-
-// Data
+// Types/constants
 import { allRatedWallets } from '@/data/wallets'
 
 
-// Utils
+// Functions
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 
-// Params
+// Routes
+export const prerender = true
+
 export const getStaticPaths = () => [
 	...nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({
 		params: { walletName },
@@ -21,15 +19,12 @@ export const getStaticPaths = () => [
 const { walletName } = Astro.params
 
 
-// Derived
+// Data
 const wallet = allRatedWallets[walletName]
 
 
-// Layouts
-import Layout from '@/layouts/Layout.astro'
-
-
 // Components
+import Layout from '@/layouts/Layout.astro'
 import WalletPage from '@/components/WalletPage.svelte'
 // import { WalletPage as WalletPageReact } from '@/components/WalletPage.tsx'
 ---
