@@ -1,6 +1,17 @@
 ---
-import Layout from '../../layouts/Layout.astro'
-import { HomePage } from '../../components/HomePage'
+// Types/constants
+import { WalletType } from '@/schema/wallet-types'
+import { defaultNavigationItems } from '@/components/navigation'
+import { allRatedWallets } from '@/data/wallets'
+import { attributeTree } from '@/schema/attribute-groups'
+
+const attributeGroups = Object.values(attributeTree)
+
+
+// Components
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/ui/organisms/Navigation.astro'
+import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
 
 <Layout
@@ -8,5 +19,22 @@ import { HomePage } from '../../components/HomePage'
 		title: 'Walletbeat',
 	}}
 >
-	<HomePage client:load selectedGroupId='embedded' />
+	<Navigation
+		navigationItems={defaultNavigationItems}
+	/>
+	
+	<main>
+		<section>
+			<WalletTable
+				client:load
+				title="Embedded Wallets"
+				wallets={
+					Object
+						.values(allRatedWallets)
+						.filter(wallet => wallet.types[WalletType.EMBEDDED])
+				}
+				{attributeGroups}
+			/>
+		</section>
+	</main>
 </Layout>
