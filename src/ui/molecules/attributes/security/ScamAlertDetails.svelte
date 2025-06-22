@@ -25,8 +25,8 @@
 	content={value.shortExplanation}
 	strings={{
 		WALLET_NAME: wallet.metadata.displayName,
-		WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? '',
-		WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? '',
+		WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+		WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
 	}}
 />
 
