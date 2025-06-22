@@ -11,3 +11,13 @@ export const betaSiteRoot = ''
  * versus the main branch.
  */
 export const betaImagesRoot = '/images'
+
+/**
+ * URL to the project repository.
+ */
+export const repositoryUrl = 'https://github.com/walletbeat/walletbeat'
+
+/**
+ * URL to the project's social channel.
+ */
+export const socialChannel = 'https://farcaster.xyz/~/channel/walletbeat'
