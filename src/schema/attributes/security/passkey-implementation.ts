@@ -11,7 +11,8 @@ import {
 	type PasskeyVerificationSupport,
 } from '@/schema/features/security/passkey-verification'
 import { popRefs } from '@/schema/reference'
-import { type AtLeastOneVariant, Variant } from '@/schema/variants'
+import { type AtLeastOneVariant } from '@/schema/variants'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -309,7 +310,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 		pickWorstRating<PasskeyImplementationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<PasskeyImplementationValue> => {
 		// Hardware wallets don't use passkeys
-		if (features.variant === Variant.HARDWARE) {
+		if (features.type === WalletType.HARDWARE) {
 			return exempt(
 				passkeyImplementation,
 				sentence(

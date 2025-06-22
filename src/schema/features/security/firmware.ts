@@ -10,10 +10,10 @@ export interface FirmwareSupport {
 	type: FirmwareType
 	url?: string
 	details?: string
-	silentUpdateProtection: FirmwareType
-	firmwareOpenSource: FirmwareType
-	reproducibleBuilds: FirmwareType
-	customFirmware: FirmwareType
+	silentUpdateProtection: FirmwareType | null
+	firmwareOpenSource: FirmwareType | null
+	reproducibleBuilds: FirmwareType | null
+	customFirmware: FirmwareType | null
 }
 
 export type FirmwareImplementation = WithRef<FirmwareSupport>

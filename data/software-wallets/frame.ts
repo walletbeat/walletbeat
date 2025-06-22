@@ -1,3 +1,6 @@
+import { lucemans } from '@/data/contributors/lucemans'
+import { nconsigny } from '@/data/contributors/nconsigny'
+import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
@@ -8,10 +11,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
-import { lucemans } from '../contributors/lucemans'
-import { nconsigny } from '../contributors/nconsigny'
-import { polymutex } from '../contributors/polymutex'
 
 export const frame: SoftwareWallet = {
 	metadata: {
@@ -49,6 +48,7 @@ export const frame: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainAbstraction: null,
 		chainConfigurability: {
 			customChains: true,
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
