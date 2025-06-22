@@ -8,9 +8,14 @@ import { ClientRouter } from 'astro:transitions'
 
 type Props = {
 	metadata: ComponentProps<typeof Metadata>['metadata']
+
+	/**
+	 * If specified, rewrite URL to this as the page loads.
+	 */
+	rewriteUrlTo?: string
 }
 
-const { metadata } = Astro.props
+const { metadata, rewriteUrlTo } = Astro.props
 
 // Components
 import Metadata from '@/components/Metadata.astro'
@@ -28,6 +33,13 @@ import Metadata from '@/components/Metadata.astro'
 			const colorScheme = localStorage.getItem('theme')
 			if (colorScheme) document.documentElement.style.colorScheme = colorScheme
 		</script>
+		{
+			rewriteUrlTo !== undefined && (
+				<script is:inline define:vars={{ rewriteUrlTo }}>
+					history.replaceState(null, '', rewriteUrlTo);
+				</script>
+			)
+		}
 	</head>
 	<body>
 		<div

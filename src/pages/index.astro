@@ -8,7 +8,6 @@ import { attributeTree } from '@/schema/attribute-groups'
 
 const attributeGroups = Object.values(attributeTree)
 
-
 // Layouts
 import Layout from '../layouts/Layout.astro'
 
@@ -17,33 +16,32 @@ import Navigation from '@/ui/organisms/Navigation.astro'
 import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
 
-
 <Layout
 	metadata={{
 		title: 'Walletbeat',
 	}}
 >
-	<Navigation
-		navigationItems={defaultNavigationItems}
-	/>
+	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<header
-			data-sticky="inline"
-		>
+		<header data-sticky='inline'>
 			<h1>Who watches the wallets?</h1>
 
-			<p>Beta version. For content contributions, please see <a href="https://github.com/walletbeat/walletbeat" target="_blank" rel="noreferrer">GitHub</a>.</p>
+			<p>
+				Beta version. For content contributions, please see <a
+					href='https://github.com/walletbeat/walletbeat'
+					target='_blank'
+					rel='noreferrer'
+					>GitHub</a
+				>.
+			</p>
 		</header>
 
 		<section>
 			<WalletTable
 				client:load
-				title="Software Wallets"
-				wallets={
-					Object
-						.values(ratedSoftwareWallets)
-				}
+				title='Software Wallets'
+				wallets={Object.values(ratedSoftwareWallets)}
 				{attributeGroups}
 			/>
 		</section>
@@ -51,17 +49,13 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 		<section>
 			<WalletTable
 				client:load
-				title="Hardware Wallets"
-				wallets={
-					Object
-						.values(ratedHardwareWallets)
-				}
+				title='Hardware Wallets'
+				wallets={Object.values(ratedHardwareWallets)}
 				{attributeGroups}
 			/>
 		</section>
 	</main>
 </Layout>
-
 
 <style>
 	main {
@@ -70,16 +64,14 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 		> header {
 			background:
 				linear-gradient(to right, var(--background-primary) 33cqi, transparent 125%),
-				url('./robot.png') 98% 1rem / clamp(12rem, 24cqi, 20rem) no-repeat
-			;
+				url('./robot.png') 98% 1rem / clamp(12rem, 24cqi, 20rem) no-repeat;
 
 			padding: clamp(1.5rem, 8cqi, 12rem) clamp(1.5rem, 6cqi, 2rem);
 
 			text-shadow:
 				0 0 1em var(--background-primary),
 				0 0 2em var(--background-primary),
-				0 0 3em var(--background-primary)
-			;
+				0 0 3em var(--background-primary);
 
 			h1 {
 				font-size: clamp(1.5em, 5cqi, 3em);

@@ -1,3 +1,4 @@
+import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
@@ -8,8 +9,6 @@ import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
-import { polymutex } from '../contributors/polymutex'
 
 export const rainbow: SoftwareWallet = {
 	metadata: {
@@ -49,6 +48,7 @@ export const rainbow: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainAbstraction: null,
 		chainConfigurability: null,
 		integration: {
 			browser: {

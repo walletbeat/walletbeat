@@ -1,3 +1,4 @@
+import { nconsigny } from '@/data/contributors/nconsigny'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
@@ -6,8 +7,6 @@ import { notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
-import { nconsigny } from '../contributors/nconsigny'
 
 export const elytro: SoftwareWallet = {
 	metadata: {
@@ -50,6 +49,7 @@ export const elytro: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainAbstraction: null,
 		chainConfigurability: null,
 		integration: {
 			browser: {

@@ -14,9 +14,9 @@ alwaysApply: true
 
 ## Running tests
 
-After editing code, if you want to whether your edits broke anything, you can run a quick set of tests using `pnpm run check:quick`.
+After editing code, if you want to whether your edits broke anything, you can run a quick set of tests using `pnpm run check:quick`. You do not need to do this at the beginning of your task.
 
-At the end of a task, to double-check your work more thoroughly, you should run the entire test of tests using `pnpm run check:all`. Do not do this until you are confident you are done with the current task.
+At the end of a task, to double-check your work more thoroughly, you should run the entire test of tests using `pnpm run check:all`. This takes a long time, so you should only run this after you finish a task. Do not run this until you are confident you are done with the current task.
 
 If any of these commands fail, you must fix their failures before you may consider your task complete.
 

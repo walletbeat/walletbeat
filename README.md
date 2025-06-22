@@ -1,13 +1,8 @@
 # walletbeat 💗
 
-> This is a work in progress visual rework of the walletbeat website. You can view [the new alpha version here](https://wallet.page).
-> You can visit the original site at [beta.walletbeat.eth](https://beta.walletbeat.eth.limo).
+Walletbeat is the L2BEAT of wallets. An open repository of EVM-compatible wallets.
 
-An open repository of EVM-compatible wallets.
-
-## Special Thanks
-
-A special thank you goes out to [@polymutex](https://github.com/polymutex) & [@fluidkey](https://github.com/fluidkey) for their kickstart & continued support of this project.
+You are browsing the `beta` branch of Walletbeat, available on the web at [beta.walletbeat.eth](https://beta.walletbeat.eth.limo).
 
 ## Contributing
 
