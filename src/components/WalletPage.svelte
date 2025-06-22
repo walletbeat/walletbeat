@@ -36,7 +36,7 @@
 
 	// Components
 	import Typography from '@/ui/atoms/Typography.svelte'
-	import Pie from '@/ui/atoms/Pie.svelte'
+	import Pie, { PieLayout } from '@/ui/atoms/Pie.svelte'
 	import RenderCustomContent from '@/ui/atoms/RenderCustomContent.svelte'
 	import ReferenceLinks from '@/ui/atoms/ReferenceLinks.svelte'
 
@@ -339,19 +339,27 @@
 			<section class="attributes-overview">
 				<div class="attributes-pie">
 					<Pie
-						slices={attributes.map(({ attribute, evalAttr }) => ({
-							id: attribute.id,
-							color: ratingToColor(evalAttr.evaluation.value.rating),
-							weight: 1,
-							arcLabel: '',
-							tooltip: attribute.displayName,
-							tooltipValue: evalAttr.evaluation.value.rating,
-							href: `#${slugifyCamelCase(attribute.id)}`,
-						}))}
-						layout="Full"
+						layout={PieLayout.FullTop}
 						radius={120}
-						outerRadiusFraction={0.95}
-						innerRadiusFraction={0}
+						padding={20}
+						levels={[{
+							outerRadiusFraction: 0.95,
+							innerRadiusFraction: 0,
+							gap: 8,
+							angleGap: 0,
+						}]}
+						slices={
+							attributes
+								.map(({ attribute, evalAttr }) => ({
+									id: attribute.id,
+									color: ratingToColor(evalAttr.evaluation.value.rating),
+									weight: 1,
+									arcLabel: '',
+									tooltip: attribute.displayName,
+									tooltipValue: evalAttr.evaluation.value.rating,
+									href: `#${slugifyCamelCase(attribute.id)}`,
+								}))
+						}
 						highlightedSliceId={highlightedAttributeId}
 						onSliceMouseEnter={id => {
 							highlightedAttributeId = id
