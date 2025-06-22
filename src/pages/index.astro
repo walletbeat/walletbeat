@@ -4,22 +4,9 @@ import { defaultNavigationItems } from '@/components/navigation'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
 import { ratedHardwareWallets } from '@/data/hardware-wallets'
 
-import {
-	ecosystemAttributeGroup,
-	privacyAttributeGroup,
-	securityAttributeGroup,
-	selfSovereigntyAttributeGroup,
-	transparencyAttributeGroup,
-	mapNonExemptAttributeGroupsInTree,
-} from '@/schema/attribute-groups'
+import { attributeTree } from '@/schema/attribute-groups'
 
-const attributeGroups = [
-	securityAttributeGroup,
-	privacyAttributeGroup,
-	selfSovereigntyAttributeGroup,
-	transparencyAttributeGroup,
-	ecosystemAttributeGroup,
-]
+const attributeGroups = Object.values(attributeTree)
 
 
 // Layouts
