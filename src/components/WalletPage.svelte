@@ -435,10 +435,15 @@
 		}
 	})()}
 
-	<section class="attribute" id={slugifyCamelCase(attribute.id)} aria-label={attribute.displayName}>
+	<section 
+		class="attribute" 
+		id={slugifyCamelCase(attribute.id)} 
+		aria-label={attribute.displayName}
+		style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
+		data-rating={evalAttr.evaluation.value.rating.toLowerCase()}
+		data-icon={attribute.icon}
+	>
 		<details
-			style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
-			data-rating={evalAttr.evaluation.value.rating.toLowerCase()}
 			open
 		>
 			<summary>
@@ -755,7 +760,6 @@
 		--border-radius: 0.375rem;
 		--border-radius-sm: 0.25rem;
 		--nav-width: 20rem;
-		--marker-gap: 0.375rem;
 
 		display: grid;
 		grid-template:
@@ -785,20 +789,32 @@
 			&::scroll-marker-group {
 				grid-area: Nav;
 
+				box-sizing: border-box;
 				position: sticky;
 				top: 0;
+				width: var(--nav-width);
+				max-height: 100dvh;
 
 				overflow-y: auto;
 				scroll-behavior: smooth;
 
-				max-height: 100dvh;
-
 				display: grid;
-				width: var(--nav-width);
-				padding: calc(2.5rem + 1rem) 1rem 1rem;
-				background-color: var(--background-primary);
+				align-content: start;
+				padding: calc(2.5rem + 1rem) 0.75rem 1rem;
+				gap: 2px;
+
+				background:
+					linear-gradient(
+						to right,
+						transparent 1.66rem,
+						var(--border-color) 1.66rem,
+						var(--border-color) calc(1.66rem + 1px),
+						transparent calc(1.66rem + 1px)
+					) 
+					0 calc(2.5rem + 1rem) / 100% calc(100% - calc(2.5rem + 1rem) - 1rem) no-repeat,
+					var(--background-secondary)
+				;
 				border-right: 1px solid var(--border-color);
-				gap: var(--marker-gap);
 			}
 
 			> :is(header, section, footer) {
@@ -811,21 +827,24 @@
 	}
 
 	.nav-title {
+		z-index: 1;
+
 		position: absolute;
-		top: 1rem;
-		left: 1rem;
-		width: calc(var(--nav-width) - 1rem * 2);
-		font-size: 0.9rem;
+		inset: 0;
+		bottom: auto;
+		padding: 1rem;
+		width: calc(var(--nav-width) - 1px);
+
+		backdrop-filter: blur(10px);
+		border-bottom: 1px solid var(--border-color);
+
+		font-size: 0.875rem;
 		color: var(--text-secondary);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		font-weight: 500;
-		opacity: 0.8;
-		margin-bottom: 0.5rem;
-		padding-bottom: 0.5rem;
-		border-bottom: 1px solid var(--border-color);
-		z-index: 10;
-		background-color: var(--background-primary);
+
+		pointer-events: none;
 
 		@supports not (scroll-marker-group: before) {
 			display: none;
@@ -922,43 +941,50 @@
 
 		&::scroll-marker {
 			content: attr(data-icon) '\00a0\00a0' attr(aria-label);
-			text-decoration: none;
-			padding: 0.75em 2.5em 0.75em 0.75em;
-			color: var(--text-secondary);
-			position: relative;
-			transition: all 0.2s ease;
-			border-radius: var(--border-radius-sm);
+
 			display: flex;
 			align-items: center;
+			gap: 0.5rem;
+			padding: 0.45rem 2rem 0.45rem 0.45rem;
 
-			background: radial-gradient(
+			font-size: 0.975em;
+
+			color: inherit;
+			font-weight: 500;
+			text-decoration: none;
+
+			border-radius: 0.375rem;
+			background:
+				radial-gradient(
 					circle closest-side,
 					var(--accent, var(--text-secondary)) calc(100% - 0.5px),
 					transparent 100%
 				)
-				no-repeat right calc(1.15rem - 0.25em) center / 0.5em 0.5em var(--background-secondary);
-			opacity: 0.8;
+				no-repeat right calc(1.15rem - 0.25em) center / 0.5em 0.5em
+				var(--background-secondary)
+			;
 
-			&:target-current {
-				background-color: var(--background-primary);
-				color: var(--accent);
-				font-weight: 500;
-				opacity: 1;
+			transition-property: background-color, color, outline;
+		}
 
-				background-image: radial-gradient(
-					circle at right 1.15rem center,
-					var(--accent) 0,
-					var(--accent) 0.4rem,
-					transparent 0.4rem
-				);
-				box-shadow: inset 2px 0 0 var(--accent, transparent);
-			}
+		&::scroll-marker:hover:not(:target-current) {
+			background-color: var(--background-primary);
+			color: var(--accent);
+		}
 
-			&:hover {
-				background-color: var(--background-tertiary);
-				color: var(--accent);
-				opacity: 1;
-			}
+		&::scroll-marker:target-current {
+			background-color: var(--background-primary);
+			color: var(--accent);
+			font-weight: 500;
+		}
+
+		&::scroll-marker:focus {
+			outline: 2px solid var(--accent);
+			outline-offset: -1px;
+		}
+
+		&::scroll-marker:active {
+			background-color: var(--background-primary);
 		}
 
 		> header {
@@ -1108,39 +1134,55 @@
 	.attribute {
 		&::scroll-marker {
 			content: attr(data-icon) '\00a0\00a0' attr(aria-label);
-			text-decoration: none;
-			padding: 0.6em 2.5em 0.6em 0.75em;
-			font-size: 0.85rem;
-			color: var(--text-secondary);
-			position: relative;
-			transition: all 0.2s ease;
-			border-radius: var(--border-radius-sm);
-			margin-left: 1.15rem;
+
+			margin-left: 1.5rem;
+			padding: 0.45rem 0.75rem;
+
 			display: flex;
 			align-items: center;
-			opacity: 0.8;
-			background: radial-gradient(
+			gap: 0.5rem;
+			position: relative;
+
+			font-size: 0.9em;
+
+			border-radius: 0.375rem;
+			background:
+				radial-gradient(
 					circle closest-side,
 					var(--accent, var(--text-secondary)) calc(100% - 0.5px),
 					transparent 100%
 				)
-				no-repeat right calc(1.15rem - 0.25em) center / 0.5em 0.5em var(--background-secondary);
+				no-repeat right calc(1.15rem - 0.25em) center / 0.5em 0.5em
+				var(--background-secondary)
+			;
 
-			&:target-current {
-				background-color: var(--background-primary);
-				background-color: white;
-				color: var(--accent);
-				font-weight: 500;
-				opacity: 1;
 
-				box-shadow: inset 1px 0 0 var(--accent, transparent);
-			}
+			color: inherit;
+			font-weight: 500;
+			text-decoration: none;
 
-			&:hover {
-				background-color: var(--background-tertiary);
-				color: var(--accent);
-				opacity: 1;
-			}
+
+			transition-property: background-color, color, outline;
+		}
+
+		&::scroll-marker:hover:not(:target-current) {
+			background-color: var(--background-primary);
+			color: var(--accent);
+		}
+
+		&::scroll-marker:target-current {
+			background-color: var(--background-primary);
+			color: var(--accent);
+			font-weight: 500;
+		}
+
+		&::scroll-marker:focus {
+			outline: 2px solid var(--accent);
+			outline-offset: -1px;
+		}
+
+		&::scroll-marker:active {
+			background-color: var(--background-primary);
 		}
 
 		> details {
@@ -1593,3 +1635,4 @@
 		}
 	}
 </style>
+
