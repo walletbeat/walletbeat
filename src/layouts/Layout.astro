@@ -86,6 +86,14 @@ import Metadata from '@/components/Metadata.astro'
 
 		> main {
 			grid-area: Main;
+
+			> section {
+				display: grid;
+				padding: clamp(1.5rem, 6cqi, 2rem);
+				gap: 1.5rem;
+				max-width: 80rem;
+				margin: 0 auto;
+			}
 		}
 	}
 </style>
