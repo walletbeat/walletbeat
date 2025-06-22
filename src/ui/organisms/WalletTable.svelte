@@ -34,9 +34,9 @@
 					...attrGroup,
 					attributes: (
 						Object.fromEntries(
-							Object.entries(attrGroup.attributes).filter(([attrId, _]) => 
+							Object.entries(attrGroup.attributes).filter(([attributeId, _]) => 
 								wallets.find(w => w.variants.browser || w.variants.desktop || w.variants.mobile)
-									?.overall[attrGroup.id]?.[attrId]?.evaluation?.value?.rating !== Rating.EXEMPT
+									?.overall[attrGroup.id]?.[attributeId]?.evaluation?.value?.rating !== Rating.EXEMPT
 							)
 						)
 					)
@@ -64,7 +64,11 @@
 
 	let expandedRowIds = $state(new SvelteSet<string>())
 
-	let activeAttributeId: { walletId: string; attributeGroupId: string; attributeId: string } | undefined = $state(undefined)
+	let activeEntityId: {
+		walletId: string
+		attributeGroupId: string
+		attributeId?: string
+	} | undefined = $state(undefined)
 
 	let sortedColumn: Column<RatedWallet> | undefined = $state(undefined)
 
@@ -346,12 +350,12 @@
 							defaultIsExpanded: false,
 							children: (
 								Object.entries(attrGroup.attributes)
-									.map(([attrId, attribute]) => ({
-										id: `${attrGroup.id}.${attrId}`,
+									.map(([attributeId, attribute]) => ({
+										id: `${attrGroup.id}.${attributeId}`,
 										// name: `${attribute.icon} ${attribute.displayName}`,
 										name: attribute.displayName,
 										getValue: wallet => {
-											const evalAttr = wallet.overall[attrGroup.id]?.[attrId]
+											const evalAttr = wallet.overall[attrGroup.id]?.[attributeId]
 											return evalAttr?.evaluation?.value?.rating || undefined
 										},
 										defaultSortDirection: 'desc',
@@ -655,7 +659,7 @@
 			{@const selectedSliceId = (
 				selectedAttribute ?
 					attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id]) ?
-						`${attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id])!.id}:${selectedAttribute}`
+						`attrGroup_${attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id])!.id}__attr_${selectedAttribute}`
 					:
 						undefined
 				:
@@ -663,17 +667,16 @@
 			)}
 
 			{@const activeSliceId = (
-				activeAttributeId?.walletId === wallet.metadata.id ?
-					activeAttributeId.attributeId ?
-						`${activeAttributeId.attributeGroupId}:${activeAttributeId.attributeId}`
+				activeEntityId?.walletId === wallet.metadata.id ?
+					activeEntityId.attributeId ?
+						`attrGroup_${activeEntityId.attributeGroupId}__attr_${activeEntityId.attributeId}`
 					:
-						activeAttributeId.attributeGroupId
+						`attrGroup_${activeEntityId.attributeGroupId}`
 				:
 					undefined
 			)}
 
 			{@const highlightedSliceId = selectedSliceId ?? activeSliceId}
-
 			<!-- Overall rating -->
 			{#if column.id === 'overall'}
 				{@const score = value}
@@ -686,7 +689,7 @@
 								const evalGroup = wallet.overall[attrGroup.id]
 
 								return {
-									id: attrGroup.id,
+									id: `attrGroup_${attrGroup.id}`,
 									arcLabel: `${attrGroup.icon}${groupScore?.hasUnratedComponent ? '*' : ''}`,
 									color: (
 										groupScore ?
@@ -713,7 +716,7 @@
 													evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
 												))
 												.map(([evalAttrId, evalAttr]) => ({
-													id: `${attrGroup.id}:${evalAttrId}`,
+													id: `attrGroup_${attrGroup.id}__attr_${evalAttrId}`,
 													color: ratingToColor(evalAttr.evaluation.value.rating),
 													weight: 1,
 													arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
@@ -744,26 +747,26 @@
 						]}
 						{highlightedSliceId}
 						onSliceClick={sliceId => {
-							const [groupId, attrId] = sliceId.split(':')
+							const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 
 							selectedAttribute = (
-								selectedAttribute === attrId ? undefined : attrId
+								attributeId && selectedAttribute === attributeId ? undefined : attributeId
 							)
 
 							if (!isExpanded)
 								toggleRowExpanded(wallet.metadata.id)
 						}}
 						onSliceMouseEnter={sliceId => {
-							const [groupId, attrId] = sliceId.split(':')
-
-							activeAttributeId = {
+							const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
+							
+							activeEntityId = {
 								walletId: wallet.metadata.id,
-								attributeGroupId: groupId,
-								attributeId: attrId,
+								attributeGroupId: attributeGroupId,
+								...(attributeId && { attributeId: attributeId }),
 							}
 						}}
 						onSliceMouseLeave={sliceId => {
-							activeAttributeId = undefined
+							activeEntityId = undefined
 						}}
 						centerLabel={
 							score ?
@@ -794,9 +797,9 @@
 
 				{#snippet expandedContent()}
 					{@const displayedAttribute = (
-						activeAttributeId?.walletId === wallet.metadata.id ?
-							activeAttributeId.attributeId ?
-								wallet.overall[activeAttributeId.attributeGroupId]?.[activeAttributeId.attributeId]
+						activeEntityId?.walletId === wallet.metadata.id ?
+							activeEntityId.attributeId ?
+								wallet.overall[activeEntityId.attributeGroupId]?.[activeEntityId.attributeId]
 							:
 								undefined
 						: selectedAttribute ?
@@ -809,8 +812,8 @@
 					)}
 		
 					{@const displayedGroup = (
-						activeAttributeId?.walletId === wallet.metadata.id ?
-							attributeGroups.find(g => g.id === activeAttributeId.attributeGroupId)
+						activeEntityId?.walletId === wallet.metadata.id ?
+							attributeGroups.find(g => g.id === activeEntityId.attributeGroupId)
 						: selectedAttribute ?
 							attributeGroups.find(g => g.id in wallet.overall && selectedAttribute in wallet.overall[g.id])
 						:
@@ -850,11 +853,11 @@
 						evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
 					))}
 
-				{@const hasActiveAttribute = activeAttributeId?.walletId === wallet.metadata.id && activeAttributeId?.attributeGroupId === attrGroup.id}
+				{@const hasActiveAttribute = activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id}
 
 				{@const currentAttribute = (
-					hasActiveAttribute && activeAttributeId ?
-						evalGroup[activeAttributeId.attributeId]
+					hasActiveAttribute && activeEntityId ?
+						evalGroup[activeEntityId.attributeId]
 											: selectedAttribute ?
 							evalGroup[selectedAttribute]
 					:
@@ -902,7 +905,7 @@
 									})()
 									
 									return {
-										id: evalAttrId.toString(),
+										id: `attrGroup_${attrGroup.id}__attr_${evalAttrId.toString()}`,
 										color: ratingToColor(evalAttr.evaluation.value.rating),
 										weight: 1,
 										arcLabel: icon,
@@ -912,7 +915,7 @@
 								}
 							)
 						}
-						highlightedSliceId={currentAttribute?.attribute.id}
+						{highlightedSliceId}
 						centerLabel={
 							groupScore ?
 								`${
@@ -926,41 +929,53 @@
 							:
 								'❓'
 						}
-						onSliceClick={attributeId => {
-							selectedAttribute = (
-								selectedAttribute === attributeId ? undefined : attributeId
-							)
+						onSliceClick={sliceId => {
+							const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
+							
+							if (attributeId) {
+								selectedAttribute = (
+									selectedAttribute === attributeId ? undefined : attributeId
+								)
 
-							if (!isExpanded)
-								toggleRowExpanded(wallet.metadata.id)
-						}}
-						onSliceMouseEnter={attributeId => {
-							activeAttributeId = {
-								walletId: wallet.metadata.id,
-								attributeGroupId: attrGroup.id,
-								attributeId,
+								if (!isExpanded)
+									toggleRowExpanded(wallet.metadata.id)
 							}
 						}}
-						onSliceMouseLeave={attributeId => {
-							activeAttributeId = undefined
-						}}
-						onSliceFocus={attributeId => {
-							activeAttributeId = {
-								walletId: wallet.metadata.id,
-								attributeGroupId: attrGroup.id,
-								attributeId,
+						onSliceMouseEnter={sliceId => {
+							const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
+							
+							if (attributeId) {
+								activeEntityId = {
+									walletId: wallet.metadata.id,
+									attributeGroupId: attributeGroupId,
+									attributeId: attributeId,
+								}
 							}
 						}}
-						onSliceBlur={attributeId => {
-							activeAttributeId = undefined
+						onSliceMouseLeave={sliceId => {
+							activeEntityId = undefined
+						}}
+						onSliceFocus={sliceId => {
+							const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
+							
+							if (attributeId) {
+								activeEntityId = {
+									walletId: wallet.metadata.id,
+									attributeGroupId: attributeGroupId,
+									attributeId: attributeId,
+								}
+							}
+						}}
+						onSliceBlur={sliceId => {
+							activeEntityId = undefined
 						}}
 					/>
 				{/snippet}
 
 				{#snippet expandedContent()}
 					{@const displayedAttribute = (
-						activeAttributeId?.walletId === wallet.metadata.id && activeAttributeId?.attributeGroupId === attrGroup.id ?
-							evalGroup[activeAttributeId.attributeId]
+						activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id ?
+							evalGroup[activeEntityId.attributeId]
 						: selectedAttribute ?
 							evalGroup[selectedAttribute]
 						:
@@ -988,10 +1003,10 @@
 
 			<!-- Attribute rating -->
 			{:else}
-				{@const [attributeGroupId, attrId] = column.id.split('.')}
+				{@const [attributeGroupId, attributeId] = column.id.split('.')}
 				{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === attributeGroupId)!}
-				{@const attribute = attrGroup.attributes[attrId]}
-				{@const evalAttr = wallet.overall[attributeGroupId][attrId]}
+				{@const attribute = attrGroup.attributes[attributeId]}
+				{@const evalAttr = wallet.overall[attributeGroupId][attributeId]}
 
 				{#snippet content()}
 					<Pie
@@ -1012,7 +1027,7 @@
 							evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
 								[
 									{
-										id: attrId,
+										id: `attrGroup_${attributeGroupId}__attr_${attributeId}`,
 										color: ratingToColor(evalAttr.evaluation.value.rating),
 										weight: 1,
 										arcLabel: attribute.icon,
@@ -1023,6 +1038,7 @@
 							:
 								[]
 						}
+						{highlightedSliceId}
 						centerLabel={evalAttr.evaluation.value.rating}
 						class="wallet-attribute-rating-pie"
 					/>
