@@ -65,6 +65,15 @@ export const walletNavigationGroups: NavigationGroup[] = Object.values(
 								id: attr.id,
 							}),
 						),
+						...(walletType === WalletType.SOFTWARE
+							? [
+									{
+										title: 'EIP-7702 tracker',
+										id: 'eip-7702-tracker',
+										href: `/${walletTypeToUrlSlug(walletType)}/7702`,
+									},
+								]
+							: []),
 					],
 				},
 			],

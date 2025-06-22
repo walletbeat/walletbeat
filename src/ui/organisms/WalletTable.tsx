@@ -16,7 +16,6 @@ import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { ratedHardwareWallets, unratedHardwareWallet } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets, unratedSoftwareWallet } from '@/data/software-wallets'
-import { HardwareIcon } from '@/icons/devices/HardwareIcon'
 import type { EvaluationTree } from '@/schema/attribute-groups'
 import {
 	calculateAttributeGroupScore,
@@ -302,44 +301,50 @@ const hardwareWalletData: TableRow[] = Object.values(ratedHardwareWallets)
 	.sort((a, b) => a.name.localeCompare(b.name))
 
 // Create a reusable cell renderer for wallet name columns
-function createWalletNameCell(): ({ row }: { row: Row<TableRow> }) => React.ReactNode {
-	const createCell = ({ row }: { row: Row<TableRow> }): React.ReactNode => {
-		// Regular row rendering with logo
-		const walletId = row.original.wallet.metadata.id
-		const logoPath = `/images/wallets/${walletId}.${row.original.wallet.metadata.iconExtension}`
-		const defaultLogo = '/images/wallets/default.svg'
-		const walletUrl = `/${walletId}`
+export function walletNameCell<T extends { wallet: RatedWallet }>({
+	row,
+}: {
+	row: Row<T>
+}): React.ReactNode {
+	// Regular row rendering with logo
+	const walletId = row.original.wallet.metadata.id
+	const logoPath = `/images/wallets/${walletId}.${row.original.wallet.metadata.iconExtension}`
+	const defaultLogo = '/images/wallets/default.svg'
+	const walletUrl = `/${walletId}`
 
-		return (
-			<div className='flex items-center'>
-				{/* Wallet Logo */}
-				<div className='flex-shrink-0 mr-3'>
-					<img
-						src={logoPath}
-						alt=''
-						className='w-6 h-6 object-contain'
-						onError={e => {
-							// Fallback for missing logos
-							e.currentTarget.src = defaultLogo
-						}}
-					/>
-				</div>
-				{/* Wallet Name */}
-				<a
-					href={walletUrl}
-					className='text-base font-medium hover:text-blue-600 hover:underline cursor-pointer'
-				>
-					{row.original.wallet.metadata.displayName}
-				</a>
+	return (
+		<div className='flex items-center'>
+			{/* Wallet Logo */}
+			<div className='flex-shrink-0 mr-3'>
+				<img
+					src={logoPath}
+					alt=''
+					className='w-6 h-6 object-contain'
+					onError={e => {
+						// Fallback for missing logos
+						e.currentTarget.src = defaultLogo
+					}}
+				/>
 			</div>
-		)
-	}
-
-	return createCell
+			{/* Wallet Name */}
+			<a
+				href={walletUrl}
+				className='text-base font-medium hover:text-blue-600 hover:underline cursor-pointer'
+			>
+				{row.original.wallet.metadata.displayName}
+			</a>
+		</div>
+	)
 }
 
 // Helper function for EIP standards with hover preview (non-link version)
-function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
+export function EipStandardTag({
+	standard,
+	usePrefix,
+}: {
+	standard: Eip
+	usePrefix: boolean
+}): React.ReactElement {
 	const [isTagHovered, setIsTagHovered] = useState<boolean>(false)
 	const [isModalHovered, setIsModalHovered] = useState<boolean>(false)
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
@@ -389,7 +394,8 @@ function EipStandardTag({ standard }: { standard: Eip }): React.ReactElement {
 				onMouseEnter={handleTagMouseEnter}
 				onMouseLeave={handleTagMouseLeave}
 			>
-				#{standard.number}
+				{usePrefix ? `${standard.prefix}-` : '#'}
+				{standard.number}
 			</span>
 			{isHovered && anchorEl !== null && (
 				<EipPreviewModal
@@ -729,7 +735,7 @@ export default function WalletTable(): React.ReactElement {
 		{
 			id: 'wallet',
 			header: 'Wallet',
-			cell: createWalletNameCell(),
+			cell: walletNameCell<TableRow>,
 		},
 	)
 	const walletTypeColumn = columnHelper.display({
@@ -764,9 +770,9 @@ export default function WalletTable(): React.ReactElement {
 
 							// Add Markdown-style links for ERC standards
 							if (std === SmartWalletStandard.ERC_4337) {
-								return <EipStandardTag key={std} standard={erc4337} />
+								return <EipStandardTag key={std} usePrefix={false} standard={erc4337} />
 							} else if (std === SmartWalletStandard.ERC_7702) {
-								return <EipStandardTag key={std} standard={eip7702} />
+								return <EipStandardTag key={std} usePrefix={false} standard={eip7702} />
 							} else {
 								return null // Return null for other standards like 'OTHER'
 							}
@@ -934,54 +940,10 @@ export default function WalletTable(): React.ReactElement {
 		cell: ({ row }: { row: Row<TableRow> }): CellValue =>
 			getHardwareWalletManufactureTypeDisplay(row.original.wallet),
 	})
-	// Replace web/mobile/desktop device selector with hardware icon for hardware wallets
-	const hardwareWalletVariantColumn = columnHelper.display({
-		id: 'risk_by_device',
-		header: 'Risk by device',
-		cell: () => (
-			<div className='flex space-x-0 items-center justify-center'>
-				<div className='flex flex-col items-center group'>
-					<button
-						className={cx(
-							'p-2 rounded-md transition-colors',
-							selectedVariant === DeviceVariant.NONE
-								? 'text-[var(--text-secondary)] group-hover:text-[var(--hover)]'
-								: 'text-[var(--active)]',
-						)}
-						onClick={() => {
-							handleVariantChange(
-								selectedVariant === DeviceVariant.NONE
-									? DeviceVariant.HARDWARE
-									: DeviceVariant.NONE,
-							)
-						}}
-						title='Hardware'
-					>
-						<HardwareIcon
-							style={{
-								width: '24px',
-								height: '24px',
-								fill: selectedVariant === DeviceVariant.NONE ? 'currentColor' : 'var(--active)',
-							}}
-						/>
-					</button>
-					<div
-						className={cx(
-							'w-2 h-2 rounded-full mt-1 transition-colors',
-							selectedVariant !== DeviceVariant.NONE
-								? 'bg-[var(--active)]'
-								: 'bg-[var(--background-tertiary)] group-hover:bg-[var(--hover)]',
-						)}
-					/>
-				</div>
-			</div>
-		),
-	})
 	const hardwareColumns: Array<ColumnDef<TableRow, CellValue>> = [
 		rankColumn,
 		hardwareWalletNameColumn,
 		hardwareWalletManufactureTypeColumn,
-		hardwareWalletVariantColumn,
 		...mapNonExemptAttributeGroupsInTree(
 			unratedHardwareWallet.overall,
 			attributeGroupColumnFromAttrGroup,
@@ -1215,9 +1177,7 @@ export default function WalletTable(): React.ReactElement {
 													headerContent === 'Type' ||
 													headerContent === 'Manufacture Type'
 													? 'font-bold'
-													: headerContent === 'Risk by device'
-														? 'font-semibold'
-														: 'font-normal',
+													: 'font-normal',
 											)}
 										>
 											{headerContent !== undefined &&

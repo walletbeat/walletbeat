@@ -1,3 +1,4 @@
+import { lucemans } from '@/data/contributors/lucemans'
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
@@ -6,8 +7,6 @@ import { notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
-import { lucemans } from '../contributors/lucemans'
 
 export const family: SoftwareWallet = {
 	metadata: {
@@ -46,6 +45,7 @@ export const family: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainAbstraction: null,
 		chainConfigurability: null,
 		integration: {
 			browser: {

@@ -9,6 +9,9 @@ export type EVMAddress = `0x${Lowercase<string>}`
  * delegated via EIP-7702.
  */
 export interface SmartWalletContract {
+	/** A human-readable name for the contract. */
+	name: string
+
 	/** The address of the smart wallet contract. */
 	address: EVMAddress
 

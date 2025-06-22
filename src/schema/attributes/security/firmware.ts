@@ -4,7 +4,7 @@ import type { ResolvedFeatures } from '@/schema/features'
 import { type FirmwareSupport, FirmwareType } from '@/schema/features/security/firmware'
 import { popRefs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -12,10 +12,10 @@ import { exempt, pickWorstRating, unrated } from '../common'
 const brand = 'attributes.firmware'
 
 export type FirmwareValue = Value & {
-	silentUpdateProtection: FirmwareType
-	firmwareOpenSource: FirmwareType
-	reproducibleBuilds: FirmwareType
-	customFirmware: FirmwareType
+	silentUpdateProtection: FirmwareType | null
+	firmwareOpenSource: FirmwareType | null
+	reproducibleBuilds: FirmwareType | null
+	customFirmware: FirmwareType | null
 	__brand: 'attributes.firmware'
 }
 
@@ -26,6 +26,12 @@ function evaluateFirmware(features: FirmwareSupport): Rating {
 		features.reproducibleBuilds,
 		features.customFirmware,
 	]
+
+	// If any rating is null (unreviewed), return UNRATED
+	if (ratings.some(r => r === null)) {
+		return Rating.UNRATED
+	}
+
 	const passCount = ratings.filter(r => r === FirmwareType.PASS).length
 
 	if (passCount >= 3) {
@@ -87,7 +93,7 @@ export const firmware: Attribute<FirmwareValue> = {
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FirmwareValue>>) =>
 		pickWorstRating<FirmwareValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
-		if (features.variant !== Variant.HARDWARE) {
+		if (features.type !== WalletType.HARDWARE) {
 			return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), brand, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
@@ -109,6 +115,15 @@ export const firmware: Attribute<FirmwareValue> = {
 
 		const { withoutRefs, refs: extractedRefs } = popRefs<FirmwareSupport>(firmwareFeature)
 		const rating = evaluateFirmware(withoutRefs)
+
+		if (rating === Rating.UNRATED) {
+			return unrated(firmware, brand, {
+				silentUpdateProtection: FirmwareType.FAIL,
+				firmwareOpenSource: FirmwareType.FAIL,
+				reproducibleBuilds: FirmwareType.FAIL,
+				customFirmware: FirmwareType.FAIL,
+			})
+		}
 
 		return {
 			value: {

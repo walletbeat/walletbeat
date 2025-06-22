@@ -1,3 +1,4 @@
+import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import {
 	Leak,
@@ -19,7 +20,6 @@ import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
-import { polymutex } from '../contributors/polymutex'
 import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
@@ -69,6 +69,27 @@ export const rabby: SoftwareWallet = {
 					url: 'https://github.com/RabbyHub/Rabby/blob/5f2b84491b6af881ab4ef41f7627d5e068d10652/src/ui/views/ImportWatchAddress.tsx#L170',
 				},
 			],
+		},
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					feesLargerThan1bps: 'HIDDEN_BY_DEFAULT',
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ether: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				usdc: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+			},
 		},
 		chainConfigurability: {
 			customChains: true,

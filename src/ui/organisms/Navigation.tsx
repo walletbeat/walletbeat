@@ -197,7 +197,7 @@ const NavigationItem = memo(
 									height='1em'
 									width='1em'
 									xmlns='http://www.w3.org/2000/svg'
-									className={cx('transition-transform', isOpen ? '' : 'rotate-90')}
+									className={cx('transition-transform', isOpen ? 'rotate-180' : '')}
 								>
 									<polyline points='6 9 12 15 18 9'></polyline>
 								</svg>

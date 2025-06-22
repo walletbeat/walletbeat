@@ -7,7 +7,7 @@ import {
 } from '@/schema/features/transparency/maintenance'
 import { popRefs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -97,7 +97,7 @@ export const maintenance: Attribute<MaintenanceValue> = {
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<MaintenanceValue>>) =>
 		pickWorstRating<MaintenanceValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<MaintenanceValue> => {
-		if (features.variant !== Variant.HARDWARE) {
+		if (features.type !== WalletType.HARDWARE) {
 			return exempt(
 				maintenance,
 				sentence('These attributes only refer to hardware wallet maintenance'),
