@@ -7,13 +7,18 @@ import { representativeWalletForType, allRatedWallets } from '@/data/wallets'
 
 // Functions
 import { getAttributeGroupById } from '@/schema/attribute-groups'
-import { getStaticPathsForWalletType } from '@/components/CriteriaPage'
+import { displayedAttributeIdsForWalletType } from '@/schema/wallet-navigation'
 
 
 // Context
 export const prerender = true
 
-export const getStaticPaths = getStaticPathsForWalletType(WalletType.SOFTWARE)
+export const getStaticPaths = () => (
+	displayedAttributeIdsForWalletType(WalletType.SOFTWARE)
+		.map(attrGroupId => ({
+			params: { attrGroupId },
+		}))
+)
 
 const { attrGroupId } = Astro.params
 

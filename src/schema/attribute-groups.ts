@@ -112,6 +112,7 @@ import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './sco
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { WalletMetadata } from './wallet'
 
+
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
@@ -706,3 +707,5 @@ export function getAttributeGroupById(
 
 	return attrGroup
 }
+
+
