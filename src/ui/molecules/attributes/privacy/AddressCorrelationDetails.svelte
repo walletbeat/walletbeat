@@ -66,7 +66,11 @@
 			contentType: ContentType.MARKDOWN,
 			markdown: 'By default, **{{WALLET_NAME}}** allows your wallet address to be correlated with your personal information:'
 		}}
-		strings={{ WALLET_NAME: wallet.metadata.displayName }}
+		strings={{ 
+			WALLET_NAME: wallet.metadata.displayName,
+			WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+			WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
+		}}
 	/>
 {:else}
 	{@const sortedLinkables = nonEmptySorted(
@@ -145,6 +149,10 @@
 
 ${leaksText}`
 		}}
-		strings={{ WALLET_NAME: wallet.metadata.displayName }}
+		strings={{ 
+			WALLET_NAME: wallet.metadata.displayName,
+			WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
+			WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
+		}}
 	/>
 {/if} 
