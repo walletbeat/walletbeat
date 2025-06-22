@@ -12,9 +12,13 @@
 	type _Column = Column<_RowValue, _CellValue, _ColumnId>
 
 
+	// IDs
+	const id = $props.id()
+
+
 	// Inputs
 	let {
-		tableId,
+		tableId = `table_${id}`,
 		columns,
 		defaultSort,
 		rows,
