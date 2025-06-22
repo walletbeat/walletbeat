@@ -3,7 +3,7 @@
 # Repository root.
 root = true
 
-[{,.editorconfig,.gitignore,.prettierrc,{,.github,.vscode,public,src}/**/*.{astro,css,js,json,jsx,md,mdx,mjs,ts,tsx,yaml}}]
+[{,.editorconfig,.gitignore,.prettierrc,{,.github,.vscode,public,src}/**/*.{astro,css,js,json,md,mdx,mjs,ts,yaml}}]
 
 # Set default charset.
 charset = utf-8

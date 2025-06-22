@@ -28,7 +28,6 @@ const wallet = allRatedWallets[walletName]
 import Layout from '@/layouts/Layout.astro'
 import Navigation from '@/ui/organisms/Navigation.astro'
 import WalletPage from '@/components/WalletPage.svelte'
-// import { WalletPage as WalletPageReact } from '@/components/WalletPage.tsx'
 ---
 
 <Layout
@@ -54,6 +53,5 @@ import WalletPage from '@/components/WalletPage.svelte'
 
 	<main>
 		<WalletPage {walletName} client:load />
-		{/* <WalletPageReact {walletName} client:load /> */}
 	</main>
 </Layout>
