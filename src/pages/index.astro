@@ -19,11 +19,9 @@ const attributeGroups = [
 	ecosystemAttributeGroup,
 ]
 
-
 // Layouts
 import Layout from '../layouts/Layout.astro'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-
 
 // Components
 import LuKey from 'lucide-static/icons/key.svg?raw'
@@ -31,7 +29,6 @@ import LuWallet from 'lucide-static/icons/wallet.svg?raw'
 import { navigationAbout, navigationCriteria } from '@/components/navigation'
 import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
-
 
 <Layout
 	metadata={{
@@ -127,33 +124,37 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 			},
 		]}
 	>
-		<div class="flex flex-col">
+		<div class='flex flex-col'>
 			<div>
-				<div class="px-8 py-6 flex justify-between items-center flex-wrap min-h-96 relative">
-					<div class="flex flex-col gap-2 py-8 flex-1">
-						<h1 class="text-5xl font-extrabold text-accent">Who watches the wallets?</h1>
-						<p class="text-secondary">
+				<div class='px-8 py-6 flex justify-between items-center flex-wrap min-h-96 relative'>
+					<div class='flex flex-col gap-2 py-8 flex-1'>
+						<h1 class='text-5xl font-extrabold text-accent'>Who watches the wallets?</h1>
+						<p class='text-secondary'>
 							Beta version; For content contributions, please see{' '}
 							<a
-								href="https://github.com/walletbeat/walletbeat"
-								target="_blank"
-								rel="noreferrer"
-								class="text-accent underline"
+								href='https://github.com/walletbeat/walletbeat'
+								target='_blank'
+								rel='noreferrer'
+								class='text-accent underline'
 							>
 								GitHub
 							</a>
 							.
 						</p>
 					</div>
-					<div class="flex-1 flex justify-center items-center">
-						<img src="robot.png" alt="Walletbeat Robot" class="h-80 w-auto object-contain" />
+					<div class='flex-1 flex justify-center items-center'>
+						<img
+							src='robot.png'
+							alt='Walletbeat Robot'
+							class='h-80 w-auto object-contain'
+						/>
 					</div>
 				</div>
 			</div>
 
-			<div class="w-full flex flex-col gap-2 p-4 md:p-8">
-				<div class="wallet-tables">
-					<div class="table-section">
+			<div class='w-full flex flex-col gap-2 p-4 md:p-8'>
+				<div class='wallet-tables'>
+					<div class='table-section'>
 						<h2>Software Wallets</h2>
 
 						<WalletTable
@@ -163,7 +164,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 						/>
 					</div>
 
-					<div class="table-section">
+					<div class='table-section'>
 						<h2>Hardware Wallets</h2>
 
 						<WalletTable

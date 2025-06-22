@@ -1,3 +1,5 @@
+import { nconsigny } from '@/data/contributors/nconsigny'
+import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import {
 	Leak,
@@ -17,8 +19,6 @@ import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
-import { nconsigny } from '../contributors/nconsigny'
-import { polymutex } from '../contributors/polymutex'
 import { binance } from '../entities/binance'
 import { daimoInc } from '../entities/daimo'
 import { honeycomb } from '../entities/honeycomb'
@@ -82,6 +82,27 @@ export const daimo: SoftwareWallet = {
 					url: 'https://github.com/daimo-eth/daimo/blob/a960ddbbc0cb486f21b8460d22cebefc6376aac9/packages/daimo-api/src/network/viemClient.ts#L128',
 				},
 			],
+		},
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					feesLargerThan1bps: 'VISIBLE_BY_DEFAULT',
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ether: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: notSupported,
+				},
+				globalAccountValue: notSupported,
+				perChainAccountValue: notSupported,
+				usdc: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: notSupported,
+				},
+			},
 		},
 		chainConfigurability: {
 			customChains: false,

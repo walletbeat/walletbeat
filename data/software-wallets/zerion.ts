@@ -1,3 +1,4 @@
+import { lucemans } from '@/data/contributors/lucemans'
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
@@ -7,8 +8,6 @@ import { featureSupported, notSupported, supported } from '@/schema/features/sup
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
-import { lucemans } from '../contributors/lucemans'
 
 export const zerion: SoftwareWallet = {
 	metadata: {
@@ -47,6 +46,7 @@ export const zerion: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 			ref: null,
 		},
+		chainAbstraction: null,
 		chainConfigurability: null,
 		integration: {
 			browser: {

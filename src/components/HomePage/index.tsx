@@ -3,6 +3,7 @@ import { LuGithub } from 'react-icons/lu'
 
 import { walletNavigationGroups } from '@/components/CriteriaPage'
 import { navigationAbout } from '@/components/navigation'
+import { repositoryUrl } from '@/constants'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import WalletTable from '@/ui/organisms/WalletTable'
@@ -41,7 +42,7 @@ export const HomePage: FC<{ selectedGroupId?: string }> = ({ selectedGroupId }) 
 								<div className='flex flex-row gap-2 items-center' key='repo'>
 									<LuGithub />
 									<ExternalLink
-										url='https://github.com/walletbeat/walletbeat'
+										url={repositoryUrl}
 										defaultLabel='GitHub Repository'
 										style={{
 											fontWeight: 500,
@@ -60,7 +61,7 @@ export const HomePage: FC<{ selectedGroupId?: string }> = ({ selectedGroupId }) 
 						<p className='text-secondary'>
 							We welcome contributions via the{' '}
 							<ExternalLink
-								url='https://github.com/walletbeat/walletbeat'
+								url={repositoryUrl}
 								defaultLabel='GitHub Repository'
 								style={{
 									fontWeight: 500,

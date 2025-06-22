@@ -1,4 +1,5 @@
 import type { AccountSupport } from './features/account-support'
+import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import {
 	notApplicableWalletIntegration,
 	type ResolvedWalletIntegration,
@@ -33,6 +34,7 @@ import type { Monetization } from './features/transparency/monetization'
 import type { ReputationSupport } from './features/transparency/reputation'
 import type { WithRef } from './reference'
 import { type ResolvedFeature, resolveFeature, type Variant, type VariantFeature } from './variants'
+import { variantToWalletType, type WalletType } from './wallet-types'
 
 /**
  * A set of features about any type of wallet.
@@ -141,6 +143,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 	/** How the wallet resolves Ethereum addresses. */
 	addressResolution: VariantFeature<WithRef<AddressResolution>>
+
+	/** How well does the wallet abstract over chains? */
+	chainAbstraction: VariantFeature<ChainAbstraction>
 }
 
 /**
@@ -205,8 +210,17 @@ export type WalletEmbeddedFeatures = WalletBaseFeatures & {}
  * All features are resolved to a single variant here.
  */
 export interface ResolvedFeatures {
-	/** The wallet variant which was used to resolve the feature tree. */
+	/**
+	 * The wallet variant which was used to resolve the feature tree.
+	 */
 	variant: Variant
+
+	/**
+	 * The type of the wallet.
+	 * This is a shorthand for `variantToWalletType(variant)`, meant to be used
+	 * for easy filtering in attribute evaluation code.
+	 */
+	type: WalletType
 
 	/** The profile of the wallet. */
 	profile: WalletProfile
@@ -242,6 +256,7 @@ export interface ResolvedFeatures {
 		reputation: ResolvedFeature<ReputationSupport>
 		maintenance: ResolvedFeature<MaintenanceSupport>
 	}
+	chainAbstraction: ResolvedFeature<ChainAbstraction>
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
 	accountSupport: ResolvedFeature<AccountSupport>
 	multiAddress: ResolvedFeature<Support>
@@ -278,6 +293,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 
 	return {
 		variant,
+		type: variantToWalletType(variant),
 		profile: features.profile,
 		security: {
 			scamAlerts: softwareFeat(features => features.security.scamAlerts),
@@ -320,6 +336,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 			reputation: hardwareFeat(features => features.transparency.reputation),
 			maintenance: hardwareFeat(features => features.transparency.maintenance),
 		},
+		chainAbstraction: softwareFeat(features => features.chainAbstraction),
 		chainConfigurability: softwareFeat(features => features.chainConfigurability),
 		accountSupport: baseFeat(features => features.accountSupport),
 		multiAddress: baseFeat(features => features.multiAddress),

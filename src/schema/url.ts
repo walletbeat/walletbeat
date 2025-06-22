@@ -35,7 +35,8 @@ export function getDomain(url: Url): string {
 const wellKnownDomainsToLabels: Record<string, string> = {
 	'crunchbase.com': 'Crunchbase',
 	'github.com': 'GitHub',
-	'warpcast.com': 'Warpcast',
+	'warpcast.com': 'Farcaster',
+	'farcaster.xyz': 'Farcaster',
 }
 
 function getDefaultUrlLabel(url: string): string {

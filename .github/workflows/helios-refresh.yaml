@@ -19,6 +19,11 @@ jobs:
         env:
           GIT_USERNAME: walletbeat-bot
           GIT_EMAIL: walletbeat-bot@users.noreply.github.com
+          GIT_REMOTE_URL: git@github.com:walletbeat/walletbeat.git
+          GIT_REMOTE_BRANCH: beta
+          GIT_SSH_AUTHENTICATION_KEY_TYPE: ed25519
+          GIT_SSH_AUTHENTICATION_KEY_PUBLIC: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCBvEBIVY5uNBq0a1sqOKojgI/pReRR4PtDQXiWnj6U walletbeat-bot@walletbeat.eth'
+          GIT_SSH_AUTHENTICATION_KEY_PRIVATE: ${{ secrets.WALLETBEAT_BOT_GIT_SSH_AUTHENTICATION_KEY_PRIVATE }}
           GIT_SSH_SIGNING_KEY_TYPE: ed25519
           GIT_SSH_SIGNING_KEY_PUBLIC: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBw+NZEg1p71wrjIngH8PZQ1GDeACirHUjposkeYdurM walletbeat-bot@walletbeat.eth'
           GIT_SSH_SIGNING_KEY_PRIVATE: ${{ secrets.WALLETBEAT_BOT_GIT_SSH_SIGNING_KEY_PRIVATE }}

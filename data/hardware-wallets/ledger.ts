@@ -1,12 +1,15 @@
+import { nconsigny, patrickalphac } from '@/data/contributors'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { DappSigningLevel } from '@/schema/features/security/hardware-wallet-dapp-signing'
+import {
+	DataExtraction,
+	displaysFullTransactionDetails,
+	noCalldataDecoding,
+} from '@/schema/features/security/hardware-wallet-dapp-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
-import { nconsigny } from '../contributors/nconsigny'
 
 export const ledgerWallet: HardwareWallet = {
 	metadata: {
@@ -17,7 +20,7 @@ export const ledgerWallet: HardwareWallet = {
 			Ledger Wallet is a self-custodial wallet built by Ledger. It
 			integrates with Ledger hardware wallets to provide secure cryptocurrency management.
 		`),
-		contributors: [nconsigny],
+		contributors: [nconsigny, patrickalphac],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
@@ -99,16 +102,34 @@ export const ledgerWallet: HardwareWallet = {
 			},
 			firmware: null,
 			hardwareWalletDappSigning: {
-				details:
-					'Ledger provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-				level: DappSigningLevel.PARTIAL,
+				messageSigning: {
+					calldataDecoding: noCalldataDecoding,
+					details:
+						'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
+					messageExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.HASHES]: true, // Fantastic
+						[DataExtraction.QRCODE]: false,
+					},
+				},
 				ref: [
 					{
 						explanation:
-							"Independent video demonstration of Ledger's clear signing implementation on Safe.",
-						url: 'https://youtu.be/7lP_0h-PPvY?t=720',
+							"Independent video demonstration of Ledger's signing implementation on a Safe.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
 					},
 				],
+				transactionSigning: {
+					calldataDecoding: noCalldataDecoding,
+					calldataExtraction: {
+						[DataExtraction.EYES]: true, // VERY hard to verify, very weird format
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+					details:
+						'Ledger provides basic message signing details when using hardware wallets, but complex interactions are very difficult to verify on the device.',
+					displayedTransactionDetails: displaysFullTransactionDetails,
+				},
 			},
 			keysHandling: null,
 			lightClient: {

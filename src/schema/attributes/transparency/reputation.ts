@@ -4,7 +4,7 @@ import type { ResolvedFeatures } from '@/schema/features'
 import { type ReputationSupport, ReputationType } from '@/schema/features/transparency/reputation'
 import { popRefs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
-import { Variant } from '@/schema/variants'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -94,7 +94,7 @@ export const reputation: Attribute<ReputationValue> = {
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationValue>>) =>
 		pickWorstRating<ReputationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<ReputationValue> => {
-		if (features.variant !== Variant.HARDWARE) {
+		if (features.type !== WalletType.HARDWARE) {
 			return exempt(reputation, sentence('Only rated for hardware wallets'), brand, {
 				originalProduct: ReputationType.FAIL,
 				availability: ReputationType.FAIL,
