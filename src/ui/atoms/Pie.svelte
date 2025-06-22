@@ -433,7 +433,7 @@
 					pointer-events: none;
 				}
 
-				> .slice-path {
+				.slice-path {
 					d: var(--slice-path);
 					fill: var(--slice-fill);
 				}
