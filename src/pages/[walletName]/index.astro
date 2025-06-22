@@ -1,6 +1,7 @@
 ---
 // Types/constants
 import { allRatedWallets } from '@/data/wallets'
+import { defaultNavigationItems } from '@/components/navigation'
 
 
 // Functions
@@ -25,6 +26,7 @@ const wallet = allRatedWallets[walletName]
 
 // Components
 import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/ui/organisms/Navigation.astro'
 import WalletPage from '@/components/WalletPage.svelte'
 // import { WalletPage as WalletPageReact } from '@/components/WalletPage.tsx'
 ---
@@ -48,6 +50,10 @@ import WalletPage from '@/components/WalletPage.svelte'
 		keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
 	}}
 >
-	<WalletPage {walletName} client:load />
-	{/* <WalletPageReact {walletName} client:load /> */}
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main>
+		<WalletPage {walletName} client:load />
+		{/* <WalletPageReact {walletName} client:load /> */}
+	</main>
 </Layout>
