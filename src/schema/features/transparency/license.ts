@@ -11,6 +11,7 @@ export enum License {
 	GPL_3_0 = 'GPL-3.0',
 	BSD_3_CLAUSE = 'BSD-3-Clause',
 	MIT = 'MIT',
+	MIT_WITH_CLAUSE = 'MIT-C',
 	PROPRIETARY = '_PROPRIETARY',
 	UNLICENSED_VISIBLE = '_UNLICENSED_VISIBLE',
 }
@@ -48,6 +49,8 @@ export function licenseName(license: License): string {
 			return 'BSD 3-Clause'
 		case License.MIT:
 			return 'MIT'
+		case License.MIT_WITH_CLAUSE:
+			return 'MIT with Clause'
 		case License.PROPRIETARY:
 			return 'Proprietary'
 		case License.UNLICENSED_VISIBLE:
@@ -75,6 +78,8 @@ export function licenseIsFOSS(license: License): FOSS {
 			return FOSS.NOT_FOSS
 		case License.UNLICENSED_VISIBLE:
 			return FOSS.NOT_FOSS
+		case License.MIT_WITH_CLAUSE:
+			return FOSS.FOSS
 	}
 }
 
@@ -93,6 +98,8 @@ export function licenseSourceIsVisible(license: License): boolean {
 		case License.BSD_3_CLAUSE:
 			return true
 		case License.MIT:
+			return true
+		case License.MIT_WITH_CLAUSE:
 			return true
 		case License.PROPRIETARY:
 			return false

@@ -33,6 +33,10 @@ import {
 	type BrowserIntegrationValue,
 } from './attributes/ecosystem/browser-integration'
 import {
+	chainAbstraction,
+	type ChainAbstractionValue,
+} from './attributes/ecosystem/chain-abstraction'
+import {
 	addressCorrelation,
 	type AddressCorrelationValue,
 } from './attributes/privacy/address-correlation'
@@ -262,6 +266,7 @@ type EcosystemValues = Dict<{
 	accountAbstraction: AccountAbstractionValue
 	addressResolution: AddressResolutionValue
 	browserIntegration: BrowserIntegrationValue
+	chainAbstraction: ChainAbstractionValue
 	interoperability: InteroperabilityValue
 }>
 
@@ -277,12 +282,14 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		accountAbstraction,
 		addressResolution,
 		browserIntegration,
+		chainAbstraction,
 		interoperability,
 	},
 	attributeWeights: {
 		accountAbstraction: 1.0,
 		addressResolution: 1.0,
 		browserIntegration: 1.0,
+		chainAbstraction: 1.0,
 		interoperability: 1.0,
 	},
 }
@@ -361,6 +368,7 @@ export interface EcosystemEvaluations extends EvaluatedGroup<EcosystemValues> {
 	accountAbstraction: EvaluatedAttribute<AccountAbstractionValue>
 	addressResolution: EvaluatedAttribute<AddressResolutionValue>
 	browserIntegration: EvaluatedAttribute<BrowserIntegrationValue>
+	chainAbstraction: EvaluatedAttribute<ChainAbstractionValue>
 	interoperability: EvaluatedAttribute<InteroperabilityValue>
 }
 
@@ -457,6 +465,7 @@ export function evaluateAttributes(
 			accountAbstraction: evalAttr(accountAbstraction),
 			addressResolution: evalAttr(addressResolution),
 			browserIntegration: evalAttr(browserIntegration),
+			chainAbstraction: evalAttr(chainAbstraction),
 			interoperability: evalAttr(interoperability),
 		},
 		maintenance: {
@@ -525,6 +534,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			accountAbstraction: attr(tree => tree.ecosystem.accountAbstraction),
 			addressResolution: attr(tree => tree.ecosystem.addressResolution),
 			browserIntegration: attr(tree => tree.ecosystem.browserIntegration),
+			chainAbstraction: attr(tree => tree.ecosystem.chainAbstraction),
 			interoperability: attr(tree => tree.ecosystem.interoperability),
 		},
 		maintenance: {

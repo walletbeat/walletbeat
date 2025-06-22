@@ -11,7 +11,7 @@ import {
 	navigationHome,
 	navigationRepository,
 } from '@/components/navigation'
-import { betaSiteRoot } from '@/constants'
+import { betaSiteRoot, repositoryUrl } from '@/constants'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import { IconLink } from '@/ui/atoms/IconLink'
@@ -69,19 +69,11 @@ function AboutContents(): React.JSX.Element {
 			<Typography variant='body1'>
 				Walletbeat is committed to transparency. Contributors reveal their affiliation and / or
 				shares in wallet companies. It is an{' '}
-				<IconLink
-					IconComponent={GitHubIcon}
-					href='https://github.com/walletbeat/walletbeat'
-					target='_blank'
-				>
+				<IconLink IconComponent={GitHubIcon} href={repositoryUrl} target='_blank'>
 					open-source project
 				</IconLink>{' '}
 				licensed under the Free and Open-Source MIT license. Discussions are held on the{' '}
-				<IconLink
-					IconComponent={ForumIcon}
-					href='https://warpcast.com/~/channel/walletbeat'
-					target='_blank'
-				>
+				<IconLink IconComponent={ForumIcon} href={repositoryUrl} target='_blank'>
 					public /walletbeat Farcaster channel
 				</IconLink>
 				.
@@ -141,11 +133,7 @@ function AboutContents(): React.JSX.Element {
 			<Typography variant='body1'>
 				Wallets listed on Walletbeat do not represent an endorsement and is for informational
 				purposes only. If you find that something is wrong, please help Walletbeat by{' '}
-				<IconLink
-					IconComponent={GitHubIcon}
-					href='https://github.com/walletbeat/walletbeat'
-					target='_blank'
-				>
+				<IconLink IconComponent={GitHubIcon} href={repositoryUrl} target='_blank'>
 					contributing
 				</IconLink>
 				!
