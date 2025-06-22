@@ -763,6 +763,8 @@
 			/ auto 1fr;
 		gap: 1rem;
 
+		position: relative;
+
 		@supports not (scroll-marker-group: before) {
 			&::before {
 				content: '';
@@ -824,6 +826,10 @@
 		border-bottom: 1px solid var(--border-color);
 		z-index: 10;
 		background-color: var(--background-primary);
+
+		@supports not (scroll-marker-group: before) {
+			display: none;
+		}
 	}
 
 	.page-header {
