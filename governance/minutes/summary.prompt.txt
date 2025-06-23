@@ -1,4 +1,4 @@
-Here is the rough audio-to-text transcript call about Walletbeat, an open-source project to rate Ethereum wallets.
+Here is a rough audio-to-text transcript call about Walletbeat, an open-source project to rate Ethereum wallets.
 This transcript may contain inaccuracies due of the audio quality of the call, and of the text-to-speech transcription.
 Your task is to provide an accurate high-level summary of this meeting,
 taking into consideration that the transcript may not be entirely accurate due to these transcription errors.
