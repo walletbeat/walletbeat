@@ -41,7 +41,6 @@
 		"marked": "^15.0.12",
 		"micromark": "^4.0.2",
 		"postcss": "^8.5.3",
-		"sass-embedded": "^1.87.0",
 		"svelte": "^5.34.3",
 		"typescript-eslint": "^8.32.1"
 	},
