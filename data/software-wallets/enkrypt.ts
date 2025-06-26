@@ -20,7 +20,6 @@ import {
   RegularEndpoint,
   MultiAddressPolicy,
 } from '@/schema/features/privacy/data-collection';
-import { deBank } from '../entities/debank';
 import { myetherwalletEntity } from '../entities/myetherwallet';
 
 export const enkrypt: SoftwareWallet = {
