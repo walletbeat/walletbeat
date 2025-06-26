@@ -196,14 +196,7 @@ export const enkrypt: SoftwareWallet = {
           ref: null,
         }),
         scamUrlWarning: notSupported,
-        sendTransactionWarning: supported({
-          leaksRecipient: false,
-          leaksUserAddress: false,
-          leaksUserIp: false,
-          newRecipientWarning: false,
-          ref: null,
-          userWhitelist: true,
-        }),
+        sendTransactionWarning: notSupported,
       },
     },
     selfSovereignty: {
@@ -223,7 +216,7 @@ export const enkrypt: SoftwareWallet = {
     transparency: {
       feeTransparency: {
         disclosesWalletFees: true,
-        level: FeeTransparencyLevel.DETAILED,
+        level: FeeTransparencyLevel.COMPREHENSIVE,
         showsTransactionPurpose: true,
       },
     },
