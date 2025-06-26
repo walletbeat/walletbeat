@@ -8,6 +8,7 @@ import { enkrypt } from './software-wallets/enkrypt';
 import { family } from './software-wallets/family';
 import { frame } from './software-wallets/frame';
 import { metamask } from './software-wallets/metamask';
+import { mewmobile } from './software-wallets/mewmobile';
 import { phantom } from './software-wallets/phantom';
 import { rabby } from './software-wallets/rabby';
 import { rainbow } from './software-wallets/rainbow';
@@ -25,6 +26,7 @@ export const softwareWallets = {
   family,
   frame,
   metamask,
+  mewmobile,
   phantom,
   rabby,
   rainbow,
