@@ -1,25 +1,26 @@
 import { AccountType } from '@/schema/features/account-support';
-import { abyscuit } from '../contributors/abyscuit';
+import {
+  Leak,
+  MultiAddressPolicy,
+  RegularEndpoint,
+} from '@/schema/features/privacy/data-collection';
 import { WalletProfile } from '@/schema/features/profile';
+import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
+import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability';
 import {
   TransactionSubmissionL2Support,
   TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission';
+import { featureSupported, notSupported, supported } from '@/schema/features/support';
+import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency';
+import { License } from '@/schema/features/transparency/license';
 import { Variant } from '@/schema/variants';
 import type { SoftwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
-import { featureSupported, notSupported, supported } from '@/schema/features/support';
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability';
-import { License } from '@/schema/features/transparency/license';
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
-import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency';
-import {
-  Leak,
-  RegularEndpoint,
-  MultiAddressPolicy,
-} from '@/schema/features/privacy/data-collection';
+
+import { abyscuit } from '../contributors/abyscuit';
 import { myetherwalletEntity } from '../entities/myetherwallet';
 
 export const enkrypt: SoftwareWallet = {
@@ -159,8 +160,8 @@ export const enkrypt: SoftwareWallet = {
     security: {
       bugBountyProgram: {
         type: BugBountyProgramType.BASIC,
-        url: 'https://hackenproof.com/programs/myetherwallet',
         upgradePathAvailable: false,
+        url: 'https://hackenproof.com/programs/myetherwallet',
       },
       hardwareWalletSupport: {
         [Variant.BROWSER]: {

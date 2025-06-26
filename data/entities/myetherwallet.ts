@@ -1,7 +1,4 @@
-import type {
-  CorporateEntity,
-  WalletDeveloper,
-} from '@/schema/entity';
+import type { CorporateEntity, WalletDeveloper } from '@/schema/entity';
 
 export const myetherwalletEntity: CorporateEntity & WalletDeveloper = {
   id: 'myetherwallet',
