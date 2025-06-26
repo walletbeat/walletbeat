@@ -34,6 +34,8 @@ import { uniswap } from './wallets/uniswap';
 import { unstoppable } from './wallets/unstoppable';
 import { welldone } from './wallets/welldone';
 import { zerion } from './wallets/zerion';
+import { mewportfolio } from './wallets/mewportfolio';
+import { mewmobile } from './wallets/mewmobile';
 
 export const wallets: Record<string, Info> = {
   MetaMask: metamask,
@@ -71,4 +73,6 @@ export const wallets: Record<string, Info> = {
   Rabby: rabby,
   Talisman: talisman,
   'Clear Wallet': clearwallet,
+  'MEW Portfolio': mewportfolio,
+  'MEW Mobile': mewmobile,
 };
