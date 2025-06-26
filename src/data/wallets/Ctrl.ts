@@ -1,0 +1,108 @@
+import type { Info } from '@/types/Info';
+
+export const Ctrl Wallet: Info = {
+  url: 'https://ctrl.xyz/',
+  submittedByName: '@msean-mc-grath',
+  submittedByUrl: 'https://github.com/sean-mc-grath',
+  updatedAt: '13/03/2025',
+  updatedByName: '@sean-mc-grath',
+  updatedByUrl: 'https://github.com/kien-ngo',
+  mobile: {
+    accountType: 'EOA',
+    chainCompatibility: {
+      configurable: true,
+      autoswitch: true,
+      ethereum: true,
+      optimism: true,
+      arbitrum: true,
+      base: true,
+      polygon: true,
+      gnosis: true,
+      bnbSmartChain: true,
+      avalanche: true,
+    },
+    ensCompatibility: {
+      mainnet: true,
+      subDomains: true,
+      offchain: true,
+      L2s: true,
+      customDomains: false,
+      freeUsernames: false,
+    },
+    backupOptions: {
+      cloud: false,
+      local: true,
+      socialRecovery: true,
+    },
+    securityFeatures: {
+      multisig: false,
+      MPC: false,
+      keyRotation: false,
+      transactionScanning: true,
+      limitsAndTimelocks: false,
+      hardwareWalletSupport: true,
+    },
+    availableTestnets: {
+      availableTestnets: true,
+    },
+    license: 'PROPRIETARY',
+    connectionMethods: {
+      walletConnect: true,
+      injected: false,
+      embedded: false,
+      inappBrowser: false,
+    },
+    modularity: {
+      modularity: false,
+    },
+  },
+  browser: {
+    accountType: 'EOA',
+    chainCompatibility: {
+      configurable: true,
+      autoswitch: true,
+      ethereum: true,
+      optimism: true,
+      arbitrum: true,
+      base: true,
+      polygon: true,
+      gnosis: true,
+      bnbSmartChain: true,
+      avalanche: true,
+    },
+    ensCompatibility: {
+      mainnet: true,
+      subDomains: true,
+      offchain: true,
+      L2s: true,
+      customDomains: false,
+      freeUsernames: false,
+    },
+    backupOptions: {
+      cloud: false,
+      local: true,
+      socialRecovery: true,
+    },
+    securityFeatures: {
+      multisig: false,
+      MPC: false,
+      keyRotation: false,
+      transactionScanning: true,
+      limitsAndTimelocks: false,
+      hardwareWalletSupport: true,
+    },
+    availableTestnets: {
+      availableTestnets: true,
+    },
+    license: 'PROPRIETARY',
+    connectionMethods: {
+      walletConnect: false,
+      injected: true,
+      embedded: false,
+      inappBrowser: false,
+    },
+    modularity: {
+      modularity: false,
+    },
+  },
+};
