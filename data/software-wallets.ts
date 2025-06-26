@@ -4,6 +4,7 @@ import { ambire } from './software-wallets/ambire';
 import { coinbase } from './software-wallets/coinbase';
 import { daimo } from './software-wallets/daimo';
 import { elytro } from './software-wallets/elytro';
+import { enkrypt } from './software-wallets/enkrypt';
 import { family } from './software-wallets/family';
 import { frame } from './software-wallets/frame';
 import { metamask } from './software-wallets/metamask';
@@ -20,6 +21,7 @@ export const softwareWallets = {
   coinbase,
   daimo,
   elytro,
+  enkrypt,
   family,
   frame,
   metamask,
