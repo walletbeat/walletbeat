@@ -1,28 +1,86 @@
 ---
-import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
-import Layout from '../../layouts/Layout.astro'
-import { walletNavigationGroups } from '@/components/CriteriaPage'
-import { navigationAbout } from '@/components/navigation'
-import { Eip7702Adoption } from '@/ui/organisms/Eip7702Adoption'
+// Types/constants
+import { defaultNavigationItems } from '@/components/navigation'
+import { repositoryUrl } from '@/constants'
+
+
+// Components
+import Layout from '@/layouts/Layout.astro'
+import Eip7702Table from '@/ui/organisms/Eip7702Table.svelte'
+import Navigation from '@/ui/organisms/Navigation.astro'
+import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 ---
 
 <Layout
 	metadata={{
 		title: 'Walletbeat - EIP-7702 wallet adoption',
+		description: 'Which wallets implement EIP-7702? Track the adoption of EIP-7702 across the Ethereum wallet ecosystem.',
 	}}
 >
-	<NavigationPageLayout
-		groups={[
-			...walletNavigationGroups,
-			{
-				id: 'about',
-				items: [navigationAbout],
-				overflow: false,
-			},
-		]}
-		selectedGroupId='wallet'
-		selectedItemId='eip-7702-tracker'
-	>
-		<Eip7702Adoption />
-	</NavigationPageLayout>
+	<Navigation
+    navigationItems={defaultNavigationItems}
+  />
+
+	<main>
+		<section>
+			<header>
+				<h1>EIP-7702 Adoption Tracker</h1>
+				<p>Which wallets implement <a href="https://eip.tools/eip/7702" target="_blank" rel="noopener noreferrer">EIP-7702</a>? How compliant and standardized is their implementation? Which new 7702-enabled features does each wallet support?</p>
+				<p>Inspired by <a href="https://swiss-knife.xyz/7702beat" target="_blank" rel="noopener noreferrer">7702 Beat</a>, from the great folks at <a href="https://swiss-knife.xyz" target="_blank" rel="noopener noreferrer">Swiss-Knife.xyz</a>. Also check out <a href="https://www.bundlebear.com/eip7702-authorized-contracts/all" target="_blank" rel="noopener noreferrer">BundleBear's EIP-7702 contract tracker</a>!</p>
+			</header>
+
+			<Eip7702Table client:load />
+
+			<footer>
+				<p>Incorrect data? Submit a PR: <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" class="github-link"><span set:html={GitHubIcon}></span>GitHub Repository</a></p>
+			</footer>
+		</section>
+	</main>
 </Layout>
+
+
+<style>
+	header {
+		h1 {
+			font-size: 2.5rem;
+			font-weight: 800;
+			margin-bottom: 1rem;
+		}
+	}
+
+	footer {
+		justify-content: center;
+		margin-top: 2rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--border-color);
+		
+		p {
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+		}
+		
+		.github-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			margin-left: 0.5rem;
+			padding: 0.5rem 1rem;
+			background: var(--background-primary);
+			border: 1px solid var(--border-color);
+			border-radius: 0.375rem;
+			text-decoration: none;
+			color: var(--text-primary);
+			
+			&:hover {
+				background: var(--background-secondary);
+				text-decoration: none;
+			}
+			
+			span {
+				width: 1rem;
+				height: 1rem;
+				opacity: 0.8;
+			}
+		}
+	}
+</style>
