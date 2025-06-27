@@ -161,7 +161,7 @@ export const enkrypt: SoftwareWallet = {
       bugBountyProgram: {
         type: BugBountyProgramType.BASIC,
         upgradePathAvailable: false,
-        url: 'https://hackenproof.com/programs/myetherwallet',
+        url: 'https://hackenproof.com/programs/enkrypt-wallet',
       },
       hardwareWalletSupport: {
         [Variant.BROWSER]: {
