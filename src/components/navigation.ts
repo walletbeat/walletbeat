@@ -76,9 +76,9 @@ export const navigationFarcasterChannel = {
 } as const satisfies NavigationItem
 
 export const defaultNavigationItems = [
-	{
-		...navigationHome,
-		children: [
+	// {
+	// 	...navigationHome,
+	// 	children: [
 			{
 				id: 'software-wallets',
 				title: 'Software Wallets',
@@ -184,8 +184,8 @@ export const defaultNavigationItems = [
 					},
 				],
 			},
-		],
-	},
+	// 	],
+	// },
 	navigationAbout,
 	navigationFaq,
 	navigationRepository,
