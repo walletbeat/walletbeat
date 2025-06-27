@@ -2,12 +2,14 @@
 // Types/constants
 import { defaultNavigationItems } from '@/components/navigation'
 import { repositoryUrl } from '@/constants'
+import { markdown } from '@/types/content'
 
 
 // Components
 import Layout from '@/layouts/Layout.astro'
 import Eip7702Table from '@/ui/organisms/Eip7702Table.svelte'
 import Navigation from '@/ui/organisms/Navigation.astro'
+import Typography from '@/ui/atoms/Typography.svelte'
 import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 ---
 
@@ -24,9 +26,17 @@ import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 	<main>
 		<section>
 			<header>
-				<h1>EIP-7702 Adoption Tracker</h1>
-				<p>Which wallets implement <a href="https://eip.tools/eip/7702" target="_blank" rel="noopener noreferrer">EIP-7702</a>? How compliant and standardized is their implementation? Which new 7702-enabled features does each wallet support?</p>
-				<p>Inspired by <a href="https://swiss-knife.xyz/7702beat" target="_blank" rel="noopener noreferrer">7702 Beat</a>, from the great folks at <a href="https://swiss-knife.xyz" target="_blank" rel="noopener noreferrer">Swiss-Knife.xyz</a>. Also check out <a href="https://www.bundlebear.com/eip7702-authorized-contracts/all" target="_blank" rel="noopener noreferrer">BundleBear's EIP-7702 contract tracker</a>!</p>
+				<Typography
+					content={
+						markdown(`
+							# EIP-7702 Adoption Tracker
+
+							Which wallets implement [EIP-7702](https://eip.tools/eip/7702)? How compliant and standardized is their implementation? Which new 7702-enabled features does each wallet support?
+
+							Inspired by [7702 Beat](https://swiss-knife.xyz/7702beat), from the great folks at [Swiss-Knife.xyz](https://swiss-knife.xyz). Also check out [BundleBear's EIP-7702 contract tracker](https://www.bundlebear.com/eip7702-authorized-contracts/all)!
+						`)
+					}
+				/>
 			</header>
 
 			<Eip7702Table
