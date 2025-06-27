@@ -206,7 +206,17 @@
 
 			{#if typeFor7702 === WalletTypeFor7702.EIP7702}
 				<Tooltip placement="block-start">
-					<span class="tag" data-tag-type="eip">EIP-7702</span>
+					<button
+						class="tag"
+						data-tag-type="eip"
+						aria-label="Filter by EIP-7702"
+						onclick={e => {
+							e.stopPropagation()
+							toggleFilterById!('accountType-eip7702')
+						}}
+					>
+						EIP-7702
+					</button>
 
 					{#snippet tooltip()}
 						<EipDetails eip={eip7702} />
@@ -214,7 +224,17 @@
 				</Tooltip>
 			{:else if typeFor7702 === WalletTypeFor7702.EIP4337}
 				<Tooltip placement="block-start">
-					<span class="tag" data-tag-type="eip">ERC-4337</span>
+					<button
+						class="tag"
+						data-tag-type="eip"
+						aria-label="Filter by ERC-4337"
+						onclick={e => {
+							e.stopPropagation()
+							toggleFilterById!('accountType-erc4337')
+						}}
+					>
+						ERC-4337
+					</button>
 
 					{#snippet tooltip()}
 						<EipDetails eip={erc4337} />
@@ -222,7 +242,17 @@
 				</Tooltip>
 			{:else}
 				{#if typeFor7702 === WalletTypeFor7702.NON_7702_EOA}
-					<span class="tag" data-tag-type="eoa">EOA</span>
+					<button
+						class="tag"
+						data-tag-type="eoa"
+						aria-label="Filter by EOA"
+						onclick={e => {
+							e.stopPropagation()
+							toggleFilterById!('accountType-eoa')
+						}}
+					>
+						EOA
+					</button>
 				{/if}
 
 				<small class="muted-text">(non-7702)</small>
@@ -355,6 +385,15 @@
 			--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.30 0.07 300));
 			--tag-hover-textColor: light-dark(oklch(0.60 0.18 300), oklch(0.85 0.15 300));
 			--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.50 0.10 300));
+		}
+
+		&[data-tag-type='eoa'] {
+			--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
+			--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.70 0.25 145));
+			--tag-borderColor: light-dark(oklch(0.90 0.06 145), oklch(0.40 0.08 145));
+			--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
+			--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
+			--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
 		}
 	}
 
