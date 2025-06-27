@@ -29,7 +29,9 @@ import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 				<p>Inspired by <a href="https://swiss-knife.xyz/7702beat" target="_blank" rel="noopener noreferrer">7702 Beat</a>, from the great folks at <a href="https://swiss-knife.xyz" target="_blank" rel="noopener noreferrer">Swiss-Knife.xyz</a>. Also check out <a href="https://www.bundlebear.com/eip7702-authorized-contracts/all" target="_blank" rel="noopener noreferrer">BundleBear's EIP-7702 contract tracker</a>!</p>
 			</header>
 
-			<Eip7702Table client:load />
+			<Eip7702Table
+				client:load
+			/>
 
 			<footer>
 				<p>Incorrect data? Submit a PR: <a href={repositoryUrl} target="_blank" rel="noopener noreferrer" class="github-link"><span set:html={GitHubIcon}></span>GitHub Repository</a></p>
