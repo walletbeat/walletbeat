@@ -159,8 +159,9 @@ export const mewportfolio: SoftwareWallet = {
         [Variant.BROWSER]: {
           ref: [
             {
-              explanation: 'Enkrypt fully supports Ledger and Trezor hardware wallets.',
-              url: 'https://enkrypt.com/download',
+              explanation:
+                'MyEtherWallet fully supports Ledger, Trezor, KeepKey, BitBox02 and CoolWallet hardware wallets.',
+              url: 'https://myetherwallet.com/',
             },
           ],
           supportedWallets: {
