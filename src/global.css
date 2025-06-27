@@ -305,7 +305,7 @@ span svg {
 	--tag-hover-textColor: light-dark(var(--accent), rgb(187, 147, 255));
 	--tag-hover-borderColor: light-dark(rgba(108, 36, 224, 0.3), rgba(108, 36, 224, 0.4));
 
-	font-size: 0.55em;
+	font-size: 0.66em;
 
 	display: inline-flex;
 	align-items: center;
