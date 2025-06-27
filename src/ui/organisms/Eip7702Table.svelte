@@ -222,37 +222,39 @@
 						<EipDetails eip={eip7702} />
 					{/snippet}
 				</Tooltip>
-			{:else if typeFor7702 === WalletTypeFor7702.EIP4337}
-				<Tooltip placement="block-start">
-					<button
-						class="tag"
-						data-tag-type="eip"
-						aria-label="Filter by ERC-4337"
-						onclick={e => {
-							e.stopPropagation()
-							toggleFilterById!('accountType-erc4337')
-						}}
-					>
-						ERC-4337
-					</button>
-
-					{#snippet tooltip()}
-						<EipDetails eip={erc4337} />
-					{/snippet}
-				</Tooltip>
 			{:else}
-				{#if typeFor7702 === WalletTypeFor7702.NON_7702_EOA}
-					<button
-						class="tag"
-						data-tag-type="eoa"
-						aria-label="Filter by EOA"
-						onclick={e => {
-							e.stopPropagation()
-							toggleFilterById!('accountType-eoa')
-						}}
-					>
-						EOA
-					</button>
+				{#if typeFor7702 === WalletTypeFor7702.EIP4337}
+					<Tooltip placement="block-start">
+						<button
+							class="tag"
+							data-tag-type="eip"
+							aria-label="Filter by ERC-4337"
+							onclick={e => {
+								e.stopPropagation()
+								toggleFilterById!('accountType-erc4337')
+							}}
+						>
+							ERC-4337
+						</button>
+
+						{#snippet tooltip()}
+							<EipDetails eip={erc4337} />
+						{/snippet}
+					</Tooltip>
+				{:else}
+					{#if typeFor7702 === WalletTypeFor7702.NON_7702_EOA}
+						<button
+							class="tag"
+							data-tag-type="eoa"
+							aria-label="Filter by EOA"
+							onclick={e => {
+								e.stopPropagation()
+								toggleFilterById!('accountType-eoa')
+							}}
+						>
+							EOA
+						</button>
+					{/if}
 				{/if}
 
 				<small class="muted-text">(non-7702)</small>
@@ -394,6 +396,10 @@
 			--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
 			--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
 			--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
+		}
+
+		:global(button:has(&)) {
+			display: inline-flex;
 		}
 	}
 
