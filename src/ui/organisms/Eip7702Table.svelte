@@ -25,6 +25,14 @@
 	} as const
 
 
+	// Props
+	let {
+		title
+	}: {
+		title?: string
+	} = $props()
+
+
 	// Functions
 	import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
 	import { getVariantResolvedWallet, getWalletVariants, walletSupportedAccountTypes } from '@/schema/wallet'
@@ -92,6 +100,10 @@
 	data-sticky="inline"
 	class="row wrap"
 >
+	{#if title}
+		<h2>{title}</h2>
+	{/if}
+
 	<Filters
 		items={Object.values(ratedSoftwareWallets)}
 		filterGroups={[
