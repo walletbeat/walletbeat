@@ -4,7 +4,7 @@ import { WalletProfile } from '@/schema/features/profile';
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
-import { featureSupported, notSupported, supported } from '@/schema/features/support';
+import { notSupported, supported } from '@/schema/features/support';
 import { Variant } from '@/schema/variants';
 import type { SoftwareWallet } from '@/schema/wallet';
 import { paragraph } from '@/types/content';
@@ -88,12 +88,39 @@ export const zerion: SoftwareWallet = {
       hardwareWalletSupport: {
         ref: [
           {
-            explanation: 'Ledger.com has a page dedicated to Zerion.',
+            explanation:
+              'Right now Ledger is the lone first-class citizen in Zerion, but the WalletConnect & external-wallet routes mean you can still sign (or at least track) with Trezor, Keystone, GridPlus, and practically any other cold-storage solution—just with one extra hop.',
             url: ['https://www.ledger.com/zerion'],
           },
         ],
         supportedWallets: {
-          [HardwareWalletType.LEDGER]: featureSupported,
+          [HardwareWalletType.LEDGER]: supported({
+            ref: {
+              explanation: 'Ledger has native first-class support in Zerion.',
+              url: 'https://www.ledger.com/zerion',
+            },
+          }),
+          [HardwareWalletType.TREZOR]: supported({
+            ref: {
+              explanation:
+                'Trezor can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
+              url: 'https://www.ledger.com/zerion',
+            },
+          }),
+          [HardwareWalletType.KEYSTONE]: supported({
+            ref: {
+              explanation:
+                'Keystone can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
+              url: 'https://www.ledger.com/zerion',
+            },
+          }),
+          [HardwareWalletType.GRIDPLUS]: supported({
+            ref: {
+              explanation:
+                'GridPlus can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
+              url: 'https://www.ledger.com/zerion',
+            },
+          }),
         },
       },
       lightClient: {
