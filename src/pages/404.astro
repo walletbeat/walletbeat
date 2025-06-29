@@ -1,25 +1,25 @@
 ---
 // Constants
-import { betaSiteRoot } from '@/constants';
+import { betaSiteRoot } from '@/constants'
 
 // Layouts
-import Layout from '../layouts/Layout.astro';
+import Layout from '../layouts/Layout.astro'
 
 // Components
-import { IconLink } from '@/ui/atoms/IconLink';
-import { Typography } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
+import { IconLink } from '@/ui/atoms/IconLink'
+import { Typography } from '@mui/material'
+import HomeIcon from '@mui/icons-material/Home'
 ---
 
 <Layout
-  metadata={{
-    title: 'Page not found | Walletbeat',
-  }}
+	metadata={{
+		title: 'Page not found | Walletbeat',
+	}}
 >
-  <div class='max-w-full flex flex-col items-center'>
-    <div class='min-h-screen max-w-full flex flex-col items-center justify-center px-2'>
-      <Typography variant='h1' fontWeight={600} mt={1} maxWidth='90vw'> 404 </Typography>
-      <IconLink href={`${betaSiteRoot}/`} IconComponent={HomeIcon}> Home </IconLink>
-    </div>
-  </div>
+	<div class='max-w-full flex flex-col items-center'>
+		<div class='min-h-screen max-w-full flex flex-col items-center justify-center px-2'>
+			<Typography variant='h1' fontWeight={600} mt={1} maxWidth='90vw'> 404 </Typography>
+			<IconLink href={`${betaSiteRoot}/`} IconComponent={HomeIcon}> Home </IconLink>
+		</div>
+	</div>
 </Layout>
