@@ -1,0 +1,33 @@
+Here is a rough audio-to-text transcript call about Walletbeat, an open-source project to rate Ethereum wallets.
+This transcript may contain inaccuracies due of the audio quality of the call, and of the text-to-speech transcription.
+Your task is to provide an accurate high-level summary of this meeting,
+taking into consideration that the transcript may not be entirely accurate due to these transcription errors.
+
+Transcript:
+
+```
+<Transcript here>
+```
+
+End of transcript.
+
+Here are the manually-written meeting notes of the meeting.
+These notes may not be in the same chronological order as the meeting transcript.
+
+```
+<Markdown-formatted manual meeting notes here>
+```
+
+Review the entire transcript and meeting notes, then answer the following questions:
+
+- Who were the attendees?
+- What were the main segments of the call? For each of them, ensure your description answers the following questions:
+  - What was the topic?
+  - What was the purpose of bringing up this topic?
+  - Was there a problem to be solved? If so, what solutions were proposed?
+  - Was there debate or unresolved questions at the end of this segment?
+  - What actions or follow-up items should be taken as a result of this discussion?
+
+Finally, provide a high-level summary of the call in its entirety.
+
+As you answer through these questions, you can and you should go into technical details as much as possible, as the purpose of this summary is for the project's own meeting minutes document which is meant to be a document of record of this meeting. So no not over-simplify the analysis.
