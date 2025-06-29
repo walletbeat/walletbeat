@@ -6,7 +6,6 @@ import {
   type Value,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
-import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support';
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
 import { isSupported } from '@/schema/features/support';
 import { popRefs } from '@/schema/reference';
@@ -168,19 +167,8 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
       );
     }
 
-    // @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
-    // 	all such wallet have the opportunity to support hardware wallet to provide better security for the user
-    // Check for ERC-4337 smart wallet support
-    if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
-      return exempt(
-        hardwareWalletSupport,
-        sentence(
-          'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
-        ),
-        brand,
-        { supportedHardwareWallets: [] },
-      );
-    }
+    // @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it should not be exempt from this statistic
+    // 	all such wallets have the opportunity to support hardware wallets to provide better security for the user
 
     if (features.security.hardwareWalletSupport === null) {
       return unrated(hardwareWalletSupport, brand, { supportedHardwareWallets: [] });

@@ -322,20 +322,40 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
         url: 'https://immunefi.com/bug-bounty/ambire/information/',
       },
       hardwareWalletSupport: {
-        [Variant.BROWSER]: {
-          ref: [
-            {
+        ref: {
+          explanation:
+            'You can natively sign transactions with Ledger, Trezor, or GridPlus Lattice1 in Ambire.',
+          url: 'https://www.ambire.com/',
+        },
+        supportedWallets: {
+          [HardwareWalletType.LEDGER]: supported({
+            ref: {
+              explanation:
+                'Ambire supports native transaction signing with Ledger hardware wallets.',
               url: 'https://www.ambire.com/',
             },
-          ],
-          supportedWallets: {
-            [HardwareWalletType.LEDGER]: featureSupported,
-            [HardwareWalletType.GRIDPLUS]: featureSupported,
-            [HardwareWalletType.TREZOR]: featureSupported,
-            [HardwareWalletType.FIREFLY]: notSupported,
-            [HardwareWalletType.KEEPKEY]: notSupported,
-            [HardwareWalletType.KEYSTONE]: notSupported,
-          },
+          }),
+          [HardwareWalletType.TREZOR]: supported({
+            ref: {
+              explanation:
+                'Ambire supports native transaction signing with Trezor hardware wallets.',
+              url: 'https://www.ambire.com/',
+            },
+          }),
+          [HardwareWalletType.GRIDPLUS]: supported({
+            ref: {
+              explanation:
+                'Ambire supports native transaction signing with GridPlus Lattice1 hardware wallets.',
+              url: 'https://www.ambire.com/',
+            },
+          }),
+          [HardwareWalletType.KEYSTONE]: supported({
+            ref: {
+              explanation:
+                'Ambire supports Keystone hardware wallets through connector integration (non-native).',
+              url: 'https://www.ambire.com/',
+            },
+          }),
         },
       },
       lightClient: {
