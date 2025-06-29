@@ -1,28 +1,64 @@
 ---
-export const prerender = true;
-import Layout from '@/layouts/Layout.astro';
-import { getAttributeGroupById } from '@/schema/attribute-groups';
-import { CriteriaPage, getStaticPathsForWalletType } from '@/components/CriteriaPage';
-import { representativeWalletForType } from '@/data/wallets';
-import { WalletType } from '@/schema/wallet-types';
+// Types/constants
+import { WalletType } from '@/schema/wallet-types'
+import { defaultNavigationItems } from '@/components/navigation'
+import { representativeWalletForType } from '@/data/wallets'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
 
-export const getStaticPaths = getStaticPathsForWalletType(WalletType.HARDWARE);
-const { attrGroupId } = Astro.params;
+// Functions
+import { getAttributeGroupById } from '@/schema/attribute-groups'
+import { displayedAttributeIdsForWalletType } from '@/schema/wallet-navigation'
+
+
+// Context
+export const prerender = true
+
+export const getStaticPaths = () => (
+	displayedAttributeIdsForWalletType(WalletType.HARDWARE)
+		.map(attrGroupId => ({
+			params: { attrGroupId },
+		}))
+)
+
+const { attrGroupId } = Astro.params
+
+
+// Data
 const attrGroup = getAttributeGroupById(
-  attrGroupId,
-  representativeWalletForType(WalletType.HARDWARE).overall,
-);
-if (attrGroup === null) {
-  throw new Error('Invalid attribute group');
-}
+	attrGroupId,
+	representativeWalletForType(WalletType.HARDWARE).overall,
+)
+
+if (!attrGroup)
+	throw new Error('Invalid attribute group')
+
+
+// Components
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/ui/organisms/Navigation.astro'
+import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
 
 <Layout
-  metadata={{
-    title: `${attrGroup.displayName} - Walletbeat`,
-    description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
-    keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
-  }}
+	metadata={{
+		title: `${attrGroup.displayName} - Walletbeat`,
+		description: `Learn how ${attrGroup.displayName} impacts your wallet experience.`,
+		keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
+	}}
 >
-  <CriteriaPage walletType={WalletType.HARDWARE} attrGroupId={attrGroupId} client:load />
+	<Navigation
+		navigationItems={defaultNavigationItems}
+	/>
+	
+	<main>
+		<section>
+			<WalletTable
+				client:load
+				title="Hardware Wallets"
+				wallets={Object.values(ratedHardwareWallets)}
+				attributeGroups={[attrGroup]}
+				expandByDefault={true}
+			/>
+		</section>
+	</main>
 </Layout>

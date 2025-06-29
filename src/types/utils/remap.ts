@@ -6,11 +6,11 @@
  * @returns The remapped object.
  */
 export function remap<R1 extends Record<K, V1>, V2, K extends string | number | symbol, V1>(
-  obj: R1,
-  map: (k: K, v: V1) => V2,
+	obj: R1,
+	map: (k: K, v: V1) => V2,
 ): { [k in keyof R1]: V2 } {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that the output object structure will match this.
-  return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, map(k as K, v as V1)])) as {
-    [k in keyof R1]: V2;
-  };
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that the output object structure will match this.
+	return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, map(k as K, v as V1)])) as {
+		[k in keyof R1]: V2
+	}
 }
