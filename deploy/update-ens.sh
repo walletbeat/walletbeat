@@ -8,7 +8,7 @@ if [[ -z "$ENS_DOMAIN" ]]; then
 	exit 1
 fi
 if [[ -z "${DEPLOY_DIRECTORY:-}" ]]; then
-  echo 'Missing DEPLOY_DIRECTORY' >&2
+	echo 'Missing DEPLOY_DIRECTORY' >&2
 	exit 1
 fi
 if [[ -z "${BLUMEN_PK:-}" ]]; then

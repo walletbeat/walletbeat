@@ -16,7 +16,7 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [[ "$1" != "--checkpoint-only" ]]; then
-  HELIOS_VERSION="$1"
+	HELIOS_VERSION="$1"
 	RELEASE_ARTIFACTS=(
 		helios_linux_amd64.tar.gz
 		helios_linux_arm64.tar.gz
