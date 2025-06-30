@@ -6,7 +6,10 @@ import {
   type Value,
 } from '@/schema/attributes';
 import type { ResolvedFeatures } from '@/schema/features';
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import {
+  HardwareWalletConnection,
+  HardwareWalletType,
+} from '@/schema/features/security/hardware-wallet-support';
 import { isSupported } from '@/schema/features/support';
 import { popRefs } from '@/schema/reference';
 import { type AtLeastOneVariant } from '@/schema/variants';
@@ -110,16 +113,17 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		the hardware solution that best fits their needs and preferences.
 	`),
   methodology: markdown(`
-		Wallets are evaluated based on their support for popular hardware wallet devices.
+		Wallets are evaluated based on their direct integration with popular hardware wallet devices.
 		
 		A wallet receives a passing rating if it supports 3 out of 4 major hardware
-		wallet brands: Ledger, Trezor, Keystone, and GridPlus. Allowing users to perform all
-		essential operations using these hardware wallets.
+		wallet brands with direct connections (USB, webUSB, webHID, Bluetooth, or QR): 
+		Ledger, Trezor, Keystone, and GridPlus. Hardware wallets accessible only through 
+		WalletConnect are not counted as they require relying on another third party.
 		
 		A wallet receives a partial rating if it supports at least one hardware wallet
-		brand but doesn't support 3 out of 4 major brands mentioned above.
+		brand with direct connection but doesn't support 3 out of 4 major brands mentioned above.
 		
-		A wallet fails this attribute if it doesn't support any hardware wallets.
+		A wallet fails this attribute if it doesn't support any hardware wallets with direct connections.
 	`),
   ratingScale: {
     display: 'pass-fail',
@@ -180,13 +184,27 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
     const supportedWallets: HardwareWalletType[] = [];
     const hwSupport = withoutRefs.supportedWallets;
 
-    // Check which hardware wallets are supported
+    // Check which hardware wallets are supported with direct connections (not just WALLET_CONNECT)
     Object.entries(hwSupport).forEach(([walletType, support]) => {
       if (isSupported(support)) {
-        // Type assertion is safe because we're iterating over keys of hwSupport
-        // which are HardwareWalletType values
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're iterating over hwSupport keys
-        supportedWallets.push(walletType as HardwareWalletType);
+        // Check if the hardware wallet has any direct connection methods (not just WALLET_CONNECT)
+        const hasDirectConnection = Object.entries(support).some(
+          ([connectionType, connectionSupport]) => {
+            return (
+              connectionType !== HardwareWalletConnection.WALLET_CONNECT.toString() &&
+              typeof connectionSupport === 'object' &&
+              connectionSupport !== null &&
+              isSupported(connectionSupport)
+            );
+          },
+        );
+
+        if (hasDirectConnection) {
+          // Type assertion is safe because we're iterating over keys of hwSupport
+          // which are HardwareWalletType values
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're iterating over hwSupport keys
+          supportedWallets.push(walletType as HardwareWalletType);
+        }
       }
     });
 
