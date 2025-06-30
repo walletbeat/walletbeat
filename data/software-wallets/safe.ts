@@ -109,20 +109,14 @@ export const safe: SoftwareWallet = {
             }),
           }),
           [HardwareWalletType.TREZOR]: supported({
-            [HardwareWalletConnection.webUSB]: supported({
+            [HardwareWalletConnection.WALLET_CONNECT]: supported({
               ref: {
-                explanation: 'Safe natively supports Trezor hardware wallets over USB connection.',
+                explanation: 'Safe supports Trezor hardware wallets via WalletConnect.',
                 url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
               },
             }),
           }),
           [HardwareWalletType.KEYSTONE]: supported({
-            [HardwareWalletConnection.QR]: supported({
-              ref: {
-                explanation: 'Safe supports Keystone hardware wallets via QR code / WalletConnect.',
-                url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
-              },
-            }),
             [HardwareWalletConnection.WALLET_CONNECT]: supported({
               ref: {
                 explanation: 'Safe supports Keystone hardware wallets via QR code / WalletConnect.',
@@ -131,13 +125,6 @@ export const safe: SoftwareWallet = {
             }),
           }),
           [HardwareWalletType.GRIDPLUS]: supported({
-            [HardwareWalletConnection.QR]: supported({
-              ref: {
-                explanation:
-                  'Safe supports GridPlus Lattice1 hardware wallets via QR code / WalletConnect.',
-                url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
-              },
-            }),
             [HardwareWalletConnection.WALLET_CONNECT]: supported({
               ref: {
                 explanation:
