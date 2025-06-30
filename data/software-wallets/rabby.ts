@@ -1,3 +1,4 @@
+import { nconsigny } from '@/data/contributors/nconsigny';
 import { polymutex } from '@/data/contributors/polymutex';
 import { AccountType } from '@/schema/features/account-support';
 import {
@@ -6,7 +7,10 @@ import {
   RegularEndpoint,
 } from '@/schema/features/privacy/data-collection';
 import { WalletProfile } from '@/schema/features/profile';
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import {
+  HardwareWalletConnection,
+  HardwareWalletType,
+} from '@/schema/features/security/hardware-wallet-support';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits';
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability';
@@ -34,7 +38,7 @@ export const rabby: SoftwareWallet = {
 			Rabby is a user-friendly Ethereum wallet focusing on smooth UX and security.
 			It features an intuitive transaction preview feature and works on many chains.
 		`),
-    contributors: [polymutex],
+    contributors: [polymutex, nconsigny],
     iconExtension: 'svg',
     lastUpdated: '2024-12-15',
     repoUrl: 'https://github.com/RabbyHub/Rabby',
@@ -206,11 +210,21 @@ export const rabby: SoftwareWallet = {
             },
           ],
           supportedWallets: {
-            [HardwareWalletType.LEDGER]: featureSupported,
-            [HardwareWalletType.TREZOR]: featureSupported,
-            [HardwareWalletType.KEYSTONE]: featureSupported,
-            [HardwareWalletType.GRIDPLUS]: featureSupported,
-            [HardwareWalletType.OTHER]: featureSupported,
+            [HardwareWalletType.LEDGER]: supported({
+              [HardwareWalletConnection.webUSB]: featureSupported,
+            }),
+            [HardwareWalletType.TREZOR]: supported({
+              [HardwareWalletConnection.webUSB]: featureSupported,
+            }),
+            [HardwareWalletType.KEYSTONE]: supported({
+              [HardwareWalletConnection.QR]: featureSupported,
+            }),
+            [HardwareWalletType.GRIDPLUS]: supported({
+              [HardwareWalletConnection.webUSB]: featureSupported,
+            }),
+            [HardwareWalletType.OTHER]: supported({
+              [HardwareWalletConnection.webUSB]: featureSupported,
+            }),
           },
         },
       },
