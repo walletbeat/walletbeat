@@ -5,6 +5,7 @@ import {
   MultiAddressPolicy,
   RegularEndpoint,
 } from '@/schema/features/privacy/data-collection';
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy';
 import { WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
@@ -301,7 +302,8 @@ export const ambire: SoftwareWallet = {
       privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
       transactionPrivacy: {
         defaultFungibleTokenTransferMode: 'PUBLIC',
-        stealthAddresses: notSupported,
+        [PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+        [PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
       },
     },
     profile: WalletProfile.GENERIC,
