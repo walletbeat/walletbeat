@@ -3,7 +3,10 @@ import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+} from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
@@ -105,11 +108,21 @@ export const frame: SoftwareWallet = {
 			hardwareWalletSupport: {
 				ref: null,
 				supportedWallets: {
-					[HardwareWalletType.LEDGER]: featureSupported,
-					[HardwareWalletType.TREZOR]: featureSupported,
-					[HardwareWalletType.KEYSTONE]: featureSupported,
-					[HardwareWalletType.GRIDPLUS]: featureSupported,
-					[HardwareWalletType.OTHER]: featureSupported,
+					[HardwareWalletType.LEDGER]: supported({
+						[HardwareWalletConnection.webUSB]: featureSupported,
+					}),
+					[HardwareWalletType.TREZOR]: supported({
+						[HardwareWalletConnection.webUSB]: featureSupported,
+					}),
+					[HardwareWalletType.KEYSTONE]: supported({
+						[HardwareWalletConnection.QR]: featureSupported,
+					}),
+					[HardwareWalletType.GRIDPLUS]: supported({
+						[HardwareWalletConnection.webUSB]: featureSupported,
+					}),
+					[HardwareWalletType.OTHER]: supported({
+						[HardwareWalletConnection.webUSB]: featureSupported,
+					}),
 				},
 			},
 			lightClient: {

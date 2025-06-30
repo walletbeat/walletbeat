@@ -2,7 +2,10 @@ import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
+import {
+	HardwareWalletConnection,
+	HardwareWalletType,
+} from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -124,7 +127,9 @@ export const coinbase: SoftwareWallet = {
 			hardwareWalletSupport: {
 				ref: null,
 				supportedWallets: {
-					[HardwareWalletType.LEDGER]: featureSupported,
+					[HardwareWalletType.LEDGER]: supported({
+						[HardwareWalletConnection.webUSB]: featureSupported,
+					}),
 				},
 			},
 			lightClient: {
