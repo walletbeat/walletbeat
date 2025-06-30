@@ -1,7 +1,10 @@
 import { lucemans } from '@/data/contributors/lucemans';
 import { AccountType } from '@/schema/features/account-support';
 import { WalletProfile } from '@/schema/features/profile';
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import {
+  HardwareWalletConnection,
+  HardwareWalletType,
+} from '@/schema/features/security/hardware-wallet-support';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
 import { notSupported, supported } from '@/schema/features/support';
@@ -95,31 +98,39 @@ export const zerion: SoftwareWallet = {
         ],
         supportedWallets: {
           [HardwareWalletType.LEDGER]: supported({
-            ref: {
-              explanation: 'Ledger has native first-class support in Zerion.',
-              url: 'https://www.ledger.com/zerion',
-            },
+            [HardwareWalletConnection.webUSB]: supported({
+              ref: {
+                explanation: 'Ledger has native first-class support in Zerion via USB connection.',
+                url: 'https://www.ledger.com/zerion',
+              },
+            }),
           }),
           [HardwareWalletType.TREZOR]: supported({
-            ref: {
-              explanation:
-                'Trezor can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
-              url: 'https://www.ledger.com/zerion',
-            },
+            [HardwareWalletConnection.WALLET_CONNECT]: supported({
+              ref: {
+                explanation:
+                  'Trezor can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
+                url: 'https://www.ledger.com/zerion',
+              },
+            }),
           }),
           [HardwareWalletType.KEYSTONE]: supported({
-            ref: {
-              explanation:
-                'Keystone can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
-              url: 'https://www.ledger.com/zerion',
-            },
+            [HardwareWalletConnection.WALLET_CONNECT]: supported({
+              ref: {
+                explanation:
+                  'Keystone can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
+                url: 'https://www.ledger.com/zerion',
+              },
+            }),
           }),
           [HardwareWalletType.GRIDPLUS]: supported({
-            ref: {
-              explanation:
-                'GridPlus can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
-              url: 'https://www.ledger.com/zerion',
-            },
+            [HardwareWalletConnection.WALLET_CONNECT]: supported({
+              ref: {
+                explanation:
+                  'GridPlus can be used with Zerion via WalletConnect and external-wallet routes, with one extra hop.',
+                url: 'https://www.ledger.com/zerion',
+              },
+            }),
           }),
         },
       },

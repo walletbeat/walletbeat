@@ -1,4 +1,5 @@
 import { jiojosbg } from '@/data/contributors/jiojosbg';
+import { nconsigny } from '@/data/contributors/nconsigny';
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support';
 import {
   Leak,
@@ -7,7 +8,10 @@ import {
 } from '@/schema/features/privacy/data-collection';
 import { WalletProfile } from '@/schema/features/profile';
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program';
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import {
+  HardwareWalletConnection,
+  HardwareWalletType,
+} from '@/schema/features/security/hardware-wallet-support';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import type { SecurityAudit } from '@/schema/features/security/security-audits';
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability';
@@ -121,7 +125,7 @@ export const ambire: SoftwareWallet = {
 			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
 			improving security and user experience.
 			`),
-    contributors: [jiojosbg],
+    contributors: [jiojosbg, nconsigny],
     iconExtension: 'svg',
     lastUpdated: '2025-03-20',
     repoUrl: 'https://github.com/AmbireTech/extension',
@@ -329,32 +333,40 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
         },
         supportedWallets: {
           [HardwareWalletType.LEDGER]: supported({
-            ref: {
-              explanation:
-                'Ambire supports native transaction signing with Ledger hardware wallets.',
-              url: 'https://www.ambire.com/',
-            },
+            [HardwareWalletConnection.webUSB]: supported({
+              ref: {
+                explanation:
+                  'Ambire supports native transaction signing with Ledger hardware wallets.',
+                url: 'https://www.ambire.com/',
+              },
+            }),
           }),
           [HardwareWalletType.TREZOR]: supported({
-            ref: {
-              explanation:
-                'Ambire supports native transaction signing with Trezor hardware wallets.',
-              url: 'https://www.ambire.com/',
-            },
+            [HardwareWalletConnection.webUSB]: supported({
+              ref: {
+                explanation:
+                  'Ambire supports native transaction signing with Trezor hardware wallets.',
+                url: 'https://www.ambire.com/',
+              },
+            }),
           }),
           [HardwareWalletType.GRIDPLUS]: supported({
-            ref: {
-              explanation:
-                'Ambire supports native transaction signing with GridPlus Lattice1 hardware wallets.',
-              url: 'https://www.ambire.com/',
-            },
+            [HardwareWalletConnection.webUSB]: supported({
+              ref: {
+                explanation:
+                  'Ambire supports native transaction signing with GridPlus Lattice1 hardware wallets.',
+                url: 'https://www.ambire.com/',
+              },
+            }),
           }),
           [HardwareWalletType.KEYSTONE]: supported({
-            ref: {
-              explanation:
-                'Ambire supports Keystone hardware wallets through connector integration (non-native).',
-              url: 'https://www.ambire.com/',
-            },
+            [HardwareWalletConnection.QR]: supported({
+              ref: {
+                explanation:
+                  'Ambire supports Keystone hardware wallets through connector integration (non-native).',
+                url: 'https://www.ambire.com/',
+              },
+            }),
           }),
         },
       },

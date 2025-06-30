@@ -1,7 +1,10 @@
 import { nconsigny } from '@/data/contributors/nconsigny';
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support';
 import { WalletProfile } from '@/schema/features/profile';
-import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support';
+import {
+  HardwareWalletConnection,
+  HardwareWalletType,
+} from '@/schema/features/security/hardware-wallet-support';
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification';
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission';
 import { notSupported, supported } from '@/schema/features/support';
@@ -98,29 +101,50 @@ export const safe: SoftwareWallet = {
         },
         supportedWallets: {
           [HardwareWalletType.LEDGER]: supported({
-            ref: {
-              explanation: 'Safe natively supports Ledger hardware wallets over USB connection.',
-              url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
-            },
+            [HardwareWalletConnection.webUSB]: supported({
+              ref: {
+                explanation: 'Safe natively supports Ledger hardware wallets over USB connection.',
+                url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
+              },
+            }),
           }),
           [HardwareWalletType.TREZOR]: supported({
-            ref: {
-              explanation: 'Safe natively supports Trezor hardware wallets over USB connection.',
-              url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
-            },
+            [HardwareWalletConnection.webUSB]: supported({
+              ref: {
+                explanation: 'Safe natively supports Trezor hardware wallets over USB connection.',
+                url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
+              },
+            }),
           }),
           [HardwareWalletType.KEYSTONE]: supported({
-            ref: {
-              explanation: 'Safe supports Keystone hardware wallets via QR code / WalletConnect.',
-              url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
-            },
+            [HardwareWalletConnection.QR]: supported({
+              ref: {
+                explanation: 'Safe supports Keystone hardware wallets via QR code / WalletConnect.',
+                url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
+              },
+            }),
+            [HardwareWalletConnection.WALLET_CONNECT]: supported({
+              ref: {
+                explanation: 'Safe supports Keystone hardware wallets via QR code / WalletConnect.',
+                url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
+              },
+            }),
           }),
           [HardwareWalletType.GRIDPLUS]: supported({
-            ref: {
-              explanation:
-                'Safe supports GridPlus Lattice1 hardware wallets via QR code / WalletConnect.',
-              url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
-            },
+            [HardwareWalletConnection.QR]: supported({
+              ref: {
+                explanation:
+                  'Safe supports GridPlus Lattice1 hardware wallets via QR code / WalletConnect.',
+                url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
+              },
+            }),
+            [HardwareWalletConnection.WALLET_CONNECT]: supported({
+              ref: {
+                explanation:
+                  'Safe supports GridPlus Lattice1 hardware wallets via QR code / WalletConnect.',
+                url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
+              },
+            }),
           }),
         },
       },
