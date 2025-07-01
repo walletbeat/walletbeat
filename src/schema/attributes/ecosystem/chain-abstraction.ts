@@ -48,19 +48,19 @@ function evaluateChainAbstraction(
 				__brand: brand,
 			},
 			details: markdown(`
-        {{WALLET_NAME}} does not display your account's total value across
-        chains. This is a one of many features that wallets need to
-        implement in order to be multi-chain-aware, which is important to
-        the Ethereum L2 roadmap to make L2s seamless for users.
-      `),
+				{{WALLET_NAME}} does not display your account's total value across
+				chains. This is a one of many features that wallets need to
+				implement in order to be multi-chain-aware, which is important to
+				the Ethereum L2 roadmap to make L2s seamless for users.
+			`),
 			howToImprove: markdown(`
-        {{WALLET_NAME}} should implement more cross-chain features, such as:
+				{{WALLET_NAME}} should implement more cross-chain features, such as:
 
-        - Displaying account value across chains
-        - Displaying token balances across chains
-        - Transparent cross-chain bridging
-        - etc.
-      `),
+				- Displaying account value across chains
+				- Displaying token balances across chains
+				- Transparent cross-chain bridging
+				- etc.
+			`),
 			references,
 		}
 	}
@@ -80,24 +80,24 @@ function evaluateChainAbstraction(
 				__brand: brand,
 			},
 			details: markdown(`
-        While {{WALLET_NAME}} can display your account's total value across
-        chains, it does not let you see your token balance (e.g. Ether or
-        USDC) across multiple chains at once. This makes it difficult for you
-        as a user to determine, for example, how much USDC you have.
+				While {{WALLET_NAME}} can display your account's total value across
+				chains, it does not let you see your token balance (e.g. Ether or
+				USDC) across multiple chains at once. This makes it difficult for you
+				as a user to determine, for example, how much USDC you have.
 
-        Cross-chain token balance awareness is a one of many features that
-        wallets need to implement in order to be multi-chain-aware,
-        which is important to the Ethereum L2 roadmap to make L2s seamless
-        for users.
-      `),
+				Cross-chain token balance awareness is a one of many features that
+				wallets need to implement in order to be multi-chain-aware,
+				which is important to the Ethereum L2 roadmap to make L2s seamless
+				for users.
+			`),
 			howToImprove: markdown(`
-        {{WALLET_NAME}} should implement more cross-chain features, such as:
+				{{WALLET_NAME}} should implement more cross-chain features, such as:
 
-        - Displaying account value across chains
-        - Displaying token balances across chains
-        - Transparent cross-chain bridging
-        - etc.
-      `),
+				- Displaying account value across chains
+				- Displaying token balances across chains
+				- Transparent cross-chain bridging
+				- etc.
+			`),
 			references,
 		}
 	}
@@ -114,14 +114,14 @@ function evaluateChainAbstraction(
 				__brand: brand,
 			},
 			details: markdown(`
-        {{WALLET_NAME}} does not provide a built-in way to bridge assets
-        from one chain to another. This is a critical feature for
-        Ethereum's L2 roadmap in order to minimize UX friction when dealing
-        with the reality of multiple chains on top of Ethereum.
-      `),
+				{{WALLET_NAME}} does not provide a built-in way to bridge assets
+				from one chain to another. This is a critical feature for
+				Ethereum's L2 roadmap in order to minimize UX friction when dealing
+				with the reality of multiple chains on top of Ethereum.
+			`),
 			howToImprove: markdown(`
-        {{WALLET_NAME}} should add a built-in bridging feature.
-      `),
+				{{WALLET_NAME}} should add a built-in bridging feature.
+			`),
 			references,
 		}
 	}
@@ -141,21 +141,21 @@ function evaluateChainAbstraction(
 				__brand: brand,
 			},
 			details: markdown(`
-        While {{WALLET_NAME}} can display your account's total value across
-        chains, as well as individual per-chain token balances, it does not
-        let you see your total token balance (for example: Ether or
-        USDC) summed up across multiple chains. This makes it difficult for
-        you as a user to determine, for example, how much USDC you have.
+				While {{WALLET_NAME}} can display your account's total value across
+				chains, as well as individual per-chain token balances, it does not
+				let you see your total token balance (for example: Ether or
+				USDC) summed up across multiple chains. This makes it difficult for
+				you as a user to determine, for example, how much USDC you have.
 
-        Cross-chain token balance awareness is a one of many features that
-        wallets need to implement in order to be multi-chain-aware,
-        which is important to the Ethereum L2 roadmap to make L2s seamless
-        for users.
-      `),
+				Cross-chain token balance awareness is a one of many features that
+				wallets need to implement in order to be multi-chain-aware,
+				which is important to the Ethereum L2 roadmap to make L2s seamless
+				for users.
+			`),
 			howToImprove: markdown(`
-        {{WALLET_NAME}} should have a way to see token balances summed up
-        across chains.
-      `),
+				{{WALLET_NAME}} should have a way to see token balances summed up
+				across chains.
+			`),
 			references,
 		}
 	}
@@ -176,37 +176,37 @@ function evaluateChainAbstraction(
 					: 'Non-transparent cross-chain bridging fees',
 				rating: Rating.PARTIAL,
 				shortExplanation: sentence(`
-          {{WALLET_NAME}} implements cross-chain bridging,
-          but does not
-          ${feesHidden ? 'straightforwardly display' : 'display'}
-          the fees involved in doing so.
-        `),
+					{{WALLET_NAME}} implements cross-chain bridging,
+					but does not
+					${feesHidden ? 'straightforwardly display' : 'display'}
+					the fees involved in doing so.
+				`),
 				__brand: brand,
 			},
 			details: markdown(`
-        {{WALLET_NAME}} has a built-in cross-chain bridging feature, but
-        it does not display the fees involved in using this bridging
-        feature${feesHidden ? '' : ' by default'}.
-        You as a user deserve to know where your money is going.
+				{{WALLET_NAME}} has a built-in cross-chain bridging feature, but
+				it does not display the fees involved in using this bridging
+				feature${feesHidden ? '' : ' by default'}.
+				You as a user deserve to know where your money is going.
 
-        Cross-chain bridges inevitably involve one or more types of fees,
-        such as:
+				Cross-chain bridges inevitably involve one or more types of fees,
+				such as:
 
-        - Gas fees of the chain funds are sent from
-        - Bridging service fees
-        - Cross-chain liquidity provider fees
-        - (Sometimes) Gas fees of the chain funds are sent to
-        - Wallet development teams may also add a fee on top of the
-          wallet's native bridging feature.
-      `),
+				- Gas fees of the chain funds are sent from
+				- Bridging service fees
+				- Cross-chain liquidity provider fees
+				- (Sometimes) Gas fees of the chain funds are sent to
+				- Wallet development teams may also add a fee on top of the
+					wallet's native bridging feature.
+			`),
 			howToImprove: markdown(`
-        {{WALLET_NAME}} should display the fees involved in using its
-        bridging feature by default.
-        While it may already display the expected amount received on
-        the target chain, you as a user should be able to know who
-        this fee is going to, broken down between all the parties that
-        take a cut.
-      `),
+				{{WALLET_NAME}} should display the fees involved in using its
+				bridging feature by default.
+				While it may already display the expected amount received on
+				the target chain, you as a user should be able to know who
+				this fee is going to, broken down between all the parties that
+				take a cut.
+			`),
 			references,
 		}
 	}
@@ -227,39 +227,39 @@ function evaluateChainAbstraction(
 					: 'Non-transparent cross-chain bridging risks',
 				rating: Rating.PARTIAL,
 				shortExplanation: sentence(`
-          {{WALLET_NAME}} implements cross-chain bridging,
-          but does not
-          ${risksHidden ? 'straightforwardly display' : 'display'}
-          the risks involved in doing so.
-        `),
+					{{WALLET_NAME}} implements cross-chain bridging,
+					but does not
+					${risksHidden ? 'straightforwardly display' : 'display'}
+					the risks involved in doing so.
+				`),
 				__brand: brand,
 			},
 			details: markdown(`
-        {{WALLET_NAME}} has a built-in cross-chain bridging feature, but
-        it does not display the risks involved in using this bridging
-        feature${risksHidden ? '' : ' by default'}.
-        You as a user deserve to know the risks involved in bridging your
-        assets.
+				{{WALLET_NAME}} has a built-in cross-chain bridging feature, but
+				it does not display the risks involved in using this bridging
+				feature${risksHidden ? '' : ' by default'}.
+				You as a user deserve to know the risks involved in bridging your
+				assets.
 
-        Cross-chain bridges inevitably involve one or more types of risks,
-        such as:
+				Cross-chain bridges inevitably involve one or more types of risks,
+				such as:
 
-        - Insufficient liquidity on the target chain
-        - Bridge correctness failure
-        - Risks involved in wrapped assets (when applicable)
-        - Risks involved in L2-to-L2 interop (when applicable)
+				- Insufficient liquidity on the target chain
+				- Bridge correctness failure
+				- Risks involved in wrapped assets (when applicable)
+				- Risks involved in L2-to-L2 interop (when applicable)
 
-        Bridging assets to an L2 chain also inherently implies accepting the
-        risk of that L2 chain, which [our friends at L2BEAT](https://l2beat/)
-        do a great job documenting.
-      `),
+				Bridging assets to an L2 chain also inherently implies accepting the
+				risk of that L2 chain, which [our friends at L2BEAT](https://l2beat/)
+				do a great job documenting.
+			`),
 			howToImprove: markdown(`
-        {{WALLET_NAME}} should display the risks involved in using its
-        bridging feature by default. These are
-        [well-documented on L2BEAT](https://l2beat.com/). However, wallet
-        developers also have a responsibility to make these risks known to
-        users when they bridge assets.
-      `),
+				{{WALLET_NAME}} should display the risks involved in using its
+				bridging feature by default. These are
+				[well-documented on L2BEAT](https://l2beat.com/). However, wallet
+				developers also have a responsibility to make these risks known to
+				users when they bridge assets.
+			`),
 			references,
 		}
 	}
@@ -276,22 +276,22 @@ function evaluateChainAbstraction(
 				__brand: brand,
 			},
 			details: markdown(`
-        {{WALLET_NAME}} abstracts away most cross-chain complexity by
-        implementing:
+				{{WALLET_NAME}} abstracts away most cross-chain complexity by
+				implementing:
 
-        - Global (cross-chain) account valuation.
-        - Cross-chain token balances ("How many Ether do I have
-          across all chains?"), while still allowing the user to go into
-          per-chain balances if they wish.
-        - Cross-chain bridging with transparent fee breakdown and risk
-          explanation.
-      `),
+				- Global (cross-chain) account valuation.
+				- Cross-chain token balances ("How many Ether do I have
+					across all chains?"), while still allowing the user to go into
+					per-chain balances if they wish.
+				- Cross-chain bridging with transparent fee breakdown and risk
+					explanation.
+			`),
 			howToImprove: markdown(`
-        {{WALLET_NAME}} should automatically suggest to use its bridging
-        feature when the user is attempting to spend funds on a chain where
-        they have insufficient balance, while they have sufficient funds on
-        another supported chain.
-      `),
+				{{WALLET_NAME}} should automatically suggest to use its bridging
+				feature when the user is attempting to spend funds on a chain where
+				they have insufficient balance, while they have sufficient funds on
+				another supported chain.
+			`),
 			references,
 		}
 	}
@@ -308,17 +308,17 @@ function evaluateChainAbstraction(
 			__brand: brand,
 		},
 		details: markdown(`
-      {{WALLET_NAME}} abstracts away cross-chain complexity by
-      implementing:
+			{{WALLET_NAME}} abstracts away cross-chain complexity by
+			implementing:
 
-      - Global (cross-chain) account valuation.
-      - Cross-chain token balances ("How many Ether do I have
-        across all chains?"), while still allowing the user to go into
-        per-chain balances if they wish.
-      - Cross-chain bridging with transparent fee breakdown and risk
-        explanation.
-      - Automatically suggesting cross-chain bridging when appropriate.
-    `),
+			- Global (cross-chain) account valuation.
+			- Cross-chain token balances ("How many Ether do I have
+				across all chains?"), while still allowing the user to go into
+				per-chain balances if they wish.
+			- Cross-chain bridging with transparent fee breakdown and risk
+				explanation.
+			- Automatically suggesting cross-chain bridging when appropriate.
+		`),
 		references,
 	}
 }
@@ -354,47 +354,47 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 		'Does the wallet smooth out the complexities of dealing with multiple chains?',
 	),
 	why: markdown(`
-    Ethereum activity is not limited to the main L1 chain; a lot of activity
-    has moved onto rollups and Layer 2 chains. This has allowed Ethereum to
-    scale beyond what its L1 chain can handle, but has also introduced
-    complexity and fragmentation for users and wallets to deal with.
-    They must now deal with token balances fragmented across multiple chains.
+		Ethereum activity is not limited to the main L1 chain; a lot of activity
+		has moved onto rollups and Layer 2 chains. This has allowed Ethereum to
+		scale beyond what its L1 chain can handle, but has also introduced
+		complexity and fragmentation for users and wallets to deal with.
+		They must now deal with token balances fragmented across multiple chains.
 
-    To address the UX impact of this complexity, wallets should provide
-    features to abstract away these issues, while remaining transparent to
-    the user when cross-chain bridging risks or fees are involved.
-  `),
+		To address the UX impact of this complexity, wallets should provide
+		features to abstract away these issues, while remaining transparent to
+		the user when cross-chain bridging risks or fees are involved.
+	`),
 	methodology: markdown(`
-    Wallets are rated based on how much of the complexity involved in dealing
-    with multiple chains is abstracted away from users, while keeping risks
-    and fees transparent.
+		Wallets are rated based on how much of the complexity involved in dealing
+		with multiple chains is abstracted away from users, while keeping risks
+		and fees transparent.
 
-    To get a passing rating, wallets must be cross-chain aware in how they
-    display account value and individual token balances:
+		To get a passing rating, wallets must be cross-chain aware in how they
+		display account value and individual token balances:
 
-    - When displaying the user account's total value, this value should sum
-      up the user's valuations across all chains the wallet supports by
-      default.
-    - When displaying a specific token's balance, the balance should reflect
-      the user's total balance for this token across all chains that the
-      wallet supports by default (and on which the token exists). For rating
-      purposes, Walletbeat looks specifically at Ether and USDT balances.
+		- When displaying the user account's total value, this value should sum
+			up the user's valuations across all chains the wallet supports by
+			default.
+		- When displaying a specific token's balance, the balance should reflect
+			the user's total balance for this token across all chains that the
+			wallet supports by default (and on which the token exists). For rating
+			purposes, Walletbeat looks specifically at Ether and USDT balances.
 
-    In addition, wallets must make it easy for users to move their assets
-    across chains when needed. To get a passing rating, wallets must provide
-    a built-in bridging feature.
+		In addition, wallets must make it easy for users to move their assets
+		across chains when needed. To get a passing rating, wallets must provide
+		a built-in bridging feature.
 
-    - This bridging feature must explain the risks involved in bridging assets
-      across chains. Our friends at [L2BEAT](https://l2beat.com/) do a
-      fantastic job documenting this, but wallet developers also have a duty
-      to explain these risks to their users.
-    - For bridge operations where the net fee is larger than 1bps, the wallet
-      must display the fee breakdown by default.
-    - When the user attempts to send tokens to an address on a chain where the
-      user's own balance is insufficient, but for which there is sufficient
-      balance on another chain, the wallet should automatically propose to use
-      this bridging feature in order to perform the transaction.
-  `),
+		- This bridging feature must explain the risks involved in bridging assets
+			across chains. Our friends at [L2BEAT](https://l2beat.com/) do a
+			fantastic job documenting this, but wallet developers also have a duty
+			to explain these risks to their users.
+		- For bridge operations where the net fee is larger than 1bps, the wallet
+			must display the fee breakdown by default.
+		- When the user attempts to send tokens to an address on a chain where the
+			user's own balance is insufficient, but for which there is sufficient
+			balance on another chain, the wallet should automatically propose to use
+			this bridging feature in order to perform the transaction.
+	`),
 	ratingScale: {
 		display: 'fail-pass',
 		exhaustive: false,
