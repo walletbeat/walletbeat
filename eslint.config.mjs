@@ -77,7 +77,7 @@ export default tseslint.config(
 
 			// indent: ['error', { SwitchCase: 1 }, { SwitchCase: 1 }, { SwitchCase: 1 }, { SwitchCase: 1 }, { SwitchCase: 1 }, { SwitchCase: 1 }, { SwitchCase: 1 }, { SwitchCase: 1 }, { SwitchCase: 1 }, 2],
 			quotes: ['error', 'single', { avoidEscape: true }],
-			semi: ['error', 'always'],
+			semi: 'off', // Enforced by prettier format checks.
 			'no-var': 'error',
 			'prefer-const': 'error',
 			'no-console': ['warn', { allow: ['warn', 'error'] }],
