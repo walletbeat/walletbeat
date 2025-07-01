@@ -47,7 +47,7 @@ export const PizzaSliceChart = <Vs extends ValueSet>({
 		const centerX = 50
 		const centerY = 50
 		const radius = 45
-		const gapAngle = 2 // Gap in degrees
+		const gapAngle = 0 // Gap in degrees
 		const precision = 4 // Number of decimal places to round coordinates to
 
 		const sliceAngle = 360 / attributeCount - gapAngle

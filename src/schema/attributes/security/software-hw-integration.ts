@@ -6,7 +6,6 @@ import {
 	type Value,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
-import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 import { HardwareWalletType } from '@/schema/features/security/hardware-wallet-support'
 import { isSupported } from '@/schema/features/support'
 import { mergeRefs, refs } from '@/schema/reference'
@@ -121,6 +120,29 @@ function excellentHardwareWalletIntegration(
 	}
 }
 
+function hardwareWalletSupportUnrated(
+	supportedWallets: string[] = [],
+): Evaluation<SoftwareHWIntegrationValue> {
+	const supportedWalletsText =
+		supportedWallets.length > 0 ? ` with ${supportedWallets.join(', ')}` : ''
+
+	return {
+		value: {
+			id: 'hw_support_unrated',
+			rating: Rating.UNRATED,
+			displayName: 'Hardware wallet support - unrated',
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports hardware wallets${supportedWalletsText} but hardware wallet integration evaluation is not yet available.`,
+			),
+			integrationLevel: 0,
+			__brand: brand,
+		},
+		details: paragraph(
+			`{{WALLET_NAME}} supports hardware wallet integration${supportedWalletsText}, but the evaluation of its hardware wallet integration quality is not yet available. This rating will be updated as more detailed integration data becomes available.`,
+		),
+	}
+}
+
 export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 	id: 'softwareHWIntegration',
 	icon: '\u{1F517}', // Chain link
@@ -196,42 +218,43 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SoftwareHWIntegrationValue> => {
-		// For hardware wallets, this evaluation doesn't apply
-		if (features.type !== WalletType.HARDWARE) {
-			return {
-				value: {
-					id: 'exempt_hardware_wallet',
-					rating: Rating.EXEMPT,
-					displayName: 'Not applicable for hardware wallets',
-					shortExplanation: sentence(
-						'This attribute evaluates software wallet integration with hardware wallets, which is not applicable for {{WALLET_NAME}} as it is a hardware wallet.',
-					),
-					integrationLevel: 0,
-					__brand: brand,
-				},
-				details: paragraph(
-					'As {{WALLET_NAME}} is a hardware wallet itself, this attribute which evaluates how software wallets integrate with hardware wallets is not applicable.',
-				),
-			}
-		}
-
-		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
-		//	all such wallet have the opportunity to support hardware wallet to provide better security for the user
-		// Check for ERC-4337 smart wallet
-		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
+		// This attribute only applies to software wallets
+		if (features.type === WalletType.HARDWARE) {
 			return exempt(
 				softwareHWIntegration,
 				sentence(
-					'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
+					'This attribute evaluates software wallet integration with hardware wallets, which is not applicable for {{WALLET_NAME}} as it is a hardware wallet.',
 				),
 				brand,
 				{ integrationLevel: 0 },
 			)
 		}
 
+		// For embedded wallets, this evaluation doesn't apply
+		if (features.type === WalletType.EMBEDDED) {
+			return exempt(
+				softwareHWIntegration,
+				sentence(
+					'This attribute is not applicable for {{WALLET_NAME}} as it is an embedded wallet.',
+				),
+				brand,
+				{ integrationLevel: 0 },
+			)
+		}
+
+		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it is should not be exempt from this statistic
+		// 	all such wallet have the opportunity to support hardware wallet to provide better security for the user
+
 		// Check if hardware wallet support feature exists
 		if (features.security.hardwareWalletSupport === null) {
-			return noHardwareWalletSupport()
+			return exempt(
+				softwareHWIntegration,
+				sentence(
+					'This attribute is not applicable for {{WALLET_NAME}} as it does not support hardware wallets.',
+				),
+				brand,
+				{ integrationLevel: 0 },
+			)
 		}
 
 		// Check if any hardware wallets are supported
@@ -276,34 +299,10 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 				}
 			})
 
-		// Check for EIP-712 clear signing support on Safe and Aave
-		// This would need to be added to the features schema to track this data
-		// For now we'll use a placeholder implementation
-
-		// Use the new structured dApp signing data instead of text parsing
-
-		// Check how many hardware wallet brands are supported for these integrations
-		const supportedHWBrands = supportedHardwareWallets.length
-
-		// Generate base evaluation result
-		let result: Evaluation<SoftwareHWIntegrationValue> =
-			basicHardwareWalletIntegration(supportedHardwareWallets)
-
-		// TODO: Implement evaluation logic using the new structured dApp signing features
-		// Check calldataDecoding, calldataExtraction, and DisplayedTransactionDetails
-		// from features.security.hardwareWalletDappSigning.transactionSigning
-
-		// Determine integration level based on hardware wallet support count
-		if (supportedHWBrands >= 2) {
-			result = excellentHardwareWalletIntegration(supportedHardwareWallets)
-		} else if (supportedHWBrands >= 1) {
-			result = goodHardwareWalletIntegration(supportedHardwareWallets, [])
-		}
-
-		// Return result with references if any
+		// If wallet supports any hardware wallet, rate as unrated/grey for now
 		return {
 			references,
-			...result,
+			...hardwareWalletSupportUnrated(supportedHardwareWallets),
 		}
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SoftwareHWIntegrationValue>>) =>
