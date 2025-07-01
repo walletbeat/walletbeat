@@ -25,6 +25,7 @@ import AppWindowIcon from 'lucide-static/icons/app-window.svg?raw'
 import BadgeCheckIcon from 'lucide-static/icons/badge-check.svg?raw'
 import BuildingIcon from 'lucide-static/icons/building-2.svg?raw'
 import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
+import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
 import CpuIcon from 'lucide-static/icons/cpu.svg?raw'
 import GithubIcon from 'lucide-static/icons/github.svg?raw'
 import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
@@ -76,9 +77,9 @@ export const navigationFarcasterChannel = {
 } as const satisfies NavigationItem
 
 export const defaultNavigationItems = [
-	{
-		...navigationHome,
-		children: [
+	// {
+	// 	...navigationHome,
+	// 	children: [
 			{
 				id: 'software-wallets',
 				title: 'Software Wallets',
@@ -116,6 +117,12 @@ export const defaultNavigationItems = [
 									icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
 								}))
 						),
+					},
+					{
+						id: 'eip-7702-tracker',
+						title: 'EIP-7702 Tracker',
+						href: '/wallet/7702',
+						icon: ChartBarIcon,
 					},
 				],
 			},
@@ -184,8 +191,8 @@ export const defaultNavigationItems = [
 					},
 				],
 			},
-		],
-	},
+	// 	],
+	// },
 	navigationAbout,
 	navigationFaq,
 	navigationRepository,
