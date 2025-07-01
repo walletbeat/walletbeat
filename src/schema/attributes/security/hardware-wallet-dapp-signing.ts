@@ -254,7 +254,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 		
 		Full dApp signing implementations ensure that all relevant transaction details (recipient
 		address, amount, fees, etc.) are clearly displayed on the hardware wallet screen, EIP-712 message hashes,
-        and decoded calldata, allowing users to make informed decisions before authorizing transactions.
+		and decoded calldata, allowing users to make informed decisions before authorizing transactions.
 	`),
 	methodology: markdown(`
 		Hardware wallets are evaluated based on their implementation of dApp signing capabilities.
@@ -271,7 +271,6 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 		
 		A hardware wallet fails this attribute if it doesn't properly implement dApp signing functionality,
 		requiring users to trust the connected software wallet without independent verification.
-		
 	`),
 	ratingScale: {
 		display: 'pass-fail',
