@@ -375,9 +375,9 @@ export interface Attribute<V extends Value> {
 				/**
 				 * The order in which each explanation below is displayed:
 				 * - "pass-fail": Passing examples first, failing examples last
-				 * 	(partial examples in the middle, if any).
+				 *   (partial examples in the middle, if any).
 				 * - "fail-pass": Failing examples first, passing examples last
-				 * 	(partial examples in the middle, if any).
+				 *   (partial examples in the middle, if any).
 				 */
 				display: 'pass-fail' | 'fail-pass'
 
