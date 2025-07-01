@@ -1,0 +1,241 @@
+/* eslint-disable */
+
+// Types
+export type Column<
+	RowValue = any,
+	CellValue = any,
+	ColumnId extends string = string
+> = {
+	id: ColumnId
+	name: string
+	isSticky?: boolean
+	isSortable?: boolean
+	defaultSortDirection?: SortDirection
+	getValue: (row: RowValue) => CellValue
+	sorter?: (a: CellValue, b: CellValue, rowA: RowValue, rowB: RowValue) => number
+	children?: Column<RowValue, CellValue, ColumnId>[]
+	defaultIsExpanded?: boolean
+}
+
+type SortDirection = 'asc' | 'desc'
+
+type SortState<
+	ColumnId extends string = string
+> = {
+	columnId: ColumnId
+	direction: SortDirection
+}
+
+import { SvelteSet, SvelteMap } from 'svelte/reactivity'
+
+
+// State
+export class DataTable<
+	RowValue = any,
+	CellValue = any,
+	ColumnId extends string = string
+> {
+	columns: Column<RowValue, CellValue, ColumnId>[] = $state(
+		[]
+	)
+
+	#columnsById = $derived(
+		new SvelteMap(
+			this.columns
+				.flatMap(function flatten(column): typeof column[] {
+					return [
+						column,
+						...column.children?.flatMap(flatten) ?? [],
+					]
+				})
+				.map(column => [
+					column.id,
+					column
+				])
+		)
+	)
+
+	#isColumnExpanded = $state(
+		new SvelteSet<ColumnId>()
+	)
+
+	rows = $state<RowValue[]>(
+		[]
+	)
+
+	pageSize: number = $state(
+		Infinity
+	)
+	currentPage = $state(
+		1
+	)
+
+	#defaultColumnSort?: SortState<ColumnId>
+	columnSort?: SortState<ColumnId> = $state(
+		this.#defaultColumnSort
+	)
+
+	#isRowDisabled?: (row: RowValue, table: DataTable<RowValue, CellValue, ColumnId>) => boolean
+	#displaceDisabledRows: boolean
+
+	rowsSorted = $derived.by(() => {
+		if(!this.columnSort)
+			return this.rows
+
+		const { columnId, direction } = this.columnSort
+
+		const column = this.#columnsById.get(columnId)
+
+		return (
+			this.rows
+				.toSorted((a, b) => {
+					if (this.#displaceDisabledRows && this.#isRowDisabled) {
+						const isRowADisplaced = this.#isRowDisabled(a, this)
+						const isRowBDisplaced = this.#isRowDisabled(b, this)
+
+						if(isRowADisplaced || isRowBDisplaced)
+							return (
+								isRowADisplaced && isRowBDisplaced ?
+									0
+								: isRowADisplaced ?
+									1
+								:
+									-1
+							)
+					}
+
+					const aVal = column?.getValue(a)
+					const bVal = column?.getValue(b)
+
+					return (
+						aVal === undefined || aVal === null ?
+							direction === 'asc' ? 1 : -1
+
+						: bVal === undefined || bVal === null ?
+							direction === 'asc' ? -1 : 1
+
+						: column?.sorter ?
+							direction === 'asc' ?
+								column.sorter(aVal, bVal, a, b)
+							:
+								column.sorter(bVal, aVal, b, a)
+
+						: typeof aVal === 'string' && typeof bVal === 'string' ?
+							direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+
+						: aVal < bVal ?
+							direction === 'asc' ? -1 : 1
+
+						: aVal > bVal ?
+							direction === 'asc' ? 1 : -1
+
+						:
+							0
+					)
+				})
+		)
+	})
+
+	rowsVisible = $derived(
+		this.rowsSorted
+			.slice(
+				((this.currentPage - 1) * this.pageSize || 0),
+				((this.currentPage - 1) * this.pageSize || 0) + this.pageSize
+			)
+	)
+
+	totalPages = $derived(
+		Math.max(1, Math.ceil(this.rows.length / this.pageSize))
+	)
+
+	canGoBack = $derived(
+		this.rows.length > 0 && this.currentPage > 1
+	)
+
+	canGoForward = $derived(
+		this.rows.length > 0 && this.currentPage < this.totalPages
+	)
+
+	columnsVisible = $derived.by(() => {
+		const getVisibleColumns = (columns: Column<RowValue, CellValue, ColumnId>[]): Column<RowValue, CellValue, ColumnId>[] => (
+			columns.flatMap(column => (
+				column.children?.length && this.#isColumnExpanded.has(column.id) ?
+					getVisibleColumns(column.children)
+				:
+					[column]
+			))
+		)
+		return getVisibleColumns(this.columns)
+	})
+
+	constructor({
+		data,
+		columns,
+		pageSize,
+		defaultSort,
+		isRowDisabled,
+		displaceDisabledRows,
+	}: {
+		data: RowValue[]
+		columns: Column<RowValue, CellValue, ColumnId>[]
+		pageSize?: number
+		defaultSort?: SortState<ColumnId>
+		isRowDisabled?: (row: RowValue, table: DataTable<RowValue, CellValue, ColumnId>) => boolean
+		displaceDisabledRows?: boolean
+	}) {
+		this.rows = [...data]
+		this.columns = columns
+		this.pageSize = pageSize || Infinity
+		this.#defaultColumnSort = this.columnSort = defaultSort
+		this.#isRowDisabled = isRowDisabled
+		this.#displaceDisabledRows = displaceDisabledRows ?? false
+
+		const initializeIsColumnExpanded = (columns: Column<RowValue, CellValue, ColumnId>[]) => {
+			columns.forEach(column => {
+				if (column.defaultIsExpanded)
+					this.#isColumnExpanded.add(column.id)
+
+				if (column.children?.length)
+					initializeIsColumnExpanded(column.children)
+			})
+		}
+		initializeIsColumnExpanded(columns)
+	}
+
+	toggleColumnSort = (columnId: ColumnId) => {
+		const column = this.#columnsById.get(columnId)
+
+		if (!column || !(column.isSortable ?? true))
+			return false
+
+		const defaultSortDirection = column.defaultSortDirection ?? 'asc'
+
+		this.columnSort = (
+			this.columnSort?.columnId !== columnId ?
+				{
+					columnId,
+					direction: defaultSortDirection,
+				}
+			: this.columnSort?.direction === defaultSortDirection ?
+				{
+					columnId,
+					direction: defaultSortDirection === 'asc' ? 'desc' : 'asc',
+				}
+			:
+				this.#defaultColumnSort
+		)
+
+		return true
+	}
+
+	isColumnExpanded = (columnId: ColumnId): boolean => (
+		this.#isColumnExpanded.has(columnId)
+	)
+
+	toggleIsColumnExpanded = (columnId: ColumnId) => {
+		if (this.#isColumnExpanded.has(columnId))
+			this.#isColumnExpanded.delete(columnId)
+		else
+			this.#isColumnExpanded.add(columnId)
+	}
+}
