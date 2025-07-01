@@ -20,7 +20,7 @@ const { metadata, rewriteUrlTo } = Astro.props
 // Components
 import Metadata from '@/components/Metadata.astro'
 import ThemeRegistry from '@/components/ThemeRegistry/ThemeRegistry'
-import { NavigationStateManager } from '@/components/NavigationStateManager'
+// import { NavigationStateManager } from '@/components/NavigationStateManager'
 ---
 
 <!doctype html>
@@ -62,7 +62,7 @@ import { NavigationStateManager } from '@/components/NavigationStateManager'
 	</head>
 	<body>
 		<ThemeRegistry>
-			<NavigationStateManager client:load />
+			<!-- <NavigationStateManager client:load /> -->
 			<slot />
 		</ThemeRegistry>
 	</body>

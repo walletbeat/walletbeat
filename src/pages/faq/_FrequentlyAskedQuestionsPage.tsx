@@ -339,7 +339,7 @@ export function FrequentlyAskedQuestionsPage(): React.JSX.Element {
 						nonEmptyMap(frequentlyAskedQuestions, faq => ({
 							id: faq.anchor,
 							title: faq.navTitle,
-							icon: <QuestionMarkIcon />,
+							icon: QuestionMarkIcon,
 							contentId: faq.anchor,
 						})),
 					]),

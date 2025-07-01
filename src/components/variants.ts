@@ -1,30 +1,33 @@
-import type { SvgIconComponent } from '@mui/icons-material'
-import LanguageIcon from '@mui/icons-material/Language'
-import MemoryIcon from '@mui/icons-material/Memory'
-import MonitorIcon from '@mui/icons-material/Monitor'
-import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid'
-import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet'
-
 import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/variants'
 
-/**
- * @returns An SVG icon representing the given variant.
- */
-export function variantToIcon(variant: Variant): SvgIconComponent {
-	// We return the direct MUI icon component. Consumers can style via the parent element.
-	switch (variant) {
-		case Variant.BROWSER:
-			return LanguageIcon
-		case Variant.DESKTOP:
-			return MonitorIcon
-		case Variant.MOBILE:
-			return PhoneAndroidIcon
-		case Variant.EMBEDDED:
-			return SettingsEthernetIcon
-		case Variant.HARDWARE:
-			return MemoryIcon
-	}
-}
+import PhoneAndroidIcon from '@material-icons/svg/svg/phone_android/baseline.svg?raw'
+import LanguageIcon from '@material-icons/svg/svg/language/baseline.svg?raw'
+import MonitorIcon from '@material-icons/svg/svg/monitor/baseline.svg?raw'
+import SettingsEthernetIcon from '@material-icons/svg/svg/settings_ethernet/baseline.svg?raw'
+import HardwareIcon from '@material-icons/svg/svg/hardware/baseline.svg?raw'
+
+export const variants = {
+	[Variant.BROWSER]: {
+		label: 'Browser extension',
+		icon: LanguageIcon,
+	},
+	[Variant.DESKTOP]: {
+		label: 'Desktop app',
+		icon: MonitorIcon,
+	},
+	[Variant.MOBILE]: {
+		label: 'Mobile app',
+		icon: PhoneAndroidIcon,
+	},
+	[Variant.EMBEDDED]: {
+		label: 'Embedded wallet',
+		icon: SettingsEthernetIcon,
+	},
+	[Variant.HARDWARE]: {
+		label: 'Hardware wallet',
+		icon: HardwareIcon,
+	},
+} as const satisfies Record<Variant, { label: string, icon: string }>
 
 /**
  * Human-readable variant name.

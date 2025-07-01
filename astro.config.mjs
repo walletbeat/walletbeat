@@ -2,6 +2,7 @@
 import { resolve } from 'node:path'
 
 import react from '@astrojs/react'
+import svelte from '@astrojs/svelte'
 import sitemap from '@astrojs/sitemap'
 import { shield } from '@kindspells/astro-shield'
 import { defineConfig } from 'astro/config'
@@ -16,6 +17,7 @@ export default defineConfig({
 	output: 'static',
 	integrations: [
 		react(),
+		svelte(),
 		sitemap(),
 		shield({
 			sri: {

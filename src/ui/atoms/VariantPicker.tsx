@@ -41,6 +41,7 @@ export function VariantPicker<V extends string>({
 			{nonEmptyMap(variants, variant => {
 				let opacity = opacityDefault
 				const isSelected = pickedVariant === variant.id
+				const IconComponent = variant.icon
 
 				if (pickedVariant !== null) {
 					opacity = opacityFaded
@@ -54,7 +55,7 @@ export function VariantPicker<V extends string>({
 					<Tooltip key={variant.id} content={variant.tooltip}>
 						<div className='flex flex-row items-center'>
 							{variant.click === undefined ? (
-								<variant.icon
+								<IconComponent
 									data-selected={isSelected}
 									style={{
 										opacity,
@@ -67,7 +68,7 @@ export function VariantPicker<V extends string>({
 										opacity,
 									}}
 								>
-									<variant.icon data-selected={isSelected} />
+									<IconComponent data-selected={isSelected} />
 								</IconButton>
 							)}
 						</div>

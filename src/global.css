@@ -166,11 +166,127 @@ html.dark {
 }
 
 :root {
+	--transition-easeOutExpo: cubic-bezier(0.16, 1, 0.3, 1);
+
+	--active-transitionInDuration: 0.125s;
+	--active-transitionOutDuration: 0.2s;
+	--active-scale: 0.99;
+	--active-opacity: 0.8;
+
 	scroll-behavior: smooth;
+
+	transition-duration: 0.2s;
+	transition-timing-function: var(--transition-easeOutExpo);
+
+
+	font-family: 'Montserrat', 'Noto Color Emoji';
 }
 
 * {
-	font-family: 'Montserrat', sans-serif, 'Noto Color Emoji';
+	margin: 0;
+	text-box-trim: trim-both;
+	transition-duration: inherit;
+	transition-timing-function: inherit;
+	transition-behavior: allow-discrete;
+
+	scroll-behavior: smooth;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+details {
+	--details-transition-duration: 0.3s;
+	--details-transform-closed: translateY(-6px);
+
+	&::details-content {
+		transition: 
+			content-visibility var(--details-transition-duration) ease allow-discrete,
+			opacity var(--details-transition-duration) ease,
+			transform var(--details-transition-duration) ease,
+			height var(--details-transition-duration) ease allow-keywords;
+	}
+
+	&:not([open])::details-content {
+		content-visibility: hidden;
+		opacity: 0;
+		transform: var(--details-transform-closed);
+		height: 0;
+	}
+
+	&[open]::details-content {
+		content-visibility: visible;
+		opacity: 1;
+		transform: translateY(0);
+		height: auto;
+
+		@starting-style {
+			height: 0;
+		}
+	}
+
+	> summary {
+		cursor: pointer;
+
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: center;
+		gap: 0.5rem;
+
+		&::-webkit-details-marker {
+			display: none;
+		}
+
+		&::after {
+			content: '';
+			width: 0.75em;
+			height: 0.75em;
+			background-color: currentColor;
+			mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 3'%3E%3Cpath d='m.5 1 1 1 1-1' fill='none' stroke='black' stroke-width='0.5' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E");
+			opacity: 0.66;
+
+			transform: perspective(100px);
+			transition: transform var(--details-transition-duration) ease;
+		}
+	}
+
+	&[open] > summary::after {
+		transform: perspective(100px) rotateX(180deg);
+	}
+}
+
+.stack {
+	display: grid;
+	grid: 'stack';
+
+	& > *,
+	&::before,
+	&::after {
+		grid-area: stack;
+	}
+}
+
+.column {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 1rem;
+	align-content: start;
+
+	&.inline {
+		gap: 0.25rem;
+	}
+}
+
+.row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.75em;
+
+	&.inline {
+		gap: 0.5ch;
+	}
 }
 
 code {
