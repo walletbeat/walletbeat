@@ -53,7 +53,7 @@ export function EvaluatedGroupOverview<Vs extends ValueSet>({
 		const centerX = 150
 		const centerY = 150
 		const radius = 120
-		const gapAngle = 2 // Gap in degrees
+		const gapAngle = 0 // Gap in degrees
 		const sliceAngle = 360 / attributeCount - gapAngle
 
 		return mapNonExemptGroupAttributes(evalGroup, (evalAttr, i) => {
