@@ -1,7 +1,7 @@
-import type { Contributor } from '@/schema/wallet';
+import type { Contributor } from '@/schema/wallet'
 
 export const polymutex: Contributor = {
-  name: 'polymutex',
-  affiliation: 'NO_AFFILIATION',
-  url: 'https://warpcast.com/polymutex.eth',
-};
+	name: 'polymutex',
+	affiliation: 'NO_AFFILIATION',
+	url: 'https://warpcast.com/polymutex.eth',
+}

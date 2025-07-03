@@ -1,65 +1,65 @@
 ---
 // Types/constants
-import { betaImagesRoot } from '@/constants';
+import { betaImagesRoot } from '@/constants'
 
 type Icon = {
-  url: string;
-  sizes?: string;
-};
+	url: string
+	sizes?: string
+}
 type MetadataConfig = {
-  title: string;
-  icons?: Icon[];
-  description?: string;
-  keywordsBefore?: string[];
-  keywordsAfter?: string[];
-};
+	title: string
+	icons?: Icon[]
+	description?: string
+	keywordsBefore?: string[]
+	keywordsAfter?: string[]
+}
 
-const siteName = 'Walletbeat';
+const siteName = 'Walletbeat'
 const siteDescription =
-  'Walletbeat is an Ethereum wallet rating site. It aims to provide a trustworthy, up-to-date source of information about the state of the Ethereum wallet ecosystem';
-const defaultKeywords = ['walletbeat', 'ethereum', 'wallet', 'wallets', 'wallet beat', 'evm'];
+	'Walletbeat is an Ethereum wallet rating site. It aims to provide a trustworthy, up-to-date source of information about the state of the Ethereum wallet ecosystem'
+const defaultKeywords = ['walletbeat', 'ethereum', 'wallet', 'wallets', 'wallet beat', 'evm']
 const defaultIcons: Icon[] = [
-  {
-    url: `${betaImagesRoot}/favicon.ico`,
-    sizes: '16x16',
-  },
-  {
-    url: `${betaImagesRoot}/icon.png`,
-  },
-];
-const locale = 'en-US';
+	{
+		url: `${betaImagesRoot}/favicon.ico`,
+		sizes: '16x16',
+	},
+	{
+		url: `${betaImagesRoot}/icon.png`,
+	},
+]
+const locale = 'en-US'
 
 // Functions
 const generateBasicMetadata = ({
-  title,
-  description,
-  icons,
-  keywordsBefore,
-  keywordsAfter,
+	title,
+	description,
+	icons,
+	keywordsBefore,
+	keywordsAfter,
 }: MetadataConfig) => ({
-  title,
-  applicationName: siteName,
-  description: description ?? siteDescription,
-  keywords: [...(keywordsBefore ?? []), ...defaultKeywords, ...(keywordsAfter ?? [])],
-  icons: icons ?? defaultIcons,
-  openGraph: {
-    type: 'website',
-    determiner: '',
-    title,
-    description: description ?? siteDescription,
-    siteName,
-    locale,
-  },
-});
+	title,
+	applicationName: siteName,
+	description: description ?? siteDescription,
+	keywords: [...(keywordsBefore ?? []), ...defaultKeywords, ...(keywordsAfter ?? [])],
+	icons: icons ?? defaultIcons,
+	openGraph: {
+		type: 'website',
+		determiner: '',
+		title,
+		description: description ?? siteDescription,
+		siteName,
+		locale,
+	},
+})
 
 // Props
 type Props = {
-  metadata: MetadataConfig;
-};
+	metadata: MetadataConfig
+}
 
-const { metadata: rawMetadata } = Astro.props;
+const { metadata: rawMetadata } = Astro.props
 
-const metadata = generateBasicMetadata(rawMetadata);
+const metadata = generateBasicMetadata(rawMetadata)
 ---
 
 <title>{metadata.title}</title>

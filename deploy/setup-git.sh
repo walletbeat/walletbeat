@@ -4,12 +4,12 @@ set -euo pipefail
 set +x
 
 if [[ -z "${GIT_USERNAME:-}" ]]; then
-  echo 'Missing GIT_USERNAME' >&2
+	echo 'Missing GIT_USERNAME' >&2
 	exit 1
 fi
 
 if [[ -z "${GIT_EMAIL:-}" ]]; then
-  echo 'Missing GIT_EMAIL' >&2
+echo 'Missing GIT_EMAIL' >&2
 	exit 1
 fi
 
@@ -58,13 +58,13 @@ git config --global gpg.format ssh
 git config --global user.signingKey "${HOME}/.ssh/id_${GIT_SSH_SIGNING_KEY_TYPE}_signing.pub"
 git config --global commit.gpgSign true
 if [[ ! -f "${HOME}/.ssh/config" ]] || ( ! grep -qF "Host github.com" "${HOME}/.ssh/config" ); then
-  echo "Host github.com" >> "${HOME}/.ssh/config"
-  echo "  IdentityFile ${HOME}/.ssh/id_${GIT_SSH_AUTHENTICATION_KEY_TYPE}_authentication" >> "${HOME}/.ssh/config"
+	echo "Host github.com" >> "${HOME}/.ssh/config"
+	echo "	IdentityFile ${HOME}/.ssh/id_${GIT_SSH_AUTHENTICATION_KEY_TYPE}_authentication" >> "${HOME}/.ssh/config"
 fi
 if [[ ! -f "${HOME}/.ssh/known_hosts" ]] || ( ! grep -qF "github.com" "${HOME}/.ssh/known_hosts" ); then
-  ssh-keyscan github.com >> "${HOME}/.ssh/known_hosts"
+	ssh-keyscan github.com >> "${HOME}/.ssh/known_hosts"
 fi
 if [[ ! -f "${HOME}/.ssh/allowed_signers" ]] || ( ! grep -qF "${GIT_EMAIL}" "${HOME}/.ssh/allowed_signers" ); then
-  echo "${GIT_EMAIL} namespaces=\"git\" $(cat "${HOME}/.ssh/id_${GIT_SSH_SIGNING_KEY_TYPE}_signing.pub")" >> "${HOME}/.ssh/allowed_signers"
+	echo "${GIT_EMAIL} namespaces=\"git\" $(cat "${HOME}/.ssh/id_${GIT_SSH_SIGNING_KEY_TYPE}_signing.pub")" >> "${HOME}/.ssh/allowed_signers"
 fi
 git config --global gpg.ssh.allowedSignersFile "${HOME}/.ssh/allowed_signers"
