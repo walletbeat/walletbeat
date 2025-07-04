@@ -733,16 +733,16 @@
 						radius={80}
 						levels={[
 							{
-								outerRadiusFraction: 0.705,
+								outerRadiusFraction: 0.7,
 								innerRadiusFraction: 0.3,
 								gap: 4,
 								angleGap: 0
 							},
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.7,
+								innerRadiusFraction: 0.725,
 								gap: 2,
-								angleGap: 1,
+								angleGap: 0,
 							}
 						]}
 						{highlightedSliceId}
@@ -872,7 +872,7 @@
 							{
 								outerRadiusFraction: 1,
 								innerRadiusFraction: 0.3,
-								gap: 2,
+								gap: 3,
 								angleGap: 0
 							}
 						]}
@@ -1017,7 +1017,8 @@
 								{
 									outerRadiusFraction: 1,
 									innerRadiusFraction: 0.3,
-									gap: evalAttr.evaluation.value.rating !== Rating.EXEMPT ? 20 : 0,
+									offset: evalAttr.evaluation.value.rating !== Rating.EXEMPT ? 20 : 0,
+									gap: 0,
 									angleGap: 0,
 								}
 							]

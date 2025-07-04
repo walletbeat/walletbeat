@@ -20,6 +20,7 @@
 	export type LevelConfig = {
 		outerRadiusFraction: number
 		innerRadiusFraction: number
+		offset: number
 		gap: number
 		angleGap: number
 	}
@@ -128,6 +129,7 @@
 	const getSlicePath = ({
 		cx = 0,
 		cy = 0,
+		gap,
 		outerRadius,
 		innerRadius,
 		startAngle,
@@ -135,6 +137,7 @@
 	}: {
 		cx: number
 		cy: number
+		gap: number
 		outerRadius: number
 		innerRadius: number
 		startAngle: number
@@ -155,20 +158,33 @@
 			].join(' ')
 		}
 
-		const start = polarToCartesian(cx, cy, outerRadius, endAngle)
-		const end = polarToCartesian(cx, cy, outerRadius, startAngle)
-		const innerStart = polarToCartesian(cx, cy, innerRadius, endAngle)
-		const innerEnd = polarToCartesian(cx, cy, innerRadius, startAngle)
-		const largeArcFlag = angleDiff > 180 ? 1 : 0
-		const sweepFlag = orientation === 1 ? 0 : 1
+		const outerAngleStart = startAngle + Math.asin((gap / 2) / outerRadius) * 180 / Math.PI * orientation
+		const outerStart = polarToCartesian(cx, cy, outerRadius, outerAngleStart)
+
+		const outerAngleEnd = endAngle - Math.asin((gap / 2) / outerRadius) * 180 / Math.PI * orientation
+		const outerEnd = polarToCartesian(cx, cy, outerRadius, outerAngleEnd)
+
+		const innerAngleEnd = endAngle - Math.asin((gap / 2) / innerRadius) * 180 / Math.PI * orientation
+		const innerEnd = polarToCartesian(cx, cy, innerRadius, innerAngleEnd)
+
+		const innerAngleStart = startAngle + Math.asin((gap / 2) / innerRadius) * 180 / Math.PI * orientation
+		const innerStart = polarToCartesian(cx, cy, innerRadius, innerAngleStart)
+
+		const largeArcFlag = angleDiff > 180 ? 0 : 0
+		const sweepFlag = orientation === 1 ? 1 : 0
+
+		// For equiangular pie slices with n slices (each with angle θ = 360°/n),
+		// the distance d they need to be moved from the origin to create gaps of width x is:
+		// d = x / (2 * sin(θ / 2))
+		const offset = Math.abs(gap / (2 * Math.sin(Math.abs(endAngle - startAngle) / 2)))
 
 		return (
 			[
-				`M ${start.x} ${start.y}`,
-				`A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`,
+				`M ${outerStart.x} ${outerStart.y}`,
+				`A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} ${sweepFlag} ${outerEnd.x} ${outerEnd.y}`,
 				`L ${innerEnd.x} ${innerEnd.y}`,
 				`A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} ${1 - sweepFlag} ${innerStart.x} ${innerStart.y}`,
-				`L ${start.x} ${start.y}`,
+				`L ${outerStart.x} ${outerStart.y}`,
 			]
 				.join(' ')
 		)
@@ -188,24 +204,34 @@
 		level = 0,
 	): ComputedSlice[] => {
 		const levelConfig = getLevelConfig(level)
-		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
-		const totalAngle = endAngle - startAngle
-		const angleGap = Math.sign(totalAngle) * levelConfig.angleGap
-		const totalGapAngle = angleGap * (slices.length - 1)
-		const totalEffectiveAngle = totalAngle - totalGapAngle
+		const parentLevelConfig = getLevelConfig(level - 1)
 
 		const outerRadius = radius * levelConfig.outerRadiusFraction
 		const innerRadius = radius * levelConfig.innerRadiusFraction
 
-		let currentAngle = startAngle
+		const orientation = Math.sign(endAngle - startAngle)
+
+		const angleGap = levelConfig.angleGap * orientation
+		const totalGapAngle = angleGap * (slices.length - 1)
+
+		const angleInsetFromGap = angleGap / 2
+		const angleInsetFromParentGap = parentLevelConfig ? (Math.asin((levelConfig.gap / 2) / outerRadius) - Math.asin((parentLevelConfig.gap / 2) / outerRadius)) * 180 / Math.PI * orientation : 0
+
+		const effectiveStartAngle = startAngle + (angleInsetFromGap + angleInsetFromParentGap) * orientation
+		const effectiveEndAngle = endAngle - (angleInsetFromGap + angleInsetFromParentGap) * orientation
+		const effectiveTotalAngle = effectiveEndAngle - effectiveStartAngle - totalGapAngle * orientation
+
+		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
+
+		let currentAngle = effectiveStartAngle
 
 		return slices.map(({ children, ...slice }, i) => {
-			const totalAngle = totalEffectiveAngle * (slice.weight / totalWeight)
+			const totalAngle = effectiveTotalAngle * (slice.weight / totalWeight)
 			const startAngle = currentAngle
 			const endAngle = currentAngle + totalAngle
 			const midAngle = startAngle + totalAngle / 2
 
-			currentAngle = endAngle + (i < slices.length - 1 ? angleGap : 0)
+			currentAngle = endAngle + (i < slices.length - 1 ? angleGap * orientation : 0)
 
 			return {
 				...slice,
@@ -213,16 +239,19 @@
 					path: getSlicePath({
 						cx: 0,
 						cy,
+						gap: levelConfig.gap,
 						outerRadius,
 						innerRadius,
 						startAngle: -totalAngle / 2,
 						endAngle: totalAngle / 2,
 					}),
+					totalAngle,
 					midAngle,
 					outerRadius,
 					innerRadius,
 					level,
 					labelRadius: (radius * levelConfig.outerRadiusFraction + radius * levelConfig.innerRadiusFraction) / 2,
+					offset: levelConfig.offset,
 					gap: levelConfig.gap,
 				},
 				...children && {
@@ -271,8 +300,8 @@
 
 	let svgAttributes = $derived.by(() => {
 		const maxRadiusMultiplier = Math.max(...levels.map(level => level.outerRadiusFraction))
-		const maxGap = Math.max(...levels.map(level => level.gap))
-		const maxRadius = radius * maxRadiusMultiplier + maxGap
+		const maxOffset = Math.max(...levels.map(level => level.offset ?? 0))
+		const maxRadius = radius * maxRadiusMultiplier + maxOffset
 
 		const width = padding * 2 + maxRadius * 2
 		const height = padding * 2 + maxRadius * (layout === PieLayout.HalfTop ? 1 : 2)
@@ -292,6 +321,7 @@
 	<g
 		class="slice"
 		style:--slice-midAngle={slice.computed.midAngle}
+		style:--slice-offset={slice.computed.offset}
 		style:--slice-gap={slice.computed.gap}
 		style:--slice-labelRadius={slice.computed.labelRadius}
 		style:--slice-path={`path("${slice.computed.path}")`}
@@ -398,12 +428,17 @@
 
 			.slice {
 				--slice-scale: 1;
+				--slice-offset: 1;
+
 				transform-origin: 0 0;
 				cursor: pointer;
 				will-change: transform;
 
-				transform: rotate(calc(var(--slice-midAngle) * 1deg)) scale(var(--slice-scale))
-					translate(0, calc(var(--slice-gap) * -1px));
+				transform:
+					rotate(calc(var(--slice-midAngle) * 1deg))
+					scale(var(--slice-scale))
+					translateY(calc(var(--slice-offset) * -1px))
+				;
 				transition: transform 0.2s ease-out;
 
 				&:hover,
@@ -436,6 +471,7 @@
 				.slice-path {
 					d: var(--slice-path);
 					fill: var(--slice-fill);
+					stroke-linecap: square;
 				}
 
 				> .label {
