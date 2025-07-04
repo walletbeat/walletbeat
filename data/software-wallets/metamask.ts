@@ -163,7 +163,7 @@ export const metamask: SoftwareWallet = {
 					auditDate: '2025-03-18',
 					auditor: cyfrin,
 					codeSnapshot: {
-						date: '2025-02-7',
+						date: '2025-02-07',
 					},
 					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
 					unpatchedFlaws: 'ALL_FIXED',
