@@ -20,6 +20,7 @@
 	export type LevelConfig = {
 		outerRadiusFraction: number
 		innerRadiusFraction: number
+		offset: number
 		gap: number
 		angleGap: number
 	}
@@ -250,6 +251,7 @@
 					innerRadius,
 					level,
 					labelRadius: (radius * levelConfig.outerRadiusFraction + radius * levelConfig.innerRadiusFraction) / 2,
+					offset: levelConfig.offset,
 					gap: levelConfig.gap,
 				},
 				...children && {
@@ -298,8 +300,8 @@
 
 	let svgAttributes = $derived.by(() => {
 		const maxRadiusMultiplier = Math.max(...levels.map(level => level.outerRadiusFraction))
-		const maxGap = Math.max(...levels.map(level => level.gap))
-		const maxRadius = radius * maxRadiusMultiplier + maxGap
+		const maxOffset = Math.max(...levels.map(level => level.offset ?? 0))
+		const maxRadius = radius * maxRadiusMultiplier + maxOffset
 
 		const width = padding * 2 + maxRadius * 2
 		const height = padding * 2 + maxRadius * (layout === PieLayout.HalfTop ? 1 : 2)
@@ -319,6 +321,7 @@
 	<g
 		class="slice"
 		style:--slice-midAngle={slice.computed.midAngle}
+		style:--slice-offset={slice.computed.offset}
 		style:--slice-gap={slice.computed.gap}
 		style:--slice-labelRadius={slice.computed.labelRadius}
 		style:--slice-path={`path("${slice.computed.path}")`}
@@ -425,6 +428,8 @@
 
 			.slice {
 				--slice-scale: 1;
+				--slice-offset: 1;
+
 				transform-origin: 0 0;
 				cursor: pointer;
 				will-change: transform;
@@ -432,6 +437,7 @@
 				transform:
 					rotate(calc(var(--slice-midAngle) * 1deg))
 					scale(var(--slice-scale))
+					translateY(calc(var(--slice-offset) * -1px))
 				;
 				transition: transform 0.2s ease-out;
 
