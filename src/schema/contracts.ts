@@ -35,15 +35,14 @@ export interface SmartWalletContract {
 	}
 }
 
-
 /**
  * A native account abstraction contract deployer, for deploying smart accounts that use the
- * chain's native account abstraction. Which mean, the wallet can send 
+ * chain's native account abstraction. Which mean, the wallet can send
  * transactions to the public mempool.
  */
 export interface NativeAccountAbstraction {
 	/** A human-readable name for the contract. */
-	name: string	
+	name: string
 
 	/** The chain this contract is deployed on. */
 	chain: string
@@ -59,9 +58,8 @@ export interface NativeAccountAbstraction {
 		| { available: false }
 		| WithRef<{
 				available: true
-		  }>	
-
-	}
+		  }>
+}
 
 export interface AADeployer {
 	/** A human-readable name for the contract. */
@@ -78,5 +76,5 @@ export interface AADeployer {
 		| { available: false }
 		| WithRef<{
 				available: true
-			}>
+		  }>
 }

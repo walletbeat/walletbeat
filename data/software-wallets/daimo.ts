@@ -52,7 +52,6 @@ export const daimo: SoftwareWallet = {
 			defaultAccountType: AccountType.erc4337,
 			eip7702: notSupported,
 			eoa: notSupported,
-			mpc: notSupported,
 			erc4337: supported({
 				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
@@ -66,6 +65,7 @@ export const daimo: SoftwareWallet = {
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
+			mpc: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {

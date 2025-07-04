@@ -11,7 +11,7 @@ import React from 'react'
 import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
-import type { EVMAddress, SmartWalletContract } from '@/schema/contracts'
+import type { EVMAddress, NativeAccountAbstraction, SmartWalletContract } from '@/schema/contracts'
 import { AccountType, isAccountTypeSupported } from '@/schema/features/account-support'
 import { refs } from '@/schema/reference'
 import { isLabeledUrl } from '@/schema/url'
@@ -41,7 +41,7 @@ interface TableRow {
 	name: string
 	wallet: RatedWallet
 	typeFor7702: WalletTypeFor7702
-	contract: SmartWalletContract | 'UNKNOWN' | 'NONE'
+	contract: SmartWalletContract | NativeAccountAbstraction | 'UNKNOWN' | 'NONE'
 	sortPriority: number
 }
 
@@ -174,6 +174,11 @@ export default function Eip7702Table(): React.JSX.Element {
 				return <span style={{ opacity: 1 }}>Unknown - Send PR!</span>
 			}
 
+			// Handle NativeAccountAbstraction which doesn't have an address property
+			if ('chain' in contract) {
+				return <span>{contract.name}</span>
+			}
+
 			return <ExternalLink url={walletContractUrl(contract.address)} defaultLabel={contract.name} />
 		},
 	})
@@ -189,6 +194,11 @@ export default function Eip7702Table(): React.JSX.Element {
 
 			if (contract === 'UNKNOWN') {
 				return null
+			}
+
+			// Handle NativeAccountAbstraction which doesn't have sourceCode property
+			if ('chain' in contract) {
+				return <span style={{ opacity: 0.5 }}>N/A</span>
 			}
 
 			if (!contract.sourceCode.available) {

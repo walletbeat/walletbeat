@@ -1,4 +1,5 @@
-import type {  NativeAccountAbstraction } from '@/schema/contracts'
+import type { NativeAccountAbstraction } from '@/schema/contracts'
+
 import { claveAccountDeployer } from './clave-deployer'
 
 export const claveAccount: NativeAccountAbstraction = {

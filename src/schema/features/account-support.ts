@@ -5,7 +5,7 @@ import {
 	nonEmptySetFromArray,
 } from '@/types/utils/non-empty'
 
-import type { SmartWalletContract, NativeAccountAbstraction } from '../contracts'
+import type { NativeAccountAbstraction, SmartWalletContract } from '../contracts'
 import type { WithRef } from '../reference'
 import { isSupported, type NotSupported, type Support, type Supported } from './support'
 
@@ -51,11 +51,11 @@ export enum TransactionGenerationCapability {
 	/** The process to generate such a transaction requires the use of a standalone proprietary application. */
 	USING_PROPRIETARY_STANDALONE_APP = 'USING_PROPRIETARY_STANDALONE_APP',
 
-	/** The process to generate such a transaction requires the use of an open-source standalone application. 
-	 * 
+	/** The process to generate such a transaction requires the use of an open-source standalone application.
+	 *
 	 * Note: This also means that a developer could also generate such a transaction
 	 * without relying on this open-sourced application.
-	*/
+	 */
 	USING_OPEN_SOURCE_STANDALONE_APP = 'USING_OPEN_SOURCE_STANDALONE_APP',
 
 	/** It is not possible to generate such a transaction. */

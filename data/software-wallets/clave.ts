@@ -1,28 +1,29 @@
 import { patrickalphac } from '@/data/contributors'
 import { claveAccount } from '@/data/wallet-contracts/base-clave-account'
-import { WalletProfile } from '@/schema/features/profile'
-import { License } from '@/schema/features/transparency/license'
-import { notSupported, supported } from '@/schema/features/support'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	Leak,
 	MultiAddressPolicy,
 	RegularEndpoint,
 } from '@/schema/features/privacy/data-collection'
+import { WalletProfile } from '@/schema/features/profile'
+import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { notSupported, supported } from '@/schema/features/support'
+import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
+import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
-import { claveEntity } from '../entities/clave'
-import { aws } from '../entities/aws'
 import { aiprise } from '../entities/aiprise'
+import { aws } from '../entities/aws'
 import { cantina } from '../entities/cantina'
+import { claveEntity } from '../entities/clave'
 import { nethermind } from '../entities/nethermind'
 
-export const unratedTemplate: SoftwareWallet = {
+export const clave: SoftwareWallet = {
 	metadata: {
 		id: 'clave',
 		displayName: 'Clave',
@@ -39,22 +40,24 @@ export const unratedTemplate: SoftwareWallet = {
 	features: {
 		accountSupport: {
 			defaultAccountType: AccountType.erc4337,
-			erc4337: supported({
-				contract: claveAccount,
-				controllingSharesInSelfCustodyByDefault: 'YES',
-				// Question: Technically, I can always send a transaction because I'm a developer... But I will often use their prioprietary API to generate transactions... What should we put?
-				tokenTransferTransactionGeneration: TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				keyRotationTransactionGeneration: TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-			}),
+			eip7702: notSupported,
 			eoa: supported({
 				canExportPrivateKey: false,
 				canExportSeedPhrase: false,
 				keyDerivation: {
-					type: 'NONSTANDARD'
-				}
+					type: 'NONSTANDARD',
+				},
+			}),
+			erc4337: supported({
+				contract: claveAccount,
+				controllingSharesInSelfCustodyByDefault: 'YES',
+				keyRotationTransactionGeneration:
+					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+				// Question: Technically, I can always send a transaction because I'm a developer... But I will often use their proprietary API to generate transactions... What should we put?
+				tokenTransferTransactionGeneration:
+					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 			mpc: notSupported,
-			eip7702: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {
@@ -70,7 +73,7 @@ export const unratedTemplate: SoftwareWallet = {
 		chainConfigurability: {
 			customChains: false,
 			l1RpcEndpoint: RpcEndpointConfiguration.NO,
-			otherRpcEndpoints: RpcEndpointConfiguration.NO ,
+			otherRpcEndpoints: RpcEndpointConfiguration.NO,
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
@@ -111,7 +114,8 @@ export const unratedTemplate: SoftwareWallet = {
 							pseudonym: Leak.OPT_IN,
 							ref: [
 								{
-									explanation: 'Clave collects device information, usage data, and transaction information as described in their privacy policy.',
+									explanation:
+										'Clave collects device information, usage data, and transaction information as described in their privacy policy.',
 									url: 'https://www.getclave.com/privacy-policy',
 								},
 							],
@@ -125,7 +129,8 @@ export const unratedTemplate: SoftwareWallet = {
 							ipAddress: Leak.ALWAYS,
 							ref: [
 								{
-									explanation: 'Clave uses AWS for cloud storage and processing, which may store personal data in data centers outside the UK.',
+									explanation:
+										'Clave uses AWS for cloud storage and processing, which may store personal data in data centers outside the UK.',
 									url: 'https://www.getclave.com/privacy-policy',
 								},
 							],
@@ -138,7 +143,8 @@ export const unratedTemplate: SoftwareWallet = {
 							ipAddress: Leak.OPT_IN,
 							ref: [
 								{
-									explanation: 'AiPrise is used for KYC verification when users access Rain Card or Onramp services through Clave.',
+									explanation:
+										'AiPrise is used for KYC verification when users access Rain Card or Onramp services through Clave.',
 									url: 'https://aiprise.io/privacy-policy',
 								},
 							],
@@ -250,12 +256,14 @@ export const unratedTemplate: SoftwareWallet = {
 			},
 		},
 		transparency: {
-			feeTransparency: null,
+			feeTransparency: {
+				disclosesWalletFees: true,
+				level: FeeTransparencyLevel.BASIC,
+				showsTransactionPurpose: false,
+			},
 		},
 	},
 	variants: {
 		[Variant.MOBILE]: true,
-		[Variant.BROWSER]: true,
-		[Variant.DESKTOP]: true,
 	},
 }

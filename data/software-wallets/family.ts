@@ -34,8 +34,8 @@ export const family: SoftwareWallet = {
 					seedPhrase: 'BIP39',
 				},
 			}),
-			mpc: notSupported,
 			erc4337: notSupported,
+			mpc: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {
