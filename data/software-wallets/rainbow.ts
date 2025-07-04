@@ -41,7 +41,7 @@ export const rainbow: SoftwareWallet = {
 				},
 			}),
 			mpc: notSupported,
-			rawErc4337: notSupported,
+			erc4337: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {

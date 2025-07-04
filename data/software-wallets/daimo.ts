@@ -49,11 +49,11 @@ export const daimo: SoftwareWallet = {
 	},
 	features: {
 		accountSupport: {
-			defaultAccountType: AccountType.rawErc4337,
+			defaultAccountType: AccountType.erc4337,
 			eip7702: notSupported,
 			eoa: notSupported,
 			mpc: notSupported,
-			rawErc4337: supported({
+			erc4337: supported({
 				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:

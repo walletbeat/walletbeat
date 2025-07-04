@@ -744,7 +744,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 		const allRefs = mergeRefs(
 			refs(features.accountSupport.eoa),
 			refs(features.accountSupport.mpc),
-			refs(features.accountSupport.rawErc4337),
+			refs(features.accountSupport.erc4337),
 			refs(features.accountSupport.eip7702),
 		)
 		const evaluations: Array<Evaluation<AccountPortabilityValue>> = []
@@ -770,12 +770,12 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			}
 		}
 
-		if (isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)) {
-			const evaluation = evaluateMultifactor(features.accountSupport.rawErc4337, 'erc4337', allRefs)
+		if (isSupported<AccountTypeMutableMultifactor>(features.accountSupport.erc4337)) {
+			const evaluation = evaluateMultifactor(features.accountSupport.erc4337, 'erc4337', allRefs)
 
 			evaluations.push(evaluation)
 
-			if (features.accountSupport.defaultAccountType === AccountType.rawErc4337) {
+			if (features.accountSupport.defaultAccountType === AccountType.erc4337) {
 				defaultEvaluation = evaluation
 			}
 		}

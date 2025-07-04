@@ -5,7 +5,7 @@ import {
 	nonEmptySetFromArray,
 } from '@/types/utils/non-empty'
 
-import type { SmartWalletContract } from '../contracts'
+import type { SmartWalletContract, NativeAccountAbstraction } from '../contracts'
 import type { WithRef } from '../reference'
 import { isSupported, type NotSupported, type Support, type Supported } from './support'
 
@@ -33,13 +33,13 @@ export enum AccountType {
 	 * Raw ERC-4337 account, i.e. an account for which the address matches the
 	 * smart contract code.
 	 */
-	rawErc4337 = 'rawErc4337',
+	erc4337 = 'erc4337',
 }
 
 const allAccountTypes: NonEmptyArray<AccountType> = [
 	AccountType.eoa,
 	AccountType.mpc,
-	AccountType.rawErc4337,
+	AccountType.erc4337,
 	AccountType.eip7702,
 ]
 
@@ -51,7 +51,11 @@ export enum TransactionGenerationCapability {
 	/** The process to generate such a transaction requires the use of a standalone proprietary application. */
 	USING_PROPRIETARY_STANDALONE_APP = 'USING_PROPRIETARY_STANDALONE_APP',
 
-	/** The process to generate such a transaction requires the use of an open-source standalone application. */
+	/** The process to generate such a transaction requires the use of an open-source standalone application. 
+	 * 
+	 * Note: This also means that a developer could also generate such a transaction
+	 * without relying on this open-sourced application.
+	*/
 	USING_OPEN_SOURCE_STANDALONE_APP = 'USING_OPEN_SOURCE_STANDALONE_APP',
 
 	/** It is not possible to generate such a transaction. */
@@ -83,10 +87,11 @@ export type AccountSupport = Exclude<
 		eip7702: AccountTypeSupport<AccountType7702>
 
 		/**
-		 * Support for smart accounts (pure ERC-4337 accounts for which the
-		 * address matches the contract code).
+		 * Support for smart accounts (either pure ERC-4337 accounts for which the
+		 * address matches the contract code, or accounts that use the chain's native
+		 * account abstraction).
 		 */
-		rawErc4337: AccountTypeSupport<AccountType4337>
+		erc4337: AccountTypeSupport<AccountType4337>
 	},
 	// At least one account type must be supported.
 	Record<AccountType, NotSupported>
@@ -204,7 +209,7 @@ export type AccountTypeMutableMultifactor = AccountTypeMultifactor & {
 
 /** A wallet backed by a smart contract. */
 export interface SmartAccountType {
-	contract: 'UNKNOWN' | SmartWalletContract
+	contract: 'UNKNOWN' | SmartWalletContract | NativeAccountAbstraction
 }
 
 /** Support information for ERC-4337 accounts. */

@@ -153,7 +153,7 @@ export const ambire: SoftwareWallet = {
 				},
 			}),
 			mpc: notSupported,
-			rawErc4337: supported({
+			erc4337: supported({
 				contract: ambireAccountContract,
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:

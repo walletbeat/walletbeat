@@ -57,7 +57,7 @@ const softwareWalletData: TableRow[] = Object.values(ratedSoftwareWallets)
 	.map(wallet => {
 		const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
 		const hasErc4337 =
-			accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.rawErc4337)
+			accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.erc4337)
 		const hasEip7702 =
 			accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eip7702)
 		const hasEoa =
@@ -82,8 +82,8 @@ const softwareWalletData: TableRow[] = Object.values(ratedSoftwareWallets)
 					return variantWallet.features.accountSupport.eip7702.contract
 				}
 
-				if (isAccountTypeSupported(variantWallet.features.accountSupport.rawErc4337)) {
-					return variantWallet.features.accountSupport.rawErc4337.contract
+				if (isAccountTypeSupported(variantWallet.features.accountSupport.erc4337)) {
+					return variantWallet.features.accountSupport.erc4337.contract
 				}
 			}
 

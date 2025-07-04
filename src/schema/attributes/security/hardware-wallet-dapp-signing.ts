@@ -514,7 +514,7 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 		}
 
 		// Check for ERC-4337 smart wallet
-		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
+		if (supportsOnlyAccountType(features.accountSupport, AccountType.erc4337)) {
 			return exempt(
 				hardwareWalletDappSigning,
 				sentence(

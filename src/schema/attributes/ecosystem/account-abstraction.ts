@@ -214,23 +214,23 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 		const supported: Record<AccountType, boolean> = {
 			eoa: isAccountTypeSupported<AccountTypeEoa>(features.accountSupport.eoa),
 			mpc: isAccountTypeSupported<AccountTypeMpc>(features.accountSupport.mpc),
-			rawErc4337: isAccountTypeSupported<AccountTypeMutableMultifactor>(
-				features.accountSupport.rawErc4337,
+			erc4337: isAccountTypeSupported<AccountTypeMutableMultifactor>(
+				features.accountSupport.erc4337,
 			),
 			eip7702: isAccountTypeSupported<AccountType7702>(features.accountSupport.eip7702),
 		}
 		const allRefs = mergeRefs(
 			refs(features.accountSupport.eoa),
 			refs(features.accountSupport.mpc),
-			refs(features.accountSupport.rawErc4337),
+			refs(features.accountSupport.erc4337),
 			refs(features.accountSupport.eip7702),
 		)
 
-		if (supported.rawErc4337 && supported.eip7702) {
+		if (supported.erc4337 && supported.eip7702) {
 			return supportsErc4337AndEip7702(allRefs)
 		}
 
-		if (supported.rawErc4337) {
+		if (supported.erc4337) {
 			return supportsErc4337(allRefs)
 		}
 

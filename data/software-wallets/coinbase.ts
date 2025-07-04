@@ -54,7 +54,7 @@ export const coinbase: SoftwareWallet = {
 				},
 			}),
 			mpc: notSupported,
-			rawErc4337: supported({
+			erc4337: supported({
 				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,

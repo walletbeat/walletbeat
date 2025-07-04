@@ -119,7 +119,7 @@ function getWalletTypeInfo(
 	const hasSmartWallet =
 		accountTypes !== null &&
 		(setContains<AccountType>(accountTypes, AccountType.eip7702) ||
-			setContains<AccountType>(accountTypes, AccountType.rawErc4337))
+			setContains<AccountType>(accountTypes, AccountType.erc4337))
 	const hasHardware = hasVariant(wallet.variants, Variant.HARDWARE)
 
 	return {
@@ -129,7 +129,7 @@ function getWalletTypeInfo(
 		hasHardware,
 		standards: {
 			ERC_4337:
-				accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.rawErc4337),
+				accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.erc4337),
 			ERC_7702:
 				accountTypes !== null && setContains<AccountType>(accountTypes, AccountType.eip7702),
 			OTHER:
