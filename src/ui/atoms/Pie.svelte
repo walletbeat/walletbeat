@@ -471,6 +471,7 @@
 				> .slice-path {
 					d: var(--slice-path);
 					fill: var(--slice-fill);
+					stroke-linecap: square;
 				}
 
 				> .label {
