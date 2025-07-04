@@ -128,6 +128,7 @@
 	const getSlicePath = ({
 		cx = 0,
 		cy = 0,
+		gap,
 		outerRadius,
 		innerRadius,
 		startAngle,
@@ -135,6 +136,7 @@
 	}: {
 		cx: number
 		cy: number
+		gap: number
 		outerRadius: number
 		innerRadius: number
 		startAngle: number
@@ -155,20 +157,33 @@
 			].join(' ')
 		}
 
-		const start = polarToCartesian(cx, cy, outerRadius, endAngle)
-		const end = polarToCartesian(cx, cy, outerRadius, startAngle)
-		const innerStart = polarToCartesian(cx, cy, innerRadius, endAngle)
-		const innerEnd = polarToCartesian(cx, cy, innerRadius, startAngle)
-		const largeArcFlag = angleDiff > 180 ? 1 : 0
-		const sweepFlag = orientation === 1 ? 0 : 1
+		const outerAngleStart = startAngle + Math.asin((gap / 2) / outerRadius) * 180 / Math.PI * orientation
+		const outerStart = polarToCartesian(cx, cy, outerRadius, outerAngleStart)
+
+		const outerAngleEnd = endAngle - Math.asin((gap / 2) / outerRadius) * 180 / Math.PI * orientation
+		const outerEnd = polarToCartesian(cx, cy, outerRadius, outerAngleEnd)
+
+		const innerAngleEnd = endAngle - Math.asin((gap / 2) / innerRadius) * 180 / Math.PI * orientation
+		const innerEnd = polarToCartesian(cx, cy, innerRadius, innerAngleEnd)
+
+		const innerAngleStart = startAngle + Math.asin((gap / 2) / innerRadius) * 180 / Math.PI * orientation
+		const innerStart = polarToCartesian(cx, cy, innerRadius, innerAngleStart)
+
+		const largeArcFlag = angleDiff > 180 ? 0 : 0
+		const sweepFlag = orientation === 1 ? 1 : 0
+
+		// For equiangular pie slices with n slices (each with angle θ = 360°/n),
+		// the distance d they need to be moved from the origin to create gaps of width x is:
+		// d = x / (2 * sin(θ / 2))
+		const offset = Math.abs(gap / (2 * Math.sin(Math.abs(endAngle - startAngle) / 2)))
 
 		return (
 			[
-				`M ${start.x} ${start.y}`,
-				`A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`,
+				`M ${outerStart.x} ${outerStart.y}`,
+				`A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} ${sweepFlag} ${outerEnd.x} ${outerEnd.y}`,
 				`L ${innerEnd.x} ${innerEnd.y}`,
 				`A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} ${1 - sweepFlag} ${innerStart.x} ${innerStart.y}`,
-				`L ${start.x} ${start.y}`,
+				`L ${outerStart.x} ${outerStart.y}`,
 			]
 				.join(' ')
 		)
@@ -213,11 +228,13 @@
 					path: getSlicePath({
 						cx: 0,
 						cy,
+						gap: levelConfig.gap,
 						outerRadius,
 						innerRadius,
 						startAngle: -totalAngle / 2,
 						endAngle: totalAngle / 2,
 					}),
+					totalAngle,
 					midAngle,
 					outerRadius,
 					innerRadius,
@@ -402,8 +419,10 @@
 				cursor: pointer;
 				will-change: transform;
 
-				transform: rotate(calc(var(--slice-midAngle) * 1deg)) scale(var(--slice-scale))
-					translate(0, calc(var(--slice-gap) * -1px));
+				transform:
+					rotate(calc(var(--slice-midAngle) * 1deg))
+					scale(var(--slice-scale))
+				;
 				transition: transform 0.2s ease-out;
 
 				&:hover,
