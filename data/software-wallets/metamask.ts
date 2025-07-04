@@ -14,6 +14,7 @@ import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 import { cure53 } from '../entities/cure53'
+import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
 
@@ -155,6 +156,26 @@ export const metamask: SoftwareWallet = {
 						date: '2024-03-25',
 					},
 					ref: 'https://assets.ctfassets.net/clixtyxoaeas/4sNMB55kkGw6BtAiIn08mm/f1f4a78d3901dd03848d070e15a1ff12/pentest-report_metamask-signing-snap.pdf',
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: 'ALL_VARIANTS',
+				},
+				{
+					auditDate: '2025-03-18',
+					auditor: cyfrin,
+					codeSnapshot: {
+						date: '2025-02-7',
+					},
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: 'ALL_VARIANTS',
+				},
+				{
+					auditDate: '2025-04-01',
+					auditor: cyfrin,
+					codeSnapshot: {
+						date: '2025-04-01',
+					},
+					ref: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
 					unpatchedFlaws: 'ALL_FIXED',
 					variantsScope: 'ALL_VARIANTS',
 				},
