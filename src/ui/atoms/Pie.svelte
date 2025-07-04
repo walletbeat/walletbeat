@@ -203,24 +203,34 @@
 		level = 0,
 	): ComputedSlice[] => {
 		const levelConfig = getLevelConfig(level)
-		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
-		const totalAngle = endAngle - startAngle
-		const angleGap = Math.sign(totalAngle) * levelConfig.angleGap
-		const totalGapAngle = angleGap * (slices.length - 1)
-		const totalEffectiveAngle = totalAngle - totalGapAngle
+		const parentLevelConfig = getLevelConfig(level - 1)
 
 		const outerRadius = radius * levelConfig.outerRadiusFraction
 		const innerRadius = radius * levelConfig.innerRadiusFraction
 
-		let currentAngle = startAngle
+		const orientation = Math.sign(endAngle - startAngle)
+
+		const angleGap = levelConfig.angleGap * orientation
+		const totalGapAngle = angleGap * (slices.length - 1)
+
+		const angleInsetFromGap = angleGap / 2
+		const angleInsetFromParentGap = parentLevelConfig ? (Math.asin((levelConfig.gap / 2) / outerRadius) - Math.asin((parentLevelConfig.gap / 2) / outerRadius)) * 180 / Math.PI * orientation : 0
+
+		const effectiveStartAngle = startAngle + (angleInsetFromGap + angleInsetFromParentGap) * orientation
+		const effectiveEndAngle = endAngle - (angleInsetFromGap + angleInsetFromParentGap) * orientation
+		const effectiveTotalAngle = effectiveEndAngle - effectiveStartAngle - totalGapAngle * orientation
+
+		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
+
+		let currentAngle = effectiveStartAngle
 
 		return slices.map(({ children, ...slice }, i) => {
-			const totalAngle = totalEffectiveAngle * (slice.weight / totalWeight)
+			const totalAngle = effectiveTotalAngle * (slice.weight / totalWeight)
 			const startAngle = currentAngle
 			const endAngle = currentAngle + totalAngle
 			const midAngle = startAngle + totalAngle / 2
 
-			currentAngle = endAngle + (i < slices.length - 1 ? angleGap : 0)
+			currentAngle = endAngle + (i < slices.length - 1 ? angleGap * orientation : 0)
 
 			return {
 				...slice,
