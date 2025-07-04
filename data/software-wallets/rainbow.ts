@@ -40,8 +40,8 @@ export const rainbow: SoftwareWallet = {
 					seedPhrase: 'BIP39',
 				},
 			}),
+			erc4337: notSupported,
 			mpc: notSupported,
-			rawErc4337: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {

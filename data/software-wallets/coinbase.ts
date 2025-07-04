@@ -53,8 +53,7 @@ export const coinbase: SoftwareWallet = {
 					seedPhrase: 'BIP39',
 				},
 			}),
-			mpc: notSupported,
-			rawErc4337: supported({
+			erc4337: supported({
 				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
@@ -65,6 +64,7 @@ export const coinbase: SoftwareWallet = {
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
+			mpc: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {
