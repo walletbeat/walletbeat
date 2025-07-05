@@ -29,6 +29,12 @@ import {
 } from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
+import { ladders, type WalletLadderType } from './ladders'
+import {
+	evaluateWalletOnLadder,
+	type StageEvaluatableWallet,
+	type WalletLadderEvaluation,
+} from './stages'
 import type { Url } from './url'
 import {
 	type AtLeastOneTrueVariant,
@@ -297,6 +303,16 @@ export interface RatedWallet {
 	/** Aggregate evaluation across all variants. */
 	overall: EvaluationTree
 
+	/**
+	 * Stage rating on wallet ladders.
+	 *
+	 * Given that a single wallet may be of multiple `WalletType`s, a single
+	 * wallet may consequently qualify on more than one ladder.
+	 * When displayed on the interface, it is expected that the interface code
+	 * will select the evaluation on the ladder(s) that makes sense to display.
+	 */
+	ladders: Record<WalletLadderType, WalletLadderEvaluation>
+
 	/** Overrides for specific attributes. */
 	overrides: WalletOverrides
 }
@@ -422,13 +438,20 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 		},
 	)
 
-	return {
-		metadata: wallet.metadata,
+	const stageEvaluatable: StageEvaluatableWallet = {
 		types: walletTypes(wallet),
 		variants: perVariantWallets,
 		variantSpecificity,
 		overall: aggregateAttributes(perVariantTree),
 		overrides: wallet.overrides ?? { attributes: {} },
+	}
+
+	return {
+		metadata: wallet.metadata,
+		...stageEvaluatable,
+		ladders: nonEmptyRemap(ladders, (_, ladder) =>
+			evaluateWalletOnLadder(stageEvaluatable, ladder),
+		),
 	}
 }
 

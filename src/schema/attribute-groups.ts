@@ -716,3 +716,34 @@ export function getAttributeGroupById(
 
 	return attrGroup
 }
+
+export function getAttributeFromTree<V extends Value>(
+	tree: EvaluationTree,
+	attribute: Attribute<V>,
+): EvaluatedAttribute<V> | null {
+	const evalAttrs = mapNonExemptAttributeGroupsInTree(
+		tree,
+		<Vs extends ValueSet>(
+			_: AttributeGroup<Vs>,
+			evalGroup: EvaluatedGroup<Vs>,
+		): EvaluatedAttribute<V> | null => {
+			for (const evalAttr of evaluatedAttributes(evalGroup)) {
+				if (evalAttr.attribute.id === attribute.id) {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we checked the attributes match by ID.
+					return evalAttr as unknown as EvaluatedAttribute<V>
+				}
+			}
+
+			return null
+		},
+	).filter(v => v !== null)
+
+	switch (evalAttrs.length) {
+		case 0:
+			return null
+		case 1:
+			return evalAttrs[0]
+		default:
+			throw new Error(`Found multiple attributes with the same ID ${attribute.id}`)
+	}
+}
