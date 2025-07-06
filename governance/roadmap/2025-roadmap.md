@@ -6,9 +6,9 @@ _The purpose of this document is to come to a consensus of what Walletbeat needs
 
 ## Background & project history
 
-Walletbeat was kicked off by [Fluidkey](https://fluidkey.com/) in December 2023, documenting the state of Ethereum wallets, at [walletbeat.fyi](https://walletbeat.fyi). The idea was to follow the lead of [L2BEAT], and to do for Ethereum wallets what L2BEAT has done for Ethereum rollups. Walletbeat rates Ethereum wallets on criteria such as multi-chain support, ENS integration, open-source licensing, account recovery, etc.
+Walletbeat was kicked off by [Fluidkey](https://fluidkey.com/)'s [mozrt2](https://github.com/mozrt2) in December 2023, documenting the state of Ethereum wallets, at [walletbeat.fyi](https://walletbeat.fyi). The idea was to follow the lead of [L2BEAT], and to do for Ethereum wallets what L2BEAT has done for Ethereum rollups. Walletbeat rates Ethereum wallets on criteria such as multi-chain support, ENS integration, open-source licensing, account recovery, etc.
 
-In November 2024, inspired by [Vitalik Buterin's post on Ethereum alignment](https://vitalik.eth.limo/general/2024/09/28/alignment.html), polymutex kicked off an effort to revamp Walletbeat. This work took on the name of "Walletbeat Beta". The purpose of this effort was to go deeper into each wallet and expand the way wallets in which are evaluated to closely map with Ethereum values. See [Ethereum Magicians kickoff thread on this](https://ethereum-magicians.org/t/making-ethereum-alignment-legible-wallets/21841). Shortly thereafter, Vitalik Buterin published a [blog post on what Ethereum wallets should implement](https://vitalik.eth.limo/general/2024/12/03/wallets.html). Other contributors have joined the effort: darrylyeo, nconsigny, lucemans, nloureiro, Jontes-Tech, minimalsm, and PatrickAlphaC.
+In November 2024, inspired by [Vitalik Buterin's post on Ethereum alignment](https://vitalik.eth.limo/general/2024/09/28/alignment.html), [polymutex](https://github.com/polymutex) kicked off an effort to revamp Walletbeat. This work took on the name of "Walletbeat Beta". The purpose of this effort was to go deeper into each wallet and expand the way wallets in which are evaluated to closely map with Ethereum values. See [Ethereum Magicians kickoff thread on this](https://ethereum-magicians.org/t/making-ethereum-alignment-legible-wallets/21841). Shortly thereafter, Vitalik Buterin published a [blog post on what Ethereum wallets should implement](https://vitalik.eth.limo/general/2024/12/03/wallets.html). Other contributors have joined the effort: [darrylyeo](https://github.com/darrylyeo), [nconsigny](https://github.com/nconsigny), [lucemans](https://github.com/lucemans), [nloureiro](https://github.com/nloureiro), [Jontes-Tech](https://github.com/Jontes-Tech), [minimalsm](https://github.com/minimalsm), and [PatrickAlphaC](https://github.com/PatrickAlphaC).
 
 Whereas Walletbeat was a single large comparison table, Walletbeat Beta goes in depth on all of the attributes it rates. Each attribute comes with rationale as to its importance, and each wallet rating comes with a reason for the rating, a set of steps the wallets can take to improve its rating, etc. Attributes are grouped around Ethereum values: **Security**, **privacy**, **self-sovereignty**, **transparency**, and **ecosystem alignment**.
 
@@ -18,7 +18,7 @@ As Walletbeat Beta has been getting closer to finalizing its attribute set and r
 
 Walletbeat Beta currently features 12 software wallets, 7 hardware wallets, 5 attribute groups, and 30 rated attributes. While many of the wallets do not have full feature data, the site does have a large amount of information that is valuable to the public. Launching in a not-fully-rated state also encourages others to contribute to fill in the missing data. Notably, the Ambire wallet development team has already contributed PRs to fill out the wallet feature data for their own wallet, and a MetaMask developer has also offered to do so in the future once the attribute set is finalized.
 
-The project has benefited from other regular and non-regular contributors joining in to help: darrylyeo, nconsigny, lucemans, nloureiro, Jontes-Tech, minimalsm, and PatrickAlphaC. The project having multiple regular contributors is essential for Walletbeat's long-term legitimacy, sustainability, and decentralization; it must not be "just some internet person's opinion".
+The project has benefited from other regular and non-regular contributors joining in to help. The project having multiple regular contributors is essential for Walletbeat's long-term legitimacy, sustainability, and decentralization; it must not be "just some internet person's opinion".
 
 We have also achieved recognition from important parts of the ecosystem (Ethereum Foundation contributors, shout-out on the Daily Gwei, one "new attribute" tweet retweeted by Vitalik Buterin), received a grant from the Ethereum Foundation, and have been offered 2 podcast spots (declined due to pre-launch status, but may apply post-launch).
 
@@ -45,6 +45,10 @@ We have also achieved recognition from important parts of the ecosystem (Ethereu
 - **Establish a common UX theme for the site**:
   - _Why important_: Walletbeat Beta has so far been worked on mostly by non-UX-specialized engineers with little sense of design. The EF has contributed their designers to address a lot of these problems, but more UX work remains around consistent iconography, logo, press materials, etc.
   - _Why a goal for launch_: Walletbeat may be featured in articles and screenshotted quite often at launch, and these screenshots and articles to stand the test of time.
+- **Flesh out EIP-7702 adoption tracker**:
+  - _Details_: Flesh out the EIP-7702 feature set, populate its data for 12 wallets, and reflect this on a dedicated EIP-7702 tracking page.
+  - _Why important_: This was promised to the EF in the [Pectra Proactive Grant Round](https://esp.ethereum.foundation/pectra-pgr).
+  - _Why a goal for launch_: This is not strictly a launch goal, but timeline-wise these things are pretty much the same, so might as well treat it as a launch goal.
 - **Establish new ownership of "Walletbeat" name**:
   - _Details_: The name "Walletbeat" is currently overloaded, half owned by Fluidkey (`walletbeat.fyi`), half owned by polymutex (`beta.walletbeat.eth`). If Walletbeat Beta is to replace its predecessor, there should be a formal handover of the Walletbeat name.
   - _Why a goal for launch_: Needed for clarity of the status of Walletbeat as a name.
@@ -83,4 +87,16 @@ TBD
 
 ## Governance structure
 
-TBD
+Walletbeat's governance structure is currently a nebulous combination of the following:
+
+- [Fluidkey](https://github.com/fluidkey) provides hosting for `walletbeat.fyi` and own this domain name.
+- [mozrt2](https://github.com/mozrt2) provides PR review and maintenance for `walletbeat.fyi`.
+- [polymutex](https://github.com/polymutex) owns `walletbeat.eth`.
+
+The ideal state for Walletbeat's post-launch, pre-2026 governance structure should have the following properties:
+
+- `walletbeat.eth` is owned by a multisig with at least 5 active members.
+- Fluidkey formally recognizes this multisig as owning "Walletbeat" as a name.
+- Walletbeat may have a [BDFL](https://en.wikipedia.org/wiki/Benevolent_dictator_for_life)-like structure for maintainership, but that person should not have unilateral authority over the `walletbeat.eth` multisig.
+
+[nconsigny](https://github.com/nconsigny) has volunteered for BDFL role for a few months as of this writing (June 2025). [polymutex](https://github.com/polymutex) cannot commit to the project full-time for these few months, though future availability may be greater.
