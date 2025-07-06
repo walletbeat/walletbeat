@@ -20,6 +20,8 @@ Walletbeat Beta currently features 12 software wallets, 7 hardware wallets, 5 at
 
 The project has benefited from other regular and non-regular contributors joining in to help: darrylyeo, nconsigny, lucemans, nloureiro, Jontes-Tech, minimalsm, and PatrickAlphaC. The project having multiple regular contributors is essential for Walletbeat's long-term legitimacy, sustainability, and decentralization; it must not be "just some internet person's opinion".
 
+We have also achieved recognition from important parts of the ecosystem (Ethereum Foundation contributors, shout-out on the Daily Gwei, one "new attribute" tweet retweeted by Vitalik Buterin), received a grant from the Ethereum Foundation, and have been offered 2 podcast spots (declined due to pre-launch status, but may apply post-launch).
+
 ## Goals for launch
 
 - **Finalize wallet attribute set**:
@@ -43,6 +45,9 @@ The project has benefited from other regular and non-regular contributors joinin
 - **Establish a common UX theme for the site**:
   - _Why important_: Walletbeat Beta has so far been worked on mostly by non-UX-specialized engineers with little sense of design. The EF has contributed their designers to address a lot of these problems, but more UX work remains around consistent iconography, logo, press materials, etc.
   - _Why a goal for launch_: Walletbeat may be featured in articles and screenshotted quite often at launch, and these screenshots and articles to stand the test of time.
+- **Establish new ownership of "Walletbeat" name**:
+  - _Details_: The name "Walletbeat" is currently overloaded, half owned by Fluidkey (`walletbeat.fyi`), half owned by polymutex (`beta.walletbeat.eth`). If Walletbeat Beta is to replace its predecessor, there should be a formal handover of the Walletbeat name.
+  - _Why a goal for launch_: Needed for clarity of the status of Walletbeat as a name.
 
 ## Non-goals for launch, but still in scope for 2025
 
@@ -56,6 +61,12 @@ The project has benefited from other regular and non-regular contributors joinin
   - _Details_: Make Walletbeat wallet rating data exportable as JSON (for machine readability) and Markdown (for LLMs) to consume.
   - _Why important_: Walletbeat is at its core an informational site, and the value in that information lies in how trustworthy, reliable, and widespread it is. Expanding the reach of this data helps all of these goals.
   - _Why non-goal for launch_: The primary audience of the launch is humans, not machines.
+- **Establishing governance structure**:
+  - _Details_: Need a long-term governance structure more formalized than the current one. See "Governance structure" section below for more details.
+  - _Why important_:
+    - Necessary for current contributors to feel that they have legitimate ownership of the project, which is critical to Walletbeat being a decentralized, community-owned project.
+    - Necessary to avoid long-term capture by wallet development teams.
+  - _Why non-goal for launch_: The main purpose of the launch is to propagate Walletbeat as an idea and an informational resource. Launch itself may end up attracting more new contributors who may be further motivated to contribute rather than the current set which is limited in size.
 
 ## Non-goals for 2025
 
