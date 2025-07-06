@@ -1,6 +1,6 @@
-import type { AADeployer } from '@/schema/contracts'
+import type { AccountAbstractionDeployer } from '@/schema/contracts'
 
-export const claveAccountDeployer: AADeployer = {
+export const claveAccountDeployer: AccountAbstractionDeployer = {
 	name: 'Clave Account Factory',
 	address: '0x2b196aab35184aa539e3d8360258caf8d8309ebc',
 	chain: 'zksyncEra',

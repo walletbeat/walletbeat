@@ -52,10 +52,9 @@ export const clave: SoftwareWallet = {
 				contract: claveAccount,
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				// Question: Technically, I can always send a transaction because I'm a developer... But I will often use their proprietary API to generate transactions... What should we put?
+					TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
 				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
+					TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
 			}),
 			mpc: notSupported,
 		},
@@ -111,7 +110,7 @@ export const clave: SoftwareWallet = {
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
-							pseudonym: Leak.OPT_IN,
+							pseudonym: Leak.PROMPTED,
 							ref: [
 								{
 									explanation:
@@ -152,7 +151,7 @@ export const clave: SoftwareWallet = {
 					},
 				],
 				onchain: {
-					pseudonym: Leak.OPT_IN,
+					pseudonym: Leak.PROMPTED,
 					ref: {
 						explanation: 'Users may optionally provide usernames which are stored onchain.',
 						url: 'https://www.getclave.com/privacy-policy',

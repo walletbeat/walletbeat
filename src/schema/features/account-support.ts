@@ -5,7 +5,7 @@ import {
 	nonEmptySetFromArray,
 } from '@/types/utils/non-empty'
 
-import type { NativeAccountAbstraction, SmartWalletContract } from '../contracts'
+import type { NativeAccountAbstractionContract, SmartWalletContract } from '../contracts'
 import type { WithRef } from '../reference'
 import { isSupported, type NotSupported, type Support, type Supported } from './support'
 
@@ -209,7 +209,7 @@ export type AccountTypeMutableMultifactor = AccountTypeMultifactor & {
 
 /** A wallet backed by a smart contract. */
 export interface SmartAccountType {
-	contract: 'UNKNOWN' | SmartWalletContract | NativeAccountAbstraction
+	contract: 'UNKNOWN' | SmartWalletContract | NativeAccountAbstractionContract
 }
 
 /** Support information for ERC-4337 accounts. */

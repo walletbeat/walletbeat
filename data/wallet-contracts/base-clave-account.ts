@@ -1,8 +1,8 @@
-import type { NativeAccountAbstraction } from '@/schema/contracts'
+import type { NativeAccountAbstractionContract } from '@/schema/contracts'
 
 import { claveAccountDeployer } from './clave-deployer'
 
-export const claveAccount: NativeAccountAbstraction = {
+export const claveAccount: NativeAccountAbstractionContract = {
 	name: 'Clave Account',
 	chain: 'zksyncEra',
 	deployer: claveAccountDeployer,

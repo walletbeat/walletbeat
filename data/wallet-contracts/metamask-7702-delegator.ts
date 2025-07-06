@@ -1,6 +1,8 @@
 import type { SmartWalletContract } from '@/schema/contracts'
 import { featureSupported } from '@/schema/features/support'
 
+// https://github.com/MetaMask/delegation-framework/blob/main/documents/Deployments.md
+
 export const metamask7702DelegatorContract: SmartWalletContract = {
 	name: 'MetaMask 7702 Delegator',
 	address: '0x63c0c19a282a1b52b07dd5a65b58948a07dae32b',
