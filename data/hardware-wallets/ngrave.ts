@@ -1,10 +1,15 @@
 import { patrickalphac } from '@/data/contributors'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
+	DappConnectionMethod,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
+import {
 	DataExtraction,
 	noCalldataDecoding,
 	noDataExtraction,
-} from '@/schema/features/security/hardware-wallet-dapp-signing'
+} from '@/schema/features/security/signing-intent-clarity'
+import { supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -70,13 +75,14 @@ export const ngrave: HardwareWallet = {
 		security: {
 			bugBountyProgram: null,
 			firmware: null,
-			hardwareWalletDappSigning: {
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
 					details:
 						'NGRAVE Zero does not display EIP-712 data properly. It shows an unrecognizable binary format instead of the actual struct data.',
 					messageExtraction: {
 						[DataExtraction.EYES]: false,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -120,6 +126,13 @@ export const ngrave: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
+		dappConnectionSupport: supported({
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+			},
+			ref: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
+		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

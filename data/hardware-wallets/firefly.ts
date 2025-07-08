@@ -63,8 +63,9 @@ export const fireflyWallet: HardwareWallet = {
 				upgradePathAvailable: false,
 				url: '',
 			},
+			dappConnectionSupport: null,
 			firmware: null,
-			hardwareWalletDappSigning: {
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: null,
 					details:

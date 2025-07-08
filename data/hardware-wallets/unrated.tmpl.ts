@@ -49,7 +49,7 @@ export const unratedHardwareTemplate: HardwareWallet = {
 		security: {
 			bugBountyProgram: null,
 			firmware: null,
-			hardwareWalletDappSigning: null,
+			signingIntentClarity: null,
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,

@@ -267,7 +267,7 @@ export const softwareHWIntegration: Attribute<SoftwareHWIntegrationValue> = {
 
 		const references = mergeRefs(
 			refs(features.security.hardwareWalletSupport),
-			refs(features.security.hardwareWalletDappSigning ?? {}),
+			refs(features.security.signingIntentClarity ?? {}),
 		)
 
 		if (!hasHardwareWalletSupport) {

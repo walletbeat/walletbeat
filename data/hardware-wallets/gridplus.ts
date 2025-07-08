@@ -2,10 +2,15 @@ import { nconsigny, patrickalphac } from '@/data/contributors'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import {
+	DappConnectionMethod,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
+import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
-} from '@/schema/features/security/hardware-wallet-dapp-signing'
+} from '@/schema/features/security/signing-intent-clarity'
+import { supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -76,7 +81,7 @@ export const gridplusWallet: HardwareWallet = {
 				url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
 			},
 			firmware: null,
-			hardwareWalletDappSigning: {
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: {
 						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
@@ -89,6 +94,7 @@ export const gridplusWallet: HardwareWallet = {
 						'GridPlus Lattice1 provides message signing support, but does not show EIP-712 digests or hashes.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -115,6 +121,7 @@ export const gridplusWallet: HardwareWallet = {
 					},
 					calldataExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -141,6 +148,17 @@ export const gridplusWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
+		dappConnectionSupport: supported({
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.AMBIRE]: true,
+				[SoftwareWalletType.FRAME]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
+		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

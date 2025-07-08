@@ -3,10 +3,15 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
+	DappConnectionMethod,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
+import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
-} from '@/schema/features/security/hardware-wallet-dapp-signing'
+} from '@/schema/features/security/signing-intent-clarity'
+import { supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -91,13 +96,14 @@ export const onekeyWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.FAIL,
 				silentUpdateProtection: null,
 			},
-			hardwareWalletDappSigning: {
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
 					details:
 						'OneKey Pro shows EIP-712 domain types and message data but does not display domain hash or message hash for easier verification.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -117,6 +123,7 @@ export const onekeyWallet: HardwareWallet = {
 					calldataDecoding: noCalldataDecoding,
 					calldataExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -147,6 +154,17 @@ export const onekeyWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
+		dappConnectionSupport: supported({
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+			ref: [
+				'https://help.onekey.so/en/articles/11461105-how-to-use-rabby-wallet-with-onekey-hardware-wallets',
+				'https://developer.onekey.so/connect-to-software/using-walletconnect',
+			],
+		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

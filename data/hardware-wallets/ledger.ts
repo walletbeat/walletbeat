@@ -5,11 +5,16 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
-} from '@/schema/features/security/hardware-wallet-dapp-signing'
+} from '@/schema/features/security/signing-intent-clarity'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import { supported } from '@/schema/features/support'
+import {
+	DappConnectionMethod,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 
 export const ledgerWallet: HardwareWallet = {
 	metadata: {
@@ -101,13 +106,14 @@ export const ledgerWallet: HardwareWallet = {
 				url: 'https://donjon.ledger.com/bounty/',
 			},
 			firmware: null,
-			hardwareWalletDappSigning: {
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
 					details:
 						'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false, 
 						[DataExtraction.HASHES]: true, // Fantastic
 						[DataExtraction.QRCODE]: false,
 					},
@@ -123,6 +129,7 @@ export const ledgerWallet: HardwareWallet = {
 					calldataDecoding: noCalldataDecoding,
 					calldataExtraction: {
 						[DataExtraction.EYES]: true, // VERY hard to verify, very weird format
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -152,6 +159,16 @@ export const ledgerWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
+		dappConnectionSupport: supported({
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.FRAME]: true,
+				[SoftwareWalletType.OTHER]: true,
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+			},
+			ref: 'https://support.ledger.com/article/360018444599-zd',
+		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

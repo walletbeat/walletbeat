@@ -17,6 +17,10 @@ import { paragraph } from '@/types/content'
 import { cantina } from '../entities/cantina'
 import { certora } from '../entities/certora'
 import { code4rena } from '../entities/code4rena'
+import {
+	DataExtraction,
+	noCalldataDecoding,
+} from '@/schema/features/security/signing-intent-clarity'
 
 export const coinbase: SoftwareWallet = {
 	metadata: {
@@ -174,6 +178,36 @@ export const coinbase: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 			],
+			signingIntentClarity: {
+				messageSigning: {
+					calldataDecoding: noCalldataDecoding,
+					messageExtraction: {
+						[DataExtraction.EYES]: false,
+						[DataExtraction.COPY]: false,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+				},
+				transactionSigning: {
+					calldataDecoding: noCalldataDecoding,
+					calldataExtraction: {
+						[DataExtraction.EYES]: false,
+						[DataExtraction.COPY]: false,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+					details: 'Coinbase Wallet does not show calldata.',
+					displayedTransactionDetails: {
+						chain: true,
+						from: true,
+						gas: true,
+						nonce: false,
+						to: true,
+						value: true,
+					},
+				},
+				ref: 'https://github.com/walletbeat/walletbeat/blob/beta/data/evidence-reference/coinbase/limited-signature-intent.jpg',
+			},
 			scamAlerts: null,
 		},
 		selfSovereignty: {

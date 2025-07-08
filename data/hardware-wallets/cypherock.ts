@@ -2,11 +2,13 @@ import { patrickalphac } from '@/data/contributors'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import { DappConnectionMethod } from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import {
 	DataExtraction,
 	noCalldataDecoding,
 	noDataExtraction,
-} from '@/schema/features/security/hardware-wallet-dapp-signing'
+} from '@/schema/features/security/signing-intent-clarity'
+import { supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -91,13 +93,14 @@ export const cypherockWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.PASS,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
-			hardwareWalletDappSigning: {
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
 					details:
 						'Shows EIP-712 signature data only in the companion application, not on the hardware wallet itself.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -146,6 +149,12 @@ export const cypherockWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
+		dappConnectionSupport: supported({
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+			},
+			ref: 'https://www.youtube.com/watch?v=R0g35dKjRtI',
+		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

@@ -28,6 +28,7 @@ import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
+import { CalldataDecoding, DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 
 export const rabby: SoftwareWallet = {
 	metadata: {
@@ -439,6 +440,46 @@ export const rabby: SoftwareWallet = {
 					],
 					userWhitelist: true,
 				}),
+			},
+			signingIntentClarity: {
+				messageSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: false,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
+						[CalldataDecoding.AAVE_SUPPLY]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+					},
+					messageExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+				},
+				transactionSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+						[CalldataDecoding.AAVE_SUPPLY]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+					},
+					calldataExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+					displayedTransactionDetails: {
+						chain: true,
+						from: true,
+						gas: true,
+						nonce: true,
+						to: true,
+						value: true,
+					},
+				},
 			},
 		},
 		selfSovereignty: {
