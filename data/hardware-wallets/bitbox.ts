@@ -2,6 +2,10 @@ import { patrickalphac } from '@/data/contributors'
 import { bitbox } from '@/data/entities/bitbox'
 import { etherscan } from '@/data/entities/etherscan'
 import {
+	DappConnectionMethod,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
+import {
 	Leak,
 	LeakedPersonalInfo,
 	LeakedWalletInfo,
@@ -9,10 +13,6 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
-import {
-	DappConnectionMethod,
-	SoftwareWalletType,
-} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	DataExtraction,
@@ -49,6 +49,21 @@ export const bitboxWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			details:
+				'BitBox02 supports dApp connections through their open-source BitBoxApp, WalletConnect protocol, and integration with Rabby wallet.',
+			ref: [
+				{
+					explanation:
+						'BitBox blog post explaining WalletConnect integration for secure dApp connections',
+					url: 'https://blog.bitbox.swiss/en/using-walletconnect-to-securely-connect-to-your-favorite-dapp/',
+				},
+			],
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[SoftwareWalletType.RABBY]: true,
+			},
+		}),
 		license: {
 			license: License.APACHE_2_0,
 			ref: [
@@ -144,6 +159,12 @@ export const bitboxWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.PASS,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
 			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
@@ -182,12 +203,6 @@ export const bitboxWallet: HardwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
@@ -200,21 +215,6 @@ export const bitboxWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
-		dappConnectionSupport: supported({
-			supportedConnections: {
-				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
-				[SoftwareWalletType.RABBY]: true,
-			},
-			details:
-				'BitBox02 supports dApp connections through their open-source BitBoxApp, WalletConnect protocol, and integration with Rabby wallet.',
-			ref: [
-				{
-					explanation:
-						'BitBox blog post explaining WalletConnect integration for secure dApp connections',
-					url: 'https://blog.bitbox.swiss/en/using-walletconnect-to-securely-connect-to-your-favorite-dapp/',
-				},
-			],
-		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

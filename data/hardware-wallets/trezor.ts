@@ -1,20 +1,20 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
+import {
+	DappConnectionMethod,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/signing-intent-clarity'
-import {
-	DappConnectionMethod,
-	SoftwareWalletType,
-} from '@/schema/features/ecosystem/hw-dapp-connection-support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import { supported } from '@/schema/features/support'
 
 export const trezorWallet: HardwareWallet = {
 	metadata: {
@@ -60,6 +60,19 @@ export const trezorWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			details:
+				'Trezor supports multiple dApp connection methods including their open-source Trezor Suite, WalletConnect, and integration with popular software wallets like MetaMask and Rabby.',
+			ref: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.AMBIRE]: true,
+				[SoftwareWalletType.FRAME]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+		}),
 		license: null,
 		monetization: {
 			ref: null,
@@ -100,6 +113,15 @@ export const trezorWallet: HardwareWallet = {
 				url: 'https://trezor.io/support/a/how-to-report-a-security-issue',
 			},
 			firmware: null,
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
+			publicSecurityAudits: null,
 			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
@@ -140,15 +162,6 @@ export const trezorWallet: HardwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
@@ -161,19 +174,6 @@ export const trezorWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
-		dappConnectionSupport: supported({
-			supportedConnections: {
-				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
-				[SoftwareWalletType.METAMASK]: true,
-				[SoftwareWalletType.RABBY]: true,
-				[SoftwareWalletType.AMBIRE]: true,
-				[SoftwareWalletType.FRAME]: true,
-				[SoftwareWalletType.OTHER]: true,
-			},
-			details:
-				'Trezor supports multiple dApp connection methods including their open-source Trezor Suite, WalletConnect, and integration with popular software wallets like MetaMask and Rabby.',
-			ref: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
-		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

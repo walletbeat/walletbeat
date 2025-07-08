@@ -1,5 +1,6 @@
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
+import type { DappConnectionSupport } from './features/ecosystem/hw-dapp-connection-support'
 import {
 	notApplicableWalletIntegration,
 	type ResolvedWalletIntegration,
@@ -13,14 +14,13 @@ import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
 import type { FirmwareSupport } from './features/security/firmware'
-import type { SigningIntentClarityImplementation } from './features/security/signing-intent-clarity'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
-import type { DappConnectionSupport } from './features/ecosystem/hw-dapp-connection-support'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
 import type { EthereumL1LightClientSupport } from './features/security/light-client'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
 import type { ScamAlerts } from './features/security/scam-alerts'
 import type { SecurityAudit } from './features/security/security-audits'
+import type { SigningIntentClarityImplementation } from './features/security/signing-intent-clarity'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type { UserSafetySupport } from './features/security/user-safety'
@@ -316,6 +316,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 				if (isWalletSoftwareFeatures(features) && features.security.signingIntentClarity) {
 					return softwareFeat(features => features.security.signingIntentClarity)
 				}
+
 				return hardwareFeat(features => features.security.signingIntentClarity)
 			})(),
 			passkeyVerification: baseFeat(features => features.security.passkeyVerification),

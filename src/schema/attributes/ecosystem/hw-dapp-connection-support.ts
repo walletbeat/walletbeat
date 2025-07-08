@@ -6,24 +6,20 @@ import {
 	type Value,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
-import { notSupported } from '@/schema/features/support'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 import type { DappConnectionMethodDetails } from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import {
-	DappConnectionMethod,
-	SoftwareWalletType,
-	cannotConnectToDapps,
 	countAllConnectionMethods,
+	DappConnectionMethod,
 	getSupportedSoftwareWallets,
-	singleConnectionMethod,
+	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-dapp-connection-support'
-import { isSupported, supported } from '@/schema/features/support'
 import type { Support, Supported } from '@/schema/features/support'
+import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { refs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import type { DappConnectionSupport } from '@/schema/features/ecosystem/hw-dapp-connection-support'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
@@ -218,8 +214,11 @@ export const dappConnectionSupport: Attribute<DappConnectionSupportValue> = {
 					application, limiting user choice and requiring trust in unverifiable software.
 				`),
 				limitedDappConnectionSupport(
-					supported(singleConnectionMethod(DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP)),
-					[],
+					supported({
+						supportedConnections: {
+							[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
+						},
+					}),
 				).value,
 			),
 			exampleRating(
@@ -289,7 +288,6 @@ export const dappConnectionSupport: Attribute<DappConnectionSupportValue> = {
 			})
 		}
 
-
 		// Extract references if supported
 		const references = isSupported(dappSupport) ? refs(dappSupport) : []
 
@@ -320,6 +318,7 @@ export const dappConnectionSupport: Attribute<DappConnectionSupportValue> = {
 
 		const hasOpenSource =
 			dappSupport.supportedConnections[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
+
 		if (totalMethodCount <= 2 && !hasOpenSource) {
 			return limitedDappConnectionSupport(dappSupport)
 		}

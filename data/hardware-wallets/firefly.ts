@@ -65,6 +65,12 @@ export const fireflyWallet: HardwareWallet = {
 			},
 			dappConnectionSupport: null,
 			firmware: null,
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
 			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: null,
@@ -81,12 +87,6 @@ export const fireflyWallet: HardwareWallet = {
 					displayedTransactionDetails: null,
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

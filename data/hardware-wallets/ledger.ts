@@ -1,20 +1,20 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
+import {
+	DappConnectionMethod,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/signing-intent-clarity'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import { supported } from '@/schema/features/support'
-import {
-	DappConnectionMethod,
-	SoftwareWalletType,
-} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 
 export const ledgerWallet: HardwareWallet = {
 	metadata: {
@@ -66,6 +66,16 @@ export const ledgerWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			ref: 'https://support.ledger.com/article/360018444599-zd',
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.FRAME]: true,
+				[SoftwareWalletType.OTHER]: true,
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+			},
+		}),
 		license: null,
 		monetization: {
 			ref: null,
@@ -106,6 +116,15 @@ export const ledgerWallet: HardwareWallet = {
 				url: 'https://donjon.ledger.com/bounty/',
 			},
 			firmware: null,
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
+			publicSecurityAudits: null,
 			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
@@ -113,7 +132,7 @@ export const ledgerWallet: HardwareWallet = {
 						'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false, 
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: true, // Fantastic
 						[DataExtraction.QRCODE]: false,
 					},
@@ -138,15 +157,6 @@ export const ledgerWallet: HardwareWallet = {
 					displayedTransactionDetails: displaysFullTransactionDetails,
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
@@ -159,16 +169,6 @@ export const ledgerWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
-		dappConnectionSupport: supported({
-			supportedConnections: {
-				[SoftwareWalletType.METAMASK]: true,
-				[SoftwareWalletType.RABBY]: true,
-				[SoftwareWalletType.FRAME]: true,
-				[SoftwareWalletType.OTHER]: true,
-				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
-			},
-			ref: 'https://support.ledger.com/article/360018444599-zd',
-		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

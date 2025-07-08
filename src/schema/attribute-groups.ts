@@ -37,6 +37,10 @@ import {
 	type ChainAbstractionValue,
 } from './attributes/ecosystem/chain-abstraction'
 import {
+	dappConnectionSupport,
+	type DappConnectionSupportValue,
+} from './attributes/ecosystem/hw-dapp-connection-support'
+import {
 	addressCorrelation,
 	type AddressCorrelationValue,
 } from './attributes/privacy/address-correlation'
@@ -59,14 +63,6 @@ import {
 } from './attributes/security/chain-verification'
 import { firmware, type FirmwareValue } from './attributes/security/firmware'
 import {
-	signingIntentClarity,
-	type SigningIntentClarityValue,
-} from './attributes/security/signing-intent-clarity'
-import {
-	dappConnectionSupport,
-	type DappConnectionSupportValue,
-} from './attributes/ecosystem/hw-dapp-connection-support'
-import {
 	hardwareWalletSupport,
 	type HardwareWalletSupportValue,
 } from './attributes/security/hardware-wallet-support'
@@ -77,6 +73,10 @@ import {
 } from './attributes/security/passkey-implementation'
 import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
 import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
+import {
+	signingIntentClarity,
+	type SigningIntentClarityValue,
+} from './attributes/security/signing-intent-clarity'
 import {
 	softwareHWIntegration,
 	type SoftwareHWIntegrationValue,

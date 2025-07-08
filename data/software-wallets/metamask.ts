@@ -7,6 +7,7 @@ import {
 	HardwareWalletType,
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { CalldataDecoding, DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
@@ -17,7 +18,6 @@ import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
-import { CalldataDecoding, DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 
 export const metamask: SoftwareWallet = {
 	metadata: {

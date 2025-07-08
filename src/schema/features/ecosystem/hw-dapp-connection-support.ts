@@ -1,7 +1,7 @@
-import type { WithRef } from '@/schema/reference'
 import type { Support } from '@/schema/features/support'
-import { isSupported, supported, notSupported } from '@/schema/features/support'
-import { setItems, type NonEmptySet } from '@/types/utils/non-empty'
+import { isSupported, notSupported } from '@/schema/features/support'
+import type { WithRef } from '@/schema/reference'
+import { type NonEmptySet, setItems } from '@/types/utils/non-empty'
 
 /**
  * Methods by which a hardware wallet can connect to dApps
@@ -93,18 +93,6 @@ export function getSupportedSoftwareWallets(
 	if (!isSupported(connectionSupport)) {
 		return []
 	}
-	return setItems(connectionSupport.supportedConnections).filter(isSoftwareWalletType)
-}
 
-/**
- * Helper function to create connection details for a wallet that only supports one method
- */
-export function singleConnectionMethod(
-	method: DappConnectionMethod | SoftwareWalletType,
-): DappConnectionMethodDetails {
-	return {
-		supportedConnections: {
-			[method]: true,
-		} as NonEmptySet<DappConnectionMethod | SoftwareWalletType>,
-	}
+	return setItems(connectionSupport.supportedConnections).filter(isSoftwareWalletType)
 }

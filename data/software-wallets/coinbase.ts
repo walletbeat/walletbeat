@@ -7,6 +7,10 @@ import {
 	HardwareWalletType,
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import {
+	DataExtraction,
+	noCalldataDecoding,
+} from '@/schema/features/security/signing-intent-clarity'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
@@ -17,10 +21,6 @@ import { paragraph } from '@/types/content'
 import { cantina } from '../entities/cantina'
 import { certora } from '../entities/certora'
 import { code4rena } from '../entities/code4rena'
-import {
-	DataExtraction,
-	noCalldataDecoding,
-} from '@/schema/features/security/signing-intent-clarity'
 
 export const coinbase: SoftwareWallet = {
 	metadata: {
@@ -178,6 +178,7 @@ export const coinbase: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 			],
+			scamAlerts: null,
 			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
@@ -188,6 +189,7 @@ export const coinbase: SoftwareWallet = {
 						[DataExtraction.QRCODE]: false,
 					},
 				},
+				ref: 'https://github.com/walletbeat/walletbeat/blob/beta/data/evidence-reference/coinbase/limited-signature-intent.jpg',
 				transactionSigning: {
 					calldataDecoding: noCalldataDecoding,
 					calldataExtraction: {
@@ -206,9 +208,7 @@ export const coinbase: SoftwareWallet = {
 						value: true,
 					},
 				},
-				ref: 'https://github.com/walletbeat/walletbeat/blob/beta/data/evidence-reference/coinbase/limited-signature-intent.jpg',
 			},
-			scamAlerts: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

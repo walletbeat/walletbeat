@@ -13,6 +13,7 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
+import { CalldataDecoding, DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
@@ -28,7 +29,6 @@ import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
-import { CalldataDecoding, DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 
 export const rabby: SoftwareWallet = {
 	metadata: {

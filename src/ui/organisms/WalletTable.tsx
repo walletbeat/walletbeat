@@ -477,6 +477,7 @@ function ExpandableHardwareWalletRow({
 		if (columnIndex < 1) {
 			return flexRender(cell.column.columnDef.cell, cell.getContext())
 		}
+
 		return perAttributeGroupCells[columnIndex - 1]
 	}
 

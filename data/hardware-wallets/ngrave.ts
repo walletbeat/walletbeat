@@ -1,9 +1,6 @@
 import { patrickalphac } from '@/data/contributors'
+import { SoftwareWalletType } from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import {
-	DappConnectionMethod,
-	SoftwareWalletType,
-} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import {
 	DataExtraction,
 	noCalldataDecoding,
@@ -40,6 +37,13 @@ export const ngrave: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			ref: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+			},
+		}),
 		license: {
 			license: License.PROPRIETARY,
 			ref: [
@@ -75,6 +79,12 @@ export const ngrave: HardwareWallet = {
 		security: {
 			bugBountyProgram: null,
 			firmware: null,
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
 			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
@@ -108,12 +118,6 @@ export const ngrave: HardwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
@@ -126,13 +130,6 @@ export const ngrave: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
-		dappConnectionSupport: supported({
-			supportedConnections: {
-				[SoftwareWalletType.METAMASK]: true,
-				[SoftwareWalletType.RABBY]: true,
-			},
-			ref: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
-		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

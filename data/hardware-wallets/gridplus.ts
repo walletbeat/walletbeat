@@ -1,10 +1,10 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
-import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import {
 	DappConnectionMethod,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-dapp-connection-support'
+import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
+import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import {
 	CalldataDecoding,
 	DataExtraction,
@@ -41,6 +41,17 @@ export const gridplusWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.AMBIRE]: true,
+				[SoftwareWalletType.FRAME]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+		}),
 		license: null,
 		monetization: {
 			ref: null,
@@ -81,6 +92,12 @@ export const gridplusWallet: HardwareWallet = {
 				url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
 			},
 			firmware: null,
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
 			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: {
@@ -130,12 +147,6 @@ export const gridplusWallet: HardwareWallet = {
 					displayedTransactionDetails: displaysFullTransactionDetails,
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
@@ -148,17 +159,6 @@ export const gridplusWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
-		dappConnectionSupport: supported({
-			supportedConnections: {
-				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
-				[SoftwareWalletType.METAMASK]: true,
-				[SoftwareWalletType.RABBY]: true,
-				[SoftwareWalletType.AMBIRE]: true,
-				[SoftwareWalletType.FRAME]: true,
-				[SoftwareWalletType.OTHER]: true,
-			},
-			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
-		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

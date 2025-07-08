@@ -1,11 +1,8 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
+import { SoftwareWalletType } from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
-import {
-	DappConnectionMethod,
-	SoftwareWalletType,
-} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import {
 	CalldataDecoding,
 	DataExtraction,
@@ -42,6 +39,14 @@ export const keystoneWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			ref: 'https://guide.keyst.one/docs/keystone',
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+		}),
 		license: null,
 		monetization: {
 			ref: null,
@@ -88,6 +93,12 @@ export const keystoneWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.PASS,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
 			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: {
@@ -137,12 +148,6 @@ export const keystoneWallet: HardwareWallet = {
 					displayedTransactionDetails: { ...displaysFullTransactionDetails, nonce: false },
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
@@ -155,14 +160,6 @@ export const keystoneWallet: HardwareWallet = {
 			maintenance: null,
 			reputation: null,
 		},
-		dappConnectionSupport: supported({
-			supportedConnections: {
-				[SoftwareWalletType.METAMASK]: true,
-				[SoftwareWalletType.RABBY]: true,
-				[SoftwareWalletType.OTHER]: true,
-			},
-			ref: 'https://guide.keyst.one/docs/keystone',
-		}),
 	},
 	variants: {
 		[Variant.HARDWARE]: true,

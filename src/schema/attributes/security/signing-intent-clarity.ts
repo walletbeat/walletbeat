@@ -6,7 +6,6 @@ import {
 	type Value,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
-import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 import type {
 	CalldataDecodingTypes,
 	DataExtractionMethods,
@@ -17,18 +16,17 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	displaysNoTransactionDetails,
+	isFullTransactionDetails,
 	noCalldataDecoding,
 	noDataExtraction,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
-	isFullTransactionDetails,
 } from '@/schema/features/security/signing-intent-clarity'
 import { refs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
-import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.signing_intent_clarity'
 
@@ -84,7 +82,7 @@ function basicSigningIntentClarity(
 			id: 'basic_signing_intent_clarity',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic signing intent clarity support',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports basic signing intent clarity.`),
+			shortExplanation: sentence('{{WALLET_NAME}} supports basic signing intent clarity.'),
 			messageExtraction,
 			messageDecoding,
 			calldataExtraction,
@@ -93,7 +91,7 @@ function basicSigningIntentClarity(
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} supports basic signing intent clarity, but the implementation does not provide full transparency for all transaction details. Signature intent clarity is important for security as it allows users to verify transaction details on their wallet screen before signing.`,
+			'{{WALLET_NAME}} supports basic signing intent clarity, but the implementation does not provide full transparency for all transaction details. Signature intent clarity is important for security as it allows users to verify transaction details on their wallet screen before signing.',
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should improve its signing intent clarity implementation to provide full transparency for all transaction details and better calldata extraction methods.',
@@ -113,7 +111,7 @@ function partialSigningIntentClarity(
 			id: 'partial_signing_intent_clarity',
 			rating: Rating.PARTIAL,
 			displayName: 'Partial signing intent clarity support',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports partial signing intent clarity.`),
+			shortExplanation: sentence('{{WALLET_NAME}} supports partial signing intent clarity.'),
 			messageExtraction,
 			messageDecoding,
 			calldataExtraction,
@@ -122,7 +120,7 @@ function partialSigningIntentClarity(
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} supports partial signing intent clarity. Most transaction details are displayed on the wallet screen/window for verification, but some complex transactions may not show all details. Showing transaction details (signing intent clarity) is crucial for security as it allows users to verify transaction details before signing.`,
+			'{{WALLET_NAME}} supports partial signing intent clarity. Most transaction details are displayed on the wallet screen/window for verification, but some complex transactions may not show all details. Showing transaction details (signing intent clarity) is crucial for security as it allows users to verify transaction details before signing.',
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should extend its signing intent clarity implementation to cover all transaction types and ensure all details are clearly displayed with better extraction methods.',
@@ -143,7 +141,7 @@ function fullSigningIntentClarity(
 			id: 'full_signing_intent_clarity',
 			rating: Rating.PASS,
 			displayName: 'Full signing intent clarity support',
-			shortExplanation: sentence(`{{WALLET_NAME}} supports full signing intent clarity.`),
+			shortExplanation: sentence('{{WALLET_NAME}} supports full signing intent clarity.'),
 			messageExtraction,
 			messageDecoding,
 			calldataExtraction,
@@ -152,7 +150,7 @@ function fullSigningIntentClarity(
 			__brand: brand,
 		},
 		details: mdParagraph(
-			`{{WALLET_NAME}} full signing intent clarity. All transaction details are clearly displayed on the wallet screen/window for verification before signing, providing maximum security and transparency for users.`,
+			'{{WALLET_NAME}} full signing intent clarity. All transaction details are clearly displayed on the wallet screen/window for verification before signing, providing maximum security and transparency for users.',
 		),
 		// Include references if provided
 		references: refs.length > 0 ? refs : undefined,
