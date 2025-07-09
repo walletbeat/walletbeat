@@ -6,6 +6,7 @@ import {
 	HardwareWalletType,
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { CalldataDecoding, DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
@@ -155,6 +156,46 @@ export const safe: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			signingIntentClarity: {
+				messageSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+						[CalldataDecoding.AAVE_SUPPLY]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
+					},
+					messageExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+				},
+				transactionSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+						[CalldataDecoding.AAVE_SUPPLY]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
+					},
+					calldataExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+					displayedTransactionDetails: {
+						chain: true,
+						from: true,
+						gas: true,
+						nonce: true,
+						to: true,
+						value: true,
+					},
+				},
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

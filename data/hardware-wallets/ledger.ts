@@ -1,12 +1,17 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
+import {
+	DappConnectionMethod,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
-} from '@/schema/features/security/hardware-wallet-dapp-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+} from '@/schema/features/security/signing-intent-clarity'
+import { supported } from '@/schema/features/support'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -61,6 +66,16 @@ export const ledgerWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			ref: 'https://support.ledger.com/article/360018444599-zd',
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.FRAME]: true,
+				[SoftwareWalletType.OTHER]: true,
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+			},
+		}),
 		license: null,
 		monetization: {
 			ref: null,
@@ -101,13 +116,23 @@ export const ledgerWallet: HardwareWallet = {
 				url: 'https://donjon.ledger.com/bounty/',
 			},
 			firmware: null,
-			hardwareWalletDappSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				library: PasskeyVerificationLibrary.NONE,
+				ref: null,
+			},
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
 					details:
 						'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: true, // Fantastic
 						[DataExtraction.QRCODE]: false,
 					},
@@ -123,6 +148,7 @@ export const ledgerWallet: HardwareWallet = {
 					calldataDecoding: noCalldataDecoding,
 					calldataExtraction: {
 						[DataExtraction.EYES]: true, // VERY hard to verify, very weird format
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -131,15 +157,6 @@ export const ledgerWallet: HardwareWallet = {
 					displayedTransactionDetails: displaysFullTransactionDetails,
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: {
-				library: PasskeyVerificationLibrary.NONE,
-				ref: null,
-			},
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

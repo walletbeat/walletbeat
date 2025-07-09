@@ -215,6 +215,11 @@ export enum DataExtraction {
 	 * Shows calldata/message data, and a group of hashes to compare against
 	 */
 	HASHES = 'HASHES',
+
+	/**
+	 * User is on a software device where they can copy the calldata directly.
+	 */
+	COPY = 'COPY',
 }
 
 /**
@@ -227,6 +232,7 @@ export type DataExtractionMethods = Record<DataExtraction, boolean>
  */
 export const noDataExtraction: DataExtractionMethods = {
 	[DataExtraction.EYES]: false,
+	[DataExtraction.COPY]: false,
 	[DataExtraction.QRCODE]: false,
 	[DataExtraction.HASHES]: false,
 }
@@ -286,9 +292,9 @@ export interface TransactionSigningSupport {
 }
 
 /**
- * A record of hardware wallet dapp signing support (both message and transaction)
+ * A record of signing intent clarity support (both message and transaction)
  */
-export interface HardwareWalletDappSigningSupport {
+export interface SigningIntentClaritySupport {
 	/**
 	 * Message signing support
 	 */
@@ -299,6 +305,12 @@ export interface HardwareWalletDappSigningSupport {
 	transactionSigning: TransactionSigningSupport
 }
 
+export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
+	return (
+		details.gas && details.nonce && details.from && details.to && details.chain && details.value
+	)
+}
+
 export type MessageSigningImplementation = WithRef<MessageSigningSupport>
 export type TransactionSigningImplementation = WithRef<TransactionSigningSupport>
-export type HardwareWalletDappSigningImplementation = WithRef<HardwareWalletDappSigningSupport>
+export type SigningIntentClarityImplementation = WithRef<SigningIntentClaritySupport>
