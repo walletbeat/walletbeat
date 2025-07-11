@@ -133,7 +133,7 @@ Walletbeat already has the following software wallets >90% rated:
 - Daimo, mobile version
 - Ambire, browser extension version
 
-We have selected the following software wallets to bring the total of rated wallets up to 6:
+We have selected the following software wallets to bring the total of rated wallets up to 8:
 
 - Coinbase Wallet, [mobile](https://github.com/walletbeat/walletbeat/issues/98) and [browser extension](https://github.com/walletbeat/walletbeat/issues/97) versions. (Owner: Hugoo)
 - Rainbow wallet, [mobile](https://github.com/walletbeat/walletbeat/issues/96) and [browser extension](https://github.com/walletbeat/walletbeat/issues/95) versions. (Owner: Hugoo)
@@ -143,7 +143,7 @@ We have selected the following software wallets to bring the total of rated wall
 
 - **Owner**: Per-wallet
 - **ETA**: 2 weeks per wallet, can be done in parallel if assigned to different contributors.
-- **Funding**: 5,000 USD per wallet, so 15,000 USD for 3 wallets.
+- **Funding**: 5,000 USD per wallet, so 25,000 USD for 5 wallets.
 
 #### Milestone: Three hardware wallets are >90% rated
 
