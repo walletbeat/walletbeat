@@ -2,7 +2,7 @@
 Status: Draft
 Grant recipient: Walletbeat (collective)
 Fiat currency: USD
-Amount: 88100
+Amount: 98100
 ---
 
 # Walletbeat 2025 EF funding grant proposal
@@ -138,6 +138,8 @@ We have selected the following software wallets to bring the total of rated wall
 - Coinbase Wallet, [mobile](https://github.com/walletbeat/walletbeat/issues/98) and [browser extension](https://github.com/walletbeat/walletbeat/issues/97) versions. (Owner: Hugoo)
 - Rainbow wallet, [mobile](https://github.com/walletbeat/walletbeat/issues/96) and [browser extension](https://github.com/walletbeat/walletbeat/issues/95) versions. (Owner: Hugoo)
 - MetaMask, [mobile](https://github.com/walletbeat/walletbeat/issues/94) and [browser extension](https://github.com/walletbeat/walletbeat/issues/93) versions. (Owner: polymutex)
+- Phantom [mobile](https://github.com/walletbeat/walletbeat/issues/) and [browser extension](https://github.com/walletbeat/walletbeat/issues/) versions. (Owner: Hugoo)
+- Zerion [mobile](https://github.com/walletbeat/walletbeat/issues/) and [browser extension](https://github.com/walletbeat/walletbeat/issues/) versions. (Owner: Hugoo)
 
 - **Owner**: Per-wallet
 - **ETA**: 2 weeks per wallet, can be done in parallel if assigned to different contributors.
@@ -147,9 +149,9 @@ We have selected the following software wallets to bring the total of rated wall
 
 This milestone is the same as the above, but for hardware wallets. None of the hardware wallets are fully rated at the moment. We have selected the following hardware wallets for rating:
 
-- [Ledger](https://github.com/walletbeat/walletbeat/issues/196) (Owner: Hugoo)
-- [Trezor](https://github.com/walletbeat/walletbeat/issues/197) (Owner: Hugoo)
-- [GridPlus](https://github.com/walletbeat/walletbeat/issues/220) (Owner: Hugoo)
+- [Ledger](https://github.com/walletbeat/walletbeat/issues/196) (Owner: PatrickAlphaC & nconsigny)
+- [Trezor](https://github.com/walletbeat/walletbeat/issues/197) (Owner: PatrickAlphaC & nconsigny)
+- [GridPlus](https://github.com/walletbeat/walletbeat/issues/220) (Owner: PatrickAlphaC)
 
 - **Owner**: Per-wallet
 - **ETA**: 2 weeks per wallet, can be done in parallel if assigned to different contributors.
@@ -411,7 +413,7 @@ No other funding has been sought or received as of this writing, but Walletbeat 
 
 ## Anything else you'd like to share?
 
-No, but thanks for reading!
+As Lucemans and nconsigny are EF members, they will decline the funding, and any funds assigned to items listing them will be redirected to other contributors.
 
 ## How did you hear about the Ecosystem Support Program?
 
