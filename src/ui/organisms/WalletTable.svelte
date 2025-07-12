@@ -356,8 +356,8 @@
 										// name: `${attribute.icon} ${attribute.displayName}`,
 										name: attribute.displayName,
 										getValue: wallet => {
-											const evalAttr = wallet.overall[attrGroup.id]?.[attributeId]
-											return evalAttr?.evaluation?.value?.rating || undefined
+											const attribute = wallet.overall[attrGroup.id]?.[attributeId]
+											return attribute?.evaluation?.value?.rating || undefined
 										},
 										defaultSortDirection: 'desc',
 									} satisfies Column<RatedWallet>))
@@ -711,16 +711,16 @@
 									...evalGroup && {
 										children: (
 											evaluatedAttributesEntries(evalGroup)
-												.filter(([_, evalAttr]) => (
-													evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
+												.filter(([_, attribute]) => (
+													attribute?.evaluation?.value?.rating !== Rating.EXEMPT
 												))
-												.map(([evalAttrId, evalAttr]) => ({
-													id: `attrGroup_${attrGroup.id}__attr_${evalAttrId}`,
-													color: ratingToColor(evalAttr.evaluation.value.rating),
+												.map(([attributeId, attribute]) => ({
+													id: `attrGroup_${attrGroup.id}__attr_${attributeId}`,
+													color: ratingToColor(attribute.evaluation.value.rating),
 													weight: 1,
-													arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
-													tooltip: `${evalAttr.attribute.displayName}`,
-													tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
+													arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
+													tooltip: `${attribute.attribute.displayName}`,
+													tooltipValue: ratingToIcon(attribute.evaluation.value.rating),
 												}))
 										),
 									},
@@ -848,8 +848,8 @@
 				{@const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
 
 				{@const evalEntries = evaluatedAttributesEntries(evalGroup)
-					.filter(([_, evalAttr]) => (
-						evalAttr?.evaluation?.value?.rating !== Rating.EXEMPT
+					.filter(([_, attribute]) => (
+						attribute?.evaluation?.value?.rating !== Rating.EXEMPT
 					))}
 
 				{@const hasActiveAttribute = activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id}
@@ -882,8 +882,8 @@
 							
 							: nonEmptyMap(
 								evalEntries,
-								([evalAttrId, evalAttr]) => {
-									const icon = evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon
+								([attributeId, attribute]) => {
+									const icon = attribute.evaluation.value.icon ?? attribute.attribute.icon
 
 									const tooltipSuffix = (() => {
 										const variant = selectedVariant
@@ -891,7 +891,7 @@
 										if(!variant || !wallet.variants[variant])
 											return
 
-										const specificity = attributeVariantSpecificity(wallet, variant, evalAttr.attribute)
+										const specificity = attributeVariantSpecificity(wallet, variant, attribute.attribute)
 
 										return (
 											specificity === VariantSpecificity.UNIQUE_TO_VARIANT ?
@@ -904,12 +904,12 @@
 									})()
 									
 									return {
-										id: `attrGroup_${attrGroup.id}__attr_${evalAttrId.toString()}`,
-										color: ratingToColor(evalAttr.evaluation.value.rating),
+										id: `attrGroup_${attrGroup.id}__attr_${attributeId.toString()}`,
+										color: ratingToColor(attribute.evaluation.value.rating),
 										weight: 1,
 										arcLabel: icon,
-										tooltip: `${icon} ${evalAttr.evaluation.value.displayName}${tooltipSuffix}`,
-										tooltipValue: ratingToIcon(evalAttr.evaluation.value.rating),
+										tooltip: `${icon} ${attribute.evaluation.value.displayName}${tooltipSuffix}`,
+										tooltipValue: ratingToIcon(attribute.evaluation.value.rating),
 									}
 								}
 							)
@@ -1004,8 +1004,7 @@
 			{:else}
 				{@const [attributeGroupId, attributeId] = column.id.split('.')}
 				{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === attributeGroupId)!}
-				{@const attribute = attrGroup.attributes[attributeId]}
-				{@const evalAttr = wallet.overall[attributeGroupId][attributeId]}
+				{@const attribute = wallet.overall[attributeGroupId][attributeId]}
 
 				{#snippet content()}
 					<Pie
@@ -1017,7 +1016,7 @@
 									outerRadiusFraction: 1,
 									innerRadiusFraction: 0.3,
 									offset: (
-										evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
+										attribute.evaluation.value.rating !== Rating.EXEMPT ?
 											20
 										:
 											0
@@ -1028,28 +1027,28 @@
 							]
 						}
 						padding={
-							evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
+							attribute.evaluation.value.rating !== Rating.EXEMPT ?
 								4
 							:
 								24
 						}
 						slices={
-							evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
+							attribute.evaluation.value.rating !== Rating.EXEMPT ?
 								[
 									{
 										id: `attrGroup_${attributeGroupId}__attr_${attributeId}`,
-										color: ratingToColor(evalAttr.evaluation.value.rating),
+										color: ratingToColor(attribute.evaluation.value.rating),
 										weight: 1,
 										arcLabel: attribute.icon,
 										tooltip: `${attribute.icon} ${attribute.displayName}`,
-										tooltipValue: evalAttr.evaluation.value.rating,
+										tooltipValue: attribute.evaluation.value.rating,
 									}
 								]
 							:
 								[]
 						}
 						{highlightedSliceId}
-						centerLabel={evalAttr.evaluation.value.rating}
+						centerLabel={attribute.evaluation.value.rating}
 						class="wallet-attribute-rating-pie"
 					/>
 				{/snippet}
@@ -1057,7 +1056,7 @@
 				{#snippet expandedContent()}
 					<WalletAttributeSummary
 						{wallet}
-						attribute={evalAttr}
+						attribute={attribute}
 						variant={selectedVariant}
 					/>
 				{/snippet}
