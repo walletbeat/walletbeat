@@ -60,6 +60,7 @@
 {#if isEnabled}
 	<button
 		type="button"
+		data-tooltip-trigger
 		onclick={e => {
 			e.preventDefault()
 		}}
