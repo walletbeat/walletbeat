@@ -26,7 +26,7 @@
 		isRowDisabled,
 		getCellVerticalAlign,
 		cellSnippet,
-		headerCellSnippet,
+		headerTitleSnippet,
 		expandHeaderCells = true,
 		onRowClick,
 		displaceDisabledRows = false,
@@ -49,7 +49,7 @@
 			column: _Column
 			value: _CellValue
 		}]>
-		headerCellSnippet?: Snippet<[{
+		headerTitleSnippet?: Snippet<[{
 			column: _Column
 		}]>
 		onRowClick?: (row: _RowValue, rowId?: RowId) => void
@@ -224,13 +224,21 @@
 					data-expanded={isExpandable && isExpanded ? '' : undefined}
 				>
 					<div class="header-cell-content">
+						{#snippet _headerTitle()}
+							<span
+								class="header-title"
+							>
+								{#if headerTitleSnippet}
+									{@render headerTitleSnippet({ column })}
+								{:else}
+									{column.name}
+								{/if}
+							</span>
+						{/snippet}
+
 						{#if isSortable}
 							<label class="sort-label">
-								{#if headerCellSnippet}
-									{@render headerCellSnippet({ column })}
-								{:else}
-									<span>{column.name}</span>
-								{/if}
+								{@render _headerTitle()}
 
 								<button
 									type="button"
@@ -243,11 +251,7 @@
 								></button>
 							</label>
 						{:else}
-							{#if headerCellSnippet}
-								{@render headerCellSnippet({ column })}
-							{:else}
-								<span>{column.name}</span>
-							{/if}
+							{@render _headerTitle()}
 						{/if}
 
 						{#if isExpandable}
@@ -469,6 +473,13 @@
 						&:has(.sort-button:focus) {
 							outline: 1px solid var(--accent);
 							border-radius: 0.5em;
+						}
+
+						.header-title {
+							white-space: wrap;
+							flex: 0 0 0;
+							width: 0;
+							min-width: fit-content;
 						}
 					}
 

@@ -380,10 +380,6 @@
 			undefined
 	)}
 >
-	{#snippet headerCellSnippet({ column })}
-		<span class="header-title">{column.name}</span>
-	{/snippet}
-
 	{#snippet cellSnippet({
 		row: wallet,
 		column,
@@ -1077,12 +1073,6 @@
 
 
 <style>
-	.header-title {
-		white-space: wrap;
-		flex: 0 0 0;
-		min-width: fit-content;
-	}
-
 	.with-expanded-content {
 		display: grid;
 
