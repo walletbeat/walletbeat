@@ -3,7 +3,7 @@
 	RowId
 ">
 	// Types
-	import { DataTable, type Column } from '@/lib/DataTable.svelte'
+	import { DataTable, type Column } from '@/lib/DataTable.svelte.ts'
 	import type { Snippet } from 'svelte'
 
 	type _RowValue = _DataTable extends DataTable<infer RowValue, any, any> ? RowValue : any
