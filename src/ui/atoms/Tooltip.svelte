@@ -18,7 +18,6 @@
 <script lang="ts">
 	// Types/constants
 	import type { Snippet } from 'svelte'
-	import type { Placement as FloatingPlacement } from '@floating-ui/dom'
 
 
 	// IDs
@@ -51,13 +50,6 @@
 		globalThis.CSS?.supports('anchor-name: --test')
 	)
 
-	const placementMap = {
-		'block-start': 'top',
-		'block-end': 'bottom',
-		'inline-start': 'left',
-		'inline-end': 'right',
-	} as const satisfies Record<string, FloatingPlacement>
-
 
 	// State
 	let isTriggerHovered = $state(false)
@@ -68,6 +60,7 @@
 {#if isEnabled}
 	<button
 		type="button"
+		data-tooltip-trigger
 		onclick={e => {
 			e.preventDefault()
 		}}
@@ -104,7 +97,12 @@
 					node,
 					node.popoverTargetElement,
 					{
-						placement: placementMap[placement],
+						placement: {
+							'block-start': 'top',
+							'block-end': 'bottom',
+							'inline-start': 'left',
+							'inline-end': 'right',
+						}[placement],
 						middleware: [
 							offsetMiddleware(offset),
 							flip(),

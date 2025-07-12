@@ -1087,6 +1087,11 @@
 					display: none;
 				}
 			}
+
+			/* Firefox: align `<Tooltip>` trigger center */
+			:global([data-tooltip-trigger]:not(.tags > *)) {
+				width: 100%;
+			}
 		}
 
 		.expanded-content {
