@@ -13,10 +13,35 @@ import {
 } from '@/components/navigation'
 import { betaSiteRoot, repositoryUrl } from '@/constants'
 import { NavigationPageLayout } from '@/layouts/NavigationPageLayout'
+import type { Url } from '@/schema/url'
 import { ExternalLink } from '@/ui/atoms/ExternalLink'
 import { IconLink } from '@/ui/atoms/IconLink'
 
+interface FundingInfo {
+	date: string
+	source: string
+	amount: string
+	asPartOf?: Url
+	details: Url
+}
+
 function AboutContents(): React.JSX.Element {
+	const fundingInfos: FundingInfo[] = [
+		{
+			date: '2025-03',
+			source: 'Ethereum Foundation',
+			amount: '577.02 USD',
+			asPartOf: {
+				label: 'Pectra Proactive Grant Round',
+				url: 'https://esp.ethereum.foundation/pectra-pgr',
+			},
+			details: {
+				label: 'Grant Proposal',
+				url: `${repositoryUrl}/tree/beta/governance/grants/2025-02-ethereum-foundation-pectra-proactive-grant-round`,
+			},
+		},
+	]
+
 	return (
 		<>
 			<Typography variant='body1'>
@@ -90,12 +115,27 @@ function AboutContents(): React.JSX.Element {
 				}}
 			/>
 			<Typography variant='body1'>
-				As of 2025-01, Walletbeat has received no funding and is not in need of any.
-				<br />
-				If funding becomes a necessity in the future, Walletbeat aims to raise funds through
-				retroactive funding, ecosystem grants, and individual donations. Walletbeat will then
-				publish a funding transparency page that documents the date, origin, and amount of such
-				funding.
+				Walletbeat has received the following funding:
+				<ul style={{ listStyleType: 'disc', marginLeft: '1.5rem' }}>
+					{fundingInfos.map(funding => (
+						<li key={`${funding.date}-${funding.source}`}>
+							<strong>{funding.date}</strong>: Received <strong>{funding.amount}</strong> from{' '}
+							<strong>{funding.source}</strong>
+							{funding.asPartOf !== undefined ? (
+								<>
+									{' '}
+									as part of <ExternalLink url={funding.asPartOf} />
+								</>
+							) : null}
+							: <ExternalLink url={funding.details} />
+						</li>
+					))}
+				</ul>
+			</Typography>
+			<Typography variant='body1'>
+				If further funding becomes a necessity in the future, Walletbeat aims to raise funds through
+				retroactive funding, ecosystem grants, and individual donations. Walletbeat will then update
+				the above list to document the date, source, and amount of such funding.
 			</Typography>
 			<Divider
 				orientation='horizontal'
