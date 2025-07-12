@@ -1115,11 +1115,12 @@
 	}
 
 	.wallet-info {
+		block-size: 5rem;
+
 		text-align: start;
 
 		display: flex;
 		align-items: center;
-		padding: 0.5em 0;
 		gap: 0.85em;
 
 		.row-count {
