@@ -1020,13 +1020,23 @@
 								{
 									outerRadiusFraction: 1,
 									innerRadiusFraction: 0.3,
-									offset: evalAttr.evaluation.value.rating !== Rating.EXEMPT ? 20 : 0,
+									offset: (
+										evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
+											20
+										:
+											0
+									),
 									gap: 0,
 									angleGap: 0,
 								}
 							]
 						}
-						padding={4}
+						padding={
+							evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
+								4
+							:
+								24
+						}
 						slices={
 							evalAttr.evaluation.value.rating !== Rating.EXEMPT ?
 								[
