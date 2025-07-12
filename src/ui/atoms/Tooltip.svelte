@@ -45,6 +45,12 @@
 	} & Record<string, any> = $props()
 
 
+	// Functions
+	const supportsAnchorPositioning = (
+		globalThis.CSS?.supports('anchor-name: --test')
+	)
+
+
 	// State
 	let isTriggerHovered = $state(false)
 	let isPopoverHovered = $state(false)
@@ -54,6 +60,7 @@
 {#if isEnabled}
 	<button
 		type="button"
+		data-tooltip-trigger
 		onclick={e => {
 			e.preventDefault()
 		}}
@@ -72,6 +79,49 @@
 		}}
 		onblur={() => {
 			isTriggerHovered = false
+		}}
+
+		{@attach async node => {
+			if (supportsAnchorPositioning) return
+
+			const {
+				computePosition,
+				offset: offsetMiddleware,
+				flip,
+				shift,
+				autoUpdate,
+			} = await import('@floating-ui/dom')
+
+			const updatePosition = async () => {
+				const {x, y} = await computePosition(
+					node,
+					node.popoverTargetElement,
+					{
+						placement: {
+							'block-start': 'top',
+							'block-end': 'bottom',
+							'inline-start': 'left',
+							'inline-end': 'right',
+						}[placement],
+						middleware: [
+							offsetMiddleware(offset),
+							flip(),
+							shift(),
+						],
+					}
+				)
+
+				node.popoverTargetElement.style.left = `${x}px`
+				node.popoverTargetElement.style.top = `${y}px`
+			}
+
+			updatePosition()
+
+			return autoUpdate(
+				node,
+				node.popoverTargetElement,
+				updatePosition
+			)
 		}}
 	>
 		{@render children()}
