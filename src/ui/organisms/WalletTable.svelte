@@ -129,6 +129,7 @@
 	import WalletAttributeGroupSummary from '@/ui/molecules/WalletAttributeGroupSummary.svelte'
 	import WalletAttributeSummary from '@/ui/molecules/WalletAttributeSummary.svelte'
 
+	import BlockTransition from '@/ui/atoms/BlockTransition.svelte'
 	import Pie, { PieLayout } from '@/ui/atoms/Pie.svelte'
 	import Table from '@/ui/atoms/Table.svelte'
 	import Tooltip from '@/ui/atoms/Tooltip.svelte'
@@ -397,45 +398,47 @@
 			content: Snippet
 			expandedContent: Snippet
 		})}
-			<details
-				class="with-expanded-content"
-				bind:open={
-					() => (
-						isExpanded
-					),
-					open => {
-						if(open)
-							expandedRowIds.add(wallet.metadata.id)
-						else
-							expandedRowIds.delete(wallet.metadata.id)
+			<BlockTransition>
+				<details
+					class="with-expanded-content"
+					bind:open={
+						() => (
+							isExpanded
+						),
+						open => {
+							if(open)
+								expandedRowIds.add(wallet.metadata.id)
+							else
+								expandedRowIds.delete(wallet.metadata.id)
+						}
 					}
-				}
-			>
-				<summary>
-					<Tooltip
-						isEnabled={!isExpanded}
-					>
-						{@render content()}
+				>
+					<summary>
+						<Tooltip
+							isEnabled={!isExpanded}
+						>
+							{@render content()}
 
-						{#snippet tooltip()}
-							{#if !isExpanded}
-								<div class="expanded-tooltip-content">
-									{@render expandedContent()}
-								</div>
-							{/if}
-						{/snippet}
-					</Tooltip>
-				</summary>
+							{#snippet tooltip()}
+								{#if !isExpanded}
+									<div class="expanded-tooltip-content">
+										{@render expandedContent()}
+									</div>
+								{/if}
+							{/snippet}
+						</Tooltip>
+					</summary>
 
-				{#if isExpanded}
-					<div
-						class="expanded-content"
-						transition:fade={{ duration: 200, easing: expoOut }}
-					>
-						{@render expandedContent()}
-					</div>
-				{/if}
-			</details>
+					{#if isExpanded}
+						<div
+							class="expanded-content"
+							transition:fade={{ duration: 200, easing: expoOut }}
+						>
+							{@render expandedContent()}
+						</div>
+					{/if}
+				</details>
+			</BlockTransition>
 		{/snippet}
 
 		{#if column.id === 'displayName'}
@@ -1112,11 +1115,12 @@
 	}
 
 	.wallet-info {
+		block-size: 5rem;
+
 		text-align: start;
 
 		display: flex;
 		align-items: center;
-		padding: 0.5em 0;
 		gap: 0.85em;
 
 		.row-count {
