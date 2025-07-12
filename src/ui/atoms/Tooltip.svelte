@@ -18,6 +18,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { Snippet } from 'svelte'
+	import type { Placement as FloatingPlacement } from '@floating-ui/dom'
 
 
 	// IDs
@@ -43,6 +44,19 @@
 		isEnabled?: boolean
 		children: Snippet
 	} & Record<string, any> = $props()
+
+
+	// Functions
+	const supportsAnchorPositioning = (
+		globalThis.CSS?.supports('anchor-name: --test')
+	)
+
+	const placementMap = {
+		'block-start': 'top',
+		'block-end': 'bottom',
+		'inline-start': 'left',
+		'inline-end': 'right',
+	} as const satisfies Record<string, FloatingPlacement>
 
 
 	// State
@@ -72,6 +86,44 @@
 		}}
 		onblur={() => {
 			isTriggerHovered = false
+		}}
+
+		{@attach async node => {
+			if (supportsAnchorPositioning) return
+
+			const {
+				computePosition,
+				offset: offsetMiddleware,
+				flip,
+				shift,
+				autoUpdate,
+			} = await import('@floating-ui/dom')
+
+			const updatePosition = async () => {
+				const {x, y} = await computePosition(
+					node,
+					node.popoverTargetElement,
+					{
+						placement: placementMap[placement],
+						middleware: [
+							offsetMiddleware(offset),
+							flip(),
+							shift(),
+						],
+					}
+				)
+
+				node.popoverTargetElement.style.left = `${x}px`
+				node.popoverTargetElement.style.top = `${y}px`
+			}
+
+			updatePosition()
+
+			return autoUpdate(
+				node,
+				node.popoverTargetElement,
+				updatePosition
+			)
 		}}
 	>
 		{@render children()}
