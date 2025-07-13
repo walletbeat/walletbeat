@@ -10,6 +10,7 @@ interface Props {
 }
 
 const { navigationItems } = Astro.props
+const currentPathname = Astro.url.pathname
 ---
 
 
@@ -71,9 +72,10 @@ const { navigationItems } = Astro.props
 		id="nav-menu"
 		data-sticky-container
 	>
-		<NavigationItems
-			items={navigationItems}
-			client:load
+    <NavigationItems 
+			items={navigationItems} 
+			currentPathname={currentPathname}
+			client:load 
 		/>
 	</div>
 
