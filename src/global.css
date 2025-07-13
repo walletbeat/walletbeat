@@ -498,3 +498,20 @@ span svg {
 	background-color: var(--sticky-backgroundColor);
 	backdrop-filter: var(--sticky-backdropFilter);
 }
+
+@view-transition {
+	navigation: auto;
+}
+
+::view-transition,
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.3s;
+  animation-timing-function: var(--transition-easeOutExpo);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+	object-fit: contain;
+}
