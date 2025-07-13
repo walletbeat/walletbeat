@@ -12,9 +12,13 @@
 	import { eip7702 } from '@/data/eips/eip-7702'
 
 
+	// IDs
+	const id = $props.id()
+
+
 	// Props
 	let {
-		tableId,
+		tableId = `WalletTable-${id}`,
 		title,
 		wallets,
 		attributeGroups,
@@ -452,149 +456,161 @@
 
 			{#snippet content()}
 				<div class="wallet-info">
-					<span class="row-count"></span>
+					<div
+						class="left"
+						style:view-transition-class="WalletTable__column-displayName__left"
+						style:view-transition-name="{tableId}__wallet-{wallet.metadata.id}__column-displayName__left"
+					>
+						<span class="row-count"></span>
 
-					<img
-						alt={displayName}
-						src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-						width="16"
-						height="16"
-					/>
+						<img
+							alt={displayName}
+							src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+							width="16"
+							height="16"
+						/>
 
-					<div class="name-and-tags">
-						<div class="name">
-							<h3>{displayName}</h3>
+						<div class="name-and-tags">
+							<div class="name">
+								<h3>{displayName}</h3>
 
-							{#if selectedVariant && selectedVariant in wallet.variants}
-								<div class="variant">
-									{variants[selectedVariant].label}
-								</div>
-							{/if}
-						</div>
+								{#if selectedVariant && selectedVariant in wallet.variants}
+									<div class="variant">
+										{variants[selectedVariant].label}
+									</div>
+								{/if}
+							</div>
 
-						<div class="tags">
-							{#each (
-								[
-									// Wallet type tags
-									hasVariant(wallet.variants, Variant.HARDWARE) && {
-										label: 'Hardware',
-										filterId: 'walletType-hardware',
-										type: 'wallet-type',
-									},
-									!hasVariant(wallet.variants, Variant.HARDWARE) && {
-										label: 'Software',
-										filterId: 'walletType-software',
-										type: 'wallet-type',
-									},
-									// Manufacture type tags
-									hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
-										label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
-										filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
-										type: 'manufacture-type',
-									},
-									// Account type tags
-									...(
-										accountTypes !== null ?
-											[
-												AccountType.eoa in accountTypes && {
-													label: 'EOA',
-													filterId: 'accountType-eoa',
-													type: 'account-type',
-												},
-												AccountType.rawErc4337 in accountTypes && {
-													label: `#${erc4337.number}`,
-													filterId: 'accountType-erc4337',
-													type: 'eip',
-													eipTooltipContent: erc4337,
-												},
-												AccountType.eip7702 in accountTypes && {
-													label: `#${eip7702.number}`,
-													filterId: 'accountType-eip7702',
-													type: 'eip',
-													eipTooltipContent: eip7702,
-												},
-												AccountType.mpc in accountTypes && {
-													label: 'MPC',
-													filterId: 'accountType-mpc',
-													type: 'account-type',
-												},
-											]
-										:
-											[]
-									),
-								]
-									.filter(Boolean)
-							) as tag (tag.label)}
-								{#if tag.eipTooltipContent}
-									<Tooltip 
-										placement="inline-end"
-									>
-										<div
+							<div class="tags">
+								{#each (
+									[
+										// Wallet type tags
+										hasVariant(wallet.variants, Variant.HARDWARE) && {
+											label: 'Hardware',
+											filterId: 'walletType-hardware',
+											type: 'wallet-type',
+										},
+										!hasVariant(wallet.variants, Variant.HARDWARE) && {
+											label: 'Software',
+											filterId: 'walletType-software',
+											type: 'wallet-type',
+										},
+										// Manufacture type tags
+										hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
+											label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
+											filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
+											type: 'manufacture-type',
+										},
+										// Account type tags
+										...(
+											accountTypes !== null ?
+												[
+													AccountType.eoa in accountTypes && {
+														label: 'EOA',
+														filterId: 'accountType-eoa',
+														type: 'account-type',
+													},
+													AccountType.rawErc4337 in accountTypes && {
+														label: `#${erc4337.number}`,
+														filterId: 'accountType-erc4337',
+														type: 'eip',
+														eipTooltipContent: erc4337,
+													},
+													AccountType.eip7702 in accountTypes && {
+														label: `#${eip7702.number}`,
+														filterId: 'accountType-eip7702',
+														type: 'eip',
+														eipTooltipContent: eip7702,
+													},
+													AccountType.mpc in accountTypes && {
+														label: 'MPC',
+														filterId: 'accountType-mpc',
+														type: 'account-type',
+													},
+												]
+											:
+												[]
+										),
+									]
+										.filter(Boolean)
+								) as tag (tag.label)}
+									{#if tag.eipTooltipContent}
+										<Tooltip 
+											placement="inline-end"
+										>
+											<div
+												class="tag"
+												role="button"
+												tabindex="0"
+												data-tag-type={tag.type}
+												aria-label="Filter by {tag.label}"
+												onclick={e => {
+													e.stopPropagation()
+													toggleFilterById!(tag.filterId)
+												}}
+												onkeydown={e => {
+													if (e.key !== 'Enter' && e.key !== ' ') return
+
+													e.stopPropagation()
+													toggleFilterById!(tag.filterId)
+												}}
+											>
+												{tag.label}
+											</div>
+
+											{#snippet tooltip()}
+												<div class="eip-tooltip-content">
+													<EipDetails
+														eip={tag.eipTooltipContent}
+													/>
+												</div>
+											{/snippet}
+										</Tooltip>
+									{:else}
+										<button
 											class="tag"
-											role="button"
-											tabindex="0"
 											data-tag-type={tag.type}
 											aria-label="Filter by {tag.label}"
-											onclick={e => {
-												e.stopPropagation()
-												toggleFilterById!(tag.filterId)
-											}}
-											onkeydown={e => {
-												if (e.key !== 'Enter' && e.key !== ' ') return
-
+											onclick={(e) => {
 												e.stopPropagation()
 												toggleFilterById!(tag.filterId)
 											}}
 										>
 											{tag.label}
-										</div>
-
-										{#snippet tooltip()}
-											<div class="eip-tooltip-content">
-												<EipDetails
-													eip={tag.eipTooltipContent}
-												/>
-											</div>
-										{/snippet}
-									</Tooltip>
-								{:else}
-									<button
-										class="tag"
-										data-tag-type={tag.type}
-										aria-label="Filter by {tag.label}"
-										onclick={(e) => {
-											e.stopPropagation()
-											toggleFilterById!(tag.filterId)
-										}}
-									>
-										{tag.label}
-									</button>
-								{/if}
-							{/each}
+										</button>
+									{/if}
+								{/each}
+							</div>
 						</div>
 					</div>
 
 					{#if allSupportedVariants.length > 1}
-						<div class="variants inline">
-							{#each supportedVariants as variant}
-								<button
-									data-selected={variant === selectedVariant ? '' : undefined}
-									aria-label={`Select ${variants[variant].label} variant`}
-									aria-pressed={variant === selectedVariant}
-									onclick={e => {
-										e.stopPropagation()
-										toggleFilterById!(`variant-${variant}`, true)
-									}}
-								>
-									<span
-										class="icon"
-										title={variants[variant].label}
-										aria-hidden="true"
+						<div
+							class="right"
+							style:view-transition-class="WalletTable__column-displayName__right"
+							style:view-transition-name="{tableId}__wallet-{wallet.metadata.id}__column-displayName__right"
+						>
+							<div class="variants">
+								{#each supportedVariants as variant}
+									<button
+										data-selected={variant === selectedVariant ? '' : undefined}
+										aria-label={`Select ${variants[variant].label} variant`}
+										aria-pressed={variant === selectedVariant}
+										onclick={e => {
+											e.stopPropagation()
+											toggleFilterById!(`variant-${variant}`, true)
+										}}
 									>
-										{@html variants[variant].icon}
-									</span>
-								</button>
-							{/each}
+										<span
+											class="icon"
+											title={variants[variant].label}
+											aria-hidden="true"
+										>
+											{@html variants[variant].icon}
+										</span>
+									</button>
+								{/each}
+							</div>
 						</div>
 					{/if}
 				</div>
@@ -1123,9 +1139,17 @@
 
 		text-align: start;
 
-		display: flex;
-		align-items: center;
-		gap: 0.85em;
+		&,
+		> .left,
+		> .right {
+			display: flex;
+			align-items: center;
+			gap: 0.85em;
+		}
+
+		.right {
+			margin-inline-start: auto;
+		}
 
 		.row-count {
 			display: inline-flex;
@@ -1221,8 +1245,6 @@
 		}
 
 		.variants {
-			margin-inline-start: auto;
-
 			font-size: 1.25em;
 
 			display: flex;
