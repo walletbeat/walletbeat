@@ -2,6 +2,7 @@
 	"name": "walletbeat",
 	"type": "module",
 	"version": "0.0.1",
+	"packageManager": "pnpm@10.13.1+sha512.N+vxpcejDV+r4MXfRO6NpMllygxa89urKMOhaBtwolYhjQXIHJwNz3Z+9rhVHrW5YAQrntQwDFkkIzY3fgHPrQ==",
 	"scripts": {
 		"astro": "ASTRO_TELEMETRY_DISABLED=1 astro",
 		"build": "pnpm run astro build",
@@ -60,11 +61,10 @@
 		"globals": "^15.15.0",
 		"husky": "^9.1.7",
 		"orbiter-cli": "^0.8.2",
-		"pnpm": "10.4.0",
+		"pnpm": "10.13.1",
 		"prettier": "^3.5.3",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-curly": "^0.3.2",
 		"typescript": "^5.8.3"
-	},
-	"packageManager": "pnpm@10.4.0+sha512.6b849d0787d97f8f4e1f03a9b8ff8f038e79e153d6f11ae539ae7c435ff9e796df6a862c991502695c7f9e8fac8aeafc1ac5a8dab47e36148d183832d886dd52"
+	}
 }
