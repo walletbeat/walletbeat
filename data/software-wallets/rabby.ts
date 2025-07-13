@@ -19,7 +19,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -48,7 +53,9 @@ export const rabby: SoftwareWallet = {
 	features: {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
-			eip7702: notSupported,
+			eip7702: notSupportedWithRef({
+				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+			}),
 			eoa: supported({
 				canExportPrivateKey: true,
 				keyDerivation: {
@@ -114,7 +121,9 @@ export const rabby: SoftwareWallet = {
 					},
 				],
 			},
-			eip5792: null,
+			walletCall: notSupportedWithRef({
+				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+			}),
 		},
 		license: {
 			license: License.MIT,

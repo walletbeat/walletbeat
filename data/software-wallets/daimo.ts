@@ -112,7 +112,7 @@ export const daimo: SoftwareWallet = {
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
-			eip5792: null,
+			walletCall: notSupported,
 		},
 		license: {
 			license: License.GPL_3_0,

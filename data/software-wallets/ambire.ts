@@ -16,7 +16,12 @@ import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-v
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import { License } from '@/schema/features/transparency/license'
 import type { References } from '@/schema/reference'
@@ -250,7 +255,11 @@ export const ambire: SoftwareWallet = {
 					url: 'https://github.com/AmbireTech/extension/blob/v2/src/web/extension-services/background/background.ts',
 				},
 			},
-			eip5792: featureSupported,
+			walletCall: supported({
+				atomicMultiTransactions: notSupportedWithRef({
+					ref: 'https://github.com/AmbireTech/extension/blob/099922f941c83029e7b456c143f11767bb7d04b7/src/web/extension-services/background/provider/ProviderController.ts#L368-L370',
+				}),
+			}),
 		},
 		license: {
 			license: License.GPL_3_0,

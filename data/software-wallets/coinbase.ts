@@ -84,7 +84,7 @@ export const coinbase: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			walletCall: null,
 		},
 		license: {
 			license: License.BSD_3_CLAUSE,
