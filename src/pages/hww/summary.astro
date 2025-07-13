@@ -26,6 +26,7 @@ import WalletTable from '@/ui/organisms/WalletTable.svelte'
 		<section>
 			<WalletTable
 				client:load
+				tableId="hardware-wallets"
 				title="Hardware Wallets"
 				wallets={Object.values(ratedHardwareWallets)}
 				{attributeGroups}
