@@ -165,6 +165,14 @@ export function nonEmptyConcat<T>([arr, rest]:
 }
 
 /**
+ * Flatten a non-empty array of non-empty arrays into a flat non-empty array.
+ */
+export function nonEmptyFlatten<T>(arr: NonEmptyArray<NonEmptyArray<T>>): NonEmptyArray<T> {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input arrays were non-empty.
+	return arr.flat() as NonEmptyArray<T>
+}
+
+/**
  * A set that contains at least one true element.
  */
 export type NonEmptySet<K extends string | number | symbol> = NonEmptyRecord<K, true>
