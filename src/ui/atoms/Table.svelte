@@ -334,8 +334,8 @@
 									value,
 								})
 							}
-							animate:flip={{ duration: 300, easing: expoOut }}
-							in:fade={{ duration: 300, easing: expoOut }}
+							style:view-transition-class="Table__cell"
+							style:view-transition-name="{tableId}__{column.id}__{rowId}__cell"
 						>
 							{#if cellSnippet}
 								{@render cellSnippet({
