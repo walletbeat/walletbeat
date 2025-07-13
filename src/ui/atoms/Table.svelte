@@ -557,11 +557,11 @@
 				&[tabIndex='0'] {
 					cursor: pointer;
 
-					transition: var(--active-transitionOutDuration) var(--transition-easeOutExpo);
+					transition-duration: var(--active-transitionOutDuration);
 
 					& td.sticky {
-						transition: var(--active-transitionOutDuration) var(--active-transitionOutDuration)
-							var(--transition-easeOutExpo);
+						transition-duration: var(--active-transitionOutDuration);
+						transition-delay: var(--active-transitionOutDuration);
 					}
 
 					&:hover {
