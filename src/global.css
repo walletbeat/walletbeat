@@ -513,5 +513,5 @@ span svg {
 
 ::view-transition-old(*),
 ::view-transition-new(*) {
-	object-fit: contain;
+	object-fit: none;
 }
