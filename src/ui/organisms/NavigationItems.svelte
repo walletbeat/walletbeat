@@ -57,6 +57,7 @@
 	{#if item.href}
 		<a
 			href={item.href}
+			aria-current={currentPathname === item.href ? 'page' : undefined}
 			{...item.href.startsWith('http') && {
 				target: '_blank',
 				rel: 'noreferrer',
@@ -96,6 +97,10 @@
 		&:hover {
 			color: var(--accent);
 			text-decoration: none;
+		}
+
+		&[aria-current] {
+			background-color: var(--background-primary);
 		}
 	}
 
