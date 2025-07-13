@@ -224,11 +224,15 @@
 					data-is-sticky={column.isSticky ? '' : undefined}
 					data-expandable={isExpandable ? '' : undefined}
 					data-expanded={isExpandable && isExpanded ? '' : undefined}
+					style:view-transition-class="Table__header"
+					style:view-transition-name="{tableId}__{column.id}__header"
 				>
 					<div class="header-cell-content">
 						{#snippet _headerTitle()}
 							<span
 								class="header-title"
+								style:view-transition-class="Table__header__title"
+								style:view-transition-name="{tableId}__{column.id}__header__title"
 							>
 								{#if headerTitleSnippet}
 									{@render headerTitleSnippet({ column })}
@@ -246,6 +250,8 @@
 									type="button"
 									aria-label={`Sort by ${column.name}`}
 									class="sort-button"
+									style:view-transition-class="Table__header__sort-button"
+									style:view-transition-name="{tableId}__{column.id}__header__sort-button"
 									onclick={withViewTransition(() => {
 										table.toggleColumnSort(column.id)
 									})}
@@ -260,6 +266,8 @@
 							<button 
 								type="button"
 								class="expansion-button"
+								style:view-transition-class="Table__header__expansion-button"
+								style:view-transition-name="{tableId}__{column.id}__header__expansion-button"
 								onclick={withViewTransition(() => {
 									table.toggleIsColumnExpanded(column.id)
 								})}
