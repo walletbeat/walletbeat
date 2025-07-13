@@ -146,6 +146,8 @@
 
 
 	// Transitions/animations
+	import { withViewTransition } from '@/utils/view-transitions'
+
 	import { flip } from 'svelte/animate'
 	import { fade, fly } from 'svelte/transition'
 	import { expoOut } from 'svelte/easing'
@@ -244,9 +246,9 @@
 									type="button"
 									aria-label={`Sort by ${column.name}`}
 									class="sort-button"
-									onclick={() => {
+									onclick={withViewTransition(() => {
 										table.toggleColumnSort(column.id)
-									}}
+									})}
 									disabled={column.isSortable === false}
 								></button>
 							</label>
@@ -258,9 +260,9 @@
 							<button 
 								type="button"
 								class="expansion-button"
-								onclick={() => {
+								onclick={withViewTransition(() => {
 									table.toggleIsColumnExpanded(column.id)
-								}}
+								})}
 								title={isExpanded ? 'Collapse' : 'Expand'}
 								aria-label={isExpanded ? 'Collapse' : 'Expand'}
 							></button>

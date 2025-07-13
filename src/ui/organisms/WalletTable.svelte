@@ -145,6 +145,8 @@
 
 
 	// Transitions
+	import { withViewTransition } from '@/utils/view-transitions'
+
 	import { fade } from 'svelte/transition'
 	import { expoOut } from 'svelte/easing'
 
@@ -293,7 +295,10 @@
 			]
 		}
 		bind:activeFilters
-		bind:filteredItems={filteredWallets}
+		bind:filteredItems={
+			() => filteredWallets,
+			withViewTransition(_ => filteredWallets = _)
+		}
 		bind:toggleFilter
 		bind:toggleFilterById
 	/>
