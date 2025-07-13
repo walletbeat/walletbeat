@@ -6,9 +6,18 @@
 	// Props
 	let {
 		items,
+		currentPathname,
 	}: {
 		items: NavigationItem[]
+		currentPathname: string
 	} = $props()
+
+
+	// Functions
+	const hasCurrentPage = (item: NavigationItem) => (
+		currentPathname === item.href
+		|| (item.children?.some(hasCurrentPage) ?? false)
+	)
 </script>
 
 
@@ -31,7 +40,7 @@
 		{@render linkable(item)}
 	{:else}
 		<details
-			open={!item.defaultIsCollapsed}
+			open={hasCurrentPage(item)}
 			data-sticky-container
 		>
 			<summary data-sticky>
@@ -48,6 +57,7 @@
 	{#if item.href}
 		<a
 			href={item.href}
+			aria-current={currentPathname === item.href ? 'page' : undefined}
 			{...item.href.startsWith('http') && {
 				target: '_blank',
 				rel: 'noreferrer',
@@ -87,6 +97,10 @@
 		&:hover {
 			color: var(--accent);
 			text-decoration: none;
+		}
+
+		&[aria-current] {
+			background-color: var(--background-primary);
 		}
 	}
 

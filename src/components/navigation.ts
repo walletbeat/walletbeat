@@ -5,7 +5,6 @@ export type NavigationItem = {
 	icon?: string
 	href?: string
 	children?: NavigationItem[]
-	defaultIsCollapsed?: boolean
 }
 
 
@@ -90,7 +89,6 @@ export const defaultNavigationItems = [
 						id: 'software-by-rating',
 						title: 'By Rating',
 						icon: ChartPieIcon,
-						defaultIsCollapsed: true,
 						children: (
 							mapNonExemptAttributeGroupsInTree(
 								representativeWalletForType(WalletType.SOFTWARE).overall,
@@ -107,7 +105,6 @@ export const defaultNavigationItems = [
 						id: 'software-by-wallet',
 						title: 'By Wallet',
 						icon: WalletIcon,
-						defaultIsCollapsed: true,
 						children: (
 							Object.entries(softwareWallets)
 								.map(([key, wallet]) => ({
@@ -136,7 +133,6 @@ export const defaultNavigationItems = [
 						id: 'hardware-by-rating',
 						title: 'By Rating',
 						icon: ChartPieIcon,
-						defaultIsCollapsed: true,
 						children: [
 							...mapNonExemptAttributeGroupsInTree(
 								representativeWalletForType(WalletType.HARDWARE).overall,
@@ -153,7 +149,6 @@ export const defaultNavigationItems = [
 						id: 'hardware-by-wallet',
 						title: 'By Wallet',
 						icon: WalletIcon,
-						defaultIsCollapsed: true,
 						children: (
 							Object.entries(hardwareWallets)
 								.map(([key, wallet]) => ({
@@ -176,7 +171,6 @@ export const defaultNavigationItems = [
 						id: 'embedded-by-rating',
 						title: 'By Rating',
 						icon: ChartPieIcon,
-						defaultIsCollapsed: true,
 						children: [
 							...mapNonExemptAttributeGroupsInTree(
 								representativeWalletForType(WalletType.EMBEDDED).overall,
