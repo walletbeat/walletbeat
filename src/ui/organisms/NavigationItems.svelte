@@ -6,9 +6,18 @@
 	// Props
 	let {
 		items,
+		currentPathname,
 	}: {
 		items: NavigationItem[]
+		currentPathname: string
 	} = $props()
+
+
+	// Functions
+	const hasCurrentPage = (item: NavigationItem) => (
+		currentPathname === item.href
+		|| (item.children?.some(hasCurrentPage) ?? false)
+	)
 </script>
 
 
@@ -31,7 +40,7 @@
 		{@render linkable(item)}
 	{:else}
 		<details
-			open={!item.defaultIsCollapsed}
+			open={hasCurrentPage(item)}
 			data-sticky-container
 		>
 			<summary data-sticky>
