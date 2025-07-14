@@ -473,12 +473,12 @@ function ExpandableHardwareWalletRow({
 		cell: Cell<TableRow, unknown>,
 		columnIndex: number,
 	): React.ReactNode => {
-		// Skip first two columns (Wallet name and Manufacture Type)
-		if (columnIndex < 2) {
+		// Skip first columns (Manufacture Type)
+		if (columnIndex < 1) {
 			return flexRender(cell.column.columnDef.cell, cell.getContext())
 		}
 
-		return perAttributeGroupCells[columnIndex - 2]
+		return perAttributeGroupCells[columnIndex - 1]
 	}
 
 	// Sort models to place flagship first

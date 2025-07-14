@@ -7,6 +7,10 @@ import {
 	HardwareWalletType,
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import {
+	DataExtraction,
+	noCalldataDecoding,
+} from '@/schema/features/security/signing-intent-clarity'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
@@ -175,6 +179,36 @@ export const coinbase: SoftwareWallet = {
 				},
 			],
 			scamAlerts: null,
+			signingIntentClarity: {
+				messageSigning: {
+					calldataDecoding: noCalldataDecoding,
+					messageExtraction: {
+						[DataExtraction.EYES]: false,
+						[DataExtraction.COPY]: false,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+				},
+				ref: 'https://github.com/walletbeat/walletbeat/blob/beta/data/evidence-reference/coinbase/limited-signature-intent.jpg',
+				transactionSigning: {
+					calldataDecoding: noCalldataDecoding,
+					calldataExtraction: {
+						[DataExtraction.EYES]: false,
+						[DataExtraction.COPY]: false,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+					details: 'Coinbase Wallet does not show calldata.',
+					displayedTransactionDetails: {
+						chain: true,
+						from: true,
+						gas: true,
+						nonce: false,
+						to: true,
+						value: true,
+					},
+				},
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

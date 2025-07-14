@@ -1,10 +1,12 @@
 import { patrickalphac } from '@/data/contributors'
+import { SoftwareWalletType } from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	DataExtraction,
 	noCalldataDecoding,
 	noDataExtraction,
-} from '@/schema/features/security/hardware-wallet-dapp-signing'
+} from '@/schema/features/security/signing-intent-clarity'
+import { supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -35,6 +37,13 @@ export const ngrave: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			ref: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+			},
+		}),
 		license: {
 			license: License.PROPRIETARY,
 			ref: [
@@ -70,13 +79,20 @@ export const ngrave: HardwareWallet = {
 		security: {
 			bugBountyProgram: null,
 			firmware: null,
-			hardwareWalletDappSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
 					details:
 						'NGRAVE Zero does not display EIP-712 data properly. It shows an unrecognizable binary format instead of the actual struct data.',
 					messageExtraction: {
 						[DataExtraction.EYES]: false,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -102,12 +118,6 @@ export const ngrave: HardwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

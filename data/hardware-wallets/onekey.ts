@@ -1,4 +1,5 @@
 import { patrickalphac } from '@/data/contributors'
+import { SoftwareWalletType } from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
@@ -6,7 +7,8 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
-} from '@/schema/features/security/hardware-wallet-dapp-signing'
+} from '@/schema/features/security/signing-intent-clarity'
+import { supported } from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -37,6 +39,17 @@ export const onekeyWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported({
+			ref: [
+				'https://help.onekey.so/en/articles/11461105-how-to-use-rabby-wallet-with-onekey-hardware-wallets',
+				'https://developer.onekey.so/connect-to-software/using-walletconnect',
+			],
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+		}),
 		license: {
 			license: License.GPL_3_0,
 			ref: [
@@ -91,13 +104,20 @@ export const onekeyWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.FAIL,
 				silentUpdateProtection: null,
 			},
-			hardwareWalletDappSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				messageSigning: {
 					calldataDecoding: noCalldataDecoding,
 					details:
 						'OneKey Pro shows EIP-712 domain types and message data but does not display domain hash or message hash for easier verification.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -117,6 +137,7 @@ export const onekeyWallet: HardwareWallet = {
 					calldataDecoding: noCalldataDecoding,
 					calldataExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -129,12 +150,6 @@ export const onekeyWallet: HardwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

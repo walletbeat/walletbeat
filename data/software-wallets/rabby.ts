@@ -13,6 +13,7 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
+import { CalldataDecoding, DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
@@ -439,6 +440,46 @@ export const rabby: SoftwareWallet = {
 					],
 					userWhitelist: true,
 				}),
+			},
+			signingIntentClarity: {
+				messageSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: false,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
+						[CalldataDecoding.AAVE_SUPPLY]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+					},
+					messageExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+				},
+				transactionSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+						[CalldataDecoding.AAVE_SUPPLY]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+					},
+					calldataExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+					displayedTransactionDetails: {
+						chain: true,
+						from: true,
+						gas: true,
+						nonce: true,
+						to: true,
+						value: true,
+					},
+				},
 			},
 		},
 		selfSovereignty: {
