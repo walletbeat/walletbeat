@@ -1,8 +1,8 @@
 ---
 Status: Draft
 Grant recipient: Walletbeat (collective)
-Fiat currency: USD
-Amount: 98100
+Amount: 106100
+Currency: USD
 ---
 
 # Walletbeat 2025 EF funding grant proposal
@@ -11,7 +11,23 @@ Amount: 98100
 
 _Briefly describe your organization. Provide links to previous work. How is your organization suited to the project's objectives, and how does it provide the necessary expertise?_
 
-TODO
+Walletbeat is a collective of contributors who believe the Ethereum wallet ecosystem is in need of a watchdog-type organization. Like L2BEAT, we believe a steward is necessary to uphold Ethereum values in the wallet ecosystem. This includes security, privacy, self-sovereignty, transparency, and standards alignment.
+
+[Walletbeat's beta revamp](https://beta.walletbeat.eth.limo) has been in the works since November 2024 by:
+
+- **Individuals**:
+  - [polymutex](https://github.com/polymutex) (dev, wallet attribute design & research, project stewardship)
+  - [darrylyeo](https://github.com/darrylyeo) (dev, UX)
+  - [Hugoo](https://github.com/Hugoo) (wallet research, UX)
+  - [PatrickAlphaC](https://github.com/PatrickAlphaC) (hardware wallet attribute design & research)
+- **EF members**:
+  - [nconsigny](https://github.com/nconsigny) (dev, hardware wallet attribute design & research, Walletbeat project stewardship within EF)
+  - [lucemans](https://github.com/lucemans) (dev, UX)
+  - [nloureiro](https://github.com/nloureiro), [Jontes-Tech](https://github.com/Jontes-Tech), [minimalsm](https://github.com/minimalsm) (UX)
+
+Our work so far can be seen at **[`beta.walletbeat.eth`](https://beta.walletbeat.eth.limo)**.
+
+None of Walletbeat's regular contributors are affiliated with wallet companies (with the exception of Fluidkey, which is why Fluidkey's wallet product is not and will not be listed on Walletbeat).
 
 ## Project category
 
@@ -82,7 +98,9 @@ This milestone contains the following criteria that still need implementation:
   - [Private key access security](https://github.com/walletbeat/walletbeat/issues/218)
   - [Account recovery](https://github.com/walletbeat/walletbeat/issues/191)
   - [Transaction simulation](https://github.com/walletbeat/walletbeat/issues/190)
-  - [Transaction legibility](https://github.com/walletbeat/walletbeat/issues/200) (owner: Hugoo)
+  - [Transaction legibility](https://github.com/walletbeat/walletbeat/issues/200) (owner: PatrickAlphaC)
+  - [Wallet bug bounty program](https://github.com/walletbeat/walletbeat/issues/230) (owner: PatrickAlphaC)
+  - [Security history](https://github.com/walletbeat/walletbeat/issues/231) (owner: PatrickAlphaC)
 - **Privacy**:
   - [Private token transfers beyond Stealth Addresses](https://github.com/walletbeat/walletbeat/issues/192)
   - [Per-dapp wallet addresses](https://github.com/walletbeat/walletbeat/issues/193)
@@ -93,25 +111,29 @@ This milestone contains the following criteria that still need implementation:
   - [Warnings for dapp-specified EIP-7702 delegation requests](https://github.com/walletbeat/walletbeat/issues/166)
   - [Unified cross-chain balances](https://github.com/walletbeat/walletbeat/issues/164)
   - [EIP-7702 transaction batching support](https://github.com/walletbeat/walletbeat/issues/219)
-- [Software and hardware wallet attribute consolidation](https://github.com/walletbeat/walletbeat/issues/181) (owner: PatrickAlphaC)
+- [Software and hardware wallet attribute consolidation](https://github.com/walletbeat/walletbeat/issues/181), refactor "maintenance" attribute group (owner: PatrickAlphaC)
 
 This list may grow as the project continues; the above is only the known set of missing attributes. We welcome feedback around existing and missing attributes that should be added to this set.
 
-- **Owner**: polymutex, except otherwise noted on individual attributes
+- **Owner**: polymutex, except otherwise noted on specific attributes
 - **ETA**: 2.5 months
-- **Funding**: 40,000 USD, distributed to contributors on a per-implemented-attribute basis
+- **Funding**: 45,000 USD
+  - 40,000 USD, distributed to contributors on a per-implemented-attribute basis. We expect the set of needed attributes may still change between now and launch, but in order to keep the grant application size fixed, this sum will be split between however many attributes end up being implemented.
+  - Additional 5,000 USD specifically for the software/hardware wallet attribute consolidation, as it is a large refactor involving many attribute redesigns.
 
 #### Milestone: Finalize the wallet stage system
 
 This milestone represents the finalization of the set of criteria that go into assigning a single "Stage" rating to all wallets. The intent of the stage system is to reduce the amount of rating information that Walletbeat has on wallets down to a single easy-to-communicate label, similar to L2BEAT's stage system.
 
-- [Define what "stage 1" means for a wallet](https://github.com/walletbeat/walletbeat/issues/173)
-- [Define what "stage 2" means for a wallet](https://github.com/walletbeat/walletbeat/issues/195)
-- [Implement UI features for stage system](https://github.com/walletbeat/walletbeat/issues/221)
+- **Software wallets**:
+  - [Define what "stage 1" means for a wallet](https://github.com/walletbeat/walletbeat/issues/173)
+  - [Define what "stage 2" means for a wallet](https://github.com/walletbeat/walletbeat/issues/195)
+  - [Implement UI features for stage system](https://github.com/walletbeat/walletbeat/issues/221)
+- **Hardware wallets**: Same set of issues.
 
-- **Owner**: polymutex
+- **Owner**: polymutex for software wallets, PatrickAlphaC for hardware wallets.
 - **ETA**: 2 weeks
-- **Funding**: 7,000 USD
+- **Funding**: 10,000 USD (5,000 USD for software wallets, 5,000 USD for hardware wallets)
 
 ### Track: Wallet data collection
 
@@ -121,31 +143,31 @@ This work runs in parallel with the "Wallet methodology stabilization" track, bu
 
 **Coordinator**: None; this type of work is easily sharded out to multiple contributors without the need for high-level coordination, as seen below.
 
-#### Milestone: Six software wallets are >90% rated
+#### Milestone: A sufficient number of software wallets are >90% rated
 
 This milestone represents a meaningful amount of software wallet review work, such that wallet users and developers understand the landscape.
 
 "Why >90%": A wallet being ">90%" rated means it has sufficient information such that at least 90% of Walletbeat's final attributes have the data necessary to arrive at a conclusion, and that these attributes are sufficient to determine the stage of a wallet. This non-100% threshold ensures that this milestone can make progress even if the "Wallet methodology stabilization" lags behind.
 
-Walletbeat already has the following software wallets >90% rated:
+Walletbeat already has the following 3 software wallets >90% rated:
 
 - Rabby, browser extension version
 - Daimo, mobile version
 - Ambire, browser extension version
 
-We have selected the following software wallets to bring the total of rated wallets up to 8:
+We have selected the following 10 software wallets, bringing the total of rated wallets up to 13:
 
-- Coinbase Wallet, [mobile](https://github.com/walletbeat/walletbeat/issues/98) and [browser extension](https://github.com/walletbeat/walletbeat/issues/97) versions. (Owner: Hugoo)
-- Rainbow wallet, [mobile](https://github.com/walletbeat/walletbeat/issues/96) and [browser extension](https://github.com/walletbeat/walletbeat/issues/95) versions. (Owner: Hugoo)
-- MetaMask, [mobile](https://github.com/walletbeat/walletbeat/issues/94) and [browser extension](https://github.com/walletbeat/walletbeat/issues/93) versions. (Owner: polymutex)
-- Phantom [mobile](https://github.com/walletbeat/walletbeat/issues/) and [browser extension](https://github.com/walletbeat/walletbeat/issues/) versions. (Owner: Hugoo)
-- Zerion [mobile](https://github.com/walletbeat/walletbeat/issues/) and [browser extension](https://github.com/walletbeat/walletbeat/issues/) versions. (Owner: Hugoo)
+- **Coinbase Wallet**, [mobile](https://github.com/walletbeat/walletbeat/issues/98) and [browser extension](https://github.com/walletbeat/walletbeat/issues/97) versions. (Owner: Hugoo)
+- **Rainbow wallet**, [mobile](https://github.com/walletbeat/walletbeat/issues/96) and [browser extension](https://github.com/walletbeat/walletbeat/issues/95) versions. (Owner: Hugoo)
+- **MetaMask**, [mobile](https://github.com/walletbeat/walletbeat/issues/94) and [browser extension](https://github.com/walletbeat/walletbeat/issues/93) versions. (Owner: polymutex)
+- **Phantom** [mobile](https://github.com/walletbeat/walletbeat/issues/232) and [browser extension](https://github.com/walletbeat/walletbeat/issues/233) versions. (Owner: Hugoo)
+- **Zerion** [mobile](https://github.com/walletbeat/walletbeat/issues/234) and [browser extension](https://github.com/walletbeat/walletbeat/issues/235) versions. (Owner: Hugoo)
 
 - **Owner**: Per-wallet
 - **ETA**: 2 weeks per wallet, can be done in parallel if assigned to different contributors.
-- **Funding**: 5,000 USD per wallet, so 25,000 USD for 5 wallets.
+- **Funding**: 2,500 USD per wallet, so 25,000 USD for 10 wallets.
 
-#### Milestone: Three hardware wallets are >90% rated
+#### Milestone: A sufficient number of hardware wallets are >90% rated
 
 This milestone is the same as the above, but for hardware wallets. None of the hardware wallets are fully rated at the moment. We have selected the following hardware wallets for rating:
 
@@ -156,6 +178,7 @@ This milestone is the same as the above, but for hardware wallets. None of the h
 - **Owner**: Per-wallet
 - **ETA**: 2 weeks per wallet, can be done in parallel if assigned to different contributors.
 - **Funding**: 5,000 USD per wallet, so 15,000 USD for 3 wallets.
+  - The per-wallet rate is higher than software wallets, because testing hardware wallets requires buying a physical device, tests are more manual, and require testing integration of the hardware wallet with multiple software wallets.
 
 #### Milestone: Easy data entry
 
@@ -164,7 +187,7 @@ The goal of this milestone is to make initial wallet data entry easy for new wal
 This includes [documentation around the data entry process](https://github.com/walletbeat/walletbeat/issues/198), and may grow to encompass an intake form to collect some high-level data in a more structured manner.
 
 - **Owner**: Hugoo
-- **ETA**: 3 weeks
+- **ETA**: 2 weeks
 - **Funding**: 5,000 USD
 
 ### Track: Walletbeat UI/UX
@@ -202,7 +225,7 @@ While Walletbeat's website design is fairly stable, [the project lacks strong an
 
 - **Owner**: lucemans, Hugoo
 - **ETA**: 1 week
-- **Funding**: 2,000 USD
+- **Funding**: 2,000 USD to Hugoo (as lucemans cannot receive grant funding as an EF member)
 
 ### Track: Walletbeat legitimacy
 
@@ -260,6 +283,14 @@ This effort is blocked by the need to have consistent branding/logo/press materi
 - **ETA**: 3 weeks
 - **Funding**: 2,000 USD
 
+#### Milestone: Organize a public donation campaign
+
+Raise additional funds through a public donation campaign to fund ongoing development and wallet reviews. Walletbeat will purposefully refuse donations from sources known to be affiliated with wallet development entities.
+
+- **Owner**: polymutex
+- **ETA**: A few days to set up website materials
+- **Funding**: 0 USD, should be hopefully self-funding.
+
 ### Timeline
 
 - **ETA**:
@@ -268,7 +299,7 @@ This effort is blocked by the need to have consistent branding/logo/press materi
   - **Walletbeat UI/UX**: 2 months (in parallel)
   - **Walletbeat legitimacy**: Varies (depends on contributor availability) but probably not the limiting factor.
   - ETA: TODO
-- **Total funding requested**: 88,100 USD.
+- **Total funding requested**: 106,100 USD.
 
 ## Why is your project important?
 
