@@ -6,6 +6,7 @@ import {
 	MultiAddressPolicy,
 	RegularEndpoint,
 } from '@/schema/features/privacy/data-collection'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
@@ -288,7 +289,8 @@ export const daimo: SoftwareWallet = {
 			privacyPolicy: 'https://daimo.com/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.PAYMENTS,
