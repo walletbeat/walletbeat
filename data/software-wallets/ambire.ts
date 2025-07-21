@@ -3,6 +3,8 @@ import { nconsigny } from '@/data/contributors/nconsigny'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import {
 	Leak,
+	LeakedPersonalInfo,
+	LeakedWalletInfo,
 	MultiAddressPolicy,
 	RegularEndpoint,
 } from '@/schema/features/privacy/data-collection'
@@ -227,76 +229,64 @@ export const ambire: SoftwareWallet = {
 					{
 						entity: ambireEntity,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
 							},
 							ref: dataLeakReferences.ambire,
-							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: pimlico,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							ref: dataLeakReferences.pimlico,
-							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: biconomy,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							ref: dataLeakReferences.biconomy,
-							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: lifi,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.NEVER,
 							ref: dataLeakReferences.lifi,
-							walletAddress: Leak.NEVER,
 						},
 					},
 					{
 						entity: github,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.NEVER,
 							ref: dataLeakReferences.github,
-							walletAddress: Leak.NEVER,
 						},
 					},
 					{
 						entity: jiffylabs,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.NEVER,
 							ref: dataLeakReferences.jiffylabs,
-							walletAddress: Leak.NEVER,
 						},
 					},
 				],

@@ -10,7 +10,7 @@ import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type Endpoint,
 	type EntityData,
-	inferLeaks,
+	inferEndpointLeaks,
 	leaksByDefault,
 	type MultiAddressHandling,
 	MultiAddressPolicy,
@@ -235,9 +235,9 @@ function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): numbe
 											switch (endpoint.verifiability.clientVerification.type) {
 												case 'NOT_VERIFIED':
 													return 1
-												case 'VERIFIED':
-													return 2
 												case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
+													return 2
+												case 'VERIFIED':
 													return 3
 											}
 									}
@@ -371,7 +371,7 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		const allRefs: ReferenceArray = []
 
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
-			const leaks = inferLeaks(collected.leaks)
+			const leaks = inferEndpointLeaks(collected.leaks)
 
 			if (!leaksByDefault(leaks.walletAddress)) {
 				continue

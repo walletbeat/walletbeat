@@ -10,7 +10,9 @@ import type { ResolvedFeatures } from '@/schema/features'
 import {
 	compareLeakedInfo,
 	type Endpoint,
+	inferEndpointLeaks,
 	inferLeaks,
+	isEndpointLeaks,
 	Leak,
 	type LeakedInfo,
 	leakedInfoName,
@@ -162,8 +164,10 @@ function isSealedSecureEnclave(endpoint?: Endpoint): boolean {
 	return true
 }
 
-export function linkableToWalletAddress(leaks: Leaks): WalletAddressLinkableTo[] {
-	const qualLeaks = inferLeaks(leaks)
+export function linkableToWalletAddress<T extends LeakedInfo>(
+	leaks: Leaks<T>,
+): WalletAddressLinkableTo[] {
+	const qualLeaks = isEndpointLeaks(leaks) ? inferEndpointLeaks(leaks) : inferLeaks(leaks)
 
 	if (!leaksByDefault(qualLeaks.walletAddress)) {
 		return []
@@ -185,7 +189,7 @@ export function linkableToWalletAddress(leaks: Leaks): WalletAddressLinkableTo[]
 			// Check if the server is running in a secure enclave with all
 			// desirable properties to shield the IP address from being a
 			// privacy leak.
-			if (isSealedSecureEnclave(leaks.endpoint)) {
+			if (isEndpointLeaks(qualLeaks) && isSealedSecureEnclave(qualLeaks.endpoint)) {
 				continue
 			}
 		}
@@ -287,7 +291,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		}
 
 		const linkables: WalletAddressLinkableBy[] = []
-		const allRefs: ReferenceArray = refs(features.privacy.dataCollection.onchain)
+		const allRefs: ReferenceArray = []
 
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
 			allRefs.push(...refs(collected.leaks))
@@ -296,6 +300,8 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 				linkables.push({ by: collected.entity, ...linkable })
 			}
 		}
+
+		allRefs.push(...refs(features.privacy.dataCollection.onchain))
 
 		for (const linkable of linkableToWalletAddress({
 			...features.privacy.dataCollection.onchain,
