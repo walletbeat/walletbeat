@@ -3,6 +3,8 @@ import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import {
 	Leak,
+	LeakedPersonalInfo,
+	LeakedWalletInfo,
 	MultiAddressPolicy,
 	RegularEndpoint,
 } from '@/schema/features/privacy/data-collection'
@@ -159,27 +161,28 @@ export const daimo: SoftwareWallet = {
 					{
 						entity: daimoInc,
 						leaks: {
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
+							[LeakedPersonalInfo.PSEUDONYM]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
-							pseudonym: Leak.ALWAYS,
 							ref: {
 								explanation:
 									'Wallet operations are routed through Daimo.com servers without proxying.',
 								url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/viemClient.ts#L35-L50',
 							},
-							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: pimlico,
 						leaks: {
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
@@ -190,18 +193,18 @@ export const daimo: SoftwareWallet = {
 									'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/bundlerClient.ts#L131-L133',
 								],
 							},
-							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: honeycomb,
 						leaks: {
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedPersonalInfo.PSEUDONYM]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
-							pseudonym: Leak.ALWAYS,
 							ref: {
 								explanation:
 									'Daimo records telemetry events to Honeycomb. This data includes your Daimo username. Since this username is also linked to your wallet address onchain, Honeycomb can associate the username they receive with your wallet address.',
@@ -209,29 +212,15 @@ export const daimo: SoftwareWallet = {
 									'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/server/telemetry.ts#L101-L111',
 								],
 							},
-							walletAddress: Leak.ALWAYS,
-						},
-					},
-					{
-						entity: daimoInc,
-						leaks: {
-							endpoint: RegularEndpoint,
-							farcasterAccount: Leak.OPT_IN,
-							ref: [
-								{
-									explanation:
-										'Users may opt to link their Farcaster profile to their Daimo profile.',
-									url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/apps/daimo-mobile/src/view/sheet/FarcasterBottomSheet.tsx#L141-L148',
-								},
-							],
 						},
 					},
 					{
 						entity: binance,
 						leaks: {
-							cexAccount: Leak.OPT_IN,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.OPT_IN,
+							[LeakedPersonalInfo.CEX_ACCOUNT]: Leak.OPT_IN,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.OPT_IN,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.OPT_IN,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
@@ -242,14 +231,13 @@ export const daimo: SoftwareWallet = {
 									url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/binanceClient.ts#L132',
 								},
 							],
-							walletAddress: Leak.OPT_IN,
 						},
 					},
 					{
 						entity: openExchangeRates,
 						leaks: {
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
 							ref: [
 								{
 									explanation:
@@ -263,10 +251,28 @@ export const daimo: SoftwareWallet = {
 						},
 					},
 					{
-						entity: merkleManufactory,
+						entity: daimoInc,
 						leaks: {
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.OPT_IN,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.OPT_IN,
+							[LeakedPersonalInfo.FARCASTER_ACCOUNT]: Leak.OPT_IN,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.OPT_IN,
+							ref: [
+								{
+									explanation:
+										'Users may opt to link their Farcaster profile to their Daimo profile.',
+									url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/apps/daimo-mobile/src/view/sheet/FarcasterBottomSheet.tsx#L141-L148',
+								},
+							],
+						},
+					},
+					{
+						entity: merkleManufactory,
+						leaks: {
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.OPT_IN,
+							[LeakedPersonalInfo.FARCASTER_ACCOUNT]: Leak.OPT_IN,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.OPT_IN,
+							endpoint: RegularEndpoint,
 							ref: [
 								{
 									explanation:
@@ -278,7 +284,7 @@ export const daimo: SoftwareWallet = {
 					},
 				],
 				onchain: {
-					pseudonym: Leak.ALWAYS,
+					[LeakedPersonalInfo.PSEUDONYM]: Leak.ALWAYS,
 					ref: {
 						explanation:
 							"Creating a Daimo wallet creates a transaction publicly registering your name and address in Daimo's nameRegistry contract on Ethereum.",
