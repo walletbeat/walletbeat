@@ -1,11 +1,11 @@
 import { jiojosbg } from '@/data/contributors/jiojosbg'
-import { nconsigny } from '@/data/contributors/nconsigny'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import {
 	Leak,
 	MultiAddressPolicy,
 	RegularEndpoint,
 } from '@/schema/features/privacy/data-collection'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import {
@@ -24,6 +24,7 @@ import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
+import { nconsigny } from '../contributors'
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
 import { github } from '../entities/github'
@@ -344,7 +345,8 @@ export const ambire: SoftwareWallet = {
 			privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,

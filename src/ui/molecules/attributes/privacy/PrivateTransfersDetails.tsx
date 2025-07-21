@@ -23,6 +23,8 @@ function privateTransferTechnologyName(tech: PrivateTransferTechnology): string 
 	switch (tech) {
 		case PrivateTransferTechnology.STEALTH_ADDRESSES:
 			return 'stealth addresses'
+		case PrivateTransferTechnology.TORNADO_CASH_NOVA:
+			return 'Tornado Cash Nova'
 	}
 }
 
@@ -71,8 +73,14 @@ export function PrivateTransfersDetails({
 						)}
 					</strong>{' '}
 					for private token transfers.
-					{value.defaultFungibleTokenTransferMode === 'PUBLIC' &&
-						' However, the default option for token transfers is public by default. Users must be careful to select private token transfers in order to transact privately.'}
+					{value.defaultFungibleTokenTransferMode === 'PUBLIC' && (
+						<>
+							{' '}
+							However, the default option for token transfers is <strong>public by default</strong>.
+							Users must be careful to select private token transfers in order to transact
+							privately.
+						</>
+					)}
 					{value.defaultFungibleTokenTransferMode === 'EXPLICIT_CHOICE' &&
 						' Users must explicitly select private token transfers in order to transact privately.'}
 					{isPrivateTransferTechnology(value.defaultFungibleTokenTransferMode) &&
@@ -110,6 +118,7 @@ export function PrivateTransfersDetails({
 								</em>
 								<ul style={{ marginLeft: '1.5rem', marginTop: '0.25rem' }}>
 									<StyledListItem
+										key={'sending'}
 										isFirstItem={true}
 										bulletText={privateTransferLevelToIcon(levels.sendingPrivacy)}
 										bulletFontSize='60%'
@@ -119,6 +128,7 @@ export function PrivateTransfersDetails({
 										<RenderTypographicContent content={details.sendingDetails} />
 									</StyledListItem>
 									<StyledListItem
+										key={'receiving'}
 										isFirstItem={false}
 										bulletText={privateTransferLevelToIcon(levels.receivingPrivacy)}
 										bulletFontSize='60%'
@@ -128,6 +138,7 @@ export function PrivateTransfersDetails({
 										<RenderTypographicContent content={details.receivingDetails} />
 									</StyledListItem>
 									<StyledListItem
+										key={'spending'}
 										isFirstItem={false}
 										bulletText={privateTransferLevelToIcon(levels.spendingPrivacy)}
 										bulletFontSize='60%'
@@ -136,6 +147,17 @@ export function PrivateTransfersDetails({
 										<strong>Spending privately-received tokens</strong>:{' '}
 										<RenderTypographicContent content={details.spendingDetails} />
 									</StyledListItem>
+									{details.extraNotes.map((note, index) => (
+										<StyledListItem
+											key={`note-${index}`}
+											isFirstItem={false}
+											bulletText={ratingToIcon(Rating.PARTIAL)}
+											bulletFontSize='60%'
+											spaceBetweenItems='0.5rem'
+										>
+											<RenderTypographicContent content={note} />
+										</StyledListItem>
+									))}
 								</ul>
 							</li>
 						)
