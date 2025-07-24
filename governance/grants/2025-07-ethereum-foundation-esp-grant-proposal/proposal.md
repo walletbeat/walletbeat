@@ -245,8 +245,11 @@ Part of this is to establish Walletbeat as a more formal organization. For it to
 
 #### Milestone: Formalize governance structure
 
-TODO: Need to research how long non-profit options take to set up, how much money this takes, options etc.
-Also includes writing up governance charter.
+Write up a governance charter and ratify it by all multisig members. At a high level, the goal of this charter should be to define the duties of Walletbeat multisig members, the membership change process, and document anti-capture provisions (e.g. members must be fully divested from wallet projects that are reviewed on Walletbeat in order to participate in governance).
+
+- **Owner**: polymutex, but needs consensus from all participants
+- **ETA**: 1 day of active work, 1 week of consensus-gathering
+- **Funding**: 0 USD
 
 #### Milestone: Secure endorsements from other parts of the ecosystem
 
@@ -298,7 +301,9 @@ Raise additional funds through a public donation campaign to fund ongoing develo
   - **Wallet data collection**: 2 months (somewhat in parallel, somewhat behind Wallet methodology stabilization track)
   - **Walletbeat UI/UX**: 2 months (in parallel)
   - **Walletbeat legitimacy**: Varies (depends on contributor availability) but probably not the limiting factor.
-  - ETA: TODO
+  - polymutex plans to take a few months from full-time commitment to focus on Walletbeat, which will allow the bulk of this effort to be focused during this time.
+    The timing of this is still undecided as of this writing (2025-07-23), but likely starting in late September.
+    If so, this provides a reasonable timeline of launch by the end of 2025.
 - **Total funding requested**: 106,100 USD.
 
 ## Why is your project important?
@@ -444,7 +449,7 @@ No other funding has been sought or received as of this writing, but Walletbeat 
 
 ## Anything else you'd like to share?
 
-As Lucemans and nconsigny are EF members, they will decline the funding, and any funds assigned to items listing them will be redirected to other contributors.
+As Lucemans and nconsigny are EF members, they will decline the funding, and any funds assigned to items listing them will be redirected to other contributors. Nonetheless, they will still be able to contribute to the project.
 
 ## How did you hear about the Ecosystem Support Program?
 
