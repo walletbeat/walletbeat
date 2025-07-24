@@ -8,9 +8,13 @@ import {
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
+import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+
+import { ackee } from '../entities/ackee'
+import { certora } from '../entities/certora'
 
 export const safe: SoftwareWallet = {
 	metadata: {
@@ -34,7 +38,24 @@ export const safe: SoftwareWallet = {
 			eoa: notSupported,
 			mpc: notSupported,
 			rawErc4337: supported({
-				contract: 'UNKNOWN',
+				contract: {
+					name: 'Safe',
+					address: '0x0000000000000000000000000000000000000000',
+					eip7702Delegatable: false,
+					methods: {
+						isValidSignature: supported({}),
+						validateUserOp: supported({}),
+					},
+					/** Is the source code for this contract available? */
+					sourceCode: {
+						available: true,
+						ref: {
+							explanation: 'Safe uses the GPL-3.0 license for its source code',
+							label: 'Safe License File',
+							url: 'https://github.com/safe-global/safe-smart-account',
+						},
+					},
+				},
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
@@ -63,25 +84,41 @@ export const safe: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			eip5792: supported({
+				ref: {
+					explanation: 'Safe supports EIP-5792 for transaction batching.',
+					url: 'https://github.com/safe-global/safe-modules/tree/main/modules/batching',
+				},
+			}),
 		},
-		license: null,
+		license: {
+			license: License.GPL_3_0,
+			ref: [
+				{
+					explanation: 'Safe uses the LGPL-3.0 license for its source code',
+					label: 'Safe License File',
+					url: 'https://github.com/safe-global/safe-wallet-monorepo',
+				},
+			],
+		},
 		monetization: {
 			ref: null,
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: null,
-				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
+				donations: false,
+				ecosystemGrants: false,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: false,
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: {
+			support: 'SUPPORTED',
+		},
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://safe.global/privacy',
@@ -153,8 +190,47 @@ export const safe: SoftwareWallet = {
 					},
 				],
 			},
-			publicSecurityAudits: null,
-			scamAlerts: null,
+			publicSecurityAudits: [
+				{
+					auditDate: '2025-01-14',
+					auditor: certora,
+					ref: 'https://github.com/safe-global/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: 'ALL_VARIANTS',
+				},
+				{
+					auditDate: '2025-05-28',
+					auditor: ackee,
+					ref: 'https://github.com/safe-global/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: 'ALL_VARIANTS',
+				},
+			],
+			scamAlerts: {
+				contractTransactionWarning: {
+					contractRegistry: true,
+					leaksContractAddress: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					previousContractInteractionWarning: false,
+					recentContractWarning: false,
+					support: 'SUPPORTED',
+				},
+				scamUrlWarning: {
+					leaksIp: false,
+					leaksUserAddress: false,
+					leaksVisitedUrl: 'NO',
+					support: 'SUPPORTED',
+				},
+				sendTransactionWarning: {
+					leaksRecipient: false,
+					leaksUserAddress: false,
+					leaksUserIp: false,
+					newRecipientWarning: false,
+					support: 'SUPPORTED',
+					userWhitelist: true,
+				},
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {
