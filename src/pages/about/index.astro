@@ -1,10 +1,21 @@
 ---
+// Constants
+import { navigationAbout, navigationFaq, navigationRepository, navigationFarcasterChannel, navigationHome } from '@/components/navigation'
+
+
 // Layouts
 import Layout from '@/layouts/Layout.astro'
 
+
 // Components
-import { AboutPage } from './_AboutPage.tsx'
+import Navigation from '@/ui/organisms/Navigation.astro'
+
+import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
+import GitHubIcon from 'lucide-static/icons/github.svg?raw'
+import MessageCircleIcon from 'lucide-static/icons/message-circle.svg?raw'
+import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
 ---
+
 
 <Layout
 	metadata={{
@@ -12,5 +23,93 @@ import { AboutPage } from './_AboutPage.tsx'
 		keywordsAfter: ['about'],
 	}}
 >
-	<AboutPage client:load />
+	<Navigation
+		navigationItems={[
+			navigationHome,
+			navigationAbout,
+			navigationFaq,
+			navigationRepository,
+			navigationFarcasterChannel,
+		]}
+	/>
+
+	<main>
+		<header>
+			<h1>About Walletbeat</h1>
+			<p>Who watches the wallets?</p>
+		</header>
+
+		<hr>
+
+		<p>
+			Walletbeat is a public good project that brings transparency to the Ethereum wallet ecosystem.
+		</p>
+
+		<p>
+			<strong>As <a href="https://l2beat.com" target="_blank" rel="noopener noreferrer">L2Beat <span set:html={ExternalLinkIcon} /></a> has done for Ethereum Layer 2s, Walletbeat aims to do the same for Ethereum wallets.</strong>
+		</p>
+
+		<hr>
+
+		<p>
+			Walletbeat aims to be fair, objective and impartial in its assessment methodology of Ethereum wallets.
+		</p>
+
+		<p>
+			Where there is inherent subjectivity, such as in the decision of <em>which</em> criteria are used to rate and categorize wallets, Walletbeat aims to follow Ethereum's ethos and cypherpunk values as a guiding principle. See <a href="https://vitalik.eth.limo/general/2024/12/03/wallets.html" target="_blank" rel="noopener noreferrer">Vitalik's blog post on wallets <span set:html={ExternalLinkIcon} /></a> and the <a href="/faq"><span set:html={HelpCircleIcon} />Walletbeat FAQ page</a> for more details.
+		</p>
+
+		<hr>
+
+		<p>
+			Walletbeat is committed to transparency. Contributors reveal their affiliation and / or shares in wallet companies. It is an <a href="https://github.com/walletbeat/walletbeat" target="_blank" rel="noopener noreferrer"><span set:html={GitHubIcon} />open-source project</a> licensed under the Free and Open-Source MIT license. Discussions are held on the <a href="https://warpcast.com/~/channel/walletbeat" target="_blank" rel="noopener noreferrer"><span set:html={MessageCircleIcon} />public /walletbeat Farcaster channel</a>.
+		</p>
+
+		<hr>
+
+		<p>
+			As of 2025-01, Walletbeat has received no funding and is not in need of any.
+		</p>
+
+		<p>
+			If funding becomes a necessity in the future, Walletbeat aims to raise funds through retroactive funding, ecosystem grants, and individual donations. Walletbeat will then publish a funding transparency page that documents the date, origin, and amount of such funding.
+		</p>
+
+		<hr>
+
+		<p>
+			Walletbeat refuses and will continue to refuse funding from wallet-related entities.
+		</p>
+
+		<p>
+			Walletbeat however was originally created and is currently hosted by <a href="https://fluidkey.com/" target="_blank" rel="noopener noreferrer">Fluidkey <span set:html={ExternalLinkIcon} /></a>, an incorporated company in Switzerland with a wallet offering. In order to maximize credible neutrality, Walletbeat's long-term ownership goal is to become an independent DAO or foundation (similar to L2Beat) once Walletbeat reaches a higher level of maturity and a broader set of regular contributors. Until this is achieved, Walletbeat will not list nor rate wallet software from Fluidkey.
+		</p>
+
+		<hr>
+
+		<p>
+			Wallets listed on Walletbeat do not represent an endorsement and is for informational purposes only. If you find that something is wrong, please help Walletbeat by <a href="https://github.com/walletbeat/walletbeat" target="_blank" rel="noopener noreferrer"><span set:html={GitHubIcon} />contributing</a>!
+		</p>
+	</main>
 </Layout>
+
+
+<style>
+	main {
+		display: grid;
+		grid-template-columns: minmax(0, 42rem);
+		justify-content: center;
+		padding: 3rem 1.5rem;
+		gap: 1.66rem;
+		line-height: 1.8;
+
+		> header {
+			> p {
+				font-size: 1.25rem;
+				font-style: italic;
+				color: var(--text-secondary);
+				opacity: 0.75;
+			}
+		}
+	}
+</style>
