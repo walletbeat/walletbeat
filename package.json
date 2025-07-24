@@ -50,7 +50,6 @@
 		"@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
 		"@fleek-platform/cli": "^3.8.3",
 		"@kindspells/astro-shield": "^1.7.1",
-		"@types/marked": "^6.0.0",
 		"blumen": "^0.16.3",
 		"cspell": "^8.19.3",
 		"eslint": "^9.25.1",

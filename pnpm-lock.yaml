@@ -78,9 +78,6 @@ importers:
       '@kindspells/astro-shield':
         specifier: ^1.7.1
         version: 1.7.1(astro@5.12.3(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.29.2)(rollup@4.40.2)(sass-embedded@1.87.0)(tsx@4.19.3)(typescript@5.8.3)(yaml@2.7.1))
-      '@types/marked':
-        specifier: ^6.0.0
-        version: 6.0.0
       blumen:
         specifier: ^0.16.3
         version: 0.16.3
@@ -1861,10 +1858,6 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
-
-  '@types/marked@6.0.0':
-    resolution: {integrity: sha512-jmjpa4BwUsmhxcfsgUit/7A9KbrC48Q0q8KvnY107ogcjGgTFDlIL3RpihNpx2Mu1hM4mdFQjoVc4O6JoGKHsA==}
-    deprecated: This is a stub types definition. marked provides its own type definitions, so you do not need this installed.
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -7591,10 +7584,6 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
-
-  '@types/marked@6.0.0':
-    dependencies:
-      marked: 15.0.12
 
   '@types/mdast@4.0.4':
     dependencies:
