@@ -32,7 +32,7 @@
 		"@fontsource/montserrat": "^5.2.5",
 		"@material-icons/svg": "^1.0.33",
 		"@tanstack/match-sorter-utils": "^8.19.4",
-		"astro": "^5.9.3",
+		"astro": "^5.12.3",
 		"autoprefixer": "^10.4.21",
 		"cmdk": "^1.1.1",
 		"eslint-plugin-import": "^2.31.0",
