@@ -346,16 +346,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 								url: 'https://www.ambire.com/',
 							},
 						}),
-					}),
-					[HardwareWalletType.KEYSTONE]: supported({
-						[HardwareWalletConnection.QR]: supported({
-							ref: {
-								explanation:
-									'Ambire supports Keystone hardware wallets through connector integration (non-native).',
-								url: 'https://www.ambire.com/',
-							},
-						}),
-					}),
+					})
 				},
 			},
 			lightClient: {
