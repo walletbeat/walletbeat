@@ -212,10 +212,10 @@ export const ambire: SoftwareWallet = {
 				ecosystemGrants: true,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: false,
-				hiddenConvenienceFees: true,
+				hiddenConvenienceFees: false,
 				publicOffering: false,
 				selfFunded: true,
-				transparentConvenienceFees: false,
+				transparentConvenienceFees: true,
 				ventureCapital: true,
 			},
 		},
@@ -393,7 +393,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 		transparency: {
 			feeTransparency: {
 				disclosesWalletFees: true,
-				level: FeeTransparencyLevel.DETAILED,
+				level: FeeTransparencyLevel.COMPREHENSIVE,
 				showsTransactionPurpose: true,
 			},
 		},
