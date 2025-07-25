@@ -199,7 +199,11 @@ export const ambire: SoftwareWallet = {
 					url: 'https://github.com/AmbireTech/extension/blob/v2/src/web/extension-services/background/background.ts',
 				},
 			},
-			eip5792: featureSupported,
+			walletCall: supported({
+				atomicMultiTransactions: supported({
+					ref: 'https://github.com/AmbireTech/ambire-common/blob/eba5dda7bccbd1c404f293d75c4ea74d939c8d01/src/libs/account/EOA7702.ts#L181-L183',
+				}),
+			}),
 		},
 		license: {
 			license: License.GPL_3_0,
