@@ -1,13 +1,15 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -33,11 +35,12 @@ export const safe: SoftwareWallet = {
 	},
 	features: {
 		accountSupport: {
-			defaultAccountType: AccountType.rawErc4337,
+			defaultAccountType: AccountType.safe,
 			eip7702: notSupported,
 			eoa: notSupported,
 			mpc: notSupported,
-			rawErc4337: supported({
+			rawErc4337: notSupported,
+			safe: supported({
 				contract: {
 					name: 'Safe',
 					address: '0x0000000000000000000000000000000000000000',
@@ -46,7 +49,6 @@ export const safe: SoftwareWallet = {
 						isValidSignature: supported({}),
 						validateUserOp: supported({}),
 					},
-					/** Is the source code for this contract available? */
 					sourceCode: {
 						available: true,
 						ref: {
@@ -56,15 +58,6 @@ export const safe: SoftwareWallet = {
 						},
 					},
 				},
-				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				ref: {
-					explanation: 'Safe supports ERC-4337 via their 4337 module implementation',
-					url: 'https://github.com/safe-global/safe-modules/tree/master/4337',
-				},
-				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 		},
 		addressResolution: {
@@ -76,7 +69,11 @@ export const safe: SoftwareWallet = {
 			ref: null,
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: {
+			customChains: false,
+			l1RpcEndpoint: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+			otherRpcEndpoints: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+		},
 		integration: {
 			browser: {
 				'1193': null,
@@ -208,25 +205,25 @@ export const safe: SoftwareWallet = {
 			],
 			scamAlerts: {
 				contractTransactionWarning: {
-					contractRegistry: true,
-					leaksContractAddress: false,
-					leaksUserAddress: false,
-					leaksUserIp: false,
+					contractRegistry: true, //blockaid
+					leaksContractAddress: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
 					previousContractInteractionWarning: false,
-					recentContractWarning: false,
+					recentContractWarning: true, //blockaid
 					support: 'SUPPORTED',
 				},
 				scamUrlWarning: {
-					leaksIp: false,
-					leaksUserAddress: false,
-					leaksVisitedUrl: 'NO',
+					leaksIp: true,
+					leaksUserAddress: true,
+					leaksVisitedUrl: 'FULL_URL',
 					support: 'SUPPORTED',
 				},
 				sendTransactionWarning: {
-					leaksRecipient: false,
-					leaksUserAddress: false,
-					leaksUserIp: false,
-					newRecipientWarning: false,
+					leaksRecipient: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					newRecipientWarning: true, //blockaid
 					support: 'SUPPORTED',
 					userWhitelist: true,
 				},
@@ -235,17 +232,21 @@ export const safe: SoftwareWallet = {
 		selfSovereignty: {
 			transactionSubmission: {
 				l1: {
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
+					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},
 		transparency: {
-			feeTransparency: null,
+			feeTransparency: {
+				disclosesWalletFees: true,
+				level: FeeTransparencyLevel.DETAILED,
+				showsTransactionPurpose: true,
+			},
 		},
 	},
 	variants: {

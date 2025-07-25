@@ -165,6 +165,7 @@ export const ambire: SoftwareWallet = {
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
+			safe: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {
@@ -403,7 +404,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 			transactionSubmission: {
 				l1: {
 					selfBroadcastViaDirectGossip: notSupported,
-					selfBroadcastViaSelfHostedNode: featureSupported,
+					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
 					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,

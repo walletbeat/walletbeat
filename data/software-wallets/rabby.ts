@@ -59,6 +59,25 @@ export const rabby: SoftwareWallet = {
 			}),
 			mpc: notSupported,
 			rawErc4337: notSupported,
+			safe: supported({
+				contract: {
+					name: 'Safe',
+					address: '0x0000000000000000000000000000000000000000',
+					eip7702Delegatable: false,
+					methods: {
+						isValidSignature: supported({}),
+						validateUserOp: supported({}),
+					},
+					sourceCode: {
+						available: true,
+						ref: {
+							explanation: 'Safe uses the GPL-3.0 license for its source code',
+							label: 'Safe License File',
+							url: 'https://github.com/safe-global/safe-smart-account',
+						},
+					},
+				},
+			}),
 		},
 		addressResolution: {
 			chainSpecificAddressing: {
