@@ -231,7 +231,7 @@ export const ambire: SoftwareWallet = {
 							ipAddress: Leak.ALWAYS,
 							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
-								type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							ref: dataLeakReferences.ambire,
 							walletAddress: Leak.ALWAYS,
