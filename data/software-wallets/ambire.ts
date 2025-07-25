@@ -33,6 +33,7 @@ import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
+import { unsupportedProp } from '@mui/material'
 
 const v2Audits: SecurityAudit[] = [
 	{
@@ -174,7 +175,47 @@ export const ambire: SoftwareWallet = {
 				medium: 'CHAIN_CLIENT',
 			}),
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			crossChainBalances: {
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				ether: supported({
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+					crossChainSumView: notSupported,
+					ref: {
+						url: 'https://www.ambire.com/',
+						explanation: 'Ambire supports filtering by token name.',
+					},
+				}),
+				usdc: supported({
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+					crossChainSumView: notSupported,
+					ref: {
+						url: 'https://www.ambire.com/',
+						explanation: 'Ambire supports filtering by token name.',
+					},
+				}),
+				ref: {
+					url: 'https://ambire.notion.site/Ambire-Wallet-Whitepaper-d502e54caf584fe7a67f9b0a018cd10f',
+					explanation:
+						'Ambire supports filtering by token name and chain, as well as displaying the total balance from the resulting tokens',
+				},
+			},
+
+			/** Chain bridging features. */
+			bridging: {
+				/** Does the wallet have a built-in bridging feature? */
+				builtInBridging: supported({
+					risksExplained: 'NOT_IN_UI',
+					feesLargerThan1bps: 'VISIBLE_BY_DEFAULT',
+					ref: {
+						url: 'https://www.ambire.com/',
+						explanation: 'All fees are displayed when agreeing to the bridge',
+					},
+				}),
+				suggestedBridging: notSupported,
+			},
+		},
 		chainConfigurability: {
 			customChains: true,
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
