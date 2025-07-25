@@ -28,12 +28,12 @@ import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
 import { github } from '../entities/github'
 import { hunterSecurity } from '../entities/hunter-security'
-import { jiffylabs } from '../entities/jiffyscan'
 import { lifi } from '../entities/lifi'
 import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
+import { unsupportedProp } from '@mui/material'
 
 const v2Audits: SecurityAudit[] = [
 	{
@@ -175,7 +175,47 @@ export const ambire: SoftwareWallet = {
 				medium: 'CHAIN_CLIENT',
 			}),
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			crossChainBalances: {
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				ether: supported({
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+					crossChainSumView: notSupported,
+					ref: {
+						url: 'https://www.ambire.com/',
+						explanation: 'Ambire supports filtering by token name.',
+					},
+				}),
+				usdc: supported({
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+					crossChainSumView: notSupported,
+					ref: {
+						url: 'https://www.ambire.com/',
+						explanation: 'Ambire supports filtering by token name.',
+					},
+				}),
+				ref: {
+					url: 'https://ambire.notion.site/Ambire-Wallet-Whitepaper-d502e54caf584fe7a67f9b0a018cd10f',
+					explanation:
+						'Ambire supports filtering by token name and chain, as well as displaying the total balance from the resulting tokens',
+				},
+			},
+
+			/** Chain bridging features. */
+			bridging: {
+				/** Does the wallet have a built-in bridging feature? */
+				builtInBridging: supported({
+					risksExplained: 'NOT_IN_UI',
+					feesLargerThan1bps: 'VISIBLE_BY_DEFAULT',
+					ref: {
+						url: 'https://www.ambire.com/',
+						explanation: 'All fees are displayed when agreeing to the bridge',
+					},
+				}),
+				suggestedBridging: notSupported,
+			},
+		},
 		chainConfigurability: {
 			customChains: true,
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
@@ -213,10 +253,10 @@ export const ambire: SoftwareWallet = {
 				ecosystemGrants: true,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: false,
-				hiddenConvenienceFees: true,
+				hiddenConvenienceFees: false,
 				publicOffering: false,
 				selfFunded: true,
-				transparentConvenienceFees: false,
+				transparentConvenienceFees: true,
 				ventureCapital: true,
 			},
 		},
@@ -232,7 +272,7 @@ export const ambire: SoftwareWallet = {
 							ipAddress: Leak.ALWAYS,
 							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
-								type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							ref: dataLeakReferences.ambire,
 							walletAddress: Leak.ALWAYS,
@@ -285,17 +325,6 @@ export const ambire: SoftwareWallet = {
 							ipAddress: Leak.ALWAYS,
 							mempoolTransactions: Leak.NEVER,
 							ref: dataLeakReferences.github,
-							walletAddress: Leak.NEVER,
-						},
-					},
-					{
-						entity: jiffylabs,
-						leaks: {
-							cexAccount: Leak.NEVER,
-							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.NEVER,
-							ref: dataLeakReferences.jiffylabs,
 							walletAddress: Leak.NEVER,
 						},
 					},
@@ -359,15 +388,6 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							},
 						}),
 					}),
-					[HardwareWalletType.KEYSTONE]: supported({
-						[HardwareWalletConnection.QR]: supported({
-							ref: {
-								explanation:
-									'Ambire supports Keystone hardware wallets through connector integration (non-native).',
-								url: 'https://www.ambire.com/',
-							},
-						}),
-					}),
 				},
 			},
 			lightClient: {
@@ -414,7 +434,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 		transparency: {
 			feeTransparency: {
 				disclosesWalletFees: true,
-				level: FeeTransparencyLevel.DETAILED,
+				level: FeeTransparencyLevel.COMPREHENSIVE,
 				showsTransactionPurpose: true,
 			},
 		},
