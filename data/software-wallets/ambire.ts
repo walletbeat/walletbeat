@@ -28,7 +28,6 @@ import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
 import { github } from '../entities/github'
 import { hunterSecurity } from '../entities/hunter-security'
-import { jiffylabs } from '../entities/jiffyscan'
 import { lifi } from '../entities/lifi'
 import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
@@ -287,18 +286,7 @@ export const ambire: SoftwareWallet = {
 							ref: dataLeakReferences.github,
 							walletAddress: Leak.NEVER,
 						},
-					},
-					{
-						entity: jiffylabs,
-						leaks: {
-							cexAccount: Leak.NEVER,
-							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.NEVER,
-							ref: dataLeakReferences.jiffylabs,
-							walletAddress: Leak.NEVER,
-						},
-					},
+					}
 				],
 				onchain: {},
 			},
