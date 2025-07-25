@@ -9,6 +9,7 @@ export enum License {
 	APACHE_2_0 = 'Apache-2.0',
 	BUSL_1_1 = 'BUSL-1.1',
 	GPL_3_0 = 'GPL-3.0',
+	LGPL_3_0 = 'LGPL-3.0',
 	BSD_3_CLAUSE = 'BSD-3-Clause',
 	MIT = 'MIT',
 	MIT_WITH_CLAUSE = 'MIT-C',
