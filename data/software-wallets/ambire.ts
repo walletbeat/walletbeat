@@ -327,7 +327,7 @@ export const ambire: SoftwareWallet = {
 							ref: dataLeakReferences.github,
 							walletAddress: Leak.NEVER,
 						},
-					}
+					},
 				],
 				onchain: {},
 			},
@@ -387,7 +387,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 								url: 'https://www.ambire.com/',
 							},
 						}),
-					})
+					}),
 				},
 			},
 			lightClient: {
