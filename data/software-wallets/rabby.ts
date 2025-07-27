@@ -110,6 +110,9 @@ export const rabby: SoftwareWallet = {
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 		},
+		ecosystem: {
+			delegation: 'EIP_7702_NOT_SUPPORTED',
+		},
 		integration: {
 			browser: {
 				'1193': featureSupported,

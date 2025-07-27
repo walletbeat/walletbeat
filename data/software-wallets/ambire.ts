@@ -243,6 +243,20 @@ export const ambire: SoftwareWallet = {
 				],
 			},
 		},
+		ecosystem: {
+			delegation: {
+				duringEOACreation: 'NO',
+				duringEOAImport: 'NO',
+				duringFirst7702Operation: supported({
+					type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS',
+					nonDelegationTransactionDetailsIdenticalToNormalFlow: true,
+				}),
+				fee: {
+					crossChainGas: featureSupported,
+					walletSponsored: featureSupported,
+				},
+			},
+		},
 		integration: {
 			browser: {
 				'1193': featureSupported,

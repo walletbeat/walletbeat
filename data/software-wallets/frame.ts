@@ -69,6 +69,9 @@ export const frame: SoftwareWallet = {
 				},
 			],
 		},
+		ecosystem: {
+			delegation: null,
+		},
 		integration: {
 			browser: {
 				'1193': null,

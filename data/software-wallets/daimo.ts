@@ -112,6 +112,9 @@ export const daimo: SoftwareWallet = {
 			l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,
 			otherRpcEndpoints: RpcEndpointConfiguration.NO,
 		},
+		ecosystem: {
+			delegation: 'EIP_7702_NOT_SUPPORTED',
+		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
 			walletCall: notSupported,
