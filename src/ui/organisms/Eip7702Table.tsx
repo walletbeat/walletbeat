@@ -15,10 +15,9 @@ import type { EVMAddress, SmartWalletContract } from '@/schema/contracts'
 import { AccountType, isAccountTypeSupported } from '@/schema/features/account-support'
 import { refs } from '@/schema/reference'
 import { isLabeledUrl } from '@/schema/url'
-import type { Variant } from '@/schema/variants'
+import { getVariants, type Variant } from '@/schema/variants'
 import {
 	getVariantResolvedWallet,
-	getWalletVariants,
 	type RatedWallet,
 	walletSupportedAccountTypes,
 } from '@/schema/wallet'
@@ -71,7 +70,7 @@ const softwareWalletData: TableRow[] = Object.values(ratedSoftwareWallets)
 					? WalletTypeFor7702.NON_7702_EOA
 					: WalletTypeFor7702.OTHER
 		const contract = ((): TableRow['contract'] => {
-			for (const variant of setItems<Variant>(getWalletVariants(wallet))) {
+			for (const variant of setItems<Variant>(getVariants(wallet.variants))) {
 				const variantWallet = getVariantResolvedWallet(wallet, variant)
 
 				if (variantWallet === null || variantWallet.features.accountSupport === null) {
