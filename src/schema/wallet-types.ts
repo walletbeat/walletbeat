@@ -7,8 +7,8 @@ import {
 	nonEmptySetFromArray,
 } from '@/types/utils/non-empty'
 
-import { allVariants, Variant } from './variants'
-import { type BaseWallet, getWalletVariants, type RatedWallet } from './wallet'
+import { allVariants, getVariants, Variant } from './variants'
+import type { BaseWallet, RatedWallet } from './wallet'
 
 /**
  * A high-level wallet "type".
@@ -113,6 +113,6 @@ export function variantToWalletType(variant: Variant): WalletType {
  */
 export function walletTypes(wallet: BaseWallet | RatedWallet): NonEmptySet<WalletType> {
 	return nonEmptySetFromArray(
-		nonEmptyMap(nonEmptyKeys(getWalletVariants(wallet)), variantToWalletType),
+		nonEmptyMap(nonEmptyKeys(getVariants(wallet.variants)), variantToWalletType),
 	)
 }
