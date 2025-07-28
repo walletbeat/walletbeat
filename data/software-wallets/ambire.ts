@@ -33,7 +33,6 @@ import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
-import { unsupportedProp } from '@mui/material'
 
 const v2Audits: SecurityAudit[] = [
 	{
