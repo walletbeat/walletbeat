@@ -79,6 +79,9 @@ const dataLeakReferences: Record<string, References> = {
 			url: 'https://relayer.ambire.com',
 		},
 		{
+			explanation:
+				'Ambire does a single batch request for token discovery on multiple chains for a single account. This feature utilizes the Ambire relayer.',
+			lastRetrieved: '2025-07-28',
 			urls: [
 				{
 					label: 'A single account-network pair is queued',
@@ -90,10 +93,6 @@ const dataLeakReferences: Record<string, References> = {
 					url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/batcher.ts#L143',
 				},
 			],
-
-			explanation:
-				'Ambire does a single batch request for token discovery on multiple chains for a single account. This feature utilizes the Ambire relayer.',
-			lastRetrieved: `2025-07-28`,
 		},
 		{
 			explanation: "Ambire's NFT CDN is responsible for fetching NFT media.",
@@ -186,46 +185,45 @@ export const ambire: SoftwareWallet = {
 			}),
 		},
 		chainAbstraction: {
-			crossChainBalances: {
-				globalAccountValue: featureSupported,
-				perChainAccountValue: featureSupported,
-				ether: supported({
-					perChainBalanceViewAcrossMultipleChains: featureSupported,
-					crossChainSumView: notSupported,
-					ref: {
-						label: 'Implementation of token filtering by name',
-						url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
-						explanation: 'Ambire supports filtering by token name.',
-					},
-				}),
-				usdc: supported({
-					perChainBalanceViewAcrossMultipleChains: featureSupported,
-					crossChainSumView: notSupported,
-					ref: {
-						url: 'https://www.ambire.com/',
-						explanation: 'Ambire supports filtering by token name.',
-					},
-				}),
-				ref: {
-					label: 'Implementation of token filtering by name',
-					url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
-					explanation:
-						'Ambire supports filtering by token name and chain, as well as displaying the total balance from the resulting tokens',
-				},
-			},
-
 			/** Chain bridging features. */
 			bridging: {
 				/** Does the wallet have a built-in bridging feature? */
 				builtInBridging: supported({
-					risksExplained: 'NOT_IN_UI',
 					feesLargerThan1bps: 'VISIBLE_BY_DEFAULT',
 					ref: {
-						url: 'https://www.ambire.com/',
 						explanation: 'All fees are displayed when agreeing to the bridge',
+						url: 'https://www.ambire.com/',
 					},
+					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ether: supported({
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+					ref: {
+						explanation: 'Ambire supports filtering by token name.',
+						label: 'Implementation of token filtering by name',
+						url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+					},
+				}),
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				ref: {
+					explanation:
+						'Ambire supports filtering by token name and chain, as well as displaying the total balance from the resulting tokens',
+					label: 'Implementation of token filtering by name',
+					url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+				},
+				usdc: supported({
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+					ref: {
+						explanation: 'Ambire supports filtering by token name.',
+						url: 'https://www.ambire.com/',
+					},
+				}),
 			},
 		},
 		chainConfigurability: {
