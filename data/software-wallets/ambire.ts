@@ -95,12 +95,6 @@ const dataLeakReferences: Record<string, References> = {
 			url: ['https://raw.githubusercontent.com', 'https://github.com', 'https://api.github.com'],
 		},
 	],
-	jiffylabs: [
-		{
-			explanation: 'User for fetching info about AA operations.',
-			url: 'https://api.jiffyscan.xyz',
-		},
-	],
 	lifi: [
 		{
 			explanation: 'Ambire uses LiFi as bridge and swap API.',
