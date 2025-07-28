@@ -193,7 +193,8 @@ export const ambire: SoftwareWallet = {
 					perChainBalanceViewAcrossMultipleChains: featureSupported,
 					crossChainSumView: notSupported,
 					ref: {
-						url: 'https://www.ambire.com/',
+						label: 'Implementation of token filtering by name',
+						url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
 						explanation: 'Ambire supports filtering by token name.',
 					},
 				}),
@@ -206,7 +207,8 @@ export const ambire: SoftwareWallet = {
 					},
 				}),
 				ref: {
-					url: 'https://ambire.notion.site/Ambire-Wallet-Whitepaper-d502e54caf584fe7a67f9b0a018cd10f',
+					label: 'Implementation of token filtering by name',
+					url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
 					explanation:
 						'Ambire supports filtering by token name and chain, as well as displaying the total balance from the resulting tokens',
 				},
