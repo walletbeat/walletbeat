@@ -398,7 +398,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							},
 						}),
 					}),
-					[HardwareWalletType.KEYSTONE]: notSupported
+					[HardwareWalletType.KEYSTONE]: notSupported,
 				},
 			},
 			lightClient: {
