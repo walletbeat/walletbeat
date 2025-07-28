@@ -14,8 +14,15 @@ import {
 	PrivateTransferTechnology,
 	type StealthAddressSupport,
 	StealthAddressUnlabeledBehavior,
+	type TornadoCashNovaSupport,
 } from '@/schema/features/privacy/transaction-privacy'
-import { isSupported, notSupported, type Supported, supported } from '@/schema/features/support'
+import {
+	isSupported,
+	notSupported,
+	type Support,
+	type Supported,
+	supported,
+} from '@/schema/features/support'
 import {
 	markdown,
 	mdParagraph,
@@ -33,7 +40,7 @@ import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/util
 import { commaListFormat, markdownListFormat } from '@/types/utils/text'
 
 import { entityMarkdownLink } from '../../entity'
-import { mergeRefs, type ReferenceArray } from '../../reference'
+import { mergeRefs, type ReferenceArray, refs } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.privacy.private_transfers'
@@ -115,12 +122,9 @@ function mergeEvaluations(
 	const betterTransferDetails = extractPrivateTransferDetails(better.details)
 	const details =
 		worseTransferDetails !== null
-			? privateTransfersDetailsContent({
-					privateTransferDetails: mergePrivateTransferDetails(
-						betterTransferDetails,
-						worseTransferDetails,
-					),
-				})
+			? privateTransfersDetailsContent(
+					mergePrivateTransferDetails(betterTransferDetails, worseTransferDetails),
+				)
 			: worse.details
 
 	return {
@@ -152,40 +156,46 @@ const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
 		perTechnology: new Map(),
 		__brand: brand,
 	},
-	details: mdParagraph(`
-		{{WALLET_NAME}} does not support any type of private token transfers.
+	details: mdParagraph(
+		`
+			{{WALLET_NAME}} does not support any type of private token transfers.
 
-		This means all token transfers made using {{WALLET_NAME}} are public
-		information and are recorded forever.
-		Therefore, {{WALLET_NAME}} users should only make token transfers if they
-		would also be comfortable with continuously publishing their bank account
-		statement or payment app transaction history for all to see online, as
-		their level of privacy would be similar.
-	`),
-	impact: mdParagraph<{ WALLET_NAME: string }>(`
-		As all token transfers will be recorded publicly onchain forever,
-		{{WALLET_NAME}} should only be used for transactions where privacy is not
-		and will never be needed, such as public DAO treasury operations.
+			This means all token transfers made using {{WALLET_NAME}} are public
+			information and are recorded forever.
+			Therefore, {{WALLET_NAME}} users should only make token transfers if they
+			would also be comfortable with continuously publishing their bank account
+			statement or payment app transaction history for all to see online, as
+			their level of privacy would be similar.
+		`,
+	),
+	impact: mdParagraph<{ WALLET_NAME: string }>(
+		`
+			As all token transfers will be recorded publicly onchain forever,
+			{{WALLET_NAME}} should only be used for transactions where privacy is not
+			and will never be needed, such as public DAO treasury operations.
 
-		{{WALLET_NAME}} **should not be used for peer-to-peer transfers**, and
-		users should keep their addresses to themselves to avoid creating
-		permanent associations between their public transactions and their
-		personal identity.
+			{{WALLET_NAME}} **should not be used for peer-to-peer transfers**, and
+			users should keep their addresses to themselves to avoid creating
+			permanent associations between their public transactions and their
+			personal identity.
 
-		Usage of {{WALLET_NAME}} for conducting real-world transactions is
-		especially **not advisable**, as it exposes the user to the risk of the
-		merchant looking up their customer's balance and initiating a
-		[**wrench attack**](https://github.com/jlopp/physical-bitcoin-attacks/blob/master/README.md)
-		on the user. This puts users of {{WALLET_NAME}} at risk of physical
-		and financial harm.
-	`),
-	howToImprove: mdParagraph(`
-		{{WALLET_NAME}} should support some form of private token transfers,
-		such as ${eipMarkdownLink(erc5564)}, and should make this the primary
-		way to perform token transfers. Public token transfers should either be
-		hidden under a power-user-only menu, come with important user safety
-		warnings, or deleted from the wallet's feature set.
-	`),
+			Usage of {{WALLET_NAME}} for conducting real-world transactions is
+			especially **not advisable**, as it exposes the user to the risk of the
+			merchant looking up their customer's balance and initiating a
+			[**wrench attack**](https://github.com/jlopp/physical-bitcoin-attacks/blob/master/README.md)
+			on the user. This puts users of {{WALLET_NAME}} at risk of physical
+			and financial harm.
+		`,
+	),
+	howToImprove: mdParagraph(
+		`
+			{{WALLET_NAME}} should support some form of private token transfers,
+			such as ${eipMarkdownLink(erc5564)}, and should make this the primary
+			way to perform token transfers. Public token transfers should either be
+			hidden under a power-user-only menu, come with important user safety
+			warnings, or deleted from the wallet's feature set.
+		`,
+	),
 }
 
 const nonDefault: Evaluation<PrivateTransfersValue> = {
@@ -200,23 +210,23 @@ const nonDefault: Evaluation<PrivateTransfersValue> = {
 		perTechnology: new Map(),
 		__brand: brand,
 	},
-	details: paragraph(`
-		Token transfers with {{WALLET_NAME}} are public by default, despite it
-		supporting private token transfers.
-
-		This means token transfers made using {{WALLET_NAME}} are by default
-		public information that is recorded forever.
-	`),
-	impact: paragraph(`
-		{{WALLET_NAME}} users should always use private token transfers
-		to protect their privacy.
-	`),
-	howToImprove: paragraph(`
-		{{WALLET_NAME}} should make token transfers private by default.
-		Public token transfers should either be hidden under a
-		power-user-only menu, come with important user safety warnings,
-		or deleted from the wallet's feature set.
-	`),
+	details: privateTransfersDetailsContent({
+		privateTransferDetails: new Map(),
+	}),
+	impact: paragraph(
+		`
+			{{WALLET_NAME}} users should always use private token transfers
+			to protect their privacy.
+		`,
+	),
+	howToImprove: paragraph(
+		`
+			{{WALLET_NAME}} should make token transfers private by default.
+			Public token transfers should either be hidden under a
+			power-user-only menu, come with important user safety warnings,
+			or deleted from the wallet's feature set.
+		`,
+	),
 }
 
 function rateStealthAddressSupport(
@@ -476,21 +486,23 @@ function rateStealthAddressSupport(
 		.concat(labelingImprovements)
 		.concat(derivationImprovements)
 	const howToImprove = isNonEmptyArray(walletShould)
-		? mdParagraph<{ WALLET_NAME: string }>(`
-			{{WALLET_NAME}} should${markdownListFormat(walletShould, {
-				ifEmpty: { behavior: 'THROW_ERROR' },
-				singleItemTemplate: ' ITEM.',
-				uppercaseFirstCharacterOfListItems: true,
-				multiItemPrefix: `:
-
-			`,
-				multiItemTemplate: `
-			- ITEM`,
-				multiItemSuffix: `
-
-			`,
-			})}
-		`)
+		? mdParagraph<{ WALLET_NAME: string }>(
+				`
+					{{WALLET_NAME}} should${markdownListFormat(walletShould, {
+						ifEmpty: { behavior: 'THROW_ERROR' },
+						singleItemTemplate: ' ITEM.',
+						uppercaseFirstCharacterOfListItems: true,
+						multiItemPrefix: `:
+					
+					`,
+						multiItemTemplate: `
+					- ITEM`,
+						multiItemSuffix: `
+					
+					`,
+					})}
+				`,
+			)
 		: undefined
 	const worstLevel = worstPrivateTransfersPrivacyLevel([
 		sendingPrivacy,
@@ -516,6 +528,7 @@ function rateStealthAddressSupport(
 			sendingDetails,
 			receivingDetails,
 			spendingDetails,
+			extraNotes: [],
 		}),
 	})
 
@@ -575,6 +588,293 @@ function rateStealthAddressSupport(
 	}
 }
 
+function rateTornadoCashNovaSupport(
+	tornadoCashNova: Supported<TornadoCashNovaSupport>,
+): Evaluation<PrivateTransfersValue> {
+	const references: ReferenceArray = refs(tornadoCashNova)
+	const extraNotes: Paragraph[] = []
+	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
+		sendingPrivacy: PrivateTransfersPrivacyLevel
+		sendingDetails: Paragraph
+		sendingImprovements: string[]
+	} => {
+		switch (tornadoCashNova.integrationType) {
+			case 'THROUGH_ENTITY':
+				if (tornadoCashNova.entityLearnsUserUtxos) {
+					return {
+						sendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+						sendingDetails: mdParagraph(`
+							When sending tokens to the Tornado Cash Nova pool,
+							${entityMarkdownLink(tornadoCashNova.entity)} learns about the
+							depositor and recipient of the transaction.
+						`),
+						sendingImprovements: [
+							`only reveal UTXO **commitment** information to ${entityMarkdownLink(tornadoCashNova.entity)}`,
+						],
+					}
+				}
+
+				if (tornadoCashNova.entityLearnsUserIpAddress) {
+					return {
+						sendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+						sendingDetails: mdParagraph(`
+							When sending tokens to the Tornado Cash Nova pool,
+							${entityMarkdownLink(tornadoCashNova.entity)} learns about the
+							depositor's IP address.
+						`),
+						sendingImprovements: [
+							`only contact ${entityMarkdownLink(tornadoCashNova.entity)} through a mixnet`,
+						],
+					}
+				}
+
+				return {
+					sendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
+					sendingDetails: mdParagraph(`
+							Token deposit transactions are sent through
+							${entityMarkdownLink(tornadoCashNova.entity)}, but it does not
+							learn the depositor's identity nor IP address.
+					`),
+					sendingImprovements: [],
+				}
+			case 'DIRECT':
+				return {
+					sendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
+					sendingDetails: mdParagraph('Token deposit transactions are sent directly to the pool.'),
+					sendingImprovements: [],
+				}
+		}
+	})()
+	const { receivingPrivacy, receivingDetails, receivingImprovements } = ((): {
+		receivingPrivacy: PrivateTransfersPrivacyLevel
+		receivingDetails: Paragraph
+		receivingImprovements: string[]
+	} => {
+		switch (tornadoCashNova.utxoFiltering) {
+			case 'EXTERNAL':
+				return {
+					receivingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+					receivingDetails: mdParagraph(`
+						The user's private notes (UTXOs) are filtered externally,
+						allowing a third party to correlate the user's funds within
+						the pool.
+					`),
+					receivingImprovements: ['should perform UTXO filtering client-side'],
+				}
+			case 'WALLET_SIDE':
+				return {
+					receivingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
+					receivingDetails: mdParagraph(`
+						The user's private notes (UTXOs) are filtered by the wallet
+						itself, ensuring that no third party may correlate the user's
+						received funds in the pool.
+					`),
+					receivingImprovements: [],
+				}
+		}
+	})()
+	const { spendingPrivacy, spendingDetails, spendingImprovements } = ((): {
+		spendingPrivacy: PrivateTransfersPrivacyLevel
+		spendingDetails: Paragraph
+		spendingImprovements: string[]
+	} => {
+		if (!isSupported(tornadoCashNova.novaInternalTransfers)) {
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
+				spendingDetails: mdParagraph(`
+					Pool-internal token transfers are not supported; this means
+					spending your private balance requires an out-of-pool withdrawal
+					followed by another deposit, which is challenging to do in a
+					fully privacy-preserving way.
+				`),
+				spendingImprovements: ['integrate pool-internal transfers'],
+			}
+		}
+
+		if (!isSupported(tornadoCashNova.warnAboutSuccessiveOperations)) {
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
+				spendingDetails: mdParagraph(`
+					The user is not warned when performing multiple transfers in quick
+					succession. This could allow an observer to correlate multiple pool
+					operations and infer information about the user's identity.
+				`),
+				spendingImprovements: ['warn the user when doing multiple operations in quick succession'],
+			}
+		}
+
+		return {
+			spendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
+			spendingDetails: mdParagraph(`
+				Pool-internal transfers are supported, and the user is cautioned
+				against doing too many operations in quick succession to avoid
+				time-based correlation.
+			`),
+			spendingImprovements: [],
+		}
+	})()
+
+	switch (tornadoCashNova.integrationType) {
+		case 'THROUGH_ENTITY':
+			extraNotes.push(
+				mdParagraph(`
+					All Tornado Cash Nova operations go through
+					${entityMarkdownLink(tornadoCashNova.entity)}, who is in a position
+					to censor or block transactions.
+				`),
+			)
+			spendingImprovements.push(
+				'allow the user to spend pool funds directly through a configurable relayer endpoint',
+			)
+			break
+		case 'DIRECT':
+			if (!isSupported(tornadoCashNova.customizableRelayer)) {
+				extraNotes.push(
+					mdParagraph(`
+						The Tornado Cash Nova relayer is not user-customizable, and is in
+						a position to censor or block transactions.
+					`),
+				)
+				spendingImprovements.push('allow the user to customize the relayer endpoint')
+			}
+
+			break
+	}
+
+	switch (tornadoCashNova.relayerFee) {
+		case 'NOT_IN_UI':
+			extraNotes.push(paragraph('The Tornado Cash Nova relayer fee is not displayed in the UI.'))
+			sendingImprovements.push('display the Tornado Cash Nova relayer fee in the UI')
+			break
+		case 'HIDDEN_BY_DEFAULT':
+			extraNotes.push(
+				paragraph('The Tornado Cash Nova relayer fee is not displayed by default in the UI.'),
+			)
+			sendingImprovements.push('display the Tornado Cash Nova relayer fee in the UI by default')
+			break
+		case 'SHOWN_BY_DEFAULT':
+			break
+	}
+
+	const walletShould = sendingImprovements
+		.concat(receivingImprovements)
+		.concat(spendingImprovements)
+	const howToImprove = isNonEmptyArray(walletShould)
+		? mdParagraph<{ WALLET_NAME: string }>(
+				`
+					{{WALLET_NAME}} should${markdownListFormat(walletShould, {
+						ifEmpty: { behavior: 'THROW_ERROR' },
+						singleItemTemplate: ' ITEM.',
+						uppercaseFirstCharacterOfListItems: true,
+						multiItemPrefix: `:
+					
+					`,
+						multiItemTemplate: `
+					- ITEM`,
+						multiItemSuffix: `
+					
+					`,
+					})}
+				`,
+			)
+		: undefined
+	const perTechnology = singleTechnology<PrivateTransfersPrivacyLevels>(
+		PrivateTransferTechnology.TORNADO_CASH_NOVA,
+		{
+			sendingPrivacy,
+			receivingPrivacy,
+			spendingPrivacy,
+		},
+	)
+	const details = privateTransfersDetailsContent({
+		privateTransferDetails: singleTechnology(PrivateTransferTechnology.TORNADO_CASH_NOVA, {
+			sendingDetails,
+			receivingDetails,
+			spendingDetails,
+			extraNotes,
+		}),
+	})
+	const worstLevel = worstPrivateTransfersPrivacyLevel([
+		sendingPrivacy,
+		receivingPrivacy,
+		spendingPrivacy,
+	])
+
+	switch (worstLevel) {
+		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
+			return {
+				value: {
+					id: 'non_private_tornado_cash_nova',
+					rating: Rating.FAIL,
+					displayName: 'Non-private Tornado Cash Nova integration',
+					shortExplanation: mdSentence(
+						'{{WALLET_NAME}} integrates Tornado Cash Nova in a non-privacy-preserving way.',
+					),
+					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+					perTechnology,
+					__brand: brand,
+				},
+				details,
+				howToImprove,
+				references,
+			}
+		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
+			return {
+				value: {
+					id: 'chain_private_tornado_cash_nova',
+					rating: Rating.PARTIAL,
+					displayName: 'Tornado Cash Nova integration relying on external provider',
+					shortExplanation: mdSentence(
+						'{{WALLET_NAME}} integrates Tornado Cash Nova but relies on a third-party.',
+					),
+					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+					perTechnology,
+					__brand: brand,
+				},
+				details,
+				howToImprove,
+				references,
+			}
+		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
+			if (howToImprove !== undefined) {
+				return {
+					value: {
+						id: 'partial_tornado_cash_nova_integration',
+						rating: Rating.PARTIAL,
+						displayName: 'Imperfect Tornado Cash Nova integration',
+						shortExplanation: mdSentence(
+							'{{WALLET_NAME}} integrates Tornado Cash Nova with some important compromises.',
+						),
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+						perTechnology,
+						__brand: brand,
+					},
+					details,
+					howToImprove,
+					references,
+				}
+			}
+
+			return {
+				value: {
+					id: 'full_tornado_cash_nova_integration',
+					rating: Rating.PASS,
+					icon: '\u{1f48c}', // Love letter
+					displayName: 'Full Tornado Cash Nova integration',
+					shortExplanation: mdSentence(
+						'{{WALLET_NAME}} integrates Tornado Cash Nova for private transfers.',
+					),
+					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+					perTechnology,
+					__brand: brand,
+				},
+				details,
+				howToImprove,
+				references,
+			}
+	}
+}
+
 export const privateTransfers: Attribute<PrivateTransfersValue> = {
 	id: 'privateTransfers',
 	icon: '\u{1f4e8}', // Incoming envelope
@@ -610,7 +910,8 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		Walletbeat currently recognizes the following privacy-preserving token
 		transfer solutions:
 
-		- ${eipMarkdownLinkAndTitle(erc5564)}
+			- ${eipMarkdownLinkAndTitle(erc5564)}
+			- [Tornado Cash Nova](https://nova.tornadocash.eth.limo/)
 	`),
 	ratingScale: {
 		display: 'fail-pass',
@@ -823,18 +1124,33 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		let evaluation: Evaluation<PrivateTransfersValue> | null = null
 		let atLeastOneTechnologySupported = false
 
-		for (const { supportInfo, evaluate } of [
-			{
-				supportInfo: features.privacy.transactionPrivacy.stealthAddresses,
-				evaluate: rateStealthAddressSupport,
-			},
+		const maybeEvaluateTechnology = <T>(
+			support: Support<T>,
+			evaluate: (supported: Supported<T>) => Evaluation<PrivateTransfersValue>,
+		): Evaluation<PrivateTransfersValue> | null => {
+			if (!isSupported(support)) {
+				return null
+			}
+
+			return evaluate(support)
+		}
+
+		for (const maybeEvaluation of [
+			maybeEvaluateTechnology(
+				features.privacy.transactionPrivacy.stealthAddresses,
+				rateStealthAddressSupport,
+			),
+			maybeEvaluateTechnology(
+				features.privacy.transactionPrivacy.tornadoCashNova,
+				rateTornadoCashNovaSupport,
+			),
 		]) {
-			if (!isSupported(supportInfo)) {
+			if (maybeEvaluation === null) {
 				continue
 			}
 
 			atLeastOneTechnologySupported = true
-			evaluation = mergeEvaluations(evaluation, evaluate(supportInfo))
+			evaluation = mergeEvaluations(evaluation, maybeEvaluation)
 		}
 
 		if (features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode === 'PUBLIC') {
@@ -862,14 +1178,14 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		if (privateTransferDetails !== null) {
 			// Sanity check that the set of keys are consistent.
 			for (const [key] of evaluation.value.perTechnology) {
-				if (!privateTransferDetails.has(key)) {
+				if (!privateTransferDetails.privateTransferDetails.has(key)) {
 					throw new Error(
 						`Private transfer evaluation details does not include expected key ${key}`,
 					)
 				}
 			}
 
-			for (const [key] of privateTransferDetails) {
+			for (const [key] of privateTransferDetails.privateTransferDetails) {
 				if (!evaluation.value.perTechnology.has(key)) {
 					throw new Error(`Private transfer value does not include expected key ${key}`)
 				}

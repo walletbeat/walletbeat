@@ -15,6 +15,7 @@ interface PrivateTokenTransferDetails {
 	sendingDetails: Paragraph
 	receivingDetails: Paragraph
 	spendingDetails: Paragraph
+	extraNotes: Paragraph[]
 }
 
 export interface PrivateTransfersDetailsProps extends EvaluationData<PrivateTransfersValue> {
@@ -35,7 +36,7 @@ function isPrivateTransferDetailsContent(
 
 export function extractPrivateTransferDetails<S extends Strings>(
 	content: Content<S>,
-): Map<PrivateTransferTechnology, PrivateTokenTransferDetails> | null {
+): PrivateTransfersDetailsProps | null {
 	if (!isCustomContent(content)) {
 		return null
 	}
@@ -44,30 +45,32 @@ export function extractPrivateTransferDetails<S extends Strings>(
 		return null
 	}
 
-	return content.component.componentProps.privateTransferDetails
+	return content.component.componentProps
 }
 
 export function mergePrivateTransferDetails(
-	map1: Map<PrivateTransferTechnology, PrivateTokenTransferDetails> | null,
-	map2: Map<PrivateTransferTechnology, PrivateTokenTransferDetails>,
-): Map<PrivateTransferTechnology, PrivateTokenTransferDetails> {
-	if (map1 === null) {
-		return map2
+	details1: PrivateTransfersDetailsProps | null,
+	details2: PrivateTransfersDetailsProps,
+): Pick<PrivateTransfersDetailsProps, 'privateTransferDetails'> {
+	if (details1 === null) {
+		return details2
 	}
 
 	const mergedMap = new Map<PrivateTransferTechnology, PrivateTokenTransferDetails>()
 
-	for (const [key, value] of map1) {
+	for (const [key, value] of details1.privateTransferDetails) {
 		mergedMap.set(key, value)
 	}
 
-	for (const [key, value] of map2) {
+	for (const [key, value] of details2.privateTransferDetails) {
 		if (!mergedMap.has(key)) {
 			mergedMap.set(key, value)
 		}
 	}
 
-	return mergedMap
+	return {
+		privateTransferDetails: mergedMap,
+	}
 }
 
 export function privateTransfersDetailsContent(
