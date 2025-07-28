@@ -79,6 +79,23 @@ const dataLeakReferences: Record<string, References> = {
 			url: 'https://relayer.ambire.com',
 		},
 		{
+			urls: [
+				{
+					label: 'A single account-network pair is queued',
+					url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/portfolio.ts#L146-L150',
+				},
+				{
+					label:
+						"All the queued requests are batched. Since the debounce time is 0, only queue elements requested 'at the same time' get batched together",
+					url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/batcher.ts#L143',
+				},
+			],
+
+			explanation:
+				'Ambire does a single batch request for token discovery on multiple chains for a single account. This feature utilizes the Ambire relayer.',
+			lastRetrieved: `2025-07-28`,
+		},
+		{
 			explanation: "Ambire's NFT CDN is responsible for fetching NFT media.",
 			url: 'https://nftcdn.ambire.com',
 		},
