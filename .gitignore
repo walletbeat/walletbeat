@@ -5,6 +5,9 @@ src/generated/
 # Generated types
 .astro/
 
+# Cache for Vitest or whatever else
+.cache/
+
 # Dependencies
 node_modules/
 
