@@ -3,7 +3,7 @@ import type { CorporateEntity, SecurityAuditor } from '@/schema/entity'
 export const ackee: CorporateEntity & SecurityAuditor = {
 	id: 'ackee',
 	name: 'Ackee',
-	legalName: { name: 'Ackee', soundsDifferent: false },
+	legalName: { name: 'Ackee Blockchain a.s.', soundsDifferent: false },
 	type: {
 		chainDataProvider: false,
 		corporate: true,
@@ -14,17 +14,17 @@ export const ackee: CorporateEntity & SecurityAuditor = {
 		transactionBroadcastProvider: false,
 		walletDeveloper: false,
 	},
-	crunchbase: { type: 'NO_CRUNCHBASE_URL' },
-	farcaster: { type: 'NO_FARCASTER_PROFILE' },
+	crunchbase: 'https://www.crunchbase.com/organization/ackee-blockchain',
+	farcaster: 'https://farcaster.xyz/ackee',
 	icon: {
 		extension: 'png',
 		height: 200,
 		width: 200,
 	},
-	jurisdiction: 'GLOBAL',
-	linkedin: { type: 'NO_LINKEDIN_URL' },
+	jurisdiction: 'Prague, Czech Republic',
+	linkedin: 'https://linkedin.com/company/ackee-blockchain',
 	privacyPolicy: 'https://ackee.xyz/privacy-policy',
-	repoUrl: { type: 'NO_REPO' },
+	repoUrl: 'https://github.com/Ackee-Blockchain',
 	twitter: 'https://x.com/ackee_xyz',
 	url: 'https://ackee.xyz/',
 }

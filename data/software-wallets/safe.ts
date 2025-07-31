@@ -7,7 +7,10 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
-import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
 import { License } from '@/schema/features/transparency/license'
@@ -113,9 +116,7 @@ export const safe: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: {
-			support: 'SUPPORTED',
-		},
+		multiAddress: featureSupported,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://safe.global/privacy',
@@ -204,29 +205,26 @@ export const safe: SoftwareWallet = {
 				},
 			],
 			scamAlerts: {
-				contractTransactionWarning: {
+				contractTransactionWarning: supported({
 					contractRegistry: true, //blockaid
 					leaksContractAddress: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
 					previousContractInteractionWarning: false,
 					recentContractWarning: true, //blockaid
-					support: 'SUPPORTED',
-				},
-				scamUrlWarning: {
+				}),
+				scamUrlWarning: supported({
 					leaksIp: true,
 					leaksUserAddress: true,
 					leaksVisitedUrl: 'FULL_URL',
-					support: 'SUPPORTED',
-				},
-				sendTransactionWarning: {
+				}),
+				sendTransactionWarning: supported({
 					leaksRecipient: true,
 					leaksUserAddress: true,
 					leaksUserIp: true,
 					newRecipientWarning: true, //blockaid
-					support: 'SUPPORTED',
 					userWhitelist: true,
-				},
+				}),
 			},
 		},
 		selfSovereignty: {
@@ -236,8 +234,10 @@ export const safe: SoftwareWallet = {
 					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
-					arbitrum: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
-					opStack: TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},
