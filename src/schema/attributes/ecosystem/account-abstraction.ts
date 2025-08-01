@@ -14,6 +14,7 @@ import {
 	type AccountTypeEoa,
 	type AccountTypeMpc,
 	type AccountTypeMutableMultifactor,
+	type AccountTypeSafe,
 	isAccountTypeSupported,
 } from '@/schema/features/account-support'
 import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
@@ -217,6 +218,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 			rawErc4337: isAccountTypeSupported<AccountTypeMutableMultifactor>(
 				features.accountSupport.rawErc4337,
 			),
+			safe: isAccountTypeSupported<AccountTypeSafe>(features.accountSupport.safe),
 			eip7702: isAccountTypeSupported<AccountType7702>(features.accountSupport.eip7702),
 		}
 		const allRefs = mergeRefs(

@@ -1,16 +1,25 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { FeeTransparencyLevel } from '@/schema/features/transparency/fee-transparency'
+import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+
+import { ackee } from '../entities/ackee'
+import { certora } from '../entities/certora'
 
 export const safe: SoftwareWallet = {
 	metadata: {
@@ -29,21 +38,29 @@ export const safe: SoftwareWallet = {
 	},
 	features: {
 		accountSupport: {
-			defaultAccountType: AccountType.rawErc4337,
+			defaultAccountType: AccountType.safe,
 			eip7702: notSupported,
 			eoa: notSupported,
 			mpc: notSupported,
-			rawErc4337: supported({
-				contract: 'UNKNOWN',
-				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				ref: {
-					explanation: 'Safe supports ERC-4337 via their 4337 module implementation',
-					url: 'https://github.com/safe-global/safe-modules/tree/master/4337',
+			rawErc4337: notSupported,
+			safe: supported({
+				contract: {
+					name: 'Safe',
+					address: '0x0000000000000000000000000000000000000000',
+					eip7702Delegatable: false,
+					methods: {
+						isValidSignature: supported({}),
+						validateUserOp: supported({}),
+					},
+					sourceCode: {
+						available: true,
+						ref: {
+							explanation: 'Safe uses the GPL-3.0 license for its source code',
+							label: 'Safe License File',
+							url: 'https://github.com/safe-global/safe-smart-account',
+						},
+					},
 				},
-				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
 		},
 		addressResolution: {
@@ -55,7 +72,11 @@ export const safe: SoftwareWallet = {
 			ref: null,
 		},
 		chainAbstraction: null,
-		chainConfigurability: null,
+		chainConfigurability: {
+			customChains: false,
+			l1RpcEndpoint: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+			otherRpcEndpoints: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+		},
 		integration: {
 			browser: {
 				'1193': null,
@@ -63,25 +84,39 @@ export const safe: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			eip5792: supported({
+				ref: {
+					explanation: 'Safe supports EIP-5792 for transaction batching.',
+					url: 'https://github.com/safe-global/safe-modules/tree/main/modules/batching',
+				},
+			}),
 		},
-		license: null,
+		license: {
+			license: License.GPL_3_0,
+			ref: [
+				{
+					explanation: 'Safe uses the LGPL-3.0 license for its source code',
+					label: 'Safe License File',
+					url: 'https://github.com/safe-global/safe-wallet-monorepo',
+				},
+			],
+		},
 		monetization: {
 			ref: null,
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: null,
-				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
+				donations: false,
+				ecosystemGrants: false,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: false,
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: featureSupported,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://safe.global/privacy',
@@ -153,23 +188,65 @@ export const safe: SoftwareWallet = {
 					},
 				],
 			},
-			publicSecurityAudits: null,
-			scamAlerts: null,
+			publicSecurityAudits: [
+				{
+					auditDate: '2025-01-14',
+					auditor: certora,
+					ref: 'https://github.com/safe-global/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: 'ALL_VARIANTS',
+				},
+				{
+					auditDate: '2025-05-28',
+					auditor: ackee,
+					ref: 'https://github.com/safe-global/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
+					unpatchedFlaws: 'NONE_FOUND',
+					variantsScope: 'ALL_VARIANTS',
+				},
+			],
+			scamAlerts: {
+				contractTransactionWarning: supported({
+					contractRegistry: true, //blockaid
+					leaksContractAddress: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					previousContractInteractionWarning: false,
+					recentContractWarning: true, //blockaid
+				}),
+				scamUrlWarning: supported({
+					leaksIp: true,
+					leaksUserAddress: true,
+					leaksVisitedUrl: 'FULL_URL',
+				}),
+				sendTransactionWarning: supported({
+					leaksRecipient: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					newRecipientWarning: true, //blockaid
+					userWhitelist: true,
+				}),
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {
 				l1: {
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: featureSupported,
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 				},
 			},
 		},
 		transparency: {
-			feeTransparency: null,
+			feeTransparency: {
+				disclosesWalletFees: true,
+				level: FeeTransparencyLevel.DETAILED,
+				showsTransactionPurpose: true,
+			},
 		},
 	},
 	variants: {
