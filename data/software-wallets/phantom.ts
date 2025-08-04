@@ -61,7 +61,7 @@ export const phantom: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			walletCall: null,
 		},
 		license: null,
 		monetization: {
