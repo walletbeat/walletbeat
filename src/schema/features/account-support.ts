@@ -44,6 +44,7 @@ const allAccountTypes: NonEmptyArray<AccountType> = [
 	AccountType.mpc,
 	AccountType.rawErc4337,
 	AccountType.eip7702,
+	AccountType.safe,
 ]
 
 /** The ability (or lack thereof) to generate a transaction of a specific type. */

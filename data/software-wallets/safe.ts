@@ -102,17 +102,38 @@ export const safe: SoftwareWallet = {
 			],
 		},
 		monetization: {
-			ref: null,
+			ref: [
+				{
+					explanation:
+						'SafeDAO has received ecosystem grants; example Optimism grant proposal in the Optimism governance forum.',
+					url: 'https://gov.optimism.io/t/draft-gf-phase-1-proposal-old-template-safe/3400',
+				},
+				{
+					explanation:
+						'Safe community updates covering grants and RPGF-related support across ecosystems.',
+					url: 'https://forum.safe.global/t/safedao-community-updates/4213',
+				},
+				{
+					explanation:
+						'Community‑Aligned Fees: revenue (e.g., Native Swaps) pledged to SafeDAO; fee approach is explained publicly.',
+					url: 'https://safe.global/blog/safedao-community-aligned-fees-introduction',
+				},
+				{
+					explanation:
+						'SAFE tokenomics and governance scope; currently primarily used for SafeDAO treasury resource allocation (e.g., grants).',
+					url: 'https://safe.global/blog/safe-tokenomics',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: false,
-				ecosystemGrants: false,
+				ecosystemGrants: true,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: false,
 				hiddenConvenienceFees: false,
 				publicOffering: null,
 				selfFunded: null,
-				transparentConvenienceFees: null,
+				transparentConvenienceFees: true,
 				ventureCapital: null,
 			},
 		},

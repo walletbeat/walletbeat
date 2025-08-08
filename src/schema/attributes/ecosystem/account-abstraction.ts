@@ -226,6 +226,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 			refs(features.accountSupport.mpc),
 			refs(features.accountSupport.rawErc4337),
 			refs(features.accountSupport.eip7702),
+			refs(features.accountSupport.safe),
 		)
 
 		if (supported.rawErc4337 && supported.eip7702) {
@@ -250,6 +251,14 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 
 		if (supported.eoa) {
 			return supportsRawEoaOnly(allRefs)
+		}
+
+		// If the wallet only supports Safe accounts (and none of the other
+		// account types considered by this attribute), return an unrated value
+		// instead of throwing. Safe accounts are smart accounts but are not
+		// covered by the ERC-4337/EIP-7702 checks above.
+		if (supported.safe) {
+			return unrated(accountAbstraction, brand, null)
 		}
 
 		throw new Error('Wallet supports no account type')
