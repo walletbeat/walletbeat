@@ -74,12 +74,12 @@ function evaluateAddressResolution(
 	addressResolution: AddressResolution<AddressResolutionSupport>,
 	references: ReferenceArray,
 ): Evaluation<AddressResolutionValue> {
-	const chainSpecificErcs: NonEmptyArray<[Eip, AddressResolutionSupport, string]> = [
+	const chainSpecificERCs: NonEmptyArray<[Eip, AddressResolutionSupport, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
 	]
 
-	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificErcs) {
+	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificERCs) {
 		if (chainSpecificSupport.support !== 'SUPPORTED') {
 			continue
 		}
