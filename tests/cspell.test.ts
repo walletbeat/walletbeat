@@ -3,9 +3,26 @@ import { describe, expect, it } from 'vitest'
 import { getCodebaseWordIndex, getRepositoryRoot, GitIgnoredFiles } from './utils/codebase'
 import { getCSpellWords } from './utils/cspell'
 
-describe('cSpell', () => {
-	const cSpellWords = getCSpellWords()
+const cSpellWords = getCSpellWords()
 
+const codebaseWordIndex = await getCodebaseWordIndex({
+	root: getRepositoryRoot(),
+	ignore: [
+		// Exclude .git
+		'.git',
+
+		// Exclude the cSpell config file itself.
+		'.cspell.json',
+
+		// Exclude entries from .gitignore.
+		await GitIgnoredFiles(),
+
+		// Exclude PNG and PDF files.
+		/\.(png|pdf)$/i,
+	],
+})
+
+describe('cSpell', () => {
 	it('is in sorted order', () => {
 		cSpellWords.reduce<string>((prev, cur): string => {
 			if (prev.toLowerCase() > cur.toLowerCase()) {
@@ -44,24 +61,7 @@ describe('cSpell', () => {
 		}
 	})
 
-	it('does not have any unused words', async () => {
-		const codebaseWordIndex = await getCodebaseWordIndex({
-			root: getRepositoryRoot(),
-			ignore: [
-				// Exclude .git
-				'.git',
-
-				// Exclude the cSpell config file itself.
-				'.cspell.json',
-
-				// Exclude entries from .gitignore.
-				await GitIgnoredFiles(),
-
-				// Exclude PNG and PDF files.
-				/\.pdf$/i,
-			],
-		})
-
+	it('does not have any unused words', () => {
 		cSpellWords.map(word => {
 			const isProper = word.toLowerCase() !== word
 

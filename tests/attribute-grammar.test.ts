@@ -10,7 +10,9 @@ import {
 	nonEmptyMap,
 } from '@/types/utils/non-empty'
 
-import { contentGrammarLint, grammarLint } from './utils/grammar'
+import { contentGrammarLint, grammarLint, warmupGrammarLinter } from './utils/grammar'
+
+await warmupGrammarLinter()
 
 describe('attribute', () => {
 	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {

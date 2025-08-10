@@ -50,6 +50,11 @@ async function getLinter(): Promise<harper.LocalLinter> {
 	return linter
 }
 
+/** Warm up grammar linter if not already initialized. */
+export async function warmupGrammarLinter() {
+	await getLinter()
+}
+
 /** Lint a string for grammar errors. */
 export async function grammarLint(text: string, lintOptions?: harper.LintOptions) {
 	const linter = await getLinter()
