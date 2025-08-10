@@ -164,6 +164,9 @@ importers:
       globals:
         specifier: ^15.14.0
         version: 15.14.0
+      harper.js:
+        specifier: ^0.56.0
+        version: 0.56.0
       orbiter-cli:
         specifier: ^0.8.2
         version: 0.8.2(@types/node@22.13.1)
@@ -6869,6 +6872,12 @@ packages:
     resolution:
       {
         integrity: sha512-ao22eiONdgelqcnknw0iD645qW0s9NnrJHr5OBz4WOMdBdycfSas1EQf1wXRsm+PcB2Yoj43pjBPwqIpJQTeWg==,
+      }
+
+  harper.js@0.56.0:
+    resolution:
+      {
+        integrity: sha512-EsLZcduBYhrUnXmtLr1F0bsv0rKjrwxaq9j5n8hdY28Ar6HSHGJ446JauaztGJkCMljWHi48ZH6UWETKCPw/Ow==,
       }
 
   has-bigints@1.1.0:
@@ -16188,6 +16197,8 @@ snapshots:
       ufo: 1.5.4
       uncrypto: 0.1.3
       unenv: 1.10.0
+
+  harper.js@0.56.0: {}
 
   has-bigints@1.1.0: {}
 

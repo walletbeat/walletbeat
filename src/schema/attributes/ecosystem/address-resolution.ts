@@ -267,15 +267,16 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		Additionally, the mechanism used to do the resolution must either:
 
 		* Be done using onchain data and reusing the wallet's common chain
-			interaction client, inheriting its verifiability (via light client)
-			and privacy properties.
+		  interaction client, inheriting its verifiability (via light client)
+		  and privacy properties.
 		* **OR** be done using an offchain third-party provider in such a way that
-			the address returned by the third-party provider is verifiable, and
-			without revealing the user's IP address to the provider. This ensures
-			that the wallet cannot be tricked into sending funds to an attacker
-			compromising the offchain provider's responses, and that the provider
-			may not progressively learn the user's contacts list by associating its
-			successive resolution queries by IP over time.
+		  the address returned by the third-party provider is verifiable, and
+		  without revealing the user's IP address to the provider.
+			This ensures that:
+			- The wallet cannot be tricked into sending funds to an attacker
+		    compromising the offchain provider's responses
+		  - The provider may not progressively learn the user's contacts list by
+		    associating its successive resolution queries by IP over time.
 	`),
 	ratingScale: {
 		display: 'fail-pass',

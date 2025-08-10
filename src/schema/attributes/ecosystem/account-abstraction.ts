@@ -173,9 +173,19 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 		As part of the [Pectra upgrade](https://eips.ethereum.org/EIPS/eip-7600), ${eipMarkdownLink(eip7702)} changes this situation by allowing a clean path for existing EOAs to obtain all of the UX benefits of smart wallet accounts and account abstraction, without the need for users to switch to a different account address. This represents a large User Experience upgrade for all Ethereum EOA users.
 	`),
 	methodology: markdown(`
-		Wallets are rated based on whether they make use of ${eipMarkdownLink(eip7702)} transactions (for EOA or MPC wallets), or if they support ${eipMarkdownLink(erc4337)} transactions (for smart contract wallets).
+		Wallets are rated based on whether they make use of
+		${eipMarkdownLink(eip7702)} transactions (for EOA or MPC wallets),
+		or if they support ${eipMarkdownLink(erc4337)} transactions
+		(for smart contract wallets).
 
-		Because the user experience benefits of these enhancements are still in-flight and are expected to develop as these standards mature and are built on top of, Walletbeat does not currently consider *which* improvements wallets provide for their users as a result of these new capabilities. However, it is expected that a future version of this attribute would look at such improvements; for example, to verify that users are able to update the signing authority of their wallets to a quantum-safe signature scheme.
+		The user experience benefits of these enhancements are still in-flight
+		and are expected to develop as these standards mature and are built on
+		top of. As such, Walletbeat does not currently consider *which*
+		improvements wallets provide for their users as a result of these new
+		capabilities. However, it is expected that a future version of this
+		attribute would look at such improvements. For example: to verify
+		that users are able to update the signing authority of their wallets
+		to a quantum-safe signature scheme.
 	`),
 	ratingScale: {
 		display: 'pass-fail',

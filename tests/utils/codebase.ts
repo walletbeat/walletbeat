@@ -154,6 +154,14 @@ export async function getCodebaseWordIndex(options: CodebaseWordIndexOptions): P
 			properWords.add(match)
 		}
 
+		const numericalConstants = contents.match(/(\b|(?<=[_]))[\p{Lu}]+[\p{Nd}]+(\b|(?=[_\p{Nd}]))/gu)
+
+		if (numericalConstants !== null) {
+			for (const numericalConstant of numericalConstants) {
+				properWords.add(numericalConstant)
+			}
+		}
+
 		return {
 			path: filePath,
 			commonWords,

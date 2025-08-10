@@ -83,7 +83,7 @@ function evaluateTransactionBatching(
 			},
 			details: mdParagraph(`
 				{{WALLET_NAME}} does not implement ${eipMarkdownLinkAndTitle(eip5792)}.
-				This means dapps and DeFi applications cannot request the wallet to
+				This means dApps and DeFi applications cannot request the wallet to
 				bundle multiple transactions into a single operation.
 				For example, this means token approval transactions need to be
 				submitted separately from the transactions that spend these tokens.
@@ -110,7 +110,7 @@ function evaluateTransactionBatching(
 			},
 			details: mdParagraph(`
 				{{WALLET_NAME}} implements ${eipMarkdownLinkAndTitle(eip5792)}.
-				This means dapps and DeFi applications can request the wallet to
+				This means dApps and DeFi applications can request the wallet to
 				bundle multiple transactions into a single operation.
 				For example, this means token approval transactions need to be
 				submitted separately from the transactions that spend these tokens.
@@ -141,7 +141,7 @@ function evaluateTransactionBatching(
 		},
 		details: mdParagraph(`
 			{{WALLET_NAME}} implements ${eipMarkdownLinkAndTitle(eip5792)}.
-			This means dapps and DeFi applications can request the wallet to
+			This means dApps and DeFi applications can request the wallet to
 			bundle multiple transactions into a single operation.
 			For example, this means token approval transactions need to be
 			submitted separately from the transactions that spend these tokens.
@@ -175,7 +175,7 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 	methodology: markdown(`
 		Smart account types such as ${eipMarkdownLink(erc4337)} and
 		${eipMarkdownLink(eip7702)} unlock the ability to perform multiple
-		operations as a single transaction. This is exposed to dapps through
+		operations as a single transaction. This is exposed to dApps through
 		${eipMarkdownLinkAndTitle(eip5792)}.
 
 		To qualify for a passing rating, the wallet must:

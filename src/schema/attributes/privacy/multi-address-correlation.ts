@@ -267,12 +267,14 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		Wallets are assessed based on whether a third-party can learn that
 		two or more of the user's wallet addresses belong to the same user.
 
-		A third-party may learn of this correlation either through the wallet
-		software explicitly sending this data (e.g. through analytics), or by
-		requesting data about multiple wallet addresses in bulk, which allows
-		the receiving endpoint to learn that all of these addresses belong to
-		the same user. Similar correlations are also possible by IP and/or
-		time-based correlation of requests that each contain one wallet address.
+		A third-party may learn of this correlation either through:
+
+		- The wallet software explicitly sending this data (e.g. through
+		  analytics)
+		- Requesting data about multiple wallet addresses in bulk, allowing
+		  the receiving endpoint to learn that all of these addresses belong to
+		  the same user. Similar correlations are also possible by IP and/or
+			time-based correlation of requests that each contain one wallet address.
 
 		In order to prevent this information from being revealed, wallets can
 		use a variety of strategies:
