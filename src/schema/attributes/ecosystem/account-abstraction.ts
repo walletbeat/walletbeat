@@ -164,13 +164,18 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 		* Batch multiple transactions, removing the need for separate "token approval" transactions before every other token operation.
 		* Pay gas fees in other tokens than Ether, or having third-parties sponsor transaction fees (with ${eipMarkdownLink(erc4337)})
 		* Delegate some operation to trusted third-parties, such as allowing onchain games to withdraw small amounts of tokens without signing pop-ups for each and every transaction.
-		* Change transaction authorization logic, enabling the use of Passkeys (and mobile phone authentication methods) for signing transactions.
+		* Change transaction authorization logic, enabling the use of Passkeys (and cellphone authentication methods) for signing transactions.
 		* Update the set of keys used to control the wallet, enabling the switch to quantum-resistant encryption algorithms in the future.
 		* Define account recovery rules, reducing the risk of losing access to your account when losing a private key or a device.
 
 		However, smart wallet accounts have historically been an all-or-nothing, wallet-specific proposition for users. There was no transition path to such wallets.
 
-		As part of the [Pectra upgrade](https://eips.ethereum.org/EIPS/eip-7600), ${eipMarkdownLink(eip7702)} changes this situation by allowing a clean path for existing EOAs to obtain all of the UX benefits of smart wallet accounts and account abstraction, without the need for users to switch to a different account address. This represents a large User Experience upgrade for all Ethereum EOA users.
+		As part of the [Pectra upgrade](https://eips.ethereum.org/EIPS/eip-7600),
+		${eipMarkdownLink(eip7702)} fixes this problem. It create a clean path for
+		existing EOAs to obtain all the UX benefits of smart wallet accounts
+		and account abstraction, without the need for users to switch to a
+		different account address.
+		This represents a large User Experience upgrade for all Ethereum EOA users.
 	`),
 	methodology: markdown(`
 		Wallets are rated based on whether they make use of

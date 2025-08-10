@@ -66,8 +66,8 @@ export function TransactionInclusionDetails({
 						return (
 							<>
 								<Typography fontWeight={subsectionWeight}>
-									{wallet.metadata.displayName} does not support Ethereum peer-to-peer gossipping
-									nor connecting to a user&apos;s self-hosted Ethereum node.
+									{wallet.metadata.displayName} does not support Ethereum peer-to-peer gossiping nor
+									connecting to a user&apos;s self-hosted Ethereum node.
 								</Typography>
 								<Typography fontWeight={subsectionWeight}>
 									Therefore, L1 transactions are subject to censorship by intermediaries.

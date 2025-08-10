@@ -208,9 +208,15 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		midSentenceName: 'wallet address privacy',
 	},
 	question: sentence('Is your wallet address linkable to other information about yourself?'),
-	why: paragraph(
-		'Your wallet address is unique and permanent, which makes it easy for applications and companies like Chainalysis to track your activity. In web-privacy terms, it is worse than cookies: its record is permanent, publicly visible, and even tracks across multiple devices and websites. The more personal information is linkable to your wallet address, the more effective such tracking can be. It is therefore important to use a wallet that does its best to protect your information from being linked to your wallet address.',
-	),
+	why: paragraph(`
+		Your wallet address is unique and permanent, which makes it easy for applications and companies
+		like Chainalysis to track your activity. In web-privacy terms, it is worse than cookies:
+		wallet addresses are permanent, publicly visible, and can even be tracked across multiple
+		devices and websites.
+		The more personal information is linkable to your wallet address, the more effective such
+		tracking can be. It is therefore important to use a wallet that protects your information
+		from being linked to your wallet address.
+	`),
 	methodology: markdown(`
 		In order to qualify for a perfect rating on wallet address privacy, a
 		wallet must not, *by default*, allow any third-party to link your wallet

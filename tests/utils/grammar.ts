@@ -17,6 +17,13 @@ function getVocabulary(): string[] {
 
 		vocabulary = cSpellWords
 			.concat(walletNames)
+			.reduce<string[]>((prev, cur) => {
+				if (cur.toLowerCase() === cur) {
+					return prev.concat([cur])
+				}
+
+				return prev.concat([cur, `${cur}'s`])
+			}, [])
 			.sort()
 			.reduce<string[]>((prev, cur) => (prev.includes(cur) ? prev : prev.concat([cur])), [])
 	}
@@ -44,7 +51,7 @@ async function getLinter(): Promise<harper.LocalLinter> {
 }
 
 /** Lint a string for grammar errors. */
-async function grammarLint(text: string, lintOptions: harper.LintOptions) {
+export async function grammarLint(text: string, lintOptions?: harper.LintOptions) {
 	const linter = await getLinter()
 
 	const lints = await linter.lint(trimWhitespacePrefix(text), lintOptions)

@@ -39,7 +39,7 @@ describe('cSpell', () => {
 	it('has no compound words', () => {
 		for (const word of cSpellWords) {
 			expect(word).toMatch(
-				/^[\p{Lu}\p{Ll}]([\p{Lu}\p{Ll}\p{Nd}]*[\p{Lu}\p{Ll}])?$|^[\p{Lu}]+[\p{Nd}]+$/u,
+				/^[\p{Lu}\p{Ll}]([\p{Lu}\p{Ll}\p{Nd}]*[\p{Lu}\p{Ll}])?$|^([\p{Lu}]+|[\p{Ll}]+)[\p{Nd}]+$/u,
 			)
 		}
 	})

@@ -228,11 +228,12 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		generating lookalike-addresses and tricking users into copy/pasting
 		them without noticing the difference.
 
-		Additionally, Ethereum's transition to layer 2s has changed user needs
-		when sending funds. The hexadecimal address isn't sufficient anymore;
-		the user needs to ensure that they are sending funds to the correct
-		hexadecimal address *on the correct chain*, increasing the potential
-		for mistakenly sending funds to the wrong place or the wrong chain.
+		Additionally, Ethereum's transition to layer 2 chains has changed user
+		needs when sending funds. The hexadecimal address isn't sufficient
+		anymore; the user needs to ensure that they are sending funds to the
+		correct hexadecimal address *on the correct chain*, increasing the
+		potential for mistakenly sending funds to the wrong place or the wrong
+		chain.
 
 		Address naming registries like ENS partially solve this problem by
 		allowing more human-readable names like \`username.eth\` to be
