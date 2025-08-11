@@ -1,4 +1,5 @@
 import {
+	type AtLeastOneTrueVariant,
 	type ResolvedFeature,
 	resolveFeature,
 	type Variant,
@@ -66,10 +67,11 @@ export const notApplicableWalletIntegration: WalletIntegration = {
 
 export function resolveWalletIntegrationFeatures(
 	walletIntegration: WalletIntegration,
+	expectedVariants: AtLeastOneTrueVariant,
 	variant: Variant,
 ): ResolvedWalletIntegration {
 	return {
 		browser: walletIntegration.browser,
-		walletCall: resolveFeature(walletIntegration.walletCall, variant),
+		walletCall: resolveFeature(walletIntegration.walletCall, expectedVariants, variant),
 	}
 }

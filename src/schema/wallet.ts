@@ -1,5 +1,6 @@
 import type { Paragraph, TypographicContent } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
+import { prefixError } from '@/types/errors'
 import type { Dict } from '@/types/utils/dict'
 import {
 	isNonEmptyArray,
@@ -322,13 +323,17 @@ function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | 
 		return null
 	}
 
-	const resolvedFeatures = resolveFeatures(wallet.features, variant)
+	try {
+		const resolvedFeatures = resolveFeatures(wallet.features, wallet.variants, variant)
 
-	return {
-		metadata: wallet.metadata,
-		variant,
-		features: resolvedFeatures,
-		attributes: evaluateAttributes(resolvedFeatures, wallet.metadata),
+		return {
+			metadata: wallet.metadata,
+			variant,
+			features: resolvedFeatures,
+			attributes: evaluateAttributes(resolvedFeatures, wallet.metadata),
+		}
+	} catch (e) {
+		throw prefixError(`Wallet ${wallet.metadata.id}`, e)
 	}
 }
 
