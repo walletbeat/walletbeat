@@ -213,6 +213,8 @@ export const rabby: SoftwareWallet = {
 					],
 					onchain: {},
 				},
+				[Variant.DESKTOP]: null,
+				[Variant.MOBILE]: null,
 			},
 			privacyPolicy: 'https://rabby.io/docs/privacy',
 			transactionPrivacy: {
@@ -251,6 +253,8 @@ export const rabby: SoftwareWallet = {
 						}),
 					},
 				},
+				[Variant.BROWSER]: null,
+				[Variant.MOBILE]: null,
 			},
 			lightClient: {
 				ethereumL1: notSupported,

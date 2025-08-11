@@ -1,3 +1,5 @@
+import { prefixError } from '@/types/errors'
+
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import type { DelegationHandling } from './features/ecosystem/delegation-handling'
@@ -34,7 +36,13 @@ import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { Monetization } from './features/transparency/monetization'
 import type { ReputationSupport } from './features/transparency/reputation'
 import type { WithRef } from './reference'
-import { type ResolvedFeature, resolveFeature, type Variant, type VariantFeature } from './variants'
+import {
+	type AtLeastOneTrueVariant,
+	type ResolvedFeature,
+	resolveFeature,
+	type Variant,
+	type VariantFeature,
+} from './variants'
 import { variantToWalletType, type WalletType } from './wallet-types'
 
 /**
@@ -274,28 +282,48 @@ export interface ResolvedFeatures {
 }
 
 /** Resolve a set of features according to the given variant. */
-export function resolveFeatures(features: WalletBaseFeatures, variant: Variant): ResolvedFeatures {
+export function resolveFeatures(
+	features: WalletBaseFeatures,
+	expectedVariants: AtLeastOneTrueVariant,
+	variant: Variant,
+): ResolvedFeatures {
+	const resolveFeat = <F>(
+		featureName: string,
+		feature: VariantFeature<F>,
+		expectedVariants: AtLeastOneTrueVariant,
+		variant: Variant,
+	): ResolvedFeature<F> => {
+		try {
+			return resolveFeature<F>(feature, expectedVariants, variant)
+		} catch (e) {
+			throw prefixError(`Feature ${featureName}`, e)
+		}
+	}
 	const baseFeat = <F>(
+		featureName: string,
 		featureFn: (baseFeatures: WalletBaseFeatures) => VariantFeature<F>,
-	): ResolvedFeature<F> => resolveFeature<F>(featureFn(features), variant)
+	): ResolvedFeature<F> =>
+		resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
 
 	const softwareFeat = <F>(
+		featureName: string,
 		featureFn: (softwareFeatures: WalletSoftwareFeatures) => VariantFeature<F>,
 	): ResolvedFeature<F> => {
 		if (!isWalletSoftwareFeatures(features)) {
 			return null
 		}
 
-		return resolveFeature<F>(featureFn(features), variant)
+		return resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
 	}
 	const hardwareFeat = <F>(
+		featureName: string,
 		featureFn: (hardwareFeatures: WalletHardwareFeatures) => VariantFeature<F>,
 	): ResolvedFeature<F> => {
 		if (!isWalletHardwareFeatures(features)) {
 			return null
 		}
 
-		return resolveFeature<F>(featureFn(features), variant)
+		return resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
 	}
 
 	return {
@@ -303,7 +331,7 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 		type: variantToWalletType(variant),
 		profile: features.profile,
 		security: {
-			scamAlerts: softwareFeat(features => features.security.scamAlerts),
+			scamAlerts: softwareFeat('security.scamAlerts', features => features.security.scamAlerts),
 			publicSecurityAudits:
 				features.security.publicSecurityAudits === null
 					? null
@@ -312,47 +340,95 @@ export function resolveFeatures(features: WalletBaseFeatures, variant: Variant):
 								audit.variantsScope === 'ALL_VARIANTS' || audit.variantsScope[variant] === true,
 						),
 			lightClient: {
-				ethereumL1: softwareFeat(features => features.security.lightClient.ethereumL1),
+				ethereumL1: softwareFeat(
+					'security.lightClient.ethereumL1',
+					features => features.security.lightClient.ethereumL1,
+				),
 			},
-			hardwareWalletSupport: softwareFeat(features => features.security.hardwareWalletSupport),
+			hardwareWalletSupport: softwareFeat(
+				'security.hardwareWalletSupport',
+				features => features.security.hardwareWalletSupport,
+			),
 			hardwareWalletDappSigning: hardwareFeat(
+				'hardwareWalletDappSigning',
 				features => features.security.hardwareWalletDappSigning,
 			),
-			passkeyVerification: baseFeat(features => features.security.passkeyVerification),
-			bugBountyProgram: hardwareFeat(features => features.security.bugBountyProgram),
-			firmware: hardwareFeat(features => features.security.firmware),
-			keysHandling: hardwareFeat(features => features.security.keysHandling),
-			supplyChainDIY: hardwareFeat(features => features.security.supplyChainDIY),
-			supplyChainFactory: hardwareFeat(features => features.security.supplyChainFactory),
-			userSafety: hardwareFeat(features => features.security.userSafety),
+			passkeyVerification: baseFeat(
+				'passkeyVerification',
+				features => features.security.passkeyVerification,
+			),
+			bugBountyProgram: hardwareFeat(
+				'bugBountyProgram',
+				features => features.security.bugBountyProgram,
+			),
+			firmware: hardwareFeat('security.firmware', features => features.security.firmware),
+			keysHandling: hardwareFeat(
+				'security.keysHandling',
+				features => features.security.keysHandling,
+			),
+			supplyChainDIY: hardwareFeat(
+				'security.supplyChainDIY',
+				features => features.security.supplyChainDIY,
+			),
+			supplyChainFactory: hardwareFeat(
+				'security.supplyChainFactory',
+				features => features.security.supplyChainFactory,
+			),
+			userSafety: hardwareFeat('security.userSafety', features => features.security.userSafety),
 		},
 		privacy: {
-			dataCollection: baseFeat(features => features.privacy.dataCollection),
-			privacyPolicy: baseFeat(features => features.privacy.privacyPolicy),
-			hardwarePrivacy: hardwareFeat(features => features.privacy.hardwarePrivacy),
-			transactionPrivacy: baseFeat(features => features.privacy.transactionPrivacy),
+			dataCollection: baseFeat(
+				'privacy.dataCollection',
+				features => features.privacy.dataCollection,
+			),
+			privacyPolicy: baseFeat('privacy.privacyPolicy', features => features.privacy.privacyPolicy),
+			hardwarePrivacy: hardwareFeat(
+				'privacy.hardwarePrivacy',
+				features => features.privacy.hardwarePrivacy,
+			),
+			transactionPrivacy: baseFeat(
+				'privacy.transactionPrivacy',
+				features => features.privacy.transactionPrivacy,
+			),
 		},
 		selfSovereignty: {
 			transactionSubmission: softwareFeat(
+				'selfSovereignty.transactionSubmission',
 				features => features.selfSovereignty.transactionSubmission,
 			),
-			interoperability: hardwareFeat(features => features.selfSovereignty.interoperability),
+			interoperability: hardwareFeat(
+				'selfSovereignty.interoperability',
+				features => features.selfSovereignty.interoperability,
+			),
 		},
 		transparency: {
-			feeTransparency: baseFeat(features => features.transparency.feeTransparency),
-			reputation: hardwareFeat(features => features.transparency.reputation),
-			maintenance: hardwareFeat(features => features.transparency.maintenance),
+			feeTransparency: baseFeat(
+				'transparency.feeTransparency',
+				features => features.transparency.feeTransparency,
+			),
+			reputation: hardwareFeat(
+				'transparency.reputation',
+				features => features.transparency.reputation,
+			),
+			maintenance: hardwareFeat(
+				'transparency.maintenance',
+				features => features.transparency.maintenance,
+			),
 		},
-		chainAbstraction: softwareFeat(features => features.chainAbstraction),
-		chainConfigurability: softwareFeat(features => features.chainConfigurability),
-		accountSupport: baseFeat(features => features.accountSupport),
-		multiAddress: baseFeat(features => features.multiAddress),
+		chainAbstraction: softwareFeat('chainAbstraction', features => features.chainAbstraction),
+		chainConfigurability: softwareFeat(
+			'chainConfigurability',
+			features => features.chainConfigurability,
+		),
+		accountSupport: baseFeat('accountSupport', features => features.accountSupport),
+		multiAddress: baseFeat('multiAddress', features => features.multiAddress),
 		integration: resolveWalletIntegrationFeatures(
 			isWalletSoftwareFeatures(features) ? features.integration : notApplicableWalletIntegration,
+			expectedVariants,
 			variant,
 		),
-		addressResolution: softwareFeat(features => features.addressResolution),
-		license: baseFeat(features => features.license),
-		monetization: baseFeat(features => features.monetization),
+		addressResolution: softwareFeat('addressResolution', features => features.addressResolution),
+		license: baseFeat('license', features => features.license),
+		monetization: baseFeat('monetization', features => features.monetization),
 	}
 }
