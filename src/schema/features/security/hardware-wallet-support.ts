@@ -13,6 +13,8 @@ export enum HardwareWalletType {
 	KEEPKEY = 'KEEPKEY',
 	FIREFLY = 'FIREFLY',
 	OTHER = 'OTHER',
+	ONEKEY = 'ONEKEY',
+	BITBOX = 'BITBOX',
 }
 
 /**
