@@ -1,5 +1,6 @@
 import { gabrielkerekes } from '@/data/contributors/gabrielkerekes'
 import { AccountType } from '@/schema/features/account-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
@@ -49,11 +50,10 @@ export const nufi: SoftwareWallet = {
 		},
 		addressResolution: {
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: null,
-			ref: null,
+			nonChainSpecificEnsResolution: notSupported,
 		},
 		chainAbstraction: null,
 		chainConfigurability: {
@@ -80,43 +80,42 @@ export const nufi: SoftwareWallet = {
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
-				ref: null,
 			},
 			walletCall: supported({
-				atomicMultiTransactions: supported({
-					ref: null,
-				}),
+				atomicMultiTransactions: featureSupported,
 			}),
 		},
 		license: {
 			license: License.PROPRIETARY,
 		},
 		monetization: {
-			ref: null,
 			revenueBreakdownIsPublic: false,
 			strategies: {
-				donations: null,
-				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
-				publicOffering: null,
+				donations: false,
+				ecosystemGrants: false,
+				governanceTokenLowFloat: false,
+				governanceTokenMostlyDistributed: false,
+				hiddenConvenienceFees: false,
+				publicOffering: false,
 				selfFunded: true,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
+				transparentConvenienceFees: false,
+				ventureCapital: false,
 			},
 		},
 		multiAddress: featureSupported,
 		privacy: {
 			dataCollection: null,
 			privacyPolicy: 'https://nu.fi/privacy-and-cookies-policy',
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
 			hardwareWalletSupport: {
-				ref: null,
 				supportedWallets: {
 					[HardwareWalletType.LEDGER]: supported({
 						[HardwareWalletConnection.webUSB]: featureSupported,
@@ -140,7 +139,7 @@ export const nufi: SoftwareWallet = {
 				},
 			},
 			lightClient: {
-				ethereumL1: null,
+				ethereumL1: notSupported,
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
@@ -149,8 +148,8 @@ export const nufi: SoftwareWallet = {
 		selfSovereignty: {
 			transactionSubmission: {
 				l1: {
-					selfBroadcastViaDirectGossip: null,
-					selfBroadcastViaSelfHostedNode: null,
+					selfBroadcastViaDirectGossip: notSupported,
+					selfBroadcastViaSelfHostedNode: notSupported,
 				},
 				l2: {
 					[TransactionSubmissionL2Type.arbitrum]: null,
