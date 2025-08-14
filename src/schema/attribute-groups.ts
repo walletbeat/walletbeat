@@ -37,6 +37,10 @@ import {
 	type ChainAbstractionValue,
 } from './attributes/ecosystem/chain-abstraction'
 import {
+	transactionBatching,
+	type TransactionBatchingValue,
+} from './attributes/ecosystem/transaction-batching'
+import {
 	addressCorrelation,
 	type AddressCorrelationValue,
 } from './attributes/privacy/address-correlation'
@@ -268,6 +272,7 @@ type EcosystemValues = Dict<{
 	addressResolution: AddressResolutionValue
 	browserIntegration: BrowserIntegrationValue
 	chainAbstraction: ChainAbstractionValue
+	transactionBatching: TransactionBatchingValue
 	interoperability: InteroperabilityValue
 }>
 
@@ -284,6 +289,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		addressResolution,
 		browserIntegration,
 		chainAbstraction,
+		transactionBatching,
 		interoperability,
 	},
 	attributeWeights: {
@@ -291,6 +297,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		addressResolution: 1.0,
 		browserIntegration: 1.0,
 		chainAbstraction: 1.0,
+		transactionBatching: 1.0,
 		interoperability: 1.0,
 	},
 }
@@ -467,6 +474,7 @@ export function evaluateAttributes(
 			addressResolution: evalAttr(addressResolution),
 			browserIntegration: evalAttr(browserIntegration),
 			chainAbstraction: evalAttr(chainAbstraction),
+			transactionBatching: evalAttr(transactionBatching),
 			interoperability: evalAttr(interoperability),
 		},
 		maintenance: {
@@ -536,6 +544,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			addressResolution: attr(tree => tree.ecosystem.addressResolution),
 			browserIntegration: attr(tree => tree.ecosystem.browserIntegration),
 			chainAbstraction: attr(tree => tree.ecosystem.chainAbstraction),
+			transactionBatching: attr(tree => tree.ecosystem.transactionBatching),
 			interoperability: attr(tree => tree.ecosystem.interoperability),
 		},
 		maintenance: {

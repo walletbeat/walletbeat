@@ -6,6 +6,7 @@ import type { MultiAddressHandling, MultiAddressPolicy } from './data-collection
 
 export enum PrivateTransferTechnology {
 	STEALTH_ADDRESSES = 'stealthAddresses',
+	TORNADO_CASH_NOVA = 'tornadoCashNova',
 }
 
 /** Type predicate for `PrivateTransferTechnology`. */
@@ -17,6 +18,9 @@ export function isPrivateTransferTechnology(obj: unknown): obj is PrivateTransfe
 	switch (obj) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- Safe because this is exactly what we are trying to establish
 		case PrivateTransferTechnology.STEALTH_ADDRESSES:
+			return true
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison -- Safe because this is exactly what we are trying to establish
+		case PrivateTransferTechnology.TORNADO_CASH_NOVA:
 			return true
 		default:
 			return false
@@ -63,14 +67,23 @@ export type TransactionPrivacy = {
 	/** Support for stealth addresses. */
 	[PrivateTransferTechnology.STEALTH_ADDRESSES]: Support<StealthAddressSupport>
 
+	/** Support for Tornado Cash Nova. */
+	[PrivateTransferTechnology.TORNADO_CASH_NOVA]: Support<TornadoCashNovaSupport>
+
 	// TODO: Add other forms of transaction privacy here,
-	// e.g. Privacy Pools, Tornado Cash etc.
+	// e.g. Privacy Pools, Railgun, etc.
 } & IfDefaultTransferMode<
 	PrivateTransferTechnology.STEALTH_ADDRESSES,
 	{
 		[PrivateTransferTechnology.STEALTH_ADDRESSES]: Supported<StealthAddressSupport>
 	}
->
+> &
+	IfDefaultTransferMode<
+		PrivateTransferTechnology.TORNADO_CASH_NOVA,
+		{
+			[PrivateTransferTechnology.TORNADO_CASH_NOVA]: Supported<TornadoCashNovaSupport>
+		}
+	>
 
 /** Support for ERC-5564 stealth addresses. */
 export interface StealthAddressSupport {
@@ -198,3 +211,72 @@ export enum StealthAddressUnlabeledBehavior {
 	/** Users cannot spend from unlabeled addresses; must label them first. */
 	MUST_LABEL_BEFORE_SPENDING = 'MUST_LABEL_BEFORE_SPENDING',
 }
+
+/**
+ * Support data for Tornado Cash Nova.
+ */
+export type TornadoCashNovaSupport = WithRef<
+	{
+		/**
+		 * Does the wallet support in-pool transfers (no withdrawal needed)?
+		 */
+		novaInternalTransfers: Support
+
+		/**
+		 * Does the wallet warn when doing multiple Tornado Cash Nova operations
+		 * in quick succession, potentially leading to time-based correlation?
+		 */
+		warnAboutSuccessiveOperations: Support
+
+		/**
+		 * When scanning for a user's UTXOs, are they filtered entirely by the
+		 * wallet on the client side, or are they filtered by an external service?
+		 */
+		utxoFiltering: 'WALLET_SIDE' | 'EXTERNAL'
+
+		/**
+		 * Is the fee taken by the relayer displayed in the UI?
+		 */
+		relayerFee: 'SHOWN_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' | 'NOT_IN_UI'
+	} & (
+		| {
+				/**
+				 * The wallet integrates with Tornado Cash Nova directly.
+				 * Requests that require a relayer go through the relayer directly.
+				 */
+				integrationType: 'DIRECT'
+
+				/**
+				 * Can the relayer endpoint be customized?
+				 */
+				customizableRelayer: Support
+
+				/**
+				 * Can the relayer learn the user's IP address?
+				 */
+				relayerLearnsUserIpAddress: boolean
+		  }
+		| {
+				/**
+				 * The wallet integrates with Tornado Cash Nova by going through some
+				 * central service that is the one actually interacting with Tornado Cash.
+				 */
+				integrationType: 'THROUGH_ENTITY'
+
+				/**
+				 * The entity doing the interaction with Tornado Cash Nova.
+				 */
+				entity: Entity
+
+				/**
+				 * Does the entity learn the user's UTXOs?
+				 */
+				entityLearnsUserUtxos: boolean
+
+				/**
+				 * Does the entity learn the user's IP address?
+				 */
+				entityLearnsUserIpAddress: boolean
+		  }
+	)
+>

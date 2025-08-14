@@ -10,7 +10,9 @@ import type { ResolvedFeatures } from '@/schema/features'
 import {
 	compareLeakedInfo,
 	type Endpoint,
+	inferEndpointLeaks,
 	inferLeaks,
+	isEndpointLeaks,
 	Leak,
 	type LeakedInfo,
 	leakedInfoName,
@@ -162,8 +164,10 @@ function isSealedSecureEnclave(endpoint?: Endpoint): boolean {
 	return true
 }
 
-export function linkableToWalletAddress(leaks: Leaks): WalletAddressLinkableTo[] {
-	const qualLeaks = inferLeaks(leaks)
+export function linkableToWalletAddress<T extends LeakedInfo>(
+	leaks: Leaks<T>,
+): WalletAddressLinkableTo[] {
+	const qualLeaks = isEndpointLeaks(leaks) ? inferEndpointLeaks(leaks) : inferLeaks(leaks)
 
 	if (!leaksByDefault(qualLeaks.walletAddress)) {
 		return []
@@ -185,7 +189,7 @@ export function linkableToWalletAddress(leaks: Leaks): WalletAddressLinkableTo[]
 			// Check if the server is running in a secure enclave with all
 			// desirable properties to shield the IP address from being a
 			// privacy leak.
-			if (isSealedSecureEnclave(leaks.endpoint)) {
+			if (isEndpointLeaks(qualLeaks) && isSealedSecureEnclave(qualLeaks.endpoint)) {
 				continue
 			}
 		}
@@ -204,9 +208,15 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		midSentenceName: 'wallet address privacy',
 	},
 	question: sentence('Is your wallet address linkable to other information about yourself?'),
-	why: paragraph(
-		'Your wallet address is unique and permanent, which makes it easy for applications and companies like Chainalysis to track your activity. In web-privacy terms, it is worse than cookies: its record is permanent, publicly visible, and even tracks across multiple devices and websites. The more personal information is linkable to your wallet address, the more effective such tracking can be. It is therefore important to use a wallet that does its best to protect your information from being linked to your wallet address.',
-	),
+	why: paragraph(`
+		Your wallet address is unique and permanent, which makes it easy for applications and companies
+		like Chainalysis to track your activity. In web-privacy terms, it is worse than cookies:
+		wallet addresses are permanent, publicly visible, and can even be tracked across multiple
+		devices and websites.
+		The more personal information is linkable to your wallet address, the more effective such
+		tracking can be. It is therefore important to use a wallet that protects your information
+		from being linked to your wallet address.
+	`),
 	methodology: markdown(`
 		In order to qualify for a perfect rating on wallet address privacy, a
 		wallet must not, *by default*, allow any third-party to link your wallet
@@ -287,7 +297,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		}
 
 		const linkables: WalletAddressLinkableBy[] = []
-		const allRefs: ReferenceArray = refs(features.privacy.dataCollection.onchain)
+		const allRefs: ReferenceArray = []
 
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
 			allRefs.push(...refs(collected.leaks))
@@ -296,6 +306,8 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 				linkables.push({ by: collected.entity, ...linkable })
 			}
 		}
+
+		allRefs.push(...refs(features.privacy.dataCollection.onchain))
 
 		for (const linkable of linkableToWalletAddress({
 			...features.privacy.dataCollection.onchain,

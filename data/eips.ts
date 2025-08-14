@@ -1,6 +1,7 @@
 import type { Eip, EipNumber } from '../src/schema/eips'
 import { eip1193 } from './eips/eip-1193'
 import { eip2700 } from './eips/eip-2700'
+import { eip5792 } from './eips/eip-5792'
 import { eip6963 } from './eips/eip-6963'
 import { eip7702 } from './eips/eip-7702'
 import { erc4337 } from './eips/erc-4337'
@@ -16,6 +17,7 @@ export const eips: Record<EipNumber, Eip> = {
 	'2700': eip2700,
 	'4337': erc4337,
 	'5564': erc5564,
+	'5792': eip5792,
 	'6963': eip6963,
 	'7702': eip7702,
 	'7828': erc7828,

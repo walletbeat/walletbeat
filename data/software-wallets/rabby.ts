@@ -3,9 +3,12 @@ import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import {
 	Leak,
+	LeakedPersonalInfo,
+	LeakedWalletInfo,
 	MultiAddressPolicy,
 	RegularEndpoint,
 } from '@/schema/features/privacy/data-collection'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
@@ -18,7 +21,12 @@ import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -47,7 +55,9 @@ export const rabby: SoftwareWallet = {
 	features: {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
-			eip7702: notSupported,
+			eip7702: notSupportedWithRef({
+				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+			}),
 			eoa: supported({
 				canExportPrivateKey: true,
 				keyDerivation: {
@@ -100,6 +110,9 @@ export const rabby: SoftwareWallet = {
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
 		},
+		ecosystem: {
+			delegation: 'EIP_7702_NOT_SUPPORTED',
+		},
 		integration: {
 			browser: {
 				'1193': featureSupported,
@@ -113,7 +126,9 @@ export const rabby: SoftwareWallet = {
 					},
 				],
 			},
-			eip5792: null,
+			walletCall: notSupportedWithRef({
+				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+			}),
 		},
 		license: {
 			license: License.MIT,
@@ -162,10 +177,13 @@ export const rabby: SoftwareWallet = {
 							// The code refers to this by `api.rabby.io`, but Rabby is wholly owned by DeBank.
 							entity: deBank,
 							leaks: {
-								cexAccount: Leak.NEVER, // There appears to be code to link to a Coinbase account but no way to reach it from the UI?
+								[LeakedPersonalInfo.CEX_ACCOUNT]: Leak.NEVER, // There appears to be code to link to a Coinbase account but no way to reach it from the UI?
+								[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+								[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+								[LeakedWalletInfo.WALLET_ACTIONS]: Leak.ALWAYS, // Matomo analytics
+								[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
+								[LeakedWalletInfo.WALLET_CONNECTED_DOMAINS]: Leak.ALWAYS, // Scam prevention dialog queries online service and sends domain name
 								endpoint: RegularEndpoint,
-								ipAddress: Leak.ALWAYS,
-								mempoolTransactions: Leak.ALWAYS,
 								multiAddress: {
 									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 								},
@@ -176,15 +194,20 @@ export const rabby: SoftwareWallet = {
 									},
 									{
 										explanation:
-											'Rabby uses self-hosted Matomo Analytics to track user actions. While this tracking data does not contain wallet addresses, it goes to DeBank-owned servers much like Ethereum RPC requests do. This puts DeBank in a position to link user actions with wallet addresses through IP address correlation.',
+											'Rabby uses self-hosted Matomo Analytics to track user actions within the wallet interface. While this tracking data does not contain wallet addresses, it goes to DeBank-owned servers much like Ethereum RPC requests do. This puts DeBank in a position to link user actions with wallet addresses through IP address correlation.',
 										url: 'https://github.com/search?q=repo%3ARabbyHub%2FRabby%20matomoRequestEvent&type=code',
+									},
+									{
+										explanation:
+											'Rabby checks whether the domain you are connecting your wallet to is on a scam list. It sends the domain along with Ethereum address in non-proxied HTTP requests for API methods `getOriginIsScam`, `getOriginPopularityLevel`, `getRecommendChains`, and others.',
+										label: 'Rabby API code on npmjs.com',
+										url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
 									},
 									{
 										explanation: 'Balance refresh requests are made about the active address only.',
 										url: 'https://github.com/RabbyHub/Rabby/blob/356ed60957d61d508a89d71c63a33b7474d6b311/src/background/controller/wallet.ts#L1622',
 									},
 								],
-								walletAddress: Leak.ALWAYS,
 							},
 						},
 					],
@@ -194,7 +217,8 @@ export const rabby: SoftwareWallet = {
 			privacyPolicy: 'https://rabby.io/docs/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,

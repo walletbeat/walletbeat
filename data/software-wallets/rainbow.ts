@@ -1,5 +1,6 @@
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
@@ -53,6 +54,9 @@ export const rainbow: SoftwareWallet = {
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
+		ecosystem: {
+			delegation: null,
+		},
 		integration: {
 			browser: {
 				'1193': null,
@@ -60,7 +64,7 @@ export const rainbow: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			walletCall: null,
 		},
 		license: {
 			license: License.GPL_3_0,
@@ -93,7 +97,8 @@ export const rainbow: SoftwareWallet = {
 			privacyPolicy: 'https://rainbow.me/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,

@@ -1,5 +1,6 @@
 import { lucemans } from '@/data/contributors/lucemans'
 import { AccountType } from '@/schema/features/account-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
@@ -51,6 +52,9 @@ export const zerion: SoftwareWallet = {
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
+		ecosystem: {
+			delegation: null,
+		},
 		integration: {
 			browser: {
 				'1193': null,
@@ -58,7 +62,7 @@ export const zerion: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			walletCall: null,
 		},
 		license: null,
 		monetization: {
@@ -82,7 +86,8 @@ export const zerion: SoftwareWallet = {
 			privacyPolicy: null,
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,

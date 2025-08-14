@@ -260,6 +260,45 @@ export type Endpoint =
 				  }
 	  }
 
+/** Returns whether */
+export function endpointLeaksIpAddress(endpoint: Endpoint): 'YES' | 'NO' | 'UNVERIFIABLE' {
+	switch (endpoint.type) {
+		case 'REGULAR':
+			return 'YES'
+		case 'SECURE_ENCLAVE':
+			switch (endpoint.externalLogging.type) {
+				case 'UNKNOWN':
+					return 'YES' // Assume the worst; most web servers will log IPs even in default configuration.
+				case 'YES':
+					return 'YES'
+				case 'NO':
+					switch (endpoint.endToEndEncryption.type) {
+						case 'NONE':
+							return 'UNVERIFIABLE'
+						case 'TERMINATED_OUT_OF_ENCLAVE':
+							return 'UNVERIFIABLE'
+						case 'TERMINATED_INSIDE_ENCLAVE':
+							if (
+								!endpoint.verifiability.sourceAvailable ||
+								!endpoint.verifiability.reproducibleBuilds
+							) {
+								// Server can be running anything, so all bets are off.
+								return 'UNVERIFIABLE'
+							}
+
+							switch (endpoint.verifiability.clientVerification.type) {
+								case 'NOT_VERIFIED':
+									return 'UNVERIFIABLE'
+								case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
+									return 'UNVERIFIABLE'
+								case 'VERIFIED':
+									return 'NO'
+							}
+					}
+			}
+	}
+}
+
 /**
  * @param leak Some leak level.
  * @returns If the data collection happens by default.
@@ -284,6 +323,9 @@ export enum LeakedPersonalInfo {
 
 	/** The user's phone number. */
 	PHONE = 'phone',
+
+	/** URLs the user visits. */
+	BROWSING_HISTORY_URLS = 'browsingHistoryUrls',
 
 	/**
 	 * The user's contacts (e.g. when searching for friends to invite).
@@ -336,6 +378,9 @@ export enum LeakedWalletInfo {
 	 * For example, MEV protection services usually fall under this category.
 	 */
 	MEMPOOL_TRANSACTIONS = 'mempoolTransactions',
+
+	/** Domain names the wallet is connected to. */
+	WALLET_CONNECTED_DOMAINS = 'walletConnectedDomains',
 }
 
 export type LeakedInfo = LeakedPersonalInfo | LeakedWalletInfo
@@ -363,6 +408,8 @@ function leakedInfoScore(leakedInfo: LeakedInfo): number {
 			return 4
 		case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
 			return 5
+		case LeakedWalletInfo.WALLET_CONNECTED_DOMAINS:
+			return 5
 		case LeakedPersonalInfo.PSEUDONYM:
 			return 6
 
@@ -374,20 +421,22 @@ function leakedInfoScore(leakedInfo: LeakedInfo): number {
 		case LeakedPersonalInfo.EMAIL:
 			return 7
 
-		case LeakedPersonalInfo.LEGAL_NAME:
+		case LeakedPersonalInfo.BROWSING_HISTORY_URLS:
 			return 8
-		case LeakedPersonalInfo.PHONE:
+		case LeakedPersonalInfo.LEGAL_NAME:
 			return 9
-		case LeakedPersonalInfo.CONTACTS:
+		case LeakedPersonalInfo.PHONE:
 			return 10
-		case LeakedPersonalInfo.PHYSICAL_ADDRESS:
+		case LeakedPersonalInfo.CONTACTS:
 			return 11
-		case LeakedPersonalInfo.CEX_ACCOUNT:
+		case LeakedPersonalInfo.PHYSICAL_ADDRESS:
 			return 12
-		case LeakedPersonalInfo.FACE:
+		case LeakedPersonalInfo.CEX_ACCOUNT:
 			return 13
-		case LeakedPersonalInfo.GOVERNMENT_ID:
+		case LeakedPersonalInfo.FACE:
 			return 14
+		case LeakedPersonalInfo.GOVERNMENT_ID:
+			return 15
 	}
 }
 
@@ -415,6 +464,8 @@ export function leakedInfoType(leakedInfo: LeakedInfo): LeakedInfoType {
 			return LeakedInfoType.WALLET_RELATED
 		case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
 			return LeakedInfoType.WALLET_RELATED
+		case LeakedWalletInfo.WALLET_CONNECTED_DOMAINS:
+			return LeakedInfoType.WALLET_RELATED
 		case LeakedPersonalInfo.PSEUDONYM:
 			return LeakedInfoType.PERSONAL_DATA
 		case LeakedPersonalInfo.FARCASTER_ACCOUNT:
@@ -426,6 +477,8 @@ export function leakedInfoType(leakedInfo: LeakedInfo): LeakedInfoType {
 		case LeakedPersonalInfo.LEGAL_NAME:
 			return LeakedInfoType.PERSONAL_DATA
 		case LeakedPersonalInfo.PHONE:
+			return LeakedInfoType.PERSONAL_DATA
+		case LeakedPersonalInfo.BROWSING_HISTORY_URLS:
 			return LeakedInfoType.PERSONAL_DATA
 		case LeakedPersonalInfo.CONTACTS:
 			return LeakedInfoType.PERSONAL_DATA
@@ -460,6 +513,8 @@ export function leakedInfoName(leakedInfo: LeakedInfo) {
 			return { short: 'wallet address', long: 'wallet address' } as const
 		case LeakedWalletInfo.MEMPOOL_TRANSACTIONS:
 			return { short: 'outgoing transactions', long: 'outgoing wallet transactions' } as const
+		case LeakedWalletInfo.WALLET_CONNECTED_DOMAINS:
+			return { short: 'connected sites', long: 'wallet-connected domains' } as const
 		case LeakedPersonalInfo.PSEUDONYM:
 			return {
 				short: '{{WALLET_PSEUDONYM_SINGULAR}}',
@@ -475,6 +530,8 @@ export function leakedInfoName(leakedInfo: LeakedInfo) {
 			return { short: 'name', long: 'legal name' } as const
 		case LeakedPersonalInfo.PHONE:
 			return { short: 'phone', long: 'phone number' } as const
+		case LeakedPersonalInfo.BROWSING_HISTORY_URLS:
+			return { short: 'Browsing history', long: 'Browsing history' } as const
 		case LeakedPersonalInfo.CONTACTS:
 			return { short: 'contacts', long: 'personal contact list' } as const
 		case LeakedPersonalInfo.PHYSICAL_ADDRESS:
@@ -488,66 +545,145 @@ export function leakedInfoName(leakedInfo: LeakedInfo) {
 	}
 }
 
-/** What data is leaked from an entity; fully qualified. */
-export type QualifiedLeaks<T extends LeakedInfo> = Dict<
-	Record<T, Leak> & {
+/** What data is leaked from an entity; partial. */
+type PartialLeaks<T extends LeakedInfo> = Dict<
+	Partial<Record<T, Leak>> & {
 		/**
 		 * How multiple addresses are handled, if at all.
 		 */
 		multiAddress?: MultiAddressHandling
-
-		/**
-		 * Information about the endpoint that receives this data.
-		 */
-		endpoint: Endpoint
 	}
 >
 
 /** A partially-known set of leaks, with reference information. */
-export type Leaks = WithRef<Partial<QualifiedLeaks<LeakedInfo>>>
+export type Leaks<L extends LeakedInfo> = WithRef<PartialLeaks<L>>
 
 /** A partially-known set of personal info leaks, with reference information. */
-export type PersonalInfoLeaks = WithRef<Partial<QualifiedLeaks<LeakedPersonalInfo>>>
+export type PersonalInfoLeaks = Leaks<LeakedPersonalInfo>
+
+/** Adds endpoint information to a leaks type. */
+type WithEndpoint<L> = L & {
+	/**
+	 * Information about the endpoint that receives this data.
+	 */
+	endpoint: Endpoint
+}
+
+/** A partially-known set of leaks, with reference information. */
+export type EndpointLeaks = WithEndpoint<Leaks<LeakedInfo>>
+
+/** Type predicate for WithEndpoint<L>. */
+export function isEndpointLeaks<L extends Leaks<LeakedInfo>>(
+	maybeEndpoint: L,
+): maybeEndpoint is WithEndpoint<L> {
+	return Object.hasOwn(maybeEndpoint, 'endpoint')
+}
+
+/** What data is leaked from an entity; fully qualified. */
+export type QualifiedLeaks = WithRef<
+	Dict<
+		Record<LeakedInfo, Leak> & {
+			/**
+			 * How multiple addresses are handled, if at all.
+			 */
+			multiAddress?: MultiAddressHandling
+		}
+	>
+>
 
 /**
  * Infer what leaks from a given partial set of known leaks.
  * @param leaks Partial set of known leaks.
  * @returns A fully-qualified set of leaks.
  */
-export function inferLeaks(leaks: Leaks): WithRef<QualifiedLeaks<LeakedInfo>> {
+export function inferLeaks<T extends LeakedInfo, L extends Leaks<T>>(leaks: L): QualifiedLeaks {
+	const get = (leakedInfo: LeakedInfo): Leak | undefined => {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all possible `LeakedInfo` keys map to `Leak` values, or are unset (undefined).
+		return (leaks as Record<LeakedInfo, Leak>)[leakedInfo]
+	}
 	const first = (...ls: Array<Leak | undefined>): Leak | undefined => ls.find(l => l !== undefined)
 
+	let ipAddressLeak = get(LeakedPersonalInfo.IP_ADDRESS)
+
+	if (
+		ipAddressLeak !== Leak.ALWAYS &&
+		ipAddressLeak !== Leak.BY_DEFAULT &&
+		isEndpointLeaks<L>(leaks) &&
+		endpointLeaksIpAddress(leaks.endpoint) === 'YES'
+	) {
+		// If endpoint leaks IP address, and `leaks` doesn't specify this explicitly,
+		// then infer that the IP address does leak.
+		ipAddressLeak = Leak.BY_DEFAULT
+	}
+
 	return {
-		ipAddress: leaks.ipAddress ?? Leak.NEVER,
-		walletActions: leaks.walletActions ?? Leak.NEVER,
-		walletAddress:
-			first(leaks.walletAddress, leaks.mempoolTransactions, leaks.walletBalance) ?? Leak.NEVER,
-		walletBalance:
-			first(leaks.walletBalance, leaks.walletAddress, leaks.mempoolTransactions) ?? Leak.NEVER,
-		walletAssets:
+		[LeakedPersonalInfo.IP_ADDRESS]: ipAddressLeak ?? Leak.NEVER,
+		[LeakedWalletInfo.WALLET_ACTIONS]: get(LeakedWalletInfo.WALLET_ACTIONS) ?? Leak.NEVER,
+		[LeakedWalletInfo.WALLET_ADDRESS]:
 			first(
-				leaks.walletAssets,
-				leaks.walletAddress,
-				leaks.walletBalance,
-				leaks.mempoolTransactions,
+				get(LeakedWalletInfo.WALLET_ADDRESS),
+				get(LeakedWalletInfo.MEMPOOL_TRANSACTIONS),
+				get(LeakedWalletInfo.WALLET_BALANCE),
 			) ?? Leak.NEVER,
-		mempoolTransactions: leaks.mempoolTransactions ?? Leak.NEVER,
-		pseudonym: first(leaks.pseudonym, leaks.email) ?? Leak.NEVER, // Email addresses usually contains at least pseudonym-level information.
-		farcasterAccount: leaks.farcasterAccount ?? Leak.NEVER,
-		xDotComAccount: leaks.xDotComAccount ?? Leak.NEVER,
-		legalName: first(leaks.legalName, leaks.governmentId) ?? Leak.NEVER,
-		email: first(leaks.email, leaks.cexAccount) ?? Leak.NEVER,
-		phone: first(leaks.phone, leaks.cexAccount) ?? Leak.NEVER,
-		contacts: leaks.contacts ?? Leak.NEVER,
-		physicalAddress:
-			first(leaks.physicalAddress, leaks.cexAccount, leaks.governmentId) ?? Leak.NEVER,
-		face: first(leaks.face, leaks.governmentId) ?? Leak.NEVER,
-		cexAccount: leaks.cexAccount ?? Leak.NEVER,
-		governmentId: leaks.governmentId ?? Leak.NEVER,
+		[LeakedWalletInfo.WALLET_BALANCE]:
+			first(
+				get(LeakedWalletInfo.WALLET_BALANCE),
+				get(LeakedWalletInfo.WALLET_ADDRESS),
+				get(LeakedWalletInfo.MEMPOOL_TRANSACTIONS),
+			) ?? Leak.NEVER,
+		[LeakedWalletInfo.WALLET_ASSETS]:
+			first(
+				get(LeakedWalletInfo.WALLET_ASSETS),
+				get(LeakedWalletInfo.WALLET_ADDRESS),
+				get(LeakedWalletInfo.WALLET_BALANCE),
+				get(LeakedWalletInfo.MEMPOOL_TRANSACTIONS),
+			) ?? Leak.NEVER,
+		[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]:
+			get(LeakedWalletInfo.MEMPOOL_TRANSACTIONS) ?? Leak.NEVER,
+		[LeakedWalletInfo.WALLET_CONNECTED_DOMAINS]:
+			first(
+				get(LeakedWalletInfo.WALLET_CONNECTED_DOMAINS),
+				get(LeakedPersonalInfo.BROWSING_HISTORY_URLS),
+			) ?? Leak.NEVER,
+		[LeakedPersonalInfo.PSEUDONYM]:
+			first(
+				get(LeakedPersonalInfo.PSEUDONYM),
+				get(LeakedPersonalInfo.EMAIL),
+				get(LeakedPersonalInfo.FARCASTER_ACCOUNT),
+				get(LeakedPersonalInfo.X_DOT_COM_ACCOUNT),
+			) ?? Leak.NEVER, // Email addresses and social media accounts usually contains at least pseudonym-level information.
+		[LeakedPersonalInfo.FARCASTER_ACCOUNT]: get(LeakedPersonalInfo.FARCASTER_ACCOUNT) ?? Leak.NEVER,
+		[LeakedPersonalInfo.X_DOT_COM_ACCOUNT]: get(LeakedPersonalInfo.X_DOT_COM_ACCOUNT) ?? Leak.NEVER,
+		[LeakedPersonalInfo.LEGAL_NAME]:
+			first(get(LeakedPersonalInfo.LEGAL_NAME), get(LeakedPersonalInfo.GOVERNMENT_ID)) ??
+			Leak.NEVER,
+		[LeakedPersonalInfo.EMAIL]:
+			first(get(LeakedPersonalInfo.EMAIL), get(LeakedPersonalInfo.CEX_ACCOUNT)) ?? Leak.NEVER,
+		[LeakedPersonalInfo.PHONE]:
+			first(get(LeakedPersonalInfo.PHONE), get(LeakedPersonalInfo.CEX_ACCOUNT)) ?? Leak.NEVER,
+		[LeakedPersonalInfo.BROWSING_HISTORY_URLS]:
+			get(LeakedPersonalInfo.BROWSING_HISTORY_URLS) ?? Leak.NEVER,
+		[LeakedPersonalInfo.CONTACTS]: get(LeakedPersonalInfo.CONTACTS) ?? Leak.NEVER,
+		[LeakedPersonalInfo.PHYSICAL_ADDRESS]:
+			first(
+				get(LeakedPersonalInfo.PHYSICAL_ADDRESS),
+				get(LeakedPersonalInfo.CEX_ACCOUNT),
+				get(LeakedPersonalInfo.GOVERNMENT_ID),
+			) ?? Leak.NEVER,
+		[LeakedPersonalInfo.FACE]:
+			first(get(LeakedPersonalInfo.FACE), get(LeakedPersonalInfo.GOVERNMENT_ID)) ?? Leak.NEVER,
+		[LeakedPersonalInfo.CEX_ACCOUNT]: get(LeakedPersonalInfo.CEX_ACCOUNT) ?? Leak.NEVER,
+		[LeakedPersonalInfo.GOVERNMENT_ID]: get(LeakedPersonalInfo.GOVERNMENT_ID) ?? Leak.NEVER,
 		multiAddress: leaks.multiAddress,
-		endpoint: leaks.endpoint ?? RegularEndpoint,
 		ref: leaks.ref,
 	}
+}
+
+/** Infer leaks, preserving endpoint information. */
+export function inferEndpointLeaks<T extends LeakedInfo, L extends Leaks<T>>(
+	leaks: WithEndpoint<L>,
+): WithEndpoint<QualifiedLeaks> {
+	return { ...inferLeaks<T, L>(leaks), endpoint: leaks.endpoint }
 }
 
 /**
@@ -558,7 +694,7 @@ export interface EntityData {
 	entity: Entity
 
 	/** The type of data that an entity may be sent. */
-	leaks: Leaks
+	leaks: EndpointLeaks
 }
 
 /**

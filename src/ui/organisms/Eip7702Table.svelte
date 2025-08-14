@@ -35,7 +35,7 @@
 
 	// Functions
 	import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
-	import { getVariantResolvedWallet, getWalletVariants, walletSupportedAccountTypes } from '@/schema/wallet'
+	import { getVariantResolvedWallet, getVariants, walletSupportedAccountTypes } from '@/schema/wallet'
 	import { isLabeledUrl } from '@/schema/url'
 	import { isAccountTypeSupported } from '@/schema/features/account-support'
 	import { refs } from '@/schema/reference'
@@ -60,7 +60,7 @@
 	}
 
 	const getWalletContract = (wallet: RatedWallet): SmartWalletContract | 'UNKNOWN' | undefined => {
-		for (const variant of setItems<Variant>(getWalletVariants(wallet))) {
+		for (const variant of setItems<Variant>(getVariants(wallet.variants))) {
 			const variantWallet = getVariantResolvedWallet(wallet, variant)
 
 			if (variantWallet === null || variantWallet.features.accountSupport === null)

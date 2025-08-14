@@ -213,7 +213,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 	),
 	why: markdown(`
 		Passkeys provide a secure and phishing-resistant way to authenticate users without relying on seed phrases. 
-		Using gas-efficient and well-audited libraries for verification is crucial for both security and cost-effectiveness.
+		Using gas-efficient and well-audited libraries for verification is crucial both for security and cost-effectiveness.
 		
 		P256 signature verification is computationally expensive on-chain, so using optimized libraries reduces transaction costs.
 		

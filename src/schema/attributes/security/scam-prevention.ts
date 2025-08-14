@@ -472,7 +472,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		],
 		partial: [
 			exampleRating(
-				sentence('The wallet implements some but not all of the required scam warning features.'),
+				sentence('The wallet implements some but not all the required scam warning features.'),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
 					scamUrlWarning: supported({

@@ -118,15 +118,14 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 		important benefits:
 
 		* **Privacy**: Because the wallet can work directly on your own hardware
-			with no outside dependencies, the wallet can query data about the state
-			of the chain without revealing private details such as your wallet
-			address or IP address to a third-party RPC provider.
+			with no outside dependencies, the wallet can query chain data without
+			revealing private details (wallet address, IP address, etc.) to a
+			third-party RPC provider.
 		* **Integrity**: Relying on a third-party RPC provider means that this
 			provider may return incorrect data about the state of the chain,
 			tricking you into signing a transaction that ends up having a different
-			effect than the one you intended. Your own L1 node will verify the
-			integrity of the chain, so such attacks cannot occur when using a
-			self-hosted node.
+			effect than intended. Your own L1 node will verify the integrity of the
+			chain, so such attacks cannot occur when using a self-hosted node.
 		* **Censorship resistance**: Because an L1 node may broadcast transactions
 			into a shared mempool directly to other nodes in the network, your
 			transactions are not censorable by a third-party RPC provider that would

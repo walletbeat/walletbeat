@@ -10,7 +10,7 @@ import type { SourceVisibilityDetailsContent } from './content/source-visibility
 import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
 import type { UnratedAttributeContent } from './content/unrated-attribute'
 import type { Strings as _Strings, ValidateText } from './utils/string-templates'
-import { trimWhitespacePrefix } from './utils/text'
+import { renderStrings, trimWhitespacePrefix } from './utils/text'
 
 /**
  * Type of content that may be displayed on the UI.
@@ -113,6 +113,28 @@ export function isTypographicContent<Strings extends _Strings = null>(
 	content: Content<Strings>,
 ): content is TypographicContent<Strings> {
 	return content.contentType === ContentType.TEXT || content.contentType === ContentType.MARKDOWN
+}
+
+/**
+ * Pre-render typographic content such that it no longer requires any
+ * template string.
+ *
+ * @param content TypographicContent to pre-render.
+ * @param strings The strings to bake into it.
+ * @returns A TypographicContent of the same type but with no template strings.
+ */
+export function prerenderTypographicContent<Strings extends _Strings = null>(
+	content: TypographicContent<Strings>,
+	strings: Strings,
+): TypographicContent<null> {
+	const bakedStrings = content.strings ?? {}
+
+	switch (content.contentType) {
+		case ContentType.TEXT:
+			return textContent(renderStrings(content.text, { ...bakedStrings, ...strings }))
+		case ContentType.MARKDOWN:
+			return markdown(renderStrings(content.markdown, { ...bakedStrings, ...strings }))
+	}
 }
 
 /**

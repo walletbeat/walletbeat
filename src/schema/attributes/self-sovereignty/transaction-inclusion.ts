@@ -208,7 +208,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			),
 			exampleRating(
 				paragraph(
-					'The wallet supports force-withdrawal transactions on L2s, and supports directly gossipping such transactions over the Ethereum L1 network.',
+					'The wallet supports force-withdrawal transactions on L2s, and supports directly gossiping such transactions over the Ethereum L1 network.',
 				),
 				transactionSubmissionEvaluation({
 					supportsL1Broadcast: 'SELF_GOSSIP',
@@ -234,7 +234,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			),
 			exampleRating(
 				paragraph(
-					'The wallet supports force-withdrawal transactions on some L2s, but not all of the L2s that are configured out of the box.',
+					'The wallet supports force-withdrawal transactions on some L2s, but not on all the L2s that are configured out of the box.',
 				),
 				transactionSubmissionEvaluation({
 					supportsL1Broadcast: 'NO',
