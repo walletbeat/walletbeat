@@ -29,20 +29,39 @@ export interface WalletIntegration {
 	 */
 	browser: 'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>
 
-	/** EIP-5792: Wallet Call API support for transaction batching. */
-	eip5792: VariantFeature<Support>
+	/**
+	 * EIP-5792: Wallet Call API support.
+	 * The wallet must support all of the following calls:
+	 *  - wallet_sendCalls
+	 *  - wallet_getCallsStatus
+	 *  - wallet_showCallsStatus
+	 *  - wallet_getCapabilities
+	 */
+	walletCall: VariantFeature<WithRef<Support<WalletCallIntegration>>>
 }
 
 /** Variant-specific resolution of `WalletIntegration`. */
 export interface ResolvedWalletIntegration {
 	browser: WalletIntegration['browser']
-	eip5792: ResolvedFeature<Support>
+	walletCall: ResolvedFeature<Support<WalletCallIntegration>>
+}
+
+/** EIP-5792 Wallet Call API support. */
+export interface WalletCallIntegration {
+	/**
+	 * `atomic` capability as reported by wallet_getCapabilities.
+	 * This allows dapps to execute multiple transactions atomically.
+	 * https://eips.ethereum.org/EIPS/eip-5792#atomic-capability
+	 * For the purpose of this attribute, we only look at support on L1.
+	 * A reported value of 'ready' or 'supported' qualifies as supported.
+	 */
+	atomicMultiTransactions: WithRef<Support>
 }
 
 /** A WalletIntegration stand-in used for non-software wallets. */
 export const notApplicableWalletIntegration: WalletIntegration = {
 	browser: 'NOT_A_BROWSER_WALLET',
-	eip5792: notSupported,
+	walletCall: notSupported,
 }
 
 export function resolveWalletIntegrationFeatures(
@@ -51,6 +70,6 @@ export function resolveWalletIntegrationFeatures(
 ): ResolvedWalletIntegration {
 	return {
 		browser: walletIntegration.browser,
-		eip5792: resolveFeature(walletIntegration.eip5792, variant),
+		walletCall: resolveFeature(walletIntegration.walletCall, variant),
 	}
 }

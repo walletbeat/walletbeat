@@ -522,13 +522,6 @@ export function getAttributeOverride(
 	return override ?? null
 }
 
-/**
- * Returns the set of variants the wallet supports.
- */
-export function getWalletVariants(wallet: RatedWallet | BaseWallet): NonEmptySet<Variant> {
-	return getVariants(wallet.variants)
-}
-
 export function getVariantResolvedWallet(
 	wallet: RatedWallet,
 	variant: Variant,
@@ -553,7 +546,7 @@ export function walletSupportedAccountTypes(
 	if (variant === 'ALL_VARIANTS') {
 		const accountTypeSets: Array<NonEmptySet<AccountType>> = []
 
-		for (const variant of setItems(getWalletVariants(wallet))) {
+		for (const variant of setItems(getVariants(wallet.variants))) {
 			const supportedByVariant = walletSupportedAccountTypes(wallet, variant)
 
 			if (supportedByVariant === null) {

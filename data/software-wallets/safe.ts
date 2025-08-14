@@ -1,5 +1,6 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
-import { AccountType } from '@/schema/features/account-support'
+import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
@@ -76,6 +77,8 @@ export const safe: SoftwareWallet = {
 			customChains: false,
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
 			otherRpcEndpoints: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+		ecosystem: {
+			delegation: null,
 		},
 		integration: {
 			browser: {
@@ -100,6 +103,7 @@ export const safe: SoftwareWallet = {
 					url: 'https://github.com/safe-global/safe-wallet-monorepo',
 				},
 			],
+			walletCall: null,
 		},
 		monetization: {
 			ref: [
@@ -143,7 +147,8 @@ export const safe: SoftwareWallet = {
 			privacyPolicy: 'https://safe.global/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,

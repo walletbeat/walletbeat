@@ -534,9 +534,8 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 			exampleRating(
 				paragraph(`
-					The wallet is an MPC wallet where the user does not have
-					sufficient key shares under self-custody to unilaterally control
-					the account by default.
+					The wallet is an MPC wallet. By default, the user does not have
+					sufficient key shares under self-custody to unilaterally control the account.
 				`),
 				evaluateMpc(
 					{
@@ -550,10 +549,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 			exampleRating(
 				paragraph(`
-					The wallet is an MPC wallet where the user is in self-custody of
-					sufficient key shares to unilaterally control the account, but
-					cannot generate a token transfer transaction without relying on
-					a third party API.
+					The wallet is an MPC wallet. By default, the user is in self-custody
+					of sufficient key shares to unilaterally control the account.
+					However, the user cannot generate a token transfer transaction
+					without relying on a third party API.
 				`),
 				evaluateMpc(
 					{
@@ -567,10 +566,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet
-					where the control logic of the smart contract is such that the
-					user cannot update it to have the user's own private keys as the
-					sole controlling keys of the account.
+					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet.
+					The control logic of the smart contract is such that the user cannot
+					update it to have the user's own private keys as the sole controlling
+					keys of the account.
 				`),
 				evaluateMultifactor(
 					{
@@ -585,10 +584,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet
-					over which the user does not have full self-custodial control by
-					default, and needs to rely on a third-party API or proprietary
-					software to modify this.
+					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet.
+					The user does not have full self-custodial control by default, and
+					needs to rely on a third-party API or proprietary software to change
+					this.
 				`),
 				evaluateMultifactor(
 					{
@@ -604,10 +603,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet
-					over which the user has full self-custodial control by default,
-					but still needs to rely on a third-party API or proprietary software
-					to generate a valid token transfer transaction.
+					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet.
+					The user has self-custodial control by default, but still needs to
+					rely on a third-party API or proprietary software to generate a
+					valid token transfer transaction.
 				`),
 				evaluateMultifactor(
 					{
@@ -642,10 +641,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 			exampleRating(
 				paragraph(`
-					The wallet is an MPC wallet where the user is in self-custody of
-					sufficient key shares to unilaterally control the account, but
-					cannot generate a token transfer transaction without the use of
-					proprietary software.
+					The wallet is an MPC wallet. By default, the user is in self-custody
+					of sufficient key shares to unilaterally control the account. However,
+					the user cannot generate a token transfer transaction without the use
+					of proprietary software.
 				`),
 				evaluateMpc(
 					{
@@ -659,10 +658,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet
-					over which the user does not have full self-custodial control by
-					default, but can create a transaction that modifies this using
-					standalone open-source software.
+					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet.
+					The user does not have full self-custodial control by default, but can
+					create a transaction that modifies this using standalone open-source
+					software.
 				`),
 				evaluateMultifactor(
 					{
@@ -702,9 +701,9 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			exampleRating(
 				paragraph(`
 					The wallet is an MPC wallet where the user is in self-custody of
-					sufficient key shares to unilaterally control the account, and can
-					generate a token transfer transaction using standalone open-source
-					software which does not rely on any third party API.
+					sufficient key shares to unilaterally control the account.
+					The user can generate a token transfer transaction using standalone
+					open-source software which does not rely on any third party API.
 				`),
 				evaluateMpc(
 					{
@@ -718,10 +717,10 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 			exampleRating(
 				mdParagraph(`
-					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet
-					over which the user has full self-custodial control by default,
-					and can create token transfer transactions using solely open-source
-					software without relying on a third-party API.
+					The wallet is an ${eipMarkdownLink(erc4337)} (smart contract) wallet,
+					with the user having full self-custodial control by default.
+					The user can create token transfer transactions using solely
+					open-source software without relying on a third-party API.
 				`),
 				evaluateMultifactor(
 					{

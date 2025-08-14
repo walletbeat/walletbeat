@@ -1,11 +1,13 @@
 import { jiojosbg } from '@/data/contributors/jiojosbg'
-import { nconsigny } from '@/data/contributors/nconsigny'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import {
 	Leak,
+	LeakedPersonalInfo,
+	LeakedWalletInfo,
 	MultiAddressPolicy,
 	RegularEndpoint,
 } from '@/schema/features/privacy/data-collection'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
 import {
@@ -24,11 +26,11 @@ import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
+import { nconsigny } from '../contributors'
 import { ambireEntity } from '../entities/ambire'
 import { biconomy } from '../entities/biconomy'
 import { github } from '../entities/github'
 import { hunterSecurity } from '../entities/hunter-security'
-import { jiffylabs } from '../entities/jiffyscan'
 import { lifi } from '../entities/lifi'
 import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
@@ -80,6 +82,22 @@ const dataLeakReferences: Record<string, References> = {
 			url: 'https://relayer.ambire.com',
 		},
 		{
+			explanation:
+				'Ambire does a single batch request for token discovery on multiple chains for a single account. This feature utilizes the Ambire relayer.',
+			lastRetrieved: '2025-07-28',
+			urls: [
+				{
+					label: 'A single account-network pair is queued',
+					url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/portfolio.ts#L146-L150',
+				},
+				{
+					label:
+						"All the queued requests are batched. Since the debounce time is 0, only queue elements requested 'at the same time' get batched together",
+					url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/batcher.ts#L143',
+				},
+			],
+		},
+		{
 			explanation: "Ambire's NFT CDN is responsible for fetching NFT media.",
 			url: 'https://nftcdn.ambire.com',
 		},
@@ -94,12 +112,6 @@ const dataLeakReferences: Record<string, References> = {
 		{
 			explanation: 'Used for static content and info lists.',
 			url: ['https://raw.githubusercontent.com', 'https://github.com', 'https://api.github.com'],
-		},
-	],
-	jiffylabs: [
-		{
-			explanation: 'User for fetching info about AA operations.',
-			url: 'https://api.jiffyscan.xyz',
 		},
 	],
 	lifi: [
@@ -176,7 +188,48 @@ export const ambire: SoftwareWallet = {
 				medium: 'CHAIN_CLIENT',
 			}),
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			/** Chain bridging features. */
+			bridging: {
+				/** Does the wallet have a built-in bridging feature? */
+				builtInBridging: supported({
+					feesLargerThan1bps: 'VISIBLE_BY_DEFAULT',
+					ref: {
+						explanation: 'All fees are displayed when agreeing to the bridge',
+						url: 'https://www.ambire.com/',
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ether: supported({
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+					ref: {
+						explanation: 'Ambire supports filtering by token name.',
+						label: 'Implementation of token filtering by name',
+						url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+					},
+				}),
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				ref: {
+					explanation:
+						'Ambire supports filtering by token name and chain, as well as displaying the total balance from the resulting tokens',
+					label: 'Implementation of token filtering by name',
+					url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+				},
+				usdc: supported({
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+					ref: {
+						explanation: 'Ambire supports filtering by token name.',
+						url: 'https://www.ambire.com/',
+					},
+				}),
+			},
+		},
 		chainConfigurability: {
 			customChains: true,
 			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
@@ -191,6 +244,20 @@ export const ambire: SoftwareWallet = {
 				],
 			},
 		},
+		ecosystem: {
+			delegation: {
+				duringEOACreation: 'NO',
+				duringEOAImport: 'NO',
+				duringFirst7702Operation: supported({
+					type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS',
+					nonDelegationTransactionDetailsIdenticalToNormalFlow: true,
+				}),
+				fee: {
+					crossChainGas: featureSupported,
+					walletSponsored: featureSupported,
+				},
+			},
+		},
 		integration: {
 			browser: {
 				'1193': featureSupported,
@@ -200,7 +267,11 @@ export const ambire: SoftwareWallet = {
 					url: 'https://github.com/AmbireTech/extension/blob/v2/src/web/extension-services/background/background.ts',
 				},
 			},
-			eip5792: featureSupported,
+			walletCall: supported({
+				atomicMultiTransactions: supported({
+					ref: 'https://github.com/AmbireTech/ambire-common/blob/eba5dda7bccbd1c404f293d75c4ea74d939c8d01/src/libs/account/EOA7702.ts#L181-L183',
+				}),
+			}),
 		},
 		license: {
 			license: License.GPL_3_0,
@@ -214,10 +285,10 @@ export const ambire: SoftwareWallet = {
 				ecosystemGrants: true,
 				governanceTokenLowFloat: false,
 				governanceTokenMostlyDistributed: false,
-				hiddenConvenienceFees: true,
+				hiddenConvenienceFees: false,
 				publicOffering: false,
 				selfFunded: true,
-				transparentConvenienceFees: false,
+				transparentConvenienceFees: true,
 				ventureCapital: true,
 			},
 		},
@@ -228,76 +299,56 @@ export const ambire: SoftwareWallet = {
 					{
 						entity: ambireEntity,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
-								type: MultiAddressPolicy.SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES,
+								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							ref: dataLeakReferences.ambire,
-							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: pimlico,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							ref: dataLeakReferences.pimlico,
-							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: biconomy,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
+							[LeakedWalletInfo.MEMPOOL_TRANSACTIONS]: Leak.ALWAYS,
+							[LeakedWalletInfo.WALLET_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.ALWAYS,
 							multiAddress: {
 								type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
 							},
 							ref: dataLeakReferences.biconomy,
-							walletAddress: Leak.ALWAYS,
 						},
 					},
 					{
 						entity: lifi,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.NEVER,
 							ref: dataLeakReferences.lifi,
-							walletAddress: Leak.NEVER,
 						},
 					},
 					{
 						entity: github,
 						leaks: {
-							cexAccount: Leak.NEVER,
+							[LeakedPersonalInfo.IP_ADDRESS]: Leak.ALWAYS,
 							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.NEVER,
 							ref: dataLeakReferences.github,
-							walletAddress: Leak.NEVER,
-						},
-					},
-					{
-						entity: jiffylabs,
-						leaks: {
-							cexAccount: Leak.NEVER,
-							endpoint: RegularEndpoint,
-							ipAddress: Leak.ALWAYS,
-							mempoolTransactions: Leak.NEVER,
-							ref: dataLeakReferences.jiffylabs,
-							walletAddress: Leak.NEVER,
 						},
 					},
 				],
@@ -306,7 +357,8 @@ export const ambire: SoftwareWallet = {
 			privacyPolicy: 'https://www.ambire.com/Ambire%20ToS%20and%20PP%20(26%20November%202021).pdf',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,
@@ -360,15 +412,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 							},
 						}),
 					}),
-					[HardwareWalletType.KEYSTONE]: supported({
-						[HardwareWalletConnection.QR]: supported({
-							ref: {
-								explanation:
-									'Ambire supports Keystone hardware wallets through connector integration (non-native).',
-								url: 'https://www.ambire.com/',
-							},
-						}),
-					}),
+					[HardwareWalletType.KEYSTONE]: notSupported,
 				},
 			},
 			lightClient: {
@@ -415,7 +459,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 		transparency: {
 			feeTransparency: {
 				disclosesWalletFees: true,
-				level: FeeTransparencyLevel.DETAILED,
+				level: FeeTransparencyLevel.COMPREHENSIVE,
 				showsTransactionPurpose: true,
 			},
 		},

@@ -1,6 +1,7 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
@@ -63,6 +64,9 @@ export const metamask: SoftwareWallet = {
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
+		ecosystem: {
+			delegation: null,
+		},
 		integration: {
 			browser: {
 				'1193': null,
@@ -70,7 +74,7 @@ export const metamask: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			walletCall: null,
 		},
 		license: null,
 		monetization: {
@@ -94,7 +98,8 @@ export const metamask: SoftwareWallet = {
 			privacyPolicy: 'https://consensys.io/privacy-notice',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,

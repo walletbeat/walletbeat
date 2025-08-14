@@ -74,12 +74,12 @@ function evaluateAddressResolution(
 	addressResolution: AddressResolution<AddressResolutionSupport>,
 	references: ReferenceArray,
 ): Evaluation<AddressResolutionValue> {
-	const chainSpecificErcs: NonEmptyArray<[Eip, AddressResolutionSupport, string]> = [
+	const chainSpecificERCs: NonEmptyArray<[Eip, AddressResolutionSupport, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
 	]
 
-	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificErcs) {
+	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificERCs) {
 		if (chainSpecificSupport.support !== 'SUPPORTED') {
 			continue
 		}
@@ -228,11 +228,12 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		generating lookalike-addresses and tricking users into copy/pasting
 		them without noticing the difference.
 
-		Additionally, Ethereum's transition to layer 2s has changed user needs
-		when sending funds. The hexadecimal address isn't sufficient anymore;
-		the user needs to ensure that they are sending funds to the correct
-		hexadecimal address *on the correct chain*, increasing the potential
-		for mistakenly sending funds to the wrong place or the wrong chain.
+		Additionally, Ethereum's transition to layer 2 chains has changed user
+		needs when sending funds. The hexadecimal address isn't sufficient
+		anymore; the user needs to ensure that they are sending funds to the
+		correct hexadecimal address *on the correct chain*, increasing the
+		potential for mistakenly sending funds to the wrong place or the wrong
+		chain.
 
 		Address naming registries like ENS partially solve this problem by
 		allowing more human-readable names like \`username.eth\` to be
@@ -267,15 +268,16 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		Additionally, the mechanism used to do the resolution must either:
 
 		* Be done using onchain data and reusing the wallet's common chain
-			interaction client, inheriting its verifiability (via light client)
-			and privacy properties.
+		  interaction client, inheriting its verifiability (via light client)
+		  and privacy properties.
 		* **OR** be done using an offchain third-party provider in such a way that
-			the address returned by the third-party provider is verifiable, and
-			without revealing the user's IP address to the provider. This ensures
-			that the wallet cannot be tricked into sending funds to an attacker
-			compromising the offchain provider's responses, and that the provider
-			may not progressively learn the user's contacts list by associating its
-			successive resolution queries by IP over time.
+		  the address returned by the third-party provider is verifiable, and
+		  without revealing the user's IP address to the provider.
+			This ensures that:
+			- The wallet cannot be tricked into sending funds to an attacker
+		    compromising the offchain provider's responses
+		  - The provider may not progressively learn the user's contacts list by
+		    associating its successive resolution queries by IP over time.
 	`),
 	ratingScale: {
 		display: 'fail-pass',

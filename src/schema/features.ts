@@ -1,5 +1,6 @@
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
+import type { DelegationHandling } from './features/ecosystem/delegation-handling'
 import {
 	notApplicableWalletIntegration,
 	type ResolvedWalletIntegration,
@@ -133,6 +134,12 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<TransactionSubmission>
+	}
+
+	/** Ecosystem features. */
+	ecosystem: {
+		/** EIP-7702 delegation handling. */
+		delegation: VariantFeature<DelegationHandling>
 	}
 
 	/** Level of configurability for chains. */
