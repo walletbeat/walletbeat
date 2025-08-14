@@ -1,20 +1,42 @@
 ---
-export const prerender = true
-import Layout from '@/layouts/Layout.astro'
-import { getAttributeGroupById } from '@/schema/attribute-groups'
-import { CriteriaPage, getStaticPathsForWalletType } from '@/components/CriteriaPage'
-import { representativeWalletForType } from '@/data/wallets'
+// Types/constants
 import { WalletType } from '@/schema/wallet-types'
+import { defaultNavigationItems } from '@/components/navigation'
+import { representativeWalletForType, allRatedWallets } from '@/data/wallets'
 
-export const getStaticPaths = getStaticPathsForWalletType(WalletType.SOFTWARE)
+
+// Functions
+import { getAttributeGroupById } from '@/schema/attribute-groups'
+import { displayedAttributeIdsForWalletType } from '@/schema/wallet-navigation'
+
+
+// Context
+export const prerender = true
+
+export const getStaticPaths = () => (
+	displayedAttributeIdsForWalletType(WalletType.SOFTWARE)
+		.map(attrGroupId => ({
+			params: { attrGroupId },
+		}))
+)
+
 const { attrGroupId } = Astro.params
+
+
+// Data
 const attrGroup = getAttributeGroupById(
 	attrGroupId,
 	representativeWalletForType(WalletType.SOFTWARE).overall,
 )
-if (attrGroup === null) {
+
+if (!attrGroup)
 	throw new Error('Invalid attribute group')
-}
+
+
+// Components
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/ui/organisms/Navigation.astro'
+import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
 
 <Layout
@@ -24,5 +46,23 @@ if (attrGroup === null) {
 		keywordsBefore: [`Ethereum ${attrGroup.displayName}`],
 	}}
 >
-	<CriteriaPage walletType={WalletType.SOFTWARE} attrGroupId={attrGroupId} client:load />
+	<Navigation
+		navigationItems={defaultNavigationItems}
+	/>
+	
+	<main>
+		<section>
+			<WalletTable
+				client:load
+				title="Software Wallets"
+				wallets={
+					Object
+						.values(allRatedWallets)
+						.filter(wallet => wallet.types[WalletType.SOFTWARE])
+				}
+				attributeGroups={[attrGroup]}
+				expandByDefault={true}
+			/>
+		</section>
+	</main>
 </Layout>

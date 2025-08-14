@@ -1,6 +1,16 @@
 ---
-import Layout from '../../layouts/Layout.astro'
-import { HomePage } from '../../components/HomePage'
+// Types/constants
+import { defaultNavigationItems } from '@/components/navigation'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
+import { attributeTree } from '@/schema/attribute-groups'
+
+const attributeGroups = Object.values(attributeTree)
+
+
+// Components
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/ui/organisms/Navigation.astro'
+import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
 
 <Layout
@@ -8,5 +18,18 @@ import { HomePage } from '../../components/HomePage'
 		title: 'Walletbeat',
 	}}
 >
-	<HomePage client:load selectedGroupId='hww' />
+	<Navigation
+		navigationItems={defaultNavigationItems}
+	/>
+	
+	<main>
+		<section>
+			<WalletTable
+				client:load
+				title="Hardware Wallets"
+				wallets={Object.values(ratedHardwareWallets)}
+				{attributeGroups}
+			/>
+		</section>
+	</main>
 </Layout>
