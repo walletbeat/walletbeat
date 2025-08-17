@@ -21,14 +21,15 @@ jobs:
         run: pnpm check:all
       - name: Build
         run: pnpm build
-      - name: Edgeserver Upload
-        uses: v3xlabs/edgeserver-upload@v0.1.2-pre.4
-        with:
-          app_id: '422130713911889920'
-          server: https://api.edgeserver.io
-          token: ${{ secrets.EDGE_TOKEN }}
-          directory: dist
-          context: true
+      # Disabled due to issue #246.
+      # - name: Edgeserver Upload
+      #   uses: v3xlabs/edgeserver-upload@v0.1.2-pre.4
+      #   with:
+      #     app_id: '422130713911889920'
+      #     server: https://api.edgeserver.io
+      #     token: ${{ secrets.EDGE_TOKEN }}
+      #     directory: dist
+      #     context: true
       - name: Edgeserver v0.2 Upload
         uses: v3xlabs/edgeserver-upload@v0.2.1-pre.4
         with:
