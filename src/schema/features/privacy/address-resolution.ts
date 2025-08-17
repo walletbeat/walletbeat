@@ -1,7 +1,7 @@
 import type { Support } from '../support'
 
 /** Which methods of address resolution a wallet supports. */
-export interface AddressResolution<ARS = AddressResolutionSupport | null> {
+export interface AddressResolution<ARS = Support<AddressResolutionData> | null> {
 	/**
 	 * Support for basic ENS lookups (ENS domain to non-chain-specific raw hex
 	 * address).
@@ -19,7 +19,7 @@ export interface AddressResolution<ARS = AddressResolutionSupport | null> {
 }
 
 /** How a wallet resolves addresses. */
-export type AddressResolutionSupport = Support<
+export type AddressResolutionData =
 	| {
 			/**
 			 * The wallet reuses its own chain client provider to look up the
@@ -47,4 +47,3 @@ export type AddressResolutionSupport = Support<
 			 */
 			offchainProviderConnection: 'DIRECT_CONNECTION' | 'UNIQUE_PROXY_CIRCUIT'
 	  }
->
