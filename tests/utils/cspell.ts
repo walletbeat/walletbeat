@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import { getRepositoryRoot } from './codebase.ts'
+import { getRepositoryRoot } from './codebase'
 
 /** Type for CSpell configuration file. */
 interface CSpellConfig {

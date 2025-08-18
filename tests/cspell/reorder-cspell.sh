@@ -13,7 +13,7 @@ if [[ ! -f "$CSPELL_JSON" ]]; then
 fi
 
 set +e
-pnpm exec ts-node "tests/cspell/reorder-cspell.ts"
+pnpm tsx tests/cspell/reorder-cspell.ts "$@"
 RETURN_CODE="$?"
 if [[ "$RETURN_CODE" == 0 ]]; then
 	# Already in order.
