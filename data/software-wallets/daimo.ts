@@ -1,6 +1,7 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import {
 	Leak,
 	LeakedPersonalInfo,
@@ -75,7 +76,7 @@ export const daimo: SoftwareWallet = {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: supported({
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
 			}),
 			ref: [

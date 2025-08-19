@@ -1,5 +1,6 @@
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import {
 	Leak,
 	LeakedPersonalInfo,
@@ -183,7 +184,7 @@ export const ambire: SoftwareWallet = {
 				erc7828: notSupported,
 				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: supported({
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
 				medium: 'CHAIN_CLIENT',
 			}),
 		},

@@ -8,6 +8,7 @@ import {
 	type Value,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
+import { isSupported, type Support, type Supported } from '@/schema/features/support'
 import { type ReferenceArray, refs } from '@/schema/reference'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -15,19 +16,19 @@ import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } from '../../eips'
 import type {
 	AddressResolution,
-	AddressResolutionSupport,
+	AddressResolutionData,
 } from '../../features/privacy/address-resolution'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.ecosystem.address_resolution'
 
 export type AddressResolutionValue = Value & {
-	addressResolution?: AddressResolution<AddressResolutionSupport>
+	addressResolution?: AddressResolution<Support<AddressResolutionData>>
 	__brand: 'attributes.ecosystem.address_resolution'
 }
 
 function getOffchainProviderInfo(
-	support: AddressResolutionSupport & { support: 'SUPPORTED'; medium: 'OFFCHAIN' },
+	support: Supported<AddressResolutionData> & { medium: 'OFFCHAIN' },
 ): { rating: Rating; offchainInfo: string; walletShould?: string } {
 	if (
 		support.offchainDataVerifiability === 'VERIFIABLE' &&
@@ -71,16 +72,16 @@ function getOffchainProviderInfo(
 }
 
 function evaluateAddressResolution(
-	addressResolution: AddressResolution<AddressResolutionSupport>,
+	addressResolution: AddressResolution<Support<AddressResolutionData>>,
 	references: ReferenceArray,
 ): Evaluation<AddressResolutionValue> {
-	const chainSpecificERCs: NonEmptyArray<[Eip, AddressResolutionSupport, string]> = [
+	const chainSpecificERCs: NonEmptyArray<[Eip, Support<AddressResolutionData>, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
 	]
 
 	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificERCs) {
-		if (chainSpecificSupport.support !== 'SUPPORTED') {
+		if (!isSupported(chainSpecificSupport)) {
 			continue
 		}
 
@@ -438,7 +439,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 
 		// We've checked all the nulls, so recreate the object without nulls in
 		// the type description.
-		const resolvedResolution: AddressResolution<AddressResolutionSupport> = {
+		const resolvedResolution: AddressResolution<Support<AddressResolutionData>> = {
 			chainSpecificAddressing: {
 				erc7828: features.addressResolution.chainSpecificAddressing.erc7828,
 				erc7831: features.addressResolution.chainSpecificAddressing.erc7831,

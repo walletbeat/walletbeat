@@ -1124,7 +1124,7 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		let evaluation: Evaluation<PrivateTransfersValue> | null = null
 		let atLeastOneTechnologySupported = false
 
-		const maybeEvaluateTechnology = <T>(
+		const maybeEvaluateTechnology = <T extends object>(
 			support: Support<T>,
 			evaluate: (supported: Supported<T>) => Evaluation<PrivateTransfersValue>,
 		): Evaluation<PrivateTransfersValue> | null => {
