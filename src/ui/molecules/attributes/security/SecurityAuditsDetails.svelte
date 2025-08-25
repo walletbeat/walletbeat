@@ -52,7 +52,7 @@
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
-			markdown: `**{{WALLET_NAME}}** was last audited on ${mostRecentAudit.auditDate}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
+			markdown: `**{{WALLET_NAME}}** was last audited on ${Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(new Date(mostRecentAudit.auditDate))}${auditedInLastYear ? '.' : ', which was over a year ago.'}${hasUnaddressedFlaws ? ' There remain unaddressed security flaws in the codebase.' : ''}`,
 		}}
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
@@ -64,61 +64,66 @@
 	{/if}
 
 	<div class="audits-container">
+		<h4>Audits</h4>
+
 		<ul class="audits-list">
 			{#each securityAuditsSorted as audit}
 				<li>
-					<div>
-						<strong><time datetime={audit.auditDate}>{audit.auditDate}</time></strong>
-
-						by
-						{#if isUrl(audit.auditor.url)}
-							<cite
-								><a
-									href={typeof audit.auditor.url === 'string'
-										? audit.auditor.url
-										: audit.auditor.url.url}
-									target="_blank"
-									rel="noopener noreferrer"
+					<article>
+						<header>
+							{#if isUrl(audit.auditor.url)}
+								<cite
+									><a
+										href={typeof audit.auditor.url === 'string'
+											? audit.auditor.url
+											: audit.auditor.url.url}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{audit.auditor.name}
+									</a></cite
 								>
-									{audit.auditor.name}
-								</a></cite
-							>
-						{:else}
-							<cite>{audit.auditor.name}</cite>
-						{/if}
-					</div>
+							{:else}
+								<cite>{audit.auditor.name}</cite>
+							{/if}
 
-					{#if audit.ref}
-						<ReferenceLinks references={toFullyQualified(audit.ref)} />
-					{/if}
+							<strong><time datetime={audit.auditDate}>{Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(new Date(audit.auditDate))}</time></strong>
+						</header>
 
-					<p>
-						{#if audit.unpatchedFlaws === 'NONE_FOUND'}
-							<span>No security flaws of severity level medium or higher were found.</span>
-						{:else if audit.unpatchedFlaws === 'ALL_FIXED'}
-							<span>All security flaws of severity level medium or higher were addressed.</span>
-						{:else if Array.isArray(audit.unpatchedFlaws) && audit.unpatchedFlaws.length > 0}
-							<span>
-								The following security flaws were identified
-								{!audit.unpatchedFlaws.some((flaw: any) => flaw.presentStatus === 'NOT_FIXED')
-									? ' and have all been addressed since'
-									: ''}:
-							</span>
-							<ul class="flaws-list">
-								{#each audit.unpatchedFlaws as flaw}
-									<li>
-										<strong>{securityFlawSeverityName(flaw.severityAtAuditPublication)}</strong>:
-										{#if flaw.presentStatus === 'FIXED'}
-											<span class="fixed-flaw">{flaw.name}</span>
-											<strong class="fixed-label">(Fixed)</strong>
-										{:else}
-											<span>{flaw.name}</span> <strong class="not-fixed-label">(Not fixed)</strong>
-										{/if}
-									</li>
-								{/each}
-							</ul>
+						{#if audit.ref}
+							<ReferenceLinks
+								references={toFullyQualified(audit.ref)}
+							/>
 						{/if}
-					</p>
+
+						<p>
+							{#if audit.unpatchedFlaws === 'NONE_FOUND'}
+								<span>No security flaws of severity level medium or higher were found.</span>
+							{:else if audit.unpatchedFlaws === 'ALL_FIXED'}
+								<span>All security flaws of severity level medium or higher were addressed.</span>
+							{:else if Array.isArray(audit.unpatchedFlaws) && audit.unpatchedFlaws.length > 0}
+								<span>
+									The following security flaws were identified
+									{!audit.unpatchedFlaws.some((flaw: any) => flaw.presentStatus === 'NOT_FIXED')
+										? ' and have all been addressed since'
+										: ''}:
+								</span>
+								<ul class="flaws-list">
+									{#each audit.unpatchedFlaws as flaw}
+										<li>
+											<strong>{securityFlawSeverityName(flaw.severityAtAuditPublication)}</strong>:
+											{#if flaw.presentStatus === 'FIXED'}
+												<span class="fixed-flaw">{flaw.name}</span>
+												<strong class="fixed-label">(Fixed)</strong>
+											{:else}
+												<span>{flaw.name}</span> <strong class="not-fixed-label">(Not fixed)</strong>
+											{/if}
+										</li>
+									{/each}
+								</ul>
+							{/if}
+						</p>
+					</article>
 				</li>
 			{/each}
 		</ul>
@@ -130,9 +135,12 @@
 	.audits-container {
 		max-height: 300px;
 		overflow-y: auto;
-		border: 1px solid var(--border-color);
-		padding: 0.5rem;
-		border-radius: 0.25rem;
+		padding: 1.5em;
+
+		display: grid;
+		gap: 1em;
+
+		border-radius: 0.5em;
 		background-color: var(--background-secondary);
 	}
 
@@ -154,6 +162,18 @@
 
 			> :global(* + *) {
 				margin-top: 0.5em;
+			}
+		}
+
+		article {
+			display: grid;
+			gap: 1em;
+
+			header {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-between;
+				align-items: center;
 			}
 		}
 	}
