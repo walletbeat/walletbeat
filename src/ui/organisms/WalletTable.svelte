@@ -1,3 +1,11 @@
+<script module lang="ts">
+	export enum SummaryVisualization {
+		None = 'none',
+		Dot = 'dot',
+		Score = 'score',
+	}
+</script>
+
 <script lang="ts">
 	// Types/constants
 	import type { Column } from '@/lib/DataTable.svelte'
@@ -11,6 +19,8 @@
 	import { erc4337 } from '@/data/eips/erc-4337'
 	import { eip7702 } from '@/data/eips/eip-7702'
 
+	import type { Snippet } from 'svelte'
+
 
 	// Props
 	let {
@@ -18,11 +28,13 @@
 		title,
 		wallets,
 		attributeGroups,
+		summaryVisualization = SummaryVisualization.None,
 	}: {
 		tableId?: string,
 		title?: string
 		wallets: RatedWallet[]
 		attributeGroups: AttributeGroup<any>[]
+		summaryVisualization?: SummaryVisualization
 	} = $props()
 
 	// (Derived)
@@ -732,14 +744,14 @@
 						radius={80}
 						levels={[
 							{
-								outerRadiusFraction: 0.7,
-								innerRadiusFraction: 0.3,
+								outerRadiusFraction: summaryVisualization !== SummaryVisualization.None ? 0.7 : 0.65,
+								innerRadiusFraction: summaryVisualization !== SummaryVisualization.None ? 0.3 : 0.1,
 								gap: 4,
 								angleGap: 0
 							},
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.725,
+								innerRadiusFraction: summaryVisualization !== SummaryVisualization.None ? 0.725 : 0.675,
 								gap: 2,
 								angleGap: 0,
 							}
@@ -767,31 +779,43 @@
 						onSliceMouseLeave={sliceId => {
 							activeEntityId = undefined
 						}}
-						centerLabel={
-							score ?
-								`${
-									score === 0 ?
-										'\u{1f480}'
-									: score === 1 ?
-										'\u{1f4af}'
-									:
-										(score * 100).toFixed(0)
-								}${
-									(
-										displayedAttributeGroups
-											.some(attrGroup => (
-												calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
-													?.hasUnratedComponent
-											))
-									) ?
-										'*'
-									:
-										''
-								}`
-							:
-								'❓'
-						}
-					/>
+					>
+						{#snippet centerContentSnippet()}
+							{#if summaryVisualization === SummaryVisualization.Score}
+								<text>
+									{
+										score ?
+											`${
+												score === 0 ?
+													'\u{1f480}'
+												: score === 1 ?
+													'\u{1f4af}'
+												:
+													(score * 100).toFixed(0)
+											}${
+												(
+													displayedAttributeGroups
+														.some(attrGroup => (
+															calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
+																?.hasUnratedComponent
+														))
+												) ?
+													'*'
+												:
+													''
+											}`
+										:
+											'❓'
+									}
+								</text>
+							{:else if summaryVisualization === SummaryVisualization.Dot}
+								<circle
+									r="22"
+									fill={scoreToColor(score)}
+								/>
+							{/if}
+						{/snippet}
+					</Pie>
 				{/snippet}
 
 				{#snippet expandedContent()}
@@ -870,7 +894,7 @@
 						levels={[
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.3,
+								innerRadiusFraction: summaryVisualization !== SummaryVisualization.None ? 0.3 : 0.166,
 								gap: 3,
 								angleGap: 0
 							}
@@ -915,19 +939,6 @@
 							)
 						}
 						{highlightedSliceId}
-						centerLabel={
-							groupScore ?
-								`${
-									groupScore.score === 0 ?
-										'\u{1f480}'
-									: groupScore.score === 1 ?
-										'\u{1f4af}'
-									:
-										(groupScore.score * 100).toFixed(0)
-								}${groupScore.hasUnratedComponent ? '*' : ''}`
-							:
-								'❓'
-						}
 						onSliceClick={sliceId => {
 							const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 							
@@ -968,7 +979,32 @@
 						onSliceBlur={sliceId => {
 							activeEntityId = undefined
 						}}
-					/>
+					>
+						{#snippet centerContentSnippet()}
+							{#if summaryVisualization === SummaryVisualization.Score}
+								<text>
+									{
+										groupScore ?
+											`${
+												groupScore.score === 0 ?
+													'\u{1f480}'
+												: groupScore.score === 1 ?
+													'\u{1f4af}'
+												:
+													(groupScore.score * 100).toFixed(0)
+											}${groupScore.hasUnratedComponent ? '*' : ''}`
+										:
+											'❓'
+									}
+								</text>
+							{:else if summaryVisualization === SummaryVisualization.Dot}
+								<circle
+									r="10"
+									fill={scoreToColor(groupScore?.score ?? 0)}
+								/>
+							{/if}
+						{/snippet}
+					</Pie>
 				{/snippet}
 
 				{#snippet expandedContent()}

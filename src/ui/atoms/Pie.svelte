@@ -20,7 +20,7 @@
 	export type LevelConfig = {
 		outerRadiusFraction: number
 		innerRadiusFraction: number
-		offset: number
+		offset?: number
 		gap: number
 		angleGap: number
 	}
