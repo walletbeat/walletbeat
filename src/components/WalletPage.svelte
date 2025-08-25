@@ -344,7 +344,7 @@
 						padding={20}
 						levels={[{
 							outerRadiusFraction: 0.95,
-							innerRadiusFraction: 0,
+							innerRadiusFraction: 0.125,
 							gap: 8,
 							angleGap: 0,
 						}]}
@@ -367,7 +367,14 @@
 						onSliceMouseLeave={() => {
 							highlightedAttributeId = null
 						}}
-					/>
+					>
+						{#snippet centerContentSnippet()}
+							<circle
+								r="8"
+								fill={score?.score ? scoreToColor(score.score) : 'var(--rating-unrated)'}
+							/>
+						{/snippet}
+					</Pie>
 				</div>
 
 				<div class="attributes-list">
