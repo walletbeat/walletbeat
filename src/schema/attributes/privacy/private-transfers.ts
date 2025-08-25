@@ -910,8 +910,8 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		Walletbeat currently recognizes the following privacy-preserving token
 		transfer solutions:
 
-			- ${eipMarkdownLinkAndTitle(erc5564)}
-			- [Tornado Cash Nova](https://nova.tornadocash.eth.limo/)
+		- ${eipMarkdownLinkAndTitle(erc5564)}
+		- [Tornado Cash Nova](https://nova.tornadocash.eth.limo/)
 	`),
 	ratingScale: {
 		display: 'fail-pass',

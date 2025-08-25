@@ -296,16 +296,15 @@ function evaluateScamAlerts(
 				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
-			howToImprove: markdown(
-				`{{WALLET_NAME}} should implement the following features:
+			howToImprove: markdown(`
+				{{WALLET_NAME}} should implement the following features:
 
 				${unsupportedFeatures
-					.map(
-						sas => `
-						*	${sas.listFeature}
-					`,
-					)
-					.join('\n')}
+					.map(sas => `
+				*	${sas.listFeature}
+				`)
+					.join('')
+				}
 			`,
 			),
 			references: allRefs,

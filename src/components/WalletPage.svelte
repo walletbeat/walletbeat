@@ -650,7 +650,7 @@
 																	.flat()
 																	.map(
 																		example =>
-																			`* ${example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text}`,
+																			`* ${(example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text).trim()}`,
 																	)
 																	.join('\n'),
 															].join('\n\n'),
@@ -670,7 +670,7 @@
 																	.flat()
 																	.map(
 																		example =>
-																			`* ${example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text}`,
+																			`* ${(example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text).trim()}`,
 																	)
 																	.join('\n'),
 															].join('\n\n'),
@@ -690,7 +690,7 @@
 																	.flat()
 																	.map(
 																		example =>
-																			`* ${example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text}`,
+																			`* ${(example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text).trim()}`,
 																	)
 																	.join('\n'),
 															].join('\n\n'),
