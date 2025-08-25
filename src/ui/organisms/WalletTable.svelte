@@ -28,7 +28,7 @@
 		title,
 		wallets,
 		attributeGroups,
-		summaryVisualization = SummaryVisualization.None,
+		summaryVisualization = SummaryVisualization.Dot,
 	}: {
 		tableId?: string,
 		title?: string
@@ -744,14 +744,14 @@
 						radius={80}
 						levels={[
 							{
-								outerRadiusFraction: summaryVisualization !== SummaryVisualization.None ? 0.7 : 0.65,
-								innerRadiusFraction: summaryVisualization !== SummaryVisualization.None ? 0.3 : 0.1,
+								outerRadiusFraction: summaryVisualization === SummaryVisualization.Score ? 0.7 : 0.65,
+								innerRadiusFraction: summaryVisualization === SummaryVisualization.Score ? 0.3 : 0.1,
 								gap: 4,
 								angleGap: 0
 							},
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: summaryVisualization !== SummaryVisualization.None ? 0.725 : 0.675,
+								innerRadiusFraction: summaryVisualization === SummaryVisualization.Score ? 0.725 : 0.675,
 								gap: 2,
 								angleGap: 0,
 							}
@@ -810,7 +810,7 @@
 								</text>
 							{:else if summaryVisualization === SummaryVisualization.Dot}
 								<circle
-									r="22"
+									r="4"
 									fill={scoreToColor(score)}
 								/>
 							{/if}
@@ -894,7 +894,7 @@
 						levels={[
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: summaryVisualization !== SummaryVisualization.None ? 0.3 : 0.166,
+								innerRadiusFraction: summaryVisualization === SummaryVisualization.Score ? 0.3 : 0.166,
 								gap: 3,
 								angleGap: 0
 							}
@@ -999,7 +999,7 @@
 								</text>
 							{:else if summaryVisualization === SummaryVisualization.Dot}
 								<circle
-									r="10"
+									r="4"
 									fill={scoreToColor(groupScore?.score ?? 0)}
 								/>
 							{/if}
