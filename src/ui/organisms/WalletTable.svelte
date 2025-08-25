@@ -324,34 +324,9 @@
 	displaceDisabledRows={true}
 
 	columns={
-		[
-			{
-				id: 'displayName',
-				name: 'Wallet',
-				getValue: wallet => (
-					wallet.metadata.displayName
-				),
-				isSticky: true,
-			} satisfies Column<RatedWallet>,
-			{
-				id: 'overall',
-				name: 'Rating',
-				getValue(wallet) {
-					// Calculate aggregate score across all attribute groups
-					const scores = (
-						this.children!
-							.map(column => column.getValue(wallet))
-							.filter(score => score !== undefined)
-					)
-
-					if (!scores.length) return undefined
-
-					return scores.reduce((sum, score) => sum + score, 0) / scores.length
-				},
-				defaultSortDirection: 'desc',
-				defaultIsExpanded: true,
-				children: (
-					displayedAttributeGroups
+		(() => {
+			const attrGroupColumns = (
+				displayedAttributeGroups
 						.map(attrGroup => ({
 							id: attrGroup.id,
 							// name: `${attrGroup.icon} ${attrGroup.displayName}`,
@@ -375,9 +350,47 @@
 									} satisfies Column<RatedWallet>))
 							),
 						} satisfies Column<RatedWallet>))
+			)
+
+			return [
+				{
+					id: 'displayName',
+					name: 'Wallet',
+					getValue: wallet => (
+						wallet.metadata.displayName
+					),
+					isSticky: true,
+				} satisfies Column<RatedWallet>,
+
+				(
+					attrGroupColumns.length > 1 ?
+						{
+							id: 'overall',
+							name: 'Rating',
+							getValue(wallet) {
+								// Calculate aggregate score across all attribute groups
+								const scores = (
+									this.children!
+										.map(column => column.getValue(wallet))
+										.filter(score => score !== undefined)
+								)
+
+								if (!scores.length) return undefined
+
+								return scores.reduce((sum, score) => sum + score, 0) / scores.length
+							},
+							defaultSortDirection: 'desc',
+							defaultIsExpanded: true,
+							children: (
+								attrGroupColumns
+							),
+						} satisfies Column<RatedWallet>
+
+					:
+						attrGroupColumns[0]
 				),
-			} satisfies Column<RatedWallet>,
-		]
+			]
+		})()
 	}
 	defaultSort={{
 		columnId: 'overall',
