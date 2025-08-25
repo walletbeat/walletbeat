@@ -1,4 +1,4 @@
-import { getCSpellWords, writeCSpellWords } from '../utils/cspell.ts'
+import { getCSpellWords, writeCSpellWords } from '../utils/cspell'
 
 const cSpellWords = getCSpellWords()
 

@@ -35,7 +35,8 @@
 
 	// Functions
 	import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
-	import { getVariantResolvedWallet, getVariants, walletSupportedAccountTypes } from '@/schema/wallet'
+	import { getVariantResolvedWallet, walletSupportedAccountTypes } from '@/schema/wallet'
+	import { getVariants } from '@/schema/variants'
 	import { isLabeledUrl } from '@/schema/url'
 	import { isAccountTypeSupported } from '@/schema/features/account-support'
 	import { refs } from '@/schema/reference'
