@@ -3,16 +3,18 @@ import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
-export const family: SoftwareWallet = {
+export const mtpelerin: SoftwareWallet = {
 	metadata: {
 		id: 'mtpelerin',
 		displayName: 'Bridge Wallet',
 		tableName: 'Bridge Wallet',
-		blurb: paragraph('TODOOOO: Powerful wallet for powerful users.'),
+		legalName: { name: 'Mt Pelerin Group SA', soundsDifferent: false },
+		blurb: paragraph('Buy, swap and sell crypto with the lowest fees, zero hidden costs and full control over your cryptoassets.'),
 		contributors: [sigri],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-26',
@@ -58,7 +60,7 @@ export const family: SoftwareWallet = {
 			},
 			walletCall: null,
 		},
-		license: null,
+		license: License.PROPRIETARY,
 		monetization: {
 			ref: true,
 			revenueBreakdownIsPublic: false,
@@ -69,7 +71,7 @@ export const family: SoftwareWallet = {
 				governanceTokenMostlyDistributed: null,
 				hiddenConvenienceFees: null,
 				publicOffering: null,
-				selfFunded: null,
+				selfFunded: true,
 				transparentConvenienceFees: null,
 				ventureCapital: null,
 			},
