@@ -7,6 +7,7 @@ import { elytro } from './software-wallets/elytro'
 import { family } from './software-wallets/family'
 import { frame } from './software-wallets/frame'
 import { metamask } from './software-wallets/metamask'
+import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
 import { phantom } from './software-wallets/phantom'
 import { rabby } from './software-wallets/rabby'
@@ -24,6 +25,7 @@ export const softwareWallets = {
 	family,
 	frame,
 	metamask,
+	mtpelerin,
 	nufi,
 	phantom,
 	rabby,
