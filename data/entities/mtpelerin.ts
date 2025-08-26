@@ -1,6 +1,6 @@
 import type { CorporateEntity, WalletDeveloper } from '@/schema/entity'
 
-export const nufi: CorporateEntity & WalletDeveloper = {
+export const mtpelerin: CorporateEntity & WalletDeveloper = {
 	id: 'mtpelerin',
 	name: 'Mt Pelerin',
 	legalName: { name: 'Mt Pelerin Group SA', soundsDifferent: false },
