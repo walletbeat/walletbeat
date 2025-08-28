@@ -93,6 +93,7 @@
 
 	a {
 		color: inherit;
+		font-weight: inherit;
 
 		&:hover {
 			color: var(--accent);
@@ -101,6 +102,7 @@
 
 		&[aria-current] {
 			background-color: var(--background-primary);
+			font-weight: 700;
 		}
 	}
 

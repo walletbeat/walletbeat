@@ -120,8 +120,9 @@ html.dark {
 }
 
 a {
-	color: var(--accent);
+	color: color-mix(in oklch, var(--text-primary) 33%, var(--accent));
 	text-decoration: none;
+	font-weight: 600;
 
 	&:hover {
 		text-decoration: underline;
