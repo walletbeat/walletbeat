@@ -35,6 +35,7 @@
 			labelRadius: number
 			gap: number
 			level: number
+			offset: number
 		}
 		children?: ComputedSlice[]
 	}
@@ -428,7 +429,7 @@
 
 			.slice {
 				--slice-scale: 1;
-				--slice-offset: 1;
+				--slice-offset: 0;
 
 				transform-origin: 0 0;
 				cursor: pointer;
