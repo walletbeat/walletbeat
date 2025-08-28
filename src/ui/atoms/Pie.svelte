@@ -480,9 +480,9 @@
 					dominant-baseline: central;
 					fill: currentColor;
 					stroke: none;
-					font-size: 10px;
+					font-size: 0.725em;
 					pointer-events: none;
-					translate: 0 calc(var(--slice-labelRadius) * -1px);
+					translate: 0 calc(var(--slice-labelRadius) * 1.075 * -1px);
 					rotate: calc(var(--slice-midAngle) * -1deg);
 					transition-property: filter;
 				}
