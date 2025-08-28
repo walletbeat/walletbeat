@@ -345,7 +345,7 @@
 									id: attribute.id,
 									color: ratingToColor(evalAttr.evaluation.value.rating),
 									weight: 1,
-									arcLabel: '',
+									arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
 									tooltip: attribute.displayName,
 									tooltipValue: evalAttr.evaluation.value.rating,
 									href: `#${slugifyCamelCase(attribute.id)}`,
@@ -1061,6 +1061,8 @@
 		> .attributes-pie {
 			display: flex;
 			align-items: center;
+
+			font-size: 2.5em;
 		}
 
 		> .attributes-list {
