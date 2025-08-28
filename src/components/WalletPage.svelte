@@ -121,10 +121,10 @@
 
 	// Styles
 	const ratingIconMap = {
-		[Rating.PASS]: '✓',
+		[Rating.PASS]: '✅',
 		[Rating.PARTIAL]: '⚠️',
-		[Rating.FAIL]: '✗',
-		[Rating.UNRATED]: '?',
+		[Rating.FAIL]: '❌',
+		[Rating.UNRATED]: '❓',
 		[Rating.EXEMPT]: '○',
 	}
 </script>
@@ -1551,67 +1551,6 @@
 				&:hover {
 					transform: translateY(-2px);
 					box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-				}
-
-				&[data-type='ledger'] {
-					&::before {
-						content: '🔵';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(0, 82, 255, 0.1);
-					border-color: rgba(0, 82, 255, 0.3);
-				}
-
-				&[data-type='trezor'] {
-					&::before {
-						content: '🟣';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(99, 0, 226, 0.1);
-					border-color: rgba(99, 0, 226, 0.3);
-				}
-
-				&[data-type='gridplus'] {
-					&::before {
-						content: '🟢';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(0, 168, 98, 0.1);
-					border-color: rgba(0, 168, 98, 0.3);
-				}
-
-				&[data-type='keystone'] {
-					&::before {
-						content: '🟠';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(255, 123, 0, 0.1);
-					border-color: rgba(255, 123, 0, 0.3);
-				}
-
-				&[data-type='keepkey'] {
-					&::before {
-						content: '🔘';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(128, 128, 128, 0.1);
-					border-color: rgba(128, 128, 128, 0.3);
-				}
-
-				&[data-type='firefly'] {
-					&::before {
-						content: '🔴';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(255, 59, 48, 0.1);
-					border-color: rgba(255, 59, 48, 0.3);
-				}
-
-				&[data-type='other'] {
-					&::before {
-						content: '⚪';
-						font-size: 0.9rem;
-					}
 				}
 			}
 		}
