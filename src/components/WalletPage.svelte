@@ -765,6 +765,8 @@
 			/ auto 1fr;
 		gap: 1rem;
 
+		line-height: 1.6;
+
 		position: relative;
 
 		@supports not (scroll-marker-group: before) {
