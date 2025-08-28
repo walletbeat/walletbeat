@@ -124,8 +124,8 @@
 		[Rating.PASS]: '✅',
 		[Rating.PARTIAL]: '⚠️',
 		[Rating.FAIL]: '❌',
-		[Rating.UNRATED]: '❓',
-		[Rating.EXEMPT]: '○',
+		[Rating.UNRATED]: 'ℹ️',
+		[Rating.EXEMPT]: '🆗',
 	}
 </script>
 
