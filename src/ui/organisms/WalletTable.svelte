@@ -11,7 +11,7 @@
 	import type { Column } from '@/lib/DataTable.svelte'
 	import type { Filter } from '@/ui/molecules/Filters.svelte'
 	import type { RatedWallet } from '@/schema/wallet'
-	import { type AttributeGroup, Rating } from '@/schema/attributes'
+	import { type AttributeGroup, Rating, ratingIcons } from '@/schema/attributes'
 	import { Variant } from '@/schema/variants'
 	import { variants } from '@/components/variants'
 	import { AccountType } from '@/schema/features/account-support'
@@ -115,7 +115,7 @@
 	import { walletSupportedAccountTypes, attributeVariantSpecificity, VariantSpecificity } from '@/schema/wallet'
 	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
 	import { isLabeledUrl } from '@/schema/url'
-	import { evaluatedAttributesEntries, ratingToIcon, ratingToColor } from '@/schema/attributes'
+	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 
 
@@ -745,7 +745,7 @@
 													weight: 1,
 													arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
 													tooltip: `${attribute.attribute.displayName}`,
-													tooltipValue: ratingToIcon(attribute.evaluation.value.rating),
+													tooltipValue: ratingIcons[attribute.evaluation.value.rating],
 												}))
 										),
 									},
@@ -946,7 +946,7 @@
 										weight: 1,
 										arcLabel: icon,
 										tooltip: `${icon} ${attribute.evaluation.value.displayName}${tooltipSuffix}`,
-										tooltipValue: ratingToIcon(attribute.evaluation.value.rating),
+										tooltipValue: ratingIcons[attribute.evaluation.value.rating],
 									}
 								}
 							)

@@ -7,6 +7,7 @@
 		type AttributeGroup,
 		type Attribute,
 		type EvaluatedGroup,
+		ratingIcons,
 	} from '@/schema/attributes'
 	import { VariantSpecificity } from '@/schema/wallet'
 	import { getSingleVariant, type Variant } from '@/schema/variants'
@@ -116,16 +117,6 @@
 		)
 
 		pickedVariant = variant
-	}
-
-
-	// Styles
-	const ratingIconMap = {
-		[Rating.PASS]: '✅',
-		[Rating.PARTIAL]: '⚠️',
-		[Rating.FAIL]: '❌',
-		[Rating.UNRATED]: 'ℹ️',
-		[Rating.EXEMPT]: '🆗',
 	}
 </script>
 
@@ -521,7 +512,7 @@
 
 			<div class="rating-display" data-rating={evalAttr.evaluation.value.rating.toLowerCase()}>
 				<div class="rating-icon">
-					{ratingIconMap[evalAttr.evaluation.value.rating as Rating]}
+					{ratingIcons[evalAttr.evaluation.value.rating]}
 				</div>
 				<div class="rating-content">
 					{#if isTypographicContent(evalAttr.evaluation.details)}
@@ -646,7 +637,7 @@
 
 										<ul>
 											{#if attribute.ratingScale.pass}
-												<li data-icon={ratingIconMap[Rating.PASS]}>
+												<li data-icon={ratingIcons[Rating.PASS]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,
@@ -666,7 +657,7 @@
 											{/if}
 
 											{#if attribute.ratingScale.partial}
-												<li data-icon={ratingIconMap[Rating.PARTIAL]}>
+												<li data-icon={ratingIcons[Rating.PARTIAL]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,
@@ -686,7 +677,7 @@
 											{/if}
 
 											{#if attribute.ratingScale.fail}
-												<li data-icon={ratingIconMap[Rating.FAIL]}>
+												<li data-icon={ratingIcons[Rating.FAIL]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,

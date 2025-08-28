@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import { type EvaluatedAttribute, ratingToIcon } from '@/schema/attributes'
+	import { type EvaluatedAttribute, ratingIcons } from '@/schema/attributes'
 	import { attributeVariantSpecificity, VariantSpecificity, type RatedWallet } from '@/schema/wallet'
 	import type { Variant } from '@/schema/variants'
 
@@ -35,7 +35,7 @@
 	</h4>
 
 	<p>
-		{ratingToIcon(attribute.evaluation.value.rating)}
+		{ratingIcons[attribute.evaluation.value.rating]}
 
 		<Typography
 			content={attribute.evaluation.value.shortExplanation}
