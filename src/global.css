@@ -37,11 +37,11 @@
 	--hashtag-bg-hover: light-dark(rgba(25, 118, 210, 0.12), rgba(144, 202, 249, 0.12));
 
 	/* Rating colors */
-	--rating-pass: oklch(0.75 0.18 152.32);
-	--rating-fail: oklch(0.63 0.19 29.44);
-	--rating-partial: oklch(0.84 0.17 91.75);
+	--rating-pass: light-dark(oklch(0.81 0.22 152.32), oklch(0.75 0.18 152.32));
+	--rating-fail: light-dark(oklch(0.69 0.23 29.44), oklch(0.63 0.19 29.44));
+	--rating-partial: light-dark(oklch(0.90 0.21 91.75), oklch(0.84 0.17 91.75));
 	--rating-neutral: #bdc3c7;
-	--rating-unrated: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.2));
+	--rating-unrated: light-dark(oklch(0.75 0.02 244.87), oklch(0.67 0.01 264.61));
 }
 
 .text-accent {
