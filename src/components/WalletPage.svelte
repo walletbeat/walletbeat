@@ -397,10 +397,9 @@
 								>
 									<span>{attribute.displayName}</span>
 									<data
-										class="rating-{evalAttr.evaluation.value.rating.toLowerCase()}"
+										class="rating"
 										value={evalAttr.evaluation.value.rating}
-										>{evalAttr.evaluation.value.rating}</data
-									>
+									>{evalAttr.evaluation.value.rating}</data>
 								</a>
 							</li>
 						{/each}
@@ -463,16 +462,23 @@
 		>
 			<summary>
 				<header>
-					<h3 data-icon={attribute.icon}>{attribute.displayName}</h3>
+					<div>
+						<h3 data-icon={attribute.icon}>{attribute.displayName}</h3>
 
-					{#if attribute.question}
-						<div class="subsection-caption">
-							<Typography
-								content={attribute.question}
-								strings={{ WALLET_NAME: wallet.metadata.displayName }}
-							/>
-						</div>
-					{/if}
+						{#if attribute.question}
+							<div class="subsection-caption">
+								<Typography
+									content={attribute.question}
+									strings={{ WALLET_NAME: wallet.metadata.displayName }}
+								/>
+							</div>
+						{/if}
+					</div>
+					
+					<data
+						class="rating"
+						value={evalAttr.evaluation.value.rating}
+					>{evalAttr.evaluation.value.rating}</data>
 				</header>
 
 				{#if relevantVariants.length === 1}
@@ -1110,14 +1116,6 @@
 						flex-shrink: 0;
 						background-color: var(--accent);
 					}
-
-					data {
-						font-size: 0.75rem;
-						font-weight: 500;
-						padding: 0.25rem 0.5rem;
-						border-radius: var(--border-radius-sm);
-						background-color: color-mix(in srgb, var(--accent) 25%, transparent);
-					}
 				}
 			}
 
@@ -1129,6 +1127,14 @@
 				padding: 2rem 0;
 			}
 		}
+	}
+
+	.rating {
+		font-size: 0.75rem;
+		font-weight: 500;
+		padding: 0.25rem 0.5rem;
+		border-radius: var(--border-radius-sm);
+		background-color: color-mix(in srgb, var(--accent) 25%, transparent);
 	}
 
 	.attribute {
@@ -1208,12 +1214,21 @@
 				justify-content: space-between;
 				align-items: center;
 
-				header {
-					display: grid;
+				> header {
+					flex-grow: 1;
+
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
 					gap: 0.5rem;
 
-					h3 {
-						font-weight: 600;
+					> div {
+						display: grid;
+						gap: 0.5rem;
+
+						h3 {
+							font-weight: 600;
+						}
 					}
 				}
 			}
