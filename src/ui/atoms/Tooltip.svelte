@@ -173,6 +173,11 @@
 	}
 
 	[popover] {
+		--popover-backgroundColor: light-dark(rgba(255, 255, 255, 0.95), rgba(0, 0, 0, 0.95));
+		--popover-borderColor: var(--border-color);
+		--popover-borderWidth: 1px;
+		--popover-boxShadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
+
 		position: absolute;
 		position-visibility: anchors-visible;
 		position-area: block-end;
@@ -181,12 +186,12 @@
 
 		margin: var(--offset);
 
-		background: rgba(0, 0, 0, 0.95);
+		background-color: var(--popover-backgroundColor);
 		border-radius: 0.5rem;
 		padding: 1rem;
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		border: var(--popover-borderWidth) solid var(--popover-borderColor);
 		backdrop-filter: blur(10px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+		box-shadow: var(--popover-boxShadow);
 
 		transition-property: display, content-visibility, opacity, scale;
 
