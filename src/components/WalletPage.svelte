@@ -754,7 +754,8 @@
 <style>
 	.container {
 		--wallet-icon-size: 3rem;
-		--border-radius: 0.375rem;
+		--border-radius-lg: 1rem;
+		--border-radius: 0.5rem;
 		--border-radius-sm: 0.25rem;
 		--nav-width: 20rem;
 
@@ -1041,7 +1042,7 @@
 
 	.attributes-overview {
 		background-color: var(--background-primary);
-		border-radius: var(--border-radius);
+		border-radius: var(--border-radius-lg);
 		padding: 1rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
@@ -1185,7 +1186,7 @@
 		> details {
 			display: grid;
 			padding: 1.5rem;
-			border-radius: var(--border-radius);
+			border-radius: var(--border-radius-lg);
 			border: 2px solid var(--accent);
 			background-color: var(--background-primary);
 			color: var(--text-primary);
