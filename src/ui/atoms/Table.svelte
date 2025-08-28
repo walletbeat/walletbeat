@@ -347,9 +347,9 @@
 
 <style>	
 	.container {
-		--table-backgroundColor: #22242b;
-		--table-outerBorderColor: rgba(20, 21, 25, 1);
-		--table-innerBorderColor: rgba(20, 21, 25, 1);
+		--table-backgroundColor: light-dark(#fdfdfd, #22242b);
+		--table-outerBorderColor: var(--border-color);
+		--table-innerBorderColor: color-mix(in oklch, var(--border-color) 50%, transparent);
 		--table-borderWidth: 1px;
 		--table-cornerRadius: 1rem;
 		--table-cell-verticalAlign: middle;
