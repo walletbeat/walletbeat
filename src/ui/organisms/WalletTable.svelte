@@ -1279,22 +1279,22 @@
 				aspect-ratio: 1;
 				padding: 0.33em;
 
-				background-color: transparent;
+				background-color: light-dark(rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.18));
 				border-radius: 50%;
 
 				transition-property: background-color, opacity;
 
 				&[data-selected] {
-					background-color: rgba(255, 255, 255, 0.1);
-					border-color: rgba(255, 255, 255, 0.33);
+					background-color: var(--accent-very-light);
+					border-color: light-dark(rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.33));
 				}
 
 				&:focus {
-					background-color: rgba(255, 255, 255, 0.15);
+					border-color: var(--accent);
 				}
 
 				&:hover:not(:disabled) {
-					background-color: rgba(255, 255, 255, 0.2);
+					filter: contrast(1.25) brightness(1.1);
 				}
 
 				&:disabled {
@@ -1302,7 +1302,7 @@
 				}
 
 				.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
-					opacity: 0.5;
+					opacity: 0.75;
 				}
 			}
 		}
