@@ -640,7 +640,7 @@
 
 										<ul>
 											{#if attribute.ratingScale.pass}
-												<li data-icon="✓">
+												<li data-icon={ratingIconMap[Rating.PASS]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,
@@ -660,7 +660,7 @@
 											{/if}
 
 											{#if attribute.ratingScale.partial}
-												<li data-icon="⚠️">
+												<li data-icon={ratingIconMap[Rating.PARTIAL]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,
@@ -680,7 +680,7 @@
 											{/if}
 
 											{#if attribute.ratingScale.fail}
-												<li data-icon="✗">
+												<li data-icon={ratingIconMap[Rating.FAIL]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,
