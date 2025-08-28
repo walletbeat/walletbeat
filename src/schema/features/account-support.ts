@@ -34,6 +34,9 @@ export enum AccountType {
 	 * smart contract code.
 	 */
 	rawErc4337 = 'rawErc4337',
+
+	/** Safe account type, behind a smart contract. */
+	safe = 'safe',
 }
 
 const allAccountTypes: NonEmptyArray<AccountType> = [
@@ -41,6 +44,7 @@ const allAccountTypes: NonEmptyArray<AccountType> = [
 	AccountType.mpc,
 	AccountType.rawErc4337,
 	AccountType.eip7702,
+	AccountType.safe,
 ]
 
 /** The ability (or lack thereof) to generate a transaction of a specific type. */
@@ -87,6 +91,9 @@ export type AccountSupport = Exclude<
 		 * address matches the contract code).
 		 */
 		rawErc4337: AccountTypeSupport<AccountType4337>
+
+		/** Support for Safe accounts. */
+		safe: AccountTypeSupport<AccountTypeSafe>
 	},
 	// At least one account type must be supported.
 	Record<AccountType, NotSupported>
@@ -214,3 +221,6 @@ export type AccountType4337 = AccountTypeMutableMultifactor & SmartAccountType
  * Support information for EIP-7702 accounts.
  */
 export type AccountType7702 = SmartAccountType
+
+/** Support information for Safe accounts. */
+export type AccountTypeSafe = SmartAccountType

@@ -177,6 +177,7 @@ export const ambire: SoftwareWallet = {
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
+			safe: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {

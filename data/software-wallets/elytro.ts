@@ -41,6 +41,7 @@ export const elytro: SoftwareWallet = {
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
+			safe: notSupported,
 		},
 		addressResolution: {
 			chainSpecificAddressing: {

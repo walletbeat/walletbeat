@@ -16,6 +16,7 @@ import {
 	type AccountTypeEoa,
 	type AccountTypeMpc,
 	type AccountTypeMutableMultifactor,
+	type AccountTypeSafe,
 	TransactionGenerationCapability,
 } from '@/schema/features/account-support'
 import { isSupported } from '@/schema/features/support'
@@ -789,7 +790,17 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			}
 		}
 
+		// If no recognized account types were evaluated but the wallet is a Safe,
+		// return an unrated value instead of throwing. The Safe account type is
+		// supported in the feature schema but not yet evaluated here.
 		if (!isNonEmptyArray(evaluations) || defaultEvaluation === null) {
+			if (
+				isSupported<AccountTypeSafe>(features.accountSupport.safe) &&
+				features.accountSupport.defaultAccountType === AccountType.safe
+			) {
+				return unrated(accountPortability, brand, null)
+			}
+
 			throw new Error('No account type evaluations; should be impossible from type system')
 		}
 
