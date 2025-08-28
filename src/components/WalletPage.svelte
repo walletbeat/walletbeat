@@ -755,21 +755,6 @@
 
 
 <style>
-	:global(a) {
-		color: var(--accent, var(--link, #0066cc));
-		text-decoration: none;
-		font-weight: 500;
-
-		&:hover {
-			text-decoration: underline;
-		}
-
-		&:focus {
-			outline: 2px solid var(--link, #0066cc);
-			outline-offset: 2px;
-		}
-	}
-
 	.container {
 		--wallet-icon-size: 3rem;
 		--border-radius: 0.375rem;
