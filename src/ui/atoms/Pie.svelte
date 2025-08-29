@@ -404,6 +404,12 @@
 
 
 <style>
+	@property --pie-rotate {
+		syntax: "<angle>";
+		inherits: true;
+		initial-value: 0turn;
+	}
+
 	.container {
 		--highlight-color: rgba(255, 255, 255, 1);
 		--highlight-stroke-width: 2;
@@ -436,7 +442,7 @@
 				will-change: transform;
 
 				transform:
-					rotate(calc(var(--slice-midAngle) * 1deg))
+					rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
 					scale(var(--slice-scale))
 					translateY(calc(var(--slice-offset) * -1px))
 				;
@@ -483,15 +489,15 @@
 					font-size: 0.725em;
 					pointer-events: none;
 					translate: 0 calc(var(--slice-labelRadius) * 1.075 * -1px);
-					rotate: calc(var(--slice-midAngle) * -1deg);
-					transition-property: filter;
+					rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
+					transition-property: translate, rotate, filter;
 				}
 				&:not(:hover, :focus) > .label {
 					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
 				}
 
 				> .slices {
-					transform: rotate(calc(var(--slice-midAngle) * -1deg));
+					transform: rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * -1deg));
 					transform-origin: 0 0;
 					will-change: transform;
 				}
