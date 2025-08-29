@@ -429,6 +429,7 @@
 		transform: translateZ(0);
 		will-change: transform;
 		backface-visibility: hidden;
+		transition-duration: 0.4s;
 
 		svg {
 			display: grid;
@@ -446,7 +447,7 @@
 					scale(var(--slice-scale))
 					translateY(calc(var(--slice-offset) * -1px))
 				;
-				transition: transform 0.2s ease-out;
+				transition-property: transform;
 
 				&:hover,
 				&:focus {
