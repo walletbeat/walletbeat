@@ -303,7 +303,7 @@
 			data-icon={attrGroup.icon}
 			style:--accent={score ? scoreToColor(score.score) : 'transparent'}
 		>
-			<header>
+			<header data-sticky>
 				<h2>{attrGroup.displayName}</h2>
 				<div class="section-controls">
 					{#if score}
@@ -327,84 +327,88 @@
 				</div>
 			{/if}
 
-			<section class="attributes-overview">
-				<div class="attributes-pie">
-					<Pie
-						layout={PieLayout.FullTop}
-						radius={120}
-						padding={20}
-						levels={[{
-							outerRadiusFraction: 0.95,
-							innerRadiusFraction: 0.125,
-							gap: 8,
-							angleGap: 0,
-						}]}
-						slices={
-							attributes
-								.map(({ attribute, evalAttr }) => ({
-									id: attribute.id,
-									color: ratingToColor(evalAttr.evaluation.value.rating),
-									weight: 1,
-									arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
-									tooltip: attribute.displayName,
-									tooltipValue: evalAttr.evaluation.value.rating,
-									href: `#${slugifyCamelCase(attribute.id)}`,
-								}))
-						}
-						highlightedSliceId={highlightedAttributeId}
-						onSliceMouseEnter={id => {
-							highlightedAttributeId = id
-						}}
-						onSliceMouseLeave={() => {
-							highlightedAttributeId = null
-						}}
-					>
-						{#snippet centerContentSnippet()}
-							<circle
-								r="8"
-								fill={score?.score ? scoreToColor(score.score) : 'var(--rating-unrated)'}
-							/>
-						{/snippet}
-					</Pie>
-				</div>
+			<div class="attributes-overview-container">
+				<section class="attributes-overview">
+					<div class="attributes-pie">
+						<Pie
+							layout={PieLayout.FullTop}
+							radius={120}
+							padding={20}
+							levels={[{
+								outerRadiusFraction: 0.95,
+								innerRadiusFraction: 0.125,
+								gap: 8,
+								angleGap: 0,
+							}]}
+							slices={
+								attributes
+									.map(({ attribute, evalAttr }) => ({
+										id: attribute.id,
+										color: ratingToColor(evalAttr.evaluation.value.rating),
+										weight: 1,
+										arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
+										tooltip: attribute.displayName,
+										tooltipValue: evalAttr.evaluation.value.rating,
+										href: `#${slugifyCamelCase(attribute.id)}`,
+									}))
+							}
+							highlightedSliceId={highlightedAttributeId}
+							onSliceMouseEnter={id => {
+								highlightedAttributeId = id
+							}}
+							onSliceMouseLeave={() => {
+								highlightedAttributeId = null
+							}}
+						>
+							{#snippet centerContentSnippet()}
+								<circle
+									r="8"
+									fill={score?.score ? scoreToColor(score.score) : 'var(--rating-unrated)'}
+								/>
+							{/snippet}
+						</Pie>
+					</div>
 
-				<div class="attributes-list">
-					<h3>Attribute Details:</h3>
+					<div class="attributes-list">
+						<h3>Attribute Details:</h3>
 
-					<ul>
-						{#each attributes as { attribute, evalAttr }}
-							{@const attributeUrl = `#${slugifyCamelCase(attribute.id)}`}
-							<li>
-								<a
-									href={attributeUrl}
-									style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
-									data-highlighted={highlightedAttributeId === attribute.id ? '' : undefined}
-									onmouseenter={() => {
-										highlightedAttributeId = attribute.id
-									}}
-									onmouseleave={() => {
-										highlightedAttributeId = null
-									}}
-								>
-									<span>{attribute.displayName}</span>
-									<data
-										class="rating"
-										value={evalAttr.evaluation.value.rating}
-									>{evalAttr.evaluation.value.rating}</data>
-								</a>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			</section>
+						<ul>
+							{#each attributes as { attribute, evalAttr }}
+								{@const attributeUrl = `#${slugifyCamelCase(attribute.id)}`}
+								<li>
+									<a
+										href={attributeUrl}
+										style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
+										data-highlighted={highlightedAttributeId === attribute.id ? '' : undefined}
+										onmouseenter={() => {
+											highlightedAttributeId = attribute.id
+										}}
+										onmouseleave={() => {
+											highlightedAttributeId = null
+										}}
+									>
+										<span>{attribute.displayName}</span>
+										<data
+											class="rating"
+											value={evalAttr.evaluation.value.rating}
+										>{evalAttr.evaluation.value.rating}</data>
+									</a>
+								</li>
+							{/each}
+						</ul>
+					</div>
+				</section>
+			</div>
 
-			{#each attributes as { attribute, evalAttr }}
-				{@render attributeSnippet({
-					attrGroupId: attrGroup.id,
-					attribute,
-					evalAttr,
-				})}
-			{/each}
+			<div class="attributes">
+				{#each attributes as { attribute, evalAttr }}
+					{@render attributeSnippet({
+						attrGroupId: attrGroup.id,
+						attribute,
+						evalAttr,
+					})}
+				{/each}
+			</div>
 		</section>
 	{/if}
 {/snippet}
@@ -934,6 +938,18 @@
 	}
 
 	.attribute-group {
+		&:has(.attribute:nth-of-type(1)) { --attributesCount: 1; }
+		&:has(.attribute:nth-of-type(2)) { --attributesCount: 2; }
+		&:has(.attribute:nth-of-type(3)) { --attributesCount: 3; }
+		&:has(.attribute:nth-of-type(4)) { --attributesCount: 4; }
+		&:has(.attribute:nth-of-type(5)) { --attributesCount: 5; }
+		&:has(.attribute:nth-of-type(6)) { --attributesCount: 6; }
+		&:has(.attribute:nth-of-type(7)) { --attributesCount: 7; }
+		&:has(.attribute:nth-of-type(8)) { --attributesCount: 8; }
+		&:has(.attribute:nth-of-type(9)) { --attributesCount: 9; }
+
+		timeline-scope: --AttributesViewTimeline;
+
 		display: grid;
 		gap: 1em;
 		scroll-margin-top: 3.5rem;
@@ -991,11 +1007,8 @@
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			position: relative;
+
 			padding-block: 1rem;
-			position: sticky;
-			top: 0;
-			z-index: 1;
 			background-color: color-mix(var(--background-secondary), transparent);
 
 			&::before {
@@ -1042,6 +1055,14 @@
 		}
 	}
 
+	.attributes-overview-container {
+		@supports (container-type: scroll-state) {
+			container-type: scroll-state;
+			position: sticky;
+			top: -1rem;
+		}
+	}
+
 	.attributes-overview {
 		background-color: var(--background-primary);
 		border-radius: var(--border-radius-lg);
@@ -1052,6 +1073,12 @@
 		grid-template-columns: auto 1fr;
 		gap: 1rem;
 		align-items: center;
+
+		transition-property: background-color;
+
+		@container not scroll-state(stuck: none) {
+			background-color: transparent;
+		}
 
 		@container (max-width: 600px) {
 			grid-template-columns: 1fr;
@@ -1068,6 +1095,15 @@
 		> .attributes-list {
 			display: grid;
 			gap: 0.75em;
+
+			transition-property: translate, scale, opacity;
+
+			@container not scroll-state(stuck: none) {
+				translate: 0 -2rem;
+				scale: 0.95;
+				opacity: 0;
+				pointer-events: none;
+			}
 
 			h3 {
 				font-size: 1rem;
@@ -1133,7 +1169,72 @@
 		background-color: color-mix(in srgb, var(--accent) 25%, transparent);
 	}
 
+	.attributes-pie {
+		animation:
+			AttributesPieAngleAnimation steps(var(--attributesCount), jump-end) forwards,
+			AttributesPieTransformAnimation var(--transition-easeOutExpo) both
+		;
+		animation-range:
+			entry 50% exit 50%,
+			entry 0% exit 100%
+		;
+		animation-timeline: --AttributesViewTimeline;
+	}
+
+	@keyframes AttributesPieAngleAnimation {
+		from {
+			--pie-rotate: calc(-0.25turn + 0.5turn / var(--attributesCount));
+		}
+		to {
+			--pie-rotate: calc(-0.25turn + 0.5turn / var(--attributesCount) + 1turn);
+		}
+		exit 100% {
+			--pie-rotate: 1turn;
+		}
+	}
+
+	@keyframes AttributesPieTransformAnimation {
+		entry 40% {
+			translate: 0px 0px;
+		}
+		entry 55% {
+			translate: calc(-50% - 1rem) calc(50vh - 50%);
+		}
+
+		exit 47.5% {
+			translate: calc(-50% - 1rem) calc(50vh - 50%);
+			scale: 1;
+			opacity: 1;
+		}
+		exit 75% {
+			opacity: 0;
+		}
+		exit 100% {
+			scale: 0;
+			translate: 0 0;
+		}
+	}
+
+	.attributes {
+		view-timeline: --AttributesViewTimeline block;
+
+		position: relative;
+		display: grid;
+		gap: 1em;
+
+		.attributes-pie {
+			position: sticky;
+			left: 0;
+			top: 50vh;
+			width: max-content;
+			height: 0;
+			translate: -50% -50%;
+		}
+	}
+
 	.attribute {
+		position: relative;
+
 		&::scroll-marker {
 			content: attr(data-icon) '\00a0\00a0' attr(aria-label);
 

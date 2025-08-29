@@ -492,6 +492,7 @@ span svg {
 
 	/* Rules */
 	z-index: 1;
+	container-type: scroll-state;
 
 	position: sticky;
 
