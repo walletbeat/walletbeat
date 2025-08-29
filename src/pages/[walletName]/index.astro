@@ -1,14 +1,16 @@
 ---
-// Astro settings
-export const prerender = true
+// Types/constants
+import { allRatedWallets } from '@/data/wallets'
+import { defaultNavigationItems } from '@/components/navigation'
 
-// Data
-import { allRatedWallets, isValidWalletName } from '@/data/wallets'
 
-// Utils
+// Functions
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
-// Params
+
+// Routes
+export const prerender = true
+
 export const getStaticPaths = () => [
 	...nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({
 		params: { walletName },
@@ -17,46 +19,39 @@ export const getStaticPaths = () => [
 
 const { walletName } = Astro.params
 
-// Derived
-const wallet = isValidWalletName(walletName) ? allRatedWallets[walletName] : null
 
-// Layouts
-import Layout from '@/layouts/Layout.astro'
+// Data
+const wallet = allRatedWallets[walletName]
+
 
 // Components
-import { WalletPage } from '@/components/WalletPage'
+import Layout from '@/layouts/Layout.astro'
+import Navigation from '@/ui/organisms/Navigation.astro'
+import WalletPage from '@/components/WalletPage.svelte'
 ---
 
-{
-	wallet !== null ? (
-		<Layout
-			metadata={{
-				title: `${wallet.metadata.displayName} - Walletbeat`,
-				description: `How does ${wallet.metadata.displayName} stack up as an Ethereum wallet?`,
-				icons: [
-					{
-						url: `/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
-					},
-				],
-				keywordsBefore: [
-					wallet.metadata.id,
-					wallet.metadata.displayName,
-					`${wallet.metadata.id} wallet`,
-					`${wallet.metadata.displayName} wallet`,
-					'wallet',
-				],
-				keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
-			}}
-		>
-			<WalletPage {walletName} client:load />
-		</Layout>
-	) : (
-		<Layout
-			metadata={{
-				title: '404',
-			}}
-		>
-			<div>Invalid wallet name!</div>
-		</Layout>
-	)
-}
+<Layout
+	metadata={{
+		title: `${wallet.metadata.displayName} - Walletbeat`,
+		description: `How does ${wallet.metadata.displayName} stack up as an Ethereum wallet?`,
+		icons: [
+			{
+				url: `/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
+			},
+		],
+		keywordsBefore: [
+			wallet.metadata.id,
+			wallet.metadata.displayName,
+			`${wallet.metadata.id} wallet`,
+			`${wallet.metadata.displayName} wallet`,
+			'wallet',
+		],
+		keywordsAfter: ['ranking', 'reviews', 'security', 'privacy'],
+	}}
+>
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main>
+		<WalletPage {walletName} client:load />
+	</main>
+</Layout>

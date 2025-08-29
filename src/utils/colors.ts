@@ -1,15 +1,6 @@
-export const percentageToColor = (percentage: number): string => {
-	if (percentage >= 0.9) {
-		return 'bg-green-500'
-	}
-
-	if (percentage >= 0.7) {
-		return 'bg-orange-500'
-	}
-
-	if (percentage >= 0.3) {
-		return 'bg-yellow-500'
-	}
-
-	return 'bg-red-500'
-}
+export const scoreToColor = (score: number) => (
+	score <= 0.5 ?
+		`color-mix(in oklch, var(--rating-fail), var(--rating-partial) ${score * 200}%)`
+	:
+		`color-mix(in oklch, var(--rating-partial), var(--rating-pass) ${(score - 0.5) * 200}%)`
+)

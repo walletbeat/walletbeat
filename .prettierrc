@@ -4,7 +4,6 @@
 	"printWidth": 100,
 	"tabWidth": 2,
 	"semi": false,
-	"jsxSingleQuote": true,
 	"bracketSameLine": false,
 	"arrowParens": "avoid",
 	"endOfLine": "lf",

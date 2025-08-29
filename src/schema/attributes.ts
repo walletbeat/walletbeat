@@ -46,6 +46,14 @@ export enum Rating {
 	EXEMPT = 'EXEMPT',
 }
 
+export const ratingIcons = {
+	[Rating.PASS]: '✅',
+	[Rating.PARTIAL]: '⚠️',
+	[Rating.FAIL]: '❌',
+	[Rating.UNRATED]: 'ℹ️',
+	[Rating.EXEMPT]: '🆗',
+}
+
 /** Type predicate for `Rating`. */
 export function isRating(value: unknown): value is Rating {
 	return (
@@ -104,7 +112,9 @@ export function ratingToColor(rating: Rating): string {
 			return 'var(--rating-partial)'
 		case Rating.FAIL:
 			return 'var(--rating-fail)'
-		default:
+		case Rating.UNRATED:
+			return 'var(--rating-unrated)'
+		case Rating.EXEMPT:
 			return 'var(--rating-neutral)'
 	}
 }

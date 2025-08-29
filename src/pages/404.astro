@@ -1,25 +1,45 @@
 ---
-// Constants
-import { betaSiteRoot } from '@/constants'
+// Types/constants
+import { defaultNavigationItems } from '@/components/navigation'
 
-// Layouts
-import Layout from '../layouts/Layout.astro'
 
 // Components
-import { IconLink } from '@/ui/atoms/IconLink'
-import { Typography } from '@mui/material'
-import HomeIcon from '@mui/icons-material/Home'
+import Layout from '../layouts/Layout.astro'
+import Navigation from '@/ui/organisms/Navigation.astro'
 ---
+
 
 <Layout
 	metadata={{
 		title: 'Page not found | Walletbeat',
 	}}
 >
-	<div class='max-w-full flex flex-col items-center'>
-		<div class='min-h-screen max-w-full flex flex-col items-center justify-center px-2'>
-			<Typography variant='h1' fontWeight={600} mt={1} maxWidth='90vw'> 404 </Typography>
-			<IconLink href={`${betaSiteRoot}/`} IconComponent={HomeIcon}> Home </IconLink>
-		</div>
-	</div>
+	<Navigation
+		navigationItems={defaultNavigationItems}
+	/>
+	
+	<main>
+		<h1>404</h1>
+
+		<p>Page not found.</p>
+
+		<a onclick="history.back()">← Go back</a>
+	</main>
 </Layout>
+
+
+<style>
+	main {
+		align-self: stretch;
+
+		display: grid;
+		align-content: center;
+		gap: 1rem;
+
+		text-align: center;
+
+		h1 {
+			font-size: 6em;
+		}
+	}
+</style>

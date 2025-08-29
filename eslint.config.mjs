@@ -1,7 +1,6 @@
 import eslint from '@eslint/js'
 import eslintPluginImport from 'eslint-plugin-import'
 import eslintPluginPrettier from 'eslint-plugin-prettier'
-import react from 'eslint-plugin-react'
 import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort'
 import eslintPluginSortKeysCustomOrder from 'eslint-plugin-sort-keys-custom-order'
 import eslintPluginUnusedImports from 'eslint-plugin-unused-imports'
@@ -43,10 +42,8 @@ export default tseslint.config(
 					},
 				},
 			},
-	react.configs.flat.recommended,
-	react.configs.flat['jsx-runtime'],
 	{
-		files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
+		files: ['**/*.{js,mjs,cjs,ts}'],
 		languageOptions: {
 			globals: {
 				...globals.browser,
@@ -54,19 +51,12 @@ export default tseslint.config(
 			ecmaVersion: 'latest',
 			sourceType: 'module',
 		},
-		settings: {
-			react: {
-				version: 'detect',
-			},
-		},
 		plugins: {
 			import: eslintPluginImport,
 			'simple-import-sort': eslintPluginSimpleImportSort,
 			'unused-imports': eslintPluginUnusedImports,
 		},
 		rules: {
-			// React rules
-			'react/display-name': 'off',
 			'prefer-destructuring': 'off',
 
 			'no-unused-vars': 'off',
@@ -153,7 +143,7 @@ export default tseslint.config(
 		},
 	},
 	{
-		files: ['data/**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
+		files: ['data/**/*.{js,mjs,cjs,ts}'],
 		plugins: { 'sort-keys-custom-order': eslintPluginSortKeysCustomOrder },
 		rules: {
 			'sort-keys-custom-order/object-keys': [

@@ -1,13 +1,92 @@
 ---
+// Constants
+import { defaultNavigationItems } from '@/components/navigation'
+import { ratedSoftwareWallets } from '@/data/software-wallets'
+import { ratedHardwareWallets } from '@/data/hardware-wallets'
+
+import { attributeTree } from '@/schema/attribute-groups'
+
+const attributeGroups = Object.values(attributeTree)
+
+// Layouts
 import Layout from '../layouts/Layout.astro'
-import { HomePage } from '../components/HomePage'
+
+// Components
+import Navigation from '@/ui/organisms/Navigation.astro'
+import WalletTable from '@/ui/organisms/WalletTable.svelte'
 ---
 
 <Layout
 	metadata={{
 		title: 'Walletbeat',
 	}}
-	rewriteUrlTo='/wallet/summary/'
 >
-	<HomePage client:load selectedGroupId='wallet' />
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container>
+		<header data-sticky='inline'>
+			<h1>Who watches the wallets?</h1>
+
+			<p>
+				Beta version. For content contributions, please see <a
+					href='https://github.com/walletbeat/walletbeat'
+					target='_blank'
+					rel='noreferrer'
+					>GitHub</a
+				>.
+			</p>
+		</header>
+
+		<section>
+			<WalletTable
+				client:load
+				title='Software Wallets'
+				wallets={Object.values(ratedSoftwareWallets)}
+				{attributeGroups}
+			/>
+		</section>
+
+		<section>
+			<WalletTable
+				client:load
+				title='Hardware Wallets'
+				wallets={Object.values(ratedHardwareWallets)}
+				{attributeGroups}
+			/>
+		</section>
+	</main>
 </Layout>
+
+<style>
+	main {
+		container-type: inline-size;
+
+		> header {
+			background:
+				linear-gradient(to right, var(--background-primary) 33cqi, transparent 125%),
+				url('./robot.png') 98% 1rem / clamp(12rem, 24cqi, 20rem) no-repeat;
+
+			padding: clamp(1.5rem, 8cqi, 12rem) clamp(1.5rem, 6cqi, 2rem);
+
+			text-shadow:
+				0 0 1em var(--background-primary),
+				0 0 2em var(--background-primary),
+				0 0 3em var(--background-primary);
+
+			h1 {
+				font-size: clamp(1.5em, 5cqi, 3em);
+				font-weight: 800;
+				color: var(--accent);
+				margin: 0 0 1rem 0;
+				line-height: 1.1;
+			}
+
+			p {
+				font-size: smaller;
+				color: var(--text-secondary);
+				line-height: 1.6;
+				margin: 0;
+			}
+		}
+	}
+</style>
