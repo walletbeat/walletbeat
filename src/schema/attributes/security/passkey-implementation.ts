@@ -197,6 +197,31 @@ function webAuthnSolImplementation(
 	}
 }
 
+function zeroDevImplementation(
+	support: PasskeyVerificationSupport,
+): Evaluation<PasskeyImplementationValue> {
+	return {
+		value: {
+			id: 'zero_dev_implementation',
+			rating: Rating.PASS,
+			displayName: 'Audited passkey implementation (ZeroDev)',
+			shortExplanation: mdSentence(
+				'{{WALLET_NAME}} implements passkeys using ZeroDev infrastructure.',
+			),
+			library: PasskeyVerificationLibrary.ZERO_DEV,
+			libraryUrl:
+				support.libraryUrl !== undefined && support.libraryUrl !== ''
+					? support.libraryUrl
+					: 'https://github.com/zerodevapp/kernel',
+			__brand: brand,
+		},
+		details: mdParagraph(
+			'{{WALLET_NAME}} implements passkeys using ZeroDev, a secure account abstraction infrastructure. ZeroDev provides comprehensive smart account functionality with passkey support, leveraging battle-tested verification libraries and modular account standards for secure authentication.',
+		),
+		howToImprove: undefined,
+	}
+}
+
 export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 	id: 'passkeyImplementation',
 	icon: '\u{1F5F9}', // Check mark
@@ -227,6 +252,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			- [Daimo P256 verifier](https://github.com/daimo-eth/p256-verifier)
 			- [OpenZeppelin P256 verifier](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol)
 			- [WebAuthn.sol](https://github.com/base/webauthn-sol) which falls back to Fresh Crypto Lib
+			- [ZeroDev](https://github.com/zerodevapp/kernel) secure account abstraction infrastructure
 
 		2. **Partial**: Using libraries that work but are less optimal:
 			- [Fresh Crypto Lib](https://github.com/rdubois-crypto/FreshCryptoLib)
@@ -266,6 +292,15 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 					library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
 					libraryUrl:
 						'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
+				}).value,
+			),
+			exampleRating(
+				mdParagraph(
+					'The wallet implements passkeys using [ZeroDev](https://github.com/zerodevapp/kernel), a secure account abstraction infrastructure with comprehensive passkey support.',
+				),
+				zeroDevImplementation({
+					library: PasskeyVerificationLibrary.ZERO_DEV,
+					libraryUrl: 'https://github.com/zerodevapp/kernel',
 				}).value,
 			),
 		],
@@ -355,6 +390,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 					return freshCryptoLibImplementation(withoutRefs)
 				case PasskeyVerificationLibrary.WEB_AUTHN_SOL:
 					return webAuthnSolImplementation(withoutRefs)
+				case PasskeyVerificationLibrary.ZERO_DEV:
+					return zeroDevImplementation(withoutRefs)
 				case PasskeyVerificationLibrary.OTHER:
 					return otherPasskeyImplementation(withoutRefs)
 				default:
