@@ -39,7 +39,7 @@ if [[ "$GOT_HASH" != "$SHA512" ]]; then
 	echo "Corrupt or malicious archive at '$EXPECTED_PATH'." >&2
 	exit 1
 fi
-HELIOS_TEMP_DIR="$(mktemp -d --tmpdir=/dev/shm "helios-${HELIOS_VERSION}-${ARCH}.XXXXXX")"
+HELIOS_TEMP_DIR="$(mktemp -d "helios-${HELIOS_VERSION}-${ARCH}.XXXXXX")"
 tar -C "$HELIOS_TEMP_DIR" -xf "$EXPECTED_PATH"
 if [[ ! -x "$HELIOS_TEMP_DIR/helios" ]]; then
 	echo "Missing executable in Helios archive." >&2

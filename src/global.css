@@ -37,11 +37,11 @@
 	--hashtag-bg-hover: light-dark(rgba(25, 118, 210, 0.12), rgba(144, 202, 249, 0.12));
 
 	/* Rating colors */
-	--rating-pass: oklch(0.75 0.18 152.32);
-	--rating-fail: oklch(0.63 0.19 29.44);
-	--rating-partial: oklch(0.84 0.17 91.75);
+	--rating-pass: light-dark(oklch(0.81 0.22 152.32), oklch(0.75 0.18 152.32));
+	--rating-fail: light-dark(oklch(0.69 0.23 29.44), oklch(0.63 0.19 29.44));
+	--rating-partial: light-dark(oklch(0.90 0.21 91.75), oklch(0.84 0.17 91.75));
 	--rating-neutral: #bdc3c7;
-	--rating-unrated: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.2));
+	--rating-unrated: light-dark(oklch(0.75 0.02 244.87), oklch(0.67 0.01 264.61));
 }
 
 .text-accent {
@@ -120,8 +120,9 @@ html.dark {
 }
 
 a {
-	color: var(--accent);
+	color: color-mix(in oklch, var(--text-primary) 33%, var(--accent));
 	text-decoration: none;
+	font-weight: 600;
 
 	&:hover {
 		text-decoration: underline;
@@ -136,6 +137,16 @@ hr {
 
 strong {
 	font-weight: 600;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	text-box: trim-both auto;
+	text-wrap: balance;
 }
 
 details {
@@ -297,6 +308,25 @@ span svg {
 	padding: 16px;
 }
 
+.badge {
+	padding: 0.25em 0.5em;
+	border-radius: 0.25em;
+	background-color: color-mix(in srgb, var(--accent) 33%, transparent);
+
+	&[data-badge-size='small'] {
+		font-size: 0.75em;
+		font-weight: 500;
+	}
+
+	&[data-badge-size='medium'] {
+		font-size: 0.9em;
+	}
+
+	&[data-badge-size='large'] {
+		font-size: 1.25em;
+	}
+}
+
 .tag {
 	--tag-backgroundColor: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
 	--tag-textColor: light-dark(var(--accent), rgb(187, 147, 255));
@@ -335,6 +365,60 @@ span svg {
 			transform: translateY(0);
 			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 		}
+	}
+
+	&[data-tag-variant='wallet-type'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.00 0), oklch(0.25 0.00 0));
+		--tag-textColor: light-dark(oklch(0.65 0.00 0), oklch(0.80 0.00 0));
+		--tag-borderColor: light-dark(oklch(0.90 0.00 0), oklch(0.40 0.00 0));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.00 0), oklch(0.30 0.00 0));
+		--tag-hover-textColor: light-dark(oklch(0.60 0.00 0), oklch(0.85 0.00 0));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.00 0), oklch(0.50 0.00 0));
+	}
+
+	&[data-tag-variant='account-type'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
+		--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.70 0.25 145));
+		--tag-borderColor: light-dark(oklch(0.90 0.06 145), oklch(0.40 0.08 145));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
+		--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
+	}
+
+	&[data-tag-variant='eip'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
+		--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.70 0.25 300));
+		--tag-borderColor: light-dark(oklch(0.90 0.06 300), oklch(0.40 0.08 300));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.30 0.07 300));
+		--tag-hover-textColor: light-dark(oklch(0.60 0.18 300), oklch(0.85 0.15 300));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.50 0.10 300));
+	}
+
+	&[data-tag-variant='eip-status'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 250), oklch(0.25 0.05 250));
+		--tag-textColor: light-dark(oklch(0.65 0.15 250), oklch(0.70 0.25 250));
+		--tag-borderColor: light-dark(oklch(0.90 0.06 250), oklch(0.40 0.08 250));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 250), oklch(0.30 0.07 250));
+		--tag-hover-textColor: light-dark(oklch(0.60 0.18 250), oklch(0.85 0.15 250));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 250), oklch(0.50 0.10 250));
+	}
+
+	&[data-tag-variant='manufacture-type'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 290), oklch(0.25 0.05 290));
+		--tag-textColor: light-dark(oklch(0.65 0.15 290), oklch(0.70 0.25 290));
+		--tag-borderColor: light-dark(oklch(0.90 0.06 290), oklch(0.40 0.08 290));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 290), oklch(0.30 0.07 290));
+		--tag-hover-textColor: light-dark(oklch(0.60 0.18 290), oklch(0.85 0.15 290));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 290), oklch(0.50 0.10 290));
+	}
+
+	&[data-tag-variant='eoa'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
+		--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.70 0.25 145));
+		--tag-borderColor: light-dark(oklch(0.90 0.06 145), oklch(0.40 0.08 145));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
+		--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
 	}
 }
 
@@ -475,12 +559,13 @@ span svg {
 
 [data-sticky] {
 	/* Inputs */
-	--sticky-backgroundColor: light-dark(#efefefcc, #141414cc);
-	--sticky-backdropFilter: blur(8px);
+	--sticky-backgroundColor: light-dark(#efefef66, #14141488);
+	--sticky-backdropFilter: blur(20px);
 	--sticky-backdropMaskImage: none;
 
 	/* Rules */
 	z-index: 1;
+	container-type: scroll-state;
 
 	position: sticky;
 
@@ -495,8 +580,15 @@ span svg {
 		inset-inline-end: var(--sticky-insetInlineEnd);
 	}
 
-	background-color: var(--sticky-backgroundColor);
-	backdrop-filter: var(--sticky-backdropFilter);
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-color: var(--sticky-backgroundColor);
+		backdrop-filter: var(--sticky-backdropFilter);
+		border-radius: inherit;
+		z-index: -1;
+	}
 }
 
 @view-transition {

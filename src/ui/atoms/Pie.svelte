@@ -20,7 +20,7 @@
 	export type LevelConfig = {
 		outerRadiusFraction: number
 		innerRadiusFraction: number
-		offset: number
+		offset?: number
 		gap: number
 		angleGap: number
 	}
@@ -35,6 +35,7 @@
 			labelRadius: number
 			gap: number
 			level: number
+			offset: number
 		}
 		children?: ComputedSlice[]
 	}
@@ -170,7 +171,7 @@
 		const innerAngleStart = startAngle + Math.asin((gap / 2) / innerRadius) * 180 / Math.PI * orientation
 		const innerStart = polarToCartesian(cx, cy, innerRadius, innerAngleStart)
 
-		const largeArcFlag = angleDiff > 180 ? 0 : 0
+		const largeArcFlag = angleDiff > 180 ? 1 : 0
 		const sweepFlag = orientation === 1 ? 1 : 0
 
 		// For equiangular pie slices with n slices (each with angle θ = 360°/n),
@@ -250,7 +251,6 @@
 					outerRadius,
 					innerRadius,
 					level,
-					labelRadius: (radius * levelConfig.outerRadiusFraction + radius * levelConfig.innerRadiusFraction) / 2,
 					offset: levelConfig.offset,
 					gap: levelConfig.gap,
 				},
@@ -323,7 +323,8 @@
 		style:--slice-midAngle={slice.computed.midAngle}
 		style:--slice-offset={slice.computed.offset}
 		style:--slice-gap={slice.computed.gap}
-		style:--slice-labelRadius={slice.computed.labelRadius}
+		style:--slice-outerRadius={slice.computed.outerRadius}
+		style:--slice-innerRadius={slice.computed.innerRadius}
 		style:--slice-path={`path("${slice.computed.path}")`}
 		style:--slice-fill={slice.color}
 		class:highlighted={highlightedSliceId === slice.id}
@@ -403,6 +404,12 @@
 
 
 <style>
+	@property --pie-rotate {
+		syntax: "<angle>";
+		inherits: true;
+		initial-value: 0turn;
+	}
+
 	.container {
 		--highlight-color: rgba(255, 255, 255, 1);
 		--highlight-stroke-width: 2;
@@ -422,24 +429,35 @@
 		transform: translateZ(0);
 		will-change: transform;
 		backface-visibility: hidden;
+		transition-duration: 0.4s;
 
 		svg {
 			display: grid;
 
 			.slice {
 				--slice-scale: 1;
-				--slice-offset: 1;
+				--slice-offset: 0;
+
+				/* Weighted average: 1/3 centroid distance + 2/3 midpoint radius for better visual balance */
+				--slice-labelRadius: calc(
+					1/3 * (
+						2/3 * (pow(var(--slice-outerRadius), 3) - pow(var(--slice-innerRadius), 3)) / (pow(var(--slice-outerRadius), 2) - pow(var(--slice-innerRadius), 2))
+					)
+					+ 2/3 * (
+						(var(--slice-outerRadius) + var(--slice-innerRadius)) / 2
+					)
+				);
 
 				transform-origin: 0 0;
 				cursor: pointer;
 				will-change: transform;
 
 				transform:
-					rotate(calc(var(--slice-midAngle) * 1deg))
+					rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
 					scale(var(--slice-scale))
 					translateY(calc(var(--slice-offset) * -1px))
 				;
-				transition: transform 0.2s ease-out;
+				transition-property: transform;
 
 				&:hover,
 				&:focus {
@@ -479,18 +497,18 @@
 					dominant-baseline: central;
 					fill: currentColor;
 					stroke: none;
-					font-size: 10px;
+					font-size: 0.725em;
 					pointer-events: none;
 					translate: 0 calc(var(--slice-labelRadius) * -1px);
-					rotate: calc(var(--slice-midAngle) * -1deg);
-					transition-property: filter;
+					rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
+					transition-property: translate, rotate, filter;
 				}
 				&:not(:hover, :focus) > .label {
 					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
 				}
 
 				> .slices {
-					transform: rotate(calc(var(--slice-midAngle) * -1deg));
+					transform: rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * -1deg));
 					transform-origin: 0 0;
 					will-change: transform;
 				}

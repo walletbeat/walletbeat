@@ -27,6 +27,8 @@
 		markdown: (
 			value.license === License.PROPRIETARY ?
 				`**{{WALLET_NAME}}** is licensed under a proprietary non-open-source license.`
+			: value.license === License.PROPRIETARY_SOURCE_AVAILABLE ?
+				`**{{WALLET_NAME}}** is licensed under a proprietary source-available non-FOSS license.`
 			: value.license === License.UNLICENSED_VISIBLE ?
 				`**{{WALLET_NAME}}** has no visible license information. Consequently, it should be assumed to be proprietary (not open-source).`
 			:

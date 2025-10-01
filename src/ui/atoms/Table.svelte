@@ -357,9 +357,9 @@
 
 <style>	
 	.container {
-		--table-backgroundColor: #22242b;
-		--table-outerBorderColor: rgba(20, 21, 25, 1);
-		--table-innerBorderColor: rgba(20, 21, 25, 1);
+		--table-backgroundColor: light-dark(#fdfdfd, #22242b);
+		--table-outerBorderColor: var(--border-color);
+		--table-innerBorderColor: color-mix(in oklch, var(--border-color) 50%, transparent);
 		--table-borderWidth: 1px;
 		--table-cornerRadius: 1rem;
 		--table-cell-verticalAlign: middle;
@@ -369,7 +369,7 @@
 
 		background-color: var(--table-backgroundColor);
 		box-shadow: 0 0 0 var(--table-borderWidth) var(--table-outerBorderColor) inset;
-		border-radius: var(--table-cornerRadius);
+		border-radius: calc(var(--table-cornerRadius) + var(--table-borderWidth));
 
 		clip-path: inset(
 			calc(-1 * var(--table-borderWidth))
@@ -383,7 +383,7 @@
 	table {
 		min-width: 100%;
 		width: max-content;
-		margin-inline: calc(-1 * var(--table-borderWidth));
+		/* margin-inline: calc(-1 * var(--table-borderWidth)); */
 
 		border-collapse: separate;
 		border-spacing: var(--table-borderWidth);
@@ -529,6 +529,20 @@
 						}
 					}
 				}
+
+				&:first-child {
+					border-start-start-radius: var(--table-cornerRadius) !important;
+					border-start-end-radius: var(--table-cornerRadius) !important;
+
+					th {
+						&:first-child {
+							border-start-start-radius: var(--table-cornerRadius) !important;
+						}
+						&:last-child {
+							border-start-end-radius: var(--table-cornerRadius) !important;
+						}
+					}
+				}
 			}
 		}
 
@@ -604,6 +618,22 @@
 					/* When sorting a non-sticky column, fade cells from other non-sticky columns */
 					tr:has(:not([data-is-sticky])[data-sort]) &[data-sortable]:not([data-sort], [data-is-sticky], :hover, :focus-within) {
 						opacity: 0.66;
+					}
+				}
+			}
+
+			&:last-child {
+				tr:last-child {
+					border-end-start-radius: var(--table-cornerRadius) !important;
+					border-end-end-radius: var(--table-cornerRadius) !important;
+
+					td {
+						&:first-child {
+							border-end-start-radius: var(--table-cornerRadius) !important;
+						}
+						&:last-child {
+							border-end-end-radius: var(--table-cornerRadius) !important;
+						}
 					}
 				}
 			}

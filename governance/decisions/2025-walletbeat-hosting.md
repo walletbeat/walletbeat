@@ -123,7 +123,7 @@ _Note: Fleek used to feature a free hosting tier which Walletbeat used for a whi
 
 Orbiter supports wallet-based sign up, but Orbiter accounts still need to have an **attached email address** which can be used to log in without access to the wallet keys. This means control over the email address grants control over the Orbiter account, and thus cannot be securely split across multiple people. This doesn't entirely rule out Orbiter, but does mean that additional mitigations need to be in place to account for the case where the Orbiter account is compromised. Specifically, this means we cannot rely on the Orbiter gateway (`*.orbiter.website`), as any compromise of either the Orbiter account or of the email address that controls it would be enough to permanently take over the site URL.
 
-Orbiter supports KYC-free crypto payments via [loopcrypto](https://loopcrypto.xyz/), making it possible for a multisig wallet to fund an Orbiter account.
+Orbiter supports KYC-free crypto payments via [LoopCrypto](https://loopcrypto.xyz/), making it possible for a multisig wallet to fund an Orbiter account.
 
 Orbiter relies by default on its own offchain resolver at `api.orbiter.host` for IPCM lookups. The multisig owning the ENS name can still override the ENS resolver record away from Orbiter in case of an Orbiter compromise, so the domain remains unruggable. However, this still means that in the non-compromise case, Orbiter is in a position to collect analytics about who is visiting the website based on queries to its resolver, even when browsing sites using a non-Orbiter IPFS gateway. This is not a huge deal for a non-sensitive, non-personalized website such as Walletbeat, but may be a dealbreaker for more sensitive websites.
 

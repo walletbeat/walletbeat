@@ -1,15 +1,25 @@
+<script module lang="ts">
+	export enum SummaryVisualization {
+		None = 'none',
+		Dot = 'dot',
+		Score = 'score',
+	}
+</script>
+
 <script lang="ts">
 	// Types/constants
 	import type { Column } from '@/lib/DataTable.svelte'
 	import type { Filter } from '@/ui/molecules/Filters.svelte'
 	import type { RatedWallet } from '@/schema/wallet'
-	import { type AttributeGroup, Rating } from '@/schema/attributes'
+	import { type AttributeGroup, Rating, ratingIcons } from '@/schema/attributes'
 	import { Variant } from '@/schema/variants'
 	import { variants } from '@/components/variants'
 	import { AccountType } from '@/schema/features/account-support'
 	import { HardwareWalletManufactureType } from '@/schema/features/profile'
 	import { erc4337 } from '@/data/eips/erc-4337'
 	import { eip7702 } from '@/data/eips/eip-7702'
+
+	import type { Snippet } from 'svelte'
 
 
 	// IDs
@@ -22,11 +32,13 @@
 		title,
 		wallets,
 		attributeGroups,
+		summaryVisualization = SummaryVisualization.Dot,
 	}: {
 		tableId?: string,
 		title?: string
 		wallets: RatedWallet[]
 		attributeGroups: AttributeGroup<any>[]
+		summaryVisualization?: SummaryVisualization
 	} = $props()
 
 	// (Derived)
@@ -105,9 +117,9 @@
 	import { variantUrlQuery, variantToName } from '@/components/variants'
 	import { hasVariant } from '@/schema/variants'
 	import { walletSupportedAccountTypes, attributeVariantSpecificity, VariantSpecificity } from '@/schema/wallet'
-	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
+	import { calculateAttributeGroupScore, calculateOverallScore, filterEvaluationTree } from '@/schema/attribute-groups'
 	import { isLabeledUrl } from '@/schema/url'
-	import { evaluatedAttributesEntries, ratingToIcon, ratingToColor } from '@/schema/attributes'
+	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 
 
@@ -130,6 +142,7 @@
 	// Components
 	import EipDetails from '@/ui/molecules/EipDetails.svelte'
 	import Filters from '@/ui/molecules/Filters.svelte'
+	import WalletOverallSummary from '@/ui/molecules/WalletOverallSummary.svelte'
 	import WalletAttributeGroupSummary from '@/ui/molecules/WalletAttributeGroupSummary.svelte'
 	import WalletAttributeSummary from '@/ui/molecules/WalletAttributeSummary.svelte'
 
@@ -321,34 +334,9 @@
 	displaceDisabledRows={true}
 
 	columns={
-		[
-			{
-				id: 'displayName',
-				name: 'Wallet',
-				getValue: wallet => (
-					wallet.metadata.displayName
-				),
-				isSticky: true,
-			} satisfies Column<RatedWallet>,
-			{
-				id: 'overall',
-				name: 'Rating',
-				getValue(wallet) {
-					// Calculate aggregate score across all attribute groups
-					const scores = (
-						this.children!
-							.map(column => column.getValue(wallet))
-							.filter(score => score !== undefined)
-					)
-
-					if (!scores.length) return undefined
-
-					return scores.reduce((sum, score) => sum + score, 0) / scores.length
-				},
-				defaultSortDirection: 'desc',
-				defaultIsExpanded: true,
-				children: (
-					displayedAttributeGroups
+		(() => {
+			const attrGroupColumns = (
+				displayedAttributeGroups
 						.map(attrGroup => ({
 							id: attrGroup.id,
 							// name: `${attrGroup.icon} ${attrGroup.displayName}`,
@@ -372,9 +360,44 @@
 									} satisfies Column<RatedWallet>))
 							),
 						} satisfies Column<RatedWallet>))
+			)
+
+			return [
+				{
+					id: 'displayName',
+					name: 'Wallet',
+					getValue: wallet => (
+						wallet.metadata.displayName
+					),
+					isSticky: true,
+				} satisfies Column<RatedWallet>,
+
+				(
+					attrGroupColumns.length > 1 ?
+						{
+							id: 'overall',
+							name: 'Rating',
+							getValue: wallet => (
+								calculateOverallScore(
+									filterEvaluationTree(
+										wallet.overall,
+										displayedAttributeGroups
+									)
+								)
+									?.score
+							),
+							defaultSortDirection: 'desc',
+							defaultIsExpanded: true,
+							children: (
+								attrGroupColumns
+							),
+						} satisfies Column<RatedWallet>
+
+					:
+						attrGroupColumns[0]
 				),
-			} satisfies Column<RatedWallet>,
-		]
+			]
+		})()
 	}
 	defaultSort={{
 		columnId: 'overall',
@@ -401,7 +424,7 @@
 			expandedContent,
 		}: {
 			content: Snippet
-			expandedContent: Snippet
+			expandedContent: Snippet<[{ isInTooltip?: boolean }]>
 		})}
 			<BlockTransition>
 				<details
@@ -421,13 +444,18 @@
 					<summary>
 						<Tooltip
 							isEnabled={!isExpanded}
+							style="
+								--popover-padding: 0;
+								--popover-backgroundColor: transparent;
+								--popover-borderColor: transparent;
+							"
 						>
 							{@render content()}
 
 							{#snippet tooltip()}
 								{#if !isExpanded}
 									<div class="expanded-tooltip-content">
-										{@render expandedContent()}
+										{@render expandedContent({ isInTooltip: true })}
 									</div>
 								{/if}
 							{/snippet}
@@ -439,7 +467,7 @@
 							class="expanded-content"
 							transition:fade={{ duration: 200, easing: expoOut }}
 						>
-							{@render expandedContent()}
+							{@render expandedContent({ isInTooltip: false })}
 						</div>
 					{/if}
 				</details>
@@ -579,12 +607,12 @@
 											{tag.label}
 										</button>
 									{/if}
-								{/each}
-							</div>
+							{/each}
 						</div>
 					</div>
+				</div>
 
-					{#if allSupportedVariants.length > 1}
+				{#if allSupportedVariants.length > 1}
 						<div
 							class="right"
 							style:view-transition-class="WalletTable__column-displayName__right"
@@ -699,7 +727,14 @@
 			{@const highlightedSliceId = selectedSliceId ?? activeSliceId}
 			<!-- Overall rating -->
 			{#if column.id === 'overall'}
-				{@const score = value}
+				{@const score = (
+					calculateOverallScore(
+						filterEvaluationTree(
+							wallet.overall,
+							displayedAttributeGroups
+						)
+					)
+				)}
 
 				{#snippet content()}
 					<Pie
@@ -738,10 +773,10 @@
 												.map(([attributeId, attribute]) => ({
 													id: `attrGroup_${attrGroup.id}__attr_${attributeId}`,
 													color: ratingToColor(attribute.evaluation.value.rating),
-													weight: 1,
+													weight: attrGroup.attributeWeights[attributeId],
 													arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
 													tooltip: `${attribute.attribute.displayName}`,
-													tooltipValue: ratingToIcon(attribute.evaluation.value.rating),
+													tooltipValue: ratingIcons[attribute.evaluation.value.rating],
 												}))
 										),
 									},
@@ -753,14 +788,14 @@
 						radius={80}
 						levels={[
 							{
-								outerRadiusFraction: 0.7,
-								innerRadiusFraction: 0.3,
+								outerRadiusFraction: summaryVisualization === SummaryVisualization.Score ? 0.7 : 0.65,
+								innerRadiusFraction: summaryVisualization === SummaryVisualization.Score ? 0.3 : 0.1,
 								gap: 4,
 								angleGap: 0
 							},
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.725,
+								innerRadiusFraction: summaryVisualization === SummaryVisualization.Score ? 0.725 : 0.675,
 								gap: 2,
 								angleGap: 0,
 							}
@@ -788,34 +823,46 @@
 						onSliceMouseLeave={sliceId => {
 							activeEntityId = undefined
 						}}
-						centerLabel={
-							score ?
-								`${
-									score === 0 ?
-										'\u{1f480}'
-									: score === 1 ?
-										'\u{1f4af}'
-									:
-										(score * 100).toFixed(0)
-								}${
-									(
-										displayedAttributeGroups
-											.some(attrGroup => (
-												calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
-													?.hasUnratedComponent
-											))
-									) ?
-										'*'
-									:
-										''
-								}`
-							:
-								'❓'
-						}
-					/>
+					>
+						{#snippet centerContentSnippet()}
+							{#if summaryVisualization === SummaryVisualization.Score}
+								<text>
+									{
+										score?.score !== undefined ?
+											`${
+												score.score === 0 ?
+													'\u{1f480}'
+												: score.score === 1 ?
+													'\u{1f4af}'
+												:
+													(score.score * 100).toFixed(0)
+											}${
+												score?.hasUnratedComponent ?
+													'*'
+												:
+													''
+											}`
+										:
+											'❓'
+									}
+								</text>
+							{:else if summaryVisualization === SummaryVisualization.Dot}
+								<circle
+									r="4"
+									fill={scoreToColor(score?.score)}
+								>
+									{#if score?.hasUnratedComponent}
+										<title>
+											*contains unrated components
+										</title>
+									{/if}
+								</circle>
+							{/if}
+						{/snippet}
+					</Pie>
 				{/snippet}
 
-				{#snippet expandedContent()}
+				{#snippet expandedContent({ isInTooltip }: { isInTooltip?: boolean })}
 					{@const displayedAttribute = (
 						activeEntityId?.walletId === wallet.metadata.id ?
 							activeEntityId.attributeId ?
@@ -845,15 +892,21 @@
 							{wallet}
 							attribute={displayedAttribute}
 							variant={selectedVariant}
+							showRating={true}
+							{isInTooltip}
 						/>
 					{:else if displayedGroup}
 						<WalletAttributeGroupSummary
 							{wallet}
 							attributeGroup={displayedGroup}
+							{isInTooltip}
 						/>
 					{:else}
-						<strong>{wallet.metadata.displayName}</strong>
-						<div>Overall Rating: {score ? (score * 100).toFixed(0) + '%' : 'N/A'}</div>
+						<WalletOverallSummary
+							{wallet}
+							{score}
+							{isInTooltip}
+						/>
 					{/if}
 				{/snippet}
 
@@ -891,7 +944,7 @@
 						levels={[
 							{
 								outerRadiusFraction: 1,
-								innerRadiusFraction: 0.3,
+								innerRadiusFraction: summaryVisualization === SummaryVisualization.Score ? 0.3 : 0.166,
 								gap: 3,
 								angleGap: 0
 							}
@@ -927,28 +980,15 @@
 									return {
 										id: `attrGroup_${attrGroup.id}__attr_${attributeId.toString()}`,
 										color: ratingToColor(attribute.evaluation.value.rating),
-										weight: 1,
+										weight: attrGroup.attributeWeights[attributeId],
 										arcLabel: icon,
 										tooltip: `${icon} ${attribute.evaluation.value.displayName}${tooltipSuffix}`,
-										tooltipValue: ratingToIcon(attribute.evaluation.value.rating),
+										tooltipValue: ratingIcons[attribute.evaluation.value.rating],
 									}
 								}
 							)
 						}
 						{highlightedSliceId}
-						centerLabel={
-							groupScore ?
-								`${
-									groupScore.score === 0 ?
-										'\u{1f480}'
-									: groupScore.score === 1 ?
-										'\u{1f4af}'
-									:
-										(groupScore.score * 100).toFixed(0)
-								}${groupScore.hasUnratedComponent ? '*' : ''}`
-							:
-								'❓'
-						}
 						onSliceClick={sliceId => {
 							const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 							
@@ -989,10 +1029,41 @@
 						onSliceBlur={sliceId => {
 							activeEntityId = undefined
 						}}
-					/>
+					>
+						{#snippet centerContentSnippet()}
+							{#if summaryVisualization === SummaryVisualization.Score}
+								<text>
+									{
+										groupScore?.score !== undefined ?
+											`${
+												groupScore.score === 0 ?
+													'\u{1f480}'
+												: groupScore.score === 1 ?
+													'\u{1f4af}'
+												:
+													(groupScore.score * 100).toFixed(0)
+											}${groupScore.hasUnratedComponent ? '*' : ''}`
+										:
+											'❓'
+									}
+								</text>
+							{:else if summaryVisualization === SummaryVisualization.Dot}
+								<circle
+									r="4"
+									fill={scoreToColor(groupScore?.score)}
+								>
+									{#if groupScore?.hasUnratedComponent}
+										<title>
+											*contains unrated components
+										</title>
+									{/if}
+								</circle>
+							{/if}
+						{/snippet}
+					</Pie>
 				{/snippet}
 
-				{#snippet expandedContent()}
+				{#snippet expandedContent({ isInTooltip }: { isInTooltip?: boolean })}
 					{@const displayedAttribute = (
 						activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id ?
 							evalGroup[activeEntityId.attributeId]
@@ -1007,11 +1078,14 @@
 							{wallet}
 							attribute={displayedAttribute}
 							variant={selectedVariant}
+							showRating={true}
+							{isInTooltip}
 						/>
 					{:else}
 						<WalletAttributeGroupSummary
 							{wallet}
 							attributeGroup={attrGroup}
+							{isInTooltip}
 						/>
 					{/if}
 				{/snippet}
@@ -1074,11 +1148,13 @@
 					/>
 				{/snippet}
 
-				{#snippet expandedContent()}
+				{#snippet expandedContent({ isInTooltip }: { isInTooltip?: boolean })}
 					<WalletAttributeSummary
 						{wallet}
 						attribute={attribute}
 						variant={selectedVariant}
+						showRating={false}
+						{isInTooltip}
 					/>
 				{/snippet}
 
@@ -1130,7 +1206,7 @@
 		}
 
 		.expanded-tooltip-content {
-			max-width: 13rem;
+			max-width: 16em;
 		}
 	}
 
@@ -1203,44 +1279,6 @@
 				display: flex;
 				flex-wrap: wrap;
 				gap: 0.25em;
-
-				.tag {
-					&[data-tag-type='wallet-type'] {
-						--tag-backgroundColor: light-dark(oklch(0.95 0.00 0), oklch(0.25 0.00 0));
-						--tag-textColor: light-dark(oklch(0.65 0.00 0), oklch(0.80 0.00 0));
-						--tag-borderColor: light-dark(oklch(0.90 0.00 0), oklch(0.40 0.00 0));
-						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.00 0), oklch(0.30 0.00 0));
-						--tag-hover-textColor: light-dark(oklch(0.60 0.00 0), oklch(0.85 0.00 0));
-						--tag-hover-borderColor: light-dark(oklch(0.85 0.00 0), oklch(0.50 0.00 0));
-					}
-
-					&[data-tag-type='account-type'] {
-						--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
-						--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.70 0.25 145));
-						--tag-borderColor: light-dark(oklch(0.90 0.06 145), oklch(0.40 0.08 145));
-						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
-						--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
-						--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
-					}
-
-					&[data-tag-type='eip'] {
-						--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
-						--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.70 0.25 300));
-						--tag-borderColor: light-dark(oklch(0.90 0.06 300), oklch(0.40 0.08 300));
-						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.30 0.07 300));
-						--tag-hover-textColor: light-dark(oklch(0.60 0.18 300), oklch(0.85 0.15 300));
-						--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.50 0.10 300));
-					}
-
-					&[data-tag-type='manufacture-type'] {
-						--tag-backgroundColor: light-dark(oklch(0.95 0.03 290), oklch(0.25 0.05 290));
-						--tag-textColor: light-dark(oklch(0.65 0.15 290), oklch(0.70 0.25 290));
-						--tag-borderColor: light-dark(oklch(0.90 0.06 290), oklch(0.40 0.08 290));
-						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 290), oklch(0.30 0.07 290));
-						--tag-hover-textColor: light-dark(oklch(0.60 0.18 290), oklch(0.85 0.15 290));
-						--tag-hover-borderColor: light-dark(oklch(0.85 0.08 290), oklch(0.50 0.10 290));
-					}
-				}
 			}
 		}
 
@@ -1257,22 +1295,22 @@
 				aspect-ratio: 1;
 				padding: 0.33em;
 
-				background-color: transparent;
+				background-color: light-dark(rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.18));
 				border-radius: 50%;
 
 				transition-property: background-color, opacity;
 
 				&[data-selected] {
-					background-color: rgba(255, 255, 255, 0.1);
-					border-color: rgba(255, 255, 255, 0.33);
+					background-color: var(--accent-very-light);
+					border-color: light-dark(rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.33));
 				}
 
 				&:focus {
-					background-color: rgba(255, 255, 255, 0.15);
+					border-color: var(--accent);
 				}
 
 				&:hover:not(:disabled) {
-					background-color: rgba(255, 255, 255, 0.2);
+					filter: contrast(1.25) brightness(1.1);
 				}
 
 				&:disabled {
@@ -1280,7 +1318,7 @@
 				}
 
 				.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
-					opacity: 0.5;
+					opacity: 0.75;
 				}
 			}
 		}
@@ -1294,6 +1332,8 @@
 		text-align: start;
 
 		.expanded-tooltip-content & {
+			background-color: var(--background-primary);
+			padding: 1em;
 			font-size: 0.75em;
 		}
 

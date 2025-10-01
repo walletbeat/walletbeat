@@ -34,6 +34,9 @@ export enum StageCriterionRating {
 	/** The wallet does not meet this stage criterion. */
 	FAIL = 'FAIL',
 
+	/** The wallet is exempt from this stage. */
+	EXEMPT = 'EXEMPT',
+
 	/**
 	 * The wallet cannot be rated on this stage criterion, because the
 	 * necessary data to make this call is not populated.
@@ -169,6 +172,13 @@ export type WalletLadderEvaluation = {
 export function stageCriterionEvaluationPerVariant(
 	variants: NonEmptySet<Variant>,
 	variantEval: (variantWallet: ResolvedWallet) => StageCriterionEvaluation,
+	options?: {
+		/**
+		 * What to return if no wallet variants are in scope.
+		 * Throw an error if this situation occurs and ifNoVariantInScope is null.
+		 */
+		ifNoVariantInScope: StageCriterionEvaluation | null
+	},
 ): (wallet: StageEvaluatableWallet) => StageCriterionEvaluation {
 	return (wallet: StageEvaluatableWallet): StageCriterionEvaluation => {
 		const evaluations: StageCriterionEvaluation[] = []
@@ -184,6 +194,10 @@ export function stageCriterionEvaluationPerVariant(
 		}
 
 		if (!isNonEmptyArray(evaluations)) {
+			if (options !== undefined && options.ifNoVariantInScope !== null) {
+				return options.ifNoVariantInScope
+			}
+
 			throw new Error(
 				`Wallet did not match any of the expected variants: ${setItems(variants).join(' | ')}`,
 			)
@@ -224,11 +238,18 @@ export function variantsMustPassAttribute<V extends Value>(
 	options?: {
 		/** Whether to allow `PARTIAL` ratings. */
 		allowPartial: boolean
+
+		/**
+		 * What to return if none of the wallet's variants are in scope.
+		 * If null, this case will throw an error.
+		 */
+		ifNoVariantInScope: StageCriterionEvaluation | null
 	},
 ): (wallet: StageEvaluatableWallet) => StageCriterionEvaluation {
 	if (options === undefined) {
 		options = {
 			allowPartial: false,
+			ifNoVariantInScope: null,
 		}
 	}
 
@@ -245,9 +266,10 @@ export function variantsMustPassAttribute<V extends Value>(
 
 			switch (evalAttr.evaluation.value.rating) {
 				case Rating.EXEMPT:
-					throw new Error(
-						`Wallet variant ${variantWallet.variant} is EXEMPT from attribute with ID ${attribute.id}`,
-					)
+					return {
+						rating: StageCriterionRating.EXEMPT,
+						explanation: evalAttr.evaluation.value.shortExplanation,
+					}
 				case Rating.FAIL:
 					return {
 						rating: StageCriterionRating.FAIL,
@@ -269,6 +291,9 @@ export function variantsMustPassAttribute<V extends Value>(
 						explanation: evalAttr.evaluation.value.shortExplanation,
 					}
 			}
+		},
+		{
+			ifNoVariantInScope: options.ifNoVariantInScope,
 		},
 	)
 }

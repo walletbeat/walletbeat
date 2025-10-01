@@ -54,7 +54,7 @@ export interface TransactionSubmission {
 	l1: WithRef<{
 		/**
 		 * Whether the wallet is able to self-broadcast by acting as its own
-		 * gossipping node in the Ethereum L1.
+		 * gossiping node in the Ethereum L1.
 		 */
 		selfBroadcastViaDirectGossip: Support | null
 

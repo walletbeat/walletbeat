@@ -186,6 +186,8 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<FeeTransparencyValue> => {
+		// TODO: Refactor fee transparency wallet feature data to be more granular.
+
 		if (features.transparency.feeTransparency === null) {
 			return unrated(feeTransparency, brand, {
 				feeTransparencyLevel: FeeTransparencyLevel.NONE,

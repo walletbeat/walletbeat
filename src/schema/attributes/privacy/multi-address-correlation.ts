@@ -10,7 +10,7 @@ import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type Endpoint,
 	type EntityData,
-	inferLeaks,
+	inferEndpointLeaks,
 	leaksByDefault,
 	type MultiAddressHandling,
 	MultiAddressPolicy,
@@ -235,9 +235,9 @@ function rateHandling(handling: MultiAddressHandling, endpoint: Endpoint): numbe
 											switch (endpoint.verifiability.clientVerification.type) {
 												case 'NOT_VERIFIED':
 													return 1
-												case 'VERIFIED':
-													return 2
 												case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
+													return 2
+												case 'VERIFIED':
 													return 3
 											}
 									}
@@ -260,19 +260,24 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		midSentenceName: 'multi-address privacy',
 	},
 	question: sentence('Can the wallet correlate your different wallet addresses with each other?'),
-	why: paragraph(
-		'You probably have more than one wallet address configured in your wallet, which you use for different purposes and perhaps as different identities. These wallet addresses all belong to you, but you would rather keep that fact private. It is therefore important to use a wallet that does not reveal that fact.',
-	),
+	why: paragraph(`
+		You probably have more than one wallet address configured in your wallet,
+		which you use for different purposes and perhaps as different identities.
+		These wallet addresses all belong to you, but you would rather keep that
+		fact private. It is therefore important to use a wallet that does not reveal that fact.
+	`),
 	methodology: markdown(`
 		Wallets are assessed based on whether a third-party can learn that
 		two or more of the user's wallet addresses belong to the same user.
 
-		A third-party may learn of this correlation either through the wallet
-		software explicitly sending this data (e.g. through analytics), or by
-		requesting data about multiple wallet addresses in bulk, which allows
-		the receiving endpoint to learn that all of these addresses belong to
-		the same user. Similar correlations are also possible by IP and/or
-		time-based correlation of requests that each contain one wallet address.
+		A third-party may learn of this correlation either through:
+
+		- The wallet software explicitly sending this data (e.g. through
+		  analytics)
+		- Requesting data about multiple wallet addresses in bulk, allowing
+		  the receiving endpoint to learn that all of these addresses belong to
+		  the same user. Similar correlations are also possible by IP and/or
+			time-based correlation of requests that each contain one wallet address.
 
 		In order to prevent this information from being revealed, wallets can
 		use a variety of strategies:
@@ -371,7 +376,7 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 		const allRefs: ReferenceArray = []
 
 		for (const collected of features.privacy.dataCollection.collectedByEntities) {
-			const leaks = inferLeaks(collected.leaks)
+			const leaks = inferEndpointLeaks(collected.leaks)
 
 			if (!leaksByDefault(leaks.walletAddress)) {
 				continue

@@ -56,7 +56,7 @@ export enum CalldataDecoding {
 	ETH_USDC_TRANSFER = 'ETH_USDC_TRANSFER',
 
 	/**
-	 * Same as above, but on a non-mainnet chain
+	 * Same as above, but on a non-mainnet chain (ZKsync)
 	 */
 	ZKSYNC_USDC_TRANSFER = 'ZKSYNC_USDC_TRANSFER',
 

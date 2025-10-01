@@ -33,6 +33,9 @@ export const unratedTemplate: SoftwareWallet = {
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
+		ecosystem: {
+			delegation: null,
+		},
 		integration: {
 			browser: {
 				'1193': null,
@@ -40,7 +43,7 @@ export const unratedTemplate: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			walletCall: null,
 		},
 		license: null,
 		monetization: {

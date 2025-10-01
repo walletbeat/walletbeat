@@ -67,7 +67,7 @@
 		contentType: ContentType.MARKDOWN,
 		markdown: (
 			supportsL1Broadcast === 'NO' ?
-				`**{{WALLET_NAME}}** does not support Ethereum peer-to-peer gossipping nor connecting to a user's self-hosted Ethereum node.\n\nTherefore, L1 transactions are subject to censorship by intermediaries.`
+				`**{{WALLET_NAME}}** does not support Ethereum peer-to-peer gossiping nor connecting to a user's self-hosted Ethereum node.\n\nTherefore, L1 transactions are subject to censorship by intermediaries.`
 			: supportsL1Broadcast === 'OWN_NODE' ?
 				`**{{WALLET_NAME}}** supports connecting to a user's self-hosted Ethereum node, which can be used to broadcast L1 transactions without trusting intermediaries.`
 			: supportsL1Broadcast === 'SELF_GOSSIP' ?

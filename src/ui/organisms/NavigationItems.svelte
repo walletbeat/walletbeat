@@ -13,20 +13,133 @@
 	} = $props()
 
 
+	// State
+	import { SvelteMap } from 'svelte/reactivity'
+
+	let isOpen = $state(
+		new SvelteMap<NavigationItem, boolean>()
+	)
+
+	let searchValue = $state(
+		''
+	)
+
+	let effectiveSearchValue = $derived(
+		searchValue.trim().toLowerCase()
+	)
+
+
 	// Functions
 	const hasCurrentPage = (item: NavigationItem) => (
 		currentPathname === item.href
 		|| (item.children?.some(hasCurrentPage) ?? false)
 	)
+
+	const fuzzyMatch = (text: string, query: string): [number, number][] | undefined => {
+		const ranges: [number, number][] = []
+		let textIndex = 0
+
+		for (const char of query) {
+			textIndex = text.toLowerCase().indexOf(char, textIndex)
+			if (textIndex === -1) return
+
+			const lastRange = ranges.at(-1)
+			if (lastRange && lastRange[1] === textIndex) {
+				lastRange[1]++
+			} else {
+				ranges.push([textIndex, textIndex + 1])
+			}
+
+			textIndex++
+		}
+
+		return ranges
+	}
+
+	const matchesSearch = (item: NavigationItem, query: string): boolean => (
+		!query
+		|| !!fuzzyMatch(item.title, query)
+		|| (item.children?.some((child) => matchesSearch(child, query)) ?? false)
+	)
+
+	const highlightText = (text: string, query: string) => {
+		const ranges = fuzzyMatch(text, query)
+
+		return (
+			ranges ?
+				[
+					...ranges.flatMap(([start, end], i, arr) => [
+						text.slice(arr[i - 1]?.[1] ?? 0, start),
+						`<mark>${text.slice(start, end)}</mark>`,
+					]),
+					text.slice(ranges.at(-1)?.[1] ?? 0),
+				]
+					.join('')
+			:
+				text
+		)
+	}
 </script>
 
 
-{@render navigationItems(items)}
+<search>
+	<input
+		type="search"
+		bind:value={searchValue}
+		placeholder="Search (⌘+K)"
+		{@attach element => {
+			const abortController = new AbortController()
+
+			let lastFocusedElement: HTMLElement | undefined = $state()
+
+			globalThis.addEventListener(
+				'keydown',
+				event => {
+					if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+						event.preventDefault()
+
+						if(document.activeElement instanceof HTMLElement)
+							lastFocusedElement = document.activeElement
+
+						element.focus()
+					}
+				},
+				{ signal: abortController.signal }
+			)
+
+			element.addEventListener(
+				'blur',
+				() => {
+					lastFocusedElement?.focus()
+					lastFocusedElement = undefined
+				},
+				{ signal: abortController.signal }
+			)
+
+			return () => {
+				abortController.abort()
+				lastFocusedElement?.focus()
+				lastFocusedElement = undefined
+			}
+		}}
+		onkeyup={event => {
+			if (event.key === 'Escape')
+				event.currentTarget.blur()
+		}}
+	/>
+
+	{@render navigationItems(items)}
+</search>
 
 
 {#snippet navigationItems(items: NavigationItem[])}
 	<menu>
-		{#each items as item (item.id)}
+		{#each (
+			effectiveSearchValue ?
+				items.filter(item => matchesSearch(item, effectiveSearchValue))
+			:
+				items
+		) as item (item.id)}
 			<li>
 				{@render navigationItem(item)}
 			</li>
@@ -40,7 +153,18 @@
 		{@render linkable(item)}
 	{:else}
 		<details
-			open={hasCurrentPage(item)}
+			bind:open={
+				() => (
+					effectiveSearchValue ?
+						matchesSearch(item, effectiveSearchValue)
+					:
+						isOpen.get(item) ?? isOpen.set(item, hasCurrentPage(item)).get(item)
+				),
+				_ => {
+					if (!effectiveSearchValue && _ !== undefined)
+						isOpen.set(item, _)
+				}
+			}
 			data-sticky-container
 		>
 			<summary data-sticky>
@@ -64,22 +188,27 @@
 			}}
 		>
 			{#if item.icon}
-				<span>{@html item.icon}</span>
+				<span class="icon">{@html item.icon}</span>
 			{/if}
 
-			{item.title}
+			<span>{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 		</a>
 	{:else}
 		{#if item.icon}
-			<span>{@html item.icon}</span>
+			<span class="icon">{@html item.icon}</span>
 		{/if}
 
-		{item.title}
+		<span>{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 	{/if}
 {/snippet}
 
 
 <style>
+	search {
+		display: grid;
+		gap: 0.75rem;
+	}
+
 	menu {
 		display: grid;
 		gap: 2px;
@@ -93,6 +222,7 @@
 
 	a {
 		color: inherit;
+		font-weight: inherit;
 
 		&:hover {
 			color: var(--accent);
@@ -101,6 +231,7 @@
 
 		&[aria-current] {
 			background-color: var(--background-primary);
+			font-weight: 700;
 		}
 	}
 
@@ -110,7 +241,7 @@
 		align-items: center;
 		gap: 0.5rem;
 
-		> span {
+		> .icon {
 			display: flex;
 			font-size: 1.25em;
 			width: 1em;
@@ -125,6 +256,13 @@
 				width: 100%;
 				height: 100%;
 			}
+		}
+
+		:global(mark) {
+			font-weight: 600;
+			text-decoration: underline;
+			background-color: transparent;
+			color: inherit;
 		}
 	}
 

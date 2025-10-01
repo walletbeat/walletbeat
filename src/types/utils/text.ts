@@ -172,7 +172,11 @@ export function trimWhitespacePrefix(str: string): string {
 
 	return lines
 		.map(line =>
-			line.startsWith(longestCommonPrefix) ? line.substring(longestCommonPrefix.length) : line,
+			line.startsWith(longestCommonPrefix)
+				? line.substring(longestCommonPrefix.length)
+				: line.trim() === ''
+					? ''
+					: line,
 		)
 		.join('\n')
 }

@@ -5,6 +5,9 @@ src/generated/
 # Generated types
 .astro/
 
+# Cache for Vitest or whatever else
+.cache/
+
 # Dependencies
 node_modules/
 
@@ -28,4 +31,4 @@ pnpm-debug.log*
 .idea/
 
 # For playing with claude code
-scrap.md 
+scrap.md

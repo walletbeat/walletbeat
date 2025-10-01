@@ -264,10 +264,10 @@ export const hardwareWalletDappSigning: Attribute<HardwareWalletDappSigningValue
 		support for standard transactions, ERC-20 token transfers, 712 messages and complex contract interactions. 
 
 		The hardware should be able to **display clearly all transaction types on Safe, Aave and Uniswap.**
-		To do so **the hardware MUST be able to connect directly to the dapp or allow the user to use at least two different software wallets independent from the hardware manufacturer**.
+		To do so **the hardware MUST be able to connect directly to the dApp or allow the user to use at least two different software wallets independent from the hardware manufacturer**.
 		
 		A hardware wallet receives a partial rating if it implements dApp signing but with limitations, such
-		as not displaying all transaction details or not supporting dApp signing for all transaction types. Or if the hardware supports only one independent software wallet. Or if the hardware supports only 1/3 of the dapps.
+		as not displaying all transaction details or not supporting dApp signing for all transaction types. Or if the hardware supports only one independent software wallet. Or if the hardware supports only 1/3 of the dApps.
 		
 		A hardware wallet fails this attribute if it doesn't properly implement dApp signing functionality,
 		requiring users to trust the connected software wallet without independent verification.

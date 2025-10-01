@@ -1,7 +1,7 @@
-import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
+import { type NonEmptyArray } from '@/types/utils/non-empty'
 
 /** Score is a score between 0.0 (lowest) and 1.0 (highest). */
-export type Score = number
+export type Score = number | undefined
 
 /** A score and a weight. */
 export interface WeightedScore {
@@ -19,14 +19,22 @@ export type MaybeUnratedScore = null | {
 }
 
 /** Compute a weighted aggregate score. */
-export function weightedScore(scores: NonEmptyArray<WeightedScore>): Score {
-	let totalScore = 0.0
-	let totalWeight = 0.0
+export const weightedScore = (scores: NonEmptyArray<WeightedScore>): Score => {
+	if(scores.every(({ score }) => score === undefined))
+		return undefined
 
-	nonEmptyMap(scores, ({ score, weight }) => {
-		totalScore += score * weight
-		totalWeight += weight
-	})
+	const [totalScore, totalWeight] = (
+		scores
+			.reduce(
+				([totalScore, totalWeight], { score, weight }) => (
+					[
+						totalScore + (score ?? 0) * weight,
+						totalWeight + weight,
+					]
+				),
+				[0, 0] as [number, number],
+			)
+	)
 
-	return totalWeight === 0.0 ? 0.0 : totalScore / totalWeight
+	return totalScore / totalWeight
 }

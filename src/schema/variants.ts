@@ -37,10 +37,10 @@ export type AtLeastOneTrueVariant = NonEmptySet<Variant>
  * A feature that may or may not depend on the wallet variant.
  * 'null' represents the fact that the feature was not evaluated on a wallet.
  */
-export type VariantFeature<T> = T | AtLeastOneVariant<T> | null
+export type VariantFeature<T> = T | AtLeastOneVariant<T | null> | null
 
 /** Type guard for the AtLeastOneVariant<T> branch of VariantsFeature<T>. */
-function isAtLeastOneVariants<T>(value: VariantFeature<T>): value is AtLeastOneVariant<T> {
+function isAtLeastOneVariant<T>(value: VariantFeature<T>): value is AtLeastOneVariant<T | null> {
 	if (value === null || typeof value !== 'object') {
 		return false
 	}
@@ -121,15 +121,29 @@ export type ResolvedFeature<T> = T | null
 /** Resolve a single feature according to the given variant. */
 export function resolveFeature<T>(
 	feature: VariantFeature<T>,
+	expectedVariants: AtLeastOneTrueVariant,
 	variant: Variant,
 ): ResolvedFeature<T> {
 	if (feature === null) {
 		return null
 	}
 
-	if (isAtLeastOneVariants(feature)) {
+	if (isAtLeastOneVariant<T>(feature)) {
+		if (feature[variant] === undefined && expectedVariants[variant]) {
+			throw new Error(`Feature data for variant ${variant} is missing`)
+		}
+
+		if (
+			feature[variant] !== undefined &&
+			(expectedVariants[variant] === undefined || !expectedVariants[variant])
+		) {
+			throw new Error(
+				`Feature data was not expected for variant ${variant}, yet found: ${String(feature[variant])}`,
+			)
+		}
+
 		return feature[variant] ?? null
 	}
 
-	return feature
+	return feature ?? null
 }

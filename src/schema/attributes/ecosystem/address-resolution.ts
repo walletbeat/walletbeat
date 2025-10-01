@@ -8,6 +8,7 @@ import {
 	type Value,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
+import { isSupported, type Support, type Supported } from '@/schema/features/support'
 import { type ReferenceArray, refs } from '@/schema/reference'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
@@ -15,19 +16,19 @@ import type { NonEmptyArray } from '@/types/utils/non-empty'
 import { type Eip, eipMarkdownLink, eipMarkdownLinkAndTitle, eipShortLabel } from '../../eips'
 import type {
 	AddressResolution,
-	AddressResolutionSupport,
+	AddressResolutionData,
 } from '../../features/privacy/address-resolution'
 import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.ecosystem.address_resolution'
 
 export type AddressResolutionValue = Value & {
-	addressResolution?: AddressResolution<AddressResolutionSupport>
+	addressResolution?: AddressResolution<Support<AddressResolutionData>>
 	__brand: 'attributes.ecosystem.address_resolution'
 }
 
 function getOffchainProviderInfo(
-	support: AddressResolutionSupport & { support: 'SUPPORTED'; medium: 'OFFCHAIN' },
+	support: Supported<AddressResolutionData> & { medium: 'OFFCHAIN' },
 ): { rating: Rating; offchainInfo: string; walletShould?: string } {
 	if (
 		support.offchainDataVerifiability === 'VERIFIABLE' &&
@@ -71,16 +72,16 @@ function getOffchainProviderInfo(
 }
 
 function evaluateAddressResolution(
-	addressResolution: AddressResolution<AddressResolutionSupport>,
+	addressResolution: AddressResolution<Support<AddressResolutionData>>,
 	references: ReferenceArray,
 ): Evaluation<AddressResolutionValue> {
-	const chainSpecificErcs: NonEmptyArray<[Eip, AddressResolutionSupport, string]> = [
+	const chainSpecificERCs: NonEmptyArray<[Eip, Support<AddressResolutionData>, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
 	]
 
-	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificErcs) {
-		if (chainSpecificSupport.support !== 'SUPPORTED') {
+	for (const [erc, chainSpecificSupport, exampleAddress] of chainSpecificERCs) {
+		if (!isSupported(chainSpecificSupport)) {
 			continue
 		}
 
@@ -228,11 +229,12 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		generating lookalike-addresses and tricking users into copy/pasting
 		them without noticing the difference.
 
-		Additionally, Ethereum's transition to layer 2s has changed user needs
-		when sending funds. The hexadecimal address isn't sufficient anymore;
-		the user needs to ensure that they are sending funds to the correct
-		hexadecimal address *on the correct chain*, increasing the potential
-		for mistakenly sending funds to the wrong place or the wrong chain.
+		Additionally, Ethereum's transition to layer 2 chains has changed user
+		needs when sending funds. The hexadecimal address isn't sufficient
+		anymore; the user needs to ensure that they are sending funds to the
+		correct hexadecimal address *on the correct chain*, increasing the
+		potential for mistakenly sending funds to the wrong place or the wrong
+		chain.
 
 		Address naming registries like ENS partially solve this problem by
 		allowing more human-readable names like \`username.eth\` to be
@@ -267,15 +269,16 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		Additionally, the mechanism used to do the resolution must either:
 
 		* Be done using onchain data and reusing the wallet's common chain
-			interaction client, inheriting its verifiability (via light client)
-			and privacy properties.
+		  interaction client, inheriting its verifiability (via light client)
+		  and privacy properties.
 		* **OR** be done using an offchain third-party provider in such a way that
-			the address returned by the third-party provider is verifiable, and
-			without revealing the user's IP address to the provider. This ensures
-			that the wallet cannot be tricked into sending funds to an attacker
-			compromising the offchain provider's responses, and that the provider
-			may not progressively learn the user's contacts list by associating its
-			successive resolution queries by IP over time.
+		  the address returned by the third-party provider is verifiable, and
+		  without revealing the user's IP address to the provider.
+			This ensures that:
+			- The wallet cannot be tricked into sending funds to an attacker
+		    compromising the offchain provider's responses
+		  - The provider may not progressively learn the user's contacts list by
+		    associating its successive resolution queries by IP over time.
 	`),
 	ratingScale: {
 		display: 'fail-pass',
@@ -436,7 +439,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 
 		// We've checked all the nulls, so recreate the object without nulls in
 		// the type description.
-		const resolvedResolution: AddressResolution<AddressResolutionSupport> = {
+		const resolvedResolution: AddressResolution<Support<AddressResolutionData>> = {
 			chainSpecificAddressing: {
 				erc7828: features.addressResolution.chainSpecificAddressing.erc7828,
 				erc7831: features.addressResolution.chainSpecificAddressing.erc7831,

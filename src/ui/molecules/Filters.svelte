@@ -394,4 +394,24 @@
 			color: var(--accent-very-light);
 		}
 	}
+
+	/* Hide reset button when form is in default state */
+	form:not(
+		:has(
+			:is(
+				input[type="checkbox"],
+				input[type="radio"]
+			):is(
+				[checked]:not(:checked),
+				:not([checked]):checked
+			),
+			select option:is(
+				[selected]:not(:checked),
+				:not([selected]):checked
+			)
+		)
+	) button[type="reset"] {
+		display: none;
+		opacity: 0;
+	}
 </style>

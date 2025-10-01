@@ -7,6 +7,7 @@
 		type AttributeGroup,
 		type Attribute,
 		type EvaluatedGroup,
+		ratingIcons,
 	} from '@/schema/attributes'
 	import { VariantSpecificity } from '@/schema/wallet'
 	import { getSingleVariant, type Variant } from '@/schema/variants'
@@ -26,6 +27,7 @@
 	import {
 		attributeTree,
 		calculateAttributeGroupScore,
+		calculateOverallScore,
 	} from '@/schema/attribute-groups'
 	import { nonEmptyEntries } from '@/types/utils/non-empty'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
@@ -39,6 +41,8 @@
 	import Pie, { PieLayout } from '@/ui/atoms/Pie.svelte'
 	import RenderCustomContent from '@/ui/atoms/RenderCustomContent.svelte'
 	import ReferenceLinks from '@/ui/atoms/ReferenceLinks.svelte'
+	import ScoreBadge from '@/ui/atoms/ScoreBadge.svelte'
+	import WalletAttributeGroupSummary from '@/ui/molecules/WalletAttributeGroupSummary.svelte'
 
 
 	// Props
@@ -101,6 +105,10 @@
 		return map
 	})
 
+	const overallScore = $derived(
+		calculateOverallScore(wallet.overall)
+	)
+
 
 	// Actions
 	const updatePickedVariant = (variant: Variant | null) => {
@@ -116,16 +124,6 @@
 		)
 
 		pickedVariant = variant
-	}
-
-
-	// Styles
-	const ratingIconMap = {
-		[Rating.PASS]: '✓',
-		[Rating.PARTIAL]: '⚠️',
-		[Rating.FAIL]: '✗',
-		[Rating.UNRATED]: '?',
-		[Rating.EXEMPT]: '○',
 	}
 </script>
 
@@ -199,10 +197,15 @@
 
 <div class="container">
 	<article>
-		<div class="nav-title">Navigation</div>
+		<div
+			data-sticky
+			class="nav-title"
+		>
+			Table of contents
+		</div>
 
-		<header id="top" class="page-header">
-			{#if wallet}
+		<header id="top">
+			<div>
 				<h1>
 					<img
 						class="wallet-icon"
@@ -211,59 +214,62 @@
 					/>
 					<span>{wallet.metadata.displayName}</span>
 				</h1>
-			{/if}
 
-			{#if wallet}
-				<section class="wallet-overview">
-					<nav class="wallet-links">
+				<div>
+					<span>Walletbeat score: </span>
+					<ScoreBadge score={overallScore} size="large" />
+				</div>
+			</div>
+
+			<section class="wallet-overview">
+				<nav class="wallet-links">
+					<a
+						href={typeof wallet.metadata.url === 'string' ? wallet.metadata.url : wallet.metadata.url?.url ?? '#'}
+						class="wallet-link website"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Website
+					</a>
+
+					{#if wallet.metadata.repoUrl}
 						<a
-							href={typeof wallet.metadata.url === 'string' ? wallet.metadata.url : wallet.metadata.url?.url ?? '#'}
-							class="wallet-link website"
+							href={typeof wallet.metadata.repoUrl === 'string' ? wallet.metadata.repoUrl : wallet.metadata.repoUrl?.url ?? '#'}
+							class="wallet-link repo"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							Website
+							GitHub Repository
 						</a>
+					{/if}
+				</nav>
 
-						{#if wallet.metadata.repoUrl}
-							<a
-								href={typeof wallet.metadata.repoUrl === 'string' ? wallet.metadata.repoUrl : wallet.metadata.repoUrl?.url ?? '#'}
-								class="wallet-link repo"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								GitHub Repository
-							</a>
-						{/if}
-					</nav>
+				<div class="wallet-blurb">
+					<Typography
+						content={wallet.metadata.blurb}
+						strings={{ WALLET_NAME: wallet.metadata.displayName }}
+					/>
+				</div>
 
-					<div class="wallet-blurb">
-						<Typography
-							content={wallet.metadata.blurb}
-							strings={{ WALLET_NAME: wallet.metadata.displayName }}
-						/>
-					</div>
+				<footer class="wallet-platforms">
+					<span class="platforms-label">Platforms: </span>
+					{#each Object.keys(wallet.variants) as variant, i}
+						{i > 0 ? ', ' : ''}<strong>{variantToRunsOn(variant as Variant)}</strong>
+					{/each}.
 
-					<footer class="wallet-platforms">
-						<span class="platforms-label">Platforms: </span>
-						{#each Object.keys(wallet.variants) as variant, i}
-							{i > 0 ? ', ' : ''}<strong>{variantToRunsOn(variant as Variant)}</strong>
-						{/each}.
-
-						{#if singleVariant === null}
-							<span class="variant-disclaimer">
-								The ratings below vary depending on the version.
-								{#if pickedVariant === null}
-									Select a version to see version-specific ratings.
-								{:else}
-									You are currently viewing the ratings for the
-									<strong>{variantToName(pickedVariant, false)}</strong> version.
-								{/if}
-							</span>
-						{/if}
-					</footer>
-				</section>
-			{/if}
+					{#if singleVariant === null}
+						<span class="variant-disclaimer">
+							The ratings below vary depending on the version.
+							{#if pickedVariant === null}
+								Select a version to see version-specific ratings.
+							{:else}
+								You are currently viewing the ratings for the
+								<strong>{variantToName(pickedVariant, false)}</strong> version.
+							{/if}
+						</span>
+					{/if}
+				</footer>
+			</section>
 		</header>
 
 		{#each evalTree ? objectEntries(attributeTree) : [] as [attrGroupId, attrGroup]}
@@ -300,7 +306,7 @@
 
 	{#if attributes.length > 0}
 		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup) : null}
-		{@const scoreLevel = score ? score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low' : undefined}
+		{@const scoreLevel = score?.score ? score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low' : undefined}
 
 		<hr />
 
@@ -310,21 +316,14 @@
 			aria-label={attrGroup.displayName}
 			data-score={scoreLevel}
 			data-icon={attrGroup.icon}
-			style:--accent={score ? scoreToColor(score.score) : 'transparent'}
+			style:--accent={scoreToColor(score?.score)}
 		>
-			<header>
+			<header data-sticky>
 				<h2>{attrGroup.displayName}</h2>
-				<div class="section-controls">
-					{#if score}
-						<div class="section-score">
-							{Math.round(score.score * 100)}%
 
-							{#if score.hasUnratedComponent}
-								<span class="unrated-hint" title="This section contains unrated components">ⓘ</span>
-							{/if}
-						</div>
-					{/if}
-				</div>
+				<ScoreBadge
+					{score}
+				/>
 			</header>
 
 			{#if attrGroup.perWalletQuestion}
@@ -336,78 +335,94 @@
 				</div>
 			{/if}
 
-			<section class="attributes-overview">
-				<div class="attributes-pie">
-					<Pie
-						layout={PieLayout.FullTop}
-						radius={120}
-						padding={20}
-						levels={[{
-							outerRadiusFraction: 0.95,
-							innerRadiusFraction: 0,
-							gap: 8,
-							angleGap: 0,
-						}]}
-						slices={
-							attributes
-								.map(({ attribute, evalAttr }) => ({
-									id: attribute.id,
-									color: ratingToColor(evalAttr.evaluation.value.rating),
-									weight: 1,
-									arcLabel: '',
-									tooltip: attribute.displayName,
-									tooltipValue: evalAttr.evaluation.value.rating,
-									href: `#${slugifyCamelCase(attribute.id)}`,
-								}))
-						}
-						highlightedSliceId={highlightedAttributeId}
-						onSliceMouseEnter={id => {
-							highlightedAttributeId = id
-						}}
-						onSliceMouseLeave={() => {
-							highlightedAttributeId = null
-						}}
-					/>
-				</div>
-
-				<div class="attributes-list">
-					<h3>Attribute Details:</h3>
-
-					<ul>
-						{#each attributes as { attribute, evalAttr }}
-							{@const attributeUrl = `#${slugifyCamelCase(attribute.id)}`}
-							<li>
-								<a
-									href={attributeUrl}
-									style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
-									data-highlighted={highlightedAttributeId === attribute.id ? '' : undefined}
-									onmouseenter={() => {
-										highlightedAttributeId = attribute.id
-									}}
-									onmouseleave={() => {
-										highlightedAttributeId = null
-									}}
+			<div class="attributes-overview-container">
+				<section class="attributes-overview">
+					<div class="attributes-pie">
+						<Pie
+							layout={PieLayout.FullTop}
+							radius={120}
+							padding={20}
+							levels={[{
+								outerRadiusFraction: 0.95,
+								innerRadiusFraction: 0.125,
+								gap: 8,
+								angleGap: 0,
+							}]}
+							slices={
+								attributes
+									.map(({ attribute, evalAttr }) => ({
+										id: attribute.id,
+										color: ratingToColor(evalAttr.evaluation.value.rating),
+										weight: attrGroup.attributeWeights[attribute.id],
+										arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
+										tooltip: attribute.displayName,
+										tooltipValue: evalAttr.evaluation.value.rating,
+										href: `#${slugifyCamelCase(attribute.id)}`,
+									}))
+							}
+							highlightedSliceId={highlightedAttributeId}
+							onSliceMouseEnter={id => {
+								highlightedAttributeId = id
+							}}
+							onSliceMouseLeave={() => {
+								highlightedAttributeId = null
+							}}
+						>
+							{#snippet centerContentSnippet()}
+								<circle
+									r="8"
+									fill={scoreToColor(score?.score)}
 								>
-									<span>{attribute.displayName}</span>
-									<data
-										class="rating-{evalAttr.evaluation.value.rating.toLowerCase()}"
-										value={evalAttr.evaluation.value.rating}
-										>{evalAttr.evaluation.value.rating}</data
-									>
-								</a>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			</section>
+									{#if score?.hasUnratedComponent}
+										<title>
+											*contains unrated components
+										</title>
+									{/if}
+								</circle>
+							{/snippet}
+						</Pie>
+					</div>
 
-			{#each attributes as { attribute, evalAttr }}
-				{@render attributeSnippet({
-					attrGroupId: attrGroup.id,
-					attribute,
-					evalAttr,
-				})}
-			{/each}
+					<div class="attributes-list">
+						<h3>Attribute Details:</h3>
+
+						<ul>
+							{#each attributes as { attribute, evalAttr }}
+								{@const attributeUrl = `#${slugifyCamelCase(attribute.id)}`}
+								<li>
+									<a
+										href={attributeUrl}
+										style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
+										data-highlighted={highlightedAttributeId === attribute.id ? '' : undefined}
+										onmouseenter={() => {
+											highlightedAttributeId = attribute.id
+										}}
+										onmouseleave={() => {
+											highlightedAttributeId = null
+										}}
+									>
+										<span>{attribute.displayName}</span>
+										<data
+											class="rating"
+											value={evalAttr.evaluation.value.rating}
+										>{evalAttr.evaluation.value.rating}</data>
+									</a>
+								</li>
+							{/each}
+						</ul>
+					</div>
+				</section>
+			</div>
+
+			<div class="attributes">
+				{#each attributes as { attribute, evalAttr }}
+					{@render attributeSnippet({
+						attrGroupId: attrGroup.id,
+						attribute,
+						evalAttr,
+					})}
+				{/each}
+			</div>
 		</section>
 	{/if}
 {/snippet}
@@ -456,16 +471,23 @@
 		>
 			<summary>
 				<header>
-					<h3 data-icon={attribute.icon}>{attribute.displayName}</h3>
+					<div>
+						<h3 data-icon={attribute.icon}>{attribute.displayName}</h3>
 
-					{#if attribute.question}
-						<div class="subsection-caption">
-							<Typography
-								content={attribute.question}
-								strings={{ WALLET_NAME: wallet.metadata.displayName }}
-							/>
-						</div>
-					{/if}
+						{#if attribute.question}
+							<div class="subsection-caption">
+								<Typography
+									content={attribute.question}
+									strings={{ WALLET_NAME: wallet.metadata.displayName }}
+								/>
+							</div>
+						{/if}
+					</div>
+					
+					<data
+						class="rating"
+						value={evalAttr.evaluation.value.rating}
+					>{evalAttr.evaluation.value.rating}</data>
 				</header>
 
 				{#if relevantVariants.length === 1}
@@ -508,7 +530,7 @@
 
 			<div class="rating-display" data-rating={evalAttr.evaluation.value.rating.toLowerCase()}>
 				<div class="rating-icon">
-					{ratingIconMap[evalAttr.evaluation.value.rating as Rating]}
+					{ratingIcons[evalAttr.evaluation.value.rating]}
 				</div>
 				<div class="rating-content">
 					{#if isTypographicContent(evalAttr.evaluation.details)}
@@ -633,7 +655,7 @@
 
 										<ul>
 											{#if attribute.ratingScale.pass}
-												<li data-icon="✓">
+												<li data-icon={ratingIcons[Rating.PASS]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,
@@ -643,7 +665,7 @@
 																	.flat()
 																	.map(
 																		example =>
-																			`* ${example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text}`,
+																			`* ${(example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text).trim()}`,
 																	)
 																	.join('\n'),
 															].join('\n\n'),
@@ -653,7 +675,7 @@
 											{/if}
 
 											{#if attribute.ratingScale.partial}
-												<li data-icon="⚠️">
+												<li data-icon={ratingIcons[Rating.PARTIAL]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,
@@ -663,7 +685,7 @@
 																	.flat()
 																	.map(
 																		example =>
-																			`* ${example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text}`,
+																			`* ${(example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text).trim()}`,
 																	)
 																	.join('\n'),
 															].join('\n\n'),
@@ -673,7 +695,7 @@
 											{/if}
 
 											{#if attribute.ratingScale.fail}
-												<li data-icon="✗">
+												<li data-icon={ratingIcons[Rating.FAIL]}>
 													<Typography
 														content={{
 															contentType: ContentType.MARKDOWN,
@@ -683,7 +705,7 @@
 																	.flat()
 																	.map(
 																		example =>
-																			`* ${example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text}`,
+																			`* ${(example.description.contentType === ContentType.MARKDOWN ? example.description.markdown : example.description.text).trim()}`,
 																	)
 																	.join('\n'),
 															].join('\n\n'),
@@ -748,32 +770,34 @@
 
 
 <style>
-	:global(a) {
-		color: var(--accent, var(--link, #0066cc));
-		text-decoration: none;
-		font-weight: 500;
-
-		&:hover {
-			text-decoration: underline;
-		}
-
-		&:focus {
-			outline: 2px solid var(--link, #0066cc);
-			outline-offset: 2px;
-		}
-	}
-
 	.container {
 		--wallet-icon-size: 3rem;
-		--border-radius: 0.375rem;
+		--border-radius-lg: 1rem;
+		--border-radius: 0.5rem;
 		--border-radius-sm: 0.25rem;
 		--nav-width: 20rem;
 
 		display: grid;
 		grid-template:
-			'Nav Content'
-			/ auto 1fr;
-		gap: 1rem;
+			'Content Nav'
+			/ 1fr auto
+		;
+		@media (max-width: 1024px) {
+			grid-template:
+				'Nav Content'
+				/ auto 1fr
+			;
+		}
+		@media (max-width: 864px) {
+			grid-template:
+				[Nav-start]
+				'Content'
+				[Nav-end]
+				/ [Nav-start] 1fr [Nav-end]
+			;
+		}
+
+		line-height: 1.6;
 
 		position: relative;
 
@@ -788,15 +812,20 @@
 			grid-area: Content;
 
 			max-height: 100dvh;
-			overflow-y: auto;
+			overflow: hidden auto;
+
+			scroll-padding-block-start: 5rem;
+			scroll-padding-block-end: 1rem;
 
 			scroll-marker-group: before;
 
 			display: grid;
 
 			&::scroll-marker-group {
+				z-index: 2;
 				grid-area: Nav;
 
+				scroll-padding-block: 0.5rem;
 				box-sizing: border-box;
 				position: sticky;
 				top: 0;
@@ -822,7 +851,22 @@
 					0 calc(2.5rem + 1rem) / 100% calc(100% - calc(2.5rem + 1rem) - 1rem) no-repeat,
 					var(--background-secondary)
 				;
-				border-right: 1px solid var(--border-color);
+				border-inline: 1px solid var(--border-color);
+			}
+
+			@media (max-width: 864px) {
+				&::scroll-marker-group {
+					top: calc(var(--navigation-mobile-blockSize) + 4rem);
+					max-height: calc(100dvh - var(--navigation-mobile-blockSize) - 4rem);
+
+					transition-property: translate;
+					transition-timing-function: var(--ease-out-expo);
+					transition-duration: 0.3s;
+				}
+
+				&::scroll-marker-group:not(:focus-within) {
+					translate: -100% 0;
+				}
 			}
 
 			> :is(header, section, footer) {
@@ -835,10 +879,22 @@
 	}
 
 	.nav-title {
-		z-index: 1;
+		z-index: 3;
 
 		position: absolute;
-		inset: 0;
+		left: auto;
+		right: 0;
+
+		@media (max-width: 1024px) {
+			right: auto;
+			left: 0;
+		}
+
+		@media (max-width: 864px) {
+			transition-property: translate;
+			translate: -100% 0;
+		}
+
 		bottom: auto;
 		padding: 1rem;
 		width: calc(var(--nav-width) - 1px);
@@ -859,18 +915,29 @@
 		}
 	}
 
-	.page-header {
-		display: grid;
-		padding: 3rem 1rem;
+	header {
 		gap: 1.5rem;
 
-		h1 {
-			display: grid;
-			grid-template-columns: auto 1fr;
+		> div {
+			display: flex;
 			align-items: center;
-			gap: 0.5rem;
-			font-size: 2.25rem;
-			color: var(--text-primary);
+			gap: 1rem;
+			justify-content: space-between;
+
+			> h1 {
+				display: grid;
+				grid-template-columns: auto 1fr;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 2.25rem;
+				color: var(--text-primary);
+			}
+
+			> div {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
 		}
 	}
 
@@ -942,6 +1009,18 @@
 	}
 
 	.attribute-group {
+		&:has(.attribute:nth-of-type(1)) { --attributesCount: 1; }
+		&:has(.attribute:nth-of-type(2)) { --attributesCount: 2; }
+		&:has(.attribute:nth-of-type(3)) { --attributesCount: 3; }
+		&:has(.attribute:nth-of-type(4)) { --attributesCount: 4; }
+		&:has(.attribute:nth-of-type(5)) { --attributesCount: 5; }
+		&:has(.attribute:nth-of-type(6)) { --attributesCount: 6; }
+		&:has(.attribute:nth-of-type(7)) { --attributesCount: 7; }
+		&:has(.attribute:nth-of-type(8)) { --attributesCount: 8; }
+		&:has(.attribute:nth-of-type(9)) { --attributesCount: 9; }
+
+		timeline-scope: --AttributesViewTimeline;
+
 		display: grid;
 		gap: 1em;
 		scroll-margin-top: 3.5rem;
@@ -999,19 +1078,12 @@
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			position: relative;
-			padding-block: 1rem;
-			position: sticky;
-			top: 0;
-			z-index: 1;
-			background-color: color-mix(var(--background-secondary), transparent);
 
-			&::before {
+			padding-block: 1rem;
+
+			&[data-sticky]::before {
 				content: '';
-				position: absolute;
-				inset: -0.5rem -2rem;
-				backdrop-filter: blur(0.5rem);
-				z-index: -1;
+				inset: -0.5rem -6rem;
 				mask-image: linear-gradient(to top, transparent, white 0.5rem);
 			}
 
@@ -1052,7 +1124,7 @@
 
 	.attributes-overview {
 		background-color: var(--background-primary);
-		border-radius: var(--border-radius);
+		border-radius: var(--border-radius-lg);
 		padding: 1rem;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
@@ -1060,6 +1132,12 @@
 		grid-template-columns: auto 1fr;
 		gap: 1rem;
 		align-items: center;
+
+		transition-property: background-color;
+
+		@container not scroll-state(stuck: none) {
+			background-color: transparent;
+		}
 
 		@container (max-width: 600px) {
 			grid-template-columns: 1fr;
@@ -1069,11 +1147,22 @@
 		> .attributes-pie {
 			display: flex;
 			align-items: center;
+
+			font-size: 2.5em;
 		}
 
 		> .attributes-list {
 			display: grid;
 			gap: 0.75em;
+
+			transition-property: translate, scale, opacity;
+
+			@container not scroll-state(stuck: none) {
+				translate: 0 -2rem;
+				scale: 0.95;
+				opacity: 0;
+				pointer-events: none;
+			}
 
 			h3 {
 				font-size: 1rem;
@@ -1118,14 +1207,6 @@
 						flex-shrink: 0;
 						background-color: var(--accent);
 					}
-
-					data {
-						font-size: 0.75rem;
-						font-weight: 500;
-						padding: 0.25rem 0.5rem;
-						border-radius: var(--border-radius-sm);
-						background-color: color-mix(in srgb, var(--accent) 25%, transparent);
-					}
 				}
 			}
 
@@ -1139,7 +1220,105 @@
 		}
 	}
 
+	.score,
+	.rating {
+		font-size: 0.75em;
+		font-weight: 500;
+		padding: 0.25em 0.5em;
+		border-radius: var(--border-radius-sm);
+		background-color: color-mix(in srgb, var(--accent) 33%, transparent);
+	}
+
+	.score {
+		font-size: 1em;
+	}
+
+	@media (min-width: 1800px) {
+		.attributes-overview-container {
+			@supports (container-type: scroll-state) {
+				container-type: scroll-state;
+				position: sticky;
+				top: -1rem;
+			}
+		}
+
+		.attributes-pie {
+			background-image: radial-gradient(circle closest-side, var(--background-secondary) 90%, transparent 90%);
+
+			animation:
+				AttributesPieAngleAnimation steps(var(--attributesCount), jump-end) forwards,
+				AttributesPieTransformAnimation var(--transition-easeOutExpo) both
+			;
+			animation-range:
+				entry 50% exit 50%,
+				entry 0% exit 100%
+			;
+			animation-timeline: --AttributesViewTimeline;
+
+			> :global(*) {
+				transition-property: translate, scale, opacity;
+				transition-duration: 0.5s;
+				translate: var(--translate);
+				scale: var(--scale);
+				opacity: var(--opacity);
+			}
+		}
+
+		@keyframes AttributesPieAngleAnimation {
+			from {
+				--pie-rotate: calc(-0.25turn + 0.5turn / var(--attributesCount));
+			}
+			to {
+				--pie-rotate: calc(-0.25turn + 0.5turn / var(--attributesCount) + 1turn);
+			}
+			exit 100% {
+				--pie-rotate: 1turn;
+			}
+		}
+
+		@keyframes AttributesPieTransformAnimation {
+			entry 40% {
+				--translate: 0px 0px;
+			}
+			entry 55% {
+				--translate: calc(-50% - 1rem) calc(50vh - 50%);
+			}	
+
+			exit 47.5% {
+				--translate: calc(-50% - 1rem) calc(50vh - 50%);
+				--scale: 1;
+				--opacity: 1;
+			}
+			exit 75% {
+				--opacity: 0;
+			}
+			exit 100% {
+				--scale: 0;
+				--translate: 0 0;
+			}
+		}
+	}
+
+	.attributes {
+		view-timeline: --AttributesViewTimeline block;
+
+		position: relative;
+		display: grid;
+		gap: 1em;
+
+		.attributes-pie {
+			position: sticky;
+			left: 0;
+			top: 50vh;
+			width: max-content;
+			height: 0;
+			translate: -50% -50%;
+		}
+	}
+
 	.attribute {
+		position: relative;
+
 		&::scroll-marker {
 			content: attr(data-icon) '\00a0\00a0' attr(aria-label);
 
@@ -1196,7 +1375,7 @@
 		> details {
 			display: grid;
 			padding: 1.5rem;
-			border-radius: var(--border-radius);
+			border-radius: var(--border-radius-lg);
 			border: 2px solid var(--accent);
 			background-color: var(--background-primary);
 			color: var(--text-primary);
@@ -1216,12 +1395,21 @@
 				justify-content: space-between;
 				align-items: center;
 
-				header {
-					display: grid;
+				> header {
+					flex-grow: 1;
+
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
 					gap: 0.5rem;
 
-					h3 {
-						font-weight: 600;
+					> div {
+						display: grid;
+						gap: 0.5rem;
+
+						h3 {
+							font-weight: 600;
+						}
 					}
 				}
 			}
@@ -1544,67 +1732,6 @@
 				&:hover {
 					transform: translateY(-2px);
 					box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-				}
-
-				&[data-type='ledger'] {
-					&::before {
-						content: '🔵';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(0, 82, 255, 0.1);
-					border-color: rgba(0, 82, 255, 0.3);
-				}
-
-				&[data-type='trezor'] {
-					&::before {
-						content: '🟣';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(99, 0, 226, 0.1);
-					border-color: rgba(99, 0, 226, 0.3);
-				}
-
-				&[data-type='gridplus'] {
-					&::before {
-						content: '🟢';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(0, 168, 98, 0.1);
-					border-color: rgba(0, 168, 98, 0.3);
-				}
-
-				&[data-type='keystone'] {
-					&::before {
-						content: '🟠';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(255, 123, 0, 0.1);
-					border-color: rgba(255, 123, 0, 0.3);
-				}
-
-				&[data-type='keepkey'] {
-					&::before {
-						content: '🔘';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(128, 128, 128, 0.1);
-					border-color: rgba(128, 128, 128, 0.3);
-				}
-
-				&[data-type='firefly'] {
-					&::before {
-						content: '🔴';
-						font-size: 0.9rem;
-					}
-					background-color: rgba(255, 59, 48, 0.1);
-					border-color: rgba(255, 59, 48, 0.3);
-				}
-
-				&[data-type='other'] {
-					&::before {
-						content: '⚪';
-						font-size: 0.9rem;
-					}
 				}
 			}
 		}

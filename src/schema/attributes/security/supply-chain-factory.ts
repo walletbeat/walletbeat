@@ -73,7 +73,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 	methodology: markdown(
 		`Evaluated based on:
 
-- **Factory OPSEC:** Availability and verification (audits, certifications) of documentation detailing security practices during manufacturing.
+- **Factory Operational Security:** Availability and verification (audits, certifications) of documentation detailing security practices during manufacturing.
 
 - **Tamper Evidence:** Effectiveness of physical seals or mechanisms to detect package tampering.
 

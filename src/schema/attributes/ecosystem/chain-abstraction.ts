@@ -376,9 +376,9 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 			up the user's valuations across all chains the wallet supports by
 			default.
 		- When displaying a specific token's balance, the balance should reflect
-			the user's total balance for this token across all chains that the
-			wallet supports by default (and on which the token exists). For rating
-			purposes, Walletbeat looks specifically at Ether and USDT balances.
+			the user's total balance for this token across all wallet-supported
+			chains (and on which the token exists). For rating purposes,
+			Walletbeat looks specifically at Ether and USDT balances.
 
 		In addition, wallets must make it easy for users to move their assets
 		across chains when needed. To get a passing rating, wallets must provide
@@ -391,9 +391,8 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 		- For bridge operations where the net fee is larger than 1bps, the wallet
 			must display the fee breakdown by default.
 		- When the user attempts to send tokens to an address on a chain where the
-			user's own balance is insufficient, but for which there is sufficient
-			balance on another chain, the wallet should automatically propose to use
-			this bridging feature in order to perform the transaction.
+			user's balance is insufficient, but for which they have sufficient tokens
+			on another chain, the wallet should automatically propose to bridge them.
 	`),
 	ratingScale: {
 		display: 'fail-pass',

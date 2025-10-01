@@ -49,7 +49,7 @@ function openInTheFuture({ license, ref }: LicenseWithRef): Evaluation<OpenSourc
 		value: {
 			id: license,
 			rating: Rating.PARTIAL,
-			icon: '\u{2764}', // Mending heart
+			icon: '❤️‍🩹',
 			displayName: `Open source in the future (${licenseName(license)})`,
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} (${licenseName(license)})'s code license commits to transition to open-source in the future.`,
@@ -67,7 +67,7 @@ function proprietary({ ref }: LicenseWithRef): Evaluation<OpenSourceValue> {
 		value: {
 			id: 'proprietary',
 			rating: Rating.FAIL,
-			icon: '\u{1f494}', // Broken heart
+			icon: '💔', // Broken heart
 			displayName: 'Proprietary code license',
 			shortExplanation: sentence('{{WALLET_NAME}} uses a proprietary source code license.'),
 			license: License.PROPRIETARY,
@@ -87,7 +87,7 @@ const unlicensed: Evaluation<OpenSourceValue> = {
 	value: {
 		id: 'unlicensed',
 		rating: Rating.FAIL,
-		icon: '\u{2754}', // White question mark
+		icon: '❔',
 		displayName: 'Unlicensed or missing license file',
 		shortExplanation: sentence(
 			'{{WALLET_NAME}} does not have a valid license for its source code.',
@@ -104,7 +104,7 @@ const unlicensed: Evaluation<OpenSourceValue> = {
 
 export const openSource: Attribute<OpenSourceValue> = {
 	id: 'openSource',
-	icon: '\u{2764}', // Heart
+	icon: '❤️',
 	displayName: 'Source code license',
 	wording: {
 		midSentenceName: 'source code license',

@@ -35,7 +35,8 @@
 
 	// Functions
 	import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
-	import { getVariantResolvedWallet, getWalletVariants, walletSupportedAccountTypes } from '@/schema/wallet'
+	import { getVariantResolvedWallet, walletSupportedAccountTypes } from '@/schema/wallet'
+	import { getVariants } from '@/schema/variants'
 	import { isLabeledUrl } from '@/schema/url'
 	import { isAccountTypeSupported } from '@/schema/features/account-support'
 	import { refs } from '@/schema/reference'
@@ -60,7 +61,7 @@
 	}
 
 	const getWalletContract = (wallet: RatedWallet): SmartWalletContract | 'UNKNOWN' | undefined => {
-		for (const variant of setItems<Variant>(getWalletVariants(wallet))) {
+		for (const variant of setItems<Variant>(getVariants(wallet.variants))) {
 			const variantWallet = getVariantResolvedWallet(wallet, variant)
 
 			if (variantWallet === null || variantWallet.features.accountSupport === null)
@@ -208,7 +209,7 @@
 				<Tooltip placement="block-start">
 					<button
 						class="tag"
-						data-tag-type="eip"
+						data-tag-variant="eip"
 						aria-label="Filter by EIP-7702"
 						onclick={e => {
 							e.stopPropagation()
@@ -227,7 +228,7 @@
 					<Tooltip placement="block-start">
 						<button
 							class="tag"
-							data-tag-type="eip"
+							data-tag-variant="eip"
 							aria-label="Filter by ERC-4337"
 							onclick={e => {
 								e.stopPropagation()
@@ -245,7 +246,7 @@
 					{#if typeFor7702 === WalletTypeFor7702.NON_7702_EOA}
 						<button
 							class="tag"
-							data-tag-type="eoa"
+							data-tag-variant="eoa"
 							aria-label="Filter by EOA"
 							onclick={e => {
 								e.stopPropagation()
@@ -380,24 +381,6 @@
 	}
 
 	.tag {
-		&[data-tag-type='eip'] {
-			--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
-			--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.70 0.25 300));
-			--tag-borderColor: light-dark(oklch(0.90 0.06 300), oklch(0.40 0.08 300));
-			--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.30 0.07 300));
-			--tag-hover-textColor: light-dark(oklch(0.60 0.18 300), oklch(0.85 0.15 300));
-			--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.50 0.10 300));
-		}
-
-		&[data-tag-type='eoa'] {
-			--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
-			--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.70 0.25 145));
-			--tag-borderColor: light-dark(oklch(0.90 0.06 145), oklch(0.40 0.08 145));
-			--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.30 0.07 145));
-			--tag-hover-textColor: light-dark(oklch(0.60 0.18 145), oklch(0.85 0.15 145));
-			--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.50 0.10 145));
-		}
-
 		:global(button:has(&)) {
 			display: inline-flex;
 		}

@@ -1,5 +1,6 @@
 import type { ChainDataProvider, OffchainDataProvider } from '@/schema/entity'
 
+/** JiffyLabs */
 export const jiffylabs: ChainDataProvider & OffchainDataProvider = {
 	id: 'jiffylabs',
 	name: 'Jiffy Labs',

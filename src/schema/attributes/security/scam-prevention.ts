@@ -296,16 +296,15 @@ function evaluateScamAlerts(
 				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
-			howToImprove: markdown(
-				`{{WALLET_NAME}} should implement the following features:
+			howToImprove: markdown(`
+				{{WALLET_NAME}} should implement the following features:
 
 				${unsupportedFeatures
-					.map(
-						sas => `
-						*	${sas.listFeature}
-					`,
-					)
-					.join('\n')}
+					.map(sas => `
+				*	${sas.listFeature}
+				`)
+					.join('')
+				}
 			`,
 			),
 			references: allRefs,
@@ -472,7 +471,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		],
 		partial: [
 			exampleRating(
-				sentence('The wallet implements some but not all of the required scam warning features.'),
+				sentence('The wallet implements some but not all the required scam warning features.'),
 				evaluateScamAlerts(WalletProfile.GENERIC, {
 					contractTransactionWarning: notSupported,
 					scamUrlWarning: supported({

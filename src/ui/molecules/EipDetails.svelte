@@ -25,11 +25,17 @@
 <article>
 	<header>
 		<div class="tags">
-			<div class="tag" data-tag-type="eip">
+			<div
+				class="tag"
+				data-tag-variant="eip"
+			>
 				{eip.prefix}-{eip.number}
 			</div>
 
-			<div class="tag" data-tag-type="eip-status">
+			<div
+				class="tag"
+				data-tag-variant="eip-status"
+			>
 				{eip.status}
 			</div>
 		</div>
@@ -99,26 +105,6 @@
 				display: flex;
 				align-items: center;
 				gap: 0.5em;
-
-				.tag {
-					&[data-tag-type='eip'] {
-						--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
-						--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.70 0.25 300));
-						--tag-borderColor: light-dark(oklch(0.90 0.06 300), oklch(0.40 0.08 300));
-						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.30 0.07 300));
-						--tag-hover-textColor: light-dark(oklch(0.60 0.18 300), oklch(0.85 0.15 300));
-						--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.50 0.10 300));
-					}
-
-					&[data-tag-type='eip-status'] {
-						--tag-backgroundColor: light-dark(oklch(0.95 0.03 250), oklch(0.25 0.05 250));
-						--tag-textColor: light-dark(oklch(0.65 0.15 250), oklch(0.70 0.25 250));
-						--tag-borderColor: light-dark(oklch(0.90 0.06 250), oklch(0.40 0.08 250));
-						--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 250), oklch(0.30 0.07 250));
-						--tag-hover-textColor: light-dark(oklch(0.60 0.18 250), oklch(0.85 0.15 250));
-						--tag-hover-borderColor: light-dark(oklch(0.85 0.08 250), oklch(0.50 0.10 250));
-					}
-				}
 			}
 
 			h3 {

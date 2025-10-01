@@ -1,0 +1,7 @@
+PidFile /tmp/pids/tor.pid
+AvoidDiskWrites 1
+RunAsDaemon 0
+ClientOnly 1
+SafeSocks 1
+RejectPlaintextPorts 80
+HTTPTunnelPort 127.0.0.1:9980 IsolateClientAddr IsolateDestAddr IsolateDestPort

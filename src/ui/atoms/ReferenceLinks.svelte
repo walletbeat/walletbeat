@@ -6,35 +6,48 @@
 	// Props
 	let {
 		references,
-		explanation,
 	}: {
 		references: FullyQualifiedReference[]
-		explanation?: string
 	} = $props()
 </script>
 
 
 {#if references.length > 0}
-	{@const totalUrls = references.reduce((count: number, ref: FullyQualifiedReference) => count + ref.urls.length, 0)}
+	<!-- {@const totalUrls = references.reduce((count: number, ref: FullyQualifiedReference) => count + ref.urls.length, 0)} -->
 	
 	<div>
-		<span>{totalUrls > 1 ? 'Sources:' : 'Source:'}</span>
-		{#each references as ref, refIndex}
-			{#if refIndex > 0}, {/if}
-			{#each ref.urls as url, urlIndex}
-				{#if urlIndex > 0}, {/if}
-				<a
-					href={url.url}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{url.label}
-				</a>
+		<!-- <h5>{totalUrls > 1 ? 'Sources' : 'Source'}</h5> -->
+
+		<ul class="references">
+			{#each references as ref}
+				<li>
+					{#if ref.explanation}
+						<p>{ref.explanation}</p>
+					{/if}
+
+					<div class="urls">
+						<ul>
+							{#each ref.urls as url}
+								<li>
+									<a
+										href={url.url}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<cite>{url.label}</cite>
+									</a>
+								</li>
+							{/each}
+						</ul>
+
+						{#if ref.lastRetrieved}
+							as of
+							<time datetime={ref.lastRetrieved}>{ref.lastRetrieved}</time>
+						{/if}
+					</div>
+				</li>
 			{/each}
-		{/each}
-		{#if explanation !== undefined && explanation !== ''}
-			<p>({explanation})</p>
-		{/if}
+		</ul>
 	</div>
 {/if}
 
@@ -50,12 +63,45 @@
 		line-height: 1.4;
 	}
 
-	strong {
-		margin-right: 0.25rem;
+	ul.references {
+		font-size: smaller;
+		list-style: none;
+
+		> * + * {
+			margin-top: 1em;
+		}
+
+		> li {
+			background-color: var(--background-secondary);
+			padding: 1em;
+			padding-left: 2em;
+			border-radius: 0.5em;
+
+			> * + * {
+				margin-top: 1em;
+			}
+
+			ul {
+				list-style: none;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1em;
+				padding: 0;
+
+				li {
+					background-color: var(--background-primary);
+					padding: 0.5em;
+					border-radius: 0.5em;
+				}
+			}
+		}
+	}
+
+	cite {
+		font-style: normal;
 	}
 
 	p {
-		margin-left: 0.25rem;
-		font-style: italic;
+		margin-top: 0.5em;
 	}
 </style> 

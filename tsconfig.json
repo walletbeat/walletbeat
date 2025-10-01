@@ -6,6 +6,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@/data/*": ["./data/*"],
+			"@/tests/*": ["./tests/*"],
 			"@/*": ["src/*"]
 		},
 		"lib": ["ES2024"],

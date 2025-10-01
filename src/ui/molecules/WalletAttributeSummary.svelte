@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import { type EvaluatedAttribute, ratingToIcon } from '@/schema/attributes'
+	import { type EvaluatedAttribute, ratingIcons, ratingToColor } from '@/schema/attributes'
 	import { attributeVariantSpecificity, VariantSpecificity, type RatedWallet } from '@/schema/wallet'
 	import type { Variant } from '@/schema/variants'
 
@@ -10,10 +10,14 @@
 		wallet,
 		attribute,
 		variant,
+		showRating = false,
+		isInTooltip = false,
 	}: {
 		wallet: RatedWallet
 		attribute: EvaluatedAttribute<any>
 		variant?: Variant
+		showRating?: boolean
+		isInTooltip?: boolean
 	} = $props()
 
 
@@ -28,14 +32,28 @@
 </script>
 
 
-<div>
-	<h4>
-		<span>{attribute.evaluation.value.icon ?? attribute.attribute.icon}</span>
-		{attribute.attribute.displayName}
-	</h4>
+<div 
+	class="attribute-summary"
+	data-in-tooltip={isInTooltip ? '' : undefined}
+	style:--accent={ratingToColor(attribute.evaluation.value.rating)}
+>
+	<header>
+		<h4>
+			<span>{attribute.evaluation.value.icon ?? attribute.attribute.icon}</span>
+			{attribute.attribute.displayName}
+		</h4>
+
+		{#if showRating}
+			<data
+				class="badge"
+				data-badge-size="small"
+				value={attribute.evaluation.value.rating}
+			>{attribute.evaluation.value.rating}</data>
+		{/if}
+	</header>
 
 	<p>
-		{ratingToIcon(attribute.evaluation.value.rating)}
+		{ratingIcons[attribute.evaluation.value.rating]}
 
 		<Typography
 			content={attribute.evaluation.value.shortExplanation}
@@ -69,11 +87,36 @@
 
 
 <style>
-	div {
+	.attribute-summary {
 		font-size: smaller;
-
 		display: grid;
 		gap: 1em;
 		line-height: 1.4;
+
+		&[data-in-tooltip] {
+			padding: 0.75rem;
+			border-radius: 0.5rem;
+			border: 2px solid var(--accent);
+			background-color: var(--background-primary);
+		}
+
+		header {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 0.5em 0.75em;
+
+			h4 {
+				font-weight: 600;
+				display: flex;
+				align-items: center;
+				gap: 0.33em;
+			}
+		}
+
+		p :global(.markdown) {
+			display: inline;
+		}
 	}
 </style>

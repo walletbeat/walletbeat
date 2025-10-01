@@ -13,6 +13,7 @@ export enum License {
 	MIT = 'MIT',
 	MIT_WITH_CLAUSE = 'MIT-C',
 	PROPRIETARY = '_PROPRIETARY',
+	PROPRIETARY_SOURCE_AVAILABLE = '_PROPRIETARY_SOURCE_AVAILABLE',
 	UNLICENSED_VISIBLE = '_UNLICENSED_VISIBLE',
 }
 
@@ -53,6 +54,8 @@ export function licenseName(license: License): string {
 			return 'MIT with Clause'
 		case License.PROPRIETARY:
 			return 'Proprietary'
+		case License.PROPRIETARY_SOURCE_AVAILABLE:
+			return 'Proprietary source-available'
 		case License.UNLICENSED_VISIBLE:
 			return 'Unlicensed'
 	}
@@ -75,6 +78,8 @@ export function licenseIsFOSS(license: License): FOSS {
 		case License.MIT:
 			return FOSS.FOSS
 		case License.PROPRIETARY:
+			return FOSS.NOT_FOSS
+		case License.PROPRIETARY_SOURCE_AVAILABLE:
 			return FOSS.NOT_FOSS
 		case License.UNLICENSED_VISIBLE:
 			return FOSS.NOT_FOSS
@@ -103,6 +108,8 @@ export function licenseSourceIsVisible(license: License): boolean {
 			return true
 		case License.PROPRIETARY:
 			return false
+		case License.PROPRIETARY_SOURCE_AVAILABLE:
+			return true
 		case License.UNLICENSED_VISIBLE:
 			return true
 	}
@@ -113,16 +120,17 @@ export function licenseSourceIsVisible(license: License): boolean {
  * @returns The SPDX URL of the license.
  */
 export function licenseUrl(license: License): LabeledUrl | null {
-	if (license === License.PROPRIETARY) {
-		return null
-	}
-
-	if (license === License.UNLICENSED_VISIBLE) {
-		return null
-	}
-
-	return {
-		url: `https://spdx.org/licenses/${license}.html`,
-		label: licenseName(license),
+	switch (license) {
+		case License.PROPRIETARY:
+			return null
+		case License.PROPRIETARY_SOURCE_AVAILABLE:
+			return null
+		case License.UNLICENSED_VISIBLE:
+			return null
+		default:
+			return {
+				url: `https://spdx.org/licenses/${license}.html`,
+				label: licenseName(license),
+			}
 	}
 }

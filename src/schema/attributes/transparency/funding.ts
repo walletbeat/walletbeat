@@ -135,9 +135,12 @@ export const funding: Attribute<FundingValue> = {
 		midSentenceName: 'funding',
 	},
 	question: sentence("How is the wallet's development team funded?"),
-	why: paragraph(
-		'Wallets are complex, high-stakes pieces of software. They must be maintained, regularly audited, and follow the continuous improvements in the ecosystem. This requires a reliable, transparent source of funding.',
-	),
+	why: paragraph(`
+		Wallets are complex, high-stakes pieces of software.
+		They must be maintained, regularly audited, and follow the continuous
+		improvements in the ecosystem.
+		This requires a reliable, transparent source of funding.
+	`),
 	methodology: markdown(`
 		Wallets are assessed based on how sustainable, transparent, and
 		user-aligned their funding mechanisms are.

@@ -13,7 +13,9 @@ if [[ -z "${1:-}" ]]; then
 	echo 'be replaced with the actual Helios RPC endpoint value.' >&2
 	exit 2
 fi
-NON_SECURE_RPC_ENDPOINT="${ETHEREUM_MAINNET_RPC_ENDPOINT:-https://eth-mainnet.g.alchemy.com/v2/demo}"
+ETHEREUM_MAINNET_CONSENSUS_RPC_ENDPOINT="${ETHEREUM_MAINNET_CONSENSUS_RPC_ENDPOINT:-https://www.lightclientdata.org}"
+ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="${ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT:-https://eth-mainnet.g.alchemy.com/v2/demo}"
+HELIOS_STARTUP_PROBE_SECONDS="${HELIOS_STARTUP_PROBE_SECONDS:-10}"
 if ! hash wget; then
 	echo 'wget not installed.' >&2
 	exit 1
@@ -31,7 +33,8 @@ echo '[Helios] Starting Helios...' >&2
 	--network=mainnet \
 	--rpc-bind-ip="$HELIOS_IP" \
 	--rpc-port="$HELIOS_PORT" \
-	--execution-rpc="$NON_SECURE_RPC_ENDPOINT" \
+	--consensus-rpc="$ETHEREUM_MAINNET_CONSENSUS_RPC_ENDPOINT" \
+	--execution-rpc="$ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT" \
 	--strict-checkpoint-age \
 	--data-dir="${SCRIPT_DIR}/data" &
 HELIOS_PID="$!"
@@ -52,7 +55,7 @@ maybe_kill() {
 }
 
 sleep 10
-for i in $(seq 1 10); do
+for i in $(seq 1 "$HELIOS_STARTUP_PROBE_SECONDS"); do
 	if probe; then
 	  break
 	fi

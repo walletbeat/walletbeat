@@ -1,6 +1,7 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	HardwareWalletConnection,
@@ -9,6 +10,7 @@ import {
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -62,6 +64,9 @@ export const metamask: SoftwareWallet = {
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
+		ecosystem: {
+			delegation: null,
+		},
 		integration: {
 			browser: {
 				'1193': null,
@@ -69,9 +74,25 @@ export const metamask: SoftwareWallet = {
 				'6963': null,
 				ref: null,
 			},
-			eip5792: null,
+			walletCall: null,
 		},
-		license: null,
+		license: {
+			[Variant.BROWSER]: {
+				license: License.PROPRIETARY_SOURCE_AVAILABLE,
+				ref: {
+					explanation:
+						'The MetaMask browser extension uses a proprietary source-available license.',
+					url: 'https://github.com/MetaMask/metamask-extension/blob/main/LICENSE',
+				},
+			},
+			[Variant.MOBILE]: {
+				license: License.PROPRIETARY_SOURCE_AVAILABLE,
+				ref: {
+					explanation: 'The MetaMask mobile app uses a proprietary source-available license.',
+					url: 'https://github.com/MetaMask/metamask-mobile/blob/main/LICENSE',
+				},
+			},
+		},
 		monetization: {
 			ref: null,
 			revenueBreakdownIsPublic: false,
@@ -93,7 +114,8 @@ export const metamask: SoftwareWallet = {
 			privacyPolicy: 'https://consensys.io/privacy-notice',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
-				stealthAddresses: notSupported,
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,

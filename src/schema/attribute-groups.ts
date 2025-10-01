@@ -7,6 +7,7 @@ import {
 	nonEmptyRemap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
+import { objectEntries } from '@/types/utils/object'
 
 import {
 	type Attribute,
@@ -36,6 +37,10 @@ import {
 	chainAbstraction,
 	type ChainAbstractionValue,
 } from './attributes/ecosystem/chain-abstraction'
+import {
+	transactionBatching,
+	type TransactionBatchingValue,
+} from './attributes/ecosystem/transaction-batching'
 import {
 	addressCorrelation,
 	type AddressCorrelationValue,
@@ -112,7 +117,7 @@ import {
 	type SourceVisibilityValue,
 } from './attributes/transparency/source-visibility'
 import type { ResolvedFeatures } from './features'
-import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score'
+import { type MaybeUnratedScore, type Score, type WeightedScore, weightedScore } from './score'
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { WalletMetadata } from './wallet'
 
@@ -268,6 +273,7 @@ type EcosystemValues = Dict<{
 	addressResolution: AddressResolutionValue
 	browserIntegration: BrowserIntegrationValue
 	chainAbstraction: ChainAbstractionValue
+	transactionBatching: TransactionBatchingValue
 	interoperability: InteroperabilityValue
 }>
 
@@ -284,6 +290,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		addressResolution,
 		browserIntegration,
 		chainAbstraction,
+		transactionBatching,
 		interoperability,
 	},
 	attributeWeights: {
@@ -291,6 +298,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		addressResolution: 1.0,
 		browserIntegration: 1.0,
 		chainAbstraction: 1.0,
+		transactionBatching: 1.0,
 		interoperability: 1.0,
 	},
 }
@@ -467,6 +475,7 @@ export function evaluateAttributes(
 			addressResolution: evalAttr(addressResolution),
 			browserIntegration: evalAttr(browserIntegration),
 			chainAbstraction: evalAttr(chainAbstraction),
+			transactionBatching: evalAttr(transactionBatching),
 			interoperability: evalAttr(interoperability),
 		},
 		maintenance: {
@@ -536,6 +545,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			addressResolution: attr(tree => tree.ecosystem.addressResolution),
 			browserIntegration: attr(tree => tree.ecosystem.browserIntegration),
 			chainAbstraction: attr(tree => tree.ecosystem.chainAbstraction),
+			transactionBatching: attr(tree => tree.ecosystem.transactionBatching),
 			interoperability: attr(tree => tree.ecosystem.interoperability),
 		},
 		maintenance: {
@@ -665,7 +675,7 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 	weights: AttributeGroup<Vs>['attributeWeights'],
 	evaluations: EvaluatedGroup<Vs>,
 ): MaybeUnratedScore {
-	const subScores: WeightedScore[] = nonEmptyValues<keyof Vs, WeightedScore | null>(
+	const subScores = nonEmptyValues<keyof Vs, WeightedScore | null>(
 		nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
 			const { value } = evaluations[key].evaluation
 			const score = value.score ?? defaultRatingScore(value.rating)
@@ -675,9 +685,10 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 				: {
 						score,
 						weight,
-					}
+					} as WeightedScore
 		}),
-	).filter(score => score !== null)
+	)
+		.filter(score => score !== null)
 
 	if (isNonEmptyArray(subScores)) {
 		let hasUnratedComponent = false
@@ -690,6 +701,56 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 	}
 
 	return null
+}
+
+/**
+ * Filter an evaluation tree to only include specific attribute groups.
+ * @param evaluationTree The evaluation tree to filter.
+ * @param attributeGroups The attribute groups to include.
+ * @returns A filtered evaluation tree containing only the specified groups.
+ */
+export const filterEvaluationTree = (
+	evaluationTree: EvaluationTree,
+	attributeGroups: AttributeGroup<any>[],
+): Partial<EvaluationTree> => {
+	const groupIds = new Set(attributeGroups.map(group => group.id))
+
+	return (
+		Object.fromEntries(
+			Object.entries(evaluationTree)
+				.filter(([attrGroupId]) => groupIds.has(attrGroupId))
+		) as Partial<EvaluationTree>
+	)
+}
+
+/**
+ * Calculate the overall wallet score by averaging all attribute group scores.
+ * @param evaluationTree The evaluation tree to score.
+ * @returns The overall score between 0.0 (lowest) and 1.0 (highest), or undefined if no scores.
+ */
+export const calculateOverallScore = (evaluationTree: EvaluationTree | Partial<EvaluationTree>): MaybeUnratedScore => {
+	const scores = (
+		objectEntries(attributeTree)
+			.map(([attrGroupId, attrGroup]) => (
+				evaluationTree[attrGroupId] && (
+					calculateAttributeGroupScore(
+						attrGroup.attributeWeights,
+						evaluationTree[attrGroupId] as any,
+					)
+				)
+			))
+			.filter((score): score is { score: number, hasUnratedComponent: boolean } => score?.score !== undefined)
+	)
+
+	return {
+		score: (
+			scores.length ?
+				scores.reduce((sum, { score }) => sum + score, 0) / scores.length
+			:
+				undefined
+		),
+		hasUnratedComponent: scores.some(score => score?.hasUnratedComponent),
+	}
 }
 
 /**
