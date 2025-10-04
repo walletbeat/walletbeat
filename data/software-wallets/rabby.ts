@@ -229,7 +229,7 @@ export const rabby: SoftwareWallet = {
 								dataCollection: {
 									[PersonalInfo.CEX_ACCOUNT]: CollectionPolicy.NEVER, // There appears to be code to link to a Coinbase account but no way to reach it from the UI?
 									[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
-									[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+									[WalletInfo.TRANSACTION_DATA]: CollectionPolicy.ALWAYS,
 									[WalletInfo.USER_ACTIONS]: CollectionPolicy.ALWAYS, // Matomo analytics
 									[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 									endpoint: RegularEndpoint,

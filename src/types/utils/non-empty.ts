@@ -243,6 +243,13 @@ export function setItems<K extends string | number | symbol>(
 }
 
 /**
+ * Number of items in the set. Guaranteed to not be zero.
+ */
+export function setSize(set: NonEmptySet<string | number | symbol>): Exclude<number, 0> {
+	return Object.entries(set).length
+}
+
+/**
  * Returns the union of one or more non-empty sets.
  */
 export function setUnion<K extends string | number | symbol>(

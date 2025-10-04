@@ -34,6 +34,7 @@ import type { BasicOperationFees } from './features/transparency/fee-display'
 import type { LicenseWithRef } from './features/transparency/license'
 import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { Monetization } from './features/transparency/monetization'
+import type { OrderflowDisclosures } from './features/transparency/orderflow'
 import type { ReputationSupport } from './features/transparency/reputation'
 import type { WithRef } from './reference'
 import {
@@ -142,6 +143,12 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<TransactionSubmission>
+	}
+
+	/** Transparency features. */
+	transparency: {
+		/** How well the wallet discloses who gets access to user orderflow data. */
+		orderflow: VariantFeature<OrderflowDisclosures>
 	}
 
 	/** Ecosystem features. */
@@ -270,6 +277,7 @@ export interface ResolvedFeatures {
 		operationFees: ResolvedFeature<BasicOperationFees>
 		reputation: ResolvedFeature<ReputationSupport>
 		maintenance: ResolvedFeature<MaintenanceSupport>
+		orderflow: ResolvedFeature<OrderflowDisclosures>
 	}
 	chainAbstraction: ResolvedFeature<ChainAbstraction>
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
@@ -413,6 +421,10 @@ export function resolveFeatures(
 			maintenance: hardwareFeat(
 				'transparency.maintenance',
 				features => features.transparency.maintenance,
+			),
+			orderflow: softwareFeat(
+				'transparency.orderflow',
+				features => features.transparency.orderflow,
 			),
 		},
 		chainAbstraction: softwareFeat('chainAbstraction', features => features.chainAbstraction),

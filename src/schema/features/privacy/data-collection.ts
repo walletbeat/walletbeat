@@ -157,109 +157,178 @@ export const RegularEndpoint = {
 } as const
 
 /**
+ * Represents a server endpoint running in a secure enclave (TEE).
+ */
+export interface SecureEnclaveEndpoint {
+	/**
+	 * The server is running in a secure enclave.
+	 */
+	type: 'SECURE_ENCLAVE'
+
+	/**
+	 * Whether the software running within the enclave is verifiable
+	 * by the client.
+	 */
+	verifiability: WithRef<{
+		/**
+		 * Whether the source code of the server software is available.
+		 */
+		sourceAvailable: boolean
+
+		/**
+		 * Whether the source code of the server software can be reproducibly
+		 * built.
+		 */
+		reproducibleBuilds: boolean
+
+		/**
+		 * How the client verifies that the endpoint is running in a secure enclave.
+		 */
+		clientVerification:
+			| {
+					/** The client does not do any verification. */
+					type: 'NOT_VERIFIED'
+			  }
+			| {
+					/**
+					 * The client claims to verify but has not made the source code that
+					 * does this available.
+					 */
+					type: 'VERIFIED_BUT_NO_SOURCE_AVAILABLE'
+			  }
+			| MustRef<{
+					/**
+					 * The client verifies this. Must also come with a code reference.
+					 */
+					type: 'VERIFIED'
+			  }>
+	}>
+
+	/**
+	 * Whether the endpoint running in a secure enclave logs anything
+	 * outside of the enclave, thereby removing the privacy advantage
+	 * of enclaves.
+	 */
+	externalLogging:
+		| {
+				/**
+				 * It is not known whether the software running within the enclave
+				 * logs any data externally.
+				 */
+				type: 'UNKNOWN'
+		  }
+		| {
+				/**
+				 * This server software is known to log data externally to the
+				 * enclave.
+				 */
+				type: 'YES'
+		  }
+		| {
+				/**
+				 * This server software does not log data externally to the
+				 * enclave.
+				 */
+				type: 'NO'
+		  }
+
+	/**
+	 * Info about the use of end-to-end encryption to the endpoint.
+	 * In most cases, this means where does the TLS handshake happens?
+	 * If this does not happen within the enclave (such as if terminated
+	 * at the load balancer level), then the connection is susceptible to
+	 * be man-in-the-middle'd.
+	 */
+	endToEndEncryption:
+		| {
+				/** No end-to-end encryption (really? in this day and age?) */
+				type: 'NONE'
+		  }
+		| {
+				/**
+				 * End-to-end encryption terminated outside of the enclave,
+				 * for example at the load balancer level.
+				 */
+				type: 'TERMINATED_OUT_OF_ENCLAVE'
+		  }
+		| {
+				/** End-to-end encryption terminated inside the enclave. */
+				type: 'TERMINATED_INSIDE_ENCLAVE'
+		  }
+}
+
+/**
  * The environment in which the server endpoint is running.
  * A server can either be running as a regular server (`RegularEndpoint`),
  * or in a secure enclave which potentially gives it more privacy properties.
  */
-export type Endpoint =
-	| typeof RegularEndpoint
-	| {
-			/**
-			 * The server is running in a secure enclave.
-			 */
-			type: 'SECURE_ENCLAVE'
+export type Endpoint = typeof RegularEndpoint | SecureEnclaveEndpoint
 
-			/**
-			 * Whether the software running within the enclave is verifiable
-			 * by the client.
-			 */
-			verifiability: WithRef<{
-				/**
-				 * Whether the source code of the server software is available.
-				 */
-				sourceAvailable: boolean
+/** Type predicate for SecureEnclaveEndpoint. */
+export function isSecureEnclaveEndpoint(endpoint: Endpoint): endpoint is SecureEnclaveEndpoint {
+	return endpoint.type === 'SECURE_ENCLAVE'
+}
 
-				/**
-				 * Whether the source code of the server software can be reproducibly
-				 * built.
-				 */
-				reproducibleBuilds: boolean
+/**
+ * Does the given endpoint run verifiable code?
+ */
+export function endpointRunsVerifiableCode(endpoint: Endpoint): boolean {
+	if (!isSecureEnclaveEndpoint(endpoint)) {
+		return false
+	}
 
-				/**
-				 * How the client verifies that the endpoint is running in a secure enclave.
-				 */
-				clientVerification:
-					| {
-							/** The client does not do any verification. */
-							type: 'NOT_VERIFIED'
-					  }
-					| {
-							/**
-							 * The client claims to verify but has not made the source code that
-							 * does this available.
-							 */
-							type: 'VERIFIED_BUT_NO_SOURCE_AVAILABLE'
-					  }
-					| MustRef<{
-							/**
-							 * The client verifies this. Must also come with a code reference.
-							 */
-							type: 'VERIFIED'
-					  }>
-			}>
+	if (!endpoint.verifiability.sourceAvailable) {
+		return false // No source, obviously not verifiable.
+	}
 
-			/**
-			 * Whether the endpoint running in a secure enclave logs anything
-			 * outside of the enclave, thereby removing the privacy advantage
-			 * of enclaves.
-			 */
-			externalLogging:
-				| {
-						/**
-						 * It is not known whether the software running within the enclave
-						 * logs any data externally.
-						 */
-						type: 'UNKNOWN'
-				  }
-				| {
-						/**
-						 * This server software is known to log data externally to the
-						 * enclave.
-						 */
-						type: 'YES'
-				  }
-				| {
-						/**
-						 * This server software does not log data externally to the
-						 * enclave.
-						 */
-						type: 'NO'
-				  }
+	if (!endpoint.verifiability.reproducibleBuilds) {
+		return false // No reproducible builds means any attestation data is not meaningful.
+	}
 
-			/**
-			 * Info about the use of end-to-end encryption to the endpoint.
-			 * In most cases, this means where does the TLS handshake happens?
-			 * If this does not happen within the enclave (such as if terminated
-			 * at the load balancer level), then the connection is susceptible to
-			 * be man-in-the-middle'd.
-			 */
-			endToEndEncryption:
-				| {
-						/** No end-to-end encryption (really? in this day and age?) */
-						type: 'NONE'
-				  }
-				| {
-						/**
-						 * End-to-end encryption terminated outside of the enclave,
-						 * for example at the load balancer level.
-						 */
-						type: 'TERMINATED_OUT_OF_ENCLAVE'
-				  }
-				| {
-						/** End-to-end encryption terminated inside the enclave. */
-						type: 'TERMINATED_INSIDE_ENCLAVE'
-				  }
-	  }
+	switch (endpoint.endToEndEncryption.type) {
+		case 'NONE':
+			// No e2e encryption means a non-enclave middleman can act on the data
+			// going into the enclave, i.e. the enclave is not the only thing privy
+			// to the communication.
+			return false
+		case 'TERMINATED_OUT_OF_ENCLAVE':
+			// If e2e encryption is terminated outside the enclave, then a
+			// non-enclave middleman can act on the data going into the enclave,
+			// i.e. the enclave is not the only thing privy to the communication.
+			return false
+		case 'TERMINATED_INSIDE_ENCLAVE':
+			break // Continue
+	}
+
+	return true
+}
+
+/**
+ * Does the given endpoint run verifiable code,
+ * and does the client verify that?
+ */
+export function endpointRunsVerifiedCode(endpoint: Endpoint): boolean {
+	if (!isSecureEnclaveEndpoint(endpoint)) {
+		return false
+	}
+
+	if (!endpointRunsVerifiableCode(endpoint)) {
+		return false
+	}
+
+	switch (endpoint.verifiability.clientVerification.type) {
+		case 'NOT_VERIFIED':
+			// Client doesn't verify the server attestation.
+			return false
+		case 'VERIFIED_BUT_NO_SOURCE_AVAILABLE':
+			// Client may verify the server attestation, but we can't see the source
+			// code of that client verifying this, so cannot verify.
+			return false
+		case 'VERIFIED':
+			// Client verifies.
+			return true
+	}
+}
 
 /** Returns whether an endpoint gets to learn the user's IP address */
 export function endpointLearnsUserIpAddress(endpoint: Endpoint): 'YES' | 'NO' | 'UNVERIFIABLE' {
@@ -390,10 +459,20 @@ export enum WalletInfo {
 	ASSETS = 'assets',
 
 	/**
+	 * Non-transaction data which expresses an intent of the user to
+	 * perform a transaction in the near future.
+	 * For example, a swap quote with specific pricing/routing for a
+	 * given chain and wallet address may not be a well-formed Ethereum
+	 * transaction object, but nonetheless carries similar level of information
+	 * about the user's upcoming transaction.
+	 */
+	TRANSACTION_INTENT = 'transactionIntent',
+
+	/**
 	 * The user's wallet transactions before they are included onchain.
 	 * For example, MEV protection services usually fall under this category.
 	 */
-	MEMPOOL_TRANSACTIONS = 'mempoolTransactions',
+	TRANSACTION_DATA = 'transactionData',
 
 	/** Domain names the wallet is connected to. */
 	WALLET_CONNECTED_DOMAINS = 'walletConnectedDomains',
@@ -404,7 +483,8 @@ export const walletInfo = new Enum<WalletInfo>({
 	[WalletInfo.ACCOUNT_ADDRESS]: true,
 	[WalletInfo.BALANCE]: true,
 	[WalletInfo.ASSETS]: true,
-	[WalletInfo.MEMPOOL_TRANSACTIONS]: true,
+	[WalletInfo.TRANSACTION_INTENT]: true,
+	[WalletInfo.TRANSACTION_DATA]: true,
 	[WalletInfo.WALLET_CONNECTED_DOMAINS]: true,
 })
 
@@ -431,37 +511,39 @@ function userInfoScore(userInfo: UserInfo): number {
 			return 3
 		case WalletInfo.ACCOUNT_ADDRESS:
 			return 4
-		case WalletInfo.MEMPOOL_TRANSACTIONS:
+		case WalletInfo.TRANSACTION_INTENT:
 			return 5
-		case WalletInfo.WALLET_CONNECTED_DOMAINS:
-			return 5
-		case PersonalInfo.PSEUDONYM:
+		case WalletInfo.TRANSACTION_DATA:
 			return 6
+		case WalletInfo.WALLET_CONNECTED_DOMAINS:
+			return 7
+		case PersonalInfo.PSEUDONYM:
+			return 8
 
 		// All the social-media-y entries are roughly the same as email.
 		case PersonalInfo.FARCASTER_ACCOUNT:
-			return 7
+			return 9
 		case PersonalInfo.X_DOT_COM_ACCOUNT:
-			return 7
+			return 9
 		case PersonalInfo.EMAIL:
-			return 7
+			return 9
 
 		case PersonalInfo.BROWSING_HISTORY_URLS:
-			return 8
-		case PersonalInfo.LEGAL_NAME:
-			return 9
-		case PersonalInfo.PHONE:
 			return 10
-		case PersonalInfo.CONTACTS:
+		case PersonalInfo.LEGAL_NAME:
 			return 11
-		case PersonalInfo.PHYSICAL_ADDRESS:
+		case PersonalInfo.PHONE:
 			return 12
-		case PersonalInfo.CEX_ACCOUNT:
+		case PersonalInfo.CONTACTS:
 			return 13
-		case PersonalInfo.FACE:
+		case PersonalInfo.PHYSICAL_ADDRESS:
 			return 14
-		case PersonalInfo.GOVERNMENT_ID:
+		case PersonalInfo.CEX_ACCOUNT:
 			return 15
+		case PersonalInfo.FACE:
+			return 16
+		case PersonalInfo.GOVERNMENT_ID:
+			return 17
 	}
 }
 
@@ -487,7 +569,9 @@ export function userInfoType(userInfo: UserInfo): UserInfoType {
 			return UserInfoType.WALLET_RELATED
 		case WalletInfo.ACCOUNT_ADDRESS:
 			return UserInfoType.WALLET_RELATED
-		case WalletInfo.MEMPOOL_TRANSACTIONS:
+		case WalletInfo.TRANSACTION_INTENT:
+			return UserInfoType.WALLET_RELATED
+		case WalletInfo.TRANSACTION_DATA:
 			return UserInfoType.WALLET_RELATED
 		case WalletInfo.WALLET_CONNECTED_DOMAINS:
 			return UserInfoType.WALLET_RELATED
@@ -536,7 +620,7 @@ export function userInfoName(userInfo: UserInfo) {
 			return { short: 'wallet balance', long: 'wallet assets and balances' } as const
 		case WalletInfo.ACCOUNT_ADDRESS:
 			return { short: 'wallet address', long: 'wallet address' } as const
-		case WalletInfo.MEMPOOL_TRANSACTIONS:
+		case WalletInfo.TRANSACTION_DATA:
 			return { short: 'outgoing transactions', long: 'outgoing wallet transactions' } as const
 		case WalletInfo.WALLET_CONNECTED_DOMAINS:
 			return { short: 'connected sites', long: 'wallet-connected domains' } as const
@@ -760,24 +844,26 @@ export function qualifiedDataCollection<T extends UserInfo>(
 		[WalletInfo.ACCOUNT_ADDRESS]:
 			first(
 				get(WalletInfo.ACCOUNT_ADDRESS),
-				get(WalletInfo.MEMPOOL_TRANSACTIONS),
+				get(WalletInfo.TRANSACTION_DATA),
 				get(WalletInfo.BALANCE),
 			) ?? CollectionPolicy.NEVER,
 		[WalletInfo.BALANCE]:
 			first(
 				get(WalletInfo.BALANCE),
 				get(WalletInfo.ACCOUNT_ADDRESS),
-				get(WalletInfo.MEMPOOL_TRANSACTIONS),
+				get(WalletInfo.TRANSACTION_DATA),
 			) ?? CollectionPolicy.NEVER,
 		[WalletInfo.ASSETS]:
 			first(
 				get(WalletInfo.ASSETS),
 				get(WalletInfo.ACCOUNT_ADDRESS),
 				get(WalletInfo.BALANCE),
-				get(WalletInfo.MEMPOOL_TRANSACTIONS),
+				get(WalletInfo.TRANSACTION_DATA),
 			) ?? CollectionPolicy.NEVER,
-		[WalletInfo.MEMPOOL_TRANSACTIONS]:
-			get(WalletInfo.MEMPOOL_TRANSACTIONS) ?? CollectionPolicy.NEVER,
+		[WalletInfo.TRANSACTION_INTENT]:
+			first(get(WalletInfo.TRANSACTION_INTENT), get(WalletInfo.TRANSACTION_DATA)) ??
+			CollectionPolicy.NEVER,
+		[WalletInfo.TRANSACTION_DATA]: get(WalletInfo.TRANSACTION_DATA) ?? CollectionPolicy.NEVER,
 		[WalletInfo.WALLET_CONNECTED_DOMAINS]:
 			first(get(WalletInfo.WALLET_CONNECTED_DOMAINS), get(PersonalInfo.BROWSING_HISTORY_URLS)) ??
 			CollectionPolicy.NEVER,

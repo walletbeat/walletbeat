@@ -326,7 +326,7 @@ export const ambire: SoftwareWallet = {
 							byEntity: ambireEntity,
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
-								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.TRANSACTION_DATA]: CollectionPolicy.ALWAYS,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
@@ -343,7 +343,7 @@ export const ambire: SoftwareWallet = {
 							byEntity: pimlico,
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
-								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.TRANSACTION_DATA]: CollectionPolicy.ALWAYS,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
@@ -357,7 +357,7 @@ export const ambire: SoftwareWallet = {
 							byEntity: biconomy,
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
-								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.ALWAYS,
+								[WalletInfo.TRANSACTION_DATA]: CollectionPolicy.ALWAYS,
 								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
 								multiAddress: {
