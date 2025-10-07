@@ -87,7 +87,10 @@ export interface WalletBaseFeatures {
 
 	/** Privacy features. */
 	privacy: {
-		/** Data collection information. */
+		/**
+		 * Data collection information.
+		 * See /docs/mitmproxy-guide for how to collect this.
+		 */
 		dataCollection: VariantFeature<DataCollection>
 
 		/** Privacy policy URL of the wallet. */

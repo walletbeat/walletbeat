@@ -854,6 +854,7 @@ export type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
 
 /**
  * A collection of data that a wallet collects.
+ * See /docs/mitmproxy-guide for how to collect this.
  */
 export interface DataCollection {
 	/** What data is collected during signup? */

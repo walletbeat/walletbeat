@@ -261,7 +261,7 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 	wording: {
 		midSentenceName: 'multi-address privacy',
 	},
-	question: sentence('Can the wallet correlate your different wallet addresses with each other?'),
+	question: sentence('Can your multiple wallet addresses be correlated with one another?'),
 	why: paragraph(`
 		You probably have more than one wallet address configured in your wallet,
 		which you use for different purposes and perhaps as different identities.
