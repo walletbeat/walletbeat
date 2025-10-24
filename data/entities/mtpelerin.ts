@@ -20,9 +20,9 @@ export const mtpelerin: CorporateEntity & WalletDeveloper = {
 		extension: 'svg',
 	},
 	jurisdiction: 'Switzerland',
+	linkedin: 'https://www.linkedin.com/company/mt-pelerin/',
 	privacyPolicy: 'https://www.mtpelerin.com/privacy-policy',
 	repoUrl: 'https://github.com/mtpelerin',
-	linkedin: 'https://www.linkedin.com/company/mt-pelerin/',
 	twitter: 'https://x.com/mtpelerin',
 	url: 'https://www.mtpelerin.com/',
 }

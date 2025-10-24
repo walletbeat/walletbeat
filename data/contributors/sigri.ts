@@ -1,5 +1,5 @@
-import type { Contributor } from '@/schema/wallet'
 import { mtpelerin } from '@/data/entities/mtpelerin'
+import type { Contributor } from '@/schema/wallet'
 
 export const sigri: Contributor = {
 	name: 'sigri',
