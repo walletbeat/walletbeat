@@ -58,6 +58,16 @@ export function Eip7702Adoption(): React.JSX.Element {
 									fontSize: '0.9rem',
 								}}
 							/>
+							{' '}and{' '}
+							<ExternalLink
+								url='https://eip7702.app'
+								defaultLabel="Curvegrid's EIP-7702 delegation checker"
+								style={{
+									fontWeight: 500,
+									color: 'var(--text-primary)',
+									fontSize: '0.9rem',
+								}}
+							/>
 							!
 						</p>
 					</div>
