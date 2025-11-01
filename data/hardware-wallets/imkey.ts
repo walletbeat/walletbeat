@@ -39,7 +39,7 @@ export const imkeyWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2025-10-31',
+		lastUpdated: '2025-10-21',
 		repoUrl: 'https://github.com/consenlabs/imkey-core',
 		url: 'https://imkey.im/',
 	},
@@ -103,18 +103,13 @@ export const imkeyWallet: HardwareWallet = {
 
 			firmware: {
 				type: FirmwareType.PASS,
-				ref: [
-					{
-						explanation: 'Firmware update & security guide',
-						url: 'https://support.imkey.im/hc/en-001/articles/36709320202649',
-					},
-				],
 				customFirmware: null,
 				details:
 					'All firmware updates are distributed via imKey Manager and must pass digital signature checks. Updates require explicit user confirmation and cannot be installed silently.',
 				firmwareOpenSource: FirmwareType.PARTIAL,
 				reproducibleBuilds: FirmwareType.PASS,
 				silentUpdateProtection: FirmwareType.PASS,
+				url: 'https://support.imkey.im/hc/en-001/articles/36709320202649',
 			},
 
 			hardwareWalletAppSigning: {
@@ -170,25 +165,15 @@ export const imkeyWallet: HardwareWallet = {
 			supplyChainDIY: null,
 			supplyChainFactory: {
 				type: SupplyChainFactoryType.PASS,
-				ref: [
-					{
-						explanation:
-							'imKey devices are produced in secure facilities with serial verification and tamper-evident seals. Users should verify package integrity before first use.',
-						url: [
-							'https://imkey.im/pages/verify',
-							'https://imkey.im/pages/sn-check',
-							'https://learn.imkey.im/hc/en-001/articles/42589035963417',
-						],
-					},
-				],
 				details:
-					'Manufactured with QA and serial verification; tamper-evident packaging and official-channel logistics mitigate supply chain attacks.',
+					'Manufactured with QA and serial verification; tamper-evident packaging and official-channel logistics mitigate supply chain attacks. Verification: https://imkey.im/pages/sn-check, https://learn.imkey.im/hc/en-001/articles/42589035963417',
 				factoryOpsecAudit: SupplyChainFactoryType.PASS,
 				factoryOpsecDocs: SupplyChainFactoryType.PASS,
 				genuineCheck: SupplyChainFactoryType.PASS,
 				hardwareVerification: SupplyChainFactoryType.PASS,
 				tamperEvidence: SupplyChainFactoryType.PASS,
 				tamperResistance: SupplyChainFactoryType.PASS,
+				url: 'https://imkey.im/pages/verify',
 			},
 			userSafety: null,
 		},
@@ -196,18 +181,11 @@ export const imkeyWallet: HardwareWallet = {
 		selfSovereignty: {
 			interoperability: {
 				type: InteroperabilityType.PASS,
-				ref: [
-					{
-						explanation:
-							'Compatible with imToken mobile (Bluetooth) and Rabby browser extension (USB).',
-						url: [
-							'https://imkey.im/pages/integrated-wallets',
-							'https://learn.imkey.im/hc/en-001/articles/35683788822937',
-						],
-					},
-				],
+				details:
+					'Compatible with imToken mobile (Bluetooth) and Rabby browser extension (USB). See also: https://learn.imkey.im/hc/en-001/articles/35683788822937',
 				interoperability: InteroperabilityType.PASS,
 				noSupplierLinkage: InteroperabilityType.PASS,
+				url: 'https://imkey.im/pages/integrated-wallets',
 			},
 		},
 
