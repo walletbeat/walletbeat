@@ -11,7 +11,7 @@ import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
-import type { License } from '@/schema/features/transparency/license'
+import { License } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -39,7 +39,7 @@ export const imkeyWallet: HardwareWallet = {
 			},
 		],
 		iconExtension: 'svg',
-		lastUpdated: '2025-10-21',
+		lastUpdated: '2025-10-30',
 		repoUrl: 'https://github.com/consenlabs/imkey-core',
 		url: 'https://imkey.im/',
 	},
@@ -55,7 +55,7 @@ export const imkeyWallet: HardwareWallet = {
 					url: 'https://github.com/consenlabs/imkey-core',
 				},
 			],
-			license: 'Apache-2.0' as License,
+			license: License.APACHE_2_0,
 		},
 
 		monetization: {
