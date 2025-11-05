@@ -58,6 +58,7 @@
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-simple-import-sort": "^12.1.1",
 		"eslint-plugin-sort-keys-custom-order": "^2.2.1",
+		"eslint-plugin-svelte": "^3.13.0",
 		"globals": "^15.15.0",
 		"harper.js": "^0.56.0",
 		"orbiter-cli": "^0.8.2",

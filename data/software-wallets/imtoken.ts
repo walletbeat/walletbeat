@@ -26,7 +26,11 @@ import {
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
-import { License } from '@/schema/features/transparency/license'
+import {
+	FOSSLicense,
+	LicensingType,
+	SourceNotAvailableLicense,
+} from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -135,16 +139,23 @@ export const imtoken: SoftwareWallet = {
 			browser: 'NOT_A_BROWSER_WALLET',
 			walletCall: null,
 		},
-		license: {
-			[Variant.MOBILE]: {
+		licensing: {
+			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
+			coreLicense: {
 				ref: [
 					{
 						explanation:
-							'imToken publishes its core code under the Apache 2.0 open-source license.',
+							'imToken publishes its core code under the Apache 2.0 open-source license; the app itself is proprietary.',
 						url: 'https://github.com/consenlabs/token-core-monorepo/blob/main/LICENSE',
 					},
 				],
-				license: License.APACHE_2_0,
+				license: FOSSLicense.APACHE_2_0,
+			},
+			walletAppLicense: {
+				[Variant.MOBILE]: {
+					ref: refNotNecessary,
+					license: SourceNotAvailableLicense.PROPRIETARY,
+				},
 			},
 		},
 		monetization: {

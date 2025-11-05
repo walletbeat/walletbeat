@@ -1,8 +1,8 @@
 <script lang="ts">
 	// Types
-	import type { EasingFunction } from 'svelte/transition'
 	import type { Snippet } from 'svelte'
 	import type { SvelteHTMLElements } from 'svelte/elements'
+	import type { EasingFunction } from 'svelte/transition'
 	import type { TransitionConfig } from 'svelte/transition'
 
 	type Key = $$Generic<any>
@@ -59,8 +59,8 @@
 
 
 	// Transitions
-	import { fade } from 'svelte/transition'
 	import { expoOut } from 'svelte/easing'
+	import { fade } from 'svelte/transition'
 </script>
 
 

@@ -10,6 +10,7 @@ import {
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -29,7 +30,7 @@ export const phantom: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
 		repoUrl: null,
-		url: 'https://www.phantom.com',
+		url: 'https://phantom.com',
 	},
 	features: {
 		accountSupport: {
@@ -71,7 +72,13 @@ export const phantom: SoftwareWallet = {
 			},
 			walletCall: null,
 		},
-		license: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: refNotNecessary,
+				license: SourceNotAvailableLicense.PROPRIETARY,
+			},
+		},
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,
@@ -91,7 +98,7 @@ export const phantom: SoftwareWallet = {
 		privacy: {
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: 'https://www.phantom.com/privacy',
+			privacyPolicy: 'https://phantom.com/privacy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,

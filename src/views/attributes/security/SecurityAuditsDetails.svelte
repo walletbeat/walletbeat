@@ -6,7 +6,7 @@
 
 
 	// Props
-	let {
+	const {
 		wallet,
 		value,
 		auditedInLastYear,
@@ -20,31 +20,27 @@
 
 
 	// Functions
-	import { isUrl } from '@/schema/url'
-	import { securityFlawSeverityName } from '@/schema/features/security/security-audits'
+	import { securityFlawSeverityName, type UnpatchedSecurityFlaw } from '@/schema/features/security/security-audits'
 	import { toFullyQualified } from '@/schema/reference'
+	import { isUrl } from '@/schema/url'
 
 
 	// Components
-	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import Typography from '@/components/Typography.svelte'
+	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
-
 
 {#if value.securityAudits.length === 0}
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
-			markdown: `**{{WALLET_NAME}}** has not undergone any security audits.`
+			markdown: '**{{WALLET_NAME}}** has not undergone any security audits.',
 		}}
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
 {:else}
-	{@const securityAuditsSorted = (
-		value.securityAudits
-			.toSorted((a, b) => (
-				new Date(b.auditDate).getTime() - new Date(a.auditDate).getTime()
-			))
+	{@const securityAuditsSorted = value.securityAudits.toSorted(
+		(a, b) => new Date(b.auditDate).getTime() - new Date(a.auditDate).getTime(),
 	)}
 
 	{@const mostRecentAudit = securityAuditsSorted[0]}
@@ -58,16 +54,14 @@
 	/>
 
 	{#if mostRecentAudit?.ref}
-		<ReferenceLinks
-			references={toFullyQualified(mostRecentAudit.ref)}
-		/>
+		<ReferenceLinks references={toFullyQualified(mostRecentAudit.ref)} />
 	{/if}
 
 	<div class="audits-container" data-card="secondary padding-6">
 		<h4>Audits</h4>
 
 		<ul class="audits-list">
-			{#each securityAuditsSorted as audit}
+			{#each securityAuditsSorted as audit (audit.auditDate)}
 				<li>
 					<article data-column>
 						<header data-row="wrap">
@@ -87,49 +81,51 @@
 								<cite>{audit.auditor.name}</cite>
 							{/if}
 
-							<strong><time datetime={audit.auditDate}>{Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(new Date(audit.auditDate))}</time></strong>
+							<strong
+								><time datetime={audit.auditDate}
+									>{Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(
+										new Date(audit.auditDate),
+									)}</time
+								></strong
+							>
 						</header>
 
 						{#if audit.ref}
-							<ReferenceLinks
-								references={toFullyQualified(audit.ref)}
-							/>
+							<ReferenceLinks references={toFullyQualified(audit.ref)} />
 						{/if}
 
-						<p>
-							{#if audit.unpatchedFlaws === 'NONE_FOUND'}
-								<span>No security flaws of severity level medium or higher were found.</span>
-							{:else if audit.unpatchedFlaws === 'ALL_FIXED'}
-								<span>All security flaws of severity level medium or higher were addressed.</span>
-							{:else if Array.isArray(audit.unpatchedFlaws) && audit.unpatchedFlaws.length > 0}
-								<span>
-									The following security flaws were identified
-									{!audit.unpatchedFlaws.some((flaw: any) => flaw.presentStatus === 'NOT_FIXED')
-										? ' and have all been addressed since'
-										: ''}:
-								</span>
-								<ul class="flaws-list">
-									{#each audit.unpatchedFlaws as flaw}
-										<li>
-											<strong>{securityFlawSeverityName(flaw.severityAtAuditPublication)}</strong>:
-											{#if flaw.presentStatus === 'FIXED'}
-												<span class="fixed-flaw">{flaw.name}</span>
-												<strong class="fixed-label">(Fixed)</strong>
-											{:else}
-												<span>{flaw.name}</span> <strong class="not-fixed-label">(Not fixed)</strong>
-											{/if}
-										</li>
-									{/each}
-								</ul>
-							{/if}
-						</p>
+						{#if audit.unpatchedFlaws === 'NONE_FOUND'}
+							<p>No security flaws of severity level medium or higher were found.</p>
+						{:else if audit.unpatchedFlaws === 'ALL_FIXED'}
+							<p>All security flaws of severity level medium or higher were addressed.</p>
+						{:else if Array.isArray(audit.unpatchedFlaws) && audit.unpatchedFlaws.length > 0}
+							<p>
+								The following security flaws were identified
+								{!audit.unpatchedFlaws.some((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED')
+									? ' and have all been addressed since'
+									: ''}:
+							</p>
+							<ul class="flaws-list">
+								{#each audit.unpatchedFlaws as flaw (flaw.name)}
+									<li>
+										<strong>{securityFlawSeverityName(flaw.severityAtAuditPublication)}</strong>:
+										{#if flaw.presentStatus === 'FIXED'}
+											<span class="fixed-flaw">{flaw.name}</span>
+											<strong class="fixed-label">(Fixed)</strong>
+										{:else}
+											<span>{flaw.name}</span>
+											<strong class="not-fixed-label">(Not fixed)</strong>
+										{/if}
+									</li>
+								{/each}
+							</ul>
+						{/if}
 					</article>
 				</li>
 			{/each}
 		</ul>
 	</div>
 {/if}
-
 
 <style>
 	.audits-container {

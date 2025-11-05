@@ -1,8 +1,8 @@
 <script lang="ts">
 	// Types/constants
-	import { type EvaluatedAttribute, ratingIcons, ratingToColor } from '@/schema/attributes'
-	import { attributeVariantSpecificity, VariantSpecificity, type RatedWallet } from '@/schema/wallet'
+	import { type EvaluatedAttribute, ratingIcons, ratingToColor, type Value } from '@/schema/attributes'
 	import type { Variant } from '@/schema/variants'
+	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
 
 
 	// Props
@@ -14,7 +14,7 @@
 		isInTooltip = false,
 	}: {
 		wallet: RatedWallet
-		attribute: EvaluatedAttribute<any>
+		attribute: EvaluatedAttribute<Value>
 		variant?: Variant
 		showRating?: boolean
 		isInTooltip?: boolean
@@ -22,13 +22,13 @@
 
 
 	// Functions
-	import { slugifyCamelCase } from '@/types/utils/text'
 	import { variantToName } from '@/constants/variants'
+	import { slugifyCamelCase } from '@/types/utils/text'
 
 
 	// Components
-	import Typography from '../components/Typography.svelte'
 	import InfoIcon from '@material-icons/svg/svg/info/baseline.svg?raw'
+	import Typography from '../components/Typography.svelte'
 </script>
 
 

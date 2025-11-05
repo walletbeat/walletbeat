@@ -3,8 +3,9 @@
 	RowId
 ">
 	// Types
-	import { TableState, type Column } from '@/components/TableState.svelte'
+	import type { SvelteHTMLElements } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
+	import { type Column,TableState } from '@/components/TableState.svelte'
 
 	type _RowValue = _TableState extends TableState<infer RowValue, any, any> ? RowValue : any
 	type _CellValue = _TableState extends TableState<any, infer CellValue, any> ? CellValue : any
@@ -35,7 +36,7 @@
 		Cell,
 
 		...restProps
-	}: {
+	}: SvelteHTMLElements['div'] & {
 		tableId?: string
 
 		rows: _RowValue[]
@@ -107,15 +108,15 @@
 
 	// Transitions/animations
 	import { flip } from 'svelte/animate'
-	import { fade, fly } from 'svelte/transition'
 	import { expoOut } from 'svelte/easing'
+	import { fade, fly } from 'svelte/transition'
 </script>
 
 
 <div
 	{...restProps}
 	id={tableId}
-	 class="container {'class' in restProps ? restProps.class : ''}"
+	class="container {'class' in restProps ? restProps.class : ''}"
 >
 	<table>
 		<colgroup>
@@ -135,7 +136,7 @@
 			{@render headerRows(table.columns, 0)}
 
 			{#snippet headerRows(columns: (_Column | undefined)[], level: number)}
-				{@const nextLevelColumns = (
+				{@const nextLevelColumns =
 					columns
 						.flatMap(column => (
 							!column ?
@@ -145,7 +146,7 @@
 							:
 								Array.from({ length: getColumnSpan(column) }, () => undefined)
 						))
-				)}
+				}
 
 				<tr in:fly={{ y: '-50%', duration: 300, easing: expoOut }}>
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
@@ -201,7 +202,7 @@
 
 						<div data-sticky-container>
 							{#if isSortable}
-								<label class="sort-label">
+								<label class="sort-label" data-pressable="to-containing">
 									<span data-sticky="no-backdrop">
 										{@render HeaderTitle()}
 
@@ -245,7 +246,8 @@
 				{@const rowId = getRowId?.(row, index)}
 
 				<tr
-					tabIndex={0}
+					tabIndex={onRowClick ? 0 : undefined}
+					data-pressable={onRowClick ? '' : undefined}
 					onclick={e => {
 						// e.stopPropagation()
 						onRowClick?.(row, rowId)
@@ -324,35 +326,33 @@
 		--table-backgroundColor: light-dark(#fdfdfd, #22242b);
 		--table-outerBorderColor: var(--border-color);
 		--table-innerBorderColor: color-mix(in oklch, var(--border-color) 50%, transparent);
-		--table-borderWidth: 1px;
+		--table-outerBorderWidth: 1px;
+		--table-innerBorderWidth: 1px;
 		--table-cornerRadius: 1rem;
 		--table-cell-verticalAlign: middle;
 		--table-cell-padding: 0.75em;
 
-		scroll-padding: var(--table-borderWidth);
+		scroll-padding: var(--table-outerBorderWidth);
 
 		background-color: var(--table-backgroundColor);
-		box-shadow: 0 0 0 var(--table-borderWidth) var(--table-outerBorderColor) inset;
-		border-radius: calc(var(--table-cornerRadius) + var(--table-borderWidth));
+		box-shadow: 0 0 0 var(--table-outerBorderWidth) var(--table-outerBorderColor) inset;
+		border-radius: calc(var(--table-cornerRadius) + var(--table-outerBorderWidth));
 
 		clip-path: inset(
-			calc(-1 * var(--table-borderWidth))
-			calc(-1 * var(--table-borderWidth))
-			calc(-1 * var(--table-borderWidth))
-			calc(-1 * var(--table-borderWidth))
-			round var(--table-cornerRadius)
+			0 0 0 0
+			round calc(var(--table-cornerRadius) + var(--table-outerBorderWidth))
 		);
 	}
 
-	table {
+	:where(table) {
 		min-width: 100%;
 		width: max-content;
 		/* margin-inline: calc(-1 * var(--table-borderWidth)); */
 
 		border-collapse: separate;
-		border-spacing: var(--table-borderWidth);
+		border-spacing: var(--table-innerBorderWidth);
 
-		thead {
+		:where(thead) {
 			font-size: 0.75em;
 			text-wrap: nowrap;
 
@@ -360,8 +360,16 @@
 			top: 0;
 			z-index: 1;
 
-			tr {
-				th {
+			border-start-start-radius: calc(var(--table-cornerRadius) + var(--table-outerBorderWidth));
+			border-start-end-radius: calc(var(--table-cornerRadius) + var(--table-outerBorderWidth));
+
+			@container not scroll-state(stuck: none) {
+				border-start-start-radius: 0;
+				border-start-end-radius: 0;
+			}
+
+			:where(tr) {
+				:where(th) {
 					/* &:not(:empty) {
 						backdrop-filter: blur(20px);
 					} */
@@ -428,6 +436,8 @@
 							justify-content: center;
 							cursor: pointer;
 
+							padding: var(--table-cell-padding);
+
 							.sort-button {
 								margin-inline-start: 0.5em;
 								display: inline-block;
@@ -453,7 +463,8 @@
 						}
 
 						&:has(.sort-button:focus) {
-							outline: 1px solid var(--accent);
+							outline: var(--table-outerBorderWidth) solid var(--accent);
+							outline-offset: calc(-1 * var(--table-outerBorderWidth));
 							border-radius: 0.5em;
 						}
 
@@ -475,13 +486,15 @@
 						}
 
 						.expansion-button {
+							margin: var(--table-cell-padding);
+							margin-inline-start: calc(-2 * var(--table-cell-padding));
+
 							background-color: transparent;
 
 							flex: 0 0 auto;
 							font-size: 0.75em;
 							padding: 0.33em;
 							border: none;
-							margin-inline-end: -0.25em;
 
 							transition-property: background-color, transform, opacity;
 
@@ -506,7 +519,7 @@
 					border-start-start-radius: var(--table-cornerRadius) !important;
 					border-start-end-radius: var(--table-cornerRadius) !important;
 
-					th {
+					:where(th) {
 						&:first-child {
 							border-start-start-radius: var(--table-cornerRadius) !important;
 						}
@@ -515,15 +528,34 @@
 						}
 					}
 				}
+
+				@container not scroll-state(stuck: none) {
+					&:first-child {
+						border-start-start-radius: 0.5em !important;
+						border-start-end-radius: 0.5em !important;
+
+						:where(th) {
+							&:first-child {
+								border-start-start-radius: 0.5em !important;
+							}
+							&:last-child {
+								border-start-end-radius: 0.5em !important;
+							}
+						}
+					}
+				}
 			}
 		}
 
-		tbody {
+		:where(tbody) {
 			isolation: isolate;
+
+			border-end-start-radius: calc(var(--table-cornerRadius) + var(--table-outerBorderWidth));
+			border-end-end-radius: calc(var(--table-cornerRadius) + var(--table-outerBorderWidth));
 
 			counter-reset: TableRowCount;
 
-			tr {
+			:where(tr) {
 				--table-row-backgroundColor: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.03));
 
 				&:not([data-disabled]) {
@@ -533,20 +565,18 @@
 				counter-reset: TableColumnCount;
 
 				box-shadow:
-					0 var(--table-borderWidth) var(--table-outerBorderColor),
-					0 calc(-1 * var(--table-borderWidth)) var(--table-outerBorderColor);
+					0 var(--table-innerBorderWidth) var(--table-innerBorderColor),
+					0 calc(-1 * var(--table-innerBorderWidth)) var(--table-innerBorderColor);
 
 				&:nth-of-type(odd) {
 					background-color: var(--table-row-backgroundColor);
 				}
 
-				&[tabIndex='0'] {
+				&[data-pressable] {
 					cursor: pointer;
 
-					transition: var(--active-transitionOutDuration) var(--transition-easeOutExpo);
-
 					& td.sticky {
-						transition: var(--active-transitionOutDuration) var(--active-transitionOutDuration)
+						transition: var(--pressable-transitionOutDuration) var(--pressable-transitionOutDuration)
 							var(--transition-easeOutExpo);
 					}
 
@@ -555,10 +585,6 @@
 					}
 
 					&:active:not(:has([tabindex='0']:active)) {
-						transition-duration: var(--active-transitionInDuration);
-						opacity: var(--active-opacity);
-						scale: var(--active-scale);
-
 						&:active {
 							--borderColor: transparent;
 						}
@@ -581,8 +607,8 @@
 					opacity: 0.3;
 				}
 
-				> td {
-					box-shadow: var(--table-borderWidth) 0 var(--table-row-backgroundColor);
+				> :where(td) {
+					box-shadow: var(--table-innerBorderWidth) 0 var(--table-row-backgroundColor);
 					vertical-align: var(--table-cell-verticalAlign);
 
 					counter-increment: TableColumnCount;
@@ -594,27 +620,27 @@
 				}
 			}
 
-			&:last-child {
-				tr:last-child {
-					border-end-start-radius: var(--table-cornerRadius) !important;
-					border-end-end-radius: var(--table-cornerRadius) !important;
+			/* &:last-child {
+				:where(tr):last-child {
+					border-end-start-radius: var(--table-cornerRadius);
+					border-end-end-radius: var(--table-cornerRadius);
 
-					td {
+					:where(td) {
 						&:first-child {
-							border-end-start-radius: var(--table-cornerRadius) !important;
+							border-end-start-radius: var(--table-cornerRadius);
 						}
 						&:last-child {
-							border-end-end-radius: var(--table-cornerRadius) !important;
+							border-end-end-radius: var(--table-cornerRadius);
 						}
 					}
 				}
-			}
+			} */
 		}
 
-		th,
-		td {
-			padding: var(--table-cell-padding);
-
+		:where(
+			th,
+			td
+		) {
 			&[data-align='start'] {
 				text-align: start;
 				align-items: start;
@@ -635,6 +661,14 @@
 				inset-inline-start: 0;
 				inset-inline-end: 0;
 			} */
+		}
+
+		:where(th) {
+			position: relative;
+		}
+
+		:where(td) {
+			padding: var(--table-cell-padding);
 		}
 	}
 </style>

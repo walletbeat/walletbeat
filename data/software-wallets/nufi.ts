@@ -10,8 +10,8 @@ import {
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { License } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
+import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -99,9 +99,12 @@ export const nufi: SoftwareWallet = {
 				atomicMultiTransactions: featureSupported,
 			}),
 		},
-		license: {
-			ref: refTodo,
-			license: License.PROPRIETARY,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: refNotNecessary,
+				license: SourceNotAvailableLicense.PROPRIETARY,
+			},
 		},
 		monetization: {
 			ref: refTodo,

@@ -18,7 +18,7 @@ import {
 } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display' // for level
-import { License } from '@/schema/features/transparency/license' // assuming path
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license' // assuming path
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -36,7 +36,7 @@ export const safe: SoftwareWallet = {
 		contributors: [nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
-		repoUrl: 'https://github.com/safe-global',
+		repoUrl: 'https://github.com/safe-fndn',
 		url: 'https://safe.global',
 	},
 	features: {
@@ -46,10 +46,7 @@ export const safe: SoftwareWallet = {
 			eoa: notSupported,
 			mpc: notSupported,
 			rawErc4337: supported({
-				ref: {
-					explanation: 'Safe supports ERC-4337 via their 4337 module implementation',
-					url: 'https://github.com/safe-global/safe-modules/tree/master/4337',
-				},
+				ref: refTodo,
 				contract: 'UNKNOWN',
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
@@ -112,15 +109,18 @@ export const safe: SoftwareWallet = {
 				atomicMultiTransactions: featureSupported,
 			}),
 		},
-		license: {
-			ref: [
-				{
-					explanation: 'Safe uses the LGPL-3.0 license for its source code', // keep explanation but change enum if needed
-					label: 'Safe License File',
-					url: 'https://github.com/safe-global/safe-wallet-monorepo',
-				},
-			],
-			license: License.GPL_3_0,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'Safe uses the LGPL-3.0 license for its source code', // keep explanation but change enum if needed
+						label: 'Safe License File',
+						url: 'https://github.com/safe-global/safe-wallet-monorepo',
+					},
+				],
+				license: FOSSLicense.GPL_3_0,
+			},
 		},
 		monetization: {
 			ref: [
@@ -174,11 +174,7 @@ export const safe: SoftwareWallet = {
 		security: {
 			bugBountyProgram: null,
 			hardwareWalletSupport: {
-				ref: {
-					explanation:
-						'Safe natively supports Ledger and Trezor over USB, and Keystone and GridPlus Lattice1 via QR / WalletConnect; any other hardware wallet that works through MetaMask or a similar connector can also act as a Safe signer.',
-					url: 'https://help.safe.global/en/articles/40824-what-hardware-wallets-are-supported',
-				},
+				ref: refTodo,
 				wallets: {
 					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.webUSB],
@@ -200,28 +196,28 @@ export const safe: SoftwareWallet = {
 			passkeyVerification: {
 				ref: [
 					{
-						url: 'https://github.com/safe-global/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
+						url: 'https://github.com/safe-fndn/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
 					},
 					{
 						explanation: 'Safe uses FCL P256 verifier for passkey verification.',
-						url: 'https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
+						url: 'https://github.com/safe-fndn/safe-modules/blob/main/modules/passkey/contracts/verifiers/FCLP256Verifier.sol',
 					},
 				],
 				details: 'Safe uses FreshCryptoLib for passkey verification in their 4337 modules.',
 				library: PasskeyVerificationLibrary.FRESH_CRYPTO_LIB,
 				libraryUrl:
-					'https://github.com/safe-global/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
+					'https://github.com/safe-fndn/safe-modules/tree/main/modules/passkey/contracts/vendor/FCL',
 			},
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/safe-global/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
+					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
 					auditDate: '2025-01-14',
 					auditor: certora,
 					unpatchedFlaws: 'NONE_FOUND',
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/safe-global/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
+					ref: 'https://github.com/safe-fndn/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
 					auditDate: '2025-05-28',
 					auditor: ackee,
 					unpatchedFlaws: 'NONE_FOUND',

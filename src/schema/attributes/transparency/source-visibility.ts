@@ -1,9 +1,8 @@
 import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
-import { licenseSourceIsVisible } from '@/schema/features/transparency/license'
-import { type ReferenceArray, toFullyQualified } from '@/schema/reference'
-import { paragraph, sentence } from '@/types/content'
-import { sourceVisibilityDetailsContent } from '@/types/content/source-visibility-details'
+import { licenseSourceIsVisible, LicensingType } from '@/schema/features/transparency/license'
+import { mergeRefs, type ReferenceArray, toFullyQualified } from '@/schema/reference'
+import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
@@ -24,7 +23,41 @@ function sourcePublic(references: ReferenceArray): Evaluation<SourceVisibilityVa
 			`),
 			__brand: brand,
 		},
-		details: sourceVisibilityDetailsContent(),
+		details: markdown(`
+			The source code for **{{WALLET_NAME}}** is publicly viewable.
+		`),
+		impact: paragraph(`
+			This allows its source code to be examined for security flaws and
+			for Walletbeat to review how the wallet works.
+		`),
+		references,
+	}
+}
+
+function sourcePartiallyPrivate(references: ReferenceArray): Evaluation<SourceVisibilityValue> {
+	return {
+		value: {
+			id: 'partially_private',
+			rating: Rating.FAIL,
+			displayName: 'Source code not fully available',
+			shortExplanation: sentence(`
+				The source code for {{WALLET_NAME}} is not fully public.
+			`),
+			__brand: brand,
+		},
+		details: paragraph(`
+			Some but not all parts of the source code for {{WALLET_NAME}}
+			are available to the public.
+		`),
+		impact: paragraph(`
+			Since not all the source code is publicly viewable,
+			it is not possible to audit {{WALLET_NAME}}
+			or to fully determine how it works.
+		`),
+		howToImprove: paragraph(`
+			{{WALLET_NAME}} should make all of its source code publicly
+			viewable.
+		`),
 		references,
 	}
 }
@@ -43,6 +76,11 @@ function sourcePrivate(references: ReferenceArray): Evaluation<SourceVisibilityV
 		details: paragraph(`
 			The source code for {{WALLET_NAME}} is not available
 			to the public.
+		`),
+		impact: paragraph(`
+			Since its source code is not publicly viewable,
+			it is not possible to audit {{WALLET_NAME}}
+			or to fully determine how it works.
 		`),
 		howToImprove: paragraph(`
 			{{WALLET_NAME}} should make its source code publicly
@@ -74,20 +112,59 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 	`),
 	ratingScale: {
 		display: 'simple',
-		content: paragraph(`
+		content: mdParagraph(`
 			If a wallet's source code is visible, it passes. If not, it fails.
+
+			If a wallet's source code spans multiple repositories (e.g. shared
+			core libraries and per-version repositories), all of them need to
+			be visible.
 		`),
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SourceVisibilityValue> => {
-		if (features.license === null) {
+		if (features.licensing === null) {
 			return unrated(sourceVisibility, brand, null)
 		}
 
-		if (licenseSourceIsVisible(features.license.license)) {
-			return sourcePublic(toFullyQualified(features.license.ref))
-		}
+		switch (features.licensing.type) {
+			case LicensingType.SINGLE_WALLET_REPO_AND_LICENSE:
+				if (features.licensing.walletAppLicense === null) {
+					return unrated(sourceVisibility, brand, null)
+				}
 
-		return sourcePrivate(toFullyQualified(features.license.ref))
+				if (licenseSourceIsVisible(features.licensing.walletAppLicense.license)) {
+					return sourcePublic(toFullyQualified(features.licensing.walletAppLicense.ref))
+				}
+
+				return sourcePrivate(toFullyQualified(features.licensing.walletAppLicense.ref))
+			case LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE:
+				return (() => {
+					if (
+						features.licensing.coreLicense === null ||
+						features.licensing.walletAppLicense === null
+					) {
+						return unrated(sourceVisibility, brand, null)
+					}
+
+					const refs = mergeRefs(
+						features.licensing.coreLicense.ref,
+						features.licensing.walletAppLicense.ref,
+					)
+					const coreVisible = licenseSourceIsVisible(features.licensing.coreLicense.license)
+					const walletAppVisible = licenseSourceIsVisible(
+						features.licensing.walletAppLicense.license,
+					)
+
+					if (coreVisible && walletAppVisible) {
+						return sourcePublic(refs)
+					}
+
+					if (!coreVisible && !walletAppVisible) {
+						return sourcePrivate(refs)
+					}
+
+					return sourcePartiallyPrivate(refs)
+				})()
+		}
 	},
 	aggregate: pickWorstRating<SourceVisibilityValue>,
 }

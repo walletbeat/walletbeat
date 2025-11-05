@@ -53,7 +53,7 @@ export const ratingIcons = {
 	[Rating.FAIL]: '❌',
 	[Rating.UNRATED]: '❔',
 	[Rating.EXEMPT]: '🆗',
-}
+} as const
 
 /** Ratings enum. */
 export const ratingEnum = new Enum<Rating>({
@@ -208,6 +208,10 @@ export function defaultRatingScore(rating: Rating): Score {
 			return 0.5
 		case Rating.PASS:
 			return 1.0
+		case Rating.EXEMPT:
+			return null
+		case Rating.UNRATED:
+			return null
 	}
 }
 

@@ -18,7 +18,11 @@ import {
 	comprehensiveFeesShownByDefault,
 	FeeDisplayLevel,
 } from '@/schema/features/transparency/fee-display'
-import { License } from '@/schema/features/transparency/license'
+import {
+	FOSSLicense,
+	LicensingType,
+	SourceAvailableNonFOSSLicense,
+} from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -150,21 +154,32 @@ export const metamask: SoftwareWallet = {
 				atomicMultiTransactions: featureSupported,
 			}),
 		},
-		license: {
-			[Variant.BROWSER]: {
+		licensing: {
+			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
+			coreLicense: {
 				ref: {
 					explanation:
-						'The MetaMask browser extension uses a proprietary source-available license.',
-					url: 'https://github.com/MetaMask/metamask-extension/blob/main/LICENSE',
+						'The MetaMask core repository contains various packages reused across all MetaMask versions, licensed under MIT.',
+					url: 'https://github.com/MetaMask/core/tree/main/packages',
 				},
-				license: License.PROPRIETARY_SOURCE_AVAILABLE,
+				license: FOSSLicense.MIT,
 			},
-			[Variant.MOBILE]: {
-				ref: {
-					explanation: 'The MetaMask mobile app uses a proprietary source-available license.',
-					url: 'https://github.com/MetaMask/metamask-mobile/blob/main/LICENSE',
+			walletAppLicense: {
+				[Variant.BROWSER]: {
+					ref: {
+						explanation:
+							'The MetaMask browser extension uses a proprietary source-available license.',
+						url: 'https://github.com/MetaMask/metamask-extension/blob/main/LICENSE',
+					},
+					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
 				},
-				license: License.PROPRIETARY_SOURCE_AVAILABLE,
+				[Variant.MOBILE]: {
+					ref: {
+						explanation: 'The MetaMask mobile app uses a proprietary source-available license.',
+						url: 'https://github.com/MetaMask/metamask-mobile/blob/main/LICENSE',
+					},
+					license: SourceAvailableNonFOSSLicense.PROPRIETARY_SOURCE_AVAILABLE,
+				},
 			},
 		},
 		monetization: {

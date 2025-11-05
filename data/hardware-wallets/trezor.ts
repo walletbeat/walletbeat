@@ -56,7 +56,7 @@ export const trezorWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		license: null,
+		licensing: null,
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,

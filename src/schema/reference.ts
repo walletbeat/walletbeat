@@ -17,7 +17,7 @@
  */
 
 import type { CalendarDate } from '@/types/date'
-import { type NonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
+import { isNonEmptyArray, type NonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
 import {
 	getUrlLabel,
@@ -46,6 +46,21 @@ export interface LooseReference {
 	lastRetrieved?: CalendarDate
 }
 
+/** Type predicate for LooseReference. */
+export function isLooseReference(x: unknown): x is LooseReference {
+	return (
+		x !== undefined &&
+		x !== null &&
+		typeof x === 'object' &&
+		Object.hasOwn(x, 'url') &&
+		((url: unknown) =>
+			isUrl(url) || (Array.isArray(url) && isNonEmptyArray(url) && url.every(isLabeledUrl)))(
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
+			(x as unknown as { url: unknown }).url,
+		)
+	)
+}
+
 /**
  * A fully-qualified reference.
  */
@@ -60,13 +75,25 @@ export interface FullyQualifiedReference {
 	lastRetrieved?: CalendarDate
 }
 
+/** Type predicate for FullyQualifiedReference. */
+export function isFullyQualifiedReference(x: unknown): x is FullyQualifiedReference {
+	return (
+		x !== undefined &&
+		x !== null &&
+		typeof x === 'object' &&
+		Object.hasOwn(x, 'urls') &&
+		((urls: unknown) => Array.isArray(urls) && isNonEmptyArray(urls) && urls.every(isLabeledUrl))(
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
+			(x as unknown as { urls: unknown }).urls,
+		)
+	)
+}
+
 type Reference = Url | LooseReference | FullyQualifiedReference
 
-/** Type predicate for FullyQualifiedReference. */
-export function isFullyQualifiedReference(
-	reference: Reference,
-): reference is FullyQualifiedReference {
-	return typeof reference === 'object' && Object.hasOwn(reference, 'urls')
+/** Type predicate for Reference. */
+function isReference(x: unknown): x is Reference {
+	return isUrl(x) || isLooseReference(x) || isFullyQualifiedReference(x)
 }
 
 /** One or more references. */
@@ -205,6 +232,18 @@ export function toFullyQualified(
 			lastRetrieved,
 		}
 	})
+}
+
+/** Type predicate for `WithRef`. */
+export function hasRefs(maybeWithRef: unknown): maybeWithRef is WithRef<unknown> {
+	return (
+		maybeWithRef !== undefined &&
+		maybeWithRef !== null &&
+		typeof maybeWithRef === 'object' &&
+		Object.hasOwn(maybeWithRef, 'ref') &&
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
+		isReference((maybeWithRef as unknown as { ref: unknown }).ref)
+	)
 }
 
 /** Extract references out of `withRef`. */

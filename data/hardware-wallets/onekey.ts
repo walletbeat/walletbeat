@@ -7,7 +7,7 @@ import {
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/hardware-wallet-app-signing'
-import { License } from '@/schema/features/transparency/license'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -38,14 +38,17 @@ export const onekeyWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		license: {
-			ref: [
-				{
-					explanation: 'OneKey has mixed licensing (GPLv3/LGPLv3/MIT)',
-					url: 'https://walletscrutiny.com/hardware/onekey.pro/',
-				},
-			],
-			license: License.GPL_3_0,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'OneKey has mixed licensing (GPLv3/LGPLv3/MIT)',
+						url: 'https://walletscrutiny.com/hardware/onekey.pro/',
+					},
+				],
+				license: FOSSLicense.GPL_3_0,
+			},
 		},
 		monetization: {
 			ref: refTodo,

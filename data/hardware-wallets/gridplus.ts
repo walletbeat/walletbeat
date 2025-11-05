@@ -37,7 +37,7 @@ export const gridplusWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		license: null,
+		licensing: null,
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,

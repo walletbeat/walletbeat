@@ -4,7 +4,7 @@
 
 
 	// Props
-	let {
+	const {
 		eip,
 	}: {
 		eip: Eip

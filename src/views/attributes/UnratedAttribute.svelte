@@ -6,9 +6,9 @@
 
 
 	// Props
-	let {
+	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
+	const {
 		wallet,
-		value,
 	}: {
 		wallet: RatedWallet
 		value: Value

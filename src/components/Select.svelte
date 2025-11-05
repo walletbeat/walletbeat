@@ -14,6 +14,7 @@
 	_SelectOption extends SelectOption = SelectOption
 ">
 	// Types/constants
+	import type { SvelteHTMLElements } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
 
 
@@ -25,7 +26,7 @@
 		optionContent,
 		selectedOption = $bindable(),
 		...restProps
-	}: {
+	}: SvelteHTMLElements['select'] & {
 		id?: string
 		value?: _SelectValue
 		options: _SelectOption[]
@@ -61,7 +62,12 @@
 	{/snippet}
 
 	{#each options as option}
-		<option value={option.value}>
+		<option
+			value={option.value}
+			onclick={e => {
+				e.preventDefault()
+			}}
+		>
 			{#if optionContent}
 				{@render optionContent(option)}
 			{:else}

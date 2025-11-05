@@ -25,7 +25,7 @@ export const zerion: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
 		repoUrl: null,
-		url: 'https://www.zerion.io',
+		url: 'https://zerion.io',
 	},
 	features: {
 		accountSupport: {
@@ -68,7 +68,7 @@ export const zerion: SoftwareWallet = {
 			},
 			walletCall: null,
 		},
-		license: null,
+		licensing: null,
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,

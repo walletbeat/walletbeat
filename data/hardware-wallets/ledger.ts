@@ -62,7 +62,7 @@ export const ledgerWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		license: null,
+		licensing: null,
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,

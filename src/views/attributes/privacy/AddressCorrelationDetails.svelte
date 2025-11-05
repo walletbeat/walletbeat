@@ -1,11 +1,10 @@
 <script lang="ts">
 	// Types/constants
-	import type { AddressCorrelationValue } from '@/schema/attributes/privacy/address-correlation'
-	import type { WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
+	import type { AddressCorrelationValue, WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
 	import type { FullyQualifiedReference } from '@/schema/reference'
 	import type { RatedWallet } from '@/schema/wallet'
-	import type { NonEmptyArray } from '@/types/utils/non-empty'
 	import { ContentType } from '@/types/content'
+	import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 	type LeakInfo = {
 		key: string
@@ -22,9 +21,9 @@
 
 
 	// Props
-	let {
+	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
+	const {
 		wallet,
-		value,
 		linkables,
 	}: {
 		wallet: RatedWallet
@@ -96,6 +95,7 @@
 		for (const linkable of sortedLinkables) {
 			const sourceName = typeof linkable.by === 'string' ? linkable.by : linkable.by.name
 			const forSource = map.get(sourceName)
+
 			if (forSource === undefined) {
 				map.set(sourceName, [linkable] as NonEmptyArray<WalletAddressLinkableBy>)
 			} else {
@@ -132,7 +132,7 @@
 	{@const leaksText = leaksList.map(leak => (
 		leak.entity === 'onchain' ?
 			`- An onchain record permanently associates your **${joinedListText(leak.linkableInfos)}** with your wallet address.`
-		: typeof leak.entity !== 'string' ?
+		:
 			(() => {
 				const privacyPolicyText = (
 					isUrl(leak.entity.privacyPolicy) ?
@@ -140,10 +140,9 @@
 					:
 						''
 				)
+
 				return `- **${leak.entity.name}**${privacyPolicyText} may link your wallet address to your **${joinedListText(leak.linkableInfos)}**.`
 			})()
-		:
-			`- **${leak.entity}** may link your wallet address to your **${joinedListText(leak.linkableInfos)}**.`
 	)).join('\n')}
 
 	<Typography

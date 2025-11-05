@@ -33,7 +33,11 @@ import type { InteroperabilitySupport } from './features/self-sovereignty/intero
 import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
 import type { Support } from './features/support'
 import type { BasicOperationFees } from './features/transparency/fee-display'
-import type { LicenseWithRef } from './features/transparency/license'
+import {
+	type ResolvedWalletLicensing,
+	resolveWalletLicense,
+	type WalletLicensing,
+} from './features/transparency/license'
 import type { MaintenanceSupport } from './features/transparency/maintenance'
 import type { Monetization } from './features/transparency/monetization'
 import type { ReputationSupport } from './features/transparency/reputation'
@@ -117,8 +121,11 @@ export interface WalletBaseFeatures {
 	/** Does the wallet support more than one Ethereum address? */
 	multiAddress: VariantFeature<Support>
 
-	/** License of the wallet. */
-	license: VariantFeature<LicenseWithRef>
+	/**
+	 * License of the wallet.
+	 * Variant specificity handled internally to `WalletLicense` type.
+	 */
+	licensing: WalletLicensing
 
 	/** The monetization model of the wallet. */
 	monetization: VariantFeature<Monetization>
@@ -289,7 +296,7 @@ export interface ResolvedFeatures {
 	multiAddress: ResolvedFeature<Support>
 	integration: ResolvedWalletIntegration
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
-	license: ResolvedFeature<LicenseWithRef>
+	licensing: ResolvedWalletLicensing
 	monetization: ResolvedFeature<Monetization>
 }
 
@@ -454,7 +461,7 @@ export function resolveFeatures(
 		addressResolution: nullable(
 			softwareFeat('addressResolution', features => features.addressResolution),
 		),
-		license: baseFeat('license', features => features.license),
+		licensing: resolveWalletLicense(features.licensing, expectedVariants, variant),
 		monetization: baseFeat('monetization', features => features.monetization),
 	}
 }

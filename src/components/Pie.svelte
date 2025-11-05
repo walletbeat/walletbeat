@@ -32,7 +32,6 @@
 			midAngle: number
 			outerRadius: number
 			innerRadius: number
-			labelRadius: number
 			gap: number
 			level: number
 			offset: number
@@ -45,10 +44,11 @@
 <script lang="ts">
 	// Types
 	import type { Snippet } from 'svelte'
+	import type { SvelteHTMLElements } from 'svelte/elements'
 
 
 	// Props
-	let {
+	const {
 		// Content
 		slices = [],
 		centerLabel,
@@ -86,7 +86,7 @@
 		centerContentSnippet,
 
 		...restProps
-	}: {
+	}: SvelteHTMLElements['div'] & {
 		// Content
 		slices: Slice[]
 		centerLabel?: string
@@ -122,6 +122,7 @@
 		angleInDegrees: number,
 	) => {
 		const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0
+
 		return {
 			x: centerX + radius * Math.cos(angleInRadians),
 			y: centerY + radius * Math.sin(angleInRadians),
@@ -178,7 +179,7 @@
 		// For equiangular pie slices with n slices (each with angle θ = 360°/n),
 		// the distance d they need to be moved from the origin to create gaps of width x is:
 		// d = x / (2 * sin(θ / 2))
-		const offset = Math.abs(gap / (2 * Math.sin(Math.abs(endAngle - startAngle) / 2)))
+		// const offset = Math.abs(gap / (2 * Math.sin(Math.abs(endAngle - startAngle) / 2)))
 
 		return (
 			[
@@ -252,7 +253,7 @@
 					outerRadius,
 					innerRadius,
 					level,
-					offset: levelConfig.offset,
+					offset: levelConfig.offset ?? 0,
 					gap: levelConfig.gap,
 				},
 				...children && {
@@ -268,13 +269,13 @@
 						)
 					),
 				},
-			} as ComputedSlice
+			}
 		})
 	}
 
 
 	// State
-	let computedSlices = $derived(
+	const computedSlices = $derived(
 		computeSlices(
 			{
 				slices,
@@ -299,7 +300,7 @@
 		),
 	)
 
-	let svgAttributes = $derived.by(() => {
+	const svgAttributes = $derived.by(() => {
 		const maxRadiusMultiplier = Math.max(...levels.map(level => level.outerRadiusFraction))
 		const maxOffset = Math.max(...levels.map(level => level.offset ?? 0))
 		const maxRadius = radius * maxRadiusMultiplier + maxOffset
@@ -371,7 +372,7 @@
 
 		{#if slice.children?.length}
 			<g class="slices">
-				{#each slice.children as childSlice}
+				{#each slice.children as childSlice (childSlice.id)}
 					{@render sliceSnippet(childSlice)}
 				{/each}
 			</g>
@@ -386,7 +387,7 @@
 >
 	<svg {...svgAttributes}>
 		<g class="slices">
-			{#each computedSlices as slice}
+			{#each computedSlices as slice (slice.id)}
 				{@render sliceSnippet(slice)}
 			{/each}
 		</g>

@@ -5,7 +5,7 @@ import {
 	noCalldataDecoding,
 	noDataExtraction,
 } from '@/schema/features/security/hardware-wallet-app-signing'
-import { License } from '@/schema/features/transparency/license'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -26,24 +26,27 @@ export const ngrave: HardwareWallet = {
 				id: 'ngrave-zero',
 				name: 'NGRAVE Zero',
 				isFlagship: true,
-				url: 'https://www.ngrave.io/zero',
+				url: 'https://ngrave.io/zero',
 			},
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-01-07',
 		repoUrl: null,
-		url: 'https://www.ngrave.io/',
+		url: 'https://ngrave.io/',
 	},
 	features: {
 		accountSupport: null,
-		license: {
-			ref: [
-				{
-					explanation: 'NGRAVE is not open source',
-					url: 'https://youtu.be/-m1jcBFS0dc?t=701',
-				},
-			],
-			license: License.PROPRIETARY,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'NGRAVE is not open source',
+						url: 'https://youtu.be/-m1jcBFS0dc?t=701',
+					},
+				],
+				license: SourceNotAvailableLicense.PROPRIETARY,
+			},
 		},
 		monetization: {
 			ref: refTodo,
@@ -64,7 +67,7 @@ export const ngrave: HardwareWallet = {
 		privacy: {
 			dataCollection: null,
 			hardwarePrivacy: null,
-			privacyPolicy: 'https://www.ngrave.io/privacy-policy',
+			privacyPolicy: 'https://ngrave.io/privacy-policy',
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,

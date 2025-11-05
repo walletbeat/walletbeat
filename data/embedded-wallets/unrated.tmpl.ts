@@ -23,7 +23,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 	},
 	features: {
 		accountSupport: null,
-		license: null,
+		licensing: null,
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,

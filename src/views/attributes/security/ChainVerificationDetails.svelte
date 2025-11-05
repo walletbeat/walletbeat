@@ -2,18 +2,18 @@
 	// Types/constants
 	import type { ChainVerificationValue } from '@/schema/attributes/security/chain-verification'
 	import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
+	import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 	import type { FullyQualifiedReference } from '@/schema/reference'
 	import type { RatedWallet } from '@/schema/wallet'
-	import type { NonEmptyArray } from '@/types/utils/non-empty'
 	import { ContentType } from '@/types/content'
-	import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
+	import type { NonEmptyArray } from '@/types/utils/non-empty'
 	import { commaListPrefix } from '@/types/utils/text'
 
 
 	// Props
-	let {
+	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
+		const {
 		wallet,
-		value,
 		lightClients,
 		refs,
 	}: {
@@ -25,8 +25,8 @@
 
 
 	// Components
-	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import Typography from '@/components/Typography.svelte'
+	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
 
@@ -35,10 +35,11 @@
 		contentType: ContentType.MARKDOWN,
 		markdown: (
 			!lightClients || lightClients.length === 0 ?
-				`**{{WALLET_NAME}}** does not perform L1 chain state verification.`
+				'**{{WALLET_NAME}}** does not perform L1 chain state verification.'
 			:
 				`**{{WALLET_NAME}}** performs L1 chain state verification using ${lightClients.map((client: EthereumL1LightClient, i: number) => {
 					const clientUrl = ethereumL1LightClientUrl(client)
+
 					return `${commaListPrefix(i, lightClients.length)}[${client}](${typeof clientUrl === 'string' ? clientUrl : clientUrl.url})`
 				}).join('')}${lightClients.length === 1 ? ' light client.' : ' light clients.'}`
 		)

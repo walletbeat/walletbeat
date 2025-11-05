@@ -1,19 +1,19 @@
 <script lang="ts">
 	// Types/constants
-	import type { AttributeGroup } from '@/schema/attributes'
-	import type { RatedWallet } from '@/schema/wallet'
 	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
+	import type { AttributeGroup, ValueSet } from '@/schema/attributes'
+	import type { RatedWallet } from '@/schema/wallet'
 	import { scoreToColor } from '@/utils/colors'
 
 
 	// Props
-	let {
+	const {
 		wallet,
 		attributeGroup,
 		isInTooltip = false,
 	}: {
 		wallet: RatedWallet
-		attributeGroup: AttributeGroup<any>,
+		attributeGroup: AttributeGroup<ValueSet>,
 		isInTooltip?: boolean
 	} = $props()
 

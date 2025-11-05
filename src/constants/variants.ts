@@ -1,5 +1,5 @@
+import ExtensionIcon from '@material-icons/svg/svg/extension/outline.svg?raw'
 import HardwareIcon from '@material-icons/svg/svg/hardware/baseline.svg?raw'
-import LanguageIcon from '@material-icons/svg/svg/language/baseline.svg?raw'
 import MonitorIcon from '@material-icons/svg/svg/monitor/baseline.svg?raw'
 import PhoneAndroidIcon from '@material-icons/svg/svg/phone_android/baseline.svg?raw'
 import SettingsEthernetIcon from '@material-icons/svg/svg/settings_ethernet/baseline.svg?raw'
@@ -9,7 +9,7 @@ import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/vari
 export const variants = {
 	[Variant.BROWSER]: {
 		label: 'Browser extension',
-		icon: LanguageIcon,
+		icon: ExtensionIcon,
 	},
 	[Variant.DESKTOP]: {
 		label: 'Desktop app',

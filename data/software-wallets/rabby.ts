@@ -36,7 +36,11 @@ import {
 	comprehensiveFeesShownByDefault,
 	FeeDisplayLevel,
 } from '@/schema/features/transparency/fee-display'
-import { License } from '@/schema/features/transparency/license'
+import {
+	FOSSLicense,
+	LicensingType,
+	SourceAvailableNonFOSSLicense,
+} from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -169,14 +173,51 @@ export const rabby: SoftwareWallet = {
 				ref: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
 			}),
 		},
-		license: {
-			ref: [
-				{
-					explanation: 'Rabby is licensed under the MIT license.',
-					url: 'https://github.com/RabbyHub/Rabby/blob/develop/LICENSE',
+		licensing: {
+			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
+			coreLicense: {
+				ref: [
+					{
+						explanation: "Rabby's rabby-api package is unlicensed.",
+						url: 'https://www.npmjs.com/package/@rabby-wallet/rabby-api?activeTab=code',
+					},
+					{
+						explanation:
+							"Other than its rabby-api package, Rabby's core code is licensed under the MIT license.",
+						url: 'https://github.com/RabbyHub/Rabby/blob/develop/LICENSE',
+					},
+				],
+				license: SourceAvailableNonFOSSLicense.UNLICENSED_VISIBLE,
+			},
+			walletAppLicense: {
+				[Variant.BROWSER]: {
+					ref: [
+						{
+							explanation: "Rabby's browser extension is licensed under the MIT license.",
+							url: 'https://github.com/RabbyHub/Rabby/blob/develop/LICENSE',
+						},
+					],
+					license: FOSSLicense.MIT,
 				},
-			],
-			license: License.MIT,
+				[Variant.MOBILE]: {
+					ref: [
+						{
+							explanation: "Rabby's mobile app is unlicensed.",
+							url: 'https://github.com/RabbyHub/rabby-mobile',
+						},
+					],
+					license: SourceAvailableNonFOSSLicense.UNLICENSED_VISIBLE,
+				},
+				[Variant.DESKTOP]: {
+					ref: [
+						{
+							explanation: "Rabby's desktop app is licensed under the MIT license.",
+							url: 'https://github.com/RabbyHub/RabbyDesktop/blob/publish/prod/LICENSE',
+						},
+					],
+					license: FOSSLicense.MIT,
+				},
+			},
 		},
 		monetization: {
 			ref: [
@@ -360,7 +401,7 @@ export const rabby: SoftwareWallet = {
 			},
 			publicSecurityAudits: [
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/master/docs/Rabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
 					auditDate: '2021-06-18',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -370,7 +411,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/master/docs/SlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet-2022.03.18.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
 					auditDate: '2022-03-18',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -382,7 +423,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/master/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet-2023.07.20.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
 					auditDate: '2023-07-20',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -406,7 +447,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: { [Variant.DESKTOP]: true },
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/docs/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
 					auditDate: '2024-10-18',
 					auditor: leastAuthority,
 					codeSnapshot: {
@@ -433,7 +474,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/docs/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
 					auditDate: '2024-10-22',
 					auditor: cure53,
 					codeSnapshot: {
@@ -470,7 +511,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/docs/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
+					ref: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
 					auditDate: '2024-10-23',
 					auditor: slowMist,
 					codeSnapshot: {
@@ -481,7 +522,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/docs/Least%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report-20241212.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
 					auditDate: '2024-12-12',
 					auditor: leastAuthority,
 					codeSnapshot: {
@@ -492,7 +533,7 @@ export const rabby: SoftwareWallet = {
 					variantsScope: 'ALL_VARIANTS',
 				},
 				{
-					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/docs/Rabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report-20241217.pdf',
+					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
 					auditDate: '2024-12-17',
 					auditor: slowMist,
 					codeSnapshot: {

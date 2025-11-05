@@ -1,20 +1,20 @@
 <script lang="ts">
 	// Types/constants
 	import type { FundingValue } from '@/schema/attributes/transparency/funding'
-	import type { RatedWallet } from '@/schema/wallet'
 	import {
 		type Monetization,
 		monetizationStrategies,
 		monetizationStrategyName
 	} from '@/schema/features/transparency/monetization'
-	import { ContentType } from '@/types/content'
 	import { refs } from '@/schema/reference'
+	import type { RatedWallet } from '@/schema/wallet'
+	import { ContentType } from '@/types/content'
 
 
 	// Props
-	let {
+	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
+	const {
 		wallet,
-		value,
 		monetization,
 	}: {
 		wallet: RatedWallet
@@ -24,8 +24,8 @@
 
 
 	// Components
-	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import Typography from '@/components/Typography.svelte'
+	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
 
@@ -39,10 +39,11 @@
 						.filter(({ value }) => value === true)
 						.map(({ strategy }) => strategy)
 					const strategiesText = strategies.length === 0 ? 'unknown sources' : strategies.map(strategy => monetizationStrategyName(strategy)).join(', ')
+
 					return `**{{WALLET_NAME}}** is funded by **${strategiesText}**.`
 				})()
 			:
-				`**{{WALLET_NAME}}** is funded by **unknown sources**.`
+				'**{{WALLET_NAME}}** is funded by **unknown sources**.'
 		)
 	}}
 	strings={{ WALLET_NAME: wallet.metadata.displayName }}

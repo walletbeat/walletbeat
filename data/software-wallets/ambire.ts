@@ -26,7 +26,7 @@ import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/cha
 import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
-import { License } from '@/schema/features/transparency/license'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type References, refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -45,7 +45,7 @@ import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
 
 const v2Audits: SecurityAudit[] = [
 	{
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Pashov-Ambire-third-security-review.md',
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Pashov-Ambire-third-security-review.md',
 		auditDate: '2024-01-26',
 		auditor: pashov,
 		codeSnapshot: {
@@ -57,7 +57,7 @@ const v2Audits: SecurityAudit[] = [
 		variantsScope: { [Variant.BROWSER]: true },
 	},
 	{
-		ref: 'https://github.com/AmbireTech/ambire-common/blob/v2/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+		ref: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
 		auditDate: '2025-02-20',
 		auditor: hunterSecurity,
 		codeSnapshot: {
@@ -147,7 +147,7 @@ export const ambire: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-20',
 		repoUrl: 'https://github.com/AmbireTech/extension',
-		url: 'https://ambire.com',
+		url: 'https://www.ambire.com',
 	},
 	features: {
 		accountSupport: {
@@ -156,7 +156,7 @@ export const ambire: SoftwareWallet = {
 				ref: {
 					explanation:
 						'Ambire is AA wallet by default. With the introduction of EIP-7702 it allows you to use your existing EOA just like you would use any smart account wallet!',
-					url: 'https://blog.ambire.com/eip-7702-wallet',
+					url: 'https://blog.ambire.com/eip-7702-wallet/',
 				},
 				contract: ambireDelegatorContract,
 			}),
@@ -175,7 +175,7 @@ export const ambire: SoftwareWallet = {
 			rawErc4337: supported({
 				ref: {
 					explanation: 'Ambire supports ERC-4337 smart contract wallets',
-					url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount.sol',
+					url: 'https://github.com/AmbireTech/ambire-common/blob/main/contracts/AmbireAccount.sol',
 				},
 				contract: ambireAccountContract,
 				controllingSharesInSelfCustodyByDefault: 'YES',
@@ -243,9 +243,9 @@ export const ambire: SoftwareWallet = {
 				explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
 				label: 'List of RPCs Ambire uses for default chains',
 				url: [
-					'https://github.com/AmbireTech/ambire-common/blob/v2/src/consts/networks.ts',
-					'https://github.com/AmbireTech/ambire-common/blob/v2/src/services/ensDomains/ensDomains.ts',
-					'https://github.com/AmbireTech/ambire-common/blob/v2/src/libs/portfolio/getOnchainBalances.ts',
+					'https://github.com/AmbireTech/ambire-common/blob/main/src/consts/networks.ts',
+					'https://github.com/AmbireTech/ambire-common/blob/main/src/services/ensDomains/ensDomains.ts',
+					'https://github.com/AmbireTech/ambire-common/blob/main/src/libs/portfolio/getOnchainBalances.ts',
 				],
 			},
 			customChains: true,
@@ -269,7 +269,7 @@ export const ambire: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: {
-					url: 'https://github.com/AmbireTech/extension/blob/v2/src/web/extension-services/background/background.ts',
+					url: 'https://github.com/AmbireTech/extension/blob/main/src/web/extension-services/background/background.ts',
 				},
 				'1193': featureSupported,
 				'2700': featureSupported,
@@ -280,9 +280,12 @@ export const ambire: SoftwareWallet = {
 				atomicMultiTransactions: featureSupported,
 			}),
 		},
-		license: {
-			ref: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
-			license: License.GPL_3_0,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
+				license: FOSSLicense.GPL_3_0,
+			},
 		},
 		monetization: {
 			ref: refTodo,
@@ -467,7 +470,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 						urls: [
 							{
 								label: 'Implementation',
-								url: 'https://github.com/AmbireTech/ambire-common/blob/v2/src/controllers/phishing/phishing.ts',
+								url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/controllers/phishing/phishing.ts',
 							},
 						],
 					},

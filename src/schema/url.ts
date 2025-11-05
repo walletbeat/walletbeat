@@ -79,7 +79,8 @@ export function isLabeledUrl(obj: unknown): obj is LabeledUrl {
 		typeof obj === 'object' &&
 		obj !== null &&
 		Object.hasOwn(obj, 'label') &&
-		Object.hasOwn(obj, 'url')
+		Object.hasOwn(obj, 'url') &&
+		Object.values(obj).every(val => typeof val === 'string')
 	)
 }
 

@@ -7,7 +7,6 @@ import {
 	nonEmptyRemap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-import { objectEntries } from '@/types/utils/object'
 
 import {
 	type Attribute,
@@ -118,7 +117,7 @@ import {
 	type SourceVisibilityValue,
 } from './attributes/transparency/source-visibility'
 import type { ResolvedFeatures } from './features'
-import { type MaybeUnratedScore, type WeightedScore, weightedScore } from './score'
+import { type MaybeUnratedScore, type Score, type WeightedScore, weightedScore } from './score'
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { WalletMetadata } from './wallet'
 
@@ -707,51 +706,34 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 }
 
 /**
- * Filter an evaluation tree to only include specific attribute groups.
- * @param evaluationTree The evaluation tree to filter.
- * @param attributeGroups The attribute groups to include.
- * @returns A filtered evaluation tree containing only the specified groups.
- */
-export const filterEvaluationTree = (
-	evaluationTree: EvaluationTree,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	attributeGroups: AttributeGroup<any>[],
-): Partial<EvaluationTree> => {
-	const groupIds = new Set(attributeGroups.map(group => group.id))
-
-	return Object.fromEntries(
-		Object.entries(evaluationTree).filter(([attrGroupId]) => groupIds.has(attrGroupId)),
-	) as Partial<EvaluationTree>
-}
-
-/**
  * Calculate the overall wallet score by averaging all attribute group scores.
  * @param evaluationTree The evaluation tree to score.
- * @returns The overall score between 0.0 (lowest) and 1.0 (highest), or undefined if no scores.
+ * @param attrGroupPredicate A predicate determining whether the given attribute group should be scored.
+ * @returns The overall score between 0.0 (lowest) and 1.0 (highest), or null if no scores.
  */
 export const calculateOverallScore = (
-	evaluationTree: EvaluationTree | Partial<EvaluationTree>,
+	evaluationTree: EvaluationTree,
+	attrGroupPredicate: <Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>) => boolean,
 ): MaybeUnratedScore => {
-	const scores = objectEntries(attributeTree)
-		.map(
-			([attrGroupId, attrGroup]) =>
-				evaluationTree[attrGroupId] &&
-				calculateAttributeGroupScore(
-					attrGroup.attributeWeights,
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any
-					evaluationTree[attrGroupId] as any,
-				),
-		)
-		.filter(
-			(score): score is { score: number; hasUnratedComponent: boolean } =>
-				score?.score !== undefined,
-		)
+	const scores = mapNonExemptAttributeGroupsInTree(
+		evaluationTree,
+		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => {
+			if (!attrGroupPredicate<Vs>(attrGroup)) {
+				return null
+			}
+
+			return calculateAttributeGroupScore<Vs>(attrGroup.attributeWeights, evalGroup)
+		},
+	).filter((score): score is { score: Score; hasUnratedComponent: boolean } => score !== null)
+
+	if (!isNonEmptyArray(scores)) {
+		return null
+	}
 
 	return {
-		score: scores.length
-			? scores.reduce((sum, { score }) => sum + score, 0) / scores.length
-			: undefined,
-		hasUnratedComponent: scores.some(score => score?.hasUnratedComponent),
+		score:
+			scores.reduce((sum, { score }) => (score === null ? sum : sum + score), 0) / scores.length,
+		hasUnratedComponent: scores.some(score => score.hasUnratedComponent),
 	}
 }
 

@@ -1,19 +1,35 @@
 <script lang="ts">
 	// Types/constants
-	import {
-		ratingToColor,
-		Rating,
-		type EvaluatedAttribute,
-		type AttributeGroup,
-		type Attribute,
-		type EvaluatedGroup,
-		ratingIcons,
-	} from '@/schema/attributes'
-	import { VariantSpecificity } from '@/schema/wallet'
-	import { type Variant, hasSingleVariant } from '@/schema/variants'
 	import { allRatedWallets, type WalletName } from '@/data/wallets'
+	import {
+		type Attribute,
+		type AttributeGroup,
+		type EvaluatedAttribute,
+		type EvaluatedGroup,
+		Rating,
+		ratingIcons,
+		ratingToColor,
+	} from '@/schema/attributes'
+	import { hasSingleVariant,type Variant } from '@/schema/variants'
+	import { VariantSpecificity } from '@/schema/wallet'
 	import { ContentType, isTypographicContent } from '@/types/content'
 	import { objectEntries, objectKeys } from '@/types/utils/object'
+
+
+	// Components
+	import { Github, Globe } from 'lucide-static'
+	import Pie, { PieLayout } from '@/components/Pie.svelte'
+	import Select from '@/components/Select.svelte'
+	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
+	import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
+	import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
+	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
+	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
+	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
+	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
+	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
+	import ScoreBadge from '@/views/ScoreBadge.svelte'
+	import Typography from '@/components/Typography.svelte'
 
 
 	// Functions
@@ -22,34 +38,16 @@
 		variantToName,
 		variantToRunsOn,
 	} from '@/constants/variants'
+	import { allHardwareModels } from '@/data/hardware-wallets'
 	import {
 		attributeTree,
 		calculateAttributeGroupScore,
 		calculateOverallScore,
 	} from '@/schema/attribute-groups'
-	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
+	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { scoreToColor } from '@/utils/colors'
-	import { allHardwareModels } from '@/data/hardware-wallets'
-
-
-	// Components
-	import Typography from '@/components/Typography.svelte'
-	import Pie, { PieLayout } from '@/components/Pie.svelte'
-	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
-	import ScoreBadge from '@/views/ScoreBadge.svelte'
-	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
-	import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
-	import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
-	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
-	import TransactionInclusionDetails from '@/views/attributes/self-sovereignty/TransactionInclusionDetails.svelte'
-	import FundingDetails from '@/views/attributes/transparency/FundingDetails.svelte'
-	import LicenseDetails from '@/views/attributes/transparency/LicenseDetails.svelte'
-	import SourceVisibilityDetails from '@/views/attributes/transparency/SourceVisibilityDetails.svelte'
-	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
-	import Select from '@/components/Select.svelte'
-	import { Github, Globe } from 'lucide-static'
 
 
 	// Props
@@ -62,6 +60,7 @@
 
 	// State
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
+	import { isLabeledUrl } from '@/schema/url'
 
 	let queryParams = $state<URLSearchParams>(
 		globalThis.location && new SvelteURLSearchParams(globalThis.location.search)
@@ -75,6 +74,7 @@
 	let highlightedAttributeId = $state<string | null>(
 		null
 	)
+
 
 	// (Derived)
 	const wallet = $derived(
@@ -137,18 +137,18 @@
 	})
 
 	const overallScore = $derived(
-		calculateOverallScore(wallet.overall)
+		calculateOverallScore(wallet.overall, () => true),
 	)
 </script>
 
 
 <svelte:head>
-	{@html `<script type="application/ld+json">${JSON.stringify({
+	{@html `<script type="application/ld+json">` + JSON.stringify({
 		'@context': 'https://schema.org',
 		'@type': 'FAQPage',
 		mainEntity: evalTree
 			? objectEntries(attributeTree).flatMap(([attrGroupId, attrGroup]) =>
-					objectEntries(attrGroup.attributes as AttributeGroup<any>['attributes'])
+					objectEntries(attrGroup.attributes)
 						.map(([attrId, attribute]) => ({
 							evalAttr: evalTree[attrGroupId][
 								attrId as keyof (typeof evalTree)[typeof attrGroupId]
@@ -190,9 +190,7 @@
 			'@type': 'SoftwareApplication',
 			name: wallet.metadata.displayName,
 			description: renderStrings(
-				wallet.metadata.blurb.contentType === ContentType.TEXT
-					? wallet.metadata.blurb.text
-					: `${wallet.metadata.displayName} wallet`,
+				wallet.metadata.blurb.contentType === ContentType.TEXT ? wallet.metadata.blurb.text : wallet.metadata.displayName + ' wallet',
 				{
 					WALLET_NAME: wallet.metadata.displayName,
 				},
@@ -203,7 +201,7 @@
 				.map(variant => variantToRunsOn(variant))
 				.join(', '),
 		},
-	})}</script>`}
+	}) + `</script>`}
 </svelte:head>
 
 
@@ -227,6 +225,7 @@
 			<div data-row="wrap">
 				<div data-row="wrap">
 					<a
+						data-link="camouflaged"
 						class="wallet-name"
 						href="#top"
 					>
@@ -281,7 +280,7 @@
 
 					<nav data-row="gap-2 start wrap">
 						<a
-							href={typeof wallet.metadata.url === 'string' ? wallet.metadata.url : wallet.metadata.url?.url ?? '#'}
+							href={isLabeledUrl(wallet.metadata.url) ? wallet.metadata.url.url : wallet.metadata.url}
 							data-badge="medium"
 							target="_blank"
 							rel="noopener noreferrer"
@@ -292,13 +291,13 @@
 
 						{#if wallet.metadata.repoUrl}
 							<a
-								href={typeof wallet.metadata.repoUrl === 'string' ? wallet.metadata.repoUrl : wallet.metadata.repoUrl?.url ?? '#'}
+								href={isLabeledUrl(wallet.metadata.repoUrl) ? wallet.metadata.repoUrl.url : wallet.metadata.repoUrl}
 								data-badge="medium"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
 								{@html Github}
-								GitHub Repository
+								Source Code
 							</a>
 						{/if}
 					</nav>
@@ -363,7 +362,7 @@
 	attrGroup: AttributeGroup<any>
 	evalGroup: EvaluatedGroup<any>
 })}
-	{@const attributes = objectEntries(attrGroup.attributes as AttributeGroup<any>['attributes'])
+	{@const attributes = objectEntries(attrGroup.attributes)
 		.map(([attrId, attribute]) => ({
 			attribute,
 			evalAttr: evalGroup[attrId] as EvaluatedAttribute<any> | undefined,
@@ -376,7 +375,8 @@
 
 	{#if attributes.length > 0}
 		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup) : null}
-		{@const scoreLevel = score?.score ? score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low' : undefined}
+		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
+		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 
 		<hr />
 
@@ -388,10 +388,10 @@
 			data-score={scoreLevel}
 			data-icon={attrGroup.icon}
 			style:--attributeGroup-icon={`'${attrGroup.icon}'`}
-			style:--accent={scoreToColor(score?.score)}
+			style:--accent={scoreColor}
 		>
 			<header data-sticky data-row>
-				<a href={`#${slugifyCamelCase(attrGroup.id)}`}>
+				<a data-link="camouflaged" href={`#${slugifyCamelCase(attrGroup.id)}`}>
 					<h2>
 						{attrGroup.displayName}
 					</h2>
@@ -447,7 +447,7 @@
 							{#snippet centerContentSnippet()}
 								<circle
 									r="8"
-									fill={scoreToColor(score?.score)}
+									fill={scoreColor}
 								>
 									{#if score?.hasUnratedComponent}
 										<title>
@@ -467,6 +467,7 @@
 								{@const attributeUrl = `#${slugifyCamelCase(attribute.id)}`}
 								<li>
 									<a
+										data-link="camouflaged"
 										href={attributeUrl}
 										style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
 										data-card="secondary padding-3"
@@ -550,7 +551,7 @@
 				<header data-row>
 					<div>
 						<div data-row="start gap-2">
-							<a href={`#${slugifyCamelCase(attribute.id)}`}>
+							<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
 								<h3 data-icon={attribute.icon}>
 									{attribute.displayName}
 								</h3>
@@ -628,10 +629,6 @@
 								<TransactionInclusionDetails {...componentProps} {wallet} {value} {references} />
 							{:else if componentName === 'FundingDetails'}
 								<FundingDetails {...componentProps} {wallet} {value} {references} />
-							{:else if componentName === 'LicenseDetails'}
-								<LicenseDetails {...componentProps} {wallet} {value} {references} />
-							{:else if componentName === 'SourceVisibilityDetails'}
-								<SourceVisibilityDetails {...componentProps} {wallet} {value} {references} />
 							{:else if componentName === 'UnratedAttribute'}
 								<UnratedAttribute {...componentProps} {wallet} {value} {references} />
 							{/if}
@@ -670,11 +667,11 @@
 			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.value && typeof evalAttr.evaluation.value === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.value && Array.isArray(evalAttr.evaluation.value.supportedHardwareWallets) && evalAttr.evaluation.value.supportedHardwareWallets.length > 0}
 				{@const supportedBrands = evalAttr.evaluation.value.supportedHardwareWallets}
 
-				{@const supportedModels = (
+				{@const supportedModels =
 					allHardwareModels.filter(m => (
 						supportedBrands.includes(m.brandId.toUpperCase())
 					))
-				)}
+				}
 
 				<div class="supported-hardware-wallets" data-card="secondary padding-6">
 					<h4>Supported hardware wallets:</h4>
@@ -970,13 +967,6 @@
 		display: flex;
 		align-items: center;
 
-		color: inherit;
-		text-decoration: none;
-
-		&:hover {
-			color: var(--accent);
-		}
-
 		&::before {
 			content: '# ';
 			display: inline-flex;
@@ -1182,7 +1172,7 @@
 				var(--background-secondary)
 			;
 
-			transition-property: background-color, color, outline;
+			transition-property: opacity, scale, background-color, color, outline;
 		}
 
 		&::scroll-marker:hover:not(:target-current) {
@@ -1306,8 +1296,6 @@
 					gap: 0.5rem;
 					align-items: center;
 					padding: 0.5rem;
-					color: var(--text-primary);
-					text-decoration: none;
 					font-size: 0.875rem;
 
 					&:hover,
@@ -1482,8 +1470,7 @@
 			font-weight: 500;
 			text-decoration: none;
 
-
-			transition-property: background-color, color, outline;
+			transition-property: opacity, scale, background-color, color, outline;
 		}
 
 		&::scroll-marker:hover:not(:target-current) {
@@ -1555,6 +1542,7 @@
 
 			.rating-display {
 				grid-template-columns: auto 1fr;
+				gap: 1rem;
 				font-weight: 500;
 				background-color: color-mix(in srgb, var(--accent) 5%, var(--background-secondary));
 				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);

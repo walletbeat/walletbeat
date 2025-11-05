@@ -4,7 +4,7 @@
 
 
 	// Props
-	let {
+	const {
 		references,
 	}: {
 		references: FullyQualifiedReference[]
@@ -19,7 +19,7 @@
 		<!-- <h5>{totalUrls > 1 ? 'Sources' : 'Source'}</h5> -->
 
 		<ul class="references">
-			{#each references as ref}
+			{#each references as ref, index (index + '::' + ref.urls.map(url => url.url).toSorted().join('|'))}
 				<li data-card="secondary padding-3">
 					{#if ref.explanation}
 						<p>{ref.explanation}</p>
@@ -27,7 +27,7 @@
 
 					<div class="urls">
 						<ul data-row="start gap-2">
-							{#each ref.urls as url}
+							{#each ref.urls as url (url.url)}
 								<li data-card="padding-3">
 									<a
 										href={url.url}

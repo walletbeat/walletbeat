@@ -10,7 +10,7 @@ import {
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
-import { License } from '@/schema/features/transparency/license'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -70,15 +70,18 @@ export const rainbow: SoftwareWallet = {
 			},
 			walletCall: null,
 		},
-		license: {
-			ref: [
-				{
-					explanation: 'Rainbow uses the GPL-3.0 license for its source code',
-					label: 'Rainbow License File',
-					url: 'https://github.com/rainbow-me/rainbow/blob/develop/LICENSE',
-				},
-			],
-			license: License.GPL_3_0,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'Rainbow uses the GPL-3.0 license for its source code',
+						label: 'Rainbow License File',
+						url: 'https://github.com/rainbow-me/rainbow/blob/develop/LICENSE',
+					},
+				],
+				license: FOSSLicense.GPL_3_0,
+			},
 		},
 		monetization: {
 			ref: refTodo,

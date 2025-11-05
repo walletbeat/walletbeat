@@ -7,6 +7,8 @@ import eslintPluginSortKeysCustomOrder from 'eslint-plugin-sort-keys-custom-orde
 import eslintPluginUnusedImports from 'eslint-plugin-unused-imports'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
+import svelte from 'eslint-plugin-svelte'
+import svelteConfig from './svelte.config.js'
 
 // Note: If you want to use eslint-comments rules, you need to install and import eslint-plugin-eslint-comments
 
@@ -28,10 +30,26 @@ export default [
 		ignores: [
 			// Ignore generated files
 			'src/generated/**',
+
+			// Issue #329: Remove these ignored files as errors are fixed.
+			'src/views/WalletTable.svelte',
+			'src/views/WalletPage.svelte',
+			'src/views/NavigationItems.svelte',
+			'src/views/Eip7702Table.svelte',
+			'src/components/Typography.svelte',
+			'src/components/Tooltip.svelte',
+			'src/components/Table.svelte',
+			'src/components/Select.svelte',
+			'src/components/Filters.svelte',
+			'src/components/BlockTransition.svelte',
+			'src/views/WalletAttributeSummary.svelte',
 		],
 	},
 	eslintPluginEslintComments.recommended,
-	eslint.configs.recommended,
+	{
+		...eslint.configs.recommended,
+		files: ['**/*.{js,mjs,cjs,ts,svelte}'],
+	},
 	...(process.env.WALLETBEAT_PRECOMMIT_FAST === 'true'
 		? tseslint.configs.recommended
 		: tseslint.configs.recommendedTypeChecked),
@@ -47,8 +65,24 @@ export default [
 					},
 				},
 			]),
+	...svelte.configs.recommended,
 	{
-		files: ['**/*.{js,mjs,cjs,ts}'],
+		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
+		languageOptions: {
+			parserOptions: {
+				projectService: true,
+				extraFileExtensions: ['.svelte'],
+				parser: {
+					ts: tseslint.parser,
+					typescript: tseslint.parser,
+					svelte: tseslint.parser,
+				},
+				svelteConfig,
+			},
+		},
+	},
+	{
+		files: ['**/*.{js,mjs,cjs,ts,svelte}'],
 		languageOptions: {
 			globals: {
 				...globals.browser,
@@ -168,10 +202,31 @@ export default [
 		},
 	},
 	{
+		files: ['**/*.{js,mjs,cjs,ts}'],
 		plugins: { prettier: eslintPluginPrettier },
 		rules: {
-			'prettier/prettier': ['error', { singleQuote: true, useTabs: true, semi: false }],
+			'prettier/prettier': [
+				'error',
+				{
+					singleQuote: true,
+					useTabs: true,
+					semi: false,
+					proseWrap: 'preserve',
+				},
+			],
 			quotes: ['error', 'single', { avoidEscape: true }],
+		},
+	},
+	...svelte.configs.prettier,
+	{
+		files: ['**/*.svelte'],
+		rules: {
+			// Respect import groupings.
+			'simple-import-sort/imports': 'off',
+			'simple-import-sort/exports': 'off',
+
+			// Not useful for props.
+			'prefer-const': 'off',
 		},
 	},
 ]

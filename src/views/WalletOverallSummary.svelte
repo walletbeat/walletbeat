@@ -1,12 +1,12 @@
 <script lang="ts">
 	// Types/constants
+	import type { MaybeUnratedScore } from '@/schema/score'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { scoreToColor } from '@/utils/colors'
-	import type { MaybeUnratedScore } from '@/schema/score'
 
 
 	// Props
-	let {
+	const {
 		wallet,
 		score,
 		isInTooltip = false,

@@ -85,7 +85,7 @@ export const frame: SoftwareWallet = {
 			},
 			walletCall: null,
 		},
-		license: null,
+		licensing: null,
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,

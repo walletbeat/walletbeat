@@ -2,11 +2,9 @@ import type { Value } from '../schema/attributes'
 import type { AddressCorrelationDetailsContent } from './content/address-correlation-details'
 import type { ChainVerificationDetailsContent } from './content/chain-verification-details'
 import type { FundingDetailsContent } from './content/funding-details'
-import type { LicenseDetailsContent } from './content/license-details'
 import type { PrivateTransfersDetailsContent } from './content/private-transfers-details'
 import type { ScamAlertDetailsContent } from './content/scam-alert-details'
 import type { SecurityAuditsDetailsContent } from './content/security-audits-details'
-import type { SourceVisibilityDetailsContent } from './content/source-visibility-details'
 import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
 import type { UnratedAttributeContent } from './content/unrated-attribute'
 import type { Strings as _Strings, ValidateText } from './utils/string-templates'
@@ -33,11 +31,9 @@ export type ComponentAndProps =
 	| AddressCorrelationDetailsContent
 	| ChainVerificationDetailsContent
 	| FundingDetailsContent
-	| LicenseDetailsContent
 	| PrivateTransfersDetailsContent
 	| ScamAlertDetailsContent
 	| SecurityAuditsDetailsContent
-	| SourceVisibilityDetailsContent
 	| TransactionInclusionDetailsContent
 	| UnratedAttributeContent<Value>
 

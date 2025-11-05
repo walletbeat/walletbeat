@@ -2,8 +2,8 @@ type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 type ThirtyDays = `0${Exclude<Digit, '0'>}` | `1${Digit}` | `2${Digit}` | '30'
 type ThirtyOneDays = ThirtyDays | '31'
 type FebruaryDays = Exclude<ThirtyDays, '30'>
-type ThirtyDayMonths = '04' | '06' | '08' | '10' | '12'
-type ThirtyOneDayMonths = '01' | '03' | '05' | '07' | '09' | '11'
+type ThirtyDayMonths = '04' | '06' | '09' | '11'
+type ThirtyOneDayMonths = '01' | '03' | '05' | '07' | '08' | '10' | '12'
 type MonthAndDay =
 	| `${ThirtyDayMonths}-${ThirtyDays}`
 	| `${ThirtyOneDayMonths}-${ThirtyOneDays}`

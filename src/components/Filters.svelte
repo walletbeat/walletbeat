@@ -28,6 +28,7 @@
 	Item
 ">
 	// Types/constants
+	import type { SvelteHTMLElements } from 'svelte/elements'
 	import type { Snippet } from 'svelte'
 
 
@@ -40,7 +41,7 @@
 		toggleFilter = $bindable(),
 		toggleFilterById = $bindable(),
 		...restProps
-	}: {
+	}: SvelteHTMLElements['form'] & {
 		items: Item[]
 		filterGroups: FilterGroup<Item>[]
 		activeFilters?: Set<Filter<Item>>

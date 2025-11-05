@@ -1,7 +1,6 @@
 import { type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { ambire } from './software-wallets/ambire'
-import { coinbase } from './software-wallets/coinbase'
 import { daimo } from './software-wallets/daimo'
 import { elytro } from './software-wallets/elytro'
 import { family } from './software-wallets/family'
@@ -21,7 +20,6 @@ import { zerion } from './software-wallets/zerion'
 /** Set of all known software wallets. */
 export const softwareWallets = {
 	ambire,
-	coinbase,
 	daimo,
 	elytro,
 	family,

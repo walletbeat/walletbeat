@@ -1,15 +1,15 @@
 <script lang="ts">
 	// Types/constants
 	import type { L1BroadcastSupport, TransactionInclusionValue } from '@/schema/attributes/self-sovereignty/transaction-inclusion'
-	import type { RatedWallet } from '@/schema/wallet'
 	import type { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
+	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 
 
 	// Props
-	let {
+	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
+	const {
 		wallet,
-		value,
 		supportsL1Broadcast,
 		supportAnyL2Transactions = [],
 		supportForceWithdrawal = [],
@@ -34,13 +34,10 @@
 
 
 {#if supportAnyL2Transactions.length || supportForceWithdrawal.length || unsupportedL2s.length}
-	{@const allSupportedForceWithdrawals = (
-		[
+	{@const allSupportedForceWithdrawals = [
 			...supportAnyL2Transactions,
 			...supportForceWithdrawal,
-		]
-			.toSorted()
-	)}
+		].toSorted()}
 
 	{#if allSupportedForceWithdrawals.length}
 		<Typography
@@ -67,11 +64,11 @@
 		contentType: ContentType.MARKDOWN,
 		markdown: (
 			supportsL1Broadcast === 'NO' ?
-				`**{{WALLET_NAME}}** does not support Ethereum peer-to-peer gossiping nor connecting to a user's self-hosted Ethereum node.\n\nTherefore, L1 transactions are subject to censorship by intermediaries.`
+				'**{{WALLET_NAME}}** does not support Ethereum peer-to-peer gossiping nor connecting to a user\'s self-hosted Ethereum node.\n\nTherefore, L1 transactions are subject to censorship by intermediaries.'
 			: supportsL1Broadcast === 'OWN_NODE' ?
-				`**{{WALLET_NAME}}** supports connecting to a user's self-hosted Ethereum node, which can be used to broadcast L1 transactions without trusting intermediaries.`
+				'**{{WALLET_NAME}}** supports connecting to a user\'s self-hosted Ethereum node, which can be used to broadcast L1 transactions without trusting intermediaries.'
 			: supportsL1Broadcast === 'SELF_GOSSIP' ?
-				`**{{WALLET_NAME}}** supports directly gossipping over Ethereum's peer-to-peer network, allowing L1 transactions to be reliably included without trusting intermediaries.`
+				'**{{WALLET_NAME}}** supports directly gossipping over Ethereum\'s peer-to-peer network, allowing L1 transactions to be reliably included without trusting intermediaries.'
 			:
 				''
 		),

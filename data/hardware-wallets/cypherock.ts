@@ -7,7 +7,7 @@ import {
 	noCalldataDecoding,
 	noDataExtraction,
 } from '@/schema/features/security/hardware-wallet-app-signing'
-import { License } from '@/schema/features/transparency/license'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -34,18 +34,21 @@ export const cypherockWallet: HardwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-01-06',
 		repoUrl: 'https://github.com/Cypherock',
-		url: 'https://cypherock.com/',
+		url: 'https://www.cypherock.com',
 	},
 	features: {
 		accountSupport: null,
-		license: {
-			ref: [
-				{
-					explanation: 'Cypherock is open-source and reproducible',
-					url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/main/LICENSE.md',
-				},
-			],
-			license: License.MIT_WITH_CLAUSE,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'Cypherock is open-source and reproducible',
+						url: 'https://github.com/Cypherock/x1_wallet_firmware/blob/main/LICENSE.md',
+					},
+				],
+				license: FOSSLicense.MIT_WITH_CLAUSE,
+			},
 		},
 		monetization: {
 			ref: refTodo,
@@ -77,13 +80,13 @@ export const cypherockWallet: HardwareWallet = {
 					{
 						explanation:
 							'Bug bounty program with responsible disclosure policy and discretionary rewards',
-						url: 'https://cypherock.com/bug-bounty',
+						url: 'https://www.cypherock.com/bug-bounty',
 					},
 				],
 				details:
 					'Cypherock provides legal protection for security researchers and discretionary rewards for valid security issues affecting X1 Wallet and X1 Card.',
 				upgradePathAvailable: true,
-				url: 'https://cypherock.com/bug-bounty',
+				url: 'https://www.cypherock.com/bug-bounty',
 			},
 			firmware: {
 				type: FirmwareType.PASS,

@@ -4,7 +4,7 @@
 
 
 	// Props
-	let {
+	const {
 		score,
 		size = 'medium',
 	}: {
@@ -18,7 +18,7 @@
 </script>
 
 
-{#if score?.score !== undefined}
+{#if score !== null && score.score !== null}
 	<data
 		data-badge={size}
 		value={score.score}

@@ -16,7 +16,7 @@ import {
 	DataExtraction,
 	noCalldataDecoding,
 } from '@/schema/features/security/hardware-wallet-app-signing'
-import { License } from '@/schema/features/transparency/license'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -47,14 +47,17 @@ export const bitboxWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		license: {
-			ref: [
-				{
-					explanation: 'BitBox02 firmware is fully open source and verified by WalletScrutiny',
-					url: 'https://github.com/BitBoxSwiss/bitbox02-firmware',
-				},
-			],
-			license: License.APACHE_2_0,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'BitBox02 firmware is fully open source and verified by WalletScrutiny',
+						url: 'https://github.com/BitBoxSwiss/bitbox02-firmware',
+					},
+				],
+				license: FOSSLicense.APACHE_2_0,
+			},
 		},
 		monetization: {
 			ref: refTodo,

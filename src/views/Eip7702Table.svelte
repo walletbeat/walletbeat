@@ -1,12 +1,12 @@
 <script lang="ts">
 	// Types/constants
-	import type { EVMAddress, SmartWalletContract } from '@/schema/contracts'
-	import type { Variant } from '@/schema/variants'
-	import type { RatedWallet } from '@/schema/wallet'
-	import { AccountType } from '@/schema/features/account-support'
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
 	import { ratedSoftwareWallets } from '@/data/software-wallets'
+	import type { EVMAddress, SmartWalletContract } from '@/schema/contracts'
+	import { AccountType } from '@/schema/features/account-support'
+	import type { Variant } from '@/schema/variants'
+	import type { RatedWallet } from '@/schema/wallet'
 
 	const WalletTypeFor7702 = {
 		EIP7702: 'EIP7702',
@@ -34,12 +34,12 @@
 
 
 	// Functions
-	import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
-	import { getVariantResolvedWallet, walletSupportedAccountTypes } from '@/schema/wallet'
-	import { getVariants } from '@/schema/variants'
-	import { isLabeledUrl } from '@/schema/url'
 	import { isAccountTypeSupported } from '@/schema/features/account-support'
 	import { refs } from '@/schema/reference'
+	import { isLabeledUrl } from '@/schema/url'
+	import { getVariants } from '@/schema/variants'
+	import { getVariantResolvedWallet, walletSupportedAccountTypes } from '@/schema/wallet'
+	import { isNonEmptyArray, nonEmptyGet, setContains, setItems } from '@/types/utils/non-empty'
 
 	const getWalletTypeFor7702 = (wallet: RatedWallet) => {
 		const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
@@ -87,13 +87,13 @@
 
 
 	// Components
+	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
+	import KeyIcon from 'lucide-static/icons/key.svg?raw'
+
 	import Filters from '@/components/Filters.svelte'
+	import Table from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import EipDetails from '@/views/EipDetails.svelte'
-	import Table from '@/components/Table.svelte'
-
-	import KeyIcon from 'lucide-static/icons/key.svg?raw'
-	import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 </script>
 
 
@@ -290,12 +290,12 @@
 				<small>
 					{#if contract.sourceCode.available}
 						{@const sourceRefs = refs(contract.sourceCode)}
-						{@const sourceUrl = (
+						{@const sourceUrl =
 							isNonEmptyArray(sourceRefs) ?
 								nonEmptyGet(nonEmptyGet(sourceRefs).urls)
 							:
 								getContractUrl(contract.address, 'code')
-						)}
+						}
 						{@const rawUrl = isLabeledUrl(sourceUrl) ? sourceUrl.url : sourceUrl}
 
 						<a

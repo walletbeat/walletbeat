@@ -275,7 +275,7 @@
 		border-radius: 0.375rem;
 		font-weight: 500;
 
-		transition-property: background-color, color, outline;
+		transition-property: opacity, scale, background-color, color, outline;
 
 		&:hover:not(:has(a:hover)) {
 			background-color: var(--background-primary);

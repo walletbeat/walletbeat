@@ -7,7 +7,7 @@ import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-v
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
-import { License } from '@/schema/features/transparency/license'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -72,14 +72,17 @@ export const gemwallet: SoftwareWallet = {
 			browser: 'NOT_A_BROWSER_WALLET',
 			walletCall: null,
 		},
-		license: {
-			ref: [
-				{
-					explanation: 'Gem Wallet is licensed under the GPL-3.0 license.',
-					url: 'https://github.com/gemwalletcom/gem-ios/blob/main/LICENSE',
-				},
-			],
-			license: License.GPL_3_0,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'Gem Wallet is licensed under the GPL-3.0 license.',
+						url: 'https://github.com/gemwalletcom/gem-ios/blob/main/LICENSE',
+					},
+				],
+				license: FOSSLicense.GPL_3_0,
+			},
 		},
 		monetization: {
 			ref: [

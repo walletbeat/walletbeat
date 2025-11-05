@@ -5,7 +5,7 @@ import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-prog
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported } from '@/schema/features/support'
-import { License } from '@/schema/features/transparency/license'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -66,9 +66,12 @@ export const mtpelerin: SoftwareWallet = {
 			},
 			walletCall: null,
 		},
-		license: {
-			ref: refTodo,
-			license: License.PROPRIETARY,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: refNotNecessary,
+				license: SourceNotAvailableLicense.PROPRIETARY,
+			},
 		},
 		monetization: {
 			ref: 'https://developers.mtpelerin.com/service-information/revenue-sharing',
