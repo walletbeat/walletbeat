@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { Snippet, ComponentProps } from 'svelte'
+	import type { Snippet } from 'svelte'
 	import type { SvelteHTMLElements } from 'svelte/elements'
 
 
@@ -21,9 +21,9 @@
 		isExpanded: boolean
 		showAccordionMarker?: boolean
 
-		tooltipMaxWidth?: string
-		tooltipButtonTriggerPlacement?: ComponentProps<typeof Tooltip>['buttonTriggerPlacement']
-		tooltipHoverTriggerPlacement?: ComponentProps<typeof Tooltip>['hoverTriggerPlacement']
+	tooltipMaxWidth?: string
+	tooltipButtonTriggerPlacement?: 'around' | 'behind'
+	tooltipHoverTriggerPlacement?: 'around' | 'button'
 
 		children: Snippet
 		ExpandedContent: Snippet<[{ isInTooltip?: boolean }]>
