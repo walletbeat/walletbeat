@@ -11,7 +11,7 @@ import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
-import type { License } from '@/schema/features/transparency/license'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -47,15 +47,18 @@ export const imkeyWallet: HardwareWallet = {
 	features: {
 		accountSupport: null,
 
-		license: {
-			ref: [
-				{
-					explanation:
-						'Core components are open-sourced under Apache-2.0 on GitHub. Some firmware remains proprietary but reproducible builds ensure verifiable integrity.',
-					url: 'https://github.com/consenlabs/imkey-core',
-				},
-			],
-			license: License.APACHE_2_0,
+		licensing: {
+			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
+
+			coreLicense: {
+				ref: [
+					{
+						explanation: 'Core components are open-sourced under Apache-2.0 on GitHub.',
+						url: 'https://github.com/consenlabs/imkey-core',
+					},
+				],
+				license: FOSSLicense.APACHE_2_0,
+			},
 		},
 
 		monetization: {
