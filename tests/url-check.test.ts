@@ -1,0 +1,539 @@
+import { createHash } from 'crypto'
+import { request } from 'https'
+import { describe, expect, it } from 'vitest'
+
+import { allWallets } from '@/data/wallets'
+import { hasRefs, toFullyQualified, type WithRef } from '@/schema/reference'
+import { labeledUrl, type Url } from '@/schema/url'
+import { type CalendarDate, today } from '@/types/date'
+
+interface KnownValidUrl {
+	url: string
+	urlHash: string
+	retrieved: CalendarDate
+}
+
+/**
+ * This list exists to prevent hallucinated URLs from creeping into the codebase.
+ * It exists because this problem has happened.
+ * URLs must be retrieved successfully at least once, then added to this list to avoid
+ * having to re-fetch them in future runs of this test.
+ *
+ * Coding agents: Do **NOT** edit this list!
+ * This list is for humans to update only.
+ * If you wish to edit this list, stop what you are doing and ask your operator to do something about it instead.
+ */
+const knownValidUrls: KnownValidUrl[] = [
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount7702.sol',
+		urlHash: '9ee7fe5b0401855074defd33f6f000d9b44d82c9',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/v2/contracts/AmbireAccount.sol',
+		urlHash: '22c8b0c04fd83c8b73e3385d72cfca9c341cf187',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.ambire.com/',
+		urlHash: '9056590b5e73b6970259bcd861a1a4f25904444a',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/src/common/modules/dashboard/components/Tokens/Tokens.tsx#L89-L106',
+		urlHash: 'e6b9b4718af4cc2d2bf7620bd222af58e0f380bd',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/eba5dda7bccbd1c404f293d75c4ea74d939c8d01/src/libs/account/EOA7702.ts#L181-L183',
+		urlHash: 'f1819791d1bcb34e4b3bd8e7f8c84f05bbfe8362',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/LICENSE',
+		urlHash: '018c53893a7478394c89a4c2761105aacbd2c971',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/master/apps/daimo-mobile/src/view/screen/keyRotation/AddKeySlotButton.tsx',
+		urlHash: 'a845d17a32a9b240959429b5188ef1adf29e245c',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/contract/nameRegistry.ts#L183-L197',
+		urlHash: 'c5e42c214b1b6300f16fcf410093de8d62b18233',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/e1ddce7c37959d5cec92b05608ce62f93f3316b7/packages/daimo-api/src/network/viemClient.ts#L35-L50',
+		urlHash: '1dd9648f73ee8fe161637e32754ba0e8d77ec366',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo/blob/master/audits/2023-10-veridise-daimo.pdf',
+		urlHash: 'f4a623a2a525b4e5e844008f9ddb76bd2e3d8d72',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://elytro.com',
+		urlHash: '2e213bd9d3d9bfa33c76e72424f12fe449b7659c',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/Elytro-eth/soul-wallet-contract',
+		urlHash: 'ce277d3d0abb029b3a19965f7393d28e37ffc110',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://family.co',
+		urlHash: '312d2833bbee6edd4987c61dd266d324c38cbf33',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://frame.sh',
+		urlHash: 'eceb723c41dea2999054d18a5d9b07b8921e79e6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://gemwallet.com',
+		urlHash: '30b962c6f41cda4b6fbe8e800e15ac88190ea74f',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://metamask.io',
+		urlHash: 'ddd617777dd14c4d772ef645dce14808cc020d71',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://support.metamask.io/more-web3/learn/field-guide-to-bridges/',
+		urlHash: 'f0a2d00d2047598d581d19f3637e04a3060e81b3',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://support.metamask.io/manage-crypto/tokens/how-to-view-your-token-balance-across-multiple-networks/',
+		urlHash: '85292c97cef9e0ae82f5538ba4f79d1f9fb90e49',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/MetaMask/core/tree/main/packages',
+		urlHash: 'b10087f4a0f6d32253b4b485abce382722d27342',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension/blob/main/LICENSE',
+		urlHash: '07a9ab7b43d86028875bac86fc7aca96783c0988',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-mobile/blob/main/LICENSE',
+		urlHash: '845c4b18205459fbb91be0a5cbe7ea3ab4ad371a',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://assets.ctfassets.net/clixtyxoaeas/21m4LE3WLYbgWjc33aDcp2/8252073e115688b1dc1500a9c2d33fe4/metamask-delegator-framework-audit-2024-10.pdf',
+		urlHash: '13e8d550931291ff8617aefc577777e71592f627',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://assets.ctfassets.net/clixtyxoaeas/4sNMB55kkGw6BtAiIn08mm/f1f4a78d3901dd03848d070e15a1ff12/pentest-report_metamask-signing-snap.pdf',
+		urlHash: '6e3c1ded5545f10407784398daffe66a592989e2',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-03-18-cyfrin-Metamask-DelegationFramework1-v2.0.pdf',
+		urlHash: '5c70ba42892c9c58a0b05130acaacf22f47a690c',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/Cyfrin/cyfrin-audit-reports/blob/main/reports/2025-04-01-cyfrin-Metamask-DelegationFramework2-v2.0.pdf',
+		urlHash: '62e258694c4d2a5c08891d28fb5a498f712a6d0c',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.mtpelerin.com/',
+		urlHash: 'e2a5275410aa4af87e3d3ef4f121c3f0d9451f9c',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://developers.mtpelerin.com/service-information/revenue-sharing',
+		urlHash: '93fe25d48aa026197acb65b8837a477ba68557f7',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://nu.fi',
+		urlHash: '768b9a33d06b0ab33c87a8e88628feaa592d090b',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://support.nu.fi/support/solutions/articles/80001178239',
+		urlHash: 'e3cf55040413a724e090fe4bb617e141fe5bcdd6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://rabby.io',
+		urlHash: 'bdf2dfd8e68f5d193a5546174446edda6e7b25ee',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/fa9d0988e944f67e70da67d852cf3041d3b162da/src/background/controller/provider/controller.ts#L402-L407',
+		urlHash: 'ae5b23948f69b87f8ed38e206000c64e09415cc8',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/RabbyDesktop/blob/publish/prod/docs/SlowMist%20Audit%20Report%20-%20Rabby%20Wallet%20Desktop.pdf',
+		urlHash: '5753f96cf0bc31a9fd9d8b6f66a82423bd086222',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://rainbow.me',
+		urlHash: 'd644f5e836c2c0e63f2f18a4526eded90d13e236',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://safe.global',
+		urlHash: 'b04af73888fa32372bee2405ef919f410547a1d6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/safe-global/safe-wallet-monorepo/blob/f918ceb9b561dd3a27af96903071cd56c1fb5ddd/apps/web/src/services/safe-wallet-provider/index.ts#L184',
+		urlHash: '7da7c72ae031938d7512ec3567cee253bbac10cb',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://bitbox.swiss/',
+		urlHash: 'f0ea281aae5ae6f15d55bb3dee437b78d37fad9d',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://firefly.city/',
+		urlHash: '4b5374e0b40b8c99c67b3ad24f7ef156820208db',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.ledger.com/',
+		urlHash: '6eaef16400d9a1725ac38426ab0ff8411bbfa607',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://onekey.so/',
+		urlHash: '3c9a3345f1ad10e65043374746a3a4e43e2d8502',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://trezor.io/',
+		urlHash: '693376b03a7fe431819b4693b56b7deb9f52721b',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://ngrave.io/',
+		urlHash: 'fc6972f7c67bd094040a6289154a1e0073848855',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://blog.ambire.com/eip-7702-wallet/',
+		urlHash: '8c8ea02e6d6ce85d1fb135536cc0d00ccd8fdce6',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/main/contracts/AmbireAccount.sol',
+		urlHash: 'fff71c2e8756a4894ca6a677ff38e48884e6cfba',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/src/web/extension-services/background/background.ts',
+		urlHash: '538f8876e903f74e2400eeac3ecceb4e8223da59',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Pashov-Ambire-third-security-review.md',
+		urlHash: '8f2df0e9a9dbe4ef08da29919d4a59788832f4d3',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/main/audits/Ambire-EIP-7702-Update-Hunter-Security-Audit-Report-0.1.pdf',
+		urlHash: '941e22389b148f853bcdefe3122f60b574daf9b0',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/AmbireTech/ambire-common/blob/main/src/controllers/phishing/phishing.ts',
+		urlHash: '6ccc26a8fec7f3567b523c329c35a51c5090c1fa',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/safe-fndn/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Certora.pdf',
+		urlHash: 'db1d24341e14fc7f61c0d4823c856353a77d9f06',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/safe-fndn/safe-smart-account/blob/main/docs/Safe_Audit_Report_1_5_0_Ackee.pdf',
+		urlHash: '9d0157e2de71d84fb5d225fb69fd6b4ab86b63a3',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://zerion.io',
+		urlHash: '3dbaa0aff3a17de107b4ede050772af955291068',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.cypherock.com',
+		urlHash: 'd5f6869ac8c564c2268d996f4df5a6c9f17852c3',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://www.ambire.com',
+		urlHash: '3b41a43a21f4d0d1209715d7203802b68e96a03d',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',
+		urlHash: '4de756a893d258e0c399b5cf8f4c8584ca7f7df7',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2022/%5B20220318%5DSlowMist%20Audit%20Report%20-%20Rabby%20browser%20extension%20wallet.pdf',
+		urlHash: '0c12cc81b82abdd74911a6f994e7efc01d510ae2',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2023/%5B20230720%5DSlowMist%20Audit%20Report%20-%20Rabby%20Wallet.pdf',
+		urlHash: 'e3fba673f0acb428582f8c4562d8b6e90e10b5a8',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/Least%20Authority%20-%20Debank%20Rabby%20Walle%20Audit%20Report.pdf',
+		urlHash: 'df8d42a52fb0276d50fbd19ff11ded5269756ad0',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/Cure53%20-%20Debank%20Rabby%20Wallet%20Audit%20Report.pdf',
+		urlHash: 'fa0b6a2a095e1b497de684aa96e86bf648204458',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/rabby-mobile/blob/develop/audits/2024/SlowMist%20Audit%20Report%20-%20Rabby%20mobile%20wallet%20iOS.pdf',
+		urlHash: '51a4009a53d08bc4c376ec9a7ea06d3924370e91',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2024/%5B20241212%5DLeast%20Authority%20-%20DeBank%20Rabby%20Wallet%20Extension%20Final%20Audit%20Report.pdf',
+		urlHash: '587f37c86181eaf2295b5847e9695dd8b3bd446a',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2024/%5B20241217%5DRabby%20Browser%20Extension%20Wallet%20-%20SlowMist%20Audit%20Report.pdf',
+		urlHash: '4cd45e89ca413bf099921a1aca8e6e63ef208518',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://daimo.com',
+		urlHash: '3cb9fb7a3fad5bbf0581a3f54ffb923384fc3dbc',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://token.im',
+		urlHash: '0ce4a9de92e7c615f36655ca206617c3d2a5127a',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://gridplus.io/',
+		urlHash: '389499f1fe64edb548b5573070def41538035f30',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://imkey.im/',
+		urlHash: 'a48c5da2453ffb4f5e7ba1f3f9c46bd30e1de5b9',
+		retrieved: '2025-11-05',
+	},
+	{
+		url: 'https://keyst.one/',
+		urlHash: '17e49d498d1f04f47a7c79dd02974ffd60183efc',
+		retrieved: '2025-10-31',
+	},
+	{
+		url: 'https://phantom.com',
+		urlHash: '2ade81c184f3fece1b40ece8632d63685e923be6',
+		retrieved: '2025-10-31',
+	},
+]
+
+const newValidUrls: string[] = []
+
+const verifiedUrls: KnownValidUrl[] = []
+
+async function checkValidUrl(url: Url): Promise<void> {
+	const href = labeledUrl(url).url
+	const h = createHash('sha1')
+
+	h.update(href)
+	const digest = h.digest('hex')
+	const existing = knownValidUrls.find(knownValidUrl => knownValidUrl.urlHash === digest)
+
+	if (existing !== undefined) {
+		expect(existing).toBeDefined()
+		verifiedUrls.push(existing)
+
+		return new Promise(resolve => {
+			resolve()
+		})
+	}
+
+	if (newValidUrls.some(newValidUrl => href === newValidUrl)) {
+		expect(true).toBeDefined()
+
+		return new Promise(resolve => {
+			resolve()
+		})
+	}
+
+	const isValidStatusCode = (statusCode: undefined | number): boolean => {
+		if (statusCode === undefined) {
+			return false
+		}
+
+		return statusCode >= 200 && statusCode <= 299
+	}
+
+	return new Promise(resolve => {
+		let hasData = false
+		let error: Error | null = null
+
+		const req = request(href, res => {
+			res.on('data', () => {
+				hasData = true
+			})
+			res.on('error', err => {
+				expect(err).toBeNull()
+				resolve()
+			})
+			res.on('end', () => {
+				console.log(
+					'>>> to force:',
+					newValidUrls.push(
+						`\t{\n\t\turl: '${href}',\n\t\turlHash: '${digest}',\n\t\tretrieved: '${today()}'\n\t},`,
+					),
+				)
+				expect(null).toSatisfy(
+					() => isValidStatusCode(res.statusCode) && hasData && error === null,
+					`Request to ${href} failed (HTTP status code: ${res.statusCode ?? 'unknown'})${hasData ? '' : ' (received 0 bytes)'}${error === null ? '' : `; error: ${error}`}`,
+				)
+
+				if (isValidStatusCode(res.statusCode) && hasData && error === null) {
+					newValidUrls.push(
+						`\t{\n\t\turl: '${href}',\n\t\turlHash: '${digest}',\n\t\tretrieved: '${today()}'\n\t},`,
+					)
+				}
+
+				resolve()
+			})
+		})
+
+		req.on('timeout', () => {
+			expect(false).toSatisfy(x => x === null, `Request to ${href} timed out.`)
+			resolve()
+		})
+		req.on('error', err => {
+			error = err
+			expect(error).toBeNull()
+			resolve()
+		})
+		req.end()
+	})
+}
+
+describe('reference URLs', () => {
+	for (const wallet of Object.values(allWallets)) {
+		describe(`wallet ${wallet.metadata.displayName}`, () => {
+			it('has valid URL', async () => {
+				await checkValidUrl(wallet.metadata.url)
+			})
+			type FieldWithRef = {
+				path: string[]
+				withRef: WithRef<unknown>
+			}
+			const refFields: FieldWithRef[] = []
+			const findRefs = (path: string[], x: unknown) => {
+				if (x === undefined || x === null) {
+					return
+				}
+
+				if (Array.isArray(x)) {
+					x.map((item, index) => findRefs(path.concat([`[${index.toString()}]`]), item))
+
+					return
+				}
+
+				if (typeof x !== 'object') {
+					return
+				}
+
+				for (const [key, val] of Object.entries(x)) {
+					findRefs(path.length === 0 ? [key] : path.concat([`.${key}`]), val)
+				}
+
+				if (hasRefs(x)) {
+					refFields.push({
+						path,
+						withRef: x,
+					})
+				}
+			}
+
+			findRefs([], wallet)
+
+			for (const fieldWithRef of refFields) {
+				describe(fieldWithRef.path.join(''), () => {
+					for (const qualRef of toFullyQualified(fieldWithRef.withRef.ref)) {
+						for (const qualRefUrl of qualRef.urls) {
+							describe(qualRefUrl.url, () => {
+								it('is valid URL', async () => {
+									await checkValidUrl(qualRefUrl)
+								})
+							})
+						}
+					}
+				})
+			}
+		})
+	}
+})
+
+describe('already-known valid URLs set', () => {
+	it('is exhaustive', () => {
+		expect(null).toSatisfy(
+			() => newValidUrls.length === 0,
+			(newValidUrls.length === 1
+				? 'A new valid URL was detected, and needs to be added to this test to avoid re-fetching it on every run.'
+				: 'New valid URLs were detected, and need to be added to this test to avoid re-fetching them on every run.') +
+				'\n\nAdd the following to `knownValidUrls`:\n\n' +
+				newValidUrls.join('\n'),
+		)
+	})
+	it('has no extraneous entries', () => {
+		expect(null).toSatisfy(
+			() =>
+				knownValidUrls.every(knownValidUrl =>
+					verifiedUrls.some(verifiedUrl => knownValidUrl.urlHash === verifiedUrl.urlHash),
+				),
+			'URLs were removed; please remove them from the set of known-valid URLs as well:\n\n' +
+				knownValidUrls
+					.filter(knownValidUrl =>
+						verifiedUrls.every(verifiedUrl => knownValidUrl.urlHash !== verifiedUrl.urlHash),
+					)
+					.map(verifiedUrl => `- ${verifiedUrl.url}`)
+					.join('\n'),
+		)
+	})
+	it('has no duplicate entries', () => {
+		for (const knownValidUrl1 of knownValidUrls) {
+			expect(null).toSatisfy(
+				() =>
+					knownValidUrls.filter(
+						knownValidUrl2 =>
+							knownValidUrl1.url === knownValidUrl2.url ||
+							knownValidUrl1.urlHash === knownValidUrl2.urlHash,
+					).length === 1,
+				`URL '${knownValidUrl1.url}' is duplicated.`,
+			)
+		}
+	})
+})
