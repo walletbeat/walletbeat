@@ -11,7 +11,11 @@ import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
-import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
+import {
+	FOSSLicense,
+	LicensingType,
+	SourceNotAvailableLicense,
+} from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -58,6 +62,19 @@ export const imkeyWallet: HardwareWallet = {
 					},
 				],
 				license: FOSSLicense.APACHE_2_0,
+			},
+
+			walletAppLicense: {
+				[Variant.HARDWARE]: {
+					ref: [
+						{
+							explanation:
+								'Some firmware remains proprietary but reproducible builds ensure verifiable integrity.',
+							url: 'https://github.com/consenlabs/imkey-core',
+						},
+					],
+					license: SourceNotAvailableLicense.PROPRIETARY,
+				},
 			},
 		},
 
