@@ -56,13 +56,14 @@ export const safe: SoftwareWallet = {
 			}),
 			safe: supported({
 				ref: refNotNecessary, // It's Safe Wallet, duh.
-				canDeployNew: true,
+				canDeployNew: supported({
+					defaultConfig: {
+						modules: [],
+						owners: 1,
+						threshold: 1,
+					},
+				}),
 				controllingSharesInSelfCustodyByDefault: 'YES',
-				defaultConfig: {
-					modules: [],
-					owners: 1,
-					threshold: 1,
-				},
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 				supportedConfigs: {
