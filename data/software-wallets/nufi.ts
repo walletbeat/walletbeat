@@ -86,6 +86,7 @@ export const nufi: SoftwareWallet = {
 					walletSponsored: notSupported,
 				},
 			},
+			siweSupport: null,
 		},
 		integration: {
 			browser: {
@@ -165,6 +166,7 @@ export const nufi: SoftwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

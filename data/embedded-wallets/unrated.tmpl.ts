@@ -53,6 +53,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			interoperability: null,

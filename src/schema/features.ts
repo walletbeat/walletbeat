@@ -10,6 +10,7 @@ import {
 	resolveWalletIntegrationFeatures,
 	type WalletIntegration,
 } from './features/ecosystem/integration'
+import type { SiweImplementation } from './features/ecosystem/siwe-support'
 import type { AddressResolution } from './features/privacy/address-resolution'
 import type { AppIsolation as AppIsolation } from './features/privacy/app-isolation'
 import type { DataCollection } from './features/privacy/data-collection'
@@ -27,6 +28,7 @@ import type { ScamAlerts } from './features/security/scam-alerts'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
+import type { TransactionSimulationImplementation } from './features/security/transaction-simulation'
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
@@ -89,8 +91,11 @@ export interface WalletBaseFeatures {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
-	}
 
+		/** Transaction simulation implementation */
+		transactionSimulation: VariantFeature<TransactionSimulationImplementation>
+	}
+	
 	/** Privacy features. */
 	privacy: {
 		/**
@@ -166,8 +171,11 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	ecosystem: {
 		/** EIP-7702 delegation handling. */
 		delegation: VariantFeature<DelegationHandling>
-	}
 
+		/** Sign-In With Ethereum (EIP-4361) support. */
+		siweSupport: VariantFeature<SiweImplementation>
+	}
+	
 	/** Level of configurability for chains. */
 	chainConfigurability: VariantFeature<Nullable<ChainConfigurability>>
 
@@ -267,6 +275,7 @@ export interface ResolvedFeatures {
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
 		hardwareWalletAppSigning: ResolvedFeature<HardwareWalletAppSigningImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
+		transactionSimulation: ResolvedFeature<TransactionSimulationImplementation>
 		bugBountyProgram: ResolvedFeature<BugBountyProgramImplementation>
 		firmware: ResolvedFeature<FirmwareSupport>
 		keysHandling: ResolvedFeature<KeysHandlingSupport>
@@ -289,6 +298,9 @@ export interface ResolvedFeatures {
 		operationFees: ResolvedFeature<BasicOperationFees>
 		reputation: ResolvedFeature<ReputationSupport>
 		maintenance: ResolvedFeature<MaintenanceSupport>
+	}
+	ecosystem: {
+		siweSupport: ResolvedFeature<SiweImplementation>
 	}
 	chainAbstraction: ResolvedFeature<ChainAbstraction>
 	chainConfigurability: ResolvedFeature<ChainConfigurability>
@@ -383,6 +395,12 @@ export function resolveFeatures(
 				'passkeyVerification',
 				features => features.security.passkeyVerification,
 			),
+			transactionSimulation: nullable(
+				softwareFeat(
+					'security.transactionSimulation',
+					features => features.security.transactionSimulation,
+				),
+			),
 			bugBountyProgram: hardwareFeat(
 				'bugBountyProgram',
 				features => features.security.bugBountyProgram,
@@ -443,6 +461,11 @@ export function resolveFeatures(
 			maintenance: hardwareFeat(
 				'transparency.maintenance',
 				features => features.transparency.maintenance,
+			),
+		},
+		ecosystem: {
+			siweSupport: nullable(
+				softwareFeat('ecosystem.siweSupport', features => features.ecosystem.siweSupport),
 			),
 		},
 		chainAbstraction: nullable(

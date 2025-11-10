@@ -135,6 +135,18 @@ export const metamask: SoftwareWallet = {
 		},
 		ecosystem: {
 			delegation: null,
+			siweSupport: supported({
+				ref: [
+					{
+						explanation:
+							'MetaMask supports Sign-In with Ethereum (SIWE) through its standard Ethereum provider API. Developers can implement SIWE authentication using the eth_personal_sign method.',
+						url: 'https://docs.metamask.io/wallet/how-to/sign-data/',
+					},
+				],
+				builtInUI: false,
+				eip4361Compliant: true,
+				supported: true,
+			}),
 		},
 		integration: {
 			browser: {
@@ -348,6 +360,7 @@ export const metamask: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

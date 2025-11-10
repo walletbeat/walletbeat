@@ -134,6 +134,7 @@ export const imtoken: SoftwareWallet = {
 		},
 		ecosystem: {
 			delegation: null,
+			siweSupport: null,
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
@@ -328,6 +329,7 @@ export const imtoken: SoftwareWallet = {
 				}),
 				sendTransactionWarning: notSupported,
 			},
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

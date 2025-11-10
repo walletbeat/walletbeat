@@ -145,6 +145,7 @@ export const trezorWallet: HardwareWallet = {
 			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
+			transactionSimulation: null,
 			userSafety: null,
 		},
 		selfSovereignty: {

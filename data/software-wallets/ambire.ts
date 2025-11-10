@@ -265,6 +265,7 @@ export const ambire: SoftwareWallet = {
 					walletSponsored: featureSupported,
 				},
 			},
+			siweSupport: null,
 		},
 		integration: {
 			browser: {
@@ -480,6 +481,7 @@ Payouts are handled by the Ambire team directly and are denominated in USD. Howe
 				}),
 				sendTransactionWarning: notSupported,
 			},
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -150,6 +150,7 @@ export const rabby: SoftwareWallet = {
 		},
 		ecosystem: {
 			delegation: 'EIP_7702_NOT_SUPPORTED',
+			siweSupport: null,
 		},
 		integration: {
 			browser: {
@@ -599,6 +600,7 @@ export const rabby: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

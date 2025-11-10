@@ -62,6 +62,7 @@ export const phantom: SoftwareWallet = {
 		chainConfigurability: null,
 		ecosystem: {
 			delegation: null,
+			siweSupport: null,
 		},
 		integration: {
 			browser: {
@@ -126,6 +127,7 @@ export const phantom: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

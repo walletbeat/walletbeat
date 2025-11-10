@@ -94,6 +94,7 @@ export const safe: SoftwareWallet = {
 		},
 		ecosystem: {
 			delegation: null,
+			siweSupport: null,
 		},
 		integration: {
 			browser: {
@@ -250,6 +251,7 @@ export const safe: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

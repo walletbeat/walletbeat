@@ -75,6 +75,7 @@ export const frame: SoftwareWallet = {
 		},
 		ecosystem: {
 			delegation: null,
+			siweSupport: null,
 		},
 		integration: {
 			browser: {
@@ -145,6 +146,7 @@ export const frame: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

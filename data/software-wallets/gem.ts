@@ -67,6 +67,7 @@ export const gemwallet: SoftwareWallet = {
 		chainConfigurability: null,
 		ecosystem: {
 			delegation: 'EIP_7702_NOT_SUPPORTED',
+			siweSupport: null,
 		},
 		integration: {
 			browser: 'NOT_A_BROWSER_WALLET',
@@ -161,6 +162,7 @@ export const gemwallet: SoftwareWallet = {
 					userWhitelist: false,
 				}),
 			},
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

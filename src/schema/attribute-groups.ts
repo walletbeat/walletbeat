@@ -40,6 +40,7 @@ import {
 	hardwareWalletInteroperability,
 	type HardwareWalletInteroperabilityValue,
 } from './attributes/ecosystem/hardware-wallet-interoperability'
+import { siweSupport, type SiweValue } from './attributes/ecosystem/siwe-support'
 import {
 	transactionBatching,
 	type TransactionBatchingValue,
@@ -87,6 +88,10 @@ import {
 	supplyChainFactory,
 	type SupplyChainFactoryValue,
 } from './attributes/security/supply-chain-factory'
+import {
+	transactionSimulation,
+	type TransactionSimulationValue,
+} from './attributes/security/transaction-simulation'
 import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
 import {
 	accountPortability,
@@ -129,6 +134,7 @@ type SecurityValues = Dict<{
 	hardwareWalletAppSigning: HardwareWalletAppSigningValue
 	hardwareWalletSupport: HardwareWalletSupportValue
 	passkeyImplementation: PasskeyImplementationValue
+	transactionSimulation: TransactionSimulationValue
 	bugBountyProgram: BugBountyProgramValue
 	supplyChainDIY: SupplyChainDIYValue
 	supplyChainFactory: SupplyChainFactoryValue
@@ -150,6 +156,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		hardwareWalletAppSigning,
 		hardwareWalletSupport,
 		passkeyImplementation,
+		transactionSimulation,
 		bugBountyProgram,
 		supplyChainDIY,
 		supplyChainFactory,
@@ -164,6 +171,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		hardwareWalletAppSigning: 1.0,
 		hardwareWalletSupport: 1.0,
 		passkeyImplementation: 1.0,
+		transactionSimulation: 1.0,
 		bugBountyProgram: 1.0,
 		supplyChainDIY: 1.0,
 		supplyChainFactory: 1.0,
@@ -275,6 +283,7 @@ type EcosystemValues = Dict<{
 	transactionBatching: TransactionBatchingValue
 	hardwareWalletInteroperability: HardwareWalletInteroperabilityValue
 	interoperability: InteroperabilityValue
+	siweSupport: SiweValue
 }>
 
 /** Ecosystem attributes. */
@@ -293,6 +302,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		transactionBatching,
 		hardwareWalletInteroperability,
 		interoperability,
+		siweSupport,
 	},
 	attributeWeights: {
 		accountAbstraction: 1.0,
@@ -302,6 +312,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		transactionBatching: 1.0,
 		hardwareWalletInteroperability: 1.0,
 		interoperability: 1.0,
+		siweSupport: 1.0,
 	},
 }
 
@@ -445,6 +456,7 @@ export function evaluateAttributes(
 			hardwareWalletAppSigning: evalAttr(hardwareWalletAppSigning),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			passkeyImplementation: evalAttr(passkeyImplementation),
+			transactionSimulation: evalAttr(transactionSimulation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
 			supplyChainDIY: evalAttr(supplyChainDIY),
 			supplyChainFactory: evalAttr(supplyChainFactory),
@@ -479,6 +491,7 @@ export function evaluateAttributes(
 			transactionBatching: evalAttr(transactionBatching),
 			hardwareWalletInteroperability: evalAttr(hardwareWalletInteroperability),
 			interoperability: evalAttr(interoperability),
+			siweSupport: evalAttr(siweSupport),
 		},
 		maintenance: {
 			maintenance: evalAttr(maintenance),
@@ -516,6 +529,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			hardwareWalletAppSigning: attr(tree => tree.security.hardwareWalletAppSigning),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
+			transactionSimulation: attr(tree => tree.security.transactionSimulation),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
 			supplyChainDIY: attr(tree => tree.security.supplyChainDIY),
 			supplyChainFactory: attr(tree => tree.security.supplyChainFactory),
@@ -550,6 +564,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			transactionBatching: attr(tree => tree.ecosystem.transactionBatching),
 			hardwareWalletInteroperability: attr(tree => tree.ecosystem.hardwareWalletInteroperability),
 			interoperability: attr(tree => tree.ecosystem.interoperability),
+			siweSupport: attr(tree => tree.ecosystem.siweSupport),
 		},
 		maintenance: {
 			maintenance: attr(tree => tree.maintenance.maintenance),

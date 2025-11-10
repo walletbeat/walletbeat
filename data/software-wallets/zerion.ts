@@ -58,6 +58,7 @@ export const zerion: SoftwareWallet = {
 		chainConfigurability: null,
 		ecosystem: {
 			delegation: null,
+			siweSupport: null,
 		},
 		integration: {
 			browser: {
@@ -131,6 +132,7 @@ export const zerion: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

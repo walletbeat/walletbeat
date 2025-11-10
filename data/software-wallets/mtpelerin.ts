@@ -56,6 +56,7 @@ export const mtpelerin: SoftwareWallet = {
 		chainConfigurability: null,
 		ecosystem: {
 			delegation: null,
+			siweSupport: null,
 		},
 		integration: {
 			browser: {
@@ -122,6 +123,7 @@ export const mtpelerin: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			transactionSimulation: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
