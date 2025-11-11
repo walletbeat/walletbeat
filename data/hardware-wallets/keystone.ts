@@ -1,16 +1,23 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-app-signing'
+import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 export const keystoneWallet: HardwareWallet = {
 	metadata: {
@@ -63,20 +70,26 @@ export const keystoneWallet: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
-				ref: [
-					{
-						explanation:
-							'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users',
-						url: 'https://keyst.one/bug-bounty-program',
-					},
-				],
-				details:
-					'The Keystone Bug Bounty Program is designed to encourage security research in Keystone hardware and software to award them for their invaluable contribution to the security of all Keystone users.',
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: refTodo,
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2021-04-02' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: [
+						{
+							explanation:
+								'Keystone strongly supports security research into our products and wants to encourage that research.',
+							url: 'https://keyst.one/bug-bounty-program',
+						},
+					],
+				}),
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: notSupported,
 				upgradePathAvailable: false,
-				url: 'https://keyst.one/bug-bounty-program',
-			},
+			}),
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,

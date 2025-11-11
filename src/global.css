@@ -257,7 +257,12 @@ details {
 select,
 button,
 input,
-label:has(> input:is([type='checkbox'], [type='radio'])) {
+label:has(
+	> input:is(
+		[type='checkbox'],
+		[type='radio']
+	)
+) {
 	cursor: pointer;
 
 	display: flex;
@@ -280,7 +285,12 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 }
 
 option,
-label:has(> input:is([type='checkbox'], [type='radio'])) {
+label:has(
+	> input:is(
+		[type='checkbox'],
+		[type='radio']
+	)
+) {
 	padding: 0.6em 0.8em;
 }
 
@@ -293,7 +303,13 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 	option,
 	button,
 	input,
-	label:has(> input:is([type='checkbox'], [type='radio']), button),
+	label:has(
+		> input:is(
+			[type='checkbox'],
+			[type='radio']
+		),
+		button
+	),
 	::scroll-marker
 ) {
 	position: relative;
@@ -312,7 +328,13 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 	transition-duration: var(--pressable-transitionOutDuration);
 
 	&:active:is(
-			label:has(> input:is([type='checkbox'], [type='radio']), button),
+			label:has(
+				> input:is(
+					[type='checkbox'],
+					[type='radio']
+				),
+				button
+			),
 			:not(
 				:has(
 					:where(
@@ -325,7 +347,13 @@ label:has(> input:is([type='checkbox'], [type='radio'])) {
 							option,
 							button,
 							input,
-							label:has(> input:is([type='checkbox'], [type='radio']), button)
+							label:has(
+								> input:is(
+									[type='checkbox'],
+									[type='radio']
+								),
+								button
+							)
 						)
 					):active
 				)
@@ -424,8 +452,11 @@ span svg {
 	&[data-row~='wrap'] {
 		flex-wrap: wrap;
 
-		&:not([data-row~='start']):not([data-row~='center']):not([data-row~='end'])
-			> :nth-child(2):last-child {
+		&:not(
+			[data-row~='start'],
+			[data-row~='center'],
+			[data-row~='end']
+		) > :nth-child(2):last-child {
 			margin-inline-start: auto;
 		}
 	}
@@ -654,38 +685,30 @@ span svg {
 	}
 }
 
-[data-sticky-container] {
-	/* Inputs */
-	--sticky-marginBlockStart: 0px;
-	--sticky-marginBlockEnd: 0px;
-	--sticky-marginInlineStart: 0px;
-	--sticky-marginInlineEnd: 0px;
-	--sticky-paddingBlockStart: 0px;
-	--sticky-paddingBlockEnd: 0px;
-	--sticky-paddingInlineStart: 0px;
-	--sticky-paddingInlineEnd: 0px;
 
-	/* Rules */
-	isolation: isolate;
-}
-
+/**
+ * Scroll Container
+ */
 [data-scroll-container] {
+	/* Inputs */
+	--scrollContainer-sizeBlock: 100cqb;
+	--scrollContainer-sizeInline: 100cqi;
+
 	/* Rules */
 	container-name: ScrollContainer;
 
-	--scrollContainer-blockSize: 100cqb;
-	--scrollContainer-inlineSize: 100cqi;
-
 	&:not([data-scroll-container~='block']):not([data-scroll-container~='inline']) {
+		container-type: size;
 		container-type: scroll-state size;
 		overflow: auto auto;
 	}
 	&[data-scroll-container~='block'] {
+		container-type: inline-size;
 		container-type: scroll-state inline-size;
 		overflow-y: auto;
 	}
 	&[data-scroll-container~='inline'] {
-		container-type: scroll-state size;
+		container-type: block-size;
 		container-type: scroll-state block-size;
 		overflow-x: auto;
 	}
@@ -703,10 +726,16 @@ span svg {
 	--sticky0-paddingInlineStart: var(--sticky-paddingInlineStart);
 	--sticky0-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
+	--sticky0-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky0-insetBlockStart) - var(--sticky0-insetBlockEnd));
+	--sticky0-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky0-insetInlineStart) - var(--sticky0-insetInlineEnd));
+
 	--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
 	--sticky-insetBlockEnd: var(--sticky0-insetBlockEnd);
 	--sticky-insetInlineStart: var(--sticky0-insetInlineStart);
 	--sticky-insetInlineEnd: var(--sticky0-insetInlineEnd);
+
+	--sticky-sizeBlock: var(--sticky0-sizeBlock);
+	--sticky-sizeInline: var(--sticky0-sizeInline);
 
 	@scope (
 		&
@@ -716,187 +745,253 @@ span svg {
 		[data-sticky-container]:not(&) {
 			--sticky-level: 1;
 
-			--sticky1-insetBlockStart: calc(
-				var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) +
-					var(--sticky-marginBlockStart)
-			);
-			--sticky1-insetBlockEnd: calc(
-				var(--sticky0-insetBlockEnd) + var(--sticky0-paddingBlockEnd) + var(--sticky-marginBlockEnd)
-			);
-			--sticky1-insetInlineStart: calc(
-				var(--sticky0-insetInlineStart) + var(--sticky0-paddingInlineStart) +
-					var(--sticky-marginInlineStart)
-			);
-			--sticky1-insetInlineEnd: calc(
-				var(--sticky0-insetInlineEnd) + var(--sticky0-paddingInlineEnd) +
-					var(--sticky-marginInlineEnd)
-			);
+			--sticky1-insetBlockStart: calc(var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) + var(--sticky-marginBlockStart));
+			--sticky1-insetBlockEnd: calc(var(--sticky0-insetBlockEnd) + var(--sticky0-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+			--sticky1-insetInlineStart: calc(var(--sticky0-insetInlineStart) + var(--sticky0-paddingInlineStart) + var(--sticky-marginInlineStart));
+			--sticky1-insetInlineEnd: calc(var(--sticky0-insetInlineEnd) + var(--sticky0-paddingInlineEnd) + var(--sticky-marginInlineEnd));
 
 			--sticky1-paddingBlockStart: var(--sticky-paddingBlockStart);
 			--sticky1-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 			--sticky1-paddingInlineStart: var(--sticky-paddingInlineStart);
 			--sticky1-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
+			--sticky1-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky1-insetBlockStart) - var(--sticky1-insetBlockEnd));
+			--sticky1-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky1-insetInlineStart) - var(--sticky1-insetInlineEnd));
+
 			--sticky-insetBlockStart: var(--sticky1-insetBlockStart);
 			--sticky-insetBlockEnd: var(--sticky1-insetBlockEnd);
 			--sticky-insetInlineStart: var(--sticky1-insetInlineStart);
 			--sticky-insetInlineEnd: var(--sticky1-insetInlineEnd);
 
+			--sticky-sizeBlock: var(--sticky1-sizeBlock);
+			--sticky-sizeInline: var(--sticky1-sizeInline);
+
 			[data-sticky-container] {
 				--sticky-level: 2;
 
-				--sticky2-insetBlockStart: calc(
-					var(--sticky1-insetBlockStart) + var(--sticky1-paddingBlockStart) +
-						var(--sticky-marginBlockStart)
-				);
-				--sticky2-insetBlockEnd: calc(
-					var(--sticky1-insetBlockEnd) + var(--sticky1-paddingBlockEnd) +
-						var(--sticky-marginBlockEnd)
-				);
-				--sticky2-insetInlineStart: calc(
-					var(--sticky1-insetInlineStart) + var(--sticky1-paddingInlineStart) +
-						var(--sticky-marginInlineStart)
-				);
-				--sticky2-insetInlineEnd: calc(
-					var(--sticky1-insetInlineEnd) + var(--sticky1-paddingInlineEnd) +
-						var(--sticky-marginInlineEnd)
-				);
+				--sticky2-insetBlockStart: calc(var(--sticky1-insetBlockStart) + var(--sticky1-paddingBlockStart) + var(--sticky-marginBlockStart));
+				--sticky2-insetBlockEnd: calc(var(--sticky1-insetBlockEnd) + var(--sticky1-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+				--sticky2-insetInlineStart: calc(var(--sticky1-insetInlineStart) + var(--sticky1-paddingInlineStart) + var(--sticky-marginInlineStart));
+				--sticky2-insetInlineEnd: calc(var(--sticky1-insetInlineEnd) + var(--sticky1-paddingInlineEnd) + var(--sticky-marginInlineEnd));
 
 				--sticky2-paddingBlockStart: var(--sticky-paddingBlockStart);
 				--sticky2-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 				--sticky2-paddingInlineStart: var(--sticky-paddingInlineStart);
 				--sticky2-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
+				--sticky2-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky2-insetBlockStart) - var(--sticky2-insetBlockEnd));
+				--sticky2-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky2-insetInlineStart) - var(--sticky2-insetInlineEnd));
+
 				--sticky-insetBlockStart: var(--sticky2-insetBlockStart);
 				--sticky-insetBlockEnd: var(--sticky2-insetBlockEnd);
 				--sticky-insetInlineStart: var(--sticky2-insetInlineStart);
 				--sticky-insetInlineEnd: var(--sticky2-insetInlineEnd);
 
+				--sticky-sizeBlock: var(--sticky2-sizeBlock);
+				--sticky-sizeInline: var(--sticky2-sizeInline);
+
 				[data-sticky-container] {
 					--sticky-level: 3;
 
-					--sticky3-insetBlockStart: calc(
-						var(--sticky2-insetBlockStart) + var(--sticky2-paddingBlockStart) +
-							var(--sticky-marginBlockStart)
-					);
-					--sticky3-insetBlockEnd: calc(
-						var(--sticky2-insetBlockEnd) + var(--sticky2-paddingBlockEnd) +
-							var(--sticky-marginBlockEnd)
-					);
-					--sticky3-insetInlineStart: calc(
-						var(--sticky2-insetInlineStart) + var(--sticky2-paddingInlineStart) +
-							var(--sticky-marginInlineStart)
-					);
-					--sticky3-insetInlineEnd: calc(
-						var(--sticky2-insetInlineEnd) + var(--sticky2-paddingInlineEnd) +
-							var(--sticky-marginInlineEnd)
-					);
+					--sticky3-insetBlockStart: calc(var(--sticky2-insetBlockStart) + var(--sticky2-paddingBlockStart) + var(--sticky-marginBlockStart));
+					--sticky3-insetBlockEnd: calc(var(--sticky2-insetBlockEnd) + var(--sticky2-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+					--sticky3-insetInlineStart: calc(var(--sticky2-insetInlineStart) + var(--sticky2-paddingInlineStart) + var(--sticky-marginInlineStart));
+					--sticky3-insetInlineEnd: calc(var(--sticky2-insetInlineEnd) + var(--sticky2-paddingInlineEnd) + var(--sticky-marginInlineEnd));
 
 					--sticky3-paddingBlockStart: var(--sticky-paddingBlockStart);
 					--sticky3-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 					--sticky3-paddingInlineStart: var(--sticky-paddingInlineStart);
 					--sticky3-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
+					--sticky3-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky3-insetBlockStart) - var(--sticky3-insetBlockEnd));
+					--sticky3-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky3-insetInlineStart) - var(--sticky3-insetInlineEnd));
+
 					--sticky-insetBlockStart: var(--sticky3-insetBlockStart);
 					--sticky-insetBlockEnd: var(--sticky3-insetBlockEnd);
 					--sticky-insetInlineStart: var(--sticky3-insetInlineStart);
 					--sticky-insetInlineEnd: var(--sticky3-insetInlineEnd);
 
+					--sticky-sizeBlock: var(--sticky3-sizeBlock);
+					--sticky-sizeInline: var(--sticky3-sizeInline);
+
 					[data-sticky-container] {
 						--sticky-level: 4;
 
-						--sticky4-insetBlockStart: calc(
-							var(--sticky3-insetBlockStart) + var(--sticky3-paddingBlockStart) +
-								var(--sticky-marginBlockStart)
-						);
-						--sticky4-insetBlockEnd: calc(
-							var(--sticky3-insetBlockEnd) + var(--sticky3-paddingBlockEnd) +
-								var(--sticky-marginBlockEnd)
-						);
-						--sticky4-insetInlineStart: calc(
-							var(--sticky3-insetInlineStart) + var(--sticky3-paddingInlineStart) +
-								var(--sticky-marginInlineStart)
-						);
-						--sticky4-insetInlineEnd: calc(
-							var(--sticky3-insetInlineEnd) + var(--sticky3-paddingInlineEnd) +
-								var(--sticky-marginInlineEnd)
-						);
+						--sticky4-insetBlockStart: calc(var(--sticky3-insetBlockStart) + var(--sticky3-paddingBlockStart) + var(--sticky-marginBlockStart));
+						--sticky4-insetBlockEnd: calc(var(--sticky3-insetBlockEnd) + var(--sticky3-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+						--sticky4-insetInlineStart: calc(var(--sticky3-insetInlineStart) + var(--sticky3-paddingInlineStart) + var(--sticky-marginInlineStart));
+						--sticky4-insetInlineEnd: calc(var(--sticky3-insetInlineEnd) + var(--sticky3-paddingInlineEnd) + var(--sticky-marginInlineEnd));
 
 						--sticky4-paddingBlockStart: var(--sticky-paddingBlockStart);
 						--sticky4-paddingBlockEnd: var(--sticky-paddingBlockEnd);
 						--sticky4-paddingInlineStart: var(--sticky-paddingInlineStart);
 						--sticky4-paddingInlineEnd: var(--sticky-paddingInlineEnd);
 
+						--sticky4-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky4-insetBlockStart) - var(--sticky4-insetBlockEnd));
+						--sticky4-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky4-insetInlineStart) - var(--sticky4-insetInlineEnd));
+
 						--sticky-insetBlockStart: var(--sticky4-insetBlockStart);
 						--sticky-insetBlockEnd: var(--sticky4-insetBlockEnd);
 						--sticky-insetInlineStart: var(--sticky4-insetInlineStart);
 						--sticky-insetInlineEnd: var(--sticky4-insetInlineEnd);
+
+						--sticky-sizeBlock: var(--sticky4-sizeBlock);
+						--sticky-sizeInline: var(--sticky4-sizeInline);
 					}
 				}
 			}
 		}
 	}
-}
 
-[data-sticky] {
-	/* Inputs */
-	--sticky-backgroundColor: light-dark(#efefef66, #14141488);
-	--sticky-backdropFilter: blur(20px);
-	--sticky-backdropMaskImage: none;
 
-	/* Rules */
-	z-index: 1;
-	container-type: scroll-state;
+	/**
+	 * Sticky Container
+	 */
+	&[data-sticky-container],
+	[data-sticky-container] {
+		/* Inputs */
+		--sticky-marginBlockStart: 0px;
+		--sticky-marginBlockEnd: 0px;
+		--sticky-marginInlineStart: 0px;
+		--sticky-marginInlineEnd: 0px;
+		--sticky-paddingBlockStart: 0px;
+		--sticky-paddingBlockEnd: 0px;
+		--sticky-paddingInlineStart: 0px;
+		--sticky-paddingInlineEnd: 0px;
+		--scrollItem-inlineDetached-maxSizeInline: var(--sticky-sizeInline);
+		--scrollItem-inlineDetached-maxPaddingMatchStart: 2rem;
+		--scrollItem-inlineDetached-maxPaddingMatchEnd: 2rem;
 
-	position: sticky;
+		/* Rules */
+		isolation: isolate;
 
-	&:not([data-sticky|='block']):not([data-sticky|='inline']),
-	&[data-sticky|='block'] {
-		inset-block-start: var(--sticky-insetBlockStart);
-		inset-block-end: var(--sticky-insetBlockEnd);
 
-		max-block-size: calc(
-			var(--scrollContainer-blockSize) - var(--sticky-insetBlockStart) - var(--sticky-insetBlockEnd)
-		);
+		/**
+		 * Sticky Item
+		 */
+		[data-sticky] {
+			/* Inputs */
+			--sticky-backgroundColor: light-dark(#efefef66, #14141488);
+			--sticky-backdropFilter: blur(20px);
+			--sticky-backdropMaskImage: none;
 
-		&[data-sticky~='block-start'] {
-			inset-inline-end: auto;
+			/* Rules */
+			z-index: 1;
+			container-type: scroll-state;
+
+			position: sticky;
+
+			&:not([data-sticky|='block']):not([data-sticky|='inline']),
+			&[data-sticky~='block'] {
+				inset-block-start: var(--sticky-insetBlockStart);
+				inset-block-end: var(--sticky-insetBlockEnd);
+
+				max-block-size: calc(var(--scrollContainer-sizeBlock) - var(--sticky-insetBlockStart) - var(--sticky-insetBlockEnd));
+
+				&[data-sticky~='block-start'] {
+					inset-inline-end: auto;
+				}
+
+				&[data-sticky~='block-end'] {
+					inset-inline-start: auto;
+				}
+			}
+			&:not([data-sticky|='block']):not([data-sticky|='inline']),
+			&[data-sticky~='inline'] {
+				inset-inline-start: var(--sticky-insetInlineStart);
+				inset-inline-end: var(--sticky-insetInlineEnd);
+
+				max-inline-size: calc(var(--scrollContainer-sizeInline) - var(--sticky-insetInlineStart) - var(--sticky-insetInlineEnd));
+
+				&[data-sticky~='inline-start'] {
+					inset-inline-end: auto;
+				}
+
+				&[data-sticky~='inline-end'] {
+					inset-inline-start: auto;
+				}
+			}
+
+			&:not([data-sticky~='no-backdrop'])::before {
+				content: '';
+				z-index: -1;
+				position: absolute;
+				inset: 0;
+				background-color: var(--sticky-backgroundColor);
+				backdrop-filter: var(--sticky-backdropFilter);
+				border-radius: inherit;
+
+				transition-property: background-color, backdrop-filter;
+
+				@container scroll-state(stuck: none) {
+					background-color: transparent !important;
+					backdrop-filter: blur(0px);
+				}
+			}
 		}
 
-		&[data-sticky~='block-end'] {
-			inset-inline-start: auto;
-		}
-	}
-	&:not([data-sticky|='block']):not([data-sticky|='inline']),
-	&[data-sticky|='inline'] {
-		inset-inline-start: var(--sticky-insetInlineStart);
-		inset-inline-end: var(--sticky-insetInlineEnd);
 
-		max-inline-size: calc(100cqi - var(--sticky-insetInlineStart) - var(--sticky-insetInlineEnd));
+		/**
+		 * Scroll Item
+		 */
+		[data-scroll-item] {
+			&[data-scroll-item~='inline-detached'] {
+				/* Rules */
+				--scrollItem-paddingInline: max(1.5rem, (var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSizeInline)) / 2);
 
-		&[data-sticky~='inline-start'] {
-			inset-inline-end: auto;
-		}
+				width: 100%;
+				padding-inline-start: var(--scrollItem-paddingInline);
+				padding-inline-end: var(--scrollItem-paddingInline);
 
-		&[data-sticky~='inline-end'] {
-			inset-inline-start: auto;
-		}
-	}
+				&[data-sticky-container] {
+					--sticky-paddingInlineStart: var(--scrollItem-paddingInline);
+					--sticky-paddingInlineEnd: var(--scrollItem-paddingInline);
+				}
 
-	&:not([data-sticky~='no-backdrop'])::before {
-		content: '';
-		z-index: -1;
-		position: absolute;
-		inset: 0;
-		background-color: var(--sticky-backgroundColor);
-		backdrop-filter: var(--sticky-backdropFilter);
-		border-radius: inherit;
+				&[data-scroll-item~='padding-match-start'] {
+					padding-block-start: min(var(--scrollItem-paddingInline), var(--scrollItem-inlineDetached-maxPaddingMatchStart));
+				}
 
-		transition-property: background-color, backdrop-filter;
+				&[data-scroll-item~='padding-match-end'] {
+					padding-block-end: min(var(--scrollItem-paddingInline), var(--scrollItem-inlineDetached-maxPaddingMatchEnd));
+				}
+			}
+			&[data-scroll-item~='inline-attached'] {
+				display: grid;
+				inline-size: min-content;
+				min-inline-size: var(--sticky-sizeInline);
 
-		@container scroll-state(stuck: none) {
-			background-color: transparent !important;
-			backdrop-filter: blur(0px);
+				&[data-scroll-item~='underflow-start'] {
+					justify-content: safe start;
+				}
+				&[data-scroll-item~='underflow-center'] {
+					justify-content: safe center;
+				}
+				&[data-scroll-item~='underflow-end'] {
+					justify-content: safe end;
+				}
+
+				&[data-scroll-item~='overflow-start'] {
+					position: sticky;
+					inset-inline-end: var(--sticky-insetInlineEnd);
+					margin-inline-start: auto;
+				}
+				&[data-scroll-item~='overflow-center'] {
+					margin-inline: auto;
+				}
+				&[data-scroll-item~='overflow-end'] {
+					position: sticky;
+					inset-inline-start: var(--sticky-insetInlineStart);
+					margin-inline-end: auto;
+				}
+			}
+
+			&[data-scroll-item~='snap-block-start'] {
+				scroll-snap-align: start;
+			}
+			&[data-scroll-item~='snap-block-end'] {
+				scroll-snap-align: end;
+			}
 		}
 	}
 }

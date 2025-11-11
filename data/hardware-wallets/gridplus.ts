@@ -1,15 +1,22 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/hardware-wallet-app-signing'
+import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 export const gridplusWallet: HardwareWallet = {
 	metadata: {
@@ -62,20 +69,26 @@ export const gridplusWallet: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
-				ref: [
-					{
-						explanation:
-							'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
-						url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
-					},
-				],
-				details:
-					'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations',
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: refTodo,
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2021-09-23' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: [
+						{
+							explanation:
+								'GridPlus pledges not to initiate legal action for security research conducted pursuant to all Bug Bounty Program policies, including good faith, accidental violations.',
+							url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
+						},
+					],
+				}),
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: notSupported,
 				upgradePathAvailable: true,
-				url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
-			},
+			}),
 			firmware: null,
 			hardwareWalletAppSigning: {
 				ref: [

@@ -354,6 +354,18 @@
 			border-start-start-radius: calc(var(--table-cornerRadius) + var(--table-outerBorderWidth));
 			border-start-end-radius: calc(var(--table-cornerRadius) + var(--table-outerBorderWidth));
 
+			&[data-sticky] {
+				/* Safari: apply `backdrop-filter` and `background-color` to `thead` instead of `thead::before` */
+				@supports (hanging-punctuation: first) and (font: -apple-system-body) and (-webkit-appearance: none) {
+					background-color: var(--sticky-backgroundColor);
+					backdrop-filter: var(--sticky-backdropFilter);
+
+					&::before {
+						content: none !important;
+					}
+				}
+			}
+
 			@container not scroll-state(stuck: none) {
 				border-start-start-radius: 0;
 				border-start-end-radius: 0;
@@ -361,10 +373,6 @@
 
 			:where(tr) {
 				:where(th) {
-					/* &:not(:empty) {
-						backdrop-filter: blur(20px);
-					} */
-
 					&[data-header-level='0'] {
 						font-weight: 700;
 						font-size: 1.1em;
@@ -642,16 +650,6 @@
 				align-items: end;
 				transform-origin: right;
 			}
-
-			/* &[data-sticky],
-			&[data-sort]:not([data-sticky]) { */
-			/* &[data-sticky] {
-				position: sticky;
-				backdrop-filter: blur(20px);
-				z-index: 1;
-				inset-inline-start: 0;
-				inset-inline-end: 0;
-			} */
 		}
 
 		:where(th) {

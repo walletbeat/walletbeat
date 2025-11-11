@@ -354,16 +354,22 @@
 			y2={-slice.computed.innerRadius}
 		/>
 
-		{#if slice.href}
-			<a href={slice.href}>
-				<path class="slice-path">
-					<title>{[slice.tooltipValue, slice.tooltip].join('\n')}</title>
-				</path>
-			</a>
-		{:else}
-			<path class="slice-path">
+		{#snippet slicePathSnippet(slice: ComputedSlice)}
+			<!-- Safari: set path directly with `d` attribute -->
+			<path
+				d={slice.computed.path}
+				class="slice-path"
+			>
 				<title>{[slice.tooltipValue, slice.tooltip].join('\n')}</title>
 			</path>
+		{/snippet}
+
+		{#if slice.href}
+			<a href={slice.href}>
+				{@render slicePathSnippet(slice)}
+			</a>
+		{:else}
+			{@render slicePathSnippet(slice)}
 		{/if}
 
 		<text class="label" aria-hidden="true">

@@ -43,14 +43,12 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<section data-sticky-container data-column='gap-6'>
-			<WalletTable
-				client:load
-				title='Hardware Wallets'
-				wallets={Object.values(ratedHardwareWallets)}
-				attributeGroups={[attrGroup]}
-				expandByDefault={true}
-			/>
-		</section>
+		<WalletTable
+			client:load
+			title='Hardware Wallets'
+			wallets={Object.values(ratedHardwareWallets)}
+			attributeGroups={[attrGroup]}
+			expandByDefault={true}
+		/>
 	</main>
 </Layout>

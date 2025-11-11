@@ -13,7 +13,11 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+} from '@/schema/features/security/bug-bounty-program'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -31,6 +35,7 @@ import { type References, refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 import { nconsigny } from '../contributors'
 import { ambireEntity } from '../entities/ambire'
@@ -418,22 +423,22 @@ export const ambire: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
-				ref: refTodo,
-
-				details: `Rewards are distributed according to the impact of the vulnerability based on the Immunefi Vulnerability Severity Classification System V2.2. This is a simplified 5-level scale, with separate scales for websites/apps and smart contracts/blockchains, encompassing everything from consequence of exploitation to privilege required to likelihood of a successful exploit.
-
-All High and Critical Smart Contract bug reports require a PoC and a suggestion for a fix to be eligible for a reward. All Low and Medium Smart contract bug reports require a suggestion for a fix to be eligible for a reward.
-
-The following vulnerabilities are not eligible for a reward:
-
-https://github.com/AmbireTech/code4rena#known-tradeoffs
-
-Payouts are handled by the Ambire team directly and are denominated in USD. However, payouts are done in ETH unless agreed otherwise.`,
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: [
+					{
+						explanation: 'As from August 2025, this bug bounty program is no longer active.',
+						url: 'https://blog.ambire.com/ambire-x-immunefy-bug-bounty-audit-our-code-and-earn-rewards/',
+					},
+				],
+				availability: BugBountyProgramAvailability.INACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2021-12-17' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: notSupported,
 				upgradePathAvailable: false,
-				url: 'https://immunefi.com/bug-bounty/ambire/information/',
-			},
+			}),
 			hardwareWalletSupport: {
 				ref: {
 					explanation:

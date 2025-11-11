@@ -21,13 +21,11 @@ import WalletTable from '@/views/WalletTable.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<section data-sticky-container data-column='gap-6'>
-			<WalletTable
-				client:load
-				title='Embedded Wallets'
-				wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.EMBEDDED])}
-				{attributeGroups}
-			/>
-		</section>
+		<WalletTable
+			client:load
+			title='Embedded Wallets'
+			wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.EMBEDDED])}
+			{attributeGroups}
+		/>
 	</main>
 </Layout>

@@ -11,7 +11,11 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+} from '@/schema/features/security/bug-bounty-program'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -35,6 +39,7 @@ import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 import { cure53 } from '../entities/cure53'
 import { imToken } from '../entities/imtoken'
@@ -238,24 +243,27 @@ export const imtoken: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
 					{
 						explanation:
-							'imToken bug bounty program covers both wallet and website security vulnerabilities.',
+							'To show our appreciation to researchers, who help keep our products and our customers safe, we are glad to introduce a Responsible Disclosure Program to provide recognition and rewards for responsibly disclosed vulnerabilities.',
 						url: 'https://bugrap.io/bounties/imToken%20Wallet',
 					},
-					{
-						explanation: 'imToken website bug bounty program for security vulnerabilities.',
-						url: 'https://bugrap.io/bounties/imToken%20Website',
-					},
 				],
-				details:
-					'imToken operates a comprehensive bug bounty program through Bugrap platform, covering both the wallet and the website. The program has a wide scope, competitive rewards, and a responsive disclosure process.',
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2024-04-15' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: notSupported,
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: supported({
+					currency: 'USDC',
+					maximum: 10000,
+					minimum: 0,
+				}),
 				upgradePathAvailable: true,
-				url: 'https://bugrap.io/bounties/imToken%20Wallet',
-			},
+			}),
 			hardwareWalletSupport: {
 				[Variant.MOBILE]: {
 					ref: [

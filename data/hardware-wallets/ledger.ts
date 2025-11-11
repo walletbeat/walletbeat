@@ -1,16 +1,23 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/hardware-wallet-app-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 export const ledgerWallet: HardwareWallet = {
 	metadata: {
@@ -87,20 +94,28 @@ export const ledgerWallet: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
-				ref: [
-					{
-						explanation:
-							'Ledger maintains a well-documented bug bounty program through their Donjon security team, offering rewards up to $10,000 for critical vulnerabilities.',
-						url: 'https://donjon.ledger.com/bounty/',
-					},
-				],
-				details:
-					'Ledger offers a comprehensive bug bounty program through their Donjon security team. The program offers competitive rewards based on the severity of findings and has a clear disclosure process.',
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: refTodo,
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2020-03-07' as CalendarDate,
+				disclosure: supported({
+					numberOfDays: 90,
+				}),
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: [
+						{
+							explanation:
+								'Ledger commits that security researchers reporting bugs will be protected from legal liability, so long as they follow responsible disclosure guidelines and principles.',
+							url: 'https://donjon.ledger.com/bounty',
+						},
+					],
+				}),
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: notSupported,
 				upgradePathAvailable: true,
-				url: 'https://donjon.ledger.com/bounty/',
-			},
+			}),
 			firmware: null,
 			hardwareWalletAppSigning: {
 				ref: [

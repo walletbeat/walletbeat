@@ -23,7 +23,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 >
 	<Navigation navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container>
+	<main data-sticky-container data-column='gap-6'>
 		<header data-sticky='inline'>
 			<h1>Who watches the wallets?</h1>
 
@@ -41,23 +41,19 @@ import WalletTable from '@/views/WalletTable.svelte'
 			</p>
 		</header>
 
-		<section data-sticky-container data-column='gap-6'>
-			<WalletTable
-				client:load
-				title='Software Wallets'
-				wallets={Object.values(ratedSoftwareWallets)}
-				{attributeGroups}
-			/>
-		</section>
+		<WalletTable
+			client:load
+			title='Software Wallets'
+			wallets={Object.values(ratedSoftwareWallets)}
+			{attributeGroups}
+		/>
 
-		<section data-sticky-container data-column='gap-6'>
-			<WalletTable
-				client:load
-				title='Hardware Wallets'
-				wallets={Object.values(ratedHardwareWallets)}
-				{attributeGroups}
-			/>
-		</section>
+		<WalletTable
+			client:load
+			title='Hardware Wallets'
+			wallets={Object.values(ratedHardwareWallets)}
+			{attributeGroups}
+		/>
 	</main>
 </Layout>
 
@@ -70,7 +66,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 					url('./robot.png') 98% 1rem / clamp(12rem, 24cqi, 20rem) no-repeat;
 			}
 
-			padding: clamp(1.5rem, 8cqi, 12rem) clamp(1.5rem, 6cqi, 2rem);
+			padding: clamp(1.5rem, 8cqi, 8rem) clamp(1.5rem, 6cqi, 2rem);
 
 			text-shadow:
 				0 0 1em var(--background-primary),

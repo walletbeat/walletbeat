@@ -1,9 +1,17 @@
 import { exampleContributor } from '@/data/contributors/example'
 import { WalletProfile } from '@/schema/features/profile'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
+import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 export const unratedHardwareTemplate: HardwareWallet = {
 	metadata: {
@@ -48,7 +56,27 @@ export const unratedHardwareTemplate: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			bugBountyProgram: null,
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: refTodo,
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2024-01-01' as CalendarDate,
+				disclosure: supported({
+					numberOfDays: 30,
+				}),
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: [
+						{
+							explanation: 'Sample Reference',
+							url: 'https://example.com',
+						},
+					],
+				}),
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: notSupported,
+				upgradePathAvailable: true,
+			}),
 			firmware: null,
 			hardwareWalletAppSigning: null,
 			keysHandling: null,

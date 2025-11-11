@@ -81,7 +81,7 @@ export interface WalletBaseFeatures {
 		publicSecurityAudits: SecurityAudit[] | null
 
 		/** Bug bounty program implementation */
-		bugBountyProgram: VariantFeature<BugBountyProgramImplementation>
+		bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>>
 
 		/** Light clients. */
 		lightClient: {

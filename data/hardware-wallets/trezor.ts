@@ -1,16 +1,23 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
-import { BugBountyProgramType } from '@/schema/features/security/bug-bounty-program'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/hardware-wallet-app-signing'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 export const trezorWallet: HardwareWallet = {
 	metadata: {
@@ -81,20 +88,29 @@ export const trezorWallet: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			bugBountyProgram: {
-				type: BugBountyProgramType.COMPREHENSIVE,
-				ref: [
-					{
-						explanation:
-							'At SatoshiLabs and Trezor, the safety of our products and services is a top priority. If you have identified a security vulnerability, we would greatly appreciate your assistance in disclosing it to us in a responsible manner.',
-						url: 'https://trezor.io/support/a/how-to-report-a-security-issue',
-					},
-				],
-				details:
-					'At SatoshiLabs and Trezor, the safety of our products and services is a top priority. If you have identified a security vulnerability, we would greatly appreciate your assistance in disclosing it to us in a responsible manner.',
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: refTodo,
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE',
+				dateStarted: '2018-08-25' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: [
+						{
+							explanation: 'Use exploits solely to verify the existence of vulnerabilities.',
+							url: 'https://trezor.io/other/partner-portal/for-developers/bug-bounty-program',
+						},
+					],
+				}),
+				platform: BugBountyPlatform.SELF_HOSTED,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 100000,
+					minimum: 0,
+				}),
 				upgradePathAvailable: true,
-				url: 'https://trezor.io/support/a/how-to-report-a-security-issue',
-			},
+			}),
 			firmware: null,
 			hardwareWalletAppSigning: {
 				ref: [
