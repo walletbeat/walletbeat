@@ -7,7 +7,14 @@ import {
 	nonEmptyRemap,
 	nonEmptyValues,
 } from '@/types/utils/non-empty'
-
+import {
+	dappConnectionSupport,
+	type DappConnectionSupportValue,
+} from './attributes/ecosystem/hw-dapp-connection-support'
+import {
+	signingIntentClarity,
+	type SigningIntentClarityValue,
+} from './attributes/security/signing-intent-clarity'
 import {
 	type Attribute,
 	type AttributeGroup,
@@ -126,6 +133,7 @@ type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
 	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
+	signingIntentClarity: SigningIntentClarityValue
 	hardwareWalletAppSigning: HardwareWalletAppSigningValue
 	hardwareWalletSupport: HardwareWalletSupportValue
 	passkeyImplementation: PasskeyImplementationValue
@@ -147,6 +155,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		securityAudits,
 		scamPrevention,
 		chainVerification,
+		signingIntentClarity,
 		hardwareWalletAppSigning,
 		hardwareWalletSupport,
 		passkeyImplementation,
@@ -161,6 +170,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		securityAudits: 1.0,
 		scamPrevention: 1.0,
 		chainVerification: 1.0,
+		signingIntentClarity: 1.0,
 		hardwareWalletAppSigning: 1.0,
 		hardwareWalletSupport: 1.0,
 		passkeyImplementation: 1.0,
@@ -275,6 +285,7 @@ type EcosystemValues = Dict<{
 	transactionBatching: TransactionBatchingValue
 	hardwareWalletInteroperability: HardwareWalletInteroperabilityValue
 	interoperability: InteroperabilityValue
+	dappConnectionSupport: DappConnectionSupportValue
 }>
 
 /** Ecosystem attributes. */
@@ -293,6 +304,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		transactionBatching,
 		hardwareWalletInteroperability,
 		interoperability,
+		dappConnectionSupport,
 	},
 	attributeWeights: {
 		accountAbstraction: 1.0,
@@ -302,6 +314,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		transactionBatching: 1.0,
 		hardwareWalletInteroperability: 1.0,
 		interoperability: 1.0,
+		dappConnectionSupport: 1.0,
 	},
 }
 
@@ -442,6 +455,7 @@ export function evaluateAttributes(
 			securityAudits: evalAttr(securityAudits),
 			scamPrevention: evalAttr(scamPrevention),
 			chainVerification: evalAttr(chainVerification),
+			signingIntentClarity: evalAttr(signingIntentClarity),
 			hardwareWalletAppSigning: evalAttr(hardwareWalletAppSigning),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			passkeyImplementation: evalAttr(passkeyImplementation),
@@ -479,6 +493,7 @@ export function evaluateAttributes(
 			transactionBatching: evalAttr(transactionBatching),
 			hardwareWalletInteroperability: evalAttr(hardwareWalletInteroperability),
 			interoperability: evalAttr(interoperability),
+			dappConnectionSupport: evalAttr(dappConnectionSupport),
 		},
 		maintenance: {
 			maintenance: evalAttr(maintenance),
@@ -513,6 +528,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			securityAudits: attr(tree => tree.security.securityAudits),
 			scamPrevention: attr(tree => tree.security.scamPrevention),
 			chainVerification: attr(tree => tree.security.chainVerification),
+			signingIntentClarity: attr(tree => tree.security.signingIntentClarity),
 			hardwareWalletAppSigning: attr(tree => tree.security.hardwareWalletAppSigning),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
@@ -550,6 +566,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			transactionBatching: attr(tree => tree.ecosystem.transactionBatching),
 			hardwareWalletInteroperability: attr(tree => tree.ecosystem.hardwareWalletInteroperability),
 			interoperability: attr(tree => tree.ecosystem.interoperability),
+			dappConnectionSupport: attr(tree => tree.ecosystem.dappConnectionSupport),
 		},
 		maintenance: {
 			maintenance: attr(tree => tree.maintenance.maintenance),

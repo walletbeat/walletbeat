@@ -1,6 +1,6 @@
 import { prefixError } from '@/types/errors'
 import { isNonNull, type Nullable, type NullableObject } from '@/types/utils/nullable'
-
+import type { DappConnectionSupport } from './features/ecosystem/hw-dapp-connection-support'
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import type { DelegationHandling } from './features/ecosystem/delegation-handling'
@@ -20,6 +20,7 @@ import type { BugBountyProgramImplementation } from './features/security/bug-bou
 import type { FirmwareSupport } from './features/security/firmware'
 import type { HardwareWalletAppSigningImplementation } from './features/security/hardware-wallet-app-signing'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
+import type { SigningIntentClarityImplementation } from './features/security/signing-intent-clarity'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
 import type { EthereumL1LightClientSupport } from './features/security/light-client'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
@@ -89,6 +90,9 @@ export interface WalletBaseFeatures {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
+
+		/** Signing intent clarity implementation */
+		signingIntentClarity: VariantFeature<SigningIntentClarityImplementation>
 	}
 
 	/** Privacy features. */
@@ -204,6 +208,7 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 
 		firmware: VariantFeature<FirmwareSupport>
 		keysHandling: VariantFeature<KeysHandlingSupport>
+		signingIntentClarity: VariantFeature<SigningIntentClarityImplementation>
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
@@ -218,6 +223,7 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		reputation: VariantFeature<ReputationSupport>
 		maintenance: VariantFeature<MaintenanceSupport>
 	}
+	dappConnectionSupport: VariantFeature<DappConnectionSupport>
 }
 
 /**
@@ -265,6 +271,7 @@ export interface ResolvedFeatures {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
+		signingIntentClarity: ResolvedFeature<SigningIntentClarityImplementation>
 		hardwareWalletAppSigning: ResolvedFeature<HardwareWalletAppSigningImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
@@ -298,6 +305,7 @@ export interface ResolvedFeatures {
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
 	licensing: ResolvedWalletLicensing
 	monetization: ResolvedFeature<Monetization>
+	dappConnectionSupport: ResolvedFeature<DappConnectionSupport>
 }
 
 /** Resolve a set of features according to the given variant. */
@@ -379,6 +387,12 @@ export function resolveFeatures(
 				'hardwareWalletAppSigning',
 				features => features.security.hardwareWalletAppSigning,
 			),
+			signingIntentClarity: (() => {
+				if (isWalletSoftwareFeatures(features) && features.security.signingIntentClarity) {
+					return softwareFeat('security.signingIntentClarity', features => features.security.signingIntentClarity)
+				}
+				return hardwareFeat('security.signingIntentClarity', features => features.security.signingIntentClarity)
+			})(),
 			passkeyVerification: baseFeat(
 				'passkeyVerification',
 				features => features.security.passkeyVerification,
@@ -463,5 +477,6 @@ export function resolveFeatures(
 		),
 		licensing: resolveWalletLicense(features.licensing, expectedVariants, variant),
 		monetization: baseFeat('monetization', features => features.monetization),
+		dappConnectionSupport: hardwareFeat('dappConnectionSupport', features => features.dappConnectionSupport),
 	}
 }
