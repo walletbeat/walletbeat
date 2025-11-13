@@ -16,7 +16,7 @@ import {
 } from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import type { Support, Supported } from '@/schema/features/support'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
-import { refs } from '@/schema/reference'
+import { refTodo, refs, type WithRef } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
@@ -26,7 +26,7 @@ import { exempt, pickWorstRating, unrated } from '../common'
 const brand = 'attributes.security.dapp_connection_support'
 
 export type DappConnectionSupportValue = Value & {
-	connectionDetails: Support<DappConnectionMethodDetails>
+	connectionDetails: Support<WithRef<DappConnectionMethodDetails>>
 	__brand: 'attributes.security.dapp_connection_support'
 }
 
@@ -50,7 +50,7 @@ function noDappConnectionSupport(): Evaluation<DappConnectionSupportValue> {
 }
 
 function limitedDappConnectionSupport(
-	connectionDetails: Supported<DappConnectionMethodDetails>,
+	connectionDetails: Supported<WithRef<DappConnectionMethodDetails>>,
 ): Evaluation<DappConnectionSupportValue> {
 	const hasOnlyClosedSource =
 		connectionDetails.supportedConnections[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP] ===
@@ -81,7 +81,7 @@ function limitedDappConnectionSupport(
 }
 
 function goodDappConnectionSupport(
-	connectionDetails: Supported<DappConnectionMethodDetails>,
+	connectionDetails: Supported<WithRef<DappConnectionMethodDetails>>,
 ): Evaluation<DappConnectionSupportValue> {
 	return {
 		value: {
@@ -101,7 +101,7 @@ function goodDappConnectionSupport(
 }
 
 function excellentDappConnectionSupport(
-	connectionDetails: Supported<DappConnectionMethodDetails>,
+	connectionDetails: Supported<WithRef<DappConnectionMethodDetails>>,
 ): Evaluation<DappConnectionSupportValue> {
 	const hasOpenSource =
 		connectionDetails.supportedConnections[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
@@ -183,6 +183,7 @@ wallets are exempt as they inherently support dApp connections.
 		`),
 				excellentDappConnectionSupport(
 					supported({
+						ref: refTodo,
 						supportedConnections: {
 							[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 							[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
@@ -190,7 +191,7 @@ wallets are exempt as they inherently support dApp connections.
 							[SoftwareWalletType.RABBY]: true,
 						},
 					}),
-				).value,
+				),
 			),
 			exampleRating(
 				paragraph(`
@@ -199,12 +200,13 @@ wallets are exempt as they inherently support dApp connections.
 		`),
 				goodDappConnectionSupport(
 					supported({
+						ref: refTodo,
 						supportedConnections: {
 							[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 							[SoftwareWalletType.METAMASK]: true,
 						},
 					}),
-				).value,
+				),
 			),
 		],
 		partial: [
@@ -215,11 +217,12 @@ wallets are exempt as they inherently support dApp connections.
 		`),
 				limitedDappConnectionSupport(
 					supported({
+						ref: refTodo,
 						supportedConnections: {
 							[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
 						},
 					}),
-				).value,
+				),
 			),
 			exampleRating(
 				paragraph(`
@@ -228,12 +231,13 @@ wallets are exempt as they inherently support dApp connections.
 		`),
 				limitedDappConnectionSupport(
 					supported({
+						ref: refTodo,
 						supportedConnections: {
 							[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
 							[SoftwareWalletType.METAMASK]: true,
 						},
 					}),
-				).value,
+				),
 			),
 		],
 		fail: exampleRating(
@@ -241,7 +245,7 @@ wallets are exempt as they inherently support dApp connections.
 		The wallet cannot connect to dApps, severely limiting its functionality in the 
 		Web3 ecosystem.
 	`),
-			noDappConnectionSupport().value,
+			noDappConnectionSupport(),
 		),
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<DappConnectionSupportValue> => {
