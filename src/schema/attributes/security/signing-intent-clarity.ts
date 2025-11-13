@@ -248,7 +248,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 					CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
 				),
 				displaysFullTransactionDetails,
-			).value,
+			),
 		),
 		partial: [
 			exampleRating(
@@ -266,7 +266,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 						gas: true,
 						nonce: true,
 					},
-				).value,
+				),
 			),
 			exampleRating(
 				paragraph(`
@@ -283,7 +283,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 						gas: true,
 						nonce: true,
 					},
-				).value,
+				),
 			),
 		],
 		fail: [
@@ -297,7 +297,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 					noDataExtraction,
 					noCalldataDecoding,
 					displaysNoTransactionDetails,
-				).value,
+				),
 			),
 		],
 	},
