@@ -72,10 +72,6 @@ import {
 } from './attributes/security/chain-verification'
 import { firmware, type FirmwareValue } from './attributes/security/firmware'
 import {
-	hardwareWalletAppSigning,
-	type HardwareWalletAppSigningValue,
-} from './attributes/security/hardware-wallet-app-signing'
-import {
 	hardwareWalletSupport,
 	type HardwareWalletSupportValue,
 } from './attributes/security/hardware-wallet-support'
@@ -135,7 +131,6 @@ type SecurityValues = Dict<{
 	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
 	signingIntentClarity: SigningIntentClarityValue
-	hardwareWalletAppSigning: HardwareWalletAppSigningValue
 	hardwareWalletSupport: HardwareWalletSupportValue
 	passkeyImplementation: PasskeyImplementationValue
 	bugBountyProgram: BugBountyProgramValue
@@ -157,7 +152,6 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		scamPrevention,
 		chainVerification,
 		signingIntentClarity,
-		hardwareWalletAppSigning,
 		hardwareWalletSupport,
 		passkeyImplementation,
 		bugBountyProgram,
@@ -172,7 +166,6 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		scamPrevention: 1.0,
 		chainVerification: 1.0,
 		signingIntentClarity: 1.0,
-		hardwareWalletAppSigning: 1.0,
 		hardwareWalletSupport: 1.0,
 		passkeyImplementation: 1.0,
 		bugBountyProgram: 1.0,
@@ -354,7 +347,6 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
 	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
-	hardwareWalletAppSigning: EvaluatedAttribute<HardwareWalletAppSigningValue>
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
 	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
 	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
@@ -457,7 +449,6 @@ export function evaluateAttributes(
 			scamPrevention: evalAttr(scamPrevention),
 			chainVerification: evalAttr(chainVerification),
 			signingIntentClarity: evalAttr(signingIntentClarity),
-			hardwareWalletAppSigning: evalAttr(hardwareWalletAppSigning),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
@@ -530,7 +521,6 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			scamPrevention: attr(tree => tree.security.scamPrevention),
 			chainVerification: attr(tree => tree.security.chainVerification),
 			signingIntentClarity: attr(tree => tree.security.signingIntentClarity),
-			hardwareWalletAppSigning: attr(tree => tree.security.hardwareWalletAppSigning),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
