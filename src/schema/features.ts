@@ -1,9 +1,10 @@
 import { prefixError } from '@/types/errors'
 import { isNonNull, type Nullable, type NullableObject } from '@/types/utils/nullable'
-import type { DappConnectionSupport } from './features/ecosystem/hw-dapp-connection-support'
+
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import type { DelegationHandling } from './features/ecosystem/delegation-handling'
+import type { DappConnectionSupport } from './features/ecosystem/hw-dapp-connection-support'
 import {
 	notApplicableWalletIntegration,
 	type ResolvedWalletIntegration,
@@ -18,14 +19,13 @@ import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
 import type { FirmwareSupport } from './features/security/firmware'
-import type { HardwareWalletAppSigningImplementation } from './features/security/hardware-wallet-app-signing'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
-import type { SigningIntentClarityImplementation } from './features/security/signing-intent-clarity'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
 import type { EthereumL1LightClientSupport } from './features/security/light-client'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
 import type { ScamAlerts } from './features/security/scam-alerts'
 import type { SecurityAudit } from './features/security/security-audits'
+import type { SigningIntentClarityImplementation } from './features/security/signing-intent-clarity'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type { UserSafetySupport } from './features/security/user-safety'
@@ -203,9 +203,6 @@ export function isWalletSoftwareFeatures(
  */
 export type WalletHardwareFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
-		/** Hardware wallet app signing support */
-		hardwareWalletAppSigning: VariantFeature<HardwareWalletAppSigningImplementation>
-
 		firmware: VariantFeature<FirmwareSupport>
 		keysHandling: VariantFeature<KeysHandlingSupport>
 		signingIntentClarity: VariantFeature<SigningIntentClarityImplementation>
@@ -272,7 +269,6 @@ export interface ResolvedFeatures {
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
 		signingIntentClarity: ResolvedFeature<SigningIntentClarityImplementation>
-		hardwareWalletAppSigning: ResolvedFeature<HardwareWalletAppSigningImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
@@ -383,10 +379,6 @@ export function resolveFeatures(
 				'security.hardwareWalletSupport',
 				features => features.security.hardwareWalletSupport,
 			),
-			hardwareWalletAppSigning: hardwareFeat(
-				'hardwareWalletAppSigning',
-				features => features.security.hardwareWalletAppSigning,
-			),
 			signingIntentClarity: (() => {
 				if (isWalletSoftwareFeatures(features) && features.security.signingIntentClarity) {
 					return softwareFeat(
@@ -394,6 +386,7 @@ export function resolveFeatures(
 						features => features.security.signingIntentClarity,
 					)
 				}
+
 				return hardwareFeat(
 					'security.signingIntentClarity',
 					features => features.security.signingIntentClarity,
