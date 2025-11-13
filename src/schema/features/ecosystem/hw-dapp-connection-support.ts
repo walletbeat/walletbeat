@@ -1,5 +1,5 @@
 import type { Support } from '@/schema/features/support'
-import { isSupported, notSupported } from '@/schema/features/support'
+import { isSupported } from '@/schema/features/support'
 import type { WithRef } from '@/schema/reference'
 import { type NonEmptySet, setItems } from '@/types/utils/non-empty'
 
