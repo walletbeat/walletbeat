@@ -389,9 +389,15 @@ export function resolveFeatures(
 			),
 			signingIntentClarity: (() => {
 				if (isWalletSoftwareFeatures(features) && features.security.signingIntentClarity) {
-					return softwareFeat('security.signingIntentClarity', features => features.security.signingIntentClarity)
+					return softwareFeat(
+						'security.signingIntentClarity',
+						features => features.security.signingIntentClarity,
+					)
 				}
-				return hardwareFeat('security.signingIntentClarity', features => features.security.signingIntentClarity)
+				return hardwareFeat(
+					'security.signingIntentClarity',
+					features => features.security.signingIntentClarity,
+				)
 			})(),
 			passkeyVerification: baseFeat(
 				'passkeyVerification',
@@ -477,6 +483,9 @@ export function resolveFeatures(
 		),
 		licensing: resolveWalletLicense(features.licensing, expectedVariants, variant),
 		monetization: baseFeat('monetization', features => features.monetization),
-		dappConnectionSupport: hardwareFeat('dappConnectionSupport', features => features.dappConnectionSupport),
+		dappConnectionSupport: hardwareFeat(
+			'dappConnectionSupport',
+			features => features.dappConnectionSupport,
+		),
 	}
 }
