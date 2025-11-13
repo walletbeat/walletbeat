@@ -94,7 +94,6 @@ export const family: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			signingIntentClarity: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
@@ -108,6 +107,7 @@ export const family: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			signingIntentClarity: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

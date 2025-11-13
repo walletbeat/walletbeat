@@ -136,7 +136,6 @@ export const nufi: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			signingIntentClarity: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
@@ -166,6 +165,7 @@ export const nufi: SoftwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			signingIntentClarity: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -116,7 +116,6 @@ export const frame: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			signingIntentClarity: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
@@ -146,6 +145,7 @@ export const frame: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			signingIntentClarity: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

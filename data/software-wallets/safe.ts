@@ -11,8 +11,7 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { type ScamUrlWarning } from '@/schema/features/security/scam-alerts'
-import { CalldataDecoding } from '@/schema/features/security/signing-intent-clarity'
-import { DataExtraction } from '@/schema/features/security/signing-intent-clarity'
+import { CalldataDecoding, DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
@@ -176,47 +175,6 @@ export const safe: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			signingIntentClarity: {
-				ref: refTodo,
-				messageSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
-					},
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: true,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-				},
-				transactionSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
-					},
-					calldataExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: true,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-					displayedTransactionDetails: {
-						chain: true,
-						from: true,
-						gas: true,
-						nonce: true,
-						to: true,
-						value: true,
-					},
-				},
-			},
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
@@ -292,6 +250,47 @@ export const safe: SoftwareWallet = {
 					newRecipientWarning: true, //blockaid
 					userWhitelist: true,
 				}),
+			},
+			signingIntentClarity: {
+				ref: refTodo,
+				messageSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+						[CalldataDecoding.AAVE_SUPPLY]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
+					},
+					messageExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+				},
+				transactionSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+						[CalldataDecoding.AAVE_SUPPLY]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
+					},
+					calldataExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+					displayedTransactionDetails: {
+						chain: true,
+						from: true,
+						gas: true,
+						nonce: true,
+						to: true,
+						value: true,
+					},
+				},
 			},
 		},
 		selfSovereignty: {

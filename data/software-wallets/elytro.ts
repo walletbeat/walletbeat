@@ -97,7 +97,6 @@ export const elytro: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			signingIntentClarity: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
@@ -120,6 +119,7 @@ export const elytro: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
+			signingIntentClarity: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

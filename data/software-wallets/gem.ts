@@ -120,7 +120,6 @@ export const gemwallet: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			signingIntentClarity: null,
 			hardwareWalletSupport: null,
 			lightClient: {
 				ethereumL1: notSupported,
@@ -162,6 +161,7 @@ export const gemwallet: SoftwareWallet = {
 					userWhitelist: false,
 				}),
 			},
+			signingIntentClarity: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {
