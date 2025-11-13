@@ -1,4 +1,8 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
+import {
+	type DappConnectionMethodDetails,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -11,9 +15,9 @@ import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
-} from '@/schema/features/security/hardware-wallet-app-signing'
+} from '@/schema/features/security/signing-intent-clarity'
 import { notSupported, supported } from '@/schema/features/support'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -45,6 +49,14 @@ export const keystoneWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+			ref: 'https://guide.keyst.one/docs/keystone',
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+		}),
 		licensing: null,
 		monetization: {
 			ref: refTodo,
@@ -97,7 +109,13 @@ export const keystoneWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.PASS,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
-			hardwareWalletAppSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				ref: [
 					{
 						explanation:
@@ -122,6 +140,7 @@ export const keystoneWallet: HardwareWallet = {
 						'Keystone provides full message signing support for many transactions, however, it is buggy on many transactions like with a Safe{Wallet}, making it unreliable in some cases. In some cases, it shows no data. This is mitigated by the fact that the wallet supports QR code transaction extraction.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: true,
 					},
@@ -136,6 +155,7 @@ export const keystoneWallet: HardwareWallet = {
 					},
 					calldataExtraction: {
 						[DataExtraction.EYES]: false,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: true,
 					},
@@ -144,12 +164,6 @@ export const keystoneWallet: HardwareWallet = {
 					displayedTransactionDetails: { ...displaysFullTransactionDetails, nonce: false },
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

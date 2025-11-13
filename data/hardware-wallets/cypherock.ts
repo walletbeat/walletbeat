@@ -1,4 +1,8 @@
 import { patrickalphac } from '@/data/contributors'
+import {
+	DappConnectionMethod,
+	type DappConnectionMethodDetails,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -11,10 +15,10 @@ import {
 	DataExtraction,
 	noCalldataDecoding,
 	noDataExtraction,
-} from '@/schema/features/security/hardware-wallet-app-signing'
+} from '@/schema/features/security/signing-intent-clarity'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -47,6 +51,12 @@ export const cypherockWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+			ref: 'https://www.youtube.com/watch?v=R0g35dKjRtI',
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+			},
+		}),
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
@@ -118,43 +128,6 @@ export const cypherockWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.PASS,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
-			hardwareWalletAppSigning: {
-				ref: [
-					{
-						explanation: "Independent video demonstration of Cypherock's signing implementation.",
-						url: 'https://youtu.be/9YmPWxAvKYY?t=534',
-					},
-					{
-						explanation:
-							"Independent video demonstration of Cypherock's transaction implementation.",
-						url: 'https://youtube.com/shorts/YG6lzwTUojE',
-					},
-				],
-				messageSigning: {
-					calldataDecoding: noCalldataDecoding,
-					details:
-						'Shows EIP-712 signature data only in the companion application, not on the hardware wallet itself.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-				},
-				transactionSigning: {
-					calldataDecoding: noCalldataDecoding,
-					calldataExtraction: noDataExtraction,
-					details:
-						'Completely fails to display calldata for transactions on either the application or the hardware wallet itself.',
-					displayedTransactionDetails: {
-						chain: false,
-						from: true, // derivation path counts
-						gas: true, // tx fee
-						nonce: false,
-						to: true, // contract address
-						value: true,
-					},
-				},
-			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
@@ -181,6 +154,44 @@ export const cypherockWallet: HardwareWallet = {
 					variantsScope: { [Variant.HARDWARE]: true },
 				},
 			],
+			signingIntentClarity: {
+				ref: [
+					{
+						explanation: "Independent video demonstration of Cypherock's signing implementation.",
+						url: 'https://youtu.be/9YmPWxAvKYY?t=534',
+					},
+					{
+						explanation:
+							"Independent video demonstration of Cypherock's transaction implementation.",
+						url: 'https://youtube.com/shorts/YG6lzwTUojE',
+					},
+				],
+				messageSigning: {
+					calldataDecoding: noCalldataDecoding,
+					details:
+						'Shows EIP-712 signature data only in the companion application, not on the hardware wallet itself.',
+					messageExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+				},
+				transactionSigning: {
+					calldataDecoding: noCalldataDecoding,
+					calldataExtraction: noDataExtraction,
+					details:
+						'Completely fails to display calldata for transactions on either the application or the hardware wallet itself.',
+					displayedTransactionDetails: {
+						chain: false,
+						from: true, // derivation path counts
+						gas: true, // tx fee
+						nonce: false,
+						to: true, // contract address
+						value: true,
+					},
+				},
+			},
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

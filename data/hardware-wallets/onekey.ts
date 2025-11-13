@@ -1,4 +1,8 @@
 import { patrickalphac } from '@/data/contributors'
+import {
+	type DappConnectionMethodDetails,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -10,10 +14,10 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
-} from '@/schema/features/security/hardware-wallet-app-signing'
+} from '@/schema/features/security/signing-intent-clarity'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -44,6 +48,17 @@ export const onekeyWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+			ref: [
+				'https://help.onekey.so/en/articles/11461105-how-to-use-rabby-wallet-with-onekey-hardware-wallets',
+				'https://developer.onekey.so/connect-to-software/using-walletconnect',
+			],
+			supportedConnections: {
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+		}),
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
@@ -109,7 +124,13 @@ export const onekeyWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.FAIL,
 				silentUpdateProtection: null,
 			},
-			hardwareWalletAppSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				ref: [
 					{
 						explanation:
@@ -127,6 +148,7 @@ export const onekeyWallet: HardwareWallet = {
 						'OneKey Pro shows EIP-712 domain types and message data but does not display domain hash or message hash for easier verification.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -135,6 +157,7 @@ export const onekeyWallet: HardwareWallet = {
 					calldataDecoding: noCalldataDecoding,
 					calldataExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -147,12 +170,6 @@ export const onekeyWallet: HardwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

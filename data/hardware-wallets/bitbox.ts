@@ -2,6 +2,11 @@ import { patrickalphac } from '@/data/contributors'
 import { bitbox } from '@/data/entities/bitbox'
 import { etherscan } from '@/data/entities/etherscan'
 import {
+	DappConnectionMethod,
+	type DappConnectionMethodDetails,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
+import {
 	CollectionPolicy,
 	DataCollectionPurpose,
 	PersonalInfo,
@@ -19,10 +24,10 @@ import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	DataExtraction,
 	noCalldataDecoding,
-} from '@/schema/features/security/hardware-wallet-app-signing'
+} from '@/schema/features/security/signing-intent-clarity'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -53,6 +58,21 @@ export const bitboxWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+			ref: [
+				{
+					explanation:
+						'BitBox blog post explaining WalletConnect integration for secure dApp connections',
+					url: 'https://blog.bitbox.swiss/en/using-walletconnect-to-securely-connect-to-your-favorite-dapp/',
+				},
+			],
+			details:
+				'BitBox02 supports dApp connections through their open-source BitBoxApp, WalletConnect protocol, and integration with Rabby wallet.',
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[SoftwareWalletType.RABBY]: true,
+			},
+		}),
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
@@ -167,7 +187,13 @@ export const bitboxWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.PASS,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
-			hardwareWalletAppSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				ref: [
 					{
 						explanation: 'Independent video demonstration of BitBox02 signing capabilities',
@@ -180,6 +206,7 @@ export const bitboxWallet: HardwareWallet = {
 						'BitBox02 displays all EIP-712 data on the device despite limited screen real estate. Does not show message digest/hash.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -188,6 +215,7 @@ export const bitboxWallet: HardwareWallet = {
 					calldataDecoding: noCalldataDecoding,
 					calldataExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -203,12 +231,6 @@ export const bitboxWallet: HardwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

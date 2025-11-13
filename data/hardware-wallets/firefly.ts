@@ -32,6 +32,7 @@ export const fireflyWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: null,
 		licensing: null,
 		monetization: {
 			ref: refTodo,
@@ -59,7 +60,13 @@ export const fireflyWallet: HardwareWallet = {
 		security: {
 			bugBountyProgram: notSupported,
 			firmware: null,
-			hardwareWalletAppSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				ref: refTodo,
 				messageSigning: {
 					calldataDecoding: null,
@@ -75,12 +82,6 @@ export const fireflyWallet: HardwareWallet = {
 					displayedTransactionDetails: null,
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

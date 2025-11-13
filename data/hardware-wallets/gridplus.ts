@@ -1,4 +1,9 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
+import {
+	DappConnectionMethod,
+	type DappConnectionMethodDetails,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -10,9 +15,9 @@ import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
-} from '@/schema/features/security/hardware-wallet-app-signing'
+} from '@/schema/features/security/signing-intent-clarity'
 import { notSupported, supported } from '@/schema/features/support'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -44,6 +49,17 @@ export const gridplusWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.AMBIRE]: true,
+				[SoftwareWalletType.FRAME]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+		}),
 		licensing: null,
 		monetization: {
 			ref: refTodo,
@@ -90,7 +106,13 @@ export const gridplusWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			firmware: null,
-			hardwareWalletAppSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				ref: [
 					{
 						explanation:
@@ -115,6 +137,7 @@ export const gridplusWallet: HardwareWallet = {
 						'GridPlus Lattice1 provides message signing support, but does not show EIP-712 digests or hashes.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -129,6 +152,7 @@ export const gridplusWallet: HardwareWallet = {
 					},
 					calldataExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -137,12 +161,6 @@ export const gridplusWallet: HardwareWallet = {
 					displayedTransactionDetails: displaysFullTransactionDetails,
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: null,
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

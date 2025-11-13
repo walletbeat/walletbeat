@@ -1,4 +1,9 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
+import {
+	DappConnectionMethod,
+	type DappConnectionMethodDetails,
+	SoftwareWalletType,
+} from '@/schema/features/ecosystem/hw-dapp-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -6,14 +11,14 @@ import {
 	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
-} from '@/schema/features/security/hardware-wallet-app-signing'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+} from '@/schema/features/security/signing-intent-clarity'
 import { notSupported, supported } from '@/schema/features/support'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -63,6 +68,19 @@ export const trezorWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
+		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+			ref: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
+			details:
+				'Trezor supports multiple dApp connection methods including their open-source Trezor Suite, WalletConnect, and integration with popular software wallets like MetaMask and Rabby.',
+			supportedConnections: {
+				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[SoftwareWalletType.METAMASK]: true,
+				[SoftwareWalletType.RABBY]: true,
+				[SoftwareWalletType.AMBIRE]: true,
+				[SoftwareWalletType.FRAME]: true,
+				[SoftwareWalletType.OTHER]: true,
+			},
+		}),
 		licensing: null,
 		monetization: {
 			ref: refTodo,
@@ -112,7 +130,16 @@ export const trezorWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			firmware: null,
-			hardwareWalletAppSigning: {
+			keysHandling: null,
+			lightClient: {
+				ethereumL1: null,
+			},
+			passkeyVerification: {
+				ref: refNotNecessary,
+				library: PasskeyVerificationLibrary.NONE,
+			},
+			publicSecurityAudits: null,
+			signingIntentClarity: {
 				ref: [
 					{
 						explanation:
@@ -130,6 +157,7 @@ export const trezorWallet: HardwareWallet = {
 						'Trezor provides basic message signing details when using hardware wallets, but some complex interactions may be difficult to verify off device.',
 					messageExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -138,6 +166,7 @@ export const trezorWallet: HardwareWallet = {
 					calldataDecoding: noCalldataDecoding,
 					calldataExtraction: {
 						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: false,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
 					},
@@ -150,15 +179,6 @@ export const trezorWallet: HardwareWallet = {
 					},
 				},
 			},
-			keysHandling: null,
-			lightClient: {
-				ethereumL1: null,
-			},
-			passkeyVerification: {
-				ref: refNotNecessary,
-				library: PasskeyVerificationLibrary.NONE,
-			},
-			publicSecurityAudits: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
