@@ -32,6 +32,8 @@ import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
+import { CalldataDecoding } from '@/schema/features/security/signing-intent-clarity'
+import { DataExtraction } from '@/schema/features/security/signing-intent-clarity'
 
 export const metamask: SoftwareWallet = {
 	metadata: {
@@ -218,6 +220,49 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
+			signingIntentClarity: {
+				ref: refTodo,
+				messageSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: false,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
+						[CalldataDecoding.AAVE_SUPPLY]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+					},
+					messageExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+				},
+				transactionSigning: {
+					calldataDecoding: {
+						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+						[CalldataDecoding.AAVE_SUPPLY]: true,
+						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+					},
+					calldataExtraction: {
+						[DataExtraction.EYES]: true,
+						[DataExtraction.COPY]: true,
+						[DataExtraction.HASHES]: false,
+						[DataExtraction.QRCODE]: false,
+					},
+					details:
+						'MetaMask provides clear transaction support, showing all transaction data, and even doing nested calldata decoding in some cases.',
+					displayedTransactionDetails: {
+						chain: true,
+						from: true,
+						gas: true,
+						nonce: true,
+						to: true,
+						value: true,
+					},
+				},
+			},
 			hardwareWalletSupport: {
 				ref: [
 					{

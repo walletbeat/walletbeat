@@ -72,6 +72,7 @@ export const unratedTemplate: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
+			signingIntentClarity: null,
 			hardwareWalletSupport: null,
 			lightClient: {
 				ethereumL1: null,

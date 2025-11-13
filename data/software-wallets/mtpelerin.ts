@@ -128,6 +128,7 @@ export const mtpelerin: SoftwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
+			signingIntentClarity: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},

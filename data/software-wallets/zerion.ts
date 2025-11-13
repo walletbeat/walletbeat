@@ -99,6 +99,7 @@ export const zerion: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
+			signingIntentClarity: null,
 			hardwareWalletSupport: {
 				ref: [
 					{
