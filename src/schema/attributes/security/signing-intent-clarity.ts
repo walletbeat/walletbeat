@@ -198,7 +198,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 		),
 	},
 	question: sentence(
-		'When asking the user to sign a transaction, does the wallet give enough information for the user to verify the what the signature is for?',
+		'When signing a transaction, does the wallet show transaction details clearly?',
 	),
 	why: markdown(`
 		Signing intent clarity is a critical security feature for wallets that allows users to verify
