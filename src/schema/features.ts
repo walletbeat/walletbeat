@@ -378,19 +378,10 @@ export function resolveFeatures(
 				'security.hardwareWalletSupport',
 				features => features.security.hardwareWalletSupport,
 			),
-			signingIntentClarity: (() => {
-				if (isWalletSoftwareFeatures(features) && features.security.signingIntentClarity) {
-					return softwareFeat(
-						'security.signingIntentClarity',
-						features => features.security.signingIntentClarity,
-					)
-				}
-
-				return hardwareFeat(
-					'security.signingIntentClarity',
-					features => features.security.signingIntentClarity,
-				)
-			})(),
+			signingIntentClarity: baseFeat(
+				'security.signingIntentClarity',
+				features => features.security.signingIntentClarity,
+			),
 			passkeyVerification: baseFeat(
 				'passkeyVerification',
 				features => features.security.passkeyVerification,
