@@ -213,8 +213,8 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 		and decoded calldata, allowing users to make informed decisions before authorizing transactions.
 	`),
 	methodology: markdown(`
-		Wallets are evaluated based on their implementation of signing intent clarity capabilities.
-		
+		Wallets are evaluated based on how clearly they display transaction details for a specific set of benchmark transactions.
+
 		A wallet receives a passing rating if it implements full signing intent clarity, where all transaction
 		details are clearly displayed on the wallet screen for verification before signing. This includes
 		support for standard transactions, ERC-20 token transfers, EIP-712 messages and complex contract interactions. 
