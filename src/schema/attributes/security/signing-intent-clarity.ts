@@ -192,7 +192,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 	displayName: 'Signing Intent Clarity',
 	wording: {
 		midSentenceName: null,
-		howIsEvaluated: "How is a wallet evaluated for clearly showing what users are signing?",
+		howIsEvaluated: 'How is a wallet evaluated for clearly showing what users are signing?',
 		whatCanWalletDoAboutIts: sentence(
 			'What can {{WALLET_NAME}} do to make it easy for users to understand what they are signing?',
 		),
