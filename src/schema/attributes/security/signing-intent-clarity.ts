@@ -314,9 +314,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 		}
 
 		// Extract references from the wallet signing intent clarity feature
-		const references = features.security.signingIntentClarity?.ref
-			? refs(features.security.signingIntentClarity)
-			: []
+		const references = refs(features.security.signingIntentClarity)
 
 		const messageExtraction =
 			features.security.signingIntentClarity.messageSigning.messageExtraction
