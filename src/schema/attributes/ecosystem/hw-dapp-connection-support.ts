@@ -295,56 +295,54 @@ wallets are exempt as they inherently support dApp connections.
 		// Extract references if supported
 		const references = isSupported(dappSupport) ? refs(dappSupport) : []
 
-		// If not supported, cannot connect to dApps
-		if (!isSupported(dappSupport)) {
-			return noDappConnectionSupport()
-		}
-
-		// Get all supported software wallets
-		const supportedSoftwareWallets = getSupportedSoftwareWallets(dappSupport)
-
-		// Count the total number of connection methods
-		const totalMethodCount = countAllConnectionMethods(dappSupport)
-
-		// Determine rating based on connection methods
-		if (totalMethodCount === 0) {
-			return noDappConnectionSupport()
-		}
-
-		// Check for only closed-source proprietary app
-		const hasOnlyClosedSource =
-			totalMethodCount === 1 &&
-			dappSupport.supportedConnections[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
-
-		if (hasOnlyClosedSource) {
-			return limitedDappConnectionSupport(dappSupport)
-		}
-
-		const hasOpenSource =
-			dappSupport.supportedConnections[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
-
-		if (totalMethodCount <= 2 && !hasOpenSource) {
-			return limitedDappConnectionSupport(dappSupport)
-		}
-
-		if (totalMethodCount <= 2 && hasOpenSource) {
-			return goodDappConnectionSupport(dappSupport)
-		}
-
-		// Check for excellent support (3+ methods or includes open source app + others)
-		const hasSoftwareWallets = supportedSoftwareWallets.length > 0
-
-		if (totalMethodCount >= 3 || (hasOpenSource && hasSoftwareWallets)) {
-			return {
-				...excellentDappConnectionSupport(dappSupport),
-				references,
+		const evaluation = (() => {
+			// If not supported, cannot connect to dApps
+			if (!isSupported(dappSupport)) {
+				return noDappConnectionSupport()
 			}
-		}
 
-		return {
-			...goodDappConnectionSupport(dappSupport),
-			references,
-		}
+			// Get all supported software wallets
+			const supportedSoftwareWallets = getSupportedSoftwareWallets(dappSupport)
+
+			// Count the total number of connection methods
+			const totalMethodCount = countAllConnectionMethods(dappSupport)
+
+			// Determine rating based on connection methods
+			if (totalMethodCount === 0) {
+				return noDappConnectionSupport()
+			}
+
+			// Check for only closed-source proprietary app
+			const hasOnlyClosedSource =
+				totalMethodCount === 1 &&
+				dappSupport.supportedConnections[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
+
+			if (hasOnlyClosedSource) {
+				return limitedDappConnectionSupport(dappSupport)
+			}
+
+			const hasOpenSource =
+				dappSupport.supportedConnections[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
+
+			if (totalMethodCount <= 2 && !hasOpenSource) {
+				return limitedDappConnectionSupport(dappSupport)
+			}
+
+			if (totalMethodCount <= 2 && hasOpenSource) {
+				return goodDappConnectionSupport(dappSupport)
+			}
+
+			// Check for excellent support (3+ methods or includes open source app + others)
+			const hasSoftwareWallets = supportedSoftwareWallets.length > 0
+
+			if (totalMethodCount >= 3 || (hasOpenSource && hasSoftwareWallets)) {
+				return excellentDappConnectionSupport(dappSupport)
+			}
+
+			return goodDappConnectionSupport(dappSupport)
+		})()
+
+		return { ...evaluation, references }
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<DappConnectionSupportValue>>) =>
 		pickWorstRating<DappConnectionSupportValue>(perVariant),
