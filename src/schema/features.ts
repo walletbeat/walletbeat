@@ -205,7 +205,6 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
 		firmware: VariantFeature<FirmwareSupport>
 		keysHandling: VariantFeature<KeysHandlingSupport>
-		signingIntentClarity: VariantFeature<SigningIntentClarityImplementation>
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
