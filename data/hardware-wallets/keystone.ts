@@ -19,6 +19,8 @@ import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
+import { slowMist } from '../entities/slowmist'
+
 export const keystoneWallet: HardwareWallet = {
 	metadata: {
 		id: 'keystone',
@@ -149,7 +151,21 @@ export const keystoneWallet: HardwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: null,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [
+				{
+					ref: [
+						{
+							explanation: 'Keystone 3 Pro security audit by SlowMist',
+							url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20Keystone3_en-us.pdf',
+						},
+					],
+					auditDate: '2023-09-07',
+					auditor: slowMist,
+					codeSnapshot: undefined,
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
+			],
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
