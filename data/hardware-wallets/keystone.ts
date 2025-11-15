@@ -19,8 +19,8 @@ import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
-import { slowMist } from '../entities/slowmist'
 import { keylabs } from '../entities/keylabs'
+import { slowMist } from '../entities/slowmist'
 
 export const keystoneWallet: HardwareWallet = {
 	metadata: {
