@@ -20,6 +20,7 @@ import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
 import { slowMist } from '../entities/slowmist'
+import { keylabs } from '../entities/keylabs'
 
 export const keystoneWallet: HardwareWallet = {
 	metadata: {
@@ -152,6 +153,19 @@ export const keystoneWallet: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: [
+				{
+					ref: [
+						{
+							explanation: 'Keystone 3 Pro security audit by Keylabs',
+							url: 'https://github.com/keylabsio/audits/blob/main/2023-11-keystone3.pdf',
+						},
+					],
+					auditDate: '2023-11-22',
+					auditor: keylabs,
+					codeSnapshot: undefined,
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
 				{
 					ref: [
 						{
