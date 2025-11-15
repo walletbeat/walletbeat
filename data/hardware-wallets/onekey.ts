@@ -19,6 +19,8 @@ import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
+import { slowMist } from '../entities/slowmist'
+
 export const onekeyWallet: HardwareWallet = {
 	metadata: {
 		id: 'onekey',
@@ -152,7 +154,21 @@ export const onekeyWallet: HardwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: null,
-			publicSecurityAudits: null,
+			publicSecurityAudits: [
+				{
+					ref: [
+						{
+							explanation: 'OneKey Pro security audit by SlowMist',
+							url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OneKey%20Pro_en-us.pdf',
+						},
+					],
+					auditDate: '2024-10-21',
+					auditor: slowMist,
+					codeSnapshot: undefined,
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
+			],
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
