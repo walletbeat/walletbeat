@@ -135,7 +135,7 @@ export const dappConnectionSupport: Attribute<DappConnectionSupportValue> = {
 		midSentenceName: null,
 		howIsEvaluated: "How is a hardware wallet's dApp connection support evaluated?",
 		whatCanWalletDoAboutIts: sentence(
-			'What can {{WALLET_NAME}} do to improve dApp connection support?',
+			'Can {{WALLET_NAME}} connect to web3 apps?',
 		),
 	},
 	question: sentence('Can the hardware wallet connect to decentralized applications (dApps)?'),
