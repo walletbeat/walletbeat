@@ -4,7 +4,7 @@ import { isNonNull, type Nullable, type NullableObject } from '@/types/utils/nul
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import type { DelegationHandling } from './features/ecosystem/delegation-handling'
-import type { DappConnectionSupport } from './features/ecosystem/hw-dapp-connection-support'
+import type { DappConnectionSupport } from './features/ecosystem/hw-app-connection-support'
 import {
 	notApplicableWalletIntegration,
 	type ResolvedWalletIntegration,

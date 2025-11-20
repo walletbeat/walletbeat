@@ -2,7 +2,7 @@ import { patrickalphac } from '@/data/contributors'
 import {
 	type DappConnectionMethodDetails,
 	SoftwareWalletType,
-} from '@/schema/features/ecosystem/hw-dapp-connection-support'
+} from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,

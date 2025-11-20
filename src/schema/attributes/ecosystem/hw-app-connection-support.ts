@@ -7,13 +7,13 @@ import {
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
-import type { DappConnectionMethodDetails } from '@/schema/features/ecosystem/hw-dapp-connection-support'
+import type { DappConnectionMethodDetails } from '@/schema/features/ecosystem/hw-app-connection-support'
 import {
 	countAllConnectionMethods,
 	DappConnectionMethod,
 	getSupportedSoftwareWallets,
 	SoftwareWalletType,
-} from '@/schema/features/ecosystem/hw-dapp-connection-support'
+} from '@/schema/features/ecosystem/hw-app-connection-support'
 import type { Support, Supported } from '@/schema/features/support'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { refs, refTodo, type WithRef } from '@/schema/reference'

@@ -5,7 +5,7 @@ import {
 	DappConnectionMethod,
 	type DappConnectionMethodDetails,
 	SoftwareWalletType,
-} from '@/schema/features/ecosystem/hw-dapp-connection-support'
+} from '@/schema/features/ecosystem/hw-app-connection-support'
 import {
 	CollectionPolicy,
 	DataCollectionPurpose,
