@@ -4,18 +4,18 @@ import type { WithRef } from '@/schema/reference'
 import { type NonEmptySet, setItems } from '@/types/utils/non-empty'
 
 /**
- * Methods by which a hardware wallet can connect to dApps
+ * Methods by which a hardware wallet can connect to apps
  *
  * If supported by a software wallet, just fill in the list below
  */
-export enum DappConnectionMethod {
+export enum AppConnectionMethod {
 	/**
-	 * The wallet connects to dApps through its own proprietary closed-source application
+	 * The wallet connects to apps through its own proprietary closed-source application
 	 */
 	VENDOR_CLOSED_SOURCE_APP = 'VENDOR_CLOSED_SOURCE_APP',
 
 	/**
-	 * The wallet connects to dApps through its own open-source application
+	 * The wallet connects to apps through its own open-source application
 	 */
 	VENDOR_OPEN_SOURCE_APP = 'VENDOR_OPEN_SOURCE_APP',
 }
@@ -32,34 +32,34 @@ export enum SoftwareWalletType {
 }
 
 /**
- * Specific details about a dApp connection method when supported
+ * Specific details about a app connection method when supported
  */
-export interface DappConnectionMethodDetails {
+export interface AppConnectionMethodDetails {
 	/**
 	 * Which connection methods are supported (must have at least one)
 	 */
-	supportedConnections: NonEmptySet<DappConnectionMethod | SoftwareWalletType>
+	supportedConnections: NonEmptySet<AppConnectionMethod | SoftwareWalletType>
 
 	/**
-	 * Additional details about dApp connection capabilities
+	 * Additional details about app connection capabilities
 	 */
 	details?: string
 }
 
 /**
- * A record of hardware wallet dApp connection support
+ * A record of hardware wallet app connection support
  */
-export type DappConnectionSupport = Support<WithRef<DappConnectionMethodDetails>>
+export type AppConnectionSupport = Support<WithRef<AppConnectionMethodDetails>>
 
 /**
  * Returns the number of connection methods (including software wallets)
  */
-export function countAllConnectionMethods(dappSupport: DappConnectionSupport): number {
-	if (!isSupported(dappSupport)) {
+export function countAllConnectionMethods(appSupport: AppConnectionSupport): number {
+	if (!isSupported(appSupport)) {
 		return 0
 	}
 
-	return Object.values(dappSupport.supportedConnections).filter(supported => supported === true)
+	return Object.values(appSupport.supportedConnections).filter(supported => supported === true)
 		.length
 }
 
@@ -67,12 +67,12 @@ export function countAllConnectionMethods(dappSupport: DappConnectionSupport): n
  * Checks if connection is a software wallet
  */
 function isSoftwareWalletType(
-	maybeWalletType: DappConnectionMethod | SoftwareWalletType,
+	maybeWalletType: AppConnectionMethod | SoftwareWalletType,
 ): maybeWalletType is SoftwareWalletType {
 	switch (maybeWalletType) {
-		case DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP:
+		case AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP:
 			return false
-		case DappConnectionMethod.VENDOR_OPEN_SOURCE_APP:
+		case AppConnectionMethod.VENDOR_OPEN_SOURCE_APP:
 			return false
 		default:
 			return true
@@ -83,7 +83,7 @@ function isSoftwareWalletType(
  * Returns all supported software wallet types
  */
 export function getSupportedSoftwareWallets(
-	connectionSupport: DappConnectionSupport,
+	connectionSupport: AppConnectionSupport,
 ): SoftwareWalletType[] {
 	if (!isSupported(connectionSupport)) {
 		return []
