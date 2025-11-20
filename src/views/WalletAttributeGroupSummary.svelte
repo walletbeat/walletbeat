@@ -1,3 +1,11 @@
+<script module lang="ts">
+	export enum WalletAttributeGroupSummaryType {
+		None = 'none',
+		Score = 'score',
+	}
+</script>
+
+
 <script lang="ts">
 	// Types/constants
 	import { calculateAttributeGroupScore } from '@/schema/attribute-groups'
@@ -10,10 +18,12 @@
 	const {
 		wallet,
 		attributeGroup,
+		summaryType = WalletAttributeGroupSummaryType.None,
 		isInTooltip = false,
 	}: {
 		wallet: RatedWallet
 		attributeGroup: AttributeGroup<ValueSet>,
+		summaryType?: WalletAttributeGroupSummaryType
 		isInTooltip?: boolean
 	} = $props()
 
@@ -49,7 +59,9 @@
 			<span>{attributeGroup.icon}</span> {attributeGroup.displayName}
 		</h3>
 
-		<ScoreBadge score={groupScore} />
+		{#if summaryType === WalletAttributeGroupSummaryType.Score}
+			<ScoreBadge score={groupScore} />
+		{/if}
 	</header>
 
 	<p>

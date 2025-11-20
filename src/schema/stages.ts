@@ -111,6 +111,9 @@ export interface WalletStage {
 	/** An ID for this stage. */
 	id: string
 
+	/** A human-readable label for this stage (e.g., "Stage 0", "Stage 1"). */
+	label: string
+
 	/** A description of what this stage represents. */
 	description: Content
 
@@ -253,7 +256,7 @@ export function variantsMustPassAttribute<V extends Value>(
 		}
 	}
 
-	return stageCriterionEvaluationPerVariant(
+	const evaluateFunction = stageCriterionEvaluationPerVariant(
 		variants,
 		(variantWallet: ResolvedWallet): StageCriterionEvaluation => {
 			const evalAttr = getAttributeFromTree<V>(variantWallet.attributes, attribute)
@@ -296,6 +299,13 @@ export function variantsMustPassAttribute<V extends Value>(
 			ifNoVariantInScope: options.ifNoVariantInScope,
 		},
 	)
+
+	// Attach the attribute ID to the evaluate function so it can be easily retrieved
+	// by getCriterionAttributeId without needing to serialize the function
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+	;(evaluateFunction as any).__attributeId = attribute.id
+
+	return evaluateFunction
 }
 
 /**

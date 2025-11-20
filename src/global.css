@@ -15,7 +15,8 @@
 	--background-primary: light-dark(#fff, #17191f);
 	--background-secondary: light-dark(#efefef, #141414);
 	--background-tertiary: light-dark(#eeeff4, #17191f);
-	--accent: light-dark(#e564bc, #e683c7);
+	--accent: var(--accent-color);
+	--accent-color: light-dark(#e564bc, #e683c7);
 	--accent-backgroundColor: light-dark(#fbdcf2, #440530);
 	--text-primary: light-dark(#222222, #efefef);
 	--text-secondary: light-dark(#3f4046, #b1b2b9);
@@ -256,6 +257,20 @@ details {
 			transform: perspective(100px) rotateX(180deg);
 		}
 	}
+
+	&[data-card] {
+		padding: 0;
+		gap: 0;
+
+		> summary {
+			padding: var(--card-padding);
+		}
+
+		> summary ~ * {
+			padding: var(--card-padding);
+			padding-top: 0;
+		}
+	}
 }
 
 select,
@@ -269,7 +284,7 @@ label:has(
 ) {
 	cursor: pointer;
 
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	padding: 0.66em;
 	gap: 0.5em;
@@ -502,54 +517,60 @@ span svg {
 }
 
 [data-card] {
-	background-color: var(--background-primary);
-	border-radius: 0.5em;
-	padding: 1em;
+	/* Inputs */
+	--card-backgroundColor: var(--background-primary);
+	--card-radius: 0.5em;
+	--card-padding: 1em;
+
+	/* Rules */
+	background-color: var(--card-backgroundColor);
+	border-radius: var(--card-radius);
+	padding: var(--card-padding);
 
 	&[data-card~='secondary'] {
-		background-color: var(--background-secondary);
+		--card-backgroundColor: var(--background-secondary);
 		border-color: var(--border-color);
 	}
 
 	&[data-card~='radius-1'] {
-		border-radius: 0.125em;
+		--card-radius: 0.125em;
 	}
 	&[data-card~='radius-2'] {
-		border-radius: 0.25em;
+		--card-radius: 0.25em;
 	}
 	&[data-card~='radius-3'] {
-		border-radius: 0.375em;
+		--card-radius: 0.375em;
 	}
 	&[data-card~='radius-4'] {
-		border-radius: 0.5em;
+		--card-radius: 0.5em;
 	}
 	&[data-card~='radius-6'] {
-		border-radius: 0.75em;
+		--card-radius: 0.75em;
 	}
 	&[data-card~='radius-8'] {
-		border-radius: 1em;
+		--card-radius: 1em;
 	}
 
 	&[data-card~='padding-0'] {
-		padding: 0em;
+		--card-padding: 0em;
 	}
 	&[data-card~='padding-1'] {
-		padding: 0.25em;
+		--card-padding: 0.25em;
 	}
 	&[data-card~='padding-2'] {
-		padding: 0.5em;
+		--card-padding: 0.5em;
 	}
 	&[data-card~='padding-3'] {
-		padding: 0.75em;
+		--card-padding: 0.75em;
 	}
 	&[data-card~='padding-4'] {
-		padding: 1em;
+		--card-padding: 1em;
 	}
 	&[data-card~='padding-5'] {
-		padding: 1.25em;
+		--card-padding: 1.25em;
 	}
 	&[data-card~='padding-6'] {
-		padding: 1.5em;
+		--card-padding: 1.5em;
 	}
 
 	&[data-card~='border-accent'] {
@@ -559,6 +580,7 @@ span svg {
 
 [data-badge] {
 	flex-shrink: 0;
+	flex-basis: auto;
 
 	column-gap: 0;
 
@@ -591,6 +613,11 @@ span svg {
 		&:first-child {
 			margin-inline-end: 0.25em;
 		}
+	}
+
+	a:has(> &:only-child) {
+		flex-shrink: 0;
+		flex-basis: auto;
 	}
 }
 

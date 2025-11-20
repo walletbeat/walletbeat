@@ -35,6 +35,7 @@ export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 
 export const softwareWalletStageZero: WalletStage = {
 	id: 'software_stage_0',
+	label: 'Stage 0',
 	description: sentence('The basic stage for Walletbeat to evaluate any software wallet.'),
 	criteriaGroups: [
 		{
@@ -56,6 +57,7 @@ export const softwareWalletStageZero: WalletStage = {
 
 export const softwareWalletStageOne: WalletStage = {
 	id: 'software_stage_1',
+	label: 'Stage 1',
 	description: sentence(
 		'The wallet has made a minimal but significant commitment to Ethereum values.',
 	),
@@ -259,6 +261,7 @@ export const softwareWalletStageOne: WalletStage = {
 
 const softwareWalletStageTwo: WalletStage = {
 	id: 'software_stage_2',
+	label: 'Stage 2',
 	description: sentence('The wallet has made a significant commitment to Ethereum values.'),
 	criteriaGroups: [
 		{

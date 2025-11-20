@@ -430,6 +430,8 @@
 						}
 
 						.sort-label {
+							line-height: 1;
+
 							display: flex;
 							align-items: center;
 							justify-content: center;
@@ -649,6 +651,16 @@
 				text-align: end;
 				align-items: end;
 				transform-origin: right;
+			}
+
+			@container (width < 48rem) {
+				&[data-sticky] {
+					position: static !important;
+
+					&:before {
+						content: none !important;
+					}
+				}
 			}
 		}
 

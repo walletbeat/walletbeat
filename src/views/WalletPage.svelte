@@ -31,14 +31,21 @@
 	import { toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
+	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { scoreToColor } from '@/utils/colors'
+	import { getAttributeStages, isAttributeUsedInStages } from '@/utils/stage-attributes'
+	import { WalletLadderType } from '@/schema/ladders'
 
 
 	// Props
 	const {
-		walletName
+		walletName,
+		showStage = true,
+		showScores = false,
 	}: {
 		walletName: WalletName,
+		showStage?: boolean,
+		showScores?: boolean,
 	} = $props()
 
 
@@ -138,6 +145,10 @@
 	import UnratedAttribute from '@/views/attributes/UnratedAttribute.svelte'
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 	import ScoreBadge from '@/views/ScoreBadge.svelte'
+	import WalletStageBadge from '@/views/WalletStageBadge.svelte'
+	import WalletStageOverview from '@/views/WalletStageOverview.svelte'
+	import WalletStageSummary from '@/views/WalletStageSummary.svelte'
+	import Tooltip from '@/components/Tooltip.svelte'
 	import Typography from '@/components/Typography.svelte'
 </script>
 
@@ -302,11 +313,30 @@
 							/>
 						{/if}
 					{/if}
+
 				</div>
 
 				<div data-row="gap-2">
-					<span>Walletbeat score: </span>
-					<ScoreBadge score={overallScore} size="large" />
+					{#if showStage}
+						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
+						{#if stage !== null && ladderEvaluation !== null}
+							<Tooltip
+								buttonTriggerPlacement="behind"
+								hoverTriggerPlacement="around"
+							>
+								{#snippet children()}
+									<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+								{/snippet}
+								{#snippet TooltipContent()}
+									<WalletStageSummary {wallet} {stage} {ladderEvaluation} />
+								{/snippet}
+							</Tooltip>
+						{/if}
+					{/if}
+
+					{#if showScores}
+						<ScoreBadge score={overallScore} size="large" />
+					{/if}
 				</div>
 			</div>
 
@@ -347,7 +377,7 @@
 					</nav>
 				</div>
 
-				<footer
+				<div
 					class="wallet-platforms"
 					data-card="padding-5"
 				>
@@ -384,9 +414,29 @@
 							</p>
 						{/if}
 					{/if}
-				</footer>
+				</div>
 			</section>
 		</header>
+
+		{#if showStage}
+			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
+
+			<section id="stages">
+				<header
+					data-sticky="block"
+					data-row
+					data-scroll-item="inline-detached"
+				>
+					<a data-link="camouflaged" href="#stage-requirements">
+						<h2>Stage Progress</h2>
+					</a>
+				</header>
+
+				<div data-scroll-item="inline-detached padding-match-end" data-column>
+					<WalletStageOverview {wallet} {stage} {ladderEvaluation} />
+				</div>
+			</section>
+		{/if}
 
 		{#each evalTree ? objectEntries(attributeTree) : [] as [attrGroupId, attrGroup]}
 			{@const evalGroup = evalTree?.[attrGroupId]}
@@ -447,9 +497,9 @@
 					</h2>
 				</a>
 
-				<ScoreBadge
-					{score}
-				/>
+				{#if showScores}
+					<ScoreBadge {score} size="medium" />
+				{/if}
 			</header>
 
 			<div
@@ -602,15 +652,84 @@
 			data-column="gap-0"
 			open
 		>
-			<summary data-row>
-				<header data-row>
-					<div>
-						<div data-row="start gap-2">
-							<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
-								<h3 data-icon={attribute.icon}>
-									{attribute.displayName}
-								</h3>
-							</a>
+		<summary data-row>
+			<header data-row>
+				<div>
+					<div data-row="start gap-2">
+						<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
+							<h3 data-icon={attribute.icon}>
+								{attribute.displayName}
+							</h3>
+						</a>
+
+						{#if true}
+							{@const attributeStages = getAttributeStages(attribute)}
+							{@const { ladderEvaluation } = getWalletStageAndLadder(wallet)}
+							{@const relevantStages = (() => {
+								if (!ladderEvaluation) {
+									return []
+								}
+								const ladderType = (() => {
+									for (const [type, evaluation] of Object.entries(wallet.ladders)) {
+										if (evaluation === ladderEvaluation) {
+											return type as WalletLadderType
+										}
+									}
+									return null
+								})()
+								if (!ladderType) {
+									return []
+								}
+								const stagesForLadder = attributeStages.find(s => s.ladderType === ladderType)
+								return stagesForLadder?.stageNumbers ?? []
+							})()}
+							{#if relevantStages.length > 0}
+								{@const stageNumber = relevantStages[0]}
+								{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+								{#if stage && ladderEvaluation}
+									<Tooltip
+										buttonTriggerPlacement="behind"
+										hoverTriggerPlacement="around"
+									>
+										{#snippet children()}
+											<a
+												href={`#stage-${stageNumber}`}
+												data-link="camouflaged"
+												title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+											>
+												<div
+													data-badge="small"
+													style:--accent="var(--accent-color)"
+												>
+													<small>Stage {relevantStages.join(', ')}</small>
+												</div>
+											</a>
+										{/snippet}
+										{#snippet TooltipContent()}
+											<WalletStageSummary 
+												{wallet} 
+												stage={stage} 
+												{ladderEvaluation}
+												showNextStageCriteria={false}
+											/>
+										{/snippet}
+									</Tooltip>
+								{:else}
+									<a
+										href={`#stage-${stageNumber}`}
+										data-link="camouflaged"
+										title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+									>
+										<div
+											data-badge="small"
+											style:--accent="var(--accent-color)"
+										>
+											<small>Stage {relevantStages.join(', ')}</small>
+										</div>
+									</a>
+								{/if}
+							{/if}
+						{/if}
 
 							{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}
 								<div
@@ -745,7 +864,7 @@
 			{/if}
 
 			<div class="attribute-accordions" data-column>
-				<details data-card="secondary padding-0 radius-4" data-column="gap-0">
+				<details data-card="padding-2 secondary radius-4" data-column="gap-0">
 					<summary>
 						<h4>
 							{evalAttr.evaluation.value.rating === Rating.PASS || evalAttr.evaluation.value.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
@@ -1055,7 +1174,9 @@
 				view-timeline-axis: block;
 
 				.wallet-name {
-					h1 img {
+					position: static;
+
+					.wallet-icon {
 						position: sticky;
 						position: absolute;
 						top: 0;
@@ -1186,6 +1307,12 @@
 
 	.platforms-label {
 		color: var(--accent);
+	}
+
+	#stages {
+		> header {
+			padding-block: 1.2rem;
+		}
 	}
 
 	.attribute-group {

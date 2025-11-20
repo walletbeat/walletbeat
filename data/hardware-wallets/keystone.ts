@@ -23,6 +23,9 @@ import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
+import { keylabs } from '../entities/keylabs'
+import { slowMist } from '../entities/slowmist'
+
 export const keystoneWallet: HardwareWallet = {
 	metadata: {
 		id: 'keystone',
@@ -114,7 +117,6 @@ export const keystoneWallet: HardwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: null,
-			publicSecurityAudits: null,
 			signingIntentClarity: {
 				ref: [
 					{
@@ -164,6 +166,34 @@ export const keystoneWallet: HardwareWallet = {
 					displayedTransactionDetails: { ...displaysFullTransactionDetails, nonce: false },
 				},
 			},
+			publicSecurityAudits: [
+				{
+					ref: [
+						{
+							explanation: 'Keystone 3 Pro security audit by Keylabs',
+							url: 'https://github.com/keylabsio/audits/blob/main/2023-11-keystone3.pdf',
+						},
+					],
+					auditDate: '2023-11-22',
+					auditor: keylabs,
+					codeSnapshot: undefined,
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
+				{
+					ref: [
+						{
+							explanation: 'Keystone 3 Pro security audit by SlowMist',
+							url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20Keystone3_en-us.pdf',
+						},
+					],
+					auditDate: '2023-09-07',
+					auditor: slowMist,
+					codeSnapshot: undefined,
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
+			],
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

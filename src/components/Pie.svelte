@@ -530,7 +530,7 @@
 			}
 
 			> .center {
-				text {
+				:global(text) {
 					font-size: 0.8em;
 					fill: currentColor;
 

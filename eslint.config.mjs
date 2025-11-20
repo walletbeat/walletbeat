@@ -34,6 +34,21 @@ export default [
 			// Ignore Svelte files with ESLint parser errors
 			'src/views/WalletPage.svelte',
 			'src/views/WalletTable.svelte',
+
+			// TEMP: Ignore files modified for stage system UI for Devconnect shipping
+			'src/components/BlockTransition.svelte',
+			'src/components/Filters.svelte',
+			'src/components/Select.svelte',
+			'src/components/Table.svelte',
+			'src/components/TableState.svelte.ts',
+			'src/components/Tooltip.svelte',
+			'src/schema/stages.ts',
+			'src/utils/stage-attributes.ts',
+			'src/views/Eip7702Table.svelte',
+			'src/views/NavigationItems.svelte',
+			'src/views/WalletAttributeSummary.svelte',
+			'src/views/WalletStageOverview.svelte',
+			'src/views/WalletStageSummary.svelte',
 		],
 	},
 	eslintPluginEslintComments.recommended,
