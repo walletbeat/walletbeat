@@ -1,6 +1,6 @@
 import { patrickalphac } from '@/data/contributors'
 import {
-	type DappConnectionMethodDetails,
+	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
@@ -50,7 +50,7 @@ export const onekeyWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: [
 				'https://help.onekey.so/en/articles/11461105-how-to-use-rabby-wallet-with-onekey-hardware-wallets',
 				'https://developer.onekey.so/connect-to-software/using-walletconnect',

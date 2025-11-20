@@ -1,7 +1,7 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
 import {
-	DappConnectionMethod,
-	type DappConnectionMethodDetails,
+	AppConnectionMethod,
+	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
@@ -49,10 +49,10 @@ export const gridplusWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
 			supportedConnections: {
-				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.METAMASK]: true,
 				[SoftwareWalletType.RABBY]: true,
 				[SoftwareWalletType.AMBIRE]: true,

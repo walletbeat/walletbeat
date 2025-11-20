@@ -1,6 +1,6 @@
 import { nconsigny, patrickalphac } from '@/data/contributors'
 import {
-	type DappConnectionMethodDetails,
+	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
@@ -52,7 +52,7 @@ export const keystoneWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://guide.keyst.one/docs/keystone',
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,

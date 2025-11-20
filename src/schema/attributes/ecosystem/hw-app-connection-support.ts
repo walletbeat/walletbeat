@@ -7,10 +7,10 @@ import {
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
-import type { DappConnectionMethodDetails } from '@/schema/features/ecosystem/hw-app-connection-support'
+import type { AppConnectionMethodDetails } from '@/schema/features/ecosystem/hw-app-connection-support'
 import {
 	countAllConnectionMethods,
-	DappConnectionMethod,
+	AppConnectionMethod,
 	getSupportedSoftwareWallets,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
@@ -26,7 +26,7 @@ import { exempt, pickWorstRating, unrated } from '../common'
 const brand = 'attributes.security.dapp_connection_support'
 
 export type DappConnectionSupportValue = Value & {
-	connectionDetails: Support<WithRef<DappConnectionMethodDetails>>
+	connectionDetails: Support<WithRef<AppConnectionMethodDetails>>
 	__brand: 'attributes.security.dapp_connection_support'
 }
 
@@ -50,10 +50,10 @@ function noDappConnectionSupport(): Evaluation<DappConnectionSupportValue> {
 }
 
 function limitedDappConnectionSupport(
-	connectionDetails: Supported<WithRef<DappConnectionMethodDetails>>,
+	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<DappConnectionSupportValue> {
 	const hasOnlyClosedSource =
-		connectionDetails.supportedConnections[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP] ===
+		connectionDetails.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] ===
 			true && countAllConnectionMethods(connectionDetails) === 1
 
 	return {
@@ -81,7 +81,7 @@ function limitedDappConnectionSupport(
 }
 
 function goodDappConnectionSupport(
-	connectionDetails: Supported<WithRef<DappConnectionMethodDetails>>,
+	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<DappConnectionSupportValue> {
 	return {
 		value: {
@@ -101,10 +101,10 @@ function goodDappConnectionSupport(
 }
 
 function excellentDappConnectionSupport(
-	connectionDetails: Supported<WithRef<DappConnectionMethodDetails>>,
+	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<DappConnectionSupportValue> {
 	const hasOpenSource =
-		connectionDetails.supportedConnections[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
+		connectionDetails.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
 
 	return {
 		value: {
@@ -185,8 +185,8 @@ wallets are exempt as they inherently support dApp connections.
 					supported({
 						ref: refTodo,
 						supportedConnections: {
-							[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
-							[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
+							[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+							[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
 							[SoftwareWalletType.METAMASK]: true,
 							[SoftwareWalletType.RABBY]: true,
 						},
@@ -202,7 +202,7 @@ wallets are exempt as they inherently support dApp connections.
 					supported({
 						ref: refTodo,
 						supportedConnections: {
-							[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+							[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 							[SoftwareWalletType.METAMASK]: true,
 						},
 					}),
@@ -219,7 +219,7 @@ wallets are exempt as they inherently support dApp connections.
 					supported({
 						ref: refTodo,
 						supportedConnections: {
-							[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
+							[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
 						},
 					}),
 				),
@@ -233,7 +233,7 @@ wallets are exempt as they inherently support dApp connections.
 					supported({
 						ref: refTodo,
 						supportedConnections: {
-							[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
+							[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
 							[SoftwareWalletType.METAMASK]: true,
 						},
 					}),
@@ -315,14 +315,14 @@ wallets are exempt as they inherently support dApp connections.
 			// Check for only closed-source proprietary app
 			const hasOnlyClosedSource =
 				totalMethodCount === 1 &&
-				dappSupport.supportedConnections[DappConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
+				dappSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
 
 			if (hasOnlyClosedSource) {
 				return limitedDappConnectionSupport(dappSupport)
 			}
 
 			const hasOpenSource =
-				dappSupport.supportedConnections[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
+				dappSupport.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
 
 			if (totalMethodCount <= 2 && !hasOpenSource) {
 				return limitedDappConnectionSupport(dappSupport)

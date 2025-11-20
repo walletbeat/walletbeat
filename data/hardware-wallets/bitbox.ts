@@ -2,8 +2,8 @@ import { patrickalphac } from '@/data/contributors'
 import { bitbox } from '@/data/entities/bitbox'
 import { etherscan } from '@/data/entities/etherscan'
 import {
-	DappConnectionMethod,
-	type DappConnectionMethodDetails,
+	AppConnectionMethod,
+	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import {
@@ -58,7 +58,7 @@ export const bitboxWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: [
 				{
 					explanation:
@@ -69,7 +69,7 @@ export const bitboxWallet: HardwareWallet = {
 			details:
 				'BitBox02 supports dApp connections through their open-source BitBoxApp, WalletConnect protocol, and integration with Rabby wallet.',
 			supportedConnections: {
-				[DappConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.RABBY]: true,
 			},
 		}),

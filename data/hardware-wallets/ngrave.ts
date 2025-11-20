@@ -1,6 +1,6 @@
 import { patrickalphac } from '@/data/contributors'
 import {
-	type DappConnectionMethodDetails,
+	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
@@ -48,7 +48,7 @@ export const ngrave: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<DappConnectionMethodDetails>>({
+		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,
