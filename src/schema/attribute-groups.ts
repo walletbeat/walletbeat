@@ -43,7 +43,7 @@ import {
 import {
 	dappConnectionSupport,
 	type DappConnectionSupportValue,
-} from './attributes/ecosystem/hw-dapp-connection-support'
+} from './attributes/ecosystem/hw-app-connection-support'
 import {
 	transactionBatching,
 	type TransactionBatchingValue,

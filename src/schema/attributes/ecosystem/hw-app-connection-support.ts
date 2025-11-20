@@ -41,7 +41,7 @@ function noDappConnectionSupport(): Evaluation<DappConnectionSupportValue> {
 			__brand: brand,
 		},
 		details: paragraph(
-			"{{WALLET_NAME}} does not support connecting to decentralized applications (dApps). This severely limits the wallet's functionality, as users cannot interact with DeFi protocols, NFT marketplaces, or other Web3 applications. Without dApp connectivity, the wallet can only be used for basic sending and receiving of assets.",
+			"{{WALLET_NAME}} does not support connecting to web3 applications (dApps). This severely limits the wallet's functionality, as users cannot interact with DeFi protocols, NFT marketplaces, or other Web3 applications. Without dApp connectivity, the wallet can only be used for basic sending and receiving of assets.",
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should implement at least one method of connecting to dApps such as support through popular software wallets.',
@@ -95,7 +95,7 @@ function goodDappConnectionSupport(
 			__brand: brand,
 		},
 		details: mdParagraph(
-			"{{WALLET_NAME}} offers good dApp connectivity with multiple connection methods. Users have flexibility in choosing how to interact with decentralized applications, whether through software wallet integrations, or the wallet's own application.",
+			"{{WALLET_NAME}} offers good dApp connectivity with multiple connection methods. Users have flexibility in choosing how to interact with web3 applications, whether through software wallet integrations, or the wallet's own application.",
 		),
 	}
 }
@@ -138,9 +138,9 @@ export const dappConnectionSupport: Attribute<DappConnectionSupportValue> = {
 			'Can {{WALLET_NAME}} connect to web3 apps?',
 		),
 	},
-	question: sentence('Can the hardware wallet connect to decentralized applications (dApps)?'),
+	question: sentence('Can the hardware wallet connect to web3 applications (dApps)?'),
 	why: markdown(`
-The ability to connect to decentralized applications (dApps) is crucial for hardware wallet 
+The ability to connect to web3 applications (dApps) is crucial for hardware wallet 
 users who want to interact with DeFi protocols, NFT marketplaces, and other Web3 services 
 while maintaining the security of their private keys on a hardware device.
 
