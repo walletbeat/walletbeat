@@ -68,7 +68,7 @@ export const trezorWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
+		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
 			details:
 				'Trezor supports multiple dApp connection methods including their open-source Trezor Suite, WalletConnect, and integration with popular software wallets like MetaMask and Rabby.',

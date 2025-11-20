@@ -49,7 +49,7 @@ export const gridplusWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
+		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,

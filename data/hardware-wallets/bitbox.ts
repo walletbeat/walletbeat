@@ -58,7 +58,7 @@ export const bitboxWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
+		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: [
 				{
 					explanation:

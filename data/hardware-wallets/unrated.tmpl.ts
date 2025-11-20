@@ -31,7 +31,7 @@ export const unratedHardwareTemplate: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: null,
+		appConnectionSupport: null,
 		licensing: null,
 		monetization: {
 			ref: refTodo,

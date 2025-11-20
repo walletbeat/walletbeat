@@ -51,7 +51,7 @@ export const cypherockWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
+		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://www.youtube.com/watch?v=R0g35dKjRtI',
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,

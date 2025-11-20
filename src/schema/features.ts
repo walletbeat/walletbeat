@@ -4,7 +4,7 @@ import { isNonNull, type Nullable, type NullableObject } from '@/types/utils/nul
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import type { DelegationHandling } from './features/ecosystem/delegation-handling'
-import type { DappConnectionSupport } from './features/ecosystem/hw-app-connection-support'
+import type { AppConnectionSupport } from './features/ecosystem/hw-app-connection-support'
 import {
 	notApplicableWalletIntegration,
 	type ResolvedWalletIntegration,
@@ -219,7 +219,7 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		reputation: VariantFeature<ReputationSupport>
 		maintenance: VariantFeature<MaintenanceSupport>
 	}
-	dappConnectionSupport: VariantFeature<DappConnectionSupport>
+	appConnectionSupport: VariantFeature<AppConnectionSupport>
 }
 
 /**
@@ -300,7 +300,7 @@ export interface ResolvedFeatures {
 	addressResolution: ResolvedFeature<WithRef<AddressResolution>>
 	licensing: ResolvedWalletLicensing
 	monetization: ResolvedFeature<Monetization>
-	dappConnectionSupport: ResolvedFeature<DappConnectionSupport>
+	appConnectionSupport: ResolvedFeature<AppConnectionSupport>
 }
 
 /** Resolve a set of features according to the given variant. */
@@ -466,9 +466,9 @@ export function resolveFeatures(
 		),
 		licensing: resolveWalletLicense(features.licensing, expectedVariants, variant),
 		monetization: baseFeat('monetization', features => features.monetization),
-		dappConnectionSupport: hardwareFeat(
-			'dappConnectionSupport',
-			features => features.dappConnectionSupport,
+		appConnectionSupport: hardwareFeat(
+			'appConnectionSupport',
+			features => features.appConnectionSupport,
 		),
 	}
 }

@@ -52,7 +52,7 @@ export const keystoneWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
+		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://guide.keyst.one/docs/keystone',
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,

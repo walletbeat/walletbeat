@@ -74,7 +74,7 @@ export const ledgerWallet: HardwareWallet = {
 	},
 	features: {
 		accountSupport: null,
-		dappConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
+		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://support.ledger.com/article/360018444599-zd',
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,

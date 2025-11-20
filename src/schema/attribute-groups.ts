@@ -41,8 +41,8 @@ import {
 	type HardwareWalletInteroperabilityValue,
 } from './attributes/ecosystem/hardware-wallet-interoperability'
 import {
-	dappConnectionSupport,
-	type DappConnectionSupportValue,
+	appConnectionSupport,
+	type AppConnectionSupportValue,
 } from './attributes/ecosystem/hw-app-connection-support'
 import {
 	transactionBatching,
@@ -279,7 +279,7 @@ type EcosystemValues = Dict<{
 	transactionBatching: TransactionBatchingValue
 	hardwareWalletInteroperability: HardwareWalletInteroperabilityValue
 	interoperability: InteroperabilityValue
-	dappConnectionSupport: DappConnectionSupportValue
+	appConnectionSupport: AppConnectionSupportValue
 }>
 
 /** Ecosystem attributes. */
@@ -298,7 +298,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		transactionBatching,
 		hardwareWalletInteroperability,
 		interoperability,
-		dappConnectionSupport,
+		appConnectionSupport,
 	},
 	attributeWeights: {
 		accountAbstraction: 1.0,
@@ -308,7 +308,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 		transactionBatching: 1.0,
 		hardwareWalletInteroperability: 1.0,
 		interoperability: 1.0,
-		dappConnectionSupport: 1.0,
+		appConnectionSupport: 1.0,
 	},
 }
 
@@ -485,7 +485,7 @@ export function evaluateAttributes(
 			transactionBatching: evalAttr(transactionBatching),
 			hardwareWalletInteroperability: evalAttr(hardwareWalletInteroperability),
 			interoperability: evalAttr(interoperability),
-			dappConnectionSupport: evalAttr(dappConnectionSupport),
+			appConnectionSupport: evalAttr(appConnectionSupport),
 		},
 		maintenance: {
 			maintenance: evalAttr(maintenance),
@@ -557,7 +557,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			transactionBatching: attr(tree => tree.ecosystem.transactionBatching),
 			hardwareWalletInteroperability: attr(tree => tree.ecosystem.hardwareWalletInteroperability),
 			interoperability: attr(tree => tree.ecosystem.interoperability),
-			dappConnectionSupport: attr(tree => tree.ecosystem.dappConnectionSupport),
+			appConnectionSupport: attr(tree => tree.ecosystem.appConnectionSupport),
 		},
 		maintenance: {
 			maintenance: attr(tree => tree.maintenance.maintenance),

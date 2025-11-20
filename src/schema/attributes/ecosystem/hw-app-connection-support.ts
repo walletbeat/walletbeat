@@ -23,102 +23,102 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.dapp_connection_support'
+const brand = 'attributes.security.app_connection_support'
 
-export type DappConnectionSupportValue = Value & {
+export type AppConnectionSupportValue = Value & {
 	connectionDetails: Support<WithRef<AppConnectionMethodDetails>>
-	__brand: 'attributes.security.dapp_connection_support'
+	__brand: 'attributes.security.app_connection_support'
 }
 
-function noDappConnectionSupport(): Evaluation<DappConnectionSupportValue> {
+function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 	return {
 		value: {
-			id: 'no_dapp_connection',
+			id: 'no_app_connection',
 			rating: Rating.FAIL,
-			displayName: 'No dApp connection support',
-			shortExplanation: sentence('{{WALLET_NAME}} cannot connect to dApps.'),
+			displayName: 'No app connection support',
+			shortExplanation: sentence('{{WALLET_NAME}} cannot connect to apps.'),
 			connectionDetails: notSupported,
 			__brand: brand,
 		},
 		details: paragraph(
-			"{{WALLET_NAME}} does not support connecting to web3 applications (dApps). This severely limits the wallet's functionality, as users cannot interact with DeFi protocols, NFT marketplaces, or other Web3 applications. Without dApp connectivity, the wallet can only be used for basic sending and receiving of assets.",
+			"{{WALLET_NAME}} does not support connecting to web3 applications (apps). This severely limits the wallet's functionality, as users cannot interact with DeFi protocols, NFT marketplaces, or other Web3 applications. Without app connectivity, the wallet can only be used for basic sending and receiving of assets.",
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should implement at least one method of connecting to dApps such as support through popular software wallets.',
+			'{{WALLET_NAME}} should implement at least one method of connecting to apps such as support through popular software wallets.',
 		),
 	}
 }
 
-function limitedDappConnectionSupport(
+function limitedAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<DappConnectionSupportValue> {
+): Evaluation<AppConnectionSupportValue> {
 	const hasOnlyClosedSource =
 		connectionDetails.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] ===
 			true && countAllConnectionMethods(connectionDetails) === 1
 
 	return {
 		value: {
-			id: 'limited_dapp_connection',
+			id: 'limited_app_connection',
 			rating: Rating.PARTIAL,
-			displayName: 'Limited dApp connection support',
+			displayName: 'Limited app connection support',
 			shortExplanation: sentence(
 				hasOnlyClosedSource
-					? '{{WALLET_NAME}} can only connect to dApps through its proprietary closed-source application.'
-					: '{{WALLET_NAME}} has limited options for connecting to dApps.',
+					? '{{WALLET_NAME}} can only connect to apps through its proprietary closed-source application.'
+					: '{{WALLET_NAME}} has limited options for connecting to apps.',
 			),
 			connectionDetails,
 			__brand: brand,
 		},
 		details: paragraph(
 			hasOnlyClosedSource
-				? "{{WALLET_NAME}} can connect to dApps, but only through its own proprietary closed-source application. This creates vendor lock-in and requires users to trust the wallet provider's software without the ability to verify its security. Users cannot use their preferred software wallet or standard protocols."
-				: '{{WALLET_NAME}} supports connecting to dApps but with limited options. While functional, the restricted connection methods may limit user choice and flexibility in how they interact with Web3 applications.',
+				? "{{WALLET_NAME}} can connect to apps, but only through its own proprietary closed-source application. This creates vendor lock-in and requires users to trust the wallet provider's software without the ability to verify its security. Users cannot use their preferred software wallet or standard protocols."
+				: '{{WALLET_NAME}} supports connecting to apps but with limited options. While functional, the restricted connection methods may limit user choice and flexibility in how they interact with Web3 applications.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should expand its dApp connection options by supporting standard protocols and enabling connections through popular software wallets. If using a proprietary app, consider open-sourcing it for transparency.',
+			'{{WALLET_NAME}} should expand its app connection options by supporting standard protocols and enabling connections through popular software wallets. If using a proprietary app, consider open-sourcing it for transparency.',
 		),
 	}
 }
 
-function goodDappConnectionSupport(
+function goodAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<DappConnectionSupportValue> {
+): Evaluation<AppConnectionSupportValue> {
 	return {
 		value: {
-			id: 'good_dapp_connection',
+			id: 'good_app_connection',
 			rating: Rating.PASS,
-			displayName: 'Good dApp connection support',
+			displayName: 'Good app connection support',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} provides multiple secure methods for connecting to dApps.',
+				'{{WALLET_NAME}} provides multiple secure methods for connecting to apps.',
 			),
 			connectionDetails,
 			__brand: brand,
 		},
 		details: mdParagraph(
-			"{{WALLET_NAME}} offers good dApp connectivity with multiple connection methods. Users have flexibility in choosing how to interact with web3 applications, whether through software wallet integrations, or the wallet's own application.",
+			"{{WALLET_NAME}} offers good app connectivity with multiple connection methods. Users have flexibility in choosing how to interact with web3 applications, whether through software wallet integrations, or the wallet's own application.",
 		),
 	}
 }
 
-function excellentDappConnectionSupport(
+function excellentAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<DappConnectionSupportValue> {
+): Evaluation<AppConnectionSupportValue> {
 	const hasOpenSource =
 		connectionDetails.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
 
 	return {
 		value: {
-			id: 'excellent_dapp_connection',
+			id: 'excellent_app_connection',
 			rating: Rating.PASS,
-			displayName: 'Excellent dApp connection support',
+			displayName: 'Excellent app connection support',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} provides comprehensive dApp connectivity with maximum user choice.',
+				'{{WALLET_NAME}} provides comprehensive app connectivity with maximum user choice.',
 			),
 			connectionDetails,
 			__brand: brand,
 		},
 		details: mdParagraph(
-			'{{WALLET_NAME}} excels in dApp connectivity by supporting multiple connection methods. ' +
+			'{{WALLET_NAME}} excels in app connectivity by supporting multiple connection methods. ' +
 				(hasOpenSource
 					? 'The wallet also provides its own open-source application, ensuring transparency and security. '
 					: '') +
@@ -127,24 +127,24 @@ function excellentDappConnectionSupport(
 	}
 }
 
-export const dappConnectionSupport: Attribute<DappConnectionSupportValue> = {
-	id: 'dappConnectionSupport',
+export const appConnectionSupport: Attribute<AppConnectionSupportValue> = {
+	id: 'appConnectionSupport',
 	icon: '\u{1F517}', // Link symbol
-	displayName: 'dApp Connection Support',
+	displayName: 'app Connection Support',
 	wording: {
 		midSentenceName: null,
-		howIsEvaluated: "How is a hardware wallet's dApp connection support evaluated?",
+		howIsEvaluated: "How is a hardware wallet's app connection support evaluated?",
 		whatCanWalletDoAboutIts: sentence(
-			'Can {{WALLET_NAME}} connect to web3 apps?',
+			'Can {{WALLET_NAME}} connect to web3 applications (apps)?',
 		),
 	},
-	question: sentence('Can the hardware wallet connect to web3 applications (dApps)?'),
+	question: sentence('Can the hardware wallet connect to web3 applications (apps)?'),
 	why: markdown(`
-The ability to connect to web3 applications (dApps) is crucial for hardware wallet 
+The ability to connect to web3 applications (apps) is crucial for hardware wallet 
 users who want to interact with DeFi protocols, NFT marketplaces, and other Web3 services 
 while maintaining the security of their private keys on a hardware device.
 
-Hardware wallets face unique challenges in connecting to dApps because they must maintain 
+Hardware wallets face unique challenges in connecting to apps because they must maintain 
 an air gap for security while still enabling complex interactions. The methods available 
 for connection significantly impact both security and user experience.
 
@@ -154,7 +154,7 @@ protocols or integration with popular software wallets give users
 more choice and transparency.
 `),
 	methodology: markdown(`
-Hardware wallets are evaluated based on their dApp connection capabilities and the 
+Hardware wallets are evaluated based on their app connection capabilities and the 
 variety of methods they support.
 
 A wallet receives a passing rating if it supports multiple connection methods, especially 
@@ -162,15 +162,15 @@ if it includes standard protocols or integration with well-known
 software wallets. Excellent ratings are given to wallets that also provide open-source 
 solutions.
 
-A wallet receives a partial rating if it can connect to dApps but with limitations, such 
+A wallet receives a partial rating if it can connect to apps but with limitations, such 
 as only supporting a proprietary closed-source application or having very few connection 
 options.
 
-A hardware wallet fails this attribute if it cannot connect to dApps at all, severely 
+A hardware wallet fails this attribute if it cannot connect to apps at all, severely 
 limiting its utility in the modern Web3 ecosystem.
 
 This attribute only applies to hardware wallets. Software wallets and smart contract 
-wallets are exempt as they inherently support dApp connections.
+wallets are exempt as they inherently support app connections.
 `),
 	ratingScale: {
 		display: 'pass-fail',
@@ -178,10 +178,10 @@ wallets are exempt as they inherently support dApp connections.
 		pass: [
 			exampleRating(
 				paragraph(`
-			The wallet provides excellent dApp connectivity with support 
+			The wallet provides excellent app connectivity with support 
 			multiple software wallet integrations, and its own open-source application.
 		`),
-				excellentDappConnectionSupport(
+				excellentAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -198,7 +198,7 @@ wallets are exempt as they inherently support dApp connections.
 			The wallet supports multiple connection methods including 
 			several popular software wallets.
 		`),
-				goodDappConnectionSupport(
+				goodAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -212,10 +212,10 @@ wallets are exempt as they inherently support dApp connections.
 		partial: [
 			exampleRating(
 				paragraph(`
-			The wallet can only connect to dApps through its proprietary closed-source 
+			The wallet can only connect to apps through its proprietary closed-source 
 			application, limiting user choice and requiring trust in unverifiable software.
 		`),
-				limitedDappConnectionSupport(
+				limitedAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -226,10 +226,10 @@ wallets are exempt as they inherently support dApp connections.
 			),
 			exampleRating(
 				paragraph(`
-			The wallet has limited dApp connection options, supporting only one or two 
+			The wallet has limited app connection options, supporting only one or two 
 			methods with restrictions.
 		`),
-				limitedDappConnectionSupport(
+				limitedAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -242,17 +242,17 @@ wallets are exempt as they inherently support dApp connections.
 		],
 		fail: exampleRating(
 			paragraph(`
-		The wallet cannot connect to dApps, severely limiting its functionality in the 
+		The wallet cannot connect to apps, severely limiting its functionality in the 
 		Web3 ecosystem.
 	`),
-			noDappConnectionSupport(),
+			noAppConnectionSupport(),
 		),
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<DappConnectionSupportValue> => {
+	evaluate: (features: ResolvedFeatures): Evaluation<AppConnectionSupportValue> => {
 		// Check for ERC-4337 smart wallet
 		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(
-				dappConnectionSupport,
+				appConnectionSupport,
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
 				),
@@ -272,78 +272,78 @@ wallets are exempt as they inherently support dApp connections.
 					rating: Rating.EXEMPT,
 					displayName: 'Only applicable for hardware wallets',
 					shortExplanation: sentence(
-						'This attribute evaluates hardware wallet dApp connection capabilities and is not applicable for software wallets.',
+						'This attribute evaluates hardware wallet app connection capabilities and is not applicable for software wallets.',
 					),
 					connectionDetails: notSupported,
 					__brand: brand,
 				},
 				details: paragraph(
-					'As {{WALLET_NAME}} is a software wallet, this attribute which evaluates hardware wallet dApp connection capabilities is not applicable. Software wallets inherently support dApp connections.',
+					'As {{WALLET_NAME}} is a software wallet, this attribute which evaluates hardware wallet app connection capabilities is not applicable. Software wallets inherently support app connections.',
 				),
 			}
 		}
 
-		// Check if dApp connection support feature exists - rename variable to avoid shadowing
-		const dappSupport = features.dappConnectionSupport
+		// Check if app connection support feature exists - rename variable to avoid shadowing
+		const appSupport = features.appConnectionSupport
 
-		if (!dappSupport) {
-			return unrated(dappConnectionSupport, brand, {
+		if (!appSupport) {
+			return unrated(appConnectionSupport, brand, {
 				connectionDetails: notSupported,
 			})
 		}
 
 		// Extract references if supported
-		const references = isSupported(dappSupport) ? refs(dappSupport) : []
+		const references = isSupported(appSupport) ? refs(appSupport) : []
 
 		const evaluation = (() => {
-			// If not supported, cannot connect to dApps
-			if (!isSupported(dappSupport)) {
-				return noDappConnectionSupport()
+			// If not supported, cannot connect to apps
+			if (!isSupported(appSupport)) {
+				return noAppConnectionSupport()
 			}
 
 			// Get all supported software wallets
-			const supportedSoftwareWallets = getSupportedSoftwareWallets(dappSupport)
+			const supportedSoftwareWallets = getSupportedSoftwareWallets(appSupport)
 
 			// Count the total number of connection methods
-			const totalMethodCount = countAllConnectionMethods(dappSupport)
+			const totalMethodCount = countAllConnectionMethods(appSupport)
 
 			// Determine rating based on connection methods
 			if (totalMethodCount === 0) {
-				return noDappConnectionSupport()
+				return noAppConnectionSupport()
 			}
 
 			// Check for only closed-source proprietary app
 			const hasOnlyClosedSource =
 				totalMethodCount === 1 &&
-				dappSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
+				appSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
 
 			if (hasOnlyClosedSource) {
-				return limitedDappConnectionSupport(dappSupport)
+				return limitedAppConnectionSupport(appSupport)
 			}
 
 			const hasOpenSource =
-				dappSupport.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
+				appSupport.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
 
 			if (totalMethodCount <= 2 && !hasOpenSource) {
-				return limitedDappConnectionSupport(dappSupport)
+				return limitedAppConnectionSupport(appSupport)
 			}
 
 			if (totalMethodCount <= 2 && hasOpenSource) {
-				return goodDappConnectionSupport(dappSupport)
+				return goodAppConnectionSupport(appSupport)
 			}
 
 			// Check for excellent support (3+ methods or includes open source app + others)
 			const hasSoftwareWallets = supportedSoftwareWallets.length > 0
 
 			if (totalMethodCount >= 3 || (hasOpenSource && hasSoftwareWallets)) {
-				return excellentDappConnectionSupport(dappSupport)
+				return excellentAppConnectionSupport(appSupport)
 			}
 
-			return goodDappConnectionSupport(dappSupport)
+			return goodAppConnectionSupport(appSupport)
 		})()
 
 		return { ...evaluation, references }
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<DappConnectionSupportValue>>) =>
-		pickWorstRating<DappConnectionSupportValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<AppConnectionSupportValue>>) =>
+		pickWorstRating<AppConnectionSupportValue>(perVariant),
 }
