@@ -28,9 +28,26 @@ async function codebaseBannedExpressionIndex(): Promise<Map<string, Set<string>>
 		indexFn: (_, fileContents: string): FileBannedExpressionNames => {
 			const matched = new Set<string>()
 
+			const urlRegex = /https?:\/\/[^\s'"`<>]+/gi
+
+			const urls: { start: number; end: number }[] = []
+			let matchUrl
+			while ((matchUrl = urlRegex.exec(fileContents)) !== null) {
+				urls.push({ start: matchUrl.index, end: matchUrl.index + matchUrl[0].length })
+			}
+
+			function isInsideUrl(pos: number): boolean {
+				return urls.some(url => pos >= url.start && pos < url.end)
+			}
+
 			for (const bannedExpr of bannedExpressions) {
-				if (bannedExpr.regexp.test(fileContents)) {
-					matched.add(bannedExpr.name)
+				const regexp = new RegExp(bannedExpr.regexp, 'gi')
+				let match
+				while ((match = regexp.exec(fileContents)) !== null) {
+					if (!isInsideUrl(match.index)) {
+						matched.add(bannedExpr.name)
+						break 
+					}
 				}
 			}
 
