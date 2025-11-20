@@ -131,6 +131,21 @@ export const onekeyWallet: HardwareWallet = {
 				ethereumL1: null,
 			},
 			passkeyVerification: null,
+			publicSecurityAudits: [
+				{
+					ref: [
+						{
+							explanation: 'OneKey Pro security audit by SlowMist',
+							url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OneKey%20Pro_en-us.pdf',
+						},
+					],
+					auditDate: '2024-10-21',
+					auditor: slowMist,
+					codeSnapshot: undefined,
+					unpatchedFlaws: 'ALL_FIXED',
+					variantsScope: { [Variant.HARDWARE]: true },
+				},
+			],
 			signingIntentClarity: {
 				ref: [
 					{
@@ -171,21 +186,6 @@ export const onekeyWallet: HardwareWallet = {
 					},
 				},
 			},
-			publicSecurityAudits: [
-				{
-					ref: [
-						{
-							explanation: 'OneKey Pro security audit by SlowMist',
-							url: 'https://github.com/slowmist/Knowledge-Base/blob/master/open-report-V2/blockchain-application/SlowMist%20Audit%20Report%20-%20OneKey%20Pro_en-us.pdf',
-						},
-					],
-					auditDate: '2024-10-21',
-					auditor: slowMist,
-					codeSnapshot: undefined,
-					unpatchedFlaws: 'ALL_FIXED',
-					variantsScope: { [Variant.HARDWARE]: true },
-				},
-			],
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
