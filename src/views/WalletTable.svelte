@@ -969,9 +969,6 @@
 									const [_attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
 
 									selectedAttribute = attributeId && selectedAttribute === attributeId ? undefined : attributeId
-
-									if (!isExpanded)
-										toggleRowExpanded(wallet.metadata.id)
 								}}
 								onSliceMouseEnter={sliceId => {
 									const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
@@ -1185,9 +1182,6 @@
 
 									if (attributeId) {
 										selectedAttribute = selectedAttribute === attributeId ? undefined : attributeId
-
-										if (!isExpanded)
-											toggleRowExpanded(wallet.metadata.id)
 									}
 								}}
 								onSliceMouseEnter={sliceId => {
