@@ -979,7 +979,7 @@ span svg {
 				--scrollItem-paddingInlineEnd: max(var(--scrollItem-inlineDetached-paddingEnd), (var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2);
 				--scrollItem-paddingInlineMatch: min(var(--scrollItem-paddingInlineStart), var(--scrollItem-paddingInlineEnd));
 
-				width: 100%;
+				inline-size: 100%;
 				padding-inline-start: var(--scrollItem-paddingInlineStart);
 				padding-inline-end: var(--scrollItem-paddingInlineEnd);
 
@@ -994,6 +994,17 @@ span svg {
 
 				&[data-scroll-item~='padding-match-end'] {
 					padding-block-end: min(var(--scrollItem-paddingInlineMatch), var(--scrollItem-inlineDetached-maxPaddingMatchEnd));
+				}
+
+				> :only-child {
+					width: max-content;
+				}
+
+				[data-scroll-item~='inline-detached'] {
+					inline-size: auto;
+					max-inline-size: calc(100% + var(--scrollItem-paddingInlineStart) + var(--scrollItem-paddingInlineEnd));
+					margin-inline-start: calc(-1 * var(--scrollItem-paddingInlineStart));
+					margin-inline-end: calc(-1 * var(--scrollItem-paddingInlineEnd));
 				}
 			}
 			&[data-scroll-item~='inline-attached'] {
