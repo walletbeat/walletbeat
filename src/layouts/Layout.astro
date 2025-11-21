@@ -25,7 +25,7 @@ import Metadata from '@/layouts/Metadata.astro'
 <html lang='en'>
 	<head>
 		<meta charset='UTF-8' />
-		<meta name='viewport' content='width=device-width' />
+		<meta name='viewport' content='width=device-width, viewport-fit=cover' />
 		<Metadata {metadata} />
 		<ClientRouter />
 		<script is:inline>
@@ -58,9 +58,17 @@ import Metadata from '@/layouts/Metadata.astro'
 		/* Rules */
 		width: 100dvw;
 		height: 100dvh;
+		padding: var(--safeArea-insetTop) var(--safeArea-insetRight) var(--safeArea-insetBottom) var(--safeArea-insetLeft);
 		display: grid;
 		align-items: start;
 		gap: var(--separator-width);
+
+		&[data-scroll-container] {
+			--sticky-paddingBlockStart: var(--safeArea-insetTop);
+			--sticky-paddingBlockEnd: var(--safeArea-insetBottom);
+			--sticky-paddingInlineStart: var(--safeArea-insetLeft);
+			--sticky-paddingInlineEnd: var(--safeArea-insetRight);
+		}
 
 		@media not (max-width: 1024px) {
 			grid-template:
