@@ -222,10 +222,10 @@
 		--popover-boxShadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
 
 		position: absolute;
-		position-visibility: anchors-visible;
 		position-area: block-end;
 		position-try-fallbacks: flip-block;
 		position-try-order: most-block-size;
+		position-visibility: anchors-visible;
 
 		margin: var(--offset);
 
@@ -236,7 +236,13 @@
 		backdrop-filter: blur(10px);
 		box-shadow: var(--popover-boxShadow);
 
-		transition-property: display, content-visibility, opacity, scale;
+		transition-property:
+			display,
+			content-visibility,
+			opacity,
+			scale,
+			translate
+		;
 
 		@starting-style {
 			opacity: 0;
@@ -250,6 +256,19 @@
 
 			opacity: 0;
 			scale: 0.95;
+		}
+
+		@media (width <= 40rem) {
+			position-anchor: unset !important;
+			inset: var(--offset);
+			margin: auto;
+			margin-block-end: 0;
+			max-block-size: min(15rem, 50vh);
+			overflow: auto;
+
+			@starting-style {
+				translate: 0 1em;
+			}
 		}
 	}
 </style>
