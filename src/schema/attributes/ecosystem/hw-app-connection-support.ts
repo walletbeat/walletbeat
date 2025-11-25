@@ -9,8 +9,8 @@ import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 import type { AppConnectionMethodDetails } from '@/schema/features/ecosystem/hw-app-connection-support'
 import {
-	countAllConnectionMethods,
 	AppConnectionMethod,
+	countAllConnectionMethods,
 	getSupportedSoftwareWallets,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
@@ -53,8 +53,8 @@ function limitedAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<AppConnectionSupportValue> {
 	const hasOnlyClosedSource =
-		connectionDetails.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] ===
-			true && countAllConnectionMethods(connectionDetails) === 1
+		connectionDetails.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true &&
+		countAllConnectionMethods(connectionDetails) === 1
 
 	return {
 		value: {
@@ -134,9 +134,7 @@ export const appConnectionSupport: Attribute<AppConnectionSupportValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a hardware wallet's app connection support evaluated?",
-		whatCanWalletDoAboutIts: sentence(
-			'Can {{WALLET_NAME}} connect to web3 applications (apps)?',
-		),
+		whatCanWalletDoAboutIts: sentence('Can {{WALLET_NAME}} connect to web3 applications (apps)?'),
 	},
 	question: sentence('Can the hardware wallet connect to web3 applications?'),
 	why: markdown(`
