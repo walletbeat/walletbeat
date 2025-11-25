@@ -50,11 +50,11 @@ jobs:
         env:
           DEPLOY_DIRECTORY: dist
           BLUMEN_4EVERLAND_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
-      - name: Deploy to Lighthouse
-        run: ./deploy/deploy-blumen.sh
-        env:
-          DEPLOY_DIRECTORY: dist
-          BLUMEN_LIGHTHOUSE_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_LIGHTHOUSE_API_KEY }}
+      # - name: Deploy to Lighthouse
+      #   run: ./deploy/deploy-blumen.sh
+      #   env:
+      #     DEPLOY_DIRECTORY: dist
+      #     BLUMEN_LIGHTHOUSE_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_LIGHTHOUSE_API_KEY }}
       - name: Ping IPFS gateways
         run: ./deploy/ping-gateways.sh
         env:

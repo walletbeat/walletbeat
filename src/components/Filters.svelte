@@ -416,7 +416,7 @@
 				}
 
 				.label {
-					flex: 1;
+					flex: 1 0 auto;
 					text-align: left;
 				}
 			}
