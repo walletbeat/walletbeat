@@ -39,11 +39,6 @@ export interface AppConnectionMethodDetails {
 	 * Which connection methods are supported (must have at least one)
 	 */
 	supportedConnections: NonEmptySet<AppConnectionMethod | SoftwareWalletType>
-
-	/**
-	 * Additional details about app connection capabilities
-	 */
-	details?: string
 }
 
 /**
