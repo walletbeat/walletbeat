@@ -50,9 +50,9 @@ function noSigningIntentClarity(
 		value: {
 			id: 'no_signing_intent_clarity',
 			rating: Rating.FAIL,
-			displayName: 'No signing intent clarity support',
+			displayName: 'Unclear transaction details',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} supports does not have effective signing intent clarity.',
+				'{{WALLET_NAME}} does not display clear transaction details when signing.',
 			),
 			messageExtraction,
 			messageDecoding,
