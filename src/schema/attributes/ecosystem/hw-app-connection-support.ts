@@ -41,7 +41,7 @@ function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 			__brand: brand,
 		},
 		details: paragraph(
-			"{{WALLET_NAME}} does not support connecting to web3 applications (apps). This severely limits the wallet's functionality, as users cannot interact with DeFi protocols, NFT marketplaces, or other Web3 applications. Without app connectivity, the wallet can only be used for basic sending and receiving of assets.",
+			"{{WALLET_NAME}} does not support connecting to web3 applications. This severely limits the wallet's functionality, as users cannot interact with DeFi protocols, NFT marketplaces, or other Web3 applications. Without app connectivity, the wallet can only be used for basic sending and receiving of assets.",
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should implement at least one method of connecting to apps such as support through popular software wallets.',
@@ -138,9 +138,9 @@ export const appConnectionSupport: Attribute<AppConnectionSupportValue> = {
 			'Can {{WALLET_NAME}} connect to web3 applications (apps)?',
 		),
 	},
-	question: sentence('Can the hardware wallet connect to web3 applications (apps)?'),
+	question: sentence('Can the hardware wallet connect to web3 applications?'),
 	why: markdown(`
-The ability to connect to web3 applications (apps) is crucial for hardware wallet 
+The ability to connect to web3 applications is crucial for hardware wallet 
 users who want to interact with DeFi protocols, NFT marketplaces, and other Web3 services 
 while maintaining the security of their private keys on a hardware device.
 
@@ -168,9 +168,6 @@ options.
 
 A hardware wallet fails this attribute if it cannot connect to apps at all, severely 
 limiting its utility in the modern Web3 ecosystem.
-
-This attribute only applies to hardware wallets. Software wallets and smart contract 
-wallets are exempt as they inherently support app connections.
 `),
 	ratingScale: {
 		display: 'pass-fail',

@@ -67,7 +67,7 @@ export const bitboxWallet: HardwareWallet = {
 				},
 			],
 			details:
-				'BitBox02 supports dApp connections through their open-source BitBoxApp, WalletConnect protocol, and integration with Rabby wallet.',
+				'BitBox02 supports app connections through their open-source BitBoxApp, WalletConnect protocol, and integration with Rabby wallet.',
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.RABBY]: true,
