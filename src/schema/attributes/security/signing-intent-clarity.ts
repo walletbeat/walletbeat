@@ -206,7 +206,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 		step is crucial for preventing attacks where malicious software might attempt to trick users
 		into signing transactions with different parameters than what they intended.
 		
-		Without this, users are at the mercy of the dApp they are interacting with sending them a bad transactions, either because they have a bug, were hacked, or are malicious. Without a signer being able to verify if their transaction is correct, user should not send such a transaction.
+		Without this, users are at the mercy of the app they are interacting with sending them a bad transactions, either because they have a bug, were hacked, or are malicious. Without a signer being able to verify if their transaction is correct, user should not send such a transaction.
 		
 		Full signing intent clarity implementations ensure that all relevant transaction details (recipient
 		address, amount, fees, etc.) are clearly displayed on the wallet screen, EIP-712 message hashes,
@@ -219,8 +219,8 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 		details are clearly displayed on the wallet screen for verification before signing. This includes
 		support for standard transactions, ERC-20 token transfers, EIP-712 messages and complex contract interactions. 
 
-		The should be able to **display clearly all transaction types on Safe, Aave and Uniswap.**
-		To do so, if the wallet is a hardware wallet, **the wallet MUST be able to connect directly to the dapp**.
+		The should be able to **display clearly all transaction types on Safe, and Aave.**
+		To do so, if the wallet is a hardware wallet, **the wallet MUST be able to connect directly to the app**.
 		
 		A wallet receives a partial rating if it implements signing intent clarity but with limitations, such
 		as not displaying all transaction details or not supporting signing intent clarity for all transaction types.
