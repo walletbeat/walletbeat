@@ -46,7 +46,7 @@ async function codebaseBannedExpressionIndex(): Promise<Map<string, Set<string>>
 				while ((match = regexp.exec(fileContents)) !== null) {
 					if (!isInsideUrl(match.index)) {
 						matched.add(bannedExpr.name)
-						break 
+						break
 					}
 				}
 			}
