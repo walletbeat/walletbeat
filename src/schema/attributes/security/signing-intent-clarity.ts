@@ -9,16 +9,12 @@ import type { ResolvedFeatures } from '@/schema/features'
 import type {
 	CalldataDecodingTypes,
 	DataExtractionMethods,
-	DisplayedTransactionDetails,
 } from '@/schema/features/security/signing-intent-clarity'
 import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
-	displaysNoTransactionDetails,
 	isFullTransactionDetails,
-	noCalldataDecoding,
-	noDataExtraction,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
 } from '@/schema/features/security/signing-intent-clarity'
@@ -31,21 +27,10 @@ import { pickWorstRating, unrated } from '../common'
 const brand = 'attributes.security.signing_intent_clarity'
 
 export type SigningIntentClarityValue = Value & {
-	messageExtraction: DataExtractionMethods | null
-	messageDecoding: CalldataDecodingTypes | null
-	calldataExtraction: DataExtractionMethods | null
-	calldataDecoding: CalldataDecodingTypes | null
-	displayedTransactionDetails: DisplayedTransactionDetails | null
 	__brand: 'attributes.security.signing_intent_clarity'
 }
 
-function noSigningIntentClarity(
-	messageExtraction: DataExtractionMethods | null,
-	messageDecoding: CalldataDecodingTypes | null,
-	calldataExtraction: DataExtractionMethods | null,
-	calldataDecoding: CalldataDecodingTypes | null,
-	displayedTransactionDetails: DisplayedTransactionDetails | null,
-): Evaluation<SigningIntentClarityValue> {
+function noSigningIntentClarity(): Evaluation<SigningIntentClarityValue> {
 	return {
 		value: {
 			id: 'no_signing_intent_clarity',
@@ -54,11 +39,6 @@ function noSigningIntentClarity(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} does not display clear transaction details when signing.',
 			),
-			messageExtraction,
-			messageDecoding,
-			calldataDecoding,
-			calldataExtraction,
-			displayedTransactionDetails,
 			__brand: brand,
 		},
 		details: paragraph(
@@ -70,24 +50,13 @@ function noSigningIntentClarity(
 	}
 }
 
-function basicSigningIntentClarity(
-	messageExtraction: DataExtractionMethods | null,
-	messageDecoding: CalldataDecodingTypes | null,
-	calldataExtraction: DataExtractionMethods | null,
-	calldataDecoding: CalldataDecodingTypes | null,
-	displayedTransactionDetails: DisplayedTransactionDetails | null,
-): Evaluation<SigningIntentClarityValue> {
+function basicSigningIntentClarity(): Evaluation<SigningIntentClarityValue> {
 	return {
 		value: {
 			id: 'basic_signing_intent_clarity',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic signing intent clarity support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports basic signing intent clarity.'),
-			messageExtraction,
-			messageDecoding,
-			calldataExtraction,
-			calldataDecoding,
-			displayedTransactionDetails,
 			__brand: brand,
 		},
 		details: paragraph(
@@ -99,24 +68,13 @@ function basicSigningIntentClarity(
 	}
 }
 
-function partialSigningIntentClarity(
-	messageExtraction: DataExtractionMethods | null,
-	messageDecoding: CalldataDecodingTypes | null,
-	calldataExtraction: DataExtractionMethods | null,
-	calldataDecoding: CalldataDecodingTypes | null,
-	displayedTransactionDetails: DisplayedTransactionDetails | null,
-): Evaluation<SigningIntentClarityValue> {
+function partialSigningIntentClarity(): Evaluation<SigningIntentClarityValue> {
 	return {
 		value: {
 			id: 'partial_signing_intent_clarity',
 			rating: Rating.PARTIAL,
 			displayName: 'Partial signing intent clarity support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports partial signing intent clarity.'),
-			messageExtraction,
-			messageDecoding,
-			calldataExtraction,
-			calldataDecoding,
-			displayedTransactionDetails,
 			__brand: brand,
 		},
 		details: paragraph(
@@ -129,11 +87,6 @@ function partialSigningIntentClarity(
 }
 
 function fullSigningIntentClarity(
-	messageExtraction: DataExtractionMethods | null,
-	messageDecoding: CalldataDecodingTypes | null,
-	calldataExtraction: DataExtractionMethods | null,
-	calldataDecoding: CalldataDecodingTypes | null,
-	displayedTransactionDetails: DisplayedTransactionDetails | null,
 	refs: Array<{ url: string; explanation: string }> = [],
 ): Evaluation<SigningIntentClarityValue> {
 	return {
@@ -142,11 +95,6 @@ function fullSigningIntentClarity(
 			rating: Rating.PASS,
 			displayName: 'Full signing intent clarity support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports full signing intent clarity.'),
-			messageExtraction,
-			messageDecoding,
-			calldataExtraction,
-			calldataDecoding,
-			displayedTransactionDetails,
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -238,17 +186,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 				The wallet implements full signing intent clarity, displaying all
 				transaction details on the wallet screen/window for verification before signing.
 			`),
-			fullSigningIntentClarity(
-				singleDataExtractionMethod(DataExtraction.QRCODE),
-				singleCalldataDecodingType(
-					CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
-				),
-				singleDataExtractionMethod(DataExtraction.QRCODE),
-				singleCalldataDecodingType(
-					CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
-				),
-				displaysFullTransactionDetails,
-			),
+			fullSigningIntentClarity(),
 		),
 		partial: [
 			exampleRating(
@@ -256,34 +194,14 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 					The wallet implements partial signing intent clarity, where most but not all transaction
 					details are displayed on the wallet screen/window.
 				`),
-				partialSigningIntentClarity(
-					singleDataExtractionMethod(DataExtraction.EYES),
-					singleCalldataDecodingType(CalldataDecoding.ETH_USDC_TRANSFER),
-					singleDataExtractionMethod(DataExtraction.EYES),
-					singleCalldataDecodingType(CalldataDecoding.ETH_USDC_TRANSFER),
-					{
-						...displaysNoTransactionDetails,
-						gas: true,
-						nonce: true,
-					},
-				),
+				partialSigningIntentClarity(),
 			),
 			exampleRating(
 				paragraph(`
 					The wallet implements basic signing intent clarity, but the implementation is limited
 					and doesn't provide full transparency for all transaction details.
 				`),
-				basicSigningIntentClarity(
-					singleDataExtractionMethod(DataExtraction.EYES),
-					noCalldataDecoding,
-					singleDataExtractionMethod(DataExtraction.EYES),
-					noCalldataDecoding,
-					{
-						...displaysNoTransactionDetails,
-						gas: true,
-						nonce: true,
-					},
-				),
+				basicSigningIntentClarity(),
 			),
 		],
 		fail: [
@@ -291,26 +209,14 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 				paragraph(`
 					The wallet does not implement effective signing intent clarity.
 				`),
-				noSigningIntentClarity(
-					noDataExtraction,
-					noCalldataDecoding,
-					noDataExtraction,
-					noCalldataDecoding,
-					displaysNoTransactionDetails,
-				),
+				noSigningIntentClarity(),
 			),
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SigningIntentClarityValue> => {
 		// Check if signing intent clarity feature exists
 		if (features.security.signingIntentClarity === null) {
-			return unrated(signingIntentClarity, brand, {
-				messageExtraction: null,
-				messageDecoding: null,
-				calldataDecoding: null,
-				calldataExtraction: null,
-				displayedTransactionDetails: null,
-			})
+			return unrated(signingIntentClarity, brand, null)
 		}
 
 		// Extract references from the wallet signing intent clarity feature
@@ -402,13 +308,7 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 
 		const result = ((): Evaluation<SigningIntentClarityValue> => {
 			if (overallRating === Rating.UNRATED) {
-				return unrated(signingIntentClarity, brand, {
-					messageExtraction,
-					messageDecoding,
-					calldataExtraction,
-					calldataDecoding,
-					displayedTransactionDetails,
-				})
+				return unrated(signingIntentClarity, brand, null)
 			}
 
 			// Necessary check to appease the TypeScript typechecker, as it can't
@@ -427,21 +327,9 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 			}
 
 			if (overallRating === Rating.FAIL) {
-				return noSigningIntentClarity(
-					messageExtraction,
-					messageDecoding,
-					calldataExtraction,
-					calldataDecoding,
-					displayedTransactionDetails,
-				)
+				return noSigningIntentClarity()
 			} else if (overallRating === Rating.PASS) {
-				return fullSigningIntentClarity(
-					messageExtraction,
-					messageDecoding,
-					calldataExtraction,
-					calldataDecoding,
-					displayedTransactionDetails,
-				)
+				return fullSigningIntentClarity()
 			} else {
 				// Determine if it's basic or partial based on some features working
 				const hasPartialSupport =
@@ -449,21 +337,9 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 					!supportsAnyCalldataDecoding(calldataDecoding)
 
 				if (hasPartialSupport) {
-					return partialSigningIntentClarity(
-						messageExtraction,
-						messageDecoding,
-						calldataExtraction,
-						calldataDecoding,
-						displayedTransactionDetails,
-					)
+					return partialSigningIntentClarity()
 				} else {
-					return basicSigningIntentClarity(
-						messageExtraction,
-						messageDecoding,
-						calldataExtraction,
-						calldataDecoding,
-						displayedTransactionDetails,
-					)
+					return basicSigningIntentClarity()
 				}
 			}
 		})()
