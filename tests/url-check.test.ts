@@ -340,6 +340,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-10-31',
 	},
 	{
+		url: 'https://imkey.im/',
+		urlHash: 'a48c5da2453ffb4f5e7ba1f3f9c46bd30e1de5b9',
+		retrieved: '2025-11-05',
+	},
+	{
 		url: 'https://keyst.one/',
 		urlHash: '17e49d498d1f04f47a7c79dd02974ffd60183efc',
 		retrieved: '2025-10-31',

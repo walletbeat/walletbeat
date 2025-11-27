@@ -23,9 +23,9 @@
 		isExpanded: boolean
 		showAccordionMarker?: boolean
 
-		tooltipMaxWidth?: string
-		tooltipButtonTriggerPlacement?: ComponentProps<typeof Tooltip>['buttonTriggerPlacement']
-		tooltipHoverTriggerPlacement?: ComponentProps<typeof Tooltip>['hoverTriggerPlacement']
+	tooltipMaxWidth?: string
+	tooltipButtonTriggerPlacement?: ComponentProps<typeof Tooltip>['buttonTriggerPlacement']
+	tooltipHoverTriggerPlacement?: ComponentProps<typeof Tooltip>['hoverTriggerPlacement']
 
 		children: Snippet
 		ExpandedContent: Snippet<[{ isInTooltip?: boolean }]>

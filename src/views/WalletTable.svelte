@@ -403,6 +403,15 @@
 										}
 									},
 									{
+										id: 'accountType-safe',
+										label: '# Safe',
+										icon: KeyIcon,
+										filterFunction: wallet => {
+											const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
+											return accountTypes !== null && AccountType.safe in accountTypes
+										}
+									},
+									{
 										id: 'accountType-mpc',
 										label: 'MPC',
 										icon: KeyIcon,
@@ -719,6 +728,11 @@
 															filterId: 'accountType-eip7702',
 															type: 'eip',
 															eipTooltipContent: eip7702,
+														},
+														AccountType.safe in accountTypes && {
+															label: '# Safe',
+															filterId: 'accountType-safe',
+															type: 'safe',
 														},
 														AccountType.mpc in accountTypes && {
 															label: 'MPC',

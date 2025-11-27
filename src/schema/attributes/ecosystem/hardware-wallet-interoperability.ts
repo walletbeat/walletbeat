@@ -36,6 +36,7 @@ const majorHardwareWalletManufacturers: NonEmptyArray<HardwareWalletType> = [
 	HardwareWalletType.TREZOR,
 	HardwareWalletType.KEYSTONE,
 	HardwareWalletType.GRIDPLUS,
+	HardwareWalletType.IMKEY,
 ]
 
 const minMajorHardwareWalletManufacturers: number = 3

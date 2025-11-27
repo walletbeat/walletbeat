@@ -268,7 +268,7 @@ export const imtoken: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'imToken works with the imKey Bluetooth hardware wallet, and with Keystone via QR codes.',
+								'imToken works with the imKey hardware wallet via Bluetooth, and with Keystone via QR codes.',
 							url: 'https://support.token.im/hc/en-us/articles/25985632007193-imToken-and-Hardware-Wallets-Uncompromised-Protection-Unparalleled-Convenience',
 						},
 					],
@@ -276,7 +276,7 @@ export const imtoken: SoftwareWallet = {
 						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
 							connectionTypes: [HardwareWalletConnection.QR],
 						}),
-						[HardwareWalletType.OTHER]: supported<SupportedHardwareWallet>({
+						[HardwareWalletType.IMKEY]: supported<SupportedHardwareWallet>({
 							connectionTypes: [HardwareWalletConnection.bluetooth],
 						}),
 					},

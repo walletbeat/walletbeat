@@ -4,6 +4,7 @@ import { bitboxWallet } from './hardware-wallets/bitbox'
 import { cypherockWallet } from './hardware-wallets/cypherock'
 import { fireflyWallet } from './hardware-wallets/firefly'
 import { gridplusWallet } from './hardware-wallets/gridplus'
+import { imkeyWallet } from './hardware-wallets/imkey'
 import { keystoneWallet } from './hardware-wallets/keystone'
 import { ledgerWallet } from './hardware-wallets/ledger'
 import { ngrave } from './hardware-wallets/ngrave'
@@ -17,6 +18,7 @@ export const hardwareWallets = {
 	cypherock: cypherockWallet,
 	firefly: fireflyWallet,
 	gridplus: gridplusWallet,
+	imkey: imkeyWallet,
 	keystone: keystoneWallet,
 	ledger: ledgerWallet,
 	ngrave: ngrave,
