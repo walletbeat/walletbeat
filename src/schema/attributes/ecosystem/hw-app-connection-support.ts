@@ -221,15 +221,16 @@ limiting its utility in the modern Web3 ecosystem.
 			),
 			exampleRating(
 				paragraph(`
-			The wallet has limited app connection options, supporting only one or two 
-			methods with restrictions.
+			The wallet has limited app connection options, supporting only a proprietary 
+			closed-source application and a software wallet integration that requires 
+			permission, without any permissionless options like MetaMask.
 		`),
 				limitedAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
 							[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
-							[SoftwareWalletType.METAMASK]: true,
+							[SoftwareWalletType.OTHER]: true,
 						},
 					}),
 				),
@@ -319,11 +320,15 @@ limiting its utility in the modern Web3 ecosystem.
 			const hasOpenSource =
 				appSupport.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
 
-			if (totalMethodCount <= 2 && !hasOpenSource) {
+			// MetaMask integration is permissionless, so it provides similar benefits to open-source apps
+			const hasPermissionlessIntegration =
+				appSupport.supportedConnections[SoftwareWalletType.METAMASK] === true
+
+			if (totalMethodCount <= 2 && !hasOpenSource && !hasPermissionlessIntegration) {
 				return limitedAppConnectionSupport(appSupport)
 			}
 
-			if (totalMethodCount <= 2 && hasOpenSource) {
+			if (totalMethodCount <= 2 && (hasOpenSource || hasPermissionlessIntegration)) {
 				return goodAppConnectionSupport(appSupport)
 			}
 
