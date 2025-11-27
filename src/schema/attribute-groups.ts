@@ -82,15 +82,15 @@ import {
 } from './attributes/security/passkey-implementation'
 import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
 import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
-import {
-	signingIntentClarity,
-	type SigningIntentClarityValue,
-} from './attributes/security/signing-intent-clarity'
 import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy'
 import {
 	supplyChainFactory,
 	type SupplyChainFactoryValue,
 } from './attributes/security/supply-chain-factory'
+import {
+	signingIntentClarity,
+	type SigningIntentClarityValue,
+} from './attributes/security/transaction-legibility'
 import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
 import {
 	accountPortability,

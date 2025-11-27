@@ -25,9 +25,9 @@ import type { EthereumL1LightClientSupport } from './features/security/light-cli
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
 import type { ScamAlerts } from './features/security/scam-alerts'
 import type { SecurityAudit } from './features/security/security-audits'
-import type { SigningIntentClarityImplementation } from './features/security/signing-intent-clarity'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
+import type { TransactionLegibilityImplementation } from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
@@ -91,8 +91,8 @@ export interface WalletBaseFeatures {
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
 
-		/** Signing intent clarity implementation */
-		signingIntentClarity: VariantFeature<SigningIntentClarityImplementation>
+		/** Transaction legibility implementation */
+		transactionLegibility: VariantFeature<TransactionLegibilityImplementation>
 	}
 
 	/** Privacy features. */
@@ -267,7 +267,7 @@ export interface ResolvedFeatures {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
-		signingIntentClarity: ResolvedFeature<SigningIntentClarityImplementation>
+		transactionLegibility: ResolvedFeature<TransactionLegibilityImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
@@ -378,9 +378,9 @@ export function resolveFeatures(
 				'security.hardwareWalletSupport',
 				features => features.security.hardwareWalletSupport,
 			),
-			signingIntentClarity: baseFeat(
-				'security.signingIntentClarity',
-				features => features.security.signingIntentClarity,
+			transactionLegibility: baseFeat(
+				'security.transactionLegibility',
+				features => features.security.transactionLegibility,
 			),
 			passkeyVerification: baseFeat(
 				'passkeyVerification',
