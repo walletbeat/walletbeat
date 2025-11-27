@@ -25,6 +25,61 @@ import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.app_connection_support'
 
+/**
+ * Builds a description of the supported connection methods
+ */
+function describeConnectionMethods(
+	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
+): string {
+	const methods: string[] = []
+	const supported = connectionDetails.supportedConnections
+
+	if (supported[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true) {
+		methods.push('its proprietary closed-source application')
+	}
+
+	if (supported[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true) {
+		methods.push('its open-source application')
+	}
+
+	if (supported[SoftwareWalletType.METAMASK] === true) {
+		methods.push('MetaMask')
+	}
+
+	if (supported[SoftwareWalletType.RABBY] === true) {
+		methods.push('Rabby')
+	}
+
+	if (supported[SoftwareWalletType.FRAME] === true) {
+		methods.push('Frame')
+	}
+
+	if (supported[SoftwareWalletType.AMBIRE] === true) {
+		methods.push('Ambire')
+	}
+
+	if (supported[SoftwareWalletType.OTHER] === true) {
+		methods.push('other software wallets')
+	}
+
+	if (methods.length === 0) {
+		return 'no connection methods'
+	}
+
+	if (methods.length === 1) {
+		return methods[0]!
+	}
+
+	if (methods.length === 2) {
+		return `${methods[0]} and ${methods[1]}`
+	}
+
+	// 3 or more methods
+	const last = methods.pop()!
+
+	return `${methods.join(', ')}, and ${last}`
+}
+
 export type AppConnectionSupportValue = Value & {
 	connectionDetails: Support<WithRef<AppConnectionMethodDetails>>
 	__brand: 'attributes.security.app_connection_support'
@@ -72,7 +127,7 @@ function limitedAppConnectionSupport(
 		details: paragraph(
 			hasOnlyClosedSource
 				? "{{WALLET_NAME}} can connect to apps, but only through its own proprietary closed-source application. This creates vendor lock-in and requires users to trust the wallet provider's software without the ability to verify its security. Users cannot use their preferred software wallet or standard protocols."
-				: '{{WALLET_NAME}} supports connecting to apps but with limited options. While functional, the restricted connection methods may limit user choice and flexibility in how they interact with Web3 applications.',
+				: `{{WALLET_NAME}} supports connecting to apps but with limited options, only through ${describeConnectionMethods(connectionDetails)}. While functional, the restricted connection methods may limit user choice and flexibility in how they interact with Web3 applications.`,
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should expand its app connection options by supporting standard protocols and enabling connections through popular software wallets. If using a proprietary app, consider open-sourcing it for transparency.',
