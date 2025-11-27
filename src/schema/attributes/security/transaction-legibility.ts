@@ -9,7 +9,7 @@ import type { ResolvedFeatures } from '@/schema/features'
 import type {
 	CalldataDecodingTypes,
 	DataExtractionMethods,
-} from '@/schema/features/security/signing-intent-clarity'
+} from '@/schema/features/security/transaction-legibility'
 import {
 	CalldataDecoding,
 	DataExtraction,
@@ -17,23 +17,23 @@ import {
 	isFullTransactionDetails,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
-} from '@/schema/features/security/signing-intent-clarity'
+} from '@/schema/features/security/transaction-legibility'
 import { refs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.signing_intent_clarity'
+const brand = 'attributes.transaction-legibility'
 
-export type SigningIntentClarityValue = Value & {
-	__brand: 'attributes.security.signing_intent_clarity'
+export type TransactionLegibilityValue = Value & {
+	__brand: 'attributes.transaction-legibility'
 }
 
-function noSigningIntentClarity(): Evaluation<SigningIntentClarityValue> {
+function noTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
-			id: 'no_signing_intent_clarity',
+			id: 'no_transaction_legibility',
 			rating: Rating.FAIL,
 			displayName: 'Unclear transaction details',
 			shortExplanation: sentence(
@@ -42,63 +42,63 @@ function noSigningIntentClarity(): Evaluation<SigningIntentClarityValue> {
 			__brand: brand,
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} implements either zero or very little signing intent clarity. Signature intent clarity is important for security as it allows users to verify transaction details on their wallet screen before signing.',
+			'{{WALLET_NAME}} implements either zero or very little transaction legibility. Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should implement comprehensive signing intent clarity to improve security by allowing users to verify transaction details on their device.',
+			'{{WALLET_NAME}} should implement comprehensive transaction legibility to improve security by allowing users to verify transaction details on their device.',
 		),
 	}
 }
 
-function basicSigningIntentClarity(): Evaluation<SigningIntentClarityValue> {
+function basicTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
-			id: 'basic_signing_intent_clarity',
+			id: 'basic_transaction_legibility',
 			rating: Rating.PARTIAL,
-			displayName: 'Basic signing intent clarity support',
-			shortExplanation: sentence('{{WALLET_NAME}} supports basic signing intent clarity.'),
+			displayName: 'Basic transaction legibility support',
+			shortExplanation: sentence('{{WALLET_NAME}} supports basic transaction legibility.'),
 			__brand: brand,
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} supports basic signing intent clarity, but the implementation does not provide full transparency for all transaction details. Signature intent clarity is important for security as it allows users to verify transaction details on their wallet screen before signing.',
+			'{{WALLET_NAME}} supports basic transaction legibility, but the implementation does not provide full transparency for all transaction details. Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should improve its signing intent clarity implementation to provide full transparency for all transaction details and better calldata extraction methods.',
+			'{{WALLET_NAME}} should improve its transaction legibility implementation to provide full transparency for all transaction details and better calldata extraction methods.',
 		),
 	}
 }
 
-function partialSigningIntentClarity(): Evaluation<SigningIntentClarityValue> {
+function partialTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
-			id: 'partial_signing_intent_clarity',
+			id: 'partial_transaction_legibility',
 			rating: Rating.PARTIAL,
-			displayName: 'Partial signing intent clarity support',
-			shortExplanation: sentence('{{WALLET_NAME}} supports partial signing intent clarity.'),
+			displayName: 'Partial transaction legibility support',
+			shortExplanation: sentence('{{WALLET_NAME}} supports partial transaction legibility.'),
 			__brand: brand,
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} supports partial signing intent clarity. Most transaction details are displayed on the wallet screen/window for verification, but some complex transactions may not show all details. Showing transaction details (signing intent clarity) is crucial for security as it allows users to verify transaction details before signing.',
+			'{{WALLET_NAME}} supports partial transaction legibility. Most transaction details are displayed on the wallet screen/window for verification, but some complex transactions may not show all details. Showing transaction details (transaction legibility) is crucial for security as it allows users to verify transaction details before signing.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should extend its signing intent clarity implementation to cover all transaction types and ensure all details are clearly displayed with better extraction methods.',
+			'{{WALLET_NAME}} should extend its transaction legibility implementation to cover all transaction types and ensure all details are clearly displayed with better extraction methods.',
 		),
 	}
 }
 
-function fullSigningIntentClarity(
+function fullTransactionLegibility(
 	refs: Array<{ url: string; explanation: string }> = [],
-): Evaluation<SigningIntentClarityValue> {
+): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
-			id: 'full_signing_intent_clarity',
+			id: 'full_transaction_legibility',
 			rating: Rating.PASS,
-			displayName: 'Full signing intent clarity support',
-			shortExplanation: sentence('{{WALLET_NAME}} supports full signing intent clarity.'),
+			displayName: 'Full transaction legibility support',
+			shortExplanation: sentence('{{WALLET_NAME}} supports full transaction legibility.'),
 			__brand: brand,
 		},
 		details: mdParagraph(
-			'{{WALLET_NAME}} full signing intent clarity. All transaction details are clearly displayed on the wallet screen/window for verification before signing, providing maximum security and transparency for users.',
+			'{{WALLET_NAME}} full transaction legibility. All transaction details are clearly displayed on the wallet screen/window for verification before signing, providing maximum security and transparency for users.',
 		),
 		// Include references if provided
 		references: refs.length > 0 ? refs : undefined,
@@ -134,10 +134,10 @@ function singleCalldataDecodingType(calldataDecoding: CalldataDecoding): Calldat
 	}
 }
 
-export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
-	id: 'signingIntentClarity',
+export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
+	id: 'transactionLegibility',
 	icon: '\u{1F50F}', // Lock with pen
-	displayName: 'Signing Intent Clarity',
+	displayName: 'Transaction Legibility',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: 'How is a wallet evaluated for clearly showing what users are signing?',
@@ -149,31 +149,31 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 		'When signing a transaction, does the wallet show transaction details clearly?',
 	),
 	why: markdown(`
-		Signing intent clarity is a critical security feature for wallets that allows users to verify
+		Transaction legibility is a critical security feature for wallets that allows users to verify
 		transaction details directly on their wallet's screen/window before signing. This verification
 		step is crucial for preventing attacks where malicious software might attempt to trick users
 		into signing transactions with different parameters than what they intended.
 		
 		Without this, users are at the mercy of the app they are interacting with sending them a bad transactions, either because they have a bug, were hacked, or are malicious. Without a signer being able to verify if their transaction is correct, user should not send such a transaction.
 		
-		Full signing intent clarity implementations ensure that all relevant transaction details (recipient
+		Full transaction legibility implementations ensure that all relevant transaction details (recipient
 		address, amount, fees, etc.) are clearly displayed on the wallet screen, EIP-712 message hashes,
 		and decoded calldata, allowing users to make informed decisions before authorizing transactions.
 	`),
 	methodology: markdown(`
 		Wallets are evaluated based on how clearly they display transaction details for a specific set of benchmark transactions.
 
-		A wallet receives a passing rating if it implements full signing intent clarity, where all transaction
+		A wallet receives a passing rating if it implements full transaction legibility, where all transaction
 		details are clearly displayed on the wallet screen for verification before signing. This includes
 		support for standard transactions, ERC-20 token transfers, EIP-712 messages and complex contract interactions. 
 
 		The should be able to **display clearly all transaction types on Safe, and Aave.**
 		To do so, if the wallet is a hardware wallet, **the wallet MUST be able to connect directly to the app**.
 		
-		A wallet receives a partial rating if it implements signing intent clarity but with limitations, such
-		as not displaying all transaction details or not supporting signing intent clarity for all transaction types.
+		A wallet receives a partial rating if it implements transaction legibility but with limitations, such
+		as not displaying all transaction details or not supporting transaction legibility for all transaction types.
 		
-		A hardware wallet fails this attribute if it doesn't properly implement signing intent clarity functionality,
+		A hardware wallet fails this attribute if it doesn't properly implement transaction legibility functionality,
 		requiring users to trust the connected software wallet without independent verification.
 
 		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet itself. Any data shown on a software wallet component is ignored for hardware wallet ratings.
@@ -183,54 +183,54 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 		exhaustive: true,
 		pass: exampleRating(
 			paragraph(`
-				The wallet implements full signing intent clarity, displaying all
+				The wallet implements full transaction legibility, displaying all
 				transaction details on the wallet screen/window for verification before signing.
 			`),
-			fullSigningIntentClarity(),
+			fullTransactionLegibility(),
 		),
 		partial: [
 			exampleRating(
 				paragraph(`
-					The wallet implements partial signing intent clarity, where most but not all transaction
+					The wallet implements partial transaction legibility, where most but not all transaction
 					details are displayed on the wallet screen/window.
 				`),
-				partialSigningIntentClarity(),
+				partialTransactionLegibility(),
 			),
 			exampleRating(
 				paragraph(`
-					The wallet implements basic signing intent clarity, but the implementation is limited
+					The wallet implements basic transaction legibility, but the implementation is limited
 					and doesn't provide full transparency for all transaction details.
 				`),
-				basicSigningIntentClarity(),
+				basicTransactionLegibility(),
 			),
 		],
 		fail: [
 			exampleRating(
 				paragraph(`
-					The wallet does not implement effective signing intent clarity.
+					The wallet does not implement effective transaction legibility.
 				`),
-				noSigningIntentClarity(),
+				noTransactionLegibility(),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<SigningIntentClarityValue> => {
-		// Check if signing intent clarity feature exists
-		if (features.security.signingIntentClarity === null) {
-			return unrated(signingIntentClarity, brand, null)
+	evaluate: (features: ResolvedFeatures): Evaluation<TransactionLegibilityValue> => {
+		// Check if transaction legibility feature exists
+		if (features.security.transactionLegibility === null) {
+			return unrated(transactionLegibility, brand, null)
 		}
 
-		// Extract references from the wallet signing intent clarity feature
-		const references = refs(features.security.signingIntentClarity)
+		// Extract references from the wallet transaction legibility feature
+		const references = refs(features.security.transactionLegibility)
 
 		const messageExtraction =
-			features.security.signingIntentClarity.messageSigning.messageExtraction
-		const messageDecoding = features.security.signingIntentClarity.messageSigning.calldataDecoding
+			features.security.transactionLegibility.messageSigning.messageExtraction
+		const messageDecoding = features.security.transactionLegibility.messageSigning.calldataDecoding
 		const calldataExtraction =
-			features.security.signingIntentClarity.transactionSigning.calldataExtraction
+			features.security.transactionLegibility.transactionSigning.calldataExtraction
 		const calldataDecoding =
-			features.security.signingIntentClarity.transactionSigning.calldataDecoding
+			features.security.transactionLegibility.transactionSigning.calldataDecoding
 		const displayedTransactionDetails =
-			features.security.signingIntentClarity.transactionSigning.displayedTransactionDetails
+			features.security.transactionLegibility.transactionSigning.displayedTransactionDetails
 
 		// Determine overall rating based on all features
 		const getOverallRating = (): Rating => {
@@ -306,9 +306,9 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 
 		const overallRating = getOverallRating()
 
-		const result = ((): Evaluation<SigningIntentClarityValue> => {
+		const result = ((): Evaluation<TransactionLegibilityValue> => {
 			if (overallRating === Rating.UNRATED) {
-				return unrated(signingIntentClarity, brand, null)
+				return unrated(transactionLegibility, brand, null)
 			}
 
 			// Necessary check to appease the TypeScript typechecker, as it can't
@@ -327,9 +327,9 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 			}
 
 			if (overallRating === Rating.FAIL) {
-				return noSigningIntentClarity()
+				return noTransactionLegibility()
 			} else if (overallRating === Rating.PASS) {
-				return fullSigningIntentClarity()
+				return fullTransactionLegibility()
 			} else {
 				// Determine if it's basic or partial based on some features working
 				const hasPartialSupport =
@@ -337,9 +337,9 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 					!supportsAnyCalldataDecoding(calldataDecoding)
 
 				if (hasPartialSupport) {
-					return partialSigningIntentClarity()
+					return partialTransactionLegibility()
 				} else {
-					return basicSigningIntentClarity()
+					return basicTransactionLegibility()
 				}
 			}
 		})()
@@ -350,6 +350,6 @@ export const signingIntentClarity: Attribute<SigningIntentClarityValue> = {
 			references,
 		}
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SigningIntentClarityValue>>) =>
-		pickWorstRating<SigningIntentClarityValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<TransactionLegibilityValue>>) =>
+		pickWorstRating<TransactionLegibilityValue>(perVariant),
 }

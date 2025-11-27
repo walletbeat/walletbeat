@@ -292,9 +292,9 @@ export interface TransactionSigningSupport {
 }
 
 /**
- * A record of signing intent clarity support (both message and transaction)
+ * A record of transaction legibility support (both message and transaction)
  */
-export interface SigningIntentClaritySupport {
+export interface TransactionLegibilitySupport {
 	/**
 	 * Message signing support
 	 */
@@ -313,4 +313,4 @@ export const isFullTransactionDetails = (details: DisplayedTransactionDetails): 
 
 export type MessageSigningImplementation = WithRef<MessageSigningSupport>
 export type TransactionSigningImplementation = WithRef<TransactionSigningSupport>
-export type SigningIntentClarityImplementation = WithRef<SigningIntentClaritySupport>
+export type TransactionLegibilityImplementation = WithRef<TransactionLegibilitySupport>
