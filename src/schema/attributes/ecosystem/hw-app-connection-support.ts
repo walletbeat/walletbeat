@@ -10,7 +10,6 @@ import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-
 import type { AppConnectionMethodDetails } from '@/schema/features/ecosystem/hw-app-connection-support'
 import {
 	AppConnectionMethod,
-	countAllConnectionMethods,
 	getSupportedSoftwareWallets,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
@@ -104,80 +103,68 @@ function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 	}
 }
 
-function limitedAppConnectionSupport(
+function unverifiableAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<AppConnectionSupportValue> {
-	const hasOnlyClosedSource =
-		connectionDetails.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true &&
-		countAllConnectionMethods(connectionDetails) === 1
-
 	return {
 		value: {
-			id: 'limited_app_connection',
+			id: 'unverifiable_app_connection',
 			rating: Rating.PARTIAL,
-			displayName: 'Limited app connection support',
+			displayName: 'Unverifiable app connection support',
 			shortExplanation: sentence(
-				hasOnlyClosedSource
-					? '{{WALLET_NAME}} can only connect to apps through its proprietary closed-source application.'
-					: '{{WALLET_NAME}} has limited options for connecting to apps.',
+				'{{WALLET_NAME}} can connect to apps, but requires trusting unverifiable code.',
 			),
 			connectionDetails,
 			__brand: brand,
 		},
 		details: paragraph(
-			hasOnlyClosedSource
-				? "{{WALLET_NAME}} can connect to apps, but only through its own proprietary closed-source application. This creates vendor lock-in and requires users to trust the wallet provider's software without the ability to verify its security. Users cannot use their preferred software wallet or standard protocols."
-				: `{{WALLET_NAME}} supports connecting to apps but with limited options, only through ${describeConnectionMethods(connectionDetails)}. While functional, the restricted connection methods may limit user choice and flexibility in how they interact with Web3 applications.`,
+			"{{WALLET_NAME}} can connect to apps, but only through its proprietary closed-source application. This requires users to trust the wallet provider's software without the ability to verify its security. While functional, this creates vendor lock-in and prevents users from using standard protocols or their preferred software wallets.",
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should expand its app connection options by supporting standard protocols and enabling connections through popular software wallets. If using a proprietary app, consider open-sourcing it for transparency.',
+			'{{WALLET_NAME}} should support standard protocols and enable connections through popular software wallets, or open-source its application for transparency and verifiability.',
 		),
 	}
 }
 
-function goodAppConnectionSupport(
+function limitedVerifiableAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<AppConnectionSupportValue> {
 	return {
 		value: {
-			id: 'good_app_connection',
-			rating: Rating.PASS,
-			displayName: 'Good app connection support',
+			id: 'limited_verifiable_app_connection',
+			rating: Rating.PARTIAL,
+			displayName: 'Limited verifiable app connection support',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} provides multiple secure methods for connecting to apps.',
+				'{{WALLET_NAME}} can connect to some apps using verifiable code or open standards, but with limitations.',
+			),
+			connectionDetails,
+			__brand: brand,
+		},
+		details: paragraph(
+			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)}, which uses verifiable code or open standards. However, this connection method has limitations that prevent it from connecting to all apps, restricting the wallet's full utility in the Web3 ecosystem.`,
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should support standard protocols that enable connections to any app, such as integration with popular software wallets like MetaMask.',
+		),
+	}
+}
+
+function verifiableUniversalAppConnectionSupport(
+	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
+): Evaluation<AppConnectionSupportValue> {
+	return {
+		value: {
+			id: 'verifiable_universal_app_connection',
+			rating: Rating.PASS,
+			displayName: 'Verifiable universal app connection support',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} can connect to any app using entirely verifiable code or open standards.',
 			),
 			connectionDetails,
 			__brand: brand,
 		},
 		details: mdParagraph(
-			"{{WALLET_NAME}} offers good app connectivity with multiple connection methods. Users have flexibility in choosing how to interact with web3 applications, whether through software wallet integrations, or the wallet's own application.",
-		),
-	}
-}
-
-function excellentAppConnectionSupport(
-	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<AppConnectionSupportValue> {
-	const hasOpenSource =
-		connectionDetails.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
-
-	return {
-		value: {
-			id: 'excellent_app_connection',
-			rating: Rating.PASS,
-			displayName: 'Excellent app connection support',
-			shortExplanation: sentence(
-				'{{WALLET_NAME}} provides comprehensive app connectivity with maximum user choice.',
-			),
-			connectionDetails,
-			__brand: brand,
-		},
-		details: mdParagraph(
-			'{{WALLET_NAME}} excels in app connectivity by supporting multiple connection methods. ' +
-				(hasOpenSource
-					? 'The wallet also provides its own open-source application, ensuring transparency and security. '
-					: '') +
-				'This comprehensive support gives users maximum flexibility and choice in how they interact with Web3 applications.',
+			`{{WALLET_NAME}} supports connecting to any app through ${describeConnectionMethods(connectionDetails)}, which uses entirely verifiable code or open standards. This provides users with full access to the Web3 ecosystem while maintaining transparency and security through verifiable connection methods.`,
 		),
 	}
 }
@@ -207,17 +194,16 @@ protocols or integration with popular software wallets give users
 more choice and transparency.
 `),
 	methodology: markdown(`
-Hardware wallets are evaluated based on their app connection capabilities and the 
-variety of methods they support.
+Hardware wallets are evaluated based on the reliability, openness, and breadth of their 
+best app connection method, not the number of connection methods available.
 
-A wallet receives a passing rating if it supports multiple connection methods, especially 
-if it includes standard protocols or integration with well-known 
-software wallets. Excellent ratings are given to wallets that also provide open-source 
-solutions.
+A wallet receives a passing rating if it can connect to any app using entirely verifiable 
+code or open standards, such as through integration with popular software wallets or 
+open-source applications.
 
-A wallet receives a partial rating if it can connect to apps but with limitations, such 
-as only supporting a proprietary closed-source application or having very few connection 
-options.
+A wallet receives a partial rating if it can connect to apps but requires trusting 
+unverifiable code (such as a proprietary closed-source application), or if it can only 
+connect to some apps even when using verifiable code or open standards.
 
 A hardware wallet fails this attribute if it cannot connect to apps at all, severely 
 limiting its utility in the modern Web3 ecosystem.
@@ -228,15 +214,14 @@ limiting its utility in the modern Web3 ecosystem.
 		pass: [
 			exampleRating(
 				paragraph(`
-			The wallet provides excellent app connectivity with support 
-			multiple software wallet integrations, and its own open-source application.
+			The wallet can connect to any app using entirely verifiable code or open 
+			standards, such as through integration with popular software wallets like 
+			MetaMask or Rabby.
 		`),
-				excellentAppConnectionSupport(
+				verifiableUniversalAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
-							[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
-							[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
 							[SoftwareWalletType.METAMASK]: true,
 							[SoftwareWalletType.RABBY]: true,
 						},
@@ -245,10 +230,10 @@ limiting its utility in the modern Web3 ecosystem.
 			),
 			exampleRating(
 				paragraph(`
-			The wallet supports multiple connection methods including 
-			several popular software wallets.
+			The wallet can connect to any app through its open-source application, 
+			providing verifiable and transparent connection methods.
 		`),
-				goodAppConnectionSupport(
+				verifiableUniversalAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -262,10 +247,10 @@ limiting its utility in the modern Web3 ecosystem.
 		partial: [
 			exampleRating(
 				paragraph(`
-			The wallet can only connect to apps through its proprietary closed-source 
-			application, limiting user choice and requiring trust in unverifiable software.
+			The wallet can connect to apps, but only through its proprietary closed-source 
+			application, requiring users to trust unverifiable code.
 		`),
-				limitedAppConnectionSupport(
+				unverifiableAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -276,16 +261,14 @@ limiting its utility in the modern Web3 ecosystem.
 			),
 			exampleRating(
 				paragraph(`
-			The wallet has limited app connection options, supporting only a proprietary 
-			closed-source application and a software wallet integration that requires 
-			permission, without any permissionless options like MetaMask.
+			The wallet can connect to some apps using verifiable code or open standards, 
+			but has limitations that prevent it from connecting to all apps.
 		`),
-				limitedAppConnectionSupport(
+				limitedVerifiableAppConnectionSupport(
 					supported({
 						ref: refTodo,
 						supportedConnections: {
-							[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
-							[SoftwareWalletType.OTHER]: true,
+							[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 						},
 					}),
 				),
@@ -352,49 +335,40 @@ limiting its utility in the modern Web3 ecosystem.
 				return noAppConnectionSupport()
 			}
 
-			// Get all supported software wallets
-			const supportedSoftwareWallets = getSupportedSoftwareWallets(appSupport)
+			// Determine rating based on the best connection method available
+			// Priority: software wallet integration (universal + verifiable) > 
+			//           vendor open-source app (verifiable but potentially limited) > 
+			//           vendor closed-source app (unverifiable)
 
-			// Count the total number of connection methods
-			const totalMethodCount = countAllConnectionMethods(appSupport)
+			// Check if there's any software wallet integration (universal + verifiable)
+			const hasSoftwareWalletIntegration = getSupportedSoftwareWallets(appSupport).length > 0
 
-			// Determine rating based on connection methods
-			if (totalMethodCount === 0) {
-				return noAppConnectionSupport()
+			if (hasSoftwareWalletIntegration) {
+				// Can connect to any app using verifiable code/open standards → PASS
+				return verifiableUniversalAppConnectionSupport(appSupport)
 			}
 
-			// Check for only closed-source proprietary app
-			const hasOnlyClosedSource =
-				totalMethodCount === 1 &&
-				appSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
-
-			if (hasOnlyClosedSource) {
-				return limitedAppConnectionSupport(appSupport)
-			}
-
+			// Check for vendor open-source app
 			const hasOpenSource =
 				appSupport.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
 
-			// MetaMask integration is permissionless, so it provides similar benefits to open-source apps
-			const hasPermissionlessIntegration =
-				appSupport.supportedConnections[SoftwareWalletType.METAMASK] === true
-
-			if (totalMethodCount <= 2 && !hasOpenSource && !hasPermissionlessIntegration) {
-				return limitedAppConnectionSupport(appSupport)
+			if (hasOpenSource) {
+				// Can connect to some apps using verifiable code/open standards → PARTIAL
+				// (We assume vendor apps are limited unless proven otherwise)
+				return limitedVerifiableAppConnectionSupport(appSupport)
 			}
 
-			if (totalMethodCount <= 2 && (hasOpenSource || hasPermissionlessIntegration)) {
-				return goodAppConnectionSupport(appSupport)
+			// Check for vendor closed-source app
+			const hasClosedSource =
+				appSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
+
+			if (hasClosedSource) {
+				// Can connect to apps but requires trusting unverifiable code → PARTIAL
+				return unverifiableAppConnectionSupport(appSupport)
 			}
 
-			// Check for excellent support (3+ methods or includes open source app + others)
-			const hasSoftwareWallets = supportedSoftwareWallets.length > 0
-
-			if (totalMethodCount >= 3 || (hasOpenSource && hasSoftwareWallets)) {
-				return excellentAppConnectionSupport(appSupport)
-			}
-
-			return goodAppConnectionSupport(appSupport)
+			// Should not reach here if feature data is correct, but handle gracefully
+			return noAppConnectionSupport()
 		})()
 
 		return { ...evaluation, references }
