@@ -59,7 +59,12 @@ export const onekeyWallet: HardwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'OneKey Secures Series B Funding at $150M Valuation, Led by YZi Labs',
+					url: 'https://onekey.so/blog/updates/onekey-secures-series-b-funding/',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -70,7 +75,7 @@ export const onekeyWallet: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
