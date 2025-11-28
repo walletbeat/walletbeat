@@ -46,7 +46,12 @@ export const gridplusWallet: HardwareWallet = {
 		accountSupport: null,
 		licensing: null,
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Grid+ is the first internally incubated venture to spin out of ConsenSys.',
+					url: 'https://medium.com/@mark_dago/grid-progress-report-12-15-2017-fdb4e24ed2ed',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -57,7 +62,7 @@ export const gridplusWallet: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
