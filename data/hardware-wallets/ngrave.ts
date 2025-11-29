@@ -57,7 +57,12 @@ export const ngrave: HardwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Crypto hardware wallet NGRAVE raises $6M seed round',
+					url: 'https://ngrave.io/en/crypto-hardware-wallet-ngrave-raises-6m-seed-round',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -68,7 +73,7 @@ export const ngrave: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
