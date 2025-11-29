@@ -71,7 +71,13 @@ export const ledgerWallet: HardwareWallet = {
 		accountSupport: null,
 		licensing: null,
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'Ledger raises $380 million to make digital assets more secure and accessible to everyone',
+					url: 'https://www.ledger.com/ledger-raises-380-million-to-make-digital-assets-more-secure-and-accessible-to-everyone',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -82,7 +88,7 @@ export const ledgerWallet: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
