@@ -50,6 +50,7 @@ import {
 	type VariantFeature,
 } from './variants'
 import { variantToWalletType, type WalletType } from './wallet-types'
+import type { SecureElementSupport } from './features/security/secure-element'
 
 /**
  * A set of features about any type of wallet.
@@ -77,6 +78,9 @@ export interface WalletBaseFeatures {
 		 * the fact that we haven't checked whether there have been any audit.
 		 */
 		publicSecurityAudits: SecurityAudit[] | null
+
+		/** Secure element support */
+		secureElement: VariantFeature<Support<SecureElementSupport>>
 
 		/** Bug bounty program implementation */
 		bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>>
