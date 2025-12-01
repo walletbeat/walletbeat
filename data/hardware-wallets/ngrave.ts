@@ -146,8 +146,13 @@ export const ngrave: HardwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			secureElement: supported({
-				ref: refTodo,
-				secureElementType: SecureElementType.EAL_6_PLUS,
+				ref: [
+					{
+						explanation: 'The only crypto hardware wallet that achieved EAL7 certification.',
+						url: 'https://ngrave.io/en/zero',
+					},
+				],
+				secureElementType: SecureElementType.EAL_7,
 			}),
 			supplyChainDIY: null,
 			supplyChainFactory: null,

@@ -164,7 +164,13 @@ export const ledgerWallet: HardwareWallet = {
 			},
 			publicSecurityAudits: null,
 			secureElement: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Ledger devices have an EAL 5+ or an EAL 6+ certification depending on which device you get.',
+						url: 'https://www.ledger.com/academy/security/the-secure-element-whistanding-security-attacks',
+					},
+				],
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
 			supplyChainDIY: null,

@@ -161,7 +161,13 @@ export const trezorWallet: HardwareWallet = {
 			},
 			publicSecurityAudits: null,
 			secureElement: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Equipped with features including the Secure Element (EAL6+) and device-entry passphrase, it’s an impenetrable security pair.',
+						url: 'https://trezor.io/trezor-safe-3?',
+					},
+				],
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
 			supplyChainDIY: null,

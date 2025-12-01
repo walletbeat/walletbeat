@@ -176,7 +176,13 @@ export const onekeyWallet: HardwareWallet = {
 				},
 			],
 			secureElement: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Built with an EAL 6+ Secure Element, the same level of chip security used in government IDs, passports, and EMV bank cards.',
+						url: 'https://onekey.so/products/onekey-classic-1s-hardware-wallet/',
+					},
+				],
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
 			supplyChainDIY: null,

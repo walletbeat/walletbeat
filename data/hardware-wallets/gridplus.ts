@@ -150,7 +150,13 @@ export const gridplusWallet: HardwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			secureElement: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'The Lattice1 meets stringent security industry standards including FIPS, PCI, and EAL 6+ and is the only hardware wallet designed to safeguard against edge case risks such as attackers remotely accessing a users secrets via RF emissions.',
+						url: 'https://www.prnewswire.com/news-releases/gridplus-sets-a-new-standard-for-blockchain-security-with-the-release-of-the-enterprise-grade-lattice1-wireless-hardware-wallet-301186849.html',
+					},
+				],
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
 			supplyChainDIY: null,

@@ -182,7 +182,13 @@ export const keystoneWallet: HardwareWallet = {
 				},
 			],
 			secureElement: supported({
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Keystone 3 incorporates a PCI-grade anti-tampering feature, with an intricate ‘security house’ of circuitry encompassing the core IC and SE chips.',
+						url: 'https://blog.keyst.one/secure-elements-the-bedrock-of-hardware-wallet-security-1dd8cbdef461',
+					},
+				],
 				secureElementType: SecureElementType.PCI,
 			}),
 			supplyChainDIY: null,
