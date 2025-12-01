@@ -79,9 +79,6 @@ export interface WalletBaseFeatures {
 		 */
 		publicSecurityAudits: SecurityAudit[] | null
 
-		/** Secure element support */
-		secureElement: VariantFeature<Support<SecureElementSupport>>
-
 		/** Bug bounty program implementation */
 		bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>>
 
@@ -211,6 +208,8 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
+		/** Secure element support */
+		secureElement: VariantFeature<Support<SecureElementSupport>>
 	}
 	privacy: WalletBaseFeatures['privacy'] & {
 		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>
