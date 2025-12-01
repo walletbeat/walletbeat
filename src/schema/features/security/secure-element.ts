@@ -1,4 +1,4 @@
-import type { WithRef } from "@/schema/reference";
+import type { WithRef } from '@/schema/reference'
 export type SecureElementSupport = WithRef<{
 	secureElementType: SecureElementType
 }>

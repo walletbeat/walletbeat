@@ -81,6 +81,7 @@ export const fireflyWallet: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
+			secureElement: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
