@@ -6,7 +6,7 @@ import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
-} from '@/schema/features/security/hardware-wallet-app-signing'
+} from '@/schema/features/security/transaction-legibility'
 import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -49,6 +49,7 @@ export const imkeyWallet: HardwareWallet = {
 	},
 
 	features: {
+		appConnectionSupport: null,
 		accountSupport: null,
 
 		licensing: {
@@ -132,7 +133,7 @@ export const imkeyWallet: HardwareWallet = {
 				url: 'https://support.imkey.im/hc/en-001/articles/36709320202649',
 			},
 
-			hardwareWalletAppSigning: {
+			transactionLegibility: {
 				ref: [
 					{
 						explanation:
@@ -157,6 +158,7 @@ export const imkeyWallet: HardwareWallet = {
 						[DataExtraction.EYES]: true,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
+						[DataExtraction.COPY]: null,
 					},
 				},
 				transactionSigning: {
@@ -171,6 +173,7 @@ export const imkeyWallet: HardwareWallet = {
 						[DataExtraction.EYES]: true,
 						[DataExtraction.HASHES]: false,
 						[DataExtraction.QRCODE]: false,
+						[DataExtraction.COPY]: null,
 					},
 					details:
 						'imKey acts as a signing device; transaction decoding and UI are performed by imToken/Rabby. On-device prompts confirm and sign the request.',
