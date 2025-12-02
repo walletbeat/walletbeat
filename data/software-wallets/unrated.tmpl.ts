@@ -79,7 +79,7 @@ export const unratedTemplate: SoftwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			signingIntentClarity: null,
+			transactionLegibility: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

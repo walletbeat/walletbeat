@@ -401,7 +401,7 @@ export const daimo: SoftwareWallet = {
 					userWhitelist: false,
 				}),
 			},
-			signingIntentClarity: null,
+			transactionLegibility: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

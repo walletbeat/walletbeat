@@ -349,7 +349,7 @@ export const metamask: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: refTodo,
 				messageSigning: {
 					calldataDecoding: {

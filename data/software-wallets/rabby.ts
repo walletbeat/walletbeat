@@ -600,7 +600,7 @@ export const rabby: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: refTodo,
 				messageSigning: {
 					calldataDecoding: {

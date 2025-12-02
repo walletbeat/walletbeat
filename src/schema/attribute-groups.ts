@@ -88,8 +88,8 @@ import {
 	type SupplyChainFactoryValue,
 } from './attributes/security/supply-chain-factory'
 import {
-	signingIntentClarity,
-	type SigningIntentClarityValue,
+	transactionLegibility,
+	type TransactionLegibilityValue,
 } from './attributes/security/transaction-legibility'
 import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
 import {
@@ -130,7 +130,7 @@ type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
 	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
-	signingIntentClarity: SigningIntentClarityValue
+	transactionLegibility: TransactionLegibilityValue
 	hardwareWalletSupport: HardwareWalletSupportValue
 	passkeyImplementation: PasskeyImplementationValue
 	bugBountyProgram: BugBountyProgramValue
@@ -151,7 +151,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		securityAudits,
 		scamPrevention,
 		chainVerification,
-		signingIntentClarity,
+		transactionLegibility,
 		hardwareWalletSupport,
 		passkeyImplementation,
 		bugBountyProgram,
@@ -165,7 +165,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		securityAudits: 1.0,
 		scamPrevention: 1.0,
 		chainVerification: 1.0,
-		signingIntentClarity: 1.0,
+		transactionLegibility: 1.0,
 		hardwareWalletSupport: 1.0,
 		passkeyImplementation: 1.0,
 		bugBountyProgram: 1.0,
@@ -448,7 +448,7 @@ export function evaluateAttributes(
 			securityAudits: evalAttr(securityAudits),
 			scamPrevention: evalAttr(scamPrevention),
 			chainVerification: evalAttr(chainVerification),
-			signingIntentClarity: evalAttr(signingIntentClarity),
+			transactionLegibility: evalAttr(transactionLegibility),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
@@ -520,7 +520,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			securityAudits: attr(tree => tree.security.securityAudits),
 			scamPrevention: attr(tree => tree.security.scamPrevention),
 			chainVerification: attr(tree => tree.security.chainVerification),
-			signingIntentClarity: attr(tree => tree.security.signingIntentClarity),
+			transactionLegibility: attr(tree => tree.security.transactionLegibility),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),

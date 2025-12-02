@@ -145,7 +145,7 @@ export const frame: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			signingIntentClarity: null,
+			transactionLegibility: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

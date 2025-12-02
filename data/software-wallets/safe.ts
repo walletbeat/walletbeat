@@ -251,7 +251,7 @@ export const safe: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: refTodo,
 				messageSigning: {
 					calldataDecoding: {
