@@ -10,12 +10,12 @@ import {
 	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataExtraction,
 	noCalldataDecoding,
 	noDataExtraction,
 } from '@/schema/features/security/transaction-legibility'
-import { SecureElementType } from '@/schema/features/security/secure-element'
 import { notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -124,6 +124,17 @@ export const ngrave: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
+			secureElement: supported({
+				ref: [
+					{
+						explanation: 'The only crypto hardware wallet that achieved EAL7 certification.',
+						url: 'https://ngrave.io/en/zero',
+					},
+				],
+				secureElementType: SecureElementType.EAL_7,
+			}),
+			supplyChainDIY: null,
+			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: [
 					{
@@ -157,17 +168,6 @@ export const ngrave: HardwareWallet = {
 					},
 				},
 			},
-			secureElement: supported({
-				ref: [
-					{
-						explanation: 'The only crypto hardware wallet that achieved EAL7 certification.',
-						url: 'https://ngrave.io/en/zero',
-					},
-				],
-				secureElementType: SecureElementType.EAL_7,
-			}),
-			supplyChainDIY: null,
-			supplyChainFactory: null,
 			userSafety: null,
 		},
 		selfSovereignty: {

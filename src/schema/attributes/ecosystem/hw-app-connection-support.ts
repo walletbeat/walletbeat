@@ -66,7 +66,7 @@ function describeConnectionMethods(
 	}
 
 	if (methods.length === 1) {
-		return methods[0]!
+		return methods[0]
 	}
 
 	if (methods.length === 2) {
@@ -336,8 +336,8 @@ limiting its utility in the modern Web3 ecosystem.
 			}
 
 			// Determine rating based on the best connection method available
-			// Priority: software wallet integration (universal + verifiable) > 
-			//           vendor open-source app (verifiable but potentially limited) > 
+			// Priority: software wallet integration (universal + verifiable) >
+			//           vendor open-source app (verifiable but potentially limited) >
 			//           vendor closed-source app (unverifiable)
 
 			// Check if there's any software wallet integration (universal + verifiable)

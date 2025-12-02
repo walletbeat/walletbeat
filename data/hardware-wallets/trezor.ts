@@ -12,12 +12,12 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
-import { SecureElementType } from '@/schema/features/security/secure-element'
 import { notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -138,6 +138,18 @@ export const trezorWallet: HardwareWallet = {
 				library: PasskeyVerificationLibrary.NONE,
 			},
 			publicSecurityAudits: null,
+			secureElement: supported({
+				ref: [
+					{
+						explanation:
+							'Equipped with features including the Secure Element (EAL6+) and device-entry passphrase, it’s an impenetrable security pair.',
+						url: 'https://trezor.io/trezor-safe-3?',
+					},
+				],
+				secureElementType: SecureElementType.EAL_6_PLUS,
+			}),
+			supplyChainDIY: null,
+			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: [
 					{
@@ -178,18 +190,6 @@ export const trezorWallet: HardwareWallet = {
 					},
 				},
 			},
-			secureElement: supported({
-				ref: [
-					{
-						explanation:
-							'Equipped with features including the Secure Element (EAL6+) and device-entry passphrase, it’s an impenetrable security pair.',
-						url: 'https://trezor.io/trezor-safe-3?',
-					},
-				],
-				secureElementType: SecureElementType.EAL_6_PLUS,
-			}),
-			supplyChainDIY: null,
-			supplyChainFactory: null,
 			userSafety: null,
 		},
 		selfSovereignty: {

@@ -11,12 +11,12 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { SecureElementType } from '@/schema/features/security/secure-element'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -146,6 +146,18 @@ export const keystoneWallet: HardwareWallet = {
 					variantsScope: { [Variant.HARDWARE]: true },
 				},
 			],
+			secureElement: supported({
+				ref: [
+					{
+						explanation:
+							'Keystone 3 incorporates a PCI-grade anti-tampering feature, with an intricate ‘security house’ of circuitry encompassing the core IC and SE chips.',
+						url: 'https://blog.keyst.one/secure-elements-the-bedrock-of-hardware-wallet-security-1dd8cbdef461',
+					},
+				],
+				secureElementType: SecureElementType.PCI,
+			}),
+			supplyChainDIY: null,
+			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: [
 					{
@@ -195,18 +207,6 @@ export const keystoneWallet: HardwareWallet = {
 					displayedTransactionDetails: { ...displaysFullTransactionDetails, nonce: false },
 				},
 			},
-			secureElement: supported({
-				ref: [
-					{
-						explanation:
-							'Keystone 3 incorporates a PCI-grade anti-tampering feature, with an intricate ‘security house’ of circuitry encompassing the core IC and SE chips.',
-						url: 'https://blog.keyst.one/secure-elements-the-bedrock-of-hardware-wallet-security-1dd8cbdef461',
-					},
-				],
-				secureElementType: SecureElementType.PCI,
-			}),
-			supplyChainDIY: null,
-			supplyChainFactory: null,
 			userSafety: null,
 		},
 		selfSovereignty: {

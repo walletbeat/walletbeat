@@ -191,6 +191,9 @@ export const bitboxWallet: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
+			secureElement: null,
+			supplyChainDIY: null,
+			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: [
 					{
@@ -229,9 +232,6 @@ export const bitboxWallet: HardwareWallet = {
 					},
 				},
 			},
-			secureElement: null,
-			supplyChainDIY: null,
-			supplyChainFactory: null,
 			userSafety: null,
 		},
 		selfSovereignty: {

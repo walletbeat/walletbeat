@@ -66,6 +66,9 @@ export const fireflyWallet: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
+			secureElement: null,
+			supplyChainDIY: null,
+			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: refTodo,
 				messageSigning: {
@@ -82,9 +85,6 @@ export const fireflyWallet: HardwareWallet = {
 					displayedTransactionDetails: null,
 				},
 			},
-			secureElement: null,
-			supplyChainDIY: null,
-			supplyChainFactory: null,
 			userSafety: null,
 		},
 		selfSovereignty: {

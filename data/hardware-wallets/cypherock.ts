@@ -11,6 +11,7 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataExtraction,
 	noCalldataDecoding,
@@ -19,7 +20,6 @@ import {
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
-import { SecureElementType } from '@/schema/features/security/secure-element'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -160,6 +160,18 @@ export const cypherockWallet: HardwareWallet = {
 					variantsScope: { [Variant.HARDWARE]: true },
 				},
 			],
+			secureElement: supported({
+				ref: [
+					{
+						explanation:
+							'X1 Vault is open source and stores 1 of the 5 shards and the 4 X1 Cards have EAL 6+ secure elements and store the remaining 4 of the 5 shards.',
+						url: 'https://docs.cypherock.com/security-overview/introduction',
+					},
+				],
+				secureElementType: SecureElementType.EAL_6_PLUS,
+			}),
+			supplyChainDIY: null,
+			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: [
 					{
@@ -198,18 +210,6 @@ export const cypherockWallet: HardwareWallet = {
 					},
 				},
 			},
-			secureElement: supported({
-				ref: [
-					{
-						explanation:
-							'X1 Vault is open source and stores 1 of the 5 shards and the 4 X1 Cards have EAL 6+ secure elements and store the remaining 4 of the 5 shards.',
-						url: 'https://docs.cypherock.com/security-overview/introduction',
-					},
-				],
-				secureElementType: SecureElementType.EAL_6_PLUS,
-			}),
-			supplyChainDIY: null,
-			supplyChainFactory: null,
 			userSafety: null,
 		},
 		selfSovereignty: {

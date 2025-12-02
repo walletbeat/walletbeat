@@ -85,10 +85,10 @@ export const unratedHardwareTemplate: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
-			transactionLegibility: null,
 			secureElement: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
+			transactionLegibility: null,
 			userSafety: null,
 		},
 		selfSovereignty: {
