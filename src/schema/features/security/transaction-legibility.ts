@@ -225,7 +225,7 @@ export enum DataExtraction {
 /**
  * Set of data extraction methods that a wallet supports.
  */
-export type DataExtractionMethods = Record<DataExtraction, boolean>
+export type DataExtractionMethods = Record<DataExtraction, boolean | null>
 
 /**
  * Shorthand for a wallet that cannot do any data extraction.
