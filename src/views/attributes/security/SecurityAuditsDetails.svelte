@@ -20,7 +20,7 @@
 
 
 	// Functions
-	import { securityFlawSeverityName, type UnpatchedSecurityFlaw } from '@/schema/features/security/security-audits'
+	import { securityAuditId, securityFlawSeverityName, type UnpatchedSecurityFlaw } from '@/schema/features/security/security-audits'
 	import { toFullyQualified } from '@/schema/reference'
 	import { isUrl } from '@/schema/url'
 
@@ -61,7 +61,7 @@
 		<h4>Audits</h4>
 
 		<ul class="audits-list">
-			{#each securityAuditsSorted as audit (audit.auditDate)}
+			{#each securityAuditsSorted as audit (securityAuditId(audit))}
 				<li>
 					<article data-column>
 						<header data-row="wrap">
