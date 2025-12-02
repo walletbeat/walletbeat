@@ -19,6 +19,7 @@ import { refs, refTodo, type WithRef } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
@@ -80,18 +81,7 @@ function describeConnectionMethods(
 		return 'no connection methods'
 	}
 
-	if (methods.length === 1) {
-		return methods[0]
-	}
-
-	if (methods.length === 2) {
-		return `${methods[0]} and ${methods[1]}`
-	}
-
-	// 3 or more methods
-	const last = methods.pop()!
-
-	return `${methods.join(', ')}, and ${last}`
+	return commaListFormat(methods)
 }
 
 export type AppConnectionSupportValue = Value & {
