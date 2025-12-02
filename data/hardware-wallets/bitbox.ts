@@ -66,8 +66,6 @@ export const bitboxWallet: HardwareWallet = {
 					url: 'https://blog.bitbox.swiss/en/using-walletconnect-to-securely-connect-to-your-favorite-dapp/',
 				},
 			],
-			details:
-				'BitBox02 supports app connections through their open-source BitBoxApp, WalletConnect protocol, and integration with Rabby wallet.',
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.RABBY]: true,
@@ -193,7 +191,7 @@ export const bitboxWallet: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: [
 					{
 						explanation: 'Independent video demonstration of BitBox02 signing capabilities',
@@ -231,6 +229,7 @@ export const bitboxWallet: HardwareWallet = {
 					},
 				},
 			},
+			secureElement: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

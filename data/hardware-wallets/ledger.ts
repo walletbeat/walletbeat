@@ -17,6 +17,7 @@ import {
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import { notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -86,7 +87,13 @@ export const ledgerWallet: HardwareWallet = {
 		}),
 		licensing: null,
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation:
+						'Ledger raises $380 million to make digital assets more secure and accessible to everyone',
+					url: 'https://www.ledger.com/ledger-raises-380-million-to-make-digital-assets-more-secure-and-accessible-to-everyone',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -97,7 +104,7 @@ export const ledgerWallet: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
@@ -141,7 +148,7 @@ export const ledgerWallet: HardwareWallet = {
 				library: PasskeyVerificationLibrary.NONE,
 			},
 			publicSecurityAudits: null,
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: [
 					{
 						explanation:
@@ -173,6 +180,16 @@ export const ledgerWallet: HardwareWallet = {
 					displayedTransactionDetails: displaysFullTransactionDetails,
 				},
 			},
+			secureElement: supported({
+				ref: [
+					{
+						explanation:
+							'Ledger devices have an EAL 5+ or an EAL 6+ certification depending on which device you get.',
+						url: 'https://www.ledger.com/academy/security/the-secure-element-whistanding-security-attacks',
+					},
+				],
+				secureElementType: SecureElementType.EAL_6_PLUS,
+			}),
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

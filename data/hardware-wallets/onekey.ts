@@ -15,6 +15,7 @@ import {
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -74,7 +75,12 @@ export const onekeyWallet: HardwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'OneKey Secures Series B Funding at $150M Valuation, Led by YZi Labs',
+					url: 'https://onekey.so/blog/updates/onekey-secures-series-b-funding/',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -85,7 +91,7 @@ export const onekeyWallet: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
@@ -146,7 +152,7 @@ export const onekeyWallet: HardwareWallet = {
 					variantsScope: { [Variant.HARDWARE]: true },
 				},
 			],
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: [
 					{
 						explanation:
@@ -186,6 +192,16 @@ export const onekeyWallet: HardwareWallet = {
 					},
 				},
 			},
+			secureElement: supported({
+				ref: [
+					{
+						explanation:
+							'Built with an EAL 6+ Secure Element, the same level of chip security used in government IDs, passports, and EMV bank cards.',
+						url: 'https://onekey.so/products/onekey-classic-1s-hardware-wallet/',
+					},
+				],
+				secureElementType: SecureElementType.EAL_6_PLUS,
+			}),
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

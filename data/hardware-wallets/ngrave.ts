@@ -15,6 +15,7 @@ import {
 	noCalldataDecoding,
 	noDataExtraction,
 } from '@/schema/features/security/transaction-legibility'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import { notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -68,7 +69,12 @@ export const ngrave: HardwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Crypto hardware wallet NGRAVE raises $6M seed round',
+					url: 'https://ngrave.io/en/crypto-hardware-wallet-ngrave-raises-6m-seed-round',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -79,7 +85,7 @@ export const ngrave: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
@@ -118,7 +124,7 @@ export const ngrave: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: [
 					{
 						explanation: 'Independent video demonstration of NGRAVE Zero signing issues',
@@ -151,6 +157,15 @@ export const ngrave: HardwareWallet = {
 					},
 				},
 			},
+			secureElement: supported({
+				ref: [
+					{
+						explanation: 'The only crypto hardware wallet that achieved EAL7 certification.',
+						url: 'https://ngrave.io/en/zero',
+					},
+				],
+				secureElementType: SecureElementType.EAL_7,
+			}),
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

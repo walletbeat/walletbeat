@@ -16,6 +16,7 @@ import {
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -62,7 +63,12 @@ export const gridplusWallet: HardwareWallet = {
 		}),
 		licensing: null,
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Grid+ is the first internally incubated venture to spin out of ConsenSys.',
+					url: 'https://medium.com/@mark_dago/grid-progress-report-12-15-2017-fdb4e24ed2ed',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -73,7 +79,7 @@ export const gridplusWallet: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
@@ -112,7 +118,7 @@ export const gridplusWallet: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: [
 					{
 						explanation:
@@ -161,6 +167,16 @@ export const gridplusWallet: HardwareWallet = {
 					displayedTransactionDetails: displaysFullTransactionDetails,
 				},
 			},
+			secureElement: supported({
+				ref: [
+					{
+						explanation:
+							'The Lattice1 meets stringent security industry standards including FIPS, PCI, and EAL 6+ and is the only hardware wallet designed to safeguard against edge case risks such as attackers remotely accessing a users secrets via RF emissions.',
+						url: 'https://www.prnewswire.com/news-releases/gridplus-sets-a-new-standard-for-blockchain-security-with-the-release-of-the-enterprise-grade-lattice1-wireless-hardware-wallet-301186849.html',
+					},
+				],
+				secureElementType: SecureElementType.EAL_6_PLUS,
+			}),
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

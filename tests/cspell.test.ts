@@ -28,7 +28,7 @@ interface FileWords extends IndexedFileData {
 
 function getFileWords(_: string, fileContents: string): FileWords {
 	let matches: RegExpMatchArray | string[] | null = fileContents.match(
-		/(?<!%[0-9A-Fa-f]{2})(\b|(?<=[_]))[\p{Lu}\p{Ll}]([\p{Lu}\p{Ll}\p{Nd}]*[\p{Lu}\p{Ll}])?(\b|(?=[_\p{Nd}]))/gu,
+		/(?<!%[0-9A-Fa-f]{2})(\b|(?<=[_]|\b0x))[\p{Lu}\p{Ll}]([\p{Lu}\p{Ll}\p{Nd}]*[\p{Lu}\p{Ll}])?(\b|(?=[_\p{Nd}]))/gu,
 	)
 
 	if (matches === null) {

@@ -17,6 +17,7 @@ import {
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
 } from '@/schema/features/security/transaction-legibility'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import { notSupported, supported } from '@/schema/features/support'
 import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -70,8 +71,6 @@ export const trezorWallet: HardwareWallet = {
 		accountSupport: null,
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
-			details:
-				'Trezor supports multiple app connection methods including their open-source Trezor Suite, WalletConnect, and integration with popular software wallets like MetaMask and Rabby.',
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.METAMASK]: true,
@@ -139,7 +138,7 @@ export const trezorWallet: HardwareWallet = {
 				library: PasskeyVerificationLibrary.NONE,
 			},
 			publicSecurityAudits: null,
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: [
 					{
 						explanation:
@@ -179,6 +178,16 @@ export const trezorWallet: HardwareWallet = {
 					},
 				},
 			},
+			secureElement: supported({
+				ref: [
+					{
+						explanation:
+							'Equipped with features including the Secure Element (EAL6+) and device-entry passphrase, it’s an impenetrable security pair.',
+						url: 'https://trezor.io/trezor-safe-3?',
+					},
+				],
+				secureElementType: SecureElementType.EAL_6_PLUS,
+			}),
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

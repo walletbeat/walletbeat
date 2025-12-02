@@ -24,6 +24,7 @@ import type { KeysHandlingSupport } from './features/security/keys-handling'
 import type { EthereumL1LightClientSupport } from './features/security/light-client'
 import type { PasskeyVerificationImplementation } from './features/security/passkey-verification'
 import type { ScamAlerts } from './features/security/scam-alerts'
+import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
@@ -208,6 +209,8 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
+		/** Secure element support */
+		secureElement: VariantFeature<Support<SecureElementSupport>>
 	}
 	privacy: WalletBaseFeatures['privacy'] & {
 		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>

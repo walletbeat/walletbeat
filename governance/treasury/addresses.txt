@@ -1,0 +1,3 @@
+eth:0x52666AD68156B03EAce67678cDCF1d74bC56201D: Walletbeat Safe multisig
+eth:0xc9C8C560BA80e840A71bE2F9409600B6133a119f: EOA owned by polymutex, used exclusively for receiving grant funds prior to multisig being established
+eth:0x943623f9bd1a83fdb8b8cc30848b09b79e95bae1: EOA owned by 0xMattmatt

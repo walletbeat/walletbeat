@@ -66,7 +66,7 @@ export const fireflyWallet: HardwareWallet = {
 			},
 			passkeyVerification: null,
 			publicSecurityAudits: null,
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: refTodo,
 				messageSigning: {
 					calldataDecoding: null,
@@ -82,6 +82,7 @@ export const fireflyWallet: HardwareWallet = {
 					displayedTransactionDetails: null,
 				},
 			},
+			secureElement: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,

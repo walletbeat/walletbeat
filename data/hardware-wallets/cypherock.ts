@@ -18,7 +18,8 @@ import {
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { type WithRef } from '@/schema/reference'
+import { SecureElementType } from '@/schema/features/security/secure-element'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -70,7 +71,12 @@ export const cypherockWallet: HardwareWallet = {
 			},
 		},
 		monetization: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'Hardware wallet startup Cypherock raises $1 Mn',
+					url: 'https://entrackr.com/2022/12/hardware-wallet-startup-cypherock-raises-1-mn/',
+				},
+			],
 			revenueBreakdownIsPublic: false,
 			strategies: {
 				donations: null,
@@ -81,7 +87,7 @@ export const cypherockWallet: HardwareWallet = {
 				publicOffering: null,
 				selfFunded: null,
 				transparentConvenienceFees: null,
-				ventureCapital: null,
+				ventureCapital: true,
 			},
 		},
 		multiAddress: null,
@@ -154,7 +160,7 @@ export const cypherockWallet: HardwareWallet = {
 					variantsScope: { [Variant.HARDWARE]: true },
 				},
 			],
-			signingIntentClarity: {
+			transactionLegibility: {
 				ref: [
 					{
 						explanation: "Independent video demonstration of Cypherock's signing implementation.",
@@ -192,6 +198,16 @@ export const cypherockWallet: HardwareWallet = {
 					},
 				},
 			},
+			secureElement: supported({
+				ref: [
+					{
+						explanation:
+							'X1 Vault is open source and stores 1 of the 5 shards and the 4 X1 Cards have EAL 6+ secure elements and store the remaining 4 of the 5 shards.',
+						url: 'https://docs.cypherock.com/security-overview/introduction',
+					},
+				],
+				secureElementType: SecureElementType.EAL_6_PLUS,
+			}),
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			userSafety: null,
