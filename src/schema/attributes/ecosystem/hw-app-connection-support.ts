@@ -25,6 +25,43 @@ import { exempt, pickWorstRating, unrated } from '../common'
 const brand = 'attributes.security.app_connection_support'
 
 /**
+ * Converts a connection method enum value to its string representation
+ */
+function connectionMethodToString(
+	connectionMethod: AppConnectionMethod | SoftwareWalletType,
+): string {
+	switch (connectionMethod) {
+		case AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP:
+			return 'its proprietary closed-source application'
+		case AppConnectionMethod.VENDOR_OPEN_SOURCE_APP:
+			return 'its open-source application'
+		case SoftwareWalletType.METAMASK:
+			return 'MetaMask'
+		case SoftwareWalletType.RABBY:
+			return 'Rabby'
+		case SoftwareWalletType.FRAME:
+			return 'Frame'
+		case SoftwareWalletType.AMBIRE:
+			return 'Ambire'
+		case SoftwareWalletType.OTHER:
+			return 'other software wallets'
+	}
+}
+
+/**
+ * All possible connection methods in the order they should be checked
+ */
+const allConnectionMethods: Array<AppConnectionMethod | SoftwareWalletType> = [
+	AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP,
+	AppConnectionMethod.VENDOR_OPEN_SOURCE_APP,
+	SoftwareWalletType.METAMASK,
+	SoftwareWalletType.RABBY,
+	SoftwareWalletType.FRAME,
+	SoftwareWalletType.AMBIRE,
+	SoftwareWalletType.OTHER,
+]
+
+/**
  * Builds a description of the supported connection methods
  */
 function describeConnectionMethods(
@@ -33,32 +70,10 @@ function describeConnectionMethods(
 	const methods: string[] = []
 	const supported = connectionDetails.supportedConnections
 
-	if (supported[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true) {
-		methods.push('its proprietary closed-source application')
-	}
-
-	if (supported[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true) {
-		methods.push('its open-source application')
-	}
-
-	if (supported[SoftwareWalletType.METAMASK] === true) {
-		methods.push('MetaMask')
-	}
-
-	if (supported[SoftwareWalletType.RABBY] === true) {
-		methods.push('Rabby')
-	}
-
-	if (supported[SoftwareWalletType.FRAME] === true) {
-		methods.push('Frame')
-	}
-
-	if (supported[SoftwareWalletType.AMBIRE] === true) {
-		methods.push('Ambire')
-	}
-
-	if (supported[SoftwareWalletType.OTHER] === true) {
-		methods.push('other software wallets')
+	for (const method of allConnectionMethods) {
+		if (supported[method] === true) {
+			methods.push(connectionMethodToString(method))
+		}
 	}
 
 	if (methods.length === 0) {
