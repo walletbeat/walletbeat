@@ -246,26 +246,26 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 			}
 
 			// PASS: Full support across all dimensions
-			const messageExtractionPass: boolean =
+			const messageExtractionPass: boolean | null =
 				messageExtraction[DataExtraction.QRCODE] ||
 				messageExtraction[DataExtraction.HASHES] ||
 				messageExtraction[DataExtraction.COPY]
 
 			// Either the wallet decodes it, or, you can extract it to decode it yourself
-			const messageDecodingPass: boolean =
+			const messageDecodingPass: boolean | null =
 				messageDecoding[
 					CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
 				] ||
 				messageDecoding[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED] ||
 				messageExtractionPass
 
-			const calldataExtractionPass: boolean =
+			const calldataExtractionPass: boolean | null =
 				calldataExtraction[DataExtraction.QRCODE] ||
 				calldataExtraction[DataExtraction.HASHES] ||
 				messageExtraction[DataExtraction.COPY]
 
 			// Either the wallet decodes it, or, you can extract it to decode it yourself and it does a basic decoding
-			const calldataDecodingPass: boolean =
+			const calldataDecodingPass: boolean | null =
 				calldataDecoding[
 					CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
 				] ||
@@ -275,7 +275,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 						calldataDecoding[CalldataDecoding.ZKSYNC_USDC_TRANSFER] ||
 						calldataDecoding[CalldataDecoding.AAVE_SUPPLY]))
 
-			const displayedTransactionDetailsPass: boolean = isFullTransactionDetails(
+			const displayedTransactionDetailsPass: boolean | null = isFullTransactionDetails(
 				displayedTransactionDetails,
 			)
 
