@@ -169,7 +169,7 @@ export enum CalldataDecoding {
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type CalldataDecodingTypes = Record<CalldataDecoding, boolean>
+export type CalldataDecodingTypes = Record<CalldataDecoding, boolean | null>
 
 /**
  * Shorthand for a wallet that cannot do any calldata decoding.
