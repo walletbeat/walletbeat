@@ -353,7 +353,7 @@ export const metamask: SoftwareWallet = {
 				ref: refTodo,
 				messageSigning: {
 					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: false,
+						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
 						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
 						[CalldataDecoding.AAVE_SUPPLY]: false,
 						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
