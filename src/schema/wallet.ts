@@ -118,11 +118,8 @@ export interface WalletMetadata {
 		plural: string
 	}
 
-	/** External link to the wallet's website. */
-	url: Url
-
-	/** Link to the wallet's source code repository, if public. */
-	repoUrl: Url | null
+	/** URLs associated with the wallet, organized by category. */
+	urls: WalletUrls
 
 	/** The last date the wallet information was updated. */
 	lastUpdated: CalendarDate
@@ -139,6 +136,19 @@ export interface WalletMetadata {
 	 * For hardware wallets, list of available models/devices
 	 */
 	hardwareWalletModels?: HardwareWalletModel[]
+}
+
+export interface WalletUrls {
+	/** Website URL(s) for the wallet. At least one is required. */
+	website: NonEmptyArray<Url>
+	/** Documentation URL(s), if available. */
+	docs?: Url[]
+	/** Repository URL(s) for source code, if public. */
+	repository?: Url[]
+	/** Social media URL(s), if available. */
+	social?: Url[]
+	/** Other relevant URL(s), if any. */
+	others?: Url[]
 }
 
 /** Per-wallet, per-attribute override. */
