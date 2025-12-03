@@ -140,7 +140,7 @@ export interface WalletMetadata {
 
 export interface WalletUrls {
 	/** Website URL(s) for the wallet. At least one is required. */
-	website: NonEmptyArray<Url>
+	websites: NonEmptyArray<Url>
 	/** Documentation URL(s), if available. */
 	docs?: Url[]
 	/** Repository URL(s) for source code, if public. */
