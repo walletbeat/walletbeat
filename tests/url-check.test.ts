@@ -443,8 +443,10 @@ async function checkValidUrl(url: Url): Promise<void> {
 describe('reference URLs', () => {
 	for (const wallet of Object.values(allWallets)) {
 		describe(`wallet ${wallet.metadata.displayName}`, () => {
-			it('has valid URL', async () => {
-				await checkValidUrl(wallet.metadata.url)
+			it('has valid websites', async () => {
+				for (const website of wallet.metadata.urls?.websites ?? []) {
+					await checkValidUrl(website)
+				}
 			})
 			type FieldWithRef = {
 				path: string[]
