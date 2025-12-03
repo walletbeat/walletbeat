@@ -19,10 +19,9 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',
 		urls: {
-			repository: ['https://example.com/repo'],
-			websites: ['https://example.com'],
 			docs: ['https://example.com/docs'],
 			extensions: ['https://example.com/extensions'],
+			repository: ['https://example.com/repo'],
 			social: {
 				discord: 'https://example.com/discord',
 				farcaster: 'https://example.com/farcaster',
@@ -30,6 +29,7 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 				telegram: 'https://example.com/telegram',
 				x: 'https://example.com/twitter',
 			},
+			websites: ['https://example.com'],
 		},
 	},
 	features: {
