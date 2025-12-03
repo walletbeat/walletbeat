@@ -145,6 +145,8 @@ export interface WalletUrls {
 	docs?: Url[]
 	/** Repository URL(s) for source code, if public. */
 	repository?: Url[]
+	/** Extension URLs associated with the wallet, if available. */
+	extensions?: Url[]
 	/** Social media URLs associated with the wallet, if available. */
 	social?: SocialUrls
 	/** Other relevant URL(s), if any. */
