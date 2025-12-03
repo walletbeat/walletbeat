@@ -40,8 +40,10 @@ export const gridplusWallet: HardwareWallet = {
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
-		repoUrl: 'https://github.com/GridPlus',
-		url: 'https://gridplus.io/',
+		urls: {
+			repository: ['https://github.com/GridPlus'],
+			websites: ['https://gridplus.io/'],
+		},
 	},
 	features: {
 		accountSupport: null,

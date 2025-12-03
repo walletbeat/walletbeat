@@ -19,8 +19,9 @@ export const family: SoftwareWallet = {
 		contributors: [lucemans],
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
-		repoUrl: null,
-		url: 'https://family.co',
+		urls: {
+			websites: ['https://family.co'],
+		},
 	},
 	features: {
 		accountSupport: {

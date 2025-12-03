@@ -27,8 +27,9 @@ export const frame: SoftwareWallet = {
 		contributors: [polymutex, nconsigny, lucemans],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-13',
-		repoUrl: null,
-		url: 'https://frame.sh',
+		urls: {
+			websites: ['https://frame.sh'],
+		},
 	},
 	features: {
 		accountSupport: {

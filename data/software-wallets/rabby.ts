@@ -63,8 +63,10 @@ export const rabby: SoftwareWallet = {
 		contributors: [polymutex, nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2024-12-15',
-		repoUrl: 'https://github.com/RabbyHub/Rabby',
-		url: 'https://rabby.io',
+		urls: {
+			repository: ['https://github.com/RabbyHub/Rabby'],
+			websites: ['https://rabby.io'],
+		},
 	},
 	features: {
 		accountSupport: {

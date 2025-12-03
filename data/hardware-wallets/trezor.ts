@@ -59,8 +59,10 @@ export const trezorWallet: HardwareWallet = {
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
-		repoUrl: 'https://github.com/trezor/trezor-suite',
-		url: 'https://trezor.io/',
+		urls: {
+			repository: ['https://github.com/trezor/trezor-suite'],
+			websites: ['https://trezor.io/'],
+		},
 	},
 	features: {
 		accountSupport: null,

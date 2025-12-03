@@ -119,7 +119,7 @@ export interface WalletMetadata {
 	}
 
 	/** URLs associated with the wallet, organized by category. */
-	urls: WalletUrls
+	urls?: WalletUrls
 
 	/** The last date the wallet information was updated. */
 	lastUpdated: CalendarDate

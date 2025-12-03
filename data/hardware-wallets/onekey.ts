@@ -42,8 +42,10 @@ export const onekeyWallet: HardwareWallet = {
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-01-06',
-		repoUrl: 'https://github.com/OneKeyHQ',
-		url: 'https://onekey.so/',
+		urls: {
+			repository: ['https://github.com/OneKeyHQ'],
+			websites: ['https://onekey.so/'],
+		},
 	},
 	features: {
 		accountSupport: null,

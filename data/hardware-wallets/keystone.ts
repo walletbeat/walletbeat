@@ -44,8 +44,10 @@ export const keystoneWallet: HardwareWallet = {
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
-		repoUrl: 'https://github.com/KeystoneHQ',
-		url: 'https://keyst.one/',
+		urls: {
+			repository: ['https://github.com/KeystoneHQ'],
+			websites: ['https://keyst.one/'],
+		},
 	},
 	features: {
 		accountSupport: null,

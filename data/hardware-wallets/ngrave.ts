@@ -40,8 +40,9 @@ export const ngrave: HardwareWallet = {
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-01-07',
-		repoUrl: null,
-		url: 'https://ngrave.io/',
+		urls: {
+			websites: ['https://ngrave.io/'],
+		},
 	},
 	features: {
 		accountSupport: null,

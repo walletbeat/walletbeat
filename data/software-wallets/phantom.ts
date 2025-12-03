@@ -29,8 +29,9 @@ export const phantom: SoftwareWallet = {
 		contributors: [nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
-		repoUrl: null,
-		url: 'https://phantom.com',
+		urls: {
+			websites: ['https://phantom.com'],
+		},
 	},
 	features: {
 		accountSupport: {
