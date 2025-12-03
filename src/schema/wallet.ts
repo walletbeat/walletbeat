@@ -145,12 +145,23 @@ export interface WalletUrls {
 	docs?: Url[]
 	/** Repository URL(s) for source code, if public. */
 	repository?: Url[]
-	/** Social media URL(s), if available. */
-	social?: Url[]
+	/** Social media URLs associated with the wallet, if available. */
+	social?: SocialUrls
 	/** Other relevant URL(s), if any. */
 	others?: Url[]
 }
-
+export interface SocialUrls {
+	/** X(formerly Twitter) URL, if available. */
+	x?: Url
+	/** LinkedIn URL, if available. */
+	linkedin?: Url
+	/** Farcaster URL, if available. */
+	farcaster?: Url
+	/** Discord URL, if available. */
+	discord?: Url
+	/** Telegram URL, if available. */
+	telegram?: Url
+}
 /** Per-wallet, per-attribute override. */
 export interface AttributeOverride {
 	/**
