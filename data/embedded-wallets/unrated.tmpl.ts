@@ -18,8 +18,19 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',
-		repoUrl: 'https://example.com/repo',
-		url: 'https://example.com',
+		urls: {
+			repository: ['https://example.com/repo'],
+			websites: ['https://example.com'],
+			docs: ['https://example.com/docs'],
+			extensions: ['https://example.com/extensions'],
+			social: {
+				discord: 'https://example.com/discord',
+				farcaster: 'https://example.com/farcaster',
+				linkedin: 'https://example.com/linkedin',
+				telegram: 'https://example.com/telegram',
+				x: 'https://example.com/twitter',
+			},
+		},
 	},
 	features: {
 		accountSupport: null,
