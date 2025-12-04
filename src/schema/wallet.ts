@@ -36,7 +36,7 @@ import {
 	type StageEvaluatableWallet,
 	type WalletLadderEvaluation,
 } from './stages'
-import type { Url } from './url'
+import type { DomainUrl, LabeledUrl, Url } from './url'
 import {
 	type AtLeastOneTrueVariant,
 	type AtLeastOneVariant,
@@ -144,13 +144,13 @@ export interface WalletUrls {
 	/** Documentation URL(s), if available. */
 	docs?: Url[]
 	/** Repository URL(s) for source code, if public. */
-	repository?: Url[]
+	repositories?: Url[]
 	/** Extension URLs associated with the wallet, if available. */
 	extensions?: Url[]
 	/** Social media URLs associated with the wallet, if available. */
-	social?: SocialUrls
+	socials?: SocialUrls
 	/** Other relevant URL(s), if any. */
-	others?: Url[]
+	others?: LabeledUrl[]
 }
 export interface SocialUrls {
 	/** X(formerly Twitter) URL, if available. */
