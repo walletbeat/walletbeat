@@ -448,6 +448,31 @@ describe('reference URLs', () => {
 					await checkValidUrl(website)
 				}
 			})
+			it('has valid docs', async () => {
+				for (const doc of wallet.metadata.urls?.docs ?? []) {
+					await checkValidUrl(doc)
+				}
+			})
+			it('has valid repositories', async () => {
+				for (const repository of wallet.metadata.urls?.repositories ?? []) {
+					await checkValidUrl(repository)
+				}
+			})
+			it('has valid extensions', async () => {
+				for (const extension of wallet.metadata.urls?.extensions ?? []) {
+					await checkValidUrl(extension)
+				}
+			})
+			it('has valid socials', async () => {
+				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
+					await checkValidUrl(social.url)
+				}
+			})
+			it('has valid others', async () => {
+				for (const other of wallet.metadata.urls?.others ?? []) {
+					await checkValidUrl(other)
+				}
+			})
 			type FieldWithRef = {
 				path: string[]
 				withRef: WithRef<unknown>
