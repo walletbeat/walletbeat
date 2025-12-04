@@ -154,15 +154,17 @@ export interface WalletUrls {
 }
 export interface SocialUrls {
 	/** X(formerly Twitter) URL, if available. */
-	x?: Url
+	x?: DomainUrl<'x.com'>
 	/** LinkedIn URL, if available. */
-	linkedin?: Url
+	linkedin?: DomainUrl<'linkedin.com'>
 	/** Farcaster URL, if available. */
-	farcaster?: Url
+	farcaster?: DomainUrl<'warpcast.com' | 'farcaster.xyz'>
 	/** Discord URL, if available. */
-	discord?: Url
+	discord?: DomainUrl<'discord.com' | 'discord.gg'>
 	/** Telegram URL, if available. */
-	telegram?: Url
+	telegram?: DomainUrl<'t.me' | 'telegram.org' | 'telegram.me'>
+	/** Youtube URL, if available. */
+	youtube?: DomainUrl<'youtube.com'>
 }
 /** Per-wallet, per-attribute override. */
 export interface AttributeOverride {
