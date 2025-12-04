@@ -21,13 +21,13 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		urls: {
 			docs: ['https://example.com/docs'],
 			extensions: ['https://example.com/extensions'],
-			repository: ['https://example.com/repo'],
-			social: {
-				discord: 'https://example.com/discord',
-				farcaster: 'https://example.com/farcaster',
-				linkedin: 'https://example.com/linkedin',
-				telegram: 'https://example.com/telegram',
-				x: 'https://example.com/twitter',
+			repositories: ['https://example.com/repo'],
+			socials: {
+				discord: 'https://discord.com/discord',
+				farcaster: 'https://farcaster.xyz/farcaster',
+				linkedin: 'https://linkedin.com/linkedin',
+				telegram: 'https://telegram.org/telegram',
+				x: 'https://x.com/twitter',
 			},
 			websites: ['https://example.com'],
 		},
