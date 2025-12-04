@@ -45,7 +45,7 @@ export const imkeyWallet: HardwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-30',
 		urls: {
-			repository: ['https://github.com/consenlabs/imkey-core'],
+			repositories: ['https://github.com/consenlabs/imkey-core'],
 			websites: ['https://imkey.im/'],
 		},
 	},

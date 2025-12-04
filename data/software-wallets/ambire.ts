@@ -152,7 +152,7 @@ export const ambire: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-20',
 		urls: {
-			repository: ['https://github.com/AmbireTech/extension'],
+			repositories: ['https://github.com/AmbireTech/extension'],
 			websites: ['https://www.ambire.com'],
 		},
 	},

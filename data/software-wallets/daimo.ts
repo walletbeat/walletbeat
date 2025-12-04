@@ -54,7 +54,7 @@ export const daimo: SoftwareWallet = {
 			singular: 'Daimo username',
 		},
 		urls: {
-			repository: ['https://github.com/daimo-eth/daimo'],
+			repositories: ['https://github.com/daimo-eth/daimo'],
 			websites: ['https://daimo.com'],
 		},
 	},

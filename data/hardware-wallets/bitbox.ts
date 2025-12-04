@@ -49,7 +49,7 @@ export const bitboxWallet: HardwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-01-07',
 		urls: {
-			repository: ['https://github.com/BitBoxSwiss/bitbox02-firmware'],
+			repositories: ['https://github.com/BitBoxSwiss/bitbox02-firmware'],
 			websites: ['https://bitbox.swiss/'],
 		},
 	},

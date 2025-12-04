@@ -64,7 +64,7 @@ export const rabby: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2024-12-15',
 		urls: {
-			repository: ['https://github.com/RabbyHub/Rabby'],
+			repositories: ['https://github.com/RabbyHub/Rabby'],
 			websites: ['https://rabby.io'],
 		},
 	},

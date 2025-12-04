@@ -28,7 +28,7 @@ export const mtpelerin: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-26',
 		urls: {
-			repository: ['https://github.com/mtpelerin'],
+			repositories: ['https://github.com/mtpelerin'],
 			websites: ['https://www.mtpelerin.com/'],
 		},
 	},

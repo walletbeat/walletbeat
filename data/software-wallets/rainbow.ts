@@ -28,7 +28,7 @@ export const rainbow: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
 		urls: {
-			repository: ['https://github.com/rainbow-me/rainbow'],
+			repositories: ['https://github.com/rainbow-me/rainbow'],
 			websites: ['https://rainbow.me'],
 		},
 	},

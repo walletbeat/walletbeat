@@ -47,7 +47,7 @@ export const metamask: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-13',
 		urls: {
-			repository: ['https://github.com/MetaMask/metamask-extension'],
+			repositories: ['https://github.com/MetaMask/metamask-extension'],
 			websites: ['https://metamask.io'],
 		},
 	},
