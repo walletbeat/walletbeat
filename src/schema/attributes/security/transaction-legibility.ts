@@ -167,9 +167,6 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		A wallet receives a passing rating if it implements full transaction legibility, where all transaction
 		details are clearly displayed on the wallet screen for verification before signing. This includes
 		support for standard transactions, ERC-20 token transfers, EIP-712 messages and complex contract interactions. 
-
-		The should be able to **display clearly all transaction types on Safe, and Aave.**
-		To do so, if the wallet is a hardware wallet, **the wallet MUST be able to connect directly to the app**.
 		
 		A wallet receives a partial rating if it implements transaction legibility but with limitations, such
 		as not displaying all transaction details or not supporting transaction legibility for all transaction types.
