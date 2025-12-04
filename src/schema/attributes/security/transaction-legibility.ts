@@ -124,6 +124,7 @@ function singleCalldataDecodingType(calldataDecoding: CalldataDecoding): Calldat
 	return {
 		[CalldataDecoding.AAVE_SUPPLY]: calldataDecoding === CalldataDecoding.AAVE_SUPPLY,
 		[CalldataDecoding.ETH_USDC_TRANSFER]: calldataDecoding === CalldataDecoding.ETH_USDC_TRANSFER,
+		[CalldataDecoding.USDC_APPROVAL]: calldataDecoding === CalldataDecoding.USDC_APPROVAL,
 		[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]:
 			calldataDecoding === CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
 		[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:

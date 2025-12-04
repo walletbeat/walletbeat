@@ -56,6 +56,19 @@ export enum CalldataDecoding {
 	ETH_USDC_TRANSFER = 'ETH_USDC_TRANSFER',
 
 	/**
+	 * cast calldata "approve(address,uint256)" 0x06496E706bB260Bef1656297A7eaDDF5D3E7788A 1000000
+	 * https://tools.cyfrin.io/abi-encoding?data=0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240
+	 *
+	 *	📞 Function: approve(address,uint256)
+	 *	📋 Parameters:
+	 *     param0: 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2 - AAVE Address
+	 *     param1: 1000000
+	 *
+	 *     To: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+	 */
+	USDC_APPROVAL = 'USDC_APPROVAL',
+
+	/**
 	 * Same as above, but on a non-mainnet chain
 	 */
 	ZKSYNC_USDC_TRANSFER = 'ZKSYNC_USDC_TRANSFER',
@@ -163,6 +176,7 @@ export type CalldataDecodingTypes = Record<CalldataDecoding, boolean | null>
 export const noCalldataDecoding: CalldataDecodingTypes = {
 	[CalldataDecoding.ETH_USDC_TRANSFER]: false,
 	[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
+	[CalldataDecoding.USDC_APPROVAL]: false,
 	[CalldataDecoding.AAVE_SUPPLY]: false,
 	[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
 	[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
