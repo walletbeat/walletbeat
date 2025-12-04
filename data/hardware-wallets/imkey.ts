@@ -163,40 +163,20 @@ export const imkeyWallet: HardwareWallet = {
 						],
 					},
 				],
-				messageSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-					},
-					details:
-						'imKey functions as a signer only; decoding/rendering is handled by companion apps (imToken/Rabby). Users approve on-device; data may be extracted via QR where applicable.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-						[DataExtraction.COPY]: null,
-					},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
+					[DataExtraction.COPY]: null,
 				},
-				transactionSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-					},
-					calldataExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-						[DataExtraction.COPY]: null,
-					},
-					details:
-						'imKey acts as a signing device; transaction decoding and UI are performed by imToken/Rabby. On-device prompts confirm and sign the request.',
-					displayedTransactionDetails: { ...displaysFullTransactionDetails, nonce: false },
+				detailsDisplayed: { ...displaysFullTransactionDetails, nonce: false },
+				legibility: {
+					[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+					[CalldataDecoding.USDC_APPROVAL]: null,
+					[CalldataDecoding.AAVE_SUPPLY]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
 				},
 			},
 			userSafety: null,

@@ -176,33 +176,18 @@ export const onekeyWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/J_XG7cNOVhM',
 					},
 				],
-				messageSigning: {
-					calldataDecoding: noCalldataDecoding,
-					details:
-						'OneKey Pro shows EIP-712 domain types and message data but does not display domain hash or message hash for easier verification.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.COPY]: false,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
 				},
-				transactionSigning: {
-					calldataDecoding: noCalldataDecoding,
-					calldataExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-					details:
-						'OneKey Pro shows all calldata but does not decode it, requiring users to manually interpret the transaction data.',
-					displayedTransactionDetails: {
-						...displaysFullTransactionDetails,
-						chain: false,
-						nonce: false,
-					},
+				detailsDisplayed: {
+					...displaysFullTransactionDetails,
+					chain: false,
+					nonce: false,
 				},
+				legibility: noCalldataDecoding,
 			},
 			userSafety: null,
 		},

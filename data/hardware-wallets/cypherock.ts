@@ -15,7 +15,6 @@ import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataExtraction,
 	noCalldataDecoding,
-	noDataExtraction,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -184,31 +183,22 @@ export const cypherockWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/YG6lzwTUojE',
 					},
 				],
-				messageSigning: {
-					calldataDecoding: noCalldataDecoding,
-					details:
-						'Shows EIP-712 signature data only in the companion application, not on the hardware wallet itself.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
+
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.COPY]: false,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
 				},
-				transactionSigning: {
-					calldataDecoding: noCalldataDecoding,
-					calldataExtraction: noDataExtraction,
-					details:
-						'Completely fails to display calldata for transactions on either the application or the hardware wallet itself.',
-					displayedTransactionDetails: {
-						chain: false,
-						from: true, // derivation path counts
-						gas: true, // tx fee
-						nonce: false,
-						to: true, // contract address
-						value: true,
-					},
+				detailsDisplayed: {
+					chain: false,
+					from: true, // derivation path counts
+					gas: true, // tx fee
+					nonce: false,
+					to: true, // contract address
+					value: true,
 				},
+				legibility: noCalldataDecoding,
 			},
 			userSafety: null,
 		},

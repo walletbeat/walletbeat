@@ -11,7 +11,7 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
-import { CalldataDecoding, DataExtraction } from '@/schema/features/security/transaction-legibility'
+import { CalldataDecoding } from '@/schema/features/security/transaction-legibility'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -351,45 +351,21 @@ export const metamask: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				messageSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
-						[CalldataDecoding.AAVE_SUPPLY]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-					},
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: true,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
+				detailsDisplayed: {
+					chain: true,
+					from: true,
+					gas: true,
+					nonce: true,
+					to: true,
+					value: true,
 				},
-				transactionSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-					},
-					calldataExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: true,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-					details:
-						'MetaMask provides clear transaction support, showing all transaction data, and even doing nested calldata decoding in some cases.',
-					displayedTransactionDetails: {
-						chain: true,
-						from: true,
-						gas: true,
-						nonce: true,
-						to: true,
-						value: true,
-					},
+				legibility: {
+					[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
+					[CalldataDecoding.USDC_APPROVAL]: null,
+					[CalldataDecoding.AAVE_SUPPLY]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
 				},
 			},
 		},

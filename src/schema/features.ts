@@ -212,8 +212,10 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
-		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
-			HardwareWalletTransactionLegibilitySupport
+		transactionLegibility: VariantFeature<
+			WalletBaseFeatures['security']['transactionLegibility'] &
+				HardwareWalletTransactionLegibilitySupport
+		>
 		/** Secure element support */
 		secureElement: VariantFeature<Support<SecureElementSupport>>
 	}

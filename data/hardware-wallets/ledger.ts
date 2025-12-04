@@ -168,29 +168,14 @@ export const ledgerWallet: HardwareWallet = {
 						url: 'https://youtu.be/9YmPWxAvKYY?t=1722',
 					},
 				],
-				messageSigning: {
-					calldataDecoding: noCalldataDecoding,
-					details:
-						'Ledger provides basic message signing details when using hardware wallets, and complex signatures can be verified by comparing the EIP-712 hashes to their expected outcomes.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: true, // Fantastic
-						[DataExtraction.QRCODE]: false,
-					},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.COPY]: false,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
 				},
-				transactionSigning: {
-					calldataDecoding: noCalldataDecoding,
-					calldataExtraction: {
-						[DataExtraction.EYES]: true, // VERY hard to verify, very weird format
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-					details:
-						'Ledger provides basic message signing details when using hardware wallets, but complex interactions are very difficult to verify on the device.',
-					displayedTransactionDetails: displaysFullTransactionDetails,
-				},
+				detailsDisplayed: displaysFullTransactionDetails,
+				legibility: noCalldataDecoding,
 			},
 			userSafety: null,
 		},

@@ -12,7 +12,6 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	DataExtraction,
 	noCalldataDecoding,
 	noDataExtraction,
 } from '@/schema/features/security/transaction-legibility'
@@ -142,31 +141,16 @@ export const ngrave: HardwareWallet = {
 						url: 'https://youtu.be/-m1jcBFS0dc?t=701',
 					},
 				],
-				messageSigning: {
-					calldataDecoding: noCalldataDecoding,
-					details:
-						'NGRAVE Zero does not display EIP-712 data properly. It shows an unrecognizable binary format instead of the actual struct data.',
-					messageExtraction: {
-						[DataExtraction.EYES]: false,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
+				dataExtraction: noDataExtraction,
+				detailsDisplayed: {
+					chain: false,
+					from: true,
+					gas: true,
+					nonce: false,
+					to: true,
+					value: true,
 				},
-				transactionSigning: {
-					calldataDecoding: noCalldataDecoding,
-					calldataExtraction: noDataExtraction,
-					details:
-						'NGRAVE Zero fails to display calldata properly. It shows calldata in an unrecognizable binary format that cannot be verified.',
-					displayedTransactionDetails: {
-						chain: false,
-						from: true,
-						gas: true,
-						nonce: false,
-						to: true,
-						value: true,
-					},
-				},
+				legibility: noCalldataDecoding,
 			},
 			userSafety: null,
 		},

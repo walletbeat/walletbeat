@@ -162,33 +162,18 @@ export const trezorWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/4LayLrSuHNg',
 					},
 				],
-				messageSigning: {
-					calldataDecoding: noCalldataDecoding,
-					details:
-						'Trezor provides basic message signing details when using hardware wallets, but some complex interactions may be difficult to verify off device.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.COPY]: false,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
 				},
-				transactionSigning: {
-					calldataDecoding: noCalldataDecoding,
-					calldataExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-					details:
-						'Trezor provides basic transaction details when using hardware wallets, but some complex interactions may not display complete information on the hardware device.',
-					displayedTransactionDetails: {
-						...displaysFullTransactionDetails,
-						chain: false,
-						nonce: false,
-					},
+				detailsDisplayed: {
+					...displaysFullTransactionDetails,
+					chain: false,
+					nonce: false,
 				},
+				legibility: noCalldataDecoding,
 			},
 			userSafety: null,
 		},

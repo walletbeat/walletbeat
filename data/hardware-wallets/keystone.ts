@@ -171,40 +171,20 @@ export const keystoneWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/Ly9lo4g5NpA',
 					},
 				],
-				messageSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-					},
-					details:
-						'Keystone provides full message signing support for many transactions, however, it is buggy on many transactions like with a Safe{Wallet}, making it unreliable in some cases. In some cases, it shows no data. This is mitigated by the fact that the wallet supports QR code transaction extraction.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: true,
-					},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.COPY]: false,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: true,
 				},
-				transactionSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-					},
-					calldataExtraction: {
-						[DataExtraction.EYES]: false,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: true,
-					},
-					details:
-						'Keystone provides almost full clear signing support, it breaks down for more complex transactions.',
-					displayedTransactionDetails: { ...displaysFullTransactionDetails, nonce: false },
+				detailsDisplayed: { ...displaysFullTransactionDetails, nonce: false },
+				legibility: {
+					[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+					[CalldataDecoding.USDC_APPROVAL]: null,
+					[CalldataDecoding.AAVE_SUPPLY]: true,
+					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
 				},
 			},
 			userSafety: null,

@@ -201,36 +201,21 @@ export const bitboxWallet: HardwareWallet = {
 						url: 'https://youtu.be/-m1jcBFS0dc?t=300',
 					},
 				],
-				messageSigning: {
-					calldataDecoding: noCalldataDecoding,
-					details:
-						'BitBox02 displays all EIP-712 data on the device despite limited screen real estate. Does not show message digest/hash.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.COPY]: false,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
 				},
-				transactionSigning: {
-					calldataDecoding: noCalldataDecoding,
-					calldataExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-					details:
-						'BitBox02 shows all calldata on the device in raw format. Data extraction is limited to visual verification only.',
-					displayedTransactionDetails: {
-						chain: true,
-						from: true,
-						gas: true,
-						nonce: false,
-						to: true,
-						value: true,
-					},
+				detailsDisplayed: {
+					chain: true,
+					from: true,
+					gas: true,
+					nonce: false,
+					to: true,
+					value: true,
 				},
+				legibility: noCalldataDecoding,
 			},
 			userSafety: null,
 		},

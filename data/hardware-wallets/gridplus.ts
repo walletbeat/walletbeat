@@ -143,40 +143,20 @@ export const gridplusWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/_s5PjZhgBig',
 					},
 				],
-				messageSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-					},
-					details:
-						'GridPlus Lattice1 provides message signing support, but does not show EIP-712 digests or hashes.',
-					messageExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.COPY]: false,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
 				},
-				transactionSigning: {
-					calldataDecoding: {
-						[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-						[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-						[CalldataDecoding.AAVE_SUPPLY]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
-						[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-					},
-					calldataExtraction: {
-						[DataExtraction.EYES]: true,
-						[DataExtraction.COPY]: false,
-						[DataExtraction.HASHES]: false,
-						[DataExtraction.QRCODE]: false,
-					},
-					details:
-						'GridPlus Lattice1 provides clear transaction support, showing all transaction data, and even doing nested calldata decoding in some cases.',
-					displayedTransactionDetails: displaysFullTransactionDetails,
+				detailsDisplayed: displaysFullTransactionDetails,
+				legibility: {
+					[CalldataDecoding.ETH_USDC_TRANSFER]: true,
+					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
+					[CalldataDecoding.USDC_APPROVAL]: null,
+					[CalldataDecoding.AAVE_SUPPLY]: true,
+					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
 				},
 			},
 			userSafety: null,

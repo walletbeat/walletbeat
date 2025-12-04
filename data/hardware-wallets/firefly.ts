@@ -1,5 +1,9 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
+import {
+	noCalldataDecoding,
+	noDataExtraction,
+} from '@/schema/features/security/transaction-legibility'
 import { notSupported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -71,19 +75,9 @@ export const fireflyWallet: HardwareWallet = {
 			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: refTodo,
-				messageSigning: {
-					calldataDecoding: null,
-					details:
-						'Firefly currently does not provide message signing support as it is still in development.',
-					messageExtraction: null,
-				},
-				transactionSigning: {
-					calldataDecoding: null,
-					calldataExtraction: null,
-					details:
-						'Firefly currently does not provide clear transaction signing support as it is still in development.',
-					displayedTransactionDetails: null,
-				},
+				dataExtraction: noDataExtraction,
+				detailsDisplayed: null,
+				legibility: noCalldataDecoding,
 			},
 			userSafety: null,
 		},
