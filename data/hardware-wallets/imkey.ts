@@ -2,12 +2,12 @@ import { mako } from '@/data/contributors/mako'
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
-import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
@@ -49,8 +49,8 @@ export const imkeyWallet: HardwareWallet = {
 	},
 
 	features: {
-		appConnectionSupport: null,
 		accountSupport: null,
+		appConnectionSupport: null,
 
 		licensing: {
 			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
@@ -133,6 +133,25 @@ export const imkeyWallet: HardwareWallet = {
 				url: 'https://support.imkey.im/hc/en-001/articles/36709320202649',
 			},
 
+			keysHandling: null,
+			lightClient: { ethereumL1: null },
+			passkeyVerification: null,
+			publicSecurityAudits: null,
+			secureElement: null,
+			supplyChainDIY: null,
+			supplyChainFactory: {
+				type: SupplyChainFactoryType.PASS,
+				details:
+					'Manufactured with QA and serial verification; tamper-evident packaging and official-channel logistics mitigate supply chain attacks. Verification: https://imkey.im/pages/sn-check, https://learn.imkey.im/hc/en-001/articles/42589035963417',
+				factoryOpsecAudit: SupplyChainFactoryType.PASS,
+				factoryOpsecDocs: SupplyChainFactoryType.PASS,
+				genuineCheck: SupplyChainFactoryType.PASS,
+				hardwareVerification: SupplyChainFactoryType.PASS,
+				tamperEvidence: SupplyChainFactoryType.PASS,
+				tamperResistance: SupplyChainFactoryType.PASS,
+				url: 'https://imkey.im/pages/verify',
+			},
+
 			transactionLegibility: {
 				ref: [
 					{
@@ -179,25 +198,6 @@ export const imkeyWallet: HardwareWallet = {
 						'imKey acts as a signing device; transaction decoding and UI are performed by imToken/Rabby. On-device prompts confirm and sign the request.',
 					displayedTransactionDetails: { ...displaysFullTransactionDetails, nonce: false },
 				},
-			},
-
-			keysHandling: null,
-			lightClient: { ethereumL1: null },
-			passkeyVerification: null,
-			publicSecurityAudits: null,
-			secureElement: null,
-			supplyChainDIY: null,
-			supplyChainFactory: {
-				type: SupplyChainFactoryType.PASS,
-				details:
-					'Manufactured with QA and serial verification; tamper-evident packaging and official-channel logistics mitigate supply chain attacks. Verification: https://imkey.im/pages/sn-check, https://learn.imkey.im/hc/en-001/articles/42589035963417',
-				factoryOpsecAudit: SupplyChainFactoryType.PASS,
-				factoryOpsecDocs: SupplyChainFactoryType.PASS,
-				genuineCheck: SupplyChainFactoryType.PASS,
-				hardwareVerification: SupplyChainFactoryType.PASS,
-				tamperEvidence: SupplyChainFactoryType.PASS,
-				tamperResistance: SupplyChainFactoryType.PASS,
-				url: 'https://imkey.im/pages/verify',
 			},
 			userSafety: null,
 		},
