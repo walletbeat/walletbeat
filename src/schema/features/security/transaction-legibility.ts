@@ -296,13 +296,20 @@ export interface TransactionSigningSupport {
  */
 export interface TransactionLegibilitySupport {
 	/**
-	 * Message signing support
+	 * Does a wallet display transaction details clearly?
 	 */
-	messageSigning: MessageSigningSupport
+	legibility: CalldataDecodingTypes | null
 	/**
-	 * Transaction signing support
+	 * Does a wallet display transaction details clearly?
 	 */
-	transactionSigning: TransactionSigningSupport
+	detailsDisplayed: DisplayedTransactionDetails | null
+}
+
+export interface HardwareWalletTransactionLegibilitySupport {
+	/**
+	 * How is a user able to extract calldata from a hardware wallet?
+	 */
+	dataExtraction: DataExtractionMethods | null
 }
 
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {

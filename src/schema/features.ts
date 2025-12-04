@@ -28,7 +28,10 @@ import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
-import type { TransactionLegibilityImplementation } from './features/security/transaction-legibility'
+import type {
+	HardwareWalletTransactionLegibilitySupport,
+	TransactionLegibilityImplementation,
+} from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
@@ -209,6 +212,8 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
+		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
+			HardwareWalletTransactionLegibilitySupport
 		/** Secure element support */
 		secureElement: VariantFeature<Support<SecureElementSupport>>
 	}
