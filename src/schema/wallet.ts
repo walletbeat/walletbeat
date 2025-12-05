@@ -153,7 +153,7 @@ export interface WalletUrls {
 	others?: LabeledUrl[]
 }
 export interface SocialUrls {
-	/** X(formerly Twitter) URL, if available. */
+	/** X (formerly Twitter) URL, if available. */
 	x?: DomainUrl<'x.com'>
 	/** LinkedIn URL, if available. */
 	linkedin?: DomainUrl<'linkedin.com'>
