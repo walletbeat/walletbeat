@@ -147,6 +147,8 @@ export interface WalletUrls {
 	repositories?: Url[]
 	/** Extension URLs associated with the wallet, if available. */
 	extensions?: Url[]
+	/** Web App URLs, if available. */
+	webapps?: Url[]
 	/** Play Store URL, if available. */
 	playstore?: Url
 	/** App Store URL, if available. */
