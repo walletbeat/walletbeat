@@ -147,8 +147,14 @@ export interface WalletUrls {
 	repositories?: Url[]
 	/** Extension URLs associated with the wallet, if available. */
 	extensions?: Url[]
+	/** Play Store URL, if available. */
+	playstore?: Url
+	/** App Store URL, if available. */
+	appstore?: Url
 	/** Social media URLs associated with the wallet, if available. */
+
 	socials?: SocialUrls
+
 	/** Other relevant URL(s), if any. */
 	others?: LabeledUrl[]
 }
