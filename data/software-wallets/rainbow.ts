@@ -27,8 +27,10 @@ export const rainbow: SoftwareWallet = {
 		contributors: [polymutex],
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
-		repoUrl: 'https://github.com/rainbow-me/rainbow',
-		url: 'https://rainbow.me',
+		urls: {
+			repositories: ['https://github.com/rainbow-me/rainbow'],
+			websites: ['https://rainbow.me'],
+		},
 	},
 	features: {
 		accountSupport: {

@@ -26,8 +26,10 @@ export const gemwallet: SoftwareWallet = {
 		contributors: [h3rman],
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-14',
-		repoUrl: 'https://github.com/gemwalletcom/gem-ios',
-		url: 'https://gemwallet.com',
+		urls: {
+			repositories: ['https://github.com/gemwalletcom/gem-ios'],
+			websites: ['https://gemwallet.com'],
+		},
 	},
 	features: {
 		accountSupport: {

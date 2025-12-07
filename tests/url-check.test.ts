@@ -354,6 +354,101 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '2ade81c184f3fece1b40ece8632d63685e923be6',
 		retrieved: '2025-10-31',
 	},
+	{
+		url: 'https://github.com/AmbireTech/extension',
+		urlHash: 'fb3693c39d0e16fcecd756fe9bdcd6512e4a0dbe',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/daimo-eth/daimo',
+		urlHash: 'c1deb6057590ad95d6c38cd5a9df85d1ba7f2eb5',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/Elytro-eth',
+		urlHash: '2bd7c8c2bea748f5e90302b997431291f67e8666',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/gemwalletcom/gem-ios',
+		urlHash: '20ef1311fce88a839d49b4da560ece38514ed097',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/consenlabs/token-core-monorepo',
+		urlHash: '24c27cb0b84e4936627f8b5550764f28a3e69949',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/MetaMask/metamask-extension',
+		urlHash: 'efffdfe52d6431678ef0bb885e7f2bbe3c36021e',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/mtpelerin',
+		urlHash: '52cec4b8cefdda81f4321fe8abbe886bba90dd27',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/nufi-official/nufi',
+		urlHash: '1c627e48c21b66b3217b60b7ca64bd16d79506ca',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/RabbyHub/Rabby',
+		urlHash: 'c6157bc0c8cd5286a4684049fd6b83c0cd6fe57f',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/rainbow-me/rainbow',
+		urlHash: 'f02fdbb37a245bcc077f7eef8d0b1a17cd91d28b',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/safe-fndn',
+		urlHash: '4623aeac8399d1112a4f85eae525881390810d6d',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/BitBoxSwiss/bitbox02-firmware',
+		urlHash: 'd3a746d513e09077799d9b884c1cd9858e299836',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/Cypherock',
+		urlHash: '4f3f89eea1f6e237f87c2d28a9d8b8fa6d13b944',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/GridPlus',
+		urlHash: 'f2e9ad66a296755d8c55885381031d8cb9fae930',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/consenlabs/imkey-core',
+		urlHash: 'bab751b002caab589b2cbe5344e067667d484eab',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/KeystoneHQ',
+		urlHash: '4d2a88c5addf046b5384a8ab144a4c05ce973686',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/LedgerHQ/',
+		urlHash: 'fe86af9feb4bf26014d59cdc6110f95615298437',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/OneKeyHQ',
+		urlHash: '4b3df49df953e02de65257636fa32f640bf7fab2',
+		retrieved: '2025-12-04',
+	},
+	{
+		url: 'https://github.com/trezor/trezor-suite',
+		urlHash: '68f7e9858a3ae6e5abcd3aa229eb1f39e92a41bd',
+		retrieved: '2025-12-04',
+	},
 ]
 
 const newValidUrls: string[] = []
@@ -443,8 +538,35 @@ async function checkValidUrl(url: Url): Promise<void> {
 describe('reference URLs', () => {
 	for (const wallet of Object.values(allWallets)) {
 		describe(`wallet ${wallet.metadata.displayName}`, () => {
-			it('has valid URL', async () => {
-				await checkValidUrl(wallet.metadata.url)
+			it('has valid websites', async () => {
+				for (const website of wallet.metadata.urls?.websites ?? []) {
+					await checkValidUrl(website)
+				}
+			})
+			it('has valid docs', async () => {
+				for (const doc of wallet.metadata.urls?.docs ?? []) {
+					await checkValidUrl(doc)
+				}
+			})
+			it('has valid repositories', async () => {
+				for (const repository of wallet.metadata.urls?.repositories ?? []) {
+					await checkValidUrl(repository)
+				}
+			})
+			it('has valid extensions', async () => {
+				for (const extension of wallet.metadata.urls?.extensions ?? []) {
+					await checkValidUrl(extension)
+				}
+			})
+			it('has valid socials', async () => {
+				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
+					await checkValidUrl(social.url)
+				}
+			})
+			it('has valid others', async () => {
+				for (const other of wallet.metadata.urls?.others ?? []) {
+					await checkValidUrl(other)
+				}
 			})
 			type FieldWithRef = {
 				path: string[]

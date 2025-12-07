@@ -24,8 +24,9 @@ export const zerion: SoftwareWallet = {
 		contributors: [lucemans],
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
-		repoUrl: null,
-		url: 'https://zerion.io',
+		urls: {
+			websites: ['https://zerion.io'],
+		},
 	},
 	features: {
 		accountSupport: {

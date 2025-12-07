@@ -31,8 +31,9 @@ export const fireflyWallet: HardwareWallet = {
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
-		repoUrl: null,
-		url: 'https://firefly.city/',
+		urls: {
+			websites: ['https://firefly.city/'],
+		},
 	},
 	features: {
 		accountSupport: null,

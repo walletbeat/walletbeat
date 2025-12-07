@@ -151,8 +151,10 @@ export const ambire: SoftwareWallet = {
 		contributors: [jiojosbg, nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-20',
-		repoUrl: 'https://github.com/AmbireTech/extension',
-		url: 'https://www.ambire.com',
+		urls: {
+			repositories: ['https://github.com/AmbireTech/extension'],
+			websites: ['https://www.ambire.com'],
+		},
 	},
 	features: {
 		accountSupport: {

@@ -46,8 +46,10 @@ export const cypherockWallet: HardwareWallet = {
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-01-06',
-		repoUrl: 'https://github.com/Cypherock',
-		url: 'https://www.cypherock.com',
+		urls: {
+			repositories: ['https://github.com/Cypherock'],
+			websites: ['https://www.cypherock.com'],
+		},
 	},
 	features: {
 		accountSupport: null,

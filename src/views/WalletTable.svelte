@@ -847,7 +847,7 @@
 									<hr>
 
 									<a
-										href={isLabeledUrl(wallet.metadata.url) ? wallet.metadata.url.url : wallet.metadata.url}
+										href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
 										target="_blank"
 										rel="noopener noreferrer"
 									>
@@ -855,11 +855,11 @@
 										Website
 									</a>
 
-									{#if wallet.metadata.repoUrl}
+									{#if wallet.metadata.urls?.repository}
 										<hr>
 
 										<a
-											href={isLabeledUrl(wallet.metadata.repoUrl) ? wallet.metadata.repoUrl.url : wallet.metadata.repoUrl}
+											href={isLabeledUrl(wallet.metadata.urls.repository[0]) ? wallet.metadata.urls.repository[0].url : wallet.metadata.urls.repository[0]}
 											target="_blank"
 											rel="noopener noreferrer"
 										>

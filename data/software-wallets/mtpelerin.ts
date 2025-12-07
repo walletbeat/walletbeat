@@ -27,8 +27,10 @@ export const mtpelerin: SoftwareWallet = {
 		contributors: [sigri],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-26',
-		repoUrl: 'https://github.com/mtpelerin',
-		url: 'https://www.mtpelerin.com/',
+		urls: {
+			repositories: ['https://github.com/mtpelerin'],
+			websites: ['https://www.mtpelerin.com/'],
+		},
 	},
 	features: {
 		/*accountSupport: {

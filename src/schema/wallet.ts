@@ -36,7 +36,7 @@ import {
 	type StageEvaluatableWallet,
 	type WalletLadderEvaluation,
 } from './stages'
-import type { Url } from './url'
+import type { DomainUrl, LabeledUrl, Url } from './url'
 import {
 	type AtLeastOneTrueVariant,
 	type AtLeastOneVariant,
@@ -118,11 +118,8 @@ export interface WalletMetadata {
 		plural: string
 	}
 
-	/** External link to the wallet's website. */
-	url: Url
-
-	/** Link to the wallet's source code repository, if public. */
-	repoUrl: Url | null
+	/** URLs associated with the wallet, organized by category. */
+	urls?: WalletUrls
 
 	/** The last date the wallet information was updated. */
 	lastUpdated: CalendarDate
@@ -141,6 +138,42 @@ export interface WalletMetadata {
 	hardwareWalletModels?: HardwareWalletModel[]
 }
 
+export interface WalletUrls {
+	/** Website URL(s) for the wallet. At least one is required. */
+	websites: NonEmptyArray<Url>
+	/** Documentation URL(s), if available. */
+	docs?: Url[]
+	/** Repository URL(s) for source code, if public. */
+	repositories?: Url[]
+	/** Extension URLs associated with the wallet, if available. */
+	extensions?: Url[]
+	/** Web App URLs, if available. */
+	webapps?: Url[]
+	/** Play Store URL, if available. */
+	playstore?: Url
+	/** App Store URL, if available. */
+	appstore?: Url
+	/** Social media URLs associated with the wallet, if available. */
+
+	socials?: SocialUrls
+
+	/** Other relevant URL(s), if any. */
+	others?: LabeledUrl[]
+}
+export interface SocialUrls {
+	/** X (formerly Twitter) URL, if available. */
+	x?: DomainUrl<'x.com'>
+	/** LinkedIn URL, if available. */
+	linkedin?: DomainUrl<'linkedin.com'>
+	/** Farcaster URL, if available. */
+	farcaster?: DomainUrl<'warpcast.com' | 'farcaster.xyz'>
+	/** Discord URL, if available. */
+	discord?: DomainUrl<'discord.com' | 'discord.gg'>
+	/** Telegram URL, if available. */
+	telegram?: DomainUrl<'t.me' | 'telegram.org' | 'telegram.me'>
+	/** Youtube URL, if available. */
+	youtube?: DomainUrl<'youtube.com'>
+}
 /** Per-wallet, per-attribute override. */
 export interface AttributeOverride {
 	/**

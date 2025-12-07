@@ -19,8 +19,19 @@ export const unratedTemplate: SoftwareWallet = {
 		contributors: [exampleContributor],
 		iconExtension: 'svg',
 		lastUpdated: '2020-01-01',
-		repoUrl: 'https://example.com/repo',
-		url: 'https://example.com',
+		urls: {
+			docs: ['https://example.com/docs'],
+			extensions: ['https://example.com/extensions'],
+			repositories: ['https://example.com/repo'],
+			socials: {
+				discord: 'https://discord.com/example',
+				farcaster: 'https://farcaster.xyz/example',
+				linkedin: 'https://linkedin.com/example',
+				telegram: 'https://telegram.org/example',
+				x: 'https://x.com/example',
+			},
+			websites: ['https://example.com'],
+		},
 	},
 	features: {
 		accountSupport: null,

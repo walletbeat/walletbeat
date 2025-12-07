@@ -29,8 +29,10 @@ export const nufi: SoftwareWallet = {
 		contributors: [gabrielkerekes],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-11',
-		repoUrl: 'https://github.com/nufi-official/nufi',
-		url: 'https://nu.fi',
+		urls: {
+			repositories: ['https://github.com/nufi-official/nufi'],
+			websites: ['https://nu.fi'],
+		},
 	},
 	features: {
 		accountSupport: {

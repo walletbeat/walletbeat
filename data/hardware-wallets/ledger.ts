@@ -70,8 +70,10 @@ export const ledgerWallet: HardwareWallet = {
 		],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
-		repoUrl: 'https://github.com/LedgerHQ/',
-		url: 'https://www.ledger.com/',
+		urls: {
+			repositories: ['https://github.com/LedgerHQ/'],
+			websites: ['https://www.ledger.com/'],
+		},
 	},
 	features: {
 		accountSupport: null,

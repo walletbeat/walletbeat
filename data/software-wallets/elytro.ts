@@ -21,8 +21,10 @@ export const elytro: SoftwareWallet = {
 		contributors: [nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
-		repoUrl: 'https://github.com/Elytro-eth',
-		url: 'https://elytro.com',
+		urls: {
+			repositories: ['https://github.com/Elytro-eth'],
+			websites: ['https://elytro.com'],
+		},
 	},
 	features: {
 		accountSupport: {

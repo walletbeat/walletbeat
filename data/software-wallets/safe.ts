@@ -37,8 +37,10 @@ export const safe: SoftwareWallet = {
 		contributors: [nconsigny],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
-		repoUrl: 'https://github.com/safe-fndn',
-		url: 'https://safe.global',
+		urls: {
+			repositories: ['https://github.com/safe-fndn'],
+			websites: ['https://safe.global'],
+		},
 	},
 	features: {
 		accountSupport: {
