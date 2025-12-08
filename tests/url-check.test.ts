@@ -449,6 +449,121 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '68f7e9858a3ae6e5abcd3aa229eb1f39e92a41bd',
 		retrieved: '2025-12-04',
 	},
+	{
+		url: 'https://bitbox.swiss/dev/',
+		urlHash: 'b4f94a40360751f24aca2f8a53ad29bca1702e8e',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://docs.cypherock.com/',
+		urlHash: 'dcc46d653bb007b2d8c5d19a370fa4b655a75bcb',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://docs.gridplus.io/',
+		urlHash: 'cdfc6a061a08caeac0d94f0b8cca8838eaee8ee1',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://support.keyst.one/',
+		urlHash: '22b43ad06c2e7bce190b83158055f30bcf2f6a8d',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://developers.ledger.com/',
+		urlHash: 'aee76f91795e4822e68fd390ed195ed85cd23996',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://developer.onekey.so/',
+		urlHash: '4bfb28a04b4f00411c4f9f21419a4fa87c8a17fe',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://trezor.io/learn',
+		urlHash: 'ece6156a9e5fb17b96b488ee95850ac3089abe39',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/BitBoxSwiss',
+		urlHash: '91c72481edcabf1553ad58e67fd05da2fec16a27',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://www.youtube.com/@bitboxswiss',
+		urlHash: 'f3a0e03a260098953a460d19395b9694e7f2d427',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://t.me/cypherock',
+		urlHash: 'b5f6cdc01cfdc207ba952304c48871f0b8b13d9a',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/CypherockWallet',
+		urlHash: '9002d8da1e73708d4d674f7096a7a75f3561925a',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://discord.com/invite/gridplus',
+		urlHash: '721caded54e216ddf169dde8a66ced15753015b9',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/gridplus/',
+		urlHash: '2c0ebdda1894e8d285abac96cf269abe853b552d',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://farcaster.xyz/keystonewallet',
+		urlHash: 'c0b381af10b3ec40fa34fcf7a9d720e4cb5133ad',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://t.me/KeystoneWallet',
+		urlHash: 'c88ecd88c690e8202de8bf73efc8f7b8d031c6dc',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/KeystoneWallet',
+		urlHash: '68b066f60ed46a29d0d73c12b0a8059720a167a8',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://www.youtube.com/channel/UCaReIdawwYPPcyWGoNunF7g',
+		urlHash: '3558c0fec7ba4e6f8067d772694b16813a9f0aad',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/Ledger',
+		urlHash: '768d245facd22619dec680687f01eff336ed0b47',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://discord.com/invite/gapxmWEBNJ',
+		urlHash: '529970c1e8efa911b8c88160278d25e158d44e8a',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/ngrave_official',
+		urlHash: 'c60578dd7cc59f374556fd2f69faac632da43363',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/OneKeyHQ',
+		urlHash: '46326dbf5b61b98b8839ccc384b6d0a3420fbfe5',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://x.com/trezor',
+		urlHash: '9ed6792bcfa02411b582ff840bd860044c4b8093',
+		retrieved: '2025-12-08',
+	},
+	{
+		url: 'https://www.youtube.com/@TrezorWallet',
+		urlHash: '4df76409512b9f9f52f2dfb9efc14081a9ef0729',
+		retrieved: '2025-12-08',
+	},
 ]
 
 const newValidUrls: string[] = []
