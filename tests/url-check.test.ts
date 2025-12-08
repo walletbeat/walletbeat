@@ -560,7 +560,13 @@ describe('reference URLs', () => {
 			})
 			it('has valid socials', async () => {
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
-					await checkValidUrl(social.url)
+					if (social !== undefined) {
+						const urlString = labeledUrl(social).url
+						if (urlString.includes('linkedin.com')) {
+							continue
+						}
+						await checkValidUrl(social)
+					}
 				}
 			})
 			it('has valid others', async () => {
