@@ -66,7 +66,12 @@ export const ledgerWallet: HardwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
 		urls: {
+			docs: ['https://developers.ledger.com/'],
 			repositories: ['https://github.com/LedgerHQ/'],
+			socials: {
+				linkedin: 'https://www.linkedin.com/company/ledgerhq/',
+				x: 'https://x.com/Ledger',
+			},
 			websites: ['https://www.ledger.com/'],
 		},
 	},

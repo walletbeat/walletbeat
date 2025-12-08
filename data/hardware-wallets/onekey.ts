@@ -43,7 +43,12 @@ export const onekeyWallet: HardwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-01-06',
 		urls: {
+			docs: ['https://developer.onekey.so/'],
 			repositories: ['https://github.com/OneKeyHQ'],
+			socials: {
+				linkedin: 'https://www.linkedin.com/company/onekeyhq',
+				x: 'https://x.com/OneKeyHQ',
+			},
 			websites: ['https://onekey.so/'],
 		},
 	},

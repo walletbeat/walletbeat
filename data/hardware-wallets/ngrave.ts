@@ -41,6 +41,11 @@ export const ngrave: HardwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-01-07',
 		urls: {
+			socials: {
+				discord: 'https://discord.com/invite/gapxmWEBNJ',
+				linkedin: 'https://www.linkedin.com/company/ngrave/',
+				x: 'https://x.com/ngrave_official',
+			},
 			websites: ['https://ngrave.io/'],
 		},
 	},

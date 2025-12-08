@@ -41,7 +41,13 @@ export const gridplusWallet: HardwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
 		urls: {
+			docs: ['https://docs.gridplus.io/'],
 			repositories: ['https://github.com/GridPlus'],
+			socials: {
+				discord: 'https://discord.com/invite/gridplus',
+				linkedin: 'https://www.linkedin.com/company/gridplus/',
+				x: 'https://x.com/gridplus/',
+			},
 			websites: ['https://gridplus.io/'],
 		},
 	},
