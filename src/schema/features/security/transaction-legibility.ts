@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+import { notSupported, type Support } from '../support'
 
 /**
  * What essential transaction data does the hardware wallet show? (Or can show via options)
@@ -168,18 +169,30 @@ export enum CalldataDecoding {
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type CalldataDecodingTypes = Record<CalldataDecoding, boolean | null>
+export type CalldataDecodingTypes = Record<CalldataDecoding, Support<WithRef<CalldataDecodingSupport>>>
 
+
+/** If a wallet can decode the calldata for a specific transaction, what does that look like? */
+export interface CalldataDecodingSupport {
+	/** Where does the calldata decoding actually happen? */
+	decoded: CalldataDecoded
+}
+
+/** Where does the calldata decoding actually happen? */
+export enum CalldataDecoded {
+	ON_DEVICE = 'ON_DEVICE',
+	OFF_DEVICE = 'OFF_DEVICE',
+}
 /**
  * Shorthand for a wallet that cannot do any calldata decoding.
  */
 export const noCalldataDecoding: CalldataDecodingTypes = {
-	[CalldataDecoding.ETH_USDC_TRANSFER]: false,
-	[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
-	[CalldataDecoding.USDC_APPROVAL]: false,
-	[CalldataDecoding.AAVE_SUPPLY]: false,
-	[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-	[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+	[CalldataDecoding.ETH_USDC_TRANSFER]: notSupported,
+	[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: notSupported,
+	[CalldataDecoding.USDC_APPROVAL]: notSupported,
+	[CalldataDecoding.AAVE_SUPPLY]: notSupported,
+	[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: notSupported,
+	[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: notSupported,
 }
 
 /**
@@ -187,7 +200,7 @@ export const noCalldataDecoding: CalldataDecodingTypes = {
  * extraction method at all.
  */
 export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecodingTypes): boolean {
-	return Object.values(calldataDecodingTypes).includes(true)
+	return Object.values(calldataDecodingTypes).some((support) => support.support === 'SUPPORTED')
 }
 
 /**
