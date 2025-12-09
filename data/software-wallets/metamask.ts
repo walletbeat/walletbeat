@@ -221,24 +221,14 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			callDataDisplay: {
-				ref: refTodo,
-				detailsDisplayed: {
-					chain: true,
-					from: true,
-					gas: true,
-					nonce: true,
-					to: true,
-					value: true,
+			dataDisplay: {	
+				calldataDisplay: {
+					ref: refTodo,
+					rawHex: true,
+					copyHexToClipboard: true,
+					formatted: true,
 				},
-				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
-					[CalldataDecoding.USDC_APPROVAL]: null,
-					[CalldataDecoding.AAVE_SUPPLY]: false,
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-				},
+				transactionDetailsDisplay: null
 			},
 			hardwareWalletSupport: {
 				ref: [

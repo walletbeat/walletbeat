@@ -18,7 +18,7 @@ import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy
 import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
-import type { CallDataDisplayImplementation } from './features/security/calldata-display'
+import type { DataDisplayImplementation } from './features/security/data-display'
 import type { FirmwareSupport } from './features/security/firmware'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
@@ -153,7 +153,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
 
 		/** Call data display implementation */
-		callDataDisplay: VariantFeature<CallDataDisplayImplementation>
+		dataDisplay: VariantFeature<Nullable<DataDisplayImplementation>>
 	}
 
 	/** Privacy features. */
@@ -274,7 +274,7 @@ export interface ResolvedFeatures {
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
 		transactionLegibility: ResolvedFeature<TransactionLegibilityImplementation>
-		callDataDisplay: ResolvedFeature<CallDataDisplayImplementation>
+		dataDisplay: ResolvedFeature<DataDisplayImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
@@ -389,9 +389,9 @@ export function resolveFeatures(
 				'security.transactionLegibility',
 				features => features.security.transactionLegibility,
 			),
-			callDataDisplay: softwareFeat(
-				'security.callDataDisplay',
-				features => features.security.callDataDisplay,
+			dataDisplay: softwareFeat(
+				'security.dataDisplay',
+				features => features.security.dataDisplay,
 			),
 			passkeyVerification: baseFeat(
 				'passkeyVerification',
