@@ -1,8 +1,12 @@
 import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
-import { type DataDisplaySupport } from '@/schema/features/security/data-display'
-import { mergeRefs, refs } from '@/schema/reference'
+import {
+	type CallDataDisplay,
+	type DataDisplaySupport,
+	type TransactionDetailsDisplay,
+} from '@/schema/features/security/data-display'
+import { mergeRefs, popRefs, refs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -20,13 +24,39 @@ function evaluateDataDisplay(features: DataDisplaySupport): Rating {
 		return Rating.UNRATED
 	}
 
-	const ratings = [features.calldataDisplay.rawHex, features.calldataDisplay.copyHexToClipboard, features.calldataDisplay.formatted]
+	const { withoutRefs: calldataDisplay } = popRefs<CallDataDisplay>(features.calldataDisplay)
+	const { withoutRefs: transactionDetailsDisplay } = popRefs<TransactionDetailsDisplay>(
+		features.transactionDetailsDisplay,
+	)
 
-	const transactionDetailsRatings = [features.transactionDetailsDisplay.gas, features.transactionDetailsDisplay.nonce, features.transactionDetailsDisplay.from, features.transactionDetailsDisplay.to, features.transactionDetailsDisplay.chain, features.transactionDetailsDisplay.value]
+	const calldataRatings = [
+		calldataDisplay.rawHex,
+		calldataDisplay.copyHexToClipboard,
+		calldataDisplay.formatted,
+	]
 
-	const passCount = ratings.filter(r => r).length + transactionDetailsRatings.filter(r => r).length
+	const transactionDetailsRatings = [
+		transactionDetailsDisplay.gas,
+		transactionDetailsDisplay.nonce,
+		transactionDetailsDisplay.from,
+		transactionDetailsDisplay.to,
+		transactionDetailsDisplay.chain,
+		transactionDetailsDisplay.value,
+	]
 
-	return passCount >= 6 ? Rating.PASS : passCount >= 3 ? Rating.PARTIAL : Rating.FAIL
+	const totalCriteria = calldataRatings.length + transactionDetailsRatings.length 
+	const passCount = calldataRatings.filter(r => r).length + transactionDetailsRatings.filter(r => r).length
+
+
+	if (passCount >= totalCriteria) {
+		return Rating.PASS
+	}
+
+	if (passCount >= 3) {
+		return Rating.PARTIAL
+	}
+
+	return Rating.FAIL
 }
 
 export const dataDisplay: Attribute<DataDisplayValue> = {
@@ -42,19 +72,29 @@ export const dataDisplay: Attribute<DataDisplayValue> = {
 	},
 	question: sentence('Does {{WALLET_NAME}} allow users to view transaction data?'),
 	why: markdown(`
-		Data display is an important security feature that allows users to inspect the raw transaction data before signing.
+		Data display is an important security feature that allows users to inspect transaction data before signing.
 		This transparency enables users to verify what they are actually signing, helping them detect malicious or unexpected transactions.
-		Users should be able to view data in multiple formats (raw hex, formatted, and be able to copy it) to enable independent verification and analysis.
+		Users should be able to view both calldata (in multiple formats: raw hex, formatted, and be able to copy it) and essential transaction details (gas, nonce, from, to, chain, value) to enable independent verification and analysis.
 	`),
 	methodology: markdown(`
-		Evaluated based on whether the wallet allows users to view transaction calldata in different formats:
+		Evaluated based on two aspects of data display:
+
+		**Calldata Display:**
 		- **Raw Hex Display:** Can the wallet display the calldata in raw hexadecimal format?
 		- **Copy to Clipboard:** Can users copy the raw hex calldata to their clipboard for external analysis?
 		- **Formatted Display:** Can the wallet display the calldata in a formatted output (e.g., JSON, decoded parameters)?
-		
-		A wallet receives a passing rating if it supports all three methods of calldata display.
-		A wallet receives a partial rating if it supports at least one method.
-		A wallet receives a failing rating if it does not support any method of calldata display.
+
+		**Transaction Details Display:**
+		- **Gas:** Can the wallet display the gas limit and/or gas price?
+		- **Nonce:** Can the wallet display the transaction nonce?
+		- **From:** Can the wallet display the sender address?
+		- **To:** Can the wallet display the recipient address?
+		- **Chain:** Can the wallet display which chain/network the transaction is for?
+		- **Value:** Can the wallet display the transaction value/amount?
+
+		A wallet receives a passing rating if it supports all of these 9 criteria.
+		A wallet receives a partial rating if it supports at least 5 of these 9 criteria.
+		A wallet receives a failing rating if it supports 2 or fewer criteria.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
@@ -62,20 +102,20 @@ export const dataDisplay: Attribute<DataDisplayValue> = {
 		pass: [
 			exampleRating(
 				sentence(
-					'The wallet supports all calldata display methods (raw hex, copy to clipboard, and formatted display).',
+					'The wallet supports comprehensive data display, including calldata display methods and essential transaction details.',
 				),
 				(v: DataDisplayValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The wallet supports some calldata display methods.'),
+				sentence('The wallet supports some data display methods for calldata and/or transaction details.'),
 				(v: DataDisplayValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The wallet does not support calldata display.'),
+				sentence('The wallet does not support adequate data display for calldata or transaction details.'),
 				(v: DataDisplayValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -99,27 +139,50 @@ export const dataDisplay: Attribute<DataDisplayValue> = {
 		}
 
 		const rating = evaluateDataDisplay(dataDisplayFeature)
-		const calldataDisplayReferences = dataDisplayFeature.calldataDisplay ? refs(dataDisplayFeature.calldataDisplay) : []
-		const transactionDetailsDisplayReferences = dataDisplayFeature.transactionDetailsDisplay ? refs(dataDisplayFeature.transactionDetailsDisplay) : []
 
-		const references = mergeRefs(calldataDisplayReferences, transactionDetailsDisplayReferences)
+		if (rating === Rating.UNRATED) {
+			return unrated(dataDisplay, brand, null)
+		}
+
+		const calldataDisplayData =
+			dataDisplayFeature.calldataDisplay !== null
+				? popRefs<CallDataDisplay>(dataDisplayFeature.calldataDisplay).withoutRefs
+				: null
+		const transactionDetailsDisplayData =
+			dataDisplayFeature.transactionDetailsDisplay !== null
+				? popRefs<TransactionDetailsDisplay>(dataDisplayFeature.transactionDetailsDisplay).withoutRefs
+				: null
+
+		// This should not happen if rating is not UNRATED, but TypeScript needs this check
+		if (calldataDisplayData === null || transactionDetailsDisplayData === null) {
+			return unrated(dataDisplay, brand, null)
+		}
+
+		const calldataDisplayReferences = dataDisplayFeature.calldataDisplay
+			? refs(dataDisplayFeature.calldataDisplay)
+			: []
+		const transactionDetailsDisplayReferences = dataDisplayFeature.transactionDetailsDisplay
+			? refs(dataDisplayFeature.transactionDetailsDisplay)
+			: []
+
+		const allRefs = mergeRefs(calldataDisplayReferences, transactionDetailsDisplayReferences)
 
 		return {
 			value: {
-				id: 'call-data-display',
+				id: 'data-display',
 				rating,
-				displayName: 'Call Data Display',
+				displayName: 'Data Display',
 				shortExplanation: sentence(
-					`{{WALLET_NAME}} has ${rating.toLowerCase()} call data display.`,
+					`{{WALLET_NAME}} has ${rating.toLowerCase()} data display.`,
 				),
 				...dataDisplayFeature,
 				__brand: brand,
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} call data display evaluation is ${rating.toLowerCase()}.`,
+				`{{WALLET_NAME}} data display evaluation is ${rating.toLowerCase()}, considering both calldata display and transaction details display.`,
 			),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-			references,
+			...(allRefs.length > 0 && { references: allRefs }),
 		}
 	},
 }
