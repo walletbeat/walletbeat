@@ -19,6 +19,8 @@ import { type AtLeastOneVariant } from '@/schema/variants'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
+import { isSupported } from '@/schema/features/support'
+import { mergeRefs } from '@/schema/reference'
 
 const brand = 'attributes.transaction-legibility'
 
@@ -83,8 +85,9 @@ function partialTransactionLegibility(): Evaluation<TransactionLegibilityValue> 
 }
 
 function fullTransactionLegibility(
-	refs: Array<{ url: string; explanation: string }> = [],
+	references: Array<{ url: string; explanation: string }> = [],
 ): Evaluation<TransactionLegibilityValue> {
+
 	return {
 		value: {
 			id: 'full_transaction_legibility',
@@ -96,8 +99,7 @@ function fullTransactionLegibility(
 		details: mdParagraph(
 			'{{WALLET_NAME}} full transaction legibility. All transaction details are clearly displayed on the wallet screen/window for verification before signing, providing maximum security and transparency for users.',
 		),
-		// Include references if provided
-		references: refs.length > 0 ? refs : undefined,
+		references: references.length > 0 ? references : [],
 	}
 }
 
@@ -128,17 +130,29 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		and decoded calldata, allowing users to make informed decisions before authorizing transactions.
 	`),
 	methodology: markdown(`
-		Wallets are evaluated based on how clearly they display transaction details for a specific set of benchmark transactions.
+		Wallets are evaluated based on two key aspects of transaction legibility:
 
-		A wallet receives a passing rating if it implements full transaction legibility, where all transaction
-		details are clearly displayed on the wallet screen for verification before signing. This includes
-		support for standard transactions, ERC-20 token transfers, EIP-712 messages and complex contract interactions. 
-		
-		A wallet receives a partial rating if it implements transaction legibility but with limitations, such
-		as not displaying all transaction details or not supporting transaction legibility for all transaction types.
-		
-		A hardware wallet fails this attribute if it doesn't properly implement transaction legibility functionality,
-		requiring users to trust the connected software wallet without independent verification.
+		**Calldata Decoding (legibility):**
+		The wallet's ability to decode and display calldata for various transaction types, including:
+		- Simple transfers (ETH_USDC_TRANSFER, ZKSYNC_USDC_TRANSFER)
+		- Token approvals (USDC_APPROVAL)
+		- DeFi interactions (AAVE_SUPPLY)
+		- Complex nested transactions (SAFEWALLET_AAVE_SUPPLY_NESTED, SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND)
+
+		**Transaction Details Display (detailsDisplayed):**
+		The wallet's ability to display essential transaction information:
+		- Gas limit and/or gas price
+		- Transaction nonce
+		- Sender address (from)
+		- Recipient address (to)
+		- Chain/network identifier
+		- Transaction value/amount
+
+		A wallet receives a passing rating if it supports decoding of complex nested transactions AND displays all essential transaction details.
+
+		A wallet receives a partial rating if it has some decoding support (basic or complex) OR displays most transaction details, but not both at the full level.
+
+		A wallet receives a failing rating if it lacks both calldata decoding support and does not display essential transaction details.
 
 		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet itself. Any data shown on a software wallet component is ignored for hardware wallet ratings.
 	`),
@@ -179,92 +193,58 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<TransactionLegibilityValue> => {
 		// Check if transaction legibility feature exists
-		if (features.security.transactionLegibility === null) {
+		if (features.security.transactionLegibility === null || features.security.transactionLegibility.dataExtraction === null || features.security.transactionLegibility.detailsDisplayed === null || features.security.transactionLegibility.legibility === null) {
 			return unrated(transactionLegibility, brand, null)
 		}
 
 		// Extract references from the wallet transaction legibility feature
-		const references = refs(features.security.transactionLegibility)
+		const references = mergeRefs(refs(features.security.transactionLegibility.legibility), refs(features.security.transactionLegibility.detailsDisplayed), refs(features.security.transactionLegibility.dataExtraction))
 
-		const messageExtraction =
-			features.security.transactionLegibility.messageSigning.messageExtraction
-		const messageDecoding = features.security.transactionLegibility.messageSigning.calldataDecoding
-		const calldataExtraction =
-			features.security.transactionLegibility.transactionSigning.calldataExtraction
-		const calldataDecoding =
-			features.security.transactionLegibility.transactionSigning.calldataDecoding
-		const displayedTransactionDetails =
-			features.security.transactionLegibility.transactionSigning.displayedTransactionDetails
+		const legibility = features.security.transactionLegibility.legibility
+		const detailsDisplayed = features.security.transactionLegibility.detailsDisplayed
+		const dataExtraction = features.security.transactionLegibility.dataExtraction
 
-		// Determine overall rating based on all features
 		const getOverallRating = (): Rating => {
-			// If any feature is null (unreviewed), return UNRATED
-			if (
-				messageExtraction === null ||
-				messageDecoding === null ||
-				calldataDecoding === null ||
-				calldataExtraction === null ||
-				displayedTransactionDetails === null
-			) {
+			if (legibility === null || detailsDisplayed === null || dataExtraction === null) {
 				return Rating.UNRATED
 			}
 
-			// PASS: Full support across all dimensions
-			const messageExtractionPass: boolean | null =
-				messageExtraction[DataExtraction.QRCODE] ||
-				messageExtraction[DataExtraction.HASHES] ||
-				messageExtraction[DataExtraction.COPY]
+			// Check if wallet supports calldata decoding for complex transactions
+			const supportsComplexDecoding: boolean =
+				supportsAnyCalldataDecoding(legibility) &&
+				(isSupported(legibility[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]) ||
+					isSupported(legibility[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]))
 
-			// Either the wallet decodes it, or, you can extract it to decode it yourself
-			const messageDecodingPass: boolean | null =
-				messageDecoding[
-					CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
-				] ||
-				messageDecoding[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED] ||
-				messageExtractionPass
+			// Check if wallet supports basic calldata decoding
+			const supportsBasicDecoding: boolean =
+				isSupported(legibility[CalldataDecoding.ETH_USDC_TRANSFER]) &&
+				isSupported(legibility[CalldataDecoding.ZKSYNC_USDC_TRANSFER]) &&
+				isSupported(legibility[CalldataDecoding.AAVE_SUPPLY])
 
-			const calldataExtractionPass: boolean | null =
-				calldataExtraction[DataExtraction.QRCODE] ||
-				calldataExtraction[DataExtraction.HASHES] ||
-				messageExtraction[DataExtraction.COPY]
+			// Check if all transaction details are displayed
+			const displaysAllDetails: boolean = isFullTransactionDetails(detailsDisplayed)
 
-			// Either the wallet decodes it, or, you can extract it to decode it yourself and it does a basic decoding
-			const calldataDecodingPass: boolean | null =
-				calldataDecoding[
-					CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
-				] ||
-				calldataDecoding[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED] ||
-				(calldataExtractionPass &&
-					(calldataDecoding[CalldataDecoding.ETH_USDC_TRANSFER] ||
-						calldataDecoding[CalldataDecoding.ZKSYNC_USDC_TRANSFER] ||
-						calldataDecoding[CalldataDecoding.AAVE_SUPPLY]))
-
-			const displayedTransactionDetailsPass: boolean | null = isFullTransactionDetails(
-				displayedTransactionDetails,
-			)
-
-			if (
-				messageExtractionPass &&
-				messageDecodingPass &&
-				calldataExtractionPass &&
-				calldataDecodingPass &&
-				displayedTransactionDetailsPass
-			) {
+			// PASS: Full support - complex decoding AND all details displayed
+			if (supportsComplexDecoding && displaysAllDetails) {
 				return Rating.PASS
 			}
 
-			// FAIL: No support or very poor support
-			// At this time, we do not consider not decoding to be a fail
-			const messageExtractionFail: boolean = !supportsAnyDataExtraction(messageExtraction)
-			const calldataExtractionFail: boolean = !supportsAnyDataExtraction(calldataExtraction)
-			const displayedTransactionDetailsFail: boolean =
-				displayedTransactionDetails !== displaysFullTransactionDetails
-
-			if ((messageExtractionFail || calldataExtractionFail) && displayedTransactionDetailsFail) {
+			// FAIL: No decoding support AND missing essential details
+			if (!supportsAnyCalldataDecoding(legibility) && !displaysAllDetails) {
 				return Rating.FAIL
 			}
 
-			// PARTIAL: Everything else
+			// PARTIAL: Some support but not full
+			// Either has basic decoding, or displays most details, or has some complex decoding but missing details
+			if (
+				supportsBasicDecoding ||
+				displaysAllDetails ||
+				(supportsAnyCalldataDecoding(legibility) && !displaysAllDetails)
+			) {
+				return Rating.PARTIAL
+			}
+
+			// Default to PARTIAL if we have any support
 			return Rating.PARTIAL
 		}
 
@@ -275,18 +255,10 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 				return unrated(transactionLegibility, brand, null)
 			}
 
-			// Necessary check to appease the TypeScript typechecker, as it can't
-			// guarantee that the `null` checks we've already performed are still
-			// true when executing this inner function. This should never happen.
-			if (
-				messageExtraction === null ||
-				messageDecoding === null ||
-				calldataDecoding === null ||
-				calldataExtraction === null ||
-				displayedTransactionDetails === null
-			) {
+			// Necessary check to appease the TypeScript typechecker
+			if (legibility === null || detailsDisplayed === null) {
 				throw new Error(
-					'Got unknown message extraction or calldata decoding information despite checking it earlier',
+					'Got null legibility or detailsDisplayed despite checking it earlier',
 				)
 			}
 
@@ -295,12 +267,11 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 			} else if (overallRating === Rating.PASS) {
 				return fullTransactionLegibility()
 			} else {
-				// Determine if it's basic or partial based on some features working
-				const hasPartialSupport =
-					!supportsAnyCalldataDecoding(messageDecoding) ||
-					!supportsAnyCalldataDecoding(calldataDecoding)
+				// Determine if it's basic or partial based on decoding support
+				const hasDecodingSupport = supportsAnyCalldataDecoding(legibility)
+				const hasAllDetails = isFullTransactionDetails(detailsDisplayed)
 
-				if (hasPartialSupport) {
+				if (hasDecodingSupport && !hasAllDetails) {
 					return partialTransactionLegibility()
 				} else {
 					return basicTransactionLegibility()
