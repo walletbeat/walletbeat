@@ -186,7 +186,8 @@ export const imkeyWallet: HardwareWallet = {
 					[CalldataDecoding.USDC_APPROVAL]: notSupported,
 					[CalldataDecoding.AAVE_SUPPLY]: notSupported,
 					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: notSupported,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: notSupported,
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						notSupported,
 				},
 			},
 			userSafety: null,

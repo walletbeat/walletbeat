@@ -29,7 +29,7 @@ import type { SecurityAudit } from './features/security/security-audits'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type {
-	HardwareWalletTransactionLegibilitySupport,
+	CallDataDisplayImplementation,
 	TransactionLegibilityImplementation,
 } from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
@@ -94,9 +94,6 @@ export interface WalletBaseFeatures {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
-
-		/** Transaction legibility implementation */
-		transactionLegibility: VariantFeature<TransactionLegibilityImplementation>
 	}
 
 	/** Privacy features. */
@@ -156,6 +153,9 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
+
+		/** Call data display implementation */
+		callDataDisplay: VariantFeature<CallDataDisplayImplementation>
 	}
 
 	/** Privacy features. */
@@ -212,10 +212,8 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
-		transactionLegibility: VariantFeature<
-			WalletBaseFeatures['security']['transactionLegibility'] &
-				HardwareWalletTransactionLegibilitySupport
-		>
+		/** Transaction legibility implementation */
+		transactionLegibility: VariantFeature<TransactionLegibilityImplementation>
 		/** Secure element support */
 		secureElement: VariantFeature<Support<SecureElementSupport>>
 	}
@@ -278,6 +276,7 @@ export interface ResolvedFeatures {
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
 		transactionLegibility: ResolvedFeature<TransactionLegibilityImplementation>
+		callDataDisplay: ResolvedFeature<CallDataDisplayImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
@@ -388,9 +387,13 @@ export function resolveFeatures(
 				'security.hardwareWalletSupport',
 				features => features.security.hardwareWalletSupport,
 			),
-			transactionLegibility: baseFeat(
+			transactionLegibility: hardwareFeat(
 				'security.transactionLegibility',
 				features => features.security.transactionLegibility,
+			),
+			callDataDisplay: softwareFeat(
+				'security.callDataDisplay',
+				features => features.security.callDataDisplay,
 			),
 			passkeyVerification: baseFeat(
 				'passkeyVerification',
