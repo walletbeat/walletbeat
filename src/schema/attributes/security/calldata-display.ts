@@ -10,16 +10,12 @@ import { exempt, pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.calldata-display'
 
-export type CalldataDisplayValue = Value & {
+export type CallDataDisplayValue = Value & {
 	__brand: 'attributes.security.calldata-display'
 }
 
 function evaluateCalldataDisplay(features: CallDataDisplaySupport): Rating {
-	const ratings = [
-		features.rawHex,
-		features.copyHexToClipboard,
-		features.formatted,
-	]
+	const ratings = [features.rawHex, features.copyHexToClipboard, features.formatted]
 
 	// If any rating is null (unreviewed), return UNRATED
 	if (ratings.some(r => r === null)) {
@@ -39,14 +35,16 @@ function evaluateCalldataDisplay(features: CallDataDisplaySupport): Rating {
 	return Rating.FAIL
 }
 
-export const callDataDisplay: Attribute<CalldataDisplayValue> = {
+export const callDataDisplay: Attribute<CallDataDisplayValue> = {
 	id: 'calldata-display',
 	icon: '💾',
 	displayName: 'Calldata Display',
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's calldata display evaluated?",
-		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its calldata display?'),
+		whatCanWalletDoAboutIts: sentence(
+			'What can {{WALLET_NAME}} do to improve its calldata display?',
+		),
 	},
 	question: sentence('Does {{WALLET_NAME}} allow users to view transaction calldata?'),
 	why: markdown(`
@@ -69,28 +67,35 @@ export const callDataDisplay: Attribute<CalldataDisplayValue> = {
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The wallet supports all calldata display methods (raw hex, copy to clipboard, and formatted display).'),
-				(v: CalldataDisplayValue) => v.rating === Rating.PASS,
+				sentence(
+					'The wallet supports all calldata display methods (raw hex, copy to clipboard, and formatted display).',
+				),
+				(v: CallDataDisplayValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The wallet supports some calldata display methods.'),
-				(v: CalldataDisplayValue) => v.rating === Rating.PARTIAL,
+				(v: CallDataDisplayValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The wallet does not support calldata display.'),
-				(v: CalldataDisplayValue) => v.rating === Rating.FAIL,
+				(v: CallDataDisplayValue) => v.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<CalldataDisplayValue>>) =>
-		pickWorstRating<CalldataDisplayValue>(perVariant),
-	evaluate: (features: ResolvedFeatures): Evaluation<CalldataDisplayValue> => {
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<CallDataDisplayValue>>) =>
+		pickWorstRating<CallDataDisplayValue>(perVariant),
+	evaluate: (features: ResolvedFeatures): Evaluation<CallDataDisplayValue> => {
 		if (features.type === WalletType.HARDWARE) {
-			return exempt(callDataDisplay, sentence('Call data display is only rated for software wallets'), brand, null)
+			return exempt(
+				callDataDisplay,
+				sentence('Call data display is only rated for software wallets'),
+				brand,
+				null,
+			)
 		}
 
 		const callDataDisplayFeature = features.security.callDataDisplay
@@ -106,11 +111,15 @@ export const callDataDisplay: Attribute<CalldataDisplayValue> = {
 				id: 'call-data-display',
 				rating,
 				displayName: 'Call Data Display',
-				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} call data display.`),
+				shortExplanation: sentence(
+					`{{WALLET_NAME}} has ${rating.toLowerCase()} call data display.`,
+				),
 				...callDataDisplayFeature,
 				__brand: brand,
 			},
-			details: paragraph(`{{WALLET_NAME}} call data display evaluation is ${rating.toLowerCase()}.`),
+			details: paragraph(
+				`{{WALLET_NAME}} call data display evaluation is ${rating.toLowerCase()}.`,
+			),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
 			// TODO: References.
 		}

@@ -18,6 +18,7 @@ import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy
 import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
+import type { CallDataDisplayImplementation } from './features/security/calldata-display'
 import type { FirmwareSupport } from './features/security/firmware'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
@@ -28,9 +29,7 @@ import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
-import type {
-	TransactionLegibilityImplementation,
-} from './features/security/transaction-legibility'
+import type { TransactionLegibilityImplementation } from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
@@ -54,7 +53,6 @@ import {
 	type VariantFeature,
 } from './variants'
 import { variantToWalletType, type WalletType } from './wallet-types'
-import type { CallDataDisplayImplementation } from './features/security/calldata-display'
 
 /**
  * A set of features about any type of wallet.

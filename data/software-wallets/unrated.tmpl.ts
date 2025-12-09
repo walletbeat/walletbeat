@@ -83,6 +83,7 @@ export const unratedTemplate: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
+			callDataDisplay: null,
 			hardwareWalletSupport: null,
 			lightClient: {
 				ethereumL1: null,
@@ -90,7 +91,6 @@ export const unratedTemplate: SoftwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			callDataDisplay: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

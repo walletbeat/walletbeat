@@ -6,7 +6,6 @@ import {
 	type Value,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
-import type { DataExtractionMethods } from '@/schema/features/security/transaction-legibility'
 import {
 	CalldataDecoding,
 	DataExtraction,

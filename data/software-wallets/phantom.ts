@@ -110,6 +110,7 @@ export const phantom: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
+			callDataDisplay: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {
@@ -127,7 +128,6 @@ export const phantom: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			callDataDisplay: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -1,4 +1,4 @@
-import type { WithRef } from "@/schema/reference"
+import type { WithRef } from '@/schema/reference'
 
 export interface CallDataDisplaySupport {
 	/* Can display the calldata in raw hex format */
