@@ -2,6 +2,7 @@ import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/at
 import { exampleRating } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
 import { type CallDataDisplaySupport } from '@/schema/features/security/calldata-display'
+import { refs } from '@/schema/reference'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -105,6 +106,7 @@ export const callDataDisplay: Attribute<CallDataDisplayValue> = {
 		}
 
 		const rating = evaluateCalldataDisplay(callDataDisplayFeature)
+		const references = refs(callDataDisplayFeature)
 
 		return {
 			value: {
@@ -121,7 +123,7 @@ export const callDataDisplay: Attribute<CallDataDisplayValue> = {
 				`{{WALLET_NAME}} call data display evaluation is ${rating.toLowerCase()}.`,
 			),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-			// TODO: References.
+			references,
 		}
 	},
 }
