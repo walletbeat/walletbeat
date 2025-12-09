@@ -333,19 +333,6 @@ export const isFullTransactionDetails = (details: DisplayedTransactionDetails): 
 		details.gas && details.nonce && details.from && details.to && details.chain && details.value
 	)
 }
-
-export interface CallDataDisplay {
-	/* Can display the calldata in raw hex format */
-	rawHex: boolean
-
-	/* Can the user copy the raw hex code to the clipboard? */
-	copyHexToClipboard: boolean
-
-	/* Can display the calldata in some formatted output (e.g. JSON) */
-	formatted: boolean
-}
-
-export type CallDataDisplayImplementation = WithRef<CallDataDisplay>
 export type MessageSigningImplementation = WithRef<MessageSigningSupport>
 export type TransactionSigningImplementation = WithRef<TransactionSigningSupport>
 export type TransactionLegibilityImplementation = WithRef<TransactionLegibilitySupport>

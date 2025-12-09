@@ -29,7 +29,6 @@ import type { SecurityAudit } from './features/security/security-audits'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type {
-	CallDataDisplayImplementation,
 	TransactionLegibilityImplementation,
 } from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
@@ -55,6 +54,7 @@ import {
 	type VariantFeature,
 } from './variants'
 import { variantToWalletType, type WalletType } from './wallet-types'
+import type { CallDataDisplayImplementation } from './features/security/calldata-display'
 
 /**
  * A set of features about any type of wallet.
