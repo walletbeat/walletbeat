@@ -48,38 +48,40 @@ export const callDataDisplay: Attribute<CalldataDisplayValue> = {
 		howIsEvaluated: "How is a wallet's calldata display evaluated?",
 		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its calldata display?'),
 	},
-	question: sentence('Does {{WALLET_NAME}} have secure and open calldata display?'),
+	question: sentence('Does {{WALLET_NAME}} allow users to view transaction calldata?'),
 	why: markdown(`
-		Firmware security and openness are critical for user trust, resistance against attacks, and ensuring the device can be safely upgraded.
-		Users need assurance that the code running on their device is authentic and hasn't been tampered with.
-		Openness allows for independent verification and community audit.
+		Calldata display is an important security feature that allows users to inspect the raw transaction data before signing.
+		This transparency enables users to verify what they are actually signing, helping them detect malicious or unexpected transactions.
+		Users should be able to view calldata in multiple formats (raw hex, formatted, and be able to copy it) to enable independent verification and analysis.
 	`),
 	methodology: markdown(`
-		Evaluated based on several factors:
-		- **Update Security:** Protection against silent/forced updates, authentication requirements for updates, and possibility of downgrades.
-		- **Source Code Openness:** Availability and licensing of firmware source code (full or partial), and isolation between open/closed parts.
-		- **Build Verifiability:** Ability to reproduce firmware builds from source and compare against official binaries (reproducible builds).
-		- **Runtime Integrity:** Mechanisms to check the authenticity of the code running on the device.
-		- **Custom Firmware:** Support for users loading custom firmware and its impact on device security/integrity.
+		Evaluated based on whether the wallet allows users to view transaction calldata in different formats:
+		- **Raw Hex Display:** Can the wallet display the calldata in raw hexadecimal format?
+		- **Copy to Clipboard:** Can users copy the raw hex calldata to their clipboard for external analysis?
+		- **Formatted Display:** Can the wallet display the calldata in a formatted output (e.g., JSON, decoded parameters)?
+		
+		A wallet receives a passing rating if it supports all three methods of calldata display.
+		A wallet receives a partial rating if it supports at least one method.
+		A wallet receives a failing rating if it does not support any method of calldata display.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
 		pass: [
 			exampleRating(
-				sentence('The hardware wallet passes most calldata display sub-criteria.'),
+				sentence('The wallet supports all calldata display methods (raw hex, copy to clipboard, and formatted display).'),
 				(v: CalldataDisplayValue) => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
-				sentence('The hardware wallet passes some calldata display sub-criteria.'),
+				sentence('The wallet supports some calldata display methods.'),
 				(v: CalldataDisplayValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The hardware wallet fails most or all calldata display sub-criteria.'),
+				sentence('The wallet does not support calldata display.'),
 				(v: CalldataDisplayValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -87,33 +89,17 @@ export const callDataDisplay: Attribute<CalldataDisplayValue> = {
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<CalldataDisplayValue>>) =>
 		pickWorstRating<CalldataDisplayValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<CalldataDisplayValue> => {
-		if (features.type !== WalletType.HARDWARE) {
-			return exempt(callDataDisplay, sentence('Call data display is only rated for hardware wallets'), brand, {
-				rawHex: CallDataDisplayType.FAIL,
-				copyHexToClipboard: CallDataDisplayType.FAIL,
-				formatted: CallDataDisplayType.FAIL,
-			})
+		if (features.type === WalletType.HARDWARE) {
+			return exempt(callDataDisplay, sentence('Call data display is only rated for software wallets'), brand, null)
 		}
 
 		const callDataDisplayFeature = features.security.callDataDisplay
 
 		if (callDataDisplayFeature === null) {
-			return unrated(callDataDisplay, brand, {
-				rawHex: false,
-				copyHexToClipboard: false,
-				formatted: false,
-			})
+			return unrated(callDataDisplay, brand, null)
 		}
-		
-		const rating = evaluateCalldataDisplay(callDataDisplayFeature)
 
-		if (rating === Rating.UNRATED) {
-			return unrated(callDataDisplay, brand, {
-				rawHex: false,
-				copyHexToClipboard: false,
-				formatted: false,
-			})
-		}
+		const rating = evaluateCalldataDisplay(callDataDisplayFeature)
 
 		return {
 			value: {
@@ -121,7 +107,7 @@ export const callDataDisplay: Attribute<CalldataDisplayValue> = {
 				rating,
 				displayName: 'Call Data Display',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} call data display.`),
-				...callDataDisplayFeature, // TODO: Filter fields.
+				...callDataDisplayFeature,
 				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} call data display evaluation is ${rating.toLowerCase()}.`),
