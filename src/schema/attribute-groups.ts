@@ -66,11 +66,11 @@ import {
 	bugBountyProgram,
 	type BugBountyProgramValue,
 } from './attributes/security/bug-bounty-program'
-import { dataDisplay, type DataDisplayValue } from './attributes/security/data-display'
 import {
 	chainVerification,
 	type ChainVerificationValue,
 } from './attributes/security/chain-verification'
+import { dataDisplay, type DataDisplayValue } from './attributes/security/data-display'
 import { firmware, type FirmwareValue } from './attributes/security/firmware'
 import {
 	hardwareWalletSupport,

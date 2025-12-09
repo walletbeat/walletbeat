@@ -44,9 +44,9 @@ function evaluateDataDisplay(features: DataDisplaySupport): Rating {
 		transactionDetailsDisplay.value,
 	]
 
-	const totalCriteria = calldataRatings.length + transactionDetailsRatings.length 
-	const passCount = calldataRatings.filter(r => r).length + transactionDetailsRatings.filter(r => r).length
-
+	const totalCriteria = calldataRatings.length + transactionDetailsRatings.length
+	const passCount =
+		calldataRatings.filter(r => r).length + transactionDetailsRatings.filter(r => r).length
 
 	if (passCount >= totalCriteria) {
 		return Rating.PASS
@@ -66,9 +66,7 @@ export const dataDisplay: Attribute<DataDisplayValue> = {
 	wording: {
 		midSentenceName: null,
 		howIsEvaluated: "How is a wallet's data display evaluated?",
-		whatCanWalletDoAboutIts: sentence(
-			'What can {{WALLET_NAME}} do to improve its data display?',
-		),
+		whatCanWalletDoAboutIts: sentence('What can {{WALLET_NAME}} do to improve its data display?'),
 	},
 	question: sentence('Does {{WALLET_NAME}} allow users to view transaction data?'),
 	why: markdown(`
@@ -109,13 +107,17 @@ export const dataDisplay: Attribute<DataDisplayValue> = {
 		],
 		partial: [
 			exampleRating(
-				sentence('The wallet supports some data display methods for calldata and/or transaction details.'),
+				sentence(
+					'The wallet supports some data display methods for calldata and/or transaction details.',
+				),
 				(v: DataDisplayValue) => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
-				sentence('The wallet does not support adequate data display for calldata or transaction details.'),
+				sentence(
+					'The wallet does not support adequate data display for calldata or transaction details.',
+				),
 				(v: DataDisplayValue) => v.rating === Rating.FAIL,
 			),
 		],
@@ -150,7 +152,8 @@ export const dataDisplay: Attribute<DataDisplayValue> = {
 				: null
 		const transactionDetailsDisplayData =
 			dataDisplayFeature.transactionDetailsDisplay !== null
-				? popRefs<TransactionDetailsDisplay>(dataDisplayFeature.transactionDetailsDisplay).withoutRefs
+				? popRefs<TransactionDetailsDisplay>(dataDisplayFeature.transactionDetailsDisplay)
+						.withoutRefs
 				: null
 
 		// This should not happen if rating is not UNRATED, but TypeScript needs this check
@@ -172,9 +175,7 @@ export const dataDisplay: Attribute<DataDisplayValue> = {
 				id: 'data-display',
 				rating,
 				displayName: 'Data Display',
-				shortExplanation: sentence(
-					`{{WALLET_NAME}} has ${rating.toLowerCase()} data display.`,
-				),
+				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} data display.`),
 				...dataDisplayFeature,
 				__brand: brand,
 			},

@@ -389,10 +389,7 @@ export function resolveFeatures(
 				'security.transactionLegibility',
 				features => features.security.transactionLegibility,
 			),
-			dataDisplay: softwareFeat(
-				'security.dataDisplay',
-				features => features.security.dataDisplay,
-			),
+			dataDisplay: softwareFeat('security.dataDisplay', features => features.security.dataDisplay),
 			passkeyVerification: baseFeat(
 				'passkeyVerification',
 				features => features.security.passkeyVerification,

@@ -11,7 +11,6 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
-import { CalldataDecoding } from '@/schema/features/security/transaction-legibility'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -221,14 +220,14 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			dataDisplay: {	
+			dataDisplay: {
 				calldataDisplay: {
 					ref: refTodo,
-					rawHex: true,
 					copyHexToClipboard: true,
 					formatted: true,
+					rawHex: true,
 				},
-				transactionDetailsDisplay: null
+				transactionDetailsDisplay: null,
 			},
 			hardwareWalletSupport: {
 				ref: [
