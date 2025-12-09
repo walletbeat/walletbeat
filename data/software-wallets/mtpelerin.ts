@@ -130,7 +130,7 @@ export const mtpelerin: SoftwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
-			callDataDisplay: null,
+			dataDisplay: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},

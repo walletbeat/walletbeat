@@ -117,7 +117,7 @@ export const frame: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			callDataDisplay: null,
+			dataDisplay: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {

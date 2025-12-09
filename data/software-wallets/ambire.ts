@@ -440,7 +440,7 @@ export const ambire: SoftwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: false,
 			}),
-			callDataDisplay: null,
+			dataDisplay: null,
 			hardwareWalletSupport: {
 				ref: {
 					explanation:

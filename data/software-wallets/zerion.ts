@@ -100,6 +100,7 @@ export const zerion: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
+			dataDisplay: null,
 			hardwareWalletSupport: {
 				ref: [
 					{
@@ -132,7 +133,6 @@ export const zerion: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			transactionLegibility: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

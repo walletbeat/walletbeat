@@ -21,7 +21,6 @@ import {
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
-import { CalldataDecoding } from '@/schema/features/security/transaction-legibility'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
@@ -360,6 +359,18 @@ export const rabby: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
+			dataDisplay: supported({
+				calldataDisplay: null,
+				transactionDetailsDisplay: supported({
+					ref: refTodo,
+					chain: true,
+					from: true,
+					gas: true,
+					nonce: true,
+					to: true,
+					value: true,
+				}),
+			}),
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
 					ref: [
@@ -601,26 +612,6 @@ export const rabby: SoftwareWallet = {
 					newRecipientWarning: false,
 					userWhitelist: true,
 				}),
-			},
-			transactionLegibility: {
-				ref: refTodo,
-
-				detailsDisplayed: {
-					chain: true,
-					from: true,
-					gas: true,
-					nonce: true,
-					to: true,
-					value: true,
-				},
-				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-					[CalldataDecoding.USDC_APPROVAL]: null,
-					[CalldataDecoding.AAVE_SUPPLY]: false,
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-				},
 			},
 		},
 		selfSovereignty: {
