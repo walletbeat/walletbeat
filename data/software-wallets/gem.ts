@@ -163,7 +163,7 @@ export const gemwallet: SoftwareWallet = {
 					userWhitelist: false,
 				}),
 			},
-			transactionLegibility: null,
+			callDataDisplay: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

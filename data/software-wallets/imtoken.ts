@@ -338,7 +338,7 @@ export const imtoken: SoftwareWallet = {
 				}),
 				sendTransactionWarning: notSupported,
 			},
-			transactionLegibility: null,
+			callDataDisplay: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

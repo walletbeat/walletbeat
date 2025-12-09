@@ -127,7 +127,7 @@ export const phantom: SoftwareWallet = {
 			},
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			transactionLegibility: null,
+			callDataDisplay: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

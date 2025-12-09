@@ -403,7 +403,7 @@ export const daimo: SoftwareWallet = {
 					userWhitelist: false,
 				}),
 			},
-			transactionLegibility: null,
+			callDataDisplay: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

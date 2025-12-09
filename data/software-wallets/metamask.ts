@@ -351,7 +351,7 @@ export const metamask: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
-			transactionLegibility: {
+			callDataDisplay: {
 				ref: refTodo,
 				detailsDisplayed: {
 					chain: true,
