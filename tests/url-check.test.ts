@@ -677,6 +677,7 @@ describe('reference URLs', () => {
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
 					if (social !== undefined) {
 						const urlString = labeledUrl(social).url
+						// LinkedIn urls would always return Response `900`. Skip linkedin urls to avoid failing the test.
 						if (urlString.includes('linkedin.com')) {
 							continue
 						}
