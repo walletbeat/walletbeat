@@ -262,52 +262,6 @@ export function supportsAnyDataExtraction(dataExtractionMethods: DataExtractionM
 }
 
 /**
- * A record of hardware wallet message signing support
- */
-export interface MessageSigningSupport {
-	/**
-	 * How is a user able to verify the message they are about to sign?
-	 * A wallet may support multiple data extraction methods.
-	 * This maps data extraction methods to whether the wallet supports it.
-	 */
-	messageExtraction: DataExtractionMethods | null
-
-	/**
-	 * Does a wallet decode calldata natively within EIP-712 messages?
-	 * This maps some transaction types to whether or not the wallet is able to
-	 * extract the data they need to verify its meaning.
-	 */
-	calldataDecoding: CalldataDecodingTypes | null
-
-	/**
-	 * Additional details about the message signing implementation
-	 */
-	details?: string
-}
-
-/**
- * A record of hardware wallet transaction signing support
- */
-export interface TransactionSigningSupport {
-	/**
-	 * Basic transaction details displayed
-	 */
-	displayedTransactionDetails: DisplayedTransactionDetails | null
-	/**
-	 * Does a wallet decode calldata natively?
-	 */
-	calldataDecoding: CalldataDecodingTypes | null
-	/**
-	 * How is a user able to extract calldata from a hardware wallet?
-	 */
-	calldataExtraction: DataExtractionMethods | null
-	/**
-	 * Additional details about the transaction signing implementation
-	 */
-	details?: string
-}
-
-/**
  * A record of transaction legibility support (both message and transaction)
  */
 export interface TransactionLegibilitySupport {
@@ -319,11 +273,9 @@ export interface TransactionLegibilitySupport {
 	 * Does a wallet display transaction details clearly?
 	 */
 	detailsDisplayed: DisplayedTransactionDetails | null
-}
 
-export interface HardwareWalletTransactionLegibilitySupport {
 	/**
-	 * How is a user able to extract calldata from a hardware wallet?
+	 * Does a wallet allow for data extraction?
 	 */
 	dataExtraction: DataExtractionMethods | null
 }
@@ -333,6 +285,4 @@ export const isFullTransactionDetails = (details: DisplayedTransactionDetails): 
 		details.gas && details.nonce && details.from && details.to && details.chain && details.value
 	)
 }
-export type MessageSigningImplementation = WithRef<MessageSigningSupport>
-export type TransactionSigningImplementation = WithRef<TransactionSigningSupport>
 export type TransactionLegibilityImplementation = WithRef<TransactionLegibilitySupport>
