@@ -564,6 +564,37 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '4df76409512b9f9f52f2dfb9efc14081a9ef0729',
 		retrieved: '2025-12-08',
 	},
+	{
+		url: 'https://www.youtube.com/watch?v=R0g35dKjRtI',
+		urlHash: '18accfdc98d7db3fe8da0d329de0fc07f01d0288',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
+		urlHash: '5a4fcf1a9f5962726e0276ecfb9ac3b8ae9f8a5a',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://guide.keyst.one/docs/keystone',
+		urlHash: 'f9bec99a37876566243f6ee49468e3aeca9e7e64',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://support.ledger.com/article/360018444599-zd',
+		urlHash: '8549635465c6f706108cbca9f14cbef16295ea71',
+		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
+		urlHash: '1f6bf49de87f6fcdbce0d353fc7ef8681c212685',
+		retrieved: '2025-12-09',
+	},
+
+	{
+		url: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
+		urlHash: '826047213cd41016cbcd483f67ee42961129f5a1',
+		retrieved: '2025-12-09'
+},
 ]
 
 const newValidUrls: string[] = []

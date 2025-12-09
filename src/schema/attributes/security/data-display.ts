@@ -13,10 +13,10 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.data-display'
+const brand = 'attributes.security.data_display'
 
 export type DataDisplayValue = Value & {
-	__brand: 'attributes.security.data-display'
+	__brand: 'attributes.security.data_display'
 }
 
 function evaluateDataDisplay(features: DataDisplaySupport): Rating {
@@ -60,7 +60,7 @@ function evaluateDataDisplay(features: DataDisplaySupport): Rating {
 }
 
 export const dataDisplay: Attribute<DataDisplayValue> = {
-	id: 'data-display',
+	id: 'dataDisplay',
 	icon: '💾',
 	displayName: 'Data Display',
 	wording: {
@@ -172,7 +172,7 @@ export const dataDisplay: Attribute<DataDisplayValue> = {
 
 		return {
 			value: {
-				id: 'data-display',
+				id: 'dataDisplay',
 				rating,
 				displayName: 'Data Display',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} data display.`),

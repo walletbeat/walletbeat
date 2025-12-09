@@ -189,29 +189,25 @@ The ability to connect to web3 applications is crucial for hardware wallet
 users who want to interact with DeFi protocols, NFT marketplaces, and other Web3 services 
 while maintaining the security of their private keys on a hardware device.
 
-Hardware wallets face unique challenges in connecting to apps because they must maintain 
-an air gap for security while still enabling complex interactions. The methods available 
-for connection significantly impact both security and user experience.
+Hardware wallets must maintain an air gap for security while still enabling complex interactions. 
+Connection methods significantly impact security and user experience.
 
-Wallets that only offer proprietary closed-source solutions create vendor lock-in and 
-require users to trust unverifiable software. In contrast, wallets supporting standard 
-protocols or integration with popular software wallets give users 
-more choice and transparency.
+Wallets with only proprietary closed-source solutions force vendor lock-in and trust in unverifiable software. 
+Supporting standard protocols or popular wallet integrations offers users more choice and transparency.
 `),
 	methodology: markdown(`
 Hardware wallets are evaluated based on the reliability, openness, and breadth of their 
-best app connection method, not the number of connection methods available.
+best app connection method.
 
-A wallet receives a passing rating if it can connect to any app using entirely verifiable 
-code or open standards, such as through integration with popular software wallets or 
-open-source applications.
+A wallet receives a passing rating if it can connect to any app using verifiable 
+code or open standards.
 
 A wallet receives a partial rating if it can connect to apps but requires trusting 
-unverifiable code (such as a proprietary closed-source application), or if it can only 
-connect to some apps even when using verifiable code or open standards.
+unverifiable code (proprietary closed-source), or if it can only connect to some apps 
+even when using verifiable code or open standards.
 
 A hardware wallet fails this attribute if it cannot connect to apps at all, severely 
-limiting its utility in the modern Web3 ecosystem.
+limiting its utility.
 `),
 	ratingScale: {
 		display: 'pass-fail',

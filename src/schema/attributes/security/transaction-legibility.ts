@@ -129,14 +129,14 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 	methodology: markdown(`
 		Wallets are evaluated based on three key aspects of transaction legibility:
 
-		**Calldata Decoding (legibility):**
+		**Calldata Decoding:**
 		The wallet's ability to decode and display calldata for various transaction types, including:
-		- Simple transfers (ETH_USDC_TRANSFER, ZKSYNC_USDC_TRANSFER)
-		- Token approvals (USDC_APPROVAL)
-		- DeFi interactions (AAVE_SUPPLY)
-		- Complex nested transactions (SAFEWALLET_AAVE_SUPPLY_NESTED, SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND)
+		- Simple transfers
+		- Token approvals
+		- DeFi interactions
+		- Complex nested transactions
 
-		**Transaction Details Display (detailsDisplayed):**
+		**Transaction Details Display:**
 		The wallet's ability to display essential transaction information:
 		- Gas limit and/or gas price
 		- Transaction nonce
@@ -145,14 +145,14 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		- Chain/network identifier
 		- Transaction value/amount
 
-		**Data Extraction (dataExtraction):**
+		**Data Extraction:**
 		The wallet's ability to allow users to extract transaction data for verification:
-		- Visual display (EYES): Users can view the data on the wallet screen
-		- QR code (QRCODE): Users can scan a QR code to extract data
-		- Hashes (HASHES): Users can compare hashes to verify data
-		- Copy to clipboard (COPY): Users can copy the data directly (software wallets)
+		- Visual display: Users can view the data on the wallet screen
+		- QR code: Users can scan a QR code to extract data
+		- Hashes: Users can compare hashes to verify data
+		- Copy to clipboard: Users can copy the data directly (software wallets)
 
-		A wallet receives a passing rating if it supports decoding of complex nested transactions AND displays all essential transaction details AND provides at least one data extraction method (visual display is acceptable, but advanced methods like QR codes or hashes are preferred).
+		A wallet receives a passing rating if it supports decoding of complex nested transactions and displays all essential transaction details and provides at least one data extraction method.
 
 		A wallet receives a partial rating if it has some combination of these features (decoding support, transaction details display, or data extraction methods), but not all at the full level.
 
