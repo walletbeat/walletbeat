@@ -13,12 +13,14 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
+	CalldataDecoded,
 	CalldataDecoding,
+	type CalldataDecodingSupport,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -159,12 +161,25 @@ export const gridplusWallet: HardwareWallet = {
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
 				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-					[CalldataDecoding.USDC_APPROVAL]: null,
-					[CalldataDecoding.AAVE_SUPPLY]: true,
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+					[CalldataDecoding.ETH_USDC_TRANSFER]: supported<WithRef<CalldataDecodingSupport>>({
+						ref: refNotNecessary,
+						decoded: CalldataDecoded.ON_DEVICE,
+					}),
+					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: supported({
+						ref: refNotNecessary,
+						decoded: CalldataDecoded.ON_DEVICE,
+					}),
+					[CalldataDecoding.USDC_APPROVAL]: notSupported,
+					[CalldataDecoding.AAVE_SUPPLY]: supported({
+						ref: refNotNecessary,
+						decoded: CalldataDecoded.ON_DEVICE,
+					}),
+					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: supported({
+						ref: refNotNecessary,
+						decoded: CalldataDecoded.ON_DEVICE,
+					}),
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						notSupported,
 				},
 			},
 			userSafety: null,

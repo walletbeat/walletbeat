@@ -13,6 +13,7 @@ import {
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
+	CalldataDecoded,
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
@@ -188,12 +189,22 @@ export const keystoneWallet: HardwareWallet = {
 				},
 				detailsDisplayed: { ...displaysFullTransactionDetails, nonce: false },
 				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: true,
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: true,
-					[CalldataDecoding.USDC_APPROVAL]: null,
-					[CalldataDecoding.AAVE_SUPPLY]: true,
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
+					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
+						ref: refTodo,
+						decoded: CalldataDecoded.ON_DEVICE,
+					}),
+					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: supported({
+						ref: refTodo,
+						decoded: CalldataDecoded.ON_DEVICE,
+					}),
+					[CalldataDecoding.USDC_APPROVAL]: notSupported,
+					[CalldataDecoding.AAVE_SUPPLY]: supported({
+						ref: refTodo,
+						decoded: CalldataDecoded.ON_DEVICE,
+					}),
+					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: notSupported,
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						notSupported,
 				},
 			},
 			userSafety: null,
