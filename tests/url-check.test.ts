@@ -593,8 +593,8 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
 		urlHash: '826047213cd41016cbcd483f67ee42961129f5a1',
-		retrieved: '2025-12-09'
-},
+		retrieved: '2025-12-09',
+	},
 ]
 
 const newValidUrls: string[] = []
