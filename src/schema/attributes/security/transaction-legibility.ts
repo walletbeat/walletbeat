@@ -102,18 +102,6 @@ function fullTransactionLegibility(
 	}
 }
 
-/**
- * Helper function for `DataExtractionMethods` that only supports one method.
- */
-function singleDataExtractionMethod(method: DataExtraction): DataExtractionMethods {
-	return {
-		[DataExtraction.EYES]: method === DataExtraction.EYES,
-		[DataExtraction.COPY]: method === DataExtraction.COPY,
-		[DataExtraction.QRCODE]: method === DataExtraction.QRCODE,
-		[DataExtraction.HASHES]: method === DataExtraction.HASHES,
-	}
-}
-
 export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 	id: 'transactionLegibility',
 	icon: '\u{1F50F}', // Lock with pen
