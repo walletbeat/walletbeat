@@ -1,7 +1,13 @@
 import type { WithRef } from '@/schema/reference'
 
 export interface DataDisplaySupport {
+	/**
+	 * Does the software wallet support displaying the calldata in different formats?
+	 */
 	calldataDisplay: WithRef<CallDataDisplay> | null
+	/**
+	 * Does the software wallet support displaying the transaction details?
+	 */
 	transactionDetailsDisplay: WithRef<TransactionDetailsDisplay> | null
 }
 
