@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+
 import { notSupported, type Support } from '../support'
 
 /**
@@ -169,8 +170,10 @@ export enum CalldataDecoding {
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type CalldataDecodingTypes = Record<CalldataDecoding, Support<WithRef<CalldataDecodingSupport>>>
-
+export type CalldataDecodingTypes = Record<
+	CalldataDecoding,
+	Support<WithRef<CalldataDecodingSupport>>
+>
 
 /** If a wallet can decode the calldata for a specific transaction, what does that look like? */
 export interface CalldataDecodingSupport {
@@ -200,7 +203,7 @@ export const noCalldataDecoding: CalldataDecodingTypes = {
  * extraction method at all.
  */
 export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecodingTypes): boolean {
-	return Object.values(calldataDecodingTypes).some((support) => support.support === 'SUPPORTED')
+	return Object.values(calldataDecodingTypes).some(support => support.support === 'SUPPORTED')
 }
 
 /**
