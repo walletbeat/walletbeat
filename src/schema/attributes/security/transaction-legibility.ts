@@ -117,24 +117,6 @@ function singleDataExtractionMethod(method: DataExtraction): DataExtractionMetho
 	}
 }
 
-/**
- * Helper function for `DataExtractionMethods` that only supports one method.
- */
-function singleCalldataDecodingType(calldataDecoding: CalldataDecoding): CalldataDecodingTypes {
-	return {
-		[CalldataDecoding.AAVE_SUPPLY]: calldataDecoding === CalldataDecoding.AAVE_SUPPLY,
-		[CalldataDecoding.ETH_USDC_TRANSFER]: calldataDecoding === CalldataDecoding.ETH_USDC_TRANSFER,
-		[CalldataDecoding.USDC_APPROVAL]: calldataDecoding === CalldataDecoding.USDC_APPROVAL,
-		[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]:
-			calldataDecoding === CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
-		[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-			calldataDecoding ===
-			CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
-		[CalldataDecoding.ZKSYNC_USDC_TRANSFER]:
-			calldataDecoding === CalldataDecoding.ZKSYNC_USDC_TRANSFER,
-	}
-}
-
 export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 	id: 'transactionLegibility',
 	icon: '\u{1F50F}', // Lock with pen
