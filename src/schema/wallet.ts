@@ -173,6 +173,14 @@ export interface SocialUrls {
 	telegram?: DomainUrl<'t.me' | 'telegram.org' | 'telegram.me'>
 	/** Youtube URL, if available. */
 	youtube?: DomainUrl<'youtube.com'>
+	/** Reddit URL, if available. */
+	reddit?: DomainUrl<'reddit.com' | 'www.reddit.com'>
+	/** Instagram URL, if available. */
+	instagram?: DomainUrl<'instagram.com' | 'www.instagram.com'>
+	/** TikTok URL, if available. */
+	tiktok?: DomainUrl<'tiktok.com' | 'www.tiktok.com'>
+	/** Facebook URL, if available. */
+	facebook?: DomainUrl<'facebook.com' | 'www.facebook.com'>
 }
 /** Per-wallet, per-attribute override. */
 export interface AttributeOverride {
