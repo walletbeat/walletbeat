@@ -48,7 +48,9 @@ export const keystoneWallet: HardwareWallet = {
 			docs: ['https://support.keyst.one/'],
 			repositories: ['https://github.com/KeystoneHQ'],
 			socials: {
+				facebook: 'https://web.facebook.com/people/Keystone-Wallet/',
 				farcaster: 'https://farcaster.xyz/keystonewallet',
+				reddit: 'https://www.reddit.com/r/KeystoneWallet/',
 				telegram: 'https://t.me/KeystoneWallet',
 				x: 'https://x.com/KeystoneWallet',
 				youtube: 'https://www.youtube.com/channel/UCaReIdawwYPPcyWGoNunF7g',

@@ -52,7 +52,10 @@ export const bitboxWallet: HardwareWallet = {
 			docs: ['https://bitbox.swiss/dev/'],
 			repositories: ['https://github.com/BitBoxSwiss/bitbox02-firmware'],
 			socials: {
+				facebook: 'https://web.facebook.com/BitBoxSwiss',
+				instagram: 'https://www.instagram.com/bitboxswiss/',
 				linkedin: 'https://www.linkedin.com/company/bitbox-swiss/',
+				reddit: 'https://www.reddit.com/r/BitBoxWallet/',
 				x: 'https://x.com/BitBoxSwiss',
 				youtube: 'https://www.youtube.com/@bitboxswiss',
 			},

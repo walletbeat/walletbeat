@@ -43,6 +43,8 @@ export const ngrave: HardwareWallet = {
 		urls: {
 			socials: {
 				discord: 'https://discord.com/invite/gapxmWEBNJ',
+				facebook: 'https://web.facebook.com/ngrave.io/',
+				instagram: 'https://www.instagram.com/ngrave.io/',
 				linkedin: 'https://www.linkedin.com/company/ngrave/',
 				x: 'https://x.com/ngrave_official',
 			},

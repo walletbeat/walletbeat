@@ -63,7 +63,10 @@ export const trezorWallet: HardwareWallet = {
 			docs: ['https://trezor.io/learn'],
 			repositories: ['https://github.com/trezor/trezor-suite'],
 			socials: {
+				instagram: 'https://www.instagram.com/trezor.io/',
 				linkedin: 'https://www.linkedin.com/company/trezor/',
+				reddit: 'https://www.reddit.com/r/TREZOR/',
+				tiktok: 'https://www.tiktok.com/@trezor.io_official',
 				x: 'https://x.com/trezor',
 				youtube: 'https://www.youtube.com/@TrezorWallet',
 			},

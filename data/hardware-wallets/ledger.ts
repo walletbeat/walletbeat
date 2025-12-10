@@ -69,7 +69,11 @@ export const ledgerWallet: HardwareWallet = {
 			docs: ['https://developers.ledger.com/'],
 			repositories: ['https://github.com/LedgerHQ/'],
 			socials: {
+				facebook: 'https://web.facebook.com/Ledger/',
+				instagram: 'https://www.instagram.com/ledger/',
 				linkedin: 'https://www.linkedin.com/company/ledgerhq/',
+				reddit: 'https://www.reddit.com/r/ledgerwallet/',
+				tiktok: 'https://www.tiktok.com/@ledger',
 				x: 'https://x.com/Ledger',
 			},
 			websites: ['https://www.ledger.com/'],
