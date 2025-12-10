@@ -180,7 +180,7 @@ export interface SocialUrls {
 	/** TikTok URL, if available. */
 	tiktok?: DomainUrl<'tiktok.com' | 'www.tiktok.com'>
 	/** Facebook URL, if available. */
-	facebook?: DomainUrl<'facebook.com' | 'www.facebook.com'>
+	facebook?: DomainUrl<'facebook.com' | 'www.facebook.com' | 'web.facebook.com'>
 }
 /** Per-wallet, per-attribute override. */
 export interface AttributeOverride {
