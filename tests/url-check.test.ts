@@ -674,15 +674,28 @@ describe('reference URLs', () => {
 				}
 			})
 			it('has valid socials', async () => {
+				// These urls would always return an error Response. Skip urls to avoid failing the test.
+				const SOCIALS_TO_SKIP = [
+					'linkedin.com',
+					'facebook.com',
+					'instagram.com',
+					'reddit.com',
+					'tiktok.com',
+				]
+
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
-					if (social !== undefined) {
-						const urlString = labeledUrl(social).url
-						// LinkedIn urls would always return Response `900`. Skip linkedin urls to avoid failing the test.
-						if (urlString.includes('linkedin.com')) {
-							continue
-						}
-						await checkValidUrl(social)
+					if (social === undefined) {
+						continue
 					}
+
+					const urlString = labeledUrl(social).url
+					const shouldSkip = SOCIALS_TO_SKIP.some(s => urlString.includes(s))
+
+					if (shouldSkip) {
+						continue
+					}
+
+					await checkValidUrl(social)
 				}
 			})
 			it('has valid others', async () => {
