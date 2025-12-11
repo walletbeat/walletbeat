@@ -2,40 +2,46 @@ import type { WithRef } from '@/schema/reference'
 
 import { notSupported, type Support } from '../support'
 
+enum TransactionDisplayOptions {
+	SHOWN_BY_DEFAULT = 'SHOWN_BY_DEFAULT',
+	SHOWN_OPTIONALLY = 'SHOWN_OPTIONALLY',
+	NOT_IN_UI = 'NOT_IN_UI'
+}
+
 /**
- * What essential transaction data does the hardware wallet show? (Or can show via options)
+ * How are the essential transaction data displayed by the hardware wallet?
  */
 export interface DisplayedTransactionDetails {
-	gas: boolean
-	nonce: boolean
-	from: boolean
-	to: boolean
-	chain: boolean
-	value: boolean
+	gas: TransactionDisplayOptions
+	nonce: TransactionDisplayOptions
+	from: TransactionDisplayOptions
+	to: TransactionDisplayOptions
+	chain: TransactionDisplayOptions
+	value: TransactionDisplayOptions
 }
 
 /**
  * The wallet displays no transaction details.
  */
 export const displaysNoTransactionDetails: DisplayedTransactionDetails = {
-	gas: false,
-	nonce: false,
-	from: false,
-	to: false,
-	chain: false,
-	value: false,
+	gas: TransactionDisplayOptions.NOT_IN_UI,
+	nonce: TransactionDisplayOptions.NOT_IN_UI,
+	from: TransactionDisplayOptions.NOT_IN_UI,
+	to: TransactionDisplayOptions.NOT_IN_UI,
+	chain: TransactionDisplayOptions.NOT_IN_UI,
+	value: TransactionDisplayOptions.NOT_IN_UI,
 }
 
 /**
  * The wallet displays all the possible transaction details.
  */
 export const displaysFullTransactionDetails: DisplayedTransactionDetails = {
-	gas: true,
-	nonce: true,
-	from: true,
-	to: true,
-	chain: true,
-	value: true,
+	gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+	nonce: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+	from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+	to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+	chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+	value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 }
 
 /**
@@ -282,7 +288,12 @@ export interface TransactionLegibilitySupport {
 
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
 	return (
-		details.gas && details.nonce && details.from && details.to && details.chain && details.value
+		details.gas === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.nonce === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.from === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.to === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.chain === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.value === TransactionDisplayOptions.SHOWN_BY_DEFAULT
 	)
 }
 export type TransactionLegibilityImplementation = WithRef<TransactionLegibilitySupport>
