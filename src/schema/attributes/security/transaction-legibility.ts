@@ -19,17 +19,14 @@ import { type AtLeastOneVariant } from '@/schema/variants'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
+import type { HardwareTransactionLegibilityImplementation } from '@/schema/features/security/transaction-legibility'
+import { WalletType } from '@/schema/wallet-types'
 
 const brand = 'attributes.transaction_legibility'
 
-export type HardwareTransactionLegibilityValue = Value & {
-	__brand: 'attributes.hardware_transaction_legibility'
+export type TransactionLegibilityValue = Value & {
+	__brand: 'attributes.transaction_legibility'
 }
-
-export type SoftwareTransactionLegibilityValue = Value & {
-	__brand: 'attributes.software_transaction_legibility'
-}
-
 function noTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
@@ -101,6 +98,101 @@ function fullTransactionLegibility(
 			'{{WALLET_NAME}} full transaction legibility. All transaction details are clearly displayed on the wallet screen/window for verification before signing, providing maximum security and transparency for users.',
 		),
 		references: references.length > 0 ? references : [],
+	}
+}
+
+function evaluateHardwareWalletTransactionLegibility(hardwareTransactionLegibility: HardwareTransactionLegibilityImplementation): Evaluation<TransactionLegibilityValue> {
+	const references = refs(hardwareTransactionLegibility)
+
+	const legibility = hardwareTransactionLegibility.legibility
+	const detailsDisplayed = hardwareTransactionLegibility.detailsDisplayed
+	const dataExtraction = hardwareTransactionLegibility.dataExtraction
+
+	const getOverallRating = (): Rating => {
+		if (legibility === null || detailsDisplayed === null || dataExtraction === null) {
+			return Rating.UNRATED
+		}
+
+		// Check if wallet supports calldata decoding for complex transactions
+		const supportsComplexDecoding: boolean =
+			supportsAnyCalldataDecoding(legibility) &&
+			(isSupported(
+				legibility[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND],
+			) ||
+				isSupported(legibility[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]))
+
+		// Check if wallet supports basic calldata decoding
+		const supportsBasicDecoding: boolean =
+			isSupported(legibility[CalldataDecoding.ETH_USDC_TRANSFER]) &&
+			isSupported(legibility[CalldataDecoding.ZKSYNC_USDC_TRANSFER]) &&
+			isSupported(legibility[CalldataDecoding.AAVE_SUPPLY])
+
+		// Check if all transaction details are displayed
+		const displaysAllDetails: boolean = isFullTransactionDetails(detailsDisplayed)
+
+		// Check if wallet supports any data extraction method
+		const hasDataExtraction: boolean = supportsAnyDataExtraction(dataExtraction)
+
+		// Check if wallet supports advanced data extraction (more than just visual)
+		const hasAdvancedDataExtraction: boolean =
+			dataExtraction[DataExtraction.EYES] === true &&
+			dataExtraction[DataExtraction.QRCODE] === true &&
+			dataExtraction[DataExtraction.HASHES] === true
+
+		// PASS: Full support - complex decoding AND all details displayed AND at least one data extraction method
+		// Advanced extraction (QRCODE/HASHES/COPY) is preferred, but visual (EYES) is acceptable if all details are clearly displayed
+		if (supportsComplexDecoding && displaysAllDetails && hasAdvancedDataExtraction) {
+			return Rating.PASS
+		}
+
+		// FAIL: No decoding support AND missing essential details AND no data extraction
+		if (!supportsAnyCalldataDecoding(legibility) && !displaysAllDetails && !hasDataExtraction) {
+			return Rating.FAIL
+		}
+
+		// PARTIAL: Some support but not full
+		// Has some combination of: basic/complex decoding, transaction details, or data extraction
+		if (
+			supportsBasicDecoding ||
+			supportsComplexDecoding ||
+			displaysAllDetails ||
+			hasDataExtraction ||
+			(supportsAnyCalldataDecoding(legibility) && !displaysAllDetails)
+		) {
+			return Rating.PARTIAL
+		}
+
+		// Default to PARTIAL if we have any support
+		return Rating.PARTIAL
+	}
+
+	const overallRating = getOverallRating()
+
+	const result = ((): Evaluation<TransactionLegibilityValue> => {
+		if (overallRating === Rating.UNRATED) {
+			return unrated(transactionLegibility, brand, null)
+		}
+
+		if (overallRating === Rating.FAIL) {
+			return noTransactionLegibility()
+		} else if (overallRating === Rating.PASS) {
+			return fullTransactionLegibility()
+		} else {
+			const hasDecodingSupport = legibility !== null && supportsAnyCalldataDecoding(legibility)
+			const hasAllDetails = detailsDisplayed !== null && isFullTransactionDetails(detailsDisplayed)
+
+			if (hasDecodingSupport && !hasAllDetails) {
+				return partialTransactionLegibility()
+			} else {
+				return basicTransactionLegibility()
+			}
+		}
+	})()
+
+	// Return result with references
+	return {
+		...result,
+		references,
 	}
 }
 
@@ -201,108 +293,16 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<TransactionLegibilityValue> => {
 		if (
-			features.security.transactionLegibility === null ||
-			features.security.transactionLegibility.dataExtraction === null ||
-			features.security.transactionLegibility.detailsDisplayed === null ||
-			features.security.transactionLegibility.legibility === null
+			features.security.transactionLegibility === null
 		) {
 			return unrated(transactionLegibility, brand, null)
 		}
 
-		// Extract references from the wallet transaction legibility feature
-		const references = refs(features.security.transactionLegibility)
-
-		const legibility = features.security.transactionLegibility.legibility
-		const detailsDisplayed = features.security.transactionLegibility.detailsDisplayed
-		const dataExtraction = features.security.transactionLegibility.dataExtraction
-
-		const getOverallRating = (): Rating => {
-			if (legibility === null || detailsDisplayed === null || dataExtraction === null) {
-				return Rating.UNRATED
-			}
-
-			// Check if wallet supports calldata decoding for complex transactions
-			const supportsComplexDecoding: boolean =
-				supportsAnyCalldataDecoding(legibility) &&
-				(isSupported(
-					legibility[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND],
-				) ||
-					isSupported(legibility[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]))
-
-			// Check if wallet supports basic calldata decoding
-			const supportsBasicDecoding: boolean =
-				isSupported(legibility[CalldataDecoding.ETH_USDC_TRANSFER]) &&
-				isSupported(legibility[CalldataDecoding.ZKSYNC_USDC_TRANSFER]) &&
-				isSupported(legibility[CalldataDecoding.AAVE_SUPPLY])
-
-			// Check if all transaction details are displayed
-			const displaysAllDetails: boolean = isFullTransactionDetails(detailsDisplayed)
-
-			// Check if wallet supports any data extraction method
-			const hasDataExtraction: boolean = supportsAnyDataExtraction(dataExtraction)
-
-			// Check if wallet supports advanced data extraction (more than just visual)
-			const hasAdvancedDataExtraction: boolean =
-				dataExtraction[DataExtraction.EYES] === true &&
-				dataExtraction[DataExtraction.QRCODE] === true &&
-				dataExtraction[DataExtraction.HASHES] === true
-
-			// PASS: Full support - complex decoding AND all details displayed AND at least one data extraction method
-			// Advanced extraction (QRCODE/HASHES/COPY) is preferred, but visual (EYES) is acceptable if all details are clearly displayed
-			if (supportsComplexDecoding && displaysAllDetails && hasAdvancedDataExtraction) {
-				return Rating.PASS
-			}
-
-			// FAIL: No decoding support AND missing essential details AND no data extraction
-			if (!supportsAnyCalldataDecoding(legibility) && !displaysAllDetails && !hasDataExtraction) {
-				return Rating.FAIL
-			}
-
-			// PARTIAL: Some support but not full
-			// Has some combination of: basic/complex decoding, transaction details, or data extraction
-			if (
-				supportsBasicDecoding ||
-				supportsComplexDecoding ||
-				displaysAllDetails ||
-				hasDataExtraction ||
-				(supportsAnyCalldataDecoding(legibility) && !displaysAllDetails)
-			) {
-				return Rating.PARTIAL
-			}
-
-			// Default to PARTIAL if we have any support
-			return Rating.PARTIAL
+		if (features.type === WalletType.HARDWARE) {
+			return evaluateHardwareWalletTransactionLegibility(features.security.transactionLegibility as HardwareTransactionLegibilityImplementation)
 		}
 
-		const overallRating = getOverallRating()
-
-		const result = ((): Evaluation<TransactionLegibilityValue> => {
-			if (overallRating === Rating.UNRATED) {
-				return unrated(transactionLegibility, brand, null)
-			}
-
-			if (overallRating === Rating.FAIL) {
-				return noTransactionLegibility()
-			} else if (overallRating === Rating.PASS) {
-				return fullTransactionLegibility()
-			} else {
-				// Determine if it's basic or partial based on decoding support
-				const hasDecodingSupport = supportsAnyCalldataDecoding(legibility)
-				const hasAllDetails = isFullTransactionDetails(detailsDisplayed)
-
-				if (hasDecodingSupport && !hasAllDetails) {
-					return partialTransactionLegibility()
-				} else {
-					return basicTransactionLegibility()
-				}
-			}
-		})()
-
-		// Return result with references
-		return {
-			...result,
-			references,
-		}
+		return evaluateSoftwareWalletTransactionLegibility(features)
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<TransactionLegibilityValue>>) =>
 		pickWorstRating<TransactionLegibilityValue>(perVariant),
