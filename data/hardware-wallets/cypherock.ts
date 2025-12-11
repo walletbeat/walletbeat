@@ -208,6 +208,7 @@ export const cypherockWallet: HardwareWallet = {
 					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT, // contract address
 					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 				},
+				kind: 'hardware',
 				legibility: noCalldataDecoding,
 			},
 			userSafety: null,

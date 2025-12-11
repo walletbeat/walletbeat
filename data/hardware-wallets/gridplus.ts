@@ -160,6 +160,7 @@ export const gridplusWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
+				kind: 'hardware',
 				legibility: {
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported<WithRef<CalldataDecodingSupport>>({
 						ref: refNotNecessary,

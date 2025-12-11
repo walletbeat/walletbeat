@@ -19,7 +19,6 @@ import {
 import { isSupported } from '@/schema/features/support'
 import { popRefs, refs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
-import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
@@ -169,10 +168,8 @@ function softwareFullTransactionLegibility(
 }
 
 function evaluateHardwareWalletTransactionLegibility(
-	features: ResolvedFeatures,
+	hardwareTransactionLegibility: HardwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const hardwareTransactionLegibility = features.security
-		.transactionLegibility as HardwareTransactionLegibilityImplementation
 	const references = refs(hardwareTransactionLegibility)
 
 	const legibility = hardwareTransactionLegibility.legibility
@@ -268,11 +265,8 @@ function evaluateHardwareWalletTransactionLegibility(
 }
 
 function evaluateSoftwareWalletTransactionLegibility(
-	features: ResolvedFeatures,
+	softwareTransactionLegibility: SoftwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const softwareTransactionLegibility = features.security
-		.transactionLegibility as SoftwareTransactionLegibilityImplementation
-
 	if (softwareTransactionLegibility === null) {
 		return unrated(transactionLegibility, brand, null)
 	}
@@ -462,11 +456,11 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 			return unrated(transactionLegibility, brand, null)
 		}
 
-		if (features.type === WalletType.HARDWARE) {
-			return evaluateHardwareWalletTransactionLegibility(features)
+		if (features.security.transactionLegibility.kind === 'hardware') {
+			return evaluateHardwareWalletTransactionLegibility(features.security.transactionLegibility)
 		}
 
-		return evaluateSoftwareWalletTransactionLegibility(features)
+		return evaluateSoftwareWalletTransactionLegibility(features.security.transactionLegibility)
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<TransactionLegibilityValue>>) =>
 		pickWorstRating<TransactionLegibilityValue>(perVariant),

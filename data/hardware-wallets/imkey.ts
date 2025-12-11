@@ -177,6 +177,7 @@ export const imkeyWallet: HardwareWallet = {
 					...displaysFullTransactionDetails,
 					nonce: TransactionDisplayOptions.NOT_IN_UI,
 				},
+				kind: 'hardware',
 				legibility: {
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
 						ref: refTodo,

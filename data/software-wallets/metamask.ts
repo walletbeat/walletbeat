@@ -361,6 +361,7 @@ export const metamask: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,
+				kind: 'software',
 				transactionDetailsDisplay: null,
 			},
 		},

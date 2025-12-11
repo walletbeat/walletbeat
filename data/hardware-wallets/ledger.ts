@@ -186,6 +186,7 @@ export const ledgerWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
+				kind: 'hardware',
 				legibility: noCalldataDecoding,
 			},
 			userSafety: null,
