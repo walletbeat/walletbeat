@@ -39,6 +39,8 @@ export interface AppConnectionMethodDetails {
 	 * Which connection methods are supported (must have at least one)
 	 */
 	supportedConnections: NonEmptySet<AppConnectionMethod | SoftwareWalletType>
+
+	// TODO: Add check for whether features requires manufacturer consent
 }
 
 /**
