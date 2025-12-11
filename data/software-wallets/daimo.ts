@@ -354,7 +354,7 @@ export const daimo: SoftwareWallet = {
 		profile: WalletProfile.PAYMENTS,
 		security: {
 			bugBountyProgram: null,
-			dataDisplay: null,
+			transactionLegibility: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},

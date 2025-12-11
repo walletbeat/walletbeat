@@ -11,6 +11,7 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { type ScamUrlWarning } from '@/schema/features/security/scam-alerts'
+import { displaysFullCallData, displaysFullTransactionDetails, TransactionDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
@@ -180,23 +181,11 @@ export const safe: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			dataDisplay: supported({
-				calldataDisplay: supported({
-					ref: refTodo,
-					copyHexToClipboard: true,
-					formatted: true,
-					rawHex: true,
-				}),
-				transactionDetailsDisplay: supported({
-					ref: refTodo,
-					chain: true,
-					from: true,
-					gas: true,
-					nonce: true,
-					to: true,
-					value: true,
-				}),
-			}),
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: displaysFullCallData,
+				transactionDetailsDisplay: displaysFullTransactionDetails,
+			},
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {

@@ -272,7 +272,7 @@ export const imtoken: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			dataDisplay: null,
+			transactionLegibility: null,
 			hardwareWalletSupport: {
 				[Variant.MOBILE]: {
 					ref: [

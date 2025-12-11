@@ -35,6 +35,7 @@ import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
+import { displaysFullCallData } from '@/schema/features/security/transaction-legibility'
 
 export const metamask: SoftwareWallet = {
 	metadata: {
@@ -227,13 +228,9 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			dataDisplay: {
-				calldataDisplay: {
-					ref: refTodo,
-					copyHexToClipboard: true,
-					formatted: true,
-					rawHex: true,
-				},
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: displaysFullCallData,
 				transactionDetailsDisplay: null,
 			},
 			hardwareWalletSupport: {

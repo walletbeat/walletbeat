@@ -53,6 +53,7 @@ import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
+import { TransactionDisplayOptions } from '@/schema/features/security/transaction-legibility'
 
 export const rabby: SoftwareWallet = {
 	metadata: {
@@ -366,18 +367,18 @@ export const rabby: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			dataDisplay: supported({
+			transactionLegibility: {
+				ref: refTodo,
 				calldataDisplay: null,
-				transactionDetailsDisplay: supported({
-					ref: refTodo,
-					chain: true,
-					from: true,
-					gas: true,
-					nonce: true,
-					to: true,
-					value: true,
-				}),
-			}),
+				transactionDetailsDisplay: {
+					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+			},
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
 					ref: [

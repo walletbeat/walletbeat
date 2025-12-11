@@ -447,7 +447,7 @@ export const ambire: SoftwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: false,
 			}),
-			dataDisplay: null,
+			transactionLegibility: null,
 			hardwareWalletSupport: {
 				ref: {
 					explanation:
