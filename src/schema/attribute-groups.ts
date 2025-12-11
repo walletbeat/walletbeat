@@ -90,8 +90,7 @@ import {
 } from './attributes/security/supply-chain-factory'
 import {
 	transactionLegibility,
-	type HardwareTransactionLegibilityValue,
-	type SoftwareTransactionLegibilityValue,
+	type TransactionLegibilityValue,
 } from './attributes/security/transaction-legibility'
 import { userSafety, type UserSafetyValue } from './attributes/security/user-safety'
 import {
@@ -132,7 +131,7 @@ type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsValue
 	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
-	transactionLegibility: HardwareTransactionLegibilityValue | SoftwareTransactionLegibilityValue
+	transactionLegibility: TransactionLegibilityValue
 	dataDisplay: DataDisplayValue
 	hardwareWalletSupport: HardwareWalletSupportValue
 	passkeyImplementation: PasskeyImplementationValue
@@ -349,7 +348,7 @@ export const attributeTree: NonEmptyRecord<string, AttributeGroup<any>> = {
 
 /** Evaluated security attributes for a single wallet. */
 export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
-	transactionLegibility: EvaluatedAttribute<HardwareTransactionLegibilityValue | SoftwareTransactionLegibilityValue>
+	transactionLegibility: EvaluatedAttribute<TransactionLegibilityValue>
 	securityAudits: EvaluatedAttribute<SecurityAuditsValue>
 	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
