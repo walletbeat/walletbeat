@@ -1,4 +1,5 @@
 import { sigri } from '@/data/contributors/sigri'
+import {mattmatt} from '@/data/contributors/0xmattmatt'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -24,7 +25,7 @@ export const mtpelerin: SoftwareWallet = {
 		blurb: paragraph(
 			'Buy, swap and sell crypto with the lowest fees, zero hidden costs and full control over your cryptoassets.',
 		),
-		contributors: [sigri],
+		contributors: [sigri, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-26',
 		urls: {

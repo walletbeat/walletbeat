@@ -1,5 +1,6 @@
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { nconsigny } from '@/data/contributors/nconsigny'
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -151,7 +152,7 @@ export const ambire: SoftwareWallet = {
 			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
 			improving security and user experience.
 			`),
-		contributors: [jiojosbg, nconsigny],
+		contributors: [jiojosbg, nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-20',
 		urls: {
