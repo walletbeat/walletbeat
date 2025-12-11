@@ -9,30 +9,113 @@ import type { ResolvedFeatures } from '@/schema/features'
 import {
 	CalldataDecoding,
 	DataExtraction,
+	type HardwareTransactionLegibilityImplementation,
 	isFullTransactionDetails,
+	type SoftwareTransactionLegibilityImplementation,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
-	type SoftwareTransactionLegibilityImplementation,
 	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { isSupported } from '@/schema/features/support'
-import { mergeRefs, popRefs, refs } from '@/schema/reference'
+import { popRefs, refs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
+import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
-import type { HardwareTransactionLegibilityImplementation } from '@/schema/features/security/transaction-legibility'
-import { WalletType } from '@/schema/wallet-types'
 
 const brand = 'attributes.transaction_legibility'
 
 export type TransactionLegibilityValue = Value & {
 	__brand: 'attributes.transaction_legibility'
 }
-function noTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
+
+// Hardware wallet evaluation helpers
+function hardwareNoTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
-			id: 'no_transaction_legibility',
+			id: 'hardware_no_transaction_legibility',
+			rating: Rating.FAIL,
+			displayName: 'Unclear transaction details',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} does not display clear transaction details on the hardware device when signing.',
+			),
+			__brand: brand,
+		},
+		details: paragraph(
+			'{{WALLET_NAME}} implements either zero or very little transaction legibility on the hardware device itself. Transaction legibility is important for security as it allows users to verify transaction details directly on their hardware wallet screen before signing, without relying on potentially compromised software.',
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should implement comprehensive transaction legibility on the hardware device itself, including calldata decoding for complex transactions, display of all essential transaction details, and data extraction methods (QR codes, hashes) to allow users to verify transaction details independently.',
+		),
+	}
+}
+
+function hardwareBasicTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
+	return {
+		value: {
+			id: 'hardware_basic_transaction_legibility',
+			rating: Rating.PARTIAL,
+			displayName: 'Basic transaction legibility support',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} supports basic transaction legibility on the hardware device.',
+			),
+			__brand: brand,
+		},
+		details: paragraph(
+			'{{WALLET_NAME}} supports basic transaction legibility on the hardware device, but the implementation does not provide full transparency. The device may display some transaction details or support basic calldata decoding, but lacks comprehensive support for complex transactions, all essential details, or advanced data extraction methods.',
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should improve its transaction legibility implementation to support decoding of complex nested transactions, display all essential transaction details (gas, nonce, from, to, chain, value) on the device, and provide data extraction methods such as QR codes or hashes for independent verification.',
+		),
+	}
+}
+
+function hardwarePartialTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
+	return {
+		value: {
+			id: 'hardware_partial_transaction_legibility',
+			rating: Rating.PARTIAL,
+			displayName: 'Partial transaction legibility support',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} supports partial transaction legibility on the hardware device.',
+			),
+			__brand: brand,
+		},
+		details: paragraph(
+			'{{WALLET_NAME}} supports partial transaction legibility on the hardware device. The device displays most transaction details and may support calldata decoding for some transaction types, but may not fully decode complex nested transactions or provide all data extraction methods. Showing transaction details directly on the hardware device is crucial for security as it allows users to verify transaction details independently of potentially compromised software.',
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should extend its transaction legibility implementation to support decoding of complex nested transactions, ensure all essential transaction details are displayed on the device, and provide comprehensive data extraction methods (QR codes, hashes) for independent verification.',
+		),
+	}
+}
+
+function hardwareFullTransactionLegibility(
+	references: Array<{ url: string; explanation: string }> = [],
+): Evaluation<TransactionLegibilityValue> {
+	return {
+		value: {
+			id: 'hardware_full_transaction_legibility',
+			rating: Rating.PASS,
+			displayName: 'Full transaction legibility support',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} supports full transaction legibility on the hardware device.',
+			),
+			__brand: brand,
+		},
+		details: mdParagraph(
+			'{{WALLET_NAME}} implements full transaction legibility on the hardware device itself. All transaction details are clearly displayed on the device screen, the device supports decoding of complex nested transactions, and provides comprehensive data extraction methods (QR codes, hashes) for independent verification before signing, providing maximum security and transparency for users.',
+		),
+		references: references.length > 0 ? references : [],
+	}
+}
+
+// Software wallet evaluation helpers
+function softwareNoTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
+	return {
+		value: {
+			id: 'software_no_transaction_legibility',
 			rating: Rating.FAIL,
 			displayName: 'Unclear transaction details',
 			shortExplanation: sentence(
@@ -41,70 +124,55 @@ function noTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 			__brand: brand,
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} implements either zero or very little transaction legibility. Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.',
+			'{{WALLET_NAME}} implements either zero or very little transaction legibility. The wallet does not adequately display calldata in multiple formats (raw hex, formatted, copyable) or essential transaction details (gas, nonce, from, to, chain, value). Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should implement comprehensive transaction legibility to improve security by allowing users to verify transaction details on their device.',
+			'{{WALLET_NAME}} should implement comprehensive transaction legibility, including the ability to display calldata in raw hex format, formatted output, and allow copying to clipboard, as well as displaying all essential transaction details (gas, nonce, from, to, chain, value) for user verification.',
 		),
 	}
 }
 
-function basicTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
+function softwarePartialTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
-			id: 'basic_transaction_legibility',
-			rating: Rating.PARTIAL,
-			displayName: 'Basic transaction legibility support',
-			shortExplanation: sentence('{{WALLET_NAME}} supports basic transaction legibility.'),
-			__brand: brand,
-		},
-		details: paragraph(
-			'{{WALLET_NAME}} supports basic transaction legibility, but the implementation does not provide full transparency for all transaction details. Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.',
-		),
-		howToImprove: paragraph(
-			'{{WALLET_NAME}} should improve its transaction legibility implementation to provide full transparency for all transaction details and better calldata extraction methods.',
-		),
-	}
-}
-
-function partialTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
-	return {
-		value: {
-			id: 'partial_transaction_legibility',
+			id: 'software_partial_transaction_legibility',
 			rating: Rating.PARTIAL,
 			displayName: 'Partial transaction legibility support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports partial transaction legibility.'),
 			__brand: brand,
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} supports partial transaction legibility. Most transaction details are displayed on the wallet screen/window for verification, but some complex transactions may not show all details. Showing transaction details (transaction legibility) is crucial for security as it allows users to verify transaction details before signing.',
+			'{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet may display some calldata formats or some transaction details, but lacks comprehensive support for all calldata display methods (raw hex, formatted, copyable) or all essential transaction details (gas, nonce, from, to, chain, value). Showing transaction details is crucial for security as it allows users to verify transaction details before signing.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should extend its transaction legibility implementation to cover all transaction types and ensure all details are clearly displayed with better extraction methods.',
+			'{{WALLET_NAME}} should extend its transaction legibility implementation to support all calldata display methods (raw hex display, formatted output, copy to clipboard) and ensure all essential transaction details (gas, nonce, from, to, chain, value) are clearly displayed for user verification.',
 		),
 	}
 }
 
-function fullTransactionLegibility(
+function softwareFullTransactionLegibility(
 	references: Array<{ url: string; explanation: string }> = [],
 ): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
-			id: 'full_transaction_legibility',
+			id: 'software_full_transaction_legibility',
 			rating: Rating.PASS,
 			displayName: 'Full transaction legibility support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports full transaction legibility.'),
 			__brand: brand,
 		},
 		details: mdParagraph(
-			'{{WALLET_NAME}} full transaction legibility. All transaction details are clearly displayed on the wallet screen/window for verification before signing, providing maximum security and transparency for users.',
+			'{{WALLET_NAME}} implements full transaction legibility. The wallet supports comprehensive calldata display (raw hex format, formatted output, and copy to clipboard) and displays all essential transaction details (gas, nonce, from, to, chain, value) clearly on the wallet screen/window for verification before signing, providing maximum security and transparency for users.',
 		),
 		references: references.length > 0 ? references : [],
 	}
 }
 
-function evaluateHardwareWalletTransactionLegibility(features: ResolvedFeatures): Evaluation<TransactionLegibilityValue> {
-	const hardwareTransactionLegibility = features.security.transactionLegibility as HardwareTransactionLegibilityImplementation
+function evaluateHardwareWalletTransactionLegibility(
+	features: ResolvedFeatures,
+): Evaluation<TransactionLegibilityValue> {
+	const hardwareTransactionLegibility = features.security
+		.transactionLegibility as HardwareTransactionLegibilityImplementation
 	const references = refs(hardwareTransactionLegibility)
 
 	const legibility = hardwareTransactionLegibility.legibility
@@ -177,17 +245,17 @@ function evaluateHardwareWalletTransactionLegibility(features: ResolvedFeatures)
 		}
 
 		if (overallRating === Rating.FAIL) {
-			return noTransactionLegibility()
+			return hardwareNoTransactionLegibility()
 		} else if (overallRating === Rating.PASS) {
-			return fullTransactionLegibility()
+			return hardwareFullTransactionLegibility()
 		} else {
 			const hasDecodingSupport = legibility !== null && supportsAnyCalldataDecoding(legibility)
 			const hasAllDetails = detailsDisplayed !== null && isFullTransactionDetails(detailsDisplayed)
 
 			if (hasDecodingSupport && !hasAllDetails) {
-				return partialTransactionLegibility()
+				return hardwarePartialTransactionLegibility()
 			} else {
-				return basicTransactionLegibility()
+				return hardwareBasicTransactionLegibility()
 			}
 		}
 	})()
@@ -209,9 +277,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 		return unrated(transactionLegibility, brand, null)
 	}
 
-	const { withoutRefs: transactionLegibilitySupport } = popRefs(
-		softwareTransactionLegibility,
-	)
+	const { withoutRefs: transactionLegibilitySupport } = popRefs(softwareTransactionLegibility)
 
 	const calldataDisplay = transactionLegibilitySupport.calldataDisplay
 	const transactionDetailsDisplay = transactionLegibilitySupport.transactionDetailsDisplay
@@ -230,32 +296,24 @@ function evaluateSoftwareWalletTransactionLegibility(
 	const transactionDetailsRatings = [
 		transactionDetailsDisplay.gas === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
 			transactionDetailsDisplay.gas === TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.nonce ===
-			TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.nonce ===
-				TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.from ===
-			TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.from ===
-				TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.nonce === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.nonce === TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.from === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.from === TransactionDisplayOptions.SHOWN_OPTIONALLY,
 		transactionDetailsDisplay.to === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
 			transactionDetailsDisplay.to === TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.chain ===
-			TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.chain ===
-				TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.value ===
-			TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.value ===
-				TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.chain === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.chain === TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.value === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.value === TransactionDisplayOptions.SHOWN_OPTIONALLY,
 	]
 
 	const totalCriteria = calldataRatings.length + transactionDetailsRatings.length
 	const passCount =
-		calldataRatings.filter(r => r).length +
-		transactionDetailsRatings.filter(r => r).length
+		calldataRatings.filter(r => r).length + transactionDetailsRatings.filter(r => r).length
 
 	let rating: Rating
+
 	if (passCount >= totalCriteria) {
 		rating = Rating.PASS
 	} else if (passCount >= 3) {
@@ -268,11 +326,11 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 	const result = ((): Evaluation<TransactionLegibilityValue> => {
 		if (rating === Rating.FAIL) {
-			return noTransactionLegibility()
+			return softwareNoTransactionLegibility()
 		} else if (rating === Rating.PASS) {
-			return fullTransactionLegibility()
+			return softwareFullTransactionLegibility()
 		} else {
-			return partialTransactionLegibility()
+			return softwarePartialTransactionLegibility()
 		}
 	})()
 
@@ -345,42 +403,62 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 	ratingScale: {
 		display: 'pass-fail',
 		exhaustive: true,
-		pass: exampleRating(
-			paragraph(`
-				The wallet implements full transaction legibility, displaying all
-				transaction details on the wallet screen/window for verification before signing.
-			`),
-			fullTransactionLegibility(),
-		),
-		partial: [
+		pass: [
 			exampleRating(
 				paragraph(`
-					The wallet implements partial transaction legibility, where most but not all transaction
-					details are displayed on the wallet screen/window.
+					The hardware wallet implements full transaction legibility, displaying all
+					transaction details on the hardware device screen for verification before signing.
 				`),
-				partialTransactionLegibility(),
+				hardwareFullTransactionLegibility(),
 			),
 			exampleRating(
 				paragraph(`
-					The wallet implements basic transaction legibility, but the implementation is limited
-					and doesn't provide full transparency for all transaction details.
+					The software wallet implements full transaction legibility, displaying all
+					transaction details on the wallet screen/window for verification before signing.
 				`),
-				basicTransactionLegibility(),
+				softwareFullTransactionLegibility(),
+			),
+		],
+		partial: [
+			exampleRating(
+				paragraph(`
+					The hardware wallet implements partial transaction legibility, where most but not all transaction
+					details are displayed on the hardware device screen.
+				`),
+				hardwarePartialTransactionLegibility(),
+			),
+			exampleRating(
+				paragraph(`
+					The hardware wallet implements basic transaction legibility, but the implementation is limited
+					and doesn't provide full transparency for all transaction details on the device.
+				`),
+				hardwareBasicTransactionLegibility(),
+			),
+			exampleRating(
+				paragraph(`
+					The software wallet implements partial transaction legibility, where most but not all transaction
+					details are displayed on the wallet screen/window.
+				`),
+				softwarePartialTransactionLegibility(),
 			),
 		],
 		fail: [
 			exampleRating(
 				paragraph(`
-					The wallet does not implement effective transaction legibility.
+					The hardware wallet does not implement effective transaction legibility on the device itself.
 				`),
-				noTransactionLegibility(),
+				hardwareNoTransactionLegibility(),
+			),
+			exampleRating(
+				paragraph(`
+					The software wallet does not implement effective transaction legibility.
+				`),
+				softwareNoTransactionLegibility(),
 			),
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<TransactionLegibilityValue> => {
-		if (
-			features.security.transactionLegibility === null
-		) {
+		if (features.security.transactionLegibility === null) {
 			return unrated(transactionLegibility, brand, null)
 		}
 

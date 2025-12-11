@@ -21,6 +21,7 @@ import {
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
+import { displaysFullTransactionDetails } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
@@ -53,7 +54,6 @@ import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
-import { TransactionDisplayOptions } from '@/schema/features/security/transaction-legibility'
 
 export const rabby: SoftwareWallet = {
 	metadata: {
@@ -367,18 +367,6 @@ export const rabby: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			transactionLegibility: {
-				ref: refTodo,
-				calldataDisplay: null,
-				transactionDetailsDisplay: {
-					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-				},
-			},
 			hardwareWalletSupport: {
 				[Variant.DESKTOP]: {
 					ref: [
@@ -620,6 +608,11 @@ export const rabby: SoftwareWallet = {
 					newRecipientWarning: false,
 					userWhitelist: true,
 				}),
+			},
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: null,
+				transactionDetailsDisplay: displaysFullTransactionDetails,
 			},
 		},
 		selfSovereignty: {

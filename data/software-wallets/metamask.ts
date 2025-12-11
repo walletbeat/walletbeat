@@ -11,6 +11,7 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
+import { displaysFullCallData } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
@@ -35,7 +36,6 @@ import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
-import { displaysFullCallData } from '@/schema/features/security/transaction-legibility'
 
 export const metamask: SoftwareWallet = {
 	metadata: {
@@ -228,11 +228,6 @@ export const metamask: SoftwareWallet = {
 		profile: WalletProfile.GENERIC,
 		security: {
 			bugBountyProgram: null,
-			transactionLegibility: {
-				ref: refTodo,
-				calldataDisplay: displaysFullCallData,
-				transactionDetailsDisplay: null,
-			},
 			hardwareWalletSupport: {
 				ref: [
 					{
@@ -362,6 +357,11 @@ export const metamask: SoftwareWallet = {
 					newRecipientWarning: true,
 					userWhitelist: true,
 				}),
+			},
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: displaysFullCallData,
+				transactionDetailsDisplay: null,
 			},
 		},
 		selfSovereignty: {

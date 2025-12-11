@@ -447,7 +447,6 @@ export const ambire: SoftwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: false,
 			}),
-			transactionLegibility: null,
 			hardwareWalletSupport: {
 				ref: {
 					explanation:
@@ -495,6 +494,7 @@ export const ambire: SoftwareWallet = {
 				}),
 				sendTransactionWarning: notSupported,
 			},
+			transactionLegibility: null,
 		},
 		selfSovereignty: {
 			transactionSubmission: {

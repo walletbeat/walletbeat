@@ -28,7 +28,10 @@ import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
-import type { HardwareTransactionLegibilityImplementation, SoftwareTransactionLegibilityImplementation } from './features/security/transaction-legibility'
+import type {
+	HardwareTransactionLegibilityImplementation,
+	SoftwareTransactionLegibilityImplementation,
+} from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
@@ -84,7 +87,9 @@ export interface WalletBaseFeatures {
 		bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>>
 
 		/** Transaction legibility features. */
-		transactionLegibility: VariantFeature<HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation>
+		transactionLegibility: VariantFeature<
+			HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation
+		>
 
 		/** Light clients. */
 		lightClient: {
@@ -270,7 +275,9 @@ export interface ResolvedFeatures {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
-		transactionLegibility: ResolvedFeature<HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation>
+		transactionLegibility: ResolvedFeature<
+			HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation
+		>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>

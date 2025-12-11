@@ -306,8 +306,6 @@ export const displaysFullCallData: CallDataDisplay = {
 	formatted: true,
 }
 
-
-
 /**
  * A record of transaction legibility support (both message and transaction)
  */
@@ -322,7 +320,6 @@ export interface SoftwareTransactionLegibilitySupport {
 	transactionDetailsDisplay: DisplayedTransactionDetails | null
 }
 
-
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
 	return (
 		details.gas === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
@@ -333,5 +330,7 @@ export const isFullTransactionDetails = (details: DisplayedTransactionDetails): 
 		details.value === TransactionDisplayOptions.SHOWN_BY_DEFAULT
 	)
 }
-export type HardwareTransactionLegibilityImplementation = WithRef<HardwareTransactionLegibilitySupport>
-export type SoftwareTransactionLegibilityImplementation = WithRef<SoftwareTransactionLegibilitySupport>
+export type HardwareTransactionLegibilityImplementation =
+	WithRef<HardwareTransactionLegibilitySupport>
+export type SoftwareTransactionLegibilityImplementation =
+	WithRef<SoftwareTransactionLegibilitySupport>
