@@ -14,6 +14,7 @@ import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	noCalldataDecoding,
 	noDataExtraction,
+	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -149,12 +150,12 @@ export const ngrave: HardwareWallet = {
 				],
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: {
-					chain: false,
-					from: true,
-					gas: true,
-					nonce: false,
-					to: true,
-					value: true,
+					chain: TransactionDisplayOptions.NOT_IN_UI,
+					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: TransactionDisplayOptions.NOT_IN_UI,
+					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				legibility: noCalldataDecoding,
 			},

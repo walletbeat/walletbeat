@@ -15,6 +15,7 @@ import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataExtraction,
 	noCalldataDecoding,
+	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -198,12 +199,12 @@ export const cypherockWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: {
-					chain: false,
-					from: true, // derivation path counts
-					gas: true, // tx fee
-					nonce: false,
-					to: true, // contract address
-					value: true,
+					chain: TransactionDisplayOptions.NOT_IN_UI,
+					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT, // derivation path counts
+					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT, // tx fee
+					nonce: TransactionDisplayOptions.NOT_IN_UI,
+					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT, // contract address
+					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				legibility: noCalldataDecoding,
 			},

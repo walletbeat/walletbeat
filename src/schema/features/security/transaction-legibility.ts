@@ -2,10 +2,10 @@ import type { WithRef } from '@/schema/reference'
 
 import { notSupported, type Support } from '../support'
 
-enum TransactionDisplayOptions {
+export enum TransactionDisplayOptions {
 	SHOWN_BY_DEFAULT = 'SHOWN_BY_DEFAULT',
 	SHOWN_OPTIONALLY = 'SHOWN_OPTIONALLY',
-	NOT_IN_UI = 'NOT_IN_UI'
+	NOT_IN_UI = 'NOT_IN_UI',
 }
 
 /**

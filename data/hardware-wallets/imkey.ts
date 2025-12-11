@@ -8,6 +8,7 @@ import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
+	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -172,7 +173,10 @@ export const imkeyWallet: HardwareWallet = {
 					[DataExtraction.HASHES]: false,
 					[DataExtraction.QRCODE]: false,
 				},
-				detailsDisplayed: { ...displaysFullTransactionDetails, nonce: false },
+				detailsDisplayed: {
+					...displaysFullTransactionDetails,
+					nonce: TransactionDisplayOptions.NOT_IN_UI,
+				},
 				legibility: {
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
 						ref: refTodo,

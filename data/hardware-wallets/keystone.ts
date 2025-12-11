@@ -17,6 +17,7 @@ import {
 	CalldataDecoding,
 	DataExtraction,
 	displaysFullTransactionDetails,
+	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -186,7 +187,10 @@ export const keystoneWallet: HardwareWallet = {
 					[DataExtraction.HASHES]: false,
 					[DataExtraction.QRCODE]: true,
 				},
-				detailsDisplayed: { ...displaysFullTransactionDetails, nonce: false },
+				detailsDisplayed: {
+					...displaysFullTransactionDetails,
+					nonce: TransactionDisplayOptions.NOT_IN_UI,
+				},
 				legibility: {
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
 						ref: refTodo,

@@ -24,6 +24,7 @@ import { FirmwareType } from '@/schema/features/security/firmware'
 import {
 	DataExtraction,
 	noCalldataDecoding,
+	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -215,12 +216,12 @@ export const bitboxWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: {
-					chain: true,
-					from: true,
-					gas: true,
-					nonce: false,
-					to: true,
-					value: true,
+					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: TransactionDisplayOptions.NOT_IN_UI,
+					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				legibility: noCalldataDecoding,
 			},
