@@ -70,7 +70,6 @@ import {
 	chainVerification,
 	type ChainVerificationValue,
 } from './attributes/security/chain-verification'
-import { dataDisplay, type DataDisplayValue } from './attributes/security/data-display'
 import { firmware, type FirmwareValue } from './attributes/security/firmware'
 import {
 	hardwareWalletSupport,
@@ -132,7 +131,6 @@ type SecurityValues = Dict<{
 	scamPrevention: ScamPreventionValue
 	chainVerification: ChainVerificationValue
 	transactionLegibility: TransactionLegibilityValue
-	dataDisplay: DataDisplayValue
 	hardwareWalletSupport: HardwareWalletSupportValue
 	passkeyImplementation: PasskeyImplementationValue
 	bugBountyProgram: BugBountyProgramValue
@@ -154,7 +152,6 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		scamPrevention,
 		chainVerification,
 		transactionLegibility,
-		dataDisplay,
 		hardwareWalletSupport,
 		passkeyImplementation,
 		bugBountyProgram,
@@ -169,7 +166,6 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		scamPrevention: 1.0,
 		chainVerification: 1.0,
 		transactionLegibility: 1.0,
-		dataDisplay: 1.0,
 		hardwareWalletSupport: 1.0,
 		passkeyImplementation: 1.0,
 		bugBountyProgram: 1.0,
@@ -454,7 +450,6 @@ export function evaluateAttributes(
 			scamPrevention: evalAttr(scamPrevention),
 			chainVerification: evalAttr(chainVerification),
 			transactionLegibility: evalAttr(transactionLegibility),
-			dataDisplay: evalAttr(dataDisplay),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
 			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
@@ -527,7 +522,6 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			scamPrevention: attr(tree => tree.security.scamPrevention),
 			chainVerification: attr(tree => tree.security.chainVerification),
 			transactionLegibility: attr(tree => tree.security.transactionLegibility),
-			dataDisplay: attr(tree => tree.security.dataDisplay),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
 			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
