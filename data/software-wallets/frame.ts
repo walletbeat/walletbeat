@@ -10,10 +10,13 @@ import {
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -58,7 +61,7 @@ export const frame: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 		},
 		chainAbstraction: null,
-		chainConfigurability: {
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
 			ref: [
 				{
 					explanation: 'Frame allows connecting to your own Ethereum node',
@@ -70,10 +73,14 @@ export const frame: SoftwareWallet = {
 					],
 				},
 			],
-			customChains: true,
-			l1RpcEndpoint: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-			otherRpcEndpoints: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
-		},
+			customChainRpcEndpoint: featureSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			}),
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+			}),
+		}),
 		ecosystem: {
 			delegation: null,
 		},

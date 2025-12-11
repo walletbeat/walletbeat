@@ -69,12 +69,16 @@ export const nufi: SoftwareWallet = {
 			nonChainSpecificEnsResolution: notSupported,
 		},
 		chainAbstraction: null,
-		chainConfigurability: {
+		chainConfigurability: supported({
 			ref: refTodo,
-			customChains: true,
-			l1RpcEndpoint: RpcEndpointConfiguration.NO,
-			otherRpcEndpoints: RpcEndpointConfiguration.NO,
-		},
+			customChainRpcEndpoint: featureSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.NO,
+			}),
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.NO,
+			}),
+		}),
 		ecosystem: {
 			delegation: {
 				duringEOACreation: 'NO',

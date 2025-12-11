@@ -6,6 +6,7 @@ import {
 	type Value,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
+import { isSupported } from '@/schema/features/support'
 import { type ReferenceArray, refs } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -173,23 +174,31 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 			return unrated(selfHostedNode, brand, null)
 		}
 
+		if (!isSupported(features.chainConfigurability)) {
+			return noSelfHostedNode([])
+		}
+
 		const allRefs = refs(features.chainConfigurability)
 
+		if (!isSupported(features.chainConfigurability.l1)) {
+			return noSelfHostedNode([])
+		}
+
 		if (
-			features.chainConfigurability.l1RpcEndpoint ===
+			features.chainConfigurability.l1.rpcEndpointConfiguration ===
 			RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST
 		) {
 			return supportsSelfHostedNode(allRefs)
 		}
 
 		if (
-			features.chainConfigurability.l1RpcEndpoint ===
+			features.chainConfigurability.l1.rpcEndpointConfiguration ===
 			RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
 		) {
 			return supportsSelfHostedNodeAfterRequests(allRefs)
 		}
 
-		if (features.chainConfigurability.customChains) {
+		if (isSupported(features.chainConfigurability.customChainRpcEndpoint)) {
 			return customChainOnly(allRefs)
 		}
 

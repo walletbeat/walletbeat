@@ -225,7 +225,7 @@ function unsupported(): Evaluation<MultiAddressCorrelationValue> {
 	return {
 		value: {
 			id: 'unsupported',
-			rating: Rating.UNRATED,
+			rating: Rating.EXEMPT,
 			icon: '\u{1f4ce}', // Single paperclip
 			displayName: 'Multiple addresses unsupported',
 			shortExplanation: sentence('You can only use one address in {{WALLET_NAME}}.'),

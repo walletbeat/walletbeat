@@ -1,9 +1,10 @@
-import { nconsigny, patrickalphac } from '@/data/contributors'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { nconsigny } from '@/data/contributors/nconsigny'
+import { patrickalphac } from '@/data/contributors/patrickalphac'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -74,7 +75,11 @@ export const ledgerWallet: HardwareWallet = {
 			docs: ['https://developers.ledger.com/'],
 			repositories: ['https://github.com/LedgerHQ/'],
 			socials: {
+				facebook: 'https://web.facebook.com/Ledger/',
+				instagram: 'https://www.instagram.com/ledger/',
 				linkedin: 'https://www.linkedin.com/company/ledgerhq/',
+				reddit: 'https://www.reddit.com/r/ledgerwallet/',
+				tiktok: 'https://www.tiktok.com/@ledger',
 				x: 'https://x.com/Ledger',
 			},
 			websites: ['https://www.ledger.com/'],

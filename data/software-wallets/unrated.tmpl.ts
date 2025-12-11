@@ -77,7 +77,7 @@ export const unratedTemplate: SoftwareWallet = {
 		privacy: {
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: 'https://example.com/privacy-policy',
+			privacyPolicy: null,
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,

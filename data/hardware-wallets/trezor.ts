@@ -1,9 +1,10 @@
-import { nconsigny, patrickalphac } from '@/data/contributors'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { nconsigny } from '@/data/contributors/nconsigny'
+import { patrickalphac } from '@/data/contributors/patrickalphac'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -69,7 +70,10 @@ export const trezorWallet: HardwareWallet = {
 			docs: ['https://trezor.io/learn'],
 			repositories: ['https://github.com/trezor/trezor-suite'],
 			socials: {
+				instagram: 'https://www.instagram.com/trezor.io/',
 				linkedin: 'https://www.linkedin.com/company/trezor/',
+				reddit: 'https://www.reddit.com/r/TREZOR/',
+				tiktok: 'https://www.tiktok.com/@trezor.io_official',
 				x: 'https://x.com/trezor',
 				youtube: 'https://www.youtube.com/@TrezorWallet',
 			},

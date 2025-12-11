@@ -1,8 +1,8 @@
-import { patrickalphac } from '@/data/contributors'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import { patrickalphac } from '@/data/contributors/patrickalphac'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -51,6 +51,8 @@ export const cypherockWallet: HardwareWallet = {
 			docs: ['https://docs.cypherock.com/'],
 			repositories: ['https://github.com/Cypherock'],
 			socials: {
+				facebook: 'https://facebook.com/cypherock/',
+				instagram: 'https://www.instagram.com/cypherockwallet/',
 				linkedin: 'https://www.linkedin.com/company/cypherockwallet/',
 				telegram: 'https://t.me/cypherock',
 				x: 'https://x.com/CypherockWallet',

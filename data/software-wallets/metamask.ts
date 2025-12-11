@@ -11,7 +11,10 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import {
@@ -23,7 +26,7 @@ import {
 	LicensingType,
 	SourceAvailableNonFOSSLicense,
 } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { mdParagraph, paragraph } from '@/types/content'
@@ -123,7 +126,7 @@ export const metamask: SoftwareWallet = {
 				},
 			},
 		},
-		chainConfigurability: {
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
 			ref: [
 				{
 					explanation:
@@ -131,10 +134,14 @@ export const metamask: SoftwareWallet = {
 					url: 'https://support.metamask.io/configure/networks/how-to-add-a-custom-network-rpc/',
 				},
 			],
-			customChains: true,
-			l1RpcEndpoint: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
-			otherRpcEndpoints: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
-		},
+			customChainRpcEndpoint: featureSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+			}),
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+			}),
+		}),
 		ecosystem: {
 			delegation: null,
 		},

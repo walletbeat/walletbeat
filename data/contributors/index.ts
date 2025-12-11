@@ -1,8 +1,0 @@
-export { gabrielkerekes } from './gabrielkerekes'
-export { jiojosbg } from './jiojosbg'
-export { lucemans } from './lucemans'
-export { mako } from './mako'
-export { nconsigny } from './nconsigny'
-export { patrickalphac } from './patrickalphac'
-export { polymutex } from './polymutex'
-export { sigri } from './sigri'

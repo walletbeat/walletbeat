@@ -153,17 +153,17 @@ type SeparateCoreCodeVsWalletCodeLicense<L> = {
  * License feature data for a wallet.
  */
 export type WalletLicensing =
-	| null
 	| SingleWalletRepoAndLicense<VariantFeature<LicenseWithRef>>
 	| SeparateCoreCodeVsWalletCodeLicense<VariantFeature<LicenseWithRef>>
+	| null
 
 /**
  * License feature data for a wallet, resolved for a single variant.
  */
 export type ResolvedWalletLicensing =
-	| null
 	| SingleWalletRepoAndLicense<ResolvedFeature<LicenseWithRef>>
 	| SeparateCoreCodeVsWalletCodeLicense<ResolvedFeature<LicenseWithRef>>
+	| null
 
 export function resolveWalletLicense(
 	walletLicense: WalletLicensing,

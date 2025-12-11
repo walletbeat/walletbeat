@@ -175,7 +175,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	}
 
 	/** Level of configurability for chains. */
-	chainConfigurability: VariantFeature<Nullable<ChainConfigurability>>
+	chainConfigurability: VariantFeature<Support<WithRef<Nullable<ChainConfigurability>>>>
 
 	/** Integration inside browsers, mobile phones, etc. */
 	integration: WalletIntegration
@@ -300,7 +300,7 @@ export interface ResolvedFeatures {
 		maintenance: ResolvedFeature<MaintenanceSupport>
 	}
 	chainAbstraction: ResolvedFeature<ChainAbstraction>
-	chainConfigurability: ResolvedFeature<ChainConfigurability>
+	chainConfigurability: ResolvedFeature<Support<WithRef<ChainConfigurability>>>
 	accountSupport: ResolvedFeature<AccountSupport>
 	multiAddress: ResolvedFeature<Support>
 	integration: ResolvedWalletIntegration
@@ -459,7 +459,7 @@ export function resolveFeatures(
 		chainAbstraction: nullable(
 			softwareFeat('chainAbstraction', features => features.chainAbstraction),
 		),
-		chainConfigurability: nullable(
+		chainConfigurability: nullable<Support<WithRef<ChainConfigurability>>>(
 			softwareFeat('chainConfigurability', features => features.chainConfigurability),
 		),
 		accountSupport: baseFeat('accountSupport', features => features.accountSupport),

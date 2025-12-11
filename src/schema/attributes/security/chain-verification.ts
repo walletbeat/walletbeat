@@ -47,8 +47,22 @@ function supportsChainVerification(
 }
 
 function noChainVerification(
-	chainConfigurability: ChainConfigurability | null,
+	chainConfigurability: Support<ChainConfigurability> | null,
 ): Evaluation<ChainVerificationValue> {
+	const canConfigureL1 = (() => {
+		const l1Configurability =
+			chainConfigurability === null ||
+			!isSupported(chainConfigurability) ||
+			!isSupported(chainConfigurability.l1)
+				? RpcEndpointConfiguration.NO
+				: chainConfigurability.l1.rpcEndpointConfiguration
+
+		return (
+			l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
+			l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
+		)
+	})()
+
 	return {
 		value: {
 			id: 'no_chain_verification',
@@ -63,21 +77,12 @@ function noChainVerification(
 		details: markdown(`
 			{{WALLET_NAME}} does not verify the integrity of the Ethereum L1 blockchain when retrieving chain state or simulating transactions.
 
-			${canConfigureL1() ? 'Users may work around this by setting a custom RPC endpoint for the L1 chain and running their own node or external light client.' : ''}
+			${canConfigureL1 ? 'Users may work around this by setting a custom RPC endpoint for the L1 chain and running their own node or external light client.' : ''}
 		`),
 		howToImprove: mdParagraph(
 			'{{WALLET_NAME}} should integrate [light client functionality](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/) to verify the integrity of Ethereum chain data.',
 		),
 		references: [],
-	}
-
-	function canConfigureL1() {
-		const l1Configurability = chainConfigurability?.l1RpcEndpoint ?? RpcEndpointConfiguration.NO
-
-		return (
-			l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
-			l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
-		)
 	}
 }
 

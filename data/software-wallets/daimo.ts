@@ -122,12 +122,14 @@ export const daimo: SoftwareWallet = {
 				},
 			},
 		},
-		chainConfigurability: {
+		chainConfigurability: supported({
 			ref: refTodo,
-			customChains: false,
-			l1RpcEndpoint: RpcEndpointConfiguration.NEVER_USED,
-			otherRpcEndpoints: RpcEndpointConfiguration.NO,
-		},
+			customChainRpcEndpoint: notSupported,
+			l1: notSupported,
+			nonL1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.NO,
+			}),
+		}),
 		ecosystem: {
 			delegation: 'EIP_7702_NOT_SUPPORTED',
 		},

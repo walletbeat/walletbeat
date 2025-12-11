@@ -1,7 +1,7 @@
-import type { WithRef } from '../../reference'
+import type { Support } from '../support'
 
 /**
- * Customization options for each chain.
+ * Can a chain's RPC endpoint be configured, and if so, when?
  */
 export enum RpcEndpointConfiguration {
 	/**
@@ -25,23 +25,24 @@ export enum RpcEndpointConfiguration {
 
 	/** The RPC endpoint is not configurable by the user. */
 	NO = 'NO',
+}
 
-	/** The wallet never uses this chain so it has no setting for it. */
-	NEVER_USED = 'NEVER_USED',
+/** Can the wallet's usage of a particular chain be configured? */
+export interface SingleChainConfigurability {
+	/** Can the wallet's RPC endpoint for the chain be configured? */
+	rpcEndpointConfiguration: RpcEndpointConfiguration
 }
 
 /**
  * Customization options that exist for chains.
  */
-export type ChainConfigurability = WithRef<{
-	/** Can set a custom RPC endpoint address for L1. */
-	l1RpcEndpoint: RpcEndpointConfiguration
+export interface ChainConfigurability {
+	/** Does the wallet support using Ethereum L1 at all? */
+	l1: Support<SingleChainConfigurability>
 
-	/**
-	 * Can override the RPC endpoint for built-in chains other than L1.
-	 */
-	otherRpcEndpoints: RpcEndpointConfiguration
+	/** Does the wallet support non-L1 Ethereum chains? */
+	nonL1: Support<SingleChainConfigurability>
 
-	/** Can add custom chains. */
-	customChains: boolean
-}>
+	/** Does the wallet support adding custom chains? */
+	customChainRpcEndpoint: Support
+}

@@ -110,10 +110,12 @@
 		const list: LeaksListItem[] = []
 
 		bySource.forEach((linkables, sourceName) => {
-			const linkableInfos: LeakInfo[] = linkables.map(linkable => ({
+			let linkableInfos: LeakInfo[] = linkables.map(linkable => ({
 				key: linkable.info,
 				value: userInfoName(linkable.info).long
 			}))
+
+			linkableInfos = linkableInfos.filter((info, index) => linkableInfos.slice(index+1).every(otherInfo => otherInfo.key != info.key))
 			const refs = mergeRefs(...linkables.flatMap(linkable => linkable.refs))
 			const entity = nonEmptyGet(linkables).by
 

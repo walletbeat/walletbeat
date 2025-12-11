@@ -178,19 +178,30 @@ export const softwareWalletStageOne: WalletStage = {
 								return { rating: StageCriterionRating.UNRATED }
 							}
 
-							switch (variantWallet.features.chainConfigurability.l1RpcEndpoint) {
+							if (!isSupported(variantWallet.features.chainConfigurability)) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not allow users to use their own Ethereum node.',
+									),
+								}
+							}
+
+							if (!isSupported(variantWallet.features.chainConfigurability.l1)) {
+								return {
+									rating: StageCriterionRating.PASS,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not interact with Ethereum L1, so it does not rely on an Ethereum node.',
+									),
+								}
+							}
+
+							switch (variantWallet.features.chainConfigurability.l1.rpcEndpointConfiguration) {
 								case RpcEndpointConfiguration.NO:
 									return {
 										rating: StageCriterionRating.FAIL,
 										explanation: sentence(
 											'{{WALLET_NAME}} does not allow users to use their own Ethereum node.',
-										),
-									}
-								case RpcEndpointConfiguration.NEVER_USED:
-									return {
-										rating: StageCriterionRating.PASS,
-										explanation: sentence(
-											'{{WALLET_NAME}} does not interact with Ethereum L1, so it does not rely on an Ethereum node.',
 										),
 									}
 								case RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS:
@@ -355,52 +366,40 @@ const softwareWalletStageTwo: WalletStage = {
 								return { rating: StageCriterionRating.UNRATED }
 							}
 
-							switch (variantWallet.features.chainConfigurability.l1RpcEndpoint) {
+							if (!isSupported(variantWallet.features.chainConfigurability)) {
+								return {
+									rating: StageCriterionRating.FAIL,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not allow users to use their own Ethereum node.',
+									),
+								}
+							}
+
+							if (!isSupported(variantWallet.features.chainConfigurability.nonL1)) {
+								return {
+									rating: StageCriterionRating.PASS,
+									explanation: sentence(
+										'{{WALLET_NAME}} does not interact with non-L1 chains, so no further chain customization option is warranted.',
+									),
+								}
+							}
+
+							switch (variantWallet.features.chainConfigurability.nonL1.rpcEndpointConfiguration) {
 								case RpcEndpointConfiguration.NO:
 									return {
 										rating: StageCriterionRating.FAIL,
 										explanation: sentence(
-											'{{WALLET_NAME}} does not allow users to use their own Ethereum node.',
+											'{{WALLET_NAME}} does not allow users to customize non-L1 chain endpoints.',
 										),
 									}
-								case RpcEndpointConfiguration.NEVER_USED:
-								// Fallthrough.
 								case RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS:
 								// Fallthrough.
 								case RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST:
-									switch (variantWallet.features.chainConfigurability.otherRpcEndpoints) {
-										case RpcEndpointConfiguration.NO:
-											return {
-												rating: StageCriterionRating.FAIL,
-												explanation: sentence(
-													'{{WALLET_NAME}} does not allow users to customize non-L1 chain endpoints.',
-												),
-											}
-										case RpcEndpointConfiguration.NEVER_USED:
-											if (
-												variantWallet.features.chainConfigurability.l1RpcEndpoint ===
-												RpcEndpointConfiguration.NEVER_USED
-											) {
-												throw new Error(
-													'Wallet appears to interact with neither the L1 nor other chains.',
-												)
-											}
-
-											return {
-												rating: StageCriterionRating.PASS,
-												explanation: sentence(
-													'{{WALLET_NAME}} allows users to use their own Ethereum node.',
-												),
-											}
-										case RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS:
-										// Fallthrough.
-										case RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST:
-											return {
-												rating: StageCriterionRating.PASS,
-												explanation: sentence(
-													'{{WALLET_NAME}} allows users to customize L1 and non-L1 chain endpoints.',
-												),
-											}
+									return {
+										rating: StageCriterionRating.PASS,
+										explanation: sentence(
+											'{{WALLET_NAME}} allows users to customize non-L1 chain endpoints.',
+										),
 									}
 							}
 						},
