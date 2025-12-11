@@ -12,9 +12,11 @@ import {
 	isFullTransactionDetails,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
+	type SoftwareTransactionLegibilityImplementation,
+	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { isSupported } from '@/schema/features/support'
-import { refs } from '@/schema/reference'
+import { mergeRefs, popRefs, refs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
@@ -101,7 +103,8 @@ function fullTransactionLegibility(
 	}
 }
 
-function evaluateHardwareWalletTransactionLegibility(hardwareTransactionLegibility: HardwareTransactionLegibilityImplementation): Evaluation<TransactionLegibilityValue> {
+function evaluateHardwareWalletTransactionLegibility(features: ResolvedFeatures): Evaluation<TransactionLegibilityValue> {
+	const hardwareTransactionLegibility = features.security.transactionLegibility as HardwareTransactionLegibilityImplementation
 	const references = refs(hardwareTransactionLegibility)
 
 	const legibility = hardwareTransactionLegibility.legibility
@@ -193,6 +196,89 @@ function evaluateHardwareWalletTransactionLegibility(hardwareTransactionLegibili
 	return {
 		...result,
 		references,
+	}
+}
+
+function evaluateSoftwareWalletTransactionLegibility(
+	features: ResolvedFeatures,
+): Evaluation<TransactionLegibilityValue> {
+	const softwareTransactionLegibility = features.security
+		.transactionLegibility as SoftwareTransactionLegibilityImplementation
+
+	if (softwareTransactionLegibility === null) {
+		return unrated(transactionLegibility, brand, null)
+	}
+
+	const { withoutRefs: transactionLegibilitySupport } = popRefs(
+		softwareTransactionLegibility,
+	)
+
+	const calldataDisplay = transactionLegibilitySupport.calldataDisplay
+	const transactionDetailsDisplay = transactionLegibilitySupport.transactionDetailsDisplay
+
+	if (calldataDisplay === null || transactionDetailsDisplay === null) {
+		return unrated(transactionLegibility, brand, null)
+	}
+
+	const calldataRatings = [
+		calldataDisplay.rawHex,
+		calldataDisplay.copyHexToClipboard,
+		calldataDisplay.formatted,
+	]
+
+	// For DisplayedTransactionDetails, SHOWN_BY_DEFAULT or SHOWN_OPTIONALLY count as supported
+	const transactionDetailsRatings = [
+		transactionDetailsDisplay.gas === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.gas === TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.nonce ===
+			TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.nonce ===
+				TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.from ===
+			TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.from ===
+				TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.to === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.to === TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.chain ===
+			TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.chain ===
+				TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.value ===
+			TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.value ===
+				TransactionDisplayOptions.SHOWN_OPTIONALLY,
+	]
+
+	const totalCriteria = calldataRatings.length + transactionDetailsRatings.length
+	const passCount =
+		calldataRatings.filter(r => r).length +
+		transactionDetailsRatings.filter(r => r).length
+
+	let rating: Rating
+	if (passCount >= totalCriteria) {
+		rating = Rating.PASS
+	} else if (passCount >= 3) {
+		rating = Rating.PARTIAL
+	} else {
+		rating = Rating.FAIL
+	}
+
+	const references = refs(softwareTransactionLegibility)
+
+	const result = ((): Evaluation<TransactionLegibilityValue> => {
+		if (rating === Rating.FAIL) {
+			return noTransactionLegibility()
+		} else if (rating === Rating.PASS) {
+			return fullTransactionLegibility()
+		} else {
+			return partialTransactionLegibility()
+		}
+	})()
+
+	return {
+		...result,
+		...(references.length > 0 && { references }),
 	}
 }
 
@@ -299,7 +385,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		}
 
 		if (features.type === WalletType.HARDWARE) {
-			return evaluateHardwareWalletTransactionLegibility(features.security.transactionLegibility as HardwareTransactionLegibilityImplementation)
+			return evaluateHardwareWalletTransactionLegibility(features)
 		}
 
 		return evaluateSoftwareWalletTransactionLegibility(features)
