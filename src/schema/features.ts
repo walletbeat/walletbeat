@@ -18,7 +18,6 @@ import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy
 import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
-import type { DataDisplayImplementation } from './features/security/data-display'
 import type { FirmwareSupport } from './features/security/firmware'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
@@ -29,7 +28,7 @@ import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
-import type { TransactionLegibilityImplementation } from './features/security/transaction-legibility'
+import type { HardwareTransactionLegibilityImplementation, SoftwareTransactionLegibilityImplementation } from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
@@ -83,6 +82,9 @@ export interface WalletBaseFeatures {
 
 		/** Bug bounty program implementation */
 		bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>>
+
+		/** Transaction legibility features. */
+		transactionLegibility: VariantFeature<HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation>
 
 		/** Light clients. */
 		lightClient: {
@@ -151,9 +153,6 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
-
-		/** Call data display implementation */
-		dataDisplay: VariantFeature<Nullable<DataDisplayImplementation>>
 	}
 
 	/** Privacy features. */
@@ -210,8 +209,6 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
-		/** Transaction legibility implementation */
-		transactionLegibility: VariantFeature<TransactionLegibilityImplementation>
 		/** Secure element support */
 		secureElement: VariantFeature<Support<SecureElementSupport>>
 	}
@@ -273,8 +270,7 @@ export interface ResolvedFeatures {
 			ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
 		hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport>
-		transactionLegibility: ResolvedFeature<TransactionLegibilityImplementation>
-		dataDisplay: ResolvedFeature<DataDisplayImplementation>
+		transactionLegibility: ResolvedFeature<HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation>
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
@@ -385,11 +381,10 @@ export function resolveFeatures(
 				'security.hardwareWalletSupport',
 				features => features.security.hardwareWalletSupport,
 			),
-			transactionLegibility: hardwareFeat(
+			transactionLegibility: baseFeat(
 				'security.transactionLegibility',
 				features => features.security.transactionLegibility,
 			),
-			dataDisplay: softwareFeat('security.dataDisplay', features => features.security.dataDisplay),
 			passkeyVerification: baseFeat(
 				'passkeyVerification',
 				features => features.security.passkeyVerification,

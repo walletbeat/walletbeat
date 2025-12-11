@@ -270,7 +270,7 @@ export function supportsAnyDataExtraction(dataExtractionMethods: DataExtractionM
 /**
  * A record of transaction legibility support (both message and transaction)
  */
-export interface TransactionLegibilitySupport {
+export interface HardwareTransactionLegibilitySupport {
 	/**
 	 * Does a wallet display transaction details clearly?
 	 */
@@ -286,6 +286,43 @@ export interface TransactionLegibilitySupport {
 	dataExtraction: DataExtractionMethods | null
 }
 
+/**
+ * What can the user do with the calldata?
+ */
+export interface CallDataDisplay {
+	/* Can display the calldata in raw hex format */
+	rawHex: boolean
+
+	/* Can the user copy the raw hex code to the clipboard? */
+	copyHexToClipboard: boolean
+
+	/* Can display the calldata in some formatted output (e.g. JSON) */
+	formatted: boolean
+}
+
+export const displaysFullCallData: CallDataDisplay = {
+	rawHex: true,
+	copyHexToClipboard: true,
+	formatted: true,
+}
+
+
+
+/**
+ * A record of transaction legibility support (both message and transaction)
+ */
+export interface SoftwareTransactionLegibilitySupport {
+	/**
+	 * Does the software wallet support displaying the calldata in different formats?
+	 */
+	calldataDisplay: CallDataDisplay | null
+	/**
+	 * Does the software wallet support displaying the transaction details?
+	 */
+	transactionDetailsDisplay: DisplayedTransactionDetails | null
+}
+
+
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
 	return (
 		details.gas === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
@@ -296,4 +333,5 @@ export const isFullTransactionDetails = (details: DisplayedTransactionDetails): 
 		details.value === TransactionDisplayOptions.SHOWN_BY_DEFAULT
 	)
 }
-export type TransactionLegibilityImplementation = WithRef<TransactionLegibilitySupport>
+export type HardwareTransactionLegibilityImplementation = WithRef<HardwareTransactionLegibilitySupport>
+export type SoftwareTransactionLegibilityImplementation = WithRef<SoftwareTransactionLegibilitySupport>

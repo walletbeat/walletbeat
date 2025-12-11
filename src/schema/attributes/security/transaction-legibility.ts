@@ -22,8 +22,12 @@ import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.transaction_legibility'
 
-export type TransactionLegibilityValue = Value & {
-	__brand: 'attributes.transaction_legibility'
+export type HardwareTransactionLegibilityValue = Value & {
+	__brand: 'attributes.hardware_transaction_legibility'
+}
+
+export type SoftwareTransactionLegibilityValue = Value & {
+	__brand: 'attributes.software_transaction_legibility'
 }
 
 function noTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
