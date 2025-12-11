@@ -374,6 +374,5 @@ limiting its utility.
 
 		return { ...evaluation, references }
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<AppConnectionSupportValue>>) =>
-		pickWorstRating<AppConnectionSupportValue>(perVariant),
+	aggregate: pickWorstRating<AppConnectionSupportValue>,
 }

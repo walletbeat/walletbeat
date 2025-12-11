@@ -20,10 +20,10 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.transaction-legibility'
+const brand = 'attributes.transaction_legibility'
 
 export type TransactionLegibilityValue = Value & {
-	__brand: 'attributes.transaction-legibility'
+	__brand: 'attributes.transaction_legibility'
 }
 
 function noTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
@@ -241,8 +241,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 			const hasAdvancedDataExtraction: boolean =
 				dataExtraction[DataExtraction.EYES] === true &&
 				dataExtraction[DataExtraction.QRCODE] === true &&
-				dataExtraction[DataExtraction.HASHES] === true &&
-				dataExtraction[DataExtraction.COPY] === true
+				dataExtraction[DataExtraction.HASHES] === true
 
 			// PASS: Full support - complex decoding AND all details displayed AND at least one data extraction method
 			// Advanced extraction (QRCODE/HASHES/COPY) is preferred, but visual (EYES) is acceptable if all details are clearly displayed

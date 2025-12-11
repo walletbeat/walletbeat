@@ -237,11 +237,6 @@ export enum DataExtraction {
 	 * Shows calldata/message data, and a group of hashes to compare against
 	 */
 	HASHES = 'HASHES',
-
-	/**
-	 * User is on a software device where they can copy the calldata directly.
-	 */
-	COPY = 'COPY',
 }
 
 /**
@@ -254,7 +249,6 @@ export type DataExtractionMethods = Record<DataExtraction, boolean | null>
  */
 export const noDataExtraction: DataExtractionMethods = {
 	[DataExtraction.EYES]: false,
-	[DataExtraction.COPY]: false,
 	[DataExtraction.QRCODE]: false,
 	[DataExtraction.HASHES]: false,
 }
