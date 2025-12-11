@@ -171,7 +171,6 @@ export const imkeyWallet: HardwareWallet = {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
 					[DataExtraction.QRCODE]: false,
-					[DataExtraction.COPY]: null,
 				},
 				detailsDisplayed: { ...displaysFullTransactionDetails, nonce: false },
 				legibility: {

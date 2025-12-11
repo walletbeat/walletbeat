@@ -155,7 +155,6 @@ export const gridplusWallet: HardwareWallet = {
 				],
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
-					[DataExtraction.COPY]: false,
 					[DataExtraction.HASHES]: false,
 					[DataExtraction.QRCODE]: false,
 				},
