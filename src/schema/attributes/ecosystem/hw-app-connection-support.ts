@@ -16,7 +16,6 @@ import {
 import type { Support, Supported } from '@/schema/features/support'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
 import { refs, refTodo, type WithRef } from '@/schema/reference'
-import { type AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
