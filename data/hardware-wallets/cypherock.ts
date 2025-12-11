@@ -1,8 +1,8 @@
+import { patrickalphac } from '@/data/contributors/patrickalphac'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
-import { patrickalphac } from '@/data/contributors/patrickalphac'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
