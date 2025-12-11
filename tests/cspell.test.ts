@@ -166,6 +166,7 @@ describe('cSpell', async () => {
 	it('does not have any unused words', () => {
 		const allowedUnusedWords: string[] = [
 			'rman', // Used in nickname "0xh3rman"
+			'xmattmatt', // Used in nickname "Mattmatt"
 		]
 
 		cSpellWords.map(word => {

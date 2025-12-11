@@ -1,5 +1,5 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { sigri } from '@/data/contributors/sigri'
-import {mattmatt} from '@/data/contributors/0xmattmatt'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {

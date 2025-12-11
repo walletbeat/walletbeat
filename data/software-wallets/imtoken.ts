@@ -1,5 +1,5 @@
-import { mako } from '@/data/contributors/mako'
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { mako } from '@/data/contributors/mako'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import {
