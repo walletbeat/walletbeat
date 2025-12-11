@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
@@ -33,7 +34,7 @@ export const keystoneWallet: HardwareWallet = {
 			Keystone Wallet is a self-custodial hardware wallet that provides secure private
 			key storage. It uses QR codes for air-gapped transaction signing.
 		`),
-		contributors: [nconsigny, patrickalphac],
+		contributors: [nconsigny, patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{

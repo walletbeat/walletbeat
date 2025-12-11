@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
@@ -30,7 +31,7 @@ export const cypherockWallet: HardwareWallet = {
 		blurb: paragraph(`
 			The Cypherock has a secure element (EAL6+ rated) and uses a unique card-tapping system for transaction authorization.
 		`),
-		contributors: [patrickalphac],
+		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
