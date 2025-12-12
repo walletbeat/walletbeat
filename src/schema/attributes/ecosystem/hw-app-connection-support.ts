@@ -13,11 +13,12 @@ import {
 	getSupportedSoftwareWallets,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
-import type { Support, Supported } from '@/schema/features/support'
-import { isSupported, notSupported, supported } from '@/schema/features/support'
+import type { Supported } from '@/schema/features/support'
+import { isSupported, supported } from '@/schema/features/support'
 import { refs, refTodo, type WithRef } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { setItems } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
@@ -67,14 +68,8 @@ const allConnectionMethods: Array<AppConnectionMethod | SoftwareWalletType> = [
 function describeConnectionMethods(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): string {
-	const methods: string[] = []
 	const supported = connectionDetails.supportedConnections
-
-	for (const method of allConnectionMethods) {
-		if (supported[method] === true) {
-			methods.push(connectionMethodToString(method))
-		}
-	}
+	const methods = setItems(supported).map(connectionMethodToString)
 
 	if (methods.length === 0) {
 		return 'no connection methods'
@@ -84,7 +79,6 @@ function describeConnectionMethods(
 }
 
 export type AppConnectionSupportValue = Value & {
-	connectionDetails: Support<WithRef<AppConnectionMethodDetails>>
 	__brand: 'attributes.security.app_connection_support'
 }
 
@@ -95,7 +89,6 @@ function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 			rating: Rating.FAIL,
 			displayName: 'No app connection support',
 			shortExplanation: sentence('{{WALLET_NAME}} cannot connect to apps.'),
-			connectionDetails: notSupported,
 			__brand: brand,
 		},
 		details: paragraph(
@@ -118,7 +111,6 @@ function unverifiableAppConnectionSupport(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} can connect to apps, but requires trusting unverifiable code.',
 			),
-			connectionDetails,
 			__brand: brand,
 		},
 		details: paragraph(
@@ -141,7 +133,6 @@ function limitedVerifiableAppConnectionSupport(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} can connect to some apps using verifiable code or open standards, but with limitations.',
 			),
-			connectionDetails,
 			__brand: brand,
 		},
 		details: paragraph(
@@ -164,7 +155,6 @@ function verifiableUniversalAppConnectionSupport(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} can connect to any app using entirely verifiable code or open standards.',
 			),
-			connectionDetails,
 			__brand: brand,
 		},
 		details: mdParagraph(
@@ -291,9 +281,7 @@ limiting its utility.
 					'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
 				),
 				brand,
-				{
-					connectionDetails: notSupported,
-				},
+				null,
 			)
 		}
 
@@ -308,7 +296,6 @@ limiting its utility.
 					shortExplanation: sentence(
 						'This attribute evaluates hardware wallet app connection capabilities and is not applicable for software wallets.',
 					),
-					connectionDetails: notSupported,
 					__brand: brand,
 				},
 				details: paragraph(
@@ -321,9 +308,7 @@ limiting its utility.
 		const appSupport = features.appConnectionSupport
 
 		if (!appSupport) {
-			return unrated(appConnectionSupport, brand, {
-				connectionDetails: notSupported,
-			})
+			return unrated(appConnectionSupport, brand, null)
 		}
 
 		// Extract references if supported

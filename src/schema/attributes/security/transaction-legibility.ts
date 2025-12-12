@@ -18,7 +18,6 @@ import {
 } from '@/schema/features/security/transaction-legibility'
 import { isSupported } from '@/schema/features/support'
 import { popRefs, refs } from '@/schema/reference'
-import { type AtLeastOneVariant } from '@/schema/variants'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
@@ -90,9 +89,7 @@ function hardwarePartialTransactionLegibility(): Evaluation<TransactionLegibilit
 	}
 }
 
-function hardwareFullTransactionLegibility(
-	references: Array<{ url: string; explanation: string }> = [],
-): Evaluation<TransactionLegibilityValue> {
+function hardwareFullTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
 			id: 'hardware_full_transaction_legibility',
@@ -106,7 +103,6 @@ function hardwareFullTransactionLegibility(
 		details: mdParagraph(
 			'{{WALLET_NAME}} implements full transaction legibility on the hardware device itself. All transaction details are clearly displayed on the device screen, the device supports decoding of complex nested transactions, and provides comprehensive data extraction methods (QR codes, hashes) for independent verification before signing, providing maximum security and transparency for users.',
 		),
-		references: references.length > 0 ? references : [],
 	}
 }
 
@@ -149,9 +145,7 @@ function softwarePartialTransactionLegibility(): Evaluation<TransactionLegibilit
 	}
 }
 
-function softwareFullTransactionLegibility(
-	references: Array<{ url: string; explanation: string }> = [],
-): Evaluation<TransactionLegibilityValue> {
+function softwareFullTransactionLegibility(): Evaluation<TransactionLegibilityValue> {
 	return {
 		value: {
 			id: 'software_full_transaction_legibility',
@@ -163,7 +157,6 @@ function softwareFullTransactionLegibility(
 		details: mdParagraph(
 			'{{WALLET_NAME}} implements full transaction legibility. The wallet supports comprehensive calldata display (raw hex format, formatted output, and copy to clipboard) and displays all essential transaction details clearly on the wallet screen/window for verification before signing, providing maximum security and transparency for users.',
 		),
-		references: references.length > 0 ? references : [],
 	}
 }
 
@@ -267,10 +260,6 @@ function evaluateHardwareWalletTransactionLegibility(
 function evaluateSoftwareWalletTransactionLegibility(
 	softwareTransactionLegibility: SoftwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	if (softwareTransactionLegibility === null) {
-		return unrated(transactionLegibility, brand, null)
-	}
-
 	const { withoutRefs: transactionLegibilitySupport } = popRefs(softwareTransactionLegibility)
 
 	const calldataDisplay = transactionLegibilitySupport.calldataDisplay
@@ -396,7 +385,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 	`),
 	ratingScale: {
 		display: 'pass-fail',
-		exhaustive: true,
+		exhaustive: false,
 		pass: [
 			exampleRating(
 				paragraph(`
@@ -462,6 +451,5 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 
 		return evaluateSoftwareWalletTransactionLegibility(features.security.transactionLegibility)
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<TransactionLegibilityValue>>) =>
-		pickWorstRating<TransactionLegibilityValue>(perVariant),
+	aggregate: pickWorstRating<TransactionLegibilityValue>,
 }

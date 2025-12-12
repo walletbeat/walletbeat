@@ -1,6 +1,6 @@
 import type { WithRef } from '@/schema/reference'
 
-import { notSupported, type Support } from '../support'
+import { isSupported, notSupported, type Support } from '../support'
 
 export enum TransactionDisplayOptions {
 	SHOWN_BY_DEFAULT = 'SHOWN_BY_DEFAULT',
@@ -215,7 +215,7 @@ export const noCalldataDecoding: CalldataDecodingTypes = {
  * extraction method at all.
  */
 export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecodingTypes): boolean {
-	return Object.values(calldataDecodingTypes).some(support => support.support === 'SUPPORTED')
+	return Object.values(calldataDecodingTypes).some(isSupported)
 }
 
 /**

@@ -56,8 +56,7 @@ export function countAllConnectionMethods(appSupport: AppConnectionSupport): num
 		return 0
 	}
 
-	return Object.values(appSupport.supportedConnections).filter(supported => supported === true)
-		.length
+	return setItems(appSupport.supportedConnections).length
 }
 
 /*
