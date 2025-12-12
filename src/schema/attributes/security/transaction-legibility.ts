@@ -367,9 +367,9 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		and decoded calldata, allowing users to make informed decisions before authorizing transactions.
 	`),
 	methodology: markdown(`
-		Wallets are evaluated based on three key aspects of transaction legibility:
+		Wallets are evaluated based on key aspects of transaction legibility, with different criteria for software and hardware wallets:
 
-		**Calldata Decoding:**
+		**Calldata Decoding/Display:**
 		The wallet's ability to decode and display calldata for various transaction types, including:
 		- Simple transfers
 		- Token approvals
@@ -385,20 +385,31 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		- Chain/network identifier
 		- Transaction value/amount
 
-		**Data Extraction:**
-		The wallet's ability to allow users to extract transaction data for verification:
-		- Visual display: Users can view the data on the wallet screen
-		- QR code: Users can scan a QR code to extract data
-		- Hashes: Users can compare hashes to verify data
-		- Copy to clipboard: Users can copy the data directly (software wallets)
+		**Software Wallet Specific Requirements:**
+		For software wallets, calldata must be displayed in multiple formats:
+		- Raw hex format: Users can view the raw hexadecimal calldata
+		- Formatted output: Users can view decoded, human-readable calldata
+		- Copy to clipboard: Users can copy the calldata directly for verification
 
-		A wallet receives a passing rating if it supports decoding of complex nested transactions and displays all essential transaction details and provides at least one data extraction method.
+		**Hardware Wallet Specific Requirements:**
+		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet device itself. Any data shown on a software wallet component is ignored for hardware wallet ratings.
 
-		A wallet receives a partial rating if it has some combination of these features (decoding support, transaction details display, or data extraction methods), but not all at the full level.
+		Hardware wallets must also provide data extraction methods to allow users to independently verify transaction data:
+		- Visual display: Users can view the data on the hardware wallet screen
+		- QR code: Users can scan a QR code displayed on the device to extract data
+		- Hashes: Users can compare hashes displayed on the device to verify data
 
-		A wallet receives a failing rating if it lacks calldata decoding support, does not display essential transaction details, and provides no effective data extraction methods.
+		**Rating Criteria:**
 
-		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet itself. Any data shown on a software wallet component is ignored for hardware wallet ratings.
+		For software wallets:
+		- A wallet receives a passing rating if it displays calldata in all three formats (raw hex, formatted, copyable) and displays all essential transaction details.
+		- A wallet receives a partial rating if it has some combination of these features, but not all at the full level.
+		- A wallet receives a failing rating if it lacks calldata display capabilities or does not display essential transaction details.
+
+		For hardware wallets:
+		- A wallet receives a passing rating if it supports decoding of complex nested transactions, displays all essential transaction details on the device, and provides comprehensive data extraction methods (QR codes and hashes, in addition to visual display).
+		- A wallet receives a partial rating if it has some combination of these features (decoding support, transaction details display, or data extraction methods), but not all at the full level.
+		- A wallet receives a failing rating if it lacks calldata decoding support, does not display essential transaction details on the device, and provides no effective data extraction methods.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
