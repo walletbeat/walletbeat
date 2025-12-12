@@ -269,11 +269,10 @@ function evaluateSoftwareWalletTransactionLegibility(
 		return unrated(transactionLegibility, brand, null)
 	}
 
-	const calldataRatings = [
-		calldataDisplay.rawHex,
-		calldataDisplay.copyHexToClipboard,
-		calldataDisplay.formatted,
-	]
+	// Check calldata display capabilities
+	const calldataShown = calldataDisplay.rawHex
+	const calldataCopyable = calldataDisplay.copyHexToClipboard
+	const calldataFormatted = calldataDisplay.formatted
 
 	// For DisplayedTransactionDetails, SHOWN_BY_DEFAULT or SHOWN_OPTIONALLY count as supported
 	const transactionDetailsRatings = [
@@ -291,18 +290,36 @@ function evaluateSoftwareWalletTransactionLegibility(
 			transactionDetailsDisplay.value === TransactionDisplayOptions.SHOWN_OPTIONALLY,
 	]
 
-	const totalCriteria = calldataRatings.length + transactionDetailsRatings.length
-	const passCount =
-		calldataRatings.filter(r => r).length + transactionDetailsRatings.filter(r => r).length
+	const transactionDetailsCount = transactionDetailsRatings.filter(r => r).length
+	const allTransactionDetailsShown = transactionDetailsCount === transactionDetailsRatings.length
 
+	// Hierarchical scoring logic:
+	// 1. If no calldata shown at all, FAIL
+	// 2. If calldata is shown but neither copyable nor formatted, FAIL
+	// 3. If less than 3 types of transaction details shown, FAIL
+	// 4. If calldata is not copyable OR not formatted, PARTIAL
+	// 5. If more than 3 types of transaction details are shown but not all of them, PARTIAL
+	// 6. Otherwise, PASS
 	let rating: Rating
 
-	if (passCount >= totalCriteria) {
-		rating = Rating.PASS
-	} else if (passCount >= 3) {
+	if (!calldataShown) {
+		// No calldata shown at all
+		rating = Rating.FAIL
+	} else if (!calldataCopyable && !calldataFormatted) {
+		// Calldata shown but neither copyable nor formatted
+		rating = Rating.FAIL
+	} else if (transactionDetailsCount < 3) {
+		// Less than 3 types of transaction details shown
+		rating = Rating.FAIL
+	} else if (!calldataCopyable || !calldataFormatted) {
+		// Calldata is not copyable OR not formatted
+		rating = Rating.PARTIAL
+	} else if (transactionDetailsCount >= 3 && !allTransactionDetailsShown) {
+		// More than 3 types of transaction details are shown but not all of them
 		rating = Rating.PARTIAL
 	} else {
-		rating = Rating.FAIL
+		// Calldata is both copyable AND formatted, and all transaction details are shown
+		rating = Rating.PASS
 	}
 
 	const references = refs(softwareTransactionLegibility)
