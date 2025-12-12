@@ -271,7 +271,6 @@ export function supportsAnyDataExtraction(dataExtractionMethods: DataExtractionM
  * A record of transaction legibility support (both message and transaction)
  */
 export interface HardwareTransactionLegibilitySupport {
-	readonly kind: 'hardware'
 	/**
 	 * Does a wallet display transaction details clearly?
 	 */
@@ -311,7 +310,6 @@ export const displaysFullCallData: CallDataDisplay = {
  * A record of transaction legibility support (both message and transaction)
  */
 export interface SoftwareTransactionLegibilitySupport {
-	readonly kind: 'software'
 	/**
 	 * Does the software wallet support displaying the calldata in different formats?
 	 */

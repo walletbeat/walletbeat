@@ -473,11 +473,25 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 			return unrated(transactionLegibility, brand, null)
 		}
 
-		if (features.security.transactionLegibility.kind === 'hardware') {
+		if (isHardwareTransactionLegibility(features.security.transactionLegibility)) {
 			return evaluateHardwareWalletTransactionLegibility(features.security.transactionLegibility)
 		}
 
 		return evaluateSoftwareWalletTransactionLegibility(features.security.transactionLegibility)
 	},
 	aggregate: pickWorstRating<TransactionLegibilityValue>,
+}
+
+/**
+ * Type predicate for `HardwareTransactionLegibilityImplementation`.
+ */
+export function isHardwareTransactionLegibility(
+	transactionLegibility:
+		| HardwareTransactionLegibilityImplementation
+		| SoftwareTransactionLegibilityImplementation,
+): transactionLegibility is HardwareTransactionLegibilityImplementation {
+	// The `dataExtraction` field exists only on `HardwareTransactionLegibilityImplementation`,
+	// not on `SoftwareTransactionLegibilityImplementation`, so it is a good way to distinguish
+	// between the two types:
+	return Object.hasOwn(transactionLegibility, 'dataExtraction')
 }

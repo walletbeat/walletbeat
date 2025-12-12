@@ -612,7 +612,6 @@ export const rabby: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,
-				kind: 'software',
 				transactionDetailsDisplay: displaysFullTransactionDetails,
 			},
 		},

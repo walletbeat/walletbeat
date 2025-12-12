@@ -185,7 +185,6 @@ export const trezorWallet: HardwareWallet = {
 					chain: TransactionDisplayOptions.NOT_IN_UI,
 					nonce: TransactionDisplayOptions.NOT_IN_UI,
 				},
-				kind: 'hardware',
 				legibility: noCalldataDecoding,
 			},
 			userSafety: null,

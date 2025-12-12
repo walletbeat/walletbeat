@@ -159,7 +159,6 @@ export const ngrave: HardwareWallet = {
 					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				kind: 'hardware',
 				legibility: noCalldataDecoding,
 			},
 			userSafety: null,

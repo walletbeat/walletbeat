@@ -263,7 +263,6 @@ export const safe: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,
-				kind: 'software',
 				transactionDetailsDisplay: displaysFullTransactionDetails,
 			},
 		},
