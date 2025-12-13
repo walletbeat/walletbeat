@@ -48,20 +48,6 @@ function connectionMethodToString(
 			return 'other software wallets'
 	}
 }
-
-/**
- * All possible connection methods in the order they should be checked
- */
-const allConnectionMethods: Array<AppConnectionMethod | SoftwareWalletType> = [
-	AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP,
-	AppConnectionMethod.VENDOR_OPEN_SOURCE_APP,
-	SoftwareWalletType.METAMASK,
-	SoftwareWalletType.RABBY,
-	SoftwareWalletType.FRAME,
-	SoftwareWalletType.AMBIRE,
-	SoftwareWalletType.OTHER,
-]
-
 /**
  * Builds a description of the supported connection methods
  */

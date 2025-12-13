@@ -158,8 +158,10 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
-		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
-			SoftwareTransactionLegibilityImplementation
+		transactionLegibility: Nullable<
+			WalletBaseFeatures['security']['transactionLegibility'] &
+				SoftwareTransactionLegibilityImplementation
+		>
 	}
 
 	/** Privacy features. */
@@ -218,8 +220,10 @@ export type WalletHardwareFeatures = WalletBaseFeatures & {
 		userSafety: VariantFeature<UserSafetySupport>
 		/** Secure element support */
 		secureElement: VariantFeature<Support<SecureElementSupport>>
-		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
-			HardwareTransactionLegibilityImplementation
+		transactionLegibility: Nullable<
+			WalletBaseFeatures['security']['transactionLegibility'] &
+				HardwareTransactionLegibilityImplementation
+		>
 	}
 	privacy: WalletBaseFeatures['privacy'] & {
 		hardwarePrivacy: VariantFeature<HardwarePrivacySupport>
