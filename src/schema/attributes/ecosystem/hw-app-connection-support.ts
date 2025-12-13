@@ -86,9 +86,7 @@ function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 	}
 }
 
-function unverifiableAppConnectionSupport(
-	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<AppConnectionSupportValue> {
+function unverifiableAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 	return {
 		value: {
 			id: 'unverifiable_app_connection',
@@ -226,14 +224,7 @@ limiting its utility.
 			The wallet can connect to apps, but only through its proprietary closed-source 
 			application, requiring users to trust unverifiable code.
 		`),
-				unverifiableAppConnectionSupport(
-					supported({
-						ref: refTodo,
-						supportedConnections: {
-							[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
-						},
-					}),
-				),
+				unverifiableAppConnectionSupport(),
 			),
 			exampleRating(
 				paragraph(`
@@ -335,7 +326,7 @@ limiting its utility.
 
 			if (hasClosedSource) {
 				// Can connect to apps but requires trusting unverifiable code → PARTIAL
-				return unverifiableAppConnectionSupport(appSupport)
+				return unverifiableAppConnectionSupport()
 			}
 
 			// Should not reach here if feature data is correct, but handle gracefully

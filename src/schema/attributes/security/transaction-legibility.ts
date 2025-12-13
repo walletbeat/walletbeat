@@ -119,7 +119,7 @@ function softwareNoTransactionLegibility(): Evaluation<TransactionLegibilityValu
 			__brand: brand,
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} implements either zero or very little transaction legibility. The wallet does not adequately display calldata in multiple formats (raw hex, formatted, copy-able) or essential transaction details (gas, nonce, from, to, chain, value). Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.',
+			'{{WALLET_NAME}} implements either zero or very little transaction legibility. The wallet does not adequately display calldata in multiple formats (raw hex, formatted, copyable) or essential transaction details (gas, nonce, from, to, chain, value). Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.',
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should implement comprehensive transaction legibility, including the ability to display calldata in raw hex format, formatted output, and allow copying to clipboard, as well as displaying all essential transaction details for user verification.',
@@ -137,7 +137,7 @@ function softwarePartialTransactionLegibility(): Evaluation<TransactionLegibilit
 			__brand: brand,
 		},
 		details: paragraph(
-			'{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet may display some calldata formats or some transaction details, but lacks comprehensive support for all calldata display methods (raw hex, formatted, copy-able) or all essential transaction details (gas, nonce, from, to, chain, value). Showing transaction details is crucial for security as it allows users to verify transaction details before signing.',
+			'{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet may display some calldata formats or some transaction details, but lacks comprehensive support for all calldata display methods (raw hex, formatted, copyable) or all essential transaction details (gas, nonce, from, to, chain, value). Showing transaction details is crucial for security as it allows users to verify transaction details before signing.',
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should extend its transaction legibility implementation to support all calldata display methods (raw hex display, formatted output, copy to clipboard) and ensure all essential transaction details (gas, nonce, from, to, chain, value) are clearly displayed for user verification.',
