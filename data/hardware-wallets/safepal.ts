@@ -1,28 +1,26 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import {
 	AppConnectionMethod,
-	SoftwareWalletType,
 	type AppConnectionMethodDetails,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import { WalletProfile } from '@/schema/features/profile'
-import {
-	BugBountyPlatform,
-	BugBountyProgramAvailability,
-	type BugBountyProgramImplementation,
-	LegalProtectionType,
-} from '@/schema/features/security/bug-bounty-program'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-import type { CalendarDate } from '@/types/date'
 
 export const safepalWallet: HardwareWallet = {
 	metadata: {
 		id: 'safepal',
 		displayName: 'SafePal',
 		tableName: 'SafePal',
+		blurb: paragraph(`
+			This is a fictitious hardware wallet with all of its fields unrated.
+			It is meant to be useful to copy-paste to other wallet files
+			when initially creating the skeleton structure for their data.
+		`),
+		contributors: [mattmatt],
 		hardwareWalletModels: [
 			{
 				id: 'safepal-s1-pro',
@@ -31,12 +29,6 @@ export const safepalWallet: HardwareWallet = {
 				url: 'https://www.safepal.com/en/store/s1pro',
 			},
 		],
-		blurb: paragraph(`
-			This is a fictitious hardware wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
-		`),
-		contributors: [mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-12-16',
 		urls: {
@@ -45,11 +37,11 @@ export const safepalWallet: HardwareWallet = {
 			],
 			socials: {
 				facebook: 'https://www.facebook.com/iSafePal',
+				instagram: 'https://www.instagram.com/isafepal/',
 				linkedin: 'https://www.linkedin.com/company/safepal/',
 				telegram: 'https://t.me/SafePalTG',
-				x: 'https://x.com/iSafePal',
 				tiktok: 'https://www.tiktok.com/@safepal_wallet',
-				instagram: 'https://www.instagram.com/isafepal/',
+				x: 'https://x.com/iSafePal',
 				youtube: 'https://www.youtube.com/channel/UCfqztNiZWV62Eu9kiqKf6WQ',
 			},
 			websites: ['https://www.safepal.com/'],
