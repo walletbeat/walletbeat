@@ -50,15 +50,23 @@
 	}: SvelteHTMLElements['form'] & {
 		items: Item[]
 		filterGroups: FilterGroup<Item>[]
-		activeFilters?: Set<Filter<Item>>
+		activeFilters?: Set<Filter<Item>> | SvelteSet<Filter<Item>>
 		filteredItems: Item[]
 		toggleFilter?: typeof _toggleFilter
 		toggleFilterById?: typeof _toggleFilterById
 	} = $props()
 
-
 	// State
 	// (Derived)
+	// Ensure activeFilters is always a SvelteSet (has union/difference/intersection methods)
+	// Convert to SvelteSet if it's a regular Set - use $effect to handle reactive updates
+	$effect(() => {
+		if (!(activeFilters instanceof SvelteSet)) {
+			const svelteSet = new SvelteSet<Filter<Item>>(activeFilters)
+			activeFilters = svelteSet
+		}
+	})
+
 	const filterItems = (filters: Set<Filter<Item>>) => {
 		if (filters.size === 0) return items
 
