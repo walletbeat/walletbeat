@@ -1,4 +1,9 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import {
+	AppConnectionMethod,
+	SoftwareWalletType,
+	type AppConnectionMethodDetails,
+} from '@/schema/features/ecosystem/hw-app-connection-support'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -7,7 +12,7 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { notSupported, supported } from '@/schema/features/support'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -35,7 +40,9 @@ export const safepalWallet: HardwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-12-16',
 		urls: {
-			extensions: ['https://chromewebstore.google.com/detail/safepal-extension-wallet/lgmpcpglpngdoalbgeoldeajfclnhafa'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/safepal-extension-wallet/lgmpcpglpngdoalbgeoldeajfclnhafa',
+			],
 			socials: {
 				facebook: 'https://www.facebook.com/iSafePal',
 				linkedin: 'https://www.linkedin.com/company/safepal/',
@@ -43,14 +50,19 @@ export const safepalWallet: HardwareWallet = {
 				x: 'https://x.com/iSafePal',
 				tiktok: 'https://www.tiktok.com/@safepal_wallet',
 				instagram: 'https://www.instagram.com/isafepal/',
-				youtube: 'https://www.youtube.com/channel/UCfqztNiZWV62Eu9kiqKf6WQ'
+				youtube: 'https://www.youtube.com/channel/UCfqztNiZWV62Eu9kiqKf6WQ',
 			},
 			websites: ['https://www.safepal.com/'],
 		},
 	},
 	features: {
 		accountSupport: null,
-		appConnectionSupport: null,
+		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
+			ref: refTodo,
+			supportedConnections: {
+				[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP]: true,
+			},
+		}),
 		licensing: null,
 		monetization: {
 			ref: refTodo,
