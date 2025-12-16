@@ -52,22 +52,11 @@ export const safepalWallet: HardwareWallet = {
 		accountSupport: null,
 		appConnectionSupport: null,
 		licensing: null,
-		monetization: {
+		monetization: null,
+		multiAddress: supported({
 			ref: refTodo,
-			revenueBreakdownIsPublic: false,
-			strategies: {
-				donations: null,
-				ecosystemGrants: null,
-				governanceTokenLowFloat: null,
-				governanceTokenMostlyDistributed: null,
-				hiddenConvenienceFees: null,
-				publicOffering: null,
-				selfFunded: null,
-				transparentConvenienceFees: null,
-				ventureCapital: null,
-			},
-		},
-		multiAddress: null,
+			supportsMultipleAddresses: true,
+		}),
 		privacy: {
 			dataCollection: null,
 			hardwarePrivacy: null,
