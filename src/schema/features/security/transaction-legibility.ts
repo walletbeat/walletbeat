@@ -3,8 +3,11 @@ import type { WithRef } from '@/schema/reference'
 import { isSupported, notSupported, type Support } from '../support'
 
 export enum TransactionDisplayOptions {
+	/** Shown by default on the transaction approval screen */
 	SHOWN_BY_DEFAULT = 'SHOWN_BY_DEFAULT',
+	/** Available on the transaction approval screen but requires user action (e.g., clicking a button) or enabling in settings */
 	SHOWN_OPTIONALLY = 'SHOWN_OPTIONALLY',
+	/** Not displayed in the wallet UI */
 	NOT_IN_UI = 'NOT_IN_UI',
 }
 
@@ -330,6 +333,21 @@ export const isFullTransactionDetails = (details: DisplayedTransactionDetails): 
 		details.value === TransactionDisplayOptions.SHOWN_BY_DEFAULT
 	)
 }
+
+/**
+ * Type predicate for `HardwareTransactionLegibilityImplementation`.
+ */
+export function isHardwareTransactionLegibility(
+	transactionLegibility:
+		| HardwareTransactionLegibilityImplementation
+		| SoftwareTransactionLegibilityImplementation,
+): transactionLegibility is HardwareTransactionLegibilityImplementation {
+	// The `dataExtraction` field exists only on `HardwareTransactionLegibilityImplementation`,
+	// not on `SoftwareTransactionLegibilityImplementation`, so it is a good way to distinguish
+	// between the two types:
+	return Object.hasOwn(transactionLegibility, 'dataExtraction')
+}
+
 export type HardwareTransactionLegibilityImplementation =
 	WithRef<HardwareTransactionLegibilitySupport>
 export type SoftwareTransactionLegibilityImplementation =

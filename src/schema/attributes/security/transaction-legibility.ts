@@ -11,6 +11,7 @@ import {
 	DataExtraction,
 	type HardwareTransactionLegibilityImplementation,
 	isFullTransactionDetails,
+	isHardwareTransactionLegibility,
 	type SoftwareTransactionLegibilityImplementation,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
@@ -480,18 +481,4 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		return evaluateSoftwareWalletTransactionLegibility(features.security.transactionLegibility)
 	},
 	aggregate: pickWorstRating<TransactionLegibilityValue>,
-}
-
-/**
- * Type predicate for `HardwareTransactionLegibilityImplementation`.
- */
-export function isHardwareTransactionLegibility(
-	transactionLegibility:
-		| HardwareTransactionLegibilityImplementation
-		| SoftwareTransactionLegibilityImplementation,
-): transactionLegibility is HardwareTransactionLegibilityImplementation {
-	// The `dataExtraction` field exists only on `HardwareTransactionLegibilityImplementation`,
-	// not on `SoftwareTransactionLegibilityImplementation`, so it is a good way to distinguish
-	// between the two types:
-	return Object.hasOwn(transactionLegibility, 'dataExtraction')
 }
