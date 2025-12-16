@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"packageManager": "pnpm@10.4.0+sha512.6b849d0787d97f8f4e1f03a9b8ff8f038e79e153d6f11ae539ae7c435ff9e796df6a862c991502695c7f9e8fac8aeafc1ac5a8dab47e36148d183832d886dd52",
 	"scripts": {
-		"astro": "ASTRO_TELEMETRY_DISABLED=1 astro",
+		"astro": "cross-env ASTRO_TELEMETRY_DISABLED=1 astro",
 		"build": "deploy/build.sh",
 		"check:all": "pnpm run check:astro && pnpm run check:vitest --run && pnpm run check:lint && pnpm run check:syntax && pnpm run check:spelling:quiet && pnpm run check:misc && pnpm run check:build:post:quiet",
 		"check:quick": "pnpm run check:lint:quick && pnpm run check:syntax && pnpm run check:spelling:quiet && pnpm run check:misc",
@@ -52,6 +52,7 @@
 		"@fleek-platform/cli": "^3.9.4",
 		"@kindspells/astro-shield": "^1.7.1",
 		"blumen": "^0.16.5",
+		"cross-env": "^10.1.0",
 		"cspell": "^8.19.4",
 		"eslint": "^9.38.0",
 		"eslint-config-love": "^118.0.0",

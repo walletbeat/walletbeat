@@ -305,7 +305,7 @@
 										isChecked ?
 											activeFilters
 										:
-											activeFilters.symmetricDifference(new Set([filter]))
+											activeFilters.union(new Set([filter]))
 									).length
 							)}
 

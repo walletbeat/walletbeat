@@ -1,13 +1,14 @@
 // @ts-check
 import { resolve } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import sitemap from '@astrojs/sitemap'
 import svelte from '@astrojs/svelte'
 import { shield } from '@kindspells/astro-shield'
 import { defineConfig } from 'astro/config'
 
-const rootDir = new URL('.', import.meta.url).pathname
-const modulePath = resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')
+const rootDir = fileURLToPath(new URL('.', import.meta.url))
+const modulePath = pathToFileURL(resolve(rootDir, 'src', 'generated', 'sriHashes.mjs')).href
 
 // https://astro.build/config
 export default defineConfig({
