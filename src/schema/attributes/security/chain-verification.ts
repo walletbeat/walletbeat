@@ -58,8 +58,8 @@ function noChainVerification(
 				: chainConfigurability.l1.rpcEndpointConfiguration
 
 		return (
-			l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST ||
-			l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
+			l1Configurability === RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST ||
+			l1Configurability === RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS
 		)
 	})()
 

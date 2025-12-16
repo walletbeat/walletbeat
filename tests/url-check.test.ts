@@ -647,12 +647,6 @@ async function checkValidUrl(url: Url): Promise<void> {
 				resolve()
 			})
 			res.on('end', () => {
-				console.log(
-					'>>> to force:',
-					newValidUrls.push(
-						`\t{\n\t\turl: '${href}',\n\t\turlHash: '${digest}',\n\t\tretrieved: '${today()}'\n\t},`,
-					),
-				)
 				expect(null).toSatisfy(
 					() => isValidStatusCode(res.statusCode) && hasData && error === null,
 					`Request to ${href} failed (HTTP status code: ${res.statusCode ?? 'unknown'})${hasData ? '' : ' (received 0 bytes)'}${error === null ? '' : `; error: ${error}`}`,

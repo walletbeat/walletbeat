@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
 import {
 	type AppConnectionMethodDetails,
@@ -35,7 +36,7 @@ export const onekeyWallet: HardwareWallet = {
 		blurb: paragraph(`
 			OneKey Pro is a hardware wallet with excellent haptic feedback, air gap mode, and EAL6+ secure element.
 		`),
-		contributors: [patrickalphac],
+		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
@@ -111,6 +112,7 @@ export const onekeyWallet: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,

@@ -58,7 +58,9 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: null,
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},

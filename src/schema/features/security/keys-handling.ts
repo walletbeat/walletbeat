@@ -1,19 +1,25 @@
-import type { WithRef } from '@/schema/reference'
-
-export enum KeysHandlingType {
-	PASS = 'PASS',
-	PARTIAL = 'PARTIAL',
-	FAIL = 'FAIL',
+/** Where is the secret generated? */
+export enum KeyGenerationLocation {
+	FULLY_ON_USER_DEVICE = 'FULLY_ON_USER_DEVICE',
+	FULLY_OFF_USER_DEVICE = 'FULLY_OFF_USER_DEVICE',
+	MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE = 'MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE',
 }
 
+/** If the key is split between multiple parties, how does reconstruction occur? */
+export enum MultiPartyKeyReconstruction {
+	NON_MULTIPARTY = 'NON_MULTIPARTY',
+	ON_USER_DEVICE = 'RECONSTRUCTED_ON_USER_DEVICE',
+	MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE = 'MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE',
+	MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE = 'MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE',
+}
+
+/**
+ * How is private key material handled?
+ */
 export interface KeysHandlingSupport {
-	type: KeysHandlingType
-	url?: string
-	details?: string
-	masterSecretGeneration: KeysHandlingType
-	proprietaryKeyMechanisms: KeysHandlingType
-	keyTransmission: KeysHandlingType
-	physicalAttackResistance: KeysHandlingType
-}
+	/** Is the key generated on-device or not? */
+	keyGeneration: KeyGenerationLocation
 
-export type KeysHandlingImplementation = WithRef<KeysHandlingSupport>
+	/** If the key is split between multiple parties, how does reconstruction occur? */
+	multipartyKeyReconstruction: MultiPartyKeyReconstruction
+}

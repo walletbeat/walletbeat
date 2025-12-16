@@ -17,6 +17,7 @@ import type { DataCollection } from './features/privacy/data-collection'
 import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'
 import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
+import type { AccountRecovery } from './features/security/account-recovery'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
 import type { FirmwareSupport } from './features/security/firmware'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
@@ -99,6 +100,12 @@ export interface WalletBaseFeatures {
 
 		/** Passkey verification implementation */
 		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
+
+		/** How can users of the wallet recover their account? */
+		accountRecovery: VariantFeature<AccountRecovery>
+
+		/** How are secret keys handled? */
+		keysHandling: VariantFeature<WithRef<KeysHandlingSupport>>
 	}
 
 	/** Privacy features. */
@@ -212,7 +219,6 @@ export function isWalletSoftwareFeatures(
 export type WalletHardwareFeatures = WalletBaseFeatures & {
 	security: WalletBaseFeatures['security'] & {
 		firmware: VariantFeature<FirmwareSupport>
-		keysHandling: VariantFeature<KeysHandlingSupport>
 		supplyChainDIY: VariantFeature<SupplyChainDIYSupport>
 		supplyChainFactory: VariantFeature<SupplyChainFactorySupport>
 		userSafety: VariantFeature<UserSafetySupport>
@@ -285,10 +291,11 @@ export interface ResolvedFeatures {
 		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
-		keysHandling: ResolvedFeature<KeysHandlingSupport>
+		keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>>
 		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport>
 		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>
 		userSafety: ResolvedFeature<UserSafetySupport>
+		accountRecovery: ResolvedFeature<AccountRecovery>
 	}
 	privacy: {
 		dataCollection: ResolvedFeature<DataCollection>
@@ -405,10 +412,7 @@ export function resolveFeatures(
 				features => features.security.bugBountyProgram,
 			),
 			firmware: hardwareFeat('security.firmware', features => features.security.firmware),
-			keysHandling: hardwareFeat(
-				'security.keysHandling',
-				features => features.security.keysHandling,
-			),
+			keysHandling: baseFeat('security.keysHandling', features => features.security.keysHandling),
 			supplyChainDIY: hardwareFeat(
 				'security.supplyChainDIY',
 				features => features.security.supplyChainDIY,
@@ -418,6 +422,10 @@ export function resolveFeatures(
 				features => features.security.supplyChainFactory,
 			),
 			userSafety: hardwareFeat('security.userSafety', features => features.security.userSafety),
+			accountRecovery: baseFeat(
+				'security.accountRecovery',
+				features => features.security.accountRecovery,
+			),
 		},
 		privacy: {
 			dataCollection: baseFeat(

@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { sigri } from '@/data/contributors/sigri'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -24,7 +25,7 @@ export const mtpelerin: SoftwareWallet = {
 		blurb: paragraph(
 			'Buy, swap and sell crypto with the lowest fees, zero hidden costs and full control over your cryptoassets.',
 		),
-		contributors: [sigri],
+		contributors: [sigri, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-26',
 		urls: {
@@ -109,6 +110,7 @@ export const mtpelerin: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
 					{
@@ -134,6 +136,7 @@ export const mtpelerin: SoftwareWallet = {
 				ref: refTodo,
 				wallets: {},
 			},
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},

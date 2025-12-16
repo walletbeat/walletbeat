@@ -4,11 +4,16 @@ import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
+import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { displaysFullCallData } from '@/schema/features/security/transaction-legibility'
@@ -32,6 +37,9 @@ import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { mdParagraph, paragraph } from '@/types/content'
 
+import { alphabet } from '../entities/alphabet'
+import { apple } from '../entities/apple'
+import { consensys } from '../entities/consensys'
 import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
@@ -130,17 +138,24 @@ export const metamask: SoftwareWallet = {
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({
 			ref: [
 				{
-					explanation:
-						'MetaMask allows users to configure custom RPC endpoints for any network, including Ethereum mainnet, before making any requests to the default endpoints.',
+					explanation: `
+						MetaMask allows users to configure custom RPC endpoints for any
+						network, including Ethereum mainnet, though it contacts the
+						default \`mainnet.infura.io\` and some L2s (e.g
+						\`polygon-mainnet.infura.io\`, \`arbitrum-mainnet.infura.io\`) to
+						perform non-sensitive RPCs (\`eth_blockNumber\` and \`net_version\`)
+						before the user is able to customize the endpoints to use for
+						these chains.
+					`,
 					url: 'https://support.metamask.io/configure/networks/how-to-add-a-custom-network-rpc/',
 				},
 			],
 			customChainRpcEndpoint: featureSupported,
 			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,
 			}),
 			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,
 			}),
 		}),
 		ecosystem: {
@@ -227,6 +242,53 @@ export const metamask: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: {
+				guardianRecovery: supported({
+					ref: [
+						{
+							label: 'MetaMask account recovery documentation',
+							url: 'https://support.metamask.io/configure/wallet/social-login',
+						},
+					],
+					minimumGuardianPolicy: {
+						type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+						descriptionMarkdown: `
+							MetaMask's account recovery feature splits recovery key shares across Google
+							and/or Apple. The user may configure a single one without the other,
+							in which case the key is effectively a 1-of-1.
+
+							MetaMask uses a key derived from the wallet password and these key shares
+							to create an encrypted seed phrase backup stored in Consensys's data store service.
+						`,
+						optionalGuardians: [
+							{
+								type: GuardianType.USER_EXTERNAL_ACCOUNT,
+								description: 'Google account',
+								entity: alphabet,
+							},
+							{
+								type: GuardianType.USER_EXTERNAL_ACCOUNT,
+								description: 'Apple account',
+								entity: apple,
+							},
+						],
+						optionalGuardiansMinimumConfigurable: 1,
+						optionalGuardiansMinimumNeededForRecovery: 1,
+						requiredGuardians: [
+							// Needed to decrypt encrypted backup.
+							{ type: GuardianType.WALLET_PASSWORD },
+							// MetaMask data store is a critical dependency here,
+							// as without it the encrypted backup is not accessible.
+							{
+								type: GuardianType.WALLET_PROVIDER,
+								description: 'MetaMask data store service',
+								entity: consensys,
+							},
+						],
+						secretReconstitution: 'CLIENT_SIDE',
+					},
+				}),
+			},
 			bugBountyProgram: null,
 			hardwareWalletSupport: {
 				ref: [
@@ -250,6 +312,11 @@ export const metamask: SoftwareWallet = {
 						connectionTypes: [HardwareWalletConnection.QR],
 					}),
 				},
+			},
+			keysHandling: {
+				ref: refTodo,
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
 			},
 			lightClient: {
 				ethereumL1: notSupported,

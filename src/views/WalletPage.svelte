@@ -150,6 +150,7 @@
 	import WalletStageSummary from '@/views/WalletStageSummary.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import Typography from '@/components/Typography.svelte'
+	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
 </script>
 
 
@@ -803,6 +804,8 @@
 								<TransactionInclusionDetails {...componentProps} {wallet} {value} {references} />
 							{:else if componentName === 'FundingDetails'}
 								<FundingDetails {...componentProps} {wallet} {value} {references} />
+							{:else if componentName === 'AccountRecoveryDetails'}
+								<AccountRecoveryDetails {...componentProps} {wallet} {value} {references} />
 							{:else if componentName === 'UnratedAttribute'}
 								<UnratedAttribute {...componentProps} {wallet} {value} {references} />
 							{/if}

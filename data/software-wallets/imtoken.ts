@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { mako } from '@/data/contributors/mako'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -55,7 +56,7 @@ export const imtoken: SoftwareWallet = {
 		blurb: paragraph(`
 			imToken is a reliable and intuitive digital wallet, enabling easy access to over 50+ major networks including Bitcoin, Ethereum, and Tron. imToken supports hardware wallets, token swap and DApp browser etc., and provides secure and trusted non-custodial wallet services to millions of users in more than 150 countries and regions around the world.
 		`),
-		contributors: [mako],
+		contributors: [mako, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-28',
 		urls: {
@@ -140,10 +141,10 @@ export const imtoken: SoftwareWallet = {
 			],
 			customChainRpcEndpoint: featureSupported,
 			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,
 			}),
 			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,
 			}),
 		}),
 		ecosystem: {
@@ -251,6 +252,7 @@ export const imtoken: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
 					{
@@ -291,6 +293,7 @@ export const imtoken: SoftwareWallet = {
 					},
 				},
 			},
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: notSupported,
 			},

@@ -1,4 +1,6 @@
 import type { Value } from '../schema/attributes'
+import type { AccountRecoveryDetailsContent } from './content/account-recovery-details'
+import type { AccountUnruggabilityDetailsContent } from './content/account-unruggability-details'
 import type { AddressCorrelationDetailsContent } from './content/address-correlation-details'
 import type { ChainVerificationDetailsContent } from './content/chain-verification-details'
 import type { FundingDetailsContent } from './content/funding-details'
@@ -35,6 +37,8 @@ export type ComponentAndProps =
 	| ScamAlertDetailsContent
 	| SecurityAuditsDetailsContent
 	| TransactionInclusionDetailsContent
+	| AccountRecoveryDetailsContent
+	| AccountUnruggabilityDetailsContent
 	| UnratedAttributeContent<Value>
 
 /**
@@ -112,13 +116,24 @@ export function isTypographicContent<Strings extends _Strings = null>(
 }
 
 /**
- * Type predicate for expanded set of strings.
+ * Upconvert content from one set of strings to a superset.
  */
 export function typographicContentWithExtraOptionalStrings<
 	BaseStrings extends _Strings,
 	ExtendedStrings extends BaseStrings,
->(_: TypographicContent<BaseStrings>): _ is TypographicContent<ExtendedStrings> {
-	return true // Always true since ExtendedStrings extends BaseStrings.
+>(content: TypographicContent<BaseStrings>): TypographicContent<ExtendedStrings> {
+	function isTypographicContentWithExtraOptionalStrings<
+		BaseStrings extends _Strings,
+		ExtendedStrings extends BaseStrings,
+	>(_: TypographicContent<BaseStrings>): _ is TypographicContent<ExtendedStrings> {
+		return true // Always true since ExtendedStrings extends BaseStrings.
+	}
+
+	if (!isTypographicContentWithExtraOptionalStrings<BaseStrings, ExtendedStrings>(content)) {
+		throw new Error('Unreachable')
+	}
+
+	return content
 }
 
 /**

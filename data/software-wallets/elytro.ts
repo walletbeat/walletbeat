@@ -98,11 +98,13 @@ export const elytro: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},
 			},
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},

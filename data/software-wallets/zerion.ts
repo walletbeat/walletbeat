@@ -99,6 +99,7 @@ export const zerion: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: null,
 			hardwareWalletSupport: {
 				ref: [
@@ -123,6 +124,7 @@ export const zerion: SoftwareWallet = {
 					}),
 				},
 			},
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
 			},

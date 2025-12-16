@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
@@ -19,7 +20,7 @@ export const fireflyWallet: HardwareWallet = {
 			Firefly Wallet is a hardware wallet that uses biometrics
 			for user authentication and secure private key management.
 		`),
-		contributors: [nconsigny],
+		contributors: [nconsigny, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.DIY,
 		hardwareWalletModels: [
 			{
@@ -63,6 +64,7 @@ export const fireflyWallet: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: notSupported,
 			firmware: null,
 			keysHandling: null,

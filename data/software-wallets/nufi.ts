@@ -141,6 +141,7 @@ export const nufi: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
@@ -165,6 +166,7 @@ export const nufi: SoftwareWallet = {
 					}),
 				},
 			},
+			keysHandling: null,
 			lightClient: {
 				ethereumL1: notSupported,
 			},

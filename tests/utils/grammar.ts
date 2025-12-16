@@ -252,26 +252,11 @@ export function walletContentGrammarLint(
 			if (typeof content === 'string') {
 				await grammarLint(content, { language: 'plaintext' })
 			} else {
-				if (
-					!typographicContentWithExtraOptionalStrings<
-						{
-							WALLET_NAME: string
-						} | null,
-						{
-							WALLET_NAME: string
-							WALLET_PSEUDONYM_SINGULAR: string | null
-							WALLET_PSEUDONYM_PLURAL: string | null
-						}
-					>(content)
-				) {
-					throw new Error('Unreachable')
-				}
-
 				content = prerenderTypographicContent<{
 					WALLET_NAME: string
 					WALLET_PSEUDONYM_SINGULAR: string | null
 					WALLET_PSEUDONYM_PLURAL: string | null
-				}>(content, {
+				}>(typographicContentWithExtraOptionalStrings(content), {
 					WALLET_NAME: 'Example Wallet',
 					WALLET_PSEUDONYM_SINGULAR: 'Example Wallet Username',
 					WALLET_PSEUDONYM_PLURAL: 'Example Wallet Usernames',

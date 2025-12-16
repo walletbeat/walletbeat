@@ -47,13 +47,23 @@ export enum Rating {
 	EXEMPT = 'EXEMPT',
 }
 
-export const ratingIcons = {
-	[Rating.PASS]: '✅',
-	[Rating.PARTIAL]: '⚠️',
-	[Rating.FAIL]: '❌',
-	[Rating.UNRATED]: '❔',
-	[Rating.EXEMPT]: '🆗',
-} as const
+/** A rating that is either pass/partial/fail. */
+export type ExplicitRating = Rating.FAIL | Rating.PARTIAL | Rating.PASS
+
+/**
+ * Type predicate for `ExplicitRating`.
+ */
+export function isExplicitRating(rating: Rating): rating is ExplicitRating {
+	switch (rating) {
+		case Rating.PASS:
+		case Rating.PARTIAL:
+		case Rating.FAIL:
+			return true
+		case Rating.EXEMPT:
+		case Rating.UNRATED:
+			return false
+	}
+}
 
 /** Ratings enum. */
 export const ratingEnum = new Enum<Rating>({
@@ -63,6 +73,14 @@ export const ratingEnum = new Enum<Rating>({
 	[Rating.UNRATED]: true,
 	[Rating.EXEMPT]: true,
 })
+
+export const ratingIcons = {
+	[Rating.PASS]: '✅',
+	[Rating.PARTIAL]: '⚠️',
+	[Rating.FAIL]: '❌',
+	[Rating.UNRATED]: '❔',
+	[Rating.EXEMPT]: '🆗',
+} as const
 
 /**
  * Convert a rating to the icon displayed on the slice tooltip.
@@ -213,6 +231,22 @@ export function defaultRatingScore(rating: Rating): Score {
 		case Rating.UNRATED:
 			return null
 	}
+}
+
+/** Compare two explicit ratings. Suitable for using in sort functions. */
+export function compareExplicitRatings(rating1: ExplicitRating, rating2: ExplicitRating): number {
+	const score = (rating: ExplicitRating): number => {
+		switch (rating) {
+			case Rating.FAIL:
+				return 0
+			case Rating.PARTIAL:
+				return 1
+			case Rating.PASS:
+				return 2
+		}
+	}
+
+	return score(rating1) - score(rating2)
 }
 
 export interface EvaluationData<V extends Value> {

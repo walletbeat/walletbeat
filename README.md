@@ -6,4 +6,4 @@ You are browsing the `beta` branch of Walletbeat, available on the web at [beta.
 
 ## Contributing
 
-We welcome and encourage contributions. Please see our [contributing guidelines](./CONTRIBUTING.md).
+We welcome and encourage contributions. Please see our [contribution guidelines](resources/docs/contribute/CONTRIBUTING.md).

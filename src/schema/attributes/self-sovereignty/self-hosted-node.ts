@@ -186,14 +186,14 @@ export const selfHostedNode: Attribute<SelfHostedNodeValue> = {
 
 		if (
 			features.chainConfigurability.l1.rpcEndpointConfiguration ===
-			RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST
+			RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST
 		) {
 			return supportsSelfHostedNode(allRefs)
 		}
 
 		if (
 			features.chainConfigurability.l1.rpcEndpointConfiguration ===
-			RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
+			RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS
 		) {
 			return supportsSelfHostedNodeAfterRequests(allRefs)
 		}

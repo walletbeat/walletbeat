@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
 import {
 	AppConnectionMethod,
@@ -35,7 +36,7 @@ export const cypherockWallet: HardwareWallet = {
 		blurb: paragraph(`
 			The Cypherock has a secure element (EAL6+ rated) and uses a unique card-tapping system for transaction authorization.
 		`),
-		contributors: [patrickalphac],
+		contributors: [patrickalphac, mattmatt],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
 		hardwareWalletModels: [
 			{
@@ -109,6 +110,7 @@ export const cypherockWallet: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
+			accountRecovery: null,
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
 					{

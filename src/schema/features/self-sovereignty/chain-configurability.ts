@@ -11,7 +11,7 @@ export enum RpcEndpointConfiguration {
 	 * "Sensitive request" is defined as containing any user data, such as the
 	 * user's wallet address.
 	 */
-	YES_BEFORE_ANY_REQUEST = 'YES_BEFORE_ANY_REQUEST',
+	YES_BEFORE_ANY_SENSITIVE_REQUEST = 'YES_BEFORE_ANY_SENSITIVE_REQUEST',
 
 	/**
 	 * It is possible to set a custom RPC endpoint address, but the wallet makes
@@ -21,7 +21,7 @@ export enum RpcEndpointConfiguration {
 	 * "Sensitive request" is defined as containing any user data, such as the
 	 * user's wallet address.
 	 */
-	YES_AFTER_OTHER_REQUESTS = 'YES_AFTER_OTHER_REQUESTS',
+	YES_AFTER_OTHER_SENSITIVE_REQUESTS = 'YES_AFTER_OTHER_SENSITIVE_REQUESTS',
 
 	/** The RPC endpoint is not configurable by the user. */
 	NO = 'NO',
