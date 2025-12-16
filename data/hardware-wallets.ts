@@ -11,6 +11,7 @@ import { ngrave } from './hardware-wallets/ngrave'
 import { onekeyWallet } from './hardware-wallets/onekey'
 import { trezorWallet } from './hardware-wallets/trezor'
 import { unratedHardwareTemplate } from './hardware-wallets/unrated.tmpl'
+import { safepalWallet } from './hardware-wallets/safepal'
 
 /** Set of all known hardware wallets. */
 export const hardwareWallets = {
@@ -24,6 +25,7 @@ export const hardwareWallets = {
 	ngrave: ngrave,
 	onekey: onekeyWallet,
 	trezor: trezorWallet,
+	safepal: safepalWallet,
 }
 
 /** A valid hardware wallet name. */
