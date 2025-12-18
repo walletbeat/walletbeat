@@ -247,13 +247,29 @@ export function isWalletHardwareFeatures(
 }
 
 /**
+ * Type predicate for WalletEmbeddedFeatures.
+ */
+export function isWalletEmbeddedFeatures(
+	baseFeatures: WalletBaseFeatures,
+): baseFeatures is WalletEmbeddedFeatures {
+	return (
+		!isWalletSoftwareFeatures(baseFeatures) &&
+		!isWalletHardwareFeatures(baseFeatures) &&
+		Object.hasOwn(baseFeatures.security, 'passkeyVerification')
+	)
+}
+/**
  * A set of features for any embedded wallet.
  *
  * None of the fields in this type should be marked as possibly `undefined`.
  * If you want to add a new field, you need to add it to all existing wallets,
  * even if unrated (i.e. `null`).
  */
-export type WalletEmbeddedFeatures = WalletBaseFeatures & {}
+export type WalletEmbeddedFeatures = WalletBaseFeatures & {
+	security: WalletBaseFeatures['security'] & {
+		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
+	}
+}
 
 /**
  * A set of features about a specific wallet variant.
@@ -371,6 +387,17 @@ export function resolveFeatures(
 		return resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
 	}
 
+	const embeddedFeat = <F>(
+		featureName: string,
+		featureFn: (embeddedFeatures: WalletEmbeddedFeatures) => VariantFeature<F>,
+	): ResolvedFeature<F> => {
+		if (!isWalletEmbeddedFeatures(features)) {
+			return null
+		}
+
+		return resolveFeat<F>(featureName, featureFn(features), expectedVariants, variant)
+	}
+
 	return {
 		variant,
 		type: variantToWalletType(variant),
@@ -400,10 +427,15 @@ export function resolveFeatures(
 				'security.transactionLegibility',
 				features => features.security.transactionLegibility,
 			),
-			passkeyVerification: softwareFeat(
-				'passkeyVerification',
-				features => features.security.passkeyVerification,
-			),
+			passkeyVerification:
+				embeddedFeat(
+					'security.passkeyVerification',
+					features => features.security.passkeyVerification,
+				) ??
+				softwareFeat(
+					'security.passkeyVerification',
+					features => features.security.passkeyVerification,
+				),
 			bugBountyProgram: hardwareFeat(
 				'bugBountyProgram',
 				features => features.security.bugBountyProgram,
