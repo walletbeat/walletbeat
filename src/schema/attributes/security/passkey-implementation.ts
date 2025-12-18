@@ -13,10 +13,9 @@ import {
 import { isSupported } from '@/schema/features/support'
 import { popRefs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
-import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 
-import { exempt, pickWorstRating, unrated } from '../common'
+import { pickWorstRating, unrated } from '../common'
 
 const brand = 'attributes.security.passkey_implementation'
 
