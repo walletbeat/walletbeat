@@ -371,7 +371,7 @@ export const daimo: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: notSupported,
 			},
-			passkeyVerification: {
+			passkeyVerification: supported({
 				ref: [
 					{
 						explanation:
@@ -383,7 +383,7 @@ export const daimo: SoftwareWallet = {
 					'Daimo uses a verifier based on FreshCryptoLib for passkey verification in their P256Verifier contract.',
 				library: PasskeyVerificationLibrary.DAIMO_P256_VERIFIER,
 				libraryUrl: 'https://github.com/daimo-eth/p256-verifier/blob/master/src/P256Verifier.sol',
-			},
+			}),
 			publicSecurityAudits: [
 				{
 					ref: 'https://github.com/daimo-eth/daimo/blob/master/audits/2023-10-veridise-daimo.pdf',

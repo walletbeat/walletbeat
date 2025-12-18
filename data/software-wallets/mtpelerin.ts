@@ -7,7 +7,6 @@ import {
 	BugBountyProgramAvailability,
 	type BugBountyProgramImplementation,
 } from '@/schema/features/security/bug-bounty-program'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -140,10 +139,7 @@ export const mtpelerin: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: {
-				ref: refNotNecessary,
-				library: PasskeyVerificationLibrary.NONE,
-			},
+			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
 			transactionLegibility: null,

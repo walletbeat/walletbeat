@@ -3,12 +3,11 @@ import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo } from '@/schema/reference'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -128,10 +127,7 @@ export const gemwallet: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: notSupported,
 			},
-			passkeyVerification: {
-				ref: refNotNecessary,
-				library: PasskeyVerificationLibrary.NONE,
-			},
+			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: {
 				contractTransactionWarning: supported({

@@ -22,7 +22,6 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import { displaysFullTransactionDetails } from '@/schema/features/security/transaction-legibility'
@@ -49,7 +48,7 @@ import {
 	LicensingType,
 	SourceAvailableNonFOSSLicense,
 } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -412,10 +411,7 @@ export const rabby: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: notSupported,
 			},
-			passkeyVerification: {
-				ref: refNotNecessary,
-				library: PasskeyVerificationLibrary.NONE,
-			},
+			passkeyVerification: notSupported,
 			publicSecurityAudits: [
 				{
 					ref: 'https://github.com/RabbyHub/Rabby/blob/develop/audits/2021/%5B20210623%5DRabby%20chrome%20extension%20Penetration%20Testing%20Report.pdf',

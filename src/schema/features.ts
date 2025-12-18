@@ -99,7 +99,7 @@ export interface WalletBaseFeatures {
 		}
 
 		/** Passkey verification implementation */
-		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
+		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
 
 		/** How can users of the wallet recover their account? */
 		accountRecovery: VariantFeature<AccountRecovery>
@@ -164,7 +164,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 		hardwareWalletSupport: VariantFeature<HardwareWalletSupport>
 
 		/** Passkey verification implementation */
-		passkeyVerification: VariantFeature<PasskeyVerificationImplementation>
+		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
 		transactionLegibility: WalletBaseFeatures['security']['transactionLegibility'] &
 			VariantFeature<SoftwareTransactionLegibilityImplementation>
 	}
@@ -288,7 +288,7 @@ export interface ResolvedFeatures {
 		transactionLegibility: ResolvedFeature<
 			HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation
 		>
-		passkeyVerification: ResolvedFeature<PasskeyVerificationImplementation>
+		passkeyVerification: ResolvedFeature<Support<PasskeyVerificationImplementation>>
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
 		keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>>

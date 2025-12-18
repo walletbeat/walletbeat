@@ -108,7 +108,7 @@ export const elytro: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: {
+			passkeyVerification: supported({
 				ref: [
 					{
 						explanation:
@@ -120,7 +120,7 @@ export const elytro: SoftwareWallet = {
 				library: PasskeyVerificationLibrary.OPEN_ZEPPELIN_P256_VERIFIER,
 				libraryUrl:
 					'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
-			},
+			}),
 			publicSecurityAudits: null,
 			scamAlerts: null,
 			transactionLegibility: null,

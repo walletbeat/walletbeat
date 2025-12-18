@@ -22,7 +22,6 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { type ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
 	type ChainConfigurability,
@@ -297,12 +296,7 @@ export const imtoken: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: notSupported,
 			},
-			passkeyVerification: {
-				[Variant.MOBILE]: {
-					ref: refNotNecessary,
-					library: PasskeyVerificationLibrary.NONE,
-				},
-			},
+			passkeyVerification: notSupported,
 			publicSecurityAudits: [
 				{
 					ref: [
