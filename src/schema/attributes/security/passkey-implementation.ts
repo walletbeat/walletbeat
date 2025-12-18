@@ -10,6 +10,7 @@ import {
 	PasskeyVerificationLibrary,
 	type PasskeyVerificationSupport,
 } from '@/schema/features/security/passkey-verification'
+import { isSupported } from '@/schema/features/support'
 import { popRefs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
@@ -20,7 +21,7 @@ import { exempt, pickWorstRating, unrated } from '../common'
 const brand = 'attributes.security.passkey_implementation'
 
 export type PasskeyImplementationValue = Value & {
-	library: PasskeyVerificationLibrary
+	library: PasskeyVerificationLibrary | null
 	libraryUrl?: string
 	__brand: 'attributes.security.passkey_implementation'
 }
@@ -34,7 +35,7 @@ function noPasskeyImplementation(): Evaluation<PasskeyImplementationValue> {
 			shortExplanation: mdSentence(
 				'{{WALLET_NAME}} does not implement passkeys or does not use a recognized verification library.',
 			),
-			library: PasskeyVerificationLibrary.NONE,
+			library: null,
 			__brand: brand,
 		},
 		details: paragraph(
@@ -314,26 +315,30 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 					"This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet and doesn't use passkeys.",
 				),
 				brand,
-				{ library: PasskeyVerificationLibrary.NONE },
+				{ library: null },
 			)
 		}
 
 		const passkeyVerification = features.security.passkeyVerification
 
 		if (passkeyVerification === null) {
-			return unrated(passkeyImplementation, brand, { library: PasskeyVerificationLibrary.NONE })
+			return unrated(passkeyImplementation, brand, { library: null })
+		}
+
+		if (!isSupported(passkeyVerification)) {
+			return noPasskeyImplementation()
 		}
 
 		// If the library is explicitly set to NONE, this means the wallet doesn't support passkeys
 		// This handles EOA-only wallets like Frame, Rabby, Rainbow, etc.
-		if (passkeyVerification.library === PasskeyVerificationLibrary.NONE) {
+		if (passkeyVerification.library === null) {
 			return exempt(
 				passkeyImplementation,
 				sentence(
 					"This attribute is not applicable for {{WALLET_NAME}} as it doesn't implement passkeys.",
 				),
 				brand,
-				{ library: PasskeyVerificationLibrary.NONE },
+				{ library: null },
 			)
 		}
 
