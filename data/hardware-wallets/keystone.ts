@@ -133,7 +133,6 @@ export const keystoneWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
 			publicSecurityAudits: [
 				{
 					ref: [

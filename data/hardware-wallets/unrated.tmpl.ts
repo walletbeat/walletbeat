@@ -101,7 +101,6 @@ export const unratedHardwareTemplate: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
 			publicSecurityAudits: null,
 			secureElement: null,
 			supplyChainDIY: null,

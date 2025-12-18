@@ -129,7 +129,6 @@ export const gridplusWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
 			publicSecurityAudits: null,
 			secureElement: supported({
 				ref: [

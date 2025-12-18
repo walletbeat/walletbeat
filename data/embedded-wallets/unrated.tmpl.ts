@@ -64,7 +64,6 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
 			publicSecurityAudits: null,
 			transactionLegibility: null,
 		},

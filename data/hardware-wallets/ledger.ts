@@ -156,7 +156,6 @@ export const ledgerWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			secureElement: supported({
 				ref: [

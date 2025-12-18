@@ -307,18 +307,6 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) =>
 		pickWorstRating<PasskeyImplementationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<PasskeyImplementationValue> => {
-		// Hardware wallets don't use passkeys
-		if (features.type === WalletType.HARDWARE) {
-			return exempt(
-				passkeyImplementation,
-				sentence(
-					"This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet and doesn't use passkeys.",
-				),
-				brand,
-				{ library: null },
-			)
-		}
-
 		const passkeyVerification = features.security.passkeyVerification
 
 		if (passkeyVerification === null) {
@@ -327,19 +315,6 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 
 		if (!isSupported(passkeyVerification)) {
 			return noPasskeyImplementation()
-		}
-
-		// If the library is explicitly set to NONE, this means the wallet doesn't support passkeys
-		// This handles EOA-only wallets like Frame, Rabby, Rainbow, etc.
-		if (passkeyVerification.library === null) {
-			return exempt(
-				passkeyImplementation,
-				sentence(
-					"This attribute is not applicable for {{WALLET_NAME}} as it doesn't implement passkeys.",
-				),
-				brand,
-				{ library: null },
-			)
 		}
 
 		const { withoutRefs, refs: extractedRefs } =

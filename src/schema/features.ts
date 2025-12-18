@@ -98,9 +98,6 @@ export interface WalletBaseFeatures {
 			ethereumL1: VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>
 		}
 
-		/** Passkey verification implementation */
-		passkeyVerification: VariantFeature<Support<PasskeyVerificationImplementation>>
-
 		/** How can users of the wallet recover their account? */
 		accountRecovery: VariantFeature<AccountRecovery>
 
@@ -403,7 +400,7 @@ export function resolveFeatures(
 				'security.transactionLegibility',
 				features => features.security.transactionLegibility,
 			),
-			passkeyVerification: baseFeat(
+			passkeyVerification: softwareFeat(
 				'passkeyVerification',
 				features => features.security.passkeyVerification,
 			),

@@ -150,7 +150,6 @@ export const cypherockWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
 			publicSecurityAudits: [
 				{
 					ref: [
