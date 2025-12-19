@@ -821,7 +821,7 @@ describe('reference URLs', () => {
 			it('has valid docs', async () => {
 				for (const doc of wallet.metadata.urls?.docs ?? []) {
 					// These docs would always return an error Response. Skip docs to avoid failing the test.
-					const DOCS_TO_SKIP=[
+					const DOCS_TO_SKIP = [
 						'docs.phantom.com',
 						'developers.zerion.io',
 						'help.ambire.com/hc/en-us',
@@ -853,7 +853,6 @@ describe('reference URLs', () => {
 					'reddit.com',
 					'tiktok.com',
 				]
-
 
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
 					if (social === undefined) {
