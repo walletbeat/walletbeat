@@ -856,7 +856,8 @@ describe('reference URLs', () => {
 
 					const urlString = labeledUrl(social).url
 					const shouldSkip = SOCIALS_TO_SKIP.some(s => urlString.includes(s))
-					const shouldSkipSpecific = SPECIFIC_SITES_TO_SKIP.some(s => urlString.includes(s))
+					const shouldSkipSpecific = SPECIFIC_SITES_TO_SKIP.includes(urlString)
+
 					if (shouldSkip || shouldSkipSpecific) {
 						continue
 					}
