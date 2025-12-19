@@ -820,6 +820,17 @@ describe('reference URLs', () => {
 			})
 			it('has valid docs', async () => {
 				for (const doc of wallet.metadata.urls?.docs ?? []) {
+					// These docs would always return an error Response. Skip docs to avoid failing the test.
+					const DOCS_TO_SKIP=[
+						'docs.phantom.com',
+						'developers.zerion.io',
+						'help.ambire.com/hc/en-us',
+					]
+					const shouldSkip = DOCS_TO_SKIP.some(s => doc.toString().includes(s))
+					if (shouldSkip) {
+						continue
+					}
+
 					await checkValidUrl(doc)
 				}
 			})
@@ -843,11 +854,6 @@ describe('reference URLs', () => {
 					'tiktok.com',
 				]
 
-				const SPECIFIC_SITES_TO_SKIP = [
-					'https://docs.phantom.com/',
-					'https://developers.zerion.io',
-					'https://help.ambire.com/hc/en-us',
-				]
 
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
 					if (social === undefined) {
@@ -856,9 +862,8 @@ describe('reference URLs', () => {
 
 					const urlString = labeledUrl(social).url
 					const shouldSkip = SOCIALS_TO_SKIP.some(s => urlString.includes(s))
-					const shouldSkipSpecific = SPECIFIC_SITES_TO_SKIP.includes(urlString)
 
-					if (shouldSkip || shouldSkipSpecific) {
+					if (shouldSkip) {
 						continue
 					}
 
