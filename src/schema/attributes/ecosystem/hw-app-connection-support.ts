@@ -199,6 +199,9 @@ limiting its utility.
 							[SoftwareWalletType.METAMASK]: true,
 							[SoftwareWalletType.RABBY]: true,
 						},
+						requiresManufacturerConsent: {
+							type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRATABLE',
+						},
 					}),
 				),
 			),
@@ -213,6 +216,13 @@ limiting its utility.
 						supportedConnections: {
 							[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 							[SoftwareWalletType.METAMASK]: true,
+						},
+						requiresManufacturerConsent: {
+							type: 'FEATURES_GATED_BY_MANUFACTURER',
+							ref: {
+								explanation: 'The wallet requires manufacturer consent to connect to apps.',
+								url: 'https://example.com',
+							},
 						},
 					}),
 				),
@@ -236,6 +246,13 @@ limiting its utility.
 						ref: refTodo,
 						supportedConnections: {
 							[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
+						},
+						requiresManufacturerConsent: {
+							type: 'FEATURES_GATED_BY_MANUFACTURER',
+							ref: {
+								explanation: 'The wallet requires manufacturer consent to connect to apps.',
+								url: 'https://example.com',
+							},
 						},
 					}),
 				),

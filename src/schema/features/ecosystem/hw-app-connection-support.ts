@@ -40,12 +40,14 @@ export interface AppConnectionMethodDetails {
 	 */
 	supportedConnections: NonEmptySet<AppConnectionMethod | SoftwareWalletType>
 
-	
 	/**
 	 * Is manufacturer consent required to integrate any hardware wallet feature into a software wallet?
-	 * If so, must provide reference. 
+	 * If so, must provide reference.
 	 */
-	requiresManufacturerConsent: { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRATABLE' } | MustRef<{ type: 'FEATURES_GATED_BY_MANUFACTURER' }> | null
+	requiresManufacturerConsent:
+		| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRATABLE' }
+		| MustRef<{ type: 'FEATURES_GATED_BY_MANUFACTURER' }>
+		| null
 }
 
 /**
