@@ -65,12 +65,12 @@ export const onekeyWallet: HardwareWallet = {
 				'https://help.onekey.so/en/articles/11461105-how-to-use-rabby-wallet-with-onekey-hardware-wallets',
 				'https://developer.onekey.so/connect-to-software/using-walletconnect',
 			],
+			requiresManufacturerConsent: null,
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,
 				[SoftwareWalletType.RABBY]: true,
 				[SoftwareWalletType.OTHER]: true,
 			},
-			requiresManufacturerConsent: null,
 		}),
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,

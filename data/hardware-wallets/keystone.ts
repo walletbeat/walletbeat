@@ -70,12 +70,12 @@ export const keystoneWallet: HardwareWallet = {
 		accountSupport: null,
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://guide.keyst.one/docs/keystone',
+			requiresManufacturerConsent: null,
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,
 				[SoftwareWalletType.RABBY]: true,
 				[SoftwareWalletType.OTHER]: true,
 			},
-			requiresManufacturerConsent: null,
 		}),
 		licensing: null,
 		monetization: {

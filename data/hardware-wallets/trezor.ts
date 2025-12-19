@@ -84,6 +84,7 @@ export const trezorWallet: HardwareWallet = {
 		accountSupport: null,
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://trezor.io/guides/third-party-wallet-apps/third-party-wallet-apps-dapps',
+			requiresManufacturerConsent: null,
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.METAMASK]: true,
@@ -92,7 +93,6 @@ export const trezorWallet: HardwareWallet = {
 				[SoftwareWalletType.FRAME]: true,
 				[SoftwareWalletType.OTHER]: true,
 			},
-			requiresManufacturerConsent: null,
 		}),
 		licensing: null,
 		monetization: {

@@ -89,14 +89,14 @@ export const ledgerWallet: HardwareWallet = {
 		accountSupport: null,
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://support.ledger.com/article/360018444599-zd',
+			requiresManufacturerConsent: null,
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,
 				[SoftwareWalletType.RABBY]: true,
 				[SoftwareWalletType.FRAME]: true,
 				[SoftwareWalletType.OTHER]: true,
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
-			},	
-			requiresManufacturerConsent: null,
+			},
 		}),
 		licensing: null,
 		monetization: {

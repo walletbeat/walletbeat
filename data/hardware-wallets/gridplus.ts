@@ -64,6 +64,7 @@ export const gridplusWallet: HardwareWallet = {
 		accountSupport: null,
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
+			requiresManufacturerConsent: null,
 			supportedConnections: {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.METAMASK]: true,
@@ -72,7 +73,6 @@ export const gridplusWallet: HardwareWallet = {
 				[SoftwareWalletType.FRAME]: true,
 				[SoftwareWalletType.OTHER]: true,
 			},
-			requiresManufacturerConsent: null,
 		}),
 		licensing: null,
 		monetization: {
