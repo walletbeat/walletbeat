@@ -159,7 +159,18 @@ export const ambire: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-20',
 		urls: {
+			docs: ['https://help.ambire.com/hc/en-us'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/ambire-web3-wallet/ehgjhhccekdedpbkifaojjaefeohnoea',
+			],
 			repositories: ['https://github.com/AmbireTech/extension'],
+			socials: {
+				discord: 'https://discord.com/invite/ambire',
+				reddit: 'https://www.reddit.com/r/Ambire_Wallet/',
+				telegram: 'https://t.me/AmbireOfficial',
+				x: 'https://x.com/ambire',
+				youtube: 'https://www.youtube.com/@AmbireTech',
+			},
 			websites: ['https://www.ambire.com'],
 		},
 	},

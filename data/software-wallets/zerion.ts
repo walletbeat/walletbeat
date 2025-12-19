@@ -24,6 +24,13 @@ export const zerion: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
 		urls: {
+			docs: ['https://developers.zerion.io/'],
+			repositories: ['https://github.com/zeriontech/zerion-wallet-extension'],
+			socials: {
+				farcaster: 'https://farcaster.xyz/zerion.eth',
+				linkedin: 'https://www.linkedin.com/company/zeriontech/',
+				x: 'https://x.com/zerion',
+			},
 			websites: ['https://zerion.io'],
 		},
 	},

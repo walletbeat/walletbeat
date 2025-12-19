@@ -27,7 +27,12 @@ export const rainbow: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
 		urls: {
+			docs: ['https://rainbowkit.com/'],
 			repositories: ['https://github.com/rainbow-me/rainbow'],
+			socials: {
+				farcaster: 'https://farcaster.xyz/rainbow',
+				x: 'https://x.com/rainbowdotme',
+			},
 			websites: ['https://rainbow.me'],
 		},
 	},

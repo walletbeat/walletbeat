@@ -29,6 +29,14 @@ export const phantom: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
 		urls: {
+			docs: ['https://docs.phantom.com/'],
+			socials: {
+				instagram: 'https://www.instagram.com/phantom/',
+				linkedin: 'https://www.linkedin.com/company/phantomwallet/',
+				reddit: 'https://www.reddit.com/r/Phantom/',
+				x: 'https://x.com/phantom',
+				youtube: 'https://www.youtube.com/@phantom-wallet',
+			},
 			websites: ['https://phantom.com'],
 		},
 	},

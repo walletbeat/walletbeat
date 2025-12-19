@@ -30,6 +30,12 @@ export const frame: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-13',
 		urls: {
+			docs: ['https://docs.frame.sh/'],
+			repositories: ['https://github.com/floating/frame'],
+			socials: {
+				discord: 'https://discord.com/invite/rr4Yr3JkPq',
+				x: 'https://x.com/0xFrame',
+			},
 			websites: ['https://frame.sh'],
 		},
 	},

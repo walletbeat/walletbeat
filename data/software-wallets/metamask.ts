@@ -58,7 +58,18 @@ export const metamask: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-13',
 		urls: {
+			docs: ['https://docs.metamask.io/'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+			],
 			repositories: ['https://github.com/MetaMask/metamask-extension'],
+			socials: {
+				farcaster: 'https://farcaster.xyz/metamask',
+				linkedin: 'https://www.linkedin.com/company/metamask/',
+				reddit: 'https://www.reddit.com/r/Metamask/',
+				tiktok: 'https://www.tiktok.com/@metamask',
+				x: 'https://x.com/MetaMask',
+			},
 			websites: ['https://metamask.io'],
 		},
 	},

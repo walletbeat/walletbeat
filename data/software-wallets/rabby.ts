@@ -71,7 +71,15 @@ export const rabby: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2024-12-15',
 		urls: {
+			docs: ['https://rabbykit.rabby.io/'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/rabby-wallet/acmacodkjbdgmoleebolmdjonilkdbch',
+			],
 			repositories: ['https://github.com/RabbyHub/Rabby'],
+			socials: {
+				discord: 'https://discord.com/invite/seFBCWmUre',
+				x: 'https://x.com/Rabby_io',
+			},
 			websites: ['https://rabby.io'],
 		},
 	},

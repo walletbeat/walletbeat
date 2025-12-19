@@ -23,6 +23,10 @@ export const elytro: SoftwareWallet = {
 		lastUpdated: '2025-03-12',
 		urls: {
 			repositories: ['https://github.com/Elytro-eth'],
+			socials: {
+				telegram: 'https://t.me/+l9coqJq9QHgyYjI1',
+				x: 'https://x.com/Elytro_eth',
+			},
 			websites: ['https://elytro.com'],
 		},
 	},
