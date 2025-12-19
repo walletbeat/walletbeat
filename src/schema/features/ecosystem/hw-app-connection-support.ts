@@ -1,6 +1,6 @@
 import type { Support } from '@/schema/features/support'
 import { isSupported } from '@/schema/features/support'
-import type { WithRef } from '@/schema/reference'
+import type { MustRef, WithRef } from '@/schema/reference'
 import { type NonEmptySet, setItems } from '@/types/utils/non-empty'
 
 /**
@@ -39,8 +39,12 @@ export interface AppConnectionMethodDetails {
 	 * Which connection methods are supported (must have at least one)
 	 */
 	supportedConnections: NonEmptySet<AppConnectionMethod | SoftwareWalletType>
-
-	// TODO: Add check for whether features requires manufacturer consent
+	
+	/**
+	 * Is manufacturer consent required to integrate any hardware wallet feature into a software wallet?
+	 * If so, must provide reference. 
+	 */
+	requiresManufacturerConsent: { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRATABLE' } | MustRef<{ type: 'FEATURES_GATED_BY_MANUFACTURER'  | null}>
 }
 
 /**
