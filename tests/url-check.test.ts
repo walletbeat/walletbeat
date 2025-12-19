@@ -595,6 +595,141 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '826047213cd41016cbcd483f67ee42961129f5a1',
 		retrieved: '2025-12-09',
 	},
+	{
+		url: 'https://chromewebstore.google.com/detail/ambire-web3-wallet/ehgjhhccekdedpbkifaojjaefeohnoea',
+		urlHash: 'fcb8ae1a4993828173beb661943cc2d18378f8df',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://discord.com/invite/ambire',
+		urlHash: '798bc72bdc77d29dc047b3647ffe2bdc49508e0d',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://t.me/AmbireOfficial',
+		urlHash: 'b3374fcb92da0bca2a0004b9fed9542ad57b2e9a',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/ambire',
+		urlHash: '0121d068421dbe1eb821ee7617fc91b0c5647d0c',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://www.youtube.com/@AmbireTech',
+		urlHash: 'dc8e7917ea7e30a63432c2a63d7824b6416ea858',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://t.me/+l9coqJq9QHgyYjI1',
+		urlHash: 'f0765beb9f478e627b20c1d629e99e9a4fd617e8',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/Elytro_eth',
+		urlHash: '3a4317cc57bede6517bc9937e5afe1eddfd502a9',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://docs.frame.sh/',
+		urlHash: 'a1a8024b6a045bc19c6a2c185a3f50ab4ebff235',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://github.com/floating/frame',
+		urlHash: '08c2a73da8f0204aff551c7ccb6faab99567a9ff',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://discord.com/invite/rr4Yr3JkPq',
+		urlHash: '393f9368aba3db455522d7042ec1535dc9035204',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/0xFrame',
+		urlHash: '1cda6ba54424937a43a3c33fd6a9a206ccf073c6',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://docs.metamask.io/',
+		urlHash: '063384e5aa34896e0eb6a3ea2e4ba308200eb066',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
+		urlHash: '77c689503658e09fe775dbcde519ff3302c2475b',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://farcaster.xyz/metamask',
+		urlHash: '83f57de599f487f0b15333fb3d40c43e8835b1b4',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/MetaMask',
+		urlHash: 'e832939187065fe667525b07376f25e69d47064f',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/phantom',
+		urlHash: '3695a86104a927c02aa37c0c11b12a2274ef5bfc',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://www.youtube.com/@phantom-wallet',
+		urlHash: '38f6317c854a910c86e21e3a3847f7d267161114',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://rabbykit.rabby.io/',
+		urlHash: 'decdb1be0f7fe86f7807b21aeb9998aa5e870164',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/rabby-wallet/acmacodkjbdgmoleebolmdjonilkdbch',
+		urlHash: 'f8c4af09f64e100ad15071307d4ef3e0ebaf676d',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://discord.com/invite/seFBCWmUre',
+		urlHash: '639cfdb85dc5094c5974e292fc6d8dbe091c120f',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/Rabby_io',
+		urlHash: 'aec4ebbd1f47b1decacdbb4dc3f90ff1da1a5878',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://rainbowkit.com/',
+		urlHash: 'bab45e31f0639cd803f5ea156dd0df90746f9418',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://farcaster.xyz/rainbow',
+		urlHash: '84f55618238013489f20a8ed62e9326e888f509f',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/rainbowdotme',
+		urlHash: 'a5df2785570542a819ca55d26816f5480cc2ca1e',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://github.com/zeriontech/zerion-wallet-extension',
+		urlHash: '625bbfdaa489e178a87e61a4eecba29cee2cde8a',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://farcaster.xyz/zerion.eth',
+		urlHash: 'a10efd64786aa9c8bb2ba2c1afaa63789969bf74',
+		retrieved: '2025-12-19',
+	},
+	{
+		url: 'https://x.com/zerion',
+		urlHash: '29f2107818187fad134fad9a57879af673589146',
+		retrieved: '2025-12-19',
+	},
 ]
 
 const newValidUrls: string[] = []
@@ -711,9 +846,8 @@ describe('reference URLs', () => {
 				const SPECIFIC_SITES_TO_SKIP = [
 					'https://docs.phantom.com/',
 					'https://developers.zerion.io',
-					'https://help.ambire.com/hc/en-us'
+					'https://help.ambire.com/hc/en-us',
 				]
-
 
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
 					if (social === undefined) {
