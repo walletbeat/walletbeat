@@ -120,7 +120,7 @@ function limitedVerifiableAppConnectionSupport(
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)}, which uses verifiable code and/or open standards. However, this support is not universal—users may be restricted to specific apps, specific connection flows, or a limited compatibility surface. As a result, some apps or software wallets may not work reliably with {{WALLET_NAME}}.`,
+			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)}, which uses verifiable code and/or open standards. However, this support is not universal—users may be restricted to specific apps, specific connection flows, or a limited compatibility surface. As a result, some apps, or software wallets may not work reliably with {{WALLET_NAME}}.`,
 		),
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should expand standards-based, permissionless integration so it can connect broadly across the Web3 ecosystem. Concretely: support widely adopted protocols, avoid manufacturer approval gates, and ensure apps can integrate without proprietary dependencies.',
