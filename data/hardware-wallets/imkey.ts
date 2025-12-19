@@ -130,7 +130,6 @@ export const imkeyWallet: HardwareWallet = {
 			},
 			keysHandling: null,
 			lightClient: { ethereumL1: null },
-			passkeyVerification: null,
 			publicSecurityAudits: null,
 			secureElement: null,
 			supplyChainDIY: null,

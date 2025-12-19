@@ -10,7 +10,6 @@ export enum PasskeyVerificationLibrary {
 	OPEN_ZEPPELIN_P256_VERIFIER = 'OPEN_ZEPPELIN_P256_VERIFIER',
 	WEB_AUTHN_SOL = 'WEB_AUTHN_SOL',
 	OTHER = 'OTHER',
-	NONE = 'NONE',
 }
 
 /**

@@ -14,7 +14,6 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { displaysFullCallData } from '@/schema/features/security/transaction-legibility'
 import {
@@ -321,20 +320,7 @@ export const metamask: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: notSupported,
 			},
-			passkeyVerification: {
-				[Variant.BROWSER]: {
-					ref: refTodo,
-					details:
-						'MetaMask browser extension does not currently implement passkey verification. Phase 2 seedless onboarding has passkey scheduled for extension.',
-					library: PasskeyVerificationLibrary.NONE,
-				},
-				[Variant.MOBILE]: {
-					ref: refTodo,
-					details:
-						'MetaMask mobile uses biometrics that leverage the hardware enclave similar to passkeys. Standard passkey verification is not yet implemented.',
-					library: PasskeyVerificationLibrary.NONE,
-				},
-			},
+			passkeyVerification: notSupported,
 			publicSecurityAudits: [
 				{
 					ref: 'https://assets.ctfassets.net/clixtyxoaeas/21m4LE3WLYbgWjc33aDcp2/8252073e115688b1dc1500a9c2d33fe4/metamask-delegator-framework-audit-2024-10.pdf',

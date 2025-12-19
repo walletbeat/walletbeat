@@ -71,7 +71,6 @@ export const fireflyWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
 			publicSecurityAudits: null,
 			secureElement: null,
 			supplyChainDIY: null,

@@ -132,7 +132,6 @@ export const ngrave: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
 			publicSecurityAudits: null,
 			secureElement: supported({
 				ref: [

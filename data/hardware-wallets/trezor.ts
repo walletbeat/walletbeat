@@ -13,7 +13,6 @@ import {
 	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
-import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	DataExtraction,
@@ -22,7 +21,7 @@ import {
 	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
-import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -147,10 +146,6 @@ export const trezorWallet: HardwareWallet = {
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
-			},
-			passkeyVerification: {
-				ref: refNotNecessary,
-				library: PasskeyVerificationLibrary.NONE,
 			},
 			publicSecurityAudits: null,
 			secureElement: supported({

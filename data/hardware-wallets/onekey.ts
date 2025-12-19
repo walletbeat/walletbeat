@@ -146,7 +146,6 @@ export const onekeyWallet: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
 			publicSecurityAudits: [
 				{
 					ref: [

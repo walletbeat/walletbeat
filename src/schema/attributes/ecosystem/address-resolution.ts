@@ -156,19 +156,19 @@ function evaluateAddressResolution(
 		return {
 			value: {
 				id: 'support_basic_resolution_onchain',
-				rating: Rating.PARTIAL,
-				displayName: 'Resolves basic ENS addresses',
+				rating: Rating.PASS,
+				displayName: 'Supports ENS addresses',
 				addressResolution,
-				shortExplanation: sentence(
-					'{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.',
-				),
+				shortExplanation: sentence('{{WALLET_NAME}} supports sending to ENS addresses.'),
 				__brand: brand,
 			},
 			details: markdown(`
-				{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. However, because such addresses do not contain information about the chain that the recipient would like to receive funds on, it is possible for the user to mistakenly send funds to the wrong chain.
+				{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`.
+
+				It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties.
 			`),
 			howToImprove: markdown(`
-				{{WALLET_NAME}} should support sending funds to chain-specific human-readable addresses, as specified by either:
+				{{WALLET_NAME}} may want to add support for sending funds to chain-specific human-readable addresses, as specified by either:
 
 				* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
 				* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
@@ -185,10 +185,10 @@ function evaluateAddressResolution(
 		value: {
 			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
 			rating: Rating.PARTIAL,
-			displayName: 'Resolves basic ENS addresses offchain',
+			displayName: 'Resolves ENS addresses using an offchain service',
 			addressResolution,
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} supports sending to ENS addresses, but the user needs to verify which chain they are using.',
+				'{{WALLET_NAME}} supports sending to ENS addresses but uses an offchain service for resolution.',
 			),
 			__brand: brand,
 		},
@@ -196,8 +196,6 @@ function evaluateAddressResolution(
 			{{WALLET_NAME}} supports sending funds to human-readable ENS addresses such as \`username.eth\`.
 
 			${offchainInfo}
-
-			Additionally, because such addresses do not contain information about the chain that the recipient would like to receive funds on, it is possible for the user to mistakenly send funds on the wrong chain.
 		`),
 		howToImprove:
 			walletShould === undefined
@@ -205,7 +203,7 @@ function evaluateAddressResolution(
 				: markdown(`
 					{{WALLET_NAME}} should use fully-onchain resolution to resolve the address, or should ${walletShould}.
 
-					{{WALLET_NAME}} should also expand this feature to support chain-specific addresses, as specified by either:
+					{{WALLET_NAME}} may want to add support for sending funds to chain-specific human-readable addresses, as specified by either:
 
 					* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
 					* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
@@ -257,28 +255,35 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		funds to.
 
 		Specifically, Walletbeat recognizes the following destination address
-		formats:
+		formats. Wallets must be able to resolve **at least one** of them to
+		fulfill this attribute:
 
 		* Plain ENS addresses (\`username.eth\`) without destination chain information
 		* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
 		* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
 
-		Wallets must resolve *either* ERC-7828 or ERC-7831 addresses to fulfill this
-		attribute. Support for plain ENS addresses alone earns a partial rating.
-
-		Additionally, the mechanism used to do the resolution must either:
+		Additionally, the mechanism used to perform the resolution must either:
 
 		* Be done using onchain data and reusing the wallet's common chain
-		  interaction client, inheriting its verifiability (via light client)
-		  and privacy properties.
+		  interaction client, inheriting its verifiability (e.g. via light
+		  client) and privacy properties.
 		* **OR** be done using an offchain external provider in such a way that
 		  the address returned by the external provider is verifiable, and
 		  without revealing the user's IP address to the provider.
-			This ensures that:
-			- The wallet cannot be tricked into sending funds to an attacker
+		  This ensures that:
+		  - The wallet cannot be tricked into sending funds to an attacker
 		    compromising the offchain provider's responses
 		  - The provider may not progressively learn the user's contacts list by
 		    associating its successive resolution queries by IP over time.
+
+		For addresses that **require** an offchain lookup (e.g. ENS names
+		using [offchain resolvers with CCIP-Read](https://docs.ens.domains/resolvers/ccip-read)),
+		only the portion of the work necessary to _arrive at the conclusion_
+		that an offchain lookup is necessary is considered.
+		In other words, wallets must verify that the CCIP-Read
+		\`OffchainLookup\` details are as claimed and then perform the CCIP-Read
+		themselves, rather than trust an offchain provider to do so on their
+		behalf.
 	`),
 	ratingScale: {
 		display: 'fail-pass',
@@ -286,7 +291,29 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		pass: [
 			exampleRating(
 				mdSentence(
-					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using onchain data.`,
+					'The wallet resolves plain ENS addresses (`username.eth`) when sending tokens, using onchain data for resolution.',
+				),
+				evaluateAddressResolution(
+					{
+						chainSpecificAddressing: {
+							erc7828: {
+								support: 'NOT_SUPPORTED',
+							},
+							erc7831: {
+								support: 'NOT_SUPPORTED',
+							},
+						},
+						nonChainSpecificEnsResolution: {
+							support: 'SUPPORTED',
+							medium: 'CHAIN_CLIENT',
+						},
+					},
+					[],
+				),
+			),
+			exampleRating(
+				mdSentence(
+					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses, using onchain data for resolution.`,
 				),
 				evaluateAddressResolution(
 					{
@@ -333,28 +360,6 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 			),
 		],
 		partial: [
-			exampleRating(
-				mdSentence(
-					'The wallet only resolves plain ENS addresses (`username.eth`) which do not include a destination chain.',
-				),
-				evaluateAddressResolution(
-					{
-						chainSpecificAddressing: {
-							erc7828: {
-								support: 'NOT_SUPPORTED',
-							},
-							erc7831: {
-								support: 'NOT_SUPPORTED',
-							},
-						},
-						nonChainSpecificEnsResolution: {
-							support: 'SUPPORTED',
-							medium: 'CHAIN_CLIENT',
-						},
-					},
-					[],
-				),
-			),
 			exampleRating(
 				mdSentence(
 					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain external provider, without verifying the address.`,
