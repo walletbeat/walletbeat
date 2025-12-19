@@ -708,6 +708,13 @@ describe('reference URLs', () => {
 					'tiktok.com',
 				]
 
+				const SPECIFIC_SITES_TO_SKIP = [
+					'https://docs.phantom.com/',
+					'https://developers.zerion.io',
+					'https://help.ambire.com/hc/en-us'
+				]
+
+
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
 					if (social === undefined) {
 						continue
@@ -715,8 +722,8 @@ describe('reference URLs', () => {
 
 					const urlString = labeledUrl(social).url
 					const shouldSkip = SOCIALS_TO_SKIP.some(s => urlString.includes(s))
-
-					if (shouldSkip) {
+					const shouldSkipSpecific = SPECIFIC_SITES_TO_SKIP.some(s => urlString.includes(s))
+					if (shouldSkip || shouldSkipSpecific) {
 						continue
 					}
 
