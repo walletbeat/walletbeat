@@ -78,10 +78,10 @@ function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 			__brand: brand,
 		},
 		details: paragraph(
-			"{{WALLET_NAME}} does not support connecting to web3 applications. This severely limits the wallet's functionality, as users cannot interact with DeFi protocols, NFT marketplaces, or other Web3 applications. Without app connectivity, the wallet can only be used for basic sending and receiving of assets.",
+			'{{WALLET_NAME}} does not provide any supported way to connect to Web3 applications. This prevents users from approving transactions, signing messages, or interacting with DeFi, NFT marketplaces, and other onchain apps. In practice, the wallet is limited to basic asset management (send/receive) and cannot be used as a primary Web3 wallet.',
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should implement at least one method of connecting to apps such as support through popular software wallets.',
+			'{{WALLET_NAME}} should add at least one widely adopted, standards-based app connection method and/or support connection through popular software wallets. Ideally, this support should be permissionless and rely on open standards so apps can integrate without vendor approval.',
 		),
 	}
 }
@@ -98,10 +98,10 @@ function unverifiableAppConnectionSupport(): Evaluation<AppConnectionSupportValu
 			__brand: brand,
 		},
 		details: paragraph(
-			"{{WALLET_NAME}} can connect to apps, but only through its proprietary closed-source application. This requires users to trust the wallet provider's software without the ability to verify its security. While functional, this creates vendor lock-in and prevents users from using standard protocols or their preferred software wallets.",
+			"{{WALLET_NAME}} can connect to apps, but only through its proprietary closed-source application. This requires users to trust the wallet provider's software without the ability to verify its security. This increases supply-chain risk, creates vendor lock-in, and limits interoperability with the broader Web3 ecosystem.",
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should support standard protocols and enable connections through popular software wallets, or open-source its application for transparency and verifiability.',
+			'{{WALLET_NAME}} should support open standards that enable connection via software wallets and apps. If the wallet relies on a vendor app, open-sourcing the app and connection components (or publishing verifiable builds and specs) would materially improve transparency and verifiability.',
 		),
 	}
 }
@@ -120,10 +120,10 @@ function limitedVerifiableAppConnectionSupport(
 			__brand: brand,
 		},
 		details: paragraph(
-			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)}, which uses verifiable code or open standards. However, this connection method has limitations that prevent it from connecting to all apps, restricting the wallet's full utility in the Web3 ecosystem.`,
+			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)}, which uses verifiable code and/or open standards. However, this support is not universal—users may be restricted to specific apps, specific connection flows, or a limited compatibility surface. As a result, some apps or software wallets may not work reliably with {{WALLET_NAME}}.`,
 		),
 		howToImprove: paragraph(
-			'{{WALLET_NAME}} should support standard protocols that enable connections to any app, such as integration with popular software wallets like MetaMask.',
+			'{{WALLET_NAME}} should expand standards-based, permissionless integration so it can connect broadly across the Web3 ecosystem. Concretely: support widely adopted protocols, avoid manufacturer approval gates, and ensure apps can integrate without proprietary dependencies.',
 		),
 	}
 }
@@ -142,7 +142,7 @@ function verifiableUniversalAppConnectionSupport(
 			__brand: brand,
 		},
 		details: mdParagraph(
-			`{{WALLET_NAME}} supports connecting to any app through ${describeConnectionMethods(connectionDetails)}, which uses entirely verifiable code or open standards. This provides users with full access to the Web3 ecosystem while maintaining transparency and security through verifiable connection methods.`,
+			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)} using open standards and verifiable components. This enables broad compatibility with Web3 apps while maintaining transparency—integrations can be inspected and do not depend on trusting closed, proprietary connection software.`,
 		),
 	}
 }
