@@ -75,6 +75,7 @@ export const keystoneWallet: HardwareWallet = {
 				[SoftwareWalletType.RABBY]: true,
 				[SoftwareWalletType.OTHER]: true,
 			},
+			requiresManufacturerConsent: null,
 		}),
 		licensing: null,
 		monetization: {

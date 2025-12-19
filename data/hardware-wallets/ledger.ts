@@ -95,7 +95,8 @@ export const ledgerWallet: HardwareWallet = {
 				[SoftwareWalletType.FRAME]: true,
 				[SoftwareWalletType.OTHER]: true,
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
-			},
+			},	
+			requiresManufacturerConsent: null,
 		}),
 		licensing: null,
 		monetization: {

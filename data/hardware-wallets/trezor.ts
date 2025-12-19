@@ -92,6 +92,7 @@ export const trezorWallet: HardwareWallet = {
 				[SoftwareWalletType.FRAME]: true,
 				[SoftwareWalletType.OTHER]: true,
 			},
+			requiresManufacturerConsent: null,
 		}),
 		licensing: null,
 		monetization: {

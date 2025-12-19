@@ -70,6 +70,7 @@ export const onekeyWallet: HardwareWallet = {
 				[SoftwareWalletType.RABBY]: true,
 				[SoftwareWalletType.OTHER]: true,
 			},
+			requiresManufacturerConsent: null,
 		}),
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,

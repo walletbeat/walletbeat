@@ -72,6 +72,7 @@ export const gridplusWallet: HardwareWallet = {
 				[SoftwareWalletType.FRAME]: true,
 				[SoftwareWalletType.OTHER]: true,
 			},
+			requiresManufacturerConsent: null,
 		}),
 		licensing: null,
 		monetization: {

@@ -83,6 +83,7 @@ export const bitboxWallet: HardwareWallet = {
 				[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP]: true,
 				[SoftwareWalletType.RABBY]: true,
 			},
+			requiresManufacturerConsent: null,
 		}),
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
