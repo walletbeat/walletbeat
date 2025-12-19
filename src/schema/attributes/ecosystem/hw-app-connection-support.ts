@@ -314,6 +314,10 @@ limiting its utility.
 				return noAppConnectionSupport()
 			}
 
+			if (appSupport.requiresManufacturerConsent === null) {
+				return unrated(appConnectionSupport, brand, null)
+			}
+
 			// Determine rating based on the best connection method available
 			// Priority: software wallet integration (universal + verifiable) >
 			//           vendor open-source app (verifiable but potentially limited) >
@@ -321,8 +325,10 @@ limiting its utility.
 
 			// Check if there's any software wallet integration (universal + verifiable)
 			const hasSoftwareWalletIntegration = getSupportedSoftwareWallets(appSupport).length > 0
+			const consentType = appSupport.requiresManufacturerConsent.type
+			const permissionless = consentType === 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRATABLE'
 
-			if (hasSoftwareWalletIntegration) {
+			if (hasSoftwareWalletIntegration && permissionless) {
 				// Can connect to any app using verifiable code/open standards → PASS
 				return verifiableUniversalAppConnectionSupport(appSupport)
 			}
@@ -341,7 +347,7 @@ limiting its utility.
 			const hasClosedSource =
 				appSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
 
-			if (hasClosedSource) {
+			if (hasClosedSource && !permissionless) {
 				// Can connect to apps but requires trusting unverifiable code → PARTIAL
 				return unverifiableAppConnectionSupport()
 			}
