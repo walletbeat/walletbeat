@@ -89,7 +89,15 @@ export const ledgerWallet: HardwareWallet = {
 		accountSupport: null,
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://support.ledger.com/article/360018444599-zd',
-			requiresManufacturerConsent: null,
+			requiresManufacturerConsent: {
+				type: 'FEATURES_GATED_BY_MANUFACTURER',
+				ref: {
+					explanation:
+						"Software wallet developers are required to register with Ledger's partner program before their software wallet becomes able to display clear signing data on Ledger devices.",
+					label: 'Ledger Developer Portal',
+					url: 'https://developers.ledger.com/docs/clear-signing/for-wallets',
+				},
+			},
 			supportedConnections: {
 				[SoftwareWalletType.METAMASK]: true,
 				[SoftwareWalletType.RABBY]: true,
