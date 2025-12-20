@@ -57,6 +57,11 @@ export const imtoken: SoftwareWallet = {
 		urls: {
 			repositories: ['https://github.com/consenlabs/token-core-monorepo'],
 			websites: ['https://token.im'],
+			socials: {
+				x: 'https://x.com/imTokenOfficial',
+				discord: 'https://discord.com/invite/imToken',
+			},
+			docs: ['https://docs.token.im/']
 		},
 	},
 	features: {

@@ -60,6 +60,11 @@ export const daimo: SoftwareWallet = {
 		urls: {
 			repositories: ['https://github.com/daimo-eth/daimo'],
 			websites: ['https://daimo.com'],
+			socials: {
+				x: 'https://x.com/daimopay',
+				farcaster: 'https://farcaster.xyz/daimo-pay'
+			},
+			docs: ['https://paydocs.daimo.com/']
 		},
 	},
 	features: {

@@ -29,6 +29,14 @@ export const mtpelerin: SoftwareWallet = {
 		lastUpdated: '2025-08-26',
 		urls: {
 			repositories: ['https://github.com/mtpelerin'],
+			socials: {
+				discord: 'https://discord.com/invite/WErDKTvMr7',
+				facebook: 'https://www.facebook.com/mtpelerin/',
+				instagram: 'https://www.instagram.com/mtpelerin/',
+				linkedin: 'https://www.linkedin.com/company/mt-pelerin/',
+				x: 'https://x.com/mtpelerin',
+				youtube: 'https://www.youtube.com/@mtpelerin',
+			},
 			websites: ['https://www.mtpelerin.com/'],
 		},
 	},

@@ -29,7 +29,13 @@ export const nufi: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-11',
 		urls: {
+			docs: ['https://nufi.gitbook.io/'],
 			repositories: ['https://github.com/nufi-official/nufi'],
+			socials: {
+				discord: 'https://discord.com/invite/jSyVPAXw3w',
+				reddit: 'https://www.reddit.com/r/nufiofficial/',
+				x: 'https://x.com/nufiwallet',
+			},
 			websites: ['https://nu.fi'],
 		},
 	},

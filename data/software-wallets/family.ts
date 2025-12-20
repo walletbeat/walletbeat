@@ -20,6 +20,10 @@ export const family: SoftwareWallet = {
 		lastUpdated: '2025-04-22',
 		urls: {
 			websites: ['https://family.co'],
+			socials: {
+				x:'https://x.com/family'
+			},
+			docs: ['https://family.co/docs']
 		},
 	},
 	features: {
