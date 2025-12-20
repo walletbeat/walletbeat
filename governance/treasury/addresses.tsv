@@ -1,0 +1,6 @@
+Address	Name	Description
+eth:0x52666AD68156B03EAce67678cDCF1d74bC56201D	treasury	Walletbeat Safe multisig
+eth:0xc9C8C560BA80e840A71bE2F9409600B6133a119f	walletbeat_grants_staging	EOA owned by polymutex, used exclusively for receiving grant funds prior to multisig being established
+eth:0x943623f9bd1a83fdb8b8cc30848b09b79e95bae1	mattmatt	EOA owned by 0xMattmatt
+eth:0x807be577bC7F8F2701843824E7FFf220317b9006	polymutex_test1	EOA owned by polymutex, used exclusively for wallet testing. Expect random swaps and self-sends.
+eth:0xd28283fCb6e484fCccD3d5b0D24C6ED7Eb28cE86	walletbeat_ens_updater1	EOA with the private key available to CI/CD pipelines. Contains a small amount of Ether, just enough for CI to update Walletbeat's ENS records.

@@ -15,7 +15,7 @@ describe('attribute', () => {
 						expect(attributeKey).toBe(attribute.id)
 					})
 					it('has a lowerCamelCased ID', () => {
-						expect(attribute.id).toMatch(/^[a-z][A-Za-z]*$/u)
+						expect(attribute.id).toMatch(/^[a-z][A-Za-z0-9]*$/u)
 					})
 				})
 			}

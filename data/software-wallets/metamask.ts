@@ -163,6 +163,13 @@ export const metamask: SoftwareWallet = {
 			customChainRpcEndpoint: featureSupported,
 			l1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: notSupported, // Token import dialog is broken in this case
+					erc20TokenSend: notSupported, // Can't add token.
+					etherBalanceLookup: featureSupported,
+				},
 			}),
 			nonL1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,

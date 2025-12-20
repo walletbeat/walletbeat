@@ -276,6 +276,13 @@ export const ambire: SoftwareWallet = {
 			customChainRpcEndpoint: featureSupported,
 			l1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: notSupported, // Fails to estimate gas? "Proceed" button grayed out.
+					etherBalanceLookup: featureSupported,
+				},
 			}),
 			nonL1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS,

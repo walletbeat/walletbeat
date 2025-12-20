@@ -24,21 +24,17 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { type ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
-	type ChainConfigurability,
-	RpcEndpointConfiguration,
-} from '@/schema/features/self-sovereignty/chain-configurability'
-import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
 } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { notSupported, supported } from '@/schema/features/support'
 import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import {
 	FOSSLicense,
 	LicensingType,
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
-import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
+import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -130,22 +126,7 @@ export const imtoken: SoftwareWallet = {
 				},
 			},
 		},
-		chainConfigurability: supported<WithRef<ChainConfigurability>>({
-			ref: [
-				{
-					explanation:
-						'imToken allows users to set custom RPC endpoints for any EVM network before sending requests to the default ones.',
-					url: 'https://support.token.im/hc/en-us/articles/900005324266-imToken-now-supports-custom-RPC-Experience-the-layer-2-ecosystem-today',
-				},
-			],
-			customChainRpcEndpoint: featureSupported,
-			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,
-			}),
-			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,
-			}),
-		}),
+		chainConfigurability: null,
 		ecosystem: {
 			delegation: null,
 		},

@@ -9,13 +9,9 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import {
-	type ChainConfigurability,
-	RpcEndpointConfiguration,
-} from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
-import { refTodo, type WithRef } from '@/schema/reference'
+import { notSupported, supported } from '@/schema/features/support'
+import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -66,26 +62,7 @@ export const frame: SoftwareWallet = {
 			nonChainSpecificEnsResolution: null,
 		},
 		chainAbstraction: null,
-		chainConfigurability: supported<WithRef<ChainConfigurability>>({
-			ref: [
-				{
-					explanation: 'Frame allows connecting to your own Ethereum node',
-					urls: [
-						{
-							label: 'Frame node connection documentation',
-							url: 'https://docs.frame.sh/docs/Getting%20Started/Basics/Configuring%20Chains',
-						},
-					],
-				},
-			],
-			customChainRpcEndpoint: featureSupported,
-			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS,
-			}),
-			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS,
-			}),
-		}),
+		chainConfigurability: null,
 		ecosystem: {
 			delegation: null,
 		},

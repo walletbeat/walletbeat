@@ -7,7 +7,6 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -69,16 +68,7 @@ export const nufi: SoftwareWallet = {
 			nonChainSpecificEnsResolution: notSupported,
 		},
 		chainAbstraction: null,
-		chainConfigurability: supported({
-			ref: refTodo,
-			customChainRpcEndpoint: featureSupported,
-			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.NO,
-			}),
-			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.NO,
-			}),
-		}),
+		chainConfigurability: null,
 		ecosystem: {
 			delegation: {
 				duringEOACreation: 'NO',
