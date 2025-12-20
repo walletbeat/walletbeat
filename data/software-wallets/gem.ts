@@ -34,9 +34,9 @@ export const gemwallet: SoftwareWallet = {
 				telegram: 'https://t.me/gemwallet',
 				youtube: 'https://www.youtube.com/@gemwallet',
 				instagram: 'https://www.instagram.com/GemWalletApp/',
-				reddit:'https://www.reddit.com/r/gemwallet_official/'
+				reddit: 'https://www.reddit.com/r/gemwallet_official/',
 			},
-			docs: ['https://docs.gemwallet.com/']
+			docs: ['https://docs.gemwallet.com/'],
 		},
 	},
 	features: {

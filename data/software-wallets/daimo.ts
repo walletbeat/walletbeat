@@ -62,9 +62,9 @@ export const daimo: SoftwareWallet = {
 			websites: ['https://daimo.com'],
 			socials: {
 				x: 'https://x.com/daimopay',
-				farcaster: 'https://farcaster.xyz/daimo-pay'
+				farcaster: 'https://farcaster.xyz/daimo-pay',
 			},
-			docs: ['https://paydocs.daimo.com/']
+			docs: ['https://paydocs.daimo.com/'],
 		},
 	},
 	features: {

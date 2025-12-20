@@ -61,7 +61,7 @@ export const imtoken: SoftwareWallet = {
 				x: 'https://x.com/imTokenOfficial',
 				discord: 'https://discord.com/invite/imToken',
 			},
-			docs: ['https://docs.token.im/']
+			docs: ['https://docs.token.im/'],
 		},
 	},
 	features: {

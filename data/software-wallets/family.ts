@@ -21,9 +21,9 @@ export const family: SoftwareWallet = {
 		urls: {
 			websites: ['https://family.co'],
 			socials: {
-				x:'https://x.com/family'
+				x: 'https://x.com/family',
 			},
-			docs: ['https://family.co/docs']
+			docs: ['https://family.co/docs'],
 		},
 	},
 	features: {

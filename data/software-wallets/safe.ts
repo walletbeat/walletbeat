@@ -43,7 +43,7 @@ export const safe: SoftwareWallet = {
 		urls: {
 			repositories: ['https://github.com/safe-fndn'],
 			websites: ['https://safe.global'],
-			docs: ['https://docs.safe.global/']
+			docs: ['https://docs.safe.global/'],
 		},
 	},
 	features: {
