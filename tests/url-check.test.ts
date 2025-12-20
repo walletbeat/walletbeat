@@ -730,6 +730,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '29f2107818187fad134fad9a57879af673589146',
 		retrieved: '2025-12-19',
 	},
+	{
+		url: 'https://developers.ledger.com/docs/clear-signing/for-wallets',
+		urlHash: '71ba731db6934452b33327999ee3e1cd7dff7a68',
+		retrieved: '2025-12-20',
+	},
 ]
 
 const newValidUrls: string[] = []
