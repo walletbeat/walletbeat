@@ -19,11 +19,11 @@ export const family: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
 		urls: {
-			websites: ['https://family.co'],
+			docs: ['https://family.co/docs'],
 			socials: {
 				x: 'https://x.com/family',
 			},
-			docs: ['https://family.co/docs'],
+			websites: ['https://family.co'],
 		},
 	},
 	features: {
