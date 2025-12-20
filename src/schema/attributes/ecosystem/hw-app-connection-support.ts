@@ -306,7 +306,15 @@ limiting its utility.
 		}
 
 		// Extract references if supported
-		const references = isSupported(appSupport) ? refs(appSupport) : []
+		const references = isSupported(appSupport)
+			? [
+					...refs(appSupport),
+					...(appSupport.requiresManufacturerConsent !== null &&
+					appSupport.requiresManufacturerConsent.type === 'FEATURES_GATED_BY_MANUFACTURER'
+						? refs(appSupport.requiresManufacturerConsent)
+						: []),
+				]
+			: []
 
 		const evaluation = (() => {
 			// If not supported, cannot connect to apps
