@@ -45,7 +45,7 @@ export interface AppConnectionMethodDetails {
 	 * If so, must provide reference.
 	 */
 	requiresManufacturerConsent:
-		| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRATABLE' }
+		| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' }
 		| MustRef<{ type: 'FEATURES_GATED_BY_MANUFACTURER' }>
 		| null
 }

@@ -200,7 +200,7 @@ limiting its utility.
 							[SoftwareWalletType.RABBY]: true,
 						},
 						requiresManufacturerConsent: {
-							type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRATABLE',
+							type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE',
 						},
 					}),
 				),
@@ -326,7 +326,7 @@ limiting its utility.
 			// Check if there's any software wallet integration (universal + verifiable)
 			const hasSoftwareWalletIntegration = getSupportedSoftwareWallets(appSupport).length > 0
 			const consentType = appSupport.requiresManufacturerConsent.type
-			const permissionless = consentType === 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRATABLE'
+			const permissionless = consentType === 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE'
 
 			if (hasSoftwareWalletIntegration && permissionless) {
 				// Can connect to any app using verifiable code/open standards → PASS
