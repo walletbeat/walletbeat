@@ -147,6 +147,28 @@ function verifiableUniversalAppConnectionSupport(
 	}
 }
 
+function restrictedAppConnectionSupport(
+	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
+): Evaluation<AppConnectionSupportValue> {
+	return {
+		value: {
+			id: 'restricted_app_connection',
+			rating: Rating.PARTIAL,
+			displayName: 'Restricted app connection support',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} can connect to apps, but requires manufacturer approval for integrations.',
+			),
+			__brand: brand,
+		},
+		details: paragraph(
+			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)}. However, integrating {{WALLET_NAME}} into software wallets or apps requires manufacturer consent. This creates friction for developers, limits ecosystem growth, and gives the manufacturer gatekeeping power over which apps and wallets can support {{WALLET_NAME}}.`,
+		),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should adopt permissionless integration standards that allow any software wallet or app to integrate without requiring manufacturer approval. This would enable broader ecosystem support and reduce dependency on vendor cooperation.',
+		),
+	}
+}
+
 export const appConnectionSupport: Attribute<AppConnectionSupportValue> = {
 	id: 'appConnectionSupport',
 	icon: '\u{1F517}', // Link symbol
@@ -355,9 +377,14 @@ limiting its utility.
 			const hasClosedSource =
 				appSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
 
-			if (hasClosedSource && !permissionless) {
-				// Can connect to apps but requires trusting unverifiable code → PARTIAL
-				return unverifiableAppConnectionSupport()
+			if (hasClosedSource) {
+				if (!permissionless) {
+					// Has closed-source app but requires manufacturer consent
+					return restrictedAppConnectionSupport(appSupport)
+				} else {
+					// Has closed-source app but is permissionless
+					return unverifiableAppConnectionSupport()
+				}
 			}
 
 			// Should not reach here if feature data is correct, but handle gracefully
