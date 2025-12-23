@@ -141,12 +141,17 @@ export const openSource: Attribute<OpenSourceValue> = {
 	wording: {
 		midSentenceName: 'source code license',
 	},
-	question: sentence(
-		"Is the wallet's source code licensed under a Free & Open Source Software (FOSS) license?",
-	),
-	why: mdParagraph(
-		"[Free & Open Source Software (FOSS) licensing](https://en.wikipedia.org/wiki/Open-source_license) allows a software project's source code to be freely used, modified and distributed. This allows better collaboration, more transparency into the software development practices that go into the project, and allows security researchers to more easily identify and report security vulnerabilities. In short, it turns software projects into public goods.",
-	),
+	question: sentence(`
+		Does the user have the ability to avoid lock-in and freely audit,
+		modify, and redistribute the wallet's source code?
+	`),
+	why: mdParagraph(`
+		[Free & Open Source Software (FOSS) licensing](https://en.wikipedia.org/wiki/Open-source_license)
+		allows a software project's source code to be freely used, modified and distributed.
+		This allows better collaboration, more transparency into the software development practices
+		that go into the project, and allows security researchers to more easily identify and report
+		security vulnerabilities. In short, it turns software projects into public goods.
+	`),
 	methodology: markdown(`
 		Wallets are assessed based whether the license of their source code meets
 		the [Open Source Initiative's definition of open source](https://en.wikipedia.org/wiki/The_Open_Source_Definition).

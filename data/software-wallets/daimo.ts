@@ -58,7 +58,12 @@ export const daimo: SoftwareWallet = {
 			singular: 'Daimo username',
 		},
 		urls: {
+			docs: ['https://paydocs.daimo.com/'],
 			repositories: ['https://github.com/daimo-eth/daimo'],
+			socials: {
+				farcaster: 'https://farcaster.xyz/daimo-pay',
+				x: 'https://x.com/daimopay',
+			},
 			websites: ['https://daimo.com'],
 		},
 	},

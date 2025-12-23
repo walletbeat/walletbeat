@@ -1,47 +1,46 @@
-import { lucemans } from '@/data/contributors/lucemans'
-import { nconsigny } from '@/data/contributors/nconsigny'
-import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
-import {
-	HardwareWalletConnection,
-	HardwareWalletType,
-	type SupportedHardwareWallet,
-} from '@/schema/features/security/hardware-wallet-support'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
+import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
-export const frame: SoftwareWallet = {
+import { iamkio } from '../contributors/iamkio'
+import { kernal7702Contract } from '../wallet-contracts/kernal-7702'
+
+export const pillarx: SoftwareWallet = {
 	metadata: {
-		id: 'frame',
-		displayName: 'Frame',
-		tableName: 'Frame',
-		blurb: paragraph('Frame...'),
-		contributors: [polymutex, nconsigny, lucemans],
+		id: 'pillarx',
+		displayName: 'PillarX',
+		tableName: 'PillarX',
+		blurb: paragraph(
+			'PillarX is a web3 wallet that allows you to manage your digital assets and interact with the blockchain.',
+		),
+		contributors: [iamkio],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-13',
+		lastUpdated: '2025-12-16',
 		urls: {
-			docs: ['https://docs.frame.sh/'],
-			repositories: ['https://github.com/floating/frame'],
-			socials: {
-				discord: 'https://discord.com/invite/rr4Yr3JkPq',
-				x: 'https://x.com/0xFrame',
-			},
-			websites: ['https://frame.sh'],
+			websites: ['https://pillarx.app'],
 		},
 	},
 	features: {
 		accountSupport: {
-			defaultAccountType: AccountType.eoa,
-			eip7702: notSupported,
+			defaultAccountType: AccountType.eip7702,
+			eip7702: supported({
+				ref: {
+					explanation: 'PillarX supports EIP-7702',
+					url: 'https://pillarx.app/login',
+				},
+				contract: kernal7702Contract,
+			}),
+			// BIP support is not verified
 			eoa: supported({
 				ref: refTodo,
-				canExportPrivateKey: true,
+				canExportPrivateKey: false,
 				keyDerivation: {
 					type: 'BIP32',
 					canExportSeedPhrase: true,
@@ -56,8 +55,8 @@ export const frame: SoftwareWallet = {
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
 			nonChainSpecificEnsResolution: null,
 		},
@@ -69,13 +68,24 @@ export const frame: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': notSupported,
+				'2700': notSupported,
+				'6963': notSupported,
 			},
 			walletCall: null,
 		},
-		licensing: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: [
+					{
+						explanation: 'PillarX is licensed under the MIT license',
+						url: 'https://github.com/pillarwallet/x/blob/main/LICENSE',
+					},
+				],
+				license: FOSSLicense.MIT,
+			},
+		},
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,
@@ -85,17 +95,17 @@ export const frame: SoftwareWallet = {
 				governanceTokenLowFloat: null,
 				governanceTokenMostlyDistributed: null,
 				hiddenConvenienceFees: null,
-				publicOffering: null,
-				selfFunded: null,
+				publicOffering: true,
+				selfFunded: true,
 				transparentConvenienceFees: null,
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: notSupported,
 		privacy: {
 			appIsolation: null,
 			dataCollection: null,
-			privacyPolicy: null,
+			privacyPolicy: 'https://pillarx.app/privacy-policy',
 			transactionPrivacy: {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
@@ -109,23 +119,7 @@ export const frame: SoftwareWallet = {
 			bugBountyProgram: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
-				wallets: {
-					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
-					}),
-					[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
-					}),
-					[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.QR],
-					}),
-					[HardwareWalletType.GRIDPLUS]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
-					}),
-					[HardwareWalletType.OTHER]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.webUSB],
-					}),
-				},
+				wallets: {},
 			},
 			keysHandling: null,
 			lightClient: {
@@ -144,9 +138,9 @@ export const frame: SoftwareWallet = {
 					selfBroadcastViaSelfHostedNode: null,
 				},
 				l2: {
+					ref: refTodo,
 					[TransactionSubmissionL2Type.arbitrum]: null,
 					[TransactionSubmissionL2Type.opStack]: null,
-					ref: refTodo,
 				},
 			},
 		},
@@ -155,7 +149,7 @@ export const frame: SoftwareWallet = {
 		},
 	},
 	variants: {
+		[Variant.MOBILE]: true,
 		[Variant.BROWSER]: true,
-		[Variant.DESKTOP]: true,
 	},
 }

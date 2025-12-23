@@ -1,6 +1,6 @@
 # `mitmproxy` guide
 
-This guide describes how to set up [`mitmproxy`](https://mitmproxy.org) to inspect the network traffic that a wallet generates.
+_This guide describes how to set up [`mitmproxy`](https://mitmproxy.org) to inspect the network traffic that a wallet generates._
 
 ## Why?
 

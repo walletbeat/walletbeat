@@ -41,6 +41,7 @@ export const safe: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-12',
 		urls: {
+			docs: ['https://docs.safe.global/'],
 			repositories: ['https://github.com/safe-fndn'],
 			websites: ['https://safe.global'],
 		},
@@ -97,6 +98,13 @@ export const safe: SoftwareWallet = {
 			customChainRpcEndpoint: notSupported,
 			l1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: featureSupported,
+					erc20TokenSend: featureSupported,
+					etherBalanceLookup: featureSupported,
+				},
 			}),
 			nonL1: supported({
 				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST,

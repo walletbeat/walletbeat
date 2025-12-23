@@ -26,7 +26,16 @@ export const gemwallet: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-14',
 		urls: {
+			docs: ['https://docs.gemwallet.com/'],
 			repositories: ['https://github.com/gemwalletcom/gem-ios'],
+			socials: {
+				discord: 'https://discord.com/invite/4jpxtwT8r6',
+				instagram: 'https://www.instagram.com/GemWalletApp/',
+				reddit: 'https://www.reddit.com/r/gemwallet_official/',
+				telegram: 'https://t.me/gemwallet',
+				x: 'https://x.com/gemwallet',
+				youtube: 'https://www.youtube.com/@gemwallet',
+			},
 			websites: ['https://gemwallet.com'],
 		},
 	},

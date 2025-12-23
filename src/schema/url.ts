@@ -27,6 +27,11 @@ export function getDomain(url: Url): string {
 	return hostname
 }
 
+/** Get the full URL. */
+export function getUrl(url: Url): string {
+	return labeledUrl(url).url
+}
+
 /**
  * Unlabeled URLs have their labels default to their domain name.
  * However, if an entry for this domain name exists in this map, it

@@ -11,6 +11,7 @@ import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
 import { phantom } from './software-wallets/phantom'
+import { pillarx } from './software-wallets/pillarx'
 import { rabby } from './software-wallets/rabby'
 import { rainbow } from './software-wallets/rainbow'
 import { safe } from './software-wallets/safe'
@@ -30,6 +31,7 @@ export const softwareWallets = {
 	mtpelerin,
 	nufi,
 	phantom,
+	pillarx,
 	rabby,
 	rainbow,
 	safe,

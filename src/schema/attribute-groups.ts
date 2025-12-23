@@ -105,9 +105,9 @@ import {
 	type InteroperabilityValue,
 } from './attributes/self-sovereignty/interoperability'
 import {
-	selfHostedNode,
-	type SelfHostedNodeValue,
-} from './attributes/self-sovereignty/self-hosted-node'
+	type L1ProviderIndependence,
+	l1ProviderIndependence,
+} from './attributes/self-sovereignty/l1-provider-independence'
 import {
 	transactionInclusion,
 	type TransactionInclusionValue,
@@ -216,7 +216,7 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 
 /** A ValueSet for self-sovereignty Values. */
 type SelfSovereigntyValues = Dict<{
-	selfHostedNode: SelfHostedNodeValue
+	l1ProviderIndependence: L1ProviderIndependence
 	accountPortability: AccountPortabilityValue
 	transactionInclusion: TransactionInclusionValue
 	accountUnruggability: AccountUnruggabilityValue
@@ -231,13 +231,13 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 		'How much control and ownership over your account does {{WALLET_NAME}} give you?',
 	),
 	attributes: {
-		selfHostedNode,
+		l1ProviderIndependence,
 		accountPortability,
 		transactionInclusion,
 		accountUnruggability,
 	},
 	attributeWeights: {
-		selfHostedNode: 1.0,
+		l1ProviderIndependence: 1.0,
 		accountPortability: 1.0,
 		transactionInclusion: 1.0,
 		accountUnruggability: 1.0,
@@ -374,7 +374,7 @@ export interface PrivacyEvaluations extends EvaluatedGroup<PrivacyValues> {
 
 /** Evaluated self-sovereignty attributes for a single wallet. */
 export interface SelfSovereigntyEvaluations extends EvaluatedGroup<SelfSovereigntyValues> {
-	selfHostedNode: EvaluatedAttribute<SelfHostedNodeValue>
+	l1ProviderIndependence: EvaluatedAttribute<L1ProviderIndependence>
 	accountPortability: EvaluatedAttribute<AccountPortabilityValue>
 	transactionInclusion: EvaluatedAttribute<TransactionInclusionValue>
 }
@@ -474,7 +474,7 @@ export function evaluateAttributes(
 			appIsolation: evalAttr(appIsolation),
 		},
 		selfSovereignty: {
-			selfHostedNode: evalAttr(selfHostedNode),
+			l1ProviderIndependence: evalAttr(l1ProviderIndependence),
 			accountPortability: evalAttr(accountPortability),
 			transactionInclusion: evalAttr(transactionInclusion),
 			accountUnruggability: evalAttr(accountUnruggability),
@@ -547,7 +547,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			appIsolation: attr(tree => tree.privacy.appIsolation),
 		},
 		selfSovereignty: {
-			selfHostedNode: attr(tree => tree.selfSovereignty.selfHostedNode),
+			l1ProviderIndependence: attr(tree => tree.selfSovereignty.l1ProviderIndependence),
 			accountPortability: attr(tree => tree.selfSovereignty.accountPortability),
 			transactionInclusion: attr(tree => tree.selfSovereignty.transactionInclusion),
 			accountUnruggability: attr(tree => tree.selfSovereignty.accountUnruggability),

@@ -33,12 +33,49 @@ export interface SingleChainConfigurability {
 	rpcEndpointConfiguration: RpcEndpointConfiguration
 }
 
+/** Can the wallet be used to perform basic operations only using a self-hosted node? */
+export interface SelfHostedNodeL1BasicOperationsSupport {
+	/**
+	 * Can the wallet be used to perform basic operations only using
+	 * the L1 RPC provider?
+	 *
+	 * These operations must be tested in an environment with no network
+	 * connectivity to external services, other than to a user's L1 RPC
+	 * endpoint.
+	 */
+	withNoConnectivityExceptL1RPCEndpoint: {
+		/** Can you create an account? */
+		accountCreation: Support
+
+		/** Can you import an account? */
+		accountImport: Support
+
+		/** Can you see your Ether balance? */
+		etherBalanceLookup: Support
+
+		/**
+		 * Can you look up an ERC-20 token balance?
+		 * Requiring the user to input the ERC-20 contract address is OK,
+		 * the token does not need to be automatically discovered.
+		 */
+		erc20BalanceLookup: Support
+
+		/**
+		 * Can you send an ERC-20 token to another address?
+		 * Requiring the user to input the ERC-20 contract address is OK,
+		 * the token does not need to be automatically discovered.
+		 * Must be able to send to a different address than your own.
+		 */
+		erc20TokenSend: Support
+	}
+}
+
 /**
  * Customization options that exist for chains.
  */
 export interface ChainConfigurability {
 	/** Does the wallet support using Ethereum L1 at all? */
-	l1: Support<SingleChainConfigurability>
+	l1: Support<SingleChainConfigurability & SelfHostedNodeL1BasicOperationsSupport>
 
 	/** Does the wallet support non-L1 Ethereum chains? */
 	nonL1: Support<SingleChainConfigurability>

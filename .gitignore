@@ -32,3 +32,6 @@ pnpm-debug.log*
 
 # For playing with claude code
 scrap.md
+
+# Python cache
+__pycache__

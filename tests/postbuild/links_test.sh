@@ -12,7 +12,7 @@ process_link() {
 	local original_href
 	local raw_url
 	original_href="$1"
-	if echo "$original_href" | grep -qP '^https://'; then
+	if echo "$original_href" | grep -q '^https://'; then
 		return 0  # Full external URL; no sanitization.
 	fi
 	raw_url="$(echo "$original_href" | cut -d'"' -f2 | sed -r 's/#.*$//')"
@@ -22,21 +22,21 @@ process_link() {
 	if [[ "$raw_url" == '/' ]]; then
 		return 0 # Link to site root; OK.
 	fi
-	if echo "$raw_url" | grep -qP '^(https://|data:)'; then
+	if echo "$raw_url" | grep -q '^(https://|data:)'; then
 		return 0  # Full external or data URL; no sanitization.
 	fi
-	if echo "$raw_url" | grep -qP "\\\$\\{"; then
+	if echo "$raw_url" | grep -q "\\\$\\{"; then
 		return 0  # Probably part of inline JavaScript code; ignore.
 	fi
-	if ! echo "$raw_url" | grep -qP '^/'; then
+	if ! echo "$raw_url" | grep -q '^/'; then
 		echo "Unexpected link format. All site URLs should either start with '#' for same-page anchor-only links, or '/' for site-internal links."
 		return 1
 	fi
-	if echo "$raw_url" | grep -qP '^//'; then
+	if echo "$raw_url" | grep -q '^//'; then
 		echo "Unexpected link format. Protocol-relative URLs are not allowed."
 		return 1
 	fi
-	if ! echo "$raw_url" | grep -qP "/([^/]*\\.(svg|png|jpg|ico|css|js))?\$"; then
+	if ! echo "$raw_url" | grep -q "/([^/]*\\.(svg|png|jpg|ico|css|js))?\$"; then
 		echo "Links to pages must end in a slash."
 		return 1
 	fi
@@ -45,7 +45,7 @@ process_link() {
 
 success=true
 while IFS= read -r f; do
-	if echo "$f" | grep -qiP '\.(ico|png|jpg)$'; then
+	if echo "$f" | grep -qi '\.(ico|png|jpg)$'; then
 		continue  # Skip some file types.
 	fi
 	log "  > File: $f"
@@ -62,7 +62,7 @@ while IFS= read -r f; do
 			fi
 			success=false
 		fi
-	done < <(cat "$f" | fmt -1 | grep -ioP "(href|src)=\"[^'\"]*\"")
+	done < <(grep -io "(href|src)=\"[^'\"]*\"" "$f" 2>/dev/null || true)
 done < <(find "$DIST_DIR" -type f)
 if [[ "$success" == false ]]; then
 	echo 'Rationale: Site-internal links must end in slashes to make navigation faster when the site is served from an IPFS gateways.' >&2

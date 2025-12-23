@@ -105,11 +105,12 @@ export function evaluateAllGuardianScenarios(
 export function guardianScenarioId(scenario: GuardianScenario<GuardianScenarioType>): string {
 	switch (scenario.type) {
 		case GuardianScenarioType.DATA_LOSS:
-			return scenario.guardiansWithDataLoss.map(guardianId).toSorted().join('&')
+			return scenario.guardiansWithDataLoss.map(guardianId).slice().sort().join('&')
 		case GuardianScenarioType.ENTITY_TURNS_EVIL:
 			return scenario.turnsEvil
 				.map(entity => entity.id)
-				.toSorted()
+				.slice()
+				.sort()
 				.join('&')
 	}
 }
