@@ -751,6 +751,7 @@ Issued At: ${new Date().toISOString()}`;
 
   .content-wrapper {
     align-items: flex-start;
+		margin-bottom: 1.5rem;
   }
 
   .sidebar {
@@ -772,7 +773,7 @@ Issued At: ${new Date().toISOString()}`;
   .detail-card h3 {
     font-size: 1.1rem;
     font-weight: 600;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem 1rem;
   }
 
   .body-text {

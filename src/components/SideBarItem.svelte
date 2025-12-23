@@ -23,5 +23,57 @@
 </button>
 
 <style>
-  /* Move sidebar-item styles here */
+  .sidebar-item {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .sidebar-item:hover {
+    background-color: var(--background-secondary);
+  }
+
+  .sidebar-item.selected {
+    background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+
+  .sidebar-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .sidebar-item-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .sidebar-item.selected .sidebar-item-title {
+    color: var(--accent);
+  }
+
+  .sidebar-item-check {
+    color: var(--accent);
+    font-size: 1rem;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  .sidebar-item-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+    text-align: left;
+    line-height: 1.4;
+  }
 </style>
