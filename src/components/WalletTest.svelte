@@ -831,6 +831,8 @@ Issued At: ${new Date().toISOString()}`;
   }
 
   .tab-selector {
+		justify-content: flex-start;
+    gap: 0.75rem;
     border-bottom: 1px solid var(--background-secondary);
     padding-bottom: 0.5rem;
   }
