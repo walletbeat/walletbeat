@@ -1,42 +1,42 @@
 export interface TestTransaction {
-	id: string;
-	name: string;
-	function: string;
+	id: string
+	name: string
+	function: string
 	parameters: {
-		name: string;
-		value: string;
-		type: string;
-	}[];
-	calldata: `0x${string}`;
-	contractAddress?: `0x${string}`;
-	description?: string;
-	requirements?: string[];
-	value?: string;
+		name: string
+		value: string
+		type: string
+	}[]
+	calldata: `0x${string}`
+	contractAddress?: `0x${string}`
+	description?: string
+	requirements?: string[]
+	value?: string
 	// For multi-call transactions (EIP-7702)
 	calls?: Array<{
-		to: `0x${string}`;
-		data: `0x${string}`;
-		value?: bigint;
-	}>;
+		to: `0x${string}`
+		data: `0x${string}`
+		value?: bigint
+	}>
 }
 
 export interface TestSignature {
-	id: string;
-	name: string;
-	type: 'message' | 'typed';
-	description?: string;
-	requirements?: string[];
-	message?: string;
+	id: string
+	name: string
+	type: 'message' | 'typed'
+	description?: string
+	requirements?: string[]
+	message?: string
 	domain?: {
-		name: string;
-		version: string;
-		chainId: number;
-		verifyingContract: `0x${string}`;
-		salt: `0x${string}`;
-	};
-	types?: any;
-	primaryType?: string;
-	messageData?: any;
+		name: string
+		version: string
+		chainId: number
+		verifyingContract: `0x${string}`
+		salt: `0x${string}`
+	}
+	types?: any
+	primaryType?: string
+	messageData?: any
 }
 
 export const testTransactions: TestTransaction[] = [
@@ -63,7 +63,7 @@ export const testTransactions: TestTransaction[] = [
 		requirements: [
 			'Have at least 1 USDC in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
-			'Make sure you\'re on the correct network (Ethereum Mainnet)',
+			"Make sure you're on the correct network (Ethereum Mainnet)",
 		],
 	},
 	{
@@ -89,7 +89,7 @@ export const testTransactions: TestTransaction[] = [
 		requirements: [
 			'Have at least 1 USDC in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
-			'Make sure you\'re on the correct network (Ethereum Mainnet)',
+			"Make sure you're on the correct network (Ethereum Mainnet)",
 		],
 	},
 	{
@@ -125,7 +125,7 @@ export const testTransactions: TestTransaction[] = [
 		requirements: [
 			'Have at least 1 token of the specified asset in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
-			'Make sure you\'re on the correct network',
+			"Make sure you're on the correct network",
 		],
 	},
 	{
@@ -144,13 +144,14 @@ export const testTransactions: TestTransaction[] = [
 				type: 'uint256',
 			},
 		],
-		calldata: '0x095ea7b300000000000000000000000061a55F0713BBEB34B877eC852cfe69A946fc82290000000000000000000000000000000000000000000000000000000000000001',
+		calldata:
+			'0x095ea7b300000000000000000000000061a55F0713BBEB34B877eC852cfe69A946fc82290000000000000000000000000000000000000000000000000000000000000001',
 		contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
 		description: 'Batch transactions using EIP-7702 (EIP-5792 sendCalls)',
 		requirements: [
 			'Have at least 1 USDC in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
-			'Make sure you\'re on the correct network',
+			"Make sure you're on the correct network",
 			'Requires wallet support for EIP-5792 (wallet_sendCalls)',
 		],
 		calls: [
@@ -166,8 +167,8 @@ export const testTransactions: TestTransaction[] = [
 			},
 		],
 	},
-];
-export   const testSignatures: TestSignature[] = [
+]
+export const testSignatures: TestSignature[] = [
 	{
 		id: 'message-1',
 		name: 'Simple Test Message',
@@ -175,9 +176,9 @@ export   const testSignatures: TestSignature[] = [
 		message:
 			'This is a safe test message for educational purposes only. It does not authorize any transactions or actions.',
 		description:
-			'A simple plain text message signature. This is the safest type of signature as it\'s just text with no structured data.',
+			"A simple plain text message signature. This is the safest type of signature as it's just text with no structured data.",
 		requirements: [
-			'This signature is safe - it\'s just a plain text message',
+			"This signature is safe - it's just a plain text message",
 			'No transactions or approvals are authorized by this signature',
 			'This is for testing and educational purposes only',
 		],
@@ -228,4 +229,4 @@ export   const testSignatures: TestSignature[] = [
 			'This signature is safe for testing purposes',
 		],
 	},
-];
+]

@@ -15,17 +15,17 @@ import WalletTest from '../../components/WalletTest.svelte'
 >
 	<Navigation navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container data-column="gap-6">
-		<header data-sticky="inline" data-scroll-item="inline-detached padding-match-start">
+	<main data-sticky-container data-column='gap-6'>
+		<header data-sticky='inline' data-scroll-item='inline-detached padding-match-start'>
 			<h1>Wallet test playground</h1>
 
 			<p>
-				Use this page to manually exercise basic wallet flows (connect, send, sign) against your current
-				network. This is a developer tool and does not store any data.
+				Use this page to manually exercise basic wallet flows (connect, send, sign) against your
+				current network. This is a developer tool and does not store any data.
 			</p>
 		</header>
 
-    <WalletTest client:load />
+		<WalletTest client:load />
 	</main>
 </Layout>
 
