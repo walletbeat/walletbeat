@@ -118,15 +118,36 @@
       </p>
     </div>
 
-    {#if account?.isConnected && account.address}
-      <div class="account-pill" data-badge="medium">
-        <span class="status-dot" aria-hidden="true"></span>
-        <span class="account-label">
-          Connected as
-          <code>{account.address.slice(0, 6)}…{account.address.slice(-4)}</code>
-        </span>
-      </div>
-    {/if}
+    <div class="header-actions" data-column="gap-2 end">
+      {#if account?.isConnected && account.address}
+        <div class="account-pill" data-badge="medium">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="account-label">
+            Connected as
+            <code>{account.address.slice(0, 6)}…{account.address.slice(-4)}</code>
+          </span>
+        </div>
+      {:else}
+        <button
+          type="button"
+          data-pressable
+          onclick={openConnectorModal}
+          disabled={isConnecting || !connectors.length}
+        >
+          {#if isConnecting}
+            Connecting…
+          {:else if !connectors.length}
+            No connectors available
+          {:else}
+            Connect wallet
+          {/if}
+        </button>
+
+        {#if connectError}
+          <p class="error" role="alert">{connectError}</p>
+        {/if}
+      {/if}
+    </div>
   </header>
 
   <div class="card-grid" data-column="gap-4">
@@ -134,34 +155,13 @@
       <section data-card="radius-8 padding-5" class="card">
         <h3>Connect a wallet</h3>
         <p class="body-text">
-          To run the tests below, first connect a compatible wallet using one of the available connectors.
+          To run the tests below, first connect a compatible wallet using the
+          <strong>Connect wallet</strong> button in the top‑right corner.
         </p>
-
-        <div data-row="gap-3 start wrap">
-          <button
-            type="button"
-            data-pressable
-            onclick={openConnectorModal}
-            disabled={isConnecting || !connectors.length}
-          >
-            {#if isConnecting}
-              Connecting…
-            {:else if !connectors.length}
-              No connectors available
-            {:else}
-              Connect wallet
-            {/if}
-          </button>
-
-          {#if connectors.length > 1}
-            <span class="helper-text">
-              Multiple providers found — you&apos;ll be able to pick one.
-            </span>
-          {/if}
-        </div>
-
-        {#if connectError}
-          <p class="error" role="alert">{connectError}</p>
+        {#if connectors.length > 1}
+          <p class="helper-text">
+            Multiple providers found — you&apos;ll be able to pick one when connecting.
+          </p>
         {/if}
       </section>
     {:else}
@@ -318,6 +318,11 @@
   .wallet-test {
     max-width: 60rem;
     margin-inline: auto;
+  }
+
+  .header-actions {
+    margin-inline-start: auto;
+    align-items: flex-end;
   }
 
   .subtitle {
