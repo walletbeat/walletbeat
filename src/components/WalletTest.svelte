@@ -152,6 +152,7 @@
       } else {
         if (!tx.contractAddress) {
           console.error('Contract address is required for this transaction');
+
           return;
         }
 
@@ -712,9 +713,9 @@ Issued At: ${new Date().toISOString()}`;
                   data-pressable
                   onclick={() => {
                     if (selectedSig.type === 'message') {
-                      handleSignMessage(selectedSig);
+                      void handleSignMessage(selectedSig);
                     } else {
-                      handleSignTypedData(selectedSig);
+                      void handleSignTypedData(selectedSig);
                     }
                   }}
                   disabled={!account?.address || isSigPendingLocal}
