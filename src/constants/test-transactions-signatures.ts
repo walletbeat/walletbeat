@@ -8,10 +8,16 @@ export interface TestTransaction {
 		type: string;
 	}[];
 	calldata: `0x${string}`;
-	contractAddress: `0x${string}`;
+	contractAddress?: `0x${string}`;
 	description?: string;
 	requirements?: string[];
 	value?: string;
+	// For multi-call transactions (EIP-7702)
+	calls?: Array<{
+		to: `0x${string}`;
+		data: `0x${string}`;
+		value?: bigint;
+	}>;
 }
 
 export interface TestSignature {
@@ -120,6 +126,44 @@ export const testTransactions: TestTransaction[] = [
 			'Have at least 1 token of the specified asset in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
 			'Make sure you\'re on the correct network',
+		],
+	},
+	{
+		id: 'multicall-1',
+		name: 'EIP-7702 Multi-Call',
+		function: 'approve(address,uint256) + call(bytes)',
+		parameters: [
+			{
+				name: 'spender',
+				value: '0x61a55F0713BBEB34B877eC852cfe69A946fc8229',
+				type: 'address',
+			},
+			{
+				name: 'amount',
+				value: '1',
+				type: 'uint256',
+			},
+		],
+		calldata: '0x095ea7b300000000000000000000000061a55F0713BBEB34B877eC852cfe69A946fc82290000000000000000000000000000000000000000000000000000000000000001',
+		contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+		description: 'Batch transactions using EIP-7702 (EIP-5792 sendCalls)',
+		requirements: [
+			'Have at least 1 USDC in your wallet',
+			'Ensure you have sufficient ETH for gas fees',
+			'Make sure you\'re on the correct network',
+			'Requires wallet support for EIP-5792 (wallet_sendCalls)',
+		],
+		calls: [
+			{
+				to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' as `0x${string}`,
+				data: '0x095ea7b300000000000000000000000061a55F0713BBEB34B877eC852cfe69A946fc82290000000000000000000000000000000000000000000000000000000000000001' as `0x${string}`,
+				value: BigInt(0),
+			},
+			{
+				to: '0x61a55F0713BBEB34B877eC852cfe69A946fc8229' as `0x${string}`,
+				data: '0x5f7fb3d1' as `0x${string}`,
+				value: BigInt(0),
+			},
 		],
 	},
 ];

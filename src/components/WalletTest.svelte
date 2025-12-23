@@ -3,6 +3,7 @@
   import {
     connect,
     getAccount,
+    sendCalls,
     sendTransaction,
     signMessage,
     signTypedData,
@@ -38,6 +39,7 @@
   let activeTxId = $state<string | null>(null);
   let isTxPending = $state(false);
   let transactionHashes = $state<Record<string, `0x${string}`>>({});
+  let batchIds = $state<Record<string, string>>({});
 
   // Signature state
   let activeSigId = $state<string | null>(null);
@@ -130,12 +132,33 @@
     isTxPending = true;
     activeTxId = tx.id;
     try {
-      const hash = await sendTransaction(config, {
-        to: tx.contractAddress,
-        data: tx.calldata,
-        value: tx.value ? parseEther(tx.value) : undefined,
-      });
-      transactionHashes[tx.id] = hash;
+      // Handle multi-call transactions (EIP-7702)
+      if (tx.calls && tx.calls.length > 0) {
+        const result = await sendCalls(config, {
+          calls: tx.calls,
+        });
+        // sendCalls returns a batch ID, not a transaction hash
+        batchIds[tx.id] = result.id;
+        // Try to extract hash if available, otherwise use batch ID
+        if ('hash' in result && typeof result.hash === 'string') {
+          transactionHashes[tx.id] = result.hash as `0x${string}`;
+        } else {
+          // Store batch ID as a placeholder - wallets may provide hash later
+          transactionHashes[tx.id] = result.id as `0x${string}`;
+        }
+      } else {
+        // Regular single transaction
+        if (!tx.contractAddress) {
+          console.error('Contract address is required for this transaction');
+          return;
+        }
+        const hash = await sendTransaction(config, {
+          to: tx.contractAddress,
+          data: tx.calldata,
+          value: tx.value ? parseEther(tx.value) : undefined,
+        });
+        transactionHashes[tx.id] = hash;
+      }
     } catch (error) {
       console.error('Transaction failed:', error);
     } finally {
@@ -171,12 +194,33 @@
     isTxPending = true;
     activeTxId = tx.id;
     try {
-      const hash = await sendTransaction(config, {
-        to: tx.contractAddress,
-        data: tx.calldata,
-        value: tx.value ? parseEther(tx.value) : undefined,
-      });
-      transactionHashes[tx.id] = hash;
+      // Handle multi-call transactions (EIP-7702)
+      if (tx.calls && tx.calls.length > 0) {
+        const result = await sendCalls(config, {
+          calls: tx.calls,
+        });
+        // sendCalls returns a batch ID, not a transaction hash
+        batchIds[tx.id] = result.id;
+        // Try to extract hash if available, otherwise use batch ID
+        if ('hash' in result && typeof result.hash === 'string') {
+          transactionHashes[tx.id] = result.hash as `0x${string}`;
+        } else {
+          // Store batch ID as a placeholder - wallets may provide hash later
+          transactionHashes[tx.id] = result.id as `0x${string}`;
+        }
+      } else {
+        // Regular single transaction
+        if (!tx.contractAddress) {
+          console.error('Contract address is required for this transaction');
+          return;
+        }
+        const hash = await sendTransaction(config, {
+          to: tx.contractAddress,
+          data: tx.calldata,
+          value: tx.value ? parseEther(tx.value) : undefined,
+        });
+        transactionHashes[tx.id] = hash;
+      }
     } catch (error) {
       console.error('Transaction failed:', error);
     } finally {
@@ -469,15 +513,48 @@ Issued At: ${new Date().toISOString()}`;
                   </div>
                 {/if}
 
-                <div class="detail-section">
-                  <span class="detail-label">📦 Calldata:</span>
-                  <code class="detail-code calldata">{selectedTx.calldata}</code>
-                </div>
+                {#if selectedTx.calls && selectedTx.calls.length > 0}
+                  <div class="detail-section">
+                    <span class="detail-label">🔗 Calls ({selectedTx.calls.length}):</span>
+                    <div class="parameters-list" data-column="gap-3">
+                      {#each selectedTx.calls as call, idx}
+                        <div class="parameter-item">
+                          <div class="parameter-header">
+                            <span class="parameter-name">Call {idx + 1}</span>
+                          </div>
+                          <div data-column="gap-2">
+                            <div>
+                              <span class="parameter-type">To:</span>
+                              <code class="parameter-value">{call.to}</code>
+                            </div>
+                            <div>
+                              <span class="parameter-type">Data:</span>
+                              <code class="parameter-value calldata">{call.data}</code>
+                            </div>
+                            {#if call.value !== undefined && call.value > 0n}
+                              <div>
+                                <span class="parameter-type">Value:</span>
+                                <code class="parameter-value">{call.value.toString()} Wei</code>
+                              </div>
+                            {/if}
+                          </div>
+                        </div>
+                      {/each}
+                    </div>
+                  </div>
+                {:else}
+                  <div class="detail-section">
+                    <span class="detail-label">📦 Calldata:</span>
+                    <code class="detail-code calldata">{selectedTx.calldata}</code>
+                  </div>
 
-                <div class="detail-section">
-                  <span class="detail-label">📍 Contract Address:</span>
-                  <code class="detail-code">{selectedTx.contractAddress}</code>
-                </div>
+                  {#if selectedTx.contractAddress}
+                    <div class="detail-section">
+                      <span class="detail-label">📍 Contract Address:</span>
+                      <code class="detail-code">{selectedTx.contractAddress}</code>
+                    </div>
+                  {/if}
+                {/if}
 
                 <div class="warning-box">
                   <p class="warning-text">
@@ -489,7 +566,7 @@ Issued At: ${new Date().toISOString()}`;
                   type="button"
                   data-pressable
                   onclick={() => handleSendTransaction(selectedTx)}
-                  disabled={!account?.address || isTxPendingLocal}
+                  disabled={!account?.address || isTxPendingLocal || (!selectedTx.calls && !selectedTx.contractAddress) || (selectedTx.calls && selectedTx.calls.length === 0)}
                 >
                   {#if isTxPendingLocal}
                     Preparing…
