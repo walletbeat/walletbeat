@@ -836,12 +836,34 @@ const knownValidUrls: KnownValidUrl[] = [
 	},
 ]
 
+/**
+ * URLs that should be skipped during validation checks.
+ * These URLs would always return an error response, so we skip them to avoid failing the test.
+ */
+const URLS_TO_SKIP = [
+	'docs.phantom.com',
+	'developers.zerion.io',
+	'help.ambire.com/hc/en-us',
+	'nufi.gitbook.io/',
+	'linkedin.com',
+	'facebook.com',
+	'instagram.com',
+	'reddit.com',
+	'tiktok.com',
+]
+
 const newValidUrls: string[] = []
 
 const verifiedUrls: KnownValidUrl[] = []
 
 async function checkValidUrl(url: Url): Promise<void> {
 	const href = labeledUrl(url).url
+	const urlString = getUrl(url)
+	const shouldSkip = URLS_TO_SKIP.some(s => urlString.includes(s))
+
+	if (shouldSkip) {
+		return
+	}
 	const h = createHash('sha1')
 
 	h.update(href)
@@ -924,19 +946,6 @@ describe('reference URLs', () => {
 			})
 			it('has valid docs', async () => {
 				for (const doc of wallet.metadata.urls?.docs ?? []) {
-					// These docs would always return an error Response. Skip docs to avoid failing the test.
-					const DOCS_TO_SKIP = [
-						'docs.phantom.com',
-						'developers.zerion.io',
-						'help.ambire.com/hc/en-us',
-						'nufi.gitbook.io/',
-					]
-					const shouldSkip = DOCS_TO_SKIP.some(s => getUrl(doc).includes(s))
-
-					if (shouldSkip) {
-						continue
-					}
-
 					await checkValidUrl(doc)
 				}
 			})
@@ -951,24 +960,8 @@ describe('reference URLs', () => {
 				}
 			})
 			it('has valid socials', async () => {
-				// These urls would always return an error Response. Skip urls to avoid failing the test.
-				const SOCIALS_TO_SKIP = [
-					'linkedin.com',
-					'facebook.com',
-					'instagram.com',
-					'reddit.com',
-					'tiktok.com',
-				]
-
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
 					if (social === undefined) {
-						continue
-					}
-
-					const urlString = getUrl(social)
-					const shouldSkip = SOCIALS_TO_SKIP.some(s => urlString.includes(s))
-
-					if (shouldSkip) {
 						continue
 					}
 
