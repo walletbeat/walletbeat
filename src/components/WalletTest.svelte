@@ -151,35 +151,6 @@
   </header>
 
   <div class="card-grid" data-column="gap-4">
-    {#if !account?.isConnected}
-      <section data-card="radius-8 padding-5" class="card">
-        <h3>Connect a wallet</h3>
-        <p class="body-text">
-          To run the tests below, first connect a compatible wallet using the
-          <strong>Connect wallet</strong> button in the top‑right corner.
-        </p>
-        {#if connectors.length > 1}
-          <p class="helper-text">
-            Multiple providers found — you&apos;ll be able to pick one when connecting.
-          </p>
-        {/if}
-      </section>
-    {:else}
-      <section data-card="radius-8 padding-5" class="card">
-        <h3>Connection</h3>
-        <p class="body-text">
-          Your wallet is connected. You can now try sending a small ETH transfer or signing a message.
-        </p>
-
-        <div class="connection-meta" data-column="gap-2">
-          <div data-row="gap-2 wrap">
-            <span class="label">Address</span>
-            <code class="mono">{account.address}</code>
-          </div>
-        </div>
-      </section>
-    {/if}
-
     <section data-card="radius-8 padding-5" class="card">
       <header data-row="gap-2 start wrap">
         <div data-column="gap-1">
