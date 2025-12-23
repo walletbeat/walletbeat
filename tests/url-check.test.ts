@@ -834,6 +834,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '7b3f7d52c78b53db3a0f2bf40e37cdbe7dd81c12',
 		retrieved: '2025-12-20',
 	},
+	{
+		url: 'https://developers.ledger.com/docs/clear-signing/for-wallets',
+		urlHash: '71ba731db6934452b33327999ee3e1cd7dff7a68',
+		retrieved: '2025-12-20',
+	},
 ]
 
 /**
@@ -850,11 +855,6 @@ const URLS_TO_SKIP = [
 	'instagram.com',
 	'reddit.com',
 	'tiktok.com',
-	{
-		url: 'https://developers.ledger.com/docs/clear-signing/for-wallets',
-		urlHash: '71ba731db6934452b33327999ee3e1cd7dff7a68',
-		retrieved: '2025-12-20',
-	},
 ]
 
 const newValidUrls: string[] = []
