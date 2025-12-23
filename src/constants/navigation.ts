@@ -19,6 +19,7 @@ import GithubIcon from 'lucide-static/icons/github.svg?raw'
 import KeyIcon from 'lucide-static/icons/key.svg?raw'
 import MessageCircleIcon from 'lucide-static/icons/message-circle-heart.svg?raw'
 import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
+import FlaskConical from 'lucide-static/icons/flask-conical.svg?raw'
 
 // Constants
 import { hardwareWallets } from '@/data/hardware-wallets'
@@ -63,6 +64,12 @@ export const navigationRepository = {
 	href: 'https://github.com/walletbeat/walletbeat',
 } as const satisfies NavigationItem
 
+export const navigationTesting = {
+	id: 'testing-page',
+	icon: FlaskConical,
+	title: 'Test your wallet',
+	href: '/test',
+} as const satisfies NavigationItem
 export const navigationFarcasterChannel = {
 	id: 'farcaster-channel',
 	icon: MessageCircleIcon,
@@ -177,5 +184,6 @@ export const defaultNavigationItems = [
 	navigationAbout,
 	navigationFaq,
 	navigationRepository,
+	navigationTesting,
 	navigationFarcasterChannel,
 ] as const satisfies NavigationItem[]

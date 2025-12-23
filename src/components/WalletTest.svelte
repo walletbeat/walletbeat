@@ -141,9 +141,9 @@
           {:else}
             Connect wallet
           {/if}
-        </button>
+    </button>
 
-        {#if connectError}
+    {#if connectError}
           <p class="error" role="alert">{connectError}</p>
         {/if}
       {/if}
@@ -192,30 +192,30 @@
       </header>
 
       <div data-column="gap-3">
-        <button
+      <button 
           type="button"
           data-pressable
-          onclick={handleSendETH}
-          disabled={isPending || !account?.address}
-        >
+        onclick={handleSendETH} 
+        disabled={isPending || !account?.address}
+      >
           {#if isPending}
             Sending…
           {:else}
             Send 0.0001 ETH
           {/if}
-        </button>
+      </button>
 
         {#if !account?.address}
           <p class="helper-text">Connect a wallet above to enable this test.</p>
         {/if}
 
-        {#if txHash}
+      {#if txHash}
           <p class="result">
             Transaction submitted:
             <code>{txHash}</code>
           </p>
-        {/if}
-      </div>
+      {/if}
+    </div>
     </section>
 
     <section data-card="radius-8 padding-5" class="card">
@@ -230,30 +230,30 @@
       </header>
 
       <div data-column="gap-3">
-        <button
+      <button 
           type="button"
           data-pressable
-          onclick={handleSignMessage}
-          disabled={isPending || !account?.address}
-        >
+        onclick={handleSignMessage} 
+        disabled={isPending || !account?.address}
+      >
           {#if isPending}
             Signing…
           {:else}
             Sign &quot;Hello&quot;
           {/if}
-        </button>
+      </button>
 
         {#if !account?.address}
           <p class="helper-text">Connect a wallet above to enable this test.</p>
         {/if}
 
-        {#if signature}
+      {#if signature}
           <p class="result">
             Signature:
             <code>{signature.slice(0, 18)}…</code>
           </p>
-        {/if}
-      </div>
+      {/if}
+    </div>
     </section>
   </div>
 
@@ -303,11 +303,11 @@
             disabled={isConnecting}
           >
             Close
-          </button>
+        </button>
 
-          {#if connectError}
+        {#if connectError}
             <p class="error" role="alert">{connectError}</p>
-          {/if}
+        {/if}
         </div>
       </div>
     </div>
