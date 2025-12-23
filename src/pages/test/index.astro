@@ -1,12 +1,61 @@
 ---
-import WalletTest from '../../components/WalletTest.svelte';
+// Layouts
+import Layout from '../../layouts/Layout.astro'
+
+// Components
+import Navigation from '@/views/Navigation.astro'
+import { defaultNavigationItems } from '@/constants/navigation'
+import WalletTest from '../../components/WalletTest.svelte'
 ---
 
-<html>
-  <head>
-    <title>Wallet Test</title>
-  </head>
-  <body>
-    <WalletTest client:load />
-  </body>
-</html>
+<Layout
+	metadata={{
+		title: 'Walletbeat – Wallet test playground',
+	}}
+>
+	<Navigation navigationItems={defaultNavigationItems} />
+
+	<main data-sticky-container data-column="gap-6">
+		<header data-sticky="inline" data-scroll-item="inline-detached padding-match-start">
+			<h1>Wallet test playground</h1>
+
+			<p>
+				Use this page to manually exercise basic wallet flows (connect, send, sign) against your current
+				network. This is a developer tool and does not store any data.
+			</p>
+		</header>
+
+		<WalletTest client:load />
+	</main>
+</Layout>
+
+<style>
+	main {
+		> header {
+			padding: clamp(1.5rem, 0.08 * var(--scrollContainer-sizeInline), 4rem)
+				clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
+
+			text-shadow:
+				0 0 1em var(--background-primary),
+				0 0 2em var(--background-primary),
+				0 0 3em var(--background-primary);
+
+			h1 {
+				font-size: clamp(1.75em, 0.035 * var(--scrollContainer-sizeInline), 2.75em);
+				font-weight: 800;
+				color: var(--accent);
+				margin: 0 0 1rem 0;
+				line-height: 1.1;
+			}
+
+			p {
+				font-size: smaller;
+				color: var(--text-secondary);
+				line-height: 1.6;
+				margin: 0;
+				text-wrap: balance;
+				max-width: 60ch;
+			}
+		}
+	}
+</style>
