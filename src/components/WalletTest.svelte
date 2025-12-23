@@ -16,6 +16,7 @@
   import config from '../lib/wagmi-config';
 	import { testSignatures, testTransactions } from '../constants/test-transactions-signatures'
 	import type { TestTransaction, TestSignature } from '../constants/test-transactions-signatures'
+	import ErrorComponent from './ErrorComponent.svelte';
 
   type Account = ReturnType<typeof getAccount>;
 
@@ -39,11 +40,13 @@
   let isTxPending = $state(false);
   let transactionHashes = $state<Record<string, `0x${string}`>>({});
   let batchIds = $state<Record<string, string>>({});
+  let transactionError = $state('');
 
   // Signature state
   let activeSigId = $state<string | null>(null);
   let isSigPending = $state(false);
   let signatureResults = $state<Record<string, string>>({});
+  let signatureError = $state('');
 
   // Some configs may not define connectors at all
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -105,6 +108,22 @@
     chainSwitchError = '';
   }
 
+  function clearConnectError() {
+    connectError = '';
+  }
+
+  function clearChainSwitchError() {
+    chainSwitchError = '';
+  }
+
+  function clearTransactionError() {
+    transactionError = '';
+  }
+
+  function clearSignatureError() {
+    signatureError = '';
+  }
+
   async function handleSwitchChain() {
     if (!pendingTransaction) return;
 
@@ -118,7 +137,6 @@
       closeChainSwitchModal();
       await sendTransactionAfterChainSwitch(pendingTransaction);
     } catch (error) {
-      console.error('Failed to switch chain:', error);
       chainSwitchError = error instanceof Error ? error.message : 'Failed to switch to mainnet';
     } finally {
       isSwitchingChain = false;
@@ -130,6 +148,7 @@
 
     isTxPending = true;
     activeTxId = tx.id;
+    transactionError = '';
 
     try {
       // Handle multi-call transactions (EIP-7702)
@@ -151,7 +170,7 @@
         }
       } else {
         if (!tx.contractAddress) {
-          console.error('Contract address is required for this transaction');
+          transactionError = 'Contract address is required for this transaction';
 
           return;
         }
@@ -165,7 +184,7 @@
         transactionHashes[tx.id] = hash;
       }
     } catch (error) {
-      console.error('Transaction failed:', error);
+      transactionError = error instanceof Error ? error.message : 'Transaction failed';
     } finally {
       isTxPending = false;
       activeTxId = null;
@@ -181,7 +200,6 @@
       account = getAccount(config);
       isConnectorModalOpen = false;
     } catch (error) {
-      console.error('Connection failed:', error);
       connectError = error instanceof Error ? error.message : 'Failed to connect wallet';
     } finally {
       isConnecting = false;
@@ -200,6 +218,7 @@
 
     isTxPending = true;
     activeTxId = tx.id;
+    transactionError = '';
 
     try {
       // Handle multi-call transactions (EIP-7702)
@@ -223,7 +242,7 @@
       } else {
         // Regular single transaction
         if (!tx.contractAddress) {
-          console.error('Contract address is required for this transaction');
+          transactionError = 'Contract address is required for this transaction';
 
           return;
         }
@@ -237,7 +256,7 @@
         transactionHashes[tx.id] = hash;
       }
     } catch (error) {
-      console.error('Transaction failed:', error);
+      transactionError = error instanceof Error ? error.message : 'Transaction failed';
     } finally {
       isTxPending = false;
       activeTxId = null;
@@ -249,6 +268,7 @@
 
     isSigPending = true;
     activeSigId = sig.id;
+    signatureError = '';
 
     try {
       const result = await signMessage(config, {
@@ -257,7 +277,7 @@
 
       signatureResults[sig.id] = result;
     } catch (error) {
-      console.error('Signing failed:', error);
+      signatureError = error instanceof Error ? error.message : 'Signing failed';
     } finally {
       isSigPending = false;
       activeSigId = null;
@@ -277,6 +297,7 @@
 
     isSigPending = true;
     activeSigId = sig.id;
+    signatureError = '';
 
     try {
       const result = await signTypedData(config, {
@@ -288,7 +309,7 @@
 
       signatureResults[sig.id] = result;
     } catch (error) {
-      console.error('Typed data signing failed:', error);
+      signatureError = error instanceof Error ? error.message : 'Typed data signing failed';
     } finally {
       isSigPending = false;
       activeSigId = null;
@@ -385,10 +406,6 @@ Issued At: ${new Date().toISOString()}`;
             Connect wallet
           {/if}
         </button>
-
-        {#if connectError}
-          <p class="error" role="alert">{connectError}</p>
-        {/if}
       {/if}
     </div>
   </header>
@@ -790,10 +807,6 @@ Issued At: ${new Date().toISOString()}`;
           >
             Close
         </button>
-
-        {#if connectError}
-            <p class="error" role="alert">{connectError}</p>
-        {/if}
         </div>
       </div>
     </div>
@@ -850,14 +863,15 @@ Issued At: ${new Date().toISOString()}`;
               Switch to Mainnet
             {/if}
           </button>
-
-          {#if chainSwitchError}
-            <p class="error" role="alert">{chainSwitchError}</p>
-          {/if}
         </div>
       </div>
     </div>
   {/if}
+
+  <ErrorComponent error={connectError} onClose={clearConnectError} />
+  <ErrorComponent error={chainSwitchError} onClose={clearChainSwitchError} />
+  <ErrorComponent error={transactionError} onClose={clearTransactionError} />
+  <ErrorComponent error={signatureError} onClose={clearSignatureError} />
 </section>
 
 <style>
@@ -1239,10 +1253,5 @@ Issued At: ${new Date().toISOString()}`;
 
   .secondary-button {
     background-color: var(--background-secondary);
-  }
-
-  .error {
-    font-size: 0.8rem;
-    color: var(--rating-fail);
   }
 </style>
