@@ -14,11 +14,10 @@
   import { mainnet } from '@wagmi/core/chains';
   import { parseEther } from 'viem';
   import config from '../lib/wagmi-config';
-	import {testSignatures, testTransactions} from "../constants/test-transactions-signatures"
-	import type {TestTransaction, TestSignature} from "../constants/test-transactions-signatures"
+	import { testSignatures, testTransactions } from '../constants/test-transactions-signatures'
+	import type { TestTransaction, TestSignature } from '../constants/test-transactions-signatures'
 
   type Account = ReturnType<typeof getAccount>;
-
 
 
   let account = $state<Account | null>(null);
@@ -76,12 +75,14 @@
   function openConnectorModal() {
     if (!connectors.length) {
       connectError = 'No wallet connector available';
+
       return;
     }
 
-    // If there is only one connector, connect immediately without showing modal
+    // If there is only one connector, users should connect immediately
     if (connectors.length === 1) {
       void handleConnect(connectors[0]);
+
       return;
     }
 
@@ -109,14 +110,12 @@
 
     isSwitchingChain = true;
     chainSwitchError = '';
+
     try {
       await switchChain(config, { chainId: mainnet.id });
-      // Wait a moment for the chain switch to complete
       await new Promise((resolve) => setTimeout(resolve, 500));
-      // Re-fetch account to get updated chainId
       account = getAccount(config);
       closeChainSwitchModal();
-      // Now send the transaction
       await sendTransactionAfterChainSwitch(pendingTransaction);
     } catch (error) {
       console.error('Failed to switch chain:', error);
@@ -131,32 +130,37 @@
 
     isTxPending = true;
     activeTxId = tx.id;
+
     try {
       // Handle multi-call transactions (EIP-7702)
       if (tx.calls && tx.calls.length > 0) {
         const result = await sendCalls(config, {
           calls: tx.calls,
         });
+
         // sendCalls returns a batch ID, not a transaction hash
         batchIds[tx.id] = result.id;
+
         // Try to extract hash if available, otherwise use batch ID
         if ('hash' in result && typeof result.hash === 'string') {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           transactionHashes[tx.id] = result.hash as `0x${string}`;
         } else {
-          // Store batch ID as a placeholder - wallets may provide hash later
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           transactionHashes[tx.id] = result.id as `0x${string}`;
         }
       } else {
-        // Regular single transaction
         if (!tx.contractAddress) {
           console.error('Contract address is required for this transaction');
           return;
         }
+
         const hash = await sendTransaction(config, {
           to: tx.contractAddress,
           data: tx.calldata,
           value: tx.value ? parseEther(tx.value) : undefined,
         });
+
         transactionHashes[tx.id] = hash;
       }
     } catch (error) {
@@ -170,6 +174,7 @@
   async function handleConnect(connector: Connector) {
     isConnecting = true;
     connectError = '';
+
     try {
       await connect(config, { connector });
       account = getAccount(config);
@@ -185,40 +190,49 @@
   async function handleSendTransaction(tx: TestTransaction) {
     if (!account?.address) return;
 
-    // Check if user is on chain ID 1 (Ethereum mainnet)
+    // All transactions should be on mainnet
     if (account.chainId !== undefined && account.chainId !== mainnet.id) {
       openChainSwitchModal(tx);
+
       return;
     }
 
     isTxPending = true;
     activeTxId = tx.id;
+
     try {
       // Handle multi-call transactions (EIP-7702)
       if (tx.calls && tx.calls.length > 0) {
         const result = await sendCalls(config, {
           calls: tx.calls,
         });
+
         // sendCalls returns a batch ID, not a transaction hash
         batchIds[tx.id] = result.id;
+
         // Try to extract hash if available, otherwise use batch ID
         if ('hash' in result && typeof result.hash === 'string') {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           transactionHashes[tx.id] = result.hash as `0x${string}`;
         } else {
           // Store batch ID as a placeholder - wallets may provide hash later
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           transactionHashes[tx.id] = result.id as `0x${string}`;
         }
       } else {
         // Regular single transaction
         if (!tx.contractAddress) {
           console.error('Contract address is required for this transaction');
+
           return;
         }
+
         const hash = await sendTransaction(config, {
           to: tx.contractAddress,
           data: tx.calldata,
           value: tx.value ? parseEther(tx.value) : undefined,
         });
+
         transactionHashes[tx.id] = hash;
       }
     } catch (error) {
@@ -234,10 +248,12 @@
 
     isSigPending = true;
     activeSigId = sig.id;
+
     try {
       const result = await signMessage(config, {
         message: sig.message,
       });
+
       signatureResults[sig.id] = result;
     } catch (error) {
       console.error('Signing failed:', error);
@@ -260,6 +276,7 @@
 
     isSigPending = true;
     activeSigId = sig.id;
+
     try {
       const result = await signTypedData(config, {
         domain: sig.domain,
@@ -267,6 +284,7 @@
         primaryType: sig.primaryType,
         message: sig.messageData,
       });
+
       signatureResults[sig.id] = result;
     } catch (error) {
       console.error('Typed data signing failed:', error);
@@ -286,6 +304,7 @@
 
   function openInExplorer(txHash: string) {
     const explorerUrl = `https://etherscan.io/tx/${txHash}`;
+
     window.open(explorerUrl, '_blank', 'noopener,noreferrer');
   }
 
@@ -294,6 +313,7 @@
       try {
         const num = BigInt(value);
         const ether = Number(num) / 1e18;
+
         if (ether >= 0.0001) {
           return `${value} (${ether.toFixed(4)} ETH)`;
         }
@@ -301,14 +321,17 @@
         // If parsing fails, just return the value
       }
     }
+
     return value;
   }
 
   // Update SIWE message when account changes
   $effect(() => {
     const siweSig = testSignatures.find((s) => s.id === 'siwe-1');
+
     if (siweSig && siweSig.type === 'message') {
       const address = account?.address || '0x0000000000000000000000000000000000000000';
+
       siweSig.message = `https://portfolio.mjtpediglorio.com wants you to sign in with your Ethereum account:
 ${address}
 
@@ -377,6 +400,7 @@ Issued At: ${new Date().toISOString()}`;
       class:active={activeTab === 'transactions'}
       onclick={() => {
         activeTab = 'transactions';
+
         if (testTransactions.length > 0 && !selectedTxId) {
           selectedTxId = testTransactions[0].id;
         }
@@ -390,6 +414,7 @@ Issued At: ${new Date().toISOString()}`;
       class:active={activeTab === 'signatures'}
       onclick={() => {
         activeTab = 'signatures';
+
         if (testSignatures.length > 0 && !selectedSigId) {
           selectedSigId = testSignatures[0].id;
         }

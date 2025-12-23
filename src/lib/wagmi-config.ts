@@ -1,7 +1,7 @@
 'use client'
 
-import { mainnet, zksync } from '@wagmi/core/chains'
 import { createConfig, http } from '@wagmi/core'
+import { mainnet, zksync } from '@wagmi/core/chains'
 
 const config = createConfig({
 	chains: [mainnet, zksync],

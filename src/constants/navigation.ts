@@ -15,11 +15,11 @@ import ChartBarIcon from 'lucide-static/icons/chart-bar.svg?raw'
 import ChartPieIcon from 'lucide-static/icons/chart-pie.svg?raw'
 import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
 import CpuIcon from 'lucide-static/icons/cpu.svg?raw'
+import FlaskConical from 'lucide-static/icons/flask-conical.svg?raw'
 import GithubIcon from 'lucide-static/icons/github.svg?raw'
 import KeyIcon from 'lucide-static/icons/key.svg?raw'
 import MessageCircleIcon from 'lucide-static/icons/message-circle-heart.svg?raw'
 import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
-import FlaskConical from 'lucide-static/icons/flask-conical.svg?raw'
 
 // Constants
 import { hardwareWallets } from '@/data/hardware-wallets'
