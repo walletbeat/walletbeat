@@ -864,6 +864,7 @@ async function checkValidUrl(url: Url): Promise<void> {
 	if (shouldSkip) {
 		return
 	}
+
 	const h = createHash('sha1')
 
 	h.update(href)
