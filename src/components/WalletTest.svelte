@@ -6,9 +6,11 @@
     sendTransaction,
     signMessage,
     signTypedData,
+    switchChain,
     watchAccount,
     type Connector,
   } from '@wagmi/core';
+  import { mainnet } from '@wagmi/core/chains';
   import { parseEther } from 'viem';
   import config from '../lib/wagmi-config';
 	import {testSignatures, testTransactions} from "../constants/test-transactions-signatures"
@@ -22,6 +24,10 @@
   let isConnecting = $state(false);
   let connectError = $state('');
   let isConnectorModalOpen = $state(false);
+  let isChainSwitchModalOpen = $state(false);
+  let pendingTransaction = $state<TestTransaction | null>(null);
+  let isSwitchingChain = $state(false);
+  let chainSwitchError = $state('');
 
   // Tab state
   let activeTab = $state<'transactions' | 'signatures'>('transactions');
@@ -84,6 +90,60 @@
     isConnectorModalOpen = false;
   }
 
+  function openChainSwitchModal(tx: TestTransaction) {
+    pendingTransaction = tx;
+    isChainSwitchModalOpen = true;
+    chainSwitchError = '';
+  }
+
+  function closeChainSwitchModal() {
+    isChainSwitchModalOpen = false;
+    pendingTransaction = null;
+    chainSwitchError = '';
+  }
+
+  async function handleSwitchChain() {
+    if (!pendingTransaction) return;
+
+    isSwitchingChain = true;
+    chainSwitchError = '';
+    try {
+      await switchChain(config, { chainId: mainnet.id });
+      // Wait a moment for the chain switch to complete
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Re-fetch account to get updated chainId
+      account = getAccount(config);
+      closeChainSwitchModal();
+      // Now send the transaction
+      await sendTransactionAfterChainSwitch(pendingTransaction);
+    } catch (error) {
+      console.error('Failed to switch chain:', error);
+      chainSwitchError = error instanceof Error ? error.message : 'Failed to switch to mainnet';
+    } finally {
+      isSwitchingChain = false;
+    }
+  }
+
+  async function sendTransactionAfterChainSwitch(tx: TestTransaction) {
+    if (!account?.address) return;
+
+    isTxPending = true;
+    activeTxId = tx.id;
+    try {
+      const hash = await sendTransaction(config, {
+        to: tx.contractAddress,
+        data: tx.calldata,
+        value: tx.value ? parseEther(tx.value) : undefined,
+      });
+      transactionHashes[tx.id] = hash;
+    } catch (error) {
+      console.error('Transaction failed:', error);
+    } finally {
+      isTxPending = false;
+      activeTxId = null;
+    }
+  }
+
   async function handleConnect(connector: Connector) {
     isConnecting = true;
     connectError = '';
@@ -101,6 +161,12 @@
 
   async function handleSendTransaction(tx: TestTransaction) {
     if (!account?.address) return;
+
+    // Check if user is on chain ID 1 (Ethereum mainnet)
+    if (account.chainId !== undefined && account.chainId !== mainnet.id) {
+      openChainSwitchModal(tx);
+      return;
+    }
 
     isTxPending = true;
     activeTxId = tx.id;
@@ -625,6 +691,66 @@ Issued At: ${new Date().toISOString()}`;
         {#if connectError}
             <p class="error" role="alert">{connectError}</p>
         {/if}
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if isChainSwitchModalOpen}
+    <div
+      class="modal-backdrop"
+      role="button"
+      tabindex="0"
+      onclick={(event) => {
+        if (event.target === event.currentTarget) {
+          closeChainSwitchModal();
+        }
+      }}
+      onkeydown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          closeChainSwitchModal();
+        }
+      }}
+    >
+      <div class="modal" data-card="radius-8 padding-5">
+        <h3>Switch to Ethereum Mainnet</h3>
+
+        <div class="body-text" data-column="gap-2">
+          <p>
+            You are currently on chain ID <strong>{account?.chainId ?? 'unknown'}</strong>.
+            These test transactions require Ethereum mainnet (chain ID 1).
+          </p>
+          <p>
+            Would you like to switch to mainnet?
+          </p>
+        </div>
+
+        <div class="modal-footer" data-row="gap-2 end wrap">
+          <button
+            type="button"
+            class="secondary-button"
+            onclick={closeChainSwitchModal}
+            disabled={isSwitchingChain}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            data-pressable
+            onclick={handleSwitchChain}
+            disabled={isSwitchingChain}
+          >
+            {#if isSwitchingChain}
+              Switching…
+            {:else}
+              Switch to Mainnet
+            {/if}
+          </button>
+
+          {#if chainSwitchError}
+            <p class="error" role="alert">{chainSwitchError}</p>
+          {/if}
         </div>
       </div>
     </div>
