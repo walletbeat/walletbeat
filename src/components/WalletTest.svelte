@@ -191,8 +191,10 @@ Issued At: ${new Date().toISOString()}`;
         transactionState.batchIds[tx.id] = result.id;
 
         if ('hash' in result && typeof result.hash === 'string') {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're just asserting the has as `0x{string}`
           transactionState.hashes[tx.id] = result.hash as `0x${string}`;
         } else {
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're just asserting the has as `0x{string}`
           transactionState.hashes[tx.id] = result.id as `0x${string}`;
         }
       } else {
@@ -260,6 +262,12 @@ Issued At: ${new Date().toISOString()}`;
     signatureState.error = '';
 
     try {
+      if (!sig.types || !sig.messageData) {
+        signatureState.error = 'Missing types or messageData for typed data signature';
+
+        return;
+      }
+
       const result = await signTypedData(config, {
         domain: sig.domain,
         types: sig.types,
@@ -326,13 +334,13 @@ Issued At: ${new Date().toISOString()}`;
 
   <!-- Tab Selector -->
   <div class="tab-selector" data-row="gap-2">
-    {#each ['transactions', 'signatures'] as tab}
+    {#each ['transactions', 'signatures'] as tab (tab)}
       <button
         type="button"
         class="tab-button"
         class:active={uiState.activeTab === tab}
         onclick={() => {
-          uiState.activeTab = tab as typeof uiState.activeTab;
+          uiState.activeTab = tab === 'transactions' ? 'transactions' : 'signatures';
 
           if (tab === 'transactions' && !uiState.selectedTxId && testTransactions.length) {
             uiState.selectedTxId = testTransactions[0].id;
