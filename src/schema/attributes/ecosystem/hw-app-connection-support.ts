@@ -377,14 +377,14 @@ limiting its utility.
 			const hasClosedSource =
 				appSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
 
+			if (!permissionless) {
+				// New applications need manufacturer permission to integrate, regardless of the manufacturer's own integration work.
+				return restrictedAppConnectionSupport(appSupport)
+			}
+
 			if (hasClosedSource) {
-				if (!permissionless) {
-					// Has closed-source app but requires manufacturer consent
-					return restrictedAppConnectionSupport(appSupport)
-				} else {
-					// Has closed-source app but is permissionless
-					return unverifiableAppConnectionSupport()
-				}
+				// Has closed-source manufacturer app but is permissionless.
+				return unverifiableAppConnectionSupport()
 			}
 
 			// Should not reach here if feature data is correct, but handle gracefully
