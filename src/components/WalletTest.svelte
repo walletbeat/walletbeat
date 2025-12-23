@@ -68,6 +68,7 @@
 
     // Set default selections
     if (testTransactions.length > 0) uiState.selectedTxId = testTransactions[0].id;
+
     if (testSignatures.length > 0) uiState.selectedSigId = testSignatures[0].id;
 
     return unwatch;
@@ -76,8 +77,10 @@
   // Helper functions
   function updateSIWEMessage() {
     const siweSig = testSignatures.find((s) => s.id === 'siwe-1');
+
     if (siweSig?.type === 'message') {
       const address = account?.address || '0x0000000000000000000000000000000000000000';
+
       siweSig.message = `https://beta.walletbeat.eth.limo/ wants you to sign in with your Ethereum account:
 ${address}
 
@@ -96,6 +99,7 @@ Issued At: ${new Date().toISOString()}`;
       try {
         const num = BigInt(value);
         const ether = Number(num) / 1e18;
+
         if (ether >= 0.0001) {
           return `${value} (${ether.toFixed(4)} ETH)`;
         }
@@ -103,6 +107,7 @@ Issued At: ${new Date().toISOString()}`;
         // If parsing fails, just return the value
       }
     }
+
     return value;
   }
 
@@ -114,18 +119,23 @@ Issued At: ${new Date().toISOString()}`;
   function openConnectorModal() {
     if (!connectors.length) {
       connectionState.error = 'No wallet connector available';
+
       return;
     }
+
     if (connectors.length === 1) {
       void handleConnect(connectors[0]);
+
       return;
     }
+
     connectionState.isModalOpen = true;
   }
 
   async function handleConnect(connector: Connector) {
     connectionState.isConnecting = true;
     connectionState.error = '';
+
     try {
       await connect(config, { connector });
       account = getAccount(config);
@@ -155,6 +165,7 @@ Issued At: ${new Date().toISOString()}`;
       await new Promise((resolve) => setTimeout(resolve, 500));
       account = getAccount(config);
       const tx = chainState.pendingTransaction;
+
       chainState.isModalOpen = false;
       chainState.pendingTransaction = null;
       await sendTransactionInternal(tx);
@@ -176,6 +187,7 @@ Issued At: ${new Date().toISOString()}`;
     try {
       if (tx.calls && tx.calls.length > 0) {
         const result = await sendCalls(config, { calls: tx.calls });
+
         transactionState.batchIds[tx.id] = result.id;
 
         if ('hash' in result && typeof result.hash === 'string') {
@@ -186,6 +198,7 @@ Issued At: ${new Date().toISOString()}`;
       } else {
         if (!tx.contractAddress) {
           transactionState.error = 'Contract address is required for this transaction';
+
           return;
         }
 
@@ -210,6 +223,7 @@ Issued At: ${new Date().toISOString()}`;
 
     if (account.chainId !== undefined && account.chainId !== mainnet.id) {
       openChainSwitchModal(tx);
+
       return;
     }
 
@@ -226,6 +240,7 @@ Issued At: ${new Date().toISOString()}`;
 
     try {
       const result = await signMessage(config, { message: sig.message });
+
       signatureState.results[sig.id] = result;
     } catch (error) {
       signatureState.error = error instanceof Error ? error.message : 'Signing failed';
@@ -251,6 +266,7 @@ Issued At: ${new Date().toISOString()}`;
         primaryType: sig.primaryType,
         message: sig.messageData,
       });
+
       signatureState.results[sig.id] = result;
     } catch (error) {
       signatureState.error = error instanceof Error ? error.message : 'Typed data signing failed';
@@ -317,6 +333,7 @@ Issued At: ${new Date().toISOString()}`;
         class:active={uiState.activeTab === tab}
         onclick={() => {
           uiState.activeTab = tab as typeof uiState.activeTab;
+
           if (tab === 'transactions' && !uiState.selectedTxId && testTransactions.length) {
             uiState.selectedTxId = testTransactions[0].id;
           } else if (tab === 'signatures' && !uiState.selectedSigId && testSignatures.length) {
