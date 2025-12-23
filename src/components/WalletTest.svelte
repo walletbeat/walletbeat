@@ -640,25 +640,23 @@ Issued At: ${new Date().toISOString()}`;
     title="Select a wallet"
     onClose={() => (connectionState.isModalOpen = false)}
   >
-    {#snippet children()}
-      {#if connectors.length}
-        <div class="connector-list" data-column="gap-2">
-          {#each connectors as connector}
-            <button
-              type="button"
-              class="connector-button"
-              data-pressable
-              onclick={() => handleConnect(connector)}
-              disabled={connectionState.isConnecting}
-            >
-              <span class="connector-name">{connector.name}</span>
-            </button>
-          {/each}
-        </div>
-      {:else}
-        <p class="body-text">No wallet connectors available in this environment.</p>
-      {/if}
-    {/snippet}
+    {#if connectors.length}
+      <div class="connector-list" data-column="gap-2">
+        {#each connectors as connector (connector.uid)}
+          <button
+            type="button"
+            class="connector-button"
+            data-pressable
+            onclick={() => handleConnect(connector)}
+            disabled={connectionState.isConnecting}
+          >
+            <span class="connector-name">{connector.name}</span>
+          </button>
+        {/each}
+      </div>
+    {:else}
+      <p class="body-text">No wallet connectors available in this environment.</p>
+    {/if}
     {#snippet footer()}
       <button
         type="button"
@@ -681,15 +679,13 @@ Issued At: ${new Date().toISOString()}`;
       chainState.error = '';
     }}
   >
-    {#snippet children()}
-      <div class="body-text" data-column="gap-2">
-        <p>
-          You are currently on chain ID <strong>{account?.chainId ?? 'unknown'}</strong>.
-          These test transactions require Ethereum mainnet (chain ID 1).
-        </p>
-        <p>Would you like to switch to mainnet?</p>
-      </div>
-    {/snippet}
+    <div class="body-text" data-column="gap-2">
+      <p>
+        You are currently on chain ID <strong>{account?.chainId ?? 'unknown'}</strong>.
+        These test transactions require Ethereum mainnet (chain ID 1).
+      </p>
+      <p>Would you like to switch to mainnet?</p>
+    </div>
     {#snippet footer()}
       <button
         type="button"
