@@ -160,7 +160,7 @@ export interface WalletUrls {
 	/** Other relevant URL(s), if any. */
 	others?: LabeledUrl[]
 }
-export interface SocialUrls {
+export interface SocialUrls extends Record<string, Url | undefined> {
 	/** X (formerly Twitter) URL, if available. */
 	x?: DomainUrl<'x.com'>
 	/** LinkedIn URL, if available. */

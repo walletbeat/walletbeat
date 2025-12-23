@@ -32,6 +32,7 @@ async function codebaseBannedExpressionIndex(): Promise<Map<string, Set<string>>
 
 			const urls: { start: number; end: number }[] = []
 			let matchUrl
+
 			while ((matchUrl = urlRegex.exec(fileContents)) !== null) {
 				urls.push({ start: matchUrl.index, end: matchUrl.index + matchUrl[0].length })
 			}
@@ -43,6 +44,7 @@ async function codebaseBannedExpressionIndex(): Promise<Map<string, Set<string>>
 			for (const bannedExpr of bannedExpressions) {
 				const regexp = new RegExp(bannedExpr.regexp, 'gi')
 				let match
+
 				while ((match = regexp.exec(fileContents)) !== null) {
 					if (!isInsideUrl(match.index)) {
 						matched.add(bannedExpr.name)

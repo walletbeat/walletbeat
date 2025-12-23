@@ -94,15 +94,15 @@ Verify that you can see both your Ether balance and your USDC balance in the wal
 
 Do **not** populate the `etherBalanceLookup` and `erc20BalanceLookup` features yet; it is possible that the wallet may have cached your balance if you imported the account without using the custom JSON-RPC endpoint.
 
-### Step 8: Send yourself an ERC-20 token
+### Step 8: Send an ERC-20 token to another of your addresses
 
-Create a transaction that sends an ERC-20 token to your own address. It is acceptable if wallets show warnings or errors for some of their usual features, such as estimating the _fiat_ cost of gas or of the ERC-20 token being sent, or that they cannot simulate the transaction's effect. What you are looking for is whether the wallet lets you do the actual token send operation at all.
+Create a transaction that sends an ERC-20 token to another **different** address that you own. It is acceptable if wallets show warnings or errors for some of their usual features, such as estimating the _fiat_ cost of gas or of the ERC-20 token being sent, or that they cannot simulate the transaction's effect. What you are looking for is whether the wallet lets you do the actual token send operation at all.
 
 Populate the `features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.erc20TokenSend` feature accordingly.
 
 ### Step 9: Check your balance again
 
-Make sure you can see your balances update after the transfer. Your Ether balance should have gone down to due having paid for gas. Wallets may cache balances (including across restarts), so this helps confirm that the balance updates. If it's unchanged, go back to step 6 and update the wallet feature data accordingly.
+Make sure you can see your balances update after the transfer. Your Ether balance should have gone down to due having paid for gas, and your USDC balance should have gone down from having sent some out. Wallets may cache balances (including across restarts), so this helps confirm that the balance updates. If it's unchanged, go back to step 6 and update the wallet feature data accordingly.
 
 Populate the `features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.etherBalanceLookup` and `features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.erc20BalanceLookup` features accordingly.
 

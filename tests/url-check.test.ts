@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { allWallets } from '@/data/wallets'
 import { hasRefs, toFullyQualified, type WithRef } from '@/schema/reference'
-import { labeledUrl, type Url } from '@/schema/url'
+import { getUrl, labeledUrl, type Url } from '@/schema/url'
 import { type CalendarDate, today } from '@/types/date'
 
 interface KnownValidUrl {
@@ -589,11 +589,20 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '1f6bf49de87f6fcdbce0d353fc7ef8681c212685',
 		retrieved: '2025-12-09',
 	},
-
 	{
 		url: 'https://support.ngrave.io/hc/en-us/articles/20045312764701-How-to-stay-safe-on-web3',
 		urlHash: '826047213cd41016cbcd483f67ee42961129f5a1',
 		retrieved: '2025-12-09',
+	},
+	{
+		url: 'https://pillarx.app',
+		urlHash: 'b24441fce1ec129e0c6385e34abdfe8d7b871818',
+		retrieved: '2025-12-17',
+	},
+	{
+		url: 'https://pillarx.app/login',
+		urlHash: 'e1c183c8cb53133e9544eca41f8893500a686961',
+		retrieved: '2025-12-17',
 	},
 	{
 		url: 'https://chromewebstore.google.com/detail/ambire-web3-wallet/ehgjhhccekdedpbkifaojjaefeohnoea',
@@ -922,7 +931,8 @@ describe('reference URLs', () => {
 						'help.ambire.com/hc/en-us',
 						'nufi.gitbook.io/',
 					]
-					const shouldSkip = DOCS_TO_SKIP.some(s => doc.toString().includes(s))
+					const shouldSkip = DOCS_TO_SKIP.some(s => getUrl(doc).includes(s))
+
 					if (shouldSkip) {
 						continue
 					}
@@ -955,7 +965,7 @@ describe('reference URLs', () => {
 						continue
 					}
 
-					const urlString = labeledUrl(social).url
+					const urlString = getUrl(social)
 					const shouldSkip = SOCIALS_TO_SKIP.some(s => urlString.includes(s))
 
 					if (shouldSkip) {

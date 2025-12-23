@@ -280,7 +280,7 @@ export const ambire: SoftwareWallet = {
 					accountCreation: featureSupported,
 					accountImport: featureSupported,
 					erc20BalanceLookup: featureSupported,
-					erc20TokenSend: notSupported, // Fails to estimate gas? "Proceed" button grayed out.
+					erc20TokenSend: featureSupported,
 					etherBalanceLookup: featureSupported,
 				},
 			}),

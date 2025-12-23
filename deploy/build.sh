@@ -44,7 +44,7 @@ while IFS= read -r line; do
 done < <(do_build)
 
 if [[ -n "$need_rebuild" ]]; then
-	export WALLETBEAT_BUILD_ATTEMPTS_LEFT="$(( "$attempts_left" - 1 ))"
+	export WALLETBEAT_BUILD_ATTEMPTS_LEFT="$(( $((attempts_left)) - 1 ))"
 	if [[ "$attempts_left" -le 1 ]]; then
 		echo "> Need to rebuild (${need_rebuild}) but ran out of rebuild attempts. Build failed." >&2
 		exit 1

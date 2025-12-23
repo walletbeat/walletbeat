@@ -6,5 +6,5 @@ Date	From	To	Amount	Purpose	ID
 2025-09-24	treasury	walletbeat_grants_staging	0.0003 ETH	Test transaction	0x5c9838717bfb675efdf468e3aefc0b4185f5ae48ea23dbfc80b78d2a0726f480
 2025-09-24	walletbeat_grants_staging	treasury	2.60534287 ETH	EF grant funds	0x7558138b0ef3439f17052f5eb02381b17d1a2cda23bcb009f6121165c801fc76
 2025-11-28	treasury	mattmatt	0.03359119515496409 ETH	Reimbursement for SafePal S1 Pro hardware wallet purchase	0xe4501e0f957f6876328539ab90e02c18b69e9b4fd12391157625bd0fe772965f
-2025-12-19	treasury	polymutex_test1	0.05 ETH	Wallet testing 0xea81f2a6afec3ecf485a118022a0996e979ef73b7b3a54ee8eb3807d19a51c92
+2025-12-19	treasury	polymutex_test1	0.05 ETH	Wallet testing	0xea81f2a6afec3ecf485a118022a0996e979ef73b7b3a54ee8eb3807d19a51c92
 2025-12-19	walletbeat_grants_staging	treasury	20.317751171631829946 ETH	EF grant funds	0x8a0fa2e9a491909f4e76258ebc700bfa25e0fd684b186e1bdd08242e5fd72b8c

@@ -7,6 +7,7 @@
 	import { AccountType } from '@/schema/features/account-support'
 	import type { Variant } from '@/schema/variants'
 	import type { RatedWallet } from '@/schema/wallet'
+	import { Rating } from '@/schema/attributes'
 
 	const WalletTypeFor7702 = {
 		EIP7702: 'EIP7702',
@@ -179,7 +180,7 @@
 				{
 					id: 'batching',
 					name: 'Batching',
-					value: () => 'Coming soon',
+					value: wallet => wallet.overall.ecosystem.transactionBatching?.evaluation?.value?.rating ?? undefined,
 				},
 			]}
 		>
@@ -320,9 +321,15 @@
 					{/if}
 
 				{:else if column.id === 'batching'}
-					<!-- {@const contract = getWalletContract(wallet)} -->
+					{@const batchingRating = wallet.overall.ecosystem.transactionBatching?.evaluation?.value?.rating}
 
-					<span class="muted-text">Coming soon</span>
+					{#if batchingRating === Rating.PASS}
+						✅
+					{:else if batchingRating === Rating.FAIL}
+						❌
+					{:else}
+						<span class="muted-text">–</span>
+					{/if}
 
 				{:else}
 					{value}

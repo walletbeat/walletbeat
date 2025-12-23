@@ -74,6 +74,9 @@ importers:
       blumen:
         specifier: ^0.16.5
         version: 0.16.5
+      cross-env:
+        specifier: ^10.1.0
+        version: 10.1.0
       cspell:
         specifier: ^8.19.4
         version: 8.19.4
@@ -979,6 +982,12 @@ packages:
     resolution:
       {
         integrity: sha512-obtUmAHTMjll499P+D9A3axeJFlhdjOWdKUNs/U6QIGT7V5RjcUW1xToAzjvmgTSQhDbYn/NwfTRoJcQ2rNBxA==,
+      }
+
+  '@epic-web/invariant@1.0.0':
+    resolution:
+      {
+        integrity: sha512-lrTPqgvfFQtR/eY/qkIzp98OGdNJu0m5ji3q/nJI8v3SXkRKEnWiOxMmbvcSoAIzv/cGiuvRy57k4suKQSAdwA==,
       }
 
   '@esbuild/aix-ppc64@0.21.5':
@@ -3961,6 +3970,14 @@ packages:
       {
         integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==,
       }
+
+  cross-env@10.1.0:
+    resolution:
+      {
+        integrity: sha512-GsYosgnACZTADcmEyJctkJIoqAhHjttw7RsFrVoJNXbsWWqaq6Ym+7kZjq6mS45O0jij6vtiReppKQEtqWy6Dw==,
+      }
+    engines: { node: '>=20' }
+    hasBin: true
 
   cross-spawn@7.0.6:
     resolution:
@@ -10230,6 +10247,8 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
+  '@epic-web/invariant@1.0.0': {}
+
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
 
@@ -12166,6 +12185,11 @@ snapshots:
   core-util-is@1.0.3: {}
 
   create-require@1.1.1: {}
+
+  cross-env@10.1.0:
+    dependencies:
+      '@epic-web/invariant': 1.0.0
+      cross-spawn: 7.0.6
 
   cross-spawn@7.0.6:
     dependencies:

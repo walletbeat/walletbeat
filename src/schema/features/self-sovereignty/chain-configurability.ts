@@ -64,6 +64,7 @@ export interface SelfHostedNodeL1BasicOperationsSupport {
 		 * Can you send an ERC-20 token to another address?
 		 * Requiring the user to input the ERC-20 contract address is OK,
 		 * the token does not need to be automatically discovered.
+		 * Must be able to send to a different address than your own.
 		 */
 		erc20TokenSend: Support
 	}
