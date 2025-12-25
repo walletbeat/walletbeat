@@ -15,7 +15,10 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
-import { displaysFullCallData } from '@/schema/features/security/transaction-legibility'
+import {
+	displaysFullCallData,
+	TransactionDisplayOptions,
+} from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
@@ -432,7 +435,14 @@ export const metamask: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,
-				transactionDetailsDisplay: null,
+				transactionDetailsDisplay: {
+					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: TransactionDisplayOptions.SHOWN_OPTIONALLY,
+					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+				},
 			},
 		},
 		selfSovereignty: {
