@@ -11,8 +11,8 @@ if [[ -z "${DEPLOY_DIRECTORY:-}" ]]; then
 	echo 'Missing DEPLOY_DIRECTORY' >&2
 	exit 1
 fi
-if [[ -z "${BLUMEN_PK:-}" ]]; then
-	echo 'Missing BLUMEN_PK' >&2
+if [[ -z "${OMNIPIN_PK:-}" ]]; then
+	echo 'Missing OMNIPIN_PK' >&2
 	exit 1
 fi
 

@@ -183,7 +183,9 @@ _Note: EarthFast graciously hosts a copy of Walletbeat at `walletbeat.earthfast.
   - Relies on non-standard solutions, i.e. not using IPFS for hosting, and not using ENS records or ERC-5219 for onchain CID storage.
   - EarthFast is currently the closest practical solution to making end-to-end integrity verification happen, but important compromises remain.
 
-### Blumen
+### Omnipin _(formerly: Blumen)_
+
+_Update 2025-12: Blumen is now [Omnipin](https://omnipin.eth.link/). The text below references the Blumen tool, but all of its functionality exists in Omnipin._
 
 Unlike the other solutions on this list, [Blumen](https://blumen.stauro.dev/) is a self-custodial tool _(not a service)_ to deploy a static site to decentralized storage. It is the most "DYI" of the other approaches, as it requires the user to provide or pay for their own IPFS storage providers separately. The tool supports several large IPFS providers such as Pinata, Filebase, and Storacha. This avoids being locked into any particular IPFS provider and provides more flexibility, but also requires extra setup work relative to the other options.
 
@@ -261,15 +263,15 @@ Overall, Quilibrium offers a promising solution for decentralized hosting, thoug
 | **Fleek**      | ✅          | ✅             | ✅ / 🙁        | ✅ / 🚧        | ✅              | ✅             |                                     |
 | **Orbiter**    | ✅          | ✅             | ✅             | ✅ / 🚧        | ✅              | ✅             | Open-source (GPL) components        |
 | **Earthfast**  | ❌ / ⏳     | ❌             | ✅             | ✅ / 🙁        | ✅              | ✅             | Client-side integrity verification  |
-| **Blumen**     | ✅ / ✨     | ✅             | ✅             | ✅ / 🚧        | ✅ / 🚧         | ✅             | Multi-provider tool, incl. non-IPFS |
+| **Omnipin**    | ✅ / ✨     | ✅             | ✅             | ✅ / 🚧        | ✅ / 🚧         | ✅             | Multi-provider tool, incl. non-IPFS |
 | **Quilibrium** | ✅          | ❌ / ⏳        | ✅             | ✅             | ✅              | ✅ / ✨        | More crypto-native stack            |
 | **Edgeserver** | ✅          | Needs research | Needs research | Needs research | Needs research  | Needs research |                                     |
 
-The two leading options here are Orbiter and Blumen. Both of them tick all of the boxes, although Blumen requires more upfront work due to the need for separately look for one or more IPFS providers. Note that both of these options require a BYO approach for the IPFS gateway, as Blumen does not have a gateway (since it is not a service) and Orbiter's gateway is tied to Orbiter accounts which are controlled by email addresses. Therefore, the main differences between these two options comes down to pricing and to maintenance work (which is also a cost). Additionally, the use of an external IPFS gateway in both options means that the choice between these two options will not impact the URL of the site.
+The two leading options here are Orbiter and Omnipin. Both of them tick all of the boxes, although Omnipin requires more upfront work due to the need for separately look for one or more IPFS providers. Note that both of these options require a BYO approach for the IPFS gateway, as Omnipin does not have a gateway (since it is not a service) and Orbiter's gateway is tied to Orbiter accounts which are controlled by email addresses. Therefore, the main differences between these two options comes down to pricing and to maintenance work (which is also a cost). Additionally, the use of an external IPFS gateway in both options means that the choice between these two options will not impact the URL of the site.
 
 ## Conclusion
 
-The above table suggests using a combination of **Orbiter as an IPFS provider** (even though we would not use any of its other features), then **Blumen for updating the ENS records**.
+The above table suggests using a combination of **Orbiter as an IPFS provider** (even though we would not use any of its other features), then **Omnipin for updating the ENS records**.
 
 We can continue relying on the [`.eth.limo` IPFS gateway](https://eth.limo/) as the canonical HTTP URL. Traffic to Walletbeat should be similar or lower in volume than traffic to `vitalik.eth.limo`, so this should not overwhelm the gateway's capacity.
 
@@ -277,15 +279,15 @@ This means Walletbeat's canonical HTTP URL will be `https://walletbeat.eth.limo`
 
 ## Alternatives considered
 
-### Just use Blumen with one of its supported IPFS providers
+### Just use Omnipin with one of its supported IPFS providers
 
-This would also be a good option that simplifies the number of tools required for deployment. It may also bring down costs, as Orbiter uses downstream IPFS providers that Blumen could deploy to directly.
+This would also be a good option that simplifies the number of tools required for deployment. It may also bring down costs, as Orbiter uses downstream IPFS providers that Omnipin could deploy to directly.
 
-However, Orbiter may eventually change its account system and/or integrate Blumen's missing features, which would tip the scales in favor of using it entirely.
+However, Orbiter may eventually change its account system and/or integrate Omnipin's missing features, which would tip the scales in favor of using it entirely.
 
 In the meantime, Walletbeat is happy to support Orbiter as a business, as their stack is fully open-source and they are doing great work to make decentralized hosting easy for other projects with related but different needs than Walletbeat.
 
-### Just use Orbiter and stop using Blumen
+### Just use Orbiter and stop using Omnipin
 
 Not an option until Orbiter changes its account system to avoid potential takeover by a single human.
-Additionally, Blumen already supports unique features such as Swarm deployment and plans to support ERC-5219 deployments, making it a great option to add additional deployment mechanism that other projects can use as inspiration for setting up their own decentralized hosting deployment pipeline.
+Additionally, Omnipin already supports unique features such as Swarm deployment and plans to support ERC-5219 deployments, making it a great option to add additional deployment mechanism that other projects can use as inspiration for setting up their own decentralized hosting deployment pipeline.

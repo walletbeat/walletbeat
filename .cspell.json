@@ -85,6 +85,7 @@
 		"exportability",
 		"Farcaster",
 		"Filebase",
+		"Filecoin",
 		"Fleek",
 		"Fluidkey",
 		"fontsource",
@@ -314,5 +315,7 @@
 		"src/legacy/**",
 		"src/generated/**",
 		"pnpm-lock.yaml"
-	]
+	],
+	"patterns": [{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" }],
+	"ignoreRegExpList": ["CIDv1"]
 }

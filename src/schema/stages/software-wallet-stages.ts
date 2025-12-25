@@ -204,9 +204,9 @@ export const softwareWalletStageOne: WalletStage = {
 											'{{WALLET_NAME}} does not allow users to use their own Ethereum node.',
 										),
 									}
-								case RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS:
+								case RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS:
 								// Fallthrough.
-								case RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST:
+								case RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST:
 									return {
 										rating: StageCriterionRating.PASS,
 										explanation: sentence(
@@ -392,9 +392,9 @@ const softwareWalletStageTwo: WalletStage = {
 											'{{WALLET_NAME}} does not allow users to customize non-L1 chain endpoints.',
 										),
 									}
-								case RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS:
+								case RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS:
 								// Fallthrough.
-								case RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST:
+								case RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST:
 									return {
 										rating: StageCriterionRating.PASS,
 										explanation: sentence(

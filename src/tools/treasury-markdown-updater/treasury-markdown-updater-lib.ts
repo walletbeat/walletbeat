@@ -113,6 +113,31 @@ function generateAlignedTable(headers: string[], dataRows: string[][]): string {
 	return [headerLine, separatorLine, ...bodyLines].join('\n')
 }
 
+function getAddressRowByName(name: string, rows: AddressRow[]): AddressRow {
+	for (const addressRow of rows) {
+		if (addressRow.Name === name) {
+			return addressRow
+		}
+	}
+	throw new Error(`No address with label "${name}"`)
+}
+
+function markdownAddressLink(addressRow: AddressRow, label: string, monospace: boolean): string {
+	const components = addressRow.Address.split(':')
+	const chain = components[0]
+	const addr = components[1]
+	const m = monospace ? '`' : ''
+
+	switch (chain) {
+		case 'eth':
+			return `[${m}${escapeMd(label)}${m}](https://eth.blockscout.com/address/${escapeMd(addr)})`
+		case 'fil':
+			return `[${m}${escapeMd(label)}${m}](https://filscan.io/en/address/${escapeMd(addr)}/)`
+		default:
+			throw new Error(`Invalid chain "${chain}"`)
+	}
+}
+
 /**
  * Generates the Addresses Markdown Table
  */
@@ -121,15 +146,9 @@ function generateAddressesTable(rows: AddressRow[]): string {
 
 	// Pre-process rows into final string format to calculate lengths correctly
 	const formattedRows = rows.map(row => {
-		const addrDisplay = (() => {
-			const components = row.Address.split(':')
-
-			return `[\`${escapeMd(row.Address)}\`](https://${escapeMd(components[0])}.blockscout.com/address/${escapeMd(components[1])})`
-		})()
-
 		return [
 			`\`${escapeMd(row.Name)}\``,
-			addrDisplay,
+			markdownAddressLink(row, row.Address, true),
 			escapeMd(row.Control),
 			escapeMd(row.Description),
 		]
@@ -141,21 +160,29 @@ function generateAddressesTable(rows: AddressRow[]): string {
 /**
  * Generates the Operations Markdown Table
  */
-function generateOperationsTable(rows: OperationRow[]): string {
+function generateOperationsTable(operations: OperationRow[], addresses: AddressRow[]): string {
 	const headers = ['Date', 'From', 'To', 'Amount', 'Purpose', 'Transaction ID']
 
 	// Pre-process rows into final string format
-	const formattedRows = rows.map(row => {
-		const txLink = row.ID.startsWith('0x')
-			? `[\`${row.ID.substring(0, 10)}...\`](https://eth.blockscout.com/tx/${escapeMd(row.ID)})`
-			: escapeMd(row.ID)
+	const formattedRows = operations.map(operation => {
+		const txLink = (() => {
+			if (operation.ID.startsWith('fil:')) {
+				return `[\`${operation.ID.substring(4, 14)}...\`](https://filscan.io/en/message/${escapeMd(operation.ID)}/)`
+			}
+
+			if (operation.ID.startsWith('0x')) {
+				return `[\`${operation.ID.substring(0, 10)}...\`](https://eth.blockscout.com/tx/${escapeMd(operation.ID)})`
+			}
+
+			return escapeMd(operation.ID)
+		})()
 
 		return [
-			escapeMd(row.Date),
-			`\`${escapeMd(row.From)}\``,
-			`\`${escapeMd(row.To)}\``,
-			`\`${escapeMd(row.Amount)}\``,
-			escapeMd(row.Purpose),
+			escapeMd(operation.Date),
+			`${markdownAddressLink(getAddressRowByName(operation.From, addresses), operation.From, true)}`,
+			`${markdownAddressLink(getAddressRowByName(operation.To, addresses), operation.To, true)}`,
+			`\`${escapeMd(operation.Amount)}\``,
+			escapeMd(operation.Purpose),
 			txLink,
 		]
 	})
@@ -196,7 +223,7 @@ ${generateAddressesTable(addresses)}
 
 A history of transfers, grants, and treasury operations.
 
-${generateOperationsTable(operations)}
+${generateOperationsTable(operations, addresses)}
 
 ---
 

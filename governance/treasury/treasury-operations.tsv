@@ -8,3 +8,6 @@ Date	From	To	Amount	Purpose	ID
 2025-11-28	treasury	mattmatt	0.03359119515496409 ETH	Reimbursement for SafePal S1 Pro hardware wallet purchase	0xe4501e0f957f6876328539ab90e02c18b69e9b4fd12391157625bd0fe772965f
 2025-12-19	treasury	polymutex_test1	0.05 ETH	Wallet testing	0xea81f2a6afec3ecf485a118022a0996e979ef73b7b3a54ee8eb3807d19a51c92
 2025-12-19	walletbeat_grants_staging	treasury	20.317751171631829946 ETH	EF grant funds	0x8a0fa2e9a491909f4e76258ebc700bfa25e0fd684b186e1bdd08242e5fd72b8c
+2025-12-23	treasury	eth:walletbeat_ci_worker	0.1 ETH	CI updater funds top-up	0x98a50e87a556a342ab72d37ec5b51b3a34e19fa152bcc406448b43f76ce4f48b
+2025-12-23	eth:walletbeat_ci_worker	fil:walletbeat_ci_worker	0.025 ETH → 55.18992143 FIL	Swap for FIL on Filecoin for paying for IPFS storage	0xbe03f8b26e4e9dd6fea58231901057e706414a0792803689f5a3016807be1d14
+2025-12-23	fil:walletbeat_ci_worker	fil:walletbeat_ci_worker	50 FIL → 66.729783180684043231 USDfc	FIL swap for USDfc to pay for IPFS storage	fil:bafy2bzacec6sdtatwdmqvwyktni2eb75epnoz6f3orkdb44ujloy6atsuob66

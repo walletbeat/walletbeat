@@ -55,10 +55,12 @@ function supportsSelfHostedNodeAfterRequests(
 			__brand: brand,
 		},
 		details: paragraph(`
-			{{WALLET_NAME}} lets you use a self-hosted Ethereum node, but you cannot configure this before a sensitive request is already made to an external RPC provider.
+			{{WALLET_NAME}} lets you use a self-hosted Ethereum node,
+			but you cannot configure this before the wallet contacts its default RPC provider.
 		`),
 		howToImprove: paragraph(`
-			{{WALLET_NAME}} should modify the wallet setup flow to allow the user to configure the RPC endpoint for L1 before making any requests, or should avoid making any such requests until the user can access the RPC endpoint configuration options.
+			{{WALLET_NAME}} should modify the wallet setup flow to allow the user to configure the RPC endpoint for L1 before making any requests,
+			or should avoid making any such requests until the user can access the RPC endpoint configuration options.
 		`),
 		references,
 	}
@@ -165,7 +167,7 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 		In order to qualify for this attribute, wallets must:
 
 		- Allow the user to configure the L1 RPC endpoint to a self-hosted node
-		  before any user-data-carrying request is made to that endpoint.
+		  before any request is made to that endpoint.
 		- Support basic functions (account creation/import, balance lookups,
 		  token transfers) using nothing but the self-hosted node
 			(no external services, no non-Ethereum-API calls), and whether
@@ -250,14 +252,14 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 
 		if (
 			features.chainConfigurability.l1.rpcEndpointConfiguration ===
-			RpcEndpointConfiguration.YES_BEFORE_ANY_SENSITIVE_REQUEST
+			RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST
 		) {
 			return supportsSelfHostedNode(allRefs)
 		}
 
 		if (
 			features.chainConfigurability.l1.rpcEndpointConfiguration ===
-			RpcEndpointConfiguration.YES_AFTER_OTHER_SENSITIVE_REQUESTS
+			RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
 		) {
 			return supportsSelfHostedNodeAfterRequests(allRefs)
 		}
