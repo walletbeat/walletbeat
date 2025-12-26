@@ -11,7 +11,7 @@ export interface TestTransaction {
 	contractAddress?: `0x${string}`
 	description?: string
 	requirements?: string[]
-	value?: string
+	value?: bigint
 	// For multi-call transactions (EIP-7702)
 	calls?: Array<{
 		to: `0x${string}`

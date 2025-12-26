@@ -12,7 +12,6 @@
     type Connector,
   } from '@wagmi/core';
   import { mainnet } from '@wagmi/core/chains';
-  import { parseEther } from 'viem';
   import config from '../lib/wagmi-config';
   import { testSignatures, testTransactions } from '../constants/test-transactions-signatures';
   import type { TestTransaction, TestSignature } from '../constants/test-transactions-signatures';
@@ -207,7 +206,7 @@ Issued At: ${new Date().toISOString()}`;
         const hash = await sendTransaction(config, {
           to: tx.contractAddress,
           data: tx.calldata,
-          value: tx.value ? parseEther(tx.value) : undefined,
+          value: tx.value ? tx.value : undefined,
         });
 
         transactionState.hashes[tx.id] = hash;
