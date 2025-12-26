@@ -131,38 +131,44 @@ export const testTransactions: TestTransaction[] = [
 	{
 		id: 'multicall-1',
 		name: 'EIP-7702 Multi-Call',
-		function: 'approve(address,uint256) + call(bytes)',
+		function: 'approve(address,uint256) + transfer(address,uint256)',
 		parameters: [
 			{
 				name: 'spender',
-				value: '0x61a55F0713BBEB34B877eC852cfe69A946fc8229',
+				value: '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
 				type: 'address',
 			},
 			{
 				name: 'amount',
-				value: '1',
+				value: '1000000',
 				type: 'uint256',
+			},
+			{
+				name: 'to',
+				value: '0x06496E706bB260Bef1656297A7eaDDF5D3E7788A',
+				type: 'address',
 			},
 		],
 		calldata:
-			'0x095ea7b300000000000000000000000061a55F0713BBEB34B877eC852cfe69A946fc82290000000000000000000000000000000000000000000000000000000000000001',
+			'0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240',
 		contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-		description: 'Batch transactions using EIP-7702 (EIP-5792 sendCalls)',
+		description:
+			'Batch transactions using EIP-7702 (EIP-5792 sendCalls): Approve and transfer USDC',
 		requirements: [
 			'Have at least 1 USDC in your wallet',
 			'Ensure you have sufficient ETH for gas fees',
-			"Make sure you're on the correct network",
+			"Make sure you're on the correct network (Ethereum Mainnet)",
 			'Requires wallet support for EIP-5792 (wallet_sendCalls)',
 		],
 		calls: [
 			{
 				to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' as `0x${string}`,
-				data: '0x095ea7b300000000000000000000000061a55F0713BBEB34B877eC852cfe69A946fc82290000000000000000000000000000000000000000000000000000000000000001' as `0x${string}`,
+				data: '0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240' as `0x${string}`,
 				value: BigInt(0),
 			},
 			{
-				to: '0x61a55F0713BBEB34B877eC852cfe69A946fc8229' as `0x${string}`,
-				data: '0x5f7fb3d1' as `0x${string}`,
+				to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' as `0x${string}`,
+				data: '0xa9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a00000000000000000000000000000000000000000000000000000000000f4240' as `0x${string}`,
 				value: BigInt(0),
 			},
 		],
