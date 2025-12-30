@@ -1099,6 +1099,7 @@ Issued At: ${new Date().toISOString()}`;
   <ErrorComponent error={chainState.error} onClose={() => (chainState.error = '')} />
   <ErrorComponent error={transactionState.error} onClose={() => (transactionState.error = '')} />
   <ErrorComponent error={signatureState.error} onClose={() => (signatureState.error = '')} />
+  <ErrorComponent error={eipState.error} onClose={() => (eipState.error = '')} />
 </section>
 
 <style>
@@ -1410,5 +1411,124 @@ Issued At: ${new Date().toISOString()}`;
 
   .secondary-button {
     background-color: var(--background-secondary);
+  }
+
+  .spec-link {
+    background: transparent;
+    border: none;
+    color: var(--accent);
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: auto;
+  }
+
+  .spec-link:hover {
+    opacity: 0.8;
+  }
+
+  .eip-checks {
+    margin-top: 0.5rem;
+  }
+
+  .check-item {
+    padding: 0.75rem;
+    background: color-mix(in srgb, var(--background-secondary) 50%, transparent);
+    border: 1px solid var(--background-secondary);
+    border-radius: 0.5rem;
+  }
+
+  .check-status {
+    font-size: 1.2rem;
+    font-weight: bold;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .check-status.status-pass {
+    color: var(--rating-pass);
+    background: color-mix(in srgb, var(--rating-pass) 20%, transparent);
+  }
+
+  .check-status.status-fail {
+    color: var(--rating-fail);
+    background: color-mix(in srgb, var(--rating-fail) 20%, transparent);
+  }
+
+  .check-status.status-partial {
+    color: var(--rating-partial);
+    background: color-mix(in srgb, var(--rating-partial) 20%, transparent);
+  }
+
+  .check-status.status-untested {
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--background-secondary) 50%, transparent);
+  }
+
+  .check-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .check-description {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .critical-badge {
+    font-size: 0.65rem;
+    padding: 0.125rem 0.375rem;
+    background: color-mix(in srgb, var(--rating-fail) 20%, transparent);
+    color: var(--rating-fail);
+    border-radius: 0.25rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .providers-list {
+    margin-top: 0.5rem;
+  }
+
+  .provider-item {
+    padding: 0.75rem;
+    background: color-mix(in srgb, var(--background-secondary) 50%, transparent);
+    border: 1px solid var(--background-secondary);
+    border-radius: 0.5rem;
+  }
+
+  .provider-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.25rem;
+  }
+
+  .provider-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .provider-rdns {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
+  }
+
+  .provider-uuid {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
   }
 </style>
