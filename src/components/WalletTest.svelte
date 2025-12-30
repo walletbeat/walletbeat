@@ -18,9 +18,11 @@
   import { eipTests } from '../constants/test-eip-support';
   import type { EIPTest, EIPTestStatus } from '../constants/test-eip-support';
 
-  import Modal from './Modal.svelte';
   import ErrorComponent from './ErrorComponent.svelte';
-	import SideBarItem from './SideBarItem.svelte'
+  import SideBarItem from './SideBarItem.svelte';
+  import ConnectorModal from './Modals/ConnectorModal.svelte';
+  import ChainSwitchModal from './Modals/ChainSwitchModal.svelte';
+  import EIPResultsModal from './Modals/EIPResultsModal.svelte';
 
   type Account = ReturnType<typeof getAccount>;
 
@@ -1131,79 +1133,26 @@ Issued At: ${new Date().toISOString()}`;
   </div>
 
   <!-- Connector Modal -->
-  <Modal
+  <ConnectorModal
     isOpen={connectionState.isModalOpen}
-    title="Select a wallet"
+    {connectors}
+    isConnecting={connectionState.isConnecting}
     onClose={() => (connectionState.isModalOpen = false)}
-  >
-    {#if connectors.length}
-      <div class="connector-list" data-column="gap-2">
-        {#each connectors as connector (connector.uid)}
-          <button
-            type="button"
-            class="connector-button"
-            data-pressable
-            onclick={() => handleConnect(connector)}
-            disabled={connectionState.isConnecting}
-          >
-            <span class="connector-name">{connector.name}</span>
-          </button>
-        {/each}
-      </div>
-    {:else}
-      <p class="body-text">No wallet connectors available in this environment.</p>
-    {/if}
-    {#snippet footer()}
-      <button
-        type="button"
-        class="secondary-button"
-        onclick={() => (connectionState.isModalOpen = false)}
-        disabled={connectionState.isConnecting}
-      >
-        Close
-      </button>
-    {/snippet}
-  </Modal>
+    onConnect={handleConnect}
+  />
 
   <!-- Chain Switch Modal -->
-  <Modal
+  <ChainSwitchModal
     isOpen={chainState.isModalOpen}
-    title="Switch to Ethereum Mainnet"
+    isSwitching={chainState.isSwitching}
+    currentChainId={account?.chainId}
     onClose={() => {
       chainState.isModalOpen = false;
       chainState.pendingTransaction = null;
       chainState.error = '';
     }}
-  >
-    <div class="body-text" data-column="gap-2">
-      <p>
-        You are currently on chain ID <strong>{account?.chainId ?? 'unknown'}</strong>.
-        These test transactions require Ethereum mainnet (chain ID 1).
-      </p>
-      <p>Would you like to switch to mainnet?</p>
-    </div>
-    {#snippet footer()}
-      <button
-        type="button"
-        class="secondary-button"
-        onclick={() => {
-          chainState.isModalOpen = false;
-          chainState.pendingTransaction = null;
-        }}
-        disabled={chainState.isSwitching}
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        data-pressable
-        onclick={handleSwitchChain}
-        disabled={chainState.isSwitching}
-      >
-        {chainState.isSwitching ? 'Switching…' : 'Switch to Mainnet'}
-      </button>
-    {/snippet}
-  </Modal>
+    onSwitch={handleSwitchChain}
+  />
 
   <!-- Error Components -->
   <ErrorComponent error={connectionState.error} onClose={() => (connectionState.error = '')} />
@@ -1213,54 +1162,12 @@ Issued At: ${new Date().toISOString()}`;
   <ErrorComponent error={eipState.error} onClose={() => (eipState.error = '')} />
 
   <!-- EIP Results Modal -->
-  <Modal
+  <EIPResultsModal
     isOpen={eipState.resultsModal.isOpen}
-    title={eipState.resultsModal.passed ? 'Test Passed ✓' : 'Test Failed ✗'}
+    passed={eipState.resultsModal.passed}
+    failedChecks={eipState.resultsModal.failedChecks}
     onClose={() => (eipState.resultsModal.isOpen = false)}
-  >
-    {#if eipState.resultsModal.passed}
-      <div class="eip-results-content" data-column="gap-3">
-        <div class="eip-success-message" data-column="gap-2">
-          <div class="eip-success-icon">✓</div>
-          <p class="eip-success-text">
-            All required compliance checks passed! This wallet fully supports the tested EIP standard.
-          </p>
-        </div>
-      </div>
-    {:else}
-      <div class="eip-results-content" data-column="gap-3">
-        <div class="eip-fail-message" data-column="gap-2">
-          <div class="eip-fail-icon">✗</div>
-          <p class="eip-fail-text">
-            Some required compliance checks failed. The wallet does not fully support this EIP standard.
-          </p>
-        </div>
-
-        {#if eipState.resultsModal.failedChecks.length > 0}
-          <div class="eip-failed-checks" data-column="gap-2">
-            <h4 class="failed-checks-title">Missing Required Features:</h4>
-            <ul class="failed-checks-list">
-              {#each eipState.resultsModal.failedChecks as check}
-                <li class="failed-check-item">
-                  <span class="failed-check-name">{check.name}</span>
-                  <span class="failed-check-description">{check.description}</span>
-                </li>
-              {/each}
-            </ul>
-          </div>
-        {/if}
-      </div>
-    {/if}
-    {#snippet footer()}
-      <button
-        type="button"
-        data-pressable
-        onclick={() => (eipState.resultsModal.isOpen = false)}
-      >
-        Close
-      </button>
-    {/snippet}
-  </Modal>
+  />
 </section>
 
 <style>
@@ -1557,23 +1464,6 @@ Issued At: ${new Date().toISOString()}`;
     min-width: 0;
   }
 
-  .connector-list {
-    margin-block: 1rem 1.5rem;
-  }
-
-  .connector-button {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .connector-name {
-    font-weight: 500;
-  }
-
-  .secondary-button {
-    background-color: var(--background-secondary);
-  }
-
   .spec-link {
     background: transparent;
     border: none;
@@ -1691,89 +1581,5 @@ Issued At: ${new Date().toISOString()}`;
     margin-top: 0.5rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
       monospace;
-  }
-
-  /* EIP Results Modal */
-  .eip-results-content {
-    margin-block: 1rem 1.5rem;
-  }
-
-  .eip-success-message {
-    align-items: center;
-    text-align: center;
-    padding: 1.5rem;
-  }
-
-  .eip-success-icon {
-    font-size: 4rem;
-    color: var(--rating-pass);
-    line-height: 1;
-  }
-
-  .eip-success-text {
-    font-size: 1rem;
-    color: var(--text-primary);
-    margin: 0;
-  }
-
-  .eip-fail-message {
-    align-items: center;
-    text-align: center;
-    padding: 1.5rem 1.5rem 1rem;
-  }
-
-  .eip-fail-icon {
-    font-size: 4rem;
-    color: var(--rating-fail);
-    line-height: 1;
-  }
-
-  .eip-fail-text {
-    font-size: 1rem;
-    color: var(--text-primary);
-    margin: 0;
-  }
-
-  .eip-failed-checks {
-    padding: 1rem;
-    background: color-mix(in srgb, var(--rating-fail) 5%, transparent);
-    border: 1px solid color-mix(in srgb, var(--rating-fail) 20%, transparent);
-    border-radius: 0.5rem;
-  }
-
-  .failed-checks-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--rating-fail);
-    margin: 0 0 0.75rem 0;
-  }
-
-  .failed-checks-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .failed-check-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.75rem;
-    background: color-mix(in srgb, var(--background-primary) 50%, transparent);
-    border-radius: 0.375rem;
-  }
-
-  .failed-check-name {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-primary);
-  }
-
-  .failed-check-description {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
   }
 </style>
