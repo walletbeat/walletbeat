@@ -352,6 +352,11 @@ Issued At: ${new Date().toISOString()}`;
     const results: Record<string, EIPTestStatus> = {};
 
     try {
+      // Check if there are multiple connectors
+      if (connectors.length > 1) {
+        throw new Error('Multiple wallets/connectors detected. Please ensure only one wallet extension is active when running EIP tests.');
+      }
+
       if (eip.id === 'eip-1193') {
         await testEIP1193(results);
       } else if (eip.id === 'eip-2700') {
