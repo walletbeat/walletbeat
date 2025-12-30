@@ -15,10 +15,11 @@
         provider: unknown;
       }>;
     };
+    account: { address?: string } | null;
     onTestEIPSupport: (eip: EIPTest) => void;
   }
 
-  let { selectedEip, eipState, onTestEIPSupport }: Props = $props();
+  let { selectedEip, eipState, account, onTestEIPSupport }: Props = $props();
 
   const isActive = $derived(selectedEip && eipState.activeId === selectedEip.id);
   const isTesting = $derived(eipState.isTesting && isActive);
@@ -112,7 +113,7 @@
         </div>
       {/if}
 
-      <button type="button" data-pressable onclick={() => onTestEIPSupport(selectedEip)} disabled={isTesting}>
+      <button type="button" data-pressable onclick={() => onTestEIPSupport(selectedEip)} disabled={!account?.address || isTesting}>
         {#if isTesting}
           Testing…
         {:else if testResults}

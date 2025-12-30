@@ -453,7 +453,6 @@ Issued At: ${new Date().toISOString()}`;
     results['supports-connect'] = typeof provider.on === 'function' ? 'pass' : 'fail';
     results['supports-disconnect'] = typeof provider.on === 'function' ? 'pass' : 'fail';
 
-    // Try eth_accounts
     try {
       if (provider.request) {
         await provider.request({ method: 'eth_accounts' });
@@ -465,8 +464,16 @@ Issued At: ${new Date().toISOString()}`;
       results['eth-accounts'] = 'fail';
     }
 
-    // Don't auto-test eth_requestAccounts as it shows a prompt
-    results['eth-requestAccounts'] = 'untested';
+    try {
+      if (provider.request) {
+        await provider.request({ method: 'eth_requestAccounts' });
+        results['eth-requestAccounts'] = 'pass';
+      } else {
+        results['eth-requestAccounts'] = 'fail';
+      }
+    } catch {
+      results['eth-requestAccounts'] = 'fail';
+    }
   }
 
   function testEIP2700(results: Record<string, EIPTestStatus>) {
@@ -806,7 +813,7 @@ Issued At: ${new Date().toISOString()}`;
         />
       {:else if uiState.activeTab === 'eip-support'}
         {@const selectedEip = eipTests.find((eip) => eip.id === uiState.selectedEipId)}
-        <EIPSupportTab {selectedEip} {eipState} onTestEIPSupport={testEIPSupport} />
+        <EIPSupportTab {selectedEip} {eipState} {account} onTestEIPSupport={testEIPSupport} />
       {/if}
     </div>
   </div>
