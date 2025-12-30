@@ -760,9 +760,24 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-12-23',
 	},
 	{
+		url: 'https://github.com/keycard-tech/keycard-shell/blob/master/LICENSE',
+		urlHash: 'e573bfe99ee01564179ee9ad658ee0bdef6b01ce',
+		retrieved: '2025-12-23',
+	},
+	{
 		url: 'https://github.com/keycard-tech/status-keycard',
 		urlHash: '6adbdbcc11f3049cc70df872ee50fac0b5035a07',
 		retrieved: '2025-12-23',
+	},
+	{
+		url: 'https://keycard.tech/en/developers/overview',
+		urlHash: '0b3be0a3fb51551da19902877ddc31390423b983',
+		retrieved: '2025-12-27',
+	},
+	{
+		url: 'https://github.com/keycard-tech/eth-abi-repo',
+		urlHash: 'f56660626b1a09693dfde026d828092fd493dcff',
+		retrieved: '2025-12-27',
 	},
 	{
 		url: 'https://x.com/Keycard_',

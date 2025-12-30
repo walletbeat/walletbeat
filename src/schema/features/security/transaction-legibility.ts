@@ -271,6 +271,22 @@ export function supportsAnyDataExtraction(dataExtractionMethods: DataExtractionM
 }
 
 /**
+ * Helper function to check if a calldata decoding is supported and ON_DEVICE
+ */
+export function isSupportedOnDevice(
+	legibility: CalldataDecodingTypes,
+	decoding: CalldataDecoding,
+): boolean {
+	const support = legibility[decoding]
+
+	if (!isSupported(support)) {
+		return false
+	}
+
+	return support.decoded === CalldataDecoded.ON_DEVICE
+}
+
+/**
  * A record of transaction legibility support (both message and transaction)
  */
 export interface HardwareTransactionLegibilitySupport {

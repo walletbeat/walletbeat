@@ -12,12 +12,12 @@ import {
 	type HardwareTransactionLegibilityImplementation,
 	isFullTransactionDetails,
 	isHardwareTransactionLegibility,
+	isSupportedOnDevice,
 	type SoftwareTransactionLegibilityImplementation,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
 	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
-import { isSupported } from '@/schema/features/support'
 import { popRefs, refs } from '@/schema/reference'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
@@ -175,19 +175,20 @@ function evaluateHardwareWalletTransactionLegibility(
 			return Rating.UNRATED
 		}
 
-		// Check if wallet supports calldata decoding for complex transactions
+		// Check if wallet supports calldata decoding for complex transactions (ON_DEVICE)
 		const supportsComplexDecoding: boolean =
 			supportsAnyCalldataDecoding(legibility) &&
-			(isSupported(
-				legibility[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND],
+			(isSupportedOnDevice(
+				legibility,
+				CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
 			) ||
-				isSupported(legibility[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]))
+				isSupportedOnDevice(legibility, CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED))
 
-		// Check if wallet supports basic calldata decoding
+		// Check if wallet supports basic calldata decoding (ON_DEVICE)
 		const supportsBasicDecoding: boolean =
-			isSupported(legibility[CalldataDecoding.ETH_USDC_TRANSFER]) &&
-			isSupported(legibility[CalldataDecoding.ZKSYNC_USDC_TRANSFER]) &&
-			isSupported(legibility[CalldataDecoding.AAVE_SUPPLY])
+			isSupportedOnDevice(legibility, CalldataDecoding.ETH_USDC_TRANSFER) &&
+			isSupportedOnDevice(legibility, CalldataDecoding.ZKSYNC_USDC_TRANSFER) &&
+			isSupportedOnDevice(legibility, CalldataDecoding.AAVE_SUPPLY)
 
 		// Check if all transaction details are displayed
 		const displaysAllDetails: boolean = isFullTransactionDetails(detailsDisplayed)
