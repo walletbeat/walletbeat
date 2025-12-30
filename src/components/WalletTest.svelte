@@ -300,10 +300,13 @@ Issued At: ${new Date().toISOString()}`;
         return;
       }
 
+       
       const result = await signTypedData(config, {
         domain: sig.domain,
+         
         types: sig.types,
         primaryType: sig.primaryType,
+         
         message: sig.messageData,
       });
 
@@ -330,6 +333,10 @@ Issued At: ${new Date().toISOString()}`;
 
     // Listen for EIP-6963 provider announcements
     window.addEventListener('eip6963:announceProvider', (event: Event) => {
+      // Type guard for CustomEvent
+      if (!('detail' in event)) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const customEvent = event as CustomEvent<{
         info: { uuid: string; name: string; icon: string; rdns: string };
         provider: unknown;
@@ -371,9 +378,9 @@ Issued At: ${new Date().toISOString()}`;
       if (eip.id === 'eip-1193') {
         await testEIP1193(results);
       } else if (eip.id === 'eip-2700') {
-        await testEIP2700(results);
+        testEIP2700(results);
       } else if (eip.id === 'eip-6963') {
-        await testEIP6963(results);
+        testEIP6963(results);
       } else if (eip.id === 'eip-5792') {
         await testEIP5792(results);
       }
@@ -418,6 +425,7 @@ Issued At: ${new Date().toISOString()}`;
   }
 
   async function testEIP1193(results: Record<string, EIPTestStatus>) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Provider type from window.ethereum is unknown, we need to assert its shape
     const provider = getProvider() as {
       request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
       on?: (event: string, listener: () => void) => void;
@@ -461,18 +469,10 @@ Issued At: ${new Date().toISOString()}`;
     results['eth-requestAccounts'] = 'untested';
   }
 
-  async function testEIP2700(results: Record<string, EIPTestStatus>) {
-    const provider = getProvider() as {
-      on?: (event: string, listener: () => void) => void;
-      removeListener?: (event: string, listener: () => void) => void;
-      addListener?: (event: string, listener: () => void) => void;
-      removeAllListeners?: (event?: string) => void;
-      listeners?: (event: string) => unknown[];
-      once?: (event: string, listener: () => void) => void;
-      emit?: (event: string, ...args: unknown[]) => boolean;
-    } | null;
+  function testEIP2700(results: Record<string, EIPTestStatus>) {
+    const rawProvider = getProvider();
 
-    if (!provider) {
+    if (!rawProvider) {
       // Mark all as fail if no provider
       results['has-on'] = 'fail';
       results['has-removeListener'] = 'fail';
@@ -485,6 +485,17 @@ Issued At: ${new Date().toISOString()}`;
 
       return;
     }
+
+    // Type assertion needed to access EventEmitter methods required by EIP-2700
+    const provider = rawProvider as {
+      on?: (event: string, listener: (...args: unknown[]) => void) => unknown;
+      removeListener?: (event: string, listener: (...args: unknown[]) => void) => unknown;
+      addListener?: (event: string, listener: (...args: unknown[]) => void) => unknown;
+      removeAllListeners?: (event?: string) => unknown;
+      listeners?: (event: string) => unknown;
+      once?: (event: string, listener: (...args: unknown[]) => void) => unknown;
+      emit?: (event: string, ...args: unknown[]) => unknown;
+    };
 
     // Check on method
     results['has-on'] = typeof provider.on === 'function' ? 'pass' : 'fail';
@@ -513,7 +524,7 @@ Issued At: ${new Date().toISOString()}`;
     results['supports-message-event'] = typeof provider.on === 'function' ? 'pass' : 'fail';
   }
 
-  async function testEIP6963(results: Record<string, EIPTestStatus>) {
+  function testEIP6963(results: Record<string, EIPTestStatus>) {
     // Check if any providers were discovered
     results['announces-provider'] =
       eipState.discoveredProviders.length > 0 ? 'pass' : 'fail';
@@ -550,6 +561,7 @@ Issued At: ${new Date().toISOString()}`;
   }
 
   async function testEIP5792(results: Record<string, EIPTestStatus>) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Provider type from window.ethereum is unknown, we need to assert its shape
     const provider = getProvider() as {
       request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
     } | null;
@@ -568,6 +580,7 @@ Issued At: ${new Date().toISOString()}`;
 
     // Test wallet_getCapabilities
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Return type of wallet_getCapabilities is unknown, we need to assert its expected shape
       const capabilities = (await provider.request({
         method: 'wallet_getCapabilities',
         params: [account?.address],

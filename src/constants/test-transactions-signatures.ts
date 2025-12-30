@@ -34,9 +34,15 @@ export interface TestSignature {
 		verifyingContract: `0x${string}`
 		salt: `0x${string}`
 	}
-	types?: any
+	types?: Record<
+		string,
+		Array<{
+			name: string
+			type: string
+		}>
+	>
 	primaryType?: string
-	messageData?: any
+	messageData?: Record<string, string | number | boolean | bigint | Record<string, unknown>>
 }
 
 export const testTransactions: TestTransaction[] = [
