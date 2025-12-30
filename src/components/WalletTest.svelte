@@ -67,6 +67,12 @@
       rdns: string;
       provider: unknown;
     }>,
+    resultsModal: {
+      isOpen: false,
+      eipId: null as string | null,
+      passed: false,
+      failedChecks: [] as Array<{ name: string; description: string }>,
+    },
   });
 
   const uiState = $state({
@@ -368,12 +374,41 @@ Issued At: ${new Date().toISOString()}`;
       }
 
       eipState.results[eip.id] = results;
+
+      // Analyze results and show modal
+      analyzeAndShowResults(eip, results);
     } catch (error) {
       eipState.error = error instanceof Error ? error.message : 'EIP testing failed';
     } finally {
       eipState.isTesting = false;
       eipState.activeId = null;
     }
+  }
+
+  function analyzeAndShowResults(eip: EIPTest, results: Record<string, EIPTestStatus>) {
+    // Find all critical (required) checks that failed
+    const failedChecks: Array<{ name: string; description: string }> = [];
+
+    for (const check of eip.checks) {
+      if (check.critical) {
+        const status = results[check.id];
+        if (status === 'fail' || status === 'untested') {
+          failedChecks.push({
+            name: check.name,
+            description: check.description,
+          });
+        }
+      }
+    }
+
+    // Test passes if all required checks passed
+    const passed = failedChecks.length === 0;
+
+    // Show results modal
+    eipState.resultsModal.eipId = eip.id;
+    eipState.resultsModal.passed = passed;
+    eipState.resultsModal.failedChecks = failedChecks;
+    eipState.resultsModal.isOpen = true;
   }
 
   async function testEIP1193(results: Record<string, EIPTestStatus>) {
@@ -1176,6 +1211,56 @@ Issued At: ${new Date().toISOString()}`;
   <ErrorComponent error={transactionState.error} onClose={() => (transactionState.error = '')} />
   <ErrorComponent error={signatureState.error} onClose={() => (signatureState.error = '')} />
   <ErrorComponent error={eipState.error} onClose={() => (eipState.error = '')} />
+
+  <!-- EIP Results Modal -->
+  <Modal
+    isOpen={eipState.resultsModal.isOpen}
+    title={eipState.resultsModal.passed ? 'Test Passed ✓' : 'Test Failed ✗'}
+    onClose={() => (eipState.resultsModal.isOpen = false)}
+  >
+    {#if eipState.resultsModal.passed}
+      <div class="eip-results-content" data-column="gap-3">
+        <div class="eip-success-message" data-column="gap-2">
+          <div class="eip-success-icon">✓</div>
+          <p class="eip-success-text">
+            All required compliance checks passed! This wallet fully supports the tested EIP standard.
+          </p>
+        </div>
+      </div>
+    {:else}
+      <div class="eip-results-content" data-column="gap-3">
+        <div class="eip-fail-message" data-column="gap-2">
+          <div class="eip-fail-icon">✗</div>
+          <p class="eip-fail-text">
+            Some required compliance checks failed. The wallet does not fully support this EIP standard.
+          </p>
+        </div>
+
+        {#if eipState.resultsModal.failedChecks.length > 0}
+          <div class="eip-failed-checks" data-column="gap-2">
+            <h4 class="failed-checks-title">Missing Required Features:</h4>
+            <ul class="failed-checks-list">
+              {#each eipState.resultsModal.failedChecks as check}
+                <li class="failed-check-item">
+                  <span class="failed-check-name">{check.name}</span>
+                  <span class="failed-check-description">{check.description}</span>
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+      </div>
+    {/if}
+    {#snippet footer()}
+      <button
+        type="button"
+        data-pressable
+        onclick={() => (eipState.resultsModal.isOpen = false)}
+      >
+        Close
+      </button>
+    {/snippet}
+  </Modal>
 </section>
 
 <style>
@@ -1606,5 +1691,89 @@ Issued At: ${new Date().toISOString()}`;
     margin-top: 0.5rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
       monospace;
+  }
+
+  /* EIP Results Modal */
+  .eip-results-content {
+    margin-block: 1rem 1.5rem;
+  }
+
+  .eip-success-message {
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .eip-success-icon {
+    font-size: 4rem;
+    color: var(--rating-pass);
+    line-height: 1;
+  }
+
+  .eip-success-text {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .eip-fail-message {
+    align-items: center;
+    text-align: center;
+    padding: 1.5rem 1.5rem 1rem;
+  }
+
+  .eip-fail-icon {
+    font-size: 4rem;
+    color: var(--rating-fail);
+    line-height: 1;
+  }
+
+  .eip-fail-text {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .eip-failed-checks {
+    padding: 1rem;
+    background: color-mix(in srgb, var(--rating-fail) 5%, transparent);
+    border: 1px solid color-mix(in srgb, var(--rating-fail) 20%, transparent);
+    border-radius: 0.5rem;
+  }
+
+  .failed-checks-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--rating-fail);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .failed-checks-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .failed-check-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: color-mix(in srgb, var(--background-primary) 50%, transparent);
+    border-radius: 0.375rem;
+  }
+
+  .failed-check-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .failed-check-description {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
   }
 </style>
