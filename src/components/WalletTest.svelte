@@ -15,10 +15,12 @@
   import config from '../lib/wagmi-config';
   import { testSignatures, testTransactions } from '../constants/test-transactions-signatures';
   import type { TestTransaction, TestSignature } from '../constants/test-transactions-signatures';
-  
+  import { eipTests } from '../constants/test-eip-support';
+  import type { EIPTest, EIPTestStatus } from '../constants/test-eip-support';
+
   import Modal from './Modal.svelte';
-  import SidebarItem from './SidebarItem.svelte';
   import ErrorComponent from './ErrorComponent.svelte';
+	import SideBarItem from "./SideBarItem.svelte"
 
   type Account = ReturnType<typeof getAccount>;
 
@@ -53,10 +55,25 @@
     error: '',
   });
 
+  const eipState = $state({
+    activeId: null as string | null,
+    isTesting: false,
+    results: {} as Record<string, Record<string, EIPTestStatus>>,
+    error: '',
+    discoveredProviders: [] as Array<{
+      uuid: string;
+      name: string;
+      icon: string;
+      rdns: string;
+      provider: unknown;
+    }>,
+  });
+
   const uiState = $state({
-    activeTab: 'transactions' as 'transactions' | 'signatures',
+    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support',
     selectedTxId: null as string | null,
     selectedSigId: null as string | null,
+    selectedEipId: null as string | null,
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -69,6 +86,11 @@
     if (testTransactions.length > 0) uiState.selectedTxId = testTransactions[0].id;
 
     if (testSignatures.length > 0) uiState.selectedSigId = testSignatures[0].id;
+
+    if (eipTests.length > 0) uiState.selectedEipId = eipTests[0].id;
+
+    // Discover EIP-6963 providers
+    discoverProviders();
 
     return unwatch;
   });
@@ -283,6 +305,236 @@ Issued At: ${new Date().toISOString()}`;
     }
   }
 
+  // EIP Support Testing
+  function getProvider() {
+    if (typeof window !== 'undefined' && 'ethereum' in window) {
+      return window.ethereum as unknown;
+    }
+
+    return null;
+  }
+
+  function discoverProviders() {
+    if (typeof window === 'undefined') return;
+
+    // Listen for EIP-6963 provider announcements
+    window.addEventListener('eip6963:announceProvider', (event: Event) => {
+      const customEvent = event as CustomEvent<{
+        info: { uuid: string; name: string; icon: string; rdns: string };
+        provider: unknown;
+      }>;
+
+      const { info, provider } = customEvent.detail;
+
+      // Check if we already have this provider
+      const exists = eipState.discoveredProviders.some((p) => p.uuid === info.uuid);
+
+      if (!exists) {
+        eipState.discoveredProviders.push({
+          uuid: info.uuid,
+          name: info.name,
+          icon: info.icon,
+          rdns: info.rdns,
+          provider,
+        });
+      }
+    });
+
+    // Request providers to announce themselves
+    window.dispatchEvent(new Event('eip6963:requestProvider'));
+  }
+
+  async function testEIPSupport(eip: EIPTest) {
+    eipState.isTesting = true;
+    eipState.activeId = eip.id;
+    eipState.error = '';
+
+    const results: Record<string, EIPTestStatus> = {};
+
+    try {
+      if (eip.id === 'eip-1193') {
+        await testEIP1193(results);
+      } else if (eip.id === 'eip-6963') {
+        await testEIP6963(results);
+      } else if (eip.id === 'eip-5792') {
+        await testEIP5792(results);
+      }
+
+      eipState.results[eip.id] = results;
+    } catch (error) {
+      eipState.error = error instanceof Error ? error.message : 'EIP testing failed';
+    } finally {
+      eipState.isTesting = false;
+      eipState.activeId = null;
+    }
+  }
+
+  async function testEIP1193(results: Record<string, EIPTestStatus>) {
+    const provider = getProvider() as {
+      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+      on?: (event: string, listener: () => void) => void;
+      removeListener?: (event: string, listener: () => void) => void;
+    } | null;
+
+    // Check provider existence
+    results['has-provider'] = provider ? 'pass' : 'fail';
+
+    if (!provider) return;
+
+    // Check request method
+    results['has-request'] = typeof provider.request === 'function' ? 'pass' : 'fail';
+
+    // Check on method
+    results['has-on'] = typeof provider.on === 'function' ? 'pass' : 'fail';
+
+    // Check removeListener method
+    results['has-removeListener'] =
+      typeof provider.removeListener === 'function' ? 'pass' : 'fail';
+
+    // Check event support (we can only check if the methods exist, not if events actually fire)
+    results['supports-accountsChanged'] = typeof provider.on === 'function' ? 'pass' : 'fail';
+    results['supports-chainChanged'] = typeof provider.on === 'function' ? 'pass' : 'fail';
+    results['supports-connect'] = typeof provider.on === 'function' ? 'pass' : 'fail';
+    results['supports-disconnect'] = typeof provider.on === 'function' ? 'pass' : 'fail';
+
+    // Try eth_accounts
+    try {
+      if (provider.request) {
+        await provider.request({ method: 'eth_accounts' });
+        results['eth-accounts'] = 'pass';
+      } else {
+        results['eth-accounts'] = 'fail';
+      }
+    } catch {
+      results['eth-accounts'] = 'fail';
+    }
+
+    // Don't auto-test eth_requestAccounts as it shows a prompt
+    results['eth-requestAccounts'] = 'untested';
+  }
+
+  async function testEIP6963(results: Record<string, EIPTestStatus>) {
+    // Check if any providers were discovered
+    results['announces-provider'] =
+      eipState.discoveredProviders.length > 0 ? 'pass' : 'fail';
+    results['responds-to-request'] =
+      eipState.discoveredProviders.length > 0 ? 'pass' : 'fail';
+
+    if (eipState.discoveredProviders.length > 0) {
+      const provider = eipState.discoveredProviders[0];
+
+      // Check provider info
+      results['has-provider-info'] =
+        provider.name && provider.uuid && provider.rdns ? 'pass' : 'fail';
+
+      // Check UUID
+      results['unique-uuid'] = provider.uuid && provider.uuid.length > 0 ? 'pass' : 'fail';
+
+      // Check icon
+      results['valid-icon'] =
+        provider.icon &&
+        (provider.icon.startsWith('data:') || provider.icon.startsWith('https://'))
+          ? 'pass'
+          : 'fail';
+
+      // Check RDNS format (should be reverse domain name like com.example.wallet)
+      const rdnsRegex = /^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$/i;
+
+      results['rdns-format'] = rdnsRegex.test(provider.rdns) ? 'pass' : 'fail';
+    } else {
+      results['has-provider-info'] = 'fail';
+      results['unique-uuid'] = 'fail';
+      results['valid-icon'] = 'fail';
+      results['rdns-format'] = 'fail';
+    }
+  }
+
+  async function testEIP5792(results: Record<string, EIPTestStatus>) {
+    const provider = getProvider() as {
+      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+    } | null;
+
+    if (!provider || !provider.request) {
+      // Mark all as fail if no provider
+      results['has-sendCalls'] = 'fail';
+      results['has-getCallsStatus'] = 'fail';
+      results['has-showCallsStatus'] = 'fail';
+      results['has-getCapabilities'] = 'fail';
+      results['atomicity-support'] = 'fail';
+      results['atomicity-enforcement'] = 'untested';
+
+      return;
+    }
+
+    // Test wallet_getCapabilities
+    try {
+      const capabilities = (await provider.request({
+        method: 'wallet_getCapabilities',
+        params: [account?.address],
+      })) as Record<string, { atomicBatch?: { supported: boolean } }>;
+
+      results['has-getCapabilities'] = 'pass';
+
+      // Check for atomicity support
+      const chainId = account?.chainId?.toString() || '0x1';
+      const hasAtomicBatch = capabilities?.[chainId]?.atomicBatch?.supported === true;
+
+      results['atomicity-support'] = hasAtomicBatch ? 'pass' : 'fail';
+    } catch {
+      results['has-getCapabilities'] = 'fail';
+      results['atomicity-support'] = 'untested';
+    }
+
+    // Test wallet_sendCalls (just check if method exists, don't actually send)
+    try {
+      // We can't actually test this without sending a transaction
+      // So we check if the error message indicates the method exists but params are wrong
+      await provider.request({
+        method: 'wallet_sendCalls',
+        params: [],
+      });
+      results['has-sendCalls'] = 'pass';
+    } catch (error) {
+      // If error mentions invalid params, method exists
+      const errorMessage = error instanceof Error ? error.message.toLowerCase() : '';
+
+      results['has-sendCalls'] =
+        errorMessage.includes('param') || errorMessage.includes('argument')
+          ? 'partial'
+          : 'fail';
+    }
+
+    // Test wallet_getCallsStatus
+    try {
+      await provider.request({
+        method: 'wallet_getCallsStatus',
+        params: [''],
+      });
+      results['has-getCallsStatus'] = 'pass';
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message.toLowerCase() : '';
+
+      results['has-getCallsStatus'] =
+        errorMessage.includes('param') || errorMessage.includes('argument') || errorMessage.includes('not found')
+          ? 'partial'
+          : 'fail';
+    }
+
+    // Test wallet_showCallsStatus (optional method)
+    try {
+      await provider.request({
+        method: 'wallet_showCallsStatus',
+        params: [''],
+      });
+      results['has-showCallsStatus'] = 'pass';
+    } catch {
+      results['has-showCallsStatus'] = 'fail';
+    }
+
+    // Atomicity enforcement test requires actual transaction testing
+    results['atomicity-enforcement'] = 'untested';
+  }
+
   // Update SIWE message when account changes
   $effect(() => {
     updateSIWEMessage();
@@ -333,22 +585,31 @@ Issued At: ${new Date().toISOString()}`;
 
   <!-- Tab Selector -->
   <div class="tab-selector" data-row="gap-2">
-    {#each ['transactions', 'signatures'] as tab (tab)}
+    {#each ['transactions', 'signatures', 'eip-support'] as tab (tab)}
       <button
         type="button"
         class="tab-button"
         class:active={uiState.activeTab === tab}
         onclick={() => {
-          uiState.activeTab = tab === 'transactions' ? 'transactions' : 'signatures';
-
-          if (tab === 'transactions' && !uiState.selectedTxId && testTransactions.length) {
-            uiState.selectedTxId = testTransactions[0].id;
-          } else if (tab === 'signatures' && !uiState.selectedSigId && testSignatures.length) {
-            uiState.selectedSigId = testSignatures[0].id;
+          if (tab === 'transactions') {
+            uiState.activeTab = 'transactions';
+            if (!uiState.selectedTxId && testTransactions.length) {
+              uiState.selectedTxId = testTransactions[0].id;
+            }
+          } else if (tab === 'signatures') {
+            uiState.activeTab = 'signatures';
+            if (!uiState.selectedSigId && testSignatures.length) {
+              uiState.selectedSigId = testSignatures[0].id;
+            }
+          } else if (tab === 'eip-support') {
+            uiState.activeTab = 'eip-support';
+            if (!uiState.selectedEipId && eipTests.length) {
+              uiState.selectedEipId = eipTests[0].id;
+            }
           }
         }}
       >
-        {tab.charAt(0).toUpperCase() + tab.slice(1)}
+        {tab === 'eip-support' ? 'EIP Support' : tab.charAt(0).toUpperCase() + tab.slice(1)}
       </button>
     {/each}
   </div>
@@ -360,7 +621,7 @@ Issued At: ${new Date().toISOString()}`;
       <div class="sidebar-content" data-card="radius-8 padding-2">
         {#if uiState.activeTab === 'transactions'}
           {#each testTransactions as tx}
-            <SidebarItem
+            <SideBarItem
               title={tx.name}
               description={tx.description}
               isSelected={uiState.selectedTxId === tx.id}
@@ -368,14 +629,24 @@ Issued At: ${new Date().toISOString()}`;
               onclick={() => (uiState.selectedTxId = tx.id)}
             />
           {/each}
-        {:else}
+        {:else if uiState.activeTab === 'signatures'}
           {#each testSignatures as sig}
-            <SidebarItem
+            <SideBarItem
               title={sig.name}
               description={sig.description}
               isSelected={uiState.selectedSigId === sig.id}
               isCompleted={!!signatureState.results[sig.id]}
               onclick={() => (uiState.selectedSigId = sig.id)}
+            />
+          {/each}
+        {:else if uiState.activeTab === 'eip-support'}
+          {#each eipTests as eipTest}
+            <SideBarItem
+              title={eipTest.name}
+              description={eipTest.description}
+              isSelected={uiState.selectedEipId === eipTest.id}
+              isCompleted={!!eipState.results[eipTest.id]}
+              onclick={() => (uiState.selectedEipId = eipTest.id)}
             />
           {/each}
         {/if}
@@ -634,6 +905,113 @@ Issued At: ${new Date().toISOString()}`;
                   <code class="signature-result">{sigResult}</code>
                 </div>
               {/if}
+            </div>
+          </div>
+        {/if}
+      {:else if uiState.activeTab === 'eip-support' && uiState.selectedEipId}
+        {@const selectedEip = eipTests.find((eip) => eip.id === uiState.selectedEipId)}
+        {#if selectedEip}
+          {@const isActive = eipState.activeId === selectedEip.id}
+          {@const isTesting = eipState.isTesting && isActive}
+          {@const testResults = eipState.results[selectedEip.id]}
+          <div class="detail-card" data-card="radius-8 padding-5">
+            <header data-row="gap-2 start wrap">
+              <div data-column="gap-1">
+                <h3>{selectedEip.name}</h3>
+                {#if selectedEip.description}
+                  <p class="body-text">{selectedEip.description}</p>
+                {/if}
+              </div>
+              <a
+                href={selectedEip.specUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="spec-link"
+                title="View specification"
+              >
+                Spec ↗
+              </a>
+            </header>
+
+            <div data-column="gap-4">
+              {#if selectedEip.requirements && selectedEip.requirements.length > 0}
+                <div class="requirements-box">
+                  <h4 class="requirements-title">📋 Requirements:</h4>
+                  <ul class="requirements-list">
+                    {#each selectedEip.requirements as requirement}
+                      <li>{requirement}</li>
+                    {/each}
+                  </ul>
+                </div>
+              {/if}
+
+              <div class="detail-section">
+                <span class="detail-label">🧪 Compliance Checks:</span>
+                <div class="eip-checks" data-column="gap-2">
+                  {#each selectedEip.checks as check}
+                    {@const status = testResults?.[check.id] || 'untested'}
+                    <div class="check-item" data-row="gap-2 start">
+                      <span class="check-status status-{status}" title={status}>
+                        {#if status === 'pass'}
+                          ✓
+                        {:else if status === 'fail'}
+                          ✗
+                        {:else if status === 'partial'}
+                          ◐
+                        {:else}
+                          ○
+                        {/if}
+                      </span>
+                      <div data-column="gap-1">
+                        <div class="check-name">
+                          {check.name}
+                          {#if check.critical}
+                            <span class="critical-badge">required</span>
+                          {/if}
+                        </div>
+                        <div class="check-description">{check.description}</div>
+                      </div>
+                    </div>
+                  {/each}
+                </div>
+              </div>
+
+              {#if eipState.discoveredProviders.length > 0 && selectedEip.id === 'eip-6963'}
+                <div class="detail-section">
+                  <span class="detail-label">🔍 Discovered Providers ({eipState.discoveredProviders.length}):</span>
+                  <div class="providers-list" data-column="gap-2">
+                    {#each eipState.discoveredProviders as provider}
+                      <div class="provider-item">
+                        <div class="provider-header" data-row="gap-2 start">
+                          {#if provider.icon}
+                            <img src={provider.icon} alt={provider.name} class="provider-icon" />
+                          {/if}
+                          <div>
+                            <div class="provider-name">{provider.name}</div>
+                            <div class="provider-rdns">{provider.rdns}</div>
+                          </div>
+                        </div>
+                        <div class="provider-uuid">UUID: {provider.uuid}</div>
+                      </div>
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+
+              <button
+                type="button"
+                data-pressable
+                onclick={() => testEIPSupport(selectedEip)}
+                disabled={isTesting}
+              >
+                {#if isTesting}
+                  Testing…
+                {:else if testResults}
+                  Re-run Tests
+                {:else}
+                  Run Tests
+                {/if}
+              </button>
             </div>
           </div>
         {/if}
