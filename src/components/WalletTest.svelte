@@ -20,7 +20,7 @@
 
   import Modal from './Modal.svelte';
   import ErrorComponent from './ErrorComponent.svelte';
-	import SideBarItem from "./SideBarItem.svelte"
+	import SideBarItem from './SideBarItem.svelte'
 
   type Account = ReturnType<typeof getAccount>;
 
@@ -308,7 +308,7 @@ Issued At: ${new Date().toISOString()}`;
   // EIP Support Testing
   function getProvider() {
     if (typeof window !== 'undefined' && 'ethereum' in window) {
-      return window.ethereum as unknown;
+      return window.ethereum;
     }
 
     return null;
@@ -647,16 +647,19 @@ Issued At: ${new Date().toISOString()}`;
         onclick={() => {
           if (tab === 'transactions') {
             uiState.activeTab = 'transactions';
+
             if (!uiState.selectedTxId && testTransactions.length) {
               uiState.selectedTxId = testTransactions[0].id;
             }
           } else if (tab === 'signatures') {
             uiState.activeTab = 'signatures';
+
             if (!uiState.selectedSigId && testSignatures.length) {
               uiState.selectedSigId = testSignatures[0].id;
             }
           } else if (tab === 'eip-support') {
             uiState.activeTab = 'eip-support';
+
             if (!uiState.selectedEipId && eipTests.length) {
               uiState.selectedEipId = eipTests[0].id;
             }
