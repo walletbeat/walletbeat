@@ -550,7 +550,21 @@ Issued At: ${new Date().toISOString()}`;
       // So we check if the error message indicates the method exists but params are wrong
       await provider.request({
         method: 'wallet_sendCalls',
-        params: [],
+        params: [
+          {
+            version: '2.0.0',
+            chainId: '0x1',
+            from: account?.address || '0x0000000000000000000000000000000000000000',
+            calls: [
+              {
+                to: '0x0000000000000000000000000000000000000000',
+                data: '0x00',
+                value: '0x0',
+              },
+            ],
+            atomicRequired: false,
+          },
+        ],
       });
       results['has-sendCalls'] = 'pass';
     } catch (error) {
@@ -567,7 +581,7 @@ Issued At: ${new Date().toISOString()}`;
     try {
       await provider.request({
         method: 'wallet_getCallsStatus',
-        params: [''],
+        params: ['0x1234567890abcdef'],
       });
       results['has-getCallsStatus'] = 'pass';
     } catch (error) {
