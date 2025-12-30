@@ -50,7 +50,7 @@
         <div class="requirements-box">
           <h4 class="requirements-title">📋 Requirements:</h4>
           <ul class="requirements-list">
-            {#each selectedEip.requirements as requirement}
+            {#each selectedEip.requirements as requirement (requirement)}
               <li>{requirement}</li>
             {/each}
           </ul>
@@ -60,7 +60,7 @@
       <div class="detail-section">
         <span class="detail-label">🧪 Compliance Checks:</span>
         <div class="eip-checks" data-column="gap-2">
-          {#each selectedEip.checks as check}
+          {#each selectedEip.checks as check (check.id)}
             {@const status = testResults?.[check.id] || 'untested'}
             <div class="check-item" data-row="gap-2 start">
               <span class="check-status status-{status}" title={status}>
@@ -94,7 +94,7 @@
             >🔍 Discovered Providers ({eipState.discoveredProviders.length}):</span
           >
           <div class="providers-list" data-column="gap-2">
-            {#each eipState.discoveredProviders as provider}
+            {#each eipState.discoveredProviders as provider (provider.uuid)}
               <div class="provider-item">
                 <div class="provider-header" data-row="gap-2 start">
                   {#if provider.icon}

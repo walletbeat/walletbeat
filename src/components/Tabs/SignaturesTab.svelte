@@ -36,7 +36,7 @@
         <div class="requirements-box">
           <h4 class="requirements-title">📋 Safety Notes:</h4>
           <ul class="requirements-list">
-            {#each selectedSig.requirements as requirement}
+            {#each selectedSig.requirements as requirement (requirement)}
               <li>{requirement}</li>
             {/each}
           </ul>

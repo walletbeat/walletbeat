@@ -397,6 +397,7 @@ Issued At: ${new Date().toISOString()}`;
     for (const check of eip.checks) {
       if (check.critical) {
         const status = results[check.id];
+
         if (status === 'fail' || status === 'untested') {
           failedChecks.push({
             name: check.name,
@@ -736,7 +737,7 @@ Issued At: ${new Date().toISOString()}`;
     <div class="sidebar">
       <div class="sidebar-content" data-card="radius-8 padding-2">
         {#if uiState.activeTab === 'transactions'}
-          {#each testTransactions as tx}
+          {#each testTransactions as tx (tx.id)}
             <SideBarItem
               title={tx.name}
               description={tx.description}
@@ -746,7 +747,7 @@ Issued At: ${new Date().toISOString()}`;
             />
           {/each}
         {:else if uiState.activeTab === 'signatures'}
-          {#each testSignatures as sig}
+          {#each testSignatures as sig (sig.id)}
             <SideBarItem
               title={sig.name}
               description={sig.description}
@@ -756,7 +757,7 @@ Issued At: ${new Date().toISOString()}`;
             />
           {/each}
         {:else if uiState.activeTab === 'eip-support'}
-          {#each eipTests as eipTest}
+          {#each eipTests as eipTest (eipTest.id)}
             <SideBarItem
               title={eipTest.eipNumber}
               description={eipTest.description}

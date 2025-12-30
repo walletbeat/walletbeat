@@ -35,7 +35,7 @@
         <div class="eip-failed-checks" data-column="gap-2">
           <h4 class="failed-checks-title">Missing Required Features:</h4>
           <ul class="failed-checks-list">
-            {#each failedChecks as check}
+            {#each failedChecks as check (check.name)}
               <li class="failed-check-item">
                 <span class="failed-check-name">{check.name}</span>
                 <span class="failed-check-description">{check.description}</span>

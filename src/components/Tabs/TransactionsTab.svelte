@@ -56,7 +56,7 @@
         <div class="requirements-box">
           <h4 class="requirements-title">📋 Requirements:</h4>
           <ul class="requirements-list">
-            {#each selectedTx.requirements as requirement}
+            {#each selectedTx.requirements as requirement (requirement)}
               <li>{requirement}</li>
             {/each}
           </ul>
@@ -72,7 +72,7 @@
         <div class="detail-section">
           <span class="detail-label">📋 Parameters:</span>
           <div class="parameters-list" data-column="gap-2">
-            {#each selectedTx.parameters as param}
+            {#each selectedTx.parameters as param (param.name)}
               <div class="parameter-item">
                 <div class="parameter-header">
                   <span class="parameter-name">{param.name}:</span>
@@ -89,7 +89,7 @@
         <div class="detail-section">
           <span class="detail-label">🔗 Calls ({selectedTx.calls.length}):</span>
           <div class="parameters-list" data-column="gap-3">
-            {#each selectedTx.calls as call, idx}
+            {#each selectedTx.calls as call, idx (idx)}
               <div class="parameter-item">
                 <div class="parameter-header">
                   <span class="parameter-name">Call {idx + 1}</span>
