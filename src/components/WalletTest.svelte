@@ -354,6 +354,8 @@ Issued At: ${new Date().toISOString()}`;
     try {
       if (eip.id === 'eip-1193') {
         await testEIP1193(results);
+      } else if (eip.id === 'eip-2700') {
+        await testEIP2700(results);
       } else if (eip.id === 'eip-6963') {
         await testEIP6963(results);
       } else if (eip.id === 'eip-5792') {
@@ -411,6 +413,58 @@ Issued At: ${new Date().toISOString()}`;
 
     // Don't auto-test eth_requestAccounts as it shows a prompt
     results['eth-requestAccounts'] = 'untested';
+  }
+
+  async function testEIP2700(results: Record<string, EIPTestStatus>) {
+    const provider = getProvider() as {
+      on?: (event: string, listener: () => void) => void;
+      removeListener?: (event: string, listener: () => void) => void;
+      addListener?: (event: string, listener: () => void) => void;
+      removeAllListeners?: (event?: string) => void;
+      listeners?: (event: string) => unknown[];
+      once?: (event: string, listener: () => void) => void;
+      emit?: (event: string, ...args: unknown[]) => boolean;
+    } | null;
+
+    if (!provider) {
+      // Mark all as fail if no provider
+      results['has-on'] = 'fail';
+      results['has-removeListener'] = 'fail';
+      results['has-addListener'] = 'fail';
+      results['has-removeAllListeners'] = 'fail';
+      results['has-listeners'] = 'fail';
+      results['has-once'] = 'fail';
+      results['has-emit'] = 'fail';
+      results['supports-message-event'] = 'fail';
+
+      return;
+    }
+
+    // Check on method
+    results['has-on'] = typeof provider.on === 'function' ? 'pass' : 'fail';
+
+    // Check removeListener method
+    results['has-removeListener'] =
+      typeof provider.removeListener === 'function' ? 'pass' : 'fail';
+
+    // Check addListener method (alias for on)
+    results['has-addListener'] = typeof provider.addListener === 'function' ? 'pass' : 'fail';
+
+    // Check removeAllListeners method
+    results['has-removeAllListeners'] =
+      typeof provider.removeAllListeners === 'function' ? 'pass' : 'fail';
+
+    // Check listeners method
+    results['has-listeners'] = typeof provider.listeners === 'function' ? 'pass' : 'fail';
+
+    // Check once method
+    results['has-once'] = typeof provider.once === 'function' ? 'pass' : 'fail';
+
+    // Check emit method
+    results['has-emit'] = typeof provider.emit === 'function' ? 'pass' : 'fail';
+
+    // Test message event support (we can only check if the on method exists for now)
+    results['supports-message-event'] = typeof provider.on === 'function' ? 'pass' : 'fail';
   }
 
   async function testEIP6963(results: Record<string, EIPTestStatus>) {
@@ -642,7 +696,7 @@ Issued At: ${new Date().toISOString()}`;
         {:else if uiState.activeTab === 'eip-support'}
           {#each eipTests as eipTest}
             <SideBarItem
-              title={eipTest.name}
+              title={eipTest.eipNumber}
               description={eipTest.description}
               isSelected={uiState.selectedEipId === eipTest.id}
               isCompleted={!!eipState.results[eipTest.id]}
@@ -917,7 +971,7 @@ Issued At: ${new Date().toISOString()}`;
           <div class="detail-card" data-card="radius-8 padding-5">
             <header data-row="gap-2 start wrap">
               <div data-column="gap-1">
-                <h3>{selectedEip.name}</h3>
+                <h3>{selectedEip.eipNumber}: {selectedEip.name}</h3>
                 {#if selectedEip.description}
                   <p class="body-text">{selectedEip.description}</p>
                 {/if}

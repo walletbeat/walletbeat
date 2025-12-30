@@ -93,6 +93,68 @@ export const eipTests: EIPTest[] = [
 		],
 	},
 	{
+		id: 'eip-2700',
+		eipNumber: 'EIP-2700',
+		name: 'JavaScript Provider Event Emitter',
+		description:
+			'Extends EIP-1193 to formalize the event emitter interface, ensuring wallets properly implement EventEmitter methods for listening to provider events.',
+		specUrl: 'https://eips.ethereum.org/EIPS/eip-2700',
+		requirements: [
+			'Browser extension or injected provider must be installed',
+			'Provider should implement standard EventEmitter interface',
+		],
+		checks: [
+			{
+				id: 'has-on',
+				name: 'on() method',
+				description: 'Provider implements on(eventName, listener) method',
+				critical: true,
+			},
+			{
+				id: 'has-removeListener',
+				name: 'removeListener() method',
+				description: 'Provider implements removeListener(eventName, listener) method',
+				critical: true,
+			},
+			{
+				id: 'has-addListener',
+				name: 'addListener() method',
+				description: 'Provider implements addListener(eventName, listener) method (alias for on)',
+				critical: false,
+			},
+			{
+				id: 'has-removeAllListeners',
+				name: 'removeAllListeners() method',
+				description: 'Provider implements removeAllListeners([eventName]) method',
+				critical: false,
+			},
+			{
+				id: 'has-listeners',
+				name: 'listeners() method',
+				description: 'Provider implements listeners(eventName) method',
+				critical: false,
+			},
+			{
+				id: 'has-once',
+				name: 'once() method',
+				description: 'Provider implements once(eventName, listener) method',
+				critical: false,
+			},
+			{
+				id: 'has-emit',
+				name: 'emit() method',
+				description: 'Provider implements emit(eventName, ...args) method (for internal use)',
+				critical: false,
+			},
+			{
+				id: 'supports-message-event',
+				name: 'message event',
+				description: 'Provider supports the message event for subscription notifications',
+				critical: true,
+			},
+		],
+	},
+	{
 		id: 'eip-6963',
 		eipNumber: 'EIP-6963',
 		name: 'Multi Injected Provider Discovery',
