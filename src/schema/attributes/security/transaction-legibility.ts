@@ -22,6 +22,7 @@ import {
 	supportsAnyDataExtraction,
 	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
+import { isSupported } from '@/schema/features/support'
 import { popRefs, refs } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
@@ -86,6 +87,7 @@ interface HardwareFeatureDetails {
 	calldataDecoding: {
 		supported: string[]
 		missing: string[]
+		decodedLocation: DataDecoded | null
 	}
 	transactionDetails: {
 		supported: string[]
@@ -98,6 +100,7 @@ interface HardwareFeatureDetails {
 	messageSigning: {
 		supported: string[]
 		missing: string[]
+		decodedLocation: DataDecoded | null
 	}
 }
 
@@ -108,10 +111,10 @@ function analyzeHardwareFeatures(
 	messageSigningLegibility: HardwareTransactionLegibilityImplementation['messageSigningLegibility'],
 ): HardwareFeatureDetails {
 	const details: HardwareFeatureDetails = {
-		calldataDecoding: { supported: [], missing: [] },
+		calldataDecoding: { supported: [], missing: [], decodedLocation: null },
 		transactionDetails: { supported: [], missing: [] },
 		dataExtraction: { supported: [], missing: [] },
-		messageSigning: { supported: [], missing: [] },
+		messageSigning: { supported: [], missing: [], decodedLocation: null },
 	}
 
 	// Analyze calldata decoding
@@ -139,13 +142,42 @@ function analyzeHardwareFeatures(
 			},
 		]
 
+		// Track decoded location for calldata decoding
+		// If any supported decoding is ON_DEVICE, show ON_DEVICE; otherwise show OFF_DEVICE if any are supported
+		let calldataDecodedLocation: DataDecoded | null = null
+		let hasOnDeviceDecoding = false
+		let hasOffDeviceDecoding = false
+
 		decodingChecks.forEach(({ key, label }) => {
-			if (isSupportedOnDevice(legibility, key)) {
-				details.calldataDecoding.supported.push(label)
+			const support = legibility[key]
+
+			if (isSupported(support)) {
+				const decodedLocation = support.decoded
+
+				if (decodedLocation === DataDecoded.ON_DEVICE) {
+					hasOnDeviceDecoding = true
+				} else {
+					hasOffDeviceDecoding = true
+				}
+
+				if (isSupportedOnDevice(legibility, key)) {
+					details.calldataDecoding.supported.push(label)
+				} else {
+					details.calldataDecoding.missing.push(label)
+				}
 			} else {
 				details.calldataDecoding.missing.push(label)
 			}
 		})
+
+		// Prefer ON_DEVICE if any decoding is ON_DEVICE, otherwise use OFF_DEVICE if any are supported
+		if (hasOnDeviceDecoding) {
+			calldataDecodedLocation = DataDecoded.ON_DEVICE
+		} else if (hasOffDeviceDecoding) {
+			calldataDecodedLocation = DataDecoded.OFF_DEVICE
+		}
+
+		details.calldataDecoding.decodedLocation = calldataDecodedLocation
 	}
 
 	// Analyze transaction details
@@ -188,7 +220,10 @@ function analyzeHardwareFeatures(
 	// Analyze message signing
 	if (messageSigningLegibility !== null) {
 		const provides = messageSigningLegibility.messageSigningProvides
-		const onDevice = messageSigningLegibility.decoded === DataDecoded.ON_DEVICE
+		const decodedLocation = messageSigningLegibility.decoded
+		const onDevice = decodedLocation === DataDecoded.ON_DEVICE
+
+		details.messageSigning.decodedLocation = decodedLocation
 
 		const signingChecks = [
 			{ key: MessageSigningProvides.EIP712_STRUCT, label: 'EIP-712 structured data' },
@@ -217,11 +252,18 @@ function generateHardwareDetailsMarkdown(features: HardwareFeatureDetails): stri
 	const sections: string[] = []
 
 	// Calldata Decoding section
+	// Calldata Decoding section
 	if (
 		features.calldataDecoding.supported.length > 0 ||
 		features.calldataDecoding.missing.length > 0
 	) {
-		sections.push('**Calldata Decoding:**\n')
+		sections.push('**Calldata Decoding**\n')
+
+		if (features.calldataDecoding.decodedLocation === DataDecoded.ON_DEVICE) {
+			sections.push('Decoded on-device.\n')
+		} else if (features.calldataDecoding.decodedLocation === DataDecoded.OFF_DEVICE) {
+			sections.push('Decoded off-device.\n')
+		}
 
 		if (features.calldataDecoding.supported.length > 0) {
 			sections.push(`✓ Supported: ${commaListFormat(features.calldataDecoding.supported)}\n`)
@@ -232,38 +274,15 @@ function generateHardwareDetailsMarkdown(features: HardwareFeatureDetails): stri
 		}
 	}
 
-	// Transaction Details section
-	if (
-		features.transactionDetails.supported.length > 0 ||
-		features.transactionDetails.missing.length > 0
-	) {
-		sections.push('\n**Transaction Details Displayed (On-Device)**\n')
-
-		if (features.transactionDetails.supported.length > 0) {
-			sections.push(`✓ Supported: ${commaListFormat(features.transactionDetails.supported)}\n`)
-		}
-
-		if (features.transactionDetails.missing.length > 0) {
-			sections.push(`✗ Missing: ${commaListFormat(features.transactionDetails.missing)}\n`)
-		}
-	}
-
-	// Data Extraction section
-	if (features.dataExtraction.supported.length > 0 || features.dataExtraction.missing.length > 0) {
-		sections.push('\n**Data Extraction Methods**\n')
-
-		if (features.dataExtraction.supported.length > 0) {
-			sections.push(`✓ Supported: ${commaListFormat(features.dataExtraction.supported)}\n`)
-		}
-
-		if (features.dataExtraction.missing.length > 0) {
-			sections.push(`✗ Missing: ${commaListFormat(features.dataExtraction.missing)}\n`)
-		}
-	}
-
 	// Message Signing section
 	if (features.messageSigning.supported.length > 0 || features.messageSigning.missing.length > 0) {
-		sections.push('\n**Message Signing (On-Device)**\n')
+		sections.push('\n**Message Signing**\n')
+
+		if (features.messageSigning.decodedLocation === DataDecoded.ON_DEVICE) {
+			sections.push('Displayed on-device.\n')
+		} else if (features.messageSigning.decodedLocation === DataDecoded.OFF_DEVICE) {
+			sections.push('Displayed off-device.\n')
+		}
 
 		if (features.messageSigning.supported.length > 0) {
 			sections.push(`✓ Supported: ${commaListFormat(features.messageSigning.supported)}\n`)
@@ -286,9 +305,21 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 		)
 	}
 
+	if (features.calldataDecoding.decodedLocation === DataDecoded.OFF_DEVICE) {
+		improvements.push(
+			'**Calldata Decoding:** Move decoding on-device so users don’t have to trust a potentially compromised companion app.',
+		)
+	}
+
 	if (features.transactionDetails.missing.length > 0) {
 		improvements.push(
 			`**Transaction Details:** Display ${commaListFormat(features.transactionDetails.missing)} on the device`,
+		)
+	}
+
+	if (features.messageSigning.decodedLocation === DataDecoded.OFF_DEVICE) {
+		improvements.push(
+			'**Message Signing:** Display message signing details on-device to prevent host software from altering what the user thinks they are approving.',
 		)
 	}
 
