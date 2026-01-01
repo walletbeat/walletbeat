@@ -8,11 +8,15 @@ import {
 import type { ResolvedFeatures } from '@/schema/features'
 import {
 	CalldataDecoding,
+	DataDecoded,
 	DataExtraction,
+	type HardwareMessageSigningLegibility,
 	type HardwareTransactionLegibilityImplementation,
 	isFullTransactionDetails,
 	isHardwareTransactionLegibility,
 	isSupportedOnDevice,
+	MessageSigningProvides,
+	type SoftwareMessageSigningLegibility,
 	type SoftwareTransactionLegibilityImplementation,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
@@ -27,6 +31,53 @@ const brand = 'attributes.transaction_legibility'
 
 export type TransactionLegibilityValue = Value & {
 	__brand: 'attributes.transaction_legibility'
+}
+
+// Message signing evaluation helpers
+
+/**
+ * Evaluates if software wallet message signing meets PASS criteria.
+ * PASS if showing: EIP-712 struct OR (domainHash & messageHash) OR safeHash
+ */
+function evaluateSoftwareMessageSigning(
+	messageSigningLegibility: SoftwareMessageSigningLegibility,
+): boolean {
+	if (messageSigningLegibility === null) {
+		return false
+	}
+
+	const hasEip712Struct = messageSigningLegibility[MessageSigningProvides.EIP712_STRUCT]
+	const hasDomainHash = messageSigningLegibility[MessageSigningProvides.DOMAIN_HASH]
+	const hasMessageHash = messageSigningLegibility[MessageSigningProvides.MESSAGE_HASH]
+	const hasSafeHash = messageSigningLegibility[MessageSigningProvides.SAFE_HASH]
+
+	// PASS if: EIP-712 struct OR (domainHash AND messageHash) OR safeHash
+	return hasEip712Struct || (hasDomainHash && hasMessageHash) || hasSafeHash
+}
+
+/**
+ * Evaluates if hardware wallet message signing meets PASS criteria.
+ * PASS if showing: (EIP-712 struct OR (domainHash & messageHash) OR safeHash) AND on-device
+ */
+function evaluateHardwareMessageSigning(
+	messageSigningLegibility: HardwareMessageSigningLegibility,
+): boolean {
+	if (messageSigningLegibility === null) {
+		return false
+	}
+
+	if (messageSigningLegibility.decoded !== DataDecoded.ON_DEVICE) {
+		return false
+	}
+
+	const provides = messageSigningLegibility.messageSigningProvides
+	const hasEip712Struct = provides[MessageSigningProvides.EIP712_STRUCT]
+	const hasDomainHash = provides[MessageSigningProvides.DOMAIN_HASH]
+	const hasMessageHash = provides[MessageSigningProvides.MESSAGE_HASH]
+	const hasSafeHash = provides[MessageSigningProvides.SAFE_HASH]
+
+	// PASS if: EIP-712 struct OR (domainHash AND messageHash) OR safeHash
+	return hasEip712Struct || (hasDomainHash && hasMessageHash) || hasSafeHash
 }
 
 // Hardware wallet evaluation helpers
@@ -169,11 +220,16 @@ function evaluateHardwareWalletTransactionLegibility(
 	const legibility = hardwareTransactionLegibility.legibility
 	const detailsDisplayed = hardwareTransactionLegibility.detailsDisplayed
 	const dataExtraction = hardwareTransactionLegibility.dataExtraction
+	const messageSigningLegibility = hardwareTransactionLegibility.messageSigningLegibility
 
 	const getOverallRating = (): Rating => {
 		if (legibility === null || detailsDisplayed === null || dataExtraction === null) {
 			return Rating.UNRATED
 		}
+
+		// Evaluate message signing (PASS/FAIL only)
+		const messageSigningPasses =
+			messageSigningLegibility && evaluateHardwareMessageSigning(messageSigningLegibility)
 
 		// Check if wallet supports calldata decoding for complex transactions (ON_DEVICE)
 		const supportsComplexDecoding: boolean =
@@ -202,14 +258,21 @@ function evaluateHardwareWalletTransactionLegibility(
 			dataExtraction[DataExtraction.QRCODE] === true &&
 			dataExtraction[DataExtraction.HASHES] === true
 
-		// PASS: Full support - complex decoding AND all details displayed AND at least one data extraction method
-		// Advanced extraction (QRCODE/HASHES/COPY) is preferred, but visual (EYES) is acceptable if all details are clearly displayed
-		if (supportsComplexDecoding && displaysAllDetails && hasAdvancedDataExtraction) {
+		// PASS: Full support - complex decoding AND all details displayed AND advanced data extraction AND message signing passes
+		if (
+			supportsComplexDecoding &&
+			displaysAllDetails &&
+			hasAdvancedDataExtraction &&
+			messageSigningPasses
+		) {
 			return Rating.PASS
 		}
 
-		// FAIL: No decoding support AND missing essential details AND no data extraction
-		if (!supportsAnyCalldataDecoding(legibility) && !displaysAllDetails && !hasDataExtraction) {
+		// FAIL: (No decoding support AND missing essential details AND no data extraction) OR message signing fails
+		if (
+			(!supportsAnyCalldataDecoding(legibility) && !displaysAllDetails && !hasDataExtraction) ||
+			(messageSigningLegibility !== null && !messageSigningPasses)
+		) {
 			return Rating.FAIL
 		}
 
@@ -266,10 +329,14 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 	const calldataDisplay = transactionLegibilitySupport.calldataDisplay
 	const transactionDetailsDisplay = transactionLegibilitySupport.transactionDetailsDisplay
+	const messageSigningLegibility = transactionLegibilitySupport.messageSigningLegibility
 
 	if (calldataDisplay === null || transactionDetailsDisplay === null) {
 		return unrated(transactionLegibility, brand, null)
 	}
+
+	// Evaluate message signing (PASS/FAIL only)
+	const messageSigningPasses = evaluateSoftwareMessageSigning(messageSigningLegibility)
 
 	// Check calldata display capabilities
 	const calldataShown = calldataDisplay.rawHex
@@ -299,9 +366,10 @@ function evaluateSoftwareWalletTransactionLegibility(
 	// 1. If no calldata shown at all, FAIL
 	// 2. If calldata is shown but neither copyable nor formatted, FAIL
 	// 3. If less than 3 types of transaction details shown, FAIL
-	// 4. If calldata is not copyable OR not formatted, PARTIAL
-	// 5. If more than 3 types of transaction details are shown but not all of them, PARTIAL
-	// 6. Otherwise, PASS
+	// 4. Message signing fails, FAIL
+	// 5. If calldata is not copyable OR not formatted, PARTIAL
+	// 6. If more than 3 types of transaction details are shown but not all of them, PARTIAL
+	// 7. Otherwise, PASS (requires message signing to pass)
 	let rating: Rating
 
 	if (!calldataShown) {
@@ -313,14 +381,18 @@ function evaluateSoftwareWalletTransactionLegibility(
 	} else if (transactionDetailsCount < 3) {
 		// Less than 3 types of transaction details shown
 		rating = Rating.FAIL
+	} else if (messageSigningLegibility !== null && !messageSigningPasses) {
+		// Message signing data provided but fails criteria
+		rating = Rating.FAIL
 	} else if (!calldataCopyable || !calldataFormatted) {
 		// Calldata is not copyable OR not formatted
 		rating = Rating.PARTIAL
 	} else if (transactionDetailsCount >= 3 && !allTransactionDetailsShown) {
 		// More than 3 types of transaction details are shown but not all of them
 		rating = Rating.PARTIAL
+	} else if (!messageSigningPasses) {
+		rating = Rating.PARTIAL
 	} else {
-		// Calldata is both copyable AND formatted, and all transaction details are shown
 		rating = Rating.PASS
 	}
 
