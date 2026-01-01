@@ -193,13 +193,42 @@ export type CalldataDecodingTypes = Record<
 /** If a wallet can decode the calldata for a specific transaction, what does that look like? */
 export interface CalldataDecodingSupport {
 	/** Where does the calldata decoding actually happen? */
-	decoded: CalldataDecoded
+	decoded: DataDecoded
 }
 
 /** Where does the calldata decoding actually happen? */
-export enum CalldataDecoded {
+export enum DataDecoded {
 	ON_DEVICE = 'ON_DEVICE',
 	OFF_DEVICE = 'OFF_DEVICE',
+}
+
+/**
+ * What does the wallet provide for message signing legibility?
+ */
+export enum MessageSigningProvides {
+	/** The wallet provides the EIP-712 struct */
+	EIP712_STRUCT = 'EIP712_STRUCT',
+	/** The wallet provides the domain hash */
+	DOMAIN_HASH = 'DOMAIN_HASH',
+	/** The wallet provides the message hash */
+	MESSAGE_HASH = 'MESSAGE_HASH',
+	/** The wallet provides the Safe hash */
+	SAFE_HASH = 'SAFE_HASH',
+}
+
+/**
+ * For software wallets: track which message signing data types are available
+ */
+export type SoftwareMessageSigningLegibility = Record<MessageSigningProvides, boolean> | null
+
+/**
+ * For hardware wallets: track which message signing data types are available and where they are displayed
+ */
+export interface HardwareMessageSigningLegibility {
+	/** Which message signing data types does the wallet provide? */
+	messageSigningProvides: Record<MessageSigningProvides, boolean>
+	/** Where does the message signing data display happen? */
+	decoded: DataDecoded
 }
 /**
  * Shorthand for a wallet that cannot do any calldata decoding.
@@ -283,7 +312,7 @@ export function isSupportedOnDevice(
 		return false
 	}
 
-	return support.decoded === CalldataDecoded.ON_DEVICE
+	return support.decoded === DataDecoded.ON_DEVICE
 }
 
 /**
@@ -303,6 +332,11 @@ export interface HardwareTransactionLegibilitySupport {
 	 * Does a wallet allow for data extraction?
 	 */
 	dataExtraction: DataExtractionMethods | null
+
+	/**
+	 * What message signing data does the hardware wallet provide and where is it displayed?
+	 */
+	messageSigningLegibility: HardwareMessageSigningLegibility | null
 }
 
 /**
@@ -337,6 +371,11 @@ export interface SoftwareTransactionLegibilitySupport {
 	 * Does the software wallet support displaying the transaction details?
 	 */
 	transactionDetailsDisplay: DisplayedTransactionDetails | null
+
+	/**
+	 * What message signing data does the software wallet provide?
+	 */
+	messageSigningLegibility: SoftwareMessageSigningLegibility | null
 }
 
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
