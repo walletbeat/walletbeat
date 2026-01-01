@@ -242,6 +242,7 @@ export const keycardShell: HardwareWallet = {
 						decoded: DataDecoded.ON_DEVICE,
 					}),
 				},
+				messageSigningLegibility: null,
 			},
 			userSafety: null,
 		},

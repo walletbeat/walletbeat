@@ -211,6 +211,7 @@ export const cypherockWallet: HardwareWallet = {
 					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				legibility: noCalldataDecoding,
+				messageSigningLegibility: null,
 			},
 			userSafety: null,
 		},

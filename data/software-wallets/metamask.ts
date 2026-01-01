@@ -435,6 +435,7 @@ export const metamask: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,
+				messageSigningLegibility: null,
 				transactionDetailsDisplay: {
 					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,

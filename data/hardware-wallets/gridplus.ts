@@ -183,6 +183,7 @@ export const gridplusWallet: HardwareWallet = {
 					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						notSupported,
 				},
+				messageSigningLegibility: null,
 			},
 			userSafety: null,
 		},

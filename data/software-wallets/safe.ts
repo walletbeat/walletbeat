@@ -273,6 +273,7 @@ export const safe: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,
+				messageSigningLegibility: null,
 				transactionDetailsDisplay: displaysFullTransactionDetails,
 			},
 		},

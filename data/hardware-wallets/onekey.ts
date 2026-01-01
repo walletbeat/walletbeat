@@ -197,6 +197,7 @@ export const onekeyWallet: HardwareWallet = {
 					nonce: TransactionDisplayOptions.NOT_IN_UI,
 				},
 				legibility: noCalldataDecoding,
+				messageSigningLegibility: null,
 			},
 			userSafety: null,
 		},

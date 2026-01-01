@@ -526,6 +526,7 @@ export const ambire: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,
+				messageSigningLegibility: null,
 				transactionDetailsDisplay: {
 					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
 					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
