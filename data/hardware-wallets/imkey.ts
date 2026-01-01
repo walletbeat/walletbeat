@@ -4,8 +4,8 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
-	DataDecoded,
 	CalldataDecoding,
+	DataDecoded,
 	DataExtraction,
 	displaysFullTransactionDetails,
 	TransactionDisplayOptions,

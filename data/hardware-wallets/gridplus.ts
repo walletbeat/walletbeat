@@ -15,9 +15,9 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	DataDecoded,
 	CalldataDecoding,
 	type CalldataDecodingSupport,
+	DataDecoded,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'

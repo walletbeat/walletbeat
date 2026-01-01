@@ -12,8 +12,8 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	DataDecoded,
 	CalldataDecoding,
+	DataDecoded,
 	DataExtraction,
 	noCalldataDecoding,
 	TransactionDisplayOptions,

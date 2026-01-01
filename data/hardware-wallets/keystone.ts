@@ -15,8 +15,8 @@ import {
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	DataDecoded,
 	CalldataDecoding,
+	DataDecoded,
 	DataExtraction,
 	displaysFullTransactionDetails,
 	TransactionDisplayOptions,
