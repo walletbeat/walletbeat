@@ -12,7 +12,7 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	CalldataDecoded,
+	DataDecoded,
 	CalldataDecoding,
 	DataExtraction,
 	noCalldataDecoding,
@@ -235,11 +235,11 @@ export const keycardShell: HardwareWallet = {
 					...noCalldataDecoding,
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
 						ref: 'https://github.com/keycard-tech/eth-abi-repo',
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 					[CalldataDecoding.USDC_APPROVAL]: supported({
 						ref: 'https://github.com/keycard-tech/eth-abi-repo',
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 				},
 			},

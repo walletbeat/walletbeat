@@ -15,7 +15,7 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	CalldataDecoded,
+	DataDecoded,
 	CalldataDecoding,
 	type CalldataDecodingSupport,
 	DataExtraction,
@@ -165,20 +165,20 @@ export const gridplusWallet: HardwareWallet = {
 				legibility: {
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported<WithRef<CalldataDecodingSupport>>({
 						ref: refNotNecessary,
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: supported({
 						ref: refNotNecessary,
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 					[CalldataDecoding.USDC_APPROVAL]: notSupported,
 					[CalldataDecoding.AAVE_SUPPLY]: supported({
 						ref: refNotNecessary,
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: supported({
 						ref: refNotNecessary,
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						notSupported,
