@@ -23,7 +23,8 @@ import {
 	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { popRefs, refs } from '@/schema/reference'
-import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
+import { markdown, paragraph, sentence } from '@/types/content'
+import { commaListFormat } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
 
@@ -118,11 +119,11 @@ function analyzeHardwareFeatures(
 		const decodingChecks = [
 			{
 				key: CalldataDecoding.ETH_USDC_TRANSFER,
-				label: 'Basic token transfers (ERC-20)',
+				label: 'basic token transfers (ERC-20)',
 			},
 			{
 				key: CalldataDecoding.ZKSYNC_USDC_TRANSFER,
-				label: 'zkSync token transfers',
+				label: 'ZKSync token transfers',
 			},
 			{
 				key: CalldataDecoding.AAVE_SUPPLY,
@@ -130,11 +131,11 @@ function analyzeHardwareFeatures(
 			},
 			{
 				key: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
-				label: 'Nested Safe transactions',
+				label: 'nested Safe transactions',
 			},
 			{
 				key: CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
-				label: 'Complex nested multisend transactions',
+				label: 'complex nested multisend transactions',
 			},
 		]
 
@@ -216,62 +217,60 @@ function generateHardwareDetailsMarkdown(features: HardwareFeatureDetails): stri
 	const sections: string[] = []
 
 	// Calldata Decoding section
-	if (features.calldataDecoding.supported.length > 0 || features.calldataDecoding.missing.length > 0) {
-		sections.push('**Calldata Decoding:**')
+	if (
+		features.calldataDecoding.supported.length > 0 ||
+		features.calldataDecoding.missing.length > 0
+	) {
+		sections.push('**Calldata Decoding:**\n')
+
 		if (features.calldataDecoding.supported.length > 0) {
-			sections.push(
-				`- ✓ Supported: ${features.calldataDecoding.supported.join(', ')}`,
-			)
+			sections.push(`✓ Supported: ${commaListFormat(features.calldataDecoding.supported)}\n`)
 		}
+
 		if (features.calldataDecoding.missing.length > 0) {
-			sections.push(
-				`- ✗ Missing: ${features.calldataDecoding.missing.join(', ')}`,
-			)
+			sections.push(`✗ Missing: ${commaListFormat(features.calldataDecoding.missing)}\n`)
 		}
 	}
 
 	// Transaction Details section
-	if (features.transactionDetails.supported.length > 0 || features.transactionDetails.missing.length > 0) {
-		sections.push('\n**Transaction Details Displayed:**')
+	if (
+		features.transactionDetails.supported.length > 0 ||
+		features.transactionDetails.missing.length > 0
+	) {
+		sections.push('\n**Transaction Details Displayed (On-Device)**\n')
+
 		if (features.transactionDetails.supported.length > 0) {
-			sections.push(
-				`- ✓ Shown: ${features.transactionDetails.supported.join(', ')}`,
-			)
+			sections.push(`✓ Supported: ${commaListFormat(features.transactionDetails.supported)}\n`)
 		}
+
 		if (features.transactionDetails.missing.length > 0) {
-			sections.push(
-				`- ✗ Not shown: ${features.transactionDetails.missing.join(', ')}`,
-			)
+			sections.push(`✗ Missing: ${commaListFormat(features.transactionDetails.missing)}\n`)
 		}
 	}
 
 	// Data Extraction section
 	if (features.dataExtraction.supported.length > 0 || features.dataExtraction.missing.length > 0) {
-		sections.push('\n**Data Extraction Methods:**')
+		sections.push('\n**Data Extraction Methods**\n')
+
 		if (features.dataExtraction.supported.length > 0) {
-			sections.push(
-				`- ✓ Available: ${features.dataExtraction.supported.join(', ')}`,
-			)
+			sections.push(`✓ Supported: ${commaListFormat(features.dataExtraction.supported)}\n`)
 		}
+
 		if (features.dataExtraction.missing.length > 0) {
-			sections.push(
-				`- ✗ Not available: ${features.dataExtraction.missing.join(', ')}`,
-			)
+			sections.push(`✗ Missing: ${commaListFormat(features.dataExtraction.missing)}\n`)
 		}
 	}
 
 	// Message Signing section
 	if (features.messageSigning.supported.length > 0 || features.messageSigning.missing.length > 0) {
-		sections.push('\n**Message Signing:**')
+		sections.push('\n**Message Signing (On-Device)**\n')
+
 		if (features.messageSigning.supported.length > 0) {
-			sections.push(
-				`- ✓ Displays: ${features.messageSigning.supported.join(', ')}`,
-			)
+			sections.push(`✓ Supported: ${commaListFormat(features.messageSigning.supported)}\n`)
 		}
+
 		if (features.messageSigning.missing.length > 0) {
-			sections.push(
-				`- ✗ Missing: ${features.messageSigning.missing.join(', ')}`,
-			)
+			sections.push(`✗ Missing: ${commaListFormat(features.messageSigning.missing)}\n`)
 		}
 	}
 
@@ -283,25 +282,25 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 
 	if (features.calldataDecoding.missing.length > 0) {
 		improvements.push(
-			`**Calldata Decoding:** Add on-device support for ${features.calldataDecoding.missing.join(', ').toLowerCase()}`,
+			`**Calldata Decoding:** Add on-device support for ${commaListFormat(features.calldataDecoding.missing)}`,
 		)
 	}
 
 	if (features.transactionDetails.missing.length > 0) {
 		improvements.push(
-			`**Transaction Details:** Display ${features.transactionDetails.missing.join(', ').toLowerCase()} on the device`,
+			`**Transaction Details:** Display ${commaListFormat(features.transactionDetails.missing)} on the device`,
 		)
 	}
 
 	if (features.dataExtraction.missing.length > 0) {
 		improvements.push(
-			`**Data Extraction:** Implement ${features.dataExtraction.missing.join(', ').toLowerCase()} to allow independent verification`,
+			`**Data Extraction:** Implement ${commaListFormat(features.dataExtraction.missing)} to allow independent verification`,
 		)
 	}
 
 	if (features.messageSigning.missing.length > 0) {
 		improvements.push(
-			`**Message Signing:** Add on-device display for ${features.messageSigning.missing.join(', ').toLowerCase()}`,
+			`**Message Signing:** Add on-device display for ${commaListFormat(features.messageSigning.missing)}`,
 		)
 	}
 
@@ -541,47 +540,47 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 	const sections: string[] = []
 
 	// Calldata Display section
-	if (features.calldataDisplay.supported.length > 0 || features.calldataDisplay.missing.length > 0) {
-		sections.push('**Calldata Display:**')
+	if (
+		features.calldataDisplay.supported.length > 0 ||
+		features.calldataDisplay.missing.length > 0
+	) {
+		sections.push('**Calldata Display**\n')
+
 		if (features.calldataDisplay.supported.length > 0) {
-			sections.push(
-				`- ✓ Supported: ${features.calldataDisplay.supported.join(', ')}`,
-			)
+			sections.push(`✓ Supported: ${commaListFormat(features.calldataDisplay.supported)}\n`)
 		}
+
 		if (features.calldataDisplay.missing.length > 0) {
-			sections.push(
-				`- ✗ Missing: ${features.calldataDisplay.missing.join(', ')}`,
-			)
+			sections.push(`✗ Missing: ${commaListFormat(features.calldataDisplay.missing)}\n`)
 		}
 	}
 
 	// Transaction Details section
-	if (features.transactionDetails.supported.length > 0 || features.transactionDetails.missing.length > 0) {
-		sections.push('\n**Transaction Details Displayed:**')
+	if (
+		features.transactionDetails.supported.length > 0 ||
+		features.transactionDetails.missing.length > 0
+	) {
+		sections.push('\n**Transaction Details Displayed**\n')
+
 		if (features.transactionDetails.supported.length > 0) {
-			sections.push(
-				`- ✓ Shown: ${features.transactionDetails.supported.join(', ')}`,
-			)
+			sections.push(`✓ Supported: ${commaListFormat(features.transactionDetails.supported)}\n`)
 		}
+
 		if (features.transactionDetails.missing.length > 0) {
-			sections.push(
-				`- ✗ Not shown: ${features.transactionDetails.missing.join(', ')}`,
-			)
+			sections.push(`✗ Missing: ${commaListFormat(features.transactionDetails.missing)}\n`)
 		}
 	}
 
 	// Message Signing section
 	if (features.messageSigning.supported.length > 0 || features.messageSigning.missing.length > 0) {
-		sections.push('\n**Message Signing:**')
+		sections.push('\n**Message Signing**\n')
+
 		if (features.messageSigning.supported.length > 0) {
-			sections.push(
-				`- ✓ Displays: ${features.messageSigning.supported.join(', ')}`,
-			)
+			sections.push(`✓ Supported: ${commaListFormat(features.messageSigning.supported)}\n`)
 		}
+
 		if (features.messageSigning.missing.length > 0) {
-			sections.push(
-				`- ✗ Missing: ${features.messageSigning.missing.join(', ')}`,
-			)
+			sections.push(`✗ Missing: ${commaListFormat(features.messageSigning.missing)}\n`)
 		}
 	}
 
@@ -593,19 +592,19 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 
 	if (features.calldataDisplay.missing.length > 0) {
 		improvements.push(
-			`**Calldata Display:** Implement ${features.calldataDisplay.missing.join(', ').toLowerCase()} for calldata`,
+			`**Calldata Display:** Implement ${commaListFormat(features.calldataDisplay.missing)} for calldata`,
 		)
 	}
 
 	if (features.transactionDetails.missing.length > 0) {
 		improvements.push(
-			`**Transaction Details:** Display ${features.transactionDetails.missing.join(', ').toLowerCase()} in the wallet interface`,
+			`**Transaction Details:** Display ${commaListFormat(features.transactionDetails.missing)} in the wallet interface`,
 		)
 	}
 
 	if (features.messageSigning.missing.length > 0) {
 		improvements.push(
-			`**Message Signing:** Add support for displaying ${features.messageSigning.missing.join(', ').toLowerCase()}`,
+			`**Message Signing:** Add support for displaying ${commaListFormat(features.messageSigning.missing)}`,
 		)
 	}
 
