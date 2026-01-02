@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
@@ -16,14 +17,13 @@ import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
 export const frame: SoftwareWallet = {
 	metadata: {
 		id: 'frame',
 		displayName: 'Frame',
 		tableName: 'Frame',
 		blurb: paragraph('Frame...'),
-		contributors: [polymutex, nconsigny, lucemans],
+		contributors: [polymutex, nconsigny, lucemans, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-13',
 		urls: {

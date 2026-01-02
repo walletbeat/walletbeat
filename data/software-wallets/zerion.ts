@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -14,14 +15,13 @@ import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
 export const zerion: SoftwareWallet = {
 	metadata: {
 		id: 'zerion',
 		displayName: 'Zerion',
 		tableName: 'Zerion',
 		blurb: paragraph(''),
-		contributors: [lucemans],
+		contributors: [lucemans, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
 		urls: {

@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { gabrielkerekes } from '@/data/contributors/gabrielkerekes'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -26,7 +27,7 @@ export const nufi: SoftwareWallet = {
 		blurb: paragraph(`
 			Powerful wallet for powerful users.
 		`),
-		contributors: [gabrielkerekes],
+		contributors: [gabrielkerekes, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-11',
 		urls: {

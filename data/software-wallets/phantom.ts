@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -15,7 +16,6 @@ import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
 export const phantom: SoftwareWallet = {
 	metadata: {
 		id: 'phantom',
@@ -26,7 +26,7 @@ export const phantom: SoftwareWallet = {
 			on ease of use, easy swapping of tokens and NFTs, and integration
 			with popular DeFi and NFT exchange protocols within the wallet.
 		`),
-		contributors: [nconsigny],
+		contributors: [nconsigny, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
 		urls: {
