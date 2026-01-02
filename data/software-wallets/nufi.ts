@@ -7,6 +7,7 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import { TransactionDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -169,7 +170,18 @@ export const nufi: SoftwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			transactionLegibility: null,
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: null,
+				transactionDetailsDisplay: {
+					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: TransactionDisplayOptions.NOT_IN_UI,
+					to: TransactionDisplayOptions.SHOWN_OPTIONALLY,
+					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {
