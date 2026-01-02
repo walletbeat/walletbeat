@@ -23,9 +23,9 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
 import {
+	DataDisplayOptions,
 	DataExtraction,
 	noCalldataDecoding,
-	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -221,12 +221,12 @@ export const bitboxWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: {
-					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: TransactionDisplayOptions.NOT_IN_UI,
-					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,

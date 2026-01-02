@@ -6,9 +6,9 @@ import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-
 import {
 	CalldataDecoding,
 	DataDecoded,
+	DataDisplayOptions,
 	DataExtraction,
 	displaysFullTransactionDetails,
-	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -164,7 +164,7 @@ export const imkeyWallet: HardwareWallet = {
 				},
 				detailsDisplayed: {
 					...displaysFullTransactionDetails,
-					nonce: TransactionDisplayOptions.NOT_IN_UI,
+					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				legibility: {
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({

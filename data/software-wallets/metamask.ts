@@ -16,8 +16,8 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
+	DataDisplayOptions,
 	displaysFullCallData,
-	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
@@ -437,12 +437,12 @@ export const metamask: SoftwareWallet = {
 				calldataDisplay: displaysFullCallData,
 				messageSigningLegibility: null,
 				transactionDetailsDisplay: {
-					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: TransactionDisplayOptions.SHOWN_OPTIONALLY,
-					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 			},
 		},

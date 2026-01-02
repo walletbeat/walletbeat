@@ -31,7 +31,7 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
-import { TransactionDisplayOptions } from '@/schema/features/security/transaction-legibility'
+import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
@@ -528,12 +528,12 @@ export const ambire: SoftwareWallet = {
 				calldataDisplay: null,
 				messageSigningLegibility: null,
 				transactionDetailsDisplay: {
-					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: TransactionDisplayOptions.NOT_IN_UI,
-					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 			},
 		},

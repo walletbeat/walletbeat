@@ -9,21 +9,21 @@ import type { ResolvedFeatures } from '@/schema/features'
 import {
 	CalldataDecoding,
 	DataDecoded,
+	DataDisplayOptions,
 	DataExtraction,
 	type HardwareMessageSigningLegibility,
 	type HardwareTransactionLegibilityImplementation,
 	isFullTransactionDetails,
 	isHardwareTransactionLegibility,
 	isSupportedOnDevice,
-	MessageSigningProvides,
+	MessageSigningDetails,
 	type SoftwareMessageSigningLegibility,
 	type SoftwareTransactionLegibilityImplementation,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
-	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { isSupported } from '@/schema/features/support'
-import { popRefs, refs } from '@/schema/reference'
+import { popRefs, refs, refTodo } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
 
@@ -48,10 +48,10 @@ function evaluateSoftwareMessageSigning(
 		return false
 	}
 
-	const hasEip712Struct = messageSigningLegibility[MessageSigningProvides.EIP712_STRUCT]
-	const hasDomainHash = messageSigningLegibility[MessageSigningProvides.DOMAIN_HASH]
-	const hasMessageHash = messageSigningLegibility[MessageSigningProvides.MESSAGE_HASH]
-	const hasSafeHash = messageSigningLegibility[MessageSigningProvides.SAFE_HASH]
+	const hasEip712Struct = messageSigningLegibility[MessageSigningDetails.EIP712_STRUCT]
+	const hasDomainHash = messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH]
+	const hasMessageHash = messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH]
+	const hasSafeHash = messageSigningLegibility[MessageSigningDetails.SAFE_HASH]
 
 	// PASS if: EIP-712 struct OR (domainHash AND messageHash) OR safeHash
 	return hasEip712Struct || (hasDomainHash && hasMessageHash) || hasSafeHash
@@ -72,16 +72,23 @@ function evaluateHardwareMessageSigning(
 		return false
 	}
 
-	const provides = messageSigningLegibility.messageSigningProvides
-	const hasEip712Struct = provides[MessageSigningProvides.EIP712_STRUCT]
-	const hasDomainHash = provides[MessageSigningProvides.DOMAIN_HASH]
-	const hasMessageHash = provides[MessageSigningProvides.MESSAGE_HASH]
-	const hasSafeHash = provides[MessageSigningProvides.SAFE_HASH]
+	const provides = messageSigningLegibility.messageSigningDetails
+	const hasEip712Struct =
+		provides[MessageSigningDetails.EIP712_STRUCT] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		provides[MessageSigningDetails.EIP712_STRUCT] === DataDisplayOptions.SHOWN_OPTIONALLY
+	const hasDomainHash =
+		provides[MessageSigningDetails.DOMAIN_HASH] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		provides[MessageSigningDetails.DOMAIN_HASH] === DataDisplayOptions.SHOWN_OPTIONALLY
+	const hasMessageHash =
+		provides[MessageSigningDetails.MESSAGE_HASH] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		provides[MessageSigningDetails.MESSAGE_HASH] === DataDisplayOptions.SHOWN_OPTIONALLY
+	const hasSafeHash =
+		provides[MessageSigningDetails.SAFE_HASH] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		provides[MessageSigningDetails.SAFE_HASH] === DataDisplayOptions.SHOWN_OPTIONALLY
 
 	// PASS if: EIP-712 struct OR (domainHash AND messageHash) OR safeHash
 	return hasEip712Struct || (hasDomainHash && hasMessageHash) || hasSafeHash
 }
-
 // Hardware wallet detail generation helpers
 interface HardwareFeatureDetails {
 	calldataDecoding: {
@@ -104,12 +111,12 @@ interface HardwareFeatureDetails {
 	}
 }
 
-function analyzeHardwareFeatures(
-	legibility: HardwareTransactionLegibilityImplementation['legibility'],
-	detailsDisplayed: HardwareTransactionLegibilityImplementation['detailsDisplayed'],
-	dataExtraction: HardwareTransactionLegibilityImplementation['dataExtraction'],
-	messageSigningLegibility: HardwareTransactionLegibilityImplementation['messageSigningLegibility'],
-): HardwareFeatureDetails {
+function analyzeHardwareFeatures({
+	legibility,
+	detailsDisplayed,
+	dataExtraction,
+	messageSigningLegibility,
+}: HardwareTransactionLegibilityImplementation): HardwareFeatureDetails {
 	const details: HardwareFeatureDetails = {
 		calldataDecoding: { supported: [], missing: [], decodedLocation: null },
 		transactionDetails: { supported: [], missing: [] },
@@ -192,7 +199,7 @@ function analyzeHardwareFeatures(
 		]
 
 		detailChecks.forEach(({ value, label }) => {
-			if (value === TransactionDisplayOptions.SHOWN_BY_DEFAULT) {
+			if (value === DataDisplayOptions.SHOWN_BY_DEFAULT) {
 				details.transactionDetails.supported.push(label)
 			} else {
 				details.transactionDetails.missing.push(label)
@@ -219,17 +226,17 @@ function analyzeHardwareFeatures(
 
 	// Analyze message signing
 	if (messageSigningLegibility !== null) {
-		const provides = messageSigningLegibility.messageSigningProvides
+		const provides = messageSigningLegibility.messageSigningDetails
 		const decodedLocation = messageSigningLegibility.decoded
 		const onDevice = decodedLocation === DataDecoded.ON_DEVICE
 
 		details.messageSigning.decodedLocation = decodedLocation
 
 		const signingChecks = [
-			{ key: MessageSigningProvides.EIP712_STRUCT, label: 'EIP-712 structured data' },
-			{ key: MessageSigningProvides.DOMAIN_HASH, label: 'Domain hash' },
-			{ key: MessageSigningProvides.MESSAGE_HASH, label: 'Message hash' },
-			{ key: MessageSigningProvides.SAFE_HASH, label: 'Safe hash' },
+			{ key: MessageSigningDetails.EIP712_STRUCT, label: 'EIP-712 structured data' },
+			{ key: MessageSigningDetails.DOMAIN_HASH, label: 'Domain hash' },
+			{ key: MessageSigningDetails.MESSAGE_HASH, label: 'Message hash' },
+			{ key: MessageSigningDetails.SAFE_HASH, label: 'Safe hash' },
 		]
 
 		if (onDevice) {
@@ -344,17 +351,9 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 
 // Hardware wallet evaluation helpers
 function hardwareNoTransactionLegibility(
-	legibility: HardwareTransactionLegibilityImplementation['legibility'],
-	detailsDisplayed: HardwareTransactionLegibilityImplementation['detailsDisplayed'],
-	dataExtraction: HardwareTransactionLegibilityImplementation['dataExtraction'],
-	messageSigningLegibility: HardwareTransactionLegibilityImplementation['messageSigningLegibility'],
+	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const features = analyzeHardwareFeatures(
-		legibility,
-		detailsDisplayed,
-		dataExtraction,
-		messageSigningLegibility,
-	)
+	const features = analyzeHardwareFeatures(support)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -378,17 +377,9 @@ function hardwareNoTransactionLegibility(
 }
 
 function hardwareBasicTransactionLegibility(
-	legibility: HardwareTransactionLegibilityImplementation['legibility'],
-	detailsDisplayed: HardwareTransactionLegibilityImplementation['detailsDisplayed'],
-	dataExtraction: HardwareTransactionLegibilityImplementation['dataExtraction'],
-	messageSigningLegibility: HardwareTransactionLegibilityImplementation['messageSigningLegibility'],
+	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const features = analyzeHardwareFeatures(
-		legibility,
-		detailsDisplayed,
-		dataExtraction,
-		messageSigningLegibility,
-	)
+	const features = analyzeHardwareFeatures(support)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -412,17 +403,9 @@ function hardwareBasicTransactionLegibility(
 }
 
 function hardwarePartialTransactionLegibility(
-	legibility: HardwareTransactionLegibilityImplementation['legibility'],
-	detailsDisplayed: HardwareTransactionLegibilityImplementation['detailsDisplayed'],
-	dataExtraction: HardwareTransactionLegibilityImplementation['dataExtraction'],
-	messageSigningLegibility: HardwareTransactionLegibilityImplementation['messageSigningLegibility'],
+	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const features = analyzeHardwareFeatures(
-		legibility,
-		detailsDisplayed,
-		dataExtraction,
-		messageSigningLegibility,
-	)
+	const features = analyzeHardwareFeatures(support)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
@@ -446,17 +429,9 @@ function hardwarePartialTransactionLegibility(
 }
 
 function hardwareFullTransactionLegibility(
-	legibility: HardwareTransactionLegibilityImplementation['legibility'],
-	detailsDisplayed: HardwareTransactionLegibilityImplementation['detailsDisplayed'],
-	dataExtraction: HardwareTransactionLegibilityImplementation['dataExtraction'],
-	messageSigningLegibility: HardwareTransactionLegibilityImplementation['messageSigningLegibility'],
+	support: HardwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const features = analyzeHardwareFeatures(
-		legibility,
-		detailsDisplayed,
-		dataExtraction,
-		messageSigningLegibility,
-	)
+	const features = analyzeHardwareFeatures(support)
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 
 	return {
@@ -491,11 +466,11 @@ interface SoftwareFeatureDetails {
 	}
 }
 
-function analyzeSoftwareFeatures(
-	calldataDisplay: SoftwareTransactionLegibilityImplementation['calldataDisplay'],
-	transactionDetailsDisplay: SoftwareTransactionLegibilityImplementation['transactionDetailsDisplay'],
-	messageSigningLegibility: SoftwareTransactionLegibilityImplementation['messageSigningLegibility'],
-): SoftwareFeatureDetails {
+function analyzeSoftwareFeatures({
+	calldataDisplay,
+	transactionDetailsDisplay,
+	messageSigningLegibility,
+}: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
 	const details: SoftwareFeatureDetails = {
 		calldataDisplay: { supported: [], missing: [] },
 		transactionDetails: { supported: [], missing: [] },
@@ -536,8 +511,8 @@ function analyzeSoftwareFeatures(
 
 		detailChecks.forEach(({ value, label }) => {
 			if (
-				value === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-				value === TransactionDisplayOptions.SHOWN_OPTIONALLY
+				value === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+				value === DataDisplayOptions.SHOWN_OPTIONALLY
 			) {
 				details.transactionDetails.supported.push(label)
 			} else {
@@ -549,10 +524,10 @@ function analyzeSoftwareFeatures(
 	// Analyze message signing
 	if (messageSigningLegibility !== null) {
 		const signingChecks = [
-			{ key: MessageSigningProvides.EIP712_STRUCT, label: 'EIP-712 structured data' },
-			{ key: MessageSigningProvides.DOMAIN_HASH, label: 'Domain hash' },
-			{ key: MessageSigningProvides.MESSAGE_HASH, label: 'Message hash' },
-			{ key: MessageSigningProvides.SAFE_HASH, label: 'Safe hash' },
+			{ key: MessageSigningDetails.EIP712_STRUCT, label: 'EIP-712 structured data' },
+			{ key: MessageSigningDetails.DOMAIN_HASH, label: 'Domain hash' },
+			{ key: MessageSigningDetails.MESSAGE_HASH, label: 'Message hash' },
+			{ key: MessageSigningDetails.SAFE_HASH, label: 'Safe hash' },
 		]
 
 		signingChecks.forEach(({ key, label }) => {
@@ -648,15 +623,9 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 
 // Software wallet evaluation helpers
 function softwareNoTransactionLegibility(
-	calldataDisplay: SoftwareTransactionLegibilityImplementation['calldataDisplay'],
-	transactionDetailsDisplay: SoftwareTransactionLegibilityImplementation['transactionDetailsDisplay'],
-	messageSigningLegibility: SoftwareTransactionLegibilityImplementation['messageSigningLegibility'],
+	support: SoftwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const features = analyzeSoftwareFeatures(
-		calldataDisplay,
-		transactionDetailsDisplay,
-		messageSigningLegibility,
-	)
+	const features = analyzeSoftwareFeatures(support)
 	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateSoftwareHowToImprove(features)
 
@@ -680,15 +649,9 @@ function softwareNoTransactionLegibility(
 }
 
 function softwarePartialTransactionLegibility(
-	calldataDisplay: SoftwareTransactionLegibilityImplementation['calldataDisplay'],
-	transactionDetailsDisplay: SoftwareTransactionLegibilityImplementation['transactionDetailsDisplay'],
-	messageSigningLegibility: SoftwareTransactionLegibilityImplementation['messageSigningLegibility'],
+	support: SoftwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const features = analyzeSoftwareFeatures(
-		calldataDisplay,
-		transactionDetailsDisplay,
-		messageSigningLegibility,
-	)
+	const features = analyzeSoftwareFeatures(support)
 	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
 	const improvementsMarkdown = generateSoftwareHowToImprove(features)
 
@@ -710,15 +673,9 @@ function softwarePartialTransactionLegibility(
 }
 
 function softwareFullTransactionLegibility(
-	calldataDisplay: SoftwareTransactionLegibilityImplementation['calldataDisplay'],
-	transactionDetailsDisplay: SoftwareTransactionLegibilityImplementation['transactionDetailsDisplay'],
-	messageSigningLegibility: SoftwareTransactionLegibilityImplementation['messageSigningLegibility'],
+	support: SoftwareTransactionLegibilityImplementation,
 ): Evaluation<TransactionLegibilityValue> {
-	const features = analyzeSoftwareFeatures(
-		calldataDisplay,
-		transactionDetailsDisplay,
-		messageSigningLegibility,
-	)
+	const features = analyzeSoftwareFeatures(support)
 	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
 
 	return {
@@ -740,10 +697,8 @@ function evaluateHardwareWalletTransactionLegibility(
 ): Evaluation<TransactionLegibilityValue> {
 	const references = refs(hardwareTransactionLegibility)
 
-	const legibility = hardwareTransactionLegibility.legibility
-	const detailsDisplayed = hardwareTransactionLegibility.detailsDisplayed
-	const dataExtraction = hardwareTransactionLegibility.dataExtraction
-	const messageSigningLegibility = hardwareTransactionLegibility.messageSigningLegibility
+	const { legibility, detailsDisplayed, dataExtraction, messageSigningLegibility } =
+		hardwareTransactionLegibility
 
 	const getOverallRating = (): Rating => {
 		if (legibility === null || detailsDisplayed === null || dataExtraction === null) {
@@ -823,37 +778,17 @@ function evaluateHardwareWalletTransactionLegibility(
 		}
 
 		if (overallRating === Rating.FAIL) {
-			return hardwareNoTransactionLegibility(
-				legibility,
-				detailsDisplayed,
-				dataExtraction,
-				messageSigningLegibility,
-			)
+			return hardwareNoTransactionLegibility(hardwareTransactionLegibility)
 		} else if (overallRating === Rating.PASS) {
-			return hardwareFullTransactionLegibility(
-				legibility,
-				detailsDisplayed,
-				dataExtraction,
-				messageSigningLegibility,
-			)
+			return hardwareFullTransactionLegibility(hardwareTransactionLegibility)
 		} else {
 			const hasDecodingSupport = legibility !== null && supportsAnyCalldataDecoding(legibility)
 			const hasAllDetails = detailsDisplayed !== null && isFullTransactionDetails(detailsDisplayed)
 
 			if (hasDecodingSupport && !hasAllDetails) {
-				return hardwarePartialTransactionLegibility(
-					legibility,
-					detailsDisplayed,
-					dataExtraction,
-					messageSigningLegibility,
-				)
+				return hardwarePartialTransactionLegibility(hardwareTransactionLegibility)
 			} else {
-				return hardwareBasicTransactionLegibility(
-					legibility,
-					detailsDisplayed,
-					dataExtraction,
-					messageSigningLegibility,
-				)
+				return hardwareBasicTransactionLegibility(hardwareTransactionLegibility)
 			}
 		}
 	})()
@@ -870,9 +805,8 @@ function evaluateSoftwareWalletTransactionLegibility(
 ): Evaluation<TransactionLegibilityValue> {
 	const { withoutRefs: transactionLegibilitySupport } = popRefs(softwareTransactionLegibility)
 
-	const calldataDisplay = transactionLegibilitySupport.calldataDisplay
-	const transactionDetailsDisplay = transactionLegibilitySupport.transactionDetailsDisplay
-	const messageSigningLegibility = transactionLegibilitySupport.messageSigningLegibility
+	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility } =
+		transactionLegibilitySupport
 
 	if (calldataDisplay === null || transactionDetailsDisplay === null) {
 		return unrated(transactionLegibility, brand, null)
@@ -888,18 +822,18 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 	// For DisplayedTransactionDetails, SHOWN_BY_DEFAULT or SHOWN_OPTIONALLY count as supported
 	const transactionDetailsRatings = [
-		transactionDetailsDisplay.gas === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.gas === TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.nonce === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.nonce === TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.from === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.from === TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.to === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.to === TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.chain === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.chain === TransactionDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.value === TransactionDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.value === TransactionDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.gas === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.gas === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.nonce === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.nonce === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.from === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.from === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.to === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.to === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.chain === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.chain === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.value === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.value === DataDisplayOptions.SHOWN_OPTIONALLY,
 	]
 
 	const transactionDetailsCount = transactionDetailsRatings.filter(r => r).length
@@ -943,23 +877,11 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 	const result = ((): Evaluation<TransactionLegibilityValue> => {
 		if (rating === Rating.FAIL) {
-			return softwareNoTransactionLegibility(
-				calldataDisplay,
-				transactionDetailsDisplay,
-				messageSigningLegibility,
-			)
+			return softwareNoTransactionLegibility(softwareTransactionLegibility)
 		} else if (rating === Rating.PASS) {
-			return softwareFullTransactionLegibility(
-				calldataDisplay,
-				transactionDetailsDisplay,
-				messageSigningLegibility,
-			)
+			return softwareFullTransactionLegibility(softwareTransactionLegibility)
 		} else {
-			return softwarePartialTransactionLegibility(
-				calldataDisplay,
-				transactionDetailsDisplay,
-				messageSigningLegibility,
-			)
+			return softwarePartialTransactionLegibility(softwareTransactionLegibility)
 		}
 	})()
 
@@ -1049,14 +971,25 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					The hardware wallet implements full transaction legibility, displaying all
 					transaction details on the hardware device screen for verification before signing.
 				`),
-				hardwareFullTransactionLegibility(null, null, null, null),
+				hardwareFullTransactionLegibility({
+					legibility: null,
+					detailsDisplayed: null,
+					dataExtraction: null,
+					messageSigningLegibility: null,
+					ref: refTodo,
+				}),
 			),
 			exampleRating(
 				paragraph(`
 					The software wallet implements full transaction legibility, displaying all
 					transaction details on the wallet screen/window for verification before signing.
 				`),
-				softwareFullTransactionLegibility(null, null, null),
+				softwareFullTransactionLegibility({
+					calldataDisplay: null,
+					transactionDetailsDisplay: null,
+					messageSigningLegibility: null,
+					ref: refTodo,
+				}),
 			),
 		],
 		partial: [
@@ -1065,21 +998,38 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					The hardware wallet implements partial transaction legibility, where most but not all transaction
 					details are displayed on the hardware device screen.
 				`),
-				hardwarePartialTransactionLegibility(null, null, null, null),
+				hardwarePartialTransactionLegibility({
+					legibility: null,
+					detailsDisplayed: null,
+					dataExtraction: null,
+					messageSigningLegibility: null,
+					ref: refTodo,
+				}),
 			),
 			exampleRating(
 				paragraph(`
 					The hardware wallet implements basic transaction legibility, but the implementation is limited
 					and doesn't provide full transparency for all transaction details on the device.
 				`),
-				hardwareBasicTransactionLegibility(null, null, null, null),
+				hardwareBasicTransactionLegibility({
+					legibility: null,
+					detailsDisplayed: null,
+					dataExtraction: null,
+					messageSigningLegibility: null,
+					ref: refTodo,
+				}),
 			),
 			exampleRating(
 				paragraph(`
 					The software wallet implements partial transaction legibility, where most but not all transaction
 					details are displayed on the wallet screen/window.
 				`),
-				softwarePartialTransactionLegibility(null, null, null),
+				softwarePartialTransactionLegibility({
+					calldataDisplay: null,
+					transactionDetailsDisplay: null,
+					messageSigningLegibility: null,
+					ref: refTodo,
+				}),
 			),
 		],
 		fail: [
@@ -1087,13 +1037,24 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 				paragraph(`
 					The hardware wallet does not implement effective transaction legibility on the device itself.
 				`),
-				hardwareNoTransactionLegibility(null, null, null, null),
+				hardwareNoTransactionLegibility({
+					legibility: null,
+					detailsDisplayed: null,
+					dataExtraction: null,
+					messageSigningLegibility: null,
+					ref: refTodo,
+				}),
 			),
 			exampleRating(
 				paragraph(`
 					The software wallet does not implement effective transaction legibility.
 				`),
-				softwareNoTransactionLegibility(null, null, null),
+				softwareNoTransactionLegibility({
+					calldataDisplay: null,
+					transactionDetailsDisplay: null,
+					messageSigningLegibility: null,
+					ref: refTodo,
+				}),
 			),
 		],
 	},

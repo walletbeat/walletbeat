@@ -2,7 +2,7 @@ import type { WithRef } from '@/schema/reference'
 
 import { isSupported, notSupported, type Support } from '../support'
 
-export enum TransactionDisplayOptions {
+export enum DataDisplayOptions {
 	/** Shown by default on the transaction approval screen */
 	SHOWN_BY_DEFAULT = 'SHOWN_BY_DEFAULT',
 	/** Available on the transaction approval screen but requires user action (e.g., clicking a button) or enabling in settings */
@@ -15,36 +15,36 @@ export enum TransactionDisplayOptions {
  * How are the essential transaction data displayed by the hardware wallet?
  */
 export interface DisplayedTransactionDetails {
-	gas: TransactionDisplayOptions
-	nonce: TransactionDisplayOptions
-	from: TransactionDisplayOptions
-	to: TransactionDisplayOptions
-	chain: TransactionDisplayOptions
-	value: TransactionDisplayOptions
+	gas: DataDisplayOptions
+	nonce: DataDisplayOptions
+	from: DataDisplayOptions
+	to: DataDisplayOptions
+	chain: DataDisplayOptions
+	value: DataDisplayOptions
 }
 
 /**
  * The wallet displays no transaction details.
  */
 export const displaysNoTransactionDetails: DisplayedTransactionDetails = {
-	gas: TransactionDisplayOptions.NOT_IN_UI,
-	nonce: TransactionDisplayOptions.NOT_IN_UI,
-	from: TransactionDisplayOptions.NOT_IN_UI,
-	to: TransactionDisplayOptions.NOT_IN_UI,
-	chain: TransactionDisplayOptions.NOT_IN_UI,
-	value: TransactionDisplayOptions.NOT_IN_UI,
+	gas: DataDisplayOptions.NOT_IN_UI,
+	nonce: DataDisplayOptions.NOT_IN_UI,
+	from: DataDisplayOptions.NOT_IN_UI,
+	to: DataDisplayOptions.NOT_IN_UI,
+	chain: DataDisplayOptions.NOT_IN_UI,
+	value: DataDisplayOptions.NOT_IN_UI,
 }
 
 /**
  * The wallet displays all the possible transaction details.
  */
 export const displaysFullTransactionDetails: DisplayedTransactionDetails = {
-	gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	nonce: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 }
 
 /**
@@ -205,7 +205,7 @@ export enum DataDecoded {
 /**
  * What does the wallet provide for message signing legibility?
  */
-export enum MessageSigningProvides {
+export enum MessageSigningDetails {
 	/** The wallet provides the EIP-712 struct */
 	EIP712_STRUCT = 'EIP712_STRUCT',
 	/** The wallet provides the domain hash */
@@ -219,14 +219,14 @@ export enum MessageSigningProvides {
 /**
  * For software wallets: track which message signing data types are available
  */
-export type SoftwareMessageSigningLegibility = Record<MessageSigningProvides, boolean> | null
+export type SoftwareMessageSigningLegibility = Record<MessageSigningDetails, boolean> | null
 
 /**
  * For hardware wallets: track which message signing data types are available and where they are displayed
  */
 export interface HardwareMessageSigningLegibility {
 	/** Which message signing data types does the wallet provide? */
-	messageSigningProvides: Record<MessageSigningProvides, boolean>
+	messageSigningDetails: Record<MessageSigningDetails, DataDisplayOptions>
 	/** Where does the message signing data display happen? */
 	decoded: DataDecoded
 }
@@ -380,12 +380,12 @@ export interface SoftwareTransactionLegibilitySupport {
 
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
 	return (
-		details.gas === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.nonce === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.from === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.to === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.chain === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.value === TransactionDisplayOptions.SHOWN_BY_DEFAULT
+		details.gas === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.nonce === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.from === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.to === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.chain === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.value === DataDisplayOptions.SHOWN_BY_DEFAULT
 	)
 }
 

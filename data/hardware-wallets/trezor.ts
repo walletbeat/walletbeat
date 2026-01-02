@@ -15,10 +15,10 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
+	DataDisplayOptions,
 	DataExtraction,
 	displaysFullTransactionDetails,
 	noCalldataDecoding,
-	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
@@ -180,8 +180,8 @@ export const trezorWallet: HardwareWallet = {
 				},
 				detailsDisplayed: {
 					...displaysFullTransactionDetails,
-					chain: TransactionDisplayOptions.NOT_IN_UI,
-					nonce: TransactionDisplayOptions.NOT_IN_UI,
+					chain: DataDisplayOptions.NOT_IN_UI,
+					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,
