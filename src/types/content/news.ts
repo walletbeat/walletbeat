@@ -92,6 +92,8 @@ export type WalletSecurityNews = WithRef<{
 	/** Current status of the incident */
 	status: IncidentStatus
 
+	/** Date when the incident occurred or was first disclosed */
+	publishedAt: CalendarDate
 	/** Date when the news item was last updated */
 	updatedAt: CalendarDate
 }>
