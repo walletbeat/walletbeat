@@ -106,13 +106,15 @@ function getTypeLabel(type: NewsType) {
 			allNews.map((news, index) => (
 				<>
 					<section id={news.name} data-scroll-item='inline-detached' class='news-item'>
-						<div class='wallet-info'>
-							<img
-								src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
-								alt={news.wallet.displayName}
-							/>
-							<span class='wallet-name'>{news.wallet.displayName}</span>
-						</div>
+						{news.wallet && (
+							<div class='wallet-info'>
+								<img
+									src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
+									alt={news.wallet.displayName}
+								/>
+								<span class='wallet-name'>{news.wallet.displayName}</span>
+							</div>
+						)}
 
 						<button
 							class='news-header'

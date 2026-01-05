@@ -79,7 +79,7 @@ export type WalletSecurityNews = WithRef<{
 	/** Brief description of the incident */
 	summary: string
 	/** Wallet involved */
-	wallet: WalletMetadata
+	wallet?: WalletMetadata
 
 	/** Details about the impact of the incident */
 	impact: {
