@@ -25,7 +25,7 @@ export const globalEBreach: WalletSecurityNews = {
 	updatedAt: '2026-01-06',
 	ref: {
 		url: 'https://x.com/zachxbt/status/2008139053544194545',
-		label: 'ZachXBT community alert on Ledger data breach'
+		label: 'ZachXBT tweet about Ledger data breach'
 	}
 }
 
