@@ -22,69 +22,69 @@ import {
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
+import type { HardwareWallet, WalletMetadata } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
-
-export const ledgerWallet: HardwareWallet = {
-	metadata: {
-		id: 'ledger',
-		displayName: 'Ledger Wallet',
-		tableName: 'Ledger',
-		blurb: paragraph(`
+export const ledgerWalletMetadata: WalletMetadata = {
+	id: 'ledger',
+	displayName: 'Ledger Wallet',
+	tableName: 'Ledger',
+	blurb: paragraph(`
 			Ledger Wallet is a self-custodial wallet built by Ledger. It
 			integrates with Ledger hardware wallets to provide secure cryptocurrency management.
 		`),
-		contributors: [nconsigny, patrickalphac, mattmatt],
-		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
-		hardwareWalletModels: [
-			{
-				id: 'ledger-stax',
-				name: 'Ledger Stax',
-				isFlagship: true,
-				url: 'https://shop.ledger.com/products/ledger-stax',
-			},
-			{
-				id: 'ledger-nano-s',
-				name: 'Ledger Nano S',
-				isFlagship: false,
-				url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
-			},
-			{
-				id: 'ledger-nano-s-plus',
-				name: 'Ledger Nano S+',
-				isFlagship: false,
-				url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
-			},
-			{
-				id: 'ledger-nano-x',
-				name: 'Ledger Nano X',
-				isFlagship: false,
-				url: 'https://shop.ledger.com/products/ledger-nano-x',
-			},
-			{
-				id: 'ledger-flex',
-				name: 'Ledger Flex',
-				isFlagship: false,
-				url: 'https://shop.ledger.com/products/ledger-flex',
-			},
-		],
-		iconExtension: 'svg',
-		lastUpdated: '2025-03-12',
-		urls: {
-			docs: ['https://developers.ledger.com/'],
-			repositories: ['https://github.com/LedgerHQ/'],
-			socials: {
-				facebook: 'https://web.facebook.com/Ledger/',
-				instagram: 'https://www.instagram.com/ledger/',
-				linkedin: 'https://www.linkedin.com/company/ledgerhq/',
-				reddit: 'https://www.reddit.com/r/ledgerwallet/',
-				tiktok: 'https://www.tiktok.com/@ledger',
-				x: 'https://x.com/Ledger',
-			},
-			websites: ['https://www.ledger.com/'],
+	contributors: [nconsigny, patrickalphac, mattmatt],
+	hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
+	hardwareWalletModels: [
+		{
+			id: 'ledger-stax',
+			name: 'Ledger Stax',
+			isFlagship: true,
+			url: 'https://shop.ledger.com/products/ledger-stax',
 		},
+		{
+			id: 'ledger-nano-s',
+			name: 'Ledger Nano S',
+			isFlagship: false,
+			url: 'https://www.ledger.com/academy/tutorials/nano-s-configure-a-new-device',
+		},
+		{
+			id: 'ledger-nano-s-plus',
+			name: 'Ledger Nano S+',
+			isFlagship: false,
+			url: 'https://shop.ledger.com/products/ledger-nano-s-plus',
+		},
+		{
+			id: 'ledger-nano-x',
+			name: 'Ledger Nano X',
+			isFlagship: false,
+			url: 'https://shop.ledger.com/products/ledger-nano-x',
+		},
+		{
+			id: 'ledger-flex',
+			name: 'Ledger Flex',
+			isFlagship: false,
+			url: 'https://shop.ledger.com/products/ledger-flex',
+		},
+	],
+	iconExtension: 'svg',
+	lastUpdated: '2025-03-12',
+	urls: {
+		docs: ['https://developers.ledger.com/'],
+		repositories: ['https://github.com/LedgerHQ/'],
+		socials: {
+			facebook: 'https://web.facebook.com/Ledger/',
+			instagram: 'https://www.instagram.com/ledger/',
+			linkedin: 'https://www.linkedin.com/company/ledgerhq/',
+			reddit: 'https://www.reddit.com/r/ledgerwallet/',
+			tiktok: 'https://www.tiktok.com/@ledger',
+			x: 'https://x.com/Ledger',
+		},
+		websites: ['https://www.ledger.com/'],
 	},
+}
+export const ledgerWallet: HardwareWallet = {
+	metadata: ledgerWalletMetadata,
 	features: {
 		accountSupport: null,
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
