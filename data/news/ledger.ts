@@ -28,3 +28,7 @@ export const globalEBreach: WalletSecurityNews = {
 		label: 'ZachXBT community alert on Ledger data breach'
 	}
 }
+
+export const ledgerNewsRegistry = {
+	'ledger-global-e-breach': globalEBreach,
+} as const
