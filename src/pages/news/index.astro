@@ -103,82 +103,94 @@ function getTypeLabel(type: NewsType) {
 				<p>No security news items currently tracked.</p>
 			</section>
 		) : (
-			allNews.map(news => (
+			allNews.map((news, index) => (
 				<>
-					<section id={news.name} data-scroll-item='inline-detached' data-column='gap-4'>
-						<header data-column='gap-2'>
-							<div class='title-row'>
-								<h2>{news.title}</h2>
-								<div class='wallet-info'>
-									<img
-										src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
-										alt={news.wallet.displayName}
-									/>
-									<span class='wallet-name'>{news.wallet.displayName}</span>
-								</div>
-							</div>
-							<time datetime={news.publishedAt}>
-								Published {formatDate(news.publishedAt)}
-								{news.publishedAt !== news.updatedAt && (
-									<> • Updated {formatDate(news.updatedAt)}</>
-								)}
-							</time>
-						</header>
-
-						<p class='summary'>{news.summary}</p>
-
-						<div class='metadata-section'>
-							<div class='metadata-row'>
-								<div class='metadata-item'>
-									<span class='metadata-label'>Type</span>
-									<span class='type-badge'>{getTypeLabel(news.type)}</span>
-								</div>
-								<div class='metadata-item'>
-									<span class='metadata-label'>Severity</span>
-									<span
-										class='severity-badge'
-										style={`--severity-color: ${getSeverityColor(news.severity)}`}
-									>
-										{news.severity}
-									</span>
-								</div>
-								<div class='metadata-item'>
-									<span class='metadata-label'>Status</span>
-									<span class='status-badge' data-status={news.status.toLowerCase()}>
-										<span set:html={getStatusIcon(news.status)} />
-										{news.status}
-									</span>
-								</div>
-							</div>
-							<div class='impact-info'>
-								<strong>Impact:</strong>
-								<ul>
-									<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not affected'}</li>
-									<li>Category: {news.impact.category.replace(/_/g, ' ').toLowerCase()}</li>
-								</ul>
-							</div>
+					<section id={news.name} data-scroll-item='inline-detached' class='news-item'>
+						<div class='wallet-info'>
+							<img
+								src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
+								alt={news.wallet.displayName}
+							/>
+							<span class='wallet-name'>{news.wallet.displayName}</span>
 						</div>
 
-						{refs(news).length > 0 && (
-							<div class='references'>
-								<strong>Sources:</strong>
-								<ul>
-									{refs(news).map((ref) =>
-										ref.urls.map((url) => (
-											<li>
-												<a
-													href={url.url}
-													target='_blank'
-													rel='noopener noreferrer'
-												>
-													{url.label} →
-												</a>
-											</li>
-										))
+						<button
+							class='news-header'
+							data-news-toggle={`news-${index}`}
+							aria-expanded='false'
+							aria-controls={`news-content-${index}`}
+						>
+							<h2>{news.title}</h2>
+							<svg class='chevron' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+								<polyline points='6 9 12 15 18 9'></polyline>
+							</svg>
+						</button>
+
+						<div class='news-content' id={`news-content-${index}`} data-collapsed='true'>
+							<div class='news-content-inner'>
+								<time datetime={news.publishedAt}>
+									Published {formatDate(news.publishedAt)}
+									{news.publishedAt !== news.updatedAt && (
+										<> • Updated {formatDate(news.updatedAt)}</>
 									)}
-								</ul>
+								</time>
+
+								<p class='summary'>{news.summary}</p>
+
+								<div class='metadata-section'>
+									<div class='metadata-row'>
+										<div class='metadata-item'>
+											<span class='metadata-label'>Type</span>
+											<span class='type-badge'>{getTypeLabel(news.type)}</span>
+										</div>
+										<div class='metadata-item'>
+											<span class='metadata-label'>Severity</span>
+											<span
+												class='severity-badge'
+												style={`--severity-color: ${getSeverityColor(news.severity)}`}
+											>
+												{news.severity}
+											</span>
+										</div>
+										<div class='metadata-item'>
+											<span class='metadata-label'>Status</span>
+											<span class='status-badge' data-status={news.status.toLowerCase()}>
+												<span set:html={getStatusIcon(news.status)} />
+												{news.status}
+											</span>
+										</div>
+									</div>
+									<div class='impact-info'>
+										<strong>Impact:</strong>
+										<ul>
+											<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not affected'}</li>
+											<li>Category: {news.impact.category.replace(/_/g, ' ').toLowerCase()}</li>
+										</ul>
+									</div>
+								</div>
+
+								{refs(news).length > 0 && (
+									<div class='references'>
+										<strong>Sources:</strong>
+										<ul>
+											{refs(news).map((ref) =>
+												ref.urls.map((url) => (
+													<li>
+														<a
+															href={url.url}
+															target='_blank'
+															rel='noopener noreferrer'
+														>
+															{url.label} →
+														</a>
+													</li>
+												))
+											)}
+										</ul>
+									</div>
+								)}
 							</div>
-						)}
+						</div>
 					</section>
 
 					<hr />
@@ -213,53 +225,95 @@ function getTypeLabel(type: NewsType) {
 			opacity: 0.85;
 		}
 
-		section {
-			line-height: 1.7;
+		.news-item {
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
 
-			header {
-				.title-row {
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					gap: 1rem;
-					flex-wrap: wrap;
+			.wallet-info {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.5rem 0.75rem;
+				background: var(--background-secondary, rgba(0, 0, 0, 0.1));
+				border-radius: 0.375rem;
+				width: fit-content;
+
+				img {
+					width: 1.5rem;
+					height: 1.5rem;
+					border-radius: 0.25rem;
+				}
+
+				.wallet-name {
+					font-size: 0.9rem;
+					font-weight: 600;
+					color: var(--text-primary);
+				}
+			}
+
+			.news-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				gap: 1rem;
+				width: 100%;
+				background: transparent;
+				border: none;
+				padding: 0;
+				cursor: pointer;
+				text-align: left;
+				transition: opacity 0.2s;
+
+				&:hover {
+					opacity: 0.8;
 				}
 
 				h2 {
-					font-size: 1.75rem;
+					font-size: 1.5rem;
 					margin: 0;
 					line-height: 1.3;
 					flex: 1;
-					min-width: 0;
+					color: var(--text-primary);
 				}
 
-				time {
-					font-size: 0.9rem;
-					color: var(--text-secondary);
-					font-style: italic;
-				}
-
-				.wallet-info {
-					display: flex;
-					align-items: center;
-					gap: 0.5rem;
-					padding: 0.5rem 0.75rem;
-					background: var(--background-secondary, rgba(0, 0, 0, 0.1));
-					border-radius: 0.375rem;
+				.chevron {
 					flex-shrink: 0;
-
-					img {
-						width: 1.5rem;
-						height: 1.5rem;
-						border-radius: 0.25rem;
-					}
-
-					.wallet-name {
-						font-size: 0.9rem;
-						font-weight: 600;
-						color: var(--text-primary);
-					}
+					color: var(--text-secondary);
+					transition: transform 0.3s ease;
 				}
+
+				&[aria-expanded='true'] .chevron {
+					transform: rotate(180deg);
+				}
+			}
+
+			.news-content {
+				overflow: hidden;
+				transition: max-height 0.3s ease, opacity 0.3s ease;
+
+				&[data-collapsed='true'] {
+					max-height: 0;
+					opacity: 0;
+				}
+
+				&[data-collapsed='false'] {
+					max-height: 5000px;
+					opacity: 1;
+				}
+			}
+
+			.news-content-inner {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				padding-top: 0.5rem;
+			}
+
+			time {
+				font-size: 0.9rem;
+				color: var(--text-secondary);
+				font-style: italic;
 			}
 
 			.summary {
@@ -317,15 +371,24 @@ function getTypeLabel(type: NewsType) {
 				}
 			}
 
-			.source-link {
-				display: inline-block;
-				margin-top: 0.5rem;
-				font-weight: 500;
-				text-decoration: none;
-				color: var(--accent);
+			.references {
+				strong {
+					display: block;
+					margin-bottom: 0.5rem;
+				}
 
-				&:hover {
-					text-decoration: underline;
+				ul {
+					margin: 0;
+					padding-inline-start: 1.5em;
+
+					a {
+						color: var(--accent);
+						text-decoration: none;
+
+						&:hover {
+							text-decoration: underline;
+						}
+					}
 				}
 			}
 		}
@@ -393,3 +456,22 @@ function getTypeLabel(type: NewsType) {
 		}
 	}
 </style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const toggleButtons = document.querySelectorAll('[data-news-toggle]')
+
+		toggleButtons.forEach((button) => {
+			button.addEventListener('click', () => {
+				const isExpanded = button.getAttribute('aria-expanded') === 'true'
+				const contentId = button.getAttribute('aria-controls')
+				const content = document.getElementById(contentId!)
+
+				if (content) {
+					button.setAttribute('aria-expanded', (!isExpanded).toString())
+					content.setAttribute('data-collapsed', isExpanded.toString())
+				}
+			})
+		})
+	})
+</script>
