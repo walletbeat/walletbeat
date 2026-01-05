@@ -6,6 +6,7 @@ import {
 	navigationRepository,
 	navigationFarcasterChannel,
 	navigationHome,
+defaultNavigationItems,
 } from '@/constants/navigation'
 
 import { newsRegistry } from '@/data/news'
@@ -85,21 +86,7 @@ function getTypeLabel(type: NewsType) {
 		keywordsAfter: ['news', 'security', 'incidents'],
 	}}
 >
-	<Navigation
-		navigationItems={[
-			navigationHome,
-			navigationAbout,
-			navigationFaq,
-			{
-				id: 'news',
-				title: 'Security News',
-				icon: NewspaperIcon,
-				href: '/news/',
-			},
-			navigationRepository,
-			navigationFarcasterChannel,
-		]}
-	/>
+	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container data-column='gap-8'>
 		<header data-scroll-item='inline-detached padding-match-start'>
@@ -120,27 +107,16 @@ function getTypeLabel(type: NewsType) {
 				<>
 					<section id={news.name} data-scroll-item='inline-detached' data-column='gap-4'>
 						<header data-column='gap-2'>
-							<div class='news-meta'>
-								<span class='wallet-badge'>
+							<div class='title-row'>
+								<h2>{news.title}</h2>
+								<div class='wallet-info'>
 									<img
 										src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
 										alt={news.wallet.displayName}
 									/>
-									{news.wallet.displayName}
-								</span>
-								<span class='type-badge'>{getTypeLabel(news.type)}</span>
-								<span
-									class='severity-badge'
-									style={`--severity-color: ${getSeverityColor(news.severity)}`}
-								>
-									{news.severity}
-								</span>
-								<span class='status-badge' data-status={news.status.toLowerCase()}>
-									<span set:html={getStatusIcon(news.status)} />
-									{news.status}
-								</span>
+									<span class='wallet-name'>{news.wallet.displayName}</span>
+								</div>
 							</div>
-							<h2>{news.title}</h2>
 							<time datetime={news.publishedAt}>
 								Published {formatDate(news.publishedAt)}
 								{news.publishedAt !== news.updatedAt && (
@@ -151,12 +127,36 @@ function getTypeLabel(type: NewsType) {
 
 						<p class='summary'>{news.summary}</p>
 
-						<div class='impact-info'>
-							<strong>Impact:</strong>
-							<ul>
-								<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not affected'}</li>
-								<li>Category: {news.impact.category.replace(/_/g, ' ').toLowerCase()}</li>
-							</ul>
+						<div class='metadata-section'>
+							<div class='metadata-row'>
+								<div class='metadata-item'>
+									<span class='metadata-label'>Type</span>
+									<span class='type-badge'>{getTypeLabel(news.type)}</span>
+								</div>
+								<div class='metadata-item'>
+									<span class='metadata-label'>Severity</span>
+									<span
+										class='severity-badge'
+										style={`--severity-color: ${getSeverityColor(news.severity)}`}
+									>
+										{news.severity}
+									</span>
+								</div>
+								<div class='metadata-item'>
+									<span class='metadata-label'>Status</span>
+									<span class='status-badge' data-status={news.status.toLowerCase()}>
+										<span set:html={getStatusIcon(news.status)} />
+										{news.status}
+									</span>
+								</div>
+							</div>
+							<div class='impact-info'>
+								<strong>Impact:</strong>
+								<ul>
+									<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not affected'}</li>
+									<li>Category: {news.impact.category.replace(/_/g, ' ').toLowerCase()}</li>
+								</ul>
+							</div>
 						</div>
 
 						{refs(news).length > 0 && (
@@ -217,10 +217,20 @@ function getTypeLabel(type: NewsType) {
 			line-height: 1.7;
 
 			header {
+				.title-row {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					gap: 1rem;
+					flex-wrap: wrap;
+				}
+
 				h2 {
-					font-size: 1.5rem;
+					font-size: 1.75rem;
 					margin: 0;
 					line-height: 1.3;
+					flex: 1;
+					min-width: 0;
 				}
 
 				time {
@@ -228,10 +238,61 @@ function getTypeLabel(type: NewsType) {
 					color: var(--text-secondary);
 					font-style: italic;
 				}
+
+				.wallet-info {
+					display: flex;
+					align-items: center;
+					gap: 0.5rem;
+					padding: 0.5rem 0.75rem;
+					background: var(--background-secondary, rgba(0, 0, 0, 0.1));
+					border-radius: 0.375rem;
+					flex-shrink: 0;
+
+					img {
+						width: 1.5rem;
+						height: 1.5rem;
+						border-radius: 0.25rem;
+					}
+
+					.wallet-name {
+						font-size: 0.9rem;
+						font-weight: 600;
+						color: var(--text-primary);
+					}
+				}
 			}
 
 			.summary {
 				margin: 0;
+				font-size: 1.05rem;
+				line-height: 1.7;
+			}
+
+			.metadata-section {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.metadata-row {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1.5rem;
+			}
+
+			.metadata-item {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+
+				.metadata-label {
+					font-size: 0.75rem;
+					font-weight: 600;
+					text-transform: uppercase;
+					letter-spacing: 0.05em;
+					color: var(--text-secondary);
+					opacity: 0.8;
+				}
 			}
 
 			.impact-info {
@@ -269,38 +330,19 @@ function getTypeLabel(type: NewsType) {
 			}
 		}
 
-		.news-meta {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 0.5rem;
-			align-items: center;
-			margin-bottom: 0.5rem;
-		}
-
-		.wallet-badge,
 		.type-badge,
 		.severity-badge,
 		.status-badge {
 			display: inline-flex;
 			align-items: center;
 			gap: 0.375rem;
-			padding: 0.25rem 0.625rem;
+			padding: 0.375rem 0.75rem;
 			border-radius: 0.375rem;
-			font-size: 0.8rem;
-			font-weight: 600;
+			font-size: 0.85rem;
+			font-weight: 700;
 			text-transform: uppercase;
 			letter-spacing: 0.025em;
-		}
-
-		.wallet-badge {
-			background: var(--background-secondary, rgba(0, 0, 0, 0.1));
-			color: var(--text-primary);
-
-			img {
-				width: 1.25rem;
-				height: 1.25rem;
-				border-radius: 0.25rem;
-			}
+			width: fit-content;
 		}
 
 		.type-badge {
