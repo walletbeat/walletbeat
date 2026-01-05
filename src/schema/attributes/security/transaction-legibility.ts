@@ -23,7 +23,7 @@ import {
 	supportsAnyDataExtraction,
 } from '@/schema/features/security/transaction-legibility'
 import { isSupported } from '@/schema/features/support'
-import { popRefs, refs, refTodo } from '@/schema/reference'
+import { popRefs, refNotNecessary, refs } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
 
@@ -48,10 +48,26 @@ function evaluateSoftwareMessageSigning(
 		return false
 	}
 
-	const hasEip712Struct = messageSigningLegibility[MessageSigningDetails.EIP712_STRUCT]
-	const hasDomainHash = messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH]
-	const hasMessageHash = messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH]
-	const hasSafeHash = messageSigningLegibility[MessageSigningDetails.SAFE_HASH]
+	const hasEip712Struct =
+		messageSigningLegibility[MessageSigningDetails.EIP712_STRUCT] ===
+			DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		messageSigningLegibility[MessageSigningDetails.EIP712_STRUCT] ===
+			DataDisplayOptions.SHOWN_OPTIONALLY
+	const hasDomainHash =
+		messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH] ===
+			DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		messageSigningLegibility[MessageSigningDetails.DOMAIN_HASH] ===
+			DataDisplayOptions.SHOWN_OPTIONALLY
+	const hasMessageHash =
+		messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH] ===
+			DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		messageSigningLegibility[MessageSigningDetails.MESSAGE_HASH] ===
+			DataDisplayOptions.SHOWN_OPTIONALLY
+	const hasSafeHash =
+		messageSigningLegibility[MessageSigningDetails.SAFE_HASH] ===
+			DataDisplayOptions.SHOWN_BY_DEFAULT ||
+		messageSigningLegibility[MessageSigningDetails.SAFE_HASH] ===
+			DataDisplayOptions.SHOWN_OPTIONALLY
 
 	// PASS if: EIP-712 struct OR (domainHash AND messageHash) OR safeHash
 	return hasEip712Struct || (hasDomainHash && hasMessageHash) || hasSafeHash
@@ -258,7 +274,6 @@ function analyzeHardwareFeatures({
 function generateHardwareDetailsMarkdown(features: HardwareFeatureDetails): string {
 	const sections: string[] = []
 
-	// Calldata Decoding section
 	// Calldata Decoding section
 	if (
 		features.calldataDecoding.supported.length > 0 ||
@@ -976,7 +991,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					detailsDisplayed: null,
 					dataExtraction: null,
 					messageSigningLegibility: null,
-					ref: refTodo,
+					ref: refNotNecessary,
 				}),
 			),
 			exampleRating(
@@ -988,7 +1003,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
-					ref: refTodo,
+					ref: refNotNecessary,
 				}),
 			),
 		],
@@ -1003,7 +1018,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					detailsDisplayed: null,
 					dataExtraction: null,
 					messageSigningLegibility: null,
-					ref: refTodo,
+					ref: refNotNecessary,
 				}),
 			),
 			exampleRating(
@@ -1016,7 +1031,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					detailsDisplayed: null,
 					dataExtraction: null,
 					messageSigningLegibility: null,
-					ref: refTodo,
+					ref: refNotNecessary,
 				}),
 			),
 			exampleRating(
@@ -1028,7 +1043,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
-					ref: refTodo,
+					ref: refNotNecessary,
 				}),
 			),
 		],
@@ -1042,7 +1057,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					detailsDisplayed: null,
 					dataExtraction: null,
 					messageSigningLegibility: null,
-					ref: refTodo,
+					ref: refNotNecessary,
 				}),
 			),
 			exampleRating(
@@ -1053,7 +1068,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
-					ref: refTodo,
+					ref: refNotNecessary,
 				}),
 			),
 		],

@@ -219,7 +219,10 @@ export enum MessageSigningDetails {
 /**
  * For software wallets: track which message signing data types are available
  */
-export type SoftwareMessageSigningLegibility = Record<MessageSigningDetails, boolean> | null
+export type SoftwareMessageSigningLegibility = Record<
+	MessageSigningDetails,
+	DataDisplayOptions
+> | null
 
 /**
  * For hardware wallets: track which message signing data types are available and where they are displayed
