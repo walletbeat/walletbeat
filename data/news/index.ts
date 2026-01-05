@@ -1,4 +1,5 @@
 import { ledgerNewsRegistry } from './ledger'
+import { trustWalletNewsRegistry } from './trust-wallet'
 
 /**
  * Registry of all security news items about wallets
@@ -6,4 +7,5 @@ import { ledgerNewsRegistry } from './ledger'
  */
 export const newsRegistry = {
 	...ledgerNewsRegistry,
+	...trustWalletNewsRegistry
 } as const
