@@ -1,13 +1,6 @@
 ---
 // Constants
-import {
-	navigationAbout,
-	navigationFaq,
-	navigationRepository,
-	navigationFarcasterChannel,
-	navigationHome,
-defaultNavigationItems,
-} from '@/constants/navigation'
+import { defaultNavigationItems } from '@/constants/navigation'
 
 import { newsRegistry } from '@/data/news'
 import { IncidentStatus, NewsType, Severity } from '@/types/content/news'
@@ -19,7 +12,6 @@ import Layout from '@/layouts/Layout.astro'
 // Components
 import Navigation from '@/views/Navigation.astro'
 
-import NewspaperIcon from 'lucide-static/icons/newspaper.svg?raw'
 import ShieldAlertIcon from 'lucide-static/icons/shield-alert.svg?raw'
 import ShieldCheckIcon from 'lucide-static/icons/shield-check.svg?raw'
 import TriangleAlertIcon from 'lucide-static/icons/triangle-alert.svg?raw'
@@ -62,7 +54,7 @@ function formatDate(dateString: string) {
 	return date.toLocaleDateString('en-US', {
 		year: 'numeric',
 		month: 'long',
-		day: 'numeric'
+		day: 'numeric',
 	})
 }
 
@@ -98,114 +90,123 @@ function getTypeLabel(type: NewsType) {
 
 		<hr />
 
-		{allNews.length === 0 ? (
-			<section data-scroll-item='inline-detached' data-column='gap-5'>
-				<p>No security news items currently tracked.</p>
-			</section>
-		) : (
-			allNews.map((news, index) => (
-				<>
-					<section id={news.name} data-scroll-item='inline-detached' class='news-item'>
-						{news.wallet && (
-							<div class='wallet-info'>
-								<img
-									src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
-									alt={news.wallet.displayName}
-								/>
-								<span class='wallet-name'>{news.wallet.displayName}</span>
-							</div>
-						)}
-
-						<button
-							class='news-header'
-							data-news-toggle={`news-${index}`}
-							aria-expanded='false'
-							aria-controls={`news-content-${index}`}
-						>
-							<h2>{news.title}</h2>
-							<svg class='chevron' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-								<polyline points='6 9 12 15 18 9'></polyline>
-							</svg>
-						</button>
-
-						<div class='news-content' id={`news-content-${index}`} data-collapsed='true'>
-							<div class='news-content-inner'>
-								<time datetime={news.publishedAt}>
-									Published {formatDate(news.publishedAt)}
-									{news.publishedAt !== news.updatedAt && (
-										<> • Updated {formatDate(news.updatedAt)}</>
-									)}
-								</time>
-
-								<p class='summary'>{news.summary}</p>
-
-								<div class='metadata-section'>
-									<div class='metadata-row'>
-										<div class='metadata-item'>
-											<span class='metadata-label'>Type</span>
-											<span class='type-badge'>{getTypeLabel(news.type)}</span>
-										</div>
-										<div class='metadata-item'>
-											<span class='metadata-label'>Severity</span>
-											<span
-												class='severity-badge'
-												style={`--severity-color: ${getSeverityColor(news.severity)}`}
-											>
-												{news.severity}
-											</span>
-										</div>
-										<div class='metadata-item'>
-											<span class='metadata-label'>Status</span>
-											<span class='status-badge' data-status={news.status.toLowerCase()}>
-												<span set:html={getStatusIcon(news.status)} />
-												{news.status}
-											</span>
-										</div>
-									</div>
-									<div class='impact-info'>
-										<strong>Impact:</strong>
-										<ul>
-											<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not affected'}</li>
-											<li>Category: {news.impact.category.replace(/_/g, ' ').toLowerCase()}</li>
-										</ul>
-									</div>
+		{
+			allNews.length === 0 ? (
+				<section data-scroll-item='inline-detached' data-column='gap-5'>
+					<p>No security news items currently tracked.</p>
+				</section>
+			) : (
+				allNews.map((news, index) => (
+					<>
+						<section id={news.name} data-scroll-item='inline-detached' class='news-item'>
+							{news.wallet && (
+								<div class='wallet-info'>
+									<img
+										src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
+										alt={news.wallet.displayName}
+									/>
+									<span class='wallet-name'>{news.wallet.displayName}</span>
 								</div>
+							)}
 
-								{refs(news).length > 0 && (
-									<div class='references'>
-										<strong>Sources:</strong>
-										<ul>
-											{refs(news).map((ref) =>
-												ref.urls.map((url) => (
-													<li>
-														<a
-															href={url.url}
-															target='_blank'
-															rel='noopener noreferrer'
-														>
-															{url.label} →
-														</a>
-													</li>
-												))
-											)}
-										</ul>
+							<button
+								class='news-header'
+								data-news-toggle={`news-${index}`}
+								aria-expanded='false'
+								aria-controls={`news-content-${index}`}
+							>
+								<h2>{news.title}</h2>
+								<svg
+									class='chevron'
+									width='24'
+									height='24'
+									viewBox='0 0 24 24'
+									fill='none'
+									stroke='currentColor'
+									stroke-width='2'
+									stroke-linecap='round'
+									stroke-linejoin='round'
+								>
+									<polyline points='6 9 12 15 18 9' />
+								</svg>
+							</button>
+
+							<div class='news-content' id={`news-content-${index}`} data-collapsed='true'>
+								<div class='news-content-inner'>
+									<time datetime={news.publishedAt}>
+										Published {formatDate(news.publishedAt)}
+										{news.publishedAt !== news.updatedAt && (
+											<> • Updated {formatDate(news.updatedAt)}</>
+										)}
+									</time>
+
+									<p class='summary'>{news.summary}</p>
+
+									<div class='metadata-section'>
+										<div class='metadata-row'>
+											<div class='metadata-item'>
+												<span class='metadata-label'>Type</span>
+												<span class='type-badge'>{getTypeLabel(news.type)}</span>
+											</div>
+											<div class='metadata-item'>
+												<span class='metadata-label'>Severity</span>
+												<span
+													class='severity-badge'
+													style={`--severity-color: ${getSeverityColor(news.severity)}`}
+												>
+													{news.severity}
+												</span>
+											</div>
+											<div class='metadata-item'>
+												<span class='metadata-label'>Status</span>
+												<span class='status-badge' data-status={news.status.toLowerCase()}>
+													<span set:html={getStatusIcon(news.status)} />
+													{news.status}
+												</span>
+											</div>
+										</div>
+										<div class='impact-info'>
+											<strong>Impact:</strong>
+											<ul>
+												<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not affected'}</li>
+												<li>Category: {news.impact.category.replace(/_/g, ' ').toLowerCase()}</li>
+											</ul>
+										</div>
 									</div>
-								)}
-							</div>
-						</div>
-					</section>
 
-					<hr />
-				</>
-			))
-		)}
+									{refs(news).length > 0 && (
+										<div class='references'>
+											<strong>Sources:</strong>
+											<ul>
+												{refs(news).map(ref =>
+													ref.urls.map(url => (
+														<li>
+															<a href={url.url} target='_blank' rel='noopener noreferrer'>
+																{url.label} →
+															</a>
+														</li>
+													)),
+												)}
+											</ul>
+										</div>
+									)}
+								</div>
+							</div>
+						</section>
+
+						<hr />
+					</>
+				))
+			)
+		}
 
 		<section data-scroll-item='inline-detached padding-match-end' data-column='gap-5'>
 			<p>
 				Know about a security incident affecting a wallet? Please help by <a
 					href='https://github.com/walletbeat/walletbeat'
 					target='_blank'
-					rel='noopener noreferrer'>contributing to our repository</a>!
+					rel='noopener noreferrer'>contributing to our repository</a
+				>!
 			</p>
 		</section>
 	</main>
@@ -292,7 +293,9 @@ function getTypeLabel(type: NewsType) {
 
 			.news-content {
 				overflow: hidden;
-				transition: max-height 0.3s ease, opacity 0.3s ease;
+				transition:
+					max-height 0.3s ease,
+					opacity 0.3s ease;
 
 				&[data-collapsed='true'] {
 					max-height: 0;
@@ -463,7 +466,7 @@ function getTypeLabel(type: NewsType) {
 	document.addEventListener('DOMContentLoaded', () => {
 		const toggleButtons = document.querySelectorAll('[data-news-toggle]')
 
-		toggleButtons.forEach((button) => {
+		toggleButtons.forEach(button => {
 			button.addEventListener('click', () => {
 				const isExpanded = button.getAttribute('aria-expanded') === 'true'
 				const contentId = button.getAttribute('aria-controls')

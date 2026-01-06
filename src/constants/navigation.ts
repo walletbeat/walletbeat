@@ -18,8 +18,8 @@ import CpuIcon from 'lucide-static/icons/cpu.svg?raw'
 import GithubIcon from 'lucide-static/icons/github.svg?raw'
 import KeyIcon from 'lucide-static/icons/key.svg?raw'
 import MessageCircleIcon from 'lucide-static/icons/message-circle-heart.svg?raw'
-import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 import NewsPaperIcon from 'lucide-static/icons/newspaper.svg?raw'
+import WalletIcon from 'lucide-static/icons/wallet.svg?raw'
 
 // Constants
 import { hardwareWallets } from '@/data/hardware-wallets'
@@ -74,7 +74,7 @@ export const navigationFarcasterChannel = {
 export const navigationNews = {
 	id: 'news',
 	icon: NewsPaperIcon,
-	title: 'Relevant News',
+	title: 'Wallet News',
 	href: '/news',
 } as const satisfies NavigationItem
 

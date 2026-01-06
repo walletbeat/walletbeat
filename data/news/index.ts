@@ -7,5 +7,5 @@ import { trustWalletNewsRegistry } from './trust-wallet'
  */
 export const newsRegistry = {
 	...ledgerNewsRegistry,
-	...trustWalletNewsRegistry
+	...trustWalletNewsRegistry,
 } as const

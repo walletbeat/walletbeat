@@ -21,13 +21,13 @@ export enum IncidentStatus {
  * Category of security-related news event
  */
 export enum NewsType {
-	/** Security breach resulting in unauthorized access or theft */
+	/** Exploit or attack resulting in theft of cryptocurrency or wallet funds */
 	HACK = 'HACK',
-	/** Unauthorized access or exposure of user data */
+	/** Unauthorized exposure of user personal information (not funds) */
 	DATA_BREACH = 'DATA_BREACH',
-	/** Discovered security vulnerability or flaw */
+	/** Discovered security flaw or weakness (may or may not be exploited) */
 	VULNERABILITY = 'VULNERABILITY',
-	/** General security incident not covered by other categories */
+	/** General security event not covered by other categories */
 	INCIDENT = 'INCIDENT',
 }
 
