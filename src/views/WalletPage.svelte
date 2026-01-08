@@ -419,44 +419,80 @@
 			</section>
 		</header>
 
-		{#if wallet.news && wallet.news.length > 0}
-			<hr />
+		<hr />
 
-			<section id="news" class="attribute">
-				<header
-					data-sticky="block"
-					data-row
-					data-scroll-item="inline-detached"
+		<section
+			class="attribute"
+			id="test-news"
+			aria-label="Security News"
+			style:--accent="#e564bc"
+			data-rating="pass"
+			data-icon="📰"
+		>
+			<details
+				data-card="radius-8 padding-0 border-accent"
+				data-column="gap-0"
+				open
+			>
+				<summary data-row>
+					<header data-row>
+						<div>
+							<div data-row="start gap-2">
+								<a data-link="camouflaged" href="#test-news">
+									<h3 data-icon="📰">
+										Security News
+									</h3>
+								</a>
+							</div>
+
+							<div class="subsection-caption">
+								<p>Recent security updates and incidents</p>
+							</div>
+						</div>
+
+						<data
+							data-badge="medium"
+							value="INFO"
+						>INFO</data>
+					</header>
+				</summary>
+
+				<div
+					class="rating-display"
+					data-rating="pass"
+					data-card
 				>
-					<a data-link="camouflaged" href="#news">
-						<h2>Security News</h2>
-					</a>
-				</header>
-
-				<div data-scroll-item="inline-detached padding-match-end" data-column>
-					<div class="attribute-accordions" data-column>
-						{#each wallet.news as newsItem}
-							<details data-card="secondary padding-0 radius-4" data-column="gap-0">
-								<summary>
-									<h4>{newsItem.title}</h4>
-									<div data-row="gap-2 wrap">
-										<span data-badge="small">{newsItem.type}</span>
-										<span data-badge="small">{newsItem.severity}</span>
-										<span data-badge="small">{newsItem.status}</span>
-									</div>
-								</summary>
-
-								<section>
-									<p>{newsItem.summary}</p>
-									<small>Published: {newsItem.publishedAt}</small>
-									<ReferenceLinks references={toFullyQualified(newsItem.ref)} />
-								</section>
-							</details>
-						{/each}
+					<div class="rating-icon" data-row="center">
+						📰
+					</div>
+					<div class="rating-content">
+						<p>This is a static test news item to debug the layout.</p>
 					</div>
 				</div>
-			</section>
-		{/if}
+
+				<div class="attribute-accordions" data-column>
+					<details data-card="padding-2 secondary radius-4" data-column="gap-0">
+						<summary>
+							<h4>Test News Item 1</h4>
+						</summary>
+
+						<section>
+							<p>This is a test summary with some text to see how it behaves when collapsed and expanded.</p>
+						</section>
+					</details>
+
+					<details data-card="padding-2 secondary radius-4" data-column="gap-0">
+						<summary>
+							<h4>Test News Item 2</h4>
+						</summary>
+
+						<section>
+							<p>Another test item with a longer summary to test the overflow behavior and word wrapping capabilities of the layout system.</p>
+						</section>
+					</details>
+				</div>
+			</details>
+		</section>
 
 		{#if showStage}
 			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
@@ -1854,14 +1890,34 @@
 
 	.attribute-accordions {
 		details {
+			overflow: hidden;
+
 			summary {
 				padding: 1.25rem;
+
+				h4 {
+					max-width: 60ch;
+					word-wrap: break-word;
+					overflow-wrap: break-word;
+				}
 			}
 
 			section {
 				padding: 1.25rem;
 				padding-top: 0.25rem;
+				overflow: hidden;
+
+				p {
+					word-wrap: break-word;
+					overflow-wrap: break-word;
+				}
 			}
 		}
+	}
+
+	.news-summary {
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		max-width: 50%;
 	}
 </style>
