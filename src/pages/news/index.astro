@@ -86,16 +86,16 @@ import Navigation from '@/views/Navigation.astro'
 									data-row-item="wrap-end flexible basis-3"
 									data-row="end wrap gap-1"
 								>
-									<span>Published <time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time></span>
+									<time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time>
 
 									{news.publishedAt !== news.updatedAt && (
-										<span class="gap-1">
+										<small class="gap-1">
 											<span>・</span>
 											<span>Updated <time datetime={news.updatedAt}>{formatDate(news.updatedAt)}</time></span>
-										</span>
+										</small>
 									)}
 								</div>
-						</summary>
+							</summary>
 
 							<div
 								class="article-content"
@@ -232,7 +232,6 @@ import Navigation from '@/views/Navigation.astro'
 			text-align: end;
 			font-size: 0.9em;
 			color: var(--text-secondary);
-			font-style: italic;
 		}
 
 		.article-content {
