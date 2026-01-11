@@ -28,6 +28,7 @@ import Layout from '@/layouts/Layout.astro'
 
 // Components
 import Navigation from '@/views/Navigation.astro'
+import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 ---
 
 
@@ -170,7 +171,8 @@ import Navigation from '@/views/Navigation.astro'
 												ref.urls.map(url => (
 													<li>
 														<a href={url.url} target="_blank" rel="noopener noreferrer">
-															{url.label} →
+															{url.label}
+															<span set:html={ExternalLinkIcon} />
 														</a>
 													</li>
 												)),
