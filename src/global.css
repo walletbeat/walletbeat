@@ -768,6 +768,78 @@ summary {
 	}
 }
 
+[data-list],
+ul,
+ol {
+	/* Inputs */
+	--list-gap: 0.25lh;
+	--listItem-marker-inlineSize: 1.15em;
+	--listItem-markerGap: 0.66em;
+
+	/* Rules */
+	display: grid;
+	gap: var(--list-gap);
+	list-style-type: disc;
+	list-style-position: outside;
+	padding-inline-start: var(--listItem-marker-inlineSize);
+
+	&[data-card] {
+		padding-inline-start: calc(var(--card-padding) + var(--listItem-marker-inlineSize));
+	}
+
+	&[data-list~='gap-0'] {
+		--list-gap: 0;
+	}
+	&[data-list~='gap-1'] {
+		--list-gap: 0.25lh;
+	}
+	&[data-list~='gap-2'] {
+		--list-gap: 0.5lh;
+	}
+	&[data-list~='gap-3'] {
+		--list-gap: 0.75lh;
+	}
+	&[data-list~='gap-4'] {
+		--list-gap: 1lh;
+	}
+
+	> li,
+	> [data-list-item] {
+		--listItem-gap: 1em;
+
+		&[data-list-item~='gap-0'] {
+			--listItem-gap: 0;
+		}
+		&[data-list-item~='gap-1'] {
+			--listItem-gap: 0.25em;
+		}
+		&[data-list-item~='gap-2'] {
+			--listItem-gap: 0.5em;
+		}
+		&[data-list-item~='gap-3'] {
+			--listItem-gap: 0.75em;
+		}
+		&[data-list-item~='gap-4'] {
+			--listItem-gap: 1em;
+		}
+
+		&::marker {
+			content: '●' ' ';
+			font-size: 1em;
+		}
+		&[data-list-item-marker]::marker {
+			content: attr(data-list-item-marker);
+			font-size: 0.875em;
+		}
+
+		padding-inline-start: var(--listItem-markerGap);
+
+		> * + * {
+			margin-top: var(--listItem-gap);
+		}
+	}
+}
+
 
 /**
  * Scroll Container
