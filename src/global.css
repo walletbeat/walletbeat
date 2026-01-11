@@ -631,15 +631,20 @@ summary {
 }
 
 [data-badge] {
+	--badge-backgroundColor: color-mix(in srgb, var(--accent) 33%, transparent);
+	--badge-borderColor: color-mix(in srgb, var(--accent) 40%, transparent);
+	--badge-textColor: currentColor;
+
 	flex-shrink: 0;
 	flex-basis: auto;
 
 	column-gap: 0;
 
 	border-radius: 0.375em;
-	background-color: color-mix(in srgb, var(--accent) 33%, transparent);
-	border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+	background-color: var(--badge-backgroundColor);
+	border: 1px solid var(--badge-borderColor);
 
+	color: var(--badge-textColor);
 	font-weight: 600;
 	line-height: 1;
 
