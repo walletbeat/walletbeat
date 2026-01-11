@@ -624,6 +624,12 @@ summary {
 	&[data-card~='padding-6'] {
 		--card-padding: 1.5em;
 	}
+	&[data-card~='padding-7'] {
+		--card-padding: 1.75em;
+	}
+	&[data-card~='padding-8'] {
+		--card-padding: 2em;
+	}
 
 	&[data-card~='border-accent'] {
 		border: 2px solid color-mix(in srgb, var(--accent) 90%, transparent);
