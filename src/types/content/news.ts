@@ -1,6 +1,5 @@
 import type { WithRef } from '@/schema/reference'
 import type { WalletMetadata } from '@/schema/wallet'
-
 import type { CalendarDate } from '../date'
 
 /**
@@ -17,6 +16,36 @@ export enum IncidentStatus {
 	DISPUTED = 'DISPUTED',
 }
 
+export const incidentStatuses = {
+	[IncidentStatus.RESOLVED]: {
+		label: 'Resolved',
+		icon: (await import('lucide-static/icons/shield-check.svg?raw')).default,
+		color: '#10b981',
+	},
+	[IncidentStatus.MITIGATED]: {
+		label: 'Mitigated',
+		icon: (await import('lucide-static/icons/shield-alert.svg?raw')).default,
+		color: '#f59e0b',
+	},
+	[IncidentStatus.ONGOING]: {
+		label: 'Ongoing',
+		icon: (await import('lucide-static/icons/triangle-alert.svg?raw')).default,
+		color: '#ef4444',
+	},
+	[IncidentStatus.DISPUTED]: {
+		label: 'Disputed',
+		icon: (await import('lucide-static/icons/info.svg?raw')).default,
+		color: '#6b7280',
+	},
+} as const satisfies Record<
+	IncidentStatus,
+	{
+		label: string
+		icon: string
+		color: string
+	}
+>
+
 /**
  * Category of security-related news event
  */
@@ -31,6 +60,26 @@ export enum NewsType {
 	INCIDENT = 'INCIDENT',
 }
 
+export const newsTypes = {
+	[NewsType.HACK]: {
+		label: 'Hack',
+	},
+	[NewsType.DATA_BREACH]: {
+		label: 'Data Breach',
+	},
+	[NewsType.VULNERABILITY]: {
+		label: 'Vulnerability',
+	},
+	[NewsType.INCIDENT]: {
+		label: 'Incident',
+	},
+} as const satisfies Record<
+	NewsType,
+	{
+		label: string
+	}
+>
+
 /**
  * Severity level of a security incident
  */
@@ -44,6 +93,31 @@ export enum Severity {
 	/** Low severity - minor impact or informational */
 	LOW = 'LOW',
 }
+
+export const severities = {
+	[Severity.CRITICAL]: {
+		label: 'Critical',
+		color: 'var(--color-critical)',
+	},
+	[Severity.HIGH]: {
+		label: 'High',
+		color: 'var(--color-high)',
+	},
+	[Severity.MEDIUM]: {
+		label: 'Medium',
+		color: 'var(--color-medium)',
+	},
+	[Severity.LOW]: {
+		label: 'Low',
+		color: 'var(--color-low)',
+	},
+} as const satisfies Record<
+	Severity,
+	{
+		label: string
+		color: string
+	}
+>
 
 /**
  * Category of impact from a security incident
@@ -65,10 +139,39 @@ export enum ImpactCategory {
 	OTHER = 'OTHER',
 }
 
+export const impactCategories = {
+	[ImpactCategory.SEED_PHRASE_LEAK]: {
+		label: 'Seed Phrase Leak',
+	},
+	[ImpactCategory.PRIVATE_KEY_LEAK]: {
+		label: 'Private Key Leak',
+	},
+	[ImpactCategory.SIGNING_BUG]: {
+		label: 'Signing Bug',
+	},
+	[ImpactCategory.SUPPLY_CHAIN]: {
+		label: 'Supply Chain',
+	},
+	[ImpactCategory.PRIVACY_LEAK]: {
+		label: 'Privacy Leak',
+	},
+	[ImpactCategory.PHISHING_RELATED]: {
+		label: 'Phishing Related',
+	},
+	[ImpactCategory.OTHER]: {
+		label: 'Other',
+	},
+} as const satisfies Record<
+	ImpactCategory,
+	{
+		label: string
+	}
+>
+
 /** Represents a security-related news item about a wallet */
 export type WalletSecurityNews = WithRef<{
-	/** Identifier name for the news item */
-	name: string
+	/** Identifier slug for the news item */
+	slug: string
 	/** Category of security event */
 	type: NewsType
 	/** Severity level of the incident */
