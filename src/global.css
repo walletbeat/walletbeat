@@ -276,7 +276,7 @@ details {
 
 	&[data-card] {
 		padding: 0;
-		gap: 0;
+		gap: 0 !important;
 
 		> summary {
 			padding: var(--card-padding);
