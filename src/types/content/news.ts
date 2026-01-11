@@ -97,19 +97,19 @@ export enum Severity {
 export const severities = {
 	[Severity.CRITICAL]: {
 		label: 'Critical',
-		color: 'var(--color-critical)',
+		color: '#ef4444',
 	},
 	[Severity.HIGH]: {
 		label: 'High',
-		color: 'var(--color-high)',
+		color: '#f59e0b',
 	},
 	[Severity.MEDIUM]: {
 		label: 'Medium',
-		color: 'var(--color-medium)',
+		color: '#fbbf24',
 	},
 	[Severity.LOW]: {
 		label: 'Low',
-		color: 'var(--color-low)',
+		color: '#3b82f6',
 	},
 } as const satisfies Record<
 	Severity,
