@@ -74,7 +74,7 @@ export const navigationFarcasterChannel = {
 export const navigationNews = {
 	id: 'news',
 	icon: NewsPaperIcon,
-	title: 'Wallet News',
+	title: 'Wallet Security News',
 	href: '/news',
 } as const satisfies NavigationItem
 
@@ -182,9 +182,9 @@ export const defaultNavigationItems = [
 	},
 	// 	],
 	// },
+	navigationNews,
 	navigationAbout,
 	navigationFaq,
 	navigationRepository,
 	navigationFarcasterChannel,
-	navigationNews,
 ] as const satisfies NavigationItem[]

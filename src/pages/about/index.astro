@@ -1,11 +1,12 @@
 ---
 // Constants
 import {
+	navigationHome,
 	navigationAbout,
 	navigationFaq,
+	navigationNews,
 	navigationRepository,
 	navigationFarcasterChannel,
-	navigationHome,
 } from '@/constants/navigation'
 
 // Layouts
@@ -31,6 +32,7 @@ import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
 			navigationHome,
 			navigationAbout,
 			navigationFaq,
+			navigationNews,
 			navigationRepository,
 			navigationFarcasterChannel,
 		]}
@@ -70,15 +72,14 @@ import HelpCircleIcon from 'lucide-static/icons/circle-help.svg?raw'
 			</p>
 
 			<p>
-				Where there is inherent subjectivity, such as in the decision of <em>which</em> criteria are
-				used to rate and categorize wallets, Walletbeat aims to follow Ethereum's ethos and cypherpunk
-				values as a guiding principle. See <a
+				Where there is inherent subjectivity, such as in the decision of <em>which</em> criteria are used
+				to rate and categorize wallets, Walletbeat aims to follow Ethereum's ethos and cypherpunk values
+				as a guiding principle. See <a
 					href='https://vitalik.eth.limo/general/2024/12/03/wallets.html'
 					target='_blank'
 					rel='noopener noreferrer'
 					>Vitalik's blog post on wallets <span set:html={ExternalLinkIcon} /></a
-				> and the <a href='/faq/'><span set:html={HelpCircleIcon} />Walletbeat FAQ page</a> for more
-				details.
+				> and the <a href='/faq/'><span set:html={HelpCircleIcon} />Walletbeat FAQ page</a> for more details.
 			</p>
 		</section>
 
