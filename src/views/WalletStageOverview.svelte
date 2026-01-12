@@ -2,7 +2,7 @@
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
 	import { WalletLadderType, ladders } from '@/schema/ladders'
-	import { StageCriterionRating, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import { StageCriterionRating, stageCriterionRatings, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
 	import { getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
@@ -37,36 +37,6 @@
 		},
 	} as const satisfies Record<
 		StageStatus,
-		{
-			icon: string
-			label: string
-			color: string
-		}
-	>
-
-	const stageCriterionRatings = {
-		[StageCriterionRating.PASS]: {
-			icon: '✅',
-			label: 'Criterion passed',
-			color: 'var(--rating-pass)',
-		},
-		[StageCriterionRating.FAIL]: {
-			icon: '❌',
-			label: 'Criterion failed',
-			color: 'var(--rating-fail)',
-		},
-		[StageCriterionRating.EXEMPT]: {
-			icon: '➖',
-			label: 'Criterion exempt',
-			color: 'var(--rating-exempt)',
-		},
-		[StageCriterionRating.UNRATED]: {
-			icon: '❔',
-			label: 'Criterion unrated',
-			color: 'var(--rating-unrated)',
-		},
-	} as const satisfies Record<
-		StageCriterionRating,
 		{
 			icon: string
 			label: string

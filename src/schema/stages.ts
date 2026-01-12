@@ -44,6 +44,36 @@ export enum StageCriterionRating {
 	UNRATED = 'UNRATED',
 }
 
+export const stageCriterionRatings = {
+	[StageCriterionRating.PASS]: {
+		icon: '✅',
+		label: 'Criterion passed',
+		color: 'var(--rating-pass)',
+	},
+	[StageCriterionRating.FAIL]: {
+		icon: '❌',
+		label: 'Criterion failed',
+		color: 'var(--rating-fail)',
+	},
+	[StageCriterionRating.EXEMPT]: {
+		icon: '➖',
+		label: 'Criterion exempt',
+		color: 'var(--rating-exempt)',
+	},
+	[StageCriterionRating.UNRATED]: {
+		icon: '❔',
+		label: 'Criterion unrated',
+		color: 'var(--rating-unrated)',
+	},
+} as const satisfies Record<
+	StageCriterionRating,
+	{
+		icon: string
+		label: string
+		color: string
+	}
+>
+
 /**
  * The result of evaluating one specific stage criterion for one specific
  * wallet.
