@@ -772,19 +772,19 @@ summary {
 ul,
 ol {
 	/* Inputs */
-	--list-gap: 0.25lh;
-	--listItem-marker-inlineSize: 1.15em;
-	--listItem-markerGap: 0.66em;
+	--list-marker-inlineSize: 1.15em;
+	--list-markerGap: 0.66em;
+	--list-gap: 0.5lh;
 
 	/* Rules */
 	display: grid;
 	gap: var(--list-gap);
 	list-style-type: disc;
 	list-style-position: outside;
-	padding-inline-start: var(--listItem-marker-inlineSize);
+	padding-inline-start: var(--list-marker-inlineSize);
 
 	&[data-card] {
-		padding-inline-start: calc(var(--card-padding) + var(--listItem-marker-inlineSize));
+		padding-inline-start: calc(var(--card-padding) + var(--list-marker-inlineSize));
 	}
 
 	&[data-list~='gap-0'] {
@@ -802,25 +802,37 @@ ol {
 	&[data-list~='gap-4'] {
 		--list-gap: 1lh;
 	}
+	&[data-list~='gap-5'] {
+		--list-gap: 1.25lh;
+	}
+	&[data-list~='gap-6'] {
+		--list-gap: 1.5lh;
+	}
 
 	> li,
 	> [data-list-item] {
-		--listItem-gap: 1em;
+		--listItem-gap: 0.25lh;
 
 		&[data-list-item~='gap-0'] {
 			--listItem-gap: 0;
 		}
 		&[data-list-item~='gap-1'] {
-			--listItem-gap: 0.25em;
+			--listItem-gap: 0.25lh;
 		}
 		&[data-list-item~='gap-2'] {
-			--listItem-gap: 0.5em;
+			--listItem-gap: 0.5lh;
 		}
 		&[data-list-item~='gap-3'] {
-			--listItem-gap: 0.75em;
+			--listItem-gap: 0.75lh;
 		}
 		&[data-list-item~='gap-4'] {
-			--listItem-gap: 1em;
+			--listItem-gap: 1lh;
+		}
+		&[data-list-item~='gap-5'] {
+			--listItem-gap: 1.25lh;
+		}
+		&[data-list-item~='gap-6'] {
+			--listItem-gap: 1.5lh;
 		}
 
 		&::marker {
@@ -832,7 +844,7 @@ ol {
 			font-size: 0.875em;
 		}
 
-		padding-inline-start: var(--listItem-markerGap);
+		padding-inline-start: var(--list-markerGap);
 
 		> * + * {
 			margin-top: var(--listItem-gap);
