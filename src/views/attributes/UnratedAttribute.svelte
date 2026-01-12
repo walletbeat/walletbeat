@@ -14,6 +14,19 @@
 		value: Value
 	} = $props()
 
+	const githubUrl = $derived(
+		`https://github.com/walletbeat/walletbeat/tree/beta/data/${
+			wallet.types.SOFTWARE ?
+				'software-wallets'
+			: wallet.types.HARDWARE ?
+				'hardware-wallets'
+			: wallet.types.EMBEDDED ?
+				'embedded-wallets'
+			:
+				'' as never
+		}/${wallet.metadata.id}.ts`
+	)
+
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
@@ -23,21 +36,7 @@
 <Typography
 	content={{
 		contentType: ContentType.MARKDOWN,
-		markdown: `Walletbeat's database does not have the necessary information on **{{WALLET_NAME}}** to assess this question.
-
-Please help us by contributing your knowledge on our repository!`
+		markdown: `Walletbeat's database does not have the necessary information on **{{WALLET_NAME}}** to assess this question. Please help us by contributing your knowledge on our [GitHub repository](${githubUrl})!`
 	}}
 	strings={{ WALLET_NAME: wallet.metadata.displayName }}
 />
-
-<a href="https://github.com/walletbeat/walletbeat" target="_blank" rel="noopener noreferrer" class="repo-link">
-	GitHub Repository
-</a>
-
-
-<style>
-	.repo-link {
-		margin-top: 0.5rem;
-		display: inline-block;
-	}
-</style>
