@@ -196,7 +196,7 @@ function webAuthnSolImplementation(
 
 export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 	id: 'passkeyImplementation',
-	icon: '\u{1F5F9}', // Check mark
+	icon: '\u{1fac6}', // Fingerprint
 	displayName: 'Passkey implementation',
 	wording: {
 		midSentenceName: null,

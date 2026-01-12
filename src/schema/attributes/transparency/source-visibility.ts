@@ -92,7 +92,7 @@ function sourcePrivate(references: ReferenceArray): Evaluation<SourceVisibilityV
 
 export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 	id: 'sourceVisibility',
-	icon: '\u{1f35d}', // Spaghetti
+	icon: '\u{1f50d}', // Looking glass
 	displayName: 'Source visibility',
 	wording: {
 		midSentenceName: 'source visibility',
