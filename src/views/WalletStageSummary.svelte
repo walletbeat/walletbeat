@@ -100,7 +100,7 @@
 	const getRatingIcon = (rating: StageCriterionRating) => 
 		rating === StageCriterionRating.FAIL ? '❌' :
 		rating === StageCriterionRating.EXEMPT ? '⚠️' :
-		'❓'
+		'❔'
 	
 	const getRatingColor = (rating: StageCriterionRating) =>
 		rating === StageCriterionRating.FAIL ? 'var(--rating-fail)' :
@@ -189,41 +189,50 @@
 				</h4>
 			{/if}
 
-			<ul data-column="gap-2">
-				{#each criteria as { criteriaGroup, criterion, evaluation }}
+			<ul>
+				{#each criteria as { criterion, evaluation }}
 					{@const attributeId = getCriterionAttributeId(criterion)}
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}
 					{@const attributeLink = attributeId ? `/${wallet.metadata.id}/#${slugifyCamelCase(attributeId)}` : null}
 
-					<li data-row="start gap-2 wrap">
-						<span style="color: {getRatingColor(evaluation.rating)}">{getRatingIcon(evaluation.rating)}</span>
-						<span data-row-item="flexible">
-							{#if attribute}
-								<span>{@html attribute.icon}</span>
-							{/if}
-							{#if attributeName}
-								{#if attributeLink}
-									<a data-link="camouflaged" href={attributeLink} title={attributeName}>
-										<strong>{attributeName}</strong>
-									</a>:
+					<li
+						data-list-item-marker={attribute?.icon}
+					>
+						<span data-row="start gap-2">
+							<span data-row-item="flexible">
+								{#if attributeName}
+									{#if attributeLink}
+										<a href={attributeLink} title={attributeName}>
+											<strong>{attributeName}</strong>
+										</a>:
+									{:else}
+										<strong>{attributeName}</strong>:
+									{/if}
+									<span>
+										{#if isTypographicContent(criterion.description)}
+											<Typography content={criterion.description} />
+										{:else}
+											{criterion.id}
+										{/if}
+									</span>
 								{:else}
-									<strong>{attributeName}</strong>:
-								{/if}
-								<span>
 									{#if isTypographicContent(criterion.description)}
 										<Typography content={criterion.description} />
 									{:else}
 										{criterion.id}
 									{/if}
-								</span>
-							{:else}
-								{#if isTypographicContent(criterion.description)}
-									<Typography content={criterion.description} />
-								{:else}
-									{criterion.id}
 								{/if}
-							{/if}
+							</span>
+
+							<data
+								value={evaluation.rating}
+								title={evaluation.rating}
+							>
+								<span>
+									{getRatingIcon(evaluation.rating)}
+								</span>
+							</data>
 						</span>
 					</li>
 				{/each}
