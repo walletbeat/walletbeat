@@ -135,7 +135,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 	},
 	question: sentence("Has the wallet's source code been reviewed by security auditors?"),
 	why: markdown(`
-		Wallets are high-stakes piece of software as they deal with sensitive
+		Wallets are high-stakes pieces of software that deal with sensitive
 		user data and funds. To ensure that their code is secure, industry best
 		practices involve regularly submitting the wallet's source code for audit
 		by an independent security auditor. These companies specialize in
