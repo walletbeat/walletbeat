@@ -579,7 +579,7 @@
 							data-row-item="flexible"
 							data-column="gap-3"
 						>
-							<h3>Attribute Details:</h3>
+							<h3>Attributes</h3>
 
 							<ul data-column="gap-2">
 								{#each attributes as { attribute, evalAttr }}
