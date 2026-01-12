@@ -26,6 +26,23 @@
 		}
 	>
 
+	const flawStatuses = {
+		FIXED: {
+			label: 'Fixed',
+			color: 'var(--rating-pass)',
+		},
+		NOT_FIXED: {
+			label: 'Not fixed',
+			color: 'var(--rating-fail)',
+		},
+	} as const satisfies Record<
+		'FIXED' | 'NOT_FIXED',
+		{
+			label: string
+			color: string
+		}
+	>
+
 
 	// Props
 	const {
@@ -138,15 +155,19 @@
 									{#each [SecurityFlawSeverity.CRITICAL, SecurityFlawSeverity.HIGH, SecurityFlawSeverity.MEDIUM] as severity}
 										{#if flawGroups.has(severity)}
 											{@const flaws = flawGroups.get(severity)!}
+											{@const unfixedCount = flaws.filter((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED').length}
+											{@const allFixed = unfixedCount === 0}
 
 											<data	
 												data-badge="small"
+												data-row="gap-1"
 												value={severity}
-												title="{securityFlawSeverities[severity].label} severity flaws"
+												title="{securityFlawSeverities[severity].label} severity flaws{allFixed ? ' (all fixed)' : ''}"
+												style:--accent={allFixed ? 'var(--rating-pass)' : undefined}
 											>
-												{securityFlawSeverities[severity].icon}
-												{securityFlawSeverities[severity].label} Severity
-												({flaws.length})
+												<span>{securityFlawSeverities[severity].icon}</span>
+												<span>{securityFlawSeverities[severity].label} Severity</span>
+												<span>{allFixed ? '✅' : `(${unfixedCount})`}</span>
 											</data>
 										{/if}
 									{/each}
@@ -181,19 +202,20 @@
 								>
 									<span data-row="wrap wrap-first-last">
 										<span data-row-item="flexible basis-2">
-											<strong>{securityFlawSeverities[flaw.severityAtAuditPublication].label}</strong>:
 											{#if flaw.presentStatus === 'FIXED'}
-												<s class="fixed-flaw">{flaw.name}</s>
+												<s class="fixed-flaw">
+													<strong>{securityFlawSeverities[flaw.severityAtAuditPublication].label}</strong>: {flaw.name}
+												</s>
 											{:else}
-												<span>{flaw.name}</span>
+												<strong>{securityFlawSeverities[flaw.severityAtAuditPublication].label}</strong>: <span>{flaw.name}</span>
 											{/if}
 										</span>
 										<data
 											data-badge="small"
 											value={flaw.presentStatus}
-											style:--accent={flaw.presentStatus === 'FIXED' ? 'var(--rating-pass)' : 'var(--rating-fail)'}
+											style:--accent={flawStatuses[flaw.presentStatus].color}
 										>
-											{flaw.presentStatus === 'FIXED' ? 'Fixed' : 'Not fixed'}
+											{flawStatuses[flaw.presentStatus].label}
 										</data>
 									</span>
 								</li>
