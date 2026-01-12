@@ -320,15 +320,9 @@ import HelpOutlineIcon from '@material-icons/svg/svg/help_outline/baseline.svg?r
 							</h2>
 						</header>
 
-						<div
-							data-column="gap-5"
-							data-scroll-item='inline-detached'
-						>
+						<div data-column='gap-5' data-scroll-item='inline-detached'>
 							{/* @ts-expect-error - Astro type checking doesn't fully support Svelte 5 generics yet */}
-							<Typography
-								client:load
-								content={entry.answer}
-							/>
+							<Typography client:load content={entry.answer} />
 						</div>
 					</section>
 				</>
