@@ -718,7 +718,9 @@
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
 
 									{#if stage && ladderEvaluation}
-										<Tooltip>
+										<Tooltip
+											style="--accent: var(--accent-color)"
+										>
 											<a
 												href={`#${stage.id}`}
 												data-link="camouflaged"
