@@ -78,8 +78,6 @@
 				/>
 
 				{#if isSupported(value.scamAlerts.sendTransactionWarning) && value.scamAlerts.sendTransactionWarning.ref}
-					<hr />
-
 					<ReferenceLinks
 						references={toFullyQualified(value.scamAlerts.sendTransactionWarning.ref)}
 					/>
@@ -142,8 +140,6 @@
 				/>
 
 				{#if isSupported(value.scamAlerts.contractTransactionWarning) && value.scamAlerts.contractTransactionWarning.ref}
-					<hr />
-
 					<ReferenceLinks
 						references={toFullyQualified(value.scamAlerts.contractTransactionWarning.ref)}
 					/>
@@ -170,9 +166,9 @@
 				/>
 
 				{#if isSupported(value.scamAlerts.scamUrlWarning) && value.scamAlerts.scamUrlWarning.ref}
-					<hr />
-
-					<ReferenceLinks references={toFullyQualified(value.scamAlerts.scamUrlWarning.ref)} />
+					<ReferenceLinks
+						references={toFullyQualified(value.scamAlerts.scamUrlWarning.ref)}
+					/>
 				{/if}
 			</li>
 		{/if}
