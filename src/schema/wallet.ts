@@ -1,4 +1,5 @@
 import type { Paragraph, TypographicContent } from '@/types/content'
+import type { WalletSecurityNews } from '@/types/content/news'
 import type { CalendarDate } from '@/types/date'
 import { prefixError } from '@/types/errors'
 import type { Dict } from '@/types/utils/dict'
@@ -228,6 +229,9 @@ export interface BaseWallet {
 
 	/** Overrides for specific attributes. */
 	overrides?: WalletOverrides
+
+	/** Security news items associated with this wallet. */
+	news?: WalletSecurityNews[]
 }
 
 /**
@@ -357,6 +361,9 @@ export interface RatedWallet {
 
 	/** Overrides for specific attributes. */
 	overrides: WalletOverrides
+
+	/** Security news items associated with this wallet. */
+	news?: WalletSecurityNews[]
 }
 
 function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | null {
@@ -498,6 +505,7 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 		ladders: nonEmptyRemap(ladders, (_, ladder) =>
 			evaluateWalletOnLadder(stageEvaluatable, ladder),
 		),
+		news: wallet.news,
 	}
 }
 

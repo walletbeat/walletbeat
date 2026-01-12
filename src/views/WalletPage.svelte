@@ -420,7 +420,7 @@
 		</header>
 
 		<hr />
-
+		<div data-scroll-item="inline-detached padding-match-end" data-column>
 		<section
 			class="attribute"
 			id="test-news"
@@ -477,7 +477,7 @@
 						</summary>
 
 						<section>
-							<p>This is a test summary with some text to see how it behaves when collapsed and expanded.</p>
+							<p>This is a test summary wijkfjaskljfkasjdj jdkajskdjaskljdasdkl djksajdklajdkjaslkjdalskjd th some text to see how it behaves when collapsed and expanded.</p>
 						</section>
 					</details>
 
@@ -493,6 +493,8 @@
 				</div>
 			</details>
 		</section>
+		</div>
+
 
 		{#if showStage}
 			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}

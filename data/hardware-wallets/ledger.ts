@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
+import { ledgerNewsRegistry } from '@/data/news/ledger'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
@@ -206,6 +207,7 @@ export const ledgerWallet: HardwareWallet = {
 			reputation: null,
 		},
 	},
+	news: Object.values(ledgerNewsRegistry),
 	variants: {
 		[Variant.HARDWARE]: true,
 	},
