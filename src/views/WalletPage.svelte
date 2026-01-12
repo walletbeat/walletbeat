@@ -709,6 +709,7 @@
 										<Tooltip
 											buttonTriggerPlacement="behind"
 											hoverTriggerPlacement="around"
+											style="--accent: var(--accent-color)"
 										>
 											{#snippet children()}
 												<a
