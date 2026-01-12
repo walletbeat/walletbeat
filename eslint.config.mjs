@@ -14,6 +14,7 @@ import svelteConfig from './svelte.config.js'
 
 const firstOrderedKeys = [
 	'id',
+	'slug',
 	'name',
 	'displayName',
 	'legalName',

@@ -1,5 +1,6 @@
 import type { WithRef } from '@/schema/reference'
 import type { WalletMetadata } from '@/schema/wallet'
+
 import type { CalendarDate } from '../date'
 
 /**
