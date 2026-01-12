@@ -242,11 +242,11 @@ ${nonEmptyMap(
 	w => `
 * ${hardwareWalletTypeToString(w, null)}${sameConnectionTypeForAll === null ? walletSpecificMethod(w) : ''}`,
 ).join('')}${
-	otherSupported
-		? `
+		otherSupported
+			? `
 * ... and others${sameConnectionTypeForAll === null ? walletSpecificMethod(HardwareWalletType.OTHER) : ''}
 `
-		: ''
-}
+			: ''
+	}
 	`)
 }

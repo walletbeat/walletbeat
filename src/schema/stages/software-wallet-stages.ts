@@ -58,9 +58,7 @@ export const softwareWalletStageZero: WalletStage = {
 export const softwareWalletStageOne: WalletStage = {
 	id: 'software_stage_1',
 	label: 'Stage 1',
-	description: sentence(
-		'The wallet has made a minimal commitment to Ethereum values.',
-	),
+	description: sentence('The wallet has made a minimal commitment to Ethereum values.'),
 	criteriaGroups: [
 		{
 			id: 'security',
@@ -239,7 +237,9 @@ export const softwareWalletStageOne: WalletStage = {
 		},
 		{
 			id: 'ecosystem',
-			description: sentence('The wallet is aligned with basic Ethereum ecosystem best practices for usability.'),
+			description: sentence(
+				'The wallet is aligned with basic Ethereum ecosystem best practices for usability.',
+			),
 			criteria: [
 				{
 					id: 'address_resolution',
@@ -442,7 +442,9 @@ const softwareWalletStageTwo: WalletStage = {
 		},
 		{
 			id: 'ecosystem',
-			description: sentence('The wallet is aligned with advanced Ethereum ecosystem best practices for usability.'),
+			description: sentence(
+				'The wallet is aligned with advanced Ethereum ecosystem best practices for usability.',
+			),
 			criteria: [
 				{
 					id: 'account_abstraction',

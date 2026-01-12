@@ -80,7 +80,8 @@ function singleHardwareWalletManufacturerSupport(
 			hardwareWalletSupport,
 			__brand: brand,
 		},
-		details: mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
+		details:
+			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
 
 ${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 		impact: mdParagraph(`
@@ -107,7 +108,8 @@ function insufficientHardwareWalletManufacturerSupport(
 			hardwareWalletSupport,
 			__brand: brand,
 		},
-		details: mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
+		details:
+			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
 
 ${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 		howToImprove: paragraph(`

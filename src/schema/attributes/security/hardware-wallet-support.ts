@@ -67,7 +67,8 @@ function indirectHardwareWalletSupport(
 			hardwareWalletSupport,
 			__brand: brand,
 		},
-		details: paragraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
+		details:
+			paragraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
 
 Direct connection is not possible.`),
 		impact: paragraph(`
