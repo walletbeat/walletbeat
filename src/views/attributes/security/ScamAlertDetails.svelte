@@ -43,9 +43,9 @@
 						'the domain name of the app',
 				].filter(s => s !== ''))}
 
-	<ul class="features-list">
+	<ul data-list="gap-4">
 		{#if value.sendTransactionWarning?.required}
-			<li>
+			<li data-list-item="gap-2">
 				<Typography
 					content={{
 						contentType: ContentType.MARKDOWN,
@@ -94,14 +94,14 @@
 					].filter(Boolean)
 				: []}
 
-			<li>
+			<li data-list-item="gap-2">
 				<Typography
 					content={{
 						contentType: ContentType.MARKDOWN,
 						markdown: isSupported(value.scamAlerts.contractTransactionWarning)
-							? `**{{WALLET_NAME}}** helps you stay safe when doing onchain transactions by ${
+							? `**{{WALLET_NAME}}** helps you stay safe when doing onchain transactions by${
 									contractFeatures.length > 1
-										? `:${[
+										? `: ${[
 												value.scamAlerts.contractTransactionWarning.contractRegistry &&
 													'Checking the contract or transaction data against a database of known scams',
 												value.scamAlerts.contractTransactionWarning
@@ -110,7 +110,7 @@
 												value.scamAlerts.contractTransactionWarning.recentContractWarning &&
 													'Warning you when interacting with a contract that has only recently been created onchain',
 											]
-												.filter(s => s !== '')
+												.filter(s => s)
 												.map(listItem => `\n* ${listItem}`)
 												.join('')}`
 										: value.scamAlerts.contractTransactionWarning.contractRegistry
@@ -130,7 +130,7 @@
 														'your Ethereum address',
 													value.scamAlerts.contractTransactionWarning.leaksContractAddress &&
 														'the contract address',
-												].filter(s => s !== ''),
+												].filter(s => s),
 											)} to an external provider which can correlate them ahead of the transaction being submitted.`
 										: ''
 								}`
@@ -148,7 +148,7 @@
 		{/if}
 
 		{#if value.scamUrlWarning?.required}
-			<li>
+			<li data-list-item="gap-2">
 				<Typography
 					content={{
 						contentType: ContentType.MARKDOWN,
@@ -174,19 +174,3 @@
 		{/if}
 	</ul>
 {/if}
-
-<style>
-	.features-list {
-		margin: 0.5rem 0 0 0;
-		padding-left: 1.5rem;
-		> li + li {
-			margin-top: 1rem;
-		}
-
-		> li {
-			> :global(* + *) {
-				margin-top: 0.5rem;
-			}
-		}
-	}
-</style>
