@@ -809,25 +809,25 @@
 						{@const componentName = evalAttr.evaluation.details.component.component}
 						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
 						{@const value = evalAttr.evaluation.value}
-						{@const references = toFullyQualified(evalAttr.evaluation.references || [])}
+						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
 
 						<div data-column>
 							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...componentProps} {wallet} {value} {references} />
+								<AddressCorrelationDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...componentProps} {wallet} {value} {references} />
+								<ChainVerificationDetails {...componentProps} {wallet} {value} refs={references} />
 							{:else if componentName === 'ScamAlertDetails'}
-								<ScamAlertDetails {...componentProps} {wallet} {value} {references} />
+								<ScamAlertDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...componentProps} {wallet} {value} {references} />
+								<SecurityAuditsDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...componentProps} {wallet} {value} {references} />
+								<TransactionInclusionDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...componentProps} {wallet} {value} {references} />
+								<FundingDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...componentProps} {wallet} {value} {references} />
+								<AccountRecoveryDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...componentProps} {wallet} {value} {references} />
+								<UnratedAttribute {...componentProps} {wallet} {value} />
 							{/if}
 						</div>
 
@@ -862,7 +862,25 @@
 				</div>
 			{/if}
 
-			<ReferenceLinks references={toFullyQualified(evalAttr.evaluation.references || [])} />
+			{#if (
+				!isTypographicContent(evalAttr.evaluation.details)
+				&& evalAttr.evaluation.references?.length
+				&& !(
+					// Custom components that render their own reference links
+					[
+						'ChainVerificationDetails',
+						'FundingDetails',
+						'ScamAlertDetails',
+						'SecurityAuditsDetails',
+					]
+						.includes(evalAttr.evaluation.details.component.component)
+				)
+			)}
+				<ReferenceLinks
+					references={toFullyQualified(evalAttr.evaluation.references)}
+					cardBackground="secondary"
+				/>
+			{/if}
 
 			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.value && typeof evalAttr.evaluation.value === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.value && Array.isArray(evalAttr.evaluation.value.supportedHardwareWallets) && evalAttr.evaluation.value.supportedHardwareWallets.length > 0}
 				{@const supportedBrands = evalAttr.evaluation.value.supportedHardwareWallets}
