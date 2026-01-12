@@ -109,7 +109,7 @@
 	overflow: hidden;
 
 	font-family: 'Montserrat', 'Noto Color Emoji';
-	font-size: min(3.8vw, 16px);
+	font-size: min(3.2vw, 16px);
 
 	color-scheme: light dark;
 	color: var(--text-primary);
