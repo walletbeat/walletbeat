@@ -56,7 +56,7 @@
 			color: 'var(--rating-fail)',
 		},
 		[StageCriterionRating.EXEMPT]: {
-			icon: '⚠️',
+			icon: '➖',
 			label: 'Criterion exempt',
 			color: 'var(--rating-exempt)',
 		},
@@ -144,17 +144,18 @@
 				{@const stageIndex = index}
 				{@const isCurrent = stage && typeof stage !== 'string' && stage.id === s.id}
 				{@const allCriteria = s.criteriaGroups.flatMap(group => group.criteria)}
-				{@const passedCriteria = allCriteria.filter(criterion => {
-					const evaluation = criterion.evaluate(wallet)
-
-					return evaluation.rating === StageCriterionRating.PASS
-				})}
-				{@const passedCount = passedCriteria.length}
-				{@const totalCount = allCriteria.length}
-				{@const allPassed = passedCount === totalCount}
+				{@const allEvaluations = allCriteria.map(criterion => criterion.evaluate(wallet))}
+				{@const applicableEvaluations = allEvaluations.filter(e => e.rating !== StageCriterionRating.EXEMPT)}
+				{@const passedCount = applicableEvaluations.filter(e => e.rating === StageCriterionRating.PASS).length}
+				{@const exemptCount = allEvaluations.filter(e => e.rating === StageCriterionRating.EXEMPT).length}
+				{@const totalCount = applicableEvaluations.length}
+				{@const allPassed = totalCount > 0 && passedCount === totalCount}
+				{@const allExempt = allEvaluations.length > 0 && exemptCount === allEvaluations.length}
 				{@const isDefaultOpen = defaultOpenStageIndex === stageIndex}
 				{@const stageRating = (
-					allPassed ?
+					allExempt ?
+						StageStatus.UNRATED
+					: allPassed ?
 						StageStatus.PASS
 					: passedCount > 0 ?
 						StageStatus.PARTIAL
@@ -215,10 +216,16 @@
 							<div data-column>
 								{#each s.criteriaGroups as criteriaGroup}
 									{@const groupEvaluations = ladderDefinition ? criteriaGroup.criteria.map(c => c.evaluate(wallet)) : []}
-									{@const groupPassedCount = groupEvaluations.filter(e => e?.rating === StageCriterionRating.PASS).length}
-									{@const groupTotalCount = groupEvaluations.length}
+									{@const groupApplicableEvaluations = groupEvaluations.filter(e => e?.rating !== StageCriterionRating.EXEMPT)}
+									{@const groupPassedCount = groupApplicableEvaluations.filter(e => e?.rating === StageCriterionRating.PASS).length}
+									{@const groupExemptCount = groupEvaluations.filter(e => e?.rating === StageCriterionRating.EXEMPT).length}
+									{@const groupTotalCount = groupApplicableEvaluations.length}
+									{@const groupAllExempt = groupEvaluations.length > 0 && groupExemptCount === groupEvaluations.length}
+									{@const groupAllUnrated = groupTotalCount > 0 && groupApplicableEvaluations.every(e => e?.rating === StageCriterionRating.UNRATED)}
 									{@const groupRating = (
-										(groupTotalCount > 0 && groupEvaluations.every(e => e?.rating === StageCriterionRating.UNRATED)) ?
+										groupAllExempt ?
+											StageStatus.UNRATED
+										: groupAllUnrated ?
 											StageStatus.UNRATED
 										: groupPassedCount === groupTotalCount ?
 											StageStatus.PASS
@@ -274,6 +281,7 @@
 														<li
 															data-list-item-marker={attribute?.icon}
 															style:--accent={stageCriterionRatings[(criterionRating ?? StageCriterionRating.UNRATED) as StageCriterionRating].color}
+															data-stage-criterion-rating={criterionRating}
 														>
 															<span data-row>
 																<span data-row-item="flexible">
@@ -339,5 +347,12 @@
 
 	h4 {
 		font-weight: normal;
+	}
+
+	[data-stage-criterion-rating] {
+		&[data-stage-criterion-rating="EXEMPT"] {
+			text-decoration: line-through;
+			opacity: 0.6;
+		}
 	}
 </style>
