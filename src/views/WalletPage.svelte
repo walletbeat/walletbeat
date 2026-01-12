@@ -786,18 +786,14 @@
 				</header>
 			</summary>
 
-			<div
-				class="rating-display"
+			<ul
+				class="attribute-rating-details"
 				data-rating={evalAttr.evaluation.value.rating.toLowerCase()}
-				data-card
-				data-row="align-start"
+				data-card="padding-5"
 			>
-				<div class="rating-icon" data-row="center">
-					{ratingIcons[evalAttr.evaluation.value.rating as Rating]}
-				</div>
-				<div
-					class="rating-content"
-					data-row-item="flexible"
+				<li
+					data-list-item="gap-3"
+					data-list-item-marker={ratingIcons[evalAttr.evaluation.value.rating as Rating]}
 				>
 					{#if isTypographicContent(evalAttr.evaluation.details)}
 						<Typography
@@ -841,8 +837,8 @@
 							/>
 						</div>
 					{/if}
-				</div>
-			</div>
+				</li>
+			</ul>
 
 			{#if variantSpecificCaption}
 				<div class="variant-caption">
@@ -1746,24 +1742,19 @@
 				color: var(--text-secondary);
 			}
 
-			.rating-display {
-				font-weight: 500;
+			.attribute-rating-details {
+				&:is(ul) {
+					--list-markerGap: 1em;
+				}
+
 				background-color: color-mix(in srgb, var(--accent) 5%, var(--background-secondary));
 				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
+				color: var(--text-secondary);
+				font-weight: 500;
+
 				&[data-rating='exempt'] {
 					opacity: 0.7;
-				}
-
-				.rating-icon {
-					width: 1.5rem;
-					height: 1.5rem;
-					font-size: 1.2rem;
-					color: var(--accent);
-				}
-
-				.rating-content > div {
-					color: var(--text-secondary);
 				}
 			}
 
