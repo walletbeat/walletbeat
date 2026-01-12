@@ -851,7 +851,10 @@
 			{/if}
 
 			{#if evalAttr.evaluation.impact}
-				<div class="impact">
+				<div
+					class="impact"
+					data-column="gap-6"
+				>
 					<Typography
 						content={evalAttr.evaluation.impact}
 						strings={{ WALLET_NAME: wallet.metadata.displayName }}
@@ -894,7 +897,7 @@
 						</h4>
 					</summary>
 
-					<section>
+					<section data-column="gap-6">
 						{#if attribute.why}
 							<Typography
 								content={attribute.why}
@@ -912,7 +915,10 @@
 						</h4>
 					</summary>
 
-					<section class="methodology" data-column="gap-6">
+					<section
+						class="methodology"
+						data-column="gap-6"
+					>
 						{#if attribute.methodology}
 							<Typography content={attribute.methodology} />
 						{:else}
