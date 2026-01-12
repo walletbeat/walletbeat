@@ -170,7 +170,10 @@
 			}
 			data-sticky-container
 		>
-			<summary data-sticky>
+			<summary
+				data-sticky
+				data-row="gap-2"
+			>
 				{@render linkable(item)}
 			</summary>
 
@@ -189,6 +192,7 @@
 				target: '_blank',
 				rel: 'noreferrer',
 			}}
+			data-row="start gap-2"
 		>
 			{#if item.icon}
 				<span class="icon">{@html item.icon}</span>
@@ -242,10 +246,6 @@
 
 	summary,
 	a {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-
 		> .icon {
 			display: flex;
 			font-size: 1.25em;
@@ -294,8 +294,18 @@
 		}
 	}
 
-	details:not([open]) > summary::after {
-		transform: perspective(100px) rotateX(180deg) rotate(-90deg);
+	summary {
+		&::after {
+			margin-inline-start: auto;
+		}
+
+		details:not([open]) > &::after {
+			transform: perspective(100px) rotateX(180deg) rotate(-90deg);
+		}
+	}
+
+	summary > a {
+		flex: 0 auto;
 	}
 
 	summary ~ * {
