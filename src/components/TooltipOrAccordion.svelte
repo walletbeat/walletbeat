@@ -107,6 +107,10 @@
 					display: none;
 				}
 			}
+
+			> :global(:first-child) {
+				flex: 1;
+			}
 		}
 
 		.expanded-content {
