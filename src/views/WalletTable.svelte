@@ -407,7 +407,7 @@
 									},
 									{
 										id: 'accountType-safe',
-										label: '# Safe',
+										label: 'Safe',
 										icon: KeyIcon,
 										filterFunction: wallet => {
 											const accountTypes = walletSupportedAccountTypes(wallet, 'ALL_VARIANTS')
@@ -733,7 +733,7 @@
 															eipTooltipContent: eip7702,
 														},
 														AccountType.safe in accountTypes && {
-															label: '# Safe',
+															label: 'Safe',
 															filterId: 'accountType-safe',
 															type: 'safe',
 														},
