@@ -64,10 +64,10 @@
 	let isPopoverHovered = $state(false)
 
 	const hoverTriggerEvents = {
-		onmouseenter: () => {
+		onpointerenter: () => {
 			isTriggerHovered = true
 		},
-		onmouseleave: () => {
+		onpointerleave: () => {
 			isTriggerHovered = false
 		},
 		onfocus: () => {
@@ -151,10 +151,10 @@
 			popover="auto"
 			id={popoverId}
 
-			onmouseenter={() => {
+			onpointerenter={() => {
 				isPopoverHovered = true
 			}}
-			onmouseleave={() => {
+			onpointerleave={() => {
 				isPopoverHovered = false
 			}}
 			{@attach node => {
