@@ -519,7 +519,10 @@
 					</div>
 				{/if}
 
-				<div class="attributes-overview-container">
+				<div
+					class="attributes-overview-container"
+					data-column
+				>
 					<section
 						class="attributes-overview"
 						data-card="radius-8"
@@ -1463,12 +1466,10 @@
 
 			h3 {
 				font-size: 1rem;
-				font-weight: 700;
-				margin: 0 0 0.5rem 0;
+				padding-block: 0.25em;
 			}
 
 			ul {
-				list-style: none;
 				margin: 0;
 				padding: 0;
 
