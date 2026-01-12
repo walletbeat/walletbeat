@@ -1761,8 +1761,6 @@
 
 			.impact {
 				color: var(--text-secondary);
-				font-style: italic;
-				opacity: 0.7;
 			}
 		}
 	}
