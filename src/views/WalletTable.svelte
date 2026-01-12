@@ -1018,10 +1018,10 @@
 													{stage.label}
 												</text>
 											{:else}
-												<text>❓</text>
+												<text>❔</text>
 											{/if}
 										{:else}
-											<text>❓</text>
+											<text>❔</text>
 										{/if}
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<text>
@@ -1041,7 +1041,7 @@
 															''
 													}`
 												:
-													'❓'
+													'❔'
 											}
 										</text>
 									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
@@ -1252,7 +1252,7 @@
 															(groupScore.score * 100).toFixed(0)
 													}${groupScore.hasUnratedComponent ? '*' : ''}`
 												:
-													'❓'
+													'❔'
 											}
 										</text>
 									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
