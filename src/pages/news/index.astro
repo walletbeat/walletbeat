@@ -2,35 +2,25 @@
 // Types/constants
 import { defaultNavigationItems } from '@/constants/navigation'
 import { allWalletSecurityNews } from '@/data/news'
-import {
-	impactCategories,
-	incidentStatuses,
-	newsTypes,
-	severities,
-} from '@/types/content/news'
-
+import { impactCategories, incidentStatuses, newsTypes, severities } from '@/types/content/news'
 
 // Functions
 import { refs } from '@/schema/reference'
 
-const formatDate = (dateString: string) => (
+const formatDate = (dateString: string) =>
 	new Date(dateString).toLocaleDateString('en-US', {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
 	})
-)
-
 
 // Layouts
 import Layout from '@/layouts/Layout.astro'
-
 
 // Components
 import Navigation from '@/views/Navigation.astro'
 import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 ---
-
 
 <Layout
 	metadata={{
@@ -40,9 +30,9 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 >
 	<Navigation navigationItems={defaultNavigationItems} />
 
-	<main data-sticky-container data-column="gap-8">
-		<header data-scroll-item="inline-detached padding-match-start">
-			<hgroup data-column="gap-4">
+	<main data-sticky-container data-column='gap-8'>
+		<header data-scroll-item='inline-detached padding-match-start'>
+			<hgroup data-column='gap-4'>
 				<h1>Wallet Security News</h1>
 				<p>Security incidents, vulnerabilities, and data breaches affecting Ethereum wallets</p>
 			</hgroup>
@@ -50,154 +40,137 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 
 		<hr />
 
-		{allWalletSecurityNews.map((news) => (
-			<>
-				<div data-scroll-item="inline-detached">
-					<article id={news.slug}>
-						<details
-							data-card="padding-6"
-							data-column="gap-6"
-						>
-							<summary data-row="wrap wrap-first-last">
-								{news.wallet && (
+		{
+			allWalletSecurityNews.map(news => (
+				<>
+					<div data-scroll-item='inline-detached'>
+						<article id={news.slug}>
+							<details data-card='padding-6' data-column='gap-6'>
+								<summary data-row='wrap wrap-first-last'>
+									{news.wallet && (
+										<div data-row-item='basis-full'>
+											<a
+												class='wallet-link'
+												href={`/${news.wallet.id}`}
+												data-link='camouflaged'
+												data-badge='medium'
+											>
+												<img
+													src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
+													alt={news.wallet.displayName}
+												/>
+												<span>{news.wallet.displayName}</span>
+											</a>
+										</div>
+									)}
+
+									<h2 data-row-item='flexible basis-3'>{news.title}</h2>
+
 									<div
-										data-row-item="basis-full"
+										class='metadata-dates'
+										data-row-item='wrap-end flexible basis-3'
+										data-row='end wrap gap-1'
 									>
-										<a
-											class="wallet-link"
-											href={`/${news.wallet.id}`}
-											data-link="camouflaged"
-											data-badge="medium"
-										>
-											<img
-												src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
-												alt={news.wallet.displayName}
-											/>
-											<span>{news.wallet.displayName}</span>
-										</a>
+										<time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time>
+
+										{news.publishedAt !== news.updatedAt && (
+											<small class='gap-1'>
+												<span>・</span>
+												<span>
+													Updated{' '}
+													<time datetime={news.updatedAt}>{formatDate(news.updatedAt)}</time>
+												</span>
+											</small>
+										)}
 									</div>
-								)}
+								</summary>
 
-								<h2 data-row-item="flexible basis-3">
-									{news.title}
-								</h2>
+								<div class='article-content' data-column='gap-5'>
+									<hr />
 
-								<div
-									class="metadata-dates"
-									data-row-item="wrap-end flexible basis-3"
-									data-row="end wrap gap-1"
-								>
-									<time datetime={news.publishedAt}>{formatDate(news.publishedAt)}</time>
+									<dl class='metadata' data-row='start wrap gap-6'>
+										<div data-column='gap-2'>
+											<dt>Type</dt>
+											<dd>
+												<span class='type-badge' data-badge='medium'>
+													{newsTypes[news.type].label}
+												</span>
+											</dd>
+										</div>
 
-									{news.publishedAt !== news.updatedAt && (
-										<small class="gap-1">
-											<span>・</span>
-											<span>Updated <time datetime={news.updatedAt}>{formatDate(news.updatedAt)}</time></span>
-										</small>
+										<div data-column='gap-2'>
+											<dt>Severity</dt>
+											<dd>
+												<span
+													class='severity-badge'
+													data-badge='medium'
+													style={`--severity-color: ${severities[news.severity].color}`}
+												>
+													{severities[news.severity].label}
+												</span>
+											</dd>
+										</div>
+
+										<div data-column='gap-2'>
+											<dt>Status</dt>
+											<dd>
+												<span
+													class='status-badge'
+													data-badge='medium'
+													style={`--status-color: ${incidentStatuses[news.status].color}`}
+												>
+													<span set:html={incidentStatuses[news.status].icon} />
+													{incidentStatuses[news.status].label}
+												</span>
+											</dd>
+										</div>
+									</dl>
+
+									<p>{news.summary}</p>
+
+									<div data-card='secondary padding-4 radius-4' data-column='gap-3'>
+										<h4>Impact</h4>
+										<ul>
+											<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not Affected'}</li>
+											<li>Category: {impactCategories[news.impact.category].label}</li>
+										</ul>
+									</div>
+
+									<hr />
+
+									{refs(news).length > 0 && (
+										<footer data-column='gap-3'>
+											<h4>Sources</h4>
+											<ul>
+												{refs(news).map(ref =>
+													ref.urls.map(url => (
+														<li>
+															<a href={url.url} target='_blank' rel='noopener noreferrer'>
+																{url.label}
+																<span set:html={ExternalLinkIcon} />
+															</a>
+														</li>
+													)),
+												)}
+											</ul>
+										</footer>
 									)}
 								</div>
-							</summary>
+							</details>
+						</article>
+					</div>
 
-							<div
-								class="article-content"
-								data-column="gap-5"
-							>
-								<hr>
+					<hr />
+				</>
+			))
+		}
 
-								<dl
-									class="metadata"
-									data-row="start wrap gap-6"
-								>
-									<div data-column="gap-2">
-										<dt>Type</dt>
-										<dd>
-											<span
-												class="type-badge"
-												data-badge="medium"
-											>
-												{newsTypes[news.type].label}
-											</span>
-										</dd>
-									</div>
-
-									<div data-column="gap-2">
-										<dt>Severity</dt>
-										<dd>
-											<span
-												class="severity-badge"
-												data-badge="medium"
-												style={`--severity-color: ${severities[news.severity].color}`}
-											>
-												{severities[news.severity].label}
-											</span>
-										</dd>
-									</div>
-
-									<div data-column="gap-2">
-										<dt>Status</dt>
-										<dd>
-											<span
-												class="status-badge"
-												data-badge="medium"
-												style={`--status-color: ${incidentStatuses[news.status].color}`}
-											>
-												<span set:html={incidentStatuses[news.status].icon} />
-												{incidentStatuses[news.status].label}
-											</span>
-										</dd>
-									</div>
-								</dl>
-
-								<p>{news.summary}</p>
-
-								<div
-									data-card="secondary padding-4 radius-4"
-									data-column="gap-3"
-								>
-									<h4>Impact</h4>
-									<ul>
-										<li>Funds: {news.impact.fundsImpacted ? 'Affected' : 'Not Affected'}</li>
-										<li>Category: {impactCategories[news.impact.category].label}</li>
-									</ul>
-								</div>
-
-								<hr>
-
-								{refs(news).length > 0 && (
-									<footer data-column="gap-3">
-										<h4>Sources</h4>
-										<ul>
-											{refs(news).map(ref =>
-												ref.urls.map(url => (
-													<li>
-														<a href={url.url} target="_blank" rel="noopener noreferrer">
-															{url.label}
-															<span set:html={ExternalLinkIcon} />
-														</a>
-													</li>
-												)),
-											)}
-										</ul>
-									</footer>
-								)}
-							</div>
-						</details>
-					</article>
-				</div>
-
-				<hr />
-			</>
-		))}
-
-		<section
-			data-scroll-item="inline-detached padding-match-end"
-			data-column="gap-5"
-		>
+		<section data-scroll-item='inline-detached padding-match-end' data-column='gap-5'>
 			<p>
 				Know about a security incident affecting a wallet? Please help by <a
-					href="https://github.com/walletbeat/walletbeat"
-					target="_blank"
-					rel="noopener noreferrer">contributing to our repository</a
+					href='https://github.com/walletbeat/walletbeat'
+					target='_blank'
+					rel='noopener noreferrer'>contributing to our repository</a
 				>!
 			</p>
 		</section>
@@ -219,7 +192,7 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 			color: var(--text-secondary);
 			opacity: 0.85;
 		}
-	}	
+	}
 
 	article {
 		.wallet-link {
