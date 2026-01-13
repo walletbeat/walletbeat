@@ -2,19 +2,14 @@ import { attributeTree } from '@/schema/attribute-groups'
 import type { Attribute } from '@/schema/attributes'
 import { ladders, WalletLadderType } from '@/schema/ladders'
 import type { WalletStage, WalletStageCriterion } from '@/schema/stages'
+import { objectEntries } from '@/types/utils/object'
 
 /**
  * Get all stages across all ladders with their ladder type and index.
  */
-const allStages = (): Array<{
-	ladderType: WalletLadderType
-	stage: WalletStage
-	stageIndex: number
-}> =>
-	(Object.entries(ladders) as [WalletLadderType, (typeof ladders)[WalletLadderType]][]).flatMap(
-		([ladderType, ladder]) =>
-			ladder.stages.map((stage, stageIndex) => ({ ladderType, stage, stageIndex })),
-	)
+const allStages = objectEntries(ladders).flatMap(([ladderType, ladder]) =>
+	ladder.stages.map((stage, stageIndex) => ({ ladderType, stage, stageIndex })),
+)
 
 /**
  * Map of stage IDs to stage objects (using the first occurrence across all ladders).
@@ -52,7 +47,7 @@ export function isAttributeUsedInStages(attribute: Attribute<any>): boolean {
 	// The attribute objects are referenced in the stage definitions via variantsMustPassAttribute
 	// We can check if the attribute ID appears in the ladder structure
 	// by serializing and checking for the attribute ID
-	const ladderString = JSON.stringify(ladders, (_, value) => {
+	const ladderString = JSON.stringify(ladders, (_, value: unknown) => {
 		// When we encounter an attribute object, include its ID
 		if (
 			value &&
@@ -99,7 +94,7 @@ export const isAttributeUsedInStage = (attribute: Attribute<any>, stageId: strin
 export function getAttributeStages(
 	attribute: Attribute<any>,
 ): Array<{ ladderType: WalletLadderType; stageNumbers: number[] }> {
-	const stagesWithAttribute = allStages()
+	const stagesWithAttribute = allStages
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
 		.map(({ ladderType, stageIndex }) => ({ ladderType, stageIndex }))
 
@@ -160,7 +155,7 @@ export function getCriterionAttributeId(criterion: {
 export function getAttributeCriteria(
 	attribute: Attribute<any>,
 ): Array<{ ladderType: WalletLadderType; stageNumber: number; criterion: WalletStageCriterion }> {
-	return allStages()
+	return allStages
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
 		.flatMap(({ ladderType, stage, stageIndex }) =>
 			allCriteriaInStage(stage)
