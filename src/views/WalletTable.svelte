@@ -12,7 +12,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { Filter } from '@/components/Filters.svelte'
-	import type { Column } from '@/components/TableState.svelte'
+	import type { Column } from '@/components/Table.svelte'
 	import { variants } from '@/constants/variants'
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
