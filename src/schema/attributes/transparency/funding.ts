@@ -129,7 +129,7 @@ const unclear: Evaluation<FundingValue> = {
  */
 export const funding: Attribute<FundingValue> = {
 	id: 'funding',
-	icon: '\u{1fa99}', // Coin
+	icon: '\u{1f4b0}', // Money bag
 	displayName: 'Funding',
 	wording: {
 		midSentenceName: 'funding',

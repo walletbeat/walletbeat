@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
@@ -9,20 +10,20 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
 export const frame: SoftwareWallet = {
 	metadata: {
 		id: 'frame',
 		displayName: 'Frame',
 		tableName: 'Frame',
 		blurb: paragraph('Frame...'),
-		contributors: [polymutex, nconsigny, lucemans],
+		contributors: [polymutex, nconsigny, lucemans, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-03-13',
 		urls: {
@@ -134,7 +135,19 @@ export const frame: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			transactionLegibility: null,
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: null,
+				messageSigningLegibility: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -109,7 +109,7 @@
 	overflow: hidden;
 
 	font-family: 'Montserrat', 'Noto Color Emoji';
-	font-size: 16px;
+	font-size: min(3.8vw, 16px);
 
 	color-scheme: light dark;
 	color: var(--text-primary);
@@ -225,13 +225,12 @@ details {
 		transform: perspective(1000px) rotateX(-1deg);
 	}
 
-	> summary {
+	> :where(summary) {
 		cursor: zoom-in;
 
-		display: grid;
-		grid-template-columns: 1fr auto;
-		align-items: center;
-		gap: 0.5rem;
+		> :only-child {
+			flex: 1;
+		}
 
 		&::-webkit-details-marker {
 			display: none;
@@ -242,14 +241,28 @@ details {
 
 			flex-shrink: 0;
 			width: 0.75em;
-			height: 0.75em;
+			height: 1lh;
 
 			background-color: currentColor;
-			mask: var(--icon-chevron) no-repeat;
+			mask: var(--icon-chevron) no-repeat center;
 			opacity: 0.66;
 
 			transform: perspective(100px) rotateX(0deg);
 			transition-property: transform;
+		}
+
+		@container (inline-size < 42ch) {
+			&:has(> :only-child[data-row~="wrap"]){
+				justify-content: end;
+
+				> :only-child[data-row~="wrap"] {
+					display: contents;
+				}
+
+				&::after {
+					align-self: end;
+				}
+			}
 		}
 	}
 
@@ -263,13 +276,13 @@ details {
 
 	&[data-card] {
 		padding: 0;
-		gap: 0;
+		gap: 0 !important;
 
 		> summary {
 			padding: var(--card-padding);
 		}
 
-		> summary ~ * {
+		> summary + :last-child {
 			padding: var(--card-padding);
 			padding-top: 0;
 		}
@@ -465,22 +478,16 @@ span svg {
 }
 
 [data-row],
-[data-badge] {
+[data-badge],
+summary {
 	display: inline flex;
 	justify-content: space-between;
 	align-items: center;
 	gap: 1em;
 
-	&[data-row~='wrap'] {
+	&[data-row~='wrap'],
+	&:where(summary) {
 		flex-wrap: wrap;
-
-		&:not(
-			[data-row~='start'],
-			[data-row~='center'],
-			[data-row~='end']
-		) > :nth-child(2):last-child {
-			margin-inline-start: auto;
-		}
 	}
 
 	&[data-row~='start'] {
@@ -491,6 +498,16 @@ span svg {
 	}
 	&[data-row~='end'] {
 		justify-content: end;
+	}
+
+	&[data-row~='align-start'] {
+		align-items: start;
+	}
+	&[data-row~='align-center'] {
+		align-items: center;
+	}
+	&[data-row~='align-end'] {
+		align-items: end;
 	}
 
 	&[data-row~='gap-0'] {
@@ -516,6 +533,44 @@ span svg {
 	}
 	&[data-row~='gap-8'] {
 		gap: 2em;
+	}
+
+	> [data-row-item~="flexible"] {
+		flex: 1;
+	}
+
+	> [data-row-item~="basis-1"] {
+		flex-basis: 16ch;
+	}
+	> [data-row-item~="basis-2"] {
+		flex-basis: 22ch;
+	}
+	> [data-row-item~="basis-3"] {
+		flex-basis: 28ch;
+	}
+	> [data-row-item~="basis-4"] {
+		flex-basis: 34ch;
+	}
+	> [data-row-item~="basis-5"] {
+		flex-basis: 40ch;
+	}
+	> [data-row-item~="basis-6"] {
+		flex-basis: 46ch;
+	}
+	> [data-row-item~="basis-full"] {
+		flex-basis: 100%;
+	}
+
+	> [data-row-item~="wrap-start"],
+	&[data-row~="wrap-first-last"] > :first-child {
+		margin-inline-end: auto;
+	}
+	> [data-row-item~="wrap-center"] {
+		margin-inline: auto;
+	}
+	> [data-row-item~="wrap-end"],
+	&[data-row~="wrap-first-last"] > :last-child {
+		margin-inline-start: auto;
 	}
 }
 
@@ -575,6 +630,12 @@ span svg {
 	&[data-card~='padding-6'] {
 		--card-padding: 1.5em;
 	}
+	&[data-card~='padding-7'] {
+		--card-padding: 1.75em;
+	}
+	&[data-card~='padding-8'] {
+		--card-padding: 2em;
+	}
 
 	&[data-card~='border-accent'] {
 		border: 2px solid color-mix(in srgb, var(--accent) 90%, transparent);
@@ -582,15 +643,20 @@ span svg {
 }
 
 [data-badge] {
+	--badge-backgroundColor: color-mix(in srgb, var(--accent) 33%, transparent);
+	--badge-borderColor: color-mix(in srgb, var(--accent) 40%, transparent);
+	--badge-textColor: currentColor;
+
 	flex-shrink: 0;
 	flex-basis: auto;
 
 	column-gap: 0;
 
 	border-radius: 0.375em;
-	background-color: color-mix(in srgb, var(--accent) 33%, transparent);
-	border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+	background-color: var(--badge-backgroundColor);
+	border: 1px solid var(--badge-borderColor);
 
+	color: var(--badge-textColor);
 	font-weight: 600;
 	line-height: 1;
 
@@ -716,6 +782,90 @@ span svg {
 		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.3 0.07 145));
 		--tag-hover-textColor: light-dark(oklch(0.6 0.18 145), oklch(0.85 0.15 145));
 		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.5 0.1 145));
+	}
+}
+
+[data-list],
+ul,
+ol {
+	/* Inputs */
+	--list-marker-inlineSize: 1.15em;
+	--list-markerGap: 0.66em;
+	--list-gap: 0.5lh;
+
+	/* Rules */
+	display: grid;
+	gap: var(--list-gap);
+	list-style-type: disc;
+	list-style-position: outside;
+	padding-inline-start: var(--list-marker-inlineSize);
+
+	&[data-card] {
+		padding-inline-start: calc(var(--card-padding) + var(--list-marker-inlineSize));
+	}
+
+	&[data-list~='gap-0'] {
+		--list-gap: 0;
+	}
+	&[data-list~='gap-1'] {
+		--list-gap: 0.25lh;
+	}
+	&[data-list~='gap-2'] {
+		--list-gap: 0.5lh;
+	}
+	&[data-list~='gap-3'] {
+		--list-gap: 0.75lh;
+	}
+	&[data-list~='gap-4'] {
+		--list-gap: 1lh;
+	}
+	&[data-list~='gap-5'] {
+		--list-gap: 1.25lh;
+	}
+	&[data-list~='gap-6'] {
+		--list-gap: 1.5lh;
+	}
+
+	> li,
+	> [data-list-item] {
+		--listItem-gap: 0.25lh;
+
+		&[data-list-item~='gap-0'] {
+			--listItem-gap: 0;
+		}
+		&[data-list-item~='gap-1'] {
+			--listItem-gap: 0.25lh;
+		}
+		&[data-list-item~='gap-2'] {
+			--listItem-gap: 0.5lh;
+		}
+		&[data-list-item~='gap-3'] {
+			--listItem-gap: 0.75lh;
+		}
+		&[data-list-item~='gap-4'] {
+			--listItem-gap: 1lh;
+		}
+		&[data-list-item~='gap-5'] {
+			--listItem-gap: 1.25lh;
+		}
+		&[data-list-item~='gap-6'] {
+			--listItem-gap: 1.5lh;
+		}
+
+		&::marker {
+			content: '●' ' ';
+			font-size: 1em;
+		}
+		&[data-list-item-marker]::marker {
+			content: attr(data-list-item-marker);
+			font-size: 0.875em;
+		}
+
+		padding-inline-start: var(--list-markerGap);
+
+		> * + * {
+			margin-top: var(--listItem-gap);
+		}
 	}
 }
 
@@ -996,10 +1146,6 @@ span svg {
 					padding-block-end: min(var(--scrollItem-paddingInlineMatch), var(--scrollItem-inlineDetached-maxPaddingMatchEnd));
 				}
 
-				> :only-child {
-					width: max-content;
-				}
-
 				[data-scroll-item~='inline-detached'] {
 					inline-size: auto;
 					max-inline-size: calc(100% + var(--scrollItem-paddingInlineStart) + var(--scrollItem-paddingInlineEnd));
@@ -1042,6 +1188,14 @@ span svg {
 			}
 			&[data-scroll-item~='snap-block-end'] {
 				scroll-snap-align: end;
+			}
+
+			&[data-scroll-item~='block-size-max'] {
+				block-size: max-content;
+			}
+
+			&[data-scroll-item~='inline-size-max'] {
+				inline-size: max-content;
 			}
 		}
 	}

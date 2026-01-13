@@ -3,6 +3,10 @@
 set -euo pipefail
 set +x
 
+if [[ -n "${DEBUG:-}" ]]; then
+	set -x
+fi
+
 if [[ -z "${ORBITER_DOMAIN:-}" ]]; then
 	echo 'Missing ORBITER_DOMAIN' >&2
 	exit 1

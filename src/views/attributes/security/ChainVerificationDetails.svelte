@@ -48,7 +48,5 @@
 />
 
 {#if refs && refs.length > 0}
-	<hr>
-
 	<ReferenceLinks references={refs} />
 {/if}

@@ -7,8 +7,7 @@ import type { TransactionSubmissionL2Type } from '@/schema/features/self-soverei
 
 import { component, type Content } from '../content'
 
-export interface TransactionInclusionDetailsProps
-	extends EvaluationData<TransactionInclusionValue> {
+export interface TransactionInclusionDetailsProps extends EvaluationData<TransactionInclusionValue> {
 	supportsL1Broadcast: L1BroadcastSupport
 	supportAnyL2Transactions: TransactionSubmissionL2Type[]
 	supportForceWithdrawal: TransactionSubmissionL2Type[]

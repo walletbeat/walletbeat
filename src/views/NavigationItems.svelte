@@ -194,14 +194,14 @@
 				<span class="icon">{@html item.icon}</span>
 			{/if}
 
-			<span>{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+			<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 		</a>
 	{:else}
 		{#if item.icon}
 			<span class="icon">{@html item.icon}</span>
 		{/if}
 
-		<span>{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
+		<span data-row-item="flexible">{@html effectiveSearchValue ? highlightText(item.title, effectiveSearchValue) : item.title}</span>
 	{/if}
 {/snippet}
 

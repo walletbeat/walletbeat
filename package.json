@@ -24,7 +24,6 @@
 		"lint": "pnpm run check:syntax --write && pnpm run check:lint --fix && pnpm run check:spelling:reorder && pnpm run check:treasury:markdown && cspell lint .",
 		"preview": "pnpm run astro preview",
 		"fix": "pnpm run lint",
-		"ipfs": "deploy/ipfs/ipfs.sh",
 		"helios": "deploy/helios/helios.sh",
 		"helios:wrap": "deploy/helios/helios-wrap.sh"
 	},
@@ -65,7 +64,7 @@
 		"eslint-plugin-svelte": "^3.13.0",
 		"globals": "^15.15.0",
 		"harper.js": "^0.56.0",
-		"omnipin": "^1.7.1",
+		"omnipin": "^2.0.1",
 		"orbiter-cli": "^0.8.2",
 		"p-limit": "^6.2.0",
 		"pnpm": "10.13.1",

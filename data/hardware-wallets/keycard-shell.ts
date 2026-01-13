@@ -12,11 +12,11 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	CalldataDecoded,
 	CalldataDecoding,
+	DataDecoded,
+	DataDisplayOptions,
 	DataExtraction,
 	noCalldataDecoding,
-	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, supported } from '@/schema/features/support'
@@ -224,24 +224,25 @@ export const keycardShell: HardwareWallet = {
 					[DataExtraction.QRCODE]: true,
 				},
 				detailsDisplayed: {
-					chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: TransactionDisplayOptions.NOT_IN_UI,
-					to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-					value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
 				legibility: {
 					...noCalldataDecoding,
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
 						ref: 'https://github.com/keycard-tech/eth-abi-repo',
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 					[CalldataDecoding.USDC_APPROVAL]: supported({
 						ref: 'https://github.com/keycard-tech/eth-abi-repo',
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 				},
+				messageSigningLegibility: null,
 			},
 			userSafety: null,
 		},

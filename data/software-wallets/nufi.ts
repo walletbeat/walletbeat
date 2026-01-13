@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { gabrielkerekes } from '@/data/contributors/gabrielkerekes'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -7,6 +8,7 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -25,7 +27,7 @@ export const nufi: SoftwareWallet = {
 		blurb: paragraph(`
 			Powerful wallet for powerful users.
 		`),
-		contributors: [gabrielkerekes],
+		contributors: [gabrielkerekes, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-08-11',
 		urls: {
@@ -169,7 +171,19 @@ export const nufi: SoftwareWallet = {
 			passkeyVerification: null,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			transactionLegibility: null,
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: null,
+				messageSigningLegibility: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_OPTIONALLY,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

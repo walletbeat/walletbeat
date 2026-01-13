@@ -4,11 +4,11 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
-	CalldataDecoded,
 	CalldataDecoding,
+	DataDecoded,
+	DataDisplayOptions,
 	DataExtraction,
 	displaysFullTransactionDetails,
-	TransactionDisplayOptions,
 } from '@/schema/features/security/transaction-legibility'
 import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -164,16 +164,16 @@ export const imkeyWallet: HardwareWallet = {
 				},
 				detailsDisplayed: {
 					...displaysFullTransactionDetails,
-					nonce: TransactionDisplayOptions.NOT_IN_UI,
+					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				legibility: {
 					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
 						ref: refTodo,
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: supported({
 						ref: refTodo,
-						decoded: CalldataDecoded.ON_DEVICE,
+						decoded: DataDecoded.ON_DEVICE,
 					}),
 					[CalldataDecoding.USDC_APPROVAL]: notSupported,
 					[CalldataDecoding.AAVE_SUPPLY]: notSupported,
@@ -181,6 +181,7 @@ export const imkeyWallet: HardwareWallet = {
 					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						notSupported,
 				},
+				messageSigningLegibility: null,
 			},
 			userSafety: null,
 		},

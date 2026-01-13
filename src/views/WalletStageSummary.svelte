@@ -2,15 +2,10 @@
 	// Types/constants
 	import { isTypographicContent } from '@/types/content'
 	import type { RatedWallet } from '@/schema/wallet'
-	import { ladders } from '@/schema/ladders'
-	import { StageCriterionRating, type StageEvaluatableWallet, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import { WalletLadderType, ladders } from '@/schema/ladders'
+	import { StageCriterionRating, stageCriterionRatings, type StageEvaluatableWallet, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
 	import { getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 	import { slugifyCamelCase } from '@/types/utils/text'
-
-
-	// Components
-	import Typography from '@/components/Typography.svelte'
-	import WalletStageBadge from './WalletStageBadge.svelte'
 
 
 	// Props
@@ -96,16 +91,6 @@
 		)
 	})
 	
-	// Rating display helpers
-	const getRatingIcon = (rating: StageCriterionRating) => 
-		rating === StageCriterionRating.FAIL ? '❌' :
-		rating === StageCriterionRating.EXEMPT ? '⚠️' :
-		'❓'
-	
-	const getRatingColor = (rating: StageCriterionRating) =>
-		rating === StageCriterionRating.FAIL ? 'var(--rating-fail)' :
-		rating === StageCriterionRating.EXEMPT ? 'var(--rating-exempt)' :
-		'var(--rating-unrated)'
 	
 	// Helper to wrap badge with click handler or link
 	const handleBadgeClick = (clickedStage: WalletStage | null) => (e: MouseEvent) => {
@@ -121,6 +106,10 @@
 		}
 	}
 
+
+	// Components
+	import Typography from '@/components/Typography.svelte'
+	import WalletStageBadge from './WalletStageBadge.svelte'
 </script>
 
 
@@ -189,41 +178,50 @@
 				</h4>
 			{/if}
 
-			<ul data-column="gap-2">
-				{#each criteria as { criteriaGroup, criterion, evaluation }}
+			<ul>
+				{#each criteria as { criterion, evaluation }}
 					{@const attributeId = getCriterionAttributeId(criterion)}
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}
 					{@const attributeLink = attributeId ? `/${wallet.metadata.id}/#${slugifyCamelCase(attributeId)}` : null}
 
-					<li data-row="start gap-2">
-						<span style="color: {getRatingColor(evaluation.rating)}">{getRatingIcon(evaluation.rating)}</span>
-						<span>
-							{#if attribute}
-								<span>{@html attribute.icon}</span>
-							{/if}
-							{#if attributeName}
-								{#if attributeLink}
-									<a data-link="camouflaged" href={attributeLink} title={attributeName}>
-										<strong>{attributeName}</strong>
-									</a>:
+					<li
+						data-list-item-marker={attribute?.icon}
+						data-stage-criterion-rating={evaluation.rating}
+						style:--accent={stageCriterionRatings[evaluation.rating as StageCriterionRating].color}
+					>
+						<span data-row="start gap-2">
+							<span data-row-item="flexible">
+								{#if attributeName}
+									{#if attributeLink}
+										<a href={attributeLink} title={attributeName}>
+											<strong>{attributeName}</strong>
+										</a>:
+									{:else}
+										<strong>{attributeName}</strong>:
+									{/if}
+									<span>
+										{#if isTypographicContent(criterion.description)}
+											<Typography content={criterion.description} />
+										{:else}
+											{criterion.id}
+										{/if}
+									</span>
 								{:else}
-									<strong>{attributeName}</strong>:
-								{/if}
-								<span>
 									{#if isTypographicContent(criterion.description)}
 										<Typography content={criterion.description} />
 									{:else}
 										{criterion.id}
 									{/if}
-								</span>
-							{:else}
-								{#if isTypographicContent(criterion.description)}
-									<Typography content={criterion.description} />
-								{:else}
-									{criterion.id}
 								{/if}
-							{/if}
+							</span>
+
+							<data
+								value={evaluation.rating}
+								title={stageCriterionRatings[evaluation.rating as StageCriterionRating].label}
+							>
+								{stageCriterionRatings[evaluation.rating as StageCriterionRating].icon}
+							</data>
 						</span>
 					</li>
 				{/each}
@@ -246,5 +244,12 @@
 
 	li > span > span:last-child {
 		color: var(--text-secondary);
+	}
+
+	[data-stage-criterion-rating] {
+		&[data-stage-criterion-rating="EXEMPT"] {
+			text-decoration: line-through;
+			opacity: 0.6;
+		}
 	}
 </style>

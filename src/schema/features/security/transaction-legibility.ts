@@ -2,7 +2,7 @@ import type { WithRef } from '@/schema/reference'
 
 import { isSupported, notSupported, type Support } from '../support'
 
-export enum TransactionDisplayOptions {
+export enum DataDisplayOptions {
 	/** Shown by default on the transaction approval screen */
 	SHOWN_BY_DEFAULT = 'SHOWN_BY_DEFAULT',
 	/** Available on the transaction approval screen but requires user action (e.g., clicking a button) or enabling in settings */
@@ -15,36 +15,36 @@ export enum TransactionDisplayOptions {
  * How are the essential transaction data displayed by the hardware wallet?
  */
 export interface DisplayedTransactionDetails {
-	gas: TransactionDisplayOptions
-	nonce: TransactionDisplayOptions
-	from: TransactionDisplayOptions
-	to: TransactionDisplayOptions
-	chain: TransactionDisplayOptions
-	value: TransactionDisplayOptions
+	gas: DataDisplayOptions
+	nonce: DataDisplayOptions
+	from: DataDisplayOptions
+	to: DataDisplayOptions
+	chain: DataDisplayOptions
+	value: DataDisplayOptions
 }
 
 /**
  * The wallet displays no transaction details.
  */
 export const displaysNoTransactionDetails: DisplayedTransactionDetails = {
-	gas: TransactionDisplayOptions.NOT_IN_UI,
-	nonce: TransactionDisplayOptions.NOT_IN_UI,
-	from: TransactionDisplayOptions.NOT_IN_UI,
-	to: TransactionDisplayOptions.NOT_IN_UI,
-	chain: TransactionDisplayOptions.NOT_IN_UI,
-	value: TransactionDisplayOptions.NOT_IN_UI,
+	gas: DataDisplayOptions.NOT_IN_UI,
+	nonce: DataDisplayOptions.NOT_IN_UI,
+	from: DataDisplayOptions.NOT_IN_UI,
+	to: DataDisplayOptions.NOT_IN_UI,
+	chain: DataDisplayOptions.NOT_IN_UI,
+	value: DataDisplayOptions.NOT_IN_UI,
 }
 
 /**
  * The wallet displays all the possible transaction details.
  */
 export const displaysFullTransactionDetails: DisplayedTransactionDetails = {
-	gas: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	nonce: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	from: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	to: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	chain: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
-	value: TransactionDisplayOptions.SHOWN_BY_DEFAULT,
+	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 }
 
 /**
@@ -193,13 +193,45 @@ export type CalldataDecodingTypes = Record<
 /** If a wallet can decode the calldata for a specific transaction, what does that look like? */
 export interface CalldataDecodingSupport {
 	/** Where does the calldata decoding actually happen? */
-	decoded: CalldataDecoded
+	decoded: DataDecoded
 }
 
 /** Where does the calldata decoding actually happen? */
-export enum CalldataDecoded {
+export enum DataDecoded {
 	ON_DEVICE = 'ON_DEVICE',
 	OFF_DEVICE = 'OFF_DEVICE',
+}
+
+/**
+ * What does the wallet provide for message signing legibility?
+ */
+export enum MessageSigningDetails {
+	/** The wallet provides the EIP-712 struct */
+	EIP712_STRUCT = 'EIP712_STRUCT',
+	/** The wallet provides the domain hash */
+	DOMAIN_HASH = 'DOMAIN_HASH',
+	/** The wallet provides the message hash */
+	MESSAGE_HASH = 'MESSAGE_HASH',
+	/** The wallet provides the Safe hash */
+	SAFE_HASH = 'SAFE_HASH',
+}
+
+/**
+ * For software wallets: track which message signing data types are available
+ */
+export type SoftwareMessageSigningLegibility = Record<
+	MessageSigningDetails,
+	DataDisplayOptions
+> | null
+
+/**
+ * For hardware wallets: track which message signing data types are available and where they are displayed
+ */
+export interface HardwareMessageSigningLegibility {
+	/** Which message signing data types does the wallet provide? */
+	messageSigningDetails: Record<MessageSigningDetails, DataDisplayOptions>
+	/** Where does the message signing data display happen? */
+	decoded: DataDecoded
 }
 /**
  * Shorthand for a wallet that cannot do any calldata decoding.
@@ -283,7 +315,7 @@ export function isSupportedOnDevice(
 		return false
 	}
 
-	return support.decoded === CalldataDecoded.ON_DEVICE
+	return support.decoded === DataDecoded.ON_DEVICE
 }
 
 /**
@@ -303,6 +335,11 @@ export interface HardwareTransactionLegibilitySupport {
 	 * Does a wallet allow for data extraction?
 	 */
 	dataExtraction: DataExtractionMethods | null
+
+	/**
+	 * What message signing data does the hardware wallet provide and where is it displayed?
+	 */
+	messageSigningLegibility: HardwareMessageSigningLegibility | null
 }
 
 /**
@@ -337,16 +374,21 @@ export interface SoftwareTransactionLegibilitySupport {
 	 * Does the software wallet support displaying the transaction details?
 	 */
 	transactionDetailsDisplay: DisplayedTransactionDetails | null
+
+	/**
+	 * What message signing data does the software wallet provide?
+	 */
+	messageSigningLegibility: SoftwareMessageSigningLegibility | null
 }
 
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
 	return (
-		details.gas === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.nonce === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.from === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.to === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.chain === TransactionDisplayOptions.SHOWN_BY_DEFAULT &&
-		details.value === TransactionDisplayOptions.SHOWN_BY_DEFAULT
+		details.gas === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.nonce === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.from === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.to === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.chain === DataDisplayOptions.SHOWN_BY_DEFAULT &&
+		details.value === DataDisplayOptions.SHOWN_BY_DEFAULT
 	)
 }
 

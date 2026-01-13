@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { lucemans } from '@/data/contributors/lucemans'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -7,20 +8,20 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
 export const zerion: SoftwareWallet = {
 	metadata: {
 		id: 'zerion',
 		displayName: 'Zerion',
 		tableName: 'Zerion',
 		blurb: paragraph(''),
-		contributors: [lucemans],
+		contributors: [lucemans, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-04-22',
 		urls: {
@@ -137,7 +138,19 @@ export const zerion: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			transactionLegibility: null,
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: null,
+				messageSigningLegibility: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {

@@ -52,8 +52,6 @@
 {#if monetization}
 	{@const references = refs(monetization)}
 	{#if references.length > 0}
-		<hr>
-
 		<ReferenceLinks references={references} />
 	{/if}
 {/if}

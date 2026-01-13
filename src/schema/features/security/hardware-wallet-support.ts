@@ -236,18 +236,17 @@ export function supportsHardwareWalletTypesMarkdown(
 		)
 	const sameConnectionTypeForAll = connectionTypes.length === 1 ? connectionTypes[0] : null
 
-	return trimWhitespacePrefix(`
-		the following hardware wallets${sameConnectionTypeForAll === null ? '' : hardwareWalletConnectionIsOnlyWalletConnect(sameConnectionTypeForAll) ? ' (through WalletConnect)' : ' (directly)'}:
-		${nonEmptyMap(
-			supportedWalletTypes,
-			w => `
-		* ${hardwareWalletTypeToString(w, null)}${sameConnectionTypeForAll === null ? walletSpecificMethod(w) : ''}`,
-		).join('')}${
-			otherSupported
-				? `
-		* ... and others${sameConnectionTypeForAll === null ? walletSpecificMethod(HardwareWalletType.OTHER) : ''}
-		`
-				: ''
-		}
+	return trimWhitespacePrefix(`the following hardware wallets${sameConnectionTypeForAll === null ? '' : hardwareWalletConnectionIsOnlyWalletConnect(sameConnectionTypeForAll) ? ' (through WalletConnect)' : ' (directly)'}:
+${nonEmptyMap(
+	supportedWalletTypes,
+	w => `
+* ${hardwareWalletTypeToString(w, null)}${sameConnectionTypeForAll === null ? walletSpecificMethod(w) : ''}`,
+).join('')}${
+		otherSupported
+			? `
+* ... and others${sameConnectionTypeForAll === null ? walletSpecificMethod(HardwareWalletType.OTHER) : ''}
+`
+			: ''
+	}
 	`)
 }

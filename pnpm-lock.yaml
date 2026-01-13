@@ -111,8 +111,8 @@ importers:
         specifier: ^0.56.0
         version: 0.56.0
       omnipin:
-        specifier: ^1.7.1
-        version: 1.7.1
+        specifier: ^2.0.1
+        version: 2.0.1
       orbiter-cli:
         specifier: ^0.8.2
         version: 0.8.2(@types/node@24.9.2)(bufferutil@4.1.0)(utf-8-validate@5.0.10)
@@ -508,10 +508,10 @@ packages:
         integrity: sha512-IfVJPrDPhHfqXRDb89472hXkpvJuQQR7FDI9isLPHEqSYt/45whIoBxSPgZ0ssTt379VhQo4+87PWI1DoLSfAQ==,
       }
 
-  '@bufbuild/protobuf@2.10.0':
+  '@bufbuild/protobuf@2.10.2':
     resolution:
       {
-        integrity: sha512-fdRs9PSrBF7QUntpZpq6BTw58fhgGJojgg39m9oFOJGZT+nip9b0so5cYY1oWl5pvemDLr0cPPsH46vwThEbpQ==,
+        integrity: sha512-uFsRXwIGyu+r6AMdz+XijIIZJYpoWeYzILt5yZ2d3mCjQrWUTVpVD9WL/jZAbvp+Ed04rOhrsk7FiTcEDseB5A==,
       }
 
   '@capsizecss/unpack@3.0.0':
@@ -7944,10 +7944,10 @@ packages:
         integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==,
       }
 
-  omnipin@1.7.1:
+  omnipin@2.0.1:
     resolution:
       {
-        integrity: sha512-Zk4PLOy8/Dowlgd4bjydvPSiBVNGhcv5aVLpbgnaTc0PDupDFlioC7M7Jj83Dx3MT1nAfEpx2im6pVITZ62CZw==,
+        integrity: sha512-xqugYx4HxPbTGvni7fjIy6hCU62ZX65MatyB23V5JrUfLuL2oIX+Cl5BJk6+N0KQEm4uZF7kbxcVPQfK2l2S6A==,
       }
     engines: { node: ^20.10.0 || >=21.1.0 }
     hasBin: true
@@ -11639,7 +11639,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@bufbuild/protobuf@2.10.0':
+  '@bufbuild/protobuf@2.10.2':
     optional: true
 
   '@capsizecss/unpack@3.0.0':
@@ -17246,7 +17246,7 @@ snapshots:
 
   ohash@2.0.11: {}
 
-  omnipin@1.7.1: {}
+  omnipin@2.0.1: {}
 
   on-exit-leak-free@0.2.0: {}
 
@@ -17996,7 +17996,7 @@ snapshots:
 
   sass-embedded@1.87.0:
     dependencies:
-      '@bufbuild/protobuf': 2.10.0
+      '@bufbuild/protobuf': 2.10.2
       buffer-builder: 0.2.0
       colorjs.io: 0.5.2
       immutable: 5.1.4

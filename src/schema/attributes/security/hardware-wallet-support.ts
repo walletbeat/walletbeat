@@ -67,11 +67,10 @@ function indirectHardwareWalletSupport(
 			hardwareWalletSupport,
 			__brand: brand,
 		},
-		details: paragraph(`
-			{{WALLET_NAME}} ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
+		details:
+			paragraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
 
-			Direct connection is not possible.
-		`),
+Direct connection is not possible.`),
 		impact: paragraph(`
 			Hardware wallets provide an additional layer of security by keeping private keys offline.
 

@@ -117,9 +117,9 @@
 			&::picker-icon {
 				content: '';
 				width: 0.75em;
-				height: 0.75em;
+				height: 1lh;
 				background-color: currentColor;
-				mask: var(--icon-chevron) no-repeat;
+				mask: var(--icon-chevron) no-repeat center;
 				opacity: 0.66;
 				transform: perspective(100px) rotateX(0deg);
 				transition: transform 0.2s ease;

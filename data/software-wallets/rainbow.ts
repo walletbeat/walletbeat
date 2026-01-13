@@ -1,3 +1,4 @@
+import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
@@ -7,6 +8,7 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -14,7 +16,6 @@ import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
 export const rainbow: SoftwareWallet = {
 	metadata: {
 		id: 'rainbow',
@@ -23,7 +24,7 @@ export const rainbow: SoftwareWallet = {
 		blurb: paragraph(`
 			Rainbow Extension. Built for speed. Built for power. Built for You.
 		`),
-		contributors: [polymutex],
+		contributors: [polymutex, mattmatt],
 		iconExtension: 'svg',
 		lastUpdated: '2025-02-08',
 		urls: {
@@ -138,7 +139,19 @@ export const rainbow: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			transactionLegibility: null,
+			transactionLegibility: {
+				ref: refTodo,
+				calldataDisplay: null,
+				messageSigningLegibility: null,
+				transactionDetailsDisplay: {
+					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					nonce: DataDisplayOptions.NOT_IN_UI,
+					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				},
+			},
 		},
 		selfSovereignty: {
 			transactionSubmission: {
