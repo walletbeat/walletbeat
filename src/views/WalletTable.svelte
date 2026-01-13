@@ -249,7 +249,7 @@
 	import Filters from '@/components/Filters.svelte'
 	import Pie, { PieLayout } from '@/components/Pie.svelte'
 	import Select from '@/components/Select.svelte'
-	import Table from '@/components/Table.svelte'
+	import Table, { SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
@@ -474,7 +474,7 @@
 
 			columns={
 				(() => {
-					const attrGroupColumns =
+					const attrGroupColumns: Column<RatedWallet>[] = (
 						displayedAttributeGroups
 							.map(attrGroup => ({
 								id: attrGroup.id,
@@ -484,7 +484,7 @@
 									return attrGroupScore === null ? null : attrGroupScore.score
 								},
 								sort: {
-									defaultDirection: 'desc',
+									defaultDirection: SortDirection.Descending,
 								},
 
 								subcolumns: (
@@ -496,11 +496,14 @@
 												const attribute = wallet.overall[attrGroup.id]?.[attributeId]
 												return attribute?.evaluation?.value?.rating || undefined
 											},
-											sort: { defaultDirection: 'desc' },
-										} satisfies Column<RatedWallet>))
+											sort: {
+												defaultDirection: SortDirection.Descending,
+											},
+										}))
 								),
 								isDefaultExpanded: false,
-							} satisfies Column<RatedWallet>))
+							}))
+					)
 
 					return [
 						{
@@ -509,7 +512,7 @@
 							value: (wallet: RatedWallet) => wallet.metadata.displayName,
 
 							sort: {
-								defaultDirection: 'asc',
+								defaultDirection: SortDirection.Ascending,
 							},
 
 							isSticky: true,
@@ -529,7 +532,7 @@
 							sort: {
 								defaultDirection: 'desc',
 							},
-						} satisfies Column<RatedWallet>]),
+						}]),
 
 						(
 							attrGroupColumns.length > 1 ?
@@ -546,19 +549,19 @@
 
 									sort: {
 										isDefault: true,
-										defaultDirection: 'desc',
+										defaultDirection: SortDirection.Descending,
 									},
 
 									subcolumns: attrGroupColumns,
 									isDefaultExpanded: true,
-								} satisfies Column<RatedWallet>
+								}
 							:
 								{
 									...attrGroupColumns[0],
 									isDefaultExpanded: true,
 								}
 						),
-					]
+					] as Column<RatedWallet>[]
 				})()
 			}
 			bind:sortedColumn
