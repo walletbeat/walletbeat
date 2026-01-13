@@ -46,7 +46,7 @@
 		hoverTriggerPlacement?: 'around' | 'button'
 		offset?: number
 		hideDelay?: number
-		TooltipContent: Snippet
+		TooltipContent?: Snippet
 		isEnabled?: boolean
 		children?: Snippet
 	} = $props()
@@ -160,7 +160,9 @@
 
 			{...restProps}
 		>
-			{@render TooltipContent()}
+			{#if TooltipContent}
+				{@render TooltipContent()}
+			{/if}
 		</div>
 	{/snippet}
 
