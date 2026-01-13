@@ -1,7 +1,11 @@
 import { attributeTree } from '@/schema/attribute-groups'
 import type { Attribute } from '@/schema/attributes'
 import { ladders, WalletLadderType } from '@/schema/ladders'
-import type { WalletStage, WalletStageCriterion } from '@/schema/stages'
+import {
+	getEvaluateFunctionAttributeId,
+	type WalletStage,
+	type WalletStageCriterion,
+} from '@/schema/stages'
 import { objectEntries } from '@/types/utils/object'
 
 /**
@@ -115,37 +119,8 @@ export function getAttributeStages(
  * @param criterion The criterion to check
  * @returns The attribute ID if found, null otherwise
  */
-export function getCriterionAttributeId(criterion: {
-	evaluate: (wallet: any) => any
-}): string | null {
-	// First check if the evaluate function has the __attributeId property attached
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-	const attachedId = (criterion.evaluate as any).__attributeId
-
-	if (typeof attachedId === 'string') {
-		return attachedId
-	}
-
-	// Fallback to serialization for other cases
-	const criterionString = JSON.stringify(criterion, (_, value) => {
-		if (
-			value &&
-			typeof value === 'object' &&
-			'id' in value &&
-			'displayName' in value &&
-			'question' in value
-		) {
-			return { id: value.id, _isAttribute: true }
-		}
-
-		return value
-	})
-
-	// Try to extract the attribute ID from the serialized string
-	const attributeIdMatch = criterionString.match(/"id":"([^"]+)","_isAttribute":true/)
-
-	return attributeIdMatch ? attributeIdMatch[1] : null
-}
+export const getCriterionAttributeId = (criterion: WalletStageCriterion): string | null =>
+	getEvaluateFunctionAttributeId(criterion.evaluate)
 
 /**
  * Get all criteria that reference a specific attribute across all ladders.
