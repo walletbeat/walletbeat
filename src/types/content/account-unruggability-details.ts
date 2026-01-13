@@ -3,7 +3,8 @@ import type { AccountUnruggabilityValue } from '@/schema/attributes/self-soverei
 
 import { component, type Content } from '../content'
 
-export interface AccountUnruggabilityDetailsProps extends EvaluationData<AccountUnruggabilityValue> {}
+export interface AccountUnruggabilityDetailsProps
+	extends EvaluationData<AccountUnruggabilityValue> {}
 
 export interface AccountUnruggabilityDetailsContent {
 	component: 'AccountUnruggabilityDetails'

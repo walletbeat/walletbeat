@@ -314,16 +314,18 @@ export const testSteps: TestStep[] = [
 
 // Helper to get a step by ID
 export function getStepById(stepId: string): TestStep | undefined {
-	return testSteps.find((step) => step.id === stepId)
+	return testSteps.find(step => step.id === stepId)
 }
 
 // Helper to get all EIP numbers tested across all steps
 export function getAllTestedEIPs(): string[] {
 	const eips = new Set<string>()
+
 	for (const step of testSteps) {
 		for (const eip of step.eips) {
 			eips.add(eip.eipNumber)
 		}
 	}
+
 	return Array.from(eips)
 }

@@ -21,6 +21,7 @@
     } else {
       expandedSteps.add(stepId);
     }
+
     expandedSteps = new Set(expandedSteps);
   }
 

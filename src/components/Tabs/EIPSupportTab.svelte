@@ -38,15 +38,21 @@
 
   function getStepButtonText(): string {
     if (isRunning) return 'Running...';
+
     if (stepStatus === 'passed') return 'Step Passed ✓';
+
     if (stepStatus === 'failed') return 'Retry Step';
+
     return 'Run Step';
   }
 
   function canRunCurrentStep(): boolean {
     if (isRunning) return false;
+
     if (stepTestState.currentStepIndex === 0) return true;
+
     const prevStep = testSteps[stepTestState.currentStepIndex - 1];
+
     return stepTestState.stepResults[prevStep.id]?.status === 'passed';
   }
 </script>

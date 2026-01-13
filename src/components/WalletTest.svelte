@@ -381,6 +381,7 @@ Issued At: ${new Date().toISOString()}`;
 
   function createEIPResult(eipNumber: string, name: string, specUrl: string, checks: EIPCheckResult[]): EIPTestResult {
     const overallPassed = checks.filter((c) => c.passed === false).length === 0;
+
     return { eipNumber, name, specUrl, checks, overallPassed };
   }
 
@@ -390,8 +391,10 @@ Issued At: ${new Date().toISOString()}`;
 
   function canRunStep(stepIndex: number): boolean {
     if (stepIndex === 0) return true;
+
     const previousStep = testSteps[stepIndex - 1];
     const previousResult = stepTestState.stepResults[previousStep.id];
+
     return previousResult?.status === 'passed';
   }
 
@@ -401,8 +404,10 @@ Issued At: ${new Date().toISOString()}`;
 
   async function runCurrentStep() {
     const step = getCurrentStep();
+
     if (!canRunStep(stepTestState.currentStepIndex)) {
       stepTestState.error = 'Please complete the previous step first';
+
       return;
     }
 
@@ -442,6 +447,7 @@ Issued At: ${new Date().toISOString()}`;
 
       // Check if this was the last step and it passed
       const isLastStep = step.id === testSteps[testSteps.length - 1].id;
+
       if (isLastStep && result.status === 'passed') {
         stepTestState.overallStatus = 'completed';
         showFinalResults();
@@ -452,10 +458,12 @@ Issued At: ${new Date().toISOString()}`;
         if (result.status === 'passed' && stepTestState.currentStepIndex < testSteps.length - 1) {
           stepTestState.currentStepIndex++;
         }
+
         stepTestState.overallStatus = 'idle';
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Step execution failed';
+
       stepTestState.stepResults[step.id] = createStepResult(step, 'failed', [], errorMsg);
       stepTestState.error = errorMsg;
       stepTestState.overallStatus = 'failed';
@@ -528,6 +536,7 @@ Issued At: ${new Date().toISOString()}`;
       });
 
       const rdnsRegex = /^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$/i;
+
       eip6963Checks.push({
         id: 'rdns-format',
         name: 'RDNS format',
@@ -566,6 +575,7 @@ Issued At: ${new Date().toISOString()}`;
 
     // Step passes if we found at least one provider
     const stepPassed = hasProviders || providerExists;
+
     return createStepResult(step, stepPassed ? 'passed' : 'failed', eipResults);
   }
 
@@ -609,6 +619,7 @@ Issued At: ${new Date().toISOString()}`;
       if (provider.request) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         const accounts = (await provider.request({ method: 'eth_requestAccounts' })) as string[];
+
         if (accounts && accounts.length > 0) {
           connectPassed = true;
           stepTestState.connectedAddress = accounts[0];
@@ -657,6 +668,7 @@ Issued At: ${new Date().toISOString()}`;
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const accounts = (await provider.request({ method: 'eth_accounts' })) as string[];
+
       if (accounts && accounts.length > 0) {
         accountsPassed = true;
         returnedAddress = accounts[0];
@@ -690,9 +702,11 @@ Issued At: ${new Date().toISOString()}`;
 
     // Check accountsChanged event subscription
     let eventSubscribable = false;
+
     try {
       if (typeof provider.on === 'function') {
         const noop = () => {};
+
         provider.on('accountsChanged', noop);
         eventSubscribable = true;
       }
@@ -710,6 +724,7 @@ Issued At: ${new Date().toISOString()}`;
     eipResults.push(createEIPResult('EIP-1193', 'Ethereum Provider JavaScript API', 'https://eips.ethereum.org/EIPS/eip-1193', eip1193Checks));
 
     const stepPassed = accountsPassed && validAddress;
+
     return createStepResult(step, stepPassed ? 'passed' : 'failed', eipResults);
   }
 
@@ -740,8 +755,10 @@ Issued At: ${new Date().toISOString()}`;
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const chainIdHex = (await provider.request({ method: 'eth_chainId' })) as string;
+
       if (chainIdHex) {
         const chainId = parseInt(chainIdHex, 16);
+
         stepTestState.chainId = chainId;
         chainIdPassed = true;
         chainIdDetail = `Chain ID: ${chainId} (${chainIdHex})`;
@@ -760,9 +777,11 @@ Issued At: ${new Date().toISOString()}`;
 
     // Check chainChanged event
     let chainEventSubscribable = false;
+
     try {
       if (typeof provider.on === 'function') {
         const noop = () => {};
+
         provider.on('chainChanged', noop);
         chainEventSubscribable = true;
       }
@@ -831,6 +850,7 @@ Issued At: ${new Date().toISOString()}`;
     }
 
     const connectedAddress = stepTestState.connectedAddress || account?.address;
+
     if (!connectedAddress) {
       return createStepResult(step, 'failed', [], 'No connected address');
     }
@@ -852,6 +872,7 @@ Issued At: ${new Date().toISOString()}`;
 
       // Check atomicity for current chain
       const chainIdHex = stepTestState.chainId ? `0x${stepTestState.chainId.toString(16)}` : '0x1';
+
       atomicitySupported = capabilities?.[chainIdHex]?.atomicBatch?.supported === true;
     } catch (error) {
       capabilitiesDetail = error instanceof Error ? error.message : 'Method not supported';
@@ -900,6 +921,7 @@ Issued At: ${new Date().toISOString()}`;
 
       // Handle both string and object response formats
       let batchId: string;
+
       if (typeof result === 'string') {
         batchId = result;
       } else if (result && typeof result === 'object' && 'id' in result) {
@@ -915,6 +937,7 @@ Issued At: ${new Date().toISOString()}`;
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+
       // Check if it's a user rejection vs method not supported
       if (errorMsg.toLowerCase().includes('reject') || errorMsg.toLowerCase().includes('denied')) {
         sendCallsDetail = 'User rejected the transaction';
@@ -1003,6 +1026,7 @@ Issued At: ${new Date().toISOString()}`;
 
     // Test wallet_showCallsStatus (optional)
     let showStatusPassed = false;
+
     try {
       await provider.request({
         method: 'wallet_showCallsStatus',
