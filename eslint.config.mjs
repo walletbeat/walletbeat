@@ -240,6 +240,9 @@ export default [
 			// {@html} is used for inline SVG icons.
 			'svelte/no-at-html-tags': 'off',
 
+			// Not useful in an Astro project.
+			'svelte/no-navigation-without-resolve': 'off',
+
 			// Prefer explicit `$state()` wrapping for `SvelteMap` / `SvelteSet`.
 			'svelte/no-unnecessary-state-wrap': 'off',
 
