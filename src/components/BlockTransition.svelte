@@ -1,6 +1,6 @@
 <script lang="ts" generics="
 	Key extends string | number | undefined = undefined,
-	Value extends any = any
+	Value extends object | string | number | bigint | boolean | undefined | null = object | string | number | bigint | boolean | undefined | null
 ">
 	// Types
 	import type { Snippet } from 'svelte'
@@ -33,7 +33,7 @@
 		clip?: boolean
 
 		// Snippets
-		children?: Snippet<[{ key?: Key, value: Value }]>
+		children?: Snippet<[{ key?: Key, value: Value | undefined }]>
 
 		// View options
 		align?: 'top' | 'center' | 'bottom'
