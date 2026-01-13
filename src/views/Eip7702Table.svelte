@@ -92,7 +92,7 @@
 	import KeyIcon from 'lucide-static/icons/key.svg?raw'
 
 	import Filters from '@/components/Filters.svelte'
-	import Table from '@/components/Table.svelte'
+	import Table, { SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import EipDetails from '@/views/EipDetails.svelte'
 </script>
@@ -160,7 +160,7 @@
 					value: wallet => wallet.metadata.displayName,
 					isSticky: true,
 					sort: {
-						defaultDirection: 'asc',
+						defaultDirection: SortDirection.Ascending,
 					},
 				},
 				{
@@ -169,7 +169,7 @@
 					value: wallet => WalletTypeFor7702SortPriority[getWalletTypeFor7702(wallet)],
 					sort: {
 						isDefault: true,
-						defaultDirection: 'asc',
+						defaultDirection: SortDirection.Ascending,
 					},
 				},
 				{
@@ -182,7 +182,7 @@
 					name: 'Batching',
 					value: wallet => wallet.overall.ecosystem.transactionBatching?.evaluation?.value?.rating ?? undefined,
 				},
-			]}
+			] as Column<RatedWallet>[]}
 		>
 			{#snippet Cell({ row: wallet, column, value })}
 				{#if column.id === 'wallet'}
