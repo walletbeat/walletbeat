@@ -23,7 +23,7 @@
 			: wallet.types.EMBEDDED ?
 				'embedded-wallets'
 			:
-				'' as never
+				(() => { throw new Error('Unknown wallet type') })()
 		}/${wallet.metadata.id}.ts`
 	)
 
