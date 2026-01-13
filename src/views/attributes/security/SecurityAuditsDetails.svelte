@@ -88,18 +88,10 @@
 
 	{@const mostRecentAudit = securityAudits[0]}
 
-	{@const anyAuditHasUnfixedFlaws = (
-		securityAudits
-			.some((audit) => (
-				Array.isArray(audit.unpatchedFlaws)
-				&& (
-					audit.unpatchedFlaws
-						.some((flaw: UnpatchedSecurityFlaw) => (
-							flaw.presentStatus === 'NOT_FIXED'
-						))
-				)
-			))
-	)}
+	{@const anyAuditHasUnfixedFlaws = securityAudits.some((audit) => {
+		if (!Array.isArray(audit.unpatchedFlaws)) return false;
+		return audit.unpatchedFlaws.some((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED');
+	})}
 
 	<Typography
 		content={{
@@ -112,8 +104,8 @@
 	<section data-column="gap-2">
 		{#each securityAudits as audit, index (securityAuditId(audit))}
 			{@const isMostRecent = index === 0}
-			{@const hasUnfixedFlaws = Array.isArray(audit.unpatchedFlaws) && audit.unpatchedFlaws.some((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED')}
-			{@const flawGroups = Array.isArray(audit.unpatchedFlaws) ? Map.groupBy(audit.unpatchedFlaws, (flaw: UnpatchedSecurityFlaw) => flaw.severityAtAuditPublication) : null}
+			{@const hasUnfixedFlaws = Array.isArray(audit.unpatchedFlaws) && audit.unpatchedFlaws.some(flaw => flaw.presentStatus === 'NOT_FIXED')}
+			{@const flawGroups = Array.isArray(audit.unpatchedFlaws) ? Map.groupBy(audit.unpatchedFlaws, flaw => flaw.severityAtAuditPublication) : null}
 			{@const hasFlaws = flawGroups && flawGroups.size > 0}
 
 			<details
@@ -155,7 +147,7 @@
 									{#each [SecurityFlawSeverity.CRITICAL, SecurityFlawSeverity.HIGH, SecurityFlawSeverity.MEDIUM] as severity}
 										{#if flawGroups.has(severity)}
 											{@const flaws = flawGroups.get(severity)!}
-											{@const unfixedCount = flaws.filter((flaw: UnpatchedSecurityFlaw) => flaw.presentStatus === 'NOT_FIXED').length}
+											{@const unfixedCount = flaws.filter(flaw => flaw.presentStatus === 'NOT_FIXED').length}
 											{@const allFixed = unfixedCount === 0}
 
 											<data	
