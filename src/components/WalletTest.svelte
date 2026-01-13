@@ -914,7 +914,6 @@ Issued At: ${new Date().toISOString()}`;
         sendCallsDetail = `Batch ID: ${batchId.slice(0, 16)}...`;
       }
     } catch (error) {
-      console.log(error);
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       // Check if it's a user rejection vs method not supported
       if (errorMsg.toLowerCase().includes('reject') || errorMsg.toLowerCase().includes('denied')) {
@@ -984,7 +983,6 @@ Issued At: ${new Date().toISOString()}`;
         validResponse = false;
       }
     } catch (error) {
-      console.log('wallet_getCallsStatus error:', error);
       statusDetail = error instanceof Error ? error.message : 'Failed to get status';
     }
 
