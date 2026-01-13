@@ -64,7 +64,9 @@
 		_CellValue extends Value = Value,
 		_ColumnId extends Value = Value,
 	> {
-		columns: Column<_RowValue, _CellValue, _ColumnId>[] = $state([])
+		columns: Column<_RowValue, _CellValue, _ColumnId>[] = $state(
+			[]
+		)
 
 		#columnsById = $derived(
 			new SvelteMap(
@@ -76,7 +78,9 @@
 			),
 		)
 
-		#isColumnExpanded = $state(new SvelteSet<_ColumnId>())
+		#isColumnExpanded: Set<_ColumnId> = $state(
+			new SvelteSet()
+		)
 
 		columnsVisible = $derived.by(() => {
 			const getVisibleColumns = (
@@ -93,7 +97,9 @@
 
 		#defaultColumnSort?: SortState<_ColumnId>
 
-		sortState?: SortState<_ColumnId> = $state(this.#defaultColumnSort)
+		sortState?: SortState<_ColumnId> = $state(
+			this.#defaultColumnSort
+		)
 
 		sortedColumn = $derived(
 			this.sortState?.columnId && this.#columnsById.get(this.sortState.columnId),
@@ -111,11 +117,19 @@
 			return getMaxLevel(this.columns)
 		})
 
-		rows: _RowValue[] = $state([])
+		rows: _RowValue[] = $state(
+			[]
+		)
 
-		rowIsDisabled?: (rowValue: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean = $state(undefined)
+		rowIsDisabled?: (
+			(rowValue: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean
+		) = $state(
+			undefined
+		)
 
-		displaceDisabledRows: boolean = $state(false)
+		displaceDisabledRows: boolean = $state(
+			false
+		)
 
 		rowsAscending = $derived.by(() => {
 			if (!this.sortState) return this.rows
@@ -181,9 +195,13 @@
 			return result
 		})
 
-		pageSize: number = $state(Infinity)
+		pageSize = $state(
+			Infinity
+		)
 
-		currentPage = $state(1)
+		currentPage = $state(
+			1
+		)
 
 		rowsVisible = $derived(
 			this.rowsSorted
@@ -356,15 +374,16 @@
 
 
 	// State
-	let table = $derived(
-		new TableState<_RowValue, _CellValue, _ColumnId>({
-			rows,
-			columns,
-			rowIsDisabled,
-			displaceDisabledRows,
-		})
-	)
-
+	let table = new TableState({
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		rows,
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		columns,
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		rowIsDisabled,
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		displaceDisabledRows,
+	})
 	$effect(() => {
 		table.rows = rows
 	})
