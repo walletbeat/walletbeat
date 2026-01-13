@@ -479,7 +479,7 @@
 							.map(attrGroup => ({
 								id: attrGroup.id,
 								name: attrGroup.displayName,
-								value: (wallet: RatedWallet) => {
+								value: wallet => {
 									const attrGroupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
 									return attrGroupScore === null ? null : attrGroupScore.score
 								},
@@ -492,7 +492,7 @@
 										.map(([attributeId, attribute]) => ({
 											id: `${attrGroup.id}.${attributeId}`,
 											name: attribute.displayName,
-											value: (wallet: RatedWallet) => {
+											value: wallet => {
 												const attribute = wallet.overall[attrGroup.id]?.[attributeId]
 												return attribute?.evaluation?.value?.rating || undefined
 											},
@@ -509,7 +509,7 @@
 						{
 							id: 'displayName',
 							name: 'Wallet',
-							value: (wallet: RatedWallet) => wallet.metadata.displayName,
+							value: wallet => wallet.metadata.displayName,
 
 							sort: {
 								defaultDirection: SortDirection.Ascending,
@@ -521,7 +521,7 @@
 						...(hasNonApplicableStages ? [] : [{
 							id: 'stage',
 							name: 'Stage',
-							value: (wallet: RatedWallet) => {
+							value: wallet => {
 								const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 								if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return undefined
 								if (typeof stage === 'string') return null
@@ -530,16 +530,16 @@
 							},
 
 							sort: {
-								defaultDirection: 'desc',
+								defaultDirection: SortDirection.Descending,
 							},
-						}]),
+						} satisfies Column<RatedWallet>]),
 
 						(
 							attrGroupColumns.length > 1 ?
 								{
 									id: 'overall',
 									name: 'Rating',
-									value: (wallet: RatedWallet) => {
+									value: wallet => {
 										const overallScore = calculateOverallScore(
 											wallet.overall,
 											ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),

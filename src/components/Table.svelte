@@ -11,7 +11,8 @@
 	> = {
 		id: _ColumnId
 		name: string
-		value: (row: _RowValue) => _CellValue
+		value: (row: _RowValue) => any
+		// value: (row: _RowValue) => _CellValue
 
 		isSticky?: boolean
 
@@ -48,7 +49,9 @@
 		Descending = 'desc',
 	}
 
-	type SortState<_ColumnId extends string = string> = {
+	type SortState<
+		_ColumnId extends Value = Value,
+	> = {
 		columnId: _ColumnId
 		direction: SortDirection
 	}
@@ -59,7 +62,7 @@
 	export class TableState<
 		_RowValue extends Value = Value,
 		_CellValue extends Value = Value,
-		_ColumnId extends string = string,
+		_ColumnId extends Value = Value,
 	> {
 		columns: Column<_RowValue, _CellValue, _ColumnId>[] = $state([])
 
@@ -289,9 +292,9 @@
 
 
 <script lang="ts" generics="
-	_RowValue extends Value,
-	_RowId,
-	_ColumnId extends Value,
+	_RowValue extends Value = Value,
+	_RowId extends Value = Value,
+	_ColumnId extends Value = Value,
 	_CellValue extends Value = Value
 ">
 	// Types

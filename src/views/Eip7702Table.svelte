@@ -182,7 +182,7 @@
 					name: 'Batching',
 					value: wallet => wallet.overall.ecosystem.transactionBatching?.evaluation?.value?.rating ?? undefined,
 				},
-			] as Column<RatedWallet>[]}
+			]}
 		>
 			{#snippet Cell({ row: wallet, column, value })}
 				{#if column.id === 'wallet'}
