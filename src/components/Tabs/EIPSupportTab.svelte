@@ -96,9 +96,9 @@
     </header>
 
     <!-- EIPs being tested -->
-    <div class="eips-tested" data-column="gap-3">
+    <div class="eips-tested" data-column="gap-1">
       <span class="section-label">Testing:</span>
-      <div class="eip-tags" data-row="gap-2 wrap">
+      <div class="eip-tags">
         {#each currentStep.eips as eip (eip.eipNumber)}
           <a
             href={eip.specUrl}
@@ -361,7 +361,11 @@
   }
 
   .eip-tags {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 0.5rem;
+    justify-content: flex-start;
   }
 
   .eip-tag {
