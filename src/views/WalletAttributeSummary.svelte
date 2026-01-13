@@ -99,20 +99,19 @@
 					buttonTriggerPlacement="behind"
 					hoverTriggerPlacement="around"
 				>
-					{#snippet children()}
-						<a
-							href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#stage-${stageNumber}`}
-							data-link="camouflaged"
-							title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+					<a
+						href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#stage-${stageNumber}`}
+						data-link="camouflaged"
+						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+					>
+						<div
+							data-badge="small"
+							style:--accent="var(--accent-color)"
 						>
-							<div
-								data-badge="small"
-								style:--accent="var(--accent-color)"
-							>
-								<small>Stage {relevantStages.join(', ')}</small>
-							</div>
-						</a>
-					{/snippet}
+							<small>Stage {relevantStages.join(', ')}</small>
+						</div>
+					</a>
+
 					{#snippet TooltipContent()}
 						<WalletStageSummary 
 							{wallet} 
