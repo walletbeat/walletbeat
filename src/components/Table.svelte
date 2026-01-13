@@ -2,10 +2,12 @@
 	// Types
 	import type { Snippet } from 'svelte'
 
+	type Value = object | string | number | bigint | boolean | undefined | null
+
 	export type Column<
-		_RowValue = any,
-		_CellValue = any,
-		_ColumnId extends string = string,
+		_RowValue extends Value = Value,
+		_CellValue extends Value = Value,
+		_ColumnId extends Value = Value,
 	> = {
 		id: _ColumnId
 		name: string
@@ -55,8 +57,8 @@
 
 	// State
 	export class TableState<
-		_RowValue = any,
-		_CellValue = any,
+		_RowValue extends Value = Value,
+		_CellValue extends Value = Value,
 		_ColumnId extends string = string,
 	> {
 		columns: Column<_RowValue, _CellValue, _ColumnId>[] = $state([])
@@ -106,60 +108,74 @@
 			return getMaxLevel(this.columns)
 		})
 
-		rows = $state<_RowValue[]>([])
+		rows: _RowValue[] = $state([])
 
-		rowIsDisabled?: (row: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean = $state(undefined)
+		rowIsDisabled?: (rowValue: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean = $state(undefined)
 
 		displaceDisabledRows: boolean = $state(false)
 
-		rowsSorted = $derived.by(() => {
-			if (!this.sortState) {
-				return this.rows
-			}
+		rowsAscending = $derived.by(() => {
+			if (!this.sortState) return this.rows
 
-			const { columnId, direction } = this.sortState
-
+			const { columnId } = this.sortState
 			const column = this.#columnsById.get(columnId)
 
-			return this.rows.toSorted((a, b) => {
-				if (this.displaceDisabledRows && this.rowIsDisabled) {
-					const isRowADisplaced = this.rowIsDisabled(a, this)
-					const isRowBDisplaced = this.rowIsDisabled(b, this)
+			if(!column) return this.rows
 
-					if (isRowADisplaced || isRowBDisplaced) {
-						return isRowADisplaced && isRowBDisplaced ? 0 : isRowADisplaced ? 1 : -1
-					}
-				}
+			return (
+				this.rows
+					?.toSorted((rowValueA, rowValueB) => {
+						const a = column.value(rowValueA)
+						const b = column.value(rowValueB)
 
-				const aVal = column?.value(a)
-				const bVal = column?.value(b)
+						return (
+							(
+								a !== undefined && b !== undefined ?
+									column.sort?.compare ?
+										column.sort.compare(a, b, rowValueA, rowValueB)
+									:
+										typeof a === 'string' && typeof b === 'string' ?
+											a.localeCompare(b)
+										: a < b ?
+											-1
+										: a > b ?
+											1
+										:
+											0
+								: a === undefined ?
+									1
+								: b === undefined ?
+									-1
+								:
+									0
+							)
+						)
+					})
+				)
+		})
 
-				return aVal === undefined || aVal === null
-					? direction === SortDirection.Ascending
-						? 1
-						: -1
-					: bVal === undefined || bVal === null
-						? direction === SortDirection.Ascending
-							? -1
-							: 1
-						: column?.sort?.compare
-							? direction === SortDirection.Ascending
-								? column.sort.compare(aVal, bVal, a, b)
-								: column.sort.compare(bVal, aVal, b, a)
-							: typeof aVal === 'string' && typeof bVal === 'string'
-								? direction === SortDirection.Ascending
-									? aVal.localeCompare(bVal)
-									: bVal.localeCompare(aVal)
-								: aVal < bVal
-									? direction === SortDirection.Ascending
-										? -1
-										: 1
-									: aVal > bVal
-										? direction === SortDirection.Ascending
-											? 1
-											: -1
-										: 0
-			})
+		rowsSorted = $derived.by(() => {
+			if (!this.sortState) return this.rows
+
+			const { direction } = this.sortState
+
+			let result = this.rowsAscending
+
+			if(!result) return result
+
+			if (direction === SortDirection.Descending) {
+				result = result.toReversed()
+			}
+
+			if(this.displaceDisabledRows && this.rowIsDisabled)
+				result = result.toSorted((rowValueA, rowValueB) => {
+					const isRowADisplaced = this.rowIsDisabled!(rowValueA, this)
+					const isRowBDisplaced = this.rowIsDisabled!(rowValueB, this)
+
+					return isRowADisplaced ? 1 : isRowBDisplaced ? -1 : 0
+				})
+
+			return result
 		})
 
 		pageSize: number = $state(Infinity)
@@ -167,33 +183,46 @@
 		currentPage = $state(1)
 
 		rowsVisible = $derived(
-			this.rowsSorted.slice(
-				(this.currentPage - 1) * this.pageSize || 0,
-				((this.currentPage - 1) * this.pageSize || 0) + this.pageSize,
-			),
+			this.rowsSorted
+				?.slice(
+					(this.currentPage - 1) * this.pageSize || 0,
+					((this.currentPage - 1) * this.pageSize || 0) + this.pageSize,
+				)
 		)
 
-		totalPages = $derived(Math.max(1, Math.ceil(this.rows.length / this.pageSize)))
+		totalRows = $derived(
+			this.rows.length
+		)
 
-		canGoBack = $derived(this.rows.length > 0 && this.currentPage > 1)
+		totalPages = $derived(
+			Math.max(1, Math.ceil(this.totalRows / this.pageSize))
+		)
 
-		canGoForward = $derived(this.rows.length > 0 && this.currentPage < this.totalPages)
+		canGoBack = $derived(
+			this.totalRows > 0 && this.currentPage > 1
+		)
+
+		canGoForward = $derived(
+			this.totalRows > 0 && this.currentPage < this.totalPages
+		)
 
 		constructor({
-			data,
+			rows,
 			columns,
 			pageSize,
 			rowIsDisabled,
 			displaceDisabledRows,
 		}: {
-			data: _RowValue[]
+			rows: _RowValue[]
 			columns: Column<_RowValue, _CellValue, _ColumnId>[]
 			pageSize?: number
-			rowIsDisabled?: (row: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean
+			rowIsDisabled?: (rowValue: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean
 			displaceDisabledRows?: boolean
 		}) {
-			this.rows = [...data]
+			this.rows = rows
+
 			this.columns = columns
+
 			this.pageSize = pageSize || Infinity
 
 			const defaultSortedColumn = this.columns.find(column => column.sort?.isDefault)
@@ -208,11 +237,13 @@
 
 			const initializeIsColumnExpanded = (columns: Column<_RowValue, _CellValue, _ColumnId>[]) => {
 				columns.forEach(column => {
-					if (column.isDefaultExpanded)
+					if (column.isDefaultExpanded) {
 						this.#isColumnExpanded.add(column.id)
+					}
 
-					if (column.subcolumns?.length)
+					if (column.subcolumns?.length) {
 						initializeIsColumnExpanded(column.subcolumns)
+					}
 				})
 			}
 
@@ -222,9 +253,8 @@
 		toggleColumnSort = (columnId: _ColumnId) => {
 			const column = this.#columnsById.get(columnId)
 
-			if (!column?.sort) {
+			if (!column?.sort)
 				return false
-			}
 
 			this.sortState = (
 				this.sortState?.columnId !== columnId ?
@@ -244,10 +274,12 @@
 			return true
 		}
 
-		isColumnExpanded = (columnId: _ColumnId): boolean => this.#isColumnExpanded.has(columnId)
+		isColumnExpanded = (columnId: _ColumnId) => (
+			this.#isColumnExpanded.has(columnId)
+		)
 
 		toggleIsColumnExpanded = (columnId: _ColumnId) => {
-			if (this.#isColumnExpanded.has(columnId))
+			if(this.#isColumnExpanded.has(columnId))
 				this.#isColumnExpanded.delete(columnId)
 			else
 				this.#isColumnExpanded.add(columnId)
@@ -257,10 +289,10 @@
 
 
 <script lang="ts" generics="
-	_RowValue,
+	_RowValue extends Value,
 	_RowId,
-	_ColumnId extends string,
-	_CellValue
+	_ColumnId extends Value,
+	_CellValue extends Value = Value
 ">
 	// Types
 	import type { SvelteHTMLElements } from 'svelte/elements'
@@ -322,8 +354,8 @@
 
 	// State
 	let table = $derived(
-		new TableState({
-			data: rows,
+		new TableState<_RowValue, _CellValue, _ColumnId>({
+			rows,
 			columns,
 			rowIsDisabled,
 			displaceDisabledRows,
@@ -396,7 +428,7 @@
 			{@render headerRows(table.columns, 0)}
 
 			{#snippet headerRows(columns: (_Column | undefined)[], level: number)}
-				{@const nextLevelColumns =
+				{@const nextLevelColumns = (
 					columns
 						.flatMap(column => (
 							!column ?
@@ -406,7 +438,7 @@
 							:
 								Array.from({ length: getColumnSpan(column) }, () => undefined)
 						))
-				}
+				)}
 
 				<tr in:fly={{ y: '-50%', duration: 300, easing: expoOut }}>
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}
