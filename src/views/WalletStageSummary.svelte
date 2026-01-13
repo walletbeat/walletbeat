@@ -204,7 +204,7 @@
 			{/if}
 
 			<ul>
-				{#each criteria as { criterion, evaluation }}
+				{#each criteria as { criterion, evaluation } (criterion.id)}
 					{@const attributeId = getCriterionAttributeId(criterion)}
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}
