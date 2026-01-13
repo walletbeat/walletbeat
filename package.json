@@ -66,9 +66,9 @@
 		"orbiter-cli": "^0.8.2",
 		"p-limit": "^6.2.0",
 		"pnpm": "10.13.1",
-		"prettier": "^3.6.2",
+		"prettier": "^3.7.4",
 		"prettier-plugin-astro": "^0.14.1",
-		"prettier-plugin-curly": "^0.3.2",
+		"prettier-plugin-curly": "^0.4.1",
 		"tsx": "^4.20.6",
 		"typescript": "^5.9.3",
 		"vitest": "^3.2.4"
