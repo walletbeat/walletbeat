@@ -149,6 +149,18 @@ export const testSteps: TestStep[] = [
 						description: 'Provider implements the removeListener(eventName, listener) method',
 						critical: true,
 					},
+					{
+						id: 'connect-event',
+						name: 'connect event',
+						description: 'Can subscribe to connect event (MUST emit when connected)',
+						critical: false,
+					},
+					{
+						id: 'disconnect-event',
+						name: 'disconnect event',
+						description: 'Can subscribe to disconnect event (MUST emit with error 4900/4901)',
+						critical: false,
+					},
 				],
 			},
 		],
@@ -297,8 +309,20 @@ export const testSteps: TestStep[] = [
 					{
 						id: 'valid-status-response',
 						name: 'Valid status response',
-						description: 'Status response includes expected fields (status, receipts)',
+						description: 'Status response includes status field (number or string)',
 						critical: true,
+					},
+					{
+						id: 'has-atomic-field',
+						name: 'Atomic field present',
+						description: 'Response includes atomic field indicating execution type',
+						critical: false,
+					},
+					{
+						id: 'valid-receipts',
+						name: 'Valid receipts array',
+						description: 'Response includes receipts array with transaction receipt fields',
+						critical: false,
 					},
 					{
 						id: 'has-showCallsStatus',

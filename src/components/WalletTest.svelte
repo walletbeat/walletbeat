@@ -587,8 +587,8 @@ Issued At: ${new Date().toISOString()}`;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const provider = getProvider() as {
       request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on?: (event: string, listener: () => void) => void;
-      removeListener?: (event: string, listener: () => void) => void;
+      on?: (event: string, listener: (...args: unknown[]) => void) => void;
+      removeListener?: (event: string, listener: (...args: unknown[]) => void) => void;
     } | null;
 
     if (!provider) {
@@ -611,6 +611,28 @@ Issued At: ${new Date().toISOString()}`;
       passed: typeof provider.removeListener === 'function',
     });
 
+    // Set up connect event listener BEFORE requesting accounts
+    let connectEventFired = false;
+    let connectEventData: unknown = null;
+    const connectListener = (info: unknown) => {
+      connectEventFired = true;
+      connectEventData = info;
+    };
+
+    // Set up disconnect event listener to verify subscription works
+    let disconnectEventSubscribable = false;
+    const disconnectListener = () => {};
+
+    try {
+      if (typeof provider.on === 'function') {
+        provider.on('connect', connectListener);
+        provider.on('disconnect', disconnectListener);
+        disconnectEventSubscribable = true;
+      }
+    } catch {
+      // Provider doesn't support event subscription
+    }
+
     // Actually connect via eth_requestAccounts
     let connectPassed = false;
     let connectDetail = '';
@@ -632,12 +654,56 @@ Issued At: ${new Date().toISOString()}`;
       connectDetail = error instanceof Error ? error.message : 'Connection rejected';
     }
 
+    // Give a brief moment for connect event to fire (some wallets emit asynchronously)
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Clean up listeners
+    try {
+      if (typeof provider.removeListener === 'function') {
+        provider.removeListener('connect', connectListener);
+        provider.removeListener('disconnect', disconnectListener);
+      }
+    } catch {
+      // Ignore cleanup errors
+    }
+
     eip1193Checks.push({
       id: 'eth-requestAccounts',
       name: 'eth_requestAccounts',
       description: 'Successfully prompts user to connect and returns accounts',
       passed: connectPassed,
       detail: connectDetail,
+    });
+
+    // Check if connect event actually fired (EIP-1193 MUST emit when connected)
+    let connectEventDetail = '';
+
+    if (connectEventFired) {
+      // Validate connect event data has chainId per EIP-1193
+      const hasChainId = connectEventData && typeof connectEventData === 'object' && 'chainId' in connectEventData;
+
+      connectEventDetail = hasChainId
+        ? `Event fired with chainId: ${(connectEventData as { chainId: string }).chainId}`
+        : 'Event fired (missing chainId in payload)';
+    } else {
+      connectEventDetail = 'Event did not fire during connection';
+    }
+
+    eip1193Checks.push({
+      id: 'connect-event',
+      name: 'connect event',
+      description: 'Connect event fires when wallet connects (MUST per EIP-1193)',
+      passed: connectEventFired,
+      detail: connectEventDetail,
+    });
+
+    // For disconnect, we can only verify subscription works (can't trigger actual disconnect)
+    eip1193Checks.push({
+      id: 'disconnect-event',
+      name: 'disconnect event',
+      description: 'Can subscribe to disconnect event (fires with error 4900/4901 on disconnect)',
+      passed: disconnectEventSubscribable,
+      detail: disconnectEventSubscribable ? 'Subscription supported' : 'Cannot subscribe to event',
     });
 
     eipResults.push(createEIPResult('EIP-1193', 'Ethereum Provider JavaScript API', 'https://eips.ethereum.org/EIPS/eip-1193', eip1193Checks));
@@ -983,13 +1049,36 @@ Issued At: ${new Date().toISOString()}`;
     let statusPassed = false;
     let statusDetail = '';
     let validResponse = false;
+    let hasAtomicField = false;
+    let hasValidReceipts = false;
+    let atomicDetail = '';
+    let receiptsDetail = '';
+
+    // Define the expected receipt structure per EIP-5792
+    interface CallsStatusReceipt {
+      logs?: unknown[];
+      status?: string;
+      chainId?: string;
+      blockHash?: string;
+      blockNumber?: string;
+      gasUsed?: string;
+      transactionHash?: string;
+    }
+
+    interface CallsStatusResponse {
+      status: number | string;
+      receipts?: CallsStatusReceipt[];
+      version?: string;
+      atomic?: boolean;
+      id?: unknown;
+    }
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const status = (await provider.request({
         method: 'wallet_getCallsStatus',
         params: [stepTestState.batchId],
-      })) as { status: number | string; receipts?: unknown[]; version?: string };
+      })) as CallsStatusResponse;
 
       statusPassed = true;
 
@@ -1004,6 +1093,39 @@ Issued At: ${new Date().toISOString()}`;
       } else {
         statusDetail = 'Status field missing or invalid type';
         validResponse = false;
+      }
+
+      // Check for atomic field (EIP-5792 MUST include this)
+      if ('atomic' in status && typeof status.atomic === 'boolean') {
+        hasAtomicField = true;
+        atomicDetail = `Atomic: ${status.atomic}`;
+      } else {
+        atomicDetail = 'Atomic field missing or invalid type';
+      }
+
+      // Check for valid receipts array structure
+      if (Array.isArray(status.receipts)) {
+        if (status.receipts.length > 0) {
+          // Validate first receipt has expected fields
+          const firstReceipt = status.receipts[0];
+          const hasRequiredFields =
+            firstReceipt &&
+            typeof firstReceipt === 'object' &&
+            ('transactionHash' in firstReceipt || 'status' in firstReceipt);
+
+          if (hasRequiredFields) {
+            hasValidReceipts = true;
+            receiptsDetail = `${status.receipts.length} receipt(s) with valid structure`;
+          } else {
+            receiptsDetail = 'Receipts missing required fields (transactionHash, status)';
+          }
+        } else {
+          // Empty array is valid for pending transactions
+          hasValidReceipts = true;
+          receiptsDetail = 'Empty receipts array (transaction may be pending)';
+        }
+      } else {
+        receiptsDetail = 'Receipts field missing or not an array';
       }
     } catch (error) {
       statusDetail = error instanceof Error ? error.message : 'Failed to get status';
@@ -1020,8 +1142,24 @@ Issued At: ${new Date().toISOString()}`;
     eip5792Checks.push({
       id: 'valid-status-response',
       name: 'Valid status response',
-      description: 'Status response includes expected fields (status, receipts)',
+      description: 'Status response includes status field (number or string)',
       passed: validResponse,
+    });
+
+    eip5792Checks.push({
+      id: 'has-atomic-field',
+      name: 'Atomic field present',
+      description: 'Response includes atomic field indicating execution type',
+      passed: hasAtomicField,
+      detail: atomicDetail,
+    });
+
+    eip5792Checks.push({
+      id: 'valid-receipts',
+      name: 'Valid receipts array',
+      description: 'Response includes receipts array with transaction receipt fields',
+      passed: hasValidReceipts,
+      detail: receiptsDetail,
     });
 
     // Test wallet_showCallsStatus (optional)
