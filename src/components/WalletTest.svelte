@@ -440,18 +440,18 @@ Issued At: ${new Date().toISOString()}`;
 
       stepTestState.stepResults[step.id] = result;
 
-      // If passed and not the last step, auto-advance
-      if (result.status === 'passed' && stepTestState.currentStepIndex < testSteps.length - 1) {
-        stepTestState.currentStepIndex++;
-      }
-
-      // Check if all steps completed
-      if (stepTestState.currentStepIndex === testSteps.length - 1 && result.status === 'passed') {
+      // Check if this was the last step and it passed
+      const isLastStep = step.id === testSteps[testSteps.length - 1].id;
+      if (isLastStep && result.status === 'passed') {
         stepTestState.overallStatus = 'completed';
         showFinalResults();
       } else if (result.status === 'failed') {
         stepTestState.overallStatus = 'failed';
       } else {
+        // If passed and not the last step, auto-advance
+        if (result.status === 'passed' && stepTestState.currentStepIndex < testSteps.length - 1) {
+          stepTestState.currentStepIndex++;
+        }
         stepTestState.overallStatus = 'idle';
       }
     } catch (error) {
@@ -896,15 +896,25 @@ Issued At: ${new Date().toISOString()}`;
             ],
           },
         ],
-      })) as string;
+      })) as string | { id: string };
 
-      if (result) {
+      // Handle both string and object response formats
+      let batchId: string;
+      if (typeof result === 'string') {
+        batchId = result;
+      } else if (result && typeof result === 'object' && 'id' in result) {
+        batchId = result.id;
+      } else {
+        throw new Error('Unexpected response format from wallet_sendCalls');
+      }
+
+      if (batchId) {
         sendCallsPassed = true;
-        stepTestState.batchId = result;
-        sendCallsDetail = `Batch ID: ${result.slice(0, 16)}...`;
+        stepTestState.batchId = batchId;
+        sendCallsDetail = `Batch ID: ${batchId.slice(0, 16)}...`;
       }
     } catch (error) {
-			console.log(error);
+      console.log(error);
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       // Check if it's a user rejection vs method not supported
       if (errorMsg.toLowerCase().includes('reject') || errorMsg.toLowerCase().includes('denied')) {
@@ -957,14 +967,24 @@ Issued At: ${new Date().toISOString()}`;
       const status = (await provider.request({
         method: 'wallet_getCallsStatus',
         params: [stepTestState.batchId],
-      })) as { status: string; receipts?: unknown[] };
+      })) as { status: number | string; receipts?: unknown[]; version?: string };
 
       statusPassed = true;
-      statusDetail = `Status: ${status.status}`;
 
-      // Validate response structure
-      validResponse = typeof status.status === 'string';
+      // EIP-5792 v2.0.0 uses numeric status codes (like HTTP: 200 = success)
+      // Earlier versions used string status ("CONFIRMED", "PENDING", etc.)
+      if (typeof status.status === 'number') {
+        statusDetail = `Status: ${status.status} (${status.status >= 200 && status.status < 300 ? 'success' : 'pending/failed'})`;
+        validResponse = true;
+      } else if (typeof status.status === 'string') {
+        statusDetail = `Status: ${status.status}`;
+        validResponse = true;
+      } else {
+        statusDetail = 'Status field missing or invalid type';
+        validResponse = false;
+      }
     } catch (error) {
+      console.log('wallet_getCallsStatus error:', error);
       statusDetail = error instanceof Error ? error.message : 'Failed to get status';
     }
 
