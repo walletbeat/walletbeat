@@ -63,7 +63,7 @@
 		</button>
 	{/snippet}
 
-	{#each options as option}
+	{#each options as option (option)}
 		<option
 			value={option.value}
 			selected={option.value === defaultValue}
