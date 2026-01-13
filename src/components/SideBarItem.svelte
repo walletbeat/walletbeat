@@ -4,17 +4,38 @@
     description?: string;
     isSelected: boolean;
     isCompleted: boolean;
+    isFailed?: boolean;
+    isDisabled?: boolean;
     onclick: () => void;
   }
 
-  let { title, description, isSelected, isCompleted, onclick }: SidebarItemProps = $props();
+  let {
+    title,
+    description,
+    isSelected,
+    isCompleted,
+    isFailed = false,
+    isDisabled = false,
+    onclick,
+  }: SidebarItemProps = $props();
 </script>
 
-<button type="button" class="sidebar-item" class:selected={isSelected} {onclick}>
+<button
+  type="button"
+  class="sidebar-item"
+  class:selected={isSelected}
+  class:completed={isCompleted}
+  class:failed={isFailed}
+  class:disabled={isDisabled}
+  disabled={isDisabled}
+  {onclick}
+>
   <div class="sidebar-item-header">
     <h3 class="sidebar-item-title">{title}</h3>
     {#if isCompleted}
-      <span class="sidebar-item-check">✓</span>
+      <span class="sidebar-item-check passed">✓</span>
+    {:else if isFailed}
+      <span class="sidebar-item-check failed">✗</span>
     {/if}
   </div>
   {#if description}
@@ -34,13 +55,26 @@
     transition: background-color 0.2s;
   }
 
-  .sidebar-item:hover {
+  .sidebar-item:hover:not(.disabled) {
     background-color: var(--background-secondary);
   }
 
   .sidebar-item.selected {
     background-color: color-mix(in srgb, var(--accent) 15%, transparent);
     border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+
+  .sidebar-item.completed:not(.selected) {
+    background-color: color-mix(in srgb, var(--rating-pass) 5%, transparent);
+  }
+
+  .sidebar-item.failed:not(.selected) {
+    background-color: color-mix(in srgb, var(--rating-fail) 5%, transparent);
+  }
+
+  .sidebar-item.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 
   .sidebar-item-header {
@@ -62,11 +96,26 @@
     color: var(--accent);
   }
 
+  .sidebar-item.completed .sidebar-item-title {
+    color: var(--rating-pass);
+  }
+
+  .sidebar-item.failed .sidebar-item-title {
+    color: var(--rating-fail);
+  }
+
   .sidebar-item-check {
-    color: var(--accent);
     font-size: 1rem;
     font-weight: bold;
     flex-shrink: 0;
+  }
+
+  .sidebar-item-check.passed {
+    color: var(--rating-pass);
+  }
+
+  .sidebar-item-check.failed {
+    color: var(--rating-fail);
   }
 
   .sidebar-item-desc {

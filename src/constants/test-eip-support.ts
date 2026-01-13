@@ -1,258 +1,329 @@
-export type EIPTestStatus = 'untested' | 'pass' | 'fail' | 'partial' | 'testing'
+// Step-based EIP testing types
+export type StepStatus = 'pending' | 'running' | 'passed' | 'failed' | 'skipped'
 
-export interface EIPTest {
+export interface EIPCheckResult {
 	id: string
+	name: string
+	description: string
+	passed: boolean
+	detail?: string
+}
+
+export interface EIPTestResult {
 	eipNumber: string
 	name: string
-	description: string
 	specUrl: string
-	requirements?: string[]
-	checks: EIPCheck[]
+	checks: EIPCheckResult[]
+	overallPassed: boolean
 }
 
-export interface EIPCheck {
+export interface TestStep {
+	id: string
+	stepNumber: number
+	name: string
+	description: string
+	eips: EIPReference[]
+}
+
+export interface EIPReference {
+	eipNumber: string
+	name: string
+	specUrl: string
+	checks: EIPCheckDefinition[]
+}
+
+export interface EIPCheckDefinition {
 	id: string
 	name: string
 	description: string
-	critical: boolean // Whether this check is required for compliance
+	critical: boolean
 }
 
-export const eipTests: EIPTest[] = [
+export interface StepResult {
+	stepId: string
+	status: StepStatus
+	eipResults: EIPTestResult[]
+	error?: string
+	timestamp?: number
+}
+
+export interface DiscoveredProvider {
+	uuid: string
+	name: string
+	icon: string
+	rdns: string
+}
+
+// The 6 testing steps with their EIP mappings
+export const testSteps: TestStep[] = [
 	{
-		id: 'eip-1193',
-		eipNumber: 'EIP-1193',
-		name: 'Ethereum Provider JavaScript API',
-		description:
-			'Defines a standard JavaScript provider interface for Ethereum wallets, including the request method and event system.',
-		specUrl: 'https://eips.ethereum.org/EIPS/eip-1193',
-		requirements: [
-			'Browser extension or injected provider must be installed',
-			'Provider should be accessible via window.ethereum or EIP-6963 discovery',
-		],
-		checks: [
+		id: 'step-1-detection',
+		stepNumber: 1,
+		name: 'Wallet Detection',
+		description: 'Detect available wallets via EIP-6963 discovery or window.ethereum fallback',
+		eips: [
 			{
-				id: 'has-provider',
-				name: 'Provider exists',
-				description: 'window.ethereum or provider discovered via EIP-6963',
-				critical: true,
+				eipNumber: 'EIP-6963',
+				name: 'Multi Injected Provider Discovery',
+				specUrl: 'https://eips.ethereum.org/EIPS/eip-6963',
+				checks: [
+					{
+						id: 'announces-provider',
+						name: 'Provider announcement',
+						description: 'Wallet announces itself via eip6963:announceProvider event',
+						critical: true,
+					},
+					{
+						id: 'responds-to-request',
+						name: 'Responds to discovery',
+						description: 'Wallet responds to eip6963:requestProvider event',
+						critical: true,
+					},
+					{
+						id: 'has-provider-info',
+						name: 'Provider info object',
+						description: 'Includes valid provider info (uuid, name, icon, rdns)',
+						critical: true,
+					},
+					{
+						id: 'valid-icon',
+						name: 'Valid icon URI',
+						description: 'Provider icon is a valid data URI or HTTPS URL',
+						critical: false,
+					},
+					{
+						id: 'rdns-format',
+						name: 'RDNS format',
+						description: 'Provider rdns follows reverse domain name format',
+						critical: false,
+					},
+				],
 			},
 			{
-				id: 'has-request',
-				name: 'request() method',
-				description: 'Provider implements the request(args) method',
-				critical: true,
-			},
-			{
-				id: 'has-on',
-				name: 'on() method',
-				description: 'Provider implements the on(eventName, listener) method',
-				critical: true,
-			},
-			{
-				id: 'has-removeListener',
-				name: 'removeListener() method',
-				description: 'Provider implements the removeListener(eventName, listener) method',
-				critical: true,
-			},
-			{
-				id: 'supports-accountsChanged',
-				name: 'accountsChanged event',
-				description: 'Provider emits accountsChanged when accounts change',
-				critical: true,
-			},
-			{
-				id: 'supports-chainChanged',
-				name: 'chainChanged event',
-				description: 'Provider emits chainChanged when chain changes',
-				critical: true,
-			},
-			{
-				id: 'supports-connect',
-				name: 'connect event',
-				description: 'Provider emits connect event when connected',
-				critical: false,
-			},
-			{
-				id: 'supports-disconnect',
-				name: 'disconnect event',
-				description: 'Provider emits disconnect event when disconnected',
-				critical: false,
-			},
-			{
-				id: 'eth-accounts',
-				name: 'eth_accounts RPC',
-				description: 'Responds to eth_accounts request',
-				critical: true,
-			},
-			{
-				id: 'eth-requestAccounts',
-				name: 'eth_requestAccounts RPC',
-				description: 'Responds to eth_requestAccounts request (shows connection prompt)',
-				critical: true,
+				eipNumber: 'EIP-1193',
+				name: 'Ethereum Provider JavaScript API',
+				specUrl: 'https://eips.ethereum.org/EIPS/eip-1193',
+				checks: [
+					{
+						id: 'has-provider',
+						name: 'Provider exists',
+						description: 'window.ethereum or provider discovered via EIP-6963',
+						critical: true,
+					},
+					{
+						id: 'has-request',
+						name: 'request() method',
+						description: 'Provider implements the request(args) method',
+						critical: true,
+					},
+				],
 			},
 		],
 	},
 	{
-		id: 'eip-2700',
-		eipNumber: 'EIP-2700',
-		name: 'JavaScript Provider Event Emitter',
-		description:
-			'Extends EIP-1193 to formalize the event emitter interface, ensuring wallets properly implement EventEmitter methods for listening to provider events.',
-		specUrl: 'https://eips.ethereum.org/EIPS/eip-2700',
-		requirements: [
-			'Browser extension or injected provider must be installed',
-			'Provider should implement standard EventEmitter interface',
-		],
-		checks: [
+		id: 'step-2-connect',
+		stepNumber: 2,
+		name: 'Connect Wallet',
+		description: 'Connect to the wallet and verify connection methods work correctly',
+		eips: [
 			{
-				id: 'has-on',
-				name: 'on() method',
-				description: 'Provider implements on(eventName, listener) method',
-				critical: true,
-			},
-			{
-				id: 'has-removeListener',
-				name: 'removeListener() method',
-				description: 'Provider implements removeListener(eventName, listener) method',
-				critical: true,
-			},
-			{
-				id: 'has-addListener',
-				name: 'addListener() method',
-				description: 'Provider implements addListener(eventName, listener) method (alias for on)',
-				critical: false,
-			},
-			{
-				id: 'has-removeAllListeners',
-				name: 'removeAllListeners() method',
-				description: 'Provider implements removeAllListeners([eventName]) method',
-				critical: false,
-			},
-			{
-				id: 'has-listeners',
-				name: 'listeners() method',
-				description: 'Provider implements listeners(eventName) method',
-				critical: false,
-			},
-			{
-				id: 'has-once',
-				name: 'once() method',
-				description: 'Provider implements once(eventName, listener) method',
-				critical: false,
-			},
-			{
-				id: 'has-emit',
-				name: 'emit() method',
-				description: 'Provider implements emit(eventName, ...args) method (for internal use)',
-				critical: false,
-			},
-			{
-				id: 'supports-message-event',
-				name: 'message event',
-				description: 'Provider supports the message event for subscription notifications',
-				critical: true,
+				eipNumber: 'EIP-1193',
+				name: 'Ethereum Provider JavaScript API',
+				specUrl: 'https://eips.ethereum.org/EIPS/eip-1193',
+				checks: [
+					{
+						id: 'eth-requestAccounts',
+						name: 'eth_requestAccounts',
+						description: 'Successfully prompts user to connect and returns accounts',
+						critical: true,
+					},
+					{
+						id: 'has-on',
+						name: 'on() method',
+						description: 'Provider implements the on(eventName, listener) method',
+						critical: true,
+					},
+					{
+						id: 'has-removeListener',
+						name: 'removeListener() method',
+						description: 'Provider implements the removeListener(eventName, listener) method',
+						critical: true,
+					},
+				],
 			},
 		],
 	},
 	{
-		id: 'eip-6963',
-		eipNumber: 'EIP-6963',
-		name: 'Multi Injected Provider Discovery',
-		description:
-			'Enables multiple wallet extensions to coexist by announcing their providers via events instead of overwriting window.ethereum.',
-		specUrl: 'https://eips.ethereum.org/EIPS/eip-6963',
-		requirements: [
-			'Modern browser with multiple wallet extensions installed (recommended)',
-			'At least one wallet supporting EIP-6963',
-		],
-		checks: [
+		id: 'step-3-account',
+		stepNumber: 3,
+		name: 'Check Account',
+		description: 'Verify account access and event subscription capabilities',
+		eips: [
 			{
-				id: 'announces-provider',
-				name: 'Provider announcement',
-				description: 'Wallet announces itself via eip6963:announceProvider event',
-				critical: true,
-			},
-			{
-				id: 'responds-to-request',
-				name: 'Responds to discovery request',
-				description: 'Wallet responds to eip6963:requestProvider event',
-				critical: true,
-			},
-			{
-				id: 'has-provider-info',
-				name: 'Provider info object',
-				description: 'Includes valid provider info (uuid, name, icon, rdns)',
-				critical: true,
-			},
-			{
-				id: 'unique-uuid',
-				name: 'Unique UUID',
-				description: 'Provider has a unique UUID',
-				critical: true,
-			},
-			{
-				id: 'valid-icon',
-				name: 'Valid icon URI',
-				description: 'Provider icon is a valid data URI or HTTPS URL',
-				critical: false,
-			},
-			{
-				id: 'rdns-format',
-				name: 'RDNS format',
-				description: 'Provider rdns follows reverse domain name format',
-				critical: false,
+				eipNumber: 'EIP-1193',
+				name: 'Ethereum Provider JavaScript API',
+				specUrl: 'https://eips.ethereum.org/EIPS/eip-1193',
+				checks: [
+					{
+						id: 'eth-accounts',
+						name: 'eth_accounts',
+						description: 'Returns connected account addresses',
+						critical: true,
+					},
+					{
+						id: 'valid-address',
+						name: 'Valid address format',
+						description: 'Returned address is a valid Ethereum address (0x + 40 hex chars)',
+						critical: true,
+					},
+					{
+						id: 'accountsChanged-event',
+						name: 'accountsChanged event',
+						description: 'Can subscribe to accountsChanged event',
+						critical: false,
+					},
+				],
 			},
 		],
 	},
 	{
-		id: 'eip-5792',
-		eipNumber: 'EIP-5792',
-		name: 'Wallet Function Call API',
-		description:
-			'Defines methods for sending batched transactions (wallet_sendCalls) and querying their status, enabling atomic multi-call operations.',
-		specUrl: 'https://eips.ethereum.org/EIPS/eip-5792',
-		requirements: [
-			'Wallet must support EIP-5792 (newer standard, not all wallets support it yet)',
-			'Requires connection to a wallet',
+		id: 'step-4-network',
+		stepNumber: 4,
+		name: 'Check Network',
+		description: 'Verify chain information and EventEmitter implementation',
+		eips: [
+			{
+				eipNumber: 'EIP-1193',
+				name: 'Ethereum Provider JavaScript API',
+				specUrl: 'https://eips.ethereum.org/EIPS/eip-1193',
+				checks: [
+					{
+						id: 'eth-chainId',
+						name: 'eth_chainId',
+						description: 'Returns current chain ID',
+						critical: true,
+					},
+					{
+						id: 'chainChanged-event',
+						name: 'chainChanged event',
+						description: 'Can subscribe to chainChanged event',
+						critical: false,
+					},
+				],
+			},
+			{
+				eipNumber: 'EIP-2700',
+				name: 'JavaScript Provider Event Emitter',
+				specUrl: 'https://eips.ethereum.org/EIPS/eip-2700',
+				checks: [
+					{
+						id: 'has-on',
+						name: 'on() method',
+						description: 'Provider implements on(eventName, listener)',
+						critical: true,
+					},
+					{
+						id: 'has-removeListener',
+						name: 'removeListener() method',
+						description: 'Provider implements removeListener(eventName, listener)',
+						critical: true,
+					},
+					{
+						id: 'has-once',
+						name: 'once() method',
+						description: 'Provider implements once(eventName, listener)',
+						critical: false,
+					},
+					{
+						id: 'has-removeAllListeners',
+						name: 'removeAllListeners() method',
+						description: 'Provider implements removeAllListeners([eventName])',
+						critical: false,
+					},
+				],
+			},
 		],
-		checks: [
+	},
+	{
+		id: 'step-5-batch-send',
+		stepNumber: 5,
+		name: 'Send Batch Calls',
+		description: 'Test EIP-5792 by sending a batched transaction (requires wallet confirmation)',
+		eips: [
 			{
-				id: 'has-sendCalls',
-				name: 'wallet_sendCalls',
-				description: 'Provider implements wallet_sendCalls method',
-				critical: true,
+				eipNumber: 'EIP-5792',
+				name: 'Wallet Function Call API',
+				specUrl: 'https://eips.ethereum.org/EIPS/eip-5792',
+				checks: [
+					{
+						id: 'has-getCapabilities',
+						name: 'wallet_getCapabilities',
+						description: 'Provider implements wallet_getCapabilities method',
+						critical: false,
+					},
+					{
+						id: 'atomicity-support',
+						name: 'Atomicity support',
+						description: 'Wallet declares atomicBatch capability',
+						critical: false,
+					},
+					{
+						id: 'has-sendCalls',
+						name: 'wallet_sendCalls',
+						description: 'Successfully sends batched calls and returns batch ID',
+						critical: true,
+					},
+				],
 			},
+		],
+	},
+	{
+		id: 'step-6-batch-status',
+		stepNumber: 6,
+		name: 'Check Batch Status',
+		description: 'Query the status of the batch transaction sent in the previous step',
+		eips: [
 			{
-				id: 'has-getCallsStatus',
-				name: 'wallet_getCallsStatus',
-				description: 'Provider implements wallet_getCallsStatus method',
-				critical: true,
-			},
-			{
-				id: 'has-showCallsStatus',
-				name: 'wallet_showCallsStatus',
-				description: 'Provider implements wallet_showCallsStatus method (optional)',
-				critical: false,
-			},
-			{
-				id: 'has-getCapabilities',
-				name: 'wallet_getCapabilities',
-				description: 'Provider implements wallet_getCapabilities method',
-				critical: false,
-			},
-			{
-				id: 'atomicity-support',
-				name: 'Atomicity support',
-				description: 'Wallet declares atomicBatch capability in wallet_getCapabilities',
-				critical: false,
-			},
-			{
-				id: 'atomicity-enforcement',
-				name: 'Atomicity enforcement',
-				description:
-					'When atomicBatch is true, wallet reverts all calls if any call fails (true atomic batch)',
-				critical: false,
+				eipNumber: 'EIP-5792',
+				name: 'Wallet Function Call API',
+				specUrl: 'https://eips.ethereum.org/EIPS/eip-5792',
+				checks: [
+					{
+						id: 'has-getCallsStatus',
+						name: 'wallet_getCallsStatus',
+						description: 'Successfully retrieves batch status',
+						critical: true,
+					},
+					{
+						id: 'valid-status-response',
+						name: 'Valid status response',
+						description: 'Status response includes expected fields (status, receipts)',
+						critical: true,
+					},
+					{
+						id: 'has-showCallsStatus',
+						name: 'wallet_showCallsStatus',
+						description: 'Provider implements wallet_showCallsStatus (optional)',
+						critical: false,
+					},
+				],
 			},
 		],
 	},
 ]
+
+// Helper to get a step by ID
+export function getStepById(stepId: string): TestStep | undefined {
+	return testSteps.find((step) => step.id === stepId)
+}
+
+// Helper to get all EIP numbers tested across all steps
+export function getAllTestedEIPs(): string[] {
+	const eips = new Set<string>()
+	for (const step of testSteps) {
+		for (const eip of step.eips) {
+			eips.add(eip.eipNumber)
+		}
+	}
+	return Array.from(eips)
+}

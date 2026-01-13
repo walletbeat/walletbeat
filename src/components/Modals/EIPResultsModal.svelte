@@ -1,137 +1,332 @@
 <script lang="ts">
   import Modal from '../Modal.svelte';
+  import type { StepResult } from '../../constants/test-eip-support';
+  import { testSteps } from '../../constants/test-eip-support';
 
   interface Props {
     isOpen: boolean;
-    passed: boolean;
-    failedChecks: Array<{ name: string; description: string }>;
+    overallPassed: boolean;
+    stepResults: StepResult[];
     onClose: () => void;
   }
 
-  let { isOpen, passed, failedChecks, onClose }: Props = $props();
+  let { isOpen, overallPassed, stepResults, onClose }: Props = $props();
+
+  // Track which steps are expanded
+  let expandedSteps = $state<Set<string>>(new Set());
+
+  function toggleStep(stepId: string) {
+    if (expandedSteps.has(stepId)) {
+      expandedSteps.delete(stepId);
+    } else {
+      expandedSteps.add(stepId);
+    }
+    expandedSteps = new Set(expandedSteps);
+  }
+
+  function getStepName(stepId: string): string {
+    return testSteps.find((s) => s.id === stepId)?.name ?? stepId;
+  }
+
+  function getStepNumber(stepId: string): number {
+    return testSteps.find((s) => s.id === stepId)?.stepNumber ?? 0;
+  }
 </script>
 
-<Modal {isOpen} title={passed ? 'Test Passed ✓' : 'Test Failed ✗'} {onClose}>
-  {#if passed}
-    <div class="eip-results-content" data-column="gap-3">
-      <div class="eip-success-message" data-column="gap-2">
-        <div class="eip-success-icon">✓</div>
-        <p class="eip-success-text">
-          All required compliance checks passed! This wallet fully supports the tested EIP standard.
-        </p>
+<Modal {isOpen} title={overallPassed ? 'All Tests Passed!' : 'Test Results'} {onClose}>
+  <div class="results-content" data-column="gap-3">
+    <!-- Summary -->
+    <div class="summary" class:passed={overallPassed} class:failed={!overallPassed}>
+      <div class="summary-icon">
+        {#if overallPassed}
+          ✓
+        {:else}
+          !
+        {/if}
+      </div>
+      <div class="summary-text">
+        {#if overallPassed}
+          <p>Your wallet passed all EIP compliance tests!</p>
+          <p class="summary-detail">
+            All {stepResults.length} steps completed successfully. The wallet supports EIP-1193,
+            EIP-2700, EIP-6963, and EIP-5792.
+          </p>
+        {:else}
+          <p>Some tests did not pass.</p>
+          <p class="summary-detail">
+            Review the results below to see which checks failed.
+          </p>
+        {/if}
       </div>
     </div>
-  {:else}
-    <div class="eip-results-content" data-column="gap-3">
-      <div class="eip-fail-message" data-column="gap-2">
-        <div class="eip-fail-icon">✗</div>
-        <p class="eip-fail-text">
-          Some required compliance checks failed. The wallet does not fully support this EIP
-          standard.
-        </p>
-      </div>
 
-      {#if failedChecks.length > 0}
-        <div class="eip-failed-checks" data-column="gap-2">
-          <h4 class="failed-checks-title">Missing Required Features:</h4>
-          <ul class="failed-checks-list">
-            {#each failedChecks as check (check.name)}
-              <li class="failed-check-item">
-                <span class="failed-check-name">{check.name}</span>
-                <span class="failed-check-description">{check.description}</span>
-              </li>
-            {/each}
-          </ul>
+    <!-- Step Results -->
+    <div class="step-results" data-column="gap-2">
+      <h4 class="section-title">Step-by-Step Results</h4>
+      {#each stepResults as result (result.stepId)}
+        {@const stepPassed = result.status === 'passed'}
+        <div class="step-result" class:passed={stepPassed} class:failed={!stepPassed}>
+          <button
+            type="button"
+            class="step-header"
+            onclick={() => toggleStep(result.stepId)}
+            aria-expanded={expandedSteps.has(result.stepId)}
+          >
+            <span class="step-status">
+              {#if stepPassed}
+                ✓
+              {:else}
+                ✗
+              {/if}
+            </span>
+            <span class="step-name">
+              Step {getStepNumber(result.stepId)}: {getStepName(result.stepId)}
+            </span>
+            <span class="expand-icon" class:expanded={expandedSteps.has(result.stepId)}>
+              ▸
+            </span>
+          </button>
+
+          {#if expandedSteps.has(result.stepId)}
+            <div class="step-details" data-column="gap-2">
+              {#each result.eipResults as eipResult (eipResult.eipNumber)}
+                <div class="eip-result" class:passed={eipResult.overallPassed} class:failed={!eipResult.overallPassed}>
+                  <div class="eip-header">
+                    <span class="eip-status">
+                      {#if eipResult.overallPassed}
+                        ✓
+                      {:else}
+                        ✗
+                      {/if}
+                    </span>
+                    <span class="eip-number">{eipResult.eipNumber}</span>
+                    <span class="eip-name">{eipResult.name}</span>
+                  </div>
+                  <div class="checks-list" data-column="gap-1">
+                    {#each eipResult.checks as check (check.id)}
+                      <div class="check-row" class:passed={check.passed} class:failed={!check.passed}>
+                        <span class="check-icon">
+                          {#if check.passed}
+                            ✓
+                          {:else}
+                            ✗
+                          {/if}
+                        </span>
+                        <span class="check-name">{check.name}</span>
+                        {#if check.detail}
+                          <span class="check-detail">{check.detail}</span>
+                        {/if}
+                      </div>
+                    {/each}
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {/if}
         </div>
-      {/if}
+      {/each}
     </div>
-  {/if}
+  </div>
+
   {#snippet footer()}
     <button type="button" data-pressable onclick={onClose}>Close</button>
   {/snippet}
 </Modal>
 
 <style>
-  .eip-results-content {
+  .results-content {
     margin-block: 1rem 1.5rem;
+    max-height: 60vh;
+    overflow-y: auto;
   }
 
-  .eip-success-message {
-    align-items: center;
-    text-align: center;
-    padding: 1.5rem;
-  }
-
-  .eip-success-icon {
-    font-size: 4rem;
-    color: var(--rating-pass);
-    line-height: 1;
-  }
-
-  .eip-success-text {
-    font-size: 1rem;
-    color: var(--text-primary);
-    margin: 0;
-  }
-
-  .eip-fail-message {
-    align-items: center;
-    text-align: center;
-    padding: 1.5rem 1.5rem 1rem;
-  }
-
-  .eip-fail-icon {
-    font-size: 4rem;
-    color: var(--rating-fail);
-    line-height: 1;
-  }
-
-  .eip-fail-text {
-    font-size: 1rem;
-    color: var(--text-primary);
-    margin: 0;
-  }
-
-  .eip-failed-checks {
+  .summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
     padding: 1rem;
-    background: color-mix(in srgb, var(--rating-fail) 5%, transparent);
-    border: 1px solid color-mix(in srgb, var(--rating-fail) 20%, transparent);
     border-radius: 0.5rem;
   }
 
-  .failed-checks-title {
-    font-size: 0.9rem;
-    font-weight: 600;
+  .summary.passed {
+    background: color-mix(in srgb, var(--rating-pass) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--rating-pass) 30%, transparent);
+  }
+
+  .summary.failed {
+    background: color-mix(in srgb, var(--rating-fail) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--rating-fail) 30%, transparent);
+  }
+
+  .summary-icon {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .summary.passed .summary-icon {
+    color: var(--rating-pass);
+  }
+
+  .summary.failed .summary-icon {
     color: var(--rating-fail);
-    margin: 0 0 0.75rem 0;
   }
 
-  .failed-checks-list {
+  .summary-text p {
     margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    font-size: 0.9rem;
   }
 
-  .failed-check-item {
+  .summary-text p:first-child {
+    font-weight: 600;
+  }
+
+  .summary-detail {
+    font-size: 0.8rem !important;
+    color: var(--text-secondary);
+    margin-top: 0.25rem !important;
+  }
+
+  .section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .step-result {
+    border: 1px solid var(--background-secondary);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .step-result.passed {
+    border-color: color-mix(in srgb, var(--rating-pass) 30%, transparent);
+  }
+
+  .step-result.failed {
+    border-color: color-mix(in srgb, var(--rating-fail) 30%, transparent);
+  }
+
+  .step-header {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+
+  .step-header:hover {
+    background: color-mix(in srgb, var(--background-secondary) 50%, transparent);
+  }
+
+  .step-status {
+    font-weight: bold;
+    font-size: 1rem;
+  }
+
+  .step-result.passed .step-status {
+    color: var(--rating-pass);
+  }
+
+  .step-result.failed .step-status {
+    color: var(--rating-fail);
+  }
+
+  .step-name {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .expand-icon {
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+  }
+
+  .expand-icon.expanded {
+    transform: rotate(90deg);
+  }
+
+  .step-details {
+    padding: 0.75rem 1rem 1rem;
+    background: color-mix(in srgb, var(--background-secondary) 30%, transparent);
+  }
+
+  .eip-result {
     padding: 0.75rem;
     background: color-mix(in srgb, var(--background-primary) 50%, transparent);
     border-radius: 0.375rem;
   }
 
-  .failed-check-name {
+  .eip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .eip-status {
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: bold;
+  }
+
+  .eip-result.passed .eip-status {
+    color: var(--rating-pass);
+  }
+
+  .eip-result.failed .eip-status {
+    color: var(--rating-fail);
+  }
+
+  .eip-number {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  .eip-name {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .checks-list {
+    padding-left: 1.25rem;
+  }
+
+  .check-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .check-icon {
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+
+  .check-row.passed .check-icon {
+    color: var(--rating-pass);
+  }
+
+  .check-row.failed .check-icon {
+    color: var(--rating-fail);
+  }
+
+  .check-name {
     color: var(--text-primary);
   }
 
-  .failed-check-description {
-    font-size: 0.75rem;
+  .check-detail {
     color: var(--text-secondary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.7rem;
   }
 </style>

@@ -15,8 +15,15 @@
   import config from '../lib/wagmi-config';
   import { testSignatures, testTransactions } from '../constants/test-transactions-signatures';
   import type { TestTransaction, TestSignature } from '../constants/test-transactions-signatures';
-  import { eipTests } from '../constants/test-eip-support';
-  import type { EIPTest, EIPTestStatus } from '../constants/test-eip-support';
+  import { testSteps } from '../constants/test-eip-support';
+  import type {
+    StepStatus,
+    StepResult,
+    EIPTestResult,
+    EIPCheckResult,
+    DiscoveredProvider,
+    TestStep,
+  } from '../constants/test-eip-support';
 
   import ErrorComponent from './ErrorComponent.svelte';
   import SideBarItem from './SideBarItem.svelte';
@@ -60,23 +67,25 @@
     error: '',
   });
 
-  const eipState = $state({
-    activeId: null as string | null,
-    isTesting: false,
-    results: {} as Record<string, Record<string, EIPTestStatus>>,
+  // Step-based EIP testing state
+  const stepTestState = $state({
+    currentStepIndex: 0,
+    overallStatus: 'idle' as 'idle' | 'in_progress' | 'completed' | 'failed',
     error: '',
-    discoveredProviders: [] as Array<{
-      uuid: string;
-      name: string;
-      icon: string;
-      rdns: string;
-      provider: unknown;
-    }>,
+    stepResults: {} as Record<string, StepResult>,
+
+    // Step-specific data persisted across steps
+    discoveredProviders: [] as Array<DiscoveredProvider & { provider: unknown }>,
+    selectedProviderId: null as string | null,
+    connectedAddress: null as string | null,
+    chainId: null as number | null,
+    batchId: null as string | null,
+
+    // Results modal
     resultsModal: {
       isOpen: false,
-      eipId: null as string | null,
-      passed: false,
-      failedChecks: [] as Array<{ name: string; description: string }>,
+      overallPassed: false,
+      stepResults: [] as StepResult[],
     },
   });
 
@@ -84,7 +93,6 @@
     activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support',
     selectedTxId: null as string | null,
     selectedSigId: null as string | null,
-    selectedEipId: null as string | null,
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -98,9 +106,7 @@
 
     if (testSignatures.length > 0) uiState.selectedSigId = testSignatures[0].id;
 
-    if (eipTests.length > 0) uiState.selectedEipId = eipTests[0].id;
-
-    // Discover EIP-6963 providers
+    // Discover EIP-6963 providers for step 1
     discoverProviders();
 
     return unwatch;
@@ -336,7 +342,7 @@ Issued At: ${new Date().toISOString()}`;
       // Type guard for CustomEvent
       if (!('detail' in event)) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const customEvent = event as CustomEvent<{
         info: { uuid: string; name: string; icon: string; rdns: string };
         provider: unknown;
@@ -345,10 +351,10 @@ Issued At: ${new Date().toISOString()}`;
       const { info, provider } = customEvent.detail;
 
       // Check if we already have this provider
-      const exists = eipState.discoveredProviders.some((p) => p.uuid === info.uuid);
+      const exists = stepTestState.discoveredProviders.some((p) => p.uuid === info.uuid);
 
       if (!exists) {
-        eipState.discoveredProviders.push({
+        stepTestState.discoveredProviders.push({
           uuid: info.uuid,
           name: info.name,
           icon: info.icon,
@@ -362,260 +368,525 @@ Issued At: ${new Date().toISOString()}`;
     window.dispatchEvent(new Event('eip6963:requestProvider'));
   }
 
-  async function testEIPSupport(eip: EIPTest) {
-    eipState.isTesting = true;
-    eipState.activeId = eip.id;
-    eipState.error = '';
+  // Step-based EIP testing functions
+  function createStepResult(step: TestStep, status: StepStatus, eipResults: EIPTestResult[], error?: string): StepResult {
+    return {
+      stepId: step.id,
+      status,
+      eipResults,
+      error,
+      timestamp: Date.now(),
+    };
+  }
 
-    const results: Record<string, EIPTestStatus> = {};
+  function createEIPResult(eipNumber: string, name: string, specUrl: string, checks: EIPCheckResult[]): EIPTestResult {
+    const overallPassed = checks.filter((c) => c.passed === false).length === 0;
+    return { eipNumber, name, specUrl, checks, overallPassed };
+  }
+
+  function getCurrentStep(): TestStep {
+    return testSteps[stepTestState.currentStepIndex];
+  }
+
+  function canRunStep(stepIndex: number): boolean {
+    if (stepIndex === 0) return true;
+    const previousStep = testSteps[stepIndex - 1];
+    const previousResult = stepTestState.stepResults[previousStep.id];
+    return previousResult?.status === 'passed';
+  }
+
+  function getStepStatus(stepId: string): StepStatus {
+    return stepTestState.stepResults[stepId]?.status ?? 'pending';
+  }
+
+  async function runCurrentStep() {
+    const step = getCurrentStep();
+    if (!canRunStep(stepTestState.currentStepIndex)) {
+      stepTestState.error = 'Please complete the previous step first';
+      return;
+    }
+
+    stepTestState.overallStatus = 'in_progress';
+    stepTestState.error = '';
+
+    // Mark step as running
+    stepTestState.stepResults[step.id] = createStepResult(step, 'running', []);
 
     try {
-      // Check if there are multiple connectors
-      if (connectors.length > 1) {
-        throw new Error('Multiple wallets/connectors detected. Please ensure only one wallet extension is active when running EIP tests.');
+      let result: StepResult;
+
+      switch (step.id) {
+        case 'step-1-detection':
+          result = await runStep1Detection(step);
+          break;
+        case 'step-2-connect':
+          result = await runStep2Connect(step);
+          break;
+        case 'step-3-account':
+          result = await runStep3Account(step);
+          break;
+        case 'step-4-network':
+          result = await runStep4Network(step);
+          break;
+        case 'step-5-batch-send':
+          result = await runStep5BatchSend(step);
+          break;
+        case 'step-6-batch-status':
+          result = await runStep6BatchStatus(step);
+          break;
+        default:
+          throw new Error(`Unknown step: ${step.id}`);
       }
 
-      if (eip.id === 'eip-1193') {
-        await testEIP1193(results);
-      } else if (eip.id === 'eip-2700') {
-        testEIP2700(results);
-      } else if (eip.id === 'eip-6963') {
-        testEIP6963(results);
-      } else if (eip.id === 'eip-5792') {
-        await testEIP5792(results);
+      stepTestState.stepResults[step.id] = result;
+
+      // If passed and not the last step, auto-advance
+      if (result.status === 'passed' && stepTestState.currentStepIndex < testSteps.length - 1) {
+        stepTestState.currentStepIndex++;
       }
 
-      eipState.results[eip.id] = results;
-
-      // Analyze results and show modal
-      analyzeAndShowResults(eip, results);
+      // Check if all steps completed
+      if (stepTestState.currentStepIndex === testSteps.length - 1 && result.status === 'passed') {
+        stepTestState.overallStatus = 'completed';
+        showFinalResults();
+      } else if (result.status === 'failed') {
+        stepTestState.overallStatus = 'failed';
+      } else {
+        stepTestState.overallStatus = 'idle';
+      }
     } catch (error) {
-      eipState.error = error instanceof Error ? error.message : 'EIP testing failed';
-    } finally {
-      eipState.isTesting = false;
-      eipState.activeId = null;
+      const errorMsg = error instanceof Error ? error.message : 'Step execution failed';
+      stepTestState.stepResults[step.id] = createStepResult(step, 'failed', [], errorMsg);
+      stepTestState.error = errorMsg;
+      stepTestState.overallStatus = 'failed';
     }
   }
 
-  function analyzeAndShowResults(eip: EIPTest, results: Record<string, EIPTestStatus>) {
-    // Find all critical (required) checks that failed
-    const failedChecks: Array<{ name: string; description: string }> = [];
+  function showFinalResults() {
+    const allResults = testSteps.map((step) => stepTestState.stepResults[step.id]).filter(Boolean);
+    const allPassed = allResults.every((r) => r.status === 'passed');
 
-    for (const check of eip.checks) {
-      if (check.critical) {
-        const status = results[check.id];
-
-        if (status === 'fail' || status === 'untested') {
-          failedChecks.push({
-            name: check.name,
-            description: check.description,
-          });
-        }
-      }
-    }
-
-    // Test passes if all required checks passed
-    const passed = failedChecks.length === 0;
-
-    // Show results modal
-    eipState.resultsModal.eipId = eip.id;
-    eipState.resultsModal.passed = passed;
-    eipState.resultsModal.failedChecks = failedChecks;
-    eipState.resultsModal.isOpen = true;
+    stepTestState.resultsModal.overallPassed = allPassed;
+    stepTestState.resultsModal.stepResults = allResults;
+    stepTestState.resultsModal.isOpen = true;
   }
 
-  async function testEIP1193(results: Record<string, EIPTestStatus>) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Provider type from window.ethereum is unknown, we need to assert its shape
+  function resetStepTests() {
+    stepTestState.currentStepIndex = 0;
+    stepTestState.overallStatus = 'idle';
+    stepTestState.error = '';
+    stepTestState.stepResults = {};
+    stepTestState.selectedProviderId = null;
+    stepTestState.connectedAddress = null;
+    stepTestState.chainId = null;
+    stepTestState.batchId = null;
+  }
+
+  // Step 1: Wallet Detection
+  async function runStep1Detection(step: TestStep): Promise<StepResult> {
+    const eipResults: EIPTestResult[] = [];
+
+    // Re-request providers to ensure we have the latest
+    window.dispatchEvent(new Event('eip6963:requestProvider'));
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // EIP-6963 checks
+    const eip6963Checks: EIPCheckResult[] = [];
+    const hasProviders = stepTestState.discoveredProviders.length > 0;
+
+    eip6963Checks.push({
+      id: 'announces-provider',
+      name: 'Provider announcement',
+      description: 'Wallet announces itself via eip6963:announceProvider event',
+      passed: hasProviders,
+      detail: hasProviders ? `Found ${stepTestState.discoveredProviders.length} provider(s)` : 'No providers discovered',
+    });
+
+    eip6963Checks.push({
+      id: 'responds-to-request',
+      name: 'Responds to discovery',
+      description: 'Wallet responds to eip6963:requestProvider event',
+      passed: hasProviders,
+    });
+
+    if (hasProviders) {
+      const provider = stepTestState.discoveredProviders[0];
+
+      eip6963Checks.push({
+        id: 'has-provider-info',
+        name: 'Provider info object',
+        description: 'Includes valid provider info (uuid, name, icon, rdns)',
+        passed: !!(provider.name && provider.uuid && provider.rdns),
+        detail: provider.name || 'Unknown',
+      });
+
+      eip6963Checks.push({
+        id: 'valid-icon',
+        name: 'Valid icon URI',
+        description: 'Provider icon is a valid data URI or HTTPS URL',
+        passed: provider.icon?.startsWith('data:') || provider.icon?.startsWith('https://'),
+      });
+
+      const rdnsRegex = /^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$/i;
+      eip6963Checks.push({
+        id: 'rdns-format',
+        name: 'RDNS format',
+        description: 'Provider rdns follows reverse domain name format',
+        passed: rdnsRegex.test(provider.rdns),
+        detail: provider.rdns,
+      });
+
+      // Auto-select first provider
+      stepTestState.selectedProviderId = provider.uuid;
+    }
+
+    eipResults.push(createEIPResult('EIP-6963', 'Multi Injected Provider Discovery', 'https://eips.ethereum.org/EIPS/eip-6963', eip6963Checks));
+
+    // EIP-1193 basic checks
+    const eip1193Checks: EIPCheckResult[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    const rawProvider = getProvider() as { request?: unknown } | null;
+    const providerExists = !!rawProvider || hasProviders;
+
+    eip1193Checks.push({
+      id: 'has-provider',
+      name: 'Provider exists',
+      description: 'window.ethereum or provider discovered via EIP-6963',
+      passed: providerExists,
+    });
+
+    eip1193Checks.push({
+      id: 'has-request',
+      name: 'request() method',
+      description: 'Provider implements the request(args) method',
+      passed: providerExists && typeof rawProvider?.request === 'function',
+    });
+
+    eipResults.push(createEIPResult('EIP-1193', 'Ethereum Provider JavaScript API', 'https://eips.ethereum.org/EIPS/eip-1193', eip1193Checks));
+
+    // Step passes if we found at least one provider
+    const stepPassed = hasProviders || providerExists;
+    return createStepResult(step, stepPassed ? 'passed' : 'failed', eipResults);
+  }
+
+  // Step 2: Connect Wallet
+  async function runStep2Connect(step: TestStep): Promise<StepResult> {
+    const eipResults: EIPTestResult[] = [];
+    const eip1193Checks: EIPCheckResult[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const provider = getProvider() as {
       request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
       on?: (event: string, listener: () => void) => void;
       removeListener?: (event: string, listener: () => void) => void;
     } | null;
 
-    // Check provider existence
-    results['has-provider'] = provider ? 'pass' : 'fail';
+    if (!provider) {
+      return createStepResult(step, 'failed', [], 'No provider found');
+    }
 
-    if (!provider) return;
+    // Check on() method
+    eip1193Checks.push({
+      id: 'has-on',
+      name: 'on() method',
+      description: 'Provider implements the on(eventName, listener) method',
+      passed: typeof provider.on === 'function',
+    });
 
-    // Check request method
-    results['has-request'] = typeof provider.request === 'function' ? 'pass' : 'fail';
+    // Check removeListener() method
+    eip1193Checks.push({
+      id: 'has-removeListener',
+      name: 'removeListener() method',
+      description: 'Provider implements the removeListener(eventName, listener) method',
+      passed: typeof provider.removeListener === 'function',
+    });
 
-    // Check on method
-    results['has-on'] = typeof provider.on === 'function' ? 'pass' : 'fail';
-
-    // Check removeListener method
-    results['has-removeListener'] =
-      typeof provider.removeListener === 'function' ? 'pass' : 'fail';
-
-    // Check event support (we can only check if the methods exist, not if events actually fire)
-    results['supports-accountsChanged'] = typeof provider.on === 'function' ? 'pass' : 'fail';
-    results['supports-chainChanged'] = typeof provider.on === 'function' ? 'pass' : 'fail';
-    results['supports-connect'] = typeof provider.on === 'function' ? 'pass' : 'fail';
-    results['supports-disconnect'] = typeof provider.on === 'function' ? 'pass' : 'fail';
+    // Actually connect via eth_requestAccounts
+    let connectPassed = false;
+    let connectDetail = '';
 
     try {
       if (provider.request) {
-        await provider.request({ method: 'eth_accounts' });
-        results['eth-accounts'] = 'pass';
-      } else {
-        results['eth-accounts'] = 'fail';
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+        const accounts = (await provider.request({ method: 'eth_requestAccounts' })) as string[];
+        if (accounts && accounts.length > 0) {
+          connectPassed = true;
+          stepTestState.connectedAddress = accounts[0];
+          connectDetail = `Connected: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+        } else {
+          connectDetail = 'No accounts returned';
+        }
       }
-    } catch {
-      results['eth-accounts'] = 'fail';
+    } catch (error) {
+      connectDetail = error instanceof Error ? error.message : 'Connection rejected';
     }
 
-    try {
-      if (provider.request) {
-        await provider.request({ method: 'eth_requestAccounts' });
-        results['eth-requestAccounts'] = 'pass';
-      } else {
-        results['eth-requestAccounts'] = 'fail';
-      }
-    } catch {
-      results['eth-requestAccounts'] = 'fail';
-    }
+    eip1193Checks.push({
+      id: 'eth-requestAccounts',
+      name: 'eth_requestAccounts',
+      description: 'Successfully prompts user to connect and returns accounts',
+      passed: connectPassed,
+      detail: connectDetail,
+    });
+
+    eipResults.push(createEIPResult('EIP-1193', 'Ethereum Provider JavaScript API', 'https://eips.ethereum.org/EIPS/eip-1193', eip1193Checks));
+
+    return createStepResult(step, connectPassed ? 'passed' : 'failed', eipResults);
   }
 
-  function testEIP2700(results: Record<string, EIPTestStatus>) {
-    const rawProvider = getProvider();
+  // Step 3: Check Account
+  async function runStep3Account(step: TestStep): Promise<StepResult> {
+    const eipResults: EIPTestResult[] = [];
+    const eip1193Checks: EIPCheckResult[] = [];
 
-    if (!rawProvider) {
-      // Mark all as fail if no provider
-      results['has-on'] = 'fail';
-      results['has-removeListener'] = 'fail';
-      results['has-addListener'] = 'fail';
-      results['has-removeAllListeners'] = 'fail';
-      results['has-listeners'] = 'fail';
-      results['has-once'] = 'fail';
-      results['has-emit'] = 'fail';
-      results['supports-message-event'] = 'fail';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    const provider = getProvider() as {
+      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+      on?: (event: string, listener: () => void) => void;
+    } | null;
 
-      return;
+    if (!provider?.request) {
+      return createStepResult(step, 'failed', [], 'No provider found');
     }
 
-    // Type assertion needed to access EventEmitter methods required by EIP-2700
-    const provider = rawProvider as {
+    // Call eth_accounts
+    let accountsPassed = false;
+    let accountsDetail = '';
+    let returnedAddress = '';
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      const accounts = (await provider.request({ method: 'eth_accounts' })) as string[];
+      if (accounts && accounts.length > 0) {
+        accountsPassed = true;
+        returnedAddress = accounts[0];
+        accountsDetail = `${accounts.length} account(s) returned`;
+      } else {
+        accountsDetail = 'No accounts returned (wallet may be disconnected)';
+      }
+    } catch (error) {
+      accountsDetail = error instanceof Error ? error.message : 'Failed to get accounts';
+    }
+
+    eip1193Checks.push({
+      id: 'eth-accounts',
+      name: 'eth_accounts',
+      description: 'Returns connected account addresses',
+      passed: accountsPassed,
+      detail: accountsDetail,
+    });
+
+    // Validate address format
+    const addressRegex = /^0x[a-fA-F0-9]{40}$/;
+    const validAddress = addressRegex.test(returnedAddress);
+
+    eip1193Checks.push({
+      id: 'valid-address',
+      name: 'Valid address format',
+      description: 'Returned address is a valid Ethereum address (0x + 40 hex chars)',
+      passed: validAddress,
+      detail: validAddress ? returnedAddress : 'Invalid or no address',
+    });
+
+    // Check accountsChanged event subscription
+    let eventSubscribable = false;
+    try {
+      if (typeof provider.on === 'function') {
+        const noop = () => {};
+        provider.on('accountsChanged', noop);
+        eventSubscribable = true;
+      }
+    } catch {
+      eventSubscribable = false;
+    }
+
+    eip1193Checks.push({
+      id: 'accountsChanged-event',
+      name: 'accountsChanged event',
+      description: 'Can subscribe to accountsChanged event',
+      passed: eventSubscribable,
+    });
+
+    eipResults.push(createEIPResult('EIP-1193', 'Ethereum Provider JavaScript API', 'https://eips.ethereum.org/EIPS/eip-1193', eip1193Checks));
+
+    const stepPassed = accountsPassed && validAddress;
+    return createStepResult(step, stepPassed ? 'passed' : 'failed', eipResults);
+  }
+
+  // Step 4: Check Network
+  async function runStep4Network(step: TestStep): Promise<StepResult> {
+    const eipResults: EIPTestResult[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    const provider = getProvider() as {
+      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
       on?: (event: string, listener: (...args: unknown[]) => void) => unknown;
       removeListener?: (event: string, listener: (...args: unknown[]) => void) => unknown;
-      addListener?: (event: string, listener: (...args: unknown[]) => void) => unknown;
-      removeAllListeners?: (event?: string) => unknown;
-      listeners?: (event: string) => unknown;
       once?: (event: string, listener: (...args: unknown[]) => void) => unknown;
-      emit?: (event: string, ...args: unknown[]) => unknown;
-    };
+      removeAllListeners?: (event?: string) => unknown;
+    } | null;
 
-    // Check on method
-    results['has-on'] = typeof provider.on === 'function' ? 'pass' : 'fail';
-
-    // Check removeListener method
-    results['has-removeListener'] =
-      typeof provider.removeListener === 'function' ? 'pass' : 'fail';
-
-    // Check addListener method (alias for on)
-    results['has-addListener'] = typeof provider.addListener === 'function' ? 'pass' : 'fail';
-
-    // Check removeAllListeners method
-    results['has-removeAllListeners'] =
-      typeof provider.removeAllListeners === 'function' ? 'pass' : 'fail';
-
-    // Check listeners method
-    results['has-listeners'] = typeof provider.listeners === 'function' ? 'pass' : 'fail';
-
-    // Check once method
-    results['has-once'] = typeof provider.once === 'function' ? 'pass' : 'fail';
-
-    // Check emit method
-    results['has-emit'] = typeof provider.emit === 'function' ? 'pass' : 'fail';
-
-    // Test message event support (we can only check if the on method exists for now)
-    results['supports-message-event'] = typeof provider.on === 'function' ? 'pass' : 'fail';
-  }
-
-  function testEIP6963(results: Record<string, EIPTestStatus>) {
-    // Check if any providers were discovered
-    results['announces-provider'] =
-      eipState.discoveredProviders.length > 0 ? 'pass' : 'fail';
-    results['responds-to-request'] =
-      eipState.discoveredProviders.length > 0 ? 'pass' : 'fail';
-
-    if (eipState.discoveredProviders.length > 0) {
-      const provider = eipState.discoveredProviders[0];
-
-      // Check provider info
-      results['has-provider-info'] =
-        provider.name && provider.uuid && provider.rdns ? 'pass' : 'fail';
-
-      // Check UUID
-      results['unique-uuid'] = provider.uuid && provider.uuid.length > 0 ? 'pass' : 'fail';
-
-      // Check icon
-      results['valid-icon'] =
-        provider.icon &&
-        (provider.icon.startsWith('data:') || provider.icon.startsWith('https://'))
-          ? 'pass'
-          : 'fail';
-
-      // Check RDNS format (should be reverse domain name like com.example.wallet)
-      const rdnsRegex = /^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$/i;
-
-      results['rdns-format'] = rdnsRegex.test(provider.rdns) ? 'pass' : 'fail';
-    } else {
-      results['has-provider-info'] = 'fail';
-      results['unique-uuid'] = 'fail';
-      results['valid-icon'] = 'fail';
-      results['rdns-format'] = 'fail';
+    if (!provider?.request) {
+      return createStepResult(step, 'failed', [], 'No provider found');
     }
+
+    // EIP-1193 checks
+    const eip1193Checks: EIPCheckResult[] = [];
+
+    // Get chain ID
+    let chainIdPassed = false;
+    let chainIdDetail = '';
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      const chainIdHex = (await provider.request({ method: 'eth_chainId' })) as string;
+      if (chainIdHex) {
+        const chainId = parseInt(chainIdHex, 16);
+        stepTestState.chainId = chainId;
+        chainIdPassed = true;
+        chainIdDetail = `Chain ID: ${chainId} (${chainIdHex})`;
+      }
+    } catch (error) {
+      chainIdDetail = error instanceof Error ? error.message : 'Failed to get chain ID';
+    }
+
+    eip1193Checks.push({
+      id: 'eth-chainId',
+      name: 'eth_chainId',
+      description: 'Returns current chain ID',
+      passed: chainIdPassed,
+      detail: chainIdDetail,
+    });
+
+    // Check chainChanged event
+    let chainEventSubscribable = false;
+    try {
+      if (typeof provider.on === 'function') {
+        const noop = () => {};
+        provider.on('chainChanged', noop);
+        chainEventSubscribable = true;
+      }
+    } catch {
+      chainEventSubscribable = false;
+    }
+
+    eip1193Checks.push({
+      id: 'chainChanged-event',
+      name: 'chainChanged event',
+      description: 'Can subscribe to chainChanged event',
+      passed: chainEventSubscribable,
+    });
+
+    eipResults.push(createEIPResult('EIP-1193', 'Ethereum Provider JavaScript API', 'https://eips.ethereum.org/EIPS/eip-1193', eip1193Checks));
+
+    // EIP-2700 EventEmitter checks
+    const eip2700Checks: EIPCheckResult[] = [];
+
+    eip2700Checks.push({
+      id: 'has-on',
+      name: 'on() method',
+      description: 'Provider implements on(eventName, listener)',
+      passed: typeof provider.on === 'function',
+    });
+
+    eip2700Checks.push({
+      id: 'has-removeListener',
+      name: 'removeListener() method',
+      description: 'Provider implements removeListener(eventName, listener)',
+      passed: typeof provider.removeListener === 'function',
+    });
+
+    eip2700Checks.push({
+      id: 'has-once',
+      name: 'once() method',
+      description: 'Provider implements once(eventName, listener)',
+      passed: typeof provider.once === 'function',
+    });
+
+    eip2700Checks.push({
+      id: 'has-removeAllListeners',
+      name: 'removeAllListeners() method',
+      description: 'Provider implements removeAllListeners([eventName])',
+      passed: typeof provider.removeAllListeners === 'function',
+    });
+
+    eipResults.push(createEIPResult('EIP-2700', 'JavaScript Provider Event Emitter', 'https://eips.ethereum.org/EIPS/eip-2700', eip2700Checks));
+
+    // Step passes if chain ID was retrieved
+    return createStepResult(step, chainIdPassed ? 'passed' : 'failed', eipResults);
   }
 
-  async function testEIP5792(results: Record<string, EIPTestStatus>) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Provider type from window.ethereum is unknown, we need to assert its shape
+  // Step 5: Send Batch Calls
+  async function runStep5BatchSend(step: TestStep): Promise<StepResult> {
+    const eipResults: EIPTestResult[] = [];
+    const eip5792Checks: EIPCheckResult[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const provider = getProvider() as {
       request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
     } | null;
 
-    if (!provider || !provider.request) {
-      // Mark all as fail if no provider
-      results['has-sendCalls'] = 'fail';
-      results['has-getCallsStatus'] = 'fail';
-      results['has-showCallsStatus'] = 'fail';
-      results['has-getCapabilities'] = 'fail';
-      results['atomicity-support'] = 'fail';
-      results['atomicity-enforcement'] = 'untested';
-
-      return;
+    if (!provider?.request) {
+      return createStepResult(step, 'failed', [], 'No provider found');
     }
 
-    // Test wallet_getCapabilities
+    const connectedAddress = stepTestState.connectedAddress || account?.address;
+    if (!connectedAddress) {
+      return createStepResult(step, 'failed', [], 'No connected address');
+    }
+
+    // Check wallet_getCapabilities
+    let capabilitiesPassed = false;
+    let atomicitySupported = false;
+    let capabilitiesDetail = '';
+
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Return type of wallet_getCapabilities is unknown, we need to assert its expected shape
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const capabilities = (await provider.request({
         method: 'wallet_getCapabilities',
-        params: [account?.address],
+        params: [connectedAddress],
       })) as Record<string, { atomicBatch?: { supported: boolean } }>;
 
-      results['has-getCapabilities'] = 'pass';
+      capabilitiesPassed = true;
+      capabilitiesDetail = 'Capabilities retrieved';
 
-      // Check for atomicity support
-      const chainId = account?.chainId?.toString() || '0x1';
-      const hasAtomicBatch = capabilities?.[chainId]?.atomicBatch?.supported === true;
-
-      results['atomicity-support'] = hasAtomicBatch ? 'pass' : 'fail';
-    } catch {
-      results['has-getCapabilities'] = 'fail';
-      results['atomicity-support'] = 'untested';
+      // Check atomicity for current chain
+      const chainIdHex = stepTestState.chainId ? `0x${stepTestState.chainId.toString(16)}` : '0x1';
+      atomicitySupported = capabilities?.[chainIdHex]?.atomicBatch?.supported === true;
+    } catch (error) {
+      capabilitiesDetail = error instanceof Error ? error.message : 'Method not supported';
     }
 
-    // Test wallet_sendCalls (just check if method exists, don't actually send)
+    eip5792Checks.push({
+      id: 'has-getCapabilities',
+      name: 'wallet_getCapabilities',
+      description: 'Provider implements wallet_getCapabilities method',
+      passed: capabilitiesPassed,
+      detail: capabilitiesDetail,
+    });
+
+    eip5792Checks.push({
+      id: 'atomicity-support',
+      name: 'Atomicity support',
+      description: 'Wallet declares atomicBatch capability',
+      passed: atomicitySupported,
+      detail: atomicitySupported ? 'Atomic batching supported' : 'Not supported or not declared',
+    });
+
+    // Actually send batched calls
+    let sendCallsPassed = false;
+    let sendCallsDetail = '';
+
     try {
-      // We can't actually test this without sending a transaction
-      // So we check if the error message indicates the method exists but params are wrong
-      await provider.request({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      const result = (await provider.request({
         method: 'wallet_sendCalls',
         params: [
           {
             version: '2.0.0',
-            chainId: '0x1',
-            from: account?.address || '0x0000000000000000000000000000000000000000',
+            chainId: stepTestState.chainId ? `0x${stepTestState.chainId.toString(16)}` : '0x1',
+            from: connectedAddress,
+            atomicRequired: false, // Required for EIP-5792 v2.0.0
             calls: [
               {
                 to: '0x0000000000000000000000000000000000000000',
@@ -623,50 +894,118 @@ Issued At: ${new Date().toISOString()}`;
                 value: '0x0',
               },
             ],
-            atomicRequired: false,
           },
         ],
-      });
-      results['has-sendCalls'] = 'pass';
-    } catch (error) {
-      // If error mentions invalid params, method exists
-      const errorMessage = error instanceof Error ? error.message.toLowerCase() : '';
+      })) as string;
 
-      results['has-sendCalls'] =
-        errorMessage.includes('param') || errorMessage.includes('argument')
-          ? 'partial'
-          : 'fail';
+      if (result) {
+        sendCallsPassed = true;
+        stepTestState.batchId = result;
+        sendCallsDetail = `Batch ID: ${result.slice(0, 16)}...`;
+      }
+    } catch (error) {
+			console.log(error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      // Check if it's a user rejection vs method not supported
+      if (errorMsg.toLowerCase().includes('reject') || errorMsg.toLowerCase().includes('denied')) {
+        sendCallsDetail = 'User rejected the transaction';
+      } else if (errorMsg.toLowerCase().includes('not supported') || errorMsg.toLowerCase().includes('not implemented')) {
+        sendCallsDetail = 'wallet_sendCalls not supported by this wallet';
+      } else {
+        sendCallsDetail = errorMsg;
+      }
     }
 
-    // Test wallet_getCallsStatus
+    eip5792Checks.push({
+      id: 'has-sendCalls',
+      name: 'wallet_sendCalls',
+      description: 'Successfully sends batched calls and returns batch ID',
+      passed: sendCallsPassed,
+      detail: sendCallsDetail,
+    });
+
+    eipResults.push(createEIPResult('EIP-5792', 'Wallet Function Call API', 'https://eips.ethereum.org/EIPS/eip-5792', eip5792Checks));
+
+    return createStepResult(step, sendCallsPassed ? 'passed' : 'failed', eipResults);
+  }
+
+  // Step 6: Check Batch Status
+  async function runStep6BatchStatus(step: TestStep): Promise<StepResult> {
+    const eipResults: EIPTestResult[] = [];
+    const eip5792Checks: EIPCheckResult[] = [];
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    const provider = getProvider() as {
+      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+    } | null;
+
+    if (!provider?.request) {
+      return createStepResult(step, 'failed', [], 'No provider found');
+    }
+
+    if (!stepTestState.batchId) {
+      return createStepResult(step, 'failed', [], 'No batch ID from previous step');
+    }
+
+    // Check wallet_getCallsStatus
+    let statusPassed = false;
+    let statusDetail = '';
+    let validResponse = false;
+
     try {
-      await provider.request({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      const status = (await provider.request({
         method: 'wallet_getCallsStatus',
-        params: ['0x1234567890abcdef'],
-      });
-      results['has-getCallsStatus'] = 'pass';
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message.toLowerCase() : '';
+        params: [stepTestState.batchId],
+      })) as { status: string; receipts?: unknown[] };
 
-      results['has-getCallsStatus'] =
-        errorMessage.includes('param') || errorMessage.includes('argument') || errorMessage.includes('not found')
-          ? 'partial'
-          : 'fail';
+      statusPassed = true;
+      statusDetail = `Status: ${status.status}`;
+
+      // Validate response structure
+      validResponse = typeof status.status === 'string';
+    } catch (error) {
+      statusDetail = error instanceof Error ? error.message : 'Failed to get status';
     }
 
-    // Test wallet_showCallsStatus (optional method)
+    eip5792Checks.push({
+      id: 'has-getCallsStatus',
+      name: 'wallet_getCallsStatus',
+      description: 'Successfully retrieves batch status',
+      passed: statusPassed,
+      detail: statusDetail,
+    });
+
+    eip5792Checks.push({
+      id: 'valid-status-response',
+      name: 'Valid status response',
+      description: 'Status response includes expected fields (status, receipts)',
+      passed: validResponse,
+    });
+
+    // Test wallet_showCallsStatus (optional)
+    let showStatusPassed = false;
     try {
       await provider.request({
         method: 'wallet_showCallsStatus',
-        params: [''],
+        params: [stepTestState.batchId],
       });
-      results['has-showCallsStatus'] = 'pass';
+      showStatusPassed = true;
     } catch {
-      results['has-showCallsStatus'] = 'fail';
+      showStatusPassed = false;
     }
 
-    // Atomicity enforcement test requires actual transaction testing
-    results['atomicity-enforcement'] = 'untested';
+    eip5792Checks.push({
+      id: 'has-showCallsStatus',
+      name: 'wallet_showCallsStatus',
+      description: 'Provider implements wallet_showCallsStatus (optional)',
+      passed: showStatusPassed,
+      detail: showStatusPassed ? 'Supported' : 'Not supported (optional)',
+    });
+
+    eipResults.push(createEIPResult('EIP-5792', 'Wallet Function Call API', 'https://eips.ethereum.org/EIPS/eip-5792', eip5792Checks));
+
+    return createStepResult(step, statusPassed ? 'passed' : 'failed', eipResults);
   }
 
   // Update SIWE message when account changes
@@ -739,10 +1078,6 @@ Issued At: ${new Date().toISOString()}`;
             }
           } else if (tab === 'eip-support') {
             uiState.activeTab = 'eip-support';
-
-            if (!uiState.selectedEipId && eipTests.length) {
-              uiState.selectedEipId = eipTests[0].id;
-            }
           }
         }}
       >
@@ -777,13 +1112,22 @@ Issued At: ${new Date().toISOString()}`;
             />
           {/each}
         {:else if uiState.activeTab === 'eip-support'}
-          {#each eipTests as eipTest (eipTest.id)}
+          {#each testSteps as step, index (step.id)}
+            {@const status = getStepStatus(step.id)}
+            {@const isCurrent = stepTestState.currentStepIndex === index}
+            {@const isClickable = canRunStep(index)}
             <SideBarItem
-              title={eipTest.eipNumber}
-              description={eipTest.description}
-              isSelected={uiState.selectedEipId === eipTest.id}
-              isCompleted={!!eipState.results[eipTest.id]}
-              onclick={() => (uiState.selectedEipId = eipTest.id)}
+              title={`${step.stepNumber}. ${step.name}`}
+              description={step.eips.map((e) => e.eipNumber).join(', ')}
+              isSelected={isCurrent}
+              isCompleted={status === 'passed'}
+              isFailed={status === 'failed'}
+              isDisabled={!isClickable && !isCurrent}
+              onclick={() => {
+                if (isClickable || status === 'passed' || status === 'failed') {
+                  stepTestState.currentStepIndex = index;
+                }
+              }}
             />
           {/each}
         {/if}
@@ -812,8 +1156,16 @@ Issued At: ${new Date().toISOString()}`;
           onSignTypedData={handleSignTypedData}
         />
       {:else if uiState.activeTab === 'eip-support'}
-        {@const selectedEip = eipTests.find((eip) => eip.id === uiState.selectedEipId)}
-        <EIPSupportTab {selectedEip} {eipState} {account} onTestEIPSupport={testEIPSupport} />
+        {@const currentStep = getCurrentStep()}
+        {@const currentStepResult = stepTestState.stepResults[currentStep.id]}
+        <EIPSupportTab
+          {currentStep}
+          {currentStepResult}
+          {stepTestState}
+          {account}
+          onRunStep={runCurrentStep}
+          onReset={resetStepTests}
+        />
       {/if}
     </div>
   </div>
@@ -845,14 +1197,14 @@ Issued At: ${new Date().toISOString()}`;
   <ErrorComponent error={chainState.error} onClose={() => (chainState.error = '')} />
   <ErrorComponent error={transactionState.error} onClose={() => (transactionState.error = '')} />
   <ErrorComponent error={signatureState.error} onClose={() => (signatureState.error = '')} />
-  <ErrorComponent error={eipState.error} onClose={() => (eipState.error = '')} />
+  <ErrorComponent error={stepTestState.error} onClose={() => (stepTestState.error = '')} />
 
   <!-- EIP Results Modal -->
   <EIPResultsModal
-    isOpen={eipState.resultsModal.isOpen}
-    passed={eipState.resultsModal.passed}
-    failedChecks={eipState.resultsModal.failedChecks}
-    onClose={() => (eipState.resultsModal.isOpen = false)}
+    isOpen={stepTestState.resultsModal.isOpen}
+    overallPassed={stepTestState.resultsModal.overallPassed}
+    stepResults={stepTestState.resultsModal.stepResults}
+    onClose={() => (stepTestState.resultsModal.isOpen = false)}
   />
 </section>
 
