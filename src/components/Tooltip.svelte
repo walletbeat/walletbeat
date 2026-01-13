@@ -48,7 +48,7 @@
 		hideDelay?: number
 		TooltipContent: Snippet
 		isEnabled?: boolean
-		children: Snippet
+		children?: Snippet
 	} = $props()
 
 
@@ -180,7 +180,9 @@
 				{@attach useButtonTrigger}
 			></button>
 
-			{@render children()}
+			{#if children}
+				{@render children()}
+			{/if}
 		</div>
 
 		{@render Popover()}
@@ -195,13 +197,17 @@
 			{...hoverTriggerEvents}
 			{@attach useButtonTrigger}
 		>
-			{@render children()}
+			{#if children}
+				{@render children()}
+			{/if}
 
 			{@render Popover()}
 		</button>
 	{/if}
 {:else}
-	{@render children()}
+	{#if children}
+		{@render children()}
+	{/if}
 {/if}
 
 
