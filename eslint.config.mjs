@@ -228,7 +228,7 @@ export default [
 		files: ['**/*.svelte'],
 		rules: {
 			// Allow imports from the same file across multiple groups.
-			'import/no-duplicates': 'warn',
+			'import/no-duplicates': 'off',
 
 			// Not useful for props.
 			'prefer-const': 'off',
