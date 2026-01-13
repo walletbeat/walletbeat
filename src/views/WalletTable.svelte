@@ -135,7 +135,7 @@
 		new SvelteSet<Filter<RatedWallet>>()
 	)
 
-	let filteredWallets = $state(
+	let filteredWallets = $derived(
 		wallets
 	)
 
@@ -209,9 +209,7 @@
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-	import { getAttributeStages, isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
-	import { ladders, WalletLadderType } from '@/schema/ladders'
-	import WalletStageBadge from './WalletStageBadge.svelte'
+	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
 
 	// Actions
@@ -259,6 +257,7 @@
 	import WalletAttributeGroupSummary, { WalletAttributeGroupSummaryType } from '@/views/WalletAttributeGroupSummary.svelte'
 	import WalletAttributeSummary, { WalletAttributeSummaryType } from '@/views/WalletAttributeSummary.svelte'
 	import WalletOverallSummary, { WalletSummaryType } from '@/views/WalletOverallSummary.svelte'
+	import WalletStageBadge from './WalletStageBadge.svelte'
 
 
 	// Styles
