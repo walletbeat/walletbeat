@@ -6,7 +6,7 @@ import {
 	type WalletSecurityNews,
 } from '@/types/content/news'
 
-export const browserExtensionHack: WalletSecurityNews =  {
+export const browserExtensionHack: WalletSecurityNews = {
 	slug: 'browser-extension-v268-incident',
 	type: NewsType.HACK,
 	ref: {
@@ -25,7 +25,6 @@ export const browserExtensionHack: WalletSecurityNews =  {
 	title: 'Trust Wallet Browser Extension v2.68 Supply Chain Attack',
 	updatedAt: '2026-01-06',
 } as const
-
 
 export const trustWalletRegistry = {
 	'browser-extension-v268-incident': browserExtensionHack,

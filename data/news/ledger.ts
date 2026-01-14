@@ -1,6 +1,12 @@
-import { ImpactCategory, IncidentStatus, NewsType, Severity, type WalletSecurityNews } from '@/types/content/news'
-import { ledgerWalletMetadata } from '../hardware-wallets/ledger'
+import {
+	ImpactCategory,
+	IncidentStatus,
+	NewsType,
+	Severity,
+	type WalletSecurityNews,
+} from '@/types/content/news'
 
+import { ledgerWalletMetadata } from '../hardware-wallets/ledger'
 
 export const globalEBreach: WalletSecurityNews = {
 	slug: 'global-e-breach',
