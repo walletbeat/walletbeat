@@ -7,7 +7,7 @@
 	import type { TransitionConfig } from 'svelte/transition'
 
 	type TransitionFnAndParams<
-		Fn extends (node: Element, _?: any) => TransitionConfig = any
+		Fn extends (node: Element, _?: unknown) => TransitionConfig = (node: Element, _?: unknown) => TransitionConfig
 	> = (
 		Fn extends (node: Element, _?: infer Params) => TransitionConfig
 			? [Fn] | [Fn, Params | undefined]
