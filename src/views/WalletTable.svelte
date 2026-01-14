@@ -204,6 +204,7 @@
 	import { variantToName } from '@/constants/variants'
 	import { calculateAttributeGroupScore, calculateOverallScore, formatAttributeGroupTitleText } from '@/schema/attribute-groups'
 	import { evaluatedAttributesEntries, ratingToColor, formatAttributeTitleText } from '@/schema/attributes'
+	import { formatScore } from '@/schema/score'
 	import { isLabeledUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
@@ -1029,24 +1030,7 @@
 										{/if}
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<text>
-											{
-												score !== null && score.score !== null ?
-													`${
-														score.score === 0 ?
-															'\u{1f480}'
-														: score.score === 1 ?
-															'\u{1f4af}'
-														:
-															(score.score * 100).toFixed(0)
-													}${
-														score !== null && score.hasUnratedComponent ?
-															'*'
-														:
-															''
-													}`
-												:
-													'❔'
-											}
+											{formatScore(score)}
 										</text>
 									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
 										<circle
@@ -1253,19 +1237,7 @@
 										</text>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<text>
-											{
-												groupScore !== null && groupScore.score !== null ?
-													`${
-														groupScore.score === 0 ?
-															'\u{1f480}'
-														: groupScore.score === 1 ?
-															'\u{1f4af}'
-														:
-															(groupScore.score * 100).toFixed(0)
-													}${groupScore.hasUnratedComponent ? '*' : ''}`
-												:
-													'❔'
-											}
+											{formatScore(groupScore)}
 										</text>
 									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
 										<circle
