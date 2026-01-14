@@ -49,6 +49,7 @@
 	// Props
 	const {
 		// Content
+		title,
 		slices = [],
 		centerLabel,
 
@@ -391,6 +392,10 @@
 	data-layout={layout}
 >
 	<svg {...svgAttributes}>
+		{#if title}
+			<title>{title}</title>
+		{/if}
+
 		<g class="slices">
 			{#each computedSlices as slice (slice.id)}
 				{@render sliceSnippet(slice)}
