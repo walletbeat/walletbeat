@@ -28,6 +28,7 @@
 		attributeTree,
 		calculateAttributeGroupScore,
 		calculateOverallScore,
+		formatAttributeGroupTitleText,
 	} from '@/schema/attribute-groups'
 	import { toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
@@ -131,6 +132,10 @@
 	const overallScore = $derived(
 		calculateOverallScore(wallet.overall, () => true),
 	)
+
+
+	// Functions
+	import { formatAttributeTitleText } from '@/schema/attributes'
 
 
 	// Components
@@ -497,7 +502,7 @@
 				data-scroll-item="inline-detached"
 			>
 				<a data-link="camouflaged" href={`#${slugifyCamelCase(attrGroup.id)}`}>
-					<h2>
+					<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
 						{attrGroup.displayName}
 					</h2>
 				</a>
@@ -531,6 +536,8 @@
 							data-row-item="wrap-center"
 						>
 							<Pie
+								title={formatAttributeGroupTitleText(attrGroup, score, showScores)}
+
 								layout={PieLayout.FullTop}
 								radius={120}
 								padding={20}
@@ -540,6 +547,7 @@
 									gap: 8,
 									angleGap: 0,
 								}]}
+
 								slices={
 									attributes
 										.map(({ attribute, evalAttr }) => ({
@@ -547,8 +555,7 @@
 											color: ratingToColor(evalAttr.evaluation.value.rating),
 											weight: attrGroup.attributeWeights[attribute.id],
 											arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
-											tooltip: attribute.displayName,
-											tooltipValue: evalAttr.evaluation.value.rating,
+											titleText: formatAttributeTitleText(evalAttr),
 											href: `#${slugifyCamelCase(attribute.id)}`,
 										}))
 								}
@@ -565,7 +572,7 @@
 										r="8"
 										fill={scoreColor}
 									>
-										{#if score?.hasUnratedComponent}
+										{#if showScores && score?.hasUnratedComponent}
 											<title>
 												*contains unrated components
 											</title>
@@ -674,7 +681,10 @@
 					<div data-row-item="flexible basis-2">
 						<div data-row="start gap-2 wrap">
 							<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
-								<h3 data-icon={attribute.icon}>
+								<h3
+									data-icon={attribute.icon}
+									title={formatAttributeTitleText(evalAttr)}
+								>
 									{attribute.displayName}
 								</h3>
 							</a>

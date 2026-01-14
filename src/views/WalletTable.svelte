@@ -202,8 +202,8 @@
 
 	// Functions
 	import { variantToName } from '@/constants/variants'
-	import { calculateAttributeGroupScore, calculateOverallScore } from '@/schema/attribute-groups'
-	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
+	import { calculateAttributeGroupScore, calculateOverallScore, formatAttributeGroupTitleText } from '@/schema/attribute-groups'
+	import { evaluatedAttributesEntries, ratingToColor, formatAttributeTitleText } from '@/schema/attributes'
 	import { isLabeledUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
@@ -959,16 +959,10 @@
 												:
 													'var(--rating-unrated)'
 											),
-											tooltip: attrGroup.displayName,
-											tooltipValue: (
-												groupScore !== null && groupScore.score !== null ?
-													`${
-														(groupScore.score * 100).toFixed(0)
-													}%${
-														groupScore.hasUnratedComponent ? ' (has unrated components)' : ''
-													}`
-												:
-													'N/A'
+											titleText: formatAttributeGroupTitleText(
+												attrGroup,
+												groupScore,
+												summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.ScoreDot,
 											),
 											weight: 1,
 											...evalGroup && {
@@ -983,8 +977,7 @@
 															color: ratingToColor(attribute.evaluation.value.rating),
 															weight: attrGroup.attributeWeights[attributeId],
 															arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
-															tooltip: `${attribute.attribute.displayName}`,
-															tooltipValue: ratingIcons[attribute.evaluation.value.rating],
+															titleText: formatAttributeTitleText(attribute),
 														}))
 												),
 											},
@@ -1155,6 +1148,14 @@
 							}
 						>
 							<Pie
+								title={
+									formatAttributeGroupTitleText(
+										attrGroup,
+										groupScore,
+										summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.ScoreDot,
+									)
+								}
+
 								layout={PieLayout.FullTop}
 								radius={44}
 								levels={[
@@ -1199,8 +1200,7 @@
 												color: ratingToColor(attribute.evaluation.value.rating),
 												weight: attrGroup.attributeWeights[attributeId],
 												arcLabel: icon,
-												tooltip: `${icon} ${attribute.evaluation.value.displayName}${tooltipSuffix}`,
-												tooltipValue: ratingIcons[attribute.evaluation.value.rating],
+												titleText: formatAttributeTitleText(attribute, tooltipSuffix),
 											}
 										}
 									)
@@ -1325,6 +1325,8 @@
 							}
 						>
 							<Pie
+								title={formatAttributeTitleText(attribute)}
+
 								layout={PieLayout.HalfTop}
 								radius={24}
 								levels={
@@ -1360,8 +1362,7 @@
 												color: ratingToColor(attribute.evaluation.value.rating),
 												weight: 1,
 												arcLabel: attribute.icon,
-												tooltip: `${attribute.icon} ${attribute.displayName}`,
-												tooltipValue: attribute.evaluation.value.rating,
+												titleText: formatAttributeTitleText(attribute),
 											}
 										]
 									:
