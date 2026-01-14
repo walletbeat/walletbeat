@@ -12,6 +12,11 @@
 			hidePopover(): void
 		}
 	}
+
+	export enum TooltipLayoutMode {
+		FloatingUI = 'FloatingUI',
+		AnchorPositioning = 'AnchorPositioning',
+	}
 </script>
 
 
@@ -33,6 +38,7 @@
 		placement = 'block-end',
 		buttonTriggerPlacement = 'around',
 		hoverTriggerPlacement = 'around',
+		layoutMode = TooltipLayoutMode.FloatingUI,
 		offset = 8,
 		TooltipContent,
 		hideDelay = 200,
@@ -44,6 +50,7 @@
 		placement?: 'block-start' | 'block-end' | 'inline-start' | 'inline-end'
 		buttonTriggerPlacement?: 'around' | 'behind'
 		hoverTriggerPlacement?: 'around' | 'button'
+		layoutMode?: TooltipLayoutMode
 		offset?: number
 		hideDelay?: number
 		TooltipContent?: Snippet
@@ -83,7 +90,8 @@
 				node.style.removeProperty('position')
 		})
 
-		if (supportsAnchorPositioning) return
+		if (layoutMode === TooltipLayoutMode.AnchorPositioning && supportsAnchorPositioning)
+			return
 
 		const {
 			computePosition,
@@ -92,6 +100,11 @@
 			shift,
 			autoUpdate,
 		} = await import('@floating-ui/dom')
+
+		// Disable native anchor positioning
+		node.popoverTargetElement.style.position = 'absolute'
+		node.popoverTargetElement.style.setProperty('position-area', 'none')
+		node.popoverTargetElement.style.setProperty('position-anchor', anchorName)
 
 		const updatePosition = () => {
 			void computePosition(
@@ -107,7 +120,11 @@
 					middleware: [
 						offsetMiddleware(offset),
 						flip(),
-						shift(),
+						shift({
+							padding: offset * 2,
+							crossAxis: true,
+							mainAxis: true,
+						}),
 					],
 				}
 			)
@@ -236,6 +253,7 @@
 		position-visibility: anchors-visible;
 
 		margin: var(--offset);
+		width: max-content;
 
 		background-color: var(--popover-backgroundColor);
 		border-radius: 0.5rem;
