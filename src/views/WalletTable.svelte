@@ -247,7 +247,7 @@
 	import Filters from '@/components/Filters.svelte'
 	import Pie, { PieLayout } from '@/components/Pie.svelte'
 	import Select from '@/components/Select.svelte'
-	import Table, { SortDirection } from '@/components/Table.svelte'
+	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
@@ -482,9 +482,12 @@
 									const attrGroupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
 									return attrGroupScore === null ? null : attrGroupScore.score
 								},
+
 								sort: {
 									defaultDirection: SortDirection.Descending,
 								},
+
+								align: ColumnAlignment.Center,
 
 								subcolumns: (
 									Object.entries(attrGroup.attributes)
@@ -531,6 +534,8 @@
 							sort: {
 								defaultDirection: SortDirection.Descending,
 							},
+
+							align: ColumnAlignment.Center,
 						} satisfies Column<RatedWallet>]),
 
 						(
@@ -550,6 +555,8 @@
 										isDefault: true,
 										defaultDirection: SortDirection.Descending,
 									},
+
+									align: ColumnAlignment.Center,
 
 									subcolumns: attrGroupColumns,
 									isDefaultExpanded: true,
