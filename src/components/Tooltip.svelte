@@ -229,7 +229,7 @@
 		--popover-borderWidth: 1px;
 		--popover-boxShadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
 
-		position: absolute;
+		position: fixed;
 		position-area: block-end;
 		position-try-fallbacks: flip-block;
 		position-try-order: most-block-size;
