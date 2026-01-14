@@ -1,20 +1,19 @@
 import { attributeTree } from '@/schema/attribute-groups'
 import type { Attribute } from '@/schema/attributes'
 import { ladders, WalletLadderType } from '@/schema/ladders'
-import type { WalletStage, WalletStageCriterion } from '@/schema/stages'
+import {
+	getEvaluateFunctionAttributeId,
+	type WalletStage,
+	type WalletStageCriterion,
+} from '@/schema/stages'
+import { objectEntries } from '@/types/utils/object'
 
 /**
  * Get all stages across all ladders with their ladder type and index.
  */
-const allStages = (): Array<{
-	ladderType: WalletLadderType
-	stage: WalletStage
-	stageIndex: number
-}> =>
-	(Object.entries(ladders) as [WalletLadderType, (typeof ladders)[WalletLadderType]][]).flatMap(
-		([ladderType, ladder]) =>
-			ladder.stages.map((stage, stageIndex) => ({ ladderType, stage, stageIndex })),
-	)
+const allStages = objectEntries(ladders).flatMap(([ladderType, ladder]) =>
+	ladder.stages.map((stage, stageIndex) => ({ ladderType, stage, stageIndex })),
+)
 
 /**
  * Map of stage IDs to stage objects (using the first occurrence across all ladders).
@@ -48,11 +47,11 @@ const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
  * @param attribute The attribute to check
  * @returns true if the attribute is used in any stage criterion
  */
-export function isAttributeUsedInStages(attribute: Attribute<any>): boolean {
+export function isAttributeUsedInStages(attribute: Attribute): boolean {
 	// The attribute objects are referenced in the stage definitions via variantsMustPassAttribute
 	// We can check if the attribute ID appears in the ladder structure
 	// by serializing and checking for the attribute ID
-	const ladderString = JSON.stringify(ladders, (_, value) => {
+	const ladderString = JSON.stringify(ladders, (_, value: unknown) => {
 		// When we encounter an attribute object, include its ID
 		if (
 			value &&
@@ -76,7 +75,7 @@ export function isAttributeUsedInStages(attribute: Attribute<any>): boolean {
  * @param stage The stage to check
  * @returns true if the attribute is used in the stage
  */
-const isAttributeUsedInStageObject = (attribute: Attribute<any>, stage: WalletStage): boolean =>
+const isAttributeUsedInStageObject = (attribute: Attribute, stage: WalletStage): boolean =>
 	allCriteriaInStage(stage).some(criterion => getCriterionAttributeId(criterion) === attribute.id)
 
 /**
@@ -85,7 +84,7 @@ const isAttributeUsedInStageObject = (attribute: Attribute<any>, stage: WalletSt
  * @param stageId The stage ID to check
  * @returns true if the attribute is used in the stage
  */
-export const isAttributeUsedInStage = (attribute: Attribute<any>, stageId: string): boolean => {
+export const isAttributeUsedInStage = (attribute: Attribute, stageId: string): boolean => {
 	const stage = stagesById.get(stageId)
 
 	return stage !== undefined && isAttributeUsedInStageObject(attribute, stage)
@@ -97,9 +96,9 @@ export const isAttributeUsedInStage = (attribute: Attribute<any>, stageId: strin
  * @returns An array of objects containing ladder type and stage numbers where the attribute is used
  */
 export function getAttributeStages(
-	attribute: Attribute<any>,
+	attribute: Attribute,
 ): Array<{ ladderType: WalletLadderType; stageNumbers: number[] }> {
-	const stagesWithAttribute = allStages()
+	const stagesWithAttribute = allStages
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
 		.map(({ ladderType, stageIndex }) => ({ ladderType, stageIndex }))
 
@@ -120,37 +119,8 @@ export function getAttributeStages(
  * @param criterion The criterion to check
  * @returns The attribute ID if found, null otherwise
  */
-export function getCriterionAttributeId(criterion: {
-	evaluate: (wallet: any) => any
-}): string | null {
-	// First check if the evaluate function has the __attributeId property attached
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-	const attachedId = (criterion.evaluate as any).__attributeId
-
-	if (typeof attachedId === 'string') {
-		return attachedId
-	}
-
-	// Fallback to serialization for other cases
-	const criterionString = JSON.stringify(criterion, (_, value) => {
-		if (
-			value &&
-			typeof value === 'object' &&
-			'id' in value &&
-			'displayName' in value &&
-			'question' in value
-		) {
-			return { id: value.id, _isAttribute: true }
-		}
-
-		return value
-	})
-
-	// Try to extract the attribute ID from the serialized string
-	const attributeIdMatch = criterionString.match(/"id":"([^"]+)","_isAttribute":true/)
-
-	return attributeIdMatch ? attributeIdMatch[1] : null
-}
+export const getCriterionAttributeId = (criterion: WalletStageCriterion): string | null =>
+	getEvaluateFunctionAttributeId(criterion.evaluate)
 
 /**
  * Get all criteria that reference a specific attribute across all ladders.
@@ -158,9 +128,9 @@ export function getCriterionAttributeId(criterion: {
  * @returns An array of objects containing ladder type, stage number, and criterion
  */
 export function getAttributeCriteria(
-	attribute: Attribute<any>,
+	attribute: Attribute,
 ): Array<{ ladderType: WalletLadderType; stageNumber: number; criterion: WalletStageCriterion }> {
-	return allStages()
+	return allStages
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
 		.flatMap(({ ladderType, stage, stageIndex }) =>
 			allCriteriaInStage(stage)

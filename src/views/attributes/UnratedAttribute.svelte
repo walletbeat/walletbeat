@@ -23,7 +23,7 @@
 			: wallet.types.EMBEDDED ?
 				'embedded-wallets'
 			:
-				'' as never
+				''
 		}/${wallet.metadata.id}.ts`
 	)
 

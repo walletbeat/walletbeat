@@ -23,15 +23,14 @@ import GitHubIcon from 'lucide-static/icons/github.svg?raw'
 
 	<main data-sticky-container data-column='gap-8'>
 		<header data-sticky='inline' data-scroll-item='inline-detached padding-match-start'>
-			{/* @ts-expect-error - Astro type checking doesn't fully support Svelte 5 generics yet */}
 			<Typography
 				content={markdown(`
-						# EIP-7702 Adoption Tracker
+					# EIP-7702 Adoption Tracker
 
-						Which wallets implement [EIP-7702](https://eip.tools/eip/7702)? How compliant and standardized is their implementation? Which new 7702-enabled features does each wallet support?
+					Which wallets implement [EIP-7702](https://eip.tools/eip/7702)? How compliant and standardized is their implementation? Which new 7702-enabled features does each wallet support?
 
-						Inspired by [7702 Beat](https://swiss-knife.xyz/7702beat), from the great folks at [Swiss-Knife.xyz](https://swiss-knife.xyz). Also check out [BundleBear's EIP-7702 contract tracker](https://www.bundlebear.com/eip7702-authorized-contracts/all)!
-					`)}
+					Inspired by [7702 Beat](https://swiss-knife.xyz/7702beat), from the great folks at [Swiss-Knife.xyz](https://swiss-knife.xyz). Also check out [BundleBear's EIP-7702 contract tracker](https://www.bundlebear.com/eip7702-authorized-contracts/all)!
+				`)}
 			/>
 		</header>
 

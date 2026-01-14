@@ -32,24 +32,16 @@ export default [
 			// Ignore generated files
 			'src/generated/**',
 
-			// Ignore Svelte files with ESLint parser errors
-			'src/views/WalletPage.svelte',
-			'src/views/WalletTable.svelte',
-
-			// TEMP: Ignore files modified for stage system UI for Devconnect shipping
-			'src/components/BlockTransition.svelte',
-			'src/components/Filters.svelte',
-			'src/components/Select.svelte',
-			'src/components/Table.svelte',
-			'src/components/TableState.svelte.ts',
-			'src/components/Tooltip.svelte',
-			'src/schema/stages.ts',
-			'src/utils/stage-attributes.ts',
+			// Ignore Svelte files with ESLint errors due to inaccurate generic parameter type inference
 			'src/views/Eip7702Table.svelte',
-			'src/views/NavigationItems.svelte',
-			'src/views/WalletAttributeSummary.svelte',
+
+			// Ignore Svelte files with ESLint errors due to inaccurate parsing
+			'src/components/Filters.svelte',
+			'src/components/Table.svelte',
+			'src/views/WalletPage.svelte',
 			'src/views/WalletStageOverview.svelte',
-			'src/views/WalletStageSummary.svelte',
+			'src/views/WalletTable.svelte',
+			'src/views/attributes/security/SecurityAuditsDetails.svelte',
 		],
 	},
 	eslintPluginEslintComments.recommended,
@@ -228,7 +220,7 @@ export default [
 		files: ['**/*.svelte'],
 		rules: {
 			// Allow imports from the same file across multiple groups.
-			'import/no-duplicates': 'warn',
+			'import/no-duplicates': 'off',
 
 			// Not useful for props.
 			'prefer-const': 'off',
@@ -239,6 +231,9 @@ export default [
 
 			// {@html} is used for inline SVG icons.
 			'svelte/no-at-html-tags': 'off',
+
+			// Not useful in an Astro project.
+			'svelte/no-navigation-without-resolve': 'off',
 
 			// Prefer explicit `$state()` wrapping for `SvelteMap` / `SvelteSet`.
 			'svelte/no-unnecessary-state-wrap': 'off',

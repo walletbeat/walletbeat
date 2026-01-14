@@ -12,7 +12,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { Filter } from '@/components/Filters.svelte'
-	import type { Column } from '@/components/TableState.svelte'
+	import type { Column } from '@/components/Table.svelte'
 	import { variants } from '@/constants/variants'
 	import { eip7702 } from '@/data/eips/eip-7702'
 	import { erc4337 } from '@/data/eips/erc-4337'
@@ -135,7 +135,7 @@
 		new SvelteSet<Filter<RatedWallet>>()
 	)
 
-	let filteredWallets = $state(
+	let filteredWallets = $derived(
 		wallets
 	)
 
@@ -209,9 +209,7 @@
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
 	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
-	import { getAttributeStages, isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
-	import { ladders, WalletLadderType } from '@/schema/ladders'
-	import WalletStageBadge from './WalletStageBadge.svelte'
+	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
 
 
 	// Actions
@@ -249,7 +247,7 @@
 	import Filters from '@/components/Filters.svelte'
 	import Pie, { PieLayout } from '@/components/Pie.svelte'
 	import Select from '@/components/Select.svelte'
-	import Table from '@/components/Table.svelte'
+	import Table, { SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
@@ -259,6 +257,7 @@
 	import WalletAttributeGroupSummary, { WalletAttributeGroupSummaryType } from '@/views/WalletAttributeGroupSummary.svelte'
 	import WalletAttributeSummary, { WalletAttributeSummaryType } from '@/views/WalletAttributeSummary.svelte'
 	import WalletOverallSummary, { WalletSummaryType } from '@/views/WalletOverallSummary.svelte'
+	import WalletStageBadge from './WalletStageBadge.svelte'
 
 
 	// Styles
@@ -474,17 +473,17 @@
 
 			columns={
 				(() => {
-					const attrGroupColumns =
+					const attrGroupColumns: Column<RatedWallet>[] = (
 						displayedAttributeGroups
 							.map(attrGroup => ({
 								id: attrGroup.id,
 								name: attrGroup.displayName,
-								value: (wallet: RatedWallet) => {
+								value: wallet => {
 									const attrGroupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
 									return attrGroupScore === null ? null : attrGroupScore.score
 								},
 								sort: {
-									defaultDirection: 'desc',
+									defaultDirection: SortDirection.Descending,
 								},
 
 								subcolumns: (
@@ -492,24 +491,27 @@
 										.map(([attributeId, attribute]) => ({
 											id: `${attrGroup.id}.${attributeId}`,
 											name: attribute.displayName,
-											value: (wallet: RatedWallet) => {
+											value: wallet => {
 												const attribute = wallet.overall[attrGroup.id]?.[attributeId]
 												return attribute?.evaluation?.value?.rating || undefined
 											},
-											sort: { defaultDirection: 'desc' },
-										} satisfies Column<RatedWallet>))
+											sort: {
+												defaultDirection: SortDirection.Descending,
+											},
+										}))
 								),
 								isDefaultExpanded: false,
-							} satisfies Column<RatedWallet>))
+							}))
+					)
 
 					return [
 						{
 							id: 'displayName',
 							name: 'Wallet',
-							value: (wallet: RatedWallet) => wallet.metadata.displayName,
+							value: wallet => wallet.metadata.displayName,
 
 							sort: {
-								defaultDirection: 'asc',
+								defaultDirection: SortDirection.Ascending,
 							},
 
 							isSticky: true,
@@ -518,7 +520,7 @@
 						...(hasNonApplicableStages ? [] : [{
 							id: 'stage',
 							name: 'Stage',
-							value: (wallet: RatedWallet) => {
+							value: wallet => {
 								const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 								if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return undefined
 								if (typeof stage === 'string') return null
@@ -527,7 +529,7 @@
 							},
 
 							sort: {
-								defaultDirection: 'desc',
+								defaultDirection: SortDirection.Descending,
 							},
 						} satisfies Column<RatedWallet>]),
 
@@ -536,7 +538,7 @@
 								{
 									id: 'overall',
 									name: 'Rating',
-									value: (wallet: RatedWallet) => {
+									value: wallet => {
 										const overallScore = calculateOverallScore(
 											wallet.overall,
 											ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),
@@ -546,19 +548,19 @@
 
 									sort: {
 										isDefault: true,
-										defaultDirection: 'desc',
+										defaultDirection: SortDirection.Descending,
 									},
 
 									subcolumns: attrGroupColumns,
 									isDefaultExpanded: true,
-								} satisfies Column<RatedWallet>
+								}
 							:
 								{
 									...attrGroupColumns[0],
 									isDefaultExpanded: true,
 								}
 						),
-					]
+					] as Column<RatedWallet>[]
 				})()
 			}
 			bind:sortedColumn
