@@ -32,7 +32,10 @@ export default [
 			// Ignore generated files
 			'src/generated/**',
 
-			// Ignore Svelte files with ESLint parser errors
+			// Ignore Svelte files with ESLint errors due to inaccurate generic parameter type inference
+			'src/views/Eip7702Table.svelte',
+
+			// Ignore Svelte files with ESLint errors due to inaccurate parsing
 			'src/components/Filters.svelte',
 			'src/components/Table.svelte',
 			'src/views/WalletPage.svelte',
