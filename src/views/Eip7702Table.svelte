@@ -78,13 +78,23 @@
 
 
 	// State
-	let activeFilters: Filters<RatedWallet>['$$prop_def']['activeFilters'] = $state(new Set())
-	let filteredWallets = $state<RatedWallet[]>([])
+	let activeFilters: Filters<RatedWallet>['$$prop_def']['activeFilters'] = $state(
+		new Set()
+	)
+
+	let filteredWallets: RatedWallet[] = $state(
+		[]
+	)
 
 
 	// Actions
-	let toggleFilterById: Filters<RatedWallet>['$$prop_def']['toggleFilterById'] = $state()
-	let toggleFilter: Filters<RatedWallet>['$$prop_def']['toggleFilter'] = $state()
+	let toggleFilterById: Filters<RatedWallet>['$$prop_def']['toggleFilterById'] = $state(
+		undefined
+	)
+
+	let toggleFilter: Filters<RatedWallet>['$$prop_def']['toggleFilter'] = $state(
+		undefined
+	)
 
 
 	// Components
