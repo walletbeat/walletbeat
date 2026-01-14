@@ -5,6 +5,6 @@ import type { WalletSecurityNews } from '@/types/content/news'
  * Compiled from individual news files
  */
 export const allWalletSecurityNews: WalletSecurityNews[] = [
-	(await import('./2025-12-25-browser-extension-v268-incident')).default,
-	(await import('./2026-01-06-global-e-breach')).default,
+	...Object.values((await import('./trust-wallet')).trustWalletRegistry),
+	...Object.values((await import('./ledger')).ledgerNewsRegistry),
 ].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))

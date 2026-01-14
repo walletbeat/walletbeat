@@ -1,14 +1,8 @@
-import {
-	ImpactCategory,
-	IncidentStatus,
-	NewsType,
-	Severity,
-	type WalletSecurityNews,
-} from '@/types/content/news'
-
+import { ImpactCategory, IncidentStatus, NewsType, Severity, type WalletSecurityNews } from '@/types/content/news'
 import { ledgerWalletMetadata } from '../hardware-wallets/ledger'
 
-export default {
+
+export const globalEBreach: WalletSecurityNews = {
 	slug: 'global-e-breach',
 	type: NewsType.DATA_BREACH,
 	ref: {
@@ -27,4 +21,8 @@ export default {
 	title: 'Global-e Independent Provider Data Breach Affecting Ledger Customers',
 	updatedAt: '2026-01-06',
 	wallet: ledgerWalletMetadata,
-} as const satisfies WalletSecurityNews
+} as const
+
+export const ledgerNewsRegistry = {
+	'ledger-global-e-breach': globalEBreach,
+} as const
