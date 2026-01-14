@@ -36,8 +36,6 @@
 		"@material-icons/svg": "^1.0.33",
 		"@tanstack/match-sorter-utils": "^8.19.4",
 		"@wagmi/core": "^3.0.0",
-		"astro": "^5.15.2",
-		"autoprefixer": "^10.4.21",
 		"astro": "^5.16.9",
 		"autoprefixer": "^10.4.23",
 		"eslint-plugin-import": "^2.32.0",
@@ -46,9 +44,7 @@
 		"lucide-static": "^0.562.0",
 		"micromark": "^4.0.2",
 		"postcss": "^8.5.6",
-		"svelte": "^5.43.0",
-		"typescript-eslint": "^8.46.2",
-		"wagmi": "2.16.9"
+		"wagmi": "2.16.9",
 		"svelte": "^5.46.3",
 		"typescript-eslint": "^8.53.0"
 	},
