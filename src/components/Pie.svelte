@@ -5,8 +5,7 @@
 		color: string
 		weight: number
 		arcLabel: string
-		tooltip: string
-		tooltipValue: string
+		titleText: string
 		href?: string
 		children?: Slice[]
 	}
@@ -360,7 +359,7 @@
 				d={slice.computed.path}
 				class="slice-path"
 			>
-				<title>{[slice.tooltipValue, slice.tooltip].join('\n')}</title>
+				<title>{slice.titleText}</title>
 			</path>
 		{/snippet}
 
