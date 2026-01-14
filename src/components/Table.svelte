@@ -1,15 +1,324 @@
+<script module lang="ts">
+	// Types
+	import type { Snippet } from 'svelte'
+
+	type Value = object | string | number | bigint | boolean | undefined | null
+
+	export type Column<
+		_RowValue extends Value = Value,
+		_CellValue extends Value = Value,
+		_ColumnId extends Value = Value,
+	> = {
+		id: _ColumnId
+		name: string
+		value: (row: _RowValue) => any
+		// value: (row: _RowValue) => _CellValue
+
+		isSticky?: boolean
+
+		sort?: {
+			isDefault?: boolean
+			defaultDirection: SortDirection
+			compare?: (a: _CellValue, b: _CellValue, rowA: _RowValue, rowB: _RowValue) => number
+		}
+
+		HeaderTitle?: Snippet<
+			[
+				{
+					column: Column<_RowValue, _CellValue, _ColumnId>
+				},
+			]
+		>
+
+		Cell?: Snippet<
+			[
+				{
+					row: _RowValue
+					column: Column<_RowValue, _CellValue, _ColumnId>
+					value: _CellValue
+				},
+			]
+		>
+
+		subcolumns?: Column<_RowValue, _CellValue, _ColumnId>[]
+		isDefaultExpanded?: boolean
+	}
+
+	export enum SortDirection {
+		Ascending = 'asc',
+		Descending = 'desc',
+	}
+
+	type SortState<
+		_ColumnId extends Value = Value,
+	> = {
+		columnId: _ColumnId
+		direction: SortDirection
+	}
+
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity'
+
+	// State
+	export class TableState<
+		_RowValue extends Value = Value,
+		_CellValue extends Value = Value,
+		_ColumnId extends Value = Value,
+	> {
+		columns: Column<_RowValue, _CellValue, _ColumnId>[] = $state(
+			[]
+		)
+
+		#columnsById = $derived(
+			new SvelteMap(
+				this.columns
+					.flatMap(function flatten(column): (typeof column)[] {
+						return [column, ...(column.subcolumns?.flatMap(flatten) ?? [])]
+					})
+					.map(column => [column.id, column]),
+			),
+		)
+
+		#isColumnExpanded: Set<_ColumnId> = $state(
+			new SvelteSet()
+		)
+
+		columnsVisible = $derived.by(() => {
+			const getVisibleColumns = (
+				columns: Column<_RowValue, _CellValue, _ColumnId>[],
+			): Column<_RowValue, _CellValue, _ColumnId>[] =>
+				columns.flatMap(column =>
+					column.subcolumns?.length && this.#isColumnExpanded.has(column.id)
+						? getVisibleColumns(column.subcolumns)
+						: [column],
+				)
+
+			return getVisibleColumns(this.columns)
+		})
+
+		#defaultColumnSort?: SortState<_ColumnId>
+
+		sortState?: SortState<_ColumnId> = $state(
+			this.#defaultColumnSort
+		)
+
+		sortedColumn = $derived(
+			this.sortState?.columnId && this.#columnsById.get(this.sortState.columnId),
+		)
+
+		maxHeaderLevel = $derived.by(() => {
+			const getMaxLevel = (columns: Column<_RowValue, _CellValue, _ColumnId>[]): number =>
+				Math.max(
+					1,
+					...columns.map(column =>
+						!column.subcolumns?.length ? 1 : 1 + getMaxLevel(column.subcolumns),
+					),
+				)
+
+			return getMaxLevel(this.columns)
+		})
+
+		rows: _RowValue[] = $state(
+			[]
+		)
+
+		rowIsDisabled?: (
+			(rowValue: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean
+		) = $state(
+			undefined
+		)
+
+		displaceDisabledRows: boolean = $state(
+			false
+		)
+
+		rowsAscending = $derived.by(() => {
+			if (!this.sortState) return this.rows
+
+			const { columnId } = this.sortState
+			const column = this.#columnsById.get(columnId)
+
+			if(!column) return this.rows
+
+			return (
+				this.rows
+					?.toSorted((rowValueA, rowValueB) => {
+						const a = column.value(rowValueA)
+						const b = column.value(rowValueB)
+
+						return (
+							(
+								a !== undefined && b !== undefined ?
+									column.sort?.compare ?
+										column.sort.compare(a, b, rowValueA, rowValueB)
+									:
+										typeof a === 'string' && typeof b === 'string' ?
+											a.localeCompare(b)
+										: a < b ?
+											-1
+										: a > b ?
+											1
+										:
+											0
+								: a === undefined ?
+									1
+								: b === undefined ?
+									-1
+								:
+									0
+							)
+						)
+					})
+				)
+		})
+
+		rowsSorted = $derived.by(() => {
+			if (!this.sortState) return this.rows
+
+			const { direction } = this.sortState
+
+			let result = this.rowsAscending
+
+			if(!result) return result
+
+			if (direction === SortDirection.Descending) {
+				result = result.toReversed()
+			}
+
+			if(this.displaceDisabledRows && this.rowIsDisabled)
+				result = result.toSorted((rowValueA, rowValueB) => {
+					const isRowADisplaced = this.rowIsDisabled!(rowValueA, this)
+					const isRowBDisplaced = this.rowIsDisabled!(rowValueB, this)
+
+					return isRowADisplaced ? 1 : isRowBDisplaced ? -1 : 0
+				})
+
+			return result
+		})
+
+		pageSize = $state(
+			Infinity
+		)
+
+		currentPage = $state(
+			1
+		)
+
+		rowsVisible = $derived(
+			this.rowsSorted
+				?.slice(
+					(this.currentPage - 1) * this.pageSize || 0,
+					((this.currentPage - 1) * this.pageSize || 0) + this.pageSize,
+				)
+		)
+
+		totalRows = $derived(
+			this.rows.length
+		)
+
+		totalPages = $derived(
+			Math.max(1, Math.ceil(this.totalRows / this.pageSize))
+		)
+
+		canGoBack = $derived(
+			this.totalRows > 0 && this.currentPage > 1
+		)
+
+		canGoForward = $derived(
+			this.totalRows > 0 && this.currentPage < this.totalPages
+		)
+
+		constructor({
+			rows,
+			columns,
+			pageSize,
+			rowIsDisabled,
+			displaceDisabledRows,
+		}: {
+			rows: _RowValue[]
+			columns: Column<_RowValue, _CellValue, _ColumnId>[]
+			pageSize?: number
+			rowIsDisabled?: (rowValue: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean
+			displaceDisabledRows?: boolean
+		}) {
+			this.rows = rows
+
+			this.columns = columns
+
+			this.pageSize = pageSize || Infinity
+
+			const defaultSortedColumn = this.columns.find(column => column.sort?.isDefault)
+
+			this.#defaultColumnSort = this.sortState = defaultSortedColumn && {
+				columnId: defaultSortedColumn.id,
+				direction: defaultSortedColumn.sort?.defaultDirection ?? SortDirection.Ascending,
+			}
+
+			this.rowIsDisabled = rowIsDisabled
+			this.displaceDisabledRows = displaceDisabledRows ?? false
+
+			const initializeIsColumnExpanded = (columns: Column<_RowValue, _CellValue, _ColumnId>[]) => {
+				columns.forEach(column => {
+					if (column.isDefaultExpanded) {
+						this.#isColumnExpanded.add(column.id)
+					}
+
+					if (column.subcolumns?.length) {
+						initializeIsColumnExpanded(column.subcolumns)
+					}
+				})
+			}
+
+			initializeIsColumnExpanded(columns)
+		}
+
+		toggleColumnSort = (columnId: _ColumnId) => {
+			const column = this.#columnsById.get(columnId)
+
+			if (!column?.sort)
+				return false
+
+			this.sortState = (
+				this.sortState?.columnId !== columnId ?
+					{
+						columnId,
+						direction: column.sort.defaultDirection,
+					}
+				: this.sortState?.direction === column.sort.defaultDirection ?
+					{
+						columnId,
+						direction: column.sort.defaultDirection === SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending,
+					}
+				:
+					this.#defaultColumnSort
+			)
+
+			return true
+		}
+
+		isColumnExpanded = (columnId: _ColumnId) => (
+			this.#isColumnExpanded.has(columnId)
+		)
+
+		toggleIsColumnExpanded = (columnId: _ColumnId) => {
+			if(this.#isColumnExpanded.has(columnId))
+				this.#isColumnExpanded.delete(columnId)
+			else
+				this.#isColumnExpanded.add(columnId)
+		}
+	}
+</script>
+
+
 <script lang="ts" generics="
-	_TableState extends TableState,
-	RowId
+	_RowValue extends Value = Value,
+	_RowId extends Value = Value,
+	_ColumnId extends Value = Value,
+	_CellValue extends Value = Value
 ">
 	// Types
 	import type { SvelteHTMLElements } from 'svelte/elements'
-	import type { Snippet } from 'svelte'
-	import { type Column,TableState } from '@/components/TableState.svelte'
 
-	type _RowValue = _TableState extends TableState<infer RowValue, any, any> ? RowValue : any
-	type _CellValue = _TableState extends TableState<any, infer CellValue, any> ? CellValue : any
-	type _ColumnId = _TableState extends TableState<any, any, infer ColumnId> ? ColumnId : string
+	type _TableState = TableState<_RowValue, _CellValue, _ColumnId>
 	type _Column = Column<_RowValue, _CellValue, _ColumnId>
 
 
@@ -41,9 +350,9 @@
 
 		rows: _RowValue[]
 
-		rowId?: (row: _RowValue, index: number) => RowId
-		rowIsDisabled?: (row: _RowValue, table: TableState<_RowValue, _CellValue, _ColumnId>) => boolean
-		onRowClick?: (row: _RowValue, rowId?: RowId) => void
+		rowId?: (row: _RowValue, index: number) => _RowId
+		rowIsDisabled?: (row: _RowValue, table: _TableState) => boolean
+		onRowClick?: (row: _RowValue, rowId?: _RowId) => void
 		displaceDisabledRows?: boolean
 
 		columns: _Column[]
@@ -65,14 +374,28 @@
 
 
 	// State
-	let table = $derived(
-		new TableState({
-			data: rows,
-			columns,
-			rowIsDisabled,
-			displaceDisabledRows,
-		})
-	)
+	let table = new TableState({
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		rows,
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		columns,
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		rowIsDisabled,
+		// svelte-ignore state_referenced_locally -- reactivity is handled by `$effect`s below
+		displaceDisabledRows,
+	})
+	$effect(() => {
+		table.rows = rows
+	})
+	$effect(() => {
+		table.columns = columns
+	})
+	$effect(() => {
+		table.rowIsDisabled = rowIsDisabled
+	})
+	$effect(() => {
+		table.displaceDisabledRows = displaceDisabledRows
+	})
 
 	$effect(() => {
 		sortedColumn = table.sortedColumn
@@ -127,7 +450,7 @@
 			{@render headerRows(table.columns, 0)}
 
 			{#snippet headerRows(columns: (_Column | undefined)[], level: number)}
-				{@const nextLevelColumns =
+				{@const nextLevelColumns = (
 					columns
 						.flatMap(column => (
 							!column ?
@@ -137,7 +460,7 @@
 							:
 								Array.from({ length: getColumnSpan(column) }, () => undefined)
 						))
-				}
+				)}
 
 				<tr in:fly={{ y: '-50%', duration: 300, easing: expoOut }}>
 					{#each columns as column, index (column?.id ?? `blank-${level}-${index}`)}

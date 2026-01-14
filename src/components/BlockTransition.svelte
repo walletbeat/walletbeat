@@ -1,13 +1,13 @@
 <script lang="ts" generics="
 	Key extends string | number | undefined = undefined,
-	Value extends any = any
+	Value extends object | string | number | bigint | boolean | undefined | null = object | string | number | bigint | boolean | undefined | null
 ">
 	// Types
 	import type { Snippet } from 'svelte'
 	import type { TransitionConfig } from 'svelte/transition'
 
 	type TransitionFnAndParams<
-		Fn extends (node: Element, _?: any) => TransitionConfig = any
+		Fn extends (node: Element, _?: unknown) => TransitionConfig = (node: Element, _?: unknown) => TransitionConfig
 	> = (
 		Fn extends (node: Element, _?: infer Params) => TransitionConfig
 			? [Fn] | [Fn, Params | undefined]
@@ -33,7 +33,7 @@
 		clip?: boolean
 
 		// Snippets
-		children?: Snippet<[{ key?: Key, value: Value }]>
+		children?: Snippet<[{ key?: Key, value: Value | undefined }]>
 
 		// View options
 		align?: 'top' | 'center' | 'bottom'

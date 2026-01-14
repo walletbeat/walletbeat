@@ -1,11 +1,18 @@
 <script lang="ts">
 	// Types/constants
-	import { isTypographicContent } from '@/types/content'
 	import type { RatedWallet } from '@/schema/wallet'
-	import { WalletLadderType, ladders } from '@/schema/ladders'
-	import { StageCriterionRating, stageCriterionRatings, type StageEvaluatableWallet, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
-	import { getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
+	import { ladders } from '@/schema/ladders'
+	import {
+		StageCriterionRating,
+		stageCriterionRatings,
+		type StageEvaluatableWallet,
+		type WalletLadderEvaluation,
+		type WalletStage,
+	} from '@/schema/stages'
+	import { isTypographicContent } from '@/types/content'
+	import { objectEntries } from '@/types/utils/object'
 	import { slugifyCamelCase } from '@/types/utils/text'
+	import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
 
 
 	// Props
@@ -24,7 +31,7 @@
 	} = $props()
 
 
-	// Derived
+	// (Derived)
 	const stageEvaluatableWallet: StageEvaluatableWallet = $derived({
 		types: wallet.types,
 		variants: wallet.variants,
@@ -32,73 +39,91 @@
 		overall: wallet.overall,
 		overrides: wallet.overrides,
 	})
+
 	const ladderType = $derived(
-		ladderEvaluation ? 
-			(Object.entries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0] as WalletLadderType | undefined) ?? null
-		: null
+		ladderEvaluation ?
+			objectEntries(wallet.ladders)
+				.find(([, evaluation]) => evaluation === ladderEvaluation)
+				?.[0]
+			?? null
+		:
+			null
 	)
-	const ladderDefinition = $derived(ladderType ? ladders[ladderType] : null)
-	const stage0 = $derived(ladderDefinition?.stages[0] ?? null)
-	
-	const currentStageIndex = $derived.by(() => {
-		if (!stage || typeof stage === 'string' || !ladderDefinition) return null
 
-		return ladderDefinition.stages.findIndex(s => s.id === stage.id)
-	})
-	
-	const nextStage = $derived.by(() => {
-		if (currentStageIndex === null || !ladderDefinition) return null
+	const ladderDefinition = $derived(
+		ladderType ? ladders[ladderType] : null
+	)
 
-		const nextIndex = currentStageIndex + 1
+	const stage0 = $derived(
+		ladderDefinition?.stages[0] ?? null
+	)
 
-		return nextIndex < ladderDefinition.stages.length ? ladderDefinition.stages[nextIndex] : null
-	})
-	
-	const displayStage = $derived.by(() => {
-		if (stage === 'QUALIFIED_FOR_NO_STAGES' && stage0) return stage0
+	const currentStageIndex = $derived(
+		(!stage || typeof stage === 'string' || !ladderDefinition) ?
+			null
+		:
+			ladderDefinition.stages.findIndex(s => s.id === stage.id)
+	)
 
-		return stage && typeof stage !== 'string' ? stage : null
-	})
-	
-	// Target stage: what criteria to show
-	const targetStage = $derived.by(() => {
-		if (showNextStageCriteria) {
-			return stage === 'QUALIFIED_FOR_NO_STAGES' ? stage0 : nextStage
-		}
+	const currentStage = $derived(
+		(currentStageIndex === null || !ladderDefinition) ?
+			null
+		:
+			ladderDefinition.stages[currentStageIndex] ?? null
+	)
 
-		if (stage === 'QUALIFIED_FOR_NO_STAGES') return stage0
+	const nextStage = $derived(
+		(currentStageIndex === null || !ladderDefinition) ?
+			null
+		: currentStageIndex + 1 < ladderDefinition.stages.length ?
+			ladderDefinition.stages[currentStageIndex + 1]
+		:
+			null
+	)
 
-		if (stage === 'NOT_APPLICABLE' || stage === null) return null
+	const displayStage = $derived(
+		(stage === 'QUALIFIED_FOR_NO_STAGES' && stage0) ?
+			stage0
+		:
+			currentStage
+	)
 
-		return displayStage
-	})
-	const criteria = $derived.by(() => {
-		if (!targetStage || typeof targetStage !== 'object' || !('criteriaGroups' in targetStage)) {
-			return []
-		}
-		
-		return targetStage.criteriaGroups.flatMap(criteriaGroup =>
-			criteriaGroup.criteria
-				.filter(criterion => typeof criterion.evaluate === 'function')
-				.map(criterion => ({
-					criteriaGroup,
-					criterion,
-					evaluation: criterion.evaluate(stageEvaluatableWallet),
-				}))
-				.filter(({ evaluation }) => 
-					!showNextStageCriteria || evaluation.rating !== StageCriterionRating.PASS
-				)
-		)
-	})
-	
-	
-	// Helper to wrap badge with click handler or link
+	const targetStage = $derived(
+		showNextStageCriteria ?
+			(stage === 'QUALIFIED_FOR_NO_STAGES' ? stage0 : nextStage)
+		: stage === 'QUALIFIED_FOR_NO_STAGES' ?
+			stage0
+		: stage === 'NOT_APPLICABLE' || stage === null ?
+			null
+		:
+			displayStage
+	)
+
+	const criteria = $derived(
+		!targetStage ?
+			[]
+		:
+			targetStage.criteriaGroups.flatMap(criteriaGroup =>
+				criteriaGroup.criteria
+					.map(criterion => ({
+						criteriaGroup,
+						criterion,
+						evaluation: criterion.evaluate(stageEvaluatableWallet),
+					}))
+					.filter(({ evaluation }) =>
+						!showNextStageCriteria || evaluation.rating !== StageCriterionRating.PASS
+					)
+			)
+	)
+
+
+	// Actions
 	const handleBadgeClick = (clickedStage: WalletStage | null) => (e: MouseEvent) => {
 		e.preventDefault()
 		e.stopPropagation()
 
 		if (clickedStage && ladderDefinition) {
-			const stageIndex = ladderDefinition.stages.findIndex(s => s.id === clickedStage.id)
+			const stageIndex = ladderDefinition.stages.findIndex(stage => stage.id === clickedStage.id)
 
 			if (stageIndex >= 0) {
 				onStageClick?.(stageIndex)
@@ -179,7 +204,7 @@
 			{/if}
 
 			<ul>
-				{#each criteria as { criterion, evaluation }}
+				{#each criteria as { criterion, evaluation } (criterion.id)}
 					{@const attributeId = getCriterionAttributeId(criterion)}
 					{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 					{@const attributeName = attribute?.displayName ?? attributeId}

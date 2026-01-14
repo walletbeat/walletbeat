@@ -13,7 +13,6 @@
 	let {
 		content,
 		strings,
-		...restProps
 	}: SvelteHTMLElements['div'] & {
 		content: TypographicContent
 		strings?: TypographicContent extends _TypographicContent<infer Strings> ? Strings extends null ? never : Strings : never

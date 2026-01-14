@@ -12,10 +12,9 @@
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
 	import { getAttributeStages } from '@/utils/stage-attributes'
 	import { getWalletStageAndLadder } from '@/utils/stage'
-	import { WalletLadderType } from '@/schema/ladders'
 
 
-	// Props
+// Props
 	let {
 		wallet,
 		attribute,
@@ -44,39 +43,40 @@
 
 
 	// Derived
-	const { ladderEvaluation } = getWalletStageAndLadder(wallet)
-	const ladderType = $derived.by(() => {
-		if (!ladderEvaluation) {
-			return null
-		}
+	import { objectEntries } from '@/types/utils/object'
 
-		for (const [type, evaluation] of Object.entries(wallet.ladders)) {
-			if (evaluation === ladderEvaluation) {
-				return type as WalletLadderType
-			}
-		}
+	const ladderEvaluation = $derived(
+		getWalletStageAndLadder(wallet)
+			.ladderEvaluation
+		?? undefined
+	)
 
-		return null
-	})
-	const attributeStages = $derived(getAttributeStages(attribute.attribute))
-	const relevantStages = $derived.by(() => {
-		if (!ladderType || !ladderEvaluation) {
-			return []
-		}
+	const ladderType = $derived(
+		ladderEvaluation &&
+			objectEntries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0]
+		||
+			undefined
+	)
 
-		const stagesForLadder = attributeStages.find(s => s.ladderType === ladderType)
+	const attributeStages = $derived(
+		getAttributeStages(attribute.attribute)
+	)
 
-		return stagesForLadder?.stageNumbers ?? []
-	})
-	const firstStage = $derived.by(() => {
-		if (relevantStages.length === 0 || !ladderEvaluation) {
-			return null
-		}
+	const relevantStages = $derived(
+		ladderType && ladderEvaluation &&
+			attributeStages
+				.find(stage => stage.ladderType === ladderType)
+				?.stageNumbers
+		||
+			[]
+	)
 
-		const stageNumber = relevantStages[0]
-
-		return ladderEvaluation.ladder.stages[stageNumber] ?? null
-	})
+	const firstStage = $derived(
+		relevantStages.length > 0 &&
+			ladderEvaluation?.ladder.stages[relevantStages[0]]
+		||
+			undefined
+	)
 </script>
 
 
@@ -99,20 +99,19 @@
 					buttonTriggerPlacement="behind"
 					hoverTriggerPlacement="around"
 				>
-					{#snippet children()}
-						<a
-							href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#stage-${stageNumber}`}
-							data-link="camouflaged"
-							title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+					<a
+						href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#stage-${stageNumber}`}
+						data-link="camouflaged"
+						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+					>
+						<div
+							data-badge="small"
+							style:--accent="var(--accent-color)"
 						>
-							<div
-								data-badge="small"
-								style:--accent="var(--accent-color)"
-							>
-								<small>Stage {relevantStages.join(', ')}</small>
-							</div>
-						</a>
-					{/snippet}
+							<small>Stage {relevantStages.join(', ')}</small>
+						</div>
+					</a>
+
 					{#snippet TooltipContent()}
 						<WalletStageSummary 
 							{wallet} 
