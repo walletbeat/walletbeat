@@ -314,11 +314,12 @@
 	"ignorePaths": [
 		"**/*.css",
 		"dist/**",
-		"public/**/*.svg",
 		"node_modules/**",
-		"src/legacy/**",
+		"pnpm-lock.yaml",
+		"public/**/*.svg",
+		"resources/files/**",
 		"src/generated/**",
-		"pnpm-lock.yaml"
+		"src/legacy/**"
 	],
 	"patterns": [{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" }],
 	"ignoreRegExpList": ["CIDv1"]
