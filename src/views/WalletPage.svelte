@@ -53,6 +53,13 @@
 	// State
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { isLabeledUrl } from '@/schema/url'
+	import {
+		incidentStatuses,
+		newsTypes,
+		severities,
+		impactCategories,
+	} from '@/types/content/news'
+	import { refs as extractRefs } from '@/schema/reference'
 
 	let queryParams = $state<URLSearchParams | undefined>(
 		globalThis.location && new SvelteURLSearchParams(globalThis.location.search)
@@ -463,15 +470,77 @@
 					</summary>
 
 
-					<div class="attribute-accordions" data-column>
+					<div class="attribute-accordions news-items" data-column>
 						{#each wallet.news as newsItem}
+							{@const statusInfo = incidentStatuses[newsItem.status]}
+							{@const severityInfo = severities[newsItem.severity]}
+							{@const typeInfo = newsTypes[newsItem.type]}
+							{@const impactInfo = impactCategories[newsItem.impact.category]}
+							{@const newsRefs = extractRefs(newsItem)}
 							<details data-card="padding-2 secondary radius-4" data-column="gap-0">
-								<summary>
-									<h4>{newsItem.title}</h4>
+								<summary data-row="gap-2">
+									<div data-column="gap-1" data-row-item="flexible">
+										<h4>{newsItem.title}</h4>
+										<div class="news-meta" data-row="gap-2">
+											<span
+												class="news-badge news-type"
+												data-badge="small"
+											>{typeInfo.label}</span>
+											<span
+												class="news-badge news-severity"
+												data-badge="small"
+												style:--accent={severityInfo.color}
+											>{severityInfo.label}</span>
+											<span
+												class="news-badge news-status"
+												data-badge="small"
+												style:--accent={statusInfo.color}
+											>
+												{@html statusInfo.icon}
+												{statusInfo.label}
+											</span>
+										</div>
+									</div>
 								</summary>
 
-								<section>
-									<p>{newsItem.summary}</p>
+								<section data-column="gap-4">
+									<p class="news-summary">{newsItem.summary}</p>
+
+									<div class="news-details" data-column="gap-2">
+										<div class="news-impact" data-column="gap-1">
+											<span class="news-detail-label">Impact:</span>
+											<div data-row="gap-2">
+												<span class="news-detail-value">{impactInfo.label}</span>
+												{#if newsItem.impact.fundsImpacted}
+													<span
+														class="news-badge funds-impacted"
+														data-badge="small"
+														style:--accent="#ef4444"
+													>Funds Impacted</span>
+												{/if}
+											</div>
+										</div>
+
+										<div class="news-dates" data-row="gap-4 wrap">
+											<span>
+												<span class="news-detail-label">Published:</span>
+												<span class="news-detail-value">{newsItem.publishedAt}</span>
+											</span>
+											{#if newsItem.updatedAt !== newsItem.publishedAt}
+												<span>
+													<span class="news-detail-label">Updated:</span>
+													<span class="news-detail-value">{newsItem.updatedAt}</span>
+												</span>
+											{/if}
+										</div>
+
+										{#if newsRefs.length > 0}
+											<ReferenceLinks
+												references={newsRefs}
+												cardBackground="tertiary"
+											/>
+										{/if}
+									</div>
 								</section>
 							</details>
 						{/each}
@@ -1891,9 +1960,52 @@
 		}
 	}
 
-	.news-summary {
-		word-wrap: break-word;
-		overflow-wrap: break-word;
-		max-width: 50%;
+	.news-items {
+		.news-meta {
+			font-size: 0.85rem;
+		}
+
+		.news-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.25rem;
+
+			:global(svg) {
+				width: 1em;
+				height: 1em;
+			}
+		}
+
+		.news-type {
+			--accent: var(--color-accent-purple);
+		}
+
+		.news-summary {
+			word-wrap: break-word;
+			overflow-wrap: break-word;
+			color: var(--text-secondary);
+		}
+
+		.news-details {
+			font-size: 0.9rem;
+		}
+
+		.news-detail-label {
+			color: var(--text-secondary);
+			font-weight: 500;
+		}
+
+		.news-detail-value {
+			color: var(--text-primary);
+		}
+
+		.funds-impacted {
+			font-weight: 600;
+		}
+
+		.news-dates {
+			color: var(--text-secondary);
+			font-size: 0.85rem;
+		}
 	}
 </style>
