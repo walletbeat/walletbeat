@@ -920,6 +920,24 @@
 								filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
 							) : null}
 							<Pie
+								layout={PieLayout.FullTop}
+								padding={8}
+								radius={80}
+								levels={[
+									{
+										outerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.7 : 0.65,
+										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.3 : 0.1,
+										gap: 4,
+										angleGap: 0
+									},
+									{
+										outerRadiusFraction: 1,
+										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.725 : 0.675,
+										gap: 2,
+										angleGap: 0,
+									}
+								]}
+
 								slices={
 									displayedAttributeGroups.map(attrGroup => {
 										const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
@@ -966,23 +984,7 @@
 										}
 									})
 								}
-								layout={PieLayout.FullTop}
-								padding={8}
-								radius={80}
-								levels={[
-									{
-										outerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.7 : 0.65,
-										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.3 : 0.1,
-										gap: 4,
-										angleGap: 0
-									},
-									{
-										outerRadiusFraction: 1,
-										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.725 : 0.675,
-										gap: 2,
-										angleGap: 0,
-									}
-								]}
+
 								{highlightedSliceId}
 								onSliceClick={sliceId => {
 									const [_attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
@@ -1157,6 +1159,7 @@
 									}
 								]}
 								padding={4}
+
 								slices={
 									!isNonEmptyArray(evalEntries) ?
 										[]
@@ -1339,6 +1342,9 @@
 									:
 										24
 								}
+
+								centerLabel={attribute.evaluation.value.rating}
+
 								slices={
 									attribute.evaluation.value.rating !== Rating.EXEMPT ?
 										[
@@ -1355,7 +1361,7 @@
 										[]
 								}
 								{highlightedSliceId}
-								centerLabel={attribute.evaluation.value.rating}
+
 								class="wallet-attribute-rating-pie"
 							/>
 
