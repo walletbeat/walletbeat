@@ -351,7 +351,7 @@ export interface ExampleRating<V extends Value> {
  * For example, an attribute could be about whether or not a wallet is
  * licensed under an open-source license.
  */
-export interface Attribute<V extends Value> {
+export interface Attribute<V extends Value = Value> {
 	/**
 	 * Unique ID representing the attribute in camelCase.
 	 * For example: "sourceVisibility".

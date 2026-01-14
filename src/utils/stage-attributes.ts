@@ -47,7 +47,7 @@ const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
  * @param attribute The attribute to check
  * @returns true if the attribute is used in any stage criterion
  */
-export function isAttributeUsedInStages(attribute: Attribute<any>): boolean {
+export function isAttributeUsedInStages(attribute: Attribute): boolean {
 	// The attribute objects are referenced in the stage definitions via variantsMustPassAttribute
 	// We can check if the attribute ID appears in the ladder structure
 	// by serializing and checking for the attribute ID
@@ -75,7 +75,7 @@ export function isAttributeUsedInStages(attribute: Attribute<any>): boolean {
  * @param stage The stage to check
  * @returns true if the attribute is used in the stage
  */
-const isAttributeUsedInStageObject = (attribute: Attribute<any>, stage: WalletStage): boolean =>
+const isAttributeUsedInStageObject = (attribute: Attribute, stage: WalletStage): boolean =>
 	allCriteriaInStage(stage).some(criterion => getCriterionAttributeId(criterion) === attribute.id)
 
 /**
@@ -84,7 +84,7 @@ const isAttributeUsedInStageObject = (attribute: Attribute<any>, stage: WalletSt
  * @param stageId The stage ID to check
  * @returns true if the attribute is used in the stage
  */
-export const isAttributeUsedInStage = (attribute: Attribute<any>, stageId: string): boolean => {
+export const isAttributeUsedInStage = (attribute: Attribute, stageId: string): boolean => {
 	const stage = stagesById.get(stageId)
 
 	return stage !== undefined && isAttributeUsedInStageObject(attribute, stage)
@@ -96,7 +96,7 @@ export const isAttributeUsedInStage = (attribute: Attribute<any>, stageId: strin
  * @returns An array of objects containing ladder type and stage numbers where the attribute is used
  */
 export function getAttributeStages(
-	attribute: Attribute<any>,
+	attribute: Attribute,
 ): Array<{ ladderType: WalletLadderType; stageNumbers: number[] }> {
 	const stagesWithAttribute = allStages
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
@@ -128,7 +128,7 @@ export const getCriterionAttributeId = (criterion: WalletStageCriterion): string
  * @returns An array of objects containing ladder type, stage number, and criterion
  */
 export function getAttributeCriteria(
-	attribute: Attribute<any>,
+	attribute: Attribute,
 ): Array<{ ladderType: WalletLadderType; stageNumber: number; criterion: WalletStageCriterion }> {
 	return allStages
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
