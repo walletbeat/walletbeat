@@ -44,6 +44,36 @@ export enum StageCriterionRating {
 	UNRATED = 'UNRATED',
 }
 
+export const stageCriterionRatings = {
+	[StageCriterionRating.PASS]: {
+		icon: '✅',
+		label: 'Criterion passed',
+		color: 'var(--rating-pass)',
+	},
+	[StageCriterionRating.FAIL]: {
+		icon: '❌',
+		label: 'Criterion failed',
+		color: 'var(--rating-fail)',
+	},
+	[StageCriterionRating.EXEMPT]: {
+		icon: '➖',
+		label: 'Criterion exempt',
+		color: 'var(--rating-exempt)',
+	},
+	[StageCriterionRating.UNRATED]: {
+		icon: '❔',
+		label: 'Criterion unrated',
+		color: 'var(--rating-unrated)',
+	},
+} as const satisfies Record<
+	StageCriterionRating,
+	{
+		icon: string
+		label: string
+		color: string
+	}
+>
+
 /**
  * The result of evaluating one specific stage criterion for one specific
  * wallet.
@@ -85,6 +115,14 @@ export interface WalletStageCriterion {
 	/** Evaluate a wallet for this given criterion. */
 	evaluate: (wallet: StageEvaluatableWallet) => StageCriterionEvaluation
 }
+
+/** Map of evaluate functions to their associated attribute IDs. */
+const evaluateFunctionAttributeIds = new WeakMap<WalletStageCriterion['evaluate'], string>()
+
+/** Get the attribute ID associated with an evaluate function, if any. */
+export const getEvaluateFunctionAttributeId = (
+	evaluate: WalletStageCriterion['evaluate'],
+): string | null => evaluateFunctionAttributeIds.get(evaluate) ?? null
 
 /**
  * A logical criteria group for a wallet stage.
@@ -300,10 +338,9 @@ export function variantsMustPassAttribute<V extends Value>(
 		},
 	)
 
-	// Attach the attribute ID to the evaluate function so it can be easily retrieved
-	// by getCriterionAttributeId without needing to serialize the function
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-	;(evaluateFunction as any).__attributeId = attribute.id
+	// Associate attribute ID with the evaluate function so it can be easily retrieved
+	// without needing to serialize the function
+	evaluateFunctionAttributeIds.set(evaluateFunction, attribute.id)
 
 	return evaluateFunction
 }

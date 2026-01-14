@@ -13,7 +13,6 @@
 	let {
 		content,
 		strings,
-		...restProps
 	}: SvelteHTMLElements['div'] & {
 		content: TypographicContent
 		strings?: TypographicContent extends _TypographicContent<infer Strings> ? Strings extends null ? never : Strings : never
@@ -39,33 +38,5 @@
 {:else if content.contentType === ContentType.MARKDOWN}
 	{@const text = strings ? renderStrings(content.markdown, strings) : content.markdown}
 
-	<div
-		class="markdown"
-		data-column="gap-5"
-		{...restProps}
-	>
-		{@html parseMarkdown(text)}
-	</div>
+	{@html parseMarkdown(text)}
 {/if}
-
-
-<style>
-	.markdown {
-		:global {
-			ul, ol {
-				list-style-type: revert;
-				padding-inline-start: 1.5em;
-
-				> * + * {
-					margin-top: 1em;
-				}
-			}
-
-			li {
-				> * + * {
-					margin-top: 1em;
-				}
-			}
-		}
-	}
-</style>

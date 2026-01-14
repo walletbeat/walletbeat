@@ -80,11 +80,10 @@ function singleHardwareWalletManufacturerSupport(
 			hardwareWalletSupport,
 			__brand: brand,
 		},
-		details: mdParagraph(`
-{{WALLET_NAME}} ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
+		details:
+			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
 
-${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}
-		`),
+${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 		impact: mdParagraph(`
 			The support of hardware wallets from a single manufacturer hinders
 			hardware wallet ecosystem interoperability.
@@ -109,11 +108,10 @@ function insufficientHardwareWalletManufacturerSupport(
 			hardwareWalletSupport,
 			__brand: brand,
 		},
-		details: mdParagraph(`
-{{WALLET_NAME}} ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
+		details:
+			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
 
-${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}
-		`),
+${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 		howToImprove: paragraph(`
 			{{WALLET_NAME}} should add direct support for more popular hardware wallets to improve security options for users.
 		`),
@@ -132,9 +130,9 @@ function comprehensiveHardwareWalletSupport(
 			hardwareWalletSupport,
 			__brand: brand,
 		},
-		details: mdParagraph(`
-			{{WALLET_NAME}} ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
-		`),
+		details: mdParagraph(
+			`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}`,
+		),
 	}
 }
 

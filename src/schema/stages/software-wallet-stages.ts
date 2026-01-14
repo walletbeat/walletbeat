@@ -36,7 +36,7 @@ export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 export const softwareWalletStageZero: WalletStage = {
 	id: 'software_stage_0',
 	label: 'Stage 0',
-	description: sentence('The basic stage for Walletbeat to evaluate any software wallet.'),
+	description: sentence('The wallet meets the minimum criteria for evaluation.'),
 	criteriaGroups: [
 		{
 			id: 'reviewability',
@@ -58,9 +58,7 @@ export const softwareWalletStageZero: WalletStage = {
 export const softwareWalletStageOne: WalletStage = {
 	id: 'software_stage_1',
 	label: 'Stage 1',
-	description: sentence(
-		'The wallet has made a minimal but significant commitment to Ethereum values.',
-	),
+	description: sentence('The wallet has made a minimal commitment to Ethereum values.'),
 	criteriaGroups: [
 		{
 			id: 'security',
@@ -239,7 +237,9 @@ export const softwareWalletStageOne: WalletStage = {
 		},
 		{
 			id: 'ecosystem',
-			description: sentence('Ethereum ecosystem alignment'),
+			description: sentence(
+				'The wallet is aligned with basic Ethereum ecosystem best practices for usability.',
+			),
 			criteria: [
 				{
 					id: 'address_resolution',
@@ -442,7 +442,9 @@ const softwareWalletStageTwo: WalletStage = {
 		},
 		{
 			id: 'ecosystem',
-			description: sentence('Ethereum ecosystem alignment'),
+			description: sentence(
+				'The wallet is aligned with advanced Ethereum ecosystem best practices for usability.',
+			),
 			criteria: [
 				{
 					id: 'account_abstraction',

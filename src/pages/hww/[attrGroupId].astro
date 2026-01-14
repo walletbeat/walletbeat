@@ -25,7 +25,9 @@ const attrGroup = getAttributeGroupById(
 	representativeWalletForType(WalletType.HARDWARE).overall,
 )
 
-if (!attrGroup) throw new Error('Invalid attribute group')
+if (!attrGroup) {
+	throw new Error('Invalid attribute group')
+}
 
 // Components
 import Layout from '@/layouts/Layout.astro'

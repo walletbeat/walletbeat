@@ -31,7 +31,9 @@ import Metadata from '@/layouts/Metadata.astro'
 		<script is:inline>
 			// `color-scheme` override
 			const colorScheme = localStorage.getItem('theme')
-			if (colorScheme) document.documentElement.style.colorScheme = colorScheme
+			if (colorScheme) {
+				document.documentElement.style.colorScheme = colorScheme
+			}
 		</script>
 
 		{

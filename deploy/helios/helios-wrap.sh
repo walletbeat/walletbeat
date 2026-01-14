@@ -5,6 +5,10 @@
 set -euo pipefail
 set +x
 
+if [[ -n "${DEBUG:-}" ]]; then
+	set -x
+fi
+
 if [[ -z "${1:-}" ]]; then
 	echo "Usage: $0 <command> [command args...]" >&2
 	echo 'Helios will be started and its endpoint will be populated' >&2
