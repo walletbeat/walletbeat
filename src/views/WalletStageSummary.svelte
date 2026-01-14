@@ -261,6 +261,10 @@
 
 
 <style>
+	section {
+		text-align: start;
+	}
+
 	button {
 		background: none;
 		border: none;
