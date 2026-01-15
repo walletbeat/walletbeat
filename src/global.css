@@ -1122,20 +1122,30 @@ ol {
 				}
 			}
 
-			&:not([data-sticky~='backdrop-none'])::before {
-				content: '';
-				z-index: -1;
-				position: absolute;
-				inset: 0;
-				background-color: var(--sticky-backgroundColor);
-				backdrop-filter: var(--sticky-backdropFilter);
-				border-radius: inherit;
+			&:not([data-sticky~='backdrop-none']) {
+				&[data-scroll-container],
+				&:not([data-scroll-container])::before {
+					background-color: var(--sticky-backgroundColor);
+					backdrop-filter: var(--sticky-backdropFilter);
+					border-radius: inherit;
 
-				transition-property: background-color, backdrop-filter;
+					transition-property: background-color, backdrop-filter;
+				}
 
-				@container scroll-state(stuck: none) {
-					background-color: transparent !important;
-					backdrop-filter: blur(0px);
+				&:not([data-scroll-container])::before {
+					content: '';
+					z-index: -1;
+					position: absolute;
+					inset: 0;
+				}
+
+				&:not([data-sticky~='backdrop-always']) {
+					&:not([data-scroll-container])::before {
+						@container scroll-state(stuck: none) {
+							background-color: transparent !important;
+							backdrop-filter: blur(0px);
+						}
+					}
 				}
 			}
 		}
