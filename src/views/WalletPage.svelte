@@ -714,22 +714,22 @@
 								{#if relevantStages.length > 0}
 									{@const stageNumber = relevantStages[0]}
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+
 									{#if stage && ladderEvaluation}
 										<Tooltip>
-											{#snippet children()}
-												<a
-													href={`#${stage.id}`}
-													data-link="camouflaged"
-													title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+											<a
+												href={`#${stage.id}`}
+												data-link="camouflaged"
+												title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+											>
+												<div
+													data-badge="small"
+													style:--accent="var(--accent-color)"
 												>
-													<div
-														data-badge="small"
-														style:--accent="var(--accent-color)"
-													>
-														<small>Stage {relevantStages.join(', ')}</small>
-													</div>
-												</a>
-											{/snippet}
+													<small>Stage {relevantStages.join(', ')}</small>
+												</div>
+											</a>
+
 											{#snippet TooltipContent()}
 												<WalletStageSummary 
 													{wallet} 
