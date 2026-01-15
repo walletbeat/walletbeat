@@ -5,9 +5,9 @@
 		color: string
 		weight: number
 		arcLabel: string
-		tooltip: string
-		tooltipValue: string
+		titleText: string
 		href?: string
+		opacity?: number
 		children?: Slice[]
 	}
 
@@ -29,9 +29,10 @@
 	type ComputedSlice = Slice & {
 		computed: {
 			path: string
+			totalAngle: number
 			midAngle: number
-			outerRadius: number
-			innerRadius: number
+			outerR: number
+			innerR: number
 			gap: number
 			level: number
 			offset: number
@@ -50,6 +51,7 @@
 	// Props
 	const {
 		// Content
+		title,
 		slices = [],
 		centerLabel,
 
@@ -57,6 +59,7 @@
 		layout = PieLayout.HalfTop,
 		padding = 0,
 		radius = 47,
+		labelSize = radius / 4,
 		levels = [
 			{
 				outerRadiusFraction: 0.6,
@@ -95,6 +98,7 @@
 		layout?: (typeof PieLayout)[keyof typeof PieLayout]
 		radius?: number
 		padding?: number
+		labelSize?: number
 		levels?: LevelConfig[]
 
 		// State
@@ -133,16 +137,16 @@
 		cx = 0,
 		cy = 0,
 		gap,
-		outerRadius,
-		innerRadius,
+		outerR,
+		innerR,
 		startAngle,
 		endAngle,
 	}: {
 		cx: number
 		cy: number
 		gap: number
-		outerRadius: number
-		innerRadius: number
+		outerR: number
+		innerR: number
 		startAngle: number
 		endAngle: number
 	}) => {
@@ -152,26 +156,26 @@
 		// Handle full circles (or nearly full circles)
 		if (angleDiff >= 359.99) {
 			return [
-				`M ${cx + outerRadius} ${cy}`,
-				`A ${outerRadius} ${outerRadius} 0 1 0 ${cx - outerRadius} ${cy}`,
-				`A ${outerRadius} ${outerRadius} 0 1 0 ${cx + outerRadius} ${cy}`,
-				`M ${cx + innerRadius} ${cy}`,
-				`A ${innerRadius} ${innerRadius} 0 1 1 ${cx - innerRadius} ${cy}`,
-				`A ${innerRadius} ${innerRadius} 0 1 1 ${cx + innerRadius} ${cy}`,
+				`M ${cx + outerR} ${cy}`,
+				`A ${outerR} ${outerR} 0 1 0 ${cx - outerR} ${cy}`,
+				`A ${outerR} ${outerR} 0 1 0 ${cx + outerR} ${cy}`,
+				`M ${cx + innerR} ${cy}`,
+				`A ${innerR} ${innerR} 0 1 1 ${cx - innerR} ${cy}`,
+				`A ${innerR} ${innerR} 0 1 1 ${cx + innerR} ${cy}`,
 			].join(' ')
 		}
 
-		const outerAngleStart = startAngle + Math.asin((gap / 2) / outerRadius) * 180 / Math.PI * orientation
-		const outerStart = polarToCartesian(cx, cy, outerRadius, outerAngleStart)
+		const outerAngleStart = startAngle + Math.asin((gap / 2) / outerR) * 180 / Math.PI * orientation
+		const outerStart = polarToCartesian(cx, cy, outerR, outerAngleStart)
 
-		const outerAngleEnd = endAngle - Math.asin((gap / 2) / outerRadius) * 180 / Math.PI * orientation
-		const outerEnd = polarToCartesian(cx, cy, outerRadius, outerAngleEnd)
+		const outerAngleEnd = endAngle - Math.asin((gap / 2) / outerR) * 180 / Math.PI * orientation
+		const outerEnd = polarToCartesian(cx, cy, outerR, outerAngleEnd)
 
-		const innerAngleEnd = endAngle - Math.asin((gap / 2) / innerRadius) * 180 / Math.PI * orientation
-		const innerEnd = polarToCartesian(cx, cy, innerRadius, innerAngleEnd)
+		const innerAngleEnd = endAngle - Math.asin((gap / 2) / innerR) * 180 / Math.PI * orientation
+		const innerEnd = polarToCartesian(cx, cy, innerR, innerAngleEnd)
 
-		const innerAngleStart = startAngle + Math.asin((gap / 2) / innerRadius) * 180 / Math.PI * orientation
-		const innerStart = polarToCartesian(cx, cy, innerRadius, innerAngleStart)
+		const innerAngleStart = startAngle + Math.asin((gap / 2) / innerR) * 180 / Math.PI * orientation
+		const innerStart = polarToCartesian(cx, cy, innerR, innerAngleStart)
 
 		const largeArcFlag = angleDiff > 180 ? 1 : 0
 		const sweepFlag = orientation === 1 ? 1 : 0
@@ -184,9 +188,9 @@
 		return (
 			[
 				`M ${outerStart.x} ${outerStart.y}`,
-				`A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} ${sweepFlag} ${outerEnd.x} ${outerEnd.y}`,
+				`A ${outerR} ${outerR} 0 ${largeArcFlag} ${sweepFlag} ${outerEnd.x} ${outerEnd.y}`,
 				`L ${innerEnd.x} ${innerEnd.y}`,
-				`A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} ${1 - sweepFlag} ${innerStart.x} ${innerStart.y}`,
+				`A ${innerR} ${innerR} 0 ${largeArcFlag} ${1 - sweepFlag} ${innerStart.x} ${innerStart.y}`,
 				`L ${outerStart.x} ${outerStart.y}`,
 			]
 				.join(' ')
@@ -209,8 +213,8 @@
 		const levelConfig = getLevelConfig(level)
 		const parentLevelConfig = getLevelConfig(level - 1)
 
-		const outerRadius = radius * levelConfig.outerRadiusFraction
-		const innerRadius = radius * levelConfig.innerRadiusFraction
+		const outerR = radius * levelConfig.outerRadiusFraction
+		const innerR = radius * levelConfig.innerRadiusFraction
 
 		const orientation = Math.sign(endAngle - startAngle)
 
@@ -218,7 +222,7 @@
 		const totalGapAngle = angleGap * (slices.length - 1)
 
 		const angleInsetFromGap = angleGap / 2
-		const angleInsetFromParentGap = parentLevelConfig ? (Math.asin((levelConfig.gap / 2) / outerRadius) - Math.asin((parentLevelConfig.gap / 2) / outerRadius)) * 180 / Math.PI * orientation : 0
+		const angleInsetFromParentGap = parentLevelConfig ? (Math.asin((levelConfig.gap / 2) / outerR) - Math.asin((parentLevelConfig.gap / 2) / outerR)) * 180 / Math.PI * orientation : 0
 
 		const effectiveStartAngle = startAngle + (angleInsetFromGap + angleInsetFromParentGap) * orientation
 		const effectiveEndAngle = endAngle - (angleInsetFromGap + angleInsetFromParentGap) * orientation
@@ -243,15 +247,15 @@
 						cx: 0,
 						cy,
 						gap: levelConfig.gap,
-						outerRadius,
-						innerRadius,
+						outerR,
+						innerR,
 						startAngle: -totalAngle / 2,
 						endAngle: totalAngle / 2,
 					}),
 					totalAngle,
 					midAngle,
-					outerRadius,
-					innerRadius,
+					outerR,
+					innerR,
 					level,
 					offset: levelConfig.offset ?? 0,
 					gap: levelConfig.gap,
@@ -325,10 +329,12 @@
 		style:--slice-midAngle={slice.computed.midAngle}
 		style:--slice-offset={slice.computed.offset}
 		style:--slice-gap={slice.computed.gap}
-		style:--slice-outerRadius={slice.computed.outerRadius}
-		style:--slice-innerRadius={slice.computed.innerRadius}
+		style:--slice-outerR={slice.computed.outerR}
+		style:--slice-innerR={slice.computed.innerR}
+		style:--slice-totalAngle={slice.computed.totalAngle}
 		style:--slice-path={`path("${slice.computed.path}")`}
 		style:--slice-fill={slice.color}
+		style:--slice-opacity={slice.opacity ?? 1}
 		class:highlighted={highlightedSliceId === slice.id}
 		data-slice-id={slice.id}
 		role={slice.href ? 'link' : 'button'}
@@ -351,7 +357,7 @@
 			x1="0"
 			y1={slice.computed.gap}
 			x2="0"
-			y2={-slice.computed.innerRadius}
+			y2={-slice.computed.innerR}
 		/>
 
 		{#snippet slicePathSnippet(slice: ComputedSlice)}
@@ -360,7 +366,7 @@
 				d={slice.computed.path}
 				class="slice-path"
 			>
-				<title>{[slice.tooltipValue, slice.tooltip].join('\n')}</title>
+				<title>{slice.titleText}</title>
 			</path>
 		{/snippet}
 
@@ -390,8 +396,14 @@
 	{...restProps}
 	class="container {'class' in restProps ? restProps.class : ''}"
 	data-layout={layout}
+	style:--pie-radius={radius}
+	style:--pie-labelSize={labelSize}
 >
 	<svg {...svgAttributes}>
+		{#if title}
+			<title>{title}</title>
+		{/if}
+
 		<g class="slices">
 			{#each computedSlices as slice (slice.id)}
 				{@render sliceSnippet(slice)}
@@ -453,14 +465,38 @@
 				--slice-scale: 1;
 				--slice-offset: 0;
 
-				/* Weighted average: 1/3 centroid distance + 2/3 midpoint radius for better visual balance */
-				--slice-labelRadius: calc(
-					1/3 * (
-						2/3 * (pow(var(--slice-outerRadius), 3) - pow(var(--slice-innerRadius), 3)) / (pow(var(--slice-outerRadius), 2) - pow(var(--slice-innerRadius), 2))
-					)
-					+ 2/3 * (
-						(var(--slice-outerRadius) + var(--slice-innerRadius)) / 2
-					)
+				--slice-labelRadius: calc(var(--pie-labelSize) / 2);
+				--slice-labelR: clamp(
+					/* Geometric mean of the inner and outer radii (with label radius carved out) */
+					pow(
+						(
+							(var(--slice-outerR) - var(--slice-labelRadius))
+							* (var(--slice-innerR) + var(--slice-labelRadius))
+						),
+						0.5
+					),
+
+					/* Centroid of the trimmed annular sector (with inner radius adjusted by label radius) */
+					(
+						2 / 3
+						* (
+							(
+								pow(var(--slice-outerR), 3)
+								- pow(var(--slice-innerR), 3)
+							)
+							/ (
+								pow(var(--slice-outerR), 2)
+								- pow(var(--slice-innerR), 2)
+							)
+						)
+						* (
+							sin(var(--slice-totalAngle) * 1deg / 2)
+							/ (var(--slice-totalAngle) * pi/180 / 2)
+						)
+					),
+
+					/* Outer radius minus label radius */
+					var(--slice-outerR) - var(--slice-labelRadius)
 				);
 
 				transform-origin: 0 0;
@@ -472,25 +508,26 @@
 					scale(var(--slice-scale))
 					translateY(calc(var(--slice-offset) * -1px))
 				;
-				transition-property: transform;
+				opacity: var(--slice-opacity);
+				transition-property: transform, opacity;
 
 				&:hover,
 				&:focus {
 					filter: brightness(var(--hover-brightness));
 					--slice-scale: var(--hover-scale);
+					opacity: 1;
 				}
 
-				&:focus {
-					stroke: var(--highlight-color);
-					stroke-width: calc(var(--highlight-stroke-width) * 1px);
-					z-index: 2;
-					outline: none;
-				}
-
+				&:focus,
 				&.highlighted {
 					stroke: var(--highlight-color);
 					stroke-width: calc(var(--highlight-stroke-width) * 1px);
 					z-index: 2;
+					opacity: 1;
+				}
+
+				&:focus {
+					outline: none;
 				}
 
 				> .label-line {
@@ -512,9 +549,9 @@
 					dominant-baseline: central;
 					fill: currentColor;
 					stroke: none;
-					font-size: 0.725em;
+					font-size: calc(var(--pie-labelSize) * 1px);
 					pointer-events: none;
-					translate: 0 calc(var(--slice-labelRadius) * -1px);
+					translate: 0 calc(var(--slice-labelR) * -1px);
 					rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
 					transition-property: translate, rotate, filter;
 				}

@@ -21,13 +21,11 @@
 		stage,
 		ladderEvaluation,
 		showNextStageCriteria = true,
-		onStageClick,
 	}: {
 		wallet: RatedWallet
 		stage: WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 		ladderEvaluation: WalletLadderEvaluation | null
 		showNextStageCriteria?: boolean
-		onStageClick?: (stageIndex: number) => void
 	} = $props()
 
 
@@ -117,21 +115,6 @@
 	)
 
 
-	// Actions
-	const handleBadgeClick = (clickedStage: WalletStage | null) => (e: MouseEvent) => {
-		e.preventDefault()
-		e.stopPropagation()
-
-		if (clickedStage && ladderDefinition) {
-			const stageIndex = ladderDefinition.stages.findIndex(stage => stage.id === clickedStage.id)
-
-			if (stageIndex >= 0) {
-				onStageClick?.(stageIndex)
-			}
-		}
-	}
-
-
 	// Components
 	import Typography from '@/components/Typography.svelte'
 	import WalletStageBadge from './WalletStageBadge.svelte'
@@ -151,27 +134,28 @@
 	{:else if stage === 'QUALIFIED_FOR_NO_STAGES'}
 		<header data-column="gap-2">
 			<h3 data-row="gap-2">
-				{#if onStageClick}
-					<button type="button" onclick={handleBadgeClick(stage0)}>
-						<WalletStageBadge stage={stage} ladderEvaluation={ladderEvaluation} size="large" />
-					</button>
-				{:else}
-					<WalletStageBadge stage={stage} ladderEvaluation={ladderEvaluation} size="large" />
-				{/if}
+				<a data-link="camouflaged" href={`/${wallet.metadata.id}/#stages`}>
+					<WalletStageBadge
+						stage={stage}
+						ladderEvaluation={ladderEvaluation}
+						size="large"
+					/>
+				</a>
 			</h3>
 		</header>
 	{:else if displayStage}
 		<header data-column="gap-2">
 			<h3 data-row="gap-2 start">
-				{#if onStageClick}
-					<button type="button" onclick={handleBadgeClick(displayStage)}>
-						<WalletStageBadge stage={displayStage} ladderEvaluation={ladderEvaluation} size="large" />
-					</button>
-				{:else}
-					<a data-link="camouflaged" href={`/${wallet.metadata.id}/#stage-${displayStage.id}`}>
-						<WalletStageBadge stage={displayStage} ladderEvaluation={ladderEvaluation} size="large" />
-					</a>
-				{/if}
+				<a
+					data-link="camouflaged"
+					href={`/${wallet.metadata.id}/#${displayStage.id}`}
+				>
+					<WalletStageBadge
+						stage={displayStage}
+						ladderEvaluation={ladderEvaluation}
+						size="large"
+					/>
+				</a>
 				{#if isTypographicContent(displayStage.description)}
 					<Typography content={displayStage.description} />
 				{:else}
@@ -190,16 +174,16 @@
 			{#if showNextStageCriteria && targetStage && typeof targetStage === 'object'}
 				<h4>
 					Criteria needed to advance to
-					{#if onStageClick}
-						<button type="button" onclick={handleBadgeClick(targetStage)}>
-							<WalletStageBadge stage={targetStage} ladderEvaluation={ladderEvaluation} size="medium" />
-						</button>
-					{:else}
-						<a data-link="camouflaged" href={`/${wallet.metadata.id}/#stage-${targetStage.id}`}>
-							<WalletStageBadge stage={targetStage} ladderEvaluation={ladderEvaluation} size="large" />
-						</a>
-					{/if}
-					:
+					<a
+						data-link="camouflaged"
+						href={`/${wallet.metadata.id}/#${targetStage.id}`}
+					>
+						<WalletStageBadge
+							stage={targetStage}
+							ladderEvaluation={ladderEvaluation}
+							size="medium"
+						/>
+					</a>:
 				</h4>
 			{/if}
 
@@ -261,10 +245,8 @@
 
 
 <style>
-	button {
-		background: none;
-		border: none;
-		padding: 0;
+	section {
+		text-align: start;
 	}
 
 	li > span > span:last-child {

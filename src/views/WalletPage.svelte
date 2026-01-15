@@ -28,6 +28,7 @@
 		attributeTree,
 		calculateAttributeGroupScore,
 		calculateOverallScore,
+		formatAttributeGroupTitleText,
 	} from '@/schema/attribute-groups'
 	import { toFullyQualified } from '@/schema/reference'
 	import { getAttributeOverride } from '@/schema/wallet'
@@ -131,6 +132,10 @@
 	const overallScore = $derived(
 		calculateOverallScore(wallet.overall, () => true),
 	)
+
+
+	// Functions
+	import { formatAttributeTitleText } from '@/schema/attributes'
 
 
 	// Components
@@ -324,14 +329,15 @@
 				>
 					{#if showStage}
 						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
+
 						{#if stage !== null && ladderEvaluation !== null}
-							<Tooltip
-								buttonTriggerPlacement="behind"
-								hoverTriggerPlacement="around"
-							>
-								{#snippet children()}
-									<WalletStageBadge {stage} {ladderEvaluation} size="large" />
-								{/snippet}
+							<Tooltip>
+								<WalletStageBadge
+									{stage}
+									{ladderEvaluation}
+									size="large"
+								/>
+
 								{#snippet TooltipContent()}
 									<WalletStageSummary {wallet} {stage} {ladderEvaluation} />
 								{/snippet}
@@ -432,8 +438,8 @@
 					data-row
 					data-scroll-item="inline-detached"
 				>
-					<a data-link="camouflaged" href="#stage-requirements">
-						<h2>Stage Progress</h2>
+					<a data-link="camouflaged" href="#stages">
+						<h2 id="stages">Stage Progress</h2>
 					</a>
 				</header>
 
@@ -497,7 +503,7 @@
 				data-scroll-item="inline-detached"
 			>
 				<a data-link="camouflaged" href={`#${slugifyCamelCase(attrGroup.id)}`}>
-					<h2>
+					<h2 title={formatAttributeGroupTitleText(attrGroup, score, showScores)}>
 						{attrGroup.displayName}
 					</h2>
 				</a>
@@ -531,6 +537,8 @@
 							data-row-item="wrap-center"
 						>
 							<Pie
+								title={formatAttributeGroupTitleText(attrGroup, score, showScores)}
+
 								layout={PieLayout.FullTop}
 								radius={120}
 								padding={20}
@@ -540,6 +548,7 @@
 									gap: 8,
 									angleGap: 0,
 								}]}
+
 								slices={
 									attributes
 										.map(({ attribute, evalAttr }) => ({
@@ -547,8 +556,7 @@
 											color: ratingToColor(evalAttr.evaluation.value.rating),
 											weight: attrGroup.attributeWeights[attribute.id],
 											arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
-											tooltip: attribute.displayName,
-											tooltipValue: evalAttr.evaluation.value.rating,
+											titleText: formatAttributeTitleText(evalAttr),
 											href: `#${slugifyCamelCase(attribute.id)}`,
 										}))
 								}
@@ -565,7 +573,7 @@
 										r="8"
 										fill={scoreColor}
 									>
-										{#if score?.hasUnratedComponent}
+										{#if showScores && score?.hasUnratedComponent}
 											<title>
 												*contains unrated components
 											</title>
@@ -674,54 +682,56 @@
 					<div data-row-item="flexible basis-2">
 						<div data-row="start gap-2 wrap">
 							<a data-link="camouflaged" href={`#${slugifyCamelCase(attribute.id)}`}>
-								<h3 data-icon={attribute.icon}>
+								<h3
+									data-icon={attribute.icon}
+									title={formatAttributeTitleText(evalAttr)}
+								>
 									{attribute.displayName}
 								</h3>
 							</a>
 
 							{#if true}
-								{@const attributeStages = getAttributeStages(attribute)}
 								{@const { ladderEvaluation } = getWalletStageAndLadder(wallet)}
-								{@const relevantStages = (() => {
-									if (!ladderEvaluation) {
-										return []
-									}
-									const ladderType = (() => {
-										for (const [type, evaluation] of Object.entries(wallet.ladders)) {
-											if (evaluation === ladderEvaluation) {
-												return type as WalletLadderType
-											}
-										}
-										return null
-									})()
-									if (!ladderType) {
-										return []
-									}
-									const stagesForLadder = attributeStages.find(s => s.ladderType === ladderType)
-									return stagesForLadder?.stageNumbers ?? []
-								})()}
-								{#if relevantStages.length > 0}
-									{@const stageNumber = relevantStages[0]}
+
+								{@const ladderType = (
+									ladderEvaluation ?
+										Object.entries(wallet.ladders)
+											.find(([_, evaluation]) => evaluation === ladderEvaluation)
+											?.[0] as WalletLadderType | undefined
+									:
+										undefined
+								)}
+
+								{@const attributeStages = getAttributeStages(attribute)}
+
+								{@const stageNumbers = (
+									ladderType &&
+										attributeStages
+											.find(stage => stage.ladderType === ladderType)
+											?.stageNumbers
+									||
+										[]
+								)}
+
+								{#if stageNumbers.length > 0}
+									{@const stageNumber = stageNumbers[0]}
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+
 									{#if stage && ladderEvaluation}
-										<Tooltip
-											buttonTriggerPlacement="behind"
-											hoverTriggerPlacement="around"
-										>
-											{#snippet children()}
-												<a
-													href={`#stage-${stageNumber}`}
-													data-link="camouflaged"
-													title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+										<Tooltip>
+											<a
+												href={`#${stage.id}`}
+												data-link="camouflaged"
+												title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
+											>
+												<div
+													data-badge="small"
+													style:--accent="var(--accent-color)"
 												>
-													<div
-														data-badge="small"
-														style:--accent="var(--accent-color)"
-													>
-														<small>Stage {relevantStages.join(', ')}</small>
-													</div>
-												</a>
-											{/snippet}
+													<small>Stage {stageNumbers.join(', ')}</small>
+												</div>
+											</a>
+
 											{#snippet TooltipContent()}
 												<WalletStageSummary 
 													{wallet} 
@@ -731,17 +741,17 @@
 												/>
 											{/snippet}
 										</Tooltip>
-									{:else}
+									{:else if stage}
 										<a
-											href={`#stage-${stageNumber}`}
+											href={`#${stage.id}`}
 											data-link="camouflaged"
-											title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+											title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
 										>
 											<div
 												data-badge="small"
 												style:--accent="var(--accent-color)"
 											>
-												<small>Stage {relevantStages.join(', ')}</small>
+												<small>Stage {stageNumbers.join(', ')}</small>
 											</div>
 										</a>
 									{/if}

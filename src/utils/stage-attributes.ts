@@ -84,7 +84,10 @@ const isAttributeUsedInStageObject = (attribute: Attribute, stage: WalletStage):
  * @param stageId The stage ID to check
  * @returns true if the attribute is used in the stage
  */
-export const isAttributeUsedInStage = (attribute: Attribute, stageId: string): boolean => {
+export const isAttributeUsedInStage = (
+	attribute: Attribute,
+	stageId: WalletStage['id'],
+): boolean => {
 	const stage = stagesById.get(stageId)
 
 	return stage !== undefined && isAttributeUsedInStageObject(attribute, stage)

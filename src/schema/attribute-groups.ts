@@ -755,6 +755,28 @@ export const calculateOverallScore = (
 }
 
 /**
+ * Format title text for an attribute group.
+ * @param attrGroup The attribute group to format.
+ * @param groupScore The score for the group, or null if not available.
+ * @param showScores Whether to show scores in the title.
+ * @returns Formatted title text showing icon and score (if enabled) or just display name.
+ */
+export const formatAttributeGroupTitleText = <Vs extends ValueSet>(
+	attrGroup: AttributeGroup<Vs>,
+	groupScore: MaybeUnratedScore,
+	showScores: boolean,
+) =>
+	`${attrGroup.icon} ${attrGroup.displayName}${
+		showScores
+			? `\n\n${
+					groupScore !== null && groupScore.score !== null
+						? `${(groupScore.score * 100).toFixed(0)}%${groupScore.hasUnratedComponent ? ' (has unrated components)' : ''}`
+						: 'N/A'
+				}`
+			: ''
+	}`
+
+/**
  * Look up an attribute group by ID, verifying that it exists and is not
  * entirely exempt from the given EvaluationTree.
  */

@@ -12,6 +12,11 @@
 			hidePopover(): void
 		}
 	}
+
+	export enum TooltipLayoutMode {
+		FloatingUI = 'FloatingUI',
+		AnchorPositioning = 'AnchorPositioning',
+	}
 </script>
 
 
@@ -33,6 +38,7 @@
 		placement = 'block-end',
 		buttonTriggerPlacement = 'around',
 		hoverTriggerPlacement = 'around',
+		layoutMode = TooltipLayoutMode.FloatingUI,
 		offset = 8,
 		TooltipContent,
 		hideDelay = 200,
@@ -44,11 +50,12 @@
 		placement?: 'block-start' | 'block-end' | 'inline-start' | 'inline-end'
 		buttonTriggerPlacement?: 'around' | 'behind'
 		hoverTriggerPlacement?: 'around' | 'button'
+		layoutMode?: TooltipLayoutMode
 		offset?: number
 		hideDelay?: number
-		TooltipContent: Snippet
+		TooltipContent?: Snippet
 		isEnabled?: boolean
-		children: Snippet
+		children?: Snippet
 	} = $props()
 
 
@@ -83,7 +90,8 @@
 				node.style.removeProperty('position')
 		})
 
-		if (supportsAnchorPositioning) return
+		if (layoutMode === TooltipLayoutMode.AnchorPositioning && supportsAnchorPositioning)
+			return
 
 		const {
 			computePosition,
@@ -92,6 +100,11 @@
 			shift,
 			autoUpdate,
 		} = await import('@floating-ui/dom')
+
+		// Disable native anchor positioning
+		node.popoverTargetElement.style.position = 'absolute'
+		node.popoverTargetElement.style.setProperty('position-area', 'none')
+		node.popoverTargetElement.style.setProperty('position-anchor', anchorName)
 
 		const updatePosition = () => {
 			void computePosition(
@@ -107,7 +120,11 @@
 					middleware: [
 						offsetMiddleware(offset),
 						flip(),
-						shift(),
+						shift({
+							padding: offset * 2,
+							crossAxis: true,
+							mainAxis: true,
+						}),
 					],
 				}
 			)
@@ -160,7 +177,9 @@
 
 			{...restProps}
 		>
-			{@render TooltipContent()}
+			{#if TooltipContent}
+				{@render TooltipContent()}
+			{/if}
 		</div>
 	{/snippet}
 
@@ -180,7 +199,9 @@
 				{@attach useButtonTrigger}
 			></button>
 
-			{@render children()}
+			{#if children}
+				{@render children()}
+			{/if}
 		</div>
 
 		{@render Popover()}
@@ -195,19 +216,23 @@
 			{...hoverTriggerEvents}
 			{@attach useButtonTrigger}
 		>
-			{@render children()}
+			{#if children}
+				{@render children()}
+			{/if}
 
 			{@render Popover()}
 		</button>
 	{/if}
 {:else}
-	{@render children()}
+	{#if children}
+		{@render children()}
+	{/if}
 {/if}
 
 
 <style>
 	[data-tooltip-trigger] {
-		display: grid;
+		display: inline grid;
 		font: inherit;
 		padding: 0;
 		background-color: transparent;
@@ -221,13 +246,14 @@
 		--popover-borderWidth: 1px;
 		--popover-boxShadow: 0 4px 12px light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.4));
 
-		position: absolute;
+		position: fixed;
 		position-area: block-end;
 		position-try-fallbacks: flip-block;
 		position-try-order: most-block-size;
 		position-visibility: anchors-visible;
 
 		margin: var(--offset);
+		width: max-content;
 
 		background-color: var(--popover-backgroundColor);
 		border-radius: 0.5rem;

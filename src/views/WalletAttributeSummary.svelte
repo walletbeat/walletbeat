@@ -94,13 +94,9 @@
 
 		<div data-row="gap-2">
 			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
-				{@const stageNumber = relevantStages[0]}
-				<Tooltip
-					buttonTriggerPlacement="behind"
-					hoverTriggerPlacement="around"
-				>
+				<Tooltip>
 					<a
-						href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#stage-${stageNumber}`}
+						href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#${firstStage.id}`}
 						data-link="camouflaged"
 						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
 					>
