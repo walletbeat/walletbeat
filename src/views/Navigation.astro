@@ -21,7 +21,13 @@ const currentPathname = Astro.url.pathname
 	})
 </script>
 
-<nav id='nav' popover='auto' data-sticky data-scroll-container data-sticky-container>
+<nav
+	id='nav'
+	popover='auto'
+	data-sticky='backdrop-always'
+	data-scroll-container
+	data-sticky-container
+>
 	<header data-sticky='block' data-row data-scroll-container>
 		<a href='/'>
 			<picture>
