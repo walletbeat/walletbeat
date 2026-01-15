@@ -254,6 +254,7 @@
 
 		margin: var(--offset);
 		width: max-content;
+		max-width: calc(100vw - var(--offset) * 2);
 
 		background-color: var(--popover-backgroundColor);
 		border-radius: 0.5rem;
