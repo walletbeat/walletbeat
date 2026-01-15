@@ -83,7 +83,7 @@
 		!ladderDefinition ?
 			null
 		: currentStageIndex === null ?
-			ladderDefinition.stages.length - 1
+			0
 		:
 			(currentStageIndex + 1 < ladderDefinition.stages.length ? currentStageIndex + 1 : ladderDefinition.stages.length - 1)
 	)
