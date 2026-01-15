@@ -594,31 +594,32 @@
 					{:else}
 						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
 						{@const stageFilterId = `stage-${stageValue}`}
-						<Tooltip
-							buttonTriggerPlacement="behind"
-							hoverTriggerPlacement="around"
-						>
-							{#snippet children()}
-								<div
-									role="button"
-									tabindex="0"
-									aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
-									onclick={(e) => {
-										e.preventDefault()
-										e.stopPropagation()
-										toggleAttributeFilterById?.(stageFilterId)
-									}}
-									onkeydown={(e) => {
-										if (e.key !== 'Enter' && e.key !== ' ') return
 
-										e.preventDefault()
-										e.stopPropagation()
-										toggleAttributeFilterById?.(stageFilterId)
-									}}
-								>
-									<WalletStageBadge {stage} {ladderEvaluation} size="medium" />
-								</div>
-							{/snippet}
+						<Tooltip>
+							<div
+								role="button"
+								tabindex="0"
+								aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
+								onclick={(e) => {
+									e.preventDefault()
+									e.stopPropagation()
+									toggleAttributeFilterById?.(stageFilterId)
+								}}
+								onkeydown={(e) => {
+									if (e.key !== 'Enter' && e.key !== ' ') return
+
+									e.preventDefault()
+									e.stopPropagation()
+									toggleAttributeFilterById?.(stageFilterId)
+								}}
+							>
+								<WalletStageBadge
+									{stage}
+									{ladderEvaluation}
+									size="medium"
+								/>
+							</div>
+
 							{#snippet TooltipContent()}
 								<WalletStageSummary
 									{wallet}

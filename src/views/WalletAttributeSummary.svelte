@@ -94,10 +94,7 @@
 
 		<div data-row="gap-2">
 			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
-				<Tooltip
-					buttonTriggerPlacement="behind"
-					hoverTriggerPlacement="around"
-				>
+				<Tooltip>
 					<a
 						href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#${firstStage.id}`}
 						data-link="camouflaged"

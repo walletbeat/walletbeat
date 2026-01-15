@@ -329,14 +329,15 @@
 				>
 					{#if showStage}
 						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
+
 						{#if stage !== null && ladderEvaluation !== null}
-							<Tooltip
-								buttonTriggerPlacement="behind"
-								hoverTriggerPlacement="around"
-							>
-								{#snippet children()}
-									<WalletStageBadge {stage} {ladderEvaluation} size="large" />
-								{/snippet}
+							<Tooltip>
+								<WalletStageBadge
+									{stage}
+									{ladderEvaluation}
+									size="large"
+								/>
+
 								{#snippet TooltipContent()}
 									<WalletStageSummary {wallet} {stage} {ladderEvaluation} />
 								{/snippet}
@@ -714,10 +715,7 @@
 									{@const stageNumber = relevantStages[0]}
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
 									{#if stage && ladderEvaluation}
-										<Tooltip
-											buttonTriggerPlacement="behind"
-											hoverTriggerPlacement="around"
-										>
+										<Tooltip>
 											{#snippet children()}
 												<a
 													href={`#${stage.id}`}
