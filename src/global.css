@@ -862,6 +862,25 @@ ol {
 			font-size: 0.875em;
 		}
 
+		@supports not selector(::before::marker) {
+			&::marker {
+				color: transparent;
+			}
+
+			&::before {
+				position: absolute;
+				margin-inline-start: calc(-1 * var(--list-marker-inlineSize) - var(--list-markerGap));
+				width: var(--list-marker-inlineSize);
+
+				content: '●';
+				font-size: 1em;
+				text-align: center;
+			}
+			&[data-list-item-marker]::before {
+				content: attr(data-list-item-marker);
+			}
+		}
+
 		padding-inline-start: var(--list-markerGap);
 
 		> * + * {
