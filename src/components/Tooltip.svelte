@@ -232,7 +232,7 @@
 
 <style>
 	[data-tooltip-trigger] {
-		display: grid;
+		display: inline grid;
 		font: inherit;
 		padding: 0;
 		background-color: transparent;
