@@ -1367,6 +1367,12 @@
 		}
 	}
 
+	@media (scripting: none) {
+		.filters {
+			display: none;
+		}
+	}
+
 	:global {
 		.wallet-table {
 			tr {
