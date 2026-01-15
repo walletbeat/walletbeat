@@ -623,4 +623,19 @@ export function exampleRating<V extends Value>(
  * @returns Formatted title text in the format: "(icon) title [(eval icon) EVAL VALUE]\n\n(displayName)"
  */
 export const formatAttributeTitleText = (attribute: EvaluatedAttribute<Value>, suffix?: string) =>
-	`${attribute.evaluation.value.icon ?? attribute.attribute.icon} ${attribute.attribute.displayName}${suffix ?? ''} [${ratingIcons[attribute.evaluation.value.rating]} ${attribute.evaluation.value.rating}]\n\n${attribute.evaluation.value.displayName}`
+	`${
+		attribute.evaluation.value.icon ?? attribute.attribute.icon
+	} ${
+		attribute.attribute.displayName
+	}${
+		suffix ?? ''
+	} [${
+		ratingIcons[attribute.evaluation.value.rating]
+	} ${
+		attribute.evaluation.value.rating
+	}]${
+		![Rating.EXEMPT, Rating.UNRATED].includes(attribute.evaluation.value.rating) ?
+			`\n\n${attribute.evaluation.value.displayName}`
+		:
+			''
+	}`
