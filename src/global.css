@@ -1122,7 +1122,7 @@ ol {
 				}
 			}
 
-			&:not([data-sticky~='no-backdrop'])::before {
+			&:not([data-sticky~='backdrop-none'])::before {
 				content: '';
 				z-index: -1;
 				position: absolute;
