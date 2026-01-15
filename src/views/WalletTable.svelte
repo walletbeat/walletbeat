@@ -1401,6 +1401,10 @@
 
 						transition-property: opacity, scale, min-block-size, padding-block-end;
 						min-block-size: var(--walletTable-rowClosed-blockSize);
+
+						> :global(:first-child) {
+							flex: 1;
+						}
 					}
 
 					&:open summary {
