@@ -83,7 +83,7 @@
 		!ladderDefinition ?
 			null
 		: currentStageIndex === null ?
-			ladderDefinition.stages.length - 1
+			0
 		:
 			(currentStageIndex + 1 < ladderDefinition.stages.length ? currentStageIndex + 1 : ladderDefinition.stages.length - 1)
 	)
@@ -134,7 +134,7 @@
 				)}
 
 				<details
-					id={`stage-${stageIndex}`}
+					id={s.id}
 					open={isDefaultOpen}
 					data-card="radius-8 padding-6 {isCurrent ? 'border-accent' : ''}"
 					data-column="gap-0"
@@ -145,7 +145,7 @@
 						<div data-row="wrap wrap-first-last">
 							<a
 								data-link="camouflaged"
-								href={`#stage-${stageIndex}`}
+								href={`#${s.id}`}
 							>
 								<data
 									data-badge="medium"

@@ -54,13 +54,11 @@
 	style:--accent={stageColor}
 >
 	{#if stageValue === 'NOT_APPLICABLE'}
-		<small>N/A</small>
+		N/A
 	{:else if stageValue === 'QUALIFIED_FOR_NO_STAGES'}
-		<small>No Stage</small>
+		No Stage
 	{:else if stage && typeof stage === 'object'}
-		<strong>
-			{stage.label}
-		</strong>
+		{stage.label}
 	{/if}
 </data>
 
@@ -70,6 +68,12 @@
 		&[value='NO_STAGES'],
 		&[value='NOT_APPLICABLE'] {
 			--accent: var(--rating-unrated);
+		}
+
+		&[value='NO_STAGES'] {
+			border-style: dashed;
+			background-color: color-mix(in oklch, var(--background-tertiary) 75%, transparent);
+			color: color-mix(in oklch, var(--text-primary) 85%, transparent);
 		}
 	}
 </style>

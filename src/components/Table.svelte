@@ -40,8 +40,16 @@
 			]
 		>
 
+		align?: ColumnAlignment
+
 		subcolumns?: Column<_RowValue, _CellValue, _ColumnId>[]
 		isDefaultExpanded?: boolean
+	}
+
+	export enum ColumnAlignment {
+		Start = 'Start',
+		Center = 'Center',
+		End = 'End',
 	}
 
 	export enum SortDirection {
@@ -442,6 +450,7 @@
 					span={columnSpan}
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
+					data-column-align={column.align ? column.align.toLowerCase() : undefined}
 				/>
 			{/each}
 		</colgroup>
@@ -495,6 +504,7 @@
 					data-sortable={isSortable ? '' : undefined}
 					data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 					data-sticky={column.isSticky ? 'inline' : undefined}
+					data-column-align={column.align ? column.align.toLowerCase() : undefined}
 					data-expandable={isExpandable ? '' : undefined}
 					data-expanded={isExpandable && isExpanded ? '' : undefined}
 				>
@@ -601,6 +611,7 @@
 							data-sortable={isSortable ? '' : undefined}
 							data-sort={table.sortState?.columnId === column.id ? table.sortState?.direction : undefined}
 							data-sticky={column.isSticky ? 'inline' : undefined}
+							data-column-align={column.align ? column.align.toLowerCase() : undefined}
 							style:--table-cell-verticalAlign={
 								cellVerticalAlign?.({
 									row,
@@ -965,14 +976,16 @@
 			th,
 			td
 		) {
-			&[data-align='start'] {
+			&[data-column-align='start'] {
 				text-align: start;
-				align-items: start;
 				transform-origin: left;
 			}
-			&[data-align='end'] {
+			&[data-column-align='center'] {
+				text-align: center;
+				transform-origin: center;
+			}
+			&[data-column-align='end'] {
 				text-align: end;
-				align-items: end;
 				transform-origin: right;
 			}
 
