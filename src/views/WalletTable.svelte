@@ -199,6 +199,26 @@
 		})
 	)
 
+	const attributesExemptForAllWallets = $derived(
+		new Set(
+			attributeGroups.flatMap(attrGroup =>
+				Object.keys(attrGroup.attributes)
+					.filter(attributeId => {
+						const walletsWithAttribute = filteredWallets.filter(wallet =>
+							wallet.overall[attrGroup.id]?.[attributeId] !== undefined
+						)
+						return (
+							walletsWithAttribute.length > 0 &&
+							walletsWithAttribute.every(wallet =>
+								wallet.overall[attrGroup.id]?.[attributeId]?.evaluation?.value?.rating === Rating.EXEMPT
+							)
+						)
+					})
+					.map(attributeId => `${attrGroup.id}.${attributeId}`)
+			)
+		)
+	)
+
 
 	// Functions
 	import { variantToName } from '@/constants/variants'
@@ -966,8 +986,14 @@
 												children: (
 													evaluatedAttributesEntries(evalGroup)
 														.filter(([attributeId, attribute]) => (
-															attribute?.evaluation?.value?.rating !== Rating.EXEMPT &&
-															(overallFilteredAttributeIds === null || overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`))
+															(
+																attribute?.evaluation?.value?.rating !== Rating.EXEMPT
+																|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
+															)
+															&& (
+																overallFilteredAttributeIds === null
+																|| overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
+															)
 														))
 														.map(([attributeId, attribute]) => ({
 															id: `attrGroup_${attrGroup.id}__attr_${attributeId}`,
@@ -975,6 +1001,9 @@
 															weight: attrGroup.attributeWeights[attributeId],
 															arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
 															titleText: formatAttributeTitleText(attribute),
+															...attribute.evaluation.value.rating === Rating.EXEMPT && {
+																opacity: 0.33,
+															},
 														}))
 												),
 											},
@@ -1104,11 +1133,19 @@
 						{@const filteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(
 							filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
 						) : null}
-						{@const evalEntries = evaluatedAttributesEntries(evalGroup)
-							.filter(([attributeId, attribute]) => (
-								attribute?.evaluation?.value?.rating !== Rating.EXEMPT &&
-								(filteredAttributeIds === null || filteredAttributeIds.has(`${attrGroup.id}.${attributeId}`))
-							))}
+						{@const evalEntries = (
+							evaluatedAttributesEntries(evalGroup)
+								.filter(([attributeId, attribute]) => (
+									(
+										attribute?.evaluation?.value?.rating !== Rating.EXEMPT
+										|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
+									)
+									&& (
+										filteredAttributeIds === null
+										|| filteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
+									)
+								))
+						)}
 
 						{@const hasActiveAttribute = activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id}
 
@@ -1181,6 +1218,9 @@
 												weight: attrGroup.attributeWeights[attributeId],
 												arcLabel: icon,
 												titleText: formatAttributeTitleText(attribute, tooltipSuffix),
+												...attribute.evaluation.value.rating === Rating.EXEMPT && {
+													opacity: 0.33,
+												},
 											}
 										}
 									)
@@ -1364,12 +1404,6 @@
 			--scrollItem-inlineDetached-maxSize: 60.5rem;
 			--scrollItem-inlineDetached-paddingStart: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 			--scrollItem-inlineDetached-paddingEnd: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
-		}
-	}
-
-	@media (scripting: none) {
-		.filters {
-			display: none;
 		}
 	}
 
