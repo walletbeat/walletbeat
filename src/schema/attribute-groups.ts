@@ -765,19 +765,16 @@ export const formatAttributeGroupTitleText = <Vs extends ValueSet>(
 	attrGroup: AttributeGroup<Vs>,
 	groupScore: MaybeUnratedScore,
 	showScores: boolean,
-) => (
+) =>
 	`${attrGroup.icon} ${attrGroup.displayName}${
-		showScores ?
-			`\n\n${
-				groupScore !== null && groupScore.score !== null ?
-					`${(groupScore.score * 100).toFixed(0)}%${groupScore.hasUnratedComponent ? ' (has unrated components)' : ''}`
-				:
-					'N/A'
-			}`
-		:
-			''
+		showScores
+			? `\n\n${
+					groupScore !== null && groupScore.score !== null
+						? `${(groupScore.score * 100).toFixed(0)}%${groupScore.hasUnratedComponent ? ' (has unrated components)' : ''}`
+						: 'N/A'
+				}`
+			: ''
 	}`
-)
 
 /**
  * Look up an attribute group by ID, verifying that it exists and is not
