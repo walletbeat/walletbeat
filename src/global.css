@@ -305,9 +305,11 @@ label:has(
 	padding: 0.66em;
 	gap: 0.5em;
 
+	appearance: none;
 	background-color: var(--background-primary);
 	border: 1px solid var(--border-color);
 	border-radius: 0.5em;
+	color: inherit;
 
 	font: inherit;
 	font-size: smaller;
