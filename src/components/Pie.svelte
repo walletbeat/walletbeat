@@ -7,6 +7,7 @@
 		arcLabel: string
 		titleText: string
 		href?: string
+		opacity?: number
 		children?: Slice[]
 	}
 
@@ -333,6 +334,7 @@
 		style:--slice-totalAngle={slice.computed.totalAngle}
 		style:--slice-path={`path("${slice.computed.path}")`}
 		style:--slice-fill={slice.color}
+		style:--slice-opacity={slice.opacity ?? 1}
 		class:highlighted={highlightedSliceId === slice.id}
 		data-slice-id={slice.id}
 		role={slice.href ? 'link' : 'button'}
@@ -506,25 +508,26 @@
 					scale(var(--slice-scale))
 					translateY(calc(var(--slice-offset) * -1px))
 				;
-				transition-property: transform;
+				opacity: var(--slice-opacity);
+				transition-property: transform, opacity;
 
 				&:hover,
 				&:focus {
 					filter: brightness(var(--hover-brightness));
 					--slice-scale: var(--hover-scale);
+					opacity: 1;
 				}
 
-				&:focus {
-					stroke: var(--highlight-color);
-					stroke-width: calc(var(--highlight-stroke-width) * 1px);
-					z-index: 2;
-					outline: none;
-				}
-
+				&:focus,
 				&.highlighted {
 					stroke: var(--highlight-color);
 					stroke-width: calc(var(--highlight-stroke-width) * 1px);
 					z-index: 2;
+					opacity: 1;
+				}
+
+				&:focus {
+					outline: none;
 				}
 
 				> .label-line {
