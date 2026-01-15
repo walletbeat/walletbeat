@@ -691,28 +691,30 @@
 							</a>
 
 							{#if true}
-								{@const attributeStages = getAttributeStages(attribute)}
 								{@const { ladderEvaluation } = getWalletStageAndLadder(wallet)}
-								{@const relevantStages = (() => {
-									if (!ladderEvaluation) {
-										return []
-									}
-									const ladderType = (() => {
-										for (const [type, evaluation] of Object.entries(wallet.ladders)) {
-											if (evaluation === ladderEvaluation) {
-												return type as WalletLadderType
-											}
-										}
-										return null
-									})()
-									if (!ladderType) {
-										return []
-									}
-									const stagesForLadder = attributeStages.find(s => s.ladderType === ladderType)
-									return stagesForLadder?.stageNumbers ?? []
-								})()}
-								{#if relevantStages.length > 0}
-									{@const stageNumber = relevantStages[0]}
+
+								{@const ladderType = (
+									ladderEvaluation ?
+										Object.entries(wallet.ladders)
+											.find(([_, evaluation]) => evaluation === ladderEvaluation)
+											?.[0] as WalletLadderType | undefined
+									:
+										undefined
+								)}
+
+								{@const attributeStages = getAttributeStages(attribute)}
+
+								{@const stageNumbers = (
+									ladderType &&
+										attributeStages
+											.find(stage => stage.ladderType === ladderType)
+											?.stageNumbers
+									||
+										[]
+								)}
+
+								{#if stageNumbers.length > 0}
+									{@const stageNumber = stageNumbers[0]}
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
 
 									{#if stage && ladderEvaluation}
@@ -720,13 +722,13 @@
 											<a
 												href={`#${stage.id}`}
 												data-link="camouflaged"
-												title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+												title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
 											>
 												<div
 													data-badge="small"
 													style:--accent="var(--accent-color)"
 												>
-													<small>Stage {relevantStages.join(', ')}</small>
+													<small>Stage {stageNumbers.join(', ')}</small>
 												</div>
 											</a>
 
@@ -743,13 +745,13 @@
 										<a
 											href={`#${stage.id}`}
 											data-link="camouflaged"
-											title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
+											title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
 										>
 											<div
 												data-badge="small"
 												style:--accent="var(--accent-color)"
 											>
-												<small>Stage {relevantStages.join(', ')}</small>
+												<small>Stage {stageNumbers.join(', ')}</small>
 											</div>
 										</a>
 									{/if}
