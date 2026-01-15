@@ -147,7 +147,7 @@ export interface WalletStageGroup {
  */
 export interface WalletStage {
 	/** An ID for this stage. */
-	id: string
+	id: `stage:${string}`
 
 	/** A human-readable label for this stage (e.g., "Stage 0", "Stage 1"). */
 	label: string

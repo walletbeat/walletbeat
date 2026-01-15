@@ -437,8 +437,8 @@
 					data-row
 					data-scroll-item="inline-detached"
 				>
-					<a data-link="camouflaged" href="#stage-requirements">
-						<h2>Stage Progress</h2>
+					<a data-link="camouflaged" href="#stages">
+						<h2 id="stages">Stage Progress</h2>
 					</a>
 				</header>
 
@@ -720,7 +720,7 @@
 										>
 											{#snippet children()}
 												<a
-													href={`#stage-${stageNumber}`}
+													href={`#${stage.id}`}
 													data-link="camouflaged"
 													title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
 												>
@@ -741,9 +741,9 @@
 												/>
 											{/snippet}
 										</Tooltip>
-									{:else}
+									{:else if stage}
 										<a
-											href={`#stage-${stageNumber}`}
+											href={`#${stage.id}`}
 											data-link="camouflaged"
 											title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
 										>

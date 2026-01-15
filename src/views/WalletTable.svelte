@@ -624,11 +624,6 @@
 									{wallet}
 									{stage}
 									{ladderEvaluation}
-									onStageClick={n => {
-										if (ladderEvaluation && n !== null && n < ladderEvaluation.ladder.stages.length) {
-											toggleAttributeFilterById?.(stageFilterId)
-										}
-									}}
 								/>
 							{/snippet}
 						</Tooltip>
