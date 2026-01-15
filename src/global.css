@@ -117,6 +117,8 @@
 	outline-color: var(--accent);
 
 	transition-property: background-color, color;
+
+	touch-action: none;
 }
 
 *,
@@ -901,7 +903,8 @@ ol {
 	--scrollContainer-sizeInline: 100cqi;
 
 	/* Rules */
-	container-name: ScrollContainer;
+	overscroll-behavior: none;
+	touch-action: pan-x pan-y;
 
 	&:not([data-scroll-container~='block']):not([data-scroll-container~='inline']) {
 		container-type: size;
