@@ -857,7 +857,7 @@ ol {
 			--listItem-gap: 1.5lh;
 		}
 
-		&::marker {
+		/* &::marker {
 			content: '●' ' ';
 			font-size: 1em;
 		}
@@ -866,7 +866,7 @@ ol {
 			font-size: 0.875em;
 		}
 
-		@supports not selector(::before::marker) {
+		@supports not selector(::before::marker) { */
 			&::marker {
 				color: transparent;
 			}
@@ -883,7 +883,7 @@ ol {
 			&[data-list-item-marker]::before {
 				content: attr(data-list-item-marker);
 			}
-		}
+		/* } */
 
 		padding-inline-start: var(--list-markerGap);
 
