@@ -8,7 +8,7 @@ import {
 
 import { ledgerWalletMetadata } from '../hardware-wallets/ledger'
 
-export const globalEBreach: WalletSecurityNews = {
+export default {
 	slug: 'global-e-breach',
 	type: NewsType.DATA_BREACH,
 	ref: {
@@ -27,8 +27,4 @@ export const globalEBreach: WalletSecurityNews = {
 	title: 'Global-e Independent Provider Data Breach Affecting Ledger Customers',
 	updatedAt: '2026-01-06',
 	wallet: ledgerWalletMetadata,
-} as const
-
-export const ledgerNewsRegistry = {
-	'ledger-global-e-breach': globalEBreach,
-} as const
+} as const satisfies WalletSecurityNews
