@@ -402,18 +402,17 @@ export interface MaintenanceEvaluations extends EvaluatedGroup<MaintenanceValues
 }
 
 /** Evaluated attributes for a single wallet. */
-export interface EvaluationTree
-	extends NonEmptyRecord<
-		string,
-		EvaluatedGroup<
-			| SecurityValues
-			| PrivacyValues
-			| SelfSovereigntyValues
-			| TransparencyValues
-			| EcosystemValues
-			| MaintenanceValues
-		>
-	> {
+export interface EvaluationTree extends NonEmptyRecord<
+	string,
+	EvaluatedGroup<
+		| SecurityValues
+		| PrivacyValues
+		| SelfSovereigntyValues
+		| TransparencyValues
+		| EcosystemValues
+		| MaintenanceValues
+	>
+> {
 	security: SecurityEvaluations
 	privacy: PrivacyEvaluations
 	selfSovereignty: SelfSovereigntyEvaluations
