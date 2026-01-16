@@ -16,5 +16,5 @@ export const allWalletSecurityNews: WalletSecurityNews[] = [
  * @returns Array of WalletSecurityNews items affecting the given wallet
  */
 export function getNewsForWallet(walletId: string): WalletSecurityNews[] {
-	return allWalletSecurityNews.filter((news) => news.wallet?.id === walletId)
+	return allWalletSecurityNews.filter(news => news.wallet?.id === walletId)
 }
