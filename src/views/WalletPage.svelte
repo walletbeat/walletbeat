@@ -61,6 +61,7 @@
 		impactCategories,
 	} from '@/types/content/news'
 	import { refs as extractRefs } from '@/schema/reference'
+	import { getNewsForWallet } from '@/data/news'
 
 	let queryParams = $state<URLSearchParams | undefined>(
 		globalThis.location && new SvelteURLSearchParams(globalThis.location.search)
@@ -78,6 +79,10 @@
 	// (Derived)
 	const wallet = $derived(
 		allRatedWallets[walletName]
+	)
+
+	const walletNews = $derived(
+		getNewsForWallet(wallet.metadata.id)
 	)
 
 	let selectedVariant = $derived<Variant | undefined>(
@@ -436,7 +441,7 @@
 			</section>
 		</header>
 
-		{#if wallet.news && wallet.news.length > 0}
+		{#if walletNews.length > 0}
 			<hr />
 			<div data-scroll-item="inline-detached padding-match-end" data-column>
 			<section
@@ -477,7 +482,7 @@
 
 
 					<div class="attribute-accordions news-items" data-column>
-						{#each wallet.news as newsItem}
+						{#each walletNews as newsItem}
 							{@const statusInfo = incidentStatuses[newsItem.status]}
 							{@const severityInfo = severities[newsItem.severity]}
 							{@const typeInfo = newsTypes[newsItem.type]}
