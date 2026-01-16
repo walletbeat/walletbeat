@@ -395,7 +395,8 @@ Issued At: ${new Date().toISOString()}`;
     const previousStep = testSteps[stepIndex - 1];
     const previousResult = stepTestState.stepResults[previousStep.id];
 
-    return previousResult?.status === 'passed';
+    // Allow running if previous step completed (passed or failed)
+    return previousResult?.status === 'passed' || previousResult?.status === 'failed';
   }
 
   function getStepStatus(stepId: string): StepStatus {
@@ -445,17 +446,16 @@ Issued At: ${new Date().toISOString()}`;
 
       stepTestState.stepResults[step.id] = result;
 
-      // Check if this was the last step and it passed
+      // Check if this was the last step
       const isLastStep = step.id === testSteps[testSteps.length - 1].id;
 
-      if (isLastStep && result.status === 'passed') {
-        stepTestState.overallStatus = 'completed';
+      if (isLastStep) {
+        // Show final results after last step regardless of pass/fail
+        stepTestState.overallStatus = result.status === 'passed' ? 'completed' : 'failed';
         showFinalResults();
-      } else if (result.status === 'failed') {
-        stepTestState.overallStatus = 'failed';
       } else {
-        // If passed and not the last step, auto-advance
-        if (result.status === 'passed' && stepTestState.currentStepIndex < testSteps.length - 1) {
+        // Auto-advance to next step regardless of pass/fail
+        if (stepTestState.currentStepIndex < testSteps.length - 1) {
           stepTestState.currentStepIndex++;
         }
 
@@ -466,7 +466,22 @@ Issued At: ${new Date().toISOString()}`;
 
       stepTestState.stepResults[step.id] = createStepResult(step, 'failed', [], errorMsg);
       stepTestState.error = errorMsg;
-      stepTestState.overallStatus = 'failed';
+
+      // Check if this was the last step
+      const isLastStep = step.id === testSteps[testSteps.length - 1].id;
+
+      if (isLastStep) {
+        // Show final results after last step even on error
+        stepTestState.overallStatus = 'failed';
+        showFinalResults();
+      } else {
+        // Auto-advance to next step even on error
+        if (stepTestState.currentStepIndex < testSteps.length - 1) {
+          stepTestState.currentStepIndex++;
+        }
+
+        stepTestState.overallStatus = 'idle';
+      }
     }
   }
 
