@@ -55,11 +55,13 @@
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { isLabeledUrl } from '@/schema/url'
 	import {
+		IncidentStatus,
 		incidentStatuses,
 		newsTypes,
 		severities,
 		impactCategories,
 	} from '@/types/content/news'
+	import { daysSince } from '@/types/date'
 	import { refs as extractRefs } from '@/schema/reference'
 	import { getNewsForWallet } from '@/data/news'
 
@@ -83,6 +85,40 @@
 
 	const walletNews = $derived(
 		getNewsForWallet(wallet.metadata.id)
+	)
+
+	// News section behavior: determine prominence based on recency and resolution status
+	const allNewsResolved = $derived(
+		walletNews.length > 0 &&
+		walletNews.every(news => news.status === IncidentStatus.RESOLVED)
+	)
+
+	const latestNewsDate = $derived(
+		walletNews.length > 0
+			? walletNews.reduce((latest, news) =>
+				news.updatedAt > latest ? news.updatedAt : latest,
+				walletNews[0].updatedAt
+			)
+			: null
+	)
+
+	const daysSinceLatestNews = $derived(
+		latestNewsDate ? daysSince(latestNewsDate) : null
+	)
+
+	// Collapse by default if all resolved and >30 days old
+	const newsIsStale = $derived(
+		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 30
+	)
+
+	// Move to bottom if all resolved and >1 year old
+	const newsIsVeryStale = $derived(
+		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 365
+	)
+
+	// Expand by default unless news is stale
+	const shouldExpandNews = $derived(
+		!newsIsStale
 	)
 
 	let selectedVariant = $derived<Variant | undefined>(
@@ -441,9 +477,15 @@
 			</section>
 		</header>
 
-		{#if walletNews.length > 0}
+		{#if walletNews.length > 0 && !newsIsVeryStale}
 			<hr />
 			<div data-scroll-item="inline-detached padding-match-end" data-column>
+			{@render securityNewsSection()}
+			</div>
+		{/if}
+
+
+		{#snippet securityNewsSection()}
 			<section
 				class="attribute"
 				id="security-news"
@@ -455,7 +497,7 @@
 				<details
 					data-card="radius-8 padding-0 border-accent"
 					data-column="gap-0"
-					open
+					open={shouldExpandNews}
 				>
 					<summary data-row>
 						<header data-row>
@@ -469,7 +511,15 @@
 								</div>
 
 								<div class="subsection-caption">
-									<p>Recent security updates and incidents</p>
+									<p>
+										{#if !allNewsResolved}
+											Recent security updates and incidents
+										{:else if shouldExpandNews}
+											All incidents resolved. This section will collapse automatically after 30 days.
+										{:else}
+											Past security incidents (all resolved)
+										{/if}
+									</p>
 								</div>
 							</div>
 
@@ -558,8 +608,7 @@
 					</div>
 				</details>
 			</section>
-			</div>
-		{/if}
+		{/snippet}
 
 
 		{#if showStage}
@@ -592,6 +641,13 @@
 				})}
 			{/if}
 		{/each}
+
+		{#if walletNews.length > 0 && newsIsVeryStale}
+			<hr />
+			<div data-scroll-item="inline-detached padding-match-end" data-column>
+				{@render securityNewsSection()}
+			</div>
+		{/if}
 	</article>
 </div>
 
