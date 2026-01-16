@@ -13,10 +13,8 @@
     stepTestState: {
       currentStepIndex: number;
       overallStatus: 'idle' | 'in_progress' | 'completed' | 'failed';
-      error: string;
       stepResults: Record<string, StepResult>;
       discoveredProviders: Array<DiscoveredProvider & { provider: unknown }>;
-      selectedProviderId: string | null;
       connectedAddress: string | null;
       chainId: number | null;
       batchId: string | null;

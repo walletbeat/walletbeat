@@ -698,6 +698,7 @@ Issued At: ${new Date().toISOString()}`;
       const hasChainId = connectEventData && typeof connectEventData === 'object' && 'chainId' in connectEventData;
 
       connectEventDetail = hasChainId
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- connectEventData validated above
         ? `Event fired with chainId: ${(connectEventData as { chainId: string }).chainId}`
         : 'Event fired (missing chainId in payload)';
     } else {
