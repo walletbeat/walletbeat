@@ -199,11 +199,32 @@
 		})
 	)
 
+	const attributesExemptForAllWallets = $derived(
+		new Set(
+			attributeGroups.flatMap(attrGroup =>
+				Object.keys(attrGroup.attributes)
+					.filter(attributeId => {
+						const walletsWithAttribute = filteredWallets.filter(wallet =>
+							wallet.overall[attrGroup.id]?.[attributeId] !== undefined
+						)
+						return (
+							walletsWithAttribute.length > 0 &&
+							walletsWithAttribute.every(wallet =>
+								wallet.overall[attrGroup.id]?.[attributeId]?.evaluation?.value?.rating === Rating.EXEMPT
+							)
+						)
+					})
+					.map(attributeId => `${attrGroup.id}.${attributeId}`)
+			)
+		)
+	)
+
 
 	// Functions
 	import { variantToName } from '@/constants/variants'
-	import { calculateAttributeGroupScore, calculateOverallScore } from '@/schema/attribute-groups'
-	import { evaluatedAttributesEntries, ratingToColor } from '@/schema/attributes'
+	import { calculateAttributeGroupScore, calculateOverallScore, formatAttributeGroupTitleText } from '@/schema/attribute-groups'
+	import { evaluatedAttributesEntries, ratingToColor, formatAttributeTitleText } from '@/schema/attributes'
+	import { formatScore } from '@/schema/score'
 	import { isLabeledUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
@@ -247,7 +268,7 @@
 	import Filters from '@/components/Filters.svelte'
 	import Pie, { PieLayout } from '@/components/Pie.svelte'
 	import Select from '@/components/Select.svelte'
-	import Table, { SortDirection } from '@/components/Table.svelte'
+	import Table, { ColumnAlignment, SortDirection } from '@/components/Table.svelte'
 	import Tooltip from '@/components/Tooltip.svelte'
 	import TooltipOrAccordion from '@/components/TooltipOrAccordion.svelte'
 	import WalletStageSummary from './WalletStageSummary.svelte'
@@ -482,9 +503,12 @@
 									const attrGroupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
 									return attrGroupScore === null ? null : attrGroupScore.score
 								},
+
 								sort: {
 									defaultDirection: SortDirection.Descending,
 								},
+
+								align: ColumnAlignment.Center,
 
 								subcolumns: (
 									Object.entries(attrGroup.attributes)
@@ -531,6 +555,8 @@
 							sort: {
 								defaultDirection: SortDirection.Descending,
 							},
+
+							align: ColumnAlignment.Center,
 						} satisfies Column<RatedWallet>]),
 
 						(
@@ -550,6 +576,8 @@
 										isDefault: true,
 										defaultDirection: SortDirection.Descending,
 									},
+
+									align: ColumnAlignment.Center,
 
 									subcolumns: attrGroupColumns,
 									isDefaultExpanded: true,
@@ -586,41 +614,37 @@
 					{:else}
 						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
 						{@const stageFilterId = `stage-${stageValue}`}
-						<Tooltip
-							buttonTriggerPlacement="behind"
-							hoverTriggerPlacement="around"
-						>
-							{#snippet children()}
-								<div
-									role="button"
-									tabindex="0"
-									aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
-									onclick={(e) => {
-										e.preventDefault()
-										e.stopPropagation()
-										toggleAttributeFilterById?.(stageFilterId)
-									}}
-									onkeydown={(e) => {
-										if (e.key !== 'Enter' && e.key !== ' ') return
 
-										e.preventDefault()
-										e.stopPropagation()
-										toggleAttributeFilterById?.(stageFilterId)
-									}}
-								>
-									<WalletStageBadge {stage} {ladderEvaluation} size="medium" />
-								</div>
-							{/snippet}
+						<Tooltip>
+							<div
+								role="button"
+								tabindex="0"
+								aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
+								onclick={(e) => {
+									e.preventDefault()
+									e.stopPropagation()
+									toggleAttributeFilterById?.(stageFilterId)
+								}}
+								onkeydown={(e) => {
+									if (e.key !== 'Enter' && e.key !== ' ') return
+
+									e.preventDefault()
+									e.stopPropagation()
+									toggleAttributeFilterById?.(stageFilterId)
+								}}
+							>
+								<WalletStageBadge
+									{stage}
+									{ladderEvaluation}
+									size="medium"
+								/>
+							</div>
+
 							{#snippet TooltipContent()}
 								<WalletStageSummary
 									{wallet}
 									{stage}
 									{ladderEvaluation}
-									onStageClick={n => {
-										if (ladderEvaluation && n !== null && n < ladderEvaluation.ladder.stages.length) {
-											toggleAttributeFilterById?.(stageFilterId)
-										}
-									}}
 								/>
 							{/snippet}
 						</Tooltip>
@@ -920,52 +944,6 @@
 								filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
 							) : null}
 							<Pie
-								slices={
-									displayedAttributeGroups.map(attrGroup => {
-										const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
-										const evalGroup = wallet.overall[attrGroup.id]
-
-										return {
-											id: `attrGroup_${attrGroup.id}`,
-											arcLabel: `${attrGroup.icon}${(groupScore !== null && groupScore.hasUnratedComponent) ? '*' : ''}`,
-											color: (
-												groupScore !== null ?
-													scoreToColor(groupScore.score)
-												:
-													'var(--rating-unrated)'
-											),
-											tooltip: attrGroup.displayName,
-											tooltipValue: (
-												groupScore !== null && groupScore.score !== null ?
-													`${
-														(groupScore.score * 100).toFixed(0)
-													}%${
-														groupScore.hasUnratedComponent ? ' (has unrated components)' : ''
-													}`
-												:
-													'N/A'
-											),
-											weight: 1,
-											...evalGroup && {
-												children: (
-													evaluatedAttributesEntries(evalGroup)
-														.filter(([attributeId, attribute]) => (
-															attribute?.evaluation?.value?.rating !== Rating.EXEMPT &&
-															(overallFilteredAttributeIds === null || overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`))
-														))
-														.map(([attributeId, attribute]) => ({
-															id: `attrGroup_${attrGroup.id}__attr_${attributeId}`,
-															color: ratingToColor(attribute.evaluation.value.rating),
-															weight: attrGroup.attributeWeights[attributeId],
-															arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
-															tooltip: `${attribute.attribute.displayName}`,
-															tooltipValue: ratingIcons[attribute.evaluation.value.rating],
-														}))
-												),
-											},
-										}
-									})
-								}
 								layout={PieLayout.FullTop}
 								padding={8}
 								radius={80}
@@ -983,6 +961,56 @@
 										angleGap: 0,
 									}
 								]}
+
+								slices={
+									displayedAttributeGroups.map(attrGroup => {
+										const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
+										const evalGroup = wallet.overall[attrGroup.id]
+
+										return {
+											id: `attrGroup_${attrGroup.id}`,
+											arcLabel: `${attrGroup.icon}${(groupScore !== null && groupScore.hasUnratedComponent) ? '*' : ''}`,
+											color: (
+												groupScore !== null ?
+													scoreToColor(groupScore.score)
+												:
+													'var(--rating-unrated)'
+											),
+											titleText: formatAttributeGroupTitleText(
+												attrGroup,
+												groupScore,
+												summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.ScoreDot,
+											),
+											weight: 1,
+											...evalGroup && {
+												children: (
+													evaluatedAttributesEntries(evalGroup)
+														.filter(([attributeId, attribute]) => (
+															(
+																attribute?.evaluation?.value?.rating !== Rating.EXEMPT
+																|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
+															)
+															&& (
+																overallFilteredAttributeIds === null
+																|| overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
+															)
+														))
+														.map(([attributeId, attribute]) => ({
+															id: `attrGroup_${attrGroup.id}__attr_${attributeId}`,
+															color: ratingToColor(attribute.evaluation.value.rating),
+															weight: attrGroup.attributeWeights[attributeId],
+															arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
+															titleText: formatAttributeTitleText(attribute),
+															...attribute.evaluation.value.rating === Rating.EXEMPT && {
+																opacity: 0.33,
+															},
+														}))
+												),
+											},
+										}
+									})
+								}
+
 								{highlightedSliceId}
 								onSliceClick={sliceId => {
 									const [_attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
@@ -1027,24 +1055,7 @@
 										{/if}
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<text>
-											{
-												score !== null && score.score !== null ?
-													`${
-														score.score === 0 ?
-															'\u{1f480}'
-														: score.score === 1 ?
-															'\u{1f4af}'
-														:
-															(score.score * 100).toFixed(0)
-													}${
-														score !== null && score.hasUnratedComponent ?
-															'*'
-														:
-															''
-													}`
-												:
-													'❔'
-											}
+											{formatScore(score)}
 										</text>
 									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
 										<circle
@@ -1122,11 +1133,19 @@
 						{@const filteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(
 							filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
 						) : null}
-						{@const evalEntries = evaluatedAttributesEntries(evalGroup)
-							.filter(([attributeId, attribute]) => (
-								attribute?.evaluation?.value?.rating !== Rating.EXEMPT &&
-								(filteredAttributeIds === null || filteredAttributeIds.has(`${attrGroup.id}.${attributeId}`))
-							))}
+						{@const evalEntries = (
+							evaluatedAttributesEntries(evalGroup)
+								.filter(([attributeId, attribute]) => (
+									(
+										attribute?.evaluation?.value?.rating !== Rating.EXEMPT
+										|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
+									)
+									&& (
+										filteredAttributeIds === null
+										|| filteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
+									)
+								))
+						)}
 
 						{@const hasActiveAttribute = activeEntityId?.walletId === wallet.metadata.id && activeEntityId?.attributeGroupId === attrGroup.id}
 
@@ -1146,6 +1165,14 @@
 							}
 						>
 							<Pie
+								title={
+									formatAttributeGroupTitleText(
+										attrGroup,
+										groupScore,
+										summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.ScoreDot,
+									)
+								}
+
 								layout={PieLayout.FullTop}
 								radius={44}
 								levels={[
@@ -1157,6 +1184,7 @@
 									}
 								]}
 								padding={4}
+
 								slices={
 									!isNonEmptyArray(evalEntries) ?
 										[]
@@ -1189,8 +1217,10 @@
 												color: ratingToColor(attribute.evaluation.value.rating),
 												weight: attrGroup.attributeWeights[attributeId],
 												arcLabel: icon,
-												tooltip: `${icon} ${attribute.evaluation.value.displayName}${tooltipSuffix}`,
-												tooltipValue: ratingIcons[attribute.evaluation.value.rating],
+												titleText: formatAttributeTitleText(attribute, tooltipSuffix),
+												...attribute.evaluation.value.rating === Rating.EXEMPT && {
+													opacity: 0.33,
+												},
 											}
 										}
 									)
@@ -1243,19 +1273,7 @@
 										</text>
 									{:else if summaryVisualization === SummaryVisualization.Score}
 										<text>
-											{
-												groupScore !== null && groupScore.score !== null ?
-													`${
-														groupScore.score === 0 ?
-															'\u{1f480}'
-														: groupScore.score === 1 ?
-															'\u{1f4af}'
-														:
-															(groupScore.score * 100).toFixed(0)
-													}${groupScore.hasUnratedComponent ? '*' : ''}`
-												:
-													'❔'
-											}
+											{formatScore(groupScore)}
 										</text>
 									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
 										<circle
@@ -1315,6 +1333,8 @@
 							}
 						>
 							<Pie
+								title={formatAttributeTitleText(attribute)}
+
 								layout={PieLayout.HalfTop}
 								radius={24}
 								levels={
@@ -1339,6 +1359,9 @@
 									:
 										24
 								}
+
+								centerLabel={attribute.evaluation.value.rating}
+
 								slices={
 									attribute.evaluation.value.rating !== Rating.EXEMPT ?
 										[
@@ -1347,15 +1370,14 @@
 												color: ratingToColor(attribute.evaluation.value.rating),
 												weight: 1,
 												arcLabel: attribute.icon,
-												tooltip: `${attribute.icon} ${attribute.displayName}`,
-												tooltipValue: attribute.evaluation.value.rating,
+												titleText: formatAttributeTitleText(attribute),
 											}
 										]
 									:
 										[]
 								}
 								{highlightedSliceId}
-								centerLabel={attribute.evaluation.value.rating}
+
 								class="wallet-attribute-rating-pie"
 							/>
 
@@ -1419,6 +1441,10 @@
 
 						transition-property: opacity, scale, min-block-size, padding-block-end;
 						min-block-size: var(--walletTable-rowClosed-blockSize);
+
+						> :global(:first-child) {
+							flex: 1;
+						}
 					}
 
 					&:open summary {

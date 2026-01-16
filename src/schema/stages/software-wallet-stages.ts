@@ -34,7 +34,7 @@ import { WalletType, walletTypeToVariants } from '../wallet-types'
 export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 
 export const softwareWalletStageZero: WalletStage = {
-	id: 'software_stage_0',
+	id: 'stage:software-0',
 	label: 'Stage 0',
 	description: sentence('The wallet meets the minimum criteria for evaluation.'),
 	criteriaGroups: [
@@ -56,7 +56,7 @@ export const softwareWalletStageZero: WalletStage = {
 }
 
 export const softwareWalletStageOne: WalletStage = {
-	id: 'software_stage_1',
+	id: 'stage:software-1',
 	label: 'Stage 1',
 	description: sentence('The wallet has made a minimal commitment to Ethereum values.'),
 	criteriaGroups: [
@@ -271,7 +271,7 @@ export const softwareWalletStageOne: WalletStage = {
 }
 
 const softwareWalletStageTwo: WalletStage = {
-	id: 'software_stage_2',
+	id: 'stage:software-2',
 	label: 'Stage 2',
 	description: sentence('The wallet has made a significant commitment to Ethereum values.'),
 	criteriaGroups: [

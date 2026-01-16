@@ -34,3 +34,15 @@ export const weightedScore = (scores: NonEmptyArray<WeightedScore>): Score => {
 
 	return totalScore / totalWeight
 }
+
+/**
+ * Format a score for display in the UI.
+ * @param score The score to format, or null if not available.
+ * @returns Formatted string: '❔' for null, '💀' for 0, '💯' for 1, percentage otherwise, with '*' suffix if hasUnratedComponent.
+ */
+export const formatScore = (score: MaybeUnratedScore): string =>
+	score !== null && score.score !== null
+		? `${
+				score.score === 0 ? '💀' : score.score === 1 ? '💯' : (score.score * 100).toFixed(0)
+			}${score.hasUnratedComponent ? '*' : ''}`
+		: '❔'
