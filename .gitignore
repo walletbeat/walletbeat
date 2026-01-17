@@ -35,3 +35,17 @@ scrap.md
 
 # Python cache
 __pycache__
+
+
+# Compiler files
+resources/contracts/cache/
+resources/contracts/out/
+resources/contracts/lib/
+
+# Ignores development broadcast logs
+resources/contracts/!/broadcast
+resources/contracts/broadcast/*/31337/
+resources/contracts/broadcast/**/dry-run/
+
+# Docs
+resources/contracts/docs/
