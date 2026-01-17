@@ -143,7 +143,6 @@
 ::before,
 ::after,
 [popover] {
-	transition-duration: 0.25s;
 	transition-timing-function: var(--transition-easeOutExpo);
 }
 
@@ -151,8 +150,16 @@
 	background-color: transparent;
 }
 
-::details-content,
-::picker(select),
+::details-content {
+	transition-duration: 0.25s;
+	transition-timing-function: var(--transition-easeOutExpo);
+	transition-behavior: allow-discrete;
+}
+::picker(select) {
+	transition-duration: 0.25s;
+	transition-timing-function: var(--transition-easeOutExpo);
+	transition-behavior: allow-discrete;
+}
 ::scroll-marker {
 	transition-duration: 0.25s;
 	transition-timing-function: var(--transition-easeOutExpo);
