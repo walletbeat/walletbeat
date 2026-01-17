@@ -8,11 +8,17 @@ contract WalletbeatTestErc20 is ERC20, Ownable {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
 
     function mint() external onlyOwner {
-        uint256 tokensToMint = block.number % 100;
-        if (tokensToMint == 0) {
-            tokensToMint = 1;
-        }
+        uint256 tokensToMint = 1 + (block.number % 100);
         super._mint(msg.sender, tokensToMint);
+    }
+
+    function burn() external onlyOwner {
+        uint256 userBalance = balanceOf(msg.sender);
+        if (block.number % 2 == 0) {
+            _burn(msg.sender, userBalance);
+        } else {
+            _burn(msg.sender, 1);
+        }
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {

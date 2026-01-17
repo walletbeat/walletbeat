@@ -50,4 +50,11 @@ contract WalletbeatTestContract {
             revert WalletbeatTestContract__ERC721CallFailed();
         }
     }
+
+    function burnTokens() external {
+        (bool success,) = i_erc20Token.call(abi.encodeWithSignature("burn()"));
+        if (!success) {
+            revert WalletbeatTestContract__ERC20CallFailed();
+        }
+    }
 }
