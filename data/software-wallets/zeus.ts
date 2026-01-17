@@ -14,8 +14,16 @@ import {
 	type SoftwareTransactionLegibilityImplementation,
 } from '@/schema/features/security/transaction-legibility'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
-import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import {
+	TransactionSubmissionL2Support,
+	TransactionSubmissionL2Type,
+} from '@/schema/features/self-sovereignty/transaction-submission'
+import {
+	featureSupported,
+	notSupported,
+	notSupportedWithRef,
+	supported,
+} from '@/schema/features/support'
 import {
 	comprehensiveFeesShownByDefault,
 	FeeDisplayLevel,
@@ -46,10 +54,7 @@ export const zeus: SoftwareWallet = {
 	features: {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
-			eip7702: supported({
-				ref: refTodo,
-				contract: 'UNKNOWN',
-			}),
+			eip7702: notSupported,
 			eoa: supported({
 				ref: [
 					{
@@ -117,7 +122,7 @@ export const zeus: SoftwareWallet = {
 			ref: [
 				{
 					explanation:
-						'Zeus uses public RPC endpoints by default but allows users to provide custom endpoints and disable or delete what they don`t want.',
+						"Zeus uses public RPC endpoints by default but allows users to provide custom endpoints and disable or delete what they don't want.",
 					url: 'https://github.com/greekfetacheese/zeus#features',
 				},
 			],
@@ -187,15 +192,13 @@ export const zeus: SoftwareWallet = {
 						ref: [
 							{
 								explanation: 'Zeus exposes the address of the active account only.',
-								url: 'https://github.com/greekfetacheese/zeus/blob/master/src/server.rs#L367',
+								url: 'https://github.com/greekfetacheese/zeus/blob/8d51c76d1c6ccce5a4a845c34429a4f89ff9cdae/src/server.rs#L371',
 							},
 						],
 						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
 					}),
 					useAppSpecificLastConnectedAddresses: notSupported,
 				},
-				[Variant.MOBILE]: null,
-				[Variant.BROWSER]: null,
 			},
 			dataCollection: null,
 			privacyPolicy: null,
@@ -237,21 +240,15 @@ export const zeus: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: {
-				contractTransactionWarning: supported({
+				contractTransactionWarning: notSupportedWithRef({
 					ref: [
 						{
 							explanation:
-								'Zeus currently does not have a scam alert mechanism, It simply shows with which contract you are interacting with. If it is a known contract a hyperlink with the contract`s name is shown otherwise a truncated version of the contract address is shown (hyperlink). The user can also see all the decoded events to inspect the transaction.',
+								'Zeus currently does not have a scam alert mechanism, It simply shows with which contract you are interacting with. If it is a known contract a hyperlink with the contracts name is shown otherwise a truncated version of the contract address is shown (hyperlink). The user can also see all the decoded events to inspect the transaction.',
 							label: 'Contract interaction is shown in the transaction details',
 							url: 'https://github.com/greekfetacheese/zeus/blob/master/src/gui/ui/tx_window.rs#L246C1-L247C1',
 						},
 					],
-					contractRegistry: true,
-					leaksContractAddress: false,
-					leaksUserAddress: false,
-					leaksUserIp: false,
-					previousContractInteractionWarning: false,
-					recentContractWarning: false,
 				}),
 				scamUrlWarning: notSupported,
 				sendTransactionWarning: supported({
@@ -313,8 +310,10 @@ export const zeus: SoftwareWallet = {
 					}),
 				},
 				l2: {
-					[TransactionSubmissionL2Type.arbitrum]: null,
-					[TransactionSubmissionL2Type.opStack]: null,
+					[TransactionSubmissionL2Type.arbitrum]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+					[TransactionSubmissionL2Type.opStack]:
+						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: [
 						{
 							explanation: 'Zeus submits L2 transactions via RPC endpoints.',
