@@ -884,6 +884,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '71ba731db6934452b33327999ee3e1cd7dff7a68',
 		retrieved: '2025-12-20',
 	},
+	{
+		url: 'https://github.com/greekfetacheese/zeus',
+		urlHash: 'eedecf715cc2b3c6dfba8e22a9413f580e33ffb0',
+		retrieved: '2026-01-12',
+	},
 ]
 
 /**

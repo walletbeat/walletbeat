@@ -17,6 +17,7 @@ import { rainbow } from './software-wallets/rainbow'
 import { safe } from './software-wallets/safe'
 import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
 import { zerion } from './software-wallets/zerion'
+import { zeus } from './software-wallets/zeus'
 
 /** Set of all known software wallets. */
 export const softwareWallets = {
@@ -36,6 +37,7 @@ export const softwareWallets = {
 	rainbow,
 	safe,
 	zerion,
+	zeus,
 }
 
 /** A valid software wallet name. */
