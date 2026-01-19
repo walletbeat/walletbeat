@@ -1,6 +1,6 @@
 'use client'
 
-import { createConfig, custom, http } from '@wagmi/core'
+import { createConfig, createStorage, custom, http, noopStorage } from '@wagmi/core'
 import { mainnet, zksync } from '@wagmi/core/chains'
 
 declare global {
@@ -24,6 +24,7 @@ const config = createConfig({
 		[zksync.id]: getTransport(),
 	},
 	ssr: false,
+	storage: createStorage({ storage: noopStorage }),
 })
 
 export default config
