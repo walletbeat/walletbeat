@@ -26,7 +26,7 @@
   } from '../constants/test-eip-support';
 
   import ErrorComponent from './ErrorComponent.svelte';
-  import SideBarItem from './SideBarItem.svelte';
+  import WalletTesterNavigationItem from './WalletTesterNavigationItem.svelte';
   import ConnectorModal from './Modals/ConnectorModal.svelte';
   import ChainSwitchModal from './Modals/ChainSwitchModal.svelte';
   import EIPResultsModal from './Modals/EIPResultsModal.svelte';
@@ -1289,7 +1289,7 @@ Issued At: ${new Date().toISOString()}`;
       <div class="sidebar-content" data-card="radius-8 padding-2">
         {#if uiState.activeTab === 'transactions'}
           {#each testTransactions as tx (tx.id)}
-            <SideBarItem
+            <WalletTesterNavigationItem
               title={tx.name}
               description={tx.description}
               isSelected={uiState.selectedTxId === tx.id}
@@ -1299,7 +1299,7 @@ Issued At: ${new Date().toISOString()}`;
           {/each}
         {:else if uiState.activeTab === 'signatures'}
           {#each testSignatures as sig (sig.id)}
-            <SideBarItem
+            <WalletTesterNavigationItem
               title={sig.name}
               description={sig.description}
               isSelected={uiState.selectedSigId === sig.id}
@@ -1312,7 +1312,7 @@ Issued At: ${new Date().toISOString()}`;
             {@const status = getStepStatus(step.id)}
             {@const isCurrent = stepTestState.currentStepIndex === index}
             {@const isClickable = canRunStep(index)}
-            <SideBarItem
+            <WalletTesterNavigationItem
               title={`${step.stepNumber}. ${step.name}`}
               description={step.eips.map((e) => e.eipNumber).join(', ')}
               isSelected={isCurrent}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  interface SidebarItemProps {
+  interface WalletTesterNavigationItemProps {
     title: string;
     description?: string;
     isSelected: boolean;
@@ -17,7 +17,7 @@
     isFailed = false,
     isDisabled = false,
     onclick,
-  }: SidebarItemProps = $props();
+  }: WalletTesterNavigationItemProps = $props();
 </script>
 
 <button
