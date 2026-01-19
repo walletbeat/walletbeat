@@ -1,66 +1,37 @@
-## Foundry
+# Walletbeat Test Contracts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Smart contracts designed to test how Ethereum wallets process transactions. These contracts help evaluate wallet behavior in scenarios that are often handled inconsistently across different wallet implementations.
 
-Foundry consists of:
+## Testing Scenarios
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- **Batch Transactions**: How wallets handle multiple transactions in a single batch
+- **Transaction Simulation with Volatile State**: How wallets simulate transactions that produce different results based on changing on-chain state (e.g., block number, timestamp)
+- **Function Selector Interpretation**: How wallets interpret and display common function selectors like `transfer(address, uint256)` that may appear in both ERC-20 tokens and custom contracts
 
-## Documentation
+## Prerequisites
 
-https://book.getfoundry.sh/
+- [Foundry](https://book.getfoundry.sh/getting-started/installation) installed
+
+## Installation
+
+```shell
+make install
+```
+
+This installs the required dependencies:
+- OpenZeppelin Contracts v4.8.3
+- Forge Standard Library
 
 ## Usage
 
 ### Build
 
 ```shell
-$ forge build
+forge build
 ```
 
 ### Test
 
 ```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+forge test
 ```
