@@ -1,13 +1,27 @@
 'use client'
 
-import { createConfig, http } from '@wagmi/core'
+import { createConfig, custom, http } from '@wagmi/core'
 import { mainnet, zksync } from '@wagmi/core/chains'
+
+declare global {
+	interface Window {
+		ethereum?: { request: (...args: unknown[]) => Promise<unknown> }
+	}
+}
+
+const getTransport = () => {
+	if (typeof window !== 'undefined' && window.ethereum) {
+		return custom(window.ethereum)
+	}
+
+	return http('http://localhost:8545')
+}
 
 const config = createConfig({
 	chains: [mainnet, zksync],
 	transports: {
-		[mainnet.id]: http(),
-		[zksync.id]: http(),
+		[mainnet.id]: getTransport(),
+		[zksync.id]: getTransport(),
 	},
 	ssr: false,
 })
