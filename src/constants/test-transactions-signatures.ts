@@ -13,11 +13,11 @@ export interface TestTransaction {
 	requirements?: string[]
 	value?: bigint
 	// For multi-call transactions (EIP-7702)
-	calls?: Array<{
+	calls?: {
 		to: `0x${string}`
 		data: `0x${string}`
 		value?: bigint
-	}>
+	}[]
 }
 
 export interface TestSignature {
@@ -36,10 +36,10 @@ export interface TestSignature {
 	}
 	types?: Record<
 		string,
-		Array<{
+		{
 			name: string
 			type: string
-		}>
+		}[]
 	>
 	primaryType?: string
 	messageData?: Record<string, string | number | boolean | bigint | Record<string, unknown>>

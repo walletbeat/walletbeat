@@ -19,6 +19,7 @@ make install
 ```
 
 This installs the required dependencies:
+
 - OpenZeppelin Contracts v4.8.3
 - Forge Standard Library
 
