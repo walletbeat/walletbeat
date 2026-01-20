@@ -54,13 +54,9 @@
 	// State
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { isLabeledUrl } from '@/schema/url'
-	import {
-		incidentStatuses,
-		newsTypes,
-		severities,
-		impactCategories,
-	} from '@/types/content/news'
-	import { refs as extractRefs } from '@/schema/reference'
+	import { IncidentStatus } from '@/types/content/news'
+	import { daysSince } from '@/types/date'
+	import { getNewsForWallet } from '@/data/news'
 
 	let queryParams = $state<URLSearchParams | undefined>(
 		globalThis.location && new SvelteURLSearchParams(globalThis.location.search)
@@ -78,6 +74,44 @@
 	// (Derived)
 	const wallet = $derived(
 		allRatedWallets[walletName]
+	)
+
+	const walletNews = $derived(
+		getNewsForWallet(wallet.metadata.id)
+	)
+
+	// News section behavior: determine prominence based on recency and resolution status
+	const allNewsResolved = $derived(
+		walletNews.length > 0 &&
+		walletNews.every(news => news.status === IncidentStatus.RESOLVED)
+	)
+
+	const latestNewsDate = $derived(
+		walletNews.length > 0
+			? walletNews.reduce((latest, news) =>
+				news.updatedAt > latest ? news.updatedAt : latest,
+				walletNews[0].updatedAt
+			)
+			: null
+	)
+
+	const daysSinceLatestNews = $derived(
+		latestNewsDate ? daysSince(latestNewsDate) : null
+	)
+
+	// Collapse by default if all resolved and >30 days old
+	const newsIsStale = $derived(
+		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 30
+	)
+
+	// Move to bottom if all resolved and >1 year old
+	const newsIsVeryStale = $derived(
+		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 365
+	)
+
+	// Expand by default unless news is stale
+	const shouldExpandNews = $derived(
+		!newsIsStale
 	)
 
 	let selectedVariant = $derived<Variant | undefined>(
@@ -164,6 +198,7 @@
 	import Tooltip from '@/components/Tooltip.svelte'
 	import Typography from '@/components/Typography.svelte'
 	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
+	import SecurityNews from '@/views/SecurityNews.svelte'
 </script>
 
 
@@ -436,126 +471,12 @@
 			</section>
 		</header>
 
-		{#if wallet.news && wallet.news.length > 0}
+		{#if walletNews.length > 0 && !newsIsVeryStale}
 			<hr />
 			<div data-scroll-item="inline-detached padding-match-end" data-column>
-			<section
-				class="attribute"
-				id="security-news"
-				aria-label="Security News"
-				style:--accent="#e564bc"
-				data-rating="pass"
-				data-icon="📰"
-			>
-				<details
-					data-card="radius-8 padding-0 border-accent"
-					data-column="gap-0"
-					open
-				>
-					<summary data-row>
-						<header data-row>
-							<div>
-								<div data-row="start gap-2">
-									<a data-link="camouflaged" href="#security-news">
-										<h3 data-icon="📰">
-											Security News
-										</h3>
-									</a>
-								</div>
-
-								<div class="subsection-caption">
-									<p>Recent security updates and incidents</p>
-								</div>
-							</div>
-
-							<data
-								data-badge="medium"
-								value="INFO"
-							>INFO</data>
-						</header>
-					</summary>
-
-
-					<div class="attribute-accordions news-items" data-column>
-						{#each wallet.news as newsItem}
-							{@const statusInfo = incidentStatuses[newsItem.status]}
-							{@const severityInfo = severities[newsItem.severity]}
-							{@const typeInfo = newsTypes[newsItem.type]}
-							{@const impactInfo = impactCategories[newsItem.impact.category]}
-							{@const newsRefs = extractRefs(newsItem)}
-							<details data-card="padding-2 secondary radius-4" data-column="gap-0">
-								<summary data-row="gap-2">
-									<div data-column="gap-1" data-row-item="flexible">
-										<h4>{newsItem.title}</h4>
-										<div class="news-meta" data-row="gap-2">
-											<span
-												class="news-badge news-type"
-												data-badge="small"
-											>{typeInfo.label}</span>
-											<span
-												class="news-badge news-severity"
-												data-badge="small"
-												style:--accent={severityInfo.color}
-											>{severityInfo.label}</span>
-											<span
-												class="news-badge news-status"
-												data-badge="small"
-												style:--accent={statusInfo.color}
-											>
-												{@html statusInfo.icon}
-												{statusInfo.label}
-											</span>
-										</div>
-									</div>
-								</summary>
-
-								<section data-column="gap-4">
-									<p class="news-summary">{newsItem.summary}</p>
-
-									<div class="news-details" data-column="gap-2">
-										<div class="news-impact" data-column="gap-1">
-											<span class="news-detail-label">Impact:</span>
-											<div data-row="gap-2">
-												<span class="news-detail-value">{impactInfo.label}</span>
-												{#if newsItem.impact.fundsImpacted}
-													<span
-														class="news-badge funds-impacted"
-														data-badge="small"
-														style:--accent="#ef4444"
-													>Funds Impacted</span>
-												{/if}
-											</div>
-										</div>
-
-										<div class="news-dates" data-row="gap-4 wrap">
-											<span>
-												<span class="news-detail-label">Published:</span>
-												<span class="news-detail-value">{newsItem.publishedAt}</span>
-											</span>
-											{#if newsItem.updatedAt !== newsItem.publishedAt}
-												<span>
-													<span class="news-detail-label">Updated:</span>
-													<span class="news-detail-value">{newsItem.updatedAt}</span>
-												</span>
-											{/if}
-										</div>
-
-										{#if newsRefs.length > 0}
-											<ReferenceLinks
-												references={newsRefs}
-												cardBackground="tertiary"
-											/>
-										{/if}
-									</div>
-								</section>
-							</details>
-						{/each}
-					</div>
-				</details>
-			</section>
+				<SecurityNews news={walletNews} {shouldExpandNews} {allNewsResolved} />
 			</div>
 		{/if}
-
 
 		{#if showStage}
 			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
@@ -587,6 +508,13 @@
 				})}
 			{/if}
 		{/each}
+
+		{#if walletNews.length > 0 && newsIsVeryStale}
+			<hr />
+			<div data-scroll-item="inline-detached padding-match-end" data-column>
+				<SecurityNews news={walletNews} {shouldExpandNews} {allNewsResolved} />
+			</div>
+		{/if}
 	</article>
 </div>
 
@@ -1967,55 +1895,6 @@
 					overflow-wrap: break-word;
 				}
 			}
-		}
-	}
-
-	.news-items {
-		.news-meta {
-			font-size: 0.85rem;
-		}
-
-		.news-badge {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.25rem;
-
-			:global(svg) {
-				width: 1em;
-				height: 1em;
-			}
-		}
-
-		.news-type {
-			--accent: var(--color-accent-purple);
-		}
-
-		.news-summary {
-			word-wrap: break-word;
-			overflow-wrap: break-word;
-			color: var(--text-secondary);
-		}
-
-		.news-details {
-			font-size: 0.9rem;
-		}
-
-		.news-detail-label {
-			color: var(--text-secondary);
-			font-weight: 500;
-		}
-
-		.news-detail-value {
-			color: var(--text-primary);
-		}
-
-		.funds-impacted {
-			font-weight: 600;
-		}
-
-		.news-dates {
-			color: var(--text-secondary);
-			font-size: 0.85rem;
 		}
 	}
 </style>
