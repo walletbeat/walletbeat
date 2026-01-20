@@ -31,7 +31,10 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
-import { DataDisplayOptions, MessageSigningDetails } from '@/schema/features/security/transaction-legibility'
+import {
+	DataDisplayOptions,
+	MessageSigningDetails,
+} from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
