@@ -29,8 +29,8 @@ Tweet #4:
 
 Here's what that looks like in practice:
 
-🔴 Trust Wallet v2.68 supply chain attack — $8.5M lost
-🟡 Ledger customer data leaked via third-party provider
+🔴 Trust Wallet v2.68 supply chain attack
+🟡 Ledger customer data leaked
 
 Real incidents users should know about.
 
