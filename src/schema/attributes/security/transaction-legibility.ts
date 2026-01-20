@@ -257,7 +257,10 @@ function analyzeHardwareFeatures({
 
 		if (onDevice) {
 			signingChecks.forEach(({ key, label }) => {
-				if (provides[key]) {
+				if (
+					provides[key] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+					provides[key] === DataDisplayOptions.SHOWN_OPTIONALLY
+				) {
 					details.messageSigning.supported.push(label)
 				} else {
 					details.messageSigning.missing.push(label)
@@ -546,7 +549,10 @@ function analyzeSoftwareFeatures({
 		]
 
 		signingChecks.forEach(({ key, label }) => {
-			if (messageSigningLegibility[key]) {
+			if (
+				messageSigningLegibility[key] === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+				messageSigningLegibility[key] === DataDisplayOptions.SHOWN_OPTIONALLY
+			) {
 				details.messageSigning.supported.push(label)
 			} else {
 				details.messageSigning.missing.push(label)
