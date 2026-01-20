@@ -66,7 +66,7 @@
 
 
 		<div class="attribute-accordions news-items" data-column>
-			{#each news as newsItem}
+			{#each news as newsItem (newsItem.title)}
 				{@const statusInfo = incidentStatuses[newsItem.status]}
 				{@const severityInfo = severities[newsItem.severity]}
 				{@const typeInfo = newsTypes[newsItem.type]}
