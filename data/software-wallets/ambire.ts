@@ -31,7 +31,7 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
-import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
+import { DataDisplayOptions, MessageSigningDetails } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
@@ -525,8 +525,17 @@ export const ambire: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: null,
-				messageSigningLegibility: null,
+				calldataDisplay: {
+					copyHexToClipboard: false,
+					formatted: false,
+					rawHex: true,
+				},
+				messageSigningLegibility: {
+					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
+				},
 				transactionDetailsDisplay: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
