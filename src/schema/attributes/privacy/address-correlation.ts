@@ -7,6 +7,7 @@ import {
 	Rating,
 	type Value,
 } from '@/schema/attributes'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	collectedByDefault,
 	type Collection,
@@ -65,6 +66,7 @@ export type WalletAddressLinkableBy = WalletAddressLinkableTo & {
 function linkable(
 	ctx: EvaluationContext<AddressCorrelationValue>,
 	linkables: NonEmptyArray<WalletAddressLinkableBy>,
+	references: ReferenceArray,
 ): Evaluation<AddressCorrelationValue> {
 	const worstLeak = nonEmptyFirst(
 		linkables,
@@ -121,7 +123,7 @@ function linkable(
 		},
 		details: addressCorrelationDetailsContent({ linkables }),
 		howToImprove: paragraph(howToImprove),
-	})
+	}
 }
 
 /**
@@ -308,6 +310,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 
 		const linkables: WalletAddressLinkableBy[] = []
 
+
 		for (const collected of allDataCollection) {
 			ctx.addRef(collected)
 
@@ -316,20 +319,23 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 			}
 		}
 
-		const onboarding = ctx.features.privacy.dataCollection[UserFlow.ONBOARDING]
+		for (const onboarding of [
+			features.privacy.dataCollection[UserFlow.ONBOARDING_NEW],
+			features.privacy.dataCollection[UserFlow.ONBOARDING_IMPORT],
+		]) {
+			if (onboarding !== null && onboarding.publishedOnchain !== 'NO_DATA_PUBLISHED_ONCHAIN') {
+				ctx.addRef(onboarding.publishedOnchain)
 
-		if (onboarding !== null && onboarding.publishedOnchain !== 'NO_DATA_PUBLISHED_ONCHAIN') {
-			ctx.addRef(onboarding.publishedOnchain)
-
-			for (const linkable of linkableToWalletAddress(
-				{
-					...onboarding.publishedOnchain,
-					// Account address is inherently published onchain.
-					[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
-				},
-				refs(onboarding.publishedOnchain),
-			)) {
-				linkables.push({ by: 'onchain', ...linkable })
+				for (const linkable of linkableToWalletAddress(
+					{
+						...onboarding.publishedOnchain,
+						// Account address is inherently published onchain.
+						[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+					},
+					refs(onboarding.publishedOnchain),
+				)) {
+					linkables.push({ by: 'onchain', ...linkable })
+				}
 			}
 		}
 
@@ -342,7 +348,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 			details: paragraph(
 				'{{WALLET_NAME}} does not allow any external provider to link your wallet address to any personal information.',
 			),
-		})
+		}
 	},
 	aggregate: pickWorstRating<AddressCorrelationValue>,
 }
