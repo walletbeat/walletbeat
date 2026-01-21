@@ -22,6 +22,7 @@ import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
 import { mattmatt } from '../contributors/0xmattmatt'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 
 export const bitget: SoftwareWallet = {
 	metadata: {
@@ -73,7 +74,33 @@ export const bitget: SoftwareWallet = {
 			},
 			nonChainSpecificEnsResolution: null,
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					ref: refTodo,
+					feesLargerThan1bps: {
+						afterSingleAction: FeeDisplayLevel.AGGREGATED,
+						byDefault: FeeDisplayLevel.AGGREGATED,
+						fullySponsored: false,
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ref: refTodo,
+				ether: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+				globalAccountValue: featureSupported,
+				perChainAccountValue: notSupported,
+				usdc: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+			},
+		},
 		chainConfigurability: notSupported,
 		ecosystem: {
 			delegation: 'EIP_7702_NOT_SUPPORTED',
