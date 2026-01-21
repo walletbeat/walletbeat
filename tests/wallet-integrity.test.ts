@@ -4,18 +4,34 @@ import { describe, expect, it } from 'vitest'
 
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
-import { allWallets, isValidWalletName } from '@/data/wallets'
+import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
 import type { BaseWallet } from '@/schema/wallet'
+import { WalletType, walletTypesOf } from '@/schema/wallet-types'
+import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
+import { WalletCaptureFile } from '@/tools/wallet-data-collection/wallet-capture-file'
+import { getErrorMessage } from '@/types/errors'
+import { setItems } from '@/types/utils/non-empty'
+
+import { getRepositoryRoot } from './utils/codebase'
 
 describe('wallets', () => {
-	const walletMaps: { walletMap: { [K: string]: BaseWallet }; walletMapName: string }[] = [
+	const walletMaps: {
+		walletMap: { [K: string]: BaseWallet }
+		walletType: WalletType | null
+		walletMapName: string
+		dataSubdir: string
+	}[] = [
 		{
 			walletMap: softwareWallets,
+			walletType: WalletType.SOFTWARE,
 			walletMapName: 'software wallets',
+			dataSubdir: 'software-wallets',
 		},
 		{
 			walletMap: hardwareWallets,
+			walletType: WalletType.HARDWARE,
 			walletMapName: 'hardware wallets',
+			dataSubdir: 'hardware-wallets',
 		},
 		// TODO: Add embedded wallets here once we have some.
 	]
@@ -48,7 +64,9 @@ describe('wallets', () => {
 	for (const { walletMap, walletMapName } of walletMaps.concat([
 		{
 			walletMap: allWallets,
+			walletType: null, // Unused
 			walletMapName: 'all wallets',
+			dataSubdir: '', // Unused
 		},
 	])) {
 		describe(walletMapName, () => {
@@ -60,18 +78,75 @@ describe('wallets', () => {
 		})
 	}
 
+	const walletIdToDataSubdir = new Map<string, string>()
+
+	for (const { walletMap, dataSubdir } of walletMaps) {
+		for (const walletKey of Object.keys(walletMap)) {
+			walletIdToDataSubdir.set(walletKey.toString(), dataSubdir)
+		}
+	}
+
 	for (const wallet of Object.values(allWallets)) {
 		describe(`wallet ${wallet.metadata.displayName}`, () => {
 			it('has valid icon', () => {
 				expect(
 					fs.existsSync(
 						path.resolve(
-							__dirname,
-							`../public/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
+							getRepositoryRoot(),
+							`public/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`,
 						),
 					),
 				).toBe(true)
 			})
+
+			const dataSubdir = walletIdToDataSubdir.get(wallet.metadata.id)
+
+			if (
+				dataSubdir !== undefined &&
+				fs.existsSync(
+					path.resolve(getRepositoryRoot(), 'data', dataSubdir, 'collection', wallet.metadata.id),
+				)
+			) {
+				it('has valid data collection info', async () => {
+					const collectionDir = path.resolve(
+						getRepositoryRoot(),
+						'data',
+						dataSubdir,
+						'collection',
+						wallet.metadata.id,
+					)
+					const walletId = assertValidWalletName(wallet.metadata.id)
+					const annotationsPath = path.join(collectionDir, `${wallet.metadata.id}.annotations.json`)
+					const annotations = WalletCaptureAnnotations.fromFile(walletId, annotationsPath)
+					const files = fs.readdirSync(collectionDir)
+					const captureFiles = files.filter(f => f.endsWith('.capture.json'))
+
+					for (const captureFile of captureFiles) {
+						const capturePath = path.join(collectionDir, captureFile)
+						const captureFileObj = WalletCaptureFile.fromFile(capturePath, annotations)
+						const issues = captureFileObj.check()
+
+						if (issues.length > 0) {
+							throw new Error(
+								`Found unaddressed issues in data collection info for wallet ${walletId}; please run the 'check' command to investigate this:\n  $ pnpm wallet-data-collection --id='${walletId}' --type='${setItems(walletTypesOf(wallet)).toSorted().join('|')}' --variant='${Object.keys(wallet.variants).toSorted().join('|')}' check`,
+							)
+						}
+
+						expect(issues).toHaveLength(0)
+
+						try {
+							// Will throw error if files are not in sync:
+							await captureFileObj.save({
+								verifyExisting: true,
+								walletId,
+								walletVariants: wallet.variants,
+							})
+						} catch (e) {
+							throw new Error(`${getErrorMessage(e)} (run \`pnpm fix\` to fix this automatically)`)
+						}
+					}
+				})
+			}
 		})
 	}
 })

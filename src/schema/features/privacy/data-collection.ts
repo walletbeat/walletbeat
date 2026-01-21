@@ -1,5 +1,10 @@
 import type { MustRef, WithRef } from '@/schema/reference'
-import type { NonEmptyArray, NonEmptyRecord } from '@/types/utils/non-empty'
+import {
+	type NonEmptyArray,
+	type NonEmptyRecord,
+	type NonEmptySet,
+	nonEmptySetFromArray,
+} from '@/types/utils/non-empty'
 import { Enum, mergeEnums } from '@/utils/enum'
 
 import type { Entity } from '../../entity'
@@ -7,18 +12,18 @@ import type { Entity } from '../../entity'
 /**
  * An enum representing when data collection occurs.
  *
- * Values are comparable as integers; the closest to zero, the more privacy.
+ * Values are ordered from most private (NEVER) to least private (ALWAYS).
  */
 export enum CollectionPolicy {
 	/** The data is never collected. */
-	NEVER = 0,
+	NEVER = 'NEVER',
 
 	/**
 	 * The wallet does not collect this data by default.
 	 * The user may decide to enable to this, but this requires explicit user
 	 * intent to do this.
 	 */
-	OPT_IN = 1,
+	OPT_IN = 'OPT_IN',
 
 	/**
 	 * The wallet does not collect this data by default. However, the
@@ -26,7 +31,7 @@ export enum CollectionPolicy {
 	 * user whether or not they want to enable this data collection, without
 	 * explicit user intent to look for this setting.
 	 */
-	PROMPTED = 2,
+	PROMPTED = 'PROMPTED',
 
 	/**
 	 * The data is collected by default, but the user may turn this off by
@@ -40,12 +45,70 @@ export enum CollectionPolicy {
 	 * before ever giving the user a chance to access the wallet settings
 	 * to turn off this feature does not qualify for this level.
 	 */
-	BY_DEFAULT = 3,
+	BY_DEFAULT = 'BY_DEFAULT',
 
 	/**
 	 * The data is always collected no matter what the user does.
 	 */
-	ALWAYS = 4,
+	ALWAYS = 'ALWAYS',
+}
+
+/** Enum for `CollectionPolicy`. */
+export const collectionPolicyEnum = new Enum<CollectionPolicy>({
+	[CollectionPolicy.NEVER]: true,
+	[CollectionPolicy.OPT_IN]: true,
+	[CollectionPolicy.PROMPTED]: true,
+	[CollectionPolicy.BY_DEFAULT]: true,
+	[CollectionPolicy.ALWAYS]: true,
+})
+
+/** Returns a numeric score for a CollectionPolicy, ordered from most private (0) to least private (4). */
+function collectionPolicyScore(policy: CollectionPolicy): number {
+	switch (policy) {
+		case CollectionPolicy.NEVER:
+			return 0
+		case CollectionPolicy.OPT_IN:
+			return 1
+		case CollectionPolicy.PROMPTED:
+			return 2
+		case CollectionPolicy.BY_DEFAULT:
+			return 3
+		case CollectionPolicy.ALWAYS:
+			return 4
+	}
+}
+
+/**
+ * @returns If the data collection happens by default for the given collection policy.
+ */
+export function collectedByDefault(collectionPolicy: CollectionPolicy): boolean {
+	return (
+		collectionPolicyScore(collectionPolicy) >= collectionPolicyScore(CollectionPolicy.BY_DEFAULT)
+	)
+}
+
+/** Returns the least-configurable of the given two `CollectionPolicy`s. */
+export function leastConfigurableCollectionPolicy(
+	policy1: CollectionPolicy,
+	policy2: CollectionPolicy,
+): CollectionPolicy {
+	return collectionPolicyScore(policy1) < collectionPolicyScore(policy2) ? policy2 : policy1
+}
+
+/** Human-readable explanation for a given `CollectionPolicy`. */
+export function collectionPolicyExplanation(policy: CollectionPolicy): string {
+	switch (policy) {
+		case CollectionPolicy.NEVER:
+			return 'The wallet never collects this data.'
+		case CollectionPolicy.OPT_IN:
+			return 'The wallet does not collect this data by default; the user explicitly configured it.'
+		case CollectionPolicy.PROMPTED:
+			return 'The wallet asked the user whether they are OK about this data being collected.'
+		case CollectionPolicy.BY_DEFAULT:
+			return 'The wallet collects this data by default, but this can be disabled by the user.'
+		case CollectionPolicy.ALWAYS:
+			return 'The wallet always collects this request, and the user cannot configure this.'
+	}
 }
 
 /**
@@ -300,58 +363,51 @@ export function endpointLearnsUserIpAddress(endpoint: Endpoint): 'YES' | 'NO' | 
 	}
 }
 
-/**
- * @returns If the data collection happens by default for the given collection policy.
- */
-export function collectedByDefault(collectionPolicy: CollectionPolicy): boolean {
-	return collectionPolicy >= CollectionPolicy.BY_DEFAULT
-}
-
 /** Personal information types. */
 export enum PersonalInfo {
 	/** The user's IP address. */
-	IP_ADDRESS = 'ipAddress',
+	IP_ADDRESS = 'IP_ADDRESS',
 
 	/** A cross-request tracking identifier, such as a cookie. */
-	TRACKING_IDENTIFIER = 'trackingIdentifier',
+	TRACKING_IDENTIFIER = 'TRACKING_IDENTIFIER',
 
 	/** The user's selected pseudonym. */
-	PSEUDONYM = 'pseudonym',
+	PSEUDONYM = 'PSEUDONYM',
 
 	/** The user's legal name. */
-	LEGAL_NAME = 'legalName',
+	LEGAL_NAME = 'LEGAL_NAME',
 
 	/** The user's email. */
-	EMAIL = 'email',
+	EMAIL = 'EMAIL',
 
 	/** The user's phone number. */
-	PHONE = 'phone',
+	PHONE = 'PHONE',
 
 	/** URLs the user visits. */
-	BROWSING_HISTORY_URLS = 'browsingHistoryUrls',
+	BROWSING_HISTORY_URLS = 'BROWSING_HISTORY_URLS',
 
 	/**
 	 * The user's contacts (e.g. when searching for friends to invite).
 	 */
-	CONTACTS = 'contacts',
+	CONTACTS = 'CONTACTS',
 
 	/** The user's physical address. */
-	PHYSICAL_ADDRESS = 'physicalAddress',
+	PHYSICAL_ADDRESS = 'PHYSICAL_ADDRESS',
 
 	/** The user's face (e.g. KYC selfie). */
-	FACE = 'face',
+	FACE = 'FACE',
 
 	/** The user's CEX account(s). */
-	CEX_ACCOUNT = 'cexAccount',
+	CEX_ACCOUNT = 'CEX_ACCOUNT',
 
 	/** The user's government-issued ID. */
-	GOVERNMENT_ID = 'governmentId',
+	GOVERNMENT_ID = 'GOVERNMENT_ID',
 
 	/** The user's X.com account. */
-	X_DOT_COM_ACCOUNT = 'xDotComAccount',
+	X_DOT_COM_ACCOUNT = 'X_DOT_COM_ACCOUNT',
 
 	/** The user's Farcaster account. */
-	FARCASTER_ACCOUNT = 'farcasterAccount',
+	FARCASTER_ACCOUNT = 'FARCASTER_ACCOUNT',
 }
 
 export const personalInfo = new Enum<PersonalInfo>({
@@ -374,33 +430,33 @@ export const personalInfo = new Enum<PersonalInfo>({
 /** Wallet-related information types. */
 export enum WalletInfo {
 	/** The user's wallet actions (clicks etc). */
-	USER_ACTIONS = 'userActions',
+	USER_ACTIONS = 'USER_ACTIONS',
 
 	/** The user's account address. */
-	ACCOUNT_ADDRESS = 'accountAddress',
+	ACCOUNT_ADDRESS = 'ACCOUNT_ADDRESS',
 
 	/**
 	 * The user's wallet balance.
 	 * This can easily be turned back into an address, because most
 	 * addresses' balance amount is unique.
 	 */
-	BALANCE = 'balance',
+	BALANCE = 'BALANCE',
 
 	/**
 	 * The set of assets that are in the wallet.
 	 * On wallets with many NFTs, this can be used to uniquely identify the
 	 * wallet.
 	 */
-	ASSETS = 'assets',
+	ASSETS = 'ASSETS',
 
 	/**
 	 * The user's wallet transactions before they are included onchain.
 	 * For example, MEV protection services usually fall under this category.
 	 */
-	MEMPOOL_TRANSACTIONS = 'mempoolTransactions',
+	MEMPOOL_TRANSACTIONS = 'MEMPOOL_TRANSACTIONS',
 
 	/** Domain names the wallet is connected to. */
-	WALLET_CONNECTED_DOMAINS = 'walletConnectedDomains',
+	WALLET_CONNECTED_DOMAINS = 'WALLET_CONNECTED_DOMAINS',
 }
 
 export const walletInfo = new Enum<WalletInfo>({
@@ -526,9 +582,9 @@ export function userInfoType(userInfo: UserInfo): UserInfoType {
 	}
 }
 
-/** Compare two UserInfo scores (higher score is more sensitive). */
+/** Compare two UserInfo scores (if used as comparison function, this will be sorted from most to least sensitive). */
 export function compareUserInfo(a: UserInfo, b: UserInfo): number {
-	return userInfoScore(a) - userInfoScore(b)
+	return userInfoScore(b) - userInfoScore(a)
 }
 
 /** Human-friendly names to refer to the type of info being collection. */
@@ -580,34 +636,124 @@ export function userInfoName(userInfo: UserInfo) {
 	}
 }
 
+// normalizeStrForUserInfo returns `str` and any applicable variant of it
+// that may make sense to match against.
+export function normalizeStrForUserInfo(str: string, userInfo: UserInfo): NonEmptySet<string> {
+	const variants = ((): NonEmptyArray<string> => {
+		switch (userInfo) {
+			case WalletInfo.ACCOUNT_ADDRESS:
+				if (str.startsWith('0x')) {
+					return [str, str.substring(2)]
+				}
+
+				return [str]
+			case PersonalInfo.EMAIL:
+				if (str.includes('@')) {
+					return [str, str.substring(0, str.indexOf('@'))]
+				}
+
+				return [str, str + '@']
+			case PersonalInfo.X_DOT_COM_ACCOUNT:
+				if (str.startsWith('@')) {
+					return [str, str.substring(1)]
+				}
+
+				return [str, '@' + str]
+			case PersonalInfo.FARCASTER_ACCOUNT:
+				if (str.startsWith('@')) {
+					return [str, str.substring(1)]
+				}
+
+				return [str, '@' + str]
+			default:
+				return [str]
+		}
+	})()
+
+	return nonEmptySetFromArray(variants)
+}
+
+// hintForUserInfo returns a hint about `str`, given that it is the user's `userInfo`.
+export function hintForUserInfo(str: string, userInfo: UserInfo): string {
+	const firstAndLast = (s: string): string => {
+		switch (s.length) {
+			case 0:
+				return '(empty)'
+			case 1:
+				return '*'
+			case 2:
+				return '**'
+			case 3:
+				return '***'
+			case 4:
+				return s.substring(0, 1) + '***'
+			case 5:
+				return s.substring(0, 1) + '***' + s.substring(4, 1)
+			case 6:
+				return s.substring(0, 2) + '***' + s.substring(4, 1)
+			case 7:
+				return s.substring(0, 2) + '****' + s.substring(6, 1)
+			case 8:
+				return s.substring(0, 2) + '****' + s.substring(6, 2)
+			default:
+				return s.substring(0, 2) + '...' + s.substring(s.length - 2)
+		}
+	}
+
+	switch (userInfo) {
+		case WalletInfo.ACCOUNT_ADDRESS:
+			return `0x${firstAndLast(str.startsWith('0x') ? str.substring(2) : str)}`
+		case PersonalInfo.EMAIL:
+			if (str.includes('@')) {
+				return `${firstAndLast(str.substring(0, str.indexOf('@')))}@${firstAndLast(str.substring(str.indexOf('@') + 1))}`
+			}
+
+			return firstAndLast(str)
+		default:
+			return firstAndLast(str)
+	}
+}
+
 /** The UX flow within a wallet. */
 export enum UserFlow {
 	/** Any flow that is unclassified or unclear. */
-	UNCLASSIFIED = 'unclassified',
+	UNCLASSIFIED = 'UNCLASSIFIED',
 
-	/** Onboard onto the wallet, either as a new user or importing an existing account. */
-	ONBOARDING = 'onboarding',
+	/** Installing the wallet. */
+	INSTALL = 'INSTALL',
 
-	/** Sending tokens to another address. */
-	SEND = 'send',
+	/** Onboard onto the wallet as a new user. */
+	ONBOARDING_NEW = 'ONBOARDING_NEW',
+
+	/** Onboard onto the wallet, importing an existing account. */
+	ONBOARDING_IMPORT = 'ONBOARDING_IMPORT',
+
+	/** Sending Ether to another address. */
+	SEND_ETHER = 'SEND_ETHER',
+
+	/** Sending USDC to another address. */
+	SEND_USDC = 'SEND_USDC',
 
 	/** Swapping tokens through a wallet's built-in swap feature. */
-	NATIVE_SWAP = 'nativeSwap',
+	NATIVE_SWAP = 'NATIVE_SWAP',
 
 	/** Review a transaction and signing it. */
-	TRANSACTION = 'transaction',
+	MAKE_TRANSACTION = 'MAKE_TRANSACTION',
 
 	/** Connecting to an application. */
-	APP_CONNECTION = 'appConnection',
+	APP_CONNECTION = 'APP_CONNECTION',
 }
 
 export const userFlow = new Enum<UserFlow>({
 	[UserFlow.UNCLASSIFIED]: true,
-	[UserFlow.ONBOARDING]: true,
+	[UserFlow.INSTALL]: true,
+	[UserFlow.ONBOARDING_NEW]: true,
+	[UserFlow.ONBOARDING_IMPORT]: true,
 	[UserFlow.APP_CONNECTION]: true,
-	[UserFlow.SEND]: true,
+	[UserFlow.SEND_ETHER]: true,
+	[UserFlow.SEND_USDC]: true,
 	[UserFlow.NATIVE_SWAP]: true,
-	[UserFlow.TRANSACTION]: true,
+	[UserFlow.MAKE_TRANSACTION]: true,
 })
 
 /** Why is data being collected? */
@@ -867,23 +1013,52 @@ export type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
  * See /docs/mitmproxy-guide for how to collect this.
  */
 export interface DataCollection {
-	/** What data is collected during signup? */
-	[UserFlow.ONBOARDING]: DataCollectionForFlowWithOnchainData | null
+	/** What data is collected when installing the wallet? */
+	[UserFlow.INSTALL]: DataCollectionForFlow | null
 
-	/** What data is collected when sending tokens? */
-	[UserFlow.SEND]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	/** What data is collected during new account creation? */
+	[UserFlow.ONBOARDING_NEW]: DataCollectionForFlowWithOnchainData | null
+
+	/** What data is collected during account import? */
+	[UserFlow.ONBOARDING_IMPORT]: DataCollectionForFlowWithOnchainData | null
+
+	/** What data is collected when sending Ether? */
+	[UserFlow.SEND_ETHER]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+
+	/** What data is collected when sending USDC? */
+	[UserFlow.SEND_USDC]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
 
 	/** What data is collected when swapping tokens using the wallet's native swap feature? */
 	[UserFlow.NATIVE_SWAP]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
 
 	/** What data is collected during the transaction review/signing flow? */
-	[UserFlow.TRANSACTION]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	[UserFlow.MAKE_TRANSACTION]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
 
 	/** What data is collected when connecting to an app? */
 	[UserFlow.APP_CONNECTION]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
 
 	/** What other data is collected but not covered in the other flows, if any? */
 	[UserFlow.UNCLASSIFIED]?: DataCollectionForFlow
+}
+
+/**
+ * @returns Whether the given `flow` may be marked as "FLOW_NOT_SUPPORTED" within `DataCollection`.
+ */
+export function userFlowMayBeMarkedUnsupported(
+	flow: UserFlow,
+): flow is
+	| UserFlow.SEND_ETHER
+	| UserFlow.SEND_USDC
+	| UserFlow.NATIVE_SWAP
+	| UserFlow.MAKE_TRANSACTION
+	| UserFlow.APP_CONNECTION {
+	return (
+		flow === UserFlow.SEND_ETHER ||
+		flow === UserFlow.SEND_USDC ||
+		flow === UserFlow.NATIVE_SWAP ||
+		flow === UserFlow.MAKE_TRANSACTION ||
+		flow === UserFlow.APP_CONNECTION
+	)
 }
 
 /**

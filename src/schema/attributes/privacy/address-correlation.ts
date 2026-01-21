@@ -7,6 +7,7 @@ import {
 	Rating,
 	type Value,
 } from '@/schema/attributes'
+import type { ResolvedFeatures } from '@/schema/features'
 import {
 	collectedByDefault,
 	type Collection,
@@ -316,20 +317,23 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 			}
 		}
 
-		const onboarding = ctx.features.privacy.dataCollection[UserFlow.ONBOARDING]
+		for (const onboarding of [
+			features.privacy.dataCollection[UserFlow.ONBOARDING_NEW],
+			features.privacy.dataCollection[UserFlow.ONBOARDING_IMPORT],
+		]) {
+			if (onboarding !== null && onboarding.publishedOnchain !== 'NO_DATA_PUBLISHED_ONCHAIN') {
+				ctx.addRef(onboarding.publishedOnchain)
 
-		if (onboarding !== null && onboarding.publishedOnchain !== 'NO_DATA_PUBLISHED_ONCHAIN') {
-			ctx.addRef(onboarding.publishedOnchain)
-
-			for (const linkable of linkableToWalletAddress(
-				{
-					...onboarding.publishedOnchain,
-					// Account address is inherently published onchain.
-					[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
-				},
-				refs(onboarding.publishedOnchain),
-			)) {
-				linkables.push({ by: 'onchain', ...linkable })
+				for (const linkable of linkableToWalletAddress(
+					{
+						...onboarding.publishedOnchain,
+						// Account address is inherently published onchain.
+						[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
+					},
+					refs(onboarding.publishedOnchain),
+				)) {
+					linkables.push({ by: 'onchain', ...linkable })
+				}
 			}
 		}
 
