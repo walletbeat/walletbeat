@@ -421,13 +421,15 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				},
-				[UserFlow.ONBOARDING]: {
+				[UserFlow.ONBOARDING_NEW]: {
 					collected: [],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
-				[UserFlow.SEND]: {
+				[UserFlow.ONBOARDING_IMPORT]: null,
+				[UserFlow.SEND_ETHER]: {
 					collected: [],
 				},
+				[UserFlow.SEND_USDC]: null,
 				[UserFlow.APP_CONNECTION]: {
 					collected: [],
 				},

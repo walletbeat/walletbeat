@@ -5,8 +5,10 @@
 		"Aadhaar",
 		"Aave",
 		"Ackee",
+		"addonmanager",
 		"Ambire",
 		"anonymizing",
+		"anticache",
 		"apikey",
 		"appstore",
 		"Arbitrum",
@@ -18,6 +20,7 @@
 		"BIP",
 		"BitBox",
 		"Bitget",
+		"bitness",
 		"BLE",
 		"Blockaid",
 		"Blumen",
@@ -108,6 +111,7 @@
 		"greekfetacheese",
 		"gridplus",
 		"grindy",
+		"gstatic",
 		"h3rman",
 		"hashrate",
 		"hmargin",
@@ -236,6 +240,7 @@
 		"ragequitting",
 		"Railgun",
 		"rdns",
+		"redactions",
 		"redelegation",
 		"remappings",
 		"renderable",
@@ -262,6 +267,7 @@
 		"Seiryu",
 		"selectedcontent",
 		"setmonofont",
+		"signup",
 		"sigri",
 		"SIWE",
 		"SlowMist",
@@ -288,6 +294,7 @@
 		"torrc",
 		"torsocks",
 		"Trezor",
+		"triaging",
 		"trixie",
 		"trustlessness",
 		"typecasted",
@@ -352,7 +359,8 @@
 	],
 	"patterns": [
 		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
-		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" }
+		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" },
+		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" }
 	],
-	"ignoreRegExpList": ["Bitcoin addresses", "CIDv1"]
+	"ignoreRegExpList": ["Bitcoin addresses", "CIDv1", "Hexadecimal addresses"]
 }

@@ -193,10 +193,11 @@ export const daimo: SoftwareWallet = {
 			dataCollection: {
 				[UserFlow.APP_CONNECTION]: 'FLOW_NOT_SUPPORTED',
 				[UserFlow.NATIVE_SWAP]: 'FLOW_NOT_SUPPORTED',
-				[UserFlow.SEND]: {
+				[UserFlow.SEND_ETHER]: {
 					collected: [],
 				},
-				[UserFlow.ONBOARDING]: {
+				[UserFlow.SEND_USDC]: null,
+				[UserFlow.ONBOARDING_NEW]: {
 					collected: [
 						{
 							ref: [
@@ -263,6 +264,7 @@ export const daimo: SoftwareWallet = {
 						purposes: [DataCollectionPurpose.ACCOUNT_SIGNUP],
 					},
 				},
+				[UserFlow.ONBOARDING_IMPORT]: null,
 				[UserFlow.TRANSACTION]: {
 					collected: [
 						{

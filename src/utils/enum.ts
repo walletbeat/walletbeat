@@ -121,3 +121,20 @@ export function mergeEnums<E1 extends string, E2 extends string>(
 
 	return new Enum<E1 | E2>(mergedRecord)
 }
+
+/**
+ * Return an Enum with the given members excluded.
+ */
+export function excludeFromEnum<E extends string, Excluded extends E>(
+	e: Enum<E>,
+	excluded: NonEmptySet<E>,
+): Enum<Exclude<E, Excluded>> {
+	return new Enum<Exclude<E, Excluded>>(
+		nonEmptySetFromArray(
+			assertNonEmptyArray(
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we check for set membership right on the spot.
+				setItems(e.set).filter(v => !setContains(excluded, v as unknown as Excluded)),
+			),
+		),
+	)
+}

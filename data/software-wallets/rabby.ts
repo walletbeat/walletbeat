@@ -308,13 +308,15 @@ export const rabby: SoftwareWallet = {
 					[UserFlow.NATIVE_SWAP]: {
 						collected: [],
 					},
-					[UserFlow.SEND]: {
+					[UserFlow.SEND_ETHER]: {
 						collected: [],
 					},
-					[UserFlow.ONBOARDING]: {
+					[UserFlow.SEND_USDC]: null,
+					[UserFlow.ONBOARDING_NEW]: {
 						collected: [],
 						publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 					},
+					[UserFlow.ONBOARDING_IMPORT]: null,
 					[UserFlow.TRANSACTION]: {
 						collected: [],
 					},

@@ -25,7 +25,8 @@
 		"preview": "pnpm run astro preview",
 		"fix": "pnpm run lint",
 		"helios": "deploy/helios/helios.sh",
-		"helios:wrap": "deploy/helios/helios-wrap.sh"
+		"helios:wrap": "deploy/helios/helios-wrap.sh",
+		"wallet-data-collection": "tsx src/tools/wallet-data-collection/wallet-data-collection-tool.ts"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.0",
@@ -54,6 +55,7 @@
 		"@fleek-platform/cli": "^3.9.4",
 		"@kindspells/astro-shield": "^1.7.1",
 		"blumen": "^1.3.0",
+		"cac": "^6.7.14",
 		"cross-env": "^10.1.0",
 		"cspell": "9.6.0",
 		"eslint": "^9.39.2",

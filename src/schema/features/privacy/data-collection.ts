@@ -583,29 +583,41 @@ export function userInfoName(userInfo: UserInfo) {
 /** The UX flow within a wallet. */
 export enum UserFlow {
 	/** Any flow that is unclassified or unclear. */
-	UNCLASSIFIED = 'unclassified',
+	UNCLASSIFIED = 'UNCLASSIFIED',
 
-	/** Onboard onto the wallet, either as a new user or importing an existing account. */
-	ONBOARDING = 'onboarding',
+	/** Installing the wallet. */
+	INSTALL = 'INSTALL',
 
-	/** Sending tokens to another address. */
-	SEND = 'send',
+	/** Onboard onto the wallet as a new user. */
+	ONBOARDING_NEW = 'ONBOARDING_NEW',
+
+	/** Onboard onto the wallet, importing an existing account. */
+	ONBOARDING_IMPORT = 'ONBOARDING_IMPORT',
+
+	/** Sending Ether to another address. */
+	SEND_ETHER = 'SEND_ETHER',
+
+	/** Sending USDC to another address. */
+	SEND_USDC = 'SEND_USDC',
 
 	/** Swapping tokens through a wallet's built-in swap feature. */
-	NATIVE_SWAP = 'nativeSwap',
+	NATIVE_SWAP = 'NATIVE_SWAP',
 
 	/** Review a transaction and signing it. */
-	TRANSACTION = 'transaction',
+	TRANSACTION = 'TRANSACTION',
 
 	/** Connecting to an application. */
-	APP_CONNECTION = 'appConnection',
+	APP_CONNECTION = 'APP_CONNECTION',
 }
 
 export const userFlow = new Enum<UserFlow>({
 	[UserFlow.UNCLASSIFIED]: true,
-	[UserFlow.ONBOARDING]: true,
+	[UserFlow.INSTALL]: true,
+	[UserFlow.ONBOARDING_NEW]: true,
+	[UserFlow.ONBOARDING_IMPORT]: true,
 	[UserFlow.APP_CONNECTION]: true,
-	[UserFlow.SEND]: true,
+	[UserFlow.SEND_ETHER]: true,
+	[UserFlow.SEND_USDC]: true,
 	[UserFlow.NATIVE_SWAP]: true,
 	[UserFlow.TRANSACTION]: true,
 })
@@ -867,11 +879,20 @@ export type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
  * See /docs/mitmproxy-guide for how to collect this.
  */
 export interface DataCollection {
-	/** What data is collected during signup? */
-	[UserFlow.ONBOARDING]: DataCollectionForFlowWithOnchainData | null
+	/** What data is collected when installing the wallet? */
+	[UserFlow.INSTALL]: DataCollectionForFlow | null
 
-	/** What data is collected when sending tokens? */
-	[UserFlow.SEND]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	/** What data is collected during new account creation? */
+	[UserFlow.ONBOARDING_NEW]: DataCollectionForFlowWithOnchainData | null
+
+	/** What data is collected during account import? */
+	[UserFlow.ONBOARDING_IMPORT]: DataCollectionForFlowWithOnchainData | null
+
+	/** What data is collected when sending Ether? */
+	[UserFlow.SEND_ETHER]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+
+	/** What data is collected when sending USDC? */
+	[UserFlow.SEND_USDC]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
 
 	/** What data is collected when swapping tokens using the wallet's native swap feature? */
 	[UserFlow.NATIVE_SWAP]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
