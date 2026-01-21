@@ -15,6 +15,7 @@ import {
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
@@ -22,7 +23,6 @@ import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
 import { mattmatt } from '../contributors/0xmattmatt'
-import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 
 export const bitget: SoftwareWallet = {
 	metadata: {
