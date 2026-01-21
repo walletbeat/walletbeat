@@ -181,7 +181,11 @@ export const bitget: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			scamAlerts: {
+				contractTransactionWarning: notSupported,
+				scamUrlWarning: notSupported,
+				sendTransactionWarning: notSupported,
+			},
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {
