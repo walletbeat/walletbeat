@@ -70,8 +70,8 @@ export const bitget: SoftwareWallet = {
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
-				erc7828: null, // DONE
-				erc7831: null, // DONE
+				erc7828: null,
+				erc7831: null,
 			},
 			nonChainSpecificEnsResolution: null,
 		},
@@ -157,17 +157,21 @@ export const bitget: SoftwareWallet = {
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: [
 					{
-						explanation: 'As from August 2025, this bug bounty program is no longer active.',
-						url: 'https://blog.ambire.com/ambire-x-immunefy-bug-bounty-audit-our-code-and-earn-rewards/',
+						explanation: "Bitget's bug bounty program is hosted through Bugrap.",
+						url: 'https://bugrap.io/bounties/Bitget%20Wallet%20(Formerly%20BitKeep)',
 					},
 				],
 				availability: BugBountyProgramAvailability.ACTIVE,
 				coverageBreadth: 'FULL_SCOPE',
-				dateStarted: '2021-12-17' as CalendarDate,
+				dateStarted: '2024-09-17' as CalendarDate,
 				disclosure: notSupported,
 				legalProtections: notSupported,
 				platform: BugBountyPlatform.BUGRAP,
-				rewards: notSupported,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 50000,
+					minimum: 10,
+				}),
 				upgradePathAvailable: false,
 			}),
 			hardwareWalletSupport: null,
