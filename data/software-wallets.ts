@@ -10,6 +10,7 @@ import { imtoken } from './software-wallets/imtoken'
 import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
+import { okxWallet } from './software-wallets/okx'
 import { phantom } from './software-wallets/phantom'
 import { pillarx } from './software-wallets/pillarx'
 import { rabby } from './software-wallets/rabby'
@@ -18,7 +19,6 @@ import { safe } from './software-wallets/safe'
 import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
 import { zerion } from './software-wallets/zerion'
 import { zeus } from './software-wallets/zeus'
-import { okxWallet } from './software-wallets/okx'
 
 /** Set of all known software wallets. */
 export const softwareWallets = {
@@ -32,6 +32,7 @@ export const softwareWallets = {
 	metamask,
 	mtpelerin,
 	nufi,
+	okxWallet,
 	phantom,
 	pillarx,
 	rabby,
@@ -39,7 +40,6 @@ export const softwareWallets = {
 	safe,
 	zerion,
 	zeus,
-	okxWallet
 }
 
 /** A valid software wallet name. */

@@ -1,7 +1,17 @@
 import { exampleContributor } from '@/data/contributors/example'
 import { AccountType } from '@/schema/features/account-support'
+import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
-import { DataDisplayOptions, MessageSigningDetails } from '@/schema/features/security/transaction-legibility'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	type BugBountyProgramImplementation,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
+import {
+	DataDisplayOptions,
+	MessageSigningDetails,
+} from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -9,6 +19,7 @@ import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 export const okxWallet: SoftwareWallet = {
 	metadata: {
@@ -120,19 +131,53 @@ export const okxWallet: SoftwareWallet = {
 				ventureCapital: null,
 			},
 		},
-		multiAddress: null,
+		multiAddress: featureSupported,
 		privacy: {
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: null,
-			transactionPrivacy: null,
+			transactionPrivacy: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
+				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
+				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+			},
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
 			accountRecovery: {
 				guardianRecovery: notSupported,
 			},
-			bugBountyProgram: null,
+			bugBountyProgram: supported<BugBountyProgramImplementation>({
+				ref: [
+					{
+						explanation:
+							'The OKG Bug Bounty Program enlists the help of the hacker community at HackerOne to make OKG more secure.',
+						url: 'https://hackerone.com/okg?type=team',
+					},
+				],
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE' as const,
+				dateStarted: '2023-03-01' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: [
+						{
+							explanation:
+								'Policy includes a Safe Harbor: compliant research is authorized and OKG says it will not initiate legal action.',
+							url: 'https://hackerone.com/okg?type=team',
+						},
+					],
+				}),
+				platform: BugBountyPlatform.HACKER_ONE,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 1000000,
+					minimum: 50,
+				}),
+				upgradePathAvailable: true,
+			}),
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
