@@ -3,7 +3,7 @@ import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
 import { DataDisplayOptions, MessageSigningDetails } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
@@ -64,7 +64,27 @@ export const okxWallet: SoftwareWallet = {
 			},
 			nonChainSpecificEnsResolution: null,
 		},
-		chainAbstraction: null,
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: notSupported,
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ref: refTodo,
+				ether: supported({
+					ref: refTodo,
+					crossChainSumView: featureSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				}),
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				usdc: supported({
+					ref: refTodo,
+					crossChainSumView: featureSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				}),
+			},
+		},
 		chainConfigurability: null,
 		ecosystem: {
 			delegation: null,
