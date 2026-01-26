@@ -4,7 +4,8 @@ import { WalletProfile } from '@/schema/features/profile'
 import { DataDisplayOptions, MessageSigningDetails } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
-import { refTodo } from '@/schema/reference'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
+import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -77,7 +78,13 @@ export const okxWallet: SoftwareWallet = {
 			},
 			walletCall: null,
 		},
-		licensing: null,
+		licensing: {
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
+			walletAppLicense: {
+				ref: refNotNecessary,
+				license: SourceNotAvailableLicense.PROPRIETARY,
+			},
+		},
 		monetization: {
 			ref: refTodo,
 			revenueBreakdownIsPublic: false,
@@ -102,7 +109,9 @@ export const okxWallet: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			accountRecovery: {
+				guardianRecovery: notSupported,
+			},
 			bugBountyProgram: null,
 			hardwareWalletSupport: null,
 			keysHandling: null,
