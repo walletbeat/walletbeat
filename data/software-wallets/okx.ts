@@ -1,7 +1,7 @@
 import { exampleContributor } from '@/data/contributors/example'
 import { AccountType } from '@/schema/features/account-support'
 import { WalletProfile } from '@/schema/features/profile'
-import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
+import { DataDisplayOptions, MessageSigningDetails } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
@@ -114,8 +114,17 @@ export const okxWallet: SoftwareWallet = {
 			scamAlerts: null,
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: null,
-				messageSigningLegibility: null,
+				calldataDisplay: {
+					copyHexToClipboard: true,
+					formatted: false,
+					rawHex: true,
+				},
+				messageSigningLegibility: {
+					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
+				},
 				transactionDetailsDisplay: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
