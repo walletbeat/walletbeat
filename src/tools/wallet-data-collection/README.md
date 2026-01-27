@@ -4,6 +4,17 @@ This command-line tool is meant to assist in capturing and analyzing network tra
 
 This is necessary to populate Walletbeat's `privacy.dataCollection` feature field, which is an otherwise tedious, manual, and error-prone process. This tool automates the capture/analysis part, but you still need to manually interact with the wallet and go through its UX flows. The command-line acts as a companion along this process.
 
+## Goal
+
+The goal of using this tool is to record the network every supported UX flow of a wallet, and analyze/categorize all of its network traffic. To that end, the high-level workflow looks like this:
+
+- Record network traffic as you perform each UX flow the wallet supports
+- Categorize every *domain* that the wallet sent requests to: Which **entity** does it belong to?
+- Categorize every *request* the wallet sent: What is their **purpose**?
+- Categorize every *piece of information* sent in these requests: What **data** did the wallet send?
+
+The tool helps you walk through these steps.
+
 ## Usage
 
 At a high level, all commands look like this:
@@ -25,26 +36,26 @@ The wallet network data capture file will be recorded at `data/{type}-wallets/co
 #### `capture` subcommand
 
 ```
-$ pnpm wallet-data-collection --wallet_id='<wallet_id>' capture --flow='<flow>' [--wallet_address='<0xaddr1,0xaddr2,...>'] [--port='<mitmproxy port>']
+$ pnpm wallet-data-collection <global flags> capture --flow='<flow>' [--wallet-addresses='<0xaddr1,0xaddr2,...>'] [--port='<mitmproxy port>']
 ```
 
 Start `mitmproxy` listening on `--port` (default `8080`), capturing all network traffic received from this session as belonging to the given `--flow`.
 
-For most flows, you must also specify the wallet address(es) you are using (or will be using) with the `--wallet_address` flag. If you have multiple addresses, separate them using commas.
+For most flows, you must also specify the wallet address(es) you are using (or will be using) with the `--wallet-addresses` flag. If you have multiple addresses, separate them using commas.
 
 ##### Flows
 
 The following flows are defined:
 
-- `IDLE_PRE_INSTALL`: Recorded using an idle device before installing the wallet. Any request from this flow will be ignored, since it is not attributable to the wallet. Does not require `--wallet_address`.
-- `INSTALL`: Recorded during the download of the wallet software. Does not require `--wallet_address`.
-- `ONBOARDING_NEW`: Recorded after wallet installation, when creating a new account. Does not require `--wallet_address`.
-- `ONBOARDING_IMPORT`: Recorded after wallet installation, while importing an existing account. Requires `--wallet_address` to be set to the account address(es) that will be imported. You should import accounts that already have Ether and USDC.
-- `SEND_ETHER`: Recorded when sending Ether to another wallet. Requires `--wallet_address` to be set to the account address(es) that you will send **from** and send **to**.
+- `IDLE_PRE_INSTALL`: Recorded using an idle device before installing the wallet. Any request from this flow will be ignored, since it is not attributable to the wallet. Does not require `--wallet-addresses`.
+- `INSTALL`: Recorded during the download of the wallet software. Does not require `--wallet-addresses`.
+- `ONBOARDING_NEW`: Recorded after wallet installation, when creating a new account. Does not require `--wallet-addresses`.
+- `ONBOARDING_IMPORT`: Recorded after wallet installation, while importing an existing account. Requires `--wallet-addresses` to be set to the account address(es) that will be imported. You should import accounts that already have Ether and USDC.
+- `SEND_ETHER`: Recorded when sending Ether to another wallet. Requires `--wallet-addresses` to be set to the account address(es) that you will send **from** and send **to**.
 - `SEND_USDC`: Same as `SEND_ETHER`, but send USDC instead of Ether.
-- `NATIVE_SWAP`: Perform a swap using the wallet's built-in swap feature. Requires `--wallet_address` to be set to the account address doing the swapping.
-- `APP_CONNECTION`: Connect and sign in to Walletbeat's wallet test app. Requires `--wallet_address` to be set to the account address doing the connection.
-- `MAKE_TRANSACTION`: Make transactions using Walletbeat's wallet test app. Requires `--wallet_address` to be set to the account address doing the transactions.
+- `NATIVE_SWAP`: Perform a swap using the wallet's built-in swap feature. Requires `--wallet-addresses` to be set to the account address doing the swapping.
+- `APP_CONNECTION`: Connect and sign in to Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the connection.
+- `MAKE_TRANSACTION`: Make transactions using Walletbeat's wallet test app. Requires `--wallet-addresses` to be set to the account address doing the transactions.
 
 #### `delete-capture` subcommand
 
@@ -73,40 +84,22 @@ $ pnpm wallet-data-collection <global flags> mark-flow-unsupported --flow='<flow
 
 Mark a flow as not being supported by the wallet, which means capturing its network traffic is impossible.
 
-#### `mark-string` subcommand
-
-```
-$ pnpm wallet-data-collection <global flags> mark-string '<some-string>' '<data-type|benign>'
-```
-
-Mark a string as conveying the given data type. All instances of the string will be redacted from the capture file.
-If a string should be explicitly marked as not carrying any user-identifying information, use `benign`.
-
-##### Examples
-
-```
-# Mark a cookie as a tracking identifier:
-$ pnpm wallet-data-collection <global flags> mark-string 'GA1.1.1294582759.1067224611' 'tracking-identifier'
-
-# Mark a wallet address as such:
-$ pnpm wallet-data-collection <global flags> mark-string '0x1234678...' 'wallet-address'
-
-# Mark a specific string as benign (instances of it will be ignored when looking for suspicious data-identifier strings):
-$ pnpm wallet-data-collection <global flags> mark-string 'Chromium' 'benign'
-```
-
 #### `mark-domain` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> mark-domain '<domain pattern>' '<entity ID>'
+$ pnpm wallet-data-collection <global flags> mark-domain --domain='<domain>' --entity='<entity ID>'
 ```
 
 Mark a domain name and all its subdomains as belonging to the given entity ID.
+Note that domain assignments are **not** wallet-specific, and will not need to be redone in future network captures.
+Domains for requests that were not actually initiated by the wallet (e.g. browser/OS built-in analytics) should **still** be marked,
+as this will help mark them appropriately for other wallets' captures. Such requests can be marked as not-wallet-initiated
+using request matchers (see `explain-request` below).
 
 #### `explain-request` subcommand
 
 ```
-$ pnpm wallet-data-collection <global flags> explain-request --domain=... [--other-selectors...] '<purpose1,purpose2,...>'
+$ pnpm wallet-data-collection <global flags> explain-request --domain=... [--other-selectors...] --purposes='<purpose1,purpose2,...>'
 ```
 
 Mark requests matching the given `selectors` as being done for purposes `purpose1`, `purpose2`, ...
@@ -133,8 +126,53 @@ Requests can be assigned to the following purposes:
 - `IDENTITY_VERIFICATION`: Verifying the wallet user's identity.
 - `STATIC_ASSETS`: Downloading static assets (images, CSS).
 - `ANALYTICS`: Wallet user analytics.
+- `NOT_WALLET_INITIATED`: Requests not actually initiated by the wallet (e.g. browser/OS built-in analytics).
 
 Purposes are case-insensitive on the command line.
+
+#### `mark-string` subcommand
+
+```
+$ pnpm wallet-data-collection <global flags> mark-string --string='<some-string>' --data='<USER_INFO_TYPE_1,USER_INFO_TYPE_2,...>' [--hint=...]
+```
+
+Mark a string as conveying the given data type. All instances of the string will be redacted from the capture file.
+A hint should be optionally provided to explain what this string contains. The hint is stored in the capture file and helps understand redacted data.
+
+Marking a string as carrying user data has two effects:
+
+- All requests carrying this string will automatically be considered as having sent this user data.
+- The string will be redacted out of all network capture files for your own privacy.
+  - Future network captures containing the same string will still be correctly identified as such, by matching on the hash of the redacted string.
+
+##### Examples
+
+```
+# Mark a cookie as a tracking identifier:
+$ pnpm wallet-data-collection <global flags> mark-string --string='GA1.1.1294582759.1067224611' --data='TRACKING_IDENTIFIER' --hint='Google Analytics cookie'
+
+# Mark a wallet address as such:
+$ pnpm wallet-data-collection <global flags> mark-string --string='0x1234678...' --data='WALLET_ADDRESS' --hint='Imported address 1'
+
+# Mark your X.com and Farcaster account name as such:
+$ pnpm wallet-data-collection <global flags> mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT' --hint='Social media account'
+```
+
+#### `review-requests` subcommand
+
+```
+$ pnpm wallet-data-collection <global flags> review-requests
+```
+
+Interactively go through requests to manually define their purpose and/or carried data.
+
+All requests must be reviewed manually at least once. This is your chance to:
+
+- Make sure the domain matches to the correct entity
+- Make sure the request's purposes matched correctly
+- Verify or expand the set of user data sent in the request when not automatically detectable (e.g. list of assets, balances).
+
+After a request is manually reviewed, it will never be prompted for in future executions of the `review-requests` subcommand.
 
 ## Workflow
 
@@ -149,12 +187,18 @@ Purposes are case-insensitive on the command line.
 - Start the browser with `mitmproxy` and create two new wallet addresses.
 - Stop the browser, end the capture.
 - Create a new browser profile, install the wallet again (do not go through user onboarding). Stop the browser.
-- Record a network capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet_address` to the two addresses you had created.
+- Record a network capture with `--flow=ONBOARDING_IMPORT` and set the `--wallet-addresses` to the two addresses you had created.
 - Start the browser and import the two wallet addresses you had created (e.g. by using the same seed phrase).
 - Stop the browser, end the capture.
 - For each remaining flow (`SEND_ETHER`, `SEND_USDC`, `NATIVE_SWAP`, `APP_CONNECTION`, `MAKE_TRANSACTION`):
-  - Record a network capture with `--flow=<flow>`, with `--wallet_address` set to the two addresses you have set up in the wallet already.
+  - If the wallet does not support this flow, run the `mark-flow-unsupported` subcommand to tag it as such. Otherwise:
+  - Record a network capture with `--flow=<flow>`, with `--wallet-addresses` set to the two addresses you have set up in the wallet already.
   - Start the browser and perform the UX flow.
   - Stop the browser, end the capture.
-- Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take.
+- Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
+  - Run the `mark-domain` and `ignore-domain` subcommands to ensure all domains involved in the network capture have associated entities.
+	- Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
+	- Run the `mark-string` subcommand to redact any personal data and automatically associate requests to the data they send.
+	- Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
+	- Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
 - Once the `check` subcommand is successful, you are done!

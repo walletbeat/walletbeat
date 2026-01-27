@@ -7,6 +7,7 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import {
 	assertNonEmptyArray,
+	isNonEmptyArray,
 	type NonEmptyArray,
 	type NonEmptySet,
 	nonEmptySetFromArray,
@@ -24,7 +25,7 @@ export interface EncodedWalletRequestMatcher {
 	domain: string
 	path?: string
 	method?: string
-	purposes: NonEmptyArray<DataCollectionPurpose>
+	purposes: NonEmptyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 }
 
 function escapeRegExp(s: string): string {
@@ -41,19 +42,13 @@ function globToRegExp(glob: string): RegExp {
 }
 
 /**
- * Domain selector semantics:
- * - If matcher domain contains '*', treat it as a glob against the full hostname.
- * - Otherwise match the domain AND any subdomain of it:
+ * Domain selector semantics: match the domain AND any subdomain of it:
  *     matcher=infura.io matches infura.io and foo.infura.io
  * Matching is case-insensitive.
  */
 function domainMatches(matcherDomain: string, requestDomain: string): boolean {
 	const m = matcherDomain.trim().toLowerCase()
 	const r = requestDomain.trim().toLowerCase()
-
-	if (m.includes('*')) {
-		return globToRegExp(m).test(r)
-	}
 
 	return r === m || r.endsWith(`.${m}`)
 }
@@ -70,7 +65,7 @@ export class WalletRequestMatcher {
 	private readonly domain: string
 	private readonly path: string | null
 	private readonly method: string | null
-	private readonly _purposes: NonEmptySet<DataCollectionPurpose>
+	private readonly _purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 
 	constructor({
 		domain,
@@ -81,9 +76,14 @@ export class WalletRequestMatcher {
 		domain: string
 		path: string | null
 		method: string | null
-		purposes: NonEmptySet<DataCollectionPurpose>
+		purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 	}) {
 		this.domain = domain
+
+		if (path !== null && (path.includes('?') || path.includes('#'))) {
+			throw new Error(`invalid path: '${path}' (must only contain path components, no "?" or "#")`)
+		}
+
 		this.path = path
 		this.method = method
 		this._purposes = purposes
@@ -112,14 +112,17 @@ export class WalletRequestMatcher {
 		return true
 	}
 
-	public get purposes(): NonEmptySet<DataCollectionPurpose> {
-		return this.purposes
+	public get purposes(): NonEmptySet<DataCollectionPurpose> | null {
+		return this._purposes === 'NOT_WALLET_INITIATED' ? null : this._purposes
 	}
 
 	public toJSON(): EncodedWalletRequestMatcher {
 		return {
 			domain: this.domain,
-			purposes: dataCollectionPurpose.reorderNonEmpty(setItems(this._purposes)),
+			purposes:
+				this._purposes === 'NOT_WALLET_INITIATED'
+					? 'NOT_WALLET_INITIATED'
+					: dataCollectionPurpose.reorderNonEmpty(setItems(this._purposes)),
 			...(this.path === null ? {} : { path: this.path }),
 			...(this.method === null ? {} : { method: this.method }),
 		}
@@ -150,32 +153,43 @@ export class WalletCaptureAnnotations {
 
 		const parsed: unknown = JSON.parse(raw)
 		const root = expectRecord(parsed, '$')
-
-		// Backward/forward compatibility: accept missing field as empty list.
-		const rawMatchers = root.requestPurposes === undefined ? [] : root.requestPurposes
-		const arr = expectArray(rawMatchers, '$.requestPurposes')
+		const arr = expectArray(root.matchers === undefined ? [] : root.matchers, '$.matchers')
 
 		this.matchers = arr.map((v, i) => {
-			const at = `$.requestPurposes[${i}]`
+			const at = `$.matchers[${i}]`
 			const obj = expectRecord(v, at)
 
 			const domain = expectString(obj.domain, `${at}.domain`)
 			const pathOpt = expectOptionalString(obj.path, `${at}.path`)
 			const methodOpt = expectOptionalString(obj.method, `${at}.method`)
 
-			const purposesRaw = expectArray(obj.purposes, `${at}.purposes`)
+			const purposes = ((): NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' => {
+				if (obj.purposes === undefined) {
+					throw new Error(`no 'purposes' at ${at}.purposes`)
+				}
 
-			if (purposesRaw.length === 0) {
-				throw new Error(`Expected non-empty array at ${at}.purposes`)
-			}
+				if (typeof obj.purposes === 'string') {
+					if (obj.purposes !== 'NOT_WALLET_INITIATED') {
+						throw new Error(`invalid purposes=${obj.purposes} at ${at}.purposes`)
+					}
 
-			const purposes = nonEmptySetFromArray(
-				assertNonEmptyArray(
-					purposesRaw.map((p, j) =>
-						dataCollectionPurpose.assert(expectString(p, `${at}.purposes[${j}]`)),
+					return 'NOT_WALLET_INITIATED'
+				}
+
+				const purposesArray = expectArray(obj.purposes, `${at}.purposes`)
+
+				if (!isNonEmptyArray(purposesArray)) {
+					throw new Error(`Expected non-empty array at ${at}.purposes`)
+				}
+
+				return nonEmptySetFromArray(
+					assertNonEmptyArray(
+						purposesArray.map((p, j) =>
+							dataCollectionPurpose.assert(expectString(p, `${at}.purposes[${j}]`)),
+						),
 					),
-				),
-			)
+				)
+			})()
 
 			return new WalletRequestMatcher({
 				domain,
@@ -194,6 +208,16 @@ export class WalletCaptureAnnotations {
 
 	public add(matcher: WalletRequestMatcher) {
 		this.matchers.push(matcher)
+	}
+
+	public remove(matcher: WalletRequestMatcher) {
+		const index = this.matchers.indexOf(matcher)
+
+		if (index === -1) {
+			throw new Error(`no such matcher: ${matcher.toString()}`)
+		}
+
+		this.matchers.splice(index, 1)
 	}
 
 	public matches(request: WalletRequest): WalletRequestMatcher | null {

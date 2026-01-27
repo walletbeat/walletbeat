@@ -1,8 +1,15 @@
 import { spawn } from 'child_process'
+import fs from 'fs'
 import path from 'path'
 import process from 'process'
+import prompts from 'prompts'
 import { fileURLToPath } from 'url'
 
+import { type EntityId, isValidEntityId } from '@/data/entities'
+import {
+	assertValidDomainToEntityIdMapping,
+	entityForDomain,
+} from '@/data/entities/domains/entity-domains'
 import { isValidWalletName, type WalletName } from '@/data/wallets'
 import {
 	DataCollectionPurpose,
@@ -13,12 +20,14 @@ import {
 } from '@/schema/features/privacy/data-collection'
 import { type Variant, variantEnum } from '@/schema/variants'
 import { WalletType, walletTypes } from '@/schema/wallet-types'
+import { getErrorMessage } from '@/types/errors'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
 	type NonEmptySet,
 	nonEmptySetFromArray,
 	setContains,
+	setItems,
 } from '@/types/utils/non-empty'
 import { Enum } from '@/utils/enum'
 
@@ -28,8 +37,11 @@ import {
 	type RecordedFlow,
 	recordedFlow,
 	RecordedOnlyFlow,
+	type UserDataDict,
 	WalletCaptureFile,
 	WalletCaptureIssue,
+	WalletRequest,
+	WalletRequestReview,
 } from './wallet-capture-file'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -53,7 +65,7 @@ export function flowInstructions(flow: RecordedFlow): string {
 			return 'Perform a built-in token swap from Ether to USDC.'
 		case UserFlow.APP_CONNECTION:
 			return 'Connect to the Walletbeat test page.'
-		case UserFlow.TRANSACTION:
+		case UserFlow.MAKE_TRANSACTION:
 			return 'Send a transaction using the Walletbeat test page.'
 	}
 }
@@ -75,8 +87,8 @@ export function getNextFlow(flow: RecordedFlow): RecordedFlow | 'DONE' {
 		case UserFlow.NATIVE_SWAP:
 			return UserFlow.APP_CONNECTION
 		case UserFlow.APP_CONNECTION:
-			return UserFlow.TRANSACTION
-		case UserFlow.TRANSACTION:
+			return UserFlow.MAKE_TRANSACTION
+		case UserFlow.MAKE_TRANSACTION:
 			return 'DONE'
 	}
 }
@@ -86,6 +98,20 @@ export function getNextFlow(flow: RecordedFlow): RecordedFlow | 'DONE' {
 // ============================================================================
 
 type Option<O> = (x: unknown) => O
+
+function optionOneOf<O1, O2>(opt1: Option<O1>, opt2: Option<O2>): Option<O1 | O2> {
+	return (x: unknown): O1 | O2 => {
+		try {
+			return opt1(x)
+		} catch (e1) {
+			try {
+				return opt2(x)
+			} catch (e2) {
+				throw new Error(`${getErrorMessage(e1)} & ${getErrorMessage(e2)}`)
+			}
+		}
+	}
+}
 
 function stringOption(x: unknown): string {
 	if (x === undefined) {
@@ -97,6 +123,24 @@ function stringOption(x: unknown): string {
 	}
 
 	return x
+}
+
+function typedStringOption<T extends string>(
+	typeName: string,
+	predicate: (s: string) => s is T,
+	helpText: string,
+): Option<T> {
+	return (x: unknown): T => {
+		const s = stringOption(x)
+
+		if (!predicate(s)) {
+			throw new Error(
+				`not a valid ${typeName}: '${s}'${helpText !== '' ? ' (' + helpText + ')' : ''}`,
+			)
+		}
+
+		return s
+	}
 }
 
 function stringListOption(x: unknown): NonEmptyArray<string> {
@@ -191,12 +235,6 @@ function enumSetOption<E extends string>(e: Enum<E>): Option<NonEmptySet<E>> {
 
 		if (!isNonEmptyArray(items)) {
 			throw new Error('need at least one item')
-		}
-
-		if (!e.is(x)) {
-			throw new Error(
-				`invalid: "${x}" (must be a comma-separated list of one or more of: ${e.items.join(', ')})`,
-			)
 		}
 
 		return nonEmptySetFromArray(items)
@@ -348,31 +386,43 @@ export const markFlowUnsupportedOptions = new Options<MarkFlowUnsupportedOptions
 	globalOptions,
 )
 
-export interface MarkStringOptions {
+export interface MarkStringOptions extends GlobalOptions {
 	string: string
-	dataType: UserInfo
+	data: NonEmptySet<UserInfo>
+	hint: string | null
 }
 
-export const markStringOptions = new Options<MarkStringOptions>({
-	string: stringOption,
-	dataType: enumOption(userInfoEnums),
-})
+export const markStringOptions = new Options<MarkStringOptions>(
+	{
+		string: stringOption,
+		data: enumSetOption(userInfoEnums),
+		hint: optionalOption(stringOption),
+	},
+	globalOptions,
+)
 
-export interface MarkDomainOptions {
-	domainPattern: string
-	entityId: string
+export interface MarkDomainOptions extends GlobalOptions {
+	domain: string
+	entity: EntityId
 }
 
-export const markDomainOptions = new Options<MarkDomainOptions>({
-	domainPattern: stringOption,
-	entityId: stringOption,
-})
+export const markDomainOptions = new Options<MarkDomainOptions>(
+	{
+		domain: stringOption,
+		entity: typedStringOption(
+			'entity ID',
+			isValidEntityId,
+			'ensure the entity is registered in `/data/entities.ts` → `allEntities`',
+		),
+	},
+	globalOptions,
+)
 
 export interface ExplainRequestOptions extends GlobalOptions {
 	domain: string
 	path: string | null
 	method: string | null
-	purposes: NonEmptySet<DataCollectionPurpose>
+	purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 }
 
 export const explainRequestOptions = new Options<ExplainRequestOptions>(
@@ -380,7 +430,14 @@ export const explainRequestOptions = new Options<ExplainRequestOptions>(
 		domain: stringOption,
 		path: optionalOption(stringOption),
 		method: optionalOption(stringOption),
-		purposes: enumSetOption(dataCollectionPurpose),
+		purposes: optionOneOf(
+			enumSetOption(dataCollectionPurpose),
+			typedStringOption(
+				'NOT_WALLET_INITIATED',
+				(s: string): s is 'NOT_WALLET_INITIATED' => s === 'NOT_WALLET_INITIATED',
+				'',
+			),
+		),
 	},
 	globalOptions,
 )
@@ -478,6 +535,8 @@ function logInstructions(instructions: string[]) {
 }
 
 export async function handleCapture(opts: CaptureOptions): Promise<void> {
+	const sessionsBefore = openCaptureFile(opts).getSessions()
+
 	const argv = [
 		'mitmdump',
 		`--listen-port=${opts.port}`,
@@ -491,12 +550,12 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 
 	if (opts.walletAddresses === null) {
 		if (!setContains(flowsNotRequiringWalletAddress, opts.flow)) {
-			throw new Error(`Must specify wallet_address for flow ${opts.flow}.`)
+			throw new Error(`Must specify --wallet-addresses for flow ${opts.flow}.`)
 		}
 
-		argv.push('--set=wallet_address=')
+		argv.push('--set=wallet_addresses=')
 	} else {
-		argv.push(`--set=wallet_address=${opts.walletAddresses.join(',')}`)
+		argv.push(`--set=wallet_addresses=${opts.walletAddresses.join(',')}`)
 	}
 
 	argv.push('-s', path.join(scriptDir(), 'mitmproxy_wallet_data_collection.py'))
@@ -512,6 +571,9 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 
 	await runCommand(argv)
 	log('mitmproxy finished.')
+	const sessionsAfter = openCaptureFile(opts).getSessions()
+	const sessionsDiff = sessionsAfter.difference(sessionsBefore)
+
 	const nextFlow = getNextFlow(opts.flow)
 
 	if (nextFlow === 'DONE') {
@@ -538,15 +600,37 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 			)
 		}
 
-		const nextInstructions = [
-			'',
-			`✅ Done with flow: ${opts.flow}`,
-			'  ➡️ If you forgot to test something, simply re-run the previous command and do it.',
-			'  ➡️ If you made a mistake, you may delete the data you just recorded using this command:',
-			`    ⚙️ ${getCommandPrefix(opts)} delete-capture --session=TODO`,
-			`  ➡️ Otherwise, move on to the next flow: ${nextFlow}.`,
-			`    ⚙️ ${getCommandPrefix(opts)} capture --flow=${nextFlow}${captureOptions.length === 0 ? '' : ' ' + captureOptions.join(' ')}`,
-		]
+		const nextInstructions: string[] = []
+
+		if (sessionsDiff.size === 0) {
+			nextInstructions.push(
+				'',
+				`⚠️ Done with flow: ${opts.flow}. ⚠️ Nothing recorded.`,
+				'  ➡️ If you forgot to actually run the flow, simply re-run the previous command and do it.',
+				`  ➡️ Otherwise, move on to the next flow: ${nextFlow}.`,
+				`    ⚙️ ${getCommandPrefix(opts)} capture --flow=${nextFlow}${captureOptions.length === 0 ? '' : ' ' + captureOptions.join(' ')}`,
+			)
+		} else if (sessionsDiff.size > 1) {
+			throw new Error(
+				`Multiple new sessions (${sessionsDiff.size}) found: ${Array.from(sessionsDiff).join(', ')}`,
+			)
+		} else {
+			const onlySession = (() => {
+				for (const session of sessionsDiff) {
+					return session
+				}
+			})()
+
+			nextInstructions.push(
+				'',
+				`✅ Done with flow: ${opts.flow}`,
+				'  ➡️ If you forgot to test something, simply re-run the previous command and do it.',
+				'  ➡️ If you made a mistake, you may delete the data you just recorded using this command:',
+				`    ⚙️ ${getCommandPrefix(opts)} delete-capture --session=${onlySession}`,
+				`  ➡️ Otherwise, move on to the next flow: ${nextFlow}.`,
+				`    ⚙️ ${getCommandPrefix(opts)} capture --flow=${nextFlow}${captureOptions.length === 0 ? '' : ' ' + captureOptions.join(' ')}`,
+			)
+		}
 
 		for (const extraInstruction of extraInstructions) {
 			nextInstructions.push(extraInstruction)
@@ -556,9 +640,12 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 	}
 }
 
-export async function handleDeleteCapture(_: DeleteCaptureOptions): Promise<void> {
-	log('delete-capture subcommand not yet implemented')
-	await Promise.resolve()
+export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<void> {
+	const capture = openCaptureFile(opts)
+
+	capture.deleteSession(opts.session)
+	await capture.save()
+	log(`✅ Successfully deleted all data for session ${opts.session}.`)
 }
 
 export async function handleCheck(opts: GlobalOptions): Promise<void> {
@@ -626,23 +713,85 @@ export async function handleMarkFlowUnsupported(opts: MarkFlowUnsupportedOptions
 	capture.markFlowUnsupported(opts.flow)
 	await capture.save()
 	log(`Flow ${opts.flow} marked as unsupported.`)
-	log(`Run ${getCommandPrefix(opts)} to see if there are any more issues to address.`)
+	log(`Run \`${getCommandPrefix(opts)} check\` to see if there are any more issues to address.`)
 }
 
-export async function handleMarkString(_: MarkStringOptions): Promise<void> {
-	log('mark-string subcommand not yet implemented')
-	await Promise.resolve()
-}
+export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
+	const domainFile = path.join(repoDir(), 'data/entities/domains/entity-domains.json')
+	const targetDomain = opts.domain.toLowerCase().trim()
+	const targetEntityId = opts.entity
 
-export async function handleMarkDomain(_: MarkDomainOptions): Promise<void> {
-	log('mark-domain subcommand not yet implemented')
-	await Promise.resolve()
+	let existingDomains: Record<string, EntityId> = {}
+
+	// Read existing domains
+	if (fs.existsSync(domainFile)) {
+		try {
+			const content = await fs.promises.readFile(domainFile, 'utf8')
+
+			existingDomains = assertValidDomainToEntityIdMapping(JSON.parse(content) as unknown)
+		} catch (e) {
+			throw new Error(`Failed to parse entity domains file: ${getErrorMessage(e)}`)
+		}
+	}
+
+	// Validation: Check for conflicts with existing domains
+	for (const existingDomain of Object.keys(existingDomains)) {
+		// Check if target matches exactly
+		if (existingDomain === targetDomain) {
+			throw new Error(
+				`Domain '${targetDomain}' is already marked as belonging to entity '${existingDomains[existingDomain]}'.`,
+			)
+		}
+
+		// Check if target is a subdomain of an existing domain (e.g., target 'api.foo.com' vs existing 'foo.com')
+		if (targetDomain.endsWith('.' + existingDomain)) {
+			throw new Error(
+				`Domain '${targetDomain}' is a subdomain of already marked '${existingDomain}' (${existingDomains[existingDomain]}). You do not need to mark it separately.`,
+			)
+		}
+
+		// Check if an existing domain is a subdomain of the target (e.g., target 'foo.com' vs existing 'api.foo.com')
+		// This suggests the user should have marked the parent domain instead of the child previously.
+		if (existingDomain.endsWith('.' + targetDomain)) {
+			const existingEntity = entityForDomain(existingDomain)
+
+			if (existingEntity !== null && targetEntityId !== existingEntity.id) {
+				throw new Error(
+					`Existing domain ${existingDomain} is already marked as belonging to entity ID ${existingEntity.id}, so cannot mark ${targetDomain} as belonging to ${targetEntityId}.`,
+				)
+			}
+
+			log(
+				`ℹ️ Consolidating: Removing '${existingDomain}' as it is a subdomain of the new target '${targetDomain}'.`,
+			)
+			delete existingDomains[existingDomain]
+			// We continue the loop to ensure no other subdomains exist (e.g. both api.foo.com and images.foo.com existed)
+		}
+	}
+
+	// Add new entry
+	existingDomains[targetDomain] = targetEntityId
+
+	// Sort keys alphabetically
+	const sortedDomains: Record<string, string> = {}
+
+	Object.keys(existingDomains)
+		.sort()
+		.forEach(key => {
+			sortedDomains[key] = existingDomains[key]
+		})
+
+	// Save file with formatting
+	await fs.promises.mkdir(path.dirname(domainFile), { recursive: true })
+	await fs.promises.writeFile(domainFile, JSON.stringify(sortedDomains, null, '\t') + '\n', 'utf8')
+
+	log(`✅ Successfully marked '${targetDomain}' as belonging to entity '${targetEntityId}'.`)
 }
 
 export async function handleExplainRequest(opts: ExplainRequestOptions): Promise<void> {
 	const capture = openCaptureFile(opts)
 
-	capture.addRequestMatcher(
+	const matched = capture.addRequestMatcher(
 		new WalletRequestMatcher({
 			domain: opts.domain,
 			path: opts.path,
@@ -650,5 +799,393 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 			purposes: opts.purposes,
 		}),
 	)
+
 	await capture.save()
+	log(`✅ Matched ${matched.length} request${matched.length === 1 ? '' : 's'}`)
+
+	for (const req of matched) {
+		log(`  - ${req.toString()}`)
+	}
+}
+
+export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
+	const capture = openCaptureFile(opts)
+
+	let addedToFlows = 0
+
+	for (const f of recordedFlow.items) {
+		const flow = capture.getFlow(f)
+
+		if (flow === null || flow === 'NOT_SUPPORTED') {
+			continue
+		}
+
+		flow.redactor.mark({
+			realStr: opts.string,
+			pieces: opts.data,
+			hint: opts.hint === null ? undefined : opts.hint,
+		})
+		addedToFlows++
+	}
+
+	if (addedToFlows === 0) {
+		log('⚠️ No flows with captured data found. String was not added to any redactor.')
+
+		return
+	}
+
+	await capture.save()
+	log(
+		`✅ Marked string as ${setItems(opts.data).join(', ')}. ${addedToFlows} flow(s) updated. All instances redacted.`,
+	)
+}
+
+function displayRequestInfo(request: WalletRequest): void {
+	function formatUserDataDict(dict: UserDataDict): string {
+		return Object.entries(dict)
+			.map(([key, values]) => `${key}=${values.map(v => v.toString()).join(', ')}`)
+			.join('; ')
+	}
+	const entity = entityForDomain(request.domain)
+
+	if (entity === null) {
+		throw new Error(`no entity associated with ${request.domain}`)
+	}
+
+	log(`        URL: https://${request.domain}${request.path}`)
+	log(`     Domain: ${request.domain} (${entity.name})`)
+
+	if (Object.keys(request.query).length > 0) {
+		log(`      Query: ${formatUserDataDict(request.query)}`)
+	}
+
+	if (request.jsonRpcMethods.length > 0) {
+		log(`   JSON-RPC: ${request.jsonRpcMethods.join(', ')}`)
+	}
+
+	if (request.content !== null) {
+		log(`    Content: ${request.content.toString()}`)
+	}
+
+	if (Object.keys(request.cookies).length > 0) {
+		log(`    Cookies: ${formatUserDataDict(request.cookies)}`)
+	}
+
+	if (request.refererDomain !== null) {
+		const refEntity = entityForDomain(request.refererDomain)
+
+		if (refEntity === null) {
+			throw new Error(`no entity associated with referer domain ${request.refererDomain}`)
+		}
+
+		log(`    Referer: ${request.refererDomain} (${refEntity.name})`)
+	}
+
+	if (Object.keys(request.oddHeaders).length > 0) {
+		log(`    Headers: ${formatUserDataDict(request.oddHeaders)}`)
+	}
+
+	if (Object.keys(request.oddTrailers).length > 0) {
+		log(`   Trailers: ${formatUserDataDict(request.oddTrailers)}`)
+	}
+}
+
+export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
+	const capture = openCaptureFile(opts)
+
+	// Collect all unreviewed requests across all flows
+	const unreviewedRequests: Array<{ flow: RecordedFlow; review: WalletRequestReview }> = []
+
+	for (const f of recordedFlow.items) {
+		const flow = capture.getFlow(f)
+
+		if (flow === null || flow === 'NOT_SUPPORTED') {
+			continue
+		}
+
+		for (const req of flow.requests) {
+			for (const domain of req.domains()) {
+				if (entityForDomain(domain) === null) {
+					throw new Error(
+						`There are still unassociated domains (e.g. ${domain}); please address these first before reviewing requests manually.`,
+					)
+				}
+			}
+		}
+
+		for (const review of flow.unreviewedRequests()) {
+			unreviewedRequests.push({ flow: f, review })
+		}
+	}
+
+	if (unreviewedRequests.length === 0) {
+		log('✅ No unreviewed requests. All requests have been manually reviewed.')
+
+		return
+	}
+
+	log(`Found ${unreviewedRequests.length} unreviewed request(s).`)
+
+	for (let i = 0; i < unreviewedRequests.length; i++) {
+		const { flow, review } = unreviewedRequests[i]
+		const request = review.request
+
+		let confirmed = false
+
+		while (!confirmed) {
+			// Display delimiter for new request
+			log('\n' + '='.repeat(80))
+			log(`Request ${i + 1} of ${unreviewedRequests.length} (Flow: ${flow})`)
+			log('='.repeat(80))
+
+			// Display request information
+			displayRequestInfo(request)
+
+			// Get matcher if any
+			const matcher = capture.findMatcherForReq(request)
+			const matcherPurposes: DataCollectionPurpose[] = matcher?.purposes
+				? setItems(matcher.purposes)
+				: []
+
+			// Display matcher info
+			if (matcher !== null) {
+				log(`\n  Matched by: ${matcher.toString()}`)
+
+				if (matcher.purposes === null) {
+					log('    → This request is marked as NOT_WALLET_INITIATED')
+				} else {
+					log(`    → Purposes from matcher: ${setItems(matcher.purposes).join(', ')}`)
+				}
+			} else {
+				log('  ⚠️  No matcher found for this request; proceeding fully manually.')
+				log('      Consider creating a matcher instead:')
+				log(
+					`        $ ${getCommandPrefix(opts)} explain-request --domain='${request.domain}' [--path='${request.path}']${request.jsonRpcMethods.length === 0 ? '' : ` [--method=${request.jsonRpcMethods[0]}]`} '--purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED`,
+				)
+			}
+
+			// Handle NOT_WALLET_INITIATED case
+			if (matcher !== null && matcher.purposes === null) {
+				const confirmResponse = await prompts({
+					type: 'confirm',
+					name: 'value',
+					message: 'This request is marked as NOT_WALLET_INITIATED. Is this correct?',
+					initial: true,
+				})
+
+				if (confirmResponse.value === undefined) {
+					log('\nReview cancelled.')
+
+					return
+				}
+
+				if (typeof confirmResponse.value !== 'boolean') {
+					throw new Error('invalid response type')
+				}
+
+				if (confirmResponse.value) {
+					review.markAsReviewed()
+					await capture.save()
+					log('✅ Review saved.')
+					confirmed = true
+				}
+
+				continue
+			}
+
+			// Purposes selection
+			let purposesConfirmed = false
+			let selectedPurposes: DataCollectionPurpose[] = []
+
+			while (!purposesConfirmed) {
+				const purposeChoices = dataCollectionPurpose.items.map(p => ({
+					title: p,
+					value: p,
+					selected: matcherPurposes.includes(p) || review.getExtraPurposes().includes(p),
+				}))
+
+				const purposeResponse = await prompts({
+					type: 'multiselect',
+					name: 'purposes',
+					message: 'Select the purposes of this request:',
+					choices: purposeChoices,
+					hint: '- Space to select. Return to submit.',
+				})
+
+				if (purposeResponse.purposes === undefined) {
+					log('\nReview cancelled.')
+
+					return
+				}
+
+				selectedPurposes = dataCollectionPurpose.assertArray(purposeResponse.purposes)
+
+				// Check if any matcher purpose was unselected
+				const unselectedMatcherPurposes = matcherPurposes.filter(p => !selectedPurposes.includes(p))
+
+				if (unselectedMatcherPurposes.length > 0 && matcher !== null) {
+					log(
+						`\n⚠️  You unselected purpose(s) from a matcher: ${unselectedMatcherPurposes.join(', ')}`,
+					)
+					log(`   Matcher: ${matcher.toString()}`)
+
+					const removeMatcherResponse = await prompts({
+						type: 'confirm',
+						name: 'value',
+						message:
+							'Would you like to delete this matcher? (Selecting "No" will restart the purpose selection)',
+						initial: false,
+					})
+
+					if (removeMatcherResponse.value === undefined) {
+						log('\nReview cancelled.')
+
+						return
+					}
+
+					if (typeof removeMatcherResponse.value !== 'boolean') {
+						throw new Error('invalid response type')
+					}
+
+					if (removeMatcherResponse.value) {
+						capture.removeRequestMatcher(matcher)
+						await capture.save()
+						log('✅ Matcher deleted. Restarting this request review...')
+					}
+
+					continue
+				}
+
+				purposesConfirmed = true
+			}
+
+			// Collect detected user info from request
+			const detectedUserInfo = request.userInfo()
+
+			if (detectedUserInfo.size > 0) {
+				log(`\n  Auto-detected user data: ${Array.from(detectedUserInfo).join(', ')}`)
+			}
+
+			// User info selection
+			let userInfoConfirmed = false
+			let selectedUserInfo: UserInfo[] = []
+
+			while (!userInfoConfirmed) {
+				const userInfoChoices = userInfoEnums.items.map(u => ({
+					title: u,
+					value: u,
+					selected: detectedUserInfo.has(u) || review.getExtraUserData().includes(u),
+				}))
+
+				const userInfoResponse = await prompts({
+					type: 'multiselect',
+					name: 'userInfo',
+					message: 'Select user data sent in this request (pre-selected = auto-detected):',
+					choices: userInfoChoices,
+					hint: '- Space to select. Return to submit.',
+				})
+
+				if (userInfoResponse.userInfo === undefined) {
+					log('\nReview cancelled.')
+
+					return
+				}
+
+				selectedUserInfo = userInfoEnums.assertArray(userInfoResponse.userInfo)
+
+				// Check if any detected user info was unselected
+				const unselectedDetected = Array.from(detectedUserInfo).filter(
+					u => !selectedUserInfo.includes(u),
+				)
+
+				if (unselectedDetected.length > 0) {
+					log(`\n⚠️  You unselected auto-detected user data: ${unselectedDetected.join(', ')}`)
+					log('Auto-detected user data is based on marked strings, which cannot be unmarked.')
+					log('Restarting selection.')
+					continue
+				}
+
+				userInfoConfirmed = true
+			}
+
+			// Calculate extra purposes and user info
+			const extraPurposes = selectedPurposes.filter(p => !matcherPurposes.includes(p))
+			const extraUserInfo = selectedUserInfo.filter(u => !detectedUserInfo.has(u))
+
+			// Show final result
+			log('\n' + '-'.repeat(40))
+			log('Review Summary:')
+			log('-'.repeat(40))
+			displayRequestInfo(request)
+
+			log('\n   Purposes:')
+
+			if (matcherPurposes.length > 0) {
+				log(`     From matcher: ${matcherPurposes.join(', ')}`)
+			}
+
+			if (extraPurposes.length > 0) {
+				log(`       Additional: ${extraPurposes.join(', ')}`)
+			}
+
+			if (matcherPurposes.length === 0 && extraPurposes.length === 0) {
+				log('     (none selected)')
+			}
+
+			log('\n  User Data:')
+
+			if (detectedUserInfo.size > 0) {
+				log(`    Auto-detected: ${Array.from(detectedUserInfo).join(', ')}`)
+			}
+
+			if (extraUserInfo.length > 0) {
+				log(`       Additional: ${extraUserInfo.join(', ')}`)
+			}
+
+			if (detectedUserInfo.size === 0 && extraUserInfo.length === 0) {
+				log('     (none)')
+			}
+
+			// Confirmation
+			log('')
+			const finalConfirm = await prompts({
+				type: 'confirm',
+				name: 'value',
+				message: 'Confirm this review? (You will NOT be prompted about this request again)',
+				initial: true,
+			})
+
+			if (finalConfirm.value === undefined) {
+				log('\nReview cancelled.')
+
+				return
+			}
+
+			if (typeof finalConfirm.value !== 'boolean') {
+				throw new Error('invalid response type')
+			}
+
+			if (finalConfirm.value) {
+				for (const extraPurpose of extraPurposes) {
+					review.addPurpose(extraPurpose)
+				}
+
+				for (const userInfo of extraUserInfo) {
+					review.addUserInfo(userInfo)
+				}
+				review.markAsReviewed()
+				await capture.save()
+				log('✅ Review saved.')
+				confirmed = true
+			} else {
+				log('\nRestarting review for this request...')
+				review.reset()
+			}
+		}
+	}
+
+	log('\n' + '='.repeat(80))
+	log('✅ All requests have been reviewed!')
+	log(`Run \`${getCommandPrefix(opts)} check\` to verify your work.`)
+	log('='.repeat(80))
 }

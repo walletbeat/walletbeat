@@ -47,6 +47,18 @@ export class Enum<E extends string> {
 		return obj
 	}
 
+	/**
+	 * @returns `obj` typecasted to `E[]`, or throws an error if `obj` is not an enum array.
+	 */
+	public assertArray(obj: unknown): E[] {
+		if (!Array.isArray(obj) || obj.some(x => !this.is(x))) {
+			throw new Error(`Attempted to typecast object of type ${typeof obj} to enum`)
+		}
+
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just checked.
+		return obj as unknown as E[]
+	}
+
 	/** Reorder an array of enums using the canonical enum order. */
 	public reorder(arr: E[]): E[] {
 		return Array.from(this.items.filter(e => arr.includes(e)))

@@ -22,62 +22,18 @@ class UxFlow(enum.StrEnum):
     ONBOARDING_NEW = "ONBOARDING_NEW"
     ONBOARDING_IMPORT = "ONBOARDING_IMPORT"
     SEND_ETHER = "SEND_ETHER"
-    SEND_USDC = ("SEND_USDC",)
+    SEND_USDC = "SEND_USDC"
     NATIVE_SWAP = "NATIVE_SWAP"
     APP_CONNECTION = "APP_CONNECTION"
     MAKE_TRANSACTION = "MAKE_TRANSACTION"
 
     @property
-    def requires_wallet_address(self) -> bool:
+    def requires_wallet_addresses(self) -> bool:
         return self not in (
             self.__class__.IDLE_PRE_INSTALL,
             self.__class__.INSTALL,
             self.__class__.ONBOARDING_NEW,
         )
-
-
-_KNOWN_BENIGN_DOMAINS = frozenset(
-    (
-        "*.google.com",
-        "*.googleapis.com",
-        "*.google.com",
-        "*.gstatic.com",
-        "*.gvt1.com",
-    )
-)
-
-_KNOWN_BENIGN_DOMAINS_RE = re.compile(
-    "^(?:"
-    + "|".join(
-        sorted(
-            domain.replace(".", "\\.").replace("*", ".*")
-            for domain in _KNOWN_BENIGN_DOMAINS
-        )
-    )
-    + ")$"
-)
-
-
-def is_benign_domain(domain: str) -> bool:
-    return _KNOWN_BENIGN_DOMAINS_RE.search(domain) is not None
-
-
-_IGNORED_REFERING_DOMAINS = frozenset(("*.google.com",))
-
-_IGNORED_REFERING_DOMAINS_RE = re.compile(
-    "^(?:"
-    + "|".join(
-        sorted(
-            domain.replace(".", "\\.").replace("*", ".*")
-            for domain in _IGNORED_REFERING_DOMAINS
-        )
-    )
-    + ")$"
-)
-
-
-def is_benign_refering_domain(domain: str) -> bool:
-    return _IGNORED_REFERING_DOMAINS_RE.search(domain) is not None
 
 
 _KNOWN_BENIGN_HEADERS = frozenset(
@@ -124,18 +80,6 @@ _KNOWN_BENIGN_HEADERS = frozenset(
 
 def is_benign_header(header: str) -> bool:
     return header.lower() in _KNOWN_BENIGN_HEADERS
-
-
-def is_benign_request(req: http.Request) -> bool:
-    if is_benign_domain(req.host):
-        return True
-    referer = req.headers.get("Referer")
-    if referer is None:
-        return False
-    referer_url = urllib.parse.urlparse(referer)
-    if is_benign_refering_domain(referer_url.hostname):
-        return True
-    return False
 
 
 class WalletCaptureFile:
@@ -740,9 +684,11 @@ class WalletRequest:
             json_rpc_method=json_rpc_method,
             content=_decode_if_set("content"),
             cookies=_decode_str_multidict("cookies"),
+            referer_domain=_decode_if_set("refererDomain"),
             odd_headers=_decode_str_multidict("oddHeaders"),
             odd_trailers=_decode_str_multidict("oddTrailers"),
             session_time=data["sessionTime"],
+            review=data.get("review", None),
         )
 
     @classmethod
@@ -767,6 +713,9 @@ class WalletRequest:
                     json_rpc_method = tuple(rpc["method"] for rpc in payload)
             except json.JSONDecodeError:
                 pass  # Not JSON-RPC
+        referer_domain: str | None = None
+        if "Referer" in req.headers:
+            referer_domain = urllib.parse.urlparse(req.headers["Referer"]).hostname
         return cls(
             flow=flow,
             domain=url.hostname,
@@ -783,6 +732,7 @@ class WalletRequest:
             cookies=UserDataPieces.classify_multidict(
                 req.cookies, flow=flow, context=WalletCaptureContext.COOKIE
             ),
+            referer_domain=referer_domain,
             odd_headers=UserDataPieces.classify_multidict(
                 {
                     k: v
@@ -802,6 +752,7 @@ class WalletRequest:
                 context=WalletCaptureContext.OTHER_HEADER,
             ),
             session_time=session_time,
+            review=None,
         )
 
     def __init__(
@@ -813,9 +764,11 @@ class WalletRequest:
         json_rpc_method: tuple[str],
         content: UserDataPieces | None,
         cookies: dict[str, tuple[UserDataPieces]],
+        referer_domain: str | None,
         odd_headers: dict[str, tuple[UserDataPieces]],
         odd_trailers: dict[str, tuple[UserDataPieces]],
         session_time: int,
+        review: object | None,
     ):
         self._flow = flow
         self._domain = domain
@@ -824,9 +777,11 @@ class WalletRequest:
         self._json_rpc_method = json_rpc_method
         self._content = content
         self._cookies = cookies
+        self._referer_domain = referer_domain
         self._odd_headers = odd_headers
         self._odd_trailers = odd_trailers
         self._session_time = session_time
+        self._review = review
 
     def __str__(self):
         def _maybe_multidict(name: str, md: dict[str, tuple[UserDataPieces]]) -> str:
@@ -844,8 +799,9 @@ class WalletRequest:
             if len(self._json_rpc_method) == 0
             else f" rpc={','.join(sorted(self._json_rpc_method))}"
         )
+        referer_domain = "" if self._referer_domain is None else f" referer={self._referer_domain}"
         content = "" if self._content is None else f" content={str(self._content)}"
-        return f"{self._domain}: {self._path}{_maybe_multidict('query', self._query)}{json_rpc}{content}{_maybe_multidict('cookie', self._cookies)}{_maybe_multidict('headers', self._odd_headers)}{_maybe_multidict('trailers', self._odd_trailers)}"
+        return f"{self._domain}: {self._path}{_maybe_multidict('query', self._query)}{json_rpc}{content}{_maybe_multidict('cookie', self._cookies)}{referer_domain}{_maybe_multidict('headers', self._odd_headers)}{_maybe_multidict('trailers', self._odd_trailers)}"
 
     def encode(self):
         data = {
@@ -873,19 +829,24 @@ class WalletRequest:
         if self._content is not None:
             data["content"] = self._content.encode()
         _encode_multidict("cookies", self._cookies)
+        if self._referer_domain is not None:
+            data["refererDomain"] = self._referer_domain
         _encode_multidict("oddHeaders", self._odd_headers)
         _encode_multidict("oddTrailers", self._odd_trailers)
+        if self._review is not None:
+            data["review"] = self._review
         return data
 
 
 class WalletDataCollectionAddon:
     def __init__(self):
         self._wallet_id: str | None = None
+        self._wallet_type: str | None = None
         self._wallet_variant: str | None = None
         self._current_ux_flow: UxFlow | None = None
         self._wallet_addresses: frozenset[str] | None = None
         self._wallet_data: WalletCaptureFile | None = None
-        self._collection_path = os.path.join(
+        self._data_path = os.path.join(
             os.path.dirname(
                 os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
             ),
@@ -897,26 +858,33 @@ class WalletDataCollectionAddon:
         self._flush_thread = None
 
     def _wallet_collection_path(self):
-        assert self._wallet_id is not None and self._wallet_variant is not None
+        assert self._wallet_id is not None and self._wallet_type is not None and self._wallet_variant is not None
         return os.path.join(
-            self._collection_path,
+            self._data_path,
+            f"{self._wallet_type}-wallets",
+            "collection",
             self._wallet_id.lower(),
             f"{self._wallet_id.lower()}.{self._wallet_variant.lower()}.capture.json",
         )
 
     def configure(self, updated):
-        if "wallet_address" in updated:
+        if "wallet_addresses" in updated:
             assert self._wallet_addresses is None, (
-                "Tried to update wallet_address twice; please restart mitmproxy instead."
+                "Tried to update wallet_addresses twice; please restart mitmproxy instead."
             )
-            assert ctx.options.wallet_address is not None, (
-                "Must specify non-empty wallet_address."
+            assert ctx.options.wallet_addresses is not None, (
+                "Must specify non-empty wallet_addresses."
             )
             self._wallet_addresses = frozenset(
                 canonicalize_addr(addr.strip())
-                for addr in ctx.options.wallet_address.split(",")
+                for addr in ctx.options.wallet_addresses.split(",")
                 if addr.strip() != ""
             )
+        if "wallet_type" in updated:
+            assert self._wallet_type is None, (
+                "Tried to update wallet_type twice; please restart mitmproxy instead."
+            )
+            self._wallet_type = ctx.options.wallet_type
         if "wallet_variant" in updated:
             assert self._wallet_variant is None, (
                 "Tried to update wallet_variant twice; please restart mitmproxy instead."
@@ -926,7 +894,7 @@ class WalletDataCollectionAddon:
             assert self._wallet_id is None, (
                 "Tried to update wallet_id twice; please restart mitmproxy instead."
             )
-            assert self._wallet_addresses is not None, "Must set wallet_address."
+            assert self._wallet_addresses is not None, "Must set wallet_addresses."
             self._wallet_id = ctx.options.wallet_id
             if not os.path.exists(self._wallet_collection_path()):
                 os.makedirs(
@@ -946,16 +914,17 @@ class WalletDataCollectionAddon:
                 f"Invalid ux_flow: {repr(ctx.options.ux_flow)}. Must be one of the following: {', '.join(str(f) for f in UxFlow)}."
             )
             self._current_ux_flow = UxFlow[ctx.options.ux_flow]
-            if self._current_ux_flow.requires_wallet_address:
+            if self._current_ux_flow.requires_wallet_addresses:
                 assert (
                     self._wallet_addresses is not None
                     and len(self._wallet_addresses) > 0
                 ), (
-                    f"Must specify wallet_address for all UX flows other than {', '.join(str(f) for f in UxFlow if not f.requires_wallet_address)}."
+                    f"Must specify wallet_addresses for all UX flows other than {', '.join(str(f) for f in UxFlow if not f.requires_wallet_addresses)}."
                 )
 
     def load(self, loader: Loader):
         loader.add_option("wallet_id", str, "", "Wallet ID.")
+        loader.add_option("wallet_type", str, "", "Wallet type.")
         loader.add_option("wallet_variant", str, "", "Wallet variant.")
         loader.add_option(
             "ux_flow",
@@ -964,15 +933,15 @@ class WalletDataCollectionAddon:
             f"Wallet UX flow being exercised. Must be one of the following: {', '.join(str(f) for f in UxFlow)}.",
         )
         loader.add_option(
-            "wallet_address",
+            "wallet_addresses",
             str,
             "",
-            f"Wallet address, or comma-separated list of multiple wallet addresses. Must be provided for all UX flows other than {', '.join(str(f) for f in UxFlow if not f.requires_wallet_address)}.",
+            f"Comma-separated list of multiple wallet addresses. Must be provided for all UX flows other than {', '.join(str(f) for f in UxFlow if not f.requires_wallet_addresses)}.",
         )
 
     def running(self):
         assert self._current_ux_flow is not None, (
-            "Must set options for this addon: wallet_id, wallet_variant, ux_flow, and wallet_address in some cases."
+            "Must set options for this addon: wallet_id, wallet_type, wallet_variant, ux_flow, and wallet_addresses in some cases."
         )
         with self._lock:
             if self._flush_thread is None:
@@ -1005,8 +974,6 @@ class WalletDataCollectionAddon:
         )
         req = flow.request
         host = req.host
-        if is_benign_request(req):
-            return
         req.anticache()
         req.constrain_encoding()
         data_flow = self._wallet_data.flow(self._current_ux_flow)

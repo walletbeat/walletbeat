@@ -310,48 +310,48 @@ export function collectedByDefault(collectionPolicy: CollectionPolicy): boolean 
 /** Personal information types. */
 export enum PersonalInfo {
 	/** The user's IP address. */
-	IP_ADDRESS = 'ipAddress',
+	IP_ADDRESS = 'IP_ADDRESS',
 
 	/** A cross-request tracking identifier, such as a cookie. */
-	TRACKING_IDENTIFIER = 'trackingIdentifier',
+	TRACKING_IDENTIFIER = 'TRACKING_IDENTIFIER',
 
 	/** The user's selected pseudonym. */
-	PSEUDONYM = 'pseudonym',
+	PSEUDONYM = 'PSEUDONYM',
 
 	/** The user's legal name. */
-	LEGAL_NAME = 'legalName',
+	LEGAL_NAME = 'LEGAL_NAME',
 
 	/** The user's email. */
-	EMAIL = 'email',
+	EMAIL = 'EMAIL',
 
 	/** The user's phone number. */
-	PHONE = 'phone',
+	PHONE = 'PHONE',
 
 	/** URLs the user visits. */
-	BROWSING_HISTORY_URLS = 'browsingHistoryUrls',
+	BROWSING_HISTORY_URLS = 'BROWSING_HISTORY_URLS',
 
 	/**
 	 * The user's contacts (e.g. when searching for friends to invite).
 	 */
-	CONTACTS = 'contacts',
+	CONTACTS = 'CONTACTS',
 
 	/** The user's physical address. */
-	PHYSICAL_ADDRESS = 'physicalAddress',
+	PHYSICAL_ADDRESS = 'PHYSICAL_ADDRESS',
 
 	/** The user's face (e.g. KYC selfie). */
-	FACE = 'face',
+	FACE = 'FACE',
 
 	/** The user's CEX account(s). */
-	CEX_ACCOUNT = 'cexAccount',
+	CEX_ACCOUNT = 'CEX_ACCOUNT',
 
 	/** The user's government-issued ID. */
-	GOVERNMENT_ID = 'governmentId',
+	GOVERNMENT_ID = 'GOVERNMENT_ID',
 
 	/** The user's X.com account. */
-	X_DOT_COM_ACCOUNT = 'xDotComAccount',
+	X_DOT_COM_ACCOUNT = 'X_DOT_COM_ACCOUNT',
 
 	/** The user's Farcaster account. */
-	FARCASTER_ACCOUNT = 'farcasterAccount',
+	FARCASTER_ACCOUNT = 'FARCASTER_ACCOUNT',
 }
 
 export const personalInfo = new Enum<PersonalInfo>({
@@ -374,33 +374,33 @@ export const personalInfo = new Enum<PersonalInfo>({
 /** Wallet-related information types. */
 export enum WalletInfo {
 	/** The user's wallet actions (clicks etc). */
-	USER_ACTIONS = 'userActions',
+	USER_ACTIONS = 'USER_ACTIONS',
 
 	/** The user's account address. */
-	ACCOUNT_ADDRESS = 'accountAddress',
+	ACCOUNT_ADDRESS = 'ACCOUNT_ADDRESS',
 
 	/**
 	 * The user's wallet balance.
 	 * This can easily be turned back into an address, because most
 	 * addresses' balance amount is unique.
 	 */
-	BALANCE = 'balance',
+	BALANCE = 'BALANCE',
 
 	/**
 	 * The set of assets that are in the wallet.
 	 * On wallets with many NFTs, this can be used to uniquely identify the
 	 * wallet.
 	 */
-	ASSETS = 'assets',
+	ASSETS = 'ASSETS',
 
 	/**
 	 * The user's wallet transactions before they are included onchain.
 	 * For example, MEV protection services usually fall under this category.
 	 */
-	MEMPOOL_TRANSACTIONS = 'mempoolTransactions',
+	MEMPOOL_TRANSACTIONS = 'MEMPOOL_TRANSACTIONS',
 
 	/** Domain names the wallet is connected to. */
-	WALLET_CONNECTED_DOMAINS = 'walletConnectedDomains',
+	WALLET_CONNECTED_DOMAINS = 'WALLET_CONNECTED_DOMAINS',
 }
 
 export const walletInfo = new Enum<WalletInfo>({
@@ -526,9 +526,9 @@ export function userInfoType(userInfo: UserInfo): UserInfoType {
 	}
 }
 
-/** Compare two UserInfo scores (higher score is more sensitive). */
+/** Compare two UserInfo scores (if used as comparison function, this will be sorted from most to least sensitive). */
 export function compareUserInfo(a: UserInfo, b: UserInfo): number {
-	return userInfoScore(a) - userInfoScore(b)
+	return userInfoScore(b) - userInfoScore(a)
 }
 
 /** Human-friendly names to refer to the type of info being collection. */
@@ -604,7 +604,7 @@ export enum UserFlow {
 	NATIVE_SWAP = 'NATIVE_SWAP',
 
 	/** Review a transaction and signing it. */
-	TRANSACTION = 'TRANSACTION',
+	MAKE_TRANSACTION = 'MAKE_TRANSACTION',
 
 	/** Connecting to an application. */
 	APP_CONNECTION = 'APP_CONNECTION',
@@ -619,7 +619,7 @@ export const userFlow = new Enum<UserFlow>({
 	[UserFlow.SEND_ETHER]: true,
 	[UserFlow.SEND_USDC]: true,
 	[UserFlow.NATIVE_SWAP]: true,
-	[UserFlow.TRANSACTION]: true,
+	[UserFlow.MAKE_TRANSACTION]: true,
 })
 
 /** Why is data being collected? */
@@ -898,7 +898,7 @@ export interface DataCollection {
 	[UserFlow.NATIVE_SWAP]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
 
 	/** What data is collected during the transaction review/signing flow? */
-	[UserFlow.TRANSACTION]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
+	[UserFlow.MAKE_TRANSACTION]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'
 
 	/** What data is collected when connecting to an app? */
 	[UserFlow.APP_CONNECTION]: DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'

@@ -2,17 +2,32 @@ import { createHash, randomBytes } from 'node:crypto'
 
 import fs from 'fs'
 
+import { entityForDomain } from '@/data/entities/domains/entity-domains'
 import {
+	compareUserInfo,
+	DataCollectionPurpose,
+	dataCollectionPurpose,
 	UserFlow,
 	userFlow,
 	type UserInfo,
 	userInfoEnums,
 } from '@/schema/features/privacy/data-collection'
 import { getErrorMessage } from '@/types/errors'
-import { assertNonEmptyArray, type NonEmptyArray, nonEmptySet } from '@/types/utils/non-empty'
+import {
+	assertNonEmptyArray,
+	isNonEmptyArray,
+	type NonEmptyArray,
+	type NonEmptySet,
+	nonEmptySet,
+	nonEmptySetFromArray,
+	nonEmptySorted,
+	setContains,
+	setItems,
+	setUnion,
+} from '@/types/utils/non-empty'
 import { Enum, excludeFromEnum, mergeEnums } from '@/utils/enum'
 
-import { expectArray, expectNumber, expectRecord, expectString } from './json-utils'
+import { expectArray, expectBoolean, expectNumber, expectRecord, expectString } from './json-utils'
 import type { WalletCaptureAnnotations, WalletRequestMatcher } from './wallet-capture-annotations'
 
 export enum RecordedOnlyFlow {
@@ -55,14 +70,19 @@ interface EncodedRedactedStringStore {
 	redactions: EncodedRedactedData[]
 }
 
-interface EncodedRedactedData {
+type EncodedRedactedData = {
 	labelPrefix: string
 	labelIndex: number
 	hash: string
 	length: number
-	piece?: UserInfo
+	firstChar: string
 	hint?: string
-}
+} & (
+	| {
+			piece: UserInfo
+	  }
+	| { pieces: NonEmptyArray<UserInfo> }
+)
 
 interface EncodedWalletDataRequest {
 	domain: string
@@ -90,8 +110,11 @@ interface EncodedWalletDataRequest {
 	content?: EncodedUserDataPieces
 
 	cookies?: EncodedMultiDict
+	refererDomain?: string
 	oddHeaders?: EncodedMultiDict
 	oddTrailers?: EncodedMultiDict
+
+	review?: EncodedWalletRequestReview
 }
 
 /**
@@ -120,6 +143,12 @@ interface EncodedUserDataPieceSingle {
 interface EncodedUserDataPiecesMultiple {
 	sample: RedactedEncodedString
 	pieces: UserInfo[]
+}
+
+interface EncodedWalletRequestReview {
+	manuallyReviewed: boolean
+	extraPurposes?: DataCollectionPurpose[]
+	extraUserData?: UserInfo[]
 }
 
 interface EncodedWalletCaptureFlow {
@@ -173,6 +202,38 @@ function parseEncodedUserDataPieces(v: unknown, at: string): EncodedUserDataPiec
 	)
 
 	return { sample, pieces }
+}
+
+function parseEncodedWalletRequestReview(v: unknown, at: string): EncodedWalletRequestReview {
+	const obj = expectRecord(v, at)
+
+	const manuallyReviewed = expectBoolean(obj.manuallyReviewed, `${at}.manuallyReviewed`)
+
+	let extraPurposes: DataCollectionPurpose[] | undefined
+
+	if (obj.extraPurposes !== undefined) {
+		const rawPurposes = expectArray(obj.extraPurposes, `${at}.extraPurposes`)
+
+		extraPurposes = rawPurposes.map((p, i) =>
+			dataCollectionPurpose.assert(expectString(p, `${at}.extraPurposes[${i}]`)),
+		)
+	}
+
+	let extraUserData: UserInfo[] | undefined
+
+	if (obj.extraUserData !== undefined) {
+		const rawData = expectArray(obj.extraUserData, `${at}.extraUserData`)
+
+		extraUserData = rawData.map((d, i) =>
+			userInfoEnums.assert(expectString(d, `${at}.extraUserData[${i}]`)),
+		)
+	}
+
+	return {
+		manuallyReviewed,
+		...(extraPurposes !== undefined && extraPurposes.length > 0 ? { extraPurposes } : {}),
+		...(extraUserData !== undefined && extraUserData.length > 0 ? { extraUserData } : {}),
+	}
 }
 
 function parseEncodedMultiDict(v: unknown, at: string): EncodedMultiDict {
@@ -241,6 +302,12 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		}
 	}
 
+	let review: EncodedWalletRequestReview | undefined
+
+	if (obj.review !== undefined) {
+		review = parseEncodedWalletRequestReview(obj.review, `${at}.review`)
+	}
+
 	return {
 		domain,
 		path,
@@ -251,6 +318,7 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		...(oddTrailers && Object.keys(oddTrailers).length ? { oddTrailers } : {}),
 		...(content ? { content } : {}),
 		...(jsonRpcMethod ? { jsonRpcMethod } : {}),
+		...(review ? { review } : {}),
 	}
 }
 
@@ -267,20 +335,38 @@ function parseRedactedDataJSON(v: unknown, at: string): EncodedRedactedData {
 		piece = userInfoEnums.assert(expectString(obj.piece, `${at}.piece`))
 	}
 
+	let pieces: NonEmptyArray<UserInfo> | undefined
+
+	if (obj.pieces !== undefined) {
+		pieces = assertNonEmptyArray(
+			expectArray(obj.pieces, `${at}.pieces`)
+				.map((x, i) => expectString(x, `${at}.pieces[${i}]`))
+				.map(x => userInfoEnums.assert(x)),
+		)
+	}
+
 	let hint: string | undefined
 
 	if (obj.hint !== undefined) {
 		hint = expectString(obj.hint, `${at}.hint`)
 	}
 
-	return {
+	const result = {
 		labelPrefix,
 		labelIndex,
 		hash,
 		length,
 		...(piece ? { piece } : {}),
+		...(pieces ? { pieces } : {}),
 		...(hint ? { hint } : {}),
 	}
+
+	if (result.piece === undefined && result.pieces === undefined) {
+		throw new Error(`Missing redacted piece/pieces at ${at}.*`)
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We checked.
+	return result as EncodedRedactedData
 }
 
 function parseRedactedStringStore(v: unknown, at: string): RedactedStringStore {
@@ -346,14 +432,14 @@ export class RedactedData {
 
 	/**
 	 * Not encoded in JSON, but the store may learn it later via `redact(...)`.
-	 * (Matches Python behavior.)
 	 */
 	public realStr: string | null
 
 	public readonly hash: string
-	public piece?: UserInfo
-	public hint?: string
+	public pieces: NonEmptySet<UserInfo>
+	public hint: string | null
 	public readonly length: number
+	public readonly firstChar: string
 
 	private constructor(args: {
 		redactor: RedactedStringStore
@@ -361,30 +447,51 @@ export class RedactedData {
 		labelIndex: number
 		realStr: string | null
 		hash: string
-		piece?: UserInfo
-		hint?: string
+		pieces: NonEmptySet<UserInfo>
+		hint: string | null
 		length: number
+		firstChar: string
 	}) {
+		if (args.realStr !== null && args.realStr.length === 0) {
+			throw new Error('Redacted string realStr cannot be an empty string.')
+		}
+
 		this._redactor = args.redactor
 		this.labelPrefix = args.labelPrefix
 		this.labelIndex = args.labelIndex
 		this.realStr = args.realStr
 		this.hash = args.hash
-		this.piece = args.piece
+		this.pieces = args.pieces
 		this.hint = args.hint
 		this.length = args.realStr != null ? args.realStr.length : args.length
+		this.firstChar = args.realStr != null ? args.realStr[0] : args.firstChar
 	}
 
 	public static fromJSON(redactor: RedactedStringStore, data: EncodedRedactedData): RedactedData {
+		const pieces = ((): RedactedData['pieces'] => {
+			if (Object.hasOwn(data, 'piece')) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We checked it exists.
+				return nonEmptySet((data as { piece: UserInfo })['piece'])
+			}
+
+			if (Object.hasOwn(data, 'pieces')) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We checked it exists.
+				return nonEmptySetFromArray((data as { pieces: NonEmptyArray<UserInfo> })['pieces'])
+			}
+
+			throw new Error('Unreachable')
+		})()
+
 		return new RedactedData({
 			redactor,
 			labelPrefix: data.labelPrefix,
 			labelIndex: data.labelIndex,
 			realStr: null,
 			hash: data.hash,
-			piece: data.piece,
-			hint: data.hint,
+			pieces,
+			hint: data.hint ?? null,
 			length: data.length,
+			firstChar: data.firstChar,
 		})
 	}
 
@@ -394,18 +501,25 @@ export class RedactedData {
 		labelIndex: number
 		realStr: string
 		hash: string
-		piece?: UserInfo
-		hint?: string
+		pieces: NonEmptySet<UserInfo>
+		hint: string | null
 	}): RedactedData {
+		if (args.realStr === '') {
+			throw new Error('Cannot redact the empty string')
+		}
+
+		// TODO: Normalize realStr.
+
 		return new RedactedData({
 			redactor: args.redactor,
 			labelPrefix: args.labelPrefix,
 			labelIndex: args.labelIndex,
 			realStr: args.realStr,
 			hash: args.hash,
-			piece: args.piece,
+			pieces: args.pieces,
 			hint: args.hint,
 			length: args.realStr.length,
+			firstChar: args.realStr[0],
 		})
 	}
 
@@ -414,34 +528,36 @@ export class RedactedData {
 	}
 
 	/**
-	 * Python `augment(...)`:
+	 * `augment(...)`:
 	 * - learns realStr (not encoded)
 	 * - may set piece/hint (encoded)
 	 * Returns true if encoded metadata changed (piece/hint).
 	 */
 	public augment(args: {
-		realStr?: string | null
-		piece?: UserInfo
-		hint?: string | null
+		realStr?: string
+		pieces?: NonEmptySet<UserInfo>
+		hint?: string
 	}): boolean {
 		let changed = false
 
-		if (args.realStr != null) {
+		if (args.realStr != undefined) {
 			if (this.realStr != null) {
 				assert(this.realStr === args.realStr, 'Hash collision')
 			}
 
+			assert(args.realStr.length > 0, 'String is empty')
 			assert(args.realStr.length === this.length, 'Length mismatch')
+			assert(args.realStr[0] === this.firstChar, 'First character mismatch')
 			this.realStr = args.realStr
 		}
 
-		if (args.piece != null) {
-			if (this.piece != null) {
-				assert(this.piece === args.piece, 'Conflicting piece')
+		if (args.pieces !== undefined) {
+			for (const piece of setItems(args.pieces)) {
+				if (!setContains(this.pieces, piece)) {
+					this.pieces = setUnion([this.pieces, nonEmptySet(piece)])
+					changed = true
+				}
 			}
-
-			this.piece = args.piece
-			changed = true
 		}
 
 		if (args.hint != null) {
@@ -449,8 +565,8 @@ export class RedactedData {
 				assert(this.hint === args.hint, 'Conflicting hint')
 			}
 
+			changed = changed || this.hint !== args.hint
 			this.hint = args.hint
-			changed = true
 		}
 
 		return changed
@@ -462,14 +578,11 @@ export class RedactedData {
 			labelIndex: this.labelIndex,
 			hash: this.hash,
 			length: this.length,
-		}
-
-		if (this.piece != null) {
-			out.piece = this.piece
-		}
-
-		if (this.hint != null) {
-			out.hint = this.hint
+			firstChar: this.firstChar,
+			...(setItems(this.pieces).length === 1
+				? { piece: setItems(this.pieces)[0] }
+				: { pieces: nonEmptySorted(setItems(this.pieces), compareUserInfo) }),
+			...(this.hint !== null ? { hint: this.hint } : {}),
 		}
 
 		return out
@@ -477,30 +590,24 @@ export class RedactedData {
 }
 
 export class RedactedStringStore {
-	public readonly salt: string
+	private readonly salt: string
+	private readonly labelNextIndex = new Map<string, number>()
+	private readonly hashToLabel = new Map<string, { labelPrefix: string; labelIndex: number }>()
+	private readonly redactions = new Map<string, RedactedData>()
+	private relevantLengths: number[] = [] // Sorted in decreasing order, unique.
+	private relevantChunks = new Map<number, Set<string>>() // Maps each length in `relevantLengths` to the potential firstChar to expect for that length.
 
-	private readonly _labelNextIndex = new Map<string, number>()
-	private readonly _hashToLabel = new Map<string, { labelPrefix: string; labelIndex: number }>()
-	private readonly _redactions = new Map<string, RedactedData>()
-
-	// Sorted desc, unique.
-	private _lengths: number[] = []
-
-	// For parity with Python (optional, but implemented).
-	private _needsFlushing = 0
-
-	public constructor(args: { salt: string; redactions?: Iterable<RedactedData> }) {
+	private constructor(args: { salt: string; redactions?: Iterable<RedactedData> }) {
 		this.salt = args.salt
 
-		if (args.redactions) {
+		if (args.redactions !== undefined) {
 			for (const r of args.redactions) {
-				this._installDecodedRedaction(r)
+				this.installDecodedRedaction(r)
 			}
 		}
 	}
 
 	public static newStore(): RedactedStringStore {
-		// Python uses 32 lowercase letters.
 		const bytes = randomBytes(32)
 		const salt = Array.from(bytes, b => String.fromCharCode(97 + (b % 26))).join('')
 
@@ -513,28 +620,15 @@ export class RedactedStringStore {
 		for (const raw of data.redactions) {
 			const r = RedactedData.fromJSON(store, raw)
 
-			store._installDecodedRedaction(r)
+			store.installDecodedRedaction(r)
 		}
-		store._needsFlushing = 0
 
 		return store
 	}
 
-	public needsFlushing(): number {
-		return this._needsFlushing
-	}
-
-	public markFlushed(amount: number): void {
-		this._needsFlushing -= amount
-
-		if (this._needsFlushing < 0) {
-			this._needsFlushing = 0
-		}
-	}
-
 	public getRedaction(labelPrefix: string, labelIndex: number): RedactedData {
 		const key = labelKey(labelPrefix, labelIndex)
-		const r = this._redactions.get(key)
+		const r = this.redactions.get(key)
 
 		assert(r != null, `Unknown redaction label: ${labelPrefix}_${labelIndex}`)
 
@@ -542,7 +636,7 @@ export class RedactedStringStore {
 	}
 
 	public redactionsSorted(): ReadonlyArray<RedactedData> {
-		const all = Array.from(this._redactions.values())
+		const all = Array.from(this.redactions.values())
 
 		all.sort((a, b) => {
 			if (a.labelPrefix < b.labelPrefix) {
@@ -566,7 +660,7 @@ export class RedactedStringStore {
 		}
 	}
 
-	private _hash(s: string): string {
+	private hash(s: string): string {
 		const h = createHash('sha256')
 
 		h.update(this.salt, 'utf8')
@@ -575,55 +669,57 @@ export class RedactedStringStore {
 		return h.digest('hex')
 	}
 
-	private _installDecodedRedaction(r: RedactedData): void {
-		const key = labelKey(r.labelPrefix, r.labelIndex)
+	private registerLengthAndChunk(len: number, firstChar: string) {
+		let set = this.relevantChunks.get(len)
 
-		// Store by label.
-		this._redactions.set(key, r)
+		if (set === undefined) {
+			set = new Set()
+			this.relevantChunks.set(len, set)
 
-		// Map hash -> label (used by `redact` scanning).
-		this._hashToLabel.set(r.hash, { labelPrefix: r.labelPrefix, labelIndex: r.labelIndex })
-
-		// Maintain next index per prefix.
-		const next = this._labelNextIndex.get(r.labelPrefix) ?? 1
-
-		if (r.labelIndex >= next) {
-			this._labelNextIndex.set(r.labelPrefix, r.labelIndex + 1)
+			// Maintain relevantLengths sorted descending
+			this.relevantLengths.push(len)
+			this.relevantLengths.sort((a, b) => b - a)
 		}
 
-		// Maintain lengths list.
-		if (!this._lengths.includes(r.length)) {
-			this._lengths = [...this._lengths, r.length].sort((a, b) => b - a)
-		}
+		set.add(firstChar)
 	}
 
-	/**
-	 * Equivalent to Python RedactedStringStore.add(...)
-	 */
-	public add(args: {
+	private installDecodedRedaction(r: RedactedData): void {
+		const key = labelKey(r.labelPrefix, r.labelIndex)
+
+		this.redactions.set(key, r)
+		this.hashToLabel.set(r.hash, { labelPrefix: r.labelPrefix, labelIndex: r.labelIndex })
+		const next = this.labelNextIndex.get(r.labelPrefix) ?? 1
+
+		if (r.labelIndex >= next) {
+			this.labelNextIndex.set(r.labelPrefix, r.labelIndex + 1)
+		}
+
+		this.registerLengthAndChunk(r.length, r.firstChar)
+	}
+
+	public mark(args: {
 		realStr: string
-		labelPrefix: string
-		piece?: UserInfo
+		pieces: NonEmptySet<UserInfo>
 		hint?: string
 	}): RedactedData {
-		const { realStr, labelPrefix, piece, hint } = args
+		const { realStr, pieces, hint } = args
 
 		assert(realStr.length > 0, 'Tried to add empty string')
 
-		const h = this._hash(realStr)
-		const existingLabel = this._hashToLabel.get(h)
+		const h = this.hash(realStr)
+		const existingLabel = this.hashToLabel.get(h)
 
 		if (existingLabel) {
 			const data = this.getRedaction(existingLabel.labelPrefix, existingLabel.labelIndex)
 
-			if (data.augment({ realStr, piece, hint })) {
-				this._needsFlushing += 1
-			}
+			data.augment({ realStr, pieces, hint })
 
 			return data
 		}
 
-		const labelIndex = this._labelNextIndex.get(labelPrefix) ?? 1
+		const labelPrefix = setItems(pieces).toSorted(compareUserInfo)[0].replaceAll('_', '')
+		const labelIndex = this.labelNextIndex.get(labelPrefix) ?? 1
 
 		const data = RedactedData.createNew({
 			redactor: this,
@@ -631,18 +727,15 @@ export class RedactedStringStore {
 			labelIndex,
 			realStr,
 			hash: h,
-			piece,
-			hint,
+			pieces,
+			hint: hint === undefined ? null : hint,
 		})
 
-		this._redactions.set(labelKey(labelPrefix, labelIndex), data)
-		this._hashToLabel.set(h, { labelPrefix, labelIndex })
-		this._labelNextIndex.set(labelPrefix, labelIndex + 1)
-		this._needsFlushing += 1
+		this.redactions.set(labelKey(labelPrefix, labelIndex), data)
+		this.hashToLabel.set(h, { labelPrefix, labelIndex })
+		this.labelNextIndex.set(labelPrefix, labelIndex + 1)
 
-		if (!this._lengths.includes(data.length)) {
-			this._lengths = [...this._lengths, data.length].sort((a, b) => b - a)
-		}
+		this.registerLengthAndChunk(data.length, data.firstChar)
 
 		return data
 	}
@@ -651,7 +744,6 @@ export class RedactedStringStore {
 		assert(!input.startsWith('~R:'), 'String was already redacted, cannot redact twice.')
 
 		const esc = escapeChar ?? RedactedString.pickEscapeChar(input)
-		const lengths = [...this._lengths] // snapshot
 		const redactions = new Set<RedactedData>()
 
 		const round = (s: string): string => {
@@ -663,14 +755,24 @@ export class RedactedStringStore {
 			for (const part of parts) {
 				if (!isRedaction) {
 					// Scan literal component for any known substrings of known lengths.
-					for (const relevantLen of lengths) {
+					for (const relevantLen of this.relevantLengths) {
 						if (part.length < relevantLen) {
 							continue
 						}
 
+						const relevantFirstChars = this.relevantChunks.get(relevantLen)
+
+						if (relevantFirstChars === undefined) {
+							throw new Error('Logic error')
+						}
+
 						for (let offset = 0; offset <= part.length - relevantLen; offset++) {
+							if (!relevantFirstChars.has(part[offset])) {
+								continue
+							}
+
 							const substr = part.slice(offset, offset + relevantLen)
-							const label = this._hashToLabel.get(this._hash(substr))
+							const label = this.hashToLabel.get(this.hash(substr))
 
 							if (!label) {
 								continue
@@ -678,10 +780,7 @@ export class RedactedStringStore {
 
 							const r = this.getRedaction(label.labelPrefix, label.labelIndex)
 
-							if (r.augment({ realStr: substr })) {
-								this._needsFlushing += 1
-							}
-
+							r.augment({ realStr: substr })
 							redactions.add(r)
 
 							// Replace exactly this match (first found) and return.
@@ -712,7 +811,7 @@ export class RedactedStringStore {
 
 		let s = input
 
-		for (;;) {
+		while (true) {
 			const next = round(s)
 
 			if (next === s) {
@@ -792,7 +891,6 @@ export class RedactedString {
 
 	/**
 	 * The *stored* payload (may be real or already-redacted depending on construction).
-	 * This matches Python, which stores the post-"~R:" string and re-redacts at encode time.
 	 */
 	public get payload(): string {
 		return this._payload
@@ -840,9 +938,6 @@ export class UserDataPieces {
 		this.pieces = new Set(args.pieces)
 	}
 
-	/**
-	 * Equivalent to Python `UserDataPieces.decode(...)`.
-	 */
 	public static decode(
 		data: EncodedUserDataPieces,
 		redactor: RedactedStringStore,
@@ -867,15 +962,12 @@ export class UserDataPieces {
 		}
 	}
 
-	/**
-	 * Equivalent to Python `UserDataPieces.encode(...)`.
-	 */
 	public encode(): EncodedUserDataPieces {
 		if (this.pieces.size === 0) {
 			return this.sample.encode()
 		}
 
-		const pieces = [...this.pieces].sort()
+		const pieces = [...this.pieces].sort(compareUserInfo)
 
 		if (pieces.length === 1) {
 			return { sample: this.sample.encode(), piece: pieces[0] }
@@ -885,7 +977,6 @@ export class UserDataPieces {
 	}
 
 	public toString(): string {
-		// Python prints repr(sample), which includes quotes.
 		const sampleRepr = JSON.stringify(this.sample.encode())
 
 		if (this.pieces.size === 0) {
@@ -924,6 +1015,96 @@ export class WalletCaptureSessionTime {
 	}
 }
 
+export type UserDataPiecesWithDomain = UserDataPieces & {
+	domain: string
+}
+
+export class WalletRequestReview {
+	public readonly request: WalletRequest
+	private reviewed: boolean | null
+	private extraPurposes: DataCollectionPurpose[]
+	private extraUserData: UserInfo[]
+
+	private constructor(args: {
+		request: WalletRequest
+		reviewed: boolean | null
+		extraPurposes: DataCollectionPurpose[]
+		extraUserData: UserInfo[]
+	}) {
+		this.request = args.request
+		this.reviewed = args.reviewed
+		this.extraPurposes = args.extraPurposes
+		this.extraUserData = args.extraUserData
+	}
+
+	public static unspecified(req: WalletRequest): WalletRequestReview {
+		return new WalletRequestReview({
+			request: req,
+			reviewed: null,
+			extraPurposes: [],
+			extraUserData: [],
+		})
+	}
+
+	public static fromEncoded(
+		req: WalletRequest,
+		review: EncodedWalletRequestReview,
+	): WalletRequestReview {
+		return new WalletRequestReview({
+			request: req,
+			reviewed: review.manuallyReviewed,
+			extraPurposes: review.extraPurposes ?? [],
+			extraUserData: review.extraUserData ?? [],
+		})
+	}
+
+	public toJSON(): EncodedWalletRequestReview | undefined {
+		if (this.reviewed === null) {
+			return undefined
+		}
+
+		return {
+			manuallyReviewed: this.reviewed,
+			...(this.extraPurposes.length > 0 ? { extraPurposes: this.extraPurposes } : {}),
+			...(this.extraUserData.length > 0 ? { extraUserData: this.extraUserData } : {}),
+		}
+	}
+
+	public isManuallyReviewed(): boolean {
+		return this.reviewed === true
+	}
+
+	public addPurpose(purpose: DataCollectionPurpose) {
+		if (!this.extraPurposes.includes(purpose)) {
+			this.extraPurposes.push(purpose)
+		}
+	}
+
+	public addUserInfo(userInfo: UserInfo) {
+		if (!this.extraUserData.includes(userInfo)) {
+			this.extraUserData.push(userInfo)
+		}
+	}
+
+	public reset() {
+		this.reviewed = null
+		this.extraPurposes = []
+		this.extraUserData = []
+	}
+
+	public markAsReviewed() {
+		this.reviewed = true
+	}
+
+	public getExtraPurposes(): ReadonlyArray<DataCollectionPurpose> {
+		return this.extraPurposes
+	}
+
+	public getExtraUserData(): ReadonlyArray<UserInfo> {
+		return this.extraUserData
+	}
+}
+
 export class WalletRequest {
 	public readonly domain: string
 	public readonly path: string
@@ -933,8 +1114,10 @@ export class WalletRequest {
 	public readonly jsonRpcMethods: string[]
 	public readonly content: UserDataPieces | null
 	public readonly cookies: UserDataDict
+	public readonly refererDomain: string | null
 	public readonly oddHeaders: UserDataDict
 	public readonly oddTrailers: UserDataDict
+	public readonly review: WalletRequestReview
 
 	private constructor(args: {
 		domain: string
@@ -944,8 +1127,10 @@ export class WalletRequest {
 		jsonRpcMethods: string[]
 		content: UserDataPieces | null
 		cookies: UserDataDict
+		refererDomain: string | null
 		oddHeaders: UserDataDict
 		oddTrailers: UserDataDict
+		review: EncodedWalletRequestReview | null
 	}) {
 		this.domain = args.domain
 		this.path = args.path
@@ -954,8 +1139,13 @@ export class WalletRequest {
 		this.jsonRpcMethods = args.jsonRpcMethods
 		this.content = args.content
 		this.cookies = args.cookies
+		this.refererDomain = args.refererDomain
 		this.oddHeaders = args.oddHeaders
 		this.oddTrailers = args.oddTrailers
+		this.review =
+			args.review === null
+				? WalletRequestReview.unspecified(this)
+				: WalletRequestReview.fromEncoded(this, args.review)
 	}
 
 	/**
@@ -984,8 +1174,10 @@ export class WalletRequest {
 					? null
 					: UserDataPieces.decode(req.content, redactor, `${at}.content`),
 			cookies: decodeUserDataDict(req.cookies, redactor, `${at}.cookies`),
+			refererDomain: req.refererDomain ?? null,
 			oddHeaders: decodeUserDataDict(req.oddHeaders, redactor, `${at}.oddHeaders`),
 			oddTrailers: decodeUserDataDict(req.oddTrailers, redactor, `${at}.oddTrailers`),
+			review: req.review ?? null,
 		})
 	}
 
@@ -1028,8 +1220,10 @@ export class WalletRequest {
 			...(jsonRpcMethod ? { jsonRpcMethod } : {}),
 			...(this.content ? { content: this.content.encode() } : {}),
 			...(cookies ? { cookies } : {}),
+			...(this.refererDomain !== null ? { refererDomain: this.refererDomain } : {}),
 			...(oddHeaders ? { oddHeaders } : {}),
 			...(oddTrailers ? { oddTrailers } : {}),
+			...(this.review.toJSON() === undefined ? {} : { review: this.review.toJSON() }),
 		}
 	}
 
@@ -1056,6 +1250,7 @@ export class WalletRequest {
 			this.jsonRpcMethods.length === 0 ? '' : ` rpc=${[...this.jsonRpcMethods].sort().join(',')}`
 
 		const content = this.content ? ` content=${this.content.toString()}` : ''
+		const refererDomain = this.refererDomain ? ` referer=${this.refererDomain.toString()}` : ''
 
 		return (
 			`${this.domain}: ${this.path}` +
@@ -1063,9 +1258,48 @@ export class WalletRequest {
 			rpc +
 			content +
 			fmtMultiDict('cookie', this.cookies) +
+			refererDomain +
 			fmtMultiDict('headers', this.oddHeaders) +
 			fmtMultiDict('trailers', this.oddTrailers)
 		)
+	}
+
+	public domains(): NonEmptyArray<string> {
+		if (
+			this.refererDomain !== null &&
+			this.refererDomain.toLowerCase() !== this.domain.toLowerCase()
+		) {
+			return [this.domain, this.refererDomain]
+		}
+
+		return [this.domain]
+	}
+
+	public userInfo(): Set<UserInfo> {
+		const detected = new Set<UserInfo>()
+
+		const processDict = (dict: UserDataDict) => {
+			for (const values of Object.values(dict)) {
+				for (const piece of values) {
+					for (const userInfo of piece.pieces) {
+						detected.add(userInfo)
+					}
+				}
+			}
+		}
+
+		processDict(this.query)
+		processDict(this.cookies)
+		processDict(this.oddHeaders)
+		processDict(this.oddTrailers)
+
+		if (this.content !== null) {
+			for (const userInfo of this.content.pieces) {
+				detected.add(userInfo)
+			}
+		}
+
+		return detected
 	}
 }
 
@@ -1074,7 +1308,7 @@ export class WalletCaptureFlow {
 	public readonly flow: RecordedFlow
 	public readonly redactor: RedactedStringStore
 
-	private readonly _requests: WalletRequest[]
+	private _requests: WalletRequest[]
 
 	public get requests(): ReadonlyArray<WalletRequest> {
 		return this._requests
@@ -1111,13 +1345,19 @@ export class WalletCaptureFlow {
 		return sessions
 	}
 
+	public deleteSession(sessionId: number): number {
+		const originalCount = this._requests.length
+
+		this._requests = this._requests.filter(r => r.sessionTime.session !== sessionId)
+
+		return originalCount - this._requests.length
+	}
+
 	public check(): WalletCaptureIssue[] {
 		const issues: WalletCaptureIssue[] = []
 
 		for (const req of this._requests) {
 			if (this.file.findMatcherForReq(req) === null) {
-				// TODO: Only report this issue about this request if all other problems
-				// with this request are clear (i.e. no untagged user data etc).
 				issues.push(
 					new WalletCaptureIssue({
 						section: ['Request annotations'],
@@ -1125,7 +1365,7 @@ export class WalletCaptureFlow {
 						suggestions: [
 							{
 								suggestion: 'Declare the purpose of this request.',
-								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} 'purpose1,purpose2,...'`,
+								subcommand: `explain-request --domain='${req.domain}' [--path='${req.path}']${req.jsonRpcMethods.length === 0 ? '' : ` [--method=${req.jsonRpcMethods[0]}]`} '--purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED'`,
 							},
 						],
 					}),
@@ -1134,6 +1374,10 @@ export class WalletCaptureFlow {
 		}
 
 		return issues
+	}
+
+	public unreviewedRequests(): WalletRequestReview[] {
+		return this._requests.map(req => req.review).filter(review => !review.isManuallyReviewed())
 	}
 }
 
@@ -1177,15 +1421,30 @@ export class WalletCaptureFile {
 	constructor(path: string, annotations: WalletCaptureAnnotations) {
 		this.path = path
 		this.annotations = annotations
-		const text = fs.readFileSync(path, 'utf8')
-		const trimmed = text.trim()
-		const parsed: unknown = trimmed.length === 0 ? {} : JSON.parse(trimmed)
+		let text = ''
+
+		if (fs.existsSync(path)) {
+			text = fs.readFileSync(path, 'utf8')
+		}
+
+		text = text.trim()
+
+		if (text === '') {
+			text = '{}'
+		}
+
+		const parsed: unknown = JSON.parse(text)
 		const root = expectRecord(parsed, '$')
 		const flowsRaw = root.flows === undefined ? {} : expectRecord(root.flows, '$.flows')
-		const captureFlows: Partial<Record<RecordedFlow, WalletCaptureFlow>> = {}
+		const captureFlows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>> = {}
 
 		for (const [flowName, flowValue] of Object.entries(flowsRaw)) {
 			const flowVal = recordedFlow.assert(flowName)
+
+			if (typeof flowValue === 'string' && flowValue === 'NOT_SUPPORTED') {
+				captureFlows[flowVal] = 'NOT_SUPPORTED'
+				continue
+			}
 
 			const data = parseWalletDataFlow(flowValue, `$.flows[${JSON.stringify(flowVal)}]`)
 
@@ -1193,7 +1452,7 @@ export class WalletCaptureFile {
 		}
 
 		this.flows = captureFlows
-		this.sessions = expectNumber(root.sessions, '$.sessions')
+		this.sessions = root.sessions === undefined ? 0 : expectNumber(root.sessions, '$.sessions')
 		const reEncoded = this.toJSON()
 		const loadedStable = stableJSONStringify(root)
 		const reEncodedStable = stableJSONStringify(reEncoded)
@@ -1265,8 +1524,26 @@ export class WalletCaptureFile {
 		return sessions
 	}
 
+	public deleteSession(sessionId: number): void {
+		let totalDeleted = 0
+
+		for (const f of recordedFlow.items) {
+			const flow = this.getFlow(f)
+
+			if (flow && flow !== 'NOT_SUPPORTED') {
+				totalDeleted += flow.deleteSession(sessionId)
+			}
+		}
+
+		if (totalDeleted === 0) {
+			throw new Error(`Session ${sessionId} was not found in any flow.`)
+		}
+	}
+
 	public check(): WalletCaptureIssue[] {
 		const issues: WalletCaptureIssue[] = []
+		let numUnreviewedRequests = 0
+		const allDomains = new Set<string>()
 
 		for (const f of recordedFlow.items) {
 			const flow = this.getFlow(f)
@@ -1295,9 +1572,69 @@ export class WalletCaptureFile {
 				continue
 			}
 
+			for (const req of flow.requests) {
+				for (const domain of req.domains()) {
+					allDomains.add(domain.toLowerCase())
+				}
+			}
+
 			for (const issue of flow.check()) {
 				issues.push(issue.prependSection(`Flow ${f}`))
 			}
+			numUnreviewedRequests += flow.unreviewedRequests().length
+		}
+
+		// Deduplicate domains: keep only "most parental" domains
+		// If we have api.example.com and example.com, keep only example.com
+		const domainsToCheck = new Set<string>(allDomains)
+
+		for (const domain of allDomains) {
+			for (const otherDomain of allDomains) {
+				if (domain !== otherDomain && domain.endsWith('.' + otherDomain)) {
+					// domain is a subdomain of otherDomain, remove the subdomain
+					domainsToCheck.delete(domain)
+					break
+				}
+			}
+		}
+
+		// Check each domain for entity mapping
+		let hasUnassociatedDomain = false
+
+		for (const domain of Array.from(domainsToCheck).sort()) {
+			const entity = entityForDomain(domain)
+
+			if (entity === null) {
+				hasUnassociatedDomain = true
+				issues.push(
+					new WalletCaptureIssue({
+						section: ['Domain matching'],
+						issue: `Domain '${domain}' does not have a known entity mapping.`,
+						suggestions: [
+							{
+								suggestion:
+									'Mark this domain as belonging to a known entity (entity must be manually added to codebase first)',
+								subcommand: `mark-domain --domain='${domain}' --entity='<entity-id>'`,
+							},
+						],
+					}),
+				)
+			}
+		}
+
+		if (!hasUnassociatedDomain && numUnreviewedRequests > 0) {
+			issues.push(
+				new WalletCaptureIssue({
+					section: ['Requests review'],
+					issue: `There are ${numUnreviewedRequests} unreviewed requests.`,
+					suggestions: [
+						{
+							suggestion: `Review request${numUnreviewedRequests === 1 ? '' : 's'}${issues.length > 0 ? ' (consider using matchers before doing so)' : ''}`,
+							subcommand: 'review-requests',
+						},
+					],
+				}),
+			)
 		}
 
 		return issues
@@ -1323,8 +1660,8 @@ export class WalletCaptureFile {
 		return this.annotations.matches(request)
 	}
 
-	public addRequestMatcher(matcher: WalletRequestMatcher) {
-		let matchesOne = false
+	public addRequestMatcher(matcher: WalletRequestMatcher): NonEmptyArray<WalletRequest> {
+		const matched: WalletRequest[] = []
 
 		for (const f of recordedFlow.items) {
 			const flow = this.getFlow(f)
@@ -1339,7 +1676,7 @@ export class WalletCaptureFile {
 
 			for (const req of flow.requests) {
 				if (matcher.matches(req)) {
-					matchesOne = true
+					matched.push(req)
 					const existingMatcher = this.annotations.matches(req)
 
 					if (existingMatcher !== null) {
@@ -1351,10 +1688,21 @@ export class WalletCaptureFile {
 			}
 		}
 
-		if (!matchesOne) {
+		if (!isNonEmptyArray(matched)) {
 			throw new Error(`Matcher ${matcher.toString()} does not match any recorded request.`)
 		}
 
 		this.annotations.add(matcher)
+
+		for (const req of matched) {
+			if (req.review.isManuallyReviewed()) {
+				req.review.reset()
+			}
+		}
+
+		return matched
+	}
+	public removeRequestMatcher(matcher: WalletRequestMatcher) {
+		this.annotations.remove(matcher)
 	}
 }

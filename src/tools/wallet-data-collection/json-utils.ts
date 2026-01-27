@@ -41,3 +41,11 @@ export function expectArray(v: unknown, at: string): unknown[] {
 
 	return v
 }
+
+export function expectBoolean(v: unknown, at: string): boolean {
+	if (typeof v !== 'boolean') {
+		throw new Error(`Expected boolean at ${at}, got ${typeof v}`)
+	}
+
+	return v
+}
