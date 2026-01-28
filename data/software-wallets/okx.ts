@@ -1,4 +1,3 @@
-import { exampleContributor } from '@/data/contributors/example'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -21,31 +20,27 @@ import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
-export const okxWallet: SoftwareWallet = {
+import { mattmatt } from '../contributors/0xmattmatt'
+
+export const okx: SoftwareWallet = {
 	metadata: {
 		id: 'okx',
 		displayName: 'OKX Wallet',
 		tableName: 'OKX',
 		blurb: paragraph(`
-			This is a fictitious wallet with all of its fields unrated.
-			It is meant to be useful to copy-paste to other wallet files
-			when initially creating the skeleton structure for their data.
+OKX Wallet is a universal crypto wallet available on multiple platforms, including app, web, and extension
 		`),
-		contributors: [exampleContributor],
+		contributors: [mattmatt],
 		iconExtension: 'png',
-		lastUpdated: '2020-01-01',
+		lastUpdated: '2026-01-28',
 		urls: {
-			docs: ['https://example.com/docs'],
-			extensions: ['https://example.com/extensions'],
-			repositories: ['https://example.com/repo'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+			],
 			socials: {
-				discord: 'https://discord.com/example',
-				farcaster: 'https://farcaster.xyz/example',
-				linkedin: 'https://linkedin.com/example',
-				telegram: 'https://telegram.org/example',
-				x: 'https://x.com/example',
+				x: 'https://x.com/wallet',
 			},
-			websites: ['https://example.com'],
+			websites: ['https://web3.okx.com/'],
 		},
 	},
 	features: {

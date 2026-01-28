@@ -11,7 +11,7 @@ import { imtoken } from './software-wallets/imtoken'
 import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
-import { okxWallet } from './software-wallets/okx'
+import { okx } from './software-wallets/okx'
 import { phantom } from './software-wallets/phantom'
 import { pillarx } from './software-wallets/pillarx'
 import { rabby } from './software-wallets/rabby'
@@ -34,7 +34,7 @@ export const softwareWallets = {
 	metamask,
 	mtpelerin,
 	nufi,
-	okxWallet,
+	okx,
 	phantom,
 	pillarx,
 	rabby,

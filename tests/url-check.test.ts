@@ -909,6 +909,21 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'b2be6e82fcd37824d1f497679611ff4a9618ff44',
 		retrieved: '2026-01-21',
 	},
+	{
+		url: 'https://web3.okx.com/',
+		urlHash: 'f5c6347af281999467371460243da89157ce815c',
+		retrieved: '2026-01-29',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+		urlHash: '417cf3d5b9346c976bdb24828c6a932fd9729428',
+		retrieved: '2026-01-29',
+	},
+	{
+		url: 'https://x.com/wallet',
+		urlHash: '9fd8107761754e932d217c8cba525769b5a2ac42',
+		retrieved: '2026-01-29',
+	},
 ]
 
 /**
