@@ -899,6 +899,16 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'eedecf715cc2b3c6dfba8e22a9413f580e33ffb0',
 		retrieved: '2026-01-12',
 	},
+	{
+		url: 'https://chromewebstore.google.com/detail/bitget-wallet-crypto-web3/jiidiaalihmmhddjgbnbgdfflelocpak',
+		urlHash: 'cb1bf5f6779c772436e55f9add6d764a456fbc59',
+		retrieved: '2026-01-21',
+	},
+	{
+		url: 'https://x.com/BitgetWallet',
+		urlHash: 'b2be6e82fcd37824d1f497679611ff4a9618ff44',
+		retrieved: '2026-01-21',
+	},
 ]
 
 /**
@@ -915,6 +925,7 @@ const URLS_TO_SKIP = [
 	'instagram.com',
 	'reddit.com',
 	'tiktok.com',
+	'web3.bitget.com',
 ]
 
 const newValidUrls: string[] = []
