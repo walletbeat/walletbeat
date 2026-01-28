@@ -52,8 +52,8 @@ export const okxWallet: SoftwareWallet = {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
 			eip7702: supported({
-								ref: refTodo,
-								contract: "UNKNOWN",
+				ref: refTodo,
+				contract: 'UNKNOWN',
 			}),
 			eoa: supported({
 				ref: refTodo,
