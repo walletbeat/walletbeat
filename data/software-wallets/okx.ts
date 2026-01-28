@@ -51,7 +51,10 @@ export const okxWallet: SoftwareWallet = {
 	features: {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
-			eip7702: notSupported,
+			eip7702: supported({
+								ref: refTodo,
+								contract: "UNKNOWN",
+			}),
 			eoa: supported({
 				ref: refTodo,
 				canExportPrivateKey: true,
@@ -96,18 +99,21 @@ export const okxWallet: SoftwareWallet = {
 				}),
 			},
 		},
-		chainConfigurability: null,
+		chainConfigurability: notSupported,
 		ecosystem: {
 			delegation: null,
 		},
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
-			walletCall: null,
+			walletCall: supported({
+				ref: refTodo,
+				atomicMultiTransactions: featureSupported,
+			}),
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -183,7 +189,7 @@ export const okxWallet: SoftwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			passkeyVerification: null,
+			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
 			transactionLegibility: {
