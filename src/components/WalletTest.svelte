@@ -34,6 +34,7 @@
   import TransactionsTab from './Tabs/TransactionsTab.svelte';
   import SignaturesTab from './Tabs/SignaturesTab.svelte';
   import EIPSupportTab from './Tabs/EIPSupportTab.svelte';
+	import { assertTransactionId } from '@/types/utils/assertions'
 
   type Account = ReturnType<typeof getAccount>;
 
@@ -231,11 +232,9 @@ Issued At: ${new Date().toISOString()}`;
         transactionState.batchIds[tx.id] = result.id;
 
         if ('hash' in result && typeof result.hash === 'string') {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're just asserting the has as `0x{string}`
-          transactionState.hashes[tx.id] = result.hash as `0x${string}`;
+          transactionState.hashes[tx.id] = assertTransactionId(result.hash);
         } else {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we're just asserting the has as `0x{string}`
-          transactionState.hashes[tx.id] = result.id as `0x${string}`;
+          transactionState.hashes[tx.id] = assertTransactionId(result.id);
         }
       } else {
         if (!tx.contractAddress) {
