@@ -50,17 +50,21 @@ export type Eip6963AnnounceProviderEvent = CustomEvent<Eip6963ProviderDetail>
  * @param event - The event to check
  * @returns True if the event is an EIP-6963 Announce Provider Event
  */
-export function isEip6963AnnounceProviderEvent(event: Event): event is Eip6963AnnounceProviderEvent {
+export function isEip6963AnnounceProviderEvent(
+	event: Event,
+): event is Eip6963AnnounceProviderEvent {
 	if (!('detail' in event)) {
 		return false
 	}
 
 	const detail = (event as CustomEvent).detail
+
 	if (typeof detail !== 'object' || detail === null) {
 		return false
 	}
 
 	const { info, provider } = detail as Partial<Eip6963ProviderDetail>
+
 	if (typeof info !== 'object' || info === null) {
 		return false
 	}
