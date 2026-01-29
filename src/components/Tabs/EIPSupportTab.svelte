@@ -19,7 +19,6 @@
       chainId: number | null;
       batchId: string | null;
     };
-    account: { address?: string } | null;
     onRunStep: () => void;
     onReset: () => void;
   }

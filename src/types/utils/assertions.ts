@@ -57,15 +57,23 @@ export function isEip6963AnnounceProviderEvent(
 		return false
 	}
 
-	const detail = (event as CustomEvent).detail
+	const detail: unknown = event.detail
 
 	if (typeof detail !== 'object' || detail === null) {
 		return false
 	}
 
-	const { info, provider } = detail as Partial<Eip6963ProviderDetail>
+	if (!('info' in detail) || !('provider' in detail)) {
+		return false
+	}
+
+	const { info, provider } = detail
 
 	if (typeof info !== 'object' || info === null) {
+		return false
+	}
+
+	if (!('uuid' in info) || !('name' in info) || !('icon' in info) || !('rdns' in info)) {
 		return false
 	}
 

@@ -1346,7 +1346,6 @@ Issued At: ${new Date().toISOString()}`;
           {currentStep}
           {currentStepResult}
           {stepTestState}
-          {account}
           onRunStep={runCurrentStep}
           onReset={resetStepTests}
         />
