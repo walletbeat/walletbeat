@@ -13,6 +13,7 @@
   } from '@wagmi/core';
   import { mainnet } from '@wagmi/core/chains';
   import config from '../lib/wagmi-config';
+  import { getBaseUrl } from '../base-url';
   import { testSignatures, testTransactions } from '../constants/test-transactions-signatures';
   import type { TestTransaction, TestSignature } from '../constants/test-transactions-signatures';
   import { testSteps } from '../constants/test-eip-support';
@@ -118,13 +119,14 @@
 
     if (siweSig?.type === 'message') {
       const address = account?.address || '0x0000000000000000000000000000000000000000';
+      const baseUrl = getBaseUrl();
 
-      siweSig.message = `https://beta.walletbeat.eth.limo/ wants you to sign in with your Ethereum account:
+      siweSig.message = `${baseUrl}/ wants you to sign in with your Ethereum account:
 ${address}
 
 Sign in to authenticate your wallet. This is a test SIWE message.
 
-URI: https://beta.walletbeat.eth.limo/
+URI: ${baseUrl}/
 Version: 1
 Chain ID: 1
 Nonce: ${Math.random().toString(36).substring(2, 15)}
