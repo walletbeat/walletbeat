@@ -64,10 +64,10 @@
 	let isPopoverHovered = $state(false)
 
 	const hoverTriggerEvents = {
-		onmouseenter: () => {
+		onpointerenter: () => {
 			isTriggerHovered = true
 		},
-		onmouseleave: () => {
+		onpointerleave: () => {
 			isTriggerHovered = false
 		},
 		onfocus: () => {
@@ -151,10 +151,10 @@
 			popover="auto"
 			id={popoverId}
 
-			onmouseenter={() => {
+			onpointerenter={() => {
 				isPopoverHovered = true
 			}}
-			onmouseleave={() => {
+			onpointerleave={() => {
 				isPopoverHovered = false
 			}}
 			{@attach node => {
@@ -254,6 +254,7 @@
 
 		margin: var(--offset);
 		width: max-content;
+		max-width: calc(100vw - var(--offset) * 2);
 
 		background-color: var(--popover-backgroundColor);
 		border-radius: 0.5rem;

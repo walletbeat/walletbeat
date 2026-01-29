@@ -85,6 +85,16 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-10-31',
 	},
 	{
+		url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/audits/SlowMist%20Audit%20Report%20-%20Elytro%20Iterative%20Audit%20-%20v1.1.1.pdf',
+		urlHash: '92f16f81bc2d4c021645ed2374ea7e962bdf120f',
+		retrieved: '2026-01-21',
+	},
+	{
+		url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf',
+		urlHash: '1baad6225085b74a18803b2b810fcaa4c9834bb1',
+		retrieved: '2026-01-21',
+	},
+	{
 		url: 'https://family.co',
 		urlHash: '312d2833bbee6edd4987c61dd266d324c38cbf33',
 		retrieved: '2025-10-31',
@@ -889,6 +899,31 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'eedecf715cc2b3c6dfba8e22a9413f580e33ffb0',
 		retrieved: '2026-01-12',
 	},
+	{
+		url: 'https://chromewebstore.google.com/detail/bitget-wallet-crypto-web3/jiidiaalihmmhddjgbnbgdfflelocpak',
+		urlHash: 'cb1bf5f6779c772436e55f9add6d764a456fbc59',
+		retrieved: '2026-01-21',
+	},
+	{
+		url: 'https://x.com/BitgetWallet',
+		urlHash: 'b2be6e82fcd37824d1f497679611ff4a9618ff44',
+		retrieved: '2026-01-21',
+	},
+	{
+		url: 'https://web3.okx.com/',
+		urlHash: 'f5c6347af281999467371460243da89157ce815c',
+		retrieved: '2026-01-29',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/okx-wallet/mcohilncbfahbmgdjkbpemcciiolgcge',
+		urlHash: '417cf3d5b9346c976bdb24828c6a932fd9729428',
+		retrieved: '2026-01-29',
+	},
+	{
+		url: 'https://x.com/wallet',
+		urlHash: '9fd8107761754e932d217c8cba525769b5a2ac42',
+		retrieved: '2026-01-29',
+	},
 ]
 
 /**
@@ -905,6 +940,7 @@ const URLS_TO_SKIP = [
 	'instagram.com',
 	'reddit.com',
 	'tiktok.com',
+	'web3.bitget.com',
 ]
 
 const newValidUrls: string[] = []

@@ -1,6 +1,7 @@
 import { type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { ambire } from './software-wallets/ambire'
+import { bitget } from './software-wallets/bitget'
 import { daimo } from './software-wallets/daimo'
 import { elytro } from './software-wallets/elytro'
 import { family } from './software-wallets/family'
@@ -10,6 +11,7 @@ import { imtoken } from './software-wallets/imtoken'
 import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
+import { okx } from './software-wallets/okx'
 import { phantom } from './software-wallets/phantom'
 import { pillarx } from './software-wallets/pillarx'
 import { rabby } from './software-wallets/rabby'
@@ -22,6 +24,7 @@ import { zeus } from './software-wallets/zeus'
 /** Set of all known software wallets. */
 export const softwareWallets = {
 	ambire,
+	bitget,
 	daimo,
 	elytro,
 	family,
@@ -31,6 +34,7 @@ export const softwareWallets = {
 	metamask,
 	mtpelerin,
 	nufi,
+	okx,
 	phantom,
 	pillarx,
 	rabby,

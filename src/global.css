@@ -109,7 +109,7 @@
 	overflow: hidden;
 
 	font-family: 'Montserrat', 'Noto Color Emoji';
-	font-size: min(3.8vw, 16px);
+	font-size: min(3.2vw, 16px);
 
 	color-scheme: light dark;
 	color: var(--text-primary);
@@ -117,6 +117,8 @@
 	outline-color: var(--accent);
 
 	transition-property: background-color, color;
+
+	touch-action: none;
 }
 
 *,
@@ -141,7 +143,6 @@
 ::before,
 ::after,
 [popover] {
-	transition-duration: 0.25s;
 	transition-timing-function: var(--transition-easeOutExpo);
 }
 
@@ -149,8 +150,16 @@
 	background-color: transparent;
 }
 
-::details-content,
-::picker(select),
+::details-content {
+	transition-duration: 0.25s;
+	transition-timing-function: var(--transition-easeOutExpo);
+	transition-behavior: allow-discrete;
+}
+::picker(select) {
+	transition-duration: 0.25s;
+	transition-timing-function: var(--transition-easeOutExpo);
+	transition-behavior: allow-discrete;
+}
 ::scroll-marker {
 	transition-duration: 0.25s;
 	transition-timing-function: var(--transition-easeOutExpo);
@@ -305,9 +314,11 @@ label:has(
 	padding: 0.66em;
 	gap: 0.5em;
 
+	appearance: none;
 	background-color: var(--background-primary);
 	border: 1px solid var(--border-color);
 	border-radius: 0.5em;
+	color: inherit;
 
 	font: inherit;
 	font-size: smaller;
@@ -853,7 +864,7 @@ ol {
 			--listItem-gap: 1.5lh;
 		}
 
-		&::marker {
+		/* &::marker {
 			content: '●' ' ';
 			font-size: 1em;
 		}
@@ -861,6 +872,25 @@ ol {
 			content: attr(data-list-item-marker);
 			font-size: 0.875em;
 		}
+
+		@supports not selector(::before::marker) { */
+			&::marker {
+				color: transparent;
+			}
+
+			&::before {
+				position: absolute;
+				margin-inline-start: calc(-1 * var(--list-marker-inlineSize) - var(--list-markerGap));
+				width: var(--list-marker-inlineSize);
+
+				content: '●';
+				font-size: 1em;
+				text-align: center;
+			}
+			&[data-list-item-marker]::before {
+				content: attr(data-list-item-marker);
+			}
+		/* } */
 
 		padding-inline-start: var(--list-markerGap);
 
@@ -880,7 +910,8 @@ ol {
 	--scrollContainer-sizeInline: 100cqi;
 
 	/* Rules */
-	container-name: ScrollContainer;
+	overscroll-behavior: none;
+	touch-action: pan-x pan-y;
 
 	&:not([data-scroll-container~='block']):not([data-scroll-container~='inline']) {
 		container-type: size;
@@ -1101,20 +1132,30 @@ ol {
 				}
 			}
 
-			&:not([data-sticky~='no-backdrop'])::before {
-				content: '';
-				z-index: -1;
-				position: absolute;
-				inset: 0;
-				background-color: var(--sticky-backgroundColor);
-				backdrop-filter: var(--sticky-backdropFilter);
-				border-radius: inherit;
+			&:not([data-sticky~='backdrop-none']) {
+				&[data-scroll-container],
+				&:not([data-scroll-container])::before {
+					background-color: var(--sticky-backgroundColor);
+					backdrop-filter: var(--sticky-backdropFilter);
+					border-radius: inherit;
 
-				transition-property: background-color, backdrop-filter;
+					transition-property: background-color, backdrop-filter;
+				}
 
-				@container scroll-state(stuck: none) {
-					background-color: transparent !important;
-					backdrop-filter: blur(0px);
+				&:not([data-scroll-container])::before {
+					content: '';
+					z-index: -1;
+					position: absolute;
+					inset: 0;
+				}
+
+				&:not([data-sticky~='backdrop-always']) {
+					&:not([data-scroll-container])::before {
+						@container scroll-state(stuck: none) {
+							background-color: transparent !important;
+							backdrop-filter: blur(0px);
+						}
+					}
 				}
 			}
 		}

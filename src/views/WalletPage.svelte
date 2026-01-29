@@ -54,6 +54,9 @@
 	// State
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { isLabeledUrl } from '@/schema/url'
+	import { IncidentStatus } from '@/types/content/news'
+	import { daysSince } from '@/types/date'
+	import { getNewsForWallet } from '@/data/news'
 
 	let queryParams = $state<URLSearchParams | undefined>(
 		globalThis.location && new SvelteURLSearchParams(globalThis.location.search)
@@ -71,6 +74,44 @@
 	// (Derived)
 	const wallet = $derived(
 		allRatedWallets[walletName]
+	)
+
+	const walletNews = $derived(
+		getNewsForWallet(wallet.metadata.id)
+	)
+
+	// News section behavior: determine prominence based on recency and resolution status
+	const allNewsResolved = $derived(
+		walletNews.length > 0 &&
+		walletNews.every(news => news.status === IncidentStatus.RESOLVED)
+	)
+
+	const latestNewsDate = $derived(
+		walletNews.length > 0
+			? walletNews.reduce((latest, news) =>
+				news.updatedAt > latest ? news.updatedAt : latest,
+				walletNews[0].updatedAt
+			)
+			: null
+	)
+
+	const daysSinceLatestNews = $derived(
+		latestNewsDate ? daysSince(latestNewsDate) : null
+	)
+
+	// Collapse by default if all resolved and >30 days old
+	const newsIsStale = $derived(
+		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 30
+	)
+
+	// Move to bottom if all resolved and >1 year old
+	const newsIsVeryStale = $derived(
+		allNewsResolved && daysSinceLatestNews !== null && daysSinceLatestNews > 365
+	)
+
+	// Expand by default unless news is stale
+	const shouldExpandNews = $derived(
+		!newsIsStale
 	)
 
 	let selectedVariant = $derived<Variant | undefined>(
@@ -157,6 +198,7 @@
 	import Tooltip from '@/components/Tooltip.svelte'
 	import Typography from '@/components/Typography.svelte'
 	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
+	import SecurityNews from '@/views/SecurityNews.svelte'
 </script>
 
 
@@ -429,6 +471,13 @@
 			</section>
 		</header>
 
+		{#if walletNews.length > 0 && !newsIsVeryStale}
+			<hr />
+			<div data-scroll-item="inline-detached padding-match-end" data-column>
+				<SecurityNews news={walletNews} {shouldExpandNews} {allNewsResolved} />
+			</div>
+		{/if}
+
 		{#if showStage}
 			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
 
@@ -459,6 +508,13 @@
 				})}
 			{/if}
 		{/each}
+
+		{#if walletNews.length > 0 && newsIsVeryStale}
+			<hr />
+			<div data-scroll-item="inline-detached padding-match-end" data-column>
+				<SecurityNews news={walletNews} {shouldExpandNews} {allNewsResolved} />
+			</div>
+		{/if}
 	</article>
 </div>
 
@@ -718,7 +774,9 @@
 									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
 
 									{#if stage && ladderEvaluation}
-										<Tooltip>
+										<Tooltip
+											style="--accent: var(--accent-color)"
+										>
 											<a
 												href={`#${stage.id}`}
 												data-link="camouflaged"
@@ -1352,6 +1410,12 @@
 		color: var(--accent);
 	}
 
+	#news {
+		> header {
+			padding-block: 1.2rem;
+		}
+	}
+
 	#stages {
 		> header {
 			padding-block: 1.2rem;
@@ -1811,13 +1875,27 @@
 
 	.attribute-accordions {
 		details {
+			overflow: hidden;
+
 			summary {
 				padding: 1.25rem;
+
+				h4 {
+					max-width: 60ch;
+					word-wrap: break-word;
+					overflow-wrap: break-word;
+				}
 			}
 
 			section {
 				padding: 1.25rem;
 				padding-top: 0.25rem;
+				overflow: hidden;
+
+				p {
+					word-wrap: break-word;
+					overflow-wrap: break-word;
+				}
 			}
 		}
 	}

@@ -527,7 +527,7 @@
 						<div data-sticky-container>
 							{#if isSortable}
 								<label class="sort-label" data-pressable="to-containing">
-									<span data-sticky="no-backdrop">
+									<span data-sticky="backdrop-none">
 										{@render HeaderTitle()}
 
 										<button

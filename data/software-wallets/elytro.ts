@@ -1,14 +1,45 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
+import { slowMist } from '@/data/entities/slowmist'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
+import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+
+const elytroAudits: SecurityAudit[] = [
+	{
+		ref: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/audits/SlowMist%20Audit%20Report%20-%20Elytro%20Iterative%20Audit%20-%20v1.1.1.pdf',
+		auditDate: '2025-07-07',
+		auditor: slowMist,
+		codeSnapshot: {
+			commit:
+				'https://github.com/Elytro-eth/Elytro-wallet-contract/commit/3d64ccd3d0cd8228298cedb25af81eb042172c59',
+			date: '2025-06-26',
+			tag: 'v1.1.1',
+		},
+		unpatchedFlaws: 'ALL_FIXED',
+		variantsScope: 'ALL_VARIANTS',
+	},
+	{
+		ref: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/audits/SlowMist%20Audit%20Report%20-%20SoulWallet.pdf',
+		auditDate: '2024-05-16',
+		auditor: slowMist,
+		codeSnapshot: {
+			commit:
+				'https://github.com/Elytro-eth/soul-wallet-contract/commit/fd9d0ce5572826ebf9e6842b5316977e17316ac2',
+			date: '2024-05-16',
+			tag: 'preliminary_audit',
+		},
+		unpatchedFlaws: 'ALL_FIXED',
+		variantsScope: 'ALL_VARIANTS',
+	},
+]
 
 export const elytro: SoftwareWallet = {
 	metadata: {
@@ -125,7 +156,7 @@ export const elytro: SoftwareWallet = {
 				libraryUrl:
 					'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/P256.sol',
 			}),
-			publicSecurityAudits: null,
+			publicSecurityAudits: elytroAudits,
 			scamAlerts: null,
 			transactionLegibility: null,
 		},

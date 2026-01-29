@@ -21,7 +21,13 @@ const currentPathname = Astro.url.pathname
 	})
 </script>
 
-<nav id='nav' popover='auto' data-sticky data-scroll-container data-sticky-container>
+<nav
+	id='nav'
+	popover='auto'
+	data-sticky='backdrop-always'
+	data-scroll-container
+	data-sticky-container
+>
 	<header data-sticky='block' data-row data-scroll-container>
 		<a href='/'>
 			<picture>
@@ -56,7 +62,7 @@ const currentPathname = Astro.url.pathname
 	</div>
 
 	<footer data-sticky>
-		<p>
+		<p data-card>
 			Wallets listed on Walletbeat do not represent endorsements and are for informational purposes
 			only.
 		</p>
@@ -132,10 +138,11 @@ const currentPathname = Astro.url.pathname
 			padding: 1rem;
 
 			p {
-				padding: 0.75rem 1rem;
+				&[data-card] {
+					--card-backgroundColor: var(--accent-backgroundColor);
+				}
+
 				line-height: 1.4;
-				background-color: var(--accent-backgroundColor);
-				border-radius: 0.5rem;
 				font-size: 0.875rem;
 				color: var(--text-secondary);
 			}
