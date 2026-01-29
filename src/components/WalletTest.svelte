@@ -92,6 +92,7 @@
     resultsModal: {
       isOpen: false,
       overallPassed: false,
+      hasPartialResults: false,
       stepResults: [] as StepResult[],
     },
   });
@@ -380,6 +381,40 @@ Issued At: ${new Date().toISOString()}`;
     };
   }
 
+  // Helper to determine step status based on critical vs non-critical check failures
+  function determineStepStatus(step: TestStep, eipResults: EIPTestResult[], primaryPassed: boolean): StepStatus {
+    if (!primaryPassed) {
+      return 'failed';
+    }
+
+    // Check if any non-critical checks failed
+    let hasNonCriticalFailure = false;
+
+    for (const eipResult of eipResults) {
+      // Find the corresponding EIP definition in the step
+      const eipDef = step.eips.find(e => e.eipNumber === eipResult.eipNumber);
+
+      if (!eipDef) continue;
+
+      for (const check of eipResult.checks) {
+        if (!check.passed) {
+          // Find the check definition to see if it's critical
+          const checkDef = eipDef.checks.find(c => c.id === check.id);
+
+          if (checkDef && !checkDef.critical) {
+            hasNonCriticalFailure = true;
+          } else if (checkDef && checkDef.critical) {
+            // Critical check failed - this shouldn't happen if primaryPassed is true
+            // but handle it just in case
+            return 'failed';
+          }
+        }
+      }
+    }
+
+    return hasNonCriticalFailure ? 'partial' : 'passed';
+  }
+
   function createEIPResult(eipNumber: string, name: string, specUrl: string, checks: EIPCheckResult[]): EIPTestResult {
     const overallPassed = checks.filter((c) => c.passed === false).length === 0;
 
@@ -396,8 +431,8 @@ Issued At: ${new Date().toISOString()}`;
     const previousStep = testSteps[stepIndex - 1];
     const previousResult = stepTestState.stepResults[previousStep.id];
 
-    // Allow running if previous step completed (passed or failed)
-    return previousResult?.status === 'passed' || previousResult?.status === 'failed';
+    // Allow running if previous step completed (passed, partial, or failed)
+    return previousResult?.status === 'passed' || previousResult?.status === 'partial' || previousResult?.status === 'failed';
   }
 
   function getStepStatus(stepId: string): StepStatus {
@@ -452,10 +487,10 @@ Issued At: ${new Date().toISOString()}`;
 
       if (isLastStep) {
         // Show final results after last step regardless of pass/fail
-        stepTestState.overallStatus = result.status === 'passed' ? 'completed' : 'failed';
+        stepTestState.overallStatus = result.status === 'passed' || result.status === 'partial' ? 'completed' : 'failed';
         showFinalResults();
       } else {
-        // Auto-advance to next step regardless of pass/fail
+        // Auto-advance to next step regardless of pass/fail/partial
         if (stepTestState.currentStepIndex < testSteps.length - 1) {
           stepTestState.currentStepIndex++;
         }
@@ -488,9 +523,11 @@ Issued At: ${new Date().toISOString()}`;
 
   function showFinalResults() {
     const allResults = testSteps.map((step) => stepTestState.stepResults[step.id]).filter(Boolean);
-    const allPassed = allResults.every((r) => r.status === 'passed');
+    const allPassed = allResults.every((r) => r.status === 'passed' || r.status === 'partial');
+    const hasPartial = allResults.some((r) => r.status === 'partial');
 
     stepTestState.resultsModal.overallPassed = allPassed;
+    stepTestState.resultsModal.hasPartialResults = hasPartial;
     stepTestState.resultsModal.stepResults = allResults;
     stepTestState.resultsModal.isOpen = true;
   }
@@ -590,8 +627,9 @@ Issued At: ${new Date().toISOString()}`;
 
     // Step passes if we found at least one provider
     const stepPassed = hasProviders || providerExists;
+    const status = determineStepStatus(step, eipResults, stepPassed);
 
-    return createStepResult(step, stepPassed ? 'passed' : 'failed', eipResults);
+    return createStepResult(step, status, eipResults);
   }
 
   // Step 2: Connect Wallet
@@ -719,7 +757,9 @@ Issued At: ${new Date().toISOString()}`;
 
     eipResults.push(createEIPResult('EIP-1193', 'Ethereum Provider JavaScript API', 'https://eips.ethereum.org/EIPS/eip-1193', eip1193Checks));
 
-    return createStepResult(step, connectPassed ? 'passed' : 'failed', eipResults);
+    const status = determineStepStatus(step, eipResults, connectPassed);
+
+    return createStepResult(step, status, eipResults);
   }
 
   // Step 3: Check Account
@@ -797,8 +837,9 @@ Issued At: ${new Date().toISOString()}`;
     eipResults.push(createEIPResult('EIP-1193', 'Ethereum Provider JavaScript API', 'https://eips.ethereum.org/EIPS/eip-1193', eip1193Checks));
 
     const stepPassed = accountsPassed && validAddress;
+    const status = determineStepStatus(step, eipResults, stepPassed);
 
-    return createStepResult(step, stepPassed ? 'passed' : 'failed', eipResults);
+    return createStepResult(step, status, eipResults);
   }
 
   // Step 4: Check Network
@@ -897,7 +938,9 @@ Issued At: ${new Date().toISOString()}`;
     eipResults.push(createEIPResult('EIP-2700', 'JavaScript Provider Event Emitter', 'https://eips.ethereum.org/EIPS/eip-2700', eip2700Checks));
 
     // Step passes if chain ID was retrieved
-    return createStepResult(step, chainIdPassed ? 'passed' : 'failed', eipResults);
+    const status = determineStepStatus(step, eipResults, chainIdPassed);
+
+    return createStepResult(step, status, eipResults);
   }
 
   // Step 5: Send Batch Calls
@@ -1028,7 +1071,9 @@ Issued At: ${new Date().toISOString()}`;
 
     eipResults.push(createEIPResult('EIP-5792', 'Wallet Function Call API', 'https://eips.ethereum.org/EIPS/eip-5792', eip5792Checks));
 
-    return createStepResult(step, sendCallsPassed ? 'passed' : 'failed', eipResults);
+    const status = determineStepStatus(step, eipResults, sendCallsPassed);
+
+    return createStepResult(step, status, eipResults);
   }
 
   // Step 6: Check Batch Status
@@ -1189,7 +1234,9 @@ Issued At: ${new Date().toISOString()}`;
 
     eipResults.push(createEIPResult('EIP-5792', 'Wallet Function Call API', 'https://eips.ethereum.org/EIPS/eip-5792', eip5792Checks));
 
-    return createStepResult(step, statusPassed ? 'passed' : 'failed', eipResults);
+    const status = determineStepStatus(step, eipResults, statusPassed);
+
+    return createStepResult(step, status, eipResults);
   }
 
   // Update SIWE message when account changes
@@ -1305,10 +1352,11 @@ Issued At: ${new Date().toISOString()}`;
               description={step.eips.map((e) => e.eipNumber).join(', ')}
               isSelected={isCurrent}
               isCompleted={status === 'passed'}
+              isPartial={status === 'partial'}
               isFailed={status === 'failed'}
               isDisabled={!isClickable && !isCurrent}
               onclick={() => {
-                if (isClickable || status === 'passed' || status === 'failed') {
+                if (isClickable || status === 'passed' || status === 'partial' || status === 'failed') {
                   stepTestState.currentStepIndex = index;
                 }
               }}
@@ -1386,6 +1434,7 @@ Issued At: ${new Date().toISOString()}`;
   <EIPResultsModal
     isOpen={stepTestState.resultsModal.isOpen}
     overallPassed={stepTestState.resultsModal.overallPassed}
+    hasPartialResults={stepTestState.resultsModal.hasPartialResults}
     stepResults={stepTestState.resultsModal.stepResults}
     onClose={() => (stepTestState.resultsModal.isOpen = false)}
   />

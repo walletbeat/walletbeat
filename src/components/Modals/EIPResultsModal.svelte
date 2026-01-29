@@ -7,11 +7,19 @@
   interface Props {
     isOpen: boolean;
     overallPassed: boolean;
+    hasPartialResults: boolean;
     stepResults: StepResult[];
     onClose: () => void;
   }
 
-  let { isOpen, overallPassed, stepResults, onClose }: Props = $props();
+  let { isOpen, overallPassed, hasPartialResults, stepResults, onClose }: Props = $props();
+
+  // Determine the overall result type for display
+  const overallResult = $derived(
+    overallPassed && !hasPartialResults ? 'passed' :
+    overallPassed && hasPartialResults ? 'partial' :
+    'failed'
+  );
 
   // Track which steps are expanded
   let expandedSteps = $state<Set<string>>(new Set());
@@ -35,23 +43,31 @@
   }
 </script>
 
-<Modal {isOpen} title={overallPassed ? 'All Tests Passed!' : 'Test Results'} {onClose}>
+<Modal {isOpen} title={overallResult === 'passed' ? 'All Tests Passed!' : overallResult === 'partial' ? 'Tests Passed with Warnings' : 'Test Results'} {onClose}>
   <div class="results-content" data-column="gap-3">
     <!-- Summary -->
-    <div class="summary" class:passed={overallPassed} class:failed={!overallPassed}>
+    <div class="summary" class:passed={overallResult === 'passed'} class:partial={overallResult === 'partial'} class:failed={overallResult === 'failed'}>
       <div class="summary-icon">
-        {#if overallPassed}
+        {#if overallResult === 'passed'}
           ✓
+        {:else if overallResult === 'partial'}
+          ⚠
         {:else}
           !
         {/if}
       </div>
       <div class="summary-text">
-        {#if overallPassed}
+        {#if overallResult === 'passed'}
           <p>Your wallet passed all EIP compliance tests!</p>
           <p class="summary-detail">
             All {stepResults.length} steps completed successfully. The wallet supports EIP-1193,
             EIP-2700, EIP-6963, and EIP-5792.
+          </p>
+        {:else if overallResult === 'partial'}
+          <p>Your wallet passed all critical tests with some warnings.</p>
+          <p class="summary-detail">
+            All {stepResults.length} steps completed. Some non-critical checks failed.
+            Review the results below for details.
           </p>
         {:else}
           <p>Some tests did not pass.</p>
@@ -66,8 +82,8 @@
     <div class="step-results" data-column="gap-2">
       <h4 class="section-title">Step-by-Step Results</h4>
       {#each stepResults as result (result.stepId)}
-        {@const stepPassed = result.status === 'passed'}
-        <div class="step-result" class:passed={stepPassed} class:failed={!stepPassed}>
+        {@const stepStatus = result.status === 'passed' ? 'passed' : result.status === 'partial' ? 'partial' : 'failed'}
+        <div class="step-result" class:passed={stepStatus === 'passed'} class:partial={stepStatus === 'partial'} class:failed={stepStatus === 'failed'}>
           <button
             type="button"
             class="step-header"
@@ -75,8 +91,10 @@
             aria-expanded={expandedSteps.has(result.stepId)}
           >
             <span class="step-status">
-              {#if stepPassed}
+              {#if stepStatus === 'passed'}
                 ✓
+              {:else if stepStatus === 'partial'}
+                ⚠
               {:else}
                 ✗
               {/if}
@@ -155,6 +173,11 @@
     border: 1px solid color-mix(in srgb, var(--rating-pass) 30%, transparent);
   }
 
+  .summary.partial {
+    background: color-mix(in srgb, var(--rating-partial) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--rating-partial) 30%, transparent);
+  }
+
   .summary.failed {
     background: color-mix(in srgb, var(--rating-fail) 10%, transparent);
     border: 1px solid color-mix(in srgb, var(--rating-fail) 30%, transparent);
@@ -168,6 +191,10 @@
 
   .summary.passed .summary-icon {
     color: var(--rating-pass);
+  }
+
+  .summary.partial .summary-icon {
+    color: var(--rating-partial);
   }
 
   .summary.failed .summary-icon {
@@ -208,6 +235,10 @@
     border-color: color-mix(in srgb, var(--rating-pass) 30%, transparent);
   }
 
+  .step-result.partial {
+    border-color: color-mix(in srgb, var(--rating-partial) 30%, transparent);
+  }
+
   .step-result.failed {
     border-color: color-mix(in srgb, var(--rating-fail) 30%, transparent);
   }
@@ -236,6 +267,10 @@
 
   .step-result.passed .step-status {
     color: var(--rating-pass);
+  }
+
+  .step-result.partial .step-status {
+    color: var(--rating-partial);
   }
 
   .step-result.failed .step-status {

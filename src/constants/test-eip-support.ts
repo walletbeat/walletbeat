@@ -1,5 +1,5 @@
 // Step-based EIP testing types
-export type StepStatus = 'pending' | 'running' | 'passed' | 'failed' | 'skipped'
+export type StepStatus = 'pending' | 'running' | 'passed' | 'partial' | 'failed' | 'skipped'
 
 export interface EIPCheckResult {
 	id: string

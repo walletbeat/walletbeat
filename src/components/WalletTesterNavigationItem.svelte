@@ -4,6 +4,7 @@
     description?: string;
     isSelected: boolean;
     isCompleted: boolean;
+    isPartial?: boolean;
     isFailed?: boolean;
     isDisabled?: boolean;
     onclick: () => void;
@@ -14,6 +15,7 @@
     description,
     isSelected,
     isCompleted,
+    isPartial = false,
     isFailed = false,
     isDisabled = false,
     onclick,
@@ -25,6 +27,7 @@
   class="sidebar-item"
   class:selected={isSelected}
   class:completed={isCompleted}
+  class:partial={isPartial}
   class:failed={isFailed}
   class:disabled={isDisabled}
   disabled={isDisabled}
@@ -34,6 +37,8 @@
     <h3 class="sidebar-item-title">{title}</h3>
     {#if isCompleted}
       <span class="sidebar-item-check passed">✓</span>
+    {:else if isPartial}
+      <span class="sidebar-item-check partial">⚠</span>
     {:else if isFailed}
       <span class="sidebar-item-check failed">✗</span>
     {/if}
@@ -68,6 +73,10 @@
     background-color: color-mix(in srgb, var(--rating-pass) 5%, transparent);
   }
 
+  .sidebar-item.partial:not(.selected) {
+    background-color: color-mix(in srgb, var(--rating-partial) 5%, transparent);
+  }
+
   .sidebar-item.failed:not(.selected) {
     background-color: color-mix(in srgb, var(--rating-fail) 5%, transparent);
   }
@@ -100,6 +109,10 @@
     color: var(--rating-pass);
   }
 
+  .sidebar-item.partial .sidebar-item-title {
+    color: var(--rating-partial);
+  }
+
   .sidebar-item.failed .sidebar-item-title {
     color: var(--rating-fail);
   }
@@ -112,6 +125,10 @@
 
   .sidebar-item-check.passed {
     color: var(--rating-pass);
+  }
+
+  .sidebar-item-check.partial {
+    color: var(--rating-partial);
   }
 
   .sidebar-item-check.failed {
