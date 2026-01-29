@@ -13,3 +13,11 @@ Date	From	To	Amount	Purpose	ID
 2025-12-23	fil:walletbeat_ci_worker	fil:walletbeat_ci_worker	50 FIL → 66.729783180684043231 USDfc	FIL swap for USDfc to pay for IPFS storage	fil:bafy2bzacec6sdtatwdmqvwyktni2eb75epnoz6f3orkdb44ujloy6atsuob66
 2026-01-13	treasury	treasury	0.427332607840587715 ETH → 1,360.95 USDC	CoW Swap transaction submission to swap ETH for 1,360.95 USDC	0x9915eb5a1b6d2840a920c145f47bb97b00ab63c0c7c40da9be84b05d6c2c2ab6
 2026-01-13	treasury	teresa5	1,360.95 USDC	Payment for Walletbeat branding services	0x5ca31bc27e5f6727a38f7beb183e9ccb5aa52f9e4d79ce42c06559a65073fb7e
+2026-01-29	treasury	treasury	0.39612959 ETH → 0.39612959 WETH	Wrapping ETH to WETH 0x74cf5ebd94477ea897f33278b53ae12d679cc807b461c49614d81fc2cb9b4d7a
+2026-01-29	treasury	treasury	0 ETH	Approving some WETH for CoW Swap	0x06f644610036d58c858123256911d963baf4cc43855a02154fc76c198112f930
+2026-01-29	treasury	treasury	0 ETH	Approving more WETH for CoW Swap	0x09814c4fe0aa420b450d4c9bd194c9a326f1e5986fa0b7e3913066a0758c2246
+2026-01-29	treasury	treasury	0 ETH	Creating CoW Swap order	0x7d0da428d3a5a7701745a4f3cd24546a06de01e26fc05703ca488de8a23e16db
+2026-01-29	treasury	treasury	0 ETH	Canceling CoW Swap order	0x14e455617eba7d7a43b7e8d6ceef44e6dcfed28c9afb3f5c358f9bb67ce589f7
+2026-01-29	treasury	treasury	0.473863291 ETH → 0.473863291 WETH	Wrapping ETH to WETH	0xa0f0a72dd12d951d8587843ac7e25d25b6f685465acde24bd4c27fddb00e8184
+2026-01-29	treasury	treasury	0.474177982339947569 WETH → 1,395.88 USDC	CoW Swap transaction submission to swap WETH for 1,395.88 USDC	0xd06619a7ff3bdbcec0c47eb31d5eff9473bc86c422b853316bd5e9754dc25885
+2026-01-29	treasury	teresa5	1,395.88 USDC	Payment for Walletbeat branding services	0xbda5d598a13866a21435ee47caabe9b030de7b6cd0f08777f0c916c6671514ec
