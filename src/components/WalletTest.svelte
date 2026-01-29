@@ -38,8 +38,8 @@
     assertTransactionId,
     isEip6963AnnounceProviderEvent,
     isRecord,
-    type Eip1193Provider,
   } from '@/types/utils/assertions'
+  import type { Eip1193Provider } from '@/types/eip'
 
   type Account = ReturnType<typeof getAccount>;
 
