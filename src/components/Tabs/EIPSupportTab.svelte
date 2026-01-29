@@ -24,7 +24,7 @@
     onReset: () => void;
   }
 
-  let { currentStep, currentStepResult, stepTestState, account, onRunStep, onReset }: Props =
+  let { currentStep, currentStepResult, stepTestState, onRunStep, onReset }: Props =
     $props();
 
   const isRunning = $derived(currentStepResult?.status === 'running');

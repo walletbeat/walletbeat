@@ -2,6 +2,7 @@
   import Modal from '../Modal.svelte';
   import type { StepResult } from '../../constants/test-eip-support';
   import { testSteps } from '../../constants/test-eip-support';
+	import { SvelteSet } from 'svelte/reactivity'
 
   interface Props {
     isOpen: boolean;
@@ -22,7 +23,7 @@
       expandedSteps.add(stepId);
     }
 
-    expandedSteps = new Set(expandedSteps);
+    expandedSteps = new SvelteSet(expandedSteps);
   }
 
   function getStepName(stepId: string): string {
