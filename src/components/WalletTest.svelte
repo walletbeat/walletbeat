@@ -152,7 +152,7 @@ Issued At: ${new Date().toISOString()}`;
   }
 
   function openInExplorer(txHash: string) {
-    window.open(`https://etherscan.io/tx/${txHash}`, '_blank', 'noopener,noreferrer');
+    window.open(`https://eth.blockscount.com/tx/${txHash}`, '_blank', 'noopener,noreferrer');
   }
 
   // Connection handlers
