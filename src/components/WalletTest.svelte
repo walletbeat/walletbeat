@@ -1113,9 +1113,12 @@ Issued At: ${new Date().toISOString()}`;
       }
 
       // Check for atomic field (EIP-5792 MUST include this)
+      // For atomicMultiTransactions feature, we need atomic to be true
       if ('atomic' in status && typeof status.atomic === 'boolean') {
-        hasAtomicField = true;
-        atomicDetail = `Atomic: ${status.atomic}`;
+        hasAtomicField = status.atomic === true;
+        atomicDetail = status.atomic
+          ? 'Batch executed atomically'
+          : 'Batch executed non-atomically (atomic: false)';
       } else {
         atomicDetail = 'Atomic field missing or invalid type';
       }
@@ -1164,9 +1167,9 @@ Issued At: ${new Date().toISOString()}`;
     });
 
     eip5792Checks.push({
-      id: 'has-atomic-field',
-      name: 'Atomic field present',
-      description: 'Response includes atomic field indicating execution type',
+      id: 'atomic-batch-execution',
+      name: 'Atomic batch execution',
+      description: 'Wallet executes batches atomically (all-or-nothing)',
       passed: hasAtomicField,
       detail: atomicDetail,
     });
