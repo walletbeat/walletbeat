@@ -37,6 +37,7 @@
 	import {
     assertTransactionId,
     isEip6963AnnounceProviderEvent,
+    isRecord,
     type Eip1193Provider,
   } from '@/types/utils/assertions'
 
@@ -818,10 +819,9 @@ Issued At: ${new Date().toISOString()}`;
     let chainIdDetail = '';
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const chainIdHex = (await provider.request({ method: 'eth_chainId' })) as string;
+      const chainIdHex = await provider.request({ method: 'eth_chainId' });
 
-      if (chainIdHex) {
+      if (typeof chainIdHex === 'string') {
         const chainId = parseInt(chainIdHex, 16);
 
         stepTestState.chainId = chainId;
@@ -923,19 +923,27 @@ Issued At: ${new Date().toISOString()}`;
     let capabilitiesDetail = '';
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const capabilities = (await provider.request({
+      const capabilities = await provider.request({
         method: 'wallet_getCapabilities',
         params: [connectedAddress],
-      })) as Record<string, { atomicBatch?: { supported: boolean } }>;
+      });
 
-      capabilitiesPassed = true;
-      capabilitiesDetail = 'Capabilities retrieved';
+      if (isRecord(capabilities)) {
+        capabilitiesPassed = true;
+        capabilitiesDetail = 'Capabilities retrieved';
 
-      // Check atomicity for current chain
-      const chainIdHex = stepTestState.chainId ? `0x${stepTestState.chainId.toString(16)}` : '0x1';
+        // Check atomicity for current chain
+        const chainIdHex = stepTestState.chainId ? `0x${stepTestState.chainId.toString(16)}` : '0x1';
+        const chainCapabilities = capabilities[chainIdHex];
 
-      atomicitySupported = capabilities?.[chainIdHex]?.atomicBatch?.supported === true;
+        if (isRecord(chainCapabilities)) {
+          const atomicBatch = chainCapabilities['atomicBatch'];
+
+          if (isRecord(atomicBatch)) {
+            atomicitySupported = atomicBatch['supported'] === true;
+          }
+        }
+      }
     } catch (error) {
       capabilitiesDetail = error instanceof Error ? error.message : 'Method not supported';
     }
