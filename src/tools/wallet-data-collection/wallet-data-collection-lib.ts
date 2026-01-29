@@ -14,9 +14,11 @@ import { isValidWalletName, type WalletName } from '@/data/wallets'
 import {
 	DataCollectionPurpose,
 	dataCollectionPurpose,
+	hintForUserInfo,
 	UserFlow,
 	type UserInfo,
 	userInfoEnums,
+	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { type Variant, variantEnum } from '@/schema/variants'
 import { WalletType, walletTypes } from '@/schema/wallet-types'
@@ -25,6 +27,7 @@ import {
 	isNonEmptyArray,
 	type NonEmptyArray,
 	type NonEmptySet,
+	nonEmptySet,
 	nonEmptySetFromArray,
 	setContains,
 	setItems,
@@ -305,8 +308,7 @@ class Options<T extends object> {
 
 				result = { [fieldName]: processed, ...result }
 			} catch (e) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because this code only ever throws Error.
-				throw new Error(`Flag --${wantFieldName}: ${e as Error}`)
+				throw new Error(`Flag --${wantFieldName}: ${getErrorMessage(e)}`)
 			}
 		}
 
@@ -552,10 +554,23 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 		if (!setContains(flowsNotRequiringWalletAddress, opts.flow)) {
 			throw new Error(`Must specify --wallet-addresses for flow ${opts.flow}.`)
 		}
-
-		argv.push('--set=wallet_addresses=')
 	} else {
-		argv.push(`--set=wallet_addresses=${opts.walletAddresses.join(',')}`)
+		const walletRedactionFile = openCaptureFile(opts)
+
+		for (let walletAddr of opts.walletAddresses) {
+			walletAddr = walletAddr.trim()
+
+			if (walletAddr === '') {
+				continue
+			}
+
+			walletRedactionFile.redactor.mark({
+				realStr: walletAddr,
+				pieces: nonEmptySet(WalletInfo.ACCOUNT_ADDRESS),
+				hint: hintForUserInfo(walletAddr, WalletInfo.ACCOUNT_ADDRESS),
+			})
+		}
+		await walletRedactionFile.save()
 	}
 
 	argv.push('-s', path.join(scriptDir(), 'mitmproxy_wallet_data_collection.py'))
@@ -811,33 +826,14 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 	const capture = openCaptureFile(opts)
 
-	let addedToFlows = 0
-
-	for (const f of recordedFlow.items) {
-		const flow = capture.getFlow(f)
-
-		if (flow === null || flow === 'NOT_SUPPORTED') {
-			continue
-		}
-
-		flow.redactor.mark({
-			realStr: opts.string,
-			pieces: opts.data,
-			hint: opts.hint === null ? undefined : opts.hint,
-		})
-		addedToFlows++
-	}
-
-	if (addedToFlows === 0) {
-		log('⚠️ No flows with captured data found. String was not added to any redactor.')
-
-		return
-	}
+	capture.redactor.mark({
+		realStr: opts.string,
+		pieces: opts.data,
+		hint: opts.hint === null ? undefined : opts.hint,
+	})
 
 	await capture.save()
-	log(
-		`✅ Marked string as ${setItems(opts.data).join(', ')}. ${addedToFlows} flow(s) updated. All instances redacted.`,
-	)
+	log(`✅ Marked string as ${setItems(opts.data).join(', ')}. All instances redacted.`)
 }
 
 function displayRequestInfo(request: WalletRequest): void {

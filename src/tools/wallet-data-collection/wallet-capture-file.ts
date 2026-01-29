@@ -7,6 +7,7 @@ import {
 	compareUserInfo,
 	DataCollectionPurpose,
 	dataCollectionPurpose,
+	normalizeStrForUserInfo,
 	UserFlow,
 	userFlow,
 	type UserInfo,
@@ -56,7 +57,6 @@ export const flowsNotRequiringWalletAddress = nonEmptySet<RecordedFlow>(
 
 interface EncodedWalletDataFlow {
 	requests: EncodedWalletDataRequest[]
-	redactor: RedactedStringStore
 }
 
 /**
@@ -153,11 +153,11 @@ interface EncodedWalletRequestReview {
 
 interface EncodedWalletCaptureFlow {
 	requests: EncodedWalletDataRequest[]
-	redactor: EncodedRedactedStringStore
 }
 
 interface EncodedWalletCaptureFile {
 	flows: Record<string, EncodedWalletCaptureFlow | 'NOT_SUPPORTED'>
+	redactions: EncodedRedactedStringStore
 	sessions: number
 }
 
@@ -328,6 +328,7 @@ function parseRedactedDataJSON(v: unknown, at: string): EncodedRedactedData {
 	const labelIndex = expectNumber(obj.labelIndex, `${at}.labelIndex`)
 	const hash = expectString(obj.hash, `${at}.hash`)
 	const length = expectNumber(obj.length, `${at}.length`)
+	const firstChar = expectString(obj.firstChar, `${at}.firstChar`)
 
 	let piece: UserInfo | undefined
 
@@ -356,6 +357,7 @@ function parseRedactedDataJSON(v: unknown, at: string): EncodedRedactedData {
 		labelIndex,
 		hash,
 		length,
+		firstChar,
 		...(piece ? { piece } : {}),
 		...(pieces ? { pieces } : {}),
 		...(hint ? { hint } : {}),
@@ -382,9 +384,8 @@ function parseWalletDataFlow(v: unknown, at: string): EncodedWalletDataFlow {
 	const obj = expectRecord(v, at)
 	const requestsRaw = expectArray(obj.requests, `${at}.requests`)
 	const requests = requestsRaw.map((x, i) => parseWalletDataRequest(x, `${at}.requests[${i}]`))
-	const redactor = parseRedactedStringStore(obj.redactor, `${at}.redactor`)
 
-	return { requests, redactor }
+	return { requests }
 }
 
 function stableJSONStringify(v: unknown): string {
@@ -464,7 +465,8 @@ export class RedactedData {
 		this.pieces = args.pieces
 		this.hint = args.hint
 		this.length = args.realStr != null ? args.realStr.length : args.length
-		this.firstChar = args.realStr != null ? args.realStr[0] : args.firstChar
+		this.firstChar =
+			args.realStr != null ? args.realStr[0].toLowerCase() : args.firstChar.toLowerCase()
 	}
 
 	public static fromJSON(redactor: RedactedStringStore, data: EncodedRedactedData): RedactedData {
@@ -547,7 +549,7 @@ export class RedactedData {
 
 			assert(args.realStr.length > 0, 'String is empty')
 			assert(args.realStr.length === this.length, 'Length mismatch')
-			assert(args.realStr[0] === this.firstChar, 'First character mismatch')
+			assert(args.realStr[0].toLowerCase() === this.firstChar, 'First character mismatch')
 			this.realStr = args.realStr
 		}
 
@@ -681,7 +683,7 @@ export class RedactedStringStore {
 			this.relevantLengths.sort((a, b) => b - a)
 		}
 
-		set.add(firstChar)
+		set.add(firstChar.toLowerCase())
 	}
 
 	private installDecodedRedaction(r: RedactedData): void {
@@ -698,46 +700,67 @@ export class RedactedStringStore {
 		this.registerLengthAndChunk(r.length, r.firstChar)
 	}
 
-	public mark(args: {
+	public mark({
+		realStr,
+		pieces,
+		hint,
+	}: {
 		realStr: string
 		pieces: NonEmptySet<UserInfo>
 		hint?: string
-	}): RedactedData {
-		const { realStr, pieces, hint } = args
+	}): NonEmptyArray<RedactedData> {
+		const normalizedStrs = new Set<string>()
 
-		assert(realStr.length > 0, 'Tried to add empty string')
+		normalizedStrs.add(realStr)
+		normalizedStrs.add(realStr.toLowerCase())
+		normalizedStrs.add(realStr.toUpperCase())
 
-		const h = this.hash(realStr)
-		const existingLabel = this.hashToLabel.get(h)
+		for (const piece of setItems(pieces)) {
+			for (const normalizedStr of setItems(normalizeStrForUserInfo(realStr, piece))) {
+				normalizedStrs.add(normalizedStr)
+				normalizedStrs.add(normalizedStr.toLowerCase())
+				normalizedStrs.add(normalizedStr.toUpperCase())
+			}
+		}
+		const redacted: RedactedData[] = []
 
-		if (existingLabel) {
-			const data = this.getRedaction(existingLabel.labelPrefix, existingLabel.labelIndex)
+		for (const str of normalizedStrs) {
+			assert(str.length > 0, 'Tried to add empty string')
 
-			data.augment({ realStr, pieces, hint })
+			const h = this.hash(str)
+			const existingLabel = this.hashToLabel.get(h)
 
-			return data
+			if (existingLabel) {
+				const existing = this.getRedaction(existingLabel.labelPrefix, existingLabel.labelIndex)
+
+				existing.augment({ realStr: str, pieces, hint })
+				redacted.push(existing)
+				continue
+			}
+
+			const labelPrefix = setItems(pieces).toSorted(compareUserInfo)[0].replaceAll('_', '')
+			const labelIndex = this.labelNextIndex.get(labelPrefix) ?? 1
+
+			const data = RedactedData.createNew({
+				redactor: this,
+				labelPrefix,
+				labelIndex,
+				realStr: str,
+				hash: h,
+				pieces,
+				hint: hint === undefined ? null : hint,
+			})
+
+			redacted.push(data)
+
+			this.redactions.set(labelKey(labelPrefix, labelIndex), data)
+			this.hashToLabel.set(h, { labelPrefix, labelIndex })
+			this.labelNextIndex.set(labelPrefix, labelIndex + 1)
+
+			this.registerLengthAndChunk(data.length, data.firstChar)
 		}
 
-		const labelPrefix = setItems(pieces).toSorted(compareUserInfo)[0].replaceAll('_', '')
-		const labelIndex = this.labelNextIndex.get(labelPrefix) ?? 1
-
-		const data = RedactedData.createNew({
-			redactor: this,
-			labelPrefix,
-			labelIndex,
-			realStr,
-			hash: h,
-			pieces,
-			hint: hint === undefined ? null : hint,
-		})
-
-		this.redactions.set(labelKey(labelPrefix, labelIndex), data)
-		this.hashToLabel.set(h, { labelPrefix, labelIndex })
-		this.labelNextIndex.set(labelPrefix, labelIndex + 1)
-
-		this.registerLengthAndChunk(data.length, data.firstChar)
-
-		return data
+		return assertNonEmptyArray(redacted)
 	}
 
 	public redact(input: string, escapeChar?: string): [string, ReadonlySet<RedactedData>] {
@@ -767,28 +790,30 @@ export class RedactedStringStore {
 						}
 
 						for (let offset = 0; offset <= part.length - relevantLen; offset++) {
-							if (!relevantFirstChars.has(part[offset])) {
+							if (!relevantFirstChars.has(part[offset].toLowerCase())) {
 								continue
 							}
 
 							const substr = part.slice(offset, offset + relevantLen)
-							const label = this.hashToLabel.get(this.hash(substr))
 
-							if (!label) {
-								continue
+							for (const substrVariant of [substr, substr.toLowerCase()]) {
+								const label = this.hashToLabel.get(this.hash(substrVariant))
+
+								if (label === undefined) {
+									continue
+								}
+
+								const r = this.getRedaction(label.labelPrefix, label.labelIndex)
+
+								r.augment({ realStr: substrVariant })
+								redactions.add(r)
+
+								return (
+									s.slice(0, offsetFromStart + offset) +
+									`${esc}${label.labelPrefix}_${label.labelIndex}${esc}` +
+									s.slice(offsetFromStart + offset + relevantLen)
+								)
 							}
-
-							const r = this.getRedaction(label.labelPrefix, label.labelIndex)
-
-							r.augment({ realStr: substr })
-							redactions.add(r)
-
-							// Replace exactly this match (first found) and return.
-							return (
-								s.slice(0, offsetFromStart + offset) +
-								`${esc}${label.labelPrefix}_${label.labelIndex}${esc}` +
-								s.slice(offsetFromStart + offset + relevantLen)
-							)
 						}
 					}
 				} else {
@@ -1306,7 +1331,6 @@ export class WalletRequest {
 export class WalletCaptureFlow {
 	public readonly file: WalletCaptureFile
 	public readonly flow: RecordedFlow
-	public readonly redactor: RedactedStringStore
 
 	private _requests: WalletRequest[]
 
@@ -1317,12 +1341,11 @@ export class WalletCaptureFlow {
 	constructor(file: WalletCaptureFile, flow: RecordedFlow, data: EncodedWalletDataFlow) {
 		this.file = file
 		this.flow = flow
-		this.redactor = data.redactor
 
 		this._requests = data.requests.map((r, i) =>
 			WalletRequest.fromEncoded(
 				r,
-				this.redactor,
+				this.file.redactor,
 				`$.flows[${JSON.stringify(flow)}].requests[${i}]`,
 			),
 		)
@@ -1331,7 +1354,6 @@ export class WalletCaptureFlow {
 	public toJSON(): EncodedWalletCaptureFlow {
 		return {
 			requests: this._requests.map(r => r.toJSON()),
-			redactor: this.redactor.toJSON(),
 		}
 	}
 
@@ -1415,6 +1437,7 @@ export class WalletCaptureIssue {
 
 export class WalletCaptureFile {
 	public readonly path: string
+	public readonly redactor: RedactedStringStore
 	private readonly flows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>>
 	private readonly sessions: number
 	private readonly annotations: WalletCaptureAnnotations
@@ -1433,8 +1456,17 @@ export class WalletCaptureFile {
 			text = '{}'
 		}
 
+		const wasNew = text === '{}'
 		const parsed: unknown = JSON.parse(text)
 		const root = expectRecord(parsed, '$')
+
+		this.redactor = ((): RedactedStringStore => {
+			if (root.redactions === undefined) {
+				return RedactedStringStore.newStore()
+			}
+
+			return parseRedactedStringStore(root.redactions, '$.redactions')
+		})()
 		const flowsRaw = root.flows === undefined ? {} : expectRecord(root.flows, '$.flows')
 		const captureFlows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>> = {}
 
@@ -1457,7 +1489,7 @@ export class WalletCaptureFile {
 		const loadedStable = stableJSONStringify(root)
 		const reEncodedStable = stableJSONStringify(reEncoded)
 
-		if (loadedStable !== reEncodedStable) {
+		if (!wasNew && loadedStable !== reEncodedStable) {
 			throw new Error(
 				[
 					'WalletCaptureFile integrity check failed: re-encoded JSON does not match loaded JSON.',
@@ -1486,6 +1518,7 @@ export class WalletCaptureFile {
 
 		const out: EncodedWalletCaptureFile = {
 			flows: flowsOut,
+			redactions: this.redactor.toJSON(),
 			sessions: this.sessions,
 		}
 
@@ -1495,7 +1528,7 @@ export class WalletCaptureFile {
 	public async save(): Promise<void> {
 		await this.annotations.save()
 		const data = this.toJSON()
-		const content = JSON.stringify(data, null, 2)
+		const content = JSON.stringify(data, null, 2) + '\n'
 		const tmpPath = this.path + '.tmp'
 
 		await fs.promises.writeFile(tmpPath, content, 'utf8')

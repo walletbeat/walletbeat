@@ -167,7 +167,7 @@ export const bitboxWallet: HardwareWallet = {
 					collected: [],
 				},
 				[UserFlow.SEND_USDC]: null,
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [],
 				},
 			},

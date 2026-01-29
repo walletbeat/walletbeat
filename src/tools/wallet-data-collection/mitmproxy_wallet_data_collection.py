@@ -6,11 +6,12 @@ import hashlib
 import logging
 import os
 import random
-import re
 import string
 import time
 import threading
 import urllib.parse
+from typing import Set, Tuple, Dict, Optional, FrozenSet, List, Union
+
 from mitmproxy import ctx
 from mitmproxy import http
 from mitmproxy.addonmanager import Loader
@@ -27,14 +28,6 @@ class UxFlow(enum.StrEnum):
     APP_CONNECTION = "APP_CONNECTION"
     MAKE_TRANSACTION = "MAKE_TRANSACTION"
 
-    @property
-    def requires_wallet_addresses(self) -> bool:
-        return self not in (
-            self.__class__.IDLE_PRE_INSTALL,
-            self.__class__.INSTALL,
-            self.__class__.ONBOARDING_NEW,
-        )
-
 
 _KNOWN_BENIGN_HEADERS = frozenset(
     h.lower()
@@ -50,7 +43,6 @@ _KNOWN_BENIGN_HEADERS = frozenset(
         "Content-Length",
         "Content-Type",
         "Upgrade-Insecure-Requests",
-        "User-Agent",
         "Sec-Fetch-Site",
         "Sec-Fetch-User",
         "Sec-Fetch-Mode",
@@ -71,6 +63,7 @@ _KNOWN_BENIGN_HEADERS = frozenset(
         "Sec-Fetch-Dest",
         "Pragma",
         "Upgrade",
+        "User-Agent",
         "Sec-WebSocket-Version",
         "Sec-WebSocket-Key",
         "Sec-WebSocket-Extensions",
@@ -83,10 +76,13 @@ def is_benign_header(header: str) -> bool:
 
 
 class WalletCaptureFile:
-    def __init__(self, path: str, wallet_addresses: frozenset[str]):
-        self._wallet_addresses = wallet_addresses
+    def __init__(self, path: str):
         self._path = path
         self._session_start = time.time()
+        os.makedirs(os.path.dirname(self._path), exist_ok=True)
+        if not os.path.exists(self._path):
+            with open(self._path, "w") as f:
+                f.write("{}")
         with open(self._path, "r") as f:
             try:
                 data = json.load(f)
@@ -94,9 +90,10 @@ class WalletCaptureFile:
                 if os.path.getsize(self._path) > 2:
                     raise e
                 data = {}  # Empty file, reset data.
-        self._flows: dict[UxFlow, WalletCaptureFlow | str] = {}
+
+        self._flows: Dict[str, Union[WalletCaptureFlow, str]] = {}
         for flow_name, flow_data in data.get("flows", {}).items():
-            if type(flow_data) is type("") and flow_data == "NOT_SUPPORTED":
+            if isinstance(flow_data, str) and flow_data == "NOT_SUPPORTED":
                 self._flows[flow_name] = "NOT_SUPPORTED"
             else:
                 self._flows[flow_name] = WalletCaptureFlow.decode(
@@ -106,10 +103,6 @@ class WalletCaptureFile:
         self._needs_flushing = 0
         self._lock = threading.Lock()
 
-    @property
-    def wallet_addresses(self) -> frozenset[str]:
-        return self._wallet_addresses
-
     def session_time(self) -> int:
         """Session time as a session-start-relative timestamp."""
         return self._session_number * 1_000_000_000 + int(
@@ -118,15 +111,17 @@ class WalletCaptureFile:
 
     def flow(self, flow: UxFlow) -> WalletCaptureFlow:
         with self._lock:
-            if flow not in self._flows or (
-                type(self._flows[flow]) is type("")
-                and self._flows[flow] == "NOT_SUPPORTED"
+            # Convert enum to string for dict key consistency
+            flow_key = str(flow)
+            if flow_key not in self._flows or (
+                isinstance(self._flows[flow_key], str)
+                and self._flows[flow_key] == "NOT_SUPPORTED"
             ):
-                self._flows[flow] = WalletCaptureFlow(
+                self._flows[flow_key] = WalletCaptureFlow(
                     wallet_data=self, flow=flow, redactor=RedactedStringStore.new()
                 )
                 self._needs_flushing += 1
-            return self._flows[flow]
+            return self._flows[flow_key]
 
     def flush(self):
         with self._lock:
@@ -147,7 +142,7 @@ class WalletCaptureFile:
                     {
                         "flows": {
                             flow_name: "NOT_SUPPORTED"
-                            if type(flow) is type("") and flow == "NOT_SUPPORTED"
+                            if isinstance(flow, str) and flow == "NOT_SUPPORTED"
                             else flow.encode()
                             for flow_name, flow in self._flows.items()
                         },
@@ -164,23 +159,23 @@ class WalletCaptureFile:
 
 class WalletCaptureFlow:
     @classmethod
-    def decode(cls, wallet_data: WalletCaptureFile, flow: UxFlow, data: dict):
+    def decode(cls, wallet_data: WalletCaptureFile, flow: str, data: dict):
         redactor = RedactedStringStore.decode(data["redactor"])
-        flow = cls(wallet_data=wallet_data, flow=flow, redactor=redactor)
+        flow_obj = cls(wallet_data=wallet_data, flow=flow, redactor=redactor)
         for r in data["requests"]:
-            flow.add(WalletRequest.decode(data=r, flow=flow))
-        flow._needs_flushing = 0
-        return flow
+            flow_obj.add(WalletRequest.decode(data=r, flow=flow_obj))
+        flow_obj._needs_flushing = 0
+        return flow_obj
 
     def __init__(
         self,
         wallet_data: WalletCaptureFile,
-        flow: UxFlow,
+        flow: Union[UxFlow, str],
         redactor: RedactedStringStore,
     ):
         self._wallet_data = wallet_data
         self._flow = flow
-        self._requests: list[WalletRequest] = []
+        self._requests: List[WalletRequest] = []
         self._redactor = redactor
         self._needs_flushing = 0
         self._lock = threading.Lock()
@@ -269,13 +264,20 @@ class RedactedString:
 class RedactedData:
     @classmethod
     def decode(cls, redactor: RedactedStringStore, data: dict):
+        pieces = set()
+        if "piece" in data:
+            pieces.add(UserInfo[data["piece"]])
+        if "pieces" in data:
+            for p in data["pieces"]:
+                pieces.add(UserInfo[p])
+
         return cls(
             redactor=redactor,
             label_prefix=data["labelPrefix"],
             label_index=data["labelIndex"],
             real_str=None,
             hash=data["hash"],
-            piece=UserInfo[data["piece"]] if "piece" in data else None,
+            pieces=frozenset(pieces),
             hint=data.get("hint"),
             length=data["length"],
         )
@@ -285,10 +287,10 @@ class RedactedData:
         redactor: RedactedStringStore,
         label_prefix: str,
         label_index: int,
-        real_str: str | None,
+        real_str: Optional[str],
         hash: str,
-        piece: UserInfo | None,
-        hint: str | None,
+        pieces: FrozenSet[UserInfo],
+        hint: Optional[str],
         length: int,
     ):
         self._redactor = redactor
@@ -296,7 +298,7 @@ class RedactedData:
         self.label_index = label_index
         self.real_str = real_str
         self.hash = hash
-        self.piece = piece
+        self.pieces = pieces
         self.hint = hint
         self.length = len(real_str) if real_str is not None else length
 
@@ -313,19 +315,22 @@ class RedactedData:
 
     def augment(
         self,
-        real_str: str | None = None,
-        piece: UserInfo | None = None,
-        hint: str | None = None,
+        real_str: Optional[str] = None,
+        pieces: Optional[FrozenSet[UserInfo]] = None,
+        hint: Optional[str] = None,
     ) -> bool:
         changed = False
         if real_str is not None:
             assert self.real_str is None or self.real_str == real_str, "Hash collision"
             assert len(real_str) == self.length, "Length mismatch"
             self.real_str = real_str
-        if piece is not None:
-            assert self.piece is None or self.piece == piece, "Conflicting piece"
-            self.piece = piece
-            changed = True
+
+        if pieces is not None:
+            for p in pieces:
+                if p not in self.pieces:
+                    self.pieces.add(p)
+                    changed = True
+
         if hint is not None:
             assert self.hint is None or self.hint == hint, "Conflicting hint"
             self.hint = hint
@@ -339,8 +344,13 @@ class RedactedData:
             "hash": self.hash,
             "length": self.length,
         }
-        if self.piece is not None:
-            data["piece"] = str(self.piece)
+
+        sorted_pieces = list(sorted(str(p) for p in self.pieces))
+        if len(sorted_pieces) == 1:
+            data["piece"] = sorted_pieces[0]
+        elif len(sorted_pieces) > 1:
+            data["pieces"] = sorted_pieces
+
         if self.hint is not None:
             data["hint"] = self.hint
         return data
@@ -369,10 +379,10 @@ class RedactedStringStore:
     def __init__(self, salt: str):
         self._lock = threading.Lock()
         self._salt = salt
-        self._label_next_index: dict[str, int] = {}
-        self._hash_to_label: dict[str, tuple[str, int]] = {}
-        self._redactions: dict[tuple[str, int], RedactedData] = {}
-        self._lengths: tuple[int] = ()
+        self._label_next_index: Dict[str, int] = {}
+        self._hash_to_label: Dict[str, Tuple[str, int]] = {}
+        self._redactions: Dict[Tuple[str, int], RedactedData] = {}
+        self._lengths: Tuple[int, ...] = ()
         self._needs_flushing = 0
 
     def needs_flushing(self) -> int:
@@ -401,15 +411,16 @@ class RedactedStringStore:
         self,
         real_str: str,
         label_prefix: str,
-        piece: UserInfo | None,
-        hint: str | None,
+        piece: Optional[UserInfo],
+        hint: Optional[str],
     ) -> RedactedData:
         assert len(real_str) > 0, "Tried to add empty string"
         h = self._hash(real_str)
+        new_pieces = frozenset((piece,)) if piece is not None else frozenset()
         with self._lock:
             if h in self._hash_to_label:
                 data = self._redactions[self._hash_to_label[h]]
-                if data.augment(real_str=real_str, piece=piece, hint=hint):
+                if data.augment(real_str=real_str, pieces=new_pieces, hint=hint):
                     self._needs_flushing += 1
                 return data
             label_index = self._label_next_index.get(label_prefix, 1)
@@ -419,7 +430,7 @@ class RedactedStringStore:
                 label_index=label_index,
                 real_str=real_str,
                 hash=h,
-                piece=piece,
+                pieces=new_pieces,
                 hint=hint,
                 length=len(real_str),
             )
@@ -434,8 +445,8 @@ class RedactedStringStore:
             return data
 
     def redact(
-        self, string: str, escape_char: str | None = None
-    ) -> [str, frozenset[RedactedData]]:
+        self, string: str, escape_char: Optional[str] = None
+    ) -> Tuple[str, FrozenSet[RedactedData]]:
         assert not string.startswith("~R:"), (
             "String was already redacted, cannot redact twice."
         )
@@ -444,7 +455,7 @@ class RedactedStringStore:
         lengths = None
         with self._lock:
             lengths = tuple(self._lengths)
-        redactions: set[RedactedData] = set()
+        redactions: Set[RedactedData] = set()
 
         def _round(s: str) -> str:
             is_redaction = False
@@ -475,8 +486,10 @@ class RedactedStringStore:
                     label_prefix, label_index_str = component.split("_", 2)
                     label_index = int(label_index_str)
                     with self._lock:
-                        redaction = self._redactions[(label_prefix, label_index)]
-                    redactions.add(redaction)
+                        if (label_prefix, label_index) in self._redactions:
+                            redaction = self._redactions[(label_prefix, label_index)]
+                            redactions.add(redaction)
+
                 is_redaction = not is_redaction
                 offset_from_start += len(component) + len(escape_char)
             return s
@@ -516,63 +529,30 @@ class UserInfo(enum.StrEnum):
     MEMPOOL_TRANSACTIONS = "MEMPOOL_TRANSACTIONS"
     WALLET_CONNECTED_DOMAINS = "WALLET_CONNECTED_DOMAINS"
 
-    def extract(
-        self, data: str, flow: WalletCaptureFlow, context: WalletCaptureContext
-    ) -> list[str]:
-        if self == self.ACCOUNT_ADDRESS:
-            addresses = flow.wallet_data.wallet_addresses
-            substrings = set()
-            for addr in addresses:
-                substrings.add(canonicalize_addr(addr)[2:].lower())
-            return list(substr for substr in substrings if substr in data)
-        else:
-            return []  # Not implemented at capture time
-
     def label_prefix(self) -> str:
-        return {
-            self.ACCOUNT_ADDRESS: "addr",
-            self.PSEUDONYM: "pseudonym",
-        }[self]
-
-    def hint(self, datum: str) -> str:
         if self == self.ACCOUNT_ADDRESS:
-            return (
-                f"0x{canonicalize_addr(datum)[2:4]}...{canonicalize_addr(datum)[-2:]}"
-            )
-        raise NotImplementedError()
-
-    def is_well_formed(self, datum: str) -> bool:
-        if self == self.ACCOUNT_ADDRESS:
-            return (
-                len(datum) == 42
-                and datum[:2] == "0x"
-                and all(c in "0123456789abcdef" for c in datum[2:].lower())
-            )
-        raise NotImplementedError()
-
-
-def canonicalize_addr(addr: str) -> str:
-    orig_addr = addr
-    addr = addr.lower()
-    if not addr.startswith("0x"):
-        addr = f"0x{addr}"
-    assert UserInfo.ACCOUNT_ADDRESS.is_well_formed(addr), (
-        f"Malformed address: {orig_addr}"
-    )
-    return addr
+            return "addr"
+        return self.value.lower().replace("_", "")
 
 
 class UserDataPieces:
     @classmethod
-    def decode(cls, flow: WalletCaptureFlow, data: dict | str) -> UserDataPieces:
-        if type(data) is type(""):
-            pieces = ()
+    def decode(cls, flow: WalletCaptureFlow, data: Union[dict, str]) -> UserDataPieces:
+        if isinstance(data, str):
+            pieces = set()
             encoded_redacted_str = data
         else:
-            pieces = data.get("pieces", (data["piece"],) if "piece" in data else ())
+            pieces_list = []
+            if "pieces" in data:
+                pieces_list = data["pieces"]
+            elif "piece" in data:
+                pieces_list = [data["piece"]]
+
+            pieces = set(UserInfo[p] for p in pieces_list)
             encoded_redacted_str = data["sample"]
+
         return cls(
-            pieces=frozenset(UserInfo[p] for p in pieces),
+            pieces=frozenset(pieces),
             sample=RedactedString.decode(
                 encoded_redacted_str=encoded_redacted_str, redactor=flow.redactor
             ),
@@ -600,10 +580,10 @@ class UserDataPieces:
     @classmethod
     def classify_dict(
         cls,
-        data: dict[str, str],
+        data: Dict[str, str],
         flow: WalletCaptureFlow,
         context: WalletCaptureContext,
-    ) -> dict[str, UserDataPieces]:
+    ) -> Dict[str, UserDataPieces]:
         return {
             k: cls.classify_str(data=v, flow=flow, context=context)
             for k, v in data.items()
@@ -612,13 +592,13 @@ class UserDataPieces:
     @classmethod
     def classify_multidict(
         cls,
-        data: dict[str, str | list[str]],
+        data: Dict[str, Union[str, List[str]]],
         flow: WalletCaptureFlow,
         context: WalletCaptureContext,
-    ) -> dict[str, tuple[UserDataPieces]]:
+    ) -> Dict[str, Tuple[UserDataPieces, ...]]:
         classified = {}
         for k, v in data.items():
-            if type(v) is type([]):
+            if isinstance(v, list):
                 classified[k] = tuple(
                     cls.classify_str(data=s, flow=flow, context=context) for s in v
                 )
@@ -626,7 +606,7 @@ class UserDataPieces:
                 classified[k] = (cls.classify_str(data=v, flow=flow, context=context),)
         return classified
 
-    def __init__(self, pieces: frozenset[UserInfo], sample: RedactedString):
+    def __init__(self, pieces: FrozenSet[UserInfo], sample: RedactedString):
         self._pieces = pieces
         self._sample = sample
 
@@ -646,10 +626,13 @@ class UserDataPieces:
         data = {
             "sample": self._sample.encode(),
         }
-        if len(self._pieces) == 1:
-            data["piece"] = str(next(iter(self._pieces)))
+
+        sorted_pieces = list(sorted(str(p) for p in self._pieces))
+        if len(sorted_pieces) == 1:
+            data["piece"] = sorted_pieces[0]
         else:
-            data["pieces"] = list(sorted(str(p) for p in self._pieces))
+            data["pieces"] = sorted_pieces
+
         return data
 
 
@@ -662,7 +645,7 @@ class WalletRequest:
         def _decode_str_multidict(k):
             decoded = {}
             for k, v in data.get(k, {}).items():
-                if type(v) is type([]):
+                if isinstance(v, list):
                     decoded[k] = tuple(
                         UserDataPieces.decode(flow=flow, data=x) for x in v
                     )
@@ -672,10 +655,11 @@ class WalletRequest:
 
         json_rpc_method = ()
         if "jsonRpcMethod" in data:
-            if type(data["jsonRpcMethod"]) is type([]):
+            if isinstance(data["jsonRpcMethod"], list):
                 json_rpc_method = tuple(data["jsonRpcMethod"])
             else:
                 json_rpc_method = (data["jsonRpcMethod"],)
+
         return cls(
             flow=flow,
             domain=data["domain"],
@@ -684,7 +668,7 @@ class WalletRequest:
             json_rpc_method=json_rpc_method,
             content=_decode_if_set("content"),
             cookies=_decode_str_multidict("cookies"),
-            referer_domain=_decode_if_set("refererDomain"),
+            referer_domain=data.get("refererDomain"),
             odd_headers=_decode_str_multidict("oddHeaders"),
             odd_trailers=_decode_str_multidict("oddTrailers"),
             session_time=data["sessionTime"],
@@ -713,7 +697,7 @@ class WalletRequest:
                     json_rpc_method = tuple(rpc["method"] for rpc in payload)
             except json.JSONDecodeError:
                 pass  # Not JSON-RPC
-        referer_domain: str | None = None
+        referer_domain: Optional[str] = None
         if "Referer" in req.headers:
             referer_domain = urllib.parse.urlparse(req.headers["Referer"]).hostname
         return cls(
@@ -760,15 +744,15 @@ class WalletRequest:
         flow: WalletCaptureFlow,
         domain: str,
         path: str,
-        query: dict[str, tuple[UserDataPieces]],
-        json_rpc_method: tuple[str],
-        content: UserDataPieces | None,
-        cookies: dict[str, tuple[UserDataPieces]],
-        referer_domain: str | None,
-        odd_headers: dict[str, tuple[UserDataPieces]],
-        odd_trailers: dict[str, tuple[UserDataPieces]],
+        query: Dict[str, Tuple[UserDataPieces, ...]],
+        json_rpc_method: Tuple[str, ...],
+        content: Optional[UserDataPieces],
+        cookies: Dict[str, Tuple[UserDataPieces, ...]],
+        referer_domain: Optional[str],
+        odd_headers: Dict[str, Tuple[UserDataPieces, ...]],
+        odd_trailers: Dict[str, Tuple[UserDataPieces, ...]],
         session_time: int,
-        review: object | None,
+        review: Optional[object],
     ):
         self._flow = flow
         self._domain = domain
@@ -784,7 +768,9 @@ class WalletRequest:
         self._review = review
 
     def __str__(self):
-        def _maybe_multidict(name: str, md: dict[str, tuple[UserDataPieces]]) -> str:
+        def _maybe_multidict(
+            name: str, md: Dict[str, Tuple[UserDataPieces, ...]]
+        ) -> str:
             if len(md) == 0:
                 return ""
             values = {}
@@ -799,7 +785,9 @@ class WalletRequest:
             if len(self._json_rpc_method) == 0
             else f" rpc={','.join(sorted(self._json_rpc_method))}"
         )
-        referer_domain = "" if self._referer_domain is None else f" referer={self._referer_domain}"
+        referer_domain = (
+            "" if self._referer_domain is None else f" referer={self._referer_domain}"
+        )
         content = "" if self._content is None else f" content={str(self._content)}"
         return f"{self._domain}: {self._path}{_maybe_multidict('query', self._query)}{json_rpc}{content}{_maybe_multidict('cookie', self._cookies)}{referer_domain}{_maybe_multidict('headers', self._odd_headers)}{_maybe_multidict('trailers', self._odd_trailers)}"
 
@@ -810,7 +798,7 @@ class WalletRequest:
             "sessionTime": self._session_time,
         }
 
-        def _encode_multidict(name: str, md: dict[str, tuple[UserDataPieces]]):
+        def _encode_multidict(name: str, md: Dict[str, Tuple[UserDataPieces, ...]]):
             if len(md) == 0:
                 return
             encoded = {}
@@ -840,61 +828,47 @@ class WalletRequest:
 
 class WalletDataCollectionAddon:
     def __init__(self):
-        self._wallet_id: str | None = None
-        self._wallet_type: str | None = None
-        self._wallet_variant: str | None = None
-        self._current_ux_flow: UxFlow | None = None
-        self._wallet_addresses: frozenset[str] | None = None
-        self._wallet_data: WalletCaptureFile | None = None
+        self._wallet_id: Optional[str] = None
+        self._wallet_type: str = "software"
+        self._wallet_variant: Optional[str] = None
+        self._current_ux_flow: Optional[UxFlow] = None
+        self._wallet_data: Optional[WalletCaptureFile] = None
         self._data_path = os.path.join(
             os.path.dirname(
                 os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
             ),
             "data",
-            "software-wallets",
-            "collection",
         )
         self._lock = threading.Lock()
         self._flush_thread = None
 
     def _wallet_collection_path(self):
-        assert self._wallet_id is not None and self._wallet_type is not None and self._wallet_variant is not None
+        assert self._wallet_id is not None and self._wallet_variant is not None
         return os.path.join(
             self._data_path,
-            f"{self._wallet_type}-wallets",
+            f"{self._wallet_type.lower()}-wallets",
             "collection",
             self._wallet_id.lower(),
             f"{self._wallet_id.lower()}.{self._wallet_variant.lower()}.capture.json",
         )
 
     def configure(self, updated):
-        if "wallet_addresses" in updated:
-            assert self._wallet_addresses is None, (
-                "Tried to update wallet_addresses twice; please restart mitmproxy instead."
-            )
-            assert ctx.options.wallet_addresses is not None, (
-                "Must specify non-empty wallet_addresses."
-            )
-            self._wallet_addresses = frozenset(
-                canonicalize_addr(addr.strip())
-                for addr in ctx.options.wallet_addresses.split(",")
-                if addr.strip() != ""
-            )
         if "wallet_type" in updated:
             assert self._wallet_type is None, (
                 "Tried to update wallet_type twice; please restart mitmproxy instead."
             )
             self._wallet_type = ctx.options.wallet_type
+
         if "wallet_variant" in updated:
             assert self._wallet_variant is None, (
                 "Tried to update wallet_variant twice; please restart mitmproxy instead."
             )
             self._wallet_variant = ctx.options.wallet_variant
+
         if "wallet_id" in updated:
             assert self._wallet_id is None, (
                 "Tried to update wallet_id twice; please restart mitmproxy instead."
             )
-            assert self._wallet_addresses is not None, "Must set wallet_addresses."
             self._wallet_id = ctx.options.wallet_id
             if not os.path.exists(self._wallet_collection_path()):
                 os.makedirs(
@@ -904,8 +878,8 @@ class WalletDataCollectionAddon:
                     f.write("{}")
             self._wallet_data = WalletCaptureFile(
                 path=self._wallet_collection_path(),
-                wallet_addresses=self._wallet_addresses,
             )
+
         if "ux_flow" in updated:
             assert self._current_ux_flow is None, (
                 "Tried to update ux_flow twice; please restart mitmproxy instead."
@@ -914,17 +888,15 @@ class WalletDataCollectionAddon:
                 f"Invalid ux_flow: {repr(ctx.options.ux_flow)}. Must be one of the following: {', '.join(str(f) for f in UxFlow)}."
             )
             self._current_ux_flow = UxFlow[ctx.options.ux_flow]
-            if self._current_ux_flow.requires_wallet_addresses:
-                assert (
-                    self._wallet_addresses is not None
-                    and len(self._wallet_addresses) > 0
-                ), (
-                    f"Must specify wallet_addresses for all UX flows other than {', '.join(str(f) for f in UxFlow if not f.requires_wallet_addresses)}."
-                )
 
     def load(self, loader: Loader):
         loader.add_option("wallet_id", str, "", "Wallet ID.")
-        loader.add_option("wallet_type", str, "", "Wallet type.")
+        loader.add_option(
+            "wallet_type",
+            str,
+            "software",
+            "Wallet type (software, hardware, embedded).",
+        )
         loader.add_option("wallet_variant", str, "", "Wallet variant.")
         loader.add_option(
             "ux_flow",
@@ -932,16 +904,10 @@ class WalletDataCollectionAddon:
             "",
             f"Wallet UX flow being exercised. Must be one of the following: {', '.join(str(f) for f in UxFlow)}.",
         )
-        loader.add_option(
-            "wallet_addresses",
-            str,
-            "",
-            f"Comma-separated list of multiple wallet addresses. Must be provided for all UX flows other than {', '.join(str(f) for f in UxFlow if not f.requires_wallet_addresses)}.",
-        )
 
     def running(self):
         assert self._current_ux_flow is not None, (
-            "Must set options for this addon: wallet_id, wallet_type, wallet_variant, ux_flow, and wallet_addresses in some cases."
+            "Must set options for this addon: wallet_id, wallet_variant, ux_flow."
         )
         with self._lock:
             if self._flush_thread is None:

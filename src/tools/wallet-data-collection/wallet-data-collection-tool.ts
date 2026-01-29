@@ -184,7 +184,7 @@ cli
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='GA1.1.1294582759' --data='TRACKING_IDENTIFIER'",
 	)
 	.example(
-		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='0x1234...' --data='WALLET_ADDRESS'",
+		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='0x1234...' --data='ACCOUNT_ADDRESS'",
 	)
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT'",

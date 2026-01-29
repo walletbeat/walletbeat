@@ -1,5 +1,10 @@
 import type { MustRef, WithRef } from '@/schema/reference'
-import type { NonEmptyArray, NonEmptyRecord } from '@/types/utils/non-empty'
+import {
+	type NonEmptyArray,
+	type NonEmptyRecord,
+	type NonEmptySet,
+	nonEmptySetFromArray,
+} from '@/types/utils/non-empty'
 import { Enum, mergeEnums } from '@/utils/enum'
 
 import type { Entity } from '../../entity'
@@ -577,6 +582,84 @@ export function userInfoName(userInfo: UserInfo) {
 			return { short: 'face', long: 'facial recognition data' } as const
 		case PersonalInfo.GOVERNMENT_ID:
 			return { short: 'government ID', long: 'government-issued ID' } as const
+	}
+}
+
+// normalizeStrForUserInfo returns `str` and any applicable variant of it
+// that may make sense to match against.
+export function normalizeStrForUserInfo(str: string, userInfo: UserInfo): NonEmptySet<string> {
+	const variants = ((): NonEmptyArray<string> => {
+		switch (userInfo) {
+			case WalletInfo.ACCOUNT_ADDRESS:
+				if (str.startsWith('0x')) {
+					return [str, str.substring(2)]
+				}
+
+				return [str]
+			case PersonalInfo.EMAIL:
+				if (str.includes('@')) {
+					return [str, str.substring(0, str.indexOf('@'))]
+				}
+
+				return [str, str + '@']
+			case PersonalInfo.X_DOT_COM_ACCOUNT:
+				if (str.startsWith('@')) {
+					return [str, str.substring(1)]
+				}
+
+				return [str, '@' + str]
+			case PersonalInfo.FARCASTER_ACCOUNT:
+				if (str.startsWith('@')) {
+					return [str, str.substring(1)]
+				}
+
+				return [str, '@' + str]
+			default:
+				return [str]
+		}
+	})()
+
+	return nonEmptySetFromArray(variants)
+}
+
+// hintForUserInfo returns a hint about `str`, given that it is the user's `userInfo`.
+export function hintForUserInfo(str: string, userInfo: UserInfo): string {
+	const firstAndLast = (s: string): string => {
+		switch (s.length) {
+			case 0:
+				return '(empty)'
+			case 1:
+				return '*'
+			case 2:
+				return '**'
+			case 3:
+				return '***'
+			case 4:
+				return s.substring(0, 1) + '***'
+			case 5:
+				return s.substring(0, 1) + '***' + s.substring(4, 1)
+			case 6:
+				return s.substring(0, 2) + '***' + s.substring(4, 1)
+			case 7:
+				return s.substring(0, 2) + '****' + s.substring(6, 1)
+			case 8:
+				return s.substring(0, 2) + '****' + s.substring(6, 2)
+			default:
+				return s.substring(0, 2) + '...' + s.substring(s.length - 2, 2)
+		}
+	}
+
+	switch (userInfo) {
+		case WalletInfo.ACCOUNT_ADDRESS:
+			return `0x${firstAndLast(str.startsWith('0x') ? str.substring(2) : str)}`
+		case PersonalInfo.EMAIL:
+			if (str.includes('@')) {
+				return `${firstAndLast(str.substring(0, str.indexOf('@')))}@${firstAndLast(str.substring(str.indexOf('@') + 1))}`
+			}
+
+			return firstAndLast(str)
+		default:
+			return firstAndLast(str)
 	}
 }
 

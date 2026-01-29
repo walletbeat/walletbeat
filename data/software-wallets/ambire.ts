@@ -408,6 +408,7 @@ export const ambire: SoftwareWallet = {
 				[Variant.DESKTOP]: null,
 			},
 			dataCollection: {
+				[UserFlow.INSTALL]: null,
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [
 						{
@@ -433,7 +434,7 @@ export const ambire: SoftwareWallet = {
 				[UserFlow.APP_CONNECTION]: {
 					collected: [],
 				},
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
 						{
 							ref: dataLeakReferences.ambire,

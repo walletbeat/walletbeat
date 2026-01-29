@@ -317,7 +317,7 @@ export const rabby: SoftwareWallet = {
 						publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 					},
 					[UserFlow.ONBOARDING_IMPORT]: null,
-					[UserFlow.TRANSACTION]: {
+					[UserFlow.MAKE_TRANSACTION]: {
 						collected: [],
 					},
 					[UserFlow.APP_CONNECTION]: {

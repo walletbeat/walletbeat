@@ -198,7 +198,7 @@ export const imtoken: SoftwareWallet = {
 					collected: [],
 				},
 				[UserFlow.SEND_USDC]: null,
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
 						{
 							ref: [

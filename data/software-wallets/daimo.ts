@@ -265,7 +265,7 @@ export const daimo: SoftwareWallet = {
 					},
 				},
 				[UserFlow.ONBOARDING_IMPORT]: null,
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
 						{
 							ref: {

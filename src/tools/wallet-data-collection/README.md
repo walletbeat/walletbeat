@@ -152,7 +152,7 @@ Marking a string as carrying user data has two effects:
 $ pnpm wallet-data-collection <global flags> mark-string --string='GA1.1.1294582759.1067224611' --data='TRACKING_IDENTIFIER' --hint='Google Analytics cookie'
 
 # Mark a wallet address as such:
-$ pnpm wallet-data-collection <global flags> mark-string --string='0x1234678...' --data='WALLET_ADDRESS' --hint='Imported address 1'
+$ pnpm wallet-data-collection <global flags> mark-string --string='0x1234678...' --data='ACCOUNT_ADDRESS' --hint='Imported address 1'
 
 # Mark your X.com and Farcaster account name as such:
 $ pnpm wallet-data-collection <global flags> mark-string --string='CodeMonkey1234' --data='X_DOT_COM_ACCOUNT,FARCASTER_ACCOUNT' --hint='Social media account'
