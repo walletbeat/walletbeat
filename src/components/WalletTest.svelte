@@ -34,7 +34,11 @@
   import TransactionsTab from './Tabs/TransactionsTab.svelte';
   import SignaturesTab from './Tabs/SignaturesTab.svelte';
   import EIPSupportTab from './Tabs/EIPSupportTab.svelte';
-	import { assertTransactionId } from '@/types/utils/assertions'
+	import {
+    assertTransactionId,
+    isEip6963AnnounceProviderEvent,
+    type Eip1193Provider,
+  } from '@/types/utils/assertions'
 
   type Account = ReturnType<typeof getAccount>;
 
@@ -327,9 +331,10 @@ Issued At: ${new Date().toISOString()}`;
   }
 
   // EIP Support Testing
-  function getProvider() {
+  function getProvider(): Eip1193Provider | null {
     if (typeof window !== 'undefined' && 'ethereum' in window) {
-      return window.ethereum;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- window.ethereum is the EIP-1193 provider
+      return window.ethereum as Eip1193Provider;
     }
 
     return null;
@@ -340,16 +345,10 @@ Issued At: ${new Date().toISOString()}`;
 
     // Listen for EIP-6963 provider announcements
     window.addEventListener('eip6963:announceProvider', (event: Event) => {
-      // Type guard for CustomEvent
-      if (!('detail' in event)) return;
+      // Type guard for EIP-6963 announce provider event
+      if (!isEip6963AnnounceProviderEvent(event)) return;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const customEvent = event as CustomEvent<{
-        info: { uuid: string; name: string; icon: string; rdns: string };
-        provider: unknown;
-      }>;
-
-      const { info, provider } = customEvent.detail;
+      const { info, provider } = event.detail;
 
       // Check if we already have this provider
       const exists = stepTestState.discoveredProviders.some((p) => p.uuid === info.uuid);
@@ -569,8 +568,7 @@ Issued At: ${new Date().toISOString()}`;
 
     // EIP-1193 basic checks
     const eip1193Checks: EIPCheckResult[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const rawProvider = getProvider() as { request?: unknown } | null;
+    const rawProvider = getProvider();
     const providerExists = !!rawProvider || hasProviders;
 
     eip1193Checks.push({
@@ -600,12 +598,7 @@ Issued At: ${new Date().toISOString()}`;
     const eipResults: EIPTestResult[] = [];
     const eip1193Checks: EIPCheckResult[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const provider = getProvider() as {
-      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on?: (event: string, listener: (...args: unknown[]) => void) => void;
-      removeListener?: (event: string, listener: (...args: unknown[]) => void) => void;
-    } | null;
+    const provider = getProvider();
 
     if (!provider) {
       return createStepResult(step, 'failed', [], 'No provider found');
@@ -733,13 +726,9 @@ Issued At: ${new Date().toISOString()}`;
     const eipResults: EIPTestResult[] = [];
     const eip1193Checks: EIPCheckResult[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const provider = getProvider() as {
-      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on?: (event: string, listener: () => void) => void;
-    } | null;
+    const provider = getProvider();
 
-    if (!provider?.request) {
+    if (!provider) {
       return createStepResult(step, 'failed', [], 'No provider found');
     }
 
@@ -815,16 +804,9 @@ Issued At: ${new Date().toISOString()}`;
   async function runStep4Network(step: TestStep): Promise<StepResult> {
     const eipResults: EIPTestResult[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const provider = getProvider() as {
-      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on?: (event: string, listener: (...args: unknown[]) => void) => unknown;
-      removeListener?: (event: string, listener: (...args: unknown[]) => void) => unknown;
-      once?: (event: string, listener: (...args: unknown[]) => void) => unknown;
-      removeAllListeners?: (event?: string) => unknown;
-    } | null;
+    const provider = getProvider();
 
-    if (!provider?.request) {
+    if (!provider) {
       return createStepResult(step, 'failed', [], 'No provider found');
     }
 
@@ -923,12 +905,9 @@ Issued At: ${new Date().toISOString()}`;
     const eipResults: EIPTestResult[] = [];
     const eip5792Checks: EIPCheckResult[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const provider = getProvider() as {
-      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-    } | null;
+    const provider = getProvider();
 
-    if (!provider?.request) {
+    if (!provider) {
       return createStepResult(step, 'failed', [], 'No provider found');
     }
 
@@ -1049,12 +1028,9 @@ Issued At: ${new Date().toISOString()}`;
     const eipResults: EIPTestResult[] = [];
     const eip5792Checks: EIPCheckResult[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const provider = getProvider() as {
-      request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-    } | null;
+    const provider = getProvider();
 
-    if (!provider?.request) {
+    if (!provider) {
       return createStepResult(step, 'failed', [], 'No provider found');
     }
 
