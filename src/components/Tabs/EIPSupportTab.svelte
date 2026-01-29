@@ -38,6 +38,8 @@
 
     if (stepStatus === 'passed') return 'Step Passed ✓';
 
+    if (stepStatus === 'partial') return 'Step Partial ⚠';
+
     if (stepStatus === 'failed') return 'Retry Step';
 
     return 'Run Step';
@@ -49,8 +51,10 @@
     if (stepTestState.currentStepIndex === 0) return true;
 
     const prevStep = testSteps[stepTestState.currentStepIndex - 1];
+    const prevStatus = stepTestState.stepResults[prevStep.id]?.status;
 
-    return stepTestState.stepResults[prevStep.id]?.status === 'passed';
+    // Allow running if previous step completed (passed, partial, or failed)
+    return prevStatus === 'passed' || prevStatus === 'partial' || prevStatus === 'failed';
   }
 </script>
 
@@ -75,9 +79,11 @@
   <!-- Current Step Card -->
   <div class="step-card" data-card="radius-8 padding-5">
     <header data-row="gap-2 start wrap">
-      <div class="step-number" class:running={isRunning} class:passed={stepStatus === 'passed'} class:failed={stepStatus === 'failed'}>
+      <div class="step-number" class:running={isRunning} class:passed={stepStatus === 'passed'} class:partial={stepStatus === 'partial'} class:failed={stepStatus === 'failed'}>
         {#if stepStatus === 'passed'}
           ✓
+        {:else if stepStatus === 'partial'}
+          ⚠
         {:else if stepStatus === 'failed'}
           ✗
         {:else if isRunning}
@@ -322,6 +328,11 @@
   .step-number.passed {
     background: color-mix(in srgb, var(--rating-pass) 20%, transparent);
     color: var(--rating-pass);
+  }
+
+  .step-number.partial {
+    background: color-mix(in srgb, var(--rating-partial) 20%, transparent);
+    color: var(--rating-partial);
   }
 
   .step-number.failed {
