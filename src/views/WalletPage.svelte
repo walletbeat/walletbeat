@@ -1,6 +1,7 @@
 <script lang="ts">
 	// Types/constants
-	import { allRatedWallets, type WalletName } from '@/data/wallets'
+	import type { NonEmptyArray } from '@/types/utils/non-empty'
+	import { type WalletName, allRatedWallets } from '@/data/wallets'
 	import {
 		type Attribute,
 		type AttributeGroup,
@@ -11,7 +12,7 @@
 		ratingIcons,
 		ratingToColor,
 	} from '@/schema/attributes'
-	import { hasSingleVariant,type Variant } from '@/schema/variants'
+	import { hasSingleVariant, type Variant } from '@/schema/variants'
 	import { VariantSpecificity } from '@/schema/wallet'
 	import { ContentType, isTypographicContent } from '@/types/content'
 
@@ -1050,7 +1051,9 @@
 													label,
 													exampleRatings: [exampleRatings].flat() as ExampleRating<any>[],
 												}))
-												.filter(({ exampleRatings }) => exampleRatings.length > 0)
+												.filter(
+													(item): item is typeof item & { exampleRatings: NonEmptyArray<ExampleRating<any>> } => item.exampleRatings.length > 0,
+												)
 										) as { rating, label, exampleRatings }}
 											<li
 												data-list-item="gap-3"
