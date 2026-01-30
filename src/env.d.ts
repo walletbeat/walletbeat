@@ -29,3 +29,10 @@ interface ObjectConstructor {
 
 	fromEntries<K extends PropertyKey, V>(entries: ReadonlyArray<readonly [K, V]>): Record<K, V>
 }
+
+interface Array<T> {
+	filter<S extends Exclude<T, undefined>>(
+		predicate: (value: T, index: number, array: T[]) => value is S,
+		thisArg?: unknown,
+	): S[]
+}
