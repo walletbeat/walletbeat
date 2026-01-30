@@ -16,12 +16,10 @@ import {
 } from './software-wallets'
 
 /** Set of all known software wallets. */
-export const allWallets = Object.fromEntries(
-	([] as Array<[string, BaseWallet]>).concat(
-		Object.entries(softwareWallets),
-		Object.entries(hardwareWallets),
-	),
-)
+export const allWallets = {
+	...softwareWallets,
+	...hardwareWallets,
+} as const satisfies Record<WalletName, BaseWallet>
 
 /** A valid wallet name. */
 export type WalletName = SoftwareWalletName | HardwareWalletName
@@ -33,9 +31,9 @@ export function isValidWalletName(name: string): name is WalletName {
 
 /** All rated wallets. */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we map from `allWallets`.
-export const allRatedWallets: Record<WalletName, RatedWallet> = Object.fromEntries(
+export const allRatedWallets = Object.fromEntries(
 	Object.entries(allWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
-) as Record<WalletName, RatedWallet>
+)
 
 /**
  * Map the given function to all rated wallets.

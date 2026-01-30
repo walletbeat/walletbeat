@@ -10,7 +10,6 @@
 		type WalletStage,
 	} from '@/schema/stages'
 	import { isTypographicContent } from '@/types/content'
-	import { objectEntries } from '@/types/utils/object'
 	import { slugifyCamelCase } from '@/types/utils/text'
 	import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
 
@@ -40,7 +39,7 @@
 
 	const ladderType = $derived(
 		ladderEvaluation ?
-			objectEntries(wallet.ladders)
+			Object.entries(wallet.ladders)
 				.find(([, evaluation]) => evaluation === ladderEvaluation)
 				?.[0]
 			?? null

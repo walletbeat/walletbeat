@@ -43,8 +43,6 @@
 
 
 	// Derived
-	import { objectEntries } from '@/types/utils/object'
-
 	const ladderEvaluation = $derived(
 		getWalletStageAndLadder(wallet)
 			.ladderEvaluation
@@ -53,7 +51,7 @@
 
 	const ladderType = $derived(
 		ladderEvaluation &&
-			objectEntries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0]
+			Object.entries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0]
 		||
 			undefined
 	)

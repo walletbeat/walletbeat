@@ -382,7 +382,7 @@
 									// 	label: 'All',
 									// },
 									...(
-										(Object.entries(variants) as [Variant, { label: string, icon: string }][])
+										Object.entries(variants)
 											.map(([variant, { label, icon }]) => ({
 												id: `variant-${variant}`,
 												label,

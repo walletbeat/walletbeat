@@ -40,15 +40,13 @@ function browserIntegrationSupport(
 ): Evaluation<BrowserIntegrationValue> {
 	const { refs, withoutRefs } = popRefs<ResolvedSupport>(support)
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
-	const supported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
+	const supported: BrowserIntegrationEip[] = Object.entries(withoutRefs)
 		.filter(([_, v]) => isSupported(v))
-		.map(([k, _]) => k) as BrowserIntegrationEip[]
+		.map(([k]) => k)
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Keys are already of type BrowserIntegrationEip, and remain so after being mapped.
-	const unsupported: BrowserIntegrationEip[] = Object.entries<Support>(withoutRefs)
+	const unsupported: BrowserIntegrationEip[] = Object.entries(withoutRefs)
 		.filter(([_, v]) => !isSupported(v))
-		.map(([k, _]) => k) as BrowserIntegrationEip[]
+		.map(([k]) => k)
 
 	if (supported.length === 0) {
 		return {

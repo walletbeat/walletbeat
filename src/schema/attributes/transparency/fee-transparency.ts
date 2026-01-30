@@ -149,10 +149,9 @@ function feeDisplayLevelForType(
 }
 
 function extractFeeTransparency(features: ResolvedFeatures): FeeTransparency {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we iterate over all fee types.
 	return Object.fromEntries(
 		allFeeTypes.map(feeType => [feeType, feeDisplayLevelForType(features, feeType)]),
-	) as FeeTransparency
+	)
 }
 
 function validateFeeDisplay(feeDisplay: FeeDisplay) {

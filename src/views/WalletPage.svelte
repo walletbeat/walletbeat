@@ -14,7 +14,6 @@
 	import { hasSingleVariant,type Variant } from '@/schema/variants'
 	import { VariantSpecificity } from '@/schema/wallet'
 	import { ContentType, isTypographicContent } from '@/types/content'
-	import { objectEntries, objectKeys } from '@/types/utils/object'
 
 
 	// Functions
@@ -149,7 +148,7 @@
 	const attrToRelevantVariants = $derived.by(() => {
 		const map = new Map<string, Variant[]>()
 
-		for (const [variant, variantSpecificityMap] of Object.entries(wallet.variantSpecificity) as [Variant, Map<string, VariantSpecificity>][]) {
+		for (const [variant, variantSpecificityMap] of Object.entries(wallet.variantSpecificity)) {
 			for (const [evalAttrId, variantSpecificity] of variantSpecificityMap) {
 				switch (variantSpecificity) {
 					case VariantSpecificity.ALL_SAME:
@@ -209,9 +208,9 @@
 			'@type': 'FAQPage',
 			mainEntity: (
 				evalTree ?
-					objectEntries(attributeTree)
+					Object.entries(attributeTree)
 						.flatMap(([attrGroupId, attrGroup]) => (
-							objectEntries(attrGroup.attributes)
+							Object.entries(attrGroup.attributes)
 								.map(([attrId, attribute]) => ({
 									evalAttr: (
 										evalTree[attrGroupId][
@@ -281,7 +280,7 @@
 				),
 				applicationCategory: 'Cryptocurrency Wallet',
 				operatingSystem: (
-					objectKeys(wallet.variants)
+					Object.keys(wallet.variants)
 						.map(variant => variantToRunsOn(variant))
 						.join(', ')
 				),
@@ -339,7 +338,7 @@
 									label: 'All versions',
 								},
 								...(
-									(Object.keys(wallet.variants) as Variant[])
+									Object.keys(wallet.variants)
 										.map(v => ({
 											value: v,
 											label: variants[v].label,
@@ -437,7 +436,7 @@
 					<p>
 						<span class="platforms-label">Platforms: </span>
 						{#each Object.keys(wallet.variants) as variant, i}
-							{i > 0 ? ', ' : ''}<strong>{variantToRunsOn(variant as Variant)}</strong>
+							{i > 0 ? ', ' : ''}<strong>{variantToRunsOn(variant)}</strong>
 						{/each}.
 					</p>
 
@@ -498,7 +497,7 @@
 			</section>
 		{/if}
 
-		{#each evalTree ? objectEntries(attributeTree) : [] as [attrGroupId, attrGroup]}
+		{#each evalTree ? Object.entries(attributeTree) : [] as [attrGroupId, attrGroup]}
 			{@const evalGroup = evalTree?.[attrGroupId]}
 
 			{#if evalGroup}
@@ -526,7 +525,7 @@
 	attrGroup: AttributeGroup<any>
 	evalGroup: EvaluatedGroup<any>
 })}
-	{@const attributes = objectEntries(attrGroup.attributes)
+	{@const attributes = Object.entries(attrGroup.attributes)
 		.map(([attrId, attribute]) => ({
 			attribute,
 			evalAttr: evalGroup[attrId] as EvaluatedAttribute<any> | undefined,
@@ -753,7 +752,7 @@
 									ladderEvaluation ?
 										Object.entries(wallet.ladders)
 											.find(([_, evaluation]) => evaluation === ladderEvaluation)
-											?.[0] as WalletLadderType | undefined
+											?.[0]
 									:
 										undefined
 								)}
