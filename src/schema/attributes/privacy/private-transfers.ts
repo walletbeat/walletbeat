@@ -6,6 +6,7 @@ import {
 	exampleRating,
 	Rating,
 	type Value,
+	type WalletNameStrings,
 } from '@/schema/attributes'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '@/schema/eips'
 import type { ResolvedFeatures } from '@/schema/features'
@@ -27,9 +28,9 @@ import {
 import { fullySponsoredFees } from '@/schema/features/transparency/fee-display'
 import {
 	markdown,
+	type MarkdownParagraph,
 	mdParagraph,
 	mdSentence,
-	type Paragraph,
 	paragraph,
 	sentence,
 } from '@/types/content'
@@ -175,7 +176,7 @@ const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
 			their level of privacy would be similar.
 		`,
 	),
-	impact: mdParagraph<{ WALLET_NAME: string }>(
+	impact: mdParagraph(
 		`
 			As all token transfers will be recorded publicly onchain forever,
 			{{WALLET_NAME}} should only be used for transactions where privacy is not
@@ -248,7 +249,7 @@ function rateStealthAddressSupport(
 	)
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
 		sendingPrivacy: PrivateTransfersPrivacyLevel
-		sendingDetails: Paragraph
+		sendingDetails: MarkdownParagraph<WalletNameStrings>
 		sendingImprovements: string[]
 	} => {
 		switch (stealthAddresses.recipientAddressResolution.type) {
@@ -341,7 +342,7 @@ function rateStealthAddressSupport(
 	})()
 	const { receivingPrivacy, receivingDetails, receivingImprovements } = ((): {
 		receivingPrivacy: PrivateTransfersPrivacyLevel
-		receivingDetails: Paragraph
+		receivingDetails: MarkdownParagraph<WalletNameStrings>
 		receivingImprovements: string[]
 	} => {
 		switch (stealthAddresses.balanceLookup.type) {
@@ -402,7 +403,7 @@ function rateStealthAddressSupport(
 	})()
 	const { labelingPrivacy, labelingDetails, labelingImprovements } = ((): {
 		labelingPrivacy: PrivateTransfersPrivacyLevel
-		labelingDetails: Paragraph
+		labelingDetails: MarkdownParagraph<WalletNameStrings>
 		labelingImprovements: string[]
 	} => {
 		if (!isSupported(stealthAddresses.userLabeling)) {
@@ -461,7 +462,7 @@ function rateStealthAddressSupport(
 	})()
 	const { derivationPrivacy, derivationDetails, derivationImprovements } = ((): {
 		derivationPrivacy: PrivateTransfersPrivacyLevel
-		derivationDetails: Paragraph | null
+		derivationDetails: MarkdownParagraph<WalletNameStrings> | null
 		derivationImprovements: string[]
 	} => {
 		switch (stealthAddresses.privateKeyDerivation.type) {
@@ -498,7 +499,7 @@ function rateStealthAddressSupport(
 		.concat(labelingImprovements)
 		.concat(derivationImprovements)
 	const howToImprove = isNonEmptyArray(walletShould)
-		? mdParagraph<{ WALLET_NAME: string }>(
+		? mdParagraph(
 				`
 					{{WALLET_NAME}} should${markdownListFormat(walletShould, {
 						ifEmpty: { behavior: 'THROW_ERROR' },
@@ -606,10 +607,10 @@ function rateTornadoCashNovaSupport(
 	tornadoCashNova: Supported<TornadoCashNovaSupport>,
 ): Evaluation<PrivateTransfersValue> {
 	const references: ReferenceArray = refs(tornadoCashNova)
-	const extraNotes: Paragraph[] = []
+	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
 		sendingPrivacy: PrivateTransfersPrivacyLevel
-		sendingDetails: Paragraph
+		sendingDetails: MarkdownParagraph<WalletNameStrings>
 		sendingImprovements: string[]
 	} => {
 		switch (tornadoCashNova.integrationType) {
@@ -661,7 +662,7 @@ function rateTornadoCashNovaSupport(
 	})()
 	const { receivingPrivacy, receivingDetails, receivingImprovements } = ((): {
 		receivingPrivacy: PrivateTransfersPrivacyLevel
-		receivingDetails: Paragraph
+		receivingDetails: MarkdownParagraph<WalletNameStrings>
 		receivingImprovements: string[]
 	} => {
 		switch (tornadoCashNova.utxoFiltering) {
@@ -689,7 +690,7 @@ function rateTornadoCashNovaSupport(
 	})()
 	const { spendingPrivacy, spendingDetails, spendingImprovements } = ((): {
 		spendingPrivacy: PrivateTransfersPrivacyLevel
-		spendingDetails: Paragraph
+		spendingDetails: MarkdownParagraph<WalletNameStrings>
 		spendingImprovements: string[]
 	} => {
 		if (!isSupported(tornadoCashNova.novaInternalTransfers)) {
@@ -759,7 +760,7 @@ function rateTornadoCashNovaSupport(
 		.concat(receivingImprovements)
 		.concat(spendingImprovements)
 	const howToImprove = isNonEmptyArray(walletShould)
-		? mdParagraph<{ WALLET_NAME: string }>(
+		? mdParagraph(
 				`
 					{{WALLET_NAME}} should${markdownListFormat(walletShould, {
 						ifEmpty: { behavior: 'THROW_ERROR' },
@@ -880,10 +881,10 @@ function ratePrivacyPoolsSupport(
 	privacyPools: Supported<PrivacyPoolsSupport>,
 ): Evaluation<PrivateTransfersValue> {
 	const references: ReferenceArray = refs(privacyPools)
-	const extraNotes: Paragraph[] = []
+	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
 		sendingPrivacy: PrivateTransfersPrivacyLevel
-		sendingDetails: Paragraph
+		sendingDetails: MarkdownParagraph<WalletNameStrings>
 		sendingImprovements: string[]
 	} => {
 		if (!isSupported(privacyPools.capabilities.etherL1Pool)) {
@@ -935,7 +936,7 @@ function ratePrivacyPoolsSupport(
 	})()
 	const { receivingPrivacy, receivingDetails, receivingImprovements } = ((): {
 		receivingPrivacy: PrivateTransfersPrivacyLevel
-		receivingDetails: Paragraph
+		receivingDetails: MarkdownParagraph<WalletNameStrings>
 		receivingImprovements: string[]
 	} => {
 		return {
@@ -950,7 +951,7 @@ function ratePrivacyPoolsSupport(
 	})()
 	const { spendingPrivacy, spendingDetails, spendingImprovements } = ((): {
 		spendingPrivacy: PrivateTransfersPrivacyLevel
-		spendingDetails: Paragraph
+		spendingDetails: MarkdownParagraph<WalletNameStrings>
 		spendingImprovements: string[]
 	} => {
 		if (!isSupported(privacyPools.depositData.exportable)) {
@@ -1111,7 +1112,7 @@ function ratePrivacyPoolsSupport(
 		.concat(receivingImprovements)
 		.concat(spendingImprovements)
 	const howToImprove = isNonEmptyArray(walletShould)
-		? mdParagraph<{ WALLET_NAME: string }>(
+		? mdParagraph(
 				`
 					{{WALLET_NAME}} should${markdownListFormat(walletShould, {
 						ifEmpty: { behavior: 'THROW_ERROR' },

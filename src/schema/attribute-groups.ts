@@ -150,7 +150,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 	id: 'security',
 	icon: '\u{1f512}', // Lock
 	displayName: 'Security',
-	perWalletQuestion: sentence<{ WALLET_NAME: string }>('How secure is {{WALLET_NAME}}?'),
+	perWalletQuestion: sentence('How secure is {{WALLET_NAME}}?'),
 	attributes: {
 		securityAudits,
 		scamPrevention,
@@ -195,9 +195,7 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 	id: 'privacy',
 	icon: '\u{1f60e}', // Face with sunglasses
 	displayName: 'Privacy',
-	perWalletQuestion: sentence<{ WALLET_NAME: string }>(
-		'How well does {{WALLET_NAME}} protect your privacy?',
-	),
+	perWalletQuestion: sentence('How well does {{WALLET_NAME}} protect your privacy?'),
 	attributes: {
 		addressCorrelation,
 		multiAddressCorrelation,
@@ -227,7 +225,7 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 	id: 'selfSovereignty',
 	icon: '\u{1f3f0}', // Castle
 	displayName: 'Self-sovereignty',
-	perWalletQuestion: sentence<{ WALLET_NAME: string }>(
+	perWalletQuestion: sentence(
 		'How much control and ownership over your account does {{WALLET_NAME}} give you?',
 	),
 	attributes: {
@@ -258,7 +256,7 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 	id: 'transparency',
 	icon: '\u{1f575}', // Detective
 	displayName: 'Transparency',
-	perWalletQuestion: sentence<{ WALLET_NAME: string }>(
+	perWalletQuestion: sentence(
 		"How transparent and sustainable is {{WALLET_NAME}}'s development model?",
 	),
 	attributes: {
@@ -294,9 +292,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 	id: 'ecosystem',
 	icon: '🌳',
 	displayName: 'Ecosystem',
-	perWalletQuestion: sentence<{ WALLET_NAME: string }>(
-		'How well does {{WALLET_NAME}} align with the ecosystem?',
-	),
+	perWalletQuestion: sentence('How well does {{WALLET_NAME}} align with the ecosystem?'),
 	attributes: {
 		accountAbstraction,
 		addressResolution,
@@ -329,7 +325,7 @@ export const maintenanceAttributeGroup: AttributeGroup<MaintenanceValues> = {
 	id: 'maintenance',
 	icon: '🛠️',
 	displayName: 'Maintenance',
-	perWalletQuestion: sentence<{ WALLET_NAME: string }>('How well-maintained is {{WALLET_NAME}}?'),
+	perWalletQuestion: sentence('How well-maintained is {{WALLET_NAME}}?'),
 	attributes: {
 		maintenance,
 	},

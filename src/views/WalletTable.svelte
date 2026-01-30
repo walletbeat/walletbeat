@@ -859,7 +859,6 @@
 										content={wallet.metadata.blurb}
 										strings={{
 											WALLET_NAME: wallet.metadata.displayName,
-											WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
 										}}
 									/>
 								{/if}

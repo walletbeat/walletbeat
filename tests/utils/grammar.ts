@@ -239,20 +239,22 @@ export function walletContentGrammarLint(
 	name: string,
 	content:
 		| string
-		| TypographicContent
-		| TypographicContent<{ WALLET_NAME: string }>
-		| TypographicContent<{
-				WALLET_NAME: string
-				WALLET_PSEUDONYM_SINGULAR: string | null
-				WALLET_PSEUDONYM_PLURAL: string | null
-		  }>,
+		| TypographicContent<
+				| null
+				| { WALLET_NAME: string }
+				| {
+						WALLET_NAME: string
+						WALLET_PSEUDONYM_SINGULAR: string | null
+						WALLET_PSEUDONYM_PLURAL: string | null
+				  }
+		  >,
 ) {
 	describe(name, () => {
 		it('has correct grammar', async () => {
 			if (typeof content === 'string') {
 				await grammarLint(content, { language: 'plaintext' })
 			} else {
-				content = prerenderTypographicContent<{
+				const rendered = prerenderTypographicContent<{
 					WALLET_NAME: string
 					WALLET_PSEUDONYM_SINGULAR: string | null
 					WALLET_PSEUDONYM_PLURAL: string | null
@@ -261,7 +263,8 @@ export function walletContentGrammarLint(
 					WALLET_PSEUDONYM_SINGULAR: 'Example Wallet Username',
 					WALLET_PSEUDONYM_PLURAL: 'Example Wallet Usernames',
 				})
-				await contentGrammarLint(content)
+
+				await contentGrammarLint(rendered)
 			}
 		})
 	})

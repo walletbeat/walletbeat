@@ -9,7 +9,7 @@ import type { ScamAlertDetailsContent } from './content/scam-alert-details'
 import type { SecurityAuditsDetailsContent } from './content/security-audits-details'
 import type { TransactionInclusionDetailsContent } from './content/transaction-inclusion-details'
 import type { UnratedAttributeContent } from './content/unrated-attribute'
-import type { Strings as _Strings, ValidateText } from './utils/string-templates'
+import type { Strings, StringsFromTemplate, ValidateText } from './utils/string-templates'
 import { renderStrings, trimWhitespacePrefix } from './utils/text'
 
 /**
@@ -44,20 +44,20 @@ export type ComponentAndProps =
 /**
  * Text-based content that may be displayed on the UI.
  */
-export type TextContent<Strings extends _Strings = null> = {
+export type TextContent<_Strings extends Strings = null> = {
 	contentType: ContentType.TEXT
 	text: string
-	strings?: Strings
+	strings?: _Strings
 }
 
 /**
  * Markdown-based content that may be displayed on the UI.
  * Also includes a text property to make it compatible with TypographicContent interfaces.
  */
-export type MarkdownContent<Strings extends _Strings = null> = {
+export type MarkdownContent<_Strings extends Strings = null> = {
 	contentType: ContentType.MARKDOWN
 	markdown: string
-	strings?: Strings
+	strings?: _Strings
 }
 
 /**
@@ -95,23 +95,23 @@ export function isCustomContent(content: unknown): content is CustomContent {
 /**
  * Typographic content that may be displayed on the UI.
  */
-export type TypographicContent<Strings extends _Strings = null> =
-	| TextContent<Strings>
-	| MarkdownContent<Strings>
+export type TypographicContent<_Strings extends Strings = null> =
+	| TextContent<_Strings>
+	| MarkdownContent<_Strings>
 
 /**
  * Represents any type of content that may be displayed on the UI.
  */
-export type Content<Strings extends _Strings = null> = TypographicContent<Strings> | CustomContent
+export type Content<_Strings extends Strings = null> = TypographicContent<_Strings> | CustomContent
 
 /**
  * Type predicate for TypographicContent.
  * @param content The content to check.
  * @returns Whether `content` is of type `TypographicContent`.
  */
-export function isTypographicContent<Strings extends _Strings = null>(
-	content: Content<Strings>,
-): content is TypographicContent<Strings> {
+export function isTypographicContent<_Strings extends Strings = null>(
+	content: Content<_Strings>,
+): content is TypographicContent<_Strings> {
 	return content.contentType === ContentType.TEXT || content.contentType === ContentType.MARKDOWN
 }
 
@@ -119,17 +119,17 @@ export function isTypographicContent<Strings extends _Strings = null>(
  * Upconvert content from one set of strings to a superset.
  */
 export function typographicContentWithExtraOptionalStrings<
-	BaseStrings extends _Strings,
-	ExtendedStrings extends BaseStrings,
->(content: TypographicContent<BaseStrings>): TypographicContent<ExtendedStrings> {
+	_Strings extends Strings,
+	_MoreStrings extends _Strings,
+>(content: TypographicContent<_Strings>): TypographicContent<_MoreStrings> {
 	function isTypographicContentWithExtraOptionalStrings<
-		BaseStrings extends _Strings,
-		ExtendedStrings extends BaseStrings,
-	>(_: TypographicContent<BaseStrings>): _ is TypographicContent<ExtendedStrings> {
+		_Strings extends Strings,
+		_MoreStrings extends _Strings,
+	>(_: TypographicContent<_Strings>): _ is TypographicContent<_MoreStrings> {
 		return true // Always true since ExtendedStrings extends BaseStrings.
 	}
 
-	if (!isTypographicContentWithExtraOptionalStrings<BaseStrings, ExtendedStrings>(content)) {
+	if (!isTypographicContentWithExtraOptionalStrings<_Strings, _MoreStrings>(content)) {
 		throw new Error('Unreachable')
 	}
 
@@ -144,9 +144,9 @@ export function typographicContentWithExtraOptionalStrings<
  * @param strings The strings to bake into it.
  * @returns A TypographicContent of the same type but with no template strings.
  */
-export function prerenderTypographicContent<Strings extends _Strings = null>(
-	content: TypographicContent<Strings>,
-	strings: Strings,
+export function prerenderTypographicContent<_Strings extends Strings = null>(
+	content: TypographicContent<_Strings>,
+	strings: _Strings,
 ): TypographicContent<null> {
 	const bakedStrings = content.strings ?? {}
 
@@ -161,38 +161,50 @@ export function prerenderTypographicContent<Strings extends _Strings = null>(
 /**
  * Create text content with optional template variables
  */
-function textContent<Strings extends _Strings, _Text extends string = string>(
+function textContent<_Strings extends Strings, _Text extends string = string>(
 	text: _Text,
-	strings?: Strings,
+	strings?: _Strings,
 ) {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Needed to enable type-level string validation.
 	return {
 		contentType: ContentType.TEXT,
 		text: trimWhitespacePrefix(text),
 		...(Boolean(strings) && { strings }),
-	} as ValidateText<TextContent<Strings>, _Text, Strings>
+	} as ValidateText<TextContent<_Strings>, _Text, _Strings>
 }
 
-export function markdown<Strings extends _Strings, _Text extends string = string>(
+export function markdown<_Text extends string>(
 	markdownText: _Text,
-	strings?: Strings,
+): MarkdownContent<StringsFromTemplate<_Text>>
+export function markdown<_Strings extends Strings, _Text extends string = string>(
+	markdownText: _Text,
+	strings?: _Strings,
+): MarkdownContent<_Strings>
+export function markdown<_Strings extends Strings, _Text extends string = string>(
+	markdownText: _Text,
+	strings?: _Strings,
 ) {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Needed to enable type-level string validation.
 	return {
 		contentType: ContentType.MARKDOWN,
 		markdown: trimWhitespacePrefix(markdownText),
 		...(Boolean(strings) && { strings }),
-	} as ValidateText<MarkdownContent<Strings>, _Text, Strings>
+	} as ValidateText<MarkdownContent<_Strings>, _Text, _Strings>
 }
 
 const sentenceMaxLength = 384
 
-export type Sentence<Strings extends _Strings = null> = TypographicContent<Strings>
+export type Sentence<_Strings extends Strings = null> = TypographicContent<_Strings>
 
 /** A single sentence. */
-export function sentence<Strings extends _Strings, _Text extends string = string>(
+export function sentence<_Text extends string>(text: _Text): TextContent<StringsFromTemplate<_Text>>
+export function sentence<_Strings extends Strings, _Text extends string = string>(
 	text: _Text,
-	strings?: Strings,
+	strings?: _Strings,
+): Sentence<_Strings>
+export function sentence<_Strings extends Strings, _Text extends string = string>(
+	text: _Text,
+	strings?: _Strings,
 ) {
 	if (text.length > sentenceMaxLength) {
 		throw new Error(
@@ -204,9 +216,16 @@ export function sentence<Strings extends _Strings, _Text extends string = string
 }
 
 /** A renderable Markdown-rendered sentence. */
-export function mdSentence<Strings extends _Strings, _Text extends string = string>(
+export function mdSentence<_Text extends string>(
 	text: _Text,
-	strings?: Strings,
+): MarkdownContent<StringsFromTemplate<_Text>>
+export function mdSentence<_Strings extends Strings, _Text extends string = string>(
+	text: _Text,
+	strings?: _Strings,
+): MarkdownContent<_Strings>
+export function mdSentence<_Strings extends Strings, _Text extends string = string>(
+	text: _Text,
+	strings?: _Strings,
 ) {
 	return markdown(text, strings)
 }
@@ -215,12 +234,23 @@ const paragraphMaxLength = 1024
 
 /** A short amount of text that fits in a single paragraph. */
 
-export type Paragraph<Strings extends _Strings = null> = TextContent<Strings>
+export type Paragraph<_Strings extends Strings = null> = TextContent<_Strings>
+
+/** A short amount of markdown that fits in a single paragraph. */
+
+export type MarkdownParagraph<_Strings extends Strings = null> = MarkdownContent<_Strings>
 
 /** A renderable paragraph. */
-export function paragraph<Strings extends _Strings, _Text extends string = string>(
+export function paragraph<_Text extends string>(
 	text: _Text,
-	strings?: Strings,
+): TextContent<StringsFromTemplate<_Text>>
+export function paragraph<_Strings extends Strings, _Text extends string = string>(
+	text: _Text,
+	strings?: _Strings,
+): Paragraph<_Strings>
+export function paragraph<_Strings extends Strings, _Text extends string = string>(
+	text: _Text,
+	strings?: _Strings,
 ) {
 	if (text.length > paragraphMaxLength) {
 		throw new Error(
@@ -232,9 +262,16 @@ export function paragraph<Strings extends _Strings, _Text extends string = strin
 }
 
 /** A renderable Markdown-rendered paragraph. */
-export function mdParagraph<Strings extends _Strings, _Text extends string = string>(
+export function mdParagraph<_Text extends string>(
 	text: _Text,
-	strings?: Strings,
+): MarkdownParagraph<StringsFromTemplate<_Text>>
+export function mdParagraph<_Strings extends Strings, _Text extends string = string>(
+	text: _Text,
+	strings?: _Strings,
+): MarkdownParagraph<_Strings>
+export function mdParagraph<_Strings extends Strings, _Text extends string = string>(
+	text: _Text,
+	strings?: _Strings,
 ) {
 	if (text.length > paragraphMaxLength) {
 		throw new Error(

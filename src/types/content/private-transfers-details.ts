@@ -1,4 +1,4 @@
-import type { EvaluationData } from '@/schema/attributes'
+import type { EvaluationData, WalletNameStrings } from '@/schema/attributes'
 import type { PrivateTransfersValue } from '@/schema/attributes/privacy/private-transfers'
 import type { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 
@@ -7,15 +7,15 @@ import {
 	type ComponentAndProps,
 	type Content,
 	isCustomContent,
-	type Paragraph,
+	type MarkdownParagraph,
 } from '../content'
 import type { Strings } from '../utils/string-templates'
 
 interface PrivateTokenTransferDetails {
-	sendingDetails: Paragraph
-	receivingDetails: Paragraph
-	spendingDetails: Paragraph
-	extraNotes: Paragraph[]
+	sendingDetails: MarkdownParagraph<WalletNameStrings>
+	receivingDetails: MarkdownParagraph<WalletNameStrings>
+	spendingDetails: MarkdownParagraph<WalletNameStrings>
+	extraNotes: MarkdownParagraph<WalletNameStrings>[]
 }
 
 export interface PrivateTransfersDetailsProps extends EvaluationData<PrivateTransfersValue> {

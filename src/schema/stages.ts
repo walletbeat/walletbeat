@@ -10,7 +10,7 @@ import {
 } from '@/types/utils/non-empty'
 
 import { getAttributeFromTree } from './attribute-groups'
-import { type Attribute, Rating, type Value } from './attributes'
+import { type Attribute, Rating, type Value, type WalletNameStrings } from './attributes'
 import type { Variant } from './variants'
 import { type RatedWallet, type ResolvedWallet } from './wallet'
 
@@ -87,11 +87,7 @@ export type StageCriterionEvaluation = {
 			rating: Omit<StageCriterionRating, StageCriterionRating.UNRATED>
 
 			/** Explanation of the rating. */
-			explanation: Sentence<{
-				WALLET_NAME: string
-				WALLET_PSEUDONYM_SINGULAR: string | null
-				WALLET_PSEUDONYM_PLURAL: string | null
-			}>
+			explanation: Sentence<WalletNameStrings>
 	  }
 	| {
 			// If unrated, the explanation is not required.

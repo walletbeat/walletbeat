@@ -1,6 +1,7 @@
 import type { Sentence } from '@/types/content'
 import { Enum } from '@/utils/enum'
 
+import type { WalletNameStrings } from '../../attributes'
 import type { GuardianScenarioDataLoss } from './guardian-data-loss'
 import type { GuardianScenarioEntityTurnsEvil } from './guardian-entity-turns-evil'
 
@@ -27,7 +28,7 @@ export type AccountRecoveryOutcomeCanBeRecovered = {
 
 export type AccountRecoveryOutcomeCannotBeRecovered = {
 	type: 'CANNOT_RECOVER'
-	description: Sentence<{ WALLET_NAME: string }>
+	description: Sentence<WalletNameStrings>
 }
 
 export type AccountRecoveryOutcome =
@@ -46,7 +47,7 @@ export type AccountTakeOverOutcomeCannotBeTakenOver = {
 
 export type AccountTakeOverOutcomeCanBeTakenOver = {
 	type: 'CAN_BE_TAKEN_OVER'
-	description: Sentence<{ WALLET_NAME: string }>
+	description: Sentence<WalletNameStrings>
 }
 
 export type AccountTakeOverOutcome =
@@ -75,14 +76,14 @@ export type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 			| { recovery: AccountRecoveryOutcomeCannotBeRecovered }
 			| { takeover: AccountTakeOverOutcomeCanBeTakenOver }
 	  ) & {
-			howToImprove: Sentence<{ WALLET_NAME: string }>
+			howToImprove: Sentence<WalletNameStrings>
 	  })
 )
 
 export const accountCanBeRecovered: AccountRecoveryOutcomeCanBeRecovered = { type: 'CAN_RECOVER' }
 
 export function accountCannotBeRecovered(
-	description: Sentence<{ WALLET_NAME: string }>,
+	description: Sentence<WalletNameStrings>,
 ): AccountRecoveryOutcomeCannotBeRecovered {
 	return { type: 'CANNOT_RECOVER', description }
 }
@@ -92,7 +93,7 @@ export const accountCannotBeTakenOver: AccountTakeOverOutcomeCannotBeTakenOver =
 }
 
 export function accountCanBeTakenOver(
-	description: Sentence<{ WALLET_NAME: string }>,
+	description: Sentence<WalletNameStrings>,
 ): AccountTakeOverOutcomeCanBeTakenOver {
 	return { type: 'CAN_BE_TAKEN_OVER', description }
 }
