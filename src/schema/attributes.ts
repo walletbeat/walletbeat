@@ -1,18 +1,17 @@
 import type { Content, Paragraph, Sentence, TypographicContent } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
 
-/** Strings for evaluation typographic content: none, {{WALLET_NAME}}, or name + pseudonym placeholders. */
-export type WalletEvaluationStrings =
-	| null
-	| { WALLET_NAME: string }
+/** Strings for content that may use {{WALLET_NAME}} only (e.g. details, blurb). */
+export type WalletNameStrings = null | { WALLET_NAME: string }
+
+/** Strings for content that may use {{WALLET_NAME}} and/or pseudonym placeholders. */
+export type WalletNameAndPseudonymStrings =
+	| WalletNameStrings
 	| {
 			WALLET_NAME: string
 			WALLET_PSEUDONYM_SINGULAR: string | null
 			WALLET_PSEUDONYM_PLURAL: string | null
 	  }
-
-/** Strings for content that may use {{WALLET_NAME}} only (e.g. details, blurb). */
-export type WalletNameStrings = null | { WALLET_NAME: string }
 
 import { Enum } from '@/utils/enum'
 
@@ -299,7 +298,7 @@ export interface Evaluation<V extends Value> {
 	 * to improve this rating. Should only be populated for ratings that are
 	 * not perfect.
 	 */
-	howToImprove?: TypographicContent<WalletEvaluationStrings>
+	howToImprove?: TypographicContent<WalletNameAndPseudonymStrings>
 
 	/**
 	 * Optional array of references with URLs and explanations.
@@ -423,7 +422,7 @@ export interface Attribute<V extends Value = Value> {
 				display: 'simple'
 
 				/** The content to display to explain the rating scale. */
-				content: TypographicContent<WalletEvaluationStrings>
+				content: TypographicContent<WalletNameAndPseudonymStrings>
 		  }
 		| {
 				/**

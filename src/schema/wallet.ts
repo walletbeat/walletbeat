@@ -23,7 +23,7 @@ import {
 	type EvaluatedAttribute,
 	Rating,
 	type Value,
-	type WalletEvaluationStrings,
+	type WalletNameAndPseudonymStrings,
 	type WalletNameStrings,
 } from './attributes'
 import type { WalletDeveloper } from './entity'
@@ -201,7 +201,7 @@ export interface AttributeOverride {
 	 * What the wallet should do to improve its rating on this attribute.
 	 * Overrides the eponymous field in `Evaluation`.
 	 */
-	howToImprove?: TypographicContent<WalletEvaluationStrings>
+	howToImprove?: TypographicContent<WalletNameAndPseudonymStrings>
 }
 
 /** Per-wallet overrides for attributes. */
