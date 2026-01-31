@@ -81,10 +81,12 @@ describe('evaluations', () => {
 		const trees: { tree: EvaluationTree; variantName: string }[] = [
 			{ tree: ratedWallet.overall, variantName: 'overall' },
 		].concat(
-			Object.values(ratedWallet.variants).map(resolvedWallet => ({
-				tree: resolvedWallet.attributes,
-				variantName: variantToName(resolvedWallet.variant, true),
-			})),
+			Object.values(ratedWallet.variants)
+				.filter((w): w is NonNullable<typeof w> => w != null)
+				.map(resolvedWallet => ({
+					tree: resolvedWallet.attributes,
+					variantName: variantToName(resolvedWallet.variant, true),
+				})),
 		)
 
 		for (const { tree, variantName } of trees) {

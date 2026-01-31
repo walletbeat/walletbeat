@@ -236,7 +236,6 @@ export function nonEmptySet<K extends string | number | symbol>(
 export function nonEmptySetFromArray<K extends string | number | symbol>(
 	keys: NonEmptyArray<K>,
 ): NonEmptySet<K> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input array was non-empty.
 	return Object.fromEntries(nonEmptyMap<K, [K, true]>(keys, key => [key, true])) as NonEmptySet<K>
 }
 
@@ -258,7 +257,7 @@ export function setItems<K extends string | number | symbol>(
 ): NonEmptyArray<K> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the input set was non-empty and contained at least one true value.
 	return Object.entries(set)
-		.filter(([_, v]): boolean => v as boolean) // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because NonEmptySet maps to boolean values.
+		.filter(([_, v]): boolean => v as boolean)
 		.map(([k, _]) => k) as NonEmptyArray<K>
 }
 

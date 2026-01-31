@@ -542,7 +542,7 @@ export function evaluatedAttributes<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
 ): NonEmptyArray<EvaluatedAttribute<Value>> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.values(evaluatedGroup) as NonEmptyArray<EvaluatedAttribute<Value>>
+	return Object.values(evaluatedGroup) as unknown as NonEmptyArray<EvaluatedAttribute<Value>>
 }
 
 /**
@@ -555,7 +555,9 @@ export function evaluatedAttributesEntries<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
 ): NonEmptyArray<[keyof Vs, EvaluatedAttribute<Value>]> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.entries(evaluatedGroup) as NonEmptyArray<[keyof Vs, EvaluatedAttribute<Value>]>
+	return Object.entries(evaluatedGroup) as unknown as NonEmptyArray<
+		[keyof Vs, EvaluatedAttribute<Value>]
+	>
 }
 
 /** Represents an unimplemented ExampleRating. See below. */

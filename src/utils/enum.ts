@@ -75,9 +75,9 @@ export class Enum<E extends string> {
 		return this.reorderPartialRecord(
 			Object.fromEntries(
 				Object.entries(rec).filter((entry): entry is [E, T] =>
-					predicate(this.assert(entry[0]), entry[1] as T),
+					entry?.[1] === undefined ? false : predicate(this.assert(entry[0]), entry[1]),
 				),
-			),
+			) as Partial<Record<E, T>>,
 		)
 	}
 
