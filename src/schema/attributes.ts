@@ -7,11 +7,7 @@ export type WalletNameStrings = null | { WALLET_NAME: string }
 /** Strings for content that may use {{WALLET_NAME}} and/or pseudonym placeholders. */
 export type WalletNameAndPseudonymStrings =
 	| WalletNameStrings
-	| {
-			WALLET_NAME: string
-			WALLET_PSEUDONYM_SINGULAR: string | null
-			WALLET_PSEUDONYM_PLURAL: string | null
-	  }
+	| (WalletNameStrings & { WALLET_PSEUDONYM_SINGULAR: string; WALLET_PSEUDONYM_PLURAL: string })
 
 import { Enum } from '@/utils/enum'
 
