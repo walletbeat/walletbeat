@@ -144,7 +144,7 @@ export const zerion: SoftwareWallet = {
 				messageSigningLegibility: null,
 				transactionDetailsDisplay: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					from: DataDisplayOptions.SHOWN_OPTIONALLY,
 					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,

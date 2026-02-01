@@ -648,7 +648,7 @@ export const rabby: SoftwareWallet = {
 				},
 				l2: {
 					[TransactionSubmissionL2Type.arbitrum]:
-						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
+						TransactionSubmissionL2Support.SUPPORTED_WITH_FORCE_INCLUSION_OF_WITHDRAWALS,
 					[TransactionSubmissionL2Type.opStack]:
 						TransactionSubmissionL2Support.SUPPORTED_BUT_NO_FORCE_INCLUSION,
 					ref: refTodo,
