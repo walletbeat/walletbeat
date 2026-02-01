@@ -75,196 +75,36 @@ def is_benign_header(header: str) -> bool:
     return header.lower() in _KNOWN_BENIGN_HEADERS
 
 
-class WalletCaptureFile:
-    def __init__(self, path: str):
-        self._path = path
-        self._session_start = time.time()
-        os.makedirs(os.path.dirname(self._path), exist_ok=True)
-        if not os.path.exists(self._path):
-            with open(self._path, "w") as f:
-                f.write("{}")
-        with open(self._path, "r") as f:
-            try:
-                data = json.load(f)
-            except json.decoder.JSONDecodeError as e:
-                if os.path.getsize(self._path) > 2:
-                    raise e
-                data = {}  # Empty file, reset data.
+class UserInfo(enum.StrEnum):
+    TRACKING_IDENTIFIER = "TRACKING_IDENTIFIER"
+    PSEUDONYM = "PSEUDONYM"
+    LEGAL_NAME = "LEGAL_NAME"
+    EMAIL = "EMAIL"
+    PHONE = "PHONE"
+    BROWSING_HISTORY_URLS = "BROWSING_HISTORY_URLS"
+    CONTACTS = "CONTACTS"
+    PHYSICAL_ADDRESS = "PHYSICAL_ADDRESS"
+    FACE = "FACE"
+    CEX_ACCOUNT = "CEX_ACCOUNT"
+    GOVERNMENT_ID = "GOVERNMENT_ID"
+    X_DOT_COM_ACCOUNT = "X_DOT_COM_ACCOUNT"
+    FARCASTER_ACCOUNT = "FARCASTER_ACCOUNT"
+    USER_ACTIONS = "USER_ACTIONS"
+    ACCOUNT_ADDRESS = "ACCOUNT_ADDRESS"
+    BALANCE = "BALANCE"
+    ASSETS = "ASSETS"
+    MEMPOOL_TRANSACTIONS = "MEMPOOL_TRANSACTIONS"
+    WALLET_CONNECTED_DOMAINS = "WALLET_CONNECTED_DOMAINS"
 
-        self._flows: Dict[str, Union[WalletCaptureFlow, str]] = {}
-        for flow_name, flow_data in data.get("flows", {}).items():
-            if isinstance(flow_data, str) and flow_data == "NOT_SUPPORTED":
-                self._flows[flow_name] = "NOT_SUPPORTED"
-            else:
-                self._flows[flow_name] = WalletCaptureFlow.decode(
-                    wallet_data=self, flow=flow_name, data=flow_data
-                )
-        self._session_number: int = data.get("sessions", 0) + 1
-        self._needs_flushing = 0
-        self._lock = threading.Lock()
-
-    def session_time(self) -> int:
-        """Session time as a session-start-relative timestamp."""
-        return self._session_number * 1_000_000_000 + int(
-            1_000 * (time.time() - self._session_start)
-        )
-
-    def flow(self, flow: UxFlow) -> WalletCaptureFlow:
-        with self._lock:
-            # Convert enum to string for dict key consistency
-            flow_key = str(flow)
-            if flow_key not in self._flows or (
-                isinstance(self._flows[flow_key], str)
-                and self._flows[flow_key] == "NOT_SUPPORTED"
-            ):
-                self._flows[flow_key] = WalletCaptureFlow(
-                    wallet_data=self, flow=flow, redactor=RedactedStringStore.new()
-                )
-                self._needs_flushing += 1
-            return self._flows[flow_key]
-
-    def flush(self):
-        with self._lock:
-            if self._needs_flushing == 0 and all(
-                flow.needs_flushing() == 0
-                for flow in self._flows.values()
-                if isinstance(flow, WalletCaptureFlow)
-            ):
-                return
-            logging.info(f"Flushing data to {self._path}.")
-            per_flow_amounts = tuple(
-                (flow, flow.needs_flushing())
-                for flow in self._flows.values()
-                if isinstance(flow, WalletCaptureFlow)
-            )
-            with open(self._path + ".tmp", "w") as f:
-                json.dump(
-                    {
-                        "flows": {
-                            flow_name: "NOT_SUPPORTED"
-                            if isinstance(flow, str) and flow == "NOT_SUPPORTED"
-                            else flow.encode()
-                            for flow_name, flow in self._flows.items()
-                        },
-                        "sessions": self._session_number,
-                    },
-                    f,
-                    indent=2,
-                )
-            os.rename(self._path + ".tmp", self._path)
-            self._needs_flushing = 0
-            for flow, per_flow_amount in per_flow_amounts:
-                flow.mark_flushed(per_flow_amount)
-
-
-class WalletCaptureFlow:
-    @classmethod
-    def decode(cls, wallet_data: WalletCaptureFile, flow: str, data: dict):
-        redactor = RedactedStringStore.decode(data["redactor"])
-        flow_obj = cls(wallet_data=wallet_data, flow=flow, redactor=redactor)
-        for r in data["requests"]:
-            flow_obj.add(WalletRequest.decode(data=r, flow=flow_obj))
-        flow_obj._needs_flushing = 0
-        return flow_obj
-
-    def __init__(
-        self,
-        wallet_data: WalletCaptureFile,
-        flow: Union[UxFlow, str],
-        redactor: RedactedStringStore,
-    ):
-        self._wallet_data = wallet_data
-        self._flow = flow
-        self._requests: List[WalletRequest] = []
-        self._redactor = redactor
-        self._needs_flushing = 0
-        self._lock = threading.Lock()
-
-    @property
-    def wallet_data(self) -> WalletCaptureFile:
-        return self._wallet_data
-
-    @property
-    def redactor(self) -> RedactedStringStore:
-        return self._redactor
-
-    def add(self, wallet_request: WalletRequest):
-        with self._lock:
-            self._requests.append(wallet_request)
-            self._needs_flushing += 1
-
-    def needs_flushing(self) -> int:
-        with self._lock:
-            return (
-                self._needs_flushing * 1_000_000_000_000
-                + self._redactor.needs_flushing()
-            )
-
-    def mark_flushed(self, amount: int):
-        with self._lock:
-            self._needs_flushing -= amount // 1_000_000_000_000
-            self._redactor.mark_flushed(amount=amount % 1_000_000_000_000)
-
-    def encode(self):
-        with self._lock:
-            return {
-                "requests": [r.encode() for r in self._requests],
-                "redactor": self._redactor.encode(),
-            }
-
-
-class RedactedString:
-    _POSSIBLE_ESCAPE_CHARS = "~+!@#$%^&*:;?.,`|-/"
-
-    @classmethod
-    def pick_escape_char(cls, real_str: str) -> str:
-        chosen_escape_char = None
-        for c in cls._POSSIBLE_ESCAPE_CHARS:
-            if c not in real_str:
-                chosen_escape_char = c
-                break
-        if chosen_escape_char is None:
-            raise ValueError(
-                "Cannot find an escape character in string: %r" % (real_str,)
-            )
-        return chosen_escape_char
-
-    @classmethod
-    def from_real(cls, real_str: str, redactor: RedactedStringStore) -> RedactedString:
-        return cls(
-            redactor=redactor,
-            redacted_str=f"~R:{cls.pick_escape_char(real_str)}{real_str}",
-        )
-
-    @classmethod
-    def decode(
-        cls, encoded_redacted_str: str, redactor: RedactedStringStore
-    ) -> RedactedString:
-        return cls(redactor=redactor, redacted_str=encoded_redacted_str)
-
-    def __init__(self, redactor: RedactedStringStore, redacted_str: str):
-        assert redacted_str.startswith("~R:")
-        self._redactor = redactor
-        self._escape_character = redacted_str[3]
-        self._redacted_str = redacted_str[4:]
-
-    def __str__(self):
-        return self.encode()
-
-    def __repr__(self):
-        return repr(str(self))
-
-    def encode(self) -> str:
-        redacted, _ = self._redactor.redact(
-            string=self._redacted_str, escape_char=self._escape_character
-        )
-        return f"~R:{self._escape_character}{redacted}"
+    def label_prefix(self) -> str:
+        # Match TypeScript: just remove underscores, don't lowercase
+        return self.value.replace("_", "")
 
 
 class RedactedData:
     @classmethod
     def decode(cls, redactor: RedactedStringStore, data: dict):
-        pieces = set()
+        pieces: Set[UserInfo] = set()
         if "piece" in data:
             pieces.add(UserInfo[data["piece"]])
         if "pieces" in data:
@@ -276,10 +116,11 @@ class RedactedData:
             label_prefix=data["labelPrefix"],
             label_index=data["labelIndex"],
             real_str=None,
-            hash=data["hash"],
+            hash_value=data["hash"],
             pieces=frozenset(pieces),
             hint=data.get("hint"),
             length=data["length"],
+            first_char=data["firstChar"],
         )
 
     def __init__(
@@ -288,19 +129,27 @@ class RedactedData:
         label_prefix: str,
         label_index: int,
         real_str: Optional[str],
-        hash: str,
+        hash_value: str,
         pieces: FrozenSet[UserInfo],
         hint: Optional[str],
         length: int,
+        first_char: Optional[str] = None,
     ):
         self._redactor = redactor
         self.label_prefix = label_prefix
         self.label_index = label_index
         self.real_str = real_str
-        self.hash = hash
+        self.hash = hash_value
         self.pieces = pieces
         self.hint = hint
         self.length = len(real_str) if real_str is not None else length
+
+        if first_char is not None:
+            self.first_char = first_char.lower()
+        elif real_str is not None and len(real_str) > 0:
+            self.first_char = real_str[0].lower()
+        else:
+            raise ValueError("Must provide either real_str or first_char")
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -313,6 +162,10 @@ class RedactedData:
     def __hash__(self):
         return hash((self.label_prefix, self.label_index))
 
+    @property
+    def label(self) -> str:
+        return f"{self.label_prefix}_{self.label_index}"
+
     def augment(
         self,
         real_str: Optional[str] = None,
@@ -320,29 +173,37 @@ class RedactedData:
         hint: Optional[str] = None,
     ) -> bool:
         changed = False
+
         if real_str is not None:
             assert self.real_str is None or self.real_str == real_str, "Hash collision"
             assert len(real_str) == self.length, "Length mismatch"
+            assert real_str[0].lower() == self.first_char, "First character mismatch"
             self.real_str = real_str
 
         if pieces is not None:
+            new_pieces = set(self.pieces)
             for p in pieces:
-                if p not in self.pieces:
-                    self.pieces.add(p)
+                if p not in new_pieces:
+                    new_pieces.add(p)
                     changed = True
+            if changed:
+                self.pieces = frozenset(new_pieces)
 
         if hint is not None:
             assert self.hint is None or self.hint == hint, "Conflicting hint"
-            self.hint = hint
-            changed = True
+            if self.hint != hint:
+                changed = True
+                self.hint = hint
+
         return changed
 
-    def encode(self):
+    def encode(self) -> dict:
         data = {
             "labelPrefix": self.label_prefix,
             "labelIndex": self.label_index,
             "hash": self.hash,
             "length": self.length,
+            "firstChar": self.first_char,
         }
 
         sorted_pieces = list(sorted(str(p) for p in self.pieces))
@@ -353,27 +214,40 @@ class RedactedData:
 
         if self.hint is not None:
             data["hint"] = self.hint
+
         return data
 
 
 class RedactedStringStore:
     @classmethod
-    def decode(cls, data):
+    def decode(cls, data: dict) -> RedactedStringStore:
         redactor = cls(salt=data["salt"])
-        for redaction in data["redactions"]:
-            redaction = RedactedData.decode(
-                redactor=redactor,
-                data=redaction,
+
+        for redaction_data in data.get("redactions", []):
+            redaction = RedactedData.decode(redactor=redactor, data=redaction_data)
+            key = (redaction.label_prefix, redaction.label_index)
+
+            redactor._redactions[key] = redaction
+            redactor._hash_to_label[redaction.hash] = key
+
+            # Update label_next_index
+            current_next = redactor._label_next_index.get(redaction.label_prefix, 1)
+            if redaction.label_index >= current_next:
+                redactor._label_next_index[redaction.label_prefix] = (
+                    redaction.label_index + 1
+                )
+
+            # Track length and first_char for efficient scanning
+            redactor._register_length_and_first_char(
+                redaction.length, redaction.first_char
             )
-            redactor._redactions[(redaction.label_prefix, redaction.label_index)] = (
-                redaction
-            )
+
         return redactor
 
     @classmethod
-    def new(cls):
+    def new(cls) -> RedactedStringStore:
         return cls(
-            salt="".join(random.choice(string.ascii_lowercase) for i in range(32))
+            salt="".join(random.choice(string.ascii_lowercase) for _ in range(32))
         )
 
     def __init__(self, salt: str):
@@ -383,7 +257,18 @@ class RedactedStringStore:
         self._hash_to_label: Dict[str, Tuple[str, int]] = {}
         self._redactions: Dict[Tuple[str, int], RedactedData] = {}
         self._lengths: Tuple[int, ...] = ()
+        self._length_to_first_chars: Dict[int, Set[str]] = {}
         self._needs_flushing = 0
+
+    def _register_length_and_first_char(self, length: int, first_char: str):
+        """Register a length and first character for efficient scanning."""
+        first_char = first_char.lower()
+        if length not in self._length_to_first_chars:
+            self._length_to_first_chars[length] = set()
+            self._lengths = tuple(
+                sorted(self._length_to_first_chars.keys(), reverse=True)
+            )
+        self._length_to_first_chars[length].add(first_char)
 
     def needs_flushing(self) -> int:
         with self._lock:
@@ -394,12 +279,14 @@ class RedactedStringStore:
             self._needs_flushing -= amount
 
     def encode(self) -> dict:
-        return {
-            "salt": self._salt,
-            "redactions": list(
-                self._redactions[k].encode() for k in sorted(self._redactions.keys())
-            ),
-        }
+        with self._lock:
+            return {
+                "salt": self._salt,
+                "redactions": [
+                    self._redactions[k].encode()
+                    for k in sorted(self._redactions.keys())
+                ],
+            }
 
     def _hash(self, s: str) -> str:
         h = hashlib.sha256()
@@ -429,7 +316,7 @@ class RedactedStringStore:
                 label_prefix=label_prefix,
                 label_index=label_index,
                 real_str=real_str,
-                hash=h,
+                hash_value=h,
                 pieces=new_pieces,
                 hint=hint,
                 length=len(real_str),
@@ -438,10 +325,7 @@ class RedactedStringStore:
             self._hash_to_label[h] = (label_prefix, label_index)
             self._label_next_index[label_prefix] = label_index + 1
             self._needs_flushing += 1
-            if data.length not in self._lengths:
-                self._lengths = tuple(
-                    sorted(self._lengths + (data.length,), reverse=True)
-                )
+            self._register_length_and_first_char(data.length, data.first_char)
             return data
 
     def redact(
@@ -450,55 +334,120 @@ class RedactedStringStore:
         assert not string.startswith("~R:"), (
             "String was already redacted, cannot redact twice."
         )
+
         if escape_char is None:
             escape_char = RedactedString.pick_escape_char(string)
-        lengths = None
+
         with self._lock:
             lengths = tuple(self._lengths)
+            length_to_first_chars = {
+                k: set(v) for k, v in self._length_to_first_chars.items()
+            }
+
         redactions: Set[RedactedData] = set()
 
         def _round(s: str) -> str:
             is_redaction = False
             offset_from_start = 0
+
             for component in s.split(escape_char):
                 if not is_redaction:
                     for relevant_len in lengths:
                         if len(component) < relevant_len:
                             continue
+                        relevant_first_chars = length_to_first_chars.get(
+                            relevant_len, set()
+                        )
                         for offset in range(0, len(component) - relevant_len + 1):
-                            substr = component[offset : offset + relevant_len]
-                            relevant_label = self._hash_to_label.get(
-                                self._hash(substr), None
-                            )
-                            if relevant_label is None:
+                            first_char = component[offset].lower()
+                            if first_char not in relevant_first_chars:
                                 continue
-                            with self._lock:
-                                redaction = self._redactions[relevant_label]
-                                if redaction.augment(real_str=substr):
-                                    self._needs_flushing += 1
-                            redactions.add(redaction)
-                            return (
-                                s[: offset_from_start + offset]
-                                + f"{escape_char}{relevant_label[0]}_{str(relevant_label[1])}{escape_char}"
-                                + s[offset_from_start + offset + relevant_len :]
-                            )
+                            substr = component[offset : offset + relevant_len]
+                            for variant in (substr, substr.lower()):
+                                h = self._hash(variant)
+                                relevant_label = self._hash_to_label.get(h)
+                                if relevant_label is None:
+                                    continue
+                                with self._lock:
+                                    redaction = self._redactions[relevant_label]
+                                    if redaction.augment(real_str=variant):
+                                        self._needs_flushing += 1
+                                redactions.add(redaction)
+                                label_str = f"{relevant_label[0]}_{relevant_label[1]}"
+                                return (
+                                    s[: offset_from_start + offset]
+                                    + f"{escape_char}{label_str}{escape_char}"
+                                    + s[offset_from_start + offset + relevant_len :]
+                                )
                 else:
-                    label_prefix, label_index_str = component.split("_", 2)
-                    label_index = int(label_index_str)
-                    with self._lock:
-                        if (label_prefix, label_index) in self._redactions:
-                            redaction = self._redactions[(label_prefix, label_index)]
-                            redactions.add(redaction)
+                    parts = component.split("_", 1)
+                    if len(parts) == 2:
+                        label_prefix = parts[0]
+                        try:
+                            label_index = int(parts[1])
+                            with self._lock:
+                                if (label_prefix, label_index) in self._redactions:
+                                    redaction = self._redactions[
+                                        (label_prefix, label_index)
+                                    ]
+                                    redactions.add(redaction)
+                        except ValueError:
+                            raise ValueError(f"Invalid label: {component}")
 
                 is_redaction = not is_redaction
                 offset_from_start += len(component) + len(escape_char)
+
             return s
 
         new_string = _round(string)
         while new_string != string:
             string = new_string
             new_string = _round(string)
+
         return string, frozenset(redactions)
+
+
+class RedactedString:
+    _POSSIBLE_ESCAPE_CHARS = "~+!@#$%^&*:;?.,`|-/"
+
+    @classmethod
+    def pick_escape_char(cls, real_str: str) -> str:
+        for c in cls._POSSIBLE_ESCAPE_CHARS:
+            if c not in real_str:
+                return c
+        raise ValueError("Cannot find an escape character in string: %r" % (real_str,))
+
+    @classmethod
+    def from_real(cls, real_str: str, redactor: RedactedStringStore) -> RedactedString:
+        escape_char = cls.pick_escape_char(real_str)
+        return cls(
+            redactor=redactor,
+            redacted_str=f"~R:{escape_char}{real_str}",
+        )
+
+    @classmethod
+    def decode(
+        cls, encoded_redacted_str: str, redactor: RedactedStringStore
+    ) -> RedactedString:
+        return cls(redactor=redactor, redacted_str=encoded_redacted_str)
+
+    def __init__(self, redactor: RedactedStringStore, redacted_str: str):
+        assert redacted_str.startswith("~R:") and len(redacted_str) >= 4
+        self._redactor = redactor
+        self._escape_character = redacted_str[3]
+        self._payload = redacted_str[4:]
+
+    def __str__(self):
+        return self.encode()
+
+    def __repr__(self):
+        return repr(str(self))
+
+    def encode(self) -> str:
+        redacted, _ = self._redactor.redact(
+            string=self._payload, escape_char=self._escape_character
+        )
+        return f"~R:{self._escape_character}{redacted}"
 
 
 class WalletCaptureContext(enum.StrEnum):
@@ -508,38 +457,13 @@ class WalletCaptureContext(enum.StrEnum):
     POST_BODY = "POST_BODY"
 
 
-class UserInfo(enum.StrEnum):
-    TRACKING_IDENTIFIER = "TRACKING_IDENTIFIER"
-    PSEUDONYM = "PSEUDONYM"
-    LEGAL_NAME = "LEGAL_NAME"
-    EMAIL = "EMAIL"
-    PHONE = "PHONE"
-    BROWSING_HISTORY_URLS = "BROWSING_HISTORY_URLS"
-    CONTACTS = "CONTACTS"
-    PHYSICAL_ADDRESS = "PHYSICAL_ADDRESS"
-    FACE = "FACE"
-    CEX_ACCOUNT = "CEX_ACCOUNT"
-    GOVERNMENT_ID = "GOVERNMENT_ID"
-    X_DOT_COM_ACCOUNT = "X_DOT_COM_ACCOUNT"
-    FARCASTER_ACCOUNT = "FARCASTER_ACCOUNT"
-    USER_ACTIONS = "USER_ACTIONS"
-    ACCOUNT_ADDRESS = "ACCOUNT_ADDRESS"
-    BALANCE = "BALANCE"
-    ASSETS = "ASSETS"
-    MEMPOOL_TRANSACTIONS = "MEMPOOL_TRANSACTIONS"
-    WALLET_CONNECTED_DOMAINS = "WALLET_CONNECTED_DOMAINS"
-
-    def label_prefix(self) -> str:
-        if self == self.ACCOUNT_ADDRESS:
-            return "addr"
-        return self.value.lower().replace("_", "")
-
-
 class UserDataPieces:
     @classmethod
-    def decode(cls, flow: WalletCaptureFlow, data: Union[dict, str]) -> UserDataPieces:
+    def decode(
+        cls, redactor: RedactedStringStore, data: Union[dict, str]
+    ) -> UserDataPieces:
         if isinstance(data, str):
-            pieces = set()
+            pieces: Set[UserInfo] = set()
             encoded_redacted_str = data
         else:
             pieces_list = []
@@ -554,56 +478,37 @@ class UserDataPieces:
         return cls(
             pieces=frozenset(pieces),
             sample=RedactedString.decode(
-                encoded_redacted_str=encoded_redacted_str, redactor=flow.redactor
+                encoded_redacted_str=encoded_redacted_str, redactor=redactor
             ),
         )
 
     @classmethod
     def classify_str(
-        cls, data: str, flow: WalletCaptureFlow, context: WalletCaptureContext
+        cls, data: str, redactor: RedactedStringStore, context: WalletCaptureContext
     ) -> UserDataPieces:
-        pieces = set()
-        for p in UserInfo:
-            for extracted in p.extract(data=data, flow=flow, context=context):
-                pieces.add(p)
-                flow.redactor.add(
-                    real_str=extracted,
-                    label_prefix=p.label_prefix(),
-                    piece=p,
-                    hint=p.hint(extracted),
-                )
         return cls(
-            pieces=frozenset(pieces),
-            sample=RedactedString.from_real(real_str=data, redactor=flow.redactor),
+            pieces=frozenset(),
+            sample=RedactedString.from_real(real_str=data, redactor=redactor),
         )
-
-    @classmethod
-    def classify_dict(
-        cls,
-        data: Dict[str, str],
-        flow: WalletCaptureFlow,
-        context: WalletCaptureContext,
-    ) -> Dict[str, UserDataPieces]:
-        return {
-            k: cls.classify_str(data=v, flow=flow, context=context)
-            for k, v in data.items()
-        }
 
     @classmethod
     def classify_multidict(
         cls,
         data: Dict[str, Union[str, List[str]]],
-        flow: WalletCaptureFlow,
+        redactor: RedactedStringStore,
         context: WalletCaptureContext,
     ) -> Dict[str, Tuple[UserDataPieces, ...]]:
         classified = {}
         for k, v in data.items():
             if isinstance(v, list):
                 classified[k] = tuple(
-                    cls.classify_str(data=s, flow=flow, context=context) for s in v
+                    cls.classify_str(data=s, redactor=redactor, context=context)
+                    for s in v
                 )
             else:
-                classified[k] = (cls.classify_str(data=v, flow=flow, context=context),)
+                classified[k] = (
+                    cls.classify_str(data=v, redactor=redactor, context=context),
+                )
         return classified
 
     def __init__(self, pieces: FrozenSet[UserInfo], sample: RedactedString):
@@ -623,6 +528,7 @@ class UserDataPieces:
     def encode(self):
         if len(self._pieces) == 0:
             return self._sample.encode()
+
         data = {
             "sample": self._sample.encode(),
         }
@@ -638,22 +544,24 @@ class UserDataPieces:
 
 class WalletRequest:
     @classmethod
-    def decode(cls, data: dict, flow: WalletCaptureFlow):
+    def decode(cls, data: dict, redactor: RedactedStringStore):
         def _decode_if_set(k):
-            return UserDataPieces.decode(flow=flow, data=data[k]) if k in data else None
+            if k not in data:
+                return None
+            return UserDataPieces.decode(redactor=redactor, data=data[k])
 
         def _decode_str_multidict(k):
             decoded = {}
-            for k, v in data.get(k, {}).items():
+            for key, v in data.get(k, {}).items():
                 if isinstance(v, list):
-                    decoded[k] = tuple(
-                        UserDataPieces.decode(flow=flow, data=x) for x in v
+                    decoded[key] = tuple(
+                        UserDataPieces.decode(redactor=redactor, data=x) for x in v
                     )
                 else:
-                    decoded[k] = (UserDataPieces.decode(flow=flow, data=v),)
+                    decoded[key] = (UserDataPieces.decode(redactor=redactor, data=v),)
             return decoded
 
-        json_rpc_method = ()
+        json_rpc_method: Tuple[str, ...] = ()
         if "jsonRpcMethod" in data:
             if isinstance(data["jsonRpcMethod"], list):
                 json_rpc_method = tuple(data["jsonRpcMethod"])
@@ -661,7 +569,7 @@ class WalletRequest:
                 json_rpc_method = (data["jsonRpcMethod"],)
 
         return cls(
-            flow=flow,
+            redactor=redactor,
             domain=data["domain"],
             path=data["path"],
             query=_decode_str_multidict("query"),
@@ -672,14 +580,15 @@ class WalletRequest:
             odd_headers=_decode_str_multidict("oddHeaders"),
             odd_trailers=_decode_str_multidict("oddTrailers"),
             session_time=data["sessionTime"],
-            review=data.get("review", None),
+            review=data.get("review"),
         )
 
     @classmethod
-    def from_request(cls, flow: WalletCaptureFlow, req: http.Request):
-        session_time = flow.wallet_data.session_time()
+    def from_request(
+        cls, redactor: RedactedStringStore, req: http.Request, session_time: int
+    ):
         url = urllib.parse.urlparse(req.url)
-        json_rpc_method = ()
+        json_rpc_method: Tuple[str, ...] = ()
         text = req.get_text()
         if text is not None and text == "":
             text = None
@@ -700,39 +609,46 @@ class WalletRequest:
         referer_domain: Optional[str] = None
         if "Referer" in req.headers:
             referer_domain = urllib.parse.urlparse(req.headers["Referer"]).hostname
+
         return cls(
-            flow=flow,
+            redactor=redactor,
             domain=url.hostname,
             path=url.path,
             query=UserDataPieces.classify_multidict(
-                req.query, flow=flow, context=WalletCaptureContext.QUERY
+                dict(req.query.items(multi=True))
+                if hasattr(req.query, "items")
+                else {},
+                redactor=redactor,
+                context=WalletCaptureContext.QUERY,
             ),
             json_rpc_method=json_rpc_method,
-            content=UserDataPieces.classify_str(
-                text, flow=flow, context=WalletCaptureContext.POST_BODY
-            )
-            if text is not None
-            else None,
+            content=(
+                UserDataPieces.classify_str(
+                    text, redactor=redactor, context=WalletCaptureContext.POST_BODY
+                )
+                if text is not None
+                else None
+            ),
             cookies=UserDataPieces.classify_multidict(
-                req.cookies, flow=flow, context=WalletCaptureContext.COOKIE
+                dict(req.cookies.items(multi=True))
+                if hasattr(req.cookies, "items")
+                else {},
+                redactor=redactor,
+                context=WalletCaptureContext.COOKIE,
             ),
             referer_domain=referer_domain,
             odd_headers=UserDataPieces.classify_multidict(
-                {
-                    k: v
-                    for k, v in (req.headers or {}).items()
-                    if not is_benign_header(k)
-                },
-                flow=flow,
+                {k: v for k, v in req.headers.items() if not is_benign_header(k)},
+                redactor=redactor,
                 context=WalletCaptureContext.OTHER_HEADER,
             ),
             odd_trailers=UserDataPieces.classify_multidict(
-                {
-                    k: v
-                    for k, v in (req.trailers or {}).items()
-                    if not is_benign_header(k)
-                },
-                flow=flow,
+                (
+                    {k: v for k, v in req.trailers.items() if not is_benign_header(k)}
+                    if req.trailers
+                    else {}
+                ),
+                redactor=redactor,
                 context=WalletCaptureContext.OTHER_HEADER,
             ),
             session_time=session_time,
@@ -741,7 +657,7 @@ class WalletRequest:
 
     def __init__(
         self,
-        flow: WalletCaptureFlow,
+        redactor: RedactedStringStore,
         domain: str,
         path: str,
         query: Dict[str, Tuple[UserDataPieces, ...]],
@@ -754,7 +670,7 @@ class WalletRequest:
         session_time: int,
         review: Optional[object],
     ):
-        self._flow = flow
+        self._redactor = redactor
         self._domain = domain
         self._path = path
         self._query = query
@@ -789,7 +705,15 @@ class WalletRequest:
             "" if self._referer_domain is None else f" referer={self._referer_domain}"
         )
         content = "" if self._content is None else f" content={str(self._content)}"
-        return f"{self._domain}: {self._path}{_maybe_multidict('query', self._query)}{json_rpc}{content}{_maybe_multidict('cookie', self._cookies)}{referer_domain}{_maybe_multidict('headers', self._odd_headers)}{_maybe_multidict('trailers', self._odd_trailers)}"
+        return (
+            f"{self._domain}: {self._path}"
+            f"{_maybe_multidict('query', self._query)}"
+            f"{json_rpc}{content}"
+            f"{_maybe_multidict('cookie', self._cookies)}"
+            f"{referer_domain}"
+            f"{_maybe_multidict('headers', self._odd_headers)}"
+            f"{_maybe_multidict('trailers', self._odd_trailers)}"
+        )
 
     def encode(self):
         data = {
@@ -806,24 +730,194 @@ class WalletRequest:
                 if len(v) == 1:
                     encoded[k] = v[0].encode()
                 else:
-                    encoded[k] = list(x.encode() for x in v)
+                    encoded[k] = [x.encode() for x in v]
             data[name] = encoded
 
         _encode_multidict("query", self._query)
+
         if len(self._json_rpc_method) == 1:
             data["jsonRpcMethod"] = self._json_rpc_method[0]
         elif len(self._json_rpc_method) > 1:
             data["jsonRpcMethod"] = list(self._json_rpc_method)
+
         if self._content is not None:
             data["content"] = self._content.encode()
+
         _encode_multidict("cookies", self._cookies)
+
         if self._referer_domain is not None:
             data["refererDomain"] = self._referer_domain
+
         _encode_multidict("oddHeaders", self._odd_headers)
         _encode_multidict("oddTrailers", self._odd_trailers)
+
         if self._review is not None:
             data["review"] = self._review
+
         return data
+
+
+class WalletCaptureFlow:
+    @classmethod
+    def decode(cls, redactor: RedactedStringStore, flow: str, data: dict):
+        flow_obj = cls(flow=flow, redactor=redactor)
+        for r in data.get("requests", []):
+            flow_obj._add_decoded(WalletRequest.decode(data=r, redactor=redactor))
+        return flow_obj
+
+    def __init__(self, flow: Union[UxFlow, str], redactor: RedactedStringStore):
+        self._flow = flow
+        self._redactor = redactor
+        self._requests: List[WalletRequest] = []
+        self._needs_flushing = 0
+        self._lock = threading.Lock()
+
+    @property
+    def redactor(self) -> RedactedStringStore:
+        return self._redactor
+
+    def _add_decoded(self, wallet_request: WalletRequest):
+        """Add a request that was decoded from file (doesn't increment flush counter)."""
+        with self._lock:
+            self._requests.append(wallet_request)
+
+    def add(self, wallet_request: WalletRequest):
+        """Add a new request (increments flush counter)."""
+        with self._lock:
+            self._requests.append(wallet_request)
+            self._needs_flushing += 1
+
+    def needs_flushing(self) -> int:
+        with self._lock:
+            return self._needs_flushing
+
+    def mark_flushed(self, amount: int):
+        with self._lock:
+            self._needs_flushing -= amount
+
+    def encode(self):
+        with self._lock:
+            return {
+                "requests": [r.encode() for r in self._requests],
+            }
+
+
+class WalletCaptureFile:
+    def __init__(self, path: str):
+        self.path = path
+        self._session_start = time.time()
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        if not os.path.exists(self.path):
+            with open(self.path, "w") as f:
+                f.write("{}")
+        with open(self.path, "r") as f:
+            try:
+                data = json.load(f)
+            except json.decoder.JSONDecodeError as e:
+                if os.path.getsize(self.path) > 2:
+                    raise e
+                data = {}  # Empty file, reset data.
+        if "redactions" in data:
+            self._redactor = RedactedStringStore.decode(data["redactions"])
+        else:
+            self._redactor = RedactedStringStore.new()
+
+        self._flows: Dict[str, Union[WalletCaptureFlow, str]] = {}
+        for flow_name, flow_data in data.get("flows", {}).items():
+            if isinstance(flow_data, str) and flow_data == "NOT_SUPPORTED":
+                self._flows[flow_name] = "NOT_SUPPORTED"
+            else:
+                self._flows[flow_name] = WalletCaptureFlow.decode(
+                    redactor=self._redactor, flow=flow_name, data=flow_data
+                )
+
+        self._session_number: int = data.get("sessions", 0) + 1
+        self._needs_flushing = 0
+        self._lock = threading.Lock()
+
+    @property
+    def redactor(self) -> RedactedStringStore:
+        return self._redactor
+
+    def session_time(self) -> int:
+        """Session time as a session-start-relative timestamp."""
+        return self._session_number * 1_000_000_000 + int(
+            1_000 * (time.time() - self._session_start)
+        )
+
+    def flow(self, flow: UxFlow) -> WalletCaptureFlow:
+        with self._lock:
+            flow_key = str(flow)
+            if flow_key not in self._flows:
+                self._flows[flow_key] = WalletCaptureFlow(
+                    flow=flow, redactor=self._redactor
+                )
+                self._needs_flushing += 1
+            elif (
+                isinstance(self._flows[flow_key], str)
+                and self._flows[flow_key] == "NOT_SUPPORTED"
+            ):
+                # Override NOT_SUPPORTED with a new flow
+                self._flows[flow_key] = WalletCaptureFlow(
+                    flow=flow, redactor=self._redactor
+                )
+                self._needs_flushing += 1
+
+            result = self._flows[flow_key]
+            assert isinstance(result, WalletCaptureFlow)
+            return result
+
+    def flush(self):
+        with self._lock:
+            # Calculate total pending changes
+            total_needs_flushing = (
+                self._needs_flushing + self._redactor.needs_flushing()
+            )
+            for f in self._flows.values():
+                if isinstance(f, WalletCaptureFlow):
+                    total_needs_flushing += f.needs_flushing()
+
+            if total_needs_flushing == 0:
+                return
+
+            logging.info(f"Flushing data to {self.path}.")
+
+            # Capture current flush amounts
+            file_flush_amount = self._needs_flushing
+            redactor_flush_amount = self._redactor.needs_flushing()
+            per_flow_amounts = [
+                (f, f.needs_flushing())
+                for f in self._flows.values()
+                if isinstance(f, WalletCaptureFlow)
+            ]
+
+            # Write to temp file then rename for atomicity
+            with open(self.path + ".tmp", "w") as f:
+                json.dump(
+                    {
+                        "flows": {
+                            flow_name: (
+                                "NOT_SUPPORTED"
+                                if isinstance(flow, str) and flow == "NOT_SUPPORTED"
+                                else flow.encode()
+                            )
+                            for flow_name, flow in self._flows.items()
+                        },
+                        "redactions": self._redactor.encode(),
+                        "sessions": self._session_number,
+                    },
+                    f,
+                    indent=2,
+                )
+                f.write("\n")
+
+            os.rename(self.path + ".tmp", self.path)
+
+            # Mark as flushed
+            self._needs_flushing -= file_flush_amount
+            self._redactor.mark_flushed(redactor_flush_amount)
+            for f, amount in per_flow_amounts:
+                f.mark_flushed(amount)
 
 
 class WalletDataCollectionAddon:
@@ -833,6 +927,7 @@ class WalletDataCollectionAddon:
         self._wallet_variant: Optional[str] = None
         self._current_ux_flow: Optional[UxFlow] = None
         self._wallet_data: Optional[WalletCaptureFile] = None
+        self._configured = False
         self._data_path = os.path.join(
             os.path.dirname(
                 os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -842,7 +937,7 @@ class WalletDataCollectionAddon:
         self._lock = threading.Lock()
         self._flush_thread = None
 
-    def _wallet_collection_path(self):
+    def _wallet_collection_path(self) -> str:
         assert self._wallet_id is not None and self._wallet_variant is not None
         return os.path.join(
             self._data_path,
@@ -854,40 +949,33 @@ class WalletDataCollectionAddon:
 
     def configure(self, updated):
         if "wallet_type" in updated:
-            assert self._wallet_type is None, (
-                "Tried to update wallet_type twice; please restart mitmproxy instead."
-            )
             self._wallet_type = ctx.options.wallet_type
-
         if "wallet_variant" in updated:
-            assert self._wallet_variant is None, (
-                "Tried to update wallet_variant twice; please restart mitmproxy instead."
-            )
             self._wallet_variant = ctx.options.wallet_variant
-
         if "wallet_id" in updated:
-            assert self._wallet_id is None, (
-                "Tried to update wallet_id twice; please restart mitmproxy instead."
-            )
             self._wallet_id = ctx.options.wallet_id
-            if not os.path.exists(self._wallet_collection_path()):
-                os.makedirs(
-                    os.path.dirname(self._wallet_collection_path()), exist_ok=True
-                )
-                with open(self._wallet_collection_path(), "w") as f:
-                    f.write("{}")
-            self._wallet_data = WalletCaptureFile(
-                path=self._wallet_collection_path(),
-            )
-
         if "ux_flow" in updated:
-            assert self._current_ux_flow is None, (
-                "Tried to update ux_flow twice; please restart mitmproxy instead."
-            )
-            assert ctx.options.ux_flow in UxFlow, (
-                f"Invalid ux_flow: {repr(ctx.options.ux_flow)}. Must be one of the following: {', '.join(str(f) for f in UxFlow)}."
-            )
-            self._current_ux_flow = UxFlow[ctx.options.ux_flow]
+            ux_flow_value = ctx.options.ux_flow
+            if ux_flow_value:
+                valid_flows = [str(f) for f in UxFlow]
+                assert ux_flow_value in valid_flows, (
+                    f"Invalid ux_flow: {repr(ux_flow_value)}. "
+                    f"Must be one of: {', '.join(valid_flows)}."
+                )
+                self._current_ux_flow = UxFlow[ux_flow_value]
+        if (
+            self._wallet_id is not None
+            and self._wallet_variant is not None
+            and self._wallet_type is not None
+        ):
+            if self._wallet_data is not None:
+                assert self._wallet_data.path == self._wallet_collection_path(), (
+                    "Wallet options and capture file path changed incompatibly"
+                )
+            else:
+                self._wallet_data = WalletCaptureFile(
+                    path=self._wallet_collection_path()
+                )
 
     def load(self, loader: Loader):
         loader.add_option("wallet_id", str, "", "Wallet ID.")
@@ -902,7 +990,7 @@ class WalletDataCollectionAddon:
             "ux_flow",
             str,
             "",
-            f"Wallet UX flow being exercised. Must be one of the following: {', '.join(str(f) for f in UxFlow)}.",
+            f"Wallet UX flow being exercised. Must be one of: {', '.join(str(f) for f in UxFlow)}.",
         )
 
     def running(self):
@@ -911,17 +999,19 @@ class WalletDataCollectionAddon:
         )
         with self._lock:
             if self._flush_thread is None:
-                self._flush_thread = threading.Thread(target=self._background)
+                self._flush_thread = threading.Thread(
+                    target=self._background, daemon=True
+                )
                 self._flush_thread.start()
 
     def _background(self):
-        loop = True
-        while loop:
+        running = True
+        while running:
             time.sleep(0.2)
             if self._wallet_data is not None:
                 self._wallet_data.flush()
             with self._lock:
-                loop = self._flush_thread is not None
+                running = self._flush_thread is not None
 
     def done(self):
         thr = None
@@ -929,8 +1019,10 @@ class WalletDataCollectionAddon:
             if self._flush_thread is not None:
                 thr = self._flush_thread
                 self._flush_thread = None
+
         if thr is not None:
             thr.join()
+
         if self._wallet_data is not None:
             self._wallet_data.flush()
 
@@ -942,9 +1034,10 @@ class WalletDataCollectionAddon:
         host = req.host
         req.anticache()
         req.constrain_encoding()
-        data_flow = self._wallet_data.flow(self._current_ux_flow)
-        wallet_data_req = WalletRequest.from_request(flow=data_flow, req=req)
-        data_flow.add(wallet_data_req)
+        wallet_data_req = WalletRequest.from_request(
+            redactor=self._wallet_data.redactor, req=req, session_time=self._wallet_data.session_time()
+        )
+        self._wallet_data.flow(self._current_ux_flow).add(wallet_data_req)
         logging.info("[%s] %s", host, wallet_data_req)
 
 

@@ -191,6 +191,7 @@ export const imtoken: SoftwareWallet = {
 				[Variant.MOBILE]: null,
 			},
 			dataCollection: {
+				[UserFlow.INSTALL]: null,
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [],
 				},

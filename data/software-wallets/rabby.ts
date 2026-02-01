@@ -305,6 +305,7 @@ export const rabby: SoftwareWallet = {
 			},
 			dataCollection: {
 				[Variant.BROWSER]: {
+					[UserFlow.INSTALL]: null,
 					[UserFlow.NATIVE_SWAP]: {
 						collected: [],
 					},

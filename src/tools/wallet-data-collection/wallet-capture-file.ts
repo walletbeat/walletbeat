@@ -272,6 +272,12 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		cookies = parseEncodedMultiDict(obj.cookies, `${at}.cookies`)
 	}
 
+	let refererDomain: string | undefined
+
+	if (obj.refererDomain !== undefined) {
+		refererDomain = expectString(obj.refererDomain, `${at}.refererDomain`)
+	}
+
 	let oddHeaders: EncodedMultiDict | undefined
 
 	if (obj.oddHeaders !== undefined) {
@@ -314,6 +320,7 @@ function parseWalletDataRequest(v: unknown, at: string): EncodedWalletDataReques
 		sessionTime,
 		...(query && Object.keys(query).length ? { query } : {}),
 		...(cookies && Object.keys(cookies).length ? { cookies } : {}),
+		...(refererDomain ? { refererDomain } : {}),
 		...(oddHeaders && Object.keys(oddHeaders).length ? { oddHeaders } : {}),
 		...(oddTrailers && Object.keys(oddTrailers).length ? { oddTrailers } : {}),
 		...(content ? { content } : {}),
@@ -1574,6 +1581,21 @@ export class WalletCaptureFile {
 	}
 
 	public check(): WalletCaptureIssue[] {
+		if (recordedFlow.items.map(this.getFlow.bind(this)).every(v => v === null)) {
+			return [
+				new WalletCaptureIssue({
+					section: ['Capture'],
+					issue: 'No network capture data for this wallet.',
+					suggestions: [
+						{
+							suggestion: 'Start capturing data for the IDLE_PRE_INSTALL flow.',
+							subcommand: `capture --flow=${RecordedOnlyFlow.IDLE_PRE_INSTALL}`,
+						},
+					],
+				}),
+			]
+		}
+
 		const issues: WalletCaptureIssue[] = []
 		let numUnreviewedRequests = 0
 		const allDomains = new Set<string>()

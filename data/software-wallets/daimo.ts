@@ -191,6 +191,7 @@ export const daimo: SoftwareWallet = {
 		privacy: {
 			appIsolation: appConnectionNotSupported,
 			dataCollection: {
+				[UserFlow.INSTALL]: null,
 				[UserFlow.APP_CONNECTION]: 'FLOW_NOT_SUPPORTED',
 				[UserFlow.NATIVE_SWAP]: 'FLOW_NOT_SUPPORTED',
 				[UserFlow.SEND_ETHER]: {
