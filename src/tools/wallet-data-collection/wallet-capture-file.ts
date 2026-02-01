@@ -1511,7 +1511,9 @@ export class WalletCaptureFile {
 	private toJSON(): EncodedWalletCaptureFile {
 		const flowsOut: Record<string, EncodedWalletCaptureFlow | 'NOT_SUPPORTED'> = {}
 
-		for (const [flowName, flow] of Object.entries(this.flows)) {
+		for (const flowName of Object.keys(this.flows)) {
+			const flow = this.flows[recordedFlow.assert(flowName)]
+
 			if (!flow) {
 				continue
 			}
@@ -1715,13 +1717,20 @@ export class WalletCaptureFile {
 		return this.annotations.matches(request)
 	}
 
-	public addRequestMatcher(matcher: WalletRequestMatcher): NonEmptyArray<WalletRequest> {
+	public addRequestMatcher(
+		matcher: WalletRequestMatcher,
+		force: boolean,
+	): NonEmptyArray<WalletRequest> {
 		const matched: WalletRequest[] = []
 
 		for (const f of recordedFlow.items) {
 			const flow = this.getFlow(f)
 
 			if (flow === null) {
+				if (force) {
+					continue
+				}
+
 				throw new Error(`Cannot add request matchers until all flows are recorded; missing: ${f}`)
 			}
 

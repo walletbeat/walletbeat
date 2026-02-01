@@ -645,7 +645,7 @@ export function hintForUserInfo(str: string, userInfo: UserInfo): string {
 			case 8:
 				return s.substring(0, 2) + '****' + s.substring(6, 2)
 			default:
-				return s.substring(0, 2) + '...' + s.substring(s.length - 2, 2)
+				return s.substring(0, 2) + '...' + s.substring(s.length - 2)
 		}
 	}
 

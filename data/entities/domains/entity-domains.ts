@@ -55,9 +55,9 @@ function entityIdForDomain(domain: string): EntityId | null {
 		return domainToEntityIdMapping[domain]
 	}
 
-	for (const domain of Object.keys(domainToEntityIdMapping)) {
-		if (domain.endsWith('.' + domain)) {
-			return assertEntityId(domainToEntityIdMapping[domain])
+	for (const d of Object.keys(domainToEntityIdMapping)) {
+		if (domain.endsWith('.' + d)) {
+			return assertEntityId(domainToEntityIdMapping[d])
 		}
 	}
 

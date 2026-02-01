@@ -2,6 +2,7 @@ import { ackee } from '@/data/entities/ackee'
 import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
+import { deBank } from '@/data/entities/debank'
 import type { Entity } from '@/schema/entity'
 
 /**
@@ -13,6 +14,7 @@ export const allEntities = {
 	alphabet,
 	ambire: ambireEntity,
 	apple,
+	debank: deBank,
 }
 
 /** A valid Entity ID. */

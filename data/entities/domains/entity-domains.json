@@ -1,4 +1,12 @@
 {
+	"apple.com": "apple",
+	"debank.com": "debank",
+	"google-analytics.com": "alphabet",
 	"google.com": "alphabet",
-	"apple.com": "apple"
+	"googleapis.com": "alphabet",
+	"googletagmanager.com": "alphabet",
+	"googleusercontent.com": "alphabet",
+	"gstatic.com": "alphabet",
+	"gvt1.com": "alphabet",
+	"rabby.io": "debank"
 }

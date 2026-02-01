@@ -167,6 +167,24 @@ function stringListOption(x: unknown): NonEmptyArray<string> {
 	return split
 }
 
+function booleanOption(x: unknown): boolean {
+	if (x === undefined) {
+		throw new Error('flag not specified')
+	}
+
+	if (typeof x !== 'string') {
+		throw new Error(`not a string (got ${typeof x})`)
+	}
+
+	const lower = x.toLowerCase()
+
+	if (lower !== 'true' && lower !== 'yes' && lower !== 'false' && lower !== 'no') {
+		throw new Error(`"${x}": not a valid boolean (want either "true" or "false")`)
+	}
+
+	return lower == 'true' || lower === 'yes'
+}
+
 function numberOption(x: unknown): number {
 	if (x === undefined) {
 		throw new Error('flag not specified')
@@ -300,7 +318,7 @@ class Options<T extends object> {
 			const option = this.fields[fieldName]
 
 			if (option === undefined) {
-				throw new Error(`unexpected field ${wantFieldName}`)
+				throw new Error(`unexpected field ${wantFieldName.toString()}`)
 			}
 
 			try {
@@ -308,7 +326,7 @@ class Options<T extends object> {
 
 				result = { [fieldName]: processed, ...result }
 			} catch (e) {
-				throw new Error(`Flag --${wantFieldName}: ${getErrorMessage(e)}`)
+				throw new Error(`Flag --${wantFieldName.toString()}: ${getErrorMessage(e)}`)
 			}
 		}
 
@@ -425,6 +443,7 @@ export interface ExplainRequestOptions extends GlobalOptions {
 	path: string | null
 	method: string | null
 	purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
+	force: boolean | null
 }
 
 export const explainRequestOptions = new Options<ExplainRequestOptions>(
@@ -440,6 +459,7 @@ export const explainRequestOptions = new Options<ExplainRequestOptions>(
 				'',
 			),
 		),
+		force: optionalOption(booleanOption),
 	},
 	globalOptions,
 )
@@ -813,6 +833,7 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 			method: opts.method,
 			purposes: opts.purposes,
 		}),
+		opts.force ?? false,
 	)
 
 	await capture.save()

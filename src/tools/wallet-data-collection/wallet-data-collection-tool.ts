@@ -122,7 +122,7 @@ cli
 		'Mark requests matching selectors as being done for specific purposes',
 	)
 	.usage(
-		"explain-request --domain=example.com [--path=...] [--method=...] --purposes='<purposes>|NOT_WALLET_INITIATED'" +
+		"explain-request --domain=example.com [--path=...] [--method=...] --purposes='<purposes>|NOT_WALLET_INITIATED' [--force=true]" +
 			trimWhitespacePrefix(`
 				Mark requests matching selectors as being done for specific purposes.
 				Use \`--purposes=NOT_WALLET_INITIATED\` if these requests were not initiated by the wallet,
@@ -141,6 +141,7 @@ cli
 		'--purposes <purposes>|NOT_WALLET_INITIATED',
 		'Comma-separated set of request purposes, or NOT_WALLET_INITIATED if the request was not initiated by the wallet.',
 	)
+	.option('--force <true|false>', 'Add this request matcher even if capture is not complete.')
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' explain-request --domain='infura.io' --method='eth_getBalance' --purposes='CHAIN_DATA_LOOKUP'",
 	)

@@ -294,40 +294,6 @@ class RedactedStringStore:
         h.update(s.encode("utf-8"))
         return h.hexdigest()
 
-    def add(
-        self,
-        real_str: str,
-        label_prefix: str,
-        piece: Optional[UserInfo],
-        hint: Optional[str],
-    ) -> RedactedData:
-        assert len(real_str) > 0, "Tried to add empty string"
-        h = self._hash(real_str)
-        new_pieces = frozenset((piece,)) if piece is not None else frozenset()
-        with self._lock:
-            if h in self._hash_to_label:
-                data = self._redactions[self._hash_to_label[h]]
-                if data.augment(real_str=real_str, pieces=new_pieces, hint=hint):
-                    self._needs_flushing += 1
-                return data
-            label_index = self._label_next_index.get(label_prefix, 1)
-            data = RedactedData(
-                redactor=self,
-                label_prefix=label_prefix,
-                label_index=label_index,
-                real_str=real_str,
-                hash_value=h,
-                pieces=new_pieces,
-                hint=hint,
-                length=len(real_str),
-            )
-            self._redactions[(label_prefix, label_index)] = data
-            self._hash_to_label[h] = (label_prefix, label_index)
-            self._label_next_index[label_prefix] = label_index + 1
-            self._needs_flushing += 1
-            self._register_length_and_first_char(data.length, data.first_char)
-            return data
-
     def redact(
         self, string: str, escape_char: Optional[str] = None
     ) -> Tuple[str, FrozenSet[RedactedData]]:
