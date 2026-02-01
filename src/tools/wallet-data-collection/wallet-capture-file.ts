@@ -74,6 +74,7 @@ type EncodedRedactedData = {
 	labelPrefix: string
 	labelIndex: number
 	hash: string
+	origHash?: string
 	length: number
 	firstChar: string
 	hint?: string
@@ -444,6 +445,7 @@ export class RedactedData {
 	public realStr: string | null
 
 	public readonly hash: string
+	public origHash: string
 	public pieces: NonEmptySet<UserInfo>
 	public hint: string | null
 	public readonly length: number
@@ -455,6 +457,7 @@ export class RedactedData {
 		labelIndex: number
 		realStr: string | null
 		hash: string
+		origHash: string | null
 		pieces: NonEmptySet<UserInfo>
 		hint: string | null
 		length: number
@@ -469,6 +472,7 @@ export class RedactedData {
 		this.labelIndex = args.labelIndex
 		this.realStr = args.realStr
 		this.hash = args.hash
+		this.origHash = args.origHash === null ? args.hash : args.origHash
 		this.pieces = args.pieces
 		this.hint = args.hint
 		this.length = args.realStr != null ? args.realStr.length : args.length
@@ -497,6 +501,7 @@ export class RedactedData {
 			labelIndex: data.labelIndex,
 			realStr: null,
 			hash: data.hash,
+			origHash: data.origHash ?? null,
 			pieces,
 			hint: data.hint ?? null,
 			length: data.length,
@@ -510,6 +515,7 @@ export class RedactedData {
 		labelIndex: number
 		realStr: string
 		hash: string
+		origHash: string | null
 		pieces: NonEmptySet<UserInfo>
 		hint: string | null
 	}): RedactedData {
@@ -517,14 +523,13 @@ export class RedactedData {
 			throw new Error('Cannot redact the empty string')
 		}
 
-		// TODO: Normalize realStr.
-
 		return new RedactedData({
 			redactor: args.redactor,
 			labelPrefix: args.labelPrefix,
 			labelIndex: args.labelIndex,
 			realStr: args.realStr,
 			hash: args.hash,
+			origHash: args.origHash,
 			pieces: args.pieces,
 			hint: args.hint,
 			length: args.realStr.length,
@@ -544,6 +549,7 @@ export class RedactedData {
 	 */
 	public augment(args: {
 		realStr?: string
+		origHash?: string
 		pieces?: NonEmptySet<UserInfo>
 		hint?: string
 	}): boolean {
@@ -558,6 +564,14 @@ export class RedactedData {
 			assert(args.realStr.length === this.length, 'Length mismatch')
 			assert(args.realStr[0].toLowerCase() === this.firstChar, 'First character mismatch')
 			this.realStr = args.realStr
+		}
+
+		if (args.origHash != undefined) {
+			if (this.origHash != args.origHash) {
+				assert(this.origHash === args.origHash, 'origHash mismatch')
+			}
+
+			this.origHash = args.origHash
 		}
 
 		if (args.pieces !== undefined) {
@@ -586,6 +600,7 @@ export class RedactedData {
 			labelPrefix: this.labelPrefix,
 			labelIndex: this.labelIndex,
 			hash: this.hash,
+			...(this.origHash === this.hash ? {} : { origHash: this.origHash }),
 			length: this.length,
 			firstChar: this.firstChar,
 			...(setItems(this.pieces).length === 1
@@ -716,6 +731,7 @@ export class RedactedStringStore {
 		pieces: NonEmptySet<UserInfo>
 		hint?: string
 	}): NonEmptyArray<RedactedData> {
+		const origHash = this.hash(realStr)
 		const normalizedStrs = new Set<string>()
 
 		normalizedStrs.add(realStr)
@@ -740,7 +756,7 @@ export class RedactedStringStore {
 			if (existingLabel) {
 				const existing = this.getRedaction(existingLabel.labelPrefix, existingLabel.labelIndex)
 
-				existing.augment({ realStr: str, pieces, hint })
+				existing.augment({ realStr: str, origHash, pieces, hint })
 				redacted.push(existing)
 				continue
 			}
@@ -754,6 +770,7 @@ export class RedactedStringStore {
 				labelIndex,
 				realStr: str,
 				hash: h,
+				origHash: origHash,
 				pieces,
 				hint: hint === undefined ? null : hint,
 			})

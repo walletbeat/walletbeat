@@ -117,6 +117,7 @@ class RedactedData:
             label_index=data["labelIndex"],
             real_str=None,
             hash_value=data["hash"],
+            orig_hash=data["origHash"],
             pieces=frozenset(pieces),
             hint=data.get("hint"),
             length=data["length"],
@@ -130,6 +131,7 @@ class RedactedData:
         label_index: int,
         real_str: Optional[str],
         hash_value: str,
+        orig_hash: Optional[str],
         pieces: FrozenSet[UserInfo],
         hint: Optional[str],
         length: int,
@@ -140,6 +142,7 @@ class RedactedData:
         self.label_index = label_index
         self.real_str = real_str
         self.hash = hash_value
+        self.orig_hash = orig_hash if orig_hash is not None else self.hash
         self.pieces = pieces
         self.hint = hint
         self.length = len(real_str) if real_str is not None else length
@@ -169,6 +172,7 @@ class RedactedData:
     def augment(
         self,
         real_str: Optional[str] = None,
+        orig_hash: Optional[str] = None,
         pieces: Optional[FrozenSet[UserInfo]] = None,
         hint: Optional[str] = None,
     ) -> bool:
@@ -178,7 +182,13 @@ class RedactedData:
             assert self.real_str is None or self.real_str == real_str, "Hash collision"
             assert len(real_str) == self.length, "Length mismatch"
             assert real_str[0].lower() == self.first_char, "First character mismatch"
+            changed = changed or self.real_str != real_str
             self.real_str = real_str
+
+        if orig_hash is not None:
+            assert self.orig_hash == self.hash or self.orig_hash == orig_hash, "Mismatching orig_hash"
+            changed = changed or self.orig_hash != orig_hash
+            self.orig_hash = orig_hash
 
         if pieces is not None:
             new_pieces = set(self.pieces)
@@ -211,7 +221,8 @@ class RedactedData:
             data["piece"] = sorted_pieces[0]
         elif len(sorted_pieces) > 1:
             data["pieces"] = sorted_pieces
-
+        if self.orig_hash != self.hash:
+            data["origHash"] = self.orig_hash
         if self.hint is not None:
             data["hint"] = self.hint
 
