@@ -390,6 +390,7 @@ Issued At: ${new Date().toISOString()}`;
   function createEIPTestContext(): EIPTestContext {
     return {
       getDiscoveredProviders: () => stepTestState.discoveredProviders,
+      getSelectedProviderId: () => stepTestState.selectedProviderId,
       getConnectedAddress: () => stepTestState.connectedAddress,
       getChainId: () => stepTestState.chainId,
       getBatchId: () => stepTestState.batchId,
@@ -664,6 +665,7 @@ Issued At: ${new Date().toISOString()}`;
           {stepTestState}
           onRunStep={runCurrentStep}
           onReset={resetStepTests}
+          onSelectProvider={(providerId) => { stepTestState.selectedProviderId = providerId; }}
         />
       {/if}
     </div>

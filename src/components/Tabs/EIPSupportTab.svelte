@@ -15,15 +15,17 @@
       overallStatus: 'idle' | 'in_progress' | 'completed' | 'failed';
       stepResults: Record<string, StepResult>;
       discoveredProviders: Array<DiscoveredProvider & { provider: unknown }>;
+      selectedProviderId: string | null;
       connectedAddress: string | null;
       chainId: number | null;
       batchId: string | null;
     };
     onRunStep: () => void;
     onReset: () => void;
+    onSelectProvider: (providerId: string) => void;
   }
 
-  let { currentStep, currentStepResult, stepTestState, onRunStep, onReset }: Props =
+  let { currentStep, currentStepResult, stepTestState, onRunStep, onReset, onSelectProvider }: Props =
     $props();
 
   const isRunning = $derived(currentStepResult?.status === 'running');
@@ -159,10 +161,19 @@
       <div class="providers-section" data-column="gap-2">
         <span class="section-label">
           Discovered Providers ({stepTestState.discoveredProviders.length}):
+          {#if stepTestState.discoveredProviders.length > 1}
+            <span class="section-hint">Click to select which provider to test</span>
+          {/if}
         </span>
         <div class="providers-list" data-column="gap-2">
           {#each stepTestState.discoveredProviders as provider (provider.uuid)}
-            <div class="provider-item">
+            {@const isSelected = stepTestState.selectedProviderId === provider.uuid}
+            <button
+              type="button"
+              class="provider-item"
+              class:selected={isSelected}
+              onclick={() => onSelectProvider(provider.uuid)}
+            >
               <div class="provider-header" data-row="gap-2 start">
                 {#if provider.icon}
                   <img src={provider.icon} alt={provider.name} class="provider-icon" />
@@ -171,8 +182,11 @@
                   <div class="provider-name">{provider.name}</div>
                   <div class="provider-rdns">{provider.rdns}</div>
                 </div>
+                {#if isSelected}
+                  <span class="selected-badge">Selected</span>
+                {/if}
               </div>
-            </div>
+            </button>
           {/each}
         </div>
       </div>
@@ -478,10 +492,49 @@
     margin-top: 0.5rem;
   }
 
+  .section-hint {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-left: 0.5rem;
+  }
+
   .provider-item {
+    width: 100%;
     padding: 0.5rem;
     background: color-mix(in srgb, var(--background-primary) 50%, transparent);
+    border: 1px solid transparent;
     border-radius: 0.375rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+  }
+
+  .provider-item:hover {
+    background: color-mix(in srgb, var(--background-secondary) 70%, transparent);
+    border-color: var(--border-color);
+  }
+
+  .provider-item.selected {
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    border-color: var(--accent);
+  }
+
+  .provider-header {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .selected-badge {
+    margin-left: auto;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    background: var(--accent);
+    color: white;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    text-transform: uppercase;
   }
 
   .provider-icon {

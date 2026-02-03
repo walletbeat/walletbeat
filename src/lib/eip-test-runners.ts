@@ -16,6 +16,7 @@ import { isRecord } from '../types/utils/assertions'
 export interface EIPTestContext {
 	// State accessors
 	getDiscoveredProviders: () => Array<DiscoveredProvider & { provider: unknown }>
+	getSelectedProviderId: () => string | null
 	getConnectedAddress: () => string | null
 	getChainId: () => number | null
 	getBatchId: () => string | null
@@ -29,7 +30,34 @@ export interface EIPTestContext {
 }
 
 /**
- * Get the EIP-1193 provider from window.ethereum
+ * Get the EIP-1193 provider - either the selected provider from EIP-6963 discovery
+ * or fallback to window.ethereum
+ */
+export function getProviderFromContext(ctx: EIPTestContext): Eip1193Provider | null {
+	const selectedId = ctx.getSelectedProviderId()
+	const discoveredProviders = ctx.getDiscoveredProviders()
+
+	// If a provider is selected, use it
+	if (selectedId) {
+		const selected = discoveredProviders.find(p => p.uuid === selectedId)
+
+		if (selected?.provider) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- provider from EIP-6963 is EIP-1193 compliant
+			return selected.provider as Eip1193Provider
+		}
+	}
+
+	// Fallback to window.ethereum
+	if (typeof window !== 'undefined' && 'ethereum' in window) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- window.ethereum is the EIP-1193 provider
+		return window.ethereum as Eip1193Provider
+	}
+
+	return null
+}
+
+/**
+ * Get the EIP-1193 provider from window.ethereum (legacy fallback)
  */
 export function getProvider(): Eip1193Provider | null {
 	if (typeof window !== 'undefined' && 'ethereum' in window) {
@@ -190,7 +218,7 @@ export async function runStep1Detection(step: TestStep, ctx: EIPTestContext): Pr
 
 	// EIP-1193 basic checks
 	const eip1193Checks: EIPCheckResult[] = []
-	const rawProvider = getProvider()
+	const rawProvider = getProviderFromContext(ctx)
 	const providerExists = !!rawProvider || hasProviders
 
 	eip1193Checks.push({
@@ -231,7 +259,7 @@ export async function runStep2Connect(step: TestStep, ctx: EIPTestContext): Prom
 	const eipResults: EIPTestResult[] = []
 	const eip1193Checks: EIPCheckResult[] = []
 
-	const provider = getProvider()
+	const provider = getProviderFromContext(ctx)
 
 	if (!provider) {
 		return createStepResult(step, 'failed', [], 'No provider found')
@@ -372,7 +400,7 @@ export async function runStep3Account(step: TestStep, ctx: EIPTestContext): Prom
 	const eipResults: EIPTestResult[] = []
 	const eip1193Checks: EIPCheckResult[] = []
 
-	const provider = getProvider()
+	const provider = getProviderFromContext(ctx)
 
 	if (!provider) {
 		return createStepResult(step, 'failed', [], 'No provider found')
@@ -470,7 +498,7 @@ export async function runStep3Account(step: TestStep, ctx: EIPTestContext): Prom
 export async function runStep4Network(step: TestStep, ctx: EIPTestContext): Promise<StepResult> {
 	const eipResults: EIPTestResult[] = []
 
-	const provider = getProvider()
+	const provider = getProviderFromContext(ctx)
 
 	if (!provider) {
 		return createStepResult(step, 'failed', [], 'No provider found')
@@ -598,7 +626,7 @@ export async function runStep5BatchSend(step: TestStep, ctx: EIPTestContext): Pr
 	const eipResults: EIPTestResult[] = []
 	const eip5792Checks: EIPCheckResult[] = []
 
-	const provider = getProvider()
+	const provider = getProviderFromContext(ctx)
 
 	if (!provider) {
 		return createStepResult(step, 'failed', [], 'No provider found')
@@ -770,7 +798,7 @@ export async function runStep6BatchStatus(
 	const eipResults: EIPTestResult[] = []
 	const eip5792Checks: EIPCheckResult[] = []
 
-	const provider = getProvider()
+	const provider = getProviderFromContext(ctx)
 
 	if (!provider) {
 		return createStepResult(step, 'failed', [], 'No provider found')
