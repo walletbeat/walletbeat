@@ -313,9 +313,9 @@ export const testSteps: TestStep[] = [
 						critical: true,
 					},
 					{
-						id: 'has-atomic-field',
-						name: 'Atomic field present',
-						description: 'Response includes atomic field indicating execution type',
+						id: 'atomic-batch-execution',
+						name: 'Atomic batch execution',
+						description: 'Wallet executes batches atomically (all-or-nothing)',
 						critical: false,
 					},
 					{
