@@ -644,6 +644,7 @@ export async function runStep5BatchSend(step: TestStep, ctx: EIPTestContext): Pr
 	let capabilitiesPassed = false
 	let atomicitySupported = false
 	let capabilitiesDetail = ''
+	let detectedVersion: string | null = null
 
 	try {
 		const capabilities = await provider.request({
@@ -664,6 +665,21 @@ export async function runStep5BatchSend(step: TestStep, ctx: EIPTestContext): Pr
 
 				if (isRecord(atomicBatch)) {
 					atomicitySupported = atomicBatch['supported'] === true
+				}
+
+				// Check for version support in capabilities
+				const sendCalls = chainCapabilities['wallet_sendCalls']
+
+				if (isRecord(sendCalls) && Array.isArray(sendCalls['supportedVersions'])) {
+					const rawVersions = sendCalls['supportedVersions']
+					// Validate that all elements are strings
+					const versions = rawVersions.filter((v): v is string => typeof v === 'string')
+
+					if (versions.includes('2.0.0')) {
+						detectedVersion = '2.0.0'
+					} else if (versions.includes('1.0.0') || versions.length > 0) {
+						detectedVersion = versions[0]
+					}
 				}
 			}
 		}
@@ -687,60 +703,119 @@ export async function runStep5BatchSend(step: TestStep, ctx: EIPTestContext): Pr
 		detail: atomicitySupported ? 'Atomic batching supported' : 'Not supported or not declared',
 	})
 
-	// Actually send batched calls
+	// Actually send batched calls - try v2.0.0 first, fallback to v1.0.0 if needed
 	let sendCallsPassed = false
 	let sendCallsDetail = ''
+	let usedVersion = detectedVersion || '2.0.0'
 
-	try {
+	// Helper to send calls with a specific version format
+	const trySendCalls = async (version: string): Promise<string | null> => {
+		const chainIdHex = chainId ? `0x${chainId.toString(16)}` : '0x1'
+
+		// v2.0.0 format includes version and atomicRequired fields
+		// v1.0.0 format is simpler without these fields
+		const params =
+			version === '2.0.0'
+				? {
+						version: '2.0.0',
+						chainId: chainIdHex,
+						from: connectedAddress,
+						atomicRequired: false,
+						calls: [
+							{
+								to: '0x0000000000000000000000000000000000000000',
+								data: '0x00',
+								value: '0x0',
+							},
+						],
+					}
+				: {
+						// v1.0.0 format (no version field, no atomicRequired)
+						chainId: chainIdHex,
+						from: connectedAddress,
+						calls: [
+							{
+								to: '0x0000000000000000000000000000000000000000',
+								data: '0x',
+								value: '0x0',
+							},
+						],
+					}
+
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
 		const result = (await provider.request({
 			method: 'wallet_sendCalls',
-			params: [
-				{
-					version: '2.0.0',
-					chainId: chainId ? `0x${chainId.toString(16)}` : '0x1',
-					from: connectedAddress,
-					atomicRequired: false, // Required for EIP-5792 v2.0.0
-					calls: [
-						{
-							to: '0x0000000000000000000000000000000000000000',
-							data: '0x00',
-							value: '0x0',
-						},
-					],
-				},
-			],
+			params: [params],
 		})) as string | { id: string }
 
-		// Handle both string and object response formats
-		let batchId: string
-
 		if (typeof result === 'string') {
-			batchId = result
+			return result
 		} else if (result && typeof result === 'object' && 'id' in result) {
-			batchId = result.id
-		} else {
-			throw new Error('Unexpected response format from wallet_sendCalls')
+			return result.id
+		}
+
+		return null
+	}
+
+	try {
+		// Try with preferred version first
+		let batchId = await trySendCalls(usedVersion)
+
+		// If v2.0.0 fails with version error, try v1.0.0
+		if (!batchId && usedVersion === '2.0.0') {
+			try {
+				usedVersion = '1.0.0'
+				batchId = await trySendCalls('1.0.0')
+			} catch {
+				// v1.0.0 fallback also failed, will report original error
+			}
 		}
 
 		if (batchId) {
 			sendCallsPassed = true
 			ctx.setBatchId(batchId)
-			sendCallsDetail = `Batch ID: ${batchId.slice(0, 16)}...`
+			sendCallsDetail = `Batch ID: ${batchId.slice(0, 16)}... (v${usedVersion})`
+		} else {
+			sendCallsDetail = 'Unexpected response format from wallet_sendCalls'
 		}
 	} catch (error) {
 		const errorMsg = error instanceof Error ? error.message : 'Unknown error'
 
-		// Check if it's a user rejection vs method not supported
-		if (errorMsg.toLowerCase().includes('reject') || errorMsg.toLowerCase().includes('denied')) {
-			sendCallsDetail = 'User rejected the transaction'
-		} else if (
-			errorMsg.toLowerCase().includes('not supported') ||
-			errorMsg.toLowerCase().includes('not implemented')
+		// If v2.0.0 fails, try v1.0.0 fallback
+		if (
+			usedVersion === '2.0.0' &&
+			(errorMsg.toLowerCase().includes('version') ||
+				errorMsg.toLowerCase().includes('invalid') ||
+				errorMsg.toLowerCase().includes('unsupported'))
 		) {
-			sendCallsDetail = 'wallet_sendCalls not supported by this wallet'
-		} else {
-			sendCallsDetail = errorMsg
+			try {
+				usedVersion = '1.0.0'
+				const batchId = await trySendCalls('1.0.0')
+
+				if (batchId) {
+					sendCallsPassed = true
+					ctx.setBatchId(batchId)
+					sendCallsDetail = `Batch ID: ${batchId.slice(0, 16)}... (v1.0.0 fallback)`
+				}
+			} catch (fallbackError) {
+				const fallbackMsg = fallbackError instanceof Error ? fallbackError.message : 'Unknown error'
+
+				sendCallsDetail = `v2.0.0 failed, v1.0.0 fallback also failed: ${fallbackMsg}`
+			}
+		}
+
+		if (!sendCallsPassed) {
+			// Check if it's a user rejection vs method not supported
+			if (errorMsg.toLowerCase().includes('reject') || errorMsg.toLowerCase().includes('denied')) {
+				sendCallsDetail = 'User rejected the transaction'
+			} else if (
+				errorMsg.toLowerCase().includes('not supported') ||
+				errorMsg.toLowerCase().includes('not implemented')
+			) {
+				sendCallsDetail = 'wallet_sendCalls not supported by this wallet'
+			} else {
+				sendCallsDetail = errorMsg
+			}
 		}
 	}
 
