@@ -8,6 +8,8 @@ pragma solidity 0.8.24;
  * @dev This contract mints ERC20 and ERC721 tokens via external calls to test wallet transaction simulation
  */
 contract WalletbeatTestContract {
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
     error WalletbeatTestContract__ERC20CallFailed();
     error WalletbeatTestContract__ERC721CallFailed();
 
@@ -57,11 +59,13 @@ contract WalletbeatTestContract {
      * @notice Replicates malicious airdrop claims that drain a user's assets.
      * @dev This function simulates a malicious call to `burn(address)` on the ERC20 token,
      * which burns all tokens held by the user.
+     * `Transfer` event is also emitted 
      */
     function claim() external {
         (bool success,) = i_erc20Token.call(abi.encodeWithSignature("burn(address)", msg.sender));
         if (!success) {
             revert WalletbeatTestContract__ERC20CallFailed();
         }
+        emit Transfer(address(0), msg.sender, FAKE_TOKENS_TO_CLAIM);
     }
 }
