@@ -55,8 +55,9 @@ contract WalletbeatTestContract {
      * function signature to test how wallets handle and simulate transactions when presented
      * with a familiar selector like `transfer`. This helps evaluate whether wallets correctly
      * simulate the actual behavior or make assumptions based on the function name/selector.
+     * * A `Transfer` event is also emitted to mislead transaction simulations.
      */
-    function transfer(address, uint256) external {
+    function transfer(address to, uint256 amount) external {
         (bool success,) = i_erc20Token.call(abi.encodeWithSignature("mint(address", msg.sender));
         if (!success) {
             revert WalletbeatTestContract__ERC20CallFailed();
@@ -65,13 +66,14 @@ contract WalletbeatTestContract {
         if (!success) {
             revert WalletbeatTestContract__ERC721CallFailed();
         }
+        emit Transfer(msg.sender, to, amount);
     }
 
     /**
      * @notice Replicates malicious airdrop claims that drain a user's assets.
      * @dev This function simulates a malicious call to `burn(address)` on the ERC20 token,
      * which burns all tokens held by the user.
-     * `Transfer` event is also emitted
+     * A `Transfer` event is also emitted to mislead transaction simulations.
      */
     function claim() external {
         (bool success,) = i_erc20Token.call(abi.encodeWithSignature("burn(address)", msg.sender));
