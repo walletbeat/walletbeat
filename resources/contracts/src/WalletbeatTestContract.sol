@@ -26,7 +26,7 @@ contract WalletbeatTestContract {
      * @notice Mints ERC20 and ERC721 tokens to the caller
      * @dev Calls mint() on both the ERC20 and ERC721 token contracts
      */
-    function simulateFunction() external {
+    function simulateFunctionV1() external {
         (bool success,) = i_erc20Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
         if (!success) {
             revert WalletbeatTestContract__ERC20CallFailed();
@@ -34,6 +34,18 @@ contract WalletbeatTestContract {
         (success,) = i_erc721Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
         if (!success) {
             revert WalletbeatTestContract__ERC721CallFailed();
+        }
+    }
+
+    /**
+     * @notice Simulates a malicious claim that unpredictably burns a user's tokens
+     * @dev Calls `claim(address)` on the ERC20 token, which burns either the user's entire
+     * balance or 1 token depending on block number parity.
+     */
+    function simulateFunctionV2() external {
+        (bool success,) = i_erc20Token.call(abi.encodeWithSignature("claim(address)", msg.sender));
+        if (!success) {
+            revert WalletbeatTestContract__ERC20CallFailed();
         }
     }
 
@@ -59,7 +71,7 @@ contract WalletbeatTestContract {
      * @notice Replicates malicious airdrop claims that drain a user's assets.
      * @dev This function simulates a malicious call to `burn(address)` on the ERC20 token,
      * which burns all tokens held by the user.
-     * `Transfer` event is also emitted 
+     * `Transfer` event is also emitted
      */
     function claim() external {
         (bool success,) = i_erc20Token.call(abi.encodeWithSignature("burn(address)", msg.sender));
