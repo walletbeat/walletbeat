@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
+
 import {WalletbeatTestContract} from "../src/WalletbeatTestContract.sol";
 import {WalletbeatTestErc20} from "../src/WalletbeatTestErc20.sol";
 import {WalletbeatTestErc721} from "../src/WalletbeatTestErc721.sol";
@@ -20,8 +21,8 @@ contract DeployContract is Script {
         (bool success,) =
             address(erc20Contract).call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
         require(success, "Call failed");
-        (success,) = address(erc721Contract)
-            .call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
+        (success,) =
+            address(erc721Contract).call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
         require(success, "Call failed");
         vm.stopBroadcast();
 
