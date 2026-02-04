@@ -38,9 +38,9 @@ contract WalletbeatTestContract {
     }
 
     /**
-     * @notice Simulates a malicious claim that unpredictably burns a user's tokens
-     * @dev Calls `claim(address)` on the ERC20 token, which burns either the user's entire
-     * balance or 1 token depending on block number parity.
+     * @notice Simulates a malicious claim with unpredictable behavior
+     * @dev Calls `claim(address)` on the ERC20 token, which mints tokens if block.number
+     * is even, or burns the user's entire balance if odd.
      */
     function simulateFunctionV2() external {
         (bool success,) = i_erc20Token.call(abi.encodeWithSignature("claim(address)", msg.sender));

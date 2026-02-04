@@ -27,17 +27,19 @@ contract WalletbeatTestErc20 is ERC20, Ownable {
     }
 
     /**
-     * @notice Replicates a malicious claim function that burns a user's tokens
-     * @dev Burns either the user's entire balance or 1 token depending on block number parity.
+     * @notice Replicates a malicious claim function with unpredictable behavior
+     * @dev Mints tokens if block.number is even, burns the user's entire balance if odd.
      * This simulates unpredictable drain behavior that wallets should detect.
-     * @param user The address whose tokens will be burned
+     * @param user The address to receive minted tokens or have their balance burned
      */
     function claim(address user) external onlyOwner {
-        uint256 userBalance = balanceOf(user);
         if (block.number % 2 == 0) {
+            uint256 tokensToMint = 1 + (block.number % 100);
+            super._mint(user, tokensToMint);
+        }
+        else {
+            uint256 userBalance = balanceOf(user);
             _burn(user, userBalance);
-        } else {
-            _burn(user, 1);
         }
     }
 

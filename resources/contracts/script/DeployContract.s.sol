@@ -21,8 +21,8 @@ contract DeployContract is Script {
         (bool success,) =
             address(erc20Contract).call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
         require(success, "Call failed");
-        (success,) =
-            address(erc721Contract).call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
+        (success,) = address(erc721Contract)
+            .call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
         require(success, "Call failed");
         vm.stopBroadcast();
 
