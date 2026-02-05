@@ -38,11 +38,11 @@
   function getStepButtonText(): string {
     if (isRunning) return 'Running...';
 
-    if (stepStatus === 'passed') return 'Step Passed ✓';
+    if (stepStatus === 'passed') return 'Step Passed ✅';
 
-    if (stepStatus === 'partial') return 'Step Partial ⚠';
+    if (stepStatus === 'partial') return 'Step Partial ⚠️';
 
-    if (stepStatus === 'failed') return 'Retry Step';
+    if (stepStatus === 'failed') return 'Retry Step 🔄';
 
     return 'Run Step';
   }
