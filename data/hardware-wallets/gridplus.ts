@@ -184,6 +184,7 @@ export const gridplusWallet: HardwareWallet = {
 						notSupported,
 				},
 				messageSigningLegibility: null,
+				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

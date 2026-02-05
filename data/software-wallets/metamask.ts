@@ -444,6 +444,7 @@ export const metamask: SoftwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
+				transactionSimulation: null,
 			},
 		},
 		selfSovereignty: {

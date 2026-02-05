@@ -163,6 +163,7 @@ export const ngrave: HardwareWallet = {
 				},
 				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,
+				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

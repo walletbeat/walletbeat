@@ -215,6 +215,7 @@ export const keystoneWallet: HardwareWallet = {
 						notSupported,
 				},
 				messageSigningLegibility: null,
+				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

@@ -230,6 +230,7 @@ export const bitboxWallet: HardwareWallet = {
 				},
 				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,
+				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

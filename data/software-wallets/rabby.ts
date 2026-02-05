@@ -637,6 +637,7 @@ export const rabby: SoftwareWallet = {
 				calldataDisplay: null,
 				messageSigningLegibility: null,
 				transactionDetailsDisplay: displaysFullTransactionDetails,
+				transactionSimulation: null,
 			},
 		},
 		selfSovereignty: {

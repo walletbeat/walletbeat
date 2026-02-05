@@ -185,6 +185,7 @@ export const trezorWallet: HardwareWallet = {
 				},
 				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,
+				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

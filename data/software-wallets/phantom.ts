@@ -146,6 +146,7 @@ export const phantom: SoftwareWallet = {
 					to: DataDisplayOptions.SHOWN_OPTIONALLY,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
+				transactionSimulation: null,
 			},
 		},
 		selfSovereignty: {

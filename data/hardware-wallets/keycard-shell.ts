@@ -243,6 +243,7 @@ export const keycardShell: HardwareWallet = {
 					}),
 				},
 				messageSigningLegibility: null,
+				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

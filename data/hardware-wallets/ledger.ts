@@ -194,6 +194,7 @@ export const ledgerWallet: HardwareWallet = {
 				detailsDisplayed: displaysFullTransactionDetails,
 				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,
+				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

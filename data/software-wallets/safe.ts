@@ -275,6 +275,7 @@ export const safe: SoftwareWallet = {
 				calldataDisplay: displaysFullCallData,
 				messageSigningLegibility: null,
 				transactionDetailsDisplay: displaysFullTransactionDetails,
+				transactionSimulation: null,
 			},
 		},
 		selfSovereignty: {

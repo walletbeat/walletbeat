@@ -182,6 +182,7 @@ export const imkeyWallet: HardwareWallet = {
 						notSupported,
 				},
 				messageSigningLegibility: null,
+				transactionSimulation: null,
 			},
 			userSafety: null,
 		},
