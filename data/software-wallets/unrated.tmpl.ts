@@ -1,9 +1,5 @@
 import { exampleContributor } from '@/data/contributors/example'
 import { WalletProfile } from '@/schema/features/profile'
-import {
-	DataDisplayOptions,
-	MessageSigningDetails,
-} from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
