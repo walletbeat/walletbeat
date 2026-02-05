@@ -356,6 +356,42 @@ export interface CallDataDisplay {
 	formatted: boolean
 }
 
+/**
+ * Does the wallet simulate transactions properly?
+ */
+export interface TransactionSimulation {
+	/**
+	 * Does the wallet simulate sending and receiving Ether accurately?
+	 */
+	sendReceiveEther: boolean
+	/**
+	 * Does the wallet simulate sending and receiving ERC-20 tokens accurately?
+	 */
+	sendReceiveErc20: boolean
+	/**
+	 * Does the wallet simulate sending and receiving ERC-721 NFTs accurately?
+	 */
+	sendReceiveERC721: boolean
+	/**
+	 * Does the wallet simulate complex contract interactions beyond simple transfers
+	 * (e.g., swaps, liquidity provisioning, staking)?
+	 */
+	contractInteractions: boolean
+	/**
+	 * Does the wallet detect when a transaction will revert before submission?
+	 */
+	detectsFailure: boolean
+	/**
+	 * In the case of a transaction result depending highly on execution state,
+	 * does the wallet detect multiple outcomes?
+	 */
+	detectsOutcomeVariance: boolean
+	/**
+	 * Does the wallet warn the user when outcome variance is detected?
+	 */
+	warnsOnVariance: boolean
+}
+
 export const displaysFullCallData: CallDataDisplay = {
 	rawHex: true,
 	copyHexToClipboard: true,
@@ -379,6 +415,11 @@ export interface SoftwareTransactionLegibilitySupport {
 	 * What message signing data does the software wallet provide?
 	 */
 	messageSigningLegibility: SoftwareMessageSigningLegibility | null
+
+	/**
+	 * Does the wallet simulates transaction properly?
+	 */
+	transactionSimulation: TransactionSimulation | null
 }
 
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
