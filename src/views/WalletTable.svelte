@@ -219,6 +219,40 @@
 		)
 	)
 
+	const walletRanks = $derived.by(() => {
+		const scores = wallets.map(wallet => ({
+			walletId: wallet.metadata.id,
+			score: calculateOverallScore(
+				wallet.overall,
+				ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),
+			)?.score ?? null
+		}))
+		
+		// Sort by score descending, then by name ascending for ties
+		const sorted = scores.toSorted((a, b) => {
+			if (a.score === null && b.score === null) return 0
+			if (a.score === null) return 1
+			if (b.score === null) return -1
+			if (a.score !== b.score) return b.score - a.score
+			// Tie-breaker: sort by wallet name
+			const walletA = wallets.find(w => w.metadata.id === a.walletId)!
+			const walletB = wallets.find(w => w.metadata.id === b.walletId)!
+			return walletA.metadata.displayName.localeCompare(walletB.metadata.displayName)
+		})
+		
+		// Assign ranks (handle ties)
+		const rankMap = new Map<string, number>()
+		let currentRank = 1
+		for (let i = 0; i < sorted.length; i++) {
+			if (i > 0 && sorted[i].score !== sorted[i-1].score) {
+				currentRank = i + 1
+			}
+			rankMap.set(sorted[i].walletId, currentRank)
+		}
+		
+		return rankMap
+	})
+
 
 	// Functions
 	import { variantToName } from '@/constants/variants'
@@ -529,16 +563,59 @@
 					)
 
 					return [
+						// Rank column
 						{
-							id: 'displayName',
-							name: 'Wallet',
-							value: wallet => wallet.metadata.displayName,
+							id: 'rank',
+							name: '#',
+							value: wallet => walletRanks.get(wallet.metadata.id) ?? null,
+							sort: {
+								defaultDirection: SortDirection.Ascending,
+								compare: (rankA, rankB, walletA, walletB) => {
+									// Sort by overall score when ranking
+									const scoreA = calculateOverallScore(
+										walletA.overall,
+										ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),
+									)?.score ?? null
+									const scoreB = calculateOverallScore(
+										walletB.overall,
+										ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),
+									)?.score ?? null
+									if (scoreA === null && scoreB === null) return 0
+									if (scoreA === null) return 1
+									if (scoreB === null) return -1
+									return scoreB - scoreA // Descending
+								}
+							},
+							align: ColumnAlignment.Center,
+							isSticky: true,
+						} satisfies Column<RatedWallet>,
 
+						// Icon column (no header)
+						{
+							id: 'icon',
+							name: '', // Empty header
+							value: wallet => wallet.metadata.id, // Just for identification
+							align: ColumnAlignment.Center,
+							isSticky: true,
+						} satisfies Column<RatedWallet>,
+
+						// Name column
+						{
+							id: 'name',
+							name: 'Name',
+							value: wallet => wallet.metadata.displayName,
 							sort: {
 								defaultDirection: SortDirection.Ascending,
 							},
-
+							align: ColumnAlignment.Start,
 							isSticky: true,
+						} satisfies Column<RatedWallet>,
+
+						// Tags column
+						{
+							id: 'tags',
+							name: '', // Empty header
+							value: wallet => wallet.metadata.id, // Just for identification
 						} satisfies Column<RatedWallet>,
 
 						...(hasNonApplicableStages ? [] : [{
@@ -649,206 +726,62 @@
 							{/snippet}
 						</Tooltip>
 					{/if}
-				{:else if column.id === 'displayName'}
-					{@const displayName = value}
-					{@const accountTypes = walletSupportedAccountTypes(wallet, selectedVariant ?? 'ALL_VARIANTS')}
-					{@const supportedVariants = (
-						[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
-							.filter(variant => variant in wallet.variants)
-					)}
-
+				{:else if column.id === 'rank'}
+					{@const rank = walletRanks.get(wallet.metadata.id)}
+					{#if rank !== undefined}
+						<span class="rank-number">{rank}</span>
+					{:else}
+						<span class="rank-number">–</span>
+					{/if}
+				{:else if column.id === 'icon'}
+					<img
+						alt={wallet.metadata.displayName}
+						src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
+						width="16"
+						height="16"
+						class="wallet-icon-small"
+					/>
+				{:else if column.id === 'name'}
 					{@const walletUrl = `/${wallet.metadata.id}/${selectedVariant ? `?variant=${selectedVariant}` : ''}`}
 
-					<TooltipOrAccordion
-						class="wallet-info-details"
-						bind:isExpanded={
-							() => isExpanded,
-							setIsExpanded
-						}
-						tooltipButtonTriggerPlacement="behind"
-						tooltipHoverTriggerPlacement="around"
-						showAccordionMarker
-						tooltipMaxWidth="20rem"
+					<Tooltip
+						buttonTriggerPlacement="behind"
+						hoverTriggerPlacement="around"
+						style="
+							--popover-padding: 0;
+							--popover-backgroundColor: transparent;
+							--popover-borderColor: transparent;
+						"
 					>
-						<div class="wallet-info" data-row="start">
-							<span class="row-count" data-row="center"></span>
+						<div class="wallet-name-cell">
+							<h3>
+								<a data-link="camouflaged" href={walletUrl}>{wallet.metadata.displayName}</a>
+							</h3>
+							{#if 'hardware' in wallet.variants}
+								{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
 
-							<img
-								alt={displayName}
-								src={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-								width="16"
-								height="16"
-							/>
-
-							<div class="name-and-tags" data-column="gap-2">
-								<div class="name" data-column="gap-1">
-									<div data-row="gap-3 start wrap">
-										<h3>
-											<a data-link="camouflaged" href={walletUrl}>{displayName}</a>
-										</h3>
-
-										{#if 'hardware' in wallet.variants}
-											{@const brandModels = allHardwareModels.filter(m => m.brandId === wallet.metadata.id)}
-
-											{#if brandModels.length > 1}
-												<Select
-													bind:value={
-														() => selectedModels.get(wallet.metadata.id),
-														(value) => {
-															if (value)
-																selectedModels.set(wallet.metadata.id, value)
-															else
-																selectedModels.delete(wallet.metadata.id)
-														}
-													}
-													options={[
-														{ value: undefined, label: 'All models' },
-														...brandModels.map(m => ({ value: m.id.split('.')[1], label: `${m.modelName}`, icon: m.iconUrl })),
-													]}
-												/>
-											{/if}
-										{/if}
-									</div>
-
-									{#if selectedVariant && selectedVariant in wallet.variants}
-										<div class="variant">
-											<a data-link="camouflaged" href={walletUrl}>{variants[selectedVariant].label}</a>
-										</div>
-									{/if}
-								</div>
-
-								<div class="tags" data-row="start gap-1 wrap">
-									{#each (
-										[
-											// Wallet type tags
-											hasVariant(wallet.variants, Variant.HARDWARE) && {
-												label: 'Hardware',
-												filterId: 'walletType-hardware',
-												type: 'wallet-type',
-											},
-											!hasVariant(wallet.variants, Variant.HARDWARE) && {
-												label: 'Software',
-												filterId: 'walletType-software',
-												type: 'wallet-type',
-											},
-											// Manufacture type tags
-											hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
-												label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
-												filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
-												type: 'manufacture-type',
-											},
-											// Account type tags
-											...(
-												accountTypes !== null ?
-													[
-														AccountType.eoa in accountTypes && {
-															label: 'EOA',
-															filterId: 'accountType-eoa',
-															type: 'account-type',
-														},
-														AccountType.rawErc4337 in accountTypes && {
-															label: `#${erc4337.number}`,
-															filterId: 'accountType-erc4337',
-															type: 'eip',
-															eipTooltipContent: erc4337,
-														},
-														AccountType.eip7702 in accountTypes && {
-															label: `#${eip7702.number}`,
-															filterId: 'accountType-eip7702',
-															type: 'eip',
-															eipTooltipContent: eip7702,
-														},
-														AccountType.safe in accountTypes && {
-															label: 'Safe',
-															filterId: 'accountType-safe',
-															type: 'safe',
-														},
-														AccountType.mpc in accountTypes && {
-															label: 'MPC',
-															filterId: 'accountType-mpc',
-															type: 'account-type',
-														},
-													]
-												:
-													[]
-											),
-										]
-											.filter(Boolean)
-									) as tag (tag.label)}
-										{#if tag.eipTooltipContent}
-											<Tooltip
-												placement="inline-end"
-											>
-												<div
-													data-tag={tag.type}
-													role="button"
-													tabindex="0"
-													aria-label="Filter by {tag.label}"
-													onclick={e => {
-														e.stopPropagation()
-														toggleFilterById!(tag.filterId)
-													}}
-													onkeydown={e => {
-														if (e.key !== 'Enter' && e.key !== ' ') return
-
-														e.stopPropagation()
-														toggleFilterById!(tag.filterId)
-													}}
-												>
-													{tag.label}
-												</div>
-
-												{#snippet TooltipContent()}
-													<div class="eip-tooltip-content">
-														<EipDetails
-															eip={tag.eipTooltipContent}
-														/>
-													</div>
-												{/snippet}
-											</Tooltip>
-										{:else}
-											<button
-												data-tag={tag.type}
-												aria-label="Filter by {tag.label}"
-												onclick={(e) => {
-													e.stopPropagation()
-													toggleFilterById!(tag.filterId)
-												}}
-											>
-												{tag.label}
-											</button>
-										{/if}
-									{/each}
-								</div>
-							</div>
-
-							{#if allSupportedVariants.length > 1}
-								<div class="variants" data-row="gap-1">
-									{#each supportedVariants as variant}
-										<button
-											data-selected={variant === selectedVariant ? '' : undefined}
-											aria-label={`Select ${variants[variant].label} variant`}
-											aria-pressed={variant === selectedVariant}
-											onclick={e => {
-												e.stopPropagation()
-												toggleFilterById!(`variant-${variant}`, true)
-											}}
-										>
-											<span
-												class="icon"
-												title={variants[variant].label}
-												aria-hidden="true"
-											>
-												{@html variants[variant].icon}
-											</span>
-										</button>
-									{/each}
-								</div>
+								{#if brandModels.length > 1}
+									<Select
+										bind:value={
+											() => selectedModels.get(wallet.metadata.id),
+											(value) => {
+												if (value)
+													selectedModels.set(wallet.metadata.id, value)
+												else
+													selectedModels.delete(wallet.metadata.id)
+											}
+										}
+										options={[
+											{ value: undefined, label: 'All models' },
+											...brandModels.map(m => ({ value: m.id.split('.')[1], label: `${m.modelName}`, icon: m.iconUrl })),
+										]}
+									/>
+								{/if}
 							{/if}
 						</div>
 
-						{#snippet ExpandedContent({ isInTooltip }: { isInTooltip?: boolean })}
-							<div class="wallet-summary" data-card={isInTooltip ? 'radius p-sm' : undefined} data-column="gap-4">
+						{#snippet TooltipContent()}
+							<div class="wallet-summary expanded-tooltip-content" data-card="radius p-sm" data-column="gap-4" style="max-width: 20rem;">
 								{#if selectedVariant && !wallet.variants[selectedVariant]}
 									<p>
 										{wallet.metadata.displayName} does not have a {selectedVariant} version.
@@ -874,20 +807,22 @@
 
 									<hr>
 
-									<a
-										href={isLabeledUrl(wallet.metadata.urls?.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<span aria-hidden="true">{@html GlobeIcon}</span>
-										Website
-									</a>
+									{#if wallet.metadata.urls?.websites?.[0]}
+										<a
+											href={isLabeledUrl(wallet.metadata.urls.websites[0]) ? wallet.metadata.urls.websites[0].url : wallet.metadata.urls.websites[0]}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<span aria-hidden="true">{@html GlobeIcon}</span>
+											Website
+										</a>
+									{/if}
 
-									{#if wallet.metadata.urls?.repository}
+									{#if wallet.metadata.urls?.repositories}
 										<hr>
 
 										<a
-											href={isLabeledUrl(wallet.metadata.urls.repository[0]) ? wallet.metadata.urls.repository[0].url : wallet.metadata.urls.repository[0]}
+											href={isLabeledUrl(wallet.metadata.urls.repositories[0]) ? wallet.metadata.urls.repositories[0].url : wallet.metadata.urls.repositories[0]}
 											target="_blank"
 											rel="noopener noreferrer"
 										>
@@ -898,7 +833,141 @@
 								</div>
 							</div>
 						{/snippet}
-					</TooltipOrAccordion>
+					</Tooltip>
+				{:else if column.id === 'tags'}
+					{@const accountTypes = walletSupportedAccountTypes(wallet, selectedVariant ?? 'ALL_VARIANTS')}
+					{@const supportedVariants = (
+						[Variant.BROWSER, Variant.MOBILE, Variant.DESKTOP, Variant.EMBEDDED, Variant.HARDWARE]
+							.filter(variant => variant in wallet.variants)
+					)}
+
+					<div class="tags-and-variants" data-column="start gap-1">
+						{#each (
+							[
+								// Wallet type tags
+								hasVariant(wallet.variants, Variant.HARDWARE) && {
+									label: 'Hardware',
+									filterId: 'walletType-hardware',
+									type: 'wallet-type',
+								},
+								!hasVariant(wallet.variants, Variant.HARDWARE) && {
+									label: 'Software',
+									filterId: 'walletType-software',
+									type: 'wallet-type',
+								},
+								// Manufacture type tags
+								hasVariant(wallet.variants, Variant.HARDWARE) && wallet.metadata.hardwareWalletManufactureType && {
+									label: wallet.metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.FACTORY_MADE ? 'Factory-Made' : 'DIY',
+									filterId: `manufactureType-${wallet.metadata.hardwareWalletManufactureType}`,
+									type: 'manufacture-type',
+								},
+								// Account type tags
+								...(
+									accountTypes !== null ?
+										[
+											AccountType.eoa in accountTypes && {
+												label: 'EOA',
+												filterId: 'accountType-eoa',
+												type: 'account-type',
+											},
+											AccountType.rawErc4337 in accountTypes && {
+												label: `#${erc4337.number}`,
+												filterId: 'accountType-erc4337',
+												type: 'eip',
+												eipTooltipContent: erc4337,
+											},
+											AccountType.eip7702 in accountTypes && {
+												label: `#${eip7702.number}`,
+												filterId: 'accountType-eip7702',
+												type: 'eip',
+												eipTooltipContent: eip7702,
+											},
+											AccountType.safe in accountTypes && {
+												label: 'Safe',
+												filterId: 'accountType-safe',
+												type: 'safe',
+											},
+											AccountType.mpc in accountTypes && {
+												label: 'MPC',
+												filterId: 'accountType-mpc',
+												type: 'account-type',
+											},
+										]
+									:
+										[]
+								),
+							]
+								.filter((tag): tag is { label: string; filterId: string; type: string; eipTooltipContent?: typeof erc4337 | typeof eip7702 } => Boolean(tag))
+						) as tag (tag.label)}
+							{#if tag.eipTooltipContent}
+								<Tooltip
+									placement="inline-end"
+								>
+									<div
+										data-tag={tag.type}
+										role="button"
+										tabindex="0"
+										aria-label="Filter by {tag.label}"
+										onclick={e => {
+											e.stopPropagation()
+											toggleFilterById!(tag.filterId)
+										}}
+										onkeydown={e => {
+											if (e.key !== 'Enter' && e.key !== ' ') return
+
+											e.stopPropagation()
+											toggleFilterById!(tag.filterId)
+										}}
+									>
+										{tag.label}
+									</div>
+
+									{#snippet TooltipContent()}
+										{#if tag.eipTooltipContent}
+											<div class="eip-tooltip-content">
+												<EipDetails
+													eip={tag.eipTooltipContent}
+												/>
+											</div>
+										{/if}
+									{/snippet}
+								</Tooltip>
+							{:else}
+								<button
+									data-tag={tag.type}
+									aria-label="Filter by {tag.label}"
+									onclick={(e) => {
+										e.stopPropagation()
+										toggleFilterById!(tag.filterId)
+									}}
+								>
+									{tag.label}
+								</button>
+							{/if}
+						{/each}
+
+						{#if allSupportedVariants.length > 1}
+							{#each supportedVariants as variant}
+								<button
+									data-tag="variant"
+									data-selected={variant === selectedVariant ? '' : undefined}
+									aria-label={`Select ${variants[variant].label} variant`}
+									aria-pressed={variant === selectedVariant}
+									onclick={e => {
+										e.stopPropagation()
+										toggleFilterById!(`variant-${variant}`, true)
+									}}
+								>
+									{#if variant !== Variant.MOBILE && variant !== Variant.BROWSER && variant !== Variant.DESKTOP}
+										<span class="variant-icon" aria-hidden="true">
+											{@html variants[variant].icon}
+										</span>
+									{/if}
+									<span class="variant-label">{variants[variant].label}</span>
+								</button>
+							{/each}
+						{/if}
+					</div>
 
 				{:else}
 					{@const selectedSliceId =
@@ -1430,107 +1499,56 @@
 					&:has(details:open) {
 						--table-cell-verticalAlign: top;
 					}
-				}
 
-				details.wallet-info-details {
-					summary {
-						box-sizing: content-box;
-						margin: calc(-1 * var(--table-cell-padding));
-						padding: var(--table-cell-padding);
-
-						transition-property: opacity, scale, min-block-size, padding-block-end;
-						min-block-size: var(--walletTable-rowClosed-blockSize);
+					&:has(.wallet-name-cell) {
+						max-width: 14rem;
 					}
 
-					&:open summary {
-						min-block-size: 5rem;
-						padding-block-end: 0.25rem;
+					&:has(.tags-and-variants) {
+						max-width: 12rem;
 					}
 				}
+
 			}
 		}
 	}
 
-	.wallet-info {
-		block-size: 5rem;
+	.rank-number {
+		font-weight: 600;
+		color: var(--text-secondary);
+		font-size: 0.9em;
+	}
 
-		text-align: start;
+	.wallet-icon-small {
+		filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
+		width: 1.5em;
+		height: 1.5em;
+		object-fit: contain;
+		border-radius: 0.25em;
+	}
 
-		.row-count {
-			width: 1.25em;
-			height: 1.25em;
+	.wallet-name-cell {
+		font-size: 0.85em;
+		max-width: 14rem;
 
-			text-align: center;
+		h3 {
 			font-weight: 600;
-			color: var(--text-secondary);
-
-			&::before {
-				content: counter(TableRowCount);
-			}
-
-			:global([data-disabled]) &::before {
-				content: '–';
-			}
 		}
+	}
 
-		img {
-			filter: drop-shadow(rgba(255, 255, 255, 0.1) 0px 0px 4.66667px);
-			width: 2.25em;
-			height: 2.25em;
-			object-fit: contain;
-			border-radius: 0.25em;
-		}
+	.tags-and-variants {
+		font-size: 0.85em;
+		align-items: flex-start;
 
-		.name-and-tags {
-			font-size: 0.85em;
+		button[data-tag="variant"] {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.33em;
 
-			.name {
-
-				h3 {
-					font-weight: 600;
-				}
-			}
-
-			.variant {
-				font-size: smaller;
-				opacity: 0.6;
-			}
-		}
-
-		.variants {
-			margin-inline-start: auto;
-
-			font-size: 1.25em;
-
-			button {
-				aspect-ratio: 1;
-				padding: 0.33em;
-
-				background-color: light-dark(rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.18));
-				border-radius: 50%;
-
-				transition-property: background-color, opacity;
-
-				&[data-selected] {
-					background-color: var(--accent-backgroundColor);
-					border-color: light-dark(rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.33));
-				}
-
-				&:focus {
-					border-color: var(--accent);
-				}
-
-				&:hover:not(:disabled) {
-					filter: contrast(1.25) brightness(1.1);
-				}
-
-				&:disabled {
-					opacity: 0.4;
-				}
-
-				.variants:has([data-selected]) &:not([data-selected]):not(:disabled) {
-					opacity: 0.75;
-				}
+			.variant-icon {
+				display: inline-flex;
+				width: 1em;
+				height: 1em;
 			}
 		}
 	}

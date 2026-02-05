@@ -8,15 +8,15 @@ import { type AtLeastOneVariant, hasSingleVariant, Variant } from '@/schema/vari
 
 export const variants = {
 	[Variant.BROWSER]: {
-		label: 'Browser extension',
+		label: 'Browser',
 		icon: ExtensionIcon,
 	},
 	[Variant.DESKTOP]: {
-		label: 'Desktop app',
+		label: 'Desktop',
 		icon: MonitorIcon,
 	},
 	[Variant.MOBILE]: {
-		label: 'Mobile app',
+		label: 'Mobile',
 		icon: PhoneAndroidIcon,
 	},
 	[Variant.EMBEDDED]: {

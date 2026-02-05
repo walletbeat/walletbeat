@@ -797,6 +797,15 @@
 							}
 						}
 
+						&[data-column-align='start'] .sort-label,
+						&:not([data-column-align]) .sort-label {
+							justify-content: flex-start;
+						}
+
+						&[data-column-align='end'] .sort-label {
+							justify-content: flex-end;
+						}
+
 						&:has(.sort-button:focus) {
 							outline: var(--table-outerBorderWidth) solid var(--accent);
 							outline-offset: calc(-1 * var(--table-outerBorderWidth));

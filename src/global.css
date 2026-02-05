@@ -795,6 +795,20 @@ summary {
 		--tag-hover-textColor: light-dark(oklch(0.6 0.18 145), oklch(0.85 0.15 145));
 		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.5 0.1 145));
 	}
+
+	&[data-tag~='variant'] {
+		--tag-backgroundColor: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
+		--tag-textColor: light-dark(var(--accent), rgb(187, 147, 255));
+		--tag-borderColor: light-dark(rgba(108, 36, 224, 0.2), rgba(108, 36, 224, 0.3));
+		--tag-hover-backgroundColor: light-dark(rgba(108, 36, 224, 0.12), rgba(108, 36, 224, 0.16));
+		--tag-hover-textColor: light-dark(var(--accent), rgb(187, 147, 255));
+		--tag-hover-borderColor: light-dark(rgba(108, 36, 224, 0.3), rgba(108, 36, 224, 0.4));
+
+		&[data-selected] {
+			--tag-backgroundColor: var(--accent-backgroundColor);
+			--tag-borderColor: light-dark(rgba(0, 0, 0, 0.18), rgba(255, 255, 255, 0.33));
+		}
+	}
 }
 
 [data-list],
