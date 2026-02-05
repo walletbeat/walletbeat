@@ -21,6 +21,7 @@ import {
 	type SoftwareTransactionLegibilityImplementation,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
+	type TransactionSimulation,
 } from '@/schema/features/security/transaction-legibility'
 import { isSupported } from '@/schema/features/support'
 import { popRefs, refNotNecessary, refs } from '@/schema/reference'
@@ -105,6 +106,31 @@ function evaluateHardwareMessageSigning(
 	// PASS if: EIP-712 struct OR (domainHash AND messageHash) OR safeHash
 	return hasEip712Struct || (hasDomainHash && hasMessageHash) || hasSafeHash
 }
+
+// Transaction simulation evaluation helpers
+
+/**
+ * Evaluates transaction simulation capabilities.
+ * Returns true if all simulation features are supported.
+ */
+function evaluateTransactionSimulation(
+	transactionSimulation: TransactionSimulation | null,
+): boolean {
+	if (transactionSimulation === null) {
+		return false
+	}
+
+	return (
+		transactionSimulation.sendReceiveEther &&
+		transactionSimulation.sendReceiveErc20 &&
+		transactionSimulation.sendReceiveERC721 &&
+		transactionSimulation.contractInteractions &&
+		transactionSimulation.detectsFailure &&
+		transactionSimulation.detectsOutcomeVariance &&
+		transactionSimulation.warnsOnVariance
+	)
+}
+
 // Hardware wallet detail generation helpers
 interface HardwareFeatureDetails {
 	calldataDecoding: {
@@ -482,17 +508,23 @@ interface SoftwareFeatureDetails {
 		supported: string[]
 		missing: string[]
 	}
+	transactionSimulation: {
+		supported: string[]
+		missing: string[]
+	}
 }
 
 function analyzeSoftwareFeatures({
 	calldataDisplay,
 	transactionDetailsDisplay,
 	messageSigningLegibility,
+	transactionSimulation,
 }: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
 	const details: SoftwareFeatureDetails = {
 		calldataDisplay: { supported: [], missing: [] },
 		transactionDetails: { supported: [], missing: [] },
 		messageSigning: { supported: [], missing: [] },
+		transactionSimulation: { supported: [], missing: [] },
 	}
 
 	// Analyze calldata display
@@ -560,6 +592,55 @@ function analyzeSoftwareFeatures({
 		})
 	}
 
+	// Analyze transaction simulation
+	if (transactionSimulation !== null) {
+		const simulationChecks = [
+			{
+				value: transactionSimulation.sendReceiveEther,
+				label: 'Ether transfers',
+				required: true,
+			},
+			{
+				value: transactionSimulation.sendReceiveErc20,
+				label: 'ERC-20 token transfers',
+				required: true,
+			},
+			{
+				value: transactionSimulation.sendReceiveERC721,
+				label: 'ERC-721 NFT transfers',
+				required: false,
+			},
+			{
+				value: transactionSimulation.contractInteractions,
+				label: 'Complex contract interactions',
+				required: false,
+			},
+			{
+				value: transactionSimulation.detectsFailure,
+				label: 'Revert detection',
+				required: true,
+			},
+			{
+				value: transactionSimulation.detectsOutcomeVariance,
+				label: 'Outcome variance detection',
+				required: false,
+			},
+			{
+				value: transactionSimulation.warnsOnVariance,
+				label: 'Variance warnings',
+				required: false,
+			},
+		]
+
+		simulationChecks.forEach(({ value, label }) => {
+			if (value === true) {
+				details.transactionSimulation.supported.push(label)
+			} else {
+				details.transactionSimulation.missing.push(label)
+			}
+		})
+	}
+
 	return details
 }
 
@@ -611,6 +692,22 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 		}
 	}
 
+	// Transaction Simulation section
+	if (
+		features.transactionSimulation.supported.length > 0 ||
+		features.transactionSimulation.missing.length > 0
+	) {
+		sections.push('\n**Transaction Simulation**\n')
+
+		if (features.transactionSimulation.supported.length > 0) {
+			sections.push(`✓ Supported: ${commaListFormat(features.transactionSimulation.supported)}\n`)
+		}
+
+		if (features.transactionSimulation.missing.length > 0) {
+			sections.push(`✗ Missing: ${commaListFormat(features.transactionSimulation.missing)}\n`)
+		}
+	}
+
 	return sections.join('\n')
 }
 
@@ -632,6 +729,12 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 	if (features.messageSigning.missing.length > 0) {
 		improvements.push(
 			`**Message Signing:** Add support for displaying ${commaListFormat(features.messageSigning.missing)}`,
+		)
+	}
+
+	if (features.transactionSimulation.missing.length > 0) {
+		improvements.push(
+			`**Transaction Simulation:** Add support for ${commaListFormat(features.transactionSimulation.missing)}`,
 		)
 	}
 
@@ -826,8 +929,12 @@ function evaluateSoftwareWalletTransactionLegibility(
 ): Evaluation<TransactionLegibilityValue> {
 	const { withoutRefs: transactionLegibilitySupport } = popRefs(softwareTransactionLegibility)
 
-	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility } =
-		transactionLegibilitySupport
+	const {
+		calldataDisplay,
+		transactionDetailsDisplay,
+		messageSigningLegibility,
+		transactionSimulation,
+	} = transactionLegibilitySupport
 
 	if (calldataDisplay === null || transactionDetailsDisplay === null) {
 		return unrated(transactionLegibility, brand, null)
@@ -835,6 +942,9 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 	// Evaluate message signing (PASS/FAIL only)
 	const messageSigningPasses = evaluateSoftwareMessageSigning(messageSigningLegibility)
+
+	// Evaluate transaction simulation
+	const transactionSimulationPasses = evaluateTransactionSimulation(transactionSimulation)
 
 	// Check calldata display capabilities
 	const calldataShown = calldataDisplay.rawHex
@@ -867,7 +977,8 @@ function evaluateSoftwareWalletTransactionLegibility(
 	// 4. Message signing fails, FAIL
 	// 5. If calldata is not copyable OR not formatted, PARTIAL
 	// 6. If more than 3 types of transaction details are shown but not all of them, PARTIAL
-	// 7. Otherwise, PASS (requires message signing to pass)
+	// 7. If transaction simulation fails, PARTIAL
+	// 8. Otherwise, PASS (requires message signing and transaction simulation to pass)
 	let rating: Rating
 
 	if (!calldataShown) {
@@ -889,6 +1000,9 @@ function evaluateSoftwareWalletTransactionLegibility(
 		// More than 3 types of transaction details are shown but not all of them
 		rating = Rating.PARTIAL
 	} else if (!messageSigningPasses) {
+		rating = Rating.PARTIAL
+	} else if (transactionSimulation !== null && !transactionSimulationPasses) {
+		// Transaction simulation data provided but not all features supported
 		rating = Rating.PARTIAL
 	} else {
 		rating = Rating.PASS
@@ -1009,6 +1123,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
+					transactionSimulation: null,
 					ref: refNotNecessary,
 				}),
 			),
@@ -1049,6 +1164,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
+					transactionSimulation: null,
 					ref: refNotNecessary,
 				}),
 			),
@@ -1074,6 +1190,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
+					transactionSimulation: null,
 					ref: refNotNecessary,
 				}),
 			),
