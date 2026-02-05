@@ -630,41 +630,21 @@
 							},
 
 							sort: {
+								isDefault: true,
 								defaultDirection: SortDirection.Descending,
 							},
 
 							align: ColumnAlignment.Center,
 						} satisfies Column<RatedWallet>]),
 
-						(
-							attrGroupColumns.length > 1 ?
-								{
-									id: 'overall',
-									name: 'Rating',
-									value: wallet => {
-										const overallScore = calculateOverallScore(
-											wallet.overall,
-											ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),
-										)
-										return overallScore === null ? null : overallScore.score
-									},
-
-									sort: {
-										isDefault: true,
-										defaultDirection: SortDirection.Descending,
-									},
-
-									align: ColumnAlignment.Center,
-
-									subcolumns: attrGroupColumns,
-									isDefaultExpanded: true,
-								}
-							:
-								{
-									...attrGroupColumns[0],
-									isDefaultExpanded: true,
-								}
-						),
+						// Attribute group columns (now top-level)
+						...attrGroupColumns.map((col, index) => ({
+							...col,
+							sort: {
+								...col.sort,
+								isDefault: hasNonApplicableStages && index === 0,
+							},
+						})),
 					] as Column<RatedWallet>[]
 				})()
 			}
@@ -969,7 +949,7 @@
 						{/if}
 					</div>
 
-				{:else}
+				{:else if column.id && !column.id.includes('.')}
 					{@const selectedSliceId =
 						selectedAttribute ?
 							attributeGroups.find(g => g.id in wallet.overall && selectedAttribute! in wallet.overall[g.id]) ?
@@ -992,210 +972,10 @@
 
 					{@const highlightedSliceId = selectedSliceId ?? activeSliceId}
 
-					<!-- Overall rating -->
-					{#if column.id === 'overall'}
-						{@const score =
-							calculateOverallScore(
-								wallet.overall,
-								ag => displayedAttributeGroups.some(attrGroup => attrGroup.id === ag.id),
-							)
-						}
-						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-
-						<TooltipOrAccordion
-							bind:isExpanded={
-								() => isExpanded,
-								setIsExpanded
-							}
-						>
-							{@const overallFilteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(
-								filteredAttributes.map(a => `${a.attributeGroupId}.${a.attributeId}`)
-							) : null}
-							<Pie
-								layout={PieLayout.FullTop}
-								padding={8}
-								radius={80}
-								levels={[
-									{
-										outerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.7 : 0.65,
-										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.3 : 0.1,
-										gap: 4,
-										angleGap: 0
-									},
-									{
-										outerRadiusFraction: 1,
-										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.725 : 0.675,
-										gap: 2,
-										angleGap: 0,
-									}
-								]}
-
-								slices={
-									displayedAttributeGroups.map(attrGroup => {
-										const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, wallet.overall[attrGroup.id])
-										const evalGroup = wallet.overall[attrGroup.id]
-
-										return {
-											id: `attrGroup_${attrGroup.id}`,
-											arcLabel: `${attrGroup.icon}${(groupScore !== null && groupScore.hasUnratedComponent) ? '*' : ''}`,
-											color: (
-												groupScore !== null ?
-													scoreToColor(groupScore.score)
-												:
-													'var(--rating-unrated)'
-											),
-											titleText: formatAttributeGroupTitleText(
-												attrGroup,
-												groupScore,
-												summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.ScoreDot,
-											),
-											weight: 1,
-											...evalGroup && {
-												children: (
-													evaluatedAttributesEntries(evalGroup)
-														.filter(([attributeId, attribute]) => (
-															(
-																attribute?.evaluation?.value?.rating !== Rating.EXEMPT
-																|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
-															)
-															&& (
-																overallFilteredAttributeIds === null
-																|| overallFilteredAttributeIds.has(`${attrGroup.id}.${attributeId}`)
-															)
-														))
-														.map(([attributeId, attribute]) => ({
-															id: `attrGroup_${attrGroup.id}__attr_${attributeId}`,
-															color: ratingToColor(attribute.evaluation.value.rating),
-															weight: attrGroup.attributeWeights[attributeId],
-															arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
-															titleText: formatAttributeTitleText(attribute),
-															...attribute.evaluation.value.rating === Rating.EXEMPT && {
-																opacity: 0.33,
-															},
-														}))
-												),
-											},
-										}
-									})
-								}
-
-								{highlightedSliceId}
-								onSliceClick={sliceId => {
-									const [_attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
-
-									selectedAttribute = attributeId && selectedAttribute === attributeId ? undefined : attributeId
-								}}
-								onSliceMouseEnter={sliceId => {
-									const [attributeGroupId, attributeId] = sliceId.split('__').map(part => part.split('_')[1])
-
-									activeEntityId = {
-										walletId: wallet.metadata.id,
-										attributeGroupId: attributeGroupId,
-										...(attributeId && { attributeId: attributeId }),
-									}
-								}}
-								onSliceMouseLeave={sliceId => {
-									activeEntityId = undefined
-								}}
-							>
-								{#snippet centerContentSnippet()}
-									{#if summaryVisualization === SummaryVisualization.Icon}
-										<image
-											href={`/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}`}
-											width="40"
-											height="40"
-											x="-20"
-											y="-20"
-										/>
-									{:else if summaryVisualization === SummaryVisualization.Stage}
-										{#if stage && stage !== 'NOT_APPLICABLE' && stage !== 'QUALIFIED_FOR_NO_STAGES' && ladderEvaluation}
-											{@const stageIndex = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)}
-											{@const maxStages = ladderEvaluation.ladder.stages.length}
-											{#if stageIndex >= 0}
-												<text fill={stageToColor(stageIndex, maxStages)}>
-													{stage.label}
-												</text>
-											{:else}
-												<text>❔</text>
-											{/if}
-										{:else}
-											<text>❔</text>
-										{/if}
-									{:else if summaryVisualization === SummaryVisualization.Score}
-										<text>
-											{formatScore(score)}
-										</text>
-									{:else if summaryVisualization === SummaryVisualization.ScoreDot}
-										<circle
-											r="4"
-											fill={scoreToColor(score === null ? null : score.score)}
-										>
-											{#if score !== null && score.hasUnratedComponent}
-												<title>
-													*contains unrated components
-												</title>
-											{/if}
-										</circle>
-									{/if}
-								{/snippet}
-							</Pie>
-
-							{#snippet ExpandedContent({ isInTooltip }: { isInTooltip?: boolean })}
-								{@const displayedAttribute = (
-									activeEntityId?.walletId === wallet.metadata.id ?
-										activeEntityId?.attributeId ?
-											wallet.overall[activeEntityId.attributeGroupId]?.[activeEntityId.attributeId]
-										:
-											undefined
-									: selectedAttribute ?
-										attributeGroups.find(g => g.id in wallet.overall && selectedAttribute! in wallet.overall[g.id]) ?
-											wallet.overall[attributeGroups.find(g => g.id in wallet.overall && selectedAttribute! in wallet.overall[g.id])!.id]?.[selectedAttribute]
-										:
-											undefined
-									:
-										undefined
-								)}
-
-								{@const displayedGroup = (
-									activeEntityId?.walletId === wallet.metadata.id ?
-										attributeGroups.find(g => g.id === activeEntityId!.attributeGroupId)
-									: selectedAttribute ?
-										attributeGroups.find(g => g.id in wallet.overall && selectedAttribute! in wallet.overall[g.id])
-									:
-										undefined
-								)}
-
-								{#if displayedAttribute}
-									<WalletAttributeSummary
-										{wallet}
-										attribute={displayedAttribute}
-										variant={selectedVariant}
-										summaryType={WalletAttributeSummaryType.Rating}
-										{isInTooltip}
-									/>
-								{:else if displayedGroup}
-									<WalletAttributeGroupSummary
-										{wallet}
-										attributeGroup={displayedGroup}
-										summaryType={WalletAttributeGroupSummaryType.None}
-										{isInTooltip}
-									/>
-								{:else}
-									<WalletOverallSummary
-										{wallet}
-										{score}
-										summaryType={showStage ? WalletSummaryType.Stage : WalletSummaryType.Score}
-										{isInTooltip}	
-									/>
-								{/if}
-							{/snippet}
-						</TooltipOrAccordion>
-
 					<!-- Attribute group rating -->
-					{:else if column.id && !column.id.includes('.')}
-						{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === column.id)}
-						{#if attrGroup}
-							{@const evalGroup = wallet.overall[attrGroup.id]}
+					{@const attrGroup = displayedAttributeGroups.find(attrGroup => attrGroup.id === column.id)}
+					{#if attrGroup}
+						{@const evalGroup = wallet.overall[attrGroup.id]}
 						{@const groupScore = calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup)}
 
 						{@const filteredAttributeIds = attributeActiveFilters.size > 0 ? new Set(
@@ -1458,7 +1238,6 @@
 								/>
 							{/snippet}
 						</TooltipOrAccordion>
-					{/if}
 				{/if}
 			{/snippet}
 		</Table>
