@@ -7,7 +7,7 @@ import type {
 	TestStep,
 } from '../constants/test-eip-support'
 import type { Eip1193Provider } from '../types/eip'
-import { isRecord } from '../types/utils/assertions'
+import { isRecord } from '../types/utils/record'
 
 /**
  * Context provided to EIP test step runners.

@@ -53,12 +53,3 @@ export function assertTransactionId(s: string): `0x${string}` {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked
 	return s as `0x${string}`
 }
-
-/**
- * Type guard to check if a value is a plain object (Record).
- * @param value - The value to check
- * @returns True if the value is a non-null, non-array object
- */
-export function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null && !Array.isArray(value)
-}

@@ -45,7 +45,7 @@
   import {
     assertTransactionId,
     isEip6963AnnounceProviderEvent,
-  } from '@/types/utils/assertions'
+  } from '@/types/utils/ethereum-types'
 
   type Account = ReturnType<typeof getAccount>;
 
