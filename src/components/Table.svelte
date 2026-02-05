@@ -669,6 +669,15 @@
 		);
 	}
 
+	:global([data-card] .container) {
+		background-color: transparent;
+		box-shadow: none;
+		border-radius: 0;
+		clip-path: none;
+		--table-cornerRadius: 0;
+		scroll-padding: 0;
+	}
+
 	:where(table) {
 		min-width: 100%;
 		width: max-content;

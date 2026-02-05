@@ -23,6 +23,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:load
 			title='Hardware Wallets'
+			description='Hardware wallets are physical devices that keep your private keys offline, helping protect them from malware and online attacks. They can be factory-made or DIY, and may support one or more connection methods (USB, Bluetooth, QR, etc.). These wallets are evaluated on security and supply-chain practices, transparency, how they connect to apps and software wallets, and other attributes relevant to dedicated key-storage devices.'
 			wallets={Object.values(ratedHardwareWallets)}
 			{attributeGroups}
 		/>

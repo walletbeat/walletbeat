@@ -28,12 +28,14 @@
 	let {
 		tableId,
 		title,
+		description,
 		wallets,
 		attributeGroups,
 		summaryVisualization = SummaryVisualization.Stage,
 	}: {
 		tableId?: string,
 		title?: string
+		description?: string
 		wallets: RatedWallet[]
 		attributeGroups: AttributeGroup<any>[]
 		summaryVisualization?: SummaryVisualization
@@ -509,10 +511,25 @@
 	</header>
 
 	<div
-		data-scroll-container="inline"
-		class="table-wrapper"
+		data-card="padding-4"
+		data-column="gap-4"
+		class="table-card"
 	>
-		<Table
+		<header>
+			<div class="table-card-description">
+				{#if description}
+					{description}
+				{:else}
+					"No description provided"
+				{/if}
+			</div>
+		</header>
+
+		<div
+			data-scroll-container="inline"
+			class="table-wrapper"
+		>
+			<Table
 			{tableId}
 			class="wallet-table"
 
@@ -1241,6 +1258,7 @@
 				{/if}
 			{/snippet}
 		</Table>
+		</div>
 	</div>
 </section>
 
@@ -1255,6 +1273,17 @@
 			/* Prevent horizontal overflow on section */
 			overflow-x: hidden;
 		}
+	}
+
+	.table-card-description {
+		font-size: 0.875em;
+		color: var(--text-secondary);
+		line-height: 1.6;
+		margin: 0;
+	}
+
+	.table-card {
+		margin-inline-end: clamp(0.5rem, 0.015 * var(--scrollContainer-sizeInline), 1rem);
 	}
 
 	.table-wrapper {

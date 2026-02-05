@@ -47,6 +47,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:load
 			title='Embedded Wallets'
+			description='Embedded wallets are wallet capabilities (often SDKs) integrated into other applications—such as dapps, games, or services—so users can sign in and transact without a separate wallet app. They are evaluated on security, key custody and recovery, privacy, transparency, and how well they fit the expectations of in-app wallet experiences.'
 			wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.EMBEDDED])}
 			attributeGroups={[attrGroup]}
 		/>

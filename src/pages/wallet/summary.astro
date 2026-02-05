@@ -24,6 +24,7 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:load
 			title='Software Wallets'
+			description='Software wallets are applications that run on general-purpose devices like computers, smartphones, or browsers. They can be browser extensions, mobile apps, or desktop applications. These wallets are evaluated across multiple dimensions including security practices, privacy features, self-sovereignty capabilities, transparency, and ecosystem integration.'
 			wallets={Object.values(allRatedWallets).filter(wallet => wallet.types[WalletType.SOFTWARE])}
 			{attributeGroups}
 		/>
