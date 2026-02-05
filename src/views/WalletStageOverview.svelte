@@ -64,7 +64,7 @@
 		:
 			Object.entries(wallet.ladders)
 				.find(([, evaluation]) => evaluation === ladderEvaluation)
-				?.[0] as WalletLadderType
+				?.[0]
 			?? null
 	)
 

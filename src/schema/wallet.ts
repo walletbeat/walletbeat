@@ -1,4 +1,4 @@
-import type { Paragraph, TypographicContent } from '@/types/content'
+import type { MarkdownParagraph, Paragraph, TypographicContent } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 import { prefixError } from '@/types/errors'
 import type { Dict } from '@/types/utils/dict'
@@ -18,7 +18,14 @@ import {
 	type EvaluationTree,
 	mapAttributesGetter,
 } from './attribute-groups'
-import { type Attribute, type EvaluatedAttribute, Rating, type Value } from './attributes'
+import {
+	type Attribute,
+	type EvaluatedAttribute,
+	Rating,
+	type Value,
+	type WalletNameAndPseudonymStrings,
+	type WalletNameStrings,
+} from './attributes'
 import type { WalletDeveloper } from './entity'
 import {
 	type ResolvedFeatures,
@@ -105,7 +112,7 @@ export interface WalletMetadata {
 	 * A short (two or three sentences) description about the wallet.
 	 * This is shown under the wallet's name in expanded view.
 	 */
-	blurb: Paragraph<{ WALLET_NAME: string }>
+	blurb: Paragraph<WalletNameStrings>
 
 	/**
 	 * If the wallet has a built-in username scheme, this should refer to
@@ -188,17 +195,13 @@ export interface AttributeOverride {
 	 * Contextual notes about why the wallet has this rating, or clarifications
 	 * about its rating.
 	 */
-	note?: Paragraph<{ WALLET_NAME: string }>
+	note?: MarkdownParagraph<WalletNameStrings>
 
 	/**
 	 * What the wallet should do to improve its rating on this attribute.
 	 * Overrides the eponymous field in `Evaluation`.
 	 */
-	howToImprove?: TypographicContent<{
-		WALLET_NAME: string
-		WALLET_PSEUDONYM_SINGULAR: string | null
-		WALLET_PSEUDONYM_PLURAL: string | null
-	}>
+	howToImprove?: TypographicContent<WalletNameAndPseudonymStrings>
 }
 
 /** Per-wallet overrides for attributes. */

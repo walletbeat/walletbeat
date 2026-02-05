@@ -81,11 +81,9 @@ export type Monetization = WithRef<{
 /**
  * Iterate over the monetization strategies in the given object.
  */
-export function monetizationStrategies(
-	monetization: Monetization,
-): Array<{ strategy: MonetizationStrategy; value: boolean | null }> {
-	return Object.entries(monetization.strategies).map(([key, value]) => ({
-		strategy: key as MonetizationStrategy, // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know the keys of the object are all MonetizationStrategy enum values.
+export function monetizationStrategies(monetization: Monetization) {
+	return Object.entries(monetization.strategies).map(([strategy, value]) => ({
+		strategy,
 		value,
 	}))
 }

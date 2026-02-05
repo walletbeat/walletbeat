@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { nconsigny } from '@/data/contributors/nconsigny'
+import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -159,9 +160,9 @@ export const ambire: SoftwareWallet = {
 			The first hybrid Account abstraction wallet to support Basic (EOA) and Smart accounts, 
 			improving security and user experience.
 			`),
-		contributors: [jiojosbg, nconsigny, mattmatt],
+		contributors: [jiojosbg, nconsigny, mattmatt, polymutex],
 		iconExtension: 'svg',
-		lastUpdated: '2025-03-20',
+		lastUpdated: '2026-01-29',
 		urls: {
 			docs: ['https://help.ambire.com/hc/en-us'],
 			extensions: [
@@ -268,18 +269,26 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 		chainConfigurability: supported<WithRef<ChainConfigurability>>({
-			ref: {
-				explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
-				label: 'List of RPCs Ambire uses for default chains',
-				url: [
-					'https://github.com/AmbireTech/ambire-common/blob/main/src/consts/networks.ts',
-					'https://github.com/AmbireTech/ambire-common/blob/main/src/services/ensDomains/ensDomains.ts',
-					'https://github.com/AmbireTech/ambire-common/blob/main/src/libs/portfolio/getOnchainBalances.ts',
-				],
-			},
+			ref: [
+				{
+					explanation: "Ambire executes generic RPC requests to get user's balance and ENS.",
+					label: 'List of RPCs Ambire uses for default chains',
+					url: [
+						'https://github.com/AmbireTech/ambire-common/blob/main/src/consts/networks.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/main/src/services/ensDomains/ensDomains.ts',
+						'https://github.com/AmbireTech/ambire-common/blob/main/src/libs/portfolio/getOnchainBalances.ts',
+					],
+				},
+				{
+					explanation:
+						'Ambire lets you customize the chain provider before any request is made to it.',
+					label: 'Ambire tweet announcing onboarding-time chain provider configuration',
+					url: ['https://x.com/ambire/status/2016861388103373134'],
+				},
+			],
 			customChainRpcEndpoint: featureSupported,
 			l1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
 				withNoConnectivityExceptL1RPCEndpoint: {
 					accountCreation: featureSupported,
 					accountImport: featureSupported,
@@ -289,7 +298,7 @@ export const ambire: SoftwareWallet = {
 				},
 			}),
 			nonL1: supported({
-				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST,
 			}),
 		}),
 		ecosystem: {

@@ -7,3 +7,5 @@ eth:0x62fEa53FD7CE1C3a37647321F5b20CB835A66dc7	polymutex_test2	polymutex	EOA own
 eth:0xd28283fCb6e484fCccD3d5b0D24C6ED7Eb28cE86	eth:walletbeat_ci_worker	All Walletbeat contributors	EOA with the private key available to CI/CD pipelines. Holds a small amount of Ether, just enough for CI to update Walletbeat's ENS records. Topped up with funds from treasury as necessary.
 fil:0xd28283fCb6e484fCccD3d5b0D24C6ED7Eb28cE86	fil:walletbeat_ci_worker	All Walletbeat contributors	EOA with the private key available to CI/CD pipelines. Holds a small amount of FIL and USDfc, used to deploy Walletbeat on IPFS by paying Filecoin storage providers.
 eth:0xc3632e3c63b1e9643358aafed0660cf6522b94e5	teresa5	teresa5	EOA owned by teresa5 (branding/artist for Walletbeat)
+eth:0xA64b19Ac3245fD8C0e2B2c906f38540C94030493	mattmatt2	0xMattmatt	EOA owned by 0xMattmatt
+eth:0x943623f9bd1A83Fdb8b8Cc30848B09b79e95baE1	mattmatt3	0xMattmatt	EOA owned by 0xMattmatt

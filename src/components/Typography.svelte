@@ -1,12 +1,13 @@
 <script
 	lang="ts"
 	generics="
-		TypographicContent extends _TypographicContent = _TypographicContent
+		_Strings extends Strings = Strings
 	"
 >
 	// Types
 	import type { SvelteHTMLElements } from 'svelte/elements'
-	import { ContentType, type TypographicContent as _TypographicContent } from '@/types/content'
+	import { ContentType, type TypographicContent } from '@/types/content'
+	import type { Strings } from '@/types/utils/string-templates'
 
 
 	// Props
@@ -14,8 +15,8 @@
 		content,
 		strings,
 	}: SvelteHTMLElements['div'] & {
-		content: TypographicContent
-		strings?: TypographicContent extends _TypographicContent<infer Strings> ? Strings extends null ? never : Strings : never
+		content: TypographicContent<_Strings>
+		strings?: _Strings extends null ? never : _Strings
 	} = $props()
 
 

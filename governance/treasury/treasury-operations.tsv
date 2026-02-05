@@ -21,3 +21,10 @@ Date	From	To	Amount	Purpose	ID
 2026-01-29	treasury	treasury	0.473863291 ETH → 0.473863291 WETH	Wrapping ETH to WETH	0xa0f0a72dd12d951d8587843ac7e25d25b6f685465acde24bd4c27fddb00e8184
 2026-01-29	treasury	treasury	0.474177982339947569 WETH → 1,395.88 USDC	CoW Swap transaction submission to swap WETH for 1,395.88 USDC	0xd06619a7ff3bdbcec0c47eb31d5eff9473bc86c422b853316bd5e9754dc25885
 2026-01-29	treasury	teresa5	1,395.88 USDC	Payment for Walletbeat branding services	0xbda5d598a13866a21435ee47caabe9b030de7b6cd0f08777f0c916c6671514ec
+2026-02-01	treasury	treasury	0 ETH	CoW Swap order creation	0xc1dcdac7655422422797628b325e25abf84f65ed2e8d2cd7f6b8751dcede8588
+2026-02-01	treasury	treasury	0.213758386 WETH → 520 USDC	CoW Swap from WETH to USDC	0xa36cda44a80e9cd07923191f154c79d31484fa63ae8d7d68c7e285e7a80601bc
+2026-02-01	treasury	treasury	0 ETH	Approval to spend 520 USDC on Sablier	0xeac92253b61381753e6b17fe3407c157b5d29b465256a142e05e869a50443a54
+2026-02-01	treasury	mattmatt3	520 USDC	Creation of Sablier payment stream for 0xMattmatt: https://app.sablier.com/payments/stream/FL3-1-22	0x2429ed6358edbc23f46b7b02256a9efda509c8fc1ed1b96b40332b393c8ee602
+2026-02-01	treasury	treasury	0.205237542906247065 ETH → 0.205237542906247065 WETH	Wrapping Ether to WETH	0xc760699074acf6fae4d41d39727d1d774eab8c4d98150a6a19e0b81b330d453f
+2026-02-01	treasury	treasury	0 ETH	CoW Swap order creation	0xe180af3e0c73552cb6acbcb101c9215f0408c69bf1bcc9cd449ebec31a003169
+2026-02-01	treasury	mattmatt2	0.205687159220030679 WETH → 500 USDC	Backpay for January for 0xMattmatt	0xaf779a0f31d3f88a24ea19f09ed71a9c4c94134fb569d4c9bcdd5120015652a7

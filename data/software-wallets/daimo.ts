@@ -30,7 +30,7 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
-import { paragraph } from '@/types/content'
+import { mdParagraph, paragraph } from '@/types/content'
 
 import { binance } from '../entities/binance'
 import { daimoInc } from '../entities/daimo'
@@ -446,7 +446,7 @@ export const daimo: SoftwareWallet = {
 		attributes: {
 			privacy: {
 				addressCorrelation: {
-					note: paragraph(`
+					note: mdParagraph(`
 						Daimo usernames are user-selected during signup, and can be set
 						to any pseudonym. Daimo provides functionality to randomize its
 						value. To preserve privacy, it is recommended to pick a random

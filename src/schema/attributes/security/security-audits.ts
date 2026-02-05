@@ -243,6 +243,10 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 		const auditsIdSet = new Set<string>()
 
 		for (const evaluation of Object.values(perVariant)) {
+			if (!evaluation) {
+				continue
+			}
+
 			for (const audit of evaluation.value.securityAudits) {
 				const auditId = securityAuditId(audit)
 

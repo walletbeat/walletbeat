@@ -8,6 +8,7 @@ import {
 	type ExemptEvaluation,
 	Rating,
 	type Value,
+	type WalletNameStrings,
 } from '../attributes'
 import type { AtLeastOneVariant, Variant } from '../variants'
 
@@ -47,11 +48,7 @@ export function unrated<V extends Value>(
  */
 export function exempt<V extends Value>(
 	attribute: Attribute<V>,
-	whyExempt: Sentence<{
-		WALLET_NAME: string
-		WALLET_PSEUDONYM_SINGULAR: string | null
-		WALLET_PSEUDONYM_PLURAL: string | null
-	}>,
+	whyExempt: Sentence<WalletNameStrings>,
 	brand: string,
 	extraProps: Omit<V, keyof (Value & { __brand: string })> extends Record<string, never>
 		? null

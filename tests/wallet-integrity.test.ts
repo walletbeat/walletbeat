@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
-import { allWallets } from '@/data/wallets'
+import { allWallets, isValidWalletName } from '@/data/wallets'
 import type { BaseWallet } from '@/schema/wallet'
 
 describe('wallets', () => {
@@ -33,6 +33,11 @@ describe('wallets', () => {
 						}
 
 						expect(otherWalletMap[walletKey]).toBeUndefined()
+
+						if (typeof walletKey !== 'string' || !isValidWalletName(walletKey)) {
+							throw new Error('unexpected wallet key')
+						}
+
 						expect(allWallets[walletKey]).toBe(walletMap[walletKey])
 					}
 				})

@@ -1,4 +1,4 @@
-import { isSupported, notSupported, type Support } from '@/schema/features/support'
+import { isSupported, notSupported, type Support, type Supported } from '@/schema/features/support'
 import type { WithRef } from '@/schema/reference'
 import {
 	isNonEmptyArray,
@@ -227,8 +227,13 @@ export function supportsHardwareWalletTypesMarkdown(
 	}
 
 	const connectionTypes = Object.values(supportedWallets)
-		.filter(isSupported)
-		.map(w => nonEmptyDedup(hardwareWalletConnectionEnum.reorderNonEmpty(w.connectionTypes)))
+		.filter(
+			(wallet): wallet is Supported<SupportedHardwareWallet> =>
+				wallet !== undefined && isSupported(wallet),
+		)
+		.map(wallet =>
+			nonEmptyDedup(hardwareWalletConnectionEnum.reorderNonEmpty(wallet.connectionTypes)),
+		)
 		.reduce<NonEmptyArray<HardwareWalletConnection>[]>(
 			(prev, cur) =>
 				prev.some(types => types.join('|') === cur.join('|')) ? prev : prev.concat([cur]),

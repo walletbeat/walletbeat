@@ -6,12 +6,10 @@ import {
 	type WalletStage,
 	type WalletStageCriterion,
 } from '@/schema/stages'
-import { objectEntries } from '@/types/utils/object'
-
 /**
  * Get all stages across all ladders with their ladder type and index.
  */
-const allStages = objectEntries(ladders).flatMap(([ladderType, ladder]) =>
+const allStages = Object.entries(ladders).flatMap(([ladderType, ladder]) =>
 	ladder.stages.map((stage, stageIndex) => ({ ladderType, stage, stageIndex })),
 )
 

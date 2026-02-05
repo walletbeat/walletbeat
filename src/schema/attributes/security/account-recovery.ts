@@ -56,14 +56,13 @@ function evaluateGuardianRecoveryPolicy(
 		throw new Error('Got no scenarios for given guardian policy.')
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we explicitly filter for this.
 	const nonRecoverableOutcomes = outcomes.filter(
-		outcome => !isAccountRecoverable(outcome.recovery),
-	) as Array<
-		GuardianScenarioOutcome<GuardianScenarioType> & {
+		(
+			outcome,
+		): outcome is GuardianScenarioOutcome<GuardianScenarioType> & {
 			recovery: AccountRecoveryOutcomeCannotBeRecovered
-		}
-	>
+		} => !isAccountRecoverable(outcome.recovery),
+	)
 
 	if (!isNonEmptyArray(nonRecoverableOutcomes)) {
 		return {

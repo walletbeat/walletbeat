@@ -1,5 +1,4 @@
 import type { WithRef } from '@/schema/reference'
-import type { WalletMetadata } from '@/schema/wallet'
 
 import type { CalendarDate } from '../date'
 
@@ -182,8 +181,11 @@ export type WalletSecurityNews = WithRef<{
 	title: string
 	/** Brief description of the incident */
 	summary: string
-	/** Wallet involved */
-	wallet?: WalletMetadata
+	/**
+	 * Wallet ID(s) affected by this incident.
+	 * Empty array indicates a general incident not specific to tracked wallets.
+	 */
+	wallets: string[]
 
 	/** Details about the impact of the incident */
 	impact: {

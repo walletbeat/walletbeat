@@ -1,5 +1,18 @@
 import type { Content, Paragraph, Sentence, TypographicContent } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
+
+/** Strings for content that may use {{WALLET_NAME}} only (e.g. details, blurb). */
+export type WalletNameStrings = null | { WALLET_NAME: string }
+
+/** Strings for content that may use {{WALLET_NAME}} and/or pseudonym placeholders. */
+export type WalletNameAndPseudonymStrings =
+	| WalletNameStrings
+	| {
+			WALLET_NAME: string
+			WALLET_PSEUDONYM_SINGULAR: string | null
+			WALLET_PSEUDONYM_PLURAL: string | null
+	  }
+
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
@@ -193,11 +206,7 @@ export interface Value {
 	 * Should be similar to `displayName` but may be formatted with the name
 	 * of the wallet.
 	 */
-	shortExplanation: Sentence<{
-		WALLET_NAME: string
-		WALLET_PSEUDONYM_SINGULAR: string | null
-		WALLET_PSEUDONYM_PLURAL: string | null
-	}>
+	shortExplanation: Sentence<WalletNameStrings>
 
 	/**
 	 * The visual representation of this value.
@@ -271,7 +280,7 @@ export interface Evaluation<V extends Value> {
 	 * This can be more verbose but should still avoid repeating information
 	 * already stated in the attribute explanation.
 	 */
-	details: Content<{ WALLET_NAME: string }>
+	details: Content<WalletNameStrings>
 
 	/**
 	 * An optional paragraph explaining the consequence of this value on the
@@ -282,18 +291,14 @@ export interface Evaluation<V extends Value> {
 	 * should explain the upsides or downsides of FOSS licensing on the wallet
 	 * software (e.g. "FOSS means more contributors").
 	 */
-	impact?: Paragraph<{ WALLET_NAME: string }>
+	impact?: TypographicContent<WalletNameStrings>
 
 	/**
 	 * An optional paragraph or list of suggestions on what the wallet can do
 	 * to improve this rating. Should only be populated for ratings that are
 	 * not perfect.
 	 */
-	howToImprove?: TypographicContent<{
-		WALLET_NAME: string
-		WALLET_PSEUDONYM_SINGULAR: string | null
-		WALLET_PSEUDONYM_PLURAL: string | null
-	}>
+	howToImprove?: TypographicContent<WalletNameAndPseudonymStrings>
 
 	/**
 	 * Optional array of references with URLs and explanations.
@@ -394,17 +399,17 @@ export interface Attribute<V extends Value = Value> {
 				howIsEvaluated: string
 
 				/** The sentence "What can <wallet> do about its <attribute>?" */
-				whatCanWalletDoAboutIts: Sentence<{ WALLET_NAME: string }>
+				whatCanWalletDoAboutIts: Sentence<WalletNameStrings>
 		  }
 
 	/** A question explaining what question the attribute is answering. */
-	question: Sentence<{ WALLET_NAME: string }>
+	question: Sentence<WalletNameStrings>
 
 	/** A paragraph explaining why this attribute is important to users. */
-	why: TypographicContent
+	why: TypographicContent<WalletNameStrings>
 
 	/** General explanation of how wallets are rated on this attribute. */
-	methodology: TypographicContent
+	methodology: TypographicContent<WalletNameStrings>
 
 	/** Explanations of what a wallet can do to achieve each rating. */
 	ratingScale:
@@ -417,7 +422,7 @@ export interface Attribute<V extends Value = Value> {
 				display: 'simple'
 
 				/** The content to display to explain the rating scale. */
-				content: TypographicContent
+				content: TypographicContent<WalletNameAndPseudonymStrings>
 		  }
 		| {
 				/**
@@ -513,7 +518,7 @@ export interface AttributeGroup<Vs extends ValueSet> {
 	 * For example, for an attribute group about privacy, a good question
 	 * might be "How well does {wallet} protect your privacy?".
 	 */
-	perWalletQuestion: Sentence<{ WALLET_NAME: string }>
+	perWalletQuestion: Sentence<WalletNameStrings>
 
 	/** The actual set of attributes belonging to this group. */
 	attributes: { [K in keyof Vs]: Attribute<Vs[K]> }
@@ -542,7 +547,7 @@ export function evaluatedAttributes<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
 ): NonEmptyArray<EvaluatedAttribute<Value>> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.values(evaluatedGroup) as NonEmptyArray<EvaluatedAttribute<Value>>
+	return Object.values(evaluatedGroup) as unknown as NonEmptyArray<EvaluatedAttribute<Value>>
 }
 
 /**
@@ -555,7 +560,9 @@ export function evaluatedAttributesEntries<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
 ): NonEmptyArray<[keyof Vs, EvaluatedAttribute<Value>]> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.entries(evaluatedGroup) as NonEmptyArray<[keyof Vs, EvaluatedAttribute<Value>]>
+	return Object.entries(evaluatedGroup) as unknown as NonEmptyArray<
+		[keyof Vs, EvaluatedAttribute<Value>]
+	>
 }
 
 /** Represents an unimplemented ExampleRating. See below. */

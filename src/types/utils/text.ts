@@ -90,8 +90,9 @@ export function markdownListFormat(
 		ifEmpty?: string | { behavior: 'THROW_ERROR' }
 	},
 ): string {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we checked `typeof item === 'string'` on each item
-	const filtered = items.filter(item => typeof item === 'string' && item.trim() !== '') as string[]
+	const filtered = items.filter(
+		(item): item is string => typeof item === 'string' && item.trim() !== '',
+	)
 	const trimmed = filtered.map(item => item.trim())
 
 	if (!isNonEmptyArray(trimmed)) {

@@ -30,3 +30,7 @@ type ExtractStringKeys<T extends string> =
 		: never
 
 type FormatStringKey<StringKey extends string> = `{{${StringKey}}}`
+
+/** Infers the required strings type from a template string when no strings object is passed. */
+export type StringsFromTemplate<T extends string> =
+	ExtractStringKeys<T> extends never ? null : { [K in ExtractStringKeys<T>]: string }

@@ -60,14 +60,13 @@ function evaluateGuardianUnruggabilityPolicy(
 		throw new Error('Got no scenarios for given guardian policy.')
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we explicitly filter for this.
-	const takeOverPossibleOutcomes = outcomes.filter(outcome =>
-		isAccountTakeOverPossible(outcome.takeover),
-	) as Array<
-		GuardianScenarioOutcome<GuardianScenarioType> & {
+	const takeOverPossibleOutcomes = outcomes.filter(
+		(
+			outcome,
+		): outcome is GuardianScenarioOutcome<GuardianScenarioType> & {
 			takeover: AccountTakeOverOutcomeCanBeTakenOver
-		}
-	>
+		} => isAccountTakeOverPossible(outcome.takeover),
+	)
 
 	if (!isNonEmptyArray(takeOverPossibleOutcomes)) {
 		return {

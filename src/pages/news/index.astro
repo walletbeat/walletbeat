@@ -2,6 +2,7 @@
 // Types/constants
 import { defaultNavigationItems } from '@/constants/navigation'
 import { allWalletSecurityNews } from '@/data/news'
+import { getWalletMetadataById } from '@/data/wallets'
 import { impactCategories, incidentStatuses, newsTypes, severities } from '@/types/content/news'
 
 // Functions
@@ -47,20 +48,30 @@ import ExternalLinkIcon from 'lucide-static/icons/external-link.svg?raw'
 						<article id={news.slug}>
 							<details data-card='padding-6' data-column='gap-6'>
 								<summary data-row='wrap wrap-first-last'>
-									{news.wallet && (
-										<div data-row-item='basis-full'>
-											<a
-												class='wallet-link'
-												href={`/${news.wallet.id}`}
-												data-link='camouflaged'
-												data-badge='medium'
-											>
-												<img
-													src={`/images/wallets/${news.wallet.id}.${news.wallet.iconExtension}`}
-													alt={news.wallet.displayName}
-												/>
-												<span>{news.wallet.displayName}</span>
-											</a>
+									{news.wallets.length > 0 && (
+										<div
+											class='wallet-links'
+											data-row-item='basis-full'
+											data-row='start wrap gap-2'
+										>
+											{news.wallets.map(walletId => {
+												const wallet = getWalletMetadataById(walletId)
+
+												return wallet ? (
+													<a
+														class='wallet-link'
+														href={`/${wallet.id}`}
+														data-link='camouflaged'
+														data-badge='medium'
+													>
+														<img
+															src={`/images/wallets/${wallet.id}.${wallet.iconExtension}`}
+															alt={wallet.displayName}
+														/>
+														<span>{wallet.displayName}</span>
+													</a>
+												) : null
+											})}
 										</div>
 									)}
 
