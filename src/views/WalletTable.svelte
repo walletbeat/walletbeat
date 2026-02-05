@@ -335,7 +335,6 @@
 
 		<div
 			class="filters"
-			data-scroll-item="inline-detached"
 			data-scroll-container="inline"
 		>
 			<div
@@ -510,7 +509,8 @@
 	</header>
 
 	<div
-		data-scroll-item="inline-attached underflow-center overflow-start snap-block-start"
+		data-scroll-container="inline"
+		class="table-wrapper"
 	>
 		<Table
 			{tableId}
@@ -1251,7 +1251,27 @@
 			--scrollItem-inlineDetached-maxSize: 60.5rem;
 			--scrollItem-inlineDetached-paddingStart: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
 			--scrollItem-inlineDetached-paddingEnd: clamp(1.5rem, 0.04 * var(--scrollContainer-sizeInline), 3rem);
+			
+			/* Prevent horizontal overflow on section */
+			overflow-x: hidden;
 		}
+	}
+
+	.table-wrapper {
+		width: 100%;
+		max-width: 100%;
+		
+		/* Allow table container to expand beyond wrapper width for scrolling */
+		:global(.container) {
+			display: block;
+			min-width: 100%;
+			width: max-content;
+		}
+	}
+
+	.filters {
+		width: 100%;
+		max-width: 100%;
 	}
 
 	:global {
