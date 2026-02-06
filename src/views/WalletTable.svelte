@@ -645,6 +645,7 @@
 							name: '#',
 							value: wallet => walletRanks.get(wallet.metadata.id) ?? null,
 							sort: {
+								isDefault: true,
 								defaultDirection: SortDirection.Ascending,
 								compare: (rankA, rankB, walletA, walletB) => {
 									// Sort by overall score when ranking
@@ -706,7 +707,6 @@
 							},
 
 							sort: {
-								isDefault: true,
 								defaultDirection: SortDirection.Descending,
 							},
 
@@ -718,7 +718,7 @@
 							...col,
 							sort: {
 								...col.sort,
-								isDefault: hasNonApplicableStages && index === 0,
+								isDefault: false,
 							},
 						})),
 					] as Column<RatedWallet>[]
