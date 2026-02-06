@@ -22,6 +22,7 @@
 	import { HardwareWalletManufactureType } from '@/schema/features/profile'
 	import { Variant } from '@/schema/variants'
 	import type { RatedWallet } from '@/schema/wallet'
+	import { WalletType } from '@/schema/wallet-types'
 
 
 	// Props
@@ -169,8 +170,40 @@
 		true
 	)
 
+	type TabOption = 'staged' | 'others'
+
+	let selectedTab = $state<TabOption>(
+		'staged'
+	)
+
 
 	// (Derived)
+	const isSoftwareWalletTable = $derived(
+		wallets.length > 0 && wallets.every(wallet => wallet.types[WalletType.SOFTWARE])
+	)
+
+	const tabFilteredWallets = $derived.by(() => {
+		if (!isSoftwareWalletTable) {
+			return wallets
+		}
+
+		return wallets.filter(wallet => {
+			const { stage } = getWalletStageAndLadder(wallet)
+
+			if (selectedTab === 'staged') {
+				// Show wallets with stage 0 or higher (any WalletStage object)
+				return stage !== null
+					&& stage !== 'NOT_APPLICABLE'
+					&& stage !== 'QUALIFIED_FOR_NO_STAGES'
+			} else {
+				// Show wallets with no stage
+				return stage === null
+					|| stage === 'NOT_APPLICABLE'
+					|| stage === 'QUALIFIED_FOR_NO_STAGES'
+			}
+		})
+	})
+
 	const allSupportedVariants = $derived(
 		Object.values(Variant)
 			.filter(variant => (
@@ -222,7 +255,7 @@
 	)
 
 	const walletRanks = $derived.by(() => {
-		const scores = wallets.map(wallet => ({
+		const scores = tabFilteredWallets.map(wallet => ({
 			walletId: wallet.metadata.id,
 			score: calculateOverallScore(
 				wallet.overall,
@@ -237,8 +270,8 @@
 			if (b.score === null) return -1
 			if (a.score !== b.score) return b.score - a.score
 			// Tie-breaker: sort by wallet name
-			const walletA = wallets.find(w => w.metadata.id === a.walletId)!
-			const walletB = wallets.find(w => w.metadata.id === b.walletId)!
+			const walletA = tabFilteredWallets.find(w => w.metadata.id === a.walletId)!
+			const walletB = tabFilteredWallets.find(w => w.metadata.id === b.walletId)!
 			return walletA.metadata.displayName.localeCompare(walletB.metadata.displayName)
 		})
 		
@@ -344,7 +377,7 @@
 				data-row
 			>
 				<Filters
-					items={wallets}
+					items={tabFilteredWallets}
 					filterGroups={
 						[
 							{
@@ -510,12 +543,38 @@
 		</div>
 	</header>
 
-	<div
-		data-card="padding-4"
-		data-column="gap-4"
-		class="table-card"
-	>
-		<header>
+	<div class="table-card-container">
+		{#if isSoftwareWalletTable}
+			<div class="table-tabs">
+				<button
+					class="table-tab"
+					data-selected={selectedTab === 'staged' ? '' : undefined}
+					aria-pressed={selectedTab === 'staged'}
+					onclick={() => {
+						selectedTab = 'staged'
+					}}
+				>
+					Staged
+				</button>
+				<button
+					class="table-tab"
+					data-selected={selectedTab === 'others' ? '' : undefined}
+					aria-pressed={selectedTab === 'others'}
+					onclick={() => {
+						selectedTab = 'others'
+					}}
+				>
+					Others
+				</button>
+			</div>
+		{/if}
+
+		<div
+			data-card="padding-4"
+			data-column="gap-4"
+			class="table-card"
+		>
+			<header>
 			<div class="table-card-description">
 				{#if description}
 					{description}
@@ -533,7 +592,7 @@
 			{tableId}
 			class="wallet-table"
 
-			rows={wallets}
+			rows={tabFilteredWallets}
 			rowId={wallet => wallet.metadata.id}
 			rowIsDisabled={wallet => (
 				!(
@@ -1259,6 +1318,7 @@
 			{/snippet}
 		</Table>
 		</div>
+		</div>
 	</div>
 </section>
 
@@ -1282,8 +1342,64 @@
 		margin: 0;
 	}
 
-	.table-card {
+	.table-card-container {
 		margin-inline-end: clamp(0.5rem, 0.015 * var(--scrollContainer-sizeInline), 1rem);
+	}
+
+	.table-tabs {
+		display: flex;
+		gap: 0.25rem;
+		padding: 0;
+		margin-bottom: -1px;
+	}
+
+	.table-tab {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.75rem 1.5rem;
+		font-size: 0.875em;
+		font-weight: 600;
+		border: none;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		border-start-start-radius: 1rem;
+		border-start-end-radius: 1rem;
+		border-end-start-radius: 0;
+		border-end-end-radius: 0;
+		position: relative;
+		background-color: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.08));
+		color: light-dark(rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.5));
+
+		&:hover {
+			background-color: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.12));
+			color: light-dark(rgba(0, 0, 0, 0.7), rgba(255, 255, 255, 0.7));
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--accent);
+			outline-offset: -2px;
+		}
+
+		&[data-selected] {
+			background-color: light-dark(#fdfdfd, #22242b);
+			color: light-dark(rgba(0, 0, 0, 0.9), rgba(255, 255, 255, 0.9));
+			z-index: 1;
+			box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+
+			&::after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 1px;
+				background-color: light-dark(#fdfdfd, #22242b);
+			}
+		}
+	}
+
+	.table-card {
 	}
 
 	.table-wrapper {
