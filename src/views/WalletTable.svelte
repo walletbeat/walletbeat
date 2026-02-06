@@ -361,7 +361,7 @@
 >
 	<header
 		data-sticky="inline"
-		data-scroll-item="inline-detached padding-match-start"
+		data-scroll-item="padding-match-start"
 		data-row="wrap"
 	>
 		{#if title}
@@ -1335,6 +1335,10 @@
 		}
 	}
 
+	header h2 {
+		padding-inline-start: 0.75em;
+	}
+
 	.table-card-description {
 		font-size: 0.875em;
 		color: var(--text-secondary);
@@ -1417,6 +1421,7 @@
 	.filters {
 		width: 100%;
 		max-width: 100%;
+		padding-inline-start: 0.75em;
 	}
 
 	:global {
