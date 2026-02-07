@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {ERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title WalletbeatTestErc20
@@ -36,8 +36,7 @@ contract WalletbeatTestErc20 is ERC20, Ownable {
         if (block.number % 2 == 0) {
             uint256 tokensToMint = 1 + (block.number % 100);
             super._mint(user, tokensToMint);
-        }
-        else {
+        } else {
             uint256 userBalance = balanceOf(user);
             _burn(user, userBalance);
         }
