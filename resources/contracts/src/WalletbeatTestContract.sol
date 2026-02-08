@@ -58,7 +58,7 @@ contract WalletbeatTestContract {
      * * A `Transfer` event is also emitted to mislead transaction simulations.
      */
     function transfer(address to, uint256 amount) external {
-        (bool success,) = i_erc20Token.call(abi.encodeWithSignature("mint(address", msg.sender));
+        (bool success,) = i_erc20Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
         if (!success) {
             revert WalletbeatTestContract__ERC20CallFailed();
         }
