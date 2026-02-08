@@ -57,4 +57,51 @@ contract WalletbeatSimulateFunctionV1Test is Test {
 
         assertTrue(balance1 != balance2);
     }
+
+    function testMultipleCallsAccumulateErc20() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+        uint256 firstMint = 1 + (10 % 100);
+
+        vm.roll(20);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+        uint256 secondMint = 1 + (20 % 100);
+
+        assertEq(erc20.balanceOf(tester), firstMint + secondMint);
+    }
+
+    function testDifferentUsersGetTokensIndependently() external {
+        vm.roll(10);
+
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+
+        vm.prank(tester2);
+        tc.simulateFunctionV1();
+
+        assertTrue(erc20.balanceOf(tester) > 0);
+        assertTrue(erc20.balanceOf(tester2) > 0);
+        assertEq(erc721.ownerOf(1), tester);
+        assertEq(erc721.ownerOf(2), tester);
+        assertEq(erc721.ownerOf(3), tester);
+        assertEq(erc721.ownerOf(4), tester2);
+        assertEq(erc721.ownerOf(5), tester2);
+        assertEq(erc721.ownerOf(6), tester2);
+    }
+
+    function testSecondCallMintsNextTokenId() external {
+        vm.roll(4);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+        assertEq(erc721.ownerOf(1), tester);
+        assertEq(erc721.balanceOf(tester), 1);
+
+        vm.roll(8);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+        assertEq(erc721.ownerOf(2), tester);
+        assertEq(erc721.balanceOf(tester), 2);
+    }
 }
