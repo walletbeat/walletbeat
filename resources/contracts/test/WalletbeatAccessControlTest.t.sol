@@ -19,4 +19,27 @@ contract WalletbeatAccessControlTest is Test {
         deployer = new DeployContract();
         (tc, erc20, erc721) = deployer.run();
     }
+    function testErc20MintOnlyOwner() external {
+        vm.prank(attacker);
+        vm.expectRevert("Ownable: caller is not the owner");
+        erc20.mint(attacker);
+    }
+
+    function testErc20BurnOnlyOwner() external {
+        vm.prank(attacker);
+        vm.expectRevert("Ownable: caller is not the owner");
+        erc20.burn(attacker);
+    }
+
+    function testErc20ClaimOnlyOwner() external {
+        vm.prank(attacker);
+        vm.expectRevert("Ownable: caller is not the owner");
+        erc20.claim(attacker);
+    }
+
+    function testErc721MintOnlyOwner() external {
+        vm.prank(attacker);
+        vm.expectRevert("Ownable: caller is not the owner");
+        erc721.mint(attacker);
+    }
 }
