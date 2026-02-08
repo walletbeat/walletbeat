@@ -345,4 +345,32 @@ contract WalletbeatUnitTests is Test {
         tc.claim(); // burns all tokens
         assertEq(erc20.totalSupply(), 0);
     }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
+    /*                   SIMULATE V1 REVERT TESTS                        */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
+
+    function testSimulateV1RevertsWhenErc20CallFails() external {
+        // New contract has incorrect owner
+        WalletbeatTestContract badTc =
+            new WalletbeatTestContract(address(erc20), address(erc721));
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
+        badTc.simulateFunctionV1();
+    }
+
+    function testSimulateV1RevertsWhenErc721CallFails() external {
+        WalletbeatTestErc20 ownedErc20 = new WalletbeatTestErc20("Owned", "O");
+        WalletbeatTestErc721 notOwnedErc721 = new WalletbeatTestErc721("NotOwned", "N");
+        WalletbeatTestContract mixedTc =
+            new WalletbeatTestContract(address(ownedErc20), address(notOwnedErc721));
+
+        // Transfer ERC20 ownership to mixedTc, but leave ERC721 owned by this test
+        ownedErc20.transferOwnership(address(mixedTc));
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC721CallFailed.selector);
+        mixedTc.simulateFunctionV1();
+    }
 }
