@@ -7,14 +7,16 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract WalletbeatTestErc721 is ERC721, Ownable {
     error WalletbeatTestErc20__Soulbound();
 
+    uint256 private s_tokenId;
+
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
     function mint(address receiver) external onlyOwner {
-        uint256 tokensToMint = block.number % 4;
-        if (tokensToMint == 0) {
-            tokensToMint = 1;
+        uint256 tokensToMint = 1 + (block.number % 4);
+        for (uint256 i = 0; i < tokensToMint; i++) {
+            s_tokenId++;
+            super._mint(receiver, s_tokenId);
         }
-        super._mint(receiver, tokensToMint);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize)
