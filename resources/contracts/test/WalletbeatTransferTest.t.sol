@@ -55,4 +55,53 @@ contract WalletbeatTransferTest is Test {
         vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc20__Soulbound.selector);
         erc721.safeTransferFrom(tester, tester2, 1);
     }
+
+    function testCannotTransferErc20BetweenUsers() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+        assertTrue(erc20.balanceOf(tester) > 0);
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestErc20.WalletbeatTestErc20__Soulbound.selector);
+        erc20.transfer(tester2, 1);
+    }
+
+    function testCannotTransferFromErc20BetweenUsers() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+
+        vm.prank(tester);
+        erc20.approve(tester2, type(uint256).max);
+
+        vm.prank(tester2);
+        vm.expectRevert(WalletbeatTestErc20.WalletbeatTestErc20__Soulbound.selector);
+        erc20.transferFrom(tester, tester2, 1);
+    }
+
+    function testErc20InitialSupplyIsZero() external view {
+        assertEq(erc20.totalSupply(), 0);
+    }
+
+    function testErc20SupplyIncreasesAfterMint() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+
+        uint256 expectedAmount = 1 + (10 % 100);
+        assertEq(erc20.totalSupply(), expectedAmount);
+    }
+
+    function testErc20SupplyDecreasesAfterBurn() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+        uint256 supplyAfterMint = erc20.totalSupply();
+        assertTrue(supplyAfterMint > 0);
+
+        vm.prank(tester);
+        tc.claim(); // burns all tokens
+        assertEq(erc20.totalSupply(), 0);
+    }
 }
