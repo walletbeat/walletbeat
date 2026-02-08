@@ -13,10 +13,12 @@ contract WalletbeatTransferTest is Test {
     WalletbeatTestErc20 erc20;
     WalletbeatTestErc721 erc721;
     address tester;
+    address tester2;
     address recipient;
 
     function setUp() external {
         tester = makeAddr("tester");
+        tester2 = makeAddr("tester2");
         recipient = makeAddr("recipient");
         deployer = new DeployContract();
         (tc, erc20, erc721) = deployer.run();
@@ -30,5 +32,27 @@ contract WalletbeatTransferTest is Test {
         uint256 expectedAmount = 1 + (10 % 100);
         assertEq(erc20.balanceOf(tester), expectedAmount);
         assertEq(erc20.balanceOf(recipient), 0);
+    }
+
+    function testCannotTransferErc721BetweenUsers() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+
+        assertEq(erc721.ownerOf(1), tester);
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc20__Soulbound.selector);
+        erc721.transferFrom(tester, tester2, 1);
+    }
+
+    function testCannotSafeTransferErc721() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc20__Soulbound.selector);
+        erc721.safeTransferFrom(tester, tester2, 1);
     }
 }
