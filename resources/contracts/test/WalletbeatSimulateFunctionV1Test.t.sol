@@ -21,4 +21,40 @@ contract WalletbeatSimulateFunctionV1Test is Test {
         deployer = new DeployContract();
         (tc, erc20, erc721) = deployer.run();
     }
+
+    function testMintsErc20Tokens() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+
+        uint256 expectedAmount = 1 + (10 % 100);
+        assertEq(erc20.balanceOf(tester), expectedAmount);
+    }
+
+    function testMintsErc721Tokens() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+
+        assertEq(erc721.ownerOf(1), tester);
+        assertEq(erc721.ownerOf(2), tester);
+        assertEq(erc721.ownerOf(3), tester);
+        assertEq(erc721.balanceOf(tester), 3);
+    }
+
+    function testErc20AmountVariesByBlock() external {
+        vm.roll(50);
+        vm.prank(tester);
+        tc.simulateFunctionV1();
+        uint256 balance1 = erc20.balanceOf(tester);
+        assertEq(balance1, 1 + (50 % 100));
+
+        vm.roll(75);
+        vm.prank(tester2);
+        tc.simulateFunctionV1();
+        uint256 balance2 = erc20.balanceOf(tester2);
+        assertEq(balance2, 1 + (75 % 100));
+
+        assertTrue(balance1 != balance2);
+    }
 }
