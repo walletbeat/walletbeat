@@ -373,4 +373,74 @@ contract WalletbeatUnitTests is Test {
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC721CallFailed.selector);
         mixedTc.simulateFunctionV1();
     }
+    
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
+    /*                   SIMULATE V2 REVERT TESTS                        */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
+
+    function testSimulateV2RevertsWhenErc20CallFails() external {
+        WalletbeatTestContract badTc =
+            new WalletbeatTestContract(address(erc20), address(erc721));
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
+        badTc.simulateFunctionV2();
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
+    /*                      TRANSFER REVERT TESTS                        */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
+
+    function testTransferRevertsWhenErc20CallFails() external {
+        WalletbeatTestContract badTc =
+            new WalletbeatTestContract(address(erc20), address(erc721));
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
+        badTc.transfer(recipient, 100);
+    }
+
+    function testTransferRevertsWhenErc721CallFails() external {
+        WalletbeatTestErc20 goodErc20 = new WalletbeatTestErc20("Good", "G");
+        WalletbeatTestErc721 badErc721 = new WalletbeatTestErc721("Bad", "B");
+        WalletbeatTestContract mixedTc =
+            new WalletbeatTestContract(address(goodErc20), address(badErc721));
+
+        goodErc20.transferOwnership(address(mixedTc));
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC721CallFailed.selector);
+        mixedTc.transfer(recipient, 100);
+    }
+
+    function testTransferMintsErc721ToCaller() external {
+        vm.roll(10);
+        vm.prank(tester);
+        tc.transfer(recipient, 100);
+
+        uint256 expectedNfts = 1 + (10 % 4);
+        assertEq(erc721.balanceOf(tester), expectedNfts);
+        assertEq(erc721.balanceOf(recipient), 0);
+    }
+
+    function testTransferEmitsTransferEvent() external {
+        vm.roll(10);
+        vm.prank(tester);
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(tester, recipient, 100);
+        tc.transfer(recipient, 100);
+    }
+
+    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
+    /*                        CLAIM REVERT TESTS                         */
+    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
+
+    function testClaimRevertsWhenErc20CallFails() external {
+        WalletbeatTestContract badTc =
+            new WalletbeatTestContract(address(erc20), address(erc721));
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
+        badTc.claim();
+    }
 }
