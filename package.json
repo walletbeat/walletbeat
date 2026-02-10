@@ -64,7 +64,7 @@
 		"eslint-plugin-svelte": "^3.14.0",
 		"globals": "^17.0.0",
 		"harper.js": "^0.61.0",
-		"omnipin": "^2.0.4",
+		"omnipin": "^2.1.0",
 		"orbiter-cli": "^0.9.11",
 		"p-limit": "^7.2.0",
 		"pnpm": "10.28.0",
