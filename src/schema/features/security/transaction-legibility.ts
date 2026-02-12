@@ -190,6 +190,11 @@ export type CalldataDecodingTypes = Record<
 	Support<WithRef<CalldataDecodingSupport>>
 >
 
+/**
+ * Types of transactions that a wallet can decode the calldata of.
+ */
+export type SoftwareCalldataDecodingTypes = Record<CalldataDecoding, boolean>
+
 /** If a wallet can decode the calldata for a specific transaction, what does that look like? */
 export interface CalldataDecodingSupport {
 	/** Where does the calldata decoding actually happen? */
@@ -383,7 +388,7 @@ export interface SoftwareTransactionLegibilitySupport {
 	/**
 	 * Does a wallet display transaction details clearly?
 	 */
-	legibility: CalldataDecodingTypes | null
+	legibility: SoftwareCalldataDecodingTypes | null
 }
 
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
