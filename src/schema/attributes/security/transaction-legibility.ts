@@ -470,6 +470,10 @@ function hardwareFullTransactionLegibility(
 
 // Software wallet detail generation helpers
 interface SoftwareFeatureDetails {
+	calldataDecoding: {
+		supported: string[]
+		missing: string[]
+	}
 	calldataDisplay: {
 		supported: string[]
 		missing: string[]
@@ -485,14 +489,50 @@ interface SoftwareFeatureDetails {
 }
 
 function analyzeSoftwareFeatures({
+	legibility,
 	calldataDisplay,
 	transactionDetailsDisplay,
 	messageSigningLegibility,
 }: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
 	const details: SoftwareFeatureDetails = {
+		calldataDecoding: { supported: [], missing: [] },
 		calldataDisplay: { supported: [], missing: [] },
 		transactionDetails: { supported: [], missing: [] },
 		messageSigning: { supported: [], missing: [] },
+	}
+
+	// Analyze calldata decoding
+	if (legibility !== null) {
+		const decodingChecks = [
+			{
+				key: CalldataDecoding.ETH_USDC_TRANSFER,
+				label: 'basic token transfers (ERC-20)',
+			},
+			{
+				key: CalldataDecoding.ZKSYNC_USDC_TRANSFER,
+				label: 'ZKSync token transfers',
+			},
+			{
+				key: CalldataDecoding.AAVE_SUPPLY,
+				label: 'DeFi interactions (e.g., Aave)',
+			},
+			{
+				key: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
+				label: 'nested Safe transactions',
+			},
+			{
+				key: CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
+				label: 'complex nested multisend transactions',
+			},
+		]
+
+		decodingChecks.forEach(({ key, label }) => {
+			if (legibility[key] === true) {
+				details.calldataDecoding.supported.push(label)
+			} else {
+				details.calldataDecoding.missing.push(label)
+			}
+		})
 	}
 
 	// Analyze calldata display
@@ -566,12 +606,28 @@ function analyzeSoftwareFeatures({
 function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): string {
 	const sections: string[] = []
 
+	// Calldata Decoding section
+	if (
+		features.calldataDecoding.supported.length > 0 ||
+		features.calldataDecoding.missing.length > 0
+	) {
+		sections.push('**Calldata Decoding**\n')
+
+		if (features.calldataDecoding.supported.length > 0) {
+			sections.push(`✓ Supported: ${commaListFormat(features.calldataDecoding.supported)}\n`)
+		}
+
+		if (features.calldataDecoding.missing.length > 0) {
+			sections.push(`✗ Missing: ${commaListFormat(features.calldataDecoding.missing)}\n`)
+		}
+	}
+
 	// Calldata Display section
 	if (
 		features.calldataDisplay.supported.length > 0 ||
 		features.calldataDisplay.missing.length > 0
 	) {
-		sections.push('**Calldata Display**\n')
+		sections.push('\n**Calldata Display**\n')
 
 		if (features.calldataDisplay.supported.length > 0) {
 			sections.push(`✓ Supported: ${commaListFormat(features.calldataDisplay.supported)}\n`)
@@ -616,6 +672,12 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 
 function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string {
 	const improvements: string[] = []
+
+	if (features.calldataDecoding.missing.length > 0) {
+		improvements.push(
+			`**Calldata Decoding:** Add support for decoding ${commaListFormat(features.calldataDecoding.missing)}`,
+		)
+	}
 
 	if (features.calldataDisplay.missing.length > 0) {
 		improvements.push(
@@ -826,10 +888,10 @@ function evaluateSoftwareWalletTransactionLegibility(
 ): Evaluation<TransactionLegibilityValue> {
 	const { withoutRefs: transactionLegibilitySupport } = popRefs(softwareTransactionLegibility)
 
-	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility } =
+	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility, legibility } =
 		transactionLegibilitySupport
 
-	if (calldataDisplay === null || transactionDetailsDisplay === null) {
+	if (calldataDisplay === null || transactionDetailsDisplay === null || legibility === null) {
 		return unrated(transactionLegibility, brand, null)
 	}
 
@@ -840,6 +902,18 @@ function evaluateSoftwareWalletTransactionLegibility(
 	const calldataShown = calldataDisplay.rawHex
 	const calldataCopyable = calldataDisplay.copyHexToClipboard
 	const calldataFormatted = calldataDisplay.formatted
+
+	// Check calldata decoding capabilities
+	const supportsBasicDecoding: boolean =
+		legibility[CalldataDecoding.ETH_USDC_TRANSFER] === true &&
+		legibility[CalldataDecoding.ZKSYNC_USDC_TRANSFER] === true &&
+		legibility[CalldataDecoding.AAVE_SUPPLY] === true
+
+	const supportsComplexDecoding: boolean =
+		supportsBasicDecoding &&
+		(legibility[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED] === true ||
+			legibility[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND] ===
+				true)
 
 	// For DisplayedTransactionDetails, SHOWN_BY_DEFAULT or SHOWN_OPTIONALLY count as supported
 	const transactionDetailsRatings = [
@@ -865,9 +939,11 @@ function evaluateSoftwareWalletTransactionLegibility(
 	// 2. If calldata is shown but neither copyable nor formatted, FAIL
 	// 3. If less than 3 types of transaction details shown, FAIL
 	// 4. Message signing fails, FAIL
-	// 5. If calldata is not copyable OR not formatted, PARTIAL
-	// 6. If more than 3 types of transaction details are shown but not all of them, PARTIAL
-	// 7. Otherwise, PASS (requires message signing to pass)
+	// 5. If basic calldata decoding not supported, FAIL
+	// 6. If calldata is not copyable OR not formatted, PARTIAL
+	// 7. If more than 3 types of transaction details are shown but not all of them, PARTIAL
+	// 8. If missing complex decoding, cap at PARTIAL
+	// 9. Otherwise, PASS (requires message signing to pass and complex calldata decoding)
 	let rating: Rating
 
 	if (!calldataShown) {
@@ -882,6 +958,9 @@ function evaluateSoftwareWalletTransactionLegibility(
 	} else if (messageSigningLegibility !== null && !messageSigningPasses) {
 		// Message signing data provided but fails criteria
 		rating = Rating.FAIL
+	} else if (!supportsBasicDecoding) {
+		// Require basic calldata decoding for passing.
+		rating = Rating.FAIL
 	} else if (!calldataCopyable || !calldataFormatted) {
 		// Calldata is not copyable OR not formatted
 		rating = Rating.PARTIAL
@@ -889,6 +968,9 @@ function evaluateSoftwareWalletTransactionLegibility(
 		// More than 3 types of transaction details are shown but not all of them
 		rating = Rating.PARTIAL
 	} else if (!messageSigningPasses) {
+		rating = Rating.PARTIAL
+	} else if (!supportsComplexDecoding) {
+		// Complex decoding not supported — cap at PARTIAL
 		rating = Rating.PARTIAL
 	} else {
 		rating = Rating.PASS
@@ -963,6 +1045,8 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		- Formatted output: Users can view decoded, human-readable calldata
 		- Copy to clipboard: Users can copy the calldata directly for verification
 
+		Software wallets must also support calldata decoding for various transaction types, from basic token transfers to complex nested transactions.
+
 		**Hardware Wallet Specific Requirements:**
 		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet device itself. Any data shown on a software wallet component is ignored for hardware wallet ratings.
 
@@ -974,8 +1058,8 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		**Rating Criteria:**
 
 		For software wallets:
-		- A wallet receives a passing rating if it displays calldata in all three formats (raw hex, formatted, copyable) and displays all essential transaction details.
-		- A wallet receives a partial rating if it has some combination of these features, but not all at the full level.
+		- A wallet receives a passing rating if it displays calldata in all three formats (raw hex, formatted, copyable), displays all essential transaction details, and supports complex calldata decoding (including nested transactions).
+		- A wallet receives a partial rating if it has some combination of these features but not all, or if calldata decoding data has not been provided.
 		- A wallet receives a failing rating if it lacks calldata display capabilities or does not display essential transaction details.
 
 		For hardware wallets:
@@ -1009,6 +1093,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
+					legibility: null,
 					ref: refNotNecessary,
 				}),
 			),
@@ -1050,6 +1135,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
 					ref: refNotNecessary,
+					legibility: null,
 				}),
 			),
 		],
@@ -1075,6 +1161,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
 					ref: refNotNecessary,
+					legibility: null,
 				}),
 			),
 		],
