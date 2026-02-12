@@ -379,6 +379,11 @@ export interface SoftwareTransactionLegibilitySupport {
 	 * What message signing data does the software wallet provide?
 	 */
 	messageSigningLegibility: SoftwareMessageSigningLegibility | null
+
+	/**
+	 * Does a wallet display transaction details clearly?
+	 */
+	legibility: CalldataDecodingTypes | null
 }
 
 export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
