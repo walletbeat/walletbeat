@@ -584,6 +584,7 @@ export const ambire: SoftwareWallet = {
 					formatted: false,
 					rawHex: true,
 				},
+				legibility: null,
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,

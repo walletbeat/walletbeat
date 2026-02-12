@@ -204,6 +204,7 @@ export const bitget: SoftwareWallet = {
 					formatted: false,
 					rawHex: true,
 				},
+				legibility: null,
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.NOT_IN_UI,
 					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
