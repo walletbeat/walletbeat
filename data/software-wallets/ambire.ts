@@ -38,7 +38,6 @@ import type {
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	CalldataDecoding,
-	DataDecoded,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
@@ -50,7 +49,7 @@ import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereign
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { type References, refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
+import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
