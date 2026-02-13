@@ -13,8 +13,6 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.user_safety'
-
 export type UserSafetyValue = Value & {
 	readableAddress: UserSafetyType
 	contractLabeling: UserSafetyType
@@ -32,7 +30,6 @@ export type UserSafetyValue = Value & {
 	txSimulation: UserSafetyType
 	txSimulationLocal: UserSafetyType
 	fullyLocalTxSimulation: UserSafetyType
-	__brand: 'attributes.user_safety'
 }
 
 function evaluateUserSafety(features: UserSafetySupport): Rating {
@@ -153,7 +150,6 @@ export const userSafety: Attribute<UserSafetyValue> = {
 				sentence(
 					'This attribute evaluates hardware wallet user safety features and is not applicable for {{WALLET_NAME}}.',
 				),
-				brand,
 				{
 					readableAddress: UserSafetyType.FAIL,
 					contractLabeling: UserSafetyType.FAIL,
@@ -178,7 +174,7 @@ export const userSafety: Attribute<UserSafetyValue> = {
 		const userSafetyFeature = features.security.userSafety
 
 		if (userSafetyFeature === null) {
-			return unrated(userSafety, brand, {
+			return unrated(userSafety, {
 				readableAddress: UserSafetyType.FAIL,
 				contractLabeling: UserSafetyType.FAIL,
 				rawTxReview: UserSafetyType.FAIL,
@@ -235,7 +231,6 @@ export const userSafety: Attribute<UserSafetyValue> = {
 				displayName: 'User Safety',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} user safety.`),
 				...userSafetyFeature, // TODO: Filter fields
-				__brand: brand,
 			},
 			details: paragraph(detailsText),
 			// TODO: Add references

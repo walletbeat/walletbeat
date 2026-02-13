@@ -19,11 +19,7 @@ import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.self_sovereignty.transaction_inclusion'
-
-export type TransactionInclusionValue = Value & {
-	__brand: 'attributes.self_sovereignty.transaction_inclusion'
-}
+export type TransactionInclusionValue = Value
 
 export type L1BroadcastSupport = 'NO' | 'SELF_GOSSIP' | 'OWN_NODE'
 
@@ -49,7 +45,6 @@ function transactionSubmissionEvaluation({
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} requires trusting intermediaries in order to withdraw funds from L2s.',
 				),
-				__brand: brand,
 			},
 			details: transactionInclusionDetailsContent({
 				supportsL1Broadcast,
@@ -73,7 +68,6 @@ function transactionSubmissionEvaluation({
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} relies on intermediaries when performing L1 transactions. This makes it possible for L1 transactions to be censored.',
 				),
-				__brand: brand,
 			},
 			details: transactionInclusionDetailsContent({
 				supportsL1Broadcast,
@@ -99,7 +93,6 @@ function transactionSubmissionEvaluation({
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not implement L2 force-withdrawal transactions for all types of L2s.',
 				),
-				__brand: brand,
 			},
 			details: transactionInclusionDetailsContent({
 				supportsL1Broadcast,
@@ -122,7 +115,6 @@ function transactionSubmissionEvaluation({
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports L2 force-withdrawal transactions for all L2 types.',
 			),
-			__brand: brand,
 		},
 		details: transactionInclusionDetailsContent({
 			supportsL1Broadcast,
@@ -258,14 +250,14 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<TransactionInclusionValue> => {
 		if (features.selfSovereignty.transactionSubmission === null) {
-			return unrated(transactionInclusion, brand, null)
+			return unrated(transactionInclusion, null)
 		}
 
 		if (
 			features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaDirectGossip === null ||
 			features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaSelfHostedNode === null
 		) {
-			return unrated(transactionInclusion, brand, null)
+			return unrated(transactionInclusion, null)
 		}
 
 		const supportsL1Broadcast: L1BroadcastSupport = isSupported(
@@ -290,7 +282,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			const support = features.selfSovereignty.transactionSubmission.l2[l2]
 
 			if (support === null) {
-				return unrated(transactionInclusion, brand, null)
+				return unrated(transactionInclusion, null)
 			}
 
 			if (support === TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT) {

@@ -38,11 +38,8 @@ import {
 } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.privacy.address_correlation'
-
 export type AddressCorrelationValue = Value & {
 	worstLeak: WalletAddressLinkableBy | null
-	__brand: 'attributes.privacy.address_correlation'
 }
 
 const uncorrelated: AddressCorrelationValue = {
@@ -52,7 +49,6 @@ const uncorrelated: AddressCorrelationValue = {
 	displayName: 'Wallet address is kept private',
 	shortExplanation: sentence('{{WALLET_NAME}} keeps your wallet address private.'),
 	worstLeak: null,
-	__brand: brand,
 }
 
 export interface WalletAddressLinkableTo {
@@ -121,7 +117,6 @@ function linkable(
 					: `{{WALLET_NAME}} allows ${worstLeak.by.name} to link your wallet address with your ${userInfoName(worstLeak.info).short}.`,
 			),
 			worstLeak,
-			__brand: brand,
 		},
 		details: addressCorrelationDetailsContent({ linkables }),
 		howToImprove: paragraph(howToImprove),
@@ -301,7 +296,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		const allDataCollection = dataCollectionForAllSupportedFlows(features.privacy.dataCollection)
 
 		if (features.privacy.dataCollection === null || allDataCollection === null) {
-			return unrated(addressCorrelation, brand, { worstLeak: null })
+			return unrated(addressCorrelation, { worstLeak: null })
 		}
 
 		const linkables: WalletAddressLinkableBy[] = []

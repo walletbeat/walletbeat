@@ -17,8 +17,6 @@ import { markdownListFormat } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.transparency.fee_transparency'
-
 /**
  * All possible fee types that a wallet may charge.
  */
@@ -297,7 +295,6 @@ function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | n
 
 export type FeeTransparencyValue = Value & {
 	worstFeeDisplay: WorstFeeDisplay | null
-	__brand: 'attributes.transparency.fee_transparency'
 }
 
 function evaluateWorstFeeDisplay(
@@ -306,7 +303,6 @@ function evaluateWorstFeeDisplay(
 	const references = worstFeeDisplay.references
 	const baseValue = {
 		worstFeeDisplay,
-		__brand: brand,
 	} as const
 	const worstFeeTypesMarkdown = (indent: string): string =>
 		markdownListFormat(nonEmptyMap(worstFeeDisplay.feeTypes, feeTypeDescription), {
@@ -580,7 +576,7 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		const worstFeeDisplay = computeWorstFees(feeTransparencyData)
 
 		if (worstFeeDisplay === null) {
-			return unrated(feeTransparency, brand, { worstFeeDisplay: null })
+			return unrated(feeTransparency, { worstFeeDisplay: null })
 		}
 
 		return evaluateWorstFeeDisplay(worstFeeDisplay)

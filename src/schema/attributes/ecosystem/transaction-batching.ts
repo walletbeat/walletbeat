@@ -32,11 +32,7 @@ import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.ecosystem.transaction_batching'
-
-export type TransactionBatchingValue = Value & {
-	__brand: 'attributes.ecosystem.transaction_batching'
-}
+export type TransactionBatchingValue = Value
 
 function evaluateTransactionBatching(
 	accountSupport: AccountSupport,
@@ -54,7 +50,6 @@ function evaluateTransactionBatching(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not support transaction batching, as it does not support any type of smart account.',
 				),
-				__brand: brand,
 			},
 			details: paragraph(`
 				{{WALLET_NAME}} does not implement any type of smart account.
@@ -83,7 +78,6 @@ function evaluateTransactionBatching(
 				displayName: 'No transaction batching support',
 				rating: Rating.FAIL,
 				shortExplanation: sentence('{{WALLET_NAME}} does not support transaction batching.'),
-				__brand: brand,
 			},
 			details: mdParagraph(`
 				{{WALLET_NAME}} does not implement ${eipMarkdownLinkAndTitle(eip5792)}.
@@ -110,7 +104,6 @@ function evaluateTransactionBatching(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} supports transaction batching, but not atomic transaction bundles.',
 				),
-				__brand: brand,
 			},
 			details: mdParagraph(`
 				{{WALLET_NAME}} implements ${eipMarkdownLinkAndTitle(eip5792)}.
@@ -141,7 +134,6 @@ function evaluateTransactionBatching(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports transaction batching and atomic transaction bundles.',
 			),
-			__brand: brand,
 		},
 		details: mdParagraph(`
 			{{WALLET_NAME}} implements ${eipMarkdownLinkAndTitle(eip5792)}.
@@ -286,7 +278,6 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 			return exempt(
 				transactionBatching,
 				sentence('Only software wallets are expected to deal with transaction batching.'),
-				brand,
 				null,
 			)
 		}
@@ -298,13 +289,12 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 					{{WALLET_NAME}} is exempt as it is a payments-focused wallet,
 					for which transaction batching is not very useful.
 				`),
-				brand,
 				null,
 			)
 		}
 
 		if (features.accountSupport === null || features.integration.walletCall === null) {
-			return unrated(transactionBatching, brand, null)
+			return unrated(transactionBatching, null)
 		}
 
 		return evaluateTransactionBatching(features.accountSupport, features.integration.walletCall)

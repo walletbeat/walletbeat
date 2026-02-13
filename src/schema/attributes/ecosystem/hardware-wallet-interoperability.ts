@@ -24,11 +24,8 @@ import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.hardware_wallet_interoperability'
-
 export type HardwareWalletInteroperabilityValue = Value & {
 	hardwareWalletSupport: HardwareWalletSupport
-	__brand: 'attributes.security.hardware_wallet_interoperability'
 }
 
 const majorHardwareWalletManufacturers: NonEmptyArray<HardwareWalletType> = [
@@ -78,7 +75,6 @@ function singleHardwareWalletManufacturerSupport(
 				{{WALLET_NAME}} only supports hardware wallets from a single major manufacturer.
 			`),
 			hardwareWalletSupport,
-			__brand: brand,
 		},
 		details:
 			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
@@ -106,7 +102,6 @@ function insufficientHardwareWalletManufacturerSupport(
 				{{WALLET_NAME}} supports a limited selection of hardware wallets.
 			`),
 			hardwareWalletSupport,
-			__brand: brand,
 		},
 		details:
 			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
@@ -128,7 +123,6 @@ function comprehensiveHardwareWalletSupport(
 			displayName: 'Interoperable hardware wallet support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports a wide range of hardware wallets.'),
 			hardwareWalletSupport,
-			__brand: brand,
 		},
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}`,
@@ -273,13 +267,12 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet itself.',
 				),
-				brand,
 				{ hardwareWalletSupport: { ref: refNotNecessary, wallets: {} } },
 			)
 		}
 
 		if (features.security.hardwareWalletSupport === null) {
-			return unrated(hardwareWalletInteroperability, brand, {
+			return unrated(hardwareWalletInteroperability, {
 				hardwareWalletSupport: { ref: refNotNecessary, wallets: {} },
 			})
 		}
@@ -306,7 +299,6 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 					return exempt(
 						hardwareWalletInteroperability,
 						sentence('{{WALLET_NAME}} does not support any hardware wallet'),
-						brand,
 						{ hardwareWalletSupport: features.security.hardwareWalletSupport },
 					)
 				case 1:

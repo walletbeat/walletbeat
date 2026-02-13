@@ -20,11 +20,7 @@ import { fundingDetailsContent } from '@/types/content/funding-details'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.transparency.funding'
-
-export type FundingValue = Value & {
-	__brand: 'attributes.transparency.funding'
-}
+export type FundingValue = Value
 
 /** Funding is transparent and at least partially non-extractive. */
 function transparent(
@@ -38,7 +34,6 @@ function transparent(
 			rating: Rating.PASS,
 			displayName: `Transparent funding (${sourceName})`,
 			shortExplanation: sentence('{{WALLET_NAME}} is transparently funded.'),
-			__brand: brand,
 		},
 		details: fundingDetailsContent({ monetization }),
 		references: toFullyQualified(monetization.ref),
@@ -60,7 +55,6 @@ function extractive(
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} is funded through user-extractive means${sourceName !== '' ? ` (${sourceName})` : ''}.`,
 			),
-			__brand: brand,
 		},
 		details: fundingDetailsContent({ monetization }),
 		howToImprove: paragraph(
@@ -77,7 +71,6 @@ const noFunding: Evaluation<FundingValue> = {
 		rating: Rating.FAIL,
 		displayName: 'No funding source',
 		shortExplanation: sentence('{{WALLET_NAME}} has no funding sources.'),
-		__brand: brand,
 	},
 	details: paragraph(
 		'{{WALLET_NAME}} has no funding sources, making its future unclear. Wallets need a consistent source of funding to ensure they keep up with security vulnerabilities and ecosystem progress.',
@@ -95,7 +88,6 @@ const unclear: Evaluation<FundingValue> = {
 		rating: Rating.FAIL,
 		displayName: 'Unclear funding source',
 		shortExplanation: sentence('How {{WALLET_NAME}} is funded is unclear.'),
-		__brand: brand,
 	},
 	details: paragraph('How {{WALLET_NAME}} is funded is unclear.'),
 	howToImprove: paragraph(
@@ -228,7 +220,7 @@ export const funding: Attribute<FundingValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<FundingValue> => {
 		if (features.monetization === null) {
-			return unrated(funding, brand, null)
+			return unrated(funding, null)
 		}
 
 		const strategies: MonetizationStrategy[] = []
@@ -236,7 +228,7 @@ export const funding: Attribute<FundingValue> = {
 		for (const { strategy, value } of monetizationStrategies(features.monetization)) {
 			switch (value) {
 				case null:
-					return unrated(funding, brand, null)
+					return unrated(funding, null)
 				case true:
 					strategies.push(strategy)
 					break

@@ -29,11 +29,7 @@ import { commaListFormat } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.transaction_legibility'
-
-export type TransactionLegibilityValue = Value & {
-	__brand: 'attributes.transaction_legibility'
-}
+export type TransactionLegibilityValue = Value
 
 // Message signing evaluation helpers
 
@@ -383,7 +379,6 @@ function hardwareNoTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} does not display clear transaction details on the hardware device when signing.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} implements either zero or very little transaction legibility on the hardware device itself. Transaction legibility is important for security as it allows users to verify transaction details directly on their hardware wallet screen before signing, without relying on potentially compromised software.\n\n${featureDetailsMarkdown}`,
@@ -409,7 +404,6 @@ function hardwareBasicTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports basic transaction legibility on the hardware device.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports basic transaction legibility on the hardware device, but the implementation does not provide full transparency. The device may display some transaction details or support basic calldata decoding, but lacks comprehensive support for complex transactions, all essential details, or advanced data extraction methods.\n\n${featureDetailsMarkdown}`,
@@ -435,7 +429,6 @@ function hardwarePartialTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports partial transaction legibility on the hardware device.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports partial transaction legibility on the hardware device. The device displays most transaction details and may support calldata decoding for some transaction types, but may not fully decode complex nested transactions or provide all data extraction methods. Showing transaction details directly on the hardware device is crucial for security as it allows users to verify transaction details independently of potentially compromised software.\n\n${featureDetailsMarkdown}`,
@@ -460,7 +453,6 @@ function hardwareFullTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports full transaction legibility on the hardware device.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} implements full transaction legibility on the hardware device itself. All transaction details are clearly displayed on the device screen, the device supports decoding of complex nested transactions, and provides comprehensive data extraction methods (QR codes, hashes) for independent verification before signing, providing maximum security and transparency for users.\n\n${featureDetailsMarkdown}`,
@@ -720,7 +712,6 @@ function softwareNoTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} does not display clear transaction details when signing.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} implements either zero or very little transaction legibility. The wallet does not adequately display calldata in multiple formats (raw hex, formatted, copyable) or essential transaction details (gas, nonce, from, to, chain, value). Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.\n\n${featureDetailsMarkdown}`,
@@ -744,7 +735,6 @@ function softwarePartialTransactionLegibility(
 			rating: Rating.PARTIAL,
 			displayName: 'Partial transaction legibility support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports partial transaction legibility.'),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet may display some calldata formats or some transaction details, but lacks comprehensive support for all calldata display methods (raw hex, formatted, copyable) or all essential transaction details (gas, nonce, from, to, chain, value). Showing transaction details is crucial for security as it allows users to verify transaction details before signing.\n\n${featureDetailsMarkdown}`,
@@ -767,7 +757,6 @@ function softwareFullTransactionLegibility(
 			rating: Rating.PASS,
 			displayName: 'Full transaction legibility support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports full transaction legibility.'),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} implements full transaction legibility. The wallet supports comprehensive calldata display (raw hex format, formatted output, and copy to clipboard) and displays all essential transaction details clearly on the wallet screen/window for verification before signing, providing maximum security and transparency for users.\n\n${featureDetailsMarkdown}`,
@@ -857,7 +846,7 @@ function evaluateHardwareWalletTransactionLegibility(
 
 	const result = ((): Evaluation<TransactionLegibilityValue> => {
 		if (overallRating === Rating.UNRATED) {
-			return unrated(transactionLegibility, brand, null)
+			return unrated(transactionLegibility, null)
 		}
 
 		if (overallRating === Rating.FAIL) {
@@ -891,8 +880,8 @@ function evaluateSoftwareWalletTransactionLegibility(
 	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility, legibility } =
 		transactionLegibilitySupport
 
-	if (calldataDisplay === null || transactionDetailsDisplay === null || legibility === null) {
-		return unrated(transactionLegibility, brand, null)
+	if (calldataDisplay === null || transactionDetailsDisplay === null) {
+		return unrated(transactionLegibility, null)
 	}
 
 	// Evaluate message signing (PASS/FAIL only)
@@ -1168,7 +1157,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<TransactionLegibilityValue> => {
 		if (features.security.transactionLegibility === null) {
-			return unrated(transactionLegibility, brand, null)
+			return unrated(transactionLegibility, null)
 		}
 
 		if (isHardwareTransactionLegibility(features.security.transactionLegibility)) {

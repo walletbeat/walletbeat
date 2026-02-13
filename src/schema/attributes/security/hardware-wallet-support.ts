@@ -22,11 +22,8 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.hardware_wallet_support'
-
 export type HardwareWalletSupportValue = Value & {
 	hardwareWalletSupport: HardwareWalletSupport
-	__brand: 'attributes.security.hardware_wallet_support'
 }
 
 function noHardwareWalletSupport(
@@ -39,7 +36,6 @@ function noHardwareWalletSupport(
 			displayName: 'No hardware wallet support',
 			shortExplanation: sentence('{{WALLET_NAME}} does not support hardware wallets.'),
 			hardwareWalletSupport,
-			__brand: brand,
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} does not support hardware wallets.
@@ -65,7 +61,6 @@ function indirectHardwareWalletSupport(
 				Using a hardware wallet with {{WALLET_NAME}} requires additional software.
 			`),
 			hardwareWalletSupport,
-			__brand: brand,
 		},
 		details:
 			paragraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
@@ -94,7 +89,6 @@ function directHardwareWalletSupport(
 			displayName: 'Supports hardware wallets',
 			shortExplanation: sentence('{{WALLET_NAME}} supports hardware wallets.'),
 			hardwareWalletSupport,
-			__brand: brand,
 		},
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}`,
@@ -190,7 +184,6 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet itself.',
 				),
-				brand,
 				{ hardwareWalletSupport: { wallets: {}, ref: refNotNecessary } },
 			)
 		}
@@ -199,7 +192,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		// 	all such wallets have the opportunity to support hardware wallets to provide better security for the user
 
 		if (features.security.hardwareWalletSupport === null) {
-			return unrated(hardwareWalletSupport, brand, {
+			return unrated(hardwareWalletSupport, {
 				hardwareWalletSupport: { wallets: {}, ref: refNotNecessary },
 			})
 		}

@@ -27,11 +27,7 @@ import { markdown, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.ecosystem.chain_abstraction'
-
-export type ChainAbstractionValue = Value & {
-	__brand: 'attributes.ecosystem.chain_abstraction'
-}
+export type ChainAbstractionValue = Value
 
 function evaluateChainAbstraction(
 	chainAbstraction: ChainAbstraction,
@@ -55,7 +51,6 @@ function evaluateChainAbstraction(
 				shortExplanation: sentence(
 					"{{WALLET_NAME}} does not display your account's total value across chains.",
 				),
-				__brand: brand,
 			},
 			details: markdown(`
 				{{WALLET_NAME}} does not display your account's total value across
@@ -87,7 +82,6 @@ function evaluateChainAbstraction(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not display token balances across chains.',
 				),
-				__brand: brand,
 			},
 			details: markdown(`
 				While {{WALLET_NAME}} can display your account's total value across
@@ -121,7 +115,6 @@ function evaluateChainAbstraction(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not provide an easy cross-chain bridging feature.',
 				),
-				__brand: brand,
 			},
 			details: markdown(`
 				{{WALLET_NAME}} does not provide a built-in way to bridge assets
@@ -148,7 +141,6 @@ function evaluateChainAbstraction(
 				displayName: 'No cross-chain token balance',
 				rating: Rating.PARTIAL,
 				shortExplanation: sentence('{{WALLET_NAME}} does not add up token balances across chains.'),
-				__brand: brand,
 			},
 			details: markdown(`
 				While {{WALLET_NAME}} can display your account's total value across
@@ -188,7 +180,6 @@ function evaluateChainAbstraction(
 					but does not display the fees involved in doing
 					so${feesHidden ? '' : ' by default'}.
 				`),
-				__brand: brand,
 			},
 			details: markdown(`
 				{{WALLET_NAME}} has a built-in cross-chain bridging feature, but
@@ -239,7 +230,6 @@ function evaluateChainAbstraction(
 					${risksHidden ? 'straightforwardly display' : 'display'}
 					the risks involved in doing so.
 				`),
-				__brand: brand,
 			},
 			details: markdown(`
 				{{WALLET_NAME}} has a built-in cross-chain bridging feature, but
@@ -280,7 +270,6 @@ function evaluateChainAbstraction(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} implements most cross-chain features, but does not automatically suggest cross-chain bridging.',
 				),
-				__brand: brand,
 			},
 			details: markdown(`
 				{{WALLET_NAME}} abstracts away most cross-chain complexity by
@@ -312,7 +301,6 @@ function evaluateChainAbstraction(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} transparently implements cross-chain token balances and bridging.',
 			),
-			__brand: brand,
 		},
 		details: markdown(`
 			{{WALLET_NAME}} abstracts away cross-chain complexity by
@@ -513,13 +501,12 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 			return exempt(
 				chainAbstraction,
 				sentence('Only software wallets are expected to deal with chain abstraction.'),
-				brand,
 				null,
 			)
 		}
 
 		if (features.chainAbstraction === null) {
-			return unrated(chainAbstraction, brand, null)
+			return unrated(chainAbstraction, null)
 		}
 
 		return evaluateChainAbstraction(features.chainAbstraction)

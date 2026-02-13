@@ -26,11 +26,7 @@ import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.bug_bounty_program'
-
-export type BugBountyProgramValue = Value & {
-	__brand: 'attributes.security.bug_bounty_program'
-}
+export type BugBountyProgramValue = Value
 
 function getCoverageDescription(breadth: AtLeastOneCoverageBreadth): string {
 	const items = setItems(breadth)
@@ -113,7 +109,6 @@ function noBugBountyProgram(): Evaluation<BugBountyProgramValue> {
 			shortExplanation: sentence(
 				"{{WALLET_NAME}} does not implement a bug bounty program and doesn't provide security updates.",
 			),
-			__brand: brand,
 		},
 		details: paragraph(
 			'{{WALLET_NAME}} does not implement a bug bounty program and does not provide a clear path for security researchers to report vulnerabilities. The wallet also lacks a documented process for providing security updates to address critical issues.',
@@ -174,7 +169,6 @@ function bugBountyAvailable(support: BugBountyProgramSupport): Evaluation<BugBou
 			shortExplanation: mdSentence(
 				`{{WALLET_NAME}} has a bug bounty program${rewardInfo ? ` ${rewardInfo}` : ''}${isActive ? '' : ', but it is currently inactive'}.`,
 			),
-			__brand: brand,
 		},
 		details: markdown(`
 			${coverageInfo}
@@ -347,13 +341,12 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 			return exempt(
 				bugBountyProgram,
 				sentence('This attribute is only applicable for hardware wallets.'),
-				brand,
 				null,
 			)
 		}
 
 		if (features.security.bugBountyProgram === null) {
-			return unrated(bugBountyProgram, brand, null)
+			return unrated(bugBountyProgram, null)
 		}
 
 		if (!isSupported(features.security.bugBountyProgram)) {

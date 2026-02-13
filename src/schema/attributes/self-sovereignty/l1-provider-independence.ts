@@ -16,11 +16,7 @@ import {
 } from '../../features/self-sovereignty/chain-configurability'
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.self_sovereignty.l1_provider_independence'
-
-export type L1ProviderIndependence = Value & {
-	__brand: 'attributes.self_sovereignty.l1_provider_independence'
-}
+export type L1ProviderIndependence = Value
 
 function supportsSelfHostedNode(references: ReferenceArray): Evaluation<L1ProviderIndependence> {
 	return {
@@ -32,7 +28,6 @@ function supportsSelfHostedNode(references: ReferenceArray): Evaluation<L1Provid
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} lets you use your own self-hosted Ethereum node to interact with Ethereum mainnet.
 			`),
-			__brand: brand,
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} lets you use your own self-hosted Ethereum node to interact with Ethereum mainnet.
@@ -52,7 +47,6 @@ function supportsSelfHostedNodeAfterRequests(
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} contacts its default L1 RPC endpoint before letting you configure a self-hosted node.
 			`),
-			__brand: brand,
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} lets you use a self-hosted Ethereum node,
@@ -79,7 +73,6 @@ function supportsSelfHostedNodeButCannotDoBasicOperations(
 				Even with your self-hosted node, {{WALLET_NAME}} depends on external
 				services to perform basic tasks on Ethereum mainnet.
 			`),
-			__brand: brand,
 		},
 		details: mdParagraph(`
 			While {{WALLET_NAME}} lets you use a self-hosted Ethereum node to
@@ -110,7 +103,6 @@ function noSelfHostedNode(references: ReferenceArray): Evaluation<L1ProviderInde
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} does not let you use your own self-hosted node to interact with Ethereum mainnet.',
 			),
-			__brand: brand,
 		},
 		details: paragraph(
 			'{{WALLET_NAME}} does not let you use your own self-hosted Ethereum node when interacting with Ethereum mainnet.',
@@ -217,7 +209,7 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<L1ProviderIndependence> => {
 		if (features.chainConfigurability === null) {
-			return unrated(l1ProviderIndependence, brand, null)
+			return unrated(l1ProviderIndependence, null)
 		}
 
 		if (!isSupported(features.chainConfigurability)) {

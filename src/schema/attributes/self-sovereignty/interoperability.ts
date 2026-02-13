@@ -11,12 +11,9 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.interoperability'
-
 export type InteroperabilityValue = Value & {
 	interoperability: InteroperabilityType
 	noSupplierLinkage: InteroperabilityType
-	__brand: 'attributes.interoperability'
 }
 
 function evaluateInteroperability(features: InteroperabilitySupport): Rating {
@@ -80,7 +77,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 		pickWorstRating<InteroperabilityValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<InteroperabilityValue> => {
 		if (features.type !== WalletType.HARDWARE) {
-			return exempt(interoperability, sentence('Only rated for hardware wallets'), brand, {
+			return exempt(interoperability, sentence('Only rated for hardware wallets'), {
 				interoperability: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,
 			})
@@ -89,7 +86,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 		const interoperabilityFeature = features.selfSovereignty.interoperability
 
 		if (interoperabilityFeature === null) {
-			return unrated(interoperability, brand, {
+			return unrated(interoperability, {
 				interoperability: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,
 			})
@@ -104,7 +101,6 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 				displayName: 'Interoperability',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} interoperability.`),
 				...interoperabilityFeature, // TODO: Filter fields
-				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} interoperability evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

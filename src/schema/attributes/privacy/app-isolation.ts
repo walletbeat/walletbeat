@@ -27,11 +27,7 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.privacy.app_isolation'
-
-export type AppIsolationValue = Value & {
-	__brand: 'attributes.privacy.app_isolation'
-}
+export type AppIsolationValue = Value
 
 function rateAppIsolation(
 	appIsolation: Exclude<AppIsolation, typeof appConnectionNotSupported>,
@@ -48,7 +44,6 @@ function rateAppIsolation(
 					{{WALLET_NAME}} does not have an option to create a new account
 					as part of the app connection flow.
 				`),
-				__brand: brand,
 			},
 			details: markdown(`
 				When connecting to an app, {{WALLET_NAME}} does not provide a way
@@ -81,7 +76,6 @@ function rateAppIsolation(
 					{{WALLET_NAME}} does not remember which set of addresses you last
 					used when connecting to an app.
 				`),
-				__brand: brand,
 			},
 			details: markdown(`
 				When connecting to an app you have connected to before,
@@ -140,7 +134,6 @@ function rateAppIsolation(
 						{{WALLET_NAME}} defaults to reusing the same account when
 						connecting to various apps.
 					`),
-					__brand: brand,
 				},
 				details: markdown(`
 					When connecting to a new app, {{WALLET_NAME}} uses the same
@@ -169,7 +162,6 @@ function rateAppIsolation(
 						{{WALLET_NAME}} exposes all your accounts to all connected
 						apps by default.
 					`),
-					__brand: brand,
 				},
 				details: markdown(`
 					When connecting to an app, {{WALLET_NAME}} exposes all your
@@ -197,7 +189,6 @@ function rateAppIsolation(
 					shortExplanation: sentence(`
 						{{WALLET_NAME}} creates app-specific accounts by default.
 					`),
-					__brand: brand,
 				},
 				details: markdown(`
 					When connecting to an app, {{WALLET_NAME}} offers the user to
@@ -217,7 +208,6 @@ function rateAppIsolation(
 						{{WALLET_NAME}} supports the creation of app-specific accounts.
 						However, this isn't the default.
 					`),
-					__brand: brand,
 				},
 				details: markdown(`
 					When connecting to an app, {{WALLET_NAME}} offers the user to
@@ -369,20 +359,18 @@ export const appIsolation: Attribute<AppIsolationValue> = {
 			return exempt(
 				appIsolation,
 				sentence('Only software wallets are expected to deal with connecting to apps.'),
-				brand,
 				null,
 			)
 		}
 
 		if (features.privacy.appIsolation === null) {
-			return unrated(appIsolation, brand, null)
+			return unrated(appIsolation, null)
 		}
 
 		if (isAppConnectionSupportedInAppIsolation(features.privacy.appIsolation)) {
 			return exempt(
 				appIsolation,
 				sentence('{{WALLET_NAME}} does not support connecting to apps.'),
-				brand,
 				null,
 			)
 		}

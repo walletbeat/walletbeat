@@ -28,11 +28,8 @@ import { exempt, pickWorstRating, unrated } from '../common'
 
 type ResolvedSupport = Record<BrowserIntegrationEip, Support>
 
-const brand = 'attributes.ecosystem.browser_integration'
-
 export type BrowserIntegrationValue = Value & {
 	support?: ResolvedSupport
-	__brand: 'attributes.ecosystem.browser_integration'
 }
 
 function browserIntegrationSupport(
@@ -58,7 +55,6 @@ function browserIntegrationSupport(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not integrate with the browser in a standard way.',
 				),
-				__brand: brand,
 			},
 			details: paragraph(
 				'{{WALLET_NAME}} does not adhere to any of the Ethereum standards for integration in web browsers.',
@@ -84,7 +80,6 @@ function browserIntegrationSupport(
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} supports ${unsupported.length === 0 ? 'all' : 'a subset of'} the prominent standards for web browser integration.`,
 			),
-			__brand: brand,
 		},
 		details: markdown(`
 			{{WALLET_NAME}} supports ${unsupported.length === 0 ? 'all' : 'a subset of'} the prominent standards for web browser integration:
@@ -169,7 +164,6 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 			return exempt(
 				browserIntegration,
 				sentence('Only browser-based wallets are rated on their browser integration support.'),
-				brand,
 				{},
 			)
 		}
@@ -181,7 +175,7 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 		}
 
 		if (Object.values(features.integration.browser).includes(null)) {
-			return unrated(browserIntegration, brand, {})
+			return unrated(browserIntegration, {})
 		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that none of the values are null.

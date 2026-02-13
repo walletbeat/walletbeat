@@ -11,13 +11,10 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.hardware_privacy'
-
 export type HardwarePrivacyValue = Value & {
 	phoningHome: HardwarePrivacyType
 	inspectableRemoteCalls: HardwarePrivacyType
 	wirelessPrivacy: HardwarePrivacyType
-	__brand: 'attributes.hardware_privacy'
 }
 
 function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
@@ -89,7 +86,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 		pickWorstRating<HardwarePrivacyValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<HardwarePrivacyValue> => {
 		if (features.type !== WalletType.HARDWARE) {
-			return exempt(hardwarePrivacy, sentence('Only rated for hardware wallets'), brand, {
+			return exempt(hardwarePrivacy, sentence('Only rated for hardware wallets'), {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
 				wirelessPrivacy: HardwarePrivacyType.FAIL,
@@ -99,7 +96,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 		const hwPrivacy = features.privacy.hardwarePrivacy
 
 		if (hwPrivacy === null) {
-			return unrated(hardwarePrivacy, brand, {
+			return unrated(hardwarePrivacy, {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
 				wirelessPrivacy: HardwarePrivacyType.FAIL,
@@ -115,7 +112,6 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 				displayName: 'Hardware Privacy',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} hardware privacy.`),
 				...hwPrivacy, // TODO: Filter fields
-				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} hardware privacy evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

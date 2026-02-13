@@ -19,12 +19,9 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.supply_chain_diy'
-
 export type SupplyChainDIYValue = Value & {
 	diyNoNda: SupplyChainDIYType
 	componentSourcingComplexity: SupplyChainDIYType
-	__brand: 'attributes.supply_chain_diy'
 }
 
 function evaluateSupplyChainDIY(features: SupplyChainDIYSupport): Rating {
@@ -97,15 +94,10 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 			features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType !== HardwareWalletManufactureType.DIY
 		) {
-			return exempt(
-				supplyChainDIY,
-				sentence('Attribute only applies to DIY hardware wallets.'),
-				brand,
-				{
-					diyNoNda: SupplyChainDIYType.FAIL,
-					componentSourcingComplexity: SupplyChainDIYType.FAIL,
-				},
-			)
+			return exempt(supplyChainDIY, sentence('Attribute only applies to DIY hardware wallets.'), {
+				diyNoNda: SupplyChainDIYType.FAIL,
+				componentSourcingComplexity: SupplyChainDIYType.FAIL,
+			})
 		}
 
 		return null
@@ -117,7 +109,6 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.',
 				),
-				brand,
 				{
 					diyNoNda: SupplyChainDIYType.FAIL,
 					componentSourcingComplexity: SupplyChainDIYType.FAIL,
@@ -128,7 +119,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 		const diyFeature = features.security.supplyChainDIY
 
 		if (diyFeature === null) {
-			return unrated(supplyChainDIY, brand, {
+			return unrated(supplyChainDIY, {
 				diyNoNda: SupplyChainDIYType.FAIL,
 				componentSourcingComplexity: SupplyChainDIYType.FAIL,
 			})
@@ -143,7 +134,6 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 				displayName: 'Supply Chain DIY',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} DIY supply chain.`),
 				...diyFeature, // TODO: Filter fields
-				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} DIY supply chain evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

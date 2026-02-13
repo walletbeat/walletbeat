@@ -6,11 +6,7 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.transparency.source_visibility'
-
-export type SourceVisibilityValue = Value & {
-	__brand: 'attributes.transparency.source_visibility'
-}
+export type SourceVisibilityValue = Value
 
 function sourcePublic(references: ReferenceArray): Evaluation<SourceVisibilityValue> {
 	return {
@@ -21,7 +17,6 @@ function sourcePublic(references: ReferenceArray): Evaluation<SourceVisibilityVa
 			shortExplanation: sentence(`
 				The source code for {{WALLET_NAME}} is public.
 			`),
-			__brand: brand,
 		},
 		details: markdown(`
 			The source code for **{{WALLET_NAME}}** is publicly viewable.
@@ -43,7 +38,6 @@ function sourcePartiallyPrivate(references: ReferenceArray): Evaluation<SourceVi
 			shortExplanation: sentence(`
 				The source code for {{WALLET_NAME}} is not fully public.
 			`),
-			__brand: brand,
 		},
 		details: paragraph(`
 			Some but not all parts of the source code for {{WALLET_NAME}}
@@ -71,7 +65,6 @@ function sourcePrivate(references: ReferenceArray): Evaluation<SourceVisibilityV
 			shortExplanation: sentence(`
 				The source code for {{WALLET_NAME}} is not public.
 			`),
-			__brand: brand,
 		},
 		details: paragraph(`
 			The source code for {{WALLET_NAME}} is not available
@@ -122,13 +115,13 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<SourceVisibilityValue> => {
 		if (features.licensing === null) {
-			return unrated(sourceVisibility, brand, null)
+			return unrated(sourceVisibility, null)
 		}
 
 		switch (features.licensing.type) {
 			case LicensingType.SINGLE_WALLET_REPO_AND_LICENSE:
 				if (features.licensing.walletAppLicense === null) {
-					return unrated(sourceVisibility, brand, null)
+					return unrated(sourceVisibility, null)
 				}
 
 				if (licenseSourceIsVisible(features.licensing.walletAppLicense.license)) {
@@ -142,7 +135,7 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 						features.licensing.coreLicense === null ||
 						features.licensing.walletAppLicense === null
 					) {
-						return unrated(sourceVisibility, brand, null)
+						return unrated(sourceVisibility, null)
 					}
 
 					const refs = mergeRefs(
