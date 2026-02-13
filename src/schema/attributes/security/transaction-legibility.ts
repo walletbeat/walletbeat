@@ -880,7 +880,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility, legibility } =
 		transactionLegibilitySupport
 
-	if (calldataDisplay === null || transactionDetailsDisplay === null) {
+	if (calldataDisplay === null || transactionDetailsDisplay === null || legibility === null) {
 		return unrated(transactionLegibility, null)
 	}
 
