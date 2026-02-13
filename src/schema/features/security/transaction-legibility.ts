@@ -328,7 +328,7 @@ export function isSupportedOnDevice(
  */
 export interface HardwareTransactionLegibilitySupport {
 	/**
-	 * Does a wallet display transaction details clearly?
+	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
 	 */
 	legibility: CalldataDecodingTypes | null
 	/**
@@ -357,7 +357,7 @@ export interface CallDataDisplay {
 	/* Can the user copy the raw hex code to the clipboard? */
 	copyHexToClipboard: boolean
 
-	/* Can display the calldata in some formatted output (e.g. JSON) */
+	/* Can display the calldata in some formatted output that shows function names and parameters (e.g. JSON / text) */
 	formatted: boolean
 }
 
@@ -386,7 +386,7 @@ export interface SoftwareTransactionLegibilitySupport {
 	messageSigningLegibility: SoftwareMessageSigningLegibility | null
 
 	/**
-	 * Does a wallet display transaction details clearly?
+	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
 	 */
 	legibility: SoftwareCalldataDecodingTypes | null
 }
