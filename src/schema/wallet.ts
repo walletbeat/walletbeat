@@ -1,6 +1,6 @@
 import type { MarkdownParagraph, Paragraph, TypographicContent } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
-import { prefixError } from '@/types/errors'
+import { getErrorMessage, prefixError } from '@/types/errors'
 import type { Dict } from '@/types/utils/dict'
 import {
 	isNonEmptyArray,
@@ -50,8 +50,9 @@ import {
 	getVariants,
 	hasVariant,
 	Variant,
+	variantEnum,
 } from './variants'
-import { type WalletType, walletTypes } from './wallet-types'
+import { type WalletType, walletTypesOf } from './wallet-types'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -384,13 +385,9 @@ function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | 
 export function rateWallet(wallet: BaseWallet): RatedWallet {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each feature must already have at least one variant populated.
 	const perVariantWallets: AtLeastOneVariant<ResolvedWallet> = Object.fromEntries(
-		Object.entries({
-			embedded: resolveVariant(wallet, Variant.EMBEDDED),
-			desktop: resolveVariant(wallet, Variant.DESKTOP),
-			browser: resolveVariant(wallet, Variant.BROWSER),
-			mobile: resolveVariant(wallet, Variant.MOBILE),
-			hardware: resolveVariant(wallet, Variant.HARDWARE),
-		}).filter(([_, val]) => val !== null),
+		variantEnum.items
+			.map(variant => [variant, resolveVariant(wallet, variant)])
+			.filter(([_, val]) => val !== null),
 	) as AtLeastOneVariant<ResolvedWallet>
 	const perVariantTree: AtLeastOneVariant<EvaluationTree> = nonEmptyRemap(
 		perVariantWallets,
@@ -488,7 +485,7 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 	)
 
 	const stageEvaluatable: StageEvaluatableWallet = {
-		types: walletTypes(wallet),
+		types: walletTypesOf(wallet),
 		variants: perVariantWallets,
 		variantSpecificity,
 		overall: aggregateAttributes(perVariantTree),
@@ -498,9 +495,13 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 	return {
 		metadata: wallet.metadata,
 		...stageEvaluatable,
-		ladders: nonEmptyRemap(ladders, (_, ladder) =>
-			evaluateWalletOnLadder(stageEvaluatable, ladder),
-		),
+		ladders: nonEmptyRemap(ladders, (_, ladder) => {
+			try {
+				return evaluateWalletOnLadder(stageEvaluatable, ladder)
+			} catch (e) {
+				throw new Error(`Wallet ${wallet.metadata.id}: ${getErrorMessage(e)}`)
+			}
+		}),
 	}
 }
 

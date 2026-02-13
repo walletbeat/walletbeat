@@ -1,4 +1,5 @@
 import type { Content, Paragraph, Sentence } from '@/types/content'
+import { getErrorMessage } from '@/types/errors'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
@@ -355,11 +356,27 @@ export function evaluateWalletOnLadder(
 	let clearedStage: WalletStage | null = null
 
 	for (const stage of ladder.stages) {
-		const stageEvaluations = nonEmptyFlatten(
-			nonEmptyMap(stage.criteriaGroups, criteriaGroup =>
-				nonEmptyMap(criteriaGroup.criteria, criterion => criterion.evaluate(wallet)),
-			),
-		)
+		const stageEvaluations = (() => {
+			try {
+				return nonEmptyFlatten(
+					nonEmptyMap(stage.criteriaGroups, criteriaGroup => {
+						try {
+							return nonEmptyMap(criteriaGroup.criteria, criterion => {
+								try {
+									return criterion.evaluate(wallet)
+								} catch (e) {
+									throw new Error(`Criterion ${criterion.id}: ${getErrorMessage(e)}`)
+								}
+							})
+						} catch (e) {
+							throw new Error(`Criteria group ${criteriaGroup.id}: ${getErrorMessage(e)}`)
+						}
+					}),
+				)
+			} catch (e) {
+				throw new Error(`Stage ${stage.id}: ${getErrorMessage(e)}`)
+			}
+		})()
 
 		// This cannot vacuously pass, because `stageEvaluations` is guaranteed to be non-empty.
 		if (stageEvaluations.every(evaluation => evaluation.rating === StageCriterionRating.PASS)) {
