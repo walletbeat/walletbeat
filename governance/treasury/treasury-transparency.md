@@ -1,6 +1,6 @@
 # Walletbeat Treasury Transparency Report
 
-_Latest operation: 2026-02-10_
+_Latest operation: 2026-02-13_
 
 This document tracks known treasury addresses and their operational history.
 
@@ -22,6 +22,8 @@ The following addresses are recognized as part of Walletbeat and its contributor
 | `mattmatt3`                 | [`eth:0x943623f9bd1A83Fdb8b8Cc30848B09b79e95baE1`](https://eth.blockscout.com/address/0x943623f9bd1A83Fdb8b8Cc30848B09b79e95baE1) | 0xMattmatt                  | EOA owned by 0xMattmatt                                                                                                                                                                       |
 | `chainflip1`                | [`eth:0x0c38377530cc4d9604c99fb3DB1c2AA9e3DAe57a`](https://eth.blockscout.com/address/0x0c38377530cc4d9604c99fb3DB1c2AA9e3DAe57a) | Chainflip                   | One-time EOA owned by Chainflip                                                                                                                                                               |
 | `proton1`                   | [`btc:bc1qw5yq9fqe7gvlnwvwwu9zf0n0pxk8mwkdndw9jl`](https://mempool.space/address/bc1qw5yq9fqe7gvlnwvwwu9zf0n0pxk8mwkdndw9jl)      | Proton                      | One-time Bitcoin payment address for Walletbeat Proton mail account                                                                                                                           |
+| `mattmatt_test1`            | [`eth:0x41C36c21b31C67e1c645CeE831dd5E4BfBF0cbC9`](https://eth.blockscout.com/address/0x41C36c21b31C67e1c645CeE831dd5E4BfBF0cbC9) | 0xMattmatt                  | EOA owned by 0xMattmatt, used exclusively for wallet testing (#1). Expect random swaps and transfers to other test accounts.                                                                  |
+| `mattmatt_test2`            | [`eth:0xedb22965D0Dd7fe8fe4dae8E89F1d958D6b2F0A4`](https://eth.blockscout.com/address/0xedb22965D0Dd7fe8fe4dae8E89F1d958D6b2F0A4) | 0xMattmatt                  | WalletbeatSafe Testing Multisig (currently 1-of-1), used exclusively for testing safe transactions. Expect random swaps transactions, and transfers to other test accounts.                   |
 
 ## 2. Operations Log
 
@@ -66,6 +68,7 @@ A history of transfers, grants, and treasury operations.
 | 2026-02-09 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`mattmatt3`](https://eth.blockscout.com/address/0x943623f9bd1A83Fdb8b8Cc30848B09b79e95baE1)                 | `1,999.999999 USDC`                                    | Top-up of Sablier stream                                                                            | [`0x4c2a2b7c...`](https://eth.blockscout.com/tx/0x4c2a2b7c3f415fa181f76399034705b7ddc3ed93a012b4792171efb0e33f818c) |
 | 2026-02-10 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`chainflip1`](https://eth.blockscout.com/address/0x0c38377530cc4d9604c99fb3DB1c2AA9e3DAe57a)                | `0.055 ETH → 0.00157093 BTC`                           | Chainflip swap to BTC https://scan.chainflip.io/swaps/1314403                                       | [`0xa39a6666...`](https://eth.blockscout.com/tx/0xa39a6666228ba3f3f023623fbd78487f0c054b70f879710d441a73d7225edfb7) |
 | 2026-02-10 | [`chainflip1`](https://eth.blockscout.com/address/0x0c38377530cc4d9604c99fb3DB1c2AA9e3DAe57a)                | [`proton1`](https://mempool.space/address/bc1qw5yq9fqe7gvlnwvwwu9zf0n0pxk8mwkdndw9jl)                        | `0.00157093 BTC`                                       | Payment for 2 years of Mail Plus for Walletbeat Proton Mail service                                 | [`d171832539...`](https://mempool.space/tx/d171832539dc34e86c29b9457249c96b98fdb8e5efbe00002a8f92073e7007ea)        |
+| 2026-02-13 | [`treasury`](https://eth.blockscout.com/address/0x52666AD68156B03EAce67678cDCF1d74bC56201D)                  | [`mattmatt_test1`](https://eth.blockscout.com/address/0x41C36c21b31C67e1c645CeE831dd5E4BfBF0cbC9)            | `0.05 ETH`                                             | Wallet testing                                                                                      | [`0xdb311311...`](https://eth.blockscout.com/tx/0xdb3113117fd8c05be082110179634ecc1170350d12ed81d8924a3e435d4048f9) |
 
 ---
 
