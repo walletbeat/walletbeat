@@ -184,6 +184,7 @@
 	import Pie, { PieLayout } from '@/components/Pie.svelte'
 	import Select from '@/components/Select.svelte'
 	import AddressCorrelationDetails from '@/views/attributes/privacy/AddressCorrelationDetails.svelte'
+	import PrivateTransfersDetails from '@/views/attributes/privacy/PrivateTransfersDetails.svelte'
 	import ChainVerificationDetails from '@/views/attributes/security/ChainVerificationDetails.svelte'
 	import ScamAlertDetails from '@/views/attributes/security/ScamAlertDetails.svelte'
 	import SecurityAuditsDetails from '@/views/attributes/security/SecurityAuditsDetails.svelte'
@@ -879,6 +880,8 @@
 						<div data-column>
 							{#if componentName === 'AddressCorrelationDetails'}
 								<AddressCorrelationDetails {...componentProps} {wallet} {value} />
+							{:else if componentName === 'PrivateTransfersDetails'}
+								<PrivateTransfersDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'ChainVerificationDetails'}
 								<ChainVerificationDetails {...componentProps} {wallet} {value} refs={references} />
 							{:else if componentName === 'ScamAlertDetails'}

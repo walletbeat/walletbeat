@@ -10,12 +10,14 @@ export enum PrivateTransferTechnology {
 	STEALTH_ADDRESSES = 'stealthAddresses',
 	TORNADO_CASH_NOVA = 'tornadoCashNova',
 	PRIVACY_POOLS = 'privacyPools',
+	RAILGUN = 'railgun',
 }
 
 export const privateTransferTechnology = new Enum<PrivateTransferTechnology>({
 	[PrivateTransferTechnology.STEALTH_ADDRESSES]: true,
 	[PrivateTransferTechnology.TORNADO_CASH_NOVA]: true,
 	[PrivateTransferTechnology.PRIVACY_POOLS]: true,
+	[PrivateTransferTechnology.RAILGUN]: true,
 })
 
 export type FungibleTokenTransferMode =
@@ -64,8 +66,8 @@ export type TransactionPrivacy = {
 	/** Support for Privacy Pools. */
 	[PrivateTransferTechnology.PRIVACY_POOLS]: Support<PrivacyPoolsSupport>
 
-	// TODO: Add other forms of transaction privacy here,
-	// e.g. Railgun, etc.
+	/** Support for Railgun. */
+	[PrivateTransferTechnology.RAILGUN]: Support<RailgunSupport>
 } & IfDefaultTransferMode<
 	PrivateTransferTechnology.STEALTH_ADDRESSES,
 	{
@@ -82,6 +84,12 @@ export type TransactionPrivacy = {
 		PrivateTransferTechnology.PRIVACY_POOLS,
 		{
 			[PrivateTransferTechnology.PRIVACY_POOLS]: Supported<PrivacyPoolsSupport>
+		}
+	> &
+	IfDefaultTransferMode<
+		PrivateTransferTechnology.RAILGUN,
+		{
+			[PrivateTransferTechnology.RAILGUN]: Supported<RailgunSupport>
 		}
 	>
 
@@ -405,4 +413,78 @@ export type PrivacyPoolsSupport = WithRef<{
 	 * How is deposit data handled?
 	 */
 	depositData: PrivacyPoolsDepositData
+}>
+
+type RailgunTransactionSubmission =
+	| {
+			/**
+			 * Only broadcaster submission is supported. Broadcasters are required
+			 * for transactions FROM shielded addresses (private transfers, unshielding),
+			 * but NOT for shielding (depositing into Railgun).
+			 */
+			type: 'BROADCASTER_ONLY'
+
+			/**
+			 * Can the broadcaster endpoint be customized?
+			 */
+			customizableBroadcaster: Support
+
+			/**
+			 * Can the broadcaster learn the user's IP address?
+			 * Should be false if using Waku Network for IP protection.
+			 */
+			broadcasterLearnsUserIpAddress: boolean
+	  }
+	| {
+			/**
+			 * Both broadcaster submission and self-relay are supported.
+			 * Broadcasters are required for transactions FROM shielded addresses
+			 * (private transfers, unshielding), but NOT for shielding (depositing into Railgun).
+			 * Self-relay exposes IP address and should be avoided for privacy.
+			 */
+			type: 'BROADCASTER_OR_SELF_RELAY'
+
+			/**
+			 * Can the broadcaster endpoint be customized?
+			 */
+			customizableBroadcaster: Support
+
+			/**
+			 * Can the broadcaster learn the user's IP address?
+			 * Should be false if using Waku Network for IP protection.
+			 */
+			broadcasterLearnsUserIpAddress: boolean
+	  }
+
+/**
+ * Support data for Railgun.
+ */
+export type RailgunSupport = WithRef<{
+	/**
+	 * Does the wallet support private transfers between Railgun wallets?
+	 */
+	privateTransfers: Support
+
+	/**
+	 * Does the wallet support cross-contract calls (private DeFi interactions)?
+	 */
+	crossContractCalls: Support
+
+	/**
+	 * Does the wallet warn when doing multiple Railgun operations
+	 * in quick succession, potentially leading to time-based correlation?
+	 */
+	warnAboutSuccessiveOperations: Support
+
+	/**
+	 * How are transactions submitted? Broadcasters are required for transactions
+	 * FROM shielded addresses (private transfers, unshielding), but NOT for
+	 * shielding (depositing into Railgun).
+	 */
+	transactionSubmission: RailgunTransactionSubmission
+
+	/**
+	 * Is the fee taken by broadcasters displayed in the UI?
+	 */
+	broadcasterFee: FeeDisplay
 }>
