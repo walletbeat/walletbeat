@@ -37,6 +37,8 @@ import type {
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
+	CalldataDecoding,
+	DataDecoded,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
@@ -48,7 +50,7 @@ import { TransactionSubmissionL2Support } from '@/schema/features/self-sovereign
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { type References, refTodo, type WithRef } from '@/schema/reference'
+import { type References, refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -584,7 +586,14 @@ export const ambire: SoftwareWallet = {
 					formatted: false,
 					rawHex: true,
 				},
-				legibility: null,
+				legibility: {
+					[CalldataDecoding.ETH_USDC_TRANSFER]: false,
+					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
+					[CalldataDecoding.USDC_APPROVAL]: false,
+					[CalldataDecoding.AAVE_SUPPLY]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false
+				},
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
