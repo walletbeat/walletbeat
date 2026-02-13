@@ -592,7 +592,7 @@ export const ambire: SoftwareWallet = {
 					[CalldataDecoding.USDC_APPROVAL]: false,
 					[CalldataDecoding.AAVE_SUPPLY]: false,
 					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
 				},
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
