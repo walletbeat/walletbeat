@@ -36,3 +36,4 @@ Date	From	To	Amount	Purpose	ID
 2026-02-09	treasury	mattmatt3	1,999.999999 USDC	Top-up of Sablier stream	0x4c2a2b7c3f415fa181f76399034705b7ddc3ed93a012b4792171efb0e33f818c
 2026-02-10	treasury	chainflip1	0.055 ETH → 0.00157093 BTC	Chainflip swap to BTC https://scan.chainflip.io/swaps/1314403	0xa39a6666228ba3f3f023623fbd78487f0c054b70f879710d441a73d7225edfb7
 2026-02-10	chainflip1	proton1	0.00157093 BTC	Payment for 2 years of Mail Plus for Walletbeat Proton Mail service	btc:d171832539dc34e86c29b9457249c96b98fdb8e5efbe00002a8f92073e7007ea
+2026-02-13	treasury	mattmatt_test1	0.05 ETH	Wallet testing	0xdb3113117fd8c05be082110179634ecc1170350d12ed81d8924a3e435d4048f9
