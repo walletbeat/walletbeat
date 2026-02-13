@@ -274,6 +274,7 @@ export const zeus: SoftwareWallet = {
 					},
 				],
 				calldataDisplay: null,
+				legibility: null,
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.SHOWN_BY_DEFAULT,
