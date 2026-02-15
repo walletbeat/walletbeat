@@ -141,6 +141,7 @@ export const zerion: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,
+				legibility: null,
 				messageSigningLegibility: null,
 				transactionDetailsDisplay: {
 					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,

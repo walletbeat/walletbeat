@@ -37,6 +37,7 @@ import type {
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
+	CalldataDecoding,
 	DataDisplayOptions,
 	MessageSigningDetails,
 } from '@/schema/features/security/transaction-legibility'
@@ -583,6 +584,14 @@ export const ambire: SoftwareWallet = {
 					copyHexToClipboard: false,
 					formatted: false,
 					rawHex: true,
+				},
+				legibility: {
+					[CalldataDecoding.ETH_USDC_TRANSFER]: false,
+					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
+					[CalldataDecoding.USDC_APPROVAL]: false,
+					[CalldataDecoding.AAVE_SUPPLY]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
+					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
 				},
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
