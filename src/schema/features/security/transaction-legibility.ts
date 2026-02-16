@@ -233,7 +233,7 @@ export type CalldataDecoding = BasicBenchmarkTransactions | ComplexBenchmarkTran
 /**
  * Merged enum-like const for CalldataDecoding, allowing CalldataDecoding.ETH_TRANSFER etc.
  */
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+
 export const CalldataDecoding = {
 	...BasicBenchmarkTransactions,
 	...ComplexBenchmarkTransactions,
@@ -261,8 +261,7 @@ export interface DisplayedFailedTransactionDetails extends DisplayedComplexTrans
 /**
  * Details for a nondeterministic simulation benchmark transaction.
  */
-export interface DisplayedNondeterministicTransactionDetails
-	extends DisplayedComplexTransactionDetails {
+export interface DisplayedNondeterministicTransactionDetails extends DisplayedComplexTransactionDetails {
 	nondeterminism: 'NOT_DETECTED' | 'DETECTED_WITHOUT_WARNING' | 'DETECTED_WITH_WARNING'
 }
 
