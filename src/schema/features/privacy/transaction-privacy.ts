@@ -2,7 +2,7 @@ import type { Entity } from '@/schema/entity'
 import type { WithRef } from '@/schema/reference'
 import { Enum } from '@/utils/enum'
 
-import type { Support, Supported } from '../support'
+import type { NotSupported, Support, Supported } from '../support'
 import type { FeeDisplay } from '../transparency/fee-display'
 import type { MultiAddressHandling, MultiAddressPolicy } from './data-collection'
 
@@ -415,51 +415,43 @@ export type PrivacyPoolsSupport = WithRef<{
 	depositData: PrivacyPoolsDepositData
 }>
 
-type RailgunShieldedTransactionSubmission =
+type BroadcasterBasedTransactionSubmissionData = {
+	/**
+	 * Can the broadcaster endpoint be customized?
+	 */
+	customizableBroadcaster: Support
+
+	/**
+	 * Can the broadcaster learn the user's IP address?
+	 * Should be false if using Logos (previously Waku) for IP protection.
+	 */
+	broadcasterLearnsUserIpAddress: boolean
+
+	/**
+	 * Is the fee taken by broadcasters displayed in the UI?
+	 */
+	broadcasterFee: FeeDisplay
+}
+
+type RailgunTransactionSubmissionVariant =
 	| {
-			/**
-			 * Only broadcaster submission is supported. Broadcasters are required
-			 * for transactions FROM shielded addresses (private transfers, unshielding),
-			 * but NOT for shielding (depositing into Railgun).
-			 */
-			type: 'BROADCASTER_ONLY'
-
-			/**
-			 * Can the broadcaster endpoint be customized?
-			 */
-			customizableBroadcaster: Support
-
-			/**
-			 * Can the broadcaster learn the user's IP address?
-			 * Should be false if using Logos (previously Waku) for IP protection.
-			 */
-			broadcasterLearnsUserIpAddress: boolean
+			broadcasterBasedTransactionSubmission: Supported<BroadcasterBasedTransactionSubmissionData>
+			selfRelayedTransactionSubmission: NotSupported
 	  }
 	| {
-			/**
-			 * Both broadcaster submission and self-relay are supported.
-			 * Broadcasters are required for transactions FROM shielded addresses
-			 * (private transfers, unshielding), but NOT for shielding (depositing into Railgun).
-			 * Self-relay exposes IP address and should be avoided for privacy.
-			 */
-			type: 'BROADCASTER_OR_SELF_RELAY'
-
+			broadcasterBasedTransactionSubmission: NotSupported
+			selfRelayedTransactionSubmission: Supported
+	  }
+	| {
+			broadcasterBasedTransactionSubmission: Supported<BroadcasterBasedTransactionSubmissionData>
+			selfRelayedTransactionSubmission: Supported
 			/**
 			 * Which transaction submission method is used by default when both
 			 * broadcaster and self-relay are available?
+			 * Required when both broadcasterBasedTransactionSubmission and
+			 * selfRelayedTransactionSubmission are supported.
 			 */
 			defaultTransactionSubmissionType: 'BROADCASTER' | 'SELF_RELAY'
-
-			/**
-			 * Can the broadcaster endpoint be customized?
-			 */
-			customizableBroadcaster: Support
-
-			/**
-			 * Can the broadcaster learn the user's IP address?
-			 * Should be false if using Logos (previously Waku) for IP protection.
-			 */
-			broadcasterLearnsUserIpAddress: boolean
 	  }
 
 /**
@@ -493,14 +485,16 @@ export type RailgunSupport = WithRef<{
 	merkleTreeSync: 'WALLET_SIDE' | 'EXTERNAL'
 
 	/**
-	 * How are transactions submitted? Broadcasters are required for transactions
-	 * FROM shielded addresses (private transfers, unshielding), but NOT for
-	 * shielding (depositing into Railgun).
+	 * Does the wallet support broadcaster-based transaction submission?
+	 * Broadcasters are required for transactions FROM shielded addresses
+	 * (private transfers, unshielding), but NOT for shielding (depositing into Railgun).
 	 */
-	shieldedTransactionSubmission: RailgunShieldedTransactionSubmission
+	broadcasterBasedTransactionSubmission: Support<BroadcasterBasedTransactionSubmissionData>
 
 	/**
-	 * Is the fee taken by broadcasters displayed in the UI?
+	 * Does the wallet support self-relayed transaction submission?
+	 * Self-relay exposes IP address and should be avoided for privacy.
 	 */
-	broadcasterFee: FeeDisplay
-}>
+	selfRelayedTransactionSubmission: Support
+}> &
+	RailgunTransactionSubmissionVariant

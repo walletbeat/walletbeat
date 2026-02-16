@@ -1338,12 +1338,46 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			}
 		}
 
+		const broadcasterSupported = isSupported(railgun.broadcasterBasedTransactionSubmission)
+		const selfRelaySupported = isSupported(railgun.selfRelayedTransactionSubmission)
+
+		// If only self-relay is supported, this exposes IP address
+		if (!broadcasterSupported && selfRelaySupported) {
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
+				spendingDetails: mdParagraph(`
+					Transactions are submitted via self-relay, which exposes the user's IP address.
+					This compromises privacy as the user's IP address can be linked to their transactions.
+				`),
+				spendingImprovements: [
+					'add support for broadcaster-based transaction submission to protect IP addresses',
+				],
+			}
+		}
+
+		// Broadcaster must be supported at this point (either broadcaster-only or both)
+		if (!broadcasterSupported) {
+			// This should not happen due to type constraint, but handle gracefully
+			throw new Error(
+				'RailgunSupport must have at least one transaction submission method supported',
+			)
+		}
+
+		// Extract broadcaster data once - we know it's supported
+		const broadcasterData = railgun.broadcasterBasedTransactionSubmission
+
+		if (!isSupported(broadcasterData)) {
+			throw new Error('Expected broadcaster to be supported')
+		}
+
+		// If both are supported and default is self-relay, this exposes IP address
 		if (
-			railgun.shieldedTransactionSubmission.type === 'BROADCASTER_OR_SELF_RELAY' &&
-			railgun.shieldedTransactionSubmission.defaultTransactionSubmissionType === 'SELF_RELAY'
+			selfRelaySupported &&
+			'defaultTransactionSubmissionType' in railgun &&
+			railgun.defaultTransactionSubmissionType === 'SELF_RELAY'
 		) {
 			// Default is self-relay, which exposes IP address
-			if (railgun.shieldedTransactionSubmission.broadcasterLearnsUserIpAddress) {
+			if (broadcasterData.broadcasterLearnsUserIpAddress) {
 				return {
 					spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
 					spendingDetails: mdParagraph(`
@@ -1358,7 +1392,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				}
 			}
 
-			if (!isSupported(railgun.shieldedTransactionSubmission.customizableBroadcaster)) {
+			if (!isSupported(broadcasterData.customizableBroadcaster)) {
 				return {
 					spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 					spendingDetails: mdParagraph(`
@@ -1387,9 +1421,9 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			}
 		}
 
-		// BROADCASTER_ONLY or BROADCASTER_OR_SELF_RELAY with BROADCASTER default
-		if (railgun.shieldedTransactionSubmission.broadcasterLearnsUserIpAddress) {
-			if (!isSupported(railgun.shieldedTransactionSubmission.customizableBroadcaster)) {
+		// Broadcaster is used (either broadcaster-only or both with broadcaster default)
+		if (broadcasterData.broadcasterLearnsUserIpAddress) {
+			if (!isSupported(broadcasterData.customizableBroadcaster)) {
 				return {
 					spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
 					spendingDetails: mdParagraph(`
@@ -1417,7 +1451,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 		}
 
 		// Broadcaster with Logos (previously Waku)
-		if (!isSupported(railgun.shieldedTransactionSubmission.customizableBroadcaster)) {
+		if (!isSupported(broadcasterData.customizableBroadcaster)) {
 			extraNotes.push(
 				mdParagraph(`
 					The Railgun broadcaster is not user-customizable, and is in a position
