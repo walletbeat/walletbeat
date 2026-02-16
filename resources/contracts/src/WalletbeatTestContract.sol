@@ -12,6 +12,7 @@ contract WalletbeatTestContract {
 
     error WalletbeatTestContract__ERC20CallFailed();
     error WalletbeatTestContract__ERC721CallFailed();
+    error WalletbeatTestContract__AlwaysFails();
 
     uint256 public constant FAKE_TOKENS_TO_CLAIM = 1e18;
     address private immutable i_erc20Token;
@@ -81,5 +82,10 @@ contract WalletbeatTestContract {
             revert WalletbeatTestContract__ERC20CallFailed();
         }
         emit Transfer(address(0), msg.sender, FAKE_TOKENS_TO_CLAIM);
+    }
+
+    function alwaysFails() external {
+        i_erc20Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
+        revert WalletbeatTestContract__AlwaysFails();
     }
 }
