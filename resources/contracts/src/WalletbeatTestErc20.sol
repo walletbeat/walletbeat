@@ -2,7 +2,6 @@
 pragma solidity 0.8.24;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title WalletbeatTestErc20
@@ -10,7 +9,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  * @notice A test ERC20 token used to evaluate how wallets simulate and display token transactions
  * @dev This token is soulbound and can only be minted or burned by the owner
  */
-contract WalletbeatTestErc20 is ERC20, Ownable {
+contract WalletbeatTestErc20 is ERC20 {
     error WalletbeatTestErc20__Soulbound();
 
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
@@ -19,6 +18,7 @@ contract WalletbeatTestErc20 is ERC20, Ownable {
      * @notice Mints a variable amount of tokens to the specified user
      * @dev The amount minted is determined by `1 + (block.number % 100)` to introduce
      * unpredictability in transaction simulations.
+     * Anyone can mint to other addresses
      * @param user The address to receive the minted tokens
      */
     function mint(address user) external {
@@ -30,9 +30,10 @@ contract WalletbeatTestErc20 is ERC20, Ownable {
      * @notice Replicates a malicious claim function with unpredictable behavior
      * @dev Mints tokens if block.number is even, burns the user's entire balance if odd.
      * This simulates unpredictable drain behavior that wallets should detect.
+     * Anyone can claim using other address
      * @param user The address to receive minted tokens or have their balance burned
      */
-    function claim(address user) external onlyOwner {
+    function claim(address user) external {
         if (block.number % 2 == 0) {
             uint256 tokensToMint = 1 + (block.number % 100);
             super._mint(user, tokensToMint);
@@ -45,6 +46,7 @@ contract WalletbeatTestErc20 is ERC20, Ownable {
     /**
      * @notice Burns all tokens held by the specified user
      * @dev This function drains the user's entire token balance.
+     * Anyone can burn other address' tokens
      * @param user The address whose tokens will be burned
      */
     function burn(address user) external {

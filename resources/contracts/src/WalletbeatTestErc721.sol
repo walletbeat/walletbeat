@@ -2,10 +2,9 @@
 pragma solidity 0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract WalletbeatTestErc721 is ERC721, Ownable {
-    error WalletbeatTestErc20__Soulbound();
+contract WalletbeatTestErc721 is ERC721 {
+    error WalletbeatTestErc721__Soulbound();
 
     uint256 private s_tokenId;
 
@@ -30,6 +29,6 @@ contract WalletbeatTestErc721 is ERC721, Ownable {
             return;
         }
 
-        revert WalletbeatTestErc20__Soulbound();
+        revert WalletbeatTestErc721__Soulbound();
     }
 }

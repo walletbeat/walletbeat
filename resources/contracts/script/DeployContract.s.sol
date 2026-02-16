@@ -18,12 +18,6 @@ contract DeployContract is Script {
         WalletbeatTestErc721 erc721Contract = new WalletbeatTestErc721(erc721TokenName, tokenSymbol);
         WalletbeatTestContract testContract =
             new WalletbeatTestContract(address(erc20Contract), address(erc721Contract));
-        (bool success,) =
-            address(erc20Contract).call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
-        require(success, "Call failed");
-        (success,) = address(erc721Contract)
-            .call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
-        require(success, "Call failed");
         vm.stopBroadcast();
 
         return (testContract, erc20Contract, erc721Contract);
