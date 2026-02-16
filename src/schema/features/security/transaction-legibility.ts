@@ -88,17 +88,8 @@ export enum BasicBenchmarkTransactions {
 	 */
 	ETH_TRANSFER = 'ETH_TRANSFER',
 
-	/**
-	 * USDC transfer transaction
-	 * cast calldata "transfer(address,uint256)" 0x06496E706bB260Bef1656297A7eaDDF5D3E7788A 1000000000000000000
-	 * https://tools.cyfrin.io/abi-encoding?data=0xa9059cbb00000000000000000000000006496e706bb260bef1656297a7eaddf5d3e7788a0000000000000000000000000000000000000000000000000de0b6b3a7640000
-	 *
-	 *   📞 Function: transfer(address,uint256)
-	 *   📋 Parameters:
-	 *     param0: 0x06496E706bB260Bef1656297A7eaDDF5D3E7788A
-	 *     param1: 1000000000000000000
-	 */
-	ETH_USDC_TRANSFER = 'ETH_USDC_TRANSFER',
+	ERC_20_TRANSFER = 'ERC_20_TRANSFER',
+	ERC_721_TRANSFER = 'ER_721_TRANSFER',
 
 	/**
 	 * ZKSync USDC transfer transaction
@@ -339,7 +330,8 @@ export interface HardwareMessageSigningLegibility {
  */
 export const noCalldataDecoding: CalldataDecodingTypes = {
 	[CalldataDecoding.ETH_TRANSFER]: notSupported,
-	[CalldataDecoding.ETH_USDC_TRANSFER]: notSupported,
+	[CalldataDecoding.ERC_20_TRANSFER]: notSupported,
+	[CalldataDecoding.ERC_721_TRANSFER]: notSupported,
 	[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: notSupported,
 	[CalldataDecoding.USDC_APPROVAL]: notSupported,
 	[CalldataDecoding.AAVE_SUPPLY]: notSupported,

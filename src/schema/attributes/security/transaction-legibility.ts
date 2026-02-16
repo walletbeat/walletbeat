@@ -145,8 +145,12 @@ function analyzeHardwareFeatures({
 				label: 'plain ETH transfers',
 			},
 			{
-				key: CalldataDecoding.ETH_USDC_TRANSFER,
+				key: CalldataDecoding.ERC_20_TRANSFER,
 				label: 'basic token transfers (ERC-20)',
+			},
+			{
+				key: CalldataDecoding.ERC_721_TRANSFER,
+				label: 'basic nft transfers (ERC-721)',
 			},
 			{
 				key: CalldataDecoding.ZKSYNC_USDC_TRANSFER,
@@ -500,8 +504,12 @@ function analyzeSoftwareFeatures({
 	if (legibility !== null) {
 		const decodingChecks = [
 			{
-				key: CalldataDecoding.ETH_USDC_TRANSFER,
+				key: CalldataDecoding.ERC_20_TRANSFER,
 				label: 'basic token transfers (ERC-20)',
+			},
+			{
+				key: CalldataDecoding.ERC_721_TRANSFER,
+				label: 'basic NFT transfers (ERC-721)',
 			},
 			{
 				key: CalldataDecoding.ZKSYNC_USDC_TRANSFER,
@@ -750,7 +758,8 @@ function evaluateHardwareWalletTransactionLegibility(
 
 		// Check if wallet supports basic calldata decoding (ON_DEVICE)
 		const supportsBasicDecoding: boolean =
-			isSupportedOnDevice(legibility, CalldataDecoding.ETH_USDC_TRANSFER) &&
+			isSupportedOnDevice(legibility, CalldataDecoding.ERC_20_TRANSFER) &&
+			isSupportedOnDevice(legibility, CalldataDecoding.ERC_721_TRANSFER) &&
 			isSupportedOnDevice(legibility, CalldataDecoding.ZKSYNC_USDC_TRANSFER) &&
 			isSupportedOnDevice(legibility, CalldataDecoding.AAVE_SUPPLY)
 
@@ -853,7 +862,8 @@ function evaluateSoftwareWalletTransactionLegibility(
 
 	// Check calldata decoding capabilities
 	const supportsBasicDecoding: boolean =
-		legibility[CalldataDecoding.ETH_USDC_TRANSFER] === true &&
+		legibility[CalldataDecoding.ERC_20_TRANSFER] === true &&
+		legibility[CalldataDecoding.ERC_721_TRANSFER] === true &&
 		legibility[CalldataDecoding.ZKSYNC_USDC_TRANSFER] === true &&
 		legibility[CalldataDecoding.AAVE_SUPPLY] === true
 
@@ -862,25 +872,6 @@ function evaluateSoftwareWalletTransactionLegibility(
 		(legibility[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED] === true ||
 			legibility[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND] ===
 				true)
-
-	// For DisplayedTransactionDetails, SHOWN_BY_DEFAULT or SHOWN_OPTIONALLY count as supported
-	const transactionDetailsRatings = [
-		transactionDetailsDisplay.gas === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.gas === DataDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.nonce === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.nonce === DataDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.from === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.from === DataDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.to === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.to === DataDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.chain === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.chain === DataDisplayOptions.SHOWN_OPTIONALLY,
-		transactionDetailsDisplay.value === DataDisplayOptions.SHOWN_BY_DEFAULT ||
-			transactionDetailsDisplay.value === DataDisplayOptions.SHOWN_OPTIONALLY,
-	]
-
-	const transactionDetailsCount = transactionDetailsRatings.filter(r => r).length
-	const allTransactionDetailsShown = transactionDetailsCount === transactionDetailsRatings.length
 
 	// Hierarchical scoring logic:
 	// 1. If no calldata shown at all, FAIL
