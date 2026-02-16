@@ -11,7 +11,7 @@ contract WalletbeatTestErc721 is ERC721, Ownable {
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
-    function mint(address receiver) external onlyOwner {
+    function mint(address receiver) external {
         uint256 tokensToMint = 1 + (block.number % 4);
         for (uint256 i = 0; i < tokensToMint; i++) {
             s_tokenId++;

@@ -21,7 +21,7 @@ contract WalletbeatTestErc20 is ERC20, Ownable {
      * unpredictability in transaction simulations.
      * @param user The address to receive the minted tokens
      */
-    function mint(address user) external onlyOwner {
+    function mint(address user) external {
         uint256 tokensToMint = 1 + (block.number % 100);
         super._mint(user, tokensToMint);
     }
@@ -47,7 +47,7 @@ contract WalletbeatTestErc20 is ERC20, Ownable {
      * @dev This function drains the user's entire token balance.
      * @param user The address whose tokens will be burned
      */
-    function burn(address user) external onlyOwner {
+    function burn(address user) external {
         uint256 userBalance = balanceOf(user);
         _burn(user, userBalance);
     }
