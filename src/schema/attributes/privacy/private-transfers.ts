@@ -1294,15 +1294,32 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 		receivingDetails: MarkdownParagraph<WalletNameStrings>
 		receivingImprovements: string[]
 	} => {
-		// Balance lookup is fully private (done locally, wallet syncs merkle tree)
-		return {
-			receivingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
-			receivingDetails: mdParagraph(`
-				Receiving funds through Railgun requires no external service. The wallet
-				syncs and decrypts the Railgun UTXO merkle tree locally, ensuring that
-				no external provider can learn about received funds.
-			`),
-			receivingImprovements: [],
+		// Receiving privacy depends on where merkle tree syncing happens.
+		// If done server-side, an external provider can learn about received funds
+		// even though chain data doesn't reveal this (CHAIN_DATA_PRIVATE).
+		// If done client-side, no external provider learns about received funds (FULLY_PRIVATE).
+		switch (railgun.merkleTreeSync) {
+			case 'EXTERNAL':
+				return {
+					receivingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+					receivingDetails: mdParagraph(`
+						The Railgun UTXO merkle tree is synced externally,
+						allowing an external provider to learn about received funds.
+						While the onchain transaction data does not reveal these details,
+						the external provider is in a position to learn about received funds.
+					`),
+					receivingImprovements: ['should perform merkle tree syncing client-side'],
+				}
+			case 'WALLET_SIDE':
+				return {
+					receivingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
+					receivingDetails: mdParagraph(`
+						Receiving funds through Railgun requires no external service. The wallet
+						syncs and decrypts the Railgun UTXO merkle tree locally, ensuring that
+						no external provider can learn about received funds.
+					`),
+					receivingImprovements: [],
+				}
 		}
 	})()
 	const { spendingPrivacy, spendingDetails, spendingImprovements } = ((): {

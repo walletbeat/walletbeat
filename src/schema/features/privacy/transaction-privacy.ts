@@ -477,6 +477,16 @@ export type RailgunSupport = WithRef<{
 	warnAboutSuccessiveOperations: Support
 
 	/**
+	 * When scanning for received funds, is the Railgun UTXO merkle tree synced
+	 * and decrypted entirely by the wallet on the client side, or is it synced
+	 * by an external service? This matters for privacy: if syncing is done
+	 * server-side, the external provider can learn about received funds even
+	 * though the chain data itself doesn't reveal this information. This would
+	 * be CHAIN_DATA_PRIVATE rather than FULLY_PRIVATE.
+	 */
+	merkleTreeSync: 'WALLET_SIDE' | 'EXTERNAL'
+
+	/**
 	 * How are transactions submitted? Broadcasters are required for transactions
 	 * FROM shielded addresses (private transfers, unshielding), but NOT for
 	 * shielding (depositing into Railgun).
