@@ -46,11 +46,11 @@ contract WalletbeatUnitTests is Test {
     }
 
     function testErc20Symbol() external view {
-        assertEq(erc20.symbol(), "WBT");
+        assertEq(erc20.symbol(), "WBTEST");
     }
 
     function testErc721Symbol() external view {
-        assertEq(erc721.symbol(), "WBT");
+        assertEq(erc721.symbol(), "WBTEST");
     }
 
     function testFakeTokensToClaimConstant() external view {

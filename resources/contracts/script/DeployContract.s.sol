@@ -11,7 +11,7 @@ contract DeployContract is Script {
     function run() external returns (WalletbeatTestContract, WalletbeatTestErc20, WalletbeatTestErc721) {
         string memory erc20TokenName = "Walletbeat Testing ERC20";
         string memory erc721TokenName = "Walletbeat Testing ERC721";
-        string memory tokenSymbol = "WBT";
+        string memory tokenSymbol = "WBTEST";
 
         vm.startBroadcast();
         WalletbeatTestErc20 erc20Contract = new WalletbeatTestErc20(erc20TokenName, tokenSymbol);
