@@ -475,6 +475,29 @@ export type RailgunSupport = WithRef<{
 	warnAboutSuccessiveOperations: Support
 
 	/**
+	 * Does the wallet warn users about correlation risks when shielding tokens?
+	 * Shielding transactions are public on-chain and can be analyzed to link
+	 * a user's 0x address to their 0zk address through amount, timing, and token
+	 * type correlation. Similar to how Privacy Pools tracks deposit correlation risks.
+	 */
+	warnAboutShieldingCorrelation: Support
+
+	/**
+	 * Does the wallet warn users when unshielding to addresses associated with
+	 * their wallet? Unshielding to addresses that belong to the same wallet creates
+	 * a correlation link between the user's 0zk and 0x addresses, compromising privacy.
+	 */
+	warnAboutUnshieldingDestinationCorrelation: Support
+
+	/**
+	 * Does the wallet warn users about the privacy risks of sharing viewing keys?
+	 * Viewing keys are encoded in 0zk addresses and are irrevocable. Anyone with
+	 * access to a viewing key can see all private interactions sent by that address
+	 * permanently, even if the key is later shared or leaked.
+	 */
+	warnAboutViewingKeySharing: Support
+
+	/**
 	 * When scanning for received funds, is the Railgun UTXO merkle tree synced
 	 * and decrypted entirely by the wallet on the client side, or is it synced
 	 * by an external service? This matters for privacy: if syncing is done

@@ -1278,13 +1278,30 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			}
 		}
 
+		// Check if wallet warns about shielding correlation risks
+		if (!isSupported(railgun.warnAboutShieldingCorrelation)) {
+			return {
+				sendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+				sendingDetails: mdParagraph(`
+					Shielding tokens into Railgun is done directly to the smart contract,
+					requiring no broadcaster. However, shielding transactions are public
+					on-chain and can be analyzed to correlate a user's 0x address with their
+					0zk address through amount, timing, and token type analysis. The wallet
+					does not warn users about these correlation risks. Private transfers
+					between Railgun wallets are supported.
+				`),
+				sendingImprovements: ['warn users about shielding correlation risks'],
+			}
+		}
+
 		// Shielding is fully private (direct to contract, no broadcaster needed)
 		return {
 			sendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 			sendingDetails: mdParagraph(`
 				Shielding tokens into Railgun is done directly to the smart contract,
-				requiring no broadcaster and maintaining full privacy. Private transfers
-				between Railgun wallets are supported.
+				requiring no broadcaster and maintaining full privacy. The wallet warns
+				users about correlation risks when shielding. Private transfers between
+				Railgun wallets are supported.
 			`),
 			sendingImprovements: [],
 		}
@@ -1460,6 +1477,17 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			)
 		}
 
+		if (!isSupported(railgun.warnAboutViewingKeySharing)) {
+			extraNotes.push(
+				mdParagraph(`
+					The wallet does not warn users about the privacy risks of sharing viewing
+					keys. Viewing keys are encoded in 0zk addresses and are irrevocable, meaning
+					anyone with access to a viewing key can permanently see all private
+					interactions sent by that address, even if the key is later shared or leaked.
+				`),
+			)
+		}
+
 		if (!isSupported(railgun.warnAboutSuccessiveOperations)) {
 			return {
 				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
@@ -1474,12 +1502,31 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			}
 		}
 
+		// Check if wallet warns about unshielding destination correlation
+		if (!isSupported(railgun.warnAboutUnshieldingDestinationCorrelation)) {
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+				spendingDetails: mdParagraph(`
+					Transactions are submitted through broadcasters using Logos (previously Waku),
+					protecting IP addresses. The user is cautioned against doing too many
+					operations in quick succession to avoid time-based correlation. However,
+					the wallet does not warn users when unshielding to addresses associated
+					with their wallet, which creates a correlation link between their 0zk
+					and 0x addresses.
+				`),
+				spendingImprovements: [
+					'warn users when unshielding to addresses associated with their wallet',
+				],
+			}
+		}
+
 		return {
 			spendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 			spendingDetails: mdParagraph(`
 				Transactions are submitted through broadcasters using Logos (previously Waku),
 				protecting IP addresses. The user is cautioned against doing too many
-				operations in quick succession to avoid time-based correlation.
+				operations in quick succession to avoid time-based correlation, and is warned
+				about unshielding destination correlation risks.
 			`),
 			spendingImprovements: [],
 		}
