@@ -1338,19 +1338,22 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			}
 		}
 
-		if (railgun.shieldedTransactionSubmission.type === 'BROADCASTER_OR_SELF_RELAY') {
-			// Self-relay option exists but exposes IP address
+		if (
+			railgun.shieldedTransactionSubmission.type === 'BROADCASTER_OR_SELF_RELAY' &&
+			railgun.shieldedTransactionSubmission.defaultTransactionSubmissionType === 'SELF_RELAY'
+		) {
+			// Default is self-relay, which exposes IP address
 			if (railgun.shieldedTransactionSubmission.broadcasterLearnsUserIpAddress) {
 				return {
 					spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
 					spendingDetails: mdParagraph(`
-						The wallet supports self-relaying transactions, which exposes the
+						The wallet defaults to self-relaying transactions, which exposes the
 						user's IP address. Additionally, broadcasters can learn the user's
 						IP address, further compromising privacy.
 					`),
 					spendingImprovements: [
 						'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
-						'prefer broadcaster usage over self-relay for better privacy',
+						'default to broadcaster usage instead of self-relay for better privacy',
 					],
 				}
 			}
@@ -1359,12 +1362,12 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				return {
 					spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 					spendingDetails: mdParagraph(`
-						The wallet supports self-relaying transactions, which exposes the
+						The wallet defaults to self-relaying transactions, which exposes the
 						user's IP address. While broadcasters use Logos (previously Waku) to protect
 						IP addresses, the broadcaster endpoint cannot be customized.
 					`),
 					spendingImprovements: [
-						'prefer broadcaster usage over self-relay for better privacy',
+						'default to broadcaster usage instead of self-relay for better privacy',
 						'allow users to customize the broadcaster endpoint',
 					],
 				}
@@ -1373,16 +1376,18 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			return {
 				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 				spendingDetails: mdParagraph(`
-					The wallet supports self-relaying transactions, which exposes the
+					The wallet defaults to self-relaying transactions, which exposes the
 					user's IP address. While broadcasters use Logos (previously Waku) to protect
 					IP addresses, users should be encouraged to use broadcasters instead
 					of self-relay.
 				`),
-				spendingImprovements: ['prefer broadcaster usage over self-relay for better privacy'],
+				spendingImprovements: [
+					'default to broadcaster usage instead of self-relay for better privacy',
+				],
 			}
 		}
 
-		// BROADCASTER_ONLY
+		// BROADCASTER_ONLY or BROADCASTER_OR_SELF_RELAY with BROADCASTER default
 		if (railgun.shieldedTransactionSubmission.broadcasterLearnsUserIpAddress) {
 			if (!isSupported(railgun.shieldedTransactionSubmission.customizableBroadcaster)) {
 				return {

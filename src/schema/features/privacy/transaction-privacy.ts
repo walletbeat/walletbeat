@@ -445,6 +445,12 @@ type RailgunShieldedTransactionSubmission =
 			type: 'BROADCASTER_OR_SELF_RELAY'
 
 			/**
+			 * Which transaction submission method is used by default when both
+			 * broadcaster and self-relay are available?
+			 */
+			defaultTransactionSubmissionType: 'BROADCASTER' | 'SELF_RELAY'
+
+			/**
 			 * Can the broadcaster endpoint be customized?
 			 */
 			customizableBroadcaster: Support
