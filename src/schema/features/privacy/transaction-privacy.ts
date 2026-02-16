@@ -415,7 +415,7 @@ export type PrivacyPoolsSupport = WithRef<{
 	depositData: PrivacyPoolsDepositData
 }>
 
-type RailgunTransactionSubmission =
+type RailgunShieldedTransactionSubmission =
 	| {
 			/**
 			 * Only broadcaster submission is supported. Broadcasters are required
@@ -491,7 +491,7 @@ export type RailgunSupport = WithRef<{
 	 * FROM shielded addresses (private transfers, unshielding), but NOT for
 	 * shielding (depositing into Railgun).
 	 */
-	transactionSubmission: RailgunTransactionSubmission
+	shieldedTransactionSubmission: RailgunShieldedTransactionSubmission
 
 	/**
 	 * Is the fee taken by broadcasters displayed in the UI?
