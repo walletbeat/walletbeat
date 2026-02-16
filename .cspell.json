@@ -230,6 +230,7 @@
 		"Railgun",
 		"rdns",
 		"redelegation",
+		"remappings",
 		"renderable",
 		"repairability",
 		"replaceability",
@@ -307,6 +308,7 @@
 		"Walletbeat",
 		"WalletConnect",
 		"Warpcast",
+		"WBTEST",
 		"web2",
 		"web3",
 		"webapps",
@@ -332,7 +334,10 @@
 		"resources/files/**",
 		"src/generated/**",
 		"src/legacy/**",
-		"resources/contracts/**"
+		"resources/contracts/cache/**",
+		"resources/contracts/lib/**",
+		"resources/contracts/out/**",
+		"resources/contracts/images/**"
 	],
 	"patterns": [{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" }],
 	"ignoreRegExpList": ["CIDv1"]
