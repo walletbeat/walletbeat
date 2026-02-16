@@ -10,8 +10,11 @@ import {
 	assertValidDomainToEntityIdMapping,
 	entityForDomain,
 } from '@/data/entities/domains/entity-domains'
-import { isValidWalletName, type WalletName } from '@/data/wallets'
+import { allWallets, isValidWalletName, type WalletName } from '@/data/wallets'
 import {
+	CollectionPolicy,
+	collectionPolicyEnum,
+	collectionPolicyExplanation,
 	DataCollectionPurpose,
 	dataCollectionPurpose,
 	hintForUserInfo,
@@ -34,7 +37,11 @@ import {
 } from '@/types/utils/non-empty'
 import { Enum } from '@/utils/enum'
 
-import { WalletCaptureAnnotations, WalletRequestMatcher } from './wallet-capture-annotations'
+import {
+	type SaveOptions,
+	WalletCaptureAnnotations,
+	WalletRequestMatcher,
+} from './wallet-capture-annotations'
 import {
 	flowsNotRequiringWalletAddress,
 	type RecordedFlow,
@@ -312,13 +319,11 @@ class Options<T extends object> {
 			}
 		}
 
-		for (const wantFieldName of Object.keys(this.fields)) {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because it is from the keys of this.fields.
-			const fieldName = wantFieldName as keyof T
+		for (const fieldName of Object.keys(this.fields)) {
 			const option = this.fields[fieldName]
 
 			if (option === undefined) {
-				throw new Error(`unexpected field ${wantFieldName.toString()}`)
+				throw new Error(`unexpected field ${fieldName.toString()}`)
 			}
 
 			try {
@@ -326,7 +331,7 @@ class Options<T extends object> {
 
 				result = { [fieldName]: processed, ...result }
 			} catch (e) {
-				throw new Error(`Flag --${wantFieldName.toString()}: ${getErrorMessage(e)}`)
+				throw new Error(`Flag --${fieldName.toString()}: ${getErrorMessage(e)}`)
 			}
 		}
 
@@ -364,6 +369,14 @@ export const globalOptions = new Options<GlobalOptions>({
 	variant: enumOption(variantEnum),
 	type: enumOption(walletTypes),
 })
+
+export function getSaveOptions(opts: GlobalOptions): SaveOptions {
+	return {
+		verifyExisting: false,
+		walletId: opts.id,
+		walletVariants: allWallets[opts.id].variants,
+	}
+}
 
 export function getCommandPrefix(opts: GlobalOptions): string {
 	return `pnpm wallet-data-collection --id=${opts.id} --variant=${opts.variant}${opts.type === WalletType.SOFTWARE ? '' : ` --type=${opts.type}`}`
@@ -443,6 +456,7 @@ export interface ExplainRequestOptions extends GlobalOptions {
 	path: string | null
 	method: string | null
 	purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
+	policy: CollectionPolicy | null
 	force: boolean | null
 }
 
@@ -459,6 +473,7 @@ export const explainRequestOptions = new Options<ExplainRequestOptions>(
 				'',
 			),
 		),
+		policy: optionalOption(enumOption(collectionPolicyEnum)),
 		force: optionalOption(booleanOption),
 	},
 	globalOptions,
@@ -485,8 +500,8 @@ function annotationsPath(options: GlobalOptions): string {
 }
 
 function openCaptureFile(options: GlobalOptions): WalletCaptureFile {
-	const annotations = new WalletCaptureAnnotations(annotationsPath(options))
-	const captureFile = new WalletCaptureFile(capturePath(options), annotations)
+	const annotations = WalletCaptureAnnotations.fromFile(options.id, annotationsPath(options))
+	const captureFile = WalletCaptureFile.fromFile(capturePath(options), annotations)
 
 	return captureFile
 }
@@ -590,7 +605,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 				hint: hintForUserInfo(walletAddr, WalletInfo.ACCOUNT_ADDRESS),
 			})
 		}
-		await walletRedactionFile.save()
+		await walletRedactionFile.save(getSaveOptions(opts))
 	}
 
 	argv.push('-s', path.join(scriptDir(), 'mitmproxy_wallet_data_collection.py'))
@@ -679,18 +694,18 @@ export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<v
 	const capture = openCaptureFile(opts)
 
 	capture.deleteSession(opts.session)
-	await capture.save()
+	await capture.save(getSaveOptions(opts))
 	log(`✅ Successfully deleted all data for session ${opts.session}.`)
 }
 
-export async function handleCheck(opts: GlobalOptions): Promise<void> {
+export async function handleCheck(opts: GlobalOptions): Promise<number> {
 	const capture = openCaptureFile(opts)
 	const issues = capture.check()
 
 	if (issues.length == 0) {
-		log('No issues found! Wallet capture process complete. Well done.')
+		log('✅ No issues found! Wallet capture process complete. Well done.')
 
-		return
+		return 0
 	}
 
 	const perSection = new Map<string, NonEmptyArray<WalletCaptureIssue>>()
@@ -738,15 +753,16 @@ export async function handleCheck(opts: GlobalOptions): Promise<void> {
 		}
 		log('')
 	}
-
 	await Promise.resolve()
+
+	return issues.length
 }
 
 export async function handleMarkFlowUnsupported(opts: MarkFlowUnsupportedOptions): Promise<void> {
 	const capture = openCaptureFile(opts)
 
 	capture.markFlowUnsupported(opts.flow)
-	await capture.save()
+	await capture.save(getSaveOptions(opts))
 	log(`Flow ${opts.flow} marked as unsupported.`)
 	log(`Run \`${getCommandPrefix(opts)} check\` to see if there are any more issues to address.`)
 }
@@ -832,11 +848,12 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 			path: opts.path,
 			method: opts.method,
 			purposes: opts.purposes,
+			policy: opts.policy,
 		}),
 		opts.force ?? false,
 	)
 
-	await capture.save()
+	await capture.save(getSaveOptions(opts))
 	log(`✅ Matched ${matched.length} request${matched.length === 1 ? '' : 's'}`)
 
 	for (const req of matched) {
@@ -853,7 +870,7 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 		hint: opts.hint === null ? undefined : opts.hint,
 	})
 
-	await capture.save()
+	await capture.save(getSaveOptions(opts))
 	log(`✅ Marked string as ${setItems(opts.data).join(', ')}. All instances redacted.`)
 }
 
@@ -960,29 +977,31 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 			// Get matcher if any
 			const matcher = capture.findMatcherForReq(request)
-			const matcherPurposes: DataCollectionPurpose[] = matcher?.purposes
-				? setItems(matcher.purposes)
-				: []
+			const matcherPurposes: DataCollectionPurpose[] = []
 
 			// Display matcher info
 			if (matcher !== null) {
+				if (matcher.purposes !== null && matcher.purposes !== 'NOT_WALLET_INITIATED') {
+					matcherPurposes.push(...setItems(matcher.purposes))
+				}
+
 				log(`\n  Matched by: ${matcher.toString()}`)
 
-				if (matcher.purposes === null) {
-					log('    → This request is marked as NOT_WALLET_INITIATED')
-				} else {
+				if (matcher.purposes === 'NOT_WALLET_INITIATED') {
+					log('    → This request is marked as NOT_WALLET_INITIATED via matcher.')
+				} else if (matcher.purposes !== null) {
 					log(`    → Purposes from matcher: ${setItems(matcher.purposes).join(', ')}`)
 				}
 			} else {
 				log('  ⚠️  No matcher found for this request; proceeding fully manually.')
 				log('      Consider creating a matcher instead:')
 				log(
-					`        $ ${getCommandPrefix(opts)} explain-request --domain='${request.domain}' [--path='${request.path}']${request.jsonRpcMethods.length === 0 ? '' : ` [--method=${request.jsonRpcMethods[0]}]`} '--purposes=purpose1,purpose2,...|NOT_WALLET_INITIATED`,
+					`        $ ${getCommandPrefix(opts)} explain-request --domain='${request.domain}' [--path='${request.path}']${request.jsonRpcMethods.length === 0 ? '' : ` [--method=${request.jsonRpcMethods[0]}]`} --purposes='purpose1,purpose2,...|NOT_WALLET_INITIATED' --policy='${CollectionPolicy.BY_DEFAULT}|${CollectionPolicy.ALWAYS}|...'`,
 				)
 			}
 
 			// Handle NOT_WALLET_INITIATED case
-			if (matcher !== null && matcher.purposes === null) {
+			if (matcher !== null && matcher.purposes === 'NOT_WALLET_INITIATED') {
 				const confirmResponse = await prompts({
 					type: 'confirm',
 					name: 'value',
@@ -1002,7 +1021,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 				if (confirmResponse.value) {
 					review.markAsReviewed()
-					await capture.save()
+					await capture.save(getSaveOptions(opts))
 					log('✅ Review saved.')
 					confirmed = true
 				}
@@ -1066,7 +1085,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 					if (removeMatcherResponse.value) {
 						capture.removeRequestMatcher(matcher)
-						await capture.save()
+						await capture.save(getSaveOptions(opts))
 						log('✅ Matcher deleted. Restarting this request review...')
 					}
 
@@ -1076,8 +1095,9 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				purposesConfirmed = true
 			}
 
-			// Collect detected user info from request
-			const detectedUserInfo = request.userInfo()
+			// Collect detected user info from request. CollectionPolicy is irrelevant here since we
+			// only look at the keys (`UserInfo`s).
+			const detectedUserInfo = new Set(request.userInfo(null, false).keys())
 
 			if (detectedUserInfo.size > 0) {
 				log(`\n  Auto-detected user data: ${Array.from(detectedUserInfo).join(', ')}`)
@@ -1125,6 +1145,59 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				userInfoConfirmed = true
 			}
 
+			// Determine collection policy.
+			let collectionPolicy: CollectionPolicy | null = null
+			let collectionPolicyFromManualReview = true
+
+			if (matcher !== null && matcher.policy !== null) {
+				const confirmPolicyResponse = await prompts({
+					type: 'confirm',
+					name: 'value',
+					message: `This request's collection policy is marked as ${matcher.policy}. Is this correct?`,
+					initial: false,
+				})
+
+				if (confirmPolicyResponse.value === undefined) {
+					log('\nReview cancelled.')
+
+					return
+				}
+
+				if (typeof confirmPolicyResponse.value !== 'boolean') {
+					throw new Error('invalid response type')
+				}
+
+				if (confirmPolicyResponse.value) {
+					collectionPolicy = matcher.policy
+					collectionPolicyFromManualReview = false
+				}
+			}
+
+			if (collectionPolicy === null) {
+				const possiblePolicies = collectionPolicyEnum.items.filter(
+					p => p !== CollectionPolicy.NEVER,
+				)
+				const manualPolicyResponse = await prompts({
+					type: 'select',
+					name: 'value',
+					message: 'Pick the appropriate collection policy.',
+					choices: possiblePolicies.map(p => ({
+						title: p.toString(),
+						description: collectionPolicyExplanation(p),
+						value: p,
+					})),
+					initial: possiblePolicies.indexOf(CollectionPolicy.ALWAYS),
+				})
+
+				if (manualPolicyResponse.value === undefined) {
+					log('\nReview cancelled.')
+
+					return
+				}
+
+				collectionPolicy = collectionPolicyEnum.assert(manualPolicyResponse.value)
+			}
+
 			// Calculate extra purposes and user info
 			const extraPurposes = selectedPurposes.filter(p => !matcherPurposes.includes(p))
 			const extraUserInfo = selectedUserInfo.filter(u => !detectedUserInfo.has(u))
@@ -1163,6 +1236,18 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				log('     (none)')
 			}
 
+			log('\n  Collection policy:')
+
+			if (collectionPolicyFromManualReview) {
+				log(
+					`     From matcher: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
+				)
+			} else {
+				log(
+					`    Classified as: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
+				)
+			}
+
 			// Confirmation
 			log('')
 			const finalConfirm = await prompts({
@@ -1190,8 +1275,13 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				for (const userInfo of extraUserInfo) {
 					review.addUserInfo(userInfo)
 				}
+
+				if (collectionPolicyFromManualReview) {
+					review.setCollectionPolicy(collectionPolicy)
+				}
+
 				review.markAsReviewed()
-				await capture.save()
+				await capture.save(getSaveOptions(opts))
 				log('✅ Review saved.')
 				confirmed = true
 			} else {
@@ -1205,4 +1295,89 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 	log('✅ All requests have been reviewed!')
 	log(`Run \`${getCommandPrefix(opts)} check\` to verify your work.`)
 	log('='.repeat(80))
+}
+
+export async function handleLintFix(): Promise<void> {
+	const dataDir = path.join(repoDir(), 'data')
+	const walletTypeDirs = fs.readdirSync(dataDir).filter(entry => {
+		const fullPath = path.join(dataDir, entry)
+
+		return fs.statSync(fullPath).isDirectory() && entry.endsWith('-wallets')
+	})
+
+	for (const walletTypeDir of walletTypeDirs) {
+		const collectionDir = path.join(dataDir, walletTypeDir, 'collection')
+
+		if (!fs.existsSync(collectionDir)) {
+			continue
+		}
+
+		for (const walletId of fs.readdirSync(collectionDir)) {
+			if (!isValidWalletName(walletId)) {
+				continue
+			}
+
+			const walletDir = path.join(collectionDir, walletId)
+
+			if (!fs.statSync(walletDir).isDirectory()) {
+				continue
+			}
+
+			const wallet = allWallets[walletId]
+
+			if (wallet === undefined) {
+				throw new Error(
+					`Wallet '${walletId}' has a collection directory but is not defined in allWallets.`,
+				)
+			}
+
+			const annotationsPath = path.join(walletDir, `${walletId}.annotations.json`)
+
+			if (!fs.existsSync(annotationsPath)) {
+				continue
+			}
+
+			const annotations = WalletCaptureAnnotations.fromFile(walletId, annotationsPath)
+			const capturePattern = new RegExp(
+				`^${walletId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.(.*?)\\.capture\\.json$`,
+			)
+
+			for (const filename of fs.readdirSync(walletDir)) {
+				const match = filename.match(capturePattern)
+
+				if (match === null) {
+					continue
+				}
+
+				const variant = match[1].toUpperCase()
+
+				if (!variantEnum.is(variant)) {
+					throw new Error(`invalid capture filename: "${filename}"`)
+				}
+
+				if (wallet.variants[variant] === undefined) {
+					throw new Error(
+						`Variant '${variant}' found in file '${filename}' for wallet '${walletId}' is not defined in allWallets[${walletId}].variants.`,
+					)
+				}
+
+				const capturePath = path.join(walletDir, filename)
+				const captureFile = WalletCaptureFile.fromFile(capturePath, annotations)
+
+				const saveOptions: SaveOptions = {
+					verifyExisting: false,
+					walletId,
+					walletVariants: wallet.variants,
+				}
+
+				const filesChanged = await captureFile.save(saveOptions)
+
+				filesChanged.sort()
+
+				for (const fileChanged of filesChanged) {
+					log(`✅ Linted: ${path.relative(repoDir(), fileChanged)}`)
+				}
+			}
+		}
+	}
 }

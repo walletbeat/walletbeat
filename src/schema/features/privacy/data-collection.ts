@@ -12,18 +12,18 @@ import type { Entity } from '../../entity'
 /**
  * An enum representing when data collection occurs.
  *
- * Values are comparable as integers; the closest to zero, the more privacy.
+ * Values are ordered from most private (NEVER) to least private (ALWAYS).
  */
 export enum CollectionPolicy {
 	/** The data is never collected. */
-	NEVER = 0,
+	NEVER = 'NEVER',
 
 	/**
 	 * The wallet does not collect this data by default.
 	 * The user may decide to enable to this, but this requires explicit user
 	 * intent to do this.
 	 */
-	OPT_IN = 1,
+	OPT_IN = 'OPT_IN',
 
 	/**
 	 * The wallet does not collect this data by default. However, the
@@ -31,7 +31,7 @@ export enum CollectionPolicy {
 	 * user whether or not they want to enable this data collection, without
 	 * explicit user intent to look for this setting.
 	 */
-	PROMPTED = 2,
+	PROMPTED = 'PROMPTED',
 
 	/**
 	 * The data is collected by default, but the user may turn this off by
@@ -45,12 +45,70 @@ export enum CollectionPolicy {
 	 * before ever giving the user a chance to access the wallet settings
 	 * to turn off this feature does not qualify for this level.
 	 */
-	BY_DEFAULT = 3,
+	BY_DEFAULT = 'BY_DEFAULT',
 
 	/**
 	 * The data is always collected no matter what the user does.
 	 */
-	ALWAYS = 4,
+	ALWAYS = 'ALWAYS',
+}
+
+/** Enum for `CollectionPolicy`. */
+export const collectionPolicyEnum = new Enum<CollectionPolicy>({
+	[CollectionPolicy.NEVER]: true,
+	[CollectionPolicy.OPT_IN]: true,
+	[CollectionPolicy.PROMPTED]: true,
+	[CollectionPolicy.BY_DEFAULT]: true,
+	[CollectionPolicy.ALWAYS]: true,
+})
+
+/** Returns a numeric score for a CollectionPolicy, ordered from most private (0) to least private (4). */
+function collectionPolicyScore(policy: CollectionPolicy): number {
+	switch (policy) {
+		case CollectionPolicy.NEVER:
+			return 0
+		case CollectionPolicy.OPT_IN:
+			return 1
+		case CollectionPolicy.PROMPTED:
+			return 2
+		case CollectionPolicy.BY_DEFAULT:
+			return 3
+		case CollectionPolicy.ALWAYS:
+			return 4
+	}
+}
+
+/**
+ * @returns If the data collection happens by default for the given collection policy.
+ */
+export function collectedByDefault(collectionPolicy: CollectionPolicy): boolean {
+	return (
+		collectionPolicyScore(collectionPolicy) >= collectionPolicyScore(CollectionPolicy.BY_DEFAULT)
+	)
+}
+
+/** Returns the least-configurable of the given two `CollectionPolicy`s. */
+export function leastConfigurableCollectionPolicy(
+	policy1: CollectionPolicy,
+	policy2: CollectionPolicy,
+): CollectionPolicy {
+	return collectionPolicyScore(policy1) < collectionPolicyScore(policy2) ? policy2 : policy1
+}
+
+/** Human-readable explanation for a given `CollectionPolicy`. */
+export function collectionPolicyExplanation(policy: CollectionPolicy): string {
+	switch (policy) {
+		case CollectionPolicy.NEVER:
+			return 'The wallet never collects this data.'
+		case CollectionPolicy.OPT_IN:
+			return 'The wallet does not collect this data by default; the user explicitly configured it.'
+		case CollectionPolicy.PROMPTED:
+			return 'The wallet asked the user whether they are OK about this data being collected.'
+		case CollectionPolicy.BY_DEFAULT:
+			return 'The wallet collects this data by default, but this can be disabled by the user.'
+		case CollectionPolicy.ALWAYS:
+			return 'The wallet always collects this request, and the user cannot configure this.'
+	}
 }
 
 /**
@@ -303,13 +361,6 @@ export function endpointLearnsUserIpAddress(endpoint: Endpoint): 'YES' | 'NO' | 
 					}
 			}
 	}
-}
-
-/**
- * @returns If the data collection happens by default for the given collection policy.
- */
-export function collectedByDefault(collectionPolicy: CollectionPolicy): boolean {
-	return collectionPolicy >= CollectionPolicy.BY_DEFAULT
 }
 
 /** Personal information types. */
@@ -988,6 +1039,26 @@ export interface DataCollection {
 
 	/** What other data is collected but not covered in the other flows, if any? */
 	[UserFlow.UNCLASSIFIED]?: DataCollectionForFlow
+}
+
+/**
+ * @returns Whether the given `flow` may be marked as "FLOW_NOT_SUPPORTED" within `DataCollection`.
+ */
+export function userFlowMayBeMarkedUnsupported(
+	flow: UserFlow,
+): flow is
+	| UserFlow.SEND_ETHER
+	| UserFlow.SEND_USDC
+	| UserFlow.NATIVE_SWAP
+	| UserFlow.MAKE_TRANSACTION
+	| UserFlow.APP_CONNECTION {
+	return (
+		flow === UserFlow.SEND_ETHER ||
+		flow === UserFlow.SEND_USDC ||
+		flow === UserFlow.NATIVE_SWAP ||
+		flow === UserFlow.MAKE_TRANSACTION ||
+		flow === UserFlow.APP_CONNECTION
+	)
 }
 
 /**

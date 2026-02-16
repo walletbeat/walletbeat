@@ -9,9 +9,9 @@ This is necessary to populate Walletbeat's `privacy.dataCollection` feature fiel
 The goal of using this tool is to record the network every supported UX flow of a wallet, and analyze/categorize all of its network traffic. To that end, the high-level workflow looks like this:
 
 - Record network traffic as you perform each UX flow the wallet supports
-- Categorize every *domain* that the wallet sent requests to: Which **entity** does it belong to?
-- Categorize every *request* the wallet sent: What is their **purpose**?
-- Categorize every *piece of information* sent in these requests: What **data** did the wallet send?
+- Categorize every _domain_ that the wallet sent requests to: Which **entity** does it belong to?
+- Categorize every _request_ the wallet sent: What is their **purpose**?
+- Categorize every _piece of information_ sent in these requests: What **data** did the wallet send?
 
 The tool helps you walk through these steps.
 
@@ -197,8 +197,8 @@ After a request is manually reviewed, it will never be prompted for in future ex
   - Stop the browser, end the capture.
 - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
   - Run the `mark-domain` and `ignore-domain` subcommands to ensure all domains involved in the network capture have associated entities.
-	- Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
-	- Run the `mark-string` subcommand to redact any personal data and automatically associate requests to the data they send.
-	- Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
-	- Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
+  - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
+  - Run the `mark-string` subcommand to redact any personal data and automatically associate requests to the data they send.
+  - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
+  - Run the `check` subcommand at any time during this process to get a list of issues that still need to be addressed.
 - Once the `check` subcommand is successful, you are done!

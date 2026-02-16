@@ -29,6 +29,17 @@ export function isValidWalletName(name: string): name is WalletName {
 	return isValidSoftwareWalletName(name) || isValidHardwareWalletName(name)
 }
 
+/** Assert that `name` is a valid `WalletName`. */
+export function assertValidWalletName(name: string): WalletName {
+	if (!isValidWalletName(name)) {
+		throw new Error(
+			`invalid wallet ID "${name}" (did you add it to \`/data/{software,hardware,...}-wallets.ts\`?)`,
+		)
+	}
+
+	return name
+}
+
 /** All rated wallets. */
 export const allRatedWallets = Object.fromEntries(
 	Object.entries(allWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),

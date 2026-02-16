@@ -3,6 +3,9 @@ import { alphabet } from '@/data/entities/alphabet'
 import { ambireEntity } from '@/data/entities/ambire'
 import { apple } from '@/data/entities/apple'
 import { deBank } from '@/data/entities/debank'
+import { hyperFoundation } from '@/data/entities/hyper-foundation'
+import { sentry } from '@/data/entities/sentry'
+import { sonicLabs } from '@/data/entities/sonic-labs'
 import type { Entity } from '@/schema/entity'
 
 /**
@@ -15,6 +18,9 @@ export const allEntities = {
 	ambire: ambireEntity,
 	apple,
 	debank: deBank,
+	hyperFoundation,
+	sentry,
+	sonicLabs,
 }
 
 /** A valid Entity ID. */
@@ -23,6 +29,15 @@ export type EntityId = keyof typeof allEntities
 /** Type predicate for EntityId. */
 export function isValidEntityId(entityId: string): entityId is EntityId {
 	return Object.prototype.hasOwnProperty.call(allEntities, entityId)
+}
+
+/** Assert that the given string is an entity ID. */
+export function assertValidEntityId(entityId: string): EntityId {
+	if (!isValidEntityId(entityId)) {
+		throw new Error(`invalid entity ID: "${entityId}"`)
+	}
+
+	return entityId
 }
 
 /**

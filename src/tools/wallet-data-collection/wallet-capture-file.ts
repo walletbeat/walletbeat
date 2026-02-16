@@ -2,22 +2,34 @@ import { createHash, randomBytes } from 'node:crypto'
 
 import fs from 'fs'
 
+import { assertValidEntityId, type EntityId } from '@/data/entities'
 import { entityForDomain } from '@/data/entities/domains/entity-domains'
+import type { Entity } from '@/schema/entity'
 import {
+	CollectionPolicy,
 	compareUserInfo,
+	type DataCollection,
+	type DataCollectionByEntity,
+	type DataCollectionForFlow,
+	type DataCollectionForFlowWithOnchainData,
 	DataCollectionPurpose,
 	dataCollectionPurpose,
+	leastConfigurableCollectionPolicy,
 	normalizeStrForUserInfo,
+	RegularEndpoint,
 	UserFlow,
 	userFlow,
+	userFlowMayBeMarkedUnsupported,
 	type UserInfo,
 	userInfoEnums,
 } from '@/schema/features/privacy/data-collection'
+import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { getErrorMessage } from '@/types/errors'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
 	type NonEmptyArray,
+	nonEmptyMapToRecord,
 	type NonEmptySet,
 	nonEmptySet,
 	nonEmptySetFromArray,
@@ -29,7 +41,11 @@ import {
 import { Enum, excludeFromEnum, mergeEnums } from '@/utils/enum'
 
 import { expectArray, expectBoolean, expectNumber, expectRecord, expectString } from './json-utils'
-import type { WalletCaptureAnnotations, WalletRequestMatcher } from './wallet-capture-annotations'
+import type {
+	SaveOptions,
+	WalletCaptureAnnotations,
+	WalletRequestMatcher,
+} from './wallet-capture-annotations'
 
 export enum RecordedOnlyFlow {
 	IDLE_PRE_INSTALL = 'IDLE_PRE_INSTALL',
@@ -150,6 +166,7 @@ interface EncodedWalletRequestReview {
 	manuallyReviewed: boolean
 	extraPurposes?: DataCollectionPurpose[]
 	extraUserData?: UserInfo[]
+	collectionPolicy?: CollectionPolicy
 }
 
 interface EncodedWalletCaptureFlow {
@@ -435,7 +452,6 @@ function parseLabelToken(token: string): { labelPrefix: string; labelIndex: numb
 }
 
 export class RedactedData {
-	private readonly _redactor: RedactedStringStore
 	public readonly labelPrefix: string
 	public readonly labelIndex: number
 
@@ -467,7 +483,6 @@ export class RedactedData {
 			throw new Error('Redacted string realStr cannot be an empty string.')
 		}
 
-		this._redactor = args.redactor
 		this.labelPrefix = args.labelPrefix
 		this.labelIndex = args.labelIndex
 		this.realStr = args.realStr
@@ -1073,17 +1088,20 @@ export class WalletRequestReview {
 	private reviewed: boolean | null
 	private extraPurposes: DataCollectionPurpose[]
 	private extraUserData: UserInfo[]
+	private collectionPolicy: CollectionPolicy | null
 
 	private constructor(args: {
 		request: WalletRequest
 		reviewed: boolean | null
 		extraPurposes: DataCollectionPurpose[]
 		extraUserData: UserInfo[]
+		collectionPolicy: CollectionPolicy | null
 	}) {
 		this.request = args.request
 		this.reviewed = args.reviewed
 		this.extraPurposes = args.extraPurposes
 		this.extraUserData = args.extraUserData
+		this.collectionPolicy = args.collectionPolicy
 	}
 
 	public static unspecified(req: WalletRequest): WalletRequestReview {
@@ -1092,6 +1110,7 @@ export class WalletRequestReview {
 			reviewed: null,
 			extraPurposes: [],
 			extraUserData: [],
+			collectionPolicy: null,
 		})
 	}
 
@@ -1104,6 +1123,7 @@ export class WalletRequestReview {
 			reviewed: review.manuallyReviewed,
 			extraPurposes: review.extraPurposes ?? [],
 			extraUserData: review.extraUserData ?? [],
+			collectionPolicy: review.collectionPolicy ?? null,
 		})
 	}
 
@@ -1116,6 +1136,7 @@ export class WalletRequestReview {
 			manuallyReviewed: this.reviewed,
 			...(this.extraPurposes.length > 0 ? { extraPurposes: this.extraPurposes } : {}),
 			...(this.extraUserData.length > 0 ? { extraUserData: this.extraUserData } : {}),
+			...(this.collectionPolicy !== null ? { collectionPolicy: this.collectionPolicy } : {}),
 		}
 	}
 
@@ -1135,6 +1156,10 @@ export class WalletRequestReview {
 		}
 	}
 
+	public setCollectionPolicy(policy: CollectionPolicy) {
+		this.collectionPolicy = policy
+	}
+
 	public reset() {
 		this.reviewed = null
 		this.extraPurposes = []
@@ -1151,6 +1176,10 @@ export class WalletRequestReview {
 
 	public getExtraUserData(): ReadonlyArray<UserInfo> {
 		return this.extraUserData
+	}
+
+	public getCollectionPolicy(_userInfo: UserInfo): CollectionPolicy | null {
+		return this.collectionPolicy
 	}
 }
 
@@ -1324,14 +1353,17 @@ export class WalletRequest {
 		return [this.domain]
 	}
 
-	public userInfo(): Set<UserInfo> {
-		const detected = new Set<UserInfo>()
+	public userInfo(
+		matcherCollectionPolicy: CollectionPolicy | null,
+		includeManualReview: boolean,
+	): Map<UserInfo, CollectionPolicy | null> {
+		const infos = new Map<UserInfo, CollectionPolicy | null>()
 
 		const processDict = (dict: UserDataDict) => {
 			for (const values of Object.values(dict)) {
 				for (const piece of values) {
 					for (const userInfo of piece.pieces) {
-						detected.add(userInfo)
+						infos.set(userInfo, matcherCollectionPolicy)
 					}
 				}
 			}
@@ -1344,11 +1376,25 @@ export class WalletRequest {
 
 		if (this.content !== null) {
 			for (const userInfo of this.content.pieces) {
-				detected.add(userInfo)
+				infos.set(userInfo, matcherCollectionPolicy)
 			}
 		}
 
-		return detected
+		if (includeManualReview) {
+			for (const userInfo of this.review.getExtraUserData()) {
+				infos.set(userInfo, null)
+			}
+
+			for (const info of infos.keys()) {
+				const manualPolicy = this.review.getCollectionPolicy(info)
+
+				if (manualPolicy !== null) {
+					infos.set(info, manualPolicy)
+				}
+			}
+		}
+
+		return infos
 	}
 }
 
@@ -1460,14 +1506,12 @@ export class WalletCaptureIssue {
 }
 
 export class WalletCaptureFile {
-	public readonly path: string
+	public readonly path: string | null
 	public readonly redactor: RedactedStringStore
 	private readonly flows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>>
 	private readonly sessions: number
 	private readonly annotations: WalletCaptureAnnotations
-	constructor(path: string, annotations: WalletCaptureAnnotations) {
-		this.path = path
-		this.annotations = annotations
+	public static fromFile(path: string, annotations: WalletCaptureAnnotations): WalletCaptureFile {
 		let text = ''
 
 		if (fs.existsSync(path)) {
@@ -1482,7 +1526,35 @@ export class WalletCaptureFile {
 
 		const wasNew = text === '{}'
 		const parsed: unknown = JSON.parse(text)
-		const root = expectRecord(parsed, '$')
+		const captureFile = new WalletCaptureFile(path, parsed, annotations)
+		const reEncoded = captureFile.toJSON()
+		const loadedStable = stableJSONStringify(parsed)
+		const reEncodedStable = stableJSONStringify(reEncoded)
+
+		if (!wasNew && loadedStable !== reEncodedStable) {
+			throw new Error(
+				[
+					'WalletCaptureFile integrity check failed: re-encoded JSON does not match loaded JSON.',
+					`File: ${path}`,
+					`Loaded:     ${loadedStable}`,
+					`Re-encoded: ${reEncodedStable}`,
+				].join('\n'),
+			)
+		}
+
+		return captureFile
+	}
+	public static fromData(data: unknown, annotations: WalletCaptureAnnotations): WalletCaptureFile {
+		return new WalletCaptureFile(null, data, annotations)
+	}
+	private constructor(
+		path: string | null,
+		jsonBody: unknown,
+		annotations: WalletCaptureAnnotations,
+	) {
+		this.path = path
+		this.annotations = annotations
+		const root = expectRecord(jsonBody, '$')
 
 		this.redactor = ((): RedactedStringStore => {
 			if (root.redactions === undefined) {
@@ -1509,20 +1581,6 @@ export class WalletCaptureFile {
 
 		this.flows = captureFlows
 		this.sessions = root.sessions === undefined ? 0 : expectNumber(root.sessions, '$.sessions')
-		const reEncoded = this.toJSON()
-		const loadedStable = stableJSONStringify(root)
-		const reEncodedStable = stableJSONStringify(reEncoded)
-
-		if (!wasNew && loadedStable !== reEncodedStable) {
-			throw new Error(
-				[
-					'WalletCaptureFile integrity check failed: re-encoded JSON does not match loaded JSON.',
-					`File: ${this.path}`,
-					`Loaded:     ${loadedStable}`,
-					`Re-encoded: ${reEncodedStable}`,
-				].join('\n'),
-			)
-		}
 	}
 
 	private toJSON(): EncodedWalletCaptureFile {
@@ -1551,14 +1609,226 @@ export class WalletCaptureFile {
 		return out
 	}
 
-	public async save(): Promise<void> {
-		await this.annotations.save()
-		const data = this.toJSON()
-		const content = JSON.stringify(data, null, 2) + '\n'
-		const tmpPath = this.path + '.tmp'
+	/**
+	 * Convert to `DataCollection`.
+	 * If `strict` is true, generate errors as we go.
+	 * Otherwise, all errors are silenced. Useful for being able to include
+	 * partial data into wallet feature data without breakage. Unit tests
+	 * should check in strict mode.
+	 */
+	public toDataCollection(strict: boolean): DataCollection {
+		const dataCollection: DataCollection = {
+			[UserFlow.INSTALL]: null,
+			[UserFlow.ONBOARDING_NEW]: null,
+			[UserFlow.ONBOARDING_IMPORT]: null,
+			[UserFlow.SEND_ETHER]: null,
+			[UserFlow.SEND_USDC]: null,
+			[UserFlow.NATIVE_SWAP]: null,
+			[UserFlow.MAKE_TRANSACTION]: null,
+			[UserFlow.APP_CONNECTION]: null,
+		}
 
-		await fs.promises.writeFile(tmpPath, content, 'utf8')
-		await fs.promises.rename(tmpPath, this.path)
+		for (const recFlow of recordedFlow.items) {
+			const flow = this.getFlow(recFlow)
+
+			if (flow === null) {
+				continue
+			}
+
+			if (!userFlow.is(recFlow)) {
+				continue
+			}
+
+			if (flow === 'NOT_SUPPORTED') {
+				if (!userFlowMayBeMarkedUnsupported(recFlow)) {
+					throw new Error(`Flow ${recFlow} cannot be marked as NOT_SUPPORTED.`)
+				}
+
+				dataCollection[recFlow] = 'FLOW_NOT_SUPPORTED' as const
+				continue
+			}
+
+			const collected = this.processFlowRequests(flow, strict)
+			const flowData: DataCollectionForFlow = {
+				collected,
+			}
+
+			if (recFlow === UserFlow.ONBOARDING_NEW || recFlow === UserFlow.ONBOARDING_IMPORT) {
+				// TODO: Handle onboarding flows with onchain data.
+				const flowDataWithOnchain: DataCollectionForFlowWithOnchainData = {
+					...flowData,
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				}
+
+				dataCollection[recFlow] = flowDataWithOnchain
+			} else {
+				dataCollection[recFlow] = flowData
+			}
+		}
+
+		return dataCollection
+	}
+
+	/**
+	 * Process flow requests to build DataCollectionByEntity array.
+	 */
+	private processFlowRequests(
+		flow: WalletCaptureFlow,
+		strict: boolean,
+	): WithRef<DataCollectionByEntity>[] {
+		const maybeThrow = (error: string) => {
+			if (strict) {
+				throw new Error(error)
+			}
+		}
+		const perEntity = new Map<
+			EntityId,
+			{
+				entity: Entity
+				info: Map<UserInfo, CollectionPolicy>
+				purposes: Set<DataCollectionPurpose>
+			}
+		>()
+
+		for (const request of flow.requests) {
+			const entity = entityForDomain(request.domain)
+
+			if (entity === null) {
+				maybeThrow(`no entity for domain ${request.domain}`)
+				continue
+			}
+
+			const matcher = this.findMatcherForReq(request)
+			const userInfos = request.userInfo(matcher === null ? null : matcher.policy, true)
+			const purposes = new Set<DataCollectionPurpose>()
+
+			if (matcher !== null) {
+				if (matcher.purposes === 'NOT_WALLET_INITIATED') {
+					continue // Not a wallet-initiated request; skip.
+				}
+
+				if (matcher.purposes !== null) {
+					for (const purpose of setItems(matcher.purposes)) {
+						purposes.add(purpose)
+					}
+				}
+			}
+
+			for (const purpose of request.review.getExtraPurposes()) {
+				purposes.add(purpose)
+			}
+
+			const entityId = assertValidEntityId(entity.id)
+			let entData = perEntity.get(entityId)
+
+			if (entData === undefined) {
+				entData = {
+					entity,
+					info: new Map<UserInfo, CollectionPolicy>(),
+					purposes: new Set<DataCollectionPurpose>(),
+				}
+				perEntity.set(entityId, entData)
+			}
+
+			for (const [info, policy] of userInfos.entries()) {
+				if (policy === null) {
+					maybeThrow(`Cannot figure out collection policy of request: ${request.toString()}`)
+					continue
+				}
+
+				const existingPolicy = entData.info.get(info)
+
+				if (existingPolicy === undefined) {
+					entData.info.set(info, policy)
+				} else {
+					entData.info.set(info, leastConfigurableCollectionPolicy(existingPolicy, policy))
+				}
+			}
+
+			for (const purpose of purposes) {
+				entData.purposes.add(purpose)
+			}
+		}
+
+		const collected: WithRef<DataCollectionByEntity>[] = []
+
+		for (const entData of perEntity.values()) {
+			const userInfos = Array.from(entData.info.keys())
+
+			if (!isNonEmptyArray(userInfos)) {
+				continue // Entity collects no user data.
+			}
+
+			const purposes = Array.from(entData.purposes)
+
+			if (!isNonEmptyArray(purposes)) {
+				maybeThrow(`Entity ${entData.entity.id} has requests with no purpose assigned`)
+				continue
+			}
+
+			collected.push({
+				byEntity: entData.entity,
+				dataCollection: {
+					// TODO: Implement support for other values here once any wallet supports this...
+					endpoint: RegularEndpoint,
+					// TODO: Handle multiAddress.
+					multiAddress: undefined,
+					...nonEmptyMapToRecord(userInfos, info => {
+						const policy = entData.info.get(info)
+
+						if (policy === undefined) {
+							maybeThrow(`Policy for user info ${info} entity ${entData.entity.id} is undefined`)
+
+							return CollectionPolicy.ALWAYS
+						}
+
+						return policy
+					}),
+				},
+				purposes: purposes,
+				ref: refNotNecessary,
+			})
+		}
+
+		return collected
+	}
+
+	public async save(opts: SaveOptions): Promise<string[]> {
+		if (this.path === null) {
+			throw new Error('WalletCaptureFile was constructed without a path; cannot save.')
+		}
+
+		const data = this.toJSON()
+		const content = JSON.stringify(data, null, '\t') + '\n'
+
+		// Check if content differs from what's on disk
+		let needsWrite = true
+
+		if (fs.existsSync(this.path)) {
+			const existingContent = fs.readFileSync(this.path, 'utf8')
+
+			if (existingContent === content) {
+				needsWrite = false
+			}
+		}
+
+		const changed: string[] = []
+
+		if (opts.verifyExisting) {
+			if (needsWrite) {
+				throw new Error(`File not in sync: ${this.path}`)
+			}
+		} else if (needsWrite) {
+			const tmpPath = this.path + '.tmp'
+
+			await fs.promises.writeFile(tmpPath, content, 'utf8')
+			await fs.promises.rename(tmpPath, this.path)
+			changed.push(this.path)
+		}
+
+		const annotationsChanged = await this.annotations.save(opts)
+
+		return changed.concat(...annotationsChanged)
 	}
 
 	public getFlow(flow: RecordedFlow): WalletCaptureFlow | 'NOT_SUPPORTED' | null {
@@ -1711,10 +1981,40 @@ export class WalletCaptureFile {
 			)
 		}
 
+		if (issues.length === 0) {
+			// Double-check that this is the case by trying to convert in strict mode:
+			try {
+				this.toDataCollection(true)
+			} catch (e) {
+				return [
+					new WalletCaptureIssue({
+						section: ['Unknown'],
+						issue: `Could not convert to DataCollection despite finding no errors: ${getErrorMessage(e)}`,
+						suggestions: [
+							{
+								suggestion: 'Investigate the above failure, then re-run the `check` subcommand.',
+								subcommand: 'check',
+							},
+						],
+					}),
+				]
+			}
+		}
+
 		return issues
 	}
 
 	public markFlowUnsupported(f: RecordedFlow) {
+		if (!userFlow.is(f)) {
+			throw new Error(
+				`Flow ${f} may not be marked as unsupported as it is not a wallet user UX flow.`,
+			)
+		}
+
+		if (!userFlowMayBeMarkedUnsupported(f)) {
+			throw new Error(`Flow ${f} may not be marked as unsupported.`)
+		}
+
 		const flow = this.getFlow(f)
 
 		if (flow !== null && flow === 'NOT_SUPPORTED') {
