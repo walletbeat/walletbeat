@@ -8,15 +8,12 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.reputation'
-
 export type ReputationValue = Value & {
 	originalProduct: ReputationType
 	availability: ReputationType
 	warrantySupportRisk: ReputationType
 	disclosureHistory: ReputationType
 	bugBounty: ReputationType
-	__brand: 'attributes.reputation'
 }
 
 function evaluateReputation(features: ReputationSupport): Rating {
@@ -94,7 +91,7 @@ export const reputation: Attribute<ReputationValue> = {
 		pickWorstRating<ReputationValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<ReputationValue> => {
 		if (features.type !== WalletType.HARDWARE) {
-			return exempt(reputation, sentence('Only rated for hardware wallets'), brand, {
+			return exempt(reputation, sentence('Only rated for hardware wallets'), {
 				originalProduct: ReputationType.FAIL,
 				availability: ReputationType.FAIL,
 				warrantySupportRisk: ReputationType.FAIL,
@@ -106,7 +103,7 @@ export const reputation: Attribute<ReputationValue> = {
 		const reputationFeature = features.transparency.reputation
 
 		if (reputationFeature === null) {
-			return unrated(reputation, brand, {
+			return unrated(reputation, {
 				originalProduct: ReputationType.FAIL,
 				availability: ReputationType.FAIL,
 				warrantySupportRisk: ReputationType.FAIL,
@@ -124,7 +121,6 @@ export const reputation: Attribute<ReputationValue> = {
 				displayName: 'Reputation',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} reputation.`),
 				...reputationFeature, // TODO: Filter fields
-				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} reputation evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

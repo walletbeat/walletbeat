@@ -6,8 +6,9 @@ import {
 	type NonEmptySet,
 	nonEmptySetFromArray,
 } from '@/types/utils/non-empty'
+import { Enum } from '@/utils/enum'
 
-import { allVariants, getVariants, Variant } from './variants'
+import { getVariants, Variant, variantEnum } from './variants'
 import type { BaseWallet, RatedWallet } from './wallet'
 
 /**
@@ -31,6 +32,12 @@ export enum WalletType {
 	/** Embedded wallet. */
 	EMBEDDED = 'EMBEDDED',
 }
+
+export const walletTypes = new Enum<WalletType>({
+	[WalletType.SOFTWARE]: true,
+	[WalletType.HARDWARE]: true,
+	[WalletType.EMBEDDED]: true,
+})
 
 /**
  * Map over all possible wallet types.
@@ -85,7 +92,7 @@ export function isWalletType(str: string): str is WalletType {
  */
 export function walletTypeToVariants(walletType: WalletType): NonEmptySet<Variant> {
 	return nonEmptySetFromArray(
-		nonEmptyFilter(allVariants, variant => variantToWalletType(variant) === walletType),
+		nonEmptyFilter(variantEnum.items, variant => variantToWalletType(variant) === walletType),
 	)
 }
 
@@ -111,7 +118,7 @@ export function variantToWalletType(variant: Variant): WalletType {
 /**
  * Returns the types of a given wallet.
  */
-export function walletTypes(wallet: BaseWallet | RatedWallet): NonEmptySet<WalletType> {
+export function walletTypesOf(wallet: BaseWallet | RatedWallet): NonEmptySet<WalletType> {
 	return nonEmptySetFromArray(
 		nonEmptyMap(nonEmptyKeys(getVariants(wallet.variants)), variantToWalletType),
 	)

@@ -24,11 +24,7 @@ import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.ecosystem.account_abstraction'
-
-export type AccountAbstractionValue = Value & {
-	__brand: 'attributes.ecosystem.account_abstraction'
-}
+export type AccountAbstractionValue = Value
 
 function supportsErc4337AndEip7702(
 	references: ReferenceArray,
@@ -41,7 +37,6 @@ function supportsErc4337AndEip7702(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports Account Abstraction via ERC-4337 and EIP-7702.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)} and ${eipMarkdownLinkAndTitle(eip7702)}.`,
@@ -57,7 +52,6 @@ function supportsErc4337(references: ReferenceArray): Evaluation<AccountAbstract
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
 			shortExplanation: sentence('{{WALLET_NAME}} supports Account Abstraction via ERC-4337.'),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)}.`,
@@ -73,7 +67,6 @@ function supportsEip7702(references: ReferenceArray): Evaluation<AccountAbstract
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
 			shortExplanation: sentence('{{WALLET_NAME}} supports Account Abstraction via EIP-7702.'),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(eip7702)}.`,
@@ -91,7 +84,6 @@ function supportsEoaAndMpc(references: ReferenceArray): Evaluation<AccountAbstra
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			'{{WALLET_NAME}} supports EOA and MPC accounts only, with no Account Abstraction support.',
@@ -115,7 +107,6 @@ function supportsMpcOnly(references: ReferenceArray): Evaluation<AccountAbstract
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			'{{WALLET_NAME}} supports MPC accounts only, with no Account Abstraction support.',
@@ -139,7 +130,6 @@ function supportsRawEoaOnly(references: ReferenceArray): Evaluation<AccountAbstr
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.',
 			),
-			__brand: brand,
 		},
 		details: markdown('{{WALLET_NAME}} supports EOAs only, with no Account Abstraction support.'),
 		impact: mdParagraph(
@@ -225,7 +215,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<AccountAbstractionValue> => {
 		if (features.accountSupport === null) {
-			return unrated(accountAbstraction, brand, null)
+			return unrated(accountAbstraction, null)
 		}
 
 		const supported: Record<AccountType, boolean> = {

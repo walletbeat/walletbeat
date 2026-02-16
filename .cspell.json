@@ -35,6 +35,7 @@
 		"Certora",
 		"CEX",
 		"Chainalysis",
+		"chainflip",
 		"checkmark",
 		"clineignore",
 		"Coinspect",
@@ -333,6 +334,9 @@
 		"src/generated/**",
 		"src/legacy/**"
 	],
-	"patterns": [{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" }],
-	"ignoreRegExpList": ["CIDv1"]
+	"patterns": [
+		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },
+		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" }
+	],
+	"ignoreRegExpList": ["Bitcoin addresses", "CIDv1"]
 }

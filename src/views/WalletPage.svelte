@@ -35,7 +35,7 @@
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { scoreToColor } from '@/utils/colors'
-	import { getAttributeStages, isAttributeUsedInStages } from '@/utils/stage-attributes'
+	import { getAttributeStagesForWallet, isAttributeUsedInStages } from '@/utils/stage-attributes'
 	import { WalletLadderType } from '@/schema/ladders'
 
 
@@ -758,7 +758,7 @@
 										undefined
 								)}
 
-								{@const attributeStages = getAttributeStages(attribute)}
+								{@const attributeStages = getAttributeStagesForWallet(attribute, wallet)}
 
 								{@const stageNumbers = (
 									ladderType &&

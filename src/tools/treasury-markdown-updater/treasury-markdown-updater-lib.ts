@@ -133,6 +133,8 @@ function markdownAddressLink(addressRow: AddressRow, label: string, monospace: b
 			return `[${m}${escapeMd(label)}${m}](https://eth.blockscout.com/address/${escapeMd(addr)})`
 		case 'fil':
 			return `[${m}${escapeMd(label)}${m}](https://filscan.io/en/address/${escapeMd(addr)}/)`
+		case 'btc':
+			return `[${m}${escapeMd(label)}${m}](https://mempool.space/address/${escapeMd(addr)})`
 		default:
 			throw new Error(`Invalid chain "${chain}"`)
 	}
@@ -167,11 +169,15 @@ function generateOperationsTable(operations: OperationRow[], addresses: AddressR
 	const formattedRows = operations.map(operation => {
 		const txLink = (() => {
 			if (operation.ID.startsWith('fil:')) {
-				return `[\`${operation.ID.substring(4, 14)}...\`](https://filscan.io/en/message/${escapeMd(operation.ID)}/)`
+				return `[\`${operation.ID.substring(4, 14)}...\`](https://filscan.io/en/message/${escapeMd(operation.ID.substring(4))}/)`
 			}
 
 			if (operation.ID.startsWith('0x')) {
 				return `[\`${operation.ID.substring(0, 10)}...\`](https://eth.blockscout.com/tx/${escapeMd(operation.ID)})`
+			}
+
+			if (operation.ID.startsWith('btc:')) {
+				return `[\`${operation.ID.substring(4, 14)}...\`](https://mempool.space/tx/${escapeMd(operation.ID.substring(4))})`
 			}
 
 			return escapeMd(operation.ID)

@@ -23,11 +23,7 @@ import {
 import { type FullyQualifiedReference, popRefs } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.chain_verification'
-
-export type ChainVerificationValue = Value & {
-	__brand: 'attributes.security.chain_verification'
-}
+export type ChainVerificationValue = Value
 
 function supportsChainVerification(
 	lightClients: NonEmptyArray<EthereumL1LightClient>,
@@ -39,7 +35,6 @@ function supportsChainVerification(
 			rating: Rating.PASS,
 			displayName: 'L1 chain state verification',
 			shortExplanation: sentence('{{WALLET_NAME}} verifies chain integrity of the Ethereum L1.'),
-			__brand: brand,
 		},
 		details: chainVerificationDetailsContent({ lightClients, refs }),
 		references: refs,
@@ -72,7 +67,6 @@ function noChainVerification(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} does not verify chain integrity of the Ethereum L1.',
 			),
-			__brand: brand,
 		},
 		details: markdown(`
 			{{WALLET_NAME}} does not verify the integrity of the Ethereum L1 blockchain when retrieving chain state or simulating transactions.
@@ -140,7 +134,6 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 			return exempt(
 				chainVerification,
 				sentence('This attribute is not applicable for hardware wallets.'),
-				brand,
 				null,
 			)
 		}
@@ -148,7 +141,7 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		const l1Client = features.security.lightClient.ethereumL1
 
 		if (l1Client === null) {
-			return unrated(chainVerification, brand, null)
+			return unrated(chainVerification, null)
 		}
 
 		if (!isSupported(l1Client)) {

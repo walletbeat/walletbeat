@@ -11,15 +11,12 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.maintenance'
-
 export type MaintenanceValue = Value & {
 	physicalDurability: MaintenanceType
 	mtbfDocumentation: MaintenanceType
 	repairability: MaintenanceType
 	batteryHandling: MaintenanceType
 	warrantyExtensions: MaintenanceType
-	__brand: 'attributes.maintenance'
 }
 
 function evaluateMaintenance(features: MaintenanceSupport): Rating {
@@ -100,7 +97,6 @@ export const maintenance: Attribute<MaintenanceValue> = {
 			return exempt(
 				maintenance,
 				sentence('These attributes only refer to hardware wallet maintenance'),
-				brand,
 				{
 					physicalDurability: MaintenanceType.FAIL,
 					mtbfDocumentation: MaintenanceType.FAIL,
@@ -114,7 +110,7 @@ export const maintenance: Attribute<MaintenanceValue> = {
 		const maintenanceFeature = features.transparency.maintenance
 
 		if (maintenanceFeature === null) {
-			return unrated(maintenance, brand, {
+			return unrated(maintenance, {
 				physicalDurability: MaintenanceType.FAIL,
 				mtbfDocumentation: MaintenanceType.FAIL,
 				repairability: MaintenanceType.FAIL,
@@ -134,7 +130,6 @@ export const maintenance: Attribute<MaintenanceValue> = {
 					`{{WALLET_NAME}} has ${rating.toLowerCase()} maintenance practices.`,
 				),
 				...maintenanceFeature, // TODO: Filter fields
-				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} maintenance evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

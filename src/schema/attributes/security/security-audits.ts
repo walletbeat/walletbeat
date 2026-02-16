@@ -18,11 +18,8 @@ import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.security_audits'
-
 export type SecurityAuditsValue = Value & {
 	securityAudits: SecurityAudit[]
-	__brand: 'attributes.security.security_audits'
 }
 
 function noAudits(): Evaluation<SecurityAuditsValue> {
@@ -33,7 +30,6 @@ function noAudits(): Evaluation<SecurityAuditsValue> {
 			displayName: 'No security audits',
 			shortExplanation: sentence('{{WALLET_NAME}} has not undergone security auditing.'),
 			securityAudits: [],
-			__brand: brand,
 		},
 		details: paragraph('{{WALLET_NAME}} has not undergone any security auditing.'),
 		references: [],
@@ -103,7 +99,6 @@ function audited(
 			displayName,
 			shortExplanation,
 			securityAudits: audits,
-			__brand: brand,
 		},
 		details: securityAuditsDetailsContent({
 			auditedInLastYear,
@@ -204,13 +199,12 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 			return exempt(
 				securityAudits,
 				sentence('This attribute is not applicable to hardware wallets.'),
-				brand,
 				{ securityAudits: [] },
 			)
 		}
 
 		if (features.security.publicSecurityAudits === null) {
-			return unrated(securityAudits, brand, { securityAudits: [] })
+			return unrated(securityAudits, { securityAudits: [] })
 		}
 
 		if (!isNonEmptyArray(features.security.publicSecurityAudits)) {

@@ -286,6 +286,11 @@ export type CalldataDecodingTypes = Record<
 	Support<WithRef<CalldataDecodingSupport>>
 >
 
+/**
+ * Types of transactions that a wallet can decode the calldata of.
+ */
+export type SoftwareCalldataDecodingTypes = Record<CalldataDecoding, boolean>
+
 /** If a wallet can decode the calldata for a specific transaction, what does that look like? */
 export interface CalldataDecodingSupport {
 	/** Where does the calldata decoding actually happen? */
@@ -420,7 +425,7 @@ export function isSupportedOnDevice(
  */
 export interface HardwareTransactionLegibilitySupport {
 	/**
-	 * Does a wallet display transaction details clearly?
+	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
 	 */
 	legibility: CalldataDecodingTypes | null
 	/**
@@ -449,7 +454,7 @@ export interface CallDataDisplay {
 	/* Can the user copy the raw hex code to the clipboard? */
 	copyHexToClipboard: boolean
 
-	/* Can display the calldata in some formatted output (e.g. JSON) */
+	/* Can display the calldata in some formatted output that shows function names and parameters (e.g. JSON / text) */
 	formatted: boolean
 }
 
@@ -477,6 +482,11 @@ export interface SoftwareTransactionLegibilitySupport {
 	 * What message signing data does the software wallet provide?
 	 */
 	messageSigningLegibility: SoftwareMessageSigningLegibility | null
+
+	/**
+	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
+	 */
+	legibility: SoftwareCalldataDecodingTypes | null
 }
 
 export const isFullBasicTransactionDetails = (

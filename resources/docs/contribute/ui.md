@@ -92,7 +92,6 @@ return {
 		displayName,
 		shortExplanation,
 		securityAudits: audits,
-		__brand: brand,
 	},
 	details: securityAuditsDetailsContent({
 		// Props defined in SecurityAuditsDetailsProps:

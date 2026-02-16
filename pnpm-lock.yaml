@@ -112,8 +112,8 @@ importers:
         specifier: ^0.61.0
         version: 0.61.0
       omnipin:
-        specifier: ^2.0.4
-        version: 2.0.4
+        specifier: ^2.1.0
+        version: 2.1.0
       orbiter-cli:
         specifier: ^0.9.11
         version: 0.9.11(@types/node@25.0.8)(bufferutil@4.1.0)(esbuild@0.21.5)(utf-8-validate@5.0.10)
@@ -4824,8 +4824,8 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
-  omnipin@2.0.4:
-    resolution: {integrity: sha512-R0rR/oQ1xE9mUBnJdJXOX2boVmKybPZuVw9TvSsOtODzGy7eHwOd29NUIx7k1fKzJB6v8xdCgiouR2PEyzPruA==}
+  omnipin@2.1.0:
+    resolution: {integrity: sha512-ucoyeUtkyLqUzu1Wjv+1Ox3IWK33OMN+4dkQO10Cn/WsOKbJdwMP6gsUV6dxxzJVzWGL5gvjDaBnylHsxMmASA==}
     engines: {node: ^20.10.0 || >=21.1.0}
     hasBin: true
 
@@ -12960,7 +12960,7 @@ snapshots:
 
   ohash@2.0.11: {}
 
-  omnipin@2.0.4: {}
+  omnipin@2.1.0: {}
 
   on-exit-leak-free@0.2.0: {}
 
@@ -13089,8 +13089,8 @@ snapshots:
       '@adraffy/ens-normalize': 1.11.1
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.6.2
-      '@scure/bip39': 1.5.4
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
       abitype: 1.0.8(typescript@5.9.3)(zod@3.25.76)
       eventemitter3: 5.0.1
     optionalDependencies:

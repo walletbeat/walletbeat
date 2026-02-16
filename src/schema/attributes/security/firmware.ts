@@ -8,14 +8,11 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.firmware'
-
 export type FirmwareValue = Value & {
 	silentUpdateProtection: FirmwareType | null
 	firmwareOpenSource: FirmwareType | null
 	reproducibleBuilds: FirmwareType | null
 	customFirmware: FirmwareType | null
-	__brand: 'attributes.firmware'
 }
 
 function evaluateFirmware(features: FirmwareSupport): Rating {
@@ -93,7 +90,7 @@ export const firmware: Attribute<FirmwareValue> = {
 		pickWorstRating<FirmwareValue>(perVariant),
 	evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
 		if (features.type !== WalletType.HARDWARE) {
-			return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), brand, {
+			return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
@@ -104,7 +101,7 @@ export const firmware: Attribute<FirmwareValue> = {
 		const firmwareFeature = features.security.firmware
 
 		if (firmwareFeature === null) {
-			return unrated(firmware, brand, {
+			return unrated(firmware, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
@@ -115,7 +112,7 @@ export const firmware: Attribute<FirmwareValue> = {
 		const rating = evaluateFirmware(firmwareFeature)
 
 		if (rating === Rating.UNRATED) {
-			return unrated(firmware, brand, {
+			return unrated(firmware, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
@@ -130,7 +127,6 @@ export const firmware: Attribute<FirmwareValue> = {
 				displayName: 'Firmware',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} firmware.`),
 				...firmwareFeature, // TODO: Filter fields.
-				__brand: brand,
 			},
 			details: paragraph(`{{WALLET_NAME}} firmware evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

@@ -29,11 +29,7 @@ import { commaListFormat } from '@/types/utils/text'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.transaction_legibility'
-
-export type TransactionLegibilityValue = Value & {
-	__brand: 'attributes.transaction_legibility'
-}
+export type TransactionLegibilityValue = Value
 
 // Message signing evaluation helpers
 
@@ -392,7 +388,6 @@ function hardwareNoTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} does not display clear transaction details on the hardware device when signing.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} implements either zero or very little transaction legibility on the hardware device itself. Transaction legibility is important for security as it allows users to verify transaction details directly on their hardware wallet screen before signing, without relying on potentially compromised software.\n\n${featureDetailsMarkdown}`,
@@ -418,7 +413,6 @@ function hardwareBasicTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports basic transaction legibility on the hardware device.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports basic transaction legibility on the hardware device, but the implementation does not provide full transparency. The device may display some transaction details or support basic calldata decoding, but lacks comprehensive support for complex transactions, all essential details, or advanced data extraction methods.\n\n${featureDetailsMarkdown}`,
@@ -444,7 +438,6 @@ function hardwarePartialTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports partial transaction legibility on the hardware device.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports partial transaction legibility on the hardware device. The device displays most transaction details and may support calldata decoding for some transaction types, but may not fully decode complex nested transactions or provide all data extraction methods. Showing transaction details directly on the hardware device is crucial for security as it allows users to verify transaction details independently of potentially compromised software.\n\n${featureDetailsMarkdown}`,
@@ -469,7 +462,6 @@ function hardwareFullTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports full transaction legibility on the hardware device.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} implements full transaction legibility on the hardware device itself. All transaction details are clearly displayed on the device screen, the device supports decoding of complex nested transactions, and provides comprehensive data extraction methods (QR codes, hashes) for independent verification before signing, providing maximum security and transparency for users.\n\n${featureDetailsMarkdown}`,
@@ -479,6 +471,10 @@ function hardwareFullTransactionLegibility(
 
 // Software wallet detail generation helpers
 interface SoftwareFeatureDetails {
+	calldataDecoding: {
+		supported: string[]
+		missing: string[]
+	}
 	calldataDisplay: {
 		supported: string[]
 		missing: string[]
@@ -490,12 +486,48 @@ interface SoftwareFeatureDetails {
 }
 
 function analyzeSoftwareFeatures({
+	legibility,
 	calldataDisplay,
 	messageSigningLegibility,
 }: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
 	const details: SoftwareFeatureDetails = {
+		calldataDecoding: { supported: [], missing: [] },
 		calldataDisplay: { supported: [], missing: [] },
 		messageSigning: { supported: [], missing: [] },
+	}
+
+	// Analyze calldata decoding
+	if (legibility !== null) {
+		const decodingChecks = [
+			{
+				key: CalldataDecoding.ETH_USDC_TRANSFER,
+				label: 'basic token transfers (ERC-20)',
+			},
+			{
+				key: CalldataDecoding.ZKSYNC_USDC_TRANSFER,
+				label: 'ZKSync token transfers',
+			},
+			{
+				key: CalldataDecoding.AAVE_SUPPLY,
+				label: 'DeFi interactions (e.g., Aave)',
+			},
+			{
+				key: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
+				label: 'nested Safe transactions',
+			},
+			{
+				key: CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
+				label: 'complex nested multisend transactions',
+			},
+		]
+
+		decodingChecks.forEach(({ key, label }) => {
+			if (legibility[key] === true) {
+				details.calldataDecoding.supported.push(label)
+			} else {
+				details.calldataDecoding.missing.push(label)
+			}
+		})
 	}
 
 	// Analyze calldata display
@@ -546,12 +578,28 @@ function analyzeSoftwareFeatures({
 function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): string {
 	const sections: string[] = []
 
+	// Calldata Decoding section
+	if (
+		features.calldataDecoding.supported.length > 0 ||
+		features.calldataDecoding.missing.length > 0
+	) {
+		sections.push('**Calldata Decoding**\n')
+
+		if (features.calldataDecoding.supported.length > 0) {
+			sections.push(`✓ Supported: ${commaListFormat(features.calldataDecoding.supported)}\n`)
+		}
+
+		if (features.calldataDecoding.missing.length > 0) {
+			sections.push(`✗ Missing: ${commaListFormat(features.calldataDecoding.missing)}\n`)
+		}
+	}
+
 	// Calldata Display section
 	if (
 		features.calldataDisplay.supported.length > 0 ||
 		features.calldataDisplay.missing.length > 0
 	) {
-		sections.push('**Calldata Display**\n')
+		sections.push('\n**Calldata Display**\n')
 
 		if (features.calldataDisplay.supported.length > 0) {
 			sections.push(`✓ Supported: ${commaListFormat(features.calldataDisplay.supported)}\n`)
@@ -580,6 +628,12 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 
 function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string {
 	const improvements: string[] = []
+
+	if (features.calldataDecoding.missing.length > 0) {
+		improvements.push(
+			`**Calldata Decoding:** Add support for decoding ${commaListFormat(features.calldataDecoding.missing)}`,
+		)
+	}
 
 	if (features.calldataDisplay.missing.length > 0) {
 		improvements.push(
@@ -616,7 +670,6 @@ function softwareNoTransactionLegibility(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} does not display clear transaction details when signing.',
 			),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} implements either zero or very little transaction legibility. The wallet does not adequately display calldata in multiple formats (raw hex, formatted, copyable) or essential transaction details. Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.\n\n${featureDetailsMarkdown}`,
@@ -640,7 +693,6 @@ function softwarePartialTransactionLegibility(
 			rating: Rating.PARTIAL,
 			displayName: 'Partial transaction legibility support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports partial transaction legibility.'),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet may display some calldata formats but lacks comprehensive support for all calldata display methods (raw hex, formatted, copyable) or complete benchmark transaction coverage. Showing transaction details is crucial for security as it allows users to verify transaction details before signing.\n\n${featureDetailsMarkdown}`,
@@ -663,7 +715,6 @@ function softwareFullTransactionLegibility(
 			rating: Rating.PASS,
 			displayName: 'Full transaction legibility support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports full transaction legibility.'),
-			__brand: brand,
 		},
 		details: markdown(
 			`{{WALLET_NAME}} implements full transaction legibility. The wallet supports comprehensive calldata display (raw hex format, formatted output, and copy to clipboard) and displays all essential transaction details clearly for each benchmark transaction type, providing maximum security and transparency for users.\n\n${featureDetailsMarkdown}`,
@@ -753,7 +804,7 @@ function evaluateHardwareWalletTransactionLegibility(
 
 	const result = ((): Evaluation<TransactionLegibilityValue> => {
 		if (overallRating === Rating.UNRATED) {
-			return unrated(transactionLegibility, brand, null)
+			return unrated(transactionLegibility, null)
 		}
 
 		if (overallRating === Rating.FAIL) {
@@ -785,11 +836,11 @@ function evaluateSoftwareWalletTransactionLegibility(
 ): Evaluation<TransactionLegibilityValue> {
 	const { withoutRefs: transactionLegibilitySupport } = popRefs(softwareTransactionLegibility)
 
-	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility } =
+	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility, legibility } =
 		transactionLegibilitySupport
 
-	if (calldataDisplay === null || transactionDetailsDisplay === null) {
-		return unrated(transactionLegibility, brand, null)
+	if (calldataDisplay === null || transactionDetailsDisplay === null || legibility === null) {
+		return unrated(transactionLegibility, null)
 	}
 
 	// Evaluate message signing (PASS/FAIL only)
@@ -800,13 +851,47 @@ function evaluateSoftwareWalletTransactionLegibility(
 	const calldataCopyable = calldataDisplay.copyHexToClipboard
 	const calldataFormatted = calldataDisplay.formatted
 
+	// Check calldata decoding capabilities
+	const supportsBasicDecoding: boolean =
+		legibility[CalldataDecoding.ETH_USDC_TRANSFER] === true &&
+		legibility[CalldataDecoding.ZKSYNC_USDC_TRANSFER] === true &&
+		legibility[CalldataDecoding.AAVE_SUPPLY] === true
+
+	const supportsComplexDecoding: boolean =
+		supportsBasicDecoding &&
+		(legibility[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED] === true ||
+			legibility[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND] ===
+				true)
+
+	// For DisplayedTransactionDetails, SHOWN_BY_DEFAULT or SHOWN_OPTIONALLY count as supported
+	const transactionDetailsRatings = [
+		transactionDetailsDisplay.gas === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.gas === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.nonce === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.nonce === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.from === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.from === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.to === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.to === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.chain === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.chain === DataDisplayOptions.SHOWN_OPTIONALLY,
+		transactionDetailsDisplay.value === DataDisplayOptions.SHOWN_BY_DEFAULT ||
+			transactionDetailsDisplay.value === DataDisplayOptions.SHOWN_OPTIONALLY,
+	]
+
+	const transactionDetailsCount = transactionDetailsRatings.filter(r => r).length
+	const allTransactionDetailsShown = transactionDetailsCount === transactionDetailsRatings.length
+
 	// Hierarchical scoring logic:
 	// 1. If no calldata shown at all, FAIL
 	// 2. If calldata is shown but neither copyable nor formatted, FAIL
-	// 3. Message signing fails, FAIL
-	// 4. If calldata is not copyable OR not formatted, PARTIAL
-	// 5. If message signing not available, PARTIAL
-	// 6. Otherwise, PASS
+	// 3. If less than 3 types of transaction details shown, FAIL
+	// 4. Message signing fails, FAIL
+	// 5. If basic calldata decoding not supported, FAIL
+	// 6. If calldata is not copyable OR not formatted, PARTIAL
+	// 7. If more than 3 types of transaction details are shown but not all of them, PARTIAL
+	// 8. If missing complex decoding, cap at PARTIAL
+	// 9. Otherwise, PASS (requires message signing to pass and complex calldata decoding)
 	let rating: Rating
 
 	if (!calldataShown) {
@@ -815,9 +900,15 @@ function evaluateSoftwareWalletTransactionLegibility(
 		rating = Rating.FAIL
 	} else if (messageSigningLegibility !== null && !messageSigningPasses) {
 		rating = Rating.FAIL
+	} else if (!supportsBasicDecoding) {
+		// Require basic calldata decoding for passing.
+		rating = Rating.FAIL
 	} else if (!calldataCopyable || !calldataFormatted) {
 		rating = Rating.PARTIAL
 	} else if (!messageSigningPasses) {
+		rating = Rating.PARTIAL
+	} else if (!supportsComplexDecoding) {
+		// Complex decoding not supported — cap at PARTIAL
 		rating = Rating.PARTIAL
 	} else {
 		rating = Rating.PASS
@@ -889,6 +980,8 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		- Formatted output: Users can view decoded, human-readable calldata
 		- Copy to clipboard: Users can copy the calldata directly for verification
 
+		Software wallets must also support calldata decoding for various transaction types, from basic token transfers to complex nested transactions.
+
 		**Hardware Wallet Specific Requirements:**
 		For hardware wallets, the signature/transaction information *must* be visible on the hardware wallet device itself. Any data shown on a software wallet component is ignored for hardware wallet ratings.
 
@@ -900,9 +993,9 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		**Rating Criteria:**
 
 		For software wallets:
-		- A wallet receives a passing rating if it displays calldata in all three formats (raw hex, formatted, copyable), displays transaction details for all benchmark transactions, and handles simulation edge cases.
-		- A wallet receives a partial rating if it has some combination of these features, but not all at the full level.
-		- A wallet receives a failing rating if it lacks calldata display capabilities.
+		- A wallet receives a passing rating if it displays calldata in all three formats (raw hex, formatted, copyable), displays all essential transaction details, and supports complex calldata decoding (including nested transactions).
+		- A wallet receives a partial rating if it has some combination of these features but not all, or if calldata decoding data has not been provided.
+		- A wallet receives a failing rating if it lacks calldata display capabilities or does not display essential transaction details.
 
 		For hardware wallets:
 		- A wallet receives a passing rating if it supports decoding of complex nested transactions, displays all essential transaction details on the device, and provides comprehensive data extraction methods (QR codes and hashes, in addition to visual display).
@@ -935,6 +1028,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
+					legibility: null,
 					ref: refNotNecessary,
 				}),
 			),
@@ -976,6 +1070,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
 					ref: refNotNecessary,
+					legibility: null,
 				}),
 			),
 		],
@@ -1001,13 +1096,14 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
 					ref: refNotNecessary,
+					legibility: null,
 				}),
 			),
 		],
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<TransactionLegibilityValue> => {
 		if (features.security.transactionLegibility === null) {
-			return unrated(transactionLegibility, brand, null)
+			return unrated(transactionLegibility, null)
 		}
 
 		if (isHardwareTransactionLegibility(features.security.transactionLegibility)) {

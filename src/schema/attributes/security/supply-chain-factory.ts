@@ -19,8 +19,6 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.supply_chain_factory'
-
 export type SupplyChainFactoryValue = Value & {
 	factoryOpsecDocs: SupplyChainFactoryType
 	factoryOpsecAudit: SupplyChainFactoryType
@@ -28,7 +26,6 @@ export type SupplyChainFactoryValue = Value & {
 	hardwareVerification: SupplyChainFactoryType
 	tamperResistance: SupplyChainFactoryType
 	genuineCheck: SupplyChainFactoryType
-	__brand: 'attributes.security.supply_chain_factory'
 }
 
 function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating {
@@ -119,7 +116,6 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 			return exempt(
 				supplyChainFactory,
 				sentence('Attribute only applies to factory-made hardware wallets.'),
-				brand,
 				{
 					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
 					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
@@ -140,7 +136,6 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.',
 				),
-				brand,
 				{
 					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
 					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
@@ -155,7 +150,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		const factoryFeature = features.security.supplyChainFactory
 
 		if (factoryFeature === null) {
-			return unrated(supplyChainFactory, brand, {
+			return unrated(supplyChainFactory, {
 				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
 				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
 				tamperEvidence: SupplyChainFactoryType.FAIL,
@@ -176,7 +171,6 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 					`{{WALLET_NAME}} has ${rating.toLowerCase()} factory supply chain.`,
 				),
 				...factoryFeature, // TODO: Filter fields
-				__brand: brand,
 			},
 			details: paragraph(
 				`{{WALLET_NAME}} factory supply chain evaluation is ${rating.toLowerCase()}.`,

@@ -39,10 +39,7 @@ import {
 import { evaluateAllGuardianScenarios } from '../../features/guardian-scenario/guardian-scenario-expansion'
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.account_recovery'
-
 export type AccountRecoveryValue = Value & {
-	__brand: 'attributes.security.account_recovery'
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
@@ -76,7 +73,6 @@ function evaluateGuardianRecoveryPolicy(
 				`),
 				minimumGuardianPolicy: guardianPolicy,
 				outcomes,
-				__brand: brand,
 			},
 			details: accountRecoveryDetailsContent({}),
 		}
@@ -93,7 +89,6 @@ function evaluateGuardianRecoveryPolicy(
 				),
 				minimumGuardianPolicy: guardianPolicy,
 				outcomes,
-				__brand: brand,
 			},
 			details: accountRecoveryDetailsContent({}),
 		}
@@ -110,7 +105,6 @@ function evaluateGuardianRecoveryPolicy(
 			`),
 			minimumGuardianPolicy: guardianPolicy,
 			outcomes,
-			__brand: brand,
 		},
 		details: accountRecoveryDetailsContent({}),
 	}
@@ -134,7 +128,6 @@ function evaluateAccountRecovery(
 			`),
 			minimumGuardianPolicy: null,
 			outcomes: null,
-			__brand: brand,
 		},
 		details: accountRecoveryDetailsContent({}),
 	}
@@ -311,7 +304,7 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<AccountRecoveryValue> => {
 		if (features.security.accountRecovery === null) {
-			return unrated(accountRecovery, brand, { minimumGuardianPolicy: null, outcomes: null })
+			return unrated(accountRecovery, { minimumGuardianPolicy: null, outcomes: null })
 		}
 
 		let references: FullyQualifiedReference[] = []

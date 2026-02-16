@@ -10,7 +10,7 @@
 	import { type EvaluatedAttribute, ratingIcons, ratingToColor, type Value } from '@/schema/attributes'
 	import type { Variant } from '@/schema/variants'
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
-	import { getAttributeStages } from '@/utils/stage-attributes'
+	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 	import { getWalletStageAndLadder } from '@/utils/stage'
 
 
@@ -57,7 +57,7 @@
 	)
 
 	const attributeStages = $derived(
-		getAttributeStages(attribute.attribute)
+		getAttributeStagesForWallet(attribute.attribute, wallet)
 	)
 
 	const relevantStages = $derived(

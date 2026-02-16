@@ -14,14 +14,10 @@ import type { AtLeastOneVariant, Variant } from '../variants'
 
 /**
  * Helper for constructing "Unrated" values.
- * @param brand Brand string to distinguish `Value` subtypes.
  */
 export function unrated<V extends Value>(
 	attribute: Attribute<V>,
-	brand: string,
-	extraProps: Omit<V, keyof (Value & { __brand: string })> extends Record<string, never>
-		? null
-		: Omit<V, keyof (Value & { __brand: string })>,
+	extraProps: Omit<V, keyof Value> extends Record<string, never> ? null : Omit<V, keyof Value>,
 ): Evaluation<V> {
 	const value: Value = {
 		id: 'unrated',
@@ -30,11 +26,7 @@ export function unrated<V extends Value>(
 		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
-	const v: V = {
-		__brand: brand,
-		...value,
-		...(extraProps ?? {}),
-	} as unknown as V
+	const v: V = { ...value, ...(extraProps ?? {}) } as unknown as V
 
 	return {
 		value: v,
@@ -42,17 +34,10 @@ export function unrated<V extends Value>(
 	}
 }
 
-/**
- * Helper for constructing "Exempt" values.
- * @param brand Brand string to distinguish `Value` subtypes.
- */
 export function exempt<V extends Value>(
 	attribute: Attribute<V>,
 	whyExempt: Sentence<WalletNameStrings>,
-	brand: string,
-	extraProps: Omit<V, keyof (Value & { __brand: string })> extends Record<string, never>
-		? null
-		: Omit<V, keyof (Value & { __brand: string })>,
+	extraProps: Omit<V, keyof Value> extends Record<string, never> ? null : Omit<V, keyof Value>,
 ): ExemptEvaluation<V> {
 	const value: Value & { rating: Rating.EXEMPT } = {
 		id: 'exempt',
@@ -62,7 +47,6 @@ export function exempt<V extends Value>(
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
 	const v: V & { rating: Rating.EXEMPT } = {
-		__brand: brand,
 		...value,
 		...(extraProps ?? {}),
 	} as unknown as V & { rating: Rating.EXEMPT }

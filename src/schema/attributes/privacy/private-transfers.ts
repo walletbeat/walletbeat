@@ -46,10 +46,7 @@ import { entityMarkdownLink } from '../../entity'
 import { mergeRefs, type ReferenceArray, refNotNecessary, refs } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.privacy.private_transfers'
-
 export type PrivateTransfersValue = Value & {
-	__brand: 'attributes.privacy.private_transfers'
 	defaultFungibleTokenTransferMode: FungibleTokenTransferMode
 	perTechnology: Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>
 }
@@ -145,7 +142,6 @@ function mergeEvaluations(
 			icon: worse.value.icon,
 			score: worse.value.score,
 			perTechnology: mergedMap,
-			__brand: brand,
 		},
 		details,
 		howToImprove: worse.howToImprove,
@@ -162,7 +158,6 @@ const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
 		shortExplanation: sentence('{{WALLET_NAME}} does not support private token transfers.'),
 		defaultFungibleTokenTransferMode: 'PUBLIC',
 		perTechnology: new Map(),
-		__brand: brand,
 	},
 	details: mdParagraph(
 		`
@@ -216,7 +211,6 @@ const nonDefault: Evaluation<PrivateTransfersValue> = {
 		),
 		defaultFungibleTokenTransferMode: 'PUBLIC',
 		perTechnology: new Map(),
-		__brand: brand,
 	},
 	details: privateTransfersDetailsContent({
 		privateTransferDetails: new Map(),
@@ -559,7 +553,6 @@ function rateStealthAddressSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -576,7 +569,6 @@ function rateStealthAddressSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -594,7 +586,6 @@ function rateStealthAddressSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -814,7 +805,6 @@ function rateTornadoCashNovaSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -831,7 +821,6 @@ function rateTornadoCashNovaSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -849,7 +838,6 @@ function rateTornadoCashNovaSupport(
 						),
 						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
 						perTechnology,
-						__brand: brand,
 					},
 					details,
 					howToImprove,
@@ -868,7 +856,6 @@ function rateTornadoCashNovaSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -1164,7 +1151,6 @@ function ratePrivacyPoolsSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -1181,7 +1167,6 @@ function ratePrivacyPoolsSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -1198,7 +1183,6 @@ function ratePrivacyPoolsSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -1216,7 +1200,6 @@ function ratePrivacyPoolsSupport(
 						),
 						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
 						perTechnology,
-						__brand: brand,
 					},
 					details,
 					howToImprove,
@@ -1235,7 +1218,6 @@ function ratePrivacyPoolsSupport(
 					),
 					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
 					perTechnology,
-					__brand: brand,
 				},
 				details,
 				howToImprove,
@@ -1514,7 +1496,7 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<PrivateTransfersValue> => {
 		if (features.privacy.transactionPrivacy === null) {
-			return unrated(privateTransfers, brand, {
+			return unrated(privateTransfers, {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				perTechnology: new Map(),
 			})

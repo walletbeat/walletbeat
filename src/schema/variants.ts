@@ -1,10 +1,10 @@
 import {
-	type NonEmptyArray,
 	nonEmptyEntries,
 	nonEmptyKeySet,
 	type NonEmptyRecord,
 	type NonEmptySet,
 } from '@/types/utils/non-empty'
+import { Enum } from '@/utils/enum'
 
 /**
  * An enum of wallet variants.
@@ -12,20 +12,20 @@ import {
  * across different of its implementations.
  */
 export enum Variant {
-	MOBILE = 'mobile',
-	DESKTOP = 'desktop',
-	BROWSER = 'browser',
-	EMBEDDED = 'embedded',
-	HARDWARE = 'hardware',
+	MOBILE = 'MOBILE',
+	DESKTOP = 'DESKTOP',
+	BROWSER = 'BROWSER',
+	EMBEDDED = 'EMBEDDED',
+	HARDWARE = 'HARDWARE',
 }
 
-export const allVariants: NonEmptyArray<Variant> = [
-	Variant.MOBILE,
-	Variant.DESKTOP,
-	Variant.BROWSER,
-	Variant.EMBEDDED,
-	Variant.HARDWARE,
-]
+export const variantEnum = new Enum<Variant>({
+	[Variant.MOBILE]: true,
+	[Variant.DESKTOP]: true,
+	[Variant.BROWSER]: true,
+	[Variant.EMBEDDED]: true,
+	[Variant.HARDWARE]: true,
+})
 
 /** Maps at least one variant to a T. */
 export type AtLeastOneVariant<T> = NonEmptyRecord<Variant, T>
@@ -49,13 +49,7 @@ function isAtLeastOneVariant<T>(value: VariantFeature<T>): value is AtLeastOneVa
 	let foundNonVariant = false
 
 	Object.keys(value).forEach(key => {
-		if (
-			key === 'mobile' ||
-			key === 'desktop' ||
-			key === 'browser' ||
-			key === 'embedded' ||
-			key === 'hardware'
-		) {
+		if (variantEnum.is(key)) {
 			foundVariant = true
 		} else {
 			foundNonVariant = true

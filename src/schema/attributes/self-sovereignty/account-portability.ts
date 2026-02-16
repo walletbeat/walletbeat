@@ -26,11 +26,7 @@ import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.self_sovereignty.account_portability'
-
-export type AccountPortabilityValue = Value & {
-	__brand: 'attributes.self_sovereignty.account_portability'
-}
+export type AccountPortabilityValue = Value
 
 function evaluateEoa(
 	eoa: AccountTypeEoa,
@@ -49,7 +45,6 @@ function evaluateEoa(
 				rating: Rating.PASS,
 				displayName: 'Standards-compliant EOA with seed phrase',
 				shortExplanation: sentence('{{WALLET_NAME}} follows EOA key derivation standards.'),
-				__brand: brand,
 			},
 			details: mdParagraph(`
 				{{WALLET_NAME}} generates EOA keys in a
@@ -84,7 +79,6 @@ function evaluateEoa(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not follow key derivation standards for EOA keys, but lets you export them to other wallets.',
 				),
-				__brand: brand,
 			},
 			details: paragraph(
 				'{{WALLET_NAME}} generates EOA keys in a non-standard way. However, these keys can be exported into other wallets, avoiding lock-in.',
@@ -108,7 +102,6 @@ function evaluateEoa(
 			shortExplanation: sentence(
 				"{{WALLET_NAME}} locks you in by not allowing you to export your account's private key.",
 			),
-			__brand: brand,
 		},
 		details: paragraph("{{WALLET_NAME}} does not allow you to export your account's private key."),
 		impact: paragraph(
@@ -133,7 +126,6 @@ function evaluateMpc(
 				shortExplanation: sentence(
 					"By default, users of {{WALLET_NAME}} do not custody enough shares of the account's private key to control it.",
 				),
-				__brand: brand,
 			},
 			details: paragraph(
 				'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. By default, the user does not custody enough shares of this private key in order to control the account. Therefore, {{WALLET_NAME}} is not a self-custodial wallet.',
@@ -161,7 +153,6 @@ function evaluateMpc(
 				shortExplanation: sentence(
 					'Withdrawing assets out of {{WALLET_NAME}} cannot be done without relying on an external party.',
 				),
-				__brand: brand,
 			},
 			details: paragraph(
 				'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully own the account, but generating an asset withdrawal transaction nonetheless requires interaction with an external service.',
@@ -188,7 +179,6 @@ function evaluateMpc(
 				shortExplanation: sentence(
 					'Withdrawing assets out of {{WALLET_NAME}} requires the use of a proprietary application.',
 				),
-				__brand: brand,
 			},
 			details: paragraph(
 				'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully own the account, but generating an asset withdrawal transaction nonetheless requires the use of a proprietary application.',
@@ -211,7 +201,6 @@ function evaluateMpc(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} puts the user in control of their MPC private key.',
 			),
-			__brand: brand,
 		},
 		details: paragraph(
 			'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully control the account, and can generate transactions without relying on an external provider.',
@@ -237,7 +226,6 @@ function evaluateMultifactor(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} is not self-custodial, and cannot be converted to become self-custodial.',
 				),
-				__brand: brand,
 			},
 			details: mdParagraph(
 				`{{WALLET_NAME}} is an ${eipMarkdownLink(eip)} (Smart Contract) wallet. The account control logic in the smart contract cannot be updated to put the user fully in control of the account.`,
@@ -266,7 +254,6 @@ function evaluateMultifactor(
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} is not self-custodial by default, and changing this requires cooperation from an external provider.',
 					),
-					__brand: brand,
 				},
 				details: markdown(`
 					{{WALLET_NAME}} is an ${eipMarkdownLink(eip)} (Smart Contract) wallet. By default, the user does not have the ability to unilaterally control the account. Therefore, {{WALLET_NAME}} is not a self-custodial wallet.
@@ -298,7 +285,6 @@ function evaluateMultifactor(
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} is not self-custodial by default, and changing this requires a proprietary application.',
 					),
-					__brand: brand,
 				},
 				details: mdParagraph(`
 					{{WALLET_NAME}} is an ${eipMarkdownLink(eip)} (Smart Contract) wallet. By default, the user does not have the ability to unilaterally control the account. Therefore, {{WALLET_NAME}} is not a self-custodial wallet.
@@ -327,7 +313,6 @@ function evaluateMultifactor(
 				shortExplanation: sentence(
 					'Withdrawing assets out of {{WALLET_NAME}} cannot be done without relying on an external provider.',
 				),
-				__brand: brand,
 			},
 			details: mdParagraph(
 				'Users of {{WALLET_NAME}} cannot generate asset transfer transactions without relying on an external provider.',
@@ -355,7 +340,6 @@ function evaluateMultifactor(
 				shortExplanation: sentence(
 					'Withdrawing assets out of {{WALLET_NAME}} requires the use of a proprietary application.',
 				),
-				__brand: brand,
 			},
 			details: mdParagraph(
 				'Generating an asset transfer transaction with {{WALLET_NAME}} requires the user of a proprietary application.',
@@ -381,7 +365,6 @@ function evaluateMultifactor(
 				rating: Rating.PARTIAL,
 				displayName: 'Not self-custodial by default',
 				shortExplanation: sentence('{{WALLET_NAME}} is not self-custodial by default.'),
-				__brand: brand,
 			},
 			details: mdParagraph(
 				`{{WALLET_NAME}} is an ${eipMarkdownLink(erc4337)} (Smart Contract) wallet. By default, the user does not have the ability to unilaterally control the account. Therefore, {{WALLET_NAME}} is not a self-custodial wallet. However, the user *can* update the smart contract control logic to turn the account into a self-custodial wallet.`,
@@ -401,7 +384,6 @@ function evaluateMultifactor(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} is self-custodial and puts the user in control of their smart contract wallet without lock-in.',
 			),
-			__brand: brand,
 		},
 		details: mdParagraph(
 			`{{WALLET_NAME}} is an ${eipMarkdownLink(erc4337)} (Smart Contract) wallet. By default, the user holds sufficient authority to generate and broadcast arbitrary transactions and can do so without relying on an external provider, including transactions which update the smart contract's control logic over the account (e.g. for key rotation).`,
@@ -424,7 +406,6 @@ function evaluateSafe(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} is not self-custodial, and cannot be converted to become self-custodial.',
 				),
-				__brand: brand,
 			},
 			details: mdParagraph(
 				'{{WALLET_NAME}} is a Safe multisig wallet. The account control logic cannot be updated to put the user fully in control of the account.',
@@ -447,7 +428,6 @@ function evaluateSafe(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} is self-custodial and puts the user in control of their Safe wallet without lock-in.',
 			),
-			__brand: brand,
 		},
 		details: mdParagraph(
 			'{{WALLET_NAME}} is a Safe multisig wallet. By default, the user holds sufficient authority to generate and broadcast arbitrary transactions and can do so without relying on an external provider, including transactions which update the control logic (e.g., for owner changes).',
@@ -789,7 +769,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<AccountPortabilityValue> => {
 		if (features.accountSupport === null) {
-			return unrated(accountPortability, brand, null)
+			return unrated(accountPortability, null)
 		}
 
 		const allRefs = mergeRefs(

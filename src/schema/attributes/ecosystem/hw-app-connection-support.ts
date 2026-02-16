@@ -23,8 +23,6 @@ import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.app_connection_support'
-
 /**
  * Converts a connection method enum value to its string representation
  */
@@ -64,9 +62,7 @@ function describeConnectionMethods(
 	return commaListFormat(methods)
 }
 
-export type AppConnectionSupportValue = Value & {
-	__brand: 'attributes.security.app_connection_support'
-}
+export type AppConnectionSupportValue = Value
 
 function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 	return {
@@ -75,7 +71,6 @@ function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 			rating: Rating.FAIL,
 			displayName: 'No app connection support',
 			shortExplanation: sentence('{{WALLET_NAME}} cannot connect to apps.'),
-			__brand: brand,
 		},
 		details: paragraph(
 			'{{WALLET_NAME}} does not provide any supported way to connect to Web3 applications. This prevents users from approving transactions, signing messages, or interacting with DeFi, NFT marketplaces, and other onchain apps. In practice, the wallet is limited to basic asset management (send/receive) and cannot be used as a primary Web3 wallet.',
@@ -95,7 +90,6 @@ function unverifiableAppConnectionSupport(): Evaluation<AppConnectionSupportValu
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} can connect to apps, but requires trusting unverifiable code.',
 			),
-			__brand: brand,
 		},
 		details: paragraph(
 			"{{WALLET_NAME}} can connect to apps, but only through its proprietary closed-source application. This requires users to trust the wallet provider's software without the ability to verify its security. This increases supply-chain risk, creates vendor lock-in, and limits interoperability with the broader Web3 ecosystem.",
@@ -117,7 +111,6 @@ function limitedVerifiableAppConnectionSupport(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} can connect to some apps using verifiable code or open standards, but with limitations.',
 			),
-			__brand: brand,
 		},
 		details: paragraph(
 			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)}, which uses verifiable code and/or open standards. However, this support is not universal—users may be restricted to specific apps, specific connection flows, or a limited compatibility surface. As a result, some apps, or software wallets may not work reliably with {{WALLET_NAME}}.`,
@@ -139,7 +132,6 @@ function verifiableUniversalAppConnectionSupport(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} can connect to any app using entirely verifiable code or open standards.',
 			),
-			__brand: brand,
 		},
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)} using open standards and verifiable components. This enables broad compatibility with Web3 apps while maintaining transparency—integrations can be inspected and do not depend on trusting closed, proprietary connection software.`,
@@ -158,7 +150,6 @@ function restrictedAppConnectionSupport(
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} can connect to apps, but requires manufacturer approval for integrations.',
 			),
-			__brand: brand,
 		},
 		details: paragraph(
 			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)}. However, integrating {{WALLET_NAME}} into software wallets or apps requires manufacturer consent. This creates friction for developers, limits ecosystem growth, and gives the manufacturer gatekeeping power over which apps and wallets can support {{WALLET_NAME}}.`,
@@ -296,7 +287,6 @@ limiting its utility.
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
 				),
-				brand,
 				null,
 			)
 		}
@@ -312,7 +302,6 @@ limiting its utility.
 					shortExplanation: sentence(
 						'This attribute evaluates hardware wallet app connection capabilities and is not applicable for software wallets.',
 					),
-					__brand: brand,
 				},
 				details: paragraph(
 					'As {{WALLET_NAME}} is a software wallet, this attribute which evaluates hardware wallet app connection capabilities is not applicable. Software wallets inherently support app connections.',
@@ -324,7 +313,7 @@ limiting its utility.
 		const appSupport = features.appConnectionSupport
 
 		if (!appSupport) {
-			return unrated(appConnectionSupport, brand, null)
+			return unrated(appConnectionSupport, null)
 		}
 
 		// Extract references if supported
@@ -345,7 +334,7 @@ limiting its utility.
 			}
 
 			if (appSupport.requiresManufacturerConsent === null) {
-				return unrated(appConnectionSupport, brand, null)
+				return unrated(appConnectionSupport, null)
 			}
 
 			// Determine rating based on the best connection method available

@@ -24,11 +24,7 @@ import { assertNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.transparency.open_source'
-
-export type OpenSourceValue = Value & {
-	__brand: 'attributes.transparency.open_source'
-}
+export type OpenSourceValue = Value
 
 function open(license: FOSSLicense): Evaluation<OpenSourceValue> {
 	return {
@@ -40,7 +36,6 @@ function open(license: FOSSLicense): Evaluation<OpenSourceValue> {
 			shortExplanation: sentence(
 				`{{WALLET_NAME}}'s source code is under an open-source license (${licenseName(license)}).`,
 			),
-			__brand: brand,
 		},
 		details: markdown(`
 			**{{WALLET_NAME}}** is licensed under the
@@ -60,7 +55,6 @@ function openInTheFuture(license: FutureFOSSLicense): Evaluation<OpenSourceValue
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} (${licenseName(license)})'s code license commits to transition to open-source in the future.`,
 			),
-			__brand: brand,
 		},
 		details: markdown(`
 			**{{WALLET_NAME}}** is licensed under the
@@ -82,7 +76,6 @@ function mixedIncludingProprietary(fossLicense: FOSSLicense): Evaluation<OpenSou
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} uses a proprietary license for some of its code.',
 			),
-			__brand: brand,
 		},
 		details: markdown(`
 			While part of **{{WALLET_NAME}}** is licensed under the
@@ -103,7 +96,6 @@ function proprietary(): Evaluation<OpenSourceValue> {
 			icon: '💔', // Broken heart
 			displayName: 'Proprietary code license',
 			shortExplanation: sentence('{{WALLET_NAME}} uses a proprietary source code license.'),
-			__brand: brand,
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} uses a proprietary or non-FOSS source code license.
@@ -125,7 +117,6 @@ function unlicensed(): Evaluation<OpenSourceValue> {
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} does not have a valid license for its source code.',
 			),
-			__brand: brand,
 		},
 		details: paragraph(
 			'{{WALLET_NAME}} does not have a valid license for its source code. This is most likely an accidental omission, but a lack of license means that even if {{WALLET_NAME}} is functionally identical to an open-source project, it may later decide to set its license to a proprietary license. Therefore, {{WALLET_NAME}} is assumed to not be Free & Open Source Software until it does have a valid license file.',
@@ -192,7 +183,7 @@ export const openSource: Attribute<OpenSourceValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<OpenSourceValue> => {
 		if (features.licensing === null || features.licensing.walletAppLicense === null) {
-			return unrated(openSource, brand, null)
+			return unrated(openSource, null)
 		}
 
 		const allLicenses = new Set<License>()
@@ -212,7 +203,7 @@ export const openSource: Attribute<OpenSourceValue> = {
 				break // Nothing more to do.
 			case LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE:
 				if (features.licensing.coreLicense === null) {
-					return unrated(openSource, brand, null)
+					return unrated(openSource, null)
 				}
 
 				allLicenses.add(features.licensing.coreLicense.license)

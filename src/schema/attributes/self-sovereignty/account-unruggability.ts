@@ -43,10 +43,7 @@ import {
 import { evaluateAllGuardianScenarios } from '../../features/guardian-scenario/guardian-scenario-expansion'
 import { pickWorstRating, unrated } from '../common'
 
-const brand = 'attributes.security.account_unruggability'
-
 export type AccountUnruggabilityValue = Value & {
-	__brand: 'attributes.security.account_unruggability'
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
@@ -80,7 +77,6 @@ function evaluateGuardianUnruggabilityPolicy(
 				`),
 				minimumGuardianPolicy: guardianPolicy,
 				outcomes,
-				__brand: brand,
 			},
 			details: accountUnruggabilityDetailsContent({}),
 		}
@@ -97,7 +93,6 @@ function evaluateGuardianUnruggabilityPolicy(
 				),
 				minimumGuardianPolicy: guardianPolicy,
 				outcomes,
-				__brand: brand,
 			},
 			details: accountUnruggabilityDetailsContent({}),
 		}
@@ -114,7 +109,6 @@ function evaluateGuardianUnruggabilityPolicy(
 			`),
 			minimumGuardianPolicy: guardianPolicy,
 			outcomes,
-			__brand: brand,
 		},
 		details: accountUnruggabilityDetailsContent({}),
 	}
@@ -141,7 +135,6 @@ function evaluateAccountUnruggability(
 					`),
 					minimumGuardianPolicy: null,
 					outcomes: null,
-					__brand: brand,
 				},
 				details: markdown(`
 					Key generation with {{WALLET_NAME}} occurs off-device. This means
@@ -172,7 +165,6 @@ function evaluateAccountUnruggability(
 					`),
 					minimumGuardianPolicy: null,
 					outcomes: null,
-					__brand: brand,
 				},
 				details: markdown(`
 					{{WALLET_NAME}} uses multi-party computation to derive the account's
@@ -203,7 +195,6 @@ function evaluateAccountUnruggability(
 			`),
 			minimumGuardianPolicy: null,
 			outcomes: null,
-			__brand: brand,
 		},
 		details: accountUnruggabilityDetailsContent({}),
 	}
@@ -394,7 +385,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<AccountUnruggabilityValue> => {
 		if (features.security.keysHandling === null || features.security.accountRecovery === null) {
-			return unrated(accountUnruggability, brand, { minimumGuardianPolicy: null, outcomes: null })
+			return unrated(accountUnruggability, { minimumGuardianPolicy: null, outcomes: null })
 		}
 
 		let references: FullyQualifiedReference[] = []

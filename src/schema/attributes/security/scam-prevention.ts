@@ -26,8 +26,6 @@ export type ScamAlertSupport = WithRef<{
 	listFeature: string
 }>
 
-const brand = 'attributes.security.scam_alert'
-
 export type ScamPreventionValue = Value &
 	(
 		| {
@@ -43,9 +41,7 @@ export type ScamPreventionValue = Value &
 				}
 		  }
 		| { scamAlerts: null }
-	) & {
-		__brand: 'attributes.security.scam_alert'
-	}
+	)
 
 function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	feature: 'sendTransactionWarning'
@@ -212,7 +208,6 @@ function evaluateScamAlerts(
 				sendTransactionWarning,
 				contractTransactionWarning,
 				scamUrlWarning,
-				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: paragraph('{{WALLET_NAME}} should implement scam alerting features.'),
@@ -241,7 +236,6 @@ function evaluateScamAlerts(
 					sendTransactionWarning,
 					contractTransactionWarning,
 					scamUrlWarning,
-					__brand: brand,
 				},
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
@@ -269,7 +263,6 @@ function evaluateScamAlerts(
 					sendTransactionWarning,
 					contractTransactionWarning,
 					scamUrlWarning,
-					__brand: brand,
 				},
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
@@ -296,7 +289,6 @@ function evaluateScamAlerts(
 				sendTransactionWarning,
 				contractTransactionWarning,
 				scamUrlWarning,
-				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
@@ -331,7 +323,6 @@ function evaluateScamAlerts(
 				sendTransactionWarning,
 				contractTransactionWarning,
 				scamUrlWarning,
-				__brand: brand,
 			},
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
@@ -371,7 +362,6 @@ function evaluateScamAlerts(
 			sendTransactionWarning,
 			contractTransactionWarning,
 			scamUrlWarning,
-			__brand: brand,
 		},
 		details: scamAlertsDetailsContent({}),
 		references: allRefs,
@@ -559,7 +549,7 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 	},
 	evaluate: (features: ResolvedFeatures): Evaluation<ScamPreventionValue> => {
 		if (features.security.scamAlerts === null) {
-			return unrated(scamPrevention, brand, { scamAlerts: null })
+			return unrated(scamPrevention, { scamAlerts: null })
 		}
 
 		return evaluateScamAlerts(features.profile, features.security.scamAlerts)

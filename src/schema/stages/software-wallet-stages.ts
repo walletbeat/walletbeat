@@ -243,12 +243,17 @@ export const softwareWalletStageOne: WalletStage = {
 			criteria: [
 				{
 					id: 'address_resolution',
-					description: sentence('The wallet can send funds to human-readable Ethereum addresses.'),
+					description: sentence(
+						'The wallet can send funds to human-readable Ethereum addresses (e.g. ENS).',
+					),
 					rationale: sentence(`
 						This improves the user experience of Ethereum and its layer 2 ecosystem
 						while reducing the potential for mistakes when sending funds.
 					`),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressResolution),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressResolution, {
+						allowPartial: true,
+						ifNoVariantInScope: null,
+					}),
 				},
 				{
 					id: 'browser_integration',
@@ -446,6 +451,20 @@ const softwareWalletStageTwo: WalletStage = {
 				'The wallet is aligned with advanced Ethereum ecosystem best practices for usability.',
 			),
 			criteria: [
+				{
+					id: 'chain_specific_address_resolution',
+					description: sentence(
+						'The wallet supports chain-specific human-readable addresses (e.g. ERC-7828, ERC-7831).',
+					),
+					rationale: sentence(`
+						Including the destination chain in the address reduces wrong-chain sends
+						and improves the user experience of Ethereum's layer 2 ecosystem.
+					`),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressResolution, {
+						allowPartial: false,
+						ifNoVariantInScope: null,
+					}),
+				},
 				{
 					id: 'account_abstraction',
 					description: sentence('The wallet is Account Abstraction ready.'),
