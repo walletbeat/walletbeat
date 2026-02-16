@@ -2,6 +2,8 @@
 pragma solidity 0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+
 
 /**
  * @title WalletbeatTestErc721
@@ -11,10 +13,14 @@ import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
  */
 contract WalletbeatTestErc721 is ERC721 {
     error WalletbeatTestErc721__Soulbound();
+    error WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
 
     uint256 private s_tokenId;
+    string private s_tokenSvgUri;
 
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+    constructor(string memory name, string memory symbol, string memory tokenSvgUri) ERC721(name, symbol) {
+        s_tokenSvgUri = tokenSvgUri;
+    }
 
     /**
      * @notice Mints a variable number of NFTs to the specified receiver
@@ -48,5 +54,29 @@ contract WalletbeatTestErc721 is ERC721 {
         }
 
         revert WalletbeatTestErc721__Soulbound();
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        if (ownerOf(tokenId) == address(0)) {
+            revert WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
+        }
+
+        return string(
+            abi.encodePacked(
+                _baseURI(),
+                Base64.encode(
+                    bytes(
+                        abi.encodePacked(
+                            '{"name":"',
+                            name(),
+                            '", "description":"A test ERC721 token used solely for testing.", ',
+                            '"attributes": [{"trait_type": "purpose", "value": "testing"}], "image":"',
+                            s_tokenSvgUri,
+                            '"}'
+                        )
+                    )
+                )
+            )
+        );
     }
 }

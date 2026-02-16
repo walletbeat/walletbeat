@@ -5,6 +5,7 @@ libs = ["lib"]
 remappings = [
     "@openzeppelin/=lib/openzeppelin-contracts/"
 ]
+fs_permissions = [{access = "read", path = "./images"}]
 [invariant]
 runs = 128
 depth = 128
