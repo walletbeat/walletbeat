@@ -12,9 +12,10 @@ export enum DataDisplayOptions {
 }
 
 /**
- * How are the essential transaction data displayed by the hardware wallet?
+ * How are the essential transaction data displayed by the wallet for basic transactions?
+ * Basic transactions have a clear recipient and value.
  */
-export interface DisplayedTransactionDetails {
+export interface DisplayedBasicTransactionDetails {
 	gas: DataDisplayOptions
 	nonce: DataDisplayOptions
 	from: DataDisplayOptions
@@ -24,9 +25,9 @@ export interface DisplayedTransactionDetails {
 }
 
 /**
- * The wallet displays no transaction details.
+ * The wallet displays no basic transaction details.
  */
-export const displaysNoTransactionDetails: DisplayedTransactionDetails = {
+export const displaysNoTransactionDetails: DisplayedBasicTransactionDetails = {
 	gas: DataDisplayOptions.NOT_IN_UI,
 	nonce: DataDisplayOptions.NOT_IN_UI,
 	from: DataDisplayOptions.NOT_IN_UI,
@@ -36,9 +37,9 @@ export const displaysNoTransactionDetails: DisplayedTransactionDetails = {
 }
 
 /**
- * The wallet displays all the possible transaction details.
+ * The wallet displays all the possible basic transaction details.
  */
-export const displaysFullTransactionDetails: DisplayedTransactionDetails = {
+export const displaysFullTransactionDetails: DisplayedBasicTransactionDetails = {
 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
 	nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -48,13 +49,45 @@ export const displaysFullTransactionDetails: DisplayedTransactionDetails = {
 }
 
 /**
- * Important: THIS INFORMATION MUST BE ON THE WALLET ITSELF. We do not trust the software "around" the wallets.
- *
- * To judge this feature of calldata decoding, we will assess a "hard-and-fast" rule of "can you decode this specific set of calldata?"
- * Hardware wallets could "cheat" this system by hard-coding just these transactions to pass the test, so we expect this list to grow over time.
- * Additionally, calldata decoding might get more advanced over time, so this list may change.
+ * Whether the effect of a complex transaction is explained to the user.
  */
-export enum CalldataDecoding {
+export enum TransactionOutcome {
+	/** The effect of the transaction is clearly explained. */
+	EXPLAINED = 'EXPLAINED',
+	/** The effect of the transaction is not explained or unclear, requiring manual user intervention to understand (e.g. interpret calldata). */
+	NOT_EXPLAINED = 'NOT_EXPLAINED',
+}
+
+/**
+ * How are the essential transaction data displayed by the wallet for complex transactions?
+ * Complex transactions interact with contracts, so there is no simple "to" address or "value" —
+ * instead we evaluate whether the transaction outcome is explained.
+ */
+export interface DisplayedComplexTransactionDetails {
+	from: DataDisplayOptions
+	gas: DataDisplayOptions
+	nonce: DataDisplayOptions
+	chain: DataDisplayOptions
+	transactionOutcome: TransactionOutcome
+}
+
+/**
+ * Benchmark transactions for basic operations with a clear recipient and value.
+ *
+ * Important: THIS INFORMATION MUST BE ON THE WALLET ITSELF for hardware wallets.
+ * We do not trust the software "around" the wallets.
+ *
+ * To judge this feature, we will assess a "hard-and-fast" rule of "can you decode this specific set of calldata?"
+ * Hardware wallets could "cheat" this system by hard-coding just these transactions to pass the test,
+ * so we expect this list to grow over time.
+ */
+export enum BasicBenchmarkTransactions {
+	/**
+	 * Plain ETH transfer to an EOA (no calldata).
+	 * A simple send of Ether to another address.
+	 */
+	ETH_TRANSFER = 'ETH_TRANSFER',
+
 	/**
 	 * USDC transfer transaction
 	 * cast calldata "transfer(address,uint256)" 0x06496E706bB260Bef1656297A7eaDDF5D3E7788A 1000000000000000000
@@ -68,6 +101,21 @@ export enum CalldataDecoding {
 	ETH_USDC_TRANSFER = 'ETH_USDC_TRANSFER',
 
 	/**
+	 * ZKSync USDC transfer transaction
+	 * Same as above, but on a non-mainnet chain
+	 */
+	ZKSYNC_USDC_TRANSFER = 'ZKSYNC_USDC_TRANSFER',
+}
+
+/**
+ * Benchmark transactions for complex contract interactions.
+ *
+ * These transactions interact with smart contracts in non-trivial ways,
+ * so there is no simple "to" address or "value" to display.
+ * Instead, we evaluate whether the wallet explains the transaction outcome.
+ */
+export enum ComplexBenchmarkTransactions {
+	/**
 	 * USDC approval transaction
 	 * cast calldata "approve(address,uint256)" 0x06496E706bB260Bef1656297A7eaDDF5D3E7788A 1000000
 	 * https://tools.cyfrin.io/abi-encoding?data=0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240
@@ -80,12 +128,6 @@ export enum CalldataDecoding {
 	 *     To: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
 	 */
 	USDC_APPROVAL = 'USDC_APPROVAL',
-
-	/**
-	 * ZKSync USDC transfer transaction
-	 * Same as above, but on a non-mainnet chain
-	 */
-	ZKSYNC_USDC_TRANSFER = 'ZKSYNC_USDC_TRANSFER',
 
 	/**
 	 * Aave supply transaction
@@ -168,7 +210,7 @@ export enum CalldataDecoding {
 	 *                   param2: 0x9467919138E36f0252886519f34a0f8016dDb3a3
 	 *                   param3: 0
 	 *                 🔤 Raw Data: 0x617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000
-	 *       🔤 Raw Data: 0x8d80ff0a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000172005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c000000000000000000000000000000000000000000000002b5e3af16b18800000078e30497a3c7527d953c6b1e3541b021a98ac43c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000Add commentMore actions
+	 *       🔤 Raw Data: 0x8d80ff0a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000172005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c000000000000000000000000000000000000000000000002b5e3af16b18800000078e30497a3c7527d953c6b1e3541b021a98ac43c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 	 *     param3: 1
 	 *     param4: 0
 	 *     param5: 0
@@ -181,6 +223,61 @@ export enum CalldataDecoding {
 
 	// In the future, add decoding of L1 -> L2 messages like `sendToL1`
 }
+
+/**
+ * CalldataDecoding is the union of basic and complex benchmark transactions.
+ * Used for hardware wallet calldata decoding evaluation.
+ */
+export type CalldataDecoding = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
+
+/**
+ * Merged enum-like const for CalldataDecoding, allowing CalldataDecoding.ETH_TRANSFER etc.
+ */
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CalldataDecoding = {
+	...BasicBenchmarkTransactions,
+	...ComplexBenchmarkTransactions,
+} as const
+
+/**
+ * Benchmark transactions for simulation-specific scenarios.
+ * These test the wallet's ability to simulate edge-case transaction outcomes.
+ */
+export enum SimulationBenchmarkTransactions {
+	/** A transaction that will fail (revert). */
+	FAILED_TRANSACTION = 'FAILED_TRANSACTION',
+
+	/** A transaction that has nondeterministic outcome (e.g. depends on execution state). */
+	NONDETERMINISTIC_TRANSACTION = 'NONDETERMINISTIC_TRANSACTION',
+}
+
+/**
+ * Details for a failed simulation benchmark transaction.
+ */
+export interface DisplayedFailedTransactionDetails extends DisplayedComplexTransactionDetails {
+	failure: 'DETECTED' | 'NOT_DETECTED'
+}
+
+/**
+ * Details for a nondeterministic simulation benchmark transaction.
+ */
+export interface DisplayedNondeterministicTransactionDetails
+	extends DisplayedComplexTransactionDetails {
+	nondeterminism: 'NOT_DETECTED' | 'DETECTED_WITHOUT_WARNING' | 'DETECTED_WITH_WARNING'
+}
+
+/**
+ * Per-benchmark-transaction display details for software wallets.
+ * Each benchmark transaction records what the wallet shows when that transaction is being signed.
+ */
+export type SoftwareTransactionDetailsDisplay =
+	| (Record<BasicBenchmarkTransactions, DisplayedBasicTransactionDetails> &
+			Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
+				[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
+			} & {
+				[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
+			})
+	| null
 
 /**
  * Types of transactions that a wallet can decode the calldata of.
@@ -237,6 +334,7 @@ export interface HardwareMessageSigningLegibility {
  * Shorthand for a wallet that cannot do any calldata decoding.
  */
 export const noCalldataDecoding: CalldataDecodingTypes = {
+	[CalldataDecoding.ETH_TRANSFER]: notSupported,
 	[CalldataDecoding.ETH_USDC_TRANSFER]: notSupported,
 	[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: notSupported,
 	[CalldataDecoding.USDC_APPROVAL]: notSupported,
@@ -329,7 +427,7 @@ export interface HardwareTransactionLegibilitySupport {
 	/**
 	 * Does a wallet display transaction details clearly?
 	 */
-	detailsDisplayed: DisplayedTransactionDetails | null
+	detailsDisplayed: DisplayedBasicTransactionDetails | null
 
 	/**
 	 * Does a wallet allow for data extraction?
@@ -356,42 +454,6 @@ export interface CallDataDisplay {
 	formatted: boolean
 }
 
-/**
- * Does the wallet simulate transactions properly?
- */
-export interface TransactionSimulation {
-	/**
-	 * Does the wallet simulate sending and receiving Ether accurately?
-	 */
-	sendReceiveEther: boolean
-	/**
-	 * Does the wallet simulate sending and receiving ERC-20 tokens accurately?
-	 */
-	sendReceiveErc20: boolean
-	/**
-	 * Does the wallet simulate sending and receiving ERC-721 NFTs accurately?
-	 */
-	sendReceiveERC721: boolean
-	/**
-	 * Does the wallet simulate complex contract interactions beyond simple transfers
-	 * (e.g., swaps, liquidity provisioning, staking)?
-	 */
-	contractInteractions: boolean
-	/**
-	 * Does the wallet detect when a transaction will revert before submission?
-	 */
-	detectsFailure: boolean
-	/**
-	 * In the case of a transaction result depending highly on execution state,
-	 * does the wallet detect multiple outcomes?
-	 */
-	detectsOutcomeVariance: boolean
-	/**
-	 * Does the wallet warn the user when outcome variance is detected?
-	 */
-	warnsOnVariance: boolean
-}
-
 export const displaysFullCallData: CallDataDisplay = {
 	rawHex: true,
 	copyHexToClipboard: true,
@@ -408,21 +470,19 @@ export interface SoftwareTransactionLegibilitySupport {
 	calldataDisplay: CallDataDisplay | null
 	/**
 	 * Does the software wallet support displaying the transaction details?
+	 * Evaluated per benchmark transaction type.
 	 */
-	transactionDetailsDisplay: DisplayedTransactionDetails | null
+	transactionDetailsDisplay: SoftwareTransactionDetailsDisplay
 
 	/**
 	 * What message signing data does the software wallet provide?
 	 */
 	messageSigningLegibility: SoftwareMessageSigningLegibility | null
-
-	/**
-	 * Does the wallet simulates transaction properly?
-	 */
-	transactionSimulation: TransactionSimulation | null
 }
 
-export const isFullTransactionDetails = (details: DisplayedTransactionDetails): boolean => {
+export const isFullBasicTransactionDetails = (
+	details: DisplayedBasicTransactionDetails,
+): boolean => {
 	return (
 		details.gas === DataDisplayOptions.SHOWN_BY_DEFAULT &&
 		details.nonce === DataDisplayOptions.SHOWN_BY_DEFAULT &&
