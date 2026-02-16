@@ -431,7 +431,7 @@ type RailgunTransactionSubmission =
 
 			/**
 			 * Can the broadcaster learn the user's IP address?
-			 * Should be false if using Waku Network for IP protection.
+			 * Should be false if using Logos (previously Waku) for IP protection.
 			 */
 			broadcasterLearnsUserIpAddress: boolean
 	  }
@@ -451,7 +451,7 @@ type RailgunTransactionSubmission =
 
 			/**
 			 * Can the broadcaster learn the user's IP address?
-			 * Should be false if using Waku Network for IP protection.
+			 * Should be false if using Logos (previously Waku) for IP protection.
 			 */
 			broadcasterLearnsUserIpAddress: boolean
 	  }

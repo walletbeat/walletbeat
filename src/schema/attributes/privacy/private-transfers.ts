@@ -1332,7 +1332,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 						IP address, further compromising privacy.
 					`),
 					spendingImprovements: [
-						'use Waku Network for broadcaster communication to protect IP addresses',
+						'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
 						'prefer broadcaster usage over self-relay for better privacy',
 					],
 				}
@@ -1343,7 +1343,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 					spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 					spendingDetails: mdParagraph(`
 						The wallet supports self-relaying transactions, which exposes the
-						user's IP address. While broadcasters use Waku Network to protect
+						user's IP address. While broadcasters use Logos (previously Waku) to protect
 						IP addresses, the broadcaster endpoint cannot be customized.
 					`),
 					spendingImprovements: [
@@ -1357,7 +1357,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 				spendingDetails: mdParagraph(`
 					The wallet supports self-relaying transactions, which exposes the
-					user's IP address. While broadcasters use Waku Network to protect
+					user's IP address. While broadcasters use Logos (previously Waku) to protect
 					IP addresses, users should be encouraged to use broadcasters instead
 					of self-relay.
 				`),
@@ -1375,7 +1375,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 						user's IP address. The broadcaster endpoint cannot be customized.
 					`),
 					spendingImprovements: [
-						'use Waku Network for broadcaster communication to protect IP addresses',
+						'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
 						'allow users to customize the broadcaster endpoint',
 					],
 				}
@@ -1386,15 +1386,15 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				spendingDetails: mdParagraph(`
 					Transactions are submitted through broadcasters, which learn the
 					user's IP address. While users can customize the broadcaster endpoint,
-					IP address protection requires using Waku Network.
+					IP address protection requires using Logos (previously Waku).
 				`),
 				spendingImprovements: [
-					'use Waku Network for broadcaster communication to protect IP addresses',
+					'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
 				],
 			}
 		}
 
-		// Broadcaster with Waku Network (IP protected)
+		// Broadcaster with Logos (previously Waku)
 		if (!isSupported(railgun.transactionSubmission.customizableBroadcaster)) {
 			extraNotes.push(
 				mdParagraph(`
@@ -1408,7 +1408,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			return {
 				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 				spendingDetails: mdParagraph(`
-					Transactions are submitted through broadcasters using Waku Network,
+					Transactions are submitted through broadcasters using Logos (previously Waku),
 					protecting IP addresses. However, the user is not warned when performing
 					multiple operations in quick succession, which could allow an observer
 					to correlate multiple operations and infer information about the user's
@@ -1421,7 +1421,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 		return {
 			spendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 			spendingDetails: mdParagraph(`
-				Transactions are submitted through broadcasters using Waku Network,
+				Transactions are submitted through broadcasters using Logos (previously Waku),
 				protecting IP addresses. The user is cautioned against doing too many
 				operations in quick succession to avoid time-based correlation.
 			`),
