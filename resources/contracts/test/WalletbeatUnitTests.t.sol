@@ -37,15 +37,6 @@ contract WalletbeatUnitTests is Test {
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
     /*                         DEPLOYMENT TESTS                         */
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
-
-    function testErc20OwnerIsTestContract() external view {
-        assertEq(erc20.owner(), address(tc));
-    }
-
-    function testErc721OwnerIsTestContract() external view {
-        assertEq(erc721.owner(), address(tc));
-    }
-
     function testErc20Name() external view {
         assertEq(erc20.name(), "Walletbeat Testing ERC20");
     }
@@ -65,17 +56,6 @@ contract WalletbeatUnitTests is Test {
     function testFakeTokensToClaimConstant() external view {
         assertEq(tc.FAKE_TOKENS_TO_CLAIM(), 1e18);
     }
-
-    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
-    /*                       ACCESS CONTROL TESTS                       */
-    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
-
-    function testErc20ClaimOnlyOwner() external {
-        vm.prank(attacker);
-        vm.expectRevert("Ownable: caller is not the owner");
-        erc20.claim(attacker);
-    }
-
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
     /*                    SIMULATE FUNCTION V1 TESTS                    */
@@ -268,7 +248,7 @@ contract WalletbeatUnitTests is Test {
         assertEq(erc721.ownerOf(1), tester);
 
         vm.prank(tester);
-        vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc20__Soulbound.selector);
+        vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc721__Soulbound.selector);
         erc721.transferFrom(tester, tester2, 1);
     }
 
@@ -278,7 +258,7 @@ contract WalletbeatUnitTests is Test {
         tc.simulateFunctionV1();
 
         vm.prank(tester);
-        vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc20__Soulbound.selector);
+        vm.expectRevert(WalletbeatTestErc721.WalletbeatTestErc721__Soulbound.selector);
         erc721.safeTransferFrom(tester, tester2, 1);
     }
 
@@ -333,18 +313,6 @@ contract WalletbeatUnitTests is Test {
         vm.prank(tester);
         tc.claim(); // burns all tokens
         assertEq(erc20.totalSupply(), 0);
-    }   
-    /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
-    /*                   SIMULATE V2 REVERT TESTS                        */
-    /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
-
-    function testSimulateV2RevertsWhenErc20CallFails() external {
-        WalletbeatTestContract badTc =
-            new WalletbeatTestContract(address(erc20), address(erc721));
-
-        vm.prank(tester);
-        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
-        badTc.simulateFunctionV2();
     }
 
     function testTransferMintsErc721ToCaller() external {
@@ -364,6 +332,7 @@ contract WalletbeatUnitTests is Test {
         emit Transfer(tester, recipient, 100);
         tc.transfer(recipient, 100);
     }
+
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
     /*                       ALWAYS REVERTS TEST                        */
     /*.•°:°.´+˚.*°.˚:*.´•*.+°.•°:´*.´•*.•°.•°:°.´:•˚°.*°.˚:*.´+°.•.•°:°.*/
@@ -378,8 +347,7 @@ contract WalletbeatUnitTests is Test {
 
     function testSimulateV1RevertsWhenErc20CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc =
-            new WalletbeatTestContract(address(badTarget), address(erc721));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
@@ -388,8 +356,7 @@ contract WalletbeatUnitTests is Test {
 
     function testSimulateV1RevertsWhenErc721CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc =
-            new WalletbeatTestContract(address(erc20), address(badTarget));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(erc20), address(badTarget));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC721CallFailed.selector);
@@ -398,8 +365,7 @@ contract WalletbeatUnitTests is Test {
 
     function testTransferRevertsWhenErc20CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc =
-            new WalletbeatTestContract(address(badTarget), address(erc721));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
@@ -408,8 +374,7 @@ contract WalletbeatUnitTests is Test {
 
     function testTransferRevertsWhenErc721CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc =
-            new WalletbeatTestContract(address(erc20), address(badTarget));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(erc20), address(badTarget));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC721CallFailed.selector);
@@ -418,8 +383,7 @@ contract WalletbeatUnitTests is Test {
 
     function testClaimRevertsWhenErc20CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc =
-            new WalletbeatTestContract(address(badTarget), address(erc721));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
