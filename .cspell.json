@@ -331,7 +331,8 @@
 		"public/**/*.svg",
 		"resources/files/**",
 		"src/generated/**",
-		"src/legacy/**"
+		"src/legacy/**",
+		"resources/contracts/**"
 	],
 	"patterns": [{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" }],
 	"ignoreRegExpList": ["CIDv1"]
