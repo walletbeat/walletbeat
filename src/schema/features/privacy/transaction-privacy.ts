@@ -240,10 +240,10 @@ export type TornadoCashNovaSupport = WithRef<
 		warnAboutSuccessiveOperations: Support
 
 		/**
-		 * When scanning for a user's UTXOs, are they filtered entirely by the
-		 * wallet on the client side, or are they filtered by an external service?
+		 * When scanning for a user's UTXOs, are they filtered entirely on the
+		 * user's device, or are they filtered by an external service?
 		 */
-		utxoFiltering: 'WALLET_SIDE' | 'EXTERNAL'
+		utxoFiltering: 'ON_USER_DEVICE' | 'EXTERNAL'
 
 		/**
 		 * Is the fee taken by the relayer displayed in the UI?
@@ -433,7 +433,7 @@ type BroadcasterBasedTransactionSubmissionData = {
 	broadcasterFee: FeeDisplay
 }
 
-type RailgunTransactionSubmissionVariant =
+type RailgunTransactionSubmissionMethods =
 	| {
 			broadcasterBasedTransactionSubmission: Supported<BroadcasterBasedTransactionSubmissionData>
 			selfRelayedTransactionSubmission: NotSupported
@@ -499,13 +499,12 @@ export type RailgunSupport = WithRef<{
 
 	/**
 	 * When scanning for received funds, is the Railgun UTXO merkle tree synced
-	 * and decrypted entirely by the wallet on the client side, or is it synced
+	 * and decrypted entirely on the user's device, or is it synced
 	 * by an external service? This matters for privacy: if syncing is done
 	 * server-side, the external provider can learn about received funds even
-	 * though the chain data itself doesn't reveal this information. This would
-	 * be CHAIN_DATA_PRIVATE rather than FULLY_PRIVATE.
+	 * though the chain data itself doesn't reveal this information.
 	 */
-	merkleTreeSync: 'WALLET_SIDE' | 'EXTERNAL'
+	merkleTreeSync: 'ON_USER_DEVICE' | 'EXTERNAL'
 
 	/**
 	 * Does the wallet support broadcaster-based transaction submission?
@@ -520,4 +519,4 @@ export type RailgunSupport = WithRef<{
 	 */
 	selfRelayedTransactionSubmission: Support
 }> &
-	RailgunTransactionSubmissionVariant
+	RailgunTransactionSubmissionMethods

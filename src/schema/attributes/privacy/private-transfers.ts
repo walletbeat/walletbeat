@@ -699,12 +699,12 @@ function rateTornadoCashNovaSupport(
 					`),
 					receivingImprovements: ['should perform UTXO filtering client-side'],
 				}
-			case 'WALLET_SIDE':
+			case 'ON_USER_DEVICE':
 				return {
 					receivingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 					receivingDetails: mdParagraph(`
-						The user's private notes (UTXOs) are filtered by the wallet
-						itself, ensuring that no external provider may correlate the
+						The user's private notes (UTXOs) are filtered on the user's 
+						device, ensuring that no external provider may correlate the
 						user's received funds in the pool.
 					`),
 					receivingImprovements: [],
@@ -1285,8 +1285,8 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				sendingDetails: mdParagraph(`
 					Shielding tokens into Railgun is done directly to the smart contract,
 					requiring no broadcaster. However, shielding transactions are public
-					on-chain and can be analyzed to correlate a user's 0x address with their
-					0zk address through amount, timing, and token type analysis. The wallet
+					on-chain and can be analyzed to correlate a user's \`0x\` address with their
+					\`0zk\` address through amount, timing, and token type analysis. The wallet
 					does not warn users about these correlation risks. Private transfers
 					between Railgun wallets are supported.
 				`),
@@ -1327,7 +1327,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 					`),
 					receivingImprovements: ['should perform merkle tree syncing client-side'],
 				}
-			case 'WALLET_SIDE':
+			case 'ON_USER_DEVICE':
 				return {
 					receivingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 					receivingDetails: mdParagraph(`
@@ -1355,11 +1355,11 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			}
 		}
 
-		const broadcasterSupported = isSupported(railgun.broadcasterBasedTransactionSubmission)
-		const selfRelaySupported = isSupported(railgun.selfRelayedTransactionSubmission)
-
 		// If only self-relay is supported, this exposes IP address
-		if (!broadcasterSupported && selfRelaySupported) {
+		if (
+			!isSupported(railgun.broadcasterBasedTransactionSubmission) &&
+			isSupported(railgun.selfRelayedTransactionSubmission)
+		) {
 			return {
 				spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
 				spendingDetails: mdParagraph(`
@@ -1372,14 +1372,6 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			}
 		}
 
-		// Broadcaster must be supported at this point (either broadcaster-only or both)
-		if (!broadcasterSupported) {
-			// This should not happen due to type constraint, but handle gracefully
-			throw new Error(
-				'RailgunSupport must have at least one transaction submission method supported',
-			)
-		}
-
 		// Extract broadcaster data once - we know it's supported
 		const broadcasterData = railgun.broadcasterBasedTransactionSubmission
 
@@ -1389,7 +1381,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 
 		// If both are supported and default is self-relay, this exposes IP address
 		if (
-			selfRelaySupported &&
+			isSupported(railgun.selfRelayedTransactionSubmission) &&
 			'defaultTransactionSubmissionType' in railgun &&
 			railgun.defaultTransactionSubmissionType === 'SELF_RELAY'
 		) {
@@ -1481,7 +1473,7 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			extraNotes.push(
 				mdParagraph(`
 					The wallet does not warn users about the privacy risks of sharing viewing
-					keys. Viewing keys are encoded in 0zk addresses and are irrevocable, meaning
+					keys. Viewing keys are encoded in \`0zk\` addresses and are irrevocable, meaning
 					anyone with access to a viewing key can permanently see all private
 					interactions sent by that address, even if the key is later shared or leaked.
 				`),
@@ -1511,8 +1503,8 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 					protecting IP addresses. The user is cautioned against doing too many
 					operations in quick succession to avoid time-based correlation. However,
 					the wallet does not warn users when unshielding to addresses associated
-					with their wallet, which creates a correlation link between their 0zk
-					and 0x addresses.
+					with their wallet, which creates a correlation link between their \`0zk\`
+					and \`0x\` addresses.
 				`),
 				spendingImprovements: [
 					'warn users when unshielding to addresses associated with their wallet',
