@@ -1361,10 +1361,12 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			isSupported(railgun.selfRelayedTransactionSubmission)
 		) {
 			return {
-				spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
+				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 				spendingDetails: mdParagraph(`
-					Transactions are submitted via self-relay, which exposes the user's IP address.
-					This compromises privacy as the user's IP address can be linked to their transactions.
+					Transactions are submitted via self-relay, which exposes the user's IP address
+					to the node receiving the transaction. While the onchain transaction data does
+					not reveal this information, the external provider is in a position to learn
+					the user's IP address and link it to their transactions.
 				`),
 				spendingImprovements: [
 					'add support for broadcaster-based transaction submission to protect IP addresses',
@@ -1388,11 +1390,15 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 			// Default is self-relay, which exposes IP address
 			if (broadcasterData.broadcasterLearnsUserIpAddress) {
 				return {
-					spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
+					spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 					spendingDetails: mdParagraph(`
 						The wallet defaults to self-relaying transactions, which exposes the
-						user's IP address. Additionally, broadcasters can learn the user's
-						IP address, further compromising privacy.
+						user's IP address to the node receiving the transaction. If users switch
+						to broadcasters, they would also learn the user's IP address (since
+						broadcasters do not use Logos/Waku for IP protection), so switching would
+						not improve privacy. While the onchain transaction data does not reveal
+						this information, external providers are in a position to learn the user's
+						IP address and link it to their transactions.
 					`),
 					spendingImprovements: [
 						'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
@@ -1434,10 +1440,13 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 		if (broadcasterData.broadcasterLearnsUserIpAddress) {
 			if (!isSupported(broadcasterData.customizableBroadcaster)) {
 				return {
-					spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_PRIVATE,
+					spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
 					spendingDetails: mdParagraph(`
 						Transactions are submitted through broadcasters, which learn the
 						user's IP address. The broadcaster endpoint cannot be customized.
+						While the onchain transaction data does not reveal this information,
+						the broadcaster is in a position to learn the user's IP address and
+						link it to their transactions.
 					`),
 					spendingImprovements: [
 						'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
