@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+import { Enum, mergeEnums } from '@/utils/enum'
 
 import { isSupported, notSupported, type Support } from '../support'
 
@@ -97,6 +98,13 @@ export enum BasicBenchmarkTransactions {
 	 */
 	ZKSYNC_USDC_TRANSFER = 'ZKSYNC_USDC_TRANSFER',
 }
+
+export const basicBenchmarkTransactions = new Enum<BasicBenchmarkTransactions>({
+	[BasicBenchmarkTransactions.ETH_TRANSFER]: true,
+	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: true,
+	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: true,
+	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: true,
+})
 
 /**
  * Benchmark transactions for complex contract interactions.
@@ -215,20 +223,21 @@ export enum ComplexBenchmarkTransactions {
 	// In the future, add decoding of L1 -> L2 messages like `sendToL1`
 }
 
+export const complexBenchmarkTransactions = new Enum<ComplexBenchmarkTransactions>({
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: true,
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: true,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
+})
+
 /**
- * CalldataDecoding is the union of basic and complex benchmark transactions.
+ * BenchmarkTransactions is the union of basic and complex benchmark transactions.
  * Used for hardware wallet calldata decoding evaluation.
  */
-export type CalldataDecoding = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
+export type BenchmarkTransactions = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
 
-/**
- * Merged enum-like const for CalldataDecoding, allowing CalldataDecoding.ETH_TRANSFER etc.
- */
-
-export const CalldataDecoding = {
-	...BasicBenchmarkTransactions,
-	...ComplexBenchmarkTransactions,
-} as const
+/** Merged enum for all benchmark transactions. */
+export const benchmarkTransactions = mergeEnums(basicBenchmarkTransactions, complexBenchmarkTransactions)
 
 /**
  * Benchmark transactions for simulation-specific scenarios.
@@ -273,14 +282,14 @@ export type SoftwareTransactionDetailsDisplay =
  * Types of transactions that a wallet can decode the calldata of.
  */
 export type CalldataDecodingTypes = Record<
-	CalldataDecoding,
+	BenchmarkTransactions,
 	Support<WithRef<CalldataDecodingSupport>>
 >
 
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type SoftwareCalldataDecodingTypes = Record<CalldataDecoding, boolean>
+export type SoftwareCalldataDecodingTypes = Record<BenchmarkTransactions, boolean>
 
 /** If a wallet can decode the calldata for a specific transaction, what does that look like? */
 export interface CalldataDecodingSupport {
@@ -329,14 +338,14 @@ export interface HardwareMessageSigningLegibility {
  * Shorthand for a wallet that cannot do any calldata decoding.
  */
 export const noCalldataDecoding: CalldataDecodingTypes = {
-	[CalldataDecoding.ETH_TRANSFER]: notSupported,
-	[CalldataDecoding.ERC_20_TRANSFER]: notSupported,
-	[CalldataDecoding.ERC_721_TRANSFER]: notSupported,
-	[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: notSupported,
-	[CalldataDecoding.USDC_APPROVAL]: notSupported,
-	[CalldataDecoding.AAVE_SUPPLY]: notSupported,
-	[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: notSupported,
-	[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: notSupported,
+	[BasicBenchmarkTransactions.ETH_TRANSFER]: notSupported,
+	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: notSupported,
+	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: notSupported,
+	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: notSupported,
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: notSupported,
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: notSupported,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: notSupported,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: notSupported,
 }
 
 /**
@@ -401,7 +410,7 @@ export function supportsAnyDataExtraction(dataExtractionMethods: DataExtractionM
  */
 export function isSupportedOnDevice(
 	legibility: CalldataDecodingTypes,
-	decoding: CalldataDecoding,
+	decoding: BenchmarkTransactions,
 ): boolean {
 	const support = legibility[decoding]
 
