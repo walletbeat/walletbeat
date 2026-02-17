@@ -16,6 +16,8 @@
   import { getBaseUrl } from '../base-url';
   import { testSignatures, testTransactions } from '../constants/test-transactions-signatures';
   import type { TestTransaction, TestSignature } from '../constants/test-transactions-signatures';
+  import { scamAlertTests } from '../constants/test-scam-alerts';
+  import type { ScamAlertTest } from '../constants/test-scam-alerts';
   import { testSteps } from '../constants/test-eip-support';
   import type {
     StepStatus,
@@ -42,6 +44,7 @@
   import TransactionsTab from './Tabs/TransactionsTab.svelte';
   import SignaturesTab from './Tabs/SignaturesTab.svelte';
   import EIPSupportTab from './Tabs/EIPSupportTab.svelte';
+  import ScamAlertsTab from './Tabs/ScamAlertsTab.svelte';
   import {
     assertTransactionId,
     isEip6963AnnounceProviderEvent,
@@ -103,10 +106,22 @@
     },
   });
 
+  const scamAlertState = $state({
+    activeId: null as string | null,
+    isPending: false,
+    hashes: {} as Record<string, `0x${string}`>,
+    error: '',
+  });
+
+  const scamAlertDisclaimer = $state({
+    accepted: false,
+  });
+
   const uiState = $state({
-    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support',
+    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support' | 'scam-alerts',
     selectedTxId: null as string | null,
     selectedSigId: null as string | null,
+    selectedScamAlertId: null as string | null,
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -119,6 +134,8 @@
     if (testTransactions.length > 0) uiState.selectedTxId = testTransactions[0].id;
 
     if (testSignatures.length > 0) uiState.selectedSigId = testSignatures[0].id;
+
+    if (scamAlertTests.length > 0) uiState.selectedScamAlertId = scamAlertTests[0].id;
 
     // Discover EIP-6963 providers for step 1
     discoverProviders();
@@ -335,6 +352,42 @@ Issued At: ${new Date().toISOString()}`;
     } finally {
       signatureState.isPending = false;
       signatureState.activeId = null;
+    }
+  }
+
+  // Scam alert handlers
+  async function handleSendScamAlert(test: ScamAlertTest) {
+    if (!account?.address) return;
+
+    if (account.chainId !== undefined && account.chainId !== mainnet.id) {
+      openChainSwitchModal({
+        id: test.id,
+        name: test.name,
+        function: '',
+        parameters: [],
+        calldata: test.calldata,
+        contractAddress: test.contractAddress,
+      });
+
+      return;
+    }
+
+    scamAlertState.isPending = true;
+    scamAlertState.activeId = test.id;
+    scamAlertState.error = '';
+
+    try {
+      const hash = await sendTransaction(config, {
+        to: test.contractAddress,
+        data: test.calldata,
+      });
+
+      scamAlertState.hashes[test.id] = hash;
+    } catch (error) {
+      scamAlertState.error = error instanceof Error ? error.message : 'Transaction failed';
+    } finally {
+      scamAlertState.isPending = false;
+      scamAlertState.activeId = null;
     }
   }
 
@@ -558,7 +611,7 @@ Issued At: ${new Date().toISOString()}`;
 
   <!-- Tab Selector -->
   <div class="tab-selector" data-row="gap-2">
-    {#each ['transactions', 'signatures', 'eip-support'] as tab (tab)}
+    {#each ['transactions', 'signatures', 'eip-support', 'scam-alerts'] as tab (tab)}
       <button
         type="button"
         class="tab-button"
@@ -578,10 +631,16 @@ Issued At: ${new Date().toISOString()}`;
             }
           } else if (tab === 'eip-support') {
             uiState.activeTab = 'eip-support';
+          } else if (tab === 'scam-alerts') {
+            uiState.activeTab = 'scam-alerts';
+
+            if (!uiState.selectedScamAlertId && scamAlertTests.length) {
+              uiState.selectedScamAlertId = scamAlertTests[0].id;
+            }
           }
         }}
       >
-        {tab === 'eip-support' ? 'EIP Support' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab.charAt(0).toUpperCase() + tab.slice(1)}
       </button>
     {/each}
   </div>
@@ -631,6 +690,16 @@ Issued At: ${new Date().toISOString()}`;
               }}
             />
           {/each}
+        {:else if uiState.activeTab === 'scam-alerts'}
+          {#each scamAlertTests as test (test.id)}
+            <WalletTesterNavigationItem
+              title={test.name}
+              description={test.description}
+              isSelected={uiState.selectedScamAlertId === test.id}
+              isCompleted={!!scamAlertState.hashes[test.id]}
+              onclick={() => (uiState.selectedScamAlertId = test.id)}
+            />
+          {/each}
         {/if}
       </div>
     </div>
@@ -667,6 +736,17 @@ Issued At: ${new Date().toISOString()}`;
           onReset={resetStepTests}
           onSelectProvider={(providerId) => { stepTestState.selectedProviderId = providerId; }}
         />
+      {:else if uiState.activeTab === 'scam-alerts'}
+        {@const selectedScamAlert = scamAlertTests.find((t) => t.id === uiState.selectedScamAlertId)}
+        <ScamAlertsTab
+          selectedTest={selectedScamAlert}
+          {scamAlertState}
+          disclaimerAccepted={scamAlertDisclaimer.accepted}
+          {account}
+          onAcceptDisclaimer={() => { scamAlertDisclaimer.accepted = true; }}
+          onSendScamAlert={handleSendScamAlert}
+          onOpenInExplorer={openInExplorer}
+        />
       {/if}
     </div>
   </div>
@@ -699,6 +779,7 @@ Issued At: ${new Date().toISOString()}`;
   <ErrorComponent error={transactionState.error} onClose={() => (transactionState.error = '')} />
   <ErrorComponent error={signatureState.error} onClose={() => (signatureState.error = '')} />
   <ErrorComponent error={stepTestState.error} onClose={() => (stepTestState.error = '')} />
+  <ErrorComponent error={scamAlertState.error} onClose={() => (scamAlertState.error = '')} />
 
   <!-- EIP Results Modal -->
   <EIPResultsModal
