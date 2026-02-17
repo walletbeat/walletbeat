@@ -22,7 +22,7 @@ contract WalletbeatTest is Test {
 
     function testSimulation() external {
         vm.prank(tester);
-        tc.simulateFunction();
+        tc.simulateFunctionV1();
         vm.stopPrank();
     }
 }

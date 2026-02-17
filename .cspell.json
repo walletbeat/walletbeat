@@ -231,6 +231,7 @@
 		"Railgun",
 		"rdns",
 		"redelegation",
+		"remappings",
 		"renderable",
 		"repairability",
 		"replaceability",
@@ -308,6 +309,7 @@
 		"Walletbeat",
 		"WalletConnect",
 		"Warpcast",
+		"WBTEST",
 		"web2",
 		"web3",
 		"webapps",
@@ -332,7 +334,11 @@
 		"public/**/*.svg",
 		"resources/files/**",
 		"src/generated/**",
-		"src/legacy/**"
+		"src/legacy/**",
+		"resources/contracts/cache/**",
+		"resources/contracts/lib/**",
+		"resources/contracts/out/**",
+		"resources/contracts/images/**"
 	],
 	"patterns": [
 		{ "name": "Bitcoin addresses", "pattern": "/\\bbtc:[0-9a-z]+/g" },

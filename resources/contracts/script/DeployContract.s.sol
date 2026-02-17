@@ -4,28 +4,37 @@ pragma solidity 0.8.24;
 import {WalletbeatTestContract} from "../src/WalletbeatTestContract.sol";
 import {WalletbeatTestErc20} from "../src/WalletbeatTestErc20.sol";
 import {WalletbeatTestErc721} from "../src/WalletbeatTestErc721.sol";
-
-import {Script} from "../lib/forge-std/src/Script.sol";
+import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {Script, console} from "../lib/forge-std/src/Script.sol";
 
 contract DeployContract is Script {
     function run() external returns (WalletbeatTestContract, WalletbeatTestErc20, WalletbeatTestErc721) {
         string memory erc20TokenName = "Walletbeat Testing ERC20";
         string memory erc721TokenName = "Walletbeat Testing ERC721";
-        string memory tokenSymbol = "WBT";
+        string memory tokenSymbol = "WBTEST";
+
+        string memory tokenSvg= vm.readFile("./images/Walletbeat.svg");
+        string memory imageUri = svgToImageURI(tokenSvg);
+        console.log(imageUri);
 
         vm.startBroadcast();
         WalletbeatTestErc20 erc20Contract = new WalletbeatTestErc20(erc20TokenName, tokenSymbol);
-        WalletbeatTestErc721 erc721Contract = new WalletbeatTestErc721(erc721TokenName, tokenSymbol);
+        WalletbeatTestErc721 erc721Contract = new WalletbeatTestErc721(erc721TokenName, tokenSymbol, imageUri);
         WalletbeatTestContract testContract =
             new WalletbeatTestContract(address(erc20Contract), address(erc721Contract));
-        (bool success,) =
-            address(erc20Contract).call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
-        require(success, "Call failed");
-        (success,) = address(erc721Contract)
-            .call(abi.encodeWithSignature("transferOwnership(address)", (address(testContract))));
-        require(success, "Call failed");
         vm.stopBroadcast();
 
         return (testContract, erc20Contract, erc721Contract);
+    }
+
+    function svgToImageURI(string memory svg) public pure returns (string memory) {
+        // example:
+        // '<svg width="500" height="500" viewBox="0 0 285 350" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="black" d="M150,0,L75,200,L225,200,Z"></path></svg>'
+        // would return ""
+        string memory baseURI = "data:image/svg+xml;base64,";
+        string memory svgBase64Encoded = Base64.encode(
+            bytes(string(abi.encodePacked(svg))) // Removing unnecessary type castings, this line can be resumed as follows : 'abi.encodePacked(svg)'
+        );
+        return string(abi.encodePacked(baseURI, svgBase64Encoded));
     }
 }
