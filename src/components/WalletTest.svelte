@@ -633,6 +633,7 @@ Issued At: ${new Date().toISOString()}`;
             uiState.activeTab = 'eip-support';
           } else if (tab === 'scam-alerts') {
             uiState.activeTab = 'scam-alerts';
+            scamAlertDisclaimer.accepted = false;
 
             if (!uiState.selectedScamAlertId && scamAlertTests.length) {
               uiState.selectedScamAlertId = scamAlertTests[0].id;

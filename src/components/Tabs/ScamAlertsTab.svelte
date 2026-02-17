@@ -43,37 +43,39 @@
 </script>
 
 {#if !disclaimerAccepted}
-  <div class="disclaimer-overlay" data-card="radius-8 padding-5">
-    <div class="disclaimer-content" data-column="gap-4">
-      <div class="disclaimer-icon">&#9888;</div>
-      <h3 class="disclaimer-title">Scam Alert Testing</h3>
-      <div class="disclaimer-warnings" data-column="gap-3">
-        <p class="disclaimer-rule">
-          Every transaction should be treated as a <strong>SCAM</strong> transaction.
-        </p>
-        <p class="disclaimer-rule">
-          Do <strong>NOT</strong> send real funds &mdash; nothing should ever be sent.
-        </p>
-        <p class="disclaimer-rule">
-          Use only <strong>disposable wallets</strong> with no real assets.
-        </p>
+  <div class="disclaimer-fullscreen">
+    <div class="disclaimer-overlay" data-card="radius-8 padding-5">
+      <div class="disclaimer-content" data-column="gap-4">
+        <div class="disclaimer-icon">&#9888;</div>
+        <h3 class="disclaimer-title">Scam Alert Testing</h3>
+        <div class="disclaimer-warnings" data-column="gap-3">
+          <p class="disclaimer-rule">
+            Every transaction should be treated as a <strong>SCAM</strong> transaction.
+          </p>
+          <p class="disclaimer-rule">
+            Do <strong>NOT</strong> send real funds &mdash; nothing should ever be sent.
+          </p>
+          <p class="disclaimer-rule">
+            Use only <strong>disposable wallets</strong> with no real assets.
+          </p>
+        </div>
+        <label class="disclaimer-checkbox">
+          <input
+            type="checkbox"
+            bind:checked={checkboxChecked}
+          />
+          <span>I understand the risks and will only use disposable wallets for testing</span>
+        </label>
+        <button
+          type="button"
+          class="disclaimer-button"
+          data-pressable
+          disabled={!checkboxChecked}
+          onclick={onAcceptDisclaimer}
+        >
+          I Understand
+        </button>
       </div>
-      <label class="disclaimer-checkbox">
-        <input
-          type="checkbox"
-          bind:checked={checkboxChecked}
-        />
-        <span>I understand the risks and will only use disposable wallets for testing</span>
-      </label>
-      <button
-        type="button"
-        class="disclaimer-button"
-        data-pressable
-        disabled={!checkboxChecked}
-        onclick={onAcceptDisclaimer}
-      >
-        I Understand
-      </button>
     </div>
   </div>
 {:else if selectedTest}
@@ -160,9 +162,24 @@
 {/if}
 
 <style>
+  .disclaimer-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+
   .disclaimer-overlay {
     border: 2px solid var(--rating-fail);
-    background: color-mix(in srgb, var(--rating-fail) 5%, var(--background-primary));
+    background: var(--background-primary);
+    max-width: 36rem;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .disclaimer-content {
