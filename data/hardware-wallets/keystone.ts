@@ -15,7 +15,8 @@ import {
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	CalldataDecoding,
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
@@ -197,25 +198,17 @@ export const keystoneWallet: HardwareWallet = {
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
-						ref: refTodo,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: supported({
-						ref: refTodo,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.USDC_APPROVAL]: notSupported,
-					[CalldataDecoding.AAVE_SUPPLY]: supported({
-						ref: refTodo,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: notSupported,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						notSupported,
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_IN_UI,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_IN_UI,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataDecoded.NOT_IN_UI,
 				},
 				messageSigningLegibility: null,
-				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

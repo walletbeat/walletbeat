@@ -15,14 +15,14 @@ import {
 } from '@/schema/features/security/bug-bounty-program'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	CalldataDecoding,
-	type CalldataDecodingSupport,
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
-import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -163,28 +163,17 @@ export const gridplusWallet: HardwareWallet = {
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
 				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: supported<WithRef<CalldataDecodingSupport>>({
-						ref: refNotNecessary,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: supported({
-						ref: refNotNecessary,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.USDC_APPROVAL]: notSupported,
-					[CalldataDecoding.AAVE_SUPPLY]: supported({
-						ref: refNotNecessary,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: supported({
-						ref: refNotNecessary,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						notSupported,
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_IN_UI,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataDecoded.NOT_IN_UI,
 				},
 				messageSigningLegibility: null,
-				transactionSimulation: null,
 			},
 			userSafety: null,
 		},
