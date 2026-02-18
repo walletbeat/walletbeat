@@ -152,7 +152,7 @@ function analyzeHardwareFeatures({
 			},
 			{
 				key: BasicBenchmarkTransactions.ERC_721_TRANSFER,
-				label: 'basic nft transfers (ERC-721)',
+				label: 'basic NFT transfers (ERC-721)',
 			},
 			{
 				key: BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER,
@@ -793,11 +793,23 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 		}
 
 		if (features.transactions.partial.length > 0) {
-			sections.push(`⚠ Partial: ${commaListFormat(features.transactions.partial)}\n`)
+			if (features.transactions.partial.length > 4) {
+				sections.push(
+					`⚠ Partial:\n${features.transactions.partial.map(t => `- ${t}`).join('\n')}\n`,
+				)
+			} else {
+				sections.push(`⚠ Partial: ${commaListFormat(features.transactions.partial)}\n`)
+			}
 		}
 
 		if (features.transactions.failing.length > 0) {
-			sections.push(`✗ Failing: ${commaListFormat(features.transactions.failing)}\n`)
+			if (features.transactions.failing.length > 4) {
+				sections.push(
+					`✗ Failing:\n${features.transactions.failing.map(t => `- ${t}`).join('\n')}\n`,
+				)
+			} else {
+				sections.push(`✗ Failing: ${commaListFormat(features.transactions.failing)}\n`)
+			}
 		}
 	}
 
@@ -827,9 +839,15 @@ function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string 
 	}
 
 	if (features.transactions.failing.length > 0) {
-		improvements.push(
-			`**Transaction Information:** Add the required fields or calldata decoding for ${commaListFormat(features.transactions.failing)}`,
-		)
+		if (features.transactions.failing.length > 4) {
+			improvements.push(
+				`**Transaction Information:** Add the required fields or calldata decoding for:\n${features.transactions.failing.map(t => `- ${t}`).join('\n')}`,
+			)
+		} else {
+			improvements.push(
+				`**Transaction Information:** Add the required fields or calldata decoding for ${commaListFormat(features.transactions.failing)}`,
+			)
+		}
 	}
 
 	if (features.transactions.partial.length > 0) {
