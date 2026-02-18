@@ -180,10 +180,10 @@ export const trezorWallet: HardwareWallet = {
 				},
 				detailsDisplayed: {
 					...displaysFullTransactionDetails,
-					chain: DataDisplayOptions.NOT_IN_UI,
-					nonce: DataDisplayOptions.NOT_IN_UI,
+					chain: DataDisplayOptions.NOT_DECODED,
+					nonce: DataDisplayOptions.NOT_DECODED,
 				},
-				legibility: noCalldataDecoding,
+				calldataDecoded: noCalldataDecoding,
 				messageSigningLegibility: null,
 			},
 			userSafety: null,

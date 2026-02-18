@@ -122,7 +122,7 @@ export const metamask: SoftwareWallet = {
 						byDefault: FeeDisplayLevel.COMPREHENSIVE,
 						fullySponsored: false,
 					},
-					risksExplained: 'NOT_IN_UI',
+					risksExplained: 'NOT_DECODED',
 				}),
 				suggestedBridging: notSupported,
 			},

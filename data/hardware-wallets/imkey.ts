@@ -164,18 +164,18 @@ export const imkeyWallet: HardwareWallet = {
 				},
 				detailsDisplayed: {
 					...displaysFullTransactionDetails,
-					nonce: DataDisplayOptions.NOT_IN_UI,
+					nonce: DataDisplayOptions.NOT_DECODED,
 				},
-				legibility: {
+				calldataDecoded: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_IN_UI,
-					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_IN_UI,
-					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_IN_UI,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_DECODED,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_DECODED,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						DataDecoded.NOT_IN_UI,
+						DataDecoded.NOT_DECODED,
 				},
 				messageSigningLegibility: null,
 			},

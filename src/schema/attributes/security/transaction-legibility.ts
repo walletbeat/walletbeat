@@ -127,7 +127,7 @@ interface HardwareFeatureDetails {
 }
 
 function analyzeHardwareFeatures({
-	legibility,
+	calldataDecoded,
 	detailsDisplayed,
 	dataExtraction,
 	messageSigningLegibility,
@@ -140,7 +140,7 @@ function analyzeHardwareFeatures({
 	}
 
 	// Analyze calldata decoding
-	if (legibility !== null) {
+	if (calldataDecoded !== null) {
 		const decodingChecks = [
 			{
 				key: BasicBenchmarkTransactions.ETH_TRANSFER,
@@ -183,16 +183,16 @@ function analyzeHardwareFeatures({
 		let hasOffDeviceDecoding = false
 
 		decodingChecks.forEach(({ key, label }) => {
-			const decodedLocation = legibility[key]
+			const decodedLocation = calldataDecoded[key]
 
-			if (decodedLocation !== DataDecoded.NOT_IN_UI) {
+			if (decodedLocation !== DataDecoded.NOT_DECODED) {
 				if (decodedLocation === DataDecoded.ON_DEVICE) {
 					hasOnDeviceDecoding = true
 				} else {
 					hasOffDeviceDecoding = true
 				}
 
-				if (isSupportedOnDevice(legibility, key)) {
+				if (isSupportedOnDevice(calldataDecoded, key)) {
 					details.calldataDecoding.supported.push(label)
 				} else {
 					details.calldataDecoding.missing.push(label)
@@ -940,11 +940,11 @@ function evaluateHardwareWalletTransactionLegibility(
 ): Evaluation<TransactionLegibilityValue> {
 	const references = refs(hardwareTransactionLegibility)
 
-	const { legibility, detailsDisplayed, dataExtraction, messageSigningLegibility } =
+	const { calldataDecoded, detailsDisplayed, dataExtraction, messageSigningLegibility } =
 		hardwareTransactionLegibility
 
 	const getOverallRating = (): Rating => {
-		if (legibility === null || detailsDisplayed === null || dataExtraction === null) {
+		if (calldataDecoded === null || detailsDisplayed === null || dataExtraction === null) {
 			return Rating.UNRATED
 		}
 
@@ -954,19 +954,19 @@ function evaluateHardwareWalletTransactionLegibility(
 
 		// Check if wallet supports calldata decoding for complex transactions (ON_DEVICE)
 		const supportsComplexDecoding: boolean =
-			supportsAnyCalldataDecoding(legibility) &&
+			supportsAnyCalldataDecoding(calldataDecoded) &&
 			(isSupportedOnDevice(
-				legibility,
+				calldataDecoded,
 				ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
 			) ||
-				isSupportedOnDevice(legibility, ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED))
+				isSupportedOnDevice(calldataDecoded, ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED))
 
 		// Check if wallet supports basic calldata decoding (ON_DEVICE)
 		const supportsBasicDecoding: boolean =
-			isSupportedOnDevice(legibility, BasicBenchmarkTransactions.ERC_20_TRANSFER) &&
-			isSupportedOnDevice(legibility, BasicBenchmarkTransactions.ERC_721_TRANSFER) &&
-			isSupportedOnDevice(legibility, BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER) &&
-			isSupportedOnDevice(legibility, ComplexBenchmarkTransactions.AAVE_SUPPLY)
+			isSupportedOnDevice(calldataDecoded, BasicBenchmarkTransactions.ERC_20_TRANSFER) &&
+			isSupportedOnDevice(calldataDecoded, BasicBenchmarkTransactions.ERC_721_TRANSFER) &&
+			isSupportedOnDevice(calldataDecoded, BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER) &&
+			isSupportedOnDevice(calldataDecoded, ComplexBenchmarkTransactions.AAVE_SUPPLY)
 
 		// Check if all transaction details are displayed
 		const displaysAllDetails: boolean = isFullBasicTransactionDetails(detailsDisplayed)
@@ -992,7 +992,7 @@ function evaluateHardwareWalletTransactionLegibility(
 
 		// FAIL: (No decoding support AND missing essential details AND no data extraction) OR message signing fails
 		if (
-			(!supportsAnyCalldataDecoding(legibility) && !displaysAllDetails && !hasDataExtraction) ||
+			(!supportsAnyCalldataDecoding(calldataDecoded) && !displaysAllDetails && !hasDataExtraction) ||
 			(messageSigningLegibility !== null && !messageSigningPasses)
 		) {
 			return Rating.FAIL
@@ -1005,7 +1005,7 @@ function evaluateHardwareWalletTransactionLegibility(
 			supportsComplexDecoding ||
 			displaysAllDetails ||
 			hasDataExtraction ||
-			(supportsAnyCalldataDecoding(legibility) && !displaysAllDetails)
+			(supportsAnyCalldataDecoding(calldataDecoded) && !displaysAllDetails)
 		) {
 			return Rating.PARTIAL
 		}
@@ -1026,7 +1026,7 @@ function evaluateHardwareWalletTransactionLegibility(
 		} else if (overallRating === Rating.PASS) {
 			return hardwareFullTransactionLegibility(hardwareTransactionLegibility)
 		} else {
-			const hasDecodingSupport = legibility !== null && supportsAnyCalldataDecoding(legibility)
+			const hasDecodingSupport = calldataDecoded !== null && supportsAnyCalldataDecoding(calldataDecoded)
 			const hasAllDetails =
 				detailsDisplayed !== null && isFullBasicTransactionDetails(detailsDisplayed)
 
@@ -1234,7 +1234,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					transaction details on the hardware device screen for verification before signing.
 				`),
 				hardwareFullTransactionLegibility({
-					legibility: null,
+					calldataDecoded: null,
 					detailsDisplayed: null,
 					dataExtraction: null,
 					messageSigningLegibility: null,
@@ -1261,7 +1261,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					details are displayed on the hardware device screen.
 				`),
 				hardwarePartialTransactionLegibility({
-					legibility: null,
+					calldataDecoded: null,
 					detailsDisplayed: null,
 					dataExtraction: null,
 					messageSigningLegibility: null,
@@ -1274,7 +1274,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					and doesn't provide full transparency for all transaction details on the device.
 				`),
 				hardwareBasicTransactionLegibility({
-					legibility: null,
+					calldataDecoded: null,
 					detailsDisplayed: null,
 					dataExtraction: null,
 					messageSigningLegibility: null,
@@ -1300,7 +1300,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					The hardware wallet does not implement effective transaction legibility on the device itself.
 				`),
 				hardwareNoTransactionLegibility({
-					legibility: null,
+					calldataDecoded: null,
 					detailsDisplayed: null,
 					dataExtraction: null,
 					messageSigningLegibility: null,

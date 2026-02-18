@@ -7,7 +7,7 @@ export enum DataDisplayOptions {
 	/** Available on the transaction approval screen but requires user action (e.g., clicking a button) or enabling in settings */
 	SHOWN_OPTIONALLY = 'SHOWN_OPTIONALLY',
 	/** Not displayed in the wallet UI */
-	NOT_IN_UI = 'NOT_IN_UI',
+	NOT_DECODED = 'NOT_DECODED',
 }
 
 /**
@@ -27,12 +27,12 @@ export interface DisplayedBasicTransactionDetails {
  * The wallet displays no basic transaction details.
  */
 export const displaysNoTransactionDetails: DisplayedBasicTransactionDetails = {
-	gas: DataDisplayOptions.NOT_IN_UI,
-	nonce: DataDisplayOptions.NOT_IN_UI,
-	from: DataDisplayOptions.NOT_IN_UI,
-	to: DataDisplayOptions.NOT_IN_UI,
-	chain: DataDisplayOptions.NOT_IN_UI,
-	value: DataDisplayOptions.NOT_IN_UI,
+	gas: DataDisplayOptions.NOT_DECODED,
+	nonce: DataDisplayOptions.NOT_DECODED,
+	from: DataDisplayOptions.NOT_DECODED,
+	to: DataDisplayOptions.NOT_DECODED,
+	chain: DataDisplayOptions.NOT_DECODED,
+	value: DataDisplayOptions.NOT_DECODED,
 }
 
 /**
@@ -332,7 +332,7 @@ export enum DataDecoded {
 	/** Calldata decoding happens outside the hardware wallet (e.g., in a companion app). */
 	OFF_DEVICE = 'OFF_DEVICE',
 	/** Calldata decoding does not happen at all. */
-	NOT_IN_UI = 'NOT_IN_UI',
+	NOT_DECODED = 'NOT_DECODED',
 }
 
 /**
@@ -370,22 +370,22 @@ export interface HardwareMessageSigningLegibility {
  * Shorthand for a wallet that cannot do any calldata decoding.
  */
 export const noCalldataDecoding: CalldataDecodingTypes = {
-	[BasicBenchmarkTransactions.ETH_TRANSFER]: DataDecoded.NOT_IN_UI,
-	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.NOT_IN_UI,
-	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DataDecoded.NOT_IN_UI,
-	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.NOT_IN_UI,
-	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_IN_UI,
-	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_IN_UI,
-	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_IN_UI,
+	[BasicBenchmarkTransactions.ETH_TRANSFER]: DataDecoded.NOT_DECODED,
+	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.NOT_DECODED,
+	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DataDecoded.NOT_DECODED,
+	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.NOT_DECODED,
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_DECODED,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_DECODED,
 	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-		DataDecoded.NOT_IN_UI,
+		DataDecoded.NOT_DECODED,
 }
 
 /**
  * Returns whether the given calldata decoding types support any decoding at all.
  */
 export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecodingTypes): boolean {
-	return Object.values(calldataDecodingTypes).some(v => v !== DataDecoded.NOT_IN_UI)
+	return Object.values(calldataDecodingTypes).some(v => v !== DataDecoded.NOT_DECODED)
 }
 
 /**
@@ -454,7 +454,7 @@ export interface HardwareTransactionLegibilitySupport {
 	/**
 	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
 	 */
-	legibility: CalldataDecodingTypes | null
+	calldataDecoded: CalldataDecodingTypes | null
 	/**
 	 * Does a wallet display transaction details clearly?
 	 */

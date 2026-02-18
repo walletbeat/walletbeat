@@ -148,7 +148,7 @@ export const rainbow: SoftwareWallet = {
 				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	nonce: DataDisplayOptions.NOT_IN_UI,
+				// 	nonce: DataDisplayOptions.NOT_DECODED,
 				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				// },
