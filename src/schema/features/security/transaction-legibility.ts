@@ -1,7 +1,6 @@
 import type { WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
 
-
 export enum DataDisplayOptions {
 	/** Shown by default on the transaction approval screen */
 	SHOWN_BY_DEFAULT = 'SHOWN_BY_DEFAULT',
@@ -91,12 +90,18 @@ export enum BasicBenchmarkTransactions {
 	 */
 	ETH_TRANSFER = 'ETH_TRANSFER',
 
+	/**
+	 * Sending of ERC-20 tokens to another address.
+	 */
 	ERC_20_TRANSFER = 'ERC_20_TRANSFER',
+	/**
+	 * Sending of ERC-721 tokens (NFTs) to another address.
+	 */
 	ERC_721_TRANSFER = 'ER_721_TRANSFER',
 
 	/**
-	 * ZKSync USDC transfer transaction
-	 * Same as above, but on a non-mainnet chain
+	 * ZKSync USDC transfer transaction.
+	 * Same as a token transfer, but on a non-mainnet chain.
 	 */
 	ZKSYNC_USDC_TRANSFER = 'ZKSYNC_USDC_TRANSFER',
 }
@@ -239,7 +244,10 @@ export const complexBenchmarkTransactions = new Enum<ComplexBenchmarkTransaction
 export type BenchmarkTransactions = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
 
 /** Merged enum for all benchmark transactions. */
-export const benchmarkTransactions = mergeEnums(basicBenchmarkTransactions, complexBenchmarkTransactions)
+export const benchmarkTransactions = mergeEnums(
+	basicBenchmarkTransactions,
+	complexBenchmarkTransactions,
+)
 
 /**
  * Benchmark transactions for simulation-specific scenarios.
@@ -256,16 +264,29 @@ export enum SimulationBenchmarkTransactions {
 /**
  * Details for a failed simulation benchmark transaction.
  */
-export interface DisplayedFailedTransactionDetails
-	extends Omit<DisplayedComplexTransactionDetails, 'transactionOutcome' | 'calldataDecoded'> {
+export interface DisplayedFailedTransactionDetails extends Omit<
+	DisplayedComplexTransactionDetails,
+	'transactionOutcome' | 'calldataDecoded'
+> {
+	/**
+	 * If the wallet detects that a transaction will fail and shows this to the user,
+	 * it's 'DETECTED'; otherwise, 'NOT_DETECTED'.
+	 */
 	failure: 'DETECTED' | 'NOT_DETECTED'
 }
 
 /**
  * Details for a nondeterministic simulation benchmark transaction.
  */
-export interface DisplayedNondeterministicTransactionDetails
-	extends Omit<DisplayedComplexTransactionDetails, 'transactionOutcome' | 'calldataDecoded'> {
+export interface DisplayedNondeterministicTransactionDetails extends Omit<
+	DisplayedComplexTransactionDetails,
+	'transactionOutcome' | 'calldataDecoded'
+> {
+	/**
+	 * NOT_DETECTED - The wallet only shows one possible outcome regardless of whether the transaction relies on execution state.
+	 * DETECTED_WITHOUT_WARNING - The wallet detects multiple outcomes but does not warn the user.
+	 * DETECTED_WITH_WARNING - The wallet detects multiple outcomes and warns the user.
+	 */
 	nondeterminism: 'NOT_DETECTED' | 'DETECTED_WITHOUT_WARNING' | 'DETECTED_WITH_WARNING'
 }
 
@@ -287,20 +308,17 @@ export type SoftwareTransactionDetailsDisplay =
 			[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DisplayedTokenTransferDetails
 			[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DisplayedTokenTransferDetails
 			[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DisplayedBasicTransactionDetails
-		} & Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
-			[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
-		} & {
-			[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
-		})
+	  } & Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
+				[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
+			} & {
+				[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
+			})
 	| null
 
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type CalldataDecodingTypes = Record<
-	BenchmarkTransactions, DataDecoded
-
->
+export type CalldataDecodingTypes = Record<BenchmarkTransactions, DataDecoded>
 
 /**
  * Types of transactions that a wallet can decode the calldata of.
@@ -309,8 +327,11 @@ export type SoftwareCalldataDecodingTypes = Record<BenchmarkTransactions, boolea
 
 /** Where does the calldata decoding actually happen? */
 export enum DataDecoded {
+	/** Calldata decoding happens on the hardware wallet itself. */
 	ON_DEVICE = 'ON_DEVICE',
+	/** Calldata decoding happens outside the hardware wallet (e.g., in a companion app). */
 	OFF_DEVICE = 'OFF_DEVICE',
+	/** Calldata decoding does not happen at all. */
 	NOT_IN_UI = 'NOT_IN_UI',
 }
 
@@ -356,15 +377,15 @@ export const noCalldataDecoding: CalldataDecodingTypes = {
 	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_IN_UI,
 	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_IN_UI,
 	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_IN_UI,
-	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: DataDecoded.NOT_IN_UI,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+		DataDecoded.NOT_IN_UI,
 }
 
 /**
- * Returns whether the given dataExtractionMethods supports any data
- * extraction method at all.
+ * Returns whether the given calldata decoding types support any decoding at all.
  */
 export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecodingTypes): boolean {
-	return Object.values(calldataDecodingTypes).some((v) => v !== DataDecoded.NOT_IN_UI)
+	return Object.values(calldataDecodingTypes).some(v => v !== DataDecoded.NOT_IN_UI)
 }
 
 /**
@@ -454,13 +475,21 @@ export interface HardwareTransactionLegibilitySupport {
  * What can the user do with the calldata?
  */
 export interface CallDataDisplay {
-	/* Can display the calldata in raw hex format */
+	/**
+	 * Does the wallet display the calldata in raw hex format?
+	 */
 	rawHex: boolean
 
-	/* Can the user copy the raw hex code to the clipboard? */
+	/**
+	 * Does the wallet have a specific button for copying the raw hex calldata to the clipboard?
+	 * For batched transactions, a single button that copies the hex wrapped in the multicall function is expected.
+	 */
 	copyHexToClipboard: boolean
 
-	/* Can display the calldata in some formatted output that shows function names and parameters (e.g. JSON / text) */
+	/**
+	 * Does the wallet show all arguments from the calldata and the function name in some formatted output (e.g., JSON / text)?
+	 * For batched transactions, the formatted calldata is expected on a per-call basis.
+	 */
 	formatted: boolean
 }
 
