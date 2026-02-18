@@ -1068,7 +1068,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 	const erc20 = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_20_TRANSFER]
 	const erc721 = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_721_TRANSFER]
 	const failedTx = transactionDetailsDisplay[SimulationBenchmarkTransactions.FAILED_TRANSACTION]
-	const nondetermTx =
+	const nondeterminismTx =
 		transactionDetailsDisplay[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]
 
 	// All benchmark transactions require all 6 basic fields to be shown (at least optionally).
@@ -1084,7 +1084,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 		safeNested,
 		safeMultisend,
 		failedTx,
-		nondetermTx,
+		nondeterminismTx,
 	]
 
 	let rating: Rating
@@ -1113,7 +1113,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 			!isShown(safeMultisend.calldataDecoded) ||
 			safeMultisend.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			failedTx.failure !== 'DETECTED' ||
-			nondetermTx.nondeterminism !== 'DETECTED_WITH_WARNING'
+			nondeterminismTx.nondeterminism !== 'DETECTED_WITH_WARNING'
 
 		rating = isPartial ? Rating.PARTIAL : Rating.PASS
 	}
