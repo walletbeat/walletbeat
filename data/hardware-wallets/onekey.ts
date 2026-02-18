@@ -198,7 +198,6 @@ export const onekeyWallet: HardwareWallet = {
 				},
 				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,
-				transactionSimulation: null,
 			},
 			userSafety: null,
 		},

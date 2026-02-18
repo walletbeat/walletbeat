@@ -204,22 +204,13 @@ export const bitget: SoftwareWallet = {
 					formatted: false,
 					rawHex: true,
 				},
-				legibility: null,
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.NOT_IN_UI,
 					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
 					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
 					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
 				},
-				transactionDetailsDisplay: {
-					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				},
-				transactionSimulation: null,
+				transactionDetailsDisplay: null,
 			},
 		},
 		selfSovereignty: {

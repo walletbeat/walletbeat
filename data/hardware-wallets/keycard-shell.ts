@@ -12,7 +12,8 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	CalldataDecoding,
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
@@ -233,17 +234,10 @@ export const keycardShell: HardwareWallet = {
 				},
 				legibility: {
 					...noCalldataDecoding,
-					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
-						ref: 'https://github.com/keycard-tech/eth-abi-repo',
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.USDC_APPROVAL]: supported({
-						ref: 'https://github.com/keycard-tech/eth-abi-repo',
-						decoded: DataDecoded.ON_DEVICE,
-					}),
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.ON_DEVICE,
 				},
 				messageSigningLegibility: null,
-				transactionSimulation: null,
 			},
 			userSafety: null,
 		},
