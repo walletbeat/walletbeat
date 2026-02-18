@@ -1,7 +1,6 @@
 import type { WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
 
-import { isSupported, notSupported, type Support } from '../support'
 
 export enum DataDisplayOptions {
 	/** Shown by default on the transaction approval screen */
@@ -65,10 +64,13 @@ export enum TransactionOutcome {
  * instead we evaluate whether the transaction outcome is explained.
  */
 export interface DisplayedComplexTransactionDetails {
-	from: DataDisplayOptions
 	gas: DataDisplayOptions
 	nonce: DataDisplayOptions
+	from: DataDisplayOptions
+	to: DataDisplayOptions
 	chain: DataDisplayOptions
+	value: DataDisplayOptions
+	calldataDecoded: DataDisplayOptions
 	transactionOutcome: TransactionOutcome
 }
 
@@ -254,15 +256,25 @@ export enum SimulationBenchmarkTransactions {
 /**
  * Details for a failed simulation benchmark transaction.
  */
-export interface DisplayedFailedTransactionDetails extends DisplayedComplexTransactionDetails {
+export interface DisplayedFailedTransactionDetails
+	extends Omit<DisplayedComplexTransactionDetails, 'transactionOutcome' | 'calldataDecoded'> {
 	failure: 'DETECTED' | 'NOT_DETECTED'
 }
 
 /**
  * Details for a nondeterministic simulation benchmark transaction.
  */
-export interface DisplayedNondeterministicTransactionDetails extends DisplayedComplexTransactionDetails {
+export interface DisplayedNondeterministicTransactionDetails
+	extends Omit<DisplayedComplexTransactionDetails, 'transactionOutcome' | 'calldataDecoded'> {
 	nondeterminism: 'NOT_DETECTED' | 'DETECTED_WITHOUT_WARNING' | 'DETECTED_WITH_WARNING'
+}
+
+/**
+ * Display details for token transfer transactions (ERC-20, ERC-721).
+ * These include a transaction outcome since the transfer involves contract interaction.
+ */
+export interface DisplayedTokenTransferDetails extends DisplayedBasicTransactionDetails {
+	transactionOutcome: TransactionOutcome
 }
 
 /**
@@ -270,20 +282,24 @@ export interface DisplayedNondeterministicTransactionDetails extends DisplayedCo
  * Each benchmark transaction records what the wallet shows when that transaction is being signed.
  */
 export type SoftwareTransactionDetailsDisplay =
-	| (Record<BasicBenchmarkTransactions, DisplayedBasicTransactionDetails> &
-			Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
-				[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
-			} & {
-				[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
-			})
+	| ({
+			[BasicBenchmarkTransactions.ETH_TRANSFER]: DisplayedBasicTransactionDetails
+			[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DisplayedTokenTransferDetails
+			[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DisplayedTokenTransferDetails
+			[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DisplayedBasicTransactionDetails
+		} & Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
+			[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
+		} & {
+			[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: DisplayedNondeterministicTransactionDetails
+		})
 	| null
 
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
 export type CalldataDecodingTypes = Record<
-	BenchmarkTransactions,
-	Support<WithRef<CalldataDecodingSupport>>
+	BenchmarkTransactions, DataDecoded
+
 >
 
 /**
@@ -291,16 +307,11 @@ export type CalldataDecodingTypes = Record<
  */
 export type SoftwareCalldataDecodingTypes = Record<BenchmarkTransactions, boolean>
 
-/** If a wallet can decode the calldata for a specific transaction, what does that look like? */
-export interface CalldataDecodingSupport {
-	/** Where does the calldata decoding actually happen? */
-	decoded: DataDecoded
-}
-
 /** Where does the calldata decoding actually happen? */
 export enum DataDecoded {
 	ON_DEVICE = 'ON_DEVICE',
 	OFF_DEVICE = 'OFF_DEVICE',
+	NOT_IN_UI = 'NOT_IN_UI',
 }
 
 /**
@@ -338,14 +349,14 @@ export interface HardwareMessageSigningLegibility {
  * Shorthand for a wallet that cannot do any calldata decoding.
  */
 export const noCalldataDecoding: CalldataDecodingTypes = {
-	[BasicBenchmarkTransactions.ETH_TRANSFER]: notSupported,
-	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: notSupported,
-	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: notSupported,
-	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: notSupported,
-	[ComplexBenchmarkTransactions.USDC_APPROVAL]: notSupported,
-	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: notSupported,
-	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: notSupported,
-	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: notSupported,
+	[BasicBenchmarkTransactions.ETH_TRANSFER]: DataDecoded.NOT_IN_UI,
+	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.NOT_IN_UI,
+	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DataDecoded.NOT_IN_UI,
+	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.NOT_IN_UI,
+	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_IN_UI,
+	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_IN_UI,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_IN_UI,
+	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: DataDecoded.NOT_IN_UI,
 }
 
 /**
@@ -353,7 +364,7 @@ export const noCalldataDecoding: CalldataDecodingTypes = {
  * extraction method at all.
  */
 export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecodingTypes): boolean {
-	return Object.values(calldataDecodingTypes).some(isSupported)
+	return Object.values(calldataDecodingTypes).some((v) => v !== DataDecoded.NOT_IN_UI)
 }
 
 /**
@@ -412,13 +423,7 @@ export function isSupportedOnDevice(
 	legibility: CalldataDecodingTypes,
 	decoding: BenchmarkTransactions,
 ): boolean {
-	const support = legibility[decoding]
-
-	if (!isSupported(support)) {
-		return false
-	}
-
-	return support.decoded === DataDecoded.ON_DEVICE
+	return legibility[decoding] === DataDecoded.ON_DEVICE
 }
 
 /**
@@ -483,11 +488,6 @@ export interface SoftwareTransactionLegibilitySupport {
 	 * What message signing data does the software wallet provide?
 	 */
 	messageSigningLegibility: SoftwareMessageSigningLegibility | null
-
-	/**
-	 * Does the wallet decode basic and complex transaction calldata to show function names and parameters?
-	 */
-	legibility: SoftwareCalldataDecodingTypes | null
 }
 
 export const isFullBasicTransactionDetails = (
