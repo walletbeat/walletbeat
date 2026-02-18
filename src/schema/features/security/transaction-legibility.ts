@@ -318,7 +318,7 @@ export type SoftwareTransactionDetailsDisplay =
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type CalldataDecodingTypes = Record<BenchmarkTransactions, DataDecoded>
+export type CalldataDecodingTypes = Record<BenchmarkTransactions, DataDecoded | null> // Allow null for existing wallets that has not enough data
 
 /**
  * Types of transactions that a wallet can decode the calldata of.
@@ -511,7 +511,7 @@ export interface SoftwareTransactionLegibilitySupport {
 	 * Does the software wallet support displaying the transaction details?
 	 * Evaluated per benchmark transaction type.
 	 */
-	transactionDetailsDisplay: SoftwareTransactionDetailsDisplay
+	transactionDetailsDisplay: SoftwareTransactionDetailsDisplay | null
 
 	/**
 	 * What message signing data does the software wallet provide?
