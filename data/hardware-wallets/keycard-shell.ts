@@ -218,6 +218,11 @@ export const keycardShell: HardwareWallet = {
 						url: 'https://github.com/keycard-tech/eth-abi-repo',
 					},
 				],
+				calldataDecoded: {
+					...noCalldataDecoding,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.ON_DEVICE,
+				},
 				// Data extraction: QR codes used for transaction data (ERC-4527); display visible to eyes
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
@@ -231,11 +236,6 @@ export const keycardShell: HardwareWallet = {
 					nonce: DataDisplayOptions.NOT_DECODED,
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				},
-				calldataDecoded: {
-					...noCalldataDecoding,
-					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
-					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.ON_DEVICE,
 				},
 				messageSigningLegibility: null,
 			},

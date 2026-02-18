@@ -157,15 +157,6 @@ export const imkeyWallet: HardwareWallet = {
 						],
 					},
 				],
-				dataExtraction: {
-					[DataExtraction.EYES]: true,
-					[DataExtraction.HASHES]: false,
-					[DataExtraction.QRCODE]: false,
-				},
-				detailsDisplayed: {
-					...displaysFullTransactionDetails,
-					nonce: DataDisplayOptions.NOT_DECODED,
-				},
 				calldataDecoded: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
@@ -176,6 +167,15 @@ export const imkeyWallet: HardwareWallet = {
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_DECODED,
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						DataDecoded.NOT_DECODED,
+				},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
+				},
+				detailsDisplayed: {
+					...displaysFullTransactionDetails,
+					nonce: DataDisplayOptions.NOT_DECODED,
 				},
 				messageSigningLegibility: null,
 			},

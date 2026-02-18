@@ -196,6 +196,7 @@ export const cypherockWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/YG6lzwTUojE',
 					},
 				],
+				calldataDecoded: noCalldataDecoding,
 
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
@@ -210,7 +211,6 @@ export const cypherockWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT, // contract address
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				calldataDecoded: noCalldataDecoding,
 				messageSigningLegibility: null,
 			},
 			userSafety: null,

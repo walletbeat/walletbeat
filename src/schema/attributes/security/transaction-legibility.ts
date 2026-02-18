@@ -959,7 +959,10 @@ function evaluateHardwareWalletTransactionLegibility(
 				calldataDecoded,
 				ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
 			) ||
-				isSupportedOnDevice(calldataDecoded, ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED))
+				isSupportedOnDevice(
+					calldataDecoded,
+					ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED,
+				))
 
 		// Check if wallet supports basic calldata decoding (ON_DEVICE)
 		const supportsBasicDecoding: boolean =
@@ -992,7 +995,9 @@ function evaluateHardwareWalletTransactionLegibility(
 
 		// FAIL: (No decoding support AND missing essential details AND no data extraction) OR message signing fails
 		if (
-			(!supportsAnyCalldataDecoding(calldataDecoded) && !displaysAllDetails && !hasDataExtraction) ||
+			(!supportsAnyCalldataDecoding(calldataDecoded) &&
+				!displaysAllDetails &&
+				!hasDataExtraction) ||
 			(messageSigningLegibility !== null && !messageSigningPasses)
 		) {
 			return Rating.FAIL
@@ -1026,7 +1031,8 @@ function evaluateHardwareWalletTransactionLegibility(
 		} else if (overallRating === Rating.PASS) {
 			return hardwareFullTransactionLegibility(hardwareTransactionLegibility)
 		} else {
-			const hasDecodingSupport = calldataDecoded !== null && supportsAnyCalldataDecoding(calldataDecoded)
+			const hasDecodingSupport =
+				calldataDecoded !== null && supportsAnyCalldataDecoding(calldataDecoded)
 			const hasAllDetails =
 				detailsDisplayed !== null && isFullBasicTransactionDetails(detailsDisplayed)
 

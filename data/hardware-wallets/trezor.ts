@@ -173,6 +173,7 @@ export const trezorWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/4LayLrSuHNg',
 					},
 				],
+				calldataDecoded: noCalldataDecoding,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -183,7 +184,6 @@ export const trezorWallet: HardwareWallet = {
 					chain: DataDisplayOptions.NOT_DECODED,
 					nonce: DataDisplayOptions.NOT_DECODED,
 				},
-				calldataDecoded: noCalldataDecoding,
 				messageSigningLegibility: null,
 			},
 			userSafety: null,

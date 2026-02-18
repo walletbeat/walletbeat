@@ -215,6 +215,7 @@ export const bitboxWallet: HardwareWallet = {
 						url: 'https://youtu.be/-m1jcBFS0dc?t=300',
 					},
 				],
+				calldataDecoded: noCalldataDecoding,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -228,7 +229,6 @@ export const bitboxWallet: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				calldataDecoded: noCalldataDecoding,
 				messageSigningLegibility: null,
 			},
 			userSafety: null,

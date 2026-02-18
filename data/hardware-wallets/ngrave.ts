@@ -152,6 +152,7 @@ export const ngrave: HardwareWallet = {
 						url: 'https://youtu.be/-m1jcBFS0dc?t=701',
 					},
 				],
+				calldataDecoded: noCalldataDecoding,
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: {
 					chain: DataDisplayOptions.NOT_DECODED,
@@ -161,7 +162,6 @@ export const ngrave: HardwareWallet = {
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
-				calldataDecoded: noCalldataDecoding,
 				messageSigningLegibility: null,
 			},
 			userSafety: null,

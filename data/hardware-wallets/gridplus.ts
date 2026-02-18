@@ -156,12 +156,6 @@ export const gridplusWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/_s5PjZhgBig',
 					},
 				],
-				dataExtraction: {
-					[DataExtraction.EYES]: true,
-					[DataExtraction.HASHES]: false,
-					[DataExtraction.QRCODE]: false,
-				},
-				detailsDisplayed: displaysFullTransactionDetails,
 				calldataDecoded: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
@@ -173,6 +167,12 @@ export const gridplusWallet: HardwareWallet = {
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						DataDecoded.NOT_DECODED,
 				},
+				dataExtraction: {
+					[DataExtraction.EYES]: true,
+					[DataExtraction.HASHES]: false,
+					[DataExtraction.QRCODE]: false,
+				},
+				detailsDisplayed: displaysFullTransactionDetails,
 				messageSigningLegibility: null,
 			},
 			userSafety: null,
