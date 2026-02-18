@@ -1,22 +1,47 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import {ERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
-import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
-contract WalletbeatTestErc721 is ERC721, Ownable {
-    error WalletbeatTestErc20__Soulbound();
 
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+/**
+ * @title WalletbeatTestErc721
+ * @author Walletbeat
+ * @notice A test ERC721 token used to evaluate how wallets simulate and display NFT transactions
+ * @dev This token is soulbound and can only be minted or burned. Transfers between non-zero addresses revert.
+ */
+contract WalletbeatTestErc721 is ERC721 {
+    error WalletbeatTestErc721__Soulbound();
+    error WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
 
-    function mint(address receiver) external onlyOwner {
-        uint256 tokensToMint = block.number % 4;
-        if (tokensToMint == 0) {
-            tokensToMint = 1;
-        }
-        super._mint(receiver, tokensToMint);
+    uint256 private s_tokenId;
+    string private s_tokenSvgUri;
+
+    constructor(string memory name, string memory symbol, string memory tokenSvgUri) ERC721(name, symbol) {
+        s_tokenSvgUri = tokenSvgUri;
     }
 
+    /**
+     * @notice Mints a variable number of NFTs to the specified receiver
+     * @dev The amount minted is determined by `1 + (block.number % 4)` to introduce
+     * unpredictability in transaction simulations.
+     * Anyone can mint to any address.
+     * @param receiver The address to receive the minted NFTs
+     */
+    function mint(address receiver) external {
+        uint256 tokensToMint = 1 + (block.number % 4);
+        for (uint256 i = 0; i < tokensToMint; i++) {
+            s_tokenId++;
+            super._mint(receiver, s_tokenId);
+        }
+    }
+
+    /**
+     * @notice Enforces soulbound behavior by preventing token transfers
+     * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
+     * on any other transfer attempt.
+     */
     function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize)
         internal
         virtual
@@ -28,6 +53,30 @@ contract WalletbeatTestErc721 is ERC721, Ownable {
             return;
         }
 
-        revert WalletbeatTestErc20__Soulbound();
+        revert WalletbeatTestErc721__Soulbound();
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        if (ownerOf(tokenId) == address(0)) {
+            revert WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
+        }
+
+        return string(
+            abi.encodePacked(
+                _baseURI(),
+                Base64.encode(
+                    bytes(
+                        abi.encodePacked(
+                            '{"name":"',
+                            name(),
+                            '", "description":"A test ERC721 token used solely for testing.", ',
+                            '"attributes": [{"trait_type": "purpose", "value": "testing"}], "image":"',
+                            s_tokenSvgUri,
+                            '"}'
+                        )
+                    )
+                )
+            )
+        );
     }
 }

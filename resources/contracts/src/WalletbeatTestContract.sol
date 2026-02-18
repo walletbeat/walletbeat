@@ -12,6 +12,7 @@ contract WalletbeatTestContract {
 
     error WalletbeatTestContract__ERC20CallFailed();
     error WalletbeatTestContract__ERC721CallFailed();
+    error WalletbeatTestContract__AlwaysFails();
 
     uint256 public constant FAKE_TOKENS_TO_CLAIM = 1e18;
     address private immutable i_erc20Token;
@@ -58,7 +59,7 @@ contract WalletbeatTestContract {
      * * A `Transfer` event is also emitted to mislead transaction simulations.
      */
     function transfer(address to, uint256 amount) external {
-        (bool success,) = i_erc20Token.call(abi.encodeWithSignature("mint(address", msg.sender));
+        (bool success,) = i_erc20Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
         if (!success) {
             revert WalletbeatTestContract__ERC20CallFailed();
         }
@@ -81,5 +82,16 @@ contract WalletbeatTestContract {
             revert WalletbeatTestContract__ERC20CallFailed();
         }
         emit Transfer(address(0), msg.sender, FAKE_TOKENS_TO_CLAIM);
+    }
+
+    /**
+     * @notice Always reverts after attempting to mint ERC20 tokens
+     * @dev Tests how wallets handle transactions that are guaranteed to revert.
+     * The external call ensures this function cannot be marked as view or pure.
+     * The mint call result is intentionally ignored since the function always reverts.
+     */
+    function alwaysFails() external {
+        i_erc20Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
+        revert WalletbeatTestContract__AlwaysFails();
     }
 }
