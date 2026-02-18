@@ -113,6 +113,7 @@ export const mtpelerin: SoftwareWallet = {
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
 				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,

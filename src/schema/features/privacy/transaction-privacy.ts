@@ -2,7 +2,7 @@ import type { Entity } from '@/schema/entity'
 import type { WithRef } from '@/schema/reference'
 import { Enum } from '@/utils/enum'
 
-import type { Support, Supported } from '../support'
+import type { NotSupported, Support, Supported } from '../support'
 import type { FeeDisplay } from '../transparency/fee-display'
 import type { MultiAddressHandling, MultiAddressPolicy } from './data-collection'
 
@@ -10,12 +10,14 @@ export enum PrivateTransferTechnology {
 	STEALTH_ADDRESSES = 'stealthAddresses',
 	TORNADO_CASH_NOVA = 'tornadoCashNova',
 	PRIVACY_POOLS = 'privacyPools',
+	RAILGUN = 'railgun',
 }
 
 export const privateTransferTechnology = new Enum<PrivateTransferTechnology>({
 	[PrivateTransferTechnology.STEALTH_ADDRESSES]: true,
 	[PrivateTransferTechnology.TORNADO_CASH_NOVA]: true,
 	[PrivateTransferTechnology.PRIVACY_POOLS]: true,
+	[PrivateTransferTechnology.RAILGUN]: true,
 })
 
 export type FungibleTokenTransferMode =
@@ -64,8 +66,8 @@ export type TransactionPrivacy = {
 	/** Support for Privacy Pools. */
 	[PrivateTransferTechnology.PRIVACY_POOLS]: Support<PrivacyPoolsSupport>
 
-	// TODO: Add other forms of transaction privacy here,
-	// e.g. Railgun, etc.
+	/** Support for Railgun. */
+	[PrivateTransferTechnology.RAILGUN]: Support<RailgunSupport>
 } & IfDefaultTransferMode<
 	PrivateTransferTechnology.STEALTH_ADDRESSES,
 	{
@@ -82,6 +84,12 @@ export type TransactionPrivacy = {
 		PrivateTransferTechnology.PRIVACY_POOLS,
 		{
 			[PrivateTransferTechnology.PRIVACY_POOLS]: Supported<PrivacyPoolsSupport>
+		}
+	> &
+	IfDefaultTransferMode<
+		PrivateTransferTechnology.RAILGUN,
+		{
+			[PrivateTransferTechnology.RAILGUN]: Supported<RailgunSupport>
 		}
 	>
 
@@ -232,10 +240,10 @@ export type TornadoCashNovaSupport = WithRef<
 		warnAboutSuccessiveOperations: Support
 
 		/**
-		 * When scanning for a user's UTXOs, are they filtered entirely by the
-		 * wallet on the client side, or are they filtered by an external service?
+		 * When scanning for a user's UTXOs, are they filtered entirely on the
+		 * user's device, or are they filtered by an external service?
 		 */
-		utxoFiltering: 'WALLET_SIDE' | 'EXTERNAL'
+		utxoFiltering: 'ON_USER_DEVICE' | 'EXTERNAL'
 
 		/**
 		 * Is the fee taken by the relayer displayed in the UI?
@@ -406,3 +414,109 @@ export type PrivacyPoolsSupport = WithRef<{
 	 */
 	depositData: PrivacyPoolsDepositData
 }>
+
+type BroadcasterBasedTransactionSubmissionData = {
+	/**
+	 * Can the broadcaster endpoint be customized?
+	 */
+	customizableBroadcaster: Support
+
+	/**
+	 * Can the broadcaster learn the user's IP address?
+	 * Should be false if using Logos (previously Waku) for IP protection.
+	 */
+	broadcasterLearnsUserIpAddress: boolean
+
+	/**
+	 * Is the fee taken by broadcasters displayed in the UI?
+	 */
+	broadcasterFee: FeeDisplay
+}
+
+type RailgunTransactionSubmissionMethods =
+	| {
+			broadcasterBasedTransactionSubmission: Supported<BroadcasterBasedTransactionSubmissionData>
+			selfRelayedTransactionSubmission: NotSupported
+	  }
+	| {
+			broadcasterBasedTransactionSubmission: NotSupported
+			selfRelayedTransactionSubmission: Supported
+	  }
+	| {
+			broadcasterBasedTransactionSubmission: Supported<BroadcasterBasedTransactionSubmissionData>
+			selfRelayedTransactionSubmission: Supported
+			/**
+			 * Which transaction submission method is used by default when both
+			 * broadcaster and self-relay are available?
+			 * Required when both broadcasterBasedTransactionSubmission and
+			 * selfRelayedTransactionSubmission are supported.
+			 */
+			defaultTransactionSubmissionType: 'BROADCASTER' | 'SELF_RELAY'
+	  }
+
+/**
+ * Support data for Railgun.
+ */
+export type RailgunSupport = WithRef<{
+	/**
+	 * Does the wallet support private transfers between Railgun wallets?
+	 */
+	privateTransfers: Support
+
+	/**
+	 * Does the wallet support cross-contract calls (private DeFi interactions)?
+	 */
+	crossContractCalls: Support
+
+	/**
+	 * Does the wallet warn when doing multiple Railgun operations
+	 * in quick succession, potentially leading to time-based correlation?
+	 */
+	warnAboutSuccessiveOperations: Support
+
+	/**
+	 * Does the wallet warn users about correlation risks when shielding tokens?
+	 * Shielding transactions are public on-chain and can be analyzed to link
+	 * a user's 0x address to their 0zk address through amount, timing, and token
+	 * type correlation. Similar to how Privacy Pools tracks deposit correlation risks.
+	 */
+	warnAboutShieldingCorrelation: Support
+
+	/**
+	 * Does the wallet warn users when unshielding to addresses associated with
+	 * their wallet? Unshielding to addresses that belong to the same wallet creates
+	 * a correlation link between the user's 0zk and 0x addresses, compromising privacy.
+	 */
+	warnAboutUnshieldingDestinationCorrelation: Support
+
+	/**
+	 * Does the wallet warn users about the privacy risks of sharing viewing keys?
+	 * Viewing keys are encoded in 0zk addresses and are irrevocable. Anyone with
+	 * access to a viewing key can see all private interactions sent by that address
+	 * permanently, even if the key is later shared or leaked.
+	 */
+	warnAboutViewingKeySharing: Support
+
+	/**
+	 * When scanning for received funds, is the Railgun UTXO merkle tree synced
+	 * and decrypted entirely on the user's device, or is it synced
+	 * by an external service? This matters for privacy: if syncing is done
+	 * server-side, the external provider can learn about received funds even
+	 * though the chain data itself doesn't reveal this information.
+	 */
+	merkleTreeSync: 'ON_USER_DEVICE' | 'EXTERNAL'
+
+	/**
+	 * Does the wallet support broadcaster-based transaction submission?
+	 * Broadcasters are required for transactions FROM shielded addresses
+	 * (private transfers, unshielding), but NOT for shielding (depositing into Railgun).
+	 */
+	broadcasterBasedTransactionSubmission: Support<BroadcasterBasedTransactionSubmissionData>
+
+	/**
+	 * Does the wallet support self-relayed transaction submission?
+	 * Self-relay exposes IP address and should be avoided for privacy.
+	 */
+	selfRelayedTransactionSubmission: Support
+}> &
+	RailgunTransactionSubmissionMethods
