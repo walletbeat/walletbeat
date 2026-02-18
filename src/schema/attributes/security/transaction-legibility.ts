@@ -7,7 +7,8 @@ import {
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
 import {
-	CalldataDecoding,
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
@@ -17,12 +18,13 @@ import {
 	isHardwareTransactionLegibility,
 	isSupportedOnDevice,
 	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
 	type SoftwareMessageSigningLegibility,
 	type SoftwareTransactionLegibilityImplementation,
 	supportsAnyCalldataDecoding,
 	supportsAnyDataExtraction,
+	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
-import { isSupported } from '@/schema/features/support'
 import { popRefs, refNotNecessary, refs } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
@@ -141,35 +143,35 @@ function analyzeHardwareFeatures({
 	if (legibility !== null) {
 		const decodingChecks = [
 			{
-				key: CalldataDecoding.ETH_TRANSFER,
+				key: BasicBenchmarkTransactions.ETH_TRANSFER,
 				label: 'plain ETH transfers',
 			},
 			{
-				key: CalldataDecoding.ERC_20_TRANSFER,
+				key: BasicBenchmarkTransactions.ERC_20_TRANSFER,
 				label: 'basic token transfers (ERC-20)',
 			},
 			{
-				key: CalldataDecoding.ERC_721_TRANSFER,
+				key: BasicBenchmarkTransactions.ERC_721_TRANSFER,
 				label: 'basic nft transfers (ERC-721)',
 			},
 			{
-				key: CalldataDecoding.ZKSYNC_USDC_TRANSFER,
+				key: BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER,
 				label: 'ZKSync token transfers',
 			},
 			{
-				key: CalldataDecoding.USDC_APPROVAL,
+				key: ComplexBenchmarkTransactions.USDC_APPROVAL,
 				label: 'token approvals',
 			},
 			{
-				key: CalldataDecoding.AAVE_SUPPLY,
+				key: ComplexBenchmarkTransactions.AAVE_SUPPLY,
 				label: 'DeFi interactions (e.g., Aave)',
 			},
 			{
-				key: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
+				key: ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED,
 				label: 'nested Safe transactions',
 			},
 			{
-				key: CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
+				key: ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
 				label: 'complex nested multisend transactions',
 			},
 		]
@@ -181,11 +183,9 @@ function analyzeHardwareFeatures({
 		let hasOffDeviceDecoding = false
 
 		decodingChecks.forEach(({ key, label }) => {
-			const support = legibility[key]
+			const decodedLocation = legibility[key]
 
-			if (isSupported(support)) {
-				const decodedLocation = support.decoded
-
+			if (decodedLocation !== DataDecoded.NOT_IN_UI) {
 				if (decodedLocation === DataDecoded.ON_DEVICE) {
 					hasOnDeviceDecoding = true
 				} else {
@@ -475,13 +475,14 @@ function hardwareFullTransactionLegibility(
 
 // Software wallet detail generation helpers
 interface SoftwareFeatureDetails {
-	calldataDecoding: {
-		supported: string[]
-		missing: string[]
-	}
 	calldataDisplay: {
 		supported: string[]
 		missing: string[]
+	}
+	transactions: {
+		passing: string[]
+		partial: string[]
+		failing: string[]
 	}
 	messageSigning: {
 		supported: string[]
@@ -490,73 +491,249 @@ interface SoftwareFeatureDetails {
 }
 
 function analyzeSoftwareFeatures({
-	legibility,
 	calldataDisplay,
+	transactionDetailsDisplay,
 	messageSigningLegibility,
 }: SoftwareTransactionLegibilityImplementation): SoftwareFeatureDetails {
 	const details: SoftwareFeatureDetails = {
-		calldataDecoding: { supported: [], missing: [] },
 		calldataDisplay: { supported: [], missing: [] },
+		transactions: { passing: [], partial: [], failing: [] },
 		messageSigning: { supported: [], missing: [] },
-	}
-
-	// Analyze calldata decoding
-	if (legibility !== null) {
-		const decodingChecks = [
-			{
-				key: CalldataDecoding.ERC_20_TRANSFER,
-				label: 'basic token transfers (ERC-20)',
-			},
-			{
-				key: CalldataDecoding.ERC_721_TRANSFER,
-				label: 'basic NFT transfers (ERC-721)',
-			},
-			{
-				key: CalldataDecoding.ZKSYNC_USDC_TRANSFER,
-				label: 'ZKSync token transfers',
-			},
-			{
-				key: CalldataDecoding.AAVE_SUPPLY,
-				label: 'DeFi interactions (e.g., Aave)',
-			},
-			{
-				key: CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED,
-				label: 'nested Safe transactions',
-			},
-			{
-				key: CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
-				label: 'complex nested multisend transactions',
-			},
-		]
-
-		decodingChecks.forEach(({ key, label }) => {
-			if (legibility[key] === true) {
-				details.calldataDecoding.supported.push(label)
-			} else {
-				details.calldataDecoding.missing.push(label)
-			}
-		})
 	}
 
 	// Analyze calldata display
 	if (calldataDisplay !== null) {
-		const displayChecks = [
-			{ key: 'rawHex', value: calldataDisplay.rawHex, label: 'Raw hex display' },
-			{ key: 'formatted', value: calldataDisplay.formatted, label: 'Formatted display' },
-			{
-				key: 'copyHexToClipboard',
-				value: calldataDisplay.copyHexToClipboard,
-				label: 'Copy to clipboard',
-			},
-		]
+		if (calldataDisplay.rawHex) {
+			details.calldataDisplay.supported.push('Raw hex display')
+		} else {
+			details.calldataDisplay.missing.push('Raw hex display')
+		}
 
-		displayChecks.forEach(({ value, label }) => {
-			if (value === true) {
-				details.calldataDisplay.supported.push(label)
-			} else {
-				details.calldataDisplay.missing.push(label)
+		if (calldataDisplay.formatted) {
+			details.calldataDisplay.supported.push('Formatted output')
+		} else {
+			details.calldataDisplay.missing.push('Formatted output')
+		}
+
+		if (calldataDisplay.copyHexToClipboard) {
+			details.calldataDisplay.supported.push('Copy to clipboard')
+		} else {
+			details.calldataDisplay.missing.push('Copy to clipboard')
+		}
+	}
+
+	// Analyze per-transaction benchmark details
+	if (transactionDetailsDisplay !== null) {
+		const isShown = (field: DataDisplayOptions): boolean =>
+			field === DataDisplayOptions.SHOWN_BY_DEFAULT || field === DataDisplayOptions.SHOWN_OPTIONALLY
+
+		type BasicFields = {
+			gas: DataDisplayOptions
+			nonce: DataDisplayOptions
+			from: DataDisplayOptions
+			to: DataDisplayOptions
+			chain: DataDisplayOptions
+			value: DataDisplayOptions
+		}
+
+		const missingBasicFields = (tx: BasicFields): string[] => {
+			const missing: string[] = []
+
+			if (!isShown(tx.gas)) {
+				missing.push('gas')
 			}
-		})
+
+			if (!isShown(tx.nonce)) {
+				missing.push('nonce')
+			}
+
+			if (!isShown(tx.from)) {
+				missing.push('from')
+			}
+
+			if (!isShown(tx.to)) {
+				missing.push('to')
+			}
+
+			if (!isShown(tx.chain)) {
+				missing.push('chain')
+			}
+
+			if (!isShown(tx.value)) {
+				missing.push('value')
+			}
+
+			return missing
+		}
+
+		// ETH transfer
+		{
+			const tx = transactionDetailsDisplay[BasicBenchmarkTransactions.ETH_TRANSFER]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(`ETH transfer (missing: ${commaListFormat(missing)})`)
+			} else {
+				details.transactions.passing.push('ETH transfer')
+			}
+		}
+
+		// ERC-20 token transfer
+		{
+			const tx = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_20_TRANSFER]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(
+					`ERC-20 token transfer (missing: ${commaListFormat(missing)})`,
+				)
+			} else if (tx.transactionOutcome !== TransactionOutcome.EXPLAINED) {
+				details.transactions.partial.push('ERC-20 token transfer (outcome not explained)')
+			} else {
+				details.transactions.passing.push('ERC-20 token transfer')
+			}
+		}
+
+		// ERC-721 NFT transfer
+		{
+			const tx = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_721_TRANSFER]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(
+					`ERC-721 NFT transfer (missing: ${commaListFormat(missing)})`,
+				)
+			} else if (tx.transactionOutcome !== TransactionOutcome.EXPLAINED) {
+				details.transactions.partial.push('ERC-721 NFT transfer (outcome not explained)')
+			} else {
+				details.transactions.passing.push('ERC-721 NFT transfer')
+			}
+		}
+
+		// ZKSync USDC transfer
+		{
+			const tx = transactionDetailsDisplay[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(
+					`ZKSync USDC transfer (missing: ${commaListFormat(missing)})`,
+				)
+			} else {
+				details.transactions.passing.push('ZKSync USDC transfer')
+			}
+		}
+
+		// USDC approval (requires calldataDecoded to reach PARTIAL)
+		{
+			const tx = transactionDetailsDisplay[ComplexBenchmarkTransactions.USDC_APPROVAL]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(`USDC approval (missing: ${commaListFormat(missing)})`)
+			} else if (!isShown(tx.calldataDecoded)) {
+				details.transactions.failing.push('USDC approval (calldata not decoded)')
+			} else if (tx.transactionOutcome !== TransactionOutcome.EXPLAINED) {
+				details.transactions.partial.push('USDC approval (outcome not explained)')
+			} else {
+				details.transactions.passing.push('USDC approval')
+			}
+		}
+
+		// Aave supply (requires calldataDecoded to reach PARTIAL)
+		{
+			const tx = transactionDetailsDisplay[ComplexBenchmarkTransactions.AAVE_SUPPLY]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(`Aave supply (missing: ${commaListFormat(missing)})`)
+			} else if (!isShown(tx.calldataDecoded)) {
+				details.transactions.failing.push('Aave supply (calldata not decoded)')
+			} else if (tx.transactionOutcome !== TransactionOutcome.EXPLAINED) {
+				details.transactions.partial.push('Aave supply (outcome not explained)')
+			} else {
+				details.transactions.passing.push('Aave supply')
+			}
+		}
+
+		// Safe nested Aave supply (requires calldataDecoded and explained outcome to PASS)
+		{
+			const tx =
+				transactionDetailsDisplay[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(
+					`Safe nested Aave supply (missing: ${commaListFormat(missing)})`,
+				)
+			} else if (!isShown(tx.calldataDecoded)) {
+				details.transactions.partial.push('Safe nested Aave supply (calldata not decoded)')
+			} else if (tx.transactionOutcome !== TransactionOutcome.EXPLAINED) {
+				details.transactions.partial.push('Safe nested Aave supply (outcome not explained)')
+			} else {
+				details.transactions.passing.push('Safe nested Aave supply')
+			}
+		}
+
+		// Safe nested multisend (hardest benchmark — requires calldataDecoded and explained outcome to PASS)
+		{
+			const tx =
+				transactionDetailsDisplay[
+					ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
+				]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(
+					`Safe nested multisend (missing: ${commaListFormat(missing)})`,
+				)
+			} else if (!isShown(tx.calldataDecoded)) {
+				details.transactions.partial.push('Safe nested multisend (calldata not decoded)')
+			} else if (tx.transactionOutcome !== TransactionOutcome.EXPLAINED) {
+				details.transactions.partial.push('Safe nested multisend (outcome not explained)')
+			} else {
+				details.transactions.passing.push('Safe nested multisend')
+			}
+		}
+
+		// Failed transaction simulation
+		{
+			const tx = transactionDetailsDisplay[SimulationBenchmarkTransactions.FAILED_TRANSACTION]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(
+					`Failed transaction simulation (missing: ${commaListFormat(missing)})`,
+				)
+			} else if (tx.failure !== 'DETECTED') {
+				details.transactions.partial.push('Failed transaction simulation (failure not detected)')
+			} else {
+				details.transactions.passing.push('Failed transaction simulation')
+			}
+		}
+
+		// Nondeterministic transaction simulation
+		{
+			const tx =
+				transactionDetailsDisplay[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(
+					`Nondeterministic transaction simulation (missing: ${commaListFormat(missing)})`,
+				)
+			} else if (tx.nondeterminism === 'NOT_DETECTED') {
+				details.transactions.partial.push(
+					'Nondeterministic transaction simulation (nondeterminism not detected)',
+				)
+			} else if (tx.nondeterminism === 'DETECTED_WITHOUT_WARNING') {
+				details.transactions.partial.push(
+					'Nondeterministic transaction simulation (detected but no warning shown)',
+				)
+			} else {
+				details.transactions.passing.push('Nondeterministic transaction simulation')
+			}
+		}
 	}
 
 	// Analyze message signing
@@ -586,28 +763,12 @@ function analyzeSoftwareFeatures({
 function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): string {
 	const sections: string[] = []
 
-	// Calldata Decoding section
-	if (
-		features.calldataDecoding.supported.length > 0 ||
-		features.calldataDecoding.missing.length > 0
-	) {
-		sections.push('**Calldata Decoding**\n')
-
-		if (features.calldataDecoding.supported.length > 0) {
-			sections.push(`✓ Supported: ${commaListFormat(features.calldataDecoding.supported)}\n`)
-		}
-
-		if (features.calldataDecoding.missing.length > 0) {
-			sections.push(`✗ Missing: ${commaListFormat(features.calldataDecoding.missing)}\n`)
-		}
-	}
-
 	// Calldata Display section
 	if (
 		features.calldataDisplay.supported.length > 0 ||
 		features.calldataDisplay.missing.length > 0
 	) {
-		sections.push('\n**Calldata Display**\n')
+		sections.push('**Calldata Display**\n')
 
 		if (features.calldataDisplay.supported.length > 0) {
 			sections.push(`✓ Supported: ${commaListFormat(features.calldataDisplay.supported)}\n`)
@@ -615,6 +776,28 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 
 		if (features.calldataDisplay.missing.length > 0) {
 			sections.push(`✗ Missing: ${commaListFormat(features.calldataDisplay.missing)}\n`)
+		}
+	}
+
+	// Transaction Benchmarks section
+	const hasTransactionData =
+		features.transactions.passing.length > 0 ||
+		features.transactions.partial.length > 0 ||
+		features.transactions.failing.length > 0
+
+	if (hasTransactionData) {
+		sections.push('\n**Transaction Benchmarks**\n')
+
+		if (features.transactions.passing.length > 0) {
+			sections.push(`✓ Passing: ${commaListFormat(features.transactions.passing)}\n`)
+		}
+
+		if (features.transactions.partial.length > 0) {
+			sections.push(`⚠ Partial: ${commaListFormat(features.transactions.partial)}\n`)
+		}
+
+		if (features.transactions.failing.length > 0) {
+			sections.push(`✗ Failing: ${commaListFormat(features.transactions.failing)}\n`)
 		}
 	}
 
@@ -637,16 +820,20 @@ function generateSoftwareDetailsMarkdown(features: SoftwareFeatureDetails): stri
 function generateSoftwareHowToImprove(features: SoftwareFeatureDetails): string {
 	const improvements: string[] = []
 
-	if (features.calldataDecoding.missing.length > 0) {
-		improvements.push(
-			`**Calldata Decoding:** Add support for decoding ${commaListFormat(features.calldataDecoding.missing)}`,
-		)
-	}
-
 	if (features.calldataDisplay.missing.length > 0) {
 		improvements.push(
 			`**Calldata Display:** Implement ${commaListFormat(features.calldataDisplay.missing)} for calldata`,
 		)
+	}
+
+	if (features.transactions.failing.length > 0) {
+		improvements.push(
+			`**Transaction Information:** Add the required fields or calldata decoding for ${commaListFormat(features.transactions.failing)}`,
+		)
+	}
+
+	if (features.transactions.partial.length > 0) {
+		improvements.push(`**Transaction Clarity:** ${commaListFormat(features.transactions.partial)}`)
 	}
 
 	if (features.messageSigning.missing.length > 0) {
@@ -680,7 +867,7 @@ function softwareNoTransactionLegibility(
 			),
 		},
 		details: markdown(
-			`{{WALLET_NAME}} implements either zero or very little transaction legibility. The wallet does not adequately display calldata in multiple formats (raw hex, formatted, copyable) or essential transaction details. Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.\n\n${featureDetailsMarkdown}`,
+			`{{WALLET_NAME}} implements either zero or very little transaction legibility. The wallet does not adequately display calldata (raw hex, formatted, copyable) or essential transaction details for all benchmark transaction types. Transaction legibility is important for security as it allows users to verify transaction details on their wallet screen before signing.\n\n${featureDetailsMarkdown}`,
 		),
 		howToImprove: markdown(
 			`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
@@ -703,7 +890,7 @@ function softwarePartialTransactionLegibility(
 			shortExplanation: sentence('{{WALLET_NAME}} supports partial transaction legibility.'),
 		},
 		details: markdown(
-			`{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet may display some calldata formats but lacks comprehensive support for all calldata display methods (raw hex, formatted, copyable) or complete benchmark transaction coverage. Showing transaction details is crucial for security as it allows users to verify transaction details before signing.\n\n${featureDetailsMarkdown}`,
+			`{{WALLET_NAME}} supports some transaction legibility features, but not all. The wallet displays basic transaction details but may be missing calldata display formats, clear transaction outcome explanations for complex interactions, or simulation capabilities. Showing full transaction details is crucial for security.\n\n${featureDetailsMarkdown}`,
 		),
 		howToImprove: markdown(
 			`{{WALLET_NAME}} should implement the following improvements:\n\n${improvementsMarkdown}`,
@@ -725,7 +912,7 @@ function softwareFullTransactionLegibility(
 			shortExplanation: sentence('{{WALLET_NAME}} supports full transaction legibility.'),
 		},
 		details: markdown(
-			`{{WALLET_NAME}} implements full transaction legibility. The wallet supports comprehensive calldata display (raw hex format, formatted output, and copy to clipboard) and displays all essential transaction details clearly for each benchmark transaction type, providing maximum security and transparency for users.\n\n${featureDetailsMarkdown}`,
+			`{{WALLET_NAME}} implements full transaction legibility. The wallet displays calldata in all formats (raw hex, formatted, copyable), clearly explains the outcome of all benchmark transaction types including complex nested transactions, and detects failed and nondeterministic transactions, providing maximum security and transparency for users.\n\n${featureDetailsMarkdown}`,
 		),
 	}
 }
@@ -752,16 +939,16 @@ function evaluateHardwareWalletTransactionLegibility(
 			supportsAnyCalldataDecoding(legibility) &&
 			(isSupportedOnDevice(
 				legibility,
-				CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
+				ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
 			) ||
-				isSupportedOnDevice(legibility, CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED))
+				isSupportedOnDevice(legibility, ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED))
 
 		// Check if wallet supports basic calldata decoding (ON_DEVICE)
 		const supportsBasicDecoding: boolean =
-			isSupportedOnDevice(legibility, CalldataDecoding.ERC_20_TRANSFER) &&
-			isSupportedOnDevice(legibility, CalldataDecoding.ERC_721_TRANSFER) &&
-			isSupportedOnDevice(legibility, CalldataDecoding.ZKSYNC_USDC_TRANSFER) &&
-			isSupportedOnDevice(legibility, CalldataDecoding.AAVE_SUPPLY)
+			isSupportedOnDevice(legibility, BasicBenchmarkTransactions.ERC_20_TRANSFER) &&
+			isSupportedOnDevice(legibility, BasicBenchmarkTransactions.ERC_721_TRANSFER) &&
+			isSupportedOnDevice(legibility, BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER) &&
+			isSupportedOnDevice(legibility, ComplexBenchmarkTransactions.AAVE_SUPPLY)
 
 		// Check if all transaction details are displayed
 		const displaysAllDetails: boolean = isFullBasicTransactionDetails(detailsDisplayed)
@@ -845,64 +1032,90 @@ function evaluateSoftwareWalletTransactionLegibility(
 ): Evaluation<TransactionLegibilityValue> {
 	const { withoutRefs: transactionLegibilitySupport } = popRefs(softwareTransactionLegibility)
 
-	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility, legibility } =
+	const { calldataDisplay, transactionDetailsDisplay, messageSigningLegibility } =
 		transactionLegibilitySupport
 
-	if (calldataDisplay === null || transactionDetailsDisplay === null || legibility === null) {
+	if (calldataDisplay === null || transactionDetailsDisplay === null) {
 		return unrated(transactionLegibility, null)
 	}
 
-	// Evaluate message signing (PASS/FAIL only)
-	const messageSigningPasses = evaluateSoftwareMessageSigning(messageSigningLegibility)
+	const isShown = (field: DataDisplayOptions): boolean =>
+		field === DataDisplayOptions.SHOWN_BY_DEFAULT || field === DataDisplayOptions.SHOWN_OPTIONALLY
 
-	// Check calldata display capabilities
-	const calldataShown = calldataDisplay.rawHex
-	const calldataCopyable = calldataDisplay.copyHexToClipboard
-	const calldataFormatted = calldataDisplay.formatted
+	const allBasicFieldsShown = (tx: {
+		gas: DataDisplayOptions
+		nonce: DataDisplayOptions
+		from: DataDisplayOptions
+		to: DataDisplayOptions
+		chain: DataDisplayOptions
+		value: DataDisplayOptions
+	}): boolean =>
+		isShown(tx.gas) &&
+		isShown(tx.nonce) &&
+		isShown(tx.from) &&
+		isShown(tx.to) &&
+		isShown(tx.chain) &&
+		isShown(tx.value)
 
-	// Check calldata decoding capabilities
-	const supportsBasicDecoding: boolean =
-		legibility[CalldataDecoding.ERC_20_TRANSFER] === true &&
-		legibility[CalldataDecoding.ERC_721_TRANSFER] === true &&
-		legibility[CalldataDecoding.ZKSYNC_USDC_TRANSFER] === true &&
-		legibility[CalldataDecoding.AAVE_SUPPLY] === true
+	const usdcApproval = transactionDetailsDisplay[ComplexBenchmarkTransactions.USDC_APPROVAL]
+	const aaveSupply = transactionDetailsDisplay[ComplexBenchmarkTransactions.AAVE_SUPPLY]
+	const safeNested =
+		transactionDetailsDisplay[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]
+	const safeMultisend =
+		transactionDetailsDisplay[
+			ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND
+		]
+	const erc20 = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_20_TRANSFER]
+	const erc721 = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_721_TRANSFER]
+	const failedTx = transactionDetailsDisplay[SimulationBenchmarkTransactions.FAILED_TRANSACTION]
+	const nondetermTx =
+		transactionDetailsDisplay[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]
 
-	const supportsComplexDecoding: boolean =
-		supportsBasicDecoding &&
-		(legibility[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED] === true ||
-			legibility[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND] ===
-				true)
+	// All benchmark transactions require all 6 basic fields to be shown (at least optionally).
+	// USDC_APPROVAL and AAVE_SUPPLY additionally require calldataDecoded to be shown.
+	// Failing any of these → FAIL.
+	const allTransactions = [
+		transactionDetailsDisplay[BasicBenchmarkTransactions.ETH_TRANSFER],
+		erc20,
+		erc721,
+		transactionDetailsDisplay[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER],
+		usdcApproval,
+		aaveSupply,
+		safeNested,
+		safeMultisend,
+		failedTx,
+		nondetermTx,
+	]
 
-	// Hierarchical scoring logic:
-	// 1. If no calldata shown at all, FAIL
-	// 2. If calldata is shown but neither copyable nor formatted, FAIL
-	// 3. If less than 3 types of transaction details shown, FAIL
-	// 4. Message signing fails, FAIL
-	// 5. If basic calldata decoding not supported, FAIL
-	// 6. If calldata is not copyable OR not formatted, PARTIAL
-	// 7. If more than 3 types of transaction details are shown but not all of them, PARTIAL
-	// 8. If missing complex decoding, cap at PARTIAL
-	// 9. Otherwise, PASS (requires message signing to pass and complex calldata decoding)
 	let rating: Rating
 
-	if (!calldataShown) {
+	if (
+		!calldataDisplay.rawHex ||
+		(messageSigningLegibility !== null &&
+			!evaluateSoftwareMessageSigning(messageSigningLegibility)) ||
+		allTransactions.some(tx => !allBasicFieldsShown(tx)) ||
+		!isShown(usdcApproval.calldataDecoded) ||
+		!isShown(aaveSupply.calldataDecoded)
+	) {
 		rating = Rating.FAIL
-	} else if (!calldataCopyable && !calldataFormatted) {
-		rating = Rating.FAIL
-	} else if (messageSigningLegibility !== null && !messageSigningPasses) {
-		rating = Rating.FAIL
-	} else if (!supportsBasicDecoding) {
-		// Require basic calldata decoding for passing.
-		rating = Rating.FAIL
-	} else if (!calldataCopyable || !calldataFormatted) {
-		rating = Rating.PARTIAL
-	} else if (!messageSigningPasses) {
-		rating = Rating.PARTIAL
-	} else if (!supportsComplexDecoding) {
-		// Complex decoding not supported — cap at PARTIAL
-		rating = Rating.PARTIAL
 	} else {
-		rating = Rating.PASS
+		// PASS requires: formatted + copyable calldata display, all transaction outcomes explained,
+		// complex nested transactions fully decoded, and simulation benchmarks detected.
+		const isPartial =
+			!calldataDisplay.formatted ||
+			!calldataDisplay.copyHexToClipboard ||
+			erc20.transactionOutcome !== TransactionOutcome.EXPLAINED ||
+			erc721.transactionOutcome !== TransactionOutcome.EXPLAINED ||
+			usdcApproval.transactionOutcome !== TransactionOutcome.EXPLAINED ||
+			aaveSupply.transactionOutcome !== TransactionOutcome.EXPLAINED ||
+			!isShown(safeNested.calldataDecoded) ||
+			safeNested.transactionOutcome !== TransactionOutcome.EXPLAINED ||
+			!isShown(safeMultisend.calldataDecoded) ||
+			safeMultisend.transactionOutcome !== TransactionOutcome.EXPLAINED ||
+			failedTx.failure !== 'DETECTED' ||
+			nondetermTx.nondeterminism !== 'DETECTED_WITH_WARNING'
+
+		rating = isPartial ? Rating.PARTIAL : Rating.PASS
 	}
 
 	const references = refs(softwareTransactionLegibility)
@@ -1019,7 +1232,6 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					calldataDisplay: null,
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
-					legibility: null,
 					ref: refNotNecessary,
 				}),
 			),
@@ -1061,7 +1273,6 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
 					ref: refNotNecessary,
-					legibility: null,
 				}),
 			),
 		],
@@ -1087,7 +1298,6 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 					transactionDetailsDisplay: null,
 					messageSigningLegibility: null,
 					ref: refNotNecessary,
-					legibility: null,
 				}),
 			),
 		],
