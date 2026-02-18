@@ -37,9 +37,13 @@ import type {
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
-	CalldataDecoding,
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
+	type DisplayedBasicTransactionDetails,
 	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
@@ -64,6 +68,15 @@ import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
+
+const ambireTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
+	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	nonce: DataDisplayOptions.NOT_IN_UI,
+	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+}
 
 const v2Audits: SecurityAudit[] = [
 	{
@@ -585,14 +598,6 @@ export const ambire: SoftwareWallet = {
 					formatted: false,
 					rawHex: true,
 				},
-				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: false,
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: false,
-					[CalldataDecoding.USDC_APPROVAL]: false,
-					[CalldataDecoding.AAVE_SUPPLY]: false,
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: false,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: false,
-				},
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
@@ -600,14 +605,46 @@ export const ambire: SoftwareWallet = {
 					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
 				},
 				transactionDetailsDisplay: {
-					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.NOT_IN_UI,
-					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: ambireTransactionDisplayDefault,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						...ambireTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						...ambireTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: ambireTransactionDisplayDefault,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						...ambireTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						...ambireTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						...ambireTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							...ambireTransactionDisplayDefault,
+							calldataDecoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
+							transactionOutcome: TransactionOutcome.EXPLAINED,
+						},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						...ambireTransactionDisplayDefault,
+						failure: 'DETECTED',
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						...ambireTransactionDisplayDefault,
+						nondeterminism: 'NOT_DETECTED',
+					},
 				},
-				transactionSimulation: null,
 			},
 		},
 		selfSovereignty: {
