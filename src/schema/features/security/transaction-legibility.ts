@@ -318,7 +318,7 @@ export type SoftwareTransactionDetailsDisplay =
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type CalldataDecodingTypes = Record<BenchmarkTransactions, DataDecoded | null> // Allow null for existing wallets that has not enough data
+export type CalldataDecodingTypes = Record<BenchmarkTransactions, DataDecoded | null> // Allow null for existing wallets that don't have enough data
 
 /**
  * Types of transactions that a wallet can decode the calldata of.
