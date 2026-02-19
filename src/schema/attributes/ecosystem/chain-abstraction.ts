@@ -210,10 +210,10 @@ function evaluateChainAbstraction(
 	}
 
 	if (
-		bridging.builtInBridging.risksExplained === 'NOT_DECODED' ||
+		bridging.builtInBridging.risksExplained === 'NOT_IN_UI' ||
 		bridging.builtInBridging.risksExplained === 'HIDDEN_BY_DEFAULT'
 	) {
-		const risksHidden = bridging.builtInBridging.risksExplained === 'NOT_DECODED'
+		const risksHidden = bridging.builtInBridging.risksExplained === 'NOT_IN_UI'
 
 		return {
 			value: {

@@ -175,7 +175,7 @@ export const imkeyWallet: HardwareWallet = {
 				},
 				detailsDisplayed: {
 					...displaysFullTransactionDetails,
-					nonce: DataDisplayOptions.NOT_DECODED,
+					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				messageSigningLegibility: null,
 			},

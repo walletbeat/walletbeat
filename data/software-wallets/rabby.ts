@@ -140,7 +140,7 @@ export const rabby: SoftwareWallet = {
 						byDefault: FeeDisplayLevel.NONE,
 						fullySponsored: false,
 					},
-					risksExplained: 'NOT_DECODED',
+					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
 			},

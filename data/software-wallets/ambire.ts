@@ -73,7 +73,7 @@ const ambireTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-	nonce: DataDisplayOptions.NOT_DECODED,
+	nonce: DataDisplayOptions.NOT_IN_UI,
 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 }
@@ -277,7 +277,7 @@ export const ambire: SoftwareWallet = {
 						url: 'https://www.ambire.com/',
 					},
 					feesLargerThan1bps: comprehensiveFeesShownByDefault,
-					risksExplained: 'NOT_DECODED',
+					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
 			},
@@ -601,9 +601,9 @@ export const ambire: SoftwareWallet = {
 				},
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_DECODED,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_DECODED,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_DECODED,
+					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
 				},
 				transactionDetailsDisplay: {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: ambireTransactionDisplayDefault,
@@ -618,17 +618,17 @@ export const ambire: SoftwareWallet = {
 					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: ambireTransactionDisplayDefault,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						...ambireTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_DECODED,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
 						...ambireTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_DECODED,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
 						...ambireTransactionDisplayDefault,
-						calldataDecoded: DataDisplayOptions.NOT_DECODED,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:

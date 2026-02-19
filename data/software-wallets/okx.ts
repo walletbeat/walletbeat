@@ -197,9 +197,9 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 				},
 				messageSigningLegibility: {
 					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
-					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_DECODED,
-					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_DECODED,
-					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_DECODED,
+					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
 				},
 				// transactionDetailsDisplay: {
 				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,

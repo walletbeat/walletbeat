@@ -204,10 +204,10 @@ export const cypherockWallet: HardwareWallet = {
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: {
-					chain: DataDisplayOptions.NOT_DECODED,
+					chain: DataDisplayOptions.NOT_IN_UI,
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT, // derivation path counts
 					gas: DataDisplayOptions.SHOWN_BY_DEFAULT, // tx fee
-					nonce: DataDisplayOptions.NOT_DECODED,
+					nonce: DataDisplayOptions.NOT_IN_UI,
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT, // contract address
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},

@@ -113,7 +113,7 @@ export const daimo: SoftwareWallet = {
 						byDefault: FeeDisplayLevel.COMPREHENSIVE,
 						fullySponsored: false,
 					},
-					risksExplained: 'NOT_DECODED',
+					risksExplained: 'NOT_IN_UI',
 				}),
 				suggestedBridging: notSupported,
 			},

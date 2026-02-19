@@ -181,8 +181,8 @@ export const trezorWallet: HardwareWallet = {
 				},
 				detailsDisplayed: {
 					...displaysFullTransactionDetails,
-					chain: DataDisplayOptions.NOT_DECODED,
-					nonce: DataDisplayOptions.NOT_DECODED,
+					chain: DataDisplayOptions.NOT_IN_UI,
+					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
 				messageSigningLegibility: null,
 			},

@@ -7,7 +7,7 @@ export enum DataDisplayOptions {
 	/** Available on the transaction approval screen but requires user action (e.g., clicking a button) or enabling in settings */
 	SHOWN_OPTIONALLY = 'SHOWN_OPTIONALLY',
 	/** Not displayed in the wallet UI */
-	NOT_DECODED = 'NOT_DECODED',
+	NOT_IN_UI = 'NOT_IN_UI',
 }
 
 /**
@@ -27,12 +27,12 @@ export interface DisplayedBasicTransactionDetails {
  * The wallet displays no basic transaction details.
  */
 export const displaysNoTransactionDetails: DisplayedBasicTransactionDetails = {
-	gas: DataDisplayOptions.NOT_DECODED,
-	nonce: DataDisplayOptions.NOT_DECODED,
-	from: DataDisplayOptions.NOT_DECODED,
-	to: DataDisplayOptions.NOT_DECODED,
-	chain: DataDisplayOptions.NOT_DECODED,
-	value: DataDisplayOptions.NOT_DECODED,
+	gas: DataDisplayOptions.NOT_IN_UI,
+	nonce: DataDisplayOptions.NOT_IN_UI,
+	from: DataDisplayOptions.NOT_IN_UI,
+	to: DataDisplayOptions.NOT_IN_UI,
+	chain: DataDisplayOptions.NOT_IN_UI,
+	value: DataDisplayOptions.NOT_IN_UI,
 }
 
 /**

@@ -52,7 +52,7 @@ export type ChainAbstraction = {
 		builtInBridging: Support<
 			WithRef<{
 				/** Are the trust assumptions of the bridge explained to the user? */
-				risksExplained: 'NOT_DECODED' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT'
+				risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT'
 
 				/**
 				 * How are the fees involved in bridging explained to the user?

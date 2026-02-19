@@ -155,10 +155,10 @@ export const ngrave: HardwareWallet = {
 				calldataDecoded: noCalldataDecoding,
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: {
-					chain: DataDisplayOptions.NOT_DECODED,
+					chain: DataDisplayOptions.NOT_IN_UI,
 					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.NOT_DECODED,
+					nonce: DataDisplayOptions.NOT_IN_UI,
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 				},
