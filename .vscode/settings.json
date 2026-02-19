@@ -3,6 +3,7 @@
 	"editor.insertSpaces": false,
 	"editor.detectIndentation": false,
 	"editor.tabSize": 2,
+	"files.eol": "\n",
 	"[jsonc]": {
 		"editor.defaultFormatter": "dbaeumer.vscode-eslint"
 	},
