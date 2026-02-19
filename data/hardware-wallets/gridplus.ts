@@ -125,7 +125,10 @@ export const gridplusWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
-			firmware: 'The Lattice1 firmware source code is not publicly available.',
+			firmware: {
+  support: FirmwareSupport.None,
+  details: 'The Lattice1 firmware source code is not publicly available.',
+},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
