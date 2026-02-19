@@ -97,7 +97,12 @@ export enum BasicBenchmarkTransactions {
 	/**
 	 * Sending of ERC-721 tokens (NFTs) to another address.
 	 */
-	ERC_721_TRANSFER = 'ER_721_TRANSFER',
+	ERC_721_TRANSFER = 'ERC_721_TRANSFER',
+
+	/**
+	 * Sending of ERC-1155 tokens to another address.
+	 */
+	ERC_1155_TRANSFER = 'ERC_1155_TRANSFER',
 
 	/**
 	 * ZKSync USDC transfer transaction.
@@ -110,6 +115,7 @@ export const basicBenchmarkTransactions = new Enum<BasicBenchmarkTransactions>({
 	[BasicBenchmarkTransactions.ETH_TRANSFER]: true,
 	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: true,
 	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: true,
+	[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: true,
 	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: true,
 })
 
@@ -251,6 +257,8 @@ export function benchmarkTransactionLabel(
 			return 'basic token transfers (ERC-20)'
 		case BasicBenchmarkTransactions.ERC_721_TRANSFER:
 			return 'basic NFT transfers (ERC-721)'
+		case BasicBenchmarkTransactions.ERC_1155_TRANSFER:
+			return 'basic semi fungible token transfers (ERC-1155)'
 		case BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER:
 			return 'ZKSync token transfers'
 		case ComplexBenchmarkTransactions.USDC_APPROVAL:
@@ -306,11 +314,17 @@ export interface DisplayedNondeterministicTransactionDetails extends Omit<
 	'transactionOutcome' | 'calldataDecoded'
 > {
 	/**
-	 * NOT_DETECTED - The wallet only shows one possible outcome regardless of whether the transaction relies on execution state.
-	 * DETECTED_WITHOUT_WARNING - The wallet detects multiple outcomes but does not warn the user.
-	 * DETECTED_WITH_WARNING - The wallet detects multiple outcomes and warns the user.
+	 * How the wallet handles state-dependent (non-deterministic) transactions.
+	 *
+	 * - STATIC_SINGLE_OUTCOME: Shows one outcome and keeps it static. No re-simulation if state changes.
+	 * - RESIMULATES_NO_WARNING: Re-simulates and updates the outcome if state changes, but doesn’t explicitly warn the user.
+	 * - RESIMULATES_WITH_WARNING: Re-simulates and explicitly warns that multiple outcomes are possible.
 	 */
-	nondeterminism: 'NOT_DETECTED' | 'DETECTED_WITHOUT_WARNING' | 'DETECTED_WITH_WARNING'
+	nondeterminism:
+		| 'NO_OUTCOME_SHOWN'
+		| 'STATIC_SINGLE_OUTCOME'
+		| 'RESIMULATES_NO_WARNING'
+		| 'RESIMULATES_WITH_WARNING'
 }
 
 /**
@@ -330,6 +344,7 @@ export type SoftwareTransactionDetailsDisplay =
 			[BasicBenchmarkTransactions.ETH_TRANSFER]: DisplayedBasicTransactionDetails
 			[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DisplayedTokenTransferDetails
 			[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DisplayedTokenTransferDetails
+			[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DisplayedTokenTransferDetails
 			[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DisplayedBasicTransactionDetails
 	  } & Record<ComplexBenchmarkTransactions, DisplayedComplexTransactionDetails> & {
 				[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: DisplayedFailedTransactionDetails
@@ -391,6 +406,7 @@ export const noCalldataDecoding: CalldataDecodingTypes = {
 	[BasicBenchmarkTransactions.ETH_TRANSFER]: DataDecoded.NOT_DECODED,
 	[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.NOT_DECODED,
 	[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DataDecoded.NOT_DECODED,
+	[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: DataDecoded.NOT_DECODED,
 	[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.NOT_DECODED,
 	[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
 	[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_DECODED,

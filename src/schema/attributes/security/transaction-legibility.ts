@@ -146,6 +146,7 @@ function analyzeHardwareFeatures({
 			BasicBenchmarkTransactions.ETH_TRANSFER,
 			BasicBenchmarkTransactions.ERC_20_TRANSFER,
 			BasicBenchmarkTransactions.ERC_721_TRANSFER,
+			BasicBenchmarkTransactions.ERC_1155_TRANSFER,
 			BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER,
 			ComplexBenchmarkTransactions.USDC_APPROVAL,
 			ComplexBenchmarkTransactions.AAVE_SUPPLY,
@@ -319,7 +320,7 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 
 	if (features.calldataDecoding.decodedLocation === DataDecoded.OFF_DEVICE) {
 		improvements.push(
-			'**Calldata Decoding:** Move decoding on-device so users don\u2019t have to trust a potentially compromised companion app.',
+			"**Calldata Decoding:** Move decoding on-device so users don't have to trust a potentially compromised companion app.",
 		)
 	}
 
@@ -588,6 +589,22 @@ function analyzeSoftwareFeatures({
 			}
 		}
 
+		// ERC-1155 token transfer
+		{
+			const tx = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_1155_TRANSFER]
+			const missing = missingBasicFields(tx)
+
+			if (missing.length > 0) {
+				details.transactions.failing.push(
+					`ERC-1155 token transfer (missing: ${commaListFormat(missing)})`,
+				)
+			} else if (tx.transactionOutcome !== TransactionOutcome.EXPLAINED) {
+				details.transactions.partial.push('ERC-1155 token transfer (outcome not explained)')
+			} else {
+				details.transactions.passing.push('ERC-1155 token transfer')
+			}
+		}
+
 		// ZKSync USDC transfer
 		{
 			const tx = transactionDetailsDisplay[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]
@@ -700,11 +717,15 @@ function analyzeSoftwareFeatures({
 				details.transactions.failing.push(
 					`Nondeterministic transaction simulation (missing: ${commaListFormat(missing)})`,
 				)
-			} else if (tx.nondeterminism === 'NOT_DETECTED') {
+			} else if (tx.nondeterminism === 'NO_OUTCOME_SHOWN') {
+				details.transactions.partial.push(
+					'Nondeterministic transaction simulation (no outcome shown)',
+				)
+			} else if (tx.nondeterminism === 'STATIC_SINGLE_OUTCOME') {
 				details.transactions.partial.push(
 					'Nondeterministic transaction simulation (nondeterminism not detected)',
 				)
-			} else if (tx.nondeterminism === 'DETECTED_WITHOUT_WARNING') {
+			} else if (tx.nondeterminism === 'RESIMULATES_NO_WARNING') {
 				details.transactions.partial.push(
 					'Nondeterministic transaction simulation (detected but no warning shown)',
 				)
@@ -946,6 +967,7 @@ function evaluateHardwareWalletTransactionLegibility(
 		const supportsBasicDecoding: boolean =
 			isSupportedOnDevice(calldataDecoded, BasicBenchmarkTransactions.ERC_20_TRANSFER) &&
 			isSupportedOnDevice(calldataDecoded, BasicBenchmarkTransactions.ERC_721_TRANSFER) &&
+			isSupportedOnDevice(calldataDecoded, BasicBenchmarkTransactions.ERC_1155_TRANSFER) &&
 			isSupportedOnDevice(calldataDecoded, BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER) &&
 			isSupportedOnDevice(calldataDecoded, ComplexBenchmarkTransactions.AAVE_SUPPLY)
 
@@ -1069,6 +1091,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 		]
 	const erc20 = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_20_TRANSFER]
 	const erc721 = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_721_TRANSFER]
+	const erc1155 = transactionDetailsDisplay[BasicBenchmarkTransactions.ERC_1155_TRANSFER]
 	const failedTx = transactionDetailsDisplay[SimulationBenchmarkTransactions.FAILED_TRANSACTION]
 	const nondeterminismTx =
 		transactionDetailsDisplay[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]
@@ -1080,6 +1103,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 		transactionDetailsDisplay[BasicBenchmarkTransactions.ETH_TRANSFER],
 		erc20,
 		erc721,
+		erc1155,
 		transactionDetailsDisplay[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER],
 		usdcApproval,
 		aaveSupply,
@@ -1108,6 +1132,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 			!calldataDisplay.copyHexToClipboard ||
 			erc20.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			erc721.transactionOutcome !== TransactionOutcome.EXPLAINED ||
+			erc1155.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			usdcApproval.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			aaveSupply.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			!isShown(safeNested.calldataDecoded) ||
@@ -1115,7 +1140,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 			!isShown(safeMultisend.calldataDecoded) ||
 			safeMultisend.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			failedTx.failure !== 'DETECTED' ||
-			nondeterminismTx.nondeterminism !== 'DETECTED_WITH_WARNING' ||
+			nondeterminismTx.nondeterminism !== 'RESIMULATES_WITH_WARNING' ||
 			messageSigningLegibility === null ||
 			!evaluateSoftwareMessageSigning(messageSigningLegibility)
 
@@ -1171,7 +1196,7 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 
 		**Calldata Decoding/Display:**
 		The wallet's ability to decode and display calldata for various transaction types, including:
-		- Simple transfers (ETH and token)
+		- Simple transfers (ETH transfers, ERC-20 transfers, ERC-1155, and ERC-721 transfers)
 		- Token approvals
 		- DeFi interactions
 		- Complex nested transactions
