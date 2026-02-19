@@ -45,6 +45,9 @@
   import SignaturesTab from './Tabs/SignaturesTab.svelte';
   import EIPSupportTab from './Tabs/EIPSupportTab.svelte';
   import ScamAlertsTab from './Tabs/ScamAlertsTab.svelte';
+  import AppIsolationTab from './Tabs/AppIsolationTab.svelte';
+  import type { AppIsolationSubTab } from './Tabs/AppIsolationTab.svelte';
+  import { getProvider } from '../lib/eip-test-runners';
   import {
     assertTransactionId,
     isEip6963AnnounceProviderEvent,
@@ -118,10 +121,11 @@
   });
 
   const uiState = $state({
-    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support' | 'scam-alerts',
+    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support' | 'app-isolation'|'scam-alerts',
     selectedTxId: null as string | null,
     selectedSigId: null as string | null,
     selectedScamAlertId: null as string | null,
+    appIsolationSubTab: 'eth-accounts' as AppIsolationSubTab,
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -611,7 +615,7 @@ Issued At: ${new Date().toISOString()}`;
 
   <!-- Tab Selector -->
   <div class="tab-selector" data-row="gap-2">
-    {#each ['transactions', 'signatures', 'eip-support', 'scam-alerts'] as tab (tab)}
+    {#each ['transactions', 'signatures', 'eip-support', 'app-isolation', 'scam-alerts'] as tab (tab)}
       <button
         type="button"
         class="tab-button"
@@ -631,7 +635,9 @@ Issued At: ${new Date().toISOString()}`;
             }
           } else if (tab === 'eip-support') {
             uiState.activeTab = 'eip-support';
-          } else if (tab === 'scam-alerts') {
+          } else if (tab === 'app-isolation') {
+            uiState.activeTab = 'app-isolation';
+          }else if (tab === 'scam-alerts') {
             uiState.activeTab = 'scam-alerts';
             scamAlertDisclaimer.accepted = false;
 
@@ -641,7 +647,7 @@ Issued At: ${new Date().toISOString()}`;
           }
         }}
       >
-        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab === 'app-isolation' ? 'App Isolation' : tab.charAt(0).toUpperCase() + tab.slice(1)}
       </button>
     {/each}
   </div>
@@ -671,6 +677,21 @@ Issued At: ${new Date().toISOString()}`;
               onclick={() => (uiState.selectedSigId = sig.id)}
             />
           {/each}
+        {:else if uiState.activeTab === 'app-isolation'}
+          <WalletTesterNavigationItem
+            title="eth_accounts"
+            description="Which accounts does the wallet expose?"
+            isSelected={uiState.appIsolationSubTab === 'eth-accounts'}
+            isCompleted={false}
+            onclick={() => { uiState.appIsolationSubTab = 'eth-accounts'; }}
+          />
+          <WalletTesterNavigationItem
+            title="wallet_connect"
+            description="ERC-7846 privacy-preserving connection"
+            isSelected={uiState.appIsolationSubTab === 'wallet-connect'}
+            isCompleted={false}
+            onclick={() => { uiState.appIsolationSubTab = 'wallet-connect'; }}
+          />
         {:else if uiState.activeTab === 'eip-support'}
           {#each testSteps as step, index (step.id)}
             {@const status = getStepStatus(step.id)}
@@ -747,6 +768,11 @@ Issued At: ${new Date().toISOString()}`;
           onAcceptDisclaimer={() => { scamAlertDisclaimer.accepted = true; }}
           onSendScamAlert={handleSendScamAlert}
           onOpenInExplorer={openInExplorer}
+        />
+      {:else if uiState.activeTab === 'app-isolation'}
+        <AppIsolationTab
+          activeSubTab={uiState.appIsolationSubTab}
+          provider={getProvider()}
         />
       {/if}
     </div>
