@@ -55,6 +55,9 @@ contract WalletbeatTestErc721 is ERC721 {
 
         revert WalletbeatTestErc721__Soulbound();
     }
+    function _baseURI() internal pure override returns (string memory) {
+        return "data:application/json;base64,";
+    }
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         if (ownerOf(tokenId) == address(0)) {
