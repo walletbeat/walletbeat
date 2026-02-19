@@ -238,6 +238,33 @@ export const complexBenchmarkTransactions = new Enum<ComplexBenchmarkTransaction
 })
 
 /**
+ * @param tx The benchmark transaction to get a human-readable label for.
+ * @returns Human-friendly label for the benchmark transaction.
+ */
+export function benchmarkTransactionLabel(
+	tx: BasicBenchmarkTransactions | ComplexBenchmarkTransactions,
+): string {
+	switch (tx) {
+		case BasicBenchmarkTransactions.ETH_TRANSFER:
+			return 'plain ETH transfers'
+		case BasicBenchmarkTransactions.ERC_20_TRANSFER:
+			return 'basic token transfers (ERC-20)'
+		case BasicBenchmarkTransactions.ERC_721_TRANSFER:
+			return 'basic NFT transfers (ERC-721)'
+		case BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER:
+			return 'ZKSync token transfers'
+		case ComplexBenchmarkTransactions.USDC_APPROVAL:
+			return 'token approvals'
+		case ComplexBenchmarkTransactions.AAVE_SUPPLY:
+			return 'DeFi interactions (e.g., Aave)'
+		case ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED:
+			return 'nested Safe transactions'
+		case ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND:
+			return 'complex nested multisend transactions'
+	}
+}
+
+/**
  * BenchmarkTransactions is the union of basic and complex benchmark transactions.
  * Used for hardware wallet calldata decoding evaluation.
  */

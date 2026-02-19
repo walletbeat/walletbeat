@@ -8,6 +8,7 @@ import {
 import type { ResolvedFeatures } from '@/schema/features'
 import {
 	BasicBenchmarkTransactions,
+	benchmarkTransactionLabel,
 	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataDisplayOptions,
@@ -141,39 +142,15 @@ function analyzeHardwareFeatures({
 
 	// Analyze calldata decoding
 	if (calldataDecoded !== null) {
-		const decodingChecks = [
-			{
-				key: BasicBenchmarkTransactions.ETH_TRANSFER,
-				label: 'plain ETH transfers',
-			},
-			{
-				key: BasicBenchmarkTransactions.ERC_20_TRANSFER,
-				label: 'basic token transfers (ERC-20)',
-			},
-			{
-				key: BasicBenchmarkTransactions.ERC_721_TRANSFER,
-				label: 'basic NFT transfers (ERC-721)',
-			},
-			{
-				key: BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER,
-				label: 'ZKSync token transfers',
-			},
-			{
-				key: ComplexBenchmarkTransactions.USDC_APPROVAL,
-				label: 'token approvals',
-			},
-			{
-				key: ComplexBenchmarkTransactions.AAVE_SUPPLY,
-				label: 'DeFi interactions (e.g., Aave)',
-			},
-			{
-				key: ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED,
-				label: 'nested Safe transactions',
-			},
-			{
-				key: ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
-				label: 'complex nested multisend transactions',
-			},
+		const decodingChecks: Array<BasicBenchmarkTransactions | ComplexBenchmarkTransactions> = [
+			BasicBenchmarkTransactions.ETH_TRANSFER,
+			BasicBenchmarkTransactions.ERC_20_TRANSFER,
+			BasicBenchmarkTransactions.ERC_721_TRANSFER,
+			BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER,
+			ComplexBenchmarkTransactions.USDC_APPROVAL,
+			ComplexBenchmarkTransactions.AAVE_SUPPLY,
+			ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED,
+			ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
 		]
 
 		// Track decoded location for calldata decoding
@@ -182,7 +159,8 @@ function analyzeHardwareFeatures({
 		let hasOnDeviceDecoding = false
 		let hasOffDeviceDecoding = false
 
-		decodingChecks.forEach(({ key, label }) => {
+		decodingChecks.forEach(key => {
+			const label = benchmarkTransactionLabel(key)
 			const decodedLocation = calldataDecoded[key]
 
 			if (decodedLocation !== DataDecoded.NOT_DECODED) {
