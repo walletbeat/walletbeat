@@ -13,6 +13,7 @@ import {
 	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import { FirmwareType } from '@/schema/features/security/firmware'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	CalldataDecoding,
@@ -126,9 +127,14 @@ export const gridplusWallet: HardwareWallet = {
 				upgradePathAvailable: true,
 			}),
 			firmware: {
-  support: FirmwareSupport.None,
-  details: 'The Lattice1 firmware source code is not publicly available.',
-},
+				// Source: gridplus team responses fileverse document
+				type: FirmwareType.FAIL,
+				customFirmware: FirmwareType.FAIL,
+				details: 'The Lattice1 firmware source code is not publicly available.',
+				firmwareOpenSource: FirmwareType.FAIL,
+				reproducibleBuilds: FirmwareType.FAIL,
+				silentUpdateProtection: FirmwareType.PASS,
+			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
