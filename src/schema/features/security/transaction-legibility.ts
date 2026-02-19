@@ -1,5 +1,5 @@
 import type { WithRef } from '@/schema/reference'
-import { Enum, mergeEnums } from '@/utils/enum'
+import { Enum } from '@/utils/enum'
 
 export enum DataDisplayOptions {
 	/** Shown by default on the transaction approval screen */
@@ -265,16 +265,12 @@ export function benchmarkTransactionLabel(
 }
 
 /**
- * BenchmarkTransactions is the union of basic and complex benchmark transactions.
+ * HardwareBenchmarkTransactions is the union of basic and complex benchmark transactions.
  * Used for hardware wallet calldata decoding evaluation.
  */
-export type BenchmarkTransactions = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
-
-/** Merged enum for all benchmark transactions. */
-export const benchmarkTransactions = mergeEnums(
-	basicBenchmarkTransactions,
-	complexBenchmarkTransactions,
-)
+export type HardwareBenchmarkTransactions =
+	| BasicBenchmarkTransactions
+	| ComplexBenchmarkTransactions
 
 /**
  * Benchmark transactions for simulation-specific scenarios.
@@ -345,12 +341,7 @@ export type SoftwareTransactionDetailsDisplay =
 /**
  * Types of transactions that a wallet can decode the calldata of.
  */
-export type CalldataDecodingTypes = Record<BenchmarkTransactions, DataDecoded | null> // Allow null for existing wallets that don't have enough data
-
-/**
- * Types of transactions that a wallet can decode the calldata of.
- */
-export type SoftwareCalldataDecodingTypes = Record<BenchmarkTransactions, boolean>
+export type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataDecoded | null> // Allow null for existing wallets that don't have enough data
 
 /** Where does the calldata decoding actually happen? */
 export enum DataDecoded {
@@ -469,7 +460,7 @@ export function supportsAnyDataExtraction(dataExtractionMethods: DataExtractionM
  */
 export function isSupportedOnDevice(
 	legibility: CalldataDecodingTypes,
-	decoding: BenchmarkTransactions,
+	decoding: HardwareBenchmarkTransactions,
 ): boolean {
 	return legibility[decoding] === DataDecoded.ON_DEVICE
 }
