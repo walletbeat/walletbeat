@@ -1115,7 +1115,9 @@ function evaluateSoftwareWalletTransactionLegibility(
 			!isShown(safeMultisend.calldataDecoded) ||
 			safeMultisend.transactionOutcome !== TransactionOutcome.EXPLAINED ||
 			failedTx.failure !== 'DETECTED' ||
-			nondeterminismTx.nondeterminism !== 'DETECTED_WITH_WARNING'
+			nondeterminismTx.nondeterminism !== 'DETECTED_WITH_WARNING' ||
+			messageSigningLegibility === null ||
+			!evaluateSoftwareMessageSigning(messageSigningLegibility)
 
 		rating = isPartial ? Rating.PARTIAL : Rating.PASS
 	}
