@@ -313,9 +313,15 @@ function generateHardwareHowToImprove(features: HardwareFeatureDetails): string 
 	const improvements: string[] = []
 
 	if (features.calldataDecoding.missing.length > 0) {
-		improvements.push(
-			`**Calldata Decoding:** Add on-device support for ${commaListFormat(features.calldataDecoding.missing)}`,
-		)
+		if (features.calldataDecoding.missing.length > 4) {
+			improvements.push(
+				`**Calldata Decoding:** Add on-device support for:\n${features.calldataDecoding.missing.map(t => `- ${t}`).join('\n')}`,
+			)
+		} else {
+			improvements.push(
+				`**Calldata Decoding:** Add on-device support for ${commaListFormat(features.calldataDecoding.missing)}`,
+			)
+		}
 	}
 
 	if (features.calldataDecoding.decodedLocation === DataDecoded.OFF_DEVICE) {
@@ -1201,11 +1207,11 @@ export const transactionLegibility: Attribute<TransactionLegibilityValue> = {
 		- DeFi interactions
 		- Complex nested transactions
 
-		**Transaction Details Display:**
-		For software wallets, transaction details are evaluated per benchmark transaction:
-		- Basic benchmarks (ETH transfer, token transfers): gas, nonce, from, to, chain, value
-		- Complex benchmarks (approvals, DeFi, nested transactions): gas, nonce, from, chain, and whether the transaction outcome is explained
-		- Simulation benchmarks (failed transactions, nondeterministic outcomes): whether failures and outcome variance are detected
+		For software wallets, transaction details are evaluated according to the set of information they display:
+		- For transfers (ETH transfers, ERC-20 transfers, ERC-721 transfers, ERC-1155 transfers): gas, nonce, sender, recipient, chain, amount. Some details may be collapsed by default (e.g. 'nonce'), but all of them must be accessible through the UI.
+		- Non-transfer transactions (approvals, DeFi contract interactions, Safe multisig nested transactions): gas, nonce, from, chain. In addition, the wallet must explain the transaction outcome visually or in plain language; for example, for ERC-20 approvals, it should explain what token is being approved, for which contract, and for how many tokens.
+		- If presented with a transaction that will revert if included onchain, the wallet must detect that the transaction would fail and warn the user beforehand.
+		- If presented with a transaction for which the behavior would be nondeterministic based on predictably-changing parameters (e.g. block number), the wallet must detect that the transaction has a nondeterministic outcome and warn the user beforehand.
 
 		**Software Wallet Specific Requirements:**
 		For software wallets, calldata must be displayed in multiple formats:

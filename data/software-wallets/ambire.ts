@@ -615,6 +615,10 @@ export const ambire: SoftwareWallet = {
 						...ambireTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 					},
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						...ambireTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
 					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: ambireTransactionDisplayDefault,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
 						...ambireTransactionDisplayDefault,
@@ -643,7 +647,7 @@ export const ambire: SoftwareWallet = {
 					},
 					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
 						...ambireTransactionDisplayDefault,
-						nondeterminism: 'NOT_DETECTED',
+						nondeterminism: 'STATIC_SINGLE_OUTCOME',
 					},
 				},
 			},

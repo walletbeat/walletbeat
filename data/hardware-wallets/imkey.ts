@@ -161,6 +161,7 @@ export const imkeyWallet: HardwareWallet = {
 					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
 					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
 					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
 					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
 					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_DECODED,
