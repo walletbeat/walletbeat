@@ -1,5 +1,5 @@
 import type { WithRef } from '@/schema/reference'
-import { Enum } from '@/utils/enum'
+import { Enum, mergeEnums } from '@/utils/enum'
 
 export enum DataDisplayOptions {
 	/** Shown by default on the transaction approval screen */
@@ -242,6 +242,11 @@ export const complexBenchmarkTransactions = new Enum<ComplexBenchmarkTransaction
 	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: true,
 	[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]: true,
 })
+
+export const benchmarkTransactions = mergeEnums(
+	basicBenchmarkTransactions,
+	complexBenchmarkTransactions,
+)
 
 /**
  * @param tx The benchmark transaction to get a human-readable label for.

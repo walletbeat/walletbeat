@@ -9,6 +9,7 @@ import type { ResolvedFeatures } from '@/schema/features'
 import {
 	BasicBenchmarkTransactions,
 	benchmarkTransactionLabel,
+	benchmarkTransactions,
 	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataDisplayOptions,
@@ -142,17 +143,7 @@ function analyzeHardwareFeatures({
 
 	// Analyze calldata decoding
 	if (calldataDecoded !== null) {
-		const decodingChecks: Array<BasicBenchmarkTransactions | ComplexBenchmarkTransactions> = [
-			BasicBenchmarkTransactions.ETH_TRANSFER,
-			BasicBenchmarkTransactions.ERC_20_TRANSFER,
-			BasicBenchmarkTransactions.ERC_721_TRANSFER,
-			BasicBenchmarkTransactions.ERC_1155_TRANSFER,
-			BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER,
-			ComplexBenchmarkTransactions.USDC_APPROVAL,
-			ComplexBenchmarkTransactions.AAVE_SUPPLY,
-			ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED,
-			ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND,
-		]
+		const decodingChecks = benchmarkTransactions.items
 
 		// Track decoded location for calldata decoding
 		// If any supported decoding is ON_DEVICE, show ON_DEVICE; otherwise show OFF_DEVICE if any are supported
