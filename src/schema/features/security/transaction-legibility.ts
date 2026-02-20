@@ -263,7 +263,7 @@ export function benchmarkTransactionLabel(
 		case BasicBenchmarkTransactions.ERC_721_TRANSFER:
 			return 'basic NFT transfers (ERC-721)'
 		case BasicBenchmarkTransactions.ERC_1155_TRANSFER:
-			return 'basic semi fungible token transfers (ERC-1155)'
+			return 'basic multi-token transfers (ERC-1155)'
 		case BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER:
 			return 'ZKSync token transfers'
 		case ComplexBenchmarkTransactions.USDC_APPROVAL:
