@@ -647,7 +647,7 @@ Issued At: ${new Date().toISOString()}`;
           }
         }}
       >
-        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab === 'app-isolation' ? 'App Isolation' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab.charAt(0).toUpperCase() + tab.slice(1)}
       </button>
     {/each}
   </div>
