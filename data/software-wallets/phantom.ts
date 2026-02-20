@@ -8,7 +8,6 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
@@ -138,16 +137,16 @@ export const phantom: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,
-				legibility: null,
 				messageSigningLegibility: null,
-				transactionDetailsDisplay: {
-					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					from: DataDisplayOptions.SHOWN_OPTIONALLY,
-					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
-					to: DataDisplayOptions.SHOWN_OPTIONALLY,
-					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				},
+				// transactionDetailsDisplay: {
+				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	from: DataDisplayOptions.SHOWN_OPTIONALLY,
+				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+				// 	to: DataDisplayOptions.SHOWN_OPTIONALLY,
+				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// },
+				transactionDetailsDisplay: null,
 			},
 		},
 		selfSovereignty: {

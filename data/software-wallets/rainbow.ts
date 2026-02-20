@@ -8,7 +8,6 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -143,16 +142,16 @@ export const rainbow: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,
-				legibility: null,
 				messageSigningLegibility: null,
-				transactionDetailsDisplay: {
-					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.NOT_IN_UI,
-					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				},
+				transactionDetailsDisplay: null,
+				// transactionDetailsDisplay: {
+				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	nonce: DataDisplayOptions.NOT_DECODED,
+				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// },
 			},
 		},
 		selfSovereignty: {

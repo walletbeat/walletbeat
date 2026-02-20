@@ -77,9 +77,9 @@ export const fireflyWallet: HardwareWallet = {
 			supplyChainFactory: null,
 			transactionLegibility: {
 				ref: refTodo,
+				calldataDecoded: noCalldataDecoding,
 				dataExtraction: noDataExtraction,
 				detailsDisplayed: null,
-				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,
 			},
 			userSafety: null,
