@@ -8,14 +8,24 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { DataDisplayOptions, MessageSigningDetails } from '@/schema/features/security/transaction-legibility'
+import { BasicBenchmarkTransactions, DataDisplayOptions, MessageSigningDetails, TransactionOutcome, type DisplayedBasicTransactionDetails } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
-import { notSupported, supported } from '@/schema/features/support'
+import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+
+
+const rainbowTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
+	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	nonce: DataDisplayOptions.NOT_IN_UI,
+	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+}
 export const rainbow: SoftwareWallet = {
 	metadata: {
 		id: 'rainbow',
@@ -71,11 +81,11 @@ export const rainbow: SoftwareWallet = {
 		integration: {
 			browser: {
 				ref: refTodo,
-				'1193': null,
-				'2700': null,
-				'6963': null,
+				'1193': featureSupported,
+				'2700': featureSupported,
+				'6963': featureSupported,
 			},
-			walletCall: null,
+			walletCall: notSupported,
 		},
 		licensing: {
 			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
@@ -153,15 +163,13 @@ export const rainbow: SoftwareWallet = {
 					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
 					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
 				},
-				transactionDetailsDisplay: null,
-				// transactionDetailsDisplay: {
-				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	nonce: DataDisplayOptions.NOT_DECODED,
-				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				// },
+				transactionDetailsDisplay: {
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: rainbowTransactionDisplayDefault,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						...rainbowTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+				}
 			},
 		},
 		selfSovereignty: {
