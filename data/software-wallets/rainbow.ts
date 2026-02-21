@@ -8,7 +8,15 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { BasicBenchmarkTransactions, DataDisplayOptions, MessageSigningDetails, TransactionOutcome, type DisplayedBasicTransactionDetails } from '@/schema/features/security/transaction-legibility'
+import {
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
+	DataDisplayOptions,
+	type DisplayedBasicTransactionDetails,
+	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
+} from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
@@ -16,7 +24,6 @@ import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
-
 
 const rainbowTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -26,6 +33,7 @@ const rainbowTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
 }
+
 export const rainbow: SoftwareWallet = {
 	metadata: {
 		id: 'rainbow',
@@ -169,7 +177,45 @@ export const rainbow: SoftwareWallet = {
 						...rainbowTransactionDisplayDefault,
 						transactionOutcome: TransactionOutcome.EXPLAINED,
 					},
-				}
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						...rainbowTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						...rainbowTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: rainbowTransactionDisplayDefault,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						...rainbowTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						...rainbowTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						...rainbowTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							...rainbowTransactionDisplayDefault,
+							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						...rainbowTransactionDisplayDefault,
+						failure: 'DETECTED',
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						...rainbowTransactionDisplayDefault,
+						nondeterminism: 'STATIC_SINGLE_OUTCOME',
+					},
+				},
 			},
 		},
 		selfSovereignty: {
