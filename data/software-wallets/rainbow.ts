@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
+import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import {
@@ -76,10 +77,12 @@ export const rainbow: SoftwareWallet = {
 		addressResolution: {
 			ref: refTodo,
 			chainSpecificAddressing: {
-				erc7828: null,
-				erc7831: null,
+				erc7828: notSupported,
+				erc7831: notSupported,
 			},
-			nonChainSpecificEnsResolution: null,
+			nonChainSpecificEnsResolution: supported<AddressResolutionData>({
+				medium: 'CHAIN_CLIENT',
+			}),
 		},
 		chainAbstraction: null,
 		chainConfigurability: null,
