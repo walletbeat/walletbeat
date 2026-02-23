@@ -507,9 +507,9 @@ function annotationsPath(options: GlobalOptions): string {
 	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id.toLocaleLowerCase()}/${id.toLocaleLowerCase()}.annotations.json`
 }
 
-function openCaptureFile(options: GlobalOptions): WalletCaptureFile {
+async function openCaptureFile(options: GlobalOptions): Promise<WalletCaptureFile> {
 	const annotations = WalletCaptureAnnotations.fromFile(options.id, annotationsPath(options))
-	const captureFile = WalletCaptureFile.fromFile(
+	const captureFile = await WalletCaptureFile.fromFile(
 		{
 			walletId: options.id,
 			walletType: options.type,
@@ -588,7 +588,7 @@ function logInstructions(instructions: string[]) {
 }
 
 export async function handleCapture(opts: CaptureOptions): Promise<void> {
-	const sessionsBefore = openCaptureFile(opts).getSessions()
+	const sessionsBefore = (await openCaptureFile(opts)).getSessions()
 
 	const argv = [
 		'mitmdump',
@@ -596,7 +596,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 		'--mode=regular',
 		'--set=upstream_cert=false',
 		'--set=http2=false',
-		`--set=wallet_type=${opts.type.toLowerCase()}`,
+		`--set=wallet_type=${opts.type}`,
 		`--set=wallet_id=${opts.id}`,
 		`--set=wallet_variant=${opts.variant}`,
 		`--set=ux_flow=${opts.flow}`,
@@ -607,7 +607,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 			throw new Error(`Must specify --wallet-addresses for flow ${opts.flow}.`)
 		}
 	} else {
-		const walletRedactionFile = openCaptureFile(opts)
+		const walletRedactionFile = await openCaptureFile(opts)
 
 		for (let walletAddr of opts.walletAddresses) {
 			walletAddr = walletAddr.trim()
@@ -638,7 +638,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 
 	await runCommand(argv)
 	log('mitmproxy finished.')
-	const sessionsAfter = openCaptureFile(opts).getSessions()
+	const sessionsAfter = (await openCaptureFile(opts)).getSessions()
 	const sessionsDiff = sessionsAfter.difference(sessionsBefore)
 
 	const nextFlow = getNextFlow(opts.flow)
@@ -708,7 +708,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 }
 
 export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<void> {
-	const capture = openCaptureFile(opts)
+	const capture = await openCaptureFile(opts)
 
 	capture.deleteSession(opts.session)
 	await capture.save(getSaveOptions(opts))
@@ -716,7 +716,7 @@ export async function handleDeleteCapture(opts: DeleteCaptureOptions): Promise<v
 }
 
 export async function handleCheck(opts: GlobalOptions): Promise<number> {
-	const capture = openCaptureFile(opts)
+	const capture = await openCaptureFile(opts)
 	const issues = capture.check()
 
 	if (issues.length == 0) {
@@ -776,7 +776,7 @@ export async function handleCheck(opts: GlobalOptions): Promise<number> {
 }
 
 export async function handleMarkFlowUnsupported(opts: MarkFlowUnsupportedOptions): Promise<void> {
-	const capture = openCaptureFile(opts)
+	const capture = await openCaptureFile(opts)
 
 	capture.markFlowUnsupported(opts.flow)
 	await capture.save(getSaveOptions(opts))
@@ -857,7 +857,7 @@ export async function handleMarkDomain(opts: MarkDomainOptions): Promise<void> {
 }
 
 export async function handleExplainRequest(opts: ExplainRequestOptions): Promise<void> {
-	const capture = openCaptureFile(opts)
+	const capture = await openCaptureFile(opts)
 
 	const matched = capture.addRequestMatcher(
 		new WalletRequestMatcher({
@@ -879,7 +879,7 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 }
 
 export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
-	const capture = openCaptureFile(opts)
+	const capture = await openCaptureFile(opts)
 
 	capture.redactor.mark({
 		realStr: opts.string,
@@ -942,7 +942,7 @@ function displayRequestInfo(request: WalletRequest): void {
 }
 
 export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
-	const capture = openCaptureFile(opts)
+	const capture = await openCaptureFile(opts)
 
 	// Collect all unreviewed requests across all flows
 	const unreviewedRequests: Array<{ flow: RecordedFlow; review: WalletRequestReview }> = []
@@ -1379,7 +1379,7 @@ export async function handleLintFix(): Promise<void> {
 				}
 
 				const capturePath = path.join(walletDir, filename)
-				const captureFile = WalletCaptureFile.fromFile(null, capturePath, annotations)
+				const captureFile = await WalletCaptureFile.fromFile(null, capturePath, annotations)
 
 				const saveOptions: SaveOptions = {
 					verifyExisting: false,

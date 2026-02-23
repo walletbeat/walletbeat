@@ -1508,6 +1508,18 @@ export class WalletCaptureIssue {
 	}
 }
 
+/**
+ * AutoGenerationOptions is a set of options controlling the feature data
+ * generation process.
+ */
+export interface AutoGenerationOptions {
+	/**
+	 * Whether to strictly verify the generated data.
+	 * Set to `true` in tests; omit in feature data files.
+	 */
+	strict?: boolean
+}
+
 export interface WalletCaptureFileIdentity {
 	walletType: WalletType
 	walletVariant: Variant
@@ -1521,11 +1533,11 @@ export class WalletCaptureFile {
 	private readonly flows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>>
 	private readonly sessions: number
 	private readonly annotations: WalletCaptureAnnotations
-	public static fromFile(
+	public static async fromFile(
 		identity: WalletCaptureFileIdentity | null,
 		path: string,
 		annotations: WalletCaptureAnnotations,
-	): WalletCaptureFile {
+	): Promise<WalletCaptureFile> {
 		let text = ''
 
 		if (fs.existsSync(path)) {
@@ -1546,19 +1558,24 @@ export class WalletCaptureFile {
 
 		const parsed: unknown = JSON.parse(text)
 		const captureFile = new WalletCaptureFile(identity, path, parsed, annotations)
-		const reEncoded = captureFile.toJSON()
-		const loadedStable = stableJSONStringify(parsed)
-		const reEncodedStable = stableJSONStringify(reEncoded)
 
-		if (!wasNew && loadedStable !== reEncodedStable) {
-			throw new Error(
-				[
-					'WalletCaptureFile integrity check failed: re-encoded JSON does not match loaded JSON.',
-					`File: ${path}`,
-					`Loaded:     ${loadedStable}`,
-					`Re-encoded: ${reEncodedStable}`,
-				].join('\n'),
-			)
+		if (wasNew) {
+			await captureFile.saveCaptureFileOnly(false)
+		} else {
+			const reEncoded = captureFile.toJSON()
+			const loadedStable = stableJSONStringify(parsed)
+			const reEncodedStable = stableJSONStringify(reEncoded)
+
+			if (!wasNew && loadedStable !== reEncodedStable) {
+				throw new Error(
+					[
+						'WalletCaptureFile integrity check failed: re-encoded JSON does not match loaded JSON.',
+						`File: ${path}`,
+						`Loaded:     ${loadedStable}`,
+						`Re-encoded: ${reEncodedStable}`,
+					].join('\n'),
+				)
+			}
 		}
 
 		return captureFile
@@ -1681,7 +1698,7 @@ export class WalletCaptureFile {
 	 * partial data into wallet feature data without breakage. Unit tests
 	 * should check in strict mode.
 	 */
-	public toDataCollection(strict: boolean): DataCollection {
+	public toDataCollection(options: AutoGenerationOptions): DataCollection {
 		const dataCollection: DataCollection = {
 			[UserFlow.INSTALL]: null,
 			[UserFlow.ONBOARDING_NEW]: null,
@@ -1713,7 +1730,7 @@ export class WalletCaptureFile {
 				continue
 			}
 
-			const collected = this.processFlowRequests(flow, strict)
+			const collected = this.processFlowRequests(flow, options.strict ?? false)
 			const flowData: DataCollectionForFlow = {
 				collected,
 			}
@@ -1858,7 +1875,7 @@ export class WalletCaptureFile {
 		return collected
 	}
 
-	public async save(opts: SaveOptions): Promise<string[]> {
+	private async saveCaptureFileOnly(verifyExisting: boolean): Promise<string[]> {
 		if (this.path === null) {
 			throw new Error('WalletCaptureFile was constructed without a path; cannot save.')
 		}
@@ -1879,7 +1896,7 @@ export class WalletCaptureFile {
 
 		const changed: string[] = []
 
-		if (opts.verifyExisting) {
+		if (verifyExisting) {
 			if (needsWrite) {
 				throw new Error(`File not in sync: ${this.path}`)
 			}
@@ -1891,6 +1908,11 @@ export class WalletCaptureFile {
 			changed.push(this.path)
 		}
 
+		return changed
+	}
+
+	public async save(opts: SaveOptions): Promise<string[]> {
+		const changed = await this.saveCaptureFileOnly(opts.verifyExisting)
 		const annotationsChanged = await this.annotations.save(opts)
 
 		return changed.concat(...annotationsChanged)
@@ -2049,7 +2071,9 @@ export class WalletCaptureFile {
 		if (issues.length === 0) {
 			// Double-check that this is the case by trying to convert in strict mode:
 			try {
-				this.toDataCollection(true)
+				this.toDataCollection({
+					strict: true,
+				})
 			} catch (e) {
 				return [
 					new WalletCaptureIssue({
