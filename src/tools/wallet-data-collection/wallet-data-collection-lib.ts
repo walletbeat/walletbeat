@@ -479,6 +479,7 @@ export interface ExplainRequestOptions extends GlobalOptions {
 	method: string | null
 	purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED'
 	policy: CollectionPolicy | null
+	global: boolean | null
 	force: boolean | null
 }
 
@@ -496,6 +497,7 @@ export const explainRequestOptions = new Options<ExplainRequestOptions>(
 			),
 		),
 		policy: optionalOption(enumOption(collectionPolicyEnum)),
+		global: optionalOption(booleanOption),
 		force: optionalOption(booleanOption),
 	},
 	globalOptions,
@@ -521,8 +523,16 @@ function annotationsPath(options: GlobalOptions): string {
 	return `data/${type.toLocaleLowerCase()}-wallets/collection/${id.toLocaleLowerCase()}/${id.toLocaleLowerCase()}.annotations.json`
 }
 
+function globalAnnotationsPath(): string {
+	return 'data/collection/global.annotations.json'
+}
+
 async function openCaptureFile(options: GlobalOptions): Promise<WalletCaptureFile> {
-	const annotations = WalletCaptureAnnotations.fromFile(options.id, annotationsPath(options))
+	const annotations = WalletCaptureAnnotations.fromFile(
+		options.id,
+		annotationsPath(options),
+		globalAnnotationsPath(),
+	)
 	const captureFile = await WalletCaptureFile.fromFile(
 		{
 			walletId: options.id,
@@ -871,13 +881,16 @@ export async function handleExplainRequest(opts: ExplainRequestOptions): Promise
 	const capture = await openCaptureFile(opts)
 
 	const matched = capture.addRequestMatcher(
-		new WalletRequestMatcher({
-			domain: opts.domain,
-			path: opts.path,
-			method: opts.method,
-			purposes: opts.purposes,
-			policy: opts.policy,
-		}),
+		new WalletRequestMatcher(
+			{
+				domain: opts.domain,
+				path: opts.path,
+				method: opts.method,
+				purposes: opts.purposes,
+				policy: opts.policy,
+			},
+			opts.global ?? false,
+		),
 		opts.force ?? false,
 	)
 
@@ -1367,7 +1380,11 @@ export async function handleLintFix(): Promise<void> {
 				continue
 			}
 
-			const annotations = WalletCaptureAnnotations.fromFile(walletId, annotationsPath)
+			const annotations = WalletCaptureAnnotations.fromFile(
+				walletId,
+				annotationsPath,
+				globalAnnotationsPath(),
+			)
 			const capturePattern = new RegExp(
 				`^${walletId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.(.*?)\\.capture\\.json$`,
 			)

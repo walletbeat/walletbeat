@@ -152,6 +152,10 @@ cli
 		'--policy <collection_policy>',
 		'Configurability and wallet policy for making this request.',
 	)
+	.option(
+		'--global <true|false>',
+		'Add this request matcher to the global set (will match for any wallet; false by default).',
+	)
 	.option('--force <true|false>', 'Add this request matcher even if capture is not complete.')
 	.example(
 		"  $ pnpm wallet-data-collection --id='metamask' --variant='BROWSER' explain-request --domain='infura.io' --method='eth_getBalance' --purposes='CHAIN_DATA_LOOKUP'",
