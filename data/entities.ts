@@ -6,6 +6,7 @@ import { deBank } from '@/data/entities/debank'
 import { hyperFoundation } from '@/data/entities/hyper-foundation'
 import { sentry } from '@/data/entities/sentry'
 import { sonicLabs } from '@/data/entities/sonic-labs'
+import { walletbeat } from '@/data/entities/walletbeat'
 import type { Entity } from '@/schema/entity'
 
 /**
@@ -21,6 +22,7 @@ export const allEntities = {
 	hyperFoundation,
 	sentry,
 	sonicLabs,
+	walletbeat,
 }
 
 /** A valid Entity ID. */
