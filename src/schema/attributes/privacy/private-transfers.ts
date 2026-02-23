@@ -14,6 +14,7 @@ import {
 	type FungibleTokenTransferMode,
 	type PrivacyPoolsSupport,
 	PrivateTransferTechnology,
+	type RailgunSupport,
 	type StealthAddressSupport,
 	StealthAddressUnlabeledBehavior,
 	type TornadoCashNovaSupport,
@@ -27,6 +28,8 @@ import {
 } from '@/schema/features/support'
 import { fullySponsoredFees } from '@/schema/features/transparency/fee-display'
 import {
+	ContentType,
+	isTypographicContent,
 	markdown,
 	type MarkdownParagraph,
 	mdParagraph,
@@ -130,7 +133,32 @@ function mergeEvaluations(
 			? privateTransfersDetailsContent(
 					mergePrivateTransferDetails(betterTransferDetails, worseTransferDetails),
 				)
-			: worse.details
+			: betterTransferDetails !== null
+				? (() => {
+						// If worse has typographic content (like mdParagraph) and better has transfer details,
+						// add the typographic content as an extra note to the first technology.
+						if (
+							isTypographicContent(worse.details) &&
+							worse.details.contentType === ContentType.MARKDOWN &&
+							betterTransferDetails.privateTransferDetails.size > 0
+						) {
+							const firstTech = Array.from(betterTransferDetails.privateTransferDetails.keys())[0]
+							const firstDetails = betterTransferDetails.privateTransferDetails.get(firstTech)!
+							const updatedDetails = new Map(betterTransferDetails.privateTransferDetails)
+
+							updatedDetails.set(firstTech, {
+								...firstDetails,
+								extraNotes: [...firstDetails.extraNotes, worse.details],
+							})
+
+							return privateTransfersDetailsContent({
+								privateTransferDetails: updatedDetails,
+							})
+						}
+
+						return privateTransfersDetailsContent(betterTransferDetails)
+					})()
+				: worse.details
 
 	return {
 		value: {
@@ -212,9 +240,13 @@ const nonDefault: Evaluation<PrivateTransfersValue> = {
 		defaultFungibleTokenTransferMode: 'PUBLIC',
 		perTechnology: new Map(),
 	},
-	details: privateTransfersDetailsContent({
-		privateTransferDetails: new Map(),
-	}),
+	details: mdParagraph(
+		`
+			{{WALLET_NAME}} supports private token transfers, but token transfers are public by default.
+			This means users may accidentally send tokens publicly, revealing their transaction history,
+			unless they explicitly choose to use private transfers.
+		`,
+	),
 	impact: paragraph(
 		`
 			{{WALLET_NAME}} users should always use private token transfers
@@ -667,12 +699,12 @@ function rateTornadoCashNovaSupport(
 					`),
 					receivingImprovements: ['should perform UTXO filtering client-side'],
 				}
-			case 'WALLET_SIDE':
+			case 'ON_USER_DEVICE':
 				return {
 					receivingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
 					receivingDetails: mdParagraph(`
-						The user's private notes (UTXOs) are filtered by the wallet
-						itself, ensuring that no external provider may correlate the
+						The user's private notes (UTXOs) are filtered on the user's 
+						device, ensuring that no external provider may correlate the
 						user's received funds in the pool.
 					`),
 					receivingImprovements: [],
@@ -1226,6 +1258,410 @@ function ratePrivacyPoolsSupport(
 	}
 }
 
+function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<PrivateTransfersValue> {
+	const references: ReferenceArray = refs(railgun)
+	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
+	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
+		sendingPrivacy: PrivateTransfersPrivacyLevel
+		sendingDetails: MarkdownParagraph<WalletNameStrings>
+		sendingImprovements: string[]
+	} => {
+		if (!isSupported(railgun.privateTransfers)) {
+			return {
+				sendingPrivacy: PrivateTransfersPrivacyLevel.NOT_FULLY_IMPLEMENTED,
+				sendingDetails: mdParagraph(`
+					Private transfers between Railgun wallets are not supported; this means
+					users can only shield tokens but cannot send them privately to other
+					Railgun wallets.
+				`),
+				sendingImprovements: ['implement private transfers between Railgun wallets'],
+			}
+		}
+
+		// Check if wallet warns about shielding correlation risks
+		if (!isSupported(railgun.warnAboutShieldingCorrelation)) {
+			return {
+				sendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+				sendingDetails: mdParagraph(`
+					Shielding tokens into Railgun is done directly to the smart contract,
+					requiring no broadcaster. However, shielding transactions are public
+					on-chain and can be analyzed to correlate a user's \`0x\` address with their
+					\`0zk\` address through amount, timing, and token type analysis. The wallet
+					does not warn users about these correlation risks. Private transfers
+					between Railgun wallets are supported.
+				`),
+				sendingImprovements: ['warn users about shielding correlation risks'],
+			}
+		}
+
+		// Shielding is fully private (direct to contract, no broadcaster needed)
+		return {
+			sendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
+			sendingDetails: mdParagraph(`
+				Shielding tokens into Railgun is done directly to the smart contract,
+				requiring no broadcaster and maintaining full privacy. The wallet warns
+				users about correlation risks when shielding. Private transfers between
+				Railgun wallets are supported.
+			`),
+			sendingImprovements: [],
+		}
+	})()
+	const { receivingPrivacy, receivingDetails, receivingImprovements } = ((): {
+		receivingPrivacy: PrivateTransfersPrivacyLevel
+		receivingDetails: MarkdownParagraph<WalletNameStrings>
+		receivingImprovements: string[]
+	} => {
+		// Receiving privacy depends on where merkle tree syncing happens.
+		// If done server-side, an external provider can learn about received funds
+		// even though chain data doesn't reveal this (CHAIN_DATA_PRIVATE).
+		// If done client-side, no external provider learns about received funds (FULLY_PRIVATE).
+		switch (railgun.merkleTreeSync) {
+			case 'EXTERNAL':
+				return {
+					receivingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+					receivingDetails: mdParagraph(`
+						The Railgun UTXO merkle tree is synced externally,
+						allowing an external provider to learn about received funds.
+						While the onchain transaction data does not reveal these details,
+						the external provider is in a position to learn about received funds.
+					`),
+					receivingImprovements: ['should perform merkle tree syncing client-side'],
+				}
+			case 'ON_USER_DEVICE':
+				return {
+					receivingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
+					receivingDetails: mdParagraph(`
+						Receiving funds through Railgun requires no external service. The wallet
+						syncs and decrypts the Railgun UTXO merkle tree locally, ensuring that
+						no external provider can learn about received funds.
+					`),
+					receivingImprovements: [],
+				}
+		}
+	})()
+	const { spendingPrivacy, spendingDetails, spendingImprovements } = ((): {
+		spendingPrivacy: PrivateTransfersPrivacyLevel
+		spendingDetails: MarkdownParagraph<WalletNameStrings>
+		spendingImprovements: string[]
+	} => {
+		if (!isSupported(railgun.privateTransfers)) {
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.NOT_FULLY_IMPLEMENTED,
+				spendingDetails: mdParagraph(`
+					Private transfers are not supported; this means spending shielded funds
+					requires unshielding, which may expose transaction details.
+				`),
+				spendingImprovements: ['implement private transfers between Railgun wallets'],
+			}
+		}
+
+		// If only self-relay is supported, this exposes IP address
+		if (
+			!isSupported(railgun.broadcasterBasedTransactionSubmission) &&
+			isSupported(railgun.selfRelayedTransactionSubmission)
+		) {
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+				spendingDetails: mdParagraph(`
+					Transactions are submitted via self-relay, which exposes the user's IP address
+					to the node receiving the transaction. While the onchain transaction data does
+					not reveal this information, the external provider is in a position to learn
+					the user's IP address and link it to their transactions.
+				`),
+				spendingImprovements: [
+					'add support for broadcaster-based transaction submission to protect IP addresses',
+				],
+			}
+		}
+
+		// Extract broadcaster data once - we know it's supported
+		const broadcasterData = railgun.broadcasterBasedTransactionSubmission
+
+		if (!isSupported(broadcasterData)) {
+			throw new Error('Expected broadcaster to be supported')
+		}
+
+		// If both are supported and default is self-relay, this exposes IP address
+		if (
+			isSupported(railgun.selfRelayedTransactionSubmission) &&
+			'defaultTransactionSubmissionType' in railgun &&
+			railgun.defaultTransactionSubmissionType === 'SELF_RELAY'
+		) {
+			// Default is self-relay, which exposes IP address
+			if (broadcasterData.broadcasterLearnsUserIpAddress) {
+				return {
+					spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+					spendingDetails: mdParagraph(`
+						The wallet defaults to self-relaying transactions, which exposes the
+						user's IP address to the node receiving the transaction. If users switch
+						to broadcasters, they would also learn the user's IP address (since
+						broadcasters do not use Logos/Waku for IP protection), so switching would
+						not improve privacy. While the onchain transaction data does not reveal
+						this information, external providers are in a position to learn the user's
+						IP address and link it to their transactions.
+					`),
+					spendingImprovements: [
+						'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
+						'default to broadcaster usage instead of self-relay for better privacy',
+					],
+				}
+			}
+
+			if (!isSupported(broadcasterData.customizableBroadcaster)) {
+				return {
+					spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+					spendingDetails: mdParagraph(`
+						The wallet defaults to self-relaying transactions, which exposes the
+						user's IP address. While broadcasters use Logos (previously Waku) to protect
+						IP addresses, the broadcaster endpoint cannot be customized.
+					`),
+					spendingImprovements: [
+						'default to broadcaster usage instead of self-relay for better privacy',
+						'allow users to customize the broadcaster endpoint',
+					],
+				}
+			}
+
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+				spendingDetails: mdParagraph(`
+					The wallet defaults to self-relaying transactions, which exposes the
+					user's IP address. While broadcasters use Logos (previously Waku) to protect
+					IP addresses, users should be encouraged to use broadcasters instead
+					of self-relay.
+				`),
+				spendingImprovements: [
+					'default to broadcaster usage instead of self-relay for better privacy',
+				],
+			}
+		}
+
+		// Broadcaster is used (either broadcaster-only or both with broadcaster default)
+		if (broadcasterData.broadcasterLearnsUserIpAddress) {
+			if (!isSupported(broadcasterData.customizableBroadcaster)) {
+				return {
+					spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+					spendingDetails: mdParagraph(`
+						Transactions are submitted through broadcasters, which learn the
+						user's IP address. The broadcaster endpoint cannot be customized.
+						While the onchain transaction data does not reveal this information,
+						the broadcaster is in a position to learn the user's IP address and
+						link it to their transactions.
+					`),
+					spendingImprovements: [
+						'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
+						'allow users to customize the broadcaster endpoint',
+					],
+				}
+			}
+
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+				spendingDetails: mdParagraph(`
+					Transactions are submitted through broadcasters, which learn the
+					user's IP address. While users can customize the broadcaster endpoint,
+					IP address protection requires using Logos (previously Waku).
+				`),
+				spendingImprovements: [
+					'use Logos (previously Waku) for broadcaster communication to protect IP addresses',
+				],
+			}
+		}
+
+		// Broadcaster with Logos (previously Waku)
+		if (!isSupported(broadcasterData.customizableBroadcaster)) {
+			extraNotes.push(
+				mdParagraph(`
+					The Railgun broadcaster is not user-customizable, and is in a position
+					to censor or block transactions.
+				`),
+			)
+		}
+
+		if (!isSupported(railgun.warnAboutViewingKeySharing)) {
+			extraNotes.push(
+				mdParagraph(`
+					The wallet does not warn users about the privacy risks of sharing viewing
+					keys. Viewing keys are encoded in \`0zk\` addresses and are irrevocable, meaning
+					anyone with access to a viewing key can permanently see all private
+					interactions sent by that address, even if the key is later shared or leaked.
+				`),
+			)
+		}
+
+		if (!isSupported(railgun.warnAboutSuccessiveOperations)) {
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+				spendingDetails: mdParagraph(`
+					Transactions are submitted through broadcasters using Logos (previously Waku),
+					protecting IP addresses. However, the user is not warned when performing
+					multiple operations in quick succession, which could allow an observer
+					to correlate multiple operations and infer information about the user's
+					identity.
+				`),
+				spendingImprovements: ['warn the user when doing multiple operations in quick succession'],
+			}
+		}
+
+		// Check if wallet warns about unshielding destination correlation
+		if (!isSupported(railgun.warnAboutUnshieldingDestinationCorrelation)) {
+			return {
+				spendingPrivacy: PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE,
+				spendingDetails: mdParagraph(`
+					Transactions are submitted through broadcasters using Logos (previously Waku),
+					protecting IP addresses. The user is cautioned against doing too many
+					operations in quick succession to avoid time-based correlation. However,
+					the wallet does not warn users when unshielding to addresses associated
+					with their wallet, which creates a correlation link between their \`0zk\`
+					and \`0x\` addresses.
+				`),
+				spendingImprovements: [
+					'warn users when unshielding to addresses associated with their wallet',
+				],
+			}
+		}
+
+		return {
+			spendingPrivacy: PrivateTransfersPrivacyLevel.FULLY_PRIVATE,
+			spendingDetails: mdParagraph(`
+				Transactions are submitted through broadcasters using Logos (previously Waku),
+				protecting IP addresses. The user is cautioned against doing too many
+				operations in quick succession to avoid time-based correlation, and is warned
+				about unshielding destination correlation risks.
+			`),
+			spendingImprovements: [],
+		}
+	})()
+
+	const walletShould = sendingImprovements
+		.concat(receivingImprovements)
+		.concat(spendingImprovements)
+	const howToImprove = isNonEmptyArray(walletShould)
+		? mdParagraph(
+				`
+					{{WALLET_NAME}} should${markdownListFormat(walletShould, {
+						ifEmpty: { behavior: 'THROW_ERROR' },
+						singleItemTemplate: ' ITEM.',
+						uppercaseFirstCharacterOfListItems: true,
+						multiItemPrefix: `:
+					
+					`,
+						multiItemTemplate: `
+					- ITEM`,
+						multiItemSuffix: `
+					
+					`,
+					})}
+				`,
+			)
+		: undefined
+	const perTechnology = singleTechnology<PrivateTransfersPrivacyLevels>(
+		PrivateTransferTechnology.RAILGUN,
+		{
+			sendingPrivacy,
+			receivingPrivacy,
+			spendingPrivacy,
+		},
+	)
+	const details = privateTransfersDetailsContent({
+		privateTransferDetails: singleTechnology(PrivateTransferTechnology.RAILGUN, {
+			sendingDetails,
+			receivingDetails,
+			spendingDetails,
+			extraNotes,
+		}),
+	})
+	const worstLevel = worstPrivateTransfersPrivacyLevel([
+		sendingPrivacy,
+		receivingPrivacy,
+		spendingPrivacy,
+	])
+
+	switch (worstLevel) {
+		case PrivateTransfersPrivacyLevel.NOT_FULLY_IMPLEMENTED:
+			return {
+				value: {
+					id: 'incomplete_railgun',
+					rating: Rating.FAIL,
+					displayName: 'Incomplete Railgun integration',
+					shortExplanation: mdSentence(
+						'{{WALLET_NAME}} integrates some Railgun features, but with severe gaps.',
+					),
+					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+					perTechnology,
+				},
+				details,
+				howToImprove,
+				references,
+			}
+		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
+			return {
+				value: {
+					id: 'non_private_railgun',
+					rating: Rating.FAIL,
+					displayName: 'Non-private Railgun integration',
+					shortExplanation: mdSentence(
+						'{{WALLET_NAME}} integrates Railgun in a non-privacy-preserving way.',
+					),
+					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+					perTechnology,
+				},
+				details,
+				howToImprove,
+				references,
+			}
+		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
+			return {
+				value: {
+					id: 'chain_private_railgun',
+					rating: Rating.PARTIAL,
+					displayName: 'Railgun integration relying on external provider',
+					shortExplanation: mdSentence(
+						'{{WALLET_NAME}} integrates Railgun but relies on an external provider.',
+					),
+					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+					perTechnology,
+				},
+				details,
+				howToImprove,
+				references,
+			}
+		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
+			if (howToImprove !== undefined) {
+				return {
+					value: {
+						id: 'partial_railgun_integration',
+						rating: Rating.PARTIAL,
+						displayName: 'Imperfect Railgun integration',
+						shortExplanation: mdSentence(
+							'{{WALLET_NAME}} integrates Railgun with some important compromises.',
+						),
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
+					details,
+					howToImprove,
+					references,
+				}
+			}
+
+			return {
+				value: {
+					id: 'full_railgun_integration',
+					rating: Rating.PASS,
+					icon: '\u{1f48c}', // Love letter
+					displayName: 'Full Railgun integration',
+					shortExplanation: mdSentence('{{WALLET_NAME}} integrates Railgun for private transfers.'),
+					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+					perTechnology,
+				},
+				details,
+				howToImprove,
+				references,
+			}
+	}
+}
+
 export const privateTransfers: Attribute<PrivateTransfersValue> = {
 	id: 'privateTransfers',
 	icon: '\u{1f4e8}', // Incoming envelope
@@ -1264,6 +1700,7 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 		- ${eipMarkdownLinkAndTitle(erc5564)}
 		- [Tornado Cash Nova](https://nova.tornadocash.eth.limo/)
 		- [Privacy Pools](https://privacypools.com/)
+		- [Railgun](https://www.railgun.org/)
 	`),
 	ratingScale: {
 		display: 'fail-pass',
@@ -1529,6 +1966,7 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 				features.privacy.transactionPrivacy.privacyPools,
 				ratePrivacyPoolsSupport,
 			),
+			maybeEvaluateTechnology(features.privacy.transactionPrivacy.railgun, rateRailgunSupport),
 		]) {
 			if (maybeEvaluation === null) {
 				continue

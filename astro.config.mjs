@@ -14,16 +14,19 @@ export default defineConfig({
 	base: process.env.BASE_URL ?? '/',
 	site: process.env.SITE_URL ?? 'https://wallet.page', // Set your production site URL here
 	output: 'static',
-	integrations: [
-		svelte(),
-		sitemap(),
-		shield({
-			sri: {
-				enableMiddleware: true,
-				hashesModule: modulePath,
-			},
-		}),
-	],
+	integrations: [svelte()].concat(
+		process.env.WALLETBEAT_DEV === 'true'
+			? []
+			: [
+					sitemap(),
+					shield({
+						sri: {
+							enableMiddleware: true,
+							hashesModule: modulePath,
+						},
+					}),
+				],
+	),
 	vite: {
 		build: {
 			// Improve chunking strategy

@@ -24,7 +24,6 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
-import { displaysFullTransactionDetails } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
@@ -380,6 +379,7 @@ export const rabby: SoftwareWallet = {
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
 				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,
@@ -635,9 +635,9 @@ export const rabby: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,
-				legibility: null,
 				messageSigningLegibility: null,
-				transactionDetailsDisplay: displaysFullTransactionDetails,
+				// transactionDetailsDisplay: displaysFullTransactionDetails,
+				transactionDetailsDisplay: null,
 			},
 		},
 		selfSovereignty: {

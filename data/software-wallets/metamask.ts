@@ -15,10 +15,7 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
-import {
-	DataDisplayOptions,
-	displaysFullCallData,
-} from '@/schema/features/security/transaction-legibility'
+import { displaysFullCallData } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
@@ -258,6 +255,7 @@ export const metamask: SoftwareWallet = {
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
 				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,
@@ -435,16 +433,16 @@ export const metamask: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,
-				legibility: null,
 				messageSigningLegibility: null,
-				transactionDetailsDisplay: {
-					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
-					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				},
+				// transactionDetailsDisplay: {
+				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// },
+				transactionDetailsDisplay: null,
 			},
 		},
 		selfSovereignty: {

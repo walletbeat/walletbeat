@@ -10,7 +10,6 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
-import { DataDisplayOptions } from '@/schema/features/security/transaction-legibility'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
@@ -102,6 +101,7 @@ export const frame: SoftwareWallet = {
 				[PrivateTransferTechnology.STEALTH_ADDRESSES]: notSupported,
 				[PrivateTransferTechnology.TORNADO_CASH_NOVA]: notSupported,
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
+				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
 		},
 		profile: WalletProfile.GENERIC,
@@ -138,16 +138,16 @@ export const frame: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: null,
-				legibility: null,
 				messageSigningLegibility: null,
-				transactionDetailsDisplay: {
-					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
-					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				},
+				transactionDetailsDisplay: null,
+				// transactionDetailsDisplay: {
+				// 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+				// 	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// 	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+				// },
 			},
 		},
 		selfSovereignty: {
