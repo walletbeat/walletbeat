@@ -17,7 +17,13 @@ import {
 	setItems,
 } from '@/types/utils/non-empty'
 
-import { expectArray, expectOptionalString, expectRecord, expectString } from './json-utils'
+import {
+	expectArray,
+	expectOptionalString,
+	expectRecord,
+	expectString,
+	isSameJson,
+} from './json-utils'
 import type { WalletRequest } from './wallet-capture-file'
 
 export interface EncodedWalletCaptureAnnotations {
@@ -352,7 +358,7 @@ export class WalletCaptureAnnotations {
 		if (fs.existsSync(this.path)) {
 			const existingContent = fs.readFileSync(this.path, 'utf8')
 
-			if (existingContent === content) {
+			if (isSameJson(existingContent, content)) {
 				needsWrite = false
 			}
 		}
@@ -361,7 +367,7 @@ export class WalletCaptureAnnotations {
 		const globalContent = JSON.stringify(this.toJSON(true), null, '\t') + '\n'
 		const existingGlobalContent = fs.readFileSync(this.globalPath, 'utf8')
 
-		if (existingGlobalContent !== globalContent) {
+		if (!isSameJson(existingGlobalContent, globalContent)) {
 			globalNeedsWrite = true
 		}
 
