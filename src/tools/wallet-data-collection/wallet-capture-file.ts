@@ -44,7 +44,14 @@ import {
 } from '@/types/utils/non-empty'
 import { Enum, excludeFromEnum, mergeEnums } from '@/utils/enum'
 
-import { expectArray, expectBoolean, expectNumber, expectRecord, expectString } from './json-utils'
+import {
+	expectArray,
+	expectBoolean,
+	expectNumber,
+	expectRecord,
+	expectString,
+	isSameJson,
+} from './json-utils'
 import type {
 	SaveOptions,
 	WalletCaptureAnnotations,
@@ -1933,7 +1940,7 @@ export class WalletCaptureFile {
 		if (fs.existsSync(this.path)) {
 			const existingContent = fs.readFileSync(this.path, 'utf8')
 
-			if (existingContent === content) {
+			if (isSameJson(existingContent, content)) {
 				needsWrite = false
 			}
 		}

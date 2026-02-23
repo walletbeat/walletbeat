@@ -49,3 +49,8 @@ export function expectBoolean(v: unknown, at: string): boolean {
 
 	return v
 }
+
+/** Returns whether two strings are JSON-equivalent. */
+export function isSameJson(obj1: string, obj2: string): boolean {
+	return JSON.stringify(JSON.parse(obj1)) === JSON.stringify(JSON.parse(obj2))
+}
