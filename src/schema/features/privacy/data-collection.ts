@@ -1,5 +1,7 @@
 import type { MustRef, WithRef } from '@/schema/reference'
+import { ethereumErc55Address } from '@/types/utils/ethereum-address'
 import {
+	assertNonEmptyArray,
 	type NonEmptyArray,
 	type NonEmptyRecord,
 	type NonEmptySet,
@@ -636,19 +638,46 @@ export function userInfoName(userInfo: UserInfo) {
 	}
 }
 
-// normalizeStrForUserInfo returns `str` and any applicable variant of it
-// that may make sense to match against.
-export function normalizeStrForUserInfo(str: string, userInfo: UserInfo): NonEmptySet<string> {
-	const variants = ((): NonEmptyArray<string> => {
+/** Normalize `str` as appropriate for `userInfo`. */
+export function normalizedStrForUserInfo(str: string, userInfo: UserInfo): string {
+	const normalize = (str: string): string => {
 		switch (userInfo) {
 			case WalletInfo.ACCOUNT_ADDRESS:
-				if (str.startsWith('0x')) {
-					return [str, str.substring(2)]
-				}
-
-				return [str]
+				return ethereumErc55Address(str)
 			case PersonalInfo.EMAIL:
-				if (str.includes('@')) {
+				return str.toLowerCase()
+			case PersonalInfo.X_DOT_COM_ACCOUNT:
+				return str.toLowerCase()
+			case PersonalInfo.FARCASTER_ACCOUNT:
+				return str.toLowerCase()
+			default:
+				return str
+		}
+	}
+	const normalized = normalize(str)
+	const renormalized = normalize(normalized)
+
+	if (normalized !== renormalized) {
+		throw new Error(`unstable normalization: ${str} => ${normalized} => ${renormalized}`)
+	}
+
+	return renormalized
+}
+
+// variationsOnStrForUserInfo returns `str` and any applicable variant of it
+// that may make sense to match against.
+export function variationsOnStrForUserInfo(str: string, userInfo: UserInfo): NonEmptySet<string> {
+	const normalizedStr = normalizedStrForUserInfo(str, userInfo)
+	const variants = (str: string): NonEmptyArray<string> => {
+		switch (userInfo) {
+			case WalletInfo.ACCOUNT_ADDRESS:
+				return [
+					ethereumErc55Address(str),
+					ethereumErc55Address(str).toLowerCase(),
+					ethereumErc55Address(str).toUpperCase(),
+				]
+			case PersonalInfo.EMAIL:
+				if (normalizedStr.includes('@')) {
 					return [str, str.substring(0, str.indexOf('@'))]
 				}
 
@@ -668,9 +697,11 @@ export function normalizeStrForUserInfo(str: string, userInfo: UserInfo): NonEmp
 			default:
 				return [str]
 		}
-	})()
+	}
 
-	return nonEmptySetFromArray(variants)
+	return nonEmptySetFromArray(
+		assertNonEmptyArray([str, normalizedStr].concat(variants(str)).concat(variants(normalizedStr))),
+	)
 }
 
 // hintForUserInfo returns a hint about `str`, given that it is the user's `userInfo`.
