@@ -1,0 +1,81 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.24;
+
+import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+
+
+/**
+ * @title WalletbeatTestErc1155
+ * @author Walletbeat
+ * @notice A test ERC1155 token used to evaluate how wallets simulate and display NFT transactions
+ * @dev This token is soulbound and can only be minted or burned. Transfers between non-zero addresses revert.
+ */
+contract WalletbeatTestErc1155 is ERC1155 {
+    error WalletbeatTestErc1155__Soulbound();
+    error WalletbeatTestErc1155__URI_QueryFor_NonExistentToken();
+
+    uint256 private s_tokenId;
+    string private s_name;
+
+    constructor(string memory _uri, string memory name) ERC1155(_uri) {
+        s_name = name;
+    }
+
+    /**
+     * @notice Mints a variable number of NFTs to the specified receiver
+     * @dev The amount minted is determined by `1 + (block.number % 4)` to introduce
+     * unpredictability in transaction simulations.
+     * Anyone can mint to any address.
+     * @param receiver The address to receive the minted NFTs
+     */
+    function mint(address receiver) external {
+        uint256 tokensToMint = 1 + (block.number % 4);
+        for (uint256 i = 0; i < tokensToMint; i++) {
+            s_tokenId++;
+            super._mint(receiver, s_tokenId);
+        }
+    }
+
+    /**
+     * @notice Enforces soulbound behavior by preventing token transfers
+     * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
+     * on any other transfer attempt.
+     */
+    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize)
+        internal
+        virtual
+        override
+    {
+        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
+
+        if (from == address(0) || to == address(0)) {
+            return;
+        }
+
+        revert WalletbeatTestErc1155__Soulbound();
+    }
+    function _baseURI() internal pure returns (string memory) {
+        return "data:application/json;base64,";
+    }
+
+    function uri(uint256 tokenId) public view virtual override returns (string memory) {
+        return string(
+            abi.encodePacked(
+                _baseURI(),
+                Base64.encode(
+                    bytes(
+                        abi.encodePacked(
+                            '{"name":"',
+                            s_name,
+                            '", "description":"A test ERC1155 token used solely for testing.", ',
+                            '"attributes": [{"trait_type": "purpose", "value": "testing"}], "image":"',
+                            super.uri(tokenId),
+                            '"}'
+                        )
+                    )
+                )
+            )
+        );
+    }
+}
