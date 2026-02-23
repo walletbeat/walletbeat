@@ -4,6 +4,7 @@ pragma solidity 0.8.24;
 import {WalletbeatTestContract} from "src/WalletbeatTestContract.sol";
 import {WalletbeatTestErc20} from "src/WalletbeatTestErc20.sol";
 import {WalletbeatTestErc721} from "src/WalletbeatTestErc721.sol";
+import {WalletbeatTestErc1155} from "src/WalletbeatTestErc1155.sol";
 import {DeployContract} from "script/DeployContract.s.sol";
 import {Test, console} from "lib/forge-std/src/Test.sol";
 
@@ -18,6 +19,7 @@ contract WalletbeatUnitTests is Test {
     WalletbeatTestContract tc;
     WalletbeatTestErc20 erc20;
     WalletbeatTestErc721 erc721;
+    WalletbeatTestErc1155 erc1155;
     address tester;
     address tester2;
     address recipient;
@@ -31,7 +33,7 @@ contract WalletbeatUnitTests is Test {
         recipient = makeAddr("recipient");
         attacker = makeAddr("attacker");
         deployer = new DeployContract();
-        (tc, erc20, erc721) = deployer.run();
+        (tc, erc20, erc721, erc1155) = deployer.run();
     }
 
     /*´:°•.°+.*•´.*:˚.°*.˚•´.°:°•.°•.*•´.*:˚.°*.˚•´.°:°•.°+.*•´.*:´:°•.°*/
@@ -66,7 +68,7 @@ contract WalletbeatUnitTests is Test {
         vm.prank(tester);
         tc.simulateFunctionV1();
 
-        uint256 expectedAmount = 1 + (10 % 100);
+        uint256 expectedAmount = (1 + (10 % 100)) * 1e18;
         assertEq(erc20.balanceOf(tester), expectedAmount);
     }
 
@@ -86,13 +88,13 @@ contract WalletbeatUnitTests is Test {
         vm.prank(tester);
         tc.simulateFunctionV1();
         uint256 balance1 = erc20.balanceOf(tester);
-        assertEq(balance1, 1 + (50 % 100));
+        assertEq(balance1, (1 + (50 % 100)) * 1e18);
 
         vm.roll(75);
         vm.prank(tester2);
         tc.simulateFunctionV1();
         uint256 balance2 = erc20.balanceOf(tester2);
-        assertEq(balance2, 1 + (75 % 100));
+        assertEq(balance2, (1 + (75 % 100)) * 1e18);
 
         assertTrue(balance1 != balance2);
     }
@@ -101,12 +103,12 @@ contract WalletbeatUnitTests is Test {
         vm.roll(10);
         vm.prank(tester);
         tc.simulateFunctionV1();
-        uint256 firstMint = 1 + (10 % 100);
+        uint256 firstMint = (1 + (10 % 100)) * 1e18;
 
         vm.roll(20);
         vm.prank(tester);
         tc.simulateFunctionV1();
-        uint256 secondMint = 1 + (20 % 100);
+        uint256 secondMint = (1 + (20 % 100)) * 1e18;
 
         assertEq(erc20.balanceOf(tester), firstMint + secondMint);
     }
@@ -153,7 +155,7 @@ contract WalletbeatUnitTests is Test {
         vm.prank(tester);
         tc.simulateFunctionV2();
 
-        uint256 expectedAmount = 1 + (10 % 100);
+        uint256 expectedAmount = (1 + (10 % 100)) * 1e18;
         assertEq(erc20.balanceOf(tester), expectedAmount);
     }
 
@@ -235,7 +237,7 @@ contract WalletbeatUnitTests is Test {
         vm.prank(tester);
         tc.transfer(recipient, 100);
 
-        uint256 expectedAmount = 1 + (10 % 100);
+        uint256 expectedAmount = (1 + (10 % 100)) * 1e18;
         assertEq(erc20.balanceOf(tester), expectedAmount);
         assertEq(erc20.balanceOf(recipient), 0);
     }
@@ -299,7 +301,7 @@ contract WalletbeatUnitTests is Test {
         vm.prank(tester);
         tc.simulateFunctionV1();
 
-        uint256 expectedAmount = 1 + (10 % 100);
+        uint256 expectedAmount = (1 + (10 % 100)) * 1e18;
         assertEq(erc20.totalSupply(), expectedAmount);
     }
 

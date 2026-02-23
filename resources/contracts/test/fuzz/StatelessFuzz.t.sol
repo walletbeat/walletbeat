@@ -4,6 +4,7 @@ pragma solidity 0.8.24;
 import {WalletbeatTestContract} from "src/WalletbeatTestContract.sol";
 import {WalletbeatTestErc20} from "src/WalletbeatTestErc20.sol";
 import {WalletbeatTestErc721} from "src/WalletbeatTestErc721.sol";
+import {WalletbeatTestErc1155} from "src/WalletbeatTestErc1155.sol";
 import {DeployContract} from "script/DeployContract.s.sol";
 import {Test, console} from "lib/forge-std/src/Test.sol";
 
@@ -12,10 +13,11 @@ contract StatelessFuzz is Test {
     WalletbeatTestContract tc;
     WalletbeatTestErc20 erc20;
     WalletbeatTestErc721 erc721;
+    WalletbeatTestErc1155 erc1155;
 
     function setUp() external {
         deployer = new DeployContract();
-        (tc, erc20, erc721) = deployer.run();
+        (tc, erc20, erc721, erc1155) = deployer.run();
     }
 
     function testFuzzSimulateFunctionV1MintsCorrectErc20Amount(uint256 blockNum) external {
@@ -26,7 +28,7 @@ contract StatelessFuzz is Test {
         vm.prank(user);
         tc.simulateFunctionV1();
 
-        uint256 expectedAmount = 1 + (blockNum % 100);
+        uint256 expectedAmount = (1 + (blockNum % 100)) * 1e18;
         assertEq(erc20.balanceOf(user), expectedAmount);
     }
 

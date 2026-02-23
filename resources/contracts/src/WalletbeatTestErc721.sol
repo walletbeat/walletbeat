@@ -37,6 +37,17 @@ contract WalletbeatTestErc721 is ERC721 {
     }
 
     /**
+     * @notice Mints a single NFT to the msg.sender
+     * @dev Unlike `mint(address receiver)`, this function intentionally mints exactly one token
+     * to msg.sender.
+     * Suitable for testing ERC721 transfers
+     */
+    function mintOne() external {
+        s_tokenId++;
+        super._mint(msg.sender, s_tokenId);
+    }
+
+    /**
      * @notice Enforces soulbound behavior by preventing token transfers
      * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
      * on any other transfer attempt.
