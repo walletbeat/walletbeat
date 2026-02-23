@@ -194,7 +194,18 @@ export const metamask: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
-			delegation: null,
+			delegation: {
+				duringEOACreation: 'NO',
+				duringEOAImport: 'NO',
+				duringFirst7702Operation: supported({
+					type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS',
+					nonDelegationTransactionDetailsIdenticalToNormalFlow: true,
+				}),
+				fee: {
+					crossChainGas: notSupported,
+					walletSponsored: notSupported,
+				},
+			},
 		},
 		integration: {
 			browser: {
