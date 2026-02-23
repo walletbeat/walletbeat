@@ -12,15 +12,18 @@ contract WalletbeatTestContract {
 
     error WalletbeatTestContract__ERC20CallFailed();
     error WalletbeatTestContract__ERC721CallFailed();
+    error WalletbeatTestContract__ERC1155CallFailed();
     error WalletbeatTestContract__AlwaysFails();
 
     uint256 public constant FAKE_TOKENS_TO_CLAIM = 1e18;
     address private immutable i_erc20Token;
     address private immutable i_erc721Token;
+    address private immutable i_erc1155Token;
 
-    constructor(address erc20, address erc721) {
+    constructor(address erc20, address erc721, address erc1155) {
         i_erc20Token = erc20;
         i_erc721Token = erc721;
+        i_erc1155Token = erc1155;
     }
 
     /**
@@ -35,6 +38,10 @@ contract WalletbeatTestContract {
         (success,) = i_erc721Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
         if (!success) {
             revert WalletbeatTestContract__ERC721CallFailed();
+        }
+        (success,) = i_erc1155Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
+        if (!success) {
+            revert WalletbeatTestContract__ERC1155CallFailed();
         }
     }
 
@@ -66,6 +73,10 @@ contract WalletbeatTestContract {
         (success,) = i_erc721Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
         if (!success) {
             revert WalletbeatTestContract__ERC721CallFailed();
+        }
+        (success,) = i_erc1155Token.call(abi.encodeWithSignature("mint(address)", msg.sender));
+        if (!success) {
+            revert WalletbeatTestContract__ERC1155CallFailed();
         }
         emit Transfer(msg.sender, to, amount);
     }
