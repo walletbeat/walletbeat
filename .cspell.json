@@ -350,6 +350,7 @@
 	"flagWords": [],
 	"ignorePaths": [
 		"**/*.css",
+		"data/collection/global.annotations.json",
 		"data/entities/domains/entity-domains.json",
 		"data/*-wallets/collection/*/*.json",
 		"dist/**",
