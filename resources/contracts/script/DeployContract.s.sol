@@ -27,7 +27,7 @@ contract DeployContract is Script {
         WalletbeatTestErc1155 erc1155Contract = new WalletbeatTestErc1155(imageUri, erc1155TokenName);
         WalletbeatTestErc721 erc721Contract = new WalletbeatTestErc721(erc721TokenName, tokenSymbol, imageUri);
         WalletbeatTestContract testContract =
-            new WalletbeatTestContract(address(erc20Contract), address(erc721Contract));
+            new WalletbeatTestContract(address(erc20Contract), address(erc721Contract), address(erc1155Contract));
         vm.stopBroadcast();
 
         return (testContract, erc20Contract, erc721Contract, erc1155Contract);

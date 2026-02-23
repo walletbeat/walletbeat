@@ -349,7 +349,7 @@ contract WalletbeatUnitTests is Test {
 
     function testSimulateV1RevertsWhenErc20CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721), address(erc1155));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
@@ -358,16 +358,25 @@ contract WalletbeatUnitTests is Test {
 
     function testSimulateV1RevertsWhenErc721CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc = new WalletbeatTestContract(address(erc20), address(badTarget));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(erc20), address(badTarget), address(erc1155));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC721CallFailed.selector);
         badTc.simulateFunctionV1();
     }
 
+    function testSimulateV1RevertsWhenErc1155CallFails() external {
+        AlwaysReverts badTarget = new AlwaysReverts();
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(erc20), address(erc721), address(badTarget));
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC1155CallFailed.selector);
+        badTc.simulateFunctionV1();
+    }
+
     function testTransferRevertsWhenErc20CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721), address(erc1155));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
@@ -376,16 +385,25 @@ contract WalletbeatUnitTests is Test {
 
     function testTransferRevertsWhenErc721CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc = new WalletbeatTestContract(address(erc20), address(badTarget));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(erc20), address(badTarget), address(erc1155));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC721CallFailed.selector);
         badTc.transfer(recipient, 100);
     }
 
+    function testTransferRevertsWhenErc1155CallFails() external {
+        AlwaysReverts badTarget = new AlwaysReverts();
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(erc20), address(erc721), address(badTarget));
+
+        vm.prank(tester);
+        vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC1155CallFailed.selector);
+        badTc.transfer(recipient, 100);
+    }
+
     function testClaimRevertsWhenErc20CallFails() external {
         AlwaysReverts badTarget = new AlwaysReverts();
-        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721));
+        WalletbeatTestContract badTc = new WalletbeatTestContract(address(badTarget), address(erc721), address(erc1155));
 
         vm.prank(tester);
         vm.expectRevert(WalletbeatTestContract.WalletbeatTestContract__ERC20CallFailed.selector);
