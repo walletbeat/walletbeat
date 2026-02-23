@@ -6,6 +6,11 @@ import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
 import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
+import {
 	HardwareWalletConnection,
 	HardwareWalletType,
 	type SupportedHardwareWallet,
@@ -44,6 +49,7 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { mdParagraph, paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 import { alphabet } from '../entities/alphabet'
 import { apple } from '../entities/apple'
@@ -336,7 +342,34 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 			},
-			bugBountyProgram: null,
+			bugBountyProgram: supported({
+				ref: [
+					{
+						explanation:
+							'Metamask works with an active community of security researchers through their Bug Bounty Program to continually improve their security.',
+						url: 'https://metamask.io/security/metamask-security-program',
+					},
+				],
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE' as const,
+				dateStarted: '2022-06-01' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: {
+						explanation:
+							'Metamask waives any relevant restriction in our Terms of Service ("TOS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here..',
+						url: 'https://hackerone.com/metamask/safe_harbor',
+					},
+				}),
+				platform: BugBountyPlatform.HACKER_ONE,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 1000000,
+					minimum: 250,
+				}),
+				upgradePathAvailable: true,
+			}),
 			hardwareWalletSupport: {
 				ref: [
 					{
