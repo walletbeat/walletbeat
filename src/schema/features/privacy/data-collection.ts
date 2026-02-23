@@ -801,8 +801,14 @@ export enum DataCollectionPurpose {
 	/** Simulating transaction outcome. */
 	TRANSACTION_SIMULATION = 'TRANSACTION_SIMULATION',
 
-	/** Getting a quote for a swap operation. */
+	/** Getting the present price of gas on the chain. */
+	GAS_QUOTE = 'GAS_QUOTE',
+
+	/** Getting a quote for a swap or bridge operation. */
 	SWAP_QUOTE = 'SWAP_QUOTE',
+
+	/** Looking up a token's price for display in a portfolio view. */
+	TOKEN_PRICE_LOOKUP = 'TOKEN_PRICE_LOOKUP',
 
 	/** Checking for scams. */
 	SCAM_DETECTION = 'SCAM_DETECTION',
@@ -830,7 +836,9 @@ export const dataCollectionPurpose = new Enum<DataCollectionPurpose>({
 	[DataCollectionPurpose.SWAP_QUOTE]: true,
 	[DataCollectionPurpose.EXTERNAL_ACCOUNT_LINKING]: true,
 	[DataCollectionPurpose.TRANSACTION_SIMULATION]: true,
+	[DataCollectionPurpose.GAS_QUOTE]: true,
 	[DataCollectionPurpose.CHAIN_DATA_LOOKUP]: true,
+	[DataCollectionPurpose.TOKEN_PRICE_LOOKUP]: true,
 	[DataCollectionPurpose.TRANSACTION_BROADCAST]: true,
 	[DataCollectionPurpose.SCAM_DETECTION]: true,
 	[DataCollectionPurpose.UPDATE_CHECKING]: true,
@@ -862,10 +870,14 @@ export function dataCollectionPurposeToText(dataCollectionPurpose: DataCollectio
 			return 'Static assets'
 		case DataCollectionPurpose.SWAP_QUOTE:
 			return 'Swap quote'
+		case DataCollectionPurpose.TOKEN_PRICE_LOOKUP:
+			return 'Token price lookup'
 		case DataCollectionPurpose.TRANSACTION_BROADCAST:
 			return 'Transaction broadcasting'
 		case DataCollectionPurpose.TRANSACTION_SIMULATION:
 			return 'Transaction simulation'
+		case DataCollectionPurpose.GAS_QUOTE:
+			return 'Gas price lookup'
 		case DataCollectionPurpose.UPDATE_CHECKING:
 			return 'Checking for updates'
 	}
