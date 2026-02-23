@@ -382,10 +382,17 @@ function parseRedactedDataJSON(v: unknown, at: string): EncodedRedactedData {
 		hint = expectString(obj.hint, `${at}.hint`)
 	}
 
+	let origHash: string | undefined
+
+	if (obj.origHash !== undefined) {
+		origHash = expectString(obj.origHash, `${at}.origHash`)
+	}
+
 	const result = {
 		labelPrefix,
 		labelIndex,
 		hash,
+		...(origHash ? { origHash } : {}),
 		length,
 		firstChar,
 		...(piece ? { piece } : {}),

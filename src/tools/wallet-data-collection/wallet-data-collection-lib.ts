@@ -26,7 +26,7 @@ import {
 import { type Variant, variantEnum } from '@/schema/variants'
 import { WalletType, walletTypes } from '@/schema/wallet-types'
 import { getErrorMessage } from '@/types/errors'
-import { assertErc55Address, type Erc55Address } from '@/types/utils/ethereum-address'
+import { type Erc55Address, ethereumErc55Address } from '@/types/utils/ethereum-address'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
@@ -177,7 +177,7 @@ function stringListOption(x: unknown): NonEmptyArray<string> {
 }
 
 function walletAddressesSet(x: unknown): NonEmptySet<Erc55Address> {
-	const set = nonEmptySetFromArray(nonEmptyMap(stringListOption(x), assertErc55Address))
+	const set = nonEmptySetFromArray(nonEmptyMap(stringListOption(x), ethereumErc55Address))
 
 	if (setItems(set).length < 4) {
 		throw new Error(
@@ -686,7 +686,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 				`⚠️ Done with flow: ${opts.flow}. ⚠️ Nothing recorded.`,
 				'  ➡️ If you forgot to actually run the flow, simply re-run the previous command and do it.',
 				`  ➡️ Otherwise, move on to the next flow: ${nextFlow}.`,
-				`    ⚙️ ${getCommandPrefix(opts)} capture --flow=${nextFlow}${captureOptions.length === 0 ? '' : ' ' + captureOptions.join(' ')}`,
+				`    ⚙️ ${getCommandPrefix(opts)} capture${captureOptions.length === 0 ? '' : ' ' + captureOptions.join(' ')} --flow=${nextFlow}`,
 			)
 		} else if (sessionsDiff.size > 1) {
 			throw new Error(
