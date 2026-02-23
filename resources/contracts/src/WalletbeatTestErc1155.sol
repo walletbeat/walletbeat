@@ -4,7 +4,6 @@ pragma solidity 0.8.24;
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
-
 /**
  * @title WalletbeatTestErc1155
  * @author Walletbeat
@@ -18,7 +17,7 @@ contract WalletbeatTestErc1155 is ERC1155 {
     uint256 private s_tokenId;
     string private s_name;
 
-    constructor(string memory _uri, string memory name) ERC1155(_uri) {
+    constructor(string memory imageUri, string memory name) ERC1155(imageUri) {
         s_name = name;
     }
 
@@ -58,6 +57,7 @@ contract WalletbeatTestErc1155 is ERC1155 {
 
         revert WalletbeatTestErc1155__Soulbound();
     }
+
     function _baseURI() internal pure returns (string memory) {
         return "data:application/json;base64,";
     }

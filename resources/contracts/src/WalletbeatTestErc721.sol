@@ -4,7 +4,6 @@ pragma solidity 0.8.24;
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 
-
 /**
  * @title WalletbeatTestErc721
  * @author Walletbeat
@@ -55,6 +54,7 @@ contract WalletbeatTestErc721 is ERC721 {
 
         revert WalletbeatTestErc721__Soulbound();
     }
+
     function _baseURI() internal pure override returns (string memory) {
         return "data:application/json;base64,";
     }
