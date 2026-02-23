@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto'
 
 import fs from 'fs'
+import path from 'path'
 
 import { assertValidEntityId, type EntityId } from '@/data/entities'
 import { entityForDomain } from '@/data/entities/domains/entity-domains'
@@ -1903,6 +1904,7 @@ export class WalletCaptureFile {
 		} else if (needsWrite) {
 			const tmpPath = this.path + '.tmp'
 
+			await fs.promises.mkdir(path.dirname(tmpPath), { recursive: true })
 			await fs.promises.writeFile(tmpPath, content, 'utf8')
 			await fs.promises.rename(tmpPath, this.path)
 			changed.push(this.path)
