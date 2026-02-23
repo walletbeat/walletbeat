@@ -26,9 +26,11 @@ import {
 import { type Variant, variantEnum } from '@/schema/variants'
 import { WalletType, walletTypes } from '@/schema/wallet-types'
 import { getErrorMessage } from '@/types/errors'
+import { assertErc55Address, type Erc55Address } from '@/types/utils/ethereum-address'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
+	nonEmptyMap,
 	type NonEmptySet,
 	nonEmptySet,
 	nonEmptySetFromArray,
@@ -66,7 +68,7 @@ export function flowInstructions(flow: RecordedFlow): string {
 		case UserFlow.ONBOARDING_NEW:
 			return 'Create two new user accounts in the wallet.'
 		case UserFlow.ONBOARDING_IMPORT:
-			return 'Reinstall the wallet, then import two user accounts into the wallet, one of which must already have some Ether and USDC.'
+			return 'Import two user accounts into the wallet, one of which must already have some Ether and USDC.'
 		case UserFlow.SEND_ETHER:
 			return 'Send Ether from one account to the other.'
 		case UserFlow.SEND_USDC:
@@ -172,6 +174,18 @@ function stringListOption(x: unknown): NonEmptyArray<string> {
 	}
 
 	return split
+}
+
+function walletAddressesSet(x: unknown): NonEmptySet<Erc55Address> {
+	const set = nonEmptySetFromArray(nonEmptyMap(stringListOption(x), assertErc55Address))
+
+	if (setItems(set).length < 4) {
+		throw new Error(
+			'Wallet addresses list must contain at least 4 addresses (2 that you created using the wallet onboarding + 2 that you are importing)',
+		)
+	}
+
+	return set
 }
 
 function booleanOption(x: unknown): boolean {
@@ -392,14 +406,14 @@ export function getCommandPrefix(opts: GlobalOptions): string {
 
 export interface CaptureOptions extends GlobalOptions {
 	flow: RecordedFlow
-	walletAddresses: NonEmptyArray<string> | null
+	walletAddresses: NonEmptySet<Erc55Address> | null
 	port: number
 }
 
 export const captureOptions = new Options<CaptureOptions>(
 	{
 		flow: enumOption(recordedFlow),
-		walletAddresses: optionalOption(stringListOption),
+		walletAddresses: optionalOption(walletAddressesSet),
 		port: numberOption,
 	},
 	globalOptions,
@@ -609,13 +623,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 	} else {
 		const walletRedactionFile = await openCaptureFile(opts)
 
-		for (let walletAddr of opts.walletAddresses) {
-			walletAddr = walletAddr.trim()
-
-			if (walletAddr === '') {
-				continue
-			}
-
+		for (const walletAddr of setItems(opts.walletAddresses)) {
 			walletRedactionFile.redactor.mark({
 				realStr: walletAddr,
 				pieces: nonEmptySet(WalletInfo.ACCOUNT_ADDRESS),
@@ -659,11 +667,14 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 		}
 
 		if (opts.walletAddresses !== null) {
-			captureOptions.push(`--wallet-addresses=${opts.walletAddresses.join(',')}`)
+			captureOptions.push(`--wallet-addresses=${setItems(opts.walletAddresses).join(',')}`)
 		} else if (!setContains(flowsNotRequiringWalletAddress, nextFlow)) {
-			captureOptions.push('--wallet-addresses=0x123...,0x456...')
+			captureOptions.push('--wallet-addresses=0x123...,0x456...,0x789...,0xabc...')
 			extraInstructions.push(
-				'(Make sure these wallet addresses are pre-funded with Ether and USDC!)',
+				'(You must supply at least 4 addresses: Two that you created using the wallet itself, and two that you are importing into the wallet.)',
+			)
+			extraInstructions.push(
+				'(Make sure the two wallet addresses you import into the wallet are pre-funded with Ether and USDC!)',
 			)
 		}
 
@@ -888,7 +899,9 @@ export async function handleMarkString(opts: MarkStringOptions): Promise<void> {
 	})
 
 	await capture.save(getSaveOptions(opts))
-	log(`✅ Marked string as ${setItems(opts.data).join(', ')}. All instances redacted.`)
+	log(
+		`✅ Marked string "${opts.string}" as ${setItems(opts.data).join(', ')}. All instances redacted.`,
+	)
 }
 
 function displayRequestInfo(request: WalletRequest): void {
