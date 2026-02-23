@@ -116,7 +116,17 @@ describe('wallets', () => {
 					)
 					const walletId = assertValidWalletName(wallet.metadata.id)
 					const annotationsPath = path.join(collectionDir, `${wallet.metadata.id}.annotations.json`)
-					const annotations = WalletCaptureAnnotations.fromFile(walletId, annotationsPath)
+					const globalAnnotationsPath = path.join(
+						getRepositoryRoot(),
+						'data',
+						'collection',
+						'global.annotations.json',
+					)
+					const annotations = WalletCaptureAnnotations.fromFile(
+						walletId,
+						annotationsPath,
+						globalAnnotationsPath,
+					)
 					const files = fs.readdirSync(collectionDir)
 					const captureFiles = files.filter(f => f.endsWith('.capture.json'))
 
