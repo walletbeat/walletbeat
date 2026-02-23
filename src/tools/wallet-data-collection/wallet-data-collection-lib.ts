@@ -197,11 +197,19 @@ function numberOption(x: unknown): number {
 		throw new Error('flag not specified')
 	}
 
-	if (typeof x !== 'number') {
-		throw new Error('not a number')
+	if (typeof x === 'number') {
+		return x
 	}
 
-	return x
+	if (typeof x === 'string' && x.trim() !== '') {
+		const n = Number(x)
+
+		if (Number.isFinite(n)) {
+			return n
+		}
+	}
+
+	throw new Error('not a number')
 }
 
 function enumOption<E extends string>(e: Enum<E>): Option<E> {
@@ -501,7 +509,15 @@ function annotationsPath(options: GlobalOptions): string {
 
 function openCaptureFile(options: GlobalOptions): WalletCaptureFile {
 	const annotations = WalletCaptureAnnotations.fromFile(options.id, annotationsPath(options))
-	const captureFile = WalletCaptureFile.fromFile(capturePath(options), annotations)
+	const captureFile = WalletCaptureFile.fromFile(
+		{
+			walletId: options.id,
+			walletType: options.type,
+			walletVariant: options.variant,
+		},
+		capturePath(options),
+		annotations,
+	)
 
 	return captureFile
 }
@@ -580,6 +596,7 @@ export async function handleCapture(opts: CaptureOptions): Promise<void> {
 		'--mode=regular',
 		'--set=upstream_cert=false',
 		'--set=http2=false',
+		`--set=wallet_type=${opts.type.toLowerCase()}`,
 		`--set=wallet_id=${opts.id}`,
 		`--set=wallet_variant=${opts.variant}`,
 		`--set=ux_flow=${opts.flow}`,
@@ -1240,11 +1257,11 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 			if (collectionPolicyFromManualReview) {
 				log(
-					`     From matcher: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
+					`    Classified as: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
 				)
 			} else {
 				log(
-					`    Classified as: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
+					`     From matcher: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
 				)
 			}
 
@@ -1362,7 +1379,7 @@ export async function handleLintFix(): Promise<void> {
 				}
 
 				const capturePath = path.join(walletDir, filename)
-				const captureFile = WalletCaptureFile.fromFile(capturePath, annotations)
+				const captureFile = WalletCaptureFile.fromFile(null, capturePath, annotations)
 
 				const saveOptions: SaveOptions = {
 					verifyExisting: false,

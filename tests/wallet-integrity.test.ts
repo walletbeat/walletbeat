@@ -6,11 +6,10 @@ import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
 import type { BaseWallet } from '@/schema/wallet'
-import { WalletType, walletTypesOf } from '@/schema/wallet-types'
+import { WalletType } from '@/schema/wallet-types'
 import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
 import { WalletCaptureFile } from '@/tools/wallet-data-collection/wallet-capture-file'
 import { getErrorMessage } from '@/types/errors'
-import { setItems } from '@/types/utils/non-empty'
 
 import { getRepositoryRoot } from './utils/codebase'
 
@@ -123,12 +122,12 @@ describe('wallets', () => {
 
 					for (const captureFile of captureFiles) {
 						const capturePath = path.join(collectionDir, captureFile)
-						const captureFileObj = WalletCaptureFile.fromFile(capturePath, annotations)
+						const captureFileObj = WalletCaptureFile.fromFile(null, capturePath, annotations)
 						const issues = captureFileObj.check()
 
 						if (issues.length > 0) {
 							throw new Error(
-								`Found unaddressed issues in data collection info for wallet ${walletId}; please run the 'check' command to investigate this:\n  $ pnpm wallet-data-collection --id='${walletId}' --type='${setItems(walletTypesOf(wallet)).toSorted().join('|')}' --variant='${Object.keys(wallet.variants).toSorted().join('|')}' check`,
+								`Found unaddressed issues in data collection info for wallet ${walletId}; please run the 'check' command to investigate this:\n  $ pnpm wallet-data-collection --id='${captureFileObj.identity.walletId}' --type='${captureFileObj.identity.walletType}' --variant='${captureFileObj.identity.walletVariant}' check`,
 							)
 						}
 
