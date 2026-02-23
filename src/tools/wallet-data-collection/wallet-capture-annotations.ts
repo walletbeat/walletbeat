@@ -80,22 +80,28 @@ export class WalletRequestMatcher {
 	private readonly domain: string
 	private readonly path: string | null
 	private readonly method: string | null
+	public readonly isGlobal: boolean
 	public readonly purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
 	public readonly policy: CollectionPolicy | null
 
-	constructor({
-		domain,
-		path,
-		method,
-		purposes,
-		policy,
-	}: {
-		domain: string
-		path: string | null
-		method: string | null
-		purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
-		policy: CollectionPolicy | null
-	}) {
+	constructor(
+		{
+			domain,
+			path,
+			method,
+			purposes,
+			policy,
+		}: {
+			domain: string
+			path: string | null
+			method: string | null
+			purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
+			policy: CollectionPolicy | null
+		},
+		isGlobal: boolean,
+	) {
+		this.isGlobal = isGlobal
+
 		if (domain.trim() === '') {
 			throw new Error('domain cannot be empty')
 		}
@@ -166,9 +172,14 @@ export class WalletRequestMatcher {
 export class WalletCaptureAnnotations {
 	private readonly walletId: string
 	private readonly path: string | null
+	private readonly globalPath: string | null
 	private matchers: WalletRequestMatcher[]
 
-	public static fromFile(walletId: string, pathStr: string): WalletCaptureAnnotations {
+	public static fromFile(
+		walletId: string,
+		pathStr: string,
+		globalPath: string,
+	): WalletCaptureAnnotations {
 		let data: EncodedWalletCaptureAnnotations = { matchers: [] }
 
 		if (fs.existsSync(pathStr)) {
@@ -181,36 +192,54 @@ export class WalletCaptureAnnotations {
 			}
 		}
 
-		return new WalletCaptureAnnotations(walletId, pathStr, data)
+		const globalRaw = fs.readFileSync(globalPath, 'utf8').trim()
+		const global = WalletCaptureAnnotations.parseEncoded(JSON.parse(globalRaw), 'global$')
+
+		return new WalletCaptureAnnotations(walletId, pathStr, globalPath, data, global)
 	}
 
-	public static fromData(walletId: string, data: unknown): WalletCaptureAnnotations {
+	public static fromData(
+		walletId: string,
+		data: unknown,
+		globalData: unknown,
+	): WalletCaptureAnnotations {
 		const parsed = WalletCaptureAnnotations.parseEncoded(data, '$')
+		const global = WalletCaptureAnnotations.parseEncoded(globalData, '$')
 
-		return new WalletCaptureAnnotations(walletId, null, parsed)
+		return new WalletCaptureAnnotations(walletId, null, null, parsed, global)
 	}
 
 	private constructor(
 		walletId: string,
 		pathStr: string | null,
+		globalPath: string | null,
 		data: EncodedWalletCaptureAnnotations,
+		global: EncodedWalletCaptureAnnotations,
 	) {
+		const toMatcher = (m: EncodedWalletRequestMatcher, isGlobal: boolean): WalletRequestMatcher => {
+			return new WalletRequestMatcher(
+				{
+					domain: m.domain,
+					path: m.path ?? null,
+					method: m.method ?? null,
+					purposes:
+						m.purposes === undefined
+							? null
+							: m.purposes === 'NOT_WALLET_INITIATED'
+								? 'NOT_WALLET_INITIATED'
+								: nonEmptySetFromArray(m.purposes),
+					policy: m.policy ?? null,
+				},
+				isGlobal,
+			)
+		}
+
 		this.walletId = walletId
+		this.globalPath = globalPath
 		this.path = pathStr
-		this.matchers = data.matchers.map(m => {
-			return new WalletRequestMatcher({
-				domain: m.domain,
-				path: m.path ?? null,
-				method: m.method ?? null,
-				purposes:
-					m.purposes === undefined
-						? null
-						: m.purposes === 'NOT_WALLET_INITIATED'
-							? 'NOT_WALLET_INITIATED'
-							: nonEmptySetFromArray(m.purposes),
-				policy: m.policy ?? null,
-			})
-		})
+		this.matchers = global.matchers
+			.map(m => toMatcher(m, true))
+			.concat(data.matchers.map(m => toMatcher(m, false)))
 	}
 
 	private static parseEncoded(v: unknown, at: string): EncodedWalletCaptureAnnotations {
@@ -268,9 +297,9 @@ export class WalletCaptureAnnotations {
 		return { matchers }
 	}
 
-	private toJSON(): EncodedWalletCaptureAnnotations {
+	private toJSON(global: boolean): EncodedWalletCaptureAnnotations {
 		return {
-			matchers: this.matchers.map(m => m.toJSON()),
+			matchers: this.matchers.filter(m => m.isGlobal === global).map(m => m.toJSON()),
 		}
 	}
 
@@ -307,7 +336,7 @@ export class WalletCaptureAnnotations {
 	}
 
 	public async save(opts: SaveOptions): Promise<string[]> {
-		if (this.path === null) {
+		if (this.path === null || this.globalPath === null) {
 			throw new Error('WalletCaptureAnnotations built without a path; cannot save.')
 		}
 
@@ -315,7 +344,7 @@ export class WalletCaptureAnnotations {
 
 		await fs.promises.mkdir(dir, { recursive: true })
 
-		const content = JSON.stringify(this.toJSON(), null, '\t') + '\n'
+		const content = JSON.stringify(this.toJSON(false), null, '\t') + '\n'
 
 		// Check if content differs from what's on disk
 		let needsWrite = true
@@ -328,18 +357,40 @@ export class WalletCaptureAnnotations {
 			}
 		}
 
+		let globalNeedsWrite = false
+		const globalContent = JSON.stringify(this.toJSON(true), null, '\t') + '\n'
+		const existingGlobalContent = fs.readFileSync(this.globalPath, 'utf8')
+
+		if (existingGlobalContent !== globalContent) {
+			globalNeedsWrite = true
+		}
+
 		const changed: string[] = []
 
 		if (opts.verifyExisting) {
 			if (needsWrite) {
 				throw new Error(`File not in sync: ${this.path}`)
 			}
-		} else if (needsWrite) {
-			const tmp = `${this.path}.tmp`
 
-			await fs.promises.writeFile(tmp, content, 'utf8')
-			await fs.promises.rename(tmp, this.path)
-			changed.push(this.path)
+			if (globalNeedsWrite) {
+				throw new Error(`File not in sync: ${this.globalPath}`)
+			}
+		} else {
+			if (needsWrite) {
+				const tmp = `${this.path}.tmp`
+
+				await fs.promises.writeFile(tmp, content, 'utf8')
+				await fs.promises.rename(tmp, this.path)
+				changed.push(this.path)
+			}
+
+			if (globalNeedsWrite) {
+				const tmp = `${this.globalPath}.tmp`
+
+				await fs.promises.writeFile(tmp, globalContent, 'utf8')
+				await fs.promises.rename(tmp, this.globalPath)
+				changed.push(this.globalPath)
+			}
 		}
 
 		const dataCollectionFilesChanged = await this.generateDataCollectionFile(dir, opts)

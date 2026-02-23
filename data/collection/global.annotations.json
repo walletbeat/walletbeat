@@ -1,0 +1,86 @@
+{
+	"matchers": [
+		{
+			"domain": "google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/complete/search"
+		},
+		{
+			"domain": "android.clients.google.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "play.google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/log"
+		},
+		{
+			"domain": "google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/async/ddljson"
+		},
+		{
+			"domain": "google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/_/scs/abc-static/*"
+		},
+		{
+			"domain": "google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/$rpc/google.internal.onegoogle.asyncdata.v1.AsyncDataService/*"
+		},
+		{
+			"domain": "gvt1.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/edgedl/chrome/*"
+		},
+		{
+			"domain": "google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/async/newtab_promos"
+		},
+		{
+			"domain": "google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/async/newtab_ogb"
+		},
+		{
+			"domain": "accounts.google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/ListAccounts"
+		},
+		{
+			"domain": "google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/async/folae"
+		},
+		{
+			"domain": "gstatic.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/images/branding/googlelogo/*"
+		},
+		{
+			"domain": "gstatic.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/og/_/js/*"
+		},
+		{
+			"domain": "google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/time/*"
+		},
+		{
+			"domain": "gstatic.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/og/_/ss/*"
+		},
+		{
+			"domain": "update.googleapis.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "beta.walletbeat.eth.limo",
+			"purposes": "NOT_WALLET_INITIATED"
+		}
+	]
+}
