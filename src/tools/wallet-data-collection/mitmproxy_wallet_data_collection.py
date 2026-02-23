@@ -117,7 +117,7 @@ class RedactedData:
             label_index=data["labelIndex"],
             real_str=None,
             hash_value=data["hash"],
-            orig_hash=data["origHash"],
+            orig_hash=data.get("origHash"),
             pieces=frozenset(pieces),
             hint=data.get("hint"),
             length=data["length"],
@@ -186,7 +186,9 @@ class RedactedData:
             self.real_str = real_str
 
         if orig_hash is not None:
-            assert self.orig_hash == self.hash or self.orig_hash == orig_hash, "Mismatching orig_hash"
+            assert self.orig_hash == self.hash or self.orig_hash == orig_hash, (
+                "Mismatching orig_hash"
+            )
             changed = changed or self.orig_hash != orig_hash
             self.orig_hash = orig_hash
 
@@ -519,6 +521,19 @@ class UserDataPieces:
         return data
 
 
+def _multidict_to_dict_of_lists(multidict, filter_fn=None) -> Dict[str, List[str]]:
+    """Convert a MultiDictView to Dict[str, List[str]], preserving all values."""
+    result: Dict[str, List[str]] = {}
+    items = multidict.items(multi=True) if hasattr(multidict, "items") else []
+    for k, v in items:
+        if filter_fn is not None and not filter_fn(k):
+            continue
+        if k not in result:
+            result[k] = []
+        result[k].append(v)
+    return result
+
+
 class WalletRequest:
     @classmethod
     def decode(cls, data: dict, redactor: RedactedStringStore):
@@ -592,9 +607,7 @@ class WalletRequest:
             domain=url.hostname,
             path=url.path,
             query=UserDataPieces.classify_multidict(
-                dict(req.query.items(multi=True))
-                if hasattr(req.query, "items")
-                else {},
+                _multidict_to_dict_of_lists(req.query),
                 redactor=redactor,
                 context=WalletCaptureContext.QUERY,
             ),
@@ -607,24 +620,24 @@ class WalletRequest:
                 else None
             ),
             cookies=UserDataPieces.classify_multidict(
-                dict(req.cookies.items(multi=True))
-                if hasattr(req.cookies, "items")
-                else {},
+                _multidict_to_dict_of_lists(req.cookies),
                 redactor=redactor,
                 context=WalletCaptureContext.COOKIE,
             ),
             referer_domain=referer_domain,
             odd_headers=UserDataPieces.classify_multidict(
-                {k: v for k, v in req.headers.items() if not is_benign_header(k)},
+                _multidict_to_dict_of_lists(
+                    req.headers, filter_fn=lambda k: not is_benign_header(k)
+                ),
                 redactor=redactor,
                 context=WalletCaptureContext.OTHER_HEADER,
             ),
             odd_trailers=UserDataPieces.classify_multidict(
-                (
-                    {k: v for k, v in req.trailers.items() if not is_benign_header(k)}
-                    if req.trailers
-                    else {}
-                ),
+                _multidict_to_dict_of_lists(
+                    req.trailers, filter_fn=lambda k: not is_benign_header(k)
+                )
+                if req.trailers
+                else {},
                 redactor=redactor,
                 context=WalletCaptureContext.OTHER_HEADER,
             ),
@@ -794,6 +807,7 @@ class WalletCaptureFile:
                 if os.path.getsize(self.path) > 2:
                     raise e
                 data = {}  # Empty file, reset data.
+        self._identity = data["identity"]
         if "redactions" in data:
             self._redactor = RedactedStringStore.decode(data["redactions"])
         else:
@@ -872,6 +886,7 @@ class WalletCaptureFile:
             with open(self.path + ".tmp", "w") as f:
                 json.dump(
                     {
+                        "identity": self._identity,
                         "flows": {
                             flow_name: (
                                 "NOT_SUPPORTED"
@@ -884,7 +899,7 @@ class WalletCaptureFile:
                         "sessions": self._session_number,
                     },
                     f,
-                    indent=2,
+                    indent="\t",
                 )
                 f.write("\n")
 
@@ -1012,7 +1027,9 @@ class WalletDataCollectionAddon:
         req.anticache()
         req.constrain_encoding()
         wallet_data_req = WalletRequest.from_request(
-            redactor=self._wallet_data.redactor, req=req, session_time=self._wallet_data.session_time()
+            redactor=self._wallet_data.redactor,
+            req=req,
+            session_time=self._wallet_data.session_time(),
         )
         self._wallet_data.flow(self._current_ux_flow).add(wallet_data_req)
         logging.info("[%s] %s", host, wallet_data_req)

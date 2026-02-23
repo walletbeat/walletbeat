@@ -196,7 +196,7 @@ After a request is manually reviewed, it will never be prompted for in future ex
   - Start the browser and perform the UX flow.
   - Stop the browser, end the capture.
 - Run the `check` subcommand. It will give you a list of things that need attention, and describe the next steps you need to take. This will roughly look like this:
-  - Run the `mark-domain` and `ignore-domain` subcommands to ensure all domains involved in the network capture have associated entities.
+  - Run the `mark-domain` subcommand to ensure all domains involved in the network capture have associated entities.
   - Run the `explain-request` subcommand to set up programmatic rules to automatically associate requests to specific purposes.
   - Run the `mark-string` subcommand to redact any personal data and automatically associate requests to the data they send.
   - Run the `review-requests` subcommand to do a manual review of the requests and check over your associations.
