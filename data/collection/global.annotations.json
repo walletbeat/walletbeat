@@ -57,7 +57,7 @@
 		{
 			"domain": "gstatic.com",
 			"purposes": "NOT_WALLET_INITIATED",
-			"path": "/images/branding/googlelogo/*"
+			"path": "/images/*"
 		},
 		{
 			"domain": "gstatic.com",
@@ -80,6 +80,77 @@
 		},
 		{
 			"domain": "beta.walletbeat.eth.limo",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "content-autofill.googleapis.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "edgedl.me.gvt1.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "clients2.googleusercontent.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/crx/*"
+		},
+		{
+			"domain": "lh3.googleusercontent.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "region1.google-analytics.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/privacy-sandbox/register-conversion"
+		},
+		{
+			"domain": "clients2.google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/service/update2/crx"
+		},
+		{
+			"domain": "feedback-pa.clients6.google.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "gstatic.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/_/mss/boq-chrome-webstore/*"
+		},
+		{
+			"domain": "gstatic.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/chrome/webstore/*"
+		},
+		{
+			"domain": "chromewebstore.google.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "fonts.gstatic.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "apis.google.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/js/*"
+		},
+		{
+			"domain": "gstatic.com",
+			"purposes": "NOT_WALLET_INITIATED",
+			"path": "/feedback/*"
+		},
+		{
+			"domain": "googletagmanager.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "fonts.googleapis.com",
+			"purposes": "NOT_WALLET_INITIATED"
+		},
+		{
+			"domain": "chrome.google.com",
 			"purposes": "NOT_WALLET_INITIATED"
 		}
 	]
