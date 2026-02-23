@@ -940,13 +940,14 @@ class WalletDataCollectionAddon:
         )
 
     def configure(self, updated):
-        if "wallet_type" in updated:
+        logging.info(f"Processing configuration data: {dict(updated)}")
+        if "wallet_type" in updated or ctx.options.wallet_type:
             self._wallet_type = ctx.options.wallet_type
-        if "wallet_variant" in updated:
+        if "wallet_variant" in updated or ctx.options.wallet_variant:
             self._wallet_variant = ctx.options.wallet_variant
-        if "wallet_id" in updated:
+        if "wallet_id" in updated or ctx.options.wallet_id:
             self._wallet_id = ctx.options.wallet_id
-        if "ux_flow" in updated:
+        if "ux_flow" in updated or ctx.options.ux_flow:
             ux_flow_value = ctx.options.ux_flow
             if ux_flow_value:
                 valid_flows = [str(f) for f in UxFlow]
@@ -954,6 +955,7 @@ class WalletDataCollectionAddon:
                     f"Invalid ux_flow: {repr(ux_flow_value)}. "
                     f"Must be one of: {', '.join(valid_flows)}."
                 )
+                logging.info("UX flow configured.")
                 self._current_ux_flow = UxFlow[ux_flow_value]
         if (
             self._wallet_id is not None
@@ -968,13 +970,16 @@ class WalletDataCollectionAddon:
                 self._wallet_data = WalletCaptureFile(
                     path=self._wallet_collection_path()
                 )
+                logging.info("Wallet capture configured.")
+        if self._current_ux_flow is not None and self._wallet_data is not None:
+            logging.info("Ready to capture requests.")
 
     def load(self, loader: Loader):
         loader.add_option("wallet_id", str, "", "Wallet ID.")
         loader.add_option(
             "wallet_type",
             str,
-            "software",
+            "",
             "Wallet type (software, hardware, embedded).",
         )
         loader.add_option("wallet_variant", str, "", "Wallet variant.")
@@ -986,9 +991,7 @@ class WalletDataCollectionAddon:
         )
 
     def running(self):
-        assert self._current_ux_flow is not None, (
-            "Must set options for this addon: wallet_id, wallet_variant, ux_flow."
-        )
+        self.configure({})
         with self._lock:
             if self._flush_thread is None:
                 self._flush_thread = threading.Thread(
@@ -1020,7 +1023,7 @@ class WalletDataCollectionAddon:
 
     def request(self, flow: http.HTTPFlow) -> None:
         assert self._wallet_data is not None and self._current_ux_flow is not None, (
-            "Received a request before being fully configured!"
+            f"Received a request before being fully configured! (wallet_data={str(self._wallet_data)}, current_ux_flow={str(self._current_ux_flow)})"
         )
         req = flow.request
         host = req.host

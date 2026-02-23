@@ -122,7 +122,7 @@ describe('wallets', () => {
 
 					for (const captureFile of captureFiles) {
 						const capturePath = path.join(collectionDir, captureFile)
-						const captureFileObj = WalletCaptureFile.fromFile(null, capturePath, annotations)
+						const captureFileObj = await WalletCaptureFile.fromFile(null, capturePath, annotations)
 						const issues = captureFileObj.check()
 
 						if (issues.length > 0) {
