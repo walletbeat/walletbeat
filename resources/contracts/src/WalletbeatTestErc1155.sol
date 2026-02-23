@@ -33,7 +33,7 @@ contract WalletbeatTestErc1155 is ERC1155 {
         uint256 tokensToMint = 1 + (block.number % 4);
         for (uint256 i = 0; i < tokensToMint; i++) {
             s_tokenId++;
-            super._mint(receiver, s_tokenId);
+            super._mint(receiver, s_tokenId, 1, "");
         }
     }
 
@@ -42,12 +42,15 @@ contract WalletbeatTestErc1155 is ERC1155 {
      * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
      * on any other transfer attempt.
      */
-    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize)
-        internal
-        virtual
-        override
-    {
-        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
 
         if (from == address(0) || to == address(0)) {
             return;
