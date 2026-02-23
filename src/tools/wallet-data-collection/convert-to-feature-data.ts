@@ -32,7 +32,7 @@ export function autoGenerateWalletDataCollection({
 					return [variant, null]
 				}
 
-				const variantData = WalletCaptureFile.fromData(entry[1], walletAnnotations)
+				const variantData = WalletCaptureFile.fromData(null, entry[1], walletAnnotations)
 
 				return [variant, { walletId, ...variantData.toDataCollection(false) }]
 			}),

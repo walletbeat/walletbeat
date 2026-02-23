@@ -24,6 +24,8 @@ import {
 	userInfoEnums,
 } from '@/schema/features/privacy/data-collection'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
+import { type Variant, variantEnum } from '@/schema/variants'
+import { type WalletType, walletTypes } from '@/schema/wallet-types'
 import { getErrorMessage } from '@/types/errors'
 import {
 	assertNonEmptyArray,
@@ -174,6 +176,7 @@ interface EncodedWalletCaptureFlow {
 }
 
 interface EncodedWalletCaptureFile {
+	identity: WalletCaptureFileIdentity
 	flows: Record<string, EncodedWalletCaptureFlow | 'NOT_SUPPORTED'>
 	redactions: EncodedRedactedStringStore
 	sessions: number
@@ -1505,13 +1508,24 @@ export class WalletCaptureIssue {
 	}
 }
 
+export interface WalletCaptureFileIdentity {
+	walletType: WalletType
+	walletVariant: Variant
+	walletId: string
+}
+
 export class WalletCaptureFile {
+	public readonly identity: WalletCaptureFileIdentity
 	public readonly path: string | null
 	public readonly redactor: RedactedStringStore
 	private readonly flows: Partial<Record<RecordedFlow, WalletCaptureFlow | 'NOT_SUPPORTED'>>
 	private readonly sessions: number
 	private readonly annotations: WalletCaptureAnnotations
-	public static fromFile(path: string, annotations: WalletCaptureAnnotations): WalletCaptureFile {
+	public static fromFile(
+		identity: WalletCaptureFileIdentity | null,
+		path: string,
+		annotations: WalletCaptureAnnotations,
+	): WalletCaptureFile {
 		let text = ''
 
 		if (fs.existsSync(path)) {
@@ -1525,8 +1539,13 @@ export class WalletCaptureFile {
 		}
 
 		const wasNew = text === '{}'
+
+		if (wasNew && identity === null) {
+			throw new Error('Cannot create a new WalletCaptureFile without providing wallet identity')
+		}
+
 		const parsed: unknown = JSON.parse(text)
-		const captureFile = new WalletCaptureFile(path, parsed, annotations)
+		const captureFile = new WalletCaptureFile(identity, path, parsed, annotations)
 		const reEncoded = captureFile.toJSON()
 		const loadedStable = stableJSONStringify(parsed)
 		const reEncodedStable = stableJSONStringify(reEncoded)
@@ -1544,10 +1563,15 @@ export class WalletCaptureFile {
 
 		return captureFile
 	}
-	public static fromData(data: unknown, annotations: WalletCaptureAnnotations): WalletCaptureFile {
-		return new WalletCaptureFile(null, data, annotations)
+	public static fromData(
+		identity: WalletCaptureFileIdentity | null,
+		data: unknown,
+		annotations: WalletCaptureAnnotations,
+	): WalletCaptureFile {
+		return new WalletCaptureFile(identity, null, data, annotations)
 	}
 	private constructor(
+		identity: WalletCaptureFileIdentity | null,
 		path: string | null,
 		jsonBody: unknown,
 		annotations: WalletCaptureAnnotations,
@@ -1555,6 +1579,46 @@ export class WalletCaptureFile {
 		this.path = path
 		this.annotations = annotations
 		const root = expectRecord(jsonBody, '$')
+		let loadedIdentity: WalletCaptureFileIdentity | null = null
+
+		if (root.identity !== undefined) {
+			const loadedIdentityObj = expectRecord(root.identity, '$.identity')
+			const loadedWalletId = expectString(loadedIdentityObj.walletId, '$.identity.walletId')
+			const loadedWalletType = walletTypes.assert(
+				expectString(loadedIdentityObj.walletType, '$.identity.walletType'),
+			)
+			const loadedWalletVariant = variantEnum.assert(
+				expectString(loadedIdentityObj.walletVariant, '$.identity.walletVariant'),
+			)
+
+			loadedIdentity = {
+				walletId: loadedWalletId,
+				walletType: loadedWalletType,
+				walletVariant: loadedWalletVariant,
+			}
+		}
+
+		if (loadedIdentity !== null && identity !== null) {
+			if (identity !== null) {
+				if (
+					loadedIdentity.walletId !== identity.walletId ||
+					loadedIdentity.walletType !== identity.walletType ||
+					loadedIdentity.walletVariant !== identity.walletVariant
+				) {
+					throw new Error(
+						`Mismatching identities: expected ${JSON.stringify(identity)}, found ${JSON.stringify(loadedIdentity)}`,
+					)
+				}
+			}
+
+			this.identity = identity
+		} else if (identity === null && loadedIdentity !== null) {
+			this.identity = loadedIdentity
+		} else if (identity !== null) {
+			this.identity = identity
+		} else {
+			throw new Error('Cannot construct a WalletCaptureFile without an identity')
+		}
 
 		this.redactor = ((): RedactedStringStore => {
 			if (root.redactions === undefined) {
@@ -1601,6 +1665,7 @@ export class WalletCaptureFile {
 		}
 
 		const out: EncodedWalletCaptureFile = {
+			identity: this.identity,
 			flows: flowsOut,
 			redactions: this.redactor.toJSON(),
 			sessions: this.sessions,

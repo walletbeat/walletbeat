@@ -96,6 +96,16 @@ export class WalletRequestMatcher {
 		purposes: NonEmptySet<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' | null
 		policy: CollectionPolicy | null
 	}) {
+		if (domain.trim() === '') {
+			throw new Error('domain cannot be empty')
+		}
+
+		if (purposes === 'NOT_WALLET_INITIATED' && policy !== null) {
+			throw new Error(
+				`cannot set any collection policy (got ${policy}) for NOT_WALLET_INITIATED requests`,
+			)
+		}
+
 		this.domain = domain
 
 		if (path !== null && (path.includes('?') || path.includes('#'))) {
