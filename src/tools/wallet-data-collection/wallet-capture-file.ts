@@ -16,13 +16,14 @@ import {
 	DataCollectionPurpose,
 	dataCollectionPurpose,
 	leastConfigurableCollectionPolicy,
-	normalizeStrForUserInfo,
+	normalizedStrForUserInfo,
 	RegularEndpoint,
 	UserFlow,
 	userFlow,
 	userFlowMayBeMarkedUnsupported,
 	type UserInfo,
 	userInfoEnums,
+	variationsOnStrForUserInfo,
 } from '@/schema/features/privacy/data-collection'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type Variant, variantEnum } from '@/schema/variants'
@@ -477,7 +478,7 @@ export class RedactedData {
 		labelIndex: number
 		realStr: string | null
 		hash: string
-		origHash: string | null
+		origHash: string
 		pieces: NonEmptySet<UserInfo>
 		hint: string | null
 		length: number
@@ -491,7 +492,7 @@ export class RedactedData {
 		this.labelIndex = args.labelIndex
 		this.realStr = args.realStr
 		this.hash = args.hash
-		this.origHash = args.origHash === null ? args.hash : args.origHash
+		this.origHash = args.origHash
 		this.pieces = args.pieces
 		this.hint = args.hint
 		this.length = args.realStr != null ? args.realStr.length : args.length
@@ -520,7 +521,7 @@ export class RedactedData {
 			labelIndex: data.labelIndex,
 			realStr: null,
 			hash: data.hash,
-			origHash: data.origHash ?? null,
+			origHash: data.origHash ?? data.hash,
 			pieces,
 			hint: data.hint ?? null,
 			length: data.length,
@@ -534,7 +535,7 @@ export class RedactedData {
 		labelIndex: number
 		realStr: string
 		hash: string
-		origHash: string | null
+		origHash: string
 		pieces: NonEmptySet<UserInfo>
 		hint: string | null
 	}): RedactedData {
@@ -750,18 +751,53 @@ export class RedactedStringStore {
 		pieces: NonEmptySet<UserInfo>
 		hint?: string
 	}): NonEmptyArray<RedactedData> {
-		const origHash = this.hash(realStr)
+		let origNormalized: string | null = null
+
+		for (const piece of setItems(pieces)) {
+			const pieceNormalized = normalizedStrForUserInfo(realStr, piece)
+
+			if (origNormalized === null) {
+				origNormalized = pieceNormalized
+			} else if (origNormalized !== pieceNormalized) {
+				throw new Error(
+					`cannot normalize "${realStr}" for pieces ${setItems(pieces)
+						.map(v => v.toString())
+						.join(
+							' & ',
+						)}: obtained conflicting normalized forms "${origNormalized}" and "${pieceNormalized}"`,
+				)
+			}
+		}
+
+		if (origNormalized === null) {
+			throw new Error('unreachable')
+		}
+
+		const origHash = this.hash(origNormalized)
 		const normalizedStrs = new Set<string>()
 
 		normalizedStrs.add(realStr)
 		normalizedStrs.add(realStr.toLowerCase())
 		normalizedStrs.add(realStr.toUpperCase())
+		normalizedStrs.add(origNormalized)
+		normalizedStrs.add(origNormalized.toLowerCase())
+		normalizedStrs.add(origNormalized.toUpperCase())
 
-		for (const piece of setItems(pieces)) {
-			for (const normalizedStr of setItems(normalizeStrForUserInfo(realStr, piece))) {
-				normalizedStrs.add(normalizedStr)
-				normalizedStrs.add(normalizedStr.toLowerCase())
-				normalizedStrs.add(normalizedStr.toUpperCase())
+		let previousSetSize = -1
+
+		while (normalizedStrs.size !== previousSetSize) {
+			previousSetSize = normalizedStrs.size
+
+			for (const piece of setItems(pieces)) {
+				for (const normalizedStr of Array.from(normalizedStrs)) {
+					for (const renormalizedStr of setItems(
+						variationsOnStrForUserInfo(normalizedStr, piece),
+					)) {
+						normalizedStrs.add(renormalizedStr)
+						normalizedStrs.add(renormalizedStr.toLowerCase())
+						normalizedStrs.add(renormalizedStr.toUpperCase())
+					}
+				}
 			}
 		}
 		const redacted: RedactedData[] = []
@@ -789,7 +825,7 @@ export class RedactedStringStore {
 				labelIndex,
 				realStr: str,
 				hash: h,
-				origHash: origHash,
+				origHash,
 				pieces,
 				hint: hint === undefined ? null : hint,
 			})
