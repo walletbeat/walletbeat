@@ -47,6 +47,8 @@
   import ScamAlertsTab from './Tabs/ScamAlertsTab.svelte';
   import AppIsolationTab from './Tabs/AppIsolationTab.svelte';
   import type { AppIsolationSubTab } from './Tabs/AppIsolationTab.svelte';
+  import TransactionSimulationsTab from './Tabs/TransactionSimulationsTab.svelte';
+  import type { TransactionSimulationSubTab } from './Tabs/TransactionSimulationsTab.svelte';
   import { getProvider } from '../lib/eip-test-runners';
   import {
     assertTransactionId,
@@ -121,11 +123,12 @@
   });
 
   const uiState = $state({
-    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support' | 'app-isolation'|'scam-alerts',
+    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support' | 'app-isolation' | 'scam-alerts' | 'tx-simulations',
     selectedTxId: null as string | null,
     selectedSigId: null as string | null,
     selectedScamAlertId: null as string | null,
     appIsolationSubTab: 'eth-accounts' as AppIsolationSubTab,
+    txSimulationSubTab: 'erc20-transfer' as TransactionSimulationSubTab,
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -615,7 +618,7 @@ Issued At: ${new Date().toISOString()}`;
 
   <!-- Tab Selector -->
   <div class="tab-selector" data-row="gap-2">
-    {#each ['transactions', 'signatures', 'eip-support', 'app-isolation', 'scam-alerts'] as tab (tab)}
+    {#each ['transactions', 'signatures', 'eip-support', 'app-isolation', 'tx-simulations', 'scam-alerts'] as tab (tab)}
       <button
         type="button"
         class="tab-button"
@@ -637,7 +640,9 @@ Issued At: ${new Date().toISOString()}`;
             uiState.activeTab = 'eip-support';
           } else if (tab === 'app-isolation') {
             uiState.activeTab = 'app-isolation';
-          }else if (tab === 'scam-alerts') {
+          } else if (tab === 'tx-simulations') {
+            uiState.activeTab = 'tx-simulations';
+          } else if (tab === 'scam-alerts') {
             uiState.activeTab = 'scam-alerts';
             scamAlertDisclaimer.accepted = false;
 
@@ -647,7 +652,7 @@ Issued At: ${new Date().toISOString()}`;
           }
         }}
       >
-        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab === 'tx-simulations' ? 'Tx Simulations' : tab.charAt(0).toUpperCase() + tab.slice(1)}
       </button>
     {/each}
   </div>
@@ -691,6 +696,49 @@ Issued At: ${new Date().toISOString()}`;
             isSelected={uiState.appIsolationSubTab === 'wallet-connect'}
             isCompleted={false}
             onclick={() => { uiState.appIsolationSubTab = 'wallet-connect'; }}
+          />
+        {:else if uiState.activeTab === 'tx-simulations'}
+          <WalletTesterNavigationItem
+            title="ERC-20 Transfer"
+            description="Simulate an ERC-20 token transfer"
+            isSelected={uiState.txSimulationSubTab === 'erc20-transfer'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc20-transfer'; }}
+          />
+          <WalletTesterNavigationItem
+            title="ERC-721 Transfer"
+            description="Simulate an ERC-721 NFT transfer"
+            isSelected={uiState.txSimulationSubTab === 'erc721-transfer'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc721-transfer'; }}
+          />
+          <WalletTesterNavigationItem
+            title="ERC-1155 Transfer"
+            description="Simulate an ERC-1155 multi-token transfer"
+            isSelected={uiState.txSimulationSubTab === 'erc1155-transfer'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc1155-transfer'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Failing Transaction"
+            description="Simulate a transaction expected to revert"
+            isSelected={uiState.txSimulationSubTab === 'failing-transaction'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'failing-transaction'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Revert Determinism"
+            description="Detects if simulation may become stale and tx could fail"
+            isSelected={uiState.txSimulationSubTab === 'revert-determinism'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'revert-determinism'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Amount Determinism"
+            description="Detects if simulated token amounts may shift due to state"
+            isSelected={uiState.txSimulationSubTab === 'amount-determinism'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'amount-determinism'; }}
           />
         {:else if uiState.activeTab === 'eip-support'}
           {#each testSteps as step, index (step.id)}
@@ -773,6 +821,11 @@ Issued At: ${new Date().toISOString()}`;
         <AppIsolationTab
           activeSubTab={uiState.appIsolationSubTab}
           provider={getProvider()}
+        />
+      {:else if uiState.activeTab === 'tx-simulations'}
+        <TransactionSimulationsTab
+          activeSubTab={uiState.txSimulationSubTab}
+          {account}
         />
       {/if}
     </div>
