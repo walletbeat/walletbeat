@@ -638,8 +638,8 @@ export const ambire: SoftwareWallet = {
 					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
 						{
 							...ambireTransactionDisplayDefault,
-							calldataDecoded: DataDisplayOptions.SHOWN_BY_DEFAULT,
-							transactionOutcome: TransactionOutcome.EXPLAINED,
+							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
 						},
 					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
 						...ambireTransactionDisplayDefault,
