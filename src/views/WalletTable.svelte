@@ -575,6 +575,24 @@
 									sort: {
 										isDefault: true,
 										defaultDirection: SortDirection.Descending,
+										// Stages always take precedence over attribute scores when sorting:
+										// a stage 1 wallet should never appear below a stage 0 wallet
+										// regardless of how good its attribute scores are. Within the
+										// same stage, fall back to the attribute score as a tiebreaker.
+										compare: (scoreA, scoreB, walletA, walletB) => {
+											// Returns -1 for wallets that cleared no stage (or N/A);
+											// 0, 1, 2... for wallets that cleared stage 0, 1, 2...
+											const stageIndex = (wallet: RatedWallet): number => {
+												const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+												if (stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null) return -1
+												if (typeof stage === 'string') return -1 // QUALIFIED_FOR_NO_STAGES
+												const idx = ladderEvaluation.ladder.stages.findIndex(s => s.id === stage.id)
+												return idx >= 0 ? idx : -1
+											}
+											const stageDiff = stageIndex(walletA) - stageIndex(walletB)
+											if (stageDiff !== 0) return stageDiff
+											return ((scoreA as number | null) ?? 0) - ((scoreB as number | null) ?? 0)
+										},
 									},
 
 									align: ColumnAlignment.Center,
