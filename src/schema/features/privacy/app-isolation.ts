@@ -106,7 +106,7 @@ interface BaseAppIsolation {
 	 * start the connection flow. Check if your wallet offers an option to create
 	 * a fresh address specifically for this app, rather than only letting you
 	 * pick from existing accounts.
-	 * 
+	 *
 	 * Contributors can use https://beta.walletbeat.eth.limo/test/ to test.
 	 */
 	createInAppConnectionFlow: Support<WithRef<{}>>
