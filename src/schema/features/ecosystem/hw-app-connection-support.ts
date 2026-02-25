@@ -10,12 +10,14 @@ import { type NonEmptySet, setItems } from '@/types/utils/non-empty'
  */
 export enum AppConnectionMethod {
 	/**
-	 * The wallet connects to apps through its own proprietary closed-source application
+	 * The wallet connects to apps through its own proprietary closed-source application.
+	 * (e.g. A hardware wallet that ships its own desktop app for connecting to dapps, where the app's source code is not publicly available.)
 	 */
 	VENDOR_CLOSED_SOURCE_APP = 'VENDOR_CLOSED_SOURCE_APP',
 
 	/**
-	 * The wallet connects to apps through its own open-source application
+	 * The wallet connects to apps through its own open-source application.
+	 * (e.g. A hardware wallet that ships its own desktop app for connecting to dapps, where the app's source code is publicly available and auditable.)
 	 */
 	VENDOR_OPEN_SOURCE_APP = 'VENDOR_OPEN_SOURCE_APP',
 }
@@ -36,13 +38,18 @@ export enum SoftwareWalletType {
  */
 export interface AppConnectionMethodDetails {
 	/**
-	 * Which connection methods are supported (must have at least one)
+	 * Which connection methods are supported (must have at least one).
+	 * (e.g. A hardware wallet that supports both its own open-source app and MetaMask would list
+	 * `VENDOR_OPEN_SOURCE_APP` and `METAMASK` here.)
 	 */
 	supportedConnections: NonEmptySet<AppConnectionMethod | SoftwareWalletType>
 
 	/**
 	 * Is manufacturer consent required to integrate any hardware wallet feature into a software wallet?
 	 * If so, must provide reference.
+	 * (e.g. `ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE`: any software wallet can integrate the hardware
+	 * wallet without needing approval from the manufacturer.
+	 * `FEATURES_GATED_BY_MANUFACTURER`: the manufacturer must approve before a software wallet can access certain features.)
 	 */
 	requiresManufacturerConsent:
 		| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' }
