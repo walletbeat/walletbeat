@@ -4,6 +4,10 @@ import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
 import { llmsTxtBody } from '@/utils/llms-txt'
 
+import { grammarLint, warmupHarperLinter } from './utils/grammar'
+
+await warmupHarperLinter()
+
 const SITE_URL = 'https://wallet.page'
 
 describe('llms.txt', () => {
@@ -53,6 +57,12 @@ describe('llms.txt', () => {
 
 			expect(hardwareSection).toContain(link)
 		}
+	})
+
+	it('has correct grammar', async () => {
+		const body = llmsTxtBody(SITE_URL)
+
+		await grammarLint(body, { language: 'markdown' })
 	})
 
 	it('no wallet link appears twice in the body', () => {

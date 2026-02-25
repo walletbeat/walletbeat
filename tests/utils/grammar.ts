@@ -11,6 +11,12 @@ import {
 } from '@/types/content'
 import { trimWhitespacePrefix } from '@/types/utils/text'
 
+/**
+ * Brand names that are spelled with a leading lowercase letter (e.g. imKey).
+ * We ignore Capitalization lints for these so the grammar rule does not force "ImKey" etc.
+ */
+const BRAND_NAMES_LOWERCASE_FIRST = new Set(['imKey'])
+
 let vocabulary: string[] | null = null
 
 function getVocabulary(): string[] {
@@ -182,6 +188,14 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 
 		lints = lints.concat(await linter.lint(trimmedText, lintOptions))
 	}
+
+	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Capitalization' ||
+			!BRAND_NAMES_LOWERCASE_FIRST.has(lint.get_problem_text()),
+	)
+
 	const message: string[] = []
 
 	for (const lint of lints) {
