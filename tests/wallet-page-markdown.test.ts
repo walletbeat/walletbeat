@@ -42,48 +42,52 @@ describe('walletPageMarkdown', () => {
 			})
 
 			it('contains each non-exempt attribute group heading', () => {
-				mapNonExemptAttributeGroupsInTree(wallet.overall, attrGroup => {
-					expect(md).toContain(`## ${attrGroup.displayName}`)
+				const groupNames = mapNonExemptAttributeGroupsInTree(
+					wallet.overall,
+					attrGroup => attrGroup.displayName,
+				)
 
-					return undefined
-				})
+				for (const name of groupNames) {
+					expect(md).toContain(`## ${name}`)
+				}
 			})
 
 			it('contains a correct heading for every non-exempt attribute', () => {
-				mapNonExemptAttributeGroupsInTree(wallet.overall, (_, evalGroup) => {
-					mapNonExemptGroupAttributes(evalGroup, evalAttr => {
-						const heading = `### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.value.rating)}`
+				const headings = mapNonExemptAttributeGroupsInTree(wallet.overall, (_, evalGroup) =>
+					mapNonExemptGroupAttributes(
+						evalGroup,
+						evalAttr =>
+							`### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.value.rating)}`,
+					),
+				).flat()
 
-						expect(md).toContain(heading)
-					})
-
-					return undefined
-				})
+				for (const heading of headings) {
+					expect(md).toContain(heading)
+				}
 			})
 
 			it('includes at least one URL for every attribute that has references', () => {
-				mapNonExemptAttributeGroupsInTree(wallet.overall, (_, evalGroup) => {
+				const urlSetsToCheck = mapNonExemptAttributeGroupsInTree(wallet.overall, (_, evalGroup) =>
 					mapNonExemptGroupAttributes(evalGroup, evalAttr => {
 						const { references } = evalAttr.evaluation
 
 						if (references === undefined || references.length === 0) {
-							return
+							return null
 						}
 
 						const qualifiedRefs = toFullyQualified(references)
 
 						if (qualifiedRefs.length === 0) {
-							return
+							return null
 						}
 
-						const allUrls = qualifiedRefs.flatMap(ref => ref.urls.map(u => u.url))
-						const foundAnyUrl = allUrls.some(url => md.includes(url))
+						return qualifiedRefs.flatMap(ref => ref.urls.map(u => u.url))
+					}).filter((urls): urls is string[] => urls !== null),
+				).flat()
 
-						expect(foundAnyUrl).toBe(true)
-					})
-
-					return undefined
-				})
+				for (const allUrls of urlSetsToCheck) {
+					expect(allUrls.some(url => md.includes(url))).toBe(true)
+				}
 			})
 
 			it('contains stage rating information', () => {
