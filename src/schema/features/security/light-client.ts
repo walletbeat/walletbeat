@@ -1,12 +1,17 @@
 import type { LabeledUrl } from '../../url'
 import type { AtLeastOneSupported } from '../support'
 
-/** Enum of known Ethereum L1 light clients. */
+/**
+ * Known Ethereum L1 light client implementations a wallet may embed.
+ * Not visible in the UI — identify by checking the wallet's documentation
+ * for light client claims, or by searching the source code for imports of
+ * helios or similar libraries.
+ */
 export enum EthereumL1LightClient {
-	/** Helios light client. */
+	/** Helios: a fast, trustless Ethereum light client written in Rust. */
 	helios = 'helios',
 
-	/** Helios-Mobi light client. */
+	/** Helios-Mobi: a mobile-optimized port of Helios. */
 	heliosMobi = 'heliosMobi',
 }
 
@@ -40,8 +45,4 @@ export function ethereumL1LightClientUrl(l1LightClient: EthereumL1LightClient): 
 	}
 }
 
-/**
- * A set of Ethereum L1 light clients that a wallet may use.
- * At least one must be supported.
- */
 export type EthereumL1LightClientSupport = AtLeastOneSupported<EthereumL1LightClient>
