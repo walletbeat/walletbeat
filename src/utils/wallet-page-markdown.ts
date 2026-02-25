@@ -123,6 +123,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 		'',
 		`Last updated: ${metadata.lastUpdated}`,
 		`Walletbeat page: ${siteUrl}/${metadata.id}`,
+		`Methodology: ${siteUrl}/methodology/index.html.md`,
 		`Variants: ${variantNames}`,
 		'',
 		'---',

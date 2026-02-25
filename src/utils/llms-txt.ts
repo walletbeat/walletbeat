@@ -43,6 +43,7 @@ export function llmsTxtBody(siteUrl: string): string {
 	)
 	lines.push('')
 	lines.push(`Full wallet list and ratings: ${siteUrl}`)
+	lines.push(`Methodology: ${siteUrl}/methodology/index.html.md`)
 	lines.push('')
 
 	if (softwareWallets.length > 0) {

@@ -1,0 +1,57 @@
+import { describe, expect, it } from 'vitest'
+
+import { attributeTree } from '@/schema/attribute-groups'
+import { methodologyPageMarkdown } from '@/utils/methodology-markdown'
+
+const SITE_URL = 'https://wallet.page'
+
+describe('methodologyPageMarkdown', () => {
+	const md = methodologyPageMarkdown(SITE_URL)
+
+	it('produces non-empty output', () => {
+		expect(md.length).toBeGreaterThan(100)
+	})
+
+	it('contains the methodology title', () => {
+		expect(md).toContain('Walletbeat Methodology')
+	})
+
+	it('contains the site URL', () => {
+		expect(md).toContain(SITE_URL)
+	})
+
+	it('has no unresolved template placeholders', () => {
+		expect(md).not.toMatch(/\{\{[^}]+\}\}/)
+	})
+
+	it('has no accidental object-to-string coercion', () => {
+		expect(md).not.toContain('[object Object]')
+	})
+
+	it('contains each attribute group heading', () => {
+		for (const group of Object.values(attributeTree)) {
+			expect(md).toContain(`## ${group.displayName}`)
+		}
+	})
+
+	it('contains each attribute heading', () => {
+		for (const group of Object.values(attributeTree)) {
+			for (const attribute of Object.values(group.attributes)) {
+				expect(md).toContain(`### ${attribute.displayName}`)
+			}
+		}
+	})
+
+	it('contains standard subsection headings', () => {
+		expect(md).toContain('#### Why it matters')
+		expect(md).toContain('#### How it is evaluated')
+		expect(md).toContain('#### Rating scale')
+	})
+
+	it('contains rating system labels', () => {
+		expect(md).toContain('PASS')
+		expect(md).toContain('FAIL')
+		expect(md).toContain('UNRATED')
+		expect(md).toContain('EXEMPT')
+	})
+})
