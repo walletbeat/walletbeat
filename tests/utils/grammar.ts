@@ -196,6 +196,11 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 			!BRAND_NAMES_LOWERCASE_FIRST.has(lint.get_problem_text()),
 	)
 
+	// Ignore Spelling lints for standalone "s" (false positive from markdown/punctuation tokenization).
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Spelling' || lint.get_problem_text() !== 's',
+	)
+
 	const message: string[] = []
 
 	for (const lint of lints) {

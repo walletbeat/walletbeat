@@ -3,6 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { attributeTree } from '@/schema/attribute-groups'
 import { methodologyPageMarkdown } from '@/utils/methodology-markdown'
 
+import { grammarLint, warmupHarperLinter } from './utils/grammar'
+
+await warmupHarperLinter()
+
 const SITE_URL = 'https://wallet.page'
 
 describe('methodologyPageMarkdown', () => {
@@ -53,5 +57,9 @@ describe('methodologyPageMarkdown', () => {
 		expect(md).toContain('FAIL')
 		expect(md).toContain('UNRATED')
 		expect(md).toContain('EXEMPT')
+	})
+
+	it('passes harper.js grammar check', async () => {
+		await grammarLint(md, { language: 'markdown' })
 	})
 })
