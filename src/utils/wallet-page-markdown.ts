@@ -1,3 +1,4 @@
+import { variantToName } from '@/constants/variants'
 import {
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
@@ -8,6 +9,7 @@ import {
 	type WalletNameStrings,
 } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
+import { getVariants, type Variant } from '@/schema/variants'
 import type { RatedWallet } from '@/schema/wallet'
 import {
 	type Content,
@@ -16,6 +18,7 @@ import {
 	prerenderTypographicContent,
 	type TypographicContent,
 } from '@/types/content'
+import { setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase } from '@/types/utils/text'
 import {
 	collapseToSingleLine,
@@ -119,6 +122,11 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	// Metadata
 	lines.push(`Last updated: ${metadata.lastUpdated}`)
 	lines.push(`Walletbeat page: ${siteUrl}/${metadata.id}`)
+	const variantNames = setItems<Variant>(getVariants(wallet.variants))
+		.map(v => variantToName(v, true))
+		.join(', ')
+
+	lines.push(`Variants: ${variantNames}`)
 	lines.push('')
 	lines.push('---')
 	lines.push('')
