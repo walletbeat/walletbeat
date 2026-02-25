@@ -12,7 +12,8 @@ import {
 } from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	CalldataDecoding,
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
@@ -217,6 +218,11 @@ export const keycardShell: HardwareWallet = {
 						url: 'https://github.com/keycard-tech/eth-abi-repo',
 					},
 				],
+				calldataDecoded: {
+					...noCalldataDecoding,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.ON_DEVICE,
+				},
 				// Data extraction: QR codes used for transaction data (ERC-4527); display visible to eyes
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
@@ -230,17 +236,6 @@ export const keycardShell: HardwareWallet = {
 					nonce: DataDisplayOptions.NOT_IN_UI,
 					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
 					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
-				},
-				legibility: {
-					...noCalldataDecoding,
-					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
-						ref: 'https://github.com/keycard-tech/eth-abi-repo',
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.USDC_APPROVAL]: supported({
-						ref: 'https://github.com/keycard-tech/eth-abi-repo',
-						decoded: DataDecoded.ON_DEVICE,
-					}),
 				},
 				messageSigningLegibility: null,
 			},

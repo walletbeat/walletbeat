@@ -13,16 +13,17 @@ import {
 	type BugBountyProgramImplementation,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import { FirmwareType } from '@/schema/features/security/firmware'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
-	CalldataDecoding,
-	type CalldataDecodingSupport,
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataExtraction,
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
-import { refNotNecessary, refTodo, type WithRef } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -125,7 +126,15 @@ export const gridplusWallet: HardwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: true,
 			}),
-			firmware: null,
+			firmware: {
+				// Source: gridplus team responses fileverse document
+				type: FirmwareType.FAIL,
+				customFirmware: FirmwareType.FAIL,
+				details: 'The Lattice1 firmware source code is not publicly available.',
+				firmwareOpenSource: FirmwareType.FAIL,
+				reproducibleBuilds: FirmwareType.FAIL,
+				silentUpdateProtection: FirmwareType.PASS,
+			},
 			keysHandling: null,
 			lightClient: {
 				ethereumL1: null,
@@ -156,33 +165,24 @@ export const gridplusWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/_s5PjZhgBig',
 					},
 				],
+				calldataDecoded: {
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataDecoded.NOT_DECODED,
+				},
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
 					[DataExtraction.QRCODE]: false,
 				},
 				detailsDisplayed: displaysFullTransactionDetails,
-				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: supported<WithRef<CalldataDecodingSupport>>({
-						ref: refNotNecessary,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: supported({
-						ref: refNotNecessary,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.USDC_APPROVAL]: notSupported,
-					[CalldataDecoding.AAVE_SUPPLY]: supported({
-						ref: refNotNecessary,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: supported({
-						ref: refNotNecessary,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						notSupported,
-				},
 				messageSigningLegibility: null,
 			},
 			userSafety: null,

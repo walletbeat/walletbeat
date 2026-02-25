@@ -186,6 +186,7 @@ export const onekeyWallet: HardwareWallet = {
 						url: 'https://youtube.com/shorts/J_XG7cNOVhM',
 					},
 				],
+				calldataDecoded: noCalldataDecoding,
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -196,7 +197,6 @@ export const onekeyWallet: HardwareWallet = {
 					chain: DataDisplayOptions.NOT_IN_UI,
 					nonce: DataDisplayOptions.NOT_IN_UI,
 				},
-				legibility: noCalldataDecoding,
 				messageSigningLegibility: null,
 			},
 			userSafety: null,

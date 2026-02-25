@@ -11,10 +11,7 @@ import {
 } from '@/schema/features/security/hardware-wallet-support'
 import { PasskeyVerificationLibrary } from '@/schema/features/security/passkey-verification'
 import { type ScamUrlWarning } from '@/schema/features/security/scam-alerts'
-import {
-	displaysFullCallData,
-	displaysFullTransactionDetails,
-} from '@/schema/features/security/transaction-legibility'
+import { displaysFullCallData } from '@/schema/features/security/transaction-legibility'
 import { RpcEndpointConfiguration } from '@/schema/features/self-sovereignty/chain-configurability'
 import {
 	TransactionSubmissionL2Support,
@@ -274,9 +271,9 @@ export const safe: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,
-				legibility: null,
 				messageSigningLegibility: null,
-				transactionDetailsDisplay: displaysFullTransactionDetails,
+				// transactionDetailsDisplay: displaysFullTransactionDetails,
+				transactionDetailsDisplay: null,
 			},
 		},
 		selfSovereignty: {

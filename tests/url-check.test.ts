@@ -924,6 +924,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '9fd8107761754e932d217c8cba525769b5a2ac42',
 		retrieved: '2026-01-29',
 	},
+	{
+		url: 'https://hackerone.com/metamask/safe_harbor',
+		urlHash: '22fefabd03259db123b5217a9deae2e6c9fb2eaa',
+		retrieved: '2026-02-24',
+	},
 ]
 
 /**

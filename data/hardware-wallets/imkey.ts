@@ -4,7 +4,8 @@ import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/
 import { FirmwareType } from '@/schema/features/security/firmware'
 import { SupplyChainFactoryType } from '@/schema/features/security/supply-chain-factory'
 import {
-	CalldataDecoding,
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDecoded,
 	DataDisplayOptions,
 	DataExtraction,
@@ -18,7 +19,6 @@ import {
 	LicensingType,
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
@@ -157,6 +157,18 @@ export const imkeyWallet: HardwareWallet = {
 						],
 					},
 				],
+				calldataDecoded: {
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DataDecoded.ON_DEVICE,
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: null,
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: DataDecoded.ON_DEVICE,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: DataDecoded.NOT_DECODED,
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: DataDecoded.NOT_DECODED,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: DataDecoded.NOT_DECODED,
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						DataDecoded.NOT_DECODED,
+				},
 				dataExtraction: {
 					[DataExtraction.EYES]: true,
 					[DataExtraction.HASHES]: false,
@@ -165,21 +177,6 @@ export const imkeyWallet: HardwareWallet = {
 				detailsDisplayed: {
 					...displaysFullTransactionDetails,
 					nonce: DataDisplayOptions.NOT_IN_UI,
-				},
-				legibility: {
-					[CalldataDecoding.ETH_USDC_TRANSFER]: supported({
-						ref: refTodo,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.ZKSYNC_USDC_TRANSFER]: supported({
-						ref: refTodo,
-						decoded: DataDecoded.ON_DEVICE,
-					}),
-					[CalldataDecoding.USDC_APPROVAL]: notSupported,
-					[CalldataDecoding.AAVE_SUPPLY]: notSupported,
-					[CalldataDecoding.SAFEWALLET_AAVE_SUPPLY_NESTED]: notSupported,
-					[CalldataDecoding.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
-						notSupported,
 				},
 				messageSigningLegibility: null,
 			},

@@ -2,9 +2,15 @@ import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
+import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
+import {
+	BugBountyPlatform,
+	BugBountyProgramAvailability,
+	LegalProtectionType,
+} from '@/schema/features/security/bug-bounty-program'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -16,8 +22,14 @@ import {
 } from '@/schema/features/security/keys-handling'
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
+	type DisplayedBasicTransactionDetails,
 	displaysFullCallData,
+	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
 import {
 	type ChainConfigurability,
@@ -38,6 +50,7 @@ import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { mdParagraph, paragraph } from '@/types/content'
+import type { CalendarDate } from '@/types/date'
 
 import { alphabet } from '../entities/alphabet'
 import { apple } from '../entities/apple'
@@ -46,6 +59,15 @@ import { cure53 } from '../entities/cure53'
 import { cyfrin } from '../entities/cyfrin'
 import { diligence } from '../entities/diligence'
 import { metamask7702DelegatorContract } from '../wallet-contracts/metamask-7702-delegator'
+
+const metamaskTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
+	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	nonce: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+}
 
 export const metamask: SoftwareWallet = {
 	metadata: {
@@ -179,7 +201,18 @@ export const metamask: SoftwareWallet = {
 			}),
 		}),
 		ecosystem: {
-			delegation: null,
+			delegation: {
+				duringEOACreation: 'NO',
+				duringEOAImport: 'NO',
+				duringFirst7702Operation: supported({
+					type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS',
+					nonDelegationTransactionDetailsIdenticalToNormalFlow: true,
+				}),
+				fee: {
+					crossChainGas: notSupported,
+					walletSponsored: notSupported,
+				},
+			},
 		},
 		integration: {
 			browser: {
@@ -250,7 +283,17 @@ export const metamask: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
-			appIsolation: null,
+			appIsolation: {
+				createInAppConnectionFlow: supported({
+					ref: refTodo,
+				}),
+				erc7846WalletConnect: notSupported,
+				ethAccounts: supported({
+					ref: refTodo,
+					defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+				}),
+				useAppSpecificLastConnectedAddresses: notSupported,
+			},
 			dataCollection: null,
 			privacyPolicy: 'https://consensys.io/privacy-notice/',
 			transactionPrivacy: {
@@ -310,7 +353,34 @@ export const metamask: SoftwareWallet = {
 					},
 				}),
 			},
-			bugBountyProgram: null,
+			bugBountyProgram: supported({
+				ref: [
+					{
+						explanation:
+							'Metamask works with an active community of security researchers through their Bug Bounty Program to continually improve their security.',
+						url: 'https://metamask.io/security/metamask-security-program',
+					},
+				],
+				availability: BugBountyProgramAvailability.ACTIVE,
+				coverageBreadth: 'FULL_SCOPE' as const,
+				dateStarted: '2022-06-01' as CalendarDate,
+				disclosure: notSupported,
+				legalProtections: supported({
+					type: LegalProtectionType.SAFE_HARBOR,
+					ref: {
+						explanation:
+							'Metamask waives any relevant restriction in our Terms of Service ("TOS") and/or Acceptable Use Policies ("AUP") that conflicts with the standard for Good Faith Security Research outlined here..',
+						url: 'https://hackerone.com/metamask/safe_harbor',
+					},
+				}),
+				platform: BugBountyPlatform.HACKER_ONE,
+				rewards: supported({
+					currency: 'USD',
+					maximum: 1000000,
+					minimum: 250,
+				}),
+				upgradePathAvailable: true,
+			}),
 			hardwareWalletSupport: {
 				ref: [
 					{
@@ -436,15 +506,56 @@ export const metamask: SoftwareWallet = {
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,
-				legibility: null,
-				messageSigningLegibility: null,
+				messageSigningLegibility: {
+					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
+				},
 				transactionDetailsDisplay: {
-					chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					from: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					gas: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
-					to: DataDisplayOptions.SHOWN_BY_DEFAULT,
-					value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						...metamaskTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						...metamaskTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: metamaskTransactionDisplayDefault,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						...metamaskTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: metamaskTransactionDisplayDefault,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						...metamaskTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						...metamaskTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						...metamaskTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							...metamaskTransactionDisplayDefault,
+							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						...metamaskTransactionDisplayDefault,
+						nondeterminism: 'RESIMULATES_NO_WARNING',
+					},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						...metamaskTransactionDisplayDefault,
+						failure: 'DETECTED',
+					},
 				},
 			},
 		},

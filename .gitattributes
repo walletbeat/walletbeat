@@ -1,0 +1,43 @@
+# Fallback:
+* text=auto
+
+*.astro text eol=lf diff=html
+*.cjs text eol=lf
+*.cjs text eol=lf
+*.css text diff=css
+*.eot binary
+*.gif binary
+*.html text eol=lf diff=html
+*.jpg binary
+*.json text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.md text eol=lf diff=markdown
+*.mdx text eol=lf diff=markdown
+*.mjs text eol=lf
+*.otf binary
+*.pdf binary
+*.png binary
+*.py text diff=python
+*.scss text diff=css
+*.sh text eol=lf
+*.svelte text eol=lf diff=html
+*.svg text eol=lf
+*.toml text eol=lf
+*.ts text eol=lf
+*.tsv text eol=lf
+*.tsx text eol=lf
+*.ttf binary
+*.txt text eol=lf diff=markdown
+*.woff2 binary
+*.woff binary
+*.yaml text eol=lf
+
+AUTHORS text eol=lf diff=markdown
+CHANGELOG text eol=lf diff=markdown
+CHANGES text eol=lf diff=markdown
+CONTRIBUTING text eol=lf diff=markdown
+COPYING text eol=lf diff=markdown
+INSTALL text eol=lf diff=markdown
+LICENSE text eol=lf diff=markdown
+README text eol=lf diff=markdown
