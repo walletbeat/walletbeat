@@ -112,156 +112,138 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 		WALLET_PSEUDONYM_PLURAL: metadata.pseudonymType?.plural ?? 'pseudonyms',
 	}
 
-	const lines: string[] = []
-
-	// Header
-	lines.push(`# ${walletName} — Walletbeat Review`)
-	lines.push('')
-
-	lines.push(...markdownBlockquote(renderTypographic(metadata.blurb, walletName)))
-	lines.push('')
-
-	// Metadata
-	lines.push(`Last updated: ${metadata.lastUpdated}`)
-	lines.push(`Walletbeat page: ${siteUrl}/${metadata.id}`)
 	const variantNames = setItems<Variant>(getVariants(wallet.variants))
 		.map(v => variantToName(v, true))
 		.join(', ')
 
-	lines.push(`Variants: ${variantNames}`)
-	lines.push('')
-	lines.push('---')
-	lines.push('')
+	const headerLines: string[] = [
+		`# ${walletName} — Walletbeat Review`,
+		'',
+		...markdownBlockquote(renderTypographic(metadata.blurb, walletName)),
+		'',
+		`Last updated: ${metadata.lastUpdated}`,
+		`Walletbeat page: ${siteUrl}/${metadata.id}`,
+		`Variants: ${variantNames}`,
+		'',
+		'---',
+		'',
+	]
 
 	const isMultiVariant = !hasSingleVariant(wallet.variants)
 
-	// Attribute groups
-	mapNonExemptAttributeGroupsInTree(wallet.overall, (attrGroup, evalGroup) => {
-		lines.push(`## ${attrGroup.displayName}`)
-		lines.push('')
+	const groupLines = mapNonExemptAttributeGroupsInTree(
+		wallet.overall,
+		(attrGroup, evalGroup): string[] => {
+			const attrLines = mapNonExemptGroupAttributes(evalGroup, (evalAttr): string[] => {
+				const { attribute, evaluation } = evalAttr
+				const rating = ratingToText(evaluation.value.rating)
+				const walletAttrUrl = `${siteUrl}/${metadata.id}#${slugifyCamelCase(attribute.id)}`
+				const parts: string[] = [`### ${attribute.displayName}: ${rating}`, '']
 
-		mapNonExemptGroupAttributes(evalGroup, evalAttr => {
-			const { attribute, evaluation } = evalAttr
-			const rating = ratingToText(evaluation.value.rating)
+				if (isMultiVariant) {
+					const isVariantSpecific = nonEmptyValues<Variant, Map<string, VariantSpecificity>>(
+						wallet.variantSpecificity,
+					).some(specMap => {
+						const spec = specMap.get(attribute.id)
 
-			// Attribute heading with rating
-			const walletAttrUrl = `${siteUrl}/${metadata.id}#${slugifyCamelCase(attribute.id)}`
+						return (
+							spec === VariantSpecificity.UNIQUE_TO_VARIANT ||
+							spec === VariantSpecificity.NOT_UNIVERSAL
+						)
+					})
 
-			lines.push(`### ${attribute.displayName}: ${rating}`)
-			lines.push('')
+					if (isVariantSpecific) {
+						const perVariantParts: string[] = []
 
-			if (isMultiVariant) {
-				const isVariantSpecific = nonEmptyValues<Variant, Map<string, VariantSpecificity>>(
-					wallet.variantSpecificity,
-				).some(specMap => {
-					const spec = specMap.get(attribute.id)
+						for (const [variant, resolved] of nonEmptyEntries<Variant, ResolvedWallet>(
+							wallet.variants,
+						)) {
+							const variantEvalAttr = getAttributeFromTree(resolved.attributes, attribute)
 
-					return (
-						spec === VariantSpecificity.UNIQUE_TO_VARIANT ||
-						spec === VariantSpecificity.NOT_UNIVERSAL
+							if (
+								variantEvalAttr === null ||
+								variantEvalAttr.evaluation.value.rating === Rating.EXEMPT
+							) {
+								continue
+							}
+
+							perVariantParts.push(
+								`${variantToName(variant, true)}: ${ratingToText(variantEvalAttr.evaluation.value.rating)}`,
+							)
+						}
+
+						if (perVariantParts.length > 0) {
+							parts.push(
+								`**Per-variant ratings:** ${perVariantParts.join(', ')}. [See full details](${walletAttrUrl}).`,
+								'',
+							)
+						}
+					}
+				}
+
+				const shortExpl = normalizeMarkdownBlankLines(
+					renderEvaluationContent(evaluation.value.shortExplanation, evalStrings),
+				)
+
+				parts.push(shortExpl.trim(), '')
+
+				const details = normalizeMarkdownBlankLines(
+					renderEvaluationContentOrFallback(
+						evaluation.details,
+						evalStrings,
+						`[See full details for ${attribute.displayName}](${walletAttrUrl})`,
+					),
+				)
+
+				if (details.trim() !== '') {
+					parts.push(details.trim(), '')
+				}
+
+				if (evaluation.impact !== undefined) {
+					const impact = normalizeMarkdownBlankLines(
+						renderEvaluationContent(evaluation.impact, evalStrings),
 					)
-				})
 
-				if (isVariantSpecific) {
-					const perVariantParts: string[] = []
+					if (impact.trim() !== '') {
+						parts.push('#### Impact', '', impact.trim(), '')
+					}
+				}
 
-					for (const [variant, resolved] of nonEmptyEntries<Variant, ResolvedWallet>(
-						wallet.variants,
-					)) {
-						const variantEvalAttr = getAttributeFromTree(resolved.attributes, attribute)
+				if (evaluation.howToImprove !== undefined) {
+					const howTo = normalizeMarkdownBlankLines(
+						renderEvaluationContent(evaluation.howToImprove, evalStrings),
+					)
 
-						if (
-							variantEvalAttr === null ||
-							variantEvalAttr.evaluation.value.rating === Rating.EXEMPT
-						) {
-							continue
+					if (howTo.trim() !== '') {
+						parts.push('#### How to improve', '', howTo.trim(), '')
+					}
+				}
+
+				if (evaluation.references !== undefined && evaluation.references.length > 0) {
+					const qualifiedRefs = toFullyQualified(evaluation.references)
+
+					if (qualifiedRefs.length > 0) {
+						parts.push('#### References', '')
+
+						for (const ref of qualifiedRefs) {
+							for (const labeledUrl of ref.urls) {
+								const refExplanation =
+									ref.explanation !== undefined ? `: ${collapseToSingleLine(ref.explanation)}` : ''
+
+								parts.push(`- [${labeledUrl.label}](${labeledUrl.url})${refExplanation}`)
+							}
 						}
 
-						perVariantParts.push(
-							`${variantToName(variant, true)}: ${ratingToText(variantEvalAttr.evaluation.value.rating)}`,
-						)
-					}
-
-					if (perVariantParts.length > 0) {
-						lines.push(
-							`**Per-variant ratings:** ${perVariantParts.join(', ')}. [See full details](${walletAttrUrl}).`,
-						)
-						lines.push('')
+						parts.push('')
 					}
 				}
-			}
 
-			const shortExpl = normalizeMarkdownBlankLines(
-				renderEvaluationContent(evaluation.value.shortExplanation, evalStrings),
-			)
+				return parts
+			})
 
-			lines.push(shortExpl.trim())
-			lines.push('')
-			const details = normalizeMarkdownBlankLines(
-				renderEvaluationContentOrFallback(
-					evaluation.details,
-					evalStrings,
-					`[See full details for ${attribute.displayName}](${walletAttrUrl})`,
-				),
-			)
+			return [`## ${attrGroup.displayName}`, '', ...attrLines.flat()]
+		},
+	)
 
-			if (details.trim() !== '') {
-				lines.push(details.trim())
-				lines.push('')
-			}
-
-			// Impact
-			if (evaluation.impact !== undefined) {
-				const impact = normalizeMarkdownBlankLines(
-					renderEvaluationContent(evaluation.impact, evalStrings),
-				)
-
-				if (impact.trim() !== '') {
-					lines.push('#### Impact')
-					lines.push('')
-					lines.push(impact.trim())
-					lines.push('')
-				}
-			}
-
-			// How to improve
-			if (evaluation.howToImprove !== undefined) {
-				const howTo = normalizeMarkdownBlankLines(
-					renderEvaluationContent(evaluation.howToImprove, evalStrings),
-				)
-
-				if (howTo.trim() !== '') {
-					lines.push('#### How to improve')
-					lines.push('')
-					lines.push(howTo.trim())
-					lines.push('')
-				}
-			}
-
-			// References
-			if (evaluation.references !== undefined && evaluation.references.length > 0) {
-				const qualifiedRefs = toFullyQualified(evaluation.references)
-
-				if (qualifiedRefs.length > 0) {
-					lines.push('#### References')
-					lines.push('')
-
-					for (const ref of qualifiedRefs) {
-						for (const labeledUrl of ref.urls) {
-							const refExplanation =
-								ref.explanation !== undefined ? `: ${collapseToSingleLine(ref.explanation)}` : ''
-
-							lines.push(`- [${labeledUrl.label}](${labeledUrl.url})${refExplanation}`)
-						}
-					}
-
-					lines.push('')
-				}
-			}
-		})
-
-		return undefined
-	})
-
-	return lines.join('\n')
+	return [...headerLines, ...groupLines.flat()].join('\n')
 }
