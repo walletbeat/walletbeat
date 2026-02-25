@@ -1,16 +1,18 @@
 import { variantToName } from '@/constants/variants'
 import {
+	getAttributeFromTree,
 	mapNonExemptAttributeGroupsInTree,
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import {
+	Rating,
 	ratingToText,
 	type WalletNameAndPseudonymStrings,
 	type WalletNameStrings,
 } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
-import { getVariants, type Variant } from '@/schema/variants'
-import type { RatedWallet } from '@/schema/wallet'
+import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
+import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import {
 	type Content,
 	ContentType,
@@ -18,7 +20,7 @@ import {
 	prerenderTypographicContent,
 	type TypographicContent,
 } from '@/types/content'
-import { setItems } from '@/types/utils/non-empty'
+import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase } from '@/types/utils/text'
 import {
 	collapseToSingleLine,
@@ -131,6 +133,8 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	lines.push('---')
 	lines.push('')
 
+	const isMultiVariant = !hasSingleVariant(wallet.variants)
+
 	// Attribute groups
 	mapNonExemptAttributeGroupsInTree(wallet.overall, (attrGroup, evalGroup) => {
 		lines.push(`## ${attrGroup.displayName}`)
@@ -141,8 +145,51 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 			const rating = ratingToText(evaluation.value.rating)
 
 			// Attribute heading with rating
+			const walletAttrUrl = `${siteUrl}/${metadata.id}#${slugifyCamelCase(attribute.id)}`
+
 			lines.push(`### ${attribute.displayName}: ${rating}`)
 			lines.push('')
+
+			if (isMultiVariant) {
+				const isVariantSpecific = nonEmptyValues<Variant, Map<string, VariantSpecificity>>(
+					wallet.variantSpecificity,
+				).some(specMap => {
+					const spec = specMap.get(attribute.id)
+
+					return (
+						spec === VariantSpecificity.UNIQUE_TO_VARIANT ||
+						spec === VariantSpecificity.NOT_UNIVERSAL
+					)
+				})
+
+				if (isVariantSpecific) {
+					const perVariantParts: string[] = []
+
+					for (const [variant, resolved] of nonEmptyEntries<Variant, ResolvedWallet>(
+						wallet.variants,
+					)) {
+						const variantEvalAttr = getAttributeFromTree(resolved.attributes, attribute)
+
+						if (
+							variantEvalAttr === null ||
+							variantEvalAttr.evaluation.value.rating === Rating.EXEMPT
+						) {
+							continue
+						}
+
+						perVariantParts.push(
+							`${variantToName(variant, true)}: ${ratingToText(variantEvalAttr.evaluation.value.rating)}`,
+						)
+					}
+
+					if (perVariantParts.length > 0) {
+						lines.push(
+							`**Per-variant ratings:** ${perVariantParts.join(', ')}. [See full details](${walletAttrUrl}).`,
+						)
+						lines.push('')
+					}
+				}
+			}
 
 			const shortExpl = normalizeMarkdownBlankLines(
 				renderEvaluationContent(evaluation.value.shortExplanation, evalStrings),
@@ -150,8 +197,6 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 			lines.push(shortExpl.trim())
 			lines.push('')
-
-			const walletAttrUrl = `${siteUrl}/${metadata.id}#${slugifyCamelCase(attribute.id)}`
 			const details = normalizeMarkdownBlankLines(
 				renderEvaluationContentOrFallback(
 					evaluation.details,
