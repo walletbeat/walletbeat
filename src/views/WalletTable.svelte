@@ -79,7 +79,7 @@
 
 	const displayedAttributeGroups = $derived.by(() => {
 		let filtered = (
-			wallets.find(w => w.variants.browser || w.variants.desktop || w.variants.mobile) ?
+			wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE]) ?
 				// Filter attribute groups to only include non-exempt attributes
 				attributeGroups
 					.map(attrGroup => ({
@@ -88,7 +88,7 @@
 							Object.fromEntries(
 								Object.entries(attrGroup.attributes)
 									.filter(([attributeId, _]) => (
-										wallets.find(w => w.variants.browser || w.variants.desktop || w.variants.mobile)
+										wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE])
 											?.overall[attrGroup.id]?.[attributeId]?.evaluation?.value?.rating !== Rating.EXEMPT
 									))
 							)
