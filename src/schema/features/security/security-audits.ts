@@ -16,7 +16,7 @@ import type { AtLeastOneTrueVariant } from '../../variants'
  * The severity of a security flaw, as assigned by the auditor.
  * Only medium-severity or higher flaws are tracked here, lower-severity
  * findings are ignored.
- * 
+ *
  * If the security auditor does not assign a severity rating, use your best judgement.
  */
 export enum SecurityFlawSeverity {

@@ -177,7 +177,7 @@ export enum LicensingType {
 	 * This repository is all that is needed to build the wallet locally.
 	 * (e.g. A wallet with one GitHub repo, one LICENSE file covering all its code,
 	 * and no separate proprietary core dependency required to build it.)
-	 * 
+	 *
 	 * To identify: the wallet has one main source repository with one LICENSE file,
 	 * and all wallet functionality can be built from that repository alone.
 	 */
@@ -186,7 +186,7 @@ export enum LicensingType {
 	/**
 	 * The wallet's code is split between "core code" covered under a specific
 	 * license, and wallet/app code that is covered under a different license.
-	 * 
+	 *
 	 * To identify: the wallet has separate repositories — or a monorepo with separate
 	 * LICENSE files per package — where the signing/crypto library and the UI app
 	 * carry different licenses.

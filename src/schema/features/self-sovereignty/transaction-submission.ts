@@ -108,7 +108,7 @@ export interface TransactionSubmission {
 		/**
 		 * Whether the wallet submits transactions through the user's self-hosted
 		 * node when one is configured as the RPC endpoint.
-		 * Verify by configuring a local node, sending a transaction, 
+		 * Verify by configuring a local node, sending a transaction,
 		 * and confirming via network traffic that the `eth_sendRawTransaction` call goes to your
 		 * node and not to any third-party relay or bundler.
 		 */

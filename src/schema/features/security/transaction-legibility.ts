@@ -103,9 +103,9 @@ export enum TransactionOutcome {
  * Complex transactions interact with contracts, so there is no simple "to" address or "value" —
  * instead we evaluate whether the transaction outcome is explained.
  * To test: initiate the relevant benchmark transaction and observe the approval screen.
- * 
- * Users can test on https://beta.walletbeat.eth.limo/test and 
- * test a transaction request under `Transactions` tab. 
+ *
+ * Users can test on https://beta.walletbeat.eth.limo/test and
+ * test a transaction request under `Transactions` tab.
  */
 export interface DisplayedComplexTransactionDetails {
 	/** The gas fee / estimated network cost. */
@@ -456,8 +456,8 @@ export enum DataDecoded {
  * To test: trigger an `eth_signTypedData_v4` request (e.g. via a dapp that
  * uses EIP-712 signatures, or via the browser console) and observe what the
  * wallet's approval screen shows.
- * 
- * Users can test on https://beta.walletbeat.eth.limo/test and 
+ *
+ * Users can test on https://beta.walletbeat.eth.limo/test and
  * test a EIP-712 message signing request under `Signatures` tab.
  */
 export enum MessageSigningDetails {
@@ -607,8 +607,8 @@ export interface HardwareTransactionLegibilitySupport {
  * What can the user do with the calldata on the approval screen?
  * To test: initiate a contract transaction (e.g. USDC_APPROVAL) and check
  * what calldata options the wallet provides.
- * 
- * Users can test on https://beta.walletbeat.eth.limo/test and 
+ *
+ * Users can test on https://beta.walletbeat.eth.limo/test and
  * test a USDC approval transaction under `Transactions` tab.
  */
 export interface CallDataDisplay {
