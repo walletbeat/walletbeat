@@ -5,7 +5,7 @@ description: >
   project (data/software-wallets/, data/hardware-wallets/, or
   data/embedded-wallets/). Guides through entity setup, contributor file,
   wallet skeleton, and populating every feature field.
-argument-hint: "[wallet-name]"
+argument-hint: '[wallet-name]'
 ---
 
 You are helping a contributor add or update wallet data in the Walletbeat project.
@@ -58,33 +58,36 @@ Confirm it exists and note the exported constant name. No further action needed 
 Using the information collected in step 5 above (name, affiliation, profile URL), create `data/contributors/[their-nickname].ts` for them. Use `data/contributors/example.ts` as the template.
 
 Key rules:
+
 - **Affiliation must always be disclosed.** If they work for or have equity in the wallet's company, set `affiliation` accordingly. If they have no affiliation, set `affiliation: []`.
 - Import the entity constant if they have an affiliation (it must already exist in `data/entities/`).
 
 Example for an affiliated contributor:
+
 ```typescript
 import type { Contributor } from '@/schema/wallet'
 import { myWalletCorp } from '@/data/entities/my-wallet-corp'
 
 export const chainMonkey: Contributor = {
-  name: 'Chain Monkey',
-  affiliation: [
-    {
-      developer: myWalletCorp,
-      hasEquity: true,
-      role: 'EMPLOYEE', // or 'FOUNDER', 'ADVISOR', 'CONTRACTOR'
-    },
-  ],
+	name: 'Chain Monkey',
+	affiliation: [
+		{
+			developer: myWalletCorp,
+			hasEquity: true,
+			role: 'EMPLOYEE', // or 'FOUNDER', 'ADVISOR', 'CONTRACTOR'
+		},
+	],
 }
 ```
 
 Example for an unaffiliated contributor:
+
 ```typescript
 import type { Contributor } from '@/schema/wallet'
 
 export const chainMonkey: Contributor = {
-  name: 'Chain Monkey',
-  affiliation: [],
+	name: 'Chain Monkey',
+	affiliation: [],
 }
 ```
 
@@ -125,6 +128,7 @@ Walk through substeps C.1 through C.4 in order, one at a time, waiting for the c
 Ask the contributor for the wallet developer's company name and legal name.
 
 Instruct them to:
+
 - Check if the entity already exists in `data/entities/`. If so, skip to C.2.
 - If not, copy `data/entities/example.ts` to `data/entities/[kebab-case-company-name].ts`.
 - Remove all constants except the `WalletDeveloper` one; rename it to the camelCase company name.
@@ -133,6 +137,7 @@ Instruct them to:
   - If only PNG is available: save as `.png` and set `icon: { extension: 'png', width: N, height: N }`.
 
 Key type fields to explain:
+
 - `type.walletDeveloper: true` — always true for the company behind a wallet
 - `type.chainDataProvider: true` — only if the company also runs RPC infrastructure
 - `type.transactionBroadcastProvider: true` — only if the company runs transaction relay infrastructure
@@ -141,6 +146,7 @@ Key type fields to explain:
 ### Step C.2 — Wallet skeleton file
 
 Instruct the contributor to:
+
 - Copy the template (`data/[type]-wallets/unrated.tmpl.ts`) to `data/[type]-wallets/[kebab-wallet-name].ts`.
 - Rename the exported constant from `unratedTemplate` / `unratedHardwareTemplate` / `unratedEmbeddedTemplate` to the camelCase wallet name (e.g., `rainbow`, `ledgerNano`, `privySdk`).
 - Update `metadata`:
@@ -164,17 +170,19 @@ At this point, all `features` fields should remain `null` — that is populated 
 ### Step C.3 — Register in index
 
 For the wallet to appear on the site, instruct the contributor to edit the index file:
+
 - Software: `data/software-wallets.ts`
 - Hardware: `data/hardware-wallets.ts`
 - Embedded: `data/embedded-wallets.ts`
 
 Add the import and add the wallet to the exported object:
+
 ```typescript
 import { myWallet } from './software-wallets/my-wallet'
 // ...
 export const softwareWallets = {
-  // ... existing wallets ...
-  myWallet,
+	// ... existing wallets ...
+	myWallet,
 }
 ```
 
@@ -189,6 +197,7 @@ pnpm dev          # Then browse to http://localhost:4321/ to see the wallet in t
 ```
 
 Help them interpret and fix any TypeScript or lint errors. Common issues:
+
 - Missing import for `Variant` or other enums
 - Incorrect object structure from the template
 - The wallet icon file is missing (the build won't fail but the icon will be broken)
@@ -204,6 +213,7 @@ The goal is to replace every `null` field (or the specific fields the contributo
 ### General workflow for each field
 
 For every `null` field:
+
 1. Explain what the field measures (use TSDoc from the type definition — Ctrl+Click on the field name in the editor to navigate to the type)
 2. Describe how to test or verify it
 3. Show the Ambire example value if applicable
@@ -214,10 +224,12 @@ For every `null` field:
 **`null` = unknown.** Never use `undefined`. A `null` field means "we don't know yet." Leave fields as `null` rather than guessing.
 
 **`VariantFeature<T>`** — Nearly every field is wrapped in this. It means you can either:
+
 - Use a single value for all variants: `multiAddress: featureSupported`
 - Use a per-variant object if the behavior differs: `multiAddress: { [Variant.BROWSER]: featureSupported, [Variant.MOBILE]: notSupported }`
 
 **`Support` / `featureSupported` / `notSupported` / `supported({...})`**:
+
 ```typescript
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 
@@ -229,14 +241,15 @@ multiAddress: notSupported
 
 // Feature is supported AND you need to provide additional structured data:
 chainConfigurability: supported({
-  ref: refTodo,
-  l1: notSupported,
-  nonL1: supported({ rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST }),
-  customChainRpcEndpoint: featureSupported,
+	ref: refTodo,
+	l1: notSupported,
+	nonL1: supported({ rpcEndpointConfiguration: RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST }),
+	customChainRpcEndpoint: featureSupported,
 })
 ```
 
 **`WithRef<T>`** — Adds a `ref` field for sourcing. Always fill `ref` with evidence:
+
 ```typescript
 // Single URL (shorthand):
 ref: 'https://github.com/example/wallet/blob/main/src/config.ts'
@@ -266,6 +279,7 @@ ref: refNotNecessary
 **`Nullable<T>`** — Any subfield can be `null` if unknown. If any subfield is `null`, Walletbeat treats the entire field as unrated.
 
 **Type inference tip**: If TypeScript complains about the `supported({...})` call, explicitly annotate the type parameter:
+
 ```typescript
 supported<WithRef<ChainConfigurability>>({ ... })
 ```
@@ -273,6 +287,7 @@ supported<WithRef<ChainConfigurability>>({ ... })
 ### Field-by-field guidance
 
 Walk through each `null` field in the wallet file (or only the fields the contributor asked about in step 3). For each one, provide:
+
 - **What it measures** (from the TSDoc comment at the type definition)
 - **How to test it** (describe the testing method: try the wallet UI, inspect network traffic, read source code)
 - **Ambire example** (show the corresponding value from `data/software-wallets/ambire.ts` if applicable)

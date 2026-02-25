@@ -416,6 +416,7 @@ export const rabby: SoftwareWallet = {
 					},
 				},
 				[Variant.BROWSER]: null,
+						}),
 				[Variant.MOBILE]: null,
 			},
 			keysHandling: {
