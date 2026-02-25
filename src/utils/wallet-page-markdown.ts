@@ -27,6 +27,7 @@ import {
 	markdownBlockquote,
 	normalizeMarkdownBlankLines,
 } from '@/utils/markdown-utils'
+import { getWalletStageAndLadder } from '@/utils/stage'
 
 /**
  * Render TypographicContent<WalletNameStrings> to a plain string.
@@ -116,6 +117,15 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 		.map(v => variantToName(v, true))
 		.join(', ')
 
+	const { stage } = getWalletStageAndLadder(wallet)
+
+	const stageHeaderText =
+		stage === null || stage === 'NOT_APPLICABLE'
+			? 'Not applicable'
+			: stage === 'QUALIFIED_FOR_NO_STAGES'
+				? 'Qualified for no stages'
+				: stage.label
+
 	const headerLines: string[] = [
 		`# ${walletName} — Walletbeat Review`,
 		'',
@@ -125,10 +135,27 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 		`Walletbeat page: ${siteUrl}/${metadata.id}`,
 		`Methodology: ${siteUrl}/methodology/index.html.md`,
 		`Variants: ${variantNames}`,
+		`Stage: ${stageHeaderText}`,
 		'',
 		'---',
 		'',
 	]
+
+	const stageSection: string[] = []
+
+	if (typeof stage === 'object' && stage !== null) {
+		stageSection.push('## Stage', '', `[${stage.label}](${siteUrl}/${metadata.id}#stages)`, '')
+
+		if (isTypographicContent(stage.description)) {
+			const desc = normalizeMarkdownBlankLines(
+				renderTypographic(stage.description, walletName),
+			).trim()
+
+			if (desc !== '') {
+				stageSection.push(desc, '')
+			}
+		}
+	}
 
 	const isMultiVariant = !hasSingleVariant(wallet.variants)
 
@@ -246,5 +273,5 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 		},
 	)
 
-	return [...headerLines, ...groupLines.flat()].join('\n')
+	return [...headerLines, ...stageSection, ...groupLines.flat()].join('\n')
 }

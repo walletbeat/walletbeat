@@ -7,6 +7,7 @@ import {
 } from '@/schema/attribute-groups'
 import { ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
+import { getWalletStageAndLadder } from '@/utils/stage'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
 const SITE_URL = 'https://wallet.page'
@@ -83,6 +84,27 @@ describe('walletPageMarkdown', () => {
 
 					return undefined
 				})
+			})
+
+			it('contains stage rating information', () => {
+				const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+
+				if (stage === null || ladderEvaluation === null || stage === 'NOT_APPLICABLE') {
+					expect(md).toContain('Stage: Not applicable')
+				} else if (stage === 'QUALIFIED_FOR_NO_STAGES') {
+					expect(md).toContain('Stage: Qualified for no stages')
+				} else {
+					expect(md).toContain(`Stage: ${stage.label}`)
+				}
+			})
+
+			it('contains Stage section when wallet has a concrete stage', () => {
+				const { stage } = getWalletStageAndLadder(wallet)
+
+				if (typeof stage === 'object' && stage !== null) {
+					expect(md).toContain('## Stage')
+					expect(md).toContain(`[${stage.label}](${SITE_URL}/${wallet.metadata.id}#stages)`)
+				}
 			})
 		})
 	}
