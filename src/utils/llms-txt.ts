@@ -33,13 +33,13 @@ export function llmsTxtBody(siteUrl: string): string {
 	)
 	lines.push('')
 	lines.push(
-		'Each wallet is rated on individual attributes using a PASS / PARTIAL / FAIL / UNRATED / EXEMPT system.',
+		'Each wallet is rated on individual attributes using a `PASS` / `PARTIAL` / `FAIL` / `UNRATED` / `EXEMPT` system.',
 	)
 	lines.push(
-		'PASS means the wallet fully meets the criteria; PARTIAL means it partially does; FAIL means it does not;',
+		'`PASS` means the wallet fully meets the criteria; `PARTIAL` means it partially does; `FAIL` means it does not;',
 	)
 	lines.push(
-		'UNRATED means the information is not yet available; EXEMPT means the attribute does not apply to this wallet.',
+		'`UNRATED` means the information is not yet available; `EXEMPT` means the attribute does not apply to this wallet.',
 	)
 	lines.push('')
 	lines.push(`Full wallet list and ratings: ${siteUrl}`)

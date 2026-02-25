@@ -7,6 +7,7 @@ import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
 export const prerender = true
 
+// TODO: https://github.com/walletbeat/walletbeat/issues/547
 export const getStaticPaths: GetStaticPaths = () =>
 	nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({ params: { walletName } }))
 
