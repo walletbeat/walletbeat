@@ -1,25 +1,40 @@
 import type { WithRef } from '@/schema/reference'
 import { Enum, mergeEnums } from '@/utils/enum'
 
+/**
+ * To test: initiate the relevant transaction type and observe the approval
+ * screen without clicking anything fee-related or expanding any sections.
+ */
 export enum DataDisplayOptions {
-	/** Shown by default on the transaction approval screen */
+	/** Visible on the approval screen before any clicks or settings changes. */
 	SHOWN_BY_DEFAULT = 'SHOWN_BY_DEFAULT',
-	/** Available on the transaction approval screen but requires user action (e.g., clicking a button) or enabling in settings */
+	/**
+	 * Visible only after at least one user action on the approval screen
+	 * (e.g. tapping a row, clicking "Details", or enabling a setting).
+	 */
 	SHOWN_OPTIONALLY = 'SHOWN_OPTIONALLY',
-	/** Not displayed in the wallet UI */
+	/** Not shown anywhere on the approval screen, even after interaction. */
 	NOT_IN_UI = 'NOT_IN_UI',
 }
 
 /**
  * How are the essential transaction data displayed by the wallet for basic transactions?
  * Basic transactions have a clear recipient and value.
+ * To test: initiate a plain ETH transfer (for ETH_TRANSFER) or an ERC-20 send
+ * and check which of the fields below appear on the approval screen.
  */
 export interface DisplayedBasicTransactionDetails {
+	/** The gas fee / estimated network cost. */
 	gas: DataDisplayOptions
+	/** The transaction nonce. */
 	nonce: DataDisplayOptions
+	/** The sender address (the user's own address). */
 	from: DataDisplayOptions
+	/** The recipient address. */
 	to: DataDisplayOptions
+	/** The chain / network the transaction will be sent on. */
 	chain: DataDisplayOptions
+	/** The ETH value being sent. */
 	value: DataDisplayOptions
 }
 
@@ -49,11 +64,37 @@ export const displaysFullTransactionDetails: DisplayedBasicTransactionDetails = 
 
 /**
  * Whether the effect of a complex transaction is explained to the user.
+ *
+ * For regular (EOA) transactions, "outcome" means the wallet explains what
+ * the transaction will do to the signer's own address — e.g. "You are
+ * approving 100 USDC to be spent by Aave", "You are supplying 1 ETH",
+ * "You are receiving / sending ERC-721 / ERC-1155 tokens.".
+ *
+ * For Safe (multisig) transactions, the standard is identical: the wallet
+ * must show what the Safe execution will actually do — the real-world effect
+ * on the Safe's address. The signer is adding a confirmation to an
+ * `execTransaction` call.
+ *
+ * To test: initiate the benchmark transaction and check whether the approval
+ * screen describes the real-world effect in plain terms. For Safe transactions,
+ * verify the wallet shows the outcome of what the Safe will execute, not just
+ * the outer `execTransaction` parameters or a Safe tx hash.
  */
 export enum TransactionOutcome {
-	/** The effect of the transaction is clearly explained. */
+	/**
+	 * The effect is clearly explained.
+	 * For EOA transactions: the wallet describes what will happen to the
+	 * signer's address (e.g. token approvals / transfers, defi deposit).
+	 * For Safe transactions: the wallet describes what will happen to the Safe address.
+	 */
 	EXPLAINED = 'EXPLAINED',
-	/** The effect of the transaction is not explained or unclear, requiring manual user intervention to understand (e.g. interpret calldata). */
+
+	/**
+	 * The effect is not explained, leaving the user to interpret raw calldata.
+	 * For Safe transactions, this includes wallets that only show the Safe
+	 * tx hash or the outer `execTransaction` parameters without showing what
+	 * the Safe will actually do.
+	 */
 	NOT_EXPLAINED = 'NOT_EXPLAINED',
 }
 
@@ -61,15 +102,38 @@ export enum TransactionOutcome {
  * How are the essential transaction data displayed by the wallet for complex transactions?
  * Complex transactions interact with contracts, so there is no simple "to" address or "value" —
  * instead we evaluate whether the transaction outcome is explained.
+ * To test: initiate the relevant benchmark transaction and observe the approval screen.
+ * 
+ * Users can test on https://beta.walletbeat.eth.limo/test and 
+ * test a transaction request under `Transactions` tab. 
  */
 export interface DisplayedComplexTransactionDetails {
+	/** The gas fee / estimated network cost. */
 	gas: DataDisplayOptions
+	/** The transaction nonce. */
 	nonce: DataDisplayOptions
+	/** The sender address. */
 	from: DataDisplayOptions
+	/** The contract being called. */
 	to: DataDisplayOptions
+	/** The chain / network the transaction will be sent on. */
 	chain: DataDisplayOptions
+	/** The ETH value attached to the call (often zero for token interactions). */
 	value: DataDisplayOptions
+	/**
+	 * Whether the calldata is decoded into a human-readable function name and arguments.
+	 * For Safe transactions, this means the wallet must decode the inner calldata
+	 * (the `bytes` `data` parameter of `execTransaction`) — not just the outer
+	 * `execTransaction` call itself. For example, a Safe Aave supply transaction
+	 * wraps `supply(address,uint256,address,uint16)` inside `execTransaction(..., data, ...)`;
+	 * decoding only the outer call leaves the inner `data` as an opaque hex blob.
+	 */
 	calldataDecoded: DataDisplayOptions
+	/**
+	 * Whether the real-world effect of the transaction is explained.
+	 * See `TransactionOutcome` for the full definition, including the
+	 * distinction for Safe (multisig) transactions.
+	 */
 	transactionOutcome: TransactionOutcome
 }
 
@@ -363,27 +427,53 @@ export type SoftwareTransactionDetailsDisplay =
  */
 export type CalldataDecodingTypes = Record<HardwareBenchmarkTransactions, DataDecoded | null> // Allow null for existing wallets that don't have enough data
 
-/** Where does the calldata decoding actually happen? */
+/**
+ * Where does the calldata decoding actually happen?
+ * To identify: initiate a contract transaction and observe whether the
+ * decoded output appears on the hardware wallet's own screen, or only in
+ * the companion app / browser extension on the computer.
+ */
 export enum DataDecoded {
-	/** Calldata decoding happens on the hardware wallet itself. */
+	/**
+	 * Decoding happens on the hardware wallet device itself.
+	 * The decoded function name and parameters are shown on the device screen,
+	 * independently of any software running on the connected computer.
+	 */
 	ON_DEVICE = 'ON_DEVICE',
-	/** Calldata decoding happens outside the hardware wallet (e.g., in a companion app). */
+
+	/**
+	 * Decoding happens off-device — in a companion app, browser extension, or
+	 * desktop software. The hardware wallet's own screen does not show decoded data.
+	 */
 	OFF_DEVICE = 'OFF_DEVICE',
-	/** Calldata decoding does not happen at all. */
+
+	/** No decoding occurs; raw hex calldata is shown (or nothing at all). */
 	NOT_DECODED = 'NOT_DECODED',
 }
 
 /**
  * What does the wallet provide for message signing legibility?
+ * To test: trigger an `eth_signTypedData_v4` request (e.g. via a dapp that
+ * uses EIP-712 signatures, or via the browser console) and observe what the
+ * wallet's approval screen shows.
+ * 
+ * Users can test on https://beta.walletbeat.eth.limo/test and 
+ * test a EIP-712 message signing request under `Signatures` tab.
  */
 export enum MessageSigningDetails {
-	/** The wallet provides the EIP-712 struct */
+	/**
+	 * The wallet shows the full decoded EIP-712 struct — domain fields and
+	 * message fields rendered as human-readable key-value pairs.
+	 */
 	EIP712_STRUCT = 'EIP712_STRUCT',
-	/** The wallet provides the domain hash */
+
+	/** The wallet shows the EIP-712 domain separator hash. */
 	DOMAIN_HASH = 'DOMAIN_HASH',
-	/** The wallet provides the message hash */
+
+	/** The wallet shows the EIP-712 message hash. */
 	MESSAGE_HASH = 'MESSAGE_HASH',
-	/** The wallet provides the Safe hash */
+
+	/** The wallet shows the Safe-specific transaction hash (used in Safe signing flows). */
 	SAFE_HASH = 'SAFE_HASH',
 }
 
@@ -428,28 +518,31 @@ export function supportsAnyCalldataDecoding(calldataDecodingTypes: CalldataDecod
 }
 
 /**
- * Data Extraction:
+ * Data Extraction: how can a user independently verify the data shown on
+ * a hardware wallet, beyond reading it with their eyes?
  *
- * How is a user able to extract that data from a hardware
- * wallet, in order to verify the information?
- *
- * IN FLUX: We as an industry will very hopefully come to a standard on what
- * wallets should do for this.
+ * IN FLUX: the industry has not yet standardized this.
  * https://ethereum-magicians.org/t/standardizing-wallet-information-so-humans-can-actually-know-what-they-are-signing/24295
+ *
+ * To identify: initiate a contract call and observe what the hardware wallet
+ * offers beyond text display on the screen.
  */
 export enum DataExtraction {
 	/**
-	 * Shows calldata/message data, but users have to look at it with their eyes.
+	 * The data is shown on screen and the user reads it visually.
+	 * No machine-readable export is available.
 	 */
 	EYES = 'EYES',
 
 	/**
-	 * Shows calldata/message data, and a QR code to extract.
+	 * The device displays a QR code that encodes the transaction data,
+	 * which can be scanned to extract and verify it externally.
 	 */
 	QRCODE = 'QRCODE',
 
 	/**
-	 * Shows calldata/message data, and a group of hashes to compare against
+	 * The device shows cryptographic hashes (e.g. domain hash, message hash)
+	 * that the user can independently compute and compare.
 	 */
 	HASHES = 'HASHES',
 }
@@ -511,23 +604,34 @@ export interface HardwareTransactionLegibilitySupport {
 }
 
 /**
- * What can the user do with the calldata?
+ * What can the user do with the calldata on the approval screen?
+ * To test: initiate a contract transaction (e.g. USDC_APPROVAL) and check
+ * what calldata options the wallet provides.
+ * 
+ * Users can test on https://beta.walletbeat.eth.limo/test and 
+ * test a USDC approval transaction under `Transactions` tab.
  */
 export interface CallDataDisplay {
 	/**
-	 * Does the wallet display the calldata in raw hex format?
+	 * The raw `0x...` hex calldata is visible somewhere on the approval screen.
+	 * To test: look for a hex string starting with `0x` on the approval screen
+	 * or in an expandable section.
 	 */
 	rawHex: boolean
 
 	/**
-	 * Does the wallet have a specific button for copying the raw hex calldata to the clipboard?
-	 * For batched transactions, a single button that copies the hex wrapped in the multicall function is expected.
+	 * A dedicated button copies the raw hex calldata to the clipboard.
+	 * For batched transactions, the full hex including the multicall wrapper is expected.
+	 * To test: look for a copy icon or "Copy" button next to the calldata.
 	 */
 	copyHexToClipboard: boolean
 
 	/**
-	 * Does the wallet show all arguments from the calldata and the function name in some formatted output (e.g., JSON / text)?
-	 * For batched transactions, the formatted calldata is expected on a per-call basis.
+	 * The calldata is decoded into a human-readable function name and arguments
+	 * (e.g. JSON or structured text), not just raw hex.
+	 * For batched transactions, each inner call should be decoded individually.
+	 * To test: check if the wallet shows the function name (e.g. `approve`) and
+	 * parameters (e.g. spender address, amount) in a readable format.
 	 */
 	formatted: boolean
 }
