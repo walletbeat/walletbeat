@@ -14,7 +14,7 @@ describe('llms.txt', () => {
 		expect(body).toContain(
 			'> Walletbeat is an independent rating platform for Ethereum wallets, evaluating them across security, privacy, self-sovereignty, transparency, ecosystem, and maintenance categories.',
 		)
-		expect(body).toContain('PASS / PARTIAL / FAIL / UNRATED / EXEMPT')
+		expect(body).toContain('`PASS` / `PARTIAL` / `FAIL` / `UNRATED` / `EXEMPT`')
 		expect(body).toContain(`Full wallet list and ratings: ${SITE_URL}`)
 	})
 

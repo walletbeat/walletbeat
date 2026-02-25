@@ -16,14 +16,12 @@ import {
 	prerenderTypographicContent,
 	type TypographicContent,
 } from '@/types/content'
-
-/**
- * Collapse runs of 3+ newlines to exactly two (one blank line).
- * Used so attribute template output does not produce excess blank lines.
- */
-function normalizeMarkdownBlankLines(content: string): string {
-	return content.replace(/\n{3,}/g, '\n\n')
-}
+import { slugifyCamelCase } from '@/types/utils/text'
+import {
+	collapseToSingleLine,
+	markdownBlockquote,
+	normalizeMarkdownBlankLines,
+} from '@/utils/markdown-utils'
 
 /**
  * Render TypographicContent<WalletNameStrings> to a plain string.
@@ -56,15 +54,9 @@ function renderTypographic(
  */
 function renderEvaluationContent(
 	content: TypographicContent<WalletNameAndPseudonymStrings>,
-	walletName: string,
-	pseudonymSingular: string,
-	pseudonymPlural: string,
+	strings: WalletNameAndPseudonymStrings,
 ): string {
-	const rendered = prerenderTypographicContent(content, {
-		WALLET_NAME: walletName,
-		WALLET_PSEUDONYM_SINGULAR: pseudonymSingular,
-		WALLET_PSEUDONYM_PLURAL: pseudonymPlural,
-	})
+	const rendered = prerenderTypographicContent(content, strings)
 
 	switch (rendered.contentType) {
 		case ContentType.TEXT:
@@ -80,16 +72,14 @@ function renderEvaluationContent(
  */
 function renderEvaluationContentOrFallback(
 	content: Content<WalletNameAndPseudonymStrings>,
-	walletName: string,
-	pseudonymSingular: string,
-	pseudonymPlural: string,
+	strings: WalletNameAndPseudonymStrings,
 	fallback: string,
 ): string {
 	if (!isTypographicContent(content)) {
 		return fallback
 	}
 
-	return renderEvaluationContent(content, walletName, pseudonymSingular, pseudonymPlural)
+	return renderEvaluationContent(content, strings)
 }
 
 /**
@@ -97,9 +87,7 @@ function renderEvaluationContentOrFallback(
  * as a short description in the /llms.txt index.
  */
 export function walletBlurbText(wallet: RatedWallet): string {
-	return renderTypographic(wallet.metadata.blurb, wallet.metadata.displayName)
-		.trim()
-		.replace(/\s+/g, ' ')
+	return collapseToSingleLine(renderTypographic(wallet.metadata.blurb, wallet.metadata.displayName))
 }
 
 /**
@@ -113,12 +101,11 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	const { metadata } = wallet
 	const walletName = metadata.displayName
 
-	// Provide non-null fallbacks for pseudonym strings so that evaluation content
-	// which contains {{WALLET_PSEUDONYM_*}} placeholders can always be rendered.
-	// For wallets with a pseudonym type, this will use the actual pseudonym name.
-	// For others, a generic term ensures the output is still readable.
-	const pseudonymSingular = metadata.pseudonymType?.singular ?? 'pseudonym'
-	const pseudonymPlural = metadata.pseudonymType?.plural ?? 'pseudonyms'
+	const evalStrings: WalletNameAndPseudonymStrings = {
+		WALLET_NAME: walletName,
+		WALLET_PSEUDONYM_SINGULAR: metadata.pseudonymType?.singular ?? 'pseudonym',
+		WALLET_PSEUDONYM_PLURAL: metadata.pseudonymType?.plural ?? 'pseudonyms',
+	}
 
 	const lines: string[] = []
 
@@ -126,14 +113,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	lines.push(`# ${walletName} — Walletbeat Review`)
 	lines.push('')
 
-	// Blurb as a blockquote; handle multi-line text
-	const blurbText = renderTypographic(metadata.blurb, walletName)
-	const blurbLines = blurbText
-		.trim()
-		.split('\n')
-		.map(line => `> ${line}`)
-
-	lines.push(...blurbLines)
+	lines.push(...markdownBlockquote(renderTypographic(metadata.blurb, walletName)))
 	lines.push('')
 
 	// Metadata
@@ -156,28 +136,19 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 			lines.push(`### ${attribute.displayName}: ${rating}`)
 			lines.push('')
 
-			// Short explanation — use full pseudonym strings because runtime string
-			// construction can embed {{WALLET_PSEUDONYM_*}} in WalletNameStrings content.
 			const shortExpl = normalizeMarkdownBlankLines(
-				renderEvaluationContent(
-					evaluation.value.shortExplanation,
-					walletName,
-					pseudonymSingular,
-					pseudonymPlural,
-				),
+				renderEvaluationContent(evaluation.value.shortExplanation, evalStrings),
 			)
 
 			lines.push(shortExpl.trim())
 			lines.push('')
 
-			// Long details — omit if CustomContent (no plain-text representation)
+			const walletAttrUrl = `${siteUrl}/${metadata.id}#${slugifyCamelCase(attribute.id)}`
 			const details = normalizeMarkdownBlankLines(
 				renderEvaluationContentOrFallback(
 					evaluation.details,
-					walletName,
-					pseudonymSingular,
-					pseudonymPlural,
-					'',
+					evalStrings,
+					`[See full details for ${attribute.displayName}](${walletAttrUrl})`,
 				),
 			)
 
@@ -189,16 +160,13 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 			// Impact
 			if (evaluation.impact !== undefined) {
 				const impact = normalizeMarkdownBlankLines(
-					renderEvaluationContent(
-						evaluation.impact,
-						walletName,
-						pseudonymSingular,
-						pseudonymPlural,
-					),
+					renderEvaluationContent(evaluation.impact, evalStrings),
 				)
 
 				if (impact.trim() !== '') {
-					lines.push(`**Impact:** ${impact.trim()}`)
+					lines.push('#### Impact')
+					lines.push('')
+					lines.push(impact.trim())
 					lines.push('')
 				}
 			}
@@ -206,16 +174,13 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 			// How to improve
 			if (evaluation.howToImprove !== undefined) {
 				const howTo = normalizeMarkdownBlankLines(
-					renderEvaluationContent(
-						evaluation.howToImprove,
-						walletName,
-						pseudonymSingular,
-						pseudonymPlural,
-					),
+					renderEvaluationContent(evaluation.howToImprove, evalStrings),
 				)
 
 				if (howTo.trim() !== '') {
-					lines.push(`**How to improve:** ${howTo.trim()}`)
+					lines.push('#### How to improve')
+					lines.push('')
+					lines.push(howTo.trim())
 					lines.push('')
 				}
 			}
@@ -225,14 +190,13 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 				const qualifiedRefs = toFullyQualified(evaluation.references)
 
 				if (qualifiedRefs.length > 0) {
-					lines.push('**References:**')
+					lines.push('#### References')
+					lines.push('')
 
 					for (const ref of qualifiedRefs) {
 						for (const labeledUrl of ref.urls) {
 							const refExplanation =
-								ref.explanation !== undefined
-									? `: ${ref.explanation.trim().replace(/\s+/g, ' ')}`
-									: ''
+								ref.explanation !== undefined ? `: ${collapseToSingleLine(ref.explanation)}` : ''
 
 							lines.push(`- [${labeledUrl.label}](${labeledUrl.url})${refExplanation}`)
 						}
