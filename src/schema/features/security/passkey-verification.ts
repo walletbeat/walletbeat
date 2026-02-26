@@ -1,7 +1,7 @@
 import type { WithRef } from '@/schema/reference'
 
 /**
- * On-chain P-256 (secp256r1) verifier libraries used to validate passkey
+ * On-chain P-256 verifier libraries used to validate passkey
  * (WebAuthn) signatures in smart contract wallets.
  *
  * This is not about whether the wallet uses passkeys for login — it refers

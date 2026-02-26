@@ -64,7 +64,7 @@ export type AddressResolutionData =
 			 * provider (thereby revealing information about who is doing the
 			 * lookup), or using anonymizing proxies to do so.
 			 * To test: monitor outbound network requests during ENS resolution. If requests
-			 * go directly to a third-party ENS API from the user's IP, use `DIRECT_CONNECTION`.
+			 * go directly to an external ENS API from the user's IP, use `DIRECT_CONNECTION`.
 			 * `UNIQUE_PROXY_CIRCUIT` requires source code or documentation confirming the
 			 * wallet routes lookups through anonymizing proxies.
 			 */

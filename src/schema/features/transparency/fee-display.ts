@@ -104,7 +104,7 @@ export interface BasicOperationFees {
 
 	/**
 	 * If the wallet has a built-in ERC-20 swap feature, how are fees displayed?
-	 * To test: use the wallet's own swap UI (not a third-party dapp) to swap
+	 * To test: use the wallet's own swap UI (not an external app) to swap
 	 * one ERC-20 token for another (e.g. USDC → DAI) and evaluate the fee
 	 * display on the approval screen. Set to not supported if the wallet has
 	 * no built-in swap feature.

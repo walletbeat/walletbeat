@@ -48,7 +48,7 @@ export enum GuardianType {
 	 * (e.g. A Google account, Apple ID, email address, or a separate Ethereum
 	 * address that the user designates as a recovery guardian.)
 	 * To identify: visible in the recovery setup UI — the wallet asks the user
-	 * to link or sign in with a third-party account to enable recovery.
+	 * to link or sign in with an external account to enable recovery.
 	 */
 	USER_EXTERNAL_ACCOUNT = 'USER_EXTERNAL_ACCOUNT',
 

@@ -18,7 +18,7 @@ import type { Support } from '../support'
  * To identify: look for a "Bug Bounty", "Security", or "Responsible Disclosure"
  * link on the wallet's website. The platform is usually obvious from the URL
  * Use SELF_HOSTED if the program is run directly on the wallet's own website
- * with no third-party platform involved.
+ * with no external platform involved.
  */
 export enum BugBountyPlatform {
 	SELF_HOSTED = 'Self-hosted',

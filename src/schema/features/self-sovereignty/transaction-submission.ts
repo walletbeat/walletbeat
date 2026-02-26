@@ -110,7 +110,7 @@ export interface TransactionSubmission {
 		 * node when one is configured as the RPC endpoint.
 		 * Verify by configuring a local node, sending a transaction,
 		 * and confirming via network traffic that the `eth_sendRawTransaction` call goes to your
-		 * node and not to any third-party relay or bundler.
+		 * node and not to any external relay or bundler.
 		 */
 		selfBroadcastViaSelfHostedNode: Support | null
 	}>

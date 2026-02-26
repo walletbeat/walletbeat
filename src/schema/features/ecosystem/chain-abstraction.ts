@@ -52,13 +52,13 @@ export type ChainAbstraction = {
 	bridging: {
 		/**
 		 * Does the wallet have a built-in bridging feature?
-		 * (e.g. The wallet allows the user to bridge ETH from Ethereum to Arbitrum directly within the wallet UI, without needing a third-party app.)
+		 * (e.g. The wallet allows the user to bridge ETH from Ethereum to Arbitrum directly within the wallet UI, without needing an external app.)
 		 */
 		builtInBridging: Support<
 			WithRef<{
 				/**
 				 * Are the trust assumptions of the bridge explained to the user?
-				 * (e.g. The wallet shows a warning that the bridge is operated by a third party and that funds may be at risk.)
+				 * (e.g. The wallet shows a warning that the bridge is operated by an external provider and that funds may be at risk.)
 				 */
 				risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT'
 
