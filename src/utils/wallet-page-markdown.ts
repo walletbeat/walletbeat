@@ -5,10 +5,12 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import {
+	type Attribute,
 	type AttributeGroup,
 	type EvaluatedGroup,
 	Rating,
 	ratingToText,
+	type Value,
 	type ValueSet,
 	type WalletNameAndPseudonymStrings,
 	type WalletNameStrings,
@@ -89,6 +91,24 @@ function renderEvaluationContentOrFallback(
 	}
 
 	return renderEvaluationContent(content, strings)
+}
+
+/**
+ * Return the "How to improve" section heading using Attribute.wording.
+ * Complex wording: use the rendered whatCanWalletDoAboutIts sentence.
+ * Simple wording: "What can {walletName} do about its {midSentenceName}?"
+ */
+function getHowToImproveHeading<V extends Value>(
+	attribute: Attribute<V>,
+	walletName: string,
+): string {
+	const { wording } = attribute
+
+	if (wording.midSentenceName === null) {
+		return collapseToSingleLine(renderTypographic(wording.whatCanWalletDoAboutIts, walletName))
+	}
+
+	return `What can ${walletName} do about its ${wording.midSentenceName}?`
 }
 
 /**
@@ -252,7 +272,12 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						)
 
 						if (howTo.trim() !== '') {
-							parts.push('#### How to improve', '', howTo.trim(), '')
+							parts.push(
+								`#### ${getHowToImproveHeading(attribute, walletName)}`,
+								'',
+								howTo.trim(),
+								'',
+							)
 						}
 					}
 

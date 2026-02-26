@@ -98,6 +98,26 @@ function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
 	return lines
 }
 
+function getHowIsEvaluatedHeading<V extends Value>(attribute: Attribute<V>): string {
+	const { wording } = attribute
+
+	if (wording.midSentenceName === null) {
+		return wording.howIsEvaluated
+	}
+
+	return `How is ${wording.midSentenceName} evaluated?`
+}
+
+function getWhyItMattersHeading<V extends Value>(attribute: Attribute<V>): string {
+	const { wording } = attribute
+
+	if (wording.midSentenceName === null) {
+		return 'Why it matters'
+	}
+
+	return `Why ${wording.midSentenceName} matters`
+}
+
 /**
  * Generate the Walletbeat methodology page as markdown.
  *
@@ -134,12 +154,12 @@ export function methodologyPageMarkdown(siteUrl: string): string {
 			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.question)).trim())
 			lines.push('')
 
-			lines.push('#### Why it matters')
+			lines.push(`#### ${getWhyItMattersHeading(attribute)}`)
 			lines.push('')
 			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.why)).trim())
 			lines.push('')
 
-			lines.push('#### How it is evaluated')
+			lines.push(`#### ${getHowIsEvaluatedHeading(attribute)}`)
 			lines.push('')
 			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.methodology)).trim())
 			lines.push('')

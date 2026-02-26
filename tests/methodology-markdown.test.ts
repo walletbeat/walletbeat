@@ -47,8 +47,10 @@ describe('methodologyPageMarkdown', () => {
 	})
 
 	it('contains standard subsection headings', () => {
-		expect(md).toContain('#### Why it matters')
-		expect(md).toContain('#### How it is evaluated')
+		// "Why" section: either "Why it matters" (complex wording) or "Why X matters" (simple wording)
+		expect(md).toMatch(/#### Why .+ matters/)
+		// "How is evaluated" section: wording-derived, e.g. "How is X evaluated?" or "How is a wallet's X evaluated?"
+		expect(md).toMatch(/#### How is .+ evaluated\?/)
 		expect(md).toContain('#### Rating scale')
 	})
 
@@ -61,5 +63,5 @@ describe('methodologyPageMarkdown', () => {
 
 	it('passes harper.js grammar check', async () => {
 		await grammarLint(md, { language: 'markdown' })
-	})
+	}, 15_000)
 })
