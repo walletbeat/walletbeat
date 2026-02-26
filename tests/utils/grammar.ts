@@ -108,6 +108,14 @@ interface AbstractLinter {
 
 const specificWordingLinters: Map<string, AbstractLinter> = new Map()
 
+function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
+	const before = text.substring(0, start)
+	const lastLinkStart = before.lastIndexOf('](')
+	const lastParen = before.lastIndexOf(')')
+
+	return lastLinkStart > lastParen
+}
+
 function getRegexpLinter({
 	name,
 	regExp,
@@ -127,8 +135,13 @@ function getRegexpLinter({
 
 					for (const match of text.matchAll(regExp)) {
 						const matchedText = match[0]
+						const start = match.index ?? 0
+
+						if (isInsideMarkdownLinkUrl(text, start)) {
+							continue
+						}
+
 						const replacement = replace(matchedText)
-						const start = match.index
 						const end = start + matchedText.length
 						const suggestion: Suggestion = {
 							get_replacement_text(): string {

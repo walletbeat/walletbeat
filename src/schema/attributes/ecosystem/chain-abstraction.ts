@@ -54,9 +54,9 @@ function evaluateChainAbstraction(
 			},
 			details: markdown(`
 				{{WALLET_NAME}} does not display your account's total value across
-				chains. This is a one of many features that wallets need to
-				implement in order to be multi-chain-aware, which is important to
-				the Ethereum L2 roadmap to make L2s seamless for users.
+				chains. This is one of many features that wallets need to be
+				multi-chain-aware. This matters for the Ethereum L2 roadmap, which
+				aims to make L2s seamless for users.
 			`),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should implement more cross-chain features, such as:
@@ -89,10 +89,9 @@ function evaluateChainAbstraction(
 				USDC) across multiple chains at once. This makes it difficult for you
 				as a user to determine, for example, how much USDC you have.
 
-				Cross-chain token balance awareness is a one of many features that
-				wallets need to implement in order to be multi-chain-aware,
-				which is important to the Ethereum L2 roadmap to make L2s seamless
-				for users.
+				Cross-chain token balance awareness is one of many features that
+				wallets need to be multi-chain-aware. This matters for the Ethereum
+				L2 roadmap, which aims to make L2s seamless for users.
 			`),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should implement more cross-chain features, such as:
@@ -143,16 +142,15 @@ function evaluateChainAbstraction(
 				shortExplanation: sentence('{{WALLET_NAME}} does not add up token balances across chains.'),
 			},
 			details: markdown(`
-				While {{WALLET_NAME}} can display your account's total value across
-				chains, as well as individual per-chain token balances, it does not
-				let you see your total token balance (for example: Ether or
-				USDC) summed up across multiple chains. This makes it difficult for
-				you as a user to determine, for example, how much USDC you have.
+				{{WALLET_NAME}} can display your account's total value across
+				chains and per-chain token balances. It does not, however, show
+				your total balance for a given token (e.g. Ether or USDC) summed
+				up across multiple chains. That makes it hard to see how much
+				USDC you have.
 
-				Cross-chain token balance awareness is a one of many features that
-				wallets need to implement in order to be multi-chain-aware,
-				which is important to the Ethereum L2 roadmap to make L2s seamless
-				for users.
+				Cross-chain token balance awareness is one of many features that
+				wallets need to be multi-chain-aware. This matters for the Ethereum
+				L2 roadmap, which aims to make L2s seamless for users.
 			`),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should have a way to see token balances summed up

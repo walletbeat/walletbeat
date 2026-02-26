@@ -186,7 +186,7 @@ const scamAlertsAndSendTxWarningRefs: WithRef<{}>['ref'] = [
 			'When attempting to send tokens via the built-in interface, Ambire displays warning based on the time since last transfer.',
 		lastRetrieved: '2026-01-29',
 		url: {
-			label: 'implementation',
+			label: 'Implementation',
 			url: 'https://github.com/AmbireTech/ambire-common/blob/389365fa505b4a32ac378bdf64d59752160ae8eb/src/services/validations/validate.ts#L122-L133',
 		},
 	},

@@ -112,7 +112,7 @@ export const zerion: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Right now Ledger is the lone first-class citizen in Zerion, but the WalletConnect & external-wallet routes mean you can still sign (or at least track) with Trezor, Keystone, GridPlus, and practically any other cold-storage solution—just with one extra hop.',
+							'Ledger has direct support in Zerion. Other hardware wallets (Trezor, Keystone, GridPlus, etc.) work via WalletConnect or external apps—with an extra hop.',
 						url: ['https://www.ledger.com/zerion'],
 					},
 				],

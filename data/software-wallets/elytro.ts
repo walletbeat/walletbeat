@@ -148,7 +148,7 @@ export const elytro: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Elytro implements P256 verification using openzeppelin p256 verifier in their WebAuthn library.',
+							'Elytro implements P256 verification using OpenZeppelin P256 verifier in their WebAuthn library.',
 						url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/contracts/libraries/WebAuthn.sol',
 					},
 				],

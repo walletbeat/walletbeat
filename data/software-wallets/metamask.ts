@@ -174,13 +174,10 @@ export const metamask: SoftwareWallet = {
 			ref: [
 				{
 					explanation: `
-						MetaMask allows users to configure custom RPC endpoints for any
-						network, including Ethereum mainnet, though it contacts the
-						default \`mainnet.infura.io\` and some L2s (e.g
-						\`polygon-mainnet.infura.io\`, \`arbitrum-mainnet.infura.io\`) to
-						perform non-sensitive RPCs (\`eth_blockNumber\` and \`net_version\`)
-						before the user is able to customize the endpoints to use for
-						these chains.
+						MetaMask lets users set custom RPC endpoints for any network,
+						including mainnet. Before that, it contacts default endpoints
+						(mainnet.infura.io and some L2s) for non-sensitive RPCs
+						(\`eth_blockNumber\`, \`net_version\`).
 					`,
 					url: 'https://support.metamask.io/configure/networks/how-to-add-a-custom-network-rpc/',
 				},
@@ -385,7 +382,7 @@ export const metamask: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'MetaMask supports Ledger, Trezor, Lattice (GridPlus), Keystone, OneKey, and KeepKey hardware wallets through their Hardware Wallet Hub.',
+							'MetaMask supports Ledger, Trezor, Lattice (GridPlus), Keystone, OneKey, and KeepKey via its Hardware Wallet Hub.',
 						url: 'https://support.metamask.io/more-web3/wallets/hardware-wallet-hub/',
 					},
 				],

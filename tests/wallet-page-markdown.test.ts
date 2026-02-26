@@ -10,6 +10,10 @@ import { toFullyQualified } from '@/schema/reference'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
+import { grammarLint, warmupHarperLinter } from './utils/grammar'
+
+await warmupHarperLinter()
+
 const SITE_URL = 'https://wallet.page'
 
 describe('walletPageMarkdown', () => {
@@ -109,6 +113,10 @@ describe('walletPageMarkdown', () => {
 					expect(md).toContain('## Stage')
 					expect(md).toContain(`[${stage.label}](${SITE_URL}/${wallet.metadata.id}#stages)`)
 				}
+			})
+
+			it('passes harper.js grammar check', async () => {
+				await grammarLint(md, { language: 'markdown' })
 			})
 		})
 	}
