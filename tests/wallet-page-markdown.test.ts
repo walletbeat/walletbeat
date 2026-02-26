@@ -115,6 +115,19 @@ describe('walletPageMarkdown', () => {
 				}
 			})
 
+			it('contains stage criteria (subheadings and ratings) when wallet has a concrete stage', () => {
+				const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
+
+				if (typeof stage === 'object' && stage !== null && ladderEvaluation !== null) {
+					expect(md).toMatch(/### Stage \d+: /)
+
+					const hasRatingIcon = /[✅❌➖❔]/.test(md)
+					const hasCriteriaPassed = /criteria passed/.test(md)
+
+					expect(hasRatingIcon || hasCriteriaPassed).toBe(true)
+				}
+			})
+
 			it('passes harper.js grammar check', async () => {
 				await grammarLint(md, { language: 'markdown' })
 			})

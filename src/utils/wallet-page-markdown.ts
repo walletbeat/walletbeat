@@ -16,6 +16,7 @@ import {
 	type WalletNameStrings,
 } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
+import { StageCriterionRating, stageCriterionRatings, type WalletStage } from '@/schema/stages'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import {
@@ -33,6 +34,18 @@ import {
 	normalizeMarkdownBlankLines,
 } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
+import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
+
+/**
+ * Convert a stage criterion id (snake_case) to a human-readable label (Title Case).
+ * Used when the criterion has no linked attribute (getCriterionAttributeId returns null).
+ */
+function criterionIdToDisplayName(id: string): string {
+	return id
+		.split('_')
+		.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+		.join(' ')
+}
 
 /**
  * Render TypographicContent<WalletNameStrings> to a plain string.
@@ -140,7 +153,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 		.map(v => variantToName(v, true))
 		.join(', ')
 
-	const { stage } = getWalletStageAndLadder(wallet)
+	const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 
 	const stageHeaderText =
 		stage === null || stage === 'NOT_APPLICABLE'
@@ -176,6 +189,82 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 			if (desc !== '') {
 				stageSection.push(desc, '')
+			}
+		}
+
+		if (ladderEvaluation !== null) {
+			const { metadata: _metadata, ladders: _ladders, ...stageEvaluatableWallet } = wallet
+
+			for (let stageIndex = 0; stageIndex < ladderEvaluation.ladder.stages.length; stageIndex++) {
+				const s: WalletStage = ladderEvaluation.ladder.stages[stageIndex]
+
+				stageSection.push(`### Stage ${stageIndex}: ${s.label}`, '')
+
+				const allCriteria = s.criteriaGroups.flatMap(group => group.criteria)
+				const allEvaluations = allCriteria.map(criterion =>
+					criterion.evaluate(stageEvaluatableWallet),
+				)
+				const applicableEvaluations = allEvaluations.filter(
+					e => e.rating !== StageCriterionRating.EXEMPT,
+				)
+				const passedCount = applicableEvaluations.filter(
+					e => e.rating === StageCriterionRating.PASS,
+				).length
+				const totalCount = applicableEvaluations.length
+
+				if (totalCount > 0) {
+					stageSection.push(`${passedCount}/${totalCount} criteria passed`, '')
+				}
+
+				for (const criteriaGroup of s.criteriaGroups) {
+					if (
+						isTypographicContent(criteriaGroup.description) &&
+						criteriaGroup.description !== undefined
+					) {
+						const groupDesc = normalizeMarkdownBlankLines(
+							renderTypographic(criteriaGroup.description, walletName),
+						).trim()
+
+						if (groupDesc !== '') {
+							const groupHeading =
+								/^[a-z]/.test(groupDesc) && groupDesc.length > 0
+									? groupDesc.charAt(0).toUpperCase() + groupDesc.slice(1)
+									: groupDesc
+
+							stageSection.push(`#### ${groupHeading}`, '')
+						}
+					}
+
+					for (const criterion of criteriaGroup.criteria) {
+						const evaluation = criterion.evaluate(stageEvaluatableWallet)
+						const attributeId = getCriterionAttributeId(criterion)
+						const attribute = attributeId ? (attributesById.get(attributeId) ?? null) : null
+						const displayName =
+							attribute?.displayName ?? attributeId ?? criterionIdToDisplayName(criterion.id)
+						const descText = normalizeMarkdownBlankLines(
+							renderTypographic(criterion.description, walletName),
+						).trim()
+						const descForBullet =
+							descText !== '' && /^[a-z]/.test(descText)
+								? descText.charAt(0).toUpperCase() + descText.slice(1)
+								: descText
+						const rating = evaluation.rating as StageCriterionRating
+						const ratingInfo = stageCriterionRatings[rating]
+						const attrLink =
+							attributeId !== null
+								? `[${displayName}](${siteUrl}/${metadata.id}#${slugifyCamelCase(attributeId)})`
+								: displayName
+						const bullet =
+							descForBullet !== ''
+								? `- ${attrLink} — ${descForBullet}: ${ratingInfo.icon}`
+								: `- ${attrLink}: ${ratingInfo.icon}`
+
+						stageSection.push(bullet)
+					}
+
+					stageSection.push('')
+				}
+				stageSection.push('')
 			}
 		}
 	}
