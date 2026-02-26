@@ -1,5 +1,6 @@
 import { attributeTree } from '@/schema/attribute-groups'
 import type { Attribute, ExampleRating, Value } from '@/schema/attributes'
+import { normalizeExampleRatings } from '@/schema/attributes'
 import { ContentType, prerenderTypographicContent, type TypographicContent } from '@/types/content'
 import { normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 
@@ -53,16 +54,6 @@ function renderPseudonymContent(
 		case ContentType.MARKDOWN:
 			return rendered.markdown
 	}
-}
-
-function normalizeExampleRatings<V extends Value>(
-	ratings: ExampleRating<V> | ExampleRating<V>[] | undefined,
-): ExampleRating<V>[] {
-	if (ratings === undefined) {
-		return []
-	}
-
-	return Array.isArray(ratings) ? ratings : [ratings]
 }
 
 function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
@@ -120,11 +111,11 @@ export function methodologyPageMarkdown(siteUrl: string): string {
 		'',
 		'Each wallet is rated on individual attributes using a `PASS` / `PARTIAL` / `FAIL` / `UNRATED` / `EXEMPT` system.',
 		'',
-		'- **PASS**: The wallet fully meets the criteria.',
-		'- **PARTIAL**: The wallet partially meets the criteria.',
-		'- **FAIL**: The wallet does not meet the criteria.',
-		'- **UNRATED**: The information is not yet available.',
-		'- **EXEMPT**: The attribute does not apply to this wallet.',
+		'- **`PASS`**: The wallet fully meets the criteria.',
+		'- **`PARTIAL`**: The wallet partially meets the criteria.',
+		'- **`FAIL`**: The wallet does not meet the criteria.',
+		'- **`UNRATED`**: The information is not yet available.',
+		'- **`EXEMPT`**: The attribute does not apply to this wallet.',
 		'',
 		`Full wallet list and ratings: ${siteUrl}`,
 		'',

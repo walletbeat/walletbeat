@@ -12,7 +12,7 @@ export function markdownBlockquote(text: string): string[] {
 	return text
 		.trim()
 		.split('\n')
-		.map(line => `> ${line}`)
+		.map(line => (line === '' ? '>' : `> ${line}`))
 }
 
 /**
