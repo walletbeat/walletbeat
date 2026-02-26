@@ -17,7 +17,24 @@ export function markdownBlockquote(text: string): string[] {
 
 /**
  * Collapse a possibly multi-line string into a single trimmed line.
+ * Intended for short inline text only (e.g. blurbs, reference explanations).
+ * Throws if the input contains multiline-only markdown (triple-backtick code
+ * blocks or blockquote lines), since flattening those would produce invalid output.
  */
 export function collapseToSingleLine(text: string): string {
-	return text.trim().replace(/\s+/g, ' ')
+	const trimmed = text.trim()
+
+	if (trimmed.includes('```')) {
+		throw new Error(
+			'collapseToSingleLine does not support triple-backtick code blocks; input must be inline-only text',
+		)
+	}
+
+	if (/^\s*>/m.test(trimmed)) {
+		throw new Error(
+			'collapseToSingleLine does not support blockquote lines; input must be inline-only text',
+		)
+	}
+
+	return trimmed.replace(/\s+/g, ' ')
 }
