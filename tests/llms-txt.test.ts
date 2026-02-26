@@ -8,7 +8,7 @@ import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()
 
-const SITE_URL = 'https://wallet.page'
+const SITE_URL = 'http://localhost:4321'
 
 describe('llms.txt', () => {
 	it('includes title, blockquote, and rating-system paragraph', () => {

@@ -7,7 +7,7 @@ import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()
 
-const SITE_URL = 'https://wallet.page'
+const SITE_URL = 'http://localhost:4321'
 
 describe('methodologyPageMarkdown', () => {
 	const md = methodologyPageMarkdown(SITE_URL)
