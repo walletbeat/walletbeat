@@ -4,6 +4,7 @@ import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
 import { llmsTxtBody } from '@/utils/llms-txt'
 
+import { assertValidMarkdown } from './utils/assertValidMarkdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()
@@ -63,6 +64,12 @@ describe('llms.txt', () => {
 		const body = llmsTxtBody(SITE_URL)
 
 		await grammarLint(body, { language: 'markdown' })
+	})
+
+	it('produces valid markdown', async () => {
+		const body = llmsTxtBody(SITE_URL)
+
+		await assertValidMarkdown(body)
 	})
 
 	it('no wallet link appears twice in the body', () => {

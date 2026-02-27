@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { attributeTree } from '@/schema/attribute-groups'
 import { methodologyPageMarkdown } from '@/utils/methodology-markdown'
 
+import { assertValidMarkdown } from './utils/assertValidMarkdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()
@@ -64,4 +65,8 @@ describe('methodologyPageMarkdown', () => {
 	it('passes harper.js grammar check', async () => {
 		await grammarLint(md, { language: 'markdown' })
 	}, 15_000)
+
+	it('produces valid markdown', async () => {
+		await assertValidMarkdown(md)
+	})
 })

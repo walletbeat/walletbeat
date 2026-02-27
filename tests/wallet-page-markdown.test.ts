@@ -10,6 +10,7 @@ import { toFullyQualified } from '@/schema/reference'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
+import { assertValidMarkdown } from './utils/assertValidMarkdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()
@@ -130,6 +131,10 @@ describe('walletPageMarkdown', () => {
 
 			it('passes harper.js grammar check', async () => {
 				await grammarLint(md, { language: 'markdown' })
+			})
+
+			it('produces valid markdown', async () => {
+				await assertValidMarkdown(md)
 			})
 		})
 	}
