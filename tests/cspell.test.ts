@@ -139,7 +139,7 @@ describe('cSpell', async () => {
 
 	it('does not have duplicate words', () => {
 		// Words that legitimately appear in both casings (e.g. proper noun in prose vs lowercase in URLs).
-		const allowedCaseVariants = new Set(['rabby'])
+		const allowedCaseVariants = new Set(['eth', 'rabby'])
 
 		cSpellWords.reduce<string>((prev, cur): string => {
 			if (prev === cur) {
