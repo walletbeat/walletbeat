@@ -35,7 +35,7 @@ Before doing anything else:
      - Software: `data/software-wallets/unrated.tmpl.ts`
      - Hardware: `data/hardware-wallets/unrated.tmpl.ts`
      - Embedded: `data/embedded-wallets/unrated.tmpl.ts`
-   - The standard software wallet example: `data/software-wallets/ambire.ts`
+   - The golden standard software wallet example: `data/software-wallets/completed.tmpl.ts`
    - The contributor guide: `resources/docs/contribute/wallet-data.md`
    - The existing wallet file if one already exists
    - The example entity file: `data/entities/example.ts`
@@ -106,7 +106,7 @@ Briefly explain the layout of `/data/`:
 ├── contributors/          ← Add yourself here (first time only)
 ├── entities/              ← Add the wallet's development company here
 ├── software-wallets/      ← Wallet data files (or hardware-wallets/, embedded-wallets/)
-│   ├── ambire.ts          ← Gold-standard reference example
+│   ├── completed.tmpl.ts  ← Gold-standard reference example
 │   ├── unrated.tmpl.ts    ← Template to copy when adding a new wallet
 │   └── [wallet-name].ts   ← The file you will create or edit
 ├── software-wallets.ts    ← Index — register the new wallet here
@@ -212,12 +212,23 @@ The goal is to replace every `null` field (or the specific fields the contributo
 
 ### General workflow for each field
 
-For every `null` field:
+**Spawn one subagent per field.** For each `null` field (or each field the contributor wants to update), use the `Task` tool to launch a `general-purpose` subagent. Do **not** handle multiple fields in the same subagent — each subagent must have a pristine, focused context for exactly one field.
 
-1. Explain what the field measures (use TSDoc from the type definition — Ctrl+Click on the field name in the editor to navigate to the type)
-2. Describe how to test or verify it
-3. Show the Ambire example value if applicable
-4. Let the contributor fill it in with a `ref`
+Before launching subagents, collect the full list of fields to work on. Then launch all independent field subagents **in parallel** using a single message with multiple `Task` tool calls. Fields with data dependencies (e.g. a field whose value influences a later field) should be launched sequentially.
+
+Each subagent's prompt must include:
+
+1. The wallet name, wallet type, and path to the wallet file.
+2. The exact field path (e.g. `features.security.lightClient`).
+3. The full TSDoc comment from the type definition for that field.
+4. The corresponding example value from `data/software-wallets/completed.tmpl.ts` (if applicable).
+5. The current value of the field in the wallet file.
+6. A clear instruction to: explain what the field measures, describe how to test or verify it, and then **wait for the contributor to provide the value and `ref`** — the subagent must NOT attempt to look up or infer the data itself.
+7. After the contributor provides the data, write the final value into the wallet file and return a one-line summary of what was set.
+
+**Critical: the subagent is a guide and scribe, not a researcher.** It reads type definition files and the completed template to understand the field, but it never fetches wallet websites, inspects source code, or guesses field values. All factual data comes from the contributor.
+
+The subagent should read the type definition file and the current wallet file itself — do not paste the entire files into the prompt. Instead, give the subagent the file paths and field name so it can navigate precisely.
 
 ### The type system — read this section carefully
 
@@ -286,12 +297,16 @@ supported<WithRef<ChainConfigurability>>({ ... })
 
 ### Field-by-field guidance
 
-Walk through each `null` field in the wallet file (or only the fields the contributor asked about in step 3). For each one, provide:
+For each subagent (one per field), the subagent explains:
 
 - **What it measures** (from the TSDoc comment at the type definition)
-- **How to test it** (describe the testing method: try the wallet UI, inspect network traffic, read source code)
-- **Ambire example** (show the corresponding value from `data/software-wallets/ambire.ts` if applicable)
-- **Ref expectations** (does it need `WithRef`? Is `refTodo` okay? Does it need `MustRef`?)
+- **How to test it** (what the contributor should do: try the wallet UI, capture network traffic, read source code)
+- **Completed Template example** (corresponding value from `data/software-wallets/completed.tmpl.ts`)
+- **Ref expectations** (`WithRef`? Is `refTodo` acceptable? `MustRef` requires a real URL)
+
+Then the subagent **waits** for the contributor to supply the data. The subagent never fills in values on behalf of the contributor based on its own knowledge of the wallet. Once the contributor provides the value and ref, the subagent writes it to the wallet file and confirms.
+
+The main session collects each subagent's one-line summary and presents a final status table to the contributor once all subagents complete.
 
 ---
 
@@ -319,4 +334,4 @@ Help the contributor fix any remaining TypeScript or lint errors before they ope
 - **Run `pnpm check:all` before opening the PR** — it must pass.
 - **Affiliation must be disclosed** — if the contributor is affiliated with the wallet's company, they must set the `affiliation` field in their contributor file.
 - **Ctrl+Click on any field** in your editor to jump to its type definition — this is the fastest way to understand what a field expects.
-- **Look at `ambire.ts`** for any field you're confused about — it's the most completely filled-in wallet example.
+- **Look at `completed.tmpl.ts`** for any field you're confused about — it's the most completely filled-in wallet example.
