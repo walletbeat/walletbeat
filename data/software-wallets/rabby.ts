@@ -25,6 +25,15 @@ import {
 import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
 import {
+	BasicBenchmarkTransactions,
+	ComplexBenchmarkTransactions,
+	DataDisplayOptions,
+	type DisplayedBasicTransactionDetails,
+	MessageSigningDetails,
+	SimulationBenchmarkTransactions,
+	TransactionOutcome,
+} from '@/schema/features/security/transaction-legibility'
+import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
@@ -56,6 +65,15 @@ import { cure53 } from '../entities/cure53'
 import { deBank } from '../entities/debank'
 import { leastAuthority } from '../entities/least-authority'
 import { slowMist } from '../entities/slowmist'
+
+const rabbyTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
+	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	from: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	gas: DataDisplayOptions.SHOWN_OPTIONALLY,
+	nonce: DataDisplayOptions.SHOWN_OPTIONALLY,
+	to: DataDisplayOptions.SHOWN_BY_DEFAULT,
+	value: DataDisplayOptions.SHOWN_BY_DEFAULT,
+}
 
 export const rabby: SoftwareWallet = {
 	metadata: {
@@ -634,10 +652,62 @@ export const rabby: SoftwareWallet = {
 			},
 			transactionLegibility: {
 				ref: refTodo,
-				calldataDisplay: null,
-				messageSigningLegibility: null,
-				// transactionDetailsDisplay: displaysFullTransactionDetails,
-				transactionDetailsDisplay: null,
+				calldataDisplay: {
+					copyHexToClipboard: false,
+					formatted: true,
+					rawHex: true,
+				},
+				messageSigningLegibility: {
+					[MessageSigningDetails.EIP712_STRUCT]: DataDisplayOptions.SHOWN_OPTIONALLY,
+					[MessageSigningDetails.DOMAIN_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.MESSAGE_HASH]: DataDisplayOptions.NOT_IN_UI,
+					[MessageSigningDetails.SAFE_HASH]: DataDisplayOptions.NOT_IN_UI,
+				},
+				transactionDetailsDisplay: {
+					[BasicBenchmarkTransactions.ETH_TRANSFER]: rabbyTransactionDisplayDefault,
+					[BasicBenchmarkTransactions.ERC_20_TRANSFER]: {
+						...rabbyTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_721_TRANSFER]: {
+						...rabbyTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ERC_1155_TRANSFER]: {
+						...rabbyTransactionDisplayDefault,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[BasicBenchmarkTransactions.ZKSYNC_USDC_TRANSFER]: rabbyTransactionDisplayDefault,
+					[ComplexBenchmarkTransactions.USDC_APPROVAL]: {
+						...rabbyTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.AAVE_SUPPLY]: {
+						...rabbyTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.SHOWN_OPTIONALLY,
+						transactionOutcome: TransactionOutcome.EXPLAINED,
+					},
+					[SimulationBenchmarkTransactions.FAILED_TRANSACTION]: {
+						...rabbyTransactionDisplayDefault,
+						failure: 'DETECTED',
+					},
+					[SimulationBenchmarkTransactions.NONDETERMINISTIC_TRANSACTION]: {
+						...rabbyTransactionDisplayDefault,
+						nondeterminism: 'STATIC_SINGLE_OUTCOME',
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_SUPPLY_NESTED]: {
+						...rabbyTransactionDisplayDefault,
+						calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+						transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+					},
+					[ComplexBenchmarkTransactions.SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND]:
+						{
+							...rabbyTransactionDisplayDefault,
+							calldataDecoded: DataDisplayOptions.NOT_IN_UI,
+							transactionOutcome: TransactionOutcome.NOT_EXPLAINED,
+						},
+				},
 			},
 		},
 		selfSovereignty: {
