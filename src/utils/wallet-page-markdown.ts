@@ -36,6 +36,7 @@ import {
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
 
+// TODO: https://github.com/walletbeat/walletbeat/issues/555
 /**
  * Convert a stage criterion id (snake_case) to a human-readable label (Title Case).
  * Used when the criterion has no linked attribute (getCriterionAttributeId returns null).
@@ -213,7 +214,9 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 				const totalCount = applicableEvaluations.length
 
 				if (totalCount > 0) {
-					stageSection.push(`${passedCount}/${totalCount} criteria passed`, '')
+					const word = totalCount === 1 ? 'criterion' : 'criteria'
+
+					stageSection.push(`${passedCount}/${totalCount} ${word} passed`, '')
 				}
 
 				for (const criteriaGroup of s.criteriaGroups) {

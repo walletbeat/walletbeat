@@ -25,6 +25,7 @@ function getVocabulary(): string[] {
 		const walletNames: string[] = Object.values(allWallets).map(
 			wallet => wallet.metadata.displayName,
 		)
+		// TODO: https://github.com/walletbeat/walletbeat/issues/547
 		// Wallet IDs (URL slugs) are not fully in cspell; add them so Harper accepts them in generated markdown URLs (e.g. .../trezor#maintenance).
 		const walletIds: string[] = Object.values(allWallets).map(wallet => wallet.metadata.id)
 
