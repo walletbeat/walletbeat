@@ -28,6 +28,15 @@ contract WalletbeatTestErc20 is ERC20 {
     }
 
     /**
+     * @notice Mints exactly 100 tokens (100e18) to the caller
+     * @dev Deterministic — produces the same result regardless of block state.
+     * Useful as a baseline to verify wallets correctly simulate a fixed ERC-20 mint.
+     */
+    function mintHundred() external {
+        super._mint(msg.sender, 100e18);
+    }
+
+    /**
      * @notice Replicates a malicious claim function with unpredictable behavior
      * @dev Mints tokens if block.number is even, burns the user's entire balance if odd.
      * This simulates unpredictable drain behavior that wallets should detect.

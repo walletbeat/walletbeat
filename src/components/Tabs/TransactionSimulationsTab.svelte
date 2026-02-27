@@ -1,11 +1,13 @@
 <script lang="ts">
   export type TransactionSimulationSubTab =
-    | 'erc20-transfer'
-    | 'erc721-transfer'
-    | 'erc1155-transfer'
-    | 'failing-transaction'
-    | 'revert-determinism'
-    | 'amount-determinism';
+    | 'erc20-mint'
+    | 'erc721-mint'
+    | 'erc1155-mint'
+    | 'all-token-transfer'
+    | 'misleading-selector'
+    | 'fake-airdrop'
+    | 'volatile-outcome'
+    | 'failing-transaction';
 
   interface Props {
     activeSubTab: TransactionSimulationSubTab;
@@ -15,49 +17,67 @@
   let { activeSubTab, account }: Props = $props();
 
   const PLACEHOLDER_ADDRESS = '0x0000000000000000000000000000000000000000';
-  const PLACEHOLDER_CALLDATA = '0x';
 
   const simulations: Record<
     TransactionSimulationSubTab,
     { name: string; description: string; contractAddress: string; calldata: string }
   > = {
-    'erc20-transfer': {
-      name: 'ERC-20 Transfer',
-      description: 'Placeholder ERC-20 token transfer simulation.',
+    'erc20-mint': {
+      name: 'ERC-20 Mint',
+      description:
+        'Mints exactly 100 tokens (100e18) to the caller via mintHundred(). Deterministic — the simulation result should always match execution.',
       contractAddress: PLACEHOLDER_ADDRESS,
-      calldata: PLACEHOLDER_CALLDATA,
+      calldata: '0x4838e647',
     },
-    'erc721-transfer': {
-      name: 'ERC-721 Transfer',
-      description: 'Placeholder ERC-721 NFT transfer simulation.',
+    'erc721-mint': {
+      name: 'ERC-721 Mint',
+      description:
+        'Mints exactly one ERC-721 NFT to the caller via mintOne(). Deterministic — the simulation result should always match execution.',
       contractAddress: PLACEHOLDER_ADDRESS,
-      calldata: PLACEHOLDER_CALLDATA,
+      calldata: '0x0ced8637',
     },
-    'erc1155-transfer': {
-      name: 'ERC-1155 Transfer',
-      description: 'Placeholder ERC-1155 multi-token transfer simulation.',
+    'erc1155-mint': {
+      name: 'ERC-1155 Mint',
+      description:
+        'Mints exactly one ERC-1155 token to the caller via mintOne(). Deterministic — the simulation result should always match execution.',
       contractAddress: PLACEHOLDER_ADDRESS,
-      calldata: PLACEHOLDER_CALLDATA,
+      calldata: '0x0ced8637',
+    },
+    'all-token-transfer': {
+      name: 'All Token Transfer',
+      description:
+        'Mints ERC-20, ERC-721, and ERC-1155 tokens to the caller in a single transaction via simulateFunctionV1(). Tests whether the wallet correctly shows all three asset types in its simulation. Amounts vary by block number.',
+      contractAddress: PLACEHOLDER_ADDRESS,
+      calldata: '0xf88a1a98',
+    },
+    'misleading-selector': {
+      name: 'Misleading Selector',
+      description:
+        'Uses the standard ERC-20 transfer() selector (0xa9059cbb) on a contract that actually mints tokens to the caller — ignoring the recipient and amount entirely. Tests whether wallets simulate actual behavior or assume behavior from the function signature.',
+      contractAddress: PLACEHOLDER_ADDRESS,
+      calldata:
+        '0xa9059cbb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+    },
+    'fake-airdrop': {
+      name: 'Fake Airdrop',
+      description:
+        'Burns the caller\'s entire ERC-20 balance while emitting a Transfer(0x0 → caller) event to suggest a mint. Tests whether wallets detect the real outcome (balance drain) behind a misleading event.',
+      contractAddress: PLACEHOLDER_ADDRESS,
+      calldata: '0x4e71d92d',
+    },
+    'volatile-outcome': {
+      name: 'Volatile Outcome',
+      description:
+        'Calls a function that mints tokens on even blocks and burns all tokens on odd blocks via simulateFunctionV2(). Tests whether wallets detect and warn about state-dependent outcomes that may differ at execution time.',
+      contractAddress: PLACEHOLDER_ADDRESS,
+      calldata: '0xa79c3153',
     },
     'failing-transaction': {
       name: 'Failing Transaction',
-      description: 'Placeholder transaction expected to revert/fail.',
-      contractAddress: PLACEHOLDER_ADDRESS,
-      calldata: PLACEHOLDER_CALLDATA,
-    },
-    'revert-determinism': {
-      name: 'Revert Determinism',
       description:
-        'Tests whether the wallet flags a transaction that could possibly fail if on-chain state changes before it is mined.',
+        'Always reverts unconditionally via alwaysFails(). Tests whether wallets correctly identify and warn about transactions that are guaranteed to fail.',
       contractAddress: PLACEHOLDER_ADDRESS,
-      calldata: PLACEHOLDER_CALLDATA,
-    },
-    'amount-determinism': {
-      name: 'Amount Determinism',
-      description:
-        'Tests whether the wallet warns when the number of tokens received by a transaction may change depending on on-chain state at execution time.',
-      contractAddress: PLACEHOLDER_ADDRESS,
-      calldata: PLACEHOLDER_CALLDATA,
+      calldata: '0x128e6c37',
     },
   };
 

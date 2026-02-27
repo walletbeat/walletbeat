@@ -128,7 +128,7 @@
     selectedSigId: null as string | null,
     selectedScamAlertId: null as string | null,
     appIsolationSubTab: 'eth-accounts' as AppIsolationSubTab,
-    txSimulationSubTab: 'erc20-transfer' as TransactionSimulationSubTab,
+    txSimulationSubTab: 'erc20-mint' as TransactionSimulationSubTab,
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -699,46 +699,60 @@ Issued At: ${new Date().toISOString()}`;
           />
         {:else if uiState.activeTab === 'tx-simulations'}
           <WalletTesterNavigationItem
-            title="ERC-20 Transfer"
-            description="Simulate an ERC-20 token transfer"
-            isSelected={uiState.txSimulationSubTab === 'erc20-transfer'}
+            title="ERC-20 Mint"
+            description="Deterministic 100-token ERC-20 mint"
+            isSelected={uiState.txSimulationSubTab === 'erc20-mint'}
             isCompleted={false}
-            onclick={() => { uiState.txSimulationSubTab = 'erc20-transfer'; }}
+            onclick={() => { uiState.txSimulationSubTab = 'erc20-mint'; }}
           />
           <WalletTesterNavigationItem
-            title="ERC-721 Transfer"
-            description="Simulate an ERC-721 NFT transfer"
-            isSelected={uiState.txSimulationSubTab === 'erc721-transfer'}
+            title="ERC-721 Mint"
+            description="Deterministic single NFT mint"
+            isSelected={uiState.txSimulationSubTab === 'erc721-mint'}
             isCompleted={false}
-            onclick={() => { uiState.txSimulationSubTab = 'erc721-transfer'; }}
+            onclick={() => { uiState.txSimulationSubTab = 'erc721-mint'; }}
           />
           <WalletTesterNavigationItem
-            title="ERC-1155 Transfer"
-            description="Simulate an ERC-1155 multi-token transfer"
-            isSelected={uiState.txSimulationSubTab === 'erc1155-transfer'}
+            title="ERC-1155 Mint"
+            description="Deterministic single token mint"
+            isSelected={uiState.txSimulationSubTab === 'erc1155-mint'}
             isCompleted={false}
-            onclick={() => { uiState.txSimulationSubTab = 'erc1155-transfer'; }}
+            onclick={() => { uiState.txSimulationSubTab = 'erc1155-mint'; }}
+          />
+          <WalletTesterNavigationItem
+            title="All Token Transfer"
+            description="Mints ERC-20, ERC-721, and ERC-1155 in one tx"
+            isSelected={uiState.txSimulationSubTab === 'all-token-transfer'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'all-token-transfer'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Misleading Selector"
+            description="transfer() selector that actually mints to caller"
+            isSelected={uiState.txSimulationSubTab === 'misleading-selector'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'misleading-selector'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Fake Airdrop"
+            description="Burns balance, emits fake mint event"
+            isSelected={uiState.txSimulationSubTab === 'fake-airdrop'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'fake-airdrop'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Volatile Outcome"
+            description="Mints or burns depending on block number"
+            isSelected={uiState.txSimulationSubTab === 'volatile-outcome'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'volatile-outcome'; }}
           />
           <WalletTesterNavigationItem
             title="Failing Transaction"
-            description="Simulate a transaction expected to revert"
+            description="Always reverts unconditionally"
             isSelected={uiState.txSimulationSubTab === 'failing-transaction'}
             isCompleted={false}
             onclick={() => { uiState.txSimulationSubTab = 'failing-transaction'; }}
-          />
-          <WalletTesterNavigationItem
-            title="Revert Determinism"
-            description="Detects if simulation may become stale and tx could fail"
-            isSelected={uiState.txSimulationSubTab === 'revert-determinism'}
-            isCompleted={false}
-            onclick={() => { uiState.txSimulationSubTab = 'revert-determinism'; }}
-          />
-          <WalletTesterNavigationItem
-            title="Amount Determinism"
-            description="Detects if simulated token amounts may shift due to state"
-            isSelected={uiState.txSimulationSubTab === 'amount-determinism'}
-            isCompleted={false}
-            onclick={() => { uiState.txSimulationSubTab = 'amount-determinism'; }}
           />
         {:else if uiState.activeTab === 'eip-support'}
           {#each testSteps as step, index (step.id)}
