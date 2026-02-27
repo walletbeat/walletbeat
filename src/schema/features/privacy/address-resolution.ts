@@ -5,7 +5,7 @@ export interface AddressResolution<ARS = Support<AddressResolutionData> | null> 
 	/**
 	 * Support for basic ENS lookups (ENS domain to non-chain-specific raw hex
 	 * address).
-	 * To test: type `vitalik.eth` in the send address field. If it resolves, it is supported.
+	 * To test: type `donations.walletbeat.eth` in the send address field. If it resolves, it is supported.
 	 */
 	nonChainSpecificEnsResolution: ARS
 
@@ -53,9 +53,9 @@ export type AddressResolutionData =
 			 * for example through a light client.
 			 * This is generally not visible in the UI — check the wallet's source code
 			 * or privacy/security documentation to determine the correct value.
-			 * (e.g. `VERIFIABLE`: the wallet cross-checks the offchain result against
-			 * on-chain data or uses a light client to verify it.
-			 * `NOT_VERIFIABLE`: the wallet trusts the offchain provider's response as-is.)
+			 *   - `VERIFIABLE`: the wallet cross-checks the offchain result against
+			 *     on-chain data or uses a light client to verify it.
+			 *   - `NOT_VERIFIABLE`: the wallet trusts the offchain provider's response as-is.
 			 */
 			offchainDataVerifiability: 'VERIFIABLE' | 'NOT_VERIFIABLE'
 

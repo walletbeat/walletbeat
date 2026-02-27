@@ -3,7 +3,12 @@ import type { WithRef } from '@/schema/reference'
 import type { Support, Supported } from '../support'
 
 /**
- * What set of accounts are exposed?
+ * What set of accounts the wallet presents as the default selection
+ * in the connection approval UI.
+ *
+ * Note: these values describe the wallet's default *selection* shown to the user
+ * before they approve the connection, not necessarily what `eth_accounts` returns.
+ * The actual `eth_accounts` result follows whatever the user chose in that dialog.
  *
  * To identify: use the Walletbeat test page (https://beta.walletbeat.eth.limo/test/)
  * which calls `eth_accounts` after connecting and shows how many accounts are returned.

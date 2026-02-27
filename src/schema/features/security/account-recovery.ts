@@ -15,7 +15,7 @@ import type { Support } from '../support'
 export enum GuardianType {
 	/**
 	 * A self-custodied private key held by the user (outside this wallet).
-	 * (e.g. The wallet lets the user designate another wallet or a
+	 * (i.e. The wallet lets the user designate another wallet or a
 	 * separately-stored seed phrase as a recovery guardian.)
 	 * To identify: look for a recovery option that asks the user to sign with
 	 * an existing private key they already control, rather than creating a new one.
@@ -24,7 +24,7 @@ export enum GuardianType {
 
 	/**
 	 * The wallet's own login/encryption password, distinct from the seed phrase.
-	 * (e.g. The wallet encrypts a recovery payload using the wallet password,
+	 * (i.e. The wallet encrypts a recovery payload using the wallet password,
 	 * so knowing the password is required to decrypt and recover.)
 	 * To identify: the recovery documentation states that the wallet password
 	 * is a required input for decrypting the recovery backup.
@@ -34,12 +34,8 @@ export enum GuardianType {
 	/**
 	 * A service operated by the wallet developer that holds a key share or
 	 * recovery material on behalf of the user.
-	 * (e.g. The wallet company's server stores one share of the recovery secret,
-	 * making it a mandatory participant in recovery.)
 	 * To identify: the wallet's architecture documentation describes a server-side
-	 * component that holds cryptographic material needed for recovery. This is also
-	 * often visible as a "required" dependency in the recovery flow — if the
-	 * provider's service is unavailable, recovery fails.
+	 * component that holds cryptographic material needed for recovery.
 	 */
 	WALLET_PROVIDER = 'WALLET_PROVIDER',
 
@@ -234,6 +230,10 @@ export function guardiansWithEntities(entities: Entity[], guardians: Guardian[])
 /**
  * Type of guardian configuration.
  *
+ * This is not a comprehensive list — if a wallet uses a recovery scheme that
+ * doesn't fit any of these types, a new enum value should be added rather than
+ * forcing it into an existing one.
+ *
  * To identify: read the wallet's recovery documentation or security audit.
  * Look for keywords — "secret sharing", "MPC", "Shamir" indicate
  * SECRET_SPLIT; "approve", "guardians", "timelock", "waiting period"
@@ -318,7 +318,7 @@ export type GuardianPolicySecretSplitAcrossGuardians = GuardianPolicyBase & {
 	/**
 	 * Where is the secret reassembled from its shares?
 	 * `CLIENT_SIDE`: the shares are combined entirely on the user's device;
-	 * the full key never passes through any server.
+	 * the full key never passes through / touches any server.
 	 * An `Entity`: the shares are sent to that entity's infrastructure
 	 * for server-side reconstruction.
 	 * To identify: this is NOT visible in the UI — check the wallet's
@@ -326,6 +326,8 @@ export type GuardianPolicySecretSplitAcrossGuardians = GuardianPolicyBase & {
 	 * or inspect the source code for where share combination occurs.
 	 * Server-side reconstruction is typically visible as an API call that
 	 * receives multiple shares and returns the full key or a derived secret.
+	 * TODO: Once issue #503 is resolved, this field should capture whether
+	 * the reconstruction is auditable/verifiable vs. opaque.
 	 */
 	secretReconstitution: 'CLIENT_SIDE' | Entity
 }

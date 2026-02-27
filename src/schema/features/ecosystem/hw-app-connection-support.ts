@@ -47,9 +47,10 @@ export interface AppConnectionMethodDetails {
 	/**
 	 * Is manufacturer consent required to integrate any hardware wallet feature into a software wallet?
 	 * If so, must provide reference.
-	 * (e.g. `ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE`: any software wallet can integrate the hardware
-	 * wallet without needing approval from the manufacturer.
-	 * `FEATURES_GATED_BY_MANUFACTURER`: the manufacturer must approve before a software wallet can access certain features.)
+	 *   - `ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE`: any software wallet can integrate the hardware
+	 *     wallet without needing approval from the manufacturer.
+	 *   - `FEATURES_GATED_BY_MANUFACTURER`: the manufacturer must approve before a software wallet can
+	 *     access certain features.
 	 */
 	requiresManufacturerConsent:
 		| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' }

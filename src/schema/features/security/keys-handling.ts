@@ -54,7 +54,7 @@ export enum KeyGenerationLocation {
 export enum MultiPartyKeyReconstruction {
 	/**
 	 * The key is not split — it exists in full on the user's device.
-	 * This is the standard model for traditional seed-phrase wallets.
+	 * This is the standard model for traditional seed phrase wallets.
 	 */
 	NON_MULTIPARTY = 'NON_MULTIPARTY',
 

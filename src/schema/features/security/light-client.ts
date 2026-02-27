@@ -3,9 +3,9 @@ import type { AtLeastOneSupported } from '../support'
 
 /**
  * Known Ethereum L1 light client implementations a wallet may embed.
- * Not visible in the UI — identify by checking the wallet's documentation
- * for light client claims, or by searching the source code for imports of
- * helios or similar libraries.
+ * Sometimes visible in the UI, but more reliably identified by checking the
+ * wallet's documentation for light client claims, or by searching the source
+ * code for imports of helios or similar libraries.
  */
 export enum EthereumL1LightClient {
 	/** Helios: a fast, trustless Ethereum light client written in Rust. */

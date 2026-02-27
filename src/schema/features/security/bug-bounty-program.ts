@@ -4,7 +4,7 @@ import { type NonEmptySet } from '@/types/utils/non-empty'
 
 import type { Support } from '../support'
 /**
- * Bug bounty program data is almost entirely researchable, no hands-on
+ * Bug bounty program data is almost entirely automatically researchable — no hands-on
  * wallet testing is required. The primary sources are:
  *   1. The wallet's bug bounty page (linked from the wallet's security
  *      documentation or directly on the platform listed below).

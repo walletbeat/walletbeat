@@ -16,7 +16,7 @@ export enum PasskeyVerificationLibrary {
 	/** SmoothCryptoLib — a P-256 verification library. */
 	SMOOTH_CRYPTO_LIB = 'SMOOTH_CRYPTO_LIB',
 
-	/** FreshCryptoLib — a P-256 verification library used by Safe and others. */
+	/** FreshCryptoLib — a P-256 verification library. */
 	FRESH_CRYPTO_LIB = 'FRESH_CRYPTO_LIB',
 
 	/** Daimo's P-256 verifier contract. */

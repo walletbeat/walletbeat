@@ -4,30 +4,30 @@ import type { Support, Supported } from '../support'
 interface DelegationOffer {
 	/**
 	 * Does the wallet offer to sign the EIP-7702 delegation transaction upon fresh EOA creation?
-	 * (e.g. `NO`: wallet creates the EOA without mentioning delegation.
-	 * `SUGGESTED`: wallet prompts the user to delegate during account setup, but they can skip it.
-	 * `REQUIRED`: wallet forces the user to delegate before the account can be used.)
+	 *   - `NO`: wallet creates the EOA without mentioning delegation.
+	 *   - `SUGGESTED`: wallet prompts the user to delegate during account setup, but they can skip it.
+	 *   - `REQUIRED`: wallet forces the user to delegate before the account can be used.
 	 */
 	duringEOACreation: 'NO' | 'SUGGESTED' | 'REQUIRED'
 
 	/**
 	 * Does the wallet offer to sign an EIP-7702 delegation transaction upon importing an existing EOA?
-	 * (e.g. `NO`: wallet imports the key without mentioning delegation.
-	 * `SUGGESTED`: wallet prompts the user to delegate after import, but they can skip it.
-	 * `REQUIRED`: wallet requires the user to delegate before the imported account can be used.)
+	 *   - `NO`: wallet imports the key without mentioning delegation.
+	 *   - `SUGGESTED`: wallet prompts the user to delegate after import, but they can skip it.
+	 *   - `REQUIRED`: wallet requires the user to delegate before the imported account can be used.
 	 */
 	duringEOAImport: 'NO' | 'SUGGESTED' | 'REQUIRED'
 
 	/**
 	 * Does the wallet offer to sign an EIP-7702 transaction upon the first operation that requires it?
-	 * (e.g. The user attempts a sponsored transaction and the wallet detects no delegation is in place yet,
+	 * (i.e. The user attempts a sponsored transaction and the wallet detects no delegation is in place yet,
 	 * so it initiates the delegation flow before or alongside the intended operation.)
 	 */
 	duringFirst7702Operation: Support<
 		| {
 				/**
 				 * Is the delegation step done as a standalone step before other operations?
-				 * (e.g. The wallet shows a "Set up your smart account" screen and waits for it to confirm
+				 * (i.e. The wallet shows a "Set up your smart account" screen and waits for it to confirm
 				 * on-chain before proceeding with the user's original transaction.)
 				 */
 				type: 'STANDALONE_UPFRONT_DELEGATION'
@@ -35,7 +35,7 @@ interface DelegationOffer {
 		| {
 				/**
 				 * Is the delegation step done together with the non-delegation operations?
-				 * (e.g. The wallet bundles the EIP-7702 delegation and the user's intended transaction
+				 * (i.e. The wallet bundles the EIP-7702 delegation and the user's intended transaction
 				 * into a single transaction that is submitted together.)
 				 */
 				type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS'
@@ -44,10 +44,10 @@ interface DelegationOffer {
 				 * Does the wallet show the same level of details on the non-delegation part of the bundle
 				 * as it would show if the user had initiated the same transaction after the wallet already
 				 * has the delegation in place?
-				 * (e.g. `true`: the wallet shows the token transfer details, recipient, and amount exactly
-				 * as it would in a normal flow — the delegation being bundled does not reduce visibility.
-				 * `false`: the wallet only shows a generic "setting up smart account" message without
-				 * details of the non-delegation transaction being bundled alongside it.)
+				 *   - `true`: the wallet shows the token transfer details, recipient, and amount exactly
+				 *     as it would in a normal flow — the delegation being bundled does not reduce visibility.
+				 *   - `false`: the wallet only shows a generic "setting up smart account" message without
+				 *     details of the non-delegation transaction being bundled alongside it.
 				 */
 				nonDelegationTransactionDetailsIdenticalToNormalFlow: boolean
 		  }
@@ -68,14 +68,14 @@ export type DelegationHandling =
 				fee: {
 					/**
 					 * Does the wallet sponsor the delegation fee?
-					 * (e.g. The wallet pays for the gas cost of the EIP-7702 delegation transaction
+					 * (i.e. The wallet pays for the gas cost of the EIP-7702 delegation transaction
 					 * on behalf of the user, so they do not need ETH to get started.)
 					 */
 					walletSponsored: Support
 
 					/**
 					 * Does the wallet support paying for the gas fee across chains?
-					 * (e.g. The user pays the delegation gas fee using USDC on Arbitrum,
+					 * (i.e. The user pays the delegation gas fee using USDC on Arbitrum,
 					 * even though the delegation occurs on Ethereum mainnet.)
 					 */
 					crossChainGas: Support

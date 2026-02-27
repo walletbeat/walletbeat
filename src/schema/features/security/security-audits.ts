@@ -6,7 +6,7 @@ import type { MustRef } from '../../reference'
 import type { AtLeastOneTrueVariant } from '../../variants'
 
 /**
- * Security audit data is fully researchable — no hands-on wallet testing needed.
+ * Security audit data is automatically researchable — no hands-on wallet testing needed.
  * To find audits: check the wallet's website security page, GitHub repository,
  * documentation, or blog. Audit reports are typically published as PDFs or links from the
  * wallet's documentation. Only list audits whose full report is PUBLICLY available.

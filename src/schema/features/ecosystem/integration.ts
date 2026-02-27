@@ -25,11 +25,6 @@ export interface WalletIntegration {
 	 *
 	 * Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
 	 * It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
-	 *
-	 * Protip to test support manually:
-	 *   - EIP-1193: Type `window.ethereum` in the console. Should return a provider object.
-	 *   - EIP-2700: Type `window.ethereum.on` and `window.ethereum.removeListener` in the console. Both should be functions.
-	 *   - EIP-6963: Check https://eip6963.org/ or use the test page above.
 	 */
 	browser: 'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>
 
