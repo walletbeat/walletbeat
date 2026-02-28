@@ -23,7 +23,7 @@ Before doing anything else:
    - Software: `data/software-wallets/[wallet-name].ts`
    - Hardware: `data/hardware-wallets/[wallet-name].ts`
    - Embedded: `data/embedded-wallets/[wallet-name].ts`
-   - If it does **not** exist, let the contributor know and suggest using `/wallet-new` first to register the wallet.
+   - If it does **not** exist, let the contributor know and suggest using `/wallet-create` first to register the wallet.
 4. Ask: "What wallet data would you like to add or update?" (e.g., a specific feature, all null fields, a particular group of fields)
 5. Ask: "What is your preferred display name or nickname?" and "Do you already have a contributor file in `data/contributors/`?"
    - If **yes** — confirm it exists. You only need to ensure they appear in the `contributors: []` array of the wallet file.

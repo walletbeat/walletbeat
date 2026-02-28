@@ -26,7 +26,7 @@ Before doing anything else:
    - Software: `data/software-wallets/[wallet-name].ts`
    - Hardware: `data/hardware-wallets/[wallet-name].ts`
    - Embedded: `data/embedded-wallets/[wallet-name].ts`
-   - If the file **already exists**, let the contributor know and suggest using `/wallet-features` instead to populate feature data.
+   - If the file **already exists**, let the contributor know and suggest using `/wallet-update` instead to populate feature data.
 4. Ask: "What is your preferred display name or nickname?" and "Do you already have a contributor file in `data/contributors/`?"
    - If **yes** — locate `data/contributors/[their-nickname].ts` and confirm it exists.
    - If **no** — also ask for their affiliation (company / role, if any) and a URL to their profile (GitHub, Twitter, etc.). You will create the contributor file for them in Step A below.
@@ -157,7 +157,7 @@ Instruct the contributor to:
 - Find an SVG icon, crop transparent edges, save to `/public/images/wallets/[id].svg`.
   - If only PNG: save as `.png` and set `iconExtension: 'png'` in metadata.
 
-All `features` fields should remain `null` for now — those are populated separately using `/wallet-features`.
+All `features` fields should remain `null` for now — those are populated separately using `/wallet-update`.
 
 ### Step C.3 — Register in index
 
@@ -203,7 +203,7 @@ Once `pnpm check:all` passes and the wallet shows in the table (all gray/unrated
 The wallet is now visible on the site with all fields unrated. To fill in the actual feature data, use:
 
 ```
-/wallet-features [wallet-name]
+/wallet-update [wallet-name]
 ```
 
 This separate skill guides through each `null` field — what it measures, how to test it, and how to fill in the value with a proper `ref`.
