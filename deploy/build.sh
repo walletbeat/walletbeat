@@ -32,7 +32,7 @@ do_build() {
 	elif has_tty; then
 		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/tty
 	else
-		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | cat
+		WALLETBEAT_BUILD_DO_NOT_RECURSE=true pnpm astro build 2>&1 | tee /dev/stderr
 	fi
 }
 
