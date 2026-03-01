@@ -10,7 +10,7 @@ import { toFullyQualified } from '@/schema/reference'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
-import { assertValidMarkdown } from './utils/assertValidMarkdown'
+import { assertValidMarkdown } from './utils/assert-valid-markdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()

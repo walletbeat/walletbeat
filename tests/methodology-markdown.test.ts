@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { attributeTree } from '@/schema/attribute-groups'
 import { methodologyPageMarkdown } from '@/utils/methodology-markdown'
 
-import { assertValidMarkdown } from './utils/assertValidMarkdown'
+import { assertValidMarkdown } from './utils/assert-valid-markdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()

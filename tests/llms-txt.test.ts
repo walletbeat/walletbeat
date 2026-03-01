@@ -4,7 +4,7 @@ import { ratedHardwareWallets } from '@/data/hardware-wallets'
 import { ratedSoftwareWallets } from '@/data/software-wallets'
 import { llmsTxtBody } from '@/utils/llms-txt'
 
-import { assertValidMarkdown } from './utils/assertValidMarkdown'
+import { assertValidMarkdown } from './utils/assert-valid-markdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
 
 await warmupHarperLinter()
