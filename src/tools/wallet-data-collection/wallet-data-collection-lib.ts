@@ -17,10 +17,12 @@ import {
 	collectionPolicyExplanation,
 	DataCollectionPurpose,
 	dataCollectionPurpose,
+	dataCollectionPurposeToText,
 	hintForUserInfo,
 	UserFlow,
 	type UserInfo,
 	userInfoEnums,
+	userInfoName,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { type Variant, variantEnum } from '@/schema/variants'
@@ -1074,14 +1076,25 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 
 			// Purposes selection
 			let purposesConfirmed = false
-			let selectedPurposes: DataCollectionPurpose[] = []
+			let selectedPurposes: DataCollectionPurpose[] | 'NOT_WALLET_INITIATED' = []
 
 			while (!purposesConfirmed) {
-				const purposeChoices = dataCollectionPurpose.items.map(p => ({
-					title: p,
-					value: p,
-					selected: matcherPurposes.includes(p) || review.getExtraPurposes().includes(p),
-				}))
+				const purposeChoices = [
+					{
+						title: 'This request was not initiated by the wallet',
+						value: 'NOT_WALLET_INITIATED',
+						description:
+							'Select this for requests that were not actually initiated by the wallet, but caught in the capture nonetheless.',
+						selected: false,
+					},
+				].concat(
+					dataCollectionPurpose.items.map(p => ({
+						title: dataCollectionPurposeToText(p),
+						value: p,
+						description: p,
+						selected: matcherPurposes.includes(p) || review.getExtraPurposes().includes(p),
+					})),
+				)
 
 				const purposeResponse = await prompts({
 					type: 'multiselect',
@@ -1097,42 +1110,59 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 					return
 				}
 
-				selectedPurposes = dataCollectionPurpose.assertArray(purposeResponse.purposes)
+				if (!Array.isArray(purposeResponse.purposes)) {
+					throw new Error('Unexpected type for purposeResponse.purposes')
+				}
 
-				// Check if any matcher purpose was unselected
-				const unselectedMatcherPurposes = matcherPurposes.filter(p => !selectedPurposes.includes(p))
+				if (purposeResponse.purposes.includes('NOT_WALLET_INITIATED')) {
+					if (purposeResponse.purposes.length > 1) {
+						log(
+							'\n⚠️  Cannot simultaneously mark the request as not-wallet-initiated while also assigning it to other purposes. Try again.',
+						)
+						continue
+					}
 
-				if (unselectedMatcherPurposes.length > 0 && matcher !== null) {
-					log(
-						`\n⚠️  You unselected purpose(s) from a matcher: ${unselectedMatcherPurposes.join(', ')}`,
+					selectedPurposes = 'NOT_WALLET_INITIATED'
+				} else {
+					selectedPurposes = dataCollectionPurpose.assertArray(purposeResponse.purposes)
+
+					// Check if any matcher purpose was unselected
+					const unselectedMatcherPurposes = matcherPurposes.filter(
+						p => !selectedPurposes.includes(p),
 					)
-					log(`   Matcher: ${matcher.toString()}`)
 
-					const removeMatcherResponse = await prompts({
-						type: 'confirm',
-						name: 'value',
-						message:
-							'Would you like to delete this matcher? (Selecting "No" will restart the purpose selection)',
-						initial: false,
-					})
+					if (unselectedMatcherPurposes.length > 0 && matcher !== null) {
+						log(
+							`\n⚠️  You unselected purpose(s) from a matcher: ${unselectedMatcherPurposes.join(', ')}`,
+						)
+						log(`   Matcher: ${matcher.toString()}`)
 
-					if (removeMatcherResponse.value === undefined) {
-						log('\nReview cancelled.')
+						const removeMatcherResponse = await prompts({
+							type: 'confirm',
+							name: 'value',
+							message:
+								'Would you like to delete this matcher? (Selecting "No" will restart the purpose selection)',
+							initial: false,
+						})
 
-						return
+						if (removeMatcherResponse.value === undefined) {
+							log('\nReview cancelled.')
+
+							return
+						}
+
+						if (typeof removeMatcherResponse.value !== 'boolean') {
+							throw new Error('invalid response type')
+						}
+
+						if (removeMatcherResponse.value) {
+							capture.removeRequestMatcher(matcher)
+							await capture.save(getSaveOptions(opts))
+							log('✅ Matcher deleted. Restarting this request review...')
+						}
+
+						continue
 					}
-
-					if (typeof removeMatcherResponse.value !== 'boolean') {
-						throw new Error('invalid response type')
-					}
-
-					if (removeMatcherResponse.value) {
-						capture.removeRequestMatcher(matcher)
-						await capture.save(getSaveOptions(opts))
-						log('✅ Matcher deleted. Restarting this request review...')
-					}
-
-					continue
 				}
 
 				purposesConfirmed = true
@@ -1150,10 +1180,13 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 			let userInfoConfirmed = false
 			let selectedUserInfo: UserInfo[] = []
 
-			while (!userInfoConfirmed) {
+			while (selectedPurposes != 'NOT_WALLET_INITIATED' && !userInfoConfirmed) {
 				const userInfoChoices = userInfoEnums.items.map(u => ({
-					title: u,
+					title: userInfoName(u)
+						.long.replaceAll('{{WALLET_PSEUDONYM_SINGULAR}}', 'wallet-specific pseudonym')
+						.replace(/^[a-z]/, x => x.toUpperCase()),
 					value: u,
+					description: u,
 					selected: detectedUserInfo.has(u) || review.getExtraUserData().includes(u),
 				}))
 
@@ -1192,7 +1225,11 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 			let collectionPolicy: CollectionPolicy | null = null
 			let collectionPolicyFromManualReview = true
 
-			if (matcher !== null && matcher.policy !== null) {
+			if (
+				selectedPurposes != 'NOT_WALLET_INITIATED' &&
+				matcher !== null &&
+				matcher.policy !== null
+			) {
 				const confirmPolicyResponse = await prompts({
 					type: 'confirm',
 					name: 'value',
@@ -1216,7 +1253,7 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				}
 			}
 
-			if (collectionPolicy === null) {
+			if (selectedPurposes != 'NOT_WALLET_INITIATED' && collectionPolicy === null) {
 				const possiblePolicies = collectionPolicyEnum.items.filter(
 					p => p !== CollectionPolicy.NEVER,
 				)
@@ -1225,8 +1262,8 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 					name: 'value',
 					message: 'Pick the appropriate collection policy.',
 					choices: possiblePolicies.map(p => ({
-						title: p.toString(),
-						description: collectionPolicyExplanation(p),
+						title: collectionPolicyExplanation(p),
+						description: p.toString(),
 						value: p,
 					})),
 					initial: possiblePolicies.indexOf(CollectionPolicy.ALWAYS),
@@ -1242,7 +1279,9 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 			}
 
 			// Calculate extra purposes and user info
-			const extraPurposes = selectedPurposes.filter(p => !matcherPurposes.includes(p))
+			const extraPurposes = Array.isArray(selectedPurposes)
+				? selectedPurposes.filter(p => !matcherPurposes.includes(p))
+				: selectedPurposes
 			const extraUserInfo = selectedUserInfo.filter(u => !detectedUserInfo.has(u))
 
 			// Show final result
@@ -1257,38 +1296,44 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 				log(`     From matcher: ${matcherPurposes.join(', ')}`)
 			}
 
-			if (extraPurposes.length > 0) {
-				log(`       Additional: ${extraPurposes.join(', ')}`)
-			}
-
-			if (matcherPurposes.length === 0 && extraPurposes.length === 0) {
+			if (extraPurposes === 'NOT_WALLET_INITIATED') {
+				log('     After review: ignoring as non-wallet-initiated')
+			} else if (extraPurposes.length > 0) {
+				log(`  Added by review: ${extraPurposes.join(', ')}`)
+			} else if (matcherPurposes.length === 0 && extraPurposes.length === 0) {
 				log('     (none selected)')
 			}
 
-			log('\n  User Data:')
+			if (extraPurposes !== 'NOT_WALLET_INITIATED') {
+				log('\n  User Data:')
 
-			if (detectedUserInfo.size > 0) {
-				log(`    Auto-detected: ${Array.from(detectedUserInfo).join(', ')}`)
-			}
+				if (detectedUserInfo.size > 0) {
+					log(`    Auto-detected: ${Array.from(detectedUserInfo).join(', ')}`)
+				}
 
-			if (extraUserInfo.length > 0) {
-				log(`       Additional: ${extraUserInfo.join(', ')}`)
-			}
+				if (extraUserInfo.length > 0) {
+					log(`       Additional: ${extraUserInfo.join(', ')}`)
+				}
 
-			if (detectedUserInfo.size === 0 && extraUserInfo.length === 0) {
-				log('     (none)')
-			}
+				if (detectedUserInfo.size === 0 && extraUserInfo.length === 0) {
+					log('     (none)')
+				}
 
-			log('\n  Collection policy:')
+				log('\n  Collection policy:')
 
-			if (collectionPolicyFromManualReview) {
-				log(
-					`    Classified as: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
-				)
-			} else {
-				log(
-					`     From matcher: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
-				)
+				if (collectionPolicy === null) {
+					throw new Error('Unreachable')
+				}
+
+				if (collectionPolicyFromManualReview) {
+					log(
+						`    Classified as: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
+					)
+				} else {
+					log(
+						`     From matcher: ${collectionPolicy} (${collectionPolicyExplanation(collectionPolicy)})`,
+					)
+				}
 			}
 
 			// Confirmation
@@ -1311,16 +1356,24 @@ export async function handleReviewRequests(opts: GlobalOptions): Promise<void> {
 			}
 
 			if (finalConfirm.value) {
-				for (const extraPurpose of extraPurposes) {
-					review.addPurpose(extraPurpose)
-				}
+				if (extraPurposes === 'NOT_WALLET_INITIATED') {
+					review.setNotWalletInitiated()
+				} else {
+					if (collectionPolicy === null) {
+						throw new Error('Unreachable')
+					}
 
-				for (const userInfo of extraUserInfo) {
-					review.addUserInfo(userInfo)
-				}
+					for (const extraPurpose of extraPurposes) {
+						review.addPurpose(extraPurpose)
+					}
 
-				if (collectionPolicyFromManualReview) {
-					review.setCollectionPolicy(collectionPolicy)
+					for (const userInfo of extraUserInfo) {
+						review.addUserInfo(userInfo)
+					}
+
+					if (collectionPolicyFromManualReview) {
+						review.setCollectionPolicy(collectionPolicy)
+					}
 				}
 
 				review.markAsReviewed()
