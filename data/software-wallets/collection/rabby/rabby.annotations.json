@@ -293,26 +293,6 @@
 		{
 			"domain": "static-assets.rabby.io",
 			"purposes": ["STATIC_ASSETS"]
-		},
-		{
-			"domain": "rabby.io",
-			"purposes": ["STATIC_ASSETS"],
-			"path": "/assets/*"
-		},
-		{
-			"domain": "rabby.io",
-			"purposes": ["STATIC_ASSETS"],
-			"path": "/js/*"
-		},
-		{
-			"domain": "rabby.io",
-			"purposes": ["STATIC_ASSETS"],
-			"path": "/static/*"
-		},
-		{
-			"domain": "rabby.io",
-			"purposes": ["STATIC_ASSETS"],
-			"path": "/"
 		}
 	]
 }

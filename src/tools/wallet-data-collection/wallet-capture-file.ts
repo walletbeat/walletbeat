@@ -17,6 +17,7 @@ import {
 	dataCollectionPurpose,
 	leastConfigurableCollectionPolicy,
 	normalizedStrForUserInfo,
+	PersonalInfo,
 	RegularEndpoint,
 	UserFlow,
 	userFlow,
@@ -175,7 +176,7 @@ interface EncodedUserDataPiecesMultiple {
 
 interface EncodedWalletRequestReview {
 	manuallyReviewed: boolean
-	extraPurposes?: DataCollectionPurpose[]
+	extraPurposes?: 'NOT_WALLET_INITIATED' | DataCollectionPurpose[]
 	extraUserData?: UserInfo[]
 	collectionPolicy?: CollectionPolicy
 }
@@ -239,14 +240,24 @@ function parseEncodedWalletRequestReview(v: unknown, at: string): EncodedWalletR
 
 	const manuallyReviewed = expectBoolean(obj.manuallyReviewed, `${at}.manuallyReviewed`)
 
-	let extraPurposes: DataCollectionPurpose[] | undefined
+	let extraPurposes: DataCollectionPurpose[] | 'NOT_WALLET_INITIATED' | undefined
 
 	if (obj.extraPurposes !== undefined) {
-		const rawPurposes = expectArray(obj.extraPurposes, `${at}.extraPurposes`)
+		if (Array.isArray(obj.extraPurposes)) {
+			const rawPurposes = expectArray(obj.extraPurposes, `${at}.extraPurposes`)
 
-		extraPurposes = rawPurposes.map((p, i) =>
-			dataCollectionPurpose.assert(expectString(p, `${at}.extraPurposes[${i}]`)),
-		)
+			extraPurposes = rawPurposes.map((p, i) =>
+				dataCollectionPurpose.assert(expectString(p, `${at}.extraPurposes[${i}]`)),
+			)
+		} else if (typeof obj.extraPurposes === 'string') {
+			if (obj.extraPurposes !== 'NOT_WALLET_INITIATED') {
+				throw new Error(`Unexpected ${at}.extraPurposes=${obj.extraPurposes}`)
+			}
+
+			extraPurposes = 'NOT_WALLET_INITIATED'
+		} else {
+			throw new Error(`Unexpected type for ${at}.extraPurposes: ${typeof obj.extraPurposes}`)
+		}
 	}
 
 	let extraUserData: UserInfo[] | undefined
@@ -1140,14 +1151,14 @@ export type UserDataPiecesWithDomain = UserDataPieces & {
 export class WalletRequestReview {
 	public readonly request: WalletRequest
 	private reviewed: boolean | null
-	private extraPurposes: DataCollectionPurpose[]
+	private extraPurposes: 'NOT_WALLET_INITIATED' | DataCollectionPurpose[]
 	private extraUserData: UserInfo[]
 	private collectionPolicy: CollectionPolicy | null
 
 	private constructor(args: {
 		request: WalletRequest
 		reviewed: boolean | null
-		extraPurposes: DataCollectionPurpose[]
+		extraPurposes: 'NOT_WALLET_INITIATED' | DataCollectionPurpose[]
 		extraUserData: UserInfo[]
 		collectionPolicy: CollectionPolicy | null
 	}) {
@@ -1198,7 +1209,29 @@ export class WalletRequestReview {
 		return this.reviewed === true
 	}
 
+	public setNotWalletInitiated() {
+		if (this.extraPurposes === 'NOT_WALLET_INITIATED') {
+			return
+		}
+
+		if (this.extraPurposes.length === 0) {
+			this.extraPurposes = 'NOT_WALLET_INITIATED'
+
+			return
+		}
+
+		throw new Error(
+			`Request already marked as having purposes ${this.extraPurposes.join(' & ')}; cannot additionally mark it as NOT_WALLET_INITIATED`,
+		)
+	}
+
 	public addPurpose(purpose: DataCollectionPurpose) {
+		if (this.extraPurposes === 'NOT_WALLET_INITIATED') {
+			throw new Error(
+				'Request already marked as NOT_WALLET_INITIATED; cannot mark it as having any other purpose.',
+			)
+		}
+
 		if (!this.extraPurposes.includes(purpose)) {
 			this.extraPurposes.push(purpose)
 		}
@@ -1224,7 +1257,7 @@ export class WalletRequestReview {
 		this.reviewed = true
 	}
 
-	public getExtraPurposes(): ReadonlyArray<DataCollectionPurpose> {
+	public getExtraPurposes(): ReadonlyArray<DataCollectionPurpose> | 'NOT_WALLET_INITIATED' {
 		return this.extraPurposes
 	}
 
@@ -1413,6 +1446,8 @@ export class WalletRequest {
 	): Map<UserInfo, CollectionPolicy | null> {
 		const infos = new Map<UserInfo, CollectionPolicy | null>()
 
+		infos.set(PersonalInfo.IP_ADDRESS, matcherCollectionPolicy)
+
 		const processDict = (dict: UserDataDict) => {
 			for (const values of Object.values(dict)) {
 				for (const piece of values) {
@@ -1523,7 +1558,14 @@ export class WalletCaptureFlow {
 	}
 
 	public unreviewedRequests(): WalletRequestReview[] {
-		return this._requests.map(req => req.review).filter(review => !review.isManuallyReviewed())
+		return this._requests
+			.filter(req => {
+				const matcher = this.file.findMatcherForReq(req)
+
+				return matcher === null || matcher.purposes !== 'NOT_WALLET_INITIATED'
+			})
+			.map(req => req.review)
+			.filter(review => !review.isManuallyReviewed())
 	}
 }
 
@@ -1847,7 +1889,13 @@ export class WalletCaptureFile {
 				}
 			}
 
-			for (const purpose of request.review.getExtraPurposes()) {
+			const extraPurposes = request.review.getExtraPurposes()
+
+			if (extraPurposes === 'NOT_WALLET_INITIATED') {
+				continue
+			}
+
+			for (const purpose of extraPurposes) {
 				purposes.add(purpose)
 			}
 
