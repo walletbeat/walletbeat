@@ -8,6 +8,7 @@ import { entityForDomain } from '@/data/entities/domains/entity-domains'
 import type { Entity } from '@/schema/entity'
 import {
 	CollectionPolicy,
+	collectionPolicyEnum,
 	compareUserInfo,
 	type DataCollection,
 	type DataCollectionByEntity,
@@ -270,10 +271,19 @@ function parseEncodedWalletRequestReview(v: unknown, at: string): EncodedWalletR
 		)
 	}
 
+	let collectionPolicy: CollectionPolicy | undefined = undefined
+
+	if (obj.collectionPolicy !== undefined) {
+		collectionPolicy = collectionPolicyEnum.assert(
+			expectString(obj.collectionPolicy, `${at}.collectionPolicy`),
+		)
+	}
+
 	return {
 		manuallyReviewed,
 		...(extraPurposes !== undefined && extraPurposes.length > 0 ? { extraPurposes } : {}),
 		...(extraUserData !== undefined && extraUserData.length > 0 ? { extraUserData } : {}),
+		...(collectionPolicy !== undefined ? { collectionPolicy } : {}),
 	}
 }
 
@@ -1199,7 +1209,9 @@ export class WalletRequestReview {
 
 		return {
 			manuallyReviewed: this.reviewed,
-			...(this.extraPurposes.length > 0 ? { extraPurposes: this.extraPurposes } : {}),
+			...(this.extraPurposes === 'NOT_WALLET_INITIATED' || this.extraPurposes.length > 0
+				? { extraPurposes: this.extraPurposes }
+				: {}),
 			...(this.extraUserData.length > 0 ? { extraUserData: this.extraUserData } : {}),
 			...(this.collectionPolicy !== null ? { collectionPolicy: this.collectionPolicy } : {}),
 		}
