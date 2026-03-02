@@ -192,11 +192,9 @@ const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
 			{{WALLET_NAME}} does not support any type of private token transfers.
 
 			This means all token transfers made using {{WALLET_NAME}} are public
-			information and are recorded forever.
-			Therefore, {{WALLET_NAME}} users should only make token transfers if they
-			would also be comfortable with continuously publishing their bank account
-			statement or payment app transaction history for all to see online, as
-			their level of privacy would be similar.
+			information and are recorded forever. Users should only make token
+			transfers if they would be comfortable publishing their bank statement
+			or payment history online—their privacy level would be similar.
 		`,
 	),
 	impact: mdParagraph(
@@ -210,12 +208,10 @@ const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
 			permanent associations between their public transactions and their
 			personal identity.
 
-			Usage of {{WALLET_NAME}} for conducting real-world transactions is
-			especially **not advisable**, as it exposes the user to the risk of the
-			merchant looking up their customer's balance and initiating a
-			[**wrench attack**](https://github.com/jlopp/physical-bitcoin-attacks/blob/master/README.md)
-			on the user. This puts users of {{WALLET_NAME}} at risk of physical
-			and financial harm.
+			Using {{WALLET_NAME}} for real-world payments is especially **not advisable**.
+			Merchants could look up a customer's balance and initiate a
+			[**wrench attack**](https://github.com/jlopp/physical-bitcoin-attacks/blob/master/README.md).
+			This puts users at risk of physical and financial harm.
 		`,
 	),
 	howToImprove: mdParagraph(

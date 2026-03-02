@@ -375,7 +375,7 @@ function evaluateWorstFeeDisplay(
 				...baseValue,
 			},
 			details: markdown(`
-				{{WALLET_NAME}} hides the some of fees being charged to the user.
+				{{WALLET_NAME}} hides some of the fees being charged to the user.
 				They are not displayed to the user by default for ${worstFeeTypesMarkdown(`
 				`)}
 			`),

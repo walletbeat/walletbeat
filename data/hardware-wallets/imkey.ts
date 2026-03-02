@@ -33,7 +33,7 @@ export const imkeyWallet: HardwareWallet = {
 			(including Bitcoin, Ethereum, and Tron). Built with an EAL6+ certified secure chip, imKey ensures
 			private keys are generated, stored, and used entirely within the device for maximum protection.
 			Seamlessly integrated with imToken on mobile and compatible with the Rabby browser extension on PC,
-			imKey enables users to manage assets, interact with DApps, and perform transactions with enhanced security and flexibility.
+			imKey enables users to manage assets, interact with apps, and perform transactions with enhanced security and flexibility.
 		`),
 		contributors: [mako],
 		hardwareWalletManufactureType: HardwareWalletManufactureType.FACTORY_MADE,
@@ -150,7 +150,7 @@ export const imkeyWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'imKey interacts seamlessly with DApps through the imToken in-app browser and supports connection via Rabby or WalletConnect.',
+							'imKey interacts seamlessly with apps through the imToken in-app browser and supports connection via Rabby or WalletConnect.',
 						url: [
 							'https://imkey.im/pages/integrated-wallets',
 							'https://learn.imkey.im/hc/en-001/articles/35683788822937',

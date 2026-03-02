@@ -351,6 +351,19 @@ export interface ExampleRating<V extends Value> {
 }
 
 /**
+ * Normalize example ratings to an array (single item or undefined becomes array).
+ */
+export function normalizeExampleRatings<V extends Value>(
+	ratings: ExampleRating<V> | ExampleRating<V>[] | undefined,
+): ExampleRating<V>[] {
+	if (ratings === undefined) {
+		return []
+	}
+
+	return Array.isArray(ratings) ? ratings : [ratings]
+}
+
+/**
  * Attribute represents a desirable property that wallets should have.
  * It corresponds to one slice of the pie chart displayed for each wallet.
  * For example, an attribute could be about whether or not a wallet is

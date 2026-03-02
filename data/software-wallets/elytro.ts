@@ -47,7 +47,7 @@ export const elytro: SoftwareWallet = {
 		displayName: 'Elytro',
 		tableName: 'Elytro',
 		blurb: paragraph(
-			'Coming soon. We build secured and decentralized public infra for humanity on Ethereum. We believe in a free, open and self-own internet. We start by building a smart contract account.',
+			'Coming soon. We build secured and decentralized public infra for humanity on Ethereum. We believe in a free, open, and self-own internet. We start by building a smart contract account.',
 		),
 		contributors: [nconsigny],
 		iconExtension: 'svg',
@@ -148,7 +148,7 @@ export const elytro: SoftwareWallet = {
 				ref: [
 					{
 						explanation:
-							'Elytro implements P256 verification using openzeppelin p256 verifier in their WebAuthn library.',
+							'Elytro implements P256 verification using OpenZeppelin P256 verifier in their WebAuthn library.',
 						url: 'https://github.com/Elytro-eth/Elytro-wallet-contract/blob/develop/contracts/libraries/WebAuthn.sol',
 					},
 				],

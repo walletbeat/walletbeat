@@ -11,6 +11,12 @@ import {
 } from '@/types/content'
 import { trimWhitespacePrefix } from '@/types/utils/text'
 
+/**
+ * Brand names that are spelled with a leading lowercase letter (e.g. imKey).
+ * We ignore Capitalization lints for these so the grammar rule does not force "ImKey" etc.
+ */
+const BRAND_NAMES_LOWERCASE_FIRST = new Set(['imKey', 'imToken'])
+
 let vocabulary: string[] | null = null
 
 function getVocabulary(): string[] {
@@ -19,9 +25,13 @@ function getVocabulary(): string[] {
 		const walletNames: string[] = Object.values(allWallets).map(
 			wallet => wallet.metadata.displayName,
 		)
+		// TODO: https://github.com/walletbeat/walletbeat/issues/547
+		// Wallet IDs (URL slugs) are not fully in cspell; add them so Harper accepts them in generated markdown URLs (e.g. .../trezor#maintenance).
+		const walletIds: string[] = Object.values(allWallets).map(wallet => wallet.metadata.id)
 
 		vocabulary = cSpellWords
 			.concat(walletNames)
+			.concat(walletIds)
 			.reduce<string[]>((prev, cur) => {
 				if (cur.toLowerCase() === cur) {
 					return prev.concat([cur])
@@ -102,6 +112,27 @@ interface AbstractLinter {
 
 const specificWordingLinters: Map<string, AbstractLinter> = new Map()
 
+function isInsideMarkdownLinkUrl(text: string, start: number): boolean {
+	const before = text.substring(0, start)
+	const lastLinkStart = before.lastIndexOf('](')
+
+	if (lastLinkStart === -1) {
+		return false
+	}
+
+	const urlStart = lastLinkStart + 2
+	const afterLinkStart = text.substring(urlStart)
+	const closeParen = afterLinkStart.indexOf(')')
+
+	if (closeParen === -1) {
+		return true
+	}
+
+	const urlEnd = urlStart + closeParen
+
+	return start >= urlStart && start < urlEnd
+}
+
 function getRegexpLinter({
 	name,
 	regExp,
@@ -121,8 +152,13 @@ function getRegexpLinter({
 
 					for (const match of text.matchAll(regExp)) {
 						const matchedText = match[0]
+						const start = match.index ?? 0
+
+						if (isInsideMarkdownLinkUrl(text, start)) {
+							continue
+						}
+
 						const replacement = replace(matchedText)
-						const start = match.index
 						const end = start + matchedText.length
 						const suggestion: Suggestion = {
 							get_replacement_text(): string {
@@ -182,6 +218,22 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 
 		lints = lints.concat(await linter.lint(trimmedText, lintOptions))
 	}
+
+	// Ignore lints inside markdown link URLs (e.g. wallet slugs in /wallet-id paths).
+	lints = lints.filter(lint => !isInsideMarkdownLinkUrl(trimmedText, lint.span().start))
+
+	// Ignore Capitalization lints for brand names that are spelled with leading lowercase.
+	lints = lints.filter(
+		lint =>
+			lint.lint_kind_pretty() !== 'Capitalization' ||
+			!BRAND_NAMES_LOWERCASE_FIRST.has(lint.get_problem_text()),
+	)
+
+	// Ignore Spelling lints for standalone "s" (false positive from markdown/punctuation tokenization).
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Spelling' || lint.get_problem_text() !== 's',
+	)
+
 	const message: string[] = []
 
 	for (const lint of lints) {

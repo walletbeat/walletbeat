@@ -22,7 +22,7 @@ export const mtpelerin: SoftwareWallet = {
 		displayName: 'Bridge Wallet',
 		tableName: 'Bridge Wallet',
 		blurb: paragraph(
-			'Buy, swap and sell crypto with the lowest fees, zero hidden costs and full control over your cryptoassets.',
+			'Buy, swap, and sell crypto with the lowest fees, zero hidden costs, and full control over your cryptoassets.',
 		),
 		contributors: [sigri, mattmatt],
 		iconExtension: 'svg',
