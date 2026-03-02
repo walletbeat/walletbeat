@@ -46,8 +46,6 @@ export enum LegalProtectionType {
 	 * computer fraud laws.
 	 * Safe Harbor language typically waives relevant ToS restrictions and
 	 * references a defined standard for "Good Faith Security Research".
-	 * (e.g. MetaMask's HackerOne page has a Safe Harbor section stating they
-	 * waive any ToS restriction that conflicts with good-faith research.)
 	 * To identify: the bug bounty page or security policy has an explicit
 	 * "Safe Harbor" heading or section using that exact term, with formal
 	 * legal commitment language.

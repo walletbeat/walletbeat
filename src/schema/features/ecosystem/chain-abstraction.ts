@@ -27,10 +27,10 @@ export interface CrossChainBalanceDisplay {
 export type ChainAbstraction = {
 	/** What types of balances can the wallet display? */
 	crossChainBalances: WithRef<{
-		/** Can the wallet display the account's total value across all chains? (e.g. Combined USD value of all assets across Ethereum, Arbitrum, and other L2s.) */
+		/** Can the wallet display the account's total value across all chains? (i.e. Combined USD value of all assets across Ethereum, Arbitrum, and other L2s.) */
 		globalAccountValue: Support
 
-		/** Can the wallet display the value of the account on a single chain? (e.g. Total USD value of assets on Ethereum, independent of other chains.) */
+		/** Can the wallet display the value of the account on a single chain? (i.e. Total USD value of assets on Ethereum, independent of other chains.) */
 		perChainAccountValue: Support
 
 		/**

@@ -13,13 +13,13 @@ export interface AddressResolution<ARS = Support<AddressResolutionData> | null> 
 	chainSpecificAddressing: {
 		/**
 		 * Address lookup through ERC-7828.
-		 * To test: type `vitalik@optimism.eth` in the send address field and check if it resolves.
+		 * To test: type `donations.walletbeat.eth@optimism.eth` in the send address field and check if it resolves.
 		 */
 		erc7828: ARS
 
 		/**
 		 * Address lookup through ERC-7831.
-		 * To test: type `vitalik.eth:optimism:1` in the send address field and check if it resolves.
+		 * To test: type `donations.walletbeat.eth:optimism:1` in the send address field and check if it resolves.
 		 */
 		erc7831: ARS
 	}
