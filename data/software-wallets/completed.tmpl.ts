@@ -83,12 +83,6 @@ import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
-import { ambireEntity } from '../entities/ambire'
-import { biconomy } from '../entities/biconomy'
-import { github } from '../entities/github'
-import { lifi } from '../entities/lifi'
-import { pimlico } from '../entities/pimlico'
-
 /**
  * Default transaction display showing all 6 basic fields.
  *
@@ -105,68 +99,32 @@ const passTransactionDisplay: DisplayedBasicTransactionDetails = {
 }
 
 /**
- * Data leak references from Ambire. Not real data and not supposed to be copied.
+ * Fictitious data leak references for the completed template.
+ * These are placeholders — replace with real URLs when filling in actual wallet data.
  */
 const dataLeakReferences: Record<string, References> = {
-	ambire: [
+	bundler: [
 		{
-			explanation:
-				"All RPC traffic for default chains passes through Ambire's proxy - Invictus RPC",
-			url: 'https://invictus.ambire.com',
-		},
-		{
-			explanation:
-				"Token prices and additional token info are fetched from Ambire's 'cena' service.",
-			url: 'https://cena.ambire.com',
-		},
-		{
-			explanation:
-				"Ambire's backend is responsible for features such as the Gas Tank, Velcro (for finding your tokens), finding linked account and others.",
-			url: 'https://relayer.ambire.com',
-		},
-		{
-			explanation:
-				'Ambire does a single batch request for token discovery on multiple chains for a single account. This feature utilizes the Ambire relayer.',
-			lastRetrieved: '2025-07-28',
-			urls: [
-				{
-					label: 'A single account-network pair is queued',
-					url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/portfolio.ts#L146-L150',
-				},
-				{
-					label:
-						"All the queued requests are batched. Since the debounce time is 0, only queue elements requested 'at the same time' get batched together",
-					url: 'https://github.com/AmbireTech/ambire-common/blob/729f19c91bf07d49b78f22dcf30822c88587bd2a/src/libs/portfolio/batcher.ts#L143',
-				},
-			],
-		},
-		{
-			explanation: "Ambire's NFT CDN is responsible for fetching NFT media.",
-			url: 'https://nftcdn.ambire.com',
+			explanation: 'Used as a bundler for ERC-4337 user operations.',
+			url: 'https://example.com/bundler',
 		},
 	],
-	biconomy: [
+	staticContent: [
 		{
-			explanation: 'Biconomy is used as a Bundler.',
-			url: 'https://bundler.biconomy.io',
+			explanation: 'Used for static content and asset delivery.',
+			url: 'https://example.com/cdn',
 		},
 	],
-	github: [
+	swapApi: [
 		{
-			explanation: 'Used for static content and info lists.',
-			url: ['https://raw.githubusercontent.com', 'https://github.com', 'https://api.github.com'],
+			explanation: 'Used as a bridge and swap API.',
+			url: 'https://example.com/swap',
 		},
 	],
-	lifi: [
+	walletBackend: [
 		{
-			explanation: 'Ambire uses LiFi as bridge and swap API.',
-			url: 'https://li.quest',
-		},
-	],
-	pimlico: [
-		{
-			explanation: 'Pimlico is used as a Bundler and gas estimation helper.',
-			url: 'https://api.pimlico.io',
+			explanation: 'RPC traffic for default chains passes through the wallet developer backend.',
+			url: 'https://example.com/rpc',
 		},
 	],
 }
@@ -409,8 +367,8 @@ export const completedTemplate: SoftwareWallet = {
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [
 						{
-							ref: dataLeakReferences.lifi,
-							byEntity: lifi,
+							ref: dataLeakReferences.swapApi,
+							byEntity: exampleCex,
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
@@ -432,8 +390,8 @@ export const completedTemplate: SoftwareWallet = {
 				[UserFlow.TRANSACTION]: {
 					collected: [
 						{
-							ref: dataLeakReferences.ambire,
-							byEntity: ambireEntity,
+							ref: dataLeakReferences.walletBackend,
+							byEntity: exampleWalletDevelopmentCompany,
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.NEVER,
 								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.NEVER,
@@ -449,22 +407,8 @@ export const completedTemplate: SoftwareWallet = {
 							],
 						},
 						{
-							ref: dataLeakReferences.pimlico,
-							byEntity: pimlico,
-							dataCollection: {
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.NEVER,
-								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.NEVER,
-								[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.NEVER,
-								endpoint: RegularEndpoint,
-								multiAddress: {
-									type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
-								},
-							},
-							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
-						},
-						{
-							ref: dataLeakReferences.biconomy,
-							byEntity: biconomy,
+							ref: dataLeakReferences.bundler,
+							byEntity: exampleNodeCompany,
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.NEVER,
 								[WalletInfo.MEMPOOL_TRANSACTIONS]: CollectionPolicy.NEVER,
@@ -481,8 +425,8 @@ export const completedTemplate: SoftwareWallet = {
 				[UserFlow.UNCLASSIFIED]: {
 					collected: [
 						{
-							ref: dataLeakReferences.github,
-							byEntity: github,
+							ref: dataLeakReferences.staticContent,
+							byEntity: exampleNodeCompany,
 							dataCollection: {
 								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
 								endpoint: RegularEndpoint,
@@ -572,8 +516,8 @@ export const completedTemplate: SoftwareWallet = {
 			hardwareWalletSupport: {
 				ref: {
 					explanation:
-						'You can natively sign transactions with Ledger, Trezor, or GridPlus Lattice1 in Ambire.',
-					url: 'https://www.ambire.com/',
+						'This wallet supports native transaction signing with Ledger, Trezor, and GridPlus Lattice1.',
+					url: 'https://example.com/hardware-wallet-support',
 				},
 				wallets: {
 					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
