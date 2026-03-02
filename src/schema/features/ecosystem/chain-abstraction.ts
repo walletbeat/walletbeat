@@ -58,7 +58,7 @@ export type ChainAbstraction = {
 			WithRef<{
 				/**
 				 * Are the trust assumptions of the bridge explained to the user?
-				 * (e.g. The wallet shows a warning that the bridge is operated by an external provider and that funds may be at risk.)
+				 * (i.e. The wallet shows a warning that the bridge is operated by an external provider and that funds may be at risk.)
 				 */
 				risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT'
 
