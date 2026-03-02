@@ -176,16 +176,21 @@ Once Steps C.1–C.3 are complete, run:
 ```bash
 pnpm lint         # Fix formatting
 pnpm check:all    # Check for errors
-pnpm dev          # Then browse to http://localhost:4321/ to see the wallet in the table
 ```
 
-Help them interpret and fix any TypeScript or lint errors. Common issues:
+Help the contributor interpret and fix any TypeScript or lint errors. Common issues:
 
 - Missing import for `Variant` or other enums
 - Incorrect object structure from the template
 - The wallet icon file is missing (the build won't fail but the icon will be broken)
 
-Once `pnpm check:all` passes and the wallet shows in the table (all gray/unrated), the wallet is registered.
+Once `pnpm check:all` passes, run:
+
+```bash
+pnpm dev
+```
+
+Then ask the contributor to browse to `http://localhost:4321/` and confirm the wallet appears in the table. Once confirmed, the wallet is registered.
 
 ---
 
