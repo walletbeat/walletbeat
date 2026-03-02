@@ -12,8 +12,6 @@ import type { Support, Supported } from '../support'
  *
  * To identify: use the Walletbeat test page (https://beta.walletbeat.eth.limo/test/)
  * which calls `eth_accounts` after connecting and shows how many accounts are returned.
- * Alternatively, open the browser console on any connected dapp and run:
- * `window.ethereum.request({ method: 'eth_accounts' })`
  */
 export enum ExposedAccountsBehavior {
 	/**
@@ -88,8 +86,6 @@ interface BaseAppIsolation {
 	 * Use the Walletbeat test page to verify: https://beta.walletbeat.eth.limo/test/
 	 * It calls `eth_accounts` after connecting and shows exactly which accounts
 	 * are returned, letting you observe the `ExposedAccountsBehavior` directly.
-	 * Alternatively, open the browser console on any connected dapp and run:
-	 * `window.ethereum.request({ method: 'eth_accounts' })`
 	 */
 	ethAccounts: Support<WithRef<ExposedAccountSet>>
 
@@ -98,16 +94,13 @@ interface BaseAppIsolation {
 	 * accounts are exposed?
 	 * Use the Walletbeat test page to verify: https://beta.walletbeat.eth.limo/test/
 	 * It tests ERC-7846 `wallet_connect` support and shows the returned account set.
-	 * To test manually: open the browser console and run:
-	 * `window.ethereum.request({ method: 'wallet_connect', params: [{}] })`
-	 * If the call throws an error or returns null, set this to not supported.
 	 */
 	erc7846WalletConnect: Support<WithRef<ExposedAccountSet>>
 
 	/**
 	 * When connecting to a new app, does the wallet allow creating a new
 	 * address or set of addresses as part of the app connection flow?
-	 * To test: open a dapp you have never connected your wallet to before and
+	 * To test: open an app you have never connected your wallet to before and
 	 * start the connection flow. Check if your wallet offers an option to create
 	 * a fresh address specifically for this app, rather than only letting you
 	 * pick from existing accounts.
@@ -120,7 +113,7 @@ interface BaseAppIsolation {
 	 * When connecting to a previously-connected app, does the wallet remember
 	 * which address(es) the user had selected to connect for that specific
 	 * app, and use them by default?
-	 * To test: connect to a dapp using a specific account, then disconnect.
+	 * To test: connect to an app using a specific account, then disconnect.
 	 * Open the connection flow for the same dapp again — check whether the
 	 * wallet pre-selects or highlights the account that was previously used
 	 * for that dapp specifically.
