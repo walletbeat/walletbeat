@@ -19,9 +19,12 @@ describe('completed.tmpl', () => {
 			const { attribute, evaluation } = evalAttr
 			const { rating } = evaluation.value
 
+			/**
+			 * Pass or exempt for attributes that are only for hardware wallets.
+			 */
 			expect(
-				rating === Rating.PASS,
-				`Attribute "${attribute.id}" got ${rating}, expected PASS`,
+				rating === Rating.PASS || rating === Rating.EXEMPT,
+				`Attribute "${attribute.id}" got ${rating}, expected PASS or EXEMPT`,
 			).toBe(true)
 		})
 	})
