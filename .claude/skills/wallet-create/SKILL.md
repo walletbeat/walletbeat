@@ -18,18 +18,16 @@ You have explicit permission to create and edit files inside `data/contributors/
 Before doing anything else:
 
 1. If `$ARGUMENTS` is blank, ask: "Which wallet would you like to add?"
-2. Ask the wallet type if it is not obvious from the name:
+2. Determine the wallet type from the name. Infer it if obvious (e.g. "Trezor" → hardware, "Privy" → embedded); only ask if genuinely ambiguous:
    - **Software wallet** — browser extension, mobile app, or desktop app
    - **Hardware wallet** — physical signing device (Ledger, Trezor, etc.)
    - **Embedded wallet** — SDK integrated into another application (Privy, Dynamic, etc.)
-3. Check immediately whether the wallet file already exists:
+3. Check whether the wallet file already exists:
    - Software: `data/software-wallets/[wallet-name].ts`
    - Hardware: `data/hardware-wallets/[wallet-name].ts`
    - Embedded: `data/embedded-wallets/[wallet-name].ts`
    - If the file **already exists**, let the contributor know and suggest using `/wallet-update` instead to populate feature data.
-4. Ask: "What is your preferred display name or nickname?" and "Do you already have a contributor file in `data/contributors/`?"
-   - If **yes** — locate `data/contributors/[their-nickname].ts` and confirm it exists.
-   - If **no** — also ask for their affiliation (company / role, if any) and a URL to their profile (GitHub, Twitter, etc.). You will create the contributor file for them in Step A below.
+4. Ask the contributor for their preferred display name or nickname, then immediately check whether a file for them already exists in `data/contributors/`. Also ask for the wallet's one-sentence blurb — this is the only piece of content only they can provide. If they need a new contributor file, also ask for their affiliation (company / role, if any) and a URL to their profile (GitHub, Twitter, etc.).
 5. Read the following files in parallel:
    - The matching template for the wallet type:
      - Software: `data/software-wallets/unrated.tmpl.ts`
@@ -119,16 +117,12 @@ Walk through substeps C.1 through C.4 in order, one at a time, waiting for the c
 
 Ask the contributor for the wallet developer's company name and legal name.
 
-Instruct them to:
+Then check whether the entity already exists in `data/entities/`. If so, skip to C.2. If not, create `data/entities/[kebab-case-company-name].ts` yourself by copying `data/entities/example.ts` and filling in the known fields:
 
-- Check if the entity already exists in `data/entities/`. If so, skip to C.2.
-- If not, copy `data/entities/example.ts` to `data/entities/[kebab-case-company-name].ts`.
-- Remove all constants except the `WalletDeveloper` one; rename it to the camelCase company name.
-- Fill in: `id`, `name`, `legalName`, `type`, `jurisdiction`, `url`, `repoUrl`, `privacyPolicy`, and social/profile URLs.
-- Find an SVG icon, crop transparent edges, and save to `/public/images/entities/[entityId].svg`.
-  - If only PNG is available: save as `.png` and set `icon: { extension: 'png', width: N, height: N }`.
+- `id`, `name`, `legalName`, `type`, `jurisdiction`, `url`, `repoUrl`, `privacyPolicy`, and social/profile URLs.
+- Ask the contributor to find an SVG icon, crop transparent edges, and save it to `/public/images/entities/[entityId].svg`. If only PNG is available, save as `.png` and set `icon: { extension: 'png', width: N, height: N }`.
 
-Key type fields to explain:
+Key type fields:
 
 - `type.walletDeveloper: true` — always true for the company behind a wallet
 - `type.chainDataProvider: true` — only if the company also runs RPC infrastructure
@@ -137,31 +131,28 @@ Key type fields to explain:
 
 ### Step C.2 — Wallet skeleton file
 
-Instruct the contributor to:
+Copy the template (`data/[type]-wallets/unrated.tmpl.ts`) to `data/[type]-wallets/[kebab-wallet-name].ts` yourself, then fill in `metadata`:
 
-- Copy the template (`data/[type]-wallets/unrated.tmpl.ts`) to `data/[type]-wallets/[kebab-wallet-name].ts`.
+- `id`: camelCase wallet name (e.g., `'rainbow'`) — must match the icon filename
+- `displayName`: The wallet's official display name
+- `tableName`: Short name for table display (often same as displayName)
+- `blurb`: Use the blurb collected in step 4, wrapped in `paragraph(\`...\`)`
 - Rename the exported constant from `unratedTemplate` / `unratedHardwareTemplate` / `unratedEmbeddedTemplate` to the camelCase wallet name (e.g., `rainbow`, `ledgerNano`, `privySdk`).
-- Update `metadata`:
-  - `id`: camelCase wallet name (e.g., `'rainbow'`) — must match the icon filename
-  - `displayName`: The wallet's official display name
-  - `tableName`: Short name for table display (often same as displayName)
-  - `blurb`: A one-sentence description wrapped in `paragraph(\`...\`)`
-  - `contributors`: `[yourContributorConstant]`
-  - `iconExtension`: `'svg'` (or `'png'` if no SVG available)
-  - `lastUpdated`: Today's date as `'YYYY-MM-DD'`
-  - `urls`: Fill in actual wallet URLs; remove social fields that don't apply
+- `contributors`: `[yourContributorConstant]`
+- `iconExtension`: `'svg'` (or `'png'` if no SVG available)
+- `lastUpdated`: Today's date as `'YYYY-MM-DD'`
+- `urls`: Fill in actual wallet URLs; remove social fields that don't apply
 - Update `variants` to only include the variants the wallet actually has:
   - Software: `Variant.BROWSER`, `Variant.MOBILE`, `Variant.DESKTOP` (remove inapplicable ones)
   - Hardware: `Variant.HARDWARE` (already set in template)
   - Embedded: `Variant.EMBEDDED` (already set in template)
-- Find an SVG icon, crop transparent edges, save to `/public/images/wallets/[id].svg`.
-  - If only PNG: save as `.png` and set `iconExtension: 'png'` in metadata.
+- Ask the contributor to find an SVG icon, crop transparent edges, and save it to `/public/images/wallets/[id].svg`. If only PNG: save as `.png` and set `iconExtension: 'png'` in metadata.
 
 All `features` fields should remain `null` for now — those are populated separately using `/wallet-update`.
 
 ### Step C.3 — Register in index
 
-For the wallet to appear on the site, instruct the contributor to edit the index file:
+Edit the index file yourself to register the wallet:
 
 - Software: `data/software-wallets.ts`
 - Hardware: `data/hardware-wallets.ts`
@@ -180,7 +171,7 @@ export const softwareWallets = {
 
 ### Step C.4 — Verify the setup
 
-Once Steps C.1–C.3 are complete, instruct the contributor to run:
+Once Steps C.1–C.3 are complete, run:
 
 ```bash
 pnpm lint         # Fix formatting

@@ -197,7 +197,7 @@ Help the contributor fix any remaining TypeScript or lint errors before they ope
 - **`refTodo` is a valid placeholder** for initial PRs; improve refs before the PR is merged if possible.
 - **`refNotNecessary`** is only for self-evident facts (e.g., Safe Wallet supports Safe multisigs).
 - **`MustRef` fields require a real URL** — `refTodo` won't compile there.
-- **Run `pnpm lint` before every commit** to auto-fix formatting.
+- **Run `pnpm fix` before every commit** to auto-fix formatting.
 - **Run `pnpm check:all` before opening the PR** — it must pass.
 - **Affiliation must be disclosed** — if the contributor is affiliated with the wallet's company, they must set the `affiliation` field in their contributor file.
 - **Ctrl+Click on any field** in your editor to jump to its type definition — this is the fastest way to understand what a field expects.
