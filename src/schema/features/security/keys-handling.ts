@@ -1,10 +1,4 @@
 /**
- * Keys handling data is not visible in the wallet UI — it must be determined
- * from the wallet's security documentation, architecture overview, or source code.
- * MPC-based wallets typically describe their key model in a blog post or whitepaper.
- */
-
-/**
  * Where and how the private key (or key shares) are generated.
  * To identify: check the wallet's security or architecture documentation.
  * For MPC wallets, a blog post or whitepaper usually describes the key generation protocol.
@@ -94,6 +88,10 @@ export enum MultiPartyKeyReconstruction {
 
 /**
  * How is private key material handled?
+ *
+ * Keys handling data is not visible in the wallet UI — it must be determined
+ * from the wallet's security documentation, architecture overview, or source code.
+ * MPC-based wallets typically describe their key model in a blog post or whitepaper.
  */
 export interface KeysHandlingSupport {
 	/**
