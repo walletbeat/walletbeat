@@ -75,7 +75,7 @@ export const bitboxWallet: HardwareWallet = {
 			ref: [
 				{
 					explanation:
-						'BitBox blog post explaining WalletConnect integration for secure dApp connections',
+						'BitBox blog post explaining WalletConnect integration for secure app connections',
 					url: 'https://blog.bitbox.swiss/en/using-walletconnect-to-securely-connect-to-your-favorite-dapp/',
 				},
 			],
@@ -180,7 +180,7 @@ export const bitboxWallet: HardwareWallet = {
 				ref: [
 					{
 						explanation:
-							'At Shift Crypto, we strive towards excellence when it comes to the security and privacy of our products and believe that an open architecture is vital to keep our users safe. However, even in time-proven security architectures, vulnerabilities can be found. This is why our code is open source. In the case you find a vulnerability, we would like to ask you to follow our bug bounty program for responsible disclosure.',
+							'At Shift Crypto, we strive towards excellence when it comes to the security and privacy of our products and believe that an open architecture is essential for keeping our users safe. However, even in time-proven security architectures, vulnerabilities can be found. This is why we release our code as open source. If you find a vulnerability, we would like to ask you to follow our bug bounty program for responsible disclosure.',
 						url: 'https://bitbox.swiss/bug-bounty-program/',
 					},
 				],

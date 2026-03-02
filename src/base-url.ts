@@ -11,7 +11,7 @@ export function getBaseUrl(): string {
 		import.meta.env.WALLETBEAT_URL_ROOT !== undefined &&
 		import.meta.env.WALLETBEAT_URL_ROOT !== ''
 	) {
-		return `$${import.meta.env.WALLETBEAT_URL_ROOT}`
+		return `${import.meta.env.WALLETBEAT_URL_ROOT}`
 	}
 
 	if (
@@ -37,7 +37,11 @@ export function getBaseUrl(): string {
 	}
 
 	if (import.meta.env.MODE === 'development') {
-		return `http://${import.meta.env.HOSTNAME ?? 'localhost'}:${import.meta.env.PORT ?? 3000}`
+		return `http://${import.meta.env.HOSTNAME ?? 'localhost'}:${import.meta.env.PORT ?? 4321}`
+	}
+
+	if (import.meta.env.SITE !== undefined && import.meta.env.SITE !== '') {
+		return import.meta.env.SITE.replace(/\/$/, '')
 	}
 
 	throw new Error(

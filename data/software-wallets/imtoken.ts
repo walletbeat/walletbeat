@@ -49,7 +49,7 @@ export const imtoken: SoftwareWallet = {
 		displayName: 'imToken',
 		tableName: 'imToken',
 		blurb: paragraph(`
-			imToken is a reliable and intuitive digital wallet, enabling easy access to over 50+ major networks including Bitcoin, Ethereum, and Tron. imToken supports hardware wallets, token swap and DApp browser etc., and provides secure and trusted non-custodial wallet services to millions of users in more than 150 countries and regions around the world.
+			imToken is a reliable and intuitive digital wallet, enabling easy access to over 50+ major networks including Bitcoin, Ethereum, and Tron. imToken supports hardware wallets, token swap and app browser etc., and provides secure and trusted non-custodial wallet services to millions of users in more than 150 countries and regions around the world.
 		`),
 		contributors: [mako, mattmatt],
 		iconExtension: 'svg',
@@ -319,7 +319,7 @@ export const imtoken: SoftwareWallet = {
 					ref: [
 						{
 							explanation:
-								'imToken warns about risky signatures such as eth_sign, non-standard EIP-712 type signatures, and ENS security risks including zero-width characters. It also marks risky tokens, addresses, and DApps. Processing happens on-device.',
+								'imToken warns about risky signatures such as eth_sign, non-standard EIP-712 type signatures, and ENS security risks including zero-width characters. It also marks risky tokens, addresses, and apps. Processing happens on-device.',
 							url: 'https://support.token.im/hc/en-us/articles/21850966355737-Revamped-imToken-signature-for-safer-and-more-intuitive-transactions',
 						},
 					],

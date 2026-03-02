@@ -37,3 +37,10 @@ Date	From	To	Amount	Purpose	ID
 2026-02-10	treasury	chainflip1	0.055 ETH → 0.00157093 BTC	Chainflip swap to BTC https://scan.chainflip.io/swaps/1314403	0xa39a6666228ba3f3f023623fbd78487f0c054b70f879710d441a73d7225edfb7
 2026-02-10	chainflip1	proton1	0.00157093 BTC	Payment for 2 years of Mail Plus for Walletbeat Proton Mail service	btc:d171832539dc34e86c29b9457249c96b98fdb8e5efbe00002a8f92073e7007ea
 2026-02-13	treasury	mattmatt_test1	0.05 ETH	Wallet testing	0xdb3113117fd8c05be082110179634ecc1170350d12ed81d8924a3e435d4048f9
+2026-02-28	treasury	treasury	0 ETH	Add 0xMattmatt as signer	0xbb4098d18189dc2524653df23983617c80bba7c048d24a80c12a95c62172ad47
+2026-02-28	treasury	treasury	0 ETH	Add polymutex2 as signer	0xa89b86eeba7dcba6d93447a1672886757a80cf5eb143139fdec6afe41b196bf0
+2026-02-28	treasury	treasury	0 ETH	Set multisig threshold to 2	0xdfc7216110ff7472657b89a5bf7c7f10456dcc9af2ed6c6fd4bdd85ea29baad7
+2026-02-28	treasury	treasury	0 ETH	Approve 10 WETH for CoW Swap	0xd3440f5f2b05a3f028237d1c7f87f07336d2cae74fe082ec2ff2f355c7df223f
+2026-02-28	treasury	treasury	3.894550942496625178 WETH → 7,222.37 USDC	CoW swap from WETH to USDC	0xbee94a398be85f91217e2ae10d5dfdf2fcae69a93f8996e0e0b39b69f805c3ef
+2026-02-28	treasury	mattmatt3	7,222.37 USDC	Top-up of Sablier stream	0xe9ff4910c0829c5ca96864b7b3b2968aac558e3a52eb490d3970330408df7525
+2026-02-28	treasury	treasury	0 ETH	Approving 80,000 USDC for spending on Sablier	0xb68e51c53df05cf771cae0f1e6311217aed82ffdee86fbe9595437fb9e3489c7
