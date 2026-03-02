@@ -46,9 +46,7 @@
   import EIPSupportTab from './Tabs/EIPSupportTab.svelte';
   import ScamAlertsTab from './Tabs/ScamAlertsTab.svelte';
   import AppIsolationTab from './Tabs/AppIsolationTab.svelte';
-  import type { AppIsolationSubTab } from './Tabs/AppIsolationTab.svelte';
   import TransactionSimulationsTab from './Tabs/TransactionSimulationsTab.svelte';
-  import type { TransactionSimulationSubTab } from './Tabs/TransactionSimulationsTab.svelte';
   import { getProvider } from '../lib/eip-test-runners';
   import {
     assertTransactionId,
@@ -115,6 +113,7 @@
     activeId: null as string | null,
     isPending: false,
     hashes: {} as Record<string, `0x${string}`>,
+    signatures: {} as Record<string, string>,
     error: '',
   });
 
@@ -122,13 +121,22 @@
     accepted: false,
   });
 
+
   const uiState = $state({
     activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support' | 'app-isolation' | 'scam-alerts' | 'tx-simulations',
     selectedTxId: null as string | null,
     selectedSigId: null as string | null,
     selectedScamAlertId: null as string | null,
-    appIsolationSubTab: 'eth-accounts' as AppIsolationSubTab,
-    txSimulationSubTab: 'erc20-mint' as TransactionSimulationSubTab,
+    appIsolationSubTab: 'eth-accounts' as 'eth-accounts' | 'wallet-connect',
+    txSimulationSubTab: 'erc20-mint' as
+      | 'erc20-mint'
+      | 'erc721-mint'
+      | 'erc1155-mint'
+      | 'all-token-transfer'
+      | 'misleading-selector'
+      | 'fake-airdrop'
+      | 'volatile-outcome'
+      | 'failing-transaction',
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -168,6 +176,17 @@ Version: 1
 Chain ID: 1
 Nonce: ${Math.random().toString(36).substring(2, 15)}
 Issued At: ${new Date().toISOString()}`;
+    }
+  }
+
+  function updatePermitOwner() {
+    const permitTest = scamAlertTests.find((t) => t.id === 'allow-infinite-permit');
+
+    if (permitTest?.messageData) {
+      permitTest.messageData = {
+        ...permitTest.messageData,
+        owner: account?.address ?? '0x0000000000000000000000000000000000000000',
+      };
     }
   }
 
@@ -398,6 +417,34 @@ Issued At: ${new Date().toISOString()}`;
     }
   }
 
+  async function handleSignScamAlert(test: ScamAlertTest) {
+    if (!account?.address || !test.domain || !test.types || !test.primaryType || !test.messageData) {
+      return;
+    }
+
+    scamAlertState.isPending = true;
+    scamAlertState.activeId = test.id;
+    scamAlertState.error = '';
+
+    try {
+      const result = await signTypedData(config, {
+        domain: test.domain,
+
+        types: test.types,
+        primaryType: test.primaryType,
+
+        message: test.messageData,
+      });
+
+      scamAlertState.signatures[test.id] = result;
+    } catch (error) {
+      scamAlertState.error = error instanceof Error ? error.message : 'Signing failed';
+    } finally {
+      scamAlertState.isPending = false;
+      scamAlertState.activeId = null;
+    }
+  }
+
   // EIP Support Testing
   function discoverProviders() {
     if (typeof window === 'undefined') return;
@@ -568,9 +615,10 @@ Issued At: ${new Date().toISOString()}`;
     stepTestState.batchId = null;
   }
 
-  // Update SIWE message when account changes
+  // Update SIWE message and permit owner when account changes
   $effect(() => {
     updateSIWEMessage();
+    updatePermitOwner();
   });
 </script>
 
@@ -780,7 +828,7 @@ Issued At: ${new Date().toISOString()}`;
               title={test.name}
               description={test.description}
               isSelected={uiState.selectedScamAlertId === test.id}
-              isCompleted={!!scamAlertState.hashes[test.id]}
+              isCompleted={!!scamAlertState.hashes[test.id] || !!scamAlertState.signatures[test.id]}
               onclick={() => (uiState.selectedScamAlertId = test.id)}
             />
           {/each}
@@ -829,6 +877,7 @@ Issued At: ${new Date().toISOString()}`;
           {account}
           onAcceptDisclaimer={() => { scamAlertDisclaimer.accepted = true; }}
           onSendScamAlert={handleSendScamAlert}
+          onSignScamAlert={handleSignScamAlert}
           onOpenInExplorer={openInExplorer}
         />
       {:else if uiState.activeTab === 'app-isolation'}
@@ -946,6 +995,7 @@ Issued At: ${new Date().toISOString()}`;
     flex-direction: column;
     gap: 0.25rem;
   }
+
 
   .main-content {
     flex: 1;

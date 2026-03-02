@@ -7,11 +7,13 @@
       activeId: string | null;
       isPending: boolean;
       hashes: Record<string, `0x${string}`>;
+      signatures: Record<string, string>;
     };
     disclaimerAccepted: boolean;
     account: { address?: string } | null;
     onAcceptDisclaimer: () => void;
     onSendScamAlert: (test: ScamAlertTest) => void;
+    onSignScamAlert: (test: ScamAlertTest) => void;
     onOpenInExplorer: (txHash: string) => void;
   }
 
@@ -22,22 +24,54 @@
     account,
     onAcceptDisclaimer,
     onSendScamAlert,
+    onSignScamAlert,
     onOpenInExplorer,
   }: Props = $props();
 
   let checkboxChecked = $state(false);
+  let customAddress = $state('');
+  let customAddressError = $state('');
 
   const isActive = $derived(
     selectedTest && scamAlertState.activeId === selectedTest.id
   );
   const isPending = $derived(scamAlertState.isPending && isActive);
   const txHash = $derived(selectedTest ? scamAlertState.hashes[selectedTest.id] : undefined);
+  const sigResult = $derived(selectedTest ? scamAlertState.signatures[selectedTest.id] : undefined);
+
+  const isWalletOwn = $derived(selectedTest?.category === 'wallet-own');
+  const isSignature = $derived(selectedTest?.testType === 'signature');
+
+  function isValidAddress(addr: string): addr is `0x${string}` {
+    return /^0x[0-9a-fA-F]{40}$/.test(addr);
+  }
+
+  function handleAction() {
+    if (!selectedTest || !account?.address) return;
+
+    customAddressError = '';
+
+    if (isSignature) {
+      onSignScamAlert(selectedTest);
+    } else if (isWalletOwn) {
+      if (!isValidAddress(customAddress)) {
+        customAddressError = 'Enter a valid Ethereum address (0x…)';
+
+        return;
+      }
+
+      onSendScamAlert({ ...selectedTest, contractAddress: customAddress });
+    } else {
+      onSendScamAlert(selectedTest);
+    }
+  }
 
   function getRiskLabel(riskType: ScamAlertTest['riskType']): string {
     switch (riskType) {
       case 'recent-deploy': return 'Recently Deployed';
       case 'previous-interaction': return 'Previous Interaction';
       case 'known-scam': return 'Known Scam';
+      case 'allow-infinite': return 'Infinite Approval';
     }
   }
 </script>
@@ -111,10 +145,28 @@
         </div>
       {/if}
 
-      <div class="detail-section">
-        <span class="detail-label">Contract Address:</span>
-        <code class="detail-code">{selectedTest.contractAddress}</code>
-      </div>
+      {#if isWalletOwn}
+        <div class="detail-section">
+          <label class="detail-label" for="custom-address">Contract Address to Test:</label>
+          <input
+            id="custom-address"
+            type="text"
+            class="address-input"
+            class:error={!!customAddressError}
+            placeholder="0x…"
+            bind:value={customAddress}
+            oninput={() => { customAddressError = ''; }}
+          />
+          {#if customAddressError}
+            <span class="address-error">{customAddressError}</span>
+          {/if}
+        </div>
+      {:else}
+        <div class="detail-section">
+          <span class="detail-label">Contract Address:</span>
+          <code class="detail-code">{selectedTest.contractAddress}</code>
+        </div>
+      {/if}
 
       <div class="detail-section">
         <span class="detail-label">Risk Type:</span>
@@ -122,6 +174,30 @@
           {getRiskLabel(selectedTest.riskType)}
         </span>
       </div>
+
+      {#if isSignature && selectedTest.messageData}
+        <div class="detail-section">
+          <span class="detail-label">Permit Details:</span>
+          <div class="permit-details">
+            <div class="permit-row">
+              <span class="permit-key">spender</span>
+              <code class="permit-value">{selectedTest.messageData.spender}</code>
+            </div>
+            <div class="permit-row">
+              <span class="permit-key">value</span>
+              <code class="permit-value">2<sup>256</sup>&minus;1 (infinite)</code>
+            </div>
+            <div class="permit-row">
+              <span class="permit-key">deadline</span>
+              <code class="permit-value">{new Date(Number(selectedTest.messageData.deadline) * 1000).toLocaleDateString()} (~5 years)</code>
+            </div>
+            <div class="permit-row">
+              <span class="permit-key">chainId</span>
+              <code class="permit-value">{selectedTest.domain?.chainId} (Base Sepolia)</code>
+            </div>
+          </div>
+        </div>
+      {/if}
 
       <div class="detail-section">
         <span class="detail-label">Expected Wallet Behavior:</span>
@@ -137,11 +213,13 @@
       <button
         type="button"
         data-pressable
-        onclick={() => onSendScamAlert(selectedTest)}
+        onclick={handleAction}
         disabled={!account?.address || isPending}
       >
         {#if isPending}
           Preparing...
+        {:else if isSignature}
+          {sigResult ? 'Signed' : 'Sign Message (Testing Only)'}
         {:else if txHash}
           Transaction Sent
         {:else}
@@ -155,6 +233,13 @@
           <button type="button" class="result-link" onclick={() => onOpenInExplorer(txHash)}>
             {txHash.slice(0, 10)}...{txHash.slice(-8)} &#8599;
           </button>
+        </div>
+      {/if}
+
+      {#if sigResult}
+        <div class="result-box">
+          <span class="result-label">Signature:</span>
+          <code class="result-sig">{sigResult.slice(0, 20)}…{sigResult.slice(-10)}</code>
         </div>
       {/if}
     </div>
@@ -330,6 +415,64 @@
     color: var(--text-primary);
   }
 
+  .address-input {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
+    font-size: 0.85rem;
+    background-color: var(--background-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--background-secondary);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .address-input:focus {
+    border-color: var(--accent);
+  }
+
+  .address-input.error {
+    border-color: var(--rating-fail);
+  }
+
+  .address-error {
+    font-size: 0.8rem;
+    color: var(--rating-fail);
+  }
+
+  .permit-details {
+    background: var(--background-secondary);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .permit-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .permit-key {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 5rem;
+  }
+
+  .permit-value {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    word-break: break-all;
+  }
+
   .risk-badge {
     display: inline-block;
     padding: 0.3em 0.75em;
@@ -355,6 +498,12 @@
     background: color-mix(in srgb, var(--rating-fail) 15%, transparent);
     color: var(--rating-fail);
     border: 1px solid color-mix(in srgb, var(--rating-fail) 40%, transparent);
+  }
+
+  .risk-badge.risk-allow-infinite {
+    background: color-mix(in srgb, #a855f7 15%, transparent);
+    color: #a855f7;
+    border: 1px solid color-mix(in srgb, #a855f7 40%, transparent);
   }
 
   .expected-behavior {
@@ -410,5 +559,13 @@
 
   .result-link:hover {
     opacity: 0.8;
+  }
+
+  .result-sig {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    word-break: break-all;
   }
 </style>
