@@ -8,6 +8,7 @@ export interface ScamAlertTest {
 	testType: 'transaction' | 'signature'
 	contractAddress: `0x${string}`
 	calldata: `0x${string}`
+	value?: bigint
 	riskType: 'recent-deploy' | 'previous-interaction' | 'known-scam' | 'allow-infinite'
 	expectedBehavior: string
 	requirements?: string[]
@@ -67,32 +68,14 @@ export const scamAlertTests: ScamAlertTest[] = [
 		],
 	},
 	{
-		id: 'scam-contract-1',
-		name: 'Scam Contract Testing',
-		description: 'Blocks or warns about known scam contracts from public blocklists.',
-		category: 'public-list',
-		testType: 'transaction',
-		contractAddress: '0x0000000000000000000000000000000000000000',
-		calldata: '0x00000000',
-		riskType: 'known-scam',
-		expectedBehavior:
-			'Wallet should block the transaction or display a prominent scam warning preventing the user from proceeding.',
-		requirements: [
-			'Connect your wallet before sending',
-			'Use a disposable wallet with no real assets',
-			'Do NOT send real funds',
-			'This test uses a known scam contract address from public blocklists',
-		],
-	},
-	// ── Wallet's Own ─────────────────────────────────────────────────────────────
-	{
 		id: 'wallet-own-1',
 		name: 'Custom Address',
-		description: "Enter any address to test the wallet's own scam detection.",
+		description: "Enter any address and send 0.0001 ETH to test the wallet's own scam detection.",
 		category: 'wallet-own',
 		testType: 'transaction',
 		contractAddress: '0x0000000000000000000000000000000000000000',
-		calldata: '0x00000000',
+		calldata: '0x',
+		value: BigInt(100_000_000_000_000),
 		riskType: 'known-scam',
 		expectedBehavior:
 			'Wallet should use its own internal detection to warn about or block suspicious addresses you provide.',
@@ -102,18 +85,18 @@ export const scamAlertTests: ScamAlertTest[] = [
 			'Do NOT send real funds',
 		],
 	},
-	// ── Allow Infinite ───────────────────────────────────────────────────────────
 	{
 		id: 'allow-infinite-zero',
-		name: 'Address Zero',
-		description: 'Sends an infinite token approval targeting the zero address (0x0000…).',
+		name: 'Known scam address',
+		description: 'Sends 0.0001 ETH to a known scam address.',
 		category: 'allow-infinite',
 		testType: 'transaction',
-		contractAddress: '0x0000000000000000000000000000000000000000',
-		calldata: INFINITE_APPROVE_CALLDATA,
+		contractAddress: '0x0000000000000000000000000000000000000000', // Placeholder
+		calldata: '0x',
+		value: BigInt(100_000_000_000_000),
 		riskType: 'allow-infinite',
 		expectedBehavior:
-			'Wallet should warn about an unlimited approval to the zero address, which is almost certainly a scam.',
+			'Wallet should warn about or block the transaction to this known scam address.',
 		requirements: [
 			'Connect your wallet before sending',
 			'Use a disposable wallet with no real assets',
@@ -141,7 +124,7 @@ export const scamAlertTests: ScamAlertTest[] = [
 		id: 'allow-infinite-permit',
 		name: 'Gasless Approval: USDC Permit',
 		description:
-			'Signs an EIP-2612 Permit granting infinite allowance to address(0). A relayer could submit permit() to USDC with no gas from you.',
+			'Signs an EIP-2612 Permit granting infinite allowance to an unknown EOA. A relayer could submit permit() to USDC with no gas from you.',
 		category: 'allow-infinite',
 		testType: 'signature',
 		contractAddress: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
@@ -170,10 +153,9 @@ export const scamAlertTests: ScamAlertTest[] = [
 			],
 		},
 		primaryType: 'Permit',
-		// owner is updated dynamically in WalletTest.svelte when the wallet connects
 		messageData: {
-			owner: '0x0000000000000000000000000000000000000000',
-			spender: '0x0000000000000000000000000000000000000000',
+			owner: '0x0000000000000000000000000000000000000000', // Placeholder
+			spender: '0x0000000000000000000000000000000000000000', // Placeholder
 			value: BigInt(
 				'115792089237316195423570985008687907853269984665640564039457584007913129639935',
 			),

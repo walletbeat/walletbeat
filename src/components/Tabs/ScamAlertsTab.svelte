@@ -147,7 +147,7 @@
 
       {#if isWalletOwn}
         <div class="detail-section">
-          <label class="detail-label" for="custom-address">Contract Address to Test:</label>
+          <label class="detail-label" for="custom-address">Address to Send To:</label>
           <input
             id="custom-address"
             type="text"
@@ -163,8 +163,15 @@
         </div>
       {:else}
         <div class="detail-section">
-          <span class="detail-label">Contract Address:</span>
+          <span class="detail-label">Address:</span>
           <code class="detail-code">{selectedTest.contractAddress}</code>
+        </div>
+      {/if}
+
+      {#if selectedTest.value !== undefined}
+        <div class="detail-section">
+          <span class="detail-label">Value Sent:</span>
+          <span class="value-badge">0.0001 ETH</span>
         </div>
       {/if}
 
@@ -222,6 +229,8 @@
           {sigResult ? 'Signed' : 'Sign Message (Testing Only)'}
         {:else if txHash}
           Transaction Sent
+        {:else if selectedTest.value !== undefined}
+          Send 0.0001 ETH (Testing Only)
         {:else}
           Send Transaction (Testing Only)
         {/if}
@@ -471,6 +480,20 @@
     font-size: 0.8rem;
     color: var(--text-primary);
     word-break: break-all;
+  }
+
+  .value-badge {
+    display: inline-block;
+    padding: 0.3em 0.75em;
+    border-radius: 0.4em;
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: fit-content;
+    background: color-mix(in srgb, var(--rating-partial) 15%, transparent);
+    color: var(--rating-partial);
+    border: 1px solid color-mix(in srgb, var(--rating-partial) 40%, transparent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
   }
 
   .risk-badge {

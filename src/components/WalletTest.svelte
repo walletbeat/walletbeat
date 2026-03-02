@@ -406,6 +406,7 @@ Issued At: ${new Date().toISOString()}`;
       const hash = await sendTransaction(config, {
         to: test.contractAddress,
         data: test.calldata,
+        value: test.value,
       });
 
       scamAlertState.hashes[test.id] = hash;
