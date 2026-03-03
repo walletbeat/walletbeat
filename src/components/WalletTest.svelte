@@ -52,8 +52,12 @@
     assertTransactionId,
     isEip6963AnnounceProviderEvent,
   } from '@/types/utils/ethereum-types'
+  import type { TransactionSimulationSubTab } from './Tabs/TransactionSimulationsTab.svelte';
 
   type Account = ReturnType<typeof getAccount>;
+
+  type ActiveTab = 'transactions' | 'signatures' | 'eip-support' | 'app-isolation' | 'scam-alerts' | 'tx-simulations';
+  type AppIsolationSubTab = 'eth-accounts' | 'wallet-connect';
 
   // Consolidated state objects
   let account = $state<Account | null>(null);
@@ -122,21 +126,20 @@
   });
 
 
-  const uiState = $state({
-    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support' | 'app-isolation' | 'scam-alerts' | 'tx-simulations',
-    selectedTxId: null as string | null,
-    selectedSigId: null as string | null,
-    selectedScamAlertId: null as string | null,
-    appIsolationSubTab: 'eth-accounts' as 'eth-accounts' | 'wallet-connect',
-    txSimulationSubTab: 'erc20-mint' as
-      | 'erc20-mint'
-      | 'erc721-mint'
-      | 'erc1155-mint'
-      | 'all-token-transfer'
-      | 'misleading-selector'
-      | 'fake-airdrop'
-      | 'volatile-outcome'
-      | 'failing-transaction',
+  const uiState = $state<{
+    activeTab: ActiveTab;
+    selectedTxId: string | null;
+    selectedSigId: string | null;
+    selectedScamAlertId: string | null;
+    appIsolationSubTab: AppIsolationSubTab;
+    txSimulationSubTab: TransactionSimulationSubTab;
+  }>({
+    activeTab: 'transactions',
+    selectedTxId: null,
+    selectedSigId: null,
+    selectedScamAlertId: null,
+    appIsolationSubTab: 'eth-accounts',
+    txSimulationSubTab: 'erc20-mint',
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -867,7 +870,7 @@ Issued At: ${new Date().toISOString()}`;
           {stepTestState}
           onRunStep={runCurrentStep}
           onReset={resetStepTests}
-          onSelectProvider={(providerId) => { stepTestState.selectedProviderId = providerId; }}
+          onSelectProvider={(providerId: string) => { stepTestState.selectedProviderId = providerId; }}
         />
       {:else if uiState.activeTab === 'scam-alerts'}
         {@const selectedScamAlert = scamAlertTests.find((t) => t.id === uiState.selectedScamAlertId)}

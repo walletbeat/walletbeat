@@ -1,10 +1,9 @@
-export type ScamAlertCategory = 'public-list' | 'wallet-own' | 'allow-infinite'
-
 export interface ScamAlertTest {
 	id: string
 	name: string
 	description: string
-	category: ScamAlertCategory
+	/** If true, the UI shows a custom address input instead of a fixed contract address. */
+	customAddress?: boolean
 	testType: 'transaction' | 'signature'
 	contractAddress: `0x${string}`
 	calldata: `0x${string}`
@@ -37,7 +36,6 @@ export const scamAlertTests: ScamAlertTest[] = [
 		id: 'recent-contract-1',
 		name: 'Recent Contract Warning',
 		description: 'Warns about newly deployed contracts.',
-		category: 'public-list',
 		testType: 'transaction',
 		contractAddress: '0x0000000000000000000000000000000000000000',
 		calldata: '0x00000000',
@@ -54,7 +52,6 @@ export const scamAlertTests: ScamAlertTest[] = [
 		id: 'previous-interaction-1',
 		name: 'Previous Contract Transaction',
 		description: 'Recognizes previously interacted contracts.',
-		category: 'public-list',
 		testType: 'transaction',
 		contractAddress: '0x0000000000000000000000000000000000000000',
 		calldata: '0x00000000',
@@ -71,7 +68,7 @@ export const scamAlertTests: ScamAlertTest[] = [
 		id: 'wallet-own-1',
 		name: 'Custom Address',
 		description: "Enter any address and send 0.0001 ETH to test the wallet's own scam detection.",
-		category: 'wallet-own',
+		customAddress: true,
 		testType: 'transaction',
 		contractAddress: '0x0000000000000000000000000000000000000000',
 		calldata: '0x',
@@ -86,15 +83,14 @@ export const scamAlertTests: ScamAlertTest[] = [
 		],
 	},
 	{
-		id: 'allow-infinite-zero',
+		id: 'known-scam-eth-send',
 		name: 'Known scam address',
 		description: 'Sends 0.0001 ETH to a known scam address.',
-		category: 'allow-infinite',
 		testType: 'transaction',
 		contractAddress: '0x0000000000000000000000000000000000000000', // Placeholder
 		calldata: '0x',
 		value: BigInt(100_000_000_000_000),
-		riskType: 'allow-infinite',
+		riskType: 'known-scam',
 		expectedBehavior:
 			'Wallet should warn about or block the transaction to this known scam address.',
 		requirements: [
@@ -107,7 +103,6 @@ export const scamAlertTests: ScamAlertTest[] = [
 		id: 'allow-infinite-usdc',
 		name: 'USDC',
 		description: 'Sends an infinite token approval targeting the USDC contract address.',
-		category: 'allow-infinite',
 		testType: 'transaction',
 		contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
 		calldata: INFINITE_APPROVE_CALLDATA,
@@ -125,9 +120,9 @@ export const scamAlertTests: ScamAlertTest[] = [
 		name: 'Gasless Approval: USDC Permit',
 		description:
 			'Signs an EIP-2612 Permit granting infinite allowance to an unknown EOA. A relayer could submit permit() to USDC with no gas from you.',
-		category: 'allow-infinite',
 		testType: 'signature',
-		contractAddress: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+		// Ethereum mainnet USDC contract address (Circle's FiatTokenProxy)
+		contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
 		calldata: '0x',
 		riskType: 'allow-infinite',
 		expectedBehavior:
@@ -141,7 +136,8 @@ export const scamAlertTests: ScamAlertTest[] = [
 			name: 'USDC',
 			version: '2',
 			chainId: 1,
-			verifyingContract: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+			// Ethereum mainnet USDC contract address (Circle's FiatTokenProxy)
+			verifyingContract: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
 		},
 		types: {
 			Permit: [
@@ -164,9 +160,3 @@ export const scamAlertTests: ScamAlertTest[] = [
 		},
 	},
 ]
-
-export const SCAM_ALERT_CATEGORY_LABELS: Record<ScamAlertCategory, string> = {
-	'public-list': 'Public List',
-	'wallet-own': "Wallet's Own",
-	'allow-infinite': 'Allow Infinite',
-}
