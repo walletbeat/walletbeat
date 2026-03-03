@@ -37,8 +37,8 @@ export const scamAlertTests: ScamAlertTest[] = [
 		name: 'Recent Contract Warning',
 		description: 'Warns about newly deployed contracts.',
 		testType: 'transaction',
-		contractAddress: '0x0000000000000000000000000000000000000000',
-		calldata: '0x00000000',
+		contractAddress: '0x0000000000000000000000000000000000000000', // Placeholder
+		calldata: '0x00000000', // Placeholder
 		riskType: 'recent-deploy',
 		expectedBehavior:
 			'Wallet should display a warning indicating the contract was recently deployed and may be risky.',
@@ -53,8 +53,8 @@ export const scamAlertTests: ScamAlertTest[] = [
 		name: 'Previous Contract Transaction',
 		description: 'Recognizes previously interacted contracts.',
 		testType: 'transaction',
-		contractAddress: '0x0000000000000000000000000000000000000000',
-		calldata: '0x00000000',
+		contractAddress: '0x0000000000000000000000000000000000000000', // Placeholder
+		calldata: '0x00000000', // Placeholder
 		riskType: 'previous-interaction',
 		expectedBehavior:
 			'Wallet may show a familiar contract indicator or skip certain warnings for previously-interacted contracts.',
@@ -70,7 +70,7 @@ export const scamAlertTests: ScamAlertTest[] = [
 		description: "Enter any address and send 0.0001 ETH to test the wallet's own scam detection.",
 		customAddress: true,
 		testType: 'transaction',
-		contractAddress: '0x0000000000000000000000000000000000000000',
+		contractAddress: '0x0000000000000000000000000000000000000000', // Placeholder
 		calldata: '0x',
 		value: BigInt(100_000_000_000_000),
 		riskType: 'known-scam',
@@ -104,6 +104,7 @@ export const scamAlertTests: ScamAlertTest[] = [
 		name: 'USDC',
 		description: 'Sends an infinite token approval targeting the USDC contract address.',
 		testType: 'transaction',
+		// Ethereum mainnet USDC contract address (Circle's FiatTokenProxy)
 		contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
 		calldata: INFINITE_APPROVE_CALLDATA,
 		riskType: 'allow-infinite',
