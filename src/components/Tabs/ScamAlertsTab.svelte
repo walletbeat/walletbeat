@@ -39,7 +39,7 @@
   const txHash = $derived(selectedTest ? scamAlertState.hashes[selectedTest.id] : undefined);
   const sigResult = $derived(selectedTest ? scamAlertState.signatures[selectedTest.id] : undefined);
 
-  const isWalletOwn = $derived(selectedTest?.category === 'wallet-own');
+  const isWalletOwn = $derived(selectedTest?.customAddress === true);
   const isSignature = $derived(selectedTest?.testType === 'signature');
 
   function isValidAddress(addr: string): addr is `0x${string}` {
@@ -66,6 +66,14 @@
     }
   }
 
+  // Teleports the element to document.body so it escapes the ancestor
+  // transform: perspective() on [data-scroll-item], which otherwise traps
+  // position: fixed children within the section instead of the viewport.
+  function portal(node: HTMLElement) {
+    document.body.appendChild(node);
+    return { destroy() { node.remove(); } };
+  }
+
   function getRiskLabel(riskType: ScamAlertTest['riskType']): string {
     switch (riskType) {
       case 'recent-deploy': return 'Recently Deployed';
@@ -77,14 +85,14 @@
 </script>
 
 {#if !disclaimerAccepted}
-  <div class="disclaimer-fullscreen">
+  <div class="disclaimer-fullscreen" use:portal>
     <div class="disclaimer-overlay" data-card="radius-8 padding-5">
       <div class="disclaimer-content" data-column="gap-4">
         <div class="disclaimer-icon">&#9888;</div>
         <h3 class="disclaimer-title">Scam Alert Testing</h3>
         <div class="disclaimer-warnings" data-column="gap-3">
           <p class="disclaimer-rule">
-            Every transaction should be treated as a <strong>SCAM</strong> transaction.
+            Every transaction on this tab should be treated as a <strong>SCAM</strong> transaction.
           </p>
           <p class="disclaimer-rule">
             Do <strong>NOT</strong> send real funds &mdash; nothing should ever be sent.
@@ -200,7 +208,7 @@
             </div>
             <div class="permit-row">
               <span class="permit-key">chainId</span>
-              <code class="permit-value">{selectedTest.domain?.chainId} (Base Sepolia)</code>
+              <code class="permit-value">{selectedTest.domain?.chainId} (Mainnet)</code>
             </div>
           </div>
         </div>
@@ -240,7 +248,7 @@
         <div class="result-box">
           <span class="result-label">Transaction Hash:</span>
           <button type="button" class="result-link" onclick={() => onOpenInExplorer(txHash)}>
-            {txHash.slice(0, 10)}...{txHash.slice(-8)} &#8599;
+            {txHash} &#8599;
           </button>
         </div>
       {/if}
@@ -248,7 +256,7 @@
       {#if sigResult}
         <div class="result-box">
           <span class="result-label">Signature:</span>
-          <code class="result-sig">{sigResult.slice(0, 20)}…{sigResult.slice(-10)}</code>
+          <code class="result-sig">{sigResult}</code>
         </div>
       {/if}
     </div>
