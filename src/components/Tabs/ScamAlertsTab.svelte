@@ -121,144 +121,157 @@
     </div>
   </div>
 {:else if selectedTest}
-  <div class="detail-card" data-card="radius-8 padding-5">
-    <header data-row="gap-2 start wrap">
-      <div data-column="gap-1">
-        <h3>{selectedTest.name}</h3>
-        {#if selectedTest.description}
-          <p class="body-text">{selectedTest.description}</p>
-        {/if}
-      </div>
-      {#if txHash}
-        <button
-          type="button"
-          class="explorer-link"
-          onclick={() => onOpenInExplorer(txHash)}
-          title="View on Etherscan"
-        >
-          &#8599;
-        </button>
-      {/if}
-    </header>
+  <div class="scam-zone">
+    <div class="scam-ticker" aria-hidden="true">
+      <span class="scam-ticker-inner">
+        ⚠️ SCAM TEST &nbsp;•&nbsp; DO NOT SEND REAL FUNDS &nbsp;•&nbsp; USE DISPOSABLE WALLETS ONLY &nbsp;•&nbsp; SCAM TEST &nbsp;•&nbsp; DO NOT SEND REAL FUNDS &nbsp;•&nbsp; USE DISPOSABLE WALLETS ONLY &nbsp;•&nbsp; SCAM TEST &nbsp;•&nbsp; DO NOT SEND REAL FUNDS &nbsp;•&nbsp; USE DISPOSABLE WALLETS ONLY &nbsp;•&nbsp;
+      </span>
+    </div>
 
-    <div data-column="gap-4">
-      {#if selectedTest.requirements && selectedTest.requirements.length > 0}
-        <div class="requirements-box">
-          <h4 class="requirements-title">Requirements:</h4>
-          <ul class="requirements-list">
-            {#each selectedTest.requirements as requirement (requirement)}
-              <li>{requirement}</li>
-            {/each}
-          </ul>
-        </div>
-      {/if}
-
-      {#if isWalletOwn}
-        <div class="detail-section">
-          <label class="detail-label" for="custom-address">Address to Send To:</label>
-          <input
-            id="custom-address"
-            type="text"
-            class="address-input"
-            class:error={!!customAddressError}
-            placeholder="0x…"
-            bind:value={customAddress}
-            oninput={() => { customAddressError = ''; }}
-          />
-          {#if customAddressError}
-            <span class="address-error">{customAddressError}</span>
+    <div class="detail-card" data-card="radius-8 padding-5">
+      <div class="scam-badge" aria-label="Scam test warning">☠️ SCAM TEST ☠️</div>
+      <header data-row="gap-2 start wrap">
+        <div data-column="gap-1">
+          <h3>{selectedTest.name}</h3>
+          {#if selectedTest.description}
+            <p class="body-text">{selectedTest.description}</p>
           {/if}
         </div>
-      {:else}
+        {#if txHash}
+          <button
+            type="button"
+            class="explorer-link"
+            onclick={() => onOpenInExplorer(txHash)}
+            title="View on Etherscan"
+          >
+            &#8599;
+          </button>
+        {/if}
+      </header>
+
+      <div data-column="gap-4">
+        {#if selectedTest.requirements && selectedTest.requirements.length > 0}
+          <div class="requirements-box">
+            <h4 class="requirements-title">Requirements:</h4>
+            <ul class="requirements-list">
+              {#each selectedTest.requirements as requirement (requirement)}
+                <li>{requirement}</li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+
+        {#if isWalletOwn}
+          <div class="detail-section">
+            <label class="detail-label" for="custom-address">Address to Send To:</label>
+            <input
+              id="custom-address"
+              type="text"
+              class="address-input"
+              class:error={!!customAddressError}
+              placeholder="0x…"
+              bind:value={customAddress}
+              oninput={() => { customAddressError = ''; }}
+            />
+            {#if customAddressError}
+              <span class="address-error">{customAddressError}</span>
+            {/if}
+          </div>
+        {:else}
+          <div class="detail-section">
+            <span class="detail-label">Address:</span>
+            <code class="detail-code">{selectedTest.contractAddress}</code>
+          </div>
+        {/if}
+
+        {#if selectedTest.value !== undefined}
+          <div class="detail-section">
+            <span class="detail-label">Value Sent:</span>
+            <span class="value-badge">0.0001 ETH</span>
+          </div>
+        {/if}
+
         <div class="detail-section">
-          <span class="detail-label">Address:</span>
-          <code class="detail-code">{selectedTest.contractAddress}</code>
+          <span class="detail-label">Risk Type:</span>
+          <span class="risk-badge risk-{selectedTest.riskType}">
+            {getRiskLabel(selectedTest.riskType)}
+          </span>
         </div>
-      {/if}
 
-      {#if selectedTest.value !== undefined}
-        <div class="detail-section">
-          <span class="detail-label">Value Sent:</span>
-          <span class="value-badge">0.0001 ETH</span>
-        </div>
-      {/if}
-
-      <div class="detail-section">
-        <span class="detail-label">Risk Type:</span>
-        <span class="risk-badge risk-{selectedTest.riskType}">
-          {getRiskLabel(selectedTest.riskType)}
-        </span>
-      </div>
-
-      {#if isSignature && selectedTest.messageData}
-        <div class="detail-section">
-          <span class="detail-label">Permit Details:</span>
-          <div class="permit-details">
-            <div class="permit-row">
-              <span class="permit-key">spender</span>
-              <code class="permit-value">{selectedTest.messageData.spender}</code>
-            </div>
-            <div class="permit-row">
-              <span class="permit-key">value</span>
-              <code class="permit-value">2<sup>256</sup>&minus;1 (infinite)</code>
-            </div>
-            <div class="permit-row">
-              <span class="permit-key">deadline</span>
-              <code class="permit-value">{new Date(Number(selectedTest.messageData.deadline) * 1000).toLocaleDateString()} (~5 years)</code>
-            </div>
-            <div class="permit-row">
-              <span class="permit-key">chainId</span>
-              <code class="permit-value">{selectedTest.domain?.chainId} (Mainnet)</code>
+        {#if isSignature && selectedTest.messageData}
+          <div class="detail-section">
+            <span class="detail-label">Permit Details:</span>
+            <div class="permit-details">
+              <div class="permit-row">
+                <span class="permit-key">spender</span>
+                <code class="permit-value">{selectedTest.messageData.spender}</code>
+              </div>
+              <div class="permit-row">
+                <span class="permit-key">value</span>
+                <code class="permit-value">2<sup>256</sup>&minus;1 (infinite)</code>
+              </div>
+              <div class="permit-row">
+                <span class="permit-key">deadline</span>
+                <code class="permit-value">{new Date(Number(selectedTest.messageData.deadline) * 1000).toLocaleDateString()} (~5 years)</code>
+              </div>
+              <div class="permit-row">
+                <span class="permit-key">chainId</span>
+                <code class="permit-value">{selectedTest.domain?.chainId} (Mainnet)</code>
+              </div>
             </div>
           </div>
-        </div>
-      {/if}
-
-      <div class="detail-section">
-        <span class="detail-label">Expected Wallet Behavior:</span>
-        <p class="expected-behavior">{selectedTest.expectedBehavior}</p>
-      </div>
-
-      <div class="warning-box">
-        <p class="warning-text">
-          <strong>&#9888;&#65039; WARNING:</strong> This page is for testing only. Do NOT send real transactions.
-        </p>
-      </div>
-
-      <button
-        type="button"
-        data-pressable
-        onclick={handleAction}
-        disabled={!account?.address || isPending}
-      >
-        {#if isPending}
-          Preparing...
-        {:else if isSignature}
-          {sigResult ? 'Signed' : 'Sign Message (Testing Only)'}
-        {:else if txHash}
-          Transaction Sent
-        {:else if selectedTest.value !== undefined}
-          Send 0.0001 ETH (Testing Only)
-        {:else}
-          Send Transaction (Testing Only)
         {/if}
-      </button>
 
-      {#if txHash}
-        <div class="result-box">
-          <span class="result-label">Transaction Hash:</span>
-          <button type="button" class="result-link" onclick={() => onOpenInExplorer(txHash)}>
-            {txHash} &#8599;
-          </button>
+        <div class="detail-section">
+          <span class="detail-label">Expected Wallet Behavior:</span>
+          <p class="expected-behavior">{selectedTest.expectedBehavior}</p>
         </div>
-      {/if}
 
-      {#if sigResult}
-        <div class="result-box">
-          <span class="result-label">Signature:</span>
-          <code class="result-sig">{sigResult}</code>
+        <div class="warning-box">
+          <p class="warning-text">
+            <strong>&#9888;&#65039; WARNING:</strong> This page is for testing only. Do NOT send real transactions.
+          </p>
         </div>
-      {/if}
+
+        <button
+          type="button"
+          data-pressable
+          onclick={handleAction}
+          disabled={!account?.address || isPending}
+        >
+          {#if isPending}
+            Preparing...
+          {:else if isSignature}
+            {sigResult ? 'Signed' : 'Sign Message (Testing Only)'}
+          {:else if txHash}
+            Transaction Sent
+          {:else if selectedTest.value !== undefined}
+            Send 0.0001 ETH (Testing Only)
+          {:else}
+            Send Transaction (Testing Only)
+          {/if}
+        </button>
+
+        {#if txHash}
+          <div class="result-box">
+            <span class="result-label">Transaction Hash:</span>
+            <button type="button" class="result-link" onclick={() => onOpenInExplorer(txHash)}>
+              {txHash} &#8599;
+            </button>
+          </div>
+        {/if}
+
+        {#if sigResult}
+          <div class="result-box">
+            <span class="result-label">Signature:</span>
+            <code class="result-sig">{sigResult}</code>
+          </div>
+        {/if}
+      </div>
+    </div>
+
+    <div class="scam-footer" aria-hidden="true">
+      ☠️ EVERY TRANSACTION ON THIS TAB IS A SCAM TEST — DO NOT SEND REAL FUNDS ☠️
     </div>
   </div>
 {/if}
@@ -355,6 +368,81 @@
     opacity: 0.4;
     cursor: not-allowed;
   }
+
+  /* ── Scam zone wrapper ─────────────────────────────────────────────────── */
+  .scam-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background-color: #cc0000;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80'%3E%3Ctext x='10' y='55' font-family='monospace' font-size='20' font-weight='900' fill='rgba(255%2C255%2C255%2C0.1)' transform='rotate(-20 110 40)'%3ESCAM TEST%3C/text%3E%3C/svg%3E");
+    background-repeat: repeat;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 3px solid #ff0000;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  /* Scrolling ticker — inner is position:absolute so it can't affect parent width */
+  .scam-ticker {
+    position: relative;
+    overflow: hidden;
+    height: 2.1rem;
+    background: #8b0000;
+    border-radius: 0.25rem;
+  }
+
+  .scam-ticker-inner {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) translateX(100vw);
+    white-space: nowrap;
+    color: white;
+    font-weight: 900;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    animation: scam-scroll 22s linear infinite;
+  }
+
+  @keyframes scam-scroll {
+    from { transform: translateY(-50%) translateX(100vw); }
+    to   { transform: translateY(-50%) translateX(-100%); }
+  }
+
+  /* "☠️ SCAM TEST ☠️" badge inside the card */
+  .scam-badge {
+    font-size: 0.8rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: #cc0000;
+    text-align: center;
+    padding: 0.35rem;
+    margin-bottom: 0.5rem;
+    background: color-mix(in srgb, #cc0000 10%, transparent);
+    border: 1px dashed #cc0000;
+    border-radius: 0.25rem;
+  }
+
+  /* Override card background so content stays readable */
+  .scam-zone .detail-card {
+    background: var(--background-primary);
+    border: 2px solid #cc0000;
+  }
+
+  /* Footer banner */
+  .scam-footer {
+    background: #8b0000;
+    color: white;
+    font-weight: 900;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+  }
+
+  /* ── End scam zone ──────────────────────────────────────────────────────── */
 
   .detail-card h3 {
     font-size: 1.1rem;
