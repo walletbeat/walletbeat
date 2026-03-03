@@ -52,7 +52,6 @@
 >
 	{@render selectedContent()}
 	{#snippet selectedContent()}
-		<!-- svelte-ignore a11y_consider_explicit_label -->
 		<button
 			type="button"
 			onclick={e => {
