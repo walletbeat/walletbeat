@@ -71,6 +71,7 @@
   // position: fixed children within the section instead of the viewport.
   function portal(node: HTMLElement) {
     document.body.appendChild(node);
+
     return { destroy() { node.remove(); } };
   }
 
@@ -124,7 +125,9 @@
   <div class="scam-zone">
     <div class="scam-ticker" aria-hidden="true">
       <span class="scam-ticker-inner">
-        ⚠️ SCAM TEST &nbsp;•&nbsp; DO NOT SEND REAL FUNDS &nbsp;•&nbsp; USE DISPOSABLE WALLETS ONLY &nbsp;•&nbsp; SCAM TEST &nbsp;•&nbsp; DO NOT SEND REAL FUNDS &nbsp;•&nbsp; USE DISPOSABLE WALLETS ONLY &nbsp;•&nbsp; SCAM TEST &nbsp;•&nbsp; DO NOT SEND REAL FUNDS &nbsp;•&nbsp; USE DISPOSABLE WALLETS ONLY &nbsp;•&nbsp;
+        {#each [0, 1] as _ (_)}
+          ⚠️ SCAM TEST &nbsp;•&nbsp; DO NOT SEND REAL FUNDS &nbsp;•&nbsp; USE DISPOSABLE WALLETS ONLY &nbsp;•&nbsp; SCAM TEST &nbsp;•&nbsp; DO NOT SEND REAL FUNDS &nbsp;•&nbsp; USE DISPOSABLE WALLETS ONLY &nbsp;•&nbsp;
+        {/each}
       </span>
     </div>
 
@@ -375,6 +378,8 @@
     flex-direction: column;
     gap: 0.75rem;
     background-color: #cc0000;
+    /* Tiled diagonal "SCAM TEST" watermark rendered as an inline SVG data URI */
+    /* cspell:disable-next-line */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='80'%3E%3Ctext x='10' y='55' font-family='monospace' font-size='20' font-weight='900' fill='rgba(255%2C255%2C255%2C0.1)' transform='rotate(-20 110 40)'%3ESCAM TEST%3C/text%3E%3C/svg%3E");
     background-repeat: repeat;
     padding: 0.75rem;
@@ -396,7 +401,7 @@
   .scam-ticker-inner {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%) translateX(100vw);
+    transform: translateY(-50%) translateX(0);
     white-space: nowrap;
     color: white;
     font-weight: 900;
@@ -406,8 +411,8 @@
   }
 
   @keyframes scam-scroll {
-    from { transform: translateY(-50%) translateX(100vw); }
-    to   { transform: translateY(-50%) translateX(-100%); }
+    from { transform: translateY(-50%) translateX(0); }
+    to   { transform: translateY(-50%) translateX(-50%); }
   }
 
   /* "☠️ SCAM TEST ☠️" badge inside the card */
