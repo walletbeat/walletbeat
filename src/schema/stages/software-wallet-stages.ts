@@ -49,6 +49,7 @@ export const softwareWalletStageZero: WalletStage = {
 						'The source code must be publicly available so that it can be reviewed by Walletbeat.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, sourceVisibility),
+					displayName: 'Source Available',
 				},
 			],
 		},
@@ -71,6 +72,7 @@ export const softwareWalletStageOne: WalletStage = {
 						'This provides a level of assurance about the software security practices of the wallet developer.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAudits),
+					displayName: 'Security Audit 1Y',
 				},
 				{
 					id: 'hardware_wallet_subset',
@@ -113,6 +115,7 @@ export const softwareWalletStageOne: WalletStage = {
 							}
 						},
 					),
+					displayName: 'Hardware Wallet Subset',
 				},
 				{
 					id: 'chain_verification',
@@ -122,6 +125,7 @@ export const softwareWalletStageOne: WalletStage = {
             wallets should verify the integrity of the L1 chain when performing transactions.
           `),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, chainVerification),
+					displayName: 'Chain Verification',
 				},
 				// TODO: Add "Private key access security" to this list.
 				// See https://github.com/walletbeat/walletbeat/issues/218
@@ -140,6 +144,7 @@ export const softwareWalletStageOne: WalletStage = {
             This would be the equivalent of a financial panopticon.
           `),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, privateTransfers),
+					displayName: 'Private Transfers',
 				},
 			],
 		},
@@ -157,6 +162,7 @@ export const softwareWalletStageOne: WalletStage = {
             account information and import it in another wallet.
           `),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, accountPortability),
+					displayName: 'Account Portability',
 				},
 				{
 					id: 'support_own_node',
@@ -214,6 +220,7 @@ export const softwareWalletStageOne: WalletStage = {
 							}
 						},
 					),
+					displayName: 'Support Own Node',
 				},
 			],
 		},
@@ -232,6 +239,7 @@ export const softwareWalletStageOne: WalletStage = {
 						'Free and Open Source Software (FOSS) licensing allows better collaboration, more transparency into the software development practices that go into the project, and allows security researchers to more easily identify and report security vulnerabilities.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, openSource),
+					displayName: 'Foss',
 				},
 			],
 		},
@@ -254,6 +262,7 @@ export const softwareWalletStageOne: WalletStage = {
 						allowPartial: true,
 						ifNoVariantInScope: null,
 					}),
+					displayName: 'Address Resolution',
 				},
 				{
 					id: 'browser_integration',
@@ -269,6 +278,7 @@ export const softwareWalletStageOne: WalletStage = {
 							explanation: sentence('{{WALLET_NAME}} is exempt as it has no browser version.'),
 						},
 					}),
+					displayName: 'Browser Integration',
 				},
 			],
 		},
@@ -298,6 +308,7 @@ const softwareWalletStageTwo: WalletStage = {
 							rating: StageCriterionRating.UNRATED,
 						}),
 					),
+					displayName: 'Bug Bounty Program',
 				},
 				// TODO: Add "key is stored in encrypted form"
 				// TODO: Add calldata interpretation
@@ -321,6 +332,7 @@ const softwareWalletStageTwo: WalletStage = {
 						Keeping it private is paramount for user privacy at least on par with web2.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressCorrelation),
+					displayName: 'Address Privacy',
 				},
 				{
 					id: 'multi_address_correlation',
@@ -332,6 +344,7 @@ const softwareWalletStageTwo: WalletStage = {
 						fact private. It is therefore important to use a wallet that does not reveal that fact.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, multiAddressCorrelation),
+					displayName: 'Multi-Address Correlation',
 				},
 			],
 		},
@@ -352,6 +365,7 @@ const softwareWalletStageTwo: WalletStage = {
 						exercise this permissionlessness at both levels.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, transactionInclusion),
+					displayName: 'Transaction Inclusion',
 				},
 				{
 					id: 'support_own_chains',
@@ -409,6 +423,7 @@ const softwareWalletStageTwo: WalletStage = {
 							}
 						},
 					),
+					displayName: 'Support Own Chains',
 				},
 			],
 		},
@@ -430,6 +445,7 @@ const softwareWalletStageTwo: WalletStage = {
 						This requires a reliable and transparent source of funding.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, funding),
+					displayName: 'Funding',
 				},
 				{
 					id: 'fee_transparency',
@@ -442,6 +458,7 @@ const softwareWalletStageTwo: WalletStage = {
 						the user deserves to know what they are paying for.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, feeTransparency),
+					displayName: 'Fee Transparency',
 				},
 			],
 		},
@@ -464,6 +481,7 @@ const softwareWalletStageTwo: WalletStage = {
 						allowPartial: false,
 						ifNoVariantInScope: null,
 					}),
+					displayName: 'Chain Specific Address Resolution',
 				},
 				{
 					id: 'account_abstraction',
@@ -474,6 +492,7 @@ const softwareWalletStageTwo: WalletStage = {
 						to preserve account portability and interoperability.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, accountAbstraction),
+					displayName: 'Account Abstraction',
 				},
 				{
 					id: 'transaction_batching',
@@ -486,6 +505,7 @@ const softwareWalletStageTwo: WalletStage = {
 						as enabling advanced DeFi use-cases.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, transactionBatching),
+					displayName: 'Transaction Batching',
 				},
 			],
 		},
