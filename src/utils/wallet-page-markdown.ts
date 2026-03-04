@@ -12,22 +12,15 @@ import {
 	ratingToText,
 	type Value,
 	type ValueSet,
-	type WalletNameAndPseudonymStrings,
-	type WalletNameStrings,
 } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import { StageCriterionRating, stageCriterionRatings, type WalletStage } from '@/schema/stages'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
-import {
-	type Content,
-	ContentType,
-	isTypographicContent,
-	prerenderTypographicContent,
-	type TypographicContent,
-} from '@/types/content'
+import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase } from '@/types/utils/text'
+import { getWalletEvalStrings, renderEvaluationContentOrFallback } from '@/utils/evaluation-content'
 import {
 	collapseToSingleLine,
 	markdownBlockquote,
@@ -49,65 +42,6 @@ function criterionIdToDisplayName(id: string): string {
 }
 
 /**
- * Render TypographicContent<WalletNameStrings> to a plain string.
- * Only for content that is known not to contain pseudonym placeholders
- * (e.g. wallet metadata like blurb).
- */
-function renderTypographic(
-	content: TypographicContent<WalletNameStrings>,
-	walletName: string,
-): string {
-	const rendered = prerenderTypographicContent(content, { WALLET_NAME: walletName })
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
-}
-
-/**
- * Render any evaluation-related TypographicContent to a plain string, always
- * supplying the full set of wallet name and pseudonym strings.
- *
- * This is necessary because some content typed as WalletNameStrings may still
- * contain {{WALLET_PSEUDONYM_*}} placeholders at runtime (e.g. shortExplanation
- * strings that embed userInfoName() values which return pseudonym placeholders).
- * TypeScript's compile-time template validation cannot catch this for strings
- * constructed from runtime values.
- */
-function renderEvaluationContent(
-	content: TypographicContent<WalletNameAndPseudonymStrings>,
-	strings: WalletNameAndPseudonymStrings,
-): string {
-	const rendered = prerenderTypographicContent(content, strings)
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
-}
-
-/**
- * Render Content, falling back to `fallback` for CustomContent.
- * Always passes the full set of strings including pseudonym placeholders.
- */
-function renderEvaluationContentOrFallback(
-	content: Content<WalletNameAndPseudonymStrings>,
-	strings: WalletNameAndPseudonymStrings,
-	fallback: string,
-): string {
-	if (!isTypographicContent(content)) {
-		return fallback
-	}
-
-	return renderEvaluationContent(content, strings)
-}
-
-/**
  * Return the "How to improve" section heading using Attribute.wording.
  * Complex wording: use the rendered whatCanWalletDoAboutIts sentence.
  * Simple wording: "What can {walletName} do about its {midSentenceName}?"
@@ -119,7 +53,11 @@ function getHowToImproveHeading<V extends Value>(
 	const { wording } = attribute
 
 	if (wording.midSentenceName === null) {
-		return collapseToSingleLine(renderTypographic(wording.whatCanWalletDoAboutIts, walletName))
+		return collapseToSingleLine(
+			renderTypographicContentToString(wording.whatCanWalletDoAboutIts, {
+				WALLET_NAME: walletName,
+			}),
+		)
 	}
 
 	return `What can ${walletName} do about its ${wording.midSentenceName}?`
@@ -130,7 +68,11 @@ function getHowToImproveHeading<V extends Value>(
  * as a short description in the /llms.txt index.
  */
 export function walletBlurbText(wallet: RatedWallet): string {
-	return collapseToSingleLine(renderTypographic(wallet.metadata.blurb, wallet.metadata.displayName))
+	return collapseToSingleLine(
+		renderTypographicContentToString(wallet.metadata.blurb, {
+			WALLET_NAME: wallet.metadata.displayName,
+		}),
+	)
 }
 
 /**
@@ -144,11 +86,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	const { metadata } = wallet
 	const walletName = metadata.displayName
 
-	const evalStrings: WalletNameAndPseudonymStrings = {
-		WALLET_NAME: walletName,
-		WALLET_PSEUDONYM_SINGULAR: metadata.pseudonymType?.singular ?? 'pseudonym',
-		WALLET_PSEUDONYM_PLURAL: metadata.pseudonymType?.plural ?? 'pseudonyms',
-	}
+	const evalStrings = getWalletEvalStrings(wallet)
 
 	const variantNames = setItems<Variant>(getVariants(wallet.variants))
 		.map(v => variantToName(v, true))
@@ -166,7 +104,9 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	const headerLines: string[] = [
 		`# ${walletName} — Walletbeat Review`,
 		'',
-		...markdownBlockquote(renderTypographic(metadata.blurb, walletName)),
+		...markdownBlockquote(
+			renderTypographicContentToString(metadata.blurb, { WALLET_NAME: walletName }),
+		),
 		'',
 		`Last updated: ${metadata.lastUpdated}`,
 		`Walletbeat page: ${siteUrl}/${metadata.id}`,
@@ -185,7 +125,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 		if (isTypographicContent(stage.description)) {
 			const desc = normalizeMarkdownBlankLines(
-				renderTypographic(stage.description, walletName),
+				renderTypographicContentToString(stage.description, { WALLET_NAME: walletName }),
 			).trim()
 
 			if (desc !== '') {
@@ -225,7 +165,9 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						criteriaGroup.description !== undefined
 					) {
 						const groupDesc = normalizeMarkdownBlankLines(
-							renderTypographic(criteriaGroup.description, walletName),
+							renderTypographicContentToString(criteriaGroup.description, {
+								WALLET_NAME: walletName,
+							}),
 						).trim()
 
 						if (groupDesc !== '') {
@@ -245,7 +187,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						const displayName =
 							attribute?.displayName ?? attributeId ?? criterionIdToDisplayName(criterion.id)
 						const descText = normalizeMarkdownBlankLines(
-							renderTypographic(criterion.description, walletName),
+							renderTypographicContentToString(criterion.description, { WALLET_NAME: walletName }),
 						).trim()
 						const descForBullet =
 							descText !== '' && /^[a-z]/.test(descText)
@@ -331,7 +273,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 					}
 
 					const shortExpl = normalizeMarkdownBlankLines(
-						renderEvaluationContent(evaluation.value.shortExplanation, evalStrings),
+						renderTypographicContentToString(evaluation.value.shortExplanation, evalStrings),
 					)
 
 					parts.push(shortExpl.trim(), '')
@@ -350,7 +292,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 					if (evaluation.impact !== undefined) {
 						const impact = normalizeMarkdownBlankLines(
-							renderEvaluationContent(evaluation.impact, evalStrings),
+							renderTypographicContentToString(evaluation.impact, evalStrings),
 						)
 
 						if (impact.trim() !== '') {
@@ -360,7 +302,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 					if (evaluation.howToImprove !== undefined) {
 						const howTo = normalizeMarkdownBlankLines(
-							renderEvaluationContent(evaluation.howToImprove, evalStrings),
+							renderTypographicContentToString(evaluation.howToImprove, evalStrings),
 						)
 
 						if (howTo.trim() !== '') {

@@ -1,7 +1,7 @@
 import { attributeTree } from '@/schema/attribute-groups'
 import type { Attribute, ExampleRating, Value } from '@/schema/attributes'
 import { normalizeExampleRatings } from '@/schema/attributes'
-import { ContentType, prerenderTypographicContent, type TypographicContent } from '@/types/content'
+import { renderTypographicContentToString, type TypographicContent } from '@/types/content'
 import { normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 
 const GENERIC_WALLET_NAME = 'the wallet'
@@ -11,28 +11,10 @@ const GENERIC_PSEUDONYM_STRINGS = {
 	WALLET_PSEUDONYM_PLURAL: 'pseudonyms',
 }
 
-function renderContent(content: TypographicContent<null>): string {
-	const rendered = prerenderTypographicContent(content, null)
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
-}
-
 function renderWalletNameContent(
 	content: TypographicContent<null | { WALLET_NAME: string }>,
 ): string {
-	const rendered = prerenderTypographicContent(content, { WALLET_NAME: GENERIC_WALLET_NAME })
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
+	return renderTypographicContentToString(content, { WALLET_NAME: GENERIC_WALLET_NAME })
 }
 
 function renderPseudonymContent(
@@ -46,14 +28,7 @@ function renderPseudonymContent(
 		  }
 	>,
 ): string {
-	const rendered = prerenderTypographicContent(content, GENERIC_PSEUDONYM_STRINGS)
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
+	return renderTypographicContentToString(content, GENERIC_PSEUDONYM_STRINGS)
 }
 
 function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
@@ -89,7 +64,7 @@ function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
 		lines.push('')
 
 		for (const example of examples) {
-			lines.push(`- ${renderContent(example.description)}`)
+			lines.push(`- ${renderTypographicContentToString(example.description, null)}`)
 		}
 
 		lines.push('')
