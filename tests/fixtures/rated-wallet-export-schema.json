@@ -1,0 +1,213 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"type": "object",
+	"additionalProperties": false,
+	"required": [
+		"walletId",
+		"types",
+		"variants",
+		"overallPrivacy",
+		"displayName",
+		"description",
+		"lastUpdated",
+		"stage"
+	],
+	"properties": {
+		"walletId": {
+			"type": "string",
+			"minLength": 1
+		},
+		"types": {
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "string",
+				"enum": ["SOFTWARE", "HARDWARE", "EMBEDDED"]
+			}
+		},
+		"variants": {
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "string",
+				"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
+			}
+		},
+		"displayName": {
+			"type": "string",
+			"minLength": 1
+		},
+		"description": {
+			"type": "string"
+		},
+		"lastUpdated": {
+			"type": "string",
+			"description": "YYYY-MM-DD"
+		},
+		"stage": {
+			"oneOf": [{ "type": "null" }, { "type": "string" }]
+		},
+		"website": {
+			"type": "string"
+		},
+		"repository": {
+			"type": "string"
+		},
+		"overallPrivacy": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"addressCorrelation",
+				"multiAddressCorrelation",
+				"privateTransfers",
+				"hardwarePrivacy",
+				"appIsolation"
+			],
+			"properties": {
+				"addressCorrelation": {
+					"$ref": "#/$defs/privacyAttribute"
+				},
+				"multiAddressCorrelation": {
+					"$ref": "#/$defs/privacyAttribute"
+				},
+				"privateTransfers": {
+					"$ref": "#/$defs/privacyAttribute"
+				},
+				"hardwarePrivacy": {
+					"$ref": "#/$defs/privacyAttribute"
+				},
+				"appIsolation": {
+					"$ref": "#/$defs/privacyAttribute"
+				}
+			}
+		}
+	},
+	"$defs": {
+		"privacyAttribute": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["attribute", "rating"],
+			"properties": {
+				"attribute": {
+					"$ref": "#/$defs/attributeBlock"
+				},
+				"rating": {
+					"$ref": "#/$defs/ratingBlock"
+				}
+			}
+		},
+		"attributeBlock": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"attributeDisplayName",
+				"attributeId",
+				"shortQuestion",
+				"whyItMatters",
+				"howIsEvaluated"
+			],
+			"properties": {
+				"attributeDisplayName": {
+					"type": "string",
+					"minLength": 1
+				},
+				"attributeId": {
+					"type": "string",
+					"minLength": 1
+				},
+				"shortQuestion": {
+					"type": "string",
+					"description": "Short question describing what the attribute evaluates (e.g. \"Can you send and receive tokens without revealing your transaction history to others?\")"
+				},
+				"whyItMatters": {
+					"type": "string",
+					"description": "Body of the \"Why does this matter?\" / \"Why should I care?\" section"
+				},
+				"howIsEvaluated": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["heading", "methodology"],
+					"properties": {
+						"heading": {
+							"type": "string",
+							"minLength": 1
+						},
+						"methodology": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		},
+		"ratingBlock": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["rating", "shortExplanation", "details"],
+			"properties": {
+				"rating": {
+					"type": "string",
+					"enum": ["PASS", "FAIL", "PARTIAL", "UNRATED", "EXEMPT"]
+				},
+				"shortExplanation": {
+					"type": "string"
+				},
+				"details": {
+					"type": "string"
+				},
+				"impact": {
+					"type": "string"
+				},
+				"howToImprove": {
+					"type": "string"
+				},
+				"references": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/reference"
+					}
+				},
+				"perVariantRatings": {
+					"type": "object",
+					"additionalProperties": {
+						"type": "string",
+						"enum": ["PASS", "FAIL", "PARTIAL", "UNRATED", "EXEMPT"]
+					},
+					"propertyNames": {
+						"type": "string",
+						"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
+					}
+				}
+			}
+		},
+		"reference": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["urls"],
+			"properties": {
+				"explanation": {
+					"type": "string"
+				},
+				"urls": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"$ref": "#/$defs/referenceUrl"
+					}
+				}
+			}
+		},
+		"referenceUrl": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["label", "url"],
+			"properties": {
+				"label": {
+					"type": "string"
+				},
+				"url": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

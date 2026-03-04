@@ -78,6 +78,9 @@ importers:
       '@kindspells/astro-shield':
         specifier: ^1.7.1
         version: 1.7.1(astro@5.18.0(@types/node@25.3.3)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.29.2)(rollup@4.59.0)(sass-embedded@1.87.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+      ajv:
+        specifier: ^8.18.0
+        version: 8.18.0
       blumen:
         specifier: ^1.3.0
         version: 1.3.0
