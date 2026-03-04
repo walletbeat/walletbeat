@@ -1,12 +1,12 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"type": "object",
-	"additionalProperties": false,
+	"description": "Rated wallet JSON export: top-level metadata, an overall block (aggregated attribute groups), and one block per variant (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE) present in variants, each with the same attribute-group structure as overall.",
 	"required": [
 		"walletId",
 		"types",
 		"variants",
-		"overallPrivacy",
+		"overall",
 		"displayName",
 		"description",
 		"lastUpdated",
@@ -15,11 +15,13 @@
 	"properties": {
 		"walletId": {
 			"type": "string",
-			"minLength": 1
+			"minLength": 1,
+			"description": "Unique identifier for the wallet."
 		},
 		"types": {
 			"type": "array",
 			"minItems": 1,
+			"description": "Wallet types (SOFTWARE, HARDWARE, EMBEDDED) this wallet belongs to.",
 			"items": {
 				"type": "string",
 				"enum": ["SOFTWARE", "HARDWARE", "EMBEDDED"]
@@ -28,6 +30,7 @@
 		"variants": {
 			"type": "array",
 			"minItems": 1,
+			"description": "List of variants (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE) this wallet has. Each variant in this list has a corresponding key on the root object with the same attribute-group structure as overall.",
 			"items": {
 				"type": "string",
 				"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
@@ -35,58 +38,80 @@
 		},
 		"displayName": {
 			"type": "string",
-			"minLength": 1
+			"minLength": 1,
+			"description": "Human-readable wallet name."
 		},
 		"description": {
-			"type": "string"
+			"type": "string",
+			"description": "Short wallet description (rendered blurb)."
 		},
 		"lastUpdated": {
 			"type": "string",
-			"description": "YYYY-MM-DD"
+			"description": "Date the wallet data was last updated (YYYY-MM-DD)."
 		},
 		"stage": {
-			"oneOf": [{ "type": "null" }, { "type": "string" }]
+			"oneOf": [{ "type": "null" }, { "type": "string" }],
+			"description": "Walletbeat stage label, or null if not applicable."
 		},
 		"website": {
-			"type": "string"
+			"type": "string",
+			"description": "Primary website URL for the wallet, when known."
 		},
 		"repository": {
-			"type": "string"
+			"type": "string",
+			"description": "Primary source code repository URL, when known."
 		},
-		"overallPrivacy": {
+		"overall": {
 			"type": "object",
-			"additionalProperties": false,
-			"required": [
-				"addressCorrelation",
-				"multiAddressCorrelation",
-				"privateTransfers",
-				"hardwarePrivacy",
-				"appIsolation"
-			],
-			"properties": {
-				"addressCorrelation": {
-					"$ref": "#/$defs/privacyAttribute"
-				},
-				"multiAddressCorrelation": {
-					"$ref": "#/$defs/privacyAttribute"
-				},
-				"privateTransfers": {
-					"$ref": "#/$defs/privacyAttribute"
-				},
-				"hardwarePrivacy": {
-					"$ref": "#/$defs/privacyAttribute"
-				},
-				"appIsolation": {
-					"$ref": "#/$defs/privacyAttribute"
-				}
+			"description": "Aggregated evaluation across all variants. Keys are attribute group ids (e.g. security, privacy); values are objects keyed by attribute id, each with attribute metadata and rating block.",
+			"additionalProperties": {
+				"$ref": "#/$defs/attributeGroupExport"
 			}
 		}
 	},
+	"additionalProperties": {
+		"$ref": "#/$defs/attributeGroupsExport",
+		"description": "Per-variant blocks: MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE. Only variants listed in the variants array appear. Each has the same structure as overall (attribute groups keyed by group id, then attribute id, then attribute + rating block)."
+	},
+	"propertyNames": {
+		"enum": [
+			"walletId",
+			"types",
+			"variants",
+			"displayName",
+			"description",
+			"lastUpdated",
+			"stage",
+			"website",
+			"repository",
+			"overall",
+			"MOBILE",
+			"DESKTOP",
+			"BROWSER",
+			"EMBEDDED",
+			"HARDWARE"
+		]
+	},
 	"$defs": {
-		"privacyAttribute": {
+		"attributeGroupsExport": {
+			"type": "object",
+			"description": "Map of attribute group id (e.g. security, privacy) to group export (attribute id to attribute + rating block). Used for overall and for each variant block.",
+			"additionalProperties": {
+				"$ref": "#/$defs/attributeGroupExport"
+			}
+		},
+		"attributeGroupExport": {
+			"type": "object",
+			"description": "One attribute group: map of attribute id to attribute export block (attribute metadata + rating).",
+			"additionalProperties": {
+				"$ref": "#/$defs/attributeExportBlock"
+			}
+		},
+		"attributeExportBlock": {
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["attribute", "rating"],
+			"description": "Single attribute export: attribute metadata (display name, question, methodology) plus wallet-specific rating (rating, shortExplanation, details, optional impact, howToImprove, references).",
 			"properties": {
 				"attribute": {
 					"$ref": "#/$defs/attributeBlock"
@@ -106,6 +131,7 @@
 				"whyItMatters",
 				"howIsEvaluated"
 			],
+			"description": "Attribute-level metadata (same for every wallet).",
 			"properties": {
 				"attributeDisplayName": {
 					"type": "string",
@@ -127,6 +153,7 @@
 					"type": "object",
 					"additionalProperties": false,
 					"required": ["heading", "methodology"],
+					"description": "Section heading and body for \"How is this attribute evaluated?\"",
 					"properties": {
 						"heading": {
 							"type": "string",
@@ -143,16 +170,20 @@
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["rating", "shortExplanation", "details"],
+			"description": "Wallet-specific evaluation result for one attribute (rating, explanation, details, optional impact, howToImprove, references).",
 			"properties": {
 				"rating": {
 					"type": "string",
-					"enum": ["PASS", "FAIL", "PARTIAL", "UNRATED", "EXEMPT"]
+					"enum": ["PASS", "FAIL", "PARTIAL", "UNRATED", "EXEMPT"],
+					"description": "Attribute rating for this wallet."
 				},
 				"shortExplanation": {
-					"type": "string"
+					"type": "string",
+					"description": "Brief explanation of why this rating was assigned."
 				},
 				"details": {
-					"type": "string"
+					"type": "string",
+					"description": "Longer explanation or summary of the evaluation; may be \"See full details on the wallet page.\" when details are component-based."
 				},
 				"impact": {
 					"type": "string"
@@ -165,17 +196,6 @@
 					"items": {
 						"$ref": "#/$defs/reference"
 					}
-				},
-				"perVariantRatings": {
-					"type": "object",
-					"additionalProperties": {
-						"type": "string",
-						"enum": ["PASS", "FAIL", "PARTIAL", "UNRATED", "EXEMPT"]
-					},
-					"propertyNames": {
-						"type": "string",
-						"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
-					}
 				}
 			}
 		},
@@ -183,6 +203,7 @@
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["urls"],
+			"description": "Optional reference with explanation and one or more URLs.",
 			"properties": {
 				"explanation": {
 					"type": "string"
@@ -200,6 +221,7 @@
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["label", "url"],
+			"description": "Single URL with optional label.",
 			"properties": {
 				"label": {
 					"type": "string"

@@ -1,20 +1,25 @@
-import type { PrivacyEvaluations } from '@/schema/attribute-groups'
-import { getAttributeFromTree } from '@/schema/attribute-groups'
+import {
+	type EvaluationTree,
+	mapNonExemptAttributeGroupsInTree,
+	mapNonExemptGroupAttributes,
+} from '@/schema/attribute-groups'
 import type {
 	Attribute,
+	AttributeGroup,
 	EvaluatedAttribute,
+	EvaluatedGroup,
 	Value,
+	ValueSet,
 	WalletNameAndPseudonymStrings,
 } from '@/schema/attributes'
-import { Rating } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import type { WalletStage } from '@/schema/stages'
 import { getUrl } from '@/schema/url'
-import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
-import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
+import { getVariants, type Variant } from '@/schema/variants'
+import { type RatedWallet } from '@/schema/wallet'
 import type { WalletType } from '@/schema/wallet-types'
 import { renderTypographicContentToString } from '@/types/content'
-import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
+import { setItems } from '@/types/utils/non-empty'
 import { getWalletEvalStrings, renderEvaluationContentOrFallback } from '@/utils/evaluation-content'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { walletBlurbText } from '@/utils/wallet-page-markdown'
@@ -76,22 +81,19 @@ export interface RatingJsonExport {
 	impact?: string
 	howToImprove?: string
 	references?: ReferenceJsonExport[]
-	perVariantRatings?: Partial<Record<Variant, string>>
 }
 
-export interface PrivacyAttributeJsonExport {
+/** Single attribute export: attribute metadata + rating block. */
+export interface AttributeExportBlock {
 	attribute: AttributeJsonExport
 	rating: RatingJsonExport
 }
 
-export interface RatedWalletJsonExport {
-	overallPrivacy: {
-		addressCorrelation: PrivacyAttributeJsonExport
-		multiAddressCorrelation: PrivacyAttributeJsonExport
-		privateTransfers: PrivacyAttributeJsonExport
-		hardwarePrivacy: PrivacyAttributeJsonExport
-		appIsolation: PrivacyAttributeJsonExport
-	}
+/** Attribute groups keyed by group id, then attribute id, then attribute + rating block. */
+export type AttributeGroupsExport = Record<string, Record<string, AttributeExportBlock>>
+
+export interface RatedWalletJsonExportBase {
+	overall: AttributeGroupsExport
 	types: WalletType[]
 	variants: Variant[]
 	walletId: string
@@ -102,6 +104,10 @@ export interface RatedWalletJsonExport {
 	website?: string
 	repository?: string
 }
+
+/** Export shape: base fields plus one key per variant (e.g. BROWSER, MOBILE) with AttributeGroupsExport. */
+export type RatedWalletJsonExport = RatedWalletJsonExportBase &
+	Partial<Record<Variant, AttributeGroupsExport>>
 
 function serializeReferences(
 	references: Parameters<typeof toFullyQualified>[0],
@@ -128,50 +134,11 @@ function getHowIsEvaluatedHeading<V extends Value>(attribute: Attribute<V>): str
 	return `How is ${wording.midSentenceName} evaluated?`
 }
 
-function perVariantRatingsForAttribute<V extends Value>(
-	wallet: RatedWallet,
-	attribute: Attribute<V>,
-): Partial<Record<Variant, string>> | undefined {
-	if (hasSingleVariant(wallet.variants)) {
-		return undefined
-	}
-
-	const isVariantSpecific = nonEmptyValues<Variant, Map<string, VariantSpecificity>>(
-		wallet.variantSpecificity,
-	).some(specMap => {
-		const spec = specMap.get(attribute.id)
-
-		return (
-			spec === VariantSpecificity.UNIQUE_TO_VARIANT || spec === VariantSpecificity.NOT_UNIVERSAL
-		)
-	})
-
-	if (!isVariantSpecific) {
-		return undefined
-	}
-
-	const perVariant: Partial<Record<Variant, string>> = {}
-
-	for (const [variant, resolved] of nonEmptyEntries<Variant, ResolvedWallet>(wallet.variants)) {
-		const variantEvalAttr = getAttributeFromTree(resolved.attributes, attribute)
-
-		if (variantEvalAttr === null || variantEvalAttr.evaluation.value.rating === Rating.EXEMPT) {
-			continue
-		}
-
-		perVariant[variant] = variantEvalAttr.evaluation.value.rating
-	}
-
-	return Object.keys(perVariant).length > 0 ? perVariant : undefined
-}
-
-function serializePrivacyAttribute<V extends Value>(
+function serializeAttribute<V extends Value>(
 	evaluatedAttribute: EvaluatedAttribute<V>,
-	wallet: RatedWallet,
 	evalStrings: WalletNameAndPseudonymStrings,
-): PrivacyAttributeJsonExport {
+): AttributeExportBlock {
 	const { attribute, evaluation } = evaluatedAttribute
-	const ratingStr = evaluation.value.rating
 
 	const attributeBlock: AttributeJsonExport = {
 		attributeDisplayName: attribute.displayName,
@@ -185,7 +152,7 @@ function serializePrivacyAttribute<V extends Value>(
 	}
 
 	const ratingBlock: RatingJsonExport = {
-		rating: ratingStr,
+		rating: evaluation.value.rating,
 		shortExplanation: renderTypographicContentToString(
 			evaluation.value.shortExplanation,
 			evalStrings,
@@ -210,22 +177,39 @@ function serializePrivacyAttribute<V extends Value>(
 		ratingBlock.references = refs
 	}
 
-	const perVariant = perVariantRatingsForAttribute(wallet, attribute)
-
-	if (perVariant !== undefined) {
-		ratingBlock.perVariantRatings = perVariant
-	}
-
 	return {
 		attribute: attributeBlock,
 		rating: ratingBlock,
 	}
 }
 
-export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExport {
-	const privacy: PrivacyEvaluations = wallet.overall.privacy
-	const { metadata } = wallet
+function serializeEvaluationTree(
+	tree: EvaluationTree,
+	evalStrings: WalletNameAndPseudonymStrings,
+): AttributeGroupsExport {
+	const result: AttributeGroupsExport = {}
 
+	const pairs = mapNonExemptAttributeGroupsInTree(
+		tree,
+		<Vs extends ValueSet>(attrGroup: AttributeGroup<Vs>, evalGroup: EvaluatedGroup<Vs>) => {
+			const entries = mapNonExemptGroupAttributes(
+				evalGroup,
+				evalAttr => [evalAttr.attribute.id, serializeAttribute(evalAttr, evalStrings)] as const,
+			)
+
+			return [attrGroup.id, Object.fromEntries(entries)] as const
+		},
+	)
+
+	for (const [groupId, groupExport] of pairs) {
+		result[groupId] = groupExport
+	}
+
+	return result
+}
+
+export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExport {
+	const { metadata } = wallet
 	const evalStrings = getWalletEvalStrings(wallet)
 
 	const { stage } = getWalletStageAndLadder(wallet)
@@ -238,7 +222,7 @@ export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExpor
 			? getUrl(metadata.urls.repositories[0])
 			: undefined
 
-	return {
+	const payload: RatedWalletJsonExport = {
 		walletId: wallet.metadata.id,
 		types: setItems(wallet.types),
 		variants: setItems(getVariants(wallet.variants)),
@@ -248,20 +232,16 @@ export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExpor
 		stage: stageExport,
 		...(website !== undefined && { website }),
 		...(repository !== undefined && { repository }),
-		overallPrivacy: {
-			addressCorrelation: serializePrivacyAttribute(
-				privacy.addressCorrelation,
-				wallet,
-				evalStrings,
-			),
-			multiAddressCorrelation: serializePrivacyAttribute(
-				privacy.multiAddressCorrelation,
-				wallet,
-				evalStrings,
-			),
-			privateTransfers: serializePrivacyAttribute(privacy.privateTransfers, wallet, evalStrings),
-			hardwarePrivacy: serializePrivacyAttribute(privacy.hardwarePrivacy, wallet, evalStrings),
-			appIsolation: serializePrivacyAttribute(privacy.appIsolation, wallet, evalStrings),
-		},
+		overall: serializeEvaluationTree(wallet.overall, evalStrings),
 	}
+
+	for (const variant of setItems(getVariants(wallet.variants))) {
+		const resolved = wallet.variants[variant]
+
+		if (resolved !== undefined) {
+			payload[variant] = serializeEvaluationTree(resolved.attributes, evalStrings)
+		}
+	}
+
+	return payload
 }

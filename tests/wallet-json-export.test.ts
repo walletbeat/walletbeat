@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { allRatedWallets } from '@/data/wallets'
 import { getUrl } from '@/schema/url'
+import { type Variant, variantEnum } from '@/schema/variants'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { ratedWalletJsonExport, stageToExportString } from '@/utils/wallet-json-export'
 import { walletBlurbText } from '@/utils/wallet-page-markdown'
@@ -48,16 +49,54 @@ describe('ratedWalletJsonExport', () => {
 				expect(payload.stage).toBe(stageToExportString(stage))
 			})
 
-			it('includes overallPrivacy object', () => {
-				expect(payload.overallPrivacy).toBeTypeOf('object')
+			it('includes overall object with attribute groups', () => {
+				expect(payload.overall).toBeTypeOf('object')
+				expect(Object.keys(payload.overall).length).toBeGreaterThan(0)
+				// At least one standard group (e.g. privacy for software wallets) is present
+				const groupIds = Object.keys(payload.overall)
+
+				expect(groupIds.length).toBeGreaterThan(0)
 			})
 
 			it('produces schema-valid JSON', () => {
 				expect(() => assertValidJson(JSON.stringify(payload))).not.toThrow()
 			})
 
-			it('includes shortQuestion, shortExplanation, whyItMatters and details for each privacy attribute', () => {
-				for (const [_key, attr] of Object.entries(payload.overallPrivacy)) {
+			it('payload.variants matches variant keys on payload', () => {
+				for (const v of payload.variants) {
+					expect(payload[v]).toBeDefined()
+					expect(typeof payload[v]).toBe('object')
+				}
+
+				const payloadVariantKeys = Object.keys(payload).filter((k): k is Variant =>
+					variantEnum.is(k),
+				)
+
+				expect(payloadVariantKeys.sort()).toEqual([...payload.variants].sort())
+			})
+
+			it('overall and each variant block have the same set of attribute groups', () => {
+				const overallGroups = Object.keys(payload.overall).sort()
+
+				for (const v of payload.variants) {
+					const variantBlock = payload[v]
+
+					expect(variantBlock).toBeDefined()
+
+					if (variantBlock !== undefined) {
+						expect(Object.keys(variantBlock).sort()).toEqual(overallGroups)
+					}
+				}
+			})
+
+			it('includes shortQuestion, shortExplanation, whyItMatters and details for each attribute in overall.privacy when present', () => {
+				const privacy = payload.overall.privacy
+
+				if (privacy === undefined) {
+					return
+				}
+
+				for (const [_key, attr] of Object.entries(privacy)) {
 					expect(attr.attribute.shortQuestion).toBeDefined()
 					expect(typeof attr.attribute.shortQuestion).toBe('string')
 					expect(attr.attribute.shortQuestion.length).toBeGreaterThan(0)
@@ -73,8 +112,14 @@ describe('ratedWalletJsonExport', () => {
 				}
 			})
 
-			it('includes howIsEvaluated (heading and methodology) for each privacy attribute', () => {
-				for (const [_key, attr] of Object.entries(payload.overallPrivacy)) {
+			it('includes howIsEvaluated (heading and methodology) for each attribute in overall.privacy when present', () => {
+				const privacy = payload.overall.privacy
+
+				if (privacy === undefined) {
+					return
+				}
+
+				for (const [_key, attr] of Object.entries(privacy)) {
 					expect(attr.attribute.howIsEvaluated).toBeDefined()
 					expect(attr.attribute.howIsEvaluated.heading).toBeDefined()
 					expect(typeof attr.attribute.howIsEvaluated.heading).toBe('string')
@@ -96,8 +141,11 @@ describe('ratedWalletJsonExport', () => {
 			}
 
 			const payload = ratedWalletJsonExport(metamask)
+			const privacy = payload.overall.privacy
 
-			for (const [_key, attr] of Object.entries(payload.overallPrivacy)) {
+			expect(privacy).toBeDefined()
+
+			for (const [_key, attr] of Object.entries(privacy)) {
 				expect(attr.attribute.shortQuestion).toBeDefined()
 				expect(attr.attribute.shortQuestion.length).toBeGreaterThan(0)
 				expect(attr.rating.shortExplanation).toBeDefined()
@@ -108,12 +156,10 @@ describe('ratedWalletJsonExport', () => {
 				expect(attr.rating.details.length).toBeGreaterThan(0)
 			}
 
-			// MetaMask has multiple variants; perVariantRatings may appear for variant-specific attributes.
-			// References may appear on any attribute.
 			expect(() => assertValidJson(JSON.stringify(payload))).not.toThrow()
 
 			// Private token transfers should include the attribute's short question (shown in UI).
-			expect(payload.overallPrivacy.privateTransfers.attribute.shortQuestion).toBe(
+			expect(privacy.privateTransfers.attribute.shortQuestion).toBe(
 				'Can you send and receive tokens without revealing your transaction history to others?',
 			)
 		})
