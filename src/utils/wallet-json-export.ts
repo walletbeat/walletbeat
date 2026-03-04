@@ -4,7 +4,6 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import type {
-	Attribute,
 	AttributeGroup,
 	EvaluatedAttribute,
 	EvaluatedGroup,
@@ -13,15 +12,31 @@ import type {
 	WalletNameAndPseudonymStrings,
 } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
-import type { WalletStage } from '@/schema/stages'
+import {
+	type WalletLadderEvaluation,
+	type WalletStage,
+	type WalletStageGroup,
+} from '@/schema/stages'
 import { getUrl } from '@/schema/url'
 import { getVariants, type Variant } from '@/schema/variants'
 import { type RatedWallet } from '@/schema/wallet'
 import type { WalletType } from '@/schema/wallet-types'
 import { renderTypographicContentToString } from '@/types/content'
 import { setItems } from '@/types/utils/non-empty'
-import { getWalletEvalStrings, renderEvaluationContentOrFallback } from '@/utils/evaluation-content'
+import { getHowIsEvaluatedHeading } from '@/utils/attribute-display'
+import {
+	getWalletEvalStrings,
+	renderCriterionDescriptionToText,
+	renderEvaluationContentOrFallback,
+	renderGroupDescriptionToText,
+} from '@/utils/evaluation-content'
 import { getWalletStageAndLadder } from '@/utils/stage'
+import {
+	attributesById,
+	computeStageCountsAndStatus,
+	getCriterionAttributeId,
+	getCriterionDisplayName,
+} from '@/utils/stage-attributes'
 import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 const DETAILS_FALLBACK = 'See full details on the wallet page.'
@@ -92,6 +107,31 @@ export interface AttributeExportBlock {
 /** Attribute groups keyed by group id, then attribute id, then attribute + rating block. */
 export type AttributeGroupsExport = Record<string, Record<string, AttributeExportBlock>>
 
+/** Single criterion within a stage for JSON export (mirrors markdown bullet). */
+export interface StageCriterionBreakdownItemJsonExport {
+	criterionId: string
+	attributeId: string | null
+	attributeDisplayName: string
+	description: string
+	rating: 'PASS' | 'FAIL' | 'EXEMPT' | 'UNRATED'
+}
+
+/** Criteria group within a stage for JSON export (mirrors markdown #### heading + bullets). */
+export interface StageCriteriaGroupBreakdownItemJsonExport {
+	description: string
+	criteria: StageCriterionBreakdownItemJsonExport[]
+}
+
+/** Per-stage criteria counts and status for JSON export (overall ladder only). */
+export interface StageBreakdownItemJsonExport {
+	stageId: string
+	label: string
+	passedCount: number
+	totalCount: number
+	status: 'PASS' | 'PARTIAL' | 'FAIL' | 'UNRATED'
+	criteriaGroups: StageCriteriaGroupBreakdownItemJsonExport[]
+}
+
 export interface RatedWalletJsonExportBase {
 	overall: AttributeGroupsExport
 	types: WalletType[]
@@ -101,6 +141,7 @@ export interface RatedWalletJsonExportBase {
 	description: string
 	lastUpdated: string
 	stage: string | null
+	stageBreakdown: StageBreakdownItemJsonExport[] | null
 	website?: string
 	repository?: string
 }
@@ -122,16 +163,6 @@ function serializeReferences(
 		...(ref.explanation !== undefined && { explanation: ref.explanation }),
 		urls: ref.urls.map(u => ({ label: u.label, url: u.url })),
 	}))
-}
-
-function getHowIsEvaluatedHeading<V extends Value>(attribute: Attribute<V>): string {
-	const { wording } = attribute
-
-	if (wording.midSentenceName === null) {
-		return wording.howIsEvaluated
-	}
-
-	return `How is ${wording.midSentenceName} evaluated?`
 }
 
 function serializeAttribute<V extends Value>(
@@ -208,12 +239,76 @@ function serializeEvaluationTree(
 	return result
 }
 
+function serializeStageCriteriaGroup(
+	group: WalletStageGroup,
+	stageEvaluatableWallet: Omit<RatedWallet, 'metadata' | 'ladders'>,
+	evalStrings: WalletNameAndPseudonymStrings,
+): StageCriteriaGroupBreakdownItemJsonExport {
+	const description = renderGroupDescriptionToText(group, evalStrings)
+
+	const criteria: StageCriterionBreakdownItemJsonExport[] = []
+
+	for (const criterion of group.criteria) {
+		const evaluation = criterion.evaluate(stageEvaluatableWallet)
+		const attributeId = getCriterionAttributeId(criterion)
+		const attribute = attributeId !== null ? (attributesById.get(attributeId) ?? null) : null
+		const attributeDisplayName = getCriterionDisplayName(criterion, attributeId, attribute)
+		const descText = renderCriterionDescriptionToText(criterion, evalStrings)
+
+		criteria.push({
+			criterionId: criterion.id,
+			attributeId,
+			attributeDisplayName,
+			description: descText,
+			rating: evaluation.rating,
+		})
+	}
+
+	return { description, criteria }
+}
+
+function computeStageBreakdown(
+	wallet: RatedWallet,
+	ladderEvaluation: WalletLadderEvaluation | null,
+): StageBreakdownItemJsonExport[] | null {
+	if (ladderEvaluation === null || ladderEvaluation.stage === 'NOT_APPLICABLE') {
+		return null
+	}
+
+	const evalStrings = getWalletEvalStrings(wallet)
+	const { metadata: _metadata, ladders: _ladders, ...stageEvaluatableWallet } = wallet
+	const result: StageBreakdownItemJsonExport[] = []
+
+	for (const s of ladderEvaluation.ladder.stages) {
+		const { passedCount, totalCount, status } = computeStageCountsAndStatus(
+			s,
+			stageEvaluatableWallet,
+		)
+
+		const criteriaGroups = s.criteriaGroups.map(group =>
+			serializeStageCriteriaGroup(group, stageEvaluatableWallet, evalStrings),
+		)
+
+		result.push({
+			stageId: s.id,
+			label: s.label,
+			passedCount,
+			totalCount,
+			status,
+			criteriaGroups,
+		})
+	}
+
+	return result
+}
+
 export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExport {
 	const { metadata } = wallet
 	const evalStrings = getWalletEvalStrings(wallet)
 
-	const { stage } = getWalletStageAndLadder(wallet)
+	const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)
 	const stageExport = stageToExportString(stage)
+	const stageBreakdown = computeStageBreakdown(wallet, ladderEvaluation)
 
 	const website =
 		metadata.urls?.websites?.[0] !== undefined ? getUrl(metadata.urls.websites[0]) : undefined
@@ -230,6 +325,7 @@ export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExpor
 		description: walletBlurbText(wallet),
 		lastUpdated: metadata.lastUpdated,
 		stage: stageExport,
+		stageBreakdown,
 		...(website !== undefined && { website }),
 		...(repository !== undefined && { repository }),
 		overall: serializeEvaluationTree(wallet.overall, evalStrings),

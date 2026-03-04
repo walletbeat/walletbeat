@@ -1,8 +1,10 @@
 import type { WalletNameAndPseudonymStrings } from '@/schema/attributes'
+import type { WalletStageCriterion, WalletStageGroup } from '@/schema/stages'
 import type { RatedWallet } from '@/schema/wallet'
 import {
 	type Content,
 	isTypographicContent,
+	type Paragraph,
 	renderTypographicContentToString,
 } from '@/types/content'
 
@@ -34,4 +36,41 @@ export function renderEvaluationContentOrFallback(
 	}
 
 	return renderTypographicContentToString(content, strings)
+}
+
+/**
+ * Render stage criterion or group description content to plain text.
+ * Centralizes "content → string": typographic content is rendered with eval strings and trimmed;
+ * custom content yields empty string.
+ * Accepts Paragraph (e.g. from stage definitions) or Content<WalletNameAndPseudonymStrings>.
+ */
+function descriptionContentToText(
+	content: Content<WalletNameAndPseudonymStrings> | Paragraph,
+	evalStrings: WalletNameAndPseudonymStrings,
+): string {
+	if (!isTypographicContent(content)) {
+		return ''
+	}
+
+	return renderTypographicContentToString(content, evalStrings).trim()
+}
+
+/**
+ * Criterion description as plain text (for JSON export or further markdown processing).
+ */
+export function renderCriterionDescriptionToText(
+	criterion: WalletStageCriterion,
+	evalStrings: WalletNameAndPseudonymStrings,
+): string {
+	return descriptionContentToText(criterion.description, evalStrings)
+}
+
+/**
+ * Criteria group description as plain text (for JSON export or further markdown processing).
+ */
+export function renderGroupDescriptionToText(
+	group: WalletStageGroup,
+	evalStrings: WalletNameAndPseudonymStrings,
+): string {
+	return descriptionContentToText(group.description, evalStrings)
 }

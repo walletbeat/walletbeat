@@ -41,6 +41,57 @@ const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
 	stage.criteriaGroups.flatMap(criteriaGroup => criteriaGroup.criteria)
 
 /**
+ * Aggregate status for a stage or criteria group based on applicable criterion ratings.
+ * Rule: all exempt → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
+ */
+export type StageCountsStatus = 'PASS' | 'PARTIAL' | 'FAIL' | 'UNRATED'
+
+export interface StageCountsAndStatus {
+	passedCount: number
+	totalCount: number
+	status: StageCountsStatus
+}
+
+/**
+ * Compute passed/total counts and aggregate status for a set of stage criteria.
+ * "Applicable" = not EXEMPT. Status: all exempt → UNRATED; else all passed → PASS;
+ * else any passed → PARTIAL; else FAIL.
+ */
+export function computeCountsAndStatus(
+	criteria: WalletStageCriterion[],
+	wallet: StageEvaluatableWallet,
+): StageCountsAndStatus {
+	const allEvaluations = criteria.map(criterion => criterion.evaluate(wallet))
+	const applicableEvaluations = allEvaluations.filter(e => e.rating !== StageCriterionRating.EXEMPT)
+	const passedCount = applicableEvaluations.filter(
+		e => e.rating === StageCriterionRating.PASS,
+	).length
+	const totalCount = applicableEvaluations.length
+	const allExempt =
+		allEvaluations.length > 0 && allEvaluations.every(e => e.rating === StageCriterionRating.EXEMPT)
+	const allPassed = totalCount > 0 && passedCount === totalCount
+	const status: StageCountsStatus = allExempt
+		? 'UNRATED'
+		: allPassed
+			? 'PASS'
+			: passedCount > 0
+				? 'PARTIAL'
+				: 'FAIL'
+
+	return { passedCount, totalCount, status }
+}
+
+/**
+ * Compute passed/total counts and aggregate status for a stage.
+ */
+export function computeStageCountsAndStatus(
+	stage: WalletStage,
+	wallet: StageEvaluatableWallet,
+): StageCountsAndStatus {
+	return computeCountsAndStatus(allCriteriaInStage(stage), wallet)
+}
+
+/**
  * Check if an attribute is used in any stage requirement by checking if the attribute
  * is referenced in the ladder structure. Since variantsMustPassAttribute creates closures
  * that capture the attribute, we check if the attribute ID appears in the serialized
@@ -101,6 +152,29 @@ export const isAttributeUsedInStage = (
  */
 export const getCriterionAttributeId = (criterion: WalletStageCriterion): string | null =>
 	getEvaluateFunctionAttributeId(criterion.evaluate)
+
+// TODO: https://github.com/walletbeat/walletbeat/issues/555
+/**
+ * Criterion id (snake_case) to human-readable label (Title Case).
+ * Used when the criterion has no linked attribute (getCriterionAttributeId returns null).
+ */
+export function criterionIdToDisplayName(id: string): string {
+	return id
+		.split('_')
+		.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+		.join(' ')
+}
+
+/**
+ * Resolve display name for a stage criterion: attribute display name, then attribute ID, then criterion id formatted.
+ */
+export function getCriterionDisplayName(
+	criterion: WalletStageCriterion,
+	attributeId: string | null,
+	attribute: Attribute | null,
+): string {
+	return attribute?.displayName ?? attributeId ?? criterionIdToDisplayName(criterion.id)
+}
 
 /**
  * Get all criteria that reference a specific attribute across all ladders.

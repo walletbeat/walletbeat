@@ -2,6 +2,7 @@ import { attributeTree } from '@/schema/attribute-groups'
 import type { Attribute, ExampleRating, Value } from '@/schema/attributes'
 import { normalizeExampleRatings } from '@/schema/attributes'
 import { renderTypographicContentToString, type TypographicContent } from '@/types/content'
+import { getHowIsEvaluatedHeading, getWhyItMattersHeading } from '@/utils/attribute-display'
 import { normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 
 const GENERIC_WALLET_NAME = 'the wallet'
@@ -71,26 +72,6 @@ function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
 	}
 
 	return lines
-}
-
-function getHowIsEvaluatedHeading<V extends Value>(attribute: Attribute<V>): string {
-	const { wording } = attribute
-
-	if (wording.midSentenceName === null) {
-		return wording.howIsEvaluated
-	}
-
-	return `How is ${wording.midSentenceName} evaluated?`
-}
-
-function getWhyItMattersHeading<V extends Value>(attribute: Attribute<V>): string {
-	const { wording } = attribute
-
-	if (wording.midSentenceName === null) {
-		return 'Why it matters'
-	}
-
-	return `Why ${wording.midSentenceName} matters`
 }
 
 /**

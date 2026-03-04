@@ -5,12 +5,10 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import {
-	type Attribute,
 	type AttributeGroup,
 	type EvaluatedGroup,
 	Rating,
 	ratingToText,
-	type Value,
 	type ValueSet,
 } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
@@ -20,48 +18,25 @@ import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/sch
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase } from '@/types/utils/text'
-import { getWalletEvalStrings, renderEvaluationContentOrFallback } from '@/utils/evaluation-content'
+import { getHowToImproveHeading } from '@/utils/attribute-display'
+import {
+	getWalletEvalStrings,
+	renderCriterionDescriptionToText,
+	renderEvaluationContentOrFallback,
+	renderGroupDescriptionToText,
+} from '@/utils/evaluation-content'
 import {
 	collapseToSingleLine,
 	markdownBlockquote,
 	normalizeMarkdownBlankLines,
 } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
-
-// TODO: https://github.com/walletbeat/walletbeat/issues/555
-/**
- * Convert a stage criterion id (snake_case) to a human-readable label (Title Case).
- * Used when the criterion has no linked attribute (getCriterionAttributeId returns null).
- */
-function criterionIdToDisplayName(id: string): string {
-	return id
-		.split('_')
-		.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-		.join(' ')
-}
-
-/**
- * Return the "How to improve" section heading using Attribute.wording.
- * Complex wording: use the rendered whatCanWalletDoAboutIts sentence.
- * Simple wording: "What can {walletName} do about its {midSentenceName}?"
- */
-function getHowToImproveHeading<V extends Value>(
-	attribute: Attribute<V>,
-	walletName: string,
-): string {
-	const { wording } = attribute
-
-	if (wording.midSentenceName === null) {
-		return collapseToSingleLine(
-			renderTypographicContentToString(wording.whatCanWalletDoAboutIts, {
-				WALLET_NAME: walletName,
-			}),
-		)
-	}
-
-	return `What can ${walletName} do about its ${wording.midSentenceName}?`
-}
+import {
+	attributesById,
+	computeStageCountsAndStatus,
+	getCriterionAttributeId,
+	getCriterionDisplayName,
+} from '@/utils/stage-attributes'
 
 /**
  * Return the wallet blurb as a single collapsed line, suitable for use
@@ -141,17 +116,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 				stageSection.push(`### Stage ${stageIndex}: ${s.label}`, '')
 
-				const allCriteria = s.criteriaGroups.flatMap(group => group.criteria)
-				const allEvaluations = allCriteria.map(criterion =>
-					criterion.evaluate(stageEvaluatableWallet),
-				)
-				const applicableEvaluations = allEvaluations.filter(
-					e => e.rating !== StageCriterionRating.EXEMPT,
-				)
-				const passedCount = applicableEvaluations.filter(
-					e => e.rating === StageCriterionRating.PASS,
-				).length
-				const totalCount = applicableEvaluations.length
+				const { passedCount, totalCount } = computeStageCountsAndStatus(s, stageEvaluatableWallet)
 
 				if (totalCount > 0) {
 					const word = totalCount === 1 ? 'criterion' : 'criteria'
@@ -160,15 +125,10 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 				}
 
 				for (const criteriaGroup of s.criteriaGroups) {
-					if (
-						isTypographicContent(criteriaGroup.description) &&
-						criteriaGroup.description !== undefined
-					) {
-						const groupDesc = normalizeMarkdownBlankLines(
-							renderTypographicContentToString(criteriaGroup.description, {
-								WALLET_NAME: walletName,
-							}),
-						).trim()
+					const groupDescRaw = renderGroupDescriptionToText(criteriaGroup, evalStrings)
+
+					if (groupDescRaw !== '') {
+						const groupDesc = normalizeMarkdownBlankLines(groupDescRaw).trim()
 
 						if (groupDesc !== '') {
 							const groupHeading =
@@ -184,10 +144,9 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						const evaluation = criterion.evaluate(stageEvaluatableWallet)
 						const attributeId = getCriterionAttributeId(criterion)
 						const attribute = attributeId ? (attributesById.get(attributeId) ?? null) : null
-						const displayName =
-							attribute?.displayName ?? attributeId ?? criterionIdToDisplayName(criterion.id)
+						const displayName = getCriterionDisplayName(criterion, attributeId, attribute)
 						const descText = normalizeMarkdownBlankLines(
-							renderTypographicContentToString(criterion.description, { WALLET_NAME: walletName }),
+							renderCriterionDescriptionToText(criterion, evalStrings),
 						).trim()
 						const descForBullet =
 							descText !== '' && /^[a-z]/.test(descText)

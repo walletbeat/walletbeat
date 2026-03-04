@@ -49,6 +49,75 @@ describe('ratedWalletJsonExport', () => {
 				expect(payload.stage).toBe(stageToExportString(stage))
 			})
 
+			it('includes stageBreakdown (null or array)', () => {
+				const { ladderEvaluation } = getWalletStageAndLadder(wallet)
+
+				expect(payload.stageBreakdown === null || Array.isArray(payload.stageBreakdown)).toBe(true)
+
+				if (payload.stage === null || payload.stage === 'NOT_APPLICABLE') {
+					expect(payload.stageBreakdown).toBeNull()
+				}
+
+				if (payload.stageBreakdown !== null) {
+					expect(payload.stageBreakdown.length).toBe(ladderEvaluation?.ladder.stages.length ?? 0)
+
+					const statuses = ['PASS', 'PARTIAL', 'FAIL', 'UNRATED']
+
+					for (const item of payload.stageBreakdown) {
+						expect(item).toHaveProperty('stageId')
+						expect(typeof item.stageId).toBe('string')
+						expect(item).toHaveProperty('label')
+						expect(typeof item.label).toBe('string')
+						expect(item).toHaveProperty('passedCount')
+						expect(typeof item.passedCount).toBe('number')
+						expect(item).toHaveProperty('totalCount')
+						expect(typeof item.totalCount).toBe('number')
+						expect(item.passedCount).toBeGreaterThanOrEqual(0)
+						expect(item.totalCount).toBeGreaterThanOrEqual(0)
+						expect(item.passedCount).toBeLessThanOrEqual(item.totalCount)
+						expect(item).toHaveProperty('status')
+						expect(statuses).toContain(item.status)
+					}
+				}
+			})
+
+			it('includes stageBreakdown criteriaGroups and criteria (markdown-equivalent detail)', () => {
+				if (payload.stageBreakdown === null) {
+					return
+				}
+
+				const criterionRatings = ['PASS', 'FAIL', 'EXEMPT', 'UNRATED']
+
+				for (const stageItem of payload.stageBreakdown) {
+					expect(stageItem).toHaveProperty('criteriaGroups')
+					expect(Array.isArray(stageItem.criteriaGroups)).toBe(true)
+
+					for (const group of stageItem.criteriaGroups) {
+						expect(group).toHaveProperty('description')
+						expect(typeof group.description).toBe('string')
+						expect(group).toHaveProperty('criteria')
+						expect(Array.isArray(group.criteria)).toBe(true)
+
+						for (const criterion of group.criteria) {
+							expect(criterion).toHaveProperty('criterionId')
+							expect(typeof criterion.criterionId).toBe('string')
+							expect(criterion.criterionId.length).toBeGreaterThan(0)
+							expect(criterion).toHaveProperty('attributeId')
+							expect(
+								criterion.attributeId === null || typeof criterion.attributeId === 'string',
+							).toBe(true)
+							expect(criterion).toHaveProperty('attributeDisplayName')
+							expect(typeof criterion.attributeDisplayName).toBe('string')
+							expect(criterion.attributeDisplayName.length).toBeGreaterThan(0)
+							expect(criterion).toHaveProperty('description')
+							expect(typeof criterion.description).toBe('string')
+							expect(criterion).toHaveProperty('rating')
+							expect(criterionRatings).toContain(criterion.rating)
+						}
+					}
+				}
+			})
+
 			it('includes overall object with attribute groups', () => {
 				expect(payload.overall).toBeTypeOf('object')
 				expect(Object.keys(payload.overall).length).toBeGreaterThan(0)
