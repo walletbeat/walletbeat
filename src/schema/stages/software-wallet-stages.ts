@@ -49,7 +49,7 @@ export const softwareWalletStageZero: WalletStage = {
 						'The source code must be publicly available so that it can be reviewed by Walletbeat.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, sourceVisibility),
-					displayName: 'Source Available',
+					displayName: 'Source Availabilty',
 				},
 			],
 		},
@@ -115,7 +115,7 @@ export const softwareWalletStageOne: WalletStage = {
 							}
 						},
 					),
-					displayName: 'Hardware Wallet Subset',
+					displayName: 'Hardware Wallet Support',
 				},
 				{
 					id: 'chain_verification',
@@ -239,7 +239,7 @@ export const softwareWalletStageOne: WalletStage = {
 						'Free and Open Source Software (FOSS) licensing allows better collaboration, more transparency into the software development practices that go into the project, and allows security researchers to more easily identify and report security vulnerabilities.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, openSource),
-					displayName: 'Foss',
+					displayName: 'Free and Open Source Licensing',
 				},
 			],
 		},
@@ -423,7 +423,7 @@ const softwareWalletStageTwo: WalletStage = {
 							}
 						},
 					),
-					displayName: 'Support Own Chains',
+					displayName: 'Chain Configurability',
 				},
 			],
 		},
@@ -445,7 +445,7 @@ const softwareWalletStageTwo: WalletStage = {
 						This requires a reliable and transparent source of funding.
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, funding),
-					displayName: 'Funding',
+					displayName: 'Funding Transparency',
 				},
 				{
 					id: 'fee_transparency',
@@ -481,7 +481,7 @@ const softwareWalletStageTwo: WalletStage = {
 						allowPartial: false,
 						ifNoVariantInScope: null,
 					}),
-					displayName: 'Chain Specific Address Resolution',
+					displayName: 'Chain-Specific Address Resolution',
 				},
 				{
 					id: 'account_abstraction',

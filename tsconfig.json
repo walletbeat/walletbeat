@@ -9,7 +9,7 @@
 			"@/tests/*": ["./tests/*"],
 			"@/*": ["src/*"]
 		},
-		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"lib": ["esnext"],
 		"forceConsistentCasingInFileNames": false
 	}
 }
