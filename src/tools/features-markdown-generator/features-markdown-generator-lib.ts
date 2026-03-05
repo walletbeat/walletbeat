@@ -90,35 +90,12 @@ function jsDocToDescription(lines: string[]): string {
 		.join('\n\n')
 }
 
-/** Convert JSDoc lines to a single-line description suitable for table cells. */
+/** Convert JSDoc lines to a single-line description. */
 function jsDocToSingleLine(lines: string[]): string {
 	return lines
 		.filter(l => l.trim() !== '')
 		.join(' ')
 		.trim()
-}
-
-// --- Markdown Table Helpers ---
-
-function escapeMdCell(text: string): string {
-	return text.replace(/\|/g, '\\|').replace(/\n/g, ' ')
-}
-
-function generateTable(headers: string[], rows: string[][]): string {
-	if (rows.length === 0) {
-		return ''
-	}
-
-	const lines: string[] = []
-
-	lines.push('| ' + headers.join(' | ') + ' |')
-	lines.push('| ' + headers.map(() => '---').join(' | ') + ' |')
-
-	for (const row of rows) {
-		lines.push('| ' + row.map(escapeMdCell).join(' | ') + ' |')
-	}
-
-	return lines.join('\n') + '\n'
 }
 
 // --- Type Rendering ---
@@ -128,7 +105,7 @@ function renderInterfaceMembers(
 	sourceText: string,
 	members: ts.NodeArray<ts.TypeElement>,
 ): string {
-	const rows: string[][] = []
+	const lines: string[] = []
 
 	for (const member of members) {
 		if (!ts.isPropertySignature(member)) {
@@ -136,18 +113,20 @@ function renderInterfaceMembers(
 		}
 
 		const name = member.name.getText(sourceFile)
-		const type = member.type?.getText(sourceFile) ?? 'unknown'
-		const optional = member.questionToken !== undefined ? 'Yes' : ''
+		const rawType = member.type?.getText(sourceFile) ?? 'unknown'
+		const type = rawType.replace(/\s+/g, ' ').trim()
+		const optional = member.questionToken !== undefined ? ', optional' : ''
 		const desc = jsDocToSingleLine(extractJSDocLines(sourceText, member))
+		const descPart = desc ? `: ${desc}` : ''
 
-		rows.push([`\`${name}\``, type, optional, desc])
+		lines.push(`- \`${name}\` (\`${type}\`${optional})${descPart}`)
 	}
 
-	if (rows.length === 0) {
+	if (lines.length === 0) {
 		return '_No properties._\n'
 	}
 
-	return generateTable(['Field', 'Type', 'Optional', 'Description'], rows)
+	return lines.join('\n') + '\n'
 }
 
 function renderEnumMembers(
@@ -155,21 +134,22 @@ function renderEnumMembers(
 	sourceText: string,
 	members: ts.NodeArray<ts.EnumMember>,
 ): string {
-	const rows: string[][] = []
+	const lines: string[] = []
 
 	for (const member of members) {
 		const name = member.name.getText(sourceFile)
 		const value = member.initializer?.getText(sourceFile) ?? '(auto)'
 		const desc = jsDocToSingleLine(extractJSDocLines(sourceText, member))
+		const descPart = desc ? `: ${desc}` : ''
 
-		rows.push([`\`${name}\``, value, desc])
+		lines.push(`- \`${name}\` = \`${value}\`${descPart}`)
 	}
 
-	if (rows.length === 0) {
+	if (lines.length === 0) {
 		return '_No members._\n'
 	}
 
-	return generateTable(['Member', 'Value', 'Description'], rows)
+	return lines.join('\n') + '\n'
 }
 
 // --- Declaration Processing ---
@@ -303,7 +283,7 @@ function pathToAnchor(relPath: string): string {
 
 // --- Main Generator ---
 
-function generateMarkdown(config: FeaturesMarkdownConfig): string {
+export function generateMarkdown(config: FeaturesMarkdownConfig): string {
 	// Build ordered file list: features.ts first, then sub-files alphabetically
 	const files: string[] = [config.featuresSrcFile, ...collectTsFiles(config.featuresDir)]
 
@@ -342,10 +322,12 @@ function generateMarkdown(config: FeaturesMarkdownConfig): string {
 		'> Types are defined in `src/schema/features.ts` and its sub-modules.\n' +
 		'>\n' +
 		'> **Core concepts:**\n' +
+		'>\n' +
 		"> - `Support<T>` — Discriminated union: `{ support: 'NOT_SUPPORTED' }` OR `{ support: 'SUPPORTED', ...T }`\n" +
 		'> - `VariantFeature<T>` — Variant-specific value (browser/mobile/desktop); resolved to a single value at evaluation time\n' +
 		'> - `WithRef<T>` — Adds optional `ref: Reference[]` (citations) to type T\n' +
 		'> - `MustRef<T>` — Adds mandatory `ref: Reference[]` to type T\n' +
+		'> - `Nullable<T>` — All fields of T become nullable (i.e. `T[K] | null` for all K); the whole object may also be `null`\n' +
 		'\n' +
 		'## Table of Contents\n' +
 		'\n' +
@@ -384,8 +366,6 @@ export function featuresMarkdownUpdate(config: FeaturesMarkdownConfig): void {
 				'docs/features.md is out of sync with the TypeScript source. Run `pnpm fix` to regenerate.',
 			)
 		}
-
-		logger.info('docs/features.md is up to date.')
 	} else {
 		if (fs.existsSync(config.outputPath)) {
 			const existingContent = fs.readFileSync(config.outputPath, 'utf-8')
