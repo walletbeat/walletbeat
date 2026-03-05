@@ -49,7 +49,7 @@ export const softwareWalletStageZero: WalletStage = {
 						'The source code must be publicly available so that it can be reviewed by Walletbeat.',
 					),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, sourceVisibility),
-					displayName: 'Source Availabilty',
+					displayName: 'Source Availability',
 				},
 			],
 		},
