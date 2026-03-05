@@ -17,7 +17,7 @@ export enum ExposedAccountsBehavior {
 	/**
 	 * The wallet exposes all user accounts to every connected app.
 	 * (e.g. `eth_accounts` returns three addresses even though only one is active.)
-	 * To identify: connect the wallet to a dapp while having multiple accounts set up,
+	 * To identify: connect the wallet to an app while having multiple accounts set up,
 	 * then call `eth_accounts` — all accounts are returned, not just the active one.
 	 */
 	ALL_ACCOUNTS = 'ALL_ACCOUNTS',
@@ -26,7 +26,7 @@ export enum ExposedAccountsBehavior {
 	 * The wallet exposes only the currently active/selected account.
 	 * (e.g. `eth_accounts` returns a single address — whichever account is selected
 	 * in the wallet at that moment.)
-	 * To identify: switch accounts in the wallet and call `eth_accounts` from a dapp —
+	 * To identify: switch accounts in the wallet and call `eth_accounts` from an app —
 	 * only one address is returned and it matches the currently active account.
 	 */
 	ACTIVE_ACCOUNT_ONLY = 'ACTIVE_ACCOUNT_ONLY',
@@ -34,9 +34,9 @@ export enum ExposedAccountsBehavior {
 	/**
 	 * There is no default set of exposed accounts; the user must explicitly choose
 	 * which account(s) to share during the connection flow.
-	 * (e.g. The wallet shows an account picker every time a new dapp requests access,
+	 * (e.g. The wallet shows an account picker every time a new app requests access,
 	 * with no account pre-selected.)
-	 * To identify: on a freshly loaded dapp that has never been connected before,
+	 * To identify: on a freshly loaded app that has never been connected before,
 	 * call `eth_accounts` before initiating a connect — it returns an empty array.
 	 * During the connect flow the wallet prompts the user to choose which account to expose.
 	 */
@@ -44,10 +44,10 @@ export enum ExposedAccountsBehavior {
 
 	/**
 	 * The wallet exposes a different address per app/origin, derived specifically
-	 * for that dapp, so apps cannot correlate activity across sites.
+	 * for that app, so apps cannot correlate activity across sites.
 	 * (e.g. app.uniswap.org sees address 0xAAA, app.aave.com sees address 0xBBB,
 	 * even though they both belong to the same user.)
-	 * To identify: connect the wallet to two different dapps and compare the addresses
+	 * To identify: connect the wallet to two different apps and compare the addresses
 	 * returned by `eth_accounts` — they should differ even for the same underlying account.
 	 */
 	APP_SPECIFIC_ACCOUNT = 'APP_SPECIFIC_ACCOUNT',
@@ -114,9 +114,9 @@ interface BaseAppIsolation {
 	 * which address(es) the user had selected to connect for that specific
 	 * app, and use them by default?
 	 * To test: connect to an app using a specific account, then disconnect.
-	 * Open the connection flow for the same dapp again — check whether the
+	 * Open the connection flow for the same app again — check whether the
 	 * wallet pre-selects or highlights the account that was previously used
-	 * for that dapp specifically.
+	 * for that app specifically.
 	 */
 	useAppSpecificLastConnectedAddresses: Support<WithRef<{}>>
 }

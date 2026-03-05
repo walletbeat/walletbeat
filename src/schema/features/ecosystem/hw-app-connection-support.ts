@@ -11,13 +11,13 @@ import { type NonEmptySet, setItems } from '@/types/utils/non-empty'
 export enum AppConnectionMethod {
 	/**
 	 * The wallet connects to apps through its own proprietary closed-source application.
-	 * (e.g. A hardware wallet that ships its own desktop app for connecting to dapps, where the app's source code is not publicly available.)
+	 * (e.g. A hardware wallet that ships its own desktop app for connecting to apps, where the app's source code is not publicly available.)
 	 */
 	VENDOR_CLOSED_SOURCE_APP = 'VENDOR_CLOSED_SOURCE_APP',
 
 	/**
 	 * The wallet connects to apps through its own open-source application.
-	 * (e.g. A hardware wallet that ships its own desktop app for connecting to dapps, where the app's source code is publicly available and auditable.)
+	 * (e.g. A hardware wallet that ships its own desktop app for connecting to apps, where the app's source code is publicly available and auditable.)
 	 */
 	VENDOR_OPEN_SOURCE_APP = 'VENDOR_OPEN_SOURCE_APP',
 }

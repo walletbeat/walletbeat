@@ -453,7 +453,7 @@ export enum DataDecoded {
 
 /**
  * What does the wallet provide for message signing legibility?
- * To test: trigger an `eth_signTypedData_v4` request (e.g. via a dapp that
+ * To test: trigger an `eth_signTypedData_v4` request (e.g. via an app that
  * uses EIP-712 signatures, or via the browser console) and observe what the
  * wallet's approval screen shows.
  *
