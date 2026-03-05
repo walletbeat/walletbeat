@@ -199,6 +199,7 @@
 	import Tooltip from '@/components/Tooltip.svelte'
 	import Typography from '@/components/Typography.svelte'
 	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
+	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 </script>
 
@@ -894,6 +895,8 @@
 								<FundingDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'AccountRecoveryDetails'}
 								<AccountRecoveryDetails {...componentProps} {wallet} {value} />
+							{:else if componentName === 'AccountUnruggabilityDetails'}
+								<AccountUnruggabilityDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'UnratedAttribute'}
 								<UnratedAttribute {...componentProps} {wallet} {value} />
 							{/if}

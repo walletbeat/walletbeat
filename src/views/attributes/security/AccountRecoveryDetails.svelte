@@ -21,7 +21,18 @@
 	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
 </script>
 
-{#if value.outcomes !== null}
+{#if value.outcomes === null}
+	<Typography
+		content={{
+			contentType: ContentType.MARKDOWN,
+			markdown: trimWhitespacePrefix(`
+				{{WALLET_NAME}} does not implement guardian-based account recovery.
+				The user will lose access to their account if they lose their seed phrase.
+			`),
+		}}
+		strings={{ WALLET_NAME: wallet.metadata.displayName }}
+	/>
+{:else}
 	{@const successfulOutcomes = value.outcomes.filter(outcome =>
 		isAccountRecoverable(outcome.recovery),
 	)}
