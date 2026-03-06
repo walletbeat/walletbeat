@@ -46,19 +46,19 @@ describe('ratedWalletJsonExport', () => {
 				}
 			})
 
-			it('payload.variants matches variant keys on payload', () => {
-				const payloadVariantKeys = Object.keys(payload).filter((k): k is Variant =>
+			it('payload.variants matches variant keys in payload.perVariant', () => {
+				const perVariantKeys = Object.keys(payload.perVariant).filter((k): k is Variant =>
 					variantEnum.is(k),
 				)
 
-				expect(payloadVariantKeys.sort()).toEqual([...payload.variants].sort())
+				expect(perVariantKeys.sort()).toEqual([...payload.variants].sort())
 			})
 
 			it('overall and each variant block have the same set of attribute groups', () => {
 				const overallGroups = Object.keys(payload.overall).sort()
 
 				for (const v of payload.variants) {
-					const variantBlock = payload[v]
+					const variantBlock = payload.perVariant[v]
 
 					expect(variantBlock).toBeDefined()
 

@@ -1,12 +1,13 @@
 {
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"type": "object",
-	"description": "Rated wallet JSON export: top-level metadata, an overall block (aggregated attribute groups), and one block per variant (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE) present in variants, each with the same attribute-group structure as overall.",
+	"description": "Rated wallet JSON export: top-level metadata, an overall block (aggregated attribute groups), and a perVariant object with one key per variant (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE) present in variants, each with the same attribute-group structure as overall.",
 	"required": [
 		"walletId",
 		"types",
 		"variants",
 		"overall",
+		"perVariant",
 		"displayName",
 		"description",
 		"lastUpdated",
@@ -35,7 +36,7 @@
 		"variants": {
 			"type": "array",
 			"minItems": 1,
-			"description": "List of variants (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE) this wallet has. Each variant in this list has a corresponding key on the root object with the same attribute-group structure as overall.",
+			"description": "List of variants (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE) this wallet has. Each variant in this list has a corresponding key in perVariant with the same attribute-group structure as overall.",
 			"items": {
 				"type": "string",
 				"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
@@ -78,37 +79,24 @@
 		},
 		"overall": {
 			"type": "object",
-			"description": "Aggregated evaluation across all variants. Keys are attribute group ids (e.g. security, privacy); values are objects keyed by attribute id, each with attribute metadata and rating block.",
+			"description": "Aggregated evaluation across all variants. Keys are attribute group ids (e.g. security, privacy); values are objects keyed by attribute id, each with attribute metadata and evaluation block.",
 			"additionalProperties": {
 				"$ref": "#/$defs/attributeGroupExport"
 			}
+		},
+		"perVariant": {
+			"type": "object",
+			"minProperties": 1,
+			"description": "Per-variant evaluation blocks. Keys are variant names (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE); only variants listed in the variants array appear. Each value has the same structure as overall (attribute groups keyed by group id, then attribute id, then attribute + evaluation block).",
+			"additionalProperties": {
+				"$ref": "#/$defs/attributeGroupsExport"
+			},
+			"propertyNames": {
+				"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
+			}
 		}
 	},
-	"additionalProperties": {
-		"$ref": "#/$defs/attributeGroupsExport",
-		"description": "Per-variant blocks: MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE. Only variants listed in the variants array appear. Each has the same structure as overall (attribute groups keyed by group id, then attribute id, then attribute + rating block)."
-	},
-	"propertyNames": {
-		"enum": [
-			"$schema",
-			"walletId",
-			"types",
-			"variants",
-			"displayName",
-			"description",
-			"lastUpdated",
-			"stage",
-			"stageBreakdown",
-			"website",
-			"repository",
-			"overall",
-			"MOBILE",
-			"DESKTOP",
-			"BROWSER",
-			"EMBEDDED",
-			"HARDWARE"
-		]
-	},
+	"additionalProperties": false,
 	"$defs": {
 		"stageBreakdownItem": {
 			"type": "object",
@@ -127,7 +115,7 @@
 				"criteriaGroups": {
 					"type": "array",
 					"items": { "$ref": "#/$defs/stageCriteriaGroupBreakdownItem" },
-					"description": "Criteria groups with heading and per-criterion details (mirrors markdown)."
+					"description": "Criteria groups, each with a description and per-criterion details."
 				}
 			}
 		},
@@ -135,7 +123,7 @@
 			"type": "object",
 			"additionalProperties": false,
 			"required": ["description", "criteria"],
-			"description": "One criteria group within a stage (mirrors markdown #### heading + bullets).",
+			"description": "One criteria group within a stage: a description plus a list of criteria.",
 			"properties": {
 				"description": { "type": "string" },
 				"criteria": {
@@ -147,12 +135,16 @@
 		"stageCriterionBreakdownItem": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["criterionId", "attributeId", "attributeDisplayName", "description", "rating"],
-			"description": "One criterion within a stage (mirrors markdown bullet with attribute link and rating).",
+			"required": ["criterionId", "attributeId", "displayName", "description", "rating"],
+			"description": "One criterion within a stage: display name, description, and rating.",
 			"properties": {
 				"criterionId": { "type": "string", "minLength": 1 },
 				"attributeId": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
-				"attributeDisplayName": { "type": "string", "minLength": 1 },
+				"displayName": {
+					"type": "string",
+					"minLength": 1,
+					"description": "Human-readable name for this criterion."
+				},
 				"description": { "type": "string" },
 				"rating": {
 					"type": "string",
@@ -162,14 +154,14 @@
 		},
 		"attributeGroupsExport": {
 			"type": "object",
-			"description": "Map of attribute group id (e.g. security, privacy) to group export (attribute id to attribute + rating block). Used for overall and for each variant block.",
+			"description": "Map of attribute group id (e.g. security, privacy) to group export (attribute id to attribute + evaluation block). Used for overall and for each variant block.",
 			"additionalProperties": {
 				"$ref": "#/$defs/attributeGroupExport"
 			}
 		},
 		"attributeGroupExport": {
 			"type": "object",
-			"description": "One attribute group: map of attribute id to attribute export block (attribute metadata + rating).",
+			"description": "One attribute group: map of attribute id to attribute export block (attribute metadata + evaluation).",
 			"additionalProperties": {
 				"$ref": "#/$defs/attributeExportBlock"
 			}
@@ -177,13 +169,13 @@
 		"attributeExportBlock": {
 			"type": "object",
 			"additionalProperties": false,
-			"required": ["attribute", "rating"],
-			"description": "Single attribute export: attribute metadata (display name, question, methodology) plus wallet-specific rating (rating, shortExplanation, details, optional impact, howToImprove, references).",
+			"required": ["attribute", "evaluation"],
+			"description": "Single attribute export: attribute metadata (display name, question, methodology) plus wallet-specific evaluation (rating, shortExplanation, details, optional impact, howToImprove, references).",
 			"properties": {
 				"attribute": {
 					"$ref": "#/$defs/attributeBlock"
 				},
-				"rating": {
+				"evaluation": {
 					"$ref": "#/$defs/ratingBlock"
 				}
 			}
@@ -242,7 +234,7 @@
 				"rating": {
 					"type": "string",
 					"enum": ["PASS", "FAIL", "PARTIAL", "UNRATED", "EXEMPT"],
-					"description": "Attribute rating for this wallet."
+					"description": "Attribute rating for this wallet. PASS: wallet meets the attribute's criteria. FAIL: wallet does not meet the criteria. PARTIAL: wallet partially meets the criteria. UNRATED: insufficient feature data to evaluate. EXEMPT: attribute is not applicable to this wallet (e.g. by type or profile)."
 				},
 				"shortExplanation": {
 					"type": "string",
@@ -250,7 +242,7 @@
 				},
 				"details": {
 					"type": "string",
-					"description": "Longer explanation or summary of the evaluation; may be \"See full details on the wallet page.\" when details are component-based."
+					"description": "Longer explanation or summary of the evaluation; may be \"See full details on the wallet page.\" when details are not easily expressed in textual format."
 				},
 				"impact": {
 					"type": "string"

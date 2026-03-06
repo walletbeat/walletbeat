@@ -90,20 +90,20 @@ export interface RatingJsonExport {
 	references?: ReferenceJsonExport[]
 }
 
-/** Single attribute export: attribute metadata + rating block. */
+/** Single attribute export: attribute metadata + evaluation block. */
 export interface AttributeExportBlock {
 	attribute: AttributeJsonExport
-	rating: RatingJsonExport
+	evaluation: RatingJsonExport
 }
 
-/** Attribute groups keyed by group id, then attribute id, then attribute + rating block. */
+/** Attribute groups keyed by group id, then attribute id, then attribute + evaluation block. */
 export type AttributeGroupsExport = Record<string, Record<string, AttributeExportBlock>>
 
 /** Single criterion within a stage for JSON export (mirrors markdown bullet). */
 export interface StageCriterionBreakdownItemJsonExport {
 	criterionId: string
 	attributeId: string | null
-	attributeDisplayName: string
+	displayName: string
 	description: string
 	rating: 'PASS' | 'FAIL' | 'EXEMPT' | 'UNRATED'
 }
@@ -127,6 +127,7 @@ export interface StageBreakdownItemJsonExport {
 export interface RatedWalletJsonExportBase {
 	$schema: string
 	overall: AttributeGroupsExport
+	perVariant: Partial<Record<Variant, AttributeGroupsExport>>
 	types: WalletType[]
 	variants: Variant[]
 	walletId: string
@@ -139,9 +140,8 @@ export interface RatedWalletJsonExportBase {
 	repository?: string
 }
 
-/** Export shape: base fields plus one key per variant (e.g. BROWSER, MOBILE) with AttributeGroupsExport. */
-export type RatedWalletJsonExport = RatedWalletJsonExportBase &
-	Partial<Record<Variant, AttributeGroupsExport>>
+/** Export shape: base fields with perVariant object keyed by variant (e.g. BROWSER, MOBILE). */
+export type RatedWalletJsonExport = RatedWalletJsonExportBase
 
 function serializeReferences(
 	references: Parameters<typeof toFullyQualified>[0],
@@ -205,7 +205,7 @@ function serializeAttribute<V extends Value>(
 
 	return {
 		attribute: attributeBlock,
-		rating: ratingBlock,
+		evaluation: ratingBlock,
 	}
 }
 
@@ -252,7 +252,7 @@ function serializeStageCriteriaGroup(
 			criterionId: criterion.id,
 			attributeId,
 			// String() ensures a primitive string type for ESLint when it doesn't resolve criterion.displayName across files.
-			attributeDisplayName: String(criterion.displayName),
+			displayName: String(criterion.displayName),
 			description: descText,
 			rating: evaluation.rating,
 		})
@@ -324,13 +324,14 @@ export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExpor
 		...(website !== undefined && { website }),
 		...(repository !== undefined && { repository }),
 		overall: serializeEvaluationTree(wallet.overall, evalStrings),
+		perVariant: {},
 	}
 
 	for (const variant of setItems(getVariants(wallet.variants))) {
 		const resolved = wallet.variants[variant]
 
 		if (resolved !== undefined) {
-			payload[variant] = serializeEvaluationTree(resolved.attributes, evalStrings)
+			payload.perVariant[variant] = serializeEvaluationTree(resolved.attributes, evalStrings)
 		}
 	}
 
