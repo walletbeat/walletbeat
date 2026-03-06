@@ -12,6 +12,7 @@
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 	import { getWalletStageAndLadder } from '@/utils/stage'
+	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 
 
 // Props
@@ -131,11 +132,7 @@
 
 		<Typography
 			content={attribute.evaluation.value.shortExplanation}
-			strings={{
-				WALLET_NAME: wallet.metadata.displayName,
-				WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-				WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
-			}}
+			strings={getWalletEvalStrings(wallet)}
 		/>
 
 		{#if variant && wallet.variants[variant]}

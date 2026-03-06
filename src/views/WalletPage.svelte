@@ -34,7 +34,9 @@
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletStageAndLadder } from '@/utils/stage'
+	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
+	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 	import { getAttributeStagesForWallet, isAttributeUsedInStages } from '@/utils/stage-attributes'
 	import { WalletLadderType } from '@/schema/ladders'
 
@@ -997,7 +999,7 @@
 				<details data-card="secondary padding-0 radius-4" data-column="gap-0">
 					<summary>
 						<h4>
-							{attribute.wording?.midSentenceName === null ? attribute.wording?.howIsEvaluated ?? 'How is this evaluated?' : `How is ${attribute.wording?.midSentenceName ?? 'this'} evaluated?`}
+							{getHowIsEvaluatedHeading(attribute)}
 						</h4>
 					</summary>
 
@@ -1090,29 +1092,14 @@
 					<details data-card="secondary padding-0 radius-4" data-column="gap-0">
 						<summary>
 							<h4>
-								{#if attribute.wording?.midSentenceName === null}
-									{#if attribute.wording?.whatCanWalletDoAboutIts}
-										<Typography
-											content={attribute.wording?.whatCanWalletDoAboutIts}
-											strings={{ WALLET_NAME: wallet.metadata.displayName }}
-										/>
-									{:else}
-										{`What can ${wallet.metadata.displayName} do about this?`}
-									{/if}
-								{:else}
-									{`What can ${wallet.metadata.displayName} do about its ${attribute.wording?.midSentenceName || 'feature'}?`}
-								{/if}
+								{getHowToImproveHeading(attribute, wallet.metadata.displayName)}
 							</h4>
 						</summary>
 
 						<section data-column>
 							<Typography
 								content={howToImprove}
-								strings={{
-									WALLET_NAME: wallet.metadata.displayName,
-									WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-									WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
-								}}
+								strings={getWalletEvalStrings(wallet)}
 							/>
 
 							{#if override}
