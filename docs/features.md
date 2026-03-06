@@ -65,10 +65,21 @@ A set of features about any type of wallet.
 None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
 
 - `profile` (`WalletProfile`): The profile of the wallet, determining the use-cases and audience that it is meant for. This has impact on which attributes are relevant to it, and which attributes it is exempt from. This is _not_ per-variant, because users would not expect that a single wallet would fulfill different use-cases depending on which variant of the wallet they install.
-- `security` (`{ publicSecurityAudits: SecurityAudit[] | null bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>> transactionLegibility: VariantFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation > lightClient: { ethereumL1: VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>> } accountRecovery: VariantFeature<AccountRecovery> keysHandling: VariantFeature<WithRef<KeysHandlingSupport>> }`): Security features.
-- `privacy` (`{ dataCollection: VariantFeature<DataCollection> privacyPolicy: VariantFeature<string> transactionPrivacy: VariantFeature<TransactionPrivacy> }`): Privacy features.
+- `security` (object): Security features.
+  - `publicSecurityAudits` (`SecurityAudit[] | null`): Public security audits the wallet has gone through. If never audited, this should be an empty array, as 'null' represents the fact that we haven't checked whether there have been any audit.
+  - `bugBountyProgram` (`VariantFeature<Support<BugBountyProgramImplementation>>`): Bug bounty program implementation
+  - `transactionLegibility` (`VariantFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation >`): Transaction legibility features.
+  - `lightClient` (object): Light clients.
+    - `ethereumL1` (`VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>`): Light client used for Ethereum L1.
+  - `accountRecovery` (`VariantFeature<AccountRecovery>`): How can users of the wallet recover their account?
+  - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
+- `privacy` (object): Privacy features.
+  - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
+  - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
+  - `transactionPrivacy` (`VariantFeature<TransactionPrivacy>`): Transaction privacy features.
 - `selfSovereignty` (`object`): Self-sovereignty features.
-- `transparency` (`{ operationFees: VariantFeature<Nullable<BasicOperationFees>> }`): Transparency features.
+- `transparency` (object): Transparency features.
+  - `operationFees` (`VariantFeature<Nullable<BasicOperationFees>>`): Information on how fees are displayed for basic operations.
 - `accountSupport` (`VariantFeature<AccountSupport>`): Which types of accounts the wallet supports.
 - `multiAddress` (`VariantFeature<Support>`): Does the wallet support more than one Ethereum address?
 - `licensing` (`WalletLicensing`): License of the wallet. Variant specificity handled internally to `WalletLicense` type.
@@ -188,10 +199,34 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `variant` (`Variant`): The wallet variant which was used to resolve the feature tree.
 - `type` (`WalletType`): The type of the wallet. This is a shorthand for `variantToWalletType(variant)`, meant to be used for easy filtering in attribute evaluation code.
 - `profile` (`WalletProfile`): The profile of the wallet.
-- `security` (`{ scamAlerts: ResolvedFeature<ScamAlerts> publicSecurityAudits: SecurityAudit[] | null lightClient: { ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>> } hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport> transactionLegibility: ResolvedFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation > passkeyVerification: ResolvedFeature<Support<PasskeyVerificationImplementation>> bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>> firmware: ResolvedFeature<FirmwareSupport> keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>> supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport> supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport> userSafety: ResolvedFeature<UserSafetySupport> accountRecovery: ResolvedFeature<AccountRecovery> }`)
-- `privacy` (`{ dataCollection: ResolvedFeature<DataCollection> privacyPolicy: ResolvedFeature<string> hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport> transactionPrivacy: ResolvedFeature<TransactionPrivacy> appIsolation: ResolvedFeature<AppIsolation> }`)
-- `selfSovereignty` (`{ transactionSubmission: ResolvedFeature<TransactionSubmission> interoperability: ResolvedFeature<InteroperabilitySupport> }`)
-- `transparency` (`{ operationFees: ResolvedFeature<BasicOperationFees> reputation: ResolvedFeature<ReputationSupport> maintenance: ResolvedFeature<MaintenanceSupport> }`)
+- `security` (object)
+  - `scamAlerts` (`ResolvedFeature<ScamAlerts>`)
+  - `publicSecurityAudits` (`SecurityAudit[] | null`)
+  - `lightClient` (object)
+    - `ethereumL1` (`ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>>`)
+  - `hardwareWalletSupport` (`ResolvedFeature<HardwareWalletSupport>`)
+  - `transactionLegibility` (`ResolvedFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation >`)
+  - `passkeyVerification` (`ResolvedFeature<Support<PasskeyVerificationImplementation>>`)
+  - `bugBountyProgram` (`ResolvedFeature<Support<BugBountyProgramImplementation>>`)
+  - `firmware` (`ResolvedFeature<FirmwareSupport>`)
+  - `keysHandling` (`ResolvedFeature<WithRef<KeysHandlingSupport>>`)
+  - `supplyChainDIY` (`ResolvedFeature<SupplyChainDIYSupport>`)
+  - `supplyChainFactory` (`ResolvedFeature<SupplyChainFactorySupport>`)
+  - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
+  - `accountRecovery` (`ResolvedFeature<AccountRecovery>`)
+- `privacy` (object)
+  - `dataCollection` (`ResolvedFeature<DataCollection>`)
+  - `privacyPolicy` (`ResolvedFeature<string>`)
+  - `hardwarePrivacy` (`ResolvedFeature<HardwarePrivacySupport>`)
+  - `transactionPrivacy` (`ResolvedFeature<TransactionPrivacy>`)
+  - `appIsolation` (`ResolvedFeature<AppIsolation>`)
+- `selfSovereignty` (object)
+  - `transactionSubmission` (`ResolvedFeature<TransactionSubmission>`)
+  - `interoperability` (`ResolvedFeature<InteroperabilitySupport>`)
+- `transparency` (object)
+  - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
+  - `reputation` (`ResolvedFeature<ReputationSupport>`)
+  - `maintenance` (`ResolvedFeature<MaintenanceSupport>`)
 - `chainAbstraction` (`ResolvedFeature<ChainAbstraction>`)
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
 - `accountSupport` (`ResolvedFeature<AccountSupport>`)
@@ -397,7 +432,11 @@ To test:
 
 - `canDeployNew` (`Support<{ defaultConfig: { owners: number threshold: number modules: string[] } }>`): Can the wallet deploy new Safe contracts?
 - `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
-- `supportedConfigs` (`{ minOwners: number maxOwners: number | 'unlimited' supportsAnyThreshold: boolean moduleSupport: 'none' | 'partial' | 'full' }`): Supported configurations for existing Safes.
+- `supportedConfigs` (object): Supported configurations for existing Safes.
+  - `minOwners` (`number`): Minimum number of owners supported.
+  - `maxOwners` (`number | 'unlimited'`): Maximum number of owners supported (or 'unlimited').
+  - `supportsAnyThreshold` (`boolean`): Whether any threshold is supported.
+  - `moduleSupport` (`'none' | 'partial' | 'full'`): Level of module support.
 
 ---
 
@@ -417,7 +456,9 @@ How does the wallet display token balances?
 Chain abstraction features.
 
 - `crossChainBalances` (`WithRef<{ globalAccountValue: Support perChainAccountValue: Support ether: CrossChainBalanceDisplay usdc: CrossChainBalanceDisplay }>`): What types of balances can the wallet display?
-- `bridging` (`{ builtInBridging: Support< WithRef<{ risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' feesLargerThan1bps: FeeDisplay }> > suggestedBridging: Support<WithRef<{}>> }`): Chain bridging features.
+- `bridging` (object): Chain bridging features.
+  - `builtInBridging` (`Support< WithRef<{ risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' feesLargerThan1bps: FeeDisplay }> >`): Does the wallet have a built-in bridging feature? (e.g. The wallet allows the user to bridge ETH from Ethereum to Arbitrum directly within the wallet UI, without needing an external app.)
+  - `suggestedBridging` (`Support<WithRef<{}>>`): When the user is attempting to spend tokens on a chain where their balance is insufficient, but where they have sufficient balance on another chain, does the wallet automatically propose the user to bridge? (e.g. The user tries to send USDC on Arbitrum but only has USDC on Ethereum, the wallet prompts them to bridge first.)
 
 ---
 
@@ -674,7 +715,9 @@ type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 Which methods of address resolution a wallet supports.
 
 - `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `donations.walletbeat.eth` in the send address field. If it resolves, it is supported.
-- `chainSpecificAddressing` (`{ erc7828: ARS erc7831: ARS }`): Chain-specific address lookups.
+- `chainSpecificAddressing` (object): Chain-specific address lookups.
+  - `erc7828` (`ARS`): Address lookup through ERC-7828. To test: type `donations.walletbeat.eth@optimism.eth` in the send address field and check if it resolves.
+  - `erc7831` (`ARS`): Address lookup through ERC-7831. To test: type `donations.walletbeat.eth:optimism:1` in the send address field and check if it resolves.
 
 ---
 
@@ -2935,11 +2978,16 @@ Can the wallet's usage of a particular chain be configured?
 
 Can the wallet be used to perform basic operations only using a self-hosted node?
 
-- `withNoConnectivityExceptL1RPCEndpoint` (`{ accountCreation: Support accountImport: Support etherBalanceLookup: Support erc20BalanceLookup: Support erc20TokenSend: Support }`): Can the wallet be used to perform basic operations only using the L1 RPC provider?
+- `withNoConnectivityExceptL1RPCEndpoint` (object): Can the wallet be used to perform basic operations only using the L1 RPC provider?
 
   These operations must be tested in an environment with no network connectivity to external services, other than to a user's L1 RPC endpoint.
 
   To set up the test environment: point the wallet at a self-hosted node, then block all other outbound traffic using firewall rules, `/etc/hosts`, or browser DevTools → Network conditions → Offline (with a localhost RPC proxy still reachable). Then attempt each operation below and record whether it succeeds.
+  - `accountCreation` (`Support`): Can you create an account? To test: go through the wallet's new account / seed phrase creation flow in the restricted environment and check if it completes successfully.
+  - `accountImport` (`Support`): Can you import an account? To test: import an existing seed phrase or private key in the restricted environment and check if the wallet loads without errors.
+  - `etherBalanceLookup` (`Support`): Can you see your Ether balance? To test: after setup, check if the ETH balance is displayed using only the self-hosted L1 RPC, with no external API calls.
+  - `erc20BalanceLookup` (`Support`): Can you look up an ERC-20 token balance? Requiring the user to input the ERC-20 contract address is OK, the token does not need to be automatically discovered. To test: manually enter a known ERC-20 contract address and check if the balance loads using only the L1 RPC.
+  - `erc20TokenSend` (`Support`): Can you send an ERC-20 token to another address? Requiring the user to input the ERC-20 contract address is OK, the token does not need to be automatically discovered. Must be able to send to a different address than your own. To test: attempt to send an ERC-20 token to a different address in the restricted environment. The transaction should broadcast successfully using only the L1 RPC, with no external API calls required.
 
 ---
 

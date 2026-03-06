@@ -139,10 +139,8 @@ function descriptionForListItem(desc: string): string {
 
 /**
  * Get the display string for a TypeScript type node.
- * Inline object literals (`{ ... }`) are shown as `{...}` to avoid
- * dumping multi-line type definitions (with embedded JSDoc trivia) into a
- * single unreadable line. Other types are shown verbatim, truncated at 80
- * characters if needed.
+ * Block comments (including JSDoc trivia) are stripped and whitespace normalized.
+ * Inline object literal types are handled by the caller via nested sub-bullets.
  */
 function typeDisplay(typeNode: ts.TypeNode | undefined, sourceFile: ts.SourceFile): string {
 	if (typeNode === undefined) {
@@ -163,6 +161,7 @@ async function renderInterfaceMembers(
 	sourceFile: ts.SourceFile,
 	sourceText: string,
 	members: ts.NodeArray<ts.TypeElement>,
+	indent: string = '',
 ): Promise<string> {
 	const lines: string[] = []
 
@@ -172,16 +171,32 @@ async function renderInterfaceMembers(
 		}
 
 		const name = member.name.getText(sourceFile)
-		const type = typeDisplay(member.type, sourceFile)
 		const optional = member.questionToken !== undefined ? ', optional' : ''
 		const desc = jsDocToDescription(await extractJSDocLines(sourceText, member))
 		const descPart = desc ? `: ${descriptionForListItem(desc)}` : ''
 
-		lines.push(`- \`${name}\` (\`${type}\`${optional})${descPart}`)
+		if (member.type !== undefined && ts.isTypeLiteralNode(member.type)) {
+			// Inline object type: expand its members as nested sub-bullets
+			lines.push(`${indent}- \`${name}\` (object${optional})${descPart}`)
+			const nested = await renderInterfaceMembers(
+				sourceFile,
+				sourceText,
+				member.type.members,
+				indent + '  ',
+			)
+
+			for (const nestedLine of nested.trimEnd().split('\n')) {
+				lines.push(nestedLine)
+			}
+		} else {
+			const type = typeDisplay(member.type, sourceFile)
+
+			lines.push(`${indent}- \`${name}\` (\`${type}\`${optional})${descPart}`)
+		}
 	}
 
 	if (lines.length === 0) {
-		return '_No properties._\n'
+		return `${indent}_No properties._\n`
 	}
 
 	return lines.join('\n') + '\n'
