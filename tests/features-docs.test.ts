@@ -19,9 +19,9 @@ const config = {
 
 describe('features documentation', () => {
 	describe('markdown docs', () => {
-		it('is in sync with the TypeScript source', () => {
+		it('is in sync with the TypeScript source', async () => {
 			try {
-				featuresMarkdownUpdate(config)
+				await featuresMarkdownUpdate(config)
 			} catch (e) {
 				expect(e).toSatisfy(
 					e => e === undefined,
@@ -33,7 +33,7 @@ describe('features documentation', () => {
 		})
 
 		it('is valid Markdown', async () => {
-			const content = generateMarkdown(config)
+			const content = await generateMarkdown(config)
 
 			await assertValidMarkdown(content)
 		})

@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import * as prettier from 'prettier'
 import ts from 'typescript'
 
 export interface FeaturesMarkdownConfig {
@@ -282,7 +283,7 @@ function pathToAnchor(relPath: string): string {
 
 // --- Main Generator ---
 
-export function generateMarkdown(config: FeaturesMarkdownConfig): string {
+export async function generateMarkdown(config: FeaturesMarkdownConfig): Promise<string> {
 	// Build ordered file list: features.ts first, then sub-files alphabetically
 	const files: string[] = [config.featuresSrcFile, ...collectTsFiles(config.featuresDir)]
 
@@ -312,7 +313,7 @@ export function generateMarkdown(config: FeaturesMarkdownConfig): string {
 		sections += content
 	}
 
-	return (
+	const raw =
 		'# Walletbeat Feature Types Reference\n' +
 		'\n' +
 		'_Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._\n' +
@@ -337,13 +338,16 @@ export function generateMarkdown(config: FeaturesMarkdownConfig): string {
 		'\n' +
 		sections.trimEnd() +
 		'\n'
-	)
+
+	const prettierConfig = (await prettier.resolveConfig(config.outputPath)) ?? {}
+
+	return prettier.format(raw, { ...prettierConfig, parser: 'markdown' })
 }
 
 // --- Public API ---
 
-export function featuresMarkdownUpdate(config: FeaturesMarkdownConfig): void {
-	const markdownContent = generateMarkdown(config)
+export async function featuresMarkdownUpdate(config: FeaturesMarkdownConfig): Promise<void> {
+	const markdownContent = await generateMarkdown(config)
 
 	if (config.test) {
 		if (!fs.existsSync(config.outputPath)) {

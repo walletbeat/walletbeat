@@ -64,7 +64,7 @@ A set of features about any type of wallet.
 
 None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
 
-- `profile` (`WalletProfile`): The profile of the wallet, determining the use-cases and audience that it is meant for. This has impact on which attributes are relevant to it, and which attributes it is exempt from. This is *not* per-variant, because users would not expect that a single wallet would fulfill different use-cases depending on which variant of the wallet they install.
+- `profile` (`WalletProfile`): The profile of the wallet, determining the use-cases and audience that it is meant for. This has impact on which attributes are relevant to it, and which attributes it is exempt from. This is _not_ per-variant, because users would not expect that a single wallet would fulfill different use-cases depending on which variant of the wallet they install.
 - `security` (`{ /** * Public security audits the wallet has gone through. * If never audited, this should be an empty array, as 'null' represents * the fact that we haven't checked whether there have been any audit. */ publicSecurityAudits: SecurityAudit[] | null /** Bug bounty program implementation */ bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>> /** Transaction legibility features. */ transactionLegibility: VariantFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation > /** Light clients. */ lightClient: { /** Light client used for Ethereum L1. */ ethereumL1: VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>> } /** How can users of the wallet recover their account? */ accountRecovery: VariantFeature<AccountRecovery> /** How are secret keys handled? */ keysHandling: VariantFeature<WithRef<KeysHandlingSupport>> }`): Security features.
 - `privacy` (`{ /** * Data collection information. * See /docs/mitmproxy-guide for how to collect this. */ dataCollection: VariantFeature<DataCollection> /** Privacy policy URL of the wallet. */ privacyPolicy: VariantFeature<string> /** Transaction privacy features. */ transactionPrivacy: VariantFeature<TransactionPrivacy> }`): Privacy features.
 - `selfSovereignty` (`object`): Self-sovereignty features.
@@ -410,7 +410,8 @@ Chain abstraction features.
 How the wallet handles EIP-7702 delegations.
 
 ```typescript
-type DelegationHandling = | 'EIP_7702_NOT_SUPPORTED'
+type DelegationHandling =
+	| 'EIP_7702_NOT_SUPPORTED'
 	| (DelegationOffer &
 			(
 				| // Either the delegation is required at EOA creation and import time...
@@ -579,7 +580,8 @@ type GuardianScenario<S extends GuardianScenarioType> = (
 ### Type: `AccountRecoveryOutcome`
 
 ```typescript
-type AccountRecoveryOutcome = | AccountRecoveryOutcomeCanBeRecovered
+type AccountRecoveryOutcome =
+	| AccountRecoveryOutcomeCanBeRecovered
 	| AccountRecoveryOutcomeCannotBeRecovered
 ```
 
@@ -601,7 +603,8 @@ type AccountRecoveryOutcome = | AccountRecoveryOutcomeCanBeRecovered
 ### Type: `AccountTakeOverOutcome`
 
 ```typescript
-type AccountTakeOverOutcome = | AccountTakeOverOutcomeCannotBeTakenOver
+type AccountTakeOverOutcome =
+	| AccountTakeOverOutcomeCannotBeTakenOver
 	| AccountTakeOverOutcomeCanBeTakenOver
 ```
 
@@ -640,7 +643,7 @@ type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 Which methods of address resolution a wallet supports.
 
 - `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `donations.walletbeat.eth` in the send address field. If it resolves, it is supported.
-- `chainSpecificAddressing` (`{ /** * Address lookup through ERC-7828. * To test: type `donations.walletbeat.eth@optimism.eth` in the send address field and check if it resolves. */ erc7828: ARS /** * Address lookup through ERC-7831. * To test: type `donations.walletbeat.eth:optimism:1` in the send address field and check if it resolves. */ erc7831: ARS }`): Chain-specific address lookups.
+- `chainSpecificAddressing` (`{ /** * Address lookup through ERC-7828. * To test: type `donations.walletbeat.eth@optimism.eth`in the send address field and check if it resolves. */ erc7828: ARS /** * Address lookup through ERC-7831. * To test: type`donations.walletbeat.eth:optimism:1` in the send address field and check if it resolves. */ erc7831: ARS }`): Chain-specific address lookups.
 
 ---
 
@@ -649,7 +652,8 @@ Which methods of address resolution a wallet supports.
 How a wallet resolves addresses.
 
 ```typescript
-type AddressResolutionData = | {
+type AddressResolutionData =
+	| {
 			/**
 			 * The wallet reuses its own chain client provider to look up the
 			 * necessary data, inheriting its privacy and verifiability properties.
@@ -702,7 +706,7 @@ type AddressResolutionData = | {
 
 What set of accounts the wallet presents as the default selection in the connection approval UI.
 
-Note: these values describe the wallet's default *selection* shown to the user before they approve the connection, not necessarily what `eth_accounts` returns. The actual `eth_accounts` result follows whatever the user chose in that dialog.
+Note: these values describe the wallet's default _selection_ shown to the user before they approve the connection, not necessarily what `eth_accounts` returns. The actual `eth_accounts` result follows whatever the user chose in that dialog.
 
 To identify: use the Walletbeat test page (https://beta.walletbeat.eth.limo/test/) which calls `eth_accounts` after connecting and shows how many accounts are returned.
 
@@ -726,7 +730,8 @@ Set of exposed accounts.
 How the wallet isolates apps from getting data that other apps may also gather.
 
 ```typescript
-type AppIsolation = | typeof appConnectionNotSupported
+type AppIsolation =
+	| typeof appConnectionNotSupported
 	| (BaseAppIsolation &
 			// Either `eth_accounts` or `wallet_connect` must be supported.
 			(| { ethAccounts: Supported<WithRef<ExposedAccountSet>> }
@@ -747,7 +752,7 @@ Values are comparable as integers; the closest to zero, the more privacy.
 - `NEVER` = `0`: The data is never collected.
 - `OPT_IN` = `1`: The wallet does not collect this data by default. The user may decide to enable to this, but this requires explicit user intent to do this.
 - `PROMPTED` = `2`: The wallet does not collect this data by default. However, the wallet will at some point (e.g. during wallet setup) actively ask the user whether or not they want to enable this data collection, without explicit user intent to look for this setting.
-- `BY_DEFAULT` = `3`: The data is collected by default, but the user may turn this off by configuring the wallet appropriately. Doing so requires explicit user intent and knowledge that there is an option to do this in the first place. In order to qualify for this level, it must be possible for the user to access this setting and turn off the collection *before* the first time it happens. For example, a wallet that refreshes crypto prices by default (using an external service) and does so before ever giving the user a chance to access the wallet settings to turn off this feature does not qualify for this level.
+- `BY_DEFAULT` = `3`: The data is collected by default, but the user may turn this off by configuring the wallet appropriately. Doing so requires explicit user intent and knowledge that there is an option to do this in the first place. In order to qualify for this level, it must be possible for the user to access this setting and turn off the collection _before_ the first time it happens. For example, a wallet that refreshes crypto prices by default (using an external service) and does so before ever giving the user a chance to access the wallet settings to turn off this feature does not qualify for this level.
 - `ALWAYS` = `4`: The data is always collected no matter what the user does.
 
 ---
@@ -771,7 +776,8 @@ If sending multiple requests, the wallet has additional control over how to prox
 If the wallet has configuration settings related to this, the setting it should be judged by is the one that applies by default once a second address is added.
 
 ```typescript
-type MultiAddressHandling = | {
+type MultiAddressHandling =
+	| {
 			/** How the wallet handles refreshing data for multiple addresses. */
 			type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY
 	  }
@@ -820,7 +826,8 @@ type MultiAddressHandling = | {
 The environment in which the server endpoint is running. A server can either be running as a regular server (`RegularEndpoint`), or in a secure enclave which potentially gives it more privacy properties.
 
 ```typescript
-type Endpoint = | typeof RegularEndpoint
+type Endpoint =
+	| typeof RegularEndpoint
 	| {
 			/**
 			 * The server is running in a secure enclave.
@@ -1145,7 +1152,8 @@ type HardwarePrivacyImplementation = WithRef<HardwarePrivacySupport>
 ### Type: `FungibleTokenTransferMode`
 
 ```typescript
-type FungibleTokenTransferMode = | 'EXPLICIT_CHOICE'
+type FungibleTokenTransferMode =
+	| 'EXPLICIT_CHOICE'
 
 	/**
 	 * Tokens are sent in a public token transaction,
@@ -1620,7 +1628,8 @@ A single guardian represented by a ZK ID scheme (zkPassport, Anon Aadhaar, etc.)
 A single guardian within a broader multi-guardian setup.
 
 ```typescript
-type Guardian = | GuardianSelfCustody
+type Guardian =
+	| GuardianSelfCustody
 	| GuardianWalletPassword
 	| GuardianWalletProviderService
 	| GuardianUserExternalAccount
@@ -1771,8 +1780,7 @@ type GuardianPolicyKOfNWithTimelocks = GuardianPolicyBase & {
 A single specific configuration of guardians.
 
 ```typescript
-type GuardianPolicy = | GuardianPolicySecretSplitAcrossGuardians
-	| GuardianPolicyKOfNWithTimelocks
+type GuardianPolicy = GuardianPolicySecretSplitAcrossGuardians | GuardianPolicyKOfNWithTimelocks
 ```
 
 ---
@@ -1781,7 +1789,7 @@ type GuardianPolicy = | GuardianPolicySecretSplitAcrossGuardians
 
 For wallets supporting social recovery (guardian-based), what policy does it use for the guardians?
 
-- `minimumGuardianPolicy` (`GuardianPolicy`): The *minimum* guardian policy the wallet requires the user to configure. "Minimum" means the least-effort setup the wallet allows — e.g. if the wallet lets the user configure just one optional guardian, that is the minimum even if more are possible. To identify: go through the wallet's recovery setup flow with the fewest possible steps and record the resulting guardian configuration.
+- `minimumGuardianPolicy` (`GuardianPolicy`): The _minimum_ guardian policy the wallet requires the user to configure. "Minimum" means the least-effort setup the wallet allows — e.g. if the wallet lets the user configure just one optional guardian, that is the minimum even if more are possible. To identify: go through the wallet's recovery setup flow with the fewest possible steps and record the resulting guardian configuration.
 
 ---
 
@@ -2539,8 +2547,7 @@ These transactions interact with smart contracts in non-trivial ways, so there i
 HardwareBenchmarkTransactions is the union of basic and complex benchmark transactions. Used for hardware wallet calldata decoding evaluation.
 
 ```typescript
-type HardwareBenchmarkTransactions = | BasicBenchmarkTransactions
-	| ComplexBenchmarkTransactions
+type HardwareBenchmarkTransactions = BasicBenchmarkTransactions | ComplexBenchmarkTransactions
 ```
 
 ---
@@ -2583,7 +2590,8 @@ Display details for token transfer transactions (ERC-20, ERC-721). These include
 Per-benchmark-transaction display details for software wallets. Each benchmark transaction records what the wallet shows when that transaction is being signed.
 
 ```typescript
-type SoftwareTransactionDetailsDisplay = | ({
+type SoftwareTransactionDetailsDisplay =
+	| ({
 			[BasicBenchmarkTransactions.ETH_TRANSFER]: DisplayedBasicTransactionDetails
 			[BasicBenchmarkTransactions.ERC_20_TRANSFER]: DisplayedTokenTransferDetails
 			[BasicBenchmarkTransactions.ERC_721_TRANSFER]: DisplayedTokenTransferDetails
@@ -2637,10 +2645,7 @@ Users can test on https://beta.walletbeat.eth.limo/test and test a EIP-712 messa
 For software wallets: track which message signing data types are available
 
 ```typescript
-type SoftwareMessageSigningLegibility = Record<
-	MessageSigningDetails,
-	DataDisplayOptions
-> | null
+type SoftwareMessageSigningLegibility = Record<MessageSigningDetails, DataDisplayOptions> | null
 ```
 
 ---
@@ -3048,7 +3053,8 @@ Type of licensing by the wallet.
 License feature data for a wallet. Set to null if licensing information has not yet been researched.
 
 ```typescript
-type WalletLicensing = | SingleWalletRepoAndLicense<VariantFeature<LicenseWithRef>>
+type WalletLicensing =
+	| SingleWalletRepoAndLicense<VariantFeature<LicenseWithRef>>
 	| SeparateCoreCodeVsWalletCodeLicense<VariantFeature<LicenseWithRef>>
 	| null
 ```
@@ -3060,7 +3066,8 @@ type WalletLicensing = | SingleWalletRepoAndLicense<VariantFeature<LicenseWithRe
 License feature data for a wallet, resolved for a single variant.
 
 ```typescript
-type ResolvedWalletLicensing = | SingleWalletRepoAndLicense<ResolvedFeature<LicenseWithRef>>
+type ResolvedWalletLicensing =
+	| SingleWalletRepoAndLicense<ResolvedFeature<LicenseWithRef>>
 	| SeparateCoreCodeVsWalletCodeLicense<ResolvedFeature<LicenseWithRef>>
 	| null
 ```
