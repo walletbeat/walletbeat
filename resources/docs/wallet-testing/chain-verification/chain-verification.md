@@ -6,7 +6,7 @@ _This guide describes how to set up the L1 Lying RPC Proxy and use it to evaluat
 
 This analysis is necessary to ensure that the wallet meets the **Chain Verification** attribute in Walletbeat: does the wallet independently verify that the data returned by its RPC provider is consistent with the actual chain?
 
-Most wallets blindly trust whatever their configured RPC provider returns. This matters because a dishonest RPC provider is a real attack vector — not just a theoretical one. A well-known scam works as follows: a scammer gives out the seed phrase to a wallet that holds funds locked in Tether, and asks a victim to "help move the crypto out" in exchange for a cut of the proceeds. The victim imports the seed phrase, sees a large token balance in their wallet, and believes the story — not realising the funds are frozen. With a lying RPC provider, this scam works even without any real locked funds at all: the provider simply reports a large fake balance for any address the scammer chooses. A wallet that integrates a light client can detect this by verifying balance data against the actual chain state, making this class of scam impossible.
+Most wallets blindly trust whatever their configured RPC provider returns. This matters because a dishonest RPC provider is a real attack vector — not just a theoretical one. A well-known scam works as follows: a scammer gives out the seed phrase to a wallet that holds funds locked in Tether, and asks a victim to "help move the crypto out" in exchange for a cut of the proceeds. The victim imports the seed phrase, sees a large token balance in their wallet, and believes the story — not realizing the funds are frozen. With a lying RPC provider, this scam works even without any real locked funds at all: the provider simply reports a large fake balance for any address the scammer chooses. A wallet that integrates a light client can detect this by verifying balance data against the actual chain state, making this class of scam impossible.
 
 More generally, a dishonest or compromised RPC provider could:
 
@@ -50,13 +50,13 @@ You should see:
 
 Leave this running in a dedicated terminal for the duration of the test.
 
-**Optional flags:**
+**Flags:**
 
-| Flag | Default | Description |
-|---|---|---|
-| `--port` | `8545` | Local port to listen on |
-| `--upstream` | *(required)* | Real upstream Ethereum JSON-RPC URL |
-| `--multiplier` | `1000000` | Factor by which ERC-20 balances are inflated |
+| Flag           | Default      | Description                                  |
+| -------------- | ------------ | -------------------------------------------- |
+| `--upstream`   | _(required)_ | Real upstream Ethereum JSON-RPC URL          |
+| `--port`       | `8545`       | Local port to listen on                      |
+| `--multiplier` | `1000000`    | Factor by which ERC-20 balances are inflated |
 
 ### Step 2: Verify the proxy is lying (sanity check)
 
@@ -130,18 +130,8 @@ Use a separate wallet or browser that is **not** pointing at the proxy to confir
 
 ### Step 6: Observe what the wallet displays
 
-Navigate to the token balance screen for the ERC-20 token. Compare what the wallet shows against the real balance you noted in Step 5.
-
-Record your observation accordingly:
-
-| Observed wallet behaviour | Rating |
-|---|---|
-| Displays the **inflated** balance with no warning | **FAIL** — wallet blindly trusts the RPC |
-| Displays the inflated balance but shows a **warning** | **PARTIAL** — user is still misled |
-| **Refuses to display** the balance or prompts to change provider | **PASS** |
-| Displays the **correct** (real) balance via light client | **PASS** |
+Navigate to the token balance screen for the ERC-20 token. Compare what the wallet shows against the real balance you noted in Step 5. Record the observed behavior in `WalletBaseFeatures.security.lightClient` using the appropriate enum value.
 
 ### Step 7: Attempt an ERC-20 token send
 
-Try to send a small amount of the ERC-20 token to a different address you own. Observe whether the wallet uses the inflated proxy balance to calculate available funds, and whether it shows any indication that it is suspicious of the balance.
-
+Try to send a small amount of the ERC-20 token to a different address you own. Observe whether the wallet uses the inflated proxy balance to calculate available funds, and whether it shows any indication that it is suspicious of the balance. Record the observed behavior in the same field as the previous step.
