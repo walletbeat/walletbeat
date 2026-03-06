@@ -24,12 +24,7 @@ import type { WalletType } from '@/schema/wallet-types'
 import { renderTypographicContentToString } from '@/types/content'
 import { setItems } from '@/types/utils/non-empty'
 import { getHowIsEvaluatedHeading } from '@/utils/attribute-display'
-import {
-	getWalletEvalStrings,
-	renderCriterionDescriptionToText,
-	renderEvaluationContentOrFallback,
-	renderGroupDescriptionToText,
-} from '@/utils/evaluation-content'
+import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import {
 	attributesById,
@@ -188,7 +183,9 @@ function serializeAttribute<V extends Value>(
 			evaluation.value.shortExplanation,
 			evalStrings,
 		),
-		details: renderEvaluationContentOrFallback(evaluation.details, evalStrings, DETAILS_FALLBACK),
+		details: renderContentToText(evaluation.details, evalStrings, {
+			fallback: DETAILS_FALLBACK,
+		}),
 	}
 
 	if (evaluation.impact !== undefined) {
@@ -244,7 +241,7 @@ function serializeStageCriteriaGroup(
 	stageEvaluatableWallet: Omit<RatedWallet, 'metadata' | 'ladders'>,
 	evalStrings: WalletNameAndPseudonymStrings,
 ): StageCriteriaGroupBreakdownItemJsonExport {
-	const description = renderGroupDescriptionToText(group, evalStrings)
+	const description = renderContentToText(group.description, evalStrings, { trim: true })
 
 	const criteria: StageCriterionBreakdownItemJsonExport[] = []
 
@@ -253,7 +250,7 @@ function serializeStageCriteriaGroup(
 		const attributeId = getCriterionAttributeId(criterion)
 		const attribute = attributeId !== null ? (attributesById.get(attributeId) ?? null) : null
 		const attributeDisplayName = getCriterionDisplayName(criterion, attributeId, attribute)
-		const descText = renderCriterionDescriptionToText(criterion, evalStrings)
+		const descText = renderContentToText(criterion.description, evalStrings, { trim: true })
 
 		criteria.push({
 			criterionId: criterion.id,

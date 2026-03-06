@@ -1,12 +1,11 @@
 import type { WalletNameAndPseudonymStrings } from '@/schema/attributes'
-import type { WalletStageCriterion, WalletStageGroup } from '@/schema/stages'
 import type { RatedWallet } from '@/schema/wallet'
 import {
 	type Content,
 	isTypographicContent,
-	type Paragraph,
 	renderTypographicContentToString,
 } from '@/types/content'
+import { trimWhitespacePrefix } from '@/types/utils/text'
 
 /**
  * Build the wallet name and pseudonym strings used when rendering evaluation content.
@@ -23,54 +22,24 @@ export function getWalletEvalStrings(wallet: RatedWallet): WalletNameAndPseudony
 }
 
 /**
- * Render Content, falling back to `fallback` for CustomContent.
- * Always passes the full set of strings including pseudonym placeholders.
+ * Render content to plain text. Typographic content is rendered with eval strings;
+ * CustomContent yields the given fallback.
+ * Optionally normalizes whitespace by stripping the longest common leading whitespace
+ * from each line (via trimWhitespacePrefix).
+ * Accepts Content (e.g. Paragraph from stage definitions).
  */
-export function renderEvaluationContentOrFallback(
+export function renderContentToText(
 	content: Content<WalletNameAndPseudonymStrings>,
 	strings: WalletNameAndPseudonymStrings,
-	fallback: string,
+	options: { fallback?: string; trim?: boolean } = {},
 ): string {
+	const { fallback = '', trim = false } = options
+
 	if (!isTypographicContent(content)) {
 		return fallback
 	}
 
-	return renderTypographicContentToString(content, strings)
-}
+	const out = renderTypographicContentToString(content, strings)
 
-/**
- * Render stage criterion or group description content to plain text.
- * Centralizes "content → string": typographic content is rendered with eval strings and trimmed;
- * custom content yields empty string.
- * Accepts Paragraph (e.g. from stage definitions) or Content<WalletNameAndPseudonymStrings>.
- */
-function descriptionContentToText(
-	content: Content<WalletNameAndPseudonymStrings> | Paragraph,
-	evalStrings: WalletNameAndPseudonymStrings,
-): string {
-	if (!isTypographicContent(content)) {
-		return ''
-	}
-
-	return renderTypographicContentToString(content, evalStrings).trim()
-}
-
-/**
- * Criterion description as plain text (for JSON export or further markdown processing).
- */
-export function renderCriterionDescriptionToText(
-	criterion: WalletStageCriterion,
-	evalStrings: WalletNameAndPseudonymStrings,
-): string {
-	return descriptionContentToText(criterion.description, evalStrings)
-}
-
-/**
- * Criteria group description as plain text (for JSON export or further markdown processing).
- */
-export function renderGroupDescriptionToText(
-	group: WalletStageGroup,
-	evalStrings: WalletNameAndPseudonymStrings,
-): string {
-	return descriptionContentToText(group.description, evalStrings)
+	return trim ? trimWhitespacePrefix(out) : out
 }

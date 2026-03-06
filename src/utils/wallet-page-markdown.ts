@@ -19,12 +19,7 @@ import { isTypographicContent, renderTypographicContentToString } from '@/types/
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
 import { slugifyCamelCase } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
-import {
-	getWalletEvalStrings,
-	renderCriterionDescriptionToText,
-	renderEvaluationContentOrFallback,
-	renderGroupDescriptionToText,
-} from '@/utils/evaluation-content'
+import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import {
 	collapseToSingleLine,
 	markdownBlockquote,
@@ -125,7 +120,9 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 				}
 
 				for (const criteriaGroup of s.criteriaGroups) {
-					const groupDescRaw = renderGroupDescriptionToText(criteriaGroup, evalStrings)
+					const groupDescRaw = renderContentToText(criteriaGroup.description, evalStrings, {
+						trim: true,
+					})
 
 					if (groupDescRaw !== '') {
 						const groupDesc = normalizeMarkdownBlankLines(groupDescRaw).trim()
@@ -146,7 +143,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						const attribute = attributeId ? (attributesById.get(attributeId) ?? null) : null
 						const displayName = getCriterionDisplayName(criterion, attributeId, attribute)
 						const descText = normalizeMarkdownBlankLines(
-							renderCriterionDescriptionToText(criterion, evalStrings),
+							renderContentToText(criterion.description, evalStrings, { trim: true }),
 						).trim()
 						const descForBullet =
 							descText !== '' && /^[a-z]/.test(descText)
@@ -238,11 +235,9 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 					parts.push(shortExpl.trim(), '')
 
 					const details = normalizeMarkdownBlankLines(
-						renderEvaluationContentOrFallback(
-							evaluation.details,
-							evalStrings,
-							`[See full details for ${attribute.displayName}](${walletAttrUrl})`,
-						),
+						renderContentToText(evaluation.details, evalStrings, {
+							fallback: `[See full details for ${attribute.displayName}](${walletAttrUrl})`,
+						}),
 					)
 
 					if (details.trim() !== '') {
