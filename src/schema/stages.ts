@@ -106,6 +106,9 @@ export interface WalletStageCriterion {
 	/** What the criterion looks for. */
 	description: Paragraph
 
+	/** Human-readable name for this criterion. */
+	displayName: string
+
 	/** Why this criterion is important and part of this stage. */
 	rationale: Paragraph
 

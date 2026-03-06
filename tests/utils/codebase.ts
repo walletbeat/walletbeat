@@ -62,18 +62,29 @@ export async function GitIgnoredFiles(): Promise<PathPredicate> {
 	}
 
 	return (path: string): boolean => {
-		if (specificFiles.has(path)) {
+		const normalizedPath = normalizePath(path)
+
+		if (specificFiles.has(normalizedPath)) {
 			return true
 		}
 
 		for (const dirPrefix of dirPrefixes) {
-			if (path === dirPrefix || path.startsWith(dirPrefix)) {
+			const normalizedDirPrefix = normalizePath(dirPrefix)
+
+			if (
+				normalizedPath === normalizedDirPrefix ||
+				normalizedPath.startsWith(normalizedDirPrefix)
+			) {
 				return true
 			}
 		}
 
 		return false
 	}
+}
+
+function normalizePath(p: string): string {
+	return path.normalize(p).replaceAll(path.sep, '/')
 }
 
 export type IndexedFileData = object
@@ -114,10 +125,10 @@ export async function getCodebaseIndex<T extends IndexedFileData>(
 			}
 
 			if (predicate instanceof RegExp) {
-				return predicate.test(filePath)
+				return predicate.test(normalizePath(filePath))
 			}
 
-			return filePath === predicate
+			return normalizePath(filePath) === normalizePath(predicate)
 		})
 
 	const concurrencyLimit = pLimit(Math.max(1, options.concurrency ?? 256))
