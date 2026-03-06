@@ -11,10 +11,6 @@ export interface FeaturesMarkdownConfig {
 	test: boolean
 }
 
-interface Logger {
-	info(message: string): void
-}
-
 interface FileResult {
 	relPath: string
 	content: string
@@ -94,8 +90,11 @@ function jsDocToDescription(lines: string[]): string {
 function jsDocToSingleLine(lines: string[]): string {
 	return lines
 		.filter(l => l.trim() !== '')
+		.map(l => l.trim())
 		.join(' ')
 		.trim()
+		.replace(/\b0x[0-9a-fA-F]+\b/g, match => `\`${match}\``)
+		.replace(/\[(\d+)\]/g, '\\[$1\\]')
 }
 
 // --- Type Rendering ---
@@ -344,14 +343,6 @@ export function generateMarkdown(config: FeaturesMarkdownConfig): string {
 // --- Public API ---
 
 export function featuresMarkdownUpdate(config: FeaturesMarkdownConfig): void {
-	const logger: Logger = {
-		info: (message: string): void => {
-			if (!config.quiet) {
-				process.stdout.write(message + '\n')
-			}
-		},
-	}
-
 	const markdownContent = generateMarkdown(config)
 
 	if (config.test) {
@@ -378,6 +369,5 @@ export function featuresMarkdownUpdate(config: FeaturesMarkdownConfig): void {
 
 		fs.mkdirSync(path.dirname(config.outputPath), { recursive: true })
 		fs.writeFileSync(config.outputPath, markdownContent)
-		logger.info('docs/features.md updated.')
 	}
 }

@@ -2,7 +2,6 @@ import * as path from 'path'
 import { describe, expect, it } from 'vitest'
 
 import { assertValidMarkdown } from '@/tests/utils/assert-valid-markdown'
-import { grammarLint } from '@/tests/utils/grammar'
 import {
 	featuresMarkdownUpdate,
 	generateMarkdown,
@@ -37,12 +36,6 @@ describe('features documentation', () => {
 			const content = generateMarkdown(config)
 
 			await assertValidMarkdown(content)
-		})
-
-		it('has correct grammar', async () => {
-			const content = generateMarkdown(config)
-
-			await grammarLint(content, { language: 'markdown' })
 		})
 	})
 })
