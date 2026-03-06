@@ -14,7 +14,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
   - [ ] Browser Extension
   - [ ] Mobile
   - [ ] Desktop
-- **Is your wallet designed for general use, or payments, or OTHERS?**
+- **Is your wallet designed for general use, or peer-to-peer payments, or some other specific use-case?**
 - **Which account types does your wallet support?** (check all that apply)
   - [ ] EOA (externally owned account — standard seed phrase wallet)
   - [ ] MPC (multi-party computation — key is split across multiple parties)
@@ -39,17 +39,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
   - [ ] Not supported
   - [ ] Other:
 
-- **[If guardian-based] What can act as a guardian?** (check all that apply)
-  - [ ] The wallet provider itself
-  - [ ] A user-chosen contact (another Ethereum address)
-  - [ ] A hardware security key
-  - [ ] A passkey
-  - [ ] Other:
-
-- **[If guardian-based] How many guardians can be configured?**
-- **[If guardian-based] What is the minimum number of guardians required to recover?**
-- **[If guardian-based] Is the minimum threshold configurable by the user?** (yes / no)
-- **[If guardian-based] Where is the secret reconstructed — on the user's device or on a server?**
+- **[If guardian-based] Please describe your guardian scheme and link to its documentation.**
 
 ### Chain Verification
 
@@ -81,15 +71,17 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 **Malicious website warnings:**
 
 - Do you warn users before connecting to potentially malicious websites or dapps? (yes / no)
+  - If so, which database or external service is used?
   - Does this check send the visited URL to an external service? (yes / no)
   - Does it send the user's wallet address to an external service? (yes / no)
-  - Does it send the user's IP address to an external service? (yes / no)
+  - Can the external service learn the user's IP address? (yes / no)
 
 **First-time contract warnings:**
 
 - Do you warn users before interacting with a contract they haven't used before? (yes / no)
+  - Is a database of known-bad contracts or external service involved? If so, which one?
   - Does this check send the contract address to an external service? (yes / no)
-  - Does it send the user's wallet address or IP to an external service? (yes / no)
+  - Can the external service learn the user's wallet address or IP address? (yes / no)
 
 **First-time recipient warnings:**
 
@@ -123,10 +115,6 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
   - [ ] Tornado Cash Nova
   - [ ] Other:
 
-- **[If stealth addresses] What is the default transfer mode — public or stealth?**
-- **[If stealth addresses] Is recipient address resolution performed on-device or via an external service?**
-- **[If stealth addresses] Is balance lookup performed on-device or via an external service?**
-
 ---
 
 ## Self-Sovereignty
@@ -149,10 +137,6 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
   - Which smart contract or implementation do you use?
   - Has it been audited? If yes, link to the report:
 
-- **[If Safe] Multisig setup:**
-  - Can users create new Safe accounts through your wallet? (yes / no)
-  - What is the default owner count and signing threshold?
-
 ### Key Security
 
 - **Where are private keys (or key shares) generated and stored?**
@@ -167,8 +151,8 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 ### Transaction Submission
 
 - **Can users broadcast Ethereum L1 transactions without routing through your infrastructure?**
-  - [ ] Yes, via direct P2P gossip (connecting to a node and relaying the transaction)
-  - [ ] Yes, via a user-configured self-hosted RPC node
+  - [ ] Yes, via direct P2P gossip (acting as a node on the network)
+  - [ ] Yes, via a user-configured self-hosted RPC node (connecting to a node and relaying the transaction)
   - [ ] No, all transactions go through your servers
 
 - **For Arbitrum: do you support force-inclusion (bypassing the Arbitrum sequencer to submit via L1)?** (yes / no / not supported)
@@ -197,6 +181,7 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 ### Open Source
 
 - **Is the wallet's source code publicly available?** (yes / no)
+- **If yes, under what license?**
 - **If yes, please share the repository URL and any other relevant links:**
 
 ### Funding & Monetization
