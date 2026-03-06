@@ -65,10 +65,10 @@ A set of features about any type of wallet.
 None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
 
 - `profile` (`WalletProfile`): The profile of the wallet, determining the use-cases and audience that it is meant for. This has impact on which attributes are relevant to it, and which attributes it is exempt from. This is _not_ per-variant, because users would not expect that a single wallet would fulfill different use-cases depending on which variant of the wallet they install.
-- `security` (`{...}`): Security features.
-- `privacy` (`{...}`): Privacy features.
+- `security` (`{ publicSecurityAudits: SecurityAudit[] | null bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>> transactionLegibility: VariantFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation > lightClient: { ethereumL1: VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>> } accountRecovery: VariantFeature<AccountRecovery> keysHandling: VariantFeature<WithRef<KeysHandlingSupport>> }`): Security features.
+- `privacy` (`{ dataCollection: VariantFeature<DataCollection> privacyPolicy: VariantFeature<string> transactionPrivacy: VariantFeature<TransactionPrivacy> }`): Privacy features.
 - `selfSovereignty` (`object`): Self-sovereignty features.
-- `transparency` (`{...}`): Transparency features.
+- `transparency` (`{ operationFees: VariantFeature<Nullable<BasicOperationFees>> }`): Transparency features.
 - `accountSupport` (`VariantFeature<AccountSupport>`): Which types of accounts the wallet supports.
 - `multiAddress` (`VariantFeature<Support>`): Does the wallet support more than one Ethereum address?
 - `licensing` (`WalletLicensing`): License of the wallet. Variant specificity handled internally to `WalletLicense` type.
@@ -188,10 +188,10 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `variant` (`Variant`): The wallet variant which was used to resolve the feature tree.
 - `type` (`WalletType`): The type of the wallet. This is a shorthand for `variantToWalletType(variant)`, meant to be used for easy filtering in attribute evaluation code.
 - `profile` (`WalletProfile`): The profile of the wallet.
-- `security` (`{...}`)
-- `privacy` (`{...}`)
-- `selfSovereignty` (`{...}`)
-- `transparency` (`{...}`)
+- `security` (`{ scamAlerts: ResolvedFeature<ScamAlerts> publicSecurityAudits: SecurityAudit[] | null lightClient: { ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>> } hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport> transactionLegibility: ResolvedFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation > passkeyVerification: ResolvedFeature<Support<PasskeyVerificationImplementation>> bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>> firmware: ResolvedFeature<FirmwareSupport> keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>> supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport> supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport> userSafety: ResolvedFeature<UserSafetySupport> accountRecovery: ResolvedFeature<AccountRecovery> }`)
+- `privacy` (`{ dataCollection: ResolvedFeature<DataCollection> privacyPolicy: ResolvedFeature<string> hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport> transactionPrivacy: ResolvedFeature<TransactionPrivacy> appIsolation: ResolvedFeature<AppIsolation> }`)
+- `selfSovereignty` (`{ transactionSubmission: ResolvedFeature<TransactionSubmission> interoperability: ResolvedFeature<InteroperabilitySupport> }`)
+- `transparency` (`{ operationFees: ResolvedFeature<BasicOperationFees> reputation: ResolvedFeature<ReputationSupport> maintenance: ResolvedFeature<MaintenanceSupport> }`)
 - `chainAbstraction` (`ResolvedFeature<ChainAbstraction>`)
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
 - `accountSupport` (`ResolvedFeature<AccountSupport>`)
@@ -304,7 +304,7 @@ To test:
 - `canExportSeedPhrase`: Go to Settings → Security and look for a
   "Reveal seed phrase" or "Back up recovery phrase" option.
 
-- `keyDerivation` (`| { type: 'NONSTANDARD' } | { type: 'BIP32' seedPhrase: 'NONSTANDARD' | 'BIP3...`): Type of standards used to deterministically derive private keys.
+- `keyDerivation` (`| { type: 'NONSTANDARD' } | { type: 'BIP32' seedPhrase: 'NONSTANDARD' | 'BIP39' derivationPath: 'NONSTANDARD' | 'BIP44' canExportSeedPhrase: boolean }`): Type of standards used to deterministically derive private keys.
 - `canExportPrivateKey` (`boolean`): Can the wallet export EOA private keys directly?
 
 ---
@@ -395,9 +395,9 @@ To test:
 - `supportedConfigs`: Try connecting the wallet to Safes with 1, 2, and
   many owners at various thresholds, and note the limits.
 
-- `canDeployNew` (`Support<{ defaultConfig: { owners: number threshold: number modules: string[]...`): Can the wallet deploy new Safe contracts?
+- `canDeployNew` (`Support<{ defaultConfig: { owners: number threshold: number modules: string[] } }>`): Can the wallet deploy new Safe contracts?
 - `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
-- `supportedConfigs` (`{...}`): Supported configurations for existing Safes.
+- `supportedConfigs` (`{ minOwners: number maxOwners: number | 'unlimited' supportsAnyThreshold: boolean moduleSupport: 'none' | 'partial' | 'full' }`): Supported configurations for existing Safes.
 
 ---
 
@@ -416,8 +416,8 @@ How does the wallet display token balances?
 
 Chain abstraction features.
 
-- `crossChainBalances` (`WithRef<{ globalAccountValue: Support perChainAccountValue: Support ether: Cr...`): What types of balances can the wallet display?
-- `bridging` (`{...}`): Chain bridging features.
+- `crossChainBalances` (`WithRef<{ globalAccountValue: Support perChainAccountValue: Support ether: CrossChainBalanceDisplay usdc: CrossChainBalanceDisplay }>`): What types of balances can the wallet display?
+- `bridging` (`{ builtInBridging: Support< WithRef<{ risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' feesLargerThan1bps: FeeDisplay }> > suggestedBridging: Support<WithRef<{}>> }`): Chain bridging features.
 
 ---
 
@@ -488,7 +488,7 @@ Types of software wallets that hardware wallets can connect through
 Specific details about a app connection method when supported
 
 - `supportedConnections` (`NonEmptySet<AppConnectionMethod | SoftwareWalletType>`): Which connection methods are supported (must have at least one). (e.g. A hardware wallet that supports both its own open-source app and MetaMask would list `VENDOR_OPEN_SOURCE_APP` and `METAMASK` here.)
-- `requiresManufacturerConsent` (`| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' } | MustRef<{ type: 'FEA...`): Is manufacturer consent required to integrate any hardware wallet feature into a software wallet? If so, must provide reference.
+- `requiresManufacturerConsent` (`| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' } | MustRef<{ type: 'FEATURES_GATED_BY_MANUFACTURER' }> | null`): Is manufacturer consent required to integrate any hardware wallet feature into a software wallet? If so, must provide reference.
   - `ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE`: any software wallet can integrate the hardware
     wallet without needing approval from the manufacturer.
   - `FEATURES_GATED_BY_MANUFACTURER`: the manufacturer must approve before a software wallet can
@@ -674,7 +674,7 @@ type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 Which methods of address resolution a wallet supports.
 
 - `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `donations.walletbeat.eth` in the send address field. If it resolves, it is supported.
-- `chainSpecificAddressing` (`{...}`): Chain-specific address lookups.
+- `chainSpecificAddressing` (`{ erc7828: ARS erc7831: ARS }`): Chain-specific address lookups.
 
 ---
 
@@ -2707,7 +2707,7 @@ Details for a failed simulation benchmark transaction.
 
 Details for a nondeterministic simulation benchmark transaction.
 
-- `nondeterminism` (`| 'NO_OUTCOME_SHOWN' | 'STATIC_SINGLE_OUTCOME' | 'RESIMULATES_NO_WARNING' | '...`): How the wallet handles state-dependent (non-deterministic) transactions.
+- `nondeterminism` (`| 'NO_OUTCOME_SHOWN' | 'STATIC_SINGLE_OUTCOME' | 'RESIMULATES_NO_WARNING' | 'RESIMULATES_WITH_WARNING'`): How the wallet handles state-dependent (non-deterministic) transactions.
   - STATIC_SINGLE_OUTCOME: Shows one outcome and keeps it static. No re-simulation if state changes.
   - RESIMULATES_NO_WARNING: Re-simulates and updates the outcome if state changes, but doesn’t explicitly warn the user.
   - RESIMULATES_WITH_WARNING: Re-simulates and explicitly warns that multiple outcomes are possible.
@@ -2935,7 +2935,7 @@ Can the wallet's usage of a particular chain be configured?
 
 Can the wallet be used to perform basic operations only using a self-hosted node?
 
-- `withNoConnectivityExceptL1RPCEndpoint` (`{...}`): Can the wallet be used to perform basic operations only using the L1 RPC provider?
+- `withNoConnectivityExceptL1RPCEndpoint` (`{ accountCreation: Support accountImport: Support etherBalanceLookup: Support erc20BalanceLookup: Support erc20TokenSend: Support }`): Can the wallet be used to perform basic operations only using the L1 RPC provider?
 
   These operations must be tested in an environment with no network connectivity to external services, other than to a user's L1 RPC endpoint.
 
@@ -3011,8 +3011,8 @@ To identify: check the wallet's documentation or UI for any "force include", "se
 
 Support for transaction broadcast and inclusion. L1 broadcast fields require network traffic inspection or source code research to verify — the UI alone does not reveal how transactions are submitted.
 
-- `l1` (`WithRef<{ selfBroadcastViaDirectGossip: Support | null selfBroadcastViaSelfHo...`): Options for broadcasting transactions to L1. The ref must link to documentation or source code evidence for each claim.
-- `l2` (`WithRef<Record<TransactionSubmissionL2Type, TransactionSubmissionL2Support | ...`): Options for broadcasting transactions to L2 chains. The ref must link to documentation or source code evidence. Set a chain's value to null if its support level has not been researched.
+- `l1` (`WithRef<{ selfBroadcastViaDirectGossip: Support | null selfBroadcastViaSelfHostedNode: Support | null }>`): Options for broadcasting transactions to L1. The ref must link to documentation or source code evidence for each claim.
+- `l2` (`WithRef<Record<TransactionSubmissionL2Type, TransactionSubmissionL2Support | null>>`): Options for broadcasting transactions to L2 chains. The ref must link to documentation or source code evidence. Set a chain's value to null if its support level has not been researched.
 
 ---
 

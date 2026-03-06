@@ -149,18 +149,12 @@ function typeDisplay(typeNode: ts.TypeNode | undefined, sourceFile: ts.SourceFil
 		return 'unknown'
 	}
 
-	if (ts.isTypeLiteralNode(typeNode)) {
-		return '{...}'
-	}
-
-	const raw = typeNode
+	return typeNode
 		.getText(sourceFile)
 		.replace(/\/\*[\s\S]*?\*\//g, '') // strip block comments (incl. JSDoc)
 		.replace(/\/\/[^\n]*/g, '') // strip line comments
 		.replace(/\s+/g, ' ')
 		.trim()
-
-	return raw.length > 80 ? raw.slice(0, 77) + '...' : raw
 }
 
 // --- Type Rendering ---
