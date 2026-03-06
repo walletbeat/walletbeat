@@ -42,9 +42,10 @@ const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
 
 /**
  * Aggregate status for a stage or criteria group based on applicable criterion ratings.
- * Rule: all exempt → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
+ * Rule: all passed → PASS; else any passed → PARTIAL; else FAIL.
+ * Throws if every criterion is EXEMPT (stage must have at least one applicable criterion).
  */
-export type StageCountsStatus = 'PASS' | 'PARTIAL' | 'FAIL' | 'UNRATED'
+export type StageCountsStatus = 'PASS' | 'PARTIAL' | 'FAIL'
 
 export interface StageCountsAndStatus {
 	passedCount: number
@@ -54,8 +55,8 @@ export interface StageCountsAndStatus {
 
 /**
  * Compute passed/total counts and aggregate status for a set of stage criteria.
- * "Applicable" = not EXEMPT. Status: all exempt → UNRATED; else all passed → PASS;
- * else any passed → PARTIAL; else FAIL.
+ * "Applicable" = not EXEMPT. Status: all passed → PASS; else any passed → PARTIAL; else FAIL.
+ * Throws if every criterion is EXEMPT (invalid stage definition for this wallet).
  */
 export function computeCountsAndStatus(
 	criteria: WalletStageCriterion[],
@@ -69,14 +70,15 @@ export function computeCountsAndStatus(
 	const totalCount = applicableEvaluations.length
 	const allExempt =
 		allEvaluations.length > 0 && allEvaluations.every(e => e.rating === StageCriterionRating.EXEMPT)
+
+	if (allExempt) {
+		throw new Error(
+			'Stage has no applicable criteria for this wallet (all criteria are EXEMPT). The stage definition should have at least one criterion that applies.',
+		)
+	}
+
 	const allPassed = totalCount > 0 && passedCount === totalCount
-	const status: StageCountsStatus = allExempt
-		? 'UNRATED'
-		: allPassed
-			? 'PASS'
-			: passedCount > 0
-				? 'PARTIAL'
-				: 'FAIL'
+	const status: StageCountsStatus = allPassed ? 'PASS' : passedCount > 0 ? 'PARTIAL' : 'FAIL'
 
 	return { passedCount, totalCount, status }
 }
@@ -152,29 +154,6 @@ export const isAttributeUsedInStage = (
  */
 export const getCriterionAttributeId = (criterion: WalletStageCriterion): string | null =>
 	getEvaluateFunctionAttributeId(criterion.evaluate)
-
-// TODO: https://github.com/walletbeat/walletbeat/issues/555
-/**
- * Criterion id (snake_case) to human-readable label (Title Case).
- * Used when the criterion has no linked attribute (getCriterionAttributeId returns null).
- */
-export function criterionIdToDisplayName(id: string): string {
-	return id
-		.split('_')
-		.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-		.join(' ')
-}
-
-/**
- * Resolve display name for a stage criterion: attribute display name, then attribute ID, then criterion id formatted.
- */
-export function getCriterionDisplayName(
-	criterion: WalletStageCriterion,
-	attributeId: string | null,
-	attribute: Attribute | null,
-): string {
-	return attribute?.displayName ?? attributeId ?? criterionIdToDisplayName(criterion.id)
-}
 
 /**
  * Get all criteria that reference a specific attribute across all ladders.

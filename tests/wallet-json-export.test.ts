@@ -61,7 +61,7 @@ describe('ratedWalletJsonExport', () => {
 				if (payload.stageBreakdown !== null) {
 					expect(payload.stageBreakdown.length).toBe(ladderEvaluation?.ladder.stages.length ?? 0)
 
-					const statuses = ['PASS', 'PARTIAL', 'FAIL', 'UNRATED']
+					const statuses = ['PASS', 'PARTIAL', 'FAIL']
 
 					for (const item of payload.stageBreakdown) {
 						expect(item).toHaveProperty('stageId')

@@ -11,7 +11,6 @@
 		PASS = 'PASS',
 		PARTIAL = 'PARTIAL',
 		FAIL = 'FAIL',
-		UNRATED = 'UNRATED',
 	}
 
 	const stageStatuses = {
@@ -29,11 +28,6 @@
 			icon: '❌',
 			label: 'All criteria failed',
 			color: 'var(--rating-fail)',
-		},
-		[StageStatus.UNRATED]: {
-			icon: '❔',
-			label: 'All criteria unrated',
-			color: 'var(--rating-unrated)',
 		},
 	} as const satisfies Record<
 		StageStatus,

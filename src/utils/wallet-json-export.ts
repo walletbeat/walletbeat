@@ -26,12 +26,7 @@ import { setItems } from '@/types/utils/non-empty'
 import { getHowIsEvaluatedHeading } from '@/utils/attribute-display'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import {
-	attributesById,
-	computeStageCountsAndStatus,
-	getCriterionAttributeId,
-	getCriterionDisplayName,
-} from '@/utils/stage-attributes'
+import { computeStageCountsAndStatus, getCriterionAttributeId } from '@/utils/stage-attributes'
 import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 const DETAILS_FALLBACK = 'See full details on the wallet page.'
@@ -123,7 +118,7 @@ export interface StageBreakdownItemJsonExport {
 	label: string
 	passedCount: number
 	totalCount: number
-	status: 'PASS' | 'PARTIAL' | 'FAIL' | 'UNRATED'
+	status: 'PASS' | 'PARTIAL' | 'FAIL'
 	criteriaGroups: StageCriteriaGroupBreakdownItemJsonExport[]
 }
 
@@ -248,14 +243,13 @@ function serializeStageCriteriaGroup(
 	for (const criterion of group.criteria) {
 		const evaluation = criterion.evaluate(stageEvaluatableWallet)
 		const attributeId = getCriterionAttributeId(criterion)
-		const attribute = attributeId !== null ? (attributesById.get(attributeId) ?? null) : null
-		const attributeDisplayName = getCriterionDisplayName(criterion, attributeId, attribute)
 		const descText = renderContentToText(criterion.description, evalStrings, { trim: true })
 
 		criteria.push({
 			criterionId: criterion.id,
 			attributeId,
-			attributeDisplayName,
+			// String() ensures a primitive string type for ESLint when it doesn't resolve criterion.displayName across files.
+			attributeDisplayName: String(criterion.displayName),
 			description: descText,
 			rating: evaluation.rating,
 		})

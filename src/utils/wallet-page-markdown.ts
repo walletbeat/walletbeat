@@ -26,12 +26,7 @@ import {
 	normalizeMarkdownBlankLines,
 } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import {
-	attributesById,
-	computeStageCountsAndStatus,
-	getCriterionAttributeId,
-	getCriterionDisplayName,
-} from '@/utils/stage-attributes'
+import { computeStageCountsAndStatus, getCriterionAttributeId } from '@/utils/stage-attributes'
 
 /**
  * Return the wallet blurb as a single collapsed line, suitable for use
@@ -140,8 +135,6 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 					for (const criterion of criteriaGroup.criteria) {
 						const evaluation = criterion.evaluate(stageEvaluatableWallet)
 						const attributeId = getCriterionAttributeId(criterion)
-						const attribute = attributeId ? (attributesById.get(attributeId) ?? null) : null
-						const displayName = getCriterionDisplayName(criterion, attributeId, attribute)
 						const descText = normalizeMarkdownBlankLines(
 							renderContentToText(criterion.description, evalStrings, { trim: true }),
 						).trim()
@@ -151,6 +144,8 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 								: descText
 						const rating = evaluation.rating as StageCriterionRating
 						const ratingInfo = stageCriterionRatings[rating]
+						// String() ensures a primitive string type for ESLint when it doesn't resolve criterion.displayName across files.
+						const displayName = String(criterion.displayName)
 						const attrLink =
 							attributeId !== null
 								? `[${displayName}](${siteUrl}/${metadata.id}#${slugifyCamelCase(attributeId)})`
