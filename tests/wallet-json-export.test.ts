@@ -54,7 +54,7 @@ describe('ratedWalletJsonExport', () => {
 				expect(perVariantKeys.sort()).toEqual([...payload.variants].sort())
 			})
 
-			it('overall and each variant block have the same set of attribute groups', () => {
+			it('each perVariant block has attributes and features', () => {
 				const overallGroups = Object.keys(payload.overall).sort()
 
 				for (const v of payload.variants) {
@@ -63,7 +63,12 @@ describe('ratedWalletJsonExport', () => {
 					expect(variantBlock).toBeDefined()
 
 					if (variantBlock !== undefined) {
-						expect(Object.keys(variantBlock).sort()).toEqual(overallGroups)
+						expect(variantBlock.attributes).toBeDefined()
+						expect(Object.keys(variantBlock.attributes).sort()).toEqual(overallGroups)
+
+						expect(variantBlock.features).toBeDefined()
+						expect(typeof variantBlock.features).toBe('object')
+						expect(variantBlock.features).not.toBeNull()
 					}
 				}
 			})

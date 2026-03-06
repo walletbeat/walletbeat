@@ -87,9 +87,9 @@
 		"perVariant": {
 			"type": "object",
 			"minProperties": 1,
-			"description": "Per-variant evaluation blocks. Keys are variant names (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE); only variants listed in the variants array appear. Each value has the same structure as overall (attribute groups keyed by group id, then attribute id, then attribute + evaluation block).",
+			"description": "Per-variant data. Keys are variant names (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE); only variants listed in the variants array appear. Each value has attributes (evaluation blocks, same structure as overall) and features (raw resolved feature data for that variant).",
 			"additionalProperties": {
-				"$ref": "#/$defs/attributeGroupsExport"
+				"$ref": "#/$defs/perVariantBlock"
 			},
 			"propertyNames": {
 				"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
@@ -98,6 +98,21 @@
 	},
 	"additionalProperties": false,
 	"$defs": {
+		"perVariantBlock": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["attributes", "features"],
+			"description": "Per-variant block: attribute evaluations (same structure as overall) and raw resolved feature data. Full schema for features is TBD; TODO: generate from TypeScript type definitions (see #552).",
+			"properties": {
+				"attributes": {
+					"$ref": "#/$defs/attributeGroupsExport"
+				},
+				"features": {
+					"type": "object",
+					"description": "Resolved feature tree for this variant. Structure matches resolved feature data; full schema TBD."
+				}
+			}
+		},
 		"stageBreakdownItem": {
 			"type": "object",
 			"additionalProperties": false,

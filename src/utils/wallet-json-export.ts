@@ -13,7 +13,8 @@ import type {
 	ValueSet,
 	WalletNameAndPseudonymStrings,
 } from '@/schema/attributes'
-import { toFullyQualified } from '@/schema/reference'
+import { type ResolvedFeatures } from '@/schema/features'
+import { isNoRef, toFullyQualified } from '@/schema/reference'
 import {
 	type WalletLadderEvaluation,
 	type WalletStage,
@@ -99,6 +100,30 @@ export interface AttributeExportBlock {
 /** Attribute groups keyed by group id, then attribute id, then attribute + evaluation block. */
 export type AttributeGroupsExport = Record<string, Record<string, AttributeExportBlock>>
 
+/** Per-variant export: attribute evaluations and raw feature data for one variant. */
+export interface PerVariantExport {
+	attributes: AttributeGroupsExport
+	features: unknown
+}
+
+type ReferenceInput = Parameters<typeof toFullyQualified>[0]
+
+function isReferenceInput(x: unknown): x is ReferenceInput {
+	if (x === undefined || x === null || isNoRef(x)) {
+		return false
+	}
+
+	if (typeof x === 'string' || Array.isArray(x)) {
+		return true
+	}
+
+	if (typeof x === 'object' && x !== null) {
+		return Object.hasOwn(x, 'urls') || Object.hasOwn(x, 'url')
+	}
+
+	return false
+}
+
 /** Single criterion within a stage for JSON export (mirrors markdown bullet). */
 export interface StageCriterionBreakdownItemJsonExport {
 	criterionId: string
@@ -127,7 +152,7 @@ export interface StageBreakdownItemJsonExport {
 export interface RatedWalletJsonExportBase {
 	$schema: string
 	overall: AttributeGroupsExport
-	perVariant: Partial<Record<Variant, AttributeGroupsExport>>
+	perVariant: Partial<Record<Variant, PerVariantExport>>
 	types: WalletType[]
 	variants: Variant[]
 	walletId: string
@@ -156,6 +181,53 @@ function serializeReferences(
 		...(ref.explanation !== undefined && { explanation: ref.explanation }),
 		urls: ref.urls.map(u => ({ label: u.label, url: u.url })),
 	}))
+}
+
+/**
+ * Recursively serialize a value from ResolvedFeatures (or nested feature data) to a
+ * JSON-serializable plain value. Normalizes `ref` properties: real references become
+ * ReferenceJsonExport[]; refTodo/refNotNecessary become null.
+ */
+function serializeFeatureValue(value: unknown): unknown {
+	if (value === null || typeof value !== 'object') {
+		return value
+	}
+
+	if (Array.isArray(value)) {
+		return value.map(serializeFeatureValue)
+	}
+
+	const result: Record<string, unknown> = {}
+
+	for (const [key, val] of Object.entries(value)) {
+		if (key === 'ref') {
+			const ref: unknown = val
+
+			if (ref === undefined || ref === null || isNoRef(ref)) {
+				result.ref = null
+			} else if (isReferenceInput(ref)) {
+				try {
+					result.ref = serializeReferences(ref)
+				} catch {
+					result.ref = null
+				}
+			} else {
+				result.ref = null
+			}
+		} else {
+			result[key] = serializeFeatureValue(val as unknown)
+		}
+	}
+
+	return result
+}
+
+/**
+ * Serialize ResolvedFeatures to a JSON-serializable plain object for export.
+ * Ref fields are normalized to the same shape as attribute references.
+ */
+function serializeResolvedFeatures(features: ResolvedFeatures): unknown {
+	return serializeFeatureValue(features)
 }
 
 function serializeAttribute<V extends Value>(
@@ -331,7 +403,10 @@ export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExpor
 		const resolved = wallet.variants[variant]
 
 		if (resolved !== undefined) {
-			payload.perVariant[variant] = serializeEvaluationTree(resolved.attributes, evalStrings)
+			payload.perVariant[variant] = {
+				attributes: serializeEvaluationTree(resolved.attributes, evalStrings),
+				features: serializeResolvedFeatures(resolved.features),
+			}
 		}
 	}
 
