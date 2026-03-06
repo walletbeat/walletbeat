@@ -495,13 +495,14 @@ export interface GuardianRecovery {
  * Note: account recovery features generally cannot be fully verified through
  * hands-on testing without deliberately losing access to a wallet.
  * Use the following approach instead:
- *   1. Walk through the wallet's recovery/backup settings UI to see what
- *      options are presented to the user.
- *   2. Read the wallet's official security or recovery documentation for
- *      the high-level policy (guardian types, thresholds, timelocks).
- *   3. Inspect the wallet's source code or published security audits for
- *      technical details that are not visible in the UI (e.g. where the
- *      recovery secret is reconstituted, or smart contract thresholds).
+ *
+ * 1. Walk through the wallet's recovery/backup settings UI to see what
+ * options are presented to the user.
+ * 2. Read the wallet's official security or recovery documentation for
+ * the high-level policy (guardian types, thresholds, timelocks).
+ * 3. Inspect the wallet's source code or published security audits for
+ * technical details that are not visible in the UI (e.g. where the
+ * recovery secret is reconstituted, or smart contract thresholds).
  */
 export interface AccountRecovery {
 	/**

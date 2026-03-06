@@ -65,10 +65,10 @@ A set of features about any type of wallet.
 None of the fields in this type should be marked as possibly `undefined`. If you want to add a new field, you need to add it to all existing wallets, even if unrated (i.e. `null`).
 
 - `profile` (`WalletProfile`): The profile of the wallet, determining the use-cases and audience that it is meant for. This has impact on which attributes are relevant to it, and which attributes it is exempt from. This is _not_ per-variant, because users would not expect that a single wallet would fulfill different use-cases depending on which variant of the wallet they install.
-- `security` (`{ /** * Public security audits the wallet has gone through. * If never audited, this should be an empty array, as 'null' represents * the fact that we haven't checked whether there have been any audit. */ publicSecurityAudits: SecurityAudit[] | null /** Bug bounty program implementation */ bugBountyProgram: VariantFeature<Support<BugBountyProgramImplementation>> /** Transaction legibility features. */ transactionLegibility: VariantFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation > /** Light clients. */ lightClient: { /** Light client used for Ethereum L1. */ ethereumL1: VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>> } /** How can users of the wallet recover their account? */ accountRecovery: VariantFeature<AccountRecovery> /** How are secret keys handled? */ keysHandling: VariantFeature<WithRef<KeysHandlingSupport>> }`): Security features.
-- `privacy` (`{ /** * Data collection information. * See /docs/mitmproxy-guide for how to collect this. */ dataCollection: VariantFeature<DataCollection> /** Privacy policy URL of the wallet. */ privacyPolicy: VariantFeature<string> /** Transaction privacy features. */ transactionPrivacy: VariantFeature<TransactionPrivacy> }`): Privacy features.
+- `security` (`{...}`): Security features.
+- `privacy` (`{...}`): Privacy features.
 - `selfSovereignty` (`object`): Self-sovereignty features.
-- `transparency` (`{ /** Information on how fees are displayed for basic operations. */ operationFees: VariantFeature<Nullable<BasicOperationFees>> }`): Transparency features.
+- `transparency` (`{...}`): Transparency features.
 - `accountSupport` (`VariantFeature<AccountSupport>`): Which types of accounts the wallet supports.
 - `multiAddress` (`VariantFeature<Support>`): Does the wallet support more than one Ethereum address?
 - `licensing` (`WalletLicensing`): License of the wallet. Variant specificity handled internally to `WalletLicense` type.
@@ -188,10 +188,10 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `variant` (`Variant`): The wallet variant which was used to resolve the feature tree.
 - `type` (`WalletType`): The type of the wallet. This is a shorthand for `variantToWalletType(variant)`, meant to be used for easy filtering in attribute evaluation code.
 - `profile` (`WalletProfile`): The profile of the wallet.
-- `security` (`{ scamAlerts: ResolvedFeature<ScamAlerts> publicSecurityAudits: SecurityAudit[] | null lightClient: { ethereumL1: ResolvedFeature<Support<WithRef<EthereumL1LightClientSupport>>> } hardwareWalletSupport: ResolvedFeature<HardwareWalletSupport> transactionLegibility: ResolvedFeature< HardwareTransactionLegibilityImplementation | SoftwareTransactionLegibilityImplementation > passkeyVerification: ResolvedFeature<Support<PasskeyVerificationImplementation>> bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>> firmware: ResolvedFeature<FirmwareSupport> keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>> supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport> supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport> userSafety: ResolvedFeature<UserSafetySupport> accountRecovery: ResolvedFeature<AccountRecovery> }`)
-- `privacy` (`{ dataCollection: ResolvedFeature<DataCollection> privacyPolicy: ResolvedFeature<string> hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport> transactionPrivacy: ResolvedFeature<TransactionPrivacy> appIsolation: ResolvedFeature<AppIsolation> }`)
-- `selfSovereignty` (`{ transactionSubmission: ResolvedFeature<TransactionSubmission> interoperability: ResolvedFeature<InteroperabilitySupport> }`)
-- `transparency` (`{ operationFees: ResolvedFeature<BasicOperationFees> reputation: ResolvedFeature<ReputationSupport> maintenance: ResolvedFeature<MaintenanceSupport> }`)
+- `security` (`{...}`)
+- `privacy` (`{...}`)
+- `selfSovereignty` (`{...}`)
+- `transparency` (`{...}`)
 - `chainAbstraction` (`ResolvedFeature<ChainAbstraction>`)
 - `chainConfigurability` (`ResolvedFeature<Support<WithRef<ChainConfigurability>>>`)
 - `accountSupport` (`ResolvedFeature<AccountSupport>`)
@@ -293,9 +293,18 @@ type AccountSupport = Exclude<
 
 Support information for EOA accounts.
 
-To test: - `keyDerivation`: During onboarding or in Settings, check whether the wallet shows a 12/24-word BIP39 seed phrase. Import the seed phrase into another BIP44-compatible wallet (e.g. MetaMask) and verify the same address is derived. - `canExportPrivateKey`: Go to Settings → Security (or equivalent) and look for an "Export private key" or "Show private key" option. - `canExportSeedPhrase`: Go to Settings → Security and look for a "Reveal seed phrase" or "Back up recovery phrase" option.
+To test:
 
-- `keyDerivation` (`| { type: 'NONSTANDARD' } | { type: 'BIP32' seedPhrase: 'NONSTANDARD' | 'BIP39' derivationPath: 'NONSTANDARD' | 'BIP44' canExportSeedPhrase: boolean }`): Type of standards used to deterministically derive private keys.
+- `keyDerivation`: During onboarding or in Settings, check whether the
+  wallet shows a 12/24-word BIP39 seed phrase. Import the seed phrase into
+  another BIP44-compatible wallet (e.g. MetaMask) and verify the same
+  address is derived.
+- `canExportPrivateKey`: Go to Settings → Security (or equivalent) and
+  look for an "Export private key" or "Show private key" option.
+- `canExportSeedPhrase`: Go to Settings → Security and look for a
+  "Reveal seed phrase" or "Back up recovery phrase" option.
+
+- `keyDerivation` (`| { type: 'NONSTANDARD' } | { type: 'BIP32' seedPhrase: 'NONSTANDARD' | 'BIP3...`): Type of standards used to deterministically derive private keys.
 - `canExportPrivateKey` (`boolean`): Can the wallet export EOA private keys directly?
 
 ---
@@ -375,11 +384,20 @@ type AccountType7702 = SmartAccountType
 
 Support information for Safe multisig accounts.
 
-To test: - `canDeployNew`: Go through the wallet's UI to create a new Safe and observe the default owner count and threshold. - `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to add or remove an owner using only the wallet's native UI (no extra modules). Check whether the wallet generates the `addOwnerWithThreshold` / `removeOwner` transaction directly. - `supportedConfigs`: Try connecting the wallet to Safes with 1, 2, and many owners at various thresholds, and note the limits.
+To test:
 
-- `canDeployNew` (`Support<{ /** Default configuration when creating a new Safe. */ defaultConfig: { /** Number of owners by default. */ owners: number /** Signature threshold by default. */ threshold: number /** Enabled modules by default. */ modules: string[] // or more specific type if needed } }>`): Can the wallet deploy new Safe contracts?
+- `canDeployNew`: Go through the wallet's UI to create a new Safe and
+  observe the default owner count and threshold.
+- `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
+  add or remove an owner using only the wallet's native UI (no extra
+  modules). Check whether the wallet generates the `addOwnerWithThreshold`
+  / `removeOwner` transaction directly.
+- `supportedConfigs`: Try connecting the wallet to Safes with 1, 2, and
+  many owners at various thresholds, and note the limits.
+
+- `canDeployNew` (`Support<{ defaultConfig: { owners: number threshold: number modules: string[]...`): Can the wallet deploy new Safe contracts?
 - `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
-- `supportedConfigs` (`{ /** Minimum number of owners supported. */ minOwners: number /** Maximum number of owners supported (or 'unlimited'). */ maxOwners: number | 'unlimited' /** Whether any threshold is supported. */ supportsAnyThreshold: boolean /** Level of module support. */ moduleSupport: 'none' | 'partial' | 'full' }`): Supported configurations for existing Safes.
+- `supportedConfigs` (`{...}`): Supported configurations for existing Safes.
 
 ---
 
@@ -398,8 +416,8 @@ How does the wallet display token balances?
 
 Chain abstraction features.
 
-- `crossChainBalances` (`WithRef<{ /** Can the wallet display the account's total value across all chains? (i.e. Combined USD value of all assets across Ethereum, Arbitrum, and other L2s.) */ globalAccountValue: Support /** Can the wallet display the value of the account on a single chain? (i.e. Total USD value of assets on Ethereum, independent of other chains.) */ perChainAccountValue: Support /** * How does the wallet display Ether balances? * Chains on which Ether is not the native unit are ignored here. */ ether: CrossChainBalanceDisplay /** * How does the wallet display USDC balances? * USDC is chosen as a sample token for which it is useful to see one's * total cross-chain balance. * Chains on which USDC is not deployed are ignored here. */ usdc: CrossChainBalanceDisplay }>`): What types of balances can the wallet display?
-- `bridging` (`{ /** * Does the wallet have a built-in bridging feature? * (e.g. The wallet allows the user to bridge ETH from Ethereum to Arbitrum directly within the wallet UI, without needing an external app.) */ builtInBridging: Support< WithRef<{ /** * Are the trust assumptions of the bridge explained to the user? * (i.e. The wallet shows a warning that the bridge is operated by an external provider and that funds may be at risk.) */ risksExplained: 'NOT_IN_UI' | 'VISIBLE_BY_DEFAULT' | 'HIDDEN_BY_DEFAULT' /** * How are the fees involved in bridging explained to the user? * For the purpose of evaluating this attribute, fees of 1bps or * smaller are not taken into consideration (it is OK for wallets * to not display them). * (e.g. The wallet shows a fee breakdown before the user confirms the bridge transaction.) */ feesLargerThan1bps: FeeDisplay }> > /** * When the user is attempting to spend tokens on a chain where their * balance is insufficient, but where they have sufficient balance on * another chain, does the wallet automatically propose the user to bridge? * (e.g. The user tries to send USDC on Arbitrum but only has USDC on Ethereum, the wallet prompts them to bridge first.) */ suggestedBridging: Support<WithRef<{}>> }`): Chain bridging features.
+- `crossChainBalances` (`WithRef<{ globalAccountValue: Support perChainAccountValue: Support ether: Cr...`): What types of balances can the wallet display?
+- `bridging` (`{...}`): Chain bridging features.
 
 ---
 
@@ -470,7 +488,11 @@ Types of software wallets that hardware wallets can connect through
 Specific details about a app connection method when supported
 
 - `supportedConnections` (`NonEmptySet<AppConnectionMethod | SoftwareWalletType>`): Which connection methods are supported (must have at least one). (e.g. A hardware wallet that supports both its own open-source app and MetaMask would list `VENDOR_OPEN_SOURCE_APP` and `METAMASK` here.)
-- `requiresManufacturerConsent` (`| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' } | MustRef<{ type: 'FEATURES_GATED_BY_MANUFACTURER' }> | null`): Is manufacturer consent required to integrate any hardware wallet feature into a software wallet? If so, must provide reference. - `ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE`: any software wallet can integrate the hardware wallet without needing approval from the manufacturer. - `FEATURES_GATED_BY_MANUFACTURER`: the manufacturer must approve before a software wallet can access certain features.
+- `requiresManufacturerConsent` (`| { type: 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE' } | MustRef<{ type: 'FEA...`): Is manufacturer consent required to integrate any hardware wallet feature into a software wallet? If so, must provide reference.
+  - `ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE`: any software wallet can integrate the hardware
+    wallet without needing approval from the manufacturer.
+  - `FEATURES_GATED_BY_MANUFACTURER`: the manufacturer must approve before a software wallet can
+    access certain features.
 
 ---
 
@@ -500,8 +522,17 @@ type BrowserIntegrationEip = '1193' | '2700' | '6963'
 
 Level of integration of a wallet within browsers, mobile phones, etc.
 
-- `browser` (`'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>`): Browser-level integrations. Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser version. Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/ It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
-- `walletCall` (`VariantFeature<Support<WithRef<WalletCallIntegration>>>`): EIP-5792: Wallet Call API support. The wallet must support all of the following calls: - wallet_sendCalls - wallet_getCallsStatus - wallet_showCallsStatus - wallet_getCapabilities Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
+- `browser` (`'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>`): Browser-level integrations. Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser version.
+
+  Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/ It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
+
+- `walletCall` (`VariantFeature<Support<WithRef<WalletCallIntegration>>>`): EIP-5792: Wallet Call API support. The wallet must support all of the following calls:
+  - wallet_sendCalls
+  - wallet_getCallsStatus
+  - wallet_showCallsStatus
+  - wallet_getCapabilities
+
+  Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
 
 ---
 
@@ -643,7 +674,7 @@ type GuardianScenarioOutcome<S extends GuardianScenarioType> = {
 Which methods of address resolution a wallet supports.
 
 - `nonChainSpecificEnsResolution` (`ARS`): Support for basic ENS lookups (ENS domain to non-chain-specific raw hex address). To test: type `donations.walletbeat.eth` in the send address field. If it resolves, it is supported.
-- `chainSpecificAddressing` (`{ /** * Address lookup through ERC-7828. * To test: type `donations.walletbeat.eth@optimism.eth`in the send address field and check if it resolves. */ erc7828: ARS /** * Address lookup through ERC-7831. * To test: type`donations.walletbeat.eth:optimism:1` in the send address field and check if it resolves. */ erc7831: ARS }`): Chain-specific address lookups.
+- `chainSpecificAddressing` (`{...}`): Chain-specific address lookups.
 
 ---
 
@@ -713,7 +744,7 @@ To identify: use the Walletbeat test page (https://beta.walletbeat.eth.limo/test
 - `ALL_ACCOUNTS` = `'ALL_ACCOUNTS'`: The wallet exposes all user accounts to every connected app. (e.g. `eth_accounts` returns three addresses even though only one is active.) To identify: connect the wallet to an app while having multiple accounts set up, then call `eth_accounts` — all accounts are returned, not just the active one.
 - `ACTIVE_ACCOUNT_ONLY` = `'ACTIVE_ACCOUNT_ONLY'`: The wallet exposes only the currently active/selected account. (e.g. `eth_accounts` returns a single address — whichever account is selected in the wallet at that moment.) To identify: switch accounts in the wallet and call `eth_accounts` from an app — only one address is returned and it matches the currently active account.
 - `NO_DEFAULT` = `'NO_DEFAULT'`: There is no default set of exposed accounts; the user must explicitly choose which account(s) to share during the connection flow. (e.g. The wallet shows an account picker every time a new app requests access, with no account pre-selected.) To identify: on a freshly loaded app that has never been connected before, call `eth_accounts` before initiating a connect — it returns an empty array. During the connect flow the wallet prompts the user to choose which account to expose.
-- `APP_SPECIFIC_ACCOUNT` = `'APP_SPECIFIC_ACCOUNT'`: The wallet exposes a different address per app/origin, derived specifically for that app, so apps cannot correlate activity across sites. (e.g. app.uniswap.org sees address `0xAAA`, app.aave.com sees address `0xBBB`, even though they both belong to the same user.) To identify: connect the wallet to two different apps and compare the addresses returned by `eth_accounts` — they should differ even for the same underlying account.
+- `APP_SPECIFIC_ACCOUNT` = `'APP_SPECIFIC_ACCOUNT'`: The wallet exposes a different address per app/origin, derived specifically for that app, so apps cannot correlate activity across sites. (e.g. app.uniswap.org sees address 0xAAA, app.aave.com sees address 0xBBB, even though they both belong to the same user.) To identify: connect the wallet to two different apps and compare the addresses returned by `eth_accounts` — they should differ even for the same underlying account.
 
 ---
 
@@ -761,7 +792,12 @@ Values are comparable as integers; the closest to zero, the more privacy.
 
 How a wallet approaches fetching data for multiple addresses.
 
-- `ACTIVE_ADDRESS_ONLY` = `'ACTIVE_ADDRESS_ONLY'`: If the wallet only handles one active account at a time, and never fetches data about other accounts unless the user actively decides to switch account. In this scenario, the wallet may support multiple addresses, but from a network correlation perspective, these multiple addresses are not correlatable on a timing basis. NOTE 1: Wallets that support multiple accounts often have an "account switcher" view which may refresh all addresses' balance at the same time. If so, this counts as SIMULTANEOUS, since the N requests happen simultaneously when the user opens this switcher. NOTE 2: Wallets using stealth addresses need to handle multiple addresses even for a single logical user account. For such wallets, the concept of "active address" does not make sense, since accounts are abstracted from addresses, and it is critical for such wallets to not allow correlation of the multiple addresses that belong to the same account or user.
+- `ACTIVE_ADDRESS_ONLY` = `'ACTIVE_ADDRESS_ONLY'`: If the wallet only handles one active account at a time, and never fetches data about other accounts unless the user actively decides to switch account. In this scenario, the wallet may support multiple addresses, but from a network correlation perspective, these multiple addresses are not correlatable on a timing basis.
+
+  NOTE 1: Wallets that support multiple accounts often have an "account switcher" view which may refresh all addresses' balance at the same time. If so, this counts as SIMULTANEOUS, since the N requests happen simultaneously when the user opens this switcher.
+
+  NOTE 2: Wallets using stealth addresses need to handle multiple addresses even for a single logical user account. For such wallets, the concept of "active address" does not make sense, since accounts are abstracted from addresses, and it is critical for such wallets to not allow correlation of the multiple addresses that belong to the same account or user.
+
 - `SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES` = `'SINGLE_REQUEST_WITH_MULTIPLE_ADDRESSES'`: If the wallet supports multiple addresses and fetches data for all of them in the same request (bearing all the addresses within).
 - `SEPARATE_REQUEST_PER_ADDRESS` = `'SEPARATE_REQUEST_PER_ADDRESS'`: If the wallet supports multiple addresses and fetches data for all of them in separate requests (one per address).
 
@@ -1647,7 +1683,10 @@ This is not a comprehensive list — if a wallet uses a recovery scheme that doe
 
 To identify: read the wallet's recovery documentation or security audit. Look for keywords — "secret sharing", "MPC", "Shamir" indicate SECRET_SPLIT; "approve", "guardians", "timelock", "waiting period" indicate K_OF_N_WITH_TIMELOCK.
 
-- `SECRET_SPLIT_ACROSS_GUARDIANS` = `'SECRET_SPLIT_ACROSS_GUARDIANS'`: A recovery secret (seed phrase or equivalent cryptographic material) is split into shares using a scheme like Shamir's Secret Sharing or MPC, and each share is distributed to a different guardian. Recovery requires collecting enough shares to reconstruct the secret. To identify: the wallet documentation mentions "key splitting", "MPC", "Shamir", or describes that recovery involves multiple parties each contributing a fragment of the key. Source code inspection can confirm.
+- `SECRET_SPLIT_ACROSS_GUARDIANS` = `'SECRET_SPLIT_ACROSS_GUARDIANS'`: A recovery secret (seed phrase or equivalent cryptographic material) is split into shares using a scheme like Shamir's Secret Sharing or MPC, and each share is distributed to a different guardian. Recovery requires collecting enough shares to reconstruct the secret.
+
+  To identify: the wallet documentation mentions "key splitting", "MPC", "Shamir", or describes that recovery involves multiple parties each contributing a fragment of the key. Source code inspection can confirm.
+
 - `K_OF_N_WITH_TIMELOCK` = `'K_OF_N_WITH_TIMELOCK'`: K out of N designated guardians must approve a recovery request, subject to a timelock delay that lets the legitimate owner cancel it. (e.g. The user sets up 3 guardians and requires 2 approvals, with a 3-day waiting period during which the owner can cancel a malicious recovery.) To identify: the wallet documentation describes "X of Y guardians must approve" and a "waiting period" or "timelock". Check the recovery smart contract for the actual threshold and delay values.
 
 ---
@@ -1797,7 +1836,9 @@ For wallets supporting social recovery (guardian-based), what policy does it use
 
 How the wallet makes it possible for the user to recover their account.
 
-Note: account recovery features generally cannot be fully verified through hands-on testing without deliberately losing access to a wallet. Use the following approach instead: 1. Walk through the wallet's recovery/backup settings UI to see what options are presented to the user. 2. Read the wallet's official security or recovery documentation for the high-level policy (guardian types, thresholds, timelocks). 3. Inspect the wallet's source code or published security audits for technical details that are not visible in the UI (e.g. where the recovery secret is reconstituted, or smart contract thresholds).
+Note: account recovery features generally cannot be fully verified through hands-on testing without deliberately losing access to a wallet. Use the following approach instead:
+
+1. Walk through the wallet's recovery/backup settings UI to see what options are presented to the user. 2. Read the wallet's official security or recovery documentation for the high-level policy (guardian types, thresholds, timelocks). 3. Inspect the wallet's source code or published security audits for technical details that are not visible in the UI (e.g. where the recovery secret is reconstituted, or smart contract thresholds).
 
 - `guardianRecovery` (`Support<WithRef<GuardianRecovery>>`): If the wallet supports "social recovery" (guardian-based), what policy does it use for the guardians? To identify: look for a "Recovery", "Backup", or "Guardian" section in the wallet's security settings. If no such feature exists, set to not supported. If it exists, fill in `GuardianRecovery` using the wallet's documentation and source code as described above.
 
@@ -2072,7 +2113,9 @@ If the key is split between multiple parties, how does signing/reconstruction oc
 - `NON_MULTIPARTY` = `'NON_MULTIPARTY'`: The key is not split — it exists in full on the user's device. This is the standard model for traditional seed phrase wallets.
 - `ON_USER_DEVICE` = `'RECONSTRUCTED_ON_USER_DEVICE'`: The key shares are combined on the user's device to reconstruct the full key before signing. The key exists in full on-device momentarily. (e.g. A wallet that stores key shares with different guardians but fetches them all to the user's device and assembles the key locally at signing time.) To identify: the wallet documentation describes "client-side key reconstruction" or the source code shows shares being combined on-device.
 - `MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE` = `'MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE'`: Signing is performed through a multi-party computation protocol that includes the user's device as one of the signing parties. The full key is never reconstructed — each party signs with its share. (e.g. An MPC wallet where the user's device holds one key share and the provider's server holds another; both participate in threshold signing for every transaction without ever combining their shares.) To identify: the wallet documentation describes "threshold signing", "MPC signing", or "distributed signing" where the user's device participates.
-- `MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE` = `'MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE'`: Signing is performed through a multi-party computation entirely on remote infrastructure — the user's device does not participate in the signing computation itself, only in authorizing it To identify: the wallet documentation describes server-side MPC signing where the user's device is not one of the signing parties.
+- `MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE` = `'MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE'`: Signing is performed through a multi-party computation entirely on remote infrastructure — the user's device does not participate in the signing computation itself, only in authorizing it
+
+  To identify: the wallet documentation describes server-side MPC signing where the user's device is not one of the signing parties.
 
 ---
 
@@ -2535,10 +2578,101 @@ Benchmark transactions for complex contract interactions.
 
 These transactions interact with smart contracts in non-trivial ways, so there is no simple "to" address or "value" to display. Instead, we evaluate whether the wallet explains the transaction outcome.
 
-- `USDC_APPROVAL` = `'USDC_APPROVAL'`: USDC approval transaction cast calldata "approve(address,uint256)" `0x06496E706bB260Bef1656297A7eaDDF5D3E7788A` 1000000 https://tools.cyfrin.io/abi-encoding?data=`0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240` 📞 Function: approve(address,uint256) 📋 Parameters: param0: `0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2` - AAVE Address param1: 1000000 To: `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48`
-- `AAVE_SUPPLY` = `'AAVE_SUPPLY'`: Aave supply transaction cast calldata "supply(address,uint256,address,uint16)" `0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E` 50000000000000000000 `0x9467919138E36f0252886519f34a0f8016dDb3a3` 0 https://tools.cyfrin.io/abi-encoding?data=`0x617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000` 📞 Function: supply(address,uint256,address,uint16) 📋 Parameters: param0: `0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E` param1: 50000000000000000000 param2: `0x9467919138E36f0252886519f34a0f8016dDb3a3` param3: 0
-- `SAFEWALLET_AAVE_SUPPLY_NESTED` = `'SAFEWALLET_AAVE_SUPPLY_NESTED'`: SafeWallet Aave supply transaction https://tools.cyfrin.io/abi-encoding?data=`0x6a76120200000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000084617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041000000000000000000000000F8Cade19b26a2B970F2dEF5eA9ECcF1bda3d118600000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000` 📞 Function: execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes) 📋 Parameters: param0: `0x78e30497a3c7527d953c6B1E3541b021A98Ac43c` param1: 0 param2: 📞 Function: supply(address,uint256,address,uint16) 🔍 Selector: `0x617ba037` 📋 Parameters: param0: `0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E` param1: 50000000000000000000 param2: `0x9467919138E36f0252886519f34a0f8016dDb3a3` param3: 0 🔤 Raw Data: `0x617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000` param3: 0 param4: 0 param5: 0 param6: 0 param7: `0x0000000000000000000000000000000000000000` param8: `0x0000000000000000000000000000000000000000` param9: `0x000000000000000000000000f8cade19b26a2b970f2def5ea9eccf1bda3d1186000000000000000000000000000000000000000000000000000000000000000001`
-- `SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND` = `'SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND'`: SafeWallet Aave USDC approve supply batch nested multi-send transaction https://tools.cyfrin.io/abi-encoding?data=`0x6a761202000000000000000000000000f220d3b4dfb23c4ade8c88e526c1353abacbc38f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000034000000000000000000000000000000000000000000000000000000000000001c48d80ff0a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000172005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c000000000000000000000000000000000000000000000002b5e3af16b18800000078e30497a3c7527d953c6b1e3541b021a98ac43c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041000000000000000000000000F8Cade19b26a2B970F2dEF5eA9ECcF1bda3d118600000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000` 📞 Function: execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes) 📋 Parameters: param0: `0xf220D3b4DFb23C4ade8C88E526C1353AbAcbC38F` param1: 0 param2: 📞 Function: multiSend(bytes) 🔍 Selector: `0x8d80ff0a` 📋 Parameters: param0: 📦 Multi-Send (2 transactions): \[0\] Transaction: Operation: 0 (Call) To: `0x5a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e` Value: 0 Data Length: 68 Decoded Call: 📞 Function: approve(address,uint256) 🔍 Selector: `0x095ea7b3` 📋 Parameters: param0: `0x78e30497a3c7527d953c6B1E3541b021A98Ac43c` param1: 50000000000000000000 🔤 Raw Data: `0x095ea7b300000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c000000000000000000000000000000000000000000000002b5e3af16b1880000` \[1\] Transaction: Operation: 0 (Call) To: `0x78e30497a3c7527d953c6b1e3541b021a98ac43c` Value: 0 Data Length: 132 Decoded Call: 📞 Function: supply(address,uint256,address,uint16) 🔍 Selector: `0x617ba037` 📋 Parameters: param0: `0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E` param1: 50000000000000000000 param2: `0x9467919138E36f0252886519f34a0f8016dDb3a3` param3: 0 🔤 Raw Data: `0x617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000` 🔤 Raw Data: `0x8d80ff0a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000172005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c000000000000000000000000000000000000000000000002b5e3af16b18800000078e30497a3c7527d953c6b1e3541b021a98ac43c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000` param3: 1 param4: 0 param5: 0 param6: 0 param7: `0x0000000000000000000000000000000000000000` param8: `0x0000000000000000000000000000000000000000` param9: `0x000000000000000000000000f8cade19b26a2b970f2def5ea9eccf1bda3d1186000000000000000000000000000000000000000000000000000000000000000001`
+- `USDC_APPROVAL` = `'USDC_APPROVAL'`: USDC approval transaction cast calldata "approve(address,uint256)" 0x06496E706bB260Bef1656297A7eaDDF5D3E7788A 1000000 https://tools.cyfrin.io/abi-encoding?data=0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000000f4240
+
+  ```
+  📞 Function: approve(address,uint256)
+  📋 Parameters:
+    param0: 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2 - AAVE Address
+    param1: 1000000
+  To: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+  ```
+
+- `AAVE_SUPPLY` = `'AAVE_SUPPLY'`: Aave supply transaction cast calldata "supply(address,uint256,address,uint16)" 0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E 50000000000000000000 0x9467919138E36f0252886519f34a0f8016dDb3a3 0 https://tools.cyfrin.io/abi-encoding?data=0x617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000
+
+  ```
+  📞 Function: supply(address,uint256,address,uint16)
+  📋 Parameters:
+    param0: 0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E
+    param1: 50000000000000000000
+    param2: 0x9467919138E36f0252886519f34a0f8016dDb3a3
+    param3: 0
+  ```
+
+- `SAFEWALLET_AAVE_SUPPLY_NESTED` = `'SAFEWALLET_AAVE_SUPPLY_NESTED'`: SafeWallet Aave supply transaction https://tools.cyfrin.io/abi-encoding?data=0x6a76120200000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000084617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041000000000000000000000000F8Cade19b26a2B970F2dEF5eA9ECcF1bda3d118600000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000
+
+  ```
+  📞 Function: execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)
+  📋 Parameters:
+    param0: 0x78e30497a3c7527d953c6B1E3541b021A98Ac43c
+    param1: 0
+    param2:
+      📞 Function: supply(address,uint256,address,uint16)
+      🔍 Selector: 0x617ba037
+      📋 Parameters:
+        param0: 0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E
+        param1: 50000000000000000000
+        param2: 0x9467919138E36f0252886519f34a0f8016dDb3a3
+        param3: 0
+      🔤 Raw Data: 0x617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000
+    param3: 0
+    param4: 0
+    param5: 0
+    param6: 0
+    param7: 0x0000000000000000000000000000000000000000
+    param8: 0x0000000000000000000000000000000000000000
+    param9: 0x000000000000000000000000f8cade19b26a2b970f2def5ea9eccf1bda3d1186000000000000000000000000000000000000000000000000000000000000000001
+  ```
+
+- `SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND` = `'SAFEWALLET_AAVE_USDC_APPROVE_SUPPLY_BATCH_NESTED_MULTISEND'`: SafeWallet Aave USDC approve supply batch nested multi-send transaction https://tools.cyfrin.io/abi-encoding?data=0x6a761202000000000000000000000000f220d3b4dfb23c4ade8c88e526c1353abacbc38f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000034000000000000000000000000000000000000000000000000000000000000001c48d80ff0a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000172005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c000000000000000000000000000000000000000000000002b5e3af16b18800000078e30497a3c7527d953c6b1e3541b021a98ac43c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000041000000000000000000000000F8Cade19b26a2B970F2dEF5eA9ECcF1bda3d118600000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000
+
+  ```
+
+  📞 Function: execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)
+  📋 Parameters:
+    param0: 0xf220D3b4DFb23C4ade8C88E526C1353AbAcbC38F
+    param1: 0
+    param2:
+      📞 Function: multiSend(bytes)
+      🔍 Selector: 0x8d80ff0a
+      📋 Parameters:
+        param0:
+          📦 Multi-Send (2 transactions):
+            [0] Transaction:
+              Operation: 0 (Call)
+              To: 0x5a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e
+              Value: 0
+              Data Length: 68
+              Decoded Call:
+                📞 Function: approve(address,uint256)
+                🔍 Selector: 0x095ea7b3
+                📋 Parameters:
+                  param0: 0x78e30497a3c7527d953c6B1E3541b021A98Ac43c
+                  param1: 50000000000000000000
+                🔤 Raw Data: 0x095ea7b300000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c000000000000000000000000000000000000000000000002b5e3af16b1880000
+            [1] Transaction:
+              Operation: 0 (Call)
+              To: 0x78e30497a3c7527d953c6b1e3541b021a98ac43c
+              Value: 0
+              Data Length: 132
+              Decoded Call:
+                📞 Function: supply(address,uint256,address,uint16)
+                🔍 Selector: 0x617ba037
+                📋 Parameters:
+                  param0: 0x5A7d6b2F92C77FAD6CCaBd7EE0624E64907Eaf3E
+                  param1: 50000000000000000000
+                  param2: 0x9467919138E36f0252886519f34a0f8016dDb3a3
+                  param3: 0
+                🔤 Raw Data: 0x617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000
+      🔤 Raw Data: 0x8d80ff0a00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000172005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044095ea7b300000000000000000000000078e30497a3c7527d953c6b1e3541b021a98ac43c000000000000000000000000000000000000000000000002b5e3af16b18800000078e30497a3c7527d953c6b1e3541b021a98ac43c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000084617ba0370000000000000000000000005a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e000000000000000000000000000000000000000000000002b5e3af16b18800000000000000000000000000009467919138e36f0252886519f34a0f8016ddb3a30000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    param3: 1
+    param4: 0
+    param5: 0
+    param6: 0
+    param7: 0x0000000000000000000000000000000000000000
+    param8: 0x0000000000000000000000000000000000000000
+    param9: 0x000000000000000000000000f8cade19b26a2b970f2def5ea9eccf1bda3d1186000000000000000000000000000000000000000000000000000000000000000001
+  ```
 
 ---
 
@@ -2573,7 +2707,10 @@ Details for a failed simulation benchmark transaction.
 
 Details for a nondeterministic simulation benchmark transaction.
 
-- `nondeterminism` (`| 'NO_OUTCOME_SHOWN' | 'STATIC_SINGLE_OUTCOME' | 'RESIMULATES_NO_WARNING' | 'RESIMULATES_WITH_WARNING'`): How the wallet handles state-dependent (non-deterministic) transactions. - STATIC_SINGLE_OUTCOME: Shows one outcome and keeps it static. No re-simulation if state changes. - RESIMULATES_NO_WARNING: Re-simulates and updates the outcome if state changes, but doesn’t explicitly warn the user. - RESIMULATES_WITH_WARNING: Re-simulates and explicitly warns that multiple outcomes are possible.
+- `nondeterminism` (`| 'NO_OUTCOME_SHOWN' | 'STATIC_SINGLE_OUTCOME' | 'RESIMULATES_NO_WARNING' | '...`): How the wallet handles state-dependent (non-deterministic) transactions.
+  - STATIC_SINGLE_OUTCOME: Shows one outcome and keeps it static. No re-simulation if state changes.
+  - RESIMULATES_NO_WARNING: Re-simulates and updates the outcome if state changes, but doesn’t explicitly warn the user.
+  - RESIMULATES_WITH_WARNING: Re-simulates and explicitly warns that multiple outcomes are possible.
 
 ---
 
@@ -2798,7 +2935,11 @@ Can the wallet's usage of a particular chain be configured?
 
 Can the wallet be used to perform basic operations only using a self-hosted node?
 
-- `withNoConnectivityExceptL1RPCEndpoint` (`{ /** * Can you create an account? * To test: go through the wallet's new account / seed phrase creation * flow in the restricted environment and check if it completes successfully. */ accountCreation: Support /** * Can you import an account? * To test: import an existing seed phrase or private key in the restricted * environment and check if the wallet loads without errors. */ accountImport: Support /** * Can you see your Ether balance? * To test: after setup, check if the ETH balance is displayed using only * the self-hosted L1 RPC, with no external API calls. */ etherBalanceLookup: Support /** * Can you look up an ERC-20 token balance? * Requiring the user to input the ERC-20 contract address is OK, * the token does not need to be automatically discovered. * To test: manually enter a known ERC-20 contract address and check * if the balance loads using only the L1 RPC. */ erc20BalanceLookup: Support /** * Can you send an ERC-20 token to another address? * Requiring the user to input the ERC-20 contract address is OK, * the token does not need to be automatically discovered. * Must be able to send to a different address than your own. * To test: attempt to send an ERC-20 token to a different address in the * restricted environment. The transaction should broadcast successfully * using only the L1 RPC, with no external API calls required. */ erc20TokenSend: Support }`): Can the wallet be used to perform basic operations only using the L1 RPC provider? These operations must be tested in an environment with no network connectivity to external services, other than to a user's L1 RPC endpoint. To set up the test environment: point the wallet at a self-hosted node, then block all other outbound traffic using firewall rules, `/etc/hosts`, or browser DevTools → Network conditions → Offline (with a localhost RPC proxy still reachable). Then attempt each operation below and record whether it succeeds.
+- `withNoConnectivityExceptL1RPCEndpoint` (`{...}`): Can the wallet be used to perform basic operations only using the L1 RPC provider?
+
+  These operations must be tested in an environment with no network connectivity to external services, other than to a user's L1 RPC endpoint.
+
+  To set up the test environment: point the wallet at a self-hosted node, then block all other outbound traffic using firewall rules, `/etc/hosts`, or browser DevTools → Network conditions → Offline (with a localhost RPC proxy still reachable). Then attempt each operation below and record whether it succeeds.
 
 ---
 
@@ -2870,8 +3011,8 @@ To identify: check the wallet's documentation or UI for any "force include", "se
 
 Support for transaction broadcast and inclusion. L1 broadcast fields require network traffic inspection or source code research to verify — the UI alone does not reveal how transactions are submitted.
 
-- `l1` (`WithRef<{ /** * Whether the wallet can broadcast transactions by participating directly * in the Ethereum P2P gossip network, without relying on any RPC endpoint. * To identify: check the wallet's source code for a P2P networking stack * (e.g. devp2p). If absent, set to not supported. Set to null if unknown. */ selfBroadcastViaDirectGossip: Support | null /** * Whether the wallet submits transactions through the user's self-hosted * node when one is configured as the RPC endpoint. * Verify by configuring a local node, sending a transaction, * and confirming via network traffic that the `eth_sendRawTransaction` call goes to your * node and not to any external relay or bundler. */ selfBroadcastViaSelfHostedNode: Support | null }>`): Options for broadcasting transactions to L1. The ref must link to documentation or source code evidence for each claim.
-- `l2` (`WithRef<Record<TransactionSubmissionL2Type, TransactionSubmissionL2Support | null>>`): Options for broadcasting transactions to L2 chains. The ref must link to documentation or source code evidence. Set a chain's value to null if its support level has not been researched.
+- `l1` (`WithRef<{ selfBroadcastViaDirectGossip: Support | null selfBroadcastViaSelfHo...`): Options for broadcasting transactions to L1. The ref must link to documentation or source code evidence for each claim.
+- `l2` (`WithRef<Record<TransactionSubmissionL2Type, TransactionSubmissionL2Support | ...`): Options for broadcasting transactions to L2 chains. The ref must link to documentation or source code evidence. Set a chain's value to null if its support level has not been researched.
 
 ---
 
@@ -3043,8 +3184,13 @@ type LicenseWithRef = { license: License } &
 
 Type of licensing by the wallet.
 
-- `SINGLE_WALLET_REPO_AND_LICENSE` = `'SINGLE_WALLET_REPO_AND_LICENSE'`: There is a single repository that is entirely covered by a single license. This repository is all that is needed to build the wallet locally. (e.g. A wallet with one GitHub repo, one LICENSE file covering all its code, and no separate proprietary core dependency required to build it.) To identify: the wallet has one main source repository with one LICENSE file, and all wallet functionality can be built from that repository alone.
-- `SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE` = `'SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE'`: The wallet's code is split between "core code" covered under a specific license, and wallet/app code that is covered under a different license. To identify: the wallet has separate repositories — or a monorepo with separate LICENSE files per package — where the signing/crypto library and the UI app carry different licenses.
+- `SINGLE_WALLET_REPO_AND_LICENSE` = `'SINGLE_WALLET_REPO_AND_LICENSE'`: There is a single repository that is entirely covered by a single license. This repository is all that is needed to build the wallet locally. (e.g. A wallet with one GitHub repo, one LICENSE file covering all its code, and no separate proprietary core dependency required to build it.)
+
+  To identify: the wallet has one main source repository with one LICENSE file, and all wallet functionality can be built from that repository alone.
+
+- `SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE` = `'SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE'`: The wallet's code is split between "core code" covered under a specific license, and wallet/app code that is covered under a different license.
+
+  To identify: the wallet has separate repositories — or a monorepo with separate LICENSE files per package — where the signing/crypto library and the UI app carry different licenses.
 
 ---
 

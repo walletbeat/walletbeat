@@ -3,6 +3,8 @@ import * as path from 'path'
 import * as prettier from 'prettier'
 import ts from 'typescript'
 
+import { assertValidMarkdown } from '@/tests/utils/assert-valid-markdown'
+
 export interface FeaturesMarkdownConfig {
 	featuresSrcFile: string
 	featuresDir: string
@@ -23,7 +25,7 @@ interface FileResult {
  * Extracts JSDoc comment lines from a node's leading trivia.
  * Returns cleaned lines (leading "* " stripped, @tag lines removed).
  */
-function extractJSDocLines(sourceText: string, node: ts.Node): string[] {
+async function extractJSDocLines(sourceText: string, node: ts.Node): Promise<string[]> {
 	const ranges = ts.getLeadingCommentRanges(sourceText, node.getFullStart()) ?? []
 	let lastJsDocRange: ts.CommentRange | undefined
 
@@ -62,49 +64,112 @@ function extractJSDocLines(sourceText: string, node: ts.Node): string[] {
 		cleaned.pop()
 	}
 
+	await assertValidMarkdown(cleaned.join('\n') + '\n')
+
 	return cleaned
 }
 
-/** Convert JSDoc lines to a description, preserving paragraph breaks. */
+/**
+ * Convert JSDoc lines to a description.
+ * - Prose lines within a paragraph are joined with spaces.
+ * - List items (`- `, `* `) and their continuations preserve line breaks.
+ * - Fenced code blocks (``` ... ```) are preserved verbatim.
+ * - Blank lines separate segments with a double newline.
+ */
 function jsDocToDescription(lines: string[]): string {
 	if (lines.length === 0) {
 		return ''
 	}
 
-	const paragraphs: string[][] = [[]]
+	type SegmentType = 'prose' | 'list' | 'code'
+	type Segment = { type: SegmentType; lines: string[] }
+	const segments: Segment[] = []
+	const lastSeg = (): Segment | undefined => segments[segments.length - 1]
+	let inCode = false
 
 	for (const line of lines) {
-		if (line.trim() === '') {
-			paragraphs.push([])
+		const trimmed = line.trim()
+
+		if (trimmed.startsWith('```')) {
+			if (!inCode) {
+				inCode = true
+				segments.push({ type: 'code', lines: [trimmed] })
+			} else {
+				inCode = false
+				lastSeg()!.lines.push(trimmed)
+			}
+		} else if (inCode) {
+			lastSeg()!.lines.push(line)
+		} else if (trimmed === '') {
+			if (lastSeg() !== undefined) {
+				segments.push({ type: 'prose', lines: [] })
+			}
+		} else if (/^[-*+] /.test(trimmed) || (/^ {2,}/.test(line) && lastSeg()?.type === 'list')) {
+			if (lastSeg()?.type !== 'list') {
+				segments.push({ type: 'list', lines: [] })
+			}
+
+			lastSeg()!.lines.push(line)
 		} else {
-			paragraphs[paragraphs.length - 1].push(line.trim())
+			if (lastSeg()?.type !== 'prose') {
+				segments.push({ type: 'prose', lines: [] })
+			}
+
+			lastSeg()!.lines.push(trimmed)
 		}
 	}
 
-	return paragraphs
-		.filter(p => p.length > 0)
-		.map(p => p.join(' '))
+	return segments
+		.filter(s => s.lines.length > 0)
+		.map(s => (s.type === 'prose' ? s.lines.join(' ') : s.lines.join('\n')))
 		.join('\n\n')
 }
 
-/** Convert JSDoc lines to a single-line description. */
-function jsDocToSingleLine(lines: string[]): string {
-	return lines
-		.filter(l => l.trim() !== '')
-		.map(l => l.trim())
-		.join(' ')
+/**
+ * Format a description string for embedding inside a markdown list item.
+ * The first line continues the bullet; subsequent lines are indented 2 spaces.
+ * Blank lines are preserved unindented.
+ */
+function descriptionForListItem(desc: string): string {
+	return desc
+		.split('\n')
+		.map((l, i) => (i === 0 || l.trim() === '' ? l : '  ' + l))
+		.join('\n')
+}
+
+/**
+ * Get the display string for a TypeScript type node.
+ * Inline object literals (`{ ... }`) are shown as `{...}` to avoid
+ * dumping multi-line type definitions (with embedded JSDoc trivia) into a
+ * single unreadable line. Other types are shown verbatim, truncated at 80
+ * characters if needed.
+ */
+function typeDisplay(typeNode: ts.TypeNode | undefined, sourceFile: ts.SourceFile): string {
+	if (typeNode === undefined) {
+		return 'unknown'
+	}
+
+	if (ts.isTypeLiteralNode(typeNode)) {
+		return '{...}'
+	}
+
+	const raw = typeNode
+		.getText(sourceFile)
+		.replace(/\/\*[\s\S]*?\*\//g, '') // strip block comments (incl. JSDoc)
+		.replace(/\/\/[^\n]*/g, '') // strip line comments
+		.replace(/\s+/g, ' ')
 		.trim()
-		.replace(/\b0x[0-9a-fA-F]+\b/g, match => `\`${match}\``)
-		.replace(/\[(\d+)\]/g, '\\[$1\\]')
+
+	return raw.length > 80 ? raw.slice(0, 77) + '...' : raw
 }
 
 // --- Type Rendering ---
 
-function renderInterfaceMembers(
+async function renderInterfaceMembers(
 	sourceFile: ts.SourceFile,
 	sourceText: string,
 	members: ts.NodeArray<ts.TypeElement>,
-): string {
+): Promise<string> {
 	const lines: string[] = []
 
 	for (const member of members) {
@@ -113,11 +178,10 @@ function renderInterfaceMembers(
 		}
 
 		const name = member.name.getText(sourceFile)
-		const rawType = member.type?.getText(sourceFile) ?? 'unknown'
-		const type = rawType.replace(/\s+/g, ' ').trim()
+		const type = typeDisplay(member.type, sourceFile)
 		const optional = member.questionToken !== undefined ? ', optional' : ''
-		const desc = jsDocToSingleLine(extractJSDocLines(sourceText, member))
-		const descPart = desc ? `: ${desc}` : ''
+		const desc = jsDocToDescription(await extractJSDocLines(sourceText, member))
+		const descPart = desc ? `: ${descriptionForListItem(desc)}` : ''
 
 		lines.push(`- \`${name}\` (\`${type}\`${optional})${descPart}`)
 	}
@@ -129,18 +193,18 @@ function renderInterfaceMembers(
 	return lines.join('\n') + '\n'
 }
 
-function renderEnumMembers(
+async function renderEnumMembers(
 	sourceFile: ts.SourceFile,
 	sourceText: string,
 	members: ts.NodeArray<ts.EnumMember>,
-): string {
+): Promise<string> {
 	const lines: string[] = []
 
 	for (const member of members) {
 		const name = member.name.getText(sourceFile)
 		const value = member.initializer?.getText(sourceFile) ?? '(auto)'
-		const desc = jsDocToSingleLine(extractJSDocLines(sourceText, member))
-		const descPart = desc ? `: ${desc}` : ''
+		const desc = jsDocToDescription(await extractJSDocLines(sourceText, member))
+		const descPart = desc ? `: ${descriptionForListItem(desc)}` : ''
 
 		lines.push(`- \`${name}\` = \`${value}\`${descPart}`)
 	}
@@ -172,7 +236,7 @@ function getTypeParams(
 }
 
 /** Process a single TypeScript file, returning its relative path and generated Markdown content. */
-function processFile(filePath: string, srcRoot: string): FileResult {
+async function processFile(filePath: string, srcRoot: string): Promise<FileResult> {
 	const sourceText = fs.readFileSync(filePath, 'utf-8')
 	const sourceFile = ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true)
 	const relPath = path.relative(srcRoot, filePath)
@@ -191,7 +255,7 @@ function processFile(filePath: string, srcRoot: string): FileResult {
 			continue
 		}
 
-		const jsdocLines = extractJSDocLines(sourceText, stmt)
+		const jsdocLines = await extractJSDocLines(sourceText, stmt)
 		const desc = jsDocToDescription(jsdocLines)
 
 		if (ts.isInterfaceDeclaration(stmt)) {
@@ -203,7 +267,7 @@ function processFile(filePath: string, srcRoot: string): FileResult {
 				content += desc + '\n\n'
 			}
 
-			content += renderInterfaceMembers(sourceFile, sourceText, stmt.members)
+			content += await renderInterfaceMembers(sourceFile, sourceText, stmt.members)
 			content += '\n---\n\n'
 		} else if (ts.isEnumDeclaration(stmt)) {
 			content += `### Enum: \`${stmt.name.text}\`\n\n`
@@ -212,7 +276,7 @@ function processFile(filePath: string, srcRoot: string): FileResult {
 				content += desc + '\n\n'
 			}
 
-			content += renderEnumMembers(sourceFile, sourceText, stmt.members)
+			content += await renderEnumMembers(sourceFile, sourceText, stmt.members)
 			content += '\n---\n\n'
 		} else {
 			// TypeAliasDeclaration
@@ -227,7 +291,7 @@ function processFile(filePath: string, srcRoot: string): FileResult {
 			const typeNode = stmt.type
 
 			if (ts.isTypeLiteralNode(typeNode)) {
-				content += renderInterfaceMembers(sourceFile, sourceText, typeNode.members)
+				content += await renderInterfaceMembers(sourceFile, sourceText, typeNode.members)
 			} else {
 				const typeText = typeNode.getText(sourceFile)
 
@@ -291,7 +355,7 @@ export async function generateMarkdown(config: FeaturesMarkdownConfig): Promise<
 	const fileResults: FileResult[] = []
 
 	for (const filePath of files) {
-		const result = processFile(filePath, config.srcRoot)
+		const result = await processFile(filePath, config.srcRoot)
 
 		if (result.content) {
 			fileResults.push(result)
@@ -338,6 +402,8 @@ export async function generateMarkdown(config: FeaturesMarkdownConfig): Promise<
 		'\n' +
 		sections.trimEnd() +
 		'\n'
+
+	await assertValidMarkdown(raw)
 
 	const prettierConfig = (await prettier.resolveConfig(config.outputPath)) ?? {}
 

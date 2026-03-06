@@ -31,10 +31,10 @@ export interface WalletIntegration {
 	/**
 	 * EIP-5792: Wallet Call API support.
 	 * The wallet must support all of the following calls:
-	 *  - wallet_sendCalls
-	 *  - wallet_getCallsStatus
-	 *  - wallet_showCallsStatus
-	 *  - wallet_getCapabilities
+	 * - wallet_sendCalls
+	 * - wallet_getCallsStatus
+	 * - wallet_showCallsStatus
+	 * - wallet_getCapabilities
 	 *
 	 * Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
 	 */
