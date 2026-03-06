@@ -1,3 +1,5 @@
+import { getBaseUrl } from '@/base-url'
+import { ratedWalletExportSchemaPath } from '@/constants'
 import {
 	type EvaluationTree,
 	mapNonExemptAttributeGroupsInTree,
@@ -123,6 +125,7 @@ export interface StageBreakdownItemJsonExport {
 }
 
 export interface RatedWalletJsonExportBase {
+	$schema: string
 	overall: AttributeGroupsExport
 	types: WalletType[]
 	variants: Variant[]
@@ -309,6 +312,7 @@ export function ratedWalletJsonExport(wallet: RatedWallet): RatedWalletJsonExpor
 			: undefined
 
 	const payload: RatedWalletJsonExport = {
+		$schema: `${getBaseUrl()}/${ratedWalletExportSchemaPath}`,
 		walletId: wallet.metadata.id,
 		types: setItems(wallet.types),
 		variants: setItems(getVariants(wallet.variants)),

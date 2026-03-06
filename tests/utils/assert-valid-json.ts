@@ -1,13 +1,14 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import * as url from 'node:url'
 
 import Ajv2020 from 'ajv/dist/2020'
 
-const schemaFilePath = path.join(
-	path.dirname(url.fileURLToPath(import.meta.url)),
-	'../fixtures/rated-wallet-export-schema.json',
-)
+import { ratedWalletExportSchemaPath } from '@/constants'
+
+import { getRepositoryRoot } from './codebase'
+
+/** Schema lives in public/; Astro serves public/ at /. Path is repo root + public + path constant. */
+const schemaFilePath = path.join(getRepositoryRoot(), 'public', ratedWalletExportSchemaPath)
 const schemaJson = fs.readFileSync(schemaFilePath, { encoding: 'utf-8' })
 const parsedSchema: unknown = JSON.parse(schemaJson)
 

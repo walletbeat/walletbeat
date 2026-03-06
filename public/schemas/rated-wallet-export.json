@@ -14,6 +14,10 @@
 		"stageBreakdown"
 	],
 	"properties": {
+		"$schema": {
+			"type": "string",
+			"description": "URL of the JSON Schema for this document."
+		},
 		"walletId": {
 			"type": "string",
 			"minLength": 1,
@@ -86,6 +90,7 @@
 	},
 	"propertyNames": {
 		"enum": [
+			"$schema",
 			"walletId",
 			"types",
 			"variants",
