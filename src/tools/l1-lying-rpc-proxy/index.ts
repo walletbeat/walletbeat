@@ -109,7 +109,7 @@ function forwardToUpstream(
 		const url = new URL(upstreamUrl)
 		const isHttps = url.protocol === 'https:'
 
-		const options: http.RequestOptions = {
+		const options: https.RequestOptions = {
 			hostname: url.hostname,
 			port: url.port || (isHttps ? 443 : 80),
 			path: url.pathname + url.search,
