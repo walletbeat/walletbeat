@@ -2,17 +2,20 @@ import * as path from 'path'
 import { describe, expect, it } from 'vitest'
 
 import { assertValidMarkdown } from '@/tests/utils/assert-valid-markdown'
+import { getRepositoryRoot } from '@/tests/utils/codebase'
 import {
 	featuresMarkdownUpdate,
 	generateMarkdown,
 } from '@/tools/features-markdown-generator/features-markdown-generator-lib'
 import { trimWhitespacePrefix } from '@/types/utils/text'
 
+const repoRoot = getRepositoryRoot()
+
 const config = {
-	featuresSrcFile: path.join(__dirname, '..', 'src', 'schema', 'features.ts'),
-	featuresDir: path.join(__dirname, '..', 'src', 'schema', 'features'),
-	outputPath: path.join(__dirname, '..', 'docs', 'features.md'),
-	srcRoot: path.join(__dirname, '..'),
+	featuresSrcFile: path.join(repoRoot, 'src', 'schema', 'features.ts'),
+	featuresDir: path.join(repoRoot, 'src', 'schema', 'features'),
+	outputPath: path.join(repoRoot, 'docs', 'features.md'),
+	srcRoot: repoRoot,
 	quiet: true,
 	test: true,
 }

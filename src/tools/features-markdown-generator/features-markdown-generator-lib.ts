@@ -84,7 +84,15 @@ function jsDocToDescription(lines: string[]): string {
 	type SegmentType = 'prose' | 'list' | 'code'
 	type Segment = { type: SegmentType; lines: string[] }
 	const segments: Segment[] = []
-	const lastSeg = (): Segment | undefined => segments[segments.length - 1]
+	const lastSeg = (): Segment => {
+		const seg = segments[segments.length - 1]
+
+		if (seg === undefined) {
+			throw new Error('No segments')
+		}
+
+		return seg
+	}
 	let inCode = false
 
 	for (const line of lines) {
@@ -96,26 +104,29 @@ function jsDocToDescription(lines: string[]): string {
 				segments.push({ type: 'code', lines: [trimmed] })
 			} else {
 				inCode = false
-				lastSeg()!.lines.push(trimmed)
+				lastSeg().lines.push(trimmed)
 			}
 		} else if (inCode) {
-			lastSeg()!.lines.push(line)
+			lastSeg().lines.push(line)
 		} else if (trimmed === '') {
-			if (lastSeg() !== undefined) {
+			if (segments.length > 0) {
 				segments.push({ type: 'prose', lines: [] })
 			}
-		} else if (/^[-*+] /.test(trimmed) || (/^ {2,}/.test(line) && lastSeg()?.type === 'list')) {
-			if (lastSeg()?.type !== 'list') {
+		} else if (
+			/^[-*+] /.test(trimmed) ||
+			(segments.length > 0 && /^ {2,}/.test(line) && lastSeg().type === 'list')
+		) {
+			if (segments.length === 0 || lastSeg().type !== 'list') {
 				segments.push({ type: 'list', lines: [] })
 			}
 
-			lastSeg()!.lines.push(line)
+			lastSeg().lines.push(line)
 		} else {
-			if (lastSeg()?.type !== 'prose') {
+			if (segments.length === 0 || lastSeg().type !== 'prose') {
 				segments.push({ type: 'prose', lines: [] })
 			}
 
-			lastSeg()!.lines.push(trimmed)
+			lastSeg().lines.push(trimmed)
 		}
 	}
 
