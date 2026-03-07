@@ -108,7 +108,6 @@ function forwardToUpstream(
 	return new Promise((resolve, reject) => {
 		const url = new URL(upstreamUrl)
 		const isHttps = url.protocol === 'https:'
-		const lib = isHttps ? https : http
 
 		const options: http.RequestOptions = {
 			hostname: url.hostname,
@@ -122,17 +121,19 @@ function forwardToUpstream(
 			},
 		}
 
-		const req = lib.request(options, res => {
-			const chunks: Buffer[] = []
+		const callback = (res: http.IncomingMessage): void => {
+			const chunks: Uint8Array[] = []
 
-			res.on('data', (chunk: Buffer) => chunks.push(chunk))
+			res.on('data', (chunk: Uint8Array) => chunks.push(chunk))
 			res.on('end', () => {
 				resolve({
 					statusCode: res.statusCode ?? 200,
 					body: Buffer.concat(chunks),
 				})
 			})
-		})
+		}
+
+		const req = isHttps ? https.request(options, callback) : http.request(options, callback)
 
 		req.on('error', reject)
 		req.write(body)
@@ -153,10 +154,10 @@ function createHandler(upstream: string, multiplier: bigint) {
 			return
 		}
 
-		const chunks: Buffer[] = []
+		const chunks: Uint8Array[] = []
 
-		for await (const chunk of req as AsyncIterable<Buffer>) {
-			chunks.push(Buffer.from(chunk as Uint8Array))
+		for await (const chunk of req as AsyncIterable<Uint8Array>) {
+			chunks.push(chunk)
 		}
 
 		const rawBody = Buffer.concat(chunks)
