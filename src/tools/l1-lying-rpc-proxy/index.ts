@@ -1,6 +1,5 @@
 import * as http from 'http'
 import * as https from 'https'
-import { URL } from 'url'
 
 // Configuration
 const DEFAULT_PORT = 8545
@@ -106,13 +105,9 @@ function forwardToUpstream(
 	body: Buffer,
 ): Promise<{ statusCode: number; body: Buffer }> {
 	return new Promise((resolve, reject) => {
-		const url = new URL(upstreamUrl)
-		const isHttps = url.protocol === 'https:'
+		const isHttps = upstreamUrl.startsWith('https:')
 
-		const options: https.RequestOptions = {
-			hostname: url.hostname,
-			port: url.port || (isHttps ? 443 : 80),
-			path: url.pathname + url.search,
+		const options: http.RequestOptions = {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -133,7 +128,9 @@ function forwardToUpstream(
 			})
 		}
 
-		const req = isHttps ? https.request(options, callback) : http.request(options, callback)
+		const req = isHttps
+			? https.request(upstreamUrl, options, callback)
+			: http.request(upstreamUrl, options, callback)
 
 		req.on('error', reject)
 		req.write(body)
