@@ -54,6 +54,7 @@ To resolve this tension, this document aims to establish an upfront policy which
     - Their own identity/pseudonym and affiliation
     - The communications channel that the subset of the conversation is from
     - The span of time that the conversation covers (start/end dates as `YYYY-MM-DD`).
+  - Exception: Large-scale communication channels (21 human participants or more) that feature both **ongoing open entry policy to wallet development teams** and **ability for new participants to look at past conversation history** are not subject to this publication, since other wallet development teams may join them and look back through the history at any time. The _existence_ of such communications channels must still be disclosed.
 * Questions about Walletbeat methodology/clarifications do not _need_ disclosure, as it is helpful for wallet development teams to request clarifications on Walletbeat criteria. However, if any such discussion ends up resulting in a methodology _change_ on the Walletbeat website/repository (even just a wording/clarification change without an underlying policy change), the change _must_ disclose which communication channel was at the source of this change.
   - All methodology changes (whether the result of communications or not) must always come with accompanying rationale.
 * Discussions about financial compensation **must** always be disclosed in full, unless they match already-published universal terms that Walletbeat already publicly offers to any other wallet development team.
