@@ -107,7 +107,7 @@ function forwardToUpstream(
 	return new Promise((resolve, reject) => {
 		const isHttps = upstreamUrl.startsWith('https:')
 
-		const options: http.RequestOptions = {
+		const options = {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ function createHandler(upstream: string, multiplier: bigint) {
 
 		// Normalize to array and validate each response
 		const rawResponses: unknown[] = Array.isArray(parsedUpstream)
-			? (parsedUpstream as unknown[])
+			? parsedUpstream
 			: [parsedUpstream]
 
 		// Verify the upstream response array is the same length as the request array.
