@@ -3,11 +3,12 @@ import { erc4337 } from '@/data/eips/erc-4337'
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type AccountType,
 	type AccountType7702,
@@ -17,8 +18,6 @@ import {
 	type AccountTypeSafe,
 	isAccountTypeSupported,
 } from '@/schema/features/account-support'
-import { isSupported } from '@/schema/features/support'
-import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
 import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
@@ -27,9 +26,9 @@ import { pickWorstRating, unrated } from '../common'
 export type AccountAbstractionValue = Value
 
 function supportsErc4337AndEip7702(
-	references: ReferenceArray,
+	ctx: EvaluationContext<AccountAbstractionValue>,
 ): Evaluation<AccountAbstractionValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'erc4337_and_eip7702_ready',
 			rating: Rating.PASS,
@@ -41,12 +40,13 @@ function supportsErc4337AndEip7702(
 		details: markdown(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)} and ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
-		references,
-	}
+	})
 }
 
-function supportsErc4337(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
-	return {
+function supportsErc4337(
+	ctx: EvaluationContext<AccountAbstractionValue>,
+): Evaluation<AccountAbstractionValue> {
+	return ctx.build({
 		value: {
 			id: 'erc4337_ready',
 			rating: Rating.PASS,
@@ -56,12 +56,13 @@ function supportsErc4337(references: ReferenceArray): Evaluation<AccountAbstract
 		details: markdown(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)}.`,
 		),
-		references,
-	}
+	})
 }
 
-function supportsEip7702(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
-	return {
+function supportsEip7702(
+	ctx: EvaluationContext<AccountAbstractionValue>,
+): Evaluation<AccountAbstractionValue> {
+	return ctx.build({
 		value: {
 			id: 'eip7702_ready',
 			rating: Rating.PASS,
@@ -71,12 +72,13 @@ function supportsEip7702(references: ReferenceArray): Evaluation<AccountAbstract
 		details: markdown(
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
-		references,
-	}
+	})
 }
 
-function supportsEoaAndMpc(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
-	return {
+function supportsEoaAndMpc(
+	ctx: EvaluationContext<AccountAbstractionValue>,
+): Evaluation<AccountAbstractionValue> {
+	return ctx.build({
 		value: {
 			id: 'eoa_and_mpc_only',
 			rating: Rating.FAIL,
@@ -94,12 +96,13 @@ function supportsEoaAndMpc(references: ReferenceArray): Evaluation<AccountAbstra
 		howToImprove: markdown(
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
-		references,
-	}
+	})
 }
 
-function supportsMpcOnly(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
-	return {
+function supportsMpcOnly(
+	ctx: EvaluationContext<AccountAbstractionValue>,
+): Evaluation<AccountAbstractionValue> {
+	return ctx.build({
 		value: {
 			id: 'mpc_only',
 			rating: Rating.FAIL,
@@ -117,12 +120,13 @@ function supportsMpcOnly(references: ReferenceArray): Evaluation<AccountAbstract
 		howToImprove: markdown(
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
-		references,
-	}
+	})
 }
 
-function supportsRawEoaOnly(references: ReferenceArray): Evaluation<AccountAbstractionValue> {
-	return {
+function supportsRawEoaOnly(
+	ctx: EvaluationContext<AccountAbstractionValue>,
+): Evaluation<AccountAbstractionValue> {
+	return ctx.build({
 		value: {
 			id: 'eoa_only',
 			rating: Rating.FAIL,
@@ -138,8 +142,7 @@ function supportsRawEoaOnly(references: ReferenceArray): Evaluation<AccountAbstr
 		howToImprove: markdown(
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
-		references,
-	}
+	})
 }
 
 export const accountAbstraction: Attribute<AccountAbstractionValue> = {
@@ -192,72 +195,75 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 				mdSentence(
 					`The wallet supports EOA accounts and can use Account Abstraction features via ${eipMarkdownLinkAndTitle(eip7702)}.`,
 				),
-				supportsEip7702([]),
+				supportsEip7702(EvaluationContext.forTest(() => accountAbstraction)),
 			),
 			exampleRating(
 				mdSentence(
 					`The wallet supports smart wallet accounts using ${eipMarkdownLinkAndTitle(erc4337)}.`,
 				),
-				supportsErc4337([]),
+				supportsErc4337(EvaluationContext.forTest(() => accountAbstraction)),
 			),
 		],
 		partial: [],
 		fail: [
 			exampleRating(
 				mdSentence('The wallet only supports plain EOAs without Account Abstraction features.'),
-				supportsRawEoaOnly([]),
+				supportsRawEoaOnly(EvaluationContext.forTest(() => accountAbstraction)),
 			),
 			exampleRating(
 				mdSentence('The wallet only supports MPC wallets without Account Abstraction features.'),
-				supportsMpcOnly([]),
+				supportsMpcOnly(EvaluationContext.forTest(() => accountAbstraction)),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<AccountAbstractionValue> => {
-		if (features.accountSupport === null) {
-			return unrated(accountAbstraction, null)
+	evaluate: (
+		ctx: EvaluationContext<AccountAbstractionValue>,
+	): Evaluation<AccountAbstractionValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
+
+		if (ctx.features.accountSupport === null) {
+			return unrated(ctx, null)
 		}
 
 		const supported: Record<AccountType, boolean> = {
-			eoa: isAccountTypeSupported<AccountTypeEoa>(features.accountSupport.eoa),
-			mpc: isAccountTypeSupported<AccountTypeMpc>(features.accountSupport.mpc),
-			safe: isAccountTypeSupported<AccountTypeSafe>(features.accountSupport.safe),
+			eoa: isAccountTypeSupported<AccountTypeEoa>(ctx.features.accountSupport.eoa),
+			mpc: isAccountTypeSupported<AccountTypeMpc>(ctx.features.accountSupport.mpc),
+			safe: isAccountTypeSupported<AccountTypeSafe>(ctx.features.accountSupport.safe),
 			rawErc4337: isAccountTypeSupported<AccountTypeMutableMultifactor>(
-				features.accountSupport.rawErc4337,
+				ctx.features.accountSupport.rawErc4337,
 			),
-			eip7702: isAccountTypeSupported<AccountType7702>(features.accountSupport.eip7702),
+			eip7702: isAccountTypeSupported<AccountType7702>(ctx.features.accountSupport.eip7702),
 		}
-		const allRefs = mergeRefs(
-			isSupported(features.accountSupport.eoa) ? refs(features.accountSupport.eoa) : [],
-			isSupported(features.accountSupport.mpc) ? refs(features.accountSupport.mpc) : [],
-			isSupported(features.accountSupport.rawErc4337)
-				? refs(features.accountSupport.rawErc4337)
-				: [],
-			isSupported(features.accountSupport.eip7702) ? refs(features.accountSupport.eip7702) : [],
+
+		ctx.addRef(
+			ctx.features.accountSupport.eoa,
+			ctx.features.accountSupport.mpc,
+			ctx.features.accountSupport.rawErc4337,
+			ctx.features.accountSupport.eip7702,
 		)
 
 		if (supported.rawErc4337 && supported.eip7702) {
-			return supportsErc4337AndEip7702(allRefs)
+			return supportsErc4337AndEip7702(ctx)
 		}
 
 		if (supported.rawErc4337) {
-			return supportsErc4337(allRefs)
+			return supportsErc4337(ctx)
 		}
 
 		if (supported.eip7702) {
-			return supportsEip7702(allRefs)
+			return supportsEip7702(ctx)
 		}
 
 		if (supported.eoa && supported.mpc) {
-			return supportsEoaAndMpc(allRefs)
+			return supportsEoaAndMpc(ctx)
 		}
 
 		if (supported.mpc) {
-			return supportsMpcOnly(allRefs)
+			return supportsMpcOnly(ctx)
 		}
 
 		if (supported.eoa) {
-			return supportsRawEoaOnly(allRefs)
+			return supportsRawEoaOnly(ctx)
 		}
 
 		throw new Error('Wallet supports no account type')
