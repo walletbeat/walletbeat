@@ -16,6 +16,7 @@
 		"check:spelling:quiet": "cspell lint --quiet --no-progress .",
 		"check:syntax": "prettier --check .",
 		"check:treasury:markdown": "tsx src/tools/treasury-markdown-updater/treasury-markdown-updater.ts",
+		"l1-lying-rpc-proxy": "tsx src/tools/l1-lying-rpc-proxy/index.ts",
 		"check:misc": "for script in deploy/misc-tests/*.sh; do echo \"> Running check: $(basename \"${script}\" | cut -d. -f1)...\" >&2; bash \"$script\" || exit \"$?\"; done; echo \"> All checks passed!\" >&2",
 		"check:vitest": "vitest --typecheck --cache",
 		"check:build:post": "tests/postbuild.sh",
