@@ -4,13 +4,14 @@
 	import { WalletLadderType, ladders } from '@/schema/ladders'
 	import { StageCriterionRating, stageCriterionRatings, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
-	import { computeCountsAndStatus, computeStageCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
+	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
 	/** Aggregate statuses for stages and stage groups (must match StageCountsStatus in stage-attributes) */
 	enum StageStatus {
 		PASS = 'PASS',
 		PARTIAL = 'PARTIAL',
 		FAIL = 'FAIL',
+		UNRATED = 'UNRATED',
 	}
 
 	const stageStatuses = {
@@ -28,6 +29,11 @@
 			icon: '❌',
 			label: 'All criteria failed',
 			color: 'var(--rating-fail)',
+		},
+		[StageStatus.UNRATED]: {
+			icon: '❔',
+			label: 'Some criteria unrated',
+			color: 'var(--rating-unrated)',
 		},
 	} as const satisfies Record<
 		StageStatus,
@@ -114,7 +120,7 @@
 			{#each ladderDefinition.stages as s, index}
 				{@const stageIndex = index}
 				{@const isCurrent = stage && typeof stage !== 'string' && stage.id === s.id}
-				{@const { passedCount, totalCount, status: stageRating } = computeStageCountsAndStatus(s, stageEvaluatableWallet)}
+				{@const { passedCount, totalCount, status: stageRating } = computeCountsAndStatus(allCriteriaInStage(s), stageEvaluatableWallet)}
 				{@const isDefaultOpen = defaultOpenStageIndex === stageIndex}
 
 				<details

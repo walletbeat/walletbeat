@@ -125,7 +125,7 @@
 				"totalCount": { "type": "integer", "minimum": 0 },
 				"status": {
 					"type": "string",
-					"enum": ["PASS", "PARTIAL", "FAIL"]
+					"enum": ["PASS", "PARTIAL", "FAIL", "UNRATED"]
 				},
 				"criteriaGroups": {
 					"type": "array",

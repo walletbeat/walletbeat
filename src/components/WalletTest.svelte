@@ -665,7 +665,7 @@ Issued At: ${new Date().toISOString()}`;
           {stepTestState}
           onRunStep={runCurrentStep}
           onReset={resetStepTests}
-          onSelectProvider={(providerId) => { stepTestState.selectedProviderId = providerId; }}
+          onSelectProvider={(providerId: string) => { stepTestState.selectedProviderId = providerId; }}
         />
       {/if}
     </div>

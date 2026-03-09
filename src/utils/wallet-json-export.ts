@@ -14,7 +14,12 @@ import type {
 	WalletNameAndPseudonymStrings,
 } from '@/schema/attributes'
 import { type ResolvedFeatures } from '@/schema/features'
-import { isNoRef, toFullyQualified } from '@/schema/reference'
+import {
+	isNoRef,
+	isReferenceInput,
+	type ReferenceInput,
+	toFullyQualified,
+} from '@/schema/reference'
 import {
 	type WalletLadderEvaluation,
 	type WalletStage,
@@ -29,7 +34,12 @@ import { setItems } from '@/types/utils/non-empty'
 import { getHowIsEvaluatedHeading } from '@/utils/attribute-display'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import { computeStageCountsAndStatus, getCriterionAttributeId } from '@/utils/stage-attributes'
+import {
+	allCriteriaInStage,
+	computeCountsAndStatus,
+	getCriterionAttributeId,
+	type StageCountsStatus,
+} from '@/utils/stage-attributes'
 import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
 const DETAILS_FALLBACK = 'See full details on the wallet page.'
@@ -106,25 +116,6 @@ export interface PerVariantExport {
 	features: unknown
 }
 
-type ReferenceInput = Parameters<typeof toFullyQualified>[0]
-
-function isReferenceInput(x: unknown): x is ReferenceInput {
-	if (x === undefined || x === null || isNoRef(x)) {
-		return false
-	}
-
-	if (typeof x === 'string' || Array.isArray(x)) {
-		return true
-	}
-
-	if (typeof x === 'object' && x !== null) {
-		return Object.hasOwn(x, 'urls') || Object.hasOwn(x, 'url')
-	}
-
-	return false
-}
-
-/** Single criterion within a stage for JSON export (mirrors markdown bullet). */
 export interface StageCriterionBreakdownItemJsonExport {
 	criterionId: string
 	attributeId: string | null
@@ -145,7 +136,7 @@ export interface StageBreakdownItemJsonExport {
 	label: string
 	passedCount: number
 	totalCount: number
-	status: 'PASS' | 'PARTIAL' | 'FAIL'
+	status: StageCountsStatus
 	criteriaGroups: StageCriteriaGroupBreakdownItemJsonExport[]
 }
 
@@ -168,9 +159,7 @@ export interface RatedWalletJsonExportBase {
 /** Export shape: base fields with perVariant object keyed by variant (e.g. BROWSER, MOBILE). */
 export type RatedWalletJsonExport = RatedWalletJsonExportBase
 
-function serializeReferences(
-	references: Parameters<typeof toFullyQualified>[0],
-): ReferenceJsonExport[] {
+function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
 	const qualified = toFullyQualified(references)
 
 	if (qualified.length === 0) {
@@ -184,49 +173,49 @@ function serializeReferences(
 }
 
 /**
- * Recursively serialize a value from ResolvedFeatures (or nested feature data) to a
- * JSON-serializable plain value. Normalizes `ref` properties: real references become
- * ReferenceJsonExport[]; refTodo/refNotNecessary become null.
- */
-function serializeFeatureValue(value: unknown): unknown {
-	if (value === null || typeof value !== 'object') {
-		return value
-	}
-
-	if (Array.isArray(value)) {
-		return value.map(serializeFeatureValue)
-	}
-
-	const result: Record<string, unknown> = {}
-
-	for (const [key, val] of Object.entries(value)) {
-		if (key === 'ref') {
-			const ref: unknown = val
-
-			if (ref === undefined || ref === null || isNoRef(ref)) {
-				result.ref = null
-			} else if (isReferenceInput(ref)) {
-				try {
-					result.ref = serializeReferences(ref)
-				} catch {
-					result.ref = null
-				}
-			} else {
-				result.ref = null
-			}
-		} else {
-			result[key] = serializeFeatureValue(val as unknown)
-		}
-	}
-
-	return result
-}
-
-/**
  * Serialize ResolvedFeatures to a JSON-serializable plain object for export.
  * Ref fields are normalized to the same shape as attribute references.
  */
 function serializeResolvedFeatures(features: ResolvedFeatures): unknown {
+	/**
+	 * Recursively serialize a value from ResolvedFeatures (or nested feature data) to a
+	 * JSON-serializable plain value. Normalizes `ref` properties: real references become
+	 * ReferenceJsonExport[]; refTodo/refNotNecessary become null.
+	 */
+	function serializeFeatureValue(value: unknown): unknown {
+		if (value === null || typeof value !== 'object') {
+			return value
+		}
+
+		if (Array.isArray(value)) {
+			return value.map(serializeFeatureValue)
+		}
+
+		const result: Record<string, unknown> = {}
+
+		for (const [key, val] of Object.entries(value)) {
+			if (key === 'ref') {
+				const ref: unknown = val
+
+				if (ref === undefined || ref === null || isNoRef(ref)) {
+					result.ref = null
+				} else if (isReferenceInput(ref)) {
+					try {
+						result.ref = serializeReferences(ref)
+					} catch {
+						result.ref = null
+					}
+				} else {
+					result.ref = null
+				}
+			} else {
+				result[key] = serializeFeatureValue(val as unknown)
+			}
+		}
+
+		return result
+	}
+
 	return serializeFeatureValue(features)
 }
 
@@ -346,8 +335,8 @@ function computeStageBreakdown(
 	const result: StageBreakdownItemJsonExport[] = []
 
 	for (const s of ladderEvaluation.ladder.stages) {
-		const { passedCount, totalCount, status } = computeStageCountsAndStatus(
-			s,
+		const { passedCount, totalCount, status } = computeCountsAndStatus(
+			allCriteriaInStage(s),
 			stageEvaluatableWallet,
 		)
 

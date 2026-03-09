@@ -90,7 +90,7 @@
 		data-sticky
 		bind:value={searchValue}
 		placeholder="Search (⌘+K)"
-		{@attach element => {
+		{@attach (element: HTMLInputElement) => {
 			const abortController = new AbortController()
 
 			let lastFocusedElement: HTMLElement | undefined = $state()
@@ -158,12 +158,11 @@
 		<details
 			bind:open={
 				() => (
-					effectiveSearchValue ?
-						matchesSearch(item, effectiveSearchValue)
-					:
-						isOpen.get(item) ?? isOpen.set(item, hasCurrentPage(item)).get(item)
+					effectiveSearchValue
+						? matchesSearch(item, effectiveSearchValue)
+						: (isOpen.get(item) ?? isOpen.set(item, hasCurrentPage(item)).get(item) ?? false)
 				),
-				_ => {
+				(_: boolean) => {
 					if (!effectiveSearchValue && _ !== undefined)
 						isOpen.set(item, _)
 				}

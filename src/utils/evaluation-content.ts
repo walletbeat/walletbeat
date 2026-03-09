@@ -1,4 +1,4 @@
-import type { WalletNameAndPseudonymStrings } from '@/schema/attributes'
+import type { ConcreteWalletEvalStrings, WalletNameAndPseudonymStrings } from '@/schema/attributes'
 import type { RatedWallet } from '@/schema/wallet'
 import {
 	type Content,
@@ -6,17 +6,6 @@ import {
 	renderTypographicContentToString,
 } from '@/types/content'
 import { trimWhitespacePrefix } from '@/types/utils/text'
-
-/**
- * Concrete wallet eval strings (all fields present, no null).
- * Used as return type of getWalletEvalStrings so it's assignable to Typography's
- * strings prop when content uses WalletNameAndPseudonymStrings (which is a union including null).
- */
-export type ConcreteWalletEvalStrings = {
-	WALLET_NAME: string
-	WALLET_PSEUDONYM_SINGULAR: string
-	WALLET_PSEUDONYM_PLURAL: string
-}
 
 /**
  * Build the wallet name and pseudonym strings used when rendering evaluation content.

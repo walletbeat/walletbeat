@@ -37,15 +37,15 @@ export const attributesById = new Map(
 /**
  * Get all criteria in a stage.
  */
-const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
+export const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
 	stage.criteriaGroups.flatMap(criteriaGroup => criteriaGroup.criteria)
 
 /**
  * Aggregate status for a stage or criteria group based on applicable criterion ratings.
- * Rule: all passed → PASS; else any passed → PARTIAL; else FAIL.
+ * Rule: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
  * Throws if every criterion is EXEMPT (stage must have at least one applicable criterion).
  */
-export type StageCountsStatus = 'PASS' | 'PARTIAL' | 'FAIL'
+export type StageCountsStatus = 'PASS' | 'PARTIAL' | 'FAIL' | 'UNRATED'
 
 export interface StageCountsAndStatus {
 	passedCount: number
@@ -55,7 +55,7 @@ export interface StageCountsAndStatus {
 
 /**
  * Compute passed/total counts and aggregate status for a set of stage criteria.
- * "Applicable" = not EXEMPT. Status: all passed → PASS; else any passed → PARTIAL; else FAIL.
+ * "Applicable" = not EXEMPT. Status: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
  * Throws if every criterion is EXEMPT (invalid stage definition for this wallet).
  */
 export function computeCountsAndStatus(
@@ -77,20 +77,17 @@ export function computeCountsAndStatus(
 		)
 	}
 
+	const hasUnrated = applicableEvaluations.some(e => e.rating === StageCriterionRating.UNRATED)
 	const allPassed = totalCount > 0 && passedCount === totalCount
-	const status: StageCountsStatus = allPassed ? 'PASS' : passedCount > 0 ? 'PARTIAL' : 'FAIL'
+	const status: StageCountsStatus = hasUnrated
+		? 'UNRATED'
+		: allPassed
+			? 'PASS'
+			: passedCount > 0
+				? 'PARTIAL'
+				: 'FAIL'
 
 	return { passedCount, totalCount, status }
-}
-
-/**
- * Compute passed/total counts and aggregate status for a stage.
- */
-export function computeStageCountsAndStatus(
-	stage: WalletStage,
-	wallet: StageEvaluatableWallet,
-): StageCountsAndStatus {
-	return computeCountsAndStatus(allCriteriaInStage(stage), wallet)
 }
 
 /**

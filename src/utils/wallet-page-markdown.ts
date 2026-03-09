@@ -26,7 +26,11 @@ import {
 	normalizeMarkdownBlankLines,
 } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import { computeStageCountsAndStatus, getCriterionAttributeId } from '@/utils/stage-attributes'
+import {
+	allCriteriaInStage,
+	computeCountsAndStatus,
+	getCriterionAttributeId,
+} from '@/utils/stage-attributes'
 
 /**
  * Return the wallet blurb as a single collapsed line, suitable for use
@@ -106,7 +110,10 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 				stageSection.push(`### Stage ${stageIndex}: ${s.label}`, '')
 
-				const { passedCount, totalCount } = computeStageCountsAndStatus(s, stageEvaluatableWallet)
+				const { passedCount, totalCount } = computeCountsAndStatus(
+					allCriteriaInStage(s),
+					stageEvaluatableWallet,
+				)
 
 				if (totalCount > 0) {
 					const word = totalCount === 1 ? 'criterion' : 'criteria'
@@ -232,6 +239,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 					const details = normalizeMarkdownBlankLines(
 						renderContentToText(evaluation.details, evalStrings, {
 							fallback: `[See full details for ${attribute.displayName}](${walletAttrUrl})`,
+							trim: true,
 						}),
 					)
 

@@ -17,7 +17,7 @@ export const betaImagesRoot = '/images'
  * Single source of truth: used in wallet JSON export $schema (with base URL + /) and in tests
  * as the path segment under public/ when loading the schema file.
  */
-export const ratedWalletExportSchemaPath = 'schemas/rated-wallet-export.json'
+export const ratedWalletExportSchemaPath = 'schemas/rated-wallet.schema.json'
 
 /**
  * URL to the project repository.
