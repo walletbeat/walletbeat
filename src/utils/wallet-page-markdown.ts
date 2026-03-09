@@ -12,7 +12,12 @@ import {
 	type ValueSet,
 } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
-import { StageCriterionRating, stageCriterionRatings, type WalletStage } from '@/schema/stages'
+import {
+	StageCriterionRating,
+	stageCriterionRatings,
+	type WalletStage,
+	type WalletStageCriterion,
+} from '@/schema/stages'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
@@ -139,7 +144,9 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						}
 					}
 
-					for (const criterion of criteriaGroup.criteria) {
+					const groupCriteria: readonly WalletStageCriterion[] = criteriaGroup.criteria
+
+					for (const criterion of groupCriteria) {
 						const evaluation = criterion.evaluate(stageEvaluatableWallet)
 						const attributeId = getCriterionAttributeId(criterion)
 						const descText = normalizeMarkdownBlankLines(
@@ -151,8 +158,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 								: descText
 						const rating = evaluation.rating as StageCriterionRating
 						const ratingInfo = stageCriterionRatings[rating]
-						// String() ensures a primitive string type for ESLint when it doesn't resolve criterion.displayName across files.
-						const displayName = String(criterion.displayName)
+						const displayName = criterion.displayName
 						const attrLink =
 							attributeId !== null
 								? `[${displayName}](${siteUrl}/${metadata.id}#${slugifyCamelCase(attributeId)})`

@@ -23,6 +23,7 @@ import {
 import {
 	type WalletLadderEvaluation,
 	type WalletStage,
+	type WalletStageCriterion,
 	type WalletStageGroup,
 } from '@/schema/stages'
 import { getUrl } from '@/schema/url'
@@ -304,7 +305,9 @@ function serializeStageCriteriaGroup(
 
 	const criteria: StageCriterionBreakdownItemJsonExport[] = []
 
-	for (const criterion of group.criteria) {
+	const groupCriteria: readonly WalletStageCriterion[] = group.criteria
+
+	for (const criterion of groupCriteria) {
 		const evaluation = criterion.evaluate(stageEvaluatableWallet)
 		const attributeId = getCriterionAttributeId(criterion)
 		const descText = renderContentToText(criterion.description, evalStrings, { trim: true })
@@ -312,8 +315,7 @@ function serializeStageCriteriaGroup(
 		criteria.push({
 			criterionId: criterion.id,
 			attributeId,
-			// String() ensures a primitive string type for ESLint when it doesn't resolve criterion.displayName across files.
-			displayName: String(criterion.displayName),
+			displayName: criterion.displayName,
 			description: descText,
 			rating: evaluation.rating,
 		})
