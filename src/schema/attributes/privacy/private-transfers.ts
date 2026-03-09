@@ -3,13 +3,14 @@ import { exampleNodeCompany } from '@/data/entities/example'
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
+	type EvaluationScaffold,
 	exampleRating,
 	Rating,
 	type Value,
 	type WalletNameStrings,
 } from '@/schema/attributes'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '@/schema/eips'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type FungibleTokenTransferMode,
 	type PrivacyPoolsSupport,
@@ -27,6 +28,8 @@ import {
 	supported,
 } from '@/schema/features/support'
 import { fullySponsoredFees } from '@/schema/features/transparency/fee-display'
+import { refNotNecessary } from '@/schema/reference'
+import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
 	ContentType,
 	isTypographicContent,
@@ -46,7 +49,6 @@ import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/util
 import { commaListFormat, markdownListFormat } from '@/types/utils/text'
 
 import { entityMarkdownLink } from '../../entity'
-import { mergeRefs, type ReferenceArray, refNotNecessary, refs } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
 export type PrivateTransfersValue = Value & {
@@ -106,15 +108,25 @@ export function worstPrivateTransfersPrivacyLevel(
 }
 
 function mergeEvaluations(
-	eval1: Evaluation<PrivateTransfersValue> | null,
-	eval2: Evaluation<PrivateTransfersValue>,
-): Evaluation<PrivateTransfersValue> {
+	ctx: EvaluationContext<PrivateTransfersValue>,
+	eval1: EvaluationScaffold<PrivateTransfersValue> | null,
+	eval2: EvaluationScaffold<PrivateTransfersValue>,
+): EvaluationScaffold<PrivateTransfersValue> {
 	if (eval1 === null) {
 		return eval2
 	}
 
-	const worse = pickWorstRating([eval1, eval2])
-	const better = worse === eval1 ? eval2 : eval1
+	if (eval1.value.id === eval2.value.id) {
+		throw new Error(
+			`Cannot disambiguate between ${JSON.stringify(eval1.value)} and ${JSON.stringify(eval2.value)} (both have the same ID)`,
+		)
+	}
+
+	const worse =
+		pickWorstRating([ctx.build(eval1), ctx.build(eval2)]).value.id === eval1.value.id
+			? eval1
+			: eval2
+	const better = worse.value.id === eval1.value.id ? eval2 : eval1
 	const mergedMap = new Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>()
 
 	for (const [key, value] of worse.value.perTechnology) {
@@ -174,21 +186,23 @@ function mergeEvaluations(
 		details,
 		howToImprove: worse.howToImprove,
 		impact: worse.impact,
-		references: mergeRefs(eval1.references, eval2.references),
 	}
 }
 
-const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
-	value: {
-		id: 'no_transfer_privacy',
-		rating: Rating.FAIL,
-		displayName: 'Private token transfers are not supported',
-		shortExplanation: sentence('{{WALLET_NAME}} does not support private token transfers.'),
-		defaultFungibleTokenTransferMode: 'PUBLIC',
-		perTechnology: new Map(),
-	},
-	details: mdParagraph(
-		`
+function noPrivateTransfers(
+	ctx: EvaluationContext<PrivateTransfersValue>,
+): Evaluation<PrivateTransfersValue> {
+	return ctx.build({
+		value: {
+			id: 'no_transfer_privacy',
+			rating: Rating.FAIL,
+			displayName: 'Private token transfers are not supported',
+			shortExplanation: sentence('{{WALLET_NAME}} does not support private token transfers.'),
+			defaultFungibleTokenTransferMode: 'PUBLIC',
+			perTechnology: new Map(),
+		},
+		details: mdParagraph(
+			`
 			{{WALLET_NAME}} does not support any type of private token transfers.
 
 			This means all token transfers made using {{WALLET_NAME}} are public
@@ -196,9 +210,9 @@ const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
 			transfers if they would be comfortable publishing their bank statement
 			or payment history online—their privacy level would be similar.
 		`,
-	),
-	impact: mdParagraph(
-		`
+		),
+		impact: mdParagraph(
+			`
 			As all token transfers will be recorded publicly onchain forever,
 			{{WALLET_NAME}} should only be used for transactions where privacy is not
 			and will never be needed, such as public DAO treasury operations.
@@ -213,61 +227,67 @@ const noPrivateTransfers: Evaluation<PrivateTransfersValue> = {
 			[**wrench attack**](https://github.com/jlopp/physical-bitcoin-attacks/blob/master/README.md).
 			This puts users at risk of physical and financial harm.
 		`,
-	),
-	howToImprove: mdParagraph(
-		`
+		),
+		howToImprove: mdParagraph(
+			`
 			{{WALLET_NAME}} should support some form of private token transfers,
 			such as ${eipMarkdownLink(erc5564)}, and should make this the primary
 			way to perform token transfers. Public token transfers should either be
 			hidden under a power-user-only menu, come with important user safety
 			warnings, or deleted from the wallet's feature set.
 		`,
-	),
+		),
+	})
 }
 
-const nonDefault: Evaluation<PrivateTransfersValue> = {
-	value: {
-		id: 'non_default_transfer_privacy',
-		rating: Rating.FAIL,
-		displayName: 'Private token transfers are not the default',
-		shortExplanation: mdSentence(
-			'Token transfers with {{WALLET_NAME}} are public by default despite it supporting private token transfers.',
-		),
-		defaultFungibleTokenTransferMode: 'PUBLIC',
-		perTechnology: new Map(),
-	},
-	details: mdParagraph(
-		`
+function nonDefault(
+	ctx: EvaluationContext<PrivateTransfersValue>,
+): Evaluation<PrivateTransfersValue> {
+	return ctx.build({
+		value: {
+			id: 'non_default_transfer_privacy',
+			rating: Rating.FAIL,
+			displayName: 'Private token transfers are not the default',
+			shortExplanation: mdSentence(
+				'Token transfers with {{WALLET_NAME}} are public by default despite it supporting private token transfers.',
+			),
+			defaultFungibleTokenTransferMode: 'PUBLIC',
+			perTechnology: new Map(),
+		},
+		details: mdParagraph(
+			`
 			{{WALLET_NAME}} supports private token transfers, but token transfers are public by default.
 			This means users may accidentally send tokens publicly, revealing their transaction history,
 			unless they explicitly choose to use private transfers.
 		`,
-	),
-	impact: paragraph(
-		`
+		),
+		impact: paragraph(
+			`
 			{{WALLET_NAME}} users should always use private token transfers
 			to protect their privacy.
 		`,
-	),
-	howToImprove: paragraph(
-		`
+		),
+		howToImprove: paragraph(
+			`
 			{{WALLET_NAME}} should make token transfers private by default.
 			Public token transfers should either be hidden under a
 			power-user-only menu, come with important user safety warnings,
 			or deleted from the wallet's feature set.
 		`,
-	),
+		),
+	})
 }
 
 function rateStealthAddressSupport(
+	ctx: EvaluationContext<PrivateTransfersValue>,
 	stealthAddresses: Supported<StealthAddressSupport>,
-): Evaluation<PrivateTransfersValue> {
-	const references: ReferenceArray = mergeRefs(
-		stealthAddresses.ref,
-		stealthAddresses.recipientAddressResolution.ref,
-		stealthAddresses.balanceLookup.ref,
-		stealthAddresses.privateKeyDerivation.ref,
-		isSupported(stealthAddresses.userLabeling) ? stealthAddresses.userLabeling.ref : undefined,
+): EvaluationScaffold<PrivateTransfersValue> {
+	ctx.addRef(
+		stealthAddresses,
+		stealthAddresses.recipientAddressResolution,
+		stealthAddresses.balanceLookup,
+		stealthAddresses.privateKeyDerivation,
+		stealthAddresses.userLabeling,
 	)
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
 		sendingPrivacy: PrivateTransfersPrivacyLevel
@@ -584,7 +604,6 @@ function rateStealthAddressSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
@@ -600,7 +619,6 @@ function rateStealthAddressSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			return {
@@ -617,15 +635,15 @@ function rateStealthAddressSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 	}
 }
 
 function rateTornadoCashNovaSupport(
+	ctx: EvaluationContext<PrivateTransfersValue>,
 	tornadoCashNova: Supported<TornadoCashNovaSupport>,
-): Evaluation<PrivateTransfersValue> {
-	const references: ReferenceArray = refs(tornadoCashNova)
+): EvaluationScaffold<PrivateTransfersValue> {
+	ctx.addRef(tornadoCashNova)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
 		sendingPrivacy: PrivateTransfersPrivacyLevel
@@ -836,7 +854,6 @@ function rateTornadoCashNovaSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
@@ -852,7 +869,6 @@ function rateTornadoCashNovaSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
@@ -869,7 +885,6 @@ function rateTornadoCashNovaSupport(
 					},
 					details,
 					howToImprove,
-					references,
 				}
 			}
 
@@ -887,15 +902,15 @@ function rateTornadoCashNovaSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 	}
 }
 
 function ratePrivacyPoolsSupport(
+	ctx: EvaluationContext<PrivateTransfersValue>,
 	privacyPools: Supported<PrivacyPoolsSupport>,
-): Evaluation<PrivateTransfersValue> {
-	const references: ReferenceArray = refs(privacyPools)
+): EvaluationScaffold<PrivateTransfersValue> {
+	ctx.addRef(privacyPools)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
 		sendingPrivacy: PrivateTransfersPrivacyLevel
@@ -1182,7 +1197,6 @@ function ratePrivacyPoolsSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
@@ -1198,7 +1212,6 @@ function ratePrivacyPoolsSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
@@ -1214,7 +1227,6 @@ function ratePrivacyPoolsSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
@@ -1231,7 +1243,6 @@ function ratePrivacyPoolsSupport(
 					},
 					details,
 					howToImprove,
-					references,
 				}
 			}
 
@@ -1249,13 +1260,15 @@ function ratePrivacyPoolsSupport(
 				},
 				details,
 				howToImprove,
-				references,
 			}
 	}
 }
 
-function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<PrivateTransfersValue> {
-	const references: ReferenceArray = refs(railgun)
+function rateRailgunSupport(
+	ctx: EvaluationContext<PrivateTransfersValue>,
+	railgun: Supported<RailgunSupport>,
+): EvaluationScaffold<PrivateTransfersValue> {
+	ctx.addRef(railgun)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
 		sendingPrivacy: PrivateTransfersPrivacyLevel
@@ -1588,7 +1601,6 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
@@ -1604,7 +1616,6 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
@@ -1620,7 +1631,6 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				},
 				details,
 				howToImprove,
-				references,
 			}
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
@@ -1637,7 +1647,6 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 					},
 					details,
 					howToImprove,
-					references,
 				}
 			}
 
@@ -1653,9 +1662,14 @@ function rateRailgunSupport(railgun: Supported<RailgunSupport>): Evaluation<Priv
 				},
 				details,
 				howToImprove,
-				references,
 			}
 	}
+}
+
+function build(
+	scaffold: EvaluationScaffold<PrivateTransfersValue>,
+): Evaluation<PrivateTransfersValue> {
+	return EvaluationContext.forTest(() => privateTransfers).build(scaffold)
 }
 
 export const privateTransfers: Attribute<PrivateTransfersValue> = {
@@ -1706,13 +1720,13 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 				paragraph(`
 					The wallet does not support private token transfers.
 				`),
-				noPrivateTransfers,
+				noPrivateTransfers(EvaluationContext.forTest(() => privateTransfers)),
 			),
 			exampleRating(
 				paragraph(`
 					The wallet's default option when sending tokens is to perform a public token transfer.
 				`),
-				nonDefault,
+				nonDefault(EvaluationContext.forTest(() => privateTransfers)),
 			),
 			exampleRating(
 				mdParagraph(`
@@ -1721,36 +1735,39 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 					private balances, thereby potentially exposing unintended public onchain links between their
 					stealth addresses.
 				`),
-				rateStealthAddressSupport(
-					supported({
-						ref: refNotNecessary,
-						balanceLookup: {
+				build(
+					rateStealthAddressSupport(
+						EvaluationContext.forTest(() => privateTransfers),
+						supported({
 							ref: refNotNecessary,
-							type: 'EXTERNAL_SERVICE',
-							externalService: exampleNodeCompany,
-							learns: {
-								generatedStealthAddresses: false,
-								userMetaAddress: false,
+							balanceLookup: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_SERVICE',
+								externalService: exampleNodeCompany,
+								learns: {
+									generatedStealthAddresses: false,
+									userMetaAddress: false,
+								},
 							},
-						},
-						recipientAddressResolution: {
-							ref: refNotNecessary,
-							type: 'EXTERNAL_RESOLVER',
-							externalResolver: exampleNodeCompany,
-							learns: {
-								recipientGeneratedStealthAddress: false,
-								recipientMetaAddress: false,
-								senderIpAddress: false,
-								senderMetaAddress: false,
+							recipientAddressResolution: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_RESOLVER',
+								externalResolver: exampleNodeCompany,
+								learns: {
+									recipientGeneratedStealthAddress: false,
+									recipientMetaAddress: false,
+									senderIpAddress: false,
+									senderMetaAddress: false,
+								},
 							},
-						},
-						privateKeyDerivation: {
-							ref: refNotNecessary,
-							type: 'LOCALLY',
-						},
-						userLabeling: notSupported,
-						fees: fullySponsoredFees,
-					}),
+							privateKeyDerivation: {
+								ref: refNotNecessary,
+								type: 'LOCALLY',
+							},
+							userLabeling: notSupported,
+							fees: fullySponsoredFees,
+						}),
+					),
 				),
 			),
 		],
@@ -1760,39 +1777,42 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 					The wallet's token transfers are implemented using ${eipMarkdownLink(erc5564)} Stealth Addresses by default.
 					However, an external provider may learn of the correlation between the user's stealth addresses.
 				`),
-				rateStealthAddressSupport(
-					supported({
-						ref: refNotNecessary,
-						balanceLookup: {
+				build(
+					rateStealthAddressSupport(
+						EvaluationContext.forTest(() => privateTransfers),
+						supported({
 							ref: refNotNecessary,
-							type: 'EXTERNAL_SERVICE',
-							externalService: exampleNodeCompany,
-							learns: {
-								generatedStealthAddresses: true,
-								userMetaAddress: true,
+							balanceLookup: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_SERVICE',
+								externalService: exampleNodeCompany,
+								learns: {
+									generatedStealthAddresses: true,
+									userMetaAddress: true,
+								},
 							},
-						},
-						recipientAddressResolution: {
-							ref: refNotNecessary,
-							type: 'EXTERNAL_RESOLVER',
-							externalResolver: exampleNodeCompany,
-							learns: {
-								recipientGeneratedStealthAddress: false,
-								recipientMetaAddress: false,
-								senderIpAddress: false,
-								senderMetaAddress: false,
+							recipientAddressResolution: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_RESOLVER',
+								externalResolver: exampleNodeCompany,
+								learns: {
+									recipientGeneratedStealthAddress: false,
+									recipientMetaAddress: false,
+									senderIpAddress: false,
+									senderMetaAddress: false,
+								},
 							},
-						},
-						privateKeyDerivation: {
-							ref: refNotNecessary,
-							type: 'LOCALLY',
-						},
-						userLabeling: supported({
-							ref: refNotNecessary,
-							unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
+							privateKeyDerivation: {
+								ref: refNotNecessary,
+								type: 'LOCALLY',
+							},
+							userLabeling: supported({
+								ref: refNotNecessary,
+								unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
+							}),
+							fees: fullySponsoredFees,
 						}),
-						fees: fullySponsoredFees,
-					}),
+					),
 				),
 			),
 			exampleRating(
@@ -1801,39 +1821,42 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 					However, when sending tokens, an external provider may learn of the correlation between the recipient's
 					meta-address and their newly-generated stealth address, thereby de-anonymizing the recipient.
 				`),
-				rateStealthAddressSupport(
-					supported({
-						ref: refNotNecessary,
-						balanceLookup: {
+				build(
+					rateStealthAddressSupport(
+						EvaluationContext.forTest(() => privateTransfers),
+						supported({
 							ref: refNotNecessary,
-							type: 'EXTERNAL_SERVICE',
-							externalService: exampleNodeCompany,
-							learns: {
-								generatedStealthAddresses: false,
-								userMetaAddress: false,
+							balanceLookup: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_SERVICE',
+								externalService: exampleNodeCompany,
+								learns: {
+									generatedStealthAddresses: false,
+									userMetaAddress: false,
+								},
 							},
-						},
-						recipientAddressResolution: {
-							ref: refNotNecessary,
-							type: 'EXTERNAL_RESOLVER',
-							externalResolver: exampleNodeCompany,
-							learns: {
-								recipientGeneratedStealthAddress: true,
-								recipientMetaAddress: true,
-								senderIpAddress: false,
-								senderMetaAddress: false,
+							recipientAddressResolution: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_RESOLVER',
+								externalResolver: exampleNodeCompany,
+								learns: {
+									recipientGeneratedStealthAddress: true,
+									recipientMetaAddress: true,
+									senderIpAddress: false,
+									senderMetaAddress: false,
+								},
 							},
-						},
-						privateKeyDerivation: {
-							ref: refNotNecessary,
-							type: 'LOCALLY',
-						},
-						userLabeling: supported({
-							ref: refNotNecessary,
-							unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
+							privateKeyDerivation: {
+								ref: refNotNecessary,
+								type: 'LOCALLY',
+							},
+							userLabeling: supported({
+								ref: refNotNecessary,
+								unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
+							}),
+							fees: fullySponsoredFees,
 						}),
-						fees: fullySponsoredFees,
-					}),
+					),
 				),
 			),
 			exampleRating(
@@ -1843,39 +1866,42 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 					meta-address or IP, and the recipient's newly-generated stealth address, thereby de-anonymizing the
 					sender and recipient of the transfer.
 				`),
-				rateStealthAddressSupport(
-					supported({
-						ref: refNotNecessary,
-						balanceLookup: {
+				build(
+					rateStealthAddressSupport(
+						EvaluationContext.forTest(() => privateTransfers),
+						supported({
 							ref: refNotNecessary,
-							type: 'EXTERNAL_SERVICE',
-							externalService: exampleNodeCompany,
-							learns: {
-								generatedStealthAddresses: false,
-								userMetaAddress: false,
+							balanceLookup: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_SERVICE',
+								externalService: exampleNodeCompany,
+								learns: {
+									generatedStealthAddresses: false,
+									userMetaAddress: false,
+								},
 							},
-						},
-						recipientAddressResolution: {
-							ref: refNotNecessary,
-							type: 'EXTERNAL_RESOLVER',
-							externalResolver: exampleNodeCompany,
-							learns: {
-								recipientGeneratedStealthAddress: true,
-								recipientMetaAddress: false,
-								senderIpAddress: false,
-								senderMetaAddress: true,
+							recipientAddressResolution: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_RESOLVER',
+								externalResolver: exampleNodeCompany,
+								learns: {
+									recipientGeneratedStealthAddress: true,
+									recipientMetaAddress: false,
+									senderIpAddress: false,
+									senderMetaAddress: true,
+								},
 							},
-						},
-						privateKeyDerivation: {
-							ref: refNotNecessary,
-							type: 'LOCALLY',
-						},
-						userLabeling: supported({
-							ref: refNotNecessary,
-							unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
+							privateKeyDerivation: {
+								ref: refNotNecessary,
+								type: 'LOCALLY',
+							},
+							userLabeling: supported({
+								ref: refNotNecessary,
+								unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
+							}),
+							fees: fullySponsoredFees,
 						}),
-						fees: fullySponsoredFees,
-					}),
+					),
 				),
 			),
 		],
@@ -1890,92 +1916,106 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 					the sender and the recipient, or of the correlation between the recipient's meta-address and their
 					newly-generated stealth address.
 				`),
-				rateStealthAddressSupport(
-					supported({
-						ref: refNotNecessary,
-						balanceLookup: {
+				build(
+					rateStealthAddressSupport(
+						EvaluationContext.forTest(() => privateTransfers),
+						supported({
 							ref: refNotNecessary,
-							type: 'EXTERNAL_SERVICE',
-							externalService: exampleNodeCompany,
-							learns: {
-								generatedStealthAddresses: false,
-								userMetaAddress: true,
+							balanceLookup: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_SERVICE',
+								externalService: exampleNodeCompany,
+								learns: {
+									generatedStealthAddresses: false,
+									userMetaAddress: true,
+								},
 							},
-						},
-						recipientAddressResolution: {
-							ref: refNotNecessary,
-							type: 'EXTERNAL_RESOLVER',
-							externalResolver: exampleNodeCompany,
-							learns: {
-								recipientGeneratedStealthAddress: false,
-								recipientMetaAddress: false,
-								senderIpAddress: true,
-								senderMetaAddress: false,
+							recipientAddressResolution: {
+								ref: refNotNecessary,
+								type: 'EXTERNAL_RESOLVER',
+								externalResolver: exampleNodeCompany,
+								learns: {
+									recipientGeneratedStealthAddress: false,
+									recipientMetaAddress: false,
+									senderIpAddress: true,
+									senderMetaAddress: false,
+								},
 							},
-						},
-						privateKeyDerivation: {
-							ref: refNotNecessary,
-							type: 'LOCALLY',
-						},
-						userLabeling: supported({
-							ref: refNotNecessary,
-							unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
+							privateKeyDerivation: {
+								ref: refNotNecessary,
+								type: 'LOCALLY',
+							},
+							userLabeling: supported({
+								ref: refNotNecessary,
+								unlabeledBehavior: StealthAddressUnlabeledBehavior.MUST_LABEL_BEFORE_SPENDING,
+							}),
+							fees: fullySponsoredFees,
 						}),
-						fees: fullySponsoredFees,
-					}),
+					),
 				),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<PrivateTransfersValue> => {
-		if (features.privacy.transactionPrivacy === null) {
-			return unrated(privateTransfers, {
+	evaluate: (ctx: EvaluationContext<PrivateTransfersValue>): Evaluation<PrivateTransfersValue> => {
+		// Verifying that private transfers are available in the UI is one thing,
+		// but verifying that the implementation is actually privacy-preserving
+		// (e.g. doesn't snitch on the user by periodically phoning home with data
+		// that invalidates the privacy guarantees that private transfers aim to
+		// provide) requires source code visibility.
+		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
+
+		if (ctx.features.privacy.transactionPrivacy === null) {
+			return unrated(ctx, {
 				defaultFungibleTokenTransferMode: 'PUBLIC',
 				perTechnology: new Map(),
 			})
 		}
 
-		let evaluation: Evaluation<PrivateTransfersValue> | null = null
+		let evaluation: EvaluationScaffold<PrivateTransfersValue> | null = null
 		let atLeastOneTechnologySupported = false
 
 		const maybeEvaluateTechnology = <T extends object>(
 			support: Support<T>,
-			evaluate: (supported: Supported<T>) => Evaluation<PrivateTransfersValue>,
-		): Evaluation<PrivateTransfersValue> | null => {
+			evaluate: (
+				ctx: EvaluationContext<PrivateTransfersValue>,
+				supported: Supported<T>,
+			) => EvaluationScaffold<PrivateTransfersValue>,
+		): EvaluationScaffold<PrivateTransfersValue> | null => {
 			if (!isSupported(support)) {
 				return null
 			}
 
-			return evaluate(support)
+			return evaluate(ctx, support)
 		}
 
 		for (const maybeEvaluation of [
 			maybeEvaluateTechnology(
-				features.privacy.transactionPrivacy.stealthAddresses,
+				ctx.features.privacy.transactionPrivacy.stealthAddresses,
 				rateStealthAddressSupport,
 			),
 			maybeEvaluateTechnology(
-				features.privacy.transactionPrivacy.tornadoCashNova,
+				ctx.features.privacy.transactionPrivacy.tornadoCashNova,
 				rateTornadoCashNovaSupport,
 			),
 			maybeEvaluateTechnology(
-				features.privacy.transactionPrivacy.privacyPools,
+				ctx.features.privacy.transactionPrivacy.privacyPools,
 				ratePrivacyPoolsSupport,
 			),
-			maybeEvaluateTechnology(features.privacy.transactionPrivacy.railgun, rateRailgunSupport),
+			maybeEvaluateTechnology(ctx.features.privacy.transactionPrivacy.railgun, rateRailgunSupport),
 		]) {
 			if (maybeEvaluation === null) {
 				continue
 			}
 
 			atLeastOneTechnologySupported = true
-			evaluation = mergeEvaluations(evaluation, maybeEvaluation)
+			evaluation = mergeEvaluations(ctx, evaluation, maybeEvaluation)
 		}
 
-		if (features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode === 'PUBLIC') {
+		if (ctx.features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode === 'PUBLIC') {
 			evaluation = mergeEvaluations(
+				ctx,
 				evaluation,
-				atLeastOneTechnologySupported ? nonDefault : noPrivateTransfers,
+				atLeastOneTechnologySupported ? nonDefault(ctx) : noPrivateTransfers(ctx),
 			)
 		}
 
@@ -2015,10 +2055,14 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			)
 		}
 
-		evaluation.value.defaultFungibleTokenTransferMode =
-			features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode
-
-		return evaluation
+		return ctx.build({
+			...evaluation,
+			value: {
+				...evaluation.value,
+				defaultFungibleTokenTransferMode:
+					ctx.features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode,
+			},
+		})
 	},
 	aggregate: pickWorstRating<PrivateTransfersValue>,
 }
