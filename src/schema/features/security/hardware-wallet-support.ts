@@ -10,7 +10,10 @@ import { commaListFormat, trimWhitespacePrefix } from '@/types/utils/text'
 import { Enum } from '@/utils/enum'
 
 /**
- * Types of hardware wallets that can be supported
+ * Types of hardware wallets that can be supported.
+ * To identify: check the wallet's documentation or settings for a list of
+ * supported hardware wallets, then verify by connecting each device.
+ * Use OTHER for hardware wallets not listed here.
  */
 export enum HardwareWalletType {
 	LEDGER = 'LEDGER',
@@ -22,6 +25,7 @@ export enum HardwareWalletType {
 	ONEKEY = 'ONEKEY',
 	BITBOX = 'BITBOX',
 	IMKEY = 'IMKEY',
+	/** A hardware wallet not listed above. */
 	OTHER = 'OTHER',
 }
 
@@ -80,24 +84,43 @@ export function hardwareWalletTypeToString(
 
 /**
  * Connection method between software and hardware wallet.
+ * To identify: connect the hardware wallet and check which browser API or
+ * protocol the software wallet uses (visible in browser DevTools → Network
+ * or via the wallet's documentation).
  */
 export enum HardwareWalletConnection {
-	/** USB, only for Desktop app with native USB; otherwise use webUSB. */
+	/**
+	 * Native USB via a desktop application (not a browser).
+	 * Use webUSB instead if the connection goes through a browser.
+	 */
 	USB = 'USB',
 
-	/** QR-code based. */
+	/**
+	 * QR-code based: the software wallet displays a QR code that the hardware
+	 * wallet camera scans (or vice versa).
+	 */
 	QR = 'QR',
 
-	/** WebUSB (using a web browser); for desktop apps, use USB. */
+	/**
+	 * USB through the browser's WebUSB API (browser extensions or web apps).
+	 * Use USB instead for native desktop applications.
+	 */
 	webUSB = 'WEBUSB',
 
-	/** WebHID (using a web browser). */
+	/**
+	 * HID through the browser's WebHID API.
+	 * Similar to webUSB but uses the HID protocol instead.
+	 * (e.g. Trezor uses WebHID in some browser integrations.)
+	 */
 	webHID = 'WEBHID',
 
-	/** Bluetooth. */
+	/** Wireless connection via Bluetooth. */
 	bluetooth = 'BLUETOOTH',
 
-	/** WalletConnect. */
+	/**
+	 * Indirect connection via the WalletConnect protocol — the hardware wallet
+	 * connects through its companion app rather than directly to the software wallet.
+	 */
 	WALLET_CONNECT = 'WALLET_CONNECT',
 }
 
@@ -137,9 +160,15 @@ export function hardwareWalletConnectionToString(
 
 /**
  * Set of connection types that are supported for a single hardware wallet.
+ * To identify: connect the hardware wallet using each available method and
+ * record which ones work. Check the wallet's documentation for the full list.
  */
 export interface SupportedHardwareWallet {
-	/** Supported ways to connect the hardware wallet to the software wallet. */
+	/**
+	 * All supported ways to connect this hardware wallet to the software wallet.
+	 * List every working connection method — a hardware wallet may support
+	 * more than one (e.g. both webUSB and Bluetooth).
+	 */
 	connectionTypes: NonEmptyArray<HardwareWalletConnection>
 }
 
@@ -155,11 +184,15 @@ export function hardwareWalletConnectionIsOnlyWalletConnect(
 }
 
 /**
- * A record of hardware wallet types and their support status
+ * A record of hardware wallet types and their support status.
+ * The ref must link to the wallet's documentation page listing supported
+ * hardware wallets, or to the relevant settings screen if no doc page exists.
  */
 export type HardwareWalletSupport = WithRef<{
 	/**
-	 * Record of hardware wallet types and their support status
+	 * For each hardware wallet type, whether it is supported and via which
+	 * connection methods. Omit a type entirely rather than setting it to
+	 * not supported — only list wallets that have been explicitly verified.
 	 */
 	wallets: Partial<Record<HardwareWalletType, Support<SupportedHardwareWallet>>>
 }>

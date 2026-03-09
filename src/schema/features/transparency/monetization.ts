@@ -7,14 +7,23 @@ import type { WithRef } from '../../reference'
  * the wallet features.
  */
 export enum MonetizationStrategy {
+	/** Founders or the company fund development from their own capital. */
 	SELF_FUNDED = 'selfFunded',
+	/** Funded by voluntary contributions from the community. */
 	DONATIONS = 'donations',
+	/** Funded by grants from Ethereum ecosystem organizations or foundations. */
 	ECOSYSTEM_GRANTS = 'ecosystemGrants',
+	/** Funded via a public token or equity sale (e.g. ICO, IPO). */
 	PUBLIC_OFFERING = 'publicOffering',
+	/** Funded by venture capital firms in exchange for equity or tokens. */
 	VENTURE_CAPITAL = 'ventureCapital',
+	/** Earns revenue through fees on swaps, bridges, or other services that are disclosed to the user. */
 	TRANSPARENT_CONVENIENCE_FEES = 'transparentConvenienceFees',
+	/** Earns revenue through undisclosed markups or routing fees hidden from the user. */
 	HIDDEN_CONVENIENCE_FEES = 'hiddenConvenienceFees',
+	/** Has a governance token where most supply is held not by the community. */
 	GOVERNANCE_TOKEN_LOW_FLOAT = 'governanceTokenLowFloat',
+	/** Has a governance token where most supply is distributed to the community. */
 	GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED = 'governanceTokenMostlyDistributed',
 }
 
