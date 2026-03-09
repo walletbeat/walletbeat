@@ -3,12 +3,13 @@ import { erc4337 } from '@/data/eips/erc-4337'
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
 import { eipMarkdownLink } from '@/schema/eips'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type AccountSupport,
 	AccountType,
@@ -20,7 +21,7 @@ import {
 	TransactionGenerationCapability,
 } from '@/schema/features/account-support'
 import { isSupported } from '@/schema/features/support'
-import { mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
+import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
@@ -29,8 +30,8 @@ import { pickWorstRating, unrated } from '../common'
 export type AccountPortabilityValue = Value
 
 function evaluateEoa(
+	ctx: EvaluationContext<AccountPortabilityValue>,
 	eoa: AccountTypeEoa,
-	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	if (
 		eoa.keyDerivation.type === 'BIP32' &&
@@ -39,7 +40,7 @@ function evaluateEoa(
 	) {
 		const canExportSeedPhrase = eoa.keyDerivation.canExportSeedPhrase
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'standard_eoa_exportable',
 				rating: Rating.PASS,
@@ -66,12 +67,11 @@ function evaluateEoa(
 						: ''
 				}
 			`),
-			references,
-		}
+		})
 	}
 
 	if (eoa.canExportPrivateKey) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'nonstandard_eoa_exportable',
 				rating: Rating.PARTIAL,
@@ -89,11 +89,10 @@ function evaluateEoa(
 			howToImprove: paragraph(
 				'{{WALLET_NAME}} should follow key derivation standards to avoid requiring users to back up each private key.',
 			),
-			references,
-		}
+		})
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'no_export_eoa',
 			rating: Rating.FAIL,
@@ -108,16 +107,15 @@ function evaluateEoa(
 			'Using {{WALLET_NAME}} locks you into it, as you cannot export your account into another wallet.',
 		),
 		howToImprove: paragraph('{{WALLET_NAME}} should let users export private keys.'),
-		references,
-	}
+	})
 }
 
 function evaluateMpc(
+	ctx: EvaluationContext<AccountPortabilityValue>,
 	mpc: AccountTypeMpc,
-	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	if (mpc.controllingSharesInSelfCustodyByDefault === 'NO') {
-		return {
+		return ctx.build({
 			value: {
 				id: 'mpc_no_controlling_shares',
 				rating: Rating.FAIL,
@@ -136,15 +134,14 @@ function evaluateMpc(
 			howToImprove: mdParagraph(
 				'{{WALLET_NAME}} should provide a way for users to obtain enough key shares in self-custody such that users no longer *need* to rely on an external provider for transactions.',
 			),
-			references,
-		}
+		})
 	}
 
 	if (
 		mpc.tokenTransferTransactionGeneration ===
 		TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
 	) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'mpc_cannot_transfer',
 				rating: Rating.FAIL,
@@ -163,15 +160,14 @@ function evaluateMpc(
 			howToImprove: paragraph(
 				'{{WALLET_NAME}} should release an open-source standalone application that allows users to sign transactions using their self-custodial key shares.',
 			),
-			references,
-		}
+		})
 	}
 
 	if (
 		mpc.tokenTransferTransactionGeneration ===
 		TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
 	) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'mpc_transfer_proprietary',
 				rating: Rating.PARTIAL,
@@ -189,11 +185,10 @@ function evaluateMpc(
 			howToImprove: paragraph(
 				'{{WALLET_NAME}} should release an open-source standalone application that allows users to sign transactions using their self-custodial key shares.',
 			),
-			references,
-		}
+		})
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'mpc_ok',
 			rating: Rating.PASS,
@@ -205,19 +200,18 @@ function evaluateMpc(
 		details: paragraph(
 			'{{WALLET_NAME}} is an MPC wallet, with the private key split up into multiple shares. The user owns enough shares to fully control the account, and can generate transactions without relying on an external provider.',
 		),
-		references,
-	}
+	})
 }
 
 function evaluateMultifactor(
+	ctx: EvaluationContext<AccountPortabilityValue>,
 	multifactor: AccountTypeMutableMultifactor,
 	multifactorType: 'erc4337' | 'eip7702',
-	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	const eip = multifactorType === 'erc4337' ? erc4337 : eip7702
 
 	if (multifactor.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
-		return {
+		return ctx.build({
 			value: {
 				id: `${multifactorType}_cannot_rotate_authority`,
 				rating: Rating.FAIL,
@@ -236,8 +230,7 @@ function evaluateMultifactor(
 			howToImprove: paragraph(
 				'{{WALLET_NAME}} should update the smart contract control logic to allow users to take full control of the account.',
 			),
-			references,
-		}
+		})
 	}
 
 	if (multifactor.controllingSharesInSelfCustodyByDefault === 'NO') {
@@ -245,7 +238,7 @@ function evaluateMultifactor(
 			multifactor.keyRotationTransactionGeneration ===
 			TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
 		) {
-			return {
+			return ctx.build({
 				value: {
 					id: `${multifactorType}_no_control_by_default_and_cannot_change_without_external_provider`,
 					rating: Rating.FAIL,
@@ -268,15 +261,14 @@ function evaluateMultifactor(
 					* ... Either release an open-source standalone application that allows
 					users to switch their account to be effectively self-custodied.
 				`),
-				references,
-			}
+			})
 		}
 
 		if (
 			multifactor.keyRotationTransactionGeneration ===
 			TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
 		) {
-			return {
+			return ctx.build({
 				value: {
 					id: `${multifactorType}_no_control_by_default_and_cannot_change_without_proprietary_app`,
 					rating: Rating.FAIL,
@@ -295,8 +287,7 @@ function evaluateMultifactor(
 				howToImprove: mdParagraph(
 					"{{WALLET_NAME}} should either change the smart contract's default control configuration such that the account is self-custodied by the user from the start, or should release an open-source standalone application that allows users to switch their account to be effectively self-custodied.",
 				),
-				references,
-			}
+			})
 		}
 	}
 
@@ -304,7 +295,7 @@ function evaluateMultifactor(
 		multifactor.tokenTransferTransactionGeneration ===
 		TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
 	) {
-		return {
+		return ctx.build({
 			value: {
 				id: `${multifactorType}_cannot_transfer_without_external_provider`,
 				rating: Rating.FAIL,
@@ -323,15 +314,14 @@ function evaluateMultifactor(
 			howToImprove: paragraph(
 				'{{WALLET_NAME}} should open-source sufficient wallet components such that users can sign and broadcast arbitrary transactions without relying on an external provider.',
 			),
-			references,
-		}
+		})
 	}
 
 	if (
 		multifactor.tokenTransferTransactionGeneration ===
 		TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
 	) {
-		return {
+		return ctx.build({
 			value: {
 				id: `${multifactorType}_cannot_transfer_proprietary`,
 				rating: Rating.FAIL,
@@ -350,8 +340,7 @@ function evaluateMultifactor(
 			howToImprove: paragraph(
 				'{{WALLET_NAME}} should open-source sufficient wallet components such that users can sign and broadcast arbitrary transactions without external or proprietary dependencies.',
 			),
-			references,
-		}
+		})
 	}
 
 	if (
@@ -359,7 +348,7 @@ function evaluateMultifactor(
 		multifactor.keyRotationTransactionGeneration ===
 			TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP
 	) {
-		return {
+		return ctx.build({
 			value: {
 				id: `${multifactorType}_no_control_by_default`,
 				rating: Rating.PARTIAL,
@@ -372,11 +361,10 @@ function evaluateMultifactor(
 			howToImprove: mdParagraph(
 				"{{WALLET_NAME}} should change the smart contract's default control configuration such that the account is self-custodied by the user from the start.",
 			),
-			references,
-		}
+		})
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: `${multifactorType}_ok`,
 			rating: Rating.PASS,
@@ -388,16 +376,15 @@ function evaluateMultifactor(
 		details: mdParagraph(
 			`{{WALLET_NAME}} is an ${eipMarkdownLink(erc4337)} (Smart Contract) wallet. By default, the user holds sufficient authority to generate and broadcast arbitrary transactions and can do so without relying on an external provider, including transactions which update the smart contract's control logic over the account (e.g. for key rotation).`,
 		),
-		references,
-	}
+	})
 }
 
 function evaluateSafe(
+	ctx: EvaluationContext<AccountPortabilityValue>,
 	safe: AccountTypeSafe,
-	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	if (safe.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'safe_cannot_rotate_authority',
 				rating: Rating.FAIL,
@@ -416,11 +403,10 @@ function evaluateSafe(
 			howToImprove: paragraph(
 				'{{WALLET_NAME}} should update the control logic to allow users to take full control of the account.',
 			),
-			references,
-		}
+		})
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'safe_ok',
 			rating: Rating.PASS,
@@ -432,13 +418,12 @@ function evaluateSafe(
 		details: mdParagraph(
 			'{{WALLET_NAME}} is a Safe multisig wallet. By default, the user holds sufficient authority to generate and broadcast arbitrary transactions and can do so without relying on an external provider, including transactions which update the control logic (e.g., for owner changes).',
 		),
-		references,
-	}
+	})
 }
 
 function evaluateEip7702(
+	ctx: EvaluationContext<AccountPortabilityValue>,
 	accountSupport: AccountSupport,
-	references: ReferenceArray,
 ): Evaluation<AccountPortabilityValue> {
 	if (!isSupported<AccountType7702>(accountSupport.eip7702)) {
 		throw new Error('EIP-7702 account type is not supported')
@@ -446,11 +431,11 @@ function evaluateEip7702(
 
 	// TODO: Add specific evaluations for EIP-7702 features on top of this.
 	if (isSupported<AccountTypeEoa>(accountSupport.eoa)) {
-		return evaluateEoa(accountSupport.eoa, references)
+		return evaluateEoa(ctx, accountSupport.eoa)
 	}
 
 	if (isSupported<AccountTypeMpc>(accountSupport.mpc)) {
-		return evaluateMpc(accountSupport.mpc, references)
+		return evaluateMpc(ctx, accountSupport.mpc)
 	}
 
 	throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported')
@@ -554,13 +539,13 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					user to export their private keys.
 				`),
 				evaluateEoa(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						canExportPrivateKey: false,
 						keyDerivation: {
 							type: 'NONSTANDARD',
 						},
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -569,13 +554,13 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					sufficient key shares under self-custody to unilaterally control the account.
 				`),
 				evaluateMpc(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'NO',
 						initialKeyGeneration: 'ON_USER_DEVICE',
 						tokenTransferTransactionGeneration:
 							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -586,13 +571,13 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					without relying on an external provider.
 				`),
 				evaluateMpc(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						initialKeyGeneration: 'ON_USER_DEVICE',
 						tokenTransferTransactionGeneration:
 							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -603,6 +588,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					keys of the account.
 				`),
 				evaluateMultifactor(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						keyRotationTransactionGeneration: TransactionGenerationCapability.IMPOSSIBLE,
@@ -610,7 +596,6 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 					},
 					'erc4337',
-					[],
 				),
 			),
 			exampleRating(
@@ -621,6 +606,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					this.
 				`),
 				evaluateMultifactor(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'NO',
 						keyRotationTransactionGeneration:
@@ -629,7 +615,6 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 					},
 					'erc4337',
-					[],
 				),
 			),
 			exampleRating(
@@ -640,6 +625,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					valid token transfer transaction.
 				`),
 				evaluateMultifactor(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						keyRotationTransactionGeneration:
@@ -648,7 +634,6 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
 					},
 					'erc4337',
-					[],
 				),
 			),
 		],
@@ -661,13 +646,13 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					other wallets.
 				`),
 				evaluateEoa(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						canExportPrivateKey: true,
 						keyDerivation: {
 							type: 'NONSTANDARD',
 						},
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -678,13 +663,13 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					of proprietary software.
 				`),
 				evaluateMpc(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						initialKeyGeneration: 'ON_USER_DEVICE',
 						tokenTransferTransactionGeneration:
 							TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP,
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -695,6 +680,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					software.
 				`),
 				evaluateMultifactor(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'NO',
 						keyRotationTransactionGeneration:
@@ -703,7 +689,6 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 					},
 					'erc4337',
-					[],
 				),
 			),
 		],
@@ -717,6 +702,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					and allows the user to export the seed phrase and/or private keys.
 				`),
 				evaluateEoa(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						canExportPrivateKey: true,
 						keyDerivation: {
@@ -726,7 +712,6 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							seedPhrase: 'BIP39',
 						},
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -737,13 +722,13 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					open-source software which does not rely on any external provider.
 				`),
 				evaluateMpc(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						initialKeyGeneration: 'ON_USER_DEVICE',
 						tokenTransferTransactionGeneration:
 							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -754,6 +739,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 					open-source software without relying on an external provider.
 				`),
 				evaluateMultifactor(
+					EvaluationContext.forTest(() => accountPortability),
 					{
 						controllingSharesInSelfCustodyByDefault: 'YES',
 						keyRotationTransactionGeneration:
@@ -762,73 +748,76 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 							TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 					},
 					'erc4337',
-					[],
 				),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<AccountPortabilityValue> => {
-		if (features.accountSupport === null) {
-			return unrated(accountPortability, null)
+	evaluate: (
+		ctx: EvaluationContext<AccountPortabilityValue>,
+	): Evaluation<AccountPortabilityValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test possible.
+
+		if (ctx.features.accountSupport === null) {
+			return unrated(ctx, null)
 		}
 
-		const allRefs = mergeRefs(
-			isSupported(features.accountSupport.eoa) ? refs(features.accountSupport.eoa) : [],
-			isSupported(features.accountSupport.mpc) ? refs(features.accountSupport.mpc) : [],
-			isSupported(features.accountSupport.rawErc4337)
-				? refs(features.accountSupport.rawErc4337)
-				: [],
-			isSupported(features.accountSupport.eip7702) ? refs(features.accountSupport.eip7702) : [],
+		ctx.addRef(
+			ctx.features.accountSupport.eoa,
+			ctx.features.accountSupport.mpc,
+			ctx.features.accountSupport.rawErc4337,
+			ctx.features.accountSupport.eip7702,
 		)
 		const evaluations: Array<Evaluation<AccountPortabilityValue>> = []
 		let defaultEvaluation: Evaluation<AccountPortabilityValue> | null = null
 
-		if (isSupported<AccountTypeEoa>(features.accountSupport.eoa)) {
-			const evaluation = evaluateEoa(features.accountSupport.eoa, allRefs)
+		if (isSupported<AccountTypeEoa>(ctx.features.accountSupport.eoa)) {
+			const evaluation = evaluateEoa(ctx, ctx.features.accountSupport.eoa)
 
 			evaluations.push(evaluation)
 
-			if (features.accountSupport.defaultAccountType === AccountType.eoa) {
+			if (ctx.features.accountSupport.defaultAccountType === AccountType.eoa) {
 				defaultEvaluation = evaluation
 			}
 		}
 
-		if (isSupported<AccountTypeMpc>(features.accountSupport.mpc)) {
-			const evaluation = evaluateMpc(features.accountSupport.mpc, allRefs)
+		if (isSupported<AccountTypeMpc>(ctx.features.accountSupport.mpc)) {
+			// MPC verification requires source code access.
+			ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
+			const evaluation = evaluateMpc(ctx, ctx.features.accountSupport.mpc)
 
 			evaluations.push(evaluation)
 
-			if (features.accountSupport.defaultAccountType === AccountType.mpc) {
+			if (ctx.features.accountSupport.defaultAccountType === AccountType.mpc) {
 				defaultEvaluation = evaluation
 			}
 		}
 
-		if (isSupported<AccountTypeMutableMultifactor>(features.accountSupport.rawErc4337)) {
-			const evaluation = evaluateMultifactor(features.accountSupport.rawErc4337, 'erc4337', allRefs)
+		if (isSupported<AccountTypeMutableMultifactor>(ctx.features.accountSupport.rawErc4337)) {
+			const evaluation = evaluateMultifactor(ctx, ctx.features.accountSupport.rawErc4337, 'erc4337')
 
 			evaluations.push(evaluation)
 
-			if (features.accountSupport.defaultAccountType === AccountType.rawErc4337) {
+			if (ctx.features.accountSupport.defaultAccountType === AccountType.rawErc4337) {
 				defaultEvaluation = evaluation
 			}
 		}
 
-		if (isSupported<AccountType7702>(features.accountSupport.eip7702)) {
-			const evaluation = evaluateEip7702(features.accountSupport, allRefs)
+		if (isSupported<AccountType7702>(ctx.features.accountSupport.eip7702)) {
+			const evaluation = evaluateEip7702(ctx, ctx.features.accountSupport)
 
 			evaluations.push(evaluation)
 
-			if (features.accountSupport.defaultAccountType === AccountType.eip7702) {
+			if (ctx.features.accountSupport.defaultAccountType === AccountType.eip7702) {
 				defaultEvaluation = evaluation
 			}
 		}
 
-		if (isSupported<AccountTypeSafe>(features.accountSupport.safe)) {
-			const evaluation = evaluateSafe(features.accountSupport.safe, allRefs)
+		if (isSupported<AccountTypeSafe>(ctx.features.accountSupport.safe)) {
+			const evaluation = evaluateSafe(ctx, ctx.features.accountSupport.safe)
 
 			evaluations.push(evaluation)
 
-			if (features.accountSupport.defaultAccountType === AccountType.safe) {
+			if (ctx.features.accountSupport.defaultAccountType === AccountType.safe) {
 				defaultEvaluation = evaluation
 			}
 		}

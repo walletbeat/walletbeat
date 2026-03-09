@@ -6,11 +6,11 @@ import {
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type AccountRecovery,
 	type GuardianPolicy,
@@ -23,7 +23,8 @@ import {
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
-import { type FullyQualifiedReference, mergeRefs, refNotNecessary } from '@/schema/reference'
+import { refNotNecessary } from '@/schema/reference'
+import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
 	markdown,
 	mdSentence,
@@ -49,6 +50,7 @@ export type AccountUnruggabilityValue = Value & {
 }
 
 function evaluateGuardianUnruggabilityPolicy(
+	ctx: EvaluationContext<AccountUnruggabilityValue>,
 	guardianPolicy: GuardianPolicy,
 ): Evaluation<AccountUnruggabilityValue> {
 	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
@@ -66,7 +68,7 @@ function evaluateGuardianUnruggabilityPolicy(
 	)
 
 	if (!isNonEmptyArray(takeOverPossibleOutcomes)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'guardian_policy_unruggable',
 				rating: Rating.PASS,
@@ -79,11 +81,11 @@ function evaluateGuardianUnruggabilityPolicy(
 				outcomes,
 			},
 			details: accountUnruggabilityDetailsContent({}),
-		}
+		})
 	}
 
 	if (takeOverPossibleOutcomes.length === 1) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'guardian_policy_ruggable_specific_scenario',
 				rating: Rating.FAIL,
@@ -95,10 +97,10 @@ function evaluateGuardianUnruggabilityPolicy(
 				outcomes,
 			},
 			details: accountUnruggabilityDetailsContent({}),
-		}
+		})
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'guardian_policy_ruggable_multiple_scenarios',
 			rating: Rating.FAIL,
@@ -111,10 +113,11 @@ function evaluateGuardianUnruggabilityPolicy(
 			outcomes,
 		},
 		details: accountUnruggabilityDetailsContent({}),
-	}
+	})
 }
 
 function evaluateAccountUnruggability(
+	ctx: EvaluationContext<AccountUnruggabilityValue>,
 	keysHandling: KeysHandlingSupport,
 	accountRecovery: AccountRecovery,
 ): Evaluation<AccountUnruggabilityValue> {
@@ -124,7 +127,7 @@ function evaluateAccountUnruggability(
 		case KeyGenerationLocation.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE:
 			break // OK
 		case KeyGenerationLocation.FULLY_OFF_USER_DEVICE:
-			return {
+			return ctx.build({
 				value: {
 					id: 'key_off_device',
 					displayName: 'Key generated off-device',
@@ -143,7 +146,7 @@ function evaluateAccountUnruggability(
 
 					**"Not your keys, not your coins."**
 				`),
-			}
+			})
 	}
 
 	switch (keysHandling.multipartyKeyReconstruction) {
@@ -154,7 +157,7 @@ function evaluateAccountUnruggability(
 		case MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE:
 			break // OK
 		case MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE:
-			return {
+			return ctx.build({
 				value: {
 					id: 'multiparty_reconstructed_without_user_device',
 					displayName: 'MPC key reconstructed without user',
@@ -175,16 +178,17 @@ function evaluateAccountUnruggability(
 
 					**"Not your keys, not your coins."**
 				`),
-			}
+			})
 	}
 
 	if (isSupported(accountRecovery.guardianRecovery)) {
 		return evaluateGuardianUnruggabilityPolicy(
+			ctx,
 			accountRecovery.guardianRecovery.minimumGuardianPolicy,
 		)
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'pass_no_guardian_recovery',
 			displayName: 'Unruggable account',
@@ -197,7 +201,7 @@ function evaluateAccountUnruggability(
 			outcomes: null,
 		},
 		details: accountUnruggabilityDetailsContent({}),
-	}
+	})
 }
 
 export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
@@ -244,6 +248,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 					The private key of the user's account resides on an external server.
 				`),
 				evaluateAccountUnruggability(
+					EvaluationContext.forTest(() => accountUnruggability),
 					{
 						keyGeneration: KeyGenerationLocation.FULLY_OFF_USER_DEVICE,
 						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
@@ -259,6 +264,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 					services without the user's involvement.
 				`),
 				evaluateAccountUnruggability(
+					EvaluationContext.forTest(() => accountUnruggability),
 					{
 						keyGeneration: KeyGenerationLocation.MULTIPARTY_COMPUTED_INCLUDING_USER_DEVICE,
 						multipartyKeyReconstruction:
@@ -275,6 +281,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 					own platform unencrypted, allowing them to take over the user's account.
 				`),
 				evaluateAccountUnruggability(
+					EvaluationContext.forTest(() => accountUnruggability),
 					{
 						keyGeneration: KeyGenerationLocation.FULLY_OFF_USER_DEVICE,
 						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
@@ -309,6 +316,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 					to obtain a copy of the recovery secret and take over the account.
 				`),
 				evaluateAccountUnruggability(
+					EvaluationContext.forTest(() => accountUnruggability),
 					{
 						keyGeneration: KeyGenerationLocation.FULLY_OFF_USER_DEVICE,
 						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
@@ -349,6 +357,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 					two or more shares from these external services.
 				`),
 				evaluateAccountUnruggability(
+					EvaluationContext.forTest(() => accountUnruggability),
 					{
 						keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 						multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
@@ -383,27 +392,28 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<AccountUnruggabilityValue> => {
-		if (features.security.keysHandling === null || features.security.accountRecovery === null) {
-			return unrated(accountUnruggability, { minimumGuardianPolicy: null, outcomes: null })
+	evaluate: (
+		ctx: EvaluationContext<AccountUnruggabilityValue>,
+	): Evaluation<AccountUnruggabilityValue> => {
+		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
+
+		if (
+			ctx.features.security.keysHandling === null ||
+			ctx.features.security.accountRecovery === null
+		) {
+			return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null })
 		}
 
-		let references: FullyQualifiedReference[] = []
+		ctx.addRef(
+			ctx.features.security.keysHandling,
+			ctx.features.security.accountRecovery.guardianRecovery,
+		)
 
-		// Collect references
-		references = mergeRefs(references, features.security.keysHandling.ref)
-
-		if (isSupported(features.security.accountRecovery.guardianRecovery)) {
-			references = mergeRefs(references, features.security.accountRecovery.guardianRecovery.ref)
-		}
-
-		return {
-			...evaluateAccountUnruggability(
-				features.security.keysHandling,
-				features.security.accountRecovery,
-			),
-			references,
-		}
+		return evaluateAccountUnruggability(
+			ctx,
+			ctx.features.security.keysHandling,
+			ctx.features.security.accountRecovery,
+		)
 	},
 	aggregate: pickWorstRating<AccountUnruggabilityValue>,
 }

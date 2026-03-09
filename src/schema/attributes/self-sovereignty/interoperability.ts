@@ -1,6 +1,12 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
+import {
+	type Attribute,
+	type Evaluation,
+	EvaluationContext,
+	Rating,
+	type Value,
+	Verifiability,
+} from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type InteroperabilitySupport,
 	InteroperabilityType,
@@ -75,18 +81,20 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<InteroperabilityValue>>) =>
 		pickWorstRating<InteroperabilityValue>(perVariant),
-	evaluate: (features: ResolvedFeatures): Evaluation<InteroperabilityValue> => {
-		if (features.type !== WalletType.HARDWARE) {
-			return exempt(interoperability, sentence('Only rated for hardware wallets'), {
+	evaluate: (ctx: EvaluationContext<InteroperabilityValue>): Evaluation<InteroperabilityValue> => {
+		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
+
+		if (ctx.features.type !== WalletType.HARDWARE) {
+			return exempt(ctx, sentence('Only rated for hardware wallets'), {
 				interoperability: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,
 			})
 		}
 
-		const interoperabilityFeature = features.selfSovereignty.interoperability
+		const interoperabilityFeature = ctx.features.selfSovereignty.interoperability
 
 		if (interoperabilityFeature === null) {
-			return unrated(interoperability, {
+			return unrated(ctx, {
 				interoperability: InteroperabilityType.FAIL,
 				noSupplierLinkage: InteroperabilityType.FAIL,
 			})
@@ -94,7 +102,7 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 
 		const rating = evaluateInteroperability(interoperabilityFeature)
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'interoperability',
 				rating,
@@ -104,7 +112,6 @@ export const interoperability: Attribute<InteroperabilityValue> = {
 			},
 			details: paragraph(`{{WALLET_NAME}} interoperability evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-			// TODO: Add references
-		}
+		})
 	},
 }
