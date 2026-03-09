@@ -2,14 +2,15 @@ import { exampleSecurityAuditor } from '@/data/entities/example'
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
-import { mergeRefs } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
+import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { securityAuditsDetailsContent } from '@/types/content/security-audits-details'
@@ -22,8 +23,8 @@ export type SecurityAuditsValue = Value & {
 	securityAudits: SecurityAudit[]
 }
 
-function noAudits(): Evaluation<SecurityAuditsValue> {
-	return {
+function noAudits(ctx: EvaluationContext<SecurityAuditsValue>): Evaluation<SecurityAuditsValue> {
+	return ctx.build({
 		value: {
 			id: 'no_audits',
 			rating: Rating.FAIL,
@@ -32,15 +33,17 @@ function noAudits(): Evaluation<SecurityAuditsValue> {
 			securityAudits: [],
 		},
 		details: paragraph('{{WALLET_NAME}} has not undergone any security auditing.'),
-		references: [],
-	}
+	})
 }
 
 function audited(
+	ctx: EvaluationContext<SecurityAuditsValue>,
 	audits: NonEmptyArray<SecurityAudit>,
 	auditedInLastYear: boolean,
 	hasUnaddressedFlaws: boolean,
 ): Evaluation<SecurityAuditsValue> {
+	ctx.addRef(...audits)
+
 	const { rating, displayName, shortExplanation, howToImprove } = ((): Pick<
 		SecurityAuditsValue,
 		'rating' | 'displayName' | 'shortExplanation'
@@ -92,7 +95,7 @@ function audited(
 		}
 	})()
 
-	return {
+	return ctx.build({
 		value: {
 			id: `audited_${auditedInLastYear}_${hasUnaddressedFlaws}`,
 			rating,
@@ -105,8 +108,7 @@ function audited(
 			hasUnaddressedFlaws,
 		}),
 		howToImprove,
-		references: mergeRefs(...audits.map(audit => audit.ref)),
-	}
+	})
 }
 
 const sampleSecurityAudit: SecurityAudit = {
@@ -167,51 +169,75 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 			paragraph(
 				'The wallet was audited within the last year, and all flaws of severity "medium" or higher are addressed.',
 			),
-			audited([sampleSecurityAudit], true, false),
+			audited(
+				EvaluationContext.forTest(() => securityAudits),
+				[sampleSecurityAudit],
+				true,
+				false,
+			),
 		),
 		partial: [
 			exampleRating(
 				paragraph('The wallet was audited over a year ago, and has not been audited since.'),
-				audited([sampleSecurityAudit], false, false),
+				audited(
+					EvaluationContext.forTest(() => securityAudits),
+					[sampleSecurityAudit],
+					false,
+					false,
+				),
 			),
 			exampleRating(
 				paragraph(
 					'The wallet was audited within the last year, and there remains at least one unaddressed security flaw of severity "medium" or higher.',
 				),
-				audited([sampleSecurityAudit], true, true),
+				audited(
+					EvaluationContext.forTest(() => securityAudits),
+					[sampleSecurityAudit],
+					true,
+					true,
+				),
 			),
 		],
 		fail: [
 			exampleRating(
 				paragraph('The wallet was never audited by an independent security auditor.'),
-				noAudits(),
+				noAudits(EvaluationContext.forTest(() => securityAudits)),
 			),
 			exampleRating(
 				paragraph(
 					'The wallet was audited over a year ago, has not been audited since, and there remains at least one unaddressed security flaw of severity "medium" or higher.',
 				),
-				audited([sampleSecurityAudit], false, true),
+				audited(
+					EvaluationContext.forTest(() => securityAudits),
+					[sampleSecurityAudit],
+					false,
+					true,
+				),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<SecurityAuditsValue> => {
-		if (features.type === WalletType.HARDWARE) {
-			return exempt(
-				securityAudits,
-				sentence('This attribute is not applicable to hardware wallets.'),
-				{ securityAudits: [] },
-			)
+	evaluate: (ctx: EvaluationContext<SecurityAuditsValue>): Evaluation<SecurityAuditsValue> => {
+		ctx.setVerifiability(
+			verifiabilityRequiresAtLeastOneReference({
+				referenceCountsAs: Verifiability.VERIFIABLE,
+			}),
+		)
+
+		if (ctx.features.type === WalletType.HARDWARE) {
+			return exempt(ctx, sentence('This attribute is not applicable to hardware wallets.'), {
+				securityAudits: [],
+			})
 		}
 
-		if (features.security.publicSecurityAudits === null) {
-			return unrated(securityAudits, { securityAudits: [] })
+		if (ctx.features.security.publicSecurityAudits === null) {
+			return unrated(ctx, { securityAudits: [] })
 		}
 
-		if (!isNonEmptyArray(features.security.publicSecurityAudits)) {
-			return noAudits()
+		if (!isNonEmptyArray(ctx.features.security.publicSecurityAudits)) {
+			return noAudits(ctx)
 		}
 
-		const audits = features.security.publicSecurityAudits
+		const audits = ctx.features.security.publicSecurityAudits
 		let auditedInLastYear = false
 		let hasUnaddressedFlaws = false
 
@@ -229,7 +255,7 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 			}
 		}
 
-		return audited(audits, auditedInLastYear, hasUnaddressedFlaws)
+		return audited(ctx, audits, auditedInLastYear, hasUnaddressedFlaws)
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsValue>>) => {
 		const worstEvaluation = pickWorstRating<SecurityAuditsValue>(perVariant)

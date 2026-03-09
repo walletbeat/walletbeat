@@ -1,11 +1,12 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	HardwareWalletConnection,
 	hardwareWalletConnectionIsOnlyWalletConnect,
@@ -16,7 +17,7 @@ import {
 	supportsHardwareWalletTypesMarkdown,
 } from '@/schema/features/security/hardware-wallet-support'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
-import { popRefs, refNotNecessary } from '@/schema/reference'
+import { refNotNecessary } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
@@ -27,9 +28,10 @@ export type HardwareWalletSupportValue = Value & {
 }
 
 function noHardwareWalletSupport(
+	ctx: EvaluationContext<HardwareWalletSupportValue>,
 	hardwareWalletSupport: HardwareWalletSupport,
 ): Evaluation<HardwareWalletSupportValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'no_hardware_wallet_support',
 			rating: Rating.FAIL,
@@ -46,13 +48,14 @@ function noHardwareWalletSupport(
 		howToImprove: paragraph(`
 			{{WALLET_NAME}} should add support for popular hardware wallets to improve security options for users.
 		`),
-	}
+	})
 }
 
 function indirectHardwareWalletSupport(
+	ctx: EvaluationContext<HardwareWalletSupportValue>,
 	hardwareWalletSupport: HardwareWalletSupport,
 ): Evaluation<HardwareWalletSupportValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'indirect_hardware_wallet_support',
 			rating: Rating.PARTIAL,
@@ -62,10 +65,11 @@ function indirectHardwareWalletSupport(
 			`),
 			hardwareWalletSupport,
 		},
-		details:
-			paragraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
+		details: paragraph(`
+			{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
 
-Direct connection is not possible.`),
+			Direct connection is not possible.
+		`),
 		impact: paragraph(`
 			Hardware wallets provide an additional layer of security by keeping private keys offline.
 
@@ -76,13 +80,14 @@ Direct connection is not possible.`),
 		howToImprove: paragraph(`
 			{{WALLET_NAME}} should directly integrate hardware wallet support.
 		`),
-	}
+	})
 }
 
 function directHardwareWalletSupport(
+	ctx: EvaluationContext<HardwareWalletSupportValue>,
 	hardwareWalletSupport: HardwareWalletSupport,
 ): Evaluation<HardwareWalletSupportValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'direct_hardware_wallet_support',
 			rating: Rating.PASS,
@@ -93,7 +98,7 @@ function directHardwareWalletSupport(
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}`,
 		),
-	}
+	})
 }
 
 export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
@@ -141,14 +146,17 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 			paragraph(`
 				The wallet integrates any type of hardware wallet.
 			`),
-			directHardwareWalletSupport({
-				ref: refNotNecessary,
-				wallets: {
-					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-						connectionTypes: [HardwareWalletConnection.USB],
-					}),
+			directHardwareWalletSupport(
+				EvaluationContext.forTest(() => hardwareWalletSupport),
+				{
+					ref: refNotNecessary,
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.USB],
+						}),
+					},
 				},
-			}),
+			),
 		),
 		partial: [
 			exampleRating(
@@ -157,14 +165,17 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				of an additional software component in order to do so
 				(e.g. WalletConnect).
 			`),
-				indirectHardwareWalletSupport({
-					ref: refNotNecessary,
-					wallets: {
-						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-							connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
-						}),
+				indirectHardwareWalletSupport(
+					EvaluationContext.forTest(() => hardwareWalletSupport),
+					{
+						ref: refNotNecessary,
+						wallets: {
+							[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+								connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
+							}),
+						},
 					},
-				}),
+				),
 			),
 		],
 		fail: [
@@ -172,15 +183,22 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 				paragraph(`
 					The wallet does not support any hardware wallets.
 				`),
-				noHardwareWalletSupport({ wallets: {}, ref: refNotNecessary }),
+				noHardwareWalletSupport(
+					EvaluationContext.forTest(() => hardwareWalletSupport),
+					{ wallets: {}, ref: refNotNecessary },
+				),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<HardwareWalletSupportValue> => {
+	evaluate: (
+		ctx: EvaluationContext<HardwareWalletSupportValue>,
+	): Evaluation<HardwareWalletSupportValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivial self-test.
+
 		// If this is a hardware wallet, mark as exempt since hardware wallets inherently support themselves
-		if (features.type === WalletType.HARDWARE) {
+		if (ctx.features.type === WalletType.HARDWARE) {
 			return exempt(
-				hardwareWalletSupport,
+				ctx,
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet itself.',
 				),
@@ -191,14 +209,16 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		// @NOTE: regardless if a wallet is EOA-, 4337- or 7702-only it should not be exempt from this statistic
 		// 	all such wallets have the opportunity to support hardware wallets to provide better security for the user
 
-		if (features.security.hardwareWalletSupport === null) {
-			return unrated(hardwareWalletSupport, {
+		if (ctx.features.security.hardwareWalletSupport === null) {
+			return unrated(ctx, {
 				hardwareWalletSupport: { wallets: {}, ref: refNotNecessary },
 			})
 		}
 
 		// Extract references from the hardware wallet support feature
-		const { withoutRefs, refs: extractedRefs } = popRefs(features.security.hardwareWalletSupport)
+		const withoutRefs = ctx.popRefs<HardwareWalletSupport>(
+			ctx.features.security.hardwareWalletSupport,
+		)
 
 		const hwSupport = hardwareWalletType.fullRecord(withoutRefs.wallets, notSupported)
 		const numSupported = Object.entries(
@@ -207,7 +227,7 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 
 		const result = (() => {
 			if (numSupported === 0) {
-				return noHardwareWalletSupport(features.security.hardwareWalletSupport)
+				return noHardwareWalletSupport(ctx, ctx.features.security.hardwareWalletSupport)
 			}
 
 			if (
@@ -220,20 +240,17 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 					),
 				).length === numSupported
 			) {
-				return indirectHardwareWalletSupport(features.security.hardwareWalletSupport)
+				return indirectHardwareWalletSupport(ctx, ctx.features.security.hardwareWalletSupport)
 			}
 
-			return directHardwareWalletSupport(features.security.hardwareWalletSupport)
+			return directHardwareWalletSupport(ctx, ctx.features.security.hardwareWalletSupport)
 		})()
 
 		if (numSupported === 0) {
-			return noHardwareWalletSupport(features.security.hardwareWalletSupport)
+			return noHardwareWalletSupport(ctx, ctx.features.security.hardwareWalletSupport)
 		}
 
-		return {
-			...result,
-			...(extractedRefs.length > 0 && { references: extractedRefs }),
-		}
+		return result
 	},
 	aggregate: pickWorstRating<HardwareWalletSupportValue>,
 }
