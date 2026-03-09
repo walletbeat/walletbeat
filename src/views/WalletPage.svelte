@@ -11,6 +11,7 @@
 		Rating,
 		ratingIcons,
 		ratingToColor,
+		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
 	import { VariantSpecificity } from '@/schema/wallet'
@@ -849,6 +850,24 @@
 						{/if}
 					</div>
 
+					{#if true}
+						{@const verifiability = evalAttr.evaluation.value.verifiability}
+						{#if verifiability === Verifiability.UNVERIFIABLE}
+							<data
+								data-row-item="wrap-end"
+								data-badge="medium"
+								value={verifiability}
+								style:--accent="var(--accent-color)"
+							>Unverifiable</data>
+						{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
+							<data
+								data-row-item="wrap-end"
+								data-badge="medium"
+								value={verifiability}
+								style:--accent="var(--accent-color)"
+							>Unverifiable but audited</data>
+						{/if}
+					{/if}
 					<data
 						data-row-item="wrap-end"
 						data-badge="medium"
