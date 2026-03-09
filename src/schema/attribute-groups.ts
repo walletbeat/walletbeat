@@ -15,6 +15,7 @@ import {
 	type EvaluatedAttribute,
 	evaluatedAttributes,
 	type EvaluatedGroup,
+	EvaluationContext,
 	isExempt,
 	Rating,
 	type Value,
@@ -423,8 +424,10 @@ export function evaluateAttributes(
 	walletMetadata: WalletMetadata,
 ): EvaluationTree {
 	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => {
+		const ctx = EvaluationContext.create<V>(attr, features)
+
 		if (attr.exempted !== undefined) {
-			const maybeExempt = attr.exempted(features, walletMetadata)
+			const maybeExempt = attr.exempted(ctx, walletMetadata)
 
 			if (maybeExempt !== null) {
 				if (!isExempt(maybeExempt)) {
@@ -442,7 +445,7 @@ export function evaluateAttributes(
 
 		return {
 			attribute: attr,
-			evaluation: attr.evaluate(features),
+			evaluation: attr.evaluate(ctx),
 		}
 	}
 
@@ -694,7 +697,7 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 	const subScores = nonEmptyValues<keyof Vs, WeightedScore | null>(
 		nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
 			const { value } = evaluations[key].evaluation
-			const score = value.score ?? defaultRatingScore(value.rating)
+			const score = value.score ?? defaultRatingScore(value)
 
 			return score === null
 				? null

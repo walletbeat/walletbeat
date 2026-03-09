@@ -3,11 +3,12 @@ import { unratedAttributeContent } from '@/types/content/unrated-attribute'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyValues } from '@/types/utils/non-empty'
 
 import {
-	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	type ExemptEvaluation,
 	Rating,
 	type Value,
+	Verifiability,
 	type WalletNameStrings,
 } from '../attributes'
 import type { AtLeastOneVariant, Variant } from '../variants'
@@ -16,13 +17,14 @@ import type { AtLeastOneVariant, Variant } from '../variants'
  * Helper for constructing "Unrated" values.
  */
 export function unrated<V extends Value>(
-	attribute: Attribute<V>,
+	ctx: EvaluationContext<V>,
 	extraProps: Omit<V, keyof Value> extends Record<string, never> ? null : Omit<V, keyof Value>,
 ): Evaluation<V> {
 	const value: Value = {
 		id: 'unrated',
 		rating: Rating.UNRATED,
-		displayName: `${attribute.displayName}: Unrated`,
+		verifiability: Verifiability.SELF_EVIDENT,
+		displayName: `${ctx.attribute.displayName}: Unrated`,
 		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
@@ -35,14 +37,15 @@ export function unrated<V extends Value>(
 }
 
 export function exempt<V extends Value>(
-	attribute: Attribute<V>,
+	ctx: EvaluationContext<V>,
 	whyExempt: Sentence<WalletNameStrings>,
 	extraProps: Omit<V, keyof Value> extends Record<string, never> ? null : Omit<V, keyof Value>,
 ): ExemptEvaluation<V> {
 	const value: Value & { rating: Rating.EXEMPT } = {
 		id: 'exempt',
 		rating: Rating.EXEMPT,
-		displayName: `${attribute.displayName}: Exempt`,
+		verifiability: Verifiability.SELF_EVIDENT,
+		displayName: `${ctx.attribute.displayName}: Exempt`,
 		shortExplanation: whyExempt,
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
