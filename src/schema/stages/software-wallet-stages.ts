@@ -71,7 +71,11 @@ export const softwareWalletStageOne: WalletStage = {
 					rationale: sentence(
 						'This provides a level of assurance about the software security practices of the wallet developer.',
 					),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAudits),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, securityAudits, {
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
 					displayName: 'Security Audit 1Y',
 				},
 				{
@@ -260,6 +264,7 @@ export const softwareWalletStageOne: WalletStage = {
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressResolution, {
 						allowPartial: true,
+						ifUnverifiable: 'THROW',
 						ifNoVariantInScope: null,
 					}),
 					displayName: 'Address Resolution',
@@ -273,6 +278,7 @@ export const softwareWalletStageOne: WalletStage = {
 					`),
 					evaluate: variantsMustPassAttribute(nonEmptySet(Variant.BROWSER), browserIntegration, {
 						allowPartial: false,
+						ifUnverifiable: 'THROW',
 						ifNoVariantInScope: {
 							rating: StageCriterionRating.EXEMPT,
 							explanation: sentence('{{WALLET_NAME}} is exempt as it has no browser version.'),
@@ -457,7 +463,11 @@ const softwareWalletStageTwo: WalletStage = {
 						or simply to interact with the chain (gas fees). Whenever they do,
 						the user deserves to know what they are paying for.
 					`),
-					evaluate: variantsMustPassAttribute(softwareWalletVariants, feeTransparency),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, feeTransparency, {
+						allowPartial: false,
+						ifUnverifiable: 'THROW',
+						ifNoVariantInScope: null,
+					}),
 					displayName: 'Fee Transparency',
 				},
 			],
@@ -479,6 +489,7 @@ const softwareWalletStageTwo: WalletStage = {
 					`),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, addressResolution, {
 						allowPartial: false,
+						ifUnverifiable: 'THROW',
 						ifNoVariantInScope: null,
 					}),
 					displayName: 'Chain-Specific Address Resolution',

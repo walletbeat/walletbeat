@@ -1,4 +1,4 @@
-import type { Content, Paragraph, Sentence } from '@/types/content'
+import { type Content, type Paragraph, type Sentence, sentence } from '@/types/content'
 import { getErrorMessage } from '@/types/errors'
 import {
 	isNonEmptyArray,
@@ -11,7 +11,13 @@ import {
 } from '@/types/utils/non-empty'
 
 import { getAttributeFromTree } from './attribute-groups'
-import { type Attribute, Rating, type Value, type WalletNameStrings } from './attributes'
+import {
+	type Attribute,
+	Rating,
+	type Value,
+	Verifiability,
+	type WalletNameStrings,
+} from './attributes'
 import type { Variant } from './variants'
 import { type RatedWallet, type ResolvedWallet } from './wallet'
 
@@ -281,6 +287,13 @@ export function variantsMustPassAttribute<V extends Value>(
 		allowPartial: boolean
 
 		/**
+		 * UNVERIFIABLE evaluations use this sentence as explanation.
+		 * If THROW, an error is thrown.
+		 * If PASS, unverifiability does not impact stage evaluation for this criterion.
+		 */
+		ifUnverifiable: Sentence<WalletNameStrings> | 'THROW' | 'PASS'
+
+		/**
 		 * What to return if none of the wallet's variants are in scope.
 		 * If null, this case will throw an error.
 		 */
@@ -288,8 +301,17 @@ export function variantsMustPassAttribute<V extends Value>(
 	},
 ): (wallet: StageEvaluatableWallet) => StageCriterionEvaluation {
 	if (options === undefined) {
+		if (attribute.wording.midSentenceName === null) {
+			throw new Error(
+				`Attribute ${attribute.displayName}: specify either options.ifUnverifiable or wording.midSentenceName`,
+			)
+		}
+
 		options = {
 			allowPartial: false,
+			ifUnverifiable: sentence(
+				`{{WALLET_NAME}}'s ${attribute.wording.midSentenceName} cannot be publicly verified.`,
+			),
 			ifNoVariantInScope: null,
 		}
 	}
@@ -304,6 +326,10 @@ export function variantsMustPassAttribute<V extends Value>(
 					`Wallet variant ${variantWallet.variant} does not have any evaluated attribute with ID ${attribute.id}`,
 				)
 			}
+
+			const isVerifiable =
+				evalAttr.evaluation.value.verifiability === Verifiability.VERIFIABLE ||
+				evalAttr.evaluation.value.verifiability === Verifiability.SELF_EVIDENT
 
 			switch (evalAttr.evaluation.value.rating) {
 				case Rating.EXEMPT:
@@ -325,8 +351,38 @@ export function variantsMustPassAttribute<V extends Value>(
 							explanation: evalAttr.evaluation.value.shortExplanation,
 						}
 					}
+
+					if (!isVerifiable) {
+						if (options.ifUnverifiable === 'THROW') {
+							throw new Error(
+								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.value.verifiability}`,
+							)
+						}
+
+						if (options.ifUnverifiable !== 'PASS') {
+							return {
+								rating: StageCriterionRating.FAIL,
+								explanation: options.ifUnverifiable,
+							}
+						}
+					}
 				// Else, fall through to the PASS case.
 				case Rating.PASS:
+					if (!isVerifiable) {
+						if (options.ifUnverifiable === 'THROW') {
+							throw new Error(
+								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.value.verifiability}`,
+							)
+						}
+
+						if (options.ifUnverifiable !== 'PASS') {
+							return {
+								rating: StageCriterionRating.FAIL,
+								explanation: options.ifUnverifiable,
+							}
+						}
+					}
+
 					return {
 						rating: StageCriterionRating.PASS,
 						explanation: evalAttr.evaluation.value.shortExplanation,
