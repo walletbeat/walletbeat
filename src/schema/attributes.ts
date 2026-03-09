@@ -674,8 +674,15 @@ export class EvaluationContext<V extends Value> {
 			| Support<WithRef<object>>
 			| LooseReference
 			| References
-			| FullyQualifiedReference,
+			| FullyQualifiedReference
+			| FullyQualifiedReference[],
 	) {
+		if (Array.isArray(x)) {
+			this.addRef(...x)
+
+			return
+		}
+
 		if (isMaybeSupported(x)) {
 			if (isSupported(x)) {
 				this.addRef(...toFullyQualified(x.ref))
@@ -703,6 +710,7 @@ export class EvaluationContext<V extends Value> {
 			| LooseReference
 			| References
 			| FullyQualifiedReference
+			| FullyQualifiedReference[]
 			| undefined
 			| null
 		)[]

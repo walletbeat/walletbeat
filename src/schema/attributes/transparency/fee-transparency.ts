@@ -1,16 +1,17 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
 import { type FeeDisplay, FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { type FullyQualifiedReference, mergeRefs, refs, type WithRef } from '@/schema/reference'
-import type { AtLeastOneVariant } from '@/schema/variants'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { type NonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 import { markdownListFormat } from '@/types/utils/text'
@@ -298,9 +299,10 @@ export type FeeTransparencyValue = Value & {
 }
 
 function evaluateWorstFeeDisplay(
+	ctx: EvaluationContext<FeeTransparencyValue>,
 	worstFeeDisplay: WorstFeeDisplay,
 ): Evaluation<FeeTransparencyValue> {
-	const references = worstFeeDisplay.references
+	ctx.addRef(worstFeeDisplay.references)
 	const baseValue = {
 		worstFeeDisplay,
 	} as const
@@ -319,7 +321,7 @@ function evaluateWorstFeeDisplay(
 			throw new Error('Logic error: all fees should be uniformly handled if fully sponsored')
 		}
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'fully_sponsored_fees',
 				displayName: 'Fully sponsored fees',
@@ -333,13 +335,12 @@ function evaluateWorstFeeDisplay(
 				{{WALLET_NAME}} sponsors all fees. This means users do not need to
 				worry about what fees they are being charged.
 			`),
-			references,
-		}
+		})
 	}
 
 	if (worstFeeDisplay.feeDisplay.byDefault === FeeDisplayLevel.NONE) {
 		if (worstFeeDisplay.isUniform) {
-			return {
+			return ctx.build({
 				value: {
 					id: 'hidden_fees',
 					displayName: 'Hidden fees',
@@ -360,11 +361,10 @@ function evaluateWorstFeeDisplay(
 					Obfuscating or hiding fees being charged to users means users
 					do not know where their money is going.
 				`),
-				references,
-			}
+			})
 		}
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'some_hidden_fees',
 				displayName: 'Some hidden fees',
@@ -386,13 +386,12 @@ function evaluateWorstFeeDisplay(
 				Obfuscating or hiding fees being charged to users means users
 				do not know where their money is going.
 			`),
-			references,
-		}
+		})
 	}
 
 	if (worstFeeDisplay.feeDisplay.afterSingleAction === FeeDisplayLevel.AGGREGATED) {
 		if (worstFeeDisplay.isUniform) {
-			return {
+			return ctx.build({
 				value: {
 					id: 'non_comprehensive_fees',
 					displayName: 'Non-comprehensive fees',
@@ -414,11 +413,10 @@ function evaluateWorstFeeDisplay(
 					Users see how much they are paying in fees, but are not able to
 					determine where this money is going exactly.
 				`),
-				references,
-			}
+			})
 		}
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'some_non_comprehensive_fees',
 				displayName: 'Some non-comprehensive fees',
@@ -441,15 +439,14 @@ function evaluateWorstFeeDisplay(
 				Users see how much they are paying in fees, but are not able to
 				determine where this money is going exactly.
 			`),
-			references,
-		}
+		})
 	}
 
 	if (worstFeeDisplay.feeDisplay.afterSingleAction !== FeeDisplayLevel.COMPREHENSIVE) {
 		throw new Error('Logic error')
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'comprehensive_fees',
 			displayName: 'Comprehensive fee breakdown',
@@ -463,8 +460,7 @@ function evaluateWorstFeeDisplay(
 			{{WALLET_NAME}} shows a complete breakdown of all transaction
 			fees${worstFeeDisplay.feeDisplay.byDefault === FeeDisplayLevel.COMPREHENSIVE ? ' by default' : ''}.
 		`),
-		references,
-	}
+	})
 }
 
 export const feeTransparency: Attribute<FeeTransparencyValue> = {
@@ -512,75 +508,87 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 		exhaustive: true,
 		fail: exampleRating(
 			paragraph('The wallet hides all or some of the transaction fees charged to the user.'),
-			evaluateWorstFeeDisplay({
-				feeDisplay: {
-					byDefault: FeeDisplayLevel.NONE,
-					afterSingleAction: FeeDisplayLevel.NONE,
-					fullySponsored: false,
+			evaluateWorstFeeDisplay(
+				EvaluationContext.forTest(() => feeTransparency),
+				{
+					feeDisplay: {
+						byDefault: FeeDisplayLevel.NONE,
+						afterSingleAction: FeeDisplayLevel.NONE,
+						fullySponsored: false,
+					},
+					feeTypes: [FeeType.ETH_L1_TRANSFER],
+					isUniform: true,
+					references: [],
 				},
-				feeTypes: [FeeType.ETH_L1_TRANSFER],
-				isUniform: true,
-				references: [],
-			}),
+			),
 		),
 		partial: exampleRating(
 			paragraph(
 				'The wallet shows an aggregate transaction fee by default, but does not provide a full breakdown.',
 			),
-			evaluateWorstFeeDisplay({
-				feeDisplay: {
-					byDefault: FeeDisplayLevel.AGGREGATED,
-					afterSingleAction: FeeDisplayLevel.AGGREGATED,
-					fullySponsored: false,
+			evaluateWorstFeeDisplay(
+				EvaluationContext.forTest(() => feeTransparency),
+				{
+					feeDisplay: {
+						byDefault: FeeDisplayLevel.AGGREGATED,
+						afterSingleAction: FeeDisplayLevel.AGGREGATED,
+						fullySponsored: false,
+					},
+					feeTypes: [FeeType.ETH_L1_TRANSFER],
+					isUniform: true,
+					references: [],
 				},
-				feeTypes: [FeeType.ETH_L1_TRANSFER],
-				isUniform: true,
-				references: [],
-			}),
+			),
 		),
 		pass: [
 			exampleRating(
 				paragraph(
 					'The wallet displays the full transaction fee breakdown by default for all transaction types it supports.',
 				),
-				evaluateWorstFeeDisplay({
-					feeDisplay: {
-						byDefault: FeeDisplayLevel.COMPREHENSIVE,
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						fullySponsored: false,
+				evaluateWorstFeeDisplay(
+					EvaluationContext.forTest(() => feeTransparency),
+					{
+						feeDisplay: {
+							byDefault: FeeDisplayLevel.COMPREHENSIVE,
+							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							fullySponsored: false,
+						},
+						feeTypes: [FeeType.ETH_L1_TRANSFER],
+						isUniform: true,
+						references: [],
 					},
-					feeTypes: [FeeType.ETH_L1_TRANSFER],
-					isUniform: true,
-					references: [],
-				}),
+				),
 			),
 			exampleRating(
 				paragraph(
 					'The wallet displays an aggregate transaction fee for all transaction types it supports, and the user can get a full breakdown in just one click.',
 				),
-				evaluateWorstFeeDisplay({
-					feeDisplay: {
-						byDefault: FeeDisplayLevel.AGGREGATED,
-						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
-						fullySponsored: false,
+				evaluateWorstFeeDisplay(
+					EvaluationContext.forTest(() => feeTransparency),
+					{
+						feeDisplay: {
+							byDefault: FeeDisplayLevel.AGGREGATED,
+							afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+							fullySponsored: false,
+						},
+						feeTypes: [FeeType.ETH_L1_TRANSFER],
+						isUniform: true,
+						references: [],
 					},
-					feeTypes: [FeeType.ETH_L1_TRANSFER],
-					isUniform: true,
-					references: [],
-				}),
+				),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<FeeTransparencyValue> => {
-		const feeTransparencyData: FeeTransparency = extractFeeTransparency(features)
+	evaluate: (ctx: EvaluationContext<FeeTransparencyValue>): Evaluation<FeeTransparencyValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable in UI.
+		const feeTransparencyData: FeeTransparency = extractFeeTransparency(ctx.features)
 		const worstFeeDisplay = computeWorstFees(feeTransparencyData)
 
 		if (worstFeeDisplay === null) {
-			return unrated(feeTransparency, { worstFeeDisplay: null })
+			return unrated(ctx, { worstFeeDisplay: null })
 		}
 
-		return evaluateWorstFeeDisplay(worstFeeDisplay)
+		return evaluateWorstFeeDisplay(ctx, worstFeeDisplay)
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FeeTransparencyValue>>) =>
-		pickWorstRating<FeeTransparencyValue>(perVariant),
+	aggregate: pickWorstRating<FeeTransparencyValue>,
 }

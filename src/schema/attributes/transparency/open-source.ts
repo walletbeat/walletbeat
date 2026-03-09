@@ -1,11 +1,12 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	FOSS,
 	FOSSLicense,
@@ -18,7 +19,6 @@ import {
 	licenseUrl,
 	LicensingType,
 } from '@/schema/features/transparency/license'
-import { hasRefs, mergeRefs, type ReferenceArray, refs } from '@/schema/reference'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { assertNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
@@ -26,8 +26,11 @@ import { pickWorstRating, unrated } from '../common'
 
 export type OpenSourceValue = Value
 
-function open(license: FOSSLicense): Evaluation<OpenSourceValue> {
-	return {
+function open(
+	ctx: EvaluationContext<OpenSourceValue>,
+	license: FOSSLicense,
+): Evaluation<OpenSourceValue> {
+	return ctx.build({
 		value: {
 			id: license,
 			rating: Rating.PASS,
@@ -42,11 +45,14 @@ function open(license: FOSSLicense): Evaluation<OpenSourceValue> {
 			[**${licenseName(license)}** license](${licenseUrl(license).url}),
 			a Free & Open-Source (FOSS) license.
 		`),
-	}
+	})
 }
 
-function openInTheFuture(license: FutureFOSSLicense): Evaluation<OpenSourceValue> {
-	return {
+function openInTheFuture(
+	ctx: EvaluationContext<OpenSourceValue>,
+	license: FutureFOSSLicense,
+): Evaluation<OpenSourceValue> {
+	return ctx.build({
 		value: {
 			id: license,
 			rating: Rating.PARTIAL,
@@ -63,11 +69,14 @@ function openInTheFuture(license: FutureFOSSLicense): Evaluation<OpenSourceValue
 			However, this license stipulates that it must transition to
 			a Free & Open-Source (FOSS) license in the future.
 		`),
-	}
+	})
 }
 
-function mixedIncludingProprietary(fossLicense: FOSSLicense): Evaluation<OpenSourceValue> {
-	return {
+function mixedIncludingProprietary(
+	ctx: EvaluationContext<OpenSourceValue>,
+	fossLicense: FOSSLicense,
+): Evaluation<OpenSourceValue> {
+	return ctx.build({
 		value: {
 			id: 'mixed_including_proprietary',
 			rating: Rating.FAIL,
@@ -85,11 +94,11 @@ function mixedIncludingProprietary(fossLicense: FOSSLicense): Evaluation<OpenSou
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should consider licensing all of its code under a Free & Open Source Software license.',
 		),
-	}
+	})
 }
 
-function proprietary(): Evaluation<OpenSourceValue> {
-	return {
+function proprietary(ctx: EvaluationContext<OpenSourceValue>): Evaluation<OpenSourceValue> {
+	return ctx.build({
 		value: {
 			id: 'proprietary',
 			rating: Rating.FAIL,
@@ -104,11 +113,11 @@ function proprietary(): Evaluation<OpenSourceValue> {
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should consider re-licensing under a Free & Open Source Software license.',
 		),
-	}
+	})
 }
 
-function unlicensed(): Evaluation<OpenSourceValue> {
-	return {
+function unlicensed(ctx: EvaluationContext<OpenSourceValue>): Evaluation<OpenSourceValue> {
+	return ctx.build({
 		value: {
 			id: 'unlicensed',
 			rating: Rating.FAIL,
@@ -122,7 +131,7 @@ function unlicensed(): Evaluation<OpenSourceValue> {
 			'{{WALLET_NAME}} does not have a valid license for its source code. This is most likely an accidental omission, but a lack of license means that even if {{WALLET_NAME}} is functionally identical to an open-source project, it may later decide to set its license to a proprietary license. Therefore, {{WALLET_NAME}} is assumed to not be Free & Open Source Software until it does have a valid license file.',
 		),
 		howToImprove: paragraph('{{WALLET_NAME}} should add a license file to its source code.'),
-	}
+	})
 }
 
 export const openSource: Attribute<OpenSourceValue> = {
@@ -165,49 +174,47 @@ export const openSource: Attribute<OpenSourceValue> = {
 		fail: [
 			exampleRating(
 				paragraph('The wallet is licensed under any non-FOSS (proprietary) license.'),
-				proprietary(),
+				proprietary(EvaluationContext.forTest(() => openSource)),
 			),
 			exampleRating(
 				paragraph(
 					'The wallet is split across multiple repositories, some of which are FOSS-licensed and some of which are not.',
 				),
-				mixedIncludingProprietary(FOSSLicense.MIT),
+				mixedIncludingProprietary(
+					EvaluationContext.forTest(() => openSource),
+					FOSSLicense.MIT,
+				),
 			),
 			exampleRating(
 				paragraph(
 					"The wallet's source code repository is missing a license file. The lack of a license file may be an accidental omission on the wallet developers' part, but also may indicate that the wallet may set its license to a proprietary license. Therefore, Walletbeat makes the conservative assumption that the wallet is not be Free & Open Open Source Software until it does have a valid license file.",
 				),
-				unlicensed(),
+				unlicensed(EvaluationContext.forTest(() => openSource)),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<OpenSourceValue> => {
-		if (features.licensing === null || features.licensing.walletAppLicense === null) {
-			return unrated(openSource, null)
+	evaluate: (ctx: EvaluationContext<OpenSourceValue>): Evaluation<OpenSourceValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // If open-source, inherently verifiable. If closed-source, evidently true.
+
+		if (ctx.features.licensing === null || ctx.features.licensing.walletAppLicense === null) {
+			return unrated(ctx, null)
 		}
 
 		const allLicenses = new Set<License>()
 
-		allLicenses.add(features.licensing.walletAppLicense.license)
-		let references: ReferenceArray = []
-		const addRefs = (maybeWithRef: unknown) => {
-			if (hasRefs(maybeWithRef)) {
-				references = mergeRefs(references, refs(maybeWithRef))
-			}
-		}
+		allLicenses.add(ctx.features.licensing.walletAppLicense.license)
+		ctx.addRef(ctx.features.licensing.walletAppLicense)
 
-		addRefs(features.licensing.walletAppLicense)
-
-		switch (features.licensing.type) {
+		switch (ctx.features.licensing.type) {
 			case LicensingType.SINGLE_WALLET_REPO_AND_LICENSE:
 				break // Nothing more to do.
 			case LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE:
-				if (features.licensing.coreLicense === null) {
-					return unrated(openSource, null)
+				if (ctx.features.licensing.coreLicense === null) {
+					return unrated(ctx, null)
 				}
 
-				allLicenses.add(features.licensing.coreLicense.license)
-				addRefs(features.licensing.coreLicense)
+				allLicenses.add(ctx.features.licensing.coreLicense.license)
+				ctx.addRef(ctx.features.licensing.coreLicense)
 		}
 
 		if (allLicenses.size === 1) {
@@ -219,24 +226,15 @@ export const openSource: Attribute<OpenSourceValue> = {
 						throw new Error('Unreachable')
 					}
 
-					return {
-						references,
-						...open(license),
-					}
+					return open(ctx, license)
 				case FOSS.FUTURE_FOSS:
 					if (!futureFOSSLicense.is(license)) {
 						throw new Error('Unreachable')
 					}
 
-					return {
-						references,
-						...openInTheFuture(license),
-					}
+					return openInTheFuture(ctx, license)
 				case FOSS.NOT_FOSS:
-					return {
-						references,
-						...proprietary(),
-					}
+					return proprietary(ctx)
 			}
 		}
 
@@ -263,7 +261,7 @@ export const openSource: Attribute<OpenSourceValue> = {
 			throw new Error('Unimplemented case; please implement.')
 		}
 
-		return mixedIncludingProprietary(hasFossLicense)
+		return mixedIncludingProprietary(ctx, hasFossLicense)
 	},
 	aggregate: pickWorstRating<OpenSourceValue>,
 }
