@@ -8,7 +8,7 @@ import { getWalletStageAndLadder } from '@/utils/stage'
 import { ratedWalletJsonExport, stageToExportString } from '@/utils/wallet-json-export'
 import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
-import { assertValidJson } from './utils/assert-valid-json'
+import { RatedWalletExportValidator } from './utils/assert-valid-json'
 
 describe('ratedWalletJsonExport', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
@@ -16,7 +16,9 @@ describe('ratedWalletJsonExport', () => {
 			const payload = ratedWalletJsonExport(wallet)
 
 			it('produces schema-valid JSON', () => {
-				expect(() => assertValidJson(JSON.stringify(payload))).not.toThrow()
+				const validator = new RatedWalletExportValidator()
+
+				expect(() => validator.assert(JSON.stringify(payload))).not.toThrow()
 			})
 
 			it('export top-level fields match source wallet', () => {
