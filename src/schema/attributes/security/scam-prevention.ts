@@ -1,20 +1,22 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
+	type EvaluationScaffold,
 	exampleRating,
 	Rating,
 	type Value,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { WalletProfile } from '@/schema/features/profile'
 import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
+import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { scamAlertsDetailsContent } from '@/types/content/scam-alert-details'
 import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
-import { mergeRefs, refNotNecessary, type WithRef } from '../../reference'
+import { refNotNecessary, type WithRef } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
 export type ScamAlertSupport = WithRef<{
@@ -168,17 +170,15 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 }
 
 function evaluateScamAlerts(
+	ctx: EvaluationContext<ScamPreventionValue>,
 	walletProfile: WalletProfile,
 	scamAlerts: ScamAlerts,
 ): Evaluation<ScamPreventionValue> {
 	const sendTransactionWarning = rateSendTransactionWarning(scamAlerts)
 	const contractTransactionWarning = rateContractTransactionWarning(scamAlerts)
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
-	const allRefs = mergeRefs(
-		sendTransactionWarning.ref,
-		contractTransactionWarning.ref,
-		scamUrlWarning.ref,
-	)
+
+	ctx.addRef(sendTransactionWarning, contractTransactionWarning, scamUrlWarning)
 	const requiredFeatures = ((): NonEmptyArray<ScamAlertSupport> => {
 		switch (walletProfile) {
 			case WalletProfile.GENERIC:
@@ -194,9 +194,14 @@ function evaluateScamAlerts(
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
 
+	type NonNullScamPreventionValueScaffold = Exclude<
+		EvaluationScaffold<ScamPreventionValue>['value'],
+		{ scamAlerts: null }
+	>
+
 	if (!isNonEmptyArray(supportedFeatures)) {
 		// No features supported.
-		return {
+		return ctx.build({
 			value: {
 				id: 'none_implemented',
 				displayName: 'No scam prevention',
@@ -208,11 +213,10 @@ function evaluateScamAlerts(
 				sendTransactionWarning,
 				contractTransactionWarning,
 				scamUrlWarning,
-			},
+			} as NonNullScamPreventionValueScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: paragraph('{{WALLET_NAME}} should implement scam alerting features.'),
-			references: allRefs,
-		}
+		})
 	}
 
 	const privacyPreservingFeatures = supportedFeatures.filter(sas => sas.privacyPreserving)
@@ -224,7 +228,7 @@ function evaluateScamAlerts(
 	) {
 		// Special case: If URLs are leaked, this gets a FAIL.
 		if (scamAlerts.scamUrlWarning.leaksVisitedUrl === 'FULL_URL') {
-			return {
+			return ctx.build({
 				value: {
 					id: 'leak_full_url',
 					displayName: 'Scam prevention feature leaks history',
@@ -236,22 +240,21 @@ function evaluateScamAlerts(
 					sendTransactionWarning,
 					contractTransactionWarning,
 					scamUrlWarning,
-				},
+				} as NonNullScamPreventionValueScaffold,
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
 					No application should ever send your browsing history to an external service, and neither should {{WALLET_NAME}}.
 
 					Scam URL detection can be implemented in a privacy-preserving manner using a local database or downloading a list of known-bad domains with the [same domain name hash prefix](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
 				`),
-				references: allRefs,
-			}
+			})
 		}
 
 		if (
 			scamAlerts.scamUrlWarning.leaksVisitedUrl === 'DOMAIN_ONLY' &&
 			(scamAlerts.scamUrlWarning.leaksUserAddress || scamAlerts.scamUrlWarning.leaksIp)
 		) {
-			return {
+			return ctx.build({
 				value: {
 					id: 'leak_domain',
 					displayName: 'Scam prevention feature leaks website history',
@@ -263,21 +266,20 @@ function evaluateScamAlerts(
 					sendTransactionWarning,
 					contractTransactionWarning,
 					scamUrlWarning,
-				},
+				} as NonNullScamPreventionValueScaffold,
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
 					No application should ever send your browsing history to an external service, and neither should {{WALLET_NAME}}.
 
 					Scam URL detection can be implemented in a privacy-preserving manner using a local database or downloading a list of known-bad domains with the [same domain name hash prefix](https://security.googleblog.com/2022/08/how-hash-based-safe-browsing-works-in.html).
 				`),
-				references: allRefs,
-			}
+			})
 		}
 	}
 
 	if (unsupportedFeatures.length > 0) {
 		// Some but not all features supported.
-		return {
+		return ctx.build({
 			value: {
 				id: 'partially_supported',
 				displayName: 'Some scam prevention features',
@@ -289,7 +291,7 @@ function evaluateScamAlerts(
 				sendTransactionWarning,
 				contractTransactionWarning,
 				scamUrlWarning,
-			},
+			} as NonNullScamPreventionValueScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should implement the following features:
@@ -302,8 +304,7 @@ function evaluateScamAlerts(
 					)
 					.join('')}
 			`),
-			references: allRefs,
-		}
+		})
 	}
 
 	if (privacyPreservingFeatures.length < supportedFeatures.length) {
@@ -311,7 +312,7 @@ function evaluateScamAlerts(
 			sas.required && sas.supported && !sas.privacyPreserving
 
 		// Not all features implemented with privacy support.
-		return {
+		return ctx.build({
 			value: {
 				id: 'need_privacy',
 				displayName: 'Privacy-invasive scam prevention',
@@ -323,7 +324,7 @@ function evaluateScamAlerts(
 				sendTransactionWarning,
 				contractTransactionWarning,
 				scamUrlWarning,
-			},
+			} as NonNullScamPreventionValueScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should ensure all scam alerting features are implemented in a privacy-preserving manner.
@@ -345,12 +346,11 @@ function evaluateScamAlerts(
 					.filter(Boolean)
 					.join('\n\n')}
 			`),
-			references: allRefs,
-		}
+		})
 	}
 
 	// All features implements with privacy.
-	return {
+	return ctx.build({
 		value: {
 			id: 'all_implemented',
 			displayName: 'Full-featured scam prevention',
@@ -362,10 +362,9 @@ function evaluateScamAlerts(
 			sendTransactionWarning,
 			contractTransactionWarning,
 			scamUrlWarning,
-		},
+		} as NonNullScamPreventionValueScaffold,
 		details: scamAlertsDetailsContent({}),
-		references: allRefs,
-	}
+	})
 }
 
 export const scamPrevention: Attribute<ScamPreventionValue> = {
@@ -442,117 +441,143 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 		fail: [
 			exampleRating(
 				sentence('The wallet does not implement any form of scam alerting.'),
-				evaluateScamAlerts(WalletProfile.GENERIC, {
-					contractTransactionWarning: notSupported,
-					scamUrlWarning: notSupported,
-					sendTransactionWarning: notSupported,
-				}),
+				evaluateScamAlerts(
+					EvaluationContext.forTest(() => scamPrevention),
+					WalletProfile.GENERIC,
+					{
+						contractTransactionWarning: notSupported,
+						scamUrlWarning: notSupported,
+						sendTransactionWarning: notSupported,
+					},
+				),
 			),
 			exampleRating(
 				sentence(
 					'The wallet leaks visited URLs to an external service as part of its malicious app warning feature.',
 				),
-				evaluateScamAlerts(WalletProfile.GENERIC, {
-					contractTransactionWarning: notSupported,
-					scamUrlWarning: supported({
-						ref: refNotNecessary,
-						leaksVisitedUrl: 'FULL_URL',
-						leaksUserAddress: false,
-						leaksIp: false,
-					}),
-					sendTransactionWarning: notSupported,
-				}),
+				evaluateScamAlerts(
+					EvaluationContext.forTest(() => scamPrevention),
+					WalletProfile.GENERIC,
+					{
+						contractTransactionWarning: notSupported,
+						scamUrlWarning: supported({
+							ref: refNotNecessary,
+							leaksVisitedUrl: 'FULL_URL',
+							leaksUserAddress: false,
+							leaksIp: false,
+						}),
+						sendTransactionWarning: notSupported,
+					},
+				),
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The wallet implements some but not all the required scam warning features.'),
-				evaluateScamAlerts(WalletProfile.GENERIC, {
-					contractTransactionWarning: notSupported,
-					scamUrlWarning: supported({
-						ref: refNotNecessary,
-						leaksVisitedUrl: 'NO',
-						leaksUserAddress: false,
-						leaksIp: true,
-					}),
-					sendTransactionWarning: supported({
-						ref: refNotNecessary,
-						newRecipientWarning: true,
-						userWhitelist: false,
-						leaksRecipient: false,
-						leaksUserAddress: false,
-						leaksUserIp: false,
-					}),
-				}),
+				evaluateScamAlerts(
+					EvaluationContext.forTest(() => scamPrevention),
+					WalletProfile.GENERIC,
+					{
+						contractTransactionWarning: notSupported,
+						scamUrlWarning: supported({
+							ref: refNotNecessary,
+							leaksVisitedUrl: 'NO',
+							leaksUserAddress: false,
+							leaksIp: true,
+						}),
+						sendTransactionWarning: supported({
+							ref: refNotNecessary,
+							newRecipientWarning: true,
+							userWhitelist: false,
+							leaksRecipient: false,
+							leaksUserAddress: false,
+							leaksUserIp: false,
+						}),
+					},
+				),
 			),
 			exampleRating(
 				sentence(
 					'The wallet implements all required scam warning features, but not in a privacy-preserving manner.',
 				),
-				evaluateScamAlerts(WalletProfile.GENERIC, {
-					contractTransactionWarning: supported({
-						ref: refNotNecessary,
-						contractRegistry: true,
-						previousContractInteractionWarning: true,
-						recentContractWarning: false,
-						leaksContractAddress: false,
-						leaksUserAddress: true,
-						leaksUserIp: true,
-					}),
-					scamUrlWarning: supported({
-						ref: refNotNecessary,
-						leaksVisitedUrl: 'NO',
-						leaksUserAddress: true,
-						leaksIp: true,
-					}),
-					sendTransactionWarning: supported({
-						ref: refNotNecessary,
-						newRecipientWarning: true,
-						userWhitelist: false,
-						leaksRecipient: false,
-						leaksUserAddress: false,
-						leaksUserIp: false,
-					}),
-				}),
+				evaluateScamAlerts(
+					EvaluationContext.forTest(() => scamPrevention),
+					WalletProfile.GENERIC,
+					{
+						contractTransactionWarning: supported({
+							ref: refNotNecessary,
+							contractRegistry: true,
+							previousContractInteractionWarning: true,
+							recentContractWarning: false,
+							leaksContractAddress: false,
+							leaksUserAddress: true,
+							leaksUserIp: true,
+						}),
+						scamUrlWarning: supported({
+							ref: refNotNecessary,
+							leaksVisitedUrl: 'NO',
+							leaksUserAddress: true,
+							leaksIp: true,
+						}),
+						sendTransactionWarning: supported({
+							ref: refNotNecessary,
+							newRecipientWarning: true,
+							userWhitelist: false,
+							leaksRecipient: false,
+							leaksUserAddress: false,
+							leaksUserIp: false,
+						}),
+					},
+				),
 			),
 		],
 		pass: exampleRating(
 			sentence(
 				'The wallet implements all required scam warning features in a privacy-preserving manner.',
 			),
-			evaluateScamAlerts(WalletProfile.GENERIC, {
-				contractTransactionWarning: supported({
-					ref: refNotNecessary,
-					contractRegistry: true,
-					previousContractInteractionWarning: true,
-					recentContractWarning: false,
-					leaksContractAddress: true,
-					leaksUserAddress: false,
-					leaksUserIp: false,
-				}),
-				scamUrlWarning: supported({
-					ref: refNotNecessary,
-					leaksVisitedUrl: 'PARTIAL_HASH_OF_DOMAIN',
-					leaksUserAddress: false,
-					leaksIp: true,
-				}),
-				sendTransactionWarning: supported({
-					ref: refNotNecessary,
-					newRecipientWarning: true,
-					userWhitelist: false,
-					leaksRecipient: true,
-					leaksUserAddress: false,
-					leaksUserIp: false,
-				}),
-			}),
+			evaluateScamAlerts(
+				EvaluationContext.forTest(() => scamPrevention),
+				WalletProfile.GENERIC,
+				{
+					contractTransactionWarning: supported({
+						ref: refNotNecessary,
+						contractRegistry: true,
+						previousContractInteractionWarning: true,
+						recentContractWarning: false,
+						leaksContractAddress: true,
+						leaksUserAddress: false,
+						leaksUserIp: false,
+					}),
+					scamUrlWarning: supported({
+						ref: refNotNecessary,
+						leaksVisitedUrl: 'PARTIAL_HASH_OF_DOMAIN',
+						leaksUserAddress: false,
+						leaksIp: true,
+					}),
+					sendTransactionWarning: supported({
+						ref: refNotNecessary,
+						newRecipientWarning: true,
+						userWhitelist: false,
+						leaksRecipient: true,
+						leaksUserAddress: false,
+						leaksUserIp: false,
+					}),
+				},
+			),
 		),
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<ScamPreventionValue> => {
-		if (features.security.scamAlerts === null) {
-			return unrated(scamPrevention, { scamAlerts: null })
+	evaluate: (ctx: EvaluationContext<ScamPreventionValue>): Evaluation<ScamPreventionValue> => {
+		ctx.setVerifiability(
+			verifiabilityRequiresSourceCodeAccess({
+				coreOnlyIsSufficient: true,
+			}),
+		)
+
+		if (ctx.features.security.scamAlerts === null) {
+			return unrated(ctx, { scamAlerts: null })
 		}
 
-		return evaluateScamAlerts(features.profile, features.security.scamAlerts)
+		return evaluateScamAlerts(ctx, ctx.features.profile, ctx.features.security.scamAlerts)
 	},
 	aggregate: pickWorstRating<ScamPreventionValue>,
 }

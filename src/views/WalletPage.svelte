@@ -11,6 +11,7 @@
 		Rating,
 		ratingIcons,
 		ratingToColor,
+		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
 	import { VariantSpecificity } from '@/schema/wallet'
@@ -199,6 +200,7 @@
 	import Tooltip from '@/components/Tooltip.svelte'
 	import Typography from '@/components/Typography.svelte'
 	import AccountRecoveryDetails from './attributes/security/AccountRecoveryDetails.svelte'
+	import AccountUnruggabilityDetails from './attributes/self-sovereignty/AccountUnruggabilityDetails.svelte'
 	import SecurityNews from '@/views/SecurityNews.svelte'
 </script>
 
@@ -848,6 +850,24 @@
 						{/if}
 					</div>
 
+					{#if true}
+						{@const verifiability = evalAttr.evaluation.value.verifiability}
+						{#if verifiability === Verifiability.UNVERIFIABLE}
+							<data
+								data-row-item="wrap-end"
+								data-badge="medium"
+								value={verifiability}
+								style:--accent="var(--accent-color)"
+							>Unverifiable</data>
+						{:else if verifiability === Verifiability.INDEPENDENTLY_AUDITED}
+							<data
+								data-row-item="wrap-end"
+								data-badge="medium"
+								value={verifiability}
+								style:--accent="var(--accent-color)"
+							>Unverifiable but audited</data>
+						{/if}
+					{/if}
 					<data
 						data-row-item="wrap-end"
 						data-badge="medium"
@@ -894,6 +914,8 @@
 								<FundingDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'AccountRecoveryDetails'}
 								<AccountRecoveryDetails {...componentProps} {wallet} {value} />
+							{:else if componentName === 'AccountUnruggabilityDetails'}
+								<AccountUnruggabilityDetails {...componentProps} {wallet} {value} />
 							{:else if componentName === 'UnratedAttribute'}
 								<UnratedAttribute {...componentProps} {wallet} {value} />
 							{/if}

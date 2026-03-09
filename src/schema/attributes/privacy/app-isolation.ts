@@ -1,12 +1,13 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import { type ResolvedFeatures } from '@/schema/features'
 import {
 	appConnectionNotSupported,
 	type AppIsolation,
@@ -21,7 +22,7 @@ import {
 	notSupported,
 	supported,
 } from '@/schema/features/support'
-import { type FullyQualifiedReference, mergeRefs, refNotNecessary } from '@/schema/reference'
+import { refNotNecessary } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
@@ -30,12 +31,11 @@ import { exempt, pickWorstRating, unrated } from '../common'
 export type AppIsolationValue = Value
 
 function rateAppIsolation(
+	ctx: EvaluationContext<AppIsolationValue>,
 	appIsolation: Exclude<AppIsolation, typeof appConnectionNotSupported>,
 ): Evaluation<AppIsolationValue> {
-	let references: FullyQualifiedReference[] = []
-
 	if (!isSupported(appIsolation.createInAppConnectionFlow)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'no_account_creation_in_connection_flow',
 				displayName: 'No per-app account option',
@@ -60,14 +60,13 @@ function rateAppIsolation(
 				as part of the app connection flow, and have this as the default
 				option.
 			`),
-			references,
-		}
+		})
 	}
 
-	references = mergeRefs(references, appIsolation.createInAppConnectionFlow.ref)
+	ctx.addRef(appIsolation.createInAppConnectionFlow)
 
 	if (!isSupported(appIsolation.useAppSpecificLastConnectedAddresses)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'no_reuse_last_connection_addresses',
 				displayName: 'No per-app account persistence',
@@ -94,11 +93,10 @@ function rateAppIsolation(
 				user selected when connecting to apps, and use this set of addresses
 				by default when reconnecting to them.
 			`),
-			references,
-		}
+		})
 	}
 
-	references = mergeRefs(references, appIsolation.useAppSpecificLastConnectedAddresses.ref)
+	ctx.addRef(appIsolation.useAppSpecificLastConnectedAddresses)
 
 	let commonExposedAccountSet: ExposedAccountSet | null = null
 
@@ -107,7 +105,7 @@ function rateAppIsolation(
 			continue
 		}
 
-		references = mergeRefs(references, exposedAccountSet.ref)
+		ctx.addRef(exposedAccountSet)
 
 		if (commonExposedAccountSet === null) {
 			commonExposedAccountSet = exposedAccountSet
@@ -125,7 +123,7 @@ function rateAppIsolation(
 
 	switch (commonExposedAccountSet.defaultBehavior) {
 		case ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY:
-			return {
+			return ctx.build({
 				value: {
 					id: 'active_account_only',
 					displayName: 'Encourages account reuse across apps',
@@ -150,10 +148,9 @@ function rateAppIsolation(
 					When connecting to a new app, {{WALLET_NAME}} should offer to
 					create a new account for that app by default.
 				`),
-				references,
-			}
+			})
 		case ExposedAccountsBehavior.ALL_ACCOUNTS:
-			return {
+			return ctx.build({
 				value: {
 					id: 'all_accounts_exposed',
 					displayName: 'All accounts exposed to all apps',
@@ -178,10 +175,9 @@ function rateAppIsolation(
 					When connecting to a new app, {{WALLET_NAME}} should offer to
 					create a new account for that app by default.
 				`),
-				references,
-			}
+			})
 		case ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT:
-			return {
+			return ctx.build({
 				value: {
 					id: 'app_specific_account',
 					displayName: 'Per-app account',
@@ -196,10 +192,9 @@ function rateAppIsolation(
 					Doing so improves your privacy across web3 by preventing apps
 					from correlating your history across apps.
 				`),
-				references,
-			}
+			})
 		case ExposedAccountsBehavior.NO_DEFAULT:
-			return {
+			return ctx.build({
 				value: {
 					id: 'no_default_behavior',
 					displayName: 'Supports per-app accounts',
@@ -217,8 +212,7 @@ function rateAppIsolation(
 					However, this isn't the default option, which can encourage
 					users to reuse accounts across apps nonetheless.
 				`),
-				references,
-			}
+			})
 	}
 }
 
@@ -275,54 +269,63 @@ export const appIsolation: Attribute<AppIsolationValue> = {
 					The wallet does not allow the creation of per-app accounts
 					during the app connection flow.
 				`),
-				rateAppIsolation({
-					ethAccounts: supported({
-						ref: refNotNecessary,
-						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
-					}),
-					erc7846WalletConnect: supported({
-						ref: refNotNecessary,
-						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
-					}),
-					createInAppConnectionFlow: notSupported,
-					useAppSpecificLastConnectedAddresses: featureSupportedNoRef,
-				}),
+				rateAppIsolation(
+					EvaluationContext.forTest(() => appIsolation),
+					{
+						ethAccounts: supported({
+							ref: refNotNecessary,
+							defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+						}),
+						erc7846WalletConnect: supported({
+							ref: refNotNecessary,
+							defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+						}),
+						createInAppConnectionFlow: notSupported,
+						useAppSpecificLastConnectedAddresses: featureSupportedNoRef,
+					},
+				),
 			),
 			exampleRating(
 				paragraph(`
 					The wallet does not remember the address (or set of addresses)
 					that was last used when connecting to a previously-connected app.
 				`),
-				rateAppIsolation({
-					ethAccounts: supported({
-						ref: refNotNecessary,
-						defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
-					}),
-					erc7846WalletConnect: supported({
-						ref: refNotNecessary,
-						defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
-					}),
-					createInAppConnectionFlow: featureSupportedNoRef,
-					useAppSpecificLastConnectedAddresses: notSupported,
-				}),
+				rateAppIsolation(
+					EvaluationContext.forTest(() => appIsolation),
+					{
+						ethAccounts: supported({
+							ref: refNotNecessary,
+							defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
+						}),
+						erc7846WalletConnect: supported({
+							ref: refNotNecessary,
+							defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
+						}),
+						createInAppConnectionFlow: featureSupportedNoRef,
+						useAppSpecificLastConnectedAddresses: notSupported,
+					},
+				),
 			),
 			exampleRating(
 				paragraph(`
 					The wallet supports creating per-app accounts when connecting to
 					an app, but the default behavior is to reuse existing accounts.
 				`),
-				rateAppIsolation({
-					ethAccounts: supported({
-						ref: refNotNecessary,
-						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
-					}),
-					erc7846WalletConnect: supported({
-						ref: refNotNecessary,
-						defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
-					}),
-					createInAppConnectionFlow: featureSupportedNoRef,
-					useAppSpecificLastConnectedAddresses: featureSupportedNoRef,
-				}),
+				rateAppIsolation(
+					EvaluationContext.forTest(() => appIsolation),
+					{
+						ethAccounts: supported({
+							ref: refNotNecessary,
+							defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+						}),
+						erc7846WalletConnect: supported({
+							ref: refNotNecessary,
+							defaultBehavior: ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY,
+						}),
+						createInAppConnectionFlow: featureSupportedNoRef,
+						useAppSpecificLastConnectedAddresses: featureSupportedNoRef,
+					},
+				),
 			),
 			exampleRating(
 				mdParagraph(`
@@ -339,43 +342,44 @@ export const appIsolation: Attribute<AppIsolationValue> = {
 					The wallet supports creating per-app accounts when connecting to
 					an app, and encourages the user to do this by default.
 				`),
-				rateAppIsolation({
-					ethAccounts: supported({
-						ref: refNotNecessary,
-						defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
-					}),
-					erc7846WalletConnect: supported({
-						ref: refNotNecessary,
-						defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
-					}),
-					createInAppConnectionFlow: featureSupportedNoRef,
-					useAppSpecificLastConnectedAddresses: featureSupportedNoRef,
-				}),
+				rateAppIsolation(
+					EvaluationContext.forTest(() => appIsolation),
+					{
+						ethAccounts: supported({
+							ref: refNotNecessary,
+							defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
+						}),
+						erc7846WalletConnect: supported({
+							ref: refNotNecessary,
+							defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
+						}),
+						createInAppConnectionFlow: featureSupportedNoRef,
+						useAppSpecificLastConnectedAddresses: featureSupportedNoRef,
+					},
+				),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<AppIsolationValue> => {
-		if (features.type !== WalletType.SOFTWARE) {
+	evaluate: (ctx: EvaluationContext<AppIsolationValue>): Evaluation<AppIsolationValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
+
+		if (ctx.features.type !== WalletType.SOFTWARE) {
 			return exempt(
-				appIsolation,
+				ctx,
 				sentence('Only software wallets are expected to deal with connecting to apps.'),
 				null,
 			)
 		}
 
-		if (features.privacy.appIsolation === null) {
-			return unrated(appIsolation, null)
+		if (ctx.features.privacy.appIsolation === null) {
+			return unrated(ctx, null)
 		}
 
-		if (isAppConnectionSupportedInAppIsolation(features.privacy.appIsolation)) {
-			return exempt(
-				appIsolation,
-				sentence('{{WALLET_NAME}} does not support connecting to apps.'),
-				null,
-			)
+		if (isAppConnectionSupportedInAppIsolation(ctx.features.privacy.appIsolation)) {
+			return exempt(ctx, sentence('{{WALLET_NAME}} does not support connecting to apps.'), null)
 		}
 
-		return rateAppIsolation(features.privacy.appIsolation)
+		return rateAppIsolation(ctx, ctx.features.privacy.appIsolation)
 	},
 	aggregate: pickWorstRating<AppIsolationValue>,
 }

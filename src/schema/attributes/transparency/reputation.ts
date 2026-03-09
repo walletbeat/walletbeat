@@ -1,6 +1,12 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
+import {
+	type Attribute,
+	type Evaluation,
+	EvaluationContext,
+	Rating,
+	type Value,
+	Verifiability,
+} from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { type ReputationSupport, ReputationType } from '@/schema/features/transparency/reputation'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
@@ -89,9 +95,11 @@ export const reputation: Attribute<ReputationValue> = {
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationValue>>) =>
 		pickWorstRating<ReputationValue>(perVariant),
-	evaluate: (features: ResolvedFeatures): Evaluation<ReputationValue> => {
-		if (features.type !== WalletType.HARDWARE) {
-			return exempt(reputation, sentence('Only rated for hardware wallets'), {
+	evaluate: (ctx: EvaluationContext<ReputationValue>): Evaluation<ReputationValue> => {
+		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable.
+
+		if (ctx.features.type !== WalletType.HARDWARE) {
+			return exempt(ctx, sentence('Only rated for hardware wallets'), {
 				originalProduct: ReputationType.FAIL,
 				availability: ReputationType.FAIL,
 				warrantySupportRisk: ReputationType.FAIL,
@@ -100,10 +108,10 @@ export const reputation: Attribute<ReputationValue> = {
 			})
 		}
 
-		const reputationFeature = features.transparency.reputation
+		const reputationFeature = ctx.features.transparency.reputation
 
 		if (reputationFeature === null) {
-			return unrated(reputation, {
+			return unrated(ctx, {
 				originalProduct: ReputationType.FAIL,
 				availability: ReputationType.FAIL,
 				warrantySupportRisk: ReputationType.FAIL,
@@ -114,7 +122,7 @@ export const reputation: Attribute<ReputationValue> = {
 
 		const rating = evaluateReputation(reputationFeature)
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'reputation',
 				rating,
@@ -124,7 +132,6 @@ export const reputation: Attribute<ReputationValue> = {
 			},
 			details: paragraph(`{{WALLET_NAME}} reputation evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-			// TODO: Add references
-		}
+		})
 	},
 }

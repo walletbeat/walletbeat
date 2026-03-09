@@ -1,13 +1,12 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { isSupported, notSupported } from '@/schema/features/support'
-import { type ReferenceArray, refs } from '@/schema/reference'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import {
@@ -18,8 +17,10 @@ import { pickWorstRating, unrated } from '../common'
 
 export type L1ProviderIndependence = Value
 
-function supportsSelfHostedNode(references: ReferenceArray): Evaluation<L1ProviderIndependence> {
-	return {
+function supportsSelfHostedNode(
+	ctx: EvaluationContext<L1ProviderIndependence>,
+): Evaluation<L1ProviderIndependence> {
+	return ctx.build({
 		value: {
 			id: 'support_self_hosted_node',
 			rating: Rating.PASS,
@@ -32,14 +33,13 @@ function supportsSelfHostedNode(references: ReferenceArray): Evaluation<L1Provid
 		details: paragraph(`
 			{{WALLET_NAME}} lets you use your own self-hosted Ethereum node to interact with Ethereum mainnet.
 		`),
-		references,
-	}
+	})
 }
 
 function supportsSelfHostedNodeAfterRequests(
-	references: ReferenceArray,
+	ctx: EvaluationContext<L1ProviderIndependence>,
 ): Evaluation<L1ProviderIndependence> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'self_hosted_node_after_requests',
 			rating: Rating.PARTIAL,
@@ -56,15 +56,14 @@ function supportsSelfHostedNodeAfterRequests(
 			{{WALLET_NAME}} should modify the wallet setup flow to allow the user to configure the RPC endpoint for L1 before making any requests,
 			or should avoid making any such requests until the user can access the RPC endpoint configuration options.
 		`),
-		references,
-	}
+	})
 }
 
 function supportsSelfHostedNodeButCannotDoBasicOperations(
+	ctx: EvaluationContext<L1ProviderIndependence>,
 	support: SelfHostedNodeL1BasicOperationsSupport,
-	references: ReferenceArray,
 ): Evaluation<L1ProviderIndependence> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'self_hosted_node_not_sufficient',
 			rating: Rating.FAIL,
@@ -89,12 +88,13 @@ function supportsSelfHostedNodeButCannotDoBasicOperations(
 			{{WALLET_NAME}} should ensure that basic operations work with no
 			other dependency than the user-configured L1 RPC endpoint.
 		`),
-		references,
-	}
+	})
 }
 
-function noSelfHostedNode(references: ReferenceArray): Evaluation<L1ProviderIndependence> {
-	return {
+function noSelfHostedNode(
+	ctx: EvaluationContext<L1ProviderIndependence>,
+): Evaluation<L1ProviderIndependence> {
+	return ctx.build({
 		value: {
 			id: 'no_self_hosted_node',
 			rating: Rating.FAIL,
@@ -110,8 +110,7 @@ function noSelfHostedNode(references: ReferenceArray): Evaluation<L1ProviderInde
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should let the user configure the endpoint used for Ethereum mainnet.',
 		),
-		references,
-	}
+	})
 }
 
 export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
@@ -169,14 +168,16 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 		exhaustive: true,
 		pass: exampleRating(
 			paragraph('The wallet lets you configure the RPC endpoint used for Ethereum mainnet.'),
-			supportsSelfHostedNode([]),
+			supportsSelfHostedNode(EvaluationContext.forTest(() => l1ProviderIndependence)),
 		),
 		partial: [
 			exampleRating(
 				paragraph(
 					'The wallet supports configuring the RPC endpoint used for Ethereum mainnet, but makes requests to an external RPC provider before being able to modify the RPC endpoint configuration.',
 				),
-				supportsSelfHostedNodeAfterRequests([]),
+				supportsSelfHostedNodeAfterRequests(
+					EvaluationContext.forTest(() => l1ProviderIndependence),
+				),
 			),
 		],
 		fail: [
@@ -184,7 +185,7 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 				paragraph(
 					'The wallet uses an external Ethereum node provider and does not let you change this setting.',
 				),
-				noSelfHostedNode([]),
+				noSelfHostedNode(EvaluationContext.forTest(() => l1ProviderIndependence)),
 			),
 			exampleRating(
 				paragraph(`
@@ -193,6 +194,7 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 					critically rely on additional external providers.
 				`),
 				supportsSelfHostedNodeButCannotDoBasicOperations(
+					EvaluationContext.forTest(() => l1ProviderIndependence),
 					{
 						withNoConnectivityExceptL1RPCEndpoint: {
 							accountCreation: notSupported,
@@ -202,61 +204,64 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 							erc20TokenSend: notSupported,
 						},
 					},
-					[],
 				),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<L1ProviderIndependence> => {
-		if (features.chainConfigurability === null) {
-			return unrated(l1ProviderIndependence, null)
+	evaluate: (
+		ctx: EvaluationContext<L1ProviderIndependence>,
+	): Evaluation<L1ProviderIndependence> => {
+		if (ctx.features.chainConfigurability === null) {
+			return unrated(ctx, null)
 		}
 
-		if (!isSupported(features.chainConfigurability)) {
-			return noSelfHostedNode([])
+		if (!isSupported(ctx.features.chainConfigurability)) {
+			return noSelfHostedNode(ctx)
 		}
 
-		const allRefs = refs(features.chainConfigurability)
+		ctx.addRef(ctx.features.chainConfigurability)
 
-		if (!isSupported(features.chainConfigurability.l1)) {
-			return noSelfHostedNode([])
+		if (!isSupported(ctx.features.chainConfigurability.l1)) {
+			return noSelfHostedNode(ctx)
 		}
 
 		if (
 			!isSupported(
-				features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.accountCreation,
+				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.accountCreation,
 			) ||
 			!isSupported(
-				features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.etherBalanceLookup,
+				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint
+					.etherBalanceLookup,
 			) ||
 			!isSupported(
-				features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.erc20BalanceLookup,
+				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint
+					.erc20BalanceLookup,
 			) ||
 			!isSupported(
-				features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.erc20TokenSend,
+				ctx.features.chainConfigurability.l1.withNoConnectivityExceptL1RPCEndpoint.erc20TokenSend,
 			)
 		) {
 			return supportsSelfHostedNodeButCannotDoBasicOperations(
-				features.chainConfigurability.l1,
-				allRefs,
+				ctx,
+				ctx.features.chainConfigurability.l1,
 			)
 		}
 
 		if (
-			features.chainConfigurability.l1.rpcEndpointConfiguration ===
+			ctx.features.chainConfigurability.l1.rpcEndpointConfiguration ===
 			RpcEndpointConfiguration.YES_BEFORE_ANY_REQUEST
 		) {
-			return supportsSelfHostedNode(allRefs)
+			return supportsSelfHostedNode(ctx)
 		}
 
 		if (
-			features.chainConfigurability.l1.rpcEndpointConfiguration ===
+			ctx.features.chainConfigurability.l1.rpcEndpointConfiguration ===
 			RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS
 		) {
-			return supportsSelfHostedNodeAfterRequests(allRefs)
+			return supportsSelfHostedNodeAfterRequests(ctx)
 		}
 
-		return noSelfHostedNode(allRefs)
+		return noSelfHostedNode(ctx)
 	},
 	aggregate: pickWorstRating<L1ProviderIndependence>,
 }

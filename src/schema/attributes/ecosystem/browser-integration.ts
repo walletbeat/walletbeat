@@ -5,18 +5,19 @@ import { eip6963 } from '@/data/eips/eip-6963'
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	featureSupported,
 	isSupported,
 	notSupported,
 	type Support,
 } from '@/schema/features/support'
-import { popRefs, refNotNecessary, type WithRef } from '@/schema/reference'
+import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { commaListFormat } from '@/types/utils/text'
@@ -33,9 +34,10 @@ export type BrowserIntegrationValue = Value & {
 }
 
 function browserIntegrationSupport(
+	ctx: EvaluationContext<BrowserIntegrationValue>,
 	support: WithRef<ResolvedSupport>,
 ): Evaluation<BrowserIntegrationValue> {
-	const { refs, withoutRefs } = popRefs<ResolvedSupport>(support)
+	const withoutRefs = ctx.popRefs<ResolvedSupport>(support)
 
 	const supported: BrowserIntegrationEip[] = Object.entries(withoutRefs)
 		.filter(([_, v]) => isSupported(v))
@@ -46,7 +48,7 @@ function browserIntegrationSupport(
 		.map(([k]) => k)
 
 	if (supported.length === 0) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'no_support',
 				rating: Rating.FAIL,
@@ -62,13 +64,12 @@ function browserIntegrationSupport(
 			howToImprove: markdown(
 				`{{WALLET_NAME}} should integrate with the browser using an Ethereum standard, such as ${eipMarkdownLink(eip1193)} or the newer ${eipMarkdownLink(eip6963)}.`,
 			),
-			references: refs,
-		}
+		})
 	}
 
 	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL
 
-	return {
+	return ctx.build({
 		value: {
 			id: `support_${supported.join('_')}`,
 			rating,
@@ -94,8 +95,7 @@ function browserIntegrationSupport(
 				: markdown(
 						`{{WALLET_NAME}} should implement ${commaListFormat(unsupported.map(eipNum => eipMarkdownLink(getEip(eipNum))))}.`,
 					),
-		references: refs,
-	}
+	})
 }
 
 export const browserIntegration: Attribute<BrowserIntegrationValue> = {
@@ -133,55 +133,68 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 		exhaustive: true,
 		pass: exampleRating(
 			sentence('The wallet implements all listed web browser integration standards.'),
-			browserIntegrationSupport({
-				ref: refNotNecessary,
-				'1193': featureSupported,
-				'2700': featureSupported,
-				'6963': featureSupported,
-			}),
+			browserIntegrationSupport(
+				EvaluationContext.forTest(() => browserIntegration),
+				{
+					ref: refNotNecessary,
+					'1193': featureSupported,
+					'2700': featureSupported,
+					'6963': featureSupported,
+				},
+			),
 		),
 		partial: exampleRating(
 			sentence('The wallet implements some but not all listed web browser integration standards.'),
-			browserIntegrationSupport({
-				ref: refNotNecessary,
-				'1193': featureSupported,
-				'2700': featureSupported,
-				'6963': notSupported,
-			}),
+			browserIntegrationSupport(
+				EvaluationContext.forTest(() => browserIntegration),
+				{
+					ref: refNotNecessary,
+					'1193': featureSupported,
+					'2700': featureSupported,
+					'6963': notSupported,
+				},
+			),
 		),
 		fail: exampleRating(
 			sentence('The wallet implements none of the listed web browser integration standards.'),
-			browserIntegrationSupport({
-				ref: refNotNecessary,
-				'1193': notSupported,
-				'2700': notSupported,
-				'6963': notSupported,
-			}),
+			browserIntegrationSupport(
+				EvaluationContext.forTest(() => browserIntegration),
+				{
+					ref: refNotNecessary,
+					'1193': notSupported,
+					'2700': notSupported,
+					'6963': notSupported,
+				},
+			),
 		),
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<BrowserIntegrationValue> => {
-		if (features.type !== WalletType.SOFTWARE || features.variant !== Variant.BROWSER) {
+	evaluate: (
+		ctx: EvaluationContext<BrowserIntegrationValue>,
+	): Evaluation<BrowserIntegrationValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can self-test using tool.
+
+		if (ctx.features.type !== WalletType.SOFTWARE || ctx.features.variant !== Variant.BROWSER) {
 			return exempt(
-				browserIntegration,
+				ctx,
 				sentence('Only browser-based wallets are rated on their browser integration support.'),
 				{},
 			)
 		}
 
-		if (features.integration.browser === 'NOT_A_BROWSER_WALLET') {
+		if (ctx.features.integration.browser === 'NOT_A_BROWSER_WALLET') {
 			throw new Error(
 				'Attempted to rate a browser-wallet with features.integration.browser set to NOT_A_BROWSER_WALLET',
 			)
 		}
 
-		if (Object.values(features.integration.browser).includes(null)) {
-			return unrated(browserIntegration, {})
+		if (Object.values(ctx.features.integration.browser).includes(null)) {
+			return unrated(ctx, {})
 		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that none of the values are null.
-		const browserIntegrationEips = features.integration.browser as WithRef<ResolvedSupport>
+		const browserIntegrationEips = ctx.features.integration.browser as WithRef<ResolvedSupport>
 
-		return browserIntegrationSupport(browserIntegrationEips)
+		return browserIntegrationSupport(ctx, browserIntegrationEips)
 	},
 	aggregate: pickWorstRating<BrowserIntegrationValue>,
 }

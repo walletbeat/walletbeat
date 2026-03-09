@@ -3,13 +3,13 @@ import { erc7831 } from '@/data/eips/erc-7831'
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { isSupported, type Support, type Supported } from '@/schema/features/support'
-import { type ReferenceArray, refs } from '@/schema/reference'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 import type { NonEmptyArray } from '@/types/utils/non-empty'
 
@@ -69,8 +69,8 @@ function getOffchainProviderInfo(
 }
 
 function evaluateAddressResolution(
+	ctx: EvaluationContext<AddressResolutionValue>,
 	addressResolution: AddressResolution<Support<AddressResolutionData>>,
-	references: ReferenceArray,
 ): Evaluation<AddressResolutionValue> {
 	const chainSpecificERCs: NonEmptyArray<[Eip, Support<AddressResolutionData>, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
@@ -83,7 +83,7 @@ function evaluateAddressResolution(
 		}
 
 		if (chainSpecificSupport.medium === 'CHAIN_CLIENT') {
-			return {
+			return ctx.build({
 				value: {
 					id: `support_via_erc${erc.number}_onchain`,
 					rating: Rating.PASS,
@@ -96,13 +96,12 @@ function evaluateAddressResolution(
 				details: mdParagraph(
 					`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format, such as \`${exampleAddress}\`. It does so using onchain data sources using the same code as when interacting with the chain in general, inheriting its privacy and verifiability properties. For more information on ${eipShortLabel(erc)} addresses, see ${eipMarkdownLinkAndTitle(erc)}.`,
 				),
-				references,
-			}
+			})
 		}
 
 		const { rating, offchainInfo, walletShould } = getOffchainProviderInfo(chainSpecificSupport)
 
-		return {
+		return ctx.build({
 			value: {
 				id: `support_via_erc${erc.number}_${chainSpecificSupport.offchainDataVerifiability.toLowerCase()}_${chainSpecificSupport.offchainProviderConnection.toLowerCase()}_provider`,
 				rating,
@@ -121,12 +120,11 @@ function evaluateAddressResolution(
 					: mdParagraph(
 							`{{WALLET_NAME}} should use fully-onchain resolution to resolve the address, or should ${walletShould}.`,
 						),
-			references,
-		}
+		})
 	}
 
 	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
-		return {
+		return ctx.build({
 			value: {
 				id: 'no_address_resolution',
 				rating: Rating.FAIL,
@@ -142,12 +140,11 @@ function evaluateAddressResolution(
 			howToImprove: markdown(
 				'When sending funds to a user-entered address, {{WALLET_NAME}} should automatically resolve such addresses when they are well-known human-readable formats such as ENS (.eth) names.',
 			),
-			references,
-		}
+		})
 	}
 
 	if (addressResolution.nonChainSpecificEnsResolution.medium === 'CHAIN_CLIENT') {
-		return {
+		return ctx.build({
 			value: {
 				id: 'support_plain_ens_onchain',
 				rating: Rating.PARTIAL,
@@ -168,15 +165,14 @@ function evaluateAddressResolution(
 				* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
 				* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
 			`),
-			references,
-		}
+		})
 	}
 
 	const { offchainInfo, walletShould } = getOffchainProviderInfo(
 		addressResolution.nonChainSpecificEnsResolution,
 	)
 
-	return {
+	return ctx.build({
 		value: {
 			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
 			rating: Rating.PARTIAL,
@@ -202,8 +198,7 @@ function evaluateAddressResolution(
 					* ${eipMarkdownLinkAndTitle(erc7828)}: \`user@l2chain.eth\`
 					* ${eipMarkdownLinkAndTitle(erc7831)}: \`user.eth:l2chain\`
 				`),
-		references,
-	}
+	})
 }
 
 export const addressResolution: Attribute<AddressResolutionValue> = {
@@ -291,6 +286,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses, using onchain data for resolution.`,
 				),
 				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
 					{
 						chainSpecificAddressing: {
 							erc7828: {
@@ -306,7 +302,6 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 							medium: 'CHAIN_CLIENT',
 						},
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -314,6 +309,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain provider in a verifiable and privacy-preserving manner.`,
 				),
 				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
 					{
 						chainSpecificAddressing: {
 							erc7828: {
@@ -330,7 +326,6 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 							support: 'NOT_SUPPORTED',
 						},
 					},
-					[],
 				),
 			),
 		],
@@ -340,6 +335,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 					'The wallet resolves non-chain-specific ENS addresses (`username.eth`) when sending tokens, using onchain data for resolution.',
 				),
 				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
 					{
 						chainSpecificAddressing: {
 							erc7828: {
@@ -354,7 +350,6 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 							medium: 'CHAIN_CLIENT',
 						},
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -362,6 +357,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain external provider, without verifying the address.`,
 				),
 				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
 					{
 						chainSpecificAddressing: {
 							erc7828: {
@@ -378,7 +374,6 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 							support: 'NOT_SUPPORTED',
 						},
 					},
-					[],
 				),
 			),
 			exampleRating(
@@ -386,6 +381,7 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 					`The wallet resolves ${eipMarkdownLink(erc7828)} or ${eipMarkdownLink(erc7831)} addresses using an offchain external provider which may learn the user's IP address.`,
 				),
 				evaluateAddressResolution(
+					EvaluationContext.forTest(() => addressResolution),
 					{
 						chainSpecificAddressing: {
 							erc7828: {
@@ -402,13 +398,13 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 							support: 'NOT_SUPPORTED',
 						},
 					},
-					[],
 				),
 			),
 		],
 		fail: exampleRating(
 			mdSentence('The wallet only supports sending funds to raw (`0x...`) addresses.'),
 			evaluateAddressResolution(
+				EvaluationContext.forTest(() => addressResolution),
 				{
 					chainSpecificAddressing: {
 						erc7828: {
@@ -422,34 +418,39 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 						support: 'NOT_SUPPORTED',
 					},
 				},
-				[],
 			),
 		),
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<AddressResolutionValue> => {
-		if (features.addressResolution === null) {
-			return unrated(addressResolution, {})
+	evaluate: (
+		ctx: EvaluationContext<AddressResolutionValue>,
+	): Evaluation<AddressResolutionValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivially self-testable.
+
+		if (ctx.features.addressResolution === null) {
+			return unrated(ctx, {})
 		}
 
+		ctx.addRef(ctx.features.addressResolution)
+
 		if (
-			features.addressResolution.nonChainSpecificEnsResolution === null ||
-			features.addressResolution.chainSpecificAddressing.erc7828 === null ||
-			features.addressResolution.chainSpecificAddressing.erc7831 === null
+			ctx.features.addressResolution.nonChainSpecificEnsResolution === null ||
+			ctx.features.addressResolution.chainSpecificAddressing.erc7828 === null ||
+			ctx.features.addressResolution.chainSpecificAddressing.erc7831 === null
 		) {
-			return unrated(addressResolution, {})
+			return unrated(ctx, {})
 		}
 
 		// We've checked all the nulls, so recreate the object without nulls in
 		// the type description.
 		const resolvedResolution: AddressResolution<Support<AddressResolutionData>> = {
 			chainSpecificAddressing: {
-				erc7828: features.addressResolution.chainSpecificAddressing.erc7828,
-				erc7831: features.addressResolution.chainSpecificAddressing.erc7831,
+				erc7828: ctx.features.addressResolution.chainSpecificAddressing.erc7828,
+				erc7831: ctx.features.addressResolution.chainSpecificAddressing.erc7831,
 			},
-			nonChainSpecificEnsResolution: features.addressResolution.nonChainSpecificEnsResolution,
+			nonChainSpecificEnsResolution: ctx.features.addressResolution.nonChainSpecificEnsResolution,
 		}
 
-		return evaluateAddressResolution(resolvedResolution, refs(features.addressResolution))
+		return evaluateAddressResolution(ctx, resolvedResolution)
 	},
 	aggregate: pickWorstRating<AddressResolutionValue>,
 }

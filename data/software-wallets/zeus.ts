@@ -161,7 +161,7 @@ export const zeus: SoftwareWallet = {
 				ref: [
 					{
 						explanation: 'Zeus is licensed under the MIT license.',
-						url: 'https://github.com/greekfetacheese/zeus/blob/main/LICENSE-MIT',
+						url: 'https://github.com/greekfetacheese/zeus/blob/master/LICENSE-MIT',
 					},
 				],
 				license: FOSSLicense.MIT,

@@ -6,12 +6,12 @@ import {
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
 	type Value,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type AccountRecovery,
 	type GuardianPolicy,
@@ -19,7 +19,8 @@ import {
 	GuardianType,
 } from '@/schema/features/security/account-recovery'
 import { isSupported, notSupported, supported } from '@/schema/features/support'
-import { type FullyQualifiedReference, mergeRefs, refNotNecessary } from '@/schema/reference'
+import { refNotNecessary } from '@/schema/reference'
+import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import {
 	markdown,
 	mdSentence,
@@ -45,6 +46,7 @@ export type AccountRecoveryValue = Value & {
 }
 
 function evaluateGuardianRecoveryPolicy(
+	ctx: EvaluationContext<AccountRecoveryValue>,
 	guardianPolicy: GuardianPolicy,
 ): Evaluation<AccountRecoveryValue> {
 	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
@@ -62,7 +64,7 @@ function evaluateGuardianRecoveryPolicy(
 	)
 
 	if (!isNonEmptyArray(nonRecoverableOutcomes)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'guardian_policy_recoverable',
 				rating: Rating.PASS,
@@ -75,11 +77,11 @@ function evaluateGuardianRecoveryPolicy(
 				outcomes,
 			},
 			details: accountRecoveryDetailsContent({}),
-		}
+		})
 	}
 
 	if (nonRecoverableOutcomes.length === 1) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'guardian_policy_nonrecoverable_specific_scenario',
 				rating: Rating.FAIL,
@@ -91,10 +93,10 @@ function evaluateGuardianRecoveryPolicy(
 				outcomes,
 			},
 			details: accountRecoveryDetailsContent({}),
-		}
+		})
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'guardian_policy_nonrecoverable_multiple_scenarios',
 			rating: Rating.FAIL,
@@ -107,17 +109,21 @@ function evaluateGuardianRecoveryPolicy(
 			outcomes,
 		},
 		details: accountRecoveryDetailsContent({}),
-	}
+	})
 }
 
 function evaluateAccountRecovery(
+	ctx: EvaluationContext<AccountRecoveryValue>,
 	accountRecovery: AccountRecovery,
 ): Evaluation<AccountRecoveryValue> {
 	if (isSupported(accountRecovery.guardianRecovery)) {
-		return evaluateGuardianRecoveryPolicy(accountRecovery.guardianRecovery.minimumGuardianPolicy)
+		return evaluateGuardianRecoveryPolicy(
+			ctx,
+			accountRecovery.guardianRecovery.minimumGuardianPolicy,
+		)
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'no_guardian_recovery',
 			displayName: 'No account recovery mechanism',
@@ -130,7 +136,7 @@ function evaluateAccountRecovery(
 			outcomes: null,
 		},
 		details: accountRecoveryDetailsContent({}),
-	}
+	})
 }
 
 export const accountRecovery: Attribute<AccountRecoveryValue> = {
@@ -182,12 +188,15 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 			exampleRating(
 				paragraph(`
 					The wallet does not implement any account recovery feature.
-					If the user forgets or loses to their seed phrase,
+					If the user forgets or
 					they lose access to their account.
 				`),
-				evaluateAccountRecovery({
-					guardianRecovery: notSupported,
-				}),
+				evaluateAccountRecovery(
+					EvaluationContext.forTest(() => accountRecovery),
+					{
+						guardianRecovery: notSupported,
+					},
+				),
 			),
 			exampleRating(
 				paragraph(`
@@ -204,28 +213,31 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 					still unable to restore their account if the wallet developer
 					goes out of business.
 				`),
-				evaluateAccountRecovery({
-					guardianRecovery: supported({
-						ref: refNotNecessary,
-						minimumGuardianPolicy: {
-							type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-							descriptionMarkdown: '',
-							requiredGuardians: [
-								{
-									type: GuardianType.WALLET_PROVIDER,
-									entity: exampleWalletDevelopmentCompany,
-									description: 'Wallet developer storage cloud',
-								},
-							],
-							optionalGuardians: [
-								{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
-							],
-							optionalGuardiansMinimumConfigurable: 1,
-							optionalGuardiansMinimumNeededForRecovery: 1,
-							secretReconstitution: 'CLIENT_SIDE',
-						},
-					}),
-				}),
+				evaluateAccountRecovery(
+					EvaluationContext.forTest(() => accountRecovery),
+					{
+						guardianRecovery: supported({
+							ref: refNotNecessary,
+							minimumGuardianPolicy: {
+								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+								descriptionMarkdown: '',
+								requiredGuardians: [
+									{
+										type: GuardianType.WALLET_PROVIDER,
+										entity: exampleWalletDevelopmentCompany,
+										description: 'Wallet developer storage cloud',
+									},
+								],
+								optionalGuardians: [
+									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
+								],
+								optionalGuardiansMinimumConfigurable: 1,
+								optionalGuardiansMinimumNeededForRecovery: 1,
+								secretReconstitution: 'CLIENT_SIDE',
+							},
+						}),
+					},
+				),
 			),
 			exampleRating(
 				paragraph(`
@@ -234,32 +246,35 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 					process requires the involvement of the wallet provider, putting
 					them in a position to deny access to the recovery feature.
 				`),
-				evaluateAccountRecovery({
-					guardianRecovery: supported({
-						ref: refNotNecessary,
-						minimumGuardianPolicy: {
-							type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-							descriptionMarkdown: '',
-							requiredGuardians: [],
-							optionalGuardians: [
-								{
-									type: GuardianType.WALLET_PROVIDER,
-									entity: exampleWalletDevelopmentCompany,
-									description: 'Wallet developer storage cloud',
-								},
-								{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
-								{
-									type: GuardianType.USER_EXTERNAL_ACCOUNT,
-									entity: exampleSecurityAuditor,
-									description: '',
-								},
-							],
-							optionalGuardiansMinimumConfigurable: 3,
-							optionalGuardiansMinimumNeededForRecovery: 2,
-							secretReconstitution: exampleWalletDevelopmentCompany,
-						},
-					}),
-				}),
+				evaluateAccountRecovery(
+					EvaluationContext.forTest(() => accountRecovery),
+					{
+						guardianRecovery: supported({
+							ref: refNotNecessary,
+							minimumGuardianPolicy: {
+								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+								descriptionMarkdown: '',
+								requiredGuardians: [],
+								optionalGuardians: [
+									{
+										type: GuardianType.WALLET_PROVIDER,
+										entity: exampleWalletDevelopmentCompany,
+										description: 'Wallet developer storage cloud',
+									},
+									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
+									{
+										type: GuardianType.USER_EXTERNAL_ACCOUNT,
+										entity: exampleSecurityAuditor,
+										description: '',
+									},
+								],
+								optionalGuardiansMinimumConfigurable: 3,
+								optionalGuardiansMinimumNeededForRecovery: 2,
+								secretReconstitution: exampleWalletDevelopmentCompany,
+							},
+						}),
+					},
+				),
 			),
 		],
 		partial: [],
@@ -273,48 +288,51 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 					The recovery secret is reconstituted on the user's device using
 					2 or more shares from these external services.
 				`),
-				evaluateAccountRecovery({
-					guardianRecovery: supported({
-						ref: refNotNecessary,
-						minimumGuardianPolicy: {
-							type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-							descriptionMarkdown: '',
-							requiredGuardians: [],
-							optionalGuardians: [
-								{
-									type: GuardianType.WALLET_PROVIDER,
-									entity: exampleWalletDevelopmentCompany,
-									description: 'Wallet developer storage cloud',
-								},
-								{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
-								{
-									type: GuardianType.USER_EXTERNAL_ACCOUNT,
-									entity: exampleSecurityAuditor,
-									description: '',
-								},
-							],
-							optionalGuardiansMinimumConfigurable: 3,
-							optionalGuardiansMinimumNeededForRecovery: 2,
-							secretReconstitution: 'CLIENT_SIDE',
-						},
-					}),
-				}),
+				evaluateAccountRecovery(
+					EvaluationContext.forTest(() => accountRecovery),
+					{
+						guardianRecovery: supported({
+							ref: refNotNecessary,
+							minimumGuardianPolicy: {
+								type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
+								descriptionMarkdown: '',
+								requiredGuardians: [],
+								optionalGuardians: [
+									{
+										type: GuardianType.WALLET_PROVIDER,
+										entity: exampleWalletDevelopmentCompany,
+										description: 'Wallet developer storage cloud',
+									},
+									{ type: GuardianType.USER_EXTERNAL_ACCOUNT, entity: exampleCex, description: '' },
+									{
+										type: GuardianType.USER_EXTERNAL_ACCOUNT,
+										entity: exampleSecurityAuditor,
+										description: '',
+									},
+								],
+								optionalGuardiansMinimumConfigurable: 3,
+								optionalGuardiansMinimumNeededForRecovery: 2,
+								secretReconstitution: 'CLIENT_SIDE',
+							},
+						}),
+					},
+				),
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<AccountRecoveryValue> => {
-		if (features.security.accountRecovery === null) {
-			return unrated(accountRecovery, { minimumGuardianPolicy: null, outcomes: null })
-		}
+	evaluate: (ctx: EvaluationContext<AccountRecoveryValue>): Evaluation<AccountRecoveryValue> => {
+		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 
-		let references: FullyQualifiedReference[] = []
+		if (ctx.features.security.accountRecovery === null) {
+			return unrated(ctx, { minimumGuardianPolicy: null, outcomes: null })
+		}
 
 		// Collect references
-		if (isSupported(features.security.accountRecovery.guardianRecovery)) {
-			references = mergeRefs(references, features.security.accountRecovery.guardianRecovery.ref)
+		if (isSupported(ctx.features.security.accountRecovery.guardianRecovery)) {
+			ctx.addRef(ctx.features.security.accountRecovery.guardianRecovery)
 		}
 
-		return { ...evaluateAccountRecovery(features.security.accountRecovery), references }
+		return evaluateAccountRecovery(ctx, ctx.features.security.accountRecovery)
 	},
 	aggregate: pickWorstRating<AccountRecoveryValue>,
 }

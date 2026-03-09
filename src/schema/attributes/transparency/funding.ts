@@ -1,20 +1,26 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
 	type Value,
+	Verifiability,
+	type VerifiabilityPredicate,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type Monetization,
 	monetizationStrategies,
-	type MonetizationStrategy,
+	MonetizationStrategy,
 	monetizationStrategyIsUserAligned,
 	monetizationStrategyName,
 } from '@/schema/features/transparency/monetization'
 import { toFullyQualified } from '@/schema/reference'
+import {
+	verifiabilityRequiresAllOf,
+	verifiabilityRequiresAtLeastOneReference,
+} from '@/schema/verifiability'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { fundingDetailsContent } from '@/types/content/funding-details'
 
@@ -24,11 +30,12 @@ export type FundingValue = Value
 
 /** Funding is transparent and at least partially non-extractive. */
 function transparent(
+	ctx: EvaluationContext<FundingValue>,
 	id: string,
 	sourceName: string,
 	monetization: Monetization,
 ): Evaluation<FundingValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: `transparent_${id.toLocaleLowerCase()}`,
 			rating: Rating.PASS,
@@ -36,17 +43,17 @@ function transparent(
 			shortExplanation: sentence('{{WALLET_NAME}} is transparently funded.'),
 		},
 		details: fundingDetailsContent({ monetization }),
-		references: toFullyQualified(monetization.ref),
-	}
+	})
 }
 
 /** Funding is entirely extractive. */
 function extractive(
+	ctx: EvaluationContext<FundingValue>,
 	id: string,
 	sourceName: string,
 	monetization: Monetization,
 ): Evaluation<FundingValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: `extractive_${id.toLocaleLowerCase()}`,
 			rating: Rating.PARTIAL,
@@ -61,39 +68,41 @@ function extractive(
 			'{{WALLET_NAME}} should change its funding sources to non-user-extractive means such as transparent convenience fees, donations, or ecosystem grants.',
 		),
 		references: toFullyQualified(monetization.ref),
-	}
+	})
 }
 
 /** Wallet has no funding. */
-const noFunding: Evaluation<FundingValue> = {
-	value: {
-		id: 'noFunding',
-		rating: Rating.FAIL,
-		displayName: 'No funding source',
-		shortExplanation: sentence('{{WALLET_NAME}} has no funding sources.'),
-	},
-	details: paragraph(
-		'{{WALLET_NAME}} has no funding sources, making its future unclear. Wallets need a consistent source of funding to ensure they keep up with security vulnerabilities and ecosystem progress.',
-	),
-	howToImprove: paragraph(
-		'While most software projects inevitably start small and unfunded, {{WALLET_NAME}} should seek a reliable source of funding once feasible.',
-	),
-	references: [],
+function noFunding(ctx: EvaluationContext<FundingValue>): Evaluation<FundingValue> {
+	return ctx.build({
+		value: {
+			id: 'noFunding',
+			rating: Rating.FAIL,
+			displayName: 'No funding source',
+			shortExplanation: sentence('{{WALLET_NAME}} has no funding sources.'),
+		},
+		details: paragraph(
+			'{{WALLET_NAME}} has no funding sources, making its future unclear. Wallets need a consistent source of funding to ensure they keep up with security vulnerabilities and ecosystem progress.',
+		),
+		howToImprove: paragraph(
+			'While most software projects inevitably start small and unfunded, {{WALLET_NAME}} should seek a reliable source of funding once feasible.',
+		),
+	})
 }
 
 /** Funding is not transparent. */
-const unclear: Evaluation<FundingValue> = {
-	value: {
-		id: 'unclear',
-		rating: Rating.FAIL,
-		displayName: 'Unclear funding source',
-		shortExplanation: sentence('How {{WALLET_NAME}} is funded is unclear.'),
-	},
-	details: paragraph('How {{WALLET_NAME}} is funded is unclear.'),
-	howToImprove: paragraph(
-		'{{WALLET_NAME}} should publish how it is funded, or how it plans to fund itself.',
-	),
-	references: [],
+function unclear(ctx: EvaluationContext<FundingValue>): Evaluation<FundingValue> {
+	return ctx.build({
+		value: {
+			id: 'unclear',
+			rating: Rating.FAIL,
+			displayName: 'Unclear funding source',
+			shortExplanation: sentence('How {{WALLET_NAME}} is funded is unclear.'),
+		},
+		details: paragraph('How {{WALLET_NAME}} is funded is unclear.'),
+		howToImprove: paragraph(
+			'{{WALLET_NAME}} should publish how it is funded, or how it plans to fund itself.',
+		),
+	})
 }
 
 /**
@@ -174,13 +183,13 @@ export const funding: Attribute<FundingValue> = {
 				paragraph(
 					'The wallet has funding but has not revealed this publicly and transparently to users.',
 				),
-				unclear,
+				unclear(EvaluationContext.forTest(() => funding)),
 			),
 			exampleRating(
 				paragraph(
 					'The wallet does not have any funding. Wallets must have sustainable funding sources in order to remain secure and up-to-date.',
 				),
-				noFunding,
+				noFunding(EvaluationContext.forTest(() => funding)),
 			),
 		],
 		partial: [
@@ -218,17 +227,59 @@ export const funding: Attribute<FundingValue> = {
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<FundingValue> => {
-		if (features.monetization === null) {
-			return unrated(funding, null)
+	evaluate: (ctx: EvaluationContext<FundingValue>): Evaluation<FundingValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can be invalidated later depending on funding type.
+
+		if (ctx.features.monetization === null) {
+			return unrated(ctx, null)
 		}
 
-		const strategies: MonetizationStrategy[] = []
+		ctx.addRef(ctx.features.monetization)
 
-		for (const { strategy, value } of monetizationStrategies(features.monetization)) {
+		const strategies: MonetizationStrategy[] = []
+		const verifiabilityPredicates: VerifiabilityPredicate<FundingValue>[] = []
+
+		for (const { strategy, value } of monetizationStrategies(ctx.features.monetization)) {
+			verifiabilityPredicates.push(
+				((): VerifiabilityPredicate<FundingValue> => {
+					switch (strategy) {
+						case MonetizationStrategy.DONATIONS:
+							return verifiabilityRequiresAtLeastOneReference({
+								referenceCountsAs: Verifiability.VERIFIABLE,
+							})
+						case MonetizationStrategy.ECOSYSTEM_GRANTS:
+							return verifiabilityRequiresAtLeastOneReference({
+								referenceCountsAs: Verifiability.VERIFIABLE,
+							})
+						case MonetizationStrategy.GOVERNANCE_TOKEN_LOW_FLOAT:
+							return () => Verifiability.VERIFIABLE
+						case MonetizationStrategy.GOVERNANCE_TOKEN_MOSTLY_DISTRIBUTED:
+							return () => Verifiability.VERIFIABLE
+						case MonetizationStrategy.HIDDEN_CONVENIENCE_FEES:
+							return verifiabilityRequiresAtLeastOneReference({
+								referenceCountsAs: Verifiability.VERIFIABLE,
+							})
+						case MonetizationStrategy.TRANSPARENT_CONVENIENCE_FEES:
+							return verifiabilityRequiresAtLeastOneReference({
+								referenceCountsAs: Verifiability.VERIFIABLE,
+							})
+						case MonetizationStrategy.PUBLIC_OFFERING:
+							return verifiabilityRequiresAtLeastOneReference({
+								referenceCountsAs: Verifiability.VERIFIABLE,
+							})
+						case MonetizationStrategy.SELF_FUNDED:
+							return () => Verifiability.UNVERIFIABLE
+						case MonetizationStrategy.VENTURE_CAPITAL:
+							return verifiabilityRequiresAtLeastOneReference({
+								referenceCountsAs: Verifiability.VERIFIABLE,
+							})
+					}
+				})(),
+			)
+
 			switch (value) {
 				case null:
-					return unrated(funding, null)
+					return unrated(ctx, null)
 				case true:
 					strategies.push(strategy)
 					break
@@ -236,10 +287,15 @@ export const funding: Attribute<FundingValue> = {
 					break // Do nothing.
 			}
 		}
+
+		if (verifiabilityPredicates.length > 0) {
+			ctx.setVerifiability(verifiabilityRequiresAllOf(...verifiabilityPredicates))
+		}
+
 		const numStrategies = strategies.length
 
 		if (numStrategies === 0) {
-			return unclear
+			return unclear(ctx)
 		}
 
 		const extractiveStrategies = []
@@ -253,27 +309,29 @@ export const funding: Attribute<FundingValue> = {
 			}
 		}
 
-		if (!features.monetization.revenueBreakdownIsPublic && extractiveStrategies.length > 0) {
+		if (!ctx.features.monetization.revenueBreakdownIsPublic && extractiveStrategies.length > 0) {
 			if (extractiveStrategies.length === 1) {
 				return extractive(
+					ctx,
 					extractiveStrategies[0],
 					monetizationStrategyName(extractiveStrategies[0]),
-					features.monetization,
+					ctx.features.monetization,
 				)
 			}
 
-			return extractive('multi', '', features.monetization)
+			return extractive(ctx, 'multi', '', ctx.features.monetization)
 		}
 
 		if (numStrategies === 1) {
 			return transparent(
+				ctx,
 				strategies[0],
 				monetizationStrategyName(strategies[0]),
-				features.monetization,
+				ctx.features.monetization,
 			)
 		}
 
-		return transparent('multi', 'Multiple sources', features.monetization)
+		return transparent(ctx, 'multi', 'Multiple sources', ctx.features.monetization)
 	},
 	aggregate: pickWorstRating<FundingValue>,
 }

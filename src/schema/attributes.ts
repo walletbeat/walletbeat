@@ -16,7 +16,19 @@ export type WalletNameAndPseudonymStrings =
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
-import type { FullyQualifiedReference, ReferenceArray } from './reference'
+import { isMaybeSupported, isSupported, type Support } from './features/support'
+import {
+	type FullyQualifiedReference,
+	hasRefs,
+	type LooseReference,
+	mergeRefs,
+	popRefs,
+	type ReferenceArray,
+	type References,
+	refs,
+	toFullyQualified,
+	type WithRef,
+} from './reference'
 import type { Score } from './score'
 import type { AtLeastOneVariant } from './variants'
 import type { RatedWallet, WalletMetadata } from './wallet'
@@ -165,13 +177,65 @@ export function borderRatingToColor(rating: Rating): string {
 }
 
 /**
+ * The level of verifiability of the claims within an evaluation.
+ *
+ * Note that something being *verifiable*
+ * does not mean that it has been *verified*.
+ * This is only about the *ability* to be verified.
+ */
+export enum Verifiability {
+	/**
+	 * This claim does not require verification because it is self-evident.
+	 *
+	 * Applies by default to "UNRATED" ratings,
+	 * since they are self-evidently correct.
+	 */
+	SELF_EVIDENT = 'SELF_EVIDENT',
+
+	/**
+	 * The claim has not been verified by anyone other than the wallet
+	 * development team, and it is not possible to verify it by oneself.
+	 */
+	UNVERIFIABLE = 'UNVERIFIABLE',
+
+	/**
+	 * An independent auditor has verified this claim, but
+	 * a member of the general public has no means to verify this for
+	 * themselves.
+	 */
+	INDEPENDENTLY_AUDITED = 'INDEPENDENTLY_AUDITED',
+
+	/**
+	 * This claim is publicly verifiable by a member of the general public.
+	 */
+	VERIFIABLE = 'VERIFIABLE',
+
+	/**
+	 * The data needed to know whether something is verifiable is itself not
+	 * known. For example, if verification requires source-code-level access,
+	 * but we do not have information on whether the wallet's source code is
+	 * available, then `Verifiability` would be `UNKNOWN`.
+	 */
+	UNKNOWN = 'UNKNOWN',
+}
+
+/** Enum helper for `Verifiability`. */
+export const verifiabilityEnum = new Enum<Verifiability>({
+	[Verifiability.SELF_EVIDENT]: true,
+	[Verifiability.UNVERIFIABLE]: true,
+	[Verifiability.INDEPENDENTLY_AUDITED]: true,
+	[Verifiability.VERIFIABLE]: true,
+	[Verifiability.UNKNOWN]: true,
+})
+
+/**
  * Value is one of multiple possible outcomes when evaluating an attribute.
  * It is *not* wallet-specific, and may often be enum-like.
  * For example, when evaluating an attribute like open-source licensing,
  * one particular Value could represent the Apache license, and another
  * could represent the MIT license.
  */
-export interface Value {
+export type Value = {
 	/**
 	 * An ID representing the value.
 	 * This needs to be unique within the set of possible values that the
@@ -224,17 +288,57 @@ export interface Value {
 	 * If unspecified, the score is derived using `defaultRatingScore`.
 	 */
 	score?: Score
-}
+} & (
+	| {
+			rating: ExplicitRating
+			// If explicit rating, need to provide verifiability.
+
+			/**
+			 * How verifiable the rating is by the general public.
+			 *
+			 * Some attributes can self-evidently be verified by just using the wallet
+			 * (e.g. "what happens if I type an ENS address when sending tokens?"),
+			 * whereas others require source-level access to ascertain ("how is private
+			 * key material handled?"), or even beyond ("what happens to my orderflow
+			 * data after I send this transaction request to the wallet's default RPC
+			 * provider?").
+			 *
+			 * Note that something being *verifiable*
+			 * does not mean that it has been *verified*.
+			 * This is only about the *ability* to be verified.
+			 */
+			verifiability: Verifiability
+	  }
+	| {
+			rating: Exclude<Rating, ExplicitRating>
+			// If EXEMPT or UNRATED, the verifiability is self-evident.
+			verifiability: Verifiability.SELF_EVIDENT
+	  }
+)
 
 /** The numerical score corresponding to a rating by default. */
-export function defaultRatingScore(rating: Rating): Score {
-	switch (rating) {
+export function defaultRatingScore(value: Value): Score {
+	switch (value.rating) {
 		case Rating.FAIL:
 			return 0.0
 		case Rating.PARTIAL:
-			return 0.5
+			switch (value.verifiability) {
+				case Verifiability.UNVERIFIABLE:
+					return 0.05
+				case Verifiability.INDEPENDENTLY_AUDITED:
+					return 0.2
+				default:
+					return 0.5
+			}
 		case Rating.PASS:
-			return 1.0
+			switch (value.verifiability) {
+				case Verifiability.UNVERIFIABLE:
+					return 0.1
+				case Verifiability.INDEPENDENTLY_AUDITED:
+					return 0.7
+				default:
+					return 1.0
+			}
 		case Rating.EXEMPT:
 			return null
 		case Rating.UNRATED:
@@ -477,7 +581,7 @@ export interface Attribute<V extends Value = Value> {
 	 * by preventing their evaluation code from taking any metadata into
 	 * account.
 	 */
-	evaluate: (features: ResolvedFeatures) => Evaluation<V>
+	evaluate: (ctx: EvaluationContext<V>) => Evaluation<V>
 
 	/**
 	 * Check whether the attribute applies to a wallet, according to its
@@ -490,7 +594,7 @@ export interface Attribute<V extends Value = Value> {
 	 *
 	 * If `exempted` is undefined, then `evaluate` is used unconditionally.
 	 */
-	exempted?: (features: ResolvedFeatures, metadata: WalletMetadata) => null | ExemptEvaluation<V>
+	exempted?: (ctx: EvaluationContext<V>, metadata: WalletMetadata) => null | ExemptEvaluation<V>
 
 	/**
 	 * Aggregates one or more per-variant evaluations into a single one.
@@ -503,6 +607,216 @@ export interface Attribute<V extends Value = Value> {
 export interface EvaluatedAttribute<V extends Value> {
 	attribute: Attribute<V>
 	evaluation: Evaluation<V>
+}
+
+/**
+ * `EvaluationScaffold<V>` is a mostly-build `Evaluation<V>`,
+ * which `EvaluationContext<V>` can build into a full `Evaluation<V>`.
+ */
+export type EvaluationScaffold<V extends Value> = Omit<Evaluation<V>, 'value'> & {
+	value: Omit<V, 'verifiability'>
+}
+
+/** A function that takes a wallet's evaluation context and returns a `Verifiability`. */
+export type VerifiabilityPredicate<V extends Value> = (ctx: EvaluationContext<V>) => Verifiability
+
+/**
+ * EvaluationContext is a helper class to build `Evaluation<V>` objects,
+ * keeping track of their references and verifiability. It is a stateful
+ * object which is progressively populated as the evaluation progresses,
+ * then `build` is called to finalize the `Evaluation<V>`.
+ */
+export class EvaluationContext<V extends Value> {
+	private readonly attributeFn: () => Attribute<V>
+	private readonly rawReferences: FullyQualifiedReference[]
+	private readonly featuresOrNull: ResolvedFeatures | null
+	private verifiability: Verifiability | VerifiabilityPredicate<V> | null
+	private isForTest: boolean = false
+
+	/**
+	 * `forTest` returns an EvaluationContext which is used in tests.
+	 * Such contexts will assume all `Evaluation`s are verifiable.
+	 */
+	public static forTest<V extends Value>(attributeFn: () => Attribute<V>): EvaluationContext<V> {
+		const ctx = new EvaluationContext<V>(attributeFn, null, true)
+
+		ctx.isForTest = true
+
+		return ctx
+	}
+
+	public static create<V extends Value>(
+		attribute: Attribute<V>,
+		features: ResolvedFeatures,
+	): EvaluationContext<V> {
+		const ctx = new EvaluationContext<V>(() => attribute, features, false)
+
+		ctx.isForTest = true
+
+		return ctx
+	}
+
+	private constructor(
+		attributeFn: () => Attribute<V>,
+		features: ResolvedFeatures | null,
+		isForTest: boolean,
+	) {
+		this.attributeFn = attributeFn
+		this.featuresOrNull = features
+		this.rawReferences = []
+		this.verifiability = null
+		this.isForTest = isForTest
+	}
+
+	private _addRef(
+		x:
+			| undefined
+			| null
+			| WithRef<unknown>
+			| Support<WithRef<object>>
+			| LooseReference
+			| References
+			| FullyQualifiedReference
+			| FullyQualifiedReference[],
+	) {
+		if (x === null || x === undefined) {
+			return
+		}
+
+		if (Array.isArray(x)) {
+			this.addRef(...x)
+
+			return
+		}
+
+		if (isMaybeSupported(x)) {
+			if (isSupported(x)) {
+				this.addRef(...toFullyQualified(x.ref))
+			}
+
+			return
+		}
+
+		if (hasRefs(x)) {
+			this.addRef(...refs(x))
+
+			return
+		}
+
+		for (const ref of toFullyQualified(x)) {
+			this.rawReferences.push(ref)
+		}
+	}
+
+	/** Add one or more references. */
+	public addRef(
+		...x: (
+			| WithRef<unknown>
+			| Support<WithRef<object>>
+			| LooseReference
+			| References
+			| FullyQualifiedReference
+			| FullyQualifiedReference[]
+			| undefined
+			| null
+		)[]
+	) {
+		for (const item of x) {
+			this._addRef(item)
+		}
+	}
+
+	/**
+	 * Extract references from `x` into current context,
+	 * then return `x` with references removed.
+	 */
+	public popRefs<T>(x: WithRef<T>): T {
+		const { withoutRefs, refs } = popRefs(x)
+
+		this.addRef(...refs)
+
+		return withoutRefs
+	}
+
+	/** Set the `verifiability` value that will be used for PASS/PARTIAL ratings. */
+	public setVerifiability(verifiability: Verifiability | VerifiabilityPredicate<V>) {
+		this.verifiability = verifiability
+	}
+
+	/** The set of wallet features being evaluated. */
+	public get features(): ResolvedFeatures {
+		if (this.featuresOrNull === null) {
+			throw new Error('tried to get ResolvedFeatures out of testing context')
+		}
+
+		return this.featuresOrNull
+	}
+
+	/** The attribute being evaluated. */
+	public get attribute(): Attribute<V> {
+		return this.attributeFn()
+	}
+
+	/** The references gathered so far. */
+	public references(): FullyQualifiedReference[] {
+		return mergeRefs(this.rawReferences)
+	}
+
+	/** Build an `Evaluation<V>` out of an `EvaluationScaffold<V>`. */
+	public build(scaffold: EvaluationScaffold<V>): Evaluation<V> {
+		const otherRefs = scaffold.references ?? []
+		const finalRefs = mergeRefs(otherRefs, this.rawReferences)
+		let verifiability =
+			this.verifiability === null
+				? this.isForTest
+					? Verifiability.VERIFIABLE
+					: null
+				: this.verifiability
+		const val = ((): V => {
+			const scaffoldVal: Omit<V, 'verifiability'> = scaffold.value
+
+			if (!isExplicitRating(scaffoldVal.rating)) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know V is the same.
+				return {
+					...scaffoldVal,
+					rating: scaffoldVal.rating,
+					verifiability: Verifiability.SELF_EVIDENT,
+				} as V
+			}
+
+			if (verifiability === null) {
+				throw new Error('verifiability is unset for PASS rating')
+			}
+
+			if (!verifiabilityEnum.is(verifiability)) {
+				if (this.features === null) {
+					throw new Error(
+						'tried to use a VerifiabilityPredicate without specifying wallet features',
+					)
+				}
+
+				verifiability = verifiability(this)
+			}
+
+			// Now we must be dealing with a `Verifiability` value.
+			verifiabilityEnum.assert(verifiability)
+
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know V is the same.
+			return {
+				...scaffoldVal,
+				rating: scaffoldVal.rating,
+				verifiability,
+			} as V
+		})()
+
+		return {
+			...{
+				...scaffold,
+				value: val,
+			},
+			...(finalRefs.length === 0 ? {} : { references: finalRefs }),
+		}
+	}
 }
 
 /**
