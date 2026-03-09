@@ -24,7 +24,7 @@ export function verifiabilityRequiresAnyOf<V extends Value>(
 				return -1
 			case Verifiability.UNVERIFIABLE:
 				return 0
-			case Verifiability.THIRD_PARTY_AUDITED:
+			case Verifiability.INDEPENDENTLY_AUDITED:
 				return 1
 			case Verifiability.VERIFIABLE:
 				return 2

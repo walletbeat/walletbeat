@@ -16,6 +16,7 @@ export type WalletNameAndPseudonymStrings =
 import { Enum } from '@/utils/enum'
 
 import type { ResolvedFeatures } from './features'
+import { isMaybeSupported, isSupported, type Support } from './features/support'
 import {
 	type FullyQualifiedReference,
 	hasRefs,
@@ -198,11 +199,11 @@ export enum Verifiability {
 	UNVERIFIABLE = 'UNVERIFIABLE',
 
 	/**
-	 * An independent third-party auditor has verified this claim, but
+	 * An independent auditor has verified this claim, but
 	 * a member of the general public has no means to verify this for
 	 * themselves.
 	 */
-	THIRD_PARTY_AUDITED = 'THIRD_PARTY_AUDITED',
+	INDEPENDENTLY_AUDITED = 'INDEPENDENTLY_AUDITED',
 
 	/**
 	 * This claim is publicly verifiable by a member of the general public.
@@ -222,7 +223,7 @@ export enum Verifiability {
 export const verifiabilityEnum = new Enum<Verifiability>({
 	[Verifiability.SELF_EVIDENT]: true,
 	[Verifiability.UNVERIFIABLE]: true,
-	[Verifiability.THIRD_PARTY_AUDITED]: true,
+	[Verifiability.INDEPENDENTLY_AUDITED]: true,
 	[Verifiability.VERIFIABLE]: true,
 	[Verifiability.UNKNOWN]: true,
 })
@@ -293,7 +294,7 @@ export type Value = {
 			// If explicit rating, need to provide verifiability.
 
 			/**
-			 * How verifiable the rating is by an independent third party.
+			 * How verifiable the rating is by the general public.
 			 *
 			 * Some attributes can self-evidently be verified by just using the wallet
 			 * (e.g. "what happens if I type an ENS address when sending tokens?"),
@@ -324,7 +325,7 @@ export function defaultRatingScore(value: Value): Score {
 			switch (value.verifiability) {
 				case Verifiability.UNVERIFIABLE:
 					return 0.05
-				case Verifiability.THIRD_PARTY_AUDITED:
+				case Verifiability.INDEPENDENTLY_AUDITED:
 					return 0.2
 				default:
 					return 0.5
@@ -333,7 +334,7 @@ export function defaultRatingScore(value: Value): Score {
 			switch (value.verifiability) {
 				case Verifiability.UNVERIFIABLE:
 					return 0.1
-				case Verifiability.THIRD_PARTY_AUDITED:
+				case Verifiability.INDEPENDENTLY_AUDITED:
 					return 0.7
 				default:
 					return 1.0
@@ -667,11 +668,24 @@ export class EvaluationContext<V extends Value> {
 		this.isForTest = isForTest
 	}
 
-	private _addRef(x: WithRef<unknown> | LooseReference | References | FullyQualifiedReference) {
-		if (hasRefs(x)) {
-			for (const ref of refs(x)) {
-				this.addRef(ref)
+	private _addRef(
+		x:
+			| WithRef<unknown>
+			| Support<WithRef<object>>
+			| LooseReference
+			| References
+			| FullyQualifiedReference,
+	) {
+		if (isMaybeSupported(x)) {
+			if (isSupported(x)) {
+				this.addRef(...toFullyQualified(x.ref))
 			}
+
+			return
+		}
+
+		if (hasRefs(x)) {
+			this.addRef(...refs(x))
 
 			return
 		}
@@ -685,6 +699,7 @@ export class EvaluationContext<V extends Value> {
 	public addRef(
 		...x: (
 			| WithRef<unknown>
+			| Support<WithRef<object>>
 			| LooseReference
 			| References
 			| FullyQualifiedReference
@@ -715,10 +730,6 @@ export class EvaluationContext<V extends Value> {
 
 	/** Set the `verifiability` value that will be used for PASS/PARTIAL ratings. */
 	public setVerifiability(verifiability: Verifiability | VerifiabilityPredicate<V>) {
-		if (this.verifiability !== null) {
-			throw new Error('cannot set verifiability twice')
-		}
-
 		this.verifiability = verifiability
 	}
 
