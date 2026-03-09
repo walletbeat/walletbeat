@@ -670,6 +670,8 @@ export class EvaluationContext<V extends Value> {
 
 	private _addRef(
 		x:
+			| undefined
+			| null
 			| WithRef<unknown>
 			| Support<WithRef<object>>
 			| LooseReference
@@ -677,6 +679,10 @@ export class EvaluationContext<V extends Value> {
 			| FullyQualifiedReference
 			| FullyQualifiedReference[],
 	) {
+		if (x === null || x === undefined) {
+			return
+		}
+
 		if (Array.isArray(x)) {
 			this.addRef(...x)
 
@@ -716,10 +722,6 @@ export class EvaluationContext<V extends Value> {
 		)[]
 	) {
 		for (const item of x) {
-			if (item === undefined || item === null) {
-				continue
-			}
-
 			this._addRef(item)
 		}
 	}

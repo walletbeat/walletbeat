@@ -11,6 +11,24 @@ import { isSupported } from './features/support'
 import { licenseSourceIsVisible, LicensingType } from './features/transparency/license'
 
 /**
+ * Internal scoring function for Verifiability. Used for sorting only.
+ */
+function verifyScore(v: Verifiability): number {
+	switch (v) {
+		case Verifiability.UNKNOWN:
+			return -1
+		case Verifiability.UNVERIFIABLE:
+			return 0
+		case Verifiability.INDEPENDENTLY_AUDITED:
+			return 1
+		case Verifiability.VERIFIABLE:
+			return 2
+		case Verifiability.SELF_EVIDENT:
+			return 3
+	}
+}
+
+/**
  * Returns a level of `Verifiability` appropriate for an attribute where
  * verifying the claim requires at least one of multiple means of
  * verification.
@@ -18,21 +36,6 @@ import { licenseSourceIsVisible, LicensingType } from './features/transparency/l
 export function verifiabilityRequiresAnyOf<V extends Value>(
 	...predicates: VerifiabilityPredicate<V>[]
 ): VerifiabilityPredicate<V> {
-	const verifyScore = (v: Verifiability): number => {
-		switch (v) {
-			case Verifiability.UNKNOWN:
-				return -1
-			case Verifiability.UNVERIFIABLE:
-				return 0
-			case Verifiability.INDEPENDENTLY_AUDITED:
-				return 1
-			case Verifiability.VERIFIABLE:
-				return 2
-			case Verifiability.SELF_EVIDENT:
-				return 3
-		}
-	}
-
 	if (!isNonEmptyArray(predicates)) {
 		throw new Error('cannot compute the verifiability from no verifiability items')
 	}
@@ -41,6 +44,25 @@ export function verifiabilityRequiresAnyOf<V extends Value>(
 		nonEmptyFirst(
 			nonEmptyMap(predicates, predicate => predicate(ctx)),
 			(a: Verifiability, b: Verifiability) => verifyScore(b) - verifyScore(a),
+		)
+}
+
+/**
+ * Returns a level of `Verifiability` appropriate for an attribute where
+ * verifying the claim requires at least one of multiple means of
+ * verification.
+ */
+export function verifiabilityRequiresAllOf<V extends Value>(
+	...predicates: VerifiabilityPredicate<V>[]
+): VerifiabilityPredicate<V> {
+	if (!isNonEmptyArray(predicates)) {
+		throw new Error('cannot compute the verifiability from no verifiability items')
+	}
+
+	return (ctx: EvaluationContext<V>) =>
+		nonEmptyFirst(
+			nonEmptyMap(predicates, predicate => predicate(ctx)),
+			(a: Verifiability, b: Verifiability) => verifyScore(a) - verifyScore(b),
 		)
 }
 
