@@ -112,7 +112,7 @@ export const ledgerWallet: HardwareWallet = {
 				{
 					explanation:
 						'Ledger raises $380 million to make digital assets more secure and accessible to everyone',
-					url: 'https://www.ledger.com/ledger-raises-380-million-to-make-digital-assets-more-secure-and-accessible-to-everyone',
+					url: 'https://www.businesswire.com/news/home/20210609005985/en/Ledger-completes-a-%24380-million-Series-C-fundraising-valuing-the-company-at-more-than-%241.5-billion-to-strengthen-its-position-as-the-leading-secure-gateway-to-digital-assets',
 				},
 			],
 			revenueBreakdownIsPublic: false,
