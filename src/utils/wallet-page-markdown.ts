@@ -22,7 +22,7 @@ import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
 import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
-import { slugifyCamelCase } from '@/types/utils/text'
+import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowToImproveHeading } from '@/utils/attribute-display'
 import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import {
@@ -99,8 +99,10 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 		if (isTypographicContent(stage.description)) {
 			const desc = normalizeMarkdownBlankLines(
-				renderTypographicContentToString(stage.description, { WALLET_NAME: walletName }),
-			).trim()
+				trimWhitespacePrefix(
+					renderTypographicContentToString(stage.description, { WALLET_NAME: walletName }),
+				),
+			)
 
 			if (desc !== '') {
 				stageSection.push(desc, '')
@@ -132,7 +134,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 					})
 
 					if (groupDescRaw !== '') {
-						const groupDesc = normalizeMarkdownBlankLines(groupDescRaw).trim()
+						const groupDesc = normalizeMarkdownBlankLines(groupDescRaw)
 
 						if (groupDesc !== '') {
 							const groupHeading =
@@ -151,7 +153,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						const attributeId = getCriterionAttributeId(criterion)
 						const descText = normalizeMarkdownBlankLines(
 							renderContentToText(criterion.description, evalStrings, { trim: true }),
-						).trim()
+						)
 						const descForBullet =
 							descText !== '' && /^[a-z]/.test(descText)
 								? descText.charAt(0).toUpperCase() + descText.slice(1)
@@ -237,10 +239,12 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 					}
 
 					const shortExpl = normalizeMarkdownBlankLines(
-						renderTypographicContentToString(evaluation.value.shortExplanation, evalStrings),
+						trimWhitespacePrefix(
+							renderTypographicContentToString(evaluation.value.shortExplanation, evalStrings),
+						),
 					)
 
-					parts.push(shortExpl.trim(), '')
+					parts.push(shortExpl, '')
 
 					const details = normalizeMarkdownBlankLines(
 						renderContentToText(evaluation.details, evalStrings, {
@@ -250,31 +254,30 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 					)
 
 					if (details.trim() !== '') {
-						parts.push(details.trim(), '')
+						parts.push(details, '')
 					}
 
 					if (evaluation.impact !== undefined) {
 						const impact = normalizeMarkdownBlankLines(
-							renderTypographicContentToString(evaluation.impact, evalStrings),
+							trimWhitespacePrefix(
+								renderTypographicContentToString(evaluation.impact, evalStrings),
+							),
 						)
 
 						if (impact.trim() !== '') {
-							parts.push('#### Impact', '', impact.trim(), '')
+							parts.push('#### Impact', '', impact, '')
 						}
 					}
 
 					if (evaluation.howToImprove !== undefined) {
 						const howTo = normalizeMarkdownBlankLines(
-							renderTypographicContentToString(evaluation.howToImprove, evalStrings),
+							trimWhitespacePrefix(
+								renderTypographicContentToString(evaluation.howToImprove, evalStrings),
+							),
 						)
 
 						if (howTo.trim() !== '') {
-							parts.push(
-								`#### ${getHowToImproveHeading(attribute, walletName)}`,
-								'',
-								howTo.trim(),
-								'',
-							)
+							parts.push(`#### ${getHowToImproveHeading(attribute, walletName)}`, '', howTo, '')
 						}
 					}
 

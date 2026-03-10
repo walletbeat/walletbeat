@@ -2,6 +2,7 @@ import { attributeTree } from '@/schema/attribute-groups'
 import type { Attribute, ExampleRating, Value } from '@/schema/attributes'
 import { normalizeExampleRatings } from '@/schema/attributes'
 import { renderTypographicContentToString, type TypographicContent } from '@/types/content'
+import { trimWhitespacePrefix } from '@/types/utils/text'
 import { getHowIsEvaluatedHeading, getWhyItMattersHeading } from '@/utils/attribute-display'
 import { normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 
@@ -37,7 +38,12 @@ function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
 	const lines: string[] = ['#### Rating scale', '']
 
 	if (ratingScale.display === 'simple') {
-		lines.push(normalizeMarkdownBlankLines(renderPseudonymContent(ratingScale.content)).trim(), '')
+		lines.push(
+			normalizeMarkdownBlankLines(
+				trimWhitespacePrefix(renderPseudonymContent(ratingScale.content)),
+			),
+			'',
+		)
 
 		return lines
 	}
@@ -107,17 +113,27 @@ export function methodologyPageMarkdown(siteUrl: string): string {
 			lines.push(`### ${attribute.displayName}`)
 			lines.push('')
 
-			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.question)).trim())
+			lines.push(
+				normalizeMarkdownBlankLines(
+					trimWhitespacePrefix(renderWalletNameContent(attribute.question)),
+				),
+			)
 			lines.push('')
 
 			lines.push(`#### ${getWhyItMattersHeading(attribute)}`)
 			lines.push('')
-			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.why)).trim())
+			lines.push(
+				normalizeMarkdownBlankLines(trimWhitespacePrefix(renderWalletNameContent(attribute.why))),
+			)
 			lines.push('')
 
 			lines.push(`#### ${getHowIsEvaluatedHeading(attribute)}`)
 			lines.push('')
-			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.methodology)).trim())
+			lines.push(
+				normalizeMarkdownBlankLines(
+					trimWhitespacePrefix(renderWalletNameContent(attribute.methodology)),
+				),
+			)
 			lines.push('')
 
 			lines.push(...renderRatingScale(attribute))
