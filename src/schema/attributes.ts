@@ -18,7 +18,7 @@ export type WalletNameAndPseudonymStrings =
  * Used as return type of getWalletEvalStrings so it's assignable to Typography's
  * strings prop when content uses WalletNameAndPseudonymStrings (which is a union including null).
  */
-export type ConcreteWalletEvalStrings = {
+export interface ConcreteWalletEvalStrings {
 	WALLET_NAME: string
 	WALLET_PSEUDONYM_SINGULAR: string
 	WALLET_PSEUDONYM_PLURAL: string

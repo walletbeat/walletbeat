@@ -247,7 +247,7 @@ export function isReferenceInput(x: unknown): x is ReferenceInput {
 		return true
 	}
 
-	if (Array.isArray(x) && x.every((item): item is Reference => isReference(item))) {
+	if (Array.isArray(x) && x.every(isReference)) {
 		return true
 	}
 

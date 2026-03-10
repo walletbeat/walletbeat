@@ -141,7 +141,8 @@ export interface StageBreakdownItemJsonExport {
 	criteriaGroups: StageCriteriaGroupBreakdownItemJsonExport[]
 }
 
-export interface RatedWalletJsonExportBase {
+/** Export shape: base fields with perVariant object keyed by variant (e.g. BROWSER, MOBILE). */
+export interface RatedWalletJsonExport {
 	$schema: string
 	overall: AttributeGroupsExport
 	perVariant: Partial<Record<Variant, PerVariantExport>>
@@ -156,9 +157,6 @@ export interface RatedWalletJsonExportBase {
 	website?: string
 	repository?: string
 }
-
-/** Export shape: base fields with perVariant object keyed by variant (e.g. BROWSER, MOBILE). */
-export type RatedWalletJsonExport = RatedWalletJsonExportBase
 
 function serializeReferences(references: ReferenceInput): ReferenceJsonExport[] {
 	const qualified = toFullyQualified(references)

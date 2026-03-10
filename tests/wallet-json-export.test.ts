@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { allRatedWallets } from '@/data/wallets'
 import { getUrl } from '@/schema/url'
-import { type Variant, variantEnum } from '@/schema/variants'
+import { variantEnum } from '@/schema/variants'
 import { setItems } from '@/types/utils/non-empty'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { ratedWalletJsonExport, stageToExportString } from '@/utils/wallet-json-export'
@@ -49,9 +49,7 @@ describe('ratedWalletJsonExport', () => {
 			})
 
 			it('payload.variants matches variant keys in payload.perVariant', () => {
-				const perVariantKeys = Object.keys(payload.perVariant).filter((k): k is Variant =>
-					variantEnum.is(k),
-				)
+				const perVariantKeys = Object.keys(payload.perVariant).filter(k => variantEnum.is(k))
 
 				expect(perVariantKeys.sort()).toEqual([...payload.variants].sort())
 			})
