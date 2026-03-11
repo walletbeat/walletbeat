@@ -128,13 +128,30 @@ export function markdownListFormat(
 
 /**
  * Trim longest shared whitespace prefix in all non-whitespace-only lines.
+ * Also removes leading and trailing lines that are empty (whitespace-only),
+ * so callers need not call `.trim()` on the result.
  *
  * Useful to make Markdown text properly indented in source code, yet
  * rendered correctly when passed to the Markdown renderer which assumes
  * no indentation in its input.
  */
 export function trimWhitespacePrefix(str: string): string {
-	const lines = str.split('\n')
+	const allLines = str.split('\n')
+	let start = 0
+	let end = allLines.length
+
+	while (start < end && allLines[start].trim() === '') {
+		start++
+	}
+	while (end > start && allLines[end - 1].trim() === '') {
+		end--
+	}
+
+	if (start >= end) {
+		return ''
+	}
+
+	const lines = allLines.slice(start, end)
 	let longestCommonPrefix: string | null = null
 
 	for (const line of lines) {
@@ -145,7 +162,7 @@ export function trimWhitespacePrefix(str: string): string {
 		const whitespacePrefixReg = /^\s+/.exec(line)
 
 		if (whitespacePrefixReg === null) {
-			return str // No common whitespace prefix. Short circuit.
+			return lines.join('\n') // No common whitespace prefix. Short circuit.
 		}
 
 		let whitespacePrefix = whitespacePrefixReg[0]
@@ -166,12 +183,12 @@ export function trimWhitespacePrefix(str: string): string {
 		}
 
 		if (whitespacePrefix !== longestCommonPrefix) {
-			return str // No common whitespace prefix. Short circuit.
+			return lines.join('\n') // No common whitespace prefix. Short circuit.
 		}
 	}
 
 	if (longestCommonPrefix === null || longestCommonPrefix === '') {
-		return str
+		return lines.join('\n')
 	}
 
 	return lines

@@ -37,8 +37,58 @@ export const attributesById = new Map(
 /**
  * Get all criteria in a stage.
  */
-const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
+export const allCriteriaInStage = (stage: WalletStage): WalletStageCriterion[] =>
 	stage.criteriaGroups.flatMap(criteriaGroup => criteriaGroup.criteria)
+
+/**
+ * Aggregate status for a stage or criteria group based on applicable criterion ratings.
+ * Rule: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
+ * Throws if every criterion is EXEMPT (stage must have at least one applicable criterion).
+ */
+export type StageCountsStatus = 'PASS' | 'PARTIAL' | 'FAIL' | 'UNRATED'
+
+export interface StageCountsAndStatus {
+	passedCount: number
+	totalCount: number
+	status: StageCountsStatus
+}
+
+/**
+ * Compute passed/total counts and aggregate status for a set of stage criteria.
+ * "Applicable" = not EXEMPT. Status: any UNRATED → UNRATED; else all passed → PASS; else any passed → PARTIAL; else FAIL.
+ * Throws if every criterion is EXEMPT (invalid stage definition for this wallet).
+ */
+export function computeCountsAndStatus(
+	criteria: WalletStageCriterion[],
+	wallet: StageEvaluatableWallet,
+): StageCountsAndStatus {
+	const allEvaluations = criteria.map(criterion => criterion.evaluate(wallet))
+	const applicableEvaluations = allEvaluations.filter(e => e.rating !== StageCriterionRating.EXEMPT)
+	const passedCount = applicableEvaluations.filter(
+		e => e.rating === StageCriterionRating.PASS,
+	).length
+	const totalCount = applicableEvaluations.length
+	const allExempt =
+		allEvaluations.length > 0 && allEvaluations.every(e => e.rating === StageCriterionRating.EXEMPT)
+
+	if (allExempt) {
+		throw new Error(
+			'Stage has no applicable criteria for this wallet (all criteria are EXEMPT). The stage definition should have at least one criterion that applies.',
+		)
+	}
+
+	const hasUnrated = applicableEvaluations.some(e => e.rating === StageCriterionRating.UNRATED)
+	const allPassed = totalCount > 0 && passedCount === totalCount
+	const status: StageCountsStatus = hasUnrated
+		? 'UNRATED'
+		: allPassed
+			? 'PASS'
+			: passedCount > 0
+				? 'PARTIAL'
+				: 'FAIL'
+
+	return { passedCount, totalCount, status }
+}
 
 /**
  * Check if an attribute is used in any stage requirement by checking if the attribute

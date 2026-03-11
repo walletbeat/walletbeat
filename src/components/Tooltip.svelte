@@ -157,7 +157,7 @@
 			onpointerleave={() => {
 				isPopoverHovered = false
 			}}
-			{@attach node => {
+			{@attach (node: HTMLElement) => {
 				if (isTriggerHovered || isPopoverHovered) {
 					node.showPopover()
 				} else {

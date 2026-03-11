@@ -5,132 +5,48 @@ import {
 	mapNonExemptGroupAttributes,
 } from '@/schema/attribute-groups'
 import {
-	type Attribute,
 	type AttributeGroup,
 	type EvaluatedGroup,
 	Rating,
 	ratingToText,
-	type Value,
 	type ValueSet,
-	type WalletNameAndPseudonymStrings,
-	type WalletNameStrings,
 } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
-import { StageCriterionRating, stageCriterionRatings, type WalletStage } from '@/schema/stages'
+import {
+	StageCriterionRating,
+	stageCriterionRatings,
+	type WalletStage,
+	type WalletStageCriterion,
+} from '@/schema/stages'
 import { getVariants, hasSingleVariant, type Variant } from '@/schema/variants'
 import { type RatedWallet, type ResolvedWallet, VariantSpecificity } from '@/schema/wallet'
-import {
-	type Content,
-	ContentType,
-	isTypographicContent,
-	prerenderTypographicContent,
-	type TypographicContent,
-} from '@/types/content'
+import { isTypographicContent, renderTypographicContentToString } from '@/types/content'
 import { nonEmptyEntries, nonEmptyValues, setItems } from '@/types/utils/non-empty'
-import { slugifyCamelCase } from '@/types/utils/text'
+import { slugifyCamelCase, trimWhitespacePrefix } from '@/types/utils/text'
+import { getHowToImproveHeading } from '@/utils/attribute-display'
+import { getWalletEvalStrings, renderContentToText } from '@/utils/evaluation-content'
 import {
 	collapseToSingleLine,
 	markdownBlockquote,
 	normalizeMarkdownBlankLines,
 } from '@/utils/markdown-utils'
 import { getWalletStageAndLadder } from '@/utils/stage'
-import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
-
-// TODO: https://github.com/walletbeat/walletbeat/issues/555
-/**
- * Convert a stage criterion id (snake_case) to a human-readable label (Title Case).
- * Used when the criterion has no linked attribute (getCriterionAttributeId returns null).
- */
-function criterionIdToDisplayName(id: string): string {
-	return id
-		.split('_')
-		.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-		.join(' ')
-}
-
-/**
- * Render TypographicContent<WalletNameStrings> to a plain string.
- * Only for content that is known not to contain pseudonym placeholders
- * (e.g. wallet metadata like blurb).
- */
-function renderTypographic(
-	content: TypographicContent<WalletNameStrings>,
-	walletName: string,
-): string {
-	const rendered = prerenderTypographicContent(content, { WALLET_NAME: walletName })
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
-}
-
-/**
- * Render any evaluation-related TypographicContent to a plain string, always
- * supplying the full set of wallet name and pseudonym strings.
- *
- * This is necessary because some content typed as WalletNameStrings may still
- * contain {{WALLET_PSEUDONYM_*}} placeholders at runtime (e.g. shortExplanation
- * strings that embed userInfoName() values which return pseudonym placeholders).
- * TypeScript's compile-time template validation cannot catch this for strings
- * constructed from runtime values.
- */
-function renderEvaluationContent(
-	content: TypographicContent<WalletNameAndPseudonymStrings>,
-	strings: WalletNameAndPseudonymStrings,
-): string {
-	const rendered = prerenderTypographicContent(content, strings)
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
-}
-
-/**
- * Render Content, falling back to `fallback` for CustomContent.
- * Always passes the full set of strings including pseudonym placeholders.
- */
-function renderEvaluationContentOrFallback(
-	content: Content<WalletNameAndPseudonymStrings>,
-	strings: WalletNameAndPseudonymStrings,
-	fallback: string,
-): string {
-	if (!isTypographicContent(content)) {
-		return fallback
-	}
-
-	return renderEvaluationContent(content, strings)
-}
-
-/**
- * Return the "How to improve" section heading using Attribute.wording.
- * Complex wording: use the rendered whatCanWalletDoAboutIts sentence.
- * Simple wording: "What can {walletName} do about its {midSentenceName}?"
- */
-function getHowToImproveHeading<V extends Value>(
-	attribute: Attribute<V>,
-	walletName: string,
-): string {
-	const { wording } = attribute
-
-	if (wording.midSentenceName === null) {
-		return collapseToSingleLine(renderTypographic(wording.whatCanWalletDoAboutIts, walletName))
-	}
-
-	return `What can ${walletName} do about its ${wording.midSentenceName}?`
-}
+import {
+	allCriteriaInStage,
+	computeCountsAndStatus,
+	getCriterionAttributeId,
+} from '@/utils/stage-attributes'
 
 /**
  * Return the wallet blurb as a single collapsed line, suitable for use
  * as a short description in the /llms.txt index.
  */
 export function walletBlurbText(wallet: RatedWallet): string {
-	return collapseToSingleLine(renderTypographic(wallet.metadata.blurb, wallet.metadata.displayName))
+	return collapseToSingleLine(
+		renderTypographicContentToString(wallet.metadata.blurb, {
+			WALLET_NAME: wallet.metadata.displayName,
+		}),
+	)
 }
 
 /**
@@ -144,11 +60,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	const { metadata } = wallet
 	const walletName = metadata.displayName
 
-	const evalStrings: WalletNameAndPseudonymStrings = {
-		WALLET_NAME: walletName,
-		WALLET_PSEUDONYM_SINGULAR: metadata.pseudonymType?.singular ?? 'pseudonym',
-		WALLET_PSEUDONYM_PLURAL: metadata.pseudonymType?.plural ?? 'pseudonyms',
-	}
+	const evalStrings = getWalletEvalStrings(wallet)
 
 	const variantNames = setItems<Variant>(getVariants(wallet.variants))
 		.map(v => variantToName(v, true))
@@ -166,7 +78,9 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	const headerLines: string[] = [
 		`# ${walletName} — Walletbeat Review`,
 		'',
-		...markdownBlockquote(renderTypographic(metadata.blurb, walletName)),
+		...markdownBlockquote(
+			renderTypographicContentToString(metadata.blurb, { WALLET_NAME: walletName }),
+		),
 		'',
 		`Last updated: ${metadata.lastUpdated}`,
 		`Walletbeat page: ${siteUrl}/${metadata.id}`,
@@ -185,8 +99,10 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 		if (isTypographicContent(stage.description)) {
 			const desc = normalizeMarkdownBlankLines(
-				renderTypographic(stage.description, walletName),
-			).trim()
+				trimWhitespacePrefix(
+					renderTypographicContentToString(stage.description, { WALLET_NAME: walletName }),
+				),
+			)
 
 			if (desc !== '') {
 				stageSection.push(desc, '')
@@ -201,17 +117,10 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 				stageSection.push(`### Stage ${stageIndex}: ${s.label}`, '')
 
-				const allCriteria = s.criteriaGroups.flatMap(group => group.criteria)
-				const allEvaluations = allCriteria.map(criterion =>
-					criterion.evaluate(stageEvaluatableWallet),
+				const { passedCount, totalCount } = computeCountsAndStatus(
+					allCriteriaInStage(s),
+					stageEvaluatableWallet,
 				)
-				const applicableEvaluations = allEvaluations.filter(
-					e => e.rating !== StageCriterionRating.EXEMPT,
-				)
-				const passedCount = applicableEvaluations.filter(
-					e => e.rating === StageCriterionRating.PASS,
-				).length
-				const totalCount = applicableEvaluations.length
 
 				if (totalCount > 0) {
 					const word = totalCount === 1 ? 'criterion' : 'criteria'
@@ -220,13 +129,12 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 				}
 
 				for (const criteriaGroup of s.criteriaGroups) {
-					if (
-						isTypographicContent(criteriaGroup.description) &&
-						criteriaGroup.description !== undefined
-					) {
-						const groupDesc = normalizeMarkdownBlankLines(
-							renderTypographic(criteriaGroup.description, walletName),
-						).trim()
+					const groupDescRaw = renderContentToText(criteriaGroup.description, evalStrings, {
+						trim: true,
+					})
+
+					if (groupDescRaw !== '') {
+						const groupDesc = normalizeMarkdownBlankLines(groupDescRaw)
 
 						if (groupDesc !== '') {
 							const groupHeading =
@@ -238,21 +146,21 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						}
 					}
 
-					for (const criterion of criteriaGroup.criteria) {
+					const groupCriteria: readonly WalletStageCriterion[] = criteriaGroup.criteria
+
+					for (const criterion of groupCriteria) {
 						const evaluation = criterion.evaluate(stageEvaluatableWallet)
 						const attributeId = getCriterionAttributeId(criterion)
-						const attribute = attributeId ? (attributesById.get(attributeId) ?? null) : null
-						const displayName =
-							attribute?.displayName ?? attributeId ?? criterionIdToDisplayName(criterion.id)
 						const descText = normalizeMarkdownBlankLines(
-							renderTypographic(criterion.description, walletName),
-						).trim()
+							renderContentToText(criterion.description, evalStrings, { trim: true }),
+						)
 						const descForBullet =
 							descText !== '' && /^[a-z]/.test(descText)
 								? descText.charAt(0).toUpperCase() + descText.slice(1)
 								: descText
 						const rating = evaluation.rating as StageCriterionRating
 						const ratingInfo = stageCriterionRatings[rating]
+						const displayName = criterion.displayName
 						const attrLink =
 							attributeId !== null
 								? `[${displayName}](${siteUrl}/${metadata.id}#${slugifyCamelCase(attributeId)})`
@@ -331,45 +239,45 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 					}
 
 					const shortExpl = normalizeMarkdownBlankLines(
-						renderEvaluationContent(evaluation.value.shortExplanation, evalStrings),
-					)
-
-					parts.push(shortExpl.trim(), '')
-
-					const details = normalizeMarkdownBlankLines(
-						renderEvaluationContentOrFallback(
-							evaluation.details,
-							evalStrings,
-							`[See full details for ${attribute.displayName}](${walletAttrUrl})`,
+						trimWhitespacePrefix(
+							renderTypographicContentToString(evaluation.value.shortExplanation, evalStrings),
 						),
 					)
 
+					parts.push(shortExpl, '')
+
+					const details = normalizeMarkdownBlankLines(
+						renderContentToText(evaluation.details, evalStrings, {
+							fallback: `[See full details for ${attribute.displayName}](${walletAttrUrl})`,
+							trim: true,
+						}),
+					)
+
 					if (details.trim() !== '') {
-						parts.push(details.trim(), '')
+						parts.push(details, '')
 					}
 
 					if (evaluation.impact !== undefined) {
 						const impact = normalizeMarkdownBlankLines(
-							renderEvaluationContent(evaluation.impact, evalStrings),
+							trimWhitespacePrefix(
+								renderTypographicContentToString(evaluation.impact, evalStrings),
+							),
 						)
 
 						if (impact.trim() !== '') {
-							parts.push('#### Impact', '', impact.trim(), '')
+							parts.push('#### Impact', '', impact, '')
 						}
 					}
 
 					if (evaluation.howToImprove !== undefined) {
 						const howTo = normalizeMarkdownBlankLines(
-							renderEvaluationContent(evaluation.howToImprove, evalStrings),
+							trimWhitespacePrefix(
+								renderTypographicContentToString(evaluation.howToImprove, evalStrings),
+							),
 						)
 
 						if (howTo.trim() !== '') {
-							parts.push(
-								`#### ${getHowToImproveHeading(attribute, walletName)}`,
-								'',
-								howTo.trim(),
-								'',
-							)
+							parts.push(`#### ${getHowToImproveHeading(attribute, walletName)}`, '', howTo, '')
 						}
 					}
 

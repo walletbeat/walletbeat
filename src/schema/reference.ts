@@ -235,6 +235,26 @@ export function toFullyQualified(
 	})
 }
 
+/** Input type accepted by `toFullyQualified`. */
+export type ReferenceInput = Parameters<typeof toFullyQualified>[0]
+
+/** Type predicate for values that are valid reference input (not undefined/null/NoRef). */
+export function isReferenceInput(x: unknown): x is ReferenceInput {
+	if (x === undefined || x === null || isNoRef(x)) {
+		return false
+	}
+
+	if (isReference(x)) {
+		return true
+	}
+
+	if (Array.isArray(x) && x.every(isReference)) {
+		return true
+	}
+
+	return false
+}
+
 /** Type predicate for `WithRef`. */
 export function hasRefs(maybeWithRef: unknown): maybeWithRef is WithRef<unknown> {
 	return (

@@ -6,6 +6,7 @@
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { commaListFormat } from '@/types/utils/text'
+	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 
 	// Props
 	const {
@@ -23,11 +24,7 @@
 
 <Typography
 	content={value.shortExplanation}
-	strings={{
-		WALLET_NAME: wallet.metadata.displayName,
-		WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-		WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
-	}}
+	strings={getWalletEvalStrings(wallet)}
 />
 
 {#if value.scamAlerts}
@@ -74,7 +71,7 @@
 								}`
 							: '**{{WALLET_NAME}}** does not warn you when sending funds to suspicious addresses.',
 					}}
-					strings={{ WALLET_NAME: wallet.metadata.displayName }}
+					strings={getWalletEvalStrings(wallet)}
 				/>
 
 				{#if isSupported(value.scamAlerts.sendTransactionWarning) && value.scamAlerts.sendTransactionWarning.ref}
@@ -136,7 +133,7 @@
 								}`
 							: '**{{WALLET_NAME}}** does not warn you when making arbitrary onchain transactions.',
 					}}
-					strings={{ WALLET_NAME: wallet.metadata.displayName }}
+					strings={getWalletEvalStrings(wallet)}
 				/>
 
 				{#if isSupported(value.scamAlerts.contractTransactionWarning) && value.scamAlerts.contractTransactionWarning.ref}
@@ -162,7 +159,7 @@
 								}`
 							: '**{{WALLET_NAME}}** does not check URLs against known scam sites.',
 					}}
-					strings={{ WALLET_NAME: wallet.metadata.displayName }}
+					strings={getWalletEvalStrings(wallet)}
 				/>
 
 				{#if isSupported(value.scamAlerts.scamUrlWarning) && value.scamAlerts.scamUrlWarning.ref}
