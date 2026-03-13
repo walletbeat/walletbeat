@@ -40,6 +40,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/security/scam-alerts.ts`](#srcschemafeaturessecurityscam-alertsts)
 - [`src/schema/features/security/secure-element.ts`](#srcschemafeaturessecuritysecure-elementts)
 - [`src/schema/features/security/security-audits.ts`](#srcschemafeaturessecuritysecurity-auditsts)
+- [`src/schema/features/security/security-best-practices.ts`](#srcschemafeaturessecuritysecurity-best-practicests)
 - [`src/schema/features/security/supply-chain-diy.ts`](#srcschemafeaturessecuritysupply-chain-diyts)
 - [`src/schema/features/security/supply-chain-factory.ts`](#srcschemafeaturessecuritysupply-chain-factoryts)
 - [`src/schema/features/security/transaction-legibility.ts`](#srcschemafeaturessecuritytransaction-legibilityts)
@@ -73,6 +74,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
     - `ethereumL1` (`VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>`): Light client used for Ethereum L1.
   - `accountRecovery` (`VariantFeature<AccountRecovery>`): How can users of the wallet recover their account?
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
+  - `securityBestPractices` (`VariantFeature<SecurityBestPracticesData>`): Security best practices (key storage, RNG, hardening).
 - `privacy` (object): Privacy features.
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
@@ -210,6 +212,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `bugBountyProgram` (`ResolvedFeature<Support<BugBountyProgramImplementation>>`)
   - `firmware` (`ResolvedFeature<FirmwareSupport>`)
   - `keysHandling` (`ResolvedFeature<WithRef<KeysHandlingSupport>>`)
+  - `securityBestPractices` (`ResolvedFeature<SecurityBestPracticesData>`)
   - `supplyChainDIY` (`ResolvedFeature<SupplyChainDIYSupport>`)
   - `supplyChainFactory` (`ResolvedFeature<SupplyChainFactorySupport>`)
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
@@ -2478,6 +2481,68 @@ type SecurityAudit = MustRef<{
 	 */
 	unpatchedFlaws: 'NONE_FOUND' | 'ALL_FIXED' | NonEmptyArray<UnpatchedSecurityFlaw>
 }>
+```
+
+---
+
+## `src/schema/features/security/security-best-practices.ts`
+
+### Enum: `KeyStorageMechanism`
+
+How the wallet stores the user's private key.
+
+- `ENCRYPTED_WITH_USER_SECRET` = `'ENCRYPTED_WITH_USER_SECRET'`: The key is encrypted with a user-known secret (password, PIN, or biometric-unlocked keychain entry) before being stored on disk.
+- `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
+- `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
+- `NO_KEY_STORED` = `'NO_KEY_STORED'`: No private key is stored on the device — the wallet uses passkey-managed smart contract accounts where signing happens through the OS passkey API.
+
+---
+
+### Enum: `SecureRngSource`
+
+The entropy source used when generating the wallet's private key or seed.
+
+- `OS_CSPRNG` = `'OS_CSPRNG'`: OS-provided CSPRNG: crypto.getRandomValues() in browsers, /dev/urandom on POSIX.
+- `HARDWARE_ENTROPY` = `'HARDWARE_ENTROPY'`: Dedicated hardware entropy source (e.g. TRNG chip).
+- `LIBRARY_RNG` = `'LIBRARY_RNG'`: A library-provided RNG whose quality is not independently verified.
+
+---
+
+### Interface: `BrowserExtensionHardening`
+
+Security hardening applied to a browser extension deployment.
+
+- `minimalPermissions` (`boolean`): The extension requests only the minimum host permissions needed for its functionality, avoiding overbroad `<all_urls>` or similar grants.
+- `lockedDownAccessibleResources` (`boolean`): The `web_accessible_resources` manifest field is either absent or restricted to specific origins, preventing other web pages from loading internal extension resources.
+
+---
+
+### Interface: `MobileAppHardening`
+
+Security hardening applied to a mobile app deployment.
+
+- `minimalPermissions` (`boolean`): The app declares only the OS permissions it actually requires, without requesting broad access to contacts, location, etc.
+- `usesKeystoreOrEnclave` (`boolean`): The app uses Android Keystore or iOS Secure Enclave for key operations, hardware-backing cryptographic material where available.
+
+---
+
+### Interface: `SecurityBestPracticesSupport`
+
+Security best-practices data for a wallet. Identifies how keys are stored, how entropy is sourced, and whether deployment-environment hardening is applied.
+
+- `keyStorageMechanism` (`KeyStorageMechanism`): How the wallet stores the user's private key.
+- `secureRng` (`SecureRngSource`): The entropy source used during key / seed generation.
+- `browserExtensionHardening` (`BrowserExtensionHardening | null`): Browser extension hardening details. Set to null if the wallet does not have a browser extension variant.
+- `mobileAppHardening` (`MobileAppHardening | null`): Mobile app hardening details. Set to null if the wallet does not have a mobile app variant.
+
+---
+
+### Type: `SecurityBestPracticesData`
+
+A referenced record of security best-practices data.
+
+```typescript
+type SecurityBestPracticesData = WithRef<SecurityBestPracticesSupport>
 ```
 
 ---
