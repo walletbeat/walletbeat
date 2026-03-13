@@ -144,11 +144,12 @@ export const gridplusWallet: HardwareWallet = {
 					{
 						explanation:
 							'The Lattice1 generates and stores key material entirely on-device. Full BIP-32, BIP-39, and BIP-44 derivation standards are supported, along with custom derivation paths.',
-						url: 'https://docs.gridplus.io/safecards/introduction-to-safecards',
+						url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
 					},
 				],
 				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
 				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+				// Source: gridplus team responses fileverse document
 			}),
 			lightClient: {
 				ethereumL1: null,
