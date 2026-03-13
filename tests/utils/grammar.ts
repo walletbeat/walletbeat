@@ -60,7 +60,7 @@ let harperLinter: harper.LocalLinter | null = null
 async function getHarperLinter(): Promise<harper.LocalLinter> {
 	if (harperLinter === null) {
 		harperLinter = new harper.LocalLinter({
-			binary: harper.binary,
+			binary: harper.binaryInlined,
 		})
 		await prepareHarperLinter(harperLinter)
 	}
