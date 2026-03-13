@@ -77,12 +77,12 @@ import {
 	hardwareWalletSupport,
 	type HardwareWalletSupportValue,
 } from './attributes/security/hardware-wallet-support'
-import {
-	passkeyImplementation,
-	type PasskeyImplementationValue,
-} from './attributes/security/passkey-implementation'
 import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
 import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
+import {
+	securityBestPractices,
+	type SecurityBestPracticesValue,
+} from './attributes/security/security-best-practices'
 import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy'
 import {
 	supplyChainFactory,
@@ -137,7 +137,7 @@ type SecurityValues = Dict<{
 	chainVerification: ChainVerificationValue
 	transactionLegibility: TransactionLegibilityValue
 	hardwareWalletSupport: HardwareWalletSupportValue
-	passkeyImplementation: PasskeyImplementationValue
+	securityBestPractices: SecurityBestPracticesValue
 	bugBountyProgram: BugBountyProgramValue
 	supplyChainDIY: SupplyChainDIYValue
 	supplyChainFactory: SupplyChainFactoryValue
@@ -158,7 +158,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		chainVerification,
 		transactionLegibility,
 		hardwareWalletSupport,
-		passkeyImplementation,
+		securityBestPractices,
 		bugBountyProgram,
 		supplyChainDIY,
 		supplyChainFactory,
@@ -172,7 +172,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		chainVerification: 1.0,
 		transactionLegibility: 1.0,
 		hardwareWalletSupport: 1.0,
-		passkeyImplementation: 1.0,
+		securityBestPractices: 1.0,
 		bugBountyProgram: 1.0,
 		supplyChainDIY: 1.0,
 		supplyChainFactory: 1.0,
@@ -353,7 +353,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
-	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
+	securityBestPractices: EvaluatedAttribute<SecurityBestPracticesValue>
 	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
 	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYValue>
 	supplyChainFactory: EvaluatedAttribute<SupplyChainFactoryValue>
@@ -456,7 +456,7 @@ export function evaluateAttributes(
 			chainVerification: evalAttr(chainVerification),
 			transactionLegibility: evalAttr(transactionLegibility),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
-			passkeyImplementation: evalAttr(passkeyImplementation),
+			securityBestPractices: evalAttr(securityBestPractices),
 			bugBountyProgram: evalAttr(bugBountyProgram),
 			supplyChainDIY: evalAttr(supplyChainDIY),
 			supplyChainFactory: evalAttr(supplyChainFactory),
@@ -529,7 +529,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			chainVerification: attr(tree => tree.security.chainVerification),
 			transactionLegibility: attr(tree => tree.security.transactionLegibility),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
-			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
+			securityBestPractices: attr(tree => tree.security.securityBestPractices),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
 			supplyChainDIY: attr(tree => tree.security.supplyChainDIY),
 			supplyChainFactory: attr(tree => tree.security.supplyChainFactory),
