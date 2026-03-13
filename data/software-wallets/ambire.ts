@@ -592,6 +592,7 @@ export const ambire: SoftwareWallet = {
 					userWhitelist: false, // address book is no sufficient in functionality for this flag
 				}),
 			},
+			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {

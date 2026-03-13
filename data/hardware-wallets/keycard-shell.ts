@@ -157,7 +157,6 @@ export const keycardShell: HardwareWallet = {
 				silentUpdateProtection: FirmwareType.PASS,
 				url: 'https://github.com/keycard-tech/keycard-shell',
 			},
-			// Keys handling: generated on-device (Keycard smartcard), BIP-32 HD wallet, no multiparty
 			keysHandling: {
 				ref: [
 					{
@@ -189,6 +188,8 @@ export const keycardShell: HardwareWallet = {
 				},
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
+			// Keys handling: generated on-device (Keycard smartcard), BIP-32 HD wallet, no multiparty
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			// Transaction legibility: QR-based signing via ERC-4527
