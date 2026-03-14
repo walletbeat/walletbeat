@@ -31,6 +31,7 @@ import {
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -83,7 +84,9 @@ export const gridplusWallet: HardwareWallet = {
 				[SoftwareWalletType.OTHER]: true,
 			},
 		}),
-		licensing: null,
+		// GridPlus confirmed that the firmware source code is not publicly published.
+		// Source: GridPlus team response — "The firmware code is not publicly published."
+		licensing: fullyClosedSource,
 		monetization: {
 			ref: [
 				{
