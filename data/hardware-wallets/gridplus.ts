@@ -113,7 +113,7 @@ export const gridplusWallet: HardwareWallet = {
 					{
 						explanation:
 							'GridPlus does not implement telemetry and does not collect, store, sell, or share user data.',
-						url: 'https://gridplus.io/policies/privacy-policy',
+						url: 'https://gridplus.io/privacy',
 					},
 				],
 				inspectableRemoteCalls: HardwarePrivacyType.PARTIAL,
@@ -121,7 +121,7 @@ export const gridplusWallet: HardwareWallet = {
 				wirelessPrivacy: HardwarePrivacyType.PARTIAL,
 				// Source: gridplus team responses fileverse document
 			}),
-			privacyPolicy: 'https://gridplus.io/policies/privacy-policy',
+			privacyPolicy: 'https://gridplus.io/privacy',
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,
