@@ -1654,6 +1654,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '51248182cd2888bd0982b46b288742f3b649ebdd',
 		retrieved: '2026-03-08',
 	},
+	{
+		url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
+		urlHash: '252cb65a18ddd62cb42a77e66e414a7a4538fc05',
+		retrieved: '2026-03-13',
+	},
 ]
 
 /**

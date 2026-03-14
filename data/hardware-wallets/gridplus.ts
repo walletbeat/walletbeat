@@ -14,6 +14,10 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	BasicBenchmarkTransactions,
@@ -135,7 +139,18 @@ export const gridplusWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.FAIL,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
-			keysHandling: null,
+			keysHandling: supported({
+				ref: [
+					{
+						explanation:
+							'The Lattice1 generates and stores key material entirely on-device. Full BIP-32, BIP-39, and BIP-44 derivation standards are supported, along with custom derivation paths.',
+						url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+				// Source: gridplus team responses fileverse document
+			}),
 			lightClient: {
 				ethereumL1: null,
 			},
