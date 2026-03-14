@@ -121,7 +121,18 @@ export const gridplusWallet: HardwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			// GridPlus does not implement guardian-based (social) recovery.
+			// However, the Lattice1 does provide SafeCards which are PIN-protected smart cards
+			// that serve as encrypted hardware backups of the user's seed phrase.
+			// Users can create as many SafeCard backups as they like, and seed recovery
+			// is possible using GridPlus's open-source software with a USB card
+			// reader, without requiring GridPlus hardware.
+			// See: https://docs.gridplus.io/safecards/introduction-to-safecards
+			// This does not qualify as guardian-based recovery under Walletbeat's schema,
+			// but it does mitigate seed phrase loss for users.
+			accountRecovery: {
+				guardianRecovery: notSupported,
+			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,
