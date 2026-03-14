@@ -1660,10 +1660,10 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-13',
 	},
 	{
-	url: 'https://pitchbook.com/profiles/company/184644-55',
-	urlHash: '09c6e4d8ca088971bd6f5b05f5eca6641c5f81e3',
-	retrieved: '2026-03-14',
-},
+		url: 'https://pitchbook.com/profiles/company/184644-55',
+		urlHash: '09c6e4d8ca088971bd6f5b05f5eca6641c5f81e3',
+		retrieved: '2026-03-14',
+	},
 ]
 
 /**
