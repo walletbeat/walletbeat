@@ -50,11 +50,11 @@ jobs:
         env:
           DEPLOY_DIRECTORY: dist
           OMNIPIN_4EVERLAND_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_4EVERLAND_ACCESS_TOKEN }}
-      # - name: Deploy to IPFS
-      #   run: ./deploy/deploy-omnipin.sh
-      #   env:
-      #     DEPLOY_DIRECTORY: dist
-      #     OMNIPIN_FILECOIN_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
+      - name: Deploy to IPFS
+        run: ./deploy/deploy-omnipin.sh
+        env:
+          DEPLOY_DIRECTORY: dist
+          OMNIPIN_FILECOIN_TOKEN: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
       - name: Check site data availability on IPFS gateways
         run: ./deploy/ping-gateways.sh
         env:
@@ -66,5 +66,5 @@ jobs:
           DEPLOY_DIRECTORY: dist
           BLUMEN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
           OMNIPIN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
-          BLUMEN_OR_OMNIPIN: blumen
+          BLUMEN_OR_OMNIPIN: omnipin
           SKIP_HELIOS: 'false'
