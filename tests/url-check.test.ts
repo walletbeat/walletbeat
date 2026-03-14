@@ -1659,6 +1659,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '252cb65a18ddd62cb42a77e66e414a7a4538fc05',
 		retrieved: '2026-03-13',
 	},
+	{
+	url: 'https://pitchbook.com/profiles/company/184644-55',
+	urlHash: '09c6e4d8ca088971bd6f5b05f5eca6641c5f81e3',
+	retrieved: '2026-03-14',
+},
 ]
 
 /**
