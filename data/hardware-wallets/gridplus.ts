@@ -6,6 +6,10 @@ import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import {
+	type HardwarePrivacyImplementation,
+	HardwarePrivacyType,
+} from '@/schema/features/privacy/hardware-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -103,8 +107,21 @@ export const gridplusWallet: HardwareWallet = {
 		multiAddress: null,
 		privacy: {
 			dataCollection: null,
-			hardwarePrivacy: null,
-			privacyPolicy: 'https://gridplus.io/privacy',
+			hardwarePrivacy: supported<HardwarePrivacyImplementation>({
+				type: HardwarePrivacyType.PARTIAL,
+				ref: [
+					{
+						explanation:
+							'GridPlus does not implement telemetry and does not collect, store, sell, or share user data.',
+						url: 'https://gridplus.io/policies/privacy-policy',
+					},
+				],
+				inspectableRemoteCalls: HardwarePrivacyType.PARTIAL,
+				phoningHome: HardwarePrivacyType.PASS,
+				wirelessPrivacy: HardwarePrivacyType.PARTIAL,
+				// Source: gridplus team responses fileverse document
+			}),
+			privacyPolicy: 'https://gridplus.io/policies/privacy-policy',
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,
