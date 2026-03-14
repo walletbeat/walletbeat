@@ -109,16 +109,11 @@ export const gridplusWallet: HardwareWallet = {
 			dataCollection: null,
 			hardwarePrivacy: supported<HardwarePrivacyImplementation>({
 				type: HardwarePrivacyType.PARTIAL,
-				ref: [
-					{
-						explanation:
-							'GridPlus does not implement telemetry and does not collect, store, sell, or share user data.',
-						url: 'https://gridplus.io/privacy',
-					},
-				],
+				ref: refTodo,
 				inspectableRemoteCalls: HardwarePrivacyType.PARTIAL,
 				phoningHome: HardwarePrivacyType.PASS,
 				wirelessPrivacy: HardwarePrivacyType.PARTIAL,
+				// GridPlus is a privacy-first company that does not implement telemetry. We do not store, sell, or share user data. At the point of sale we do collect customer shipping information so that the package can reach its destination. We then destroy this data within six months. The initial period is required for regulatory compliance purposes.
 				// Source: gridplus team responses fileverse document
 			}),
 			privacyPolicy: 'https://gridplus.io/privacy',
