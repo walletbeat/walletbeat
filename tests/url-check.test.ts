@@ -1681,6 +1681,7 @@ const URLS_TO_SKIP = [
 	'reddit.com',
 	'tiktok.com',
 	'web3.bitget.com',
+	'gridplus.io',
 ]
 
 const newValidUrls: string[] = []
