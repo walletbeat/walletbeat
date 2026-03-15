@@ -1,6 +1,7 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
+import { AccountType } from '@/schema/features/account-support'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
@@ -71,7 +72,36 @@ export const gridplusWallet: HardwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupported,
+			eoa: supported({
+				ref: [
+					{
+						explanation:
+							'The Lattice1 supports full BIP-32, BIP-39, and BIP-44 key derivation standards, along with custom derivation paths and non-standard formats such as Ledger Live, Ledger Legacy, and Solflare/Ledger derivation paths for Solana.',
+						url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
+					},
+				],
+				// The Lattice1 is not capable of exporting private keys by design.
+				// SafeCards can export individual key pairs via open-source software.
+				// Source: GridPlus team responses; https://docs.gridplus.io/safecards/introduction-to-safecards
+				canExportPrivateKey: false,
+				keyDerivation: {
+					type: 'BIP32',
+					// Seed phrase is viewable on-device with PIN entry and can be backed up to SafeCards.
+					// Individual key pairs can be exported via SafeCard + open-source software + USB card reader.
+					// The device itself cannot export the master key pair.
+					// Source: GridPlus team responses; https://docs.gridplus.io/safecards/introduction-to-safecards
+					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
 			requiresManufacturerConsent: null,
