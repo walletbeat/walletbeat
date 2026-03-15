@@ -60,22 +60,14 @@ export const safe: SoftwareWallet = {
 			}),
 			safe: supported({
 				ref: refNotNecessary,
-				canDeployNew: supported({
-					defaultConfig: {
-						modules: [],
-						owners: 1,
-						threshold: 1,
-					},
-				}),
+				canDeployNew: true,
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 				supportedConfigs: {
-					maxOwners: 'unlimited',
-					minOwners: 1,
-					moduleSupport: 'full',
-					supportsAnyThreshold: true,
+					owners: 'ANY_NUMBER_OF_SIGNERS',
 				},
+				supportsAddingOrRemovingSigners: true,
 				supportsKeyRotationWithoutModules: true,
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
