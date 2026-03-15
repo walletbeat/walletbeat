@@ -64,9 +64,7 @@ export const safe: SoftwareWallet = {
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				supportedConfigs: {
-					owners: 'ANY_NUMBER_OF_SIGNERS',
-				},
+				owners: 'ANY_NUMBER_OF_SIGNERS',
 				supportsAddingOrRemovingSigners: true,
 				supportsKeyRotationWithoutModules: true,
 				tokenTransferTransactionGeneration:
