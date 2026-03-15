@@ -287,41 +287,37 @@ export type AccountType7702 = SmartAccountType
  * Support information for Safe multisig accounts.
  *
  * To test:
- * - `canDeployNew`: Go through the wallet's UI to create a new Safe and
- *   observe the default owner count and threshold.
+ * - `canDeployNew`: Go through the wallet's UI and check whether it offers
+ *   a flow to deploy a new Safe contract.
+ * - `supportsAddingOrRemovingSigners`: In an existing Safe, attempt to add
+ *   or remove an owner using only the wallet's native UI (no extra modules).
+ *   Check whether the wallet generates the `addOwnerWithThreshold` /
+ *   `removeOwner` transaction directly.
  * - `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
- *   add or remove an owner using only the wallet's native UI (no extra
- *   modules). Check whether the wallet generates the `addOwnerWithThreshold`
- *   / `removeOwner` transaction directly.
- * - `supportedConfigs`: Try connecting the wallet to Safes with 1, 2, and
- *   many owners at various thresholds, and note the limits.
+ *   replace an owner key using only the wallet's native UI (no extra
+ *   modules). Check whether the wallet generates the `swapOwner` transaction
+ *   directly.
+ * - `supportedConfigs.owners`: Try connecting the wallet to Safes with 1,
+ *   2, and many owners and note the limits.
  */
 export interface AccountTypeSafe extends AccountTypeMutableMultifactor {
 	/** Can the wallet deploy new Safe contracts? */
-	canDeployNew: Support<{
-		/** Default configuration when creating a new Safe. */
-		defaultConfig: {
-			/** Number of owners by default. */
-			owners: number
-			/** Signature threshold by default. */
-			threshold: number
-			/** Enabled modules by default. */
-			modules: string[] // or more specific type if needed
-		}
-	}>
+	canDeployNew: boolean
+
+	/** Does the wallet support adding or removing signers without additional modules? */
+	supportsAddingOrRemovingSigners: boolean
 
 	/** Does the wallet support key rotation without additional modules? */
 	supportsKeyRotationWithoutModules: boolean
 
-	/** Supported configurations for existing Safes. */
+	/** Supported signer configurations for existing Safes. */
 	supportedConfigs: {
-		/** Minimum number of owners supported. */
-		minOwners: number
-		/** Maximum number of owners supported (or 'unlimited'). */
-		maxOwners: number | 'unlimited'
-		/** Whether any threshold is supported. */
-		supportsAnyThreshold: boolean
-		/** Level of module support. */
-		moduleSupport: 'none' | 'partial' | 'full'
+		/**
+		 * Range of signers (owners) the wallet can work with.
+		 * - SINGLE_SIGNER: only single-owner Safes are supported.
+		 * - MULTI_SIGNER: multiple owners are supported but with a cap.
+		 * - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
+		 */
+		owners: 'SINGLE_SIGNER' | 'MULTI_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'
 	}
 }
