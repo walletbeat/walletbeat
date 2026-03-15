@@ -421,22 +421,28 @@ Support information for Safe multisig accounts.
 
 To test:
 
-- `canDeployNew`: Go through the wallet's UI to create a new Safe and
-  observe the default owner count and threshold.
+- `canDeployNew`: Go through the wallet's UI and check whether it offers
+  a flow to deploy a new Safe contract.
+- `supportsAddingOrRemovingSigners`: In an existing Safe, attempt to add
+  or remove an owner using only the wallet's native UI (no extra modules).
+  Check whether the wallet generates the `addOwnerWithThreshold` /
+  `removeOwner` transaction directly.
 - `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
-  add or remove an owner using only the wallet's native UI (no extra
-  modules). Check whether the wallet generates the `addOwnerWithThreshold`
-  / `removeOwner` transaction directly.
-- `supportedConfigs`: Try connecting the wallet to Safes with 1, 2, and
-  many owners at various thresholds, and note the limits.
+  replace an owner key using only the wallet's native UI (no extra
+  modules). Check whether the wallet generates the `swapOwner` transaction
+  directly.
+- `supportedConfigs.owners`: Try connecting the wallet to Safes with 1,
+  2, and many owners and note the limits.
 
-- `canDeployNew` (`Support<{ defaultConfig: { owners: number threshold: number modules: string[] } }>`): Can the wallet deploy new Safe contracts?
+- `canDeployNew` (`boolean`): Can the wallet deploy new Safe contracts?
+- `supportsAddingOrRemovingSigners` (`boolean`): Does the wallet support adding or removing signers without additional modules?
 - `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
-- `supportedConfigs` (object): Supported configurations for existing Safes.
-  - `minOwners` (`number`): Minimum number of owners supported.
-  - `maxOwners` (`number | 'unlimited'`): Maximum number of owners supported (or 'unlimited').
-  - `supportsAnyThreshold` (`boolean`): Whether any threshold is supported.
-  - `moduleSupport` (`'none' | 'partial' | 'full'`): Level of module support.
+- `supportedConfigs` (object): Supported signer configurations for existing Safes.
+  - `owners` (`'SINGLE_SIGNER' | 'MULTI_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
+
+  - SINGLE_SIGNER: only single-owner Safes are supported.
+  - MULTI_SIGNER: multiple owners are supported but with a cap.
+  - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
 
 ---
 
