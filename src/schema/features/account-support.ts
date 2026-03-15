@@ -310,14 +310,10 @@ export interface AccountTypeSafe extends AccountTypeMutableMultifactor {
 	/** Does the wallet support key rotation without additional modules? */
 	supportsKeyRotationWithoutModules: boolean
 
-	/** Supported signer configurations for existing Safes. */
-	supportedConfigs: {
-		/**
-		 * Range of signers (owners) the wallet can work with.
-		 * - SINGLE_SIGNER: only single-owner Safes are supported.
-		 * - MULTI_SIGNER: multiple owners are supported but with a cap.
-		 * - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
-		 */
-		owners: 'SINGLE_SIGNER' | 'MULTI_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'
-	}
+	/**
+	 * Range of signers (owners) the wallet can work with.
+	 * - SINGLE_SIGNER: only single-owner Safes are supported.
+	 * - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
+	 */
+	owners: 'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'
 }
