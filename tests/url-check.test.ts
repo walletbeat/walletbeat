@@ -345,11 +345,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-10-31',
 	},
 	{
-		url: 'https://gridplus.io/',
-		urlHash: '389499f1fe64edb548b5573070def41538035f30',
-		retrieved: '2025-10-31',
-	},
-	{
 		url: 'https://imkey.im/',
 		urlHash: 'a48c5da2453ffb4f5e7ba1f3f9c46bd30e1de5b9',
 		retrieved: '2025-11-05',
@@ -470,11 +465,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2025-12-08',
 	},
 	{
-		url: 'https://docs.gridplus.io/',
-		urlHash: 'cdfc6a061a08caeac0d94f0b8cca8838eaee8ee1',
-		retrieved: '2025-12-08',
-	},
-	{
 		url: 'https://support.keyst.one/',
 		urlHash: '22b43ad06c2e7bce190b83158055f30bcf2f6a8d',
 		retrieved: '2025-12-08',
@@ -577,11 +567,6 @@ const knownValidUrls: KnownValidUrl[] = [
 	{
 		url: 'https://www.youtube.com/watch?v=R0g35dKjRtI',
 		urlHash: '18accfdc98d7db3fe8da0d329de0fc07f01d0288',
-		retrieved: '2025-12-09',
-	},
-	{
-		url: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
-		urlHash: '5a4fcf1a9f5962726e0276ecfb9ac3b8ae9f8a5a',
 		retrieved: '2025-12-09',
 	},
 	{
@@ -1315,11 +1300,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-08',
 	},
 	{
-		url: 'https://docs.gridplus.io/resources/bug-bounty-and-responsible-disclosure-policy',
-		urlHash: 'bd1e6e8e81ced4d85f525acfb2d708c95d922c66',
-		retrieved: '2026-03-08',
-	},
-	{
 		url: 'https://www.prnewswire.com/news-releases/gridplus-sets-a-new-standard-for-blockchain-security-with-the-release-of-the-enterprise-grade-lattice1-wireless-hardware-wallet-301186849.html',
 		urlHash: '6af1a91973f9601305e3ef23402a564c524dc1e9',
 		retrieved: '2026-03-08',
@@ -1653,11 +1633,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://www.businesswire.com/news/home/20210609005985/en/Ledger-completes-a-%24380-million-Series-C-fundraising-valuing-the-company-at-more-than-%241.5-billion-to-strengthen-its-position-as-the-leading-secure-gateway-to-digital-assets',
 		urlHash: '51248182cd2888bd0982b46b288742f3b649ebdd',
 		retrieved: '2026-03-08',
-	},
-	{
-		url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
-		urlHash: '252cb65a18ddd62cb42a77e66e414a7a4538fc05',
-		retrieved: '2026-03-13',
 	},
 	{
 		url: 'https://pitchbook.com/profiles/company/184644-55',
