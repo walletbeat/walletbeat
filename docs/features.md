@@ -437,7 +437,7 @@ To test:
 - `canDeployNew` (`boolean`): Can the wallet deploy new Safe contracts?
 - `supportsAddingOrRemovingSigners` (`boolean`): Does the wallet support adding or removing signers without additional modules?
 - `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
-- `owners` (`'SINGLE_SIGNER' | 'MULTI_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
+- `supportedOwners` (`'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
   - SINGLE_SIGNER: only single-owner Safes are supported.
   - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
 

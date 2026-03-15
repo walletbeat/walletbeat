@@ -124,7 +124,7 @@ export const rabby: SoftwareWallet = {
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				owners: 'ANY_NUMBER_OF_SIGNERS',
+				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
 				supportsAddingOrRemovingSigners: true,
 				supportsKeyRotationWithoutModules: true,
 				tokenTransferTransactionGeneration:

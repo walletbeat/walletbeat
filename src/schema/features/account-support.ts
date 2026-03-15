@@ -315,5 +315,5 @@ export interface AccountTypeSafe extends AccountTypeMutableMultifactor {
 	 * - SINGLE_SIGNER: only single-owner Safes are supported.
 	 * - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
 	 */
-	owners: 'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'
+	supportedOwners: 'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'
 }
