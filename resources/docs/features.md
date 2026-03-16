@@ -45,6 +45,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/security/transaction-legibility.ts`](#srcschemafeaturessecuritytransaction-legibilityts)
 - [`src/schema/features/security/user-safety.ts`](#srcschemafeaturessecurityuser-safetyts)
 - [`src/schema/features/self-sovereignty/chain-configurability.ts`](#srcschemafeaturesself-sovereigntychain-configurabilityts)
+- [`src/schema/features/self-sovereignty/delegated-spending-control.ts`](#srcschemafeaturesself-sovereigntydelegated-spending-controlts)
 - [`src/schema/features/self-sovereignty/interoperability.ts`](#srcschemafeaturesself-sovereigntyinteroperabilityts)
 - [`src/schema/features/self-sovereignty/transaction-submission.ts`](#srcschemafeaturesself-sovereigntytransaction-submissionts)
 - [`src/schema/features/support.ts`](#srcschemafeaturessupportts)
@@ -118,6 +119,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
+		delegatedSpendingControl: VariantFeature<Support<DelegatedSpendingControlSupport>>
 	}
 
 	/** Ecosystem features. */
@@ -223,6 +225,7 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `selfSovereignty` (object)
   - `transactionSubmission` (`ResolvedFeature<TransactionSubmission>`)
   - `interoperability` (`ResolvedFeature<InteroperabilitySupport>`)
+  - `delegatedSpendingControl` (`ResolvedFeature<Support<DelegatedSpendingControlSupport>>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
   - `reputation` (`ResolvedFeature<ReputationSupport>`)
@@ -3001,6 +3004,33 @@ Customization options that exist for chains.
 - `l1` (`Support<SingleChainConfigurability & SelfHostedNodeL1BasicOperationsSupport>`): Does the wallet support using Ethereum L1 at all? To test: check if the wallet lists Ethereum mainnet as an available network and can send transactions on it.
 - `nonL1` (`Support<SingleChainConfigurability>`): Does the wallet support non-L1 Ethereum chains? (e.g. The wallet allows switching to or adding Arbitrum, Base, Optimism, or other L2s.)
 - `customChainRpcEndpoint` (`Support`): Does the wallet support adding custom chains? (e.g. The wallet has an "Add network" option where you can input a custom chain ID, RPC URL, and currency symbol — beyond just editing existing chains.)
+
+---
+
+## `src/schema/features/self-sovereignty/delegated-spending-control.ts`
+
+### Interface: `Erc20ApprovalsControl`
+
+- `canInspectTokenApprovals` (`boolean`): Can the user inspect existing token approvals through the wallet?
+- `canRevokeTokenApprovals` (`boolean`): Can the user revoke an existing token approval through the wallet?
+
+---
+
+### Interface: `DelegatedSpendingControl`
+
+How the wallet helps users inspect, constrain, and revoke delegated spending authority.
+
+In v1, only ERC-20 approvals may be rated. Additional mechanisms such as smart-account spending limits and revocable pre-authorized payments can be added over time.
+
+- `erc20Approvals` (`Erc20ApprovalsControl`): ERC-20 token approvals granted to contracts.
+
+---
+
+### Type: `DelegatedSpendingControlSupport`
+
+```typescript
+type DelegatedSpendingControlSupport = WithRef<DelegatedSpendingControl>
+```
 
 ---
 
