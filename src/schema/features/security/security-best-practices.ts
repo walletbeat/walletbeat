@@ -221,32 +221,40 @@ export interface MobileAppManifest {
 }
 
 /**
- * Security best-practices data for a wallet.
- * Identifies how keys are stored, how entropy is sourced, and whether
- * deployment-environment hardening is applied.
+ * Security best-practices fields.
  */
-export interface SecurityBestPractices {
+export interface SecurityBestPracticesBase {
 	/** How the wallet stores the user's private key. */
 	keyStorageMechanism: KeyStorageMechanism
 
 	/** The entropy source used during key generation. */
 	secureRng: SecureRngSource
-
-	/**
-	 * Browser extension hardening details.
-	 * Set to 'NOT_A_BROWSER_EXTENSION' if the wallet has no browser extension
-	 * variant.
-	 */
-	browserExtensionHardening: BrowserExtensionManifest | 'NOT_A_BROWSER_EXTENSION'
-
-	/**
-	 * Mobile app hardening details.
-	 * Set to 'NOT_A_MOBILE_APP' if the wallet has no mobile app variant.
-	 */
-	mobileAppHardening: MobileAppManifest | 'NOT_A_MOBILE_APP'
 }
 
 /**
- * A referenced record of security best-practices data.
+ * Security best-practices for the browser extension variant.
  */
-export type SecurityBestPracticesData = WithRef<SecurityBestPractices>
+export interface BrowserSecurityBestPractices extends SecurityBestPracticesBase {
+	browserExtensionHardening: BrowserExtensionManifest
+}
+
+/**
+ * Security best-practices for the mobile app variant.
+ */
+export interface MobileSecurityBestPractices extends SecurityBestPracticesBase {
+	mobileAppHardening: MobileAppManifest
+}
+
+/**
+ * Security best-practices data for a wallet, broken down by variant.
+ */
+export interface SecurityBestPracticesData {
+	/** Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent. */
+	browser: WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION'
+
+	/** Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent. */
+	mobile: WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP'
+
+	/** Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent. */
+	desktop: WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP'
+}
