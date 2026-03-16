@@ -106,7 +106,7 @@ export interface WalletBaseFeatures {
 		keysHandling: VariantFeature<WithRef<KeysHandlingSupport>>
 
 		/** Security best practices (key storage, RNG, hardening). */
-		securityBestPractices: VariantFeature<SecurityBestPracticesData>
+		securityBestPractices: SecurityBestPracticesData | null
 	}
 
 	/** Privacy features. */
@@ -447,10 +447,7 @@ export function resolveFeatures(
 			),
 			firmware: hardwareFeat('security.firmware', features => features.security.firmware),
 			keysHandling: baseFeat('security.keysHandling', features => features.security.keysHandling),
-			securityBestPractices: baseFeat(
-				'security.securityBestPractices',
-				features => features.security.securityBestPractices,
-			),
+			securityBestPractices: features.security.securityBestPractices,
 			supplyChainDIY: hardwareFeat(
 				'security.supplyChainDIY',
 				features => features.security.supplyChainDIY,
