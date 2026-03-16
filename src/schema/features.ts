@@ -35,6 +35,7 @@ import type {
 } from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
+import type { DelegatedSpendingControlSupport } from './features/self-sovereignty/delegated-spending-control'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
 import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
 import type { Support } from './features/support'
@@ -176,6 +177,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
+		delegatedSpendingControl: VariantFeature<Support<DelegatedSpendingControlSupport>>
 	}
 
 	/** Ecosystem features. */
@@ -320,6 +322,7 @@ export interface ResolvedFeatures {
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
 		interoperability: ResolvedFeature<InteroperabilitySupport>
+		delegatedSpendingControl: ResolvedFeature<Support<DelegatedSpendingControlSupport>>
 	}
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>
@@ -480,6 +483,10 @@ export function resolveFeatures(
 					'selfSovereignty.transactionSubmission',
 					features => features.selfSovereignty.transactionSubmission,
 				),
+			),
+			delegatedSpendingControl: softwareFeat(
+				'selfSovereignty.delegatedSpendingControl',
+				features => features.selfSovereignty.delegatedSpendingControl,
 			),
 			interoperability: hardwareFeat(
 				'selfSovereignty.interoperability',
