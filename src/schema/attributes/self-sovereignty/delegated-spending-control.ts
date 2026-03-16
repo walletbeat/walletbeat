@@ -8,7 +8,7 @@ import {
 	Verifiability,
 } from '@/schema/attributes'
 import type { DelegatedSpendingControlSupport } from '@/schema/features/self-sovereignty/delegated-spending-control'
-import { isSupported, notSupported, supported, type Support } from '@/schema/features/support'
+import { isSupported, notSupported, type Support, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 
