@@ -102,6 +102,10 @@ import {
 	type AccountUnruggabilityValue,
 } from './attributes/self-sovereignty/account-unruggability'
 import {
+	delegatedSpendingControl,
+	type DelegatedSpendingControlValue,
+} from './attributes/self-sovereignty/delegated-spending-control'
+import {
 	interoperability,
 	type InteroperabilityValue,
 } from './attributes/self-sovereignty/interoperability'
@@ -217,6 +221,7 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 type SelfSovereigntyValues = Dict<{
 	l1ProviderIndependence: L1ProviderIndependence
 	accountPortability: AccountPortabilityValue
+	delegatedSpendingControl: DelegatedSpendingControlValue
 	transactionInclusion: TransactionInclusionValue
 	accountUnruggability: AccountUnruggabilityValue
 }>
@@ -234,12 +239,14 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 		accountPortability,
 		transactionInclusion,
 		accountUnruggability,
+		delegatedSpendingControl,
 	},
 	attributeWeights: {
 		l1ProviderIndependence: 1.0,
 		accountPortability: 1.0,
 		transactionInclusion: 1.0,
 		accountUnruggability: 1.0,
+		delegatedSpendingControl: 1.0,
 	},
 }
 
@@ -476,6 +483,7 @@ export function evaluateAttributes(
 			accountPortability: evalAttr(accountPortability),
 			transactionInclusion: evalAttr(transactionInclusion),
 			accountUnruggability: evalAttr(accountUnruggability),
+			delegatedSpendingControl: evalAttr(delegatedSpendingControl),
 		},
 		transparency: {
 			openSource: evalAttr(openSource),
@@ -549,6 +557,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			accountPortability: attr(tree => tree.selfSovereignty.accountPortability),
 			transactionInclusion: attr(tree => tree.selfSovereignty.transactionInclusion),
 			accountUnruggability: attr(tree => tree.selfSovereignty.accountUnruggability),
+			delegatedSpendingControl: attr(tree => tree.selfSovereignty.delegatedSpendingControl),
 		},
 		transparency: {
 			openSource: attr(tree => tree.transparency.openSource),
