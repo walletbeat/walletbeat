@@ -215,7 +215,7 @@ export const bitget: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			delegatedSpendingControl: null,
+			permissionsManagement: null,
 			transactionSubmission: null,
 		},
 		transparency: {

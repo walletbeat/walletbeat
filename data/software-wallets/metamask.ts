@@ -557,7 +557,7 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
-			delegatedSpendingControl: null,
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

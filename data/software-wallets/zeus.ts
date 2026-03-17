@@ -293,7 +293,7 @@ export const zeus: SoftwareWallet = {
 			} as SoftwareTransactionLegibilityImplementation),
 		},
 		selfSovereignty: {
-			delegatedSpendingControl: null,
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: [
