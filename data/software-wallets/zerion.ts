@@ -154,6 +154,7 @@ export const zerion: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegatedSpendingControl: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
