@@ -35,8 +35,8 @@ import type {
 } from './features/security/transaction-legibility'
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
-import type { DelegatedSpendingControlSupport } from './features/self-sovereignty/delegated-spending-control'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
+import type { PermissionsManagementSupport } from './features/self-sovereignty/permissions-management'
 import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
 import type { Support } from './features/support'
 import type { BasicOperationFees } from './features/transparency/fee-display'
@@ -177,7 +177,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
-		delegatedSpendingControl: VariantFeature<Support<DelegatedSpendingControlSupport>>
+		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
 	}
 
 	/** Ecosystem features. */
@@ -322,7 +322,7 @@ export interface ResolvedFeatures {
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
 		interoperability: ResolvedFeature<InteroperabilitySupport>
-		delegatedSpendingControl: ResolvedFeature<Support<DelegatedSpendingControlSupport>>
+		permissionsManagement: ResolvedFeature<Support<PermissionsManagementSupport>>
 	}
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>
@@ -484,9 +484,9 @@ export function resolveFeatures(
 					features => features.selfSovereignty.transactionSubmission,
 				),
 			),
-			delegatedSpendingControl: softwareFeat(
-				'selfSovereignty.delegatedSpendingControl',
-				features => features.selfSovereignty.delegatedSpendingControl,
+			permissionsManagement: softwareFeat(
+				'selfSovereignty.permissionsManagement',
+				features => features.selfSovereignty.permissionsManagement,
 			),
 			interoperability: hardwareFeat(
 				'selfSovereignty.interoperability',
