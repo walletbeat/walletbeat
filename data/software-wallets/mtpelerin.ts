@@ -154,7 +154,7 @@ export const mtpelerin: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
-			delegatedSpendingControl: null,
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
