@@ -19,6 +19,17 @@ import { pickWorstRating, unrated } from '../common'
 
 export type PermissionsManagementValue = Value
 
+function describeStandard(control: SpendingApprovalsControl): string {
+	switch (control) {
+		case SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE:
+			return 'can be inspected and revoked'
+		case SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE:
+			return 'can be inspected but not revoked'
+		case SpendingApprovalsControl.CANNOT_INSPECT:
+			return 'cannot be inspected or revoked'
+	}
+}
+
 function worstControl(...controls: SpendingApprovalsControl[]): SpendingApprovalsControl {
 	if (controls.includes(SpendingApprovalsControl.CANNOT_INSPECT)) {
 		return SpendingApprovalsControl.CANNOT_INSPECT
@@ -55,11 +66,17 @@ function evaluate(
 		})
 	}
 
-	const worst = worstControl(
-		control.erc20Approvals,
-		control.erc721Approvals,
-		control.erc1155Approvals,
-	)
+	const { erc20Approvals, erc721Approvals, erc1155Approvals } = control
+	const worst = worstControl(erc20Approvals, erc721Approvals, erc1155Approvals)
+	const allSame = erc20Approvals === erc721Approvals && erc721Approvals === erc1155Approvals
+	const perStandardDetails = allSame
+		? null
+		: markdown(`
+			Per token standard:
+			- ERC-20 approvals: ${describeStandard(erc20Approvals)}
+			- ERC-721 approvals: ${describeStandard(erc721Approvals)}
+			- ERC-1155 approvals: ${describeStandard(erc1155Approvals)}
+		`)
 
 	if (worst === SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE) {
 		return ctx.build({
@@ -69,9 +86,11 @@ function evaluate(
 				displayName: 'Can inspect and revoke approvals',
 				shortExplanation: sentence('{{WALLET_NAME}} lets you inspect and revoke token approvals.'),
 			},
-			details: paragraph(
-				'{{WALLET_NAME}} allows you to view all existing token approvals granted to other addresses and revoke them directly from the wallet.',
-			),
+			details:
+				perStandardDetails ??
+				paragraph(
+					'{{WALLET_NAME}} allows you to view all existing token approvals granted to other addresses and revoke them directly from the wallet.',
+				),
 		})
 	}
 
@@ -85,9 +104,11 @@ function evaluate(
 					'{{WALLET_NAME}} lets you inspect token approvals but not revoke them.',
 				),
 			},
-			details: paragraph(
-				'{{WALLET_NAME}} shows existing token approvals granted to other addresses but does not provide a way to revoke them from within the wallet.',
-			),
+			details:
+				perStandardDetails ??
+				paragraph(
+					'{{WALLET_NAME}} shows existing token approvals granted to other addresses but does not provide a way to revoke them from within the wallet.',
+				),
 			howToImprove: paragraph(
 				'{{WALLET_NAME}} should add the ability to revoke token approvals directly.',
 			),
@@ -103,9 +124,11 @@ function evaluate(
 				'{{WALLET_NAME}} does not let you inspect or revoke token approvals.',
 			),
 		},
-		details: paragraph(
-			'{{WALLET_NAME}} provides no way to inspect or revoke token approvals granted to other addresses.',
-		),
+		details:
+			perStandardDetails ??
+			paragraph(
+				'{{WALLET_NAME}} provides no way to inspect or revoke token approvals granted to other addresses.',
+			),
 		impact: paragraph(
 			'Without the ability to inspect and revoke approvals, users are exposed to risks from unlimited or unnecessary token approvals granted to other addresses.',
 		),
