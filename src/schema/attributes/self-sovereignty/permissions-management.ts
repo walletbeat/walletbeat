@@ -139,6 +139,9 @@ export const permissionsManagement: Attribute<PermissionsManagementValue> = {
 		token approvals and revoke them directly from within the wallet interface.
 		ERC-20, ERC-721, and ERC-1155 approvals are each evaluated; the worst
 		result across all token standards determines the overall rating.
+		
+		As Account Abstraction becomes more prevalent, this methodology 
+		will also grow to encompass the management of more complex account permissions.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
