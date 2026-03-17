@@ -174,6 +174,7 @@ export const gemwallet: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			delegatedSpendingControl: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

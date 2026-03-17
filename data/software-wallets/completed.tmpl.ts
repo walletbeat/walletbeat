@@ -634,6 +634,13 @@ export const completedTemplate: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegatedSpendingControl: supported({
+				ref: refTodo,
+				erc20Approvals: {
+					canInspectTokenApprovals: true,
+					canRevokeTokenApprovals: true,
+				},
+			}),
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

@@ -150,6 +150,7 @@ export const phantom: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			delegatedSpendingControl: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

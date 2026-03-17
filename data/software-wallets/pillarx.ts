@@ -132,6 +132,7 @@ export const pillarx: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			delegatedSpendingControl: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
