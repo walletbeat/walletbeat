@@ -45,8 +45,8 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/security/transaction-legibility.ts`](#srcschemafeaturessecuritytransaction-legibilityts)
 - [`src/schema/features/security/user-safety.ts`](#srcschemafeaturessecurityuser-safetyts)
 - [`src/schema/features/self-sovereignty/chain-configurability.ts`](#srcschemafeaturesself-sovereigntychain-configurabilityts)
-- [`src/schema/features/self-sovereignty/delegated-spending-control.ts`](#srcschemafeaturesself-sovereigntydelegated-spending-controlts)
 - [`src/schema/features/self-sovereignty/interoperability.ts`](#srcschemafeaturesself-sovereigntyinteroperabilityts)
+- [`src/schema/features/self-sovereignty/permissions-management.ts`](#srcschemafeaturesself-sovereigntypermissions-managementts)
 - [`src/schema/features/self-sovereignty/transaction-submission.ts`](#srcschemafeaturesself-sovereigntytransaction-submissionts)
 - [`src/schema/features/support.ts`](#srcschemafeaturessupportts)
 - [`src/schema/features/transparency/fee-display.ts`](#srcschemafeaturestransparencyfee-displayts)
@@ -119,7 +119,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
-		delegatedSpendingControl: VariantFeature<Support<DelegatedSpendingControlSupport>>
+		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
 	}
 
 	/** Ecosystem features. */
@@ -225,7 +225,7 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `selfSovereignty` (object)
   - `transactionSubmission` (`ResolvedFeature<TransactionSubmission>`)
   - `interoperability` (`ResolvedFeature<InteroperabilitySupport>`)
-  - `delegatedSpendingControl` (`ResolvedFeature<Support<DelegatedSpendingControlSupport>>`)
+  - `permissionsManagement` (`ResolvedFeature<Support<PermissionsManagementSupport>>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
   - `reputation` (`ResolvedFeature<ReputationSupport>`)
@@ -3007,33 +3007,6 @@ Customization options that exist for chains.
 
 ---
 
-## `src/schema/features/self-sovereignty/delegated-spending-control.ts`
-
-### Interface: `Erc20ApprovalsControl`
-
-- `canInspectTokenApprovals` (`boolean`): Can the user inspect existing token approvals through the wallet?
-- `canRevokeTokenApprovals` (`boolean`): Can the user revoke an existing token approval through the wallet?
-
----
-
-### Interface: `DelegatedSpendingControl`
-
-How the wallet helps users inspect, constrain, and revoke delegated spending authority.
-
-In v1, only ERC-20 approvals may be rated. Additional mechanisms such as smart-account spending limits and revocable pre-authorized payments can be added over time.
-
-- `erc20Approvals` (`Erc20ApprovalsControl`): ERC-20 token approvals granted to contracts.
-
----
-
-### Type: `DelegatedSpendingControlSupport`
-
-```typescript
-type DelegatedSpendingControlSupport = WithRef<DelegatedSpendingControl>
-```
-
----
-
 ## `src/schema/features/self-sovereignty/interoperability.ts`
 
 ### Enum: `InteroperabilityType`
@@ -3058,6 +3031,36 @@ type DelegatedSpendingControlSupport = WithRef<DelegatedSpendingControl>
 
 ```typescript
 type InteroperabilityImplementation = WithRef<InteroperabilitySupport>
+```
+
+---
+
+## `src/schema/features/self-sovereignty/permissions-management.ts`
+
+### Enum: `SpendingApprovalsControl`
+
+The level of control a wallet provides over token approvals of a given standard.
+
+- `CANNOT_INSPECT` = `(auto)`: The wallet does not show any existing approvals or allow revoking them.
+- `CAN_INSPECT_BUT_NOT_REVOKE` = `(auto)`: The wallet shows existing approvals but does not allow revoking them.
+- `CAN_INSPECT_AND_REVOKE` = `(auto)`: The wallet shows existing approvals and allows revoking them directly.
+
+---
+
+### Interface: `PermissionsManagement`
+
+How the wallet helps users inspect, constrain, and revoke delegated spending authority.
+
+- `erc20Approvals` (`SpendingApprovalsControl`): ERC-20 token approvals granted to other addresses.
+- `erc721Approvals` (`SpendingApprovalsControl`): ERC-721 token approvals granted to other addresses.
+- `erc1155Approvals` (`SpendingApprovalsControl`): ERC-1155 token approvals granted to other addresses.
+
+---
+
+### Type: `PermissionsManagementSupport`
+
+```typescript
+type PermissionsManagementSupport = WithRef<PermissionsManagement>
 ```
 
 ---
