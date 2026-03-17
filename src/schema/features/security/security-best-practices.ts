@@ -74,6 +74,114 @@ export enum HostPermissionScope {
 }
 
 /**
+ * Security-sensitive Chrome Extension permission strings declared in the
+ * `permissions` manifest field. Values match the manifest string exactly.
+ */
+export enum ChromeExtensionPermission {
+	/** Access the currently active tab's URL, title, and favicon. */
+	ACTIVE_TAB = 'activeTab',
+
+	/** Read and modify browser bookmarks. */
+	BOOKMARKS = 'bookmarks',
+
+	/** Delete browsing data (history, cookies, cache). */
+	BROWSING_DATA = 'browsingData',
+
+	/** Read clipboard contents without a user gesture. */
+	CLIPBOARD_READ = 'clipboardRead',
+
+	/** Write to the clipboard without a user gesture. */
+	CLIPBOARD_WRITE = 'clipboardWrite',
+
+	/** Read and modify cookies for all accessible hosts. */
+	COOKIES = 'cookies',
+
+	/** Attach the Chrome debugger protocol to any tab. */
+	DEBUGGER = 'debugger',
+
+	/** Block or redirect network requests via declarativeNetRequest. */
+	DECLARATIVE_NET_REQUEST = 'declarativeNetRequest',
+
+	/** Block or redirect requests with host-based access. */
+	DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS = 'declarativeNetRequestWithHostAccess',
+
+	/** Capture the desktop, a window, or a tab as a media stream. */
+	DESKTOP_CAPTURE = 'desktopCapture',
+
+	/** Access the device's geographic location. */
+	GEOLOCATION = 'geolocation',
+
+	/** Read the full browsing history. */
+	HISTORY = 'history',
+
+	/** Access the user's Google Account identity (no email). */
+	IDENTITY = 'identity',
+
+	/** Access the user's Google Account email address. */
+	IDENTITY_EMAIL = 'identity.email',
+
+	/** List, enable, disable, or uninstall other extensions. */
+	MANAGEMENT = 'management',
+
+	/** Send and receive messages from a native OS application. */
+	NATIVE_MESSAGING = 'nativeMessaging',
+
+	/** Save a tab's full page as MHTML. */
+	PAGE_CAPTURE = 'pageCapture',
+
+	/** Read and modify browser privacy settings. */
+	PRIVACY = 'privacy',
+
+	/** Monitor and control the browser's network proxy settings. */
+	PROXY = 'proxy',
+
+	/** Inject scripts and CSS into pages programmatically. */
+	SCRIPTING = 'scripting',
+
+	/** Read the URLs, titles, and favicons of all open tabs. */
+	TABS = 'tabs',
+
+	/** Register user-supplied scripts that run in web pages. */
+	USER_SCRIPTS = 'userScripts',
+
+	/** Intercept WebAuthn requests on behalf of the extension. */
+	WEB_AUTHENTICATION_PROXY = 'webAuthenticationProxy',
+
+	/** Observe all navigation events across tabs. */
+	WEB_NAVIGATION = 'webNavigation',
+
+	/** Observe (and with blocking, modify) all HTTP/S requests. */
+	WEB_REQUEST = 'webRequest',
+
+	/** Block or modify HTTP/S requests synchronously. */
+	WEB_REQUEST_BLOCKING = 'webRequestBlocking',
+}
+
+/**
+ * Scope of web origins that can load resources from the extension via
+ * `web_accessible_resources`.
+ */
+export enum WebAccessibleResourcesScope {
+	/**
+	 * `web_accessible_resources` is absent; no extension resource is
+	 * reachable from any web page. Most secure default.
+	 */
+	NONE = 'NONE',
+
+	/** Only a fixed list of named HTTPS origins may load extension resources. */
+	SPECIFIC_ORIGINS = 'SPECIFIC_ORIGINS',
+
+	/** Any HTTPS origin may load extension resources. */
+	HTTPS_ONLY = 'HTTPS_ONLY',
+
+	/** Any HTTP or HTTPS origin may load extension resources. */
+	HTTP_AND_HTTPS = 'HTTP_AND_HTTPS',
+
+	/** Any origin, including non-web schemes, may load extension resources. */
+	UNRESTRICTED = 'UNRESTRICTED',
+}
+
+/**
  * Scope of extension IDs permitted to open a message channel to the wallet
  * via `externally_connectable`. Ordered from least to most permissive.
  */
@@ -122,6 +230,20 @@ export interface BrowserExtensionManifest {
 				pageMatches: HostPermissionScope
 		  }
 		| 'NOT_EXTERNALLY_CONNECTABLE'
+
+	/**
+	 * Security-sensitive Chrome API permissions declared in the `permissions`
+	 * manifest field, granted to the extension at install time.
+	 */
+	permissions: ChromeExtensionPermission[]
+
+	/**
+	 * Broadest scope of web origins that may load resources from this
+	 * extension via `chrome-extension://` URLs.
+	 * Maps to the broadest `matches` entry across all `web_accessible_resources`
+	 * items.
+	 */
+	webAccessibleResources: WebAccessibleResourcesScope
 }
 
 /**
