@@ -96,6 +96,7 @@ export const keystoneWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analyticsConsent: null,
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://keyst.one/privacy-policy',

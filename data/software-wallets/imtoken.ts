@@ -187,6 +187,7 @@ export const imtoken: SoftwareWallet = {
 			],
 		}),
 		privacy: {
+			analyticsConsent: null,
 			appIsolation: {
 				[Variant.MOBILE]: null,
 			},

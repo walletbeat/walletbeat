@@ -114,6 +114,7 @@ export const bitboxWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analyticsConsent: null,
 			dataCollection: {
 				[UserFlow.UNCLASSIFIED]: {
 					collected: [

@@ -13,7 +13,7 @@ import {
 } from './features/ecosystem/integration'
 import type { AddressResolution } from './features/privacy/address-resolution'
 import type { AppIsolation as AppIsolation } from './features/privacy/app-isolation'
-import type { DataCollection } from './features/privacy/data-collection'
+import type { CollectionPolicy, DataCollection } from './features/privacy/data-collection'
 import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'
 import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
@@ -118,6 +118,13 @@ export interface WalletBaseFeatures {
 
 		/** Transaction privacy features. */
 		transactionPrivacy: VariantFeature<TransactionPrivacy>
+
+		/**
+		 * Collection policy for analytics and telemetry (product analytics and
+		 * crash/error reporting, e.g. Matomo, Sentry). NEVER = no analytics;
+		 * OPT_IN / PROMPTED = consent before first use; BY_DEFAULT / ALWAYS = no consent.
+		 */
+		analyticsConsent: VariantFeature<CollectionPolicy | null>
 	}
 
 	/** Self-sovereignty features. */
@@ -311,6 +318,7 @@ export interface ResolvedFeatures {
 		accountRecovery: ResolvedFeature<AccountRecovery>
 	}
 	privacy: {
+		analyticsConsent: ResolvedFeature<CollectionPolicy>
 		dataCollection: ResolvedFeature<DataCollection>
 		privacyPolicy: ResolvedFeature<string>
 		hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport>
@@ -457,6 +465,10 @@ export function resolveFeatures(
 			),
 		},
 		privacy: {
+			analyticsConsent: baseFeat(
+				'privacy.analyticsConsent',
+				features => features.privacy.analyticsConsent,
+			),
 			dataCollection: baseFeat(
 				'privacy.dataCollection',
 				features => features.privacy.dataCollection,

@@ -394,6 +394,7 @@ export const ambire: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analyticsConsent: CollectionPolicy.NEVER,
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: notSupported,

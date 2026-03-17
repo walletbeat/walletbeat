@@ -134,6 +134,7 @@ OKX Wallet is a universal crypto wallet available on multiple platforms, includi
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analyticsConsent: null,
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: null,

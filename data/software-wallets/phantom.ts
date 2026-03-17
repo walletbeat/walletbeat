@@ -104,6 +104,7 @@ export const phantom: SoftwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analyticsConsent: null,
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://phantom.com/privacy',

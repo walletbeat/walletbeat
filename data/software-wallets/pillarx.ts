@@ -103,6 +103,7 @@ export const pillarx: SoftwareWallet = {
 		},
 		multiAddress: notSupported,
 		privacy: {
+			analyticsConsent: null,
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://pillarx.app/privacy-policy',

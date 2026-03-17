@@ -286,6 +286,7 @@ export const rabby: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analyticsConsent: null,
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: notSupported,

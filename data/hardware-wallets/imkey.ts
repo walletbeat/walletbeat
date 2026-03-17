@@ -102,6 +102,7 @@ export const imkeyWallet: HardwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analyticsConsent: null,
 			dataCollection: null,
 			hardwarePrivacy: {
 				type: HardwarePrivacyType.PASS,

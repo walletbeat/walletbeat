@@ -126,6 +126,7 @@ export const nufi: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analyticsConsent: null,
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://nu.fi/privacy-and-cookies-policy',

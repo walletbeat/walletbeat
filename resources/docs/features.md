@@ -77,6 +77,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
   - `transactionPrivacy` (`VariantFeature<TransactionPrivacy>`): Transaction privacy features.
+  - `analyticsConsent` (`VariantFeature<CollectionPolicy | null>`): Collection policy for analytics and telemetry (product analytics and crash/error reporting, e.g. Matomo, Sentry). NEVER = no analytics; OPT_IN / PROMPTED = consent before first use; BY_DEFAULT / ALWAYS = no consent.
 - `selfSovereignty` (`object`): Self-sovereignty features.
 - `transparency` (object): Transparency features.
   - `operationFees` (`VariantFeature<Nullable<BasicOperationFees>>`): Information on how fees are displayed for basic operations.
@@ -215,6 +216,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
   - `accountRecovery` (`ResolvedFeature<AccountRecovery>`)
 - `privacy` (object)
+  - `analyticsConsent` (`ResolvedFeature<CollectionPolicy>`)
   - `dataCollection` (`ResolvedFeature<DataCollection>`)
   - `privacyPolicy` (`ResolvedFeature<string>`)
   - `hardwarePrivacy` (`ResolvedFeature<HardwarePrivacySupport>`)

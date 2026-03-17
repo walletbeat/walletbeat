@@ -166,6 +166,7 @@ export const safe: SoftwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analyticsConsent: null,
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://safe.global/privacy',
