@@ -58,12 +58,12 @@ export enum HostPermissionScope {
 	NONE = 'NONE',
 
 	/**
-	 * HTTPS origins only — covers all legitimate dApps without touching
+	 * HTTPS origins only — covers all legitimate apps without touching
 	 * insecure pages, local files, or WebSocket connections.
 	 */
 	HTTPS_ONLY = 'HTTPS_ONLY',
 
-	/** HTTP and HTTPS origins — includes insecure web pages in addition to dApps. */
+	/** HTTP and HTTPS origins — includes insecure web pages in addition to apps. */
 	HTTP_AND_HTTPS = 'HTTP_AND_HTTPS',
 
 	/**
