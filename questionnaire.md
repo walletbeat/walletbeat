@@ -195,5 +195,4 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 
 Is there anything about your wallet's security, privacy, or self-sovereignty features that you'd like us to know, or that the questions above didn't cover?
 
-
 _Alternatively, here's a link to this questionnaire on Fileverse [Link here](https://docs.fileverse.io/0xbf80c3d83c7f1ed9938e677fae318bc5d950a2a3/4#key=bEht60AIHK7mSSOH9aY-BKU1I-RX2bCYYdR0IgUbWT8exByOvkctcHfTA7apE5aP)_
