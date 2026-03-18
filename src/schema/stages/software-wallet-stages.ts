@@ -6,6 +6,7 @@ import { addressResolution } from '../attributes/ecosystem/address-resolution'
 import { browserIntegration } from '../attributes/ecosystem/browser-integration'
 import { transactionBatching } from '../attributes/ecosystem/transaction-batching'
 import { addressCorrelation } from '../attributes/privacy/address-correlation'
+import { generalPrivacyHygiene } from '../attributes/privacy/general-privacy-hygiene'
 import { multiAddressCorrelation } from '../attributes/privacy/multi-address-correlation'
 import { privateTransfers } from '../attributes/privacy/private-transfers'
 import { chainVerification } from '../attributes/security/chain-verification'
@@ -149,6 +150,17 @@ export const softwareWalletStageOne: WalletStage = {
           `),
 					evaluate: variantsMustPassAttribute(softwareWalletVariants, privateTransfers),
 					displayName: 'Private Transfers',
+				},
+				{
+					id: 'general_privacy_hygiene',
+					description: sentence(
+						'The wallet avoids sending data that should never be shared without user consent.',
+					),
+					rationale: sentence(
+						'A baseline expectation for user privacy is that the wallet does not send sensitive data (such as browsing history) or enable analytics without user consent.',
+					),
+					evaluate: variantsMustPassAttribute(softwareWalletVariants, generalPrivacyHygiene),
+					displayName: 'General Privacy Hygiene',
 				},
 			],
 		},
