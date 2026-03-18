@@ -143,7 +143,6 @@ export const ngrave: HardwareWallet = {
 				],
 				secureElementType: SecureElementType.EAL_7,
 			}),
-			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {

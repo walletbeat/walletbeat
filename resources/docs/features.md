@@ -75,7 +75,6 @@ None of the fields in this type should be marked as possibly `undefined`. If you
     - `ethereumL1` (`VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>`): Light client used for Ethereum L1.
   - `accountRecovery` (`VariantFeature<AccountRecovery>`): How can users of the wallet recover their account?
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
-  - `securityBestPractices` (`VariantFeature<SecurityBestPracticesData>`): Security best practices (key storage, RNG, hardening).
 - `privacy` (object): Privacy features.
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
@@ -214,7 +213,6 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `bugBountyProgram` (`ResolvedFeature<Support<BugBountyProgramImplementation>>`)
   - `firmware` (`ResolvedFeature<FirmwareSupport>`)
   - `keysHandling` (`ResolvedFeature<WithRef<KeysHandlingSupport>>`)
-  - `securityBestPractices` (`ResolvedFeature<SecurityBestPracticesData>`)
   - `supplyChainDIY` (`ResolvedFeature<SupplyChainDIYSupport>`)
   - `supplyChainFactory` (`ResolvedFeature<SupplyChainFactorySupport>`)
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
@@ -2497,59 +2495,176 @@ type SecurityAudit = MustRef<{
 
 How the wallet stores the user's private key.
 
-- `ENCRYPTED_WITH_USER_SECRET` = `'ENCRYPTED_WITH_USER_SECRET'`: The key is encrypted with a user-known secret (password, PIN, or biometric-unlocked keychain entry) before being stored on disk.
+- `ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF` = `'ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF'`: The key is encrypted with a user-known secret before being stored on disk, using a standardized key derivation function.
+- `ENCRYPTED_WITH_USER_SECRET_WEAK_KDF` = `'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF'`: The key is encrypted with a user-known secret before being stored on disk, but the key derivation is non-standard or ad-hoc.
 - `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
 - `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
-- `NO_KEY_STORED` = `'NO_KEY_STORED'`: No private key is stored on the device — the wallet uses passkey-managed smart contract accounts where signing happens through the OS passkey API.
+- `NO_KEY_STORED` = `'NO_KEY_STORED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
 
 ---
 
 ### Enum: `SecureRngSource`
 
-The entropy source used when generating the wallet's private key or seed.
+The entropy source used when generating the wallet's private key.
 
-- `OS_CSPRNG` = `'OS_CSPRNG'`: OS-provided CSPRNG: crypto.getRandomValues() in browsers, /dev/urandom on POSIX.
-- `HARDWARE_ENTROPY` = `'HARDWARE_ENTROPY'`: Dedicated hardware entropy source (e.g. TRNG chip).
+- `OS_CSPRNG` = `'OS_CSPRNG'`: OS-provided Cryptographically Secure Pseudorandom RNG.
+- `HARDWARE_ENTROPY` = `'HARDWARE_ENTROPY'`: Dedicated hardware entropy source.
 - `LIBRARY_RNG` = `'LIBRARY_RNG'`: A library-provided RNG whose quality is not independently verified.
 
 ---
 
-### Interface: `BrowserExtensionHardening`
+### Enum: `HostPermissionScope`
 
-Security hardening applied to a browser extension deployment.
+Scope of a Chrome Extension URL match pattern grant, expressed in terms relevant to wallet extensions. Ordered from least to most permissive.
 
-- `minimalPermissions` (`boolean`): The extension requests only the minimum host permissions needed for its functionality, avoiding overbroad `<all_urls>` or similar grants.
-- `lockedDownAccessibleResources` (`boolean`): The `web_accessible_resources` manifest field is either absent or restricted to specific origins, preventing other web pages from loading internal extension resources.
-
----
-
-### Interface: `MobileAppHardening`
-
-Security hardening applied to a mobile app deployment.
-
-- `minimalPermissions` (`boolean`): The app declares only the OS permissions it actually requires, without requesting broad access to contacts, location, etc.
-- `usesKeystoreOrEnclave` (`boolean`): The app uses Android Keystore or iOS Secure Enclave for key operations, hardware-backing cryptographic material where available.
+- `NONE` = `'NONE'`: No host permissions declared; the extension does not access web pages.
+- `HTTPS_ONLY` = `'HTTPS_ONLY'`: HTTPS origins only — covers all legitimate apps without touching insecure pages, local files, or WebSocket connections.
+- `HTTP_AND_HTTPS` = `'HTTP_AND_HTTPS'`: HTTP and HTTPS origins — includes insecure web pages in addition to apps.
+- `UNRESTRICTED` = `'UNRESTRICTED'`: All origins including non-web schemes (file://, ws://, wss://, etc.) — the extension can read and modify local files and raw socket traffic.
 
 ---
 
-### Interface: `SecurityBestPracticesSupport`
+### Enum: `ChromeExtensionPermission`
 
-Security best-practices data for a wallet. Identifies how keys are stored, how entropy is sourced, and whether deployment-environment hardening is applied.
+Security-sensitive Chrome Extension permission strings declared in the `permissions` manifest field. Values match the manifest string exactly.
+
+- `ACTIVE_TAB` = `'activeTab'`: Access the currently active tab's URL, title, and favicon.
+- `BOOKMARKS` = `'bookmarks'`: Read and modify browser bookmarks.
+- `BROWSING_DATA` = `'browsingData'`: Delete browsing data (history, cookies, cache).
+- `CLIPBOARD_READ` = `'clipboardRead'`: Read clipboard contents without a user gesture.
+- `CLIPBOARD_WRITE` = `'clipboardWrite'`: Write to the clipboard without a user gesture.
+- `COOKIES` = `'cookies'`: Read and modify cookies for all accessible hosts.
+- `DEBUGGER` = `'debugger'`: Attach the Chrome debugger protocol to any tab.
+- `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
+- `DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS` = `'declarativeNetRequestWithHostAccess'`: Block or redirect requests with host-based access.
+- `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
+- `GEOLOCATION` = `'geolocation'`: Access the device's geographic location.
+- `HISTORY` = `'history'`: Read the full browsing history.
+- `IDENTITY` = `'identity'`: Access the user's Google Account identity (no email).
+- `IDENTITY_EMAIL` = `'identity.email'`: Access the user's Google Account email address.
+- `MANAGEMENT` = `'management'`: List, enable, disable, or uninstall other extensions.
+- `NATIVE_MESSAGING` = `'nativeMessaging'`: Send and receive messages from a native OS application.
+- `PAGE_CAPTURE` = `'pageCapture'`: Save a tab's full page as MHTML.
+- `PRIVACY` = `'privacy'`: Read and modify browser privacy settings.
+- `PROXY` = `'proxy'`: Monitor and control the browser's network proxy settings.
+- `SCRIPTING` = `'scripting'`: Inject scripts and CSS into pages programmatically.
+- `TABS` = `'tabs'`: Read the URLs, titles, and favicons of all open tabs.
+- `USER_SCRIPTS` = `'userScripts'`: Register user-supplied scripts that run in web pages.
+- `WEB_AUTHENTICATION_PROXY` = `'webAuthenticationProxy'`: Intercept WebAuthn requests on behalf of the extension.
+- `WEB_NAVIGATION` = `'webNavigation'`: Observe all navigation events across tabs.
+- `WEB_REQUEST` = `'webRequest'`: Observe (and with blocking, modify) all HTTP/S requests.
+- `WEB_REQUEST_BLOCKING` = `'webRequestBlocking'`: Block or modify HTTP/S requests synchronously.
+
+---
+
+### Enum: `WebAccessibleResourcesScope`
+
+Scope of web origins that can load resources from the extension via `web_accessible_resources`.
+
+- `NONE` = `'NONE'`: `web_accessible_resources` is absent; no extension resource is reachable from any web page. Most secure default.
+- `SPECIFIC_ORIGINS` = `'SPECIFIC_ORIGINS'`: Only a fixed list of named HTTPS origins may load extension resources.
+- `HTTPS_ONLY` = `'HTTPS_ONLY'`: Any HTTPS origin may load extension resources.
+- `HTTP_AND_HTTPS` = `'HTTP_AND_HTTPS'`: Any HTTP or HTTPS origin may load extension resources.
+- `UNRESTRICTED` = `'UNRESTRICTED'`: Any origin, including non-web schemes, may load extension resources.
+
+---
+
+### Enum: `ExternalExtensionIdScope`
+
+Scope of extension IDs permitted to open a message channel to the wallet via `externally_connectable`. Ordered from least to most permissive.
+
+- `NONE` = `'NONE'`: No `ids` field listed; no other extension may connect.
+- `SPECIFIC` = `'SPECIFIC'`: Only specific, named extension IDs may connect.
+- `ANY` = `'ANY'`: Any installed extension may connect (`"ids": ["*"]`).
+
+---
+
+### Interface: `BrowserExtensionManifest`
+
+Security-relevant fields from the Chrome Extension Manifest. Values should be extracted directly from the published manifest.json.
+
+- `hostPermissions` (`HostPermissionScope`): Scope of host permissions granted at install time, controlling which pages the background service worker may programmatically access. Maps to the `host_permissions` manifest field.
+- `contentScripts` (`HostPermissionScope`): Scope of pages the wallet's content scripts are injected into on every page load, controlling what the wallet can silently read and modify. Maps to the broadest `matches` entry across all `content_scripts`.
+- `externallyConnectable` (`| { extensionIds: ExternalExtensionIdScope pageMatches: HostPermissionScope } | 'NOT_EXTERNALLY_CONNECTABLE'`): Which external web pages and other extensions may open a direct message channel to the wallet (e.g. to send RPC requests). Maps to the `externally_connectable` manifest field. Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the manifest, meaning no external connections are permitted.
+- `permissions` (`ChromeExtensionPermission[]`): Security-sensitive Chrome API permissions declared in the `permissions` manifest field, granted to the extension at install time.
+- `webAccessibleResources` (`WebAccessibleResourcesScope`): Broadest scope of web origins that may load resources from this extension via `chrome-extension://` URLs. Maps to the broadest `matches` entry across all `web_accessible_resources` items.
+
+---
+
+### Enum: `AndroidPermission`
+
+Android permissions declared via `<uses-permission>` in AndroidManifest.xml. Enum values match the android:name attribute string exactly.
+
+- `INTERNET` = `'android.permission.INTERNET'`: Required for any network communication.
+- `ACCESS_NETWORK_STATE` = `'android.permission.ACCESS_NETWORK_STATE'`: Check network connectivity state before making requests.
+- `SYSTEM_ALERT_WINDOW` = `'android.permission.SYSTEM_ALERT_WINDOW'`: Draw overlays on top of other apps — significant phishing risk.
+- `CAMERA` = `'android.permission.CAMERA'`: Camera access, typically for QR code scanning.
+- `RECORD_AUDIO` = `'android.permission.RECORD_AUDIO'`: Microphone access.
+- `MODIFY_AUDIO_SETTINGS` = `'android.permission.MODIFY_AUDIO_SETTINGS'`: Modify global audio settings.
+- `BLUETOOTH` = `'android.permission.BLUETOOTH'`: Bluetooth (Android < 12).
+- `BLUETOOTH_ADMIN` = `'android.permission.BLUETOOTH_ADMIN'`: Bluetooth administration (Android < 12).
+- `BLUETOOTH_CONNECT` = `'android.permission.BLUETOOTH_CONNECT'`: Initiate connections to paired Bluetooth devices (Android 12+).
+- `BLUETOOTH_SCAN` = `'android.permission.BLUETOOTH_SCAN'`: Discover and pair Bluetooth devices (Android 12+).
+- `ACCESS_FINE_LOCATION` = `'android.permission.ACCESS_FINE_LOCATION'`: Precise location, required for BLE scanning on Android < 12.
+
+---
+
+### Enum: `IosUsageDescription`
+
+iOS usage description keys declared in Info.plist (NS\*UsageDescription). Enum values match the plist key string exactly.
+
+- `BLUETOOTH_ALWAYS` = `'NSBluetoothAlwaysUsageDescription'`: Bluetooth access at all times.
+- `BLUETOOTH_PERIPHERAL` = `'NSBluetoothPeripheralUsageDescription'`: Bluetooth peripheral access (legacy, pre-iOS 13).
+- `CAMERA` = `'NSCameraUsageDescription'`: Camera access, typically for QR code scanning.
+- `FACE_ID` = `'NSFaceIDUsageDescription'`: Face ID biometric authentication.
+- `LOCATION_WHEN_IN_USE` = `'NSLocationWhenInUseUsageDescription'`: Location access while the app is in use, required for BLE on iOS.
+- `MICROPHONE` = `'NSMicrophoneUsageDescription'`: Microphone access.
+- `PHOTO_LIBRARY_ADD` = `'NSPhotoLibraryAddUsageDescription'`: Save images to the photo library.
+- `PHOTO_LIBRARY` = `'NSPhotoLibraryUsageDescription'`: Read images from the photo library.
+
+---
+
+### Interface: `MobileAppManifest`
+
+Security-relevant fields from a mobile app's platform manifest. Values should be derived directly from the published app manifest. Not available for apps without a public source repository.
+
+- `android` (`| { usesPermissions: AndroidPermission[] } | 'NOT_AN_ANDROID_APP'`): Permissions declared in AndroidManifest.xml via `<uses-permission>`. Set to 'NOT_AN_ANDROID_APP' if the wallet has no Android variant.
+- `ios` (`| { usageDescriptions: IosUsageDescription[] } | 'NOT_AN_IOS_APP'`): Usage description keys declared in Info.plist (NS\*UsageDescription). Set to 'NOT_AN_IOS_APP' if the wallet has no iOS variant.
+
+---
+
+### Interface: `SecurityBestPracticesBase`
+
+Security best-practices fields.
 
 - `keyStorageMechanism` (`KeyStorageMechanism`): How the wallet stores the user's private key.
-- `secureRng` (`SecureRngSource`): The entropy source used during key / seed generation.
-- `browserExtensionHardening` (`BrowserExtensionHardening | null`): Browser extension hardening details. Set to null if the wallet does not have a browser extension variant.
-- `mobileAppHardening` (`MobileAppHardening | null`): Mobile app hardening details. Set to null if the wallet does not have a mobile app variant.
+- `secureRng` (`SecureRngSource`): The entropy source used during key generation.
 
 ---
 
-### Type: `SecurityBestPracticesData`
+### Interface: `BrowserSecurityBestPractices`
 
-A referenced record of security best-practices data.
+Security best-practices for the browser extension variant.
 
-```typescript
-type SecurityBestPracticesData = WithRef<SecurityBestPracticesSupport>
-```
+- `browserExtensionHardening` (`BrowserExtensionManifest`)
+
+---
+
+### Interface: `MobileSecurityBestPractices`
+
+Security best-practices for the mobile app variant.
+
+- `mobileAppHardening` (`MobileAppManifest`)
+
+---
+
+### Interface: `SecurityBestPracticesData`
+
+Security best-practices data for a wallet, broken down by variant.
+
+- `browser` (`WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent.
+- `mobile` (`WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP'`): Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent.
+- `desktop` (`WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP'`): Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent.
 
 ---
 

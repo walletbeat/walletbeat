@@ -646,7 +646,6 @@ export const rabby: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
-			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {
