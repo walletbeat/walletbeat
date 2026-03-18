@@ -18,7 +18,7 @@ if [[ -z "${1:-}" ]]; then
 	exit 2
 fi
 ETHEREUM_MAINNET_CONSENSUS_RPC_ENDPOINT="${ETHEREUM_MAINNET_CONSENSUS_RPC_ENDPOINT:-https://ethereum.operationsolarstorm.org}"
-ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="${ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT:-https://eth-mainnet.g.alchemy.com/v2/demo}"
+ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT="${ETHEREUM_MAINNET_EXECUTION_RPC_ENDPOINT:-https://ethereum-rpc.publicnode.com}"
 HELIOS_STARTUP_PROBE_SECONDS="${HELIOS_STARTUP_PROBE_SECONDS:-60}"
 if ! hash wget; then
 	echo 'wget not installed.' >&2

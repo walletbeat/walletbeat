@@ -68,6 +68,7 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '@/schema/features/self-sovereignty/chain-configurability'
+import { SpendingApprovalsControl } from '@/schema/features/self-sovereignty/permissions-management'
 import {
 	TransactionSubmissionL2Support,
 	TransactionSubmissionL2Type,
@@ -634,6 +635,12 @@ export const completedTemplate: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			permissionsManagement: supported({
+				ref: refTodo,
+				erc1155Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				erc20Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+				erc721Approvals: SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE,
+			}),
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

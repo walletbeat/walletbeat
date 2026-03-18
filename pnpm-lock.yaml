@@ -115,8 +115,8 @@ importers:
         specifier: ^0.61.0
         version: 0.61.0
       omnipin:
-        specifier: ^2.1.1
-        version: 2.1.1
+        specifier: ^2.1.2
+        version: 2.1.2
       orbiter-cli:
         specifier: ^0.9.11
         version: 0.9.11(@types/node@25.3.3)(bufferutil@4.1.0)(esbuild@0.21.5)(utf-8-validate@5.0.10)
@@ -4859,8 +4859,8 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
-  omnipin@2.1.1:
-    resolution: {integrity: sha512-H99DWrJ6cZ51A+l5TaT1w5UAb2WbxEMgtOdHUz/MZUY06XBK4jNW3vjd1skqqK+nxKYXqHnh7Uam5/47o/koJA==}
+  omnipin@2.1.2:
+    resolution: {integrity: sha512-llQJkwkXLeR/DD89R+maLJdYi4Q/BaC3J0NmXdGt9Xmt2W+jyuheorHBlT9gqO27KyOW1Ji5AtjxfpB/PYTZvA==}
     engines: {node: ^20.10.0 || >=21.1.0}
     hasBin: true
 
@@ -13046,7 +13046,7 @@ snapshots:
 
   ohash@2.0.11: {}
 
-  omnipin@2.1.1: {}
+  omnipin@2.1.2: {}
 
   on-exit-leak-free@0.2.0: {}
 

@@ -424,6 +424,7 @@ export const daimo: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

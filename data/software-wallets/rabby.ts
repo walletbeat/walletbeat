@@ -707,6 +707,7 @@ export const rabby: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

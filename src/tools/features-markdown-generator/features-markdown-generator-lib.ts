@@ -437,14 +437,14 @@ export async function featuresMarkdownUpdate(config: FeaturesMarkdownConfig): Pr
 
 	if (config.test) {
 		if (!fs.existsSync(config.outputPath)) {
-			throw new Error('docs/features.md does not exist. Run `pnpm fix` to generate it.')
+			throw new Error('resources/docs/features.md does not exist. Run `pnpm fix` to generate it.')
 		}
 
 		const existingContent = fs.readFileSync(config.outputPath, 'utf-8')
 
 		if (existingContent.trim() !== markdownContent.trim()) {
 			throw new Error(
-				'docs/features.md is out of sync with the TypeScript source. Run `pnpm fix` to regenerate.',
+				'resources/docs/features.md is out of sync with the TypeScript source. Run `pnpm fix` to regenerate.',
 			)
 		}
 	} else {
