@@ -37,6 +37,7 @@ import type {
 import type { UserSafetySupport } from './features/security/user-safety'
 import type { ChainConfigurability } from './features/self-sovereignty/chain-configurability'
 import type { InteroperabilitySupport } from './features/self-sovereignty/interoperability'
+import type { PermissionsManagementSupport } from './features/self-sovereignty/permissions-management'
 import type { TransactionSubmission } from './features/self-sovereignty/transaction-submission'
 import type { Support } from './features/support'
 import type { BasicOperationFees } from './features/transparency/fee-display'
@@ -180,6 +181,7 @@ export type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
+		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
 	}
 
 	/** Ecosystem features. */
@@ -325,6 +327,7 @@ export interface ResolvedFeatures {
 	selfSovereignty: {
 		transactionSubmission: ResolvedFeature<TransactionSubmission>
 		interoperability: ResolvedFeature<InteroperabilitySupport>
+		permissionsManagement: ResolvedFeature<Support<PermissionsManagementSupport>>
 	}
 	transparency: {
 		operationFees: ResolvedFeature<BasicOperationFees>
@@ -486,6 +489,10 @@ export function resolveFeatures(
 					'selfSovereignty.transactionSubmission',
 					features => features.selfSovereignty.transactionSubmission,
 				),
+			),
+			permissionsManagement: softwareFeat(
+				'selfSovereignty.permissionsManagement',
+				features => features.selfSovereignty.permissionsManagement,
 			),
 			interoperability: hardwareFeat(
 				'selfSovereignty.interoperability',

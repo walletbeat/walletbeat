@@ -188,6 +188,7 @@ export const nufi: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

@@ -1,11 +1,16 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { patrickalphac } from '@/data/contributors/patrickalphac'
+import { AccountType } from '@/schema/features/account-support'
 import {
 	AppConnectionMethod,
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
 } from '@/schema/features/ecosystem/hw-app-connection-support'
+import {
+	type HardwarePrivacyImplementation,
+	HardwarePrivacyType,
+} from '@/schema/features/privacy/hardware-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -14,6 +19,10 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { FirmwareType } from '@/schema/features/security/firmware'
+import {
+	KeyGenerationLocation,
+	MultiPartyKeyReconstruction,
+} from '@/schema/features/security/keys-handling'
 import { SecureElementType } from '@/schema/features/security/secure-element'
 import {
 	BasicBenchmarkTransactions,
@@ -23,6 +32,7 @@ import {
 	displaysFullTransactionDetails,
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
+import { fullyClosedSource } from '@/schema/features/transparency/license'
 import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { HardwareWallet } from '@/schema/wallet'
@@ -62,7 +72,36 @@ export const gridplusWallet: HardwareWallet = {
 		},
 	},
 	features: {
-		accountSupport: null,
+		accountSupport: {
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupported,
+			eoa: supported({
+				ref: [
+					{
+						explanation:
+							'The Lattice1 supports full BIP-32, BIP-39, and BIP-44 key derivation standards, along with custom derivation paths and non-standard formats such as Ledger Live, Ledger Legacy, and Solflare/Ledger derivation paths for Solana.',
+						url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
+					},
+				],
+				// The Lattice1 is not capable of exporting private keys by design.
+				// SafeCards can export individual key pairs via open-source software.
+				// Source: GridPlus team responses; https://docs.gridplus.io/safecards/introduction-to-safecards
+				canExportPrivateKey: false,
+				keyDerivation: {
+					type: 'BIP32',
+					// Seed phrase is viewable on-device with PIN entry and can be backed up to SafeCards.
+					// Individual key pairs can be exported via SafeCard + open-source software + USB card reader.
+					// The device itself cannot export the master key pair.
+					// Source: GridPlus team responses; https://docs.gridplus.io/safecards/introduction-to-safecards
+					canExportSeedPhrase: true,
+					derivationPath: 'BIP44',
+					seedPhrase: 'BIP39',
+				},
+			}),
+			mpc: notSupported,
+			rawErc4337: notSupported,
+			safe: notSupported,
+		},
 		appConnectionSupport: supported<WithRef<AppConnectionMethodDetails>>({
 			ref: 'https://docs.gridplus.io/apps-and-integrations/lattice-manager',
 			requiresManufacturerConsent: null,
@@ -75,12 +114,19 @@ export const gridplusWallet: HardwareWallet = {
 				[SoftwareWalletType.OTHER]: true,
 			},
 		}),
-		licensing: null,
+		// GridPlus confirmed that the firmware source code is not publicly published.
+		// Source: GridPlus team response — "The firmware code is not publicly published."
+		licensing: fullyClosedSource,
 		monetization: {
 			ref: [
 				{
 					explanation: 'Grid+ is the first internally incubated venture to spin out of ConsenSys.',
 					url: 'https://medium.com/@mark_dago/grid-progress-report-12-15-2017-fdb4e24ed2ed',
+				},
+				{
+					explanation:
+						'GridPlus VC funding includes Bankless Ventures, ConsenSys Mesh, Allatus Ventures, Dlab, and Game7.',
+					url: 'https://pitchbook.com/profiles/company/184644-55',
 				},
 			],
 			revenueBreakdownIsPublic: false,
@@ -99,13 +145,37 @@ export const gridplusWallet: HardwareWallet = {
 		multiAddress: null,
 		privacy: {
 			dataCollection: null,
-			hardwarePrivacy: null,
-			privacyPolicy: 'https://gridplus.io/privacy',
+			hardwarePrivacy: supported<HardwarePrivacyImplementation>({
+				type: HardwarePrivacyType.PARTIAL,
+				ref: [
+					{
+						explanation:
+							'GridPlus does not implement telemetry. They do not store, sell, or share user data. At the point of sale they collect customer shipping information for regulatory compliance, then destroy it within six months.',
+						url: 'https://gridplus.io/policies/privacy-policy',
+					},
+				],
+				inspectableRemoteCalls: HardwarePrivacyType.PARTIAL,
+				phoningHome: HardwarePrivacyType.PASS,
+				wirelessPrivacy: HardwarePrivacyType.PARTIAL,
+				// Source: gridplus team responses fileverse document
+			}),
+			privacyPolicy: 'https://gridplus.io/policies/privacy-policy',
 			transactionPrivacy: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: null,
+			// GridPlus does not implement guardian-based (social) recovery.
+			// However, the Lattice1 does provide SafeCards which are PIN-protected smart cards
+			// that serve as encrypted hardware backups of the user's seed phrase.
+			// Users can create as many SafeCard backups as they like, and seed recovery
+			// is possible using GridPlus's open-source software with a USB card
+			// reader, without requiring GridPlus hardware.
+			// See: https://docs.gridplus.io/safecards/introduction-to-safecards
+			// This does not qualify as guardian-based recovery under Walletbeat's schema,
+			// but it does mitigate seed phrase loss for users.
+			accountRecovery: {
+				guardianRecovery: notSupported,
+			},
 			bugBountyProgram: supported<BugBountyProgramImplementation>({
 				ref: refTodo,
 				availability: BugBountyProgramAvailability.ACTIVE,
@@ -135,7 +205,18 @@ export const gridplusWallet: HardwareWallet = {
 				reproducibleBuilds: FirmwareType.FAIL,
 				silentUpdateProtection: FirmwareType.PASS,
 			},
-			keysHandling: null,
+			keysHandling: supported({
+				ref: [
+					{
+						explanation:
+							'The Lattice1 generates and stores key material entirely on-device. Full BIP-32, BIP-39, and BIP-44 derivation standards are supported, along with custom derivation paths.',
+						url: 'https://docs.gridplus.io/lattice1/how-to-manage-your-seed-phrase',
+					},
+				],
+				keyGeneration: KeyGenerationLocation.FULLY_ON_USER_DEVICE,
+				multipartyKeyReconstruction: MultiPartyKeyReconstruction.NON_MULTIPARTY,
+				// Source: gridplus team responses fileverse document
+			}),
 			lightClient: {
 				ethereumL1: null,
 			},

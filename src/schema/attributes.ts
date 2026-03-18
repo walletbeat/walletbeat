@@ -353,7 +353,7 @@ export function defaultRatingScore(value: Value): Score {
 		case Rating.EXEMPT:
 			return null
 		case Rating.UNRATED:
-			return null
+			return -0.5
 	}
 }
 

@@ -120,16 +120,12 @@ export const rabby: SoftwareWallet = {
 			rawErc4337: notSupported,
 			safe: supported({
 				ref: refTodo,
-				canDeployNew: notSupported,
+				canDeployNew: false,
 				controllingSharesInSelfCustodyByDefault: 'YES',
 				keyRotationTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				supportedConfigs: {
-					maxOwners: 10,
-					minOwners: 1,
-					moduleSupport: 'partial',
-					supportsAnyThreshold: true,
-				},
+				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
+				supportsAddingOrRemovingSigners: true,
 				supportsKeyRotationWithoutModules: true,
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
@@ -712,6 +708,7 @@ export const rabby: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

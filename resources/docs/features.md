@@ -47,6 +47,7 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/security/user-safety.ts`](#srcschemafeaturessecurityuser-safetyts)
 - [`src/schema/features/self-sovereignty/chain-configurability.ts`](#srcschemafeaturesself-sovereigntychain-configurabilityts)
 - [`src/schema/features/self-sovereignty/interoperability.ts`](#srcschemafeaturesself-sovereigntyinteroperabilityts)
+- [`src/schema/features/self-sovereignty/permissions-management.ts`](#srcschemafeaturesself-sovereigntypermissions-managementts)
 - [`src/schema/features/self-sovereignty/transaction-submission.ts`](#srcschemafeaturesself-sovereigntytransaction-submissionts)
 - [`src/schema/features/support.ts`](#srcschemafeaturessupportts)
 - [`src/schema/features/transparency/fee-display.ts`](#srcschemafeaturestransparencyfee-displayts)
@@ -120,6 +121,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
+		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
 	}
 
 	/** Ecosystem features. */
@@ -226,6 +228,7 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `selfSovereignty` (object)
   - `transactionSubmission` (`ResolvedFeature<TransactionSubmission>`)
   - `interoperability` (`ResolvedFeature<InteroperabilitySupport>`)
+  - `permissionsManagement` (`ResolvedFeature<Support<PermissionsManagementSupport>>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
   - `reputation` (`ResolvedFeature<ReputationSupport>`)
@@ -424,22 +427,25 @@ Support information for Safe multisig accounts.
 
 To test:
 
-- `canDeployNew`: Go through the wallet's UI to create a new Safe and
-  observe the default owner count and threshold.
+- `canDeployNew`: Go through the wallet's UI and check whether it offers
+  a flow to deploy a new Safe contract.
+- `supportsAddingOrRemovingSigners`: In an existing Safe, attempt to add
+  or remove an owner using only the wallet's native UI (no extra modules).
+  Check whether the wallet generates the `addOwnerWithThreshold` /
+  `removeOwner` transaction directly.
 - `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
-  add or remove an owner using only the wallet's native UI (no extra
-  modules). Check whether the wallet generates the `addOwnerWithThreshold`
-  / `removeOwner` transaction directly.
-- `supportedConfigs`: Try connecting the wallet to Safes with 1, 2, and
-  many owners at various thresholds, and note the limits.
+  replace an owner key using only the wallet's native UI (no extra
+  modules). Check whether the wallet generates the `swapOwner` transaction
+  directly.
+- `supportedConfigs.owners`: Try connecting the wallet to Safes with 1,
+  2, and many owners and note the limits.
 
-- `canDeployNew` (`Support<{ defaultConfig: { owners: number threshold: number modules: string[] } }>`): Can the wallet deploy new Safe contracts?
+- `canDeployNew` (`boolean`): Can the wallet deploy new Safe contracts?
+- `supportsAddingOrRemovingSigners` (`boolean`): Does the wallet support adding or removing signers without additional modules?
 - `supportsKeyRotationWithoutModules` (`boolean`): Does the wallet support key rotation without additional modules?
-- `supportedConfigs` (object): Supported configurations for existing Safes.
-  - `minOwners` (`number`): Minimum number of owners supported.
-  - `maxOwners` (`number | 'unlimited'`): Maximum number of owners supported (or 'unlimited').
-  - `supportsAnyThreshold` (`boolean`): Whether any threshold is supported.
-  - `moduleSupport` (`'none' | 'partial' | 'full'`): Level of module support.
+- `supportedOwners` (`'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'`): Range of signers (owners) the wallet can work with.
+  - SINGLE_SIGNER: only single-owner Safes are supported.
+  - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
 
 ---
 
@@ -3090,6 +3096,36 @@ Customization options that exist for chains.
 
 ```typescript
 type InteroperabilityImplementation = WithRef<InteroperabilitySupport>
+```
+
+---
+
+## `src/schema/features/self-sovereignty/permissions-management.ts`
+
+### Enum: `SpendingApprovalsControl`
+
+The level of control a wallet provides over token approvals of a given standard.
+
+- `CANNOT_INSPECT` = `(auto)`: The wallet does not show any existing approvals or allow revoking them.
+- `CAN_INSPECT_BUT_NOT_REVOKE` = `(auto)`: The wallet shows existing approvals but does not allow revoking them.
+- `CAN_INSPECT_AND_REVOKE` = `(auto)`: The wallet shows existing approvals and allows revoking them directly.
+
+---
+
+### Interface: `PermissionsManagement`
+
+How the wallet helps users inspect, constrain, and revoke delegated spending authority.
+
+- `erc20Approvals` (`SpendingApprovalsControl`): ERC-20 token approvals granted to other addresses.
+- `erc721Approvals` (`SpendingApprovalsControl`): ERC-721 token approvals granted to other addresses.
+- `erc1155Approvals` (`SpendingApprovalsControl`): ERC-1155 token approvals granted to other addresses.
+
+---
+
+### Type: `PermissionsManagementSupport`
+
+```typescript
+type PermissionsManagementSupport = WithRef<PermissionsManagement>
 ```
 
 ---
