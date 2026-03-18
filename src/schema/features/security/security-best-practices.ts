@@ -50,7 +50,7 @@ export enum SecureRngSource {
 }
 
 /**
- * Scope of a Chrome Extension URL match pattern grant, expressed in terms
+ * Scope of a Browser Extension URL match pattern grant, expressed in terms
  * relevant to wallet extensions. Ordered from least to most permissive.
  */
 export enum HostPermissionScope {
@@ -74,10 +74,10 @@ export enum HostPermissionScope {
 }
 
 /**
- * Security-sensitive Chrome Extension permission strings declared in the
+ * Security-sensitive Browser Extension permission strings declared in the
  * `permissions` manifest field. Values match the manifest string exactly.
  */
-export enum ChromeExtensionPermission {
+export enum BrowserExtensionPermission {
 	/** Access the currently active tab's URL, title, and favicon. */
 	ACTIVE_TAB = 'activeTab',
 
@@ -96,7 +96,7 @@ export enum ChromeExtensionPermission {
 	/** Read and modify cookies for all accessible hosts. */
 	COOKIES = 'cookies',
 
-	/** Attach the Chrome debugger protocol to any tab. */
+	/** Attach the browser debugger protocol to any tab. */
 	DEBUGGER = 'debugger',
 
 	/** Block or redirect network requests via declarativeNetRequest. */
@@ -197,7 +197,7 @@ export enum ExternalExtensionIdScope {
 }
 
 /**
- * Security-relevant fields from the Chrome Extension Manifest.
+ * Security-relevant fields from the Browser Extension Manifest.
  * Values should be extracted directly from the published manifest.json.
  */
 export interface BrowserExtensionManifest {
@@ -232,14 +232,14 @@ export interface BrowserExtensionManifest {
 		| 'NOT_EXTERNALLY_CONNECTABLE'
 
 	/**
-	 * Security-sensitive Chrome API permissions declared in the `permissions`
+	 * Security-sensitive Browser API permissions declared in the `permissions`
 	 * manifest field, granted to the extension at install time.
 	 */
-	permissions: ChromeExtensionPermission[]
+	permissions: BrowserExtensionManifest[]
 
 	/**
 	 * Broadest scope of web origins that may load resources from this
-	 * extension via `chrome-extension://` URLs.
+	 * extension.
 	 * Maps to the broadest `matches` entry across all `web_accessible_resources`
 	 * items.
 	 */
