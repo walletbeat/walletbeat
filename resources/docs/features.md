@@ -2515,7 +2515,7 @@ The entropy source used when generating the wallet's private key.
 
 ### Enum: `HostPermissionScope`
 
-Scope of a Chrome Extension URL match pattern grant, expressed in terms relevant to wallet extensions. Ordered from least to most permissive.
+Scope of a Browser Extension URL match pattern grant, expressed in terms relevant to wallet extensions. Ordered from least to most permissive.
 
 - `NONE` = `'NONE'`: No host permissions declared; the extension does not access web pages.
 - `HTTPS_ONLY` = `'HTTPS_ONLY'`: HTTPS origins only — covers all legitimate apps without touching insecure pages, local files, or WebSocket connections.
@@ -2524,9 +2524,9 @@ Scope of a Chrome Extension URL match pattern grant, expressed in terms relevant
 
 ---
 
-### Enum: `ChromeExtensionPermission`
+### Enum: `BrowserExtensionPermission`
 
-Security-sensitive Chrome Extension permission strings declared in the `permissions` manifest field. Values match the manifest string exactly.
+Security-sensitive Browser Extension permission strings declared in the `permissions` manifest field. Values match the manifest string exactly.
 
 - `ACTIVE_TAB` = `'activeTab'`: Access the currently active tab's URL, title, and favicon.
 - `BOOKMARKS` = `'bookmarks'`: Read and modify browser bookmarks.
@@ -2534,7 +2534,7 @@ Security-sensitive Chrome Extension permission strings declared in the `permissi
 - `CLIPBOARD_READ` = `'clipboardRead'`: Read clipboard contents without a user gesture.
 - `CLIPBOARD_WRITE` = `'clipboardWrite'`: Write to the clipboard without a user gesture.
 - `COOKIES` = `'cookies'`: Read and modify cookies for all accessible hosts.
-- `DEBUGGER` = `'debugger'`: Attach the Chrome debugger protocol to any tab.
+- `DEBUGGER` = `'debugger'`: Attach the browser debugger protocol to any tab.
 - `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
 - `DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS` = `'declarativeNetRequestWithHostAccess'`: Block or redirect requests with host-based access.
 - `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
@@ -2581,13 +2581,13 @@ Scope of extension IDs permitted to open a message channel to the wallet via `ex
 
 ### Interface: `BrowserExtensionManifest`
 
-Security-relevant fields from the Chrome Extension Manifest. Values should be extracted directly from the published manifest.json.
+Security-relevant fields from the Browser Extension Manifest. Values should be extracted directly from the published manifest.json.
 
 - `hostPermissions` (`HostPermissionScope`): Scope of host permissions granted at install time, controlling which pages the background service worker may programmatically access. Maps to the `host_permissions` manifest field.
 - `contentScripts` (`HostPermissionScope`): Scope of pages the wallet's content scripts are injected into on every page load, controlling what the wallet can silently read and modify. Maps to the broadest `matches` entry across all `content_scripts`.
 - `externallyConnectable` (`| { extensionIds: ExternalExtensionIdScope pageMatches: HostPermissionScope } | 'NOT_EXTERNALLY_CONNECTABLE'`): Which external web pages and other extensions may open a direct message channel to the wallet (e.g. to send RPC requests). Maps to the `externally_connectable` manifest field. Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the manifest, meaning no external connections are permitted.
-- `permissions` (`ChromeExtensionPermission[]`): Security-sensitive Chrome API permissions declared in the `permissions` manifest field, granted to the extension at install time.
-- `webAccessibleResources` (`WebAccessibleResourcesScope`): Broadest scope of web origins that may load resources from this extension via `chrome-extension://` URLs. Maps to the broadest `matches` entry across all `web_accessible_resources` items.
+- `permissions` (`BrowserExtensionManifest[]`): Security-sensitive Browser API permissions declared in the `permissions` manifest field, granted to the extension at install time.
+- `webAccessibleResources` (`WebAccessibleResourcesScope`): Broadest scope of web origins that may load resources from this extension. Maps to the broadest `matches` entry across all `web_accessible_resources` items.
 
 ---
 
