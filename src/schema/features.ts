@@ -57,6 +57,7 @@ import {
 	type VariantFeature,
 } from './variants'
 import { variantToWalletType, type WalletType } from './wallet-types'
+import type { SecurityBestPracticesData } from './features/security/security-best-practices'
 
 /**
  * A set of features about any type of wallet.
@@ -104,6 +105,9 @@ export interface WalletBaseFeatures {
 
 		/** How are secret keys handled? */
 		keysHandling: VariantFeature<WithRef<KeysHandlingSupport>>
+
+		/** Security best practices. */
+		securityBestPractices: SecurityBestPracticesData | null
 	}
 
 	/** Privacy features. */
@@ -307,6 +311,7 @@ export interface ResolvedFeatures {
 		bugBountyProgram: ResolvedFeature<Support<BugBountyProgramImplementation>>
 		firmware: ResolvedFeature<FirmwareSupport>
 		keysHandling: ResolvedFeature<WithRef<KeysHandlingSupport>>
+		securityBestPractices: ResolvedFeature<SecurityBestPracticesData>
 		supplyChainDIY: ResolvedFeature<SupplyChainDIYSupport>
 		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>
 		userSafety: ResolvedFeature<UserSafetySupport>
@@ -449,6 +454,7 @@ export function resolveFeatures(
 				'security.supplyChainDIY',
 				features => features.security.supplyChainDIY,
 			),
+			securityBestPractices: features.security.securityBestPractices,
 			supplyChainFactory: hardwareFeat(
 				'security.supplyChainFactory',
 				features => features.security.supplyChainFactory,
