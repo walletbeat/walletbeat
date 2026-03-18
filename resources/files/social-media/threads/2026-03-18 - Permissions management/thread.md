@@ -1,11 +1,11 @@
 ![Permissions Management](./cover.png)
 
 New Walletbeat attribute just dropped: 
-Permissions Management 🔑
+Permissions Management 🤹
 
 This answers a simple but critical question:
 
-Can your wallet actually protect you from bad approvals?
+Does your wallet let you inspect and manage the permissions you've granted to other contracts and apps?
 
 ---
 
@@ -36,3 +36,6 @@ If you can’t revoke approvals,
 you don’t fully control your assets.
 
 Permissions management is an important part of maintaining control over your assets.
+
+AA wallets will go further: spend limits, subscriptions, wrench-attack protection. 
+Methodology updates will be coming as wallets adopt these.
