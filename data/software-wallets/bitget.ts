@@ -198,7 +198,6 @@ export const bitget: SoftwareWallet = {
 				scamUrlWarning: notSupported,
 				sendTransactionWarning: notSupported,
 			},
-			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {

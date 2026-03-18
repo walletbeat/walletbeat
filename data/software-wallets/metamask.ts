@@ -500,7 +500,6 @@ export const metamask: SoftwareWallet = {
 					userWhitelist: true,
 				}),
 			},
-			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: displaysFullCallData,

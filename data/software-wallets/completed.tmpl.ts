@@ -56,10 +56,6 @@ import type {
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
-	KeyStorageMechanism,
-	SecureRngSource,
-} from '@/schema/features/security/security-best-practices'
-import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
@@ -577,19 +573,6 @@ export const completedTemplate: SoftwareWallet = {
 					newRecipientWarning: true,
 					userWhitelist: false,
 				}),
-			},
-			securityBestPractices: {
-				ref: refTodo,
-				browserExtensionHardening: {
-					lockedDownAccessibleResources: true,
-					minimalPermissions: true,
-				},
-				keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
-				mobileAppHardening: {
-					minimalPermissions: true,
-					usesKeystoreOrEnclave: true,
-				},
-				secureRng: SecureRngSource.OS_CSPRNG,
 			},
 			transactionLegibility: {
 				ref: refTodo,

@@ -151,7 +151,6 @@ export const mtpelerin: SoftwareWallet = {
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
 			scamAlerts: null,
-			securityBestPractices: null,
 			transactionLegibility: null,
 		},
 		selfSovereignty: {

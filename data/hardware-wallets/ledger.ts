@@ -176,7 +176,6 @@ export const ledgerWallet: HardwareWallet = {
 				],
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
-			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: {
