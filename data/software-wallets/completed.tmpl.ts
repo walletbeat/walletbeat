@@ -574,6 +574,7 @@ export const completedTemplate: SoftwareWallet = {
 					userWhitelist: false,
 				}),
 			},
+			securityBestPractices: null,
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {

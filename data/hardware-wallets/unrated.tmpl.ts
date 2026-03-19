@@ -103,6 +103,7 @@ export const unratedHardwareTemplate: HardwareWallet = {
 			},
 			publicSecurityAudits: null,
 			secureElement: null,
+			securityBestPractices: null,
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			transactionLegibility: null,
