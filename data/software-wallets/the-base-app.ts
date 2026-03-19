@@ -38,7 +38,7 @@ export const theBaseApp: SoftwareWallet = {
 		iconExtension: 'png',
 		lastUpdated: '2026-03-19',
 		urls: {
-			docs: ['https://docs.base.org/'],
+			docs: ['https://docs.base.org/get-started/base'],
 			extensions: [],
 			repositories: [
 				'https://github.com/coinbase/smart-wallet',
@@ -46,7 +46,7 @@ export const theBaseApp: SoftwareWallet = {
 			],
 			socials: {
 				discord: 'https://discord.com/invite/buildonbase',
-				farcaster: 'https://warpcast.com/base',
+				farcaster: 'https://farcaster.xyz/base',
 				x: 'https://x.com/base',
 			},
 			websites: ['https://wallet.coinbase.com/'],
