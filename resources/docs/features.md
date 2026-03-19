@@ -75,6 +75,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
     - `ethereumL1` (`VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>`): Light client used for Ethereum L1.
   - `accountRecovery` (`VariantFeature<AccountRecovery>`): How can users of the wallet recover their account?
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
+  - `securityBestPractices` (`SecurityBestPracticesData | null`): Security best practices.
 - `privacy` (object): Privacy features.
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
@@ -213,6 +214,7 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `bugBountyProgram` (`ResolvedFeature<Support<BugBountyProgramImplementation>>`)
   - `firmware` (`ResolvedFeature<FirmwareSupport>`)
   - `keysHandling` (`ResolvedFeature<WithRef<KeysHandlingSupport>>`)
+  - `securityBestPractices` (`ResolvedFeature<SecurityBestPracticesData>`)
   - `supplyChainDIY` (`ResolvedFeature<SupplyChainDIYSupport>`)
   - `supplyChainFactory` (`ResolvedFeature<SupplyChainFactorySupport>`)
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)

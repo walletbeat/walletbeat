@@ -79,6 +79,10 @@ import {
 } from './attributes/security/hardware-wallet-support'
 import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
 import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
+import {
+	securityBestPractices,
+	type SecurityBestPracticesValue,
+} from './attributes/security/security-best-practices'
 import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy'
 import {
 	supplyChainFactory,
@@ -129,7 +133,6 @@ import type { ResolvedFeatures } from './features'
 import { type MaybeUnratedScore, type Score, type WeightedScore, weightedScore } from './score'
 import type { AtLeastOneVariant, Variant } from './variants'
 import type { WalletMetadata } from './wallet'
-import { securityBestPractices, type SecurityBestPracticesValue } from './attributes/security/security-best-practices'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{

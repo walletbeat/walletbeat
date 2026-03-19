@@ -27,6 +27,7 @@ import type { PasskeyVerificationImplementation } from './features/security/pass
 import type { ScamAlerts } from './features/security/scam-alerts'
 import type { SecureElementSupport } from './features/security/secure-element'
 import type { SecurityAudit } from './features/security/security-audits'
+import type { SecurityBestPracticesData } from './features/security/security-best-practices'
 import type { SupplyChainDIYSupport } from './features/security/supply-chain-diy'
 import type { SupplyChainFactorySupport } from './features/security/supply-chain-factory'
 import type {
@@ -57,7 +58,6 @@ import {
 	type VariantFeature,
 } from './variants'
 import { variantToWalletType, type WalletType } from './wallet-types'
-import type { SecurityBestPracticesData } from './features/security/security-best-practices'
 
 /**
  * A set of features about any type of wallet.
