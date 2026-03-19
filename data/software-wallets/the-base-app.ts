@@ -10,7 +10,6 @@ import {
 import type {
 	ContractTransactionWarning,
 	ScamUrlWarning,
-	SendTransactionWarning,
 } from '@/schema/features/security/scam-alerts'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
@@ -252,6 +251,7 @@ export const theBaseApp: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,
