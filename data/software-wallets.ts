@@ -17,6 +17,7 @@ import { pillarx } from './software-wallets/pillarx'
 import { rabby } from './software-wallets/rabby'
 import { rainbow } from './software-wallets/rainbow'
 import { safe } from './software-wallets/safe'
+import { theBaseApp } from './software-wallets/the-base-app'
 import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
 import { zerion } from './software-wallets/zerion'
 import { zeus } from './software-wallets/zeus'
@@ -40,6 +41,7 @@ export const softwareWallets = {
 	rabby,
 	rainbow,
 	safe,
+	theBaseApp,
 	zerion,
 	zeus,
 }
