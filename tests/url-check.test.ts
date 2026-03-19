@@ -1639,6 +1639,51 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '09c6e4d8ca088971bd6f5b05f5eca6641c5f81e3',
 		retrieved: '2026-03-14',
 	},
+	{
+		url: 'https://wallet.coinbase.com/',
+		urlHash: 'e486536bb78f3f93e75f42b9960f2104753d1855',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://docs.base.org/get-started/base',
+		urlHash: '81a4a84e30d05861b1624b1db0d00d53c940f3f1',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet',
+		urlHash: 'bc3738927c2f5aa60b5815802d8011fdf7ffb3fa',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/base/account-sdk',
+		urlHash: 'f43270328de1d0f2cc596d9680f994c5fd396ba8',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://discord.com/invite/buildonbase',
+		urlHash: 'e4e34d04b084b64f573c559eabe6f5c78bf9a480',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://farcaster.xyz/base',
+		urlHash: 'c4d129cf4d4fc6dac86aa2bba31eec168e0e8947',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://x.com/base',
+		urlHash: 'cc53d9f00d04c138fa545871c29393f862424dc9',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet?tab=MIT-1-ov-file#readme',
+		urlHash: '8119b2bc589fe66086aa351421005960bc87e091',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://hackerone.com/coinbase?type=team',
+		urlHash: 'a592f1a22c5c28338d345d29591d4c48ccb25f26',
+		retrieved: '2026-03-19',
+	},
 ]
 
 /**
