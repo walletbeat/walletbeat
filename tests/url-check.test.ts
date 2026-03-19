@@ -1649,6 +1649,31 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '714bfb6cfe3caf2a2d5f47eba1f9d0ca4c04cf25',
 		retrieved: '2026-03-23',
 	},
+	{
+		url: 'https://docs.base.org/get-started/base',
+		urlHash: '81a4a84e30d05861b1624b1db0d00d53c940f3f1',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet',
+		urlHash: 'bc3738927c2f5aa60b5815802d8011fdf7ffb3fa',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/base/account-sdk',
+		urlHash: 'f43270328de1d0f2cc596d9680f994c5fd396ba8',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://discord.com/invite/buildonbase',
+		urlHash: 'e4e34d04b084b64f573c559eabe6f5c78bf9a480',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://hackerone.com/coinbase?type=team',
+		urlHash: 'a592f1a22c5c28338d345d29591d4c48ccb25f26',
+		retrieved: '2026-03-19',
+	},
 ]
 
 /**
@@ -1667,6 +1692,8 @@ const URLS_TO_SKIP = [
 	'tiktok.com',
 	'web3.bitget.com',
 	'gridplus.io',
+	'coinbase.com',
+	'sec.gov',
 ]
 
 const newValidUrls: string[] = []
