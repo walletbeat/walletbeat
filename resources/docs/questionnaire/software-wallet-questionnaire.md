@@ -194,4 +194,3 @@ Thank you for taking the time to fill this out. Your answers help us rate your w
 ## Anything Else you want to specifically mention?
 
 Is there anything about your wallet's security, privacy, or self-sovereignty features that you'd like us to know, or that the questions above didn't cover?
-
