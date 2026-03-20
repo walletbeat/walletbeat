@@ -143,11 +143,14 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 	wording: {
 		midSentenceName: 'privacy hygiene',
 	},
-	question: sentence(
-		'Does {{WALLET_NAME}} avoid sending data that should never be shared without your consent?',
-	),
+	question: sentence('Does {{WALLET_NAME}} only send sensitive data with your explicit consent?'),
 	why: markdown(
-		'Users expect that data like browsing history and which sites they connect their wallet to is never sent without consent. Analytics (Matomo, Sentry, etc.) should only be used after the user has agreed. This attribute encodes that baseline.',
+		[
+			'Users expect that data like browsing history and which sites they connect their wallet to is never sent without consent.',
+			'Much like users would not expect a web browser to leak browsing history for analytics, they should not expect wallets to track every site interaction by default.',
+			'Analytics (Matomo, Sentry, etc.) should only be used after the user has agreed.',
+			'This attribute encodes that baseline.',
+		].join(' '),
 	),
 	methodology: markdown(
 		'We consider default behavior; we look at network requests and data-collection policies; we fail if browsing history or wallet-connected domains are sent by default, or if analytics are used without prior consent.',
