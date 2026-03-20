@@ -28,14 +28,6 @@ import { exempt, pickWorstRating, unrated } from '../common'
 
 export type PrivacyHygieneValue = Value
 
-function doesNotCollectAnalyticsWithoutConsent(policy: CollectionPolicy): boolean {
-	return (
-		policy === CollectionPolicy.NEVER ||
-		policy === CollectionPolicy.OPT_IN ||
-		policy === CollectionPolicy.PROMPTED
-	)
-}
-
 /**
  * Whether this type of user information is forbidden without prior user consent.
  *
@@ -334,14 +326,6 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 
 		if (hasAnalyticsInSomeFlow && analyticsConsent === null) {
 			return unrated(ctx, null)
-		}
-
-		if (
-			hasAnalyticsInSomeFlow &&
-			analyticsConsent !== null &&
-			!doesNotCollectAnalyticsWithoutConsent(analyticsConsent)
-		) {
-			return analyticsWithoutConsent(ctx)
 		}
 
 		if (hasUnknownFlowData) {
