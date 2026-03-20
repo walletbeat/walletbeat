@@ -70,26 +70,74 @@ function isForbiddenWithoutPriorConsentUserInfo(userInfo: UserInfo): boolean {
 	}
 }
 
-function forbiddenDataByDefault(
+function browsingHistoryByDefault(
 	ctx: EvaluationContext<PrivacyHygieneValue>,
 ): Evaluation<PrivacyHygieneValue> {
 	return ctx.build({
 		value: {
-			id: 'forbidden_data_by_default',
+			id: 'browsing_history_by_default',
 			rating: Rating.FAIL,
-			displayName: 'Browsing history or wallet-connected domains sent by default',
+			displayName: 'Browsing history sent by default',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} sends browsing history or wallet-connected domains to an external service by default without consent.',
+				'{{WALLET_NAME}} sends browsing history to an external service by default without consent.',
 			),
 		},
 		details: sentence(
-			'{{WALLET_NAME}} sends browsing history or wallet-connected domains to an external service by default without consent.',
+			'{{WALLET_NAME}} sends browsing history to an external service by default without consent.',
+		),
+		howToImprove: sentence(
+			'{{WALLET_NAME}} should not send browsing history without prior user consent.',
+		),
+		impact: paragraph(
+			'Sending browsing history by default allows external entities to profile you and undermines expectations of privacy.',
+		),
+	})
+}
+
+function walletConnectedDomainsByDefault(
+	ctx: EvaluationContext<PrivacyHygieneValue>,
+): Evaluation<PrivacyHygieneValue> {
+	return ctx.build({
+		value: {
+			id: 'wallet_connected_domains_by_default',
+			rating: Rating.FAIL,
+			displayName: 'Wallet-connected domains sent by default',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} sends wallet-connected domains to an external service by default without consent.',
+			),
+		},
+		details: sentence(
+			'{{WALLET_NAME}} sends wallet-connected domains to an external service by default without consent.',
+		),
+		howToImprove: sentence(
+			'{{WALLET_NAME}} should not send wallet-connected domains without prior user consent.',
+		),
+		impact: paragraph(
+			'Sending wallet-connected domains by default allows external entities to profile you and undermines expectations of privacy.',
+		),
+	})
+}
+
+function browsingHistoryAndWalletConnectedDomainsByDefault(
+	ctx: EvaluationContext<PrivacyHygieneValue>,
+): Evaluation<PrivacyHygieneValue> {
+	return ctx.build({
+		value: {
+			id: 'browsing_history_and_wallet_connected_domains_by_default',
+			rating: Rating.FAIL,
+			displayName: 'Browsing history and wallet-connected domains sent by default',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} sends browsing history and wallet-connected domains to an external service by default without consent.',
+			),
+		},
+		details: sentence(
+			'{{WALLET_NAME}} sends browsing history and wallet-connected domains to an external service by default without consent.',
 		),
 		howToImprove: sentence(
 			'{{WALLET_NAME}} should not send browsing history or wallet-connected domains without prior user consent.',
 		),
 		impact: paragraph(
-			'Sending browsing history or wallet-connected domains by default allows external entities to profile you and undermines expectations of privacy.',
+			'Sending browsing history and wallet-connected domains by default allows external entities to profile you and undermines expectations of privacy.',
 		),
 	})
 }
@@ -161,9 +209,23 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 		fail: [
 			exampleRating(
 				sentence(
-					'The wallet sends browsing history or wallet-connected domains to an external service by default without consent.',
+					'The wallet sends browsing history to an external service by default without consent.',
 				),
-				forbiddenDataByDefault(EvaluationContext.forTest(() => privacyHygiene)),
+				browsingHistoryByDefault(EvaluationContext.forTest(() => privacyHygiene)),
+			),
+			exampleRating(
+				sentence(
+					'The wallet sends wallet-connected domains to an external service by default without consent.',
+				),
+				walletConnectedDomainsByDefault(EvaluationContext.forTest(() => privacyHygiene)),
+			),
+			exampleRating(
+				sentence(
+					'The wallet sends browsing history and wallet-connected domains to an external service by default without consent.',
+				),
+				browsingHistoryAndWalletConnectedDomainsByDefault(
+					EvaluationContext.forTest(() => privacyHygiene),
+				),
 			),
 			exampleRating(
 				sentence(
@@ -201,8 +263,9 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 
 		let hasUnknownFlowData = false
 		let hasAnalyticsInSomeFlow = false
-		let hasForbiddenDataByDefaultInSomeFlow = false
 		const forbiddenInfos = userInfoEnums.items.filter(isForbiddenWithoutPriorConsentUserInfo)
+		let sendsBrowsingHistoryByDefault = false
+		let sendsWalletConnectedDomainsByDefault = false
 
 		for (const flow of userFlow.items) {
 			const forFlow = dataCollection[flow]
@@ -231,8 +294,14 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 
 					if (collectedByDefault(qualifiedCollection[info])) {
 						collectsForbiddenDataByDefault = true
-						hasForbiddenDataByDefaultInSomeFlow = true
-						break
+
+						if (info === PersonalInfo.BROWSING_HISTORY_URLS) {
+							sendsBrowsingHistoryByDefault = true
+						}
+
+						if (info === WalletInfo.WALLET_CONNECTED_DOMAINS) {
+							sendsWalletConnectedDomainsByDefault = true
+						}
 					}
 				}
 
@@ -242,8 +311,16 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 			}
 		}
 
-		if (hasForbiddenDataByDefaultInSomeFlow) {
-			return forbiddenDataByDefault(ctx)
+		if (sendsBrowsingHistoryByDefault && sendsWalletConnectedDomainsByDefault) {
+			return browsingHistoryAndWalletConnectedDomainsByDefault(ctx)
+		}
+
+		if (sendsBrowsingHistoryByDefault) {
+			return browsingHistoryByDefault(ctx)
+		}
+
+		if (sendsWalletConnectedDomainsByDefault) {
+			return walletConnectedDomainsByDefault(ctx)
 		}
 
 		const analyticsConsent = ctx.features.privacy.analyticsConsent
