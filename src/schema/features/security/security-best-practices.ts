@@ -235,7 +235,7 @@ export interface BrowserExtensionManifest {
 	 * Security-sensitive Browser API permissions declared in the `permissions`
 	 * manifest field, granted to the extension at install time.
 	 */
-	permissions: BrowserExtensionManifest[]
+	permissions: BrowserExtensionPermission[]
 
 	/**
 	 * Broadest scope of web origins that may load resources from this
