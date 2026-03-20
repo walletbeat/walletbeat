@@ -10,10 +10,10 @@ import {
 import {
 	collectedByDefault,
 	CollectionPolicy,
-	dataCollectionForAllSupportedFlows,
 	DataCollectionPurpose,
 	PersonalInfo,
 	qualifiedDataCollection,
+	userFlow,
 	type UserInfo,
 	userInfoEnums,
 	WalletInfo,
@@ -194,38 +194,81 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		const dataCollection = ctx.features.privacy.dataCollection
-		const allDataCollection = dataCollectionForAllSupportedFlows(dataCollection)
 
-		if (dataCollection === null || allDataCollection === null) {
+		if (dataCollection === null) {
 			return unrated(ctx, null)
 		}
 
+		let hasUnknownFlowData = false
 		let hasAnalyticsInSomeFlow = false
+		let hasForbiddenDataByDefaultInSomeFlow = false
+		const forbiddenInfos = userInfoEnums.items.filter(isForbiddenWithoutPriorConsentUserInfo)
 
-		for (const collected of allDataCollection) {
-			ctx.addRef(collected)
-			hasAnalyticsInSomeFlow =
-				hasAnalyticsInSomeFlow || collected.purposes.includes(DataCollectionPurpose.ANALYTICS)
+		for (const flow of userFlow.items) {
+			const forFlow = dataCollection[flow]
 
-			const qualified = qualifiedDataCollection(collected.dataCollection)
+			if (forFlow === null) {
+				hasUnknownFlowData = true
+				continue
+			}
 
-			for (const info of userInfoEnums.items) {
-				if (isForbiddenWithoutPriorConsentUserInfo(info) && collectedByDefault(qualified[info])) {
-					return forbiddenDataByDefault(ctx)
+			if (forFlow === undefined || forFlow === 'FLOW_NOT_SUPPORTED') {
+				continue
+			}
+
+			for (const collected of forFlow.collected) {
+				const hasAnalyticsPurpose = collected.purposes.includes(DataCollectionPurpose.ANALYTICS)
+
+				hasAnalyticsInSomeFlow = hasAnalyticsInSomeFlow || hasAnalyticsPurpose
+
+				const qualifiedCollection = qualifiedDataCollection(collected.dataCollection)
+				let collectsForbiddenData = false
+				let collectsForbiddenDataByDefault = false
+
+				for (const info of forbiddenInfos) {
+					collectsForbiddenData =
+						collectsForbiddenData || qualifiedCollection[info] !== CollectionPolicy.NEVER
+
+					if (collectedByDefault(qualifiedCollection[info])) {
+						collectsForbiddenDataByDefault = true
+						hasForbiddenDataByDefaultInSomeFlow = true
+						break
+					}
+				}
+
+				if (hasAnalyticsPurpose || collectsForbiddenData || collectsForbiddenDataByDefault) {
+					ctx.addRef(collected)
 				}
 			}
 		}
 
+		if (hasForbiddenDataByDefaultInSomeFlow) {
+			return forbiddenDataByDefault(ctx)
+		}
+
 		const analyticsConsent = ctx.features.privacy.analyticsConsent
 
-		if (hasAnalyticsInSomeFlow) {
-			if (analyticsConsent === null) {
-				return unrated(ctx, null)
-			}
+		if (
+			analyticsConsent === CollectionPolicy.BY_DEFAULT ||
+			analyticsConsent === CollectionPolicy.ALWAYS
+		) {
+			return analyticsWithoutConsent(ctx)
+		}
 
-			if (!doesNotCollectAnalyticsWithoutConsent(analyticsConsent)) {
-				return analyticsWithoutConsent(ctx)
-			}
+		if (hasAnalyticsInSomeFlow && analyticsConsent === null) {
+			return unrated(ctx, null)
+		}
+
+		if (
+			hasAnalyticsInSomeFlow &&
+			analyticsConsent !== null &&
+			!doesNotCollectAnalyticsWithoutConsent(analyticsConsent)
+		) {
+			return analyticsWithoutConsent(ctx)
+		}
+
+		if (hasUnknownFlowData) {
+			return unrated(ctx, null)
 		}
 
 		return noForbiddenDataByDefault(ctx)
