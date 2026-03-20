@@ -104,8 +104,8 @@ export const phantom: SoftwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			analyticsConsent: null,
 			appIsolation: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: 'https://phantom.com/privacy',
 			transactionPrivacy: {
@@ -115,6 +115,7 @@ export const phantom: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

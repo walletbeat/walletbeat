@@ -189,8 +189,8 @@ export const daimo: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
-			analyticsConsent: null,
 			appIsolation: appConnectionNotSupported,
+			crashReportingConsent: null,
 			dataCollection: {
 				[UserFlow.APP_CONNECTION]: 'FLOW_NOT_SUPPORTED',
 				[UserFlow.NATIVE_SWAP]: 'FLOW_NOT_SUPPORTED',
@@ -361,6 +361,7 @@ export const daimo: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.PAYMENTS,
 		security: {

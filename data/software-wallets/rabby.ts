@@ -286,7 +286,6 @@ export const rabby: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
-			analyticsConsent: null,
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: notSupported,
@@ -300,6 +299,7 @@ export const rabby: SoftwareWallet = {
 				[Variant.MOBILE]: null,
 				[Variant.DESKTOP]: null,
 			},
+			crashReportingConsent: null,
 			dataCollection: {
 				[Variant.BROWSER]: {
 					[UserFlow.NATIVE_SWAP]: {
@@ -396,6 +396,7 @@ export const rabby: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

@@ -130,11 +130,12 @@ export const ledgerWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			analyticsConsent: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://ledger.com/privacy-policy',
 			transactionPrivacy: null,
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

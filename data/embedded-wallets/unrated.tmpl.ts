@@ -52,10 +52,11 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			analyticsConsent: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: null,
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

@@ -280,7 +280,6 @@ export const metamask: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
-			analyticsConsent: null,
 			appIsolation: {
 				createInAppConnectionFlow: supported({
 					ref: refTodo,
@@ -292,6 +291,7 @@ export const metamask: SoftwareWallet = {
 				}),
 				useAppSpecificLastConnectedAddresses: notSupported,
 			},
+			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: 'https://consensys.io/privacy-notice/',
 			transactionPrivacy: {
@@ -301,6 +301,7 @@ export const metamask: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

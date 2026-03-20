@@ -124,7 +124,7 @@ export const keycardShell: HardwareWallet = {
 		// Multi-address: wallet app selects which accounts to use; Shell signs for any derived address
 		multiAddress: featureSupported,
 		privacy: {
-			analyticsConsent: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			// Privacy: No radio onboard; USB data transfer can be disabled; air-gapped via QR
 			hardwarePrivacy: {
@@ -139,6 +139,7 @@ export const keycardShell: HardwareWallet = {
 			},
 			privacyPolicy: 'https://keycard.tech/legal/privacy-policy',
 			transactionPrivacy: null,
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

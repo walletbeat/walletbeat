@@ -184,7 +184,6 @@ export const zeus: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
-			analyticsConsent: null,
 			appIsolation: {
 				[Variant.DESKTOP]: {
 					createInAppConnectionFlow: notSupported,
@@ -201,6 +200,7 @@ export const zeus: SoftwareWallet = {
 					useAppSpecificLastConnectedAddresses: notSupported,
 				},
 			},
+			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: {
@@ -210,6 +210,7 @@ export const zeus: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

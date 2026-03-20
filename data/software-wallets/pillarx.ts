@@ -103,8 +103,8 @@ export const pillarx: SoftwareWallet = {
 		},
 		multiAddress: notSupported,
 		privacy: {
-			analyticsConsent: null,
 			appIsolation: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: 'https://pillarx.app/privacy-policy',
 			transactionPrivacy: {
@@ -114,6 +114,7 @@ export const pillarx: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

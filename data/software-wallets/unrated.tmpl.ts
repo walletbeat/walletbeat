@@ -75,11 +75,12 @@ export const unratedTemplate: SoftwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			analyticsConsent: null,
 			appIsolation: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: null,
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

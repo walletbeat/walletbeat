@@ -57,11 +57,12 @@ export const fireflyWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			analyticsConsent: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: '',
 			transactionPrivacy: null,
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

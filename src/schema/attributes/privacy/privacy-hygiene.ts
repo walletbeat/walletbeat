@@ -134,26 +134,50 @@ function browsingHistoryAndWalletConnectedDomainsByDefault(
 	})
 }
 
-function analyticsWithoutConsent(
+function usageAnalyticsWithoutConsent(
 	ctx: EvaluationContext<PrivacyHygieneValue>,
 ): Evaluation<PrivacyHygieneValue> {
 	return ctx.build({
 		value: {
-			id: 'analytics_without_consent',
+			id: 'usage_analytics_without_consent',
 			rating: Rating.FAIL,
-			displayName: 'Analytics without prior consent',
+			displayName: 'Usage analytics without prior consent',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} uses analytics (such as Matomo or Sentry) without asking for user consent first.',
+				'{{WALLET_NAME}} uses product analytics without asking for user consent first.',
 			),
 		},
 		details: sentence(
-			'{{WALLET_NAME}} uses analytics (such as Matomo or Sentry) without asking for user consent first.',
+			'{{WALLET_NAME}} uses product analytics without asking for user consent first.',
 		),
 		howToImprove: sentence(
-			'{{WALLET_NAME}} should ask for user consent before enabling analytics.',
+			'{{WALLET_NAME}} should ask for user consent before enabling product analytics.',
 		),
 		impact: paragraph(
-			"Using analytics without prior consent sends usage data to external services without the user's agreement.",
+			"Using product analytics without prior consent sends usage data to external services without the user's agreement.",
+		),
+	})
+}
+
+function crashReportingWithoutConsent(
+	ctx: EvaluationContext<PrivacyHygieneValue>,
+): Evaluation<PrivacyHygieneValue> {
+	return ctx.build({
+		value: {
+			id: 'crash_reporting_without_consent',
+			rating: Rating.PARTIAL,
+			displayName: 'Crash reporting without prior consent',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} sends crash/error reports without asking for user consent first.',
+			),
+		},
+		details: sentence(
+			'{{WALLET_NAME}} sends crash/error reports without asking for user consent first.',
+		),
+		howToImprove: sentence(
+			'{{WALLET_NAME}} should ask for user consent before enabling crash/error reporting.',
+		),
+		impact: paragraph(
+			'Collecting crash reports without prior consent can expose wallet usage context without explicit user agreement, even when product analytics are disabled or consented.',
 		),
 	})
 }
@@ -167,11 +191,11 @@ function noForbiddenDataByDefault(
 			rating: Rating.PASS,
 			displayName: 'No forbidden data sent by default',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} does not send browsing history or wallet-connected domains without consent, and asks for consent before using analytics.',
+				'{{WALLET_NAME}} does not send browsing history or wallet-connected domains without consent, and asks for consent before using product analytics or crash/error reporting.',
 			),
 		},
 		details: sentence(
-			'{{WALLET_NAME}} does not send browsing history or wallet-connected domains without consent, and asks for consent before using analytics.',
+			'{{WALLET_NAME}} does not send browsing history or wallet-connected domains without consent, and asks for consent before using product analytics or crash/error reporting.',
 		),
 	})
 }
@@ -188,12 +212,17 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 		[
 			'Users expect that data like browsing history and which sites they connect their wallet to is never sent without consent.',
 			'Much like users would not expect a web browser to leak browsing history for analytics, they should not expect wallets to track every site interaction by default.',
-			'Analytics (Matomo, Sentry, etc.) should only be used after the user has agreed.',
+			'Product analytics and crash/error reporting telemetry should only be used after the user has agreed.',
 			'This attribute encodes that baseline.',
 		].join(' '),
 	),
 	methodology: markdown(
-		'We consider default behavior; we look at network requests and data-collection policies; we fail if browsing history or wallet-connected domains are sent by default, or if analytics are used without prior consent.',
+		[
+			'We evaluate default behavior using network requests and published data-collection policies.',
+			'The wallet fails if it sends browsing history or wallet-connected domains by default.',
+			'The wallet also fails if it uses product analytics without prior consent.',
+			'It gets a partial rating when crash/error reporting runs without prior consent.',
+		].join(' '),
 	),
 	ratingScale: {
 		display: 'fail-pass',
@@ -220,16 +249,21 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 				),
 			),
 			exampleRating(
-				sentence(
-					'The wallet uses analytics (e.g. Matomo or Sentry) without asking for user consent first.',
-				),
-				analyticsWithoutConsent(EvaluationContext.forTest(() => privacyHygiene)),
+				sentence('The wallet uses product analytics without asking for user consent first.'),
+				usageAnalyticsWithoutConsent(EvaluationContext.forTest(() => privacyHygiene)),
 			),
 		],
-		partial: [],
+		partial: [
+			exampleRating(
+				sentence(
+					'The wallet asks for consent before product analytics, but sends crash/error reports without prior consent.',
+				),
+				crashReportingWithoutConsent(EvaluationContext.forTest(() => privacyHygiene)),
+			),
+		],
 		pass: exampleRating(
 			sentence(
-				'The wallet does not send browsing history or wallet-connected domains without consent, and asks for consent before using analytics.',
+				'The wallet does not send browsing history or wallet-connected domains without consent, and asks for consent before using product analytics or crash/error reporting.',
 			),
 			noForbiddenDataByDefault(EvaluationContext.forTest(() => privacyHygiene)),
 		),
@@ -315,16 +349,27 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 			return walletConnectedDomainsByDefault(ctx)
 		}
 
-		const analyticsConsent = ctx.features.privacy.analyticsConsent
+		const usageAnalyticsConsent = ctx.features.privacy.usageAnalyticsConsent
+		const crashReportingConsent = ctx.features.privacy.crashReportingConsent
 
 		if (
-			analyticsConsent === CollectionPolicy.BY_DEFAULT ||
-			analyticsConsent === CollectionPolicy.ALWAYS
+			usageAnalyticsConsent === CollectionPolicy.BY_DEFAULT ||
+			usageAnalyticsConsent === CollectionPolicy.ALWAYS
 		) {
-			return analyticsWithoutConsent(ctx)
+			return usageAnalyticsWithoutConsent(ctx)
 		}
 
-		if (hasAnalyticsInSomeFlow && analyticsConsent === null) {
+		if (
+			crashReportingConsent === CollectionPolicy.BY_DEFAULT ||
+			crashReportingConsent === CollectionPolicy.ALWAYS
+		) {
+			return crashReportingWithoutConsent(ctx)
+		}
+
+		if (
+			hasAnalyticsInSomeFlow &&
+			(usageAnalyticsConsent === null || crashReportingConsent === null)
+		) {
 			return unrated(ctx, null)
 		}
 

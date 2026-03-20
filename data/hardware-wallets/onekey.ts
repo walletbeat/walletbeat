@@ -106,11 +106,12 @@ export const onekeyWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			analyticsConsent: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://help.onekey.so/hc/en-us/articles/360002003315-Privacy-Policy',
 			transactionPrivacy: null,
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

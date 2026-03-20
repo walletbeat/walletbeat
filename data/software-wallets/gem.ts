@@ -117,8 +117,8 @@ export const gemwallet: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
-			analyticsConsent: null,
 			appIsolation: null,
+			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: 'https://gemwallet.com/privacy',
 			transactionPrivacy: {
@@ -128,6 +128,7 @@ export const gemwallet: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
+			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

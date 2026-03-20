@@ -120,11 +120,18 @@ export interface WalletBaseFeatures {
 		transactionPrivacy: VariantFeature<TransactionPrivacy>
 
 		/**
-		 * Collection policy for analytics and telemetry (product analytics and
-		 * crash/error reporting, e.g. Matomo, Sentry). NEVER = no analytics;
+		 * Collection policy for product analytics / UI usage tracking.
+		 * NEVER = no analytics;
 		 * OPT_IN / PROMPTED = consent before first use; BY_DEFAULT / ALWAYS = no consent.
 		 */
-		analyticsConsent: VariantFeature<CollectionPolicy>
+		usageAnalyticsConsent: VariantFeature<CollectionPolicy>
+
+		/**
+		 * Collection policy for crash/error reporting telemetry.
+		 * NEVER = no crash reporting;
+		 * OPT_IN / PROMPTED = consent before first use; BY_DEFAULT / ALWAYS = no consent.
+		 */
+		crashReportingConsent: VariantFeature<CollectionPolicy>
 	}
 
 	/** Self-sovereignty features. */
@@ -318,7 +325,8 @@ export interface ResolvedFeatures {
 		accountRecovery: ResolvedFeature<AccountRecovery>
 	}
 	privacy: {
-		analyticsConsent: ResolvedFeature<CollectionPolicy>
+		usageAnalyticsConsent: ResolvedFeature<CollectionPolicy>
+		crashReportingConsent: ResolvedFeature<CollectionPolicy>
 		dataCollection: ResolvedFeature<DataCollection>
 		privacyPolicy: ResolvedFeature<string>
 		hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport>
@@ -465,9 +473,13 @@ export function resolveFeatures(
 			),
 		},
 		privacy: {
-			analyticsConsent: baseFeat(
-				'privacy.analyticsConsent',
-				features => features.privacy.analyticsConsent,
+			usageAnalyticsConsent: baseFeat(
+				'privacy.usageAnalyticsConsent',
+				features => features.privacy.usageAnalyticsConsent,
+			),
+			crashReportingConsent: baseFeat(
+				'privacy.crashReportingConsent',
+				features => features.privacy.crashReportingConsent,
 			),
 			dataCollection: baseFeat(
 				'privacy.dataCollection',
