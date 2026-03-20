@@ -1,11 +1,17 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
+import {
+	type Attribute,
+	type Evaluation,
+	EvaluationContext,
+	Rating,
+	type Value,
+} from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type HardwarePrivacySupport,
 	HardwarePrivacyType,
 } from '@/schema/features/privacy/hardware-privacy'
 import type { AtLeastOneVariant } from '@/schema/variants'
+import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -84,19 +90,22 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwarePrivacyValue>>) =>
 		pickWorstRating<HardwarePrivacyValue>(perVariant),
-	evaluate: (features: ResolvedFeatures): Evaluation<HardwarePrivacyValue> => {
-		if (features.type !== WalletType.HARDWARE) {
-			return exempt(hardwarePrivacy, sentence('Only rated for hardware wallets'), {
+	evaluate: (ctx: EvaluationContext<HardwarePrivacyValue>): Evaluation<HardwarePrivacyValue> => {
+		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
+		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
+
+		if (ctx.features.type !== WalletType.HARDWARE) {
+			return exempt(ctx, sentence('Only rated for hardware wallets'), {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
 				wirelessPrivacy: HardwarePrivacyType.FAIL,
 			})
 		}
 
-		const hwPrivacy = features.privacy.hardwarePrivacy
+		const hwPrivacy = ctx.features.privacy.hardwarePrivacy
 
 		if (hwPrivacy === null) {
-			return unrated(hardwarePrivacy, {
+			return unrated(ctx, {
 				phoningHome: HardwarePrivacyType.FAIL,
 				inspectableRemoteCalls: HardwarePrivacyType.FAIL,
 				wirelessPrivacy: HardwarePrivacyType.FAIL,
@@ -105,7 +114,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 
 		const rating = evaluateHardwarePrivacy(hwPrivacy)
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'hardware_privacy',
 				rating,
@@ -115,7 +124,6 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 			},
 			details: paragraph(`{{WALLET_NAME}} hardware privacy evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-			// TODO: Add references
-		}
+		})
 	},
 }

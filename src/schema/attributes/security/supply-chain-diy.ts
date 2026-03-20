@@ -1,12 +1,13 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	type ExemptEvaluation,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { HardwareWalletManufactureType } from '@/schema/features/profile'
 import {
 	type SupplyChainDIYSupport,
@@ -87,14 +88,14 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 	},
 	aggregate: pickWorstRating<SupplyChainDIYValue>,
 	exempted: (
-		features: ResolvedFeatures,
+		ctx: EvaluationContext<SupplyChainDIYValue>,
 		metadata: WalletMetadata,
 	): ExemptEvaluation<SupplyChainDIYValue> | null => {
 		if (
-			features.variant === Variant.HARDWARE &&
+			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType !== HardwareWalletManufactureType.DIY
 		) {
-			return exempt(supplyChainDIY, sentence('Attribute only applies to DIY hardware wallets.'), {
+			return exempt(ctx, sentence('Attribute only applies to DIY hardware wallets.'), {
 				diyNoNda: SupplyChainDIYType.FAIL,
 				componentSourcingComplexity: SupplyChainDIYType.FAIL,
 			})
@@ -102,10 +103,12 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 
 		return null
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainDIYValue> => {
-		if (features.type !== WalletType.HARDWARE) {
+	evaluate: (ctx: EvaluationContext<SupplyChainDIYValue>): Evaluation<SupplyChainDIYValue> => {
+		ctx.setVerifiability(Verifiability.SELF_EVIDENT) // If you build it, you source your own parts.
+
+		if (ctx.features.type !== WalletType.HARDWARE) {
 			return exempt(
-				supplyChainDIY,
+				ctx,
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.',
 				),
@@ -116,10 +119,10 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 			)
 		}
 
-		const diyFeature = features.security.supplyChainDIY
+		const diyFeature = ctx.features.security.supplyChainDIY
 
 		if (diyFeature === null) {
-			return unrated(supplyChainDIY, {
+			return unrated(ctx, {
 				diyNoNda: SupplyChainDIYType.FAIL,
 				componentSourcingComplexity: SupplyChainDIYType.FAIL,
 			})
@@ -127,7 +130,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 
 		const rating = evaluateSupplyChainDIY(diyFeature)
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'supply_chain_diy',
 				rating,
@@ -137,7 +140,6 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 			},
 			details: paragraph(`{{WALLET_NAME}} DIY supply chain evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-			// TODO: Add references
-		}
+		})
 	},
 }

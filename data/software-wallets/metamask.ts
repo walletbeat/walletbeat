@@ -473,7 +473,7 @@ export const metamask: SoftwareWallet = {
 						{
 							explanation:
 								'MetaMask maintains a local phishing database to detect malicious apps and websites without revealing browsing activity to external services.',
-							url: 'https://support.metamask.io/ms/privacy-and-security/how-to-turn-on-security-alerts/',
+							url: 'https://support.metamask.io/configure/wallet/how-to-turn-on-security-alerts',
 						},
 						{
 							explanation:
@@ -557,6 +557,7 @@ export const metamask: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

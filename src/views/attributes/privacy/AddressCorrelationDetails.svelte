@@ -5,6 +5,7 @@
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
+	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 
 	type LeakInfo = {
 		key: string
@@ -69,11 +70,7 @@
 			contentType: ContentType.MARKDOWN,
 			markdown: 'By default, **{{WALLET_NAME}}** allows your wallet address to be correlated with your personal information:'
 		}}
-		strings={{
-			WALLET_NAME: wallet.metadata.displayName,
-			WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-			WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
-		}}
+		strings={getWalletEvalStrings(wallet)}
 	/>
 {:else}
 	{@const sortedLinkables = nonEmptySorted(
@@ -154,10 +151,6 @@
 
 ${leaksText}`
 		}}
-		strings={{
-			WALLET_NAME: wallet.metadata.displayName,
-			WALLET_PSEUDONYM_SINGULAR: wallet.metadata.pseudonymType?.singular ?? null,
-			WALLET_PSEUDONYM_PLURAL: wallet.metadata.pseudonymType?.plural ?? null,
-		}}
+		strings={getWalletEvalStrings(wallet)}
 	/>
 {/if}

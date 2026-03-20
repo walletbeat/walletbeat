@@ -1,0 +1,309 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"type": "object",
+	"description": "Rated wallet JSON export: top-level metadata, an overall block (aggregated attribute groups), and a perVariant object with one key per variant (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE) present in variants, each with the same attribute-group structure as overall.",
+	"required": [
+		"walletId",
+		"types",
+		"variants",
+		"overall",
+		"perVariant",
+		"displayName",
+		"description",
+		"lastUpdated",
+		"stage",
+		"stageBreakdown"
+	],
+	"properties": {
+		"$schema": {
+			"type": "string",
+			"description": "URL of the JSON Schema for this document."
+		},
+		"walletId": {
+			"type": "string",
+			"minLength": 1,
+			"description": "Unique identifier for the wallet."
+		},
+		"types": {
+			"type": "array",
+			"minItems": 1,
+			"description": "Wallet types (SOFTWARE, HARDWARE, EMBEDDED) this wallet belongs to.",
+			"items": {
+				"type": "string",
+				"enum": ["SOFTWARE", "HARDWARE", "EMBEDDED"]
+			}
+		},
+		"variants": {
+			"type": "array",
+			"minItems": 1,
+			"description": "List of variants (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE) this wallet has. Each variant in this list has a corresponding key in perVariant with the same attribute-group structure as overall.",
+			"items": {
+				"type": "string",
+				"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
+			}
+		},
+		"displayName": {
+			"type": "string",
+			"minLength": 1,
+			"description": "Human-readable wallet name."
+		},
+		"description": {
+			"type": "string",
+			"description": "Short wallet description (rendered blurb)."
+		},
+		"lastUpdated": {
+			"type": "string",
+			"description": "Date the wallet data was last updated (YYYY-MM-DD)."
+		},
+		"stage": {
+			"oneOf": [{ "type": "null" }, { "type": "string" }],
+			"description": "Walletbeat stage label, or null if not applicable."
+		},
+		"stageBreakdown": {
+			"oneOf": [
+				{ "type": "null" },
+				{
+					"type": "array",
+					"items": { "$ref": "#/$defs/stageBreakdownItem" },
+					"description": "Per-stage criteria passed/total and status for the primary ladder; null when stage is not applicable."
+				}
+			]
+		},
+		"website": {
+			"type": "string",
+			"description": "Primary website URL for the wallet, when known."
+		},
+		"repository": {
+			"type": "string",
+			"description": "Primary source code repository URL, when known."
+		},
+		"overall": {
+			"type": "object",
+			"description": "Aggregated evaluation across all variants. Keys are attribute group ids (e.g. security, privacy); values are objects keyed by attribute id, each with attribute metadata and evaluation block.",
+			"additionalProperties": {
+				"$ref": "#/$defs/attributeGroupExport"
+			}
+		},
+		"perVariant": {
+			"type": "object",
+			"minProperties": 1,
+			"description": "Per-variant data. Keys are variant names (MOBILE, DESKTOP, BROWSER, EMBEDDED, HARDWARE); only variants listed in the variants array appear. Each value has attributes (evaluation blocks, same structure as overall) and features (raw resolved feature data for that variant).",
+			"additionalProperties": {
+				"$ref": "#/$defs/perVariantBlock"
+			},
+			"propertyNames": {
+				"enum": ["MOBILE", "DESKTOP", "BROWSER", "EMBEDDED", "HARDWARE"]
+			}
+		}
+	},
+	"additionalProperties": false,
+	"$defs": {
+		"perVariantBlock": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["attributes", "features"],
+			"description": "Per-variant block: attribute evaluations (same structure as overall) and raw resolved feature data. Full schema for features is TBD; TODO: generate from TypeScript type definitions (see #552).",
+			"properties": {
+				"attributes": {
+					"$ref": "#/$defs/attributeGroupsExport"
+				},
+				"features": {
+					"type": "object",
+					"description": "Resolved feature tree for this variant. Structure matches resolved feature data; full schema TBD."
+				}
+			}
+		},
+		"stageBreakdownItem": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["stageId", "label", "passedCount", "totalCount", "status", "criteriaGroups"],
+			"description": "One stage in the ladder: id, label, criteria counts, derived status, and per-group/criterion details.",
+			"properties": {
+				"stageId": { "type": "string", "minLength": 1 },
+				"label": { "type": "string", "minLength": 1 },
+				"passedCount": { "type": "integer", "minimum": 0 },
+				"totalCount": { "type": "integer", "minimum": 0 },
+				"status": {
+					"type": "string",
+					"enum": ["PASS", "PARTIAL", "FAIL", "UNRATED"]
+				},
+				"criteriaGroups": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/stageCriteriaGroupBreakdownItem" },
+					"description": "Criteria groups, each with a description and per-criterion details."
+				}
+			}
+		},
+		"stageCriteriaGroupBreakdownItem": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["description", "criteria"],
+			"description": "One criteria group within a stage: a description plus a list of criteria.",
+			"properties": {
+				"description": { "type": "string" },
+				"criteria": {
+					"type": "array",
+					"items": { "$ref": "#/$defs/stageCriterionBreakdownItem" }
+				}
+			}
+		},
+		"stageCriterionBreakdownItem": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["criterionId", "attributeId", "displayName", "description", "rating"],
+			"description": "One criterion within a stage: display name, description, and rating.",
+			"properties": {
+				"criterionId": { "type": "string", "minLength": 1 },
+				"attributeId": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
+				"displayName": {
+					"type": "string",
+					"minLength": 1,
+					"description": "Human-readable name for this criterion."
+				},
+				"description": { "type": "string" },
+				"rating": {
+					"type": "string",
+					"enum": ["PASS", "FAIL", "EXEMPT", "UNRATED"]
+				}
+			}
+		},
+		"attributeGroupsExport": {
+			"type": "object",
+			"description": "Map of attribute group id (e.g. security, privacy) to group export (attribute id to attribute + evaluation block). Used for overall and for each variant block.",
+			"additionalProperties": {
+				"$ref": "#/$defs/attributeGroupExport"
+			}
+		},
+		"attributeGroupExport": {
+			"type": "object",
+			"description": "One attribute group: map of attribute id to attribute export block (attribute metadata + evaluation).",
+			"additionalProperties": {
+				"$ref": "#/$defs/attributeExportBlock"
+			}
+		},
+		"attributeExportBlock": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["attribute", "evaluation"],
+			"description": "Single attribute export: attribute metadata (display name, question, methodology) plus wallet-specific evaluation (rating, shortExplanation, details, optional impact, howToImprove, references).",
+			"properties": {
+				"attribute": {
+					"$ref": "#/$defs/attributeBlock"
+				},
+				"evaluation": {
+					"$ref": "#/$defs/ratingBlock"
+				}
+			}
+		},
+		"attributeBlock": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"attributeDisplayName",
+				"attributeId",
+				"shortQuestion",
+				"whyItMatters",
+				"howIsEvaluated"
+			],
+			"description": "Attribute-level metadata (same for every wallet).",
+			"properties": {
+				"attributeDisplayName": {
+					"type": "string",
+					"minLength": 1
+				},
+				"attributeId": {
+					"type": "string",
+					"minLength": 1
+				},
+				"shortQuestion": {
+					"type": "string",
+					"description": "Short question describing what the attribute evaluates (e.g. \"Can you send and receive tokens without revealing your transaction history to others?\")"
+				},
+				"whyItMatters": {
+					"type": "string",
+					"description": "Body of the \"Why does this matter?\" / \"Why should I care?\" section"
+				},
+				"howIsEvaluated": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["heading", "methodology"],
+					"description": "Section heading and body for \"How is this attribute evaluated?\"",
+					"properties": {
+						"heading": {
+							"type": "string",
+							"minLength": 1
+						},
+						"methodology": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		},
+		"ratingBlock": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["rating", "shortExplanation", "details"],
+			"description": "Wallet-specific evaluation result for one attribute (rating, explanation, details, optional impact, howToImprove, references).",
+			"properties": {
+				"rating": {
+					"type": "string",
+					"enum": ["PASS", "FAIL", "PARTIAL", "UNRATED", "EXEMPT"],
+					"description": "Attribute rating for this wallet. PASS: wallet meets the attribute's criteria. FAIL: wallet does not meet the criteria. PARTIAL: wallet partially meets the criteria. UNRATED: insufficient feature data to evaluate. EXEMPT: attribute is not applicable to this wallet (e.g. by type or profile)."
+				},
+				"shortExplanation": {
+					"type": "string",
+					"description": "Brief explanation of why this rating was assigned."
+				},
+				"details": {
+					"type": "string",
+					"description": "Longer explanation or summary of the evaluation; may be \"See full details on the wallet page.\" when details are not easily expressed in textual format."
+				},
+				"impact": {
+					"type": "string"
+				},
+				"howToImprove": {
+					"type": "string"
+				},
+				"references": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/reference"
+					}
+				}
+			}
+		},
+		"reference": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["urls"],
+			"description": "Optional reference with explanation and one or more URLs.",
+			"properties": {
+				"explanation": {
+					"type": "string"
+				},
+				"urls": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"$ref": "#/$defs/referenceUrl"
+					}
+				}
+			}
+		},
+		"referenceUrl": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["label", "url"],
+			"description": "Single URL with optional label.",
+			"properties": {
+				"label": {
+					"type": "string"
+				},
+				"url": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

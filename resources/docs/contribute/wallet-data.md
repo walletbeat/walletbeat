@@ -12,6 +12,17 @@ In Walletbeat, data about wallets is called **wallet feature data** (or equivale
 These are defined in such a way that they are all **objective**, **observable** information about a wallet's behavior or code.
 Therefore, your core task when contributing wallet data is to **test a wallet** and **dive into its code** to fill in the wallet feature data for the wallet you are testing.
 
+### Using Claude Code skills
+
+If you use [Claude Code](https://claude.ai/code), you can use the following skills to get interactive, step-by-step guidance instead of following this guide manually:
+
+- **`/wallet-create [wallet-name]`** — use this when adding a wallet that does not yet exist in Walletbeat. It walks you through Steps 1–2: entity file, contributor file, wallet skeleton, and site registration.
+- **`/wallet-update [wallet-name]`** — use this when the wallet already exists and you want to populate or update its feature fields. It walks you through Step 3: filling in `null` fields with values and refs.
+
+Both skills cross-reference each other, so if you land on the wrong one you will be pointed in the right direction.
+
+---
+
 ### Walkthrough assumptions
 
 In this walkthrough, we will assume the following:

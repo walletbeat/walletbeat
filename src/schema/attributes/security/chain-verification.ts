@@ -1,12 +1,17 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { isSupported, type Support } from '@/schema/features/support'
+import {
+	verifiabilityRequiresAnyOf,
+	verifiabilityRequiresCustomChainRpc,
+	verifiabilityRequiresSourceCodeAccess,
+} from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { chainVerificationDetailsContent } from '@/types/content/chain-verification-details'
@@ -20,28 +25,27 @@ import {
 	type ChainConfigurability,
 	RpcEndpointConfiguration,
 } from '../../features/self-sovereignty/chain-configurability'
-import { type FullyQualifiedReference, popRefs } from '../../reference'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type ChainVerificationValue = Value
 
 function supportsChainVerification(
+	ctx: EvaluationContext<ChainVerificationValue>,
 	lightClients: NonEmptyArray<EthereumL1LightClient>,
-	refs: FullyQualifiedReference[],
 ): Evaluation<ChainVerificationValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: `chain_verification_l1_${lightClients.join('_')}`,
 			rating: Rating.PASS,
 			displayName: 'L1 chain state verification',
 			shortExplanation: sentence('{{WALLET_NAME}} verifies chain integrity of the Ethereum L1.'),
 		},
-		details: chainVerificationDetailsContent({ lightClients, refs }),
-		references: refs,
-	}
+		details: chainVerificationDetailsContent({ lightClients }),
+	})
 }
 
 function noChainVerification(
+	ctx: EvaluationContext<ChainVerificationValue>,
 	chainConfigurability: Support<ChainConfigurability> | null,
 ): Evaluation<ChainVerificationValue> {
 	const canConfigureL1 = (() => {
@@ -58,7 +62,7 @@ function noChainVerification(
 		)
 	})()
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'no_chain_verification',
 			rating: Rating.FAIL,
@@ -77,7 +81,7 @@ function noChainVerification(
 			'{{WALLET_NAME}} should integrate [light client functionality](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/) to verify the integrity of Ethereum chain data.',
 		),
 		references: [],
-	}
+	})
 }
 
 export const chainVerification: Attribute<ChainVerificationValue> = {
@@ -120,39 +124,55 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 			mdParagraph(
 				'The wallet verifies the integrity of the Ethereum L1 chain using a [light client](https://ethereum.org/en/developers/docs/nodes-and-clients/light-clients/).',
 			),
-			supportsChainVerification([EthereumL1LightClient.helios], []),
+			supportsChainVerification(
+				EvaluationContext.forTest(() => chainVerification),
+				[EthereumL1LightClient.helios],
+			),
 		),
 		fail: exampleRating(
 			paragraph(
 				'The wallet does not verify the integrity of the Ethereum L1 chain, relying on the honesty of external RPC providers instead.',
 			),
-			noChainVerification(null),
+			noChainVerification(
+				EvaluationContext.forTest(() => chainVerification),
+				null,
+			),
 		),
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<ChainVerificationValue> => {
-		if (features.type === WalletType.HARDWARE) {
-			return exempt(
-				chainVerification,
-				sentence('This attribute is not applicable for hardware wallets.'),
-				null,
-			)
+	evaluate: (
+		ctx: EvaluationContext<ChainVerificationValue>,
+	): Evaluation<ChainVerificationValue> => {
+		ctx.setVerifiability(
+			verifiabilityRequiresAnyOf(
+				verifiabilityRequiresCustomChainRpc({
+					mustBeAbleToConfigureL1: true,
+					mustBeAbleToConfigureSpecificL2s: false,
+				}),
+				verifiabilityRequiresSourceCodeAccess({
+					coreOnlyIsSufficient: true,
+				}),
+			),
+		)
+
+		if (ctx.features.type === WalletType.HARDWARE) {
+			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'), null)
 		}
 
-		const l1Client = features.security.lightClient.ethereumL1
+		const l1Client = ctx.features.security.lightClient.ethereumL1
 
 		if (l1Client === null) {
-			return unrated(chainVerification, null)
+			return unrated(ctx, null)
 		}
 
 		if (!isSupported(l1Client)) {
-			return noChainVerification(features.chainConfigurability)
+			return noChainVerification(ctx, ctx.features.chainConfigurability)
 		}
 
-		const { withoutRefs, refs } = popRefs<EthereumL1LightClientSupport>(l1Client)
+		const l1ClientNoRefs = ctx.popRefs<EthereumL1LightClientSupport>(l1Client)
 		const supportedLightClients: EthereumL1LightClient[] = []
 
 		for (const [lightClient, supported] of nonEmptyEntries<EthereumL1LightClient, Support>(
-			withoutRefs,
+			l1ClientNoRefs,
 		)) {
 			if (isSupported(supported)) {
 				supportedLightClients.push(lightClient)
@@ -163,7 +183,7 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 			throw new Error('No supported light clients found; this should be impossible per type system')
 		}
 
-		return supportsChainVerification(supportedLightClients, refs)
+		return supportsChainVerification(ctx, supportedLightClients)
 	},
 	aggregate: pickWorstRating<ChainVerificationValue>,
 }

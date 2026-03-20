@@ -20,21 +20,46 @@ export function isAccountTypeSupported<T extends object>(
 
 /** Set of possible account types. */
 export enum AccountType {
-	/** EOA account type, behind a private key. */
+	/**
+	 * EOA account type, behind a private key.
+	 * To test: create a new wallet and check whether it shows a seed phrase
+	 * during onboarding. Verify the address starts with `0x` and has no
+	 * associated contract code (e.g. check on Etherscan — "Contract" tab
+	 * should be absent).
+	 */
 	eoa = 'eoa',
 
-	/** MPC wallets, behind a key with split shards. */
+	/**
+	 * MPC wallets, behind a key with split shards.
+	 * To test: check the wallet's documentation for "MPC", "threshold
+	 * signatures", or "key sharding". MPC wallets typically do not show a
+	 * seed phrase and the address has no on-chain contract code.
+	 */
 	mpc = 'mpc',
 
-	/** EOA account that is used as a smart contract account with EIP-7702. */
+	/**
+	 * EOA account that is used as a smart contract account with EIP-7702.
+	 * To test: check the wallet's documentation for EIP-7702 support. The
+	 * address is an EOA but will have contract code attached when the
+	 * delegation is active (visible on Etherscan under "Contract").
+	 */
 	eip7702 = 'eip7702',
 
 	/**
 	 * Raw ERC-4337 account, i.e. an account for which the address matches the
 	 * smart contract code.
+	 * To test: look up the wallet address on Etherscan — the "Contract" tab
+	 * should be present and show deployed bytecode. The wallet typically does
+	 * not show a seed phrase; authentication uses a separate signer key.
 	 */
 	rawErc4337 = 'rawErc4337',
-	/** Safe multisig smart contract account. */
+
+	/**
+	 * Safe multisig smart contract account.
+	 * To test: check whether the wallet lets you connect to or create a Safe.
+	 * The address should resolve to a Safe contract on Etherscan (look for
+	 * "GnosisSafe" or "Safe" in the contract name).
+	 */
 	safe = 'safe',
 }
 
@@ -67,7 +92,13 @@ export type PossibleTransactionGenerationCapability = Exclude<
 	TransactionGenerationCapability.IMPOSSIBLE
 >
 
-/** Account support features. */
+/**
+ * Account support features.
+ *
+ * To test: create a new wallet and observe which account type is created by
+ * default (EOA, MPC, smart account, Safe). Then check wallet settings and
+ * documentation to confirm which additional account types are supported.
+ */
 export type AccountSupport = Exclude<
 	{
 		/**
@@ -146,7 +177,19 @@ export function supportedAccountTypes(accountSupport: AccountSupport): NonEmptyS
 	)
 }
 
-/** Support information for EOA accounts. */
+/**
+ * Support information for EOA accounts.
+ *
+ * To test:
+ * - `keyDerivation`: During onboarding or in Settings, check whether the
+ *   wallet shows a 12/24-word BIP39 seed phrase. Import the seed phrase into
+ *   another BIP44-compatible wallet (e.g. MetaMask) and verify the same
+ *   address is derived.
+ * - `canExportPrivateKey`: Go to Settings → Security (or equivalent) and
+ *   look for an "Export private key" or "Show private key" option.
+ * - `canExportSeedPhrase`: Go to Settings → Security and look for a
+ *   "Reveal seed phrase" or "Back up recovery phrase" option.
+ */
 export interface AccountTypeEoa {
 	/** Type of standards used to deterministically derive private keys. */
 	keyDerivation:
@@ -168,6 +211,11 @@ interface AccountTypeMultifactor {
 	 * When setting up the wallet, does the user own enough shares in their
 	 * own self-custody to control the wallet?
 	 * "Control" here means the ability to sign arbitrary transactions.
+	 *
+	 * To test: check the wallet's documentation and onboarding flow. Look for
+	 * whether any share is stored solely on the provider's servers (NO), on the
+	 * user's device by default (YES), or whether the user is prompted to choose
+	 * (USER_MAKES_EXPLICIT_CHOICE).
 	 */
 	controllingSharesInSelfCustodyByDefault: 'YES' | 'NO' | 'USER_MAKES_EXPLICIT_CHOICE'
 
@@ -178,6 +226,11 @@ interface AccountTypeMultifactor {
 	 *
 	 * This implies that the code to create such a transaction already exists
 	 * and does not rely on any network request to a proprietary API or service.
+	 *
+	 * To test: check the wallet's source code and documentation for whether
+	 * token transfers depend on a proprietary API. Try sending a transaction
+	 * while blocking network access to the provider's endpoints to see if it
+	 * is still possible.
 	 */
 	tokenTransferTransactionGeneration: PossibleTransactionGenerationCapability
 }
@@ -187,7 +240,14 @@ interface AccountTypeMultifactor {
  * where the factors cannot be mutated.
  */
 export type AccountTypeMpc = AccountTypeMultifactor & {
-	/** How is the underlying key generation performed before shares are distributed? */
+	/**
+	 * How is the underlying key generation performed before shares are distributed?
+	 *
+	 * To test: check the wallet's technical documentation or audit reports.
+	 * ON_USER_DEVICE means key material never leaves the user's device during
+	 * generation; BY_EXTERNAL_PROVIDER_* means the provider participates in or
+	 * fully controls the initial keygen ceremony.
+	 */
 	initialKeyGeneration:
 		| 'ON_USER_DEVICE'
 		| 'BY_EXTERNAL_PROVIDER_IN_SECURE_ENCLAVE'
@@ -223,33 +283,37 @@ export type AccountType4337 = AccountTypeMutableMultifactor & SmartAccountType
  */
 export type AccountType7702 = SmartAccountType
 
-/** Support information for Safe multisig accounts. */
+/**
+ * Support information for Safe multisig accounts.
+ *
+ * To test:
+ * - `canDeployNew`: Go through the wallet's UI and check whether it offers
+ *   a flow to deploy a new Safe contract.
+ * - `supportsAddingOrRemovingSigners`: In an existing Safe, attempt to add
+ *   or remove an owner using only the wallet's native UI (no extra modules).
+ *   Check whether the wallet generates the `addOwnerWithThreshold` /
+ *   `removeOwner` transaction directly.
+ * - `supportsKeyRotationWithoutModules`: In an existing Safe, attempt to
+ *   replace an owner key using only the wallet's native UI (no extra
+ *   modules). Check whether the wallet generates the `swapOwner` transaction
+ *   directly.
+ * - `supportedConfigs.owners`: Try connecting the wallet to Safes with 1,
+ *   2, and many owners and note the limits.
+ */
 export interface AccountTypeSafe extends AccountTypeMutableMultifactor {
 	/** Can the wallet deploy new Safe contracts? */
-	canDeployNew: Support<{
-		/** Default configuration when creating a new Safe. */
-		defaultConfig: {
-			/** Number of owners by default. */
-			owners: number
-			/** Signature threshold by default. */
-			threshold: number
-			/** Enabled modules by default. */
-			modules: string[] // or more specific type if needed
-		}
-	}>
+	canDeployNew: boolean
+
+	/** Does the wallet support adding or removing signers without additional modules? */
+	supportsAddingOrRemovingSigners: boolean
 
 	/** Does the wallet support key rotation without additional modules? */
 	supportsKeyRotationWithoutModules: boolean
 
-	/** Supported configurations for existing Safes. */
-	supportedConfigs: {
-		/** Minimum number of owners supported. */
-		minOwners: number
-		/** Maximum number of owners supported (or 'unlimited'). */
-		maxOwners: number | 'unlimited'
-		/** Whether any threshold is supported. */
-		supportsAnyThreshold: boolean
-		/** Level of module support. */
-		moduleSupport: 'none' | 'partial' | 'full'
-	}
+	/**
+	 * Range of signers (owners) the wallet can work with.
+	 * - SINGLE_SIGNER: only single-owner Safes are supported.
+	 * - ANY_NUMBER_OF_SIGNERS: no practical upper limit on owners.
+	 */
+	supportedOwners: 'SINGLE_SIGNER' | 'ANY_NUMBER_OF_SIGNERS'
 }

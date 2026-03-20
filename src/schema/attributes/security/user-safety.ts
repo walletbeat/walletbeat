@@ -1,11 +1,12 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { WalletType } from '@/schema/wallet-types'
@@ -143,10 +144,12 @@ export const userSafety: Attribute<UserSafetyValue> = {
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) =>
 		pickWorstRating<UserSafetyValue>(perVariant),
-	evaluate: (features: ResolvedFeatures): Evaluation<UserSafetyValue> => {
-		if (features.type !== WalletType.HARDWARE) {
+	evaluate: (ctx: EvaluationContext<UserSafetyValue>): Evaluation<UserSafetyValue> => {
+		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
+
+		if (ctx.features.type !== WalletType.HARDWARE) {
 			return exempt(
-				userSafety,
+				ctx,
 				sentence(
 					'This attribute evaluates hardware wallet user safety features and is not applicable for {{WALLET_NAME}}.',
 				),
@@ -171,10 +174,10 @@ export const userSafety: Attribute<UserSafetyValue> = {
 			)
 		}
 
-		const userSafetyFeature = features.security.userSafety
+		const userSafetyFeature = ctx.features.security.userSafety
 
 		if (userSafetyFeature === null) {
-			return unrated(userSafety, {
+			return unrated(ctx, {
 				readableAddress: UserSafetyType.FAIL,
 				contractLabeling: UserSafetyType.FAIL,
 				rawTxReview: UserSafetyType.FAIL,
@@ -224,7 +227,7 @@ export const userSafety: Attribute<UserSafetyValue> = {
 				? '{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.'
 				: ''
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'user_safety',
 				rating,
@@ -233,11 +236,10 @@ export const userSafety: Attribute<UserSafetyValue> = {
 				...userSafetyFeature, // TODO: Filter fields
 			},
 			details: paragraph(detailsText),
-			// TODO: Add references
 			howToImprove:
 				rating === Rating.PASS || rating === Rating.EXEMPT
 					? undefined
 					: paragraph(howToImproveText),
-		}
+		})
 	},
 }

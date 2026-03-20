@@ -57,9 +57,29 @@ export function notSupportedWithRef(withRef: WithRef<unknown>): WithRef<NotSuppo
 /** A feature that may or may not be supported. */
 export type Support<T extends object = object> = NotSupported | Supported<T>
 
+/** Type predicate for Support<object>. */
+export function isMaybeSupported(x: unknown): x is Support<object> {
+	if (typeof x !== 'object' || x === undefined || x === null || !Object.hasOwn(x, 'support')) {
+		return false
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We checked the property exists.
+	const maybeSupport = (x as { support: unknown }).support
+
+	return (
+		typeof maybeSupport === 'string' &&
+		(maybeSupport === notSupported.support || maybeSupport === featureSupported.support)
+	)
+}
+
 /** Type predicate for `Supported<T>` */
 export function isSupported<T extends object>(support: Support<T>): support is Supported<T> {
 	return support.support === 'SUPPORTED'
+}
+
+/** Type predicate for `NotSupported`. */
+export function isNotSupported<T extends object = object>(x: Support<T>): x is NotSupported {
+	return Object.hasOwn(x, 'support') && x.support === 'NOT_SUPPORTED'
 }
 
 /**

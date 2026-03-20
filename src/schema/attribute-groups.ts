@@ -15,6 +15,7 @@ import {
 	type EvaluatedAttribute,
 	evaluatedAttributes,
 	type EvaluatedGroup,
+	EvaluationContext,
 	isExempt,
 	Rating,
 	type Value,
@@ -76,10 +77,6 @@ import {
 	hardwareWalletSupport,
 	type HardwareWalletSupportValue,
 } from './attributes/security/hardware-wallet-support'
-import {
-	passkeyImplementation,
-	type PasskeyImplementationValue,
-} from './attributes/security/passkey-implementation'
 import { scamPrevention, type ScamPreventionValue } from './attributes/security/scam-prevention'
 import { securityAudits, type SecurityAuditsValue } from './attributes/security/security-audits'
 import { supplyChainDIY, type SupplyChainDIYValue } from './attributes/security/supply-chain-diy'
@@ -109,6 +106,10 @@ import {
 	l1ProviderIndependence,
 } from './attributes/self-sovereignty/l1-provider-independence'
 import {
+	permissionsManagement,
+	type PermissionsManagementValue,
+} from './attributes/self-sovereignty/permissions-management'
+import {
 	transactionInclusion,
 	type TransactionInclusionValue,
 } from './attributes/self-sovereignty/transaction-inclusion'
@@ -136,7 +137,6 @@ type SecurityValues = Dict<{
 	chainVerification: ChainVerificationValue
 	transactionLegibility: TransactionLegibilityValue
 	hardwareWalletSupport: HardwareWalletSupportValue
-	passkeyImplementation: PasskeyImplementationValue
 	bugBountyProgram: BugBountyProgramValue
 	supplyChainDIY: SupplyChainDIYValue
 	supplyChainFactory: SupplyChainFactoryValue
@@ -157,7 +157,6 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		chainVerification,
 		transactionLegibility,
 		hardwareWalletSupport,
-		passkeyImplementation,
 		bugBountyProgram,
 		supplyChainDIY,
 		supplyChainFactory,
@@ -171,7 +170,6 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		chainVerification: 1.0,
 		transactionLegibility: 1.0,
 		hardwareWalletSupport: 1.0,
-		passkeyImplementation: 1.0,
 		bugBountyProgram: 1.0,
 		supplyChainDIY: 1.0,
 		supplyChainFactory: 1.0,
@@ -216,6 +214,7 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 type SelfSovereigntyValues = Dict<{
 	l1ProviderIndependence: L1ProviderIndependence
 	accountPortability: AccountPortabilityValue
+	permissionsManagement: PermissionsManagementValue
 	transactionInclusion: TransactionInclusionValue
 	accountUnruggability: AccountUnruggabilityValue
 }>
@@ -233,12 +232,14 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 		accountPortability,
 		transactionInclusion,
 		accountUnruggability,
+		permissionsManagement,
 	},
 	attributeWeights: {
 		l1ProviderIndependence: 1.0,
 		accountPortability: 1.0,
 		transactionInclusion: 1.0,
 		accountUnruggability: 1.0,
+		permissionsManagement: 1.0,
 	},
 }
 
@@ -352,7 +353,6 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	scamPrevention: EvaluatedAttribute<ScamPreventionValue>
 	chainVerification: EvaluatedAttribute<ChainVerificationValue>
 	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportValue>
-	passkeyImplementation: EvaluatedAttribute<PasskeyImplementationValue>
 	bugBountyProgram: EvaluatedAttribute<BugBountyProgramValue>
 	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYValue>
 	supplyChainFactory: EvaluatedAttribute<SupplyChainFactoryValue>
@@ -423,8 +423,10 @@ export function evaluateAttributes(
 	walletMetadata: WalletMetadata,
 ): EvaluationTree {
 	const evalAttr = <V extends Value>(attr: Attribute<V>): EvaluatedAttribute<V> => {
+		const ctx = EvaluationContext.create<V>(attr, features)
+
 		if (attr.exempted !== undefined) {
-			const maybeExempt = attr.exempted(features, walletMetadata)
+			const maybeExempt = attr.exempted(ctx, walletMetadata)
 
 			if (maybeExempt !== null) {
 				if (!isExempt(maybeExempt)) {
@@ -442,7 +444,7 @@ export function evaluateAttributes(
 
 		return {
 			attribute: attr,
-			evaluation: attr.evaluate(features),
+			evaluation: attr.evaluate(ctx),
 		}
 	}
 
@@ -453,7 +455,6 @@ export function evaluateAttributes(
 			chainVerification: evalAttr(chainVerification),
 			transactionLegibility: evalAttr(transactionLegibility),
 			hardwareWalletSupport: evalAttr(hardwareWalletSupport),
-			passkeyImplementation: evalAttr(passkeyImplementation),
 			bugBountyProgram: evalAttr(bugBountyProgram),
 			supplyChainDIY: evalAttr(supplyChainDIY),
 			supplyChainFactory: evalAttr(supplyChainFactory),
@@ -473,6 +474,7 @@ export function evaluateAttributes(
 			accountPortability: evalAttr(accountPortability),
 			transactionInclusion: evalAttr(transactionInclusion),
 			accountUnruggability: evalAttr(accountUnruggability),
+			permissionsManagement: evalAttr(permissionsManagement),
 		},
 		transparency: {
 			openSource: evalAttr(openSource),
@@ -526,7 +528,6 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			chainVerification: attr(tree => tree.security.chainVerification),
 			transactionLegibility: attr(tree => tree.security.transactionLegibility),
 			hardwareWalletSupport: attr(tree => tree.security.hardwareWalletSupport),
-			passkeyImplementation: attr(tree => tree.security.passkeyImplementation),
 			bugBountyProgram: attr(tree => tree.security.bugBountyProgram),
 			supplyChainDIY: attr(tree => tree.security.supplyChainDIY),
 			supplyChainFactory: attr(tree => tree.security.supplyChainFactory),
@@ -546,6 +547,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			accountPortability: attr(tree => tree.selfSovereignty.accountPortability),
 			transactionInclusion: attr(tree => tree.selfSovereignty.transactionInclusion),
 			accountUnruggability: attr(tree => tree.selfSovereignty.accountUnruggability),
+			permissionsManagement: attr(tree => tree.selfSovereignty.permissionsManagement),
 		},
 		transparency: {
 			openSource: attr(tree => tree.transparency.openSource),
@@ -694,7 +696,7 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 	const subScores = nonEmptyValues<keyof Vs, WeightedScore | null>(
 		nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
 			const { value } = evaluations[key].evaluation
-			const score = value.score ?? defaultRatingScore(value.rating)
+			const score = value.score ?? defaultRatingScore(value)
 
 			return score === null
 				? null

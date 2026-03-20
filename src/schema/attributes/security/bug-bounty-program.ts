@@ -1,11 +1,12 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type AtLeastOneCoverageBreadth,
 	BugBountyPlatform,
@@ -16,8 +17,9 @@ import {
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
 import { isSupported, supported } from '@/schema/features/support'
-import { mergeRefs, popRefs, refNotNecessary, refs } from '@/schema/reference'
+import { refNotNecessary } from '@/schema/reference'
 import { type AtLeastOneVariant } from '@/schema/variants'
+import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
@@ -100,8 +102,10 @@ function getRewardDetailsDescription(support: BugBountyProgramSupport): string {
 	return ''
 }
 
-function noBugBountyProgram(): Evaluation<BugBountyProgramValue> {
-	return {
+function noBugBountyProgram(
+	ctx: EvaluationContext<BugBountyProgramValue>,
+): Evaluation<BugBountyProgramValue> {
+	return ctx.build({
 		value: {
 			id: 'no_bug_bounty_program',
 			rating: Rating.FAIL,
@@ -116,10 +120,13 @@ function noBugBountyProgram(): Evaluation<BugBountyProgramValue> {
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should implement a bug bounty program to incentivize security researchers to responsibly disclose vulnerabilities. At minimum, the wallet should provide a clear vulnerability disclosure policy and ensure a process exists for providing security updates to users.',
 		),
-	}
+	})
 }
 
-function bugBountyAvailable(support: BugBountyProgramSupport): Evaluation<BugBountyProgramValue> {
+function bugBountyAvailable(
+	ctx: EvaluationContext<BugBountyProgramValue>,
+	support: BugBountyProgramSupport,
+): Evaluation<BugBountyProgramValue> {
 	const rewardInfo = getRewardDescription(support)
 	const rewardDetailsInfo = getRewardDetailsDescription(support)
 	const coverageInfo =
@@ -161,7 +168,7 @@ function bugBountyAvailable(support: BugBountyProgramSupport): Evaluation<BugBou
 			? 'Note that the program is currently inactive and not accepting new reports.'
 			: 'No bug bounty program has been announced or is publicly available.'
 
-	return {
+	return ctx.build({
 		value: {
 			id: isActive ? 'bug_bounty_available' : 'bug_bounty_not_available',
 			rating: rating,
@@ -201,7 +208,7 @@ function bugBountyAvailable(support: BugBountyProgramSupport): Evaluation<BugBou
 			${!hasLegalProtection ? '- Implement Safe Harbor or legal assurance language to protect security researchers from legal action' : ''}
 			${!support.upgradePathAvailable ? '- Establish or improve a clear upgrade path for users after vulnerabilities are fixed' : ''}
 		`),
-	}
+	})
 }
 
 function getLegalProtectionDescription(legalProtection: LegalProtection): string {
@@ -272,26 +279,29 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 					The hardware wallet has an active bug bounty program with competitive rewards,
 					full coverage of all components, and provides upgrade paths for users.
 				`),
-				bugBountyAvailable({
-					dateStarted: '2020-01-01' as CalendarDate,
-					availability: BugBountyProgramAvailability.ACTIVE,
-					coverageBreadth: 'FULL_SCOPE',
-					rewards: supported({
-						minimum: 1000,
-						maximum: 50000,
-						currency: 'USD',
-					}),
-					platform: BugBountyPlatform.HACKER_ONE,
-					disclosure: supported({
-						numberOfDays: 30,
-					}),
-					legalProtections: supported({
-						type: LegalProtectionType.SAFE_HARBOR,
-						ref: 'https://example.com/bug-bounty-safe-harbor',
-					}),
-					upgradePathAvailable: true,
-					ref: refNotNecessary,
-				}),
+				bugBountyAvailable(
+					EvaluationContext.forTest(() => bugBountyProgram),
+					{
+						dateStarted: '2020-01-01' as CalendarDate,
+						availability: BugBountyProgramAvailability.ACTIVE,
+						coverageBreadth: 'FULL_SCOPE',
+						rewards: supported({
+							minimum: 1000,
+							maximum: 50000,
+							currency: 'USD',
+						}),
+						platform: BugBountyPlatform.HACKER_ONE,
+						disclosure: supported({
+							numberOfDays: 30,
+						}),
+						legalProtections: supported({
+							type: LegalProtectionType.SAFE_HARBOR,
+							ref: 'https://example.com/bug-bounty-safe-harbor',
+						}),
+						upgradePathAvailable: true,
+						ref: refNotNecessary,
+					},
+				),
 			),
 		],
 		partial: [
@@ -300,26 +310,29 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 					The hardware wallet has a bug bounty program with rewards,
 					but it is currently inactive and not accepting new reports.
 				`),
-				bugBountyAvailable({
-					dateStarted: '2020-01-01' as CalendarDate,
-					availability: BugBountyProgramAvailability.INACTIVE,
-					coverageBreadth: nonEmptySet(CoverageBreadth.APP_ONLY),
-					rewards: supported({
-						minimum: 5000,
-						maximum: 5000,
-						currency: 'USD',
-					}),
-					platform: BugBountyPlatform.SELF_HOSTED,
-					disclosure: supported({
-						numberOfDays: 90,
-					}),
-					legalProtections: supported({
-						type: LegalProtectionType.LEGAL_ASSURANCE,
-						ref: 'https://example.com/bug-bounty-legal-assurance',
-					}),
-					upgradePathAvailable: true,
-					ref: refNotNecessary,
-				}),
+				bugBountyAvailable(
+					EvaluationContext.forTest(() => bugBountyProgram),
+					{
+						dateStarted: '2020-01-01' as CalendarDate,
+						availability: BugBountyProgramAvailability.INACTIVE,
+						coverageBreadth: nonEmptySet(CoverageBreadth.APP_ONLY),
+						rewards: supported({
+							minimum: 5000,
+							maximum: 5000,
+							currency: 'USD',
+						}),
+						platform: BugBountyPlatform.SELF_HOSTED,
+						disclosure: supported({
+							numberOfDays: 90,
+						}),
+						legalProtections: supported({
+							type: LegalProtectionType.LEGAL_ASSURANCE,
+							ref: 'https://example.com/bug-bounty-legal-assurance',
+						}),
+						upgradePathAvailable: true,
+						ref: refNotNecessary,
+					},
+				),
 			),
 		],
 		fail: [
@@ -328,46 +341,38 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 					The hardware wallet does not implement any bug bounty program or vulnerability disclosure policy.
 					It also lacks a clear process for providing security updates to address critical issues.
 				`),
-				noBugBountyProgram(),
+				noBugBountyProgram(EvaluationContext.forTest(() => bugBountyProgram)),
 			),
 		],
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<BugBountyProgramValue>>) =>
 		pickWorstRating<BugBountyProgramValue>(perVariant),
-	evaluate: (features: ResolvedFeatures): Evaluation<BugBountyProgramValue> => {
-		// This attribute is only applicable for hardware wallets
-		// For software wallets, we exempt them from this attribute
-		if (features.type !== WalletType.HARDWARE) {
-			return exempt(
-				bugBountyProgram,
-				sentence('This attribute is only applicable for hardware wallets.'),
-				null,
-			)
-		}
-
-		if (features.security.bugBountyProgram === null) {
-			return unrated(bugBountyProgram, null)
-		}
-
-		if (!isSupported(features.security.bugBountyProgram)) {
-			return noBugBountyProgram()
-		}
-
-		const { withoutRefs } = popRefs<BugBountyProgramSupport>(features.security.bugBountyProgram)
-
-		const allRefs = mergeRefs(
-			refs(features.security.bugBountyProgram),
-			isSupported(features.security.bugBountyProgram.legalProtections)
-				? refs(features.security.bugBountyProgram.legalProtections)
-				: undefined,
+	evaluate: (ctx: EvaluationContext<BugBountyProgramValue>): Evaluation<BugBountyProgramValue> => {
+		ctx.setVerifiability(
+			verifiabilityRequiresAtLeastOneReference({ referenceCountsAs: Verifiability.VERIFIABLE }),
 		)
 
-		const result = bugBountyAvailable(withoutRefs)
-
-		// Return result with references if any
-		return {
-			...result,
-			...(allRefs.length > 0 && { references: allRefs }),
+		// This attribute is only applicable for hardware wallets
+		// For software wallets, we exempt them from this attribute
+		if (ctx.features.type !== WalletType.HARDWARE) {
+			return exempt(ctx, sentence('This attribute is only applicable for hardware wallets.'), null)
 		}
+
+		if (ctx.features.security.bugBountyProgram === null) {
+			return unrated(ctx, null)
+		}
+
+		if (!isSupported(ctx.features.security.bugBountyProgram)) {
+			return noBugBountyProgram(ctx)
+		}
+
+		ctx.addRef(
+			ctx.features.security.bugBountyProgram,
+			isSupported(ctx.features.security.bugBountyProgram.legalProtections)
+				? ctx.features.security.bugBountyProgram.legalProtections
+				: null,
+		)
+
+		return bugBountyAvailable(ctx, ctx.features.security.bugBountyProgram)
 	},
 }

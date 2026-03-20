@@ -653,6 +653,7 @@ export const ambire: SoftwareWallet = {
 			},
 		},
 		selfSovereignty: {
+			permissionsManagement: notSupported,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

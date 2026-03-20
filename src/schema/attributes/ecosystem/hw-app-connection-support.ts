@@ -1,11 +1,12 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
 import type { AppConnectionMethodDetails } from '@/schema/features/ecosystem/hw-app-connection-support'
 import {
@@ -15,7 +16,7 @@ import {
 } from '@/schema/features/ecosystem/hw-app-connection-support'
 import type { Supported } from '@/schema/features/support'
 import { isSupported, supported } from '@/schema/features/support'
-import { refs, refTodo, type WithRef } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 import { setItems } from '@/types/utils/non-empty'
@@ -64,8 +65,10 @@ function describeConnectionMethods(
 
 export type AppConnectionSupportValue = Value
 
-function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
-	return {
+function noAppConnectionSupport(
+	ctx: EvaluationContext<AppConnectionSupportValue>,
+): Evaluation<AppConnectionSupportValue> {
+	return ctx.build({
 		value: {
 			id: 'no_app_connection',
 			rating: Rating.FAIL,
@@ -78,11 +81,13 @@ function noAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should add at least one widely adopted, standards-based app connection method and/or support connection through popular software wallets. Ideally, this support should be permissionless and rely on open standards so apps can integrate without vendor approval.',
 		),
-	}
+	})
 }
 
-function unverifiableAppConnectionSupport(): Evaluation<AppConnectionSupportValue> {
-	return {
+function unverifiableAppConnectionSupport(
+	ctx: EvaluationContext<AppConnectionSupportValue>,
+): Evaluation<AppConnectionSupportValue> {
+	return ctx.build({
 		value: {
 			id: 'unverifiable_app_connection',
 			rating: Rating.PARTIAL,
@@ -97,13 +102,14 @@ function unverifiableAppConnectionSupport(): Evaluation<AppConnectionSupportValu
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should support open standards that enable connection via software wallets and apps. If the wallet relies on a vendor app, open-sourcing the app and connection components (or publishing verifiable builds and specs) would materially improve transparency and verifiability.',
 		),
-	}
+	})
 }
 
 function limitedVerifiableAppConnectionSupport(
+	ctx: EvaluationContext<AppConnectionSupportValue>,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<AppConnectionSupportValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'limited_verifiable_app_connection',
 			rating: Rating.PARTIAL,
@@ -118,13 +124,14 @@ function limitedVerifiableAppConnectionSupport(
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should expand standards-based, permissionless integration so it can connect broadly across the Web3 ecosystem. Concretely: support widely adopted protocols, avoid manufacturer approval gates, and ensure apps can integrate without proprietary dependencies.',
 		),
-	}
+	})
 }
 
 function verifiableUniversalAppConnectionSupport(
+	ctx: EvaluationContext<AppConnectionSupportValue>,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<AppConnectionSupportValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'verifiable_universal_app_connection',
 			rating: Rating.PASS,
@@ -136,13 +143,14 @@ function verifiableUniversalAppConnectionSupport(
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports connecting to apps through ${describeConnectionMethods(connectionDetails)} using open standards and verifiable components. This enables broad compatibility with Web3 apps while maintaining transparency—integrations can be inspected and do not depend on trusting closed, proprietary connection software.`,
 		),
-	}
+	})
 }
 
 function restrictedAppConnectionSupport(
+	ctx: EvaluationContext<AppConnectionSupportValue>,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation<AppConnectionSupportValue> {
-	return {
+	return ctx.build({
 		value: {
 			id: 'restricted_app_connection',
 			rating: Rating.PARTIAL,
@@ -157,7 +165,7 @@ function restrictedAppConnectionSupport(
 		howToImprove: paragraph(
 			'{{WALLET_NAME}} should adopt permissionless integration standards that allow any software wallet or app to integrate without requiring manufacturer approval. This would enable broader ecosystem support and reduce dependency on vendor cooperation.',
 		),
-	}
+	})
 }
 
 export const appConnectionSupport: Attribute<AppConnectionSupportValue> = {
@@ -206,6 +214,7 @@ limiting its utility.
 			MetaMask or Rabby.
 		`),
 				verifiableUniversalAppConnectionSupport(
+					EvaluationContext.forTest(() => appConnectionSupport),
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -224,6 +233,7 @@ limiting its utility.
 			providing verifiable and transparent connection methods.
 		`),
 				verifiableUniversalAppConnectionSupport(
+					EvaluationContext.forTest(() => appConnectionSupport),
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -247,7 +257,7 @@ limiting its utility.
 			The wallet can connect to apps, but only through its proprietary closed-source 
 			application, requiring users to trust unverifiable code.
 		`),
-				unverifiableAppConnectionSupport(),
+				unverifiableAppConnectionSupport(EvaluationContext.forTest(() => appConnectionSupport)),
 			),
 			exampleRating(
 				paragraph(`
@@ -255,6 +265,7 @@ limiting its utility.
 			but has limitations that prevent it from connecting to all apps.
 		`),
 				limitedVerifiableAppConnectionSupport(
+					EvaluationContext.forTest(() => appConnectionSupport),
 					supported({
 						ref: refTodo,
 						supportedConnections: {
@@ -276,14 +287,18 @@ limiting its utility.
 		The wallet cannot connect to apps, severely limiting its functionality in the 
 		Web3 ecosystem.
 	`),
-			noAppConnectionSupport(),
+			noAppConnectionSupport(EvaluationContext.forTest(() => appConnectionSupport)),
 		),
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<AppConnectionSupportValue> => {
+	evaluate: (
+		ctx: EvaluationContext<AppConnectionSupportValue>,
+	): Evaluation<AppConnectionSupportValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
+
 		// Check for ERC-4337 smart wallet
-		if (supportsOnlyAccountType(features.accountSupport, AccountType.rawErc4337)) {
+		if (supportsOnlyAccountType(ctx.features.accountSupport, AccountType.rawErc4337)) {
 			return exempt(
-				appConnectionSupport,
+				ctx,
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
 				),
@@ -292,9 +307,9 @@ limiting its utility.
 		}
 
 		// Only evaluate hardware wallets
-		if (features.type !== WalletType.HARDWARE) {
+		if (ctx.features.type !== WalletType.HARDWARE) {
 			// For software wallets:
-			return {
+			return ctx.build({
 				value: {
 					id: 'exempt_software_wallet',
 					rating: Rating.EXEMPT,
@@ -306,81 +321,74 @@ limiting its utility.
 				details: paragraph(
 					'As {{WALLET_NAME}} is a software wallet, this attribute which evaluates hardware wallet app connection capabilities is not applicable. Software wallets inherently support app connections.',
 				),
-			}
+			})
 		}
 
 		// Check if app connection support feature exists - rename variable to avoid shadowing
-		const appSupport = features.appConnectionSupport
+		const appSupport = ctx.features.appConnectionSupport
 
-		if (!appSupport) {
-			return unrated(appConnectionSupport, null)
+		if (appSupport === null) {
+			return unrated(ctx, null)
 		}
 
-		// Extract references if supported
-		const references = isSupported(appSupport)
-			? [
-					...refs(appSupport),
-					...(appSupport.requiresManufacturerConsent !== null &&
-					appSupport.requiresManufacturerConsent.type === 'FEATURES_GATED_BY_MANUFACTURER'
-						? refs(appSupport.requiresManufacturerConsent)
-						: []),
-				]
-			: []
+		ctx.addRef(appSupport)
 
-		const evaluation = (() => {
-			// If not supported, cannot connect to apps
-			if (!isSupported(appSupport)) {
-				return noAppConnectionSupport()
-			}
+		// If not supported, cannot connect to apps
+		if (!isSupported(appSupport)) {
+			return noAppConnectionSupport(ctx)
+		}
 
-			if (appSupport.requiresManufacturerConsent === null) {
-				return unrated(appConnectionSupport, null)
-			}
+		if (appSupport.requiresManufacturerConsent === null) {
+			return unrated(ctx, null)
+		}
 
-			// Determine rating based on the best connection method available
-			// Priority: software wallet integration (universal + verifiable) >
-			//           vendor open-source app (verifiable but potentially limited) >
-			//           vendor closed-source app (unverifiable)
+		ctx.addRef(
+			appSupport.requiresManufacturerConsent.type === 'FEATURES_GATED_BY_MANUFACTURER'
+				? appSupport.requiresManufacturerConsent
+				: null,
+		)
 
-			// Check if there's any software wallet integration (universal + verifiable)
-			const hasSoftwareWalletIntegration = getSupportedSoftwareWallets(appSupport).length > 0
-			const consentType = appSupport.requiresManufacturerConsent.type
-			const permissionless = consentType === 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE'
+		// Determine rating based on the best connection method available
+		// Priority: software wallet integration (universal + verifiable) >
+		//           vendor open-source app (verifiable but potentially limited) >
+		//           vendor closed-source app (unverifiable)
 
-			if (hasSoftwareWalletIntegration && permissionless) {
-				// Can connect to any app using verifiable code/open standards → PASS
-				return verifiableUniversalAppConnectionSupport(appSupport)
-			}
+		// Check if there's any software wallet integration (universal + verifiable)
+		const hasSoftwareWalletIntegration = getSupportedSoftwareWallets(appSupport).length > 0
+		const consentType = appSupport.requiresManufacturerConsent.type
+		const permissionless = consentType === 'ALL_FEATURES_PERMISSIONLESSLY_INTEGRABLE'
 
-			// Check for vendor open-source app
-			const hasOpenSource =
-				appSupport.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
+		if (hasSoftwareWalletIntegration && permissionless) {
+			// Can connect to any app using verifiable code/open standards → PASS
+			return verifiableUniversalAppConnectionSupport(ctx, appSupport)
+		}
 
-			if (hasOpenSource) {
-				// Can connect to some apps using verifiable code/open standards → PARTIAL
-				// (We assume vendor apps are limited unless proven otherwise)
-				return limitedVerifiableAppConnectionSupport(appSupport)
-			}
+		// Check for vendor open-source app
+		const hasOpenSource =
+			appSupport.supportedConnections[AppConnectionMethod.VENDOR_OPEN_SOURCE_APP] === true
 
-			// Check for vendor closed-source app
-			const hasClosedSource =
-				appSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
+		if (hasOpenSource) {
+			// Can connect to some apps using verifiable code/open standards → PARTIAL
+			// (We assume vendor apps are limited unless proven otherwise)
+			return limitedVerifiableAppConnectionSupport(ctx, appSupport)
+		}
 
-			if (!permissionless) {
-				// New applications need manufacturer permission to integrate, regardless of the manufacturer's own integration work.
-				return restrictedAppConnectionSupport(appSupport)
-			}
+		// Check for vendor closed-source app
+		const hasClosedSource =
+			appSupport.supportedConnections[AppConnectionMethod.VENDOR_CLOSED_SOURCE_APP] === true
 
-			if (hasClosedSource) {
-				// Has closed-source manufacturer app but is permissionless.
-				return unverifiableAppConnectionSupport()
-			}
+		if (!permissionless) {
+			// New applications need manufacturer permission to integrate, regardless of the manufacturer's own integration work.
+			return restrictedAppConnectionSupport(ctx, appSupport)
+		}
 
-			// Should not reach here if feature data is correct, but handle gracefully
-			return noAppConnectionSupport()
-		})()
+		if (hasClosedSource) {
+			// Has closed-source manufacturer app but is permissionless.
+			return unverifiableAppConnectionSupport(ctx)
+		}
 
-		return { ...evaluation, references }
+		// Should not reach here if feature data is correct, but handle gracefully
+		return noAppConnectionSupport(ctx)
 	},
 	aggregate: pickWorstRating<AppConnectionSupportValue>,
 }

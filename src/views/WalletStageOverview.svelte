@@ -4,9 +4,9 @@
 	import { WalletLadderType, ladders } from '@/schema/ladders'
 	import { StageCriterionRating, stageCriterionRatings, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
-	import { getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
+	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
-	/** Aggregate statuses for stages and stage groups */
+	/** Aggregate statuses for stages and stage groups (must match StageCountsStatus in stage-attributes) */
 	enum StageStatus {
 		PASS = 'PASS',
 		PARTIAL = 'PARTIAL',
@@ -32,7 +32,7 @@
 		},
 		[StageStatus.UNRATED]: {
 			icon: '❔',
-			label: 'All criteria unrated',
+			label: 'Some criteria unrated',
 			color: 'var(--rating-unrated)',
 		},
 	} as const satisfies Record<
@@ -88,6 +88,13 @@
 			(currentStageIndex + 1 < ladderDefinition.stages.length ? currentStageIndex + 1 : ladderDefinition.stages.length - 1)
 	)
 
+	let stageEvaluatableWallet = $derived(
+		(() => {
+			const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
+			return rest
+		})(),
+	)
+
 
 	// Functions
 	import { isTypographicContent } from '@/types/content'
@@ -113,25 +120,8 @@
 			{#each ladderDefinition.stages as s, index}
 				{@const stageIndex = index}
 				{@const isCurrent = stage && typeof stage !== 'string' && stage.id === s.id}
-				{@const allCriteria = s.criteriaGroups.flatMap(group => group.criteria)}
-				{@const allEvaluations = allCriteria.map(criterion => criterion.evaluate(wallet))}
-				{@const applicableEvaluations = allEvaluations.filter(e => e.rating !== StageCriterionRating.EXEMPT)}
-				{@const passedCount = applicableEvaluations.filter(e => e.rating === StageCriterionRating.PASS).length}
-				{@const exemptCount = allEvaluations.filter(e => e.rating === StageCriterionRating.EXEMPT).length}
-				{@const totalCount = applicableEvaluations.length}
-				{@const allPassed = totalCount > 0 && passedCount === totalCount}
-				{@const allExempt = allEvaluations.length > 0 && exemptCount === allEvaluations.length}
+				{@const { passedCount, totalCount, status: stageRating } = computeCountsAndStatus(allCriteriaInStage(s), stageEvaluatableWallet)}
 				{@const isDefaultOpen = defaultOpenStageIndex === stageIndex}
-				{@const stageRating = (
-					allExempt ?
-						StageStatus.UNRATED
-					: allPassed ?
-						StageStatus.PASS
-					: passedCount > 0 ?
-						StageStatus.PARTIAL
-					:
-						StageStatus.FAIL
-				)}
 
 				<details
 					id={s.id}
@@ -185,25 +175,7 @@
 						{#if s.criteriaGroups}
 							<div data-column>
 								{#each s.criteriaGroups as criteriaGroup}
-									{@const groupEvaluations = ladderDefinition ? criteriaGroup.criteria.map(c => c.evaluate(wallet)) : []}
-									{@const groupApplicableEvaluations = groupEvaluations.filter(e => e?.rating !== StageCriterionRating.EXEMPT)}
-									{@const groupPassedCount = groupApplicableEvaluations.filter(e => e?.rating === StageCriterionRating.PASS).length}
-									{@const groupExemptCount = groupEvaluations.filter(e => e?.rating === StageCriterionRating.EXEMPT).length}
-									{@const groupTotalCount = groupApplicableEvaluations.length}
-									{@const groupAllExempt = groupEvaluations.length > 0 && groupExemptCount === groupEvaluations.length}
-									{@const groupAllUnrated = groupTotalCount > 0 && groupApplicableEvaluations.every(e => e?.rating === StageCriterionRating.UNRATED)}
-									{@const groupRating = (
-										groupAllExempt ?
-											StageStatus.UNRATED
-										: groupAllUnrated ?
-											StageStatus.UNRATED
-										: groupPassedCount === groupTotalCount ?
-											StageStatus.PASS
-										: groupPassedCount > 0 ?
-											StageStatus.PARTIAL
-										:
-											StageStatus.FAIL
-									)}
+									{@const { passedCount: groupPassedCount, totalCount: groupTotalCount, status: groupRating } = computeCountsAndStatus(criteriaGroup.criteria, stageEvaluatableWallet)}
 
 									<details
 										data-card="padding-5 secondary radius-4"

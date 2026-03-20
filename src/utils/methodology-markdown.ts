@@ -1,7 +1,9 @@
 import { attributeTree } from '@/schema/attribute-groups'
 import type { Attribute, ExampleRating, Value } from '@/schema/attributes'
 import { normalizeExampleRatings } from '@/schema/attributes'
-import { ContentType, prerenderTypographicContent, type TypographicContent } from '@/types/content'
+import { renderTypographicContentToString, type TypographicContent } from '@/types/content'
+import { trimWhitespacePrefix } from '@/types/utils/text'
+import { getHowIsEvaluatedHeading, getWhyItMattersHeading } from '@/utils/attribute-display'
 import { normalizeMarkdownBlankLines } from '@/utils/markdown-utils'
 
 const GENERIC_WALLET_NAME = 'the wallet'
@@ -11,28 +13,10 @@ const GENERIC_PSEUDONYM_STRINGS = {
 	WALLET_PSEUDONYM_PLURAL: 'pseudonyms',
 }
 
-function renderContent(content: TypographicContent<null>): string {
-	const rendered = prerenderTypographicContent(content, null)
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
-}
-
 function renderWalletNameContent(
 	content: TypographicContent<null | { WALLET_NAME: string }>,
 ): string {
-	const rendered = prerenderTypographicContent(content, { WALLET_NAME: GENERIC_WALLET_NAME })
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
+	return renderTypographicContentToString(content, { WALLET_NAME: GENERIC_WALLET_NAME })
 }
 
 function renderPseudonymContent(
@@ -46,14 +30,7 @@ function renderPseudonymContent(
 		  }
 	>,
 ): string {
-	const rendered = prerenderTypographicContent(content, GENERIC_PSEUDONYM_STRINGS)
-
-	switch (rendered.contentType) {
-		case ContentType.TEXT:
-			return rendered.text
-		case ContentType.MARKDOWN:
-			return rendered.markdown
-	}
+	return renderTypographicContentToString(content, GENERIC_PSEUDONYM_STRINGS)
 }
 
 function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
@@ -61,7 +38,12 @@ function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
 	const lines: string[] = ['#### Rating scale', '']
 
 	if (ratingScale.display === 'simple') {
-		lines.push(normalizeMarkdownBlankLines(renderPseudonymContent(ratingScale.content)).trim(), '')
+		lines.push(
+			normalizeMarkdownBlankLines(
+				trimWhitespacePrefix(renderPseudonymContent(ratingScale.content)),
+			),
+			'',
+		)
 
 		return lines
 	}
@@ -89,33 +71,13 @@ function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
 		lines.push('')
 
 		for (const example of examples) {
-			lines.push(`- ${renderContent(example.description)}`)
+			lines.push(`- ${renderTypographicContentToString(example.description, null)}`)
 		}
 
 		lines.push('')
 	}
 
 	return lines
-}
-
-function getHowIsEvaluatedHeading<V extends Value>(attribute: Attribute<V>): string {
-	const { wording } = attribute
-
-	if (wording.midSentenceName === null) {
-		return wording.howIsEvaluated
-	}
-
-	return `How is ${wording.midSentenceName} evaluated?`
-}
-
-function getWhyItMattersHeading<V extends Value>(attribute: Attribute<V>): string {
-	const { wording } = attribute
-
-	if (wording.midSentenceName === null) {
-		return 'Why it matters'
-	}
-
-	return `Why ${wording.midSentenceName} matters`
 }
 
 /**
@@ -151,17 +113,27 @@ export function methodologyPageMarkdown(siteUrl: string): string {
 			lines.push(`### ${attribute.displayName}`)
 			lines.push('')
 
-			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.question)).trim())
+			lines.push(
+				normalizeMarkdownBlankLines(
+					trimWhitespacePrefix(renderWalletNameContent(attribute.question)),
+				),
+			)
 			lines.push('')
 
 			lines.push(`#### ${getWhyItMattersHeading(attribute)}`)
 			lines.push('')
-			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.why)).trim())
+			lines.push(
+				normalizeMarkdownBlankLines(trimWhitespacePrefix(renderWalletNameContent(attribute.why))),
+			)
 			lines.push('')
 
 			lines.push(`#### ${getHowIsEvaluatedHeading(attribute)}`)
 			lines.push('')
-			lines.push(normalizeMarkdownBlankLines(renderWalletNameContent(attribute.methodology)).trim())
+			lines.push(
+				normalizeMarkdownBlankLines(
+					trimWhitespacePrefix(renderWalletNameContent(attribute.methodology)),
+				),
+			)
 			lines.push('')
 
 			lines.push(...renderRatingScale(attribute))

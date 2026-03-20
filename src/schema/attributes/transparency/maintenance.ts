@@ -1,6 +1,12 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
+import {
+	type Attribute,
+	type Evaluation,
+	EvaluationContext,
+	Rating,
+	type Value,
+	Verifiability,
+} from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type MaintenanceSupport,
 	MaintenanceType,
@@ -92,25 +98,23 @@ export const maintenance: Attribute<MaintenanceValue> = {
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<MaintenanceValue>>) =>
 		pickWorstRating<MaintenanceValue>(perVariant),
-	evaluate: (features: ResolvedFeatures): Evaluation<MaintenanceValue> => {
-		if (features.type !== WalletType.HARDWARE) {
-			return exempt(
-				maintenance,
-				sentence('These attributes only refer to hardware wallet maintenance'),
-				{
-					physicalDurability: MaintenanceType.FAIL,
-					mtbfDocumentation: MaintenanceType.FAIL,
-					repairability: MaintenanceType.FAIL,
-					batteryHandling: MaintenanceType.FAIL,
-					warrantyExtensions: MaintenanceType.FAIL,
-				},
-			)
+	evaluate: (ctx: EvaluationContext<MaintenanceValue>): Evaluation<MaintenanceValue> => {
+		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable unless audited, which never happens.
+
+		if (ctx.features.type !== WalletType.HARDWARE) {
+			return exempt(ctx, sentence('These attributes only refer to hardware wallet maintenance'), {
+				physicalDurability: MaintenanceType.FAIL,
+				mtbfDocumentation: MaintenanceType.FAIL,
+				repairability: MaintenanceType.FAIL,
+				batteryHandling: MaintenanceType.FAIL,
+				warrantyExtensions: MaintenanceType.FAIL,
+			})
 		}
 
-		const maintenanceFeature = features.transparency.maintenance
+		const maintenanceFeature = ctx.features.transparency.maintenance
 
 		if (maintenanceFeature === null) {
-			return unrated(maintenance, {
+			return unrated(ctx, {
 				physicalDurability: MaintenanceType.FAIL,
 				mtbfDocumentation: MaintenanceType.FAIL,
 				repairability: MaintenanceType.FAIL,
@@ -121,7 +125,7 @@ export const maintenance: Attribute<MaintenanceValue> = {
 
 		const rating = evaluateMaintenance(maintenanceFeature)
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'maintenance',
 				rating,
@@ -133,7 +137,6 @@ export const maintenance: Attribute<MaintenanceValue> = {
 			},
 			details: paragraph(`{{WALLET_NAME}} maintenance evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-			// TODO: Add references
-		}
+		})
 	},
 }

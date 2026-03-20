@@ -23,20 +23,20 @@ export interface WalletIntegration {
 	 * Should be set to 'NOT_A_BROWSER_WALLET' if the wallet has no browser
 	 * version.
 	 *
-	 * Protip to test support:
-	 *   - EIP-1193: Type `window.ethereum` in the console.
-	 *   - EIP-2700: Type `window.ethereum.on` and `window.ethereum.removeListener` in the console.
-	 *   - EIP-6963: Check https://eip6963.org/
+	 * Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
+	 * It tests EIP-1193, EIP-2700, and EIP-6963 directly in the browser.
 	 */
 	browser: 'NOT_A_BROWSER_WALLET' | WithRef<Record<BrowserIntegrationEip, Support | null>>
 
 	/**
 	 * EIP-5792: Wallet Call API support.
 	 * The wallet must support all of the following calls:
-	 *  - wallet_sendCalls
-	 *  - wallet_getCallsStatus
-	 *  - wallet_showCallsStatus
-	 *  - wallet_getCapabilities
+	 * - wallet_sendCalls
+	 * - wallet_getCallsStatus
+	 * - wallet_showCallsStatus
+	 * - wallet_getCapabilities
+	 *
+	 * Use the Walletbeat test page to verify support: https://beta.walletbeat.eth.limo/test/
 	 */
 	walletCall: VariantFeature<Support<WithRef<WalletCallIntegration>>>
 }

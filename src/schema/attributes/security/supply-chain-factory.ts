@@ -1,18 +1,20 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	type ExemptEvaluation,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { HardwareWalletManufactureType } from '@/schema/features/profile'
 import {
 	type SupplyChainFactorySupport,
 	SupplyChainFactoryType,
 } from '@/schema/features/security/supply-chain-factory'
 import { Variant } from '@/schema/variants'
+import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -106,33 +108,37 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 	},
 	aggregate: pickWorstRating<SupplyChainFactoryValue>,
 	exempted: (
-		features: ResolvedFeatures,
+		ctx: EvaluationContext<SupplyChainFactoryValue>,
 		metadata: WalletMetadata,
 	): ExemptEvaluation<SupplyChainFactoryValue> | null => {
 		if (
-			features.variant === Variant.HARDWARE &&
+			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
 		) {
-			return exempt(
-				supplyChainFactory,
-				sentence('Attribute only applies to factory-made hardware wallets.'),
-				{
-					factoryOpsecDocs: SupplyChainFactoryType.FAIL,
-					factoryOpsecAudit: SupplyChainFactoryType.FAIL,
-					tamperEvidence: SupplyChainFactoryType.FAIL,
-					hardwareVerification: SupplyChainFactoryType.FAIL,
-					tamperResistance: SupplyChainFactoryType.FAIL,
-					genuineCheck: SupplyChainFactoryType.FAIL,
-				},
-			)
+			return exempt(ctx, sentence('Attribute only applies to factory-made hardware wallets.'), {
+				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
+				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
+				tamperEvidence: SupplyChainFactoryType.FAIL,
+				hardwareVerification: SupplyChainFactoryType.FAIL,
+				tamperResistance: SupplyChainFactoryType.FAIL,
+				genuineCheck: SupplyChainFactoryType.FAIL,
+			})
 		}
 
 		return null
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<SupplyChainFactoryValue> => {
-		if (features.type !== WalletType.HARDWARE) {
+	evaluate: (
+		ctx: EvaluationContext<SupplyChainFactoryValue>,
+	): Evaluation<SupplyChainFactoryValue> => {
+		ctx.setVerifiability(
+			verifiabilityRequiresAtLeastOneReference({
+				referenceCountsAs: Verifiability.INDEPENDENTLY_AUDITED,
+			}),
+		)
+
+		if (ctx.features.type !== WalletType.HARDWARE) {
 			return exempt(
-				supplyChainFactory,
+				ctx,
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is not a hardware wallet.',
 				),
@@ -147,10 +153,10 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 			)
 		}
 
-		const factoryFeature = features.security.supplyChainFactory
+		const factoryFeature = ctx.features.security.supplyChainFactory
 
 		if (factoryFeature === null) {
-			return unrated(supplyChainFactory, {
+			return unrated(ctx, {
 				factoryOpsecDocs: SupplyChainFactoryType.FAIL,
 				factoryOpsecAudit: SupplyChainFactoryType.FAIL,
 				tamperEvidence: SupplyChainFactoryType.FAIL,
@@ -162,7 +168,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 
 		const rating = evaluateSupplyChainFactory(factoryFeature)
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'Supply Chain Factory',
 				rating,
@@ -176,7 +182,6 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 				`{{WALLET_NAME}} factory supply chain evaluation is ${rating.toLowerCase()}.`,
 			),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
-			// TODO: Add references
-		}
+		})
 	},
 }

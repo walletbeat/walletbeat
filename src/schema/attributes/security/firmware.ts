@@ -1,8 +1,16 @@
-import { type Attribute, type Evaluation, Rating, type Value } from '@/schema/attributes'
+import {
+	type Attribute,
+	type Evaluation,
+	EvaluationContext,
+	type ExplicitRating,
+	Rating,
+	type Value,
+	Verifiability,
+} from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import { type FirmwareSupport, FirmwareType } from '@/schema/features/security/firmware'
 import type { AtLeastOneVariant } from '@/schema/variants'
+import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -15,7 +23,7 @@ export type FirmwareValue = Value & {
 	customFirmware: FirmwareType | null
 }
 
-function evaluateFirmware(features: FirmwareSupport): Rating {
+function evaluateFirmware(features: FirmwareSupport): ExplicitRating | Rating.UNRATED {
 	const ratings = [
 		features.silentUpdateProtection,
 		features.firmwareOpenSource,
@@ -88,9 +96,15 @@ export const firmware: Attribute<FirmwareValue> = {
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation<FirmwareValue>>) =>
 		pickWorstRating<FirmwareValue>(perVariant),
-	evaluate: (features: ResolvedFeatures): Evaluation<FirmwareValue> => {
-		if (features.type !== WalletType.HARDWARE) {
-			return exempt(firmware, sentence('Firmware is only rated for hardware wallets'), {
+	evaluate: (ctx: EvaluationContext<FirmwareValue>): Evaluation<FirmwareValue> => {
+		ctx.setVerifiability(
+			verifiabilityRequiresAtLeastOneReference({
+				referenceCountsAs: Verifiability.VERIFIABLE,
+			}),
+		)
+
+		if (ctx.features.type !== WalletType.HARDWARE) {
+			return exempt(ctx, sentence('Firmware is only rated for hardware wallets'), {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
@@ -98,10 +112,10 @@ export const firmware: Attribute<FirmwareValue> = {
 			})
 		}
 
-		const firmwareFeature = features.security.firmware
+		const firmwareFeature = ctx.features.security.firmware
 
 		if (firmwareFeature === null) {
-			return unrated(firmware, {
+			return unrated(ctx, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
@@ -112,7 +126,7 @@ export const firmware: Attribute<FirmwareValue> = {
 		const rating = evaluateFirmware(firmwareFeature)
 
 		if (rating === Rating.UNRATED) {
-			return unrated(firmware, {
+			return unrated(ctx, {
 				silentUpdateProtection: FirmwareType.FAIL,
 				firmwareOpenSource: FirmwareType.FAIL,
 				reproducibleBuilds: FirmwareType.FAIL,
@@ -120,7 +134,7 @@ export const firmware: Attribute<FirmwareValue> = {
 			})
 		}
 
-		return {
+		return ctx.build({
 			value: {
 				id: 'firmware',
 				rating,
@@ -131,6 +145,6 @@ export const firmware: Attribute<FirmwareValue> = {
 			details: paragraph(`{{WALLET_NAME}} firmware evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),
 			// TODO: References.
-		}
+		})
 	},
 }

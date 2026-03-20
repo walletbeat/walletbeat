@@ -1,12 +1,12 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
 	type Value,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	collectedByDefault,
 	type Collection,
@@ -24,6 +24,7 @@ import {
 	userInfoName,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
+import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { markdown, paragraph, sentence } from '@/types/content'
 import { addressCorrelationDetailsContent } from '@/types/content/address-correlation-details'
 import { isNonEmptyArray, type NonEmptyArray, nonEmptyFirst } from '@/types/utils/non-empty'
@@ -42,14 +43,14 @@ export type AddressCorrelationValue = Value & {
 	worstLeak: WalletAddressLinkableBy | null
 }
 
-const uncorrelated: AddressCorrelationValue = {
+const uncorrelated = {
 	id: 'no_correlation',
 	rating: Rating.PASS,
 	icon: '\u{26d3}', // Broken chain
 	displayName: 'Wallet address is kept private',
 	shortExplanation: sentence('{{WALLET_NAME}} keeps your wallet address private.'),
 	worstLeak: null,
-}
+} as const
 
 export interface WalletAddressLinkableTo {
 	info: UserInfo
@@ -62,8 +63,8 @@ export type WalletAddressLinkableBy = WalletAddressLinkableTo & {
 }
 
 function linkable(
+	ctx: EvaluationContext<AddressCorrelationValue>,
 	linkables: NonEmptyArray<WalletAddressLinkableBy>,
-	references: ReferenceArray,
 ): Evaluation<AddressCorrelationValue> {
 	const worstLeak = nonEmptyFirst(
 		linkables,
@@ -106,7 +107,7 @@ function linkable(
 		}
 	})()
 
-	return {
+	return ctx.build({
 		value: {
 			id: `address_and_${worstLeak.info}`,
 			rating,
@@ -120,8 +121,7 @@ function linkable(
 		},
 		details: addressCorrelationDetailsContent({ linkables }),
 		howToImprove: paragraph(howToImprove),
-		references,
-	}
+	})
 }
 
 /**
@@ -292,28 +292,34 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 			),
 		],
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<AddressCorrelationValue> => {
-		const allDataCollection = dataCollectionForAllSupportedFlows(features.privacy.dataCollection)
+	evaluate: (
+		ctx: EvaluationContext<AddressCorrelationValue>,
+	): Evaluation<AddressCorrelationValue> => {
+		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
+		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
-		if (features.privacy.dataCollection === null || allDataCollection === null) {
-			return unrated(addressCorrelation, { worstLeak: null })
+		const allDataCollection = dataCollectionForAllSupportedFlows(
+			ctx.features.privacy.dataCollection,
+		)
+
+		if (ctx.features.privacy.dataCollection === null || allDataCollection === null) {
+			return unrated(ctx, { worstLeak: null })
 		}
 
 		const linkables: WalletAddressLinkableBy[] = []
-		const allRefs: ReferenceArray = []
 
 		for (const collected of allDataCollection) {
-			allRefs.push(...refs(collected))
+			ctx.addRef(collected)
 
 			for (const linkable of linkableToWalletAddress(collected.dataCollection, collected.ref)) {
 				linkables.push({ by: collected.byEntity, ...linkable })
 			}
 		}
 
-		const onboarding = features.privacy.dataCollection[UserFlow.ONBOARDING]
+		const onboarding = ctx.features.privacy.dataCollection[UserFlow.ONBOARDING]
 
 		if (onboarding !== null && onboarding.publishedOnchain !== 'NO_DATA_PUBLISHED_ONCHAIN') {
-			allRefs.push(...refs(onboarding.publishedOnchain))
+			ctx.addRef(onboarding.publishedOnchain)
 
 			for (const linkable of linkableToWalletAddress(
 				{
@@ -328,16 +334,15 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		}
 
 		if (isNonEmptyArray(linkables)) {
-			return linkable(linkables, allRefs)
+			return linkable(ctx, linkables)
 		}
 
-		return {
+		return ctx.build({
 			value: uncorrelated,
 			details: paragraph(
 				'{{WALLET_NAME}} does not allow any external provider to link your wallet address to any personal information.',
 			),
-			references: allRefs,
-		}
+		})
 	},
 	aggregate: pickWorstRating<AddressCorrelationValue>,
 }

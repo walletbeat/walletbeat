@@ -45,7 +45,7 @@
 {:else}
 	{@const technologies = Array.from(privateTransferDetails.entries())}
 
-	{#each technologies as [technology, details]}
+	{#each technologies as [technology, details] (technology)}
 		<section data-column="gap-4">
 			<h4>{technologyNames[technology]}</h4>
 
@@ -76,7 +76,7 @@
 
 				{#if details.extraNotes.length > 0}
 					<div data-column="gap-2">
-						{#each details.extraNotes as note}
+						{#each details.extraNotes as note, index (index)}
 							<Typography
 								content={note}
 								strings={{ WALLET_NAME: wallet.metadata.displayName }}

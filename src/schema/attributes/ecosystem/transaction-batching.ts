@@ -4,12 +4,13 @@ import { erc4337 } from '@/data/eips/erc-4337'
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '@/schema/eips'
-import type { ResolvedFeatures } from '@/schema/features'
 import {
 	type AccountSupport,
 	AccountType,
@@ -35,6 +36,7 @@ import { exempt, pickWorstRating, unrated } from '../common'
 export type TransactionBatchingValue = Value
 
 function evaluateTransactionBatching(
+	ctx: EvaluationContext<TransactionBatchingValue>,
 	accountSupport: AccountSupport,
 	walletCall: Support<WithRef<WalletCallIntegration>>,
 ): Evaluation<TransactionBatchingValue> {
@@ -42,7 +44,7 @@ function evaluateTransactionBatching(
 		!isSupported<AccountType7702>(accountSupport.eip7702) &&
 		!isSupported<AccountType4337>(accountSupport.rawErc4337)
 	) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'no_smart_account_support',
 				displayName: 'No transaction batching support',
@@ -66,13 +68,13 @@ function evaluateTransactionBatching(
 				isSupported(accountSupport.eip7702) ? refs(accountSupport.eip7702) : [],
 				isSupported(accountSupport.rawErc4337) ? refs(accountSupport.rawErc4337) : [],
 			),
-		}
+		})
 	}
 
-	let references = mergeRefs(isSupported(walletCall) ? refs(walletCall) : [])
+	ctx.addRef(walletCall)
 
 	if (!isSupported<WalletCallIntegration>(walletCall)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'no_wallet_call_support',
 				displayName: 'No transaction batching support',
@@ -89,14 +91,11 @@ function evaluateTransactionBatching(
 			howToImprove: sentence(`
 				{{WALLET_NAME}} should implement ${eipMarkdownLinkAndTitle(eip5792)}.
 			`),
-			references,
-		}
+		})
 	}
 
-	references = mergeRefs(references, refs(walletCall))
-
 	if (!isSupported<Support>(walletCall.atomicMultiTransactions)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'no_atomic_bundle_support',
 				displayName: 'Non-atomic transaction batching support',
@@ -122,11 +121,10 @@ function evaluateTransactionBatching(
 			howToImprove: sentence(`
 				{{WALLET_NAME}} should implement atomic transaction batching.
 			`),
-			references,
-		}
+		})
 	}
 
-	return {
+	return ctx.build({
 		value: {
 			id: 'full_wallet_call_support',
 			displayName: 'Full transaction batching support',
@@ -147,8 +145,7 @@ function evaluateTransactionBatching(
 			either **all executed** or **all non-executed**. This enables some
 			advanced DeFi use-cases.
 		`),
-		references,
-	}
+	})
 }
 
 export const transactionBatching: Attribute<TransactionBatchingValue> = {
@@ -188,6 +185,7 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 			exampleRating(
 				sentence('The wallet does not support any type of smart account.'),
 				evaluateTransactionBatching(
+					EvaluationContext.forTest(() => transactionBatching),
 					{
 						eoa: supported({
 							canExportPrivateKey: true,
@@ -213,6 +211,7 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 					`The wallet supports smart accounts but does not support ${eipMarkdownLinkAndTitle(eip5792)}.`,
 				),
 				evaluateTransactionBatching(
+					EvaluationContext.forTest(() => transactionBatching),
 					{
 						eoa: notSupportedWithRef({ ref: refNotNecessary }),
 						mpc: notSupportedWithRef({ ref: refNotNecessary }),
@@ -233,6 +232,7 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 				`The wallet supports ${eipMarkdownLinkAndTitle(eip5792)}, but does not support atomic bundles.`,
 			),
 			evaluateTransactionBatching(
+				EvaluationContext.forTest(() => transactionBatching),
 				{
 					eoa: notSupportedWithRef({ ref: refNotNecessary }),
 					mpc: notSupportedWithRef({ ref: refNotNecessary }),
@@ -255,6 +255,7 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 				`The wallet supports ${eipMarkdownLinkAndTitle(eip5792)} including atomic bundles.`,
 			),
 			evaluateTransactionBatching(
+				EvaluationContext.forTest(() => transactionBatching),
 				{
 					eoa: notSupportedWithRef({ ref: refNotNecessary }),
 					mpc: notSupportedWithRef({ ref: refNotNecessary }),
@@ -273,18 +274,22 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 			),
 		),
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<TransactionBatchingValue> => {
-		if (features.type !== WalletType.SOFTWARE) {
+	evaluate: (
+		ctx: EvaluationContext<TransactionBatchingValue>,
+	): Evaluation<TransactionBatchingValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
+
+		if (ctx.features.type !== WalletType.SOFTWARE) {
 			return exempt(
-				transactionBatching,
+				ctx,
 				sentence('Only software wallets are expected to deal with transaction batching.'),
 				null,
 			)
 		}
 
-		if (features.profile === WalletProfile.PAYMENTS) {
+		if (ctx.features.profile === WalletProfile.PAYMENTS) {
 			return exempt(
-				transactionBatching,
+				ctx,
 				sentence(`
 					{{WALLET_NAME}} is exempt as it is a payments-focused wallet,
 					for which transaction batching is not very useful.
@@ -293,11 +298,15 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 			)
 		}
 
-		if (features.accountSupport === null || features.integration.walletCall === null) {
-			return unrated(transactionBatching, null)
+		if (ctx.features.accountSupport === null || ctx.features.integration.walletCall === null) {
+			return unrated(ctx, null)
 		}
 
-		return evaluateTransactionBatching(features.accountSupport, features.integration.walletCall)
+		return evaluateTransactionBatching(
+			ctx,
+			ctx.features.accountSupport,
+			ctx.features.integration.walletCall,
+		)
 	},
 	aggregate: pickWorstRating<TransactionBatchingValue>,
 }

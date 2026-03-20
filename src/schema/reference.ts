@@ -54,7 +54,8 @@ export function isLooseReference(x: unknown): x is LooseReference {
 		typeof x === 'object' &&
 		Object.hasOwn(x, 'url') &&
 		((url: unknown) =>
-			isUrl(url) || (Array.isArray(url) && isNonEmptyArray(url) && url.every(isLabeledUrl)))(
+			isUrl(url) ||
+			(Array.isArray(url) && isNonEmptyArray(url) && url.every(u => isUrl(u) || isLabeledUrl(u))))(
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
 			(x as unknown as { url: unknown }).url,
 		)
@@ -234,6 +235,26 @@ export function toFullyQualified(
 	})
 }
 
+/** Input type accepted by `toFullyQualified`. */
+export type ReferenceInput = Parameters<typeof toFullyQualified>[0]
+
+/** Type predicate for values that are valid reference input (not undefined/null/NoRef). */
+export function isReferenceInput(x: unknown): x is ReferenceInput {
+	if (x === undefined || x === null || isNoRef(x)) {
+		return false
+	}
+
+	if (isReference(x)) {
+		return true
+	}
+
+	if (Array.isArray(x) && x.every(isReference)) {
+		return true
+	}
+
+	return false
+}
+
 /** Type predicate for `WithRef`. */
 export function hasRefs(maybeWithRef: unknown): maybeWithRef is WithRef<unknown> {
 	return (
@@ -241,8 +262,12 @@ export function hasRefs(maybeWithRef: unknown): maybeWithRef is WithRef<unknown>
 		maybeWithRef !== null &&
 		typeof maybeWithRef === 'object' &&
 		Object.hasOwn(maybeWithRef, 'ref') &&
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
-		isReference((maybeWithRef as unknown as { ref: unknown }).ref)
+		((): boolean => {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we just checked the field exists.
+			const ref = (maybeWithRef as unknown as { ref: unknown }).ref
+
+			return isReference(ref) || isNoRef(ref) || (Array.isArray(ref) && ref.every(isReference))
+		})()
 	)
 }
 

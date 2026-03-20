@@ -1,11 +1,12 @@
 import {
 	type Attribute,
 	type Evaluation,
+	EvaluationContext,
 	exampleRating,
 	Rating,
 	type Value,
+	Verifiability,
 } from '@/schema/attributes'
-import type { ResolvedFeatures } from '@/schema/features'
 import type {
 	ChainAbstraction,
 	CrossChainBalanceDisplay,
@@ -21,7 +22,7 @@ import {
 	comprehensiveFeesShownByDefault,
 	FeeDisplayLevel,
 } from '@/schema/features/transparency/fee-display'
-import { mergeRefs, refNotNecessary, refs } from '@/schema/reference'
+import { refNotNecessary } from '@/schema/reference'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, sentence } from '@/types/content'
 
@@ -30,20 +31,17 @@ import { exempt, pickWorstRating, unrated } from '../common'
 export type ChainAbstractionValue = Value
 
 function evaluateChainAbstraction(
+	ctx: EvaluationContext<ChainAbstractionValue>,
 	chainAbstraction: ChainAbstraction,
 ): Evaluation<ChainAbstractionValue> {
 	const { crossChainBalances, bridging } = chainAbstraction
 
-	const references = mergeRefs(
-		refs(crossChainBalances),
-		isSupported(bridging.builtInBridging) ? refs(bridging.builtInBridging) : [],
-		isSupported(bridging.suggestedBridging) ? refs(bridging.suggestedBridging) : [],
-	)
+	ctx.addRef(crossChainBalances, bridging.builtInBridging, bridging.suggestedBridging)
 
 	// FAIL conditions follow.
 
 	if (!isSupported(crossChainBalances.globalAccountValue)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'chain_abstraction_no_global_account_value',
 				displayName: 'No cross-chain awareness',
@@ -66,15 +64,14 @@ function evaluateChainAbstraction(
 				- Transparent cross-chain bridging
 				- etc.
 			`),
-			references,
-		}
+		})
 	}
 
 	if (
 		!isSupported(crossChainBalances.ether.perChainBalanceViewAcrossMultipleChains) ||
 		!isSupported(crossChainBalances.usdc.perChainBalanceViewAcrossMultipleChains)
 	) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'chain_abstraction_no_per_chain_balance_view_across_multiple_chains',
 				displayName: 'No per-chain token balance view',
@@ -101,12 +98,11 @@ function evaluateChainAbstraction(
 				- Transparent cross-chain bridging
 				- etc.
 			`),
-			references,
-		}
+		})
 	}
 
 	if (!isSupported(bridging.builtInBridging)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'chain_abstraction_no_bridging',
 				displayName: 'No cross-chain bridging support',
@@ -124,8 +120,7 @@ function evaluateChainAbstraction(
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should add a built-in bridging feature.
 			`),
-			references,
-		}
+		})
 	}
 
 	// PARTIAL conditions follow.
@@ -134,7 +129,7 @@ function evaluateChainAbstraction(
 		!isSupported(crossChainBalances.ether.crossChainSumView) ||
 		!isSupported(crossChainBalances.usdc.crossChainSumView)
 	) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'chain_abstraction_no_cross_chain_token_balance_sum',
 				displayName: 'No cross-chain token balance',
@@ -156,15 +151,14 @@ function evaluateChainAbstraction(
 				{{WALLET_NAME}} should have a way to see token balances summed up
 				across chains.
 			`),
-			references,
-		}
+		})
 	}
 
 	if (bridging.builtInBridging.feesLargerThan1bps.byDefault === FeeDisplayLevel.NONE) {
 		const feesHidden =
 			bridging.builtInBridging.feesLargerThan1bps.afterSingleAction === FeeDisplayLevel.NONE
 
-		return {
+		return ctx.build({
 			value: {
 				id: feesHidden
 					? 'chain_abstraction_bridge_hidden_fees'
@@ -203,8 +197,7 @@ function evaluateChainAbstraction(
 				this fee is going to, broken down between all the parties that
 				take a cut.
 			`),
-			references,
-		}
+		})
 	}
 
 	if (
@@ -213,7 +206,7 @@ function evaluateChainAbstraction(
 	) {
 		const risksHidden = bridging.builtInBridging.risksExplained === 'NOT_IN_UI'
 
-		return {
+		return ctx.build({
 			value: {
 				id: risksHidden
 					? 'chain_abstraction_bridge_hidden_risks'
@@ -255,12 +248,11 @@ function evaluateChainAbstraction(
 				developers also have a responsibility to make these risks known to
 				users when they bridge assets.
 			`),
-			references,
-		}
+		})
 	}
 
 	if (!isSupported(bridging.suggestedBridging)) {
-		return {
+		return ctx.build({
 			value: {
 				id: 'chain_abstraction_no_suggested_bridging',
 				displayName: 'Abstracts away most cross-chain complexity',
@@ -286,12 +278,11 @@ function evaluateChainAbstraction(
 				they have insufficient balance, while they have sufficient funds on
 				another supported chain.
 			`),
-			references,
-		}
+		})
 	}
 
 	// All pass.
-	return {
+	return ctx.build({
 		value: {
 			id: 'chain_abstraction_pass',
 			displayName: 'Abstracts away cross-chain complexity',
@@ -312,8 +303,7 @@ function evaluateChainAbstraction(
 				explanation.
 			- Automatically suggesting cross-chain bridging when appropriate.
 		`),
-		references,
-	}
+	})
 }
 
 const fullySupportedCrossChainBalanceDisplay: CrossChainBalanceDisplay = {
@@ -397,32 +387,38 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 				sentence(
 					'The wallet only displays account value or token balances for a single chain at a time.',
 				),
-				evaluateChainAbstraction({
-					crossChainBalances: {
-						ref: refNotNecessary,
-						globalAccountValue: notSupported,
-						perChainAccountValue: notSupported,
-						ether: {
-							crossChainSumView: notSupported,
-							perChainBalanceViewAcrossMultipleChains: notSupported,
+				evaluateChainAbstraction(
+					EvaluationContext.forTest(() => chainAbstraction),
+					{
+						crossChainBalances: {
+							ref: refNotNecessary,
+							globalAccountValue: notSupported,
+							perChainAccountValue: notSupported,
+							ether: {
+								crossChainSumView: notSupported,
+								perChainBalanceViewAcrossMultipleChains: notSupported,
+							},
+							usdc: {
+								crossChainSumView: notSupported,
+								perChainBalanceViewAcrossMultipleChains: notSupported,
+							},
 						},
-						usdc: {
-							crossChainSumView: notSupported,
-							perChainBalanceViewAcrossMultipleChains: notSupported,
-						},
+						bridging: fullySupportedBridging,
 					},
-					bridging: fullySupportedBridging,
-				}),
+				),
 			),
 			exampleRating(
 				sentence('The wallet does not have a built-in cross-chain bridging feature.'),
-				evaluateChainAbstraction({
-					crossChainBalances: fullySupportedCrossChainBalances,
-					bridging: {
-						builtInBridging: notSupported,
-						suggestedBridging: notSupported,
+				evaluateChainAbstraction(
+					EvaluationContext.forTest(() => chainAbstraction),
+					{
+						crossChainBalances: fullySupportedCrossChainBalances,
+						bridging: {
+							builtInBridging: notSupported,
+							suggestedBridging: notSupported,
+						},
 					},
-				}),
+				),
 			),
 		],
 		partial: [
@@ -430,84 +426,98 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 				sentence(
 					'The wallet displays global cross-chain account value, but not individual token balances across chains.',
 				),
-				evaluateChainAbstraction({
-					crossChainBalances: {
-						ref: refNotNecessary,
-						globalAccountValue: featureSupported,
-						perChainAccountValue: featureSupported,
-						ether: {
-							crossChainSumView: notSupported,
-							perChainBalanceViewAcrossMultipleChains: featureSupported,
+				evaluateChainAbstraction(
+					EvaluationContext.forTest(() => chainAbstraction),
+					{
+						crossChainBalances: {
+							ref: refNotNecessary,
+							globalAccountValue: featureSupported,
+							perChainAccountValue: featureSupported,
+							ether: {
+								crossChainSumView: notSupported,
+								perChainBalanceViewAcrossMultipleChains: featureSupported,
+							},
+							usdc: {
+								crossChainSumView: notSupported,
+								perChainBalanceViewAcrossMultipleChains: featureSupported,
+							},
 						},
-						usdc: {
-							crossChainSumView: notSupported,
-							perChainBalanceViewAcrossMultipleChains: featureSupported,
-						},
+						bridging: fullySupportedBridging,
 					},
-					bridging: fullySupportedBridging,
-				}),
+				),
 			),
 			exampleRating(
 				sentence(
 					'The wallet has a built-in cross-chain bridging feature, but bridging fees are not displayed by default.',
 				),
-				evaluateChainAbstraction({
-					crossChainBalances: fullySupportedCrossChainBalances,
-					bridging: {
-						builtInBridging: supported({
-							ref: refNotNecessary,
-							feesLargerThan1bps: {
-								byDefault: FeeDisplayLevel.NONE,
-								afterSingleAction: FeeDisplayLevel.NONE,
-								fullySponsored: false,
-							},
-							risksExplained: 'VISIBLE_BY_DEFAULT',
-						}),
-						suggestedBridging: notSupported,
+				evaluateChainAbstraction(
+					EvaluationContext.forTest(() => chainAbstraction),
+					{
+						crossChainBalances: fullySupportedCrossChainBalances,
+						bridging: {
+							builtInBridging: supported({
+								ref: refNotNecessary,
+								feesLargerThan1bps: {
+									byDefault: FeeDisplayLevel.NONE,
+									afterSingleAction: FeeDisplayLevel.NONE,
+									fullySponsored: false,
+								},
+								risksExplained: 'VISIBLE_BY_DEFAULT',
+							}),
+							suggestedBridging: notSupported,
+						},
 					},
-				}),
+				),
 			),
 			exampleRating(
 				sentence(
 					'The wallet has a built-in cross-chain bridging feature, but does not explain the risks involved in using it.',
 				),
-				evaluateChainAbstraction({
-					crossChainBalances: fullySupportedCrossChainBalances,
-					bridging: {
-						builtInBridging: supported({
-							ref: refNotNecessary,
-							feesLargerThan1bps: comprehensiveFeesShownByDefault,
-							risksExplained: 'HIDDEN_BY_DEFAULT',
-						}),
-						suggestedBridging: notSupported,
+				evaluateChainAbstraction(
+					EvaluationContext.forTest(() => chainAbstraction),
+					{
+						crossChainBalances: fullySupportedCrossChainBalances,
+						bridging: {
+							builtInBridging: supported({
+								ref: refNotNecessary,
+								feesLargerThan1bps: comprehensiveFeesShownByDefault,
+								risksExplained: 'HIDDEN_BY_DEFAULT',
+							}),
+							suggestedBridging: notSupported,
+						},
 					},
-				}),
+				),
 			),
 		],
 		pass: exampleRating(
 			sentence(
 				'The wallet displays cross-chain balances of individual tokens. It automatically offers to bridge tokens between chains when necessary, explaining the risks and fees involved in doing so.',
 			),
-			evaluateChainAbstraction({
-				crossChainBalances: fullySupportedCrossChainBalances,
-				bridging: fullySupportedBridging,
-			}),
+			evaluateChainAbstraction(
+				EvaluationContext.forTest(() => chainAbstraction),
+				{
+					crossChainBalances: fullySupportedCrossChainBalances,
+					bridging: fullySupportedBridging,
+				},
+			),
 		),
 	},
-	evaluate: (features: ResolvedFeatures): Evaluation<ChainAbstractionValue> => {
-		if (features.type !== WalletType.SOFTWARE) {
+	evaluate: (ctx: EvaluationContext<ChainAbstractionValue>): Evaluation<ChainAbstractionValue> => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can self-test.
+
+		if (ctx.features.type !== WalletType.SOFTWARE) {
 			return exempt(
-				chainAbstraction,
+				ctx,
 				sentence('Only software wallets are expected to deal with chain abstraction.'),
 				null,
 			)
 		}
 
-		if (features.chainAbstraction === null) {
-			return unrated(chainAbstraction, null)
+		if (ctx.features.chainAbstraction === null) {
+			return unrated(ctx, null)
 		}
 
-		return evaluateChainAbstraction(features.chainAbstraction)
+		return evaluateChainAbstraction(ctx, ctx.features.chainAbstraction)
 	},
 	aggregate: pickWorstRating<ChainAbstractionValue>,
 }

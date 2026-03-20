@@ -158,6 +158,34 @@ export function prerenderTypographicContent<_Strings extends Strings = null>(
 	}
 }
 
+function assertNever(x: never): never {
+	throw new Error(`Unexpected content type: ${String(x)}`)
+}
+
+/**
+ * Convert pre-rendered typographic content (no template strings left) to a plain string.
+ */
+function typographicContentToPlainString(rendered: TypographicContent<null>): string {
+	switch (rendered.contentType) {
+		case ContentType.TEXT:
+			return rendered.text
+		case ContentType.MARKDOWN:
+			return rendered.markdown
+		default:
+			return assertNever(rendered)
+	}
+}
+
+/**
+ * Render typographic content with the given template strings and return a plain string.
+ */
+export function renderTypographicContentToString<_Strings extends Strings = null>(
+	content: TypographicContent<_Strings>,
+	strings: _Strings,
+): string {
+	return typographicContentToPlainString(prerenderTypographicContent(content, strings))
+}
+
 /**
  * Create text content with optional template variables
  */
