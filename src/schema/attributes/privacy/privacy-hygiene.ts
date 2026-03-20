@@ -26,7 +26,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type GeneralPrivacyHygieneValue = Value
+export type PrivacyHygieneValue = Value
 
 function doesNotCollectAnalyticsWithoutConsent(policy: CollectionPolicy): boolean {
 	return (
@@ -71,8 +71,8 @@ function isForbiddenWithoutPriorConsentUserInfo(userInfo: UserInfo): boolean {
 }
 
 function forbiddenDataByDefault(
-	ctx: EvaluationContext<GeneralPrivacyHygieneValue>,
-): Evaluation<GeneralPrivacyHygieneValue> {
+	ctx: EvaluationContext<PrivacyHygieneValue>,
+): Evaluation<PrivacyHygieneValue> {
 	return ctx.build({
 		value: {
 			id: 'forbidden_data_by_default',
@@ -95,8 +95,8 @@ function forbiddenDataByDefault(
 }
 
 function analyticsWithoutConsent(
-	ctx: EvaluationContext<GeneralPrivacyHygieneValue>,
-): Evaluation<GeneralPrivacyHygieneValue> {
+	ctx: EvaluationContext<PrivacyHygieneValue>,
+): Evaluation<PrivacyHygieneValue> {
 	return ctx.build({
 		value: {
 			id: 'analytics_without_consent',
@@ -119,8 +119,8 @@ function analyticsWithoutConsent(
 }
 
 function noForbiddenDataByDefault(
-	ctx: EvaluationContext<GeneralPrivacyHygieneValue>,
-): Evaluation<GeneralPrivacyHygieneValue> {
+	ctx: EvaluationContext<PrivacyHygieneValue>,
+): Evaluation<PrivacyHygieneValue> {
 	return ctx.build({
 		value: {
 			id: 'no_forbidden_data_by_default',
@@ -136,12 +136,12 @@ function noForbiddenDataByDefault(
 	})
 }
 
-export const generalPrivacyHygiene: Attribute<GeneralPrivacyHygieneValue> = {
-	id: 'generalPrivacyHygiene',
-	icon: '\u{1f50f}', // lock
-	displayName: 'General privacy hygiene',
+export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
+	id: 'privacyHygiene',
+	icon: '\u{1f9fc}', // Soap
+	displayName: 'Privacy hygiene',
 	wording: {
-		midSentenceName: 'general privacy hygiene',
+		midSentenceName: 'privacy hygiene',
 	},
 	question: sentence(
 		'Does {{WALLET_NAME}} avoid sending data that should never be shared without your consent?',
@@ -160,13 +160,13 @@ export const generalPrivacyHygiene: Attribute<GeneralPrivacyHygieneValue> = {
 				sentence(
 					'The wallet sends browsing history or wallet-connected domains to an external service by default without consent.',
 				),
-				forbiddenDataByDefault(EvaluationContext.forTest(() => generalPrivacyHygiene)),
+				forbiddenDataByDefault(EvaluationContext.forTest(() => privacyHygiene)),
 			),
 			exampleRating(
 				sentence(
 					'The wallet uses analytics (e.g. Matomo or Sentry) without asking for user consent first.',
 				),
-				analyticsWithoutConsent(EvaluationContext.forTest(() => generalPrivacyHygiene)),
+				analyticsWithoutConsent(EvaluationContext.forTest(() => privacyHygiene)),
 			),
 		],
 		partial: [],
@@ -174,22 +174,20 @@ export const generalPrivacyHygiene: Attribute<GeneralPrivacyHygieneValue> = {
 			sentence(
 				'The wallet does not send browsing history or wallet-connected domains without consent, and asks for consent before using analytics.',
 			),
-			noForbiddenDataByDefault(EvaluationContext.forTest(() => generalPrivacyHygiene)),
+			noForbiddenDataByDefault(EvaluationContext.forTest(() => privacyHygiene)),
 		),
 	},
 	exempted: (
-		ctx: EvaluationContext<GeneralPrivacyHygieneValue>,
+		ctx: EvaluationContext<PrivacyHygieneValue>,
 		_metadata: WalletMetadata,
-	): ExemptEvaluation<GeneralPrivacyHygieneValue> | null => {
+	): ExemptEvaluation<PrivacyHygieneValue> | null => {
 		if (ctx.features.type === WalletType.HARDWARE) {
 			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'), null)
 		}
 
 		return null
 	},
-	evaluate: (
-		ctx: EvaluationContext<GeneralPrivacyHygieneValue>,
-	): Evaluation<GeneralPrivacyHygieneValue> => {
+	evaluate: (ctx: EvaluationContext<PrivacyHygieneValue>): Evaluation<PrivacyHygieneValue> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		const dataCollection = ctx.features.privacy.dataCollection
@@ -229,6 +227,6 @@ export const generalPrivacyHygiene: Attribute<GeneralPrivacyHygieneValue> = {
 
 		return noForbiddenDataByDefault(ctx)
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<GeneralPrivacyHygieneValue>>) =>
-		pickWorstRating<GeneralPrivacyHygieneValue>(perVariant),
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PrivacyHygieneValue>>) =>
+		pickWorstRating<PrivacyHygieneValue>(perVariant),
 }
