@@ -124,7 +124,7 @@ export interface WalletBaseFeatures {
 		 * crash/error reporting, e.g. Matomo, Sentry). NEVER = no analytics;
 		 * OPT_IN / PROMPTED = consent before first use; BY_DEFAULT / ALWAYS = no consent.
 		 */
-		analyticsConsent: VariantFeature<CollectionPolicy | null>
+		analyticsConsent: VariantFeature<CollectionPolicy>
 	}
 
 	/** Self-sovereignty features. */

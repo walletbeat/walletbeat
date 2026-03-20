@@ -15,6 +15,7 @@ import {
 	PersonalInfo,
 	qualifiedDataCollection,
 	type UserInfo,
+	userInfoEnums,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import type { AtLeastOneVariant } from '@/schema/variants'
@@ -25,24 +26,48 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-/** If this list is expanded, the attribute's methodology text must be updated to name the new data types. */
-const DATA_NEVER_WITHOUT_CONSENT: UserInfo[] = [
-	PersonalInfo.BROWSING_HISTORY_URLS,
-	WalletInfo.WALLET_CONNECTED_DOMAINS,
-]
-
 export type GeneralPrivacyHygieneValue = Value
 
-function doesNotCollectAnalyticsWithoutConsent(policy: CollectionPolicy | null): boolean {
-	if (policy === null) {
-		return false
-	}
-
+function doesNotCollectAnalyticsWithoutConsent(policy: CollectionPolicy): boolean {
 	return (
 		policy === CollectionPolicy.NEVER ||
 		policy === CollectionPolicy.OPT_IN ||
 		policy === CollectionPolicy.PROMPTED
 	)
+}
+
+/**
+ * Whether this type of user information is forbidden without prior user consent.
+ *
+ * Keep this switch exhaustive: if a new `UserInfo` is added, TypeScript should force
+ * you to decide whether it belongs in this category.
+ */
+function isForbiddenWithoutPriorConsentUserInfo(userInfo: UserInfo): boolean {
+	switch (userInfo) {
+		case PersonalInfo.BROWSING_HISTORY_URLS:
+		case WalletInfo.WALLET_CONNECTED_DOMAINS:
+			return true
+
+		case PersonalInfo.IP_ADDRESS:
+		case PersonalInfo.TRACKING_IDENTIFIER:
+		case PersonalInfo.PSEUDONYM:
+		case PersonalInfo.LEGAL_NAME:
+		case PersonalInfo.EMAIL:
+		case PersonalInfo.PHONE:
+		case PersonalInfo.CONTACTS:
+		case PersonalInfo.PHYSICAL_ADDRESS:
+		case PersonalInfo.FACE:
+		case PersonalInfo.CEX_ACCOUNT:
+		case PersonalInfo.GOVERNMENT_ID:
+		case PersonalInfo.X_DOT_COM_ACCOUNT:
+		case PersonalInfo.FARCASTER_ACCOUNT:
+		case WalletInfo.USER_ACTIONS:
+		case WalletInfo.ACCOUNT_ADDRESS:
+		case WalletInfo.BALANCE:
+		case WalletInfo.ASSETS:
+		case WalletInfo.MEMPOOL_TRANSACTIONS:
+			return false
+	}
 }
 
 function forbiddenDataByDefault(
@@ -183,8 +208,8 @@ export const generalPrivacyHygiene: Attribute<GeneralPrivacyHygieneValue> = {
 
 			const qualified = qualifiedDataCollection(collected.dataCollection)
 
-			for (const info of DATA_NEVER_WITHOUT_CONSENT) {
-				if (collectedByDefault(qualified[info])) {
+			for (const info of userInfoEnums.items) {
+				if (isForbiddenWithoutPriorConsentUserInfo(info) && collectedByDefault(qualified[info])) {
 					return forbiddenDataByDefault(ctx)
 				}
 			}
@@ -192,12 +217,14 @@ export const generalPrivacyHygiene: Attribute<GeneralPrivacyHygieneValue> = {
 
 		const analyticsConsent = ctx.features.privacy.analyticsConsent
 
-		if (hasAnalyticsInSomeFlow && analyticsConsent === null) {
-			return unrated(ctx, null)
-		}
+		if (hasAnalyticsInSomeFlow) {
+			if (analyticsConsent === null) {
+				return unrated(ctx, null)
+			}
 
-		if (hasAnalyticsInSomeFlow && !doesNotCollectAnalyticsWithoutConsent(analyticsConsent)) {
-			return analyticsWithoutConsent(ctx)
+			if (!doesNotCollectAnalyticsWithoutConsent(analyticsConsent)) {
+				return analyticsWithoutConsent(ctx)
+			}
 		}
 
 		return noForbiddenDataByDefault(ctx)
