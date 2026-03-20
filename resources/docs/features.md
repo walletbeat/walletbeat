@@ -2588,7 +2588,7 @@ Security-relevant fields from the Browser Extension Manifest. Values should be e
 - `hostPermissions` (`HostPermissionScope`): Scope of host permissions granted at install time, controlling which pages the background service worker may programmatically access. Maps to the `host_permissions` manifest field.
 - `contentScripts` (`HostPermissionScope`): Scope of pages the wallet's content scripts are injected into on every page load, controlling what the wallet can silently read and modify. Maps to the broadest `matches` entry across all `content_scripts`.
 - `externallyConnectable` (`| { extensionIds: ExternalExtensionIdScope pageMatches: HostPermissionScope } | 'NOT_EXTERNALLY_CONNECTABLE'`): Which external web pages and other extensions may open a direct message channel to the wallet (e.g. to send RPC requests). Maps to the `externally_connectable` manifest field. Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the manifest, meaning no external connections are permitted.
-- `permissions` (`BrowserExtensionManifest[]`): Security-sensitive Browser API permissions declared in the `permissions` manifest field, granted to the extension at install time.
+- `permissions` (`BrowserExtensionPermission[]`): Security-sensitive Browser API permissions declared in the `permissions` manifest field, granted to the extension at install time.
 - `webAccessibleResources` (`WebAccessibleResourcesScope`): Broadest scope of web origins that may load resources from this extension. Maps to the broadest `matches` entry across all `web_accessible_resources` items.
 
 ---
