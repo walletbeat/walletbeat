@@ -56,6 +56,12 @@ import type {
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
+	HostPermissionScope,
+	KeyStorageMechanism,
+	SecureRngSource,
+	WebAccessibleResourcesScope,
+} from '@/schema/features/security/security-best-practices'
+import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
 	DataDisplayOptions,
@@ -574,7 +580,22 @@ export const completedTemplate: SoftwareWallet = {
 					userWhitelist: false,
 				}),
 			},
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: {
+					ref: refTodo,
+					browserExtensionHardening: {
+						contentScripts: HostPermissionScope.NONE,
+						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						hostPermissions: HostPermissionScope.NONE,
+						permissions: [],
+						webAccessibleResources: WebAccessibleResourcesScope.NONE,
+					},
+					keyStorageMechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'NOT_A_MOBILE_APP',
+			},
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {
