@@ -10,6 +10,7 @@ import {
 import {
 	collectedByDefault,
 	CollectionPolicy,
+	type DataCollection,
 	DataCollectionPurpose,
 	PersonalInfo,
 	qualifiedDataCollection,
@@ -24,6 +25,7 @@ import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
+import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
@@ -201,6 +203,133 @@ function noForbiddenDataByDefault(
 	})
 }
 
+interface AnalyticsTelemetryResult {
+	evaluations: Array<Evaluation<PrivacyHygieneValue>>
+	hasIncompleteAnalyticsData: boolean
+}
+
+/**
+ * Evaluates usage analytics and crash reporting telemetry policy.
+ * Calls `ctx.addRef` for each supported analytics feature.
+ *
+ * Usage analytics without consent is rated FAIL (sends behavioral data);
+ * crash reporting without consent is rated PARTIAL (less sensitive, but still
+ * collected without agreement). Both are collected independently so
+ * `pickWorstRating` can select the appropriate overall rating.
+ *
+ * `hasIncompleteAnalyticsData` is true when either analytics feature is null,
+ * signaling the caller that a confident PASS cannot be issued.
+ */
+function evaluateAnalyticsTelemetry(
+	ctx: EvaluationContext<PrivacyHygieneValue>,
+): AnalyticsTelemetryResult {
+	const usageAnalytics = ctx.features.privacy.analytics.usage
+	const crashReportsAnalytics = ctx.features.privacy.analytics.crashReports
+	const evaluations: Array<Evaluation<PrivacyHygieneValue>> = []
+
+	if (usageAnalytics !== null && isSupported(usageAnalytics)) {
+		ctx.addRef(usageAnalytics)
+
+		if (
+			usageAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
+			usageAnalytics.policy === CollectionPolicy.ALWAYS
+		) {
+			evaluations.push(usageAnalyticsWithoutConsent(ctx))
+		}
+	}
+
+	if (crashReportsAnalytics !== null && isSupported(crashReportsAnalytics)) {
+		ctx.addRef(crashReportsAnalytics)
+
+		if (
+			crashReportsAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
+			crashReportsAnalytics.policy === CollectionPolicy.ALWAYS
+		) {
+			evaluations.push(crashReportingWithoutConsent(ctx))
+		}
+	}
+
+	return {
+		evaluations,
+		hasIncompleteAnalyticsData: usageAnalytics === null || crashReportsAnalytics === null,
+	}
+}
+
+interface FlowScanResult {
+	hasUnknownFlowData: boolean
+	hasAnalyticsInSomeFlow: boolean
+	sendsBrowsingHistoryByDefault: boolean
+	sendsWalletConnectedDomainsByDefault: boolean
+}
+
+/**
+ * Scans all user flows in `dataCollection` for forbidden-by-default data and
+ * analytics usage. Calls `ctx.addRef` on every collected-data entry that
+ * involves analytics or forbidden data, so the evaluation evidence trail is
+ * complete regardless of the final rating.
+ *
+ * Returns data-only flags; the caller is responsible for mapping these flags
+ * to `Evaluation` objects.
+ */
+function scanFlowsForForbiddenDataViolations(
+	dataCollection: DataCollection,
+	ctx: EvaluationContext<PrivacyHygieneValue>,
+): FlowScanResult {
+	let hasUnknownFlowData = false
+	let hasAnalyticsInSomeFlow = false
+	let sendsBrowsingHistoryByDefault = false
+	let sendsWalletConnectedDomainsByDefault = false
+	const forbiddenInfos = userInfoEnums.items.filter(isForbiddenWithoutPriorConsentUserInfo)
+
+	for (const flow of userFlow.items) {
+		const forFlow = dataCollection[flow]
+
+		if (forFlow === null) {
+			hasUnknownFlowData = true
+			continue
+		}
+
+		if (forFlow === undefined || forFlow === 'FLOW_NOT_SUPPORTED') {
+			continue
+		}
+
+		for (const collected of forFlow.collected) {
+			const hasAnalyticsPurpose = collected.purposes.includes(DataCollectionPurpose.ANALYTICS)
+
+			hasAnalyticsInSomeFlow = hasAnalyticsInSomeFlow || hasAnalyticsPurpose
+
+			const qualifiedCollection = qualifiedDataCollection(collected.dataCollection)
+
+			const collectsForbiddenData = forbiddenInfos.some(
+				info => qualifiedCollection[info] !== CollectionPolicy.NEVER,
+			)
+
+			if (hasAnalyticsPurpose || collectsForbiddenData) {
+				ctx.addRef(collected)
+			}
+
+			for (const info of forbiddenInfos) {
+				if (collectedByDefault(qualifiedCollection[info])) {
+					if (info === PersonalInfo.BROWSING_HISTORY_URLS) {
+						sendsBrowsingHistoryByDefault = true
+					}
+
+					if (info === WalletInfo.WALLET_CONNECTED_DOMAINS) {
+						sendsWalletConnectedDomainsByDefault = true
+					}
+				}
+			}
+		}
+	}
+
+	return {
+		hasUnknownFlowData,
+		hasAnalyticsInSomeFlow,
+		sendsBrowsingHistoryByDefault,
+		sendsWalletConnectedDomainsByDefault,
+	}
+}
+
 export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 	id: 'privacyHygiene',
 	icon: '\u{1f9fc}', // Soap
@@ -288,103 +417,32 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 			return unrated(ctx, null)
 		}
 
-		let hasUnknownFlowData = false
-		let hasAnalyticsInSomeFlow = false
-		const forbiddenInfos = userInfoEnums.items.filter(isForbiddenWithoutPriorConsentUserInfo)
-		let sendsBrowsingHistoryByDefault = false
-		let sendsWalletConnectedDomainsByDefault = false
+		const flowScan = scanFlowsForForbiddenDataViolations(dataCollection, ctx)
+		const analytics = evaluateAnalyticsTelemetry(ctx)
+		const evaluations: Array<Evaluation<PrivacyHygieneValue>> = []
 
-		for (const flow of userFlow.items) {
-			const forFlow = dataCollection[flow]
-
-			if (forFlow === null) {
-				hasUnknownFlowData = true
-				continue
-			}
-
-			if (forFlow === undefined || forFlow === 'FLOW_NOT_SUPPORTED') {
-				continue
-			}
-
-			for (const collected of forFlow.collected) {
-				const hasAnalyticsPurpose = collected.purposes.includes(DataCollectionPurpose.ANALYTICS)
-
-				hasAnalyticsInSomeFlow = hasAnalyticsInSomeFlow || hasAnalyticsPurpose
-
-				const qualifiedCollection = qualifiedDataCollection(collected.dataCollection)
-				let collectsForbiddenData = false
-				let collectsForbiddenDataByDefault = false
-
-				for (const info of forbiddenInfos) {
-					collectsForbiddenData =
-						collectsForbiddenData || qualifiedCollection[info] !== CollectionPolicy.NEVER
-
-					if (collectedByDefault(qualifiedCollection[info])) {
-						collectsForbiddenDataByDefault = true
-
-						if (info === PersonalInfo.BROWSING_HISTORY_URLS) {
-							sendsBrowsingHistoryByDefault = true
-						}
-
-						if (info === WalletInfo.WALLET_CONNECTED_DOMAINS) {
-							sendsWalletConnectedDomainsByDefault = true
-						}
-					}
-				}
-
-				if (hasAnalyticsPurpose || collectsForbiddenData || collectsForbiddenDataByDefault) {
-					ctx.addRef(collected)
-				}
-			}
+		if (flowScan.sendsBrowsingHistoryByDefault && flowScan.sendsWalletConnectedDomainsByDefault) {
+			evaluations.push(browsingHistoryAndWalletConnectedDomainsByDefault(ctx))
+		} else if (flowScan.sendsBrowsingHistoryByDefault) {
+			evaluations.push(browsingHistoryByDefault(ctx))
+		} else if (flowScan.sendsWalletConnectedDomainsByDefault) {
+			evaluations.push(walletConnectedDomainsByDefault(ctx))
 		}
 
-		if (sendsBrowsingHistoryByDefault && sendsWalletConnectedDomainsByDefault) {
-			return browsingHistoryAndWalletConnectedDomainsByDefault(ctx)
-		}
+		evaluations.push(...analytics.evaluations)
 
-		if (sendsBrowsingHistoryByDefault) {
-			return browsingHistoryByDefault(ctx)
-		}
-
-		if (sendsWalletConnectedDomainsByDefault) {
-			return walletConnectedDomainsByDefault(ctx)
-		}
-
-		const usageAnalytics = ctx.features.privacy.analytics.usage
-		const crashReportsAnalytics = ctx.features.privacy.analytics.crashReports
-
-		if (usageAnalytics !== null && isSupported(usageAnalytics)) {
-			ctx.addRef(usageAnalytics)
-		}
-
-		if (crashReportsAnalytics !== null && isSupported(crashReportsAnalytics)) {
-			ctx.addRef(crashReportsAnalytics)
-		}
-
-		if (
-			usageAnalytics !== null &&
-			isSupported(usageAnalytics) &&
-			(usageAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
-				usageAnalytics.policy === CollectionPolicy.ALWAYS)
-		) {
-			return usageAnalyticsWithoutConsent(ctx)
-		}
-
-		if (
-			crashReportsAnalytics !== null &&
-			isSupported(crashReportsAnalytics) &&
-			(crashReportsAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
-				crashReportsAnalytics.policy === CollectionPolicy.ALWAYS)
-		) {
-			return crashReportingWithoutConsent(ctx)
-		}
-
-		if (hasAnalyticsInSomeFlow && (usageAnalytics === null || crashReportsAnalytics === null)) {
+		// Incomplete data must be checked before we issue a PASS, because missing
+		// analytics or flow data means we cannot confidently say nothing is wrong.
+		if (flowScan.hasAnalyticsInSomeFlow && analytics.hasIncompleteAnalyticsData) {
 			return unrated(ctx, null)
 		}
 
-		if (hasUnknownFlowData) {
+		if (flowScan.hasUnknownFlowData) {
 			return unrated(ctx, null)
+		}
+
+		if (isNonEmptyArray(evaluations)) {
+			return pickWorstRating<PrivacyHygieneValue>(evaluations)
 		}
 
 		return noForbiddenDataByDefault(ctx)

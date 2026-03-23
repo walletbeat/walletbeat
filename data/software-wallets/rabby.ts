@@ -294,7 +294,7 @@ export const rabby: SoftwareWallet = {
 						ref: [
 							{
 								explanation:
-									'Rabby collects UI/product analytics events via Matomo which issent to DeBank-owned infrastructure.',
+									'Rabby collects UI/product analytics events via Matomo which is sent to DeBank-owned infrastructure.',
 								url: 'https://github.com/search?q=repo%3ARabbyHub%2FRabby%20matomoRequestEvent&type=code',
 							},
 						],
