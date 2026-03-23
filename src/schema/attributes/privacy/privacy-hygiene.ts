@@ -24,12 +24,44 @@ import type { AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
-import { markdown, paragraph, sentence } from '@/types/content'
+import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
+import { commaListFormat } from '@/types/utils/text'
 
+import { type Entity, entityMarkdownLink } from '../../entity'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type PrivacyHygieneValue = Value
+
+function entityNames(entities: Entity[]): string {
+	if (entities.length === 0) {
+		return 'an external service'
+	}
+
+	return commaListFormat(entities.map(e => e.name))
+}
+
+function entityLinks(entities: Entity[]): string {
+	if (entities.length === 0) {
+		return 'an external service'
+	}
+
+	return commaListFormat(entities.map(entityMarkdownLink))
+}
+
+function uniqueEntities(entities: Entity[]): Entity[] {
+	const seen = new Set<string>()
+
+	return entities.filter(e => {
+		if (seen.has(e.id)) {
+			return false
+		}
+
+		seen.add(e.id)
+
+		return true
+	})
+}
 
 /**
  * Whether this type of user information is forbidden without prior user consent.
@@ -67,120 +99,145 @@ function isForbiddenWithoutPriorConsentUserInfo(userInfo: UserInfo): boolean {
 
 function browsingHistoryByDefault(
 	ctx: EvaluationContext<PrivacyHygieneValue>,
+	entities?: Entity[],
 ): Evaluation<PrivacyHygieneValue> {
+	const names = entityNames(entities ?? [])
+	const links = entityLinks(entities ?? [])
+
 	return ctx.build({
 		value: {
 			id: 'browsing_history_by_default',
 			rating: Rating.FAIL,
 			displayName: 'Browsing history sent by default',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} sends browsing history to an external service by default without consent.',
+				`{{WALLET_NAME}} sends browsing history to ${names} by default without consent.`,
 			),
 		},
-		details: sentence(
-			'{{WALLET_NAME}} sends browsing history to an external service by default without consent.',
+		details: mdSentence(
+			`{{WALLET_NAME}} sends browsing history to ${links} by default without consent.`,
 		),
 		howToImprove: sentence(
 			'{{WALLET_NAME}} should not send browsing history without prior user consent.',
 		),
-		impact: paragraph(
-			'Sending browsing history by default allows external entities to profile you and undermines expectations of privacy.',
+		impact: mdParagraph(
+			`Sending browsing history to ${links} by default allows them to profile you and undermines expectations of privacy.`,
 		),
 	})
 }
 
 function walletConnectedDomainsByDefault(
 	ctx: EvaluationContext<PrivacyHygieneValue>,
+	entities?: Entity[],
 ): Evaluation<PrivacyHygieneValue> {
+	const names = entityNames(entities ?? [])
+	const links = entityLinks(entities ?? [])
+
 	return ctx.build({
 		value: {
 			id: 'wallet_connected_domains_by_default',
 			rating: Rating.FAIL,
 			displayName: 'Wallet-connected domains sent by default',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} sends wallet-connected domains to an external service by default without consent.',
+				`{{WALLET_NAME}} sends wallet-connected domains to ${names} by default without consent.`,
 			),
 		},
-		details: sentence(
-			'{{WALLET_NAME}} sends wallet-connected domains to an external service by default without consent.',
+		details: mdSentence(
+			`{{WALLET_NAME}} sends wallet-connected domains to ${links} by default without consent.`,
 		),
 		howToImprove: sentence(
 			'{{WALLET_NAME}} should not send wallet-connected domains without prior user consent.',
 		),
-		impact: paragraph(
-			'Sending wallet-connected domains by default allows external entities to profile you and undermines expectations of privacy.',
+		impact: mdParagraph(
+			`Sending wallet-connected domains to ${links} by default allows them to profile you and undermines expectations of privacy.`,
 		),
 	})
 }
 
 function browsingHistoryAndWalletConnectedDomainsByDefault(
 	ctx: EvaluationContext<PrivacyHygieneValue>,
+	browsingHistoryEntities?: Entity[],
+	walletConnectedDomainsEntities?: Entity[],
 ): Evaluation<PrivacyHygieneValue> {
+	const allEntities = uniqueEntities([
+		...(browsingHistoryEntities ?? []),
+		...(walletConnectedDomainsEntities ?? []),
+	])
+	const names = entityNames(allEntities)
+	const links = entityLinks(allEntities)
+
 	return ctx.build({
 		value: {
 			id: 'browsing_history_and_wallet_connected_domains_by_default',
 			rating: Rating.FAIL,
 			displayName: 'Browsing history and wallet-connected domains sent by default',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} sends browsing history and wallet-connected domains to an external service by default without consent.',
+				`{{WALLET_NAME}} sends browsing history and wallet-connected domains to ${names} by default without consent.`,
 			),
 		},
-		details: sentence(
-			'{{WALLET_NAME}} sends browsing history and wallet-connected domains to an external service by default without consent.',
+		details: mdSentence(
+			`{{WALLET_NAME}} sends browsing history and wallet-connected domains to ${links} by default without consent.`,
 		),
 		howToImprove: sentence(
 			'{{WALLET_NAME}} should not send browsing history or wallet-connected domains without prior user consent.',
 		),
-		impact: paragraph(
-			'Sending browsing history and wallet-connected domains by default allows external entities to profile you and undermines expectations of privacy.',
+		impact: mdParagraph(
+			`Sending browsing history and wallet-connected domains to ${links} by default allows them to profile you and undermines expectations of privacy.`,
 		),
 	})
 }
 
 function usageAnalyticsWithoutConsent(
 	ctx: EvaluationContext<PrivacyHygieneValue>,
+	entity?: Entity,
 ): Evaluation<PrivacyHygieneValue> {
+	const names = entity !== undefined ? entityNames([entity]) : 'external services'
+	const links = entity !== undefined ? entityLinks([entity]) : 'external services'
+
 	return ctx.build({
 		value: {
 			id: 'usage_analytics_without_consent',
 			rating: Rating.FAIL,
 			displayName: 'Usage analytics without prior consent',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} uses product analytics without asking for user consent first.',
+				`{{WALLET_NAME}} sends product analytics to ${names} without asking for user consent first.`,
 			),
 		},
-		details: sentence(
-			'{{WALLET_NAME}} uses product analytics without asking for user consent first.',
+		details: mdSentence(
+			`{{WALLET_NAME}} sends product analytics to ${links} without asking for user consent first.`,
 		),
 		howToImprove: sentence(
 			'{{WALLET_NAME}} should ask for user consent before enabling product analytics.',
 		),
-		impact: paragraph(
-			"Using product analytics without prior consent sends usage data to external services without the user's agreement.",
+		impact: mdParagraph(
+			`Using product analytics without prior consent sends usage data to ${links} without the user's agreement.`,
 		),
 	})
 }
 
 function crashReportingWithoutConsent(
 	ctx: EvaluationContext<PrivacyHygieneValue>,
+	entity?: Entity,
 ): Evaluation<PrivacyHygieneValue> {
+	const names = entity !== undefined ? entityNames([entity]) : 'an external service'
+	const links = entity !== undefined ? entityLinks([entity]) : 'an external service'
+
 	return ctx.build({
 		value: {
 			id: 'crash_reporting_without_consent',
 			rating: Rating.PARTIAL,
 			displayName: 'Crash reporting without prior consent',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} sends crash/error reports without asking for user consent first.',
+				`{{WALLET_NAME}} sends crash/error reports to ${names} without asking for user consent first.`,
 			),
 		},
-		details: sentence(
-			'{{WALLET_NAME}} sends crash/error reports without asking for user consent first.',
+		details: mdSentence(
+			`{{WALLET_NAME}} sends crash/error reports to ${links} without asking for user consent first.`,
 		),
 		howToImprove: sentence(
 			'{{WALLET_NAME}} should ask for user consent before enabling crash/error reporting.',
 		),
-		impact: paragraph(
-			'Collecting crash reports without prior consent can expose wallet usage context without explicit user agreement, even when product analytics are disabled or consented.',
+		impact: mdParagraph(
+			`Collecting crash reports without prior consent can expose wallet usage context to ${links} without explicit user agreement, even when product analytics are disabled or consented.`,
 		),
 	})
 }
@@ -249,7 +306,7 @@ function evaluateAnalyticsTelemetry(
 			usageAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
 			usageAnalytics.policy === CollectionPolicy.ALWAYS
 		) {
-			evaluations.push(usageAnalyticsWithoutConsent(ctx))
+			evaluations.push(usageAnalyticsWithoutConsent(ctx, usageAnalytics.entity))
 		}
 	}
 
@@ -260,7 +317,7 @@ function evaluateAnalyticsTelemetry(
 			crashReportsAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
 			crashReportsAnalytics.policy === CollectionPolicy.ALWAYS
 		) {
-			evaluations.push(crashReportingWithoutConsent(ctx))
+			evaluations.push(crashReportingWithoutConsent(ctx, crashReportsAnalytics.entity))
 		}
 	}
 
@@ -278,8 +335,8 @@ function evaluateAnalyticsTelemetry(
 interface FlowScanResult {
 	hasUnknownFlowData: boolean
 	hasAnalyticsInSomeFlow: boolean
-	sendsBrowsingHistoryByDefault: boolean
-	sendsWalletConnectedDomainsByDefault: boolean
+	browsingHistoryByDefaultEntities: Entity[]
+	walletConnectedDomainsByDefaultEntities: Entity[]
 }
 
 /**
@@ -297,8 +354,8 @@ function scanFlowsForForbiddenDataViolations(
 ): FlowScanResult {
 	let hasUnknownFlowData = false
 	let hasAnalyticsInSomeFlow = false
-	let sendsBrowsingHistoryByDefault = false
-	let sendsWalletConnectedDomainsByDefault = false
+	const browsingHistoryByDefaultEntities: Entity[] = []
+	const walletConnectedDomainsByDefaultEntities: Entity[] = []
 	const forbiddenInfos = userInfoEnums.items.filter(isForbiddenWithoutPriorConsentUserInfo)
 
 	for (const flow of userFlow.items) {
@@ -330,12 +387,18 @@ function scanFlowsForForbiddenDataViolations(
 
 			for (const info of forbiddenInfos) {
 				if (collectedByDefault(qualifiedCollection[info])) {
-					if (info === PersonalInfo.BROWSING_HISTORY_URLS) {
-						sendsBrowsingHistoryByDefault = true
+					if (
+						info === PersonalInfo.BROWSING_HISTORY_URLS &&
+						!browsingHistoryByDefaultEntities.some(e => e.id === collected.byEntity.id)
+					) {
+						browsingHistoryByDefaultEntities.push(collected.byEntity)
 					}
 
-					if (info === WalletInfo.WALLET_CONNECTED_DOMAINS) {
-						sendsWalletConnectedDomainsByDefault = true
+					if (
+						info === WalletInfo.WALLET_CONNECTED_DOMAINS &&
+						!walletConnectedDomainsByDefaultEntities.some(e => e.id === collected.byEntity.id)
+					) {
+						walletConnectedDomainsByDefaultEntities.push(collected.byEntity)
 					}
 				}
 			}
@@ -345,8 +408,8 @@ function scanFlowsForForbiddenDataViolations(
 	return {
 		hasUnknownFlowData,
 		hasAnalyticsInSomeFlow,
-		sendsBrowsingHistoryByDefault,
-		sendsWalletConnectedDomainsByDefault,
+		browsingHistoryByDefaultEntities,
+		walletConnectedDomainsByDefaultEntities,
 	}
 }
 
@@ -447,12 +510,23 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 		const analytics = evaluateAnalyticsTelemetry(ctx)
 		const evaluations: Array<Evaluation<PrivacyHygieneValue>> = []
 
-		if (flowScan.sendsBrowsingHistoryByDefault && flowScan.sendsWalletConnectedDomainsByDefault) {
-			evaluations.push(browsingHistoryAndWalletConnectedDomainsByDefault(ctx))
-		} else if (flowScan.sendsBrowsingHistoryByDefault) {
-			evaluations.push(browsingHistoryByDefault(ctx))
-		} else if (flowScan.sendsWalletConnectedDomainsByDefault) {
-			evaluations.push(walletConnectedDomainsByDefault(ctx))
+		const hasBrowsingHistory = isNonEmptyArray(flowScan.browsingHistoryByDefaultEntities)
+		const hasWalletConnected = isNonEmptyArray(flowScan.walletConnectedDomainsByDefaultEntities)
+
+		if (hasBrowsingHistory && hasWalletConnected) {
+			evaluations.push(
+				browsingHistoryAndWalletConnectedDomainsByDefault(
+					ctx,
+					flowScan.browsingHistoryByDefaultEntities,
+					flowScan.walletConnectedDomainsByDefaultEntities,
+				),
+			)
+		} else if (hasBrowsingHistory) {
+			evaluations.push(browsingHistoryByDefault(ctx, flowScan.browsingHistoryByDefaultEntities))
+		} else if (hasWalletConnected) {
+			evaluations.push(
+				walletConnectedDomainsByDefault(ctx, flowScan.walletConnectedDomainsByDefaultEntities),
+			)
 		}
 
 		evaluations.push(...analytics.evaluations)
