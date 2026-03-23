@@ -1,21 +1,10 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	type Value,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, EvaluationContext, Rating, Verifiability } from '@/schema/attributes'
 import { licenseSourceIsVisible, LicensingType } from '@/schema/features/transparency/license'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type SourceVisibilityValue = Value
-
-function sourcePublic(
-	ctx: EvaluationContext<SourceVisibilityValue>,
-): Evaluation<SourceVisibilityValue> {
+function sourcePublic(ctx: EvaluationContext) {
 	return ctx.build({
 		value: {
 			id: 'public',
@@ -35,9 +24,7 @@ function sourcePublic(
 	})
 }
 
-function sourcePartiallyPrivate(
-	ctx: EvaluationContext<SourceVisibilityValue>,
-): Evaluation<SourceVisibilityValue> {
+function sourcePartiallyPrivate(ctx: EvaluationContext) {
 	return ctx.build({
 		value: {
 			id: 'partially_private',
@@ -63,9 +50,7 @@ function sourcePartiallyPrivate(
 	})
 }
 
-function sourcePrivate(
-	ctx: EvaluationContext<SourceVisibilityValue>,
-): Evaluation<SourceVisibilityValue> {
+function sourcePrivate(ctx: EvaluationContext) {
 	return ctx.build({
 		value: {
 			id: 'private',
@@ -91,7 +76,7 @@ function sourcePrivate(
 	})
 }
 
-export const sourceVisibility: Attribute<SourceVisibilityValue> = {
+export const sourceVisibility: Attribute = {
 	id: 'sourceVisibility',
 	icon: '\u{1f50d}', // Looking glass
 	displayName: 'Source visibility',
@@ -121,7 +106,7 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 			be visible.
 		`),
 	},
-	evaluate: (ctx: EvaluationContext<SourceVisibilityValue>): Evaluation<SourceVisibilityValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Inherently verifiable, just look at the source.
 
 		if (ctx.features.licensing === null) {
@@ -168,5 +153,5 @@ export const sourceVisibility: Attribute<SourceVisibilityValue> = {
 				})()
 		}
 	},
-	aggregate: pickWorstRating<SourceVisibilityValue>,
+	aggregate: pickWorstRating,
 }

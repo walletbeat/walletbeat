@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety'
@@ -14,7 +13,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type UserSafetyValue = Value & {
+export type UserSafetyOutcomeMetadata = {
 	readableAddress: UserSafetyType
 	contractLabeling: UserSafetyType
 	rawTxReview: UserSafetyType
@@ -65,7 +64,7 @@ function evaluateUserSafety(features: UserSafetySupport): Rating {
 	return Rating.FAIL
 }
 
-export const userSafety: Attribute<UserSafetyValue> = {
+export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
 	id: 'userSafety',
 	icon: '🛡️',
 	displayName: 'User Safety',
@@ -126,25 +125,27 @@ export const userSafety: Attribute<UserSafetyValue> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes 11 or more user safety sub-criteria.'),
-				(v: UserSafetyValue) => v.rating === Rating.PASS,
+				v => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes 6 to 10 user safety sub-criteria.'),
-				(v: UserSafetyValue) => v.rating === Rating.PARTIAL,
+				v => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet passes 5 or fewer user safety sub-criteria.'),
-				(v: UserSafetyValue) => v.rating === Rating.FAIL,
+				v => v.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) =>
-		pickWorstRating<UserSafetyValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<UserSafetyValue>): Evaluation<UserSafetyValue> => {
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyOutcomeMetadata>>) =>
+		pickWorstRating<UserSafetyOutcomeMetadata>(perVariant),
+	evaluate: (
+		ctx: EvaluationContext<UserSafetyOutcomeMetadata>,
+	): Evaluation<UserSafetyOutcomeMetadata> => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 
 		if (ctx.features.type !== WalletType.HARDWARE) {

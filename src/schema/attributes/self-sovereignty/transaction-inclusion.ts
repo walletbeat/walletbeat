@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	TransactionSubmissionL2Support,
@@ -23,12 +22,10 @@ import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type TransactionInclusionValue = Value
-
 export type L1BroadcastSupport = 'NO' | 'SELF_GOSSIP' | 'OWN_NODE'
 
 function transactionSubmissionEvaluation(
-	ctx: EvaluationContext<TransactionInclusionValue>,
+	ctx: EvaluationContext,
 	{
 		supportsL1Broadcast,
 		supportAnyL2Transactions,
@@ -40,7 +37,7 @@ function transactionSubmissionEvaluation(
 		supportForceWithdrawal: TransactionSubmissionL2Type[]
 		unsupportedL2s: TransactionSubmissionL2Type[]
 	},
-): Evaluation<TransactionInclusionValue> {
+): Evaluation {
 	if (!isNonEmptyArray(supportAnyL2Transactions) && !isNonEmptyArray(supportForceWithdrawal)) {
 		return ctx.build({
 			value: {
@@ -127,7 +124,7 @@ function transactionSubmissionEvaluation(
 	})
 }
 
-export const transactionInclusion: Attribute<TransactionInclusionValue> = {
+export const transactionInclusion: Attribute = {
 	id: 'transactionInclusion',
 	icon: '\u{1f4e1}', // Satellite antenna
 	displayName: 'Transaction inclusion',
@@ -259,9 +256,7 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			),
 		),
 	},
-	evaluate: (
-		ctx: EvaluationContext<TransactionInclusionValue>,
-	): Evaluation<TransactionInclusionValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		if (ctx.features.selfSovereignty.transactionSubmission === null) {
 			return unrated(ctx, null)
 		}
@@ -338,5 +333,5 @@ export const transactionInclusion: Attribute<TransactionInclusionValue> = {
 			unsupportedL2s,
 		})
 	},
-	aggregate: pickWorstRating<TransactionInclusionValue>,
+	aggregate: pickWorstRating,
 }

@@ -6,8 +6,9 @@ import {
 	type Evaluation,
 	EvaluationContext,
 	type ExemptEvaluation,
+	type Outcome,
+	type OutcomeMetadata,
 	Rating,
-	type Value,
 	Verifiability,
 	type WalletNameStrings,
 } from '../attributes'
@@ -16,43 +17,43 @@ import type { AtLeastOneVariant, Variant } from '../variants'
 /**
  * Helper for constructing "Unrated" values.
  */
-export function unrated<V extends Value>(
-	ctx: EvaluationContext<V>,
-	extraProps: Omit<V, keyof Value> extends Record<string, never> ? null : Omit<V, keyof Value>,
-): Evaluation<V> {
-	const value: Value = {
+export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
+	ctx: EvaluationContext<_OutcomeMetadata>,
+	extraProps: keyof _OutcomeMetadata extends never ? null : _OutcomeMetadata,
+): Evaluation<_OutcomeMetadata> {
+	const value: Outcome = {
 		id: 'unrated',
 		rating: Rating.UNRATED,
 		verifiability: Verifiability.SELF_EVIDENT,
 		displayName: `${ctx.attribute.displayName}: Unrated`,
 		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
-	const v: V = { ...value, ...(extraProps ?? {}) } as unknown as V
+
+	const v = { ...value, ...(extraProps ?? {}) } as Outcome<_OutcomeMetadata>
 
 	return {
 		value: v,
-		details: unratedAttributeContent<V>(),
+		details: unratedAttributeContent<_OutcomeMetadata>(),
 	}
 }
 
-export function exempt<V extends Value>(
-	ctx: EvaluationContext<V>,
+export function exempt<_OutcomeMetadata extends OutcomeMetadata>(
+	ctx: EvaluationContext<_OutcomeMetadata>,
 	whyExempt: Sentence<WalletNameStrings>,
-	extraProps: Omit<V, keyof Value> extends Record<string, never> ? null : Omit<V, keyof Value>,
-): ExemptEvaluation<V> {
-	const value: Value & { rating: Rating.EXEMPT } = {
+	extraProps: keyof _OutcomeMetadata extends never ? null : _OutcomeMetadata,
+): ExemptEvaluation<_OutcomeMetadata> {
+	const value: Outcome & { rating: Rating.EXEMPT } = {
 		id: 'exempt',
 		rating: Rating.EXEMPT,
 		verifiability: Verifiability.SELF_EVIDENT,
 		displayName: `${ctx.attribute.displayName}: Exempt`,
 		shortExplanation: whyExempt,
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of V that are not in Value creates a correct V-typed object.
-	const v: V & { rating: Rating.EXEMPT } = {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of _OutcomeMetadata creates a correct Outcome<_OutcomeMetadata>-typed object.
+	const v = {
 		...value,
 		...(extraProps ?? {}),
-	} as unknown as V & { rating: Rating.EXEMPT }
+	} as Outcome<_OutcomeMetadata> & { rating: Rating.EXEMPT }
 
 	return {
 		value: v,
@@ -65,14 +66,16 @@ export function exempt<V extends Value>(
  * @param perVariant Evaluation for at least one variant.
  * @returns The evaluation with the lowest rating.
  */
-export function pickWorstRating<V extends Value>(
-	evaluations: AtLeastOneVariant<Evaluation<V>> | NonEmptyArray<Evaluation<V>>,
-): Evaluation<V> {
-	let worst: Evaluation<V> | null = null
+export function pickWorstRating<_OutcomeMetadata extends OutcomeMetadata>(
+	evaluations:
+		| AtLeastOneVariant<Evaluation<_OutcomeMetadata>>
+		| NonEmptyArray<Evaluation<_OutcomeMetadata>>,
+): Evaluation<_OutcomeMetadata> {
+	let worst: Evaluation<_OutcomeMetadata> | null = null
 	const evaluationsArray =
 		Array.isArray(evaluations) && isNonEmptyArray(evaluations)
 			? evaluations
-			: nonEmptyValues<Variant, Evaluation<V>>(evaluations)
+			: nonEmptyValues<Variant, Evaluation<_OutcomeMetadata>>(evaluations)
 
 	for (const evaluation of evaluationsArray) {
 		if (evaluation.value.rating === Rating.UNRATED) {

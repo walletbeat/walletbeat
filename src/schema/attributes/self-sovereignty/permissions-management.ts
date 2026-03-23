@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -16,8 +15,6 @@ import { refTodo } from '@/schema/reference'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
-
-export type PermissionsManagementValue = Value
 
 function describeStandard(control: SpendingApprovalsControl): string {
 	switch (control) {
@@ -43,9 +40,9 @@ function worstControl(...controls: SpendingApprovalsControl[]): SpendingApproval
 }
 
 function evaluate(
-	ctx: EvaluationContext<PermissionsManagementValue>,
+	ctx: EvaluationContext,
 	control: Support<PermissionsManagementSupport>,
-): Evaluation<PermissionsManagementValue> {
+): Evaluation {
 	if (!isSupported(control)) {
 		return ctx.build({
 			value: {
@@ -138,7 +135,7 @@ function evaluate(
 	})
 }
 
-export const permissionsManagement: Attribute<PermissionsManagementValue> = {
+export const permissionsManagement: Attribute = {
 	id: 'permissionsManagement',
 	icon: '\u{1f511}', // Key
 	displayName: 'Permissions management',
@@ -201,7 +198,7 @@ export const permissionsManagement: Attribute<PermissionsManagementValue> = {
 			),
 		),
 	},
-	evaluate: (ctx: EvaluationContext<PermissionsManagementValue>) => {
+	evaluate: (ctx: EvaluationContext) => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE)
 
 		const feature = ctx.features.selfSovereignty.permissionsManagement
@@ -214,5 +211,5 @@ export const permissionsManagement: Attribute<PermissionsManagementValue> = {
 
 		return evaluate(ctx, feature)
 	},
-	aggregate: pickWorstRating<PermissionsManagementValue>,
+	aggregate: pickWorstRating,
 }

@@ -7,7 +7,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '@/schema/eips'
@@ -33,13 +32,11 @@ import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type TransactionBatchingValue = Value
-
 function evaluateTransactionBatching(
-	ctx: EvaluationContext<TransactionBatchingValue>,
+	ctx: EvaluationContext,
 	accountSupport: AccountSupport,
 	walletCall: Support<WithRef<WalletCallIntegration>>,
-): Evaluation<TransactionBatchingValue> {
+): Evaluation {
 	if (
 		!isSupported<AccountType7702>(accountSupport.eip7702) &&
 		!isSupported<AccountType4337>(accountSupport.rawErc4337)
@@ -148,7 +145,7 @@ function evaluateTransactionBatching(
 	})
 }
 
-export const transactionBatching: Attribute<TransactionBatchingValue> = {
+export const transactionBatching: Attribute = {
 	id: 'transactionBatching',
 	icon: '\u{1f9fa}', // Basket
 	displayName: 'Transaction batching',
@@ -274,9 +271,7 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 			),
 		),
 	},
-	evaluate: (
-		ctx: EvaluationContext<TransactionBatchingValue>,
-	): Evaluation<TransactionBatchingValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		if (ctx.features.type !== WalletType.SOFTWARE) {
@@ -308,5 +303,5 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 			ctx.features.integration.walletCall,
 		)
 	},
-	aggregate: pickWorstRating<TransactionBatchingValue>,
+	aggregate: pickWorstRating,
 }

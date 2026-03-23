@@ -4,8 +4,8 @@ import {
 	EvaluationContext,
 	exampleRating,
 	exampleRatingUnimplemented,
+	type Outcome,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	collectedByDefault,
@@ -39,7 +39,7 @@ import {
 } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
-export type AddressCorrelationValue = Value & {
+export type AddressCorrelationOutcomeMetadata = {
 	worstLeak: WalletAddressLinkableBy | null
 }
 
@@ -63,9 +63,9 @@ export type WalletAddressLinkableBy = WalletAddressLinkableTo & {
 }
 
 function linkable(
-	ctx: EvaluationContext<AddressCorrelationValue>,
+	ctx: EvaluationContext<AddressCorrelationOutcomeMetadata>,
 	linkables: NonEmptyArray<WalletAddressLinkableBy>,
-): Evaluation<AddressCorrelationValue> {
+): Evaluation<AddressCorrelationOutcomeMetadata> {
 	const worstLeak = nonEmptyFirst(
 		linkables,
 		(linkableA: WalletAddressLinkableBy, linkableB: WalletAddressLinkableBy) =>
@@ -201,7 +201,7 @@ export function linkableToWalletAddress<T extends UserInfo>(
 	return linkables
 }
 
-export const addressCorrelation: Attribute<AddressCorrelationValue> = {
+export const addressCorrelation: Attribute<AddressCorrelationOutcomeMetadata> = {
 	id: 'addressCorrelation',
 	icon: '\u{1f517}', // Link
 	displayName: 'Wallet address privacy',
@@ -259,7 +259,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 					This is treated as a partial rating because users may mitigate
 					against this by forcing wallet requests to be proxied on their own.
 				`),
-				(value: AddressCorrelationValue) =>
+				(value: Outcome<AddressCorrelationOutcomeMetadata>) =>
 					value.rating === Rating.PARTIAL && value.worstLeak?.info === PersonalInfo.IP_ADDRESS,
 			),
 			exampleRating(
@@ -270,7 +270,7 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 					pseudonym for each of their wallet address to mitigate this privacy
 					issue.
 				`),
-				(value: AddressCorrelationValue) =>
+				(value: Outcome<AddressCorrelationOutcomeMetadata>) =>
 					value.rating === Rating.PARTIAL && value.worstLeak?.info === PersonalInfo.PSEUDONYM,
 			),
 		],
@@ -293,8 +293,8 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 		],
 	},
 	evaluate: (
-		ctx: EvaluationContext<AddressCorrelationValue>,
-	): Evaluation<AddressCorrelationValue> => {
+		ctx: EvaluationContext<AddressCorrelationOutcomeMetadata>,
+	): Evaluation<AddressCorrelationOutcomeMetadata> => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
@@ -347,5 +347,5 @@ export const addressCorrelation: Attribute<AddressCorrelationValue> = {
 			),
 		})
 	},
-	aggregate: pickWorstRating<AddressCorrelationValue>,
+	aggregate: pickWorstRating<AddressCorrelationOutcomeMetadata>,
 }

@@ -6,7 +6,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { isSupported, type Support, type Supported } from '@/schema/features/support'
@@ -20,7 +19,7 @@ import type {
 } from '../../features/privacy/address-resolution'
 import { pickWorstRating, unrated } from '../common'
 
-export type AddressResolutionValue = Value & {
+export type AddressResolutionOutcomeMetadata = {
 	addressResolution?: AddressResolution<Support<AddressResolutionData>>
 }
 
@@ -69,9 +68,9 @@ function getOffchainProviderInfo(
 }
 
 function evaluateAddressResolution(
-	ctx: EvaluationContext<AddressResolutionValue>,
+	ctx: EvaluationContext<AddressResolutionOutcomeMetadata>,
 	addressResolution: AddressResolution<Support<AddressResolutionData>>,
-): Evaluation<AddressResolutionValue> {
+): Evaluation<AddressResolutionOutcomeMetadata> {
 	const chainSpecificERCs: NonEmptyArray<[Eip, Support<AddressResolutionData>, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
@@ -201,7 +200,7 @@ function evaluateAddressResolution(
 	})
 }
 
-export const addressResolution: Attribute<AddressResolutionValue> = {
+export const addressResolution: Attribute<AddressResolutionOutcomeMetadata> = {
 	id: 'addressResolution',
 	icon: '\u{1f4c7}', // Card index
 	displayName: 'Address resolution',
@@ -422,8 +421,8 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		),
 	},
 	evaluate: (
-		ctx: EvaluationContext<AddressResolutionValue>,
-	): Evaluation<AddressResolutionValue> => {
+		ctx: EvaluationContext<AddressResolutionOutcomeMetadata>,
+	): Evaluation<AddressResolutionOutcomeMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivially self-testable.
 
 		if (ctx.features.addressResolution === null) {
@@ -452,5 +451,5 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 
 		return evaluateAddressResolution(ctx, resolvedResolution)
 	},
-	aggregate: pickWorstRating<AddressResolutionValue>,
+	aggregate: pickWorstRating<AddressResolutionOutcomeMetadata>,
 }

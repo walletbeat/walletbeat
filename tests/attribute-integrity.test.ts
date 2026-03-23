@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { attributeTree } from '@/schema/attribute-groups'
-import { type Attribute, Rating, ratingToText, type Value } from '@/schema/attributes'
+import { Rating, ratingToText } from '@/schema/attributes'
 
 import { warmupHarperLinter } from './utils/grammar'
 
@@ -10,10 +10,7 @@ await warmupHarperLinter()
 describe('attribute', () => {
 	for (const [attributeGroupName, attributeGroup] of Object.entries(attributeTree)) {
 		describe(`group ${attributeGroupName}`, () => {
-			for (const [attributeName, attributeAny] of Object.entries(attributeGroup.attributes)) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attributes inherit from `Attribute<Value>`.
-				const attribute = attributeAny as Attribute<Value>
-
+			for (const [attributeName, attribute] of Object.entries(attributeGroup.attributes)) {
 				describe(`attribute ${attribute.displayName}`, () => {
 					it('has well-formed lowerCamelCase ID', () => {
 						expect(attribute.id).toMatch(/^[a-z]+([A-Z][a-z]*)*/)

@@ -3,7 +3,6 @@ import {
 	type Evaluation,
 	EvaluationContext,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
@@ -14,7 +13,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type ReputationValue = Value & {
+export type ReputationOutcomeMetadata = {
 	originalProduct: ReputationType
 	availability: ReputationType
 	warrantySupportRisk: ReputationType
@@ -43,7 +42,7 @@ function evaluateReputation(features: ReputationSupport): Rating {
 	return Rating.FAIL
 }
 
-export const reputation: Attribute<ReputationValue> = {
+export const reputation: Attribute<ReputationOutcomeMetadata> = {
 	id: 'reputation',
 	icon: '🌟',
 	displayName: 'Reputation',
@@ -77,25 +76,27 @@ export const reputation: Attribute<ReputationValue> = {
 		pass: [
 			exampleRating(
 				sentence('The wallet passes most reputation sub-criteria.'),
-				(v: ReputationValue) => v.rating === Rating.PASS,
+				v => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The wallet passes some reputation sub-criteria.'),
-				(v: ReputationValue) => v.rating === Rating.PARTIAL,
+				v => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The wallet fails most or all reputation sub-criteria.'),
-				(v: ReputationValue) => v.rating === Rating.FAIL,
+				v => v.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationValue>>) =>
-		pickWorstRating<ReputationValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<ReputationValue>): Evaluation<ReputationValue> => {
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationOutcomeMetadata>>) =>
+		pickWorstRating<ReputationOutcomeMetadata>(perVariant),
+	evaluate: (
+		ctx: EvaluationContext<ReputationOutcomeMetadata>,
+	): Evaluation<ReputationOutcomeMetadata> => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {

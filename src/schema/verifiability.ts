@@ -2,7 +2,7 @@ import { isNonEmptyArray, nonEmptyFirst, nonEmptyMap } from '@/types/utils/non-e
 
 import {
 	EvaluationContext,
-	type Value,
+	type OutcomeMetadata,
 	Verifiability,
 	type VerifiabilityPredicate,
 } from './attributes'
@@ -33,14 +33,14 @@ function verifyScore(v: Verifiability): number {
  * verifying the claim requires at least one of multiple means of
  * verification.
  */
-export function verifiabilityRequiresAnyOf<V extends Value>(
-	...predicates: VerifiabilityPredicate<V>[]
-): VerifiabilityPredicate<V> {
+export function verifiabilityRequiresAnyOf<_OutcomeMetadata extends OutcomeMetadata>(
+	...predicates: VerifiabilityPredicate<_OutcomeMetadata>[]
+): VerifiabilityPredicate<_OutcomeMetadata> {
 	if (!isNonEmptyArray(predicates)) {
 		throw new Error('cannot compute the verifiability from no verifiability items')
 	}
 
-	return (ctx: EvaluationContext<V>) =>
+	return (ctx: EvaluationContext<_OutcomeMetadata>) =>
 		nonEmptyFirst(
 			nonEmptyMap(predicates, predicate => predicate(ctx)),
 			(a: Verifiability, b: Verifiability) => verifyScore(b) - verifyScore(a),
@@ -52,14 +52,14 @@ export function verifiabilityRequiresAnyOf<V extends Value>(
  * verifying the claim requires at least one of multiple means of
  * verification.
  */
-export function verifiabilityRequiresAllOf<V extends Value>(
-	...predicates: VerifiabilityPredicate<V>[]
-): VerifiabilityPredicate<V> {
+export function verifiabilityRequiresAllOf<_OutcomeMetadata extends OutcomeMetadata>(
+	...predicates: VerifiabilityPredicate<_OutcomeMetadata>[]
+): VerifiabilityPredicate<_OutcomeMetadata> {
 	if (!isNonEmptyArray(predicates)) {
 		throw new Error('cannot compute the verifiability from no verifiability items')
 	}
 
-	return (ctx: EvaluationContext<V>) =>
+	return (ctx: EvaluationContext<_OutcomeMetadata>) =>
 		nonEmptyFirst(
 			nonEmptyMap(predicates, predicate => predicate(ctx)),
 			(a: Verifiability, b: Verifiability) => verifyScore(a) - verifyScore(b),
@@ -70,14 +70,16 @@ export function verifiabilityRequiresAllOf<V extends Value>(
  * Returns a level of `Verifiability` appropriate for an attribute where
  * verifying the claim requires source-code-level access.
  */
-export function verifiabilityRequiresSourceCodeAccess<V extends Value>(policy: {
+export function verifiabilityRequiresSourceCodeAccess<
+	_OutcomeMetadata extends OutcomeMetadata,
+>(policy: {
 	/**
 	 * For wallets with split licenses between "core" wallet code and peripheral code,
 	 * is having visibility over the "core" wallet code sufficient for verifiability?
 	 */
 	coreOnlyIsSufficient: boolean
-}): VerifiabilityPredicate<V> {
-	return (ctx: EvaluationContext<V>) => {
+}): VerifiabilityPredicate<_OutcomeMetadata> {
+	return (ctx: EvaluationContext<_OutcomeMetadata>) => {
 		if (ctx.features.licensing === null) {
 			return Verifiability.UNKNOWN
 		}
@@ -123,14 +125,16 @@ export function verifiabilityRequiresSourceCodeAccess<V extends Value>(policy: {
  * Returns a level of `Verifiability` appropriate for an attribute where
  * verifying the claim requires the ability to update the chain RPC endpoint.
  */
-export function verifiabilityRequiresCustomChainRpc<V extends Value>(policy: {
+export function verifiabilityRequiresCustomChainRpc<
+	_OutcomeMetadata extends OutcomeMetadata,
+>(policy: {
 	/** Is the ability to configure the L1 RPC endpoint required? */
 	mustBeAbleToConfigureL1: boolean
 
 	/** Is the ability to configure specific L2s' RPC endpoints required? */
 	mustBeAbleToConfigureSpecificL2s: boolean
-}): VerifiabilityPredicate<V> {
-	return (ctx: EvaluationContext<V>) => {
+}): VerifiabilityPredicate<_OutcomeMetadata> {
+	return (ctx: EvaluationContext<_OutcomeMetadata>) => {
 		if (ctx.features.chainConfigurability === null) {
 			return Verifiability.UNKNOWN
 		}
@@ -173,10 +177,10 @@ export function verifiabilityRequiresCustomChainRpc<V extends Value>(policy: {
 	}
 }
 
-export function verifiabilityRequiresAtLeastOneReference<V extends Value>(policy: {
-	referenceCountsAs: Verifiability
-}): VerifiabilityPredicate<V> {
-	return (ctx: EvaluationContext<V>): Verifiability => {
+export function verifiabilityRequiresAtLeastOneReference<
+	_OutcomeMetadata extends OutcomeMetadata,
+>(policy: { referenceCountsAs: Verifiability }): VerifiabilityPredicate<_OutcomeMetadata> {
+	return (ctx: EvaluationContext<_OutcomeMetadata>): Verifiability => {
 		return ctx.references().length > 0 ? policy.referenceCountsAs : Verifiability.UNVERIFIABLE
 	}
 }

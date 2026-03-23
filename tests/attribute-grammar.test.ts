@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest'
 
 import { attributeTree } from '@/schema/attribute-groups'
-import type { ExampleRating, Value } from '@/schema/attributes'
+import type { ExampleRating, Outcome } from '@/schema/attributes'
 import {
 	assertNonEmptyArray,
 	isNonEmptyArray,
@@ -55,7 +55,7 @@ describe('attribute', () => {
 										? attribute.ratingScale.fail
 										: [attribute.ratingScale.fail],
 								)
-								const checkRatings = <V extends Value>(
+								const checkRatings = <V extends Outcome>(
 									scale: string,
 									ratings: NonEmptyArray<ExampleRating<V>>,
 								) => {

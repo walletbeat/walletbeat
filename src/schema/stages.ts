@@ -13,8 +13,8 @@ import {
 import { getAttributeFromTree } from './attribute-groups'
 import {
 	type Attribute,
+	type OutcomeMetadata,
 	Rating,
-	type Value,
 	Verifiability,
 	type WalletNameStrings,
 } from './attributes'
@@ -279,9 +279,9 @@ export function stageCriterionEvaluationPerVariant(
  * @param options More options for the behavior of this function.
  * @returns A function that can be used as `WalletStageCriterion.evaluate` for this attribute.
  */
-export function variantsMustPassAttribute<V extends Value>(
+export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 	variants: NonEmptySet<Variant>,
-	attribute: Attribute<V>,
+	attribute: Attribute<_OutcomeMetadata>,
 	options?: {
 		/** Whether to allow `PARTIAL` ratings. */
 		allowPartial: boolean
@@ -319,7 +319,7 @@ export function variantsMustPassAttribute<V extends Value>(
 	const evaluateFunction = stageCriterionEvaluationPerVariant(
 		variants,
 		(variantWallet: ResolvedWallet): StageCriterionEvaluation => {
-			const evalAttr = getAttributeFromTree<V>(variantWallet.attributes, attribute)
+			const evalAttr = getAttributeFromTree<_OutcomeMetadata>(variantWallet.attributes, attribute)
 
 			if (evalAttr === null) {
 				throw new Error(

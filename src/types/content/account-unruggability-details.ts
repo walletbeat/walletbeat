@@ -1,9 +1,9 @@
 import type { EvaluationData } from '@/schema/attributes'
-import type { AccountUnruggabilityValue } from '@/schema/attributes/self-sovereignty/account-unruggability'
+import type { AccountUnruggabilityOutcomeMetadata } from '@/schema/attributes/self-sovereignty/account-unruggability'
 
 import { component, type Content } from '../content'
 
-export interface AccountUnruggabilityDetailsProps extends EvaluationData<AccountUnruggabilityValue> {}
+export interface AccountUnruggabilityDetailsProps extends EvaluationData<AccountUnruggabilityOutcomeMetadata> {}
 
 export interface AccountUnruggabilityDetailsContent {
 	component: 'AccountUnruggabilityDetails'
@@ -13,7 +13,7 @@ export interface AccountUnruggabilityDetailsContent {
 export function accountUnruggabilityDetailsContent(
 	bakedProps: Omit<
 		AccountUnruggabilityDetailsProps,
-		keyof EvaluationData<AccountUnruggabilityValue>
+		keyof EvaluationData<AccountUnruggabilityOutcomeMetadata>
 	>,
 ): Content<{ WALLET_NAME: string }> {
 	return component<AccountUnruggabilityDetailsContent, keyof typeof bakedProps>(

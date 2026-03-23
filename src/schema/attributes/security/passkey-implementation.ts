@@ -1,30 +1,22 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	exampleRating,
-	Rating,
-	type Value,
-} from '@/schema/attributes'
+import { type Attribute, EvaluationContext, exampleRating, Rating } from '@/schema/attributes'
 import {
 	PasskeyVerificationLibrary,
 	type PasskeyVerificationSupport,
 } from '@/schema/features/security/passkey-verification'
 import { isSupported } from '@/schema/features/support'
-import { type AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type PasskeyImplementationValue = Value & {
+export type PasskeyImplementationOutcomeMetadata = {
 	library: PasskeyVerificationLibrary | null
 	libraryUrl?: string
 }
 
-function noPasskeyImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
-): Evaluation<PasskeyImplementationValue> {
+type _EvaluationContext = EvaluationContext<PasskeyImplementationOutcomeMetadata>
+
+function noPasskeyImplementation(ctx: _EvaluationContext) {
 	return ctx.build({
 		value: {
 			id: 'no_passkey_implementation',
@@ -44,10 +36,7 @@ function noPasskeyImplementation(
 	})
 }
 
-function otherPasskeyImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
-	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+function otherPasskeyImplementation(ctx: _EvaluationContext, support: PasskeyVerificationSupport) {
 	return ctx.build({
 		value: {
 			id: 'other_passkey_implementation',
@@ -69,9 +58,9 @@ function otherPasskeyImplementation(
 }
 
 function freshCryptoLibImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: _EvaluationContext,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
 		value: {
 			id: 'fresh_crypto_lib_implementation',
@@ -96,9 +85,9 @@ function freshCryptoLibImplementation(
 }
 
 function smoothCryptoLibImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: _EvaluationContext,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
 		value: {
 			id: 'smooth_crypto_lib_implementation',
@@ -121,9 +110,9 @@ function smoothCryptoLibImplementation(
 }
 
 function daimoP256VerifierImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: _EvaluationContext,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
 		value: {
 			id: 'daimo_p256_verifier_implementation',
@@ -146,9 +135,9 @@ function daimoP256VerifierImplementation(
 }
 
 function openZeppelinP256VerifierImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
+	ctx: _EvaluationContext,
 	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+) {
 	return ctx.build({
 		value: {
 			id: 'open_zeppelin_p256_verifier_implementation',
@@ -170,10 +159,7 @@ function openZeppelinP256VerifierImplementation(
 	})
 }
 
-function webAuthnSolImplementation(
-	ctx: EvaluationContext<PasskeyImplementationValue>,
-	support: PasskeyVerificationSupport,
-): Evaluation<PasskeyImplementationValue> {
+function webAuthnSolImplementation(ctx: _EvaluationContext, support: PasskeyVerificationSupport) {
 	return ctx.build({
 		value: {
 			id: 'web_authn_sol_implementation',
@@ -192,7 +178,7 @@ function webAuthnSolImplementation(
 	})
 }
 
-export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
+export const passkeyImplementation: Attribute<PasskeyImplementationOutcomeMetadata> = {
 	id: 'passkeyImplementation',
 	icon: '\u{1fac6}', // Fingerprint
 	displayName: 'Passkey implementation',
@@ -319,11 +305,8 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PasskeyImplementationValue>>) =>
-		pickWorstRating<PasskeyImplementationValue>(perVariant),
-	evaluate: (
-		ctx: EvaluationContext<PasskeyImplementationValue>,
-	): Evaluation<PasskeyImplementationValue> => {
+	aggregate: perVariant => pickWorstRating(perVariant),
+	evaluate: ctx => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 		const passkeyVerification = ctx.features.security.passkeyVerification
 
@@ -337,7 +320,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationValue> = {
 
 		const withoutRefs = ctx.popRefs<PasskeyVerificationSupport>(passkeyVerification)
 
-		const result = ((): Evaluation<PasskeyImplementationValue> => {
+		const result = (() => {
 			switch (withoutRefs.library) {
 				case PasskeyVerificationLibrary.SMOOTH_CRYPTO_LIB:
 					return smoothCryptoLibImplementation(ctx, withoutRefs)

@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import type {
@@ -28,12 +27,10 @@ import { markdown, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type ChainAbstractionValue = Value
-
 function evaluateChainAbstraction(
-	ctx: EvaluationContext<ChainAbstractionValue>,
+	ctx: EvaluationContext,
 	chainAbstraction: ChainAbstraction,
-): Evaluation<ChainAbstractionValue> {
+): Evaluation {
 	const { crossChainBalances, bridging } = chainAbstraction
 
 	ctx.addRef(crossChainBalances, bridging.builtInBridging, bridging.suggestedBridging)
@@ -328,7 +325,7 @@ const fullySupportedBridging: ChainAbstraction['bridging'] = {
 	suggestedBridging: featureSupportedNoRef,
 }
 
-export const chainAbstraction: Attribute<ChainAbstractionValue> = {
+export const chainAbstraction: Attribute = {
 	id: 'chainAbstraction',
 	icon: '\u{1f309}', // Bridge
 	displayName: 'Chain abstraction',
@@ -502,7 +499,7 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 			),
 		),
 	},
-	evaluate: (ctx: EvaluationContext<ChainAbstractionValue>): Evaluation<ChainAbstractionValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can self-test.
 
 		if (ctx.features.type !== WalletType.SOFTWARE) {
@@ -519,5 +516,5 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 
 		return evaluateChainAbstraction(ctx, ctx.features.chainAbstraction)
 	},
-	aggregate: pickWorstRating<ChainAbstractionValue>,
+	aggregate: pickWorstRating,
 }

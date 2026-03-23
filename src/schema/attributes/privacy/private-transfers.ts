@@ -7,7 +7,6 @@ import {
 	type EvaluationScaffold,
 	exampleRating,
 	Rating,
-	type Value,
 	type WalletNameStrings,
 } from '@/schema/attributes'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '@/schema/eips'
@@ -51,7 +50,7 @@ import { commaListFormat, markdownListFormat } from '@/types/utils/text'
 import { entityMarkdownLink } from '../../entity'
 import { pickWorstRating, unrated } from '../common'
 
-export type PrivateTransfersValue = Value & {
+export type PrivateTransfersOutcomeMetadata = {
 	defaultFungibleTokenTransferMode: FungibleTokenTransferMode
 	perTechnology: Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>
 }
@@ -108,10 +107,10 @@ export function worstPrivateTransfersPrivacyLevel(
 }
 
 function mergeEvaluations(
-	ctx: EvaluationContext<PrivateTransfersValue>,
-	eval1: EvaluationScaffold<PrivateTransfersValue> | null,
-	eval2: EvaluationScaffold<PrivateTransfersValue>,
-): EvaluationScaffold<PrivateTransfersValue> {
+	ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
+	eval1: EvaluationScaffold<PrivateTransfersOutcomeMetadata> | null,
+	eval2: EvaluationScaffold<PrivateTransfersOutcomeMetadata>,
+): EvaluationScaffold<PrivateTransfersOutcomeMetadata> {
 	if (eval1 === null) {
 		return eval2
 	}
@@ -190,8 +189,8 @@ function mergeEvaluations(
 }
 
 function noPrivateTransfers(
-	ctx: EvaluationContext<PrivateTransfersValue>,
-): Evaluation<PrivateTransfersValue> {
+	ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
+): Evaluation<PrivateTransfersOutcomeMetadata> {
 	return ctx.build({
 		value: {
 			id: 'no_transfer_privacy',
@@ -241,8 +240,8 @@ function noPrivateTransfers(
 }
 
 function nonDefault(
-	ctx: EvaluationContext<PrivateTransfersValue>,
-): Evaluation<PrivateTransfersValue> {
+	ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
+): Evaluation<PrivateTransfersOutcomeMetadata> {
 	return ctx.build({
 		value: {
 			id: 'non_default_transfer_privacy',
@@ -279,9 +278,9 @@ function nonDefault(
 }
 
 function rateStealthAddressSupport(
-	ctx: EvaluationContext<PrivateTransfersValue>,
+	ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
 	stealthAddresses: Supported<StealthAddressSupport>,
-): EvaluationScaffold<PrivateTransfersValue> {
+): EvaluationScaffold<PrivateTransfersOutcomeMetadata> {
 	ctx.addRef(
 		stealthAddresses,
 		stealthAddresses.recipientAddressResolution,
@@ -640,9 +639,9 @@ function rateStealthAddressSupport(
 }
 
 function rateTornadoCashNovaSupport(
-	ctx: EvaluationContext<PrivateTransfersValue>,
+	ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
 	tornadoCashNova: Supported<TornadoCashNovaSupport>,
-): EvaluationScaffold<PrivateTransfersValue> {
+): EvaluationScaffold<PrivateTransfersOutcomeMetadata> {
 	ctx.addRef(tornadoCashNova)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -907,9 +906,9 @@ function rateTornadoCashNovaSupport(
 }
 
 function ratePrivacyPoolsSupport(
-	ctx: EvaluationContext<PrivateTransfersValue>,
+	ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
 	privacyPools: Supported<PrivacyPoolsSupport>,
-): EvaluationScaffold<PrivateTransfersValue> {
+): EvaluationScaffold<PrivateTransfersOutcomeMetadata> {
 	ctx.addRef(privacyPools)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -1265,9 +1264,9 @@ function ratePrivacyPoolsSupport(
 }
 
 function rateRailgunSupport(
-	ctx: EvaluationContext<PrivateTransfersValue>,
+	ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
 	railgun: Supported<RailgunSupport>,
-): EvaluationScaffold<PrivateTransfersValue> {
+): EvaluationScaffold<PrivateTransfersOutcomeMetadata> {
 	ctx.addRef(railgun)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -1667,12 +1666,12 @@ function rateRailgunSupport(
 }
 
 function build(
-	scaffold: EvaluationScaffold<PrivateTransfersValue>,
-): Evaluation<PrivateTransfersValue> {
+	scaffold: EvaluationScaffold<PrivateTransfersOutcomeMetadata>,
+): Evaluation<PrivateTransfersOutcomeMetadata> {
 	return EvaluationContext.forTest(() => privateTransfers).build(scaffold)
 }
 
-export const privateTransfers: Attribute<PrivateTransfersValue> = {
+export const privateTransfers: Attribute<PrivateTransfersOutcomeMetadata> = {
 	id: 'privateTransfers',
 	icon: '\u{1f4e8}', // Incoming envelope
 	displayName: 'Private token transfers',
@@ -1956,7 +1955,9 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<PrivateTransfersValue>): Evaluation<PrivateTransfersValue> => {
+	evaluate: (
+		ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
+	): Evaluation<PrivateTransfersOutcomeMetadata> => {
 		// Verifying that private transfers are available in the UI is one thing,
 		// but verifying that the implementation is actually privacy-preserving
 		// (e.g. doesn't snitch on the user by periodically phoning home with data
@@ -1971,16 +1972,16 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			})
 		}
 
-		let evaluation: EvaluationScaffold<PrivateTransfersValue> | null = null
+		let evaluation: EvaluationScaffold<PrivateTransfersOutcomeMetadata> | null = null
 		let atLeastOneTechnologySupported = false
 
 		const maybeEvaluateTechnology = <T extends object>(
 			support: Support<T>,
 			evaluate: (
-				ctx: EvaluationContext<PrivateTransfersValue>,
+				ctx: EvaluationContext<PrivateTransfersOutcomeMetadata>,
 				supported: Supported<T>,
-			) => EvaluationScaffold<PrivateTransfersValue>,
-		): EvaluationScaffold<PrivateTransfersValue> | null => {
+			) => EvaluationScaffold<PrivateTransfersOutcomeMetadata>,
+		): EvaluationScaffold<PrivateTransfersOutcomeMetadata> | null => {
 			if (!isSupported(support)) {
 				return null
 			}
@@ -2064,5 +2065,5 @@ export const privateTransfers: Attribute<PrivateTransfersValue> = {
 			},
 		})
 	},
-	aggregate: pickWorstRating<PrivateTransfersValue>,
+	aggregate: pickWorstRating<PrivateTransfersOutcomeMetadata>,
 }

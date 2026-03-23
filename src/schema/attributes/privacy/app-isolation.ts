@@ -5,7 +5,6 @@ import {
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -28,12 +27,10 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type AppIsolationValue = Value
-
 function rateAppIsolation(
-	ctx: EvaluationContext<AppIsolationValue>,
+	ctx: EvaluationContext,
 	appIsolation: Exclude<AppIsolation, typeof appConnectionNotSupported>,
-): Evaluation<AppIsolationValue> {
+): Evaluation {
 	if (!isSupported(appIsolation.createInAppConnectionFlow)) {
 		return ctx.build({
 			value: {
@@ -216,7 +213,7 @@ function rateAppIsolation(
 	}
 }
 
-export const appIsolation: Attribute<AppIsolationValue> = {
+export const appIsolation: Attribute = {
 	id: 'appIsolation',
 	icon: '\u{1f3dd}', // Desert island
 	displayName: 'App isolation',
@@ -360,7 +357,7 @@ export const appIsolation: Attribute<AppIsolationValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<AppIsolationValue>): Evaluation<AppIsolationValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		if (ctx.features.type !== WalletType.SOFTWARE) {
@@ -381,5 +378,5 @@ export const appIsolation: Attribute<AppIsolationValue> = {
 
 		return rateAppIsolation(ctx, ctx.features.privacy.appIsolation)
 	},
-	aggregate: pickWorstRating<AppIsolationValue>,
+	aggregate: pickWorstRating,
 }

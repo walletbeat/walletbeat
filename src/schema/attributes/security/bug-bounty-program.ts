@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -27,8 +26,6 @@ import { nonEmptySet, setItems } from '@/types/utils/non-empty'
 import { commaListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
-
-export type BugBountyProgramValue = Value
 
 function getCoverageDescription(breadth: AtLeastOneCoverageBreadth): string {
 	const items = setItems(breadth)
@@ -102,9 +99,7 @@ function getRewardDetailsDescription(support: BugBountyProgramSupport): string {
 	return ''
 }
 
-function noBugBountyProgram(
-	ctx: EvaluationContext<BugBountyProgramValue>,
-): Evaluation<BugBountyProgramValue> {
+function noBugBountyProgram(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'no_bug_bounty_program',
@@ -123,10 +118,7 @@ function noBugBountyProgram(
 	})
 }
 
-function bugBountyAvailable(
-	ctx: EvaluationContext<BugBountyProgramValue>,
-	support: BugBountyProgramSupport,
-): Evaluation<BugBountyProgramValue> {
+function bugBountyAvailable(ctx: EvaluationContext, support: BugBountyProgramSupport): Evaluation {
 	const rewardInfo = getRewardDescription(support)
 	const rewardDetailsInfo = getRewardDetailsDescription(support)
 	const coverageInfo =
@@ -218,7 +210,7 @@ function getLegalProtectionDescription(legalProtection: LegalProtection): string
 	return `**Legal Protection**: The program provides ${protectionType} protections for security researchers conducting good faith security research.`
 }
 
-export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
+export const bugBountyProgram: Attribute = {
 	id: 'bugBountyProgram',
 	icon: '\u{1F41B}', // Bug emoji
 	displayName: 'Bug Bounty Program',
@@ -345,9 +337,8 @@ export const bugBountyProgram: Attribute<BugBountyProgramValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<BugBountyProgramValue>>) =>
-		pickWorstRating<BugBountyProgramValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<BugBountyProgramValue>): Evaluation<BugBountyProgramValue> => {
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation>) => pickWorstRating(perVariant),
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({ referenceCountsAs: Verifiability.VERIFIABLE }),
 		)

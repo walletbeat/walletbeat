@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import { isSupported, notSupported } from '@/schema/features/support'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
@@ -15,11 +14,7 @@ import {
 } from '../../features/self-sovereignty/chain-configurability'
 import { pickWorstRating, unrated } from '../common'
 
-export type L1ProviderIndependence = Value
-
-function supportsSelfHostedNode(
-	ctx: EvaluationContext<L1ProviderIndependence>,
-): Evaluation<L1ProviderIndependence> {
+function supportsSelfHostedNode(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'support_self_hosted_node',
@@ -36,9 +31,7 @@ function supportsSelfHostedNode(
 	})
 }
 
-function supportsSelfHostedNodeAfterRequests(
-	ctx: EvaluationContext<L1ProviderIndependence>,
-): Evaluation<L1ProviderIndependence> {
+function supportsSelfHostedNodeAfterRequests(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'self_hosted_node_after_requests',
@@ -60,9 +53,9 @@ function supportsSelfHostedNodeAfterRequests(
 }
 
 function supportsSelfHostedNodeButCannotDoBasicOperations(
-	ctx: EvaluationContext<L1ProviderIndependence>,
+	ctx: EvaluationContext,
 	support: SelfHostedNodeL1BasicOperationsSupport,
-): Evaluation<L1ProviderIndependence> {
+): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'self_hosted_node_not_sufficient',
@@ -91,9 +84,7 @@ function supportsSelfHostedNodeButCannotDoBasicOperations(
 	})
 }
 
-function noSelfHostedNode(
-	ctx: EvaluationContext<L1ProviderIndependence>,
-): Evaluation<L1ProviderIndependence> {
+function noSelfHostedNode(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'no_self_hosted_node',
@@ -113,7 +104,7 @@ function noSelfHostedNode(
 	})
 }
 
-export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
+export const l1ProviderIndependence: Attribute = {
 	id: 'l1ProviderIndependence',
 	icon: '\u{1f3e0}', // House
 	displayName: 'L1 provider independence',
@@ -208,9 +199,7 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<L1ProviderIndependence>,
-	): Evaluation<L1ProviderIndependence> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		if (ctx.features.chainConfigurability === null) {
 			return unrated(ctx, null)
 		}
@@ -263,5 +252,5 @@ export const l1ProviderIndependence: Attribute<L1ProviderIndependence> = {
 
 		return noSelfHostedNode(ctx)
 	},
-	aggregate: pickWorstRating<L1ProviderIndependence>,
+	aggregate: pickWorstRating,
 }

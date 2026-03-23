@@ -12,10 +12,10 @@ import {
 	type AttributeGroup,
 	type EvaluatedAttribute,
 	type Evaluation,
+	type OutcomeMetadata,
 	Rating,
 	ratingEnum,
 	ratingToText,
-	type Value,
 	type ValueSet,
 } from '@/schema/attributes'
 import { isTypographicContent } from '@/types/content'
@@ -26,25 +26,25 @@ import { walletContentGrammarLint, warmupHarperLinter } from './utils/grammar'
 await warmupHarperLinter()
 
 describe('evaluations', () => {
-	type NamedEvaluation<V extends Value> = {
+	type NamedEvaluation<_OutcomeMetadata extends OutcomeMetadata> = {
 		name: string
-		evaluation: Evaluation<V>
+		evaluation: Evaluation<_OutcomeMetadata>
 	}
-	type PerAttribute<V extends Value> = {
-		attribute: Attribute<V>
-		perRating: Map<Rating, NamedEvaluation<V>[]>
+	type PerAttribute<_OutcomeMetadata extends OutcomeMetadata> = {
+		attribute: Attribute<_OutcomeMetadata>
+		perRating: Map<Rating, NamedEvaluation<_OutcomeMetadata>[]>
 	}
 	type PerGroup = {
 		attributeGroup: AttributeGroup<ValueSet>
-		attributes: Map<string, PerAttribute<Value>>
+		attributes: Map<string, PerAttribute<OutcomeMetadata>>
 	}
 	const evaluationsPerGroup: Map<string, PerGroup> = new Map()
 	const addEvaluation = (
 		attrGroup: AttributeGroup<ValueSet>,
-		attribute: Attribute<Value>,
-		evaluation: NamedEvaluation<Value>,
+		attribute: Attribute<OutcomeMetadata>,
+		evaluation: NamedEvaluation<OutcomeMetadata>,
 	) => {
-		let perGroup: PerGroup | undefined = evaluationsPerGroup.get(attrGroup.id)
+		let perGroup = evaluationsPerGroup.get(attrGroup.id)
 
 		if (perGroup === undefined) {
 			perGroup = {
@@ -54,7 +54,7 @@ describe('evaluations', () => {
 			evaluationsPerGroup.set(attrGroup.id, perGroup)
 		}
 
-		let perAttr: PerAttribute<Value> | undefined = perGroup.attributes.get(attribute.id)
+		let perAttr = perGroup.attributes.get(attribute.id)
 
 		if (perAttr === undefined) {
 			perAttr = {
@@ -65,9 +65,7 @@ describe('evaluations', () => {
 			perGroup.attributes.set(attribute.id, perAttr)
 		}
 
-		let evaluationsForRating: NamedEvaluation<Value>[] | undefined = perAttr.perRating.get(
-			evaluation.evaluation.value.rating,
-		)
+		let evaluationsForRating = perAttr.perRating.get(evaluation.evaluation.value.rating)
 
 		if (evaluationsForRating === undefined) {
 			evaluationsForRating = []
@@ -95,8 +93,8 @@ describe('evaluations', () => {
 				const genericAttrGroup = attrGroup as unknown as AttributeGroup<ValueSet>
 
 				mapNonExemptGroupAttributes(evalGroup, evalAttr => {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attribute type parameters extend Value.
-					const genericEvalAttr = evalAttr as unknown as EvaluatedAttribute<Value>
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because all attribute type parameters extend OutcomeMetadata.
+					const genericEvalAttr = evalAttr as unknown as EvaluatedAttribute<OutcomeMetadata>
 
 					addEvaluation(genericAttrGroup, genericEvalAttr.attribute, {
 						name: `${ratedWallet.metadata.displayName} ${variantName} rating`,
@@ -152,12 +150,8 @@ describe('evaluations', () => {
 			return 0
 		})
 	}
-	const sortedMapValues = <V>(map: Map<string, V>): V[] => {
-		return sortedByStringKey<[string, V]>(
-			Array.from(map.entries()),
-			(kv: [string, V]): string => kv[0],
-		).map(([_, v]) => v)
-	}
+	const sortedMapValues = <V>(map: Map<string, V>): V[] =>
+		sortedByStringKey<[string, V]>(Array.from(map.entries()), kv => kv[0]).map(([_, v]) => v)
 
 	for (const perGroup of sortedMapValues(evaluationsPerGroup)) {
 		describe(perGroup.attributeGroup.displayName, () => {
@@ -170,10 +164,7 @@ describe('evaluations', () => {
 							continue
 						}
 
-						for (const evaluation of sortedByStringKey(
-							evaluationsForRating,
-							(v: NamedEvaluation<Value>) => v.name,
-						)) {
+						for (const evaluation of sortedByStringKey(evaluationsForRating, v => v.name)) {
 							describe(evaluation.name, () => {
 								walletContentGrammarLint('name', evaluation.evaluation.value.displayName)
 								walletContentGrammarLint(

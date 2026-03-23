@@ -10,7 +10,6 @@ import {
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	type AccountRecovery,
@@ -40,15 +39,15 @@ import {
 import { evaluateAllGuardianScenarios } from '../../features/guardian-scenario/guardian-scenario-expansion'
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountRecoveryValue = Value & {
+export type AccountRecoveryOutcomeMetadata = {
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
 
 function evaluateGuardianRecoveryPolicy(
-	ctx: EvaluationContext<AccountRecoveryValue>,
+	ctx: EvaluationContext<AccountRecoveryOutcomeMetadata>,
 	guardianPolicy: GuardianPolicy,
-): Evaluation<AccountRecoveryValue> {
+): Evaluation<AccountRecoveryOutcomeMetadata> {
 	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
 
 	if (!isNonEmptyArray(outcomes)) {
@@ -113,9 +112,9 @@ function evaluateGuardianRecoveryPolicy(
 }
 
 function evaluateAccountRecovery(
-	ctx: EvaluationContext<AccountRecoveryValue>,
+	ctx: EvaluationContext<AccountRecoveryOutcomeMetadata>,
 	accountRecovery: AccountRecovery,
-): Evaluation<AccountRecoveryValue> {
+): Evaluation<AccountRecoveryOutcomeMetadata> {
 	if (isSupported(accountRecovery.guardianRecovery)) {
 		return evaluateGuardianRecoveryPolicy(
 			ctx,
@@ -139,7 +138,7 @@ function evaluateAccountRecovery(
 	})
 }
 
-export const accountRecovery: Attribute<AccountRecoveryValue> = {
+export const accountRecovery: Attribute<AccountRecoveryOutcomeMetadata> = {
 	id: 'accountRecovery',
 	icon: '\u{1f6df}', // Ring Buoy
 	displayName: 'Account recovery',
@@ -320,7 +319,9 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<AccountRecoveryValue>): Evaluation<AccountRecoveryValue> => {
+	evaluate: (
+		ctx: EvaluationContext<AccountRecoveryOutcomeMetadata>,
+	): Evaluation<AccountRecoveryOutcomeMetadata> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 
 		if (ctx.features.security.accountRecovery === null) {
@@ -334,5 +335,5 @@ export const accountRecovery: Attribute<AccountRecoveryValue> = {
 
 		return evaluateAccountRecovery(ctx, ctx.features.security.accountRecovery)
 	},
-	aggregate: pickWorstRating<AccountRecoveryValue>,
+	aggregate: pickWorstRating<AccountRecoveryOutcomeMetadata>,
 }

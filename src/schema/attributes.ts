@@ -240,13 +240,19 @@ export const verifiabilityEnum = new Enum<Verifiability>({
 })
 
 /**
+ * Base type for attribute-specific metadata added to Value.
+ * Attributes pass only their custom fields as the generic; Value is implicit.
+ */
+export type OutcomeMetadata = object
+
+/**
  * Value is one of multiple possible outcomes when evaluating an attribute.
  * It is *not* wallet-specific, and may often be enum-like.
  * For example, when evaluating an attribute like open-source licensing,
  * one particular Value could represent the Apache license, and another
  * could represent the MIT license.
  */
-export type Value = {
+export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 	/**
 	 * An ID representing the value.
 	 * This needs to be unique within the set of possible values that the
@@ -325,10 +331,11 @@ export type Value = {
 			// If EXEMPT or UNRATED, the verifiability is self-evident.
 			verifiability: Verifiability.SELF_EVIDENT
 	  }
-)
+) &
+	_OutcomeMetadata
 
 /** The numerical score corresponding to a rating by default. */
-export function defaultRatingScore(value: Value): Score {
+export function defaultRatingScore(value: Outcome): Score {
 	switch (value.rating) {
 		case Rating.FAIL:
 			return 0.0
@@ -373,8 +380,8 @@ export function compareExplicitRatings(rating1: ExplicitRating, rating2: Explici
 	return score(rating1) - score(rating2)
 }
 
-export interface EvaluationData<V extends Value> {
-	value: V
+export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = {}> {
+	value: Outcome<_OutcomeMetadata>
 	references: FullyQualifiedReference[]
 	wallet: RatedWallet
 }
@@ -383,11 +390,11 @@ export interface EvaluationData<V extends Value> {
  * Evaluation is the result of evaluating how well a specific wallet fulfills
  * an attribute. Unlike Value, an Evaluation is wallet-specific.
  */
-export interface Evaluation<V extends Value> {
+export interface Evaluation<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	/**
 	 * The value representing how well the wallet fulfills the attribute.
 	 */
-	value: V
+	value: Outcome<_OutcomeMetadata>
 
 	/**
 	 * A long, human-readable explanation of this evaluation.
@@ -425,18 +432,19 @@ export interface Evaluation<V extends Value> {
 /**
  * An evaluation that is exempt.
  */
-export type ExemptEvaluation<V extends Value> = Evaluation<V> & {
-	value: Evaluation<V>['value'] & {
-		rating: Rating.EXEMPT
+export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata = {}> =
+	Evaluation<_OutcomeMetadata> & {
+		value: Evaluation<_OutcomeMetadata>['value'] & {
+			rating: Rating.EXEMPT
+		}
 	}
-}
 
 /**
  * Type predicate for ExemptEvaluation.
  */
-export function isExempt<V extends Value>(
-	evaluation: Evaluation<V>,
-): evaluation is ExemptEvaluation<V> {
+export function isExempt<_OutcomeMetadata extends OutcomeMetadata = {}>(
+	evaluation: Evaluation<_OutcomeMetadata>,
+): evaluation is ExemptEvaluation<_OutcomeMetadata> {
 	return evaluation.value.rating === Rating.EXEMPT
 }
 
@@ -444,7 +452,7 @@ export function isExempt<V extends Value>(
  * A human-readable description of why a wallet may be assigned a certain
  * rating.
  */
-export interface ExampleRating<V extends Value> {
+export interface ExampleRating<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	/**
 	 * A description of why a hypothetical wallet may be assigned a specific
 	 * rating.
@@ -457,20 +465,20 @@ export interface ExampleRating<V extends Value> {
 	 * Match function that determines whether the given `value` matches this
 	 * example.
 	 */
-	matchesValue: (value: V) => boolean
+	matchesValue: (value: Outcome<_OutcomeMetadata>) => boolean
 
 	/**
 	 * Sample evaluations for this rating. Optional, may be empty.
 	 */
-	sampleEvaluations: Evaluation<V>[]
+	sampleEvaluations: Evaluation<_OutcomeMetadata>[]
 }
 
 /**
  * Normalize example ratings to an array (single item or undefined becomes array).
  */
-export function normalizeExampleRatings<V extends Value>(
-	ratings: ExampleRating<V> | ExampleRating<V>[] | undefined,
-): ExampleRating<V>[] {
+export function normalizeExampleRatings<_OutcomeMetadata extends OutcomeMetadata = {}>(
+	ratings: ExampleRating<_OutcomeMetadata> | ExampleRating<_OutcomeMetadata>[] | undefined,
+): ExampleRating<_OutcomeMetadata>[] {
 	if (ratings === undefined) {
 		return []
 	}
@@ -484,7 +492,7 @@ export function normalizeExampleRatings<V extends Value>(
  * For example, an attribute could be about whether or not a wallet is
  * licensed under an open-source license.
  */
-export interface Attribute<V extends Value = Value> {
+export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	/**
 	 * Unique ID representing the attribute in camelCase.
 	 * For example: "sourceVisibility".
@@ -569,16 +577,16 @@ export interface Attribute<V extends Value = Value> {
 				exhaustive: boolean
 
 				/** One or more ways in which a wallet can achieve a passing rating. */
-				pass: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+				pass: ExampleRating<_OutcomeMetadata> | NonEmptyArray<ExampleRating<_OutcomeMetadata>>
 
 				/**
 				 * Ways in which a wallet can achieve a partial rating.
 				 * Unlike passing/failing, there may be zero ways to get a partial rating.
 				 */
-				partial?: ExampleRating<V> | Array<ExampleRating<V>>
+				partial?: ExampleRating<_OutcomeMetadata> | Array<ExampleRating<_OutcomeMetadata>>
 
 				/** One or more ways in which a wallet can achieve a failing rating. */
-				fail: ExampleRating<V> | NonEmptyArray<ExampleRating<V>>
+				fail: ExampleRating<_OutcomeMetadata> | NonEmptyArray<ExampleRating<_OutcomeMetadata>>
 		  }
 
 	/**
@@ -592,7 +600,7 @@ export interface Attribute<V extends Value = Value> {
 	 * by preventing their evaluation code from taking any metadata into
 	 * account.
 	 */
-	evaluate: (ctx: EvaluationContext<V>) => Evaluation<V>
+	evaluate: (ctx: EvaluationContext<_OutcomeMetadata>) => Evaluation<_OutcomeMetadata>
 
 	/**
 	 * Check whether the attribute applies to a wallet, according to its
@@ -605,62 +613,74 @@ export interface Attribute<V extends Value = Value> {
 	 *
 	 * If `exempted` is undefined, then `evaluate` is used unconditionally.
 	 */
-	exempted?: (ctx: EvaluationContext<V>, metadata: WalletMetadata) => null | ExemptEvaluation<V>
+	exempted?: (
+		ctx: EvaluationContext<_OutcomeMetadata>,
+		metadata: WalletMetadata,
+	) => null | ExemptEvaluation<_OutcomeMetadata>
 
 	/**
 	 * Aggregates one or more per-variant evaluations into a single one.
 	 * @param perVariant One or more per-variant evaluations.
 	 * @returns The aggregated evaluation for these per-variant evaluations.
 	 */
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<V>>) => Evaluation<V>
+	aggregate: (
+		perVariant: AtLeastOneVariant<Evaluation<_OutcomeMetadata>>,
+	) => Evaluation<_OutcomeMetadata>
 }
 
-export interface EvaluatedAttribute<V extends Value> {
-	attribute: Attribute<V>
-	evaluation: Evaluation<V>
+export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata = {}> {
+	attribute: Attribute<_OutcomeMetadata>
+	evaluation: Evaluation<_OutcomeMetadata>
 }
 
 /**
- * `EvaluationScaffold<V>` is a mostly-build `Evaluation<V>`,
- * which `EvaluationContext<V>` can build into a full `Evaluation<V>`.
+ * `EvaluationScaffold<_OutcomeMetadata>` is a mostly-build `Evaluation<_OutcomeMetadata>`,
+ * which `EvaluationContext<_OutcomeMetadata>` can build into a full `Evaluation<_OutcomeMetadata>`.
  */
-export type EvaluationScaffold<V extends Value> = Omit<Evaluation<V>, 'value'> & {
-	value: Omit<V, 'verifiability'>
+export type EvaluationScaffold<_OutcomeMetadata extends OutcomeMetadata = {}> = Omit<
+	Evaluation<_OutcomeMetadata>,
+	'value'
+> & {
+	value: Omit<Outcome<_OutcomeMetadata>, 'verifiability'>
 }
 
 /** A function that takes a wallet's evaluation context and returns a `Verifiability`. */
-export type VerifiabilityPredicate<V extends Value> = (ctx: EvaluationContext<V>) => Verifiability
+export type VerifiabilityPredicate<_OutcomeMetadata extends OutcomeMetadata = {}> = (
+	ctx: EvaluationContext<_OutcomeMetadata>,
+) => Verifiability
 
 /**
- * EvaluationContext is a helper class to build `Evaluation<V>` objects,
+ * EvaluationContext is a helper class to build `Evaluation<_OutcomeMetadata>` objects,
  * keeping track of their references and verifiability. It is a stateful
  * object which is progressively populated as the evaluation progresses,
- * then `build` is called to finalize the `Evaluation<V>`.
+ * then `build` is called to finalize the `Evaluation<_OutcomeMetadata>`.
  */
-export class EvaluationContext<V extends Value> {
-	private readonly attributeFn: () => Attribute<V>
+export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
+	private readonly attributeFn: () => Attribute<_OutcomeMetadata>
 	private readonly rawReferences: FullyQualifiedReference[]
 	private readonly featuresOrNull: ResolvedFeatures | null
-	private verifiability: Verifiability | VerifiabilityPredicate<V> | null
+	private verifiability: Verifiability | VerifiabilityPredicate<_OutcomeMetadata> | null
 	private isForTest: boolean = false
 
 	/**
 	 * `forTest` returns an EvaluationContext which is used in tests.
 	 * Such contexts will assume all `Evaluation`s are verifiable.
 	 */
-	public static forTest<V extends Value>(attributeFn: () => Attribute<V>): EvaluationContext<V> {
-		const ctx = new EvaluationContext<V>(attributeFn, null, true)
+	public static forTest<_OutcomeMetadata extends OutcomeMetadata = {}>(
+		attributeFn: () => Attribute<_OutcomeMetadata>,
+	): EvaluationContext<_OutcomeMetadata> {
+		const ctx = new EvaluationContext<_OutcomeMetadata>(attributeFn, null, true)
 
 		ctx.isForTest = true
 
 		return ctx
 	}
 
-	public static create<V extends Value>(
-		attribute: Attribute<V>,
+	public static create<_OutcomeMetadata extends OutcomeMetadata = {}>(
+		attribute: Attribute<_OutcomeMetadata>,
 		features: ResolvedFeatures,
-	): EvaluationContext<V> {
-		const ctx = new EvaluationContext<V>(() => attribute, features, false)
+	): EvaluationContext<_OutcomeMetadata> {
+		const ctx = new EvaluationContext<_OutcomeMetadata>(() => attribute, features, false)
 
 		ctx.isForTest = true
 
@@ -668,7 +688,7 @@ export class EvaluationContext<V extends Value> {
 	}
 
 	private constructor(
-		attributeFn: () => Attribute<V>,
+		attributeFn: () => Attribute<_OutcomeMetadata>,
 		features: ResolvedFeatures | null,
 		isForTest: boolean,
 	) {
@@ -750,7 +770,7 @@ export class EvaluationContext<V extends Value> {
 	}
 
 	/** Set the `verifiability` value that will be used for PASS/PARTIAL ratings. */
-	public setVerifiability(verifiability: Verifiability | VerifiabilityPredicate<V>) {
+	public setVerifiability(verifiability: Verifiability | VerifiabilityPredicate<_OutcomeMetadata>) {
 		this.verifiability = verifiability
 	}
 
@@ -764,7 +784,7 @@ export class EvaluationContext<V extends Value> {
 	}
 
 	/** The attribute being evaluated. */
-	public get attribute(): Attribute<V> {
+	public get attribute(): Attribute<_OutcomeMetadata> {
 		return this.attributeFn()
 	}
 
@@ -773,8 +793,8 @@ export class EvaluationContext<V extends Value> {
 		return mergeRefs(this.rawReferences)
 	}
 
-	/** Build an `Evaluation<V>` out of an `EvaluationScaffold<V>`. */
-	public build(scaffold: EvaluationScaffold<V>): Evaluation<V> {
+	/** Build an `Evaluation<_OutcomeMetadata>` out of an `EvaluationScaffold<_OutcomeMetadata>`. */
+	public build(scaffold: EvaluationScaffold<_OutcomeMetadata>): Evaluation<_OutcomeMetadata> {
 		const otherRefs = scaffold.references ?? []
 		const finalRefs = mergeRefs(otherRefs, this.rawReferences)
 		let verifiability =
@@ -783,16 +803,15 @@ export class EvaluationContext<V extends Value> {
 					? Verifiability.VERIFIABLE
 					: null
 				: this.verifiability
-		const val = ((): V => {
-			const scaffoldVal: Omit<V, 'verifiability'> = scaffold.value
+		const val = ((): Outcome<_OutcomeMetadata> => {
+			const scaffoldVal: Omit<Outcome<_OutcomeMetadata>, 'verifiability'> = scaffold.value
 
 			if (!isExplicitRating(scaffoldVal.rating)) {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know V is the same.
 				return {
 					...scaffoldVal,
 					rating: scaffoldVal.rating,
 					verifiability: Verifiability.SELF_EVIDENT,
-				} as V
+				} as Outcome<_OutcomeMetadata>
 			}
 
 			if (verifiability === null) {
@@ -812,12 +831,11 @@ export class EvaluationContext<V extends Value> {
 			// Now we must be dealing with a `Verifiability` value.
 			verifiabilityEnum.assert(verifiability)
 
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because we know V is the same.
 			return {
 				...scaffoldVal,
 				rating: scaffoldVal.rating,
 				verifiability,
-			} as V
+			} as Outcome<_OutcomeMetadata>
 		})()
 
 		return {
@@ -831,10 +849,9 @@ export class EvaluationContext<V extends Value> {
 }
 
 /**
- * A map of values. Should be a dictionary, i.e. its set of properties should
- * be fixed. Used to define attribute groups.
+ * A map of attribute IDs to their outcome metadata. Used to define attribute groups.
  */
-export type ValueSet = NonEmptyRecord<string, Value>
+export type ValueSet = NonEmptyRecord<string, OutcomeMetadata>
 
 /**
  * An attribute group is a collection of attributes that are related to one
@@ -883,9 +900,11 @@ export type EvaluatedGroup<Vs extends ValueSet> = {
  */
 export function evaluatedAttributes<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
-): NonEmptyArray<EvaluatedAttribute<Value>> {
+): NonEmptyArray<EvaluatedAttribute<OutcomeMetadata>> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.values(evaluatedGroup) as unknown as NonEmptyArray<EvaluatedAttribute<Value>>
+	return Object.values(evaluatedGroup) as unknown as NonEmptyArray<
+		EvaluatedAttribute<OutcomeMetadata>
+	>
 }
 
 /**
@@ -896,10 +915,10 @@ export function evaluatedAttributes<Vs extends ValueSet>(
  */
 export function evaluatedAttributesEntries<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
-): NonEmptyArray<[keyof Vs, EvaluatedAttribute<Value>]> {
+): NonEmptyArray<[keyof Vs, EvaluatedAttribute<OutcomeMetadata>]> {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
 	return Object.entries(evaluatedGroup) as unknown as NonEmptyArray<
-		[keyof Vs, EvaluatedAttribute<Value>]
+		[keyof Vs, EvaluatedAttribute<OutcomeMetadata>]
 	>
 }
 
@@ -917,13 +936,17 @@ export const exampleRatingUnimplemented = 'UNIMPLEMENTED'
  *                 apply to no wallets).
  * @returns An ExampleRating that uses the given description and matchers.
  */
-export function exampleRating<V extends Value>(
-	description: ExampleRating<V>['description'],
+export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = {}>(
+	description: ExampleRating<_OutcomeMetadata>['description'],
 	...matchers: NonEmptyArray<
-		V['id'] | Rating | Evaluation<V> | ((value: V) => boolean) | typeof exampleRatingUnimplemented
+		| Outcome<_OutcomeMetadata>['id']
+		| Rating
+		| Evaluation<_OutcomeMetadata>
+		| ((value: Outcome<_OutcomeMetadata>) => boolean)
+		| typeof exampleRatingUnimplemented
 	>
-): ExampleRating<V> {
-	const sampleEvaluations: Evaluation<V>[] = []
+): ExampleRating<_OutcomeMetadata> {
+	const sampleEvaluations: Evaluation<_OutcomeMetadata>[] = []
 
 	for (const matcher of matchers) {
 		if (
@@ -937,7 +960,7 @@ export function exampleRating<V extends Value>(
 
 	return {
 		description,
-		matchesValue: (value: V): boolean =>
+		matchesValue: (value: Outcome<_OutcomeMetadata>): boolean =>
 			nonEmptyMap(matchers, matcher => {
 				if (matcher === exampleRatingUnimplemented) {
 					return false
@@ -967,7 +990,10 @@ export function exampleRating<V extends Value>(
  * @param suffix Optional suffix to append to the title.
  * @returns Formatted title text in the format: "(icon) title [(eval icon) EVAL VALUE]\n\n(displayName)"
  */
-export const formatAttributeTitleText = (attribute: EvaluatedAttribute<Value>, suffix?: string) =>
+export const formatAttributeTitleText = (
+	attribute: EvaluatedAttribute<OutcomeMetadata>,
+	suffix?: string,
+) =>
 	`${attribute.evaluation.value.icon ?? attribute.attribute.icon} ${
 		attribute.attribute.displayName
 	}${suffix ?? ''} [${ratingIcons[attribute.evaluation.value.rating]} ${

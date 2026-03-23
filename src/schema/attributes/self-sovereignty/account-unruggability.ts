@@ -9,7 +9,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	type AccountRecovery,
@@ -44,15 +43,15 @@ import {
 import { evaluateAllGuardianScenarios } from '../../features/guardian-scenario/guardian-scenario-expansion'
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountUnruggabilityValue = Value & {
+export type AccountUnruggabilityOutcomeMetadata = {
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
 
 function evaluateGuardianUnruggabilityPolicy(
-	ctx: EvaluationContext<AccountUnruggabilityValue>,
+	ctx: EvaluationContext<AccountUnruggabilityOutcomeMetadata>,
 	guardianPolicy: GuardianPolicy,
-): Evaluation<AccountUnruggabilityValue> {
+): Evaluation<AccountUnruggabilityOutcomeMetadata> {
 	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
 
 	if (!isNonEmptyArray(outcomes)) {
@@ -117,10 +116,10 @@ function evaluateGuardianUnruggabilityPolicy(
 }
 
 function evaluateAccountUnruggability(
-	ctx: EvaluationContext<AccountUnruggabilityValue>,
+	ctx: EvaluationContext<AccountUnruggabilityOutcomeMetadata>,
 	keysHandling: KeysHandlingSupport,
 	accountRecovery: AccountRecovery,
-): Evaluation<AccountUnruggabilityValue> {
+): Evaluation<AccountUnruggabilityOutcomeMetadata> {
 	switch (keysHandling.keyGeneration) {
 		case KeyGenerationLocation.FULLY_ON_USER_DEVICE:
 			break // OK
@@ -204,7 +203,7 @@ function evaluateAccountUnruggability(
 	})
 }
 
-export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
+export const accountUnruggability: Attribute<AccountUnruggabilityOutcomeMetadata> = {
 	id: 'accountUnruggability',
 	icon: '\u{1fa9a}', // Carpentry Saw
 	displayName: 'Account unruggability',
@@ -393,8 +392,8 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 		],
 	},
 	evaluate: (
-		ctx: EvaluationContext<AccountUnruggabilityValue>,
-	): Evaluation<AccountUnruggabilityValue> => {
+		ctx: EvaluationContext<AccountUnruggabilityOutcomeMetadata>,
+	): Evaluation<AccountUnruggabilityOutcomeMetadata> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		if (
@@ -415,5 +414,5 @@ export const accountUnruggability: Attribute<AccountUnruggabilityValue> = {
 			ctx.features.security.accountRecovery,
 		)
 	},
-	aggregate: pickWorstRating<AccountUnruggabilityValue>,
+	aggregate: pickWorstRating<AccountUnruggabilityOutcomeMetadata>,
 }

@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -23,14 +22,14 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type HardwareWalletSupportValue = Value & {
+export type HardwareWalletSupportOutcomeMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
 }
 
 function noHardwareWalletSupport(
-	ctx: EvaluationContext<HardwareWalletSupportValue>,
+	ctx: EvaluationContext<HardwareWalletSupportOutcomeMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletSupportValue> {
+): Evaluation<HardwareWalletSupportOutcomeMetadata> {
 	return ctx.build({
 		value: {
 			id: 'no_hardware_wallet_support',
@@ -52,9 +51,9 @@ function noHardwareWalletSupport(
 }
 
 function indirectHardwareWalletSupport(
-	ctx: EvaluationContext<HardwareWalletSupportValue>,
+	ctx: EvaluationContext<HardwareWalletSupportOutcomeMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletSupportValue> {
+): Evaluation<HardwareWalletSupportOutcomeMetadata> {
 	return ctx.build({
 		value: {
 			id: 'indirect_hardware_wallet_support',
@@ -84,9 +83,9 @@ function indirectHardwareWalletSupport(
 }
 
 function directHardwareWalletSupport(
-	ctx: EvaluationContext<HardwareWalletSupportValue>,
+	ctx: EvaluationContext<HardwareWalletSupportOutcomeMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletSupportValue> {
+): Evaluation<HardwareWalletSupportOutcomeMetadata> {
 	return ctx.build({
 		value: {
 			id: 'direct_hardware_wallet_support',
@@ -101,7 +100,7 @@ function directHardwareWalletSupport(
 	})
 }
 
-export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
+export const hardwareWalletSupport: Attribute<HardwareWalletSupportOutcomeMetadata> = {
 	id: 'hardwareWalletSupport',
 	icon: '\u{1F5DD}', // Key emoji
 	displayName: 'Hardware wallet support',
@@ -191,8 +190,8 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 		],
 	},
 	evaluate: (
-		ctx: EvaluationContext<HardwareWalletSupportValue>,
-	): Evaluation<HardwareWalletSupportValue> => {
+		ctx: EvaluationContext<HardwareWalletSupportOutcomeMetadata>,
+	): Evaluation<HardwareWalletSupportOutcomeMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivial self-test.
 
 		// If this is a hardware wallet, mark as exempt since hardware wallets inherently support themselves
@@ -252,5 +251,5 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportValue> = {
 
 		return result
 	},
-	aggregate: pickWorstRating<HardwareWalletSupportValue>,
+	aggregate: pickWorstRating<HardwareWalletSupportOutcomeMetadata>,
 }

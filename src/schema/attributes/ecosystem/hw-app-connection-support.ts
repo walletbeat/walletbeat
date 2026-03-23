@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { AccountType, supportsOnlyAccountType } from '@/schema/features/account-support'
@@ -63,11 +62,7 @@ function describeConnectionMethods(
 	return commaListFormat(methods)
 }
 
-export type AppConnectionSupportValue = Value
-
-function noAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
-): Evaluation<AppConnectionSupportValue> {
+function noAppConnectionSupport(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'no_app_connection',
@@ -84,9 +79,7 @@ function noAppConnectionSupport(
 	})
 }
 
-function unverifiableAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
-): Evaluation<AppConnectionSupportValue> {
+function unverifiableAppConnectionSupport(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'unverifiable_app_connection',
@@ -106,9 +99,9 @@ function unverifiableAppConnectionSupport(
 }
 
 function limitedVerifiableAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
+	ctx: EvaluationContext,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<AppConnectionSupportValue> {
+): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'limited_verifiable_app_connection',
@@ -128,9 +121,9 @@ function limitedVerifiableAppConnectionSupport(
 }
 
 function verifiableUniversalAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
+	ctx: EvaluationContext,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<AppConnectionSupportValue> {
+): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'verifiable_universal_app_connection',
@@ -147,9 +140,9 @@ function verifiableUniversalAppConnectionSupport(
 }
 
 function restrictedAppConnectionSupport(
-	ctx: EvaluationContext<AppConnectionSupportValue>,
+	ctx: EvaluationContext,
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
-): Evaluation<AppConnectionSupportValue> {
+): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'restricted_app_connection',
@@ -168,7 +161,7 @@ function restrictedAppConnectionSupport(
 	})
 }
 
-export const appConnectionSupport: Attribute<AppConnectionSupportValue> = {
+export const appConnectionSupport: Attribute = {
 	id: 'appConnectionSupport',
 	icon: '\u{1F517}', // Link symbol
 	displayName: 'app Connection Support',
@@ -290,9 +283,7 @@ limiting its utility.
 			noAppConnectionSupport(EvaluationContext.forTest(() => appConnectionSupport)),
 		),
 	},
-	evaluate: (
-		ctx: EvaluationContext<AppConnectionSupportValue>,
-	): Evaluation<AppConnectionSupportValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		// Check for ERC-4337 smart wallet
@@ -390,5 +381,5 @@ limiting its utility.
 		// Should not reach here if feature data is correct, but handle gracefully
 		return noAppConnectionSupport(ctx)
 	},
-	aggregate: pickWorstRating<AppConnectionSupportValue>,
+	aggregate: pickWorstRating,
 }

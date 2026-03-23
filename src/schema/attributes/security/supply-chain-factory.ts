@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	type ExemptEvaluation,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
@@ -21,7 +20,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SupplyChainFactoryValue = Value & {
+export type SupplyChainFactoryOutcomeMetadata = {
 	factoryOpsecDocs: SupplyChainFactoryType
 	factoryOpsecAudit: SupplyChainFactoryType
 	tamperEvidence: SupplyChainFactoryType
@@ -52,7 +51,7 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 	return Rating.FAIL
 }
 
-export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
+export const supplyChainFactory: Attribute<SupplyChainFactoryOutcomeMetadata> = {
 	id: 'supplyChainFactory',
 	icon: '🏭',
 	displayName: 'Supply Chain Factory',
@@ -90,27 +89,27 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes all factory supply chain sub-criteria.'),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.PASS,
+				v => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some factory supply chain sub-criteria.'),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.PARTIAL,
+				v => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet fails most or all factory supply chain sub-criteria.'),
-				(v: SupplyChainFactoryValue) => v.rating === Rating.FAIL,
+				v => v.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: pickWorstRating<SupplyChainFactoryValue>,
+	aggregate: pickWorstRating<SupplyChainFactoryOutcomeMetadata>,
 	exempted: (
-		ctx: EvaluationContext<SupplyChainFactoryValue>,
+		ctx: EvaluationContext<SupplyChainFactoryOutcomeMetadata>,
 		metadata: WalletMetadata,
-	): ExemptEvaluation<SupplyChainFactoryValue> | null => {
+	): ExemptEvaluation<SupplyChainFactoryOutcomeMetadata> | null => {
 		if (
 			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
@@ -128,8 +127,8 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryValue> = {
 		return null
 	},
 	evaluate: (
-		ctx: EvaluationContext<SupplyChainFactoryValue>,
-	): Evaluation<SupplyChainFactoryValue> => {
+		ctx: EvaluationContext<SupplyChainFactoryOutcomeMetadata>,
+	): Evaluation<SupplyChainFactoryOutcomeMetadata> => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
 				referenceCountsAs: Verifiability.INDEPENDENTLY_AUDITED,

@@ -5,7 +5,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { type SecurityAudit, securityAuditId } from '@/schema/features/security/security-audits'
@@ -19,11 +18,13 @@ import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SecurityAuditsValue = Value & {
+export type SecurityAuditsOutcomeMetadata = {
 	securityAudits: SecurityAudit[]
 }
 
-function noAudits(ctx: EvaluationContext<SecurityAuditsValue>): Evaluation<SecurityAuditsValue> {
+function noAudits(
+	ctx: EvaluationContext<SecurityAuditsOutcomeMetadata>,
+): Evaluation<SecurityAuditsOutcomeMetadata> {
 	return ctx.build({
 		value: {
 			id: 'no_audits',
@@ -37,17 +38,19 @@ function noAudits(ctx: EvaluationContext<SecurityAuditsValue>): Evaluation<Secur
 }
 
 function audited(
-	ctx: EvaluationContext<SecurityAuditsValue>,
+	ctx: EvaluationContext<SecurityAuditsOutcomeMetadata>,
 	audits: NonEmptyArray<SecurityAudit>,
 	auditedInLastYear: boolean,
 	hasUnaddressedFlaws: boolean,
-): Evaluation<SecurityAuditsValue> {
+): Evaluation<SecurityAuditsOutcomeMetadata> {
 	ctx.addRef(...audits)
 
 	const { rating, displayName, shortExplanation, howToImprove } = ((): Pick<
-		SecurityAuditsValue,
+		Evaluation<SecurityAuditsOutcomeMetadata>['value'],
 		'rating' | 'displayName' | 'shortExplanation'
-	> & { howToImprove: Evaluation<SecurityAuditsValue>['howToImprove'] } => {
+	> & {
+		howToImprove: Evaluation<SecurityAuditsOutcomeMetadata>['howToImprove']
+	} => {
 		if (!auditedInLastYear && hasUnaddressedFlaws) {
 			return {
 				rating: Rating.FAIL,
@@ -119,7 +122,7 @@ const sampleSecurityAudit: SecurityAudit = {
 	variantsScope: 'ALL_VARIANTS',
 }
 
-export const securityAudits: Attribute<SecurityAuditsValue> = {
+export const securityAudits: Attribute<SecurityAuditsOutcomeMetadata> = {
 	id: 'securityAudits',
 	icon: '\u{1f50f}', // Locked with Pen
 	displayName: 'Security audits',
@@ -216,7 +219,9 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<SecurityAuditsValue>): Evaluation<SecurityAuditsValue> => {
+	evaluate: (
+		ctx: EvaluationContext<SecurityAuditsOutcomeMetadata>,
+	): Evaluation<SecurityAuditsOutcomeMetadata> => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
 				referenceCountsAs: Verifiability.VERIFIABLE,
@@ -257,8 +262,8 @@ export const securityAudits: Attribute<SecurityAuditsValue> = {
 
 		return audited(ctx, audits, auditedInLastYear, hasUnaddressedFlaws)
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsValue>>) => {
-		const worstEvaluation = pickWorstRating<SecurityAuditsValue>(perVariant)
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsOutcomeMetadata>>) => {
+		const worstEvaluation = pickWorstRating<SecurityAuditsOutcomeMetadata>(perVariant)
 		const allAudits: SecurityAudit[] = []
 		const auditsIdSet = new Set<string>()
 

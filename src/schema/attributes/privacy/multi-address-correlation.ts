@@ -5,7 +5,6 @@ import {
 	exampleRating,
 	exampleRatingUnimplemented,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	collectedByDefault,
@@ -25,11 +24,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type MultiAddressCorrelationValue = Value
-
-function uniqueDestinations(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function uniqueDestinations(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'unique_destinations',
@@ -46,9 +41,7 @@ function uniqueDestinations(
 	})
 }
 
-function activeAddressOnly(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function activeAddressOnly(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'active_address_only',
@@ -68,9 +61,7 @@ function activeAddressOnly(
 	})
 }
 
-function activeAddressOnlyWithTrackingIdentifier(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function activeAddressOnlyWithTrackingIdentifier(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'active_address_only_with_tracking_identifier',
@@ -94,9 +85,7 @@ function activeAddressOnlyWithTrackingIdentifier(
 	})
 }
 
-function bulkRequests(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function bulkRequests(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'bulkRequests',
@@ -118,9 +107,7 @@ function bulkRequests(
 	})
 }
 
-function correlatableRequests(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function correlatableRequests(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'correlatableRequests',
@@ -142,9 +129,7 @@ function correlatableRequests(
 	})
 }
 
-function staggeredRequests(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function staggeredRequests(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'staggered_requests',
@@ -171,9 +156,7 @@ function staggeredRequests(
 	})
 }
 
-function separateCircuits(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function separateCircuits(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'separate_circuits',
@@ -192,9 +175,7 @@ function separateCircuits(
 	})
 }
 
-function staggeredAndSeparateCircuits(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function staggeredAndSeparateCircuits(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'staggered_and_separate_circuits',
@@ -211,9 +192,7 @@ function staggeredAndSeparateCircuits(
 	})
 }
 
-function unsupported(
-	ctx: EvaluationContext<MultiAddressCorrelationValue>,
-): Evaluation<MultiAddressCorrelationValue> {
+function unsupported(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'unsupported',
@@ -305,7 +284,7 @@ function rateHandling(
 	}
 }
 
-export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = {
+export const multiAddressCorrelation: Attribute = {
 	id: 'multiAddressCorrelation',
 	icon: '\u{1f587}', // Linked paperclips
 	displayName: 'Multi-address privacy',
@@ -419,9 +398,7 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<MultiAddressCorrelationValue>,
-	): Evaluation<MultiAddressCorrelationValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
@@ -522,5 +499,5 @@ export const multiAddressCorrelation: Attribute<MultiAddressCorrelationValue> = 
 				return correlatableRequests(ctx)
 		}
 	},
-	aggregate: pickWorstRating<MultiAddressCorrelationValue>,
+	aggregate: pickWorstRating,
 }

@@ -6,7 +6,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -23,11 +22,7 @@ import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountAbstractionValue = Value
-
-function supportsErc4337AndEip7702(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
+function supportsErc4337AndEip7702(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'erc4337_and_eip7702_ready',
@@ -43,9 +38,7 @@ function supportsErc4337AndEip7702(
 	})
 }
 
-function supportsErc4337(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
+function supportsErc4337(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'erc4337_ready',
@@ -59,9 +52,7 @@ function supportsErc4337(
 	})
 }
 
-function supportsEip7702(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
+function supportsEip7702(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'eip7702_ready',
@@ -75,9 +66,7 @@ function supportsEip7702(
 	})
 }
 
-function supportsEoaAndMpc(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
+function supportsEoaAndMpc(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'eoa_and_mpc_only',
@@ -99,9 +88,7 @@ function supportsEoaAndMpc(
 	})
 }
 
-function supportsMpcOnly(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
+function supportsMpcOnly(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'mpc_only',
@@ -123,9 +110,7 @@ function supportsMpcOnly(
 	})
 }
 
-function supportsRawEoaOnly(
-	ctx: EvaluationContext<AccountAbstractionValue>,
-): Evaluation<AccountAbstractionValue> {
+function supportsRawEoaOnly(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
 		value: {
 			id: 'eoa_only',
@@ -145,7 +130,7 @@ function supportsRawEoaOnly(
 	})
 }
 
-export const accountAbstraction: Attribute<AccountAbstractionValue> = {
+export const accountAbstraction: Attribute = {
 	id: 'accountAbstraction',
 	icon: '\u{1f4bc}', // Briefcase
 	displayName: 'Account Abstraction',
@@ -216,9 +201,7 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<AccountAbstractionValue>,
-	): Evaluation<AccountAbstractionValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		if (ctx.features.accountSupport === null) {
@@ -268,5 +251,5 @@ export const accountAbstraction: Attribute<AccountAbstractionValue> = {
 
 		throw new Error('Wallet supports no account type')
 	},
-	aggregate: pickWorstRating<AccountAbstractionValue>,
+	aggregate: pickWorstRating,
 }

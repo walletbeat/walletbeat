@@ -6,7 +6,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { eipMarkdownLink } from '@/schema/eips'
@@ -27,12 +26,7 @@ import { isNonEmptyArray, nonEmptyGet } from '@/types/utils/non-empty'
 
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountPortabilityValue = Value
-
-function evaluateEoa(
-	ctx: EvaluationContext<AccountPortabilityValue>,
-	eoa: AccountTypeEoa,
-): Evaluation<AccountPortabilityValue> {
+function evaluateEoa(ctx: EvaluationContext, eoa: AccountTypeEoa): Evaluation {
 	if (
 		eoa.keyDerivation.type === 'BIP32' &&
 		eoa.keyDerivation.seedPhrase === 'BIP39' &&
@@ -110,10 +104,7 @@ function evaluateEoa(
 	})
 }
 
-function evaluateMpc(
-	ctx: EvaluationContext<AccountPortabilityValue>,
-	mpc: AccountTypeMpc,
-): Evaluation<AccountPortabilityValue> {
+function evaluateMpc(ctx: EvaluationContext, mpc: AccountTypeMpc): Evaluation {
 	if (mpc.controllingSharesInSelfCustodyByDefault === 'NO') {
 		return ctx.build({
 			value: {
@@ -204,10 +195,10 @@ function evaluateMpc(
 }
 
 function evaluateMultifactor(
-	ctx: EvaluationContext<AccountPortabilityValue>,
+	ctx: EvaluationContext,
 	multifactor: AccountTypeMutableMultifactor,
 	multifactorType: 'erc4337' | 'eip7702',
-): Evaluation<AccountPortabilityValue> {
+): Evaluation {
 	const eip = multifactorType === 'erc4337' ? erc4337 : eip7702
 
 	if (multifactor.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
@@ -379,10 +370,7 @@ function evaluateMultifactor(
 	})
 }
 
-function evaluateSafe(
-	ctx: EvaluationContext<AccountPortabilityValue>,
-	safe: AccountTypeSafe,
-): Evaluation<AccountPortabilityValue> {
+function evaluateSafe(ctx: EvaluationContext, safe: AccountTypeSafe): Evaluation {
 	if (safe.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
 		return ctx.build({
 			value: {
@@ -421,10 +409,7 @@ function evaluateSafe(
 	})
 }
 
-function evaluateEip7702(
-	ctx: EvaluationContext<AccountPortabilityValue>,
-	accountSupport: AccountSupport,
-): Evaluation<AccountPortabilityValue> {
+function evaluateEip7702(ctx: EvaluationContext, accountSupport: AccountSupport): Evaluation {
 	if (!isSupported<AccountType7702>(accountSupport.eip7702)) {
 		throw new Error('EIP-7702 account type is not supported')
 	}
@@ -441,7 +426,7 @@ function evaluateEip7702(
 	throw new Error('EIP-7702 requires at least one of EOA/MPC account types to be supported')
 }
 
-export const accountPortability: Attribute<AccountPortabilityValue> = {
+export const accountPortability: Attribute = {
 	id: 'accountPortability',
 	icon: '\u{1f9f3}', // Luggage
 	displayName: 'Account portability',
@@ -752,9 +737,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<AccountPortabilityValue>,
-	): Evaluation<AccountPortabilityValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test possible.
 
 		if (ctx.features.accountSupport === null) {
@@ -767,8 +750,8 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			ctx.features.accountSupport.rawErc4337,
 			ctx.features.accountSupport.eip7702,
 		)
-		const evaluations: Array<Evaluation<AccountPortabilityValue>> = []
-		let defaultEvaluation: Evaluation<AccountPortabilityValue> | null = null
+		const evaluations: Array<Evaluation> = []
+		let defaultEvaluation: Evaluation | null = null
 
 		if (isSupported<AccountTypeEoa>(ctx.features.accountSupport.eoa)) {
 			const evaluation = evaluateEoa(ctx, ctx.features.accountSupport.eoa)
@@ -832,7 +815,7 @@ export const accountPortability: Attribute<AccountPortabilityValue> = {
 			return defaultEvaluation
 		}
 
-		return pickWorstRating<AccountPortabilityValue>(evaluations)
+		return pickWorstRating(evaluations)
 	},
-	aggregate: pickWorstRating<AccountPortabilityValue>,
+	aggregate: pickWorstRating,
 }

@@ -1,4 +1,4 @@
-import type { Value } from '../schema/attributes'
+import type { OutcomeMetadata } from '../schema/attributes'
 import type { AccountRecoveryDetailsContent } from './content/account-recovery-details'
 import type { AccountUnruggabilityDetailsContent } from './content/account-unruggability-details'
 import type { AddressCorrelationDetailsContent } from './content/address-correlation-details'
@@ -39,7 +39,7 @@ export type ComponentAndProps =
 	| TransactionInclusionDetailsContent
 	| AccountRecoveryDetailsContent
 	| AccountUnruggabilityDetailsContent
-	| UnratedAttributeContent<Value>
+	| UnratedAttributeContent<OutcomeMetadata>
 
 /**
  * Text-based content that may be displayed on the UI.

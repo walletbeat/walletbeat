@@ -1,10 +1,4 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	type Value,
-} from '@/schema/attributes'
+import { type Attribute, type Evaluation, EvaluationContext, Rating } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
 import {
 	type HardwarePrivacySupport,
@@ -17,7 +11,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type HardwarePrivacyValue = Value & {
+export type HardwarePrivacyOutcomeMetadata = {
 	phoningHome: HardwarePrivacyType
 	inspectableRemoteCalls: HardwarePrivacyType
 	wirelessPrivacy: HardwarePrivacyType
@@ -38,7 +32,7 @@ function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
 	return Rating.FAIL
 }
 
-export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
+export const hardwarePrivacy: Attribute<HardwarePrivacyOutcomeMetadata> = {
 	id: 'hardwarePrivacy',
 	icon: '🔒',
 	displayName: 'Hardware Privacy',
@@ -70,13 +64,13 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 				sentence(
 					'The hardware wallet passes all hardware privacy sub-criteria: No phoning home, inspectable remote calls, and encrypted wireless communication.',
 				),
-				(v: HardwarePrivacyValue) => v.rating === Rating.PASS,
+				v => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some hardware privacy sub-criteria.'),
-				(v: HardwarePrivacyValue) => v.rating === Rating.PARTIAL,
+				v => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
@@ -84,13 +78,15 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyValue> = {
 				sentence(
 					'The hardware wallet fails all hardware privacy sub-criteria: Device leaks privacy in all aspects.',
 				),
-				(v: HardwarePrivacyValue) => v.rating === Rating.FAIL,
+				v => v.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwarePrivacyValue>>) =>
-		pickWorstRating<HardwarePrivacyValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<HardwarePrivacyValue>): Evaluation<HardwarePrivacyValue> => {
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwarePrivacyOutcomeMetadata>>) =>
+		pickWorstRating<HardwarePrivacyOutcomeMetadata>(perVariant),
+	evaluate: (
+		ctx: EvaluationContext<HardwarePrivacyOutcomeMetadata>,
+	): Evaluation<HardwarePrivacyOutcomeMetadata> => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 

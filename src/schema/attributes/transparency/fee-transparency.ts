@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
@@ -294,14 +293,14 @@ function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | n
 	return worstFeeTypes
 }
 
-export type FeeTransparencyValue = Value & {
+export type FeeTransparencyOutcomeMetadata = {
 	worstFeeDisplay: WorstFeeDisplay | null
 }
 
 function evaluateWorstFeeDisplay(
-	ctx: EvaluationContext<FeeTransparencyValue>,
+	ctx: EvaluationContext<FeeTransparencyOutcomeMetadata>,
 	worstFeeDisplay: WorstFeeDisplay,
-): Evaluation<FeeTransparencyValue> {
+): Evaluation<FeeTransparencyOutcomeMetadata> {
 	ctx.addRef(worstFeeDisplay.references)
 	const baseValue = {
 		worstFeeDisplay,
@@ -463,7 +462,7 @@ function evaluateWorstFeeDisplay(
 	})
 }
 
-export const feeTransparency: Attribute<FeeTransparencyValue> = {
+export const feeTransparency: Attribute<FeeTransparencyOutcomeMetadata> = {
 	id: 'feeTransparency',
 	icon: '\u{1F4B8}', // Money with wings
 	displayName: 'Fee transparency',
@@ -579,7 +578,9 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<FeeTransparencyValue>): Evaluation<FeeTransparencyValue> => {
+	evaluate: (
+		ctx: EvaluationContext<FeeTransparencyOutcomeMetadata>,
+	): Evaluation<FeeTransparencyOutcomeMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable in UI.
 		const feeTransparencyData: FeeTransparency = extractFeeTransparency(ctx.features)
 		const worstFeeDisplay = computeWorstFees(feeTransparencyData)
@@ -590,5 +591,5 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 
 		return evaluateWorstFeeDisplay(ctx, worstFeeDisplay)
 	},
-	aggregate: pickWorstRating<FeeTransparencyValue>,
+	aggregate: pickWorstRating<FeeTransparencyOutcomeMetadata>,
 }

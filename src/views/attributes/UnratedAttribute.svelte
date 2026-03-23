@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { Value } from '@/schema/attributes'
+	import type { Outcome } from '@/schema/attributes'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 
@@ -11,7 +11,7 @@
 		wallet,
 	}: {
 		wallet: RatedWallet
-		value: Value
+		value: Outcome
 	} = $props()
 
 	const githubUrl = $derived(

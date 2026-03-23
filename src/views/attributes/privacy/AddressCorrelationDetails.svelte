@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { AddressCorrelationValue, WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
+	import type { AddressCorrelationOutcomeMetadata, WalletAddressLinkableBy } from '@/schema/attributes/privacy/address-correlation'
 	import type { FullyQualifiedReference } from '@/schema/reference'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
@@ -28,7 +28,7 @@
 		linkables,
 	}: {
 		wallet: RatedWallet
-		value: AddressCorrelationValue
+		value: AddressCorrelationOutcomeMetadata
 		linkables?: NonEmptyArray<WalletAddressLinkableBy> | undefined
 	} = $props()
 

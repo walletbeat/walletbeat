@@ -8,7 +8,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -29,14 +28,14 @@ import { exempt, pickWorstRating, unrated } from '../common'
 
 type ResolvedSupport = Record<BrowserIntegrationEip, Support>
 
-export type BrowserIntegrationValue = Value & {
+export type BrowserIntegrationOutcomeMetadata = {
 	support?: ResolvedSupport
 }
 
 function browserIntegrationSupport(
-	ctx: EvaluationContext<BrowserIntegrationValue>,
+	ctx: EvaluationContext<BrowserIntegrationOutcomeMetadata>,
 	support: WithRef<ResolvedSupport>,
-): Evaluation<BrowserIntegrationValue> {
+): Evaluation<BrowserIntegrationOutcomeMetadata> {
 	const withoutRefs = ctx.popRefs<ResolvedSupport>(support)
 
 	const supported: BrowserIntegrationEip[] = Object.entries(withoutRefs)
@@ -98,7 +97,7 @@ function browserIntegrationSupport(
 	})
 }
 
-export const browserIntegration: Attribute<BrowserIntegrationValue> = {
+export const browserIntegration: Attribute<BrowserIntegrationOutcomeMetadata> = {
 	id: 'browserIntegration',
 	icon: '\u{1f310}', // Globe with Meridians
 	displayName: 'Browser integration',
@@ -169,8 +168,8 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 		),
 	},
 	evaluate: (
-		ctx: EvaluationContext<BrowserIntegrationValue>,
-	): Evaluation<BrowserIntegrationValue> => {
+		ctx: EvaluationContext<BrowserIntegrationOutcomeMetadata>,
+	): Evaluation<BrowserIntegrationOutcomeMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can self-test using tool.
 
 		if (ctx.features.type !== WalletType.SOFTWARE || ctx.features.variant !== Variant.BROWSER) {
@@ -196,5 +195,5 @@ export const browserIntegration: Attribute<BrowserIntegrationValue> = {
 
 		return browserIntegrationSupport(ctx, browserIntegrationEips)
 	},
-	aggregate: pickWorstRating<BrowserIntegrationValue>,
+	aggregate: pickWorstRating<BrowserIntegrationOutcomeMetadata>,
 }

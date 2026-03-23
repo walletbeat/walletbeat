@@ -21,8 +21,8 @@ import {
 import {
 	type Attribute,
 	type EvaluatedAttribute,
+	type OutcomeMetadata,
 	Rating,
-	type Value,
 	type WalletNameAndPseudonymStrings,
 	type WalletNameStrings,
 } from './attributes'
@@ -401,7 +401,9 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 
 			mapAttributesGetter(
 				evalTree,
-				<V extends Value>(getter: (tree: EvaluationTree) => EvaluatedAttribute<V> | undefined) => {
+				<_OutcomeMetadata extends OutcomeMetadata>(
+					getter: (tree: EvaluationTree) => EvaluatedAttribute<_OutcomeMetadata> | undefined,
+				) => {
 					const currentVariantEval = getter(evalTree)
 
 					if (currentVariantEval === undefined) {
@@ -518,10 +520,10 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
  * @returns Whether the evaluation of the given attribute is unique to the
  *          given variant within the given wallet.
  */
-export function attributeVariantSpecificity<V extends Value>(
+export function attributeVariantSpecificity<_OutcomeMetadata extends OutcomeMetadata>(
 	ratedWallet: RatedWallet,
 	variant: Variant,
-	attribute: Attribute<V>,
+	attribute: Attribute<_OutcomeMetadata>,
 ): VariantSpecificity {
 	const variantSpecificityMap = ratedWallet.variantSpecificity[variant]
 

@@ -3,7 +3,7 @@
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
-	import type { AccountRecoveryValue } from '@/schema/attributes/security/account-recovery'
+	import type { AccountRecoveryOutcomeMetadata } from '@/schema/attributes/security/account-recovery'
 
 	// Props
 	const {
@@ -11,7 +11,7 @@
 		value,
 	}: {
 		wallet: RatedWallet
-		value: AccountRecoveryValue
+		value: AccountRecoveryOutcomeMetadata
 	} = $props()
 
 	// Components

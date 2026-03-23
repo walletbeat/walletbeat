@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	type ExemptEvaluation,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
@@ -20,7 +19,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SupplyChainDIYValue = Value & {
+export type SupplyChainDIYOutcomeMetadata = {
 	diyNoNda: SupplyChainDIYType
 	componentSourcingComplexity: SupplyChainDIYType
 }
@@ -40,7 +39,7 @@ function evaluateSupplyChainDIY(features: SupplyChainDIYSupport): Rating {
 	return Rating.FAIL
 }
 
-export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
+export const supplyChainDIY: Attribute<SupplyChainDIYOutcomeMetadata> = {
 	id: 'supplyChainDIY',
 	icon: '🛠️',
 	displayName: 'Supply Chain DIY',
@@ -70,27 +69,27 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes all DIY supply chain sub-criteria.'),
-				(v: SupplyChainDIYValue) => v.rating === Rating.PASS,
+				v => v.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some DIY supply chain sub-criteria.'),
-				(v: SupplyChainDIYValue) => v.rating === Rating.PARTIAL,
+				v => v.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet fails most or all DIY supply chain sub-criteria.'),
-				(v: SupplyChainDIYValue) => v.rating === Rating.FAIL,
+				v => v.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: pickWorstRating<SupplyChainDIYValue>,
+	aggregate: pickWorstRating<SupplyChainDIYOutcomeMetadata>,
 	exempted: (
-		ctx: EvaluationContext<SupplyChainDIYValue>,
+		ctx: EvaluationContext<SupplyChainDIYOutcomeMetadata>,
 		metadata: WalletMetadata,
-	): ExemptEvaluation<SupplyChainDIYValue> | null => {
+	): ExemptEvaluation<SupplyChainDIYOutcomeMetadata> | null => {
 		if (
 			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType !== HardwareWalletManufactureType.DIY
@@ -103,7 +102,9 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 
 		return null
 	},
-	evaluate: (ctx: EvaluationContext<SupplyChainDIYValue>): Evaluation<SupplyChainDIYValue> => {
+	evaluate: (
+		ctx: EvaluationContext<SupplyChainDIYOutcomeMetadata>,
+	): Evaluation<SupplyChainDIYOutcomeMetadata> => {
 		ctx.setVerifiability(Verifiability.SELF_EVIDENT) // If you build it, you source your own parts.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
