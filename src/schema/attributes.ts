@@ -340,7 +340,9 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 )
 
 /** The numerical score corresponding to a rating by default. */
-export function defaultRatingScore(outcome: Outcome): Score {
+export function defaultRatingScore<_OutcomeMetadata extends OutcomeMetadata>(
+	outcome: Outcome<_OutcomeMetadata>,
+): Score {
 	switch (outcome.rating) {
 		case Rating.FAIL:
 			return 0.0
