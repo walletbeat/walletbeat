@@ -1,5 +1,6 @@
 <script lang="ts">
 	// Types/constants
+	import type { WalletNameStrings } from '@/schema/attributes'
 	import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType, type MarkdownParagraph } from '@/types/content'
@@ -19,10 +20,10 @@
 	}: {
 		wallet: RatedWallet
 		privateTransferDetails: Map<PrivateTransferTechnology, {
-			sendingDetails: MarkdownParagraph<{ WALLET_NAME: string }>
-			receivingDetails: MarkdownParagraph<{ WALLET_NAME: string }>
-			spendingDetails: MarkdownParagraph<{ WALLET_NAME: string }>
-			extraNotes: MarkdownParagraph<{ WALLET_NAME: string }>[]
+			sendingDetails: MarkdownParagraph<WalletNameStrings>
+			receivingDetails: MarkdownParagraph<WalletNameStrings>
+			spendingDetails: MarkdownParagraph<WalletNameStrings>
+			extraNotes: MarkdownParagraph<WalletNameStrings>[]
 		}>
 	} = $props()
 

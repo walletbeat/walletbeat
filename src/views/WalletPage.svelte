@@ -16,6 +16,17 @@
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
 	import { VariantSpecificity } from '@/schema/wallet'
 	import { ContentType, isTypographicContent } from '@/types/content'
+	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
+	import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
+	import type { FundingDetailsProps } from '@/types/content/funding-details'
+	import type { PrivateTransfersDetailsProps } from '@/types/content/private-transfers-details'
+	import type { ScamAlertDetailsProps } from '@/types/content/scam-alert-details'
+	import type { SecurityAuditsDetailsProps } from '@/types/content/security-audits-details'
+	import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
+	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
+	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
+	import type { OutcomeMetadata } from '@/schema/attributes'
+	import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
 
 
 	// Functions
@@ -901,25 +912,25 @@
 
 						<div data-column>
 							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...componentProps} {wallet} />
+								<AddressCorrelationDetails {...(componentProps as AddressCorrelationDetailsProps)} {wallet} />
 							{:else if componentName === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...componentProps} {wallet} />
+								<PrivateTransfersDetails {...(componentProps as PrivateTransfersDetailsProps)} {wallet} />
 							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...componentProps} {wallet} refs={references} />
+								<ChainVerificationDetails {...(componentProps as ChainVerificationDetailsProps)} {wallet} refs={references} />
 							{:else if componentName === 'ScamAlertDetails'}
-								<ScamAlertDetails {...componentProps} {wallet} {outcome} />
+								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
 							{:else if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...componentProps} {wallet} {outcome} />
+								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} {outcome} />
 							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...componentProps} {wallet} />
+								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
 							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...componentProps} {wallet} />
+								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
 							{:else if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...componentProps} {wallet} {outcome} />
+								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} {outcome} />
 							{:else if componentName === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...componentProps} {wallet} {outcome} />
+								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} {outcome} />
 							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...componentProps} {wallet} />
+								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
 							{/if}
 						</div>
 
