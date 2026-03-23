@@ -189,7 +189,9 @@ export const userSafety: Attribute<UserSafetyMetadata> = {
 				rating,
 				displayName: 'User Safety',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} user safety.`),
-				...userSafetyFeature, // TODO: Filter fields
+				metadata: {
+					...userSafetyFeature, // TODO: Filter fields
+				},
 			},
 			details: paragraph(detailsText),
 			howToImprove: rating === Rating.PASS ? undefined : paragraph(howToImproveText),

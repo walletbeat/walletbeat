@@ -128,7 +128,9 @@ function comprehensiveHardwareWalletSupport(
 			rating: Rating.PASS,
 			displayName: 'Interoperable hardware wallet support',
 			shortExplanation: sentence('{{WALLET_NAME}} supports a wide range of hardware wallets.'),
-			hardwareWalletSupport,
+			metadata: {
+				hardwareWalletSupport,
+			},
 		},
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}`,

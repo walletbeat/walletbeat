@@ -23,7 +23,7 @@ type _EvaluationContext = EvaluationContext<AddressResolutionMetadata>
 type _Evaluation = Evaluation<AddressResolutionMetadata>
 
 export type AddressResolutionMetadata = {
-	addressResolution?: AddressResolution<Support<AddressResolutionData>>
+	addressResolution: AddressResolution<Support<AddressResolutionData>>
 }
 
 function getOffchainProviderInfo(
@@ -90,7 +90,9 @@ function evaluateAddressResolution(
 					id: `support_via_erc${erc.number}_onchain`,
 					rating: Rating.PASS,
 					displayName: `Resolves human-readable ${eipShortLabel(erc)} addresses`,
-					addressResolution,
+					metadata: {
+						addressResolution,
+					},
 					shortExplanation: sentence(
 						`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format.`,
 					),
@@ -108,7 +110,9 @@ function evaluateAddressResolution(
 				id: `support_via_erc${erc.number}_${chainSpecificSupport.offchainDataVerifiability.toLowerCase()}_${chainSpecificSupport.offchainProviderConnection.toLowerCase()}_provider`,
 				rating,
 				displayName: `Resolves human-readable ${eipShortLabel(erc)} addresses offchain`,
-				addressResolution,
+				metadata: {
+					addressResolution,
+				},
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format using an offchain provider.`,
 				),
@@ -131,7 +135,9 @@ function evaluateAddressResolution(
 				id: 'no_address_resolution',
 				rating: Rating.FAIL,
 				displayName: 'No human-readable address resolution',
-				addressResolution,
+				metadata: {
+					addressResolution,
+				},
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not resolve human-readable addresses such as ENS names.',
 				),
@@ -151,7 +157,9 @@ function evaluateAddressResolution(
 				id: 'support_plain_ens_onchain',
 				rating: Rating.PARTIAL,
 				displayName: 'Supports non-chain-specific ENS addresses',
-				addressResolution,
+				metadata: {
+					addressResolution,
+				},
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} supports sending to plain ENS addresses but not chain-specific human-readable addresses.',
 				),
@@ -179,7 +187,9 @@ function evaluateAddressResolution(
 			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
 			rating: Rating.PARTIAL,
 			displayName: 'Resolves ENS addresses using an offchain service',
-			addressResolution,
+			metadata: {
+				addressResolution,
+			},
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports sending to ENS addresses but uses an offchain service for resolution.',
 			),

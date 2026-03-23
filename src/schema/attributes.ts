@@ -252,7 +252,10 @@ export type OutcomeMetadata = object
  * one particular Outcome could represent the Apache license, and another
  * could represent the MIT license.
  */
-export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
+export type Outcome<
+	_OutcomeMetadata extends OutcomeMetadata = {},
+	_Rating extends Rating = Rating,
+> = {
 	/**
 	 * An ID representing the outcome.
 	 * This needs to be unique within the set of possible outcomes that the
@@ -296,7 +299,26 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 	 * "PARTIAL" if the wallet is BUSL-licensed, or "FAIL" if the wallet is
 	 * proprietary.
 	 */
-	rating: Rating
+	rating: _Rating
+
+	/**
+	 * How verifiable the rating is by the general public.
+	 *
+	 * If rating is EXPLICIT, need to provide verifiability.
+	 * If rating is EXEMPT or UNRATED, the verifiability is self-evident.
+	 *
+	 * Some attributes can self-evidently be verified by just using the wallet
+	 * (e.g. "what happens if I type an ENS address when sending tokens?"),
+	 * whereas others require source-level access to ascertain ("how is private
+	 * key material handled?"), or even beyond ("what happens to my orderflow
+	 * data after I send this transaction request to the wallet's default RPC
+	 * provider?").
+	 *
+	 * Note that something being *verifiable*
+	 * does not mean that it has been *verified*.
+	 * This is only about the *ability* to be verified.
+	 */
+	verifiability: _Rating extends ExplicitRating ? Verifiability : Verifiability.SELF_EVIDENT
 
 	/**
 	 * A score representing this outcome on this specific attribute.
@@ -310,34 +332,8 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 	 * Attribute-specific metadata. Optional; only present when the attribute
 	 * has metadata beyond the base outcome fields.
 	 */
-	metadata?: {} extends _OutcomeMetadata ? undefined : _OutcomeMetadata
-} & (
-	| {
-			rating: ExplicitRating
-			// If explicit rating, need to provide verifiability.
-
-			/**
-			 * How verifiable the rating is by the general public.
-			 *
-			 * Some attributes can self-evidently be verified by just using the wallet
-			 * (e.g. "what happens if I type an ENS address when sending tokens?"),
-			 * whereas others require source-level access to ascertain ("how is private
-			 * key material handled?"), or even beyond ("what happens to my orderflow
-			 * data after I send this transaction request to the wallet's default RPC
-			 * provider?").
-			 *
-			 * Note that something being *verifiable*
-			 * does not mean that it has been *verified*.
-			 * This is only about the *ability* to be verified.
-			 */
-			verifiability: Verifiability
-	  }
-	| {
-			rating: Exclude<Rating, ExplicitRating>
-			// If EXEMPT or UNRATED, the verifiability is self-evident.
-			verifiability: Verifiability.SELF_EVIDENT
-	  }
-)
+	metadata?: {} extends _OutcomeMetadata ? never : _OutcomeMetadata
+}
 
 /** The numerical score corresponding to a rating by default. */
 export function defaultRatingScore<_OutcomeMetadata extends OutcomeMetadata>(
@@ -397,11 +393,14 @@ export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = {}> {
  * Evaluation is the result of evaluating how well a specific wallet fulfills
  * an attribute. Unlike Outcome, an Evaluation is wallet-specific.
  */
-export interface Evaluation<_OutcomeMetadata extends OutcomeMetadata = {}> {
+export interface Evaluation<
+	_OutcomeMetadata extends OutcomeMetadata = {},
+	_Rating extends Rating = Rating,
+> {
 	/**
 	 * The outcome representing how well the wallet fulfills the attribute.
 	 */
-	outcome: Outcome<_OutcomeMetadata>
+	outcome: Outcome<_OutcomeMetadata, _Rating>
 
 	/**
 	 * A long, human-readable explanation of this evaluation.
@@ -818,7 +817,7 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
 					...scaffoldVal,
 					rating: scaffoldVal.rating,
 					verifiability: Verifiability.SELF_EVIDENT,
-				} as Outcome<_OutcomeMetadata>
+				}
 			}
 
 			if (verifiability === null) {
@@ -842,7 +841,7 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
 				...scaffoldVal,
 				rating: scaffoldVal.rating,
 				verifiability,
-			} as Outcome<_OutcomeMetadata>
+			}
 		})()
 
 		return {
