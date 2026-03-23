@@ -99,8 +99,8 @@ function getRewardDetailsDescription(support: BugBountyProgramSupport): string {
 	return ''
 }
 
-function noBugBountyProgram(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const noBugBountyProgram: (typeof bugBountyProgram)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'no_bug_bounty_program',
 			rating: Rating.FAIL,
@@ -116,7 +116,6 @@ function noBugBountyProgram(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should implement a bug bounty program to incentivize security researchers to responsibly disclose vulnerabilities. At minimum, the wallet should provide a clear vulnerability disclosure policy and ensure a process exists for providing security updates to users.',
 		),
 	})
-}
 
 function bugBountyAvailable(ctx: EvaluationContext, support: BugBountyProgramSupport): Evaluation {
 	const rewardInfo = getRewardDescription(support)
@@ -338,7 +337,7 @@ export const bugBountyProgram: Attribute = {
 		],
 	},
 	aggregate: (perVariant: AtLeastOneVariant<Evaluation>) => pickWorstRating(perVariant),
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({ referenceCountsAs: Verifiability.VERIFIABLE }),
 		)

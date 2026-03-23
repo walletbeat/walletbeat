@@ -136,7 +136,7 @@ export const chainVerification: Attribute = {
 			),
 		),
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAnyOf(
 				verifiabilityRequiresCustomChainRpc({

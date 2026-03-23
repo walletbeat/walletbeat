@@ -499,7 +499,7 @@ export const chainAbstraction: Attribute = {
 			),
 		),
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can self-test.
 
 		if (ctx.features.type !== WalletType.SOFTWARE) {

@@ -85,8 +85,8 @@ function mixedIncludingProprietary(ctx: EvaluationContext, fossLicense: FOSSLice
 	})
 }
 
-function proprietary(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const proprietary: (typeof openSource)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'proprietary',
 			rating: Rating.FAIL,
@@ -102,10 +102,9 @@ function proprietary(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should consider re-licensing under a Free & Open Source Software license.',
 		),
 	})
-}
 
-function unlicensed(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const unlicensed: (typeof openSource)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'unlicensed',
 			rating: Rating.FAIL,
@@ -120,7 +119,6 @@ function unlicensed(ctx: EvaluationContext): Evaluation {
 		),
 		howToImprove: paragraph('{{WALLET_NAME}} should add a license file to its source code.'),
 	})
-}
 
 export const openSource: Attribute = {
 	id: 'openSource',
@@ -181,7 +179,7 @@ export const openSource: Attribute = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // If open-source, inherently verifiable. If closed-source, evidently true.
 
 		if (ctx.features.licensing === null || ctx.features.licensing.walletAppLicense === null) {

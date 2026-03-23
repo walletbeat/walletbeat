@@ -737,7 +737,7 @@ export const accountPortability: Attribute = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test possible.
 
 		if (ctx.features.accountSupport === null) {

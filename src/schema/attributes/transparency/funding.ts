@@ -69,8 +69,8 @@ function extractive(
 }
 
 /** Wallet has no funding. */
-function noFunding(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const noFunding: (typeof funding)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'noFunding',
 			rating: Rating.FAIL,
@@ -84,11 +84,10 @@ function noFunding(ctx: EvaluationContext): Evaluation {
 			'While most software projects inevitably start small and unfunded, {{WALLET_NAME}} should seek a reliable source of funding once feasible.',
 		),
 	})
-}
 
 /** Funding is not transparent. */
-function unclear(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const unclear: (typeof funding)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'unclear',
 			rating: Rating.FAIL,
@@ -100,7 +99,6 @@ function unclear(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should publish how it is funded, or how it plans to fund itself.',
 		),
 	})
-}
 
 /**
  * Funding encodes the transparency and user-alignment of the monetization
@@ -224,7 +222,7 @@ export const funding: Attribute = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can be invalidated later depending on funding type.
 
 		if (ctx.features.monetization === null) {

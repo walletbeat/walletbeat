@@ -14,8 +14,8 @@ import {
 } from '../../features/self-sovereignty/chain-configurability'
 import { pickWorstRating, unrated } from '../common'
 
-function supportsSelfHostedNode(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const supportsSelfHostedNode: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'support_self_hosted_node',
 			rating: Rating.PASS,
@@ -29,10 +29,9 @@ function supportsSelfHostedNode(ctx: EvaluationContext): Evaluation {
 			{{WALLET_NAME}} lets you use your own self-hosted Ethereum node to interact with Ethereum mainnet.
 		`),
 	})
-}
 
-function supportsSelfHostedNodeAfterRequests(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const supportsSelfHostedNodeAfterRequests: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'self_hosted_node_after_requests',
 			rating: Rating.PARTIAL,
@@ -50,7 +49,6 @@ function supportsSelfHostedNodeAfterRequests(ctx: EvaluationContext): Evaluation
 			or should avoid making any such requests until the user can access the RPC endpoint configuration options.
 		`),
 	})
-}
 
 function supportsSelfHostedNodeButCannotDoBasicOperations(
 	ctx: EvaluationContext,
@@ -84,8 +82,8 @@ function supportsSelfHostedNodeButCannotDoBasicOperations(
 	})
 }
 
-function noSelfHostedNode(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const noSelfHostedNode: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'no_self_hosted_node',
 			rating: Rating.FAIL,
@@ -102,7 +100,6 @@ function noSelfHostedNode(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should let the user configure the endpoint used for Ethereum mainnet.',
 		),
 	})
-}
 
 export const l1ProviderIndependence: Attribute = {
 	id: 'l1ProviderIndependence',
@@ -199,7 +196,7 @@ export const l1ProviderIndependence: Attribute = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		if (ctx.features.chainConfigurability === null) {
 			return unrated(ctx, null)
 		}

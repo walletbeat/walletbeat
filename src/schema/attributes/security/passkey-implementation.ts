@@ -16,8 +16,8 @@ export type PasskeyImplementationOutcomeMetadata = {
 
 type _EvaluationContext = EvaluationContext<PasskeyImplementationOutcomeMetadata>
 
-function noPasskeyImplementation(ctx: _EvaluationContext) {
-	return ctx.build({
+const noPasskeyImplementation: (typeof passkeyImplementation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'no_passkey_implementation',
 			rating: Rating.FAIL,
@@ -34,7 +34,6 @@ function noPasskeyImplementation(ctx: _EvaluationContext) {
 			'{{WALLET_NAME}} should implement passkeys using a well-audited verification library such as [Smooth Crypto Lib](https://github.com/get-smooth/crypto-lib) 159K gas.',
 		),
 	})
-}
 
 function otherPasskeyImplementation(ctx: _EvaluationContext, support: PasskeyVerificationSupport) {
 	return ctx.build({

@@ -1344,7 +1344,7 @@ export const transactionLegibility: Attribute = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test.
 
 		if (ctx.features.security.transactionLegibility === null) {

@@ -1,6 +1,5 @@
 import {
 	type Attribute,
-	type Evaluation,
 	EvaluationContext,
 	exampleRating,
 	exampleRatingUnimplemented,
@@ -24,8 +23,8 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-function uniqueDestinations(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const uniqueDestinations: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'unique_destinations',
 			rating: Rating.PASS,
@@ -39,10 +38,9 @@ function uniqueDestinations(ctx: EvaluationContext): Evaluation {
 			'When configured with multiple addresses, {{WALLET_NAME}} uses unique RPC endpoints for each wallet address. Therefore, no single RPC endpoint gets to learn about more than one of your addresses.',
 		),
 	})
-}
 
-function activeAddressOnly(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const activeAddressOnly: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'active_address_only',
 			rating: Rating.PASS,
@@ -59,10 +57,9 @@ function activeAddressOnly(ctx: EvaluationContext): Evaluation {
 			'Multi-address privacy is generally well-preserved by {{WALLET_NAME}}. However, you should avoid quickly switching between active addresses in order to avoid making successive requests to the same RPC endpoint about different addresses.',
 		),
 	})
-}
 
-function activeAddressOnlyWithTrackingIdentifier(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const activeAddressOnlyWithTrackingIdentifier: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'active_address_only_with_tracking_identifier',
 			rating: Rating.FAIL,
@@ -83,10 +80,9 @@ function activeAddressOnlyWithTrackingIdentifier(ctx: EvaluationContext): Evalua
 			'{{WALLET_NAME}} should strip all tracking identifiers from the RPCs it makes.',
 		),
 	})
-}
 
-function bulkRequests(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const bulkRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'bulkRequests',
 			rating: Rating.FAIL,
@@ -105,10 +101,9 @@ function bulkRequests(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should first ensure that it never makes requests containing multiple addresses simultaneously. Next, it should ensure that these requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 	})
-}
 
-function correlatableRequests(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const correlatableRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'correlatableRequests',
 			rating: Rating.FAIL,
@@ -127,10 +122,9 @@ function correlatableRequests(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should ensure that its requests are staggered and are proxied through different proxies and RPC endpoints to prevent correlation. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 	})
-}
 
-function staggeredRequests(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const staggeredRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'staggered_requests',
 			rating: Rating.PARTIAL,
@@ -154,10 +148,9 @@ function staggeredRequests(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should ensure requests are proxied through distinct proxies in order to prevent the RPC endpoint from learning the correlation between addresses. This can be done through the use of privacy solutions such as Oblivious HTTP, Tor, and others.',
 		),
 	})
-}
 
-function separateCircuits(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const separateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'separate_circuits',
 			rating: Rating.PARTIAL,
@@ -173,10 +166,9 @@ function separateCircuits(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should add randomized delays between refreshes of separate addresses in order to reduce time-based correlatability of addresses by the RPC endpoint.',
 		),
 	})
-}
 
-function staggeredAndSeparateCircuits(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const staggeredAndSeparateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'staggered_and_separate_circuits',
 			rating: Rating.PASS,
@@ -190,10 +182,9 @@ function staggeredAndSeparateCircuits(ctx: EvaluationContext): Evaluation {
 			'When configured with multiple addresses, {{WALLET_NAME}} makes requests that contain only one of your addresses at a time. While each of these requests go to the same endpoint, they each use a different proxy circuit in order to appear as coming from different IP addresses from the perspective of the endpoint, and they are staggered over time. This provides a good degree of privacy, as it makes it harder for the endpoint to correlate these requests as coming from the same user. From the perspective of the endpoint, these requests come in from random IP addresses at random times, avoiding both IP-based and time-based correlation.',
 		),
 	})
-}
 
-function unsupported(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const unsupported: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'unsupported',
 			rating: Rating.EXEMPT,
@@ -205,7 +196,6 @@ function unsupported(ctx: EvaluationContext): Evaluation {
 			'You can only use one address in {{WALLET_NAME}}, so multi-address privacy is irrelevant.',
 		),
 	})
-}
 
 type QualifiedDataCollectionWithMultiAddress = QualifiedDataCollection & {
 	multiAddress: MultiAddressHandling
@@ -398,7 +388,7 @@ export const multiAddressCorrelation: Attribute = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 

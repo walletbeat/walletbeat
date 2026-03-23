@@ -62,8 +62,8 @@ function describeConnectionMethods(
 	return commaListFormat(methods)
 }
 
-function noAppConnectionSupport(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const noAppConnectionSupport: (typeof appConnectionSupport)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'no_app_connection',
 			rating: Rating.FAIL,
@@ -77,10 +77,9 @@ function noAppConnectionSupport(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should add at least one widely adopted, standards-based app connection method and/or support connection through popular software wallets. Ideally, this support should be permissionless and rely on open standards so apps can integrate without vendor approval.',
 		),
 	})
-}
 
-function unverifiableAppConnectionSupport(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const unverifiableAppConnectionSupport: (typeof appConnectionSupport)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'unverifiable_app_connection',
 			rating: Rating.PARTIAL,
@@ -96,7 +95,6 @@ function unverifiableAppConnectionSupport(ctx: EvaluationContext): Evaluation {
 			'{{WALLET_NAME}} should support open standards that enable connection via software wallets and apps. If the wallet relies on a vendor app, open-sourcing the app and connection components (or publishing verifiable builds and specs) would materially improve transparency and verifiability.',
 		),
 	})
-}
 
 function limitedVerifiableAppConnectionSupport(
 	ctx: EvaluationContext,
@@ -283,7 +281,7 @@ limiting its utility.
 			noAppConnectionSupport(EvaluationContext.forTest(() => appConnectionSupport)),
 		),
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		// Check for ERC-4337 smart wallet

@@ -25,8 +25,8 @@ export type SecurityAuditsOutcomeMetadata = {
 type _EvaluationContext = EvaluationContext<SecurityAuditsOutcomeMetadata>
 type _Evaluation = Evaluation<SecurityAuditsOutcomeMetadata>
 
-function noAudits(ctx: _EvaluationContext): _Evaluation {
-	return ctx.build({
+const noAudits: (typeof securityAudits)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'no_audits',
 			rating: Rating.FAIL,
@@ -36,7 +36,6 @@ function noAudits(ctx: _EvaluationContext): _Evaluation {
 		},
 		details: paragraph('{{WALLET_NAME}} has not undergone any security auditing.'),
 	})
-}
 
 function audited(
 	ctx: _EvaluationContext,

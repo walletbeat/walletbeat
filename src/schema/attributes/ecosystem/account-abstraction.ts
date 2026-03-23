@@ -2,7 +2,6 @@ import { eip7702 } from '@/data/eips/eip-7702'
 import { erc4337 } from '@/data/eips/erc-4337'
 import {
 	type Attribute,
-	type Evaluation,
 	EvaluationContext,
 	exampleRating,
 	Rating,
@@ -22,8 +21,8 @@ import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '../../eips'
 import { pickWorstRating, unrated } from '../common'
 
-function supportsErc4337AndEip7702(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const supportsErc4337AndEip7702: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'erc4337_and_eip7702_ready',
 			rating: Rating.PASS,
@@ -36,10 +35,9 @@ function supportsErc4337AndEip7702(ctx: EvaluationContext): Evaluation {
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)} and ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-function supportsErc4337(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const supportsErc4337: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'erc4337_ready',
 			rating: Rating.PASS,
@@ -50,10 +48,9 @@ function supportsErc4337(ctx: EvaluationContext): Evaluation {
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(erc4337)}.`,
 		),
 	})
-}
 
-function supportsEip7702(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const supportsEip7702: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'eip7702_ready',
 			rating: Rating.PASS,
@@ -64,10 +61,9 @@ function supportsEip7702(ctx: EvaluationContext): Evaluation {
 			`{{WALLET_NAME}} supports Account Abstraction via ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-function supportsEoaAndMpc(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const supportsEoaAndMpc: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'eoa_and_mpc_only',
 			rating: Rating.FAIL,
@@ -86,10 +82,9 @@ function supportsEoaAndMpc(ctx: EvaluationContext): Evaluation {
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-function supportsMpcOnly(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const supportsMpcOnly: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'mpc_only',
 			rating: Rating.FAIL,
@@ -108,10 +103,9 @@ function supportsMpcOnly(ctx: EvaluationContext): Evaluation {
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
-function supportsRawEoaOnly(ctx: EvaluationContext): Evaluation {
-	return ctx.build({
+const supportsRawEoaOnly: (typeof accountAbstraction)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'eoa_only',
 			rating: Rating.FAIL,
@@ -128,7 +122,6 @@ function supportsRawEoaOnly(ctx: EvaluationContext): Evaluation {
 			`{{WALLET_NAME}} should implement support for Account Abstraction features, such as ${eipMarkdownLinkAndTitle(eip7702)}.`,
 		),
 	})
-}
 
 export const accountAbstraction: Attribute = {
 	id: 'accountAbstraction',
@@ -201,7 +194,7 @@ export const accountAbstraction: Attribute = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		if (ctx.features.accountSupport === null) {

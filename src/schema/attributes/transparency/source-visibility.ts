@@ -1,11 +1,11 @@
-import { type Attribute, EvaluationContext, Rating, Verifiability } from '@/schema/attributes'
+import { type Attribute, Rating, Verifiability } from '@/schema/attributes'
 import { licenseSourceIsVisible, LicensingType } from '@/schema/features/transparency/license'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { pickWorstRating, unrated } from '../common'
 
-function sourcePublic(ctx: EvaluationContext) {
-	return ctx.build({
+const sourcePublic: (typeof sourceVisibility)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'public',
 			rating: Rating.PASS,
@@ -22,10 +22,9 @@ function sourcePublic(ctx: EvaluationContext) {
 			for Walletbeat to review how the wallet works.
 		`),
 	})
-}
 
-function sourcePartiallyPrivate(ctx: EvaluationContext) {
-	return ctx.build({
+const sourcePartiallyPrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'partially_private',
 			rating: Rating.FAIL,
@@ -48,10 +47,9 @@ function sourcePartiallyPrivate(ctx: EvaluationContext) {
 			viewable.
 		`),
 	})
-}
 
-function sourcePrivate(ctx: EvaluationContext) {
-	return ctx.build({
+const sourcePrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'private',
 			rating: Rating.FAIL,
@@ -74,7 +72,6 @@ function sourcePrivate(ctx: EvaluationContext) {
 			viewable.
 		`),
 	})
-}
 
 export const sourceVisibility: Attribute = {
 	id: 'sourceVisibility',

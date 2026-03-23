@@ -192,8 +192,8 @@ function mergeEvaluations(
 	}
 }
 
-function noPrivateTransfers(ctx: _EvaluationContext): _Evaluation {
-	return ctx.build({
+const noPrivateTransfers: (typeof privateTransfers)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'no_transfer_privacy',
 			rating: Rating.FAIL,
@@ -239,10 +239,9 @@ function noPrivateTransfers(ctx: _EvaluationContext): _Evaluation {
 		`,
 		),
 	})
-}
 
-function nonDefault(ctx: _EvaluationContext): _Evaluation {
-	return ctx.build({
+const nonDefault: (typeof privateTransfers)['evaluate'] = ctx =>
+	ctx.build({
 		value: {
 			id: 'non_default_transfer_privacy',
 			rating: Rating.FAIL,
@@ -275,7 +274,6 @@ function nonDefault(ctx: _EvaluationContext): _Evaluation {
 		`,
 		),
 	})
-}
 
 function rateStealthAddressSupport(
 	ctx: _EvaluationContext,

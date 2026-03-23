@@ -256,7 +256,7 @@ export const transactionInclusion: Attribute = {
 			),
 		),
 	},
-	evaluate: (ctx: EvaluationContext): Evaluation => {
+	evaluate: ctx => {
 		if (ctx.features.selfSovereignty.transactionSubmission === null) {
 			return unrated(ctx, null)
 		}
