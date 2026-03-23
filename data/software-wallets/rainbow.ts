@@ -1,4 +1,5 @@
 import { mattmatt } from '@/data/contributors/0xmattmatt'
+import { danielsinclair } from '@/data/contributors/danielsinclair'
 import { polymutex } from '@/data/contributors/polymutex'
 import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
@@ -9,6 +10,7 @@ import {
 	HardwareWalletType,
 	type SupportedHardwareWallet,
 } from '@/schema/features/security/hardware-wallet-support'
+import type { ScamUrlWarning } from '@/schema/features/security/scam-alerts'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
@@ -18,13 +20,20 @@ import {
 	SimulationBenchmarkTransactions,
 	TransactionOutcome,
 } from '@/schema/features/security/transaction-legibility'
+import {
+	type ChainConfigurability,
+	RpcEndpointConfiguration,
+} from '@/schema/features/self-sovereignty/chain-configurability'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
+import { FeeDisplayLevel } from '@/schema/features/transparency/fee-display'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
-import { refTodo } from '@/schema/reference'
+import { refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
+
+import { rainbowCaliburContract } from '../wallet-contracts/rainbow-calibur'
 
 const rainbowTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -43,12 +52,21 @@ export const rainbow: SoftwareWallet = {
 		blurb: paragraph(`
 			Rainbow Extension. Built for speed. Built for power. Built for You.
 		`),
-		contributors: [polymutex, mattmatt],
+		contributors: [polymutex, mattmatt, danielsinclair],
 		iconExtension: 'svg',
-		lastUpdated: '2025-02-08',
+		lastUpdated: '2026-02-25',
 		urls: {
-			docs: ['https://rainbowkit.com/'],
-			repositories: ['https://github.com/rainbow-me/rainbow'],
+			docs: ['https://rainbow.me/support'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
+				'https://microsoftedge.microsoft.com/addons/detail/rainbow/cpojfbodiccabbabgimdeohkkpjfpbnf',
+				'https://addons.mozilla.org/en-US/firefox/addon/rainbow-extension/',
+			],
+			repositories: [
+				'https://github.com/rainbow-me/rainbow',
+				'https://github.com/rainbow-me/browser-extension',
+				'https://github.com/rainbow-me/delegation',
+			],
 			socials: {
 				farcaster: 'https://farcaster.xyz/rainbow',
 				x: 'https://x.com/rainbowdotme',
@@ -59,7 +77,13 @@ export const rainbow: SoftwareWallet = {
 	features: {
 		accountSupport: {
 			defaultAccountType: AccountType.eoa,
-			eip7702: notSupported,
+			eip7702: supported({
+				ref: {
+					explanation: 'Rainbow supports EIP-7702 delegation via Rainbow Calibur',
+					url: 'https://github.com/uniswap/calibur',
+				},
+				contract: rainbowCaliburContract,
+			}),
 			eoa: supported({
 				ref: refTodo,
 				canExportPrivateKey: true,
@@ -75,7 +99,12 @@ export const rainbow: SoftwareWallet = {
 			safe: notSupported,
 		},
 		addressResolution: {
-			ref: refTodo,
+			ref: [
+				{
+					explanation: 'When sending, Rainbow resolves ENS domain names to addresses.',
+					url: 'https://rainbow.me/support/app/send-eth',
+				},
+			],
 			chainSpecificAddressing: {
 				erc7828: notSupported,
 				erc7831: notSupported,
@@ -84,14 +113,88 @@ export const rainbow: SoftwareWallet = {
 				medium: 'CHAIN_CLIENT',
 			}),
 		},
-		chainAbstraction: null,
-		chainConfigurability: null,
+		chainAbstraction: {
+			bridging: {
+				builtInBridging: supported({
+					ref: {
+						explanation:
+							'Rainbow has a built-in bridge feature that allows users to bridge assets between chains.',
+						url: 'https://rainbow.me/support',
+					},
+					feesLargerThan1bps: {
+						afterSingleAction: FeeDisplayLevel.COMPREHENSIVE,
+						byDefault: FeeDisplayLevel.COMPREHENSIVE,
+						fullySponsored: false,
+					},
+					risksExplained: 'NOT_IN_UI',
+				}),
+				suggestedBridging: notSupported,
+			},
+			crossChainBalances: {
+				ref: {
+					explanation:
+						'Rainbow displays tokens across multiple networks in a single aggregated view with estimated portfolio value.',
+					url: 'https://rainbow.me/support',
+				},
+				ether: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+				globalAccountValue: featureSupported,
+				perChainAccountValue: featureSupported,
+				usdc: {
+					crossChainSumView: notSupported,
+					perChainBalanceViewAcrossMultipleChains: featureSupported,
+				},
+			},
+		},
+		chainConfigurability: supported<WithRef<ChainConfigurability>>({
+			ref: [
+				{
+					explanation: 'Rainbow lets users set a custom RPC endpoint for mainnet.',
+					url: 'https://rainbow.me/support',
+				},
+			],
+			customChainRpcEndpoint: featureSupported,
+			l1: supported({
+				rpcEndpointConfiguration: RpcEndpointConfiguration.YES_AFTER_OTHER_REQUESTS,
+				withNoConnectivityExceptL1RPCEndpoint: {
+					accountCreation: featureSupported,
+					accountImport: featureSupported,
+					erc20BalanceLookup: notSupported,
+					erc20TokenSend: notSupported,
+					etherBalanceLookup: featureSupported,
+				},
+			}),
+			nonL1: notSupported,
+		}),
 		ecosystem: {
-			delegation: null,
+			delegation: {
+				duringEOACreation: 'NO',
+				duringEOAImport: 'NO',
+				duringFirst7702Operation: supported({
+					type: 'DELEGATION_BUNDLED_WITH_OTHER_OPERATIONS',
+					nonDelegationTransactionDetailsIdenticalToNormalFlow: true,
+				}),
+				fee: {
+					crossChainGas: notSupported,
+					walletSponsored: notSupported,
+				},
+			},
 		},
 		integration: {
 			browser: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation: 'Rainbow browser extension supports standard Ethereum Provider APIs.',
+						url: 'https://rainbow.me/support/extension/get-started-with-the-rainbow-extension',
+					},
+					{
+						explanation:
+							'The Rainbow mobile app includes a built-in dApp browser that supports standard Ethereum Provider APIs.',
+						url: 'https://rainbow.me/support/app/how-to-use-the-rainbow-browser',
+					},
+				],
 				'1193': featureSupported,
 				'2700': featureSupported,
 				'6963': featureSupported,
@@ -144,7 +247,17 @@ export const rainbow: SoftwareWallet = {
 			accountRecovery: null,
 			bugBountyProgram: null,
 			hardwareWalletSupport: {
-				ref: refTodo,
+				ref: [
+					{
+						explanation:
+							'Rainbow supports Ledger (via USB and Bluetooth) and Trezor (via USB) in both the browser extension and mobile app.',
+						url: 'https://rainbow.me/support/extension/connect-your-hardware-wallet',
+					},
+					{
+						explanation: 'Rainbow supports adding a Ledger wallet on mobile.',
+						url: 'https://rainbow.me/support/app/add-a-wallet-from-ledger-to-rainbow',
+					},
+				],
 				wallets: {
 					[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
 						connectionTypes: [HardwareWalletConnection.webUSB, HardwareWalletConnection.bluetooth],
@@ -160,7 +273,36 @@ export const rainbow: SoftwareWallet = {
 			},
 			passkeyVerification: notSupported,
 			publicSecurityAudits: null,
-			scamAlerts: null,
+			scamAlerts: {
+				contractTransactionWarning: supported({
+					ref: [
+						{
+							explanation:
+								'Rainbow uses Blockaid for transaction simulation and malicious contract detection, warning users before they interact with flagged contracts.',
+							url: 'https://rainbow.me/support/safety/is-rainbow-wallet-safe',
+						},
+					],
+					contractRegistry: true,
+					leaksContractAddress: true,
+					leaksUserAddress: true,
+					leaksUserIp: true,
+					previousContractInteractionWarning: true,
+					recentContractWarning: true,
+				}),
+				scamUrlWarning: supported<ScamUrlWarning>({
+					ref: [
+						{
+							explanation:
+								'Rainbow uses Blockaid dApp scanning to warn users before connecting to known phishing sites and wallet drainers.',
+							url: 'https://rainbow.me/support/safety/avoid-crypto-scams',
+						},
+					],
+					leaksIp: true,
+					leaksUserAddress: false,
+					leaksVisitedUrl: 'DOMAIN_ONLY',
+				}),
+				sendTransactionWarning: notSupported,
+			},
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {
