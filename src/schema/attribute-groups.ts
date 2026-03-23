@@ -696,8 +696,8 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 ): MaybeUnratedScore {
 	const subScores = nonEmptyValues<keyof Vs, WeightedScore | null>(
 		nonEmptyRemap(weights, (key: keyof Vs, weight: number): WeightedScore | null => {
-			const { value } = evaluations[key].evaluation
-			const score = value.score ?? defaultRatingScore(value)
+			const { outcome } = evaluations[key].evaluation
+			const score = outcome.score ?? defaultRatingScore(outcome)
 
 			return score === null
 				? null

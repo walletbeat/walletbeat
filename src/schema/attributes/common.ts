@@ -15,7 +15,7 @@ import {
 import type { AtLeastOneVariant, Variant } from '../variants'
 
 /**
- * Helper for constructing "Unrated" values.
+ * Helper for constructing "Unrated" outcomes.
  */
 export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
 	ctx: EvaluationContext<_OutcomeMetadata>,

@@ -2038,7 +2038,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 
 			for (const [key] of privateTransferDetails.privateTransferDetails) {
 				if (!evaluation.outcome.perTechnology.has(key)) {
-					throw new Error(`Private transfer value does not include expected key ${key}`)
+					throw new Error(`Private transfer outcome does not include expected key ${key}`)
 				}
 			}
 		} else if (atLeastOneTechnologySupported) {

@@ -240,32 +240,32 @@ export const verifiabilityEnum = new Enum<Verifiability>({
 })
 
 /**
- * Base type for attribute-specific metadata added to Value.
- * Attributes pass only their custom fields as the generic; Value is implicit.
+ * Base type for attribute-specific metadata added to Outcome.
+ * Attributes pass only their custom fields as the generic; Outcome is implicit.
  */
 export type OutcomeMetadata = object
 
 /**
- * Value is one of multiple possible outcomes when evaluating an attribute.
+ * Outcome is one of multiple possible results when evaluating an attribute.
  * It is *not* wallet-specific, and may often be enum-like.
  * For example, when evaluating an attribute like open-source licensing,
- * one particular Value could represent the Apache license, and another
+ * one particular Outcome could represent the Apache license, and another
  * could represent the MIT license.
  */
 export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 	/**
-	 * An ID representing the value.
-	 * This needs to be unique within the set of possible values that the
+	 * An ID representing the outcome.
+	 * This needs to be unique within the set of possible outcomes that the
 	 * attribute may have, but does not need to be unique within the set of
-	 * all values across all attributes.
-	 * This can be used by rendering code to display value-specific content.
+	 * all outcomes across all attributes.
+	 * This can be used by rendering code to display outcome-specific content.
 	 * For example, when evaluating an attribute like open-source licensing,
-	 * the attribute of the value may be the ID of the license.
+	 * the ID may be the license identifier (e.g. "apache-2").
 	 */
 	id: string
 
 	/**
-	 * An icon that represents the *attribute* when this value is used to
+	 * An icon that represents the *attribute* when this outcome is used to
 	 * rate it. Optional, only used where it makes sense.
 	 * For example, if an attribute has the "chain" icon, one of the ratings
 	 * might use the "broken chain" icon.
@@ -273,7 +273,7 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 	icon?: string
 
 	/**
-	 * A very short, human-readable explanation of this value.
+	 * A very short, human-readable explanation of this outcome.
 	 * Used as tooltip when hovering over the attribute rating in the charts.
 	 * This should relate to the attribute's displayName but stand on its own.
 	 * For example, when evaluating an attribute like open-source licensing,
@@ -283,14 +283,14 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 	displayName: string
 
 	/**
-	 * A very short, human-readable explanation of this value.
+	 * A very short, human-readable explanation of this outcome.
 	 * Should be similar to `displayName` but may be formatted with the name
 	 * of the wallet.
 	 */
 	shortExplanation: Sentence<WalletNameStrings>
 
 	/**
-	 * The visual representation of this value.
+	 * The visual representation of this outcome.
 	 * For example, when evaluating an attribute like open-source licensing,
 	 * this could say "PASS" if the wallet is Apache-licensed or MIT-licensed,
 	 * "PARTIAL" if the wallet is BUSL-licensed, or "FAIL" if the wallet is
@@ -299,7 +299,7 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 	rating: Rating
 
 	/**
-	 * A score representing this value on this specific attribute.
+	 * A score representing this outcome on this specific attribute.
 	 * For any given Attribute, there should be at least one way to get a
 	 * score of 1.0.
 	 * If unspecified, the score is derived using `defaultRatingScore`.
@@ -340,12 +340,12 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 )
 
 /** The numerical score corresponding to a rating by default. */
-export function defaultRatingScore(value: Outcome): Score {
-	switch (value.rating) {
+export function defaultRatingScore(outcome: Outcome): Score {
+	switch (outcome.rating) {
 		case Rating.FAIL:
 			return 0.0
 		case Rating.PARTIAL:
-			switch (value.verifiability) {
+			switch (outcome.verifiability) {
 				case Verifiability.UNVERIFIABLE:
 					return 0.05
 				case Verifiability.INDEPENDENTLY_AUDITED:
@@ -354,7 +354,7 @@ export function defaultRatingScore(value: Outcome): Score {
 					return 0.5
 			}
 		case Rating.PASS:
-			switch (value.verifiability) {
+			switch (outcome.verifiability) {
 				case Verifiability.UNVERIFIABLE:
 					return 0.1
 				case Verifiability.INDEPENDENTLY_AUDITED:
@@ -393,7 +393,7 @@ export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = {}> {
 
 /**
  * Evaluation is the result of evaluating how well a specific wallet fulfills
- * an attribute. Unlike Value, an Evaluation is wallet-specific.
+ * an attribute. Unlike Outcome, an Evaluation is wallet-specific.
  */
 export interface Evaluation<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	/**
@@ -410,7 +410,7 @@ export interface Evaluation<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	details: Content<WalletNameStrings>
 
 	/**
-	 * An optional paragraph explaining the consequence of this value on the
+	 * An optional paragraph explaining the consequence of this outcome on the
 	 * user or to the wallet software.
 	 * For example, when evaluating an attribute like open-source licensing,
 	 * the "long explanation" should explain which license the wallet is using
@@ -437,7 +437,7 @@ export interface Evaluation<_OutcomeMetadata extends OutcomeMetadata = {}> {
 /**
  * An evaluation that is exempt.
  */
-export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata = {}> =
+export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata> =
 	Evaluation<_OutcomeMetadata> & {
 		outcome: Evaluation<_OutcomeMetadata>['outcome'] & {
 			rating: Rating.EXEMPT
@@ -447,7 +447,7 @@ export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata = {}> =
 /**
  * Type predicate for ExemptEvaluation.
  */
-export function isExempt<_OutcomeMetadata extends OutcomeMetadata = {}>(
+export function isExempt<_OutcomeMetadata extends OutcomeMetadata>(
 	evaluation: Evaluation<_OutcomeMetadata>,
 ): evaluation is ExemptEvaluation<_OutcomeMetadata> {
 	return evaluation.outcome.rating === Rating.EXEMPT
@@ -457,7 +457,7 @@ export function isExempt<_OutcomeMetadata extends OutcomeMetadata = {}>(
  * A human-readable description of why a wallet may be assigned a certain
  * rating.
  */
-export interface ExampleRating<_OutcomeMetadata extends OutcomeMetadata = {}> {
+export interface ExampleRating<_OutcomeMetadata extends OutcomeMetadata> {
 	/**
 	 * A description of why a hypothetical wallet may be assigned a specific
 	 * rating.
@@ -467,10 +467,10 @@ export interface ExampleRating<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	description: Sentence | Paragraph
 
 	/**
-	 * Match function that determines whether the given `value` matches this
+	 * Match function that determines whether the given outcome matches this
 	 * example.
 	 */
-	matchesValue: (value: Outcome<_OutcomeMetadata>) => boolean
+	matchesValue: (outcome: Outcome<_OutcomeMetadata>) => boolean
 
 	/**
 	 * Sample evaluations for this rating. Optional, may be empty.
@@ -633,7 +633,7 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	) => Evaluation<_OutcomeMetadata>
 }
 
-export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata = {}> {
+export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata> {
 	attribute: Attribute<_OutcomeMetadata>
 	evaluation: Evaluation<_OutcomeMetadata>
 }
@@ -642,7 +642,7 @@ export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata = {
  * `EvaluationScaffold<_OutcomeMetadata>` is a mostly-build `Evaluation<_OutcomeMetadata>`,
  * which `EvaluationContext<_OutcomeMetadata>` can build into a full `Evaluation<_OutcomeMetadata>`.
  */
-export type EvaluationScaffold<_OutcomeMetadata extends OutcomeMetadata = {}> = Omit<
+export type EvaluationScaffold<_OutcomeMetadata extends OutcomeMetadata> = Omit<
 	Evaluation<_OutcomeMetadata>,
 	'outcome'
 > & {
@@ -933,7 +933,7 @@ export const exampleRatingUnimplemented = 'UNIMPLEMENTED'
 /**
  * Helper function to build an `ExampleRating`.
  * @param description The text description for the example rating.
- * @param matchers A non-empty set of example IDs, example values, ratings,
+ * @param matchers A non-empty set of example IDs, example outcomes, ratings,
  *                 or match functions. The special string "UNIMPLEMENTED" may
  *                 also be used here, representing examples that would result
  *                 in this rating but for which the code to evaluate such
@@ -947,7 +947,7 @@ export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = {}>(
 		| Outcome<_OutcomeMetadata>['id']
 		| Rating
 		| Evaluation<_OutcomeMetadata>
-		| ((value: Outcome<_OutcomeMetadata>) => boolean)
+		| ((outcome: Outcome<_OutcomeMetadata>) => boolean)
 		| typeof exampleRatingUnimplemented
 	>
 ): ExampleRating<_OutcomeMetadata> {
@@ -965,25 +965,25 @@ export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = {}>(
 
 	return {
 		description,
-		matchesValue: (value: Outcome<_OutcomeMetadata>): boolean =>
+		matchesValue: (outcome: Outcome<_OutcomeMetadata>): boolean =>
 			nonEmptyMap(matchers, matcher => {
 				if (matcher === exampleRatingUnimplemented) {
 					return false
 				}
 
 				if (ratingEnum.is(matcher)) {
-					return value.rating === matcher
+					return outcome.rating === matcher
 				}
 
 				if (typeof matcher === 'string') {
-					return value.id === matcher
+					return outcome.id === matcher
 				}
 
 				if (typeof matcher === 'function') {
-					return matcher(value)
+					return matcher(outcome)
 				}
 
-				return matcher.outcome.id === value.id
+				return matcher.outcome.id === outcome.id
 			}).includes(true),
 		sampleEvaluations,
 	}
@@ -993,7 +993,7 @@ export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = {}>(
  * Format title text for an attribute pie slice.
  * @param attribute The evaluated attribute to format.
  * @param suffix Optional suffix to append to the title.
- * @returns Formatted title text in the format: "(icon) title [(eval icon) EVAL VALUE]\n\n(displayName)"
+ * @returns Formatted title text in the format: "(icon) title [(eval icon) EVAL OUTCOME]\n\n(displayName)"
  */
 export const formatAttributeTitleText = (
 	attribute: EvaluatedAttribute<OutcomeMetadata>,
