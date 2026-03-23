@@ -531,18 +531,19 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 
 		evaluations.push(...analytics.evaluations)
 
-		// Incomplete data must be checked before we issue a PASS, because missing
-		// analytics or flow data means we cannot confidently say nothing is wrong.
+		if (isNonEmptyArray(evaluations)) {
+			return pickWorstRating<PrivacyHygieneValue>(evaluations)
+		}
+
+		// No violations found. Incomplete data must be checked before we
+		// issue a PASS, because missing analytics or flow data means we
+		// cannot confidently say nothing is wrong.
 		if (flowScan.hasAnalyticsInSomeFlow && analytics.hasIncompleteAnalyticsData) {
 			return unrated(ctx, null)
 		}
 
 		if (flowScan.hasUnknownFlowData) {
 			return unrated(ctx, null)
-		}
-
-		if (isNonEmptyArray(evaluations)) {
-			return pickWorstRating<PrivacyHygieneValue>(evaluations)
 		}
 
 		if (analytics.hasNoAnalytics && !flowScan.hasAnalyticsInSomeFlow) {
