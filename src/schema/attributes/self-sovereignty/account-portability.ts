@@ -35,7 +35,7 @@ function evaluateEoa(ctx: EvaluationContext, eoa: AccountTypeEoa): Evaluation {
 		const canExportSeedPhrase = eoa.keyDerivation.canExportSeedPhrase
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'standard_eoa_exportable',
 				rating: Rating.PASS,
 				displayName: 'Standards-compliant EOA with seed phrase',
@@ -66,7 +66,7 @@ function evaluateEoa(ctx: EvaluationContext, eoa: AccountTypeEoa): Evaluation {
 
 	if (eoa.canExportPrivateKey) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'nonstandard_eoa_exportable',
 				rating: Rating.PARTIAL,
 				displayName: 'Non-standard but exportable EOA',
@@ -87,7 +87,7 @@ function evaluateEoa(ctx: EvaluationContext, eoa: AccountTypeEoa): Evaluation {
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_export_eoa',
 			rating: Rating.FAIL,
 			icon: '\u{1faa4}', // Mouse trap
@@ -107,7 +107,7 @@ function evaluateEoa(ctx: EvaluationContext, eoa: AccountTypeEoa): Evaluation {
 function evaluateMpc(ctx: EvaluationContext, mpc: AccountTypeMpc): Evaluation {
 	if (mpc.controllingSharesInSelfCustodyByDefault === 'NO') {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'mpc_no_controlling_shares',
 				rating: Rating.FAIL,
 				icon: '\u{1faa4}', // Mouse trap
@@ -133,7 +133,7 @@ function evaluateMpc(ctx: EvaluationContext, mpc: AccountTypeMpc): Evaluation {
 		TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'mpc_cannot_transfer',
 				rating: Rating.FAIL,
 				icon: '\u{1faa4}', // Mouse trap
@@ -159,7 +159,7 @@ function evaluateMpc(ctx: EvaluationContext, mpc: AccountTypeMpc): Evaluation {
 		TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'mpc_transfer_proprietary',
 				rating: Rating.PARTIAL,
 				displayName: 'Requires proprietary app to withdraw assets',
@@ -180,7 +180,7 @@ function evaluateMpc(ctx: EvaluationContext, mpc: AccountTypeMpc): Evaluation {
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'mpc_ok',
 			rating: Rating.PASS,
 			displayName: 'Self-custodial MPC wallet',
@@ -203,7 +203,7 @@ function evaluateMultifactor(
 
 	if (multifactor.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: `${multifactorType}_cannot_rotate_authority`,
 				rating: Rating.FAIL,
 				icon: '\u{1faa4}', // Mouse trap
@@ -230,7 +230,7 @@ function evaluateMultifactor(
 			TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
 		) {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: `${multifactorType}_no_control_by_default_and_cannot_change_without_external_provider`,
 					rating: Rating.FAIL,
 					icon: '\u{1faa4}', // Mouse trap
@@ -260,7 +260,7 @@ function evaluateMultifactor(
 			TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
 		) {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: `${multifactorType}_no_control_by_default_and_cannot_change_without_proprietary_app`,
 					rating: Rating.FAIL,
 					icon: '\u{1faa4}', // Mouse trap
@@ -287,7 +287,7 @@ function evaluateMultifactor(
 		TransactionGenerationCapability.RELYING_ON_EXTERNAL_API
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: `${multifactorType}_cannot_transfer_without_external_provider`,
 				rating: Rating.FAIL,
 				icon: '\u{1faa4}', // Mouse trap
@@ -313,7 +313,7 @@ function evaluateMultifactor(
 		TransactionGenerationCapability.USING_PROPRIETARY_STANDALONE_APP
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: `${multifactorType}_cannot_transfer_proprietary`,
 				rating: Rating.FAIL,
 				icon: '\u{1faa4}', // Mouse trap
@@ -340,7 +340,7 @@ function evaluateMultifactor(
 			TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: `${multifactorType}_no_control_by_default`,
 				rating: Rating.PARTIAL,
 				displayName: 'Not self-custodial by default',
@@ -356,7 +356,7 @@ function evaluateMultifactor(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `${multifactorType}_ok`,
 			rating: Rating.PASS,
 			displayName: 'Self-custodial smart wallet',
@@ -373,7 +373,7 @@ function evaluateMultifactor(
 function evaluateSafe(ctx: EvaluationContext, safe: AccountTypeSafe): Evaluation {
 	if (safe.keyRotationTransactionGeneration === TransactionGenerationCapability.IMPOSSIBLE) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'safe_cannot_rotate_authority',
 				rating: Rating.FAIL,
 				icon: '\u{1faa4}', // Mouse trap
@@ -395,7 +395,7 @@ function evaluateSafe(ctx: EvaluationContext, safe: AccountTypeSafe): Evaluation
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'safe_ok',
 			rating: Rating.PASS,
 			displayName: 'Self-custodial Safe wallet',
@@ -809,9 +809,9 @@ export const accountPortability: Attribute = {
 			throw new Error('No account type evaluations; should be impossible from type system')
 		}
 
-		const oneRating = nonEmptyGet(evaluations).value.rating
+		const oneRating = nonEmptyGet(evaluations).outcome.rating
 
-		if (evaluations.every(evaluation => evaluation.value.rating === oneRating)) {
+		if (evaluations.every(evaluation => evaluation.outcome.rating === oneRating)) {
 			return defaultEvaluation
 		}
 

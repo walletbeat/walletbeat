@@ -360,7 +360,7 @@ function hardwareNoTransactionLegibility(
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'hardware_no_transaction_legibility',
 			rating: Rating.FAIL,
 			displayName: 'Unclear transaction details',
@@ -386,7 +386,7 @@ function hardwareBasicTransactionLegibility(
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'hardware_basic_transaction_legibility',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic transaction legibility support',
@@ -412,7 +412,7 @@ function hardwarePartialTransactionLegibility(
 	const improvementsMarkdown = generateHardwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'hardware_partial_transaction_legibility',
 			rating: Rating.PARTIAL,
 			displayName: 'Partial transaction legibility support',
@@ -437,7 +437,7 @@ function hardwareFullTransactionLegibility(
 	const featureDetailsMarkdown = generateHardwareDetailsMarkdown(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'hardware_full_transaction_legibility',
 			rating: Rating.PASS,
 			displayName: 'Full transaction legibility support',
@@ -875,7 +875,7 @@ function softwareNoTransactionLegibility(
 	const improvementsMarkdown = generateSoftwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'software_no_transaction_legibility',
 			rating: Rating.FAIL,
 			displayName: 'Unclear transaction details',
@@ -901,7 +901,7 @@ function softwarePartialTransactionLegibility(
 	const improvementsMarkdown = generateSoftwareHowToImprove(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'software_partial_transaction_legibility',
 			rating: Rating.PARTIAL,
 			displayName: 'Partial transaction legibility support',
@@ -924,7 +924,7 @@ function softwareFullTransactionLegibility(
 	const featureDetailsMarkdown = generateSoftwareDetailsMarkdown(features)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'software_full_transaction_legibility',
 			rating: Rating.PASS,
 			displayName: 'Full transaction legibility support',

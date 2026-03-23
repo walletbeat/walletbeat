@@ -81,7 +81,7 @@ export const interoperability: Attribute<InteroperabilityMetadata> = {
 		const rating = passCount === 2 ? Rating.PASS : passCount === 1 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'interoperability',
 				rating,
 				displayName: 'Interoperability',

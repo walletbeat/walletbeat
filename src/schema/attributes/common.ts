@@ -78,7 +78,7 @@ export function pickWorstRating<_OutcomeMetadata extends OutcomeMetadata>(
 			: nonEmptyValues<Variant, Evaluation<_OutcomeMetadata>>(evaluations)
 
 	for (const evaluation of evaluationsArray) {
-		if (evaluation.value.rating === Rating.UNRATED) {
+		if (evaluation.outcome.rating === Rating.UNRATED) {
 			// If any evaluation is UNRATED, then the aggregated rating also is.
 			// So return it immediately.
 			return evaluation
@@ -90,24 +90,24 @@ export function pickWorstRating<_OutcomeMetadata extends OutcomeMetadata>(
 			continue
 		}
 
-		if (evaluation.value.rating === Rating.EXEMPT) {
+		if (evaluation.outcome.rating === Rating.EXEMPT) {
 			// Exempt ratings are ignored, unless they are the only rating we have.
 			continue
 		}
 
-		if (worst.value.rating === Rating.EXEMPT) {
+		if (worst.outcome.rating === Rating.EXEMPT) {
 			// Any non-EXEMPT rating takes precedence over an EXEMPT rating.
 			worst = evaluation
 			continue
 		}
 
-		if (worst.value.rating === Rating.PASS) {
+		if (worst.outcome.rating === Rating.PASS) {
 			// Any non-EXEMPT, non-UNRATED rating is worse or equal to PASS, so pick it.
 			worst = evaluation
 			continue
 		}
 
-		if (worst.value.rating === Rating.PARTIAL && evaluation.value.rating === Rating.FAIL) {
+		if (worst.outcome.rating === Rating.PARTIAL && evaluation.outcome.rating === Rating.FAIL) {
 			// If the worst rating is PARTIAL, pick FAIL over it.
 			worst = evaluation
 			continue

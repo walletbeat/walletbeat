@@ -25,7 +25,7 @@ import { pickWorstRating, unrated } from '../common'
 
 const uniqueDestinations: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'unique_destinations',
 			rating: Rating.PASS,
 			icon: '\u{26d3}', // Broken chain
@@ -41,7 +41,7 @@ const uniqueDestinations: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 
 const activeAddressOnly: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'active_address_only',
 			rating: Rating.PASS,
 			icon: '\u{1f4ce}', // Single paperclip
@@ -60,7 +60,7 @@ const activeAddressOnly: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 
 const activeAddressOnlyWithTrackingIdentifier: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'active_address_only_with_tracking_identifier',
 			rating: Rating.FAIL,
 			displayName: 'Multiple addresses are correlatable by a tracking cookie',
@@ -83,7 +83,7 @@ const activeAddressOnlyWithTrackingIdentifier: (typeof multiAddressCorrelation)[
 
 const bulkRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'bulkRequests',
 			rating: Rating.FAIL,
 			displayName: 'Multiple addresses are correlatable by an external provider',
@@ -104,7 +104,7 @@ const bulkRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 
 const correlatableRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'correlatableRequests',
 			rating: Rating.FAIL,
 			displayName: 'Multiple addresses are correlatable by an external provider',
@@ -125,7 +125,7 @@ const correlatableRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =
 
 const staggeredRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'staggered_requests',
 			rating: Rating.PARTIAL,
 			displayName: 'Requests for multiple addresses are staggered across time',
@@ -151,7 +151,7 @@ const staggeredRequests: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 
 const separateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'separate_circuits',
 			rating: Rating.PARTIAL,
 			displayName: 'Requests for multiple addresses use separate proxies',
@@ -169,7 +169,7 @@ const separateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 
 const staggeredAndSeparateCircuits: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'staggered_and_separate_circuits',
 			rating: Rating.PASS,
 			icon: '\u{26d3}', // Broken chain
@@ -185,7 +185,7 @@ const staggeredAndSeparateCircuits: (typeof multiAddressCorrelation)['evaluate']
 
 const unsupported: (typeof multiAddressCorrelation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'unsupported',
 			rating: Rating.EXEMPT,
 			icon: '\u{1f4ce}', // Single paperclip

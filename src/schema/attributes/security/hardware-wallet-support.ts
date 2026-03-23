@@ -34,7 +34,7 @@ function noHardwareWalletSupport(
 	hardwareWalletSupport: HardwareWalletSupport,
 ): _Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_hardware_wallet_support',
 			rating: Rating.FAIL,
 			displayName: 'No hardware wallet support',
@@ -58,7 +58,7 @@ function indirectHardwareWalletSupport(
 	hardwareWalletSupport: HardwareWalletSupport,
 ): _Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'indirect_hardware_wallet_support',
 			rating: Rating.PARTIAL,
 			displayName: 'Indirect hardware wallet support',
@@ -90,7 +90,7 @@ function directHardwareWalletSupport(
 	hardwareWalletSupport: HardwareWalletSupport,
 ): _Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'direct_hardware_wallet_support',
 			rating: Rating.PASS,
 			displayName: 'Supports hardware wallets',

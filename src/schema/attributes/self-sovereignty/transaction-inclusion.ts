@@ -40,7 +40,7 @@ function transactionSubmissionEvaluation(
 ): Evaluation {
 	if (!isNonEmptyArray(supportAnyL2Transactions) && !isNonEmptyArray(supportForceWithdrawal)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_l2_transaction_inclusion_support',
 				rating: Rating.FAIL,
 				displayName: 'No L2 force-inclusion support',
@@ -62,7 +62,7 @@ function transactionSubmissionEvaluation(
 
 	if (supportsL1Broadcast === 'NO') {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'l2_transaction_inclusion_supported_but_no_l1',
 				rating: Rating.PARTIAL,
 				displayName: 'Intermediaries required for L1 transactions',
@@ -86,7 +86,7 @@ function transactionSubmissionEvaluation(
 
 	if (unsupportedL2s.length > 0) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: valueId,
 				rating: Rating.PARTIAL,
 				displayName: 'No force-withdrawal for some L2s',
@@ -107,7 +107,7 @@ function transactionSubmissionEvaluation(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: valueId,
 			rating: Rating.PASS,
 			displayName: 'Can force-withdraw from L2s',

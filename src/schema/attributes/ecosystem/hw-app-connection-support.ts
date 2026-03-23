@@ -64,7 +64,7 @@ function describeConnectionMethods(
 
 const noAppConnectionSupport: (typeof appConnectionSupport)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'no_app_connection',
 			rating: Rating.FAIL,
 			displayName: 'No app connection support',
@@ -80,7 +80,7 @@ const noAppConnectionSupport: (typeof appConnectionSupport)['evaluate'] = ctx =>
 
 const unverifiableAppConnectionSupport: (typeof appConnectionSupport)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'unverifiable_app_connection',
 			rating: Rating.PARTIAL,
 			displayName: 'Unverifiable app connection support',
@@ -101,7 +101,7 @@ function limitedVerifiableAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'limited_verifiable_app_connection',
 			rating: Rating.PARTIAL,
 			displayName: 'Limited verifiable app connection support',
@@ -123,7 +123,7 @@ function verifiableUniversalAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'verifiable_universal_app_connection',
 			rating: Rating.PASS,
 			displayName: 'Verifiable universal app connection support',
@@ -142,7 +142,7 @@ function restrictedAppConnectionSupport(
 	connectionDetails: Supported<WithRef<AppConnectionMethodDetails>>,
 ): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'restricted_app_connection',
 			rating: Rating.PARTIAL,
 			displayName: 'Restricted app connection support',
@@ -299,7 +299,7 @@ limiting its utility.
 		if (ctx.features.type !== WalletType.HARDWARE) {
 			// For software wallets:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'exempt_software_wallet',
 					rating: Rating.EXEMPT,
 					displayName: 'Only applicable for hardware wallets',

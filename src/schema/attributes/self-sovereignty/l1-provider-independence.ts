@@ -16,7 +16,7 @@ import { pickWorstRating, unrated } from '../common'
 
 const supportsSelfHostedNode: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'support_self_hosted_node',
 			rating: Rating.PASS,
 			icon: '\u{1f3e1}', // House with garden
@@ -32,7 +32,7 @@ const supportsSelfHostedNode: (typeof l1ProviderIndependence)['evaluate'] = ctx 
 
 const supportsSelfHostedNodeAfterRequests: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'self_hosted_node_after_requests',
 			rating: Rating.PARTIAL,
 			displayName: 'Partially supports self-hosted nodes',
@@ -55,7 +55,7 @@ function supportsSelfHostedNodeButCannotDoBasicOperations(
 	support: SelfHostedNodeL1BasicOperationsSupport,
 ): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'self_hosted_node_not_sufficient',
 			rating: Rating.FAIL,
 			displayName: 'Relies on non-Ethereum services',
@@ -84,7 +84,7 @@ function supportsSelfHostedNodeButCannotDoBasicOperations(
 
 const noSelfHostedNode: (typeof l1ProviderIndependence)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'no_self_hosted_node',
 			rating: Rating.FAIL,
 			icon: '\u{1f3da}', // Derelict house

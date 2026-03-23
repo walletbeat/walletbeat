@@ -71,7 +71,7 @@ function singleHardwareWalletManufacturerSupport(
 	hardwareWalletSupport: HardwareWalletSupport,
 ): _Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'single_hardware_wallet_support',
 			rating: Rating.FAIL,
 			displayName: 'Supports only one hardware wallet manufacturer',
@@ -99,7 +99,7 @@ function insufficientHardwareWalletManufacturerSupport(
 	hardwareWalletSupport: HardwareWalletSupport,
 ): _Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'insufficient_hardware_wallet_interoperability',
 			rating: Rating.PARTIAL,
 			displayName: 'Limited hardware wallet interoperability',
@@ -123,7 +123,7 @@ function comprehensiveHardwareWalletSupport(
 	hardwareWalletSupport: HardwareWalletSupport,
 ): _Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'comprehensive_hardware_wallet_interoperability',
 			rating: Rating.PASS,
 			displayName: 'Interoperable hardware wallet support',

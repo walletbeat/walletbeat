@@ -51,7 +51,7 @@ function browserIntegrationSupport(
 
 	if (supported.length === 0) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_support',
 				rating: Rating.FAIL,
 				displayName: 'No browser integration',
@@ -72,7 +72,7 @@ function browserIntegrationSupport(
 	const rating = unsupported.length === 0 ? Rating.PASS : Rating.PARTIAL
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `support_${supported.join('_')}`,
 			rating,
 			displayName:

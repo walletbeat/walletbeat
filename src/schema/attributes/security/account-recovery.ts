@@ -67,7 +67,7 @@ function evaluateGuardianRecoveryPolicy(
 
 	if (!isNonEmptyArray(nonRecoverableOutcomes)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'guardian_policy_recoverable',
 				rating: Rating.PASS,
 				displayName: 'Account recoverable in all likely scenarios',
@@ -86,7 +86,7 @@ function evaluateGuardianRecoveryPolicy(
 
 	if (nonRecoverableOutcomes.length === 1) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'guardian_policy_nonrecoverable_specific_scenario',
 				rating: Rating.FAIL,
 				displayName: 'Account may be non-recoverable',
@@ -103,7 +103,7 @@ function evaluateGuardianRecoveryPolicy(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'guardian_policy_nonrecoverable_multiple_scenarios',
 			rating: Rating.FAIL,
 			displayName: 'Account may be non-recoverable',
@@ -132,7 +132,7 @@ function evaluateAccountRecovery(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_guardian_recovery',
 			displayName: 'No account recovery mechanism',
 			rating: Rating.FAIL,

@@ -25,7 +25,7 @@ import { pickWorstRating, unrated } from '../common'
 
 function open(ctx: EvaluationContext, license: FOSSLicense): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: license,
 			rating: Rating.PASS,
 			icon: '\u{1f496}', // Sparkling heart
@@ -44,7 +44,7 @@ function open(ctx: EvaluationContext, license: FOSSLicense): Evaluation {
 
 function openInTheFuture(ctx: EvaluationContext, license: FutureFOSSLicense): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: license,
 			rating: Rating.PARTIAL,
 			icon: '❤️‍🩹',
@@ -65,7 +65,7 @@ function openInTheFuture(ctx: EvaluationContext, license: FutureFOSSLicense): Ev
 
 function mixedIncludingProprietary(ctx: EvaluationContext, fossLicense: FOSSLicense): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'mixed_including_proprietary',
 			rating: Rating.FAIL,
 			icon: '💔', // Broken heart
@@ -87,7 +87,7 @@ function mixedIncludingProprietary(ctx: EvaluationContext, fossLicense: FOSSLice
 
 const proprietary: (typeof openSource)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'proprietary',
 			rating: Rating.FAIL,
 			icon: '💔', // Broken heart
@@ -105,7 +105,7 @@ const proprietary: (typeof openSource)['evaluate'] = ctx =>
 
 const unlicensed: (typeof openSource)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'unlicensed',
 			rating: Rating.FAIL,
 			icon: '❔',

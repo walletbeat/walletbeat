@@ -237,7 +237,7 @@
 									attribute,
 								}))
 								.filter(({ evalAttr }) => (
-									evalAttr && evalAttr.evaluation.value.rating !== Rating.EXEMPT
+									evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT
 								))
 								.map(({ attribute }) => ({
 									'@type': 'Question',
@@ -547,7 +547,7 @@
 			attribute,
 			evalAttr: evalGroup[attrId] as EvaluatedAttribute<any> | undefined,
 		}))
-		.filter(({ evalAttr }) => evalAttr && evalAttr.evaluation.value.rating !== Rating.EXEMPT)
+		.filter(({ evalAttr }) => evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT)
 		.map(({ attribute, evalAttr }) => ({
 			attribute,
 			evalAttr: evalAttr!,
@@ -625,9 +625,9 @@
 									attributes
 										.map(({ attribute, evalAttr }) => ({
 											id: attribute.id,
-											color: ratingToColor(evalAttr.evaluation.value.rating),
+											color: ratingToColor(evalAttr.evaluation.outcome.rating),
 											weight: attrGroup.attributeWeights[attribute.id],
-											arcLabel: evalAttr.evaluation.value.icon ?? evalAttr.attribute.icon,
+											arcLabel: evalAttr.evaluation.outcome.icon ?? evalAttr.attribute.icon,
 											titleText: formatAttributeTitleText(evalAttr),
 											href: `#${slugifyCamelCase(attribute.id)}`,
 										}))
@@ -669,7 +669,7 @@
 										<a
 											data-link="camouflaged"
 											href={attributeUrl}
-											style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
+											style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
 											data-card="secondary padding-3"
 											data-row="gap-2"
 											data-highlighted={highlightedAttributeId === attribute.id ? '' : undefined}
@@ -683,8 +683,8 @@
 											<span data-row-item="flexible">{attribute.displayName}</span>
 											<data
 												data-badge="small"
-												value={evalAttr.evaluation.value.rating}
-											>{evalAttr.evaluation.value.rating}</data>
+												value={evalAttr.evaluation.outcome.rating}
+											>{evalAttr.evaluation.outcome.rating}</data>
 										</a>
 									</li>
 								{/each}
@@ -740,8 +740,8 @@
 		class="attribute"
 		id={slugifyCamelCase(attribute.id)}
 		aria-label={attribute.displayName}
-		style:--accent={ratingToColor(evalAttr.evaluation.value.rating)}
-		data-rating={evalAttr.evaluation.value.rating.toLowerCase()}
+		style:--accent={ratingToColor(evalAttr.evaluation.outcome.rating)}
+		data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 		data-icon={attribute.icon}
 	>
 		<details
@@ -864,7 +864,7 @@
 					</div>
 
 					{#if true}
-						{@const verifiability = evalAttr.evaluation.value.verifiability}
+						{@const verifiability = evalAttr.evaluation.outcome.verifiability}
 						{#if verifiability === Verifiability.UNVERIFIABLE}
 							<data
 								data-row-item="wrap-end"
@@ -884,19 +884,19 @@
 					<data
 						data-row-item="wrap-end"
 						data-badge="medium"
-						value={evalAttr.evaluation.value.rating}
-					>{evalAttr.evaluation.value.rating}</data>
+						value={evalAttr.evaluation.outcome.rating}
+					>{evalAttr.evaluation.outcome.rating}</data>
 				</header>
 			</summary>
 
 			<ul
 				class="attribute-rating-details"
-				data-rating={evalAttr.evaluation.value.rating.toLowerCase()}
+				data-rating={evalAttr.evaluation.outcome.rating.toLowerCase()}
 				data-card="padding-5"
 			>
 				<li
 					data-list-item="gap-3"
-					data-list-item-marker={ratingIcons[evalAttr.evaluation.value.rating as Rating]}
+					data-list-item-marker={ratingIcons[evalAttr.evaluation.outcome.rating as Rating]}
 				>
 					{#if isTypographicContent(evalAttr.evaluation.details)}
 						<Typography
@@ -907,7 +907,7 @@
 					{:else if evalAttr.evaluation.details}
 						{@const componentName = evalAttr.evaluation.details.component.component}
 						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
-						{@const outcome = evalAttr.evaluation.value}
+						{@const outcome = evalAttr.evaluation.outcome}
 						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
 
 						<div data-column>
@@ -985,8 +985,8 @@
 				/>
 			{/if}
 
-			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.value && typeof evalAttr.evaluation.value === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.value && Array.isArray(evalAttr.evaluation.value.supportedHardwareWallets) && evalAttr.evaluation.value.supportedHardwareWallets.length > 0}
-				{@const supportedBrands = evalAttr.evaluation.value.supportedHardwareWallets}
+			{#if attribute.id === 'hardwareWalletSupport' && evalAttr.evaluation.outcome && typeof evalAttr.evaluation.outcome === 'object' && 'supportedHardwareWallets' in evalAttr.evaluation.outcome && Array.isArray(evalAttr.evaluation.outcome.supportedHardwareWallets) && evalAttr.evaluation.outcome.supportedHardwareWallets.length > 0}
+				{@const supportedBrands = evalAttr.evaluation.outcome.supportedHardwareWallets}
 
 				{@const supportedModels =
 					allHardwareModels.filter(m => (
@@ -1014,7 +1014,7 @@
 				<details data-card="padding-2 secondary radius-4" data-column="gap-0">
 					<summary>
 						<h4>
-							{evalAttr.evaluation.value.rating === Rating.PASS || evalAttr.evaluation.value.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
+							{evalAttr.evaluation.outcome.rating === Rating.PASS || evalAttr.evaluation.outcome.rating === Rating.UNRATED ? 'Why does this matter?' : 'Why should I care?'}
 						</h4>
 					</summary>
 

@@ -184,7 +184,7 @@ export const userSafety: Attribute<UserSafetyMetadata> = {
 				: ''
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'user_safety',
 				rating,
 				displayName: 'User Safety',

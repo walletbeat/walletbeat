@@ -125,7 +125,7 @@ export const firmware: Attribute<FirmwareMetadata> = {
 		}
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'firmware',
 				rating,
 				displayName: 'Firmware',

@@ -89,7 +89,7 @@
 								Object.entries(attrGroup.attributes)
 									.filter(([attributeId, _]) => (
 										wallets.find(w => w.variants[Variant.BROWSER] || w.variants[Variant.DESKTOP] || w.variants[Variant.MOBILE])
-											?.overall[attrGroup.id]?.[attributeId]?.evaluation?.value?.rating !== Rating.EXEMPT
+											?.overall[attrGroup.id]?.[attributeId]?.evaluation?.outcome?.rating !== Rating.EXEMPT
 									))
 							)
 						),
@@ -210,7 +210,7 @@
 						return (
 							walletsWithAttribute.length > 0 &&
 							walletsWithAttribute.every(wallet =>
-								wallet.overall[attrGroup.id]?.[attributeId]?.evaluation?.value?.rating === Rating.EXEMPT
+								wallet.overall[attrGroup.id]?.[attributeId]?.evaluation?.outcome?.rating === Rating.EXEMPT
 							)
 						)
 					})
@@ -518,7 +518,7 @@
 											name: attribute.displayName,
 											value: wallet => {
 												const attribute = wallet.overall[attrGroup.id]?.[attributeId]
-												return attribute?.evaluation?.value?.rating || undefined
+												return attribute?.evaluation?.outcome?.rating || undefined
 											},
 											sort: {
 												defaultDirection: SortDirection.Descending,
@@ -1005,7 +1005,7 @@
 													evaluatedAttributesEntries(evalGroup)
 														.filter(([attributeId, attribute]) => (
 															(
-																attribute?.evaluation?.value?.rating !== Rating.EXEMPT
+																attribute?.evaluation?.outcome?.rating !== Rating.EXEMPT
 																|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
 															)
 															&& (
@@ -1015,11 +1015,11 @@
 														))
 														.map(([attributeId, attribute]) => ({
 															id: `attrGroup_${attrGroup.id}__attr_${attributeId}`,
-															color: ratingToColor(attribute.evaluation.value.rating),
+															color: ratingToColor(attribute.evaluation.outcome.rating),
 															weight: attrGroup.attributeWeights[attributeId],
-															arcLabel: attribute.evaluation.value.icon ?? attribute.attribute.icon,
+															arcLabel: attribute.evaluation.outcome.icon ?? attribute.attribute.icon,
 															titleText: formatAttributeTitleText(attribute),
-															...attribute.evaluation.value.rating === Rating.EXEMPT && {
+															...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 																opacity: 0.33,
 															},
 														}))
@@ -1155,7 +1155,7 @@
 							evaluatedAttributesEntries(evalGroup)
 								.filter(([attributeId, attribute]) => (
 									(
-										attribute?.evaluation?.value?.rating !== Rating.EXEMPT
+										attribute?.evaluation?.outcome?.rating !== Rating.EXEMPT
 										|| !attributesExemptForAllWallets.has(`${attrGroup.id}.${attributeId}`)
 									)
 									&& (
@@ -1210,7 +1210,7 @@
 									: nonEmptyMap(
 										evalEntries,
 										([attributeId, attribute]) => {
-											const icon = attribute.evaluation.value.icon ?? attribute.attribute.icon
+											const icon = attribute.evaluation.outcome.icon ?? attribute.attribute.icon
 
 											const tooltipSuffix = (() => {
 												const variant = selectedVariant
@@ -1232,11 +1232,11 @@
 
 											return {
 												id: `attrGroup_${attrGroup.id}__attr_${attributeId.toString()}`,
-												color: ratingToColor(attribute.evaluation.value.rating),
+												color: ratingToColor(attribute.evaluation.outcome.rating),
 												weight: attrGroup.attributeWeights[attributeId],
 												arcLabel: icon,
 												titleText: formatAttributeTitleText(attribute, tooltipSuffix),
-												...attribute.evaluation.value.rating === Rating.EXEMPT && {
+												...attribute.evaluation.outcome.rating === Rating.EXEMPT && {
 													opacity: 0.33,
 												},
 											}
@@ -1361,7 +1361,7 @@
 											outerRadiusFraction: 1,
 											innerRadiusFraction: 0.3,
 											offset: (
-												attribute.evaluation.value.rating !== Rating.EXEMPT ?
+												attribute.evaluation.outcome.rating !== Rating.EXEMPT ?
 													20
 												:
 													0
@@ -1372,20 +1372,20 @@
 									]
 								}
 								padding={
-									attribute.evaluation.value.rating !== Rating.EXEMPT ?
+									attribute.evaluation.outcome.rating !== Rating.EXEMPT ?
 										4
 									:
 										24
 								}
 
-								centerLabel={attribute.evaluation.value.rating}
+								centerLabel={attribute.evaluation.outcome.rating}
 
 								slices={
-									attribute.evaluation.value.rating !== Rating.EXEMPT ?
+									attribute.evaluation.outcome.rating !== Rating.EXEMPT ?
 										[
 											{
 												id: `attrGroup_${attributeGroupId}__attr_${attributeId}`,
-												color: ratingToColor(attribute.evaluation.value.rating),
+												color: ratingToColor(attribute.evaluation.outcome.rating),
 												weight: 1,
 												arcLabel: attribute.icon,
 												titleText: formatAttributeTitleText(attribute),

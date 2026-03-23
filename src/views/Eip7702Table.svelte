@@ -191,7 +191,7 @@
 				{
 					id: 'batching',
 					name: 'Batching',
-					value: wallet => wallet.overall.ecosystem.transactionBatching?.evaluation?.value?.rating ?? undefined,
+					value: wallet => wallet.overall.ecosystem.transactionBatching?.evaluation?.outcome?.rating ?? undefined,
 				},
 			]}
 		>
@@ -332,7 +332,7 @@
 					{/if}
 
 				{:else if column.id === 'batching'}
-					{@const batchingRating = wallet.overall.ecosystem.transactionBatching?.evaluation?.value?.rating}
+					{@const batchingRating = wallet.overall.ecosystem.transactionBatching?.evaluation?.outcome?.rating}
 
 					{#if batchingRating === Rating.PASS}
 						✅

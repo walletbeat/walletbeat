@@ -33,7 +33,7 @@ function rateAppIsolation(
 ): Evaluation {
 	if (!isSupported(appIsolation.createInAppConnectionFlow)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_account_creation_in_connection_flow',
 				displayName: 'No per-app account option',
 				rating: Rating.FAIL,
@@ -64,7 +64,7 @@ function rateAppIsolation(
 
 	if (!isSupported(appIsolation.useAppSpecificLastConnectedAddresses)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_reuse_last_connection_addresses',
 				displayName: 'No per-app account persistence',
 				rating: Rating.FAIL,
@@ -121,7 +121,7 @@ function rateAppIsolation(
 	switch (commonExposedAccountSet.defaultBehavior) {
 		case ExposedAccountsBehavior.ACTIVE_ACCOUNT_ONLY:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'active_account_only',
 					displayName: 'Encourages account reuse across apps',
 					rating: Rating.FAIL,
@@ -148,7 +148,7 @@ function rateAppIsolation(
 			})
 		case ExposedAccountsBehavior.ALL_ACCOUNTS:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'all_accounts_exposed',
 					displayName: 'All accounts exposed to all apps',
 					rating: Rating.FAIL,
@@ -175,7 +175,7 @@ function rateAppIsolation(
 			})
 		case ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'app_specific_account',
 					displayName: 'Per-app account',
 					rating: Rating.PASS,
@@ -192,7 +192,7 @@ function rateAppIsolation(
 			})
 		case ExposedAccountsBehavior.NO_DEFAULT:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'no_default_behavior',
 					displayName: 'Supports per-app accounts',
 					rating: Rating.PARTIAL,

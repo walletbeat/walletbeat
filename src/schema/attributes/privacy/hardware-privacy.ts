@@ -95,7 +95,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 		const rating = passCount === 3 ? Rating.PASS : passCount >= 1 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'hardware_privacy',
 				rating,
 				displayName: 'Hardware Privacy',

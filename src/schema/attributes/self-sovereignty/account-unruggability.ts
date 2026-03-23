@@ -71,7 +71,7 @@ function evaluateGuardianUnruggabilityPolicy(
 
 	if (!isNonEmptyArray(takeOverPossibleOutcomes)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'guardian_policy_unruggable',
 				rating: Rating.PASS,
 				displayName: 'Account unruggable in all likely scenarios',
@@ -90,7 +90,7 @@ function evaluateGuardianUnruggabilityPolicy(
 
 	if (takeOverPossibleOutcomes.length === 1) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'guardian_policy_ruggable_specific_scenario',
 				rating: Rating.FAIL,
 				displayName: 'Account may be ruggable',
@@ -107,7 +107,7 @@ function evaluateGuardianUnruggabilityPolicy(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'guardian_policy_ruggable_multiple_scenarios',
 			rating: Rating.FAIL,
 			displayName: 'Account may be ruggable',
@@ -136,7 +136,7 @@ function evaluateAccountUnruggability(
 			break // OK
 		case KeyGenerationLocation.FULLY_OFF_USER_DEVICE:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'key_off_device',
 					displayName: 'Key generated off-device',
 					rating: Rating.FAIL,
@@ -168,7 +168,7 @@ function evaluateAccountUnruggability(
 			break // OK
 		case MultiPartyKeyReconstruction.MULTIPARTY_COMPUTED_WITHOUT_USER_DEVICE:
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'multiparty_reconstructed_without_user_device',
 					displayName: 'MPC key reconstructed without user',
 					rating: Rating.FAIL,
@@ -201,7 +201,7 @@ function evaluateAccountUnruggability(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'pass_no_guardian_recovery',
 			displayName: 'Unruggable account',
 			rating: Rating.PASS,

@@ -45,7 +45,7 @@ function evaluate(
 ): Evaluation {
 	if (!isSupported(control)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'not_supported',
 				rating: Rating.FAIL,
 				displayName: 'No approval management',
@@ -77,7 +77,7 @@ function evaluate(
 
 	if (worst === SpendingApprovalsControl.CAN_INSPECT_AND_REVOKE) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'can_inspect_and_revoke',
 				rating: Rating.PASS,
 				displayName: 'Can inspect and revoke approvals',
@@ -93,7 +93,7 @@ function evaluate(
 
 	if (worst === SpendingApprovalsControl.CAN_INSPECT_BUT_NOT_REVOKE) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'can_inspect_not_revoke',
 				rating: Rating.PARTIAL,
 				displayName: 'Can inspect but not revoke approvals',
@@ -113,7 +113,7 @@ function evaluate(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'cannot_inspect_or_revoke',
 			rating: Rating.FAIL,
 			displayName: 'No approval management',

@@ -23,7 +23,7 @@ import { pickWorstRating, unrated } from '../common'
 
 const supportsErc4337AndEip7702: (typeof accountAbstraction)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'erc4337_and_eip7702_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
@@ -38,7 +38,7 @@ const supportsErc4337AndEip7702: (typeof accountAbstraction)['evaluate'] = ctx =
 
 const supportsErc4337: (typeof accountAbstraction)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'erc4337_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
@@ -51,7 +51,7 @@ const supportsErc4337: (typeof accountAbstraction)['evaluate'] = ctx =>
 
 const supportsEip7702: (typeof accountAbstraction)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'eip7702_ready',
 			rating: Rating.PASS,
 			displayName: 'Account Abstraction ready',
@@ -64,7 +64,7 @@ const supportsEip7702: (typeof accountAbstraction)['evaluate'] = ctx =>
 
 const supportsEoaAndMpc: (typeof accountAbstraction)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'eoa_and_mpc_only',
 			rating: Rating.FAIL,
 			displayName: 'EOA & MPC only',
@@ -85,7 +85,7 @@ const supportsEoaAndMpc: (typeof accountAbstraction)['evaluate'] = ctx =>
 
 const supportsMpcOnly: (typeof accountAbstraction)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'mpc_only',
 			rating: Rating.FAIL,
 			displayName: 'MPC only',
@@ -106,7 +106,7 @@ const supportsMpcOnly: (typeof accountAbstraction)['evaluate'] = ctx =>
 
 const supportsRawEoaOnly: (typeof accountAbstraction)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'eoa_only',
 			rating: Rating.FAIL,
 			displayName: 'EOA only',

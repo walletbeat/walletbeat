@@ -33,7 +33,7 @@ function transparent(
 	monetization: Monetization,
 ): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `transparent_${id.toLocaleLowerCase()}`,
 			rating: Rating.PASS,
 			displayName: `Transparent funding (${sourceName})`,
@@ -51,7 +51,7 @@ function extractive(
 	monetization: Monetization,
 ): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `extractive_${id.toLocaleLowerCase()}`,
 			rating: Rating.PARTIAL,
 			icon: '\u{1f911}', // Money mouth face
@@ -71,7 +71,7 @@ function extractive(
 /** Wallet has no funding. */
 const noFunding: (typeof funding)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'noFunding',
 			rating: Rating.FAIL,
 			displayName: 'No funding source',
@@ -88,7 +88,7 @@ const noFunding: (typeof funding)['evaluate'] = ctx =>
 /** Funding is not transparent. */
 const unclear: (typeof funding)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'unclear',
 			rating: Rating.FAIL,
 			displayName: 'Unclear funding source',

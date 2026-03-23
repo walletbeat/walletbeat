@@ -410,7 +410,7 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 						return
 					}
 
-					if (currentVariantEval.evaluation.value.rating === Rating.EXEMPT) {
+					if (currentVariantEval.evaluation.outcome.rating === Rating.EXEMPT) {
 						variantSpecificityMap.set(
 							currentVariantEval.attribute.id,
 							VariantSpecificity.EXEMPT_FOR_THIS_VARIANT,
@@ -428,7 +428,7 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 						return
 					}
 
-					const currentVariantEvalId = currentVariantEval.evaluation.value.id
+					const currentVariantEvalId = currentVariantEval.evaluation.outcome.id
 					let allOthersExempt = true
 					let foundDifferentValue = false
 					let foundSameValue = false
@@ -446,13 +446,13 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
 							continue
 						}
 
-						if (versusEval.evaluation.value.rating === Rating.EXEMPT) {
+						if (versusEval.evaluation.outcome.rating === Rating.EXEMPT) {
 							continue
 						}
 
 						allOthersExempt = false
 
-						if (versusEval.evaluation.value.id === currentVariantEvalId) {
+						if (versusEval.evaluation.outcome.id === currentVariantEvalId) {
 							foundSameValue = true
 						} else {
 							foundDifferentValue = true

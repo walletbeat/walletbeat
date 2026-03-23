@@ -111,7 +111,7 @@ function linkable(
 	})()
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `address_and_${worstLeak.info}`,
 			rating,
 			displayName: `Wallet address linkable to ${userInfoName(worstLeak.info).short}`,

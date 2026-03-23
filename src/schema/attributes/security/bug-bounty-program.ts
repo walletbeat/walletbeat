@@ -101,7 +101,7 @@ function getRewardDetailsDescription(support: BugBountyProgramSupport): string {
 
 const noBugBountyProgram: (typeof bugBountyProgram)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'no_bug_bounty_program',
 			rating: Rating.FAIL,
 			displayName: 'No bug bounty program',
@@ -160,7 +160,7 @@ function bugBountyAvailable(ctx: EvaluationContext, support: BugBountyProgramSup
 			: 'No bug bounty program has been announced or is publicly available.'
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: isActive ? 'bug_bounty_available' : 'bug_bounty_not_available',
 			rating: rating,
 			displayName: isActive ? 'Bug bounty program available' : 'Bug bounty program inactive',

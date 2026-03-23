@@ -84,11 +84,11 @@
 	class="attribute-summary"
 	data-card={isInTooltip ? 'radius p-sm border-accent' : undefined}
 	data-column
-	style:--accent={ratingToColor(attribute.evaluation.value.rating)}
+	style:--accent={ratingToColor(attribute.evaluation.outcome.rating)}
 >
 	<header data-row="center gap-3 wrap">
 		<h4 data-row="gap-2">
-			<span>{attribute.evaluation.value.icon ?? attribute.attribute.icon}</span>
+			<span>{attribute.evaluation.outcome.icon ?? attribute.attribute.icon}</span>
 			{attribute.attribute.displayName}
 		</h4>
 
@@ -122,17 +122,17 @@
 			{#if summaryType === WalletAttributeSummaryType.Rating}
 				<data
 					data-badge="small"
-					value={attribute.evaluation.value.rating}
-				>{attribute.evaluation.value.rating}</data>
+					value={attribute.evaluation.outcome.rating}
+				>{attribute.evaluation.outcome.rating}</data>
 			{/if}
 		</div>
 	</header>
 
 	<p>
-		{ratingIcons[attribute.evaluation.value.rating]}
+		{ratingIcons[attribute.evaluation.outcome.rating]}
 
 		<Typography
-			content={attribute.evaluation.value.shortExplanation}
+			content={attribute.evaluation.outcome.shortExplanation}
 			strings={getWalletEvalStrings(wallet)}
 		/>
 

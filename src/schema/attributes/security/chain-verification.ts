@@ -31,7 +31,7 @@ function supportsChainVerification(
 	lightClients: NonEmptyArray<EthereumL1LightClient>,
 ): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `chain_verification_l1_${lightClients.join('_')}`,
 			rating: Rating.PASS,
 			displayName: 'L1 chain state verification',
@@ -60,7 +60,7 @@ function noChainVerification(
 	})()
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_chain_verification',
 			rating: Rating.FAIL,
 			icon: '\u{1f648}', // See-no-evil monkey

@@ -119,24 +119,24 @@ function mergeEvaluations(
 		return eval2
 	}
 
-	if (eval1.value.id === eval2.value.id) {
+	if (eval1.outcome.id === eval2.outcome.id) {
 		throw new Error(
-			`Cannot disambiguate between ${JSON.stringify(eval1.value)} and ${JSON.stringify(eval2.value)} (both have the same ID)`,
+			`Cannot disambiguate between ${JSON.stringify(eval1.outcome)} and ${JSON.stringify(eval2.outcome)} (both have the same ID)`,
 		)
 	}
 
 	const worse =
-		pickWorstRating([ctx.build(eval1), ctx.build(eval2)]).value.id === eval1.value.id
+		pickWorstRating([ctx.build(eval1), ctx.build(eval2)]).outcome.id === eval1.outcome.id
 			? eval1
 			: eval2
-	const better = worse.value.id === eval1.value.id ? eval2 : eval1
+	const better = worse.outcome.id === eval1.outcome.id ? eval2 : eval1
 	const mergedMap = new Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>()
 
-	for (const [key, value] of worse.value.perTechnology) {
+	for (const [key, value] of worse.outcome.perTechnology) {
 		mergedMap.set(key, value)
 	}
 
-	for (const [key, value] of better.value.perTechnology) {
+	for (const [key, value] of better.outcome.perTechnology) {
 		if (!mergedMap.has(key)) {
 			mergedMap.set(key, value)
 		}
@@ -176,14 +176,14 @@ function mergeEvaluations(
 				: worse.details
 
 	return {
-		value: {
-			id: worse.value.id,
-			defaultFungibleTokenTransferMode: worse.value.defaultFungibleTokenTransferMode,
-			displayName: worse.value.displayName,
-			rating: worse.value.rating,
-			shortExplanation: worse.value.shortExplanation,
-			icon: worse.value.icon,
-			score: worse.value.score,
+		outcome: {
+			id: worse.outcome.id,
+			defaultFungibleTokenTransferMode: worse.outcome.defaultFungibleTokenTransferMode,
+			displayName: worse.outcome.displayName,
+			rating: worse.outcome.rating,
+			shortExplanation: worse.outcome.shortExplanation,
+			icon: worse.outcome.icon,
+			score: worse.outcome.score,
 			perTechnology: mergedMap,
 		},
 		details,
@@ -194,7 +194,7 @@ function mergeEvaluations(
 
 const noPrivateTransfers: (typeof privateTransfers)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'no_transfer_privacy',
 			rating: Rating.FAIL,
 			displayName: 'Private token transfers are not supported',
@@ -242,7 +242,7 @@ const noPrivateTransfers: (typeof privateTransfers)['evaluate'] = ctx =>
 
 const nonDefault: (typeof privateTransfers)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'non_default_transfer_privacy',
 			rating: Rating.FAIL,
 			displayName: 'Private token transfers are not the default',
@@ -589,7 +589,7 @@ function rateStealthAddressSupport(
 			throw new Error('Unreachable')
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'not_private_stealth_addresses',
 					rating: Rating.FAIL,
 					displayName: 'Non-private ERC-5564 stealth address support',
@@ -604,7 +604,7 @@ function rateStealthAddressSupport(
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'chain_private_stealth_addresses',
 					rating: Rating.PARTIAL,
 					displayName: 'ERC-5564 stealth addresses reliant on trusted provider',
@@ -619,7 +619,7 @@ function rateStealthAddressSupport(
 			}
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'fully_private_stealth_addresses',
 					rating: Rating.PASS,
 					icon: '\u{1f48c}', // Love letter
@@ -839,7 +839,7 @@ function rateTornadoCashNovaSupport(
 			throw new Error('Unreachable')
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'non_private_tornado_cash_nova',
 					rating: Rating.FAIL,
 					displayName: 'Non-private Tornado Cash Nova integration',
@@ -854,7 +854,7 @@ function rateTornadoCashNovaSupport(
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'chain_private_tornado_cash_nova',
 					rating: Rating.PARTIAL,
 					displayName: 'Tornado Cash Nova integration relying on external provider',
@@ -870,7 +870,7 @@ function rateTornadoCashNovaSupport(
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
 				return {
-					value: {
+					outcome: {
 						id: 'partial_tornado_cash_nova_integration',
 						rating: Rating.PARTIAL,
 						displayName: 'Imperfect Tornado Cash Nova integration',
@@ -886,7 +886,7 @@ function rateTornadoCashNovaSupport(
 			}
 
 			return {
-				value: {
+				outcome: {
 					id: 'full_tornado_cash_nova_integration',
 					rating: Rating.PASS,
 					icon: '\u{1f48c}', // Love letter
@@ -1182,7 +1182,7 @@ function ratePrivacyPoolsSupport(
 	switch (worstLevel) {
 		case PrivateTransfersPrivacyLevel.NOT_FULLY_IMPLEMENTED:
 			return {
-				value: {
+				outcome: {
 					id: 'incomplete_private_privacy_pools',
 					rating: Rating.FAIL,
 					displayName: 'Incomplete Privacy Pools integration',
@@ -1197,7 +1197,7 @@ function ratePrivacyPoolsSupport(
 			}
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'non_private_privacy_pools',
 					rating: Rating.FAIL,
 					displayName: 'Non-private Privacy Pools integration',
@@ -1212,7 +1212,7 @@ function ratePrivacyPoolsSupport(
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'chain_private_privacy_pools',
 					rating: Rating.PARTIAL,
 					displayName: 'Privacy Pools integration relying on external provider',
@@ -1228,7 +1228,7 @@ function ratePrivacyPoolsSupport(
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
 				return {
-					value: {
+					outcome: {
 						id: 'partial_privacy_pools_integration',
 						rating: Rating.PARTIAL,
 						displayName: 'Imperfect Privacy Pools integration',
@@ -1244,7 +1244,7 @@ function ratePrivacyPoolsSupport(
 			}
 
 			return {
-				value: {
+				outcome: {
 					id: 'full_privacy_pools_integration',
 					rating: Rating.PASS,
 					icon: '\u{1f48c}', // Love letter
@@ -1586,7 +1586,7 @@ function rateRailgunSupport(
 	switch (worstLevel) {
 		case PrivateTransfersPrivacyLevel.NOT_FULLY_IMPLEMENTED:
 			return {
-				value: {
+				outcome: {
 					id: 'incomplete_railgun',
 					rating: Rating.FAIL,
 					displayName: 'Incomplete Railgun integration',
@@ -1601,7 +1601,7 @@ function rateRailgunSupport(
 			}
 		case PrivateTransfersPrivacyLevel.NOT_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'non_private_railgun',
 					rating: Rating.FAIL,
 					displayName: 'Non-private Railgun integration',
@@ -1616,7 +1616,7 @@ function rateRailgunSupport(
 			}
 		case PrivateTransfersPrivacyLevel.CHAIN_DATA_PRIVATE:
 			return {
-				value: {
+				outcome: {
 					id: 'chain_private_railgun',
 					rating: Rating.PARTIAL,
 					displayName: 'Railgun integration relying on external provider',
@@ -1632,7 +1632,7 @@ function rateRailgunSupport(
 		case PrivateTransfersPrivacyLevel.FULLY_PRIVATE:
 			if (howToImprove !== undefined) {
 				return {
-					value: {
+					outcome: {
 						id: 'partial_railgun_integration',
 						rating: Rating.PARTIAL,
 						displayName: 'Imperfect Railgun integration',
@@ -1648,7 +1648,7 @@ function rateRailgunSupport(
 			}
 
 			return {
-				value: {
+				outcome: {
 					id: 'full_railgun_integration',
 					rating: Rating.PASS,
 					icon: '\u{1f48c}', // Love letter
@@ -2018,7 +2018,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 			)
 		}
 
-		if (atLeastOneTechnologySupported && evaluation.value.perTechnology.size === 0) {
+		if (atLeastOneTechnologySupported && evaluation.outcome.perTechnology.size === 0) {
 			throw new Error(
 				'Private transfer evaluation perTechnology map empty despite supporting some form of private transfer',
 			)
@@ -2028,7 +2028,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 
 		if (privateTransferDetails !== null) {
 			// Sanity check that the set of keys are consistent.
-			for (const [key] of evaluation.value.perTechnology) {
+			for (const [key] of evaluation.outcome.perTechnology) {
 				if (!privateTransferDetails.privateTransferDetails.has(key)) {
 					throw new Error(
 						`Private transfer evaluation details does not include expected key ${key}`,
@@ -2037,7 +2037,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 			}
 
 			for (const [key] of privateTransferDetails.privateTransferDetails) {
-				if (!evaluation.value.perTechnology.has(key)) {
+				if (!evaluation.outcome.perTechnology.has(key)) {
 					throw new Error(`Private transfer value does not include expected key ${key}`)
 				}
 			}
@@ -2049,8 +2049,8 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 
 		return ctx.build({
 			...evaluation,
-			value: {
-				...evaluation.value,
+			outcome: {
+				...evaluation.outcome,
 				defaultFungibleTokenTransferMode:
 					ctx.features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode,
 			},

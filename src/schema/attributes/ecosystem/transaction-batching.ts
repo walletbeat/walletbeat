@@ -42,7 +42,7 @@ function evaluateTransactionBatching(
 		!isSupported<AccountType4337>(accountSupport.rawErc4337)
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_smart_account_support',
 				displayName: 'No transaction batching support',
 				rating: Rating.FAIL,
@@ -72,7 +72,7 @@ function evaluateTransactionBatching(
 
 	if (!isSupported<WalletCallIntegration>(walletCall)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_wallet_call_support',
 				displayName: 'No transaction batching support',
 				rating: Rating.FAIL,
@@ -93,7 +93,7 @@ function evaluateTransactionBatching(
 
 	if (!isSupported<Support>(walletCall.atomicMultiTransactions)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_atomic_bundle_support',
 				displayName: 'Non-atomic transaction batching support',
 				rating: Rating.PARTIAL,
@@ -122,7 +122,7 @@ function evaluateTransactionBatching(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'full_wallet_call_support',
 			displayName: 'Full transaction batching support',
 			rating: Rating.PASS,

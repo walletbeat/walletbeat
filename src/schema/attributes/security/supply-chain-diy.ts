@@ -103,7 +103,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 		const rating = passCount === 2 ? Rating.PASS : passCount === 1 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'supply_chain_diy',
 				rating,
 				displayName: 'Supply Chain DIY',

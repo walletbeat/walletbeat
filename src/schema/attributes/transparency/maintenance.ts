@@ -101,7 +101,7 @@ export const maintenance: Attribute<MaintenanceMetadata> = {
 		const rating = passCount >= 4 ? Rating.PASS : passCount >= 2 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'maintenance',
 				rating,
 				displayName: 'Maintenance',

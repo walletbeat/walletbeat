@@ -397,9 +397,9 @@ export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = {}> {
  */
 export interface Evaluation<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	/**
-	 * The value representing how well the wallet fulfills the attribute.
+	 * The outcome representing how well the wallet fulfills the attribute.
 	 */
-	value: Outcome<_OutcomeMetadata>
+	outcome: Outcome<_OutcomeMetadata>
 
 	/**
 	 * A long, human-readable explanation of this evaluation.
@@ -439,7 +439,7 @@ export interface Evaluation<_OutcomeMetadata extends OutcomeMetadata = {}> {
  */
 export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata = {}> =
 	Evaluation<_OutcomeMetadata> & {
-		value: Evaluation<_OutcomeMetadata>['value'] & {
+		outcome: Evaluation<_OutcomeMetadata>['outcome'] & {
 			rating: Rating.EXEMPT
 		}
 	}
@@ -450,7 +450,7 @@ export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata = {}> =
 export function isExempt<_OutcomeMetadata extends OutcomeMetadata = {}>(
 	evaluation: Evaluation<_OutcomeMetadata>,
 ): evaluation is ExemptEvaluation<_OutcomeMetadata> {
-	return evaluation.value.rating === Rating.EXEMPT
+	return evaluation.outcome.rating === Rating.EXEMPT
 }
 
 /**
@@ -644,9 +644,9 @@ export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata = {
  */
 export type EvaluationScaffold<_OutcomeMetadata extends OutcomeMetadata = {}> = Omit<
 	Evaluation<_OutcomeMetadata>,
-	'value'
+	'outcome'
 > & {
-	value: Omit<Outcome<_OutcomeMetadata>, 'verifiability'>
+	outcome: Omit<Outcome<_OutcomeMetadata>, 'verifiability'>
 }
 
 /** A function that takes a wallet's evaluation context and returns a `Verifiability`. */
@@ -809,7 +809,7 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
 					: null
 				: this.verifiability
 		const val = ((): Outcome<_OutcomeMetadata> => {
-			const scaffoldVal: Omit<Outcome<_OutcomeMetadata>, 'verifiability'> = scaffold.value
+			const scaffoldVal: Omit<Outcome<_OutcomeMetadata>, 'verifiability'> = scaffold.outcome
 
 			if (!isExplicitRating(scaffoldVal.rating)) {
 				return {
@@ -846,7 +846,7 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
 		return {
 			...{
 				...scaffold,
-				value: val,
+				outcome: val,
 			},
 			...(finalRefs.length === 0 ? {} : { references: finalRefs }),
 		}
@@ -983,7 +983,7 @@ export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = {}>(
 					return matcher(value)
 				}
 
-				return matcher.value.id === value.id
+				return matcher.outcome.id === value.id
 			}).includes(true),
 		sampleEvaluations,
 	}
@@ -999,12 +999,12 @@ export const formatAttributeTitleText = (
 	attribute: EvaluatedAttribute<OutcomeMetadata>,
 	suffix?: string,
 ) =>
-	`${attribute.evaluation.value.icon ?? attribute.attribute.icon} ${
+	`${attribute.evaluation.outcome.icon ?? attribute.attribute.icon} ${
 		attribute.attribute.displayName
-	}${suffix ?? ''} [${ratingIcons[attribute.evaluation.value.rating]} ${
-		attribute.evaluation.value.rating
+	}${suffix ?? ''} [${ratingIcons[attribute.evaluation.outcome.rating]} ${
+		attribute.evaluation.outcome.rating
 	}]${
-		![Rating.EXEMPT, Rating.UNRATED].includes(attribute.evaluation.value.rating)
-			? `\n\n${attribute.evaluation.value.displayName}`
+		![Rating.EXEMPT, Rating.UNRATED].includes(attribute.evaluation.outcome.rating)
+			? `\n\n${attribute.evaluation.outcome.displayName}`
 			: ''
 	}`

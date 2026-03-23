@@ -39,7 +39,7 @@ function evaluateChainAbstraction(
 
 	if (!isSupported(crossChainBalances.globalAccountValue)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_global_account_value',
 				displayName: 'No cross-chain awareness',
 				rating: Rating.FAIL,
@@ -69,7 +69,7 @@ function evaluateChainAbstraction(
 		!isSupported(crossChainBalances.usdc.perChainBalanceViewAcrossMultipleChains)
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_per_chain_balance_view_across_multiple_chains',
 				displayName: 'No per-chain token balance view',
 				rating: Rating.FAIL,
@@ -100,7 +100,7 @@ function evaluateChainAbstraction(
 
 	if (!isSupported(bridging.builtInBridging)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_bridging',
 				displayName: 'No cross-chain bridging support',
 				rating: Rating.FAIL,
@@ -127,7 +127,7 @@ function evaluateChainAbstraction(
 		!isSupported(crossChainBalances.usdc.crossChainSumView)
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_cross_chain_token_balance_sum',
 				displayName: 'No cross-chain token balance',
 				rating: Rating.PARTIAL,
@@ -156,7 +156,7 @@ function evaluateChainAbstraction(
 			bridging.builtInBridging.feesLargerThan1bps.afterSingleAction === FeeDisplayLevel.NONE
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: feesHidden
 					? 'chain_abstraction_bridge_hidden_fees'
 					: 'chain_abstraction_bridge_non_transparent_fees',
@@ -204,7 +204,7 @@ function evaluateChainAbstraction(
 		const risksHidden = bridging.builtInBridging.risksExplained === 'NOT_IN_UI'
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: risksHidden
 					? 'chain_abstraction_bridge_hidden_risks'
 					: 'chain_abstraction_bridge_non_transparent_risks',
@@ -250,7 +250,7 @@ function evaluateChainAbstraction(
 
 	if (!isSupported(bridging.suggestedBridging)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_suggested_bridging',
 				displayName: 'Abstracts away most cross-chain complexity',
 				rating: Rating.PARTIAL,
@@ -280,7 +280,7 @@ function evaluateChainAbstraction(
 
 	// All pass.
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'chain_abstraction_pass',
 			displayName: 'Abstracts away cross-chain complexity',
 			rating: Rating.PASS,

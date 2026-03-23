@@ -27,7 +27,7 @@ type _Evaluation = Evaluation<SecurityAuditsMetadata>
 
 const noAudits: (typeof securityAudits)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'no_audits',
 			rating: Rating.FAIL,
 			displayName: 'No security audits',
@@ -48,7 +48,7 @@ function audited(
 	ctx.addRef(...audits)
 
 	const { rating, displayName, shortExplanation, howToImprove } = ((): Pick<
-		_Evaluation['value'],
+		_Evaluation['outcome'],
 		'rating' | 'displayName' | 'shortExplanation'
 	> & {
 		howToImprove: _Evaluation['howToImprove']
@@ -101,7 +101,7 @@ function audited(
 	})()
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `audited_${auditedInLastYear}_${hasUnaddressedFlaws}`,
 			rating,
 			displayName,
@@ -270,11 +270,11 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 		const auditsIdSet = new Set<string>()
 
 		for (const evaluation of Object.values(perVariant)) {
-			if (!evaluation?.value.metadata?.securityAudits) {
+			if (!evaluation?.outcome.metadata?.securityAudits) {
 				continue
 			}
 
-			for (const audit of evaluation.value.metadata.securityAudits) {
+			for (const audit of evaluation.outcome.metadata.securityAudits) {
 				const auditId = securityAuditId(audit)
 
 				if (!auditsIdSet.has(auditId)) {
@@ -283,8 +283,8 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 				}
 			}
 		}
-		worstEvaluation.value.metadata = {
-			...worstEvaluation.value.metadata,
+		worstEvaluation.outcome.metadata = {
+			...worstEvaluation.outcome.metadata,
 			securityAudits: allAudits,
 		}
 

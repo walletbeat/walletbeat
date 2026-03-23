@@ -6,7 +6,7 @@ import { pickWorstRating, unrated } from '../common'
 
 const sourcePublic: (typeof sourceVisibility)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'public',
 			rating: Rating.PASS,
 			displayName: 'Source code publicly available',
@@ -25,7 +25,7 @@ const sourcePublic: (typeof sourceVisibility)['evaluate'] = ctx =>
 
 const sourcePartiallyPrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'partially_private',
 			rating: Rating.FAIL,
 			displayName: 'Source code not fully available',
@@ -50,7 +50,7 @@ const sourcePartiallyPrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
 
 const sourcePrivate: (typeof sourceVisibility)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'private',
 			rating: Rating.FAIL,
 			displayName: 'Source code not publicly available',

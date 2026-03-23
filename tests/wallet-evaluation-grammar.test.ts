@@ -65,11 +65,11 @@ describe('evaluations', () => {
 			perGroup.attributes.set(attribute.id, perAttr)
 		}
 
-		let evaluationsForRating = perAttr.perRating.get(evaluation.evaluation.value.rating)
+		let evaluationsForRating = perAttr.perRating.get(evaluation.evaluation.outcome.rating)
 
 		if (evaluationsForRating === undefined) {
 			evaluationsForRating = []
-			perAttr.perRating.set(evaluation.evaluation.value.rating, evaluationsForRating)
+			perAttr.perRating.set(evaluation.evaluation.outcome.rating, evaluationsForRating)
 		}
 
 		evaluationsForRating.push(evaluation)
@@ -125,7 +125,7 @@ describe('evaluations', () => {
 								for (const exampleRating of exampleRatings) {
 									for (const sampleEvaluation of exampleRating.sampleEvaluations) {
 										addEvaluation(genericAttrGroup, genericEvalAttr.attribute, {
-											name: `sample ${ratingToText(rating).toLowerCase()} evaluation ${sampleEvaluation.value.id}`,
+											name: `sample ${ratingToText(rating).toLowerCase()} evaluation ${sampleEvaluation.outcome.id}`,
 											evaluation: sampleEvaluation,
 										})
 									}
@@ -166,10 +166,10 @@ describe('evaluations', () => {
 
 						for (const evaluation of sortedByStringKey(evaluationsForRating, v => v.name)) {
 							describe(evaluation.name, () => {
-								walletContentGrammarLint('name', evaluation.evaluation.value.displayName)
+								walletContentGrammarLint('name', evaluation.evaluation.outcome.displayName)
 								walletContentGrammarLint(
 									'explanation',
-									evaluation.evaluation.value.shortExplanation,
+									evaluation.evaluation.outcome.shortExplanation,
 								)
 
 								if (isTypographicContent(evaluation.evaluation.details)) {

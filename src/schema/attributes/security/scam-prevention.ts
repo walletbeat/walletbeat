@@ -196,14 +196,14 @@ function evaluateScamAlerts(
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
 
 	type NonNullScamPreventionMetadataScaffold = Exclude<
-		_EvaluationScaffold['value'],
+		_EvaluationScaffold['outcome'],
 		{ metadata: { scamAlerts: null } }
 	>
 
 	if (!isNonEmptyArray(supportedFeatures)) {
 		// No features supported.
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'none_implemented',
 				displayName: 'No scam prevention',
 				rating: Rating.FAIL,
@@ -232,7 +232,7 @@ function evaluateScamAlerts(
 		// Special case: If URLs are leaked, this gets a FAIL.
 		if (scamAlerts.scamUrlWarning.leaksVisitedUrl === 'FULL_URL') {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'leak_full_url',
 					displayName: 'Scam prevention feature leaks history',
 					rating: Rating.FAIL,
@@ -260,7 +260,7 @@ function evaluateScamAlerts(
 			(scamAlerts.scamUrlWarning.leaksUserAddress || scamAlerts.scamUrlWarning.leaksIp)
 		) {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'leak_domain',
 					displayName: 'Scam prevention feature leaks website history',
 					rating: Rating.FAIL,
@@ -287,7 +287,7 @@ function evaluateScamAlerts(
 	if (unsupportedFeatures.length > 0) {
 		// Some but not all features supported.
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'partially_supported',
 				displayName: 'Some scam prevention features',
 				rating: Rating.PARTIAL,
@@ -322,7 +322,7 @@ function evaluateScamAlerts(
 
 		// Not all features implemented with privacy support.
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'need_privacy',
 				displayName: 'Privacy-invasive scam prevention',
 				rating: Rating.PARTIAL,
@@ -362,7 +362,7 @@ function evaluateScamAlerts(
 
 	// All features implements with privacy.
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'all_implemented',
 			displayName: 'Full-featured scam prevention',
 			rating: Rating.PASS,

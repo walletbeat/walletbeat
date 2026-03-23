@@ -328,19 +328,19 @@ export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetada
 			}
 
 			const isVerifiable =
-				evalAttr.evaluation.value.verifiability === Verifiability.VERIFIABLE ||
-				evalAttr.evaluation.value.verifiability === Verifiability.SELF_EVIDENT
+				evalAttr.evaluation.outcome.verifiability === Verifiability.VERIFIABLE ||
+				evalAttr.evaluation.outcome.verifiability === Verifiability.SELF_EVIDENT
 
-			switch (evalAttr.evaluation.value.rating) {
+			switch (evalAttr.evaluation.outcome.rating) {
 				case Rating.EXEMPT:
 					return {
 						rating: StageCriterionRating.EXEMPT,
-						explanation: evalAttr.evaluation.value.shortExplanation,
+						explanation: evalAttr.evaluation.outcome.shortExplanation,
 					}
 				case Rating.FAIL:
 					return {
 						rating: StageCriterionRating.FAIL,
-						explanation: evalAttr.evaluation.value.shortExplanation,
+						explanation: evalAttr.evaluation.outcome.shortExplanation,
 					}
 				case Rating.UNRATED:
 					return { rating: StageCriterionRating.UNRATED }
@@ -348,14 +348,14 @@ export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetada
 					if (!options.allowPartial) {
 						return {
 							rating: StageCriterionRating.FAIL,
-							explanation: evalAttr.evaluation.value.shortExplanation,
+							explanation: evalAttr.evaluation.outcome.shortExplanation,
 						}
 					}
 
 					if (!isVerifiable) {
 						if (options.ifUnverifiable === 'THROW') {
 							throw new Error(
-								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.value.verifiability}`,
+								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.outcome.verifiability}`,
 							)
 						}
 
@@ -371,7 +371,7 @@ export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetada
 					if (!isVerifiable) {
 						if (options.ifUnverifiable === 'THROW') {
 							throw new Error(
-								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.value.verifiability}`,
+								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.outcome.verifiability}`,
 							)
 						}
 
@@ -385,7 +385,7 @@ export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetada
 
 					return {
 						rating: StageCriterionRating.PASS,
-						explanation: evalAttr.evaluation.value.shortExplanation,
+						explanation: evalAttr.evaluation.outcome.shortExplanation,
 					}
 			}
 		},

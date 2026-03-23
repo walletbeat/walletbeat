@@ -155,7 +155,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 		const rating = evaluateSupplyChainFactory(factoryFeature)
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'Supply Chain Factory',
 				rating,
 				displayName: 'Supply Chain Factory',

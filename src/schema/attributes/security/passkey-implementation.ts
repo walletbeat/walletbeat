@@ -18,7 +18,7 @@ type _EvaluationContext = EvaluationContext<PasskeyImplementationMetadata>
 
 const noPasskeyImplementation: (typeof passkeyImplementation)['evaluate'] = ctx =>
 	ctx.build({
-		value: {
+		outcome: {
 			id: 'no_passkey_implementation',
 			rating: Rating.FAIL,
 			displayName: 'No passkey implementation',
@@ -37,7 +37,7 @@ const noPasskeyImplementation: (typeof passkeyImplementation)['evaluate'] = ctx 
 
 function otherPasskeyImplementation(ctx: _EvaluationContext, support: PasskeyVerificationSupport) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'other_passkey_implementation',
 			rating: Rating.PARTIAL,
 			displayName: 'Basic passkey implementation',
@@ -61,7 +61,7 @@ function freshCryptoLibImplementation(
 	support: PasskeyVerificationSupport,
 ) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'fresh_crypto_lib_implementation',
 			rating: Rating.PARTIAL,
 			displayName: 'outdated passkey verification implementation',
@@ -88,7 +88,7 @@ function smoothCryptoLibImplementation(
 	support: PasskeyVerificationSupport,
 ) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'smooth_crypto_lib_implementation',
 			rating: Rating.PASS,
 			displayName: 'Audited passkey implementation: Smooth Crypto Lib',
@@ -113,7 +113,7 @@ function daimoP256VerifierImplementation(
 	support: PasskeyVerificationSupport,
 ) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'daimo_p256_verifier_implementation',
 			rating: Rating.PASS,
 			displayName: 'Audited passkey implementation (Daimo P256 verifier)',
@@ -138,7 +138,7 @@ function openZeppelinP256VerifierImplementation(
 	support: PasskeyVerificationSupport,
 ) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'open_zeppelin_p256_verifier_implementation',
 			rating: Rating.PASS,
 			displayName: 'Audited passkey implementation (OpenZeppelin P256 verifier)',
@@ -160,7 +160,7 @@ function openZeppelinP256VerifierImplementation(
 
 function webAuthnSolImplementation(ctx: _EvaluationContext, support: PasskeyVerificationSupport) {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'web_authn_sol_implementation',
 			rating: Rating.PASS,
 			displayName: 'Audited passkey implementation (WebAuthn.sol)',

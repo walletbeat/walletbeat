@@ -324,7 +324,7 @@ function evaluateWorstFeeDisplay(
 		}
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'fully_sponsored_fees',
 				displayName: 'Fully sponsored fees',
 				rating: Rating.PASS,
@@ -343,7 +343,7 @@ function evaluateWorstFeeDisplay(
 	if (worstFeeDisplay.feeDisplay.byDefault === FeeDisplayLevel.NONE) {
 		if (worstFeeDisplay.isUniform) {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'hidden_fees',
 					displayName: 'Hidden fees',
 					rating: Rating.FAIL,
@@ -367,7 +367,7 @@ function evaluateWorstFeeDisplay(
 		}
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'some_hidden_fees',
 				displayName: 'Some hidden fees',
 				rating: Rating.FAIL,
@@ -394,7 +394,7 @@ function evaluateWorstFeeDisplay(
 	if (worstFeeDisplay.feeDisplay.afterSingleAction === FeeDisplayLevel.AGGREGATED) {
 		if (worstFeeDisplay.isUniform) {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'non_comprehensive_fees',
 					displayName: 'Non-comprehensive fees',
 					rating: Rating.PARTIAL,
@@ -419,7 +419,7 @@ function evaluateWorstFeeDisplay(
 		}
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'some_non_comprehensive_fees',
 				displayName: 'Some non-comprehensive fees',
 				rating: Rating.PARTIAL,
@@ -449,7 +449,7 @@ function evaluateWorstFeeDisplay(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'comprehensive_fees',
 			displayName: 'Comprehensive fee breakdown',
 			rating: Rating.PASS,

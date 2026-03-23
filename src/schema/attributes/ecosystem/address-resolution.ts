@@ -86,7 +86,7 @@ function evaluateAddressResolution(
 
 		if (chainSpecificSupport.medium === 'CHAIN_CLIENT') {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: `support_via_erc${erc.number}_onchain`,
 					rating: Rating.PASS,
 					displayName: `Resolves human-readable ${eipShortLabel(erc)} addresses`,
@@ -104,7 +104,7 @@ function evaluateAddressResolution(
 		const { rating, offchainInfo, walletShould } = getOffchainProviderInfo(chainSpecificSupport)
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: `support_via_erc${erc.number}_${chainSpecificSupport.offchainDataVerifiability.toLowerCase()}_${chainSpecificSupport.offchainProviderConnection.toLowerCase()}_provider`,
 				rating,
 				displayName: `Resolves human-readable ${eipShortLabel(erc)} addresses offchain`,
@@ -127,7 +127,7 @@ function evaluateAddressResolution(
 
 	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_address_resolution',
 				rating: Rating.FAIL,
 				displayName: 'No human-readable address resolution',
@@ -147,7 +147,7 @@ function evaluateAddressResolution(
 
 	if (addressResolution.nonChainSpecificEnsResolution.medium === 'CHAIN_CLIENT') {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'support_plain_ens_onchain',
 				rating: Rating.PARTIAL,
 				displayName: 'Supports non-chain-specific ENS addresses',
@@ -175,7 +175,7 @@ function evaluateAddressResolution(
 	)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
 			rating: Rating.PARTIAL,
 			displayName: 'Resolves ENS addresses using an offchain service',

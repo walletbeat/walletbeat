@@ -236,9 +236,9 @@ function serializeAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 	}
 
 	const ratingBlock: RatingJsonExport = {
-		rating: evaluation.value.rating,
+		rating: evaluation.outcome.rating,
 		shortExplanation: renderTypographicContentToString(
-			evaluation.value.shortExplanation,
+			evaluation.outcome.shortExplanation,
 			evalStrings,
 		),
 		details: renderContentToText(evaluation.details, evalStrings, {

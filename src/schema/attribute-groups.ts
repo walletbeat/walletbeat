@@ -605,8 +605,9 @@ export function mapNonExemptGroupAttributes<T, Vs extends ValueSet>(
 ): T[] {
 	return Object.values(evalGroup)
 		.filter(
-			<OM extends OutcomeMetadata>(evalAttr: EvaluatedAttribute<OM>): boolean =>
-				evalAttr.evaluation.value.rating !== Rating.EXEMPT,
+			<_OutcomeMetadata extends OutcomeMetadata>(
+				evalAttr: EvaluatedAttribute<_OutcomeMetadata>,
+			): boolean => evalAttr.evaluation.outcome.rating !== Rating.EXEMPT,
 		)
 		.map(fn)
 }
@@ -618,8 +619,9 @@ export function numNonExemptGroupAttributes<Vs extends ValueSet>(
 	evalGroup: EvaluatedGroup<Vs>,
 ): number {
 	return Object.values(evalGroup).filter(
-		<OM extends OutcomeMetadata>(evalAttr: EvaluatedAttribute<OM>): boolean =>
-			evalAttr.evaluation.value.rating !== Rating.EXEMPT,
+		<_OutcomeMetadata extends OutcomeMetadata>(
+			evalAttr: EvaluatedAttribute<_OutcomeMetadata>,
+		): boolean => evalAttr.evaluation.outcome.rating !== Rating.EXEMPT,
 	).length
 }
 
@@ -710,7 +712,7 @@ export function calculateAttributeGroupScore<Vs extends ValueSet>(
 		let hasUnratedComponent = false
 
 		for (const evalAttr of evaluatedAttributes(evaluations)) {
-			hasUnratedComponent ||= evalAttr.evaluation.value.rating === Rating.UNRATED
+			hasUnratedComponent ||= evalAttr.evaluation.outcome.rating === Rating.UNRATED
 		}
 
 		return { score: weightedScore(subScores), hasUnratedComponent }
