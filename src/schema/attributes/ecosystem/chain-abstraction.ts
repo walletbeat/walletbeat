@@ -506,12 +506,11 @@ export const chainAbstraction: Attribute = {
 			return exempt(
 				ctx,
 				sentence('Only software wallets are expected to deal with chain abstraction.'),
-				null,
 			)
 		}
 
 		if (ctx.features.chainAbstraction === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		return evaluateChainAbstraction(ctx, ctx.features.chainAbstraction)

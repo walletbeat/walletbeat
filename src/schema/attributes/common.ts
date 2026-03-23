@@ -15,48 +15,56 @@ import {
 import type { AtLeastOneVariant, Variant } from '../variants'
 
 /**
- * Helper for constructing "Unrated" outcomes.
+ * Helper for constructing Evaluation with "Unrated" Outcome.
  */
+export function unrated(ctx: EvaluationContext<{}>): Evaluation<{}>
 export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
 	ctx: EvaluationContext<_OutcomeMetadata>,
-	extraProps: keyof _OutcomeMetadata extends never ? null : _OutcomeMetadata,
+	metadata: Outcome<_OutcomeMetadata>['metadata'],
+): Evaluation<_OutcomeMetadata>
+export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
+	ctx: EvaluationContext<_OutcomeMetadata>,
+	metadata?: Outcome<_OutcomeMetadata>['metadata'],
 ): Evaluation<_OutcomeMetadata> {
-	const value = {
-		id: 'unrated',
-		rating: Rating.UNRATED,
-		verifiability: Verifiability.SELF_EVIDENT,
-		displayName: `${ctx.attribute.displayName}: Unrated`,
-		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
-		...(extraProps ? { metadata: extraProps } : {}),
-	} as Outcome<_OutcomeMetadata>
-
-	const v = value
-
 	return {
-		value: v,
+		outcome: {
+			id: 'unrated',
+			rating: Rating.UNRATED,
+			verifiability: Verifiability.SELF_EVIDENT,
+			displayName: `${ctx.attribute.displayName}: Unrated`,
+			shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
+			...(metadata !== undefined && { metadata }),
+		},
 		details: unratedAttributeContent<_OutcomeMetadata>(),
 	}
 }
 
+/**
+ * Helper for constructing Evaluation with "Exempt" Outcome.
+ */
+export function exempt(
+	ctx: EvaluationContext<{}>,
+	whyExempt: Sentence<WalletNameStrings>,
+): ExemptEvaluation<{}>
 export function exempt<_OutcomeMetadata extends OutcomeMetadata>(
 	ctx: EvaluationContext<_OutcomeMetadata>,
 	whyExempt: Sentence<WalletNameStrings>,
-	extraProps: keyof _OutcomeMetadata extends never ? null : _OutcomeMetadata,
+	metadata: Outcome<_OutcomeMetadata>['metadata'],
+): ExemptEvaluation<_OutcomeMetadata>
+export function exempt<_OutcomeMetadata extends OutcomeMetadata>(
+	ctx: EvaluationContext<_OutcomeMetadata>,
+	whyExempt: Sentence<WalletNameStrings>,
+	metadata?: Outcome<_OutcomeMetadata>['metadata'],
 ): ExemptEvaluation<_OutcomeMetadata> {
-	const value: Outcome & { rating: Rating.EXEMPT } = {
-		id: 'exempt',
-		rating: Rating.EXEMPT,
-		verifiability: Verifiability.SELF_EVIDENT,
-		displayName: `${ctx.attribute.displayName}: Exempt`,
-		shortExplanation: whyExempt,
-	}
-	const v = {
-		...value,
-		...(extraProps ? { metadata: extraProps } : {}),
-	} as Outcome<_OutcomeMetadata> & { rating: Rating.EXEMPT }
-
 	return {
-		value: v,
+		outcome: {
+			id: 'exempt',
+			rating: Rating.EXEMPT,
+			verifiability: Verifiability.SELF_EVIDENT,
+			displayName: `${ctx.attribute.displayName}: Exempt`,
+			shortExplanation: whyExempt,
+			...(metadata !== undefined && { metadata }),
+		},
 		details: whyExempt,
 	}
 }

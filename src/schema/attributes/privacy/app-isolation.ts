@@ -364,16 +364,15 @@ export const appIsolation: Attribute = {
 			return exempt(
 				ctx,
 				sentence('Only software wallets are expected to deal with connecting to apps.'),
-				null,
 			)
 		}
 
 		if (ctx.features.privacy.appIsolation === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (isAppConnectionSupportedInAppIsolation(ctx.features.privacy.appIsolation)) {
-			return exempt(ctx, sentence('{{WALLET_NAME}} does not support connecting to apps.'), null)
+			return exempt(ctx, sentence('{{WALLET_NAME}} does not support connecting to apps.'))
 		}
 
 		return rateAppIsolation(ctx, ctx.features.privacy.appIsolation)

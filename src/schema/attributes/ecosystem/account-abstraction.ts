@@ -198,7 +198,7 @@ export const accountAbstraction: Attribute = {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		if (ctx.features.accountSupport === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const supported: Record<AccountType, boolean> = {

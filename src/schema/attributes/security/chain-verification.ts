@@ -150,13 +150,13 @@ export const chainVerification: Attribute = {
 		)
 
 		if (ctx.features.type === WalletType.HARDWARE) {
-			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'), null)
+			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'))
 		}
 
 		const l1Client = ctx.features.security.lightClient.ethereumL1
 
 		if (l1Client === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (!isSupported(l1Client)) {

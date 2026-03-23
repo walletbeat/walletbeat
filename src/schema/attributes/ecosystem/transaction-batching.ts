@@ -278,7 +278,6 @@ export const transactionBatching: Attribute = {
 			return exempt(
 				ctx,
 				sentence('Only software wallets are expected to deal with transaction batching.'),
-				null,
 			)
 		}
 
@@ -289,12 +288,11 @@ export const transactionBatching: Attribute = {
 					{{WALLET_NAME}} is exempt as it is a payments-focused wallet,
 					for which transaction batching is not very useful.
 				`),
-				null,
 			)
 		}
 
 		if (ctx.features.accountSupport === null || ctx.features.integration.walletCall === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		return evaluateTransactionBatching(

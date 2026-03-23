@@ -345,11 +345,11 @@ export const bugBountyProgram: Attribute = {
 		// This attribute is only applicable for hardware wallets
 		// For software wallets, we exempt them from this attribute
 		if (ctx.features.type !== WalletType.HARDWARE) {
-			return exempt(ctx, sentence('This attribute is only applicable for hardware wallets.'), null)
+			return exempt(ctx, sentence('This attribute is only applicable for hardware wallets.'))
 		}
 
 		if (ctx.features.security.bugBountyProgram === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (!isSupported(ctx.features.security.bugBountyProgram)) {

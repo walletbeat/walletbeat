@@ -291,7 +291,6 @@ limiting its utility.
 				sentence(
 					'This attribute is not applicable for {{WALLET_NAME}} as it is an ERC-4337 smart contract wallet.',
 				),
-				null,
 			)
 		}
 
@@ -317,7 +316,7 @@ limiting its utility.
 		const appSupport = ctx.features.appConnectionSupport
 
 		if (appSupport === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(appSupport)
@@ -328,7 +327,7 @@ limiting its utility.
 		}
 
 		if (appSupport.requiresManufacturerConsent === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(
