@@ -243,7 +243,7 @@ export const verifiabilityEnum = new Enum<Verifiability>({
  * Base type for attribute-specific metadata added to Outcome.
  * Attributes pass only their custom fields as the generic; Outcome is implicit.
  */
-export type OutcomeMetadata = object
+export type OutcomeMetadata = object | null
 
 /**
  * Outcome is one of multiple possible results when evaluating an attribute.
@@ -253,7 +253,7 @@ export type OutcomeMetadata = object
  * could represent the MIT license.
  */
 export type Outcome<
-	_OutcomeMetadata extends OutcomeMetadata = {},
+	_OutcomeMetadata extends OutcomeMetadata = null,
 	_Rating extends Rating = Rating,
 > = {
 	/**
@@ -327,13 +327,12 @@ export type Outcome<
 	 * If unspecified, the score is derived using `defaultRatingScore`.
 	 */
 	score?: Score
-
+} &
 	/**
 	 * Attribute-specific metadata. Optional; only present when the attribute
 	 * has metadata beyond the base outcome fields.
 	 */
-	metadata?: {} extends _OutcomeMetadata ? never : _OutcomeMetadata
-}
+	(_OutcomeMetadata extends null ? { metadata?: undefined } : { metadata: _OutcomeMetadata })
 
 /** The numerical score corresponding to a rating by default. */
 export function defaultRatingScore<_OutcomeMetadata extends OutcomeMetadata>(
@@ -383,7 +382,7 @@ export function compareExplicitRatings(rating1: ExplicitRating, rating2: Explici
 	return score(rating1) - score(rating2)
 }
 
-export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = {}> {
+export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = null> {
 	outcome: Outcome<_OutcomeMetadata>
 	references: FullyQualifiedReference[]
 	wallet: RatedWallet
@@ -394,7 +393,7 @@ export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = {}> {
  * an attribute. Unlike Outcome, an Evaluation is wallet-specific.
  */
 export interface Evaluation<
-	_OutcomeMetadata extends OutcomeMetadata = {},
+	_OutcomeMetadata extends OutcomeMetadata = null,
 	_Rating extends Rating = Rating,
 > {
 	/**
@@ -482,7 +481,7 @@ export interface ExampleRating<_OutcomeMetadata extends OutcomeMetadata> {
 /**
  * Normalize example ratings to an array (single item or undefined becomes array).
  */
-export function normalizeExampleRatings<_OutcomeMetadata extends OutcomeMetadata = {}>(
+export function normalizeExampleRatings<_OutcomeMetadata extends OutcomeMetadata = null>(
 	ratings: ExampleRating<_OutcomeMetadata> | ExampleRating<_OutcomeMetadata>[] | undefined,
 ): ExampleRating<_OutcomeMetadata>[] {
 	if (ratings === undefined) {
@@ -498,7 +497,7 @@ export function normalizeExampleRatings<_OutcomeMetadata extends OutcomeMetadata
  * For example, an attribute could be about whether or not a wallet is
  * licensed under an open-source license.
  */
-export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = {}> {
+export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	/**
 	 * Unique ID representing the attribute in camelCase.
 	 * For example: "sourceVisibility".
@@ -634,7 +633,7 @@ export interface Attribute<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	) => Evaluation<_OutcomeMetadata>
 }
 
-export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata> {
+export interface EvaluatedAttribute<_OutcomeMetadata extends OutcomeMetadata = null> {
 	attribute: Attribute<_OutcomeMetadata>
 	evaluation: Evaluation<_OutcomeMetadata>
 }
@@ -651,7 +650,7 @@ export type EvaluationScaffold<_OutcomeMetadata extends OutcomeMetadata> = Omit<
 }
 
 /** A function that takes a wallet's evaluation context and returns a `Verifiability`. */
-export type VerifiabilityPredicate<_OutcomeMetadata extends OutcomeMetadata = {}> = (
+export type VerifiabilityPredicate<_OutcomeMetadata extends OutcomeMetadata = null> = (
 	ctx: EvaluationContext<_OutcomeMetadata>,
 ) => Verifiability
 
@@ -661,7 +660,7 @@ export type VerifiabilityPredicate<_OutcomeMetadata extends OutcomeMetadata = {}
  * object which is progressively populated as the evaluation progresses,
  * then `build` is called to finalize the `Evaluation<_OutcomeMetadata>`.
  */
-export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
+export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = null> {
 	private readonly attributeFn: () => Attribute<_OutcomeMetadata>
 	private readonly rawReferences: FullyQualifiedReference[]
 	private readonly featuresOrNull: ResolvedFeatures | null
@@ -672,7 +671,7 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
 	 * `forTest` returns an EvaluationContext which is used in tests.
 	 * Such contexts will assume all `Evaluation`s are verifiable.
 	 */
-	public static forTest<_OutcomeMetadata extends OutcomeMetadata = {}>(
+	public static forTest<_OutcomeMetadata extends OutcomeMetadata = null>(
 		attributeFn: () => Attribute<_OutcomeMetadata>,
 	): EvaluationContext<_OutcomeMetadata> {
 		const ctx = new EvaluationContext<_OutcomeMetadata>(attributeFn, null, true)
@@ -682,7 +681,7 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
 		return ctx
 	}
 
-	public static create<_OutcomeMetadata extends OutcomeMetadata = {}>(
+	public static create<_OutcomeMetadata extends OutcomeMetadata = null>(
 		attribute: Attribute<_OutcomeMetadata>,
 		features: ResolvedFeatures,
 	): EvaluationContext<_OutcomeMetadata> {
@@ -809,8 +808,10 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
 					? Verifiability.VERIFIABLE
 					: null
 				: this.verifiability
-		const val = ((): Outcome<_OutcomeMetadata> => {
-			const scaffoldVal: Omit<Outcome<_OutcomeMetadata>, 'verifiability'> = scaffold.outcome
+
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- branches spread `scaffold.outcome`; TS cannot prove conditional `metadata` on `Outcome`
+		const outcome = (() => {
+			const scaffoldVal = scaffold.outcome
 
 			if (!isExplicitRating(scaffoldVal.rating)) {
 				return {
@@ -842,14 +843,12 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = {}> {
 				rating: scaffoldVal.rating,
 				verifiability,
 			}
-		})()
+		})() as unknown as Outcome<_OutcomeMetadata, Rating>
 
 		return {
-			...{
-				...scaffold,
-				outcome: val,
-			},
-			...(finalRefs.length === 0 ? {} : { references: finalRefs }),
+			...scaffold,
+			outcome,
+			...(finalRefs.length === 0 && { references: finalRefs }),
 		}
 	}
 }
@@ -942,7 +941,7 @@ export const exampleRatingUnimplemented = 'UNIMPLEMENTED'
  *                 apply to no wallets).
  * @returns An ExampleRating that uses the given description and matchers.
  */
-export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = {}>(
+export function exampleRating<_OutcomeMetadata extends OutcomeMetadata = null>(
 	description: ExampleRating<_OutcomeMetadata>['description'],
 	...matchers: NonEmptyArray<
 		| Outcome<_OutcomeMetadata>['id']

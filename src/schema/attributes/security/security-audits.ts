@@ -284,7 +284,6 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 			}
 		}
 		worstEvaluation.outcome.metadata = {
-			...worstEvaluation.outcome.metadata,
 			securityAudits: allAudits,
 		}
 

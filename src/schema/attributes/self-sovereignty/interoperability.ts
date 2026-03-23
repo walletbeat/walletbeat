@@ -86,7 +86,10 @@ export const interoperability: Attribute<InteroperabilityMetadata> = {
 				rating,
 				displayName: 'Interoperability',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} interoperability.`),
-				...interoperabilityFeature, // TODO: Filter fields
+				metadata: {
+					interoperability: interoperabilityFeature.interoperability,
+					noSupplierLinkage: interoperabilityFeature.noSupplierLinkage,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} interoperability evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

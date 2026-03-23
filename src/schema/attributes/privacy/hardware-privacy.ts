@@ -100,7 +100,11 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 				rating,
 				displayName: 'Hardware Privacy',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} hardware privacy.`),
-				...hwPrivacy, // TODO: Filter fields
+				metadata: {
+					phoningHome: hwPrivacy.phoningHome,
+					inspectableRemoteCalls: hwPrivacy.inspectableRemoteCalls,
+					wirelessPrivacy: hwPrivacy.wirelessPrivacy,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} hardware privacy evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

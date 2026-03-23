@@ -108,7 +108,13 @@ export const maintenance: Attribute<MaintenanceMetadata> = {
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} has ${rating.toLowerCase()} maintenance practices.`,
 				),
-				...maintenanceFeature, // TODO: Filter fields
+				metadata: {
+					physicalDurability: maintenanceFeature.physicalDurability,
+					mtbfDocumentation: maintenanceFeature.mtbfDocumentation,
+					repairability: maintenanceFeature.repairability,
+					batteryHandling: maintenanceFeature.batteryHandling,
+					warrantyExtensions: maintenanceFeature.warrantyExtensions,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} maintenance evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

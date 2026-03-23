@@ -2,6 +2,7 @@ import {
 	type Attribute,
 	type Evaluation,
 	EvaluationContext,
+	type EvaluationScaffold,
 	exampleRating,
 	exampleRatingUnimplemented,
 	type Outcome,
@@ -46,14 +47,16 @@ export type AddressCorrelationMetadata = {
 type _EvaluationContext = EvaluationContext<AddressCorrelationMetadata>
 type _Evaluation = Evaluation<AddressCorrelationMetadata>
 
-const uncorrelated = {
+const uncorrelated: EvaluationScaffold<AddressCorrelationMetadata>['outcome'] = {
 	id: 'no_correlation',
 	rating: Rating.PASS,
 	icon: '\u{26d3}', // Broken chain
 	displayName: 'Wallet address is kept private',
 	shortExplanation: sentence('{{WALLET_NAME}} keeps your wallet address private.'),
-	worstLeak: null,
-} as const
+	metadata: {
+		worstLeak: null,
+	},
+}
 
 export interface WalletAddressLinkableTo {
 	info: UserInfo
@@ -120,7 +123,9 @@ function linkable(
 					? `{{WALLET_NAME}} publishes your ${userInfoName(worstLeak.info).short} onchain.`
 					: `{{WALLET_NAME}} allows ${worstLeak.by.name} to link your wallet address with your ${userInfoName(worstLeak.info).short}.`,
 			),
-			worstLeak,
+			metadata: {
+				worstLeak,
+			},
 		},
 		details: addressCorrelationDetailsContent({ linkables }),
 		howToImprove: paragraph(howToImprove),
@@ -262,8 +267,9 @@ export const addressCorrelation: Attribute<AddressCorrelationMetadata> = {
 					This is treated as a partial rating because users may mitigate
 					against this by forcing wallet requests to be proxied on their own.
 				`),
-				(value: Outcome<AddressCorrelationMetadata>) =>
-					value.rating === Rating.PARTIAL && value.worstLeak?.info === PersonalInfo.IP_ADDRESS,
+				(outcome: Outcome<AddressCorrelationMetadata>) =>
+					outcome.rating === Rating.PARTIAL &&
+					outcome.metadata.worstLeak?.info === PersonalInfo.IP_ADDRESS,
 			),
 			exampleRating(
 				paragraph(`
@@ -273,8 +279,9 @@ export const addressCorrelation: Attribute<AddressCorrelationMetadata> = {
 					pseudonym for each of their wallet address to mitigate this privacy
 					issue.
 				`),
-				(value: Outcome<AddressCorrelationMetadata>) =>
-					value.rating === Rating.PARTIAL && value.worstLeak?.info === PersonalInfo.PSEUDONYM,
+				outcome =>
+					outcome.rating === Rating.PARTIAL &&
+					outcome.metadata.worstLeak?.info === PersonalInfo.PSEUDONYM,
 			),
 		],
 		pass: [
@@ -342,7 +349,7 @@ export const addressCorrelation: Attribute<AddressCorrelationMetadata> = {
 		}
 
 		return ctx.build({
-			value: uncorrelated,
+			outcome: uncorrelated,
 			details: paragraph(
 				'{{WALLET_NAME}} does not allow any external provider to link your wallet address to any personal information.',
 			),

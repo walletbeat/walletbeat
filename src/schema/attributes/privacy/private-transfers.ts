@@ -132,11 +132,11 @@ function mergeEvaluations(
 	const better = worse.outcome.id === eval1.outcome.id ? eval2 : eval1
 	const mergedMap = new Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>()
 
-	for (const [key, value] of worse.outcome.perTechnology) {
+	for (const [key, value] of worse.outcome.metadata.perTechnology) {
 		mergedMap.set(key, value)
 	}
 
-	for (const [key, value] of better.outcome.perTechnology) {
+	for (const [key, value] of better.outcome.metadata.perTechnology) {
 		if (!mergedMap.has(key)) {
 			mergedMap.set(key, value)
 		}
@@ -178,13 +178,15 @@ function mergeEvaluations(
 	return {
 		outcome: {
 			id: worse.outcome.id,
-			defaultFungibleTokenTransferMode: worse.outcome.defaultFungibleTokenTransferMode,
 			displayName: worse.outcome.displayName,
 			rating: worse.outcome.rating,
 			shortExplanation: worse.outcome.shortExplanation,
 			icon: worse.outcome.icon,
 			score: worse.outcome.score,
-			perTechnology: mergedMap,
+			metadata: {
+				defaultFungibleTokenTransferMode: worse.outcome.metadata.defaultFungibleTokenTransferMode,
+				perTechnology: mergedMap,
+			},
 		},
 		details,
 		howToImprove: worse.howToImprove,
@@ -199,8 +201,10 @@ const noPrivateTransfers: (typeof privateTransfers)['evaluate'] = ctx =>
 			rating: Rating.FAIL,
 			displayName: 'Private token transfers are not supported',
 			shortExplanation: sentence('{{WALLET_NAME}} does not support private token transfers.'),
-			defaultFungibleTokenTransferMode: 'PUBLIC',
-			perTechnology: new Map(),
+			metadata: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				perTechnology: new Map(),
+			},
 		},
 		details: mdParagraph(
 			`
@@ -249,8 +253,10 @@ const nonDefault: (typeof privateTransfers)['evaluate'] = ctx =>
 			shortExplanation: mdSentence(
 				'Token transfers with {{WALLET_NAME}} are public by default despite it supporting private token transfers.',
 			),
-			defaultFungibleTokenTransferMode: 'PUBLIC',
-			perTechnology: new Map(),
+			metadata: {
+				defaultFungibleTokenTransferMode: 'PUBLIC',
+				perTechnology: new Map(),
+			},
 		},
 		details: mdParagraph(
 			`
@@ -596,8 +602,10 @@ function rateStealthAddressSupport(
 					shortExplanation: mdSentence(
 						`{{WALLET_NAME}} implements ${eipMarkdownLink(erc5564)} stealth addresses but may create unintended onchain links.`,
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -611,8 +619,10 @@ function rateStealthAddressSupport(
 					shortExplanation: mdSentence(
 						`{{WALLET_NAME}} implements ${eipMarkdownLink(erc5564)} stealth addresses but relies on a trusted external provider.`,
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -627,8 +637,10 @@ function rateStealthAddressSupport(
 					shortExplanation: mdSentence(
 						`{{WALLET_NAME}} fully implements ${eipMarkdownLink(erc5564)} stealth addresses.`,
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.STEALTH_ADDRESSES,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -846,8 +858,10 @@ function rateTornadoCashNovaSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Tornado Cash Nova in a non-privacy-preserving way.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -861,8 +875,10 @@ function rateTornadoCashNovaSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Tornado Cash Nova but relies on an external provider.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -877,8 +893,10 @@ function rateTornadoCashNovaSupport(
 						shortExplanation: mdSentence(
 							'{{WALLET_NAME}} integrates Tornado Cash Nova with some important compromises.',
 						),
-						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
-						perTechnology,
+						metadata: {
+							defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+							perTechnology,
+						},
 					},
 					details,
 					howToImprove,
@@ -894,8 +912,10 @@ function rateTornadoCashNovaSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Tornado Cash Nova for private transfers.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.TORNADO_CASH_NOVA,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1189,8 +1209,10 @@ function ratePrivacyPoolsSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates some Privacy Pools features, but with severe gaps.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1204,8 +1226,10 @@ function ratePrivacyPoolsSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Privacy Pools in a non-privacy-preserving way.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1219,8 +1243,10 @@ function ratePrivacyPoolsSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Privacy Pools but relies on an external provider.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1235,8 +1261,10 @@ function ratePrivacyPoolsSupport(
 						shortExplanation: mdSentence(
 							'{{WALLET_NAME}} integrates Privacy Pools with some important compromises.',
 						),
-						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-						perTechnology,
+						metadata: {
+							defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+							perTechnology,
+						},
 					},
 					details,
 					howToImprove,
@@ -1252,8 +1280,10 @@ function ratePrivacyPoolsSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Privacy Pools for private transfers.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.PRIVACY_POOLS,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1593,8 +1623,10 @@ function rateRailgunSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates some Railgun features, but with severe gaps.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1608,8 +1640,10 @@ function rateRailgunSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Railgun in a non-privacy-preserving way.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1623,8 +1657,10 @@ function rateRailgunSupport(
 					shortExplanation: mdSentence(
 						'{{WALLET_NAME}} integrates Railgun but relies on an external provider.',
 					),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -1639,8 +1675,10 @@ function rateRailgunSupport(
 						shortExplanation: mdSentence(
 							'{{WALLET_NAME}} integrates Railgun with some important compromises.',
 						),
-						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-						perTechnology,
+						metadata: {
+							defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+							perTechnology,
+						},
 					},
 					details,
 					howToImprove,
@@ -1654,8 +1692,10 @@ function rateRailgunSupport(
 					icon: '\u{1f48c}', // Love letter
 					displayName: 'Full Railgun integration',
 					shortExplanation: mdSentence('{{WALLET_NAME}} integrates Railgun for private transfers.'),
-					defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
-					perTechnology,
+					metadata: {
+						defaultFungibleTokenTransferMode: PrivateTransferTechnology.RAILGUN,
+						perTechnology,
+					},
 				},
 				details,
 				howToImprove,
@@ -2018,7 +2058,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 			)
 		}
 
-		if (atLeastOneTechnologySupported && evaluation.outcome.perTechnology.size === 0) {
+		if (atLeastOneTechnologySupported && evaluation.outcome.metadata.perTechnology.size === 0) {
 			throw new Error(
 				'Private transfer evaluation perTechnology map empty despite supporting some form of private transfer',
 			)
@@ -2028,7 +2068,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 
 		if (privateTransferDetails !== null) {
 			// Sanity check that the set of keys are consistent.
-			for (const [key] of evaluation.outcome.perTechnology) {
+			for (const [key] of evaluation.outcome.metadata.perTechnology) {
 				if (!privateTransferDetails.privateTransferDetails.has(key)) {
 					throw new Error(
 						`Private transfer evaluation details does not include expected key ${key}`,
@@ -2037,7 +2077,7 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 			}
 
 			for (const [key] of privateTransferDetails.privateTransferDetails) {
-				if (!evaluation.outcome.perTechnology.has(key)) {
+				if (!evaluation.outcome.metadata.perTechnology.has(key)) {
 					throw new Error(`Private transfer outcome does not include expected key ${key}`)
 				}
 			}
@@ -2051,8 +2091,11 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 			...evaluation,
 			outcome: {
 				...evaluation.outcome,
-				defaultFungibleTokenTransferMode:
-					ctx.features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode,
+				metadata: {
+					perTechnology: evaluation.outcome.metadata.perTechnology,
+					defaultFungibleTokenTransferMode:
+						ctx.features.privacy.transactionPrivacy.defaultFungibleTokenTransferMode,
+				},
 			},
 		})
 	},

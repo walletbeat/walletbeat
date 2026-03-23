@@ -305,9 +305,6 @@ function evaluateWorstFeeDisplay(
 	worstFeeDisplay: WorstFeeDisplay,
 ): _Evaluation {
 	ctx.addRef(worstFeeDisplay.references)
-	const baseValue = {
-		worstFeeDisplay,
-	} as const
 	const worstFeeTypesMarkdown = (indent: string): string =>
 		markdownListFormat(nonEmptyMap(worstFeeDisplay.feeTypes, feeTypeDescription), {
 			singleItemTemplate: 'ITEM.',
@@ -331,7 +328,7 @@ function evaluateWorstFeeDisplay(
 				shortExplanation: sentence(`
 					{{WALLET_NAME}} sponsors all fees.
 				`),
-				...baseValue,
+				metadata: { worstFeeDisplay },
 			},
 			details: markdown(`
 				{{WALLET_NAME}} sponsors all fees. This means users do not need to
@@ -350,7 +347,7 @@ function evaluateWorstFeeDisplay(
 					shortExplanation: sentence(`
 						{{WALLET_NAME}} hides transaction fees.
 					`),
-					...baseValue,
+					metadata: { worstFeeDisplay },
 				},
 				details: markdown(`
 					{{WALLET_NAME}} hides the fees being charged to the user.
@@ -374,7 +371,7 @@ function evaluateWorstFeeDisplay(
 				shortExplanation: sentence(`
 						{{WALLET_NAME}} hides some transaction fees.
 					`),
-				...baseValue,
+				metadata: { worstFeeDisplay },
 			},
 			details: markdown(`
 				{{WALLET_NAME}} hides some of the fees being charged to the user.
@@ -401,7 +398,7 @@ function evaluateWorstFeeDisplay(
 					shortExplanation: sentence(`
 						{{WALLET_NAME}} does not break down transaction fees.
 					`),
-					...baseValue,
+					metadata: { worstFeeDisplay },
 				},
 				details: markdown(`
 					{{WALLET_NAME}} does not show the user a complete breakdown of the
@@ -426,7 +423,7 @@ function evaluateWorstFeeDisplay(
 				shortExplanation: sentence(`
 					{{WALLET_NAME}} does not break down some transaction fees.
 				`),
-				...baseValue,
+				metadata: { worstFeeDisplay },
 			},
 			details: markdown(`
 				{{WALLET_NAME}} does not show the user a complete breakdown of the
@@ -456,7 +453,7 @@ function evaluateWorstFeeDisplay(
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} breaks down all transaction fees.
 			`),
-			...baseValue,
+			metadata: { worstFeeDisplay },
 		},
 		details: markdown(`
 			{{WALLET_NAME}} shows a complete breakdown of all transaction

@@ -130,7 +130,12 @@ export const firmware: Attribute<FirmwareMetadata> = {
 				rating,
 				displayName: 'Firmware',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} firmware.`),
-				...firmwareFeature, // TODO: Filter fields.
+				metadata: {
+					silentUpdateProtection: firmwareFeature.silentUpdateProtection,
+					firmwareOpenSource: firmwareFeature.firmwareOpenSource,
+					reproducibleBuilds: firmwareFeature.reproducibleBuilds,
+					customFirmware: firmwareFeature.customFirmware,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} firmware evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

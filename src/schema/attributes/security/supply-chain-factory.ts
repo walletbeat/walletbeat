@@ -162,7 +162,14 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} has ${rating.toLowerCase()} factory supply chain.`,
 				),
-				...factoryFeature, // TODO: Filter fields
+				metadata: {
+					factoryOpsecDocs: factoryFeature.factoryOpsecDocs,
+					factoryOpsecAudit: factoryFeature.factoryOpsecAudit,
+					tamperEvidence: factoryFeature.tamperEvidence,
+					hardwareVerification: factoryFeature.hardwareVerification,
+					tamperResistance: factoryFeature.tamperResistance,
+					genuineCheck: factoryFeature.genuineCheck,
+				},
 			},
 			details: paragraph(
 				`{{WALLET_NAME}} factory supply chain evaluation is ${rating.toLowerCase()}.`,

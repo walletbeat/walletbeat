@@ -39,7 +39,9 @@ function noHardwareWalletSupport(
 			rating: Rating.FAIL,
 			displayName: 'No hardware wallet support',
 			shortExplanation: sentence('{{WALLET_NAME}} does not support hardware wallets.'),
-			hardwareWalletSupport,
+			metadata: {
+				hardwareWalletSupport,
+			},
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} does not support hardware wallets.
@@ -65,7 +67,7 @@ function indirectHardwareWalletSupport(
 			shortExplanation: sentence(`
 				Using a hardware wallet with {{WALLET_NAME}} requires additional software.
 			`),
-			hardwareWalletSupport,
+			metadata: { hardwareWalletSupport },
 		},
 		details: paragraph(`
 			{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}
@@ -95,7 +97,7 @@ function directHardwareWalletSupport(
 			rating: Rating.PASS,
 			displayName: 'Supports hardware wallets',
 			shortExplanation: sentence('{{WALLET_NAME}} supports hardware wallets.'),
-			hardwareWalletSupport,
+			metadata: { hardwareWalletSupport },
 		},
 		details: mdParagraph(
 			`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, true)}`,

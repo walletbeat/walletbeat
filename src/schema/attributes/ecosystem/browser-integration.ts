@@ -55,7 +55,7 @@ function browserIntegrationSupport(
 				id: 'no_support',
 				rating: Rating.FAIL,
 				displayName: 'No browser integration',
-				support,
+				metadata: { support },
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not integrate with the browser in a standard way.',
 				),
@@ -79,7 +79,7 @@ function browserIntegrationSupport(
 				unsupported.length === 0
 					? 'Fully-compliant browser integration'
 					: 'Partially-compliant browser integration',
-			support,
+			metadata: { support },
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} supports ${unsupported.length === 0 ? 'all' : 'a subset of'} the prominent standards for web browser integration.`,
 			),
@@ -188,7 +188,7 @@ export const browserIntegration: Attribute<BrowserIntegrationMetadata> = {
 		}
 
 		if (Object.values(ctx.features.integration.browser).includes(null)) {
-			return unrated(ctx)
+			return unrated(ctx, {})
 		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that none of the values are null.

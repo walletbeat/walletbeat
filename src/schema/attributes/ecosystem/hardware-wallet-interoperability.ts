@@ -78,7 +78,7 @@ function singleHardwareWalletManufacturerSupport(
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} only supports hardware wallets from a single major manufacturer.
 			`),
-			hardwareWalletSupport,
+			metadata: { hardwareWalletSupport },
 		},
 		details:
 			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}
@@ -106,7 +106,7 @@ function insufficientHardwareWalletManufacturerSupport(
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} supports a limited selection of hardware wallets.
 			`),
-			hardwareWalletSupport,
+			metadata: { hardwareWalletSupport },
 		},
 		details:
 			mdParagraph(`{{WALLET_NAME}} supports ${supportsHardwareWalletTypesMarkdown(hardwareWalletSupport.wallets, false)}

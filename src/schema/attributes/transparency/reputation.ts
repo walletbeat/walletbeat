@@ -106,7 +106,13 @@ export const reputation: Attribute<ReputationMetadata> = {
 				rating,
 				displayName: 'Reputation',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} reputation.`),
-				...reputationFeature, // TODO: Filter fields
+				metadata: {
+					originalProduct: reputationFeature.originalProduct,
+					availability: reputationFeature.availability,
+					warrantySupportRisk: reputationFeature.warrantySupportRisk,
+					disclosureHistory: reputationFeature.disclosureHistory,
+					bugBounty: reputationFeature.bugBounty,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} reputation evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

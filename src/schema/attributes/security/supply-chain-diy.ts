@@ -108,7 +108,10 @@ export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 				rating,
 				displayName: 'Supply Chain DIY',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} DIY supply chain.`),
-				...diyFeature, // TODO: Filter fields
+				metadata: {
+					diyNoNda: diyFeature.diyNoNda,
+					componentSourcingComplexity: diyFeature.componentSourcingComplexity,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} DIY supply chain evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

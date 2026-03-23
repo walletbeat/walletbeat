@@ -17,7 +17,7 @@ import type { AtLeastOneVariant, Variant } from '../variants'
 /**
  * Helper for constructing Evaluation with "Unrated" Outcome.
  */
-export function unrated(ctx: EvaluationContext<{}>): Evaluation<{}>
+export function unrated(ctx: EvaluationContext): Evaluation
 export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
 	ctx: EvaluationContext<_OutcomeMetadata>,
 	metadata: Outcome<_OutcomeMetadata>['metadata'],
@@ -26,15 +26,20 @@ export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
 	ctx: EvaluationContext<_OutcomeMetadata>,
 	metadata?: Outcome<_OutcomeMetadata>['metadata'],
 ): Evaluation<_OutcomeMetadata> {
+	const outcomeBuilt = {
+		id: 'unrated',
+		rating: Rating.UNRATED,
+		verifiability: Verifiability.SELF_EVIDENT,
+		displayName: `${ctx.attribute.displayName}: Unrated`,
+		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
+		...(metadata && { metadata }),
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `metadata` presence matches `_OutcomeMetadata`; TS cannot prove conditional `Outcome` merge
+	const outcome = outcomeBuilt as unknown as Outcome<_OutcomeMetadata>
+
 	return {
-		outcome: {
-			id: 'unrated',
-			rating: Rating.UNRATED,
-			verifiability: Verifiability.SELF_EVIDENT,
-			displayName: `${ctx.attribute.displayName}: Unrated`,
-			shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
-			...(metadata !== undefined && { metadata }),
-		},
+		outcome,
 		details: unratedAttributeContent<_OutcomeMetadata>(),
 	}
 }
@@ -43,9 +48,9 @@ export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
  * Helper for constructing Evaluation with "Exempt" Outcome.
  */
 export function exempt(
-	ctx: EvaluationContext<{}>,
+	ctx: EvaluationContext<null>,
 	whyExempt: Sentence<WalletNameStrings>,
-): ExemptEvaluation<{}>
+): ExemptEvaluation<null>
 export function exempt<_OutcomeMetadata extends OutcomeMetadata>(
 	ctx: EvaluationContext<_OutcomeMetadata>,
 	whyExempt: Sentence<WalletNameStrings>,
@@ -56,15 +61,20 @@ export function exempt<_OutcomeMetadata extends OutcomeMetadata>(
 	whyExempt: Sentence<WalletNameStrings>,
 	metadata?: Outcome<_OutcomeMetadata>['metadata'],
 ): ExemptEvaluation<_OutcomeMetadata> {
+	const outcomeBuilt = {
+		id: 'exempt',
+		rating: Rating.EXEMPT,
+		verifiability: Verifiability.SELF_EVIDENT,
+		displayName: `${ctx.attribute.displayName}: Exempt`,
+		shortExplanation: whyExempt,
+		...(metadata && { metadata }),
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `metadata` presence matches `_OutcomeMetadata`; TS cannot prove conditional `Outcome` merge
+	const outcome = outcomeBuilt as unknown as Outcome<_OutcomeMetadata, Rating.EXEMPT>
+
 	return {
-		outcome: {
-			id: 'exempt',
-			rating: Rating.EXEMPT,
-			verifiability: Verifiability.SELF_EVIDENT,
-			displayName: `${ctx.attribute.displayName}: Exempt`,
-			shortExplanation: whyExempt,
-			...(metadata !== undefined && { metadata }),
-		},
+		outcome,
 		details: whyExempt,
 	}
 }

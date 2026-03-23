@@ -23,7 +23,7 @@ type _EvaluationContext = EvaluationContext<AddressResolutionMetadata>
 type _Evaluation = Evaluation<AddressResolutionMetadata>
 
 export type AddressResolutionMetadata = {
-	addressResolution: AddressResolution<Support<AddressResolutionData>>
+	addressResolution?: AddressResolution<Support<AddressResolutionData>>
 }
 
 function getOffchainProviderInfo(
@@ -437,7 +437,7 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivially self-testable.
 
 		if (ctx.features.addressResolution === null) {
-			return unrated(ctx)
+			return unrated(ctx, {})
 		}
 
 		ctx.addRef(ctx.features.addressResolution)
@@ -447,7 +447,7 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 			ctx.features.addressResolution.chainSpecificAddressing.erc7828 === null ||
 			ctx.features.addressResolution.chainSpecificAddressing.erc7831 === null
 		) {
-			return unrated(ctx)
+			return unrated(ctx, {})
 		}
 
 		// We've checked all the nulls, so recreate the object without nulls in

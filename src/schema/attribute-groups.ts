@@ -106,10 +106,10 @@ import type { WalletMetadata } from './wallet'
 type SecurityValues = Dict<{
 	securityAudits: SecurityAuditsMetadata
 	scamPrevention: ScamPreventionMetadata
-	chainVerification: {}
-	transactionLegibility: {}
+	chainVerification: null
+	transactionLegibility: null
 	hardwareWalletSupport: HardwareWalletSupportMetadata
-	bugBountyProgram: {}
+	bugBountyProgram: null
 	supplyChainDIY: SupplyChainDIYMetadata
 	supplyChainFactory: SupplyChainFactoryMetadata
 	firmware: FirmwareMetadata
@@ -157,10 +157,10 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 /** A ValueSet for privacy Values. */
 type PrivacyValues = Dict<{
 	addressCorrelation: AddressCorrelationMetadata
-	multiAddressCorrelation: {}
+	multiAddressCorrelation: null
 	privateTransfers: PrivateTransfersMetadata
 	hardwarePrivacy: HardwarePrivacyMetadata
-	appIsolation: {}
+	appIsolation: null
 	privacyHygiene: PrivacyHygieneValue
 }>
 
@@ -190,10 +190,10 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 
 /** A ValueSet for self-sovereignty Values. */
 type SelfSovereigntyValues = Dict<{
-	l1ProviderIndependence: {}
-	accountPortability: {}
-	permissionsManagement: {}
-	transactionInclusion: {}
+	l1ProviderIndependence: null
+	accountPortability: null
+	permissionsManagement: null
+	transactionInclusion: null
 	accountUnruggability: AccountUnruggabilityMetadata
 }>
 
@@ -223,9 +223,9 @@ export const selfSovereigntyAttributeGroup: AttributeGroup<SelfSovereigntyValues
 
 /** A ValueSet for transparency Values. */
 type TransparencyValues = Dict<{
-	openSource: {}
-	sourceVisibility: {}
-	funding: {}
+	openSource: null
+	sourceVisibility: null
+	funding: null
 	feeTransparency: FeeTransparencyMetadata
 	reputation: ReputationMetadata
 }>
@@ -256,14 +256,14 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 
 /** A ValueSet for ecosystem Values. */
 type EcosystemValues = Dict<{
-	accountAbstraction: {}
+	accountAbstraction: null
 	addressResolution: AddressResolutionMetadata
 	browserIntegration: BrowserIntegrationMetadata
-	chainAbstraction: {}
-	transactionBatching: {}
+	chainAbstraction: null
+	transactionBatching: null
 	hardwareWalletInteroperability: HardwareWalletInteroperabilityMetadata
 	interoperability: InteroperabilityMetadata
-	appConnectionSupport: {}
+	appConnectionSupport: null
 }>
 
 /** Ecosystem attributes. */
