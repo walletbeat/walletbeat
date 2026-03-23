@@ -26,20 +26,16 @@ export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
 	ctx: EvaluationContext<_OutcomeMetadata>,
 	metadata?: Outcome<_OutcomeMetadata>['metadata'],
 ): Evaluation<_OutcomeMetadata> {
-	const outcomeBuilt = {
-		id: 'unrated',
-		rating: Rating.UNRATED,
-		verifiability: Verifiability.SELF_EVIDENT,
-		displayName: `${ctx.attribute.displayName}: Unrated`,
-		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
-		...(metadata && { metadata }),
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `metadata` presence matches `_OutcomeMetadata`; TS cannot prove conditional `Outcome` merge
-	const outcome = outcomeBuilt as unknown as Outcome<_OutcomeMetadata>
-
 	return {
-		outcome,
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `metadata` presence matches `_OutcomeMetadata`; TS cannot prove conditional `Outcome` merge
+		outcome: {
+			id: 'unrated',
+			rating: Rating.UNRATED,
+			verifiability: Verifiability.SELF_EVIDENT,
+			displayName: `${ctx.attribute.displayName}: Unrated`,
+			shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
+			...(metadata && { metadata }),
+		} as unknown as Outcome<_OutcomeMetadata>,
 		details: unratedAttributeContent<_OutcomeMetadata>(),
 	}
 }
@@ -61,20 +57,16 @@ export function exempt<_OutcomeMetadata extends OutcomeMetadata>(
 	whyExempt: Sentence<WalletNameStrings>,
 	metadata?: Outcome<_OutcomeMetadata>['metadata'],
 ): ExemptEvaluation<_OutcomeMetadata> {
-	const outcomeBuilt = {
-		id: 'exempt',
-		rating: Rating.EXEMPT,
-		verifiability: Verifiability.SELF_EVIDENT,
-		displayName: `${ctx.attribute.displayName}: Exempt`,
-		shortExplanation: whyExempt,
-		...(metadata && { metadata }),
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `metadata` presence matches `_OutcomeMetadata`; TS cannot prove conditional `Outcome` merge
-	const outcome = outcomeBuilt as unknown as Outcome<_OutcomeMetadata, Rating.EXEMPT>
-
 	return {
-		outcome,
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `metadata` presence matches `_OutcomeMetadata`; TS cannot prove conditional `Outcome` merge
+		outcome: {
+			id: 'exempt',
+			rating: Rating.EXEMPT,
+			verifiability: Verifiability.SELF_EVIDENT,
+			displayName: `${ctx.attribute.displayName}: Exempt`,
+			shortExplanation: whyExempt,
+			...(metadata && { metadata }),
+		} as unknown as Outcome<_OutcomeMetadata, Rating.EXEMPT>, // type assertion needed to enforce presence or non-presence of `metadata`
 		details: whyExempt,
 	}
 }
