@@ -75,8 +75,10 @@ function evaluateGuardianRecoveryPolicy(
 					{{WALLET_NAME}} lets the user recover their account in all
 					likely catastrophic scenarios.
 				`),
-				minimumGuardianPolicy: guardianPolicy,
-				outcomes,
+				metadata: {
+					minimumGuardianPolicy: guardianPolicy,
+					outcomes,
+				},
 			},
 			details: accountRecoveryDetailsContent({}),
 		})
@@ -91,8 +93,10 @@ function evaluateGuardianRecoveryPolicy(
 				shortExplanation: typographicContentWithExtraOptionalStrings(
 					nonRecoverableOutcomes[0].recovery.description,
 				),
-				minimumGuardianPolicy: guardianPolicy,
-				outcomes,
+				metadata: {
+					minimumGuardianPolicy: guardianPolicy,
+					outcomes,
+				},
 			},
 			details: accountRecoveryDetailsContent({}),
 		})
@@ -107,8 +111,10 @@ function evaluateGuardianRecoveryPolicy(
 				{{WALLET_NAME}}'s account recovery feature cannot be
 				relied upon in multiple scenarios.
 			`),
-			minimumGuardianPolicy: guardianPolicy,
-			outcomes,
+			metadata: {
+				minimumGuardianPolicy: guardianPolicy,
+				outcomes,
+			},
 		},
 		details: accountRecoveryDetailsContent({}),
 	})
@@ -134,8 +140,10 @@ function evaluateAccountRecovery(
 				{{WALLET_NAME}} does not implement guardian-based account recovery.
 				The user will lose access to their account if they lose their seed phrase.
 			`),
-			minimumGuardianPolicy: null,
-			outcomes: null,
+			metadata: {
+				minimumGuardianPolicy: null,
+				outcomes: null,
+			},
 		},
 		details: accountRecoveryDetailsContent({}),
 	})

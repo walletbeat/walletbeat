@@ -32,7 +32,9 @@ const noAudits: (typeof securityAudits)['evaluate'] = ctx =>
 			rating: Rating.FAIL,
 			displayName: 'No security audits',
 			shortExplanation: sentence('{{WALLET_NAME}} has not undergone security auditing.'),
-			securityAudits: [],
+			metadata: {
+				securityAudits: [],
+			},
 		},
 		details: paragraph('{{WALLET_NAME}} has not undergone any security auditing.'),
 	})
@@ -104,7 +106,9 @@ function audited(
 			rating,
 			displayName,
 			shortExplanation,
-			securityAudits: audits,
+			metadata: {
+				securityAudits: audits,
+			},
 		},
 		details: securityAuditsDetailsContent({
 			auditedInLastYear,
@@ -266,11 +270,11 @@ export const securityAudits: Attribute<SecurityAuditsOutcomeMetadata> = {
 		const auditsIdSet = new Set<string>()
 
 		for (const evaluation of Object.values(perVariant)) {
-			if (!evaluation) {
+			if (!evaluation?.value.metadata?.securityAudits) {
 				continue
 			}
 
-			for (const audit of evaluation.value.securityAudits) {
+			for (const audit of evaluation.value.metadata.securityAudits) {
 				const auditId = securityAuditId(audit)
 
 				if (!auditsIdSet.has(auditId)) {
@@ -279,7 +283,10 @@ export const securityAudits: Attribute<SecurityAuditsOutcomeMetadata> = {
 				}
 			}
 		}
-		worstEvaluation.value.securityAudits = allAudits
+		worstEvaluation.value.metadata = {
+			...worstEvaluation.value.metadata,
+			securityAudits: allAudits,
+		}
 
 		return worstEvaluation
 	},

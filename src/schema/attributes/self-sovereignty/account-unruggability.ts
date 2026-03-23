@@ -79,8 +79,10 @@ function evaluateGuardianUnruggabilityPolicy(
 					{{WALLET_NAME}} does not allow any external service to take over
 					your account.
 				`),
-				minimumGuardianPolicy: guardianPolicy,
-				outcomes,
+				metadata: {
+					minimumGuardianPolicy: guardianPolicy,
+					outcomes,
+				},
 			},
 			details: accountUnruggabilityDetailsContent({}),
 		})
@@ -95,8 +97,10 @@ function evaluateGuardianUnruggabilityPolicy(
 				shortExplanation: typographicContentWithExtraOptionalStrings(
 					takeOverPossibleOutcomes[0].takeover.description,
 				),
-				minimumGuardianPolicy: guardianPolicy,
-				outcomes,
+				metadata: {
+					minimumGuardianPolicy: guardianPolicy,
+					outcomes,
+				},
 			},
 			details: accountUnruggabilityDetailsContent({}),
 		})
@@ -111,8 +115,10 @@ function evaluateGuardianUnruggabilityPolicy(
 				{{WALLET_NAME}}'s account recovery feature leaves the account
 				vulnerable to being rugged in multiple scenarios.
 			`),
-			minimumGuardianPolicy: guardianPolicy,
-			outcomes,
+			metadata: {
+				minimumGuardianPolicy: guardianPolicy,
+				outcomes,
+			},
 		},
 		details: accountUnruggabilityDetailsContent({}),
 	})
@@ -138,8 +144,10 @@ function evaluateAccountUnruggability(
 						When generating a key with {{WALLET_NAME}}, the key is generated
 						by an external service which can use this to rug your account.
 					`),
-					minimumGuardianPolicy: null,
-					outcomes: null,
+					metadata: {
+						minimumGuardianPolicy: null,
+						outcomes: null,
+					},
 				},
 				details: markdown(`
 					Key generation with {{WALLET_NAME}} occurs off-device. This means
@@ -168,8 +176,10 @@ function evaluateAccountUnruggability(
 						{{WALLET_NAME}} uses MPC, but the key reconstruction process can
 						occur without requiring the user's device.
 					`),
-					minimumGuardianPolicy: null,
-					outcomes: null,
+					metadata: {
+						minimumGuardianPolicy: null,
+						outcomes: null,
+					},
 				},
 				details: markdown(`
 					{{WALLET_NAME}} uses multi-party computation to derive the account's
@@ -199,8 +209,10 @@ function evaluateAccountUnruggability(
 				Private key material never leaves {{WALLET_NAME}}, so no external
 				entity may take over your account.
 			`),
-			minimumGuardianPolicy: null,
-			outcomes: null,
+			metadata: {
+				minimumGuardianPolicy: null,
+				outcomes: null,
+			},
 		},
 		details: accountUnruggabilityDetailsContent({}),
 	})

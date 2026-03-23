@@ -305,6 +305,12 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 	 * If unspecified, the score is derived using `defaultRatingScore`.
 	 */
 	score?: Score
+
+	/**
+	 * Attribute-specific metadata. Optional; only present when the attribute
+	 * has metadata beyond the base outcome fields.
+	 */
+	metadata?: {} extends _OutcomeMetadata ? undefined : _OutcomeMetadata
 } & (
 	| {
 			rating: ExplicitRating
@@ -331,8 +337,7 @@ export type Outcome<_OutcomeMetadata extends OutcomeMetadata = {}> = {
 			// If EXEMPT or UNRATED, the verifiability is self-evident.
 			verifiability: Verifiability.SELF_EVIDENT
 	  }
-) &
-	_OutcomeMetadata
+)
 
 /** The numerical score corresponding to a rating by default. */
 export function defaultRatingScore(value: Outcome): Score {

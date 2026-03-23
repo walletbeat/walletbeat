@@ -30,43 +30,43 @@
 	strings={getWalletEvalStrings(wallet)}
 />
 
-{#if outcome.scamAlerts}
+{#if outcome.metadata?.scamAlerts}
 	{@const scamUrlLeaks =
-		!outcome.scamAlerts || !isSupported(outcome.scamAlerts.scamUrlWarning)
+		!outcome.metadata.scamAlerts || !isSupported(outcome.metadata.scamAlerts.scamUrlWarning)
 			? []
 			: ([
-					outcome.scamAlerts.scamUrlWarning.leaksIp && 'your IP',
-					outcome.scamAlerts.scamUrlWarning.leaksUserAddress && 'your Ethereum address',
-					outcome.scamAlerts.scamUrlWarning.leaksVisitedUrl === 'FULL_URL' &&
+					outcome.metadata.scamAlerts.scamUrlWarning.leaksIp && 'your IP',
+					outcome.metadata.scamAlerts.scamUrlWarning.leaksUserAddress && 'your Ethereum address',
+					outcome.metadata.scamAlerts.scamUrlWarning.leaksVisitedUrl === 'FULL_URL' &&
 						'the full URL of the app',
-					outcome.scamAlerts.scamUrlWarning.leaksVisitedUrl === 'DOMAIN_ONLY' &&
+					outcome.metadata.scamAlerts.scamUrlWarning.leaksVisitedUrl === 'DOMAIN_ONLY' &&
 						'the domain name of the app',
 				].filter(s => s !== ''))}
 
 	<ul data-list="gap-4">
-		{#if outcome.sendTransactionWarning?.required}
+		{#if outcome.metadata.sendTransactionWarning?.required}
 			<li data-list-item="gap-2">
 				<Typography
 					content={{
 						contentType: ContentType.MARKDOWN,
-						markdown: isSupported(outcome.scamAlerts.sendTransactionWarning)
+						markdown: isSupported(outcome.metadata.scamAlerts.sendTransactionWarning)
 							? `**{{WALLET_NAME}}** helps you stay safe when sending funds by ${
-									outcome.scamAlerts.sendTransactionWarning.newRecipientWarning &&
-									outcome.scamAlerts.sendTransactionWarning.userWhitelist
+									outcome.metadata.scamAlerts.sendTransactionWarning.newRecipientWarning &&
+									outcome.metadata.scamAlerts.sendTransactionWarning.userWhitelist
 										? 'warning you when sending funds to an address you have not sent or received funds from in the past, and allowing you to build a contact book of addresses and warning you when sending funds to addresses not in it.'
-										: outcome.scamAlerts.sendTransactionWarning.newRecipientWarning
+										: outcome.metadata.scamAlerts.sendTransactionWarning.newRecipientWarning
 											? 'warning you when sending funds to an address you have not sent or received funds from in the past.'
-											: outcome.scamAlerts.sendTransactionWarning.userWhitelist
+											: outcome.metadata.scamAlerts.sendTransactionWarning.userWhitelist
 												? 'allowing you to build a contact book of addresses and warning you when sending funds to addresses not in it.'
 												: 'providing transaction warnings.'
 								}${
-									!outcome.sendTransactionWarning.privacyPreserving
+									!outcome.metadata.sendTransactionWarning.privacyPreserving
 										? ` However, in doing so, it leaks ${commaListFormat(
 												[
-													outcome.scamAlerts.sendTransactionWarning.leaksUserIp && 'your IP',
-													outcome.scamAlerts.sendTransactionWarning.leaksUserAddress &&
+													outcome.metadata.scamAlerts.sendTransactionWarning.leaksUserIp && 'your IP',
+													outcome.metadata.scamAlerts.sendTransactionWarning.leaksUserAddress &&
 														'your Ethereum address',
-													outcome.scamAlerts.sendTransactionWarning.leaksRecipient &&
+													outcome.metadata.scamAlerts.sendTransactionWarning.leaksRecipient &&
 														"the recipient's Ethereum address",
 												].filter(s => s !== ''),
 											)} to an external provider which can correlate them.`
@@ -77,20 +77,20 @@
 					strings={getWalletEvalStrings(wallet)}
 				/>
 
-				{#if isSupported(outcome.scamAlerts.sendTransactionWarning) && outcome.scamAlerts.sendTransactionWarning.ref}
+				{#if isSupported(outcome.metadata.scamAlerts.sendTransactionWarning) && outcome.metadata.scamAlerts.sendTransactionWarning.ref}
 					<ReferenceLinks
-						references={toFullyQualified(outcome.scamAlerts.sendTransactionWarning.ref)}
+						references={toFullyQualified(outcome.metadata.scamAlerts.sendTransactionWarning.ref)}
 					/>
 				{/if}
 			</li>
 		{/if}
 
-		{#if outcome.contractTransactionWarning?.required}
-			{@const contractFeatures = isSupported(outcome.scamAlerts.contractTransactionWarning)
+		{#if outcome.metadata.contractTransactionWarning?.required}
+			{@const contractFeatures = isSupported(outcome.metadata.scamAlerts.contractTransactionWarning)
 				? [
-						outcome.scamAlerts.contractTransactionWarning.contractRegistry,
-						outcome.scamAlerts.contractTransactionWarning.previousContractInteractionWarning,
-						outcome.scamAlerts.contractTransactionWarning.recentContractWarning,
+						outcome.metadata.scamAlerts.contractTransactionWarning.contractRegistry,
+						outcome.metadata.scamAlerts.contractTransactionWarning.previousContractInteractionWarning,
+						outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning,
 					].filter(Boolean)
 				: []}
 
@@ -98,37 +98,37 @@
 				<Typography
 					content={{
 						contentType: ContentType.MARKDOWN,
-						markdown: isSupported(outcome.scamAlerts.contractTransactionWarning)
+						markdown: isSupported(outcome.metadata.scamAlerts.contractTransactionWarning)
 							? `**{{WALLET_NAME}}** helps you stay safe when doing onchain transactions by${
 									contractFeatures.length > 1
 										? `: ${[
-												outcome.scamAlerts.contractTransactionWarning.contractRegistry &&
+												outcome.metadata.scamAlerts.contractTransactionWarning.contractRegistry &&
 													'Checking the contract or transaction data against a database of known scams',
-												outcome.scamAlerts.contractTransactionWarning
+												outcome.metadata.scamAlerts.contractTransactionWarning
 													.previousContractInteractionWarning &&
 													'Warning you when interacting with a contract you have not interacted with before',
-												outcome.scamAlerts.contractTransactionWarning.recentContractWarning &&
+												outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning &&
 													'Warning you when interacting with a contract that has only recently been created onchain',
 											]
 												.filter(s => s)
 												.map(listItem => `\n* ${listItem}`)
 												.join('')}`
-										: outcome.scamAlerts.contractTransactionWarning.contractRegistry
+										: outcome.metadata.scamAlerts.contractTransactionWarning.contractRegistry
 											? 'checking the contract or transaction data against a database of known scams.'
-											: outcome.scamAlerts.contractTransactionWarning
+											: outcome.metadata.scamAlerts.contractTransactionWarning
 														.previousContractInteractionWarning
 												? 'warning you when interacting with a contract you have not interacted with before.'
-												: outcome.scamAlerts.contractTransactionWarning.recentContractWarning
+												: outcome.metadata.scamAlerts.contractTransactionWarning.recentContractWarning
 													? 'warning you when interacting with a contract that has only recently been created onchain.'
 													: 'providing contract warnings.'
 								}${
-									!outcome.contractTransactionWarning.privacyPreserving
+									!outcome.metadata.contractTransactionWarning.privacyPreserving
 										? ` However, in doing so, it leaks ${commaListFormat(
 												[
-													outcome.scamAlerts.contractTransactionWarning.leaksUserIp && 'your IP',
-													outcome.scamAlerts.contractTransactionWarning.leaksUserAddress &&
+													outcome.metadata.scamAlerts.contractTransactionWarning.leaksUserIp && 'your IP',
+													outcome.metadata.scamAlerts.contractTransactionWarning.leaksUserAddress &&
 														'your Ethereum address',
-													outcome.scamAlerts.contractTransactionWarning.leaksContractAddress &&
+													outcome.metadata.scamAlerts.contractTransactionWarning.leaksContractAddress &&
 														'the contract address',
 												].filter(s => s),
 											)} to an external provider which can correlate them ahead of the transaction being submitted.`
@@ -139,22 +139,22 @@
 					strings={getWalletEvalStrings(wallet)}
 				/>
 
-				{#if isSupported(outcome.scamAlerts.contractTransactionWarning) && outcome.scamAlerts.contractTransactionWarning.ref}
+				{#if isSupported(outcome.metadata.scamAlerts.contractTransactionWarning) && outcome.metadata.scamAlerts.contractTransactionWarning.ref}
 					<ReferenceLinks
-						references={toFullyQualified(outcome.scamAlerts.contractTransactionWarning.ref)}
+						references={toFullyQualified(outcome.metadata.scamAlerts.contractTransactionWarning.ref)}
 					/>
 				{/if}
 			</li>
 		{/if}
 
-		{#if outcome.scamUrlWarning?.required}
+		{#if outcome.metadata.scamUrlWarning?.required}
 			<li data-list-item="gap-2">
 				<Typography
 					content={{
 						contentType: ContentType.MARKDOWN,
-						markdown: isSupported(outcome.scamAlerts.scamUrlWarning)
+						markdown: isSupported(outcome.metadata.scamAlerts.scamUrlWarning)
 							? `**{{WALLET_NAME}}** helps you stay safe when connecting to onchain apps by checking its URL against a set of known scam apps.${
-									!outcome.scamUrlWarning.privacyPreserving && scamUrlLeaks.length > 0
+									!outcome.metadata.scamUrlWarning.privacyPreserving && scamUrlLeaks.length > 0
 										? ` However, in doing so, it leaks ${commaListFormat(scamUrlLeaks)} to an external provider${
 												scamUrlLeaks.length > 1 ? ' which can correlate them' : ''
 											}.`
@@ -165,9 +165,9 @@
 					strings={getWalletEvalStrings(wallet)}
 				/>
 
-				{#if isSupported(outcome.scamAlerts.scamUrlWarning) && outcome.scamAlerts.scamUrlWarning.ref}
+				{#if isSupported(outcome.metadata.scamAlerts.scamUrlWarning) && outcome.metadata.scamAlerts.scamUrlWarning.ref}
 					<ReferenceLinks
-						references={toFullyQualified(outcome.scamAlerts.scamUrlWarning.ref)}
+						references={toFullyQualified(outcome.metadata.scamAlerts.scamUrlWarning.ref)}
 					/>
 				{/if}
 			</li>

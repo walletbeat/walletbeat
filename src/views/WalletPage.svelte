@@ -920,15 +920,15 @@
 							{:else if componentName === 'ScamAlertDetails'}
 								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
 							{:else if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome} />
+								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'TransactionInclusionDetails'}
 								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
 							{:else if componentName === 'FundingDetails'}
 								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
 							{:else if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome} />
+								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome} />
+								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'UnratedAttribute'}
 								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
 							{/if}

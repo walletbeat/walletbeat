@@ -197,7 +197,7 @@ function evaluateScamAlerts(
 
 	type NonNullScamPreventionOutcomeMetadataScaffold = Exclude<
 		_EvaluationScaffold['value'],
-		{ scamAlerts: null }
+		{ metadata: { scamAlerts: null } }
 	>
 
 	if (!isNonEmptyArray(supportedFeatures)) {
@@ -210,10 +210,12 @@ function evaluateScamAlerts(
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} makes no attempt to warn the user about potential scams.',
 				),
-				scamAlerts,
-				sendTransactionWarning,
-				contractTransactionWarning,
-				scamUrlWarning,
+				metadata: {
+					scamAlerts,
+					sendTransactionWarning,
+					contractTransactionWarning,
+					scamUrlWarning,
+				},
 			} as NonNullScamPreventionOutcomeMetadataScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: paragraph('{{WALLET_NAME}} should implement scam alerting features.'),
@@ -237,10 +239,12 @@ function evaluateScamAlerts(
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} warns you about potential scams, but leaks your browsing history in the process.',
 					),
-					scamAlerts,
-					sendTransactionWarning,
-					contractTransactionWarning,
-					scamUrlWarning,
+					metadata: {
+						scamAlerts,
+						sendTransactionWarning,
+						contractTransactionWarning,
+						scamUrlWarning,
+					},
 				} as NonNullScamPreventionOutcomeMetadataScaffold,
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
@@ -263,10 +267,12 @@ function evaluateScamAlerts(
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} warns you about potential scams, but leaks your browsed websites in the process.',
 					),
-					scamAlerts,
-					sendTransactionWarning,
-					contractTransactionWarning,
-					scamUrlWarning,
+					metadata: {
+						scamAlerts,
+						sendTransactionWarning,
+						contractTransactionWarning,
+						scamUrlWarning,
+					},
 				} as NonNullScamPreventionOutcomeMetadataScaffold,
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
@@ -288,10 +294,12 @@ function evaluateScamAlerts(
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} but not about ${commaListFormat(unsupportedFeatures.map(sas => sas.humanFeature))}`,
 				),
-				scamAlerts,
-				sendTransactionWarning,
-				contractTransactionWarning,
-				scamUrlWarning,
+				metadata: {
+					scamAlerts,
+					sendTransactionWarning,
+					contractTransactionWarning,
+					scamUrlWarning,
+				},
 			} as NonNullScamPreventionOutcomeMetadataScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
@@ -321,10 +329,12 @@ function evaluateScamAlerts(
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} in a privacy-invasive way.`,
 				),
-				scamAlerts,
-				sendTransactionWarning,
-				contractTransactionWarning,
-				scamUrlWarning,
+				metadata: {
+					scamAlerts,
+					sendTransactionWarning,
+					contractTransactionWarning,
+					scamUrlWarning,
+				},
 			} as NonNullScamPreventionOutcomeMetadataScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
@@ -359,10 +369,12 @@ function evaluateScamAlerts(
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}.`,
 			),
-			scamAlerts,
-			sendTransactionWarning,
-			contractTransactionWarning,
-			scamUrlWarning,
+			metadata: {
+				scamAlerts,
+				sendTransactionWarning,
+				contractTransactionWarning,
+				scamUrlWarning,
+			},
 		} as NonNullScamPreventionOutcomeMetadataScaffold,
 		details: scamAlertsDetailsContent({}),
 	})

@@ -21,15 +21,16 @@ export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
 	ctx: EvaluationContext<_OutcomeMetadata>,
 	extraProps: keyof _OutcomeMetadata extends never ? null : _OutcomeMetadata,
 ): Evaluation<_OutcomeMetadata> {
-	const value: Outcome = {
+	const value = {
 		id: 'unrated',
 		rating: Rating.UNRATED,
 		verifiability: Verifiability.SELF_EVIDENT,
 		displayName: `${ctx.attribute.displayName}: Unrated`,
 		shortExplanation: sentence('Walletbeat lacks the information needed to determine this.'),
-	}
+		...(extraProps ? { metadata: extraProps } : {}),
+	} as Outcome<_OutcomeMetadata>
 
-	const v = { ...value, ...(extraProps ?? {}) } as Outcome<_OutcomeMetadata>
+	const v = value
 
 	return {
 		value: v,
@@ -49,10 +50,9 @@ export function exempt<_OutcomeMetadata extends OutcomeMetadata>(
 		displayName: `${ctx.attribute.displayName}: Exempt`,
 		shortExplanation: whyExempt,
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Combining the fields of Value with the fields of _OutcomeMetadata creates a correct Outcome<_OutcomeMetadata>-typed object.
 	const v = {
 		...value,
-		...(extraProps ?? {}),
+		...(extraProps ? { metadata: extraProps } : {}),
 	} as Outcome<_OutcomeMetadata> & { rating: Rating.EXEMPT }
 
 	return {
