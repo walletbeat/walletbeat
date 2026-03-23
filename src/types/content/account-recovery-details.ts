@@ -3,7 +3,12 @@ import type { AccountRecoveryOutcomeMetadata } from '@/schema/attributes/securit
 
 import { component, type Content } from '../content'
 
-export interface AccountRecoveryDetailsProps extends EvaluationData<AccountRecoveryOutcomeMetadata> {}
+export interface AccountRecoveryDetailsProps extends Omit<
+	EvaluationData<AccountRecoveryOutcomeMetadata>,
+	'outcome'
+> {
+	metadata: AccountRecoveryOutcomeMetadata
+}
 
 export interface AccountRecoveryDetailsContent {
 	component: 'AccountRecoveryDetails'
@@ -13,7 +18,7 @@ export interface AccountRecoveryDetailsContent {
 export function accountRecoveryDetailsContent(
 	bakedProps: Omit<
 		AccountRecoveryDetailsProps,
-		keyof EvaluationData<AccountRecoveryOutcomeMetadata>
+		keyof Omit<EvaluationData<AccountRecoveryOutcomeMetadata>, 'outcome'> | 'metadata'
 	>,
 ): Content<{ WALLET_NAME: string }> {
 	return component<AccountRecoveryDetailsContent, keyof typeof bakedProps>(

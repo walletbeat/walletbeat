@@ -47,12 +47,12 @@
 	// Props
 	const {
 		wallet,
-		outcome,
+		metadata,
 		auditedInLastYear,
 		hasUnaddressedFlaws,
 	}: {
 		wallet: RatedWallet
-		outcome: SecurityAuditsOutcomeMetadata
+		metadata: SecurityAuditsOutcomeMetadata
 		auditedInLastYear?: boolean
 		hasUnaddressedFlaws?: boolean
 	} = $props()
@@ -69,7 +69,7 @@
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
-{#if outcome.securityAudits.length === 0}
+{#if metadata.securityAudits.length === 0}
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
@@ -79,7 +79,7 @@
 	/>
 {:else}
 	{@const securityAudits = (
-		outcome
+		metadata
 			.securityAudits
 			.toSorted((a, b) => (
 				new Date(b.auditDate).getTime() - new Date(a.auditDate).getTime()

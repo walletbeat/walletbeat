@@ -3,7 +3,12 @@ import type { AccountUnruggabilityOutcomeMetadata } from '@/schema/attributes/se
 
 import { component, type Content } from '../content'
 
-export interface AccountUnruggabilityDetailsProps extends EvaluationData<AccountUnruggabilityOutcomeMetadata> {}
+export interface AccountUnruggabilityDetailsProps extends Omit<
+	EvaluationData<AccountUnruggabilityOutcomeMetadata>,
+	'outcome'
+> {
+	metadata: AccountUnruggabilityOutcomeMetadata
+}
 
 export interface AccountUnruggabilityDetailsContent {
 	component: 'AccountUnruggabilityDetails'
@@ -13,7 +18,7 @@ export interface AccountUnruggabilityDetailsContent {
 export function accountUnruggabilityDetailsContent(
 	bakedProps: Omit<
 		AccountUnruggabilityDetailsProps,
-		keyof EvaluationData<AccountUnruggabilityOutcomeMetadata>
+		keyof Omit<EvaluationData<AccountUnruggabilityOutcomeMetadata>, 'outcome'> | 'metadata'
 	>,
 ): Content<{ WALLET_NAME: string }> {
 	return component<AccountUnruggabilityDetailsContent, keyof typeof bakedProps>(

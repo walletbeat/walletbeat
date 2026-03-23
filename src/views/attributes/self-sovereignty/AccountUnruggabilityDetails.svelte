@@ -6,15 +6,14 @@
 	import type {
 		AccountUnruggabilityOutcomeMetadata,
 	} from '@/schema/attributes/self-sovereignty/account-unruggability'
-	import type { Outcome } from '@/schema/attributes'
 
 	// Props
 	const {
 		wallet,
-		outcome,
+		metadata,
 	}: {
 		wallet: RatedWallet
-		outcome: Outcome<AccountUnruggabilityOutcomeMetadata>
+		metadata: AccountUnruggabilityOutcomeMetadata
 	} = $props()
 
 	// Components
@@ -24,7 +23,7 @@
 	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
 </script>
 
-{#if outcome.outcomes === null}
+{#if metadata.outcomes === null}
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
@@ -36,10 +35,10 @@
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
 {:else}
-	{@const successfulOutcomes = outcome.outcomes.filter(outcome =>
+	{@const successfulOutcomes = metadata.outcomes.filter(outcome =>
 		!isAccountTakeOverPossible(outcome.takeover),
 	)}
-	{@const failedOutcomes = outcome.outcomes.filter(
+	{@const failedOutcomes = metadata.outcomes.filter(
 		outcome => isAccountTakeOverPossible(outcome.takeover),
 	)}
 	<Typography
@@ -53,7 +52,7 @@
 		}}
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
-	{#if outcome.minimumGuardianPolicy !== null}
+	{#if metadata.minimumGuardianPolicy !== null}
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
@@ -63,13 +62,13 @@
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: trimWhitespacePrefix(outcome.minimumGuardianPolicy.descriptionMarkdown),
+				markdown: trimWhitespacePrefix(metadata.minimumGuardianPolicy.descriptionMarkdown),
 			}}
 		/>
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: guardianPolicyMarkdown(outcome.minimumGuardianPolicy),
+				markdown: guardianPolicyMarkdown(metadata.minimumGuardianPolicy),
 			}}
 		/>
 	{/if}
