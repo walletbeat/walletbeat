@@ -85,8 +85,11 @@ export const family: SoftwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: null,
-			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: {
@@ -96,7 +99,6 @@ export const family: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

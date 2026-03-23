@@ -100,12 +100,14 @@ export const ngrave: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			crashReportingConsent: null,
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://ngrave.io/privacy-policy',
 			transactionPrivacy: null,
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

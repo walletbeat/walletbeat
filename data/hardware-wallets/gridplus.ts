@@ -144,7 +144,10 @@ export const gridplusWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			crashReportingConsent: null,
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			hardwarePrivacy: supported<HardwarePrivacyImplementation>({
 				type: HardwarePrivacyType.PARTIAL,
@@ -162,7 +165,6 @@ export const gridplusWallet: HardwareWallet = {
 			}),
 			privacyPolicy: 'https://gridplus.io/policies/privacy-policy',
 			transactionPrivacy: null,
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

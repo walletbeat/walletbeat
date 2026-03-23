@@ -346,6 +346,10 @@ export const completedTemplate: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: notSupported,
+				usage: notSupported,
+			},
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: supported({
@@ -363,7 +367,6 @@ export const completedTemplate: SoftwareWallet = {
 				[Variant.MOBILE]: null,
 				[Variant.DESKTOP]: null,
 			},
-			crashReportingConsent: CollectionPolicy.NEVER,
 			dataCollection: {
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [
@@ -479,7 +482,6 @@ export const completedTemplate: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
-			usageAnalyticsConsent: CollectionPolicy.NEVER,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

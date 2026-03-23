@@ -67,12 +67,14 @@ export const unratedHardwareTemplate: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			crashReportingConsent: null,
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: null,
 			transactionPrivacy: null,
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

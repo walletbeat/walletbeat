@@ -102,7 +102,10 @@ export const imkeyWallet: HardwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
-			crashReportingConsent: null,
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			hardwarePrivacy: {
 				type: HardwarePrivacyType.PASS,
@@ -114,7 +117,6 @@ export const imkeyWallet: HardwareWallet = {
 			},
 			privacyPolicy: 'https://token.im/tos-en.html',
 			transactionPrivacy: null,
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

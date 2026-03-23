@@ -114,7 +114,10 @@ export const bitboxWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
-			crashReportingConsent: null,
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: {
 				[UserFlow.UNCLASSIFIED]: {
 					collected: [
@@ -173,7 +176,6 @@ export const bitboxWallet: HardwareWallet = {
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://bitbox.swiss/policies/privacy-policy/',
 			transactionPrivacy: null,
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

@@ -18,6 +18,7 @@ import {
 	userInfoEnums,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
+import { isSupported } from '@/schema/features/support'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
@@ -349,27 +350,36 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 			return walletConnectedDomainsByDefault(ctx)
 		}
 
-		const usageAnalyticsConsent = ctx.features.privacy.usageAnalyticsConsent
-		const crashReportingConsent = ctx.features.privacy.crashReportingConsent
+		const usageAnalytics = ctx.features.privacy.analytics.usage
+		const crashReportsAnalytics = ctx.features.privacy.analytics.crashReports
+
+		if (usageAnalytics !== null && isSupported(usageAnalytics)) {
+			ctx.addRef(usageAnalytics)
+		}
+
+		if (crashReportsAnalytics !== null && isSupported(crashReportsAnalytics)) {
+			ctx.addRef(crashReportsAnalytics)
+		}
 
 		if (
-			usageAnalyticsConsent === CollectionPolicy.BY_DEFAULT ||
-			usageAnalyticsConsent === CollectionPolicy.ALWAYS
+			usageAnalytics !== null &&
+			isSupported(usageAnalytics) &&
+			(usageAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
+				usageAnalytics.policy === CollectionPolicy.ALWAYS)
 		) {
 			return usageAnalyticsWithoutConsent(ctx)
 		}
 
 		if (
-			crashReportingConsent === CollectionPolicy.BY_DEFAULT ||
-			crashReportingConsent === CollectionPolicy.ALWAYS
+			crashReportsAnalytics !== null &&
+			isSupported(crashReportsAnalytics) &&
+			(crashReportsAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
+				crashReportsAnalytics.policy === CollectionPolicy.ALWAYS)
 		) {
 			return crashReportingWithoutConsent(ctx)
 		}
 
-		if (
-			hasAnalyticsInSomeFlow &&
-			(usageAnalyticsConsent === null || crashReportingConsent === null)
-		) {
+		if (hasAnalyticsInSomeFlow && (usageAnalytics === null || crashReportsAnalytics === null)) {
 			return unrated(ctx, null)
 		}
 

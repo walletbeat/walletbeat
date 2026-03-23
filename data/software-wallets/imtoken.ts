@@ -187,10 +187,13 @@ export const imtoken: SoftwareWallet = {
 			],
 		}),
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: {
 				[Variant.MOBILE]: null,
 			},
-			crashReportingConsent: null,
 			dataCollection: {
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [],
@@ -236,7 +239,6 @@ export const imtoken: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

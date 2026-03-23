@@ -1,6 +1,7 @@
 import { prefixError } from '@/types/errors'
 import { isNonNull, type Nullable, type NullableObject } from '@/types/utils/nullable'
 
+import type { Entity } from './entity'
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import type { DelegationHandling } from './features/ecosystem/delegation-handling'
@@ -56,6 +57,14 @@ import {
 	type VariantFeature,
 } from './variants'
 import { variantToWalletType, type WalletType } from './wallet-types'
+
+export type WalletAnalytics = WithRef<{
+	/** Where analytics data goes. */
+	entity: Entity
+
+	/** Analytics data collection policy. */
+	policy: Exclude<CollectionPolicy, CollectionPolicy.NEVER>
+}>
 
 /**
  * A set of features about any type of wallet.
@@ -120,18 +129,16 @@ export interface WalletBaseFeatures {
 		transactionPrivacy: VariantFeature<TransactionPrivacy>
 
 		/**
-		 * Collection policy for product analytics / UI usage tracking.
-		 * NEVER = no analytics;
-		 * OPT_IN / PROMPTED = consent before first use; BY_DEFAULT / ALWAYS = no consent.
+		 * Wallet analytics collectors and consent policy.
+		 * Use `NOT_SUPPORTED` when a type of analytics is not used by the wallet.
 		 */
-		usageAnalyticsConsent: VariantFeature<CollectionPolicy>
+		analytics: {
+			/** Product analytics / UI usage tracking telemetry. */
+			usage: VariantFeature<Support<WalletAnalytics>>
 
-		/**
-		 * Collection policy for crash/error reporting telemetry.
-		 * NEVER = no crash reporting;
-		 * OPT_IN / PROMPTED = consent before first use; BY_DEFAULT / ALWAYS = no consent.
-		 */
-		crashReportingConsent: VariantFeature<CollectionPolicy>
+			/** Crash and error reporting telemetry. */
+			crashReports: VariantFeature<Support<WalletAnalytics>>
+		}
 	}
 
 	/** Self-sovereignty features. */
@@ -325,8 +332,10 @@ export interface ResolvedFeatures {
 		accountRecovery: ResolvedFeature<AccountRecovery>
 	}
 	privacy: {
-		usageAnalyticsConsent: ResolvedFeature<CollectionPolicy>
-		crashReportingConsent: ResolvedFeature<CollectionPolicy>
+		analytics: {
+			usage: ResolvedFeature<Support<WalletAnalytics>>
+			crashReports: ResolvedFeature<Support<WalletAnalytics>>
+		}
 		dataCollection: ResolvedFeature<DataCollection>
 		privacyPolicy: ResolvedFeature<string>
 		hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport>
@@ -473,14 +482,13 @@ export function resolveFeatures(
 			),
 		},
 		privacy: {
-			usageAnalyticsConsent: baseFeat(
-				'privacy.usageAnalyticsConsent',
-				features => features.privacy.usageAnalyticsConsent,
-			),
-			crashReportingConsent: baseFeat(
-				'privacy.crashReportingConsent',
-				features => features.privacy.crashReportingConsent,
-			),
+			analytics: {
+				usage: baseFeat('privacy.analytics.usage', features => features.privacy.analytics.usage),
+				crashReports: baseFeat(
+					'privacy.analytics.crashReports',
+					features => features.privacy.analytics.crashReports,
+				),
+			},
 			dataCollection: baseFeat(
 				'privacy.dataCollection',
 				features => features.privacy.dataCollection,

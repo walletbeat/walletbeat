@@ -1,5 +1,6 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import {
@@ -286,6 +287,24 @@ export const rabby: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: {
+					[Variant.BROWSER]: supported<WalletAnalytics>({
+						ref: [
+							{
+								explanation:
+									'Rabby collects UI/product analytics events via Matomo which issent to DeBank-owned infrastructure.',
+								url: 'https://github.com/search?q=repo%3ARabbyHub%2FRabby%20matomoRequestEvent&type=code',
+							},
+						],
+						entity: deBank,
+						policy: CollectionPolicy.ALWAYS,
+					}),
+					[Variant.DESKTOP]: null,
+					[Variant.MOBILE]: null,
+				},
+			},
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: notSupported,
@@ -299,7 +318,6 @@ export const rabby: SoftwareWallet = {
 				[Variant.MOBILE]: null,
 				[Variant.DESKTOP]: null,
 			},
-			crashReportingConsent: null,
 			dataCollection: {
 				[Variant.BROWSER]: {
 					[UserFlow.NATIVE_SWAP]: {
@@ -396,7 +414,6 @@ export const rabby: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

@@ -166,8 +166,11 @@ export const safe: SoftwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: null,
-			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: 'https://safe.global/privacy',
 			transactionPrivacy: {
@@ -177,7 +180,6 @@ export const safe: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {

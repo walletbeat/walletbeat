@@ -126,8 +126,11 @@ export const nufi: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: null,
-			crashReportingConsent: null,
 			dataCollection: null,
 			privacyPolicy: 'https://nu.fi/privacy-and-cookies-policy',
 			transactionPrivacy: {
@@ -137,7 +140,6 @@ export const nufi: SoftwareWallet = {
 				[PrivateTransferTechnology.PRIVACY_POOLS]: notSupported,
 				[PrivateTransferTechnology.RAILGUN]: notSupported,
 			},
-			usageAnalyticsConsent: null,
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
