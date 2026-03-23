@@ -1,10 +1,6 @@
-import { type Attribute, type Evaluation, EvaluationContext, Rating } from '@/schema/attributes'
+import { type Attribute, Rating } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import {
-	type HardwarePrivacySupport,
-	HardwarePrivacyType,
-} from '@/schema/features/privacy/hardware-privacy'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
@@ -16,24 +12,6 @@ export type HardwarePrivacyOutcomeMetadata = {
 	inspectableRemoteCalls: HardwarePrivacyType
 	wirelessPrivacy: HardwarePrivacyType
 }
-
-function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
-	const ratings = [features.phoningHome, features.inspectableRemoteCalls, features.wirelessPrivacy]
-	const passCount = ratings.filter(r => r === HardwarePrivacyType.PASS).length
-
-	if (passCount === 3) {
-		return Rating.PASS
-	}
-
-	if (passCount >= 1) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
-}
-
-type _EvaluationContext = EvaluationContext<HardwarePrivacyOutcomeMetadata>
-type _Evaluation = Evaluation<HardwarePrivacyOutcomeMetadata>
 
 export const hardwarePrivacy: Attribute<HardwarePrivacyOutcomeMetadata> = {
 	id: 'hardwarePrivacy',
@@ -85,9 +63,8 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
-		pickWorstRating<HardwarePrivacyOutcomeMetadata>(perVariant),
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	aggregate: perVariant => pickWorstRating<HardwarePrivacyOutcomeMetadata>(perVariant),
+	evaluate: ctx => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
@@ -109,7 +86,13 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyOutcomeMetadata> = {
 			})
 		}
 
-		const rating = evaluateHardwarePrivacy(hwPrivacy)
+		const ratings = [
+			hwPrivacy.phoningHome,
+			hwPrivacy.inspectableRemoteCalls,
+			hwPrivacy.wirelessPrivacy,
+		]
+		const passCount = ratings.filter(r => r === HardwarePrivacyType.PASS).length
+		const rating = passCount === 3 ? Rating.PASS : passCount >= 1 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
 			value: {

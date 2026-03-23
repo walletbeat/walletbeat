@@ -1,13 +1,6 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import { type ReputationSupport, ReputationType } from '@/schema/features/transparency/reputation'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { ReputationType } from '@/schema/features/transparency/reputation'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -20,30 +13,6 @@ export type ReputationOutcomeMetadata = {
 	disclosureHistory: ReputationType
 	bugBounty: ReputationType
 }
-
-function evaluateReputation(features: ReputationSupport): Rating {
-	const ratings = [
-		features.originalProduct,
-		features.availability,
-		features.warrantySupportRisk,
-		features.disclosureHistory,
-		features.bugBounty,
-	]
-	const passCount = ratings.filter(r => r === ReputationType.PASS).length
-
-	if (passCount >= 4) {
-		return Rating.PASS
-	}
-
-	if (passCount >= 2) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
-}
-
-type _EvaluationContext = EvaluationContext<ReputationOutcomeMetadata>
-type _Evaluation = Evaluation<ReputationOutcomeMetadata>
 
 export const reputation: Attribute<ReputationOutcomeMetadata> = {
 	id: 'reputation',
@@ -95,9 +64,8 @@ export const reputation: Attribute<ReputationOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
-		pickWorstRating<ReputationOutcomeMetadata>(perVariant),
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	aggregate: perVariant => pickWorstRating<ReputationOutcomeMetadata>(perVariant),
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
@@ -122,7 +90,15 @@ export const reputation: Attribute<ReputationOutcomeMetadata> = {
 			})
 		}
 
-		const rating = evaluateReputation(reputationFeature)
+		const ratings = [
+			reputationFeature.originalProduct,
+			reputationFeature.availability,
+			reputationFeature.warrantySupportRisk,
+			reputationFeature.disclosureHistory,
+			reputationFeature.bugBounty,
+		]
+		const passCount = ratings.filter(r => r === ReputationType.PASS).length
+		const rating = passCount >= 4 ? Rating.PASS : passCount >= 2 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
 			value: {

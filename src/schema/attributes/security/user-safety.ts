@@ -1,13 +1,5 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	exampleRating,
-	Rating,
-	Verifiability,
-} from '@/schema/attributes'
-import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { type Attribute, exampleRating, Rating, Verifiability } from '@/schema/attributes'
+import { UserSafetyType } from '@/schema/features/security/user-safety'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -30,41 +22,6 @@ export type UserSafetyOutcomeMetadata = {
 	txSimulation: UserSafetyType
 	txSimulationLocal: UserSafetyType
 	fullyLocalTxSimulation: UserSafetyType
-}
-
-type _EvaluationContext = EvaluationContext<UserSafetyOutcomeMetadata>
-type _Evaluation = Evaluation<UserSafetyOutcomeMetadata>
-
-function evaluateUserSafety(features: UserSafetySupport): Rating {
-	const ratings = [
-		features.readableAddress,
-		features.contractLabeling,
-		features.rawTxReview,
-		features.readableTx,
-		features.txCoverageExtensibility,
-		features.txExpertMode,
-		features.rawEip712,
-		features.readableEip712,
-		features.eip712CoverageExtensibility,
-		features.eip712ExpertMode,
-		features.riskAnalysis,
-		features.riskAnalysisLocal,
-		features.fullyLocalRiskAnalysis,
-		features.txSimulation,
-		features.txSimulationLocal,
-		features.fullyLocalTxSimulation,
-	]
-	const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
-
-	if (passCount >= 11) {
-		return Rating.PASS
-	}
-
-	if (passCount >= 6) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
 }
 
 export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
@@ -144,9 +101,8 @@ export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
-		pickWorstRating<UserSafetyOutcomeMetadata>(perVariant),
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	aggregate: perVariant => pickWorstRating<UserSafetyOutcomeMetadata>(perVariant),
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
@@ -199,7 +155,26 @@ export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
 			})
 		}
 
-		const rating = evaluateUserSafety(userSafetyFeature)
+		const ratings = [
+			userSafetyFeature.readableAddress,
+			userSafetyFeature.contractLabeling,
+			userSafetyFeature.rawTxReview,
+			userSafetyFeature.readableTx,
+			userSafetyFeature.txCoverageExtensibility,
+			userSafetyFeature.txExpertMode,
+			userSafetyFeature.rawEip712,
+			userSafetyFeature.readableEip712,
+			userSafetyFeature.eip712CoverageExtensibility,
+			userSafetyFeature.eip712ExpertMode,
+			userSafetyFeature.riskAnalysis,
+			userSafetyFeature.riskAnalysisLocal,
+			userSafetyFeature.fullyLocalRiskAnalysis,
+			userSafetyFeature.txSimulation,
+			userSafetyFeature.txSimulationLocal,
+			userSafetyFeature.fullyLocalTxSimulation,
+		]
+		const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
+		const rating = passCount >= 11 ? Rating.PASS : passCount >= 6 ? Rating.PARTIAL : Rating.FAIL
 
 		const passCount = [
 			userSafetyFeature.readableAddress,

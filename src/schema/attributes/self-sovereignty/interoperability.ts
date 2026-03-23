@@ -1,16 +1,6 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import {
-	type InteroperabilitySupport,
-	InteroperabilityType,
-} from '@/schema/features/self-sovereignty/interoperability'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { InteroperabilityType } from '@/schema/features/self-sovereignty/interoperability'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -19,24 +9,6 @@ import { exempt, pickWorstRating, unrated } from '../common'
 export type InteroperabilityOutcomeMetadata = {
 	interoperability: InteroperabilityType
 	noSupplierLinkage: InteroperabilityType
-}
-
-type _EvaluationContext = EvaluationContext<InteroperabilityOutcomeMetadata>
-type _Evaluation = Evaluation<InteroperabilityOutcomeMetadata>
-
-function evaluateInteroperability(features: InteroperabilitySupport): Rating {
-	const ratings = [features.interoperability, features.noSupplierLinkage]
-	const passCount = ratings.filter(r => r === InteroperabilityType.PASS).length
-
-	if (passCount === 2) {
-		return Rating.PASS
-	}
-
-	if (passCount === 1) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
 }
 
 export const interoperability: Attribute<InteroperabilityOutcomeMetadata> = {
@@ -81,9 +53,8 @@ export const interoperability: Attribute<InteroperabilityOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
-		pickWorstRating<InteroperabilityOutcomeMetadata>(perVariant),
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	aggregate: perVariant => pickWorstRating<InteroperabilityOutcomeMetadata>(perVariant),
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
@@ -102,7 +73,12 @@ export const interoperability: Attribute<InteroperabilityOutcomeMetadata> = {
 			})
 		}
 
-		const rating = evaluateInteroperability(interoperabilityFeature)
+		const ratings = [
+			interoperabilityFeature.interoperability,
+			interoperabilityFeature.noSupplierLinkage,
+		]
+		const passCount = ratings.filter(r => r === InteroperabilityType.PASS).length
+		const rating = passCount === 2 ? Rating.PASS : passCount === 1 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
 			value: {

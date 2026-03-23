@@ -1,16 +1,6 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import {
-	type MaintenanceSupport,
-	MaintenanceType,
-} from '@/schema/features/transparency/maintenance'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { MaintenanceType } from '@/schema/features/transparency/maintenance'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -23,30 +13,6 @@ export type MaintenanceOutcomeMetadata = {
 	batteryHandling: MaintenanceType
 	warrantyExtensions: MaintenanceType
 }
-
-function evaluateMaintenance(features: MaintenanceSupport): Rating {
-	const ratings = [
-		features.physicalDurability,
-		features.mtbfDocumentation,
-		features.repairability,
-		features.batteryHandling,
-		features.warrantyExtensions,
-	]
-	const passCount = ratings.filter(r => r === MaintenanceType.PASS).length
-
-	if (passCount >= 4) {
-		return Rating.PASS
-	}
-
-	if (passCount >= 2) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
-}
-
-type _EvaluationContext = EvaluationContext<MaintenanceOutcomeMetadata>
-type _Evaluation = Evaluation<MaintenanceOutcomeMetadata>
 
 export const maintenance: Attribute<MaintenanceOutcomeMetadata> = {
 	id: 'maintenance',
@@ -98,9 +64,8 @@ export const maintenance: Attribute<MaintenanceOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
-		pickWorstRating<MaintenanceOutcomeMetadata>(perVariant),
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	aggregate: perVariant => pickWorstRating<MaintenanceOutcomeMetadata>(perVariant),
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable unless audited, which never happens.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
@@ -125,7 +90,15 @@ export const maintenance: Attribute<MaintenanceOutcomeMetadata> = {
 			})
 		}
 
-		const rating = evaluateMaintenance(maintenanceFeature)
+		const ratings = [
+			maintenanceFeature.physicalDurability,
+			maintenanceFeature.mtbfDocumentation,
+			maintenanceFeature.repairability,
+			maintenanceFeature.batteryHandling,
+			maintenanceFeature.warrantyExtensions,
+		]
+		const passCount = ratings.filter(r => r === MaintenanceType.PASS).length
+		const rating = passCount >= 4 ? Rating.PASS : passCount >= 2 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
 			value: {
