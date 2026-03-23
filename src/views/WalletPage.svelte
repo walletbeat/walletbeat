@@ -901,25 +901,25 @@
 
 						<div data-column>
 							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...componentProps} {wallet} {outcome} />
+								<AddressCorrelationDetails {...componentProps} {wallet} />
 							{:else if componentName === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...componentProps} {wallet} {outcome} />
+								<PrivateTransfersDetails {...componentProps} {wallet} />
 							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...componentProps} {wallet} {outcome} refs={references} />
+								<ChainVerificationDetails {...componentProps} {wallet} refs={references} />
 							{:else if componentName === 'ScamAlertDetails'}
 								<ScamAlertDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'SecurityAuditsDetails'}
 								<SecurityAuditsDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...componentProps} {wallet} {outcome} />
+								<TransactionInclusionDetails {...componentProps} {wallet} />
 							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...componentProps} {wallet} {outcome} />
+								<FundingDetails {...componentProps} {wallet} />
 							{:else if componentName === 'AccountRecoveryDetails'}
 								<AccountRecoveryDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'AccountUnruggabilityDetails'}
 								<AccountUnruggabilityDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...componentProps} {wallet} {outcome} />
+								<UnratedAttribute {...componentProps} {wallet} />
 							{/if}
 						</div>
 

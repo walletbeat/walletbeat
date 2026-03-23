@@ -1,6 +1,5 @@
 <script lang="ts">
 	// Types/constants
-	import type { Outcome } from '@/schema/attributes'
 	import {
 		type Monetization,
 		monetizationStrategies,
@@ -12,13 +11,11 @@
 
 
 	// Props
-	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
 	const {
 		wallet,
 		monetization,
 	}: {
 		wallet: RatedWallet
-		outcome: Outcome
 		monetization: Monetization | undefined
 	} = $props()
 

@@ -1,17 +1,14 @@
 <script lang="ts">
 	// Types/constants
-	import type { Outcome } from '@/schema/attributes'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 
 
 	// Props
-	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
 	const {
 		wallet,
 	}: {
 		wallet: RatedWallet
-		outcome: Outcome
 	} = $props()
 
 	const githubUrl = $derived(

@@ -1,6 +1,5 @@
 <script lang="ts">
 	// Types/constants
-	import type { Outcome } from '@/schema/attributes'
 	import type { EthereumL1LightClient } from '@/schema/features/security/light-client'
 	import { ethereumL1LightClientUrl } from '@/schema/features/security/light-client'
 	import type { FullyQualifiedReference } from '@/schema/reference'
@@ -11,14 +10,12 @@
 
 
 	// Props
-	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
 	const {
 		wallet,
 		lightClients,
 		refs,
 	}: {
 		wallet: RatedWallet
-		outcome: Outcome
 		lightClients?: NonEmptyArray<EthereumL1LightClient>
 		refs?: FullyQualifiedReference[]
 	} = $props()

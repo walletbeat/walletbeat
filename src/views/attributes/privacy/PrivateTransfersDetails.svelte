@@ -1,9 +1,5 @@
 <script lang="ts">
 	// Types/constants
-	import type {
-		PrivateTransfersOutcomeMetadata,
-	} from '@/schema/attributes/privacy/private-transfers'
-	import type { Outcome } from '@/schema/attributes'
 	import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType, type MarkdownParagraph } from '@/types/content'
@@ -17,13 +13,11 @@
 
 
 	// Props
-	// eslint-disable-next-line svelte/no-unused-props -- Consistent prop types for all content components.
 	const {
 		wallet,
 		privateTransferDetails,
 	}: {
 		wallet: RatedWallet
-		outcome: Outcome<PrivateTransfersOutcomeMetadata>
 		privateTransferDetails: Map<PrivateTransferTechnology, {
 			sendingDetails: MarkdownParagraph<{ WALLET_NAME: string }>
 			receivingDetails: MarkdownParagraph<{ WALLET_NAME: string }>
