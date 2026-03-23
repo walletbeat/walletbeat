@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { FundingValue } from '@/schema/attributes/transparency/funding'
+	import type { Outcome } from '@/schema/attributes'
 	import {
 		type Monetization,
 		monetizationStrategies,
@@ -18,7 +18,7 @@
 		monetization,
 	}: {
 		wallet: RatedWallet
-		value: FundingValue
+		outcome: Outcome
 		monetization: Monetization | undefined
 	} = $props()
 

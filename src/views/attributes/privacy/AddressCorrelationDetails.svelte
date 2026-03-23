@@ -28,7 +28,7 @@
 		linkables,
 	}: {
 		wallet: RatedWallet
-		value: AddressCorrelationOutcomeMetadata
+		outcome: AddressCorrelationOutcomeMetadata
 		linkables?: NonEmptyArray<WalletAddressLinkableBy> | undefined
 	} = $props()
 

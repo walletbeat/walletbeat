@@ -896,30 +896,30 @@
 					{:else if evalAttr.evaluation.details}
 						{@const componentName = evalAttr.evaluation.details.component.component}
 						{@const componentProps = evalAttr.evaluation.details.component.componentProps}
-						{@const value = evalAttr.evaluation.value}
+						{@const outcome = evalAttr.evaluation.value}
 						{@const references = evalAttr.evaluation.references && toFullyQualified(evalAttr.evaluation.references)}
 
 						<div data-column>
 							{#if componentName === 'AddressCorrelationDetails'}
-								<AddressCorrelationDetails {...componentProps} {wallet} {value} />
+								<AddressCorrelationDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'PrivateTransfersDetails'}
-								<PrivateTransfersDetails {...componentProps} {wallet} {value} />
+								<PrivateTransfersDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'ChainVerificationDetails'}
-								<ChainVerificationDetails {...componentProps} {wallet} {value} refs={references} />
+								<ChainVerificationDetails {...componentProps} {wallet} {outcome} refs={references} />
 							{:else if componentName === 'ScamAlertDetails'}
-								<ScamAlertDetails {...componentProps} {wallet} {value} />
+								<ScamAlertDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'SecurityAuditsDetails'}
-								<SecurityAuditsDetails {...componentProps} {wallet} {value} />
+								<SecurityAuditsDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'TransactionInclusionDetails'}
-								<TransactionInclusionDetails {...componentProps} {wallet} {value} />
+								<TransactionInclusionDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'FundingDetails'}
-								<FundingDetails {...componentProps} {wallet} {value} />
+								<FundingDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'AccountRecoveryDetails'}
-								<AccountRecoveryDetails {...componentProps} {wallet} {value} />
+								<AccountRecoveryDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'AccountUnruggabilityDetails'}
-								<AccountUnruggabilityDetails {...componentProps} {wallet} {value} />
+								<AccountUnruggabilityDetails {...componentProps} {wallet} {outcome} />
 							{:else if componentName === 'UnratedAttribute'}
-								<UnratedAttribute {...componentProps} {wallet} {value} />
+								<UnratedAttribute {...componentProps} {wallet} {outcome} />
 							{/if}
 						</div>
 

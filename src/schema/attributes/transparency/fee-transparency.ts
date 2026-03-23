@@ -297,10 +297,13 @@ export type FeeTransparencyOutcomeMetadata = {
 	worstFeeDisplay: WorstFeeDisplay | null
 }
 
+type _EvaluationContext = EvaluationContext<FeeTransparencyOutcomeMetadata>
+type _Evaluation = Evaluation<FeeTransparencyOutcomeMetadata>
+
 function evaluateWorstFeeDisplay(
-	ctx: EvaluationContext<FeeTransparencyOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	worstFeeDisplay: WorstFeeDisplay,
-): Evaluation<FeeTransparencyOutcomeMetadata> {
+): _Evaluation {
 	ctx.addRef(worstFeeDisplay.references)
 	const baseValue = {
 		worstFeeDisplay,
@@ -578,9 +581,7 @@ export const feeTransparency: Attribute<FeeTransparencyOutcomeMetadata> = {
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<FeeTransparencyOutcomeMetadata>,
-	): Evaluation<FeeTransparencyOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable in UI.
 		const feeTransparencyData: FeeTransparency = extractFeeTransparency(ctx.features)
 		const worstFeeDisplay = computeWorstFees(feeTransparencyData)

@@ -32,6 +32,9 @@ function evaluateHardwarePrivacy(features: HardwarePrivacySupport): Rating {
 	return Rating.FAIL
 }
 
+type _EvaluationContext = EvaluationContext<HardwarePrivacyOutcomeMetadata>
+type _Evaluation = Evaluation<HardwarePrivacyOutcomeMetadata>
+
 export const hardwarePrivacy: Attribute<HardwarePrivacyOutcomeMetadata> = {
 	id: 'hardwarePrivacy',
 	icon: '🔒',
@@ -82,11 +85,9 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<HardwarePrivacyOutcomeMetadata>>) =>
+	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
 		pickWorstRating<HardwarePrivacyOutcomeMetadata>(perVariant),
-	evaluate: (
-		ctx: EvaluationContext<HardwarePrivacyOutcomeMetadata>,
-	): Evaluation<HardwarePrivacyOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 

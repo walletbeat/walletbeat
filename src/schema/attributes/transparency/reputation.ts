@@ -42,6 +42,9 @@ function evaluateReputation(features: ReputationSupport): Rating {
 	return Rating.FAIL
 }
 
+type _EvaluationContext = EvaluationContext<ReputationOutcomeMetadata>
+type _Evaluation = Evaluation<ReputationOutcomeMetadata>
+
 export const reputation: Attribute<ReputationOutcomeMetadata> = {
 	id: 'reputation',
 	icon: '🌟',
@@ -92,11 +95,9 @@ export const reputation: Attribute<ReputationOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationOutcomeMetadata>>) =>
+	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
 		pickWorstRating<ReputationOutcomeMetadata>(perVariant),
-	evaluate: (
-		ctx: EvaluationContext<ReputationOutcomeMetadata>,
-	): Evaluation<ReputationOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {

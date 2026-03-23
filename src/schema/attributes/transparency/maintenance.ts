@@ -45,6 +45,9 @@ function evaluateMaintenance(features: MaintenanceSupport): Rating {
 	return Rating.FAIL
 }
 
+type _EvaluationContext = EvaluationContext<MaintenanceOutcomeMetadata>
+type _Evaluation = Evaluation<MaintenanceOutcomeMetadata>
+
 export const maintenance: Attribute<MaintenanceOutcomeMetadata> = {
 	id: 'maintenance',
 	icon: '🛠️',
@@ -95,11 +98,9 @@ export const maintenance: Attribute<MaintenanceOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<MaintenanceOutcomeMetadata>>) =>
+	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
 		pickWorstRating<MaintenanceOutcomeMetadata>(perVariant),
-	evaluate: (
-		ctx: EvaluationContext<MaintenanceOutcomeMetadata>,
-	): Evaluation<MaintenanceOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable unless audited, which never happens.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {

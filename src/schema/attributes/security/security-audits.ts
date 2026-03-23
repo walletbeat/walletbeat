@@ -22,9 +22,10 @@ export type SecurityAuditsOutcomeMetadata = {
 	securityAudits: SecurityAudit[]
 }
 
-function noAudits(
-	ctx: EvaluationContext<SecurityAuditsOutcomeMetadata>,
-): Evaluation<SecurityAuditsOutcomeMetadata> {
+type _EvaluationContext = EvaluationContext<SecurityAuditsOutcomeMetadata>
+type _Evaluation = Evaluation<SecurityAuditsOutcomeMetadata>
+
+function noAudits(ctx: _EvaluationContext): _Evaluation {
 	return ctx.build({
 		value: {
 			id: 'no_audits',
@@ -38,18 +39,18 @@ function noAudits(
 }
 
 function audited(
-	ctx: EvaluationContext<SecurityAuditsOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	audits: NonEmptyArray<SecurityAudit>,
 	auditedInLastYear: boolean,
 	hasUnaddressedFlaws: boolean,
-): Evaluation<SecurityAuditsOutcomeMetadata> {
+): _Evaluation {
 	ctx.addRef(...audits)
 
 	const { rating, displayName, shortExplanation, howToImprove } = ((): Pick<
-		Evaluation<SecurityAuditsOutcomeMetadata>['value'],
+		_Evaluation['value'],
 		'rating' | 'displayName' | 'shortExplanation'
 	> & {
-		howToImprove: Evaluation<SecurityAuditsOutcomeMetadata>['howToImprove']
+		howToImprove: _Evaluation['howToImprove']
 	} => {
 		if (!auditedInLastYear && hasUnaddressedFlaws) {
 			return {
@@ -219,9 +220,7 @@ export const securityAudits: Attribute<SecurityAuditsOutcomeMetadata> = {
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<SecurityAuditsOutcomeMetadata>,
-	): Evaluation<SecurityAuditsOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
 				referenceCountsAs: Verifiability.VERIFIABLE,
@@ -262,7 +261,7 @@ export const securityAudits: Attribute<SecurityAuditsOutcomeMetadata> = {
 
 		return audited(ctx, audits, auditedInLastYear, hasUnaddressedFlaws)
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsOutcomeMetadata>>) => {
+	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) => {
 		const worstEvaluation = pickWorstRating<SecurityAuditsOutcomeMetadata>(perVariant)
 		const allAudits: SecurityAudit[] = []
 		const auditsIdSet = new Set<string>()

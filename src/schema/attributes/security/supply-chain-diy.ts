@@ -24,6 +24,9 @@ export type SupplyChainDIYOutcomeMetadata = {
 	componentSourcingComplexity: SupplyChainDIYType
 }
 
+type _EvaluationContext = EvaluationContext<SupplyChainDIYOutcomeMetadata>
+type _Evaluation = Evaluation<SupplyChainDIYOutcomeMetadata>
+
 function evaluateSupplyChainDIY(features: SupplyChainDIYSupport): Rating {
 	const ratings = [features.diyNoNda, features.componentSourcingComplexity]
 	const passCount = ratings.filter(r => r === SupplyChainDIYType.PASS).length
@@ -87,7 +90,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYOutcomeMetadata> = {
 	},
 	aggregate: pickWorstRating<SupplyChainDIYOutcomeMetadata>,
 	exempted: (
-		ctx: EvaluationContext<SupplyChainDIYOutcomeMetadata>,
+		ctx: _EvaluationContext,
 		metadata: WalletMetadata,
 	): ExemptEvaluation<SupplyChainDIYOutcomeMetadata> | null => {
 		if (
@@ -102,9 +105,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYOutcomeMetadata> = {
 
 		return null
 	},
-	evaluate: (
-		ctx: EvaluationContext<SupplyChainDIYOutcomeMetadata>,
-	): Evaluation<SupplyChainDIYOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		ctx.setVerifiability(Verifiability.SELF_EVIDENT) // If you build it, you source your own parts.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {

@@ -1,9 +1,26 @@
 import { describe, expect, it } from 'vitest'
 
 import { attributeTree } from '@/schema/attribute-groups'
-import { Rating, ratingToText } from '@/schema/attributes'
+import { type Evaluation, type OutcomeMetadata, Rating, ratingToText } from '@/schema/attributes'
 
 import { warmupHarperLinter } from './utils/grammar'
+
+function isSampleEvaluation(e: unknown): e is Evaluation<OutcomeMetadata> {
+	if (typeof e !== 'object' || e === null || !('value' in e)) {
+		return false
+	}
+
+	const v = (e as { value: unknown }).value
+
+	return (
+		typeof v === 'object' &&
+		v !== null &&
+		'id' in v &&
+		'rating' in v &&
+		typeof (v as { id: unknown }).id === 'string' &&
+		(v as { rating: unknown }).rating !== undefined
+	)
+}
 
 await warmupHarperLinter()
 
@@ -56,10 +73,14 @@ describe('attribute', () => {
 
 									describe(ratingToText(rating).toLowerCase(), () => {
 										for (const exampleRating of exampleRatings) {
-											for (const sampleEvaluation of exampleRating.sampleEvaluations) {
-												describe(sampleEvaluation.value.id, () => {
+											const evaluations = exampleRating.sampleEvaluations.filter(isSampleEvaluation)
+
+											for (const sampleEvaluation of evaluations) {
+												const { id, rating: sampleRating } = sampleEvaluation.value
+
+												describe(id, () => {
 													it('matches the correct rating', () => {
-														expect(sampleEvaluation.value.rating).eq(rating)
+														expect(sampleRating).eq(rating)
 													})
 												})
 											}

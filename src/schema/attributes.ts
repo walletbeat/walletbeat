@@ -381,7 +381,7 @@ export function compareExplicitRatings(rating1: ExplicitRating, rating2: Explici
 }
 
 export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = {}> {
-	value: Outcome<_OutcomeMetadata>
+	outcome: Outcome<_OutcomeMetadata>
 	references: FullyQualifiedReference[]
 	wallet: RatedWallet
 }

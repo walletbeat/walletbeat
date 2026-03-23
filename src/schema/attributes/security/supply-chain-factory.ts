@@ -1,11 +1,4 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	type ExemptEvaluation,
-	Rating,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, type ExemptEvaluation, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
 import { HardwareWalletManufactureType } from '@/schema/features/profile'
 import {
@@ -14,7 +7,6 @@ import {
 } from '@/schema/features/security/supply-chain-factory'
 import { Variant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
-import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
@@ -106,10 +98,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryOutcomeMetadata> = 
 		],
 	},
 	aggregate: pickWorstRating<SupplyChainFactoryOutcomeMetadata>,
-	exempted: (
-		ctx: EvaluationContext<SupplyChainFactoryOutcomeMetadata>,
-		metadata: WalletMetadata,
-	): ExemptEvaluation<SupplyChainFactoryOutcomeMetadata> | null => {
+	exempted: (ctx, metadata): ExemptEvaluation<SupplyChainFactoryOutcomeMetadata> | null => {
 		if (
 			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY
@@ -126,9 +115,7 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryOutcomeMetadata> = 
 
 		return null
 	},
-	evaluate: (
-		ctx: EvaluationContext<SupplyChainFactoryOutcomeMetadata>,
-	): Evaluation<SupplyChainFactoryOutcomeMetadata> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
 				referenceCountsAs: Verifiability.INDEPENDENTLY_AUDITED,

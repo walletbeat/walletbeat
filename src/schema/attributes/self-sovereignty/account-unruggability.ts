@@ -48,10 +48,13 @@ export type AccountUnruggabilityOutcomeMetadata = {
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
 
+type _EvaluationContext = EvaluationContext<AccountUnruggabilityOutcomeMetadata>
+type _Evaluation = Evaluation<AccountUnruggabilityOutcomeMetadata>
+
 function evaluateGuardianUnruggabilityPolicy(
-	ctx: EvaluationContext<AccountUnruggabilityOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	guardianPolicy: GuardianPolicy,
-): Evaluation<AccountUnruggabilityOutcomeMetadata> {
+): _Evaluation {
 	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
 
 	if (!isNonEmptyArray(outcomes)) {
@@ -116,10 +119,10 @@ function evaluateGuardianUnruggabilityPolicy(
 }
 
 function evaluateAccountUnruggability(
-	ctx: EvaluationContext<AccountUnruggabilityOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	keysHandling: KeysHandlingSupport,
 	accountRecovery: AccountRecovery,
-): Evaluation<AccountUnruggabilityOutcomeMetadata> {
+): _Evaluation {
 	switch (keysHandling.keyGeneration) {
 		case KeyGenerationLocation.FULLY_ON_USER_DEVICE:
 			break // OK
@@ -391,9 +394,7 @@ export const accountUnruggability: Attribute<AccountUnruggabilityOutcomeMetadata
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<AccountUnruggabilityOutcomeMetadata>,
-	): Evaluation<AccountUnruggabilityOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		if (

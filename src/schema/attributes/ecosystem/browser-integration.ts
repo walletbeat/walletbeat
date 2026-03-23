@@ -32,10 +32,13 @@ export type BrowserIntegrationOutcomeMetadata = {
 	support?: ResolvedSupport
 }
 
+type _EvaluationContext = EvaluationContext<BrowserIntegrationOutcomeMetadata>
+type _Evaluation = Evaluation<BrowserIntegrationOutcomeMetadata>
+
 function browserIntegrationSupport(
-	ctx: EvaluationContext<BrowserIntegrationOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	support: WithRef<ResolvedSupport>,
-): Evaluation<BrowserIntegrationOutcomeMetadata> {
+): _Evaluation {
 	const withoutRefs = ctx.popRefs<ResolvedSupport>(support)
 
 	const supported: BrowserIntegrationEip[] = Object.entries(withoutRefs)
@@ -167,9 +170,7 @@ export const browserIntegration: Attribute<BrowserIntegrationOutcomeMetadata> = 
 			),
 		),
 	},
-	evaluate: (
-		ctx: EvaluationContext<BrowserIntegrationOutcomeMetadata>,
-	): Evaluation<BrowserIntegrationOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): Evaluation<BrowserIntegrationOutcomeMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can self-test using tool.
 
 		if (ctx.features.type !== WalletType.SOFTWARE || ctx.features.variant !== Variant.BROWSER) {

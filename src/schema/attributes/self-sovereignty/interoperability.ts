@@ -21,6 +21,9 @@ export type InteroperabilityOutcomeMetadata = {
 	noSupplierLinkage: InteroperabilityType
 }
 
+type _EvaluationContext = EvaluationContext<InteroperabilityOutcomeMetadata>
+type _Evaluation = Evaluation<InteroperabilityOutcomeMetadata>
+
 function evaluateInteroperability(features: InteroperabilitySupport): Rating {
 	const ratings = [features.interoperability, features.noSupplierLinkage]
 	const passCount = ratings.filter(r => r === InteroperabilityType.PASS).length
@@ -78,11 +81,9 @@ export const interoperability: Attribute<InteroperabilityOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<InteroperabilityOutcomeMetadata>>) =>
+	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
 		pickWorstRating<InteroperabilityOutcomeMetadata>(perVariant),
-	evaluate: (
-		ctx: EvaluationContext<InteroperabilityOutcomeMetadata>,
-	): Evaluation<InteroperabilityOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 
 		if (ctx.features.type !== WalletType.HARDWARE) {

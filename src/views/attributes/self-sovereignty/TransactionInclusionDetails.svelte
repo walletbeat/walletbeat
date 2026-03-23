@@ -1,6 +1,7 @@
 <script lang="ts">
 	// Types/constants
-	import type { L1BroadcastSupport, TransactionInclusionValue } from '@/schema/attributes/self-sovereignty/transaction-inclusion'
+	import type { L1BroadcastSupport } from '@/schema/attributes/self-sovereignty/transaction-inclusion'
+	import type { Outcome } from '@/schema/attributes'
 	import type { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
@@ -16,7 +17,7 @@
 		unsupportedL2s = [],
 	}: {
 		wallet: RatedWallet
-		value: TransactionInclusionValue
+		outcome: Outcome
 		supportsL1Broadcast?: L1BroadcastSupport
 		supportAnyL2Transactions?: TransactionSubmissionL2Type[]
 		supportForceWithdrawal?: TransactionSubmissionL2Type[]

@@ -43,6 +43,9 @@ export type AddressCorrelationOutcomeMetadata = {
 	worstLeak: WalletAddressLinkableBy | null
 }
 
+type _EvaluationContext = EvaluationContext<AddressCorrelationOutcomeMetadata>
+type _Evaluation = Evaluation<AddressCorrelationOutcomeMetadata>
+
 const uncorrelated = {
 	id: 'no_correlation',
 	rating: Rating.PASS,
@@ -63,9 +66,9 @@ export type WalletAddressLinkableBy = WalletAddressLinkableTo & {
 }
 
 function linkable(
-	ctx: EvaluationContext<AddressCorrelationOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	linkables: NonEmptyArray<WalletAddressLinkableBy>,
-): Evaluation<AddressCorrelationOutcomeMetadata> {
+): _Evaluation {
 	const worstLeak = nonEmptyFirst(
 		linkables,
 		(linkableA: WalletAddressLinkableBy, linkableB: WalletAddressLinkableBy) =>
@@ -292,9 +295,7 @@ export const addressCorrelation: Attribute<AddressCorrelationOutcomeMetadata> = 
 			),
 		],
 	},
-	evaluate: (
-		ctx: EvaluationContext<AddressCorrelationOutcomeMetadata>,
-	): Evaluation<AddressCorrelationOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 

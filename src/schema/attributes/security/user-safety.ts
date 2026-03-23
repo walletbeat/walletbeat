@@ -32,6 +32,9 @@ export type UserSafetyOutcomeMetadata = {
 	fullyLocalTxSimulation: UserSafetyType
 }
 
+type _EvaluationContext = EvaluationContext<UserSafetyOutcomeMetadata>
+type _Evaluation = Evaluation<UserSafetyOutcomeMetadata>
+
 function evaluateUserSafety(features: UserSafetySupport): Rating {
 	const ratings = [
 		features.readableAddress,
@@ -141,11 +144,9 @@ export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyOutcomeMetadata>>) =>
+	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) =>
 		pickWorstRating<UserSafetyOutcomeMetadata>(perVariant),
-	evaluate: (
-		ctx: EvaluationContext<UserSafetyOutcomeMetadata>,
-	): Evaluation<UserSafetyOutcomeMetadata> => {
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 
 		if (ctx.features.type !== WalletType.HARDWARE) {

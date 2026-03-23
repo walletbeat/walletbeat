@@ -11,7 +11,7 @@
 		wallet,
 	}: {
 		wallet: RatedWallet
-		value: Outcome
+		outcome: Outcome
 	} = $props()
 
 	const githubUrl = $derived(

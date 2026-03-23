@@ -3,15 +3,18 @@
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
-	import type { AccountUnruggabilityValue } from '@/schema/attributes/self-sovereignty/account-unruggability'
+	import type {
+		AccountUnruggabilityOutcomeMetadata,
+	} from '@/schema/attributes/self-sovereignty/account-unruggability'
+	import type { Outcome } from '@/schema/attributes'
 
 	// Props
 	const {
 		wallet,
-		value,
+		outcome,
 	}: {
 		wallet: RatedWallet
-		value: AccountUnruggabilityValue
+		outcome: Outcome<AccountUnruggabilityOutcomeMetadata>
 	} = $props()
 
 	// Components
@@ -21,7 +24,7 @@
 	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
 </script>
 
-{#if value.outcomes === null}
+{#if outcome.outcomes === null}
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
@@ -33,10 +36,10 @@
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
 {:else}
-	{@const successfulOutcomes = value.outcomes.filter(outcome =>
+	{@const successfulOutcomes = outcome.outcomes.filter(outcome =>
 		!isAccountTakeOverPossible(outcome.takeover),
 	)}
-	{@const failedOutcomes = value.outcomes.filter(
+	{@const failedOutcomes = outcome.outcomes.filter(
 		outcome => isAccountTakeOverPossible(outcome.takeover),
 	)}
 	<Typography
@@ -50,7 +53,7 @@
 		}}
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
-	{#if value.minimumGuardianPolicy !== null}
+	{#if outcome.minimumGuardianPolicy !== null}
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
@@ -60,13 +63,13 @@
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: trimWhitespacePrefix(value.minimumGuardianPolicy.descriptionMarkdown),
+				markdown: trimWhitespacePrefix(outcome.minimumGuardianPolicy.descriptionMarkdown),
 			}}
 		/>
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: guardianPolicyMarkdown(value.minimumGuardianPolicy),
+				markdown: guardianPolicyMarkdown(outcome.minimumGuardianPolicy),
 			}}
 		/>
 	{/if}

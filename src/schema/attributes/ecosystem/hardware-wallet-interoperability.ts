@@ -28,6 +28,9 @@ export type HardwareWalletInteroperabilityOutcomeMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
 }
 
+type _EvaluationContext = EvaluationContext<HardwareWalletInteroperabilityOutcomeMetadata>
+type _Evaluation = Evaluation<HardwareWalletInteroperabilityOutcomeMetadata>
+
 const majorHardwareWalletManufacturers: NonEmptyArray<HardwareWalletType> = [
 	HardwareWalletType.LEDGER,
 	HardwareWalletType.TREZOR,
@@ -64,9 +67,9 @@ function extraWalletsThroughWalletConnectText(
 }
 
 function singleHardwareWalletManufacturerSupport(
-	ctx: EvaluationContext<HardwareWalletInteroperabilityOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletInteroperabilityOutcomeMetadata> {
+): _Evaluation {
 	return ctx.build({
 		value: {
 			id: 'single_hardware_wallet_support',
@@ -92,9 +95,9 @@ ${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 }
 
 function insufficientHardwareWalletManufacturerSupport(
-	ctx: EvaluationContext<HardwareWalletInteroperabilityOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletInteroperabilityOutcomeMetadata> {
+): _Evaluation {
 	return ctx.build({
 		value: {
 			id: 'insufficient_hardware_wallet_interoperability',
@@ -116,9 +119,9 @@ ${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 }
 
 function comprehensiveHardwareWalletSupport(
-	ctx: EvaluationContext<HardwareWalletInteroperabilityOutcomeMetadata>,
+	ctx: _EvaluationContext,
 	hardwareWalletSupport: HardwareWalletSupport,
-): Evaluation<HardwareWalletInteroperabilityOutcomeMetadata> {
+): _Evaluation {
 	return ctx.build({
 		value: {
 			id: 'comprehensive_hardware_wallet_interoperability',
@@ -273,9 +276,7 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 				),
 			],
 		},
-		evaluate: (
-			ctx: EvaluationContext<HardwareWalletInteroperabilityOutcomeMetadata>,
-		): Evaluation<HardwareWalletInteroperabilityOutcomeMetadata> => {
+		evaluate: (ctx: _EvaluationContext): _Evaluation => {
 			ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test obvious.
 
 			if (ctx.features.type === WalletType.HARDWARE) {
