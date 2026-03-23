@@ -809,45 +809,45 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = null> 
 					: null
 				: this.verifiability
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- branches spread `scaffold.outcome`; TS cannot prove conditional `metadata` on `Outcome`
-		const outcome = (() => {
-			const scaffoldVal = scaffold.outcome
+		return {
+			...scaffold,
 
-			if (!isExplicitRating(scaffoldVal.rating)) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- branches spread `scaffold.outcome`; TS cannot prove conditional `metadata` on `Outcome`
+			outcome: (() => {
+				const scaffoldVal = scaffold.outcome
+
+				if (!isExplicitRating(scaffoldVal.rating)) {
+					return {
+						...scaffoldVal,
+						rating: scaffoldVal.rating,
+						verifiability: Verifiability.SELF_EVIDENT,
+					}
+				}
+
+				if (verifiability === null) {
+					throw new Error('verifiability is unset for PASS rating')
+				}
+
+				if (!verifiabilityEnum.is(verifiability)) {
+					if (this.features === null) {
+						throw new Error(
+							'tried to use a VerifiabilityPredicate without specifying wallet features',
+						)
+					}
+
+					verifiability = verifiability(this)
+				}
+
+				// Now we must be dealing with a `Verifiability` value.
+				verifiabilityEnum.assert(verifiability)
+
 				return {
 					...scaffoldVal,
 					rating: scaffoldVal.rating,
-					verifiability: Verifiability.SELF_EVIDENT,
+					verifiability,
 				}
-			}
+			})() as unknown as Outcome<_OutcomeMetadata, Rating>,
 
-			if (verifiability === null) {
-				throw new Error('verifiability is unset for PASS rating')
-			}
-
-			if (!verifiabilityEnum.is(verifiability)) {
-				if (this.features === null) {
-					throw new Error(
-						'tried to use a VerifiabilityPredicate without specifying wallet features',
-					)
-				}
-
-				verifiability = verifiability(this)
-			}
-
-			// Now we must be dealing with a `Verifiability` value.
-			verifiabilityEnum.assert(verifiability)
-
-			return {
-				...scaffoldVal,
-				rating: scaffoldVal.rating,
-				verifiability,
-			}
-		})() as unknown as Outcome<_OutcomeMetadata, Rating>
-
-		return {
-			...scaffold,
-			outcome,
 			...(finalRefs.length === 0 && { references: finalRefs }),
 		}
 	}
