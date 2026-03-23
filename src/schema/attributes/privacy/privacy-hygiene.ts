@@ -19,7 +19,7 @@ import {
 	userInfoEnums,
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
-import { isSupported } from '@/schema/features/support'
+import { isNotSupported, isSupported } from '@/schema/features/support'
 import type { AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
@@ -185,6 +185,20 @@ function crashReportingWithoutConsent(
 	})
 }
 
+function noTracking(ctx: EvaluationContext<PrivacyHygieneValue>): Evaluation<PrivacyHygieneValue> {
+	return ctx.build({
+		value: {
+			id: 'no_tracking',
+			rating: Rating.PASS,
+			displayName: 'No user tracking',
+			shortExplanation: sentence(
+				'{{WALLET_NAME}} does not use product analytics or crash/error reporting.',
+			),
+		},
+		details: sentence('{{WALLET_NAME}} does not use product analytics or crash/error reporting.'),
+	})
+}
+
 function noForbiddenDataByDefault(
 	ctx: EvaluationContext<PrivacyHygieneValue>,
 ): Evaluation<PrivacyHygieneValue> {
@@ -206,6 +220,7 @@ function noForbiddenDataByDefault(
 interface AnalyticsTelemetryResult {
 	evaluations: Array<Evaluation<PrivacyHygieneValue>>
 	hasIncompleteAnalyticsData: boolean
+	hasNoAnalytics: boolean
 }
 
 /**
@@ -249,9 +264,14 @@ function evaluateAnalyticsTelemetry(
 		}
 	}
 
+	const usageIsAbsent = usageAnalytics !== null && isNotSupported(usageAnalytics)
+	const crashReportsIsAbsent =
+		crashReportsAnalytics !== null && isNotSupported(crashReportsAnalytics)
+
 	return {
 		evaluations,
 		hasIncompleteAnalyticsData: usageAnalytics === null || crashReportsAnalytics === null,
+		hasNoAnalytics: usageIsAbsent && crashReportsIsAbsent,
 	}
 }
 
@@ -391,12 +411,18 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 				crashReportingWithoutConsent(EvaluationContext.forTest(() => privacyHygiene)),
 			),
 		],
-		pass: exampleRating(
-			sentence(
-				'The wallet does not send browsing history or wallet-connected domains without consent, and asks for consent before using product analytics or crash/error reporting.',
+		pass: [
+			exampleRating(
+				sentence('The wallet does not use product analytics or crash/error reporting.'),
+				noTracking(EvaluationContext.forTest(() => privacyHygiene)),
 			),
-			noForbiddenDataByDefault(EvaluationContext.forTest(() => privacyHygiene)),
-		),
+			exampleRating(
+				sentence(
+					'The wallet does not send browsing history or wallet-connected domains without consent, and asks for consent before using product analytics or crash/error reporting.',
+				),
+				noForbiddenDataByDefault(EvaluationContext.forTest(() => privacyHygiene)),
+			),
+		],
 	},
 	exempted: (
 		ctx: EvaluationContext<PrivacyHygieneValue>,
@@ -443,6 +469,10 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 
 		if (isNonEmptyArray(evaluations)) {
 			return pickWorstRating<PrivacyHygieneValue>(evaluations)
+		}
+
+		if (analytics.hasNoAnalytics && !flowScan.hasAnalyticsInSomeFlow) {
+			return noTracking(ctx)
 		}
 
 		return noForbiddenDataByDefault(ctx)
