@@ -393,7 +393,7 @@ export const multiAddressCorrelation: Attribute = {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		if (ctx.features.multiAddress === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (!isSupported(ctx.features.multiAddress)) {
@@ -403,7 +403,7 @@ export const multiAddressCorrelation: Attribute = {
 		const dataCollection = dataCollectionForAllSupportedFlows(ctx.features.privacy.dataCollection)
 
 		if (dataCollection === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		let worstHandling: DataCollectionByEntity | null = null
@@ -417,7 +417,7 @@ export const multiAddressCorrelation: Attribute = {
 			}
 
 			if (!isQualifiedDataCollectionWithMultiAddress(dataCollection)) {
-				return unrated(ctx, null)
+				return unrated(ctx)
 			}
 
 			ctx.addRef(collected)
@@ -430,13 +430,13 @@ export const multiAddressCorrelation: Attribute = {
 		}
 
 		if (worstHandling === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const worstCollection = qualifiedDataCollectionWithEndpoint(worstHandling.dataCollection)
 
 		if (!isQualifiedDataCollectionWithMultiAddress(worstCollection)) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const handling = worstCollection.multiAddress

@@ -226,7 +226,7 @@ export const funding: Attribute = {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can be invalidated later depending on funding type.
 
 		if (ctx.features.monetization === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(ctx.features.monetization)
@@ -274,7 +274,7 @@ export const funding: Attribute = {
 
 			switch (value) {
 				case null:
-					return unrated(ctx, null)
+					return unrated(ctx)
 				case true:
 					strategies.push(strategy)
 					break

@@ -188,7 +188,7 @@ export const browserIntegration: Attribute<BrowserIntegrationMetadata> = {
 		}
 
 		if (Object.values(ctx.features.integration.browser).includes(null)) {
-			return unrated(ctx, {})
+			return unrated(ctx)
 		}
 
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We just verified that none of the values are null.

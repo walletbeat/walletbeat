@@ -107,13 +107,13 @@ export const sourceVisibility: Attribute = {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Inherently verifiable, just look at the source.
 
 		if (ctx.features.licensing === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		switch (ctx.features.licensing.type) {
 			case LicensingType.SINGLE_WALLET_REPO_AND_LICENSE:
 				if (ctx.features.licensing.walletAppLicense === null) {
-					return unrated(ctx, null)
+					return unrated(ctx)
 				}
 
 				ctx.addRef(ctx.features.licensing.walletAppLicense)
@@ -129,7 +129,7 @@ export const sourceVisibility: Attribute = {
 						ctx.features.licensing.coreLicense === null ||
 						ctx.features.licensing.walletAppLicense === null
 					) {
-						return unrated(ctx, null)
+						return unrated(ctx)
 					}
 
 					ctx.addRef(ctx.features.licensing.coreLicense, ctx.features.licensing.walletAppLicense)

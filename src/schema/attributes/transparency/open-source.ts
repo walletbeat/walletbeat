@@ -183,7 +183,7 @@ export const openSource: Attribute = {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // If open-source, inherently verifiable. If closed-source, evidently true.
 
 		if (ctx.features.licensing === null || ctx.features.licensing.walletAppLicense === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const allLicenses = new Set<License>()
@@ -196,7 +196,7 @@ export const openSource: Attribute = {
 				break // Nothing more to do.
 			case LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE:
 				if (ctx.features.licensing.coreLicense === null) {
-					return unrated(ctx, null)
+					return unrated(ctx)
 				}
 
 				allLicenses.add(ctx.features.licensing.coreLicense.license)

@@ -204,7 +204,7 @@ export const permissionsManagement: Attribute = {
 		const feature = ctx.features.selfSovereignty.permissionsManagement
 
 		if (feature === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(feature)

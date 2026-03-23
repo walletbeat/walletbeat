@@ -741,7 +741,7 @@ export const accountPortability: Attribute = {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test possible.
 
 		if (ctx.features.accountSupport === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.addRef(

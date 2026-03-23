@@ -258,14 +258,14 @@ export const transactionInclusion: Attribute = {
 	},
 	evaluate: ctx => {
 		if (ctx.features.selfSovereignty.transactionSubmission === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (
 			ctx.features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaDirectGossip === null ||
 			ctx.features.selfSovereignty.transactionSubmission.l1.selfBroadcastViaSelfHostedNode === null
 		) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		ctx.setVerifiability(
@@ -302,7 +302,7 @@ export const transactionInclusion: Attribute = {
 			const support = ctx.features.selfSovereignty.transactionSubmission.l2[l2]
 
 			if (support === null) {
-				return unrated(ctx, null)
+				return unrated(ctx)
 			}
 
 			if (support === TransactionSubmissionL2Support.NOT_SUPPORTED_BY_WALLET_BY_DEFAULT) {

@@ -1025,7 +1025,7 @@ function evaluateHardwareWalletTransactionLegibility(
 	const overallRating = getOverallRating()
 
 	if (overallRating === Rating.UNRATED) {
-		return unrated(ctx, null)
+		return unrated(ctx)
 	}
 
 	if (overallRating === Rating.FAIL) {
@@ -1057,7 +1057,7 @@ function evaluateSoftwareWalletTransactionLegibility(
 		transactionLegibilitySupport
 
 	if (calldataDisplay === null || transactionDetailsDisplay === null) {
-		return unrated(ctx, null)
+		return unrated(ctx)
 	}
 
 	const isShown = (field: DataDisplayOptions): boolean =>
@@ -1348,7 +1348,7 @@ export const transactionLegibility: Attribute = {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test.
 
 		if (ctx.features.security.transactionLegibility === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (isHardwareTransactionLegibility(ctx.features.security.transactionLegibility)) {

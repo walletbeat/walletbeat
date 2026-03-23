@@ -198,7 +198,7 @@ export const l1ProviderIndependence: Attribute = {
 	},
 	evaluate: ctx => {
 		if (ctx.features.chainConfigurability === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (!isSupported(ctx.features.chainConfigurability)) {
