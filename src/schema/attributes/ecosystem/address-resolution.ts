@@ -19,10 +19,10 @@ import type {
 } from '../../features/privacy/address-resolution'
 import { pickWorstRating, unrated } from '../common'
 
-type _EvaluationContext = EvaluationContext<AddressResolutionOutcomeMetadata>
-type _Evaluation = Evaluation<AddressResolutionOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<AddressResolutionMetadata>
+type _Evaluation = Evaluation<AddressResolutionMetadata>
 
-export type AddressResolutionOutcomeMetadata = {
+export type AddressResolutionMetadata = {
 	addressResolution?: AddressResolution<Support<AddressResolutionData>>
 }
 
@@ -203,7 +203,7 @@ function evaluateAddressResolution(
 	})
 }
 
-export const addressResolution: Attribute<AddressResolutionOutcomeMetadata> = {
+export const addressResolution: Attribute<AddressResolutionMetadata> = {
 	id: 'addressResolution',
 	icon: '\u{1f4c7}', // Card index
 	displayName: 'Address resolution',
@@ -452,5 +452,5 @@ export const addressResolution: Attribute<AddressResolutionOutcomeMetadata> = {
 
 		return evaluateAddressResolution(ctx, resolvedResolution)
 	},
-	aggregate: pickWorstRating<AddressResolutionOutcomeMetadata>,
+	aggregate: pickWorstRating<AddressResolutionMetadata>,
 }

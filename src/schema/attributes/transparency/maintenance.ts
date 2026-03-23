@@ -6,7 +6,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type MaintenanceOutcomeMetadata = {
+export type MaintenanceMetadata = {
 	physicalDurability: MaintenanceType
 	mtbfDocumentation: MaintenanceType
 	repairability: MaintenanceType
@@ -14,7 +14,7 @@ export type MaintenanceOutcomeMetadata = {
 	warrantyExtensions: MaintenanceType
 }
 
-export const maintenance: Attribute<MaintenanceOutcomeMetadata> = {
+export const maintenance: Attribute<MaintenanceMetadata> = {
 	id: 'maintenance',
 	icon: '🛠️',
 	displayName: 'Maintenance',
@@ -64,7 +64,7 @@ export const maintenance: Attribute<MaintenanceOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<MaintenanceOutcomeMetadata>(perVariant),
+	aggregate: perVariant => pickWorstRating<MaintenanceMetadata>(perVariant),
 	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable unless audited, which never happens.
 

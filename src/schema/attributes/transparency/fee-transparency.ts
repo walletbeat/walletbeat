@@ -293,12 +293,12 @@ function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | n
 	return worstFeeTypes
 }
 
-export type FeeTransparencyOutcomeMetadata = {
+export type FeeTransparencyMetadata = {
 	worstFeeDisplay: WorstFeeDisplay | null
 }
 
-type _EvaluationContext = EvaluationContext<FeeTransparencyOutcomeMetadata>
-type _Evaluation = Evaluation<FeeTransparencyOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<FeeTransparencyMetadata>
+type _Evaluation = Evaluation<FeeTransparencyMetadata>
 
 function evaluateWorstFeeDisplay(
 	ctx: _EvaluationContext,
@@ -465,7 +465,7 @@ function evaluateWorstFeeDisplay(
 	})
 }
 
-export const feeTransparency: Attribute<FeeTransparencyOutcomeMetadata> = {
+export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 	id: 'feeTransparency',
 	icon: '\u{1F4B8}', // Money with wings
 	displayName: 'Fee transparency',
@@ -592,5 +592,5 @@ export const feeTransparency: Attribute<FeeTransparencyOutcomeMetadata> = {
 
 		return evaluateWorstFeeDisplay(ctx, worstFeeDisplay)
 	},
-	aggregate: pickWorstRating<FeeTransparencyOutcomeMetadata>,
+	aggregate: pickWorstRating<FeeTransparencyMetadata>,
 }

@@ -24,37 +24,37 @@ import {
 import { accountAbstraction } from './attributes/ecosystem/account-abstraction'
 import {
 	addressResolution,
-	type AddressResolutionOutcomeMetadata,
+	type AddressResolutionMetadata,
 } from './attributes/ecosystem/address-resolution'
 import {
 	browserIntegration,
-	type BrowserIntegrationOutcomeMetadata,
+	type BrowserIntegrationMetadata,
 } from './attributes/ecosystem/browser-integration'
 import { chainAbstraction } from './attributes/ecosystem/chain-abstraction'
 import {
 	hardwareWalletInteroperability,
-	type HardwareWalletInteroperabilityOutcomeMetadata,
+	type HardwareWalletInteroperabilityMetadata,
 } from './attributes/ecosystem/hardware-wallet-interoperability'
 import { appConnectionSupport } from './attributes/ecosystem/hw-app-connection-support'
 import { transactionBatching } from './attributes/ecosystem/transaction-batching'
 import {
 	addressCorrelation,
-	type AddressCorrelationOutcomeMetadata,
+	type AddressCorrelationMetadata,
 } from './attributes/privacy/address-correlation'
 import { appIsolation } from './attributes/privacy/app-isolation'
 import {
 	hardwarePrivacy,
-	type HardwarePrivacyOutcomeMetadata,
+	type HardwarePrivacyMetadata,
 } from './attributes/privacy/hardware-privacy'
 import { multiAddressCorrelation } from './attributes/privacy/multi-address-correlation'
 import { privacyHygiene, type PrivacyHygieneValue } from './attributes/privacy/privacy-hygiene'
 import {
 	privateTransfers,
-	type PrivateTransfersOutcomeMetadata,
+	type PrivateTransfersMetadata,
 } from './attributes/privacy/private-transfers'
 import {
 	accountRecovery,
-	type AccountRecoveryOutcomeMetadata,
+	type AccountRecoveryMetadata,
 } from './attributes/security/account-recovery'
 import { bugBountyProgram } from './attributes/security/bug-bounty-program'
 import { chainVerification } from './attributes/security/chain-verification'
@@ -62,49 +62,40 @@ import {
 	duressResistance,
 	type DuressResistanceValue,
 } from './attributes/security/duress-resistance'
-import { firmware, type FirmwareOutcomeMetadata } from './attributes/security/firmware'
+import { firmware, type FirmwareMetadata } from './attributes/security/firmware'
 import {
 	hardwareWalletSupport,
-	type HardwareWalletSupportOutcomeMetadata,
+	type HardwareWalletSupportMetadata,
 } from './attributes/security/hardware-wallet-support'
-import {
-	scamPrevention,
-	type ScamPreventionOutcomeMetadata,
-} from './attributes/security/scam-prevention'
-import {
-	securityAudits,
-	type SecurityAuditsOutcomeMetadata,
-} from './attributes/security/security-audits'
-import {
-	supplyChainDIY,
-	type SupplyChainDIYOutcomeMetadata,
-} from './attributes/security/supply-chain-diy'
+import { scamPrevention, type ScamPreventionMetadata } from './attributes/security/scam-prevention'
+import { securityAudits, type SecurityAuditsMetadata } from './attributes/security/security-audits'
+import { supplyChainDIY, type SupplyChainDIYMetadata } from './attributes/security/supply-chain-diy'
 import {
 	supplyChainFactory,
-	type SupplyChainFactoryOutcomeMetadata,
+	type SupplyChainFactoryMetadata,
 } from './attributes/security/supply-chain-factory'
 import { transactionLegibility } from './attributes/security/transaction-legibility'
-import { userSafety, type UserSafetyOutcomeMetadata } from './attributes/security/user-safety'
+import { userSafety, type UserSafetyMetadata } from './attributes/security/user-safety'
 import { accountPortability } from './attributes/self-sovereignty/account-portability'
 import {
 	accountUnruggability,
-	type AccountUnruggabilityOutcomeMetadata,
+	type AccountUnruggabilityMetadata,
 } from './attributes/self-sovereignty/account-unruggability'
 import {
 	interoperability,
-	type InteroperabilityOutcomeMetadata,
+	type InteroperabilityMetadata,
 } from './attributes/self-sovereignty/interoperability'
 import { l1ProviderIndependence } from './attributes/self-sovereignty/l1-provider-independence'
 import { permissionsManagement } from './attributes/self-sovereignty/permissions-management'
 import { transactionInclusion } from './attributes/self-sovereignty/transaction-inclusion'
 import {
 	feeTransparency,
-	type FeeTransparencyOutcomeMetadata,
+	type FeeTransparencyMetadata,
 } from './attributes/transparency/fee-transparency'
 import { funding } from './attributes/transparency/funding'
-import { maintenance, type MaintenanceOutcomeMetadata } from './attributes/transparency/maintenance'
+import { maintenance, type MaintenanceMetadata } from './attributes/transparency/maintenance'
 import { openSource } from './attributes/transparency/open-source'
-import { reputation, type ReputationOutcomeMetadata } from './attributes/transparency/reputation'
+import { reputation, type ReputationMetadata } from './attributes/transparency/reputation'
 import { sourceVisibility } from './attributes/transparency/source-visibility'
 import type { ResolvedFeatures } from './features'
 import { type MaybeUnratedScore, type Score, type WeightedScore, weightedScore } from './score'
@@ -113,17 +104,17 @@ import type { WalletMetadata } from './wallet'
 
 /** A ValueSet for security Values. */
 type SecurityValues = Dict<{
-	securityAudits: SecurityAuditsOutcomeMetadata
-	scamPrevention: ScamPreventionOutcomeMetadata
+	securityAudits: SecurityAuditsMetadata
+	scamPrevention: ScamPreventionMetadata
 	chainVerification: {}
 	transactionLegibility: {}
-	hardwareWalletSupport: HardwareWalletSupportOutcomeMetadata
+	hardwareWalletSupport: HardwareWalletSupportMetadata
 	bugBountyProgram: {}
-	supplyChainDIY: SupplyChainDIYOutcomeMetadata
-	supplyChainFactory: SupplyChainFactoryOutcomeMetadata
-	firmware: FirmwareOutcomeMetadata
-	userSafety: UserSafetyOutcomeMetadata
-	accountRecovery: AccountRecoveryOutcomeMetadata
+	supplyChainDIY: SupplyChainDIYMetadata
+	supplyChainFactory: SupplyChainFactoryMetadata
+	firmware: FirmwareMetadata
+	userSafety: UserSafetyMetadata
+	accountRecovery: AccountRecoveryMetadata
 	duressResistance: DuressResistanceValue
 }>
 
@@ -165,10 +156,10 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 
 /** A ValueSet for privacy Values. */
 type PrivacyValues = Dict<{
-	addressCorrelation: AddressCorrelationOutcomeMetadata
+	addressCorrelation: AddressCorrelationMetadata
 	multiAddressCorrelation: {}
-	privateTransfers: PrivateTransfersOutcomeMetadata
-	hardwarePrivacy: HardwarePrivacyOutcomeMetadata
+	privateTransfers: PrivateTransfersMetadata
+	hardwarePrivacy: HardwarePrivacyMetadata
 	appIsolation: {}
 	privacyHygiene: PrivacyHygieneValue
 }>
@@ -203,7 +194,7 @@ type SelfSovereigntyValues = Dict<{
 	accountPortability: {}
 	permissionsManagement: {}
 	transactionInclusion: {}
-	accountUnruggability: AccountUnruggabilityOutcomeMetadata
+	accountUnruggability: AccountUnruggabilityMetadata
 }>
 
 /** Self-sovereignty attributes. */
@@ -235,8 +226,8 @@ type TransparencyValues = Dict<{
 	openSource: {}
 	sourceVisibility: {}
 	funding: {}
-	feeTransparency: FeeTransparencyOutcomeMetadata
-	reputation: ReputationOutcomeMetadata
+	feeTransparency: FeeTransparencyMetadata
+	reputation: ReputationMetadata
 }>
 
 /** Transparency attributes. */
@@ -266,12 +257,12 @@ export const transparencyAttributeGroup: AttributeGroup<TransparencyValues> = {
 /** A ValueSet for ecosystem Values. */
 type EcosystemValues = Dict<{
 	accountAbstraction: {}
-	addressResolution: AddressResolutionOutcomeMetadata
-	browserIntegration: BrowserIntegrationOutcomeMetadata
+	addressResolution: AddressResolutionMetadata
+	browserIntegration: BrowserIntegrationMetadata
 	chainAbstraction: {}
 	transactionBatching: {}
-	hardwareWalletInteroperability: HardwareWalletInteroperabilityOutcomeMetadata
-	interoperability: InteroperabilityOutcomeMetadata
+	hardwareWalletInteroperability: HardwareWalletInteroperabilityMetadata
+	interoperability: InteroperabilityMetadata
 	appConnectionSupport: {}
 }>
 
@@ -305,7 +296,7 @@ export const ecosystemAttributeGroup: AttributeGroup<EcosystemValues> = {
 
 /** A ValueSet for maintenance Values. */
 type MaintenanceValues = Dict<{
-	maintenance: MaintenanceOutcomeMetadata
+	maintenance: MaintenanceMetadata
 }>
 
 /** Maintenance attributes. */
@@ -336,25 +327,25 @@ export const attributeTree: NonEmptyRecord<string, AttributeGroup<any>> = {
 /** Evaluated security attributes for a single wallet. */
 export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	transactionLegibility: EvaluatedAttribute
-	securityAudits: EvaluatedAttribute<SecurityAuditsOutcomeMetadata>
-	scamPrevention: EvaluatedAttribute<ScamPreventionOutcomeMetadata>
+	securityAudits: EvaluatedAttribute<SecurityAuditsMetadata>
+	scamPrevention: EvaluatedAttribute<ScamPreventionMetadata>
 	chainVerification: EvaluatedAttribute
-	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportOutcomeMetadata>
+	hardwareWalletSupport: EvaluatedAttribute<HardwareWalletSupportMetadata>
 	bugBountyProgram: EvaluatedAttribute
-	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYOutcomeMetadata>
-	supplyChainFactory: EvaluatedAttribute<SupplyChainFactoryOutcomeMetadata>
-	firmware: EvaluatedAttribute<FirmwareOutcomeMetadata>
-	userSafety: EvaluatedAttribute<UserSafetyOutcomeMetadata>
-	accountRecovery: EvaluatedAttribute<AccountRecoveryOutcomeMetadata>
+	supplyChainDIY: EvaluatedAttribute<SupplyChainDIYMetadata>
+	supplyChainFactory: EvaluatedAttribute<SupplyChainFactoryMetadata>
+	firmware: EvaluatedAttribute<FirmwareMetadata>
+	userSafety: EvaluatedAttribute<UserSafetyMetadata>
+	accountRecovery: EvaluatedAttribute<AccountRecoveryMetadata>
 	duressResistance: EvaluatedAttribute<DuressResistanceValue>
 }
 
 /** Evaluated privacy attributes for a single wallet. */
 export interface PrivacyEvaluations extends EvaluatedGroup<PrivacyValues> {
-	addressCorrelation: EvaluatedAttribute<AddressCorrelationOutcomeMetadata>
+	addressCorrelation: EvaluatedAttribute<AddressCorrelationMetadata>
 	multiAddressCorrelation: EvaluatedAttribute
-	privateTransfers: EvaluatedAttribute<PrivateTransfersOutcomeMetadata>
-	hardwarePrivacy: EvaluatedAttribute<HardwarePrivacyOutcomeMetadata>
+	privateTransfers: EvaluatedAttribute<PrivateTransfersMetadata>
+	hardwarePrivacy: EvaluatedAttribute<HardwarePrivacyMetadata>
 	appIsolation: EvaluatedAttribute
 	privacyHygiene: EvaluatedAttribute<PrivacyHygieneValue>
 }
@@ -371,24 +362,24 @@ export interface TransparencyEvaluations extends EvaluatedGroup<TransparencyValu
 	openSource: EvaluatedAttribute
 	sourceVisibility: EvaluatedAttribute
 	funding: EvaluatedAttribute
-	feeTransparency: EvaluatedAttribute<FeeTransparencyOutcomeMetadata>
+	feeTransparency: EvaluatedAttribute<FeeTransparencyMetadata>
 }
 
 /** Evaluated ecosystem attributes for a single wallet. */
 export interface EcosystemEvaluations extends EvaluatedGroup<EcosystemValues> {
 	accountAbstraction: EvaluatedAttribute
-	addressResolution: EvaluatedAttribute<AddressResolutionOutcomeMetadata>
-	browserIntegration: EvaluatedAttribute<BrowserIntegrationOutcomeMetadata>
+	addressResolution: EvaluatedAttribute<AddressResolutionMetadata>
+	browserIntegration: EvaluatedAttribute<BrowserIntegrationMetadata>
 	chainAbstraction: EvaluatedAttribute
 	transactionBatching: EvaluatedAttribute
-	hardwareWalletInteroperability: EvaluatedAttribute<HardwareWalletInteroperabilityOutcomeMetadata>
-	interoperability: EvaluatedAttribute<InteroperabilityOutcomeMetadata>
+	hardwareWalletInteroperability: EvaluatedAttribute<HardwareWalletInteroperabilityMetadata>
+	interoperability: EvaluatedAttribute<InteroperabilityMetadata>
 	appConnectionSupport: EvaluatedAttribute
 }
 
 /** Evaluated maintenance attributes for a single wallet. */
 export interface MaintenanceEvaluations extends EvaluatedGroup<MaintenanceValues> {
-	maintenance: EvaluatedAttribute<MaintenanceOutcomeMetadata>
+	maintenance: EvaluatedAttribute<MaintenanceMetadata>
 }
 
 /** Evaluated attributes for a single wallet. */

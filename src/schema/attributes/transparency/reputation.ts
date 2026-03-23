@@ -6,7 +6,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type ReputationOutcomeMetadata = {
+export type ReputationMetadata = {
 	originalProduct: ReputationType
 	availability: ReputationType
 	warrantySupportRisk: ReputationType
@@ -14,7 +14,7 @@ export type ReputationOutcomeMetadata = {
 	bugBounty: ReputationType
 }
 
-export const reputation: Attribute<ReputationOutcomeMetadata> = {
+export const reputation: Attribute<ReputationMetadata> = {
 	id: 'reputation',
 	icon: '🌟',
 	displayName: 'Reputation',
@@ -64,7 +64,7 @@ export const reputation: Attribute<ReputationOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<ReputationOutcomeMetadata>(perVariant),
+	aggregate: perVariant => pickWorstRating<ReputationMetadata>(perVariant),
 	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable.
 

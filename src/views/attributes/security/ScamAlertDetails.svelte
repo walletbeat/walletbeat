@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import type {
-		ScamPreventionOutcomeMetadata,
+		ScamPreventionMetadata,
 	} from '@/schema/attributes/security/scam-prevention'
 	import type { Outcome } from '@/schema/attributes'
 	import { isSupported } from '@/schema/features/support'
@@ -17,7 +17,7 @@
 		outcome,
 	}: {
 		wallet: RatedWallet
-		outcome: Outcome<ScamPreventionOutcomeMetadata>
+		outcome: Outcome<ScamPreventionMetadata>
 	} = $props()
 
 	// Components

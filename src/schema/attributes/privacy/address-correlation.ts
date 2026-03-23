@@ -39,12 +39,12 @@ import {
 } from '../../reference'
 import { pickWorstRating, unrated } from '../common'
 
-export type AddressCorrelationOutcomeMetadata = {
+export type AddressCorrelationMetadata = {
 	worstLeak: WalletAddressLinkableBy | null
 }
 
-type _EvaluationContext = EvaluationContext<AddressCorrelationOutcomeMetadata>
-type _Evaluation = Evaluation<AddressCorrelationOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<AddressCorrelationMetadata>
+type _Evaluation = Evaluation<AddressCorrelationMetadata>
 
 const uncorrelated = {
 	id: 'no_correlation',
@@ -204,7 +204,7 @@ export function linkableToWalletAddress<T extends UserInfo>(
 	return linkables
 }
 
-export const addressCorrelation: Attribute<AddressCorrelationOutcomeMetadata> = {
+export const addressCorrelation: Attribute<AddressCorrelationMetadata> = {
 	id: 'addressCorrelation',
 	icon: '\u{1f517}', // Link
 	displayName: 'Wallet address privacy',
@@ -262,7 +262,7 @@ export const addressCorrelation: Attribute<AddressCorrelationOutcomeMetadata> = 
 					This is treated as a partial rating because users may mitigate
 					against this by forcing wallet requests to be proxied on their own.
 				`),
-				(value: Outcome<AddressCorrelationOutcomeMetadata>) =>
+				(value: Outcome<AddressCorrelationMetadata>) =>
 					value.rating === Rating.PARTIAL && value.worstLeak?.info === PersonalInfo.IP_ADDRESS,
 			),
 			exampleRating(
@@ -273,7 +273,7 @@ export const addressCorrelation: Attribute<AddressCorrelationOutcomeMetadata> = 
 					pseudonym for each of their wallet address to mitigate this privacy
 					issue.
 				`),
-				(value: Outcome<AddressCorrelationOutcomeMetadata>) =>
+				(value: Outcome<AddressCorrelationMetadata>) =>
 					value.rating === Rating.PARTIAL && value.worstLeak?.info === PersonalInfo.PSEUDONYM,
 			),
 		],
@@ -348,5 +348,5 @@ export const addressCorrelation: Attribute<AddressCorrelationOutcomeMetadata> = 
 			),
 		})
 	},
-	aggregate: pickWorstRating<AddressCorrelationOutcomeMetadata>,
+	aggregate: pickWorstRating<AddressCorrelationMetadata>,
 }

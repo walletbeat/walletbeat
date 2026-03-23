@@ -5,7 +5,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type UserSafetyOutcomeMetadata = {
+export type UserSafetyMetadata = {
 	readableAddress: UserSafetyType
 	contractLabeling: UserSafetyType
 	rawTxReview: UserSafetyType
@@ -24,7 +24,7 @@ export type UserSafetyOutcomeMetadata = {
 	fullyLocalTxSimulation: UserSafetyType
 }
 
-export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
+export const userSafety: Attribute<UserSafetyMetadata> = {
 	id: 'userSafety',
 	icon: '🛡️',
 	displayName: 'User Safety',
@@ -101,7 +101,7 @@ export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<UserSafetyOutcomeMetadata>(perVariant),
+	aggregate: perVariant => pickWorstRating<UserSafetyMetadata>(perVariant),
 	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 

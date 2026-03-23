@@ -43,13 +43,13 @@ import {
 import { evaluateAllGuardianScenarios } from '../../features/guardian-scenario/guardian-scenario-expansion'
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountUnruggabilityOutcomeMetadata = {
+export type AccountUnruggabilityMetadata = {
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
 
-type _EvaluationContext = EvaluationContext<AccountUnruggabilityOutcomeMetadata>
-type _Evaluation = Evaluation<AccountUnruggabilityOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<AccountUnruggabilityMetadata>
+type _Evaluation = Evaluation<AccountUnruggabilityMetadata>
 
 function evaluateGuardianUnruggabilityPolicy(
 	ctx: _EvaluationContext,
@@ -218,7 +218,7 @@ function evaluateAccountUnruggability(
 	})
 }
 
-export const accountUnruggability: Attribute<AccountUnruggabilityOutcomeMetadata> = {
+export const accountUnruggability: Attribute<AccountUnruggabilityMetadata> = {
 	id: 'accountUnruggability',
 	icon: '\u{1fa9a}', // Carpentry Saw
 	displayName: 'Account unruggability',
@@ -427,5 +427,5 @@ export const accountUnruggability: Attribute<AccountUnruggabilityOutcomeMetadata
 			ctx.features.security.accountRecovery,
 		)
 	},
-	aggregate: pickWorstRating<AccountUnruggabilityOutcomeMetadata>,
+	aggregate: pickWorstRating<AccountUnruggabilityMetadata>,
 }

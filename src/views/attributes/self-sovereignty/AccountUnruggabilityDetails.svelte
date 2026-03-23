@@ -4,7 +4,7 @@
 	import { ContentType } from '@/types/content'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
 	import type {
-		AccountUnruggabilityOutcomeMetadata,
+		AccountUnruggabilityMetadata,
 	} from '@/schema/attributes/self-sovereignty/account-unruggability'
 
 	// Props
@@ -13,7 +13,7 @@
 		metadata,
 	}: {
 		wallet: RatedWallet
-		metadata: AccountUnruggabilityOutcomeMetadata
+		metadata: AccountUnruggabilityMetadata
 	} = $props()
 
 	// Components

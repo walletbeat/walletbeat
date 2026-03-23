@@ -9,12 +9,12 @@ import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/
 
 import { pickWorstRating, unrated } from '../common'
 
-export type PasskeyImplementationOutcomeMetadata = {
+export type PasskeyImplementationMetadata = {
 	library: PasskeyVerificationLibrary | null
 	libraryUrl?: string
 }
 
-type _EvaluationContext = EvaluationContext<PasskeyImplementationOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<PasskeyImplementationMetadata>
 
 const noPasskeyImplementation: (typeof passkeyImplementation)['evaluate'] = ctx =>
 	ctx.build({
@@ -177,7 +177,7 @@ function webAuthnSolImplementation(ctx: _EvaluationContext, support: PasskeyVeri
 	})
 }
 
-export const passkeyImplementation: Attribute<PasskeyImplementationOutcomeMetadata> = {
+export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 	id: 'passkeyImplementation',
 	icon: '\u{1fac6}', // Fingerprint
 	displayName: 'Passkey implementation',

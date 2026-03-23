@@ -24,12 +24,12 @@ import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type HardwareWalletInteroperabilityOutcomeMetadata = {
+export type HardwareWalletInteroperabilityMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
 }
 
-type _EvaluationContext = EvaluationContext<HardwareWalletInteroperabilityOutcomeMetadata>
-type _Evaluation = Evaluation<HardwareWalletInteroperabilityOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<HardwareWalletInteroperabilityMetadata>
+type _Evaluation = Evaluation<HardwareWalletInteroperabilityMetadata>
 
 const majorHardwareWalletManufacturers: NonEmptyArray<HardwareWalletType> = [
 	HardwareWalletType.LEDGER,
@@ -136,22 +136,21 @@ function comprehensiveHardwareWalletSupport(
 	})
 }
 
-export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperabilityOutcomeMetadata> =
-	{
-		id: 'hardwareWalletInteroperability',
-		icon: '\u{1f9e9}', // Puzzle piece
-		displayName: 'Hardware wallet interoperability',
-		wording: {
-			midSentenceName: null,
-			howIsEvaluated: "How is a wallet's hardware wallet support evaluated?",
-			whatCanWalletDoAboutIts: sentence(
-				'What can {{WALLET_NAME}} do to improve hardware wallet support?',
-			),
-		},
-		question: sentence(`
+export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperabilityMetadata> = {
+	id: 'hardwareWalletInteroperability',
+	icon: '\u{1f9e9}', // Puzzle piece
+	displayName: 'Hardware wallet interoperability',
+	wording: {
+		midSentenceName: null,
+		howIsEvaluated: "How is a wallet's hardware wallet support evaluated?",
+		whatCanWalletDoAboutIts: sentence(
+			'What can {{WALLET_NAME}} do to improve hardware wallet support?',
+		),
+	},
+	question: sentence(`
 		Does the wallet support directly connecting to hardware wallets from a plurality of manufacturers?
 	`),
-		why: markdown(`
+	why: markdown(`
 		Hardware wallets are physical devices that store a user's private keys offline,
 		providing an additional layer of security against online threats. By keeping
 		private keys isolated from internet-connected devices, hardware wallets protect
@@ -164,7 +163,7 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 		as users that already own a specific hardware wallets will want to use a
 		software wallet that supports it.
 	`),
-		methodology: markdown(`
+	methodology: markdown(`
 		Wallets are evaluated based on whether they directly integrate with
 		hardware wallets from a plurality of major hardware wallet manufacturers.
 
@@ -195,17 +194,42 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 		General direct hardware wallet support is also part of Walletbeat's
 		security criteria as a separate attribute.
 	`),
-		ratingScale: {
-			display: 'pass-fail',
-			exhaustive: true,
-			pass: exampleRating(
-				paragraph(`
+	ratingScale: {
+		display: 'pass-fail',
+		exhaustive: true,
+		pass: exampleRating(
+			paragraph(`
 				The wallet directly supports ${minMajorHardwareWalletManufacturers}
 				major hardware wallet manufacturers. No additional software is
 				necessary to use these hardware wallets (i.e. no need for
 				WalletConnect with an external application).
 			`),
-				comprehensiveHardwareWalletSupport(
+			comprehensiveHardwareWalletSupport(
+				EvaluationContext.forTest(() => hardwareWalletInteroperability),
+				{
+					ref: refNotNecessary,
+					wallets: {
+						[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.USB],
+						}),
+						[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.USB],
+						}),
+						[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+							connectionTypes: [HardwareWalletConnection.USB],
+						}),
+					},
+				},
+			),
+		),
+		partial: [
+			exampleRating(
+				paragraph(`
+					The wallet directly supports two major hardware wallet manufacturers.
+					Other major hardware wallets are either unsupported, or require
+					additional software in order to use.
+				`),
+				insufficientHardwareWalletManufacturerSupport(
 					EvaluationContext.forTest(() => hardwareWalletInteroperability),
 					{
 						ref: refNotNecessary,
@@ -214,7 +238,7 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 								connectionTypes: [HardwareWalletConnection.USB],
 							}),
 							[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
-								connectionTypes: [HardwareWalletConnection.USB],
+								connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
 							}),
 							[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
 								connectionTypes: [HardwareWalletConnection.USB],
@@ -223,118 +247,90 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 					},
 				),
 			),
-			partial: [
-				exampleRating(
-					paragraph(`
-					The wallet directly supports two major hardware wallet manufacturers.
-					Other major hardware wallets are either unsupported, or require
-					additional software in order to use.
-				`),
-					insufficientHardwareWalletManufacturerSupport(
-						EvaluationContext.forTest(() => hardwareWalletInteroperability),
-						{
-							ref: refNotNecessary,
-							wallets: {
-								[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-									connectionTypes: [HardwareWalletConnection.USB],
-								}),
-								[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
-									connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
-								}),
-								[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
-									connectionTypes: [HardwareWalletConnection.USB],
-								}),
-							},
-						},
-					),
-				),
-			],
-			fail: [
-				exampleRating(
-					paragraph(`
+		],
+		fail: [
+			exampleRating(
+				paragraph(`
 					The wallet only directly supports one major hardware wallet manufacturer.
 					Other major hardware wallets are either unsupported, or require
 					additional software in order to use.
 				`),
-					singleHardwareWalletManufacturerSupport(
-						EvaluationContext.forTest(() => hardwareWalletInteroperability),
-						{
-							ref: refNotNecessary,
-							wallets: {
-								[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
-									connectionTypes: [HardwareWalletConnection.USB],
-								}),
-								[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
-									connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
-								}),
-								[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
-									connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
-								}),
-							},
+				singleHardwareWalletManufacturerSupport(
+					EvaluationContext.forTest(() => hardwareWalletInteroperability),
+					{
+						ref: refNotNecessary,
+						wallets: {
+							[HardwareWalletType.LEDGER]: supported<SupportedHardwareWallet>({
+								connectionTypes: [HardwareWalletConnection.USB],
+							}),
+							[HardwareWalletType.TREZOR]: supported<SupportedHardwareWallet>({
+								connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
+							}),
+							[HardwareWalletType.KEYSTONE]: supported<SupportedHardwareWallet>({
+								connectionTypes: [HardwareWalletConnection.WALLET_CONNECT],
+							}),
 						},
-					),
+					},
 				),
-			],
-		},
-		evaluate: (ctx: _EvaluationContext): _Evaluation => {
-			ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test obvious.
+			),
+		],
+	},
+	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test obvious.
 
-			if (ctx.features.type === WalletType.HARDWARE) {
-				return exempt(
-					ctx,
-					sentence(
-						'This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet itself.',
-					),
-					{ hardwareWalletSupport: { ref: refNotNecessary, wallets: {} } },
-				)
-			}
-
-			if (ctx.features.security.hardwareWalletSupport === null) {
-				return unrated(ctx, {
-					hardwareWalletSupport: { ref: refNotNecessary, wallets: {} },
-				})
-			}
-
-			const withoutRefs = ctx.popRefs<HardwareWalletSupport>(
-				ctx.features.security.hardwareWalletSupport,
+		if (ctx.features.type === WalletType.HARDWARE) {
+			return exempt(
+				ctx,
+				sentence(
+					'This attribute is not applicable for {{WALLET_NAME}} as it is a hardware wallet itself.',
+				),
+				{ hardwareWalletSupport: { ref: refNotNecessary, wallets: {} } },
 			)
+		}
 
-			const hwSupport = hardwareWalletType.fullRecord(withoutRefs.wallets, notSupported)
-			let majorManufacturerSupported = 0
+		if (ctx.features.security.hardwareWalletSupport === null) {
+			return unrated(ctx, {
+				hardwareWalletSupport: { ref: refNotNecessary, wallets: {} },
+			})
+		}
 
-			for (const manufacturer of majorHardwareWalletManufacturers) {
-				if (!isSupported(hwSupport[manufacturer])) {
-					continue
-				}
+		const withoutRefs = ctx.popRefs<HardwareWalletSupport>(
+			ctx.features.security.hardwareWalletSupport,
+		)
 
-				if (!hardwareWalletConnectionIsOnlyWalletConnect(hwSupport[manufacturer].connectionTypes)) {
-					majorManufacturerSupported++
-				}
+		const hwSupport = hardwareWalletType.fullRecord(withoutRefs.wallets, notSupported)
+		let majorManufacturerSupported = 0
+
+		for (const manufacturer of majorHardwareWalletManufacturers) {
+			if (!isSupported(hwSupport[manufacturer])) {
+				continue
 			}
 
-			switch (majorManufacturerSupported) {
-				case 0:
-					return exempt(ctx, sentence('{{WALLET_NAME}} does not support any hardware wallet'), {
-						hardwareWalletSupport: ctx.features.security.hardwareWalletSupport,
-					})
-				case 1:
-					return singleHardwareWalletManufacturerSupport(
+			if (!hardwareWalletConnectionIsOnlyWalletConnect(hwSupport[manufacturer].connectionTypes)) {
+				majorManufacturerSupported++
+			}
+		}
+
+		switch (majorManufacturerSupported) {
+			case 0:
+				return exempt(ctx, sentence('{{WALLET_NAME}} does not support any hardware wallet'), {
+					hardwareWalletSupport: ctx.features.security.hardwareWalletSupport,
+				})
+			case 1:
+				return singleHardwareWalletManufacturerSupport(
+					ctx,
+					ctx.features.security.hardwareWalletSupport,
+				)
+			default:
+				if (majorManufacturerSupported < minMajorHardwareWalletManufacturers) {
+					return insufficientHardwareWalletManufacturerSupport(
 						ctx,
 						ctx.features.security.hardwareWalletSupport,
 					)
-				default:
-					if (majorManufacturerSupported < minMajorHardwareWalletManufacturers) {
-						return insufficientHardwareWalletManufacturerSupport(
-							ctx,
-							ctx.features.security.hardwareWalletSupport,
-						)
-					}
+				}
 
-					return comprehensiveHardwareWalletSupport(
-						ctx,
-						ctx.features.security.hardwareWalletSupport,
-					)
-			}
-		},
-		aggregate: pickWorstRating<HardwareWalletInteroperabilityOutcomeMetadata>,
-	}
+				return comprehensiveHardwareWalletSupport(ctx, ctx.features.security.hardwareWalletSupport)
+		}
+	},
+	aggregate: pickWorstRating<HardwareWalletInteroperabilityMetadata>,
+}

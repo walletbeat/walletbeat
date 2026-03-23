@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { SecurityAuditsOutcomeMetadata } from '@/schema/attributes/security/security-audits'
+	import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
@@ -52,7 +52,7 @@
 		hasUnaddressedFlaws,
 	}: {
 		wallet: RatedWallet
-		metadata: SecurityAuditsOutcomeMetadata
+		metadata: SecurityAuditsMetadata
 		auditedInLastYear?: boolean
 		hasUnaddressedFlaws?: boolean
 	} = $props()

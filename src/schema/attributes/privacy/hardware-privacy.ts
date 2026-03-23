@@ -7,13 +7,13 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type HardwarePrivacyOutcomeMetadata = {
+export type HardwarePrivacyMetadata = {
 	phoningHome: HardwarePrivacyType
 	inspectableRemoteCalls: HardwarePrivacyType
 	wirelessPrivacy: HardwarePrivacyType
 }
 
-export const hardwarePrivacy: Attribute<HardwarePrivacyOutcomeMetadata> = {
+export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 	id: 'hardwarePrivacy',
 	icon: '🔒',
 	displayName: 'Hardware Privacy',
@@ -63,7 +63,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<HardwarePrivacyOutcomeMetadata>(perVariant),
+	aggregate: perVariant => pickWorstRating<HardwarePrivacyMetadata>(perVariant),
 	evaluate: ctx => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))

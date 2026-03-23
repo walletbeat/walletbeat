@@ -8,12 +8,12 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SupplyChainDIYOutcomeMetadata = {
+export type SupplyChainDIYMetadata = {
 	diyNoNda: SupplyChainDIYType
 	componentSourcingComplexity: SupplyChainDIYType
 }
 
-export const supplyChainDIY: Attribute<SupplyChainDIYOutcomeMetadata> = {
+export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 	id: 'supplyChainDIY',
 	icon: '🛠️',
 	displayName: 'Supply Chain DIY',
@@ -59,8 +59,8 @@ export const supplyChainDIY: Attribute<SupplyChainDIYOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: pickWorstRating<SupplyChainDIYOutcomeMetadata>,
-	exempted: (ctx, metadata): ExemptEvaluation<SupplyChainDIYOutcomeMetadata> | null => {
+	aggregate: pickWorstRating<SupplyChainDIYMetadata>,
+	exempted: (ctx, metadata): ExemptEvaluation<SupplyChainDIYMetadata> | null => {
 		if (
 			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType !== HardwareWalletManufactureType.DIY

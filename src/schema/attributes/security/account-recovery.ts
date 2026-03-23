@@ -39,13 +39,13 @@ import {
 import { evaluateAllGuardianScenarios } from '../../features/guardian-scenario/guardian-scenario-expansion'
 import { pickWorstRating, unrated } from '../common'
 
-export type AccountRecoveryOutcomeMetadata = {
+export type AccountRecoveryMetadata = {
 	minimumGuardianPolicy: GuardianPolicy | null
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
 
-type _EvaluationContext = EvaluationContext<AccountRecoveryOutcomeMetadata>
-type _Evaluation = Evaluation<AccountRecoveryOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<AccountRecoveryMetadata>
+type _Evaluation = Evaluation<AccountRecoveryMetadata>
 
 function evaluateGuardianRecoveryPolicy(
 	ctx: _EvaluationContext,
@@ -149,7 +149,7 @@ function evaluateAccountRecovery(
 	})
 }
 
-export const accountRecovery: Attribute<AccountRecoveryOutcomeMetadata> = {
+export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 	id: 'accountRecovery',
 	icon: '\u{1f6df}', // Ring Buoy
 	displayName: 'Account recovery',
@@ -344,5 +344,5 @@ export const accountRecovery: Attribute<AccountRecoveryOutcomeMetadata> = {
 
 		return evaluateAccountRecovery(ctx, ctx.features.security.accountRecovery)
 	},
-	aggregate: pickWorstRating<AccountRecoveryOutcomeMetadata>,
+	aggregate: pickWorstRating<AccountRecoveryMetadata>,
 }

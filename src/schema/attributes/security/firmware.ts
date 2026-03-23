@@ -7,7 +7,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type FirmwareOutcomeMetadata = {
+export type FirmwareMetadata = {
 	silentUpdateProtection: FirmwareType | null
 	firmwareOpenSource: FirmwareType | null
 	reproducibleBuilds: FirmwareType | null
@@ -40,7 +40,7 @@ function evaluateFirmware(features: FirmwareSupport): ExplicitRating | Rating.UN
 	return Rating.FAIL
 }
 
-export const firmware: Attribute<FirmwareOutcomeMetadata> = {
+export const firmware: Attribute<FirmwareMetadata> = {
 	id: 'firmware',
 	icon: '💾',
 	displayName: 'Firmware',

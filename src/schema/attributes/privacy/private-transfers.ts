@@ -50,14 +50,14 @@ import { commaListFormat, markdownListFormat } from '@/types/utils/text'
 import { entityMarkdownLink } from '../../entity'
 import { pickWorstRating, unrated } from '../common'
 
-export type PrivateTransfersOutcomeMetadata = {
+export type PrivateTransfersMetadata = {
 	defaultFungibleTokenTransferMode: FungibleTokenTransferMode
 	perTechnology: Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>
 }
 
-type _EvaluationContext = EvaluationContext<PrivateTransfersOutcomeMetadata>
-type _Evaluation = Evaluation<PrivateTransfersOutcomeMetadata>
-type _EvaluationScaffold = EvaluationScaffold<PrivateTransfersOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<PrivateTransfersMetadata>
+type _Evaluation = Evaluation<PrivateTransfersMetadata>
+type _EvaluationScaffold = EvaluationScaffold<PrivateTransfersMetadata>
 
 function singleTechnology<V>(
 	tech: PrivateTransferTechnology,
@@ -1667,7 +1667,7 @@ function build(scaffold: _EvaluationScaffold): _Evaluation {
 	return EvaluationContext.forTest(() => privateTransfers).build(scaffold)
 }
 
-export const privateTransfers: Attribute<PrivateTransfersOutcomeMetadata> = {
+export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 	id: 'privateTransfers',
 	icon: '\u{1f4e8}', // Incoming envelope
 	displayName: 'Private token transfers',
@@ -2056,5 +2056,5 @@ export const privateTransfers: Attribute<PrivateTransfersOutcomeMetadata> = {
 			},
 		})
 	},
-	aggregate: pickWorstRating<PrivateTransfersOutcomeMetadata>,
+	aggregate: pickWorstRating<PrivateTransfersMetadata>,
 }

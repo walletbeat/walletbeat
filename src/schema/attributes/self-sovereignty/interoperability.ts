@@ -6,12 +6,12 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type InteroperabilityOutcomeMetadata = {
+export type InteroperabilityMetadata = {
 	interoperability: InteroperabilityType
 	noSupplierLinkage: InteroperabilityType
 }
 
-export const interoperability: Attribute<InteroperabilityOutcomeMetadata> = {
+export const interoperability: Attribute<InteroperabilityMetadata> = {
 	id: 'interoperability',
 	icon: '🔗',
 	displayName: 'Interoperability',
@@ -53,7 +53,7 @@ export const interoperability: Attribute<InteroperabilityOutcomeMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<InteroperabilityOutcomeMetadata>(perVariant),
+	aggregate: perVariant => pickWorstRating<InteroperabilityMetadata>(perVariant),
 	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 

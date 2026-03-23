@@ -22,12 +22,12 @@ import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type HardwareWalletSupportOutcomeMetadata = {
+export type HardwareWalletSupportMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
 }
 
-type _EvaluationContext = EvaluationContext<HardwareWalletSupportOutcomeMetadata>
-type _Evaluation = Evaluation<HardwareWalletSupportOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<HardwareWalletSupportMetadata>
+type _Evaluation = Evaluation<HardwareWalletSupportMetadata>
 
 function noHardwareWalletSupport(
 	ctx: _EvaluationContext,
@@ -103,7 +103,7 @@ function directHardwareWalletSupport(
 	})
 }
 
-export const hardwareWalletSupport: Attribute<HardwareWalletSupportOutcomeMetadata> = {
+export const hardwareWalletSupport: Attribute<HardwareWalletSupportMetadata> = {
 	id: 'hardwareWalletSupport',
 	icon: '\u{1F5DD}', // Key emoji
 	displayName: 'Hardware wallet support',
@@ -252,5 +252,5 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportOutcomeMetada
 
 		return result
 	},
-	aggregate: pickWorstRating<HardwareWalletSupportOutcomeMetadata>,
+	aggregate: pickWorstRating<HardwareWalletSupportMetadata>,
 }

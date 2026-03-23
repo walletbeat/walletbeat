@@ -12,7 +12,7 @@ import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SupplyChainFactoryOutcomeMetadata = {
+export type SupplyChainFactoryMetadata = {
 	factoryOpsecDocs: SupplyChainFactoryType
 	factoryOpsecAudit: SupplyChainFactoryType
 	tamperEvidence: SupplyChainFactoryType
@@ -43,7 +43,7 @@ function evaluateSupplyChainFactory(features: SupplyChainFactorySupport): Rating
 	return Rating.FAIL
 }
 
-export const supplyChainFactory: Attribute<SupplyChainFactoryOutcomeMetadata> = {
+export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 	id: 'supplyChainFactory',
 	icon: '🏭',
 	displayName: 'Supply Chain Factory',
@@ -97,8 +97,8 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryOutcomeMetadata> = 
 			),
 		],
 	},
-	aggregate: pickWorstRating<SupplyChainFactoryOutcomeMetadata>,
-	exempted: (ctx, metadata): ExemptEvaluation<SupplyChainFactoryOutcomeMetadata> | null => {
+	aggregate: pickWorstRating<SupplyChainFactoryMetadata>,
+	exempted: (ctx, metadata): ExemptEvaluation<SupplyChainFactoryMetadata> | null => {
 		if (
 			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType === HardwareWalletManufactureType.DIY

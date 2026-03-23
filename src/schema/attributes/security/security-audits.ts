@@ -18,12 +18,12 @@ import { isNonEmptyArray, type NonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SecurityAuditsOutcomeMetadata = {
+export type SecurityAuditsMetadata = {
 	securityAudits: SecurityAudit[]
 }
 
-type _EvaluationContext = EvaluationContext<SecurityAuditsOutcomeMetadata>
-type _Evaluation = Evaluation<SecurityAuditsOutcomeMetadata>
+type _EvaluationContext = EvaluationContext<SecurityAuditsMetadata>
+type _Evaluation = Evaluation<SecurityAuditsMetadata>
 
 const noAudits: (typeof securityAudits)['evaluate'] = ctx =>
 	ctx.build({
@@ -126,7 +126,7 @@ const sampleSecurityAudit: SecurityAudit = {
 	variantsScope: 'ALL_VARIANTS',
 }
 
-export const securityAudits: Attribute<SecurityAuditsOutcomeMetadata> = {
+export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 	id: 'securityAudits',
 	icon: '\u{1f50f}', // Locked with Pen
 	displayName: 'Security audits',
@@ -265,7 +265,7 @@ export const securityAudits: Attribute<SecurityAuditsOutcomeMetadata> = {
 		return audited(ctx, audits, auditedInLastYear, hasUnaddressedFlaws)
 	},
 	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) => {
-		const worstEvaluation = pickWorstRating<SecurityAuditsOutcomeMetadata>(perVariant)
+		const worstEvaluation = pickWorstRating<SecurityAuditsMetadata>(perVariant)
 		const allAudits: SecurityAudit[] = []
 		const auditsIdSet = new Set<string>()
 
