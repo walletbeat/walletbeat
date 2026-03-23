@@ -176,31 +176,10 @@ export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
 		const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
 		const rating = passCount >= 11 ? Rating.PASS : passCount >= 6 ? Rating.PARTIAL : Rating.FAIL
 
-		const passCount = [
-			userSafetyFeature.readableAddress,
-			userSafetyFeature.contractLabeling,
-			userSafetyFeature.rawTxReview,
-			userSafetyFeature.readableTx,
-			userSafetyFeature.txCoverageExtensibility,
-			userSafetyFeature.txExpertMode,
-			userSafetyFeature.rawEip712,
-			userSafetyFeature.readableEip712,
-			userSafetyFeature.eip712CoverageExtensibility,
-			userSafetyFeature.eip712ExpertMode,
-			userSafetyFeature.riskAnalysis,
-			userSafetyFeature.riskAnalysisLocal,
-			userSafetyFeature.fullyLocalRiskAnalysis,
-			userSafetyFeature.txSimulation,
-			userSafetyFeature.txSimulationLocal,
-			userSafetyFeature.fullyLocalTxSimulation,
-		].filter(r => r === UserSafetyType.PASS).length
-
-		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}.${
-			rating !== Rating.EXEMPT ? ` It passes ${passCount} out of 16 sub-criteria.` : ''
-		}`
+		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}. It passes ${passCount} out of 16 sub-criteria.`
 
 		const howToImproveText =
-			rating !== Rating.PASS && rating !== Rating.EXEMPT
+			rating !== Rating.PASS
 				? '{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.'
 				: ''
 
@@ -213,10 +192,7 @@ export const userSafety: Attribute<UserSafetyOutcomeMetadata> = {
 				...userSafetyFeature, // TODO: Filter fields
 			},
 			details: paragraph(detailsText),
-			howToImprove:
-				rating === Rating.PASS || rating === Rating.EXEMPT
-					? undefined
-					: paragraph(howToImproveText),
+			howToImprove: rating === Rating.PASS ? undefined : paragraph(howToImproveText),
 		})
 	},
 }
