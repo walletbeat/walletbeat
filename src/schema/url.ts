@@ -29,7 +29,7 @@ export type ExtensionUrl = DomainUrl<'chromewebstore.google.com'>
  *
  * Throws if the URL does not match the expected format.
  */
-export function getExtensionId(url: ChromeExtensionUrl): string {
+export function getExtensionId(url: ExtensionUrl): string {
 	const raw = typeof url === 'string' ? url : url.url
 	const match = /\/detail\/[^/]+\/([a-z]{32})(?:[/?#]|$)/.exec(raw)
 
