@@ -141,7 +141,6 @@ if (allMode) {
 	targets = [{ extensionUrls, id: walletId! }]
 }
 
-
 for (const { id, extensionUrls } of targets) {
 	const manifestDir = path.join(REPO_ROOT, 'data', 'manifests', id)
 

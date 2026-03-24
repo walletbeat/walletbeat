@@ -43,7 +43,7 @@ import {
 	type StageEvaluatableWallet,
 	type WalletLadderEvaluation,
 } from './stages'
-import type { ExtensionUrl, DomainUrl, LabeledUrl, Url } from './url'
+import type { DomainUrl, ExtensionUrl, LabeledUrl, Url } from './url'
 import {
 	type AtLeastOneTrueVariant,
 	type AtLeastOneVariant,
