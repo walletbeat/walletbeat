@@ -25,13 +25,33 @@ contract DeployContract is Script {
 
         vm.startBroadcast();
         WalletbeatTestErc20 erc20Contract = new WalletbeatTestErc20(erc20TokenName, tokenSymbol);
-        WalletbeatTestErc1155 erc1155Contract = new WalletbeatTestErc1155(imageUri, erc1155TokenName);
-        WalletbeatTestErc721 erc721Contract = new WalletbeatTestErc721(erc721TokenName, tokenSymbol, imageUri);
+        WalletbeatTestErc1155 erc1155Contract = new WalletbeatTestErc1155(erc1155TokenName);
+        WalletbeatTestErc721 erc721Contract = new WalletbeatTestErc721(erc721TokenName, tokenSymbol);
         WalletbeatTestContract testContract =
             new WalletbeatTestContract(address(erc20Contract), address(erc721Contract), address(erc1155Contract));
+        appendImageUriInChunks(erc721Contract, erc1155Contract, imageUri);
         vm.stopBroadcast();
 
         return (testContract, erc20Contract, erc721Contract, erc1155Contract);
+    }
+
+    function appendImageUriInChunks(
+        WalletbeatTestErc721 erc721Contract,
+        WalletbeatTestErc1155 erc1155Contract,
+        string memory imageUri
+    ) internal {
+        bytes memory imageUriBytes = bytes(imageUri);
+        uint256 chunkSize = 5000;
+        uint256 imageUriLength = imageUriBytes.length;
+        for (uint256 offset = 0; offset < imageUriLength; offset += chunkSize) {
+            uint256 end = offset + chunkSize < imageUriLength ? offset + chunkSize : imageUriLength;
+            bytes memory chunk = new bytes(end - offset);
+            for (uint256 j = 0; j < end - offset; j++) {
+                chunk[j] = imageUriBytes[offset + j];
+            }
+            erc721Contract.appendImageUri(string(chunk));
+            erc1155Contract.appendImageUri(string(chunk));
+        }
     }
 
     function svgToImageURI(string memory svg) public pure returns (string memory) {

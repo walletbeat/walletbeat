@@ -15,10 +15,25 @@ contract WalletbeatTestErc721 is ERC721 {
     error WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
 
     uint256 private s_tokenId;
-    string private s_tokenSvgUri;
+    string[] private s_imageUriChunks;
 
-    constructor(string memory name, string memory symbol, string memory tokenSvgUri) ERC721(name, symbol) {
-        s_tokenSvgUri = tokenSvgUri;
+    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+
+    function setImageUri(string memory tokenSvgUri) external {
+        delete s_imageUriChunks;
+        s_imageUriChunks.push(tokenSvgUri);
+    }
+
+    function appendImageUri(string memory chunk) external {
+        s_imageUriChunks.push(chunk);
+    }
+
+    function _getImageUri() private view returns (string memory) {
+        bytes memory result;
+        for (uint256 i = 0; i < s_imageUriChunks.length; i++) {
+            result = bytes.concat(result, bytes(s_imageUriChunks[i]));
+        }
+        return string(result);
     }
 
     /**
@@ -85,7 +100,7 @@ contract WalletbeatTestErc721 is ERC721 {
                             name(),
                             '", "description":"A test ERC721 token used solely for testing.", ',
                             '"attributes": [{"trait_type": "purpose", "value": "testing"}], "image":"',
-                            s_tokenSvgUri,
+                            _getImageUri(),
                             '"}'
                         )
                     )
