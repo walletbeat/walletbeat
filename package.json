@@ -27,7 +27,8 @@
 		"preview": "pnpm run astro preview",
 		"fix": "pnpm run lint",
 		"helios": "deploy/helios/helios.sh",
-		"helios:wrap": "deploy/helios/helios-wrap.sh"
+		"helios:wrap": "deploy/helios/helios-wrap.sh",
+		"collect:manifests": "tsx src/tools/manifest-collector/manifest-collector.ts"
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.0",
