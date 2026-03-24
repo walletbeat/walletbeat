@@ -21,7 +21,6 @@ export const unratedTemplate: SoftwareWallet = {
 		lastUpdated: '2020-01-01',
 		urls: {
 			docs: ['https://example.com/docs'],
-			extensions: ['https://example.com/extensions'],
 			repositories: ['https://example.com/repo'],
 			socials: {
 				discord: 'https://discord.com/example',

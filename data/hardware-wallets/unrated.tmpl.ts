@@ -28,7 +28,6 @@ export const unratedHardwareTemplate: HardwareWallet = {
 		lastUpdated: '2020-01-01',
 		urls: {
 			docs: ['https://example.com/docs'],
-			extensions: ['https://example.com/extensions'],
 			others: [
 				{
 					label: 'Other',

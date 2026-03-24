@@ -198,7 +198,6 @@ export const completedTemplate: SoftwareWallet = {
 		lastUpdated: '2026-02-27',
 		urls: {
 			docs: ['https://example.com/docs'],
-			extensions: ['https://example.com/extensions'],
 			repositories: ['https://example.com/repo'],
 			socials: {
 				x: 'https://x.com/example',
