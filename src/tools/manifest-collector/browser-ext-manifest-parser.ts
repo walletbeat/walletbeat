@@ -6,14 +6,6 @@ import {
 	WebAccessibleResourcesScope,
 } from '@/schema/features/security/security-best-practices'
 
-// ---------------------------------------------------------------------------
-// Safe property accessors
-//
-// TypeScript's `typeof x === 'object'` narrows `unknown` to `object` without
-// any type assertion. `Reflect.get` returns `any`, and `any as unknown` is a
-// widening cast (not narrowing), so neither triggers no-unsafe-type-assertion.
-// ---------------------------------------------------------------------------
-
 function asObj(raw: unknown): object | undefined {
 	if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
 		return undefined
@@ -69,10 +61,6 @@ function getMaybeObj(raw: unknown, key: string): object | undefined {
 	return asObj(getProp(obj, key))
 }
 
-// ---------------------------------------------------------------------------
-// Host permission pattern classification
-// ---------------------------------------------------------------------------
-
 /** Ordering of HostPermissionScope from least to most permissive. */
 const HOST_SCOPE_ORDER: HostPermissionScope[] = [
 	HostPermissionScope.NONE,
@@ -119,10 +107,6 @@ function worstScopeOfPatterns(patterns: string[]): HostPermissionScope {
 		HostPermissionScope.NONE,
 	)
 }
-
-// ---------------------------------------------------------------------------
-// Per-field parsers
-// ---------------------------------------------------------------------------
 
 function parseHostPermissions(raw: unknown): HostPermissionScope {
 	// MV3 uses host_permissions; MV2 mixes host patterns into permissions.
@@ -215,10 +199,6 @@ function parseWebAccessibleResources(raw: unknown): WebAccessibleResourcesScope 
 			return WebAccessibleResourcesScope.UNRESTRICTED
 	}
 }
-
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
 
 /**
  * Parses a raw manifest.json object into a typed `BrowserExtensionManifest`.

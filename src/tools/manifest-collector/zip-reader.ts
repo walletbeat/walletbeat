@@ -82,9 +82,6 @@ function extractLocalFile(
 	}
 
 	if (compressionMethod === COMPRESSION_DEFLATE) {
-		// Create a plain Uint8Array view to satisfy @types/node's InputType
-		// (Buffer<ArrayBufferLike> is not directly assignable to Uint8Array<ArrayBufferLike>
-		// in @types/node@25 due to slice() covariance, but Uint8Array is).
 		const view = new Uint8Array(
 			compressedData.buffer,
 			compressedData.byteOffset,

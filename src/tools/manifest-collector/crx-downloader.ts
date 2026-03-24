@@ -89,8 +89,6 @@ function fetchBuffer(url: string, remainingRedirects: number): Promise<Buffer> {
 					return
 				}
 
-				// Accumulate as Uint8Array to avoid Buffer<ArrayBufferLike> vs
-				// Uint8Array<ArrayBufferLike> incompatibility in @types/node@25.
 				const chunks: Uint8Array[] = []
 				let totalLength = 0
 

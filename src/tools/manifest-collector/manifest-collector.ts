@@ -93,10 +93,6 @@ if (allMode && (androidManifestUrl !== undefined || iosPlistUrl !== undefined)) 
 	usage()
 }
 
-// ---------------------------------------------------------------------------
-// Build the list of wallets to process
-// ---------------------------------------------------------------------------
-
 type WalletEntry = { id: string; extensionUrls: string[] }
 
 function isWalletId(id: string): id is keyof typeof allWallets {
@@ -145,9 +141,6 @@ if (allMode) {
 	targets = [{ extensionUrls, id: walletId! }]
 }
 
-// ---------------------------------------------------------------------------
-// Collect browser extension manifests
-// ---------------------------------------------------------------------------
 
 for (const { id, extensionUrls } of targets) {
 	const manifestDir = path.join(REPO_ROOT, 'data', 'manifests', id)
@@ -171,10 +164,6 @@ for (const { id, extensionUrls } of targets) {
 		process.stdout.write(snippet + '\n')
 	}
 }
-
-// ---------------------------------------------------------------------------
-// Optional: mobile manifests (--id only)
-// ---------------------------------------------------------------------------
 
 if (walletId !== undefined) {
 	const manifestDir = path.join(REPO_ROOT, 'data', 'manifests', walletId)
