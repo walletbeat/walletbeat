@@ -18,8 +18,10 @@ contract DeployContract is Script {
         string memory erc1155TokenName = "Walletbeat Testing ERC1155";
         string memory tokenSymbol = "WBTEST";
 
-        // string memory tokenSvg = vm.readFile("./images/Walletbeat.svg");
-        string memory imageUri = "ipfs://QmbwsGbEx2hfBYcefMkFtkuoZtK49Ei85WhFBV9UhrN6e1"; // IPFS of the uploaded Walletbeat SVG
+        string memory tokenSvg = vm.readFile("./images/Walletbeat.svg");
+        string memory imageUri = svgToImageURI(tokenSvg);
+
+        // string memory imageUri = "ipfs://QmbwsGbEx2hfBYcefMkFtkuoZtK49Ei85WhFBV9UhrN6e1"; // IPFS of the uploaded Walletbeat SVG
 
         vm.startBroadcast();
         WalletbeatTestErc20 erc20Contract = new WalletbeatTestErc20(erc20TokenName, tokenSymbol);
