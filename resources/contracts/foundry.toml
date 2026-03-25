@@ -3,7 +3,8 @@ src = "src"
 out = "out"
 libs = ["lib"]
 remappings = [
-    "@openzeppelin/=lib/openzeppelin-contracts/"
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "@solady/=lib/solady/src/"
 ]
 fs_permissions = [{access = "read", path = "./images"}]
 [invariant]
