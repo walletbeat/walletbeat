@@ -18,6 +18,9 @@ contract DeployContract is Script {
         string memory erc1155TokenName = "Walletbeat Testing ERC1155";
         string memory tokenSymbol = "WBTEST";
 
+        /**
+         * Compress SVG through LibZip by solady
+         */
         bytes memory tokenSvg = bytes(vm.readFile("./images/Walletbeat.svg"));
         bytes memory compressedSvg = LibZip.flzCompress(tokenSvg);
 

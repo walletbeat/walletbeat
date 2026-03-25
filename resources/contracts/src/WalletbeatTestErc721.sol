@@ -3,6 +3,7 @@ pragma solidity 0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {LibZip} from "@solady/utils/LibZip.sol";
 
 /**
  * @title WalletbeatTestErc721
@@ -14,26 +15,32 @@ contract WalletbeatTestErc721 is ERC721 {
     error WalletbeatTestErc721__Soulbound();
     error WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
 
+    event ImageDataUpdated();
+    event ImageDataAppended();
+
     uint256 private s_tokenId;
-    string[] private s_imageUriChunks;
+    bytes[] private s_imageDataChunks;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
-    function setImageUri(string memory tokenSvgUri) external {
-        delete s_imageUriChunks;
-        s_imageUriChunks.push(tokenSvgUri);
+    function setImageData(bytes calldata data) external {
+        delete s_imageDataChunks;
+        s_imageDataChunks.push(data);
+        emit ImageDataUpdated();
     }
 
-    function appendImageUri(string memory chunk) external {
-        s_imageUriChunks.push(chunk);
+    function appendImageData(bytes calldata chunk) external {
+        s_imageDataChunks.push(chunk);
+        emit ImageDataAppended();
     }
 
     function _getImageUri() private view returns (string memory) {
-        bytes memory result;
-        for (uint256 i = 0; i < s_imageUriChunks.length; i++) {
-            result = bytes.concat(result, bytes(s_imageUriChunks[i]));
+        bytes memory compressed;
+        uint256 imageDataChunksLength = s_imageDataChunks.length;
+        for (uint256 i = 0; i < imageDataChunksLength; i++) {
+            compressed = bytes.concat(compressed, s_imageDataChunks[i]);
         }
-        return string(result);
+        return string(abi.encodePacked("data:image/svg+xml;base64,", Base64.encode(LibZip.flzDecompress(compressed))));
     }
 
     /**
