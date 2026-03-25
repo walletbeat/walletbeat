@@ -36,15 +36,6 @@ contract WalletbeatTestErc1155 is ERC1155 {
         emit ImageDataAppended();
     }
 
-    function _getImageUri() private view returns (string memory) {
-        bytes memory compressed;
-        uint256 imageDataChunksLength = s_imageDataChunks.length;
-        for (uint256 i = 0; i < imageDataChunksLength; i++) {
-            compressed = bytes.concat(compressed, s_imageDataChunks[i]);
-        }
-        return string(abi.encodePacked("data:image/svg+xml;base64,", Base64.encode(LibZip.flzDecompress(compressed))));
-    }
-
     /**
      * @notice Mints a variable number of NFTs to the specified receiver
      * @dev The amount minted is determined by `1 + (block.number % 4)` to introduce
@@ -69,32 +60,6 @@ contract WalletbeatTestErc1155 is ERC1155 {
     function mintOne() external {
         s_tokenId++;
         super._mint(msg.sender, s_tokenId, 1, "");
-    }
-
-    /**
-     * @notice Enforces soulbound behavior by preventing token transfers
-     * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
-     * on any other transfer attempt.
-     */
-    function _beforeTokenTransfer(
-        address operator,
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal virtual override {
-        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
-
-        if (from == address(0) || to == address(0)) {
-            return;
-        }
-
-        revert WalletbeatTestErc1155__Soulbound();
-    }
-
-    function _baseURI() internal pure returns (string memory) {
-        return "data:application/json;base64,";
     }
 
     function uri(
@@ -123,5 +88,40 @@ contract WalletbeatTestErc1155 is ERC1155 {
                 )
             )
         );
+    }
+
+    /**
+     * @notice Enforces soulbound behavior by preventing token transfers
+     * @dev Allows minting (from == address(0)) and burning (to == address(0)) but reverts
+     * on any other transfer attempt.
+     */
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+
+        if (from == address(0) || to == address(0)) {
+            return;
+        }
+
+        revert WalletbeatTestErc1155__Soulbound();
+    }
+
+    function _baseURI() internal pure returns (string memory) {
+        return "data:application/json;base64,";
+    }
+
+    function _getImageUri() private view returns (string memory) {
+        bytes memory compressed;
+        uint256 imageDataChunksLength = s_imageDataChunks.length;
+        for (uint256 i = 0; i < imageDataChunksLength; i++) {
+            compressed = bytes.concat(compressed, s_imageDataChunks[i]);
+        }
+        return string(abi.encodePacked("data:image/svg+xml;base64,", Base64.encode(LibZip.flzDecompress(compressed))));
     }
 }

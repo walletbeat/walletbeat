@@ -34,13 +34,28 @@ contract WalletbeatTestErc721 is ERC721 {
         emit ImageDataAppended();
     }
 
-    function _getImageUri() private view returns (string memory) {
-        bytes memory compressed;
-        uint256 imageDataChunksLength = s_imageDataChunks.length;
-        for (uint256 i = 0; i < imageDataChunksLength; i++) {
-            compressed = bytes.concat(compressed, s_imageDataChunks[i]);
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        if (ownerOf(tokenId) == address(0)) {
+            revert WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
         }
-        return string(abi.encodePacked("data:image/svg+xml;base64,", Base64.encode(LibZip.flzDecompress(compressed))));
+
+        return string(
+            abi.encodePacked(
+                _baseURI(),
+                Base64.encode(
+                    bytes(
+                        abi.encodePacked(
+                            '{"name":"',
+                            name(),
+                            '", "description":"A test ERC721 token used solely for testing.", ',
+                            '"attributes": [{"trait_type": "purpose", "value": "testing"}], "image":"',
+                            _getImageUri(),
+                            '"}'
+                        )
+                    )
+                )
+            )
+        );
     }
 
     /**
@@ -92,27 +107,12 @@ contract WalletbeatTestErc721 is ERC721 {
         return "data:application/json;base64,";
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        if (ownerOf(tokenId) == address(0)) {
-            revert WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
+    function _getImageUri() private view returns (string memory) {
+        bytes memory compressed;
+        uint256 imageDataChunksLength = s_imageDataChunks.length;
+        for (uint256 i = 0; i < imageDataChunksLength; i++) {
+            compressed = bytes.concat(compressed, s_imageDataChunks[i]);
         }
-
-        return string(
-            abi.encodePacked(
-                _baseURI(),
-                Base64.encode(
-                    bytes(
-                        abi.encodePacked(
-                            '{"name":"',
-                            name(),
-                            '", "description":"A test ERC721 token used solely for testing.", ',
-                            '"attributes": [{"trait_type": "purpose", "value": "testing"}], "image":"',
-                            _getImageUri(),
-                            '"}'
-                        )
-                    )
-                )
-            )
-        );
+        return string(abi.encodePacked("data:image/svg+xml;base64,", Base64.encode(LibZip.flzDecompress(compressed))));
     }
 }
