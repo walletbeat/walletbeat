@@ -23,17 +23,37 @@ contract WalletbeatTestErc721 is ERC721 {
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
+    /**
+     * @notice Replaces the stored image data with new compressed SVG data
+     * @dev Clears all existing chunks and stores `data` as the sole chunk. Emits {ImageDataUpdated}.
+     * @param data FLZ-compressed SVG bytes to store as the token image
+     */
     function setImageData(bytes calldata data) external {
         delete s_imageDataChunks;
         s_imageDataChunks.push(data);
         emit ImageDataUpdated();
     }
 
+    /**
+     * @notice Appends an additional chunk of compressed image data
+     * @dev Allows the full image to be uploaded across multiple transactions when it exceeds
+     * the calldata size of a single transaction. Emits {ImageDataAppended}.
+     * @param chunk The next FLZ-compressed SVG byte chunk to append
+     */
     function appendImageData(bytes calldata chunk) external {
         s_imageDataChunks.push(chunk);
         emit ImageDataAppended();
     }
 
+    /**
+     * @notice Returns the metadata URI for a given token ID
+     *
+     * @dev The URI is a base64-encoded JSON data URI constructed inline from the contract name
+     * and the stored image. Reverts if `tokenId` does not exist.
+     *
+     * @param tokenId The token whose metadata URI to retrieve
+     * @return A URI containing the token's JSON metadata
+     */
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         if (ownerOf(tokenId) == address(0)) {
             revert WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
@@ -103,10 +123,22 @@ contract WalletbeatTestErc721 is ERC721 {
         revert WalletbeatTestErc721__Soulbound();
     }
 
+    /**
+     * @notice Returns the base data URI prefix used when constructing token metadata URIs
+     * @dev Overrides the ERC721 default empty string so that `tokenURI()` produces a
+     * self-contained `data:application/json;base64,` URI with no external dependencies.
+     * @return The string `"data:application/json;base64,"`
+     */
     function _baseURI() internal pure override returns (string memory) {
         return "data:application/json;base64,";
     }
 
+    /**
+     * @notice Assembles, decompresses, and base64-encodes the stored SVG image data
+     * @dev Concatenates all stored chunks, runs FLZ decompression via {LibZip.flzDecompress},
+     * then base64-encodes the result and prepends the SVG data URI scheme.
+     * @return A `data:image/svg+xml;base64,` URI ready to embed in JSON metadata
+     */
     function _getImageUri() private view returns (string memory) {
         bytes memory compressed;
         uint256 imageDataChunksLength = s_imageDataChunks.length;
