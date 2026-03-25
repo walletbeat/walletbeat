@@ -25,12 +25,23 @@ contract WalletbeatTestErc1155 is ERC1155 {
     event ImageDataUpdated();
     event ImageDataAppended();
 
+    /**
+     * @notice Replaces the stored image data with new compressed SVG data
+     * @dev Clears all existing chunks and stores `data` as the sole chunk. Emits {ImageDataUpdated}.
+     * @param data FLZ-compressed SVG bytes to store as the token image
+     */
     function setImageData(bytes calldata data) external {
         delete s_imageDataChunks;
         s_imageDataChunks.push(data);
         emit ImageDataUpdated();
     }
 
+    /**
+     * @notice Appends an additional chunk of compressed image data
+     * @dev Allows the full image to be uploaded across multiple transactions when it exceeds
+     * the calldata size of a single transaction. Emits {ImageDataAppended}.
+     * @param chunk The next FLZ-compressed SVG byte chunk to append
+     */
     function appendImageData(bytes calldata chunk) external {
         s_imageDataChunks.push(chunk);
         emit ImageDataAppended();
@@ -62,6 +73,13 @@ contract WalletbeatTestErc1155 is ERC1155 {
         super._mint(msg.sender, s_tokenId, 1, "");
     }
 
+    /**
+     * @notice Returns the metadata URI for a given token ID
+     * @dev All token IDs share identical metadata. The URI is a base64-encoded JSON data URI
+     * constructed inline from the contract name and the stored image. The `tokenId` parameter
+     * is ignored because every token in this test collection is equivalent.
+     * @return A `data:application/json;base64,` URI containing the token's JSON metadata
+     */
     function uri(
         uint256 /*tokenId*/
     )
@@ -112,10 +130,22 @@ contract WalletbeatTestErc1155 is ERC1155 {
         revert WalletbeatTestErc1155__Soulbound();
     }
 
+    /**
+     * @notice Returns the base data URI prefix used when constructing token metadata URIs
+     * @dev Overrides the default empty string so that `uri()` produces a self-contained
+     * `data:application/json;base64,` URI with no external dependencies.
+     * @return The string `"data:application/json;base64,"`
+     */
     function _baseURI() internal pure returns (string memory) {
         return "data:application/json;base64,";
     }
 
+    /**
+     * @notice Assembles, decompresses, and base64-encodes the stored SVG image data
+     * @dev Concatenates all stored chunks, runs FLZ decompression via {LibZip.flzDecompress},
+     * then base64-encodes the result and prepends the SVG data URI scheme.
+     * @return A `data:image/svg+xml;base64,` URI ready to embed in JSON metadata
+     */
     function _getImageUri() private view returns (string memory) {
         bytes memory compressed;
         uint256 imageDataChunksLength = s_imageDataChunks.length;
