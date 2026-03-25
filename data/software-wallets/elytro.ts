@@ -121,6 +121,10 @@ export const elytro: SoftwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://github.com/Elytro-eth',

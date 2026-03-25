@@ -189,6 +189,10 @@ export const daimo: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: appConnectionNotSupported,
 			dataCollection: {
 				[UserFlow.INSTALL]: null,

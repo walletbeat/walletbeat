@@ -60,6 +60,20 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 
 ## `src/schema/features.ts`
 
+### Type: `WalletAnalytics`
+
+```typescript
+type WalletAnalytics = WithRef<{
+	/** Where analytics data goes. */
+	entity: Entity
+
+	/** Analytics data collection policy. */
+	policy: Exclude<CollectionPolicy, CollectionPolicy.NEVER>
+}>
+```
+
+---
+
 ### Interface: `WalletBaseFeatures`
 
 A set of features about any type of wallet.
@@ -79,6 +93,9 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
   - `transactionPrivacy` (`VariantFeature<TransactionPrivacy>`): Transaction privacy features.
+  - `analytics` (object): Wallet analytics collectors and consent policy. Use `NOT_SUPPORTED` when a type of analytics is not used by the wallet.
+    - `usage` (`VariantFeature<Support<WalletAnalytics>>`): Product analytics / UI usage tracking telemetry.
+    - `crashReports` (`VariantFeature<Support<WalletAnalytics>>`): Crash and error reporting telemetry.
 - `selfSovereignty` (`object`): Self-sovereignty features.
 - `transparency` (object): Transparency features.
   - `operationFees` (`VariantFeature<Nullable<BasicOperationFees>>`): Information on how fees are displayed for basic operations.
@@ -218,6 +235,9 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
   - `accountRecovery` (`ResolvedFeature<AccountRecovery>`)
 - `privacy` (object)
+  - `analytics` (object)
+    - `usage` (`ResolvedFeature<Support<WalletAnalytics>>`)
+    - `crashReports` (`ResolvedFeature<Support<WalletAnalytics>>`)
   - `dataCollection` (`ResolvedFeature<DataCollection>`)
   - `privacyPolicy` (`ResolvedFeature<string>`)
   - `hardwarePrivacy` (`ResolvedFeature<HardwarePrivacySupport>`)

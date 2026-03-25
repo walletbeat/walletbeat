@@ -347,6 +347,10 @@ export const completedTemplate: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: notSupported,
+				usage: notSupported,
+			},
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: supported({

@@ -1,15 +1,15 @@
-import type { CorporateEntity, DataBroker } from '@/schema/entity'
+import type { CorporateEntity, OffchainDataProvider } from '@/schema/entity'
 
-export const sentry: CorporateEntity & DataBroker = {
+export const sentry: CorporateEntity & OffchainDataProvider = {
 	id: 'sentry',
 	name: 'Sentry',
-	legalName: { name: 'Functional Software Inc', soundsDifferent: true },
+	legalName: { name: 'Functional Software, Inc.', soundsDifferent: true },
 	type: {
 		chainDataProvider: false,
 		corporate: true,
-		dataBroker: true,
+		dataBroker: false,
 		exchange: false,
-		offchainDataProvider: false,
+		offchainDataProvider: true,
 		securityAuditor: false,
 		transactionBroadcastProvider: false,
 		walletDeveloper: false,
