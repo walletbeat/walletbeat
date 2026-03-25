@@ -1,6 +1,10 @@
 import { type NonEmptyArray } from '@/types/utils/non-empty'
 
-/** Score is a score between 0.0 (lowest) and 1.0 (highest). */
+/**
+ * Score is a number between -0.5 (worst, for fully UNRATED) and 1.0 (best).
+ * FAIL maps to 0.0; UNRATED maps to -0.5 to rank below FAIL.
+ * null means the attribute is EXEMPT (excluded from scoring entirely).
+ */
 export type Score = number | null
 
 /** A score and a weight. */
@@ -43,6 +47,6 @@ export const weightedScore = (scores: NonEmptyArray<WeightedScore>): Score => {
 export const formatScore = (score: MaybeUnratedScore): string =>
 	score !== null && score.score !== null
 		? `${
-				score.score === 0 ? '💀' : score.score === 1 ? '💯' : (score.score * 100).toFixed(0)
+				score.score <= 0 ? '💀' : score.score === 1 ? '💯' : (score.score * 100).toFixed(0)
 			}${score.hasUnratedComponent ? '*' : ''}`
 		: '❔'

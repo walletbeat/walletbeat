@@ -195,12 +195,14 @@ export const daimo: SoftwareWallet = {
 			},
 			appIsolation: appConnectionNotSupported,
 			dataCollection: {
+				[UserFlow.INSTALL]: null,
 				[UserFlow.APP_CONNECTION]: 'FLOW_NOT_SUPPORTED',
 				[UserFlow.NATIVE_SWAP]: 'FLOW_NOT_SUPPORTED',
-				[UserFlow.SEND]: {
+				[UserFlow.SEND_ETHER]: {
 					collected: [],
 				},
-				[UserFlow.ONBOARDING]: {
+				[UserFlow.SEND_USDC]: null,
+				[UserFlow.ONBOARDING_NEW]: {
 					collected: [
 						{
 							ref: [
@@ -267,7 +269,8 @@ export const daimo: SoftwareWallet = {
 						purposes: [DataCollectionPurpose.ACCOUNT_SIGNUP],
 					},
 				},
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.ONBOARDING_IMPORT]: null,
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
 						{
 							ref: {
@@ -428,6 +431,7 @@ export const daimo: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

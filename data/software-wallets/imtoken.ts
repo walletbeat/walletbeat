@@ -195,13 +195,15 @@ export const imtoken: SoftwareWallet = {
 				[Variant.MOBILE]: null,
 			},
 			dataCollection: {
+				[UserFlow.INSTALL]: null,
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [],
 				},
-				[UserFlow.SEND]: {
+				[UserFlow.SEND_ETHER]: {
 					collected: [],
 				},
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.SEND_USDC]: null,
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
 						{
 							ref: [
@@ -226,10 +228,11 @@ export const imtoken: SoftwareWallet = {
 				[UserFlow.APP_CONNECTION]: {
 					collected: [],
 				},
-				[UserFlow.ONBOARDING]: {
+				[UserFlow.ONBOARDING_NEW]: {
 					collected: [],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
+				[UserFlow.ONBOARDING_IMPORT]: null,
 			},
 			privacyPolicy: 'https://token.im/tos-en.html',
 			transactionPrivacy: {
@@ -336,6 +339,7 @@ export const imtoken: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

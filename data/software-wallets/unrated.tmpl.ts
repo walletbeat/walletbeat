@@ -99,6 +99,7 @@ export const unratedTemplate: SoftwareWallet = {
 			transactionLegibility: null,
 		},
 		selfSovereignty: {
+			permissionsManagement: null,
 			transactionSubmission: {
 				l1: {
 					ref: refTodo,

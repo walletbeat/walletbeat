@@ -161,7 +161,6 @@ export const keycardShell: HardwareWallet = {
 				silentUpdateProtection: FirmwareType.PASS,
 				url: 'https://github.com/keycard-tech/keycard-shell',
 			},
-			// Keys handling: generated on-device (Keycard smartcard), BIP-32 HD wallet, no multiparty
 			keysHandling: {
 				ref: [
 					{
@@ -183,8 +182,7 @@ export const keycardShell: HardwareWallet = {
 			lightClient: {
 				ethereumL1: null,
 			},
-			publicSecurityAudits: null,
-			// Security: EAL6+ certified JavaCard secure element (on the Keycard smartcard)
+			publicSecurityAudits: null, // Security: EAL6+ certified JavaCard secure element (on the Keycard smartcard)
 			secureElement: supported({
 				ref: {
 					explanation:
@@ -193,6 +191,7 @@ export const keycardShell: HardwareWallet = {
 				},
 				secureElementType: SecureElementType.EAL_6_PLUS,
 			}),
+			// Keys handling: generated on-device (Keycard smartcard), BIP-32 HD wallet, no multiparty
 			supplyChainDIY: null,
 			supplyChainFactory: null,
 			// Transaction legibility: QR-based signing via ERC-4527

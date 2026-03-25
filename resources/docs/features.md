@@ -40,12 +40,14 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 - [`src/schema/features/security/scam-alerts.ts`](#srcschemafeaturessecurityscam-alertsts)
 - [`src/schema/features/security/secure-element.ts`](#srcschemafeaturessecuritysecure-elementts)
 - [`src/schema/features/security/security-audits.ts`](#srcschemafeaturessecuritysecurity-auditsts)
+- [`src/schema/features/security/security-best-practices.ts`](#srcschemafeaturessecuritysecurity-best-practicests)
 - [`src/schema/features/security/supply-chain-diy.ts`](#srcschemafeaturessecuritysupply-chain-diyts)
 - [`src/schema/features/security/supply-chain-factory.ts`](#srcschemafeaturessecuritysupply-chain-factoryts)
 - [`src/schema/features/security/transaction-legibility.ts`](#srcschemafeaturessecuritytransaction-legibilityts)
 - [`src/schema/features/security/user-safety.ts`](#srcschemafeaturessecurityuser-safetyts)
 - [`src/schema/features/self-sovereignty/chain-configurability.ts`](#srcschemafeaturesself-sovereigntychain-configurabilityts)
 - [`src/schema/features/self-sovereignty/interoperability.ts`](#srcschemafeaturesself-sovereigntyinteroperabilityts)
+- [`src/schema/features/self-sovereignty/permissions-management.ts`](#srcschemafeaturesself-sovereigntypermissions-managementts)
 - [`src/schema/features/self-sovereignty/transaction-submission.ts`](#srcschemafeaturesself-sovereigntytransaction-submissionts)
 - [`src/schema/features/support.ts`](#srcschemafeaturessupportts)
 - [`src/schema/features/transparency/fee-display.ts`](#srcschemafeaturestransparencyfee-displayts)
@@ -135,6 +137,7 @@ type WalletSoftwareFeatures = WalletBaseFeatures & {
 	selfSovereignty: WalletBaseFeatures['selfSovereignty'] & {
 		/** Describes the set of options for submitting transactions. */
 		transactionSubmission: VariantFeature<Nullable<TransactionSubmission>>
+		permissionsManagement: VariantFeature<Support<PermissionsManagementSupport>>
 	}
 
 	/** Ecosystem features. */
@@ -243,6 +246,7 @@ A set of features about a specific wallet variant. All features are resolved to 
 - `selfSovereignty` (object)
   - `transactionSubmission` (`ResolvedFeature<TransactionSubmission>`)
   - `interoperability` (`ResolvedFeature<InteroperabilitySupport>`)
+  - `permissionsManagement` (`ResolvedFeature<Support<PermissionsManagementSupport>>`)
 - `transparency` (object)
   - `operationFees` (`ResolvedFeature<BasicOperationFees>`)
   - `reputation` (`ResolvedFeature<ReputationSupport>`)
@@ -844,13 +848,13 @@ type AppIsolation =
 
 An enum representing when data collection occurs.
 
-Values are comparable as integers; the closest to zero, the more privacy.
+Values are ordered from most private (NEVER) to least private (ALWAYS).
 
-- `NEVER` = `0`: The data is never collected.
-- `OPT_IN` = `1`: The wallet does not collect this data by default. The user may decide to enable to this, but this requires explicit user intent to do this.
-- `PROMPTED` = `2`: The wallet does not collect this data by default. However, the wallet will at some point (e.g. during wallet setup) actively ask the user whether or not they want to enable this data collection, without explicit user intent to look for this setting.
-- `BY_DEFAULT` = `3`: The data is collected by default, but the user may turn this off by configuring the wallet appropriately. Doing so requires explicit user intent and knowledge that there is an option to do this in the first place. In order to qualify for this level, it must be possible for the user to access this setting and turn off the collection _before_ the first time it happens. For example, a wallet that refreshes crypto prices by default (using an external service) and does so before ever giving the user a chance to access the wallet settings to turn off this feature does not qualify for this level.
-- `ALWAYS` = `4`: The data is always collected no matter what the user does.
+- `NEVER` = `'NEVER'`: The data is never collected.
+- `OPT_IN` = `'OPT_IN'`: The wallet does not collect this data by default. The user may decide to enable to this, but this requires explicit user intent to do this.
+- `PROMPTED` = `'PROMPTED'`: The wallet does not collect this data by default. However, the wallet will at some point (e.g. during wallet setup) actively ask the user whether or not they want to enable this data collection, without explicit user intent to look for this setting.
+- `BY_DEFAULT` = `'BY_DEFAULT'`: The data is collected by default, but the user may turn this off by configuring the wallet appropriately. Doing so requires explicit user intent and knowledge that there is an option to do this in the first place. In order to qualify for this level, it must be possible for the user to access this setting and turn off the collection _before_ the first time it happens. For example, a wallet that refreshes crypto prices by default (using an external service) and does so before ever giving the user a chance to access the wallet settings to turn off this feature does not qualify for this level.
+- `ALWAYS` = `'ALWAYS'`: The data is always collected no matter what the user does.
 
 ---
 
@@ -1035,20 +1039,20 @@ type Endpoint =
 
 Personal information types.
 
-- `IP_ADDRESS` = `'ipAddress'`: The user's IP address.
-- `TRACKING_IDENTIFIER` = `'trackingIdentifier'`: A cross-request tracking identifier, such as a cookie.
-- `PSEUDONYM` = `'pseudonym'`: The user's selected pseudonym.
-- `LEGAL_NAME` = `'legalName'`: The user's legal name.
-- `EMAIL` = `'email'`: The user's email.
-- `PHONE` = `'phone'`: The user's phone number.
-- `BROWSING_HISTORY_URLS` = `'browsingHistoryUrls'`: URLs the user visits.
-- `CONTACTS` = `'contacts'`: The user's contacts (e.g. when searching for friends to invite).
-- `PHYSICAL_ADDRESS` = `'physicalAddress'`: The user's physical address.
-- `FACE` = `'face'`: The user's face (e.g. KYC selfie).
-- `CEX_ACCOUNT` = `'cexAccount'`: The user's CEX account(s).
-- `GOVERNMENT_ID` = `'governmentId'`: The user's government-issued ID.
-- `X_DOT_COM_ACCOUNT` = `'xDotComAccount'`: The user's X.com account.
-- `FARCASTER_ACCOUNT` = `'farcasterAccount'`: The user's Farcaster account.
+- `IP_ADDRESS` = `'IP_ADDRESS'`: The user's IP address.
+- `TRACKING_IDENTIFIER` = `'TRACKING_IDENTIFIER'`: A cross-request tracking identifier, such as a cookie.
+- `PSEUDONYM` = `'PSEUDONYM'`: The user's selected pseudonym.
+- `LEGAL_NAME` = `'LEGAL_NAME'`: The user's legal name.
+- `EMAIL` = `'EMAIL'`: The user's email.
+- `PHONE` = `'PHONE'`: The user's phone number.
+- `BROWSING_HISTORY_URLS` = `'BROWSING_HISTORY_URLS'`: URLs the user visits.
+- `CONTACTS` = `'CONTACTS'`: The user's contacts (e.g. when searching for friends to invite).
+- `PHYSICAL_ADDRESS` = `'PHYSICAL_ADDRESS'`: The user's physical address.
+- `FACE` = `'FACE'`: The user's face (e.g. KYC selfie).
+- `CEX_ACCOUNT` = `'CEX_ACCOUNT'`: The user's CEX account(s).
+- `GOVERNMENT_ID` = `'GOVERNMENT_ID'`: The user's government-issued ID.
+- `X_DOT_COM_ACCOUNT` = `'X_DOT_COM_ACCOUNT'`: The user's X.com account.
+- `FARCASTER_ACCOUNT` = `'FARCASTER_ACCOUNT'`: The user's Farcaster account.
 
 ---
 
@@ -1056,12 +1060,12 @@ Personal information types.
 
 Wallet-related information types.
 
-- `USER_ACTIONS` = `'userActions'`: The user's wallet actions (clicks etc).
-- `ACCOUNT_ADDRESS` = `'accountAddress'`: The user's account address.
-- `BALANCE` = `'balance'`: The user's wallet balance. This can easily be turned back into an address, because most addresses' balance amount is unique.
-- `ASSETS` = `'assets'`: The set of assets that are in the wallet. On wallets with many NFTs, this can be used to uniquely identify the wallet.
-- `MEMPOOL_TRANSACTIONS` = `'mempoolTransactions'`: The user's wallet transactions before they are included onchain. For example, MEV protection services usually fall under this category.
-- `WALLET_CONNECTED_DOMAINS` = `'walletConnectedDomains'`: Domain names the wallet is connected to.
+- `USER_ACTIONS` = `'USER_ACTIONS'`: The user's wallet actions (clicks etc).
+- `ACCOUNT_ADDRESS` = `'ACCOUNT_ADDRESS'`: The user's account address.
+- `BALANCE` = `'BALANCE'`: The user's wallet balance. This can easily be turned back into an address, because most addresses' balance amount is unique.
+- `ASSETS` = `'ASSETS'`: The set of assets that are in the wallet. On wallets with many NFTs, this can be used to uniquely identify the wallet.
+- `MEMPOOL_TRANSACTIONS` = `'MEMPOOL_TRANSACTIONS'`: The user's wallet transactions before they are included onchain. For example, MEV protection services usually fall under this category.
+- `WALLET_CONNECTED_DOMAINS` = `'WALLET_CONNECTED_DOMAINS'`: Domain names the wallet is connected to.
 
 ---
 
@@ -1086,12 +1090,15 @@ The type of information that a UserInfo is about.
 
 The UX flow within a wallet.
 
-- `UNCLASSIFIED` = `'unclassified'`: Any flow that is unclassified or unclear.
-- `ONBOARDING` = `'onboarding'`: Onboard onto the wallet, either as a new user or importing an existing account.
-- `SEND` = `'send'`: Sending tokens to another address.
-- `NATIVE_SWAP` = `'nativeSwap'`: Swapping tokens through a wallet's built-in swap feature.
-- `TRANSACTION` = `'transaction'`: Review a transaction and signing it.
-- `APP_CONNECTION` = `'appConnection'`: Connecting to an application.
+- `UNCLASSIFIED` = `'UNCLASSIFIED'`: Any flow that is unclassified or unclear.
+- `INSTALL` = `'INSTALL'`: Installing the wallet.
+- `ONBOARDING_NEW` = `'ONBOARDING_NEW'`: Onboard onto the wallet as a new user.
+- `ONBOARDING_IMPORT` = `'ONBOARDING_IMPORT'`: Onboard onto the wallet, importing an existing account.
+- `SEND_ETHER` = `'SEND_ETHER'`: Sending Ether to another address.
+- `SEND_USDC` = `'SEND_USDC'`: Sending USDC to another address.
+- `NATIVE_SWAP` = `'NATIVE_SWAP'`: Swapping tokens through a wallet's built-in swap feature.
+- `MAKE_TRANSACTION` = `'MAKE_TRANSACTION'`: Review a transaction and signing it.
+- `APP_CONNECTION` = `'APP_CONNECTION'`: Connecting to an application.
 
 ---
 
@@ -1103,7 +1110,9 @@ Why is data being collected?
 - `CHAIN_DATA_LOOKUP` = `'CHAIN_DATA_LOOKUP'`: Looking up chain data (read only).
 - `TRANSACTION_BROADCAST` = `'TRANSACTION_BROADCAST'`: Broadcasting transactions for inclusion.
 - `TRANSACTION_SIMULATION` = `'TRANSACTION_SIMULATION'`: Simulating transaction outcome.
-- `SWAP_QUOTE` = `'SWAP_QUOTE'`: Getting a quote for a swap operation.
+- `GAS_QUOTE` = `'GAS_QUOTE'`: Getting the present price of gas on the chain.
+- `SWAP_QUOTE` = `'SWAP_QUOTE'`: Getting a quote for a swap or bridge operation.
+- `TOKEN_PRICE_LOOKUP` = `'TOKEN_PRICE_LOOKUP'`: Looking up a token's price for display in a portfolio view.
 - `SCAM_DETECTION` = `'SCAM_DETECTION'`: Checking for scams.
 - `ACCOUNT_SIGNUP` = `'ACCOUNT_SIGNUP'`: Signing up for a wallet-related account.
 - `EXTERNAL_ACCOUNT_LINKING` = `'EXTERNAL_ACCOUNT_LINKING'`: Linking to an external (non-wallet-related) account, e.g. CEX account.
@@ -1202,10 +1211,13 @@ type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
 
 A collection of data that a wallet collects. See /docs/mitmproxy-guide for how to collect this.
 
-- `[UserFlow.ONBOARDING]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during signup?
-- `[UserFlow.SEND]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending tokens?
+- `[UserFlow.INSTALL]` (`DataCollectionForFlow | null`): What data is collected when installing the wallet?
+- `[UserFlow.ONBOARDING_NEW]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during new account creation?
+- `[UserFlow.ONBOARDING_IMPORT]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during account import?
+- `[UserFlow.SEND_ETHER]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending Ether?
+- `[UserFlow.SEND_USDC]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending USDC?
 - `[UserFlow.NATIVE_SWAP]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when swapping tokens using the wallet's native swap feature?
-- `[UserFlow.TRANSACTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected during the transaction review/signing flow?
+- `[UserFlow.MAKE_TRANSACTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected during the transaction review/signing flow?
 - `[UserFlow.APP_CONNECTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when connecting to an app?
 - `[UserFlow.UNCLASSIFIED]` (`DataCollectionForFlow`, optional): What other data is collected but not covered in the other flows, if any?
 
@@ -2505,6 +2517,185 @@ type SecurityAudit = MustRef<{
 
 ---
 
+## `src/schema/features/security/security-best-practices.ts`
+
+### Enum: `KeyStorageMechanism`
+
+How the wallet stores the user's private key.
+
+- `ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF` = `'ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF'`: The key is encrypted with a user-known secret before being stored on disk, using a standardized key derivation function.
+- `ENCRYPTED_WITH_USER_SECRET_WEAK_KDF` = `'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF'`: The key is encrypted with a user-known secret before being stored on disk, but the key derivation is non-standard or ad-hoc.
+- `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
+- `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
+- `NO_KEY_STORED` = `'NO_KEY_STORED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
+
+---
+
+### Enum: `SecureRngSource`
+
+The entropy source used when generating the wallet's private key.
+
+- `OS_CSPRNG` = `'OS_CSPRNG'`: OS-provided Cryptographically Secure Pseudorandom RNG.
+- `HARDWARE_ENTROPY` = `'HARDWARE_ENTROPY'`: Dedicated hardware entropy source.
+- `LIBRARY_RNG` = `'LIBRARY_RNG'`: A library-provided RNG whose quality is not independently verified.
+
+---
+
+### Enum: `HostPermissionScope`
+
+Scope of a Browser Extension URL match pattern grant, expressed in terms relevant to wallet extensions. Ordered from least to most permissive.
+
+- `NONE` = `'NONE'`: No host permissions declared; the extension does not access web pages.
+- `HTTPS_ONLY` = `'HTTPS_ONLY'`: HTTPS origins only — covers all legitimate apps without touching insecure pages, local files, or WebSocket connections.
+- `HTTP_AND_HTTPS` = `'HTTP_AND_HTTPS'`: HTTP and HTTPS origins — includes insecure web pages in addition to apps.
+- `UNRESTRICTED` = `'UNRESTRICTED'`: All origins including non-web schemes (file://, ws://, wss://, etc.) — the extension can read and modify local files and raw socket traffic.
+
+---
+
+### Enum: `BrowserExtensionPermission`
+
+Security-sensitive Browser Extension permission strings declared in the `permissions` manifest field. Values match the manifest string exactly.
+
+- `ACTIVE_TAB` = `'activeTab'`: Access the currently active tab's URL, title, and favicon.
+- `BOOKMARKS` = `'bookmarks'`: Read and modify browser bookmarks.
+- `BROWSING_DATA` = `'browsingData'`: Delete browsing data (history, cookies, cache).
+- `CLIPBOARD_READ` = `'clipboardRead'`: Read clipboard contents without a user gesture.
+- `CLIPBOARD_WRITE` = `'clipboardWrite'`: Write to the clipboard without a user gesture.
+- `COOKIES` = `'cookies'`: Read and modify cookies for all accessible hosts.
+- `DEBUGGER` = `'debugger'`: Attach the browser debugger protocol to any tab.
+- `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
+- `DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS` = `'declarativeNetRequestWithHostAccess'`: Block or redirect requests with host-based access.
+- `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
+- `GEOLOCATION` = `'geolocation'`: Access the device's geographic location.
+- `HISTORY` = `'history'`: Read the full browsing history.
+- `IDENTITY` = `'identity'`: Access the user's Google Account identity (no email).
+- `IDENTITY_EMAIL` = `'identity.email'`: Access the user's Google Account email address.
+- `MANAGEMENT` = `'management'`: List, enable, disable, or uninstall other extensions.
+- `NATIVE_MESSAGING` = `'nativeMessaging'`: Send and receive messages from a native OS application.
+- `PAGE_CAPTURE` = `'pageCapture'`: Save a tab's full page as MHTML.
+- `PRIVACY` = `'privacy'`: Read and modify browser privacy settings.
+- `PROXY` = `'proxy'`: Monitor and control the browser's network proxy settings.
+- `SCRIPTING` = `'scripting'`: Inject scripts and CSS into pages programmatically.
+- `TABS` = `'tabs'`: Read the URLs, titles, and favicons of all open tabs.
+- `USER_SCRIPTS` = `'userScripts'`: Register user-supplied scripts that run in web pages.
+- `WEB_AUTHENTICATION_PROXY` = `'webAuthenticationProxy'`: Intercept WebAuthn requests on behalf of the extension.
+- `WEB_NAVIGATION` = `'webNavigation'`: Observe all navigation events across tabs.
+- `WEB_REQUEST` = `'webRequest'`: Observe (and with blocking, modify) all HTTP/S requests.
+- `WEB_REQUEST_BLOCKING` = `'webRequestBlocking'`: Block or modify HTTP/S requests synchronously.
+
+---
+
+### Enum: `WebAccessibleResourcesScope`
+
+Scope of web origins that can load resources from the extension via `web_accessible_resources`.
+
+- `NONE` = `'NONE'`: `web_accessible_resources` is absent; no extension resource is reachable from any web page. Most secure default.
+- `SPECIFIC_ORIGINS` = `'SPECIFIC_ORIGINS'`: Only a fixed list of named HTTPS origins may load extension resources.
+- `HTTPS_ONLY` = `'HTTPS_ONLY'`: Any HTTPS origin may load extension resources.
+- `HTTP_AND_HTTPS` = `'HTTP_AND_HTTPS'`: Any HTTP or HTTPS origin may load extension resources.
+- `UNRESTRICTED` = `'UNRESTRICTED'`: Any origin, including non-web schemes, may load extension resources.
+
+---
+
+### Enum: `ExternalExtensionIdScope`
+
+Scope of extension IDs permitted to open a message channel to the wallet via `externally_connectable`. Ordered from least to most permissive.
+
+- `NONE` = `'NONE'`: No `ids` field listed; no other extension may connect.
+- `SPECIFIC` = `'SPECIFIC'`: Only specific, named extension IDs may connect.
+- `ANY` = `'ANY'`: Any installed extension may connect (`"ids": ["*"]`).
+
+---
+
+### Interface: `BrowserExtensionManifest`
+
+Security-relevant fields from the Browser Extension Manifest. Values should be extracted directly from the published manifest.json.
+
+- `hostPermissions` (`HostPermissionScope`): Scope of host permissions granted at install time, controlling which pages the background service worker may programmatically access. Maps to the `host_permissions` manifest field.
+- `contentScripts` (`HostPermissionScope`): Scope of pages the wallet's content scripts are injected into on every page load, controlling what the wallet can silently read and modify. Maps to the broadest `matches` entry across all `content_scripts`.
+- `externallyConnectable` (`| { extensionIds: ExternalExtensionIdScope pageMatches: HostPermissionScope } | 'NOT_EXTERNALLY_CONNECTABLE'`): Which external web pages and other extensions may open a direct message channel to the wallet (e.g. to send RPC requests). Maps to the `externally_connectable` manifest field. Set to 'NOT_EXTERNALLY_CONNECTABLE' if the field is absent from the manifest, meaning no external connections are permitted.
+- `permissions` (`BrowserExtensionManifest[]`): Security-sensitive Browser API permissions declared in the `permissions` manifest field, granted to the extension at install time.
+- `webAccessibleResources` (`WebAccessibleResourcesScope`): Broadest scope of web origins that may load resources from this extension. Maps to the broadest `matches` entry across all `web_accessible_resources` items.
+
+---
+
+### Enum: `AndroidPermission`
+
+Android permissions declared via `<uses-permission>` in AndroidManifest.xml. Enum values match the android:name attribute string exactly.
+
+- `INTERNET` = `'android.permission.INTERNET'`: Required for any network communication.
+- `ACCESS_NETWORK_STATE` = `'android.permission.ACCESS_NETWORK_STATE'`: Check network connectivity state before making requests.
+- `SYSTEM_ALERT_WINDOW` = `'android.permission.SYSTEM_ALERT_WINDOW'`: Draw overlays on top of other apps — significant phishing risk.
+- `CAMERA` = `'android.permission.CAMERA'`: Camera access, typically for QR code scanning.
+- `RECORD_AUDIO` = `'android.permission.RECORD_AUDIO'`: Microphone access.
+- `MODIFY_AUDIO_SETTINGS` = `'android.permission.MODIFY_AUDIO_SETTINGS'`: Modify global audio settings.
+- `BLUETOOTH` = `'android.permission.BLUETOOTH'`: Bluetooth (Android < 12).
+- `BLUETOOTH_ADMIN` = `'android.permission.BLUETOOTH_ADMIN'`: Bluetooth administration (Android < 12).
+- `BLUETOOTH_CONNECT` = `'android.permission.BLUETOOTH_CONNECT'`: Initiate connections to paired Bluetooth devices (Android 12+).
+- `BLUETOOTH_SCAN` = `'android.permission.BLUETOOTH_SCAN'`: Discover and pair Bluetooth devices (Android 12+).
+- `ACCESS_FINE_LOCATION` = `'android.permission.ACCESS_FINE_LOCATION'`: Precise location, required for BLE scanning on Android < 12.
+
+---
+
+### Enum: `IosUsageDescription`
+
+iOS usage description keys declared in Info.plist (NS\*UsageDescription). Enum values match the plist key string exactly.
+
+- `BLUETOOTH_ALWAYS` = `'NSBluetoothAlwaysUsageDescription'`: Bluetooth access at all times.
+- `BLUETOOTH_PERIPHERAL` = `'NSBluetoothPeripheralUsageDescription'`: Bluetooth peripheral access (legacy, pre-iOS 13).
+- `CAMERA` = `'NSCameraUsageDescription'`: Camera access, typically for QR code scanning.
+- `FACE_ID` = `'NSFaceIDUsageDescription'`: Face ID biometric authentication.
+- `LOCATION_WHEN_IN_USE` = `'NSLocationWhenInUseUsageDescription'`: Location access while the app is in use, required for BLE on iOS.
+- `MICROPHONE` = `'NSMicrophoneUsageDescription'`: Microphone access.
+- `PHOTO_LIBRARY_ADD` = `'NSPhotoLibraryAddUsageDescription'`: Save images to the photo library.
+- `PHOTO_LIBRARY` = `'NSPhotoLibraryUsageDescription'`: Read images from the photo library.
+
+---
+
+### Interface: `MobileAppManifest`
+
+Security-relevant fields from a mobile app's platform manifest. Values should be derived directly from the published app manifest. Not available for apps without a public source repository.
+
+- `android` (`| { usesPermissions: AndroidPermission[] } | 'NOT_AN_ANDROID_APP'`): Permissions declared in AndroidManifest.xml via `<uses-permission>`. Set to 'NOT_AN_ANDROID_APP' if the wallet has no Android variant.
+- `ios` (`| { usageDescriptions: IosUsageDescription[] } | 'NOT_AN_IOS_APP'`): Usage description keys declared in Info.plist (NS\*UsageDescription). Set to 'NOT_AN_IOS_APP' if the wallet has no iOS variant.
+
+---
+
+### Interface: `SecurityBestPracticesBase`
+
+Security best-practices fields.
+
+- `keyStorageMechanism` (`KeyStorageMechanism`): How the wallet stores the user's private key.
+- `secureRng` (`SecureRngSource`): The entropy source used during key generation.
+
+---
+
+### Interface: `BrowserSecurityBestPractices`
+
+Security best-practices for the browser extension variant.
+
+- `browserExtensionHardening` (`BrowserExtensionManifest`)
+
+---
+
+### Interface: `MobileSecurityBestPractices`
+
+Security best-practices for the mobile app variant.
+
+- `mobileAppHardening` (`MobileAppManifest`)
+
+---
+
+### Interface: `SecurityBestPracticesData`
+
+Security best-practices data for a wallet, broken down by variant.
+
+- `browser` (`WithRef<BrowserSecurityBestPractices> | 'NOT_A_BROWSER_EXTENSION'`): Browser extension variant. Set to 'NOT_A_BROWSER_EXTENSION' if absent.
+- `mobile` (`WithRef<MobileSecurityBestPractices> | 'NOT_A_MOBILE_APP'`): Mobile app variant. Set to 'NOT_A_MOBILE_APP' if absent.
+- `desktop` (`WithRef<SecurityBestPracticesBase> | 'NOT_A_DESKTOP_APP'`): Desktop app variant. Set to 'NOT_A_DESKTOP_APP' if absent.
+
+---
+
 ## `src/schema/features/security/supply-chain-diy.ts`
 
 ### Enum: `SupplyChainDIYType`
@@ -3048,6 +3239,36 @@ Customization options that exist for chains.
 
 ```typescript
 type InteroperabilityImplementation = WithRef<InteroperabilitySupport>
+```
+
+---
+
+## `src/schema/features/self-sovereignty/permissions-management.ts`
+
+### Enum: `SpendingApprovalsControl`
+
+The level of control a wallet provides over token approvals of a given standard.
+
+- `CANNOT_INSPECT` = `(auto)`: The wallet does not show any existing approvals or allow revoking them.
+- `CAN_INSPECT_BUT_NOT_REVOKE` = `(auto)`: The wallet shows existing approvals but does not allow revoking them.
+- `CAN_INSPECT_AND_REVOKE` = `(auto)`: The wallet shows existing approvals and allows revoking them directly.
+
+---
+
+### Interface: `PermissionsManagement`
+
+How the wallet helps users inspect, constrain, and revoke delegated spending authority.
+
+- `erc20Approvals` (`SpendingApprovalsControl`): ERC-20 token approvals granted to other addresses.
+- `erc721Approvals` (`SpendingApprovalsControl`): ERC-721 token approvals granted to other addresses.
+- `erc1155Approvals` (`SpendingApprovalsControl`): ERC-1155 token approvals granted to other addresses.
+
+---
+
+### Type: `PermissionsManagementSupport`
+
+```typescript
+type PermissionsManagementSupport = WithRef<PermissionsManagement>
 ```
 
 ---
