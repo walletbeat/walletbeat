@@ -1,3 +1,5 @@
+import { commaListFormat } from '@/types/utils/text'
+
 import { type DomainUrl, isUrl, markdownUrlLink, type Url } from './url'
 
 export enum EntityType {
@@ -129,4 +131,34 @@ export function entityUrl(entity: Entity): Url | null {
 	}
 
 	return null
+}
+
+export function entityNames(entities: Entity[]): string {
+	if (entities.length === 0) {
+		return 'an external service'
+	}
+
+	return commaListFormat(entities.map(e => e.name))
+}
+
+export function entityLinks(entities: Entity[]): string {
+	if (entities.length === 0) {
+		return 'an external service'
+	}
+
+	return commaListFormat(entities.map(entityMarkdownLink))
+}
+
+export function uniqueEntities(entities: Entity[]): Entity[] {
+	const seen = new Set<string>()
+
+	return entities.filter(e => {
+		if (seen.has(e.id)) {
+			return false
+		}
+
+		seen.add(e.id)
+
+		return true
+	})
 }

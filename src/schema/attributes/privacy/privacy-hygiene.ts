@@ -26,42 +26,11 @@ import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, sentence } from '@/types/content'
 import { isNonEmptyArray } from '@/types/utils/non-empty'
-import { commaListFormat } from '@/types/utils/text'
 
-import { type Entity, entityMarkdownLink } from '../../entity'
+import { type Entity, entityLinks, entityNames, uniqueEntities } from '../../entity'
 import { exempt, pickWorstRating, unrated } from '../common'
 
 export type PrivacyHygieneValue = Value
-
-function entityNames(entities: Entity[]): string {
-	if (entities.length === 0) {
-		return 'an external service'
-	}
-
-	return commaListFormat(entities.map(e => e.name))
-}
-
-function entityLinks(entities: Entity[]): string {
-	if (entities.length === 0) {
-		return 'an external service'
-	}
-
-	return commaListFormat(entities.map(entityMarkdownLink))
-}
-
-function uniqueEntities(entities: Entity[]): Entity[] {
-	const seen = new Set<string>()
-
-	return entities.filter(e => {
-		if (seen.has(e.id)) {
-			return false
-		}
-
-		seen.add(e.id)
-
-		return true
-	})
-}
 
 /**
  * Whether this type of user information is forbidden without prior user consent.
@@ -263,13 +232,13 @@ function noForbiddenDataByDefault(
 		value: {
 			id: 'no_forbidden_data_by_default',
 			rating: Rating.PASS,
-			displayName: 'No forbidden data sent by default',
+			displayName: 'Asks for analytics consent',
 			shortExplanation: sentence(
-				'{{WALLET_NAME}} does not send browsing history or wallet-connected domains without consent, and asks for consent before using product analytics or crash/error reporting.',
+				'{{WALLET_NAME}} does not send browsing history without consent, and asks for consent before using product analytics or crash/error reporting.',
 			),
 		},
 		details: sentence(
-			'{{WALLET_NAME}} does not send browsing history or wallet-connected domains without consent, and asks for consent before using product analytics or crash/error reporting.',
+			'{{WALLET_NAME}} does not send browsing history without consent, and asks for consent before using product analytics or crash/error reporting.',
 		),
 	})
 }
@@ -302,10 +271,7 @@ function evaluateAnalyticsTelemetry(
 	if (usageAnalytics !== null && isSupported(usageAnalytics)) {
 		ctx.addRef(usageAnalytics)
 
-		if (
-			usageAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
-			usageAnalytics.policy === CollectionPolicy.ALWAYS
-		) {
+		if (collectedByDefault(usageAnalytics.policy)) {
 			evaluations.push(usageAnalyticsWithoutConsent(ctx, usageAnalytics.entity))
 		}
 	}
@@ -313,10 +279,7 @@ function evaluateAnalyticsTelemetry(
 	if (crashReportsAnalytics !== null && isSupported(crashReportsAnalytics)) {
 		ctx.addRef(crashReportsAnalytics)
 
-		if (
-			crashReportsAnalytics.policy === CollectionPolicy.BY_DEFAULT ||
-			crashReportsAnalytics.policy === CollectionPolicy.ALWAYS
-		) {
+		if (collectedByDefault(crashReportsAnalytics.policy)) {
 			evaluations.push(crashReportingWithoutConsent(ctx, crashReportsAnalytics.entity))
 		}
 	}
@@ -386,20 +349,27 @@ function scanFlowsForForbiddenDataViolations(
 			}
 
 			for (const info of forbiddenInfos) {
-				if (collectedByDefault(qualifiedCollection[info])) {
-					if (
-						info === PersonalInfo.BROWSING_HISTORY_URLS &&
-						!browsingHistoryByDefaultEntities.some(e => e.id === collected.byEntity.id)
-					) {
-						browsingHistoryByDefaultEntities.push(collected.byEntity)
-					}
+				if (!collectedByDefault(qualifiedCollection[info])) {
+					continue
+				}
 
-					if (
-						info === WalletInfo.WALLET_CONNECTED_DOMAINS &&
-						!walletConnectedDomainsByDefaultEntities.some(e => e.id === collected.byEntity.id)
-					) {
-						walletConnectedDomainsByDefaultEntities.push(collected.byEntity)
-					}
+				switch (info) {
+					case PersonalInfo.BROWSING_HISTORY_URLS:
+						if (!browsingHistoryByDefaultEntities.some(e => e.id === collected.byEntity.id)) {
+							browsingHistoryByDefaultEntities.push(collected.byEntity)
+						}
+
+						break
+					case WalletInfo.WALLET_CONNECTED_DOMAINS:
+						if (
+							!walletConnectedDomainsByDefaultEntities.some(e => e.id === collected.byEntity.id)
+						) {
+							walletConnectedDomainsByDefaultEntities.push(collected.byEntity)
+						}
+
+						break
+					default:
+						throw new Error(`Unexpected forbidden info: ${info}`)
 				}
 			}
 		}
@@ -423,7 +393,7 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 	question: sentence('Does {{WALLET_NAME}} only send sensitive data with your explicit consent?'),
 	why: markdown(
 		[
-			'Users expect that data like browsing history and which sites they connect their wallet to is never sent without consent.',
+			'Users expect that data like browsing history is never sent without consent.',
 			'Much like users would not expect a web browser to leak browsing history for analytics, they should not expect wallets to track every site interaction by default.',
 			'Product analytics and crash/error reporting telemetry should only be used after the user has agreed.',
 			'This attribute encodes that baseline.',
@@ -432,7 +402,7 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 	methodology: markdown(
 		[
 			'We evaluate default behavior using network requests and published data-collection policies.',
-			'The wallet fails if it sends browsing history or wallet-connected domains by default.',
+			'The wallet fails if it sends browsing history by default.',
 			'The wallet also fails if it uses product analytics without prior consent.',
 			'It gets a partial rating when crash/error reporting runs without prior consent.',
 		].join(' '),
@@ -481,7 +451,7 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 			),
 			exampleRating(
 				sentence(
-					'The wallet does not send browsing history or wallet-connected domains without consent, and asks for consent before using product analytics or crash/error reporting.',
+					'The wallet does not send browsing history without consent, and asks for consent before using product analytics or crash/error reporting.',
 				),
 				noForbiddenDataByDefault(EvaluationContext.forTest(() => privacyHygiene)),
 			),
