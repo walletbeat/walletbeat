@@ -27,6 +27,7 @@ import {
 	type WalletNameStrings,
 } from './attributes'
 import type { WalletDeveloper } from './entity'
+import type { ExtensionUrl } from './extension-url'
 import {
 	type ResolvedFeatures,
 	resolveFeatures,
@@ -43,7 +44,6 @@ import {
 	type StageEvaluatableWallet,
 	type WalletLadderEvaluation,
 } from './stages'
-import type { ExtensionUrl } from './extension-url'
 import type { DomainUrl, LabeledUrl, Url } from './url'
 import {
 	type AtLeastOneTrueVariant,

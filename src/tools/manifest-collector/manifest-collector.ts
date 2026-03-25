@@ -130,7 +130,7 @@ if (allMode) {
 }
 
 for (const { id, extensionUrls } of targets) {
-	const manifestDir = path.join(REPO_ROOT, 'data', 'software-wallets', 'manifests',id)
+	const manifestDir = path.join(REPO_ROOT, 'data', 'software-wallets', 'manifests', id)
 
 	fs.mkdirSync(manifestDir, { recursive: true })
 
@@ -153,7 +153,7 @@ for (const { id, extensionUrls } of targets) {
 }
 
 if (walletId !== undefined) {
-	const manifestDir = path.join(REPO_ROOT, 'data', 'software-wallets', 'manifests',walletId)
+	const manifestDir = path.join(REPO_ROOT, 'data', 'software-wallets', 'manifests', walletId)
 
 	fs.mkdirSync(manifestDir, { recursive: true })
 

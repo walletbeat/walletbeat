@@ -16,7 +16,6 @@ type WithDomain<D extends string> = `${'http' | 'https'}://${D | `www.${D}`}${''
 export type DomainUrl<D extends string> = Url &
 	(WithDomain<D> | (LabeledUrl & { url: WithDomain<D> }))
 
-
 /** Get the domain part of a URL. */
 export function getDomain(url: Url): string {
 	let hostname = new URL(isLabeledUrl(url) ? url.url : url).hostname

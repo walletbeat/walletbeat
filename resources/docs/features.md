@@ -2625,6 +2625,8 @@ Security-relevant fields from the Browser Extension Manifest. Values should be e
 
 Android permissions declared via `<uses-permission>` in AndroidManifest.xml. Enum values match the android:name attribute string exactly.
 
+All permissions seen in any wallet manifest must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values.
+
 - `INTERNET` = `'android.permission.INTERNET'`: Required for any network communication.
 - `ACCESS_NETWORK_STATE` = `'android.permission.ACCESS_NETWORK_STATE'`: Check network connectivity state before making requests.
 - `SYSTEM_ALERT_WINDOW` = `'android.permission.SYSTEM_ALERT_WINDOW'`: Draw overlays on top of other apps — significant phishing risk.
@@ -2642,6 +2644,8 @@ Android permissions declared via `<uses-permission>` in AndroidManifest.xml. Enu
 ### Enum: `IosUsageDescription`
 
 iOS usage description keys declared in Info.plist (NS\*UsageDescription). Enum values match the plist key string exactly.
+
+All keys seen in any wallet plist must be listed here, including non-security-relevant ones — the manifest collector throws on unknown values.
 
 - `BLUETOOTH_ALWAYS` = `'NSBluetoothAlwaysUsageDescription'`: Bluetooth access at all times.
 - `BLUETOOTH_PERIPHERAL` = `'NSBluetoothPeripheralUsageDescription'`: Bluetooth peripheral access (legacy, pre-iOS 13).
