@@ -13,7 +13,6 @@ import {LibZip} from "@solady/utils/LibZip.sol";
  */
 contract WalletbeatTestErc721 is ERC721 {
     error WalletbeatTestErc721__Soulbound();
-    error WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
 
     event ImageDataUpdated();
     event ImageDataAppended();
@@ -55,9 +54,7 @@ contract WalletbeatTestErc721 is ERC721 {
      * @return A URI containing the token's JSON metadata
      */
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        if (ownerOf(tokenId) == address(0)) {
-            revert WalletbeatTestErc721__URI_QueryFor_NonExistentToken();
-        }
+        _requireMinted(tokenId);
 
         return string(
             abi.encodePacked(
