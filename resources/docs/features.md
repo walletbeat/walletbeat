@@ -60,6 +60,20 @@ _Auto-generated from TypeScript source. Run `pnpm fix` to regenerate._
 
 ## `src/schema/features.ts`
 
+### Type: `WalletAnalytics`
+
+```typescript
+type WalletAnalytics = WithRef<{
+	/** Where analytics data goes. */
+	entity: Entity
+
+	/** Analytics data collection policy. */
+	policy: Exclude<CollectionPolicy, CollectionPolicy.NEVER>
+}>
+```
+
+---
+
 ### Interface: `WalletBaseFeatures`
 
 A set of features about any type of wallet.
@@ -80,6 +94,9 @@ None of the fields in this type should be marked as possibly `undefined`. If you
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
   - `transactionPrivacy` (`VariantFeature<TransactionPrivacy>`): Transaction privacy features.
+  - `analytics` (object): Wallet analytics collectors and consent policy. Use `NOT_SUPPORTED` when a type of analytics is not used by the wallet.
+    - `usage` (`VariantFeature<Support<WalletAnalytics>>`): Product analytics / UI usage tracking telemetry.
+    - `crashReports` (`VariantFeature<Support<WalletAnalytics>>`): Crash and error reporting telemetry.
 - `selfSovereignty` (`object`): Self-sovereignty features.
 - `transparency` (object): Transparency features.
   - `operationFees` (`VariantFeature<Nullable<BasicOperationFees>>`): Information on how fees are displayed for basic operations.
@@ -220,6 +237,9 @@ A set of features about a specific wallet variant. All features are resolved to 
   - `userSafety` (`ResolvedFeature<UserSafetySupport>`)
   - `accountRecovery` (`ResolvedFeature<AccountRecovery>`)
 - `privacy` (object)
+  - `analytics` (object)
+    - `usage` (`ResolvedFeature<Support<WalletAnalytics>>`)
+    - `crashReports` (`ResolvedFeature<Support<WalletAnalytics>>`)
   - `dataCollection` (`ResolvedFeature<DataCollection>`)
   - `privacyPolicy` (`ResolvedFeature<string>`)
   - `hardwarePrivacy` (`ResolvedFeature<HardwarePrivacySupport>`)
@@ -830,13 +850,13 @@ type AppIsolation =
 
 An enum representing when data collection occurs.
 
-Values are comparable as integers; the closest to zero, the more privacy.
+Values are ordered from most private (NEVER) to least private (ALWAYS).
 
-- `NEVER` = `0`: The data is never collected.
-- `OPT_IN` = `1`: The wallet does not collect this data by default. The user may decide to enable to this, but this requires explicit user intent to do this.
-- `PROMPTED` = `2`: The wallet does not collect this data by default. However, the wallet will at some point (e.g. during wallet setup) actively ask the user whether or not they want to enable this data collection, without explicit user intent to look for this setting.
-- `BY_DEFAULT` = `3`: The data is collected by default, but the user may turn this off by configuring the wallet appropriately. Doing so requires explicit user intent and knowledge that there is an option to do this in the first place. In order to qualify for this level, it must be possible for the user to access this setting and turn off the collection _before_ the first time it happens. For example, a wallet that refreshes crypto prices by default (using an external service) and does so before ever giving the user a chance to access the wallet settings to turn off this feature does not qualify for this level.
-- `ALWAYS` = `4`: The data is always collected no matter what the user does.
+- `NEVER` = `'NEVER'`: The data is never collected.
+- `OPT_IN` = `'OPT_IN'`: The wallet does not collect this data by default. The user may decide to enable to this, but this requires explicit user intent to do this.
+- `PROMPTED` = `'PROMPTED'`: The wallet does not collect this data by default. However, the wallet will at some point (e.g. during wallet setup) actively ask the user whether or not they want to enable this data collection, without explicit user intent to look for this setting.
+- `BY_DEFAULT` = `'BY_DEFAULT'`: The data is collected by default, but the user may turn this off by configuring the wallet appropriately. Doing so requires explicit user intent and knowledge that there is an option to do this in the first place. In order to qualify for this level, it must be possible for the user to access this setting and turn off the collection _before_ the first time it happens. For example, a wallet that refreshes crypto prices by default (using an external service) and does so before ever giving the user a chance to access the wallet settings to turn off this feature does not qualify for this level.
+- `ALWAYS` = `'ALWAYS'`: The data is always collected no matter what the user does.
 
 ---
 
@@ -1021,20 +1041,20 @@ type Endpoint =
 
 Personal information types.
 
-- `IP_ADDRESS` = `'ipAddress'`: The user's IP address.
-- `TRACKING_IDENTIFIER` = `'trackingIdentifier'`: A cross-request tracking identifier, such as a cookie.
-- `PSEUDONYM` = `'pseudonym'`: The user's selected pseudonym.
-- `LEGAL_NAME` = `'legalName'`: The user's legal name.
-- `EMAIL` = `'email'`: The user's email.
-- `PHONE` = `'phone'`: The user's phone number.
-- `BROWSING_HISTORY_URLS` = `'browsingHistoryUrls'`: URLs the user visits.
-- `CONTACTS` = `'contacts'`: The user's contacts (e.g. when searching for friends to invite).
-- `PHYSICAL_ADDRESS` = `'physicalAddress'`: The user's physical address.
-- `FACE` = `'face'`: The user's face (e.g. KYC selfie).
-- `CEX_ACCOUNT` = `'cexAccount'`: The user's CEX account(s).
-- `GOVERNMENT_ID` = `'governmentId'`: The user's government-issued ID.
-- `X_DOT_COM_ACCOUNT` = `'xDotComAccount'`: The user's X.com account.
-- `FARCASTER_ACCOUNT` = `'farcasterAccount'`: The user's Farcaster account.
+- `IP_ADDRESS` = `'IP_ADDRESS'`: The user's IP address.
+- `TRACKING_IDENTIFIER` = `'TRACKING_IDENTIFIER'`: A cross-request tracking identifier, such as a cookie.
+- `PSEUDONYM` = `'PSEUDONYM'`: The user's selected pseudonym.
+- `LEGAL_NAME` = `'LEGAL_NAME'`: The user's legal name.
+- `EMAIL` = `'EMAIL'`: The user's email.
+- `PHONE` = `'PHONE'`: The user's phone number.
+- `BROWSING_HISTORY_URLS` = `'BROWSING_HISTORY_URLS'`: URLs the user visits.
+- `CONTACTS` = `'CONTACTS'`: The user's contacts (e.g. when searching for friends to invite).
+- `PHYSICAL_ADDRESS` = `'PHYSICAL_ADDRESS'`: The user's physical address.
+- `FACE` = `'FACE'`: The user's face (e.g. KYC selfie).
+- `CEX_ACCOUNT` = `'CEX_ACCOUNT'`: The user's CEX account(s).
+- `GOVERNMENT_ID` = `'GOVERNMENT_ID'`: The user's government-issued ID.
+- `X_DOT_COM_ACCOUNT` = `'X_DOT_COM_ACCOUNT'`: The user's X.com account.
+- `FARCASTER_ACCOUNT` = `'FARCASTER_ACCOUNT'`: The user's Farcaster account.
 
 ---
 
@@ -1042,12 +1062,12 @@ Personal information types.
 
 Wallet-related information types.
 
-- `USER_ACTIONS` = `'userActions'`: The user's wallet actions (clicks etc).
-- `ACCOUNT_ADDRESS` = `'accountAddress'`: The user's account address.
-- `BALANCE` = `'balance'`: The user's wallet balance. This can easily be turned back into an address, because most addresses' balance amount is unique.
-- `ASSETS` = `'assets'`: The set of assets that are in the wallet. On wallets with many NFTs, this can be used to uniquely identify the wallet.
-- `MEMPOOL_TRANSACTIONS` = `'mempoolTransactions'`: The user's wallet transactions before they are included onchain. For example, MEV protection services usually fall under this category.
-- `WALLET_CONNECTED_DOMAINS` = `'walletConnectedDomains'`: Domain names the wallet is connected to.
+- `USER_ACTIONS` = `'USER_ACTIONS'`: The user's wallet actions (clicks etc).
+- `ACCOUNT_ADDRESS` = `'ACCOUNT_ADDRESS'`: The user's account address.
+- `BALANCE` = `'BALANCE'`: The user's wallet balance. This can easily be turned back into an address, because most addresses' balance amount is unique.
+- `ASSETS` = `'ASSETS'`: The set of assets that are in the wallet. On wallets with many NFTs, this can be used to uniquely identify the wallet.
+- `MEMPOOL_TRANSACTIONS` = `'MEMPOOL_TRANSACTIONS'`: The user's wallet transactions before they are included onchain. For example, MEV protection services usually fall under this category.
+- `WALLET_CONNECTED_DOMAINS` = `'WALLET_CONNECTED_DOMAINS'`: Domain names the wallet is connected to.
 
 ---
 
@@ -1072,12 +1092,15 @@ The type of information that a UserInfo is about.
 
 The UX flow within a wallet.
 
-- `UNCLASSIFIED` = `'unclassified'`: Any flow that is unclassified or unclear.
-- `ONBOARDING` = `'onboarding'`: Onboard onto the wallet, either as a new user or importing an existing account.
-- `SEND` = `'send'`: Sending tokens to another address.
-- `NATIVE_SWAP` = `'nativeSwap'`: Swapping tokens through a wallet's built-in swap feature.
-- `TRANSACTION` = `'transaction'`: Review a transaction and signing it.
-- `APP_CONNECTION` = `'appConnection'`: Connecting to an application.
+- `UNCLASSIFIED` = `'UNCLASSIFIED'`: Any flow that is unclassified or unclear.
+- `INSTALL` = `'INSTALL'`: Installing the wallet.
+- `ONBOARDING_NEW` = `'ONBOARDING_NEW'`: Onboard onto the wallet as a new user.
+- `ONBOARDING_IMPORT` = `'ONBOARDING_IMPORT'`: Onboard onto the wallet, importing an existing account.
+- `SEND_ETHER` = `'SEND_ETHER'`: Sending Ether to another address.
+- `SEND_USDC` = `'SEND_USDC'`: Sending USDC to another address.
+- `NATIVE_SWAP` = `'NATIVE_SWAP'`: Swapping tokens through a wallet's built-in swap feature.
+- `MAKE_TRANSACTION` = `'MAKE_TRANSACTION'`: Review a transaction and signing it.
+- `APP_CONNECTION` = `'APP_CONNECTION'`: Connecting to an application.
 
 ---
 
@@ -1089,7 +1112,9 @@ Why is data being collected?
 - `CHAIN_DATA_LOOKUP` = `'CHAIN_DATA_LOOKUP'`: Looking up chain data (read only).
 - `TRANSACTION_BROADCAST` = `'TRANSACTION_BROADCAST'`: Broadcasting transactions for inclusion.
 - `TRANSACTION_SIMULATION` = `'TRANSACTION_SIMULATION'`: Simulating transaction outcome.
-- `SWAP_QUOTE` = `'SWAP_QUOTE'`: Getting a quote for a swap operation.
+- `GAS_QUOTE` = `'GAS_QUOTE'`: Getting the present price of gas on the chain.
+- `SWAP_QUOTE` = `'SWAP_QUOTE'`: Getting a quote for a swap or bridge operation.
+- `TOKEN_PRICE_LOOKUP` = `'TOKEN_PRICE_LOOKUP'`: Looking up a token's price for display in a portfolio view.
 - `SCAM_DETECTION` = `'SCAM_DETECTION'`: Checking for scams.
 - `ACCOUNT_SIGNUP` = `'ACCOUNT_SIGNUP'`: Signing up for a wallet-related account.
 - `EXTERNAL_ACCOUNT_LINKING` = `'EXTERNAL_ACCOUNT_LINKING'`: Linking to an external (non-wallet-related) account, e.g. CEX account.
@@ -1188,10 +1213,13 @@ type DataCollectionForFlowWithOnchainData = DataCollectionForFlow & {
 
 A collection of data that a wallet collects. See /docs/mitmproxy-guide for how to collect this.
 
-- `[UserFlow.ONBOARDING]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during signup?
-- `[UserFlow.SEND]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending tokens?
+- `[UserFlow.INSTALL]` (`DataCollectionForFlow | null`): What data is collected when installing the wallet?
+- `[UserFlow.ONBOARDING_NEW]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during new account creation?
+- `[UserFlow.ONBOARDING_IMPORT]` (`DataCollectionForFlowWithOnchainData | null`): What data is collected during account import?
+- `[UserFlow.SEND_ETHER]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending Ether?
+- `[UserFlow.SEND_USDC]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when sending USDC?
 - `[UserFlow.NATIVE_SWAP]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when swapping tokens using the wallet's native swap feature?
-- `[UserFlow.TRANSACTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected during the transaction review/signing flow?
+- `[UserFlow.MAKE_TRANSACTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected during the transaction review/signing flow?
 - `[UserFlow.APP_CONNECTION]` (`DataCollectionForFlow | null | 'FLOW_NOT_SUPPORTED'`): What data is collected when connecting to an app?
 - `[UserFlow.UNCLASSIFIED]` (`DataCollectionForFlow`, optional): What other data is collected but not covered in the other flows, if any?
 

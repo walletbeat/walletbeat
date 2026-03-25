@@ -104,6 +104,10 @@ export const cypherockWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://www.cypherock.com/privacy',

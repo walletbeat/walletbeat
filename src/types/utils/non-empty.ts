@@ -98,6 +98,22 @@ export function nonEmptyRemap<K extends string | number | symbol, V1, V2>(
 }
 
 /**
+ * Maps a non-empty array of object-key-compatible values to a NonEmptyRecord with the value being defined by calling `fn`.
+ * @param arr The array to map over. Must be a key-compatible type.
+ * @param fn A mapping function used for the values that the record should have.
+ */
+export function nonEmptyMapToRecord<K extends string | number | symbol, R>(
+	arr: NonEmptyArray<K>,
+	fn: (val: K, index: number) => R,
+): NonEmptyRecord<K, R> {
+	return Object.fromEntries(
+		nonEmptyMap(arr, (val: K, index: number): [K, R] => {
+			return [val, fn(val, index)]
+		}),
+	)
+}
+
+/**
  * Filter an array, asserting that it is non-empty even after filtering.
  * Will throw an error if this is not true.
  */

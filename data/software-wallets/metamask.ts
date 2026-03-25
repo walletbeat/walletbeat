@@ -280,6 +280,10 @@ export const metamask: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: {
 				createInAppConnectionFlow: supported({
 					ref: refTodo,

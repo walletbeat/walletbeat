@@ -66,6 +66,10 @@ export const unratedHardwareTemplate: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: null,

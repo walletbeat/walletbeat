@@ -139,6 +139,10 @@ export const bitget: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: null,

@@ -10,4 +10,7 @@ export default getViteConfig({
 		},
 		include: ['**/*.test.ts'],
 	},
+	json: {
+		stringify: false,
+	},
 })

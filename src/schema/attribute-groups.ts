@@ -59,6 +59,7 @@ import {
 	multiAddressCorrelation,
 	type MultiAddressCorrelationValue,
 } from './attributes/privacy/multi-address-correlation'
+import { privacyHygiene, type PrivacyHygieneValue } from './attributes/privacy/privacy-hygiene'
 import {
 	privateTransfers,
 	type PrivateTransfersValue,
@@ -193,6 +194,7 @@ type PrivacyValues = Dict<{
 	privateTransfers: PrivateTransfersValue
 	hardwarePrivacy: HardwarePrivacyValue
 	appIsolation: AppIsolationValue
+	privacyHygiene: PrivacyHygieneValue
 }>
 
 /** Privacy attributes. */
@@ -207,6 +209,7 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 		privateTransfers,
 		hardwarePrivacy,
 		appIsolation,
+		privacyHygiene,
 	},
 	attributeWeights: {
 		addressCorrelation: 1.0,
@@ -214,6 +217,7 @@ export const privacyAttributeGroup: AttributeGroup<PrivacyValues> = {
 		privateTransfers: 1.0,
 		hardwarePrivacy: 1.0,
 		appIsolation: 1.0,
+		privacyHygiene: 1.0,
 	},
 }
 
@@ -374,6 +378,7 @@ export interface PrivacyEvaluations extends EvaluatedGroup<PrivacyValues> {
 	addressCorrelation: EvaluatedAttribute<AddressCorrelationValue>
 	multiAddressCorrelation: EvaluatedAttribute<MultiAddressCorrelationValue>
 	privateTransfers: EvaluatedAttribute<PrivateTransfersValue>
+	privacyHygiene: EvaluatedAttribute<PrivacyHygieneValue>
 }
 
 /** Evaluated self-sovereignty attributes for a single wallet. */
@@ -477,6 +482,7 @@ export function evaluateAttributes(
 			privateTransfers: evalAttr(privateTransfers),
 			hardwarePrivacy: evalAttr(hardwarePrivacy),
 			appIsolation: evalAttr(appIsolation),
+			privacyHygiene: evalAttr(privacyHygiene),
 		},
 		selfSovereignty: {
 			l1ProviderIndependence: evalAttr(l1ProviderIndependence),
@@ -551,6 +557,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			privateTransfers: attr(tree => tree.privacy.privateTransfers),
 			hardwarePrivacy: attr(tree => tree.privacy.hardwarePrivacy),
 			appIsolation: attr(tree => tree.privacy.appIsolation),
+			privacyHygiene: attr(tree => tree.privacy.privacyHygiene),
 		},
 		selfSovereignty: {
 			l1ProviderIndependence: attr(tree => tree.selfSovereignty.l1ProviderIndependence),

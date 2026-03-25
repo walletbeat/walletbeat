@@ -112,6 +112,10 @@ export const trezorWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			hardwarePrivacy: null,
 			privacyPolicy: 'https://trezor.io/privacy-policy',

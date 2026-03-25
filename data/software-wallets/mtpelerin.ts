@@ -105,6 +105,10 @@ export const mtpelerin: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://www.mtpelerin.com/privacy-policy',

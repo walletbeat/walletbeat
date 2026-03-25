@@ -21,15 +21,7 @@ Therefore, it is important that the data gathered using this technique is compre
 
 You will need a desktop computer for this. Installation instructions differ based on your operating system. Follow the [`mitmproxy` installation guide](https://docs.mitmproxy.org/stable/overview/installation/) for your operating system.
 
-### Step 2: Start `mitmweb`
-
-Once installed, run `mitmweb` in your terminal. This will start `mitmproxy` and also launch a web UI (also accessible at `http://127.0.0.1:8081`) that looks like this:
-
-![](./mitmweb-blank.png)
-
-You should **not** use the web browser this web UI is running in as your test browser. You will use a separate, purpose-built browser for this later. For now, keep this web interface open.
-
-### Step 3: Create a dedicated browser or device for wallet testing
+### Step 2: Create a dedicated browser or device for wallet testing
 
 In order to eliminate noise from the network capture you are about to do, it is imperative to use a dedicated browser or mobile device for wallet testing.
 
@@ -37,12 +29,12 @@ In order to eliminate noise from the network capture you are about to do, it is 
 
 * **For mobile app wallet testing**: The easiest way is to use an emulated Android device using [Android Studio](https://developer.android.com/studio). Create a new emulated device for the purpose of wallet testing.
 
-### Step 4: Set up your browser or device for `mitmproxy`
+### Step 3: Set up your browser or device for `mitmproxy`
 
 As the name implies, `mitmproxy` is a proxy. This means it intercepts requests and forwards them onto their initially-intended destination.
 Putting `mitmproxy` in a place where it _can_ intercept requests from a wallet is a 2-step process:
 
-#### Step 4.a: Set up proxy settings
+#### Step 3.a: Set up proxy settings
 
 You will need to configure your browser or mobile device to use `mitmproxy` as a proxy. This is browser-dependent (or device-dependent); what's not device dependent is the `mitmproxy` proxy settings: the IP is `127.0.0.1` and the port number is `8080`.
 
@@ -54,7 +46,7 @@ You will need to configure your browser or mobile device to use `mitmproxy` as a
 
 Unlike the above screenshot, you will want `127.0.0.1` as "Host name", and `8080` as port.
 
-#### Step 4.b: Install the `mitmproxy` certificate
+#### Step 3.b: Install the `mitmproxy` certificate
 
 Because `mitmproxy` needs to intercept authenticated HTTPS connections, it needs to use a certificate that your browser or mobile device will initially be very suspicious of. HTTPS is _designed_ to prevent request interception, which is why you will see lots of scary warnings in the process of adding a trusted certificate. Nonetheless, this is required for `mitmproxy` to be able to intercept authenticated requests and show their contents.
 
@@ -64,7 +56,7 @@ To do this, navigate to `http://mitm.it`. If you get a page that says "traffic i
 
 Follow the appropriate instructions for your operating system or platform. You may need to restart your browser or device after certificate installation.
 
-### Step 5: Verify setup
+### Step 4: Verify setup
 
 On your test browser or mobile device, go to `http://mitm.it`. If you get a page that says "traffic is not passing through mitmproxy", then go back through this guide and figure out what went wrong.
 
@@ -74,162 +66,47 @@ Then, navigate to some other page, such as [Ethereum.org](https://ethereum.org).
 
 If you see this, congrats, you are ready to start testing!
 
-### Step 6: Install the wallet
+### Step 5: Follow instructions from the `wallet-data-collection` tool
 
-Install the wallet browser extension or app as you normally would. **Do not go through wallet onboarding just yet**.
+Run `pnpm wallet-data-collection --id=<wallet_id> --type=<SOFTWARE|HARDWARE> --variant=<BROWSER|MOBILE|...> check`. If you did everything correctly up to this point, you will get a message like this:
 
-### Step 7: Restart from a clean slate
+```shell
+$ pnpm wallet-data-collection --id=rabby --type=SOFTWARE --variant=BROWSER check
+# Capture (1 issue):
+  > No network capture data for this wallet.
+    Suggestion:
+      - Start capturing data for the IDLE_PRE_INSTALL flow.
+        $ pnpm wallet-data-collection --id=rabby --variant=BROWSER capture --flow=IDLE_PRE_INSTALL
+```
 
-Modern web browsers and mobile operating systems produce a lot of background requests even when not in use. By this point in the guide, you likely have a lot of such cruft in `mitmweb`.
-To reduce noise from these, we need to restart from a cleaner slate.
+From this point forward, you should use the output of this `check` command as your guide for what to do next. It will suggest which subcommand of the `pnpm wallet-data-collection` you need to run, and each subcommand will come with its own set of instructions as to how to use it. You can also [read the `pnpm wallet-data-collection` tool's manual](../../../../src/tools/wallet-data-collection/README.md) for more information.
 
-- **Step 7.a**: Shut down the browser/mobile device.
-- **Step 7.b**: In the `mitmweb` web UI, go to `File → Clear All` to get rid of the cruft.
-- **Step 7.c**: Restart the browser or mobile device.
+At the end of this process, you should have the following output:
 
-### Step 8: Go through wallet onboarding
+```shell
+$ pnpm wallet-data-collection --id=rabby --type=SOFTWARE --variant=BROWSER check
+✅ No issues found! Wallet capture process complete. Well done.
+```
 
-Go through the wallet onboarding process. As soon as you are done, **close the browser or mobile device** to stop producing unrelated traffic.
+Yes, this is tiresome work. It can be the toughest part of the wallet rating process. It is also generally quite eye-opening as to how much data a wallet may be leaking out to several providers. Godspeed! 🫡
 
-### Step 9: Take note of all requests made
+### Step 7: Plumbing the captured data into Walletbeat's rating system
 
-#### Step 9.a: Identify relevant requests.
-
-Go through all entries in the `mitmweb` web UI. **This will likely contain entries not created by the wallet software itself**, but rather by the web browser or by the operating system.
-These are not relevant for Walletbeat. What we care about are **requests that carry any wallet-related information**, i.e.:
-
-- Anything that contains an Ethereum wallet address.
-- Ethereum RPC traffic data: balance lookups, transaction submissions, etc.
-- Wallet application analytics: clicks, page opens, wallet crash reporting services, etc.
-- Ethereum-wallet-specific details: for example, ERC-20 token icons, which can be used to determine the specific _mix of assets_ that a wallet user has.
-- A transaction intent, e.g. token swap quote.
-- Any request that includes data collected by the wallet from the user: wallet username, personal information, CEX account details, etc.
-- Unique identifiers carried across wallet-related requests, which can be used by external wallet services to track user actions across multiple UX flows.
-
-To determine whether any request qualifies, simply click on the request in the `mitmweb` web UI and inspect the contents of the `Request` tab. Look especially at the URL (first line), the `Cookie` header, and the payload (bottom of `Request` tab).
-
-##### Example of an **irrelevant** request:
-
-This request is very likely a "background" request initiated by `chromium` to spy on its users: it is a Google-owned domain, does not seem to carry any wallet-related information, and is initiated at regular intervals in the network capture.
-
-![](./request-irrelevant.png)
-
-You can safely ignore such requests, as they are not initiated by the wallet you are testing.
-
-##### Example of **relevant** requests:
-
-The following requests were taken while connecting a wallet to the `app.uniswap.org` dapp frontend using a wallet that shall remain unnamed.
-
-In this request, the wallet looks up the total balance of the user:
-
-![](./relevant-request-1.png)
-
-You can see that the Ethereum wallet address (encoded as `WalletInfo.ACCOUNT_ADDRESS` below) is sent to an external provider, so this is definitely relevant. This is also done without any anonymizing proxy, so the external provider learns both the user's IP address (encoded as `PersonalInfo.IP_ADDRESS` below), as well as their Ethereum address. Moreover, they are sent a persistent set of tracking cookies (encoded as `PersonalInfo.TRACKING_IDENTIFIER` below) which shows up in other requests made to the same provider, such as this other request:
-
-![](./relevant-request-2.png)
-
-This second request was made to the _same_ external provider, with the _same_ tracking cookies, sending the domain name of the dapp that the user is connecting to (encoded as `WalletInfo.WALLET_CONNECTED_DOMAINS` below).
-
-In summary, through these two requests alone, this external provider is able to learn:
-
-- The user's IP address
-- The user's Ethereum wallet address
-- The domain of the dapp the user is connecting to
-
-... and has a set of tracking cookies present to be able to track further actions of the user and link them to this existing data.
-
-#### Step 9.b: Populating wallet feature data
-
-You can now populate the wallet's `privacy.dataCollection` entries. In the above example (capture taken during the dapp connection flow of the wallet), you would add:
+Once the `pnpm wallet-data-collection` capture and annotation process is complete, you can now hook up the data it has produced to Walletbeat's data about the wallet you just rated.
 
 ```typescript
+// Add this import:
+import walletDataCollection from '@/data/software-wallets/collection/<wallet_id>/wallet-data-collection.ts'
+
 export const someWallet: SoftwareWallet = {
 	features: {
+		// [...]
 		privacy: {
-			dataCollection: {
-				// We tested the browser version of the wallet:
-				[Variant.BROWSER]: {
-					// The UX flow that was being tested in the screenshots above was to connect to a dapp:
-					[UserFlow.DAPP_CONNECTION]: {
-						collected: [
-							{
-								// Use an existing entity or create a new one, depending on the external provider:
-								byEntity: someExternalProvider,
-
-								dataCollection: {
-									// IP address implicitly collected because the wallet did not attempt to anonymize the connection:
-									[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
-
-									// The same cookie was sent along to this external provider, which acts as a
-									// tracking identifier the external provider can use to track the user across requests:
-									[PersonalInfo.TRACKING_IDENTIFIER]: CollectionPolicy.ALWAYS,
-
-									// The Ethereum address was sent to this external provider, with no way to opt out:
-									[WalletInfo.ACCOUNT_ADDRESS]: CollectionPolicy.ALWAYS,
-
-									// The domain name of the dapp was sent to this external provider, with no way to opt out:
-									[WalletInfo.WALLET_CONNECTED_DOMAINS]: CollectionPolicy.ALWAYS,
-
-									// [... Add other PersonalInfo or WalletInfo from requests to this same external provider within the same UX flow...]
-
-									// The wallet did not attempt to anonymize the connection, nor to connect to a TEE.
-									endpoint: RegularEndpoint,
-
-									// The wallet (which had 2 configured addresses) only sent the current active Ethereum address:
-									multiAddress: {
-										type: MultiAddressPolicy.ACTIVE_ADDRESS_ONLY,
-									},
-								},
-								purposes: [
-									// The wallet looked up information about the user's balance, which is onchain data:
-									DataCollectionPurpose.CHAIN_DATA_LOOKUP,
-
-									// The purpose of the second request (`/popularity_level`) was probably to look up
-									// whether the dapp was a known scam site:
-									DataCollectionPurpose.SCAM_DETECTION,
-								],
-							},
-							// [... Add data from requests to other external providers in the same UX flow here...]
-						],
-					},
-					// [... repeat for other UX flows...]
-				},
-				// [... repeat for other wallet versions (mobile/desktop)...]
-			},
+			// Set this field to the data you just imported:
+			dataCollection: walletDataCollection,
 		},
 	},
 }
 ```
 
-**Optional**: For source-available wallets, you may also want to dig through the code to find what part of the code initiates this request, and add this as a `ref`.
-
-```typescript
-					[UserFlow.DAPP_CONNECTION]: {
-						collected: [
-							{
-								// ... As above...
-								purposes: [
-									// ... As above...
-								],
-								ref: [
-									{
-										explanation:
-											'The wallet checks whether the domain you are connecting your wallet to is on a scam list. It sends the domain along with Ethereum address in non-proxied HTTP requests for API methods `getOriginIsScam`, `getOriginPopularityLevel`, `getRecommendChains`, and others.',
-										label: 'Wallet code on github.com',
-										url: '', // Link to repo source file calling these functions.
-									},
-								],
-							},
-						],
-					},
-```
-
-As you can imagine, this is very tedious to do, so consider using an LLM coding assistant to help you dig through the wallet's codebase to find these references, and consider doing this only for requests that you find especially surprising in terms of the user data they send.
-
-### Step 10 onwards: Repeat for other UX flows.
-
-Repeat steps 7 to 9 for other wallet UX flows: opening up the wallet, adding a new address, making an ERC-20 swap, connecting to a dapp, using the built-in swap feature if there is one, etc.
-
-**NOTE**: Once you have added at least 2 addresses to the wallet, pay special attention to how the wallet handles these multiple addresses. This is specified in the `multiAddress` field of the `privacy.dataCollection` entries, and is used to determine whether wallets allow external providers to correlate multiple user addresses with one another.
-
-Yes, this is tiresome work. It is also generally quite eye-opening. Godspeed! 🫡
+Once this is done, run the unit tests (`pnpm vitest`) to verify the integrity of the data. If everything passes, you are done! 🫡

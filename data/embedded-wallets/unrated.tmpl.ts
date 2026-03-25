@@ -51,6 +51,10 @@ export const unratedEmbeddedTemplate: EmbeddedWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			privacyPolicy: null,
 			transactionPrivacy: null,

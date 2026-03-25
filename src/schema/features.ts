@@ -1,6 +1,7 @@
 import { prefixError } from '@/types/errors'
 import { isNonNull, type Nullable, type NullableObject } from '@/types/utils/nullable'
 
+import type { Entity } from './entity'
 import type { AccountSupport } from './features/account-support'
 import type { ChainAbstraction } from './features/ecosystem/chain-abstraction'
 import type { DelegationHandling } from './features/ecosystem/delegation-handling'
@@ -13,7 +14,7 @@ import {
 } from './features/ecosystem/integration'
 import type { AddressResolution } from './features/privacy/address-resolution'
 import type { AppIsolation as AppIsolation } from './features/privacy/app-isolation'
-import type { DataCollection } from './features/privacy/data-collection'
+import type { CollectionPolicy, DataCollection } from './features/privacy/data-collection'
 import type { HardwarePrivacySupport } from './features/privacy/hardware-privacy'
 import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
@@ -58,6 +59,14 @@ import {
 	type VariantFeature,
 } from './variants'
 import { variantToWalletType, type WalletType } from './wallet-types'
+
+export type WalletAnalytics = WithRef<{
+	/** Where analytics data goes. */
+	entity: Entity
+
+	/** Analytics data collection policy. */
+	policy: Exclude<CollectionPolicy, CollectionPolicy.NEVER>
+}>
 
 /**
  * A set of features about any type of wallet.
@@ -123,6 +132,18 @@ export interface WalletBaseFeatures {
 
 		/** Transaction privacy features. */
 		transactionPrivacy: VariantFeature<TransactionPrivacy>
+
+		/**
+		 * Wallet analytics collectors and consent policy.
+		 * Use `NOT_SUPPORTED` when a type of analytics is not used by the wallet.
+		 */
+		analytics: {
+			/** Product analytics / UI usage tracking telemetry. */
+			usage: VariantFeature<Support<WalletAnalytics>>
+
+			/** Crash and error reporting telemetry. */
+			crashReports: VariantFeature<Support<WalletAnalytics>>
+		}
 	}
 
 	/** Self-sovereignty features. */
@@ -318,6 +339,10 @@ export interface ResolvedFeatures {
 		accountRecovery: ResolvedFeature<AccountRecovery>
 	}
 	privacy: {
+		analytics: {
+			usage: ResolvedFeature<Support<WalletAnalytics>>
+			crashReports: ResolvedFeature<Support<WalletAnalytics>>
+		}
 		dataCollection: ResolvedFeature<DataCollection>
 		privacyPolicy: ResolvedFeature<string>
 		hardwarePrivacy: ResolvedFeature<HardwarePrivacySupport>
@@ -466,6 +491,13 @@ export function resolveFeatures(
 			),
 		},
 		privacy: {
+			analytics: {
+				usage: baseFeat('privacy.analytics.usage', features => features.privacy.analytics.usage),
+				crashReports: baseFeat(
+					'privacy.analytics.crashReports',
+					features => features.privacy.analytics.crashReports,
+				),
+			},
 			dataCollection: baseFeat(
 				'privacy.dataCollection',
 				features => features.privacy.dataCollection,

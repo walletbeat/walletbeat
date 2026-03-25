@@ -352,6 +352,10 @@ export const completedTemplate: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: notSupported,
+				usage: notSupported,
+			},
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: supported({
@@ -370,30 +374,27 @@ export const completedTemplate: SoftwareWallet = {
 				[Variant.DESKTOP]: null,
 			},
 			dataCollection: {
-				[UserFlow.NATIVE_SWAP]: {
-					collected: [
-						{
-							ref: dataLeakReferences.swapApi,
-							byEntity: exampleCex,
-							dataCollection: {
-								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
-								endpoint: RegularEndpoint,
-							},
-							purposes: [DataCollectionPurpose.ASSET_METADATA],
-						},
-					],
+				[UserFlow.INSTALL]: {
+					collected: [],
 				},
-				[UserFlow.ONBOARDING]: {
+				[UserFlow.ONBOARDING_IMPORT]: {
 					collected: [],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
-				[UserFlow.SEND]: {
+				[UserFlow.ONBOARDING_NEW]: {
+					collected: [],
+					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
+				},
+				[UserFlow.SEND_ETHER]: {
+					collected: [],
+				},
+				[UserFlow.SEND_USDC]: {
 					collected: [],
 				},
 				[UserFlow.APP_CONNECTION]: {
 					collected: [],
 				},
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
 						{
 							ref: dataLeakReferences.walletBackend,
@@ -425,6 +426,19 @@ export const completedTemplate: SoftwareWallet = {
 								},
 							},
 							purposes: [DataCollectionPurpose.TRANSACTION_BROADCAST],
+						},
+					],
+				},
+				[UserFlow.NATIVE_SWAP]: {
+					collected: [
+						{
+							ref: dataLeakReferences.swapApi,
+							byEntity: exampleCex,
+							dataCollection: {
+								[PersonalInfo.IP_ADDRESS]: CollectionPolicy.ALWAYS,
+								endpoint: RegularEndpoint,
+							},
+							purposes: [DataCollectionPurpose.ASSET_METADATA],
 						},
 					],
 				},

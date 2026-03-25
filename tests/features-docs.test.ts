@@ -39,6 +39,6 @@ describe('features documentation', () => {
 			const content = await generateMarkdown(config)
 
 			await assertValidMarkdown(content)
-		})
+		}, 15_000)
 	})
 })

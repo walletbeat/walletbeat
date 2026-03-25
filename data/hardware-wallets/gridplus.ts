@@ -144,6 +144,10 @@ export const gridplusWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: null,
 			hardwarePrivacy: supported<HardwarePrivacyImplementation>({
 				type: HardwarePrivacyType.PARTIAL,
