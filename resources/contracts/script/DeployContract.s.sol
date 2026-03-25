@@ -5,7 +5,7 @@ import {WalletbeatTestContract} from "../src/WalletbeatTestContract.sol";
 import {WalletbeatTestErc20} from "../src/WalletbeatTestErc20.sol";
 import {WalletbeatTestErc721} from "../src/WalletbeatTestErc721.sol";
 import {WalletbeatTestErc1155} from "../src/WalletbeatTestErc1155.sol";
-import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {LibZip} from "@solady/utils/LibZip.sol";
 import {Script, console} from "../lib/forge-std/src/Script.sol";
 
 contract DeployContract is Script {
@@ -18,10 +18,8 @@ contract DeployContract is Script {
         string memory erc1155TokenName = "Walletbeat Testing ERC1155";
         string memory tokenSymbol = "WBTEST";
 
-        string memory tokenSvg = vm.readFile("./images/Walletbeat.svg");
-        string memory imageUri = svgToImageURI(tokenSvg);
-
-        // string memory imageUri = "ipfs://QmbwsGbEx2hfBYcefMkFtkuoZtK49Ei85WhFBV9UhrN6e1"; // IPFS of the uploaded Walletbeat SVG
+        bytes memory tokenSvg = bytes(vm.readFile("./images/Walletbeat.svg"));
+        bytes memory compressedSvg = LibZip.flzCompress(tokenSvg);
 
         vm.startBroadcast();
         WalletbeatTestErc20 erc20Contract = new WalletbeatTestErc20(erc20TokenName, tokenSymbol);
@@ -29,39 +27,33 @@ contract DeployContract is Script {
         WalletbeatTestErc721 erc721Contract = new WalletbeatTestErc721(erc721TokenName, tokenSymbol);
         WalletbeatTestContract testContract =
             new WalletbeatTestContract(address(erc20Contract), address(erc721Contract), address(erc1155Contract));
-        appendImageUriInChunks(erc721Contract, erc1155Contract, imageUri);
+        _appendImageInChunks(erc721Contract, erc1155Contract, compressedSvg);
         vm.stopBroadcast();
-
         return (testContract, erc20Contract, erc721Contract, erc1155Contract);
     }
 
-    function appendImageUriInChunks(
+    /**
+     * @dev Need to append image in chunks because setting SVG (even when compressed) is too big.
+     * Causes gas limit to fail.
+     * @param erc721Contract deployed ERC-721 contract
+     * @param erc1155Contract deployed ERC-1155 contract
+     * @param compressedImageData compressed image data in bytes
+     */
+    function _appendImageInChunks(
         WalletbeatTestErc721 erc721Contract,
         WalletbeatTestErc1155 erc1155Contract,
-        string memory imageUri
+        bytes memory compressedImageData
     ) internal {
-        bytes memory imageUriBytes = bytes(imageUri);
-        uint256 chunkSize = 5000;
-        uint256 imageUriLength = imageUriBytes.length;
-        for (uint256 offset = 0; offset < imageUriLength; offset += chunkSize) {
-            uint256 end = offset + chunkSize < imageUriLength ? offset + chunkSize : imageUriLength;
+        uint256 chunkSize = 10000;
+        uint256 dataLength = compressedImageData.length;
+        for (uint256 offset = 0; offset < dataLength; offset += chunkSize) {
+            uint256 end = offset + chunkSize < dataLength ? offset + chunkSize : dataLength;
             bytes memory chunk = new bytes(end - offset);
             for (uint256 j = 0; j < end - offset; j++) {
-                chunk[j] = imageUriBytes[offset + j];
+                chunk[j] = compressedImageData[offset + j];
             }
-            erc721Contract.appendImageUri(string(chunk));
-            erc1155Contract.appendImageUri(string(chunk));
+            erc721Contract.appendImageData(chunk);
+            erc1155Contract.appendImageData(chunk);
         }
-    }
-
-    function svgToImageURI(string memory svg) public pure returns (string memory) {
-        // example:
-        // '<svg width="500" height="500" viewBox="0 0 285 350" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="black" d="M150,0,L75,200,L225,200,Z"></path></svg>'
-        // would return ""
-        string memory baseURI = "data:image/svg+xml;base64,";
-        string memory svgBase64Encoded = Base64.encode(
-            bytes(string(abi.encodePacked(svg))) // Removing unnecessary type castings, this line can be resumed as follows : 'abi.encodePacked(svg)'
-        );
-        return string(abi.encodePacked(baseURI, svgBase64Encoded));
     }
 }
