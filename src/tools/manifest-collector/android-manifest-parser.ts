@@ -1,95 +1,81 @@
+import { DOMParser } from '@xmldom/xmldom'
+
 import {
 	AndroidPermission,
+	androidPermissions,
 	IosUsageDescription,
+	iosUsageDescriptions,
 } from '@/schema/features/security/security-best-practices'
+import { enumKey } from '@/utils/enum'
+
+const ANDROID_NS = 'http://schemas.android.com/apk/res/android'
 
 /**
  * Parses an AndroidManifest.xml string and returns the declared permissions.
  *
  * Extracts all `<uses-permission android:name="...">` entries and maps them
- * to `AndroidPermission` enum values. Unrecognized permissions are returned
- * separately so they can be reviewed and added to the enum if needed.
+ * to `AndroidPermission` enum values. Throws if an unrecognized permission is
+ * encountered — add it to the `AndroidPermission` enum if it is security-relevant,
+ * or explicitly ignore it there if not.
  */
-export function parseAndroidManifest(xmlText: string): {
-	permissions: AndroidPermission[]
-	unrecognized: string[]
-} {
-	const known = new Map<string, AndroidPermission>(
-		Object.values(AndroidPermission).map(v => [v, v]),
-	)
+export function parseAndroidManifest(xmlText: string): AndroidPermission[] {
+	const permissions = new Set<AndroidPermission>()
 
-	const permissions: AndroidPermission[] = []
-	const unrecognized: string[] = []
+	const doc = new DOMParser().parseFromString(xmlText, 'text/xml')
+	const elements = doc.getElementsByTagName('uses-permission')
 
-	// Match <uses-permission android:name="..."> (single or double quotes)
-	const pattern = /<uses-permission\s[^>]*android:name=["']([^"']+)["']/g
-	let match: RegExpExecArray | null
+	for (let i = 0; i < elements.length; i++) {
+		const name = elements[i].getAttributeNS(ANDROID_NS, 'name')
 
-	while ((match = pattern.exec(xmlText)) !== null) {
-		const name = match[1]
-		const known_perm = known.get(name)
-
-		if (known_perm !== undefined) {
-			if (!permissions.includes(known_perm)) {
-				permissions.push(known_perm)
-			}
-		} else {
-			if (!unrecognized.includes(name)) {
-				unrecognized.push(name)
-			}
+		if (name === null) {
+			continue
 		}
+
+		if (!androidPermissions.is(name)) {
+			throw new Error(
+				`Unrecognized Android permission: "${name}"\n` +
+					'Add it to the AndroidPermission enum in src/schema/features/security/security-best-practices.ts.',
+			)
+		}
+
+		permissions.add(name)
 	}
 
-	return { permissions, unrecognized }
+	return [...permissions]
 }
 
 /**
  * Parses an iOS Info.plist XML string and returns the declared usage descriptions.
  *
  * Extracts `NS*UsageDescription` keys and maps them to `IosUsageDescription`
- * enum values. Unrecognized keys are returned separately.
+ * enum values. Throws if an unrecognized key is encountered — add it to the
+ * `IosUsageDescription` enum if it is security-relevant, or explicitly ignore
+ * it there if not.
  */
-export function parseIosPlist(plistText: string): {
-	usageDescriptions: IosUsageDescription[]
-	unrecognized: string[]
-} {
-	const known = new Map<string, IosUsageDescription>(
-		Object.values(IosUsageDescription).map(v => [v, v]),
-	)
+export function parseIosPlist(plistText: string): IosUsageDescription[] {
+	const usageDescriptions = new Set<IosUsageDescription>()
 
-	const usageDescriptions: IosUsageDescription[] = []
-	const unrecognized: string[] = []
+	const doc = new DOMParser().parseFromString(plistText, 'text/xml')
+	const keyElements = doc.getElementsByTagName('key')
 
-	// Match <key>NS*UsageDescription</key>
-	const pattern = /<key>(NS\w+UsageDescription)<\/key>/g
-	let match: RegExpExecArray | null
+	for (let i = 0; i < keyElements.length; i++) {
+		const text = keyElements[i].textContent
 
-	while ((match = pattern.exec(plistText)) !== null) {
-		const key = match[1]
-		const known_desc = known.get(key)
-
-		if (known_desc !== undefined) {
-			if (!usageDescriptions.includes(known_desc)) {
-				usageDescriptions.push(known_desc)
-			}
-		} else {
-			if (!unrecognized.includes(key)) {
-				unrecognized.push(key)
-			}
+		if (text === null || !/^NS\w+UsageDescription$/.test(text)) {
+			continue
 		}
+
+		if (!iosUsageDescriptions.is(text)) {
+			throw new Error(
+				`Unrecognized iOS usage description key: "${text}"\n` +
+					'Add it to the IosUsageDescription enum in src/schema/features/security/security-best-practices.ts.',
+			)
+		}
+
+		usageDescriptions.add(text)
 	}
 
-	return { usageDescriptions, unrecognized }
-}
-
-function enumKey<T extends Record<string, string>>(enumObj: T, value: string): string {
-	for (const k in enumObj) {
-		if (enumObj[k] === value) {
-			return k
-		}
-	}
-
-	return value
+	return [...usageDescriptions]
 }
 
 /**

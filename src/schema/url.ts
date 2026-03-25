@@ -16,32 +16,6 @@ type WithDomain<D extends string> = `${'http' | 'https'}://${D | `www.${D}`}${''
 export type DomainUrl<D extends string> = Url &
 	(WithDomain<D> | (LabeledUrl & { url: WithDomain<D> }))
 
-/**
- * Format: https://chromewebstore.google.com/detail/[slug]/[32-char-extension-id]
- *
- * If this field is present on a wallet but does not match this format,
- * `getExtensionId` will throw at runtime.
- */
-export type ExtensionUrl = DomainUrl<'chromewebstore.google.com'>
-
-/**
- * Extracts the 32-character extension ID from a Chrome Web Store URL.
- *
- * Throws if the URL does not match the expected format.
- */
-export function getExtensionId(url: ExtensionUrl): string {
-	const raw = typeof url === 'string' ? url : url.url
-	const match = /\/detail\/[^/]+\/([a-z]{32})(?:[/?#]|$)/.exec(raw)
-
-	if (match === null) {
-		throw new Error(
-			`extensions[] entry does not contain a valid Chrome extension ID: ${raw}\n` +
-				'Expected format: https://chromewebstore.google.com/detail/<slug>/<32-char-id>',
-		)
-	}
-
-	return match[1]
-}
 
 /** Get the domain part of a URL. */
 export function getDomain(url: Url): string {

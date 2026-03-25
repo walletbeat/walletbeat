@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+import { Enum } from '@/utils/enum'
 
 /**
  * How the wallet stores the user's private key.
@@ -249,6 +250,9 @@ export interface BrowserExtensionManifest {
 /**
  * Android permissions declared via `<uses-permission>` in AndroidManifest.xml.
  * Enum values match the android:name attribute string exactly.
+ *
+ * All permissions seen in any wallet manifest must be listed here, including
+ * non-security-relevant ones — the manifest collector throws on unknown values.
  */
 export enum AndroidPermission {
 	/** Required for any network communication. */
@@ -285,9 +289,26 @@ export enum AndroidPermission {
 	ACCESS_FINE_LOCATION = 'android.permission.ACCESS_FINE_LOCATION',
 }
 
+export const androidPermissions = new Enum<AndroidPermission>({
+	[AndroidPermission.INTERNET]: true,
+	[AndroidPermission.ACCESS_NETWORK_STATE]: true,
+	[AndroidPermission.SYSTEM_ALERT_WINDOW]: true,
+	[AndroidPermission.CAMERA]: true,
+	[AndroidPermission.RECORD_AUDIO]: true,
+	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: true,
+	[AndroidPermission.BLUETOOTH]: true,
+	[AndroidPermission.BLUETOOTH_ADMIN]: true,
+	[AndroidPermission.BLUETOOTH_CONNECT]: true,
+	[AndroidPermission.BLUETOOTH_SCAN]: true,
+	[AndroidPermission.ACCESS_FINE_LOCATION]: true,
+})
+
 /**
  * iOS usage description keys declared in Info.plist (NS*UsageDescription).
  * Enum values match the plist key string exactly.
+ *
+ * All keys seen in any wallet plist must be listed here, including
+ * non-security-relevant ones — the manifest collector throws on unknown values.
  */
 export enum IosUsageDescription {
 	/** Bluetooth access at all times. */
@@ -314,6 +335,17 @@ export enum IosUsageDescription {
 	/** Read images from the photo library. */
 	PHOTO_LIBRARY = 'NSPhotoLibraryUsageDescription',
 }
+
+export const iosUsageDescriptions = new Enum<IosUsageDescription>({
+	[IosUsageDescription.BLUETOOTH_ALWAYS]: true,
+	[IosUsageDescription.BLUETOOTH_PERIPHERAL]: true,
+	[IosUsageDescription.CAMERA]: true,
+	[IosUsageDescription.FACE_ID]: true,
+	[IosUsageDescription.LOCATION_WHEN_IN_USE]: true,
+	[IosUsageDescription.MICROPHONE]: true,
+	[IosUsageDescription.PHOTO_LIBRARY_ADD]: true,
+	[IosUsageDescription.PHOTO_LIBRARY]: true,
+})
 
 /**
  * Security-relevant fields from a mobile app's platform manifest.

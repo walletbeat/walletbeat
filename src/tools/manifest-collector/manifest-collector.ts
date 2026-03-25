@@ -1,9 +1,9 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
-import { allWallets } from '@/data/wallets'
-import { getExtensionId } from '@/schema/url'
+import { allWallets, assertValidWalletName } from '@/data/wallets'
+import { getExtensionId } from '@/schema/extension-url'
+import { getRepositoryRoot } from '@/tests/utils/codebase'
 
 import {
 	parseAndroidManifest,
@@ -17,9 +17,7 @@ import {
 } from './browser-ext-manifest-parser'
 import { fetchBrowserExtensionManifest, fetchText } from './crx-downloader'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const REPO_ROOT = path.resolve(__dirname, '../../..')
+const REPO_ROOT = getRepositoryRoot()
 
 function usage(): never {
 	process.stderr.write(`
@@ -41,9 +39,9 @@ Optional (requires --id):
                                    GitHub) for the wallet's iOS app.
 
 Data is saved to:
-  data/manifests/<wallet-id>/<extension-id>.manifest.json
-  data/manifests/<wallet-id>/android-manifest.xml
-  data/manifests/<wallet-id>/ios-info.plist.xml
+  data/software-wallets/manifests/<wallet-id>/<extension-id>.manifest.json
+  data/software-wallets/manifests/<wallet-id>/android-manifest.xml
+  data/software-wallets/manifests/<wallet-id>/ios-info.plist.xml
 
 Examples:
   pnpm collect:manifests -- --all
@@ -95,18 +93,8 @@ if (allMode && (androidManifestUrl !== undefined || iosPlistUrl !== undefined)) 
 
 type WalletEntry = { id: string; extensionUrls: string[] }
 
-function isWalletId(id: string): id is keyof typeof allWallets {
-	return Object.hasOwn(allWallets, id)
-}
-
 function getExtensionUrls(id: string): string[] {
-	if (!isWalletId(id)) {
-		process.stderr.write(`Error: unknown wallet ID "${id}"\n`)
-		process.stderr.write(`Valid IDs: ${Object.keys(allWallets).sort().join(', ')}\n`)
-		process.exit(1)
-	}
-
-	const wallet = allWallets[id]
+	const wallet = allWallets[assertValidWalletName(id)]
 
 	return (wallet.metadata.urls?.extensions ?? []).map(url => getExtensionId(url))
 }
@@ -142,7 +130,7 @@ if (allMode) {
 }
 
 for (const { id, extensionUrls } of targets) {
-	const manifestDir = path.join(REPO_ROOT, 'data', 'manifests', id)
+	const manifestDir = path.join(REPO_ROOT, 'data', 'software-wallets', 'manifests',id)
 
 	fs.mkdirSync(manifestDir, { recursive: true })
 
@@ -165,7 +153,7 @@ for (const { id, extensionUrls } of targets) {
 }
 
 if (walletId !== undefined) {
-	const manifestDir = path.join(REPO_ROOT, 'data', 'manifests', walletId)
+	const manifestDir = path.join(REPO_ROOT, 'data', 'software-wallets', 'manifests',walletId)
 
 	fs.mkdirSync(manifestDir, { recursive: true })
 
@@ -180,17 +168,7 @@ if (walletId !== undefined) {
 		fs.writeFileSync(outPath, xmlText)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, outPath)}\n`)
 
-		const { permissions, unrecognized } = parseAndroidManifest(xmlText)
-
-		if (unrecognized.length > 0) {
-			process.stderr.write(
-				'\nUnrecognized Android permissions (review; add to AndroidPermission enum if security-relevant):\n',
-			)
-
-			for (const p of unrecognized) {
-				process.stderr.write(`  ${p}\n`)
-			}
-		}
+		const permissions = parseAndroidManifest(xmlText)
 
 		process.stderr.write('\n--- MobileAppManifest.android (paste into wallet file) ---\n\n')
 		process.stdout.write(renderAndroidPermissions(permissions) + '\n')
@@ -205,17 +183,7 @@ if (walletId !== undefined) {
 		fs.writeFileSync(outPath, plistText)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, outPath)}\n`)
 
-		const { usageDescriptions, unrecognized } = parseIosPlist(plistText)
-
-		if (unrecognized.length > 0) {
-			process.stderr.write(
-				'\nUnrecognized iOS usage description keys (review; add to IosUsageDescription enum if security-relevant):\n',
-			)
-
-			for (const k of unrecognized) {
-				process.stderr.write(`  ${k}\n`)
-			}
-		}
+		const usageDescriptions = parseIosPlist(plistText)
 
 		process.stderr.write('\n--- MobileAppManifest.ios (paste into wallet file) ---\n\n')
 		process.stdout.write(renderIosUsageDescriptions(usageDescriptions) + '\n')

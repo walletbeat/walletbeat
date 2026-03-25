@@ -5,6 +5,7 @@ import {
 	HostPermissionScope,
 	WebAccessibleResourcesScope,
 } from '@/schema/features/security/security-best-practices'
+import { enumKey } from '@/utils/enum'
 
 function asObj(raw: unknown): object | undefined {
 	if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
@@ -213,16 +214,6 @@ export function parseBrowserExtensionManifest(raw: unknown): BrowserExtensionMan
 		permissions: parsePermissions(raw),
 		webAccessibleResources: parseWebAccessibleResources(raw),
 	}
-}
-
-function enumKey<T extends Record<string, string>>(enumObj: T, value: string): string {
-	for (const k in enumObj) {
-		if (enumObj[k] === value) {
-			return k
-		}
-	}
-
-	return value
 }
 
 /**
