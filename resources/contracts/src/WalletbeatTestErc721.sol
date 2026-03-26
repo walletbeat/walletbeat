@@ -3,7 +3,7 @@ pragma solidity 0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
-import {LibZip} from "@solady/utils/LibZip.sol";
+import {LibZip} from "solady/utils/LibZip.sol";
 
 /**
  * @title WalletbeatTestErc721
@@ -14,34 +14,11 @@ import {LibZip} from "@solady/utils/LibZip.sol";
 contract WalletbeatTestErc721 is ERC721 {
     error WalletbeatTestErc721__Soulbound();
 
-    event ImageDataUpdated();
-    event ImageDataAppended();
-
     uint256 private s_tokenId;
-    bytes[] private s_imageDataChunks;
+    bytes private s_compressedImage;
 
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
-
-    /**
-     * @notice Replaces the stored image data with new compressed SVG data
-     * @dev Clears all existing chunks and stores `data` as the sole chunk. Emits {ImageDataUpdated}.
-     * @param data FLZ-compressed SVG bytes to store as the token image
-     */
-    function setImageData(bytes calldata data) external {
-        delete s_imageDataChunks;
-        s_imageDataChunks.push(data);
-        emit ImageDataUpdated();
-    }
-
-    /**
-     * @notice Appends an additional chunk of compressed image data
-     * @dev Allows the full image to be uploaded across multiple transactions when it exceeds
-     * the calldata size of a single transaction. Emits {ImageDataAppended}.
-     * @param chunk The next FLZ-compressed SVG byte chunk to append
-     */
-    function appendImageData(bytes calldata chunk) external {
-        s_imageDataChunks.push(chunk);
-        emit ImageDataAppended();
+    constructor(string memory name, string memory symbol, bytes memory compressedImage) ERC721(name, symbol) {
+        s_compressedImage = compressedImage;
     }
 
     /**
@@ -56,6 +33,10 @@ contract WalletbeatTestErc721 is ERC721 {
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         _requireMinted(tokenId);
 
+        string memory imageUri = string(
+            abi.encodePacked("data:image/svg+xml;base64,", Base64.encode(LibZip.flzDecompress(s_compressedImage)))
+        );
+
         return string(
             abi.encodePacked(
                 _baseURI(),
@@ -66,7 +47,7 @@ contract WalletbeatTestErc721 is ERC721 {
                             name(),
                             '", "description":"A test ERC721 token used solely for testing.", ',
                             '"attributes": [{"trait_type": "purpose", "value": "testing"}], "image":"',
-                            _getImageUri(),
+                            imageUri,
                             '"}'
                         )
                     )
@@ -128,20 +109,5 @@ contract WalletbeatTestErc721 is ERC721 {
      */
     function _baseURI() internal pure override returns (string memory) {
         return "data:application/json;base64,";
-    }
-
-    /**
-     * @notice Assembles, decompresses, and base64-encodes the stored SVG image data
-     * @dev Concatenates all stored chunks, runs FLZ decompression via {LibZip.flzDecompress},
-     * then base64-encodes the result and prepends the SVG data URI scheme.
-     * @return A `data:image/svg+xml;base64,` URI ready to embed in JSON metadata
-     */
-    function _getImageUri() private view returns (string memory) {
-        bytes memory compressed;
-        uint256 imageDataChunksLength = s_imageDataChunks.length;
-        for (uint256 i = 0; i < imageDataChunksLength; i++) {
-            compressed = bytes.concat(compressed, s_imageDataChunks[i]);
-        }
-        return string(abi.encodePacked("data:image/svg+xml;base64,", Base64.encode(LibZip.flzDecompress(compressed))));
     }
 }
