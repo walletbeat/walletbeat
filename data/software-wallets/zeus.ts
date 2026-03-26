@@ -184,6 +184,10 @@ export const zeus: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: {
 				[Variant.DESKTOP]: {
 					createInAppConnectionFlow: notSupported,

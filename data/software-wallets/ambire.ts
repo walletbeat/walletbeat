@@ -2,6 +2,7 @@ import { mattmatt } from '@/data/contributors/0xmattmatt'
 import { jiojosbg } from '@/data/contributors/jiojosbg'
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
@@ -66,6 +67,7 @@ import { hunterSecurity } from '../entities/hunter-security'
 import { lifi } from '../entities/lifi'
 import { pashov } from '../entities/pashov-audit-group'
 import { pimlico } from '../entities/pimlico'
+import { sentry } from '../entities/sentry'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
 
@@ -394,6 +396,31 @@ export const ambire: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: supported<WalletAnalytics>({
+					ref: [
+						{
+							explanation:
+								'Ambire integrates Sentry for anonymous crash/error reporting in the web extension context.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/src/common/config/analytics/CrashAnalytics.web.ts',
+						},
+						{
+							explanation:
+								'Sentry is initialized in the background service worker, and events are only sent when crash analytics are enabled.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/src/web/extension-services/background/background.ts',
+						},
+						{
+							explanation:
+								'Ambire provides a user toggle for enabling/disabling crash analytics in settings.',
+							url: 'https://github.com/AmbireTech/extension/blob/main/src/web/modules/settings/screens/GeneralSettingsScreen/components/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
+						},
+					],
+					entity: sentry,
+					// Ambire enables anonymous crash reporting by default (except dev/Firefox).
+					policy: CollectionPolicy.BY_DEFAULT,
+				}),
+				usage: notSupported,
+			},
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: notSupported,
@@ -408,6 +435,7 @@ export const ambire: SoftwareWallet = {
 				[Variant.DESKTOP]: null,
 			},
 			dataCollection: {
+				[UserFlow.INSTALL]: null,
 				[UserFlow.NATIVE_SWAP]: {
 					collected: [
 						{
@@ -421,17 +449,19 @@ export const ambire: SoftwareWallet = {
 						},
 					],
 				},
-				[UserFlow.ONBOARDING]: {
+				[UserFlow.ONBOARDING_NEW]: {
 					collected: [],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
-				[UserFlow.SEND]: {
+				[UserFlow.ONBOARDING_IMPORT]: null,
+				[UserFlow.SEND_ETHER]: {
 					collected: [],
 				},
+				[UserFlow.SEND_USDC]: null,
 				[UserFlow.APP_CONNECTION]: {
 					collected: [],
 				},
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [
 						{
 							ref: dataLeakReferences.ambire,

@@ -1,5 +1,6 @@
 import { nconsigny } from '@/data/contributors/nconsigny'
 import { polymutex } from '@/data/contributors/polymutex'
+import type { WalletAnalytics } from '@/schema/features'
 import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
 import { ExposedAccountsBehavior } from '@/schema/features/privacy/app-isolation'
 import {
@@ -286,6 +287,24 @@ export const rabby: SoftwareWallet = {
 		},
 		multiAddress: featureSupported,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: {
+					[Variant.BROWSER]: supported<WalletAnalytics>({
+						ref: [
+							{
+								explanation:
+									'Rabby collects UI/product analytics events via Matomo which is sent to DeBank-owned infrastructure.',
+								url: 'https://github.com/search?q=repo%3ARabbyHub%2FRabby%20matomoRequestEvent&type=code',
+							},
+						],
+						entity: deBank,
+						policy: CollectionPolicy.ALWAYS,
+					}),
+					[Variant.DESKTOP]: null,
+					[Variant.MOBILE]: null,
+				},
+			},
 			appIsolation: {
 				[Variant.BROWSER]: {
 					createInAppConnectionFlow: notSupported,
@@ -301,17 +320,20 @@ export const rabby: SoftwareWallet = {
 			},
 			dataCollection: {
 				[Variant.BROWSER]: {
+					[UserFlow.INSTALL]: null,
 					[UserFlow.NATIVE_SWAP]: {
 						collected: [],
 					},
-					[UserFlow.SEND]: {
+					[UserFlow.SEND_ETHER]: {
 						collected: [],
 					},
-					[UserFlow.ONBOARDING]: {
+					[UserFlow.SEND_USDC]: null,
+					[UserFlow.ONBOARDING_NEW]: {
 						collected: [],
 						publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 					},
-					[UserFlow.TRANSACTION]: {
+					[UserFlow.ONBOARDING_IMPORT]: null,
+					[UserFlow.MAKE_TRANSACTION]: {
 						collected: [],
 					},
 					[UserFlow.APP_CONNECTION]: {

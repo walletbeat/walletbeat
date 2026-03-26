@@ -1639,6 +1639,16 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '09c6e4d8ca088971bd6f5b05f5eca6641c5f81e3',
 		retrieved: '2026-03-14',
 	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/src/common/config/analytics/CrashAnalytics.web.ts',
+		urlHash: '0e483722af77b4fdef1f013038bdee1a5c555096',
+		retrieved: '2026-03-23',
+	},
+	{
+		url: 'https://github.com/AmbireTech/extension/blob/main/src/web/modules/settings/screens/GeneralSettingsScreen/components/CrashAnalyticsControlOption/CrashAnalyticsControlOption.tsx',
+		urlHash: '714bfb6cfe3caf2a2d5f47eba1f9d0ca4c04cf25',
+		retrieved: '2026-03-23',
+	},
 ]
 
 /**

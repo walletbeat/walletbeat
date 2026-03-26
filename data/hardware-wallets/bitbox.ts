@@ -114,7 +114,12 @@ export const bitboxWallet: HardwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			dataCollection: {
+				[UserFlow.INSTALL]: null,
 				[UserFlow.UNCLASSIFIED]: {
 					collected: [
 						{
@@ -156,16 +161,18 @@ export const bitboxWallet: HardwareWallet = {
 						},
 					],
 				},
-				[UserFlow.ONBOARDING]: {
+				[UserFlow.ONBOARDING_NEW]: {
 					collected: [],
 					publishedOnchain: 'NO_DATA_PUBLISHED_ONCHAIN',
 				},
+				[UserFlow.ONBOARDING_IMPORT]: null,
 				[UserFlow.APP_CONNECTION]: 'FLOW_NOT_SUPPORTED',
 				[UserFlow.NATIVE_SWAP]: 'FLOW_NOT_SUPPORTED',
-				[UserFlow.SEND]: {
+				[UserFlow.SEND_ETHER]: {
 					collected: [],
 				},
-				[UserFlow.TRANSACTION]: {
+				[UserFlow.SEND_USDC]: null,
+				[UserFlow.MAKE_TRANSACTION]: {
 					collected: [],
 				},
 			},
