@@ -1,4 +1,4 @@
-import { WALLETBEAT_TEST_CONTRACT } from "./test-contracts"
+import { WALLETBEAT_TEST_CONTRACT } from './test-contracts'
 
 export interface ScamAlertTest {
 	id: string
