@@ -16,10 +16,12 @@
 
   let { activeSubTab, account }: Props = $props();
 
-	const WALLETBEAT_TEST_CONTRACT ='0x8d64f3B8916CE5b007eB6F1dC4817Af8a8E508D7';
-	const WALLETBEAT_TEST_ERC721 ='0xD0AFb4fEba2Fce4bc0AB297D34d7c4562117e356';
-	const WALLETBEAT_TEST_ERC1155 ='0xDE172786698d103b94Cfb2225DB136350699118F';
-	const WALLETBEAT_TEST_ERC20 ='0x2d813f9504B1a1dEccB9eDdb10bdCEae91ef34b0';
+  import {
+    WALLETBEAT_TEST_CONTRACT,
+    WALLETBEAT_TEST_ERC721,
+    WALLETBEAT_TEST_ERC1155,
+    WALLETBEAT_TEST_ERC20,
+  } from '../../constants/test-contracts';
 
   const simulations: Record<
     TransactionSimulationSubTab,
