@@ -45,6 +45,7 @@
 		"eslint-plugin-import": "^2.32.0",
 		"eslint-plugin-prettier": "^5.5.5",
 		"eslint-plugin-unused-imports": "^4.4.1",
+		"fflate": "^0.8.2",
 		"lucide-static": "^0.562.0",
 		"micromark": "^4.0.2",
 		"postcss": "^8.5.8",

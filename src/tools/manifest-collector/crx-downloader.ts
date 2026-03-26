@@ -1,13 +1,8 @@
-import * as http from 'node:http'
-import * as https from 'node:https'
-
 import { readFileFromZip } from './zip-reader'
 
 const CRX3_MAGIC = 'Cr24'
 const CRX3_VERSION = 3
 const CRX_HEADER_PREFIX_SIZE = 12 // 4 magic + 4 version + 4 headerSize
-
-const MAX_REDIRECTS = 5
 
 /**
  * Downloads the manifest.json from a Chrome extension via the Chrome Web Store.
@@ -53,71 +48,28 @@ function downloadCrx(extensionId: string): Promise<Buffer> {
 		'&acceptformat=crx3' +
 		`&x=${innerQuery}`
 
-	return fetchBuffer(url, MAX_REDIRECTS)
+	return fetchBuffer(url)
 }
 
-function fetchBuffer(url: string, remainingRedirects: number): Promise<Buffer> {
-	return new Promise<Buffer>((resolve, reject) => {
-		const client = url.startsWith('https') ? https : http
+async function fetchBuffer(url: string): Promise<Buffer> {
+	const res = await fetch(url)
 
-		client
-			.get(url, res => {
-				const { statusCode, headers } = res
+	if (!res.ok) {
+		throw new Error(`HTTP ${res.status.toString()} fetching: ${url}`)
+	}
 
-				if (
-					statusCode !== undefined &&
-					statusCode >= 300 &&
-					statusCode < 400 &&
-					headers.location !== undefined
-				) {
-					if (remainingRedirects <= 0) {
-						reject(new Error(`Too many redirects fetching: ${url}`))
-
-						return
-					}
-
-					resolve(fetchBuffer(headers.location, remainingRedirects - 1))
-					res.resume()
-
-					return
-				}
-
-				if (statusCode !== 200) {
-					reject(new Error(`HTTP ${statusCode ?? 'unknown'} fetching: ${url}`))
-					res.resume()
-
-					return
-				}
-
-				const chunks: Uint8Array[] = []
-				let totalLength = 0
-
-				res.on('data', (chunk: Uint8Array) => {
-					chunks.push(chunk)
-					totalLength += chunk.byteLength
-				})
-				res.on('end', () => {
-					const result = new Uint8Array(totalLength)
-					let offset = 0
-
-					for (const chunk of chunks) {
-						result.set(chunk, offset)
-						offset += chunk.byteLength
-					}
-
-					resolve(Buffer.from(result))
-				})
-				res.on('error', reject)
-			})
-			.on('error', reject)
-	})
+	return Buffer.from(await res.arrayBuffer())
 }
 
 /**
  * Fetches the raw text content of a URL (for AndroidManifest.xml or Info.plist from GitHub).
  */
 export async function fetchText(url: string): Promise<string> {
-	const buffer = await fetchBuffer(url, MAX_REDIRECTS)
+	const res = await fetch(url)
 
-	return buffer.toString('utf8')
+	if (!res.ok) {
+		throw new Error(`HTTP ${res.status.toString()} fetching: ${url}`)
+	}
+
+	return res.text()
 }

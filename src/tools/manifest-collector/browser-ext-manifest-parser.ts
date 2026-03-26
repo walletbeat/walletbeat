@@ -5,7 +5,6 @@ import {
 	HostPermissionScope,
 	WebAccessibleResourcesScope,
 } from '@/schema/features/security/security-best-practices'
-import { enumKey } from '@/utils/enum'
 
 function asObj(raw: unknown): object | undefined {
 	if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) {
@@ -153,7 +152,15 @@ function parsePermissions(raw: unknown): BrowserExtensionPermission[] {
 	const all = getStringArray(raw, 'permissions')
 	const known = new Set<string>(Object.values(BrowserExtensionPermission))
 
-	return all.filter((p): p is BrowserExtensionPermission => known.has(p))
+	return all
+		.filter(p => !p.includes('://')) // MV2 host patterns — handled by parseHostPermissions
+		.map(p => {
+			if (!known.has(p)) {
+				throw new Error(`Unknown browser extension permission: ${JSON.stringify(p)}`)
+			}
+
+			return p as BrowserExtensionPermission
+		})
 }
 
 function parseWebAccessibleResources(raw: unknown): WebAccessibleResourcesScope {
@@ -214,50 +221,4 @@ export function parseBrowserExtensionManifest(raw: unknown): BrowserExtensionMan
 		permissions: parsePermissions(raw),
 		webAccessibleResources: parseWebAccessibleResources(raw),
 	}
-}
-
-/**
- * Renders a `BrowserExtensionManifest` as a TypeScript code snippet.
- *
- * The output can be pasted directly into a wallet's `browserExtensionHardening` field.
- */
-export function renderBrowserExtensionManifest(manifest: BrowserExtensionManifest): string {
-	const t = '\t'
-
-	let ec: string
-
-	if (manifest.externallyConnectable === 'NOT_EXTERNALLY_CONNECTABLE') {
-		ec = "'NOT_EXTERNALLY_CONNECTABLE'"
-	} else {
-		const { extensionIds, pageMatches } = manifest.externallyConnectable
-
-		ec = [
-			'{',
-			`${t}${t}extensionIds: ExternalExtensionIdScope.${extensionIds},`,
-			`${t}${t}pageMatches: HostPermissionScope.${pageMatches},`,
-			`${t}}`,
-		].join('\n')
-	}
-
-	let perms: string
-
-	if (manifest.permissions.length === 0) {
-		perms = '[]'
-	} else {
-		const lines = manifest.permissions
-			.map(p => `${t}${t}BrowserExtensionPermission.${enumKey(BrowserExtensionPermission, p)},`)
-			.join('\n')
-
-		perms = `[\n${lines}\n${t}]`
-	}
-
-	return [
-		'browserExtensionHardening: {',
-		`${t}hostPermissions: HostPermissionScope.${manifest.hostPermissions},`,
-		`${t}contentScripts: HostPermissionScope.${manifest.contentScripts},`,
-		`${t}externallyConnectable: ${ec},`,
-		`${t}permissions: ${perms},`,
-		`${t}webAccessibleResources: WebAccessibleResourcesScope.${manifest.webAccessibleResources},`,
-		'}',
-	].join('\n')
 }

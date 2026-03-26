@@ -1,20 +1,12 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
-import { allWallets, assertValidWalletName } from '@/data/wallets'
+import { allWallets, assertValidWalletName, type WalletName } from '@/data/wallets'
 import { getExtensionId } from '@/schema/extension-url'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 
-import {
-	parseAndroidManifest,
-	parseIosPlist,
-	renderAndroidPermissions,
-	renderIosUsageDescriptions,
-} from './android-manifest-parser'
-import {
-	parseBrowserExtensionManifest,
-	renderBrowserExtensionManifest,
-} from './browser-ext-manifest-parser'
+import { parseAndroidManifest, parseIosPlist } from './android-manifest-parser'
+import { parseBrowserExtensionManifest } from './browser-ext-manifest-parser'
 import { fetchBrowserExtensionManifest, fetchText } from './crx-downloader'
 
 const REPO_ROOT = getRepositoryRoot()
@@ -72,16 +64,16 @@ if (hasFlag('help')) {
 }
 
 const allMode = hasFlag('all')
-const walletId = getArg('id')
+const walletIdArg = getArg('id')
 const androidManifestUrl = getArg('android-manifest-url')
 const iosPlistUrl = getArg('ios-plist-url')
 
-if (!allMode && walletId === undefined) {
+if (!allMode && walletIdArg === undefined) {
 	process.stderr.write('Error: either --all or --id <wallet-id> is required\n')
 	usage()
 }
 
-if (allMode && walletId !== undefined) {
+if (allMode && walletIdArg !== undefined) {
 	process.stderr.write('Error: --all and --id are mutually exclusive\n')
 	usage()
 }
@@ -93,13 +85,14 @@ if (allMode && (androidManifestUrl !== undefined || iosPlistUrl !== undefined)) 
 
 type WalletEntry = { id: string; extensionUrls: string[] }
 
-function getExtensionUrls(id: string): string[] {
-	const wallet = allWallets[assertValidWalletName(id)]
+function getExtensionUrls(id: WalletName): string[] {
+	const wallet = allWallets[id]
 
 	return (wallet.metadata.urls?.extensions ?? []).map(url => getExtensionId(url))
 }
 
-let targets: WalletEntry[]
+let targets: WalletEntry[] = []
+let walletId: WalletName | undefined
 
 if (allMode) {
 	targets = Object.entries(allWallets)
@@ -115,8 +108,10 @@ if (allMode) {
 	}
 
 	process.stderr.write(`Found ${targets.length} wallet(s) with extension URLs.\n`)
-} else {
-	const extensionUrls = getExtensionUrls(walletId!)
+} else if (walletIdArg !== undefined) {
+	walletId = assertValidWalletName(walletIdArg)
+
+	const extensionUrls = getExtensionUrls(walletId)
 
 	if (extensionUrls.length === 0) {
 		process.stderr.write(
@@ -126,7 +121,7 @@ if (allMode) {
 		process.exit(1)
 	}
 
-	targets = [{ extensionUrls, id: walletId! }]
+	targets = [{ extensionUrls, id: walletId }]
 }
 
 for (const { id, extensionUrls } of targets) {
@@ -145,10 +140,10 @@ for (const { id, extensionUrls } of targets) {
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, outPath)}\n`)
 
 		const parsed = parseBrowserExtensionManifest(rawManifest)
-		const snippet = renderBrowserExtensionManifest(parsed)
+		const parsedPath = path.join(manifestDir, `${extensionId}.parsed.json`)
 
-		process.stderr.write('\n--- browserExtensionHardening (paste into wallet file) ---\n\n')
-		process.stdout.write(snippet + '\n')
+		fs.writeFileSync(parsedPath, JSON.stringify(parsed, null, '\t') + '\n')
+		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, parsedPath)}\n`)
 	}
 }
 
@@ -169,9 +164,13 @@ if (walletId !== undefined) {
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, outPath)}\n`)
 
 		const permissions = parseAndroidManifest(xmlText)
+		const androidParsedPath = path.join(manifestDir, 'android.parsed.json')
 
-		process.stderr.write('\n--- MobileAppManifest.android (paste into wallet file) ---\n\n')
-		process.stdout.write(renderAndroidPermissions(permissions) + '\n')
+		fs.writeFileSync(
+			androidParsedPath,
+			JSON.stringify({ usesPermissions: permissions }, null, '\t') + '\n',
+		)
+		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, androidParsedPath)}\n`)
 	}
 
 	if (iosPlistUrl !== undefined) {
@@ -184,8 +183,9 @@ if (walletId !== undefined) {
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, outPath)}\n`)
 
 		const usageDescriptions = parseIosPlist(plistText)
+		const iosParsedPath = path.join(manifestDir, 'ios.parsed.json')
 
-		process.stderr.write('\n--- MobileAppManifest.ios (paste into wallet file) ---\n\n')
-		process.stdout.write(renderIosUsageDescriptions(usageDescriptions) + '\n')
+		fs.writeFileSync(iosParsedPath, JSON.stringify({ usageDescriptions }, null, '\t') + '\n')
+		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, iosParsedPath)}\n`)
 	}
 }

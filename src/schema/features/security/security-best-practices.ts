@@ -82,6 +82,9 @@ export enum BrowserExtensionPermission {
 	/** Access the currently active tab's URL, title, and favicon. */
 	ACTIVE_TAB = 'activeTab',
 
+	/** Schedule periodic or one-time callbacks via chrome.alarms. */
+	ALARMS = 'alarms',
+
 	/** Read and modify browser bookmarks. */
 	BOOKMARKS = 'bookmarks',
 
@@ -93,6 +96,9 @@ export enum BrowserExtensionPermission {
 
 	/** Write to the clipboard without a user gesture. */
 	CLIPBOARD_WRITE = 'clipboardWrite',
+
+	/** Add items to the browser's right-click context menu. */
+	CONTEXT_MENUS = 'contextMenus',
 
 	/** Read and modify cookies for all accessible hosts. */
 	COOKIES = 'cookies',
@@ -115,6 +121,9 @@ export enum BrowserExtensionPermission {
 	/** Read the full browsing history. */
 	HISTORY = 'history',
 
+	/** Send and receive push messages via Google Cloud Messaging (legacy). */
+	GCM = 'gcm',
+
 	/** Access the user's Google Account identity (no email). */
 	IDENTITY = 'identity',
 
@@ -126,6 +135,12 @@ export enum BrowserExtensionPermission {
 
 	/** Send and receive messages from a native OS application. */
 	NATIVE_MESSAGING = 'nativeMessaging',
+
+	/** Show browser notifications to the user. */
+	NOTIFICATIONS = 'notifications',
+
+	/** Create offscreen documents for background DOM/audio/canvas operations. */
+	OFFSCREEN = 'offscreen',
 
 	/** Save a tab's full page as MHTML. */
 	PAGE_CAPTURE = 'pageCapture',
@@ -139,8 +154,23 @@ export enum BrowserExtensionPermission {
 	/** Inject scripts and CSS into pages programmatically. */
 	SCRIPTING = 'scripting',
 
+	/** Display content in the browser's side panel. */
+	SIDE_PANEL = 'sidePanel',
+
+	/** Persist key-value data in chrome.storage (local, sync, session). */
+	STORAGE = 'storage',
+
+	/** Query CPU processor information. */
+	SYSTEM_CPU = 'system.cpu',
+
+	/** Read and set the system's display configuration. */
+	SYSTEM_DISPLAY = 'system.display',
+
 	/** Read the URLs, titles, and favicons of all open tabs. */
 	TABS = 'tabs',
+
+	/** Remove the per-extension storage quota for local storage. */
+	UNLIMITED_STORAGE = 'unlimitedStorage',
 
 	/** Register user-supplied scripts that run in web pages. */
 	USER_SCRIPTS = 'userScripts',

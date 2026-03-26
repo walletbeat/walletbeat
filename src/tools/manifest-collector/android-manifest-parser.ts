@@ -6,7 +6,6 @@ import {
 	IosUsageDescription,
 	iosUsageDescriptions,
 } from '@/schema/features/security/security-best-practices'
-import { enumKey } from '@/utils/enum'
 
 const ANDROID_NS = 'http://schemas.android.com/apk/res/android'
 
@@ -76,40 +75,4 @@ export function parseIosPlist(plistText: string): IosUsageDescription[] {
 	}
 
 	return [...usageDescriptions]
-}
-
-/**
- * Renders `AndroidPermission[]` as a TypeScript code snippet for the
- * `MobileAppManifest.android.usesPermissions` field.
- */
-export function renderAndroidPermissions(permissions: AndroidPermission[]): string {
-	const t = '\t'
-
-	if (permissions.length === 0) {
-		return 'android: { usesPermissions: [] }'
-	}
-
-	const lines = permissions
-		.map(p => `${t}${t}AndroidPermission.${enumKey(AndroidPermission, p)},`)
-		.join('\n')
-
-	return `android: {\n${t}usesPermissions: [\n${lines}\n${t}],\n}`
-}
-
-/**
- * Renders `IosUsageDescription[]` as a TypeScript code snippet for the
- * `MobileAppManifest.ios.usageDescriptions` field.
- */
-export function renderIosUsageDescriptions(descriptions: IosUsageDescription[]): string {
-	const t = '\t'
-
-	if (descriptions.length === 0) {
-		return 'ios: { usageDescriptions: [] }'
-	}
-
-	const lines = descriptions
-		.map(d => `${t}${t}IosUsageDescription.${enumKey(IosUsageDescription, d)},`)
-		.join('\n')
-
-	return `ios: {\n${t}usageDescriptions: [\n${lines}\n${t}],\n}`
 }
