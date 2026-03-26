@@ -2559,10 +2559,12 @@ Scope of a Browser Extension URL match pattern grant, expressed in terms relevan
 Security-sensitive Browser Extension permission strings declared in the `permissions` manifest field. Values match the manifest string exactly.
 
 - `ACTIVE_TAB` = `'activeTab'`: Access the currently active tab's URL, title, and favicon.
+- `ALARMS` = `'alarms'`: Schedule periodic or one-time callbacks via chrome.alarms.
 - `BOOKMARKS` = `'bookmarks'`: Read and modify browser bookmarks.
 - `BROWSING_DATA` = `'browsingData'`: Delete browsing data (history, cookies, cache).
 - `CLIPBOARD_READ` = `'clipboardRead'`: Read clipboard contents without a user gesture.
 - `CLIPBOARD_WRITE` = `'clipboardWrite'`: Write to the clipboard without a user gesture.
+- `CONTEXT_MENUS` = `'contextMenus'`: Add items to the browser's right-click context menu.
 - `COOKIES` = `'cookies'`: Read and modify cookies for all accessible hosts.
 - `DEBUGGER` = `'debugger'`: Attach the browser debugger protocol to any tab.
 - `DECLARATIVE_NET_REQUEST` = `'declarativeNetRequest'`: Block or redirect network requests via declarativeNetRequest.
@@ -2570,15 +2572,23 @@ Security-sensitive Browser Extension permission strings declared in the `permiss
 - `DESKTOP_CAPTURE` = `'desktopCapture'`: Capture the desktop, a window, or a tab as a media stream.
 - `GEOLOCATION` = `'geolocation'`: Access the device's geographic location.
 - `HISTORY` = `'history'`: Read the full browsing history.
+- `GCM` = `'gcm'`: Send and receive push messages via Google Cloud Messaging (legacy).
 - `IDENTITY` = `'identity'`: Access the user's Google Account identity (no email).
 - `IDENTITY_EMAIL` = `'identity.email'`: Access the user's Google Account email address.
 - `MANAGEMENT` = `'management'`: List, enable, disable, or uninstall other extensions.
 - `NATIVE_MESSAGING` = `'nativeMessaging'`: Send and receive messages from a native OS application.
+- `NOTIFICATIONS` = `'notifications'`: Show browser notifications to the user.
+- `OFFSCREEN` = `'offscreen'`: Create offscreen documents for background DOM/audio/canvas operations.
 - `PAGE_CAPTURE` = `'pageCapture'`: Save a tab's full page as MHTML.
 - `PRIVACY` = `'privacy'`: Read and modify browser privacy settings.
 - `PROXY` = `'proxy'`: Monitor and control the browser's network proxy settings.
 - `SCRIPTING` = `'scripting'`: Inject scripts and CSS into pages programmatically.
+- `SIDE_PANEL` = `'sidePanel'`: Display content in the browser's side panel.
+- `STORAGE` = `'storage'`: Persist key-value data in chrome.storage (local, sync, session).
+- `SYSTEM_CPU` = `'system.cpu'`: Query CPU processor information.
+- `SYSTEM_DISPLAY` = `'system.display'`: Read and set the system's display configuration.
 - `TABS` = `'tabs'`: Read the URLs, titles, and favicons of all open tabs.
+- `UNLIMITED_STORAGE` = `'unlimitedStorage'`: Remove the per-extension storage quota for local storage.
 - `USER_SCRIPTS` = `'userScripts'`: Register user-supplied scripts that run in web pages.
 - `WEB_AUTHENTICATION_PROXY` = `'webAuthenticationProxy'`: Intercept WebAuthn requests on behalf of the extension.
 - `WEB_NAVIGATION` = `'webNavigation'`: Observe all navigation events across tabs.

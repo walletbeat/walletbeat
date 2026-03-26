@@ -150,16 +150,17 @@ function parseExternallyConnectable(
 
 function parsePermissions(raw: unknown): BrowserExtensionPermission[] {
 	const all = getStringArray(raw, 'permissions')
-	const known = new Set<string>(Object.values(BrowserExtensionPermission))
 
 	return all
 		.filter(p => !p.includes('://')) // MV2 host patterns — handled by parseHostPermissions
 		.map(p => {
-			if (!known.has(p)) {
+			const permission = Object.values(BrowserExtensionPermission).find(v => (v as string) === p)
+
+			if (permission === undefined) {
 				throw new Error(`Unknown browser extension permission: ${JSON.stringify(p)}`)
 			}
 
-			return p as BrowserExtensionPermission
+			return permission
 		})
 }
 
