@@ -893,6 +893,7 @@ Issued At: ${new Date().toISOString()}`;
         <TransactionSimulationsTab
           activeSubTab={uiState.txSimulationSubTab}
           {account}
+          onSendTransaction={handleSendTransaction}
         />
       {/if}
     </div>
