@@ -85,6 +85,25 @@
   };
 
   const current = $derived(simulations[activeSubTab]);
+
+  async function sendTransaction() {
+    if (!account?.address) return;
+    const ethereum = (window as unknown as { ethereum?: { request: (args: { method: string; params: unknown[] }) => Promise<unknown> } }).ethereum;
+    if (!ethereum) {
+      alert('No wallet detected. Please connect a wallet first.');
+      return;
+    }
+    await ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account.address,
+          to: current.contractAddress,
+          data: current.calldata,
+        },
+      ],
+    });
+  }
 </script>
 
 <div class="tx-simulations-tab" data-column="gap-4">
@@ -113,7 +132,7 @@
         </p>
       </div>
 
-      <button type="button" data-pressable disabled={!account?.address}>
+      <button type="button" data-pressable disabled={!account?.address} onclick={sendTransaction}>
         Send Transaction (Testing Only)
       </button>
     </div>
