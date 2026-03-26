@@ -1,3 +1,5 @@
+import { WALLETBEAT_TEST_CONTRACT } from "./test-contracts"
+
 export interface ScamAlertTest {
 	id: string
 	name: string
@@ -23,9 +25,10 @@ export interface ScamAlertTest {
 	messageData?: Record<string, string | number | bigint>
 }
 
-// approve(address(0), type(uint256).max)
+// Walletbeat's test contract
+// approve(address(0x8d64f3B8916CE5b007eB6F1dC4817Af8a8E508D7), type(uint256).max)
 const INFINITE_APPROVE_CALLDATA: `0x${string}` =
-	'0x095ea7b30000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+	'0x095ea7b30000000000000000000000008d64f3b8916ce5b007eb6f1dc4817af8a8e508d7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 // Deadline 5 years from module load time
 const PERMIT_DEADLINE = Math.floor(Date.now() / 1000) + 5 * 365 * 24 * 3600
@@ -37,8 +40,8 @@ export const scamAlertTests: ScamAlertTest[] = [
 		name: 'Recent Contract Warning',
 		description: 'Warns about newly deployed contracts.',
 		testType: 'transaction',
-		contractAddress: '0x0000000000000000000000000000000000000000', // Placeholder
-		calldata: '0x00000000', // Placeholder
+		contractAddress: WALLETBEAT_TEST_CONTRACT,
+		calldata: '0xf88a1a98',
 		riskType: 'recent-deploy',
 		expectedBehavior:
 			'Wallet should display a warning indicating the contract was recently deployed and may be risky.',
@@ -53,8 +56,8 @@ export const scamAlertTests: ScamAlertTest[] = [
 		name: 'Previous Contract Transaction',
 		description: 'Recognizes previously interacted contracts.',
 		testType: 'transaction',
-		contractAddress: '0x0000000000000000000000000000000000000000', // Placeholder
-		calldata: '0x00000000', // Placeholder
+		contractAddress: WALLETBEAT_TEST_CONTRACT,
+		calldata: '0xf88a1a98',
 		riskType: 'previous-interaction',
 		expectedBehavior:
 			'Wallet may show a familiar contract indicator or skip certain warnings for previously-interacted contracts.',
@@ -151,8 +154,8 @@ export const scamAlertTests: ScamAlertTest[] = [
 		},
 		primaryType: 'Permit',
 		messageData: {
-			owner: '0x0000000000000000000000000000000000000000', // Placeholder
-			spender: '0x0000000000000000000000000000000000000000', // Placeholder
+			owner: '0x0000000000000000000000000000000000000000',
+			spender: WALLETBEAT_TEST_CONTRACT,
 			value: BigInt(
 				'115792089237316195423570985008687907853269984665640564039457584007913129639935',
 			),
