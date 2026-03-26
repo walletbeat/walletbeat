@@ -9,13 +9,7 @@
     | 'volatile-outcome'
     | 'failing-transaction';
 
-  interface Props {
-    activeSubTab: TransactionSimulationSubTab;
-    account: { address?: string } | null;
-  }
-
-  let { activeSubTab, account }: Props = $props();
-
+  import type { TestTransaction } from '../../constants/test-transactions-signatures';
   import {
     WALLETBEAT_TEST_CONTRACT,
     WALLETBEAT_TEST_ERC721,
@@ -23,40 +17,60 @@
     WALLETBEAT_TEST_ERC20,
   } from '../../constants/test-contracts';
 
-  const simulations: Record<
-    TransactionSimulationSubTab,
-    { name: string; description: string; contractAddress: string; calldata: string }
-  > = {
+  interface Props {
+    activeSubTab: TransactionSimulationSubTab;
+    account: { address?: string } | null;
+    onSendTransaction: (tx: TestTransaction) => void;
+  }
+
+  let { activeSubTab, account, onSendTransaction }: Props = $props();
+
+  const simulations: Record<TransactionSimulationSubTab, TestTransaction> = {
     'erc20-mint': {
+      id: 'erc20-mint',
       name: 'ERC-20 Mint',
+      function: 'mintHundred()',
+      parameters: [],
       description:
         'Mints exactly 100 tokens (100e18) to the caller via mintHundred(). Deterministic — the simulation result should always match execution.',
       contractAddress: WALLETBEAT_TEST_ERC20,
       calldata: '0x4838e647',
     },
     'erc721-mint': {
+      id: 'erc721-mint',
       name: 'ERC-721 Mint',
+      function: 'mintOne()',
+      parameters: [],
       description:
         'Mints exactly one ERC-721 NFT to the caller via mintOne(). Deterministic — the simulation result should always match execution.',
       contractAddress: WALLETBEAT_TEST_ERC721,
       calldata: '0x0ced8637',
     },
     'erc1155-mint': {
+      id: 'erc1155-mint',
       name: 'ERC-1155 Mint',
+      function: 'mintOne()',
+      parameters: [],
       description:
         'Mints exactly one ERC-1155 token to the caller via mintOne(). Deterministic — the simulation result should always match execution.',
       contractAddress: WALLETBEAT_TEST_ERC1155,
       calldata: '0x0ced8637',
     },
     'all-token-transfer': {
+      id: 'all-token-transfer',
       name: 'All Token Transfer',
+      function: 'simulateFunctionV1()',
+      parameters: [],
       description:
         'Mints ERC-20, ERC-721, and ERC-1155 tokens to the caller in a single transaction via simulateFunctionV1(). Tests whether the wallet correctly shows all three asset types in its simulation. Amounts vary by block number.',
       contractAddress: WALLETBEAT_TEST_CONTRACT,
       calldata: '0xf88a1a98',
     },
     'misleading-selector': {
+      id: 'misleading-selector',
       name: 'Misleading Selector',
+      function: 'transfer(address,uint256)',
+      parameters: [],
       description:
         'Uses the standard ERC-20 transfer() selector (0xa9059cbb) on a contract that actually mints tokens to the caller — ignoring the recipient and amount entirely. Tests whether wallets simulate actual behavior or assume behavior from the function signature.',
       contractAddress: WALLETBEAT_TEST_CONTRACT,
@@ -64,21 +78,30 @@
         '0xa9059cbb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
     },
     'fake-airdrop': {
+      id: 'fake-airdrop',
       name: 'Fake Airdrop',
+      function: 'harvest()',
+      parameters: [],
       description:
-        'Burns the caller\'s entire ERC-20 balance while emitting a Transfer(0x0 → caller) event to suggest a mint. Tests whether wallets detect the real outcome (balance drain) behind a misleading event.',
+        "Burns the caller's entire ERC-20 balance while emitting a Transfer(0x0 → caller) event to suggest a mint. Tests whether wallets detect the real outcome (balance drain) behind a misleading event.",
       contractAddress: WALLETBEAT_TEST_CONTRACT,
       calldata: '0x4e71d92d',
     },
     'volatile-outcome': {
+      id: 'volatile-outcome',
       name: 'Volatile Outcome',
+      function: 'simulateFunctionV2()',
+      parameters: [],
       description:
         'Calls a function that mints tokens on even blocks and burns all tokens on odd blocks via simulateFunctionV2(). Tests whether wallets detect and warn about state-dependent outcomes that may differ at execution time.',
       contractAddress: WALLETBEAT_TEST_CONTRACT,
       calldata: '0xa79c3153',
     },
     'failing-transaction': {
+      id: 'failing-transaction',
       name: 'Failing Transaction',
+      function: 'alwaysFails()',
+      parameters: [],
       description:
         'Always reverts unconditionally via alwaysFails(). Tests whether wallets correctly identify and warn about transactions that are guaranteed to fail.',
       contractAddress: WALLETBEAT_TEST_CONTRACT,
@@ -88,24 +111,6 @@
 
   const current = $derived(simulations[activeSubTab]);
 
-  async function sendTransaction() {
-    if (!account?.address) return;
-    const ethereum = (window as unknown as { ethereum?: { request: (args: { method: string; params: unknown[] }) => Promise<unknown> } }).ethereum;
-    if (!ethereum) {
-      alert('No wallet detected. Please connect a wallet first.');
-      return;
-    }
-    await ethereum.request({
-      method: 'eth_sendTransaction',
-      params: [
-        {
-          from: account.address,
-          to: current.contractAddress,
-          data: current.calldata,
-        },
-      ],
-    });
-  }
 </script>
 
 <div class="tx-simulations-tab" data-column="gap-4">
@@ -134,7 +139,7 @@
         </p>
       </div>
 
-      <button type="button" data-pressable disabled={!account?.address} onclick={sendTransaction}>
+      <button type="button" data-pressable disabled={!account?.address} onclick={() => onSendTransaction(current)}>
         Send Transaction (Testing Only)
       </button>
     </div>
