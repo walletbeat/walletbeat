@@ -18,9 +18,8 @@
 
 	const WALLETBEAT_TEST_CONTRACT ='0x8d64f3B8916CE5b007eB6F1dC4817Af8a8E508D7';
 	const WALLETBEAT_TEST_ERC721 ='0xD0AFb4fEba2Fce4bc0AB297D34d7c4562117e356';
-	const WALLETBEAT_TEST_ERC1155 ='0x2d813f9504B1a1dEccB9eDdb10bdCEae91ef34b0';
-
-  const PLACEHOLDER_ADDRESS = '0x0000000000000000000000000000000000000000';
+	const WALLETBEAT_TEST_ERC1155 ='0xDE172786698d103b94Cfb2225DB136350699118F';
+	const WALLETBEAT_TEST_ERC20 ='0x2d813f9504B1a1dEccB9eDdb10bdCEae91ef34b0';
 
   const simulations: Record<
     TransactionSimulationSubTab,
@@ -30,35 +29,35 @@
       name: 'ERC-20 Mint',
       description:
         'Mints exactly 100 tokens (100e18) to the caller via mintHundred(). Deterministic — the simulation result should always match execution.',
-      contractAddress: PLACEHOLDER_ADDRESS,
+      contractAddress: WALLETBEAT_TEST_ERC20,
       calldata: '0x4838e647',
     },
     'erc721-mint': {
       name: 'ERC-721 Mint',
       description:
         'Mints exactly one ERC-721 NFT to the caller via mintOne(). Deterministic — the simulation result should always match execution.',
-      contractAddress: PLACEHOLDER_ADDRESS,
+      contractAddress: WALLETBEAT_TEST_ERC721,
       calldata: '0x0ced8637',
     },
     'erc1155-mint': {
       name: 'ERC-1155 Mint',
       description:
         'Mints exactly one ERC-1155 token to the caller via mintOne(). Deterministic — the simulation result should always match execution.',
-      contractAddress: PLACEHOLDER_ADDRESS,
+      contractAddress: WALLETBEAT_TEST_ERC1155,
       calldata: '0x0ced8637',
     },
     'all-token-transfer': {
       name: 'All Token Transfer',
       description:
         'Mints ERC-20, ERC-721, and ERC-1155 tokens to the caller in a single transaction via simulateFunctionV1(). Tests whether the wallet correctly shows all three asset types in its simulation. Amounts vary by block number.',
-      contractAddress: PLACEHOLDER_ADDRESS,
+      contractAddress: WALLETBEAT_TEST_CONTRACT,
       calldata: '0xf88a1a98',
     },
     'misleading-selector': {
       name: 'Misleading Selector',
       description:
         'Uses the standard ERC-20 transfer() selector (0xa9059cbb) on a contract that actually mints tokens to the caller — ignoring the recipient and amount entirely. Tests whether wallets simulate actual behavior or assume behavior from the function signature.',
-      contractAddress: PLACEHOLDER_ADDRESS,
+      contractAddress: WALLETBEAT_TEST_CONTRACT,
       calldata:
         '0xa9059cbb00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
     },
@@ -66,21 +65,21 @@
       name: 'Fake Airdrop',
       description:
         'Burns the caller\'s entire ERC-20 balance while emitting a Transfer(0x0 → caller) event to suggest a mint. Tests whether wallets detect the real outcome (balance drain) behind a misleading event.',
-      contractAddress: PLACEHOLDER_ADDRESS,
+      contractAddress: WALLETBEAT_TEST_CONTRACT,
       calldata: '0x4e71d92d',
     },
     'volatile-outcome': {
       name: 'Volatile Outcome',
       description:
         'Calls a function that mints tokens on even blocks and burns all tokens on odd blocks via simulateFunctionV2(). Tests whether wallets detect and warn about state-dependent outcomes that may differ at execution time.',
-      contractAddress: PLACEHOLDER_ADDRESS,
+      contractAddress: WALLETBEAT_TEST_CONTRACT,
       calldata: '0xa79c3153',
     },
     'failing-transaction': {
       name: 'Failing Transaction',
       description:
         'Always reverts unconditionally via alwaysFails(). Tests whether wallets correctly identify and warn about transactions that are guaranteed to fail.',
-      contractAddress: PLACEHOLDER_ADDRESS,
+      contractAddress: WALLETBEAT_TEST_CONTRACT,
       calldata: '0x128e6c37',
     },
   };
