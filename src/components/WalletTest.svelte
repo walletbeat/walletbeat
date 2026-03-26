@@ -16,6 +16,8 @@
   import { getBaseUrl } from '../base-url';
   import { testSignatures, testTransactions } from '../constants/test-transactions-signatures';
   import type { TestTransaction, TestSignature } from '../constants/test-transactions-signatures';
+  import { scamAlertTests } from '../constants/test-scam-alerts';
+  import type { ScamAlertTest } from '../constants/test-scam-alerts';
   import { testSteps } from '../constants/test-eip-support';
   import type {
     StepStatus,
@@ -42,12 +44,20 @@
   import TransactionsTab from './Tabs/TransactionsTab.svelte';
   import SignaturesTab from './Tabs/SignaturesTab.svelte';
   import EIPSupportTab from './Tabs/EIPSupportTab.svelte';
+  import ScamAlertsTab from './Tabs/ScamAlertsTab.svelte';
+  import AppIsolationTab from './Tabs/AppIsolationTab.svelte';
+  import TransactionSimulationsTab from './Tabs/TransactionSimulationsTab.svelte';
+  import { getProvider } from '../lib/eip-test-runners';
   import {
     assertTransactionId,
     isEip6963AnnounceProviderEvent,
   } from '@/types/utils/ethereum-types'
+  import type { TransactionSimulationSubTab } from './Tabs/TransactionSimulationsTab.svelte';
 
   type Account = ReturnType<typeof getAccount>;
+
+  type ActiveTab = 'transactions' | 'signatures' | 'eip-support' | 'app-isolation' | 'scam-alerts' | 'tx-simulations';
+  type AppIsolationSubTab = 'eth-accounts' | 'wallet-connect';
 
   // Consolidated state objects
   let account = $state<Account | null>(null);
@@ -103,10 +113,33 @@
     },
   });
 
-  const uiState = $state({
-    activeTab: 'transactions' as 'transactions' | 'signatures' | 'eip-support',
-    selectedTxId: null as string | null,
-    selectedSigId: null as string | null,
+  const scamAlertState = $state({
+    activeId: null as string | null,
+    isPending: false,
+    hashes: {} as Record<string, `0x${string}`>,
+    signatures: {} as Record<string, string>,
+    error: '',
+  });
+
+  const scamAlertDisclaimer = $state({
+    accepted: false,
+  });
+
+
+  const uiState = $state<{
+    activeTab: ActiveTab;
+    selectedTxId: string | null;
+    selectedSigId: string | null;
+    selectedScamAlertId: string | null;
+    appIsolationSubTab: AppIsolationSubTab;
+    txSimulationSubTab: TransactionSimulationSubTab;
+  }>({
+    activeTab: 'transactions',
+    selectedTxId: null,
+    selectedSigId: null,
+    selectedScamAlertId: null,
+    appIsolationSubTab: 'eth-accounts',
+    txSimulationSubTab: 'erc20-mint',
   });
 
   const connectors: readonly Connector[] = (config as { connectors?: readonly Connector[] }).connectors ?? [];
@@ -119,6 +152,8 @@
     if (testTransactions.length > 0) uiState.selectedTxId = testTransactions[0].id;
 
     if (testSignatures.length > 0) uiState.selectedSigId = testSignatures[0].id;
+
+    if (scamAlertTests.length > 0) uiState.selectedScamAlertId = scamAlertTests[0].id;
 
     // Discover EIP-6963 providers for step 1
     discoverProviders();
@@ -144,6 +179,17 @@ Version: 1
 Chain ID: 1
 Nonce: ${Math.random().toString(36).substring(2, 15)}
 Issued At: ${new Date().toISOString()}`;
+    }
+  }
+
+  function updatePermitOwner() {
+    const permitTest = scamAlertTests.find((t) => t.id === 'allow-infinite-permit');
+
+    if (permitTest?.messageData) {
+      permitTest.messageData = {
+        ...permitTest.messageData,
+        owner: account?.address ?? '0x0000000000000000000000000000000000000000',
+      };
     }
   }
 
@@ -338,6 +384,71 @@ Issued At: ${new Date().toISOString()}`;
     }
   }
 
+  // Scam alert handlers
+  async function handleSendScamAlert(test: ScamAlertTest) {
+    if (!account?.address) return;
+
+    if (account.chainId !== undefined && account.chainId !== mainnet.id) {
+      openChainSwitchModal({
+        id: test.id,
+        name: test.name,
+        function: '',
+        parameters: [],
+        calldata: test.calldata,
+        contractAddress: test.contractAddress,
+      });
+
+      return;
+    }
+
+    scamAlertState.isPending = true;
+    scamAlertState.activeId = test.id;
+    scamAlertState.error = '';
+
+    try {
+      const hash = await sendTransaction(config, {
+        to: test.contractAddress,
+        data: test.calldata,
+        value: test.value,
+      });
+
+      scamAlertState.hashes[test.id] = hash;
+    } catch (error) {
+      scamAlertState.error = error instanceof Error ? error.message : 'Transaction failed';
+    } finally {
+      scamAlertState.isPending = false;
+      scamAlertState.activeId = null;
+    }
+  }
+
+  async function handleSignScamAlert(test: ScamAlertTest) {
+    if (!account?.address || !test.domain || !test.types || !test.primaryType || !test.messageData) {
+      return;
+    }
+
+    scamAlertState.isPending = true;
+    scamAlertState.activeId = test.id;
+    scamAlertState.error = '';
+
+    try {
+      const result = await signTypedData(config, {
+        domain: test.domain,
+
+        types: test.types,
+        primaryType: test.primaryType,
+
+        message: test.messageData,
+      });
+
+      scamAlertState.signatures[test.id] = result;
+    } catch (error) {
+      scamAlertState.error = error instanceof Error ? error.message : 'Signing failed';
+    } finally {
+      scamAlertState.isPending = false;
+      scamAlertState.activeId = null;
+    }
+  }
+
   // EIP Support Testing
   function discoverProviders() {
     if (typeof window === 'undefined') return;
@@ -508,9 +619,10 @@ Issued At: ${new Date().toISOString()}`;
     stepTestState.batchId = null;
   }
 
-  // Update SIWE message when account changes
+  // Update SIWE message and permit owner when account changes
   $effect(() => {
     updateSIWEMessage();
+    updatePermitOwner();
   });
 </script>
 
@@ -558,7 +670,7 @@ Issued At: ${new Date().toISOString()}`;
 
   <!-- Tab Selector -->
   <div class="tab-selector" data-row="gap-2">
-    {#each ['transactions', 'signatures', 'eip-support'] as tab (tab)}
+    {#each ['transactions', 'signatures', 'eip-support', 'app-isolation', 'tx-simulations', 'scam-alerts'] as tab (tab)}
       <button
         type="button"
         class="tab-button"
@@ -578,10 +690,21 @@ Issued At: ${new Date().toISOString()}`;
             }
           } else if (tab === 'eip-support') {
             uiState.activeTab = 'eip-support';
+          } else if (tab === 'app-isolation') {
+            uiState.activeTab = 'app-isolation';
+          } else if (tab === 'tx-simulations') {
+            uiState.activeTab = 'tx-simulations';
+          } else if (tab === 'scam-alerts') {
+            uiState.activeTab = 'scam-alerts';
+            scamAlertDisclaimer.accepted = false;
+
+            if (!uiState.selectedScamAlertId && scamAlertTests.length) {
+              uiState.selectedScamAlertId = scamAlertTests[0].id;
+            }
           }
         }}
       >
-        {tab === 'eip-support' ? 'EIP Support' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+        {tab === 'eip-support' ? 'EIP Support' : tab === 'scam-alerts' ? 'Scam Alerts' : tab === 'tx-simulations' ? 'Tx Simulations' : tab.charAt(0).toUpperCase() + tab.slice(1)}
       </button>
     {/each}
   </div>
@@ -611,6 +734,78 @@ Issued At: ${new Date().toISOString()}`;
               onclick={() => (uiState.selectedSigId = sig.id)}
             />
           {/each}
+        {:else if uiState.activeTab === 'app-isolation'}
+          <WalletTesterNavigationItem
+            title="eth_accounts"
+            description="Which accounts does the wallet expose?"
+            isSelected={uiState.appIsolationSubTab === 'eth-accounts'}
+            isCompleted={false}
+            onclick={() => { uiState.appIsolationSubTab = 'eth-accounts'; }}
+          />
+          <WalletTesterNavigationItem
+            title="wallet_connect"
+            description="ERC-7846 privacy-preserving connection"
+            isSelected={uiState.appIsolationSubTab === 'wallet-connect'}
+            isCompleted={false}
+            onclick={() => { uiState.appIsolationSubTab = 'wallet-connect'; }}
+          />
+        {:else if uiState.activeTab === 'tx-simulations'}
+          <WalletTesterNavigationItem
+            title="ERC-20 Mint"
+            description="Deterministic 100-token ERC-20 mint"
+            isSelected={uiState.txSimulationSubTab === 'erc20-mint'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc20-mint'; }}
+          />
+          <WalletTesterNavigationItem
+            title="ERC-721 Mint"
+            description="Deterministic single NFT mint"
+            isSelected={uiState.txSimulationSubTab === 'erc721-mint'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc721-mint'; }}
+          />
+          <WalletTesterNavigationItem
+            title="ERC-1155 Mint"
+            description="Deterministic single token mint"
+            isSelected={uiState.txSimulationSubTab === 'erc1155-mint'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'erc1155-mint'; }}
+          />
+          <WalletTesterNavigationItem
+            title="All Token Transfer"
+            description="Mints ERC-20, ERC-721, and ERC-1155 in one tx"
+            isSelected={uiState.txSimulationSubTab === 'all-token-transfer'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'all-token-transfer'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Misleading Selector"
+            description="transfer() selector that actually mints to caller"
+            isSelected={uiState.txSimulationSubTab === 'misleading-selector'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'misleading-selector'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Fake Airdrop"
+            description="Burns balance, emits fake mint event"
+            isSelected={uiState.txSimulationSubTab === 'fake-airdrop'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'fake-airdrop'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Volatile Outcome"
+            description="Mints or burns depending on block number"
+            isSelected={uiState.txSimulationSubTab === 'volatile-outcome'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'volatile-outcome'; }}
+          />
+          <WalletTesterNavigationItem
+            title="Failing Transaction"
+            description="Always reverts unconditionally"
+            isSelected={uiState.txSimulationSubTab === 'failing-transaction'}
+            isCompleted={false}
+            onclick={() => { uiState.txSimulationSubTab = 'failing-transaction'; }}
+          />
         {:else if uiState.activeTab === 'eip-support'}
           {#each testSteps as step, index (step.id)}
             {@const status = getStepStatus(step.id)}
@@ -629,6 +824,16 @@ Issued At: ${new Date().toISOString()}`;
                   stepTestState.currentStepIndex = index;
                 }
               }}
+            />
+          {/each}
+        {:else if uiState.activeTab === 'scam-alerts'}
+          {#each scamAlertTests as test (test.id)}
+            <WalletTesterNavigationItem
+              title={test.name}
+              description={test.description}
+              isSelected={uiState.selectedScamAlertId === test.id}
+              isCompleted={!!scamAlertState.hashes[test.id] || !!scamAlertState.signatures[test.id]}
+              onclick={() => (uiState.selectedScamAlertId = test.id)}
             />
           {/each}
         {/if}
@@ -667,6 +872,29 @@ Issued At: ${new Date().toISOString()}`;
           onReset={resetStepTests}
           onSelectProvider={(providerId: string) => { stepTestState.selectedProviderId = providerId; }}
         />
+      {:else if uiState.activeTab === 'scam-alerts'}
+        {@const selectedScamAlert = scamAlertTests.find((t) => t.id === uiState.selectedScamAlertId)}
+        <ScamAlertsTab
+          selectedTest={selectedScamAlert}
+          {scamAlertState}
+          disclaimerAccepted={scamAlertDisclaimer.accepted}
+          {account}
+          onAcceptDisclaimer={() => { scamAlertDisclaimer.accepted = true; }}
+          onSendScamAlert={handleSendScamAlert}
+          onSignScamAlert={handleSignScamAlert}
+          onOpenInExplorer={openInExplorer}
+        />
+      {:else if uiState.activeTab === 'app-isolation'}
+        <AppIsolationTab
+          activeSubTab={uiState.appIsolationSubTab}
+          provider={getProvider()}
+        />
+      {:else if uiState.activeTab === 'tx-simulations'}
+        <TransactionSimulationsTab
+          activeSubTab={uiState.txSimulationSubTab}
+          {account}
+          onSendTransaction={handleSendTransaction}
+        />
       {/if}
     </div>
   </div>
@@ -699,6 +927,7 @@ Issued At: ${new Date().toISOString()}`;
   <ErrorComponent error={transactionState.error} onClose={() => (transactionState.error = '')} />
   <ErrorComponent error={signatureState.error} onClose={() => (signatureState.error = '')} />
   <ErrorComponent error={stepTestState.error} onClose={() => (stepTestState.error = '')} />
+  <ErrorComponent error={scamAlertState.error} onClose={() => (scamAlertState.error = '')} />
 
   <!-- EIP Results Modal -->
   <EIPResultsModal
@@ -771,6 +1000,7 @@ Issued At: ${new Date().toISOString()}`;
     flex-direction: column;
     gap: 0.25rem;
   }
+
 
   .main-content {
     flex: 1;
