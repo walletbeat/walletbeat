@@ -30,6 +30,9 @@ export const phantom: SoftwareWallet = {
 		lastUpdated: '2025-02-08',
 		urls: {
 			docs: ['https://docs.phantom.com/'],
+			extensions: [
+				'https://chromewebstore.google.com/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa',
+			],
 			socials: {
 				instagram: 'https://www.instagram.com/phantom/',
 				linkedin: 'https://www.linkedin.com/company/phantomwallet/',
