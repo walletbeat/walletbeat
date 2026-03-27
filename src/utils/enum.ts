@@ -150,13 +150,3 @@ export function excludeFromEnum<E extends string, Excluded extends E>(
 		),
 	)
 }
-
-export function enumKey<T extends Record<string, string>>(enumObj: T, value: string): string {
-	for (const k in enumObj) {
-		if (enumObj[k] === value) {
-			return k
-		}
-	}
-
-	return value
-}
