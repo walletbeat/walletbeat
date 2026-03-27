@@ -1,7 +1,7 @@
 ![Privacy Hygiene](./cover.png)
 
 New Walletbeat attribute just dropped:
-General Privacy Hygiene 🧹
+General Privacy Hygiene 🧼
 
 This answers a simple but important question:
 
@@ -11,8 +11,8 @@ Does your wallet respect your privacy by default?
 
 Wallets handle sensitive context.
 
-They know which dapps you visit.
-They know which domains you connect to.
+They know which apps you visit.
+They can track your activity as you use the web and the wallet itself.
 
 If that data gets sent to external services without your knowledge, it's a privacy violation, not a feature.
 
@@ -31,18 +31,20 @@ The rating scale:
 
 ⚠️ Crash/error reports sent without consent.
 
-✅ No forbidden data by default. Analytics only run after you say yes.
+✅ No forbidden data by default. Analytics only run after you say yes. The wallet simply doesn't track the user.
 
 ---
 
 Why this matters:
 
-Privacy should be the default — not something you opt into.
+Privacy should be the default, not something you opt into.
 
-If your wallet is phoning home before you've agreed to anything, that's a problem.
+If your wallet reveals your personal information to other parties without your consent, that's a problem.
 
 ---
 
-Hardware wallets are exempt from this attribute.
+Hardware wallets are exempt from this attribute, as they are disconnected from the Internet by default.
 
-This check applies to software and embedded wallets that interact with web dapps and have the surface area to collect this kind of data.
+Software companion applications to hardware wallets are not exempt.
+
+https://x.com/sethforprivacy/status/1658544668433342494
