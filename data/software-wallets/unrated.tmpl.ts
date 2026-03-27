@@ -21,6 +21,7 @@ export const unratedTemplate: SoftwareWallet = {
 		lastUpdated: '2020-01-01',
 		urls: {
 			docs: ['https://example.com/docs'],
+			extensions: ['https://chromewebstore.google.com/detail/walletbeat/fake-extension'],
 			repositories: ['https://example.com/repo'],
 			socials: {
 				discord: 'https://discord.com/example',
