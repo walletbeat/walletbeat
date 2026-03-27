@@ -257,7 +257,19 @@ export const ambire: SoftwareWallet = {
 				tokenTransferTransactionGeneration:
 					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
 			}),
-			safe: notSupported,
+			safe: supported({
+				ref: {
+					explanation: 'Ambire Extension Now Supports Safe Accounts',
+					url: 'https://blog.ambire.com/ambire-supports-safe-accounts/',
+				},
+				canDeployNew: false,
+				controllingSharesInSelfCustodyByDefault: 'YES',
+				keyRotationTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+				supportedOwners: 'ANY_NUMBER_OF_SIGNERS',
+				supportsAddingOrRemovingSigners: false,
+				supportsKeyRotationWithoutModules: false,
+				tokenTransferTransactionGeneration: TransactionGenerationCapability.RELYING_ON_EXTERNAL_API,
+			}),
 		},
 		addressResolution: {
 			ref: refTodo,
