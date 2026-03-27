@@ -25,6 +25,7 @@ import { zeus } from './software-wallets/zeus'
 /** Set of all known software wallets. */
 export const softwareWallets = {
 	ambire,
+	baseApp,
 	bitget,
 	daimo,
 	elytro,
@@ -41,7 +42,6 @@ export const softwareWallets = {
 	rabby,
 	rainbow,
 	safe,
-	baseApp,
 	zerion,
 	zeus,
 }

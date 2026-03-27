@@ -82,7 +82,7 @@ export const baseApp: SoftwareWallet = {
 				suggestedBridging: notSupported,
 			},
 			crossChainBalances: {
-				ref: refTodo,
+				ref: refTodo, // Source: Base team responses via Fileverse questionnaire (Q7, Q8, Q9)
 				ether: supported({
 					ref: refTodo,
 					crossChainSumView: featureSupported,
@@ -134,6 +134,10 @@ export const baseApp: SoftwareWallet = {
 		},
 		multiAddress: null,
 		privacy: {
+			analytics: {
+				crashReports: null,
+				usage: null,
+			},
 			appIsolation: null,
 			dataCollection: null,
 			privacyPolicy: 'https://wallet.coinbase.com/dapp-privacy-policy',
