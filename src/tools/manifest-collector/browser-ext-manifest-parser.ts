@@ -23,42 +23,74 @@ function getStringArray(raw: unknown, key: string): string[] {
 	const obj = asObj(raw)
 
 	if (obj === undefined) {
-		return []
+		throw new Error(`Expected an object but got ${typeof raw}`)
 	}
 
 	const val = getProp(obj, key)
 
-	if (!Array.isArray(val)) {
+	if (val === undefined || val === null) {
 		return []
 	}
 
-	return val.filter((v): v is string => typeof v === 'string')
+	if (!Array.isArray(val)) {
+		throw new Error(`Expected ${JSON.stringify(key)} to be an array but got ${typeof val}`)
+	}
+
+	return val.map((v: unknown, i: number) => {
+		if (typeof v !== 'string') {
+			throw new Error(`Expected ${JSON.stringify(key)}[${i}] to be a string but got ${typeof v}`)
+		}
+
+		return v
+	})
 }
 
 function getObjectArray(raw: unknown, key: string): object[] {
 	const obj = asObj(raw)
 
 	if (obj === undefined) {
-		return []
+		throw new Error(`Expected an object but got ${typeof raw}`)
 	}
 
 	const val = getProp(obj, key)
 
-	if (!Array.isArray(val)) {
+	if (val === undefined || val === null) {
 		return []
 	}
 
-	return val.filter((v): v is object => typeof v === 'object' && v !== null && !Array.isArray(v))
+	if (!Array.isArray(val)) {
+		throw new Error(`Expected ${JSON.stringify(key)} to be an array but got ${typeof val}`)
+	}
+
+	return val.map((v: unknown, i: number) => {
+		if (typeof v !== 'object' || v === null || Array.isArray(v)) {
+			throw new Error(`Expected ${JSON.stringify(key)}[${i}] to be an object but got ${typeof v}`)
+		}
+
+		return v
+	})
 }
 
 function getMaybeObj(raw: unknown, key: string): object | undefined {
 	const obj = asObj(raw)
 
 	if (obj === undefined) {
+		throw new Error(`Expected an object but got ${typeof raw}`)
+	}
+
+	const val = getProp(obj, key)
+
+	if (val === undefined || val === null) {
 		return undefined
 	}
 
-	return asObj(getProp(obj, key))
+	const result = asObj(val)
+
+	if (result === undefined) {
+		throw new Error(`Expected ${JSON.stringify(key)} to be an object but got ${typeof val}`)
+	}
+
+	return result
 }
 
 /** Ordering of HostPermissionScope from least to most permissive. */
@@ -97,8 +129,7 @@ function classifyPattern(pattern: string): HostPermissionScope {
 		return HostPermissionScope.HTTPS_ONLY
 	}
 
-	// Unrecognized pattern — assume HTTPS only to avoid under-reporting
-	return HostPermissionScope.HTTPS_ONLY
+	throw new Error(`Unrecognized host permission pattern: ${JSON.stringify(pattern)}`)
 }
 
 function worstScopeOfPatterns(patterns: string[]): HostPermissionScope {
@@ -168,12 +199,20 @@ function parseWebAccessibleResources(raw: unknown): WebAccessibleResourcesScope 
 	const obj = asObj(raw)
 
 	if (obj === undefined) {
-		return WebAccessibleResourcesScope.NONE
+		throw new Error(`Expected an object but got ${typeof raw}`)
 	}
 
 	const war = getProp(obj, 'web_accessible_resources')
 
-	if (!Array.isArray(war) || war.length === 0) {
+	if (war === undefined || war === null) {
+		return WebAccessibleResourcesScope.NONE
+	}
+
+	if (!Array.isArray(war)) {
+		throw new Error(`Expected "web_accessible_resources" to be an array but got ${typeof war}`)
+	}
+
+	if (war.length === 0) {
 		return WebAccessibleResourcesScope.NONE
 	}
 
@@ -183,7 +222,15 @@ function parseWebAccessibleResources(raw: unknown): WebAccessibleResourcesScope 
 	}
 
 	// MV3: Array<{ resources, matches }> — check matches across all entries.
-	const entries = war.filter((e): e is object => typeof e === 'object' && e !== null)
+	const entries = war.map((e: unknown, i: number) => {
+		if (typeof e !== 'object' || e === null || Array.isArray(e)) {
+			throw new Error(
+				`Expected "web_accessible_resources"[${i}] to be an object but got ${typeof e}`,
+			)
+		}
+
+		return e
+	})
 	const allMatches = entries.flatMap(e => getStringArray(e, 'matches'))
 
 	if (allMatches.length === 0) {

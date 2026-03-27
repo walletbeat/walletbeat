@@ -17,7 +17,7 @@ const ANDROID_NS = 'http://schemas.android.com/apk/res/android'
  * encountered — add it to the `AndroidPermission` enum if it is security-relevant,
  * or explicitly ignore it there if not.
  */
-export function parseAndroidManifest(xmlText: string): AndroidPermission[] {
+export function parseAndroidManifest(xmlText: string): Set<AndroidPermission> {
 	const permissions = new Set<AndroidPermission>()
 
 	const doc = new DOMParser().parseFromString(xmlText, 'text/xml')
@@ -27,7 +27,9 @@ export function parseAndroidManifest(xmlText: string): AndroidPermission[] {
 		const name = elements[i].getAttributeNS(ANDROID_NS, 'name')
 
 		if (name === null) {
-			continue
+			throw new Error(
+				`<uses-permission> element at index ${i} is missing the android:name attribute`,
+			)
 		}
 
 		if (!androidPermissions.is(name)) {
@@ -40,7 +42,7 @@ export function parseAndroidManifest(xmlText: string): AndroidPermission[] {
 		permissions.add(name)
 	}
 
-	return [...permissions]
+	return permissions
 }
 
 /**
@@ -51,7 +53,7 @@ export function parseAndroidManifest(xmlText: string): AndroidPermission[] {
  * `IosUsageDescription` enum if it is security-relevant, or explicitly ignore
  * it there if not.
  */
-export function parseIosPlist(plistText: string): IosUsageDescription[] {
+export function parseIosPlist(plistText: string): Set<IosUsageDescription> {
 	const usageDescriptions = new Set<IosUsageDescription>()
 
 	const doc = new DOMParser().parseFromString(plistText, 'text/xml')
@@ -60,7 +62,11 @@ export function parseIosPlist(plistText: string): IosUsageDescription[] {
 	for (let i = 0; i < keyElements.length; i++) {
 		const text = keyElements[i].textContent
 
-		if (text === null || !/^NS\w+UsageDescription$/.test(text)) {
+		if (text === null) {
+			throw new Error(`<key> element at index ${i} has no text content`)
+		}
+
+		if (!/^NS\w+UsageDescription$/.test(text)) {
 			continue
 		}
 
@@ -74,5 +80,5 @@ export function parseIosPlist(plistText: string): IosUsageDescription[] {
 		usageDescriptions.add(text)
 	}
 
-	return [...usageDescriptions]
+	return usageDescriptions
 }
