@@ -1674,6 +1674,21 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'a592f1a22c5c28338d345d29591d4c48ccb25f26',
 		retrieved: '2026-03-19',
 	},
+	{
+		url: 'https://x.com/baseapp',
+		urlHash: 'a39919c5d5cc7eccb1da78806beb96ebffa3e2d3',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://farcaster.xyz/baseapp.base.eth',
+		urlHash: 'cc08ee93913fafa6cd1f796c8143244dc8cd27ea',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://base.app/',
+		urlHash: 'a8eaf246359dc850b9d97536ced50a7e577898b3',
+		retrieved: '2026-03-26',
+	},
 ]
 
 /**
