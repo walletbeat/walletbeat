@@ -1,35 +1,27 @@
 import { ren2140 } from '@/data/contributors/ren2140'
-import { AccountType, TransactionGenerationCapability } from '@/schema/features/account-support'
+import { AccountType } from '@/schema/features/account-support'
 import type { AddressResolutionData } from '@/schema/features/privacy/address-resolution'
 import { WalletProfile } from '@/schema/features/profile'
-import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
 import {
 	BugBountyPlatform,
 	BugBountyProgramAvailability,
 } from '@/schema/features/security/bug-bounty-program'
-import type {
-	ContractTransactionWarning,
-	ScamUrlWarning,
-} from '@/schema/features/security/scam-alerts'
+import type { ContractTransactionWarning } from '@/schema/features/security/scam-alerts'
 import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/transaction-submission'
 import { featureSupported, notSupported, supported } from '@/schema/features/support'
 import { comprehensiveFeesShownByDefault } from '@/schema/features/transparency/fee-display'
-import {
-	FOSSLicense,
-	LicensingType,
-	SourceNotAvailableLicense,
-} from '@/schema/features/transparency/license'
+import { LicensingType, SourceNotAvailableLicense } from '@/schema/features/transparency/license'
 import { refNotNecessary, refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
-export const theBaseApp: SoftwareWallet = {
+export const baseApp: SoftwareWallet = {
 	metadata: {
-		id: 'theBaseApp',
-		displayName: 'Base',
-		tableName: 'Base',
+		id: 'baseApp',
+		displayName: 'Base App',
+		tableName: 'Base App',
 		blurb: paragraph(`
 			Base is a secure onchain wallet and browser that puts you in
 			control of your crypto, NFTs, DeFi activity, and digital assets.
@@ -46,63 +38,28 @@ export const theBaseApp: SoftwareWallet = {
 			],
 			socials: {
 				discord: 'https://discord.com/invite/buildonbase',
-				farcaster: 'https://farcaster.xyz/base',
-				x: 'https://x.com/base',
+				farcaster: 'https://farcaster.xyz/baseapp.base.eth',
+				x: 'https://x.com/baseapp',
 			},
-			websites: ['https://wallet.coinbase.com/'],
+			websites: ['https://base.app/', 'https://wallet.coinbase.com/'],
 		},
 	},
 	features: {
 		accountSupport: {
-			defaultAccountType: AccountType.rawErc4337,
-			eip7702: supported({
-				ref: 'https://github.com/coinbase/smart-wallet',
-				contract: {
-					name: 'Coinbase Smart Wallet',
-					address: '0x0000000000000000000000000000000000000000',
-					eip7702Delegatable: true,
-					methods: {
-						isValidSignature: featureSupported,
-						validateUserOp: featureSupported,
-					},
-					sourceCode: {
-						ref: 'https://github.com/coinbase/smart-wallet',
-						available: true,
-					},
-				},
-			}),
+			defaultAccountType: AccountType.eoa,
+			eip7702: notSupported,
 			eoa: supported({
-				ref: 'https://github.com/coinbase/smart-wallet',
+				ref: 'https://help.coinbase.com/en/wallet/managing-account/wallet-recovery-phrase',
 				canExportPrivateKey: true,
 				keyDerivation: {
 					type: 'BIP32',
-					canExportSeedPhrase: false,
+					canExportSeedPhrase: true,
 					derivationPath: 'BIP44',
 					seedPhrase: 'BIP39',
 				},
 			}),
 			mpc: notSupported,
-			rawErc4337: supported({
-				ref: 'https://github.com/coinbase/smart-wallet',
-				contract: {
-					name: 'Coinbase Smart Wallet',
-					address: '0x0000000000000000000000000000000000000000',
-					eip7702Delegatable: false,
-					methods: {
-						isValidSignature: featureSupported,
-						validateUserOp: featureSupported,
-					},
-					sourceCode: {
-						ref: 'https://github.com/coinbase/smart-wallet',
-						available: true,
-					},
-				},
-				controllingSharesInSelfCustodyByDefault: 'YES',
-				keyRotationTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-				tokenTransferTransactionGeneration:
-					TransactionGenerationCapability.USING_OPEN_SOURCE_STANDALONE_APP,
-			}),
+			rawErc4337: notSupported,
 			safe: notSupported,
 		},
 		addressResolution: {
@@ -154,19 +111,15 @@ export const theBaseApp: SoftwareWallet = {
 			walletCall: null,
 		},
 		licensing: {
-			type: LicensingType.SEPARATE_CORE_CODE_LICENSE_VS_WALLET_CODE_LICENSE,
-			coreLicense: {
-				ref: 'https://github.com/coinbase/smart-wallet?tab=MIT-1-ov-file#readme',
-				license: FOSSLicense.MIT,
-			},
+			type: LicensingType.SINGLE_WALLET_REPO_AND_LICENSE,
 			walletAppLicense: {
 				ref: refNotNecessary,
 				license: SourceNotAvailableLicense.PROPRIETARY,
 			},
 		},
 		monetization: {
-			ref: refTodo,
-			revenueBreakdownIsPublic: false,
+			ref: 'https://www.sec.gov/edgar/browse/?CIK=0001679788',
+			revenueBreakdownIsPublic: true,
 			strategies: {
 				donations: null,
 				ecosystemGrants: null,
@@ -188,26 +141,7 @@ export const theBaseApp: SoftwareWallet = {
 		},
 		profile: WalletProfile.GENERIC,
 		security: {
-			accountRecovery: {
-				guardianRecovery: supported({
-					ref: refTodo,
-					minimumGuardianPolicy: {
-						type: GuardianPolicyType.SECRET_SPLIT_ACROSS_GUARDIANS,
-						descriptionMarkdown:
-							'The Base App offers a recovery key on ERC-4337 accounts, allowing users to retain full access to their account if they lose access to their primary keys.',
-						optionalGuardians: [
-							{
-								type: GuardianType.SELF_CUSTODY,
-								description: 'Recovery key generated by the user',
-							},
-						],
-						optionalGuardiansMinimumConfigurable: 1,
-						optionalGuardiansMinimumNeededForRecovery: 1,
-						requiredGuardians: [],
-						secretReconstitution: 'CLIENT_SIDE',
-					},
-				}),
-			},
+			accountRecovery: null,
 			bugBountyProgram: supported({
 				ref: 'https://hackerone.com/coinbase?type=team',
 				availability: BugBountyProgramAvailability.ACTIVE,
@@ -240,12 +174,7 @@ export const theBaseApp: SoftwareWallet = {
 					previousContractInteractionWarning: false,
 					recentContractWarning: true,
 				}),
-				scamUrlWarning: supported<ScamUrlWarning>({
-					ref: refTodo,
-					leaksIp: false,
-					leaksUserAddress: false,
-					leaksVisitedUrl: 'NO',
-				}),
+				scamUrlWarning: null,
 				sendTransactionWarning: notSupported,
 			},
 			transactionLegibility: null,
