@@ -38,11 +38,7 @@
 	},
 	"content_scripts": [
 		{
-			"matches": [
-				"file://*/*",
-				"http://*/*",
-				"https://*/*"
-			],
+			"matches": ["file://*/*", "http://*/*", "https://*/*"],
 			"js": [
 				"scripts/disable-console.js",
 				"scripts/lockdown-install.js",
@@ -54,25 +50,15 @@
 			"all_frames": true
 		},
 		{
-			"matches": [
-				"file://*/*",
-				"http://*/*",
-				"https://*/*"
-			],
-			"js": [
-				"scripts/inpage.js"
-			],
+			"matches": ["file://*/*", "http://*/*", "https://*/*"],
+			"js": ["scripts/inpage.js"],
 			"run_at": "document_start",
 			"world": "MAIN",
 			"all_frames": true
 		},
 		{
-			"matches": [
-				"*://connect.trezor.io/*/popup.html*"
-			],
-			"js": [
-				"vendor/trezor/content-script.js"
-			]
+			"matches": ["*://connect.trezor.io/*/popup.html*"],
+			"js": ["vendor/trezor/content-script.js"]
 		}
 	],
 	"default_locale": "en",
@@ -97,9 +83,7 @@
 	},
 	"manifest_version": 3,
 	"name": "__MSG_appName__",
-	"optional_permissions": [
-		"clipboardRead"
-	],
+	"optional_permissions": ["clipboardRead"],
 	"permissions": [
 		"activeTab",
 		"alarms",
@@ -115,9 +99,7 @@
 		"cookies"
 	],
 	"sandbox": {
-		"pages": [
-			"snaps/index.html"
-		]
+		"pages": ["snaps/index.html"]
 	},
 	"short_name": "__MSG_appName__",
 	"content_security_policy": {
@@ -128,13 +110,8 @@
 		"value": "same-origin-allow-popups"
 	},
 	"externally_connectable": {
-		"matches": [
-			"http://*/*",
-			"https://*/*"
-		],
-		"ids": [
-			"*"
-		]
+		"matches": ["http://*/*", "https://*/*"],
+		"ids": ["*"]
 	},
 	"minimum_chrome_version": "115",
 	"side_panel": {
