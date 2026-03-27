@@ -4,6 +4,7 @@ pragma solidity 0.8.24;
 import {WalletbeatTestContract} from "../src/WalletbeatTestContract.sol";
 import {WalletbeatTestErc20} from "../src/WalletbeatTestErc20.sol";
 import {WalletbeatTestErc721} from "../src/WalletbeatTestErc721.sol";
+import {WalletbeatTestErc1155} from "../src/WalletbeatTestErc1155.sol";
 import {DeployContract} from "../script/DeployContract.s.sol";
 import {Test} from "../lib/forge-std/src/Test.sol";
 
@@ -12,12 +13,13 @@ contract WalletbeatTest is Test {
     WalletbeatTestContract tc;
     WalletbeatTestErc20 erc20;
     WalletbeatTestErc721 erc721;
+    WalletbeatTestErc1155 erc1155;
     address tester;
 
     function setUp() external {
         tester = makeAddr("testerAddress");
         deployer = new DeployContract();
-        (tc, erc20, erc721) = deployer.run();
+        (tc, erc20, erc721, erc1155) = deployer.run();
     }
 
     function testSimulation() external {

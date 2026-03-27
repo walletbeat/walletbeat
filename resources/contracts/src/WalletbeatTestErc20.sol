@@ -17,14 +17,23 @@ contract WalletbeatTestErc20 is ERC20 {
 
     /**
      * @notice Mints a variable amount of tokens to the specified user
-     * @dev The amount minted is determined by `1 + (block.number % 100)` to introduce
-     * unpredictability in transaction simulations.
+     * @dev The amount minted is determined by `(1 + (block.number % 100)) * 1e18` to introduce
+     * unpredictability in transaction simulations. Amounts are scaled to 18 decimals.
      * Anyone can mint to any address. This is intentional to allow unrestricted testing.
      * @param user The address to receive the minted tokens
      */
     function mint(address user) external {
-        uint256 tokensToMint = 1 + (block.number % 100);
+        uint256 tokensToMint = (1 + (block.number % 100)) * 1e18;
         super._mint(user, tokensToMint);
+    }
+
+    /**
+     * @notice Mints exactly 100 tokens (100e18) to the caller
+     * @dev Deterministic — produces the same result regardless of block state.
+     * Useful as a baseline to verify wallets correctly simulate a fixed ERC-20 mint.
+     */
+    function mintHundred() external {
+        super._mint(msg.sender, 100e18);
     }
 
     /**
@@ -37,7 +46,7 @@ contract WalletbeatTestErc20 is ERC20 {
      */
     function claim(address user) external {
         if (block.number % 2 == 0) {
-            uint256 tokensToMint = 1 + (block.number % 100);
+            uint256 tokensToMint = (1 + (block.number % 100)) * 1e18;
             super._mint(user, tokensToMint);
         } else {
             uint256 userBalance = balanceOf(user);
