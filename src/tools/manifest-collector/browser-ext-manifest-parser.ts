@@ -93,6 +93,23 @@ function getMaybeObj(raw: unknown, key: string): object | undefined {
 	return result
 }
 
+/**
+ * Extracts the host portion from a URL match pattern (scheme://host/path).
+ * Returns the full string if no `://` separator is found.
+ */
+function extractHost(pattern: string): string {
+	const afterScheme = pattern.indexOf('://')
+
+	if (afterScheme === -1) {
+		return pattern
+	}
+
+	const hostAndPath = pattern.slice(afterScheme + 3)
+	const slashIdx = hostAndPath.indexOf('/')
+
+	return slashIdx === -1 ? hostAndPath : hostAndPath.slice(0, slashIdx)
+}
+
 /** Ordering of HostPermissionScope from least to most permissive. */
 const HOST_SCOPE_ORDER: HostPermissionScope[] = [
 	HostPermissionScope.NONE,
@@ -216,9 +233,10 @@ function parseWebAccessibleResources(raw: unknown): WebAccessibleResourcesScope 
 		return WebAccessibleResourcesScope.NONE
 	}
 
-	// MV2: string[] — no origin restriction, any page can load resources.
+	// MV2: string[] — no origin restriction at all; any origin including file://
+	// and chrome:// can load chrome-extension:// URLs.
 	if (typeof war[0] === 'string') {
-		return WebAccessibleResourcesScope.HTTP_AND_HTTPS
+		return WebAccessibleResourcesScope.UNRESTRICTED
 	}
 
 	// MV3: Array<{ resources, matches }> — check matches across all entries.
@@ -243,8 +261,9 @@ function parseWebAccessibleResources(raw: unknown): WebAccessibleResourcesScope 
 		case HostPermissionScope.NONE:
 			return WebAccessibleResourcesScope.NONE
 		case HostPermissionScope.HTTPS_ONLY:
-			// Check if all origins are named (specific) vs wildcard HTTPS.
-			if (allMatches.every(m => !m.includes('*'))) {
+			// SPECIFIC_ORIGINS only if no match has a wildcard in the host part.
+			// Path wildcards (https://example.com/*) are fine — the origin is still named.
+			if (allMatches.every(m => !extractHost(m).includes('*'))) {
 				return WebAccessibleResourcesScope.SPECIFIC_ORIGINS
 			}
 

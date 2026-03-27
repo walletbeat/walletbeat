@@ -168,7 +168,7 @@ if (walletId !== undefined) {
 
 		fs.writeFileSync(
 			androidParsedPath,
-			JSON.stringify({ usesPermissions: permissions }, null, '\t') + '\n',
+			JSON.stringify({ usesPermissions: [...permissions] }, null, '\t') + '\n',
 		)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, androidParsedPath)}\n`)
 	}
@@ -185,7 +185,10 @@ if (walletId !== undefined) {
 		const usageDescriptions = parseIosPlist(plistText)
 		const iosParsedPath = path.join(manifestDir, 'ios.parsed.json')
 
-		fs.writeFileSync(iosParsedPath, JSON.stringify({ usageDescriptions }, null, '\t') + '\n')
+		fs.writeFileSync(
+			iosParsedPath,
+			JSON.stringify({ usageDescriptions: [...usageDescriptions] }, null, '\t') + '\n',
+		)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, iosParsedPath)}\n`)
 	}
 }
