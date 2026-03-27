@@ -1665,16 +1665,6 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-19',
 	},
 	{
-		url: 'https://farcaster.xyz/base',
-		urlHash: 'c4d129cf4d4fc6dac86aa2bba31eec168e0e8947',
-		retrieved: '2026-03-19',
-	},
-	{
-		url: 'https://x.com/base',
-		urlHash: 'cc53d9f00d04c138fa545871c29393f862424dc9',
-		retrieved: '2026-03-19',
-	},
-	{
 		url: 'https://github.com/coinbase/smart-wallet?tab=MIT-1-ov-file#readme',
 		urlHash: '8119b2bc589fe66086aa351421005960bc87e091',
 		retrieved: '2026-03-19',
@@ -1683,6 +1673,31 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://hackerone.com/coinbase?type=team',
 		urlHash: 'a592f1a22c5c28338d345d29591d4c48ccb25f26',
 		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://www.coinbase.com/legal/privacy',
+		urlHash: 'e7e547666e73bda19d1e1674837c300dad6954e7',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://x.com/baseapp',
+		urlHash: 'a39919c5d5cc7eccb1da78806beb96ebffa3e2d3',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://farcaster.xyz/baseapp.base.eth',
+		urlHash: 'cc08ee93913fafa6cd1f796c8143244dc8cd27ea',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://base.app/',
+		urlHash: 'a8eaf246359dc850b9d97536ced50a7e577898b3',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://www.sec.gov/edgar/browse/?CIK=0001679788',
+		urlHash: '33c72e3f54a957dbb0821b1b6d1d3fd708a0d6a8',
+		retrieved: '2026-03-26',
 	},
 ]
 
@@ -1702,6 +1717,8 @@ const URLS_TO_SKIP = [
 	'tiktok.com',
 	'web3.bitget.com',
 	'gridplus.io',
+	'coinbase.com',
+	'sec.gov',
 ]
 
 const newValidUrls: string[] = []

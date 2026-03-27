@@ -1,6 +1,7 @@
 import { type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { ambire } from './software-wallets/ambire'
+import { baseApp } from './software-wallets/base-app'
 import { bitget } from './software-wallets/bitget'
 import { daimo } from './software-wallets/daimo'
 import { elytro } from './software-wallets/elytro'
@@ -17,7 +18,6 @@ import { pillarx } from './software-wallets/pillarx'
 import { rabby } from './software-wallets/rabby'
 import { rainbow } from './software-wallets/rainbow'
 import { safe } from './software-wallets/safe'
-import { theBaseApp } from './software-wallets/the-base-app'
 import { unratedTemplate as unratedSoftwareTemplate } from './software-wallets/unrated.tmpl'
 import { zerion } from './software-wallets/zerion'
 import { zeus } from './software-wallets/zeus'
@@ -41,7 +41,7 @@ export const softwareWallets = {
 	rabby,
 	rainbow,
 	safe,
-	theBaseApp,
+	baseApp,
 	zerion,
 	zeus,
 }
