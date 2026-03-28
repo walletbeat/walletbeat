@@ -840,6 +840,7 @@ ol {
 
 	> li,
 	> [data-list-item] {
+		position: relative;
 		--listItem-gap: 0.25lh;
 
 		&[data-list-item~='gap-0'] {
