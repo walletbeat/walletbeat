@@ -21,9 +21,8 @@ if [[ -z "${OMNIPIN_PK:-}" ]]; then
 fi
 
 DIRECTORY_CID="$(pnpm omnipin pack --only-hash "$DEPLOY_DIRECTORY")"
-SUBCOMMAND="${BLUMEN_OR_OMNIPIN:-blumen}"
 if [[ "${SKIP_HELIOS:-false}" == true ]]; then
-	exec pnpm "$SUBCOMMAND" ens "$DIRECTORY_CID" "$ENS_DOMAIN"
+	exec pnpm omnipin ens "$DIRECTORY_CID" "$ENS_DOMAIN"
 else
-	exec pnpm helios:wrap pnpm "$SUBCOMMAND" ens --rpc-url='$HELIOS_RPC_ENDPOINT' "$DIRECTORY_CID" "$ENS_DOMAIN"
+	exec pnpm helios:wrap pnpm omnipin ens --rpc-url='$HELIOS_RPC_ENDPOINT' "$DIRECTORY_CID" "$ENS_DOMAIN"
 fi

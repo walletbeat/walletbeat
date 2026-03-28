@@ -1650,10 +1650,50 @@ const knownValidUrls: KnownValidUrl[] = [
 		retrieved: '2026-03-23',
 	},
 	{
+		url: 'https://docs.base.org/get-started/base',
+		urlHash: '81a4a84e30d05861b1624b1db0d00d53c940f3f1',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/coinbase/smart-wallet',
+		urlHash: 'bc3738927c2f5aa60b5815802d8011fdf7ffb3fa',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://github.com/base/account-sdk',
+		urlHash: 'f43270328de1d0f2cc596d9680f994c5fd396ba8',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://discord.com/invite/buildonbase',
+		urlHash: 'e4e34d04b084b64f573c559eabe6f5c78bf9a480',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://hackerone.com/coinbase?type=team',
+		urlHash: 'a592f1a22c5c28338d345d29591d4c48ccb25f26',
+		retrieved: '2026-03-19',
+	},
+	{
+		url: 'https://x.com/baseapp',
+		urlHash: 'a39919c5d5cc7eccb1da78806beb96ebffa3e2d3',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://farcaster.xyz/baseapp.base.eth',
+		urlHash: 'cc08ee93913fafa6cd1f796c8143244dc8cd27ea',
+		retrieved: '2026-03-26',
+	},
+	{
+		url: 'https://base.app/',
+		urlHash: 'a8eaf246359dc850b9d97536ced50a7e577898b3',
+		retrieved: '2026-03-26',
+	},
+	{
 		url: 'https://blog.ambire.com/ambire-supports-safe-accounts/',
 		urlHash: 'c89f9bd364380a9ffd5ff2e7f453e0220296d1d9',
 		retrieved: '2026-03-27',
-	},
+	}
 ]
 
 /**
@@ -1672,6 +1712,8 @@ const URLS_TO_SKIP = [
 	'tiktok.com',
 	'web3.bitget.com',
 	'gridplus.io',
+	'coinbase.com',
+	'sec.gov',
 ]
 
 const newValidUrls: string[] = []

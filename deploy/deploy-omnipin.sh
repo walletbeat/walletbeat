@@ -12,4 +12,4 @@ if [[ -z "${DEPLOY_DIRECTORY:-}" ]]; then
 	exit 1
 fi
 
-pnpm omnipin deploy --strict "${DEPLOY_DIRECTORY}"
+pnpm omnipin deploy --strict --verbose --providers=Filecoin --filecoin-chain=mainnet --filecoin-force-new-dataset "${DEPLOY_DIRECTORY}"
