@@ -1689,6 +1689,11 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'a8eaf246359dc850b9d97536ced50a7e577898b3',
 		retrieved: '2026-03-26',
 	},
+	{
+		url: 'https://blog.ambire.com/ambire-supports-safe-accounts/',
+		urlHash: 'c89f9bd364380a9ffd5ff2e7f453e0220296d1d9',
+		retrieved: '2026-03-27',
+	}
 ]
 
 /**
