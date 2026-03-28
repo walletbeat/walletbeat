@@ -25,13 +25,16 @@ Walletbeat evaluates wallets on two dimensions:
 
 ---
 
-The rating scale:
+Rating scale:
 
-❌ Sends browsing history or connected domains without consent, or uses product analytics without asking first.
+❌ Sends browsing history without consent, or uses product usage analytics without asking first.
 
-⚠️ Crash/error reports sent without consent.
+⚠️ Only crash/error reports sent without consent.
 
-✅ No forbidden data by default. Analytics only run after you say yes. The wallet simply doesn't track the user.
+✅ Doesn't send sensitive data by default.
+
+Or, of course, you know:
+✅ The wallet simply doesn't track the user.
 
 ---
 
