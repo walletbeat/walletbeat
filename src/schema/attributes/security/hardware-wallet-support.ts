@@ -26,13 +26,10 @@ export type HardwareWalletSupportMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
 }
 
-type _EvaluationContext = EvaluationContext<HardwareWalletSupportMetadata>
-type _Evaluation = Evaluation<HardwareWalletSupportMetadata>
-
 function noHardwareWalletSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<HardwareWalletSupportMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): _Evaluation {
+): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
 		outcome: {
 			id: 'no_hardware_wallet_support',
@@ -56,9 +53,9 @@ function noHardwareWalletSupport(
 }
 
 function indirectHardwareWalletSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<HardwareWalletSupportMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): _Evaluation {
+): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
 		outcome: {
 			id: 'indirect_hardware_wallet_support',
@@ -88,9 +85,9 @@ function indirectHardwareWalletSupport(
 }
 
 function directHardwareWalletSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<HardwareWalletSupportMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): _Evaluation {
+): Evaluation<HardwareWalletSupportMetadata> {
 	return ctx.build({
 		outcome: {
 			id: 'direct_hardware_wallet_support',
@@ -194,7 +191,9 @@ export const hardwareWalletSupport: Attribute<HardwareWalletSupportMetadata> = {
 			),
 		],
 	},
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	evaluate: (
+		ctx: EvaluationContext<HardwareWalletSupportMetadata>,
+	): Evaluation<HardwareWalletSupportMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivial self-test.
 
 		// If this is a hardware wallet, mark as exempt since hardware wallets inherently support themselves

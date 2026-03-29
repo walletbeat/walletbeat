@@ -28,9 +28,6 @@ export type HardwareWalletInteroperabilityMetadata = {
 	hardwareWalletSupport: HardwareWalletSupport
 }
 
-type _EvaluationContext = EvaluationContext<HardwareWalletInteroperabilityMetadata>
-type _Evaluation = Evaluation<HardwareWalletInteroperabilityMetadata>
-
 const majorHardwareWalletManufacturers: NonEmptyArray<HardwareWalletType> = [
 	HardwareWalletType.LEDGER,
 	HardwareWalletType.TREZOR,
@@ -67,9 +64,9 @@ function extraWalletsThroughWalletConnectText(
 }
 
 function singleHardwareWalletManufacturerSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<HardwareWalletInteroperabilityMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): _Evaluation {
+): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
 			id: 'single_hardware_wallet_support',
@@ -95,9 +92,9 @@ ${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 }
 
 function insufficientHardwareWalletManufacturerSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<HardwareWalletInteroperabilityMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): _Evaluation {
+): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
 			id: 'insufficient_hardware_wallet_interoperability',
@@ -119,9 +116,9 @@ ${extraWalletsThroughWalletConnectText(hardwareWalletSupport)}`),
 }
 
 function comprehensiveHardwareWalletSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<HardwareWalletInteroperabilityMetadata>,
 	hardwareWalletSupport: HardwareWalletSupport,
-): _Evaluation {
+): Evaluation<HardwareWalletInteroperabilityMetadata> {
 	return ctx.build({
 		outcome: {
 			id: 'comprehensive_hardware_wallet_interoperability',
@@ -277,7 +274,9 @@ export const hardwareWalletInteroperability: Attribute<HardwareWalletInteroperab
 			),
 		],
 	},
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	evaluate: (
+		ctx: EvaluationContext<HardwareWalletInteroperabilityMetadata>,
+	): Evaluation<HardwareWalletInteroperabilityMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-test obvious.
 
 		if (ctx.features.type === WalletType.HARDWARE) {

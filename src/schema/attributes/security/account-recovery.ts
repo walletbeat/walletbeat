@@ -44,13 +44,10 @@ export type AccountRecoveryMetadata = {
 	outcomes: NonEmptyArray<GuardianScenarioOutcome<GuardianScenarioType>> | null
 }
 
-type _EvaluationContext = EvaluationContext<AccountRecoveryMetadata>
-type _Evaluation = Evaluation<AccountRecoveryMetadata>
-
 function evaluateGuardianRecoveryPolicy(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	guardianPolicy: GuardianPolicy,
-): _Evaluation {
+): Evaluation<AccountRecoveryMetadata> {
 	const outcomes = evaluateAllGuardianScenarios(guardianPolicy)
 
 	if (!isNonEmptyArray(outcomes)) {
@@ -121,9 +118,9 @@ function evaluateGuardianRecoveryPolicy(
 }
 
 function evaluateAccountRecovery(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<AccountRecoveryMetadata>,
 	accountRecovery: AccountRecovery,
-): _Evaluation {
+): Evaluation<AccountRecoveryMetadata> {
 	if (isSupported(accountRecovery.guardianRecovery)) {
 		return evaluateGuardianRecoveryPolicy(
 			ctx,
@@ -330,7 +327,9 @@ export const accountRecovery: Attribute<AccountRecoveryMetadata> = {
 			),
 		],
 	},
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	evaluate: (
+		ctx: EvaluationContext<AccountRecoveryMetadata>,
+	): Evaluation<AccountRecoveryMetadata> => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 
 		if (ctx.features.security.accountRecovery === null) {

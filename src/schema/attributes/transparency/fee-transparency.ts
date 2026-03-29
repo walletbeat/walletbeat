@@ -297,13 +297,10 @@ export type FeeTransparencyMetadata = {
 	worstFeeDisplay: WorstFeeDisplay | null
 }
 
-type _EvaluationContext = EvaluationContext<FeeTransparencyMetadata>
-type _Evaluation = Evaluation<FeeTransparencyMetadata>
-
 function evaluateWorstFeeDisplay(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<FeeTransparencyMetadata>,
 	worstFeeDisplay: WorstFeeDisplay,
-): _Evaluation {
+): Evaluation<FeeTransparencyMetadata> {
 	ctx.addRef(worstFeeDisplay.references)
 	const worstFeeTypesMarkdown = (indent: string): string =>
 		markdownListFormat(nonEmptyMap(worstFeeDisplay.feeTypes, feeTypeDescription), {
@@ -578,7 +575,9 @@ export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 			),
 		],
 	},
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	evaluate: (
+		ctx: EvaluationContext<FeeTransparencyMetadata>,
+	): Evaluation<FeeTransparencyMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable in UI.
 		const feeTransparencyData: FeeTransparency = extractFeeTransparency(ctx.features)
 		const worstFeeDisplay = computeWorstFees(feeTransparencyData)

@@ -42,10 +42,6 @@ export type ScamPreventionMetadata =
 	  }
 	| { scamAlerts: null }
 
-type _EvaluationContext = EvaluationContext<ScamPreventionMetadata>
-type _Evaluation = Evaluation<ScamPreventionMetadata>
-type _EvaluationScaffold = EvaluationScaffold<ScamPreventionMetadata>
-
 function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	feature: 'sendTransactionWarning'
 } {
@@ -171,10 +167,10 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 }
 
 function evaluateScamAlerts(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<ScamPreventionMetadata>,
 	walletProfile: WalletProfile,
 	scamAlerts: ScamAlerts,
-): _Evaluation {
+): Evaluation<ScamPreventionMetadata> {
 	const sendTransactionWarning = rateSendTransactionWarning(scamAlerts)
 	const contractTransactionWarning = rateContractTransactionWarning(scamAlerts)
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
@@ -196,7 +192,7 @@ function evaluateScamAlerts(
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
 
 	type NonNullScamPreventionMetadataScaffold = Exclude<
-		_EvaluationScaffold['outcome'],
+		EvaluationScaffold<ScamPreventionMetadata>['outcome'],
 		{ metadata: { scamAlerts: null } }
 	>
 
@@ -579,7 +575,9 @@ export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 			),
 		),
 	},
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	evaluate: (
+		ctx: EvaluationContext<ScamPreventionMetadata>,
+	): Evaluation<ScamPreventionMetadata> => {
 		ctx.setVerifiability(
 			verifiabilityRequiresSourceCodeAccess({
 				coreOnlyIsSufficient: true,

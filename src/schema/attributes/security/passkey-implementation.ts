@@ -14,8 +14,6 @@ export type PasskeyImplementationMetadata = {
 	libraryUrl?: string
 }
 
-type _EvaluationContext = EvaluationContext<PasskeyImplementationMetadata>
-
 const noPasskeyImplementation: (typeof passkeyImplementation)['evaluate'] = ctx =>
 	ctx.build({
 		outcome: {
@@ -37,7 +35,10 @@ const noPasskeyImplementation: (typeof passkeyImplementation)['evaluate'] = ctx 
 		),
 	})
 
-function otherPasskeyImplementation(ctx: _EvaluationContext, support: PasskeyVerificationSupport) {
+function otherPasskeyImplementation(
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
+	support: PasskeyVerificationSupport,
+) {
 	return ctx.build({
 		outcome: {
 			id: 'other_passkey_implementation',
@@ -61,7 +62,7 @@ function otherPasskeyImplementation(ctx: _EvaluationContext, support: PasskeyVer
 }
 
 function freshCryptoLibImplementation(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
 ) {
 	return ctx.build({
@@ -90,7 +91,7 @@ function freshCryptoLibImplementation(
 }
 
 function smoothCryptoLibImplementation(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
 ) {
 	return ctx.build({
@@ -117,7 +118,7 @@ function smoothCryptoLibImplementation(
 }
 
 function daimoP256VerifierImplementation(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
 ) {
 	return ctx.build({
@@ -144,7 +145,7 @@ function daimoP256VerifierImplementation(
 }
 
 function openZeppelinP256VerifierImplementation(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
 	support: PasskeyVerificationSupport,
 ) {
 	return ctx.build({
@@ -170,7 +171,10 @@ function openZeppelinP256VerifierImplementation(
 	})
 }
 
-function webAuthnSolImplementation(ctx: _EvaluationContext, support: PasskeyVerificationSupport) {
+function webAuthnSolImplementation(
+	ctx: EvaluationContext<PasskeyImplementationMetadata>,
+	support: PasskeyVerificationSupport,
+) {
 	return ctx.build({
 		outcome: {
 			id: 'web_authn_sol_implementation',

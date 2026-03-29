@@ -19,9 +19,6 @@ import type {
 } from '../../features/privacy/address-resolution'
 import { pickWorstRating, unrated } from '../common'
 
-type _EvaluationContext = EvaluationContext<AddressResolutionMetadata>
-type _Evaluation = Evaluation<AddressResolutionMetadata>
-
 export type AddressResolutionMetadata = {
 	addressResolution?: AddressResolution<Support<AddressResolutionData>>
 }
@@ -71,9 +68,9 @@ function getOffchainProviderInfo(
 }
 
 function evaluateAddressResolution(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<AddressResolutionMetadata>,
 	addressResolution: AddressResolution<Support<AddressResolutionData>>,
-): _Evaluation {
+): Evaluation<AddressResolutionMetadata> {
 	const chainSpecificERCs: NonEmptyArray<[Eip, Support<AddressResolutionData>, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
@@ -433,7 +430,9 @@ export const addressResolution: Attribute<AddressResolutionMetadata> = {
 			),
 		),
 	},
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	evaluate: (
+		ctx: EvaluationContext<AddressResolutionMetadata>,
+	): Evaluation<AddressResolutionMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivially self-testable.
 
 		if (ctx.features.addressResolution === null) {

@@ -22,9 +22,6 @@ export type SecurityAuditsMetadata = {
 	securityAudits: SecurityAudit[]
 }
 
-type _EvaluationContext = EvaluationContext<SecurityAuditsMetadata>
-type _Evaluation = Evaluation<SecurityAuditsMetadata>
-
 const noAudits: (typeof securityAudits)['evaluate'] = ctx =>
 	ctx.build({
 		outcome: {
@@ -40,18 +37,18 @@ const noAudits: (typeof securityAudits)['evaluate'] = ctx =>
 	})
 
 function audited(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<SecurityAuditsMetadata>,
 	audits: NonEmptyArray<SecurityAudit>,
 	auditedInLastYear: boolean,
 	hasUnaddressedFlaws: boolean,
-): _Evaluation {
+): Evaluation<SecurityAuditsMetadata> {
 	ctx.addRef(...audits)
 
 	const { rating, displayName, shortExplanation, howToImprove } = ((): Pick<
-		_Evaluation['outcome'],
+		Evaluation<SecurityAuditsMetadata>['outcome'],
 		'rating' | 'displayName' | 'shortExplanation'
 	> & {
-		howToImprove: _Evaluation['howToImprove']
+		howToImprove: Evaluation<SecurityAuditsMetadata>['howToImprove']
 	} => {
 		if (!auditedInLastYear && hasUnaddressedFlaws) {
 			return {
@@ -223,7 +220,9 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 			),
 		],
 	},
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	evaluate: (
+		ctx: EvaluationContext<SecurityAuditsMetadata>,
+	): Evaluation<SecurityAuditsMetadata> => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
 				referenceCountsAs: Verifiability.VERIFIABLE,
@@ -264,7 +263,7 @@ export const securityAudits: Attribute<SecurityAuditsMetadata> = {
 
 		return audited(ctx, audits, auditedInLastYear, hasUnaddressedFlaws)
 	},
-	aggregate: (perVariant: AtLeastOneVariant<_Evaluation>) => {
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation<SecurityAuditsMetadata>>) => {
 		const worstEvaluation = pickWorstRating<SecurityAuditsMetadata>(perVariant)
 		const allAudits: SecurityAudit[] = []
 		const auditsIdSet = new Set<string>()

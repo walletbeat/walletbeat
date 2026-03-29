@@ -55,10 +55,6 @@ export type PrivateTransfersMetadata = {
 	perTechnology: Map<PrivateTransferTechnology, PrivateTransfersPrivacyLevels>
 }
 
-type _EvaluationContext = EvaluationContext<PrivateTransfersMetadata>
-type _Evaluation = Evaluation<PrivateTransfersMetadata>
-type _EvaluationScaffold = EvaluationScaffold<PrivateTransfersMetadata>
-
 function singleTechnology<V>(
 	tech: PrivateTransferTechnology,
 	value: V,
@@ -111,10 +107,10 @@ export function worstPrivateTransfersPrivacyLevel(
 }
 
 function mergeEvaluations(
-	ctx: _EvaluationContext,
-	eval1: _EvaluationScaffold | null,
-	eval2: _EvaluationScaffold,
-): _EvaluationScaffold {
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
+	eval1: EvaluationScaffold<PrivateTransfersMetadata> | null,
+	eval2: EvaluationScaffold<PrivateTransfersMetadata>,
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	if (eval1 === null) {
 		return eval2
 	}
@@ -282,9 +278,9 @@ const nonDefault: (typeof privateTransfers)['evaluate'] = ctx =>
 	})
 
 function rateStealthAddressSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
 	stealthAddresses: Supported<StealthAddressSupport>,
-): _EvaluationScaffold {
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	ctx.addRef(
 		stealthAddresses,
 		stealthAddresses.recipientAddressResolution,
@@ -649,9 +645,9 @@ function rateStealthAddressSupport(
 }
 
 function rateTornadoCashNovaSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
 	tornadoCashNova: Supported<TornadoCashNovaSupport>,
-): _EvaluationScaffold {
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	ctx.addRef(tornadoCashNova)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -924,9 +920,9 @@ function rateTornadoCashNovaSupport(
 }
 
 function ratePrivacyPoolsSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
 	privacyPools: Supported<PrivacyPoolsSupport>,
-): _EvaluationScaffold {
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	ctx.addRef(privacyPools)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -1292,9 +1288,9 @@ function ratePrivacyPoolsSupport(
 }
 
 function rateRailgunSupport(
-	ctx: _EvaluationContext,
+	ctx: EvaluationContext<PrivateTransfersMetadata>,
 	railgun: Supported<RailgunSupport>,
-): _EvaluationScaffold {
+): EvaluationScaffold<PrivateTransfersMetadata> {
 	ctx.addRef(railgun)
 	const extraNotes: MarkdownParagraph<WalletNameStrings>[] = []
 	const { sendingPrivacy, sendingDetails, sendingImprovements } = ((): {
@@ -1703,7 +1699,9 @@ function rateRailgunSupport(
 	}
 }
 
-function build(scaffold: _EvaluationScaffold): _Evaluation {
+function build(
+	scaffold: EvaluationScaffold<PrivateTransfersMetadata>,
+): Evaluation<PrivateTransfersMetadata> {
 	return EvaluationContext.forTest(() => privateTransfers).build(scaffold)
 }
 
@@ -1991,7 +1989,9 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 			),
 		],
 	},
-	evaluate: (ctx: _EvaluationContext): _Evaluation => {
+	evaluate: (
+		ctx: EvaluationContext<PrivateTransfersMetadata>,
+	): Evaluation<PrivateTransfersMetadata> => {
 		// Verifying that private transfers are available in the UI is one thing,
 		// but verifying that the implementation is actually privacy-preserving
 		// (e.g. doesn't snitch on the user by periodically phoning home with data
@@ -2006,13 +2006,16 @@ export const privateTransfers: Attribute<PrivateTransfersMetadata> = {
 			})
 		}
 
-		let evaluation: _EvaluationScaffold | null = null
+		let evaluation: EvaluationScaffold<PrivateTransfersMetadata> | null = null
 		let atLeastOneTechnologySupported = false
 
 		const maybeEvaluateTechnology = <T extends object>(
 			support: Support<T>,
-			evaluate: (ctx: _EvaluationContext, supported: Supported<T>) => _EvaluationScaffold,
-		): _EvaluationScaffold | null => {
+			evaluate: (
+				ctx: EvaluationContext<PrivateTransfersMetadata>,
+				supported: Supported<T>,
+			) => EvaluationScaffold<PrivateTransfersMetadata>,
+		): EvaluationScaffold<PrivateTransfersMetadata> | null => {
 			if (!isSupported(support)) {
 				return null
 			}
