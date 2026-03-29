@@ -33,11 +33,11 @@
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
 {:else}
-	{@const successfulOutcomes = metadata.outcomes.filter(o =>
-		isAccountRecoverable(o.recovery),
+	{@const successfulOutcomes = metadata.outcomes.filter(outcome =>
+		isAccountRecoverable(outcome.recovery),
 	)}
 	{@const failedOutcomes = metadata.outcomes.filter(
-		o => !isAccountRecoverable(o.recovery),
+		outcome => !isAccountRecoverable(outcome.recovery),
 	)}
 	<Typography
 		content={{
