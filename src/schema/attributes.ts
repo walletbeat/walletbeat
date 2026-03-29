@@ -389,6 +389,16 @@ export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = null>
 }
 
 /**
+ * Detail views that reuse evaluation fields and take `metadata` instead of a full `outcome`.
+ */
+export type EvaluationDetailProps<
+	_OutcomeMetadata extends object,
+	_AttributeGroupId extends string = string,
+> = Omit<EvaluationData<_OutcomeMetadata, _AttributeGroupId>, 'outcome'> & {
+	metadata: _OutcomeMetadata
+}
+
+/**
  * Evaluation is the result of evaluating how well a specific wallet fulfills
  * an attribute. Unlike Outcome, an Evaluation is wallet-specific.
  */
