@@ -85,7 +85,7 @@ export const firmware: Attribute<FirmwareMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating(perVariant),
+	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({
