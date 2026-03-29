@@ -10,15 +10,15 @@ function isSampleEvaluation(e: unknown): e is Evaluation<OutcomeMetadata> {
 		return false
 	}
 
-	const v = (e as { outcome: unknown }).outcome
+	const outcome = (e as { outcome: unknown }).outcome
 
 	return (
-		typeof v === 'object' &&
-		v !== null &&
-		'id' in v &&
-		'rating' in v &&
-		typeof (v as { id: unknown }).id === 'string' &&
-		(v as { rating: unknown }).rating !== undefined
+		typeof outcome === 'object' &&
+		outcome !== null &&
+		'id' in outcome &&
+		'rating' in outcome &&
+		typeof (outcome as { id: unknown }).id === 'string' &&
+		(outcome as { rating: unknown }).rating !== undefined
 	)
 }
 
