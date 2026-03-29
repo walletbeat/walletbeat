@@ -48,19 +48,19 @@ export const reputation: Attribute<ReputationMetadata> = {
 		pass: [
 			exampleRating(
 				sentence('The wallet passes most reputation sub-criteria.'),
-				v => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The wallet passes some reputation sub-criteria.'),
-				v => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The wallet fails most or all reputation sub-criteria.'),
-				v => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},

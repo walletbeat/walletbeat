@@ -45,13 +45,13 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 				sentence(
 					'The hardware wallet passes all hardware privacy sub-criteria: No phoning home, inspectable remote calls, and encrypted wireless communication.',
 				),
-				v => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some hardware privacy sub-criteria.'),
-				v => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
@@ -59,7 +59,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 				sentence(
 					'The hardware wallet fails all hardware privacy sub-criteria: Device leaks privacy in all aspects.',
 				),
-				v => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},

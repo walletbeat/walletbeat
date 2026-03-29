@@ -85,19 +85,19 @@ export const userSafety: Attribute<UserSafetyMetadata> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes 11 or more user safety sub-criteria.'),
-				v => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes 6 to 10 user safety sub-criteria.'),
-				v => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet passes 5 or fewer user safety sub-criteria.'),
-				v => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},

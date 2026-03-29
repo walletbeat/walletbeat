@@ -81,19 +81,19 @@ export const supplyChainFactory: Attribute<SupplyChainFactoryMetadata> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes all factory supply chain sub-criteria.'),
-				v => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some factory supply chain sub-criteria.'),
-				v => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet fails most or all factory supply chain sub-criteria.'),
-				v => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},

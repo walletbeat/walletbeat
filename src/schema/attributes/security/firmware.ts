@@ -69,19 +69,19 @@ export const firmware: Attribute<FirmwareMetadata> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes most firmware sub-criteria.'),
-				v => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some firmware sub-criteria.'),
-				v => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet fails most or all firmware sub-criteria.'),
-				v => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},

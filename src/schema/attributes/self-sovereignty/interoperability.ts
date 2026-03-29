@@ -37,19 +37,19 @@ export const interoperability: Attribute<InteroperabilityMetadata> = {
 		pass: [
 			exampleRating(
 				sentence('The wallet passes both interoperability sub-criteria.'),
-				v => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The wallet passes one interoperability sub-criteria.'),
-				v => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The wallet fails one or both interoperability sub-criteria.'),
-				v => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},
