@@ -1,0 +1,81 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"manifest_version": 3,
+	"name": "Phantom",
+	"description": "A crypto wallet reimagined for DeFi & NFTs",
+	"action": {
+		"default_popup": "popup.html",
+		"default_title": "Phantom"
+	},
+	"icons": {
+		"16": "icon16.png",
+		"48": "icon48.png",
+		"128": "icon128.png",
+		"512": "icon512.png"
+	},
+	"content_scripts": [
+		{
+			"matches": ["file://*/*", "http://*/*", "https://*/*"],
+			"js": ["solana.js", "phantom.js"],
+			"run_at": "document_start",
+			"all_frames": true,
+			"world": "MAIN"
+		},
+		{
+			"matches": ["file://*/*", "http://*/*", "https://*/*"],
+			"js": ["contentScript.js"],
+			"run_at": "document_start",
+			"all_frames": true,
+			"world": "ISOLATED"
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"matches": ["<all_urls>"],
+			"resources": [
+				"solana.js",
+				"evmAsk.js",
+				"evmPhantom.js",
+				"evmMetamask.js",
+				"btc.js",
+				"sui.js",
+				"phantom.js"
+			],
+			"use_dynamic_url": false
+		}
+	],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; worker-src 'self'"
+	},
+	"permissions": [
+		"activeTab",
+		"alarms",
+		"identity",
+		"storage",
+		"scripting",
+		"tabs",
+		"unlimitedStorage",
+		"webRequest",
+		"sidePanel"
+	],
+	"host_permissions": ["http://*/*", "https://*/*"],
+	"background": {
+		"service_worker": "background/serviceWorker.js",
+		"type": "module"
+	},
+	"commands": {
+		"_execute_action": {
+			"suggested_key": {
+				"windows": "Alt+Shift+P",
+				"mac": "Alt+Shift+P",
+				"chromeos": "Alt+Shift+P",
+				"linux": "Alt+Shift+P"
+			}
+		}
+	},
+	"side_panel": {
+		"default_path": "popup.html"
+	},
+	"version": "26.10.0",
+	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjcmb0xbGzvg9N2018hVht6y7J6bJjiYtYuw2Mtxrr2vcKXKImxmrryTY9ksBV/00PdqWCHr0DOF6H9gofmTCyOIFGJ37+XejfmWjbkB6qWJHCH1zxiKGCG7TAoGN/Ony4jgsseIZlOmLDOR1+iiNz8dqdth7twRZ4dp+HqjG7e6M7Nj0tRnUscYSdxJCa0pz8V9F442QbzEh/41O3zAo/gP0dqVk3LYqX7xalXPNsTUm9MG1wZcL1jQHi96Oc5nUPQY32gAMDv+CrBr5ylAsDB36cgQSEKdQzFXgVRDq0DJ+Z93CAQ4tHcWNm8jd2YQtp0KuNmwgUec0cAM0UATW6QIDAQAB"
+}
