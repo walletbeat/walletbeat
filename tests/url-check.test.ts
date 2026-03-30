@@ -1669,6 +1669,16 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'f4db2da787034114958427804936711fd439e152',
 		retrieved: '2026-03-30',
 	},
+	{
+		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
+		urlHash: 'da0b34b74deeac2a56309905cb86da9028010e11',
+		retrieved: '2026-03-31'
+	},
+	{
+		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
+		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
+		retrieved: '2026-03-31'
+	},
 ]
 
 /**
