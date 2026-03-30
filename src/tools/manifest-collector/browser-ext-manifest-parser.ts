@@ -125,7 +125,6 @@ function worstHostScope(a: HostPermissionScope, b: HostPermissionScope): HostPer
 function classifyPattern(pattern: string): HostPermissionScope {
 	if (
 		pattern === '<all_urls>' ||
-		pattern === '*://*/*' ||
 		pattern.startsWith('file://') ||
 		pattern.startsWith('ws://') ||
 		pattern.startsWith('wss://')
