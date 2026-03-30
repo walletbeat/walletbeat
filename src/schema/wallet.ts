@@ -38,6 +38,7 @@ import {
 } from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
+import type { GithubRawUrl } from './github-raw-url'
 import { ladders, type WalletLadderType } from './ladders'
 import {
 	evaluateWalletOnLadder,
@@ -156,6 +157,10 @@ export interface WalletUrls {
 	repositories?: Url[]
 	/** Web Store extension URL(s) for the wallet, if available. */
 	extensions?: ExtensionUrl[]
+	/** URL to the raw AndroidManifest.xml on GitHub, if available. */
+	androidManifestXml?: GithubRawUrl
+	/** URL to the raw iOS Info.plist on GitHub, if available. */
+	iosInfoPlist?: GithubRawUrl
 	/** Web App URLs, if available. */
 	webapps?: Url[]
 	/** Play Store URL, if available. */

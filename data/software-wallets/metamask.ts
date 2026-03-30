@@ -83,10 +83,14 @@ export const metamask: SoftwareWallet = {
 		iconExtension: 'svg',
 		lastUpdated: '2025-10-13',
 		urls: {
+			androidManifestXml:
+				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml',
 			docs: ['https://docs.metamask.io/'],
 			extensions: [
 				'https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn',
 			],
+			iosInfoPlist:
+				'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
 			repositories: ['https://github.com/MetaMask/metamask-extension'],
 			socials: {
 				farcaster: 'https://farcaster.xyz/metamask',

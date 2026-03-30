@@ -1796,6 +1796,16 @@ describe('reference URLs', () => {
 					await checkValidUrl(extension)
 				}
 			})
+			it('has valid androidManifestXml', async () => {
+				if (wallet.metadata.urls?.androidManifestXml !== undefined) {
+					await checkValidUrl(wallet.metadata.urls.androidManifestXml)
+				}
+			})
+			it('has valid iosInfoPlist', async () => {
+				if (wallet.metadata.urls?.iosInfoPlist !== undefined) {
+					await checkValidUrl(wallet.metadata.urls.iosInfoPlist)
+				}
+			})
 			it('has valid socials', async () => {
 				for (const social of Object.values(wallet.metadata.urls?.socials ?? {})) {
 					if (social === undefined) {
