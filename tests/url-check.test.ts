@@ -1649,6 +1649,26 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: '714bfb6cfe3caf2a2d5f47eba1f9d0ca4c04cf25',
 		retrieved: '2026-03-23',
 	},
+	{
+		url: 'https://chromewebstore.google.com/detail/nufi/gpnihlnnodeiiaakbikldcihojploeca',
+		urlHash: 'f3ee58ccad5b73604401c32f5ce451e773809784',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa',
+		urlHash: '1eb054801b62cdf521f2a266ea9336ff6072cab3',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/rainbow/opfgelmcmbiajamepnmloijbpoleiama',
+		urlHash: 'fef14a0fce263eab6abdcf946c39d3e496bff766',
+		retrieved: '2026-03-30',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/zerion-wallet-crypto-defi/klghhnkeealcohjjanjjdaeeggmfmlpl',
+		urlHash: 'f4db2da787034114958427804936711fd439e152',
+		retrieved: '2026-03-30',
+	},
 ]
 
 /**
