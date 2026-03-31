@@ -33,7 +33,7 @@ export enum KeyStorageMechanism {
 	 * No private key is stored on the device. The wallet uses passkey-managed
 	 * smart contract accounts
 	 */
-	NO_KEY_STORED = 'NO_KEY_STORED',
+	PASSKEY_MANAGED = 'PASSKEY_MANAGED',
 }
 
 /**
