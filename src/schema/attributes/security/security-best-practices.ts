@@ -321,31 +321,54 @@ function evaluateExternallyConnectable(
 
 const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL | Rating.PASS> = {
 	// Benign or wallet-typical permissions.
+	// Grants access only to the currently active tab when the user invokes the extension — needed for dApp injection.
 	[BrowserExtensionPermission.ACTIVE_TAB]: Rating.PASS,
+	// Schedules periodic background tasks — used for network polling, lock timers, and session expiry.
 	[BrowserExtensionPermission.ALARMS]: Rating.PASS,
-	[BrowserExtensionPermission.BOOKMARKS]: Rating.PASS,
+	// Writes text to the clipboard on user action — used to copy addresses and transaction hashes.
 	[BrowserExtensionPermission.CLIPBOARD_WRITE]: Rating.PASS,
+	// Adds items to the browser right-click menu — used for quick-access wallet actions.
 	[BrowserExtensionPermission.CONTEXT_MENUS]: Rating.PASS,
+	// Read/write access to cookies for specific origins — used for session management with wallet backends.
 	[BrowserExtensionPermission.COOKIES]: Rating.PASS,
+	// Declaratively blocks or redirects requests without seeing their content — used for ad/tracker blocking in privacy-focused wallets.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST]: Rating.PASS,
+	// Same as above but also applies to host-matched pages — used when rules must cover specific dApp domains.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS]: Rating.PASS,
+	// Firebase Cloud Messaging for push notifications — used to deliver transaction alerts.
 	[BrowserExtensionPermission.GCM]: Rating.PASS,
-	[BrowserExtensionPermission.GEOLOCATION]: Rating.PASS,
+	// OAuth2 token retrieval via the browser's identity API — used for optional social login flows.
 	[BrowserExtensionPermission.IDENTITY]: Rating.PASS,
+	// Retrieves the user's Google account email alongside the OAuth token — used when email is needed for account linking.
 	[BrowserExtensionPermission.IDENTITY_EMAIL]: Rating.PASS,
+	// Displays desktop notifications — used for transaction confirmations and security alerts.
 	[BrowserExtensionPermission.NOTIFICATIONS]: Rating.PASS,
+	// Creates an off-screen document for DOM operations without a visible window — used for background cryptographic work.
 	[BrowserExtensionPermission.OFFSCREEN]: Rating.PASS,
+	// Injects scripts into web pages — required for dApp content-script injection.
 	[BrowserExtensionPermission.SCRIPTING]: Rating.PASS,
+	// Opens the extension in the browser side panel — used for a persistent wallet UI alongside web pages.
 	[BrowserExtensionPermission.SIDE_PANEL]: Rating.PASS,
+	// Key-value storage synced or local — required for storing encrypted keys and settings.
 	[BrowserExtensionPermission.STORAGE]: Rating.PASS,
+	// Reads CPU core count and load — used to tune cryptographic thread counts.
 	[BrowserExtensionPermission.SYSTEM_CPU]: Rating.PASS,
+	// Reads connected display info — used for responsive UI layout across monitor configurations.
 	[BrowserExtensionPermission.SYSTEM_DISPLAY]: Rating.PASS,
+	// Access to tab metadata (URL, title) — used to detect active dApps and switch network contexts.
 	[BrowserExtensionPermission.TABS]: Rating.PASS,
+	// Removes the 5 MB storage cap — required for wallets that cache chain data or transaction history locally.
 	[BrowserExtensionPermission.UNLIMITED_STORAGE]: Rating.PASS,
+	// Observes navigation events without seeing request bodies — used to detect page changes for content-script re-injection.
 	[BrowserExtensionPermission.WEB_NAVIGATION]: Rating.PASS,
+	// Read-only access to HTTP/S request metadata — used to detect and warn about insecure RPC connections.
 	[BrowserExtensionPermission.WEB_REQUEST]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
+	// Exposes the user's physical location — not required for any wallet function and enables persistent user tracking.
+	[BrowserExtensionPermission.GEOLOCATION]: Rating.FAIL,
+	// Full read/write access to all bookmarks — not required for any wallet function.
+	[BrowserExtensionPermission.BOOKMARKS]: Rating.FAIL,
 	// Attaches the Chrome DevTools protocol to any tab, full read/write access to page content.
 	[BrowserExtensionPermission.DEBUGGER]: Rating.FAIL,
 	// Can delete history, cookies, and cached data, destructive and privacy-invasive.
@@ -364,7 +387,7 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.DESKTOP_CAPTURE]: Rating.FAIL,
 	// Legitimate for hardware wallet communication but opens a native OS code execution channel.
 	[BrowserExtensionPermission.NATIVE_MESSAGING]: Rating.FAIL,
-	// Reads clipboard contents without a user gesture.
+	// Reads clipboard contents without a user gesture, exposing seed phrases or keys copied elsewhere.
 	[BrowserExtensionPermission.CLIPBOARD_READ]: Rating.FAIL,
 	// Can synchronously block or modify all HTTP/S requests.
 	[BrowserExtensionPermission.WEB_REQUEST_BLOCKING]: Rating.FAIL,
@@ -484,29 +507,55 @@ function evaluateBrowserExtension(
 	})
 }
 
-const unnecessaryAndroidPermissions = [
-	// Allows drawing overlays over other apps, can be used to phish seed phrases or intercept transaction confirmations.
-	AndroidPermission.SYSTEM_ALERT_WINDOW,
-	// Microphone access enables covert audio recording of sensitive conversations.
-	AndroidPermission.RECORD_AUDIO,
-	// Precise location data can be used to profile and deanonymize users.
-	AndroidPermission.ACCESS_FINE_LOCATION,
-	// Modifying audio settings can be abused to suppress security alerts or notifications.
-	AndroidPermission.MODIFY_AUDIO_SETTINGS,
-]
+const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.FAIL> = {
+	// Necessary or wallet-typical permissions.
+	// Required for all network communication with RPC nodes, APIs, and wallet backends.
+	[AndroidPermission.INTERNET]: Rating.PASS,
+	// Checks connectivity before making network requests, avoiding unnecessary failures.
+	[AndroidPermission.ACCESS_NETWORK_STATE]: Rating.PASS,
+	// Camera access for QR code scanning — the standard way to input addresses and connect to dApps.
+	[AndroidPermission.CAMERA]: Rating.PASS,
+	// Bluetooth communication with hardware wallets (Android < 12).
+	[AndroidPermission.BLUETOOTH]: Rating.PASS,
+	// Bluetooth administration for pairing hardware wallets (Android < 12).
+	[AndroidPermission.BLUETOOTH_ADMIN]: Rating.PASS,
+	// Initiates connections to paired hardware wallets over Bluetooth (Android 12+).
+	[AndroidPermission.BLUETOOTH_CONNECT]: Rating.PASS,
+	// Discovers and pairs hardware wallets over Bluetooth (Android 12+).
+	[AndroidPermission.BLUETOOTH_SCAN]: Rating.PASS,
 
-const unnecessaryIosPermissions = [
-	// Microphone access enables covert audio recording of sensitive conversations.
-	IosUsageDescription.MICROPHONE,
-	// Precise location data can be used to profile and deanonymize users.
-	IosUsageDescription.LOCATION_WHEN_IN_USE,
-	// Read access to the full photo library is a privacy risk.
-	IosUsageDescription.PHOTO_LIBRARY,
-	// Always-on Bluetooth enables passive device tracking and proximity-based attacks.
-	IosUsageDescription.BLUETOOTH_ALWAYS,
-	// Legacy Bluetooth peripheral access exposes the device to Bluetooth-based exploitation.
-	IosUsageDescription.BLUETOOTH_PERIPHERAL,
-]
+	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
+	// Allows drawing overlays over other apps — can be used to phish seed phrases or intercept transaction confirmations.
+	[AndroidPermission.SYSTEM_ALERT_WINDOW]: Rating.FAIL,
+	// Microphone access enables covert audio recording of sensitive conversations near the device.
+	[AndroidPermission.RECORD_AUDIO]: Rating.FAIL,
+	// Precise GPS location can be used to profile and deanonymize users; not required for any wallet function.
+	[AndroidPermission.ACCESS_FINE_LOCATION]: Rating.FAIL,
+	// Modifying global audio settings can suppress security alerts or notifications from other apps.
+	[AndroidPermission.MODIFY_AUDIO_SETTINGS]: Rating.FAIL,
+}
+
+const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAIL> = {
+	// Necessary or wallet-typical permissions.
+	// Camera access for QR code scanning — the standard way to input addresses and connect to dApps.
+	[IosUsageDescription.CAMERA]: Rating.PASS,
+	// Face ID biometric authentication — used to unlock the wallet without a PIN.
+	[IosUsageDescription.FACE_ID]: Rating.PASS,
+	// Allows saving exported transaction receipts or QR codes to the photo library.
+	[IosUsageDescription.PHOTO_LIBRARY_ADD]: Rating.PASS,
+
+	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
+	// Microphone access enables covert audio recording of sensitive conversations near the device.
+	[IosUsageDescription.MICROPHONE]: Rating.FAIL,
+	// Precise GPS location can be used to profile and deanonymize users; not required for any wallet function.
+	[IosUsageDescription.LOCATION_WHEN_IN_USE]: Rating.FAIL,
+	// Read access to the full photo library exposes private images; wallets only ever need to write, not read.
+	[IosUsageDescription.PHOTO_LIBRARY]: Rating.FAIL,
+	// Always-on Bluetooth enables passive device-tracking and proximity-based attacks even when the app runs in the background.
+	[IosUsageDescription.BLUETOOTH_ALWAYS]: Rating.FAIL,
+	// Legacy pre-iOS 13 peripheral mode; replaced by BLUETOOTH_ALWAYS and no longer needed on supported OS versions.
+	[IosUsageDescription.BLUETOOTH_PERIPHERAL]: Rating.FAIL,
+}
 
 function getUnnecessaryPermissionLists(manifest: MobileAppManifest): {
 	androidList: string
@@ -515,11 +564,11 @@ function getUnnecessaryPermissionLists(manifest: MobileAppManifest): {
 	const badAndroid =
 		manifest.android === 'NOT_AN_ANDROID_APP'
 			? []
-			: manifest.android.usesPermissions.filter(p => unnecessaryAndroidPermissions.includes(p))
+			: manifest.android.usesPermissions.filter(p => androidPermissionRatings[p] === Rating.FAIL)
 	const badIos =
 		manifest.ios === 'NOT_AN_IOS_APP'
 			? []
-			: manifest.ios.usageDescriptions.filter(p => unnecessaryIosPermissions.includes(p))
+			: manifest.ios.usageDescriptions.filter(p => iosPermissionRatings[p] === Rating.FAIL)
 
 	return {
 		androidList: badAndroid.map(p => p.replace('android.permission.', '')).join(', '),
