@@ -127,8 +127,8 @@ importers:
         specifier: ^0.61.0
         version: 0.61.0
       omnipin:
-        specifier: ^2.1.2
-        version: 2.1.2
+        specifier: ^2.2.0
+        version: 2.2.0
       orbiter-cli:
         specifier: ^0.9.11
         version: 0.9.11(@types/node@25.3.3)(bufferutil@4.1.0)(esbuild@0.21.5)(utf-8-validate@5.0.10)
@@ -2174,6 +2174,9 @@ packages:
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
+
+  '@types/debug@4.1.13':
+    resolution: {integrity: sha512-KSVgmQmzMwPlmtljOomayoR89W4FynCAi3E8PPs7vmDVPe84hT+vGPKkJfThkmXs0x0jAaa9U8uW8bbfyS2fWw==}
 
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
@@ -4888,8 +4891,8 @@ packages:
   ohash@2.0.11:
     resolution: {integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==}
 
-  omnipin@2.1.2:
-    resolution: {integrity: sha512-llQJkwkXLeR/DD89R+maLJdYi4Q/BaC3J0NmXdGt9Xmt2W+jyuheorHBlT9gqO27KyOW1Ji5AtjxfpB/PYTZvA==}
+  omnipin@2.2.0:
+    resolution: {integrity: sha512-G8PR/Lg8Lu+/BtezYeYQaQP8yKgexYINohvARR6uiCnLVOKfyQAaRoy4hdf0mDQ2fHh5HEPrLLC55XpbG/Gfsw==}
     engines: {node: ^20.10.0 || >=21.1.0}
     hasBin: true
 
@@ -8389,7 +8392,7 @@ snapshots:
       '@metamask/superstruct': 3.2.1
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
-      '@types/debug': 4.1.12
+      '@types/debug': 4.1.13
       '@types/lodash': 4.17.24
       debug: 4.4.3
       lodash: 4.17.23
@@ -8402,7 +8405,7 @@ snapshots:
   '@metamask/utils@5.0.2':
     dependencies:
       '@ethereumjs/tx': 4.2.0
-      '@types/debug': 4.1.12
+      '@types/debug': 4.1.13
       debug: 4.4.3
       semver: 7.7.4
       superstruct: 1.0.4
@@ -8415,7 +8418,7 @@ snapshots:
       '@metamask/superstruct': 3.2.1
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
-      '@types/debug': 4.1.12
+      '@types/debug': 4.1.13
       debug: 4.4.3
       pony-cause: 2.1.11
       semver: 7.7.4
@@ -8429,7 +8432,7 @@ snapshots:
       '@metamask/superstruct': 3.2.1
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
-      '@types/debug': 4.1.12
+      '@types/debug': 4.1.13
       debug: 4.4.3
       pony-cause: 2.1.11
       semver: 7.7.4
@@ -9364,6 +9367,10 @@ snapshots:
       assertion-error: 2.0.1
 
   '@types/debug@4.1.12':
+    dependencies:
+      '@types/ms': 2.1.0
+
+  '@types/debug@4.1.13':
     dependencies:
       '@types/ms': 2.1.0
 
@@ -13086,7 +13093,7 @@ snapshots:
 
   ohash@2.0.11: {}
 
-  omnipin@2.1.2: {}
+  omnipin@2.2.0: {}
 
   on-exit-leak-free@0.2.0: {}
 
