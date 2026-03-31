@@ -64,5 +64,7 @@ jobs:
         env:
           ENS_DOMAIN: beta.walletbeat.eth
           DEPLOY_DIRECTORY: dist
+          BLUMEN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
           OMNIPIN_PK: ${{ secrets.BETA_WALLETBEAT_ETH_UPDATER_EOA_PRIVATE_KEY }}
+          BLUMEN_OR_OMNIPIN: blumen
           SKIP_HELIOS: 'false'
