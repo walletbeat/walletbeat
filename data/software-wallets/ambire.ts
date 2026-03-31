@@ -31,6 +31,12 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import type {
+	ContractTransactionWarning,
+	ScamUrlWarning,
+	SendTransactionWarning,
+} from '@/schema/features/security/scam-alerts'
+import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	BrowserExtensionPermission,
 	ExternalExtensionIdScope,
@@ -39,12 +45,6 @@ import {
 	SecureRngSource,
 	WebAccessibleResourcesScope,
 } from '@/schema/features/security/security-best-practices'
-import type {
-	ContractTransactionWarning,
-	ScamUrlWarning,
-	SendTransactionWarning,
-} from '@/schema/features/security/scam-alerts'
-import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
 	BasicBenchmarkTransactions,
 	ComplexBenchmarkTransactions,
