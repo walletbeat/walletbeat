@@ -1,0 +1,1143 @@
+/**
+ * Walletbeat data-attribute style primitives.
+ *
+ * Each documented block below applies to the selectors that follow. Regenerate
+ * `css-attributes.d.ts` and `.vscode/walletbeat.html-data.json` after changing these comments.
+ */
+
+/**
+ * ### Purpose
+ * Shared link styling with optional camouflaged mode.
+ *
+ * ### Usage
+ * `<a data-link>` or `<a data-link='camouflaged'>`.
+ *
+ * ### Tokens
+ * - `camouflaged` (exact `=` selector).
+ *
+ * ### CSS Variables
+ * - `--text-primary`
+ * - `--accent`
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`
+ */
+[data-link],
+a {
+	color: color-mix(in oklch, var(--text-primary) 33%, var(--accent));
+	text-decoration: none;
+	font-weight: 600;
+
+	transition-property: color, text-decoration;
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&[data-link='camouflaged'] {
+		color: inherit;
+
+		&:hover {
+			color: color-mix(in oklch, var(--text-primary) 33%, var(--accent));
+			text-decoration: none;
+		}
+	}
+}
+
+/**
+ * ### Purpose
+ * Consistent press-state feedback across interactive elements.
+ *
+ * ### Usage
+ * - add `data-pressable` on custom interactive wrappers
+ * - use `data-pressable='to-containing'` when the press overlay should cover the containing block
+ *
+ * ### Tokens
+ * - `to-containing` (exact `=` selector).
+ *
+ * ### CSS Variables
+ * - `--pressable-transitionOutDuration`
+ * - `--pressable-transitionInDuration`
+ * - `--pressable-pressed-opacity`
+ * - `--pressable-pressed-scale`
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`
+ */
+[data-pressable],
+[role='button'],
+:where(
+	summary,
+	a,
+	select,
+	option,
+	button,
+	input,
+	label:has(
+		> input:is(
+			[type='checkbox'],
+			[type='radio']
+		),
+		button
+	),
+	::scroll-marker
+) {
+	position: relative;
+
+	&[data-pressable='to-containing'] {
+		position: static;
+
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+		}
+	}
+
+	transition-property: opacity, scale;
+	transition-duration: var(--pressable-transitionOutDuration);
+
+	&:active:is(
+			label:has(
+				> input:is(
+					[type='checkbox'],
+					[type='radio']
+				),
+				button
+			),
+			:not(
+				:has(
+					:where(
+						[data-pressable],
+						[role='button'],
+						:where(
+							summary,
+							a,
+							select,
+							option,
+							button,
+							input,
+							label:has(
+								> input:is(
+									[type='checkbox'],
+									[type='radio']
+								),
+								button
+							)
+						)
+					):active
+				)
+			)
+		) {
+		transition-duration: var(--pressable-transitionInDuration);
+		opacity: var(--pressable-pressed-opacity);
+		scale: var(--pressable-pressed-scale);
+	}
+}
+::scroll-marker:active {
+	transition-duration: var(--pressable-transitionInDuration);
+	opacity: var(--pressable-pressed-opacity);
+	scale: var(--pressable-pressed-scale);
+}
+
+span svg {
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	width: 1.15em;
+	height: 1.15em;
+	vertical-align: -0.2em;
+
+	&[fill='none'] {
+		stroke: currentColor;
+	}
+
+	&:not([fill='none']) {
+		fill: currentColor;
+	}
+}
+
+/**
+ * ### Purpose
+ * Overlay direct children in one shared grid cell (`grid-area: stack`).
+ *
+ * ### Usage
+ * Container whose direct children should stack visually.
+ *
+ * ### Tokens
+ * None (`[data-stack]` presence only).
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-stack]`
+ */
+[data-stack] {
+	display: grid;
+	grid: 'stack';
+
+	& > *,
+	&::before,
+	&::after {
+		grid-area: stack;
+	}
+}
+
+/**
+ * ### Purpose
+ * One-column grid primitive for `[data-column]` (alignment + gap tokens). `[data-card]` shares the
+ * same column/grid defaults before card-specific rules apply below.
+ *
+ * ### Usage
+ * `<section data-column='start gap-4'>...</section>`
+ *
+ * ### Tokens
+ * - alignment: `start`, `center`, `end`
+ * - spacing: `gap-0`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `gap-6`, `gap-8`
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-column]`
+ */
+[data-column],
+[data-card] {
+	display: grid;
+	grid-template-columns: 1fr;
+	/* grid-template-columns: minmax(0, 1fr); */
+	gap: 1em;
+	align-content: start;
+
+	&[data-column~='start'] {
+		justify-items: start;
+	}
+	&[data-column~='center'] {
+		justify-items: center;
+	}
+	&[data-column~='end'] {
+		justify-items: end;
+	}
+
+	&[data-column~='gap-0'] {
+		gap: 0em;
+	}
+	&[data-column~='gap-1'] {
+		gap: 0.25em;
+	}
+	&[data-column~='gap-2'] {
+		gap: 0.5em;
+	}
+	&[data-column~='gap-3'] {
+		gap: 0.75em;
+	}
+	&[data-column~='gap-4'] {
+		gap: 1em;
+	}
+	&[data-column~='gap-5'] {
+		gap: 1.25em;
+	}
+	&[data-column~='gap-6'] {
+		gap: 1.5em;
+	}
+	&[data-column~='gap-8'] {
+		gap: 2em;
+	}
+}
+
+/**
+ * ### Purpose
+ * Flex row primitive: alignment, gap, wrap, and child `data-row-item` helpers. Also styles `<summary>`
+ * and shares flex defaults with `[data-badge]` in this block; see the dedicated `[data-badge]` block
+ * for badge size tokens.
+ *
+ * ### Usage
+ * - row: `<div data-row='center gap-2 wrap'>…`
+ * - item hints: `<div data-row-item='basis-3 flexible'>…`
+ *
+ * ### Tokens
+ * - container: `start`, `center`, `end`
+ * - cross-axis: `align-start`, `align-center`, `align-end`
+ * - gap: `gap-0` … `gap-8`
+ * - wrap: `wrap`, `wrap-first-last`
+ * - item: `flexible`, `basis-1`..`basis-6`, `basis-full`, `wrap-start`, `wrap-center`, `wrap-end`
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-row]`
+ */
+[data-row],
+[data-badge],
+summary {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1em;
+
+	&[data-row~='wrap'],
+	&:where(summary) {
+		flex-wrap: wrap;
+	}
+
+	&[data-row~='start'] {
+		justify-content: start;
+	}
+	&[data-row~='center'] {
+		justify-content: center;
+	}
+	&[data-row~='end'] {
+		justify-content: end;
+	}
+
+	&[data-row~='align-start'] {
+		align-items: start;
+	}
+	&[data-row~='align-center'] {
+		align-items: center;
+	}
+	&[data-row~='align-end'] {
+		align-items: end;
+	}
+
+	&[data-row~='gap-0'] {
+		gap: 0em;
+	}
+	&[data-row~='gap-1'] {
+		gap: 0.25em;
+	}
+	&[data-row~='gap-2'] {
+		gap: 0.5em;
+	}
+	&[data-row~='gap-3'] {
+		gap: 0.75em;
+	}
+	&[data-row~='gap-4'] {
+		gap: 1em;
+	}
+	&[data-row~='gap-5'] {
+		gap: 1.25em;
+	}
+	&[data-row~='gap-6'] {
+		gap: 1.5em;
+	}
+	&[data-row~='gap-8'] {
+		gap: 2em;
+	}
+
+	> [data-row-item~="flexible"] {
+		flex: 1;
+	}
+
+	> [data-row-item~="basis-1"] {
+		flex-basis: 16ch;
+	}
+	> [data-row-item~="basis-2"] {
+		flex-basis: 22ch;
+	}
+	> [data-row-item~="basis-3"] {
+		flex-basis: 28ch;
+	}
+	> [data-row-item~="basis-4"] {
+		flex-basis: 34ch;
+	}
+	> [data-row-item~="basis-5"] {
+		flex-basis: 40ch;
+	}
+	> [data-row-item~="basis-6"] {
+		flex-basis: 46ch;
+	}
+	> [data-row-item~="basis-full"] {
+		flex-basis: 100%;
+	}
+
+	> [data-row-item~="wrap-start"],
+	&[data-row~="wrap-first-last"] > :first-child {
+		margin-inline-end: auto;
+	}
+	> [data-row-item~="wrap-center"] {
+		margin-inline: auto;
+	}
+	> [data-row-item~="wrap-end"],
+	&[data-row~="wrap-first-last"] > :last-child {
+		margin-inline-start: auto;
+	}
+}
+
+/**
+ * ### Purpose
+ * Card surface: tone, radius, padding, and accent border via tokens.
+ *
+ * ### Usage
+ * `<article data-card='secondary radius-6 padding-4 border-accent'>…`
+ *
+ * ### Tokens
+ * - tone: `secondary`
+ * - radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`
+ * - padding: `padding-0` … `padding-8`
+ * - border: `border-accent`
+ *
+ * ### CSS Variables
+ * - `--card-backgroundColor`
+ * - `--card-radius`
+ * - `--card-padding`
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`
+ */
+[data-card] {
+	/* Inputs */
+	--card-backgroundColor: var(--background-primary);
+	--card-radius: 0.5em;
+	--card-padding: 1em;
+
+	/* Rules */
+	background-color: var(--card-backgroundColor);
+	border-radius: var(--card-radius);
+	padding: var(--card-padding);
+
+	&[data-card~='secondary'] {
+		--card-backgroundColor: var(--background-secondary);
+		border-color: var(--border-color);
+	}
+
+	&[data-card~='radius-1'] {
+		--card-radius: 0.125em;
+	}
+	&[data-card~='radius-2'] {
+		--card-radius: 0.25em;
+	}
+	&[data-card~='radius-3'] {
+		--card-radius: 0.375em;
+	}
+	&[data-card~='radius-4'] {
+		--card-radius: 0.5em;
+	}
+	&[data-card~='radius-6'] {
+		--card-radius: 0.75em;
+	}
+	&[data-card~='radius-8'] {
+		--card-radius: 1em;
+	}
+
+	&[data-card~='padding-0'] {
+		--card-padding: 0em;
+	}
+	&[data-card~='padding-1'] {
+		--card-padding: 0.25em;
+	}
+	&[data-card~='padding-2'] {
+		--card-padding: 0.5em;
+	}
+	&[data-card~='padding-3'] {
+		--card-padding: 0.75em;
+	}
+	&[data-card~='padding-4'] {
+		--card-padding: 1em;
+	}
+	&[data-card~='padding-5'] {
+		--card-padding: 1.25em;
+	}
+	&[data-card~='padding-6'] {
+		--card-padding: 1.5em;
+	}
+	&[data-card~='padding-7'] {
+		--card-padding: 1.75em;
+	}
+	&[data-card~='padding-8'] {
+		--card-padding: 2em;
+	}
+
+	&[data-card~='border-accent'] {
+		border: 2px solid color-mix(in srgb, var(--accent) 90%, transparent);
+	}
+}
+
+/**
+ * ### Purpose
+ * Compact badge / chip surface with size modifiers.
+ *
+ * ### Usage
+ * `<span data-badge='small'>…</span>`
+ *
+ * ### Tokens
+ * - `small`, `medium`, `large`
+ *
+ * ### CSS Variables
+ * - `--badge-backgroundColor`
+ * - `--badge-borderColor`
+ * - `--badge-textColor`
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-badge]`
+ */
+[data-badge] {
+	--badge-backgroundColor: color-mix(in srgb, var(--accent) 33%, transparent);
+	--badge-borderColor: color-mix(in srgb, var(--accent) 40%, transparent);
+	--badge-textColor: currentColor;
+
+	display: inline-flex;
+	flex-shrink: 0;
+	flex-basis: auto;
+
+	column-gap: 0;
+
+	border-radius: 0.375em;
+	background-color: var(--badge-backgroundColor);
+	border: 1px solid var(--badge-borderColor);
+
+	color: var(--badge-textColor);
+	font-weight: 600;
+	line-height: 1;
+
+	&[data-badge~='small'] {
+		font-size: 0.75em;
+		padding: 0.4em 0.5em;
+	}
+	&[data-badge~='medium'] {
+		font-size: 0.875em;
+		padding: 0.45em 0.6em;
+	}
+	&[data-badge~='large'] {
+		font-size: 1em;
+		padding: 0.5em 0.7em;
+	}
+
+	> img,
+	svg {
+		width: 1.15em;
+		height: 1.15em;
+		vertical-align: -0.2em;
+
+		&:first-child {
+			margin-inline-end: 0.25em;
+		}
+	}
+
+	a:has(> &:only-child) {
+		flex-shrink: 0;
+		flex-basis: auto;
+	}
+}
+
+/**
+ * ### Purpose
+ * Semantic tag / chip with category-based color families (`~=` tokens map to theme variables).
+ *
+ * ### Usage
+ * `<button data-tag='eip'>EIP-4337</button>`
+ *
+ * ### Tokens
+ * - `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`
+ *
+ * ### CSS Variables
+ * - `--tag-backgroundColor`
+ * - `--tag-textColor`
+ * - `--tag-borderColor`
+ * - `--tag-hover-backgroundColor`
+ * - `--tag-hover-textColor`
+ * - `--tag-hover-borderColor`
+ *
+ * ### Source
+ * @see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`
+ */
+[data-tag] {
+	--tag-backgroundColor: light-dark(rgba(108, 36, 224, 0.08), rgba(108, 36, 224, 0.12));
+	--tag-textColor: light-dark(var(--accent), rgb(187, 147, 255));
+	--tag-borderColor: light-dark(rgba(108, 36, 224, 0.2), rgba(108, 36, 224, 0.3));
+	--tag-hover-backgroundColor: light-dark(rgba(108, 36, 224, 0.12), rgba(108, 36, 224, 0.16));
+	--tag-hover-textColor: light-dark(var(--accent), rgb(187, 147, 255));
+	--tag-hover-borderColor: light-dark(rgba(108, 36, 224, 0.3), rgba(108, 36, 224, 0.4));
+
+	font-size: 0.66em;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.4em 0.66em;
+	border-radius: 9999px;
+
+	background-color: var(--tag-backgroundColor);
+	color: var(--tag-textColor);
+	border: 1px solid var(--tag-borderColor);
+	font-weight: 500;
+	line-height: 1;
+
+	cursor: pointer;
+	transition-property: background-color, border-color, color, transform, box-shadow;
+
+	&:is(button) {
+		&:hover {
+			background-color: var(--tag-hover-backgroundColor);
+			color: var(--tag-hover-textColor);
+			border-color: var(--tag-hover-borderColor);
+			transform: translateY(-1px);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+		}
+
+		&:active {
+			transform: translateY(0);
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+		}
+	}
+
+	&[data-tag~='wallet-type'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0 0), oklch(0.25 0 0));
+		--tag-textColor: light-dark(oklch(0.65 0 0), oklch(0.8 0 0));
+		--tag-borderColor: light-dark(oklch(0.9 0 0), oklch(0.4 0 0));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0 0), oklch(0.3 0 0));
+		--tag-hover-textColor: light-dark(oklch(0.6 0 0), oklch(0.85 0 0));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0 0), oklch(0.5 0 0));
+	}
+
+	&[data-tag~='account-type'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
+		--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.7 0.25 145));
+		--tag-borderColor: light-dark(oklch(0.9 0.06 145), oklch(0.4 0.08 145));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.3 0.07 145));
+		--tag-hover-textColor: light-dark(oklch(0.6 0.18 145), oklch(0.85 0.15 145));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.5 0.1 145));
+	}
+
+	&[data-tag~='eip'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 300), oklch(0.25 0.05 300));
+		--tag-textColor: light-dark(oklch(0.65 0.15 300), oklch(0.7 0.25 300));
+		--tag-borderColor: light-dark(oklch(0.9 0.06 300), oklch(0.4 0.08 300));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 300), oklch(0.3 0.07 300));
+		--tag-hover-textColor: light-dark(oklch(0.6 0.18 300), oklch(0.85 0.15 300));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 300), oklch(0.5 0.1 300));
+	}
+
+	&[data-tag~='eip-status'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 250), oklch(0.25 0.05 250));
+		--tag-textColor: light-dark(oklch(0.65 0.15 250), oklch(0.7 0.25 250));
+		--tag-borderColor: light-dark(oklch(0.9 0.06 250), oklch(0.4 0.08 250));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 250), oklch(0.3 0.07 250));
+		--tag-hover-textColor: light-dark(oklch(0.6 0.18 250), oklch(0.85 0.15 250));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 250), oklch(0.5 0.1 250));
+	}
+
+	&[data-tag~='manufacture-type'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 290), oklch(0.25 0.05 290));
+		--tag-textColor: light-dark(oklch(0.65 0.15 290), oklch(0.7 0.25 290));
+		--tag-borderColor: light-dark(oklch(0.9 0.06 290), oklch(0.4 0.08 290));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 290), oklch(0.3 0.07 290));
+		--tag-hover-textColor: light-dark(oklch(0.6 0.18 290), oklch(0.85 0.15 290));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 290), oklch(0.5 0.1 290));
+	}
+
+	&[data-tag~='eoa'] {
+		--tag-backgroundColor: light-dark(oklch(0.95 0.03 145), oklch(0.25 0.05 145));
+		--tag-textColor: light-dark(oklch(0.65 0.15 145), oklch(0.7 0.25 145));
+		--tag-borderColor: light-dark(oklch(0.9 0.06 145), oklch(0.4 0.08 145));
+		--tag-hover-backgroundColor: light-dark(oklch(0.92 0.05 145), oklch(0.3 0.07 145));
+		--tag-hover-textColor: light-dark(oklch(0.6 0.18 145), oklch(0.85 0.15 145));
+		--tag-hover-borderColor: light-dark(oklch(0.85 0.08 145), oklch(0.5 0.1 145));
+	}
+}
+
+/**
+ * ### Purpose
+ * List layout: gap, markers, and `data-list-item` / `data-list-item-marker` item spacing.
+ *
+ * ### Usage
+ * - `<ul data-list='gap-2'>…`
+ * - `<li data-list-item='gap-1' data-list-item-marker='•'>…`
+ *
+ * ### Tokens
+ * - list gap: `gap-0` … `gap-6`
+ * - item gap: `gap-0` … `gap-6` on `data-list-item`
+ * - marker: free text via `data-list-item-marker`
+ *
+ * ### CSS Variables
+ * - `--list-marker-inlineSize`
+ * - `--list-markerGap`
+ * - `--list-gap`
+ * - `--listItem-gap` (per item)
+ */
+[data-list],
+ul,
+ol {
+	/* Inputs */
+	--list-marker-inlineSize: 1.15em;
+	--list-markerGap: 0.66em;
+	--list-gap: 0.5lh;
+
+	/* Rules */
+	display: grid;
+	gap: var(--list-gap);
+	list-style-type: disc;
+	list-style-position: outside;
+	padding-inline-start: var(--list-marker-inlineSize);
+
+	&[data-card] {
+		padding-inline-start: calc(var(--card-padding) + var(--list-marker-inlineSize));
+	}
+
+	&[data-list~='gap-0'] {
+		--list-gap: 0;
+	}
+	&[data-list~='gap-1'] {
+		--list-gap: 0.25lh;
+	}
+	&[data-list~='gap-2'] {
+		--list-gap: 0.5lh;
+	}
+	&[data-list~='gap-3'] {
+		--list-gap: 0.75lh;
+	}
+	&[data-list~='gap-4'] {
+		--list-gap: 1lh;
+	}
+	&[data-list~='gap-5'] {
+		--list-gap: 1.25lh;
+	}
+	&[data-list~='gap-6'] {
+		--list-gap: 1.5lh;
+	}
+
+	> li,
+	> [data-list-item] {
+		position: relative;
+		--listItem-gap: 0.25lh;
+
+		&[data-list-item~='gap-0'] {
+			--listItem-gap: 0;
+		}
+		&[data-list-item~='gap-1'] {
+			--listItem-gap: 0.25lh;
+		}
+		&[data-list-item~='gap-2'] {
+			--listItem-gap: 0.5lh;
+		}
+		&[data-list-item~='gap-3'] {
+			--listItem-gap: 0.75lh;
+		}
+		&[data-list-item~='gap-4'] {
+			--listItem-gap: 1lh;
+		}
+		&[data-list-item~='gap-5'] {
+			--listItem-gap: 1.25lh;
+		}
+		&[data-list-item~='gap-6'] {
+			--listItem-gap: 1.5lh;
+		}
+
+		/* &::marker {
+			content: '●' ' ';
+			font-size: 1em;
+		}
+		&[data-list-item-marker]::marker {
+			content: attr(data-list-item-marker);
+			font-size: 0.875em;
+		}
+
+		@supports not selector(::before::marker) { */
+			&::marker {
+				color: transparent;
+			}
+
+			&::before {
+				position: absolute;
+				margin-inline-start: calc(-1 * var(--list-marker-inlineSize) - var(--list-markerGap));
+				width: var(--list-marker-inlineSize);
+
+				content: '●';
+				font-size: 1em;
+				text-align: center;
+			}
+			&[data-list-item-marker]::before {
+				content: attr(data-list-item-marker);
+			}
+		/* } */
+
+		padding-inline-start: var(--list-markerGap);
+
+		> * + * {
+			margin-top: var(--listItem-gap);
+		}
+	}
+}
+
+
+/**
+ * ### Purpose
+ * Scroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll
+ * item attachment, overflow, and snap helpers.
+ *
+ * ### Usage
+ * - `data-scroll-container='block|inline'`
+ * - `data-sticky-container` for nested sticky subtrees
+ * - `data-sticky='…'` sticky item tokens
+ * - `data-scroll-item='…'` scroll item modifiers
+ *
+ * ### Tokens
+ * - scroll container: `block`, `inline`
+ * - sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`
+ * - scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`
+ */
+[data-scroll-container] {
+	/* Inputs */
+	--scrollContainer-sizeBlock: 100cqb;
+	--scrollContainer-sizeInline: 100cqi;
+
+	/* Rules */
+	overscroll-behavior: none;
+	touch-action: pan-x pan-y;
+
+	&:not([data-scroll-container~='block']):not([data-scroll-container~='inline']) {
+		container-type: size;
+		container-type: scroll-state size;
+		overflow: auto auto;
+	}
+	&[data-scroll-container~='block'] {
+		container-type: inline-size;
+		container-type: scroll-state inline-size;
+		overflow-y: auto;
+	}
+	&[data-scroll-container~='inline'] {
+		container-type: block-size;
+		container-type: scroll-state block-size;
+		overflow-x: auto;
+	}
+
+	/* Derived */
+	--sticky-level: 0;
+
+	--sticky0-insetBlockStart: var(--sticky-marginBlockStart);
+	--sticky0-insetBlockEnd: var(--sticky-marginBlockEnd);
+	--sticky0-insetInlineStart: var(--sticky-marginInlineStart);
+	--sticky0-insetInlineEnd: var(--sticky-marginInlineEnd);
+
+	--sticky0-paddingBlockStart: var(--sticky-paddingBlockStart);
+	--sticky0-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+	--sticky0-paddingInlineStart: var(--sticky-paddingInlineStart);
+	--sticky0-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+
+	--sticky0-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky0-insetBlockStart) - var(--sticky0-insetBlockEnd));
+	--sticky0-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky0-insetInlineStart) - var(--sticky0-insetInlineEnd));
+
+	--sticky-insetBlockStart: var(--sticky0-insetBlockStart);
+	--sticky-insetBlockEnd: var(--sticky0-insetBlockEnd);
+	--sticky-insetInlineStart: var(--sticky0-insetInlineStart);
+	--sticky-insetInlineEnd: var(--sticky0-insetInlineEnd);
+
+	--sticky-sizeBlock: var(--sticky0-sizeBlock);
+	--sticky-sizeInline: var(--sticky0-sizeInline);
+
+	/* Firefox: not supported (find workaround to support resetting nested `[data-scroll-container]`s) */
+	/* @scope (
+		&
+	) to (
+		[data-scroll-container] > *
+	) { */
+		[data-sticky-container]:not(&) {
+			--sticky-level: 1;
+
+			--sticky1-insetBlockStart: calc(var(--sticky0-insetBlockStart) + var(--sticky0-paddingBlockStart) + var(--sticky-marginBlockStart));
+			--sticky1-insetBlockEnd: calc(var(--sticky0-insetBlockEnd) + var(--sticky0-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+			--sticky1-insetInlineStart: calc(var(--sticky0-insetInlineStart) + var(--sticky0-paddingInlineStart) + var(--sticky-marginInlineStart));
+			--sticky1-insetInlineEnd: calc(var(--sticky0-insetInlineEnd) + var(--sticky0-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+
+			--sticky1-paddingBlockStart: var(--sticky-paddingBlockStart);
+			--sticky1-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+			--sticky1-paddingInlineStart: var(--sticky-paddingInlineStart);
+			--sticky1-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+
+			--sticky1-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky1-insetBlockStart) - var(--sticky1-insetBlockEnd));
+			--sticky1-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky1-insetInlineStart) - var(--sticky1-insetInlineEnd));
+
+			--sticky-insetBlockStart: var(--sticky1-insetBlockStart);
+			--sticky-insetBlockEnd: var(--sticky1-insetBlockEnd);
+			--sticky-insetInlineStart: var(--sticky1-insetInlineStart);
+			--sticky-insetInlineEnd: var(--sticky1-insetInlineEnd);
+
+			--sticky-sizeBlock: var(--sticky1-sizeBlock);
+			--sticky-sizeInline: var(--sticky1-sizeInline);
+
+			[data-sticky-container] {
+				--sticky-level: 2;
+
+				--sticky2-insetBlockStart: calc(var(--sticky1-insetBlockStart) + var(--sticky1-paddingBlockStart) + var(--sticky-marginBlockStart));
+				--sticky2-insetBlockEnd: calc(var(--sticky1-insetBlockEnd) + var(--sticky1-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+				--sticky2-insetInlineStart: calc(var(--sticky1-insetInlineStart) + var(--sticky1-paddingInlineStart) + var(--sticky-marginInlineStart));
+				--sticky2-insetInlineEnd: calc(var(--sticky1-insetInlineEnd) + var(--sticky1-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+
+				--sticky2-paddingBlockStart: var(--sticky-paddingBlockStart);
+				--sticky2-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+				--sticky2-paddingInlineStart: var(--sticky-paddingInlineStart);
+				--sticky2-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+
+				--sticky2-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky2-insetBlockStart) - var(--sticky2-insetBlockEnd));
+				--sticky2-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky2-insetInlineStart) - var(--sticky2-insetInlineEnd));
+
+				--sticky-insetBlockStart: var(--sticky2-insetBlockStart);
+				--sticky-insetBlockEnd: var(--sticky2-insetBlockEnd);
+				--sticky-insetInlineStart: var(--sticky2-insetInlineStart);
+				--sticky-insetInlineEnd: var(--sticky2-insetInlineEnd);
+
+				--sticky-sizeBlock: var(--sticky2-sizeBlock);
+				--sticky-sizeInline: var(--sticky2-sizeInline);
+
+				[data-sticky-container] {
+					--sticky-level: 3;
+
+					--sticky3-insetBlockStart: calc(var(--sticky2-insetBlockStart) + var(--sticky2-paddingBlockStart) + var(--sticky-marginBlockStart));
+					--sticky3-insetBlockEnd: calc(var(--sticky2-insetBlockEnd) + var(--sticky2-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+					--sticky3-insetInlineStart: calc(var(--sticky2-insetInlineStart) + var(--sticky2-paddingInlineStart) + var(--sticky-marginInlineStart));
+					--sticky3-insetInlineEnd: calc(var(--sticky2-insetInlineEnd) + var(--sticky2-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+
+					--sticky3-paddingBlockStart: var(--sticky-paddingBlockStart);
+					--sticky3-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+					--sticky3-paddingInlineStart: var(--sticky-paddingInlineStart);
+					--sticky3-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+
+					--sticky3-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky3-insetBlockStart) - var(--sticky3-insetBlockEnd));
+					--sticky3-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky3-insetInlineStart) - var(--sticky3-insetInlineEnd));
+
+					--sticky-insetBlockStart: var(--sticky3-insetBlockStart);
+					--sticky-insetBlockEnd: var(--sticky3-insetBlockEnd);
+					--sticky-insetInlineStart: var(--sticky3-insetInlineStart);
+					--sticky-insetInlineEnd: var(--sticky3-insetInlineEnd);
+
+					--sticky-sizeBlock: var(--sticky3-sizeBlock);
+					--sticky-sizeInline: var(--sticky3-sizeInline);
+
+					[data-sticky-container] {
+						--sticky-level: 4;
+
+						--sticky4-insetBlockStart: calc(var(--sticky3-insetBlockStart) + var(--sticky3-paddingBlockStart) + var(--sticky-marginBlockStart));
+						--sticky4-insetBlockEnd: calc(var(--sticky3-insetBlockEnd) + var(--sticky3-paddingBlockEnd) + var(--sticky-marginBlockEnd));
+						--sticky4-insetInlineStart: calc(var(--sticky3-insetInlineStart) + var(--sticky3-paddingInlineStart) + var(--sticky-marginInlineStart));
+						--sticky4-insetInlineEnd: calc(var(--sticky3-insetInlineEnd) + var(--sticky3-paddingInlineEnd) + var(--sticky-marginInlineEnd));
+
+						--sticky4-paddingBlockStart: var(--sticky-paddingBlockStart);
+						--sticky4-paddingBlockEnd: var(--sticky-paddingBlockEnd);
+						--sticky4-paddingInlineStart: var(--sticky-paddingInlineStart);
+						--sticky4-paddingInlineEnd: var(--sticky-paddingInlineEnd);
+
+						--sticky4-sizeBlock: calc(var(--scrollContainer-sizeBlock) - var(--sticky4-insetBlockStart) - var(--sticky4-insetBlockEnd));
+						--sticky4-sizeInline: calc(var(--scrollContainer-sizeInline) - var(--sticky4-insetInlineStart) - var(--sticky4-insetInlineEnd));
+
+						--sticky-insetBlockStart: var(--sticky4-insetBlockStart);
+						--sticky-insetBlockEnd: var(--sticky4-insetBlockEnd);
+						--sticky-insetInlineStart: var(--sticky4-insetInlineStart);
+						--sticky-insetInlineEnd: var(--sticky4-insetInlineEnd);
+
+						--sticky-sizeBlock: var(--sticky4-sizeBlock);
+						--sticky-sizeInline: var(--sticky4-sizeInline);
+					}
+				}
+			}
+		}
+	/* } */
+
+
+	/**
+	 * Sticky Container
+	 */
+	&[data-sticky-container],
+	[data-sticky-container] {
+		/* Inputs */
+		--sticky-marginBlockStart: 0px;
+		--sticky-marginBlockEnd: 0px;
+		--sticky-marginInlineStart: 0px;
+		--sticky-marginInlineEnd: 0px;
+		--sticky-paddingBlockStart: 0px;
+		--sticky-paddingBlockEnd: 0px;
+		--sticky-paddingInlineStart: 0px;
+		--sticky-paddingInlineEnd: 0px;
+
+		--scrollItem-inlineDetached-maxSize: var(--sticky-sizeInline);
+		--scrollItem-inlineDetached-paddingStart: 1.5rem;
+		--scrollItem-inlineDetached-maxPaddingMatchStart: 2rem;
+		--scrollItem-inlineDetached-paddingEnd: 1.5rem;
+		--scrollItem-inlineDetached-maxPaddingMatchEnd: 2rem;
+
+		/* Rules */
+		isolation: isolate;
+
+
+		/**
+		 * Sticky Item
+		 */
+		[data-sticky] {
+			/* Inputs */
+			--sticky-backgroundColor: light-dark(#efefefaa, #141414aa);
+			--sticky-backdropFilter: blur(20px);
+			--sticky-backdropMaskImage: none;
+
+			/* Rules */
+			z-index: 1;
+			container-type: scroll-state;
+
+			position: sticky;
+
+			&:not([data-sticky~='block']):not([data-sticky~='inline']),
+			&[data-sticky~='block'] {
+				inset-block-start: var(--sticky-insetBlockStart);
+				inset-block-end: var(--sticky-insetBlockEnd);
+
+				max-block-size: calc(var(--scrollContainer-sizeBlock) - var(--sticky-insetBlockStart) - var(--sticky-insetBlockEnd));
+
+				&[data-sticky~='block-start'] {
+					inset-inline-end: auto;
+				}
+
+				&[data-sticky~='block-end'] {
+					inset-inline-start: auto;
+				}
+			}
+			&:not([data-sticky~='block']):not([data-sticky~='inline']),
+			&[data-sticky~='inline'] {
+				inset-inline-start: var(--sticky-insetInlineStart);
+				inset-inline-end: var(--sticky-insetInlineEnd);
+
+				max-inline-size: calc(var(--scrollContainer-sizeInline) - var(--sticky-insetInlineStart) - var(--sticky-insetInlineEnd));
+
+				&[data-sticky~='inline-start'] {
+					inset-inline-end: auto;
+				}
+
+				&[data-sticky~='inline-end'] {
+					inset-inline-start: auto;
+				}
+			}
+
+			&:not([data-sticky~='backdrop-none']) {
+				&[data-scroll-container],
+				&:not([data-scroll-container])::before {
+					background-color: var(--sticky-backgroundColor);
+					backdrop-filter: var(--sticky-backdropFilter);
+					border-radius: inherit;
+
+					transition-property: background-color, backdrop-filter;
+				}
+
+				&:not([data-scroll-container])::before {
+					content: '';
+					z-index: -1;
+					position: absolute;
+					inset: 0;
+				}
+
+				&:not([data-sticky~='backdrop-always']) {
+					&:not([data-scroll-container])::before {
+						@container scroll-state(stuck: none) {
+							background-color: transparent !important;
+							backdrop-filter: blur(0px);
+						}
+					}
+				}
+			}
+		}
+
+
+		/**
+		 * Scroll Item
+		 */
+		[data-scroll-item] {
+			&[data-scroll-item~='inline-detached'] {
+				/* Rules */
+				--scrollItem-paddingInlineStart: max(var(--scrollItem-inlineDetached-paddingStart), (var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2);
+				--scrollItem-paddingInlineEnd: max(var(--scrollItem-inlineDetached-paddingEnd), (var(--sticky-sizeInline) - var(--scrollItem-inlineDetached-maxSize)) / 2);
+				--scrollItem-paddingInlineMatch: min(var(--scrollItem-paddingInlineStart), var(--scrollItem-paddingInlineEnd));
+
+				inline-size: 100%;
+				padding-inline-start: var(--scrollItem-paddingInlineStart);
+				padding-inline-end: var(--scrollItem-paddingInlineEnd);
+
+				&[data-sticky-container] {
+					--sticky-paddingInlineStart: var(--scrollItem-paddingInlineStart);
+					--sticky-paddingInlineEnd: var(--scrollItem-paddingInlineEnd);
+				}
+
+				&[data-scroll-item~='padding-match-start'] {
+					padding-block-start: min(var(--scrollItem-paddingInlineMatch), var(--scrollItem-inlineDetached-maxPaddingMatchStart));
+				}
+
+				&[data-scroll-item~='padding-match-end'] {
+					padding-block-end: min(var(--scrollItem-paddingInlineMatch), var(--scrollItem-inlineDetached-maxPaddingMatchEnd));
+				}
+
+				[data-scroll-item~='inline-detached'] {
+					inline-size: auto;
+					max-inline-size: calc(100% + var(--scrollItem-paddingInlineStart) + var(--scrollItem-paddingInlineEnd));
+					margin-inline-start: calc(-1 * var(--scrollItem-paddingInlineStart));
+					margin-inline-end: calc(-1 * var(--scrollItem-paddingInlineEnd));
+				}
+			}
+			&[data-scroll-item~='inline-attached'] {
+				display: grid;
+				inline-size: min-content;
+				min-inline-size: var(--sticky-sizeInline);
+
+				&[data-scroll-item~='underflow-start'] {
+					justify-content: safe start;
+				}
+				&[data-scroll-item~='underflow-center'] {
+					justify-content: safe center;
+				}
+				&[data-scroll-item~='underflow-end'] {
+					justify-content: safe end;
+				}
+
+				&[data-scroll-item~='overflow-start'] {
+					position: sticky;
+					inset-inline-end: var(--sticky-insetInlineEnd);
+					margin-inline-start: auto;
+				}
+				&[data-scroll-item~='overflow-center'] {
+					margin-inline: auto;
+				}
+				&[data-scroll-item~='overflow-end'] {
+					position: sticky;
+					inset-inline-start: var(--sticky-insetInlineStart);
+					margin-inline-end: auto;
+				}
+			}
+
+			&[data-scroll-item~='snap-block-start'] {
+				scroll-snap-align: start;
+			}
+			&[data-scroll-item~='snap-block-end'] {
+				scroll-snap-align: end;
+			}
+
+			&[data-scroll-item~='block-size-max'] {
+				block-size: max-content;
+			}
+
+			&[data-scroll-item~='inline-size-max'] {
+				inline-size: max-content;
+			}
+		}
+	}
+}
+
+/* Keep data-attribute dependent <details> rules near other attribute utilities. */
+details {
+	> summary {
+		@container (inline-size < 42ch) {
+			&:has(> :only-child[data-row~='wrap']) {
+				justify-content: end;
+
+				> :only-child[data-row~='wrap'] {
+					display: contents;
+				}
+
+				&::after {
+					align-self: end;
+				}
+			}
+		}
+	}
+
+	&[data-card] {
+		padding: 0;
+		gap: 0 !important;
+
+		> summary {
+			padding: var(--card-padding);
+		}
+
+		> summary + :last-child {
+			padding: var(--card-padding);
+			padding-top: 0;
+		}
+	}
+}
+
