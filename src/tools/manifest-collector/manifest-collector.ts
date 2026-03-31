@@ -7,9 +7,9 @@ import { allWallets, assertValidWalletName, type WalletName } from '@/data/walle
 import { getExtensionId } from '@/schema/extension-url'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 
-import { parseAndroidManifest, parseIosPlist } from './mobile-manifest-parser'
 import { parseBrowserExtensionManifest } from './browser-ext-manifest-parser'
 import { fetchBrowserExtensionManifest, fetchText } from './crx-downloader'
+import { parseAndroidManifest, parseIosPlist } from './mobile-manifest-parser'
 
 const REPO_ROOT = getRepositoryRoot()
 
