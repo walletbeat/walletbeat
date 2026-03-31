@@ -1693,8 +1693,9 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://blog.ambire.com/ambire-supports-safe-accounts/',
 		urlHash: 'c89f9bd364380a9ffd5ff2e7f453e0220296d1d9',
 		retrieved: '2026-03-27',
-	},{
-	url: 'https://chromewebstore.google.com/detail/nufi/gpnihlnnodeiiaakbikldcihojploeca',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/nufi/gpnihlnnodeiiaakbikldcihojploeca',
 		urlHash: 'f3ee58ccad5b73604401c32f5ce451e773809784',
 		retrieved: '2026-03-30',
 	},
@@ -1722,7 +1723,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
 		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
 		retrieved: '2026-03-31',
-	}
+	},
 ]
 
 /**

@@ -31,6 +31,14 @@ import {
 	KeyGenerationLocation,
 	MultiPartyKeyReconstruction,
 } from '@/schema/features/security/keys-handling'
+import {
+	BrowserExtensionPermission,
+	ExternalExtensionIdScope,
+	HostPermissionScope,
+	KeyStorageMechanism,
+	SecureRngSource,
+	WebAccessibleResourcesScope,
+} from '@/schema/features/security/security-best-practices'
 import type {
 	ContractTransactionWarning,
 	ScamUrlWarning,
@@ -634,7 +642,34 @@ export const ambire: SoftwareWallet = {
 					userWhitelist: false, // address book is no sufficient in functionality for this flag
 				}),
 			},
-			securityBestPractices: null,
+			securityBestPractices: {
+				browser: {
+					ref: refTodo,
+					browserExtensionHardening: {
+						contentScripts: HostPermissionScope.NONE,
+						externallyConnectable: {
+							extensionIds: ExternalExtensionIdScope.ANY,
+							pageMatches: HostPermissionScope.NONE,
+						},
+						hostPermissions: HostPermissionScope.UNRESTRICTED,
+						permissions: [
+							BrowserExtensionPermission.STORAGE,
+							BrowserExtensionPermission.TABS,
+							BrowserExtensionPermission.UNLIMITED_STORAGE,
+							BrowserExtensionPermission.ACTIVE_TAB,
+							BrowserExtensionPermission.NOTIFICATIONS,
+							BrowserExtensionPermission.SCRIPTING,
+							BrowserExtensionPermission.ALARMS,
+							BrowserExtensionPermission.SYSTEM_DISPLAY,
+						],
+						webAccessibleResources: WebAccessibleResourcesScope.NONE,
+					},
+					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+					secureRng: SecureRngSource.OS_CSPRNG,
+				},
+				desktop: 'NOT_A_DESKTOP_APP',
+				mobile: 'NOT_A_MOBILE_APP',
+			},
 			transactionLegibility: {
 				ref: refTodo,
 				calldataDisplay: {
