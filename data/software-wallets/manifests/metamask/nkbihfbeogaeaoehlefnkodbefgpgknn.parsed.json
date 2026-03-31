@@ -1,9 +1,6 @@
 {
 	"contentScripts": "UNRESTRICTED",
-	"externallyConnectable": {
-		"extensionIds": "ANY",
-		"pageMatches": "HTTP_AND_HTTPS"
-	},
+	"externallyConnectable": { "extensionIds": "ANY", "pageMatches": "HTTP_AND_HTTPS" },
 	"hostPermissions": "UNRESTRICTED",
 	"permissions": [
 		"activeTab",

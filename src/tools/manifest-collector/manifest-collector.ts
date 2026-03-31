@@ -1,13 +1,15 @@
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 
+import * as prettier from 'prettier'
+
 import { allWallets, assertValidWalletName, type WalletName } from '@/data/wallets'
 import { getExtensionId } from '@/schema/extension-url'
 import { getRepositoryRoot } from '@/tests/utils/codebase'
 
-import { parseAndroidManifest, parseIosPlist } from './android-manifest-parser'
 import { parseBrowserExtensionManifest } from './browser-ext-manifest-parser'
 import { fetchBrowserExtensionManifest, fetchText } from './crx-downloader'
+import { parseAndroidManifest, parseIosPlist } from './mobile-manifest-parser'
 
 const REPO_ROOT = getRepositoryRoot()
 
@@ -19,16 +21,10 @@ Fetches and stores manifest data for wallet(s), then prints the corresponding
 TypeScript field values to paste into the wallet's data file.
 
 Modes (pick one):
-  --all                            Collect browser extension manifests for all
-                                   wallets that have a Chrome Web Store URL.
+  --all                            Collect all manifests for all wallets that
+                                   have any manifest URL in their metadata.
   --id <wallet-id>                 Collect manifests for a single wallet by ID
                                    (e.g. "metamask", "rabby").
-
-Optional (requires --id):
-  --android-manifest-url <url>     URL to a raw AndroidManifest.xml (e.g. from
-                                   GitHub) for the wallet's mobile app.
-  --ios-plist-url <url>            URL to a raw Info.plist XML (e.g. from
-                                   GitHub) for the wallet's iOS app.
 
 Data is saved to:
   data/software-wallets/manifests/<wallet-id>/<extension-id>.manifest.json
@@ -38,8 +34,6 @@ Data is saved to:
 Examples:
   pnpm collect:manifests -- --all
   pnpm collect:manifests -- --id metamask
-  pnpm collect:manifests -- --id metamask --android-manifest-url \\
-    https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/android/app/src/main/AndroidManifest.xml
 `)
 	process.exit(1)
 }
@@ -65,8 +59,6 @@ if (hasFlag('help')) {
 
 const allMode = hasFlag('all')
 const walletIdArg = getArg('id')
-const androidManifestUrl = getArg('android-manifest-url')
-const iosPlistUrl = getArg('ios-plist-url')
 
 if (!allMode && walletIdArg === undefined) {
 	process.stderr.write('Error: either --all or --id <wallet-id> is required\n')
@@ -78,58 +70,66 @@ if (allMode && walletIdArg !== undefined) {
 	usage()
 }
 
-if (allMode && (androidManifestUrl !== undefined || iosPlistUrl !== undefined)) {
-	process.stderr.write('Error: --android-manifest-url and --ios-plist-url require --id\n')
-	usage()
+type WalletEntry = {
+	id: string
+	extensionIds: string[]
+	androidManifestXml: string | undefined
+	iosInfoPlist: string | undefined
 }
 
-type WalletEntry = { id: string; extensionUrls: string[] }
-
-function getExtensionUrls(id: WalletName): string[] {
+function getWalletEntry(id: WalletName): WalletEntry {
 	const wallet = allWallets[id]
 
-	return (wallet.metadata.urls?.extensions ?? []).map(url => getExtensionId(url))
+	return {
+		androidManifestXml: wallet.metadata.urls?.androidManifestXml,
+		extensionIds: (wallet.metadata.urls?.extensions ?? []).map(url => getExtensionId(url)),
+		id,
+		iosInfoPlist: wallet.metadata.urls?.iosInfoPlist,
+	}
+}
+
+function hasAnyManifest(entry: WalletEntry): boolean {
+	return (
+		entry.extensionIds.length > 0 ||
+		entry.androidManifestXml !== undefined ||
+		entry.iosInfoPlist !== undefined
+	)
 }
 
 let targets: WalletEntry[] = []
-let walletId: WalletName | undefined
 
 if (allMode) {
-	targets = Object.entries(allWallets)
-		.map(([id, wallet]) => ({
-			extensionUrls: (wallet.metadata.urls?.extensions ?? []).map(url => getExtensionId(url)),
-			id,
-		}))
-		.filter(entry => entry.extensionUrls.length > 0)
+	targets = Object.keys(allWallets)
+		.map(id => getWalletEntry(id as WalletName))
+		.filter(hasAnyManifest)
 
 	if (targets.length === 0) {
-		process.stderr.write('No wallets with Chrome extension URLs found.\n')
+		process.stderr.write('No wallets with manifest URLs found.\n')
 		process.exit(0)
 	}
 
-	process.stderr.write(`Found ${targets.length} wallet(s) with extension URLs.\n`)
+	process.stderr.write(`Found ${targets.length} wallet(s) with manifest URLs.\n`)
 } else if (walletIdArg !== undefined) {
-	walletId = assertValidWalletName(walletIdArg)
+	const walletId = assertValidWalletName(walletIdArg)
+	const entry = getWalletEntry(walletId)
 
-	const extensionUrls = getExtensionUrls(walletId)
-
-	if (extensionUrls.length === 0) {
+	if (!hasAnyManifest(entry)) {
 		process.stderr.write(
-			`Error: wallet "${walletId}" has no Chrome extension URLs in its metadata.urls.extensions field.\n` +
-				"Add a Chrome Web Store URL to the wallet's data file first.\n",
+			`Error: wallet "${walletId}" has no manifest URLs in its metadata.urls fields.\n` +
+				"Add a Chrome Web Store URL, androidManifest URL, or iosManifest URL to the wallet's data file first.\n",
 		)
 		process.exit(1)
 	}
 
-	targets = [{ extensionUrls, id: walletId }]
+	targets = [entry]
 }
 
-for (const { id, extensionUrls } of targets) {
+for (const { id, extensionIds, androidManifestXml, iosInfoPlist } of targets) {
 	const manifestDir = path.join(REPO_ROOT, 'data', 'software-wallets', 'manifests', id)
 
 	fs.mkdirSync(manifestDir, { recursive: true })
 
-	for (const extensionId of extensionUrls) {
+	for (const extensionId of extensionIds) {
 		process.stderr.write(`\n[${id}] Fetching manifest for extension: ${extensionId} ...\n`)
 
 		const rawManifest = await fetchBrowserExtensionManifest(extensionId)
@@ -141,23 +141,19 @@ for (const { id, extensionUrls } of targets) {
 
 		const parsed = parseBrowserExtensionManifest(rawManifest)
 		const parsedPath = path.join(manifestDir, `${extensionId}.parsed.json`)
+		const parsedConfig = (await prettier.resolveConfig(parsedPath)) ?? {}
 
-		fs.writeFileSync(parsedPath, JSON.stringify(parsed, null, '\t') + '\n')
+		fs.writeFileSync(
+			parsedPath,
+			await prettier.format(JSON.stringify(parsed), { ...parsedConfig, parser: 'json' }),
+		)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, parsedPath)}\n`)
 	}
-}
 
-if (walletId !== undefined) {
-	const manifestDir = path.join(REPO_ROOT, 'data', 'software-wallets', 'manifests', walletId)
+	if (androidManifestXml !== undefined) {
+		process.stderr.write(`\n[${id}] Fetching AndroidManifest.xml from: ${androidManifestXml} ...\n`)
 
-	fs.mkdirSync(manifestDir, { recursive: true })
-
-	if (androidManifestUrl !== undefined) {
-		process.stderr.write(
-			`\n[${walletId}] Fetching AndroidManifest.xml from: ${androidManifestUrl} ...\n`,
-		)
-
-		const xmlText = await fetchText(androidManifestUrl)
+		const xmlText = await fetchText(androidManifestXml)
 		const outPath = path.join(manifestDir, 'android-manifest.xml')
 
 		fs.writeFileSync(outPath, xmlText)
@@ -165,18 +161,22 @@ if (walletId !== undefined) {
 
 		const permissions = parseAndroidManifest(xmlText)
 		const androidParsedPath = path.join(manifestDir, 'android.parsed.json')
+		const androidParsedConfig = (await prettier.resolveConfig(androidParsedPath)) ?? {}
 
 		fs.writeFileSync(
 			androidParsedPath,
-			JSON.stringify({ usesPermissions: [...permissions] }, null, '\t') + '\n',
+			await prettier.format(JSON.stringify({ usesPermissions: [...permissions] }), {
+				...androidParsedConfig,
+				parser: 'json',
+			}),
 		)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, androidParsedPath)}\n`)
 	}
 
-	if (iosPlistUrl !== undefined) {
-		process.stderr.write(`\n[${walletId}] Fetching Info.plist from: ${iosPlistUrl} ...\n`)
+	if (iosInfoPlist !== undefined) {
+		process.stderr.write(`\n[${id}] Fetching Info.plist from: ${iosInfoPlist} ...\n`)
 
-		const plistText = await fetchText(iosPlistUrl)
+		const plistText = await fetchText(iosInfoPlist)
 		const outPath = path.join(manifestDir, 'ios-info.plist.xml')
 
 		fs.writeFileSync(outPath, plistText)
@@ -184,10 +184,14 @@ if (walletId !== undefined) {
 
 		const usageDescriptions = parseIosPlist(plistText)
 		const iosParsedPath = path.join(manifestDir, 'ios.parsed.json')
+		const iosParsedConfig = (await prettier.resolveConfig(iosParsedPath)) ?? {}
 
 		fs.writeFileSync(
 			iosParsedPath,
-			JSON.stringify({ usageDescriptions: [...usageDescriptions] }, null, '\t') + '\n',
+			await prettier.format(JSON.stringify({ usageDescriptions: [...usageDescriptions] }), {
+				...iosParsedConfig,
+				parser: 'json',
+			}),
 		)
 		process.stderr.write(`Saved: ${path.relative(REPO_ROOT, iosParsedPath)}\n`)
 	}

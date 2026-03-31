@@ -33,7 +33,7 @@ import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/content'
-import { assertNonEmptyArray } from '@/types/utils/non-empty'
+import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
@@ -41,11 +41,11 @@ export type SecurityBestPracticesValue = Value
 
 function keyStoragePass(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
-	mechanism: KeyStorageMechanism,
+	mechanism: KeyStorageMechanism.HARDWARE_SECURITY_MODULE | KeyStorageMechanism.PASSKEY_MANAGED,
 ): Evaluation<SecurityBestPracticesValue> {
 	const mechanismLabel =
-		mechanism === KeyStorageMechanism.NO_KEY_STORED
-			? 'No private key is stored — the wallet uses passkey-managed accounts.'
+		mechanism === KeyStorageMechanism.PASSKEY_MANAGED
+			? 'No private key is stored, the wallet uses passkey-managed accounts.'
 			: 'Keys are stored in a hardware security module or secure enclave.'
 
 	return ctx.build({
@@ -61,7 +61,9 @@ function keyStoragePass(
 
 function keyStoragePartial(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
-	mechanism: KeyStorageMechanism,
+	mechanism:
+		| KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF
+		| KeyStorageMechanism.OS_SANDBOXED_PLAINTEXT,
 ): Evaluation<SecurityBestPracticesValue> {
 	const mechanismLabel =
 		mechanism === KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF
@@ -79,7 +81,7 @@ function keyStoragePartial(
 		},
 		details: paragraph(mechanismLabel),
 		howToImprove: mdParagraph(
-			'{{WALLET_NAME}} should store keys inside a hardware security module or secure enclave, or use passkey-managed accounts with no on-device key storage.',
+			'{{WALLET_NAME}} should store keys inside a hardware security module or secure enclave.',
 		),
 	})
 }
@@ -98,7 +100,7 @@ function keyStorageFail(
 			'The key storage mechanism used by {{WALLET_NAME}} does not provide adequate protection against key extraction.',
 		),
 		howToImprove: mdParagraph(
-			'{{WALLET_NAME}} should store keys in a hardware security module or secure enclave, encrypt them with a strong user secret, or use passkey-managed accounts.',
+			'{{WALLET_NAME}} should store keys in a hardware security module or secure enclave, or encrypt them with a strong user secret.',
 		),
 	})
 }
@@ -109,7 +111,7 @@ function evaluateKeyStorage(
 ): Evaluation<SecurityBestPracticesValue> {
 	switch (mechanism) {
 		case KeyStorageMechanism.HARDWARE_SECURITY_MODULE:
-		case KeyStorageMechanism.NO_KEY_STORED:
+		case KeyStorageMechanism.PASSKEY_MANAGED:
 			return keyStoragePass(ctx, mechanism)
 		case KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF:
 		case KeyStorageMechanism.OS_SANDBOXED_PLAINTEXT:
@@ -317,46 +319,68 @@ function evaluateExternallyConnectable(
 	})
 }
 
-const failBrowserPermissions: BrowserExtensionPermission[] = [
-	// Attaches the Chrome DevTools protocol to any tab — full read/write access to page content.
-	BrowserExtensionPermission.DEBUGGER,
-	// Can delete history, cookies, and cached data — destructive and privacy-invasive.
-	BrowserExtensionPermission.BROWSING_DATA,
-	// Full read access to the user's browsing history.
-	BrowserExtensionPermission.HISTORY,
-	// Can list, enable, disable, or uninstall other extensions.
-	BrowserExtensionPermission.MANAGEMENT,
-	// Can reroute all browser network traffic through an attacker-controlled proxy.
-	BrowserExtensionPermission.PROXY,
-	// Allows registering arbitrary user-supplied scripts that run in web pages.
-	BrowserExtensionPermission.USER_SCRIPTS,
-	// Intercepts WebAuthn requests — can impersonate hardware security keys.
-	BrowserExtensionPermission.WEB_AUTHENTICATION_PROXY,
-	// Captures the screen, a window, or a tab as a media stream.
-	BrowserExtensionPermission.DESKTOP_CAPTURE,
-]
+const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL | Rating.PASS> = {
+	// Benign or wallet-typical permissions.
+	[BrowserExtensionPermission.ACTIVE_TAB]: Rating.PASS,
+	[BrowserExtensionPermission.ALARMS]: Rating.PASS,
+	[BrowserExtensionPermission.BOOKMARKS]: Rating.PASS,
+	[BrowserExtensionPermission.CLIPBOARD_WRITE]: Rating.PASS,
+	[BrowserExtensionPermission.CONTEXT_MENUS]: Rating.PASS,
+	[BrowserExtensionPermission.COOKIES]: Rating.PASS,
+	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST]: Rating.PASS,
+	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS]: Rating.PASS,
+	[BrowserExtensionPermission.GCM]: Rating.PASS,
+	[BrowserExtensionPermission.GEOLOCATION]: Rating.PASS,
+	[BrowserExtensionPermission.IDENTITY]: Rating.PASS,
+	[BrowserExtensionPermission.IDENTITY_EMAIL]: Rating.PASS,
+	[BrowserExtensionPermission.NOTIFICATIONS]: Rating.PASS,
+	[BrowserExtensionPermission.OFFSCREEN]: Rating.PASS,
+	[BrowserExtensionPermission.SCRIPTING]: Rating.PASS,
+	[BrowserExtensionPermission.SIDE_PANEL]: Rating.PASS,
+	[BrowserExtensionPermission.STORAGE]: Rating.PASS,
+	[BrowserExtensionPermission.SYSTEM_CPU]: Rating.PASS,
+	[BrowserExtensionPermission.SYSTEM_DISPLAY]: Rating.PASS,
+	[BrowserExtensionPermission.TABS]: Rating.PASS,
+	[BrowserExtensionPermission.UNLIMITED_STORAGE]: Rating.PASS,
+	[BrowserExtensionPermission.WEB_NAVIGATION]: Rating.PASS,
+	[BrowserExtensionPermission.WEB_REQUEST]: Rating.PASS,
 
-const partialBrowserPermissions: BrowserExtensionPermission[] = [
+	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
+	// Attaches the Chrome DevTools protocol to any tab, full read/write access to page content.
+	[BrowserExtensionPermission.DEBUGGER]: Rating.FAIL,
+	// Can delete history, cookies, and cached data, destructive and privacy-invasive.
+	[BrowserExtensionPermission.BROWSING_DATA]: Rating.FAIL,
+	// Full read access to the user's browsing history.
+	[BrowserExtensionPermission.HISTORY]: Rating.FAIL,
+	// Can list, enable, disable, or uninstall other extensions.
+	[BrowserExtensionPermission.MANAGEMENT]: Rating.FAIL,
+	// Can reroute all browser network traffic through an attacker-controlled proxy.
+	[BrowserExtensionPermission.PROXY]: Rating.FAIL,
+	// Allows registering arbitrary user-supplied scripts that run in web pages.
+	[BrowserExtensionPermission.USER_SCRIPTS]: Rating.FAIL,
+	// Intercepts WebAuthn requests, can impersonate hardware security keys.
+	[BrowserExtensionPermission.WEB_AUTHENTICATION_PROXY]: Rating.FAIL,
+	// Captures the screen, a window, or a tab as a media stream.
+	[BrowserExtensionPermission.DESKTOP_CAPTURE]: Rating.FAIL,
 	// Legitimate for hardware wallet communication but opens a native OS code execution channel.
-	BrowserExtensionPermission.NATIVE_MESSAGING,
+	[BrowserExtensionPermission.NATIVE_MESSAGING]: Rating.FAIL,
 	// Reads clipboard contents without a user gesture.
-	BrowserExtensionPermission.CLIPBOARD_READ,
+	[BrowserExtensionPermission.CLIPBOARD_READ]: Rating.FAIL,
 	// Can synchronously block or modify all HTTP/S requests.
-	BrowserExtensionPermission.WEB_REQUEST_BLOCKING,
+	[BrowserExtensionPermission.WEB_REQUEST_BLOCKING]: Rating.FAIL,
 	// Reads and modifies browser-wide privacy settings.
-	BrowserExtensionPermission.PRIVACY,
+	[BrowserExtensionPermission.PRIVACY]: Rating.FAIL,
 	// Saves a full MHTML snapshot of any tab.
-	BrowserExtensionPermission.PAGE_CAPTURE,
-]
+	[BrowserExtensionPermission.PAGE_CAPTURE]: Rating.FAIL,
+}
 
 function evaluateBrowserPermissions(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 	manifest: BrowserExtensionManifest,
 ): Evaluation<SecurityBestPracticesValue> {
-	const badFail = manifest.permissions.filter(p => failBrowserPermissions.includes(p))
-	const badPartial = manifest.permissions.filter(p => partialBrowserPermissions.includes(p))
+	const badPerms = manifest.permissions.filter(p => browserPermissionRatings[p] === Rating.FAIL)
 
-	if (badFail.length > 0) {
+	if (badPerms.length > 0) {
 		return ctx.build({
 			value: {
 				id: 'browser_permissions_fail',
@@ -367,29 +391,10 @@ function evaluateBrowserPermissions(
 				),
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} declares the following high-risk browser permissions that are not required for wallet functionality: ${badFail.join(', ')}.`,
+				`{{WALLET_NAME}} declares the following high-risk browser permissions that are not required for wallet functionality: ${badPerms.join(', ')}.`,
 			),
 			howToImprove: mdParagraph(
-				`{{WALLET_NAME}} should remove these permissions from its manifest: ${badFail.map(p => `\`${p}\``).join(', ')}.`,
-			),
-		})
-	}
-
-	if (badPartial.length > 0) {
-		return ctx.build({
-			value: {
-				id: 'browser_permissions_partial',
-				rating: Rating.PARTIAL,
-				displayName: 'Risky browser permissions declared',
-				shortExplanation: mdSentence(
-					'{{WALLET_NAME}} declares browser permissions that carry elevated risk for a wallet.',
-				),
-			},
-			details: paragraph(
-				`{{WALLET_NAME}} declares the following elevated-risk browser permissions: ${badPartial.join(', ')}.`,
-			),
-			howToImprove: mdParagraph(
-				`{{WALLET_NAME}} should evaluate whether these permissions are strictly necessary and remove any that are not: ${badPartial.map(p => `\`${p}\``).join(', ')}.`,
+				`{{WALLET_NAME}} should remove these permissions from its manifest: ${badPerms.map(p => `\`${p}\``).join(', ')}.`,
 			),
 		})
 	}
@@ -480,7 +485,7 @@ function evaluateBrowserExtension(
 }
 
 const unnecessaryAndroidPermissions = [
-	// Allows drawing overlays over other apps — can be used to phish seed phrases or intercept transaction confirmations.
+	// Allows drawing overlays over other apps, can be used to phish seed phrases or intercept transaction confirmations.
 	AndroidPermission.SYSTEM_ALERT_WINDOW,
 	// Microphone access enables covert audio recording of sensitive conversations.
 	AndroidPermission.RECORD_AUDIO,
@@ -658,167 +663,114 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 				mdParagraph(
 					'(Browser extension) The extension stores keys in a hardware security module, uses an OS CSPRNG, requests minimal host permissions, and restricts web-accessible resources.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_pass',
-						rating: Rating.PASS,
-						displayName: 'Secure key storage',
-						shortExplanation: mdSentence('Keys are stored in a hardware security module.'),
+				evaluateBrowserExtension(
+					EvaluationContext.forTest(() => securityBestPractices),
+					{
+						hostPermissions: HostPermissionScope.NONE,
+						webAccessibleResources: WebAccessibleResourcesScope.NONE,
+						contentScripts: HostPermissionScope.NONE,
+						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						permissions: [],
 					},
-					details: paragraph('Keys are stored in a hardware security module.'),
-				}),
+				),
 			),
 			exampleRating(
 				mdParagraph(
 					'(Mobile app) The app stores keys in a hardware security module, uses an OS CSPRNG, and declares only the OS permissions it needs.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_pass',
-						rating: Rating.PASS,
-						displayName: 'Secure key storage',
-						shortExplanation: mdSentence('Keys are stored in a hardware security module.'),
+				evaluateMobileApp(
+					EvaluationContext.forTest(() => securityBestPractices),
+					{
+						android: { usesPermissions: [AndroidPermission.INTERNET, AndroidPermission.CAMERA] },
+						ios: { usageDescriptions: [IosUsageDescription.CAMERA, IosUsageDescription.FACE_ID] },
 					},
-					details: paragraph('Keys are stored in a hardware security module.'),
-				}),
+				),
 			),
 			exampleRating(
 				mdParagraph(
 					'(Desktop app) The app stores keys in a hardware security module and uses an OS CSPRNG.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_pass',
-						rating: Rating.PASS,
-						displayName: 'Secure key storage',
-						shortExplanation: mdSentence('Keys are stored in a hardware security module.'),
-					},
-					details: paragraph('Keys are stored in a hardware security module.'),
-				}),
+				evaluateKeyStorage(
+					EvaluationContext.forTest(() => securityBestPractices),
+					KeyStorageMechanism.HARDWARE_SECURITY_MODULE,
+				),
 			),
 		],
 		partial: [
 			exampleRating(
 				mdParagraph(
-					'(Browser extension) The extension encrypts keys with a user password and uses an OS CSPRNG, but has gaps in browser extension hardening.',
+					'(Browser extension) The extension uses a standardized KDF for key encryption and an OS CSPRNG, but its web-accessible resources are exposed to all HTTPS origins.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_partial',
-						rating: Rating.PARTIAL,
-						displayName: 'Partial key storage protection',
-						shortExplanation: mdSentence(
-							'Keys are encrypted with a user secret, providing partial protection.',
-						),
+				evaluateBrowserExtension(
+					EvaluationContext.forTest(() => securityBestPractices),
+					{
+						hostPermissions: HostPermissionScope.NONE,
+						webAccessibleResources: WebAccessibleResourcesScope.HTTPS_ONLY,
+						contentScripts: HostPermissionScope.NONE,
+						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						permissions: [],
 					},
-					details: paragraph(
-						'Keys are encrypted with a user-controlled secret but could be attacked if the secret is weak.',
-					),
-					howToImprove: mdParagraph(
-						'Consider using a hardware security module or secure enclave for key storage.',
-					),
-				}),
+				),
 			),
 			exampleRating(
 				mdParagraph(
-					'(Mobile app) The app encrypts keys with a user password and uses an OS CSPRNG, but requests high-risk OS permissions not needed for wallet functionality.',
+					'(Mobile app) The app encrypts keys with a user password using a standardized KDF and uses an OS CSPRNG, but does not use a hardware security module.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_partial',
-						rating: Rating.PARTIAL,
-						displayName: 'Partial key storage protection',
-						shortExplanation: mdSentence(
-							'Keys are encrypted with a user secret, providing partial protection.',
-						),
-					},
-					details: paragraph(
-						'Keys are encrypted with a user-controlled secret but could be attacked if the secret is weak.',
-					),
-					howToImprove: mdParagraph(
-						'Consider using a hardware security module or secure enclave for key storage.',
-					),
-				}),
+				evaluateKeyStorage(
+					EvaluationContext.forTest(() => securityBestPractices),
+					KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
+				),
 			),
 			exampleRating(
 				mdParagraph(
 					'(Desktop app) The app stores keys in OS-sandboxed storage and uses an OS CSPRNG, but does not use a hardware security module or secure enclave.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_partial',
-						rating: Rating.PARTIAL,
-						displayName: 'Partial key storage protection',
-						shortExplanation: mdSentence(
-							'Keys are stored in OS-sandboxed storage without additional encryption.',
-						),
-					},
-					details: paragraph(
-						'Keys are stored in OS-sandboxed plaintext storage. Other processes cannot read them, but they are not encrypted at rest.',
-					),
-					howToImprove: mdParagraph(
-						'Consider using a hardware security module or secure enclave for key storage.',
-					),
-				}),
+				evaluateKeyStorage(
+					EvaluationContext.forTest(() => securityBestPractices),
+					KeyStorageMechanism.OS_SANDBOXED_PLAINTEXT,
+				),
 			),
 		],
 		fail: [
 			exampleRating(
 				mdParagraph(
-					'(Browser extension) The extension stores keys without adequate encryption and requests overbroad host permissions.',
+					'(Browser extension) The extension requests overbroad host permissions and exposes web-accessible resources to all origins.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_fail',
-						rating: Rating.FAIL,
-						displayName: 'Weak key storage',
-						shortExplanation: mdSentence('Keys are not adequately protected.'),
+				evaluateBrowserExtension(
+					EvaluationContext.forTest(() => securityBestPractices),
+					{
+						hostPermissions: HostPermissionScope.HTTP_AND_HTTPS,
+						webAccessibleResources: WebAccessibleResourcesScope.HTTP_AND_HTTPS,
+						contentScripts: HostPermissionScope.NONE,
+						externallyConnectable: 'NOT_EXTERNALLY_CONNECTABLE',
+						permissions: [],
 					},
-					details: paragraph(
-						'The key storage mechanism does not provide adequate protection against key extraction.',
-					),
-					howToImprove: mdParagraph(
-						'Store keys in a hardware security module, encrypt them with a strong user secret, or use passkey-managed accounts.',
-					),
-				}),
+				),
 			),
 			exampleRating(
 				mdParagraph(
-					'(Mobile app) The app stores keys without adequate encryption and requests high-risk OS permissions such as draw-over-other-apps.',
+					'(Mobile app) The app requests high-risk OS permissions such as draw-over-other-apps.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_fail',
-						rating: Rating.FAIL,
-						displayName: 'Weak key storage',
-						shortExplanation: mdSentence('Keys are not adequately protected.'),
+				evaluateMobileApp(
+					EvaluationContext.forTest(() => securityBestPractices),
+					{
+						android: {
+							usesPermissions: [AndroidPermission.INTERNET, AndroidPermission.SYSTEM_ALERT_WINDOW],
+						},
+						ios: {
+							usageDescriptions: [IosUsageDescription.CAMERA, IosUsageDescription.MICROPHONE],
+						},
 					},
-					details: paragraph(
-						'The key storage mechanism does not provide adequate protection against key extraction.',
-					),
-					howToImprove: mdParagraph(
-						'Store keys in a hardware security module, encrypt them with a strong user secret, or use passkey-managed accounts.',
-					),
-				}),
+				),
 			),
 			exampleRating(
 				mdParagraph(
 					'(Desktop app) The app derives keys using a weak, non-standard key derivation function.',
 				),
-				EvaluationContext.forTest(() => securityBestPractices).build({
-					value: {
-						id: 'key_storage_fail',
-						rating: Rating.FAIL,
-						displayName: 'Weak key storage',
-						shortExplanation: mdSentence('Keys are not adequately protected.'),
-					},
-					details: paragraph(
-						'The key storage mechanism does not provide adequate protection against key extraction.',
-					),
-					howToImprove: mdParagraph(
-						'Store keys in a hardware security module or encrypt them with a strong standardized KDF.',
-					),
-				}),
+				evaluateKeyStorage(
+					EvaluationContext.forTest(() => securityBestPractices),
+					KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_WEAK_KDF,
+				),
 			),
 		],
 	},
@@ -843,7 +795,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 	evaluate: (
 		ctx: EvaluationContext<SecurityBestPracticesValue>,
 	): Evaluation<SecurityBestPracticesValue> => {
-		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
+		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		const feature = ctx.features.security.securityBestPractices
 
@@ -885,7 +837,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			)
 		}
 
-		if (subEvaluations.length === 0) {
+		if (!isNonEmptyArray(subEvaluations)) {
 			return unrated(ctx, null)
 		}
 
@@ -897,6 +849,6 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			subEvaluations.push(evaluatePasskeySubEval(ctx, passkeySupport))
 		}
 
-		return pickWorstRating<SecurityBestPracticesValue>(assertNonEmptyArray(subEvaluations))
+		return pickWorstRating<SecurityBestPracticesValue>(subEvaluations)
 	},
 }

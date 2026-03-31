@@ -1,0 +1,64 @@
+{
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"manifest_version": 3,
+	"version": "2.19.18",
+	"name": "__MSG_appName__",
+	"short_name": "Bitget Wallet",
+	"description": "__MSG_appDescription__",
+	"default_locale": "en",
+	"action": {
+		"default_title": "Bitget",
+		"default_popup": "popup.html"
+	},
+	"icons": {
+		"16": "static/images/favicon.png",
+		"19": "static/images/favicon.png",
+		"32": "static/images/favicon.png",
+		"48": "static/images/favicon.png",
+		"128": "static/images/favicon.png"
+	},
+	"commands": {
+		"_execute_action": {
+			"suggested_key": {
+				"windows": "Alt+Shift+K",
+				"mac": "Alt+Shift+K",
+				"chromeos": "Alt+Shift+K",
+				"linux": "Alt+Shift+K"
+			}
+		}
+	},
+	"content_security_policy": {
+		"extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';  frame-ancestors 'none';"
+	},
+	"background": {
+		"service_worker": "static/js/background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": ["http://*/*", "https://*/*"],
+			"js": ["static/js/contentscript.js", "static/js/bundle.js"],
+			"run_at": "document_start",
+			"all_frames": true
+		}
+	],
+	"host_permissions": ["http://localhost/*", "*://*/*"],
+	"permissions": [
+		"storage",
+		"activeTab",
+		"notifications",
+		"unlimitedStorage",
+		"scripting",
+		"tabs",
+		"alarms",
+		"sidePanel",
+		"contextMenus"
+	],
+	"externally_connectable": {
+		"matches": ["https://bitkeep.com/*", "https://web3.bitget.com/"],
+		"ids": ["*"]
+	},
+	"minimum_chrome_version": "88",
+	"side_panel": {
+		"default_path": "side_panel.html"
+	}
+}

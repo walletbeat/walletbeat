@@ -2529,7 +2529,7 @@ How the wallet stores the user's private key.
 - `ENCRYPTED_WITH_USER_SECRET_WEAK_KDF` = `'ENCRYPTED_WITH_USER_SECRET_WEAK_KDF'`: The key is encrypted with a user-known secret before being stored on disk, but the key derivation is non-standard or ad-hoc.
 - `HARDWARE_SECURITY_MODULE` = `'HARDWARE_SECURITY_MODULE'`: The key is stored inside a hardware security module or secure enclave that prevents key extraction by other software.
 - `OS_SANDBOXED_PLAINTEXT` = `'OS_SANDBOXED_PLAINTEXT'`: The key is stored in plaintext, but in OS-sandboxed app storage that other apps and processes cannot read.
-- `NO_KEY_STORED` = `'NO_KEY_STORED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
+- `PASSKEY_MANAGED` = `'PASSKEY_MANAGED'`: No private key is stored on the device. The wallet uses passkey-managed smart contract accounts
 
 ---
 
