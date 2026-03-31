@@ -49,3 +49,7 @@ resources/contracts/broadcast/**/dry-run/
 
 # Docs
 resources/contracts/docs/
+
+# Generated CSS attribute docs/intellisense
+src/styles/css-attributes.d.ts
+.vscode/walletbeat.html-data.json
