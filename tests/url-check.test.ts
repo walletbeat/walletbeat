@@ -1722,6 +1722,7 @@ const knownValidUrls: KnownValidUrl[] = [
 		url: 'https://raw.githubusercontent.com/MetaMask/metamask-mobile/main/ios/MetaMask/Info.plist',
 		urlHash: '80c424c11a03b5e1610e280ad0d45bdf48768611',
 		retrieved: '2026-03-31',
+	}
 ]
 
 /**
