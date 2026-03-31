@@ -319,46 +319,68 @@ function evaluateExternallyConnectable(
 	})
 }
 
-const failBrowserPermissions: BrowserExtensionPermission[] = [
-	// Attaches the Chrome DevTools protocol to any tab, full read/write access to page content.
-	BrowserExtensionPermission.DEBUGGER,
-	// Can delete history, cookies, and cached data, destructive and privacy-invasive.
-	BrowserExtensionPermission.BROWSING_DATA,
-	// Full read access to the user's browsing history.
-	BrowserExtensionPermission.HISTORY,
-	// Can list, enable, disable, or uninstall other extensions.
-	BrowserExtensionPermission.MANAGEMENT,
-	// Can reroute all browser network traffic through an attacker-controlled proxy.
-	BrowserExtensionPermission.PROXY,
-	// Allows registering arbitrary user-supplied scripts that run in web pages.
-	BrowserExtensionPermission.USER_SCRIPTS,
-	// Intercepts WebAuthn requests, can impersonate hardware security keys.
-	BrowserExtensionPermission.WEB_AUTHENTICATION_PROXY,
-	// Captures the screen, a window, or a tab as a media stream.
-	BrowserExtensionPermission.DESKTOP_CAPTURE,
-]
+const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL | Rating.PASS> = {
+	// Benign or wallet-typical permissions.
+	[BrowserExtensionPermission.ACTIVE_TAB]: Rating.PASS,
+	[BrowserExtensionPermission.ALARMS]: Rating.PASS,
+	[BrowserExtensionPermission.BOOKMARKS]: Rating.PASS,
+	[BrowserExtensionPermission.CLIPBOARD_WRITE]: Rating.PASS,
+	[BrowserExtensionPermission.CONTEXT_MENUS]: Rating.PASS,
+	[BrowserExtensionPermission.COOKIES]: Rating.PASS,
+	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST]: Rating.PASS,
+	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS]: Rating.PASS,
+	[BrowserExtensionPermission.GCM]: Rating.PASS,
+	[BrowserExtensionPermission.GEOLOCATION]: Rating.PASS,
+	[BrowserExtensionPermission.IDENTITY]: Rating.PASS,
+	[BrowserExtensionPermission.IDENTITY_EMAIL]: Rating.PASS,
+	[BrowserExtensionPermission.NOTIFICATIONS]: Rating.PASS,
+	[BrowserExtensionPermission.OFFSCREEN]: Rating.PASS,
+	[BrowserExtensionPermission.SCRIPTING]: Rating.PASS,
+	[BrowserExtensionPermission.SIDE_PANEL]: Rating.PASS,
+	[BrowserExtensionPermission.STORAGE]: Rating.PASS,
+	[BrowserExtensionPermission.SYSTEM_CPU]: Rating.PASS,
+	[BrowserExtensionPermission.SYSTEM_DISPLAY]: Rating.PASS,
+	[BrowserExtensionPermission.TABS]: Rating.PASS,
+	[BrowserExtensionPermission.UNLIMITED_STORAGE]: Rating.PASS,
+	[BrowserExtensionPermission.WEB_NAVIGATION]: Rating.PASS,
+	[BrowserExtensionPermission.WEB_REQUEST]: Rating.PASS,
 
-const partialBrowserPermissions: BrowserExtensionPermission[] = [
+	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
+	// Attaches the Chrome DevTools protocol to any tab, full read/write access to page content.
+	[BrowserExtensionPermission.DEBUGGER]: Rating.FAIL,
+	// Can delete history, cookies, and cached data, destructive and privacy-invasive.
+	[BrowserExtensionPermission.BROWSING_DATA]: Rating.FAIL,
+	// Full read access to the user's browsing history.
+	[BrowserExtensionPermission.HISTORY]: Rating.FAIL,
+	// Can list, enable, disable, or uninstall other extensions.
+	[BrowserExtensionPermission.MANAGEMENT]: Rating.FAIL,
+	// Can reroute all browser network traffic through an attacker-controlled proxy.
+	[BrowserExtensionPermission.PROXY]: Rating.FAIL,
+	// Allows registering arbitrary user-supplied scripts that run in web pages.
+	[BrowserExtensionPermission.USER_SCRIPTS]: Rating.FAIL,
+	// Intercepts WebAuthn requests, can impersonate hardware security keys.
+	[BrowserExtensionPermission.WEB_AUTHENTICATION_PROXY]: Rating.FAIL,
+	// Captures the screen, a window, or a tab as a media stream.
+	[BrowserExtensionPermission.DESKTOP_CAPTURE]: Rating.FAIL,
 	// Legitimate for hardware wallet communication but opens a native OS code execution channel.
-	BrowserExtensionPermission.NATIVE_MESSAGING,
+	[BrowserExtensionPermission.NATIVE_MESSAGING]: Rating.FAIL,
 	// Reads clipboard contents without a user gesture.
-	BrowserExtensionPermission.CLIPBOARD_READ,
+	[BrowserExtensionPermission.CLIPBOARD_READ]: Rating.FAIL,
 	// Can synchronously block or modify all HTTP/S requests.
-	BrowserExtensionPermission.WEB_REQUEST_BLOCKING,
+	[BrowserExtensionPermission.WEB_REQUEST_BLOCKING]: Rating.FAIL,
 	// Reads and modifies browser-wide privacy settings.
-	BrowserExtensionPermission.PRIVACY,
+	[BrowserExtensionPermission.PRIVACY]: Rating.FAIL,
 	// Saves a full MHTML snapshot of any tab.
-	BrowserExtensionPermission.PAGE_CAPTURE,
-]
+	[BrowserExtensionPermission.PAGE_CAPTURE]: Rating.FAIL,
+}
 
 function evaluateBrowserPermissions(
 	ctx: EvaluationContext<SecurityBestPracticesValue>,
 	manifest: BrowserExtensionManifest,
 ): Evaluation<SecurityBestPracticesValue> {
-	const badFail = manifest.permissions.filter(p => failBrowserPermissions.includes(p))
-	const badPartial = manifest.permissions.filter(p => partialBrowserPermissions.includes(p))
+	const badPerms = manifest.permissions.filter(p => browserPermissionRatings[p] === Rating.FAIL)
 
-	if (badFail.length > 0) {
+	if (badPerms.length > 0) {
 		return ctx.build({
 			value: {
 				id: 'browser_permissions_fail',
@@ -369,29 +391,10 @@ function evaluateBrowserPermissions(
 				),
 			},
 			details: paragraph(
-				`{{WALLET_NAME}} declares the following high-risk browser permissions that are not required for wallet functionality: ${badFail.join(', ')}.`,
+				`{{WALLET_NAME}} declares the following high-risk browser permissions that are not required for wallet functionality: ${badPerms.join(', ')}.`,
 			),
 			howToImprove: mdParagraph(
-				`{{WALLET_NAME}} should remove these permissions from its manifest: ${badFail.map(p => `\`${p}\``).join(', ')}.`,
-			),
-		})
-	}
-
-	if (badPartial.length > 0) {
-		return ctx.build({
-			value: {
-				id: 'browser_permissions_partial',
-				rating: Rating.PARTIAL,
-				displayName: 'Risky browser permissions declared',
-				shortExplanation: mdSentence(
-					'{{WALLET_NAME}} declares browser permissions that carry elevated risk for a wallet.',
-				),
-			},
-			details: paragraph(
-				`{{WALLET_NAME}} declares the following elevated-risk browser permissions: ${badPartial.join(', ')}.`,
-			),
-			howToImprove: mdParagraph(
-				`{{WALLET_NAME}} should evaluate whether these permissions are strictly necessary and remove any that are not: ${badPartial.map(p => `\`${p}\``).join(', ')}.`,
+				`{{WALLET_NAME}} should remove these permissions from its manifest: ${badPerms.map(p => `\`${p}\``).join(', ')}.`,
 			),
 		})
 	}
