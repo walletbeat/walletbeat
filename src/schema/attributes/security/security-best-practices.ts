@@ -321,53 +321,53 @@ function evaluateExternallyConnectable(
 
 const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL | Rating.PASS> = {
 	// Benign or wallet-typical permissions.
-	// Grants access only to the currently active tab when the user invokes the extension — needed for dApp injection.
+	// Grants access only to the currently active tab when the user invokes the extension, needed for dApp injection.
 	[BrowserExtensionPermission.ACTIVE_TAB]: Rating.PASS,
-	// Schedules periodic background tasks — used for network polling, lock timers, and session expiry.
+	// Schedules periodic background tasks, used for network polling, lock timers, and session expiry.
 	[BrowserExtensionPermission.ALARMS]: Rating.PASS,
-	// Writes text to the clipboard on user action — used to copy addresses and transaction hashes.
+	// Writes text to the clipboard on user action, used to copy addresses and transaction hashes.
 	[BrowserExtensionPermission.CLIPBOARD_WRITE]: Rating.PASS,
-	// Adds items to the browser right-click menu — used for quick-access wallet actions.
+	// Adds items to the browser right-click menu, used for quick-access wallet actions.
 	[BrowserExtensionPermission.CONTEXT_MENUS]: Rating.PASS,
-	// Read/write access to cookies for specific origins — used for session management with wallet backends.
+	// Read/write access to cookies for specific origins, used for session management with wallet backends.
 	[BrowserExtensionPermission.COOKIES]: Rating.PASS,
-	// Declaratively blocks or redirects requests without seeing their content — used for ad/tracker blocking in privacy-focused wallets.
+	// Declaratively blocks or redirects requests without seeing their content, used for ad/tracker blocking in privacy-focused wallets.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST]: Rating.PASS,
-	// Same as above but also applies to host-matched pages — used when rules must cover specific dApp domains.
+	// Same as above but also applies to host-matched pages, used when rules must cover specific dApp domains.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS]: Rating.PASS,
-	// Firebase Cloud Messaging for push notifications — used to deliver transaction alerts.
+	// Firebase Cloud Messaging for push notifications, used to deliver transaction alerts.
 	[BrowserExtensionPermission.GCM]: Rating.PASS,
-	// OAuth2 token retrieval via the browser's identity API — used for optional social login flows.
+	// OAuth2 token retrieval via the browser's identity API, used for optional social login flows.
 	[BrowserExtensionPermission.IDENTITY]: Rating.PASS,
-	// Retrieves the user's Google account email alongside the OAuth token — used when email is needed for account linking.
+	// Retrieves the user's Google account email alongside the OAuth token, used when email is needed for account linking.
 	[BrowserExtensionPermission.IDENTITY_EMAIL]: Rating.PASS,
-	// Displays desktop notifications — used for transaction confirmations and security alerts.
+	// Displays desktop notifications, used for transaction confirmations and security alerts.
 	[BrowserExtensionPermission.NOTIFICATIONS]: Rating.PASS,
-	// Creates an off-screen document for DOM operations without a visible window — used for background cryptographic work.
+	// Creates an off-screen document for DOM operations without a visible window, used for background cryptographic work.
 	[BrowserExtensionPermission.OFFSCREEN]: Rating.PASS,
-	// Injects scripts into web pages — required for dApp content-script injection.
+	// Injects scripts into web pages, required for dApp content-script injection.
 	[BrowserExtensionPermission.SCRIPTING]: Rating.PASS,
-	// Opens the extension in the browser side panel — used for a persistent wallet UI alongside web pages.
+	// Opens the extension in the browser side panel, used for a persistent wallet UI alongside web pages.
 	[BrowserExtensionPermission.SIDE_PANEL]: Rating.PASS,
-	// Key-value storage synced or local — required for storing encrypted keys and settings.
+	// Key-value storage synced or local, required for storing encrypted keys and settings.
 	[BrowserExtensionPermission.STORAGE]: Rating.PASS,
-	// Reads CPU core count and load — used to tune cryptographic thread counts.
+	// Reads CPU core count and load, used to tune cryptographic thread counts.
 	[BrowserExtensionPermission.SYSTEM_CPU]: Rating.PASS,
-	// Reads connected display info — used for responsive UI layout across monitor configurations.
+	// Reads connected display info, used for responsive UI layout across monitor configurations.
 	[BrowserExtensionPermission.SYSTEM_DISPLAY]: Rating.PASS,
-	// Access to tab metadata (URL, title) — used to detect active dApps and switch network contexts.
+	// Access to tab metadata (URL, title), used to detect active dApps and switch network contexts.
 	[BrowserExtensionPermission.TABS]: Rating.PASS,
-	// Removes the 5 MB storage cap — required for wallets that cache chain data or transaction history locally.
+	// Removes the 5 MB storage cap, required for wallets that cache chain data or transaction history locally.
 	[BrowserExtensionPermission.UNLIMITED_STORAGE]: Rating.PASS,
-	// Observes navigation events without seeing request bodies — used to detect page changes for content-script re-injection.
+	// Observes navigation events without seeing request bodies, used to detect page changes for content-script re-injection.
 	[BrowserExtensionPermission.WEB_NAVIGATION]: Rating.PASS,
-	// Read-only access to HTTP/S request metadata — used to detect and warn about insecure RPC connections.
+	// Read-only access to HTTP/S request metadata, used to detect and warn about insecure RPC connections.
 	[BrowserExtensionPermission.WEB_REQUEST]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
-	// Exposes the user's physical location — not required for any wallet function and enables persistent user tracking.
+	// Exposes the user's physical location, not required for any wallet function and enables persistent user tracking.
 	[BrowserExtensionPermission.GEOLOCATION]: Rating.FAIL,
-	// Full read/write access to all bookmarks — not required for any wallet function.
+	// Full read/write access to all bookmarks, not required for any wallet function.
 	[BrowserExtensionPermission.BOOKMARKS]: Rating.FAIL,
 	// Attaches the Chrome DevTools protocol to any tab, full read/write access to page content.
 	[BrowserExtensionPermission.DEBUGGER]: Rating.FAIL,
@@ -513,7 +513,7 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.INTERNET]: Rating.PASS,
 	// Checks connectivity before making network requests, avoiding unnecessary failures.
 	[AndroidPermission.ACCESS_NETWORK_STATE]: Rating.PASS,
-	// Camera access for QR code scanning — the standard way to input addresses and connect to dApps.
+	// Camera access for QR code scanning, the standard way to input addresses and connect to dApps.
 	[AndroidPermission.CAMERA]: Rating.PASS,
 	// Bluetooth communication with hardware wallets (Android < 12).
 	[AndroidPermission.BLUETOOTH]: Rating.PASS,
@@ -525,7 +525,7 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.BLUETOOTH_SCAN]: Rating.PASS,
 
 	// Dangerous permissions: not necessary for a wallet and introduce serious risks.
-	// Allows drawing overlays over other apps — can be used to phish seed phrases or intercept transaction confirmations.
+	// Allows drawing overlays over other apps, can be used to phish seed phrases or intercept transaction confirmations.
 	[AndroidPermission.SYSTEM_ALERT_WINDOW]: Rating.FAIL,
 	// Microphone access enables covert audio recording of sensitive conversations near the device.
 	[AndroidPermission.RECORD_AUDIO]: Rating.FAIL,
@@ -537,9 +537,9 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 
 const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAIL> = {
 	// Necessary or wallet-typical permissions.
-	// Camera access for QR code scanning — the standard way to input addresses and connect to dApps.
+	// Camera access for QR code scanning, the standard way to input addresses and connect to dApps.
 	[IosUsageDescription.CAMERA]: Rating.PASS,
-	// Face ID biometric authentication — used to unlock the wallet without a PIN.
+	// Face ID biometric authentication, used to unlock the wallet without a PIN.
 	[IosUsageDescription.FACE_ID]: Rating.PASS,
 	// Allows saving exported transaction receipts or QR codes to the photo library.
 	[IosUsageDescription.PHOTO_LIBRARY_ADD]: Rating.PASS,
