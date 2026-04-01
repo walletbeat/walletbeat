@@ -38,6 +38,7 @@ import {
 } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
 import { GuardianPolicyType, GuardianType } from '@/schema/features/security/account-recovery'
+import { BasicUnlockMechanism, DuressAction } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -528,6 +529,16 @@ export const completedTemplate: SoftwareWallet = {
 				}),
 			},
 			bugBountyProgram: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: [BasicUnlockMechanism.BIOMETRIC, BasicUnlockMechanism.PIN],
+				},
+				duressMode: supported({
+					ref: refTodo,
+					action: DuressAction.DECOY_WALLET,
+				}),
+			},
 			hardwareWalletSupport: {
 				ref: {
 					explanation:
@@ -681,5 +692,6 @@ export const completedTemplate: SoftwareWallet = {
 	},
 	variants: {
 		[Variant.BROWSER]: true,
+		[Variant.MOBILE]: true,
 	},
 }
