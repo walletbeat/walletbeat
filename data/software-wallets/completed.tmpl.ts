@@ -175,7 +175,7 @@ const recentAudit: SecurityAudit = {
 		date: '2025-12-01',
 	},
 	unpatchedFlaws: 'NONE_FOUND',
-	variantsScope: { [Variant.BROWSER]: true },
+	variantsScope: { [Variant.BROWSER]: true, [Variant.MOBILE]: true },
 }
 
 export const completedTemplate: SoftwareWallet = {
