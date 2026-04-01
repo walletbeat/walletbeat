@@ -1,8 +1,8 @@
 /**
  * Walletbeat data-attribute style primitives.
  *
- * Each documented block below applies to the selectors that follow. Regenerate
- * `css-attributes.d.ts` and `.vscode/walletbeat.html-data.json` after changing these comments.
+ * Each documented block below applies to the selectors that follow. Regenerate editor
+ * outputs with `pnpm run generate:css-attributes` after changing these comments.
  */
 
 /**
