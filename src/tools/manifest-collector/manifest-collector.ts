@@ -9,6 +9,7 @@ import { getRepositoryRoot } from '@/tests/utils/codebase'
 
 import { parseBrowserExtensionManifest } from './browser-ext-manifest-parser'
 import { fetchBrowserExtensionManifest, fetchText } from './crx-downloader'
+import { checkParsedManifests } from './manifest-checker'
 import { parseAndroidManifest, parseIosPlist } from './mobile-manifest-parser'
 
 const REPO_ROOT = getRepositoryRoot()
@@ -25,6 +26,10 @@ Modes (pick one):
                                    have any manifest URL in their metadata.
   --id <wallet-id>                 Collect manifests for a single wallet by ID
                                    (e.g. "metamask", "rabby").
+  --check                          Verify that all checked-in *.parsed.json
+                                   files match their raw manifest files.
+                                   Exits with a non-zero status if any are
+                                   out of date. Does not fetch or write files.
 
 Data is saved to:
   data/software-wallets/manifests/<wallet-id>/<extension-id>.manifest.json
@@ -34,6 +39,7 @@ Data is saved to:
 Examples:
   pnpm collect:manifests -- --all
   pnpm collect:manifests -- --id metamask
+  pnpm collect:manifests -- --check
 `)
 	process.exit(1)
 }
@@ -57,17 +63,38 @@ if (hasFlag('help')) {
 	usage()
 }
 
+const checkMode = hasFlag('check')
 const allMode = hasFlag('all')
 const walletIdArg = getArg('id')
 
-if (!allMode && walletIdArg === undefined) {
-	process.stderr.write('Error: either --all or --id <wallet-id> is required\n')
+if (checkMode && (allMode || walletIdArg !== undefined)) {
+	process.stderr.write('Error: --check is mutually exclusive with --all and --id\n')
 	usage()
 }
 
-if (allMode && walletIdArg !== undefined) {
+if (!checkMode && !allMode && walletIdArg === undefined) {
+	process.stderr.write('Error: either --all, --id <wallet-id>, or --check is required\n')
+	usage()
+}
+
+if (!checkMode && allMode && walletIdArg !== undefined) {
 	process.stderr.write('Error: --all and --id are mutually exclusive\n')
 	usage()
+}
+
+if (checkMode) {
+	const mismatches = await checkParsedManifests(REPO_ROOT)
+
+	if (mismatches.length === 0) {
+		process.stderr.write('All parsed manifest files are up to date.\n')
+		process.exit(0)
+	}
+
+	for (const { walletId, parsedFile, issue } of mismatches) {
+		process.stderr.write(`[${walletId}] ${parsedFile}: ${issue}\n`)
+	}
+
+	process.exit(1)
 }
 
 type WalletEntry = {
