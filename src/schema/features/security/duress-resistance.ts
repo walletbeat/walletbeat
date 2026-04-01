@@ -20,6 +20,20 @@ export enum BasicUnlockMechanism {
 	PATTERN = 'PATTERN',
 }
 
+/** Returns a human-readable label for a BasicUnlockMechanism. */
+export function basicUnlockMechanismName(m: BasicUnlockMechanism): string {
+	switch (m) {
+		case BasicUnlockMechanism.PIN:
+			return 'PIN code'
+		case BasicUnlockMechanism.PASSWORD:
+			return 'password'
+		case BasicUnlockMechanism.BIOMETRIC:
+			return 'biometric (Face ID / fingerprint)'
+		case BasicUnlockMechanism.PATTERN:
+			return 'swipe pattern'
+	}
+}
+
 /**
  * Information about how the wallet locks itself against unauthorized access.
  */
