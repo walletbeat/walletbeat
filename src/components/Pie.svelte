@@ -271,10 +271,6 @@
 			style:--slice-innerR={slice.computed.innerR}
 			style:--slice-totalAngle={slice.computed.totalAngle}
 			style:--slice-orientation={slice.computed.orientation}
-			style:--slice-gapPx={`${slice.computed.gap}px`}
-			style:--slice-outerRPx={`${slice.computed.outerR}px`}
-			style:--slice-innerRPx={`${slice.computed.innerR}px`}
-			style:--slice-totalAngleDeg={`${slice.computed.totalAngle}deg`}
 			style:--slice-arcSize={slice.computed.arcSize}
 			style:--slice-outerSweep={slice.computed.outerSweep}
 			style:--slice-innerSweep={slice.computed.innerSweep}
@@ -428,19 +424,19 @@
 				background-color: var(--slice-fill);
 				clip-path: shape(
 					from
-						calc(var(--slice-cx) + sin(var(--slice-outerStartAngle)) * var(--slice-outerRPx))
-						calc(var(--slice-cy) - cos(var(--slice-outerStartAngle)) * var(--slice-outerRPx)),
+						calc(var(--pie-originX) + sin(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
+						calc(var(--pie-originY) - cos(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px)),
 					arc to
-						calc(var(--slice-cx) + sin(var(--slice-outerEndAngle)) * var(--slice-outerRPx))
-						calc(var(--slice-cy) - cos(var(--slice-outerEndAngle)) * var(--slice-outerRPx))
-						of var(--slice-outerRPx) var(--slice-outerSweep) var(--slice-arcSize),
+						calc(var(--pie-originX) + sin(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
+						calc(var(--pie-originY) - cos(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-outerR)))) * var(--slice-orientation)))) * (var(--slice-outerR) * 1px))
+						of calc(var(--slice-outerR) * 1px) var(--slice-outerSweep) var(--slice-arcSize),
 					line to
-						calc(var(--slice-cx) + sin(var(--slice-innerEndAngle)) * var(--slice-innerRPx))
-						calc(var(--slice-cy) - cos(var(--slice-innerEndAngle)) * var(--slice-innerRPx)),
+						calc(var(--pie-originX) + sin(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
+						calc(var(--pie-originY) - cos(calc((var(--slice-totalAngle) * 1deg / 2) - (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px)),
 					arc to
-						calc(var(--slice-cx) + sin(var(--slice-innerStartAngle)) * var(--slice-innerRPx))
-						calc(var(--slice-cy) - cos(var(--slice-innerStartAngle)) * var(--slice-innerRPx))
-						of var(--slice-innerRPx) var(--slice-innerSweep) var(--slice-arcSize),
+						calc(var(--pie-originX) + sin(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
+						calc(var(--pie-originY) - cos(calc((-1 * var(--slice-totalAngle) * 1deg / 2) + (asin((var(--slice-gap) / (2 * var(--slice-innerR)))) * var(--slice-orientation)))) * (var(--slice-innerR) * 1px))
+						of calc(var(--slice-innerR) * 1px) var(--slice-innerSweep) var(--slice-arcSize),
 					close
 				);
 
@@ -496,26 +492,6 @@
 
 				--pie-originX: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
 				--pie-originY: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
-				--slice-cx: var(--pie-originX);
-				--slice-cy: var(--pie-originY);
-				--slice-outerInsetAngle: asin((var(--slice-gapPx) / 2) / var(--slice-outerRPx));
-				--slice-innerInsetAngle: asin((var(--slice-gapPx) / 2) / var(--slice-innerRPx));
-				--slice-outerStartAngle: calc(
-					(-1 * var(--slice-totalAngleDeg) / 2)
-					+ (var(--slice-outerInsetAngle) * var(--slice-orientation))
-				);
-				--slice-outerEndAngle: calc(
-					(var(--slice-totalAngleDeg) / 2)
-					- (var(--slice-outerInsetAngle) * var(--slice-orientation))
-				);
-				--slice-innerStartAngle: calc(
-					(-1 * var(--slice-totalAngleDeg) / 2)
-					+ (var(--slice-innerInsetAngle) * var(--slice-orientation))
-				);
-				--slice-innerEndAngle: calc(
-					(var(--slice-totalAngleDeg) / 2)
-					- (var(--slice-innerInsetAngle) * var(--slice-orientation))
-				);
 			}
 
 			> .center {
