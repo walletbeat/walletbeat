@@ -161,6 +161,7 @@ export const baseApp: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {

@@ -144,6 +144,7 @@ export const mtpelerin: SoftwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: refTodo,
 				wallets: {},

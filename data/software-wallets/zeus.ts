@@ -227,6 +227,7 @@ export const zeus: SoftwareWallet = {
 				guardianRecovery: notSupported,
 			}),
 			bugBountyProgram: notSupported,
+			duressResistance: null,
 			hardwareWalletSupport: null,
 			keysHandling: {
 				ref: [

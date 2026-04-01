@@ -382,6 +382,7 @@ export const metamask: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: [
 					{

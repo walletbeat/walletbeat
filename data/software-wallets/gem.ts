@@ -136,6 +136,7 @@ export const gemwallet: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {

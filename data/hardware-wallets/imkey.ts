@@ -122,6 +122,7 @@ export const imkeyWallet: HardwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			firmware: {
 				type: FirmwareType.PASS,
 				customFirmware: null,
