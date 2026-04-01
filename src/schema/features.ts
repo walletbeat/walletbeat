@@ -20,6 +20,7 @@ import type { TransactionPrivacy } from './features/privacy/transaction-privacy'
 import type { WalletProfile } from './features/profile'
 import type { AccountRecovery } from './features/security/account-recovery'
 import type { BugBountyProgramImplementation } from './features/security/bug-bounty-program'
+import type { DuressResistance } from './features/security/duress-resistance'
 import type { FirmwareSupport } from './features/security/firmware'
 import type { HardwareWalletSupport } from './features/security/hardware-wallet-support'
 import type { KeysHandlingSupport } from './features/security/keys-handling'
@@ -110,6 +111,16 @@ export interface WalletBaseFeatures {
 
 		/** How can users of the wallet recover their account? */
 		accountRecovery: VariantFeature<AccountRecovery>
+
+		/**
+		 * Duress resistance features, covering both basic lock-screen
+		 * protection and dedicated duress-PIN mechanisms (decoy wallet or
+		 * self-destruct-and-forward).
+		 *
+		 * Only evaluated for hardware and mobile variants; desktop, browser
+		 * extension, and embedded variants are exempt.
+		 */
+		duressResistance: VariantFeature<DuressResistance>
 
 		/** How are secret keys handled? */
 		keysHandling: VariantFeature<WithRef<KeysHandlingSupport>>
@@ -332,6 +343,7 @@ export interface ResolvedFeatures {
 		supplyChainFactory: ResolvedFeature<SupplyChainFactorySupport>
 		userSafety: ResolvedFeature<UserSafetySupport>
 		accountRecovery: ResolvedFeature<AccountRecovery>
+		duressResistance: ResolvedFeature<DuressResistance>
 	}
 	privacy: {
 		analytics: {
@@ -482,6 +494,10 @@ export function resolveFeatures(
 			accountRecovery: baseFeat(
 				'security.accountRecovery',
 				features => features.security.accountRecovery,
+			),
+			duressResistance: baseFeat(
+				'security.duressResistance',
+				features => features.security.duressResistance,
 			),
 		},
 		privacy: {
