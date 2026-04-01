@@ -630,16 +630,11 @@
 								}}
 							>
 								{#snippet centerContentSnippet()}
-									<circle
-										r="8"
-										fill={scoreColor}
-									>
-										{#if showScores && score?.hasUnratedComponent}
-											<title>
-												*contains unrated components
-											</title>
-										{/if}
-									</circle>
+									<span
+										class="pie-center-dot pie-center-dot-large"
+										style:--pie-center-color={scoreColor}
+										title={showScores && score?.hasUnratedComponent ? '*contains unrated components' : undefined}
+									></span>
 								{/snippet}
 							</Pie>
 						</div>
@@ -1607,6 +1602,14 @@
 				padding: 2rem 0;
 			}
 		}
+	}
+
+	.pie-center-dot {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		background-color: var(--pie-center-color);
 	}
 
 	@container (min-width: 1140px) {

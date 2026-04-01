@@ -28,14 +28,17 @@
 	// (Internal)
 	type ComputedSlice = Slice & {
 		computed: {
-			path: string
 			totalAngle: number
+			orientation: -1 | 1
 			midAngle: number
 			outerR: number
 			innerR: number
 			gap: number
 			level: number
 			offset: number
+			arcSize: 'small' | 'large'
+			outerSweep: 'cw' | 'ccw'
+			innerSweep: 'cw' | 'ccw'
 		}
 		children?: ComputedSlice[]
 	}
@@ -119,84 +122,6 @@
 	// Functions
 	const getLevelConfig = (level: number): LevelConfig => levels[Math.min(level, levels.length - 1)]
 
-	const polarToCartesian = (
-		centerX: number,
-		centerY: number,
-		radius: number,
-		angleInDegrees: number,
-	) => {
-		const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0
-
-		return {
-			x: centerX + radius * Math.cos(angleInRadians),
-			y: centerY + radius * Math.sin(angleInRadians),
-		}
-	}
-
-	const getSlicePath = ({
-		cx = 0,
-		cy = 0,
-		gap,
-		outerR,
-		innerR,
-		startAngle,
-		endAngle,
-	}: {
-		cx: number
-		cy: number
-		gap: number
-		outerR: number
-		innerR: number
-		startAngle: number
-		endAngle: number
-	}) => {
-		const angleDiff = Math.abs(endAngle - startAngle)
-		const orientation = Math.sign(endAngle - startAngle)
-
-		// Handle full circles (or nearly full circles)
-		if (angleDiff >= 359.99) {
-			return [
-				`M ${cx + outerR} ${cy}`,
-				`A ${outerR} ${outerR} 0 1 0 ${cx - outerR} ${cy}`,
-				`A ${outerR} ${outerR} 0 1 0 ${cx + outerR} ${cy}`,
-				`M ${cx + innerR} ${cy}`,
-				`A ${innerR} ${innerR} 0 1 1 ${cx - innerR} ${cy}`,
-				`A ${innerR} ${innerR} 0 1 1 ${cx + innerR} ${cy}`,
-			].join(' ')
-		}
-
-		const outerAngleStart = startAngle + Math.asin((gap / 2) / outerR) * 180 / Math.PI * orientation
-		const outerStart = polarToCartesian(cx, cy, outerR, outerAngleStart)
-
-		const outerAngleEnd = endAngle - Math.asin((gap / 2) / outerR) * 180 / Math.PI * orientation
-		const outerEnd = polarToCartesian(cx, cy, outerR, outerAngleEnd)
-
-		const innerAngleEnd = endAngle - Math.asin((gap / 2) / innerR) * 180 / Math.PI * orientation
-		const innerEnd = polarToCartesian(cx, cy, innerR, innerAngleEnd)
-
-		const innerAngleStart = startAngle + Math.asin((gap / 2) / innerR) * 180 / Math.PI * orientation
-		const innerStart = polarToCartesian(cx, cy, innerR, innerAngleStart)
-
-		const largeArcFlag = angleDiff > 180 ? 1 : 0
-		const sweepFlag = orientation === 1 ? 1 : 0
-
-		// For equiangular pie slices with n slices (each with angle θ = 360°/n),
-		// the distance d they need to be moved from the origin to create gaps of width x is:
-		// d = x / (2 * sin(θ / 2))
-		// const offset = Math.abs(gap / (2 * Math.sin(Math.abs(endAngle - startAngle) / 2)))
-
-		return (
-			[
-				`M ${outerStart.x} ${outerStart.y}`,
-				`A ${outerR} ${outerR} 0 ${largeArcFlag} ${sweepFlag} ${outerEnd.x} ${outerEnd.y}`,
-				`L ${innerEnd.x} ${innerEnd.y}`,
-				`A ${innerR} ${innerR} 0 ${largeArcFlag} ${1 - sweepFlag} ${innerStart.x} ${innerStart.y}`,
-				`L ${outerStart.x} ${outerStart.y}`,
-			]
-				.join(' ')
-		)
-	}
-
 	const computeSlices = (
 		{
 			slices,
@@ -243,22 +168,17 @@
 			return {
 				...slice,
 				computed: {
-					path: getSlicePath({
-						cx: 0,
-						cy,
-						gap: levelConfig.gap,
-						outerR,
-						innerR,
-						startAngle: -totalAngle / 2,
-						endAngle: totalAngle / 2,
-					}),
 					totalAngle,
+					orientation: totalAngle >= 0 ? 1 : -1,
 					midAngle,
 					outerR,
 					innerR,
 					level,
 					offset: levelConfig.offset ?? 0,
 					gap: levelConfig.gap,
+					arcSize: Math.abs(totalAngle) > 180 ? 'large' : 'small',
+					outerSweep: totalAngle >= 0 ? 'cw' : 'ccw',
+					innerSweep: totalAngle >= 0 ? 'ccw' : 'cw',
 				},
 				...children && {
 					children: (
@@ -304,7 +224,7 @@
 		),
 	)
 
-	const svgAttributes = $derived.by(() => {
+	const pieMetrics = $derived.by(() => {
 		const maxRadiusMultiplier = Math.max(...levels.map(level => level.outerRadiusFraction))
 		const maxOffset = Math.max(...levels.map(level => level.offset ?? 0))
 		const maxRadius = radius * maxRadiusMultiplier + maxOffset
@@ -315,81 +235,75 @@
 		const viewBoxY = -(padding + maxRadius)
 
 		return {
+			maxRadius,
 			width,
 			height,
 			viewBox: `${viewBoxX} ${viewBoxY} ${width} ${height}`,
 		}
 	})
+
 </script>
 
 
 {#snippet sliceSnippet(slice: ComputedSlice)}
-	<g
-		class="slice"
-		style:--slice-midAngle={slice.computed.midAngle}
-		style:--slice-offset={slice.computed.offset}
-		style:--slice-gap={slice.computed.gap}
-		style:--slice-outerR={slice.computed.outerR}
-		style:--slice-innerR={slice.computed.innerR}
-		style:--slice-totalAngle={slice.computed.totalAngle}
-		style:--slice-path={`path("${slice.computed.path}")`}
-		style:--slice-fill={slice.color}
-		style:--slice-opacity={slice.opacity ?? 1}
-		class:highlighted={highlightedSliceId === slice.id}
-		data-slice-id={slice.id}
-		role={slice.href ? 'link' : 'button'}
-		tabIndex="0"
-		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
-		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
-		onfocus={() => { onSliceFocus?.(slice.id) }}
-		onblur={() => { onSliceBlur?.(slice.id) }}
-		onclick={e => {
-			e.stopPropagation()
-			onSliceClick?.(slice.id)
-		}}
-		onkeydown={e => {
-			if (e.code === 'Enter' || e.code === 'Space')
+	{#snippet slicePathSnippet(slice: ComputedSlice)}
+		<div
+			class="slice"
+			role="button"
+			tabindex="0"
+			aria-label={slice.titleText}
+			onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
+			onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
+			onfocus={() => { onSliceFocus?.(slice.id) }}
+			onblur={() => { onSliceBlur?.(slice.id) }}
+			onclick={e => {
+				e.stopPropagation()
 				onSliceClick?.(slice.id)
-		}}
-	>
-		<line
-			class="label-line"
-			x1="0"
-			y1={slice.computed.gap}
-			x2="0"
-			y2={-slice.computed.innerR}
-		/>
+			}}
+			onkeydown={e => {
+				if (e.code === 'Enter' || e.code === 'Space')
+					onSliceClick?.(slice.id)
+			}}
+			style:--slice-midAngle={slice.computed.midAngle}
+			style:--slice-offset={slice.computed.offset}
+			style:--slice-gap={slice.computed.gap}
+			style:--slice-outerR={slice.computed.outerR}
+			style:--slice-innerR={slice.computed.innerR}
+			style:--slice-totalAngle={slice.computed.totalAngle}
+			style:--slice-orientation={slice.computed.orientation}
+			style:--slice-gapPx={`${slice.computed.gap}px`}
+			style:--slice-outerRPx={`${slice.computed.outerR}px`}
+			style:--slice-innerRPx={`${slice.computed.innerR}px`}
+			style:--slice-totalAngleDeg={`${slice.computed.totalAngle}deg`}
+			style:--slice-arcSize={slice.computed.arcSize}
+			style:--slice-outerSweep={slice.computed.outerSweep}
+			style:--slice-innerSweep={slice.computed.innerSweep}
+			style:--slice-fill={slice.color}
+			style:--slice-opacity={slice.opacity ?? 1}
+			class:highlighted={highlightedSliceId === slice.id}
+			data-slice-id={slice.id}
+			data-stack
+		>
+			<span class="label" aria-hidden="true">{slice.arcLabel}</span>
+		</div>
+	{/snippet}
 
-		{#snippet slicePathSnippet(slice: ComputedSlice)}
-			<!-- Safari: set path directly with `d` attribute -->
-			<path
-				d={slice.computed.path}
-				class="slice-path"
-			>
-				<title>{slice.titleText}</title>
-			</path>
-		{/snippet}
-
-		{#if slice.href}
-			<a href={slice.href}>
-				{@render slicePathSnippet(slice)}
-			</a>
-		{:else}
+	{#if slice.href}
+		<a
+			class="slice-link"
+			href={slice.href}
+		>
 			{@render slicePathSnippet(slice)}
-		{/if}
+		</a>
+	{:else}
+		{@render slicePathSnippet(slice)}
+	{/if}
 
-		<text class="label" aria-hidden="true">
-			{slice.arcLabel}
-		</text>
-
-		{#if slice.children?.length}
-			<g class="slices">
-				{#each slice.children as childSlice (childSlice.id)}
-					{@render sliceSnippet(childSlice)}
-				{/each}
-			</g>
-		{/if}
-	</g>
+	{#if slice.children?.length}
+		{#each slice.children as childSlice (childSlice.id)}
+			{@render sliceSnippet(childSlice)}
+		{/each}
+	{/if}
 {/snippet}
 
 <div
@@ -397,29 +311,32 @@
 	class="container {'class' in restProps ? restProps.class : ''}"
 	data-layout={layout}
 	style:--pie-radius={radius}
+	style:--pie-padding={padding}
 	style:--pie-labelSize={labelSize}
+	style:--pie-maxR={pieMetrics.maxRadius}
 >
-	<svg {...svgAttributes}>
-		{#if title}
-			<title>{title}</title>
-		{/if}
-
-		<g class="slices">
+	<div
+		class="pie"
+		aria-label={title}
+		style:width={`${pieMetrics.width}px`}
+		style:height={`${pieMetrics.height}px`}
+		data-stack
+	>
+		<div class="slices" data-stack>
 			{#each computedSlices as slice (slice.id)}
 				{@render sliceSnippet(slice)}
 			{/each}
-		</g>
-
-		<g class="center">
+		</div>
+		<div class="center" data-stack>
 			{#if centerContentSnippet}
 				{@render centerContentSnippet()}
 			{:else}
-				<text>
+				<span>
 					{centerLabel}
-				</text>
+				</span>
 			{/if}
-		</g>
-	</svg>
+		</div>
+	</div>
 </div>
 
 
@@ -457,9 +374,18 @@
 		backface-visibility: hidden;
 		transition-duration: 0.4s;
 
-		svg {
+		.pie {
+			position: relative;
 			display: grid;
 			max-width: 100%;
+
+			.slice-link {
+				display: contents;
+
+				:is([data-stack] > &) > * {
+					grid-area: inherit;
+				}
+			}
 
 			.slice {
 				--slice-scale: 1;
@@ -499,59 +425,68 @@
 					var(--slice-outerR) - var(--slice-labelRadius)
 				);
 
-				transform-origin: 0 0;
-				cursor: pointer;
-				will-change: transform;
+				background-color: var(--slice-fill);
+				clip-path: shape(
+					from
+						calc(var(--slice-cx) + sin(var(--slice-outerStartAngle)) * var(--slice-outerRPx))
+						calc(var(--slice-cy) - cos(var(--slice-outerStartAngle)) * var(--slice-outerRPx)),
+					arc to
+						calc(var(--slice-cx) + sin(var(--slice-outerEndAngle)) * var(--slice-outerRPx))
+						calc(var(--slice-cy) - cos(var(--slice-outerEndAngle)) * var(--slice-outerRPx))
+						of var(--slice-outerRPx) var(--slice-outerSweep) var(--slice-arcSize),
+					line to
+						calc(var(--slice-cx) + sin(var(--slice-innerEndAngle)) * var(--slice-innerRPx))
+						calc(var(--slice-cy) - cos(var(--slice-innerEndAngle)) * var(--slice-innerRPx)),
+					arc to
+						calc(var(--slice-cx) + sin(var(--slice-innerStartAngle)) * var(--slice-innerRPx))
+						calc(var(--slice-cy) - cos(var(--slice-innerStartAngle)) * var(--slice-innerRPx))
+						of var(--slice-innerRPx) var(--slice-innerSweep) var(--slice-arcSize),
+					close
+				);
 
+				transform-origin: var(--pie-originX) var(--pie-originY);
 				transform:
 					rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * 1deg))
 					scale(var(--slice-scale))
 					translateY(calc(var(--slice-offset) * -1px))
 				;
 				opacity: var(--slice-opacity);
-				transition-property: transform, opacity;
+
+				will-change: transform;
+				transition-property:
+					clip-path,
+					transform,
+					opacity
+				;
 
 				&:hover,
-				&:focus {
+				&:focus-within {
 					filter: brightness(var(--hover-brightness));
 					--slice-scale: var(--hover-scale);
 					opacity: 1;
 				}
 
-				&:focus,
+				&:focus-within,
 				&.highlighted {
-					stroke: var(--highlight-color);
-					stroke-width: calc(var(--highlight-stroke-width) * 1px);
 					z-index: 2;
 					opacity: 1;
 				}
 
-				&:focus {
+				&:focus-within {
 					outline: none;
 				}
 
-				> .label-line {
-					opacity: 0;
-					stroke: currentColor;
-					stroke-width: 1;
-					stroke-dasharray: 1 2;
-					pointer-events: none;
-				}
-
-				.slice-path {
-					d: var(--slice-path);
-					fill: var(--slice-fill);
-					stroke-linecap: square;
-				}
-
 				> .label {
-					text-anchor: middle;
-					dominant-baseline: central;
-					fill: currentColor;
-					stroke: none;
+					position: absolute;
+					left: var(--pie-originX);
+					top: var(--pie-originY);
+					display: inline-block;
+					white-space: nowrap;
+					text-align: center;
+					line-height: 1;
+					color: currentColor;
 					font-size: calc(var(--pie-labelSize) * 1px);
-					pointer-events: none;
-					translate: 0 calc(var(--slice-labelR) * -1px);
+					translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
 					rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
 					transition-property: translate, rotate, filter;
 				}
@@ -559,24 +494,57 @@
 					filter: contrast(0.5) brightness(3) opacity(0.5) drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.15));
 				}
 
-				> .slices {
-					transform: rotate(calc(var(--pie-rotate) + var(--slice-midAngle) * -1deg));
-					transform-origin: 0 0;
-					will-change: transform;
-				}
+				--pie-originX: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
+				--pie-originY: calc((var(--pie-maxR) + var(--pie-padding)) * 1px);
+				--slice-cx: var(--pie-originX);
+				--slice-cy: var(--pie-originY);
+				--slice-outerInsetAngle: asin((var(--slice-gapPx) / 2) / var(--slice-outerRPx));
+				--slice-innerInsetAngle: asin((var(--slice-gapPx) / 2) / var(--slice-innerRPx));
+				--slice-outerStartAngle: calc(
+					(-1 * var(--slice-totalAngleDeg) / 2)
+					+ (var(--slice-outerInsetAngle) * var(--slice-orientation))
+				);
+				--slice-outerEndAngle: calc(
+					(var(--slice-totalAngleDeg) / 2)
+					- (var(--slice-outerInsetAngle) * var(--slice-orientation))
+				);
+				--slice-innerStartAngle: calc(
+					(-1 * var(--slice-totalAngleDeg) / 2)
+					+ (var(--slice-innerInsetAngle) * var(--slice-orientation))
+				);
+				--slice-innerEndAngle: calc(
+					(var(--slice-totalAngleDeg) / 2)
+					- (var(--slice-innerInsetAngle) * var(--slice-orientation))
+				);
 			}
 
 			> .center {
-				:global(text) {
-					font-size: 0.8em;
-					fill: currentColor;
+				position: absolute;
+				inset: 0;
+				display: grid;
+				justify-items: center;
+				pointer-events: none;
 
-					text-anchor: middle;
-					dominant-baseline: var(--center-label-baseline);
+				:global {
+					> * {
+						pointer-events: auto;
 
-					pointer-events: none;
+						font-size: 0.8em;
+						color: currentColor;
+						translate: 0 calc((var(--center-align-offset, 0)) * 1px);
+					}
 				}
 			}
+		}
+
+		&[data-layout="TopHalf"] > .pie > .center {
+			align-items: end;
+			--center-align-offset: calc(-1 * var(--pie-padding));
+		}
+
+		&[data-layout="FullLeft"] > .pie > .center,
+		&[data-layout="FullTop"] > .pie > .center {
+			align-items: center;
 		}
 	}
 </style>
