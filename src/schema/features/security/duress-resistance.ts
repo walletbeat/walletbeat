@@ -48,8 +48,11 @@ export interface BasicUnlock {
 /**
  * The action triggered when a duress PIN or passphrase is entered.
  *
- * Both actions require a dedicated duress credential (PIN, passphrase, etc.)
+ * Requires a dedicated duress credential (PIN, passphrase, etc.)
  * that is distinct from the normal unlock credential.
+ *
+ * Note: This enum is not limited to decoy wallets. As more wallets implement
+ * different forms of duress actions, new variants should be added here.
  */
 export enum DuressAction {
 	/**
@@ -59,16 +62,14 @@ export enum DuressAction {
 	 * providing plausible deniability.
 	 */
 	DECOY_WALLET = 'DECOY_WALLET',
+}
 
-	/**
-	 * Entering the duress credential wipes all local wallet data and
-	 * immediately forwards all funds to a pre-configured external address.
-	 *
-	 * Note: the destination address must NOT be unilaterally user-controlled
-	 * (e.g. must be a multisig, time-locked contract, or an independent external
-	 * address), otherwise an attacker can force the user to change it first.
-	 */
-	SELF_DESTRUCT_AND_FORWARD = 'SELF_DESTRUCT_AND_FORWARD',
+/** Returns a human-readable label for a DuressAction. */
+export function duressActionName(action: DuressAction): string {
+	switch (action) {
+		case DuressAction.DECOY_WALLET:
+			return 'Decoy wallet'
+	}
 }
 
 /**
