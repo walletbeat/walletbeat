@@ -1,0 +1,461 @@
+{
+	"version": 1.1,
+	"globalAttributes": [
+		{
+			"name": "data-badge",
+			"description": "## [data-badge]\n\n### Purpose\nCompact badge / chip surface with size modifiers.\n\n### Usage\n`<span data-badge='small'>…</span>`\n\n### Tokens\n- `small`, `medium`, `large`\n\n### CSS Variables\n- `--badge-backgroundColor`\n- `--badge-borderColor`\n- `--badge-textColor`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-badge]`",
+			"values": [
+				{
+					"name": "large",
+					"description": "Token for `data-badge~='large'`"
+				},
+				{
+					"name": "medium",
+					"description": "Token for `data-badge~='medium'`"
+				},
+				{
+					"name": "small",
+					"description": "Token for `data-badge~='small'`"
+				}
+			]
+		},
+		{
+			"name": "data-card",
+			"description": "## [data-card]\n\n### Purpose\nCard surface: tone, radius, padding, and accent border via tokens.\n\n### Usage\n`<article data-card='secondary radius-6 padding-4 border-accent'>…`\n\n### Tokens\n- tone: `secondary`\n- radius: `radius-1`, `radius-2`, `radius-3`, `radius-4`, `radius-6`, `radius-8`\n- padding: `padding-0` … `padding-8`\n- border: `border-accent`\n\n### CSS Variables\n- `--card-backgroundColor`\n- `--card-radius`\n- `--card-padding`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-card]`",
+			"values": [
+				{
+					"name": "border-accent",
+					"description": "Token for `data-card~='border-accent'`"
+				},
+				{
+					"name": "padding-0",
+					"description": "Token for `data-card~='padding-0'`"
+				},
+				{
+					"name": "padding-1",
+					"description": "Token for `data-card~='padding-1'`"
+				},
+				{
+					"name": "padding-2",
+					"description": "Token for `data-card~='padding-2'`"
+				},
+				{
+					"name": "padding-3",
+					"description": "Token for `data-card~='padding-3'`"
+				},
+				{
+					"name": "padding-4",
+					"description": "Token for `data-card~='padding-4'`"
+				},
+				{
+					"name": "padding-5",
+					"description": "Token for `data-card~='padding-5'`"
+				},
+				{
+					"name": "padding-6",
+					"description": "Token for `data-card~='padding-6'`"
+				},
+				{
+					"name": "padding-7",
+					"description": "Token for `data-card~='padding-7'`"
+				},
+				{
+					"name": "padding-8",
+					"description": "Token for `data-card~='padding-8'`"
+				},
+				{
+					"name": "radius-1",
+					"description": "Token for `data-card~='radius-1'`"
+				},
+				{
+					"name": "radius-2",
+					"description": "Token for `data-card~='radius-2'`"
+				},
+				{
+					"name": "radius-3",
+					"description": "Token for `data-card~='radius-3'`"
+				},
+				{
+					"name": "radius-4",
+					"description": "Token for `data-card~='radius-4'`"
+				},
+				{
+					"name": "radius-6",
+					"description": "Token for `data-card~='radius-6'`"
+				},
+				{
+					"name": "radius-8",
+					"description": "Token for `data-card~='radius-8'`"
+				},
+				{
+					"name": "secondary",
+					"description": "Token for `data-card~='secondary'`"
+				}
+			]
+		},
+		{
+			"name": "data-column",
+			"description": "## [data-column]\n\n### Purpose\nOne-column grid primitive for `[data-column]` (alignment + gap tokens). `[data-card]` shares the\nsame column/grid defaults before card-specific rules apply below.\n\n### Usage\n`<section data-column='start gap-4'>...</section>`\n\n### Tokens\n- alignment: `start`, `center`, `end`\n- spacing: `gap-0`, `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-5`, `gap-6`, `gap-8`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-column]`",
+			"values": [
+				{
+					"name": "center",
+					"description": "Token for `data-column~='center'`"
+				},
+				{
+					"name": "end",
+					"description": "Token for `data-column~='end'`"
+				},
+				{
+					"name": "gap-0",
+					"description": "Token for `data-column~='gap-0'`"
+				},
+				{
+					"name": "gap-1",
+					"description": "Token for `data-column~='gap-1'`"
+				},
+				{
+					"name": "gap-2",
+					"description": "Token for `data-column~='gap-2'`"
+				},
+				{
+					"name": "gap-3",
+					"description": "Token for `data-column~='gap-3'`"
+				},
+				{
+					"name": "gap-4",
+					"description": "Token for `data-column~='gap-4'`"
+				},
+				{
+					"name": "gap-5",
+					"description": "Token for `data-column~='gap-5'`"
+				},
+				{
+					"name": "gap-6",
+					"description": "Token for `data-column~='gap-6'`"
+				},
+				{
+					"name": "gap-8",
+					"description": "Token for `data-column~='gap-8'`"
+				},
+				{
+					"name": "start",
+					"description": "Token for `data-column~='start'`"
+				}
+			]
+		},
+		{
+			"name": "data-link",
+			"description": "## [data-link]\n\n### Purpose\nShared link styling with optional camouflaged mode.\n\n### Usage\n`<a data-link>` or `<a data-link='camouflaged'>`.\n\n### Tokens\n- `camouflaged` (exact `=` selector).\n\n### CSS Variables\n- `--text-primary`\n- `--accent`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-link]`",
+			"values": [
+				{
+					"name": "camouflaged",
+					"description": "Token for `data-link~='camouflaged'`"
+				}
+			]
+		},
+		{
+			"name": "data-list",
+			"description": "## [data-list]\n\n### Purpose\nList layout: gap, markers, and `data-list-item` / `data-list-item-marker` item spacing.\n\n### Usage\n- `<ul data-list='gap-2'>…`\n- `<li data-list-item='gap-1' data-list-item-marker='•'>…`\n\n### Tokens\n- list gap: `gap-0` … `gap-6`\n- item gap: `gap-0` … `gap-6` on `data-list-item`\n- marker: free text via `data-list-item-marker`\n\n### CSS Variables\n- `--list-marker-inlineSize`\n- `--list-markerGap`\n- `--list-gap`\n- `--listItem-gap` (per item)\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list]`",
+			"values": [
+				{
+					"name": "gap-0",
+					"description": "Token for `data-list~='gap-0'`"
+				},
+				{
+					"name": "gap-1",
+					"description": "Token for `data-list~='gap-1'`"
+				},
+				{
+					"name": "gap-2",
+					"description": "Token for `data-list~='gap-2'`"
+				},
+				{
+					"name": "gap-3",
+					"description": "Token for `data-list~='gap-3'`"
+				},
+				{
+					"name": "gap-4",
+					"description": "Token for `data-list~='gap-4'`"
+				},
+				{
+					"name": "gap-5",
+					"description": "Token for `data-list~='gap-5'`"
+				},
+				{
+					"name": "gap-6",
+					"description": "Token for `data-list~='gap-6'`"
+				}
+			]
+		},
+		{
+			"name": "data-list-item",
+			"description": "## [data-list-item]\n\n### Purpose\nList layout: gap, markers, and `data-list-item` / `data-list-item-marker` item spacing.\n\n### Usage\n- `<ul data-list='gap-2'>…`\n- `<li data-list-item='gap-1' data-list-item-marker='•'>…`\n\n### Tokens\n- list gap: `gap-0` … `gap-6`\n- item gap: `gap-0` … `gap-6` on `data-list-item`\n- marker: free text via `data-list-item-marker`\n\n### CSS Variables\n- `--list-marker-inlineSize`\n- `--list-markerGap`\n- `--list-gap`\n- `--listItem-gap` (per item)\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item]`",
+			"values": [
+				{
+					"name": "gap-0",
+					"description": "Token for `data-list-item~='gap-0'`"
+				},
+				{
+					"name": "gap-1",
+					"description": "Token for `data-list-item~='gap-1'`"
+				},
+				{
+					"name": "gap-2",
+					"description": "Token for `data-list-item~='gap-2'`"
+				},
+				{
+					"name": "gap-3",
+					"description": "Token for `data-list-item~='gap-3'`"
+				},
+				{
+					"name": "gap-4",
+					"description": "Token for `data-list-item~='gap-4'`"
+				},
+				{
+					"name": "gap-5",
+					"description": "Token for `data-list-item~='gap-5'`"
+				},
+				{
+					"name": "gap-6",
+					"description": "Token for `data-list-item~='gap-6'`"
+				}
+			]
+		},
+		{
+			"name": "data-list-item-marker",
+			"description": "## [data-list-item-marker]\n\n### Purpose\nList layout: gap, markers, and `data-list-item` / `data-list-item-marker` item spacing.\n\n### Usage\n- `<ul data-list='gap-2'>…`\n- `<li data-list-item='gap-1' data-list-item-marker='•'>…`\n\n### Tokens\n- list gap: `gap-0` … `gap-6`\n- item gap: `gap-0` … `gap-6` on `data-list-item`\n- marker: free text via `data-list-item-marker`\n\n### CSS Variables\n- `--list-marker-inlineSize`\n- `--list-markerGap`\n- `--list-gap`\n- `--listItem-gap` (per item)\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-list-item-marker]`"
+		},
+		{
+			"name": "data-pressable",
+			"description": "## [data-pressable]\n\n### Purpose\nConsistent press-state feedback across interactive elements.\n\n### Usage\n- add `data-pressable` on custom interactive wrappers\n- use `data-pressable='to-containing'` when the press overlay should cover the containing block\n\n### Tokens\n- `to-containing` (exact `=` selector).\n\n### CSS Variables\n- `--pressable-transitionOutDuration`\n- `--pressable-transitionInDuration`\n- `--pressable-pressed-opacity`\n- `--pressable-pressed-scale`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-pressable]`",
+			"values": [
+				{
+					"name": "to-containing",
+					"description": "Token for `data-pressable~='to-containing'`"
+				}
+			]
+		},
+		{
+			"name": "data-row",
+			"description": "## [data-row]\n\n### Purpose\nFlex row primitive: alignment, gap, wrap, and child `data-row-item` helpers. Also styles `<summary>`\nand shares flex defaults with `[data-badge]` in this block; see the dedicated `[data-badge]` block\nfor badge size tokens.\n\n### Usage\n- row: `<div data-row='center gap-2 wrap'>…`\n- item hints: `<div data-row-item='basis-3 flexible'>…`\n\n### Tokens\n- container: `start`, `center`, `end`\n- cross-axis: `align-start`, `align-center`, `align-end`\n- gap: `gap-0` … `gap-8`\n- wrap: `wrap`, `wrap-first-last`\n- item: `flexible`, `basis-1`..`basis-6`, `basis-full`, `wrap-start`, `wrap-center`, `wrap-end`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row]`",
+			"values": [
+				{
+					"name": "align-center",
+					"description": "Token for `data-row~='align-center'`"
+				},
+				{
+					"name": "align-end",
+					"description": "Token for `data-row~='align-end'`"
+				},
+				{
+					"name": "align-start",
+					"description": "Token for `data-row~='align-start'`"
+				},
+				{
+					"name": "center",
+					"description": "Token for `data-row~='center'`"
+				},
+				{
+					"name": "end",
+					"description": "Token for `data-row~='end'`"
+				},
+				{
+					"name": "gap-0",
+					"description": "Token for `data-row~='gap-0'`"
+				},
+				{
+					"name": "gap-1",
+					"description": "Token for `data-row~='gap-1'`"
+				},
+				{
+					"name": "gap-2",
+					"description": "Token for `data-row~='gap-2'`"
+				},
+				{
+					"name": "gap-3",
+					"description": "Token for `data-row~='gap-3'`"
+				},
+				{
+					"name": "gap-4",
+					"description": "Token for `data-row~='gap-4'`"
+				},
+				{
+					"name": "gap-5",
+					"description": "Token for `data-row~='gap-5'`"
+				},
+				{
+					"name": "gap-6",
+					"description": "Token for `data-row~='gap-6'`"
+				},
+				{
+					"name": "gap-8",
+					"description": "Token for `data-row~='gap-8'`"
+				},
+				{
+					"name": "start",
+					"description": "Token for `data-row~='start'`"
+				},
+				{
+					"name": "wrap",
+					"description": "Token for `data-row~='wrap'`"
+				}
+			]
+		},
+		{
+			"name": "data-row-item",
+			"description": "## [data-row-item]\n\n### Purpose\nFlex row primitive: alignment, gap, wrap, and child `data-row-item` helpers. Also styles `<summary>`\nand shares flex defaults with `[data-badge]` in this block; see the dedicated `[data-badge]` block\nfor badge size tokens.\n\n### Usage\n- row: `<div data-row='center gap-2 wrap'>…`\n- item hints: `<div data-row-item='basis-3 flexible'>…`\n\n### Tokens\n- container: `start`, `center`, `end`\n- cross-axis: `align-start`, `align-center`, `align-end`\n- gap: `gap-0` … `gap-8`\n- wrap: `wrap`, `wrap-first-last`\n- item: `flexible`, `basis-1`..`basis-6`, `basis-full`, `wrap-start`, `wrap-center`, `wrap-end`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-row]`"
+		},
+		{
+			"name": "data-scroll-container",
+			"description": "## [data-scroll-container]\n\n### Purpose\nScroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll\nitem attachment, overflow, and snap helpers.\n\n### Usage\n- `data-scroll-container='block|inline'`\n- `data-sticky-container` for nested sticky subtrees\n- `data-sticky='…'` sticky item tokens\n- `data-scroll-item='…'` scroll item modifiers\n\n### Tokens\n- scroll container: `block`, `inline`\n- sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`\n- scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-container]`",
+			"values": [
+				{
+					"name": "block",
+					"description": "Token for `data-scroll-container~='block'`"
+				},
+				{
+					"name": "inline",
+					"description": "Token for `data-scroll-container~='inline'`"
+				}
+			]
+		},
+		{
+			"name": "data-scroll-item",
+			"description": "## [data-scroll-item]\n\n### Purpose\nScroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll\nitem attachment, overflow, and snap helpers.\n\n### Usage\n- `data-scroll-container='block|inline'`\n- `data-sticky-container` for nested sticky subtrees\n- `data-sticky='…'` sticky item tokens\n- `data-scroll-item='…'` scroll item modifiers\n\n### Tokens\n- scroll container: `block`, `inline`\n- sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`\n- scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-scroll-item]`",
+			"values": [
+				{
+					"name": "block-size-max",
+					"description": "Token for `data-scroll-item~='block-size-max'`"
+				},
+				{
+					"name": "inline-attached",
+					"description": "Token for `data-scroll-item~='inline-attached'`"
+				},
+				{
+					"name": "inline-detached",
+					"description": "Token for `data-scroll-item~='inline-detached'`"
+				},
+				{
+					"name": "inline-size-max",
+					"description": "Token for `data-scroll-item~='inline-size-max'`"
+				},
+				{
+					"name": "overflow-center",
+					"description": "Token for `data-scroll-item~='overflow-center'`"
+				},
+				{
+					"name": "overflow-end",
+					"description": "Token for `data-scroll-item~='overflow-end'`"
+				},
+				{
+					"name": "overflow-start",
+					"description": "Token for `data-scroll-item~='overflow-start'`"
+				},
+				{
+					"name": "padding-match-end",
+					"description": "Token for `data-scroll-item~='padding-match-end'`"
+				},
+				{
+					"name": "padding-match-start",
+					"description": "Token for `data-scroll-item~='padding-match-start'`"
+				},
+				{
+					"name": "snap-block-end",
+					"description": "Token for `data-scroll-item~='snap-block-end'`"
+				},
+				{
+					"name": "snap-block-start",
+					"description": "Token for `data-scroll-item~='snap-block-start'`"
+				},
+				{
+					"name": "underflow-center",
+					"description": "Token for `data-scroll-item~='underflow-center'`"
+				},
+				{
+					"name": "underflow-end",
+					"description": "Token for `data-scroll-item~='underflow-end'`"
+				},
+				{
+					"name": "underflow-start",
+					"description": "Token for `data-scroll-item~='underflow-start'`"
+				}
+			]
+		},
+		{
+			"name": "data-stack",
+			"description": "## [data-stack]\n\n### Purpose\nOverlay direct children in one shared grid cell (`grid-area: stack`).\n\n### Usage\nContainer whose direct children should stack visually.\n\n### Tokens\nNone (`[data-stack]` presence only).\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-stack]`"
+		},
+		{
+			"name": "data-sticky",
+			"description": "## [data-sticky]\n\n### Purpose\nScroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll\nitem attachment, overflow, and snap helpers.\n\n### Usage\n- `data-scroll-container='block|inline'`\n- `data-sticky-container` for nested sticky subtrees\n- `data-sticky='…'` sticky item tokens\n- `data-scroll-item='…'` scroll item modifiers\n\n### Tokens\n- scroll container: `block`, `inline`\n- sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`\n- scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky]`",
+			"values": [
+				{
+					"name": "backdrop-always",
+					"description": "Token for `data-sticky~='backdrop-always'`"
+				},
+				{
+					"name": "backdrop-none",
+					"description": "Token for `data-sticky~='backdrop-none'`"
+				},
+				{
+					"name": "block",
+					"description": "Token for `data-sticky~='block'`"
+				},
+				{
+					"name": "block-end",
+					"description": "Token for `data-sticky~='block-end'`"
+				},
+				{
+					"name": "block-start",
+					"description": "Token for `data-sticky~='block-start'`"
+				},
+				{
+					"name": "inline",
+					"description": "Token for `data-sticky~='inline'`"
+				},
+				{
+					"name": "inline-end",
+					"description": "Token for `data-sticky~='inline-end'`"
+				},
+				{
+					"name": "inline-start",
+					"description": "Token for `data-sticky~='inline-start'`"
+				}
+			]
+		},
+		{
+			"name": "data-sticky-container",
+			"description": "## [data-sticky-container]\n\n### Purpose\nScroll / sticky coordination: scroll container axis, nested sticky scopes, sticky items, and scroll\nitem attachment, overflow, and snap helpers.\n\n### Usage\n- `data-scroll-container='block|inline'`\n- `data-sticky-container` for nested sticky subtrees\n- `data-sticky='…'` sticky item tokens\n- `data-scroll-item='…'` scroll item modifiers\n\n### Tokens\n- scroll container: `block`, `inline`\n- sticky: `block`, `block-start`, `block-end`, `inline`, `inline-start`, `inline-end`, `backdrop-none`, `backdrop-always`\n- scroll item: `inline-detached`, `inline-attached`, `padding-match-start`, `padding-match-end`, `underflow-start|center|end`, `overflow-start|center|end`, `snap-block-start|end`, `block-size-max`, `inline-size-max`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-sticky-container]`"
+		},
+		{
+			"name": "data-tag",
+			"description": "## [data-tag]\n\n### Purpose\nSemantic tag / chip with category-based color families (`~=` tokens map to theme variables).\n\n### Usage\n`<button data-tag='eip'>EIP-4337</button>`\n\n### Tokens\n- `wallet-type`, `account-type`, `eip`, `eip-status`, `manufacture-type`, `eoa`\n\n### CSS Variables\n- `--tag-backgroundColor`\n- `--tag-textColor`\n- `--tag-borderColor`\n- `--tag-hover-backgroundColor`\n- `--tag-hover-textColor`\n- `--tag-hover-borderColor`\n\n### Source\n@see [src/styles/css-attributes.css](./css-attributes.css) `[data-tag]`",
+			"values": [
+				{
+					"name": "account-type",
+					"description": "Token for `data-tag~='account-type'`"
+				},
+				{
+					"name": "eip",
+					"description": "Token for `data-tag~='eip'`"
+				},
+				{
+					"name": "eip-status",
+					"description": "Token for `data-tag~='eip-status'`"
+				},
+				{
+					"name": "eoa",
+					"description": "Token for `data-tag~='eoa'`"
+				},
+				{
+					"name": "manufacture-type",
+					"description": "Token for `data-tag~='manufacture-type'`"
+				},
+				{
+					"name": "wallet-type",
+					"description": "Token for `data-tag~='wallet-type'`"
+				}
+			]
+		}
+	]
+}

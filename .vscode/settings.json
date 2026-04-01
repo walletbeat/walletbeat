@@ -13,5 +13,5 @@
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "dbaeumer.vscode-eslint"
 	},
-	"html.customData": [".vscode/walletbeat.html-data.json"]
+	"html.customData": [".vscode/walletbeat.css-attributes.json"]
 }
