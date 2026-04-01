@@ -2124,12 +2124,11 @@ Information about how the wallet locks itself against unauthorized access.
 
 The action triggered when a duress PIN or passphrase is entered.
 
-Both actions require a dedicated duress credential (PIN, passphrase, etc.) that is distinct from the normal unlock credential.
+Requires a dedicated duress credential (PIN, passphrase, etc.) that is distinct from the normal unlock credential.
+
+Note: This enum is not limited to decoy wallets. As more wallets implement different forms of duress actions, new variants should be added here.
 
 - `DECOY_WALLET` = `'DECOY_WALLET'`: Entering the duress credential opens a separate "decoy" wallet with a different set of accounts and balances. The real wallet is not exposed. The attacker cannot distinguish the decoy from the real wallet, providing plausible deniability.
-- `SELF_DESTRUCT_AND_FORWARD` = `'SELF_DESTRUCT_AND_FORWARD'`: Entering the duress credential wipes all local wallet data and immediately forwards all funds to a pre-configured external address.
-
-  Note: the destination address must NOT be unilaterally user-controlled (e.g. must be a multisig, time-locked contract, or an independent external address), otherwise an attacker can force the user to change it first.
 
 ---
 
