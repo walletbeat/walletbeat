@@ -179,6 +179,7 @@ export const bitget: SoftwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: null,
 			keysHandling: {
 				ref: [

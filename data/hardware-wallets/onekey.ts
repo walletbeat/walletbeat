@@ -140,6 +140,7 @@ export const onekeyWallet: HardwareWallet = {
 				}),
 				upgradePathAvailable: false,
 			}),
+			duressResistance: null,
 			firmware: {
 				type: FirmwareType.FAIL,
 				customFirmware: FirmwareType.FAIL,

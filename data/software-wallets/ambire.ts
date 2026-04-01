@@ -570,6 +570,7 @@ export const ambire: SoftwareWallet = {
 				rewards: notSupported,
 				upgradePathAvailable: false,
 			}),
+			duressResistance: null,
 			hardwareWalletSupport: {
 				ref: {
 					explanation:
