@@ -353,21 +353,17 @@ export const completedTemplate: SoftwareWallet = {
 				usage: notSupported,
 			},
 			appIsolation: {
-				[Variant.BROWSER]: {
-					createInAppConnectionFlow: supported({
-						ref: refTodo,
-					}),
-					erc7846WalletConnect: notSupported,
-					ethAccounts: supported({
-						ref: refTodo,
-						defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
-					}),
-					useAppSpecificLastConnectedAddresses: supported({
-						ref: refTodo,
-					}),
-				},
-				[Variant.MOBILE]: null,
-				[Variant.DESKTOP]: null,
+				createInAppConnectionFlow: supported({
+					ref: refTodo,
+				}),
+				erc7846WalletConnect: notSupported,
+				ethAccounts: supported({
+					ref: refTodo,
+					defaultBehavior: ExposedAccountsBehavior.APP_SPECIFIC_ACCOUNT,
+				}),
+				useAppSpecificLastConnectedAddresses: supported({
+					ref: refTodo,
+				}),
 			},
 			dataCollection: {
 				[UserFlow.INSTALL]: {
