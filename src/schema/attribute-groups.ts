@@ -73,6 +73,10 @@ import {
 	chainVerification,
 	type ChainVerificationValue,
 } from './attributes/security/chain-verification'
+import {
+	duressResistance,
+	type DuressResistanceValue,
+} from './attributes/security/duress-resistance'
 import { firmware, type FirmwareValue } from './attributes/security/firmware'
 import {
 	hardwareWalletSupport,
@@ -144,6 +148,7 @@ type SecurityValues = Dict<{
 	firmware: FirmwareValue
 	userSafety: UserSafetyValue
 	accountRecovery: AccountRecoveryValue
+	duressResistance: DuressResistanceValue
 }>
 
 /** Security attributes. */
@@ -164,6 +169,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		firmware,
 		userSafety,
 		accountRecovery,
+		duressResistance,
 	},
 	attributeWeights: {
 		securityAudits: 1.0,
@@ -177,6 +183,7 @@ export const securityAttributeGroup: AttributeGroup<SecurityValues> = {
 		firmware: 1.0,
 		userSafety: 1.0,
 		accountRecovery: 1.0,
+		duressResistance: 1.0,
 	},
 }
 
@@ -363,6 +370,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	firmware: EvaluatedAttribute<FirmwareValue>
 	userSafety: EvaluatedAttribute<UserSafetyValue>
 	accountRecovery: EvaluatedAttribute<AccountRecoveryValue>
+	duressResistance: EvaluatedAttribute<DuressResistanceValue>
 }
 
 /** Evaluated privacy attributes for a single wallet. */
@@ -466,6 +474,7 @@ export function evaluateAttributes(
 			firmware: evalAttr(firmware),
 			userSafety: evalAttr(userSafety),
 			accountRecovery: evalAttr(accountRecovery),
+			duressResistance: evalAttr(duressResistance),
 		},
 		privacy: {
 			addressCorrelation: evalAttr(addressCorrelation),
@@ -540,6 +549,7 @@ export function aggregateAttributes(perVariant: AtLeastOneVariant<EvaluationTree
 			firmware: attr(tree => tree.security.firmware),
 			userSafety: attr(tree => tree.security.userSafety),
 			accountRecovery: attr(tree => tree.security.accountRecovery),
+			duressResistance: attr(tree => tree.security.duressResistance),
 		},
 		privacy: {
 			addressCorrelation: attr(tree => tree.privacy.addressCorrelation),
