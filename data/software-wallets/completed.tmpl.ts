@@ -532,7 +532,7 @@ export const completedTemplate: SoftwareWallet = {
 				},
 				duressMode: supported({
 					ref: refTodo,
-					action: DuressAction.DECOY_WALLET,
+					actions: [DuressAction.DECOY_WALLET],
 				}),
 			},
 			hardwareWalletSupport: {
