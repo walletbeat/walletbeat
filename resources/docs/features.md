@@ -90,10 +90,7 @@ None of the fields in this type should be marked as possibly `undefined`. If you
     - `ethereumL1` (`VariantFeature<Support<WithRef<EthereumL1LightClientSupport>>>`): Light client used for Ethereum L1.
   - `accountRecovery` (`VariantFeature<AccountRecovery>`): How can users of the wallet recover their account?
   - `duressResistance` (`VariantFeature<DuressResistance>`): Duress resistance features, covering both basic lock-screen protection and dedicated duress-PIN mechanisms (decoy wallet or self-destruct-and-forward).
-
-  Only evaluated for hardware and mobile variants; desktop, browser extension, and embedded variants are exempt.
   - `keysHandling` (`VariantFeature<WithRef<KeysHandlingSupport>>`): How are secret keys handled?
-
 - `privacy` (object): Privacy features.
   - `dataCollection` (`VariantFeature<DataCollection>`): Data collection information. See /docs/mitmproxy-guide for how to collect this.
   - `privacyPolicy` (`VariantFeature<string>`): Privacy policy URL of the wallet.
@@ -2116,7 +2113,7 @@ Basic unlock mechanisms a wallet may use to prevent unauthorized access. This is
 
 Information about how the wallet locks itself against unauthorized access.
 
-- `mechanisms` (`BasicUnlockMechanism[]`): One or more unlock mechanisms supported by the wallet. Must contain at least one entry.
+- `mechanisms` (`NonEmptyArray<BasicUnlockMechanism>`): One or more unlock mechanisms supported by the wallet. Must contain at least one entry.
 
 ---
 
@@ -2129,6 +2126,8 @@ Requires a dedicated duress credential (PIN, passphrase, etc.) that is distinct 
 Note: This enum is not limited to decoy wallets. As more wallets implement different forms of duress actions, new variants should be added here.
 
 - `DECOY_WALLET` = `'DECOY_WALLET'`: Entering the duress credential opens a separate "decoy" wallet with a different set of accounts and balances. The real wallet is not exposed. The attacker cannot distinguish the decoy from the real wallet, providing plausible deniability.
+- `SELF_DESTRUCT` = `'SELF_DESTRUCT'`
+- `ONCHAIN_LOCKDOWN` = `'ONCHAIN_LOCKDOWN'`
 
 ---
 
@@ -2136,7 +2135,7 @@ Note: This enum is not limited to decoy wallets. As more wallets implement diffe
 
 Information about a wallet's duress mode.
 
-- `action` (`DuressAction`): The action triggered when the duress credential is entered.
+- `actions` (`NonEmptyArray<DuressAction>`): One or more actions triggered when duress credentials are entered.
 
 ---
 
@@ -2146,9 +2145,7 @@ Duress resistance features of a wallet.
 
 Covers the full spectrum from basic lock-screen protection through full duress-pin-triggered decoy wallets or self-destruct mechanisms. This feature helps protect users against "wrench attacks" — physical coercion to hand over funds.
 
-Only applicable to hardware wallets and mobile app wallets. Desktop and browser extension wallets are exempt.
-
-- `basicUnlock` (`WithRef<BasicUnlock> | null`): The basic unlock mechanism protecting the wallet from unauthorized access. Set to null if unknown or if the wallet has no lock screen at all. A non-null value is a prerequisite for any meaningful duress resistance.
+- `basicUnlock` (`WithRef<BasicUnlock> | 'NO_LOCK_MECHANISM'`): The basic unlock mechanism protecting the wallet from unauthorized access. Set to 'NO_LOCK_MECHANISM' if the wallet has no lock screen at all. A non-null value is a prerequisite for any meaningful duress resistance.
 - `duressMode` (`Support<WithRef<DuressMode>>`): A dedicated duress mode triggered by a separate duress credential. Use `notSupported` when the wallet has no duress mode. Use `supported({ action: ..., ref: ... })` when a duress mode exists.
 
 ---
