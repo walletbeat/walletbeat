@@ -8,13 +8,15 @@ import {
 	Verifiability,
 } from '@/schema/attributes'
 import {
+	type BasicUnlock,
 	BasicUnlockMechanism,
 	basicUnlockMechanismName,
 	DuressAction,
+	duressActionDescription,
+	duressActionName,
 	type DuressMode,
-	type DuressResistance as DuressResistanceFeature,
 } from '@/schema/features/security/duress-resistance'
-import { isSupported, notSupported, type Supported } from '@/schema/features/support'
+import { isSupported, type Supported } from '@/schema/features/support'
 import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type AtLeastOneVariant, Variant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
@@ -46,10 +48,9 @@ function noLockScreen(
 
 function basicLockOnly(
 	ctx: EvaluationContext<DuressResistanceValue>,
-	feature: DuressResistanceFeature,
+	basicUnlock: WithRef<BasicUnlock>,
 ): Evaluation<DuressResistanceValue> {
-	const mechanisms = feature.basicUnlock!.mechanisms
-	const mechNames = commaListFormat(mechanisms.map(basicUnlockMechanismName))
+	const mechNames = commaListFormat(basicUnlock.mechanisms.map(basicUnlockMechanismName))
 
 	return ctx.build({
 		value: {
@@ -67,7 +68,8 @@ function basicLockOnly(
 			{{WALLET_NAME}} should implement a duress mode triggered by a separate duress PIN or passphrase. When entered, this should either:
 
 			- Open a **decoy wallet** with a different set of accounts and balances (provides plausible deniability), or
-			- **Wipe the device and forward all funds** to a pre-configured external address that is not unilaterally user-controlled (e.g. a multisig or time-locked contract).
+			- **Wipe the wallet** (self-destruct), preventing the attacker from accessing funds, or
+			- Trigger an **onchain lockdown**, preventing unauthorized transfers of funds.
 		`),
 	})
 }
@@ -76,22 +78,22 @@ function hasDuressMode(
 	ctx: EvaluationContext<DuressResistanceValue>,
 	duressMode: Supported<WithRef<DuressMode>>,
 ): Evaluation<DuressResistanceValue> {
-	switch (duressMode.action) {
-		case DuressAction.DECOY_WALLET:
-			return ctx.build({
-				value: {
-					id: 'decoy_wallet',
-					rating: Rating.PASS,
-					displayName: 'Decoy wallet',
-					shortExplanation: sentence(
-						'{{WALLET_NAME}} supports a duress PIN that opens a separate decoy wallet.',
-					),
-				},
-				details: paragraph(
-					'{{WALLET_NAME}} implements a duress mode: entering a separate duress PIN or passphrase opens a different wallet with a distinct set of accounts and balances. The attacker cannot distinguish the decoy from the real wallet, giving the user plausible deniability under coercion.',
-				),
-			})
-	}
+	const actionNames = commaListFormat(duressMode.actions.map(duressActionName))
+	const actionDescriptions = duressMode.actions
+		.map(a => `entering a separate duress credential ${duressActionDescription(a)}`)
+		.join('; or ')
+
+	return ctx.build({
+		value: {
+			id: 'has_duress_mode',
+			rating: Rating.PASS,
+			displayName: actionNames,
+			shortExplanation: sentence(
+				`{{WALLET_NAME}} supports a duress mode: ${actionNames.toLowerCase()}.`,
+			),
+		},
+		details: paragraph(`{{WALLET_NAME}} implements a duress mode: ${actionDescriptions}.`),
+	})
 }
 
 export const duressResistance: Attribute<DuressResistanceValue> = {
@@ -105,7 +107,7 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 		'Does {{WALLET_NAME}} protect users from being physically coerced into surrendering their funds?',
 	),
 	why: markdown(`
-		A "wrench attack" is when an adversary physically coerces a user into handing over their funds.
+		A ["wrench attack"](https://xkcd.com/538/) is when an adversary physically coerces a user into handing over their funds.
 		Unlike remote attacks, no amount of cryptographic security can stop an attacker who is standing
 		next to you with a weapon.
 
@@ -115,7 +117,7 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 		   This protects against opportunistic thieves and buys time, but a determined coercer can
 		   watch you unlock it.
 
-		2. **Duress mode (strong)**: A separate duress PIN or passphrase that, when entered,
+		2. **Duress mode (stronger)**: A separate duress PIN or passphrase that, when entered,
 		   either opens a decoy wallet (providing plausible deniability) or wipes the device and
 		   immediately forwards all funds to a pre-configured address not controlled by the user alone.
 
@@ -123,17 +125,7 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 		desktop and browser extension wallets do not meaningfully face this threat model.
 	`),
 	methodology: markdown(`
-		Wallets are rated based on the strongest duress protection they provide:
-
-		1. **Pass**: Implements a duress PIN or passphrase that triggers either:
-			- A decoy wallet (different accounts and balances, plausible deniability), or
-			- A wipe-and-forward mechanism (wipes device, sends funds to a pre-configured address not unilaterally user-controlled).
-
-		2. **Partial**: Has a lock screen (PIN, password, biometric, or pattern) but no dedicated duress mode.
-
-		3. **Fail**: No lock screen at all — the wallet is accessible to anyone who picks up the device or opens the app.
-
-		4. **Exempt**: Desktop and browser extension wallets, and embedded wallets.
+		Wallets are rated based on the strongest duress protection they provide, such as support for a lock screen and duress actions.
 	`),
 	ratingScale: {
 		display: 'pass-fail',
@@ -145,7 +137,7 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 				),
 				hasDuressMode(
 					EvaluationContext.forTest(() => duressResistance),
-					{ support: 'SUPPORTED', action: DuressAction.DECOY_WALLET, ref: refNotNecessary },
+					{ support: 'SUPPORTED', actions: [DuressAction.DECOY_WALLET], ref: refNotNecessary },
 				),
 			),
 		],
@@ -157,11 +149,8 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 				basicLockOnly(
 					EvaluationContext.forTest(() => duressResistance),
 					{
-						basicUnlock: {
-							mechanisms: [BasicUnlockMechanism.PIN],
-							ref: refNotNecessary,
-						},
-						duressMode: notSupported,
+						mechanisms: [BasicUnlockMechanism.PIN],
+						ref: refNotNecessary,
 					},
 				),
 			),
@@ -201,15 +190,14 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 			return unrated(ctx, null)
 		}
 
-		if (feature.basicUnlock === null) {
+		if (feature.basicUnlock === null || feature.basicUnlock === 'NO_LOCK_MECHANISM') {
 			return noLockScreen(ctx)
 		}
 
 		ctx.addRef(feature.basicUnlock)
 
-		// Implied that basicUnlock is non-null here; a duress mode requires a basic lock screen.
 		if (!isSupported(feature.duressMode)) {
-			return basicLockOnly(ctx, feature)
+			return basicLockOnly(ctx, feature.basicUnlock)
 		}
 
 		ctx.addRef(feature.duressMode)

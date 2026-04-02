@@ -1,4 +1,5 @@
 import type { WithRef } from '@/schema/reference'
+import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import type { Support } from '../support'
 
@@ -42,7 +43,7 @@ export interface BasicUnlock {
 	 * One or more unlock mechanisms supported by the wallet.
 	 * Must contain at least one entry.
 	 */
-	mechanisms: BasicUnlockMechanism[]
+	mechanisms: NonEmptyArray<BasicUnlockMechanism>
 }
 
 /**
@@ -62,6 +63,10 @@ export enum DuressAction {
 	 * providing plausible deniability.
 	 */
 	DECOY_WALLET = 'DECOY_WALLET',
+
+	SELF_DESTRUCT = 'SELF_DESTRUCT',
+
+	ONCHAIN_LOCKDOWN = 'ONCHAIN_LOCKDOWN',
 }
 
 /** Returns a human-readable label for a DuressAction. */
@@ -69,6 +74,22 @@ export function duressActionName(action: DuressAction): string {
 	switch (action) {
 		case DuressAction.DECOY_WALLET:
 			return 'Decoy wallet'
+		case DuressAction.ONCHAIN_LOCKDOWN:
+			return 'Onchain lockdown'
+		case DuressAction.SELF_DESTRUCT:
+			return 'Self-destruct'
+	}
+}
+
+/** Returns a human-readable description of what a DuressAction does. */
+export function duressActionDescription(action: DuressAction): string {
+	switch (action) {
+		case DuressAction.DECOY_WALLET:
+			return 'opens a separate decoy wallet with a distinct set of accounts and balances, giving the user plausible deniability under coercion'
+		case DuressAction.ONCHAIN_LOCKDOWN:
+			return 'triggers an onchain lockdown, preventing unauthorized transfers of funds'
+		case DuressAction.SELF_DESTRUCT:
+			return 'wipes the wallet, preventing the attacker from accessing funds'
 	}
 }
 
@@ -76,8 +97,8 @@ export function duressActionName(action: DuressAction): string {
  * Information about a wallet's duress mode.
  */
 export interface DuressMode {
-	/** The action triggered when the duress credential is entered. */
-	action: DuressAction
+	/** One or more actions triggered when duress credentials are entered. */
+	actions: NonEmptyArray<DuressAction>
 }
 
 /**
@@ -87,17 +108,14 @@ export interface DuressMode {
  * full duress-pin-triggered decoy wallets or self-destruct mechanisms.
  * This feature helps protect users against "wrench attacks" — physical
  * coercion to hand over funds.
- *
- * Only applicable to hardware wallets and mobile app wallets.
- * Desktop and browser extension wallets are exempt.
  */
 export interface DuressResistance {
 	/**
 	 * The basic unlock mechanism protecting the wallet from unauthorized access.
-	 * Set to null if unknown or if the wallet has no lock screen at all.
+	 * Set to 'NO_LOCK_MECHANISM' if the wallet has no lock screen at all.
 	 * A non-null value is a prerequisite for any meaningful duress resistance.
 	 */
-	basicUnlock: WithRef<BasicUnlock> | null
+	basicUnlock: WithRef<BasicUnlock> | 'NO_LOCK_MECHANISM'
 
 	/**
 	 * A dedicated duress mode triggered by a separate duress credential.
