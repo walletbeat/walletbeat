@@ -79,9 +79,9 @@ function hasDuressMode(
 	duressMode: Supported<WithRef<DuressMode>>,
 ): Evaluation<DuressResistanceValue> {
 	const actionNames = commaListFormat(duressMode.actions.map(duressActionName))
-	const actionDescriptions = duressMode.actions
-		.map(a => `entering a separate duress credential ${duressActionDescription(a)}`)
-		.join('; or ')
+	const actionDescriptions = commaListFormat(
+		duressMode.actions.map(a => `entering a separate duress credential ${duressActionDescription(a)}`),
+	)
 
 	return ctx.build({
 		value: {
@@ -89,7 +89,7 @@ function hasDuressMode(
 			rating: Rating.PASS,
 			displayName: actionNames,
 			shortExplanation: sentence(
-				`{{WALLET_NAME}} supports a duress mode: ${actionNames.toLowerCase()}.`,
+				`{{WALLET_NAME}} supports a duress mode: ${actionNames}.`,
 			),
 		},
 		details: paragraph(`{{WALLET_NAME}} implements a duress mode: ${actionDescriptions}.`),

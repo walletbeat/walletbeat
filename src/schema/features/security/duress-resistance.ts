@@ -73,11 +73,11 @@ export enum DuressAction {
 export function duressActionName(action: DuressAction): string {
 	switch (action) {
 		case DuressAction.DECOY_WALLET:
-			return 'Decoy wallet'
+			return 'decoy wallet'
 		case DuressAction.ONCHAIN_LOCKDOWN:
-			return 'Onchain lockdown'
+			return 'onchain lockdown'
 		case DuressAction.SELF_DESTRUCT:
-			return 'Self-destruct'
+			return 'self-destruct'
 	}
 }
 
