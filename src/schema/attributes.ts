@@ -452,12 +452,10 @@ export interface Evaluation<
 /**
  * An evaluation that is exempt.
  */
-export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata> =
-	Evaluation<_OutcomeMetadata> & {
-		outcome: Evaluation<_OutcomeMetadata>['outcome'] & {
-			rating: Rating.EXEMPT
-		}
-	}
+export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata> = Evaluation<
+	_OutcomeMetadata,
+	Rating.EXEMPT
+>
 
 /**
  * Type predicate for ExemptEvaluation.
