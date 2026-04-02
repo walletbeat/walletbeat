@@ -13,7 +13,7 @@ import {
 	type PathPredicate,
 } from './utils/codebase'
 
-describe('repo integrity', () => {
+describe('codebase integrity', () => {
 	describe('all files have Unix line endings', async () => {
 		const filesWithCrlf: string[] = []
 
@@ -121,7 +121,7 @@ describe('repo integrity', () => {
 		}
 	})
 
-	describe('all files have only ASCII characters', async () => {
+	describe('all files have only ASCII characters and no BOM', async () => {
 		// This test exists to avoid attacks leveraging non-visible characters in code
 		// to sneak in code execution that contains a malicious payload.
 
@@ -132,6 +132,7 @@ describe('repo integrity', () => {
 			badChars: string[]
 		}
 		const filesWithNonAscii: NonAsciiViolation[][] = []
+		const filesWithBom: string[] = []
 
 		// Any change to the set of characters below should be examined with extreme prejudice.
 		const allowedNonAscii = new Set<string>([
@@ -140,8 +141,11 @@ describe('repo integrity', () => {
 			'˚',
 			'•',
 			'・',
+			'·',
+			'‑',
 			'●',
 			'→',
+			'←',
 			'↗',
 			'☠',
 			'…',
@@ -155,49 +159,96 @@ describe('repo integrity', () => {
 			'▸',
 			'—',
 			'–',
+			'─',
+			'┌',
+			'┐',
+			'│',
+			'├',
+			'┤',
+			'┘',
+			'└',
+			'┼',
+			'┬',
+			'┃',
+			'◄',
+			'▼',
 			'⚠',
 			'‼',
+			'ń',
+			'‘',
+			'’',
+			'“',
+			'”',
+			'×',
+			'›',
+			'≤',
+			'≥',
+			'℅',
 		])
 
 		for (const nonAscii of allowedNonAscii) {
-			if (nonAscii.length !== 1) {
+			if ([...nonAscii].length !== 1) {
 				throw new Error('invalid non-ASCII character list')
 			}
 		}
+		const emojiSequence = /\p{RGI_Emoji}/gv
 
 		await crawlCodebase({
-			ignore: [
-				// Text and Markdown files are just text content, not code, so they are excluded.
-				/^.*\.(txt|md)$/i as PathPredicate,
-
-				// JSON/YAML|TSV files are just structured content, not code, so they are excluded.
-				/^.*\.(json|yaml|tsv)$/i as PathPredicate,
-
-				// TEMPORARY EXCLUSION: TypeScript files.
-				/^.*\.(ts)$/i as PathPredicate,
-
-				// TEMPORARY EXCLUSION: Astro/Svelte files.
-				/^.*\.(astro|svelte)$/i as PathPredicate,
-			].concat(commonExclusions),
+			ignore: commonExclusions,
 			traversalFn: entry => {
 				if (entry.type !== CodebaseEntryType.FILE) {
 					return
+				}
+
+				// Check for BOM (UTF-8 BOM is 0xEFBBBF)
+				if (
+					entry.raw.length >= 3 &&
+					entry.raw[0] === 0xef &&
+					entry.raw[1] === 0xbb &&
+					entry.raw[2] === 0xbf
+				) {
+					filesWithBom.push(entry.path)
 				}
 
 				const lines = entry.contents.split('\n')
 				const violations: NonAsciiViolation[] = []
 
 				for (let i = 0; i < lines.length; i++) {
-					const line = lines[i]
+					const line = lines[i].replaceAll(emojiSequence, '[emoji]')
 					const foundNonAscii: string[] = []
 
-					for (let j = 0; j < line.length; j++) {
-						const charCode = line.charCodeAt(j)
+					for (const char of line) {
+						const codePoint = char.codePointAt(0)
 
-						if (charCode > 127 && !allowedNonAscii.has(line.charAt(j))) {
-							foundNonAscii.push(`"${line.charAt(j)}" (charcode: ${charCode})`)
+						if (codePoint === undefined) {
+							throw new Error(`failed getting codepoint from line ${i} of ${entry.path}`)
+						}
+
+						if (codePoint < 127) {
+							// Allow Tab (9), Line Feed (10), Carriage Return (13).
+							// Carriage return is already filtered in a different test.
+							if (codePoint < 32 && codePoint !== 9 && codePoint !== 10 && codePoint !== 13) {
+								foundNonAscii.push(`control character (charcode: ${codePoint})`)
+							}
+
+							continue
+						}
+
+						if (codePoint === 127) {
+							foundNonAscii.push('DEL control character (charcode: 127)')
+							continue
+						}
+
+						if (codePoint === 65533) {
+							foundNonAscii.push('replacement character (charcode: 65533, caused by invalid UTF-8)')
 							break
 						}
+
+						if (allowedNonAscii.has(char)) {
+							continue
+						}
+
+						foundNonAscii.push(`"${char}" (charcode: ${codePoint})`)
 					}
 
 					if (foundNonAscii.length > 0) {
@@ -241,7 +292,14 @@ describe('repo integrity', () => {
 
 			expect(
 				filesWithNonAscii,
-				`Files with non-ASCII characters:\n\n${message}\n\nPlease convert to ASCII only.`,
+				`Files with non-ASCII characters or invalid UTF-8:\n\n${message}\n\nPlease convert to ASCII only.`,
+			).toEqual([])
+		})
+
+		it('all files have no BOM', () => {
+			expect(
+				filesWithBom,
+				`Files with BOM (Byte Order Mark):\n\n${filesWithBom.join('\n')}\n\nPlease remove the BOM.`,
 			).toEqual([])
 		})
 	})

@@ -184,6 +184,7 @@ export type CodebaseEntry =
 	| {
 			type: CodebaseEntryType.FILE
 			path: string
+			raw: Buffer
 			contents: string
 	  }
 	| {
@@ -272,9 +273,10 @@ export async function crawlCodebase(options: CodebaseCrawOptions): Promise<void>
 					entryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath }
 				}
 			} else if (entry.isFile()) {
-				const contents = await concurrencyLimit(() => fs.readFile(fullPath, { encoding: 'utf-8' }))
+				const raw = await concurrencyLimit(() => fs.readFile(fullPath))
+				const contents = raw.toString('utf8')
 
-				entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, contents }
+				entryData = { type: CodebaseEntryType.FILE, path: rootRelativePath, raw, contents }
 			} else {
 				entryData = { type: CodebaseEntryType.OTHER, path: rootRelativePath }
 			}
