@@ -117,8 +117,6 @@ export interface WalletBaseFeatures {
 		 * protection and dedicated duress-PIN mechanisms (decoy wallet or
 		 * self-destruct-and-forward).
 		 *
-		 * Only evaluated for hardware and mobile variants; desktop, browser
-		 * extension, and embedded variants are exempt.
 		 */
 		duressResistance: VariantFeature<DuressResistance>
 
