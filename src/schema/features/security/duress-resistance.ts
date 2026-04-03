@@ -1,5 +1,4 @@
 import type { WithRef } from '@/schema/reference'
-import type { NonEmptyArray } from '@/types/utils/non-empty'
 
 import type { Support } from '../support'
 
@@ -40,10 +39,10 @@ export function basicUnlockMechanismName(m: BasicUnlockMechanism): string {
  */
 export interface BasicUnlock {
 	/**
-	 * One or more unlock mechanisms supported by the wallet.
-	 * Must contain at least one entry.
+	 * Which unlock mechanisms the wallet supports.
+	 * Set each mechanism to `true` if supported, `false` if not.
 	 */
-	mechanisms: NonEmptyArray<BasicUnlockMechanism>
+	mechanisms: Record<BasicUnlockMechanism, boolean>
 }
 
 /**
@@ -101,8 +100,11 @@ export function duressActionDescription(action: DuressAction): string {
  * Information about a wallet's duress mode.
  */
 export interface DuressMode {
-	/** One or more actions triggered when duress credentials are entered. */
-	actions: NonEmptyArray<DuressAction>
+	/**
+	 * Which actions are triggered when duress credentials are entered.
+	 * Set each action to `true` if triggered, `false` if not.
+	 */
+	actions: Record<DuressAction, boolean>
 }
 
 /**

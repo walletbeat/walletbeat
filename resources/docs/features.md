@@ -2113,7 +2113,7 @@ Basic unlock mechanisms a wallet may use to prevent unauthorized access. This is
 
 Information about how the wallet locks itself against unauthorized access.
 
-- `mechanisms` (`NonEmptyArray<BasicUnlockMechanism>`): One or more unlock mechanisms supported by the wallet. Must contain at least one entry.
+- `mechanisms` (`Record<BasicUnlockMechanism, boolean>`): Which unlock mechanisms the wallet supports. Set each mechanism to `true` if supported, `false` if not.
 
 ---
 
@@ -2136,7 +2136,7 @@ Note: This enum is not limited to decoy wallets. As more wallets implement diffe
 
 Information about a wallet's duress mode.
 
-- `actions` (`NonEmptyArray<DuressAction>`): One or more actions triggered when duress credentials are entered.
+- `actions` (`Record<DuressAction, boolean>`): Which actions are triggered when duress credentials are entered. Set each action to `true` if triggered, `false` if not.
 
 ---
 
