@@ -21,7 +21,7 @@ import { refNotNecessary, type WithRef } from '@/schema/reference'
 import { type AtLeastOneVariant, Variant } from '@/schema/variants'
 import { verifiabilityRequiresAtLeastOneReference } from '@/schema/verifiability'
 import { markdown, mdParagraph, paragraph, sentence } from '@/types/content'
-import { commaListFormat } from '@/types/utils/text'
+import { commaListFormat, markdownListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
@@ -50,7 +50,11 @@ function basicLockOnly(
 	ctx: EvaluationContext<DuressResistanceValue>,
 	basicUnlock: WithRef<BasicUnlock>,
 ): Evaluation<DuressResistanceValue> {
-	const mechNames = commaListFormat(basicUnlock.mechanisms.map(basicUnlockMechanismName))
+	const mechNames = commaListFormat(
+		Object.keys(basicUnlock.mechanisms)
+			.filter(m => basicUnlock.mechanisms[m])
+			.map(basicUnlockMechanismName),
+	)
 
 	return ctx.build({
 		value: {
@@ -61,8 +65,11 @@ function basicLockOnly(
 				`{{WALLET_NAME}} has a lock screen (${mechNames}) but no duress mode.`,
 			),
 		},
-		details: paragraph(
-			`{{WALLET_NAME}} protects access behind a lock screen (${mechNames}). This slows down an opportunistic attacker, but does not protect against a determined coercer who can watch you enter the credential or physically force you to unlock the wallet. There is no duress PIN, decoy wallet, or self-destruct mechanism.`,
+		details: markdown(
+			`{{WALLET_NAME}} protects access behind a lock screen (${mechNames}). 
+			This slows down an opportunistic attacker, but does not protect against 
+			a determined coercer who can watch you enter the credential or 
+			physically force you to unlock the wallet.`,
 		),
 		howToImprove: markdown(`
 			{{WALLET_NAME}} should implement a duress mode triggered by a separate duress PIN or passphrase. When entered, this should either:
@@ -77,13 +84,18 @@ function basicLockOnly(
 
 function hasDuressMode(
 	ctx: EvaluationContext<DuressResistanceValue>,
+	basicUnlock: WithRef<BasicUnlock>,
 	duressMode: Supported<WithRef<DuressMode>>,
 ): Evaluation<DuressResistanceValue> {
-	const actionNames = commaListFormat(duressMode.actions.map(duressActionName))
-	const actionDescriptions = commaListFormat(
-		duressMode.actions.map(
-			a => `entering a separate duress credential ${duressActionDescription(a)}`,
-		),
+	const mechNames = commaListFormat(
+		Object.keys(basicUnlock.mechanisms)
+			.filter(m => basicUnlock.mechanisms[m])
+			.map(basicUnlockMechanismName),
+	)
+	const activeActions = Object.keys(duressMode.actions).filter(a => duressMode.actions[a])
+	const actionNames = commaListFormat(activeActions.map(duressActionName))
+	const actionDescriptions = activeActions.map(
+		a => `entering a separate duress credential ${duressActionDescription(a)}`,
 	)
 
 	return ctx.build({
@@ -93,7 +105,19 @@ function hasDuressMode(
 			displayName: actionNames,
 			shortExplanation: sentence(`{{WALLET_NAME}} supports a duress mode: ${actionNames}.`),
 		},
-		details: paragraph(`{{WALLET_NAME}} implements a duress mode: ${actionDescriptions}.`),
+		details: mdParagraph(
+			`{{WALLET_NAME}} protects access behind a lock screen (${mechNames}) and implements a duress mode${markdownListFormat(
+				actionDescriptions,
+				{
+					ifEmpty: { behavior: 'THROW_ERROR' },
+					singleItemTemplate: ': ITEM.',
+					uppercaseFirstCharacterOfListItems: true,
+					multiItemPrefix: ':\n\n',
+					multiItemTemplate: '\n- ITEM',
+					multiItemSuffix: '\n',
+				},
+			)}`,
+		),
 	})
 }
 
@@ -138,7 +162,25 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 				),
 				hasDuressMode(
 					EvaluationContext.forTest(() => duressResistance),
-					{ support: 'SUPPORTED', actions: [DuressAction.DECOY_WALLET], ref: refNotNecessary },
+					{
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: true,
+							[BasicUnlockMechanism.PASSWORD]: false,
+							[BasicUnlockMechanism.BIOMETRIC]: false,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
+						ref: refNotNecessary,
+					},
+					{
+						support: 'SUPPORTED',
+						actions: {
+							[DuressAction.DECOY_WALLET]: true,
+							[DuressAction.SELF_DESTRUCT]: false,
+							[DuressAction.ONCHAIN_LOCKDOWN]: false,
+							[DuressAction.WIPE_AND_FORWARD]: false,
+						},
+						ref: refNotNecessary,
+					},
 				),
 			),
 		],
@@ -150,7 +192,12 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 				basicLockOnly(
 					EvaluationContext.forTest(() => duressResistance),
 					{
-						mechanisms: [BasicUnlockMechanism.PIN],
+						mechanisms: {
+							[BasicUnlockMechanism.PIN]: true,
+							[BasicUnlockMechanism.PASSWORD]: false,
+							[BasicUnlockMechanism.BIOMETRIC]: false,
+							[BasicUnlockMechanism.PATTERN]: false,
+						},
 						ref: refNotNecessary,
 					},
 				),
@@ -203,6 +250,6 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 
 		ctx.addRef(feature.duressMode)
 
-		return hasDuressMode(ctx, feature.duressMode)
+		return hasDuressMode(ctx, feature.basicUnlock, feature.duressMode)
 	},
 }
