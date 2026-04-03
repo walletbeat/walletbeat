@@ -11,6 +11,7 @@ import {
 	BugBountyProgramAvailability,
 	LegalProtectionType,
 } from '@/schema/features/security/bug-bounty-program'
+import { BasicUnlockMechanism } from '@/schema/features/security/duress-resistance'
 import {
 	HardwareWalletConnection,
 	HardwareWalletType,
@@ -382,7 +383,13 @@ export const metamask: SoftwareWallet = {
 				}),
 				upgradePathAvailable: true,
 			}),
-			duressResistance: null,
+			duressResistance: {
+				basicUnlock: {
+					ref: refTodo,
+					mechanisms: [BasicUnlockMechanism.BIOMETRIC, BasicUnlockMechanism.PASSWORD],
+				},
+				duressMode: notSupported,
+			},
 			hardwareWalletSupport: {
 				ref: [
 					{
