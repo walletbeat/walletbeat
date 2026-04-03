@@ -1694,6 +1694,41 @@ const knownValidUrls: KnownValidUrl[] = [
 		urlHash: 'c89f9bd364380a9ffd5ff2e7f453e0220296d1d9',
 		retrieved: '2026-03-27',
 	},
+	{
+		url: 'https://wallet.uniswap.org/',
+		urlHash: '53c26e1f58ef41abe6e2eb4eb95ddc1bbbba7629',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://docs.uniswap.org/',
+		urlHash: 'a3e405706ac38b59e5c1bb138162c977405124c4',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://github.com/Uniswap',
+		urlHash: '046a7fce9ef8ea6ac8c0d5854f920cb6639afa45',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://chromewebstore.google.com/detail/uniswap-extension/nnpmfplkfogfpmcngplhnbdnnilmcdcg',
+		urlHash: '97d54b721f1af8144f69b9e89abfd76d8243a5a2',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://discord.com/invite/uniswap',
+		urlHash: 'f9dc5c01d6d7dd0a07ab46833c0ae1e3c1ac259a',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://farcaster.xyz/uniswap',
+		urlHash: 'c8299cb24ebec66fffacb45145fc7439e60b4f03',
+		retrieved: '2026-04-02',
+	},
+	{
+		url: 'https://x.com/Uniswap',
+		urlHash: '236d460e150a8fff554beddcc672387e11669452',
+		retrieved: '2026-04-02',
+	},
 ]
 
 /**
