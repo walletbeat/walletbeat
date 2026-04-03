@@ -234,6 +234,11 @@ export async function grammarLint(text: string, lintOptions?: harper.LintOptions
 		lint => lint.lint_kind_pretty() !== 'Spelling' || lint.get_problem_text() !== 's',
 	)
 
+	// Ignore Word Choice lints for "lockdown" — used intentionally as a compound noun (e.g. "onchain lockdown").
+	lints = lints.filter(
+		lint => lint.lint_kind_pretty() !== 'Word Choice' || lint.get_problem_text() !== 'lockdown',
+	)
+
 	const message: string[] = []
 
 	for (const lint of lints) {
