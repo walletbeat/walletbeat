@@ -528,11 +528,21 @@ export const completedTemplate: SoftwareWallet = {
 			duressResistance: {
 				basicUnlock: {
 					ref: refTodo,
-					mechanisms: [BasicUnlockMechanism.BIOMETRIC, BasicUnlockMechanism.PIN],
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: false,
+						[BasicUnlockMechanism.PASSWORD]: true,
+						[BasicUnlockMechanism.BIOMETRIC]: true,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
 				},
 				duressMode: supported({
 					ref: refTodo,
-					actions: [DuressAction.DECOY_WALLET],
+					actions: {
+						[DuressAction.DECOY_WALLET]: true,
+						[DuressAction.ONCHAIN_LOCKDOWN]: true,
+						[DuressAction.SELF_DESTRUCT]: false,
+						[DuressAction.WIPE_AND_FORWARD]: false,
+					},
 				}),
 			},
 			hardwareWalletSupport: {

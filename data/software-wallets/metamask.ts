@@ -386,7 +386,12 @@ export const metamask: SoftwareWallet = {
 			duressResistance: {
 				basicUnlock: {
 					ref: refTodo,
-					mechanisms: [BasicUnlockMechanism.BIOMETRIC, BasicUnlockMechanism.PASSWORD],
+					mechanisms: {
+						[BasicUnlockMechanism.PIN]: false,
+						[BasicUnlockMechanism.PASSWORD]: true,
+						[BasicUnlockMechanism.BIOMETRIC]: true,
+						[BasicUnlockMechanism.PATTERN]: false,
+					},
 				},
 				duressMode: notSupported,
 			},
