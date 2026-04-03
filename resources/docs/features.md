@@ -2125,9 +2125,10 @@ Requires a dedicated duress credential (PIN, passphrase, etc.) that is distinct 
 
 Note: This enum is not limited to decoy wallets. As more wallets implement different forms of duress actions, new variants should be added here.
 
-- `DECOY_WALLET` = `'DECOY_WALLET'`: Entering the duress credential opens a separate "decoy" wallet with a different set of accounts and balances. The real wallet is not exposed. The attacker cannot distinguish the decoy from the real wallet, providing plausible deniability.
-- `SELF_DESTRUCT` = `'SELF_DESTRUCT'`
-- `ONCHAIN_LOCKDOWN` = `'ONCHAIN_LOCKDOWN'`
+- `DECOY_WALLET` = `'DECOY_WALLET'`: Opens a decoy wallet with a separate set of accounts, hiding the real wallet.
+- `SELF_DESTRUCT` = `'SELF_DESTRUCT'`: Wipes wallet data, preventing access to funds or private keys.
+- `ONCHAIN_LOCKDOWN` = `'ONCHAIN_LOCKDOWN'`: Freezes the smart contract onchain, preventing unauthorized transfers.
+- `WIPE_AND_FORWARD` = `'WIPE_AND_FORWARD'`: Wipes wallet data and forwards all funds to a pre-configured safe address.
 
 ---
 

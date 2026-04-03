@@ -56,17 +56,17 @@ export interface BasicUnlock {
  * different forms of duress actions, new variants should be added here.
  */
 export enum DuressAction {
-	/**
-	 * Entering the duress credential opens a separate "decoy" wallet with
-	 * a different set of accounts and balances. The real wallet is not
-	 * exposed. The attacker cannot distinguish the decoy from the real wallet,
-	 * providing plausible deniability.
-	 */
+	/** Opens a decoy wallet with a separate set of accounts, hiding the real wallet. */
 	DECOY_WALLET = 'DECOY_WALLET',
 
+	/** Wipes wallet data, preventing access to funds or private keys. */
 	SELF_DESTRUCT = 'SELF_DESTRUCT',
 
+	/** Freezes the smart contract onchain, preventing unauthorized transfers. */
 	ONCHAIN_LOCKDOWN = 'ONCHAIN_LOCKDOWN',
+
+	/** Wipes wallet data and forwards all funds to a pre-configured safe address. */
+	WIPE_AND_FORWARD = 'WIPE_AND_FORWARD',
 }
 
 /** Returns a human-readable label for a DuressAction. */
@@ -78,6 +78,8 @@ export function duressActionName(action: DuressAction): string {
 			return 'onchain lockdown'
 		case DuressAction.SELF_DESTRUCT:
 			return 'self-destruct'
+		case DuressAction.WIPE_AND_FORWARD:
+			return 'wipe and forward'
 	}
 }
 
@@ -90,6 +92,8 @@ export function duressActionDescription(action: DuressAction): string {
 			return 'triggers an onchain lockdown, preventing unauthorized transfers of funds'
 		case DuressAction.SELF_DESTRUCT:
 			return 'wipes the wallet, preventing the attacker from accessing funds'
+		case DuressAction.WIPE_AND_FORWARD:
+			return 'wipes the wallet and forwards all funds to a pre-configured safe address'
 	}
 }
 

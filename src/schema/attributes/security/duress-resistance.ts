@@ -69,7 +69,8 @@ function basicLockOnly(
 
 			- Open a **decoy wallet** with a different set of accounts and balances (provides plausible deniability), or
 			- **Wipe the wallet** (self-destruct), preventing the attacker from accessing funds, or
-			- Trigger an **onchain lockdown**, preventing unauthorized transfers of funds.
+			- Trigger an **onchain lockdown**, preventing unauthorized transfers of funds, or
+			- **Wipe and forward**, wiping the wallet and forwarding all funds to a pre-configured safe address.
 		`),
 	})
 }
