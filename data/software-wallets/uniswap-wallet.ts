@@ -87,6 +87,7 @@ export const uniswapWallet: SoftwareWallet = {
 		security: {
 			accountRecovery: null,
 			bugBountyProgram: null,
+			duressResistance: null,
 			hardwareWalletSupport: null,
 			keysHandling: null,
 			lightClient: {
