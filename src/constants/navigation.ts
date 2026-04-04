@@ -116,7 +116,7 @@ export const defaultNavigationItems = [
 				children: Object.entries(softwareWallets).map(([key, wallet]) => ({
 					id: key,
 					title: wallet.metadata.displayName,
-					href: `/${key}/`,
+					href: `/${wallet.metadata.id}/`,
 					icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
 				})),
 			},
@@ -157,7 +157,7 @@ export const defaultNavigationItems = [
 				children: Object.entries(hardwareWallets).map(([key, wallet]) => ({
 					id: key,
 					title: wallet.metadata.displayName.replace(' Wallet', ''),
-					href: `/${key}/`,
+					href: `/${wallet.metadata.id}/`,
 					icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
 				})),
 			},
