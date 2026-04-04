@@ -24997,7 +24997,7 @@
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
-					"path": "/images/wallets/keycardShell.svg",
+					"path": "/images/wallets/keycard-shell.svg",
 					"sessionTime": 8000027338,
 					"refererDomain": "beta.walletbeat.eth.limo",
 					"oddHeaders": {
@@ -26966,7 +26966,7 @@
 				},
 				{
 					"domain": "beta.walletbeat.eth.limo",
-					"path": "/images/wallets/keycardShell.svg",
+					"path": "/images/wallets/keycard-shell.svg",
 					"sessionTime": 9000014938,
 					"refererDomain": "beta.walletbeat.eth.limo",
 					"oddHeaders": {

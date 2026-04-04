@@ -29,7 +29,7 @@ import { paragraph } from '@/types/content'
 
 export const keycardShell: HardwareWallet = {
 	metadata: {
-		id: 'keycardShell',
+		id: 'keycard-shell',
 		displayName: 'Keycard Shell',
 		tableName: 'Keycard Shell',
 		blurb: paragraph(`

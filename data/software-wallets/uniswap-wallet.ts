@@ -8,7 +8,7 @@ import { paragraph } from '@/types/content'
 
 export const uniswapWallet: SoftwareWallet = {
 	metadata: {
-		id: 'uniswapWallet',
+		id: 'uniswap-wallet',
 		displayName: 'Uniswap Wallet',
 		tableName: 'Uniswap',
 		blurb: paragraph(`
