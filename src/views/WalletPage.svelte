@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Types/constants
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
-	import { type WalletName, allRatedWallets } from '@/data/wallets'
+	import { allRatedWalletsBySlug } from '@/data/wallets'
 	import {
 		type Attribute,
 		type AttributeGroup,
@@ -48,7 +48,7 @@
 		showStage = true,
 		showScores = false,
 	}: {
-		walletName: WalletName,
+		walletName: string,
 		showStage?: boolean,
 		showScores?: boolean,
 	} = $props()
@@ -76,7 +76,7 @@
 
 	// (Derived)
 	const wallet = $derived(
-		allRatedWallets[walletName]
+		allRatedWalletsBySlug[walletName]
 	)
 
 	const walletNews = $derived(

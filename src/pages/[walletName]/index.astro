@@ -1,24 +1,20 @@
 ---
 // Types/constants
-import { allRatedWallets } from '@/data/wallets'
+import { allRatedWalletsBySlug, allWallets } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
-
-// Functions
-import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 // Routes
 export const prerender = true
 
-export const getStaticPaths = () => [
-	...nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({
-		params: { walletName },
-	})),
-]
+export const getStaticPaths = () =>
+	Object.values(allWallets).map(wallet => ({
+		params: { walletName: wallet.metadata.id },
+	}))
 
 const { walletName } = Astro.params
 
 // Data
-const wallet = allRatedWallets[walletName]
+const wallet = allRatedWalletsBySlug[walletName]
 
 // Components
 import Layout from '@/layouts/Layout.astro'
