@@ -10,6 +10,7 @@ import { WalletType } from '@/schema/wallet-types'
 import { WalletCaptureAnnotations } from '@/tools/wallet-data-collection/wallet-capture-annotations'
 import { WalletCaptureFile } from '@/tools/wallet-data-collection/wallet-capture-file'
 import { getErrorMessage } from '@/types/errors'
+import { toKebabCase } from '@/utils/kebab'
 
 import { getRepositoryRoot } from './utils/codebase'
 
@@ -70,8 +71,8 @@ describe('wallets', () => {
 	])) {
 		describe(walletMapName, () => {
 			for (const [walletKey, wallet] of Object.entries(walletMap)) {
-				it(`has the correct key for ${wallet.metadata.displayName}`, () => {
-					expect(walletKey).toBe(wallet.metadata.id)
+				it(`has a metadata.id that is the kebab-case of its registry key for ${wallet.metadata.displayName}`, () => {
+					expect(wallet.metadata.id).toBe(toKebabCase(walletKey))
 				})
 			}
 		})
@@ -87,6 +88,10 @@ describe('wallets', () => {
 
 	for (const wallet of Object.values(allWallets)) {
 		describe(`wallet ${wallet.metadata.displayName}`, () => {
+			it('has a slug-style metadata.id (lowercase, hyphens only)', () => {
+				expect(wallet.metadata.id).toMatch(/^[a-z][a-z0-9-]*$/)
+			})
+
 			it('has valid icon', () => {
 				expect(
 					fs.existsSync(
