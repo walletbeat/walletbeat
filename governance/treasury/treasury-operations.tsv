@@ -61,3 +61,4 @@ Date	From	To	Amount	Purpose	ID
 2026-04-05	treasury	treasury	4.915677476654864086 WETH → 10,000 USDC	CoW swap from WETH to USDC	0x49492c41d899fdeaaa50800b4625d621b69a209cb4e7b273c16ad9829a79356a
 2026-04-05	treasury	mattmatt_sablier	7,222.37 USDC	Top-up of Sablier stream	0x065d5be3f230229562ddc4f715fa48e6ed656406651308eaa81d25d7e774ab9e
 2026-04-05	treasury	thegeekygrower	500 USDC	Payment for implementation of Privacy Hygiene attribute	0x0aaa5a532c563b7bf466fa3cac05ebd6d324b5246008a138c9b7e9aeac9e4944
+2026-04-05	treasury	mattmatt	50 USDC	Reimbursement for X premium subscription for Walletbeat account	0xe75ef0ecbabb33f768e9d95f5196c0cef0c7c62716ebfa42a5c2bb23b4c271fa
