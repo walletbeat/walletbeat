@@ -20,7 +20,7 @@ export const commonExclusions: PathPredicate[] = [
 	await GitIgnoredFiles(),
 
 	// Exclude known binary files and macOS metadata files.
-	/\.(png|pdf|jpg|jpeg|gif|ico)$|\.DS_Store$/i,
+	/\.(png|pdf|jpg|jpeg|gif|ico)$/i,
 
 	// Helios binary checkpoint file.
 	'deploy/helios/data/checkpoint',
@@ -82,6 +82,12 @@ export async function GitIgnoredFiles(): Promise<PathPredicate> {
 
 		if (line.includes('*')) {
 			throw new Error(`Glob pattern not yet supported in this function: ${line}`)
+		}
+
+		// If the pattern has no slash, it matches the name anywhere in the tree (like **/<pattern>).
+		if (!line.includes('/')) {
+			regexExclusions.push(new RegExp(`(?:^|/)${escapeRegExp(line)}(?:/.*)?$`, ''))
+			continue
 		}
 
 		specificFiles.add(line)
