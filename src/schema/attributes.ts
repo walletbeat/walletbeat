@@ -337,7 +337,7 @@ export type Outcome<
 	 * Attribute-specific metadata. Optional; only present when the attribute
 	 * has metadata beyond the base outcome fields.
 	 */
-	(_OutcomeMetadata extends null ? { metadata?: undefined } : { metadata: _OutcomeMetadata })
+	(_OutcomeMetadata extends null ? { metadata?: never } : { metadata: _OutcomeMetadata })
 
 /** The numerical score corresponding to a rating by default. */
 export function defaultRatingScore<_OutcomeMetadata extends OutcomeMetadata>(
