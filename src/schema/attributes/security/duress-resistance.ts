@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import {
@@ -25,13 +24,9 @@ import { commaListFormat, markdownListFormat } from '@/types/utils/text'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type DuressResistanceValue = Value
-
-function noLockScreen(
-	ctx: EvaluationContext<DuressResistanceValue>,
-): Evaluation<DuressResistanceValue> {
+function noLockScreen(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_lock_screen',
 			rating: Rating.FAIL,
 			displayName: 'No lock screen',
@@ -46,10 +41,7 @@ function noLockScreen(
 	})
 }
 
-function basicLockOnly(
-	ctx: EvaluationContext<DuressResistanceValue>,
-	basicUnlock: WithRef<BasicUnlock>,
-): Evaluation<DuressResistanceValue> {
+function basicLockOnly(ctx: EvaluationContext, basicUnlock: WithRef<BasicUnlock>): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
 			.filter(m => basicUnlock.mechanisms[m])
@@ -57,7 +49,7 @@ function basicLockOnly(
 	)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'basic_lock_only',
 			rating: Rating.PARTIAL,
 			displayName: 'Lock screen only',
@@ -83,10 +75,10 @@ function basicLockOnly(
 }
 
 function hasDuressMode(
-	ctx: EvaluationContext<DuressResistanceValue>,
+	ctx: EvaluationContext,
 	basicUnlock: WithRef<BasicUnlock>,
 	duressMode: Supported<WithRef<DuressMode>>,
-): Evaluation<DuressResistanceValue> {
+): Evaluation {
 	const mechNames = commaListFormat(
 		Object.keys(basicUnlock.mechanisms)
 			.filter(m => basicUnlock.mechanisms[m])
@@ -99,7 +91,7 @@ function hasDuressMode(
 	)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'has_duress_mode',
 			rating: Rating.PASS,
 			displayName: actionNames,
@@ -121,7 +113,7 @@ function hasDuressMode(
 	})
 }
 
-export const duressResistance: Attribute<DuressResistanceValue> = {
+export const duressResistance: Attribute = {
 	id: 'duressResistance',
 	icon: '\u{1F527}', // Wrench (references the "wrench attack" threat model)
 	displayName: 'Duress Resistance',
@@ -210,9 +202,8 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<DuressResistanceValue>>) =>
-		pickWorstRating<DuressResistanceValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<DuressResistanceValue>): Evaluation<DuressResistanceValue> => {
+	aggregate: (perVariant: AtLeastOneVariant<Evaluation>) => pickWorstRating(perVariant),
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAtLeastOneReference({ referenceCountsAs: Verifiability.VERIFIABLE }),
 		)
@@ -228,14 +219,13 @@ export const duressResistance: Attribute<DuressResistanceValue> = {
 				sentence(
 					'Duress resistance is not applicable to browser extension, desktop, and embedded wallets.',
 				),
-				null,
 			)
 		}
 
 		const feature = ctx.features.security.duressResistance
 
 		if (feature === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (feature.basicUnlock === null || feature.basicUnlock === 'NO_LOCK_MECHANISM') {

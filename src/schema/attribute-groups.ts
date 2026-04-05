@@ -58,10 +58,7 @@ import {
 } from './attributes/security/account-recovery'
 import { bugBountyProgram } from './attributes/security/bug-bounty-program'
 import { chainVerification } from './attributes/security/chain-verification'
-import {
-	duressResistance,
-	type DuressResistanceValue,
-} from './attributes/security/duress-resistance'
+import { duressResistance } from './attributes/security/duress-resistance'
 import { firmware, type FirmwareMetadata } from './attributes/security/firmware'
 import {
 	hardwareWalletSupport,
@@ -115,7 +112,7 @@ type SecurityValues = Dict<{
 	firmware: FirmwareMetadata
 	userSafety: UserSafetyMetadata
 	accountRecovery: AccountRecoveryMetadata
-	duressResistance: DuressResistanceValue
+	duressResistance: null
 }>
 
 /** Security attributes. */
@@ -353,7 +350,7 @@ export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	firmware: EvaluatedAttribute<FirmwareMetadata>
 	userSafety: EvaluatedAttribute<UserSafetyMetadata>
 	accountRecovery: EvaluatedAttribute<AccountRecoveryMetadata>
-	duressResistance: EvaluatedAttribute<DuressResistanceValue>
+	duressResistance: EvaluatedAttribute
 }
 
 /** Evaluated privacy attributes for a single wallet. */
