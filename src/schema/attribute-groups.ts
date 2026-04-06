@@ -47,7 +47,7 @@ import {
 	type HardwarePrivacyMetadata,
 } from './attributes/privacy/hardware-privacy'
 import { multiAddressCorrelation } from './attributes/privacy/multi-address-correlation'
-import { privacyHygiene, type PrivacyHygieneValue } from './attributes/privacy/privacy-hygiene'
+import { privacyHygiene } from './attributes/privacy/privacy-hygiene'
 import {
 	privateTransfers,
 	type PrivateTransfersMetadata,
@@ -161,7 +161,7 @@ type PrivacyValues = Dict<{
 	privateTransfers: PrivateTransfersMetadata
 	hardwarePrivacy: HardwarePrivacyMetadata
 	appIsolation: null
-	privacyHygiene: PrivacyHygieneValue
+	privacyHygiene: null
 }>
 
 /** Privacy attributes. */
@@ -324,6 +324,22 @@ export const attributeTree: NonEmptyRecord<string, AttributeGroup<any>> = {
 	maintenance: maintenanceAttributeGroup,
 }
 
+/** Literal union of attribute group IDs in `attributeTree`. */
+export type AttributeGroupId =
+	| 'security'
+	| 'privacy'
+	| 'selfSovereignty'
+	| 'transparency'
+	| 'ecosystem'
+	| 'maintenance'
+
+/** Software summary tables omit the maintenance group. */
+export type SoftwareWalletAttributeGroupId = Exclude<AttributeGroupId, 'maintenance'>
+
+export type HardwareWalletAttributeGroupId = AttributeGroupId
+
+export type EmbeddedWalletAttributeGroupId = AttributeGroupId
+
 /** Evaluated security attributes for a single wallet. */
 export interface SecurityEvaluations extends EvaluatedGroup<SecurityValues> {
 	transactionLegibility: EvaluatedAttribute
@@ -347,7 +363,7 @@ export interface PrivacyEvaluations extends EvaluatedGroup<PrivacyValues> {
 	privateTransfers: EvaluatedAttribute<PrivateTransfersMetadata>
 	hardwarePrivacy: EvaluatedAttribute<HardwarePrivacyMetadata>
 	appIsolation: EvaluatedAttribute
-	privacyHygiene: EvaluatedAttribute<PrivacyHygieneValue>
+	privacyHygiene: EvaluatedAttribute
 }
 
 /** Evaluated self-sovereignty attributes for a single wallet. */
