@@ -1,11 +1,13 @@
 <script lang="ts">
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
+	import type { AccountUnruggabilityMetadata } from '@/schema/attributes/self-sovereignty/account-unruggability'
+	import {
+		isAccountRecoverable,
+		isAccountTakeOverPossible,
+	} from '@/schema/features/guardian-scenario/guardian-scenario-common'
 	import { ContentType } from '@/types/content'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
-	import type {
-		AccountUnruggabilityMetadata,
-	} from '@/schema/attributes/self-sovereignty/account-unruggability'
 
 	// Props
 	const {
@@ -19,7 +21,6 @@
 	// Components
 	import Typography from '@/components/Typography.svelte'
 	import { guardianPolicyMarkdown } from '@/schema/features/security/account-recovery'
-	import { isAccountRecoverable, isAccountTakeOverPossible } from '@/schema/features/guardian-scenario/guardian-scenario-common'
 	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
 </script>
 
