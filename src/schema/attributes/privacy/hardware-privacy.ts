@@ -63,7 +63,7 @@ export const hardwarePrivacy: Attribute<HardwarePrivacyMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<HardwarePrivacyMetadata>(perVariant),
+	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		// Even with network capture data, we cannot guarantee exhaustiveness without source code access.
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
