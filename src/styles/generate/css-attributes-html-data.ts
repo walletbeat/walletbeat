@@ -1,6 +1,7 @@
 import * as fs from 'fs/promises'
 import * as path from 'path'
-import { fileURLToPath } from 'url'
+
+import { getRepositoryRoot } from '@/tests/utils/codebase'
 
 import { type CssAttributeEntry, parseCssAttributes } from './css-attributes-generator-shared'
 
@@ -16,9 +17,7 @@ type HtmlCustomData = {
 	}>
 }
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const repoRoot = path.join(__dirname, '..', '..', '..')
+const repoRoot = getRepositoryRoot()
 const cssAttributesCssPath = path.join(repoRoot, 'src', 'styles', 'css-attributes.css')
 const outputPath = path.join(repoRoot, '.vscode', 'walletbeat.html-data.json')
 
