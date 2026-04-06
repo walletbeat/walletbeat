@@ -55,9 +55,9 @@ describe('attribute', () => {
 										? attribute.ratingScale.fail
 										: [attribute.ratingScale.fail],
 								)
-								const checkRatings = <V extends Outcome>(
+								const checkRatings = <_Outcome extends Outcome>(
 									scale: string,
-									ratings: NonEmptyArray<ExampleRating<V>>,
+									ratings: NonEmptyArray<ExampleRating<_Outcome>>,
 								) => {
 									describe(scale, () => {
 										it('has correct grammar', async () => {

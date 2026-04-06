@@ -53,12 +53,14 @@ describe('attribute', () => {
 							}
 
 							describe('example ratings', () => {
-								// eslint-disable-next-line prefer-const -- Can't use const on exampleRatings.
-								for (let { rating, exampleRatings } of [
+								for (const row of [
 									{ rating: Rating.PASS, exampleRatings: ratingScale.pass },
 									{ rating: Rating.PARTIAL, exampleRatings: ratingScale.partial },
 									{ rating: Rating.FAIL, exampleRatings: ratingScale.fail },
 								]) {
+									let { exampleRatings } = row
+									const { rating } = row
+
 									if (exampleRatings === undefined) {
 										continue
 									}
