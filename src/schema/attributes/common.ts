@@ -44,7 +44,7 @@ export function unrated<_OutcomeMetadata extends OutcomeMetadata>(
  * Helper for constructing Evaluation with "Exempt" Outcome.
  */
 export function exempt(
-	ctx: EvaluationContext<null>,
+	ctx: EvaluationContext,
 	whyExempt: Sentence<WalletNameStrings>,
 ): ExemptEvaluation<null>
 export function exempt<_OutcomeMetadata extends OutcomeMetadata>(

@@ -1,5 +1,10 @@
 import type { Content, Paragraph, Sentence, TypographicContent } from '@/types/content'
-import { type NonEmptyArray, nonEmptyMap, type NonEmptyRecord } from '@/types/utils/non-empty'
+import {
+	assertNonEmptyArray,
+	type NonEmptyArray,
+	nonEmptyMap,
+	type NonEmptyRecord,
+} from '@/types/utils/non-empty'
 
 /** Strings for content that may use {{WALLET_NAME}} only (e.g. details, blurb). */
 export type WalletNameStrings = null | { WALLET_NAME: string }
@@ -391,10 +396,10 @@ export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = null>
 /**
  * Detail views that reuse evaluation fields and take `metadata` instead of a full `outcome`.
  */
-export type EvaluationDetailProps<
-	_OutcomeMetadata extends object,
-	_AttributeGroupId extends string = string,
-> = Omit<EvaluationData<_OutcomeMetadata, _AttributeGroupId>, 'outcome'> & {
+export type EvaluationDetailProps<_OutcomeMetadata extends object> = Omit<
+	EvaluationData<_OutcomeMetadata>,
+	'outcome'
+> & {
 	metadata: _OutcomeMetadata
 }
 
@@ -916,10 +921,10 @@ export type EvaluatedGroup<Vs extends ValueSet> = {
 export function evaluatedAttributes<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
 ): NonEmptyArray<EvaluatedAttribute<OutcomeMetadata>> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.values(evaluatedGroup) as unknown as NonEmptyArray<
-		EvaluatedAttribute<OutcomeMetadata>
-	>
+	return assertNonEmptyArray(
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.values widens; each entry is an evaluated attribute for this group
+		Object.values(evaluatedGroup) as unknown as EvaluatedAttribute<OutcomeMetadata>[],
+	)
 }
 
 /**
@@ -931,10 +936,10 @@ export function evaluatedAttributes<Vs extends ValueSet>(
 export function evaluatedAttributesEntries<Vs extends ValueSet>(
 	evaluatedGroup: EvaluatedGroup<Vs>,
 ): NonEmptyArray<[keyof Vs, EvaluatedAttribute<OutcomeMetadata>]> {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- We know that ValueSets cannot be empty, therefore neither can this array.
-	return Object.entries(evaluatedGroup) as unknown as NonEmptyArray<
-		[keyof Vs, EvaluatedAttribute<OutcomeMetadata>]
-	>
+	return assertNonEmptyArray(
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.entries widens keys/values; shape matches EvaluatedGroup entries
+		Object.entries(evaluatedGroup) as unknown as [keyof Vs, EvaluatedAttribute<OutcomeMetadata>][],
+	)
 }
 
 /** Represents an unimplemented ExampleRating. See below. */
