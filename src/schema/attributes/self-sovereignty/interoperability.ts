@@ -53,7 +53,7 @@ export const interoperability: Attribute<InteroperabilityMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<InteroperabilityMetadata>(perVariant),
+	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 

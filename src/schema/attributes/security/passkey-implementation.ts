@@ -322,7 +322,7 @@ export const passkeyImplementation: Attribute<PasskeyImplementationMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating(perVariant),
+	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: true }))
 		const passkeyVerification = ctx.features.security.passkeyVerification

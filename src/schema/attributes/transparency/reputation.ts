@@ -64,7 +64,7 @@ export const reputation: Attribute<ReputationMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<ReputationMetadata>(perVariant),
+	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable.
 

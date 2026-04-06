@@ -64,7 +64,7 @@ export const maintenance: Attribute<MaintenanceMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<MaintenanceMetadata>(perVariant),
+	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable unless audited, which never happens.
 

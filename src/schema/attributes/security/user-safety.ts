@@ -101,7 +101,7 @@ export const userSafety: Attribute<UserSafetyMetadata> = {
 			),
 		],
 	},
-	aggregate: perVariant => pickWorstRating<UserSafetyMetadata>(perVariant),
+	aggregate: pickWorstRating,
 	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 
