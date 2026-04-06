@@ -452,7 +452,7 @@ export interface Evaluation<
 /**
  * An evaluation that is exempt.
  */
-export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata> = Evaluation<
+export type ExemptEvaluation<_OutcomeMetadata extends OutcomeMetadata = null> = Evaluation<
 	_OutcomeMetadata,
 	Rating.EXEMPT
 >

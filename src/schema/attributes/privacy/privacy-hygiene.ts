@@ -3,7 +3,6 @@ import {
 	type Evaluation,
 	EvaluationContext,
 	exampleRating,
-	type ExemptEvaluation,
 	Rating,
 } from '@/schema/attributes'
 import {
@@ -437,7 +436,7 @@ export const privacyHygiene: Attribute = {
 			),
 		],
 	},
-	exempted: (ctx: EvaluationContext, _metadata: WalletMetadata): ExemptEvaluation | null => {
+	exempted: (ctx: EvaluationContext, _metadata: WalletMetadata) => {
 		if (ctx.features.type === WalletType.HARDWARE) {
 			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'))
 		}
