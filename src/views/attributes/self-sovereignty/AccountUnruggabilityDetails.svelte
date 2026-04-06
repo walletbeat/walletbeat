@@ -18,10 +18,12 @@
 		metadata: AccountUnruggabilityMetadata
 	} = $props()
 
+	// Functions
+	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
+	import { guardianPolicyMarkdown } from '@/schema/features/security/account-recovery'
+
 	// Components
 	import Typography from '@/components/Typography.svelte'
-	import { guardianPolicyMarkdown } from '@/schema/features/security/account-recovery'
-	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
 </script>
 
 {#if metadata.outcomes === null}
