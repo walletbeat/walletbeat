@@ -51,7 +51,7 @@ export const allRatedWalletsBySlug: Record<string, RatedWallet> = Object.fromEnt
 )
 
 /** Check if a string is a valid wallet slug (metadata.id). */
-export function isValidWalletSlug(slug: string): boolean {
+export function isValidWalletSlug(slug: string): slug is keyof typeof allRatedWalletsBySlug {
 	return Object.prototype.hasOwnProperty.call(allRatedWalletsBySlug, slug)
 }
 
