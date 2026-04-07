@@ -136,7 +136,7 @@
 
 
 {#snippet filterItemContent(
-	filter: Filter<any>,
+	filter: Filter<typeof items[number]>,
 	count: number
 )}
 	<span class="icon" aria-hidden="true">{@html filter.icon}</span>

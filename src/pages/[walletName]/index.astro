@@ -1,20 +1,41 @@
 ---
 // Types/constants
-import { allRatedWalletsBySlug, allWallets } from '@/data/wallets'
+import { allRatedWallets, assertValidWalletName } from '@/data/wallets'
 import { defaultNavigationItems } from '@/constants/navigation'
+import { softwareLadders } from '@/schema/ladders'
+import { WalletType } from '@/schema/wallet-types'
+import { softwareWalletAttributeTree } from '@/data/software-wallets'
+import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
+import { embeddedWalletAttributeTree } from '@/data/embedded-wallets'
+
+// Functions
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty.ts'
 
 // Routes
 export const prerender = true
 
-export const getStaticPaths = () =>
-	Object.values(allWallets).map(wallet => ({
-		params: { walletName: wallet.metadata.id },
-	}))
+export const getStaticPaths = () => [
+	...nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({
+		params: { walletName },
+	})),
+]
 
 const { walletName } = Astro.params
 
+assertValidWalletName(walletName)
+
 // Data
-const wallet = allRatedWalletsBySlug[walletName]
+const wallet = allRatedWallets[walletName]
+
+const attributeTree = wallet.types[WalletType.SOFTWARE]
+	? softwareWalletAttributeTree
+	: wallet.types[WalletType.HARDWARE]
+		? hardwareWalletAttributeTree
+		: wallet.types[WalletType.EMBEDDED]
+			? embeddedWalletAttributeTree
+			: (() => {
+					throw new Error('Invalid wallet type')
+				})()
 
 // Components
 import Layout from '@/layouts/Layout.astro'
@@ -44,6 +65,6 @@ import WalletPage from '@/views/WalletPage.svelte'
 	<Navigation navigationItems={defaultNavigationItems} />
 
 	<main data-sticky-container>
-		<WalletPage {walletName} client:load />
+		<WalletPage {wallet} ladders={softwareLadders} attributeTree={attributeTree} client:load />
 	</main>
 </Layout>
