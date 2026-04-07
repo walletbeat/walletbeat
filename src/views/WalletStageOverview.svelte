@@ -1,8 +1,10 @@
-<script lang="ts">
+<script lang="ts" generics="
+	_AttributeGroupId extends string
+">
 	// Types/constants
 	import type { RatedWallet } from '@/schema/wallet'
-	import { WalletLadderType, ladders } from '@/schema/ladders'
-	import { StageCriterionRating, stageCriterionRatings, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import { softwareLadders } from '@/schema/ladders'
+	import { StageCriterionRating, stageCriterionRatings, type WalletLadder, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
 	import { stageToColor } from '@/utils/colors'
 	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
 
@@ -51,9 +53,9 @@
 		stage,
 		ladderEvaluation,
 	}: {
-		wallet: RatedWallet
-		stage: WalletStage | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
-		ladderEvaluation: WalletLadderEvaluation | null
+		wallet: RatedWallet<_AttributeGroupId>
+		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
+		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 	} = $props()
 
 
@@ -69,7 +71,10 @@
 	)
 
 	let ladderDefinition = $derived(
-		ladderType ? ladders[ladderType] : null
+		ladderType ?
+			softwareLadders[ladderType] as WalletLadder<_AttributeGroupId>
+		:
+			null
 	)
 
 	let currentStageIndex = $derived(
@@ -176,7 +181,14 @@
 						{#if s.criteriaGroups}
 							<div data-column>
 								{#each s.criteriaGroups as criteriaGroup}
-									{@const { passedCount: groupPassedCount, totalCount: groupTotalCount, status: groupRating } = computeCountsAndStatus(criteriaGroup.criteria, stageEvaluatableWallet)}
+									{@const {
+										passedCount: groupPassedCount,
+										totalCount: groupTotalCount,
+										status: groupRating,
+									} = computeCountsAndStatus(
+										criteriaGroup.criteria,
+										stageEvaluatableWallet,
+									)}
 
 									<details
 										data-card="padding-5 secondary radius-4"

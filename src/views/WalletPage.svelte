@@ -1,10 +1,10 @@
-<script lang="ts">
+<script lang="ts" generics="
+	_AttributeGroupId extends string
+">
 	// Types/constants
 	import type { NonEmptyArray } from '@/types/utils/non-empty'
-	import { allRatedWalletsBySlug } from '@/data/wallets'
 	import {
 		type Attribute,
-		type AttributeGroup,
 		type EvaluatedAttribute,
 		type EvaluatedGroup,
 		type ExampleRating,
@@ -14,7 +14,10 @@
 		Verifiability,
 	} from '@/schema/attributes'
 	import { hasSingleVariant, type Variant } from '@/schema/variants'
-	import { VariantSpecificity } from '@/schema/wallet'
+	import { type RatedWallet, VariantSpecificity } from '@/schema/wallet'
+	import { type Ladders } from '@/schema/ladders'
+	import type { OutcomeMetadata } from '@/schema/attributes'
+	import type { AttributeTree } from '@/schema/attribute-groups'
 	import { ContentType, isTypographicContent } from '@/types/content'
 	import type { AddressCorrelationDetailsProps } from '@/types/content/address-correlation-details'
 	import type { ChainVerificationDetailsProps } from '@/types/content/chain-verification-details'
@@ -25,7 +28,6 @@
 	import type { TransactionInclusionDetailsProps } from '@/types/content/transaction-inclusion-details'
 	import type { AccountRecoveryDetailsProps } from '@/types/content/account-recovery-details'
 	import type { AccountUnruggabilityDetailsProps } from '@/types/content/account-unruggability-details'
-	import type { OutcomeMetadata } from '@/schema/attributes'
 	import type { UnratedAttributeProps } from '@/types/content/unrated-attribute'
 
 
@@ -37,7 +39,7 @@
 	} from '@/constants/variants'
 	import { allHardwareModels } from '@/data/hardware-wallets'
 	import {
-		attributeTree,
+		type AttributeGroup,
 		calculateAttributeGroupScore,
 		calculateOverallScore,
 		formatAttributeGroupTitleText,
@@ -49,17 +51,20 @@
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
-	import { getAttributeStagesForWallet, isAttributeUsedInStages } from '@/utils/stage-attributes'
-	import { WalletLadderType } from '@/schema/ladders'
+	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
 
 
 	// Props
 	const {
-		walletName,
+		ladders,
+		attributeTree,
+		wallet,
 		showStage = true,
 		showScores = false,
 	}: {
-		walletName: string,
+		ladders: Ladders<_AttributeGroupId>
+		attributeTree: AttributeTree<_AttributeGroupId>
+		wallet: RatedWallet<_AttributeGroupId>
 		showStage?: boolean,
 		showScores?: boolean,
 	} = $props()
@@ -86,10 +91,6 @@
 	)
 
 	// (Derived)
-	const wallet = $derived(
-		allRatedWalletsBySlug[walletName]
-	)
-
 	const walletNews = $derived(
 		getNewsForWallet(wallet.metadata.id)
 	)
@@ -185,7 +186,7 @@
 	})
 
 	const overallScore = $derived(
-		calculateOverallScore(wallet.overall, () => true),
+		calculateOverallScore(attributeTree, wallet.overall, () => true),
 	)
 
 
@@ -227,12 +228,12 @@
 				evalTree ?
 					Object.entries(attributeTree)
 						.flatMap(([attrGroupId, attrGroup]) => (
-							Object.entries(attrGroup.attributes)
-								.map(([attrId, attribute]) => ({
+							attrGroup.attributes
+								.map(({ attribute }) => ({
 									evalAttr: (
-										evalTree[attrGroupId][
-											attrId as keyof (typeof evalTree)[typeof attrGroupId]
-										] as EvaluatedAttribute<any> | undefined
+										evalTree[attrGroupId][attribute.id] as
+											| EvaluatedAttribute<any>
+											| undefined
 									),
 									attribute,
 								}))
@@ -397,7 +398,7 @@
 								/>
 
 								{#snippet TooltipContent()}
-									<WalletStageSummary {wallet} {stage} {ladderEvaluation} />
+									<WalletStageSummary {wallet} {ladders} {stage} {ladderEvaluation} />
 								{/snippet}
 							</Tooltip>
 						{/if}
@@ -539,13 +540,14 @@
 	attrGroup,
 	evalGroup,
 }: {
-	attrGroup: AttributeGroup<any>
+	attrGroup: AttributeGroup<any, any>
 	evalGroup: EvaluatedGroup<any>
 })}
-	{@const attributes = Object.entries(attrGroup.attributes)
-		.map(([attrId, attribute]) => ({
+	{@const attributes = attrGroup.attributes
+		.map(({ attribute, weight }) => ({
 			attribute,
-			evalAttr: evalGroup[attrId] as EvaluatedAttribute<any> | undefined,
+			weight,
+			evalAttr: evalGroup[attribute.id] as EvaluatedAttribute<any> | undefined,
 		}))
 		.filter(({ evalAttr }) => evalAttr && evalAttr.evaluation.outcome.rating !== Rating.EXEMPT)
 		.map(({ attribute, evalAttr }) => ({
@@ -554,7 +556,7 @@
 		}))}
 
 	{#if attributes.length > 0}
-		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup.attributeWeights, evalGroup) : null}
+		{@const score = evalGroup ? calculateAttributeGroupScore(attrGroup, evalGroup) : null}
 		{@const scoreLevel = score === null || score.score === null ? null : (score.score >= 0.7 ? 'high' : score.score >= 0.4 ? 'medium' : 'low')}
 		{@const scoreColor = scoreToColor(score === null ? null : score.score)}
 
@@ -623,10 +625,10 @@
 
 								slices={
 									attributes
-										.map(({ attribute, evalAttr }) => ({
+										.map(({ attribute, evalAttr, weight }) => ({
 											id: attribute.id,
 											color: ratingToColor(evalAttr.evaluation.outcome.rating),
-											weight: attrGroup.attributeWeights[attribute.id],
+											weight,
 											arcLabel: evalAttr.evaluation.outcome.icon ?? evalAttr.attribute.icon,
 											titleText: formatAttributeTitleText(evalAttr),
 											href: `#${slugifyCamelCase(attribute.id)}`,
@@ -774,7 +776,7 @@
 										undefined
 								)}
 
-								{@const attributeStages = getAttributeStagesForWallet(attribute, wallet)}
+								{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
 
 								{@const stageNumbers = (
 									ladderType &&
@@ -807,9 +809,10 @@
 											</a>
 
 											{#snippet TooltipContent()}
-												<WalletStageSummary 
-													{wallet} 
-													stage={stage} 
+												<WalletStageSummary
+													{wallet}
+													{ladders}
+													stage={stage}
 													{ladderEvaluation}
 													showNextStageCriteria={false}
 												/>
@@ -919,16 +922,16 @@
 								<ChainVerificationDetails {...(componentProps as ChainVerificationDetailsProps)} {wallet} refs={references} />
 							{:else if componentName === 'ScamAlertDetails'}
 								<ScamAlertDetails {...(componentProps as ScamAlertDetailsProps)} {wallet} {outcome} />
-							{:else if componentName === 'SecurityAuditsDetails' && outcome.metadata}
-								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata} />
+							{:else if componentName === 'SecurityAuditsDetails'}
+								<SecurityAuditsDetails {...(componentProps as SecurityAuditsDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'TransactionInclusionDetails'}
 								<TransactionInclusionDetails {...(componentProps as TransactionInclusionDetailsProps)} {wallet} />
 							{:else if componentName === 'FundingDetails'}
 								<FundingDetails {...(componentProps as FundingDetailsProps)} {wallet} />
-							{:else if componentName === 'AccountRecoveryDetails' && outcome.metadata}
-								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata} />
-							{:else if componentName === 'AccountUnruggabilityDetails' && outcome.metadata}
-								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata} />
+							{:else if componentName === 'AccountRecoveryDetails'}
+								<AccountRecoveryDetails {...(componentProps as AccountRecoveryDetailsProps)} {wallet} metadata={outcome.metadata!} />
+							{:else if componentName === 'AccountUnruggabilityDetails'}
+								<AccountUnruggabilityDetails {...(componentProps as AccountUnruggabilityDetailsProps)} {wallet} metadata={outcome.metadata!} />
 							{:else if componentName === 'UnratedAttribute'}
 								<UnratedAttribute {...(componentProps as UnratedAttributeProps<OutcomeMetadata>)} {wallet} />
 							{/if}
