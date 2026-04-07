@@ -89,7 +89,7 @@ describe('wallets', () => {
 	for (const wallet of Object.values(allWallets)) {
 		describe(`wallet ${wallet.metadata.displayName}`, () => {
 			it('has a slug-style metadata.id (lowercase, hyphens only)', () => {
-				expect(wallet.metadata.id).toMatch(/^[a-z][a-z0-9-]*$/)
+				expect(wallet.metadata.id).toMatch(/^[a-z\d]+(?:-[a-z\d]+)*$/)
 			})
 
 			it('has valid icon', () => {
