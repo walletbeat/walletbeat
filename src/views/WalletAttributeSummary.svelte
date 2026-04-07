@@ -5,9 +5,13 @@
 	}
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="
+	_AttributeGroupId extends string,
+	_OutcomeMetadata extends OutcomeMetadata
+">
 	// Types/constants
-	import { type EvaluatedAttribute, ratingIcons, ratingToColor } from '@/schema/attributes'
+	import { type EvaluatedAttribute, type OutcomeMetadata, ratingIcons, ratingToColor } from '@/schema/attributes'
+	import { type Ladders } from '@/schema/ladders'
 	import type { Variant } from '@/schema/variants'
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
@@ -17,14 +21,16 @@
 
 // Props
 	let {
+		ladders,
 		wallet,
 		attribute,
 		variant,
 		summaryType = WalletAttributeSummaryType.None,
 		isInTooltip = false,
 	}: {
-		wallet: RatedWallet
-		attribute: EvaluatedAttribute
+		ladders?: Ladders<_AttributeGroupId>
+		wallet: RatedWallet<_AttributeGroupId>
+		attribute: EvaluatedAttribute<_OutcomeMetadata>
 		variant?: Variant
 		summaryType?: WalletAttributeSummaryType
 		isInTooltip?: boolean
@@ -34,7 +40,6 @@
 	// Functions
 	import { variantToName } from '@/constants/variants'
 	import { slugifyCamelCase } from '@/types/utils/text'
-	import { getWalletUrl } from '@/utils/wallet-url'
 
 
 	// Components
@@ -52,20 +57,20 @@
 	)
 
 	const ladderType = $derived(
-		ladderEvaluation &&
+		(ladders && ladderEvaluation) &&
 			Object.entries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0]
 		||
 			undefined
 	)
 
 	const attributeStages = $derived(
-		getAttributeStagesForWallet(attribute.attribute, wallet)
+		ladders && getAttributeStagesForWallet(ladders, attribute.attribute, wallet)
 	)
 
 	const relevantStages = $derived(
 		ladderType && ladderEvaluation &&
 			attributeStages
-				.find(stage => stage.ladderType === ladderType)
+				?.find(stage => stage.ladderType === ladderType)
 				?.stageNumbers
 		||
 			[]
@@ -96,7 +101,7 @@
 			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
 				<Tooltip>
 					<a
-						href={getWalletUrl(wallet, { variant, attributeAnchor: firstStage.id })}
+						href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#${firstStage.id}`}
 						data-link="camouflaged"
 						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
 					>
@@ -111,6 +116,7 @@
 					{#snippet TooltipContent()}
 						<WalletStageSummary 
 							{wallet} 
+							{ladders}
 							stage={firstStage} 
 							{ladderEvaluation}
 							showNextStageCriteria={false}
@@ -149,7 +155,7 @@
 
 	<div>
 		<a
-			href={getWalletUrl(wallet, { variant, attributeAnchor: slugifyCamelCase(attribute.attribute.id) })}
+			href="/{wallet.metadata.id}/{variant ? `?variant=${variant}` : ''}#{slugifyCamelCase(attribute.attribute.id)}"
 		>
 			<span>{@html InfoIcon}</span>
 			Learn more

@@ -20,7 +20,7 @@
 		summaryType = WalletSummaryType.None,
 		isInTooltip = false,
 	}: {
-		wallet: RatedWallet
+		wallet: RatedWallet<string>
 		score: MaybeUnratedScore
 		summaryType?: WalletSummaryType
 		isInTooltip?: boolean
