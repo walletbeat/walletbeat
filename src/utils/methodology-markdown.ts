@@ -1,4 +1,5 @@
-import { attributeTree } from '@/schema/attribute-groups'
+import { AttributeGroupId } from '@/data/attribute-groups'
+import type { AttributeTree } from '@/schema/attribute-groups'
 import type { Attribute, ExampleRating, OutcomeMetadata } from '@/schema/attributes'
 import { normalizeExampleRatings } from '@/schema/attributes'
 import { renderTypographicContentToString, type TypographicContent } from '@/types/content'
@@ -87,7 +88,10 @@ function renderRatingScale<_OutcomeMetadata extends OutcomeMetadata>(
  *
  * @param siteUrl The site root URL without trailing slash.
  */
-export function methodologyPageMarkdown(siteUrl: string): string {
+export function methodologyPageMarkdown<_AttributeGroupId extends AttributeGroupId>(
+	attributeTree: AttributeTree<_AttributeGroupId>,
+	siteUrl: string,
+): string {
 	const lines: string[] = [
 		'# Walletbeat Methodology',
 		'',
@@ -111,7 +115,7 @@ export function methodologyPageMarkdown(siteUrl: string): string {
 		lines.push(`## ${group.displayName}`)
 		lines.push('')
 
-		for (const attribute of Object.values(group.attributes)) {
+		for (const { attribute } of group.attributes) {
 			lines.push(`### ${attribute.displayName}`)
 			lines.push('')
 
