@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { attributeGroupById } from '@/data/attribute-groups'
 import { allRatedWallets } from '@/data/wallets'
 import {
 	mapNonExemptAttributeGroupsInTree,
@@ -9,7 +10,6 @@ import { ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
-import { getWalletUrl } from '@/utils/wallet-url'
 
 import { assertValidMarkdown } from './utils/assert-valid-markdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
@@ -21,7 +21,7 @@ const SITE_URL = 'http://localhost:4321'
 describe('walletPageMarkdown', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
-			const md = walletPageMarkdown(wallet, SITE_URL)
+			const md = walletPageMarkdown(attributeGroupById, wallet, SITE_URL)
 
 			it('produces non-empty output', () => {
 				expect(md.length).toBeGreaterThan(100)
@@ -44,13 +44,14 @@ describe('walletPageMarkdown', () => {
 			})
 
 			it('contains the Walletbeat page URL', () => {
-				expect(md).toContain(`${SITE_URL}${getWalletUrl(wallet)}`)
+				expect(md).toContain(`${SITE_URL}/${wallet.metadata.id}`)
 			})
 
 			it('contains each non-exempt attribute group heading', () => {
-				const groupNames = mapNonExemptAttributeGroupsInTree(
+				const groupNames: string[] = mapNonExemptAttributeGroupsInTree(
+					attributeGroupById,
 					wallet.overall,
-					attrGroup => attrGroup.displayName,
+					(attrGroup, _evalGroup): string => attrGroup.displayName,
 				)
 
 				for (const name of groupNames) {
@@ -59,12 +60,15 @@ describe('walletPageMarkdown', () => {
 			})
 
 			it('contains a correct heading for every non-exempt attribute', () => {
-				const headings = mapNonExemptAttributeGroupsInTree(wallet.overall, (_, evalGroup) =>
-					mapNonExemptGroupAttributes(
-						evalGroup,
-						evalAttr =>
-							`### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.outcome.rating)}`,
-					),
+				const headings = mapNonExemptAttributeGroupsInTree(
+					attributeGroupById,
+					wallet.overall,
+					(_attrGroup, evalGroup) =>
+						mapNonExemptGroupAttributes(
+							evalGroup,
+							evalAttr =>
+								`### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.outcome.rating)}`,
+						),
 				).flat()
 
 				for (const heading of headings) {
@@ -73,26 +77,29 @@ describe('walletPageMarkdown', () => {
 			})
 
 			it('includes at least one URL for every attribute that has references', () => {
-				const urlSetsToCheck = mapNonExemptAttributeGroupsInTree(wallet.overall, (_, evalGroup) =>
-					mapNonExemptGroupAttributes(evalGroup, evalAttr => {
-						const { references } = evalAttr.evaluation
+				const urlSetsToCheck: string[][] = mapNonExemptAttributeGroupsInTree(
+					attributeGroupById,
+					wallet.overall,
+					(_attrGroup, evalGroup) =>
+						mapNonExemptGroupAttributes(evalGroup, evalAttr => {
+							const { references } = evalAttr.evaluation
 
-						if (references === undefined || references.length === 0) {
-							return null
-						}
+							if (references === undefined || references.length === 0) {
+								return null
+							}
 
-						const qualifiedRefs = toFullyQualified(references)
+							const qualifiedRefs = toFullyQualified(references)
 
-						if (qualifiedRefs.length === 0) {
-							return null
-						}
+							if (qualifiedRefs.length === 0) {
+								return null
+							}
 
-						return qualifiedRefs.flatMap(ref => ref.urls.map(u => u.url))
-					}).filter((urls): urls is string[] => urls !== null),
+							return qualifiedRefs.flatMap(ref => ref.urls.map(u => u.url))
+						}).filter((urls): urls is string[] => urls !== null),
 				).flat()
 
 				for (const allUrls of urlSetsToCheck) {
-					expect(allUrls.some(url => md.includes(url))).toBe(true)
+					expect(allUrls.some((url: string) => md.includes(url))).toBe(true)
 				}
 			})
 
@@ -113,9 +120,7 @@ describe('walletPageMarkdown', () => {
 
 				if (typeof stage === 'object' && stage !== null) {
 					expect(md).toContain('## Stage')
-					expect(md).toContain(
-						`[${stage.label}](${SITE_URL}${getWalletUrl(wallet, { attributeAnchor: 'stages' })})`,
-					)
+					expect(md).toContain(`[${stage.label}](${SITE_URL}/${wallet.metadata.id}#stages)`)
 				}
 			})
 
