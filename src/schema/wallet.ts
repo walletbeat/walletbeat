@@ -5,7 +5,6 @@ import type { Dict } from '@/types/utils/dict'
 import {
 	isNonEmptyArray,
 	type NonEmptyArray,
-	nonEmptyEntries,
 	nonEmptyRemap,
 	type NonEmptySet,
 	setItems,
@@ -14,30 +13,23 @@ import {
 
 import {
 	aggregateAttributes,
+	type AttributeTree,
 	evaluateAttributes,
 	type EvaluationTree,
 	mapAttributesGetter,
 } from './attribute-groups'
 import {
 	type Attribute,
-	type EvaluatedAttribute,
 	type OutcomeMetadata,
 	Rating,
 	type WalletNameAndPseudonymStrings,
 	type WalletNameStrings,
 } from './attributes'
 import type { WalletDeveloper } from './entity'
-import {
-	type ResolvedFeatures,
-	resolveFeatures,
-	type WalletBaseFeatures,
-	type WalletEmbeddedFeatures,
-	type WalletHardwareFeatures,
-	type WalletSoftwareFeatures,
-} from './features'
+import { type ResolvedFeatures, resolveFeatures, type WalletBaseFeatures } from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
-import { ladders, type WalletLadderType } from './ladders'
+import type { Ladders, WalletLadderType } from './ladders'
 import {
 	evaluateWalletOnLadder,
 	type StageEvaluatableWallet,
@@ -206,10 +198,10 @@ export interface AttributeOverride {
 }
 
 /** Per-wallet overrides for attributes. */
-export interface WalletOverrides {
+export interface WalletOverrides<_AttributeGroupId extends string> {
 	attributes: Dict<{
-		[attrGroup in keyof EvaluationTree]?: {
-			[_ in keyof EvaluationTree[attrGroup]]?: AttributeOverride
+		[attrGroup in keyof EvaluationTree<_AttributeGroupId>]?: {
+			[_ in keyof EvaluationTree<_AttributeGroupId>[attrGroup]]?: AttributeOverride
 		}
 	}>
 }
@@ -220,7 +212,7 @@ export interface WalletOverrides {
  * never in UI code. UI code should only deal with fully-rated wallet data.
  * See `RatedWallet` instead.
  */
-export interface BaseWallet {
+export interface BaseWallet<_AttributeGroupId extends string> {
 	/** Wallet metadata (name, URL, icon, etc.) */
 	metadata: WalletMetadata
 
@@ -231,56 +223,10 @@ export interface BaseWallet {
 	features: WalletBaseFeatures
 
 	/** Overrides for specific attributes. */
-	overrides?: WalletOverrides
+	overrides?: WalletOverrides<_AttributeGroupId>
 }
 
-/**
- * The interface used to describe software wallets.
- * This should only be used for data entry and in attribute rating logic,
- * never in UI code. UI code should only deal with fully-rated wallet data.
- * See `RatedWallet` instead.
- */
-export type SoftwareWallet = BaseWallet & {
-	features: WalletSoftwareFeatures
-	variants:
-		| {
-				[Variant.BROWSER]: true
-		  }
-		| {
-				[Variant.DESKTOP]: true
-		  }
-		| {
-				[Variant.MOBILE]: true
-		  }
-}
-
-/**
- * The interface used to describe hardware wallets.
- * This should only be used for data entry and in attribute rating logic,
- * never in UI code. UI code should only deal with fully-rated wallet data.
- * See `RatedWallet` instead.
- */
-export type HardwareWallet = BaseWallet & {
-	features: WalletHardwareFeatures
-	variants: {
-		[Variant.HARDWARE]: true
-	}
-}
-
-/**
- * The interface used to describe embedded wallets.
- * This should only be used for data entry and in attribute rating logic,
- * never in UI code. UI code should only deal with fully-rated wallet data.
- * See `RatedWallet` instead.
- */
-export type EmbeddedWallet = BaseWallet & {
-	features: WalletEmbeddedFeatures
-	variants: {
-		[Variant.EMBEDDED]: true
-	}
-}
-
-export interface ResolvedWallet {
+export interface ResolvedWallet<_AttributeGroupId extends string> {
 	/** Wallet metadata (name, URL, icon, etc.) */
 	metadata: WalletMetadata
 
@@ -291,7 +237,7 @@ export interface ResolvedWallet {
 	features: ResolvedFeatures
 
 	/** Attribute tree for the wallet variant. */
-	attributes: EvaluationTree
+	attributes: EvaluationTree<_AttributeGroupId>
 }
 
 /** Whether an outcome is specific to a variant within the same wallet. */
@@ -333,7 +279,7 @@ export enum VariantSpecificity {
 }
 
 /** A fully-rated wallet ready for display. */
-export interface RatedWallet {
+export interface RatedWallet<_AttributeGroupId extends string> {
 	/** Wallet metadata. */
 	metadata: WalletMetadata
 
@@ -341,13 +287,13 @@ export interface RatedWallet {
 	types: NonEmptySet<WalletType>
 
 	/** Per-variant evaluation. */
-	variants: AtLeastOneVariant<ResolvedWallet>
+	variants: AtLeastOneVariant<ResolvedWallet<_AttributeGroupId>>
 
 	/** For each variant, map attribute IDs to whether they are variant-specific. */
 	variantSpecificity: AtLeastOneVariant<Map<string, VariantSpecificity>>
 
 	/** Aggregate evaluation across all variants. */
-	overall: EvaluationTree
+	overall: EvaluationTree<_AttributeGroupId>
 
 	/**
 	 * Stage rating on wallet ladders.
@@ -357,13 +303,17 @@ export interface RatedWallet {
 	 * When displayed on the interface, it is expected that the interface code
 	 * will select the evaluation on the ladder(s) that makes sense to display.
 	 */
-	ladders: Record<WalletLadderType, WalletLadderEvaluation>
+	ladders: Record<WalletLadderType, WalletLadderEvaluation<_AttributeGroupId>>
 
 	/** Overrides for specific attributes. */
-	overrides: WalletOverrides
+	overrides?: WalletOverrides<_AttributeGroupId>
 }
 
-function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | null {
+function resolveVariant<_AttributeGroupId extends string>(
+	attributeGroupById: AttributeTree<_AttributeGroupId>,
+	wallet: BaseWallet<_AttributeGroupId>,
+	variant: Variant,
+): ResolvedWallet<_AttributeGroupId> | null {
 	if (!wallet.variants[variant]) {
 		return null
 	}
@@ -375,129 +325,120 @@ function resolveVariant(wallet: BaseWallet, variant: Variant): ResolvedWallet | 
 			metadata: wallet.metadata,
 			variant,
 			features: resolvedFeatures,
-			attributes: evaluateAttributes(resolvedFeatures, wallet.metadata),
+			attributes: evaluateAttributes(attributeGroupById, resolvedFeatures, wallet.metadata),
 		}
 	} catch (e) {
 		throw prefixError(`Wallet ${wallet.metadata.id}`, e)
 	}
 }
 
-export function rateWallet(wallet: BaseWallet): RatedWallet {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe because each feature must already have at least one variant populated.
-	const perVariantWallets: AtLeastOneVariant<ResolvedWallet> = Object.fromEntries(
+export function rateWallet<_AttributeGroupId extends string>(
+	attributeGroupById: AttributeTree<_AttributeGroupId>,
+	walletLadders: Ladders<_AttributeGroupId>,
+	wallet: BaseWallet<_AttributeGroupId>,
+): RatedWallet<_AttributeGroupId> {
+	const perVariantWallets = Object.fromEntries(
 		variantEnum.items
-			.map(variant => [variant, resolveVariant(wallet, variant)])
-			.filter(([_, val]) => val !== null),
-	) as AtLeastOneVariant<ResolvedWallet>
-	const perVariantTree: AtLeastOneVariant<EvaluationTree> = nonEmptyRemap(
-		perVariantWallets,
-		(_: Variant, wallet: ResolvedWallet) => wallet.attributes,
+			.map(variant => [variant, resolveVariant(attributeGroupById, wallet, variant)] as const)
+			.filter(
+				(entry): entry is [(typeof entry)[0], NonNullable<(typeof entry)[1]>] => entry[1] !== null,
+			),
+	)
+	const perVariantTree = Object.fromEntries(
+		Object.entries(perVariantWallets).map(([variant, wallet]) => [variant, wallet.attributes]),
 	)
 	const hasMultipleVariants = Object.values(perVariantTree).length > 1
-	const variantSpecificity = nonEmptyRemap(
-		perVariantTree,
-		(variant: Variant, evalTree: EvaluationTree): Map<string, VariantSpecificity> => {
-			const variantSpecificityMap = new Map<string, VariantSpecificity>()
+	const variantSpecificity = nonEmptyRemap(perVariantTree, (variant, evalTree) => {
+		const variantSpecificityMap = new Map<string, VariantSpecificity>()
 
-			mapAttributesGetter(
-				evalTree,
-				<_OutcomeMetadata extends OutcomeMetadata>(
-					getter: (tree: EvaluationTree) => EvaluatedAttribute<_OutcomeMetadata> | undefined,
-				) => {
-					const currentVariantEval = getter(evalTree)
+		mapAttributesGetter(evalTree, getter => {
+			const currentVariantEval = getter(evalTree)
 
-					if (currentVariantEval === undefined) {
-						return
-					}
+			if (currentVariantEval === undefined) {
+				return
+			}
 
-					if (currentVariantEval.evaluation.outcome.rating === Rating.EXEMPT) {
-						variantSpecificityMap.set(
-							currentVariantEval.attribute.id,
-							VariantSpecificity.EXEMPT_FOR_THIS_VARIANT,
-						)
+			if (currentVariantEval.evaluation.outcome.rating === Rating.EXEMPT) {
+				variantSpecificityMap.set(
+					currentVariantEval.attribute.id,
+					VariantSpecificity.EXEMPT_FOR_THIS_VARIANT,
+				)
 
-						return
-					}
+				return
+			}
 
-					if (!hasMultipleVariants) {
-						variantSpecificityMap.set(
-							currentVariantEval.attribute.id,
-							VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT,
-						)
+			if (!hasMultipleVariants) {
+				variantSpecificityMap.set(
+					currentVariantEval.attribute.id,
+					VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT,
+				)
 
-						return
-					}
+				return
+			}
 
-					const currentVariantEvalId = currentVariantEval.evaluation.outcome.id
-					let allOthersExempt = true
-					let foundDifferentValue = false
-					let foundSameValue = false
+			const currentVariantEvalId = currentVariantEval.evaluation.outcome.id
+			let allOthersExempt = true
+			let foundDifferentValue = false
+			let foundSameValue = false
 
-					for (const [versusVariant, versusTree] of nonEmptyEntries<Variant, EvaluationTree>(
-						perVariantTree,
-					)) {
-						if (versusVariant === variant) {
-							continue
-						}
+			for (const [versusVariant, versusTree] of Object.entries(perVariantTree)) {
+				if (versusVariant === variant) {
+					continue
+				}
 
-						const versusEval = getter(versusTree)
+				const versusEval = getter(versusTree)
 
-						if (versusEval === undefined) {
-							continue
-						}
+				if (versusEval === undefined) {
+					continue
+				}
 
-						if (versusEval.evaluation.outcome.rating === Rating.EXEMPT) {
-							continue
-						}
+				if (versusEval.evaluation.outcome.rating === Rating.EXEMPT) {
+					continue
+				}
 
-						allOthersExempt = false
+				allOthersExempt = false
 
-						if (versusEval.evaluation.outcome.id === currentVariantEvalId) {
-							foundSameValue = true
-						} else {
-							foundDifferentValue = true
-						}
-					}
+				if (versusEval.evaluation.outcome.id === currentVariantEvalId) {
+					foundSameValue = true
+				} else {
+					foundDifferentValue = true
+				}
+			}
 
-					if (allOthersExempt) {
-						variantSpecificityMap.set(
-							currentVariantEval.attribute.id,
-							VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT,
-						)
-					} else if (foundDifferentValue && foundSameValue) {
-						variantSpecificityMap.set(
-							currentVariantEval.attribute.id,
-							VariantSpecificity.NOT_UNIVERSAL,
-						)
-					} else if (foundDifferentValue && !foundSameValue) {
-						variantSpecificityMap.set(
-							currentVariantEval.attribute.id,
-							VariantSpecificity.UNIQUE_TO_VARIANT,
-						)
-					} else if (!foundDifferentValue && foundSameValue) {
-						variantSpecificityMap.set(currentVariantEval.attribute.id, VariantSpecificity.ALL_SAME)
-					} else {
-						throw new Error('Logic error in rateWallet variant specificity computation')
-					}
-				},
-			)
+			if (allOthersExempt) {
+				variantSpecificityMap.set(
+					currentVariantEval.attribute.id,
+					VariantSpecificity.ONLY_ASSESSED_FOR_THIS_VARIANT,
+				)
+			} else if (foundDifferentValue && foundSameValue) {
+				variantSpecificityMap.set(currentVariantEval.attribute.id, VariantSpecificity.NOT_UNIVERSAL)
+			} else if (foundDifferentValue && !foundSameValue) {
+				variantSpecificityMap.set(
+					currentVariantEval.attribute.id,
+					VariantSpecificity.UNIQUE_TO_VARIANT,
+				)
+			} else if (!foundDifferentValue && foundSameValue) {
+				variantSpecificityMap.set(currentVariantEval.attribute.id, VariantSpecificity.ALL_SAME)
+			} else {
+				throw new Error('Logic error in rateWallet variant specificity computation')
+			}
+		})
 
-			return variantSpecificityMap
-		},
-	)
+		return variantSpecificityMap
+	})
 
-	const stageEvaluatable: StageEvaluatableWallet = {
+	const stageEvaluatable: StageEvaluatableWallet<_AttributeGroupId> = {
 		types: walletTypesOf(wallet),
 		variants: perVariantWallets,
 		variantSpecificity,
-		overall: aggregateAttributes(perVariantTree),
-		overrides: wallet.overrides ?? { attributes: {} },
+		overall: aggregateAttributes(attributeGroupById, perVariantTree),
+		overrides: wallet.overrides,
 	}
 
 	return {
 		metadata: wallet.metadata,
 		...stageEvaluatable,
-		ladders: nonEmptyRemap(ladders, (_, ladder) => {
+		ladders: nonEmptyRemap(walletLadders, (_, ladder) => {
 			try {
 				return evaluateWalletOnLadder(stageEvaluatable, ladder)
 			} catch (e) {
@@ -520,8 +461,11 @@ export function rateWallet(wallet: BaseWallet): RatedWallet {
  * @returns Whether the evaluation of the given attribute is unique to the
  *          given variant within the given wallet.
  */
-export function attributeVariantSpecificity<_OutcomeMetadata extends OutcomeMetadata>(
-	ratedWallet: RatedWallet,
+export function attributeVariantSpecificity<
+	_AttributeGroupId extends string,
+	_OutcomeMetadata extends OutcomeMetadata,
+>(
+	ratedWallet: RatedWallet<_AttributeGroupId>,
 	variant: Variant,
 	attribute: Attribute<_OutcomeMetadata>,
 ): VariantSpecificity {
@@ -541,11 +485,21 @@ export function attributeVariantSpecificity<_OutcomeMetadata extends OutcomeMeta
 }
 
 /**
+ * Whether `attributeGroupId` is a key present on the wallet's overall evaluation tree.
+ */
+export function isRatedEvaluationTreeGroup<_AttributeGroupId extends string>(
+	attributeGroupId: string,
+	overall: EvaluationTree<_AttributeGroupId>,
+): attributeGroupId is _AttributeGroupId {
+	return Object.hasOwn(overall, attributeGroupId)
+}
+
+/**
  * Get the override for an attribute in a given wallet.
  */
-export function getAttributeOverride(
-	ratedWallet: RatedWallet,
-	attrGroup: string,
+export function getAttributeOverride<_AttributeGroupId extends string>(
+	ratedWallet: RatedWallet<_AttributeGroupId>,
+	attrGroup: _AttributeGroupId,
 	attrId: string,
 ): AttributeOverride | null {
 	if (!Object.hasOwn(ratedWallet.overall, attrGroup)) {
@@ -556,7 +510,7 @@ export function getAttributeOverride(
 		throw new Error(`Invalid attribute name ${attrId} in attribute group ${attrGroup}`)
 	}
 
-	if (!Object.hasOwn(ratedWallet.overrides.attributes, attrGroup)) {
+	if (!ratedWallet.overrides || !Object.hasOwn(ratedWallet.overrides.attributes, attrGroup)) {
 		return null
 	}
 
@@ -574,10 +528,10 @@ export function getAttributeOverride(
 	return override ?? null
 }
 
-export function getVariantResolvedWallet(
-	wallet: RatedWallet,
+export function getVariantResolvedWallet<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
 	variant: Variant,
-): ResolvedWallet | null {
+): ResolvedWallet<_AttributeGroupId> | null {
 	if (!hasVariant(wallet.variants, variant) || wallet.variants[variant] === undefined) {
 		return null
 	}
@@ -591,8 +545,8 @@ export function getVariantResolvedWallet(
  * @param wallet The rated wallet.
  * @param variant The variant to query for, or "ALL_VARIANTS" to get the union of all account types across all variants.
  */
-export function walletSupportedAccountTypes(
-	wallet: RatedWallet,
+export function walletSupportedAccountTypes<_AttributeGroupId extends string>(
+	wallet: RatedWallet<_AttributeGroupId>,
 	variant: Variant | 'ALL_VARIANTS',
 ): NonEmptySet<AccountType> | null {
 	if (variant === 'ALL_VARIANTS') {

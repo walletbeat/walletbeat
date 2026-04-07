@@ -390,7 +390,7 @@ export function compareExplicitRatings(rating1: ExplicitRating, rating2: Explici
 export interface EvaluationData<_OutcomeMetadata extends OutcomeMetadata = null> {
 	outcome: Outcome<_OutcomeMetadata>
 	references: FullyQualifiedReference[]
-	wallet: RatedWallet
+	wallet: RatedWallet<string>
 }
 
 /**
@@ -867,40 +867,9 @@ export class EvaluationContext<_OutcomeMetadata extends OutcomeMetadata = null> 
 }
 
 /**
- * A map of attribute IDs to their outcome metadata. Used to define attribute groups.
+ * A map of attribute IDs to their outcome metadata. Used with EvaluatedGroup and related helpers.
  */
 export type ValueSet = NonEmptyRecord<string, OutcomeMetadata>
-
-/**
- * An attribute group is a collection of attributes that are related to one
- * another. For example, all attributes about privacy would be in the same
- * attribute group.
- */
-export interface AttributeGroup<Vs extends ValueSet> {
-	/** Unique ID of the attribute group. */
-	id: string
-
-	/** A friendly icon for the group. */
-	icon: string
-
-	/** A human-readable name for the group. */
-	displayName: string
-
-	/**
-	 * A short question to which this attribute group is the answer.
-	 * For example, for an attribute group about privacy, a good question
-	 * might be "How well does {wallet} protect your privacy?".
-	 */
-	perWalletQuestion: Sentence<WalletNameStrings>
-
-	/** The actual set of attributes belonging to this group. */
-	attributes: { [K in keyof Vs]: Attribute<Vs[K]> }
-
-	/**
-	 * The weights for each attribute when calculating the score for this attribute group.
-	 */
-	attributeWeights: { [K in keyof Vs]: number }
-}
 
 /**
  * An evaluated group is a collection of evaluated attributes that are related

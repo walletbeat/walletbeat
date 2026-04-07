@@ -1,3 +1,4 @@
+import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
 import { sentence } from '@/types/content'
 import { nonEmptySet, setContains } from '@/types/utils/non-empty'
 
@@ -23,7 +24,6 @@ import {
 	type StageCriterionEvaluation,
 	stageCriterionEvaluationPerVariant,
 	StageCriterionRating,
-	type StageEvaluatableWallet,
 	variantsMustPassAttribute,
 	type WalletLadder,
 	type WalletStage,
@@ -33,7 +33,7 @@ import { WalletType, walletTypeToVariants } from '../wallet-types'
 
 export const softwareWalletVariants = walletTypeToVariants(WalletType.SOFTWARE)
 
-export const softwareWalletStageZero: WalletStage = {
+export const softwareWalletStageZero: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-0',
 	label: 'Stage 0',
 	description: sentence('The wallet meets the minimum criteria for evaluation.'),
@@ -56,7 +56,7 @@ export const softwareWalletStageZero: WalletStage = {
 	],
 }
 
-export const softwareWalletStageOne: WalletStage = {
+export const softwareWalletStageOne: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-1',
 	label: 'Stage 1',
 	description: sentence('The wallet has made a minimal commitment to Ethereum values.'),
@@ -291,7 +291,7 @@ export const softwareWalletStageOne: WalletStage = {
 	],
 }
 
-const softwareWalletStageTwo: WalletStage = {
+const softwareWalletStageTwo: WalletStage<SoftwareAttributeGroupId> = {
 	id: 'stage:software-2',
 	label: 'Stage 2',
 	description: sentence('The wallet has made a significant commitment to Ethereum values.'),
@@ -526,9 +526,7 @@ const softwareWalletStageTwo: WalletStage = {
 /**
  * Ladder for software wallets.
  */
-export const softwareWalletLadder: WalletLadder = {
+export const softwareWalletLadder = {
 	stages: [softwareWalletStageZero, softwareWalletStageOne, softwareWalletStageTwo],
-	applicableTo: (wallet: StageEvaluatableWallet): boolean => {
-		return setContains<WalletType>(wallet.types, WalletType.SOFTWARE)
-	},
-}
+	applicableTo: wallet => setContains<WalletType>(wallet.types, WalletType.SOFTWARE),
+} as const satisfies WalletLadder<SoftwareAttributeGroupId>
