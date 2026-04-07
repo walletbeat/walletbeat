@@ -1,22 +1,25 @@
 import type { APIRoute, GetStaticPaths } from 'astro'
 
-import { allRatedWalletsBySlug, allWallets, isValidWalletSlug } from '@/data/wallets'
+import { attributeGroupById } from '@/data/attribute-groups'
+import { allRatedWallets, isValidWalletName } from '@/data/wallets'
+import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
 import { ratedWalletJsonExport } from '@/utils/wallet-json-export'
 
 export const prerender = true
 
+// TODO: https://github.com/walletbeat/walletbeat/issues/547
 export const getStaticPaths: GetStaticPaths = () =>
-	Object.values(allWallets).map(wallet => ({ params: { walletName: wallet.metadata.id } }))
+	nonEmptyMap(nonEmptyKeys(allRatedWallets), walletName => ({ params: { walletName } }))
 
 export const GET: APIRoute = ({ params }) => {
 	const { walletName } = params
 
-	if (walletName === undefined || !isValidWalletSlug(walletName)) {
+	if (walletName === undefined || !isValidWalletName(walletName)) {
 		return new Response('Not found', { status: 404 })
 	}
 
-	const wallet = allRatedWalletsBySlug[walletName]
-	const payload = ratedWalletJsonExport(wallet)
+	const wallet = allRatedWallets[walletName]
+	const payload = ratedWalletJsonExport(attributeGroupById, wallet)
 
 	return new Response(JSON.stringify(payload), {
 		headers: { 'Content-Type': 'application/json; charset=utf-8' },
