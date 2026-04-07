@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { attributeTree } from '@/schema/attribute-groups'
+import { attributeGroupById } from '@/data/attribute-groups'
 import { methodologyPageMarkdown } from '@/utils/methodology-markdown'
 
 import { assertValidMarkdown } from './utils/assert-valid-markdown'
@@ -11,7 +11,7 @@ await warmupHarperLinter()
 const SITE_URL = 'http://localhost:4321'
 
 describe('methodologyPageMarkdown', () => {
-	const md = methodologyPageMarkdown(SITE_URL)
+	const md = methodologyPageMarkdown(attributeGroupById, SITE_URL)
 
 	it('produces non-empty output', () => {
 		expect(md.length).toBeGreaterThan(100)
@@ -34,14 +34,14 @@ describe('methodologyPageMarkdown', () => {
 	})
 
 	it('contains each attribute group heading', () => {
-		for (const group of Object.values(attributeTree)) {
+		for (const group of Object.values(attributeGroupById)) {
 			expect(md).toContain(`## ${group.displayName}`)
 		}
 	})
 
 	it('contains each attribute heading', () => {
-		for (const group of Object.values(attributeTree)) {
-			for (const attribute of Object.values(group.attributes)) {
+		for (const group of Object.values(attributeGroupById)) {
+			for (const { attribute } of group.attributes) {
 				expect(md).toContain(`### ${attribute.displayName}`)
 			}
 		}

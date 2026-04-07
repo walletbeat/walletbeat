@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { attributeGroupById } from '@/data/attribute-groups'
 import { allRatedWallets } from '@/data/wallets'
 import { getUrl } from '@/schema/url'
 import { variantEnum } from '@/schema/variants'
@@ -13,7 +14,7 @@ import { RatedWalletExportValidator } from './utils/assert-valid-json'
 describe('ratedWalletJsonExport', () => {
 	for (const wallet of Object.values(allRatedWallets)) {
 		describe(wallet.metadata.displayName, () => {
-			const payload = ratedWalletJsonExport(wallet)
+			const payload = ratedWalletJsonExport(attributeGroupById, wallet)
 
 			it('produces schema-valid JSON', () => {
 				const validator = new RatedWalletExportValidator()
@@ -77,7 +78,7 @@ describe('ratedWalletJsonExport', () => {
 
 	it('includes website and repository in export when present in wallet metadata', () => {
 		for (const wallet of Object.values(allRatedWallets)) {
-			const payload = ratedWalletJsonExport(wallet)
+			const payload = ratedWalletJsonExport(attributeGroupById, wallet)
 			const websites = wallet.metadata.urls?.websites
 			const repositories = wallet.metadata.urls?.repositories
 

@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { describe, expect, it } from 'vitest'
 
+import { AttributeGroupId } from '@/data/attribute-groups'
 import { hardwareWallets } from '@/data/hardware-wallets'
 import { softwareWallets } from '@/data/software-wallets'
 import { allWallets, assertValidWalletName, isValidWalletName } from '@/data/wallets'
@@ -16,7 +17,7 @@ import { getRepositoryRoot } from './utils/codebase'
 
 describe('wallets', () => {
 	const walletMaps: {
-		walletMap: { [K: string]: BaseWallet }
+		walletMap: { [K: string]: BaseWallet<AttributeGroupId> }
 		walletType: WalletType | null
 		walletMapName: string
 		dataSubdir: string
