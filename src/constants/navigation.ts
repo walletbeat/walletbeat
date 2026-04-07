@@ -28,6 +28,7 @@ import { softwareWallets } from '@/data/software-wallets'
 import { representativeWalletForType } from '@/data/wallets'
 import { mapNonExemptAttributeGroupsInTree } from '@/schema/attribute-groups'
 import { WalletType } from '@/schema/wallet-types'
+import { getWalletUrl } from '@/utils/wallet-url'
 
 // Constants
 export const navigationHome = {
@@ -116,7 +117,7 @@ export const defaultNavigationItems = [
 				children: Object.entries(softwareWallets).map(([key, wallet]) => ({
 					id: key,
 					title: wallet.metadata.displayName,
-					href: `/${wallet.metadata.id}/`,
+					href: getWalletUrl(wallet),
 					icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
 				})),
 			},
@@ -157,7 +158,7 @@ export const defaultNavigationItems = [
 				children: Object.entries(hardwareWallets).map(([key, wallet]) => ({
 					id: key,
 					title: wallet.metadata.displayName.replace(' Wallet', ''),
-					href: `/${wallet.metadata.id}/`,
+					href: getWalletUrl(wallet),
 					icon: `<img src="/images/wallets/${wallet.metadata.id}.${wallet.metadata.iconExtension}" alt="" />`,
 				})),
 			},

@@ -7,6 +7,7 @@
 	import { AccountType } from '@/schema/features/account-support'
 	import type { Variant } from '@/schema/variants'
 	import type { RatedWallet } from '@/schema/wallet'
+	import { getWalletUrl } from '@/utils/wallet-url'
 	import { Rating } from '@/schema/attributes'
 
 	const WalletTypeFor7702 = {
@@ -212,7 +213,7 @@
 						<div class="name">
 							<h3>
 								<a
-									href={`/${wallet.metadata.id}/`}
+									href={getWalletUrl(wallet)}
 								>
 									{wallet.metadata.displayName}
 								</a>

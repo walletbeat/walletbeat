@@ -34,6 +34,7 @@
 	// Functions
 	import { variantToName } from '@/constants/variants'
 	import { slugifyCamelCase } from '@/types/utils/text'
+	import { getWalletUrl } from '@/utils/wallet-url'
 
 
 	// Components
@@ -95,7 +96,7 @@
 			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
 				<Tooltip>
 					<a
-						href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#${firstStage.id}`}
+						href={getWalletUrl(wallet, { variant, attributeAnchor: firstStage.id })}
 						data-link="camouflaged"
 						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
 					>
@@ -148,7 +149,7 @@
 
 	<div>
 		<a
-			href="/{wallet.metadata.id}/{variant ? `?variant=${variant}` : ''}#{slugifyCamelCase(attribute.attribute.id)}"
+			href={getWalletUrl(wallet, { variant, attributeAnchor: slugifyCamelCase(attribute.attribute.id) })}
 		>
 			<span>{@html InfoIcon}</span>
 			Learn more

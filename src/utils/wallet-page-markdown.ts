@@ -36,6 +36,7 @@ import {
 	computeCountsAndStatus,
 	getCriterionAttributeId,
 } from '@/utils/stage-attributes'
+import { getWalletUrl } from '@/utils/wallet-url'
 
 /**
  * Return the wallet blurb as a single collapsed line, suitable for use
@@ -83,7 +84,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 		),
 		'',
 		`Last updated: ${metadata.lastUpdated}`,
-		`Walletbeat page: ${siteUrl}/${metadata.id}`,
+		`Walletbeat page: ${siteUrl}${getWalletUrl(wallet)}`,
 		`Methodology: ${siteUrl}/methodology/index.html.md`,
 		`Variants: ${variantNames}`,
 		`Stage: ${stageHeaderText}`,
@@ -95,7 +96,12 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 	const stageSection: string[] = []
 
 	if (typeof stage === 'object' && stage !== null) {
-		stageSection.push('## Stage', '', `[${stage.label}](${siteUrl}/${metadata.id}#stages)`, '')
+		stageSection.push(
+			'## Stage',
+			'',
+			`[${stage.label}](${siteUrl}${getWalletUrl(wallet, { attributeAnchor: 'stages' })})`,
+			'',
+		)
 
 		if (isTypographicContent(stage.description)) {
 			const desc = normalizeMarkdownBlankLines(
@@ -163,7 +169,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 						const displayName = criterion.displayName
 						const attrLink =
 							attributeId !== null
-								? `[${displayName}](${siteUrl}/${metadata.id}#${slugifyCamelCase(attributeId)})`
+								? `[${displayName}](${siteUrl}${getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) })})`
 								: displayName
 						const bullet =
 							descForBullet !== ''
@@ -194,7 +200,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 				(evalAttr): string[] => {
 					const { attribute, evaluation } = evalAttr
 					const rating = ratingToText(evaluation.value.rating)
-					const walletAttrUrl = `${siteUrl}/${metadata.id}#${slugifyCamelCase(attribute.id)}`
+					const walletAttrUrl = `${siteUrl}${getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attribute.id) })}`
 					const parts: string[] = [`### ${attribute.displayName}: ${rating}`, '']
 
 					if (isMultiVariant) {
