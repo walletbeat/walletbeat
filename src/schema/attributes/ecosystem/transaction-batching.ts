@@ -7,7 +7,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { eipMarkdownLink, eipMarkdownLinkAndTitle } from '@/schema/eips'
@@ -33,19 +32,17 @@ import { markdown, mdParagraph, mdSentence, paragraph, sentence } from '@/types/
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type TransactionBatchingValue = Value
-
 function evaluateTransactionBatching(
-	ctx: EvaluationContext<TransactionBatchingValue>,
+	ctx: EvaluationContext,
 	accountSupport: AccountSupport,
 	walletCall: Support<WithRef<WalletCallIntegration>>,
-): Evaluation<TransactionBatchingValue> {
+): Evaluation {
 	if (
 		!isSupported<AccountType7702>(accountSupport.eip7702) &&
 		!isSupported<AccountType4337>(accountSupport.rawErc4337)
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_smart_account_support',
 				displayName: 'No transaction batching support',
 				rating: Rating.FAIL,
@@ -75,7 +72,7 @@ function evaluateTransactionBatching(
 
 	if (!isSupported<WalletCallIntegration>(walletCall)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_wallet_call_support',
 				displayName: 'No transaction batching support',
 				rating: Rating.FAIL,
@@ -96,7 +93,7 @@ function evaluateTransactionBatching(
 
 	if (!isSupported<Support>(walletCall.atomicMultiTransactions)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_atomic_bundle_support',
 				displayName: 'Non-atomic transaction batching support',
 				rating: Rating.PARTIAL,
@@ -125,7 +122,7 @@ function evaluateTransactionBatching(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'full_wallet_call_support',
 			displayName: 'Full transaction batching support',
 			rating: Rating.PASS,
@@ -148,7 +145,7 @@ function evaluateTransactionBatching(
 	})
 }
 
-export const transactionBatching: Attribute<TransactionBatchingValue> = {
+export const transactionBatching: Attribute = {
 	id: 'transactionBatching',
 	icon: '\u{1f9fa}', // Basket
 	displayName: 'Transaction batching',
@@ -274,16 +271,13 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 			),
 		),
 	},
-	evaluate: (
-		ctx: EvaluationContext<TransactionBatchingValue>,
-	): Evaluation<TransactionBatchingValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable.
 
 		if (ctx.features.type !== WalletType.SOFTWARE) {
 			return exempt(
 				ctx,
 				sentence('Only software wallets are expected to deal with transaction batching.'),
-				null,
 			)
 		}
 
@@ -294,12 +288,11 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 					{{WALLET_NAME}} is exempt as it is a payments-focused wallet,
 					for which transaction batching is not very useful.
 				`),
-				null,
 			)
 		}
 
 		if (ctx.features.accountSupport === null || ctx.features.integration.walletCall === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		return evaluateTransactionBatching(
@@ -308,5 +301,5 @@ export const transactionBatching: Attribute<TransactionBatchingValue> = {
 			ctx.features.integration.walletCall,
 		)
 	},
-	aggregate: pickWorstRating<TransactionBatchingValue>,
+	aggregate: pickWorstRating,
 }

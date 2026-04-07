@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Types/constants
-	import type { SecurityAuditsValue } from '@/schema/attributes/security/security-audits'
+	import type { SecurityAuditsMetadata } from '@/schema/attributes/security/security-audits'
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { SecurityFlawSeverity } from '@/schema/features/security/security-audits'
@@ -47,12 +47,12 @@
 	// Props
 	const {
 		wallet,
-		value,
+		metadata,
 		auditedInLastYear,
 		hasUnaddressedFlaws,
 	}: {
 		wallet: RatedWallet
-		value: SecurityAuditsValue
+		metadata: SecurityAuditsMetadata
 		auditedInLastYear?: boolean
 		hasUnaddressedFlaws?: boolean
 	} = $props()
@@ -69,7 +69,7 @@
 	import ReferenceLinks from '@/views/ReferenceLinks.svelte'
 </script>
 
-{#if value.securityAudits.length === 0}
+{#if metadata.securityAudits.length === 0}
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
@@ -79,7 +79,7 @@
 	/>
 {:else}
 	{@const securityAudits = (
-		value
+		metadata
 			.securityAudits
 			.toSorted((a, b) => (
 				new Date(b.auditDate).getTime() - new Date(a.auditDate).getTime()

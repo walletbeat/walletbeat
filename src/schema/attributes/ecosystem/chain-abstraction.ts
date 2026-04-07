@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import type {
@@ -28,12 +27,10 @@ import { markdown, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type ChainAbstractionValue = Value
-
 function evaluateChainAbstraction(
-	ctx: EvaluationContext<ChainAbstractionValue>,
+	ctx: EvaluationContext,
 	chainAbstraction: ChainAbstraction,
-): Evaluation<ChainAbstractionValue> {
+): Evaluation {
 	const { crossChainBalances, bridging } = chainAbstraction
 
 	ctx.addRef(crossChainBalances, bridging.builtInBridging, bridging.suggestedBridging)
@@ -42,7 +39,7 @@ function evaluateChainAbstraction(
 
 	if (!isSupported(crossChainBalances.globalAccountValue)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_global_account_value',
 				displayName: 'No cross-chain awareness',
 				rating: Rating.FAIL,
@@ -72,7 +69,7 @@ function evaluateChainAbstraction(
 		!isSupported(crossChainBalances.usdc.perChainBalanceViewAcrossMultipleChains)
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_per_chain_balance_view_across_multiple_chains',
 				displayName: 'No per-chain token balance view',
 				rating: Rating.FAIL,
@@ -103,7 +100,7 @@ function evaluateChainAbstraction(
 
 	if (!isSupported(bridging.builtInBridging)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_bridging',
 				displayName: 'No cross-chain bridging support',
 				rating: Rating.FAIL,
@@ -130,7 +127,7 @@ function evaluateChainAbstraction(
 		!isSupported(crossChainBalances.usdc.crossChainSumView)
 	) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_cross_chain_token_balance_sum',
 				displayName: 'No cross-chain token balance',
 				rating: Rating.PARTIAL,
@@ -159,7 +156,7 @@ function evaluateChainAbstraction(
 			bridging.builtInBridging.feesLargerThan1bps.afterSingleAction === FeeDisplayLevel.NONE
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: feesHidden
 					? 'chain_abstraction_bridge_hidden_fees'
 					: 'chain_abstraction_bridge_non_transparent_fees',
@@ -207,7 +204,7 @@ function evaluateChainAbstraction(
 		const risksHidden = bridging.builtInBridging.risksExplained === 'NOT_IN_UI'
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: risksHidden
 					? 'chain_abstraction_bridge_hidden_risks'
 					: 'chain_abstraction_bridge_non_transparent_risks',
@@ -253,7 +250,7 @@ function evaluateChainAbstraction(
 
 	if (!isSupported(bridging.suggestedBridging)) {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'chain_abstraction_no_suggested_bridging',
 				displayName: 'Abstracts away most cross-chain complexity',
 				rating: Rating.PARTIAL,
@@ -283,7 +280,7 @@ function evaluateChainAbstraction(
 
 	// All pass.
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'chain_abstraction_pass',
 			displayName: 'Abstracts away cross-chain complexity',
 			rating: Rating.PASS,
@@ -328,7 +325,7 @@ const fullySupportedBridging: ChainAbstraction['bridging'] = {
 	suggestedBridging: featureSupportedNoRef,
 }
 
-export const chainAbstraction: Attribute<ChainAbstractionValue> = {
+export const chainAbstraction: Attribute = {
 	id: 'chainAbstraction',
 	icon: '\u{1f309}', // Bridge
 	displayName: 'Chain abstraction',
@@ -502,22 +499,21 @@ export const chainAbstraction: Attribute<ChainAbstractionValue> = {
 			),
 		),
 	},
-	evaluate: (ctx: EvaluationContext<ChainAbstractionValue>): Evaluation<ChainAbstractionValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Can self-test.
 
 		if (ctx.features.type !== WalletType.SOFTWARE) {
 			return exempt(
 				ctx,
 				sentence('Only software wallets are expected to deal with chain abstraction.'),
-				null,
 			)
 		}
 
 		if (ctx.features.chainAbstraction === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		return evaluateChainAbstraction(ctx, ctx.features.chainAbstraction)
 	},
-	aggregate: pickWorstRating<ChainAbstractionValue>,
+	aggregate: pickWorstRating,
 }

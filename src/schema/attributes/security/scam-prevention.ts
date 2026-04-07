@@ -5,7 +5,6 @@ import {
 	type EvaluationScaffold,
 	exampleRating,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import { WalletProfile } from '@/schema/features/profile'
 import type { ScamAlerts } from '@/schema/features/security/scam-alerts'
@@ -28,22 +27,20 @@ export type ScamAlertSupport = WithRef<{
 	listFeature: string
 }>
 
-export type ScamPreventionValue = Value &
-	(
-		| {
-				scamAlerts: ScamAlerts
-				scamUrlWarning: ScamAlertSupport & {
-					feature: 'scamUrlWarning'
-				}
-				sendTransactionWarning: ScamAlertSupport & {
-					feature: 'sendTransactionWarning'
-				}
-				contractTransactionWarning: ScamAlertSupport & {
-					feature: 'contractTransactionWarning'
-				}
-		  }
-		| { scamAlerts: null }
-	)
+export type ScamPreventionMetadata =
+	| {
+			scamAlerts: ScamAlerts
+			scamUrlWarning: ScamAlertSupport & {
+				feature: 'scamUrlWarning'
+			}
+			sendTransactionWarning: ScamAlertSupport & {
+				feature: 'sendTransactionWarning'
+			}
+			contractTransactionWarning: ScamAlertSupport & {
+				feature: 'contractTransactionWarning'
+			}
+	  }
+	| { scamAlerts: null }
 
 function rateSendTransactionWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 	feature: 'sendTransactionWarning'
@@ -170,10 +167,10 @@ function rateScamUrlWarning(scamAlerts: ScamAlerts): ScamAlertSupport & {
 }
 
 function evaluateScamAlerts(
-	ctx: EvaluationContext<ScamPreventionValue>,
+	ctx: EvaluationContext<ScamPreventionMetadata>,
 	walletProfile: WalletProfile,
 	scamAlerts: ScamAlerts,
-): Evaluation<ScamPreventionValue> {
+): Evaluation<ScamPreventionMetadata> {
 	const sendTransactionWarning = rateSendTransactionWarning(scamAlerts)
 	const contractTransactionWarning = rateContractTransactionWarning(scamAlerts)
 	const scamUrlWarning = rateScamUrlWarning(scamAlerts)
@@ -194,26 +191,28 @@ function evaluateScamAlerts(
 	const supportedFeatures = requiredFeatures.filter(sas => sas.supported)
 	const unsupportedFeatures = requiredFeatures.filter(sas => !sas.supported)
 
-	type NonNullScamPreventionValueScaffold = Exclude<
-		EvaluationScaffold<ScamPreventionValue>['value'],
-		{ scamAlerts: null }
+	type NonNullScamPreventionMetadataScaffold = Exclude<
+		EvaluationScaffold<ScamPreventionMetadata>['outcome'],
+		{ metadata: { scamAlerts: null } }
 	>
 
 	if (!isNonEmptyArray(supportedFeatures)) {
 		// No features supported.
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'none_implemented',
 				displayName: 'No scam prevention',
 				rating: Rating.FAIL,
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} makes no attempt to warn the user about potential scams.',
 				),
-				scamAlerts,
-				sendTransactionWarning,
-				contractTransactionWarning,
-				scamUrlWarning,
-			} as NonNullScamPreventionValueScaffold,
+				metadata: {
+					scamAlerts,
+					sendTransactionWarning,
+					contractTransactionWarning,
+					scamUrlWarning,
+				},
+			} as NonNullScamPreventionMetadataScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: paragraph('{{WALLET_NAME}} should implement scam alerting features.'),
 		})
@@ -229,18 +228,20 @@ function evaluateScamAlerts(
 		// Special case: If URLs are leaked, this gets a FAIL.
 		if (scamAlerts.scamUrlWarning.leaksVisitedUrl === 'FULL_URL') {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'leak_full_url',
 					displayName: 'Scam prevention feature leaks history',
 					rating: Rating.FAIL,
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} warns you about potential scams, but leaks your browsing history in the process.',
 					),
-					scamAlerts,
-					sendTransactionWarning,
-					contractTransactionWarning,
-					scamUrlWarning,
-				} as NonNullScamPreventionValueScaffold,
+					metadata: {
+						scamAlerts,
+						sendTransactionWarning,
+						contractTransactionWarning,
+						scamUrlWarning,
+					},
+				} as NonNullScamPreventionMetadataScaffold,
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
 					No application should ever send your browsing history to an external service, and neither should {{WALLET_NAME}}.
@@ -255,18 +256,20 @@ function evaluateScamAlerts(
 			(scamAlerts.scamUrlWarning.leaksUserAddress || scamAlerts.scamUrlWarning.leaksIp)
 		) {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'leak_domain',
 					displayName: 'Scam prevention feature leaks website history',
 					rating: Rating.FAIL,
 					shortExplanation: sentence(
 						'{{WALLET_NAME}} warns you about potential scams, but leaks your browsed websites in the process.',
 					),
-					scamAlerts,
-					sendTransactionWarning,
-					contractTransactionWarning,
-					scamUrlWarning,
-				} as NonNullScamPreventionValueScaffold,
+					metadata: {
+						scamAlerts,
+						sendTransactionWarning,
+						contractTransactionWarning,
+						scamUrlWarning,
+					},
+				} as NonNullScamPreventionMetadataScaffold,
 				details: scamAlertsDetailsContent({}),
 				howToImprove: markdown(`
 					No application should ever send your browsing history to an external service, and neither should {{WALLET_NAME}}.
@@ -280,18 +283,20 @@ function evaluateScamAlerts(
 	if (unsupportedFeatures.length > 0) {
 		// Some but not all features supported.
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'partially_supported',
 				displayName: 'Some scam prevention features',
 				rating: Rating.PARTIAL,
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} but not about ${commaListFormat(unsupportedFeatures.map(sas => sas.humanFeature))}`,
 				),
-				scamAlerts,
-				sendTransactionWarning,
-				contractTransactionWarning,
-				scamUrlWarning,
-			} as NonNullScamPreventionValueScaffold,
+				metadata: {
+					scamAlerts,
+					sendTransactionWarning,
+					contractTransactionWarning,
+					scamUrlWarning,
+				},
+			} as NonNullScamPreventionMetadataScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should implement the following features:
@@ -313,18 +318,20 @@ function evaluateScamAlerts(
 
 		// Not all features implemented with privacy support.
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'need_privacy',
 				displayName: 'Privacy-invasive scam prevention',
 				rating: Rating.PARTIAL,
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))} in a privacy-invasive way.`,
 				),
-				scamAlerts,
-				sendTransactionWarning,
-				contractTransactionWarning,
-				scamUrlWarning,
-			} as NonNullScamPreventionValueScaffold,
+				metadata: {
+					scamAlerts,
+					sendTransactionWarning,
+					contractTransactionWarning,
+					scamUrlWarning,
+				},
+			} as NonNullScamPreventionMetadataScaffold,
 			details: scamAlertsDetailsContent({}),
 			howToImprove: markdown(`
 				{{WALLET_NAME}} should ensure all scam alerting features are implemented in a privacy-preserving manner.
@@ -351,23 +358,25 @@ function evaluateScamAlerts(
 
 	// All features implements with privacy.
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'all_implemented',
 			displayName: 'Full-featured scam prevention',
 			rating: Rating.PASS,
 			shortExplanation: sentence(
 				`{{WALLET_NAME}} warns the user about ${commaListFormat(supportedFeatures.map(sas => sas.humanFeature))}.`,
 			),
-			scamAlerts,
-			sendTransactionWarning,
-			contractTransactionWarning,
-			scamUrlWarning,
-		} as NonNullScamPreventionValueScaffold,
+			metadata: {
+				scamAlerts,
+				sendTransactionWarning,
+				contractTransactionWarning,
+				scamUrlWarning,
+			},
+		} as NonNullScamPreventionMetadataScaffold,
 		details: scamAlertsDetailsContent({}),
 	})
 }
 
-export const scamPrevention: Attribute<ScamPreventionValue> = {
+export const scamPrevention: Attribute<ScamPreventionMetadata> = {
 	id: 'scamPrevention',
 	icon: '\u{1f6a8}', // Police Cars Revolving Light
 	displayName: 'Scam prevention',
@@ -566,7 +575,9 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 			),
 		),
 	},
-	evaluate: (ctx: EvaluationContext<ScamPreventionValue>): Evaluation<ScamPreventionValue> => {
+	evaluate: (
+		ctx: EvaluationContext<ScamPreventionMetadata>,
+	): Evaluation<ScamPreventionMetadata> => {
 		ctx.setVerifiability(
 			verifiabilityRequiresSourceCodeAccess({
 				coreOnlyIsSufficient: true,
@@ -579,5 +590,5 @@ export const scamPrevention: Attribute<ScamPreventionValue> = {
 
 		return evaluateScamAlerts(ctx, ctx.features.profile, ctx.features.security.scamAlerts)
 	},
-	aggregate: pickWorstRating<ScamPreventionValue>,
+	aggregate: pickWorstRating<ScamPreventionMetadata>,
 }

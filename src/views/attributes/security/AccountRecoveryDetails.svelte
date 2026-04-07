@@ -3,15 +3,15 @@
 	import type { RatedWallet } from '@/schema/wallet'
 	import { ContentType } from '@/types/content'
 	import { trimWhitespacePrefix } from '@/types/utils/text'
-	import type { AccountRecoveryValue } from '@/schema/attributes/security/account-recovery'
+	import type { AccountRecoveryMetadata } from '@/schema/attributes/security/account-recovery'
 
 	// Props
 	const {
 		wallet,
-		value,
+		metadata,
 	}: {
 		wallet: RatedWallet
-		value: AccountRecoveryValue
+		metadata: AccountRecoveryMetadata
 	} = $props()
 
 	// Components
@@ -21,7 +21,7 @@
 	import { guardianScenarioId } from '@/schema/features/guardian-scenario/guardian-scenario-expansion'
 </script>
 
-{#if value.outcomes === null}
+{#if metadata.outcomes === null}
 	<Typography
 		content={{
 			contentType: ContentType.MARKDOWN,
@@ -33,10 +33,10 @@
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
 {:else}
-	{@const successfulOutcomes = value.outcomes.filter(outcome =>
+	{@const successfulOutcomes = metadata.outcomes.filter(outcome =>
 		isAccountRecoverable(outcome.recovery),
 	)}
-	{@const failedOutcomes = value.outcomes.filter(
+	{@const failedOutcomes = metadata.outcomes.filter(
 		outcome => !isAccountRecoverable(outcome.recovery),
 	)}
 	<Typography
@@ -49,7 +49,7 @@
 		}}
 		strings={{ WALLET_NAME: wallet.metadata.displayName }}
 	/>
-	{#if value.minimumGuardianPolicy !== null}
+	{#if metadata.minimumGuardianPolicy !== null}
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
@@ -59,13 +59,13 @@
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: trimWhitespacePrefix(value.minimumGuardianPolicy.descriptionMarkdown),
+				markdown: trimWhitespacePrefix(metadata.minimumGuardianPolicy.descriptionMarkdown),
 			}}
 		/>
 		<Typography
 			content={{
 				contentType: ContentType.MARKDOWN,
-				markdown: guardianPolicyMarkdown(value.minimumGuardianPolicy),
+				markdown: guardianPolicyMarkdown(metadata.minimumGuardianPolicy),
 			}}
 		/>
 	{/if}

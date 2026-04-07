@@ -1,5 +1,5 @@
 import { attributeTree } from '@/schema/attribute-groups'
-import type { Attribute, ExampleRating, Value } from '@/schema/attributes'
+import type { Attribute, ExampleRating, OutcomeMetadata } from '@/schema/attributes'
 import { normalizeExampleRatings } from '@/schema/attributes'
 import { renderTypographicContentToString, type TypographicContent } from '@/types/content'
 import { trimWhitespacePrefix } from '@/types/utils/text'
@@ -33,7 +33,9 @@ function renderPseudonymContent(
 	return renderTypographicContentToString(content, GENERIC_PSEUDONYM_STRINGS)
 }
 
-function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
+function renderRatingScale<_OutcomeMetadata extends OutcomeMetadata>(
+	attribute: Attribute<_OutcomeMetadata>,
+): string[] {
 	const { ratingScale } = attribute
 	const lines: string[] = ['#### Rating scale', '']
 
@@ -48,7 +50,7 @@ function renderRatingScale<V extends Value>(attribute: Attribute<V>): string[] {
 		return lines
 	}
 
-	const sections: Array<{ label: string; examples: ExampleRating<V>[] }> = [
+	const sections: Array<{ label: string; examples: ExampleRating<_OutcomeMetadata>[] }> = [
 		{ label: 'Pass', examples: normalizeExampleRatings(ratingScale.pass) },
 		{ label: 'Partial', examples: normalizeExampleRatings(ratingScale.partial) },
 		{ label: 'Fail', examples: normalizeExampleRatings(ratingScale.fail) },

@@ -13,8 +13,8 @@ import {
 import { getAttributeFromTree } from './attribute-groups'
 import {
 	type Attribute,
+	type OutcomeMetadata,
 	Rating,
-	type Value,
 	Verifiability,
 	type WalletNameStrings,
 } from './attributes'
@@ -279,9 +279,9 @@ export function stageCriterionEvaluationPerVariant(
  * @param options More options for the behavior of this function.
  * @returns A function that can be used as `WalletStageCriterion.evaluate` for this attribute.
  */
-export function variantsMustPassAttribute<V extends Value>(
+export function variantsMustPassAttribute<_OutcomeMetadata extends OutcomeMetadata>(
 	variants: NonEmptySet<Variant>,
-	attribute: Attribute<V>,
+	attribute: Attribute<_OutcomeMetadata>,
 	options?: {
 		/** Whether to allow `PARTIAL` ratings. */
 		allowPartial: boolean
@@ -319,7 +319,7 @@ export function variantsMustPassAttribute<V extends Value>(
 	const evaluateFunction = stageCriterionEvaluationPerVariant(
 		variants,
 		(variantWallet: ResolvedWallet): StageCriterionEvaluation => {
-			const evalAttr = getAttributeFromTree<V>(variantWallet.attributes, attribute)
+			const evalAttr = getAttributeFromTree<_OutcomeMetadata>(variantWallet.attributes, attribute)
 
 			if (evalAttr === null) {
 				throw new Error(
@@ -328,19 +328,19 @@ export function variantsMustPassAttribute<V extends Value>(
 			}
 
 			const isVerifiable =
-				evalAttr.evaluation.value.verifiability === Verifiability.VERIFIABLE ||
-				evalAttr.evaluation.value.verifiability === Verifiability.SELF_EVIDENT
+				evalAttr.evaluation.outcome.verifiability === Verifiability.VERIFIABLE ||
+				evalAttr.evaluation.outcome.verifiability === Verifiability.SELF_EVIDENT
 
-			switch (evalAttr.evaluation.value.rating) {
+			switch (evalAttr.evaluation.outcome.rating) {
 				case Rating.EXEMPT:
 					return {
 						rating: StageCriterionRating.EXEMPT,
-						explanation: evalAttr.evaluation.value.shortExplanation,
+						explanation: evalAttr.evaluation.outcome.shortExplanation,
 					}
 				case Rating.FAIL:
 					return {
 						rating: StageCriterionRating.FAIL,
-						explanation: evalAttr.evaluation.value.shortExplanation,
+						explanation: evalAttr.evaluation.outcome.shortExplanation,
 					}
 				case Rating.UNRATED:
 					return { rating: StageCriterionRating.UNRATED }
@@ -348,14 +348,14 @@ export function variantsMustPassAttribute<V extends Value>(
 					if (!options.allowPartial) {
 						return {
 							rating: StageCriterionRating.FAIL,
-							explanation: evalAttr.evaluation.value.shortExplanation,
+							explanation: evalAttr.evaluation.outcome.shortExplanation,
 						}
 					}
 
 					if (!isVerifiable) {
 						if (options.ifUnverifiable === 'THROW') {
 							throw new Error(
-								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.value.verifiability}`,
+								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.outcome.verifiability}`,
 							)
 						}
 
@@ -371,7 +371,7 @@ export function variantsMustPassAttribute<V extends Value>(
 					if (!isVerifiable) {
 						if (options.ifUnverifiable === 'THROW') {
 							throw new Error(
-								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.value.verifiability}`,
+								`Attribute ${evalAttr.attribute.displayName} unexpectedly produced an evaluation with verifiability = ${evalAttr.evaluation.outcome.verifiability}`,
 							)
 						}
 
@@ -385,7 +385,7 @@ export function variantsMustPassAttribute<V extends Value>(
 
 					return {
 						rating: StageCriterionRating.PASS,
-						explanation: evalAttr.evaluation.value.shortExplanation,
+						explanation: evalAttr.evaluation.outcome.shortExplanation,
 					}
 			}
 		},

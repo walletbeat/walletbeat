@@ -1,9 +1,9 @@
-import type { EvaluationData } from '@/schema/attributes'
-import type { AccountRecoveryValue } from '@/schema/attributes/security/account-recovery'
+import type { EvaluationDetailProps } from '@/schema/attributes'
+import type { AccountRecoveryMetadata } from '@/schema/attributes/security/account-recovery'
 
 import { component, type Content } from '../content'
 
-export interface AccountRecoveryDetailsProps extends EvaluationData<AccountRecoveryValue> {}
+export interface AccountRecoveryDetailsProps extends EvaluationDetailProps<AccountRecoveryMetadata> {}
 
 export interface AccountRecoveryDetailsContent {
 	component: 'AccountRecoveryDetails'
@@ -11,7 +11,10 @@ export interface AccountRecoveryDetailsContent {
 }
 
 export function accountRecoveryDetailsContent(
-	bakedProps: Omit<AccountRecoveryDetailsProps, keyof EvaluationData<AccountRecoveryValue>>,
+	bakedProps: Omit<
+		AccountRecoveryDetailsProps,
+		keyof EvaluationDetailProps<AccountRecoveryMetadata>
+	>,
 ): Content<{ WALLET_NAME: string }> {
 	return component<AccountRecoveryDetailsContent, keyof typeof bakedProps>(
 		'AccountRecoveryDetails',

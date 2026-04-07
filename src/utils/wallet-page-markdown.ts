@@ -199,7 +199,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 				evalGroup,
 				(evalAttr): string[] => {
 					const { attribute, evaluation } = evalAttr
-					const rating = ratingToText(evaluation.value.rating)
+					const rating = ratingToText(evaluation.outcome.rating)
 					const walletAttrUrl = `${siteUrl}${getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attribute.id) })}`
 					const parts: string[] = [`### ${attribute.displayName}: ${rating}`, '']
 
@@ -225,13 +225,13 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 								if (
 									variantEvalAttr === null ||
-									variantEvalAttr.evaluation.value.rating === Rating.EXEMPT
+									variantEvalAttr.evaluation.outcome.rating === Rating.EXEMPT
 								) {
 									continue
 								}
 
 								perVariantParts.push(
-									`${variantToName(variant, true)}: ${ratingToText(variantEvalAttr.evaluation.value.rating)}`,
+									`${variantToName(variant, true)}: ${ratingToText(variantEvalAttr.evaluation.outcome.rating)}`,
 								)
 							}
 
@@ -246,7 +246,7 @@ export function walletPageMarkdown(wallet: RatedWallet, siteUrl: string): string
 
 					const shortExpl = normalizeMarkdownBlankLines(
 						trimWhitespacePrefix(
-							renderTypographicContentToString(evaluation.value.shortExplanation, evalStrings),
+							renderTypographicContentToString(evaluation.outcome.shortExplanation, evalStrings),
 						),
 					)
 

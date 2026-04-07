@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import type { ResolvedFeatures } from '@/schema/features'
@@ -294,18 +293,15 @@ function computeWorstFees(feeTransparency: FeeTransparency): WorstFeeDisplay | n
 	return worstFeeTypes
 }
 
-export type FeeTransparencyValue = Value & {
+export type FeeTransparencyMetadata = {
 	worstFeeDisplay: WorstFeeDisplay | null
 }
 
 function evaluateWorstFeeDisplay(
-	ctx: EvaluationContext<FeeTransparencyValue>,
+	ctx: EvaluationContext<FeeTransparencyMetadata>,
 	worstFeeDisplay: WorstFeeDisplay,
-): Evaluation<FeeTransparencyValue> {
+): Evaluation<FeeTransparencyMetadata> {
 	ctx.addRef(worstFeeDisplay.references)
-	const baseValue = {
-		worstFeeDisplay,
-	} as const
 	const worstFeeTypesMarkdown = (indent: string): string =>
 		markdownListFormat(nonEmptyMap(worstFeeDisplay.feeTypes, feeTypeDescription), {
 			singleItemTemplate: 'ITEM.',
@@ -322,14 +318,14 @@ function evaluateWorstFeeDisplay(
 		}
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'fully_sponsored_fees',
 				displayName: 'Fully sponsored fees',
 				rating: Rating.PASS,
 				shortExplanation: sentence(`
 					{{WALLET_NAME}} sponsors all fees.
 				`),
-				...baseValue,
+				metadata: { worstFeeDisplay },
 			},
 			details: markdown(`
 				{{WALLET_NAME}} sponsors all fees. This means users do not need to
@@ -341,14 +337,14 @@ function evaluateWorstFeeDisplay(
 	if (worstFeeDisplay.feeDisplay.byDefault === FeeDisplayLevel.NONE) {
 		if (worstFeeDisplay.isUniform) {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'hidden_fees',
 					displayName: 'Hidden fees',
 					rating: Rating.FAIL,
 					shortExplanation: sentence(`
 						{{WALLET_NAME}} hides transaction fees.
 					`),
-					...baseValue,
+					metadata: { worstFeeDisplay },
 				},
 				details: markdown(`
 					{{WALLET_NAME}} hides the fees being charged to the user.
@@ -365,14 +361,14 @@ function evaluateWorstFeeDisplay(
 		}
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'some_hidden_fees',
 				displayName: 'Some hidden fees',
 				rating: Rating.FAIL,
 				shortExplanation: sentence(`
 						{{WALLET_NAME}} hides some transaction fees.
 					`),
-				...baseValue,
+				metadata: { worstFeeDisplay },
 			},
 			details: markdown(`
 				{{WALLET_NAME}} hides some of the fees being charged to the user.
@@ -392,14 +388,14 @@ function evaluateWorstFeeDisplay(
 	if (worstFeeDisplay.feeDisplay.afterSingleAction === FeeDisplayLevel.AGGREGATED) {
 		if (worstFeeDisplay.isUniform) {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: 'non_comprehensive_fees',
 					displayName: 'Non-comprehensive fees',
 					rating: Rating.PARTIAL,
 					shortExplanation: sentence(`
 						{{WALLET_NAME}} does not break down transaction fees.
 					`),
-					...baseValue,
+					metadata: { worstFeeDisplay },
 				},
 				details: markdown(`
 					{{WALLET_NAME}} does not show the user a complete breakdown of the
@@ -417,14 +413,14 @@ function evaluateWorstFeeDisplay(
 		}
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'some_non_comprehensive_fees',
 				displayName: 'Some non-comprehensive fees',
 				rating: Rating.PARTIAL,
 				shortExplanation: sentence(`
 					{{WALLET_NAME}} does not break down some transaction fees.
 				`),
-				...baseValue,
+				metadata: { worstFeeDisplay },
 			},
 			details: markdown(`
 				{{WALLET_NAME}} does not show the user a complete breakdown of the
@@ -447,14 +443,14 @@ function evaluateWorstFeeDisplay(
 	}
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'comprehensive_fees',
 			displayName: 'Comprehensive fee breakdown',
 			rating: Rating.PASS,
 			shortExplanation: sentence(`
 				{{WALLET_NAME}} breaks down all transaction fees.
 			`),
-			...baseValue,
+			metadata: { worstFeeDisplay },
 		},
 		details: markdown(`
 			{{WALLET_NAME}} shows a complete breakdown of all transaction
@@ -463,7 +459,7 @@ function evaluateWorstFeeDisplay(
 	})
 }
 
-export const feeTransparency: Attribute<FeeTransparencyValue> = {
+export const feeTransparency: Attribute<FeeTransparencyMetadata> = {
 	id: 'feeTransparency',
 	icon: '\u{1F4B8}', // Money with wings
 	displayName: 'Fee transparency',
@@ -579,7 +575,9 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 			),
 		],
 	},
-	evaluate: (ctx: EvaluationContext<FeeTransparencyValue>): Evaluation<FeeTransparencyValue> => {
+	evaluate: (
+		ctx: EvaluationContext<FeeTransparencyMetadata>,
+	): Evaluation<FeeTransparencyMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Self-testable in UI.
 		const feeTransparencyData: FeeTransparency = extractFeeTransparency(ctx.features)
 		const worstFeeDisplay = computeWorstFees(feeTransparencyData)
@@ -590,5 +588,5 @@ export const feeTransparency: Attribute<FeeTransparencyValue> = {
 
 		return evaluateWorstFeeDisplay(ctx, worstFeeDisplay)
 	},
-	aggregate: pickWorstRating<FeeTransparencyValue>,
+	aggregate: pickWorstRating<FeeTransparencyMetadata>,
 }

@@ -3,9 +3,7 @@ import {
 	type Evaluation,
 	EvaluationContext,
 	exampleRating,
-	type ExemptEvaluation,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import {
 	collectedByDefault,
@@ -20,7 +18,6 @@ import {
 	WalletInfo,
 } from '@/schema/features/privacy/data-collection'
 import { isNotSupported, isSupported } from '@/schema/features/support'
-import type { AtLeastOneVariant } from '@/schema/variants'
 import { verifiabilityRequiresSourceCodeAccess } from '@/schema/verifiability'
 import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
@@ -29,8 +26,6 @@ import { isNonEmptyArray } from '@/types/utils/non-empty'
 
 import { type Entity, entityLinks, entityNames, uniqueEntities } from '../../entity'
 import { exempt, pickWorstRating, unrated } from '../common'
-
-export type PrivacyHygieneValue = Value
 
 /**
  * Whether this type of user information is forbidden without prior user consent.
@@ -66,15 +61,12 @@ function isForbiddenWithoutPriorConsentUserInfo(userInfo: UserInfo): boolean {
 	}
 }
 
-function browsingHistoryByDefault(
-	ctx: EvaluationContext<PrivacyHygieneValue>,
-	entities?: Entity[],
-): Evaluation<PrivacyHygieneValue> {
+function browsingHistoryByDefault(ctx: EvaluationContext, entities?: Entity[]): Evaluation {
 	const names = entityNames(entities ?? [])
 	const links = entityLinks(entities ?? [])
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'browsing_history_by_default',
 			rating: Rating.FAIL,
 			displayName: 'Browsing history sent by default',
@@ -94,15 +86,12 @@ function browsingHistoryByDefault(
 	})
 }
 
-function walletConnectedDomainsByDefault(
-	ctx: EvaluationContext<PrivacyHygieneValue>,
-	entities?: Entity[],
-): Evaluation<PrivacyHygieneValue> {
+function walletConnectedDomainsByDefault(ctx: EvaluationContext, entities?: Entity[]): Evaluation {
 	const names = entityNames(entities ?? [])
 	const links = entityLinks(entities ?? [])
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'wallet_connected_domains_by_default',
 			rating: Rating.FAIL,
 			displayName: 'Wallet-connected domains sent by default',
@@ -123,10 +112,10 @@ function walletConnectedDomainsByDefault(
 }
 
 function browsingHistoryAndWalletConnectedDomainsByDefault(
-	ctx: EvaluationContext<PrivacyHygieneValue>,
+	ctx: EvaluationContext,
 	browsingHistoryEntities?: Entity[],
 	walletConnectedDomainsEntities?: Entity[],
-): Evaluation<PrivacyHygieneValue> {
+): Evaluation {
 	const allEntities = uniqueEntities([
 		...(browsingHistoryEntities ?? []),
 		...(walletConnectedDomainsEntities ?? []),
@@ -135,7 +124,7 @@ function browsingHistoryAndWalletConnectedDomainsByDefault(
 	const links = entityLinks(allEntities)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'browsing_history_and_wallet_connected_domains_by_default',
 			rating: Rating.FAIL,
 			displayName: 'Browsing history and wallet-connected domains sent by default',
@@ -155,15 +144,12 @@ function browsingHistoryAndWalletConnectedDomainsByDefault(
 	})
 }
 
-function usageAnalyticsWithoutConsent(
-	ctx: EvaluationContext<PrivacyHygieneValue>,
-	entity?: Entity,
-): Evaluation<PrivacyHygieneValue> {
+function usageAnalyticsWithoutConsent(ctx: EvaluationContext, entity?: Entity): Evaluation {
 	const names = entity !== undefined ? entityNames([entity]) : 'external services'
 	const links = entity !== undefined ? entityLinks([entity]) : 'external services'
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'usage_analytics_without_consent',
 			rating: Rating.FAIL,
 			displayName: 'Usage analytics without prior consent',
@@ -183,15 +169,12 @@ function usageAnalyticsWithoutConsent(
 	})
 }
 
-function crashReportingWithoutConsent(
-	ctx: EvaluationContext<PrivacyHygieneValue>,
-	entity?: Entity,
-): Evaluation<PrivacyHygieneValue> {
+function crashReportingWithoutConsent(ctx: EvaluationContext, entity?: Entity): Evaluation {
 	const names = entity !== undefined ? entityNames([entity]) : 'an external service'
 	const links = entity !== undefined ? entityLinks([entity]) : 'an external service'
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'crash_reporting_without_consent',
 			rating: Rating.PARTIAL,
 			displayName: 'Crash reporting without prior consent',
@@ -211,9 +194,9 @@ function crashReportingWithoutConsent(
 	})
 }
 
-function noTracking(ctx: EvaluationContext<PrivacyHygieneValue>): Evaluation<PrivacyHygieneValue> {
+function noTracking(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_tracking',
 			rating: Rating.PASS,
 			displayName: 'No user tracking',
@@ -225,11 +208,9 @@ function noTracking(ctx: EvaluationContext<PrivacyHygieneValue>): Evaluation<Pri
 	})
 }
 
-function noForbiddenDataByDefault(
-	ctx: EvaluationContext<PrivacyHygieneValue>,
-): Evaluation<PrivacyHygieneValue> {
+function noForbiddenDataByDefault(ctx: EvaluationContext): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_forbidden_data_by_default',
 			rating: Rating.PASS,
 			displayName: 'Asks for analytics consent',
@@ -244,7 +225,7 @@ function noForbiddenDataByDefault(
 }
 
 interface AnalyticsTelemetryResult {
-	evaluations: Array<Evaluation<PrivacyHygieneValue>>
+	evaluations: Array<Evaluation>
 	hasIncompleteAnalyticsData: boolean
 	hasNoAnalytics: boolean
 }
@@ -261,12 +242,10 @@ interface AnalyticsTelemetryResult {
  * `hasIncompleteAnalyticsData` is true when either analytics feature is null,
  * signaling the caller that a confident PASS cannot be issued.
  */
-function evaluateAnalyticsTelemetry(
-	ctx: EvaluationContext<PrivacyHygieneValue>,
-): AnalyticsTelemetryResult {
+function evaluateAnalyticsTelemetry(ctx: EvaluationContext): AnalyticsTelemetryResult {
 	const usageAnalytics = ctx.features.privacy.analytics.usage
 	const crashReportsAnalytics = ctx.features.privacy.analytics.crashReports
-	const evaluations: Array<Evaluation<PrivacyHygieneValue>> = []
+	const evaluations: Array<Evaluation> = []
 
 	if (usageAnalytics !== null && isSupported(usageAnalytics)) {
 		ctx.addRef(usageAnalytics)
@@ -313,7 +292,7 @@ interface FlowScanResult {
  */
 function scanFlowsForForbiddenDataViolations(
 	dataCollection: DataCollection,
-	ctx: EvaluationContext<PrivacyHygieneValue>,
+	ctx: EvaluationContext,
 ): FlowScanResult {
 	let hasUnknownFlowData = false
 	let hasAnalyticsInSomeFlow = false
@@ -383,7 +362,7 @@ function scanFlowsForForbiddenDataViolations(
 	}
 }
 
-export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
+export const privacyHygiene: Attribute = {
 	id: 'privacyHygiene',
 	icon: '\u{1f9fc}', // Soap
 	displayName: 'Privacy hygiene',
@@ -457,28 +436,25 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 			),
 		],
 	},
-	exempted: (
-		ctx: EvaluationContext<PrivacyHygieneValue>,
-		_metadata: WalletMetadata,
-	): ExemptEvaluation<PrivacyHygieneValue> | null => {
+	exempted: (ctx: EvaluationContext, _metadata: WalletMetadata) => {
 		if (ctx.features.type === WalletType.HARDWARE) {
-			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'), null)
+			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'))
 		}
 
 		return null
 	},
-	evaluate: (ctx: EvaluationContext<PrivacyHygieneValue>): Evaluation<PrivacyHygieneValue> => {
+	evaluate: (ctx: EvaluationContext): Evaluation => {
 		ctx.setVerifiability(verifiabilityRequiresSourceCodeAccess({ coreOnlyIsSufficient: false }))
 
 		const dataCollection = ctx.features.privacy.dataCollection
 
 		if (dataCollection === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		const flowScan = scanFlowsForForbiddenDataViolations(dataCollection, ctx)
 		const analytics = evaluateAnalyticsTelemetry(ctx)
-		const evaluations: Array<Evaluation<PrivacyHygieneValue>> = []
+		const evaluations: Array<Evaluation> = []
 
 		const hasBrowsingHistory = isNonEmptyArray(flowScan.browsingHistoryByDefaultEntities)
 		const hasWalletConnected = isNonEmptyArray(flowScan.walletConnectedDomainsByDefaultEntities)
@@ -502,18 +478,18 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 		evaluations.push(...analytics.evaluations)
 
 		if (isNonEmptyArray(evaluations)) {
-			return pickWorstRating<PrivacyHygieneValue>(evaluations)
+			return pickWorstRating(evaluations)
 		}
 
 		// No violations found. Incomplete data must be checked before we
 		// issue a PASS, because missing analytics or flow data means we
 		// cannot confidently say nothing is wrong.
 		if (flowScan.hasAnalyticsInSomeFlow && analytics.hasIncompleteAnalyticsData) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (flowScan.hasUnknownFlowData) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (analytics.hasNoAnalytics && !flowScan.hasAnalyticsInSomeFlow) {
@@ -522,6 +498,5 @@ export const privacyHygiene: Attribute<PrivacyHygieneValue> = {
 
 		return noForbiddenDataByDefault(ctx)
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<PrivacyHygieneValue>>) =>
-		pickWorstRating<PrivacyHygieneValue>(perVariant),
+	aggregate: pickWorstRating,
 }

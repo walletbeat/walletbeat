@@ -1,20 +1,11 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	exampleRating,
-	Rating,
-	type Value,
-	Verifiability,
-} from '@/schema/attributes'
-import { type UserSafetySupport, UserSafetyType } from '@/schema/features/security/user-safety'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { type Attribute, exampleRating, Rating, Verifiability } from '@/schema/attributes'
+import { UserSafetyType } from '@/schema/features/security/user-safety'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type UserSafetyValue = Value & {
+export type UserSafetyMetadata = {
 	readableAddress: UserSafetyType
 	contractLabeling: UserSafetyType
 	rawTxReview: UserSafetyType
@@ -33,39 +24,7 @@ export type UserSafetyValue = Value & {
 	fullyLocalTxSimulation: UserSafetyType
 }
 
-function evaluateUserSafety(features: UserSafetySupport): Rating {
-	const ratings = [
-		features.readableAddress,
-		features.contractLabeling,
-		features.rawTxReview,
-		features.readableTx,
-		features.txCoverageExtensibility,
-		features.txExpertMode,
-		features.rawEip712,
-		features.readableEip712,
-		features.eip712CoverageExtensibility,
-		features.eip712ExpertMode,
-		features.riskAnalysis,
-		features.riskAnalysisLocal,
-		features.fullyLocalRiskAnalysis,
-		features.txSimulation,
-		features.txSimulationLocal,
-		features.fullyLocalTxSimulation,
-	]
-	const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
-
-	if (passCount >= 11) {
-		return Rating.PASS
-	}
-
-	if (passCount >= 6) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
-}
-
-export const userSafety: Attribute<UserSafetyValue> = {
+export const userSafety: Attribute<UserSafetyMetadata> = {
 	id: 'userSafety',
 	icon: '🛡️',
 	displayName: 'User Safety',
@@ -126,25 +85,24 @@ export const userSafety: Attribute<UserSafetyValue> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes 11 or more user safety sub-criteria.'),
-				(v: UserSafetyValue) => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes 6 to 10 user safety sub-criteria.'),
-				(v: UserSafetyValue) => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet passes 5 or fewer user safety sub-criteria.'),
-				(v: UserSafetyValue) => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<UserSafetyValue>>) =>
-		pickWorstRating<UserSafetyValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<UserSafetyValue>): Evaluation<UserSafetyValue> => {
+	aggregate: pickWorstRating,
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNKNOWN) // TODO
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
@@ -197,9 +155,7 @@ export const userSafety: Attribute<UserSafetyValue> = {
 			})
 		}
 
-		const rating = evaluateUserSafety(userSafetyFeature)
-
-		const passCount = [
+		const ratings = [
 			userSafetyFeature.readableAddress,
 			userSafetyFeature.contractLabeling,
 			userSafetyFeature.rawTxReview,
@@ -216,30 +172,44 @@ export const userSafety: Attribute<UserSafetyValue> = {
 			userSafetyFeature.txSimulation,
 			userSafetyFeature.txSimulationLocal,
 			userSafetyFeature.fullyLocalTxSimulation,
-		].filter(r => r === UserSafetyType.PASS).length
+		]
+		const passCount = ratings.filter(r => r === UserSafetyType.PASS).length
+		const rating = passCount >= 11 ? Rating.PASS : passCount >= 6 ? Rating.PARTIAL : Rating.FAIL
 
-		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}.${
-			rating !== Rating.EXEMPT ? ` It passes ${passCount} out of 16 sub-criteria.` : ''
-		}`
+		const detailsText = `{{WALLET_NAME}} user safety evaluation is ${rating.toLowerCase()}. It passes ${passCount} out of 16 sub-criteria.`
 
 		const howToImproveText =
-			rating !== Rating.PASS && rating !== Rating.EXEMPT
+			rating !== Rating.PASS
 				? '{{WALLET_NAME}} should improve sub-criteria related to transaction clarity, risk analysis, and simulation that are rated PARTIAL or FAIL.'
 				: ''
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'user_safety',
 				rating,
 				displayName: 'User Safety',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} user safety.`),
-				...userSafetyFeature, // TODO: Filter fields
+				metadata: {
+					readableAddress: userSafetyFeature.readableAddress,
+					contractLabeling: userSafetyFeature.contractLabeling,
+					rawTxReview: userSafetyFeature.rawTxReview,
+					readableTx: userSafetyFeature.readableTx,
+					txCoverageExtensibility: userSafetyFeature.txCoverageExtensibility,
+					txExpertMode: userSafetyFeature.txExpertMode,
+					rawEip712: userSafetyFeature.rawEip712,
+					readableEip712: userSafetyFeature.readableEip712,
+					eip712CoverageExtensibility: userSafetyFeature.eip712CoverageExtensibility,
+					eip712ExpertMode: userSafetyFeature.eip712ExpertMode,
+					riskAnalysis: userSafetyFeature.riskAnalysis,
+					riskAnalysisLocal: userSafetyFeature.riskAnalysisLocal,
+					fullyLocalRiskAnalysis: userSafetyFeature.fullyLocalRiskAnalysis,
+					txSimulation: userSafetyFeature.txSimulation,
+					txSimulationLocal: userSafetyFeature.txSimulationLocal,
+					fullyLocalTxSimulation: userSafetyFeature.fullyLocalTxSimulation,
+				},
 			},
 			details: paragraph(detailsText),
-			howToImprove:
-				rating === Rating.PASS || rating === Rating.EXEMPT
-					? undefined
-					: paragraph(howToImproveText),
+			howToImprove: rating === Rating.PASS ? undefined : paragraph(howToImproveText),
 		})
 	},
 }

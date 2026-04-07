@@ -1,46 +1,19 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	type ExemptEvaluation,
-	Rating,
-	type Value,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, type ExemptEvaluation, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
 import { HardwareWalletManufactureType } from '@/schema/features/profile'
-import {
-	type SupplyChainDIYSupport,
-	SupplyChainDIYType,
-} from '@/schema/features/security/supply-chain-diy'
+import { SupplyChainDIYType } from '@/schema/features/security/supply-chain-diy'
 import { Variant } from '@/schema/variants'
-import type { WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type SupplyChainDIYValue = Value & {
+export type SupplyChainDIYMetadata = {
 	diyNoNda: SupplyChainDIYType
 	componentSourcingComplexity: SupplyChainDIYType
 }
 
-function evaluateSupplyChainDIY(features: SupplyChainDIYSupport): Rating {
-	const ratings = [features.diyNoNda, features.componentSourcingComplexity]
-	const passCount = ratings.filter(r => r === SupplyChainDIYType.PASS).length
-
-	if (passCount === 2) {
-		return Rating.PASS
-	}
-
-	if (passCount === 1) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
-}
-
-export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
+export const supplyChainDIY: Attribute<SupplyChainDIYMetadata> = {
 	id: 'supplyChainDIY',
 	icon: '🛠️',
 	displayName: 'Supply Chain DIY',
@@ -70,27 +43,24 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 		pass: [
 			exampleRating(
 				sentence('The hardware wallet passes all DIY supply chain sub-criteria.'),
-				(v: SupplyChainDIYValue) => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The hardware wallet passes some DIY supply chain sub-criteria.'),
-				(v: SupplyChainDIYValue) => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The hardware wallet fails most or all DIY supply chain sub-criteria.'),
-				(v: SupplyChainDIYValue) => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: pickWorstRating<SupplyChainDIYValue>,
-	exempted: (
-		ctx: EvaluationContext<SupplyChainDIYValue>,
-		metadata: WalletMetadata,
-	): ExemptEvaluation<SupplyChainDIYValue> | null => {
+	aggregate: pickWorstRating<SupplyChainDIYMetadata>,
+	exempted: (ctx, metadata): ExemptEvaluation<SupplyChainDIYMetadata> | null => {
 		if (
 			ctx.features.variant === Variant.HARDWARE &&
 			metadata.hardwareWalletManufactureType !== HardwareWalletManufactureType.DIY
@@ -103,7 +73,7 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 
 		return null
 	},
-	evaluate: (ctx: EvaluationContext<SupplyChainDIYValue>): Evaluation<SupplyChainDIYValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.SELF_EVIDENT) // If you build it, you source your own parts.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
@@ -128,15 +98,20 @@ export const supplyChainDIY: Attribute<SupplyChainDIYValue> = {
 			})
 		}
 
-		const rating = evaluateSupplyChainDIY(diyFeature)
+		const ratings = [diyFeature.diyNoNda, diyFeature.componentSourcingComplexity]
+		const passCount = ratings.filter(r => r === SupplyChainDIYType.PASS).length
+		const rating = passCount === 2 ? Rating.PASS : passCount === 1 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'supply_chain_diy',
 				rating,
 				displayName: 'Supply Chain DIY',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} DIY supply chain.`),
-				...diyFeature, // TODO: Filter fields
+				metadata: {
+					diyNoNda: diyFeature.diyNoNda,
+					componentSourcingComplexity: diyFeature.componentSourcingComplexity,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} DIY supply chain evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

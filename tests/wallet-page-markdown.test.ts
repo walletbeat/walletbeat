@@ -63,7 +63,7 @@ describe('walletPageMarkdown', () => {
 					mapNonExemptGroupAttributes(
 						evalGroup,
 						evalAttr =>
-							`### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.value.rating)}`,
+							`### ${evalAttr.attribute.displayName}: ${ratingToText(evalAttr.evaluation.outcome.rating)}`,
 					),
 				).flat()
 

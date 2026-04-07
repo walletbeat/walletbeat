@@ -1,20 +1,12 @@
-import {
-	type Attribute,
-	type Evaluation,
-	EvaluationContext,
-	Rating,
-	type Value,
-	Verifiability,
-} from '@/schema/attributes'
+import { type Attribute, Rating, Verifiability } from '@/schema/attributes'
 import { exampleRating } from '@/schema/attributes'
-import { type ReputationSupport, ReputationType } from '@/schema/features/transparency/reputation'
-import type { AtLeastOneVariant } from '@/schema/variants'
+import { ReputationType } from '@/schema/features/transparency/reputation'
 import { WalletType } from '@/schema/wallet-types'
 import { markdown, paragraph, sentence } from '@/types/content'
 
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type ReputationValue = Value & {
+export type ReputationMetadata = {
 	originalProduct: ReputationType
 	availability: ReputationType
 	warrantySupportRisk: ReputationType
@@ -22,28 +14,7 @@ export type ReputationValue = Value & {
 	bugBounty: ReputationType
 }
 
-function evaluateReputation(features: ReputationSupport): Rating {
-	const ratings = [
-		features.originalProduct,
-		features.availability,
-		features.warrantySupportRisk,
-		features.disclosureHistory,
-		features.bugBounty,
-	]
-	const passCount = ratings.filter(r => r === ReputationType.PASS).length
-
-	if (passCount >= 4) {
-		return Rating.PASS
-	}
-
-	if (passCount >= 2) {
-		return Rating.PARTIAL
-	}
-
-	return Rating.FAIL
-}
-
-export const reputation: Attribute<ReputationValue> = {
+export const reputation: Attribute<ReputationMetadata> = {
 	id: 'reputation',
 	icon: '🌟',
 	displayName: 'Reputation',
@@ -77,25 +48,24 @@ export const reputation: Attribute<ReputationValue> = {
 		pass: [
 			exampleRating(
 				sentence('The wallet passes most reputation sub-criteria.'),
-				(v: ReputationValue) => v.rating === Rating.PASS,
+				outcome => outcome.rating === Rating.PASS,
 			),
 		],
 		partial: [
 			exampleRating(
 				sentence('The wallet passes some reputation sub-criteria.'),
-				(v: ReputationValue) => v.rating === Rating.PARTIAL,
+				outcome => outcome.rating === Rating.PARTIAL,
 			),
 		],
 		fail: [
 			exampleRating(
 				sentence('The wallet fails most or all reputation sub-criteria.'),
-				(v: ReputationValue) => v.rating === Rating.FAIL,
+				outcome => outcome.rating === Rating.FAIL,
 			),
 		],
 	},
-	aggregate: (perVariant: AtLeastOneVariant<Evaluation<ReputationValue>>) =>
-		pickWorstRating<ReputationValue>(perVariant),
-	evaluate: (ctx: EvaluationContext<ReputationValue>): Evaluation<ReputationValue> => {
+	aggregate: pickWorstRating,
+	evaluate: ctx => {
 		ctx.setVerifiability(Verifiability.UNVERIFIABLE) // Inherently unverifiable.
 
 		if (ctx.features.type !== WalletType.HARDWARE) {
@@ -120,15 +90,29 @@ export const reputation: Attribute<ReputationValue> = {
 			})
 		}
 
-		const rating = evaluateReputation(reputationFeature)
+		const ratings = [
+			reputationFeature.originalProduct,
+			reputationFeature.availability,
+			reputationFeature.warrantySupportRisk,
+			reputationFeature.disclosureHistory,
+			reputationFeature.bugBounty,
+		]
+		const passCount = ratings.filter(r => r === ReputationType.PASS).length
+		const rating = passCount >= 4 ? Rating.PASS : passCount >= 2 ? Rating.PARTIAL : Rating.FAIL
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'reputation',
 				rating,
 				displayName: 'Reputation',
 				shortExplanation: sentence(`{{WALLET_NAME}} has ${rating.toLowerCase()} reputation.`),
-				...reputationFeature, // TODO: Filter fields
+				metadata: {
+					originalProduct: reputationFeature.originalProduct,
+					availability: reputationFeature.availability,
+					warrantySupportRisk: reputationFeature.warrantySupportRisk,
+					disclosureHistory: reputationFeature.disclosureHistory,
+					bugBounty: reputationFeature.bugBounty,
+				},
 			},
 			details: paragraph(`{{WALLET_NAME}} reputation evaluation is ${rating.toLowerCase()}.`),
 			howToImprove: paragraph('{{WALLET_NAME}} should improve sub-criteria rated PARTIAL or FAIL.'),

@@ -4,7 +4,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 } from '@/schema/attributes'
 import { isSupported, type Support } from '@/schema/features/support'
 import {
@@ -27,14 +26,12 @@ import {
 } from '../../features/self-sovereignty/chain-configurability'
 import { exempt, pickWorstRating, unrated } from '../common'
 
-export type ChainVerificationValue = Value
-
 function supportsChainVerification(
-	ctx: EvaluationContext<ChainVerificationValue>,
+	ctx: EvaluationContext,
 	lightClients: NonEmptyArray<EthereumL1LightClient>,
-): Evaluation<ChainVerificationValue> {
+): Evaluation {
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `chain_verification_l1_${lightClients.join('_')}`,
 			rating: Rating.PASS,
 			displayName: 'L1 chain state verification',
@@ -45,9 +42,9 @@ function supportsChainVerification(
 }
 
 function noChainVerification(
-	ctx: EvaluationContext<ChainVerificationValue>,
+	ctx: EvaluationContext,
 	chainConfigurability: Support<ChainConfigurability> | null,
-): Evaluation<ChainVerificationValue> {
+): Evaluation {
 	const canConfigureL1 = (() => {
 		const l1Configurability =
 			chainConfigurability === null ||
@@ -63,7 +60,7 @@ function noChainVerification(
 	})()
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: 'no_chain_verification',
 			rating: Rating.FAIL,
 			icon: '\u{1f648}', // See-no-evil monkey
@@ -84,7 +81,7 @@ function noChainVerification(
 	})
 }
 
-export const chainVerification: Attribute<ChainVerificationValue> = {
+export const chainVerification: Attribute = {
 	id: 'chainVerification',
 	icon: '\u{2693}', // Anchor
 	displayName: 'Chain verification',
@@ -139,9 +136,7 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 			),
 		),
 	},
-	evaluate: (
-		ctx: EvaluationContext<ChainVerificationValue>,
-	): Evaluation<ChainVerificationValue> => {
+	evaluate: ctx => {
 		ctx.setVerifiability(
 			verifiabilityRequiresAnyOf(
 				verifiabilityRequiresCustomChainRpc({
@@ -155,13 +150,13 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 		)
 
 		if (ctx.features.type === WalletType.HARDWARE) {
-			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'), null)
+			return exempt(ctx, sentence('This attribute is not applicable for hardware wallets.'))
 		}
 
 		const l1Client = ctx.features.security.lightClient.ethereumL1
 
 		if (l1Client === null) {
-			return unrated(ctx, null)
+			return unrated(ctx)
 		}
 
 		if (!isSupported(l1Client)) {
@@ -185,5 +180,5 @@ export const chainVerification: Attribute<ChainVerificationValue> = {
 
 		return supportsChainVerification(ctx, supportedLightClients)
 	},
-	aggregate: pickWorstRating<ChainVerificationValue>,
+	aggregate: pickWorstRating,
 }

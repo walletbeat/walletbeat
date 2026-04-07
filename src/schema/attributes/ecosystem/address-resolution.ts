@@ -6,7 +6,6 @@ import {
 	EvaluationContext,
 	exampleRating,
 	Rating,
-	type Value,
 	Verifiability,
 } from '@/schema/attributes'
 import { isSupported, type Support, type Supported } from '@/schema/features/support'
@@ -20,7 +19,7 @@ import type {
 } from '../../features/privacy/address-resolution'
 import { pickWorstRating, unrated } from '../common'
 
-export type AddressResolutionValue = Value & {
+export type AddressResolutionMetadata = {
 	addressResolution?: AddressResolution<Support<AddressResolutionData>>
 }
 
@@ -69,9 +68,9 @@ function getOffchainProviderInfo(
 }
 
 function evaluateAddressResolution(
-	ctx: EvaluationContext<AddressResolutionValue>,
+	ctx: EvaluationContext<AddressResolutionMetadata>,
 	addressResolution: AddressResolution<Support<AddressResolutionData>>,
-): Evaluation<AddressResolutionValue> {
+): Evaluation<AddressResolutionMetadata> {
 	const chainSpecificERCs: NonEmptyArray<[Eip, Support<AddressResolutionData>, string]> = [
 		[erc7828, addressResolution.chainSpecificAddressing.erc7828, 'user@l2chain.eth'],
 		[erc7831, addressResolution.chainSpecificAddressing.erc7831, 'user.eth:l2chain'],
@@ -84,11 +83,13 @@ function evaluateAddressResolution(
 
 		if (chainSpecificSupport.medium === 'CHAIN_CLIENT') {
 			return ctx.build({
-				value: {
+				outcome: {
 					id: `support_via_erc${erc.number}_onchain`,
 					rating: Rating.PASS,
 					displayName: `Resolves human-readable ${eipShortLabel(erc)} addresses`,
-					addressResolution,
+					metadata: {
+						addressResolution,
+					},
 					shortExplanation: sentence(
 						`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format.`,
 					),
@@ -102,11 +103,13 @@ function evaluateAddressResolution(
 		const { rating, offchainInfo, walletShould } = getOffchainProviderInfo(chainSpecificSupport)
 
 		return ctx.build({
-			value: {
+			outcome: {
 				id: `support_via_erc${erc.number}_${chainSpecificSupport.offchainDataVerifiability.toLowerCase()}_${chainSpecificSupport.offchainProviderConnection.toLowerCase()}_provider`,
 				rating,
 				displayName: `Resolves human-readable ${eipShortLabel(erc)} addresses offchain`,
-				addressResolution,
+				metadata: {
+					addressResolution,
+				},
 				shortExplanation: sentence(
 					`{{WALLET_NAME}} supports chain-specific human-readable addresses in ${eipShortLabel(erc)} format using an offchain provider.`,
 				),
@@ -125,11 +128,13 @@ function evaluateAddressResolution(
 
 	if (addressResolution.nonChainSpecificEnsResolution.support === 'NOT_SUPPORTED') {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'no_address_resolution',
 				rating: Rating.FAIL,
 				displayName: 'No human-readable address resolution',
-				addressResolution,
+				metadata: {
+					addressResolution,
+				},
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} does not resolve human-readable addresses such as ENS names.',
 				),
@@ -145,11 +150,13 @@ function evaluateAddressResolution(
 
 	if (addressResolution.nonChainSpecificEnsResolution.medium === 'CHAIN_CLIENT') {
 		return ctx.build({
-			value: {
+			outcome: {
 				id: 'support_plain_ens_onchain',
 				rating: Rating.PARTIAL,
 				displayName: 'Supports non-chain-specific ENS addresses',
-				addressResolution,
+				metadata: {
+					addressResolution,
+				},
 				shortExplanation: sentence(
 					'{{WALLET_NAME}} supports sending to plain ENS addresses but not chain-specific human-readable addresses.',
 				),
@@ -173,11 +180,13 @@ function evaluateAddressResolution(
 	)
 
 	return ctx.build({
-		value: {
+		outcome: {
 			id: `support_basic_${addressResolution.nonChainSpecificEnsResolution.offchainDataVerifiability.toLowerCase()}_${addressResolution.nonChainSpecificEnsResolution.offchainProviderConnection.toLowerCase()}_provider`,
 			rating: Rating.PARTIAL,
 			displayName: 'Resolves ENS addresses using an offchain service',
-			addressResolution,
+			metadata: {
+				addressResolution,
+			},
 			shortExplanation: sentence(
 				'{{WALLET_NAME}} supports sending to ENS addresses but uses an offchain service for resolution.',
 			),
@@ -201,7 +210,7 @@ function evaluateAddressResolution(
 	})
 }
 
-export const addressResolution: Attribute<AddressResolutionValue> = {
+export const addressResolution: Attribute<AddressResolutionMetadata> = {
 	id: 'addressResolution',
 	icon: '\u{1f4c7}', // Card index
 	displayName: 'Address resolution',
@@ -422,8 +431,8 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 		),
 	},
 	evaluate: (
-		ctx: EvaluationContext<AddressResolutionValue>,
-	): Evaluation<AddressResolutionValue> => {
+		ctx: EvaluationContext<AddressResolutionMetadata>,
+	): Evaluation<AddressResolutionMetadata> => {
 		ctx.setVerifiability(Verifiability.VERIFIABLE) // Trivially self-testable.
 
 		if (ctx.features.addressResolution === null) {
@@ -452,5 +461,5 @@ export const addressResolution: Attribute<AddressResolutionValue> = {
 
 		return evaluateAddressResolution(ctx, resolvedResolution)
 	},
-	aggregate: pickWorstRating<AddressResolutionValue>,
+	aggregate: pickWorstRating<AddressResolutionMetadata>,
 }
