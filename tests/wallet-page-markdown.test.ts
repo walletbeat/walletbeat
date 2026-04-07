@@ -10,6 +10,7 @@ import { ratingToText } from '@/schema/attributes'
 import { toFullyQualified } from '@/schema/reference'
 import { getWalletStageAndLadder } from '@/utils/stage'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
+import { getWalletUrl } from '@/utils/wallet-url'
 
 import { assertValidMarkdown } from './utils/assert-valid-markdown'
 import { grammarLint, warmupHarperLinter } from './utils/grammar'
@@ -120,7 +121,9 @@ describe('walletPageMarkdown', () => {
 
 				if (typeof stage === 'object' && stage !== null) {
 					expect(md).toContain('## Stage')
-					expect(md).toContain(`[${stage.label}](${SITE_URL}/${wallet.metadata.id}#stages)`)
+					expect(md).toContain(
+						`[${stage.label}](${SITE_URL}${getWalletUrl(wallet, { attributeAnchor: 'stages' })})`,
+					)
 				}
 			})
 
