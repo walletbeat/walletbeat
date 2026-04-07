@@ -99,6 +99,7 @@
 	// Functions
 	import { isTypographicContent } from '@/types/content'
 	import { slugifyCamelCase } from '@/types/utils/text'
+	import { getWalletUrl } from '@/utils/wallet-url'
 
 
 	// Components
@@ -215,7 +216,7 @@
 														{@const criterionEvaluation = ladderDefinition ? criterion.evaluate(wallet) : null}
 														{@const criterionRating = criterionEvaluation?.rating}
 														{@const attributeId = getCriterionAttributeId(criterion)}
-														{@const attributeLink = attributeId ? `/${wallet.metadata.id}/#${slugifyCamelCase(attributeId)}` : null}
+														{@const attributeLink = attributeId ? getWalletUrl(wallet, { attributeAnchor: slugifyCamelCase(attributeId) }) : null}
 														{@const attribute = attributeId ? attributesById.get(attributeId) ?? null : null}
 														{@const attributeName = attribute?.displayName ?? attributeId}
 														{@const attributeTitle = attribute?.displayName ?? attributeId}

@@ -222,6 +222,7 @@
 
 	// Functions
 	import { variantToName } from '@/constants/variants'
+	import { getWalletUrl } from '@/utils/wallet-url'
 	import { calculateAttributeGroupScore, calculateOverallScore, formatAttributeGroupTitleText } from '@/schema/attribute-groups'
 	import { evaluatedAttributesEntries, ratingToColor, formatAttributeTitleText } from '@/schema/attributes'
 	import { formatScore } from '@/schema/score'
@@ -675,7 +676,7 @@
 							.filter(variant => variant in wallet.variants)
 					)}
 
-					{@const walletUrl = `/${wallet.metadata.id}/${selectedVariant ? `?variant=${selectedVariant}` : ''}`}
+					{@const walletUrl = getWalletUrl(wallet, { variant: selectedVariant })}
 
 					<TooltipOrAccordion
 						class="wallet-info-details"
