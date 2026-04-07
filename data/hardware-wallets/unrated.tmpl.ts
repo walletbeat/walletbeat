@@ -1,4 +1,5 @@
 import { exampleContributor } from '@/data/contributors/example'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import { WalletProfile } from '@/schema/features/profile'
 import {
 	BugBountyPlatform,
@@ -9,7 +10,6 @@ import {
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 

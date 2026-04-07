@@ -1,4 +1,5 @@
 import { mako } from '@/data/contributors/mako'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import { HardwarePrivacyType } from '@/schema/features/privacy/hardware-privacy'
 import { HardwareWalletManufactureType, WalletProfile } from '@/schema/features/profile'
 import { FirmwareType } from '@/schema/features/security/firmware'
@@ -20,7 +21,6 @@ import {
 	SourceNotAvailableLicense,
 } from '@/schema/features/transparency/license'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 export const imkeyWallet: HardwareWallet = {

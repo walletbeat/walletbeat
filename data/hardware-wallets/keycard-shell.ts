@@ -1,4 +1,5 @@
 import { phift } from '@/data/contributors/phift'
+import type { HardwareWallet } from '@/data/hardware-wallets'
 import {
 	type AppConnectionMethodDetails,
 	SoftwareWalletType,
@@ -24,7 +25,6 @@ import { featureSupported, supported } from '@/schema/features/support'
 import { FOSSLicense, LicensingType } from '@/schema/features/transparency/license'
 import { type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { HardwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 export const keycardShell: HardwareWallet = {

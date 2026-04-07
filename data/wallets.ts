@@ -1,28 +1,30 @@
-import { type BaseWallet, type RatedWallet, rateWallet, type WalletMetadata } from '@/schema/wallet'
+import { type BaseWallet, type RatedWallet, type WalletMetadata } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 
-import { unratedEmbeddedWallet } from './embedded-wallets'
+import { type AttributeGroupId } from './attribute-groups'
+import { embeddedWallets, ratedEmbeddedWallets, unratedEmbeddedWallet } from './embedded-wallets'
 import {
-	type HardwareWalletName,
 	hardwareWallets,
 	isValidHardwareWalletName,
+	ratedHardwareWallets,
 	unratedHardwareWallet,
 } from './hardware-wallets'
 import {
 	isValidSoftwareWalletName,
-	type SoftwareWalletName,
+	ratedSoftwareWallets,
 	softwareWallets,
 	unratedSoftwareWallet,
 } from './software-wallets'
 
-/** Set of all known software wallets. */
+/** Set of all known wallets. */
 export const allWallets = {
 	...softwareWallets,
 	...hardwareWallets,
-} as const satisfies Record<WalletName, BaseWallet>
+	...embeddedWallets,
+} as const satisfies Record<string, BaseWallet<AttributeGroupId>>
 
 /** A valid wallet name. */
-export type WalletName = SoftwareWalletName | HardwareWalletName
+export type WalletName = keyof typeof allWallets
 
 /** Type predicate for WalletName. */
 export function isValidWalletName(name: string): name is WalletName {
@@ -40,14 +42,16 @@ export function assertValidWalletName(name: string): WalletName {
 	return name
 }
 
-/** All rated wallets. */
-export const allRatedWallets = Object.fromEntries(
-	Object.entries(allWallets).map(([name, wallet]) => [name, rateWallet(wallet)]),
-)
+/** All rated wallets (each rated with the attribute tree for its wallet class). */
+export const allRatedWallets = {
+	...ratedSoftwareWallets,
+	...ratedHardwareWallets,
+	...ratedEmbeddedWallets,
+} as const satisfies Record<WalletName, RatedWallet<string>>
 
 /** All rated wallets keyed by their slug (metadata.id). */
-export const allRatedWalletsBySlug: Record<string, RatedWallet> = Object.fromEntries(
-	Object.entries(allWallets).map(([, wallet]) => [wallet.metadata.id, rateWallet(wallet)]),
+export const allRatedWalletsBySlug: Record<string, RatedWallet<string>> = Object.fromEntries(
+	Object.values(allRatedWallets).map(wallet => [wallet.metadata.id, wallet]),
 )
 
 /** Check if a string is a valid wallet slug (metadata.id). */
@@ -58,14 +62,14 @@ export function isValidWalletSlug(slug: string): slug is keyof typeof allRatedWa
 /**
  * Map the given function to all rated wallets.
  */
-export function mapWallets<T>(fn: (wallet: RatedWallet, index: number) => T): T[] {
+export function mapWallets<T>(fn: (wallet: RatedWallet<string>, index: number) => T): T[] {
 	return Object.values(allRatedWallets).map(fn)
 }
 
 /**
  * Given a specific wallet type, return a RatedWallet of that type.
  */
-export function representativeWalletForType(walletType: WalletType): RatedWallet {
+export function representativeWalletForType(walletType: WalletType) {
 	switch (walletType) {
 		case WalletType.SOFTWARE:
 			return unratedSoftwareWallet

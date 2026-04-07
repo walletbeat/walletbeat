@@ -1,4 +1,5 @@
 import { lucemans } from '@/data/contributors/lucemans'
+import type { SoftwareWallet } from '@/data/software-wallets'
 import { AccountType } from '@/schema/features/account-support'
 import { PrivateTransferTechnology } from '@/schema/features/privacy/transaction-privacy'
 import { WalletProfile } from '@/schema/features/profile'
@@ -6,7 +7,6 @@ import { TransactionSubmissionL2Type } from '@/schema/features/self-sovereignty/
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
-import type { SoftwareWallet } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 
 export const family: SoftwareWallet = {
