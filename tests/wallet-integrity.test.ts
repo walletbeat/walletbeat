@@ -71,11 +71,35 @@ describe('wallets', () => {
 		},
 	])) {
 		describe(walletMapName, () => {
-			for (const [walletKey, wallet] of Object.entries(walletMap)) {
-				it(`has a metadata.id that is the kebab-case of its registry key for ${wallet.metadata.displayName}`, () => {
-					expect(wallet.metadata.id).toBe(toKebabCase(walletKey))
+			for (const wallet of Object.values(walletMap)) {
+				it(`has a canonical kebab-case metadata.id for ${wallet.metadata.displayName}`, () => {
+					expect(wallet.metadata.id).toBe(toKebabCase(wallet.metadata.id))
 				})
 			}
+		})
+	}
+
+	const walletEntriesById = new Map<string, WalletType[]>()
+
+	for (const { walletMap, walletType } of walletMaps) {
+		if (walletType === null) {
+			continue
+		}
+
+		for (const wallet of Object.values(walletMap)) {
+			const existingEntries = walletEntriesById.get(wallet.metadata.id) ?? []
+
+			walletEntriesById.set(wallet.metadata.id, [...existingEntries, walletType])
+		}
+	}
+
+	for (const [walletId, entries] of walletEntriesById) {
+		if (entries.length < 2) {
+			continue
+		}
+
+		it(`only reuses wallet slug ${walletId} across distinct wallet types`, () => {
+			expect(new Set(entries).size).toBe(entries.length)
 		})
 	}
 

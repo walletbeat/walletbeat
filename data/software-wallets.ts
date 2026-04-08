@@ -1,7 +1,7 @@
 import type { AttributeTree } from '@/schema/attribute-groups'
 import type { WalletSoftwareFeatures } from '@/schema/features'
-import { softwareLadders } from '@/schema/ladders'
-import type { Variant } from '@/schema/variants'
+import { allWalletLadders } from '@/schema/ladders'
+import { type AtLeastOneTrueVariant, Variant } from '@/schema/variants'
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { AttributeGroupId, attributeTreeForIds } from './attribute-groups'
@@ -14,6 +14,7 @@ import { family } from './software-wallets/family'
 import { frame } from './software-wallets/frame'
 import { gemwallet } from './software-wallets/gem'
 import { imtoken } from './software-wallets/imtoken'
+import { ledgerLive } from './software-wallets/ledger'
 import { metamask } from './software-wallets/metamask'
 import { mtpelerin } from './software-wallets/mtpelerin'
 import { nufi } from './software-wallets/nufi'
@@ -50,16 +51,18 @@ export const softwareWalletAttributeTree = attributeTreeForIds(
  */
 export type SoftwareWallet = BaseWallet<SoftwareAttributeGroupId> & {
 	features: WalletSoftwareFeatures
-	variants:
-		| {
-				[Variant.BROWSER]: true
-		  }
-		| {
-				[Variant.DESKTOP]: true
-		  }
-		| {
-				[Variant.MOBILE]: true
-		  }
+	variants: AtLeastOneTrueVariant &
+		(
+			| {
+					[Variant.BROWSER]: true
+			  }
+			| {
+					[Variant.DESKTOP]: true
+			  }
+			| {
+					[Variant.MOBILE]: true
+			  }
+		)
 }
 
 /** Set of all known software wallets. */
@@ -73,6 +76,7 @@ export const softwareWallets = {
 	frame,
 	gemwallet,
 	imtoken,
+	ledgerLive,
 	metamask,
 	mtpelerin,
 	nufi,
@@ -99,22 +103,20 @@ export function isValidSoftwareWalletName(name: string): name is SoftwareWalletN
 export const ratedSoftwareWallets = Object.fromEntries(
 	Object.entries(softwareWallets).map(([name, wallet]) => [
 		name,
-		rateWallet(softwareWalletAttributeTree, softwareLadders, wallet),
+		rateWallet(softwareWalletAttributeTree, allWalletLadders, wallet),
 	]),
-) satisfies Record<string, RatedWallet<SoftwareAttributeGroupId>>
+) satisfies Record<string, RatedWallet<string>>
 
 /**
  * Map the given function to all rated software wallets.
  */
-export function mapSoftwareWallets<T>(
-	fn: (wallet: RatedWallet<SoftwareAttributeGroupId>, index: number) => T,
-): T[] {
+export function mapSoftwareWallets<T>(fn: (wallet: RatedWallet<string>, index: number) => T): T[] {
 	return Object.values(ratedSoftwareWallets).map(fn)
 }
 
 /** The unrated software wallet as a rated wallet. */
 export const unratedSoftwareWallet = rateWallet(
 	softwareWalletAttributeTree,
-	softwareLadders,
+	allWalletLadders,
 	unratedSoftwareTemplate,
 )

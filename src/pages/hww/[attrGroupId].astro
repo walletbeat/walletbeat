@@ -2,9 +2,9 @@
 // Types/constants
 import { WalletType } from '@/schema/wallet-types'
 import { defaultNavigationItems } from '@/constants/navigation'
+import { displayRatedHardwareWallets } from '@/data/wallets'
 import { representativeWalletForType } from '@/data/wallets'
-import { ratedHardwareWallets } from '@/data/hardware-wallets'
-import { softwareLadders } from '@/schema/ladders'
+import { allWalletLadders } from '@/schema/ladders'
 import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
 
 // Functions
@@ -51,8 +51,8 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:load
 			title='Hardware Wallets'
-			ladders={softwareLadders}
-			wallets={Object.values(ratedHardwareWallets)}
+			ladders={allWalletLadders}
+			wallets={Object.values(displayRatedHardwareWallets)}
 			attributeTree={hardwareWalletAttributeTree}
 		/>
 	</main>

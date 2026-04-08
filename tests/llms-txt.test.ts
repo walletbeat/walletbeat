@@ -53,10 +53,16 @@ describe('llms.txt', () => {
 		expect(hardwareSectionMatch).not.toBeNull()
 		const hardwareSection = hardwareSectionMatch![1] ?? ''
 
-		for (const wallet of Object.values(ratedHardwareWallets)) {
-			const link = `${SITE_URL}/${wallet.metadata.id}/index.html.md`
+		const linkedWalletIds = new Set(
+			Object.values(ratedSoftwareWallets).map(wallet => wallet.metadata.id),
+		)
 
-			expect(hardwareSection).toContain(link)
+		for (const wallet of Object.values(ratedHardwareWallets)) {
+			expect(hardwareSection).toContain(wallet.metadata.displayName)
+
+			if (!linkedWalletIds.has(wallet.metadata.id)) {
+				expect(hardwareSection).toContain(`${SITE_URL}/${wallet.metadata.id}/index.html.md`)
+			}
 		}
 	})
 

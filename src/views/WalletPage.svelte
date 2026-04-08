@@ -45,9 +45,10 @@
 		formatAttributeGroupTitleText,
 	} from '@/schema/attribute-groups'
 	import { toFullyQualified } from '@/schema/reference'
+	import { walletTypeToName } from '@/schema/wallet-types'
 	import { getAttributeOverride } from '@/schema/wallet'
 	import { renderStrings, slugifyCamelCase } from '@/types/utils/text'
-	import { getWalletStageAndLadder } from '@/utils/stage'
+	import { getWalletStagesByType } from '@/utils/stage'
 	import { getHowIsEvaluatedHeading, getHowToImproveHeading } from '@/utils/attribute-display'
 	import { scoreToColor } from '@/utils/colors'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
@@ -387,21 +388,22 @@
 					data-row="gap-2"
 				>
 					{#if showStage}
-						{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-
-						{#if stage !== null && ladderEvaluation !== null}
+						{#each getWalletStagesByType(wallet) as { walletType, stage, ladderEvaluation }}
 							<Tooltip>
-								<WalletStageBadge
-									{stage}
-									{ladderEvaluation}
-									size="large"
-								/>
+								<div data-column="gap-1">
+									<small>{walletTypeToName(walletType)}</small>
+									<WalletStageBadge
+										{stage}
+										{ladderEvaluation}
+										size="large"
+									/>
+								</div>
 
 								{#snippet TooltipContent()}
-									<WalletStageSummary {wallet} {ladders} {stage} {ladderEvaluation} />
+									<WalletStageSummary {wallet} {ladders} {walletType} {stage} {ladderEvaluation} />
 								{/snippet}
 							</Tooltip>
-						{/if}
+						{/each}
 					{/if}
 
 					{#if showScores}
@@ -496,8 +498,6 @@
 		{/if}
 
 		{#if showStage}
-			{@const { stage, ladderEvaluation } = getWalletStageAndLadder(wallet)}
-
 			<section id="stages">
 				<header
 					data-sticky="block"
@@ -510,7 +510,9 @@
 				</header>
 
 				<div data-scroll-item="inline-detached padding-match-end" data-column>
-					<WalletStageOverview {wallet} {stage} {ladderEvaluation} />
+					{#each getWalletStagesByType(wallet) as { walletType, stage, ladderEvaluation }}
+						<WalletStageOverview {wallet} {ladders} {walletType} {stage} {ladderEvaluation} />
+					{/each}
 				</div>
 			</section>
 		{/if}
@@ -765,31 +767,11 @@
 							</a>
 
 							{#if true}
-								{@const { ladderEvaluation } = getWalletStageAndLadder(wallet)}
-
-								{@const ladderType = (
-									ladderEvaluation ?
-										Object.entries(wallet.ladders)
-											.find(([_, evaluation]) => evaluation === ladderEvaluation)
-											?.[0]
-									:
-										undefined
-								)}
-
 								{@const attributeStages = getAttributeStagesForWallet(ladders, attribute, wallet)}
 
-								{@const stageNumbers = (
-									ladderType &&
-										attributeStages
-											.find(stage => stage.ladderType === ladderType)
-											?.stageNumbers
-									||
-										[]
-								)}
-
-								{#if stageNumbers.length > 0}
-									{@const stageNumber = stageNumbers[0]}
-									{@const stage = ladderEvaluation?.ladder.stages[stageNumber]}
+								{#each attributeStages as { walletType, stageNumbers }}
+									{@const ladderEvaluation = wallet.stagesByType[walletType]}
+									{@const stage = ladderEvaluation?.stage && typeof ladderEvaluation.stage !== 'string' ? ladderEvaluation.ladder.stages[stageNumbers[0]] : undefined}
 
 									{#if stage && ladderEvaluation}
 										<Tooltip
@@ -798,13 +780,13 @@
 											<a
 												href={`#${stage.id}`}
 												data-link="camouflaged"
-												title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
+												title={`${walletTypeToName(walletType)} stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
 											>
 												<div
 													data-badge="small"
 													style:--accent="var(--accent-color)"
 												>
-													<small>Stage {stageNumbers.join(', ')}</small>
+													<small>{walletTypeToName(walletType)} Stage {stageNumbers.join(', ')}</small>
 												</div>
 											</a>
 
@@ -812,27 +794,15 @@
 												<WalletStageSummary
 													{wallet}
 													{ladders}
+													{walletType}
 													stage={stage}
 													{ladderEvaluation}
 													showNextStageCriteria={false}
 												/>
 											{/snippet}
 										</Tooltip>
-									{:else if stage}
-										<a
-											href={`#${stage.id}`}
-											data-link="camouflaged"
-											title={`This attribute is required for stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
-										>
-											<div
-												data-badge="small"
-												style:--accent="var(--accent-color)"
-											>
-												<small>Stage {stageNumbers.join(', ')}</small>
-											</div>
-										</a>
 									{/if}
-								{/if}
+								{/each}
 							{/if}
 
 							{#if 0 < relevantVariants.length && relevantVariants.length < Object.keys(wallet.variants).length}

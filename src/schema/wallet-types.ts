@@ -66,6 +66,17 @@ export function walletTypeToUrlSlug(walletType: WalletType): string {
 	}
 }
 
+export function walletTypeToName(walletType: WalletType): string {
+	switch (walletType) {
+		case WalletType.SOFTWARE:
+			return 'Software'
+		case WalletType.HARDWARE:
+			return 'Hardware'
+		case WalletType.EMBEDDED:
+			return 'Embedded'
+	}
+}
+
 /**
  * Look up the wallet type for a given URL slug.
  */

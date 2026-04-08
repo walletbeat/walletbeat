@@ -2,29 +2,16 @@ import type { SoftwareAttributeGroupId } from '@/data/software-wallets'
 
 import type { WalletLadder } from './stages'
 import { softwareWalletLadder } from './stages/software-wallet-stages'
+import { WalletType } from './wallet-types'
 // import type { HardwareAttributeGroupId } from '@/data/hardware-wallets'
 // import type { EmbeddedAttributeGroupId } from '@/data/embedded-wallets'
 
-/**
- * All wallet ladders.
- */
-export enum WalletLadderType {
-	SOFTWARE = 'SOFTWARE',
-
-	// TODO: Define hardware wallet ladder.
-	// HARDWARE = 'HARDWARE',
-
-	// TODO: Define embedded wallet ladder.
-	// EMBEDDED = 'EMBEDDED',
-}
-
-export type Ladders<_AttributeGroupId extends string> = Record<
-	WalletLadderType,
-	WalletLadder<_AttributeGroupId>
+export type Ladders<_AttributeGroupId extends string> = Partial<
+	Record<WalletType, WalletLadder<_AttributeGroupId>>
 >
 
 export const softwareLadders = {
-	[WalletLadderType.SOFTWARE]: softwareWalletLadder,
+	[WalletType.SOFTWARE]: softwareWalletLadder,
 } as const satisfies Ladders<SoftwareAttributeGroupId>
 
 /**

@@ -14,8 +14,8 @@
 	import { type Ladders } from '@/schema/ladders'
 	import type { Variant } from '@/schema/variants'
 	import { attributeVariantSpecificity, type RatedWallet,VariantSpecificity } from '@/schema/wallet'
+	import { walletTypeToName } from '@/schema/wallet-types'
 	import { getAttributeStagesForWallet } from '@/utils/stage-attributes'
-	import { getWalletStageAndLadder } from '@/utils/stage'
 	import { getWalletEvalStrings } from '@/utils/evaluation-content'
 
 
@@ -50,37 +50,8 @@
 
 
 	// Derived
-	const ladderEvaluation = $derived(
-		getWalletStageAndLadder(wallet)
-			.ladderEvaluation
-		?? undefined
-	)
-
-	const ladderType = $derived(
-		(ladders && ladderEvaluation) &&
-			Object.entries(wallet.ladders).find(([_, evaluation]) => evaluation === ladderEvaluation)?.[0]
-		||
-			undefined
-	)
-
 	const attributeStages = $derived(
 		ladders && getAttributeStagesForWallet(ladders, attribute.attribute, wallet)
-	)
-
-	const relevantStages = $derived(
-		ladderType && ladderEvaluation &&
-			attributeStages
-				?.find(stage => stage.ladderType === ladderType)
-				?.stageNumbers
-		||
-			[]
-	)
-
-	const firstStage = $derived(
-		relevantStages.length > 0 &&
-			ladderEvaluation?.ladder.stages[relevantStages[0]]
-		||
-			undefined
 	)
 </script>
 
@@ -98,32 +69,38 @@
 		</h4>
 
 		<div data-row="gap-2">
-			{#if relevantStages.length > 0 && firstStage && ladderEvaluation}
-				<Tooltip>
-					<a
-						href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#${firstStage.id}`}
-						data-link="camouflaged"
-						title={`This attribute is required for stage${relevantStages.length > 1 ? 's' : ''} ${relevantStages.join(', ')}`}
-					>
-						<div
-							data-badge="small"
-							style:--accent="var(--accent-color)"
-						>
-							<small>Stage {relevantStages.join(', ')}</small>
-						</div>
-					</a>
+			{#each attributeStages ?? [] as { walletType, stageNumbers } (walletType)}
+				{@const ladderEvaluation = wallet.stagesByType[walletType]}
+				{@const firstStage = ladderEvaluation?.stage && typeof ladderEvaluation.stage !== 'string' ? ladderEvaluation.ladder.stages[stageNumbers[0]] : undefined}
 
-					{#snippet TooltipContent()}
-						<WalletStageSummary 
-							{wallet} 
-							{ladders}
-							stage={firstStage} 
-							{ladderEvaluation}
-							showNextStageCriteria={false}
-						/>
-					{/snippet}
-				</Tooltip>
-			{/if}
+				{#if firstStage && ladderEvaluation}
+					<Tooltip>
+						<a
+							href={`/${wallet.metadata.id}/${variant ? `?variant=${variant}` : ''}#${firstStage.id}`}
+							data-link="camouflaged"
+							title={`${walletTypeToName(walletType)} stage${stageNumbers.length > 1 ? 's' : ''} ${stageNumbers.join(', ')}`}
+						>
+							<div
+								data-badge="small"
+								style:--accent="var(--accent-color)"
+							>
+								<small>{walletTypeToName(walletType)} Stage {stageNumbers.join(', ')}</small>
+							</div>
+						</a>
+
+						{#snippet TooltipContent()}
+							<WalletStageSummary 
+								{wallet} 
+								{ladders}
+								{walletType}
+								stage={firstStage} 
+								{ladderEvaluation}
+								showNextStageCriteria={false}
+							/>
+						{/snippet}
+					</Tooltip>
+				{/if}
+			{/each}
 
 			{#if summaryType === WalletAttributeSummaryType.Rating}
 				<data

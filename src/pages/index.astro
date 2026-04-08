@@ -1,9 +1,10 @@
 ---
 // Constants
 import { defaultNavigationItems } from '@/constants/navigation'
-import { softwareLadders } from '@/schema/ladders'
-import { ratedSoftwareWallets, softwareWalletAttributeTree } from '@/data/software-wallets'
-import { ratedHardwareWallets, hardwareWalletAttributeTree } from '@/data/hardware-wallets'
+import { displayRatedHardwareWallets, displayRatedSoftwareWallets } from '@/data/wallets'
+import { allWalletLadders } from '@/schema/ladders'
+import { softwareWalletAttributeTree } from '@/data/software-wallets'
+import { hardwareWalletAttributeTree } from '@/data/hardware-wallets'
 
 // Layouts
 import Layout from '../layouts/Layout.astro'
@@ -41,15 +42,16 @@ import WalletTable from '@/views/WalletTable.svelte'
 		<WalletTable
 			client:load
 			title='Software Wallets'
-			ladders={softwareLadders}
-			wallets={Object.values(ratedSoftwareWallets)}
+			ladders={allWalletLadders}
+			wallets={Object.values(displayRatedSoftwareWallets)}
 			attributeTree={softwareWalletAttributeTree}
 		/>
 
 		<WalletTable
 			client:load
 			title='Hardware Wallets'
-			wallets={Object.values(ratedHardwareWallets)}
+			ladders={allWalletLadders}
+			wallets={Object.values(displayRatedHardwareWallets)}
 			attributeTree={hardwareWalletAttributeTree}
 		/>
 	</main>

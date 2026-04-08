@@ -234,9 +234,10 @@
 	import { isLabeledUrl } from '@/schema/url'
 	import { hasVariant } from '@/schema/variants'
 	import { attributeVariantSpecificity, VariantSpecificity,walletSupportedAccountTypes } from '@/schema/wallet'
-	import { getWalletStageAndLadder } from '@/utils/stage'
+	import { getWalletStageAndLadder, getWalletStagesByType } from '@/utils/stage'
 	import { isNonEmptyArray, nonEmptyMap } from '@/types/utils/non-empty'
 	import { isAttributeUsedInStage, stagesById } from '@/utils/stage-attributes'
+	import { walletTypeToName, WalletType } from '@/schema/wallet-types'
 
 
 	// Actions
@@ -334,19 +335,19 @@
 										id: 'walletType-software',
 										label: 'Software',
 										icon: AppWindowIcon,
-										filterFunction: wallet => !hasVariant(wallet.variants, Variant.HARDWARE)
+										filterFunction: wallet => wallet.types[WalletType.SOFTWARE] === true
 									},
 									{
 										id: 'walletType-hardware',
 										label: 'Hardware',
 										icon: HardwareIcon,
-										filterFunction: wallet => hasVariant(wallet.variants, Variant.HARDWARE)
+										filterFunction: wallet => wallet.types[WalletType.HARDWARE] === true
 									},
 									{
 										id: 'walletType-embedded',
 										label: 'Embedded',
 										icon: WalletIcon,
-										filterFunction: wallet => hasVariant(wallet.variants, Variant.EMBEDDED)
+										filterFunction: wallet => wallet.types[WalletType.EMBEDDED] === true
 									},
 								],
 							},
@@ -638,43 +639,51 @@
 					{#if stage === 'NOT_APPLICABLE' || stage === null || ladderEvaluation === null}
 						<small>N/A</small>
 					{:else}
-						{@const stageValue = typeof stage === 'string' ? stage : stage.id}
-						{@const stageFilterId = `stage-${stageValue}`}
+						<div data-column="gap-2">
+							{#each getWalletStagesByType(wallet) as { walletType, stage, ladderEvaluation }}
+								{@const stageValue = typeof stage === 'string' ? stage : stage.id}
+								{@const stageFilterId = `stage-${stageValue}`}
 
-						<Tooltip>
-							<div
-								role="button"
-								tabindex="0"
-								aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? 'Filter by No Stage' : stage && typeof stage === 'object' ? `Filter by ${stage.label}` : 'Filter by stage'}
-								onclick={(e) => {
-									e.preventDefault()
-									e.stopPropagation()
-									toggleAttributeFilterById?.(stageFilterId)
-								}}
-								onkeydown={(e) => {
-									if (e.key !== 'Enter' && e.key !== ' ') return
+								<Tooltip>
+									<div
+										role="button"
+										tabindex="0"
+										aria-label={stage === 'QUALIFIED_FOR_NO_STAGES' ? `Filter by ${walletTypeToName(walletType)} No Stage` : stage && typeof stage === 'object' ? `Filter by ${walletTypeToName(walletType)} ${stage.label}` : 'Filter by stage'}
+										onclick={(e) => {
+											e.preventDefault()
+											e.stopPropagation()
+											toggleAttributeFilterById?.(stageFilterId)
+										}}
+										onkeydown={(e) => {
+											if (e.key !== 'Enter' && e.key !== ' ') return
 
-									e.preventDefault()
-									e.stopPropagation()
-									toggleAttributeFilterById?.(stageFilterId)
-								}}
-							>
-								<WalletStageBadge
-									{stage}
-									{ladderEvaluation}
-									size="medium"
-								/>
-							</div>
+											e.preventDefault()
+											e.stopPropagation()
+											toggleAttributeFilterById?.(stageFilterId)
+										}}
+									>
+										<div data-column="gap-1">
+											<small>{walletTypeToName(walletType)}</small>
+											<WalletStageBadge
+												{stage}
+												{ladderEvaluation}
+												size="medium"
+											/>
+										</div>
+									</div>
 
-							{#snippet TooltipContent()}
-								<WalletStageSummary
-									{wallet}
-									{ladders}
-									{stage}
-									{ladderEvaluation}
-								/>
-							{/snippet}
-						</Tooltip>
+									{#snippet TooltipContent()}
+										<WalletStageSummary
+											{wallet}
+											{ladders}
+											{walletType}
+											{stage}
+											{ladderEvaluation}
+										/>
+									{/snippet}
+								</Tooltip>
+							{/each}
+						</div>
 					{/if}
 				{:else if column.id === 'displayName'}
 					{@const displayName = value}
@@ -748,14 +757,19 @@
 									{#each (
 										[
 											// Wallet type tags
-											hasVariant(wallet.variants, Variant.HARDWARE) && {
+											wallet.types[WalletType.SOFTWARE] && {
+												label: 'Software',
+												filterId: 'walletType-software',
+												type: 'wallet-type',
+											},
+											wallet.types[WalletType.HARDWARE] && {
 												label: 'Hardware',
 												filterId: 'walletType-hardware',
 												type: 'wallet-type',
 											},
-											!hasVariant(wallet.variants, Variant.HARDWARE) && {
-												label: 'Software',
-												filterId: 'walletType-software',
+											wallet.types[WalletType.EMBEDDED] && {
+												label: 'Embedded',
+												filterId: 'walletType-embedded',
 												type: 'wallet-type',
 											},
 											// Manufacture type tags

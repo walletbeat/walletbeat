@@ -2,32 +2,38 @@
 	_AttributeGroupId extends string
 ">
 	// Types/constants
-	import type { RatedWallet } from '@/schema/wallet'
-	import { softwareLadders, type Ladders, WalletLadderType } from '@/schema/ladders'
+	import type { Ladders } from '@/schema/ladders'
 	import {
 		StageCriterionRating,
 		stageCriterionRatings,
 		type StageEvaluatableWallet,
-		type WalletLadder,
 		type WalletLadderEvaluation,
 		type WalletStage,
 	} from '@/schema/stages'
+	import { WalletType, walletTypeToName } from '@/schema/wallet-types'
 	import { isTypographicContent } from '@/types/content'
 	import { slugifyCamelCase } from '@/types/utils/text'
 	import { getWalletUrl } from '@/utils/wallet-url'
 	import { attributesById, getCriterionAttributeId } from '@/utils/stage-attributes'
+	import type { RatedWallet } from '@/schema/wallet'
 
 
 	// Props
+	type DisplayStageWallet = RatedWallet<_AttributeGroupId> & {
+		walletsByType?: Partial<Record<WalletType, RatedWallet<_AttributeGroupId>>>
+	}
+
 	const {
 		wallet,
 		ladders,
+		walletType,
 		stage,
 		ladderEvaluation,
 		showNextStageCriteria = true,
 	}: {
-		wallet: RatedWallet<_AttributeGroupId>
+		wallet: DisplayStageWallet
 		ladders?: Ladders<_AttributeGroupId>
+		walletType: WalletType
 		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 		showNextStageCriteria?: boolean
@@ -35,31 +41,20 @@
 
 
 	// (Derived)
-	const stageEvaluatableWallet: StageEvaluatableWallet<_AttributeGroupId> = $derived({
-		types: wallet.types,
-		variants: wallet.variants,
-		variantSpecificity: wallet.variantSpecificity,
-		overall: wallet.overall,
-		overrides: wallet.overrides,
-	})
-
-	const ladderType = $derived(
-		ladderEvaluation ?
-			Object.entries(wallet.ladders)
-				.find(([, evaluation]) => evaluation === ladderEvaluation)
-				?.[0]
-			?? null
-		:
-			null
+	const criterionWallet = $derived(
+		wallet.walletsByType?.[walletType] ?? wallet
 	)
 
+	const stageEvaluatableWallet: StageEvaluatableWallet<_AttributeGroupId> = $derived({
+		types: criterionWallet.types,
+		variants: criterionWallet.variants,
+		variantSpecificity: criterionWallet.variantSpecificity,
+		overall: criterionWallet.overall,
+		overrides: criterionWallet.overrides,
+	})
+
 	const ladderDefinition = $derived(
-		ladders && ladderType === WalletLadderType.SOFTWARE ?
-			// Hydrated `ladders` props lose `evaluate`; use module ladder. Generic widens software ladder for callers.
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- intentional variance bridge
-			(softwareLadders[WalletLadderType.SOFTWARE] as unknown as WalletLadder<_AttributeGroupId>)
-		:
-			null
+		ladders?.[walletType] ?? null
 	)
 
 	const stage0 = $derived(
@@ -132,6 +127,10 @@
 
 
 <section data-column>
+	<header>
+		<small>{walletTypeToName(walletType)}</small>
+	</header>
+
 	{#if stage === 'NOT_APPLICABLE'}
 		<header data-column="gap-2">
 			<h2 data-row="gap-2">

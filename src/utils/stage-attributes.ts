@@ -1,6 +1,6 @@
 import { attributeGroupById } from '@/data/attribute-groups'
 import type { Attribute, OutcomeMetadata } from '@/schema/attributes'
-import { allWalletLadders, WalletLadderType } from '@/schema/ladders'
+import { allWalletLadders } from '@/schema/ladders'
 import {
 	getEvaluateFunctionAttributeId,
 	StageCriterionRating,
@@ -10,6 +10,7 @@ import {
 	type WalletStageCriterion,
 } from '@/schema/stages'
 import type { RatedWallet } from '@/schema/wallet'
+import { WalletType } from '@/schema/wallet-types'
 
 /**
  * Map of stage IDs to stage objects (using the first occurrence across all ladders).
@@ -171,25 +172,29 @@ export function getAttributeCriteriaForWallet<
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata,
 >(
-	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
+	ladders: Partial<Record<WalletType, WalletLadder<_AttributeGroupId>>>,
 	attribute: Attribute<_OutcomeMetadata>,
 	wallet: StageEvaluatableWallet<_AttributeGroupId>,
 ) {
-	return Object.entries(ladders)
-		.flatMap(([ladderType, ladder]) =>
-			ladder.stages.map((stage, stageIndex) => ({
-				ladderType,
-				ladder,
-				stage,
-				stageIndex,
-			})),
-		)
+	return Object.values(WalletType)
+		.flatMap(walletType => {
+			const ladder = ladders[walletType]
+
+			return ladder === undefined
+				? []
+				: ladder.stages.map((stage, stageIndex) => ({
+						walletType,
+						ladder,
+						stage,
+						stageIndex,
+					}))
+		})
 		.filter(({ ladder }) => ladder.applicableTo(wallet))
 		.filter(({ stage }) => isAttributeUsedInStageObject(attribute, stage))
-		.flatMap(({ ladderType, stage, stageIndex }) =>
+		.flatMap(({ walletType, stage, stageIndex }) =>
 			allCriteriaInStage(stage)
 				.filter(criterion => getCriterionAttributeId(criterion) === attribute.id)
-				.map(criterion => ({ ladderType, stageNumber: stageIndex, criterion })),
+				.map(criterion => ({ walletType, stageNumber: stageIndex, criterion })),
 		)
 }
 
@@ -214,28 +219,28 @@ export function getAttributeStagesForWallet<
 	_AttributeGroupId extends string,
 	_OutcomeMetadata extends OutcomeMetadata,
 >(
-	ladders: Record<WalletLadderType, WalletLadder<_AttributeGroupId>>,
+	ladders: Partial<Record<WalletType, WalletLadder<_AttributeGroupId>>>,
 	attribute: Attribute<_OutcomeMetadata>,
 	wallet: RatedWallet<_AttributeGroupId>,
-): Array<{ ladderType: WalletLadderType; stageNumbers: number[] }> {
+): Array<{ walletType: WalletType; stageNumbers: number[] }> {
 	const stageEvaluatable = toStageEvaluatable(wallet)
 	const criteria = getAttributeCriteriaForWallet(ladders, attribute, wallet)
 	const stagesPassed = criteria
 		.filter(
 			({ criterion }) => criterion.evaluate(stageEvaluatable).rating === StageCriterionRating.PASS,
 		)
-		.map(({ ladderType, stageNumber }) => ({ ladderType, stageIndex: stageNumber }))
+		.map(({ walletType, stageNumber }) => ({ walletType, stageIndex: stageNumber }))
 
-	const uniqueLadderTypes = Array.from(new Set(stagesPassed.map(({ ladderType }) => ladderType)))
+	const uniqueWalletTypes = Array.from(new Set(stagesPassed.map(({ walletType }) => walletType)))
 
-	return uniqueLadderTypes.map(ladderType => {
+	return uniqueWalletTypes.map(walletType => {
 		const indices = stagesPassed
-			.filter(({ ladderType: type }) => type === ladderType)
+			.filter(({ walletType: type }) => type === walletType)
 			.map(({ stageIndex }) => stageIndex)
 		const maxStageIndex = Math.max(...indices)
 
 		return {
-			ladderType,
+			walletType,
 			stageNumbers: [maxStageIndex],
 		}
 	})

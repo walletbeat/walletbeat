@@ -2,11 +2,12 @@
 	_AttributeGroupId extends string
 ">
 	// Types/constants
-	import type { RatedWallet } from '@/schema/wallet'
-	import { softwareLadders } from '@/schema/ladders'
-	import { StageCriterionRating, stageCriterionRatings, type WalletLadder, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import type { Ladders } from '@/schema/ladders'
+	import { StageCriterionRating, stageCriterionRatings, type WalletLadderEvaluation, type WalletStage } from '@/schema/stages'
+	import { WalletType, walletTypeToName } from '@/schema/wallet-types'
 	import { stageToColor } from '@/utils/colors'
 	import { allCriteriaInStage, computeCountsAndStatus, getCriterionAttributeId, attributesById } from '@/utils/stage-attributes'
+	import type { RatedWallet } from '@/schema/wallet'
 
 	/** Aggregate statuses for stages and stage groups (must match StageCountsStatus in stage-attributes) */
 	enum StageStatus {
@@ -48,33 +49,32 @@
 
 
 	// Props
+	type DisplayStageWallet = RatedWallet<_AttributeGroupId> & {
+		walletsByType?: Partial<Record<WalletType, RatedWallet<_AttributeGroupId>>>
+	}
+
 	const {
 		wallet,
+		ladders,
+		walletType,
 		stage,
 		ladderEvaluation,
 	}: {
-		wallet: RatedWallet<_AttributeGroupId>
+		wallet: DisplayStageWallet
+		ladders: Ladders<_AttributeGroupId>
+		walletType: WalletType
 		stage: WalletStage<_AttributeGroupId> | 'NOT_APPLICABLE' | 'QUALIFIED_FOR_NO_STAGES' | null
 		ladderEvaluation: WalletLadderEvaluation<_AttributeGroupId> | null
 	} = $props()
 
 
 	// Derived
-	let ladderType = $derived(
-		!ladderEvaluation ?
-			null
-		:
-			Object.entries(wallet.ladders)
-				.find(([, evaluation]) => evaluation === ladderEvaluation)
-				?.[0]
-			?? null
+	let criterionWallet = $derived(
+		wallet.walletsByType?.[walletType] ?? wallet
 	)
 
 	let ladderDefinition = $derived(
-		ladderType ?
-			softwareLadders[ladderType] as WalletLadder<_AttributeGroupId>
-		:
-			null
+		ladders[walletType] ?? null
 	)
 
 	let currentStageIndex = $derived(
@@ -95,7 +95,7 @@
 
 	let stageEvaluatableWallet = $derived(
 		(() => {
-			const { metadata: _metadata, ladders: _ladders, ...rest } = wallet
+			const { metadata: _metadata, ladders: _ladders, ...rest } = criterionWallet
 			return rest
 		})(),
 	)
@@ -109,10 +109,20 @@
 
 	// Components
 	import Typography from '@/components/Typography.svelte'
+	import WalletStageBadge from './WalletStageBadge.svelte'
 </script>
 
 
-{#if ladderEvaluation && ladderDefinition}
+{#if ladderEvaluation === null}
+	<div data-column="gap-4">
+		<header data-row="gap-2 wrap">
+			<h3>{walletTypeToName(walletType)}</h3>
+			<WalletStageBadge stage="NOT_APPLICABLE" ladderEvaluation={null} size="medium" />
+		</header>
+
+		<p>No stage ladder is defined for this wallet type yet.</p>
+	</div>
+{:else if ladderEvaluation && ladderDefinition}
 	<div
 		data-column
 		style:--accent={
@@ -122,6 +132,10 @@
 				'var(--rating-unrated)'
 		}
 	>
+		<header>
+			<h3>{walletTypeToName(walletType)}</h3>
+		</header>
+
 		<div data-column="gap-4">
 			{#each ladderDefinition.stages as s, index}
 				{@const stageIndex = index}

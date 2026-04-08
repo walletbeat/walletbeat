@@ -10,6 +10,7 @@
 	// Types/constants
 	import type { MaybeUnratedScore } from '@/schema/score'
 	import type { RatedWallet } from '@/schema/wallet'
+	import { walletTypeToName } from '@/schema/wallet-types'
 	import { scoreToColor } from '@/utils/colors'
 
 
@@ -28,9 +29,9 @@
 
 
 	// Derived
-	import { getWalletStageAndLadder } from '@/utils/stage'
-	const { stage, ladderEvaluation } = $derived(
-		getWalletStageAndLadder(wallet)
+	import { getWalletStagesByType } from '@/utils/stage'
+	const stagesByType = $derived(
+		getWalletStagesByType(wallet)
 	)
 
 
@@ -65,9 +66,16 @@
 
 	<div data-column="center gap-2">
 		{#if summaryType === WalletSummaryType.Stage}
-			{#if stage !== null && ladderEvaluation !== null}
+			{#if stagesByType.length > 0}
 				Walletbeat stage:
-				<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+				<div data-row="center gap-2 wrap">
+					{#each stagesByType as { walletType, stage, ladderEvaluation } (walletType)}
+						<div data-column="center gap-1">
+							<small>{walletTypeToName(walletType)}</small>
+							<WalletStageBadge {stage} {ladderEvaluation} size="large" />
+						</div>
+					{/each}
+				</div>
 			{:else}
 				Walletbeat score:
 				<ScoreBadge {score} size="large" />

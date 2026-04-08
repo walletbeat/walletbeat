@@ -1,8 +1,8 @@
 import type { AttributeTree } from '@/schema/attribute-groups'
 import type { WalletEmbeddedFeatures } from '@/schema/features'
-import { softwareLadders } from '@/schema/ladders'
-import type { Variant } from '@/schema/variants'
-import { type BaseWallet, rateWallet } from '@/schema/wallet'
+import { allWalletLadders } from '@/schema/ladders'
+import { type AtLeastOneTrueVariant, Variant } from '@/schema/variants'
+import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { AttributeGroupId, attributeTreeForIds } from './attribute-groups'
 import { unratedEmbeddedTemplate } from './embedded-wallets/unrated.tmpl'
@@ -30,7 +30,7 @@ export const embeddedWalletAttributeTree = attributeTreeForIds(
  */
 export type EmbeddedWallet = BaseWallet<EmbeddedAttributeGroupId> & {
 	features: WalletEmbeddedFeatures
-	variants: {
+	variants: AtLeastOneTrueVariant & {
 		[Variant.EMBEDDED]: true
 	}
 }
@@ -40,13 +40,13 @@ export const embeddedWallets: Record<string, EmbeddedWallet> = {}
 export const ratedEmbeddedWallets = Object.fromEntries(
 	Object.entries(embeddedWallets).map(([name, wallet]) => [
 		name,
-		rateWallet(embeddedWalletAttributeTree, softwareLadders, wallet),
+		rateWallet(embeddedWalletAttributeTree, allWalletLadders, wallet),
 	]),
-)
+) satisfies Record<string, RatedWallet<string>>
 
 /** The unrated embedded wallet as a rated wallet. */
 export const unratedEmbeddedWallet = rateWallet(
 	embeddedWalletAttributeTree,
-	softwareLadders,
+	allWalletLadders,
 	unratedEmbeddedTemplate,
 )

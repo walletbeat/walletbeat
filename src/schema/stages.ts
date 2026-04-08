@@ -30,7 +30,7 @@ import { type RatedWallet, type ResolvedWallet } from './wallet'
  */
 export type StageEvaluatableWallet<_AttributeGroupId extends string> = Omit<
 	RatedWallet<_AttributeGroupId>,
-	'metadata' | 'ladders'
+	'metadata' | 'ladders' | 'stagesByType'
 >
 
 /**

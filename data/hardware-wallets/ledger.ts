@@ -22,7 +22,6 @@ import {
 } from '@/schema/features/security/transaction-legibility'
 import { notSupported, supported } from '@/schema/features/support'
 import { refTodo, type WithRef } from '@/schema/reference'
-import { Variant } from '@/schema/variants'
 import type { WalletMetadata } from '@/schema/wallet'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
@@ -213,7 +212,7 @@ export const ledgerWallet: HardwareWallet = {
 		},
 	},
 	variants: {
-		[Variant.HARDWARE]: true,
+		HARDWARE: true,
 	},
 }
 

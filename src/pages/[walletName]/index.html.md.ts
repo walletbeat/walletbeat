@@ -2,7 +2,7 @@ import type { APIRoute, GetStaticPaths } from 'astro'
 
 import { getBaseUrl } from '@/base-url'
 import { attributeGroupById } from '@/data/attribute-groups'
-import { allRatedWallets, isValidWalletName } from '@/data/wallets'
+import { allRatedWallets, isValidWalletSlug } from '@/data/wallets'
 import { nonEmptyKeys, nonEmptyMap } from '@/types/utils/non-empty'
 import { walletPageMarkdown } from '@/utils/wallet-page-markdown'
 
@@ -15,7 +15,7 @@ export const getStaticPaths: GetStaticPaths = () =>
 export const GET: APIRoute = ({ params }) => {
 	const { walletName } = params
 
-	if (walletName === undefined || !isValidWalletName(walletName)) {
+	if (walletName === undefined || !isValidWalletSlug(walletName)) {
 		return new Response('Not found', { status: 404 })
 	}
 

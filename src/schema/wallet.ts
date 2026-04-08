@@ -29,7 +29,7 @@ import type { WalletDeveloper } from './entity'
 import { type ResolvedFeatures, resolveFeatures, type WalletBaseFeatures } from './features'
 import { type AccountType, supportedAccountTypes } from './features/account-support'
 import type { HardwareWalletManufactureType, HardwareWalletModel } from './features/profile'
-import type { Ladders, WalletLadderType } from './ladders'
+import type { Ladders } from './ladders'
 import {
 	evaluateWalletOnLadder,
 	type StageEvaluatableWallet,
@@ -44,7 +44,7 @@ import {
 	Variant,
 	variantEnum,
 } from './variants'
-import { type WalletType, walletTypesOf } from './wallet-types'
+import { mapWalletTypes, WalletType, walletTypesOf } from './wallet-types'
 
 /** A contributor to walletbeat. */
 export interface Contributor {
@@ -303,7 +303,17 @@ export interface RatedWallet<_AttributeGroupId extends string> {
 	 * When displayed on the interface, it is expected that the interface code
 	 * will select the evaluation on the ladder(s) that makes sense to display.
 	 */
-	ladders: Record<WalletLadderType, WalletLadderEvaluation<_AttributeGroupId>>
+	ladders: Partial<Record<WalletType, WalletLadderEvaluation<_AttributeGroupId>>>
+
+	/**
+	 * Explicit stage evaluation slot for every wallet type.
+	 *
+	 * This is distinct from `ladders`: a wallet can be assigned multiple
+	 * `WalletType`s, but the site may not yet define a ladder for each one.
+	 * `null` therefore means either "this wallet is not of that type" or
+	 * "that type does not yet have a ladder definition".
+	 */
+	stagesByType: Record<WalletType, WalletLadderEvaluation<_AttributeGroupId> | null>
 
 	/** Overrides for specific attributes. */
 	overrides?: WalletOverrides<_AttributeGroupId>
@@ -434,16 +444,38 @@ export function rateWallet<_AttributeGroupId extends string>(
 		overall: aggregateAttributes(attributeGroupById, perVariantTree),
 		overrides: wallet.overrides,
 	}
+	const evaluateLadder = (ladder: NonNullable<Ladders<_AttributeGroupId>[WalletType]>) => {
+		try {
+			return evaluateWalletOnLadder(stageEvaluatable, ladder)
+		} catch (e) {
+			throw new Error(`Wallet ${wallet.metadata.id}: ${getErrorMessage(e)}`)
+		}
+	}
+	const ladders = Object.values(WalletType).reduce<
+		Partial<Record<WalletType, WalletLadderEvaluation<_AttributeGroupId>>>
+	>((acc, walletType) => {
+		const ladder = walletLadders[walletType]
+
+		return ladder === undefined
+			? acc
+			: {
+					...acc,
+					[walletType]: evaluateLadder(ladder),
+				}
+	}, {})
 
 	return {
 		metadata: wallet.metadata,
 		...stageEvaluatable,
-		ladders: nonEmptyRemap(walletLadders, (_, ladder) => {
-			try {
-				return evaluateWalletOnLadder(stageEvaluatable, ladder)
-			} catch (e) {
-				throw new Error(`Wallet ${wallet.metadata.id}: ${getErrorMessage(e)}`)
+		ladders,
+		stagesByType: mapWalletTypes(walletType => {
+			const ladder = walletLadders[walletType]
+
+			if (ladder === undefined || !stageEvaluatable.types[walletType]) {
+				return null
 			}
+
+			return ladders[walletType] ?? evaluateLadder(ladder)
 		}),
 	}
 }

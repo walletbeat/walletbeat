@@ -1,7 +1,7 @@
 import type { AttributeTree } from '@/schema/attribute-groups'
 import type { WalletHardwareFeatures } from '@/schema/features'
-import { softwareLadders } from '@/schema/ladders'
-import type { Variant } from '@/schema/variants'
+import { allWalletLadders } from '@/schema/ladders'
+import { type AtLeastOneTrueVariant, Variant } from '@/schema/variants'
 import { type BaseWallet, type RatedWallet, rateWallet } from '@/schema/wallet'
 
 import { AttributeGroupId, attributeTreeForIds } from './attribute-groups'
@@ -41,7 +41,7 @@ export const hardwareWalletAttributeTree = attributeTreeForIds(
  */
 export type HardwareWallet = BaseWallet<HardwareAttributeGroupId> & {
 	features: WalletHardwareFeatures
-	variants: {
+	variants: AtLeastOneTrueVariant & {
 		[Variant.HARDWARE]: true
 	}
 }
@@ -73,23 +73,21 @@ export function isValidHardwareWalletName(name: string): name is HardwareWalletN
 export const ratedHardwareWallets = Object.fromEntries(
 	Object.entries(hardwareWallets).map(([name, wallet]) => [
 		name,
-		rateWallet<HardwareAttributeGroupId>(hardwareWalletAttributeTree, softwareLadders, wallet),
+		rateWallet(hardwareWalletAttributeTree, allWalletLadders, wallet),
 	]),
-) satisfies Record<string, RatedWallet<HardwareAttributeGroupId>>
+) satisfies Record<string, RatedWallet<string>>
 
 /**
  * Map the given function to all rated hardware wallets.
  */
-export function mapHardwareWallets<T>(
-	fn: (wallet: RatedWallet<HardwareAttributeGroupId>, index: number) => T,
-): T[] {
+export function mapHardwareWallets<T>(fn: (wallet: RatedWallet<string>, index: number) => T): T[] {
 	return Object.values(ratedHardwareWallets).map(fn)
 }
 
 /** The unrated hardware wallet as a rated wallet. */
 export const unratedHardwareWallet = rateWallet<HardwareAttributeGroupId>(
 	hardwareWalletAttributeTree,
-	softwareLadders,
+	allWalletLadders,
 	unratedHardwareTemplate,
 )
 

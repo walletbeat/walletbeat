@@ -1,7 +1,7 @@
 import { describe } from 'vitest'
 
 import { variantToName } from '@/constants/variants'
-import { attributeGroupById, AttributeGroupId } from '@/data/attribute-groups'
+import { attributeGroupById } from '@/data/attribute-groups'
 import { allRatedWallets } from '@/data/wallets'
 import {
 	type AttributeGroup,
@@ -33,13 +33,13 @@ describe('evaluations', () => {
 		attribute: Attribute<_OutcomeMetadata>
 		perRating: Map<Rating, NamedEvaluation<_OutcomeMetadata>[]>
 	}
-	type PerGroup<_AttributeGroupId extends AttributeGroupId> = {
+	type PerGroup<_AttributeGroupId extends string> = {
 		attributeGroup: AttributeGroup<_AttributeGroupId>
 		attributes: Map<string, PerAttribute<OutcomeMetadata>>
 	}
-	const evaluationsPerGroup: Map<string, PerGroup<AttributeGroupId>> = new Map()
+	const evaluationsPerGroup: Map<string, PerGroup<string>> = new Map()
 	const addEvaluation = <
-		_AttributeGroupId extends AttributeGroupId,
+		_AttributeGroupId extends string,
 		_OutcomeMetadata extends OutcomeMetadata,
 	>(
 		attrGroup: AttributeGroup<_AttributeGroupId>,

@@ -5,11 +5,13 @@ import type { RatedWallet } from '@/schema/wallet'
 import { WalletType } from '@/schema/wallet-types'
 import { walletBlurbText } from '@/utils/wallet-page-markdown'
 
-function walletEntry(wallet: RatedWallet<string>, siteUrl: string): string {
+function walletEntry(wallet: RatedWallet<string>, siteUrl: string, includeLink: boolean): string {
 	const blurb = walletBlurbText(wallet)
 	const url = `${siteUrl}/${wallet.metadata.id}/index.html.md`
 
-	return `- [${wallet.metadata.displayName}](${url}): ${blurb}`
+	return includeLink
+		? `- [${wallet.metadata.displayName}](${url}): ${blurb}`
+		: `- ${wallet.metadata.displayName}: ${blurb} See the wallet page linked above.`
 }
 
 export function llmsTxtBody(siteUrl: string): string {
@@ -23,6 +25,7 @@ export function llmsTxtBody(siteUrl: string): string {
 			w.types[WalletType.SOFTWARE] !== true &&
 			w.types[WalletType.HARDWARE] !== true,
 	)
+	const linkedWalletIds = new Set<string>()
 
 	const lines: string[] = []
 
@@ -51,7 +54,8 @@ export function llmsTxtBody(siteUrl: string): string {
 		lines.push('')
 
 		for (const wallet of softwareWallets) {
-			lines.push(walletEntry(wallet, siteUrl))
+			lines.push(walletEntry(wallet, siteUrl, !linkedWalletIds.has(wallet.metadata.id)))
+			linkedWalletIds.add(wallet.metadata.id)
 		}
 
 		lines.push('')
@@ -62,7 +66,8 @@ export function llmsTxtBody(siteUrl: string): string {
 		lines.push('')
 
 		for (const wallet of hardwareWallets) {
-			lines.push(walletEntry(wallet, siteUrl))
+			lines.push(walletEntry(wallet, siteUrl, !linkedWalletIds.has(wallet.metadata.id)))
+			linkedWalletIds.add(wallet.metadata.id)
 		}
 
 		lines.push('')
@@ -73,7 +78,8 @@ export function llmsTxtBody(siteUrl: string): string {
 		lines.push('')
 
 		for (const wallet of embeddedWallets) {
-			lines.push(walletEntry(wallet, siteUrl))
+			lines.push(walletEntry(wallet, siteUrl, !linkedWalletIds.has(wallet.metadata.id)))
+			linkedWalletIds.add(wallet.metadata.id)
 		}
 
 		lines.push('')
