@@ -38,12 +38,8 @@ import type {
 } from '@/schema/features/security/scam-alerts'
 import type { SecurityAudit } from '@/schema/features/security/security-audits'
 import {
-	BrowserExtensionPermission,
-	ExternalExtensionIdScope,
-	HostPermissionScope,
 	KeyStorageMechanism,
 	SecureRngSource,
-	WebAccessibleResourcesScope,
 } from '@/schema/features/security/security-best-practices'
 import {
 	BasicBenchmarkTransactions,
@@ -65,6 +61,7 @@ import { FOSSLicense, LicensingType } from '@/schema/features/transparency/licen
 import { type References, refTodo, type WithRef } from '@/schema/reference'
 import { Variant } from '@/schema/variants'
 import type { SoftwareWallet } from '@/schema/wallet'
+import { parseBrowserExtensionManifest } from '@/tools/manifest-collector/browser-ext-manifest-parser'
 import { paragraph } from '@/types/content'
 import type { CalendarDate } from '@/types/date'
 
@@ -78,6 +75,7 @@ import { pimlico } from '../entities/pimlico'
 import { sentry } from '../entities/sentry'
 import { ambireAccountContract } from '../wallet-contracts/ambire-account'
 import { ambireDelegatorContract } from '../wallet-contracts/ambire-delegator'
+import ambireRawExtManifest from './manifests/ambire/ehgjhhccekdedpbkifaojjaefeohnoea.manifest.json'
 
 const ambireTransactionDisplayDefault: DisplayedBasicTransactionDetails = {
 	chain: DataDisplayOptions.SHOWN_BY_DEFAULT,
@@ -645,25 +643,7 @@ export const ambire: SoftwareWallet = {
 			securityBestPractices: {
 				browser: {
 					ref: refTodo,
-					browserExtensionHardening: {
-						contentScripts: HostPermissionScope.NONE,
-						externallyConnectable: {
-							extensionIds: ExternalExtensionIdScope.ANY,
-							pageMatches: HostPermissionScope.NONE,
-						},
-						hostPermissions: HostPermissionScope.UNRESTRICTED,
-						permissions: [
-							BrowserExtensionPermission.STORAGE,
-							BrowserExtensionPermission.TABS,
-							BrowserExtensionPermission.UNLIMITED_STORAGE,
-							BrowserExtensionPermission.ACTIVE_TAB,
-							BrowserExtensionPermission.NOTIFICATIONS,
-							BrowserExtensionPermission.SCRIPTING,
-							BrowserExtensionPermission.ALARMS,
-							BrowserExtensionPermission.SYSTEM_DISPLAY,
-						],
-						webAccessibleResources: WebAccessibleResourcesScope.NONE,
-					},
+					browserExtensionHardening: parseBrowserExtensionManifest(ambireRawExtManifest),
 					keyStorageMechanism: KeyStorageMechanism.ENCRYPTED_WITH_USER_SECRET_STANDARDIZED_KDF,
 					secureRng: SecureRngSource.OS_CSPRNG,
 				},
