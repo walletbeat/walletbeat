@@ -7,7 +7,6 @@
 		arcLabel: string
 		titleText: string
 		href?: string
-		opacity?: number
 		children?: Slice[]
 	}
 
@@ -277,7 +276,6 @@
 			style:--slice-outerSweep={slice.computed.outerSweep}
 			style:--slice-innerSweep={slice.computed.innerSweep}
 			style:--slice-fill={slice.color}
-			style:--slice-opacity={slice.opacity ?? 1}
 			data-slice-id={slice.id}
 			class:highlighted={highlightedSliceId === slice.id}
 		>
