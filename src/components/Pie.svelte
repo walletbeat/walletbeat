@@ -242,50 +242,46 @@
 
 
 {#snippet Slice(slice: ComputedSlice)}
-	{#snippet SliceContent(slice: ComputedSlice)}
-		<svelte:element
-			this={slice.href ? 'a' : 'div'}
-			href={slice.href}
-			class="slice"
-			role="button"
-			tabindex="0"
-			aria-label={slice.titleText}
-			onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
-			onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
-			onfocus={() => { onSliceFocus?.(slice.id) }}
-			onblur={() => { onSliceBlur?.(slice.id) }}
-			onclick={e => {
-				e.stopPropagation()
+	<svelte:element
+		this={slice.href ? 'a' : 'div'}
+		href={slice.href}
+		class="slice"
+		role="button"
+		tabindex="0"
+		aria-label={slice.titleText}
+		onmouseenter={() => { onSliceMouseEnter?.(slice.id) }}
+		onmouseleave={() => { onSliceMouseLeave?.(slice.id) }}
+		onfocus={() => { onSliceFocus?.(slice.id) }}
+		onblur={() => { onSliceBlur?.(slice.id) }}
+		onclick={e => {
+			e.stopPropagation()
+			onSliceClick?.(slice.id)
+		}}
+		onkeydown={e => {
+			if (e.code === 'Enter' || e.code === 'Space')
 				onSliceClick?.(slice.id)
-			}}
-			onkeydown={e => {
-				if (e.code === 'Enter' || e.code === 'Space')
-					onSliceClick?.(slice.id)
-			}}
+		}}
 
-			style:--slice-midAngle={slice.computed.midAngle}
-			style:--slice-offset={slice.computed.offset}
-			style:--slice-gap={slice.computed.gap}
-			style:--slice-outerR={slice.computed.outerR}
-			style:--slice-innerR={slice.computed.innerR}
-			style:--slice-cornerRadius={slice.computed.cornerRadius}
-			style:--slice-totalAngle={slice.computed.totalAngle}
-			style:--slice-arcSize={Math.abs(slice.computed.totalAngle) > 180 ? 'large' : 'small'}
-			style:--slice-fill={slice.color}
-			class:full-ring={Math.abs(slice.computed.totalAngle) >= 359.99}
+		style:--slice-midAngle={slice.computed.midAngle}
+		style:--slice-offset={slice.computed.offset}
+		style:--slice-gap={slice.computed.gap}
+		style:--slice-outerR={slice.computed.outerR}
+		style:--slice-innerR={slice.computed.innerR}
+		style:--slice-cornerRadius={slice.computed.cornerRadius}
+		style:--slice-totalAngle={slice.computed.totalAngle}
+		style:--slice-arcSize={Math.abs(slice.computed.totalAngle) > 180 ? 'large' : 'small'}
+		style:--slice-fill={slice.color}
+		class:full-ring={Math.abs(slice.computed.totalAngle) >= 359.99}
 
-			data-slice-id={slice.id}
-			class:highlighted={highlightedSliceId === slice.id}
+		data-slice-id={slice.id}
+		class:highlighted={highlightedSliceId === slice.id}
+	>
+		<div
+			class="slice-shape"
 		>
-			<div
-				class="slice-shape"
-			>
-				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
-			</div>
-		</svelte:element>
-	{/snippet}
-
-	{@render SliceContent(slice)}
+			<span class="label" aria-hidden="true">{slice.arcLabel}</span>
+		</div>
+	</svelte:element>
 
 	{#if slice.children?.length}
 		{#each slice.children as childSlice (childSlice.id)}
