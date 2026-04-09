@@ -251,8 +251,8 @@ function evaluateExternallyConnectable(
 					'{{WALLET_NAME}} does not expose a direct message channel to web pages or other extensions.',
 				),
 			},
-			details: paragraph(
-				'{{WALLET_NAME}} does not declare externally_connectable, so no web page or external extension can send it messages directly.',
+			details: mdParagraph(
+				'{{WALLET_NAME}} does not declare `externally_connectable`, so no web page or external extension can send it messages directly.',
 			),
 		})
 	}
@@ -272,8 +272,8 @@ function evaluateExternallyConnectable(
 					'{{WALLET_NAME}} allows any extension or web page to send it wallet messages directly.',
 				),
 			},
-			details: paragraph(
-				`{{WALLET_NAME}}'s externally_connectable is open to ${
+			details: mdParagraph(
+				`{{WALLET_NAME}}'s \`externally_connectable\` is open to ${
 					extensionIds === ExternalExtensionIdScope.ANY
 						? 'any installed extension'
 						: 'all origins including non-web schemes'
@@ -313,15 +313,15 @@ function evaluateExternallyConnectable(
 				'{{WALLET_NAME}} restricts external message connections to specific trusted extensions and HTTPS pages.',
 			),
 		},
-		details: paragraph(
-			'{{WALLET_NAME}} restricts externally_connectable to specific named extension IDs and HTTPS origins, limiting who can send it direct messages.',
+		details: mdParagraph(
+			'{{WALLET_NAME}} restricts `externally_connectable` to specific named extension IDs and HTTPS origins, limiting who can send it direct messages.',
 		),
 	})
 }
 
 const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL | Rating.PASS> = {
 	// Benign or wallet-typical permissions.
-	// Grants access only to the currently active tab when the user invokes the extension, needed for dApp injection.
+	// Grants access only to the currently active tab when the user invokes the extension, needed for app injection.
 	[BrowserExtensionPermission.ACTIVE_TAB]: Rating.PASS,
 	// Schedules periodic background tasks, used for network polling, lock timers, and session expiry.
 	[BrowserExtensionPermission.ALARMS]: Rating.PASS,
@@ -333,7 +333,7 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.COOKIES]: Rating.PASS,
 	// Declaratively blocks or redirects requests without seeing their content, used for ad/tracker blocking in privacy-focused wallets.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST]: Rating.PASS,
-	// Same as above but also applies to host-matched pages, used when rules must cover specific dApp domains.
+	// Same as above but also applies to host-matched pages, used when rules must cover specific app domains.
 	[BrowserExtensionPermission.DECLARATIVE_NET_REQUEST_WITH_HOST_ACCESS]: Rating.PASS,
 	// Firebase Cloud Messaging for push notifications, used to deliver transaction alerts.
 	[BrowserExtensionPermission.GCM]: Rating.PASS,
@@ -345,7 +345,7 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.NOTIFICATIONS]: Rating.PASS,
 	// Creates an off-screen document for DOM operations without a visible window, used for background cryptographic work.
 	[BrowserExtensionPermission.OFFSCREEN]: Rating.PASS,
-	// Injects scripts into web pages, required for dApp content-script injection.
+	// Injects scripts into web pages, required for app content-script injection.
 	[BrowserExtensionPermission.SCRIPTING]: Rating.PASS,
 	// Opens the extension in the browser side panel, used for a persistent wallet UI alongside web pages.
 	[BrowserExtensionPermission.SIDE_PANEL]: Rating.PASS,
@@ -355,7 +355,7 @@ const browserPermissionRatings: Record<BrowserExtensionPermission, Rating.FAIL |
 	[BrowserExtensionPermission.SYSTEM_CPU]: Rating.PASS,
 	// Reads connected display info, used for responsive UI layout across monitor configurations.
 	[BrowserExtensionPermission.SYSTEM_DISPLAY]: Rating.PASS,
-	// Access to tab metadata (URL, title), used to detect active dApps and switch network contexts.
+	// Access to tab metadata (URL, title), used to detect active apps and switch network contexts.
 	[BrowserExtensionPermission.TABS]: Rating.PASS,
 	// Removes the 5 MB storage cap, required for wallets that cache chain data or transaction history locally.
 	[BrowserExtensionPermission.UNLIMITED_STORAGE]: Rating.PASS,
@@ -513,7 +513,7 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 	[AndroidPermission.INTERNET]: Rating.PASS,
 	// Checks connectivity before making network requests, avoiding unnecessary failures.
 	[AndroidPermission.ACCESS_NETWORK_STATE]: Rating.PASS,
-	// Camera access for QR code scanning, the standard way to input addresses and connect to dApps.
+	// Camera access for QR code scanning, the standard way to input addresses and connect to apps.
 	[AndroidPermission.CAMERA]: Rating.PASS,
 	// Bluetooth communication with hardware wallets (Android < 12).
 	[AndroidPermission.BLUETOOTH]: Rating.PASS,
@@ -537,7 +537,7 @@ const androidPermissionRatings: Record<AndroidPermission, Rating.PASS | Rating.F
 
 const iosPermissionRatings: Record<IosUsageDescription, Rating.PASS | Rating.FAIL> = {
 	// Necessary or wallet-typical permissions.
-	// Camera access for QR code scanning, the standard way to input addresses and connect to dApps.
+	// Camera access for QR code scanning, the standard way to input addresses and connect to apps.
 	[IosUsageDescription.CAMERA]: Rating.PASS,
 	// Face ID biometric authentication, used to unlock the wallet without a PIN.
 	[IosUsageDescription.FACE_ID]: Rating.PASS,
@@ -798,7 +798,7 @@ export const securityBestPractices: Attribute<SecurityBestPracticesValue> = {
 			),
 			exampleRating(
 				mdParagraph(
-					'(Mobile app) The app requests high-risk OS permissions such as draw-over-other-apps.',
+					'(Mobile app) The app requests high-risk OS permissions such as drawing over other apps.',
 				),
 				evaluateMobileApp(
 					EvaluationContext.forTest(() => securityBestPractices),
