@@ -21,7 +21,8 @@
 		innerRadiusFraction: number
 		offset?: number
 		gap: number
-		angleGap: number
+		anglePadding?: number
+		angleGap?: number
 		cornerRadius?: number
 		labelSize?: number
 	}
@@ -67,6 +68,7 @@
 				outerRadiusFraction: 0.6,
 				innerRadiusFraction: 0.5,
 				gap: 8,
+				anglePadding: 0,
 				angleGap: 0,
 				cornerRadius: 10,
 			},
@@ -74,6 +76,7 @@
 				outerRadiusFraction: 1.1,
 				innerRadiusFraction: 1.0,
 				gap: 4,
+				anglePadding: 0,
 				angleGap: 0,
 				cornerRadius: 8,
 			},
@@ -144,15 +147,15 @@
 
 		const orientation = Math.sign(endAngle - startAngle)
 
-		const angleGap = levelConfig.angleGap * orientation
-		const totalGapAngle = angleGap * (slices.length - 1)
+		const anglePadding = levelConfig.anglePadding ?? 0
+		const angleGap = levelConfig.angleGap ?? 0
+		const totalGapAngle = angleGap * Math.max(slices.length - 1, 0)
 
-		const angleInsetFromGap = angleGap / 2
-		const angleInsetFromParentGap = parentLevelConfig ? (Math.asin((levelConfig.gap / 2) / outerR) - Math.asin((parentLevelConfig.gap / 2) / outerR)) * 180 / Math.PI * orientation : 0
+		const angleInsetFromParentGap = parentLevelConfig ? (Math.asin((levelConfig.gap / 2) / outerR) - Math.asin((parentLevelConfig.gap / 2) / outerR)) * 180 / Math.PI : 0
 
-		const effectiveStartAngle = startAngle + (angleInsetFromGap + angleInsetFromParentGap) * orientation
-		const effectiveEndAngle = endAngle - (angleInsetFromGap + angleInsetFromParentGap) * orientation
-		const effectiveTotalAngle = effectiveEndAngle - effectiveStartAngle - totalGapAngle * orientation
+		const effectiveStartAngle = startAngle + orientation * (anglePadding / 2 + angleInsetFromParentGap)
+		const effectiveEndAngle = endAngle - orientation * (anglePadding / 2 + angleInsetFromParentGap)
+		const effectiveTotalAngle = effectiveEndAngle - effectiveStartAngle - orientation * totalGapAngle
 
 		const totalWeight = slices.reduce((acc, slice) => acc + slice.weight, 0)
 
@@ -164,7 +167,7 @@
 			const endAngle = currentAngle + totalAngle
 			const midAngle = startAngle + totalAngle / 2
 
-			currentAngle = endAngle + (i < slices.length - 1 ? angleGap * orientation : 0)
+			currentAngle = endAngle + (i < slices.length - 1 ? orientation * angleGap : 0)
 
 			return {
 				...slice,
