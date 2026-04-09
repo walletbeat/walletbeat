@@ -23,6 +23,7 @@
 		gap: number
 		angleGap: number
 		cornerRadius?: number
+		labelSize?: number
 	}
 
 	// (Internal)
@@ -36,6 +37,7 @@
 			gap: number
 			level: number
 			offset: number
+			labelSize: number
 		}
 		children?: ComputedSlice[]
 	}
@@ -175,6 +177,7 @@
 					level,
 					offset: levelConfig.offset ?? 0,
 					gap: levelConfig.gap,
+					labelSize: levelConfig.labelSize ?? labelSize,
 				},
 				...children && {
 					children: (
@@ -273,8 +276,10 @@
 		style:--slice-cornerRadius={slice.computed.cornerRadius}
 		style:--slice-totalAngle={slice.computed.totalAngle}
 		style:--slice-arcSize={Math.abs(slice.computed.totalAngle) > 180 ? 'large' : 'small'}
-		style:--slice-fill={slice.color}
 		class:full-ring={Math.abs(slice.computed.totalAngle) >= 359.99}
+
+		style:--slice-fill={slice.color}
+		style:--slice-labelSize={slice.computed.labelSize}
 
 		data-slice-id={slice.id}
 		class:highlighted={highlightedSliceId === slice.id}
@@ -375,6 +380,7 @@
 				--slice-strokeColor: transparent;
 				--slice-strokeWidth: 0px;
 				--slice-offset: 0;
+				--slice-labelSize: var(--pie-labelSize);
 
 				display: grid;
 
@@ -613,7 +619,7 @@
 						text-align: center;
 						line-height: 1;
 						color: currentColor;
-						font-size: calc(var(--pie-labelSize) * 1px);
+						font-size: calc(var(--slice-labelSize) * 1px);
 						translate: -50% calc(-50% + (var(--slice-labelR) * -1px));
 						rotate: calc(-1 * (var(--pie-rotate) + var(--slice-midAngle) * 1deg));
 						transition-property: translate, rotate, filter;
