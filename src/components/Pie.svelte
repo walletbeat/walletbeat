@@ -247,7 +247,9 @@
 
 {#snippet Slice(slice: ComputedSlice)}
 	{#snippet SliceContent(slice: ComputedSlice)}
-		<div
+		<svelte:element
+			this={slice.href ? 'a' : 'div'}
+			href={slice.href}
 			class="slice"
 			role="button"
 			tabindex="0"
@@ -284,20 +286,10 @@
 			>
 				<span class="label" aria-hidden="true">{slice.arcLabel}</span>
 			</div>
-		</div>
+		</svelte:element>
 	{/snippet}
 
-	{#if slice.href}
-		<a
-			class="slice-link"
-			href={slice.href}
-			data-link="contents"
-		>
-			{@render SliceContent(slice)}
-		</a>
-	{:else}
-		{@render SliceContent(slice)}
-	{/if}
+	{@render SliceContent(slice)}
 
 	{#if slice.children?.length}
 		{#each slice.children as childSlice (childSlice.id)}
