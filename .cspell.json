@@ -461,7 +461,7 @@
 		{ "name": "CIDv1", "pattern": "/\\bbafy\\w+/g" },
 		{
 			"name": "Chrome extension IDs",
-			"pattern": "/chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b/g"
+			"pattern": "/(?:chrome\\.google\\.com\\/webstore\\/[^\\s]*\\/[a-z]{32}\\b|\\b[a-z]{32}\\.manifest\\.json)/g"
 		},
 		{ "name": "Hexadecimal addresses", "pattern": "/\\b0x(?:addr)?[0-9a-f]+\\b/gi" }
 	],
