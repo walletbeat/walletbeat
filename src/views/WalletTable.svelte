@@ -970,13 +970,15 @@
 										outerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.7 : 0.65,
 										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.3 : 0.1,
 										gap: 4,
-										angleGap: 0
+										angleGap: 0,
+										cornerRadius: 12,
 									},
 									{
 										outerRadiusFraction: 1,
 										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.725 : 0.675,
 										gap: 2,
 										angleGap: 0,
+										cornerRadius: 8,
 									}
 								]}
 
@@ -1192,7 +1194,8 @@
 										outerRadiusFraction: 1,
 										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Icon) ? 0.3 : 0.166,
 										gap: 3,
-										angleGap: 0
+										angleGap: 0,
+										cornerRadius: 12,
 									}
 								]}
 								padding={4}
@@ -1353,6 +1356,7 @@
 											),
 											gap: 0,
 											angleGap: 0,
+											cornerRadius: 12,
 										}
 									]
 								}
