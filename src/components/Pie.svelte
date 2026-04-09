@@ -396,24 +396,10 @@
 				--slice-scale: 1;
 				--slice-strokeColor: transparent;
 				--slice-strokeWidth: 0px;
-				--slice-filter:
-					brightness(var(--slice-brightness))
-				;
-				--slice-hover-filter:
-					brightness(var(--slice-brightness))
-					drop-shadow(var(--slice-strokeWidth) 0 var(--slice-strokeColor))
-					drop-shadow(0 calc(-1 * var(--slice-strokeWidth)) var(--slice-strokeColor))
-					drop-shadow(calc(-1 * var(--slice-strokeWidth)) 0 var(--slice-strokeColor))
-					drop-shadow(0 var(--slice-strokeWidth) var(--slice-strokeColor))
-				;
 
 				display: grid;
 
-				filter: var(--slice-filter);
-
 				pointer-events: none;
-				transition-property: filter;
-				will-change: filter;
 
 				> * {
 					pointer-events: auto;
@@ -431,6 +417,14 @@
 					--slice-strokeColor: var(--highlight-color);
 					--slice-strokeWidth: var(--highlight-strokeWidth);
 					--slice-filter: var(--slice-hover-filter);
+
+					filter:
+						brightness(var(--slice-brightness))
+						drop-shadow(var(--slice-strokeWidth) 0 var(--slice-strokeColor))
+						drop-shadow(0 calc(-1 * var(--slice-strokeWidth)) var(--slice-strokeColor))
+						drop-shadow(calc(-1 * var(--slice-strokeWidth)) 0 var(--slice-strokeColor))
+						drop-shadow(0 var(--slice-strokeWidth) var(--slice-strokeColor))
+					;
 				}
 
 				&:focus-within {
