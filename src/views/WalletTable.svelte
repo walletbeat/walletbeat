@@ -967,18 +967,29 @@
 								radius={80}
 								levels={[
 									{
-										outerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.7 : 0.65,
-										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.3 : 0.1,
+										outerRadiusFraction: 1,
+										innerRadiusFraction: (
+											(summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage || summaryVisualization === SummaryVisualization.Icon) ?
+												0.15
+											:
+												0.1
+										),
 										gap: 4,
-										angleGap: 0,
-										cornerRadius: 12,
+										angleGap: 5,
+										offset: 3,
+										outerCornerRadius: 28,
+										innerCornerRadius: 16,
 									},
 									{
-										outerRadiusFraction: 1,
-										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Stage) ? 0.725 : 0.675,
-										gap: 2,
-										angleGap: 0,
-										cornerRadius: 8,
+										outerRadiusFraction: 0.45,
+										innerRadiusFraction: 0.1,
+										gap: 0,
+										anglePadding: -20,
+										angleGap: -30,
+										offset: 80,
+										outerCornerRadius: 8,
+										innerCornerRadius: 8,
+										labelSize: 11,
 									}
 								]}
 
@@ -1194,10 +1205,18 @@
 								levels={[
 									{
 										outerRadiusFraction: 1,
-										innerRadiusFraction: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Icon) ? 0.3 : 0.166,
+										innerRadiusFraction: (
+											summaryVisualization === SummaryVisualization.ScoreDot ?
+												0.33
+											: (summaryVisualization === SummaryVisualization.Score || summaryVisualization === SummaryVisualization.Icon) ?
+												0.3
+											:
+												0.166
+										),
 										gap: 3,
 										angleGap: 0,
-										cornerRadius: 12,
+										outerCornerRadius: 12,
+										innerCornerRadius: 12,
 									}
 								]}
 								padding={4}
@@ -1358,7 +1377,8 @@
 											),
 											gap: 0,
 											angleGap: 0,
-											cornerRadius: 12,
+											outerCornerRadius: 2,
+											innerCornerRadius: 2,
 										}
 									]
 								}
