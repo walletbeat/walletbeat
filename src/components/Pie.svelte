@@ -23,7 +23,8 @@
 		gap: number
 		anglePadding?: number
 		angleGap?: number
-		cornerRadius?: number
+		outerCornerRadius?: number
+		innerCornerRadius?: number
 		labelSize?: number
 	}
 
@@ -34,7 +35,8 @@
 			midAngle: number
 			outerR: number
 			innerR: number
-			cornerRadius: number
+			outerCornerRadius: number
+			innerCornerRadius: number
 			gap: number
 			level: number
 			offset: number
@@ -70,7 +72,8 @@
 				gap: 8,
 				anglePadding: 0,
 				angleGap: 0,
-				cornerRadius: 10,
+				outerCornerRadius: 10,
+				innerCornerRadius: 10,
 			},
 			{
 				outerRadiusFraction: 1.1,
@@ -78,7 +81,8 @@
 				gap: 4,
 				anglePadding: 0,
 				angleGap: 0,
-				cornerRadius: 8,
+				outerCornerRadius: 8,
+				innerCornerRadius: 8,
 			},
 		],
 
@@ -176,7 +180,8 @@
 					midAngle,
 					outerR,
 					innerR,
-					cornerRadius: levelConfig.cornerRadius ?? levelConfig.gap / 2,
+					outerCornerRadius: levelConfig.outerCornerRadius ?? levelConfig.gap / 2,
+					innerCornerRadius: levelConfig.innerCornerRadius ?? levelConfig.gap / 2,
 					level,
 					offset: levelConfig.offset ?? 0,
 					gap: levelConfig.gap,
@@ -276,7 +281,8 @@
 		style:--slice-gap={slice.computed.gap}
 		style:--slice-outerR={slice.computed.outerR}
 		style:--slice-innerR={slice.computed.innerR}
-		style:--slice-cornerRadius={slice.computed.cornerRadius}
+		style:--slice-outerCornerRadius={slice.computed.outerCornerRadius}
+		style:--slice-innerCornerRadius={slice.computed.innerCornerRadius}
 		style:--slice-totalAngle={slice.computed.totalAngle}
 		style:--slice-arcSize={Math.abs(slice.computed.totalAngle) > 180 ? 'large' : 'small'}
 		class:full-ring={Math.abs(slice.computed.totalAngle) >= 359.99}
@@ -455,7 +461,7 @@
 					--slice-outerCornerR: max(
 						0,
 						min(
-							var(--slice-cornerRadius),
+							var(--slice-outerCornerRadius),
 							calc((var(--slice-outerR) - var(--slice-innerR)) / 2),
 							max(
 								0,
@@ -472,7 +478,7 @@
 					--slice-innerCornerR: max(
 						0,
 						min(
-							var(--slice-cornerRadius),
+							var(--slice-innerCornerRadius),
 							calc((var(--slice-outerR) - var(--slice-innerR)) / 2),
 							max(
 								0,
