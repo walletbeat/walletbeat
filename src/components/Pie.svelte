@@ -356,7 +356,7 @@
 
 	.container {
 		--highlight-color: rgba(255, 255, 255, 1);
-		--highlight-strokeWidth: 2;
+		--highlight-strokeWidth: 1.5px;
 		--hover-brightness: 1.1;
 		--hover-scale: 1.05;
 
@@ -396,10 +396,20 @@
 				--slice-scale: 1;
 				--slice-strokeColor: transparent;
 				--slice-strokeWidth: 0px;
+				--slice-filter:
+					brightness(var(--slice-brightness))
+				;
+				--slice-hover-filter:
+					brightness(var(--slice-brightness))
+					drop-shadow(var(--slice-strokeWidth) 0 var(--slice-strokeColor))
+					drop-shadow(0 calc(-1 * var(--slice-strokeWidth)) var(--slice-strokeColor))
+					drop-shadow(calc(-1 * var(--slice-strokeWidth)) 0 var(--slice-strokeColor))
+					drop-shadow(0 var(--slice-strokeWidth) var(--slice-strokeColor))
+				;
 
 				display: grid;
 
-				filter: brightness(var(--slice-brightness));
+				filter: var(--slice-filter);
 
 				pointer-events: none;
 				transition-property: filter;
@@ -420,6 +430,7 @@
 					--slice-scale: var(--hover-scale);
 					--slice-strokeColor: var(--highlight-color);
 					--slice-strokeWidth: var(--highlight-strokeWidth);
+					--slice-filter: var(--slice-hover-filter);
 				}
 
 				&:focus-within {
